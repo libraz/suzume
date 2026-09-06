@@ -2270,22 +2270,52 @@ def postprocess_classical_b_row_moteiku(tokens: list[dict]) -> bool:
     return False
 
 
+_CLASSICAL_RAMU = "らむ"
+# The cells the present conjecture attaches to are terminals, and a terminal is a
+# predicate of one of these classes.  A nominal in that slot is what the plural
+# suffix of the same spelling follows instead (子供ら), which is why the host is
+# tested rather than the two kana alone.
+_RAMU_HOST_POS = ("Verb", "Adjective", "Auxiliary")
+
+
 @reports_mutation
-def postprocess_classical_ramu_boundary(tokens: list[dict]) -> bool:
-    """Repair MeCab's one-kanji godan-ka plus らむ boundary."""
-    for idx, token in enumerate(tokens):
-        if idx == 0 or token.get("surface") != "くらむ" or token.get("pos") != "Verb":
-            continue
+def postprocess_classical_ramu_boundary(tokens: list[dict]) -> None:
+    """Repair the boundaries around the classical present conjecture らむ.
+
+    The reference dictionary carries no entry for the auxiliary, so its two kana
+    come apart wherever they stand.  Behind a one-kanji godan-ka stem they are
+    absorbed into a verb that spells the boundary away (く+らむ read as くらむ);
+    everywhere else they are left as a pair of nominals with no lemma between them
+    (見る+ら+む, 楽しかる+ら+む), which contradicts the same auxiliary being read
+    whole after the paradigms the dictionary does cover (行きたり+らむ).  The form
+    selects a terminal, so the predicate in front is what identifies it in both
+    shapes.
+    """
+    idx = 1
+    while idx < len(tokens):
+        token = tokens[idx]
         previous = tokens[idx - 1]
-        stem = previous.get("surface", "")
-        if previous.get("pos") != "Noun" or len(stem) != 1:
-            continue
-        previous["surface"] = f"{stem}く"
-        previous["pos"] = "Verb"
-        previous["lemma"] = f"{stem}く"
-        token["surface"] = "らむ"
-        token["pos"] = "Auxiliary"
-        token["lemma"] = "らむ"
+        if token.get("surface") == "くらむ" and token.get("pos") == "Verb":
+            stem = previous.get("surface", "")
+            if previous.get("pos") == "Noun" and len(stem) == 1:
+                previous["surface"] = f"{stem}く"
+                previous["pos"] = "Verb"
+                previous["lemma"] = f"{stem}く"
+                token["surface"] = _CLASSICAL_RAMU
+                token["pos"] = "Auxiliary"
+                token["lemma"] = _CLASSICAL_RAMU
+        elif (
+            token.get("surface") == "ら"
+            and idx + 1 < len(tokens)
+            and tokens[idx + 1].get("surface") == "む"
+            and tokens[idx + 1].get("pos") == "Noun"
+            and previous.get("pos") in _RAMU_HOST_POS
+        ):
+            token["surface"] = _CLASSICAL_RAMU
+            token["pos"] = "Auxiliary"
+            token["lemma"] = _CLASSICAL_RAMU
+            del tokens[idx + 1]
+        idx += 1
 
 
 def postprocess_classical_desiderative_aux(tokens: list[dict]) -> bool:

@@ -29,6 +29,10 @@ from .constants import (
 )
 from .mecab import is_single_token_of_pos
 
+# The word classes a terminal predicate belongs to, in the two tag vocabularies a
+# token may still be carrying at this point in the pipeline.
+_TERMINAL_PREDICATE_POS = ("動詞", "Verb", "形容詞", "Adjective")
+
 
 def _is_katakana_onomatopoeia(surface: str) -> bool:
     """Check if a katakana string is an onomatopoeia (reduplication pattern)."""
@@ -465,12 +469,14 @@ def correct_mecab_pos(tokens: list[dict]) -> None:
             t["pos"] = "助動詞"
 
         # Disambiguate まじ by its host. The classical negative conjectural shares
-        # its surface with the colloquial na-adjective: the auxiliary needs a verb
-        # in front of it (確認せまじ), while the adjective follows a nominal or opens
-        # the clause (それはまじ, まじで困る). MeCab tags both 助動詞, so the reading
-        # is decided here rather than mapped unconditionally.
+        # its surface with the colloquial na-adjective: the auxiliary needs a
+        # terminal predicate in front of it, which a verb supplies directly
+        # (確認せまじ) and an adjective through its supplementary conjugation
+        # (高かるまじ), while the adjective follows a nominal or opens the clause
+        # (それはまじ, まじで困る). MeCab tags both 助動詞, so the reading is decided
+        # here rather than mapped unconditionally.
         if surface == "まじ" and pos == "助動詞":
-            if idx > 0 and tokens[idx - 1].get("pos") in ("動詞", "Verb"):
+            if idx > 0 and tokens[idx - 1].get("pos") in _TERMINAL_PREDICATE_POS:
                 t["lemma"] = "まじ"
             else:
                 t["pos"] = "形容詞"
