@@ -1881,6 +1881,84 @@
       ],
       "id": "tarashii",
       "input": "未練たらしい"
+    },
+    {
+      "description": "マジで無理みある。 - regression test",
+      "expected": [
+        {
+          "lemma": "マジ",
+          "pos": "Noun",
+          "surface": "マジ"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "無理み",
+          "pos": "Noun",
+          "surface": "無理み"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        }
+      ],
+      "id": "de_miaru",
+      "input": "マジで無理みある。"
+    },
+    {
+      "description": "無理み - regression test",
+      "expected": [
+        {
+          "lemma": "無理み",
+          "pos": "Noun",
+          "surface": "無理み"
+        }
+      ],
+      "id": "mi_2",
+      "input": "無理み"
+    },
+    {
+      "description": "眠みある - regression test",
+      "expected": [
+        {
+          "lemma": "眠み",
+          "pos": "Noun",
+          "surface": "眠み"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        }
+      ],
+      "id": "miaru",
+      "input": "眠みある"
+    },
+    {
+      "description": "無理みがある - regression test",
+      "expected": [
+        {
+          "lemma": "無理み",
+          "pos": "Noun",
+          "surface": "無理み"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        }
+      ],
+      "id": "migaaru_2",
+      "input": "無理みがある"
     }
   ],
   "description": "General nouns (part 4/4)",
