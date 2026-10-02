@@ -1851,6 +1851,92 @@
       ],
       "id": "kono_deha_enai",
       "input": "この店では買えない"
+    },
+    {
+      "description": "てか、それ先に言ってよ。 - regression test",
+      "expected": [
+        {
+          "lemma": "てか",
+          "pos": "Conjunction",
+          "surface": "てか"
+        },
+        {
+          "lemma": "それ",
+          "pos": "Pronoun",
+          "surface": "それ"
+        },
+        {
+          "lemma": "先",
+          "pos": "Suffix",
+          "surface": "先"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "teka_sore_ni_ttteyo",
+      "input": "てか、それ先に言ってよ。"
+    },
+    {
+      "description": "てかさ、それ何 - regression test",
+      "expected": [
+        {
+          "lemma": "てか",
+          "pos": "Conjunction",
+          "surface": "てか"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Particle",
+          "surface": "さ"
+        },
+        {
+          "lemma": "それ",
+          "pos": "Pronoun",
+          "surface": "それ"
+        },
+        {
+          "lemma": "何",
+          "pos": "Pronoun",
+          "surface": "何"
+        }
+      ],
+      "id": "tekasa_sore",
+      "input": "てかさ、それ何"
+    },
+    {
+      "description": "ってか、無理 - regression test",
+      "expected": [
+        {
+          "lemma": "ってか",
+          "pos": "Conjunction",
+          "surface": "ってか"
+        },
+        {
+          "lemma": "無理",
+          "pos": "Adjective",
+          "surface": "無理"
+        }
+      ],
+      "id": "ttteka",
+      "input": "ってか、無理"
     }
   ],
   "description": "conjunction tests",

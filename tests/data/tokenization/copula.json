@@ -2408,6 +2408,173 @@
       ],
       "id": "soremomotttomoda",
       "input": "それももっともだ"
+    },
+    {
+      "description": "それはもうおなじなんよ。 - regression test",
+      "expected": [
+        {
+          "lemma": "それ",
+          "pos": "Pronoun",
+          "surface": "それ"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "もう",
+          "pos": "Adverb",
+          "surface": "もう"
+        },
+        {
+          "lemma": "おなじ",
+          "pos": "Adjective",
+          "surface": "おなじ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "sorehamouonajinanyo",
+      "input": "それはもうおなじなんよ。"
+    },
+    {
+      "description": "おなじなんです - regression test",
+      "expected": [
+        {
+          "lemma": "おなじ",
+          "pos": "Adjective",
+          "surface": "おなじ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "onajinandesu",
+      "input": "おなじなんです"
+    },
+    {
+      "description": "おなじだ - regression test",
+      "expected": [
+        {
+          "lemma": "おなじ",
+          "pos": "Adjective",
+          "surface": "おなじ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "onajida",
+      "input": "おなじだ"
+    },
+    {
+      "description": "しなない - regression test",
+      "expected": [
+        {
+          "lemma": "しぬ",
+          "pos": "Verb",
+          "surface": "しな"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "shinanai",
+      "input": "しなない"
+    },
+    {
+      "description": "今日ずっとバイトでしんどみがある。 - regression test",
+      "expected": [
+        {
+          "lemma": "今日",
+          "pos": "Noun",
+          "surface": "今日"
+        },
+        {
+          "lemma": "ずっと",
+          "pos": "Adverb",
+          "surface": "ずっと"
+        },
+        {
+          "lemma": "バイト",
+          "pos": "Noun",
+          "surface": "バイト"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "しんどみ",
+          "pos": "Noun",
+          "surface": "しんどみ"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        }
+      ],
+      "id": "zuttto_deshindomigaaru",
+      "input": "今日ずっとバイトでしんどみがある。"
+    },
+    {
+      "description": "雨でしたら - regression test",
+      "expected": [
+        {
+          "lemma": "雨",
+          "pos": "Noun",
+          "surface": "雨"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "でし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "たら"
+        }
+      ],
+      "id": "deshitara",
+      "input": "雨でしたら"
     }
   ],
   "description": "Copula patterns (だ、です、である)",

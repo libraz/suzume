@@ -1201,6 +1201,141 @@
       ],
       "id": "wo_kasarenu",
       "input": "心を動かされぬ"
+    },
+    {
+      "description": "歌わされずに済んだ。 - regression test",
+      "expected": [
+        {
+          "lemma": "歌う",
+          "pos": "Verb",
+          "surface": "歌わ"
+        },
+        {
+          "lemma": "す",
+          "pos": "Auxiliary",
+          "surface": "さ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "ず",
+          "pos": "Auxiliary",
+          "surface": "ずに"
+        },
+        {
+          "lemma": "済む",
+          "pos": "Verb",
+          "surface": "済ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "wasarezuni_nda",
+      "input": "歌わされずに済んだ。"
+    },
+    {
+      "description": "歌われずに - regression test",
+      "expected": [
+        {
+          "lemma": "歌う",
+          "pos": "Verb",
+          "surface": "歌わ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "ず",
+          "pos": "Auxiliary",
+          "surface": "ずに"
+        }
+      ],
+      "id": "warezuni",
+      "input": "歌われずに"
+    },
+    {
+      "description": "言わせずにおく - regression test",
+      "expected": [
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言わ"
+        },
+        {
+          "lemma": "せる",
+          "pos": "Auxiliary",
+          "surface": "せ"
+        },
+        {
+          "lemma": "ず",
+          "pos": "Auxiliary",
+          "surface": "ずに"
+        },
+        {
+          "lemma": "おく",
+          "pos": "Verb",
+          "surface": "おく"
+        }
+      ],
+      "id": "wasezunioku",
+      "input": "言わせずにおく"
+    },
+    {
+      "description": "書かされずに - regression test",
+      "expected": [
+        {
+          "lemma": "書く",
+          "pos": "Verb",
+          "surface": "書か"
+        },
+        {
+          "lemma": "す",
+          "pos": "Auxiliary",
+          "surface": "さ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "ず",
+          "pos": "Auxiliary",
+          "surface": "ずに"
+        }
+      ],
+      "id": "kasarezuni",
+      "input": "書かされずに"
+    },
+    {
+      "description": "知られぬ - regression test",
+      "expected": [
+        {
+          "lemma": "知る",
+          "pos": "Verb",
+          "surface": "知ら"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬ"
+        }
+      ],
+      "id": "rarenu",
+      "input": "知られぬ"
     }
   ],
   "description": "Passive voice verbs (受身形) - MeCab-compatible split format",

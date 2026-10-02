@@ -787,6 +787,143 @@
       ],
       "id": "na_9",
       "input": "直接的な影響"
+    },
+    {
+      "description": "政府は来年度予算を閣議決定した。 - regression test",
+      "expected": [
+        {
+          "lemma": "政府",
+          "pos": "Noun",
+          "surface": "政府"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "来年度",
+          "pos": "Noun",
+          "surface": "来年度"
+        },
+        {
+          "lemma": "予算",
+          "pos": "Noun",
+          "surface": "予算"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "閣議決定",
+          "pos": "Noun",
+          "surface": "閣議決定"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ha_wo_shita",
+      "input": "政府は来年度予算を閣議決定した。"
+    },
+    {
+      "description": "今年度予算 - regression test",
+      "expected": [
+        {
+          "lemma": "今年度",
+          "pos": "Noun",
+          "surface": "今年度"
+        },
+        {
+          "lemma": "予算",
+          "pos": "Noun",
+          "surface": "予算"
+        }
+      ],
+      "id": "unnamed_35",
+      "input": "今年度予算"
+    },
+    {
+      "description": "昨年度予算 - regression test",
+      "expected": [
+        {
+          "lemma": "昨年度",
+          "pos": "Noun",
+          "surface": "昨年度"
+        },
+        {
+          "lemma": "予算",
+          "pos": "Noun",
+          "surface": "予算"
+        }
+      ],
+      "id": "unnamed_36",
+      "input": "昨年度予算"
+    },
+    {
+      "description": "来年度計画 - regression test",
+      "expected": [
+        {
+          "lemma": "来年度",
+          "pos": "Noun",
+          "surface": "来年度"
+        },
+        {
+          "lemma": "計画",
+          "pos": "Noun",
+          "surface": "計画"
+        }
+      ],
+      "id": "unnamed_37",
+      "input": "来年度計画"
+    },
+    {
+      "description": "取り沙汰される - regression test",
+      "expected": [
+        {
+          "lemma": "取り沙汰",
+          "pos": "Noun",
+          "surface": "取り沙汰"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "さ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れる"
+        }
+      ],
+      "id": "ri_sareru",
+      "input": "取り沙汰される"
+    },
+    {
+      "description": "取り沙汰が - regression test",
+      "expected": [
+        {
+          "lemma": "取り沙汰",
+          "pos": "Noun",
+          "surface": "取り沙汰"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        }
+      ],
+      "id": "ri_ga",
+      "input": "取り沙汰が"
     }
   ],
   "description": "noun_compounds tests",

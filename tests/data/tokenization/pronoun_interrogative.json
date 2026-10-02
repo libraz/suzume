@@ -1,0 +1,146 @@
+{
+  "cases": [
+    {
+      "description": "どうでもよくなった - regression test",
+      "expected": [
+        {
+          "lemma": "どう",
+          "pos": "Adjective",
+          "surface": "どう"
+        },
+        {
+          "lemma": "でも",
+          "pos": "Particle",
+          "surface": "でも"
+        },
+        {
+          "lemma": "よい",
+          "pos": "Adjective",
+          "surface": "よく"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "doudemoyokunattta",
+      "input": "どうでもよくなった"
+    },
+    {
+      "description": "もうどうでもよくなった。 - regression test",
+      "expected": [
+        {
+          "lemma": "もう",
+          "pos": "Adverb",
+          "surface": "もう"
+        },
+        {
+          "lemma": "どう",
+          "pos": "Adjective",
+          "surface": "どう"
+        },
+        {
+          "lemma": "でも",
+          "pos": "Particle",
+          "surface": "でも"
+        },
+        {
+          "lemma": "よい",
+          "pos": "Adjective",
+          "surface": "よく"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "moudoudemoyokunattta",
+      "input": "もうどうでもよくなった。"
+    },
+    {
+      "description": "どうする - regression test",
+      "expected": [
+        {
+          "lemma": "どう",
+          "pos": "Adjective",
+          "surface": "どう"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "dousuru",
+      "input": "どうする"
+    },
+    {
+      "description": "どうなった - regression test",
+      "expected": [
+        {
+          "lemma": "どう",
+          "pos": "Adjective",
+          "surface": "どう"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "dounattta",
+      "input": "どうなった"
+    },
+    {
+      "description": "明日はどうするの？ - regression test",
+      "expected": [
+        {
+          "lemma": "明日",
+          "pos": "Noun",
+          "surface": "明日"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "どう",
+          "pos": "Adjective",
+          "surface": "どう"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        }
+      ],
+      "id": "hadousuruno",
+      "input": "明日はどうするの？"
+    }
+  ],
+  "description": "pronoun_interrogative tests",
+  "version": "1.0"
+}

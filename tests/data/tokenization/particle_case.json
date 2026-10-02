@@ -1014,6 +1014,217 @@
       ],
       "id": "betekara_he",
       "input": "食べてから会場へ"
+    },
+    {
+      "description": "増となった - regression test",
+      "expected": [
+        {
+          "lemma": "増",
+          "pos": "Noun",
+          "surface": "増"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "tonattta",
+      "input": "増となった"
+    },
+    {
+      "description": "減となった - regression test",
+      "expected": [
+        {
+          "lemma": "減",
+          "pos": "Noun",
+          "surface": "減"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "tonattta_2",
+      "input": "減となった"
+    },
+    {
+      "description": "夢となった - regression test",
+      "expected": [
+        {
+          "lemma": "夢",
+          "pos": "Noun",
+          "surface": "夢"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "tonattta_3",
+      "input": "夢となった"
+    },
+    {
+      "description": "減となっている - regression test",
+      "expected": [
+        {
+          "lemma": "減",
+          "pos": "Noun",
+          "surface": "減"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "tonattteiru",
+      "input": "減となっている"
+    },
+    {
+      "description": "関係者への取材で分かった。 - regression test",
+      "expected": [
+        {
+          "lemma": "関係者",
+          "pos": "Noun",
+          "surface": "関係者"
+        },
+        {
+          "lemma": "へ",
+          "pos": "Particle",
+          "surface": "へ"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "取材",
+          "pos": "Noun",
+          "surface": "取材"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "分かる",
+          "pos": "Verb",
+          "surface": "分かっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "heno_de_kattta",
+      "input": "関係者への取材で分かった。"
+    },
+    {
+      "description": "責任者へ - regression test",
+      "expected": [
+        {
+          "lemma": "責任者",
+          "pos": "Noun",
+          "surface": "責任者"
+        },
+        {
+          "lemma": "へ",
+          "pos": "Particle",
+          "surface": "へ"
+        }
+      ],
+      "id": "he",
+      "input": "責任者へ"
+    },
+    {
+      "description": "消費者への - regression test",
+      "expected": [
+        {
+          "lemma": "消費者",
+          "pos": "Noun",
+          "surface": "消費者"
+        },
+        {
+          "lemma": "へ",
+          "pos": "Particle",
+          "surface": "へ"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        }
+      ],
+      "id": "heno",
+      "input": "消費者への"
+    },
+    {
+      "description": "経済成長へ - regression test",
+      "expected": [
+        {
+          "lemma": "経済成長",
+          "pos": "Noun",
+          "surface": "経済成長"
+        },
+        {
+          "lemma": "へ",
+          "pos": "Particle",
+          "surface": "へ"
+        }
+      ],
+      "id": "he_2",
+      "input": "経済成長へ"
     }
   ],
   "description": "Case particles (が、を、に、で)",

@@ -238,6 +238,360 @@
       ],
       "id": "souiukotonishitokou",
       "input": "そういうことにしとこう"
+    },
+    {
+      "description": "やめとけって言ったのに聞かないんだもん。 - regression test",
+      "expected": [
+        {
+          "lemma": "やめる",
+          "pos": "Verb",
+          "surface": "やめ"
+        },
+        {
+          "lemma": "とく",
+          "pos": "Auxiliary",
+          "surface": "とけ"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "のに",
+          "pos": "Particle",
+          "surface": "のに"
+        },
+        {
+          "lemma": "聞く",
+          "pos": "Verb",
+          "surface": "聞か"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "もん",
+          "pos": "Noun",
+          "surface": "もん"
+        }
+      ],
+      "id": "yametokettte_tttanoni_kanaindamon",
+      "input": "やめとけって言ったのに聞かないんだもん。"
+    },
+    {
+      "description": "書いとけって - regression test",
+      "expected": [
+        {
+          "lemma": "書く",
+          "pos": "Verb",
+          "surface": "書い"
+        },
+        {
+          "lemma": "とく",
+          "pos": "Auxiliary",
+          "surface": "とけ"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        }
+      ],
+      "id": "itokettte",
+      "input": "書いとけって"
+    },
+    {
+      "description": "あれ、まだ書いといてないんじゃなかったっけ？ - regression test",
+      "expected": [
+        {
+          "lemma": "あれ",
+          "pos": "Interjection",
+          "surface": "あれ"
+        },
+        {
+          "lemma": "まだ",
+          "pos": "Adverb",
+          "surface": "まだ"
+        },
+        {
+          "lemma": "書く",
+          "pos": "Verb",
+          "surface": "書い"
+        },
+        {
+          "lemma": "とく",
+          "pos": "Auxiliary",
+          "surface": "とい"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "じゃ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "っけ",
+          "pos": "Particle",
+          "surface": "っけ"
+        }
+      ],
+      "id": "are_mada_itoitenainji_nakatttattke",
+      "input": "あれ、まだ書いといてないんじゃなかったっけ？"
+    },
+    {
+      "description": "書いとこう - regression test",
+      "expected": [
+        {
+          "lemma": "書く",
+          "pos": "Verb",
+          "surface": "書い"
+        },
+        {
+          "lemma": "とく",
+          "pos": "Auxiliary",
+          "surface": "とこ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "itokou",
+      "input": "書いとこう"
+    },
+    {
+      "description": "読んどけって - regression test",
+      "expected": [
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読ん"
+        },
+        {
+          "lemma": "どく",
+          "pos": "Auxiliary",
+          "surface": "どけ"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        }
+      ],
+      "id": "ndokettte",
+      "input": "読んどけって"
+    },
+    {
+      "description": "そうなんすか。 - regression test",
+      "expected": [
+        {
+          "lemma": "そう",
+          "pos": "Adjective",
+          "surface": "そう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "す"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "sounansuka",
+      "input": "そうなんすか。"
+    },
+    {
+      "description": "いいんすか - regression test",
+      "expected": [
+        {
+          "lemma": "いい",
+          "pos": "Adjective",
+          "surface": "いい"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "す"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "iinsuka",
+      "input": "いいんすか"
+    },
+    {
+      "description": "行くんすか - regression test",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行く"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "す"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "kunsuka",
+      "input": "行くんすか"
+    },
+    {
+      "description": "ワンチャンいけるっしょ。 - regression test",
+      "expected": [
+        {
+          "lemma": "ワンチャン",
+          "pos": "Noun",
+          "surface": "ワンチャン"
+        },
+        {
+          "lemma": "いける",
+          "pos": "Verb",
+          "surface": "いける"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "っしょ"
+        }
+      ],
+      "id": "ikeruttshi",
+      "input": "ワンチャンいけるっしょ。"
+    },
+    {
+      "description": "行けるっしょ - regression test",
+      "expected": [
+        {
+          "lemma": "行ける",
+          "pos": "Verb",
+          "surface": "行ける"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "っしょ"
+        }
+      ],
+      "id": "keruttshi",
+      "input": "行けるっしょ"
+    },
+    {
+      "description": "なんとかなるっしょ - regression test",
+      "expected": [
+        {
+          "lemma": "なんとか",
+          "pos": "Adverb",
+          "surface": "なんとか"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なる"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "っしょ"
+        }
+      ],
+      "id": "nantokanaruttshi",
+      "input": "なんとかなるっしょ"
+    },
+    {
+      "description": "うまいっしょ - regression test",
+      "expected": [
+        {
+          "lemma": "うまい",
+          "pos": "Adjective",
+          "surface": "うまい"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "っしょ"
+        }
+      ],
+      "id": "umaittshi",
+      "input": "うまいっしょ"
     }
   ],
   "description": "auxiliary_colloquial tests",

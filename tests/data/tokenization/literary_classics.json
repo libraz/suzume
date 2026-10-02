@@ -1646,7 +1646,7 @@
         },
         {
           "lemma": "ない",
-          "pos": "Adjective",
+          "pos": "Auxiliary",
           "surface": "ない"
         },
         {
@@ -1884,7 +1884,7 @@
         },
         {
           "lemma": "ない",
-          "pos": "Adjective",
+          "pos": "Auxiliary",
           "surface": "ない"
         }
       ],

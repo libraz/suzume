@@ -91,6 +91,161 @@
       ],
       "id": "re",
       "input": "頑張れ"
+    },
+    {
+      "description": "早くググってみなよ。 - regression test",
+      "expected": [
+        {
+          "lemma": "早い",
+          "pos": "Adjective",
+          "surface": "早く"
+        },
+        {
+          "lemma": "ググる",
+          "pos": "Verb",
+          "surface": "ググっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "みる",
+          "pos": "Auxiliary",
+          "surface": "み"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "ku_ttteminayo",
+      "input": "早くググってみなよ。"
+    },
+    {
+      "description": "食べてみな - regression test",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "みる",
+          "pos": "Auxiliary",
+          "surface": "み"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        }
+      ],
+      "id": "betemina",
+      "input": "食べてみな"
+    },
+    {
+      "description": "見てみなよ - regression test",
+      "expected": [
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "みる",
+          "pos": "Auxiliary",
+          "surface": "み"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "teminayo",
+      "input": "見てみなよ"
+    },
+    {
+      "description": "読んでみなよ - regression test",
+      "expected": [
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読ん"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "みる",
+          "pos": "Auxiliary",
+          "surface": "み"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "ndeminayo",
+      "input": "読んでみなよ"
+    },
+    {
+      "description": "来てみな - regression test",
+      "expected": [
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "みる",
+          "pos": "Auxiliary",
+          "surface": "み"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        }
+      ],
+      "id": "temina",
+      "input": "来てみな"
     }
   ],
   "description": "verb_imperative tests",

@@ -1,0 +1,124 @@
+{
+  "cases": [
+    {
+      "description": "行ったやろ - regression test",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "や",
+          "pos": "Auxiliary",
+          "surface": "やろ"
+        }
+      ],
+      "id": "tttayaro",
+      "input": "行ったやろ"
+    },
+    {
+      "description": "聞いたことある - regression test",
+      "expected": [
+        {
+          "lemma": "聞く",
+          "pos": "Verb",
+          "surface": "聞い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "こと"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        }
+      ],
+      "id": "itakotoaru",
+      "input": "聞いたことある"
+    },
+    {
+      "description": "見たことあるよ - regression test",
+      "expected": [
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "こと"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "takotoaruyo",
+      "input": "見たことあるよ"
+    },
+    {
+      "description": "はよ行かなあかんで。 - regression test",
+      "expected": [
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行か"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "あかん",
+          "pos": "Auxiliary",
+          "surface": "あかん"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        }
+      ],
+      "id": "hayo_kanaakande",
+      "input": "はよ行かなあかんで。"
+    }
+  ],
+  "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",
+  "version": "1.0"
+}

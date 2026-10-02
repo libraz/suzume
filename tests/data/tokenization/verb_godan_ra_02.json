@@ -1,0 +1,23 @@
+{
+  "cases": [
+    {
+      "description": "沼らせる - regression test",
+      "expected": [
+        {
+          "lemma": "沼る",
+          "pos": "Verb",
+          "surface": "沼ら"
+        },
+        {
+          "lemma": "せる",
+          "pos": "Auxiliary",
+          "surface": "せる"
+        }
+      ],
+      "id": "raseru_3",
+      "input": "沼らせる"
+    }
+  ],
+  "description": "Godan Ra-row verbs (五段ラ行動詞) - verbs ending in る (part 2/2)",
+  "version": "1.0"
+}

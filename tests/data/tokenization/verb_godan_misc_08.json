@@ -2382,8 +2382,390 @@
       ],
       "id": "hikaraseba",
       "input": "光らせば"
+    },
+    {
+      "description": "もう帰らなあかんねん。 - regression test",
+      "expected": [
+        {
+          "lemma": "もう",
+          "pos": "Adverb",
+          "surface": "もう"
+        },
+        {
+          "lemma": "帰る",
+          "pos": "Verb",
+          "surface": "帰ら"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "あかん",
+          "pos": "Auxiliary",
+          "surface": "あかん"
+        },
+        {
+          "lemma": "ねん",
+          "pos": "Particle",
+          "surface": "ねん"
+        }
+      ],
+      "id": "mou_ranaakannen",
+      "input": "もう帰らなあかんねん。"
+    },
+    {
+      "description": "書いたらあかんねん - regression test",
+      "expected": [
+        {
+          "lemma": "書く",
+          "pos": "Verb",
+          "surface": "書い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "たら"
+        },
+        {
+          "lemma": "あかん",
+          "pos": "Auxiliary",
+          "surface": "あかん"
+        },
+        {
+          "lemma": "ねん",
+          "pos": "Particle",
+          "surface": "ねん"
+        }
+      ],
+      "id": "itaraakannen",
+      "input": "書いたらあかんねん"
+    },
+    {
+      "description": "乾かせば - regression test",
+      "expected": [
+        {
+          "lemma": "乾かす",
+          "pos": "Verb",
+          "surface": "乾かせ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "kaseba",
+      "input": "乾かせば"
+    },
+    {
+      "description": "髪を乾かせば - regression test",
+      "expected": [
+        {
+          "lemma": "髪",
+          "pos": "Noun",
+          "surface": "髪"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "乾かす",
+          "pos": "Verb",
+          "surface": "乾かせ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "wo_kaseba",
+      "input": "髪を乾かせば"
+    },
+    {
+      "description": "それはそうと、お腹すいた。 - regression test",
+      "expected": [
+        {
+          "lemma": "それ",
+          "pos": "Pronoun",
+          "surface": "それ"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "そう",
+          "pos": "Adverb",
+          "surface": "そう"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "腹",
+          "pos": "Noun",
+          "surface": "腹"
+        },
+        {
+          "lemma": "すく",
+          "pos": "Verb",
+          "surface": "すい"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "sorehasouto_o_suita",
+      "input": "それはそうと、お腹すいた。"
+    },
+    {
+      "description": "腹すいた - regression test",
+      "expected": [
+        {
+          "lemma": "腹",
+          "pos": "Noun",
+          "surface": "腹"
+        },
+        {
+          "lemma": "すく",
+          "pos": "Verb",
+          "surface": "すい"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "suita",
+      "input": "腹すいた"
+    },
+    {
+      "description": "手すいた - regression test",
+      "expected": [
+        {
+          "lemma": "手",
+          "pos": "Noun",
+          "surface": "手"
+        },
+        {
+          "lemma": "すく",
+          "pos": "Verb",
+          "surface": "すい"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "suita_2",
+      "input": "手すいた"
+    },
+    {
+      "description": "もう終わっとうよ。 - regression test",
+      "expected": [
+        {
+          "lemma": "もう",
+          "pos": "Adverb",
+          "surface": "もう"
+        },
+        {
+          "lemma": "終わる",
+          "pos": "Verb",
+          "surface": "終わっ"
+        },
+        {
+          "lemma": "とう",
+          "pos": "Auxiliary",
+          "surface": "とう"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "mou_watttouyo",
+      "input": "もう終わっとうよ。"
+    },
+    {
+      "description": "待っとうよ - regression test",
+      "expected": [
+        {
+          "lemma": "待つ",
+          "pos": "Verb",
+          "surface": "待っ"
+        },
+        {
+          "lemma": "とう",
+          "pos": "Auxiliary",
+          "surface": "とう"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "tttouyo",
+      "input": "待っとうよ"
+    },
+    {
+      "description": "知っとう - regression test",
+      "expected": [
+        {
+          "lemma": "知る",
+          "pos": "Verb",
+          "surface": "知っ"
+        },
+        {
+          "lemma": "とう",
+          "pos": "Auxiliary",
+          "surface": "とう"
+        }
+      ],
+      "id": "tttou",
+      "input": "知っとう"
+    },
+    {
+      "description": "読んどう - regression test",
+      "expected": [
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読ん"
+        },
+        {
+          "lemma": "どう",
+          "pos": "Auxiliary",
+          "surface": "どう"
+        }
+      ],
+      "id": "ndou",
+      "input": "読んどう"
+    },
+    {
+      "description": "食べるけえ - regression test",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べる"
+        },
+        {
+          "lemma": "け",
+          "pos": "Particle",
+          "surface": "けえ"
+        }
+      ],
+      "id": "berukee",
+      "input": "食べるけえ"
+    },
+    {
+      "description": "行くけえね - regression test",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行く"
+        },
+        {
+          "lemma": "け",
+          "pos": "Particle",
+          "surface": "けえ"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        }
+      ],
+      "id": "kukeene",
+      "input": "行くけえね"
+    },
+    {
+      "description": "これめっちゃうまいやん。 - regression test",
+      "expected": [
+        {
+          "lemma": "これ",
+          "pos": "Pronoun",
+          "surface": "これ"
+        },
+        {
+          "lemma": "めっちゃ",
+          "pos": "Adverb",
+          "surface": "めっちゃ"
+        },
+        {
+          "lemma": "うまい",
+          "pos": "Adjective",
+          "surface": "うまい"
+        },
+        {
+          "lemma": "やん",
+          "pos": "Auxiliary",
+          "surface": "やん"
+        }
+      ],
+      "id": "koremettchi_umaiyan",
+      "input": "これめっちゃうまいやん。"
+    },
+    {
+      "description": "食べたやん - regression test",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "やん",
+          "pos": "Auxiliary",
+          "surface": "やん"
+        }
+      ],
+      "id": "betayan",
+      "input": "食べたやん"
+    },
+    {
+      "description": "高いやん - regression test",
+      "expected": [
+        {
+          "lemma": "高い",
+          "pos": "Adjective",
+          "surface": "高い"
+        },
+        {
+          "lemma": "やん",
+          "pos": "Auxiliary",
+          "surface": "やん"
+        }
+      ],
+      "id": "iyan",
+      "input": "高いやん"
     }
   ],
-  "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 8/8)",
+  "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 8/9)",
   "version": "1.0"
 }

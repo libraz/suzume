@@ -31,6 +31,45 @@
       ],
       "id": "sorehamajide_ru",
       "input": "それはまじで困る"
+    },
+    {
+      "description": "だいじょうぶだよ - regression test",
+      "expected": [
+        {
+          "lemma": "だいじょうぶ",
+          "pos": "Adjective",
+          "surface": "だいじょうぶ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "daiji_ubudayo",
+      "input": "だいじょうぶだよ"
+    },
+    {
+      "description": "だいじょうぶです - regression test",
+      "expected": [
+        {
+          "lemma": "だいじょうぶ",
+          "pos": "Adjective",
+          "surface": "だいじょうぶ"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "daiji_ubudesu",
+      "input": "だいじょうぶです"
     }
   ],
   "description": "adjective_na_basic tests",

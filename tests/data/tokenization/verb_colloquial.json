@@ -154,6 +154,164 @@
       ],
       "id": "woshiteru",
       "input": "毎日仕事をしてる"
+    },
+    {
+      "description": "あいつ最近ディスりすぎ。 - regression test",
+      "expected": [
+        {
+          "lemma": "あいつ",
+          "pos": "Pronoun",
+          "surface": "あいつ"
+        },
+        {
+          "lemma": "最近",
+          "pos": "Noun",
+          "surface": "最近"
+        },
+        {
+          "lemma": "ディスる",
+          "pos": "Verb",
+          "surface": "ディスり"
+        },
+        {
+          "lemma": "すぎる",
+          "pos": "Verb",
+          "surface": "すぎ"
+        }
+      ],
+      "id": "aitsu_risugi",
+      "input": "あいつ最近ディスりすぎ。"
+    },
+    {
+      "description": "テンパりすぎ - regression test",
+      "expected": [
+        {
+          "lemma": "テンパる",
+          "pos": "Verb",
+          "surface": "テンパり"
+        },
+        {
+          "lemma": "すぎる",
+          "pos": "Verb",
+          "surface": "すぎ"
+        }
+      ],
+      "id": "risugi",
+      "input": "テンパりすぎ"
+    },
+    {
+      "description": "ディスります - regression test",
+      "expected": [
+        {
+          "lemma": "ディスる",
+          "pos": "Verb",
+          "surface": "ディスり"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "rimasu_2",
+      "input": "ディスります"
+    },
+    {
+      "description": "がんばって - regression test",
+      "expected": [
+        {
+          "lemma": "がんばる",
+          "pos": "Verb",
+          "surface": "がんばっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "ganbattte",
+      "input": "がんばって"
+    },
+    {
+      "description": "がんばらない - regression test",
+      "expected": [
+        {
+          "lemma": "がんばる",
+          "pos": "Verb",
+          "surface": "がんばら"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "ganbaranai",
+      "input": "がんばらない"
+    },
+    {
+      "description": "がんばれ - regression test",
+      "expected": [
+        {
+          "lemma": "がんばる",
+          "pos": "Verb",
+          "surface": "がんばれ"
+        }
+      ],
+      "id": "ganbare",
+      "input": "がんばれ"
+    },
+    {
+      "description": "がんばります - regression test",
+      "expected": [
+        {
+          "lemma": "がんばる",
+          "pos": "Verb",
+          "surface": "がんばり"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "ganbarimasu",
+      "input": "がんばります"
+    },
+    {
+      "description": "頑張ろ - regression test",
+      "expected": [
+        {
+          "lemma": "頑張る",
+          "pos": "Verb",
+          "surface": "頑張ろ"
+        }
+      ],
+      "id": "ro",
+      "input": "頑張ろ"
+    },
+    {
+      "description": "今日もがんばろ。 - regression test",
+      "expected": [
+        {
+          "lemma": "今日",
+          "pos": "Noun",
+          "surface": "今日"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "がんばる",
+          "pos": "Verb",
+          "surface": "がんばろ"
+        }
+      ],
+      "id": "moganbaro",
+      "input": "今日もがんばろ。"
     }
   ],
   "description": "verb_colloquial tests",

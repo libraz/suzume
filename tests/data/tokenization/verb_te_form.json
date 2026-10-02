@@ -312,6 +312,267 @@
       ],
       "id": "gakanattte_shii",
       "input": "夢がかなって嬉しい"
+    },
+    {
+      "description": "読んでもらっちゃってごめんね。 - regression test",
+      "expected": [
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読ん"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "もらう",
+          "pos": "Auxiliary",
+          "surface": "もらっ"
+        },
+        {
+          "lemma": "ちゃう",
+          "pos": "Auxiliary",
+          "surface": "ちゃっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "ごめん",
+          "pos": "Interjection",
+          "surface": "ごめん"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        }
+      ],
+      "id": "ndemorattchi_tttegomenne",
+      "input": "読んでもらっちゃってごめんね。"
+    },
+    {
+      "description": "書いてもらっちゃって - regression test",
+      "expected": [
+        {
+          "lemma": "書く",
+          "pos": "Verb",
+          "surface": "書い"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "もらう",
+          "pos": "Auxiliary",
+          "surface": "もらっ"
+        },
+        {
+          "lemma": "ちゃう",
+          "pos": "Auxiliary",
+          "surface": "ちゃっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "itemorattchi_ttte",
+      "input": "書いてもらっちゃって"
+    },
+    {
+      "description": "ちょっと待っててくんない？ - regression test",
+      "expected": [
+        {
+          "lemma": "ちょっと",
+          "pos": "Adverb",
+          "surface": "ちょっと"
+        },
+        {
+          "lemma": "待つ",
+          "pos": "Verb",
+          "surface": "待っ"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "て"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くれる",
+          "pos": "Auxiliary",
+          "surface": "くん"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "chi_ttto_tttetekunnai",
+      "input": "ちょっと待っててくんない？"
+    },
+    {
+      "description": "待っててくれない - regression test",
+      "expected": [
+        {
+          "lemma": "待つ",
+          "pos": "Verb",
+          "surface": "待っ"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "て"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くれる",
+          "pos": "Auxiliary",
+          "surface": "くれ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "tttetekurenai",
+      "input": "待っててくれない"
+    },
+    {
+      "description": "見ててくんない - regression test",
+      "expected": [
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "て"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くれる",
+          "pos": "Auxiliary",
+          "surface": "くん"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "tetekunnai",
+      "input": "見ててくんない"
+    },
+    {
+      "description": "やっててくれた - regression test",
+      "expected": [
+        {
+          "lemma": "やる",
+          "pos": "Verb",
+          "surface": "やっ"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "て"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くれる",
+          "pos": "Auxiliary",
+          "surface": "くれ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "yatttetekureta",
+      "input": "やっててくれた"
+    },
+    {
+      "description": "手伝ってくんない - regression test",
+      "expected": [
+        {
+          "lemma": "手伝う",
+          "pos": "Verb",
+          "surface": "手伝っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くれる",
+          "pos": "Auxiliary",
+          "surface": "くん"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "tttekunnai",
+      "input": "手伝ってくんない"
+    },
+    {
+      "description": "待っててね - regression test",
+      "expected": [
+        {
+          "lemma": "待つ",
+          "pos": "Verb",
+          "surface": "待っ"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "て"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        }
+      ],
+      "id": "tttetene",
+      "input": "待っててね"
     }
   ],
   "description": "verb_te_form tests",

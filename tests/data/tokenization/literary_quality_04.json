@@ -4275,8 +4275,112 @@
       ],
       "id": "noun_yorimo_comparison",
       "input": "昨日よりも今日の空が明るかった。"
+    },
+    {
+      "description": "そうした懸念を払拭するには至っていない。 - regression test",
+      "expected": [
+        {
+          "lemma": "そうした",
+          "pos": "Determiner",
+          "surface": "そうした"
+        },
+        {
+          "lemma": "懸念",
+          "pos": "Noun",
+          "surface": "懸念"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "払拭",
+          "pos": "Noun",
+          "surface": "払拭"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "至る",
+          "pos": "Verb",
+          "surface": "至っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "い"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "soushita_wo_suruniha_ttteinai",
+      "input": "そうした懸念を払拭するには至っていない。"
+    },
+    {
+      "description": "結論には至っていない - regression test",
+      "expected": [
+        {
+          "lemma": "結論",
+          "pos": "Noun",
+          "surface": "結論"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "至る",
+          "pos": "Verb",
+          "surface": "至っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "い"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "niha_ttteinai",
+      "input": "結論には至っていない"
     }
   ],
-  "description": "literary_quality tests (part 4/4)",
+  "description": "literary_quality tests (part 4/5)",
   "version": "1.0"
 }

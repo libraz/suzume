@@ -2636,8 +2636,52 @@
       ],
       "id": "ttta_6",
       "input": "牛耳った組織"
+    },
+    {
+      "description": "最近ずっと沼ってる。 - regression test",
+      "expected": [
+        {
+          "lemma": "最近",
+          "pos": "Noun",
+          "surface": "最近"
+        },
+        {
+          "lemma": "ずっと",
+          "pos": "Adverb",
+          "surface": "ずっと"
+        },
+        {
+          "lemma": "沼る",
+          "pos": "Verb",
+          "surface": "沼っ"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てる"
+        }
+      ],
+      "id": "zuttto_ttteru",
+      "input": "最近ずっと沼ってる。"
+    },
+    {
+      "description": "沼っちゃう - regression test",
+      "expected": [
+        {
+          "lemma": "沼る",
+          "pos": "Verb",
+          "surface": "沼っ"
+        },
+        {
+          "lemma": "ちゃう",
+          "pos": "Auxiliary",
+          "surface": "ちゃう"
+        }
+      ],
+      "id": "ttchi_u_2",
+      "input": "沼っちゃう"
     }
   ],
-  "description": "Godan Ra-row verbs (五段ラ行動詞) - verbs ending in る",
+  "description": "Godan Ra-row verbs (五段ラ行動詞) - verbs ending in る (part 1/2)",
   "version": "1.0"
 }

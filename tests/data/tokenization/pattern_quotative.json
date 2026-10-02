@@ -947,6 +947,594 @@
       ],
       "id": "c1_past_quote_control_2",
       "input": "終わったって。"
+    },
+    {
+      "description": "猫ってかわいい。 - regression test",
+      "expected": [
+        {
+          "lemma": "猫",
+          "pos": "Noun",
+          "surface": "猫"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "かわいい",
+          "pos": "Adjective",
+          "surface": "かわいい"
+        }
+      ],
+      "id": "tttekawaii",
+      "input": "猫ってかわいい。"
+    },
+    {
+      "description": "君ってさ - regression test",
+      "expected": [
+        {
+          "lemma": "君",
+          "pos": "Pronoun",
+          "surface": "君"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Particle",
+          "surface": "さ"
+        }
+      ],
+      "id": "tttesa",
+      "input": "君ってさ"
+    },
+    {
+      "description": "行けって言われても行かないよ。 - regression test",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行け"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言わ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行か"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "kettte_waretemo_kanaiyo",
+      "input": "行けって言われても行かないよ。"
+    },
+    {
+      "description": "食べろって - regression test",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べろ"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        }
+      ],
+      "id": "berottte",
+      "input": "食べろって"
+    },
+    {
+      "description": "やめろって - regression test",
+      "expected": [
+        {
+          "lemma": "やめる",
+          "pos": "Verb",
+          "surface": "やめろ"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        }
+      ],
+      "id": "yamerottte",
+      "input": "やめろって"
+    },
+    {
+      "description": "来いって - regression test",
+      "expected": [
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来い"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        }
+      ],
+      "id": "ittte",
+      "input": "来いって"
+    },
+    {
+      "description": "知ってるっていうか、聞いたことあるだけ。 - regression test",
+      "expected": [
+        {
+          "lemma": "知る",
+          "pos": "Verb",
+          "surface": "知っ"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てる"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "いう",
+          "pos": "Verb",
+          "surface": "いう"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "聞く",
+          "pos": "Verb",
+          "surface": "聞い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "こと"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        },
+        {
+          "lemma": "だけ",
+          "pos": "Particle",
+          "surface": "だけ"
+        }
+      ],
+      "id": "ttteruttteiuka_itakotoarudake",
+      "input": "知ってるっていうか、聞いたことあるだけ。"
+    },
+    {
+      "description": "行くっていうか - regression test",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行く"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "いう",
+          "pos": "Verb",
+          "surface": "いう"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "kuttteiuka",
+      "input": "行くっていうか"
+    },
+    {
+      "description": "見たっていうか - regression test",
+      "expected": [
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "いう",
+          "pos": "Verb",
+          "surface": "いう"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "tattteiuka",
+      "input": "見たっていうか"
+    },
+    {
+      "description": "結局行かなかったっていうね。 - regression test",
+      "expected": [
+        {
+          "lemma": "結局",
+          "pos": "Noun",
+          "surface": "結局"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行か"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "いう",
+          "pos": "Verb",
+          "surface": "いう"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        }
+      ],
+      "id": "kanakatttattteiune",
+      "input": "結局行かなかったっていうね。"
+    },
+    {
+      "description": "来なかったっていうね - regression test",
+      "expected": [
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "いう",
+          "pos": "Verb",
+          "surface": "いう"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        }
+      ],
+      "id": "nakatttattteiune",
+      "input": "来なかったっていうね"
+    },
+    {
+      "description": "高かったっていうね - regression test",
+      "expected": [
+        {
+          "lemma": "高い",
+          "pos": "Adjective",
+          "surface": "高かっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "いう",
+          "pos": "Verb",
+          "surface": "いう"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        }
+      ],
+      "id": "katttattteiune",
+      "input": "高かったっていうね"
+    },
+    {
+      "description": "行ったっていうね - regression test",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "いう",
+          "pos": "Verb",
+          "surface": "いう"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        }
+      ],
+      "id": "tttattteiune",
+      "input": "行ったっていうね"
+    },
+    {
+      "description": "行かなかったっていうか - regression test",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行か"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "いう",
+          "pos": "Verb",
+          "surface": "いう"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "kanakatttattteiuka",
+      "input": "行かなかったっていうか"
+    },
+    {
+      "description": "えぐいって、それ。 - regression test",
+      "expected": [
+        {
+          "lemma": "えぐい",
+          "pos": "Adjective",
+          "surface": "えぐい"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "それ",
+          "pos": "Pronoun",
+          "surface": "それ"
+        }
+      ],
+      "id": "eguittte_sore",
+      "input": "えぐいって、それ。"
+    },
+    {
+      "description": "ねむいって - regression test",
+      "expected": [
+        {
+          "lemma": "ねむい",
+          "pos": "Adjective",
+          "surface": "ねむい"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        }
+      ],
+      "id": "nemuittte",
+      "input": "ねむいって"
+    },
+    {
+      "description": "いいやと思った - regression test",
+      "expected": [
+        {
+          "lemma": "いい",
+          "pos": "Adjective",
+          "surface": "いい"
+        },
+        {
+          "lemma": "や",
+          "pos": "Particle",
+          "surface": "や"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "思う",
+          "pos": "Verb",
+          "surface": "思っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "iiyato_ttta",
+      "input": "いいやと思った"
+    },
+    {
+      "description": "もういいやって思っちゃった。 - regression test",
+      "expected": [
+        {
+          "lemma": "もう",
+          "pos": "Adverb",
+          "surface": "もう"
+        },
+        {
+          "lemma": "いい",
+          "pos": "Adjective",
+          "surface": "いい"
+        },
+        {
+          "lemma": "や",
+          "pos": "Particle",
+          "surface": "や"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "思う",
+          "pos": "Verb",
+          "surface": "思っ"
+        },
+        {
+          "lemma": "ちゃう",
+          "pos": "Auxiliary",
+          "surface": "ちゃっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "mouiiyattte_ttchi_ttta",
+      "input": "もういいやって思っちゃった。"
+    },
+    {
+      "description": "それはいいやって - regression test",
+      "expected": [
+        {
+          "lemma": "それ",
+          "pos": "Pronoun",
+          "surface": "それ"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "いい",
+          "pos": "Adjective",
+          "surface": "いい"
+        },
+        {
+          "lemma": "や",
+          "pos": "Particle",
+          "surface": "や"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        }
+      ],
+      "id": "sorehaiiyattte",
+      "input": "それはいいやって"
     }
   ],
   "description": "Quotative patterns (という, といって, etc.)",

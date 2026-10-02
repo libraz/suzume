@@ -742,6 +742,112 @@
       ],
       "id": "ga_beharu",
       "input": "先生が食べはる。"
+    },
+    {
+      "description": "お手数をおかけいたしました。 - regression test",
+      "expected": [
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "手数",
+          "pos": "Noun",
+          "surface": "手数"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "かける",
+          "pos": "Verb",
+          "surface": "かけ"
+        },
+        {
+          "lemma": "いたす",
+          "pos": "Verb",
+          "surface": "いたし"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "まし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "o_wookakeitashimashita",
+      "input": "お手数をおかけいたしました。"
+    },
+    {
+      "description": "おかけいたします - regression test",
+      "expected": [
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "かける",
+          "pos": "Verb",
+          "surface": "かけ"
+        },
+        {
+          "lemma": "いたす",
+          "pos": "Verb",
+          "surface": "いたし"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "okakeitashimasu",
+      "input": "おかけいたします"
+    },
+    {
+      "description": "おかけいたしません - regression test",
+      "expected": [
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "かける",
+          "pos": "Verb",
+          "surface": "かけ"
+        },
+        {
+          "lemma": "いたす",
+          "pos": "Verb",
+          "surface": "いたし"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ませ"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        }
+      ],
+      "id": "okakeitashimasen",
+      "input": "おかけいたしません"
     }
   ],
   "description": "Honorific verbs (敬語動詞)",

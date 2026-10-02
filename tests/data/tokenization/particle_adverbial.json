@@ -1275,6 +1275,169 @@
       ],
       "id": "nihakoreshika",
       "input": "私にはこれしか"
+    },
+    {
+      "description": "痛みを伴う改革から逃げてばかりいても始まらない。 - regression test",
+      "expected": [
+        {
+          "lemma": "痛み",
+          "pos": "Noun",
+          "surface": "痛み"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "伴う",
+          "pos": "Verb",
+          "surface": "伴う"
+        },
+        {
+          "lemma": "改革",
+          "pos": "Noun",
+          "surface": "改革"
+        },
+        {
+          "lemma": "から",
+          "pos": "Particle",
+          "surface": "から"
+        },
+        {
+          "lemma": "逃げる",
+          "pos": "Verb",
+          "surface": "逃げ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "ばかり",
+          "pos": "Particle",
+          "surface": "ばかり"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "い"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "始まる",
+          "pos": "Verb",
+          "surface": "始まら"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "miwo_u_kara_getebakariitemo_maranai",
+      "input": "痛みを伴う改革から逃げてばかりいても始まらない。"
+    },
+    {
+      "description": "考えてばかりいる - regression test",
+      "expected": [
+        {
+          "lemma": "考える",
+          "pos": "Verb",
+          "surface": "考え"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "ばかり",
+          "pos": "Particle",
+          "surface": "ばかり"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "いる"
+        }
+      ],
+      "id": "etebakariiru",
+      "input": "考えてばかりいる"
+    },
+    {
+      "description": "負けてばかりだ - regression test",
+      "expected": [
+        {
+          "lemma": "負ける",
+          "pos": "Verb",
+          "surface": "負け"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "ばかり",
+          "pos": "Particle",
+          "surface": "ばかり"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "ketebakarida",
+      "input": "負けてばかりだ"
+    },
+    {
+      "description": "食べてばかりいても - regression test",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "ばかり",
+          "pos": "Particle",
+          "surface": "ばかり"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "い"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        }
+      ],
+      "id": "betebakariitemo",
+      "input": "食べてばかりいても"
     }
   ],
   "description": "particle_adverbial tests",

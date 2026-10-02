@@ -476,6 +476,280 @@
       ],
       "id": "no_ha_shiku_ku_teshinaku",
       "input": "人生の道は、険しく、長く、果てしなく。"
+    },
+    {
+      "description": "テストやばすぎて草。 - regression test",
+      "expected": [
+        {
+          "lemma": "テスト",
+          "pos": "Noun",
+          "surface": "テスト"
+        },
+        {
+          "lemma": "やばい",
+          "pos": "Adjective",
+          "surface": "やば"
+        },
+        {
+          "lemma": "すぎる",
+          "pos": "Verb",
+          "surface": "すぎ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "草",
+          "pos": "Noun",
+          "surface": "草"
+        }
+      ],
+      "id": "yabasugite",
+      "input": "テストやばすぎて草。"
+    },
+    {
+      "description": "やばすぎ - regression test",
+      "expected": [
+        {
+          "lemma": "やばい",
+          "pos": "Adjective",
+          "surface": "やば"
+        },
+        {
+          "lemma": "すぎる",
+          "pos": "Verb",
+          "surface": "すぎ"
+        }
+      ],
+      "id": "yabasugi",
+      "input": "やばすぎ"
+    },
+    {
+      "description": "だるすぎて - regression test",
+      "expected": [
+        {
+          "lemma": "だるい",
+          "pos": "Adjective",
+          "surface": "だる"
+        },
+        {
+          "lemma": "すぎる",
+          "pos": "Verb",
+          "surface": "すぎ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "darusugite",
+      "input": "だるすぎて"
+    },
+    {
+      "description": "しんどすぎて無理。 - regression test",
+      "expected": [
+        {
+          "lemma": "しんどい",
+          "pos": "Adjective",
+          "surface": "しんど"
+        },
+        {
+          "lemma": "すぎる",
+          "pos": "Verb",
+          "surface": "すぎ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "無理",
+          "pos": "Adjective",
+          "surface": "無理"
+        }
+      ],
+      "id": "shindosugite",
+      "input": "しんどすぎて無理。"
+    },
+    {
+      "description": "しつこすぎ - regression test",
+      "expected": [
+        {
+          "lemma": "しつこい",
+          "pos": "Adjective",
+          "surface": "しつこ"
+        },
+        {
+          "lemma": "すぎる",
+          "pos": "Verb",
+          "surface": "すぎ"
+        }
+      ],
+      "id": "shitsukosugi",
+      "input": "しつこすぎ"
+    },
+    {
+      "description": "やばすぎない - regression test",
+      "expected": [
+        {
+          "lemma": "やばい",
+          "pos": "Adjective",
+          "surface": "やば"
+        },
+        {
+          "lemma": "すぎる",
+          "pos": "Verb",
+          "surface": "すぎ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "yabasuginai",
+      "input": "やばすぎない"
+    },
+    {
+      "description": "照れくさそうに笑った。 - regression test",
+      "expected": [
+        {
+          "lemma": "照れくさい",
+          "pos": "Adjective",
+          "surface": "照れくさ"
+        },
+        {
+          "lemma": "そう",
+          "pos": "Auxiliary",
+          "surface": "そう"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "笑う",
+          "pos": "Verb",
+          "surface": "笑っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "rekusasouni_ttta",
+      "input": "照れくさそうに笑った。"
+    },
+    {
+      "description": "面倒くさそうだ - regression test",
+      "expected": [
+        {
+          "lemma": "面倒くさい",
+          "pos": "Adjective",
+          "surface": "面倒くさ"
+        },
+        {
+          "lemma": "そう",
+          "pos": "Adjective",
+          "surface": "そう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "kusasouda",
+      "input": "面倒くさそうだ"
+    },
+    {
+      "description": "照れくささ - regression test",
+      "expected": [
+        {
+          "lemma": "照れくさい",
+          "pos": "Adjective",
+          "surface": "照れくさ"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Suffix",
+          "surface": "さ"
+        }
+      ],
+      "id": "rekusasa",
+      "input": "照れくささ"
+    },
+    {
+      "description": "面倒くさがらずにやる。 - regression test",
+      "expected": [
+        {
+          "lemma": "面倒くさい",
+          "pos": "Adjective",
+          "surface": "面倒くさ"
+        },
+        {
+          "lemma": "がる",
+          "pos": "Verb",
+          "surface": "がら"
+        },
+        {
+          "lemma": "ず",
+          "pos": "Auxiliary",
+          "surface": "ずに"
+        },
+        {
+          "lemma": "やる",
+          "pos": "Verb",
+          "surface": "やる"
+        }
+      ],
+      "id": "kusagarazuniyaru",
+      "input": "面倒くさがらずにやる。"
+    },
+    {
+      "description": "面倒くさがる - regression test",
+      "expected": [
+        {
+          "lemma": "面倒くさい",
+          "pos": "Adjective",
+          "surface": "面倒くさ"
+        },
+        {
+          "lemma": "がる",
+          "pos": "Verb",
+          "surface": "がる"
+        }
+      ],
+      "id": "kusagaru",
+      "input": "面倒くさがる"
+    },
+    {
+      "description": "恥ずかしがらずに - regression test",
+      "expected": [
+        {
+          "lemma": "恥ずかしい",
+          "pos": "Adjective",
+          "surface": "恥ずかし"
+        },
+        {
+          "lemma": "がる",
+          "pos": "Verb",
+          "surface": "がら"
+        },
+        {
+          "lemma": "ず",
+          "pos": "Auxiliary",
+          "surface": "ずに"
+        }
+      ],
+      "id": "zukashigarazuni",
+      "input": "恥ずかしがらずに"
     }
   ],
   "description": "I-adjectives compound/derived forms (複合・派生) - sou patterns, nominalization, contracted forms",

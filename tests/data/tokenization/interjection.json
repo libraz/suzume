@@ -241,6 +241,62 @@
       ],
       "id": "iya_rimashitane",
       "input": "いやー、参りましたね。"
+    },
+    {
+      "description": "いや、違う。 - regression test",
+      "expected": [
+        {
+          "lemma": "いや",
+          "pos": "Interjection",
+          "surface": "いや"
+        },
+        {
+          "lemma": "違う",
+          "pos": "Verb",
+          "surface": "違う"
+        }
+      ],
+      "id": "iya_u",
+      "input": "いや、違う。"
+    },
+    {
+      "description": "いや本当に - regression test",
+      "expected": [
+        {
+          "lemma": "いや",
+          "pos": "Interjection",
+          "surface": "いや"
+        },
+        {
+          "lemma": "本当",
+          "pos": "Noun",
+          "surface": "本当"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        }
+      ],
+      "id": "iya_ni",
+      "input": "いや本当に"
+    },
+    {
+      "description": "いや違う - regression test",
+      "expected": [
+        {
+          "lemma": "いや",
+          "pos": "Interjection",
+          "surface": "いや"
+        },
+        {
+          "lemma": "違う",
+          "pos": "Verb",
+          "surface": "違う"
+        }
+      ],
+      "id": "iya_u_2",
+      "input": "いや違う"
     }
   ],
   "description": "Interjections and greetings (感動詞・挨拶)",

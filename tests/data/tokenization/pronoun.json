@@ -1151,6 +1151,153 @@
       ],
       "id": "tsukano",
       "input": "幾つかの記録"
+    },
+    {
+      "description": "これ見ちゃいけないやつじゃん。 - regression test",
+      "expected": [
+        {
+          "lemma": "これ",
+          "pos": "Pronoun",
+          "surface": "これ"
+        },
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "ちゃ",
+          "pos": "Particle",
+          "surface": "ちゃ"
+        },
+        {
+          "lemma": "いける",
+          "pos": "Auxiliary",
+          "surface": "いけ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        },
+        {
+          "lemma": "やつ",
+          "pos": "Pronoun",
+          "surface": "やつ"
+        },
+        {
+          "lemma": "じゃん",
+          "pos": "Particle",
+          "surface": "じゃん"
+        }
+      ],
+      "id": "kore_chi_ikenaiyatsuji_n",
+      "input": "これ見ちゃいけないやつじゃん。"
+    },
+    {
+      "description": "知らないやつ - regression test",
+      "expected": [
+        {
+          "lemma": "知る",
+          "pos": "Verb",
+          "surface": "知ら"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        },
+        {
+          "lemma": "やつ",
+          "pos": "Pronoun",
+          "surface": "やつ"
+        }
+      ],
+      "id": "ranaiyatsu",
+      "input": "知らないやつ"
+    },
+    {
+      "description": "すごいやつ - regression test",
+      "expected": [
+        {
+          "lemma": "すごい",
+          "pos": "Adjective",
+          "surface": "すごい"
+        },
+        {
+          "lemma": "やつ",
+          "pos": "Pronoun",
+          "surface": "やつ"
+        }
+      ],
+      "id": "sugoiyatsu",
+      "input": "すごいやつ"
+    },
+    {
+      "description": "いいやつだ - regression test",
+      "expected": [
+        {
+          "lemma": "いい",
+          "pos": "Adjective",
+          "surface": "いい"
+        },
+        {
+          "lemma": "やつ",
+          "pos": "Pronoun",
+          "surface": "やつ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "iiyatsuda",
+      "input": "いいやつだ"
+    },
+    {
+      "description": "これなんぼですか。 - regression test",
+      "expected": [
+        {
+          "lemma": "これ",
+          "pos": "Pronoun",
+          "surface": "これ"
+        },
+        {
+          "lemma": "なんぼ",
+          "pos": "Pronoun",
+          "surface": "なんぼ"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "korenanbodesuka",
+      "input": "これなんぼですか。"
+    },
+    {
+      "description": "それなんぼ - regression test",
+      "expected": [
+        {
+          "lemma": "それ",
+          "pos": "Pronoun",
+          "surface": "それ"
+        },
+        {
+          "lemma": "なんぼ",
+          "pos": "Pronoun",
+          "surface": "なんぼ"
+        }
+      ],
+      "id": "sorenanbo",
+      "input": "それなんぼ"
     }
   ],
   "description": "Pronouns",

@@ -1,0 +1,38 @@
+{
+  "cases": [
+    {
+      "description": "読んでなどいない - regression test",
+      "expected": [
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読ん"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "など",
+          "pos": "Particle",
+          "surface": "など"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "い"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "ndenadoinai",
+      "input": "読んでなどいない"
+    }
+  ],
+  "description": "literary_quality tests (part 5/5)",
+  "version": "1.0"
+}

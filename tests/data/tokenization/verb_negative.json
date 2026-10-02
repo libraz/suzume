@@ -721,6 +721,101 @@
       ],
       "id": "ranakereba",
       "input": "知らなければ。"
+    },
+    {
+      "description": "もう帰んなきゃ。 - regression test",
+      "expected": [
+        {
+          "lemma": "もう",
+          "pos": "Adverb",
+          "surface": "もう"
+        },
+        {
+          "lemma": "帰る",
+          "pos": "Verb",
+          "surface": "帰ん"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なきゃ"
+        }
+      ],
+      "id": "mou_nnaki",
+      "input": "もう帰んなきゃ。"
+    },
+    {
+      "description": "帰んない - regression test",
+      "expected": [
+        {
+          "lemma": "帰る",
+          "pos": "Verb",
+          "surface": "帰ん"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "nnai",
+      "input": "帰んない"
+    },
+    {
+      "description": "走んなきゃ - regression test",
+      "expected": [
+        {
+          "lemma": "走る",
+          "pos": "Verb",
+          "surface": "走ん"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なきゃ"
+        }
+      ],
+      "id": "nnaki",
+      "input": "走んなきゃ"
+    },
+    {
+      "description": "切んない - regression test",
+      "expected": [
+        {
+          "lemma": "切る",
+          "pos": "Verb",
+          "surface": "切ん"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "nnai_2",
+      "input": "切んない"
+    },
+    {
+      "description": "帰んなかった - regression test",
+      "expected": [
+        {
+          "lemma": "帰る",
+          "pos": "Verb",
+          "surface": "帰ん"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "nnakattta",
+      "input": "帰んなかった"
     }
   ],
   "description": "verb_negative tests",

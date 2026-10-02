@@ -665,6 +665,52 @@
       ],
       "id": "ookisawohakaru",
       "input": "おおきさをはかる"
+    },
+    {
+      "description": "飽きっぽい性格だ。 - regression test",
+      "expected": [
+        {
+          "lemma": "飽きっぽい",
+          "pos": "Adjective",
+          "surface": "飽きっぽい"
+        },
+        {
+          "lemma": "性格",
+          "pos": "Noun",
+          "surface": "性格"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "kittpoi_da",
+      "input": "飽きっぽい性格だ。"
+    },
+    {
+      "description": "怒りっぽい - regression test",
+      "expected": [
+        {
+          "lemma": "怒りっぽい",
+          "pos": "Adjective",
+          "surface": "怒りっぽい"
+        }
+      ],
+      "id": "rittpoi",
+      "input": "怒りっぽい"
+    },
+    {
+      "description": "惚れっぽい - regression test",
+      "expected": [
+        {
+          "lemma": "惚れっぽい",
+          "pos": "Adjective",
+          "surface": "惚れっぽい"
+        }
+      ],
+      "id": "rettpoi",
+      "input": "惚れっぽい"
     }
   ],
   "description": "suffix_general tests",

@@ -762,6 +762,258 @@
       ],
       "id": "sore_udattteba",
       "input": "それ違うだってば"
+    },
+    {
+      "description": "それな、めっちゃわかる。 - regression test",
+      "expected": [
+        {
+          "lemma": "それ",
+          "pos": "Pronoun",
+          "surface": "それ"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        },
+        {
+          "lemma": "めっちゃ",
+          "pos": "Adverb",
+          "surface": "めっちゃ"
+        },
+        {
+          "lemma": "わかる",
+          "pos": "Verb",
+          "surface": "わかる"
+        }
+      ],
+      "id": "sorena_mettchi_wakaru",
+      "input": "それな、めっちゃわかる。"
+    },
+    {
+      "description": "めちゃわかる - regression test",
+      "expected": [
+        {
+          "lemma": "めちゃ",
+          "pos": "Adverb",
+          "surface": "めちゃ"
+        },
+        {
+          "lemma": "わかる",
+          "pos": "Verb",
+          "surface": "わかる"
+        }
+      ],
+      "id": "mechi_wakaru",
+      "input": "めちゃわかる"
+    },
+    {
+      "description": "めっちゃわかる - regression test",
+      "expected": [
+        {
+          "lemma": "めっちゃ",
+          "pos": "Adverb",
+          "surface": "めっちゃ"
+        },
+        {
+          "lemma": "わかる",
+          "pos": "Verb",
+          "surface": "わかる"
+        }
+      ],
+      "id": "mettchi_wakaru",
+      "input": "めっちゃわかる"
+    },
+    {
+      "description": "何なのって - regression test",
+      "expected": [
+        {
+          "lemma": "何",
+          "pos": "Pronoun",
+          "surface": "何"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        }
+      ],
+      "id": "nanottte",
+      "input": "何なのって"
+    },
+    {
+      "description": "なんかもう無理 - regression test",
+      "expected": [
+        {
+          "lemma": "なんか",
+          "pos": "Particle",
+          "surface": "なんか"
+        },
+        {
+          "lemma": "もう",
+          "pos": "Adverb",
+          "surface": "もう"
+        },
+        {
+          "lemma": "無理",
+          "pos": "Adjective",
+          "surface": "無理"
+        }
+      ],
+      "id": "nankamou",
+      "input": "なんかもう無理"
+    },
+    {
+      "description": "なんかまだ無理 - regression test",
+      "expected": [
+        {
+          "lemma": "なんか",
+          "pos": "Particle",
+          "surface": "なんか"
+        },
+        {
+          "lemma": "まだ",
+          "pos": "Adverb",
+          "surface": "まだ"
+        },
+        {
+          "lemma": "無理",
+          "pos": "Adjective",
+          "surface": "無理"
+        }
+      ],
+      "id": "nankamada",
+      "input": "なんかまだ無理"
+    },
+    {
+      "description": "とかもう無理 - regression test",
+      "expected": [
+        {
+          "lemma": "とか",
+          "pos": "Particle",
+          "surface": "とか"
+        },
+        {
+          "lemma": "もう",
+          "pos": "Adverb",
+          "surface": "もう"
+        },
+        {
+          "lemma": "無理",
+          "pos": "Adjective",
+          "surface": "無理"
+        }
+      ],
+      "id": "tokamou",
+      "input": "とかもう無理"
+    },
+    {
+      "description": "これでええ - regression test",
+      "expected": [
+        {
+          "lemma": "これ",
+          "pos": "Pronoun",
+          "surface": "これ"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "ええ",
+          "pos": "Adjective",
+          "surface": "ええ"
+        }
+      ],
+      "id": "koredeee",
+      "input": "これでええ"
+    },
+    {
+      "description": "食べてええ - regression test",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "ええ",
+          "pos": "Adjective",
+          "surface": "ええ"
+        }
+      ],
+      "id": "beteee",
+      "input": "食べてええ"
+    },
+    {
+      "description": "それでええよ - regression test",
+      "expected": [
+        {
+          "lemma": "それで",
+          "pos": "Conjunction",
+          "surface": "それで"
+        },
+        {
+          "lemma": "ええ",
+          "pos": "Adjective",
+          "surface": "ええ"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "soredeeeyo",
+      "input": "それでええよ"
+    },
+    {
+      "description": "見てもええよ - regression test",
+      "expected": [
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "ええ",
+          "pos": "Adjective",
+          "surface": "ええ"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "temoeeyo",
+      "input": "見てもええよ"
     }
   ],
   "description": "Colloquial and slang patterns",

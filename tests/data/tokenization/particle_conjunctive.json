@@ -1228,6 +1228,297 @@
       ],
       "id": "t22_plain_causal_node_control",
       "input": "本を読むので静かにする"
+    },
+    {
+      "description": "知らないふりをしつつ見ていた。 - regression test",
+      "expected": [
+        {
+          "lemma": "知る",
+          "pos": "Verb",
+          "surface": "知ら"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        },
+        {
+          "lemma": "ふり",
+          "pos": "Noun",
+          "surface": "ふり"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "つつ",
+          "pos": "Particle",
+          "surface": "つつ"
+        },
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ranaifuriwoshitsutsu_teita",
+      "input": "知らないふりをしつつ見ていた。"
+    },
+    {
+      "description": "仕事をしつつ - regression test",
+      "expected": [
+        {
+          "lemma": "仕事",
+          "pos": "Noun",
+          "surface": "仕事"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "つつ",
+          "pos": "Particle",
+          "surface": "つつ"
+        }
+      ],
+      "id": "woshitsutsu",
+      "input": "仕事をしつつ"
+    },
+    {
+      "description": "それをしつつ。 - regression test",
+      "expected": [
+        {
+          "lemma": "それ",
+          "pos": "Pronoun",
+          "surface": "それ"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "つつ",
+          "pos": "Particle",
+          "surface": "つつ"
+        }
+      ],
+      "id": "sorewoshitsutsu",
+      "input": "それをしつつ。"
+    },
+    {
+      "description": "雨なのに出かけた。 - regression test",
+      "expected": [
+        {
+          "lemma": "雨",
+          "pos": "Noun",
+          "surface": "雨"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "のに",
+          "pos": "Particle",
+          "surface": "のに"
+        },
+        {
+          "lemma": "出かける",
+          "pos": "Verb",
+          "surface": "出かけ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "nanoni_kaketa",
+      "input": "雨なのに出かけた。"
+    },
+    {
+      "description": "雨なのに行った - regression test",
+      "expected": [
+        {
+          "lemma": "雨",
+          "pos": "Noun",
+          "surface": "雨"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "のに",
+          "pos": "Particle",
+          "surface": "のに"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "nanoni_ttta",
+      "input": "雨なのに行った"
+    },
+    {
+      "description": "子供なのに偉い - regression test",
+      "expected": [
+        {
+          "lemma": "子供",
+          "pos": "Noun",
+          "surface": "子供"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "のに",
+          "pos": "Particle",
+          "surface": "のに"
+        },
+        {
+          "lemma": "偉い",
+          "pos": "Adjective",
+          "surface": "偉い"
+        }
+      ],
+      "id": "nanoni_i",
+      "input": "子供なのに偉い"
+    },
+    {
+      "description": "好きなのには理由がある - regression test",
+      "expected": [
+        {
+          "lemma": "好き",
+          "pos": "Adjective",
+          "surface": "好き"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "理由",
+          "pos": "Noun",
+          "surface": "理由"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        }
+      ],
+      "id": "kinanoniha_gaaru",
+      "input": "好きなのには理由がある"
+    },
+    {
+      "description": "雨なのにもかかわらず - regression test",
+      "expected": [
+        {
+          "lemma": "雨",
+          "pos": "Noun",
+          "surface": "雨"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "かかわる",
+          "pos": "Verb",
+          "surface": "かかわら"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ず"
+        }
+      ],
+      "id": "nanonimokakawarazu",
+      "input": "雨なのにもかかわらず"
     }
   ],
   "description": "particle_conjunctive tests",

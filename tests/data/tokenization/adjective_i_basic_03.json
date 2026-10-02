@@ -1357,6 +1357,89 @@
       ],
       "id": "heyagaakarui",
       "input": "部屋が明るい"
+    },
+    {
+      "description": "暇でしょうがない - regression test",
+      "expected": [
+        {
+          "lemma": "暇",
+          "pos": "Noun",
+          "surface": "暇"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "しょうがない",
+          "pos": "Adjective",
+          "surface": "しょうがない"
+        }
+      ],
+      "id": "deshi_uganai",
+      "input": "暇でしょうがない"
+    },
+    {
+      "description": "暇でしょうがないよ - regression test",
+      "expected": [
+        {
+          "lemma": "暇",
+          "pos": "Noun",
+          "surface": "暇"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "しょうがない",
+          "pos": "Adjective",
+          "surface": "しょうがない"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "deshi_uganaiyo",
+      "input": "暇でしょうがないよ"
+    },
+    {
+      "description": "えらいことだ - regression test",
+      "expected": [
+        {
+          "lemma": "えらい",
+          "pos": "Adjective",
+          "surface": "えらい"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "こと"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "eraikotoda",
+      "input": "えらいことだ"
+    },
+    {
+      "description": "からい - regression test",
+      "expected": [
+        {
+          "lemma": "からい",
+          "pos": "Adjective",
+          "surface": "からい"
+        }
+      ],
+      "id": "karai",
+      "input": "からい"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 3/3)",

@@ -1,0 +1,481 @@
+{
+  "cases": [
+    {
+      "description": "知る権利が損なわれかねない。 - regression test",
+      "expected": [
+        {
+          "lemma": "知る",
+          "pos": "Verb",
+          "surface": "知る"
+        },
+        {
+          "lemma": "権利",
+          "pos": "Noun",
+          "surface": "権利"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "損なう",
+          "pos": "Verb",
+          "surface": "損なわ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "かねる",
+          "pos": "Auxiliary",
+          "surface": "かね"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "ru_ga_nawarekanenai",
+      "input": "知る権利が損なわれかねない。"
+    },
+    {
+      "description": "損なわれかねません - regression test",
+      "expected": [
+        {
+          "lemma": "損なう",
+          "pos": "Verb",
+          "surface": "損なわ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "かねる",
+          "pos": "Auxiliary",
+          "surface": "かね"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ませ"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        }
+      ],
+      "id": "nawarekanemasen",
+      "input": "損なわれかねません"
+    },
+    {
+      "description": "誤解されかねない - regression test",
+      "expected": [
+        {
+          "lemma": "誤解",
+          "pos": "Noun",
+          "surface": "誤解"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "さ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "かねる",
+          "pos": "Auxiliary",
+          "surface": "かね"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "sarekanenai",
+      "input": "誤解されかねない"
+    },
+    {
+      "description": "食べられかねない - regression test",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "られる",
+          "pos": "Auxiliary",
+          "surface": "られ"
+        },
+        {
+          "lemma": "かねる",
+          "pos": "Auxiliary",
+          "surface": "かね"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "berarekanenai",
+      "input": "食べられかねない"
+    },
+    {
+      "description": "行かせかねない - regression test",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行か"
+        },
+        {
+          "lemma": "せる",
+          "pos": "Auxiliary",
+          "surface": "せ"
+        },
+        {
+          "lemma": "かねる",
+          "pos": "Auxiliary",
+          "surface": "かね"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "kasekanenai",
+      "input": "行かせかねない"
+    },
+    {
+      "description": "この服は着やすそうに見える。 - regression test",
+      "expected": [
+        {
+          "lemma": "この",
+          "pos": "Determiner",
+          "surface": "この"
+        },
+        {
+          "lemma": "服",
+          "pos": "Noun",
+          "surface": "服"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "着る",
+          "pos": "Verb",
+          "surface": "着"
+        },
+        {
+          "lemma": "やすい",
+          "pos": "Adjective",
+          "surface": "やす"
+        },
+        {
+          "lemma": "そう",
+          "pos": "Auxiliary",
+          "surface": "そう"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "見える",
+          "pos": "Verb",
+          "surface": "見える"
+        }
+      ],
+      "id": "kono_ha_yasusouni_eru",
+      "input": "この服は着やすそうに見える。"
+    },
+    {
+      "description": "見やすそうな字 - regression test",
+      "expected": [
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "やすい",
+          "pos": "Adjective",
+          "surface": "やす"
+        },
+        {
+          "lemma": "そう",
+          "pos": "Auxiliary",
+          "surface": "そう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "字",
+          "pos": "Noun",
+          "surface": "字"
+        }
+      ],
+      "id": "yasusouna",
+      "input": "見やすそうな字"
+    },
+    {
+      "description": "寝やすそうな部屋 - regression test",
+      "expected": [
+        {
+          "lemma": "寝る",
+          "pos": "Verb",
+          "surface": "寝"
+        },
+        {
+          "lemma": "やすい",
+          "pos": "Adjective",
+          "surface": "やす"
+        },
+        {
+          "lemma": "そう",
+          "pos": "Auxiliary",
+          "surface": "そう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "部屋",
+          "pos": "Noun",
+          "surface": "部屋"
+        }
+      ],
+      "id": "yasusouna_2",
+      "input": "寝やすそうな部屋"
+    },
+    {
+      "description": "読みやすそうに見える - regression test",
+      "expected": [
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読み"
+        },
+        {
+          "lemma": "やすい",
+          "pos": "Adjective",
+          "surface": "やす"
+        },
+        {
+          "lemma": "そう",
+          "pos": "Auxiliary",
+          "surface": "そう"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "見える",
+          "pos": "Verb",
+          "surface": "見える"
+        }
+      ],
+      "id": "miyasusouni_eru",
+      "input": "読みやすそうに見える"
+    },
+    {
+      "description": "見たくなくても見てしまう。 - regression test",
+      "expected": [
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たく"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なく"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "しまう",
+          "pos": "Auxiliary",
+          "surface": "しまう"
+        }
+      ],
+      "id": "takunakutemo_teshimau",
+      "input": "見たくなくても見てしまう。"
+    },
+    {
+      "description": "寝たくなくても - regression test",
+      "expected": [
+        {
+          "lemma": "寝る",
+          "pos": "Verb",
+          "surface": "寝"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たく"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なく"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        }
+      ],
+      "id": "takunakutemo",
+      "input": "寝たくなくても"
+    },
+    {
+      "description": "見たくなかった - regression test",
+      "expected": [
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たく"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "takunakattta",
+      "input": "見たくなかった"
+    },
+    {
+      "description": "早く寝なさい。 - regression test",
+      "expected": [
+        {
+          "lemma": "早い",
+          "pos": "Adjective",
+          "surface": "早く"
+        },
+        {
+          "lemma": "寝る",
+          "pos": "Verb",
+          "surface": "寝"
+        },
+        {
+          "lemma": "なさる",
+          "pos": "Auxiliary",
+          "surface": "なさい"
+        }
+      ],
+      "id": "ku_nasai",
+      "input": "早く寝なさい。"
+    },
+    {
+      "description": "見なさい - regression test",
+      "expected": [
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "なさる",
+          "pos": "Auxiliary",
+          "surface": "なさい"
+        }
+      ],
+      "id": "nasai",
+      "input": "見なさい"
+    },
+    {
+      "description": "もう寝なさいよ - regression test",
+      "expected": [
+        {
+          "lemma": "もう",
+          "pos": "Adverb",
+          "surface": "もう"
+        },
+        {
+          "lemma": "寝る",
+          "pos": "Verb",
+          "surface": "寝"
+        },
+        {
+          "lemma": "なさる",
+          "pos": "Auxiliary",
+          "surface": "なさい"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "mou_nasaiyo",
+      "input": "もう寝なさいよ"
+    }
+  ],
+  "description": "Modality auxiliaries (たい、そう、らしい) (part 2/2)",
+  "version": "1.0"
+}

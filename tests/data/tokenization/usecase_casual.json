@@ -602,7 +602,7 @@
         },
         {
           "lemma": "ない",
-          "pos": "Adjective",
+          "pos": "Auxiliary",
           "surface": "なかっ"
         },
         {
@@ -961,7 +961,7 @@
           "surface": "て"
         },
         {
-          "lemma": "く",
+          "lemma": "いく",
           "pos": "Auxiliary",
           "surface": "く"
         }

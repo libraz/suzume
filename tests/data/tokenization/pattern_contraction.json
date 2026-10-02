@@ -1319,6 +1319,101 @@
       ],
       "id": "tsumannai",
       "input": "つまんない。"
+    },
+    {
+      "description": "知らねえよ。 - regression test",
+      "expected": [
+        {
+          "lemma": "知る",
+          "pos": "Verb",
+          "surface": "知ら"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ねえ"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "raneeyo",
+      "input": "知らねえよ。"
+    },
+    {
+      "description": "行かねえ - regression test",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行か"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ねえ"
+        }
+      ],
+      "id": "kanee",
+      "input": "行かねえ"
+    },
+    {
+      "description": "食べねえ - regression test",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ねえ"
+        }
+      ],
+      "id": "benee",
+      "input": "食べねえ"
+    },
+    {
+      "description": "高くねえ - regression test",
+      "expected": [
+        {
+          "lemma": "高い",
+          "pos": "Adjective",
+          "surface": "高く"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ねえ"
+        }
+      ],
+      "id": "kunee",
+      "input": "高くねえ"
+    },
+    {
+      "description": "じゃねえか - regression test",
+      "expected": [
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "じゃ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ねえ"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "ji_neeka",
+      "input": "じゃねえか"
     }
   ],
   "description": "Contraction patterns (てる、ちゃう)",

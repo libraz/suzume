@@ -160,8 +160,8 @@
           "surface": "ん"
         },
         {
-          "lemma": "だ",
-          "pos": "Auxiliary",
+          "lemma": "で",
+          "pos": "Particle",
           "surface": "で"
         },
         {
@@ -192,8 +192,8 @@
           "surface": "ん"
         },
         {
-          "lemma": "だ",
-          "pos": "Auxiliary",
+          "lemma": "で",
+          "pos": "Particle",
           "surface": "で"
         },
         {
@@ -224,8 +224,8 @@
           "surface": "ん"
         },
         {
-          "lemma": "だ",
-          "pos": "Auxiliary",
+          "lemma": "で",
+          "pos": "Particle",
           "surface": "で"
         },
         {
@@ -2248,6 +2248,228 @@
       ],
       "id": "ga_dekizu_ttta",
       "input": "理由が理解できず困った"
+    },
+    {
+      "description": "行かんでいい - regression test",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行か"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "いい",
+          "pos": "Adjective",
+          "surface": "いい"
+        }
+      ],
+      "id": "kandeii",
+      "input": "行かんでいい"
+    },
+    {
+      "description": "そんなことせんでええよ。 - regression test",
+      "expected": [
+        {
+          "lemma": "そんな",
+          "pos": "Determiner",
+          "surface": "そんな"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "こと"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "せ"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "ええ",
+          "pos": "Adjective",
+          "surface": "ええ"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "sonnakotosendeeeyo",
+      "input": "そんなことせんでええよ。"
+    },
+    {
+      "description": "行かんではいけない - regression test",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行か"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "いける",
+          "pos": "Auxiliary",
+          "surface": "いけ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "kandehaikenai",
+      "input": "行かんではいけない"
+    },
+    {
+      "description": "行かないでもいい - regression test",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行か"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "いい",
+          "pos": "Adjective",
+          "surface": "いい"
+        }
+      ],
+      "id": "kanaidemoii",
+      "input": "行かないでもいい"
+    },
+    {
+      "description": "ええよ、気にせんといて。 - regression test",
+      "expected": [
+        {
+          "lemma": "ええ",
+          "pos": "Adjective",
+          "surface": "ええ"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        },
+        {
+          "lemma": "気",
+          "pos": "Noun",
+          "surface": "気"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "せ"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "い"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "eeyo_nisentoite",
+      "input": "ええよ、気にせんといて。"
+    },
+    {
+      "description": "気にせんと - regression test",
+      "expected": [
+        {
+          "lemma": "気",
+          "pos": "Noun",
+          "surface": "気"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "せ"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        }
+      ],
+      "id": "nisento",
+      "input": "気にせんと"
     }
   ],
   "description": "Negation auxiliaries (ない、ぬ)",

@@ -1455,6 +1455,92 @@
       ],
       "id": "eeee",
       "input": "ええええ"
+    },
+    {
+      "description": "今日も一日お疲れ様でしたっと。 - regression test",
+      "expected": [
+        {
+          "lemma": "今日",
+          "pos": "Noun",
+          "surface": "今日"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "一日",
+          "pos": "Noun",
+          "surface": "一日"
+        },
+        {
+          "lemma": "お疲れ様",
+          "pos": "Interjection",
+          "surface": "お疲れ様"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "でし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "っと",
+          "pos": "Particle",
+          "surface": "っと"
+        }
+      ],
+      "id": "mo_o_re_deshitattto",
+      "input": "今日も一日お疲れ様でしたっと。"
+    },
+    {
+      "description": "帰ったっと - regression test",
+      "expected": [
+        {
+          "lemma": "帰る",
+          "pos": "Verb",
+          "surface": "帰っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "っと",
+          "pos": "Particle",
+          "surface": "っと"
+        }
+      ],
+      "id": "tttattto",
+      "input": "帰ったっと"
+    },
+    {
+      "description": "読んだっと - regression test",
+      "expected": [
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "っと",
+          "pos": "Particle",
+          "surface": "っと"
+        }
+      ],
+      "id": "ndattto",
+      "input": "読んだっと"
     }
   ],
   "description": "Onomatopoeia and mimetic words",

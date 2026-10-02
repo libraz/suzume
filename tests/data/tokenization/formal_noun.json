@@ -2730,6 +2730,119 @@
       ],
       "id": "d6_determiner_tameshi_control",
       "input": "そんなためしがない。"
+    },
+    {
+      "description": "そういうとこだぞ。 - regression test",
+      "expected": [
+        {
+          "lemma": "そういう",
+          "pos": "Determiner",
+          "surface": "そういう"
+        },
+        {
+          "lemma": "とこ",
+          "pos": "Noun",
+          "surface": "とこ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "ぞ",
+          "pos": "Particle",
+          "surface": "ぞ"
+        }
+      ],
+      "id": "souiutokodazo",
+      "input": "そういうとこだぞ。"
+    },
+    {
+      "description": "そういうところだぞ - regression test",
+      "expected": [
+        {
+          "lemma": "そういう",
+          "pos": "Determiner",
+          "surface": "そういう"
+        },
+        {
+          "lemma": "ところ",
+          "pos": "Noun",
+          "surface": "ところ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "ぞ",
+          "pos": "Particle",
+          "surface": "ぞ"
+        }
+      ],
+      "id": "souiutokorodazo",
+      "input": "そういうところだぞ"
+    },
+    {
+      "description": "こういうとこ - regression test",
+      "expected": [
+        {
+          "lemma": "こういう",
+          "pos": "Determiner",
+          "surface": "こういう"
+        },
+        {
+          "lemma": "とこ",
+          "pos": "Noun",
+          "surface": "とこ"
+        }
+      ],
+      "id": "kouiutoko",
+      "input": "こういうとこ"
+    },
+    {
+      "description": "食べたとこなんだけど - regression test",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "とこ",
+          "pos": "Noun",
+          "surface": "とこ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "けど",
+          "pos": "Particle",
+          "surface": "けど"
+        }
+      ],
+      "id": "betatokonandakedo",
+      "input": "食べたとこなんだけど"
     }
   ],
   "description": "formal_noun tests",

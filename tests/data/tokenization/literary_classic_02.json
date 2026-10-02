@@ -690,6 +690,269 @@
       ],
       "id": "tamu_wo_mutosu",
       "input": "春待たむ人を見むとす"
+    },
+    {
+      "description": "よき。 - regression test",
+      "expected": [
+        {
+          "lemma": "よい",
+          "pos": "Adjective",
+          "surface": "よき"
+        }
+      ],
+      "id": "yoki",
+      "input": "よき。"
+    },
+    {
+      "description": "よき日 - regression test",
+      "expected": [
+        {
+          "lemma": "よい",
+          "pos": "Adjective",
+          "surface": "よき"
+        },
+        {
+          "lemma": "日",
+          "pos": "Noun",
+          "surface": "日"
+        }
+      ],
+      "id": "yoki_2",
+      "input": "よき日"
+    },
+    {
+      "description": "よきかな - regression test",
+      "expected": [
+        {
+          "lemma": "よい",
+          "pos": "Adjective",
+          "surface": "よき"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        }
+      ],
+      "id": "yokikana",
+      "input": "よきかな"
+    },
+    {
+      "description": "議論を尽くさぬまま成立を急ぐべきではない。 - regression test",
+      "expected": [
+        {
+          "lemma": "議論",
+          "pos": "Noun",
+          "surface": "議論"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "尽くす",
+          "pos": "Verb",
+          "surface": "尽くさ"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬ"
+        },
+        {
+          "lemma": "まま",
+          "pos": "Noun",
+          "surface": "まま"
+        },
+        {
+          "lemma": "成立",
+          "pos": "Noun",
+          "surface": "成立"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "急ぐ",
+          "pos": "Verb",
+          "surface": "急ぐ"
+        },
+        {
+          "lemma": "べし",
+          "pos": "Auxiliary",
+          "surface": "べき"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "wo_kusanumama_wo_gubekidehanai",
+      "input": "議論を尽くさぬまま成立を急ぐべきではない。"
+    },
+    {
+      "description": "本を読まぬ - regression test",
+      "expected": [
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読ま"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬ"
+        }
+      ],
+      "id": "wo_manu",
+      "input": "本を読まぬ"
+    },
+    {
+      "description": "手を出さぬ - regression test",
+      "expected": [
+        {
+          "lemma": "手",
+          "pos": "Noun",
+          "surface": "手"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "出す",
+          "pos": "Verb",
+          "surface": "出さ"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬ"
+        }
+      ],
+      "id": "wo_sanu",
+      "input": "手を出さぬ"
+    },
+    {
+      "description": "死なぬ - regression test",
+      "expected": [
+        {
+          "lemma": "死ぬ",
+          "pos": "Verb",
+          "surface": "死な"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬ"
+        }
+      ],
+      "id": "nanu",
+      "input": "死なぬ"
+    },
+    {
+      "description": "何をか言わんや - regression test",
+      "expected": [
+        {
+          "lemma": "何",
+          "pos": "Pronoun",
+          "surface": "何"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言わ"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        },
+        {
+          "lemma": "や",
+          "pos": "Particle",
+          "surface": "や"
+        }
+      ],
+      "id": "woka_wanya",
+      "input": "何をか言わんや"
+    },
+    {
+      "description": "何をか言わんや。 - regression test",
+      "expected": [
+        {
+          "lemma": "何",
+          "pos": "Pronoun",
+          "surface": "何"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言わ"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        },
+        {
+          "lemma": "や",
+          "pos": "Particle",
+          "surface": "や"
+        }
+      ],
+      "id": "woka_wanya_2",
+      "input": "何をか言わんや。"
     }
   ],
   "description": "literary_classic tests (part 2/2)",

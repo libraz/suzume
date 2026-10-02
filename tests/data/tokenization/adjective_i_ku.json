@@ -1387,6 +1387,158 @@
       ],
       "id": "i_no_de_ha_ezu_ku",
       "input": "蒼い空の下で、風は絶えず吹く。"
+    },
+    {
+      "description": "言われるまでもなくやる。 - regression test",
+      "expected": [
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言わ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れる"
+        },
+        {
+          "lemma": "まで",
+          "pos": "Particle",
+          "surface": "まで"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "なく"
+        },
+        {
+          "lemma": "やる",
+          "pos": "Verb",
+          "surface": "やる"
+        }
+      ],
+      "id": "warerumademonakuyaru",
+      "input": "言われるまでもなくやる。"
+    },
+    {
+      "description": "迷いもなくやる - regression test",
+      "expected": [
+        {
+          "lemma": "迷い",
+          "pos": "Noun",
+          "surface": "迷い"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "なく"
+        },
+        {
+          "lemma": "やる",
+          "pos": "Verb",
+          "surface": "やる"
+        }
+      ],
+      "id": "imonakuyaru",
+      "input": "迷いもなくやる"
+    },
+    {
+      "description": "なくやる - regression test",
+      "expected": [
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "なく"
+        },
+        {
+          "lemma": "やる",
+          "pos": "Verb",
+          "surface": "やる"
+        }
+      ],
+      "id": "nakuyaru",
+      "input": "なくやる"
+    },
+    {
+      "description": "そういうのってなんか違くない？ - regression test",
+      "expected": [
+        {
+          "lemma": "そういう",
+          "pos": "Determiner",
+          "surface": "そういう"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "なんか",
+          "pos": "Particle",
+          "surface": "なんか"
+        },
+        {
+          "lemma": "違い",
+          "pos": "Adjective",
+          "surface": "違く"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "souiunotttenanka_kunai",
+      "input": "そういうのってなんか違くない？"
+    },
+    {
+      "description": "違くて - regression test",
+      "expected": [
+        {
+          "lemma": "違い",
+          "pos": "Adjective",
+          "surface": "違く"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "kute",
+      "input": "違くて"
+    },
+    {
+      "description": "違かった - regression test",
+      "expected": [
+        {
+          "lemma": "違い",
+          "pos": "Adjective",
+          "surface": "違かっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "kattta_2",
+      "input": "違かった"
     }
   ],
   "description": "I-adjectives ku-forms (連用形) - adverbial, negative, te-form, ku-naru patterns",

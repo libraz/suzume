@@ -9,13 +9,13 @@
           "surface": "待っ"
         },
         {
-          "lemma": "て",
-          "pos": "Particle",
+          "lemma": "てる",
+          "pos": "Auxiliary",
           "surface": "て"
         },
         {
-          "lemma": "てる",
-          "pos": "Auxiliary",
+          "lemma": "て",
+          "pos": "Particle",
           "surface": "て"
         },
         {
@@ -496,6 +496,738 @@
       ],
       "id": "naraokdesu",
       "input": "本ならOKです"
+    },
+    {
+      "description": "いいってば。 - regression test",
+      "expected": [
+        {
+          "lemma": "いい",
+          "pos": "Adjective",
+          "surface": "いい"
+        },
+        {
+          "lemma": "ってば",
+          "pos": "Particle",
+          "surface": "ってば"
+        }
+      ],
+      "id": "iittteba",
+      "input": "いいってば。"
+    },
+    {
+      "description": "早く来いってば。 - regression test",
+      "expected": [
+        {
+          "lemma": "早い",
+          "pos": "Adjective",
+          "surface": "早く"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来い"
+        },
+        {
+          "lemma": "ってば",
+          "pos": "Particle",
+          "surface": "ってば"
+        }
+      ],
+      "id": "ku_ittteba",
+      "input": "早く来いってば。"
+    },
+    {
+      "description": "いいってばよ - regression test",
+      "expected": [
+        {
+          "lemma": "いい",
+          "pos": "Adjective",
+          "surface": "いい"
+        },
+        {
+          "lemma": "ってば",
+          "pos": "Particle",
+          "surface": "ってば"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "iitttebayo",
+      "input": "いいってばよ"
+    },
+    {
+      "description": "そんなわけないでしょって。 - regression test",
+      "expected": [
+        {
+          "lemma": "そんな",
+          "pos": "Determiner",
+          "surface": "そんな"
+        },
+        {
+          "lemma": "わけ",
+          "pos": "Noun",
+          "surface": "わけ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "でしょ"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        }
+      ],
+      "id": "sonnawakenaideshi_ttte",
+      "input": "そんなわけないでしょって。"
+    },
+    {
+      "description": "だめでしょって - regression test",
+      "expected": [
+        {
+          "lemma": "だめ",
+          "pos": "Adjective",
+          "surface": "だめ"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "でしょ"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        }
+      ],
+      "id": "damedeshi_ttte",
+      "input": "だめでしょって"
+    },
+    {
+      "description": "行くよお - regression test",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行く"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よお"
+        }
+      ],
+      "id": "kuyoo",
+      "input": "行くよお"
+    },
+    {
+      "description": "それがいいんだけどさあ。 - regression test",
+      "expected": [
+        {
+          "lemma": "それ",
+          "pos": "Pronoun",
+          "surface": "それ"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "いい",
+          "pos": "Adjective",
+          "surface": "いい"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "けど",
+          "pos": "Particle",
+          "surface": "けど"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Particle",
+          "surface": "さあ"
+        }
+      ],
+      "id": "soregaiindakedosaa",
+      "input": "それがいいんだけどさあ。"
+    },
+    {
+      "description": "雨だよお - regression test",
+      "expected": [
+        {
+          "lemma": "雨",
+          "pos": "Noun",
+          "surface": "雨"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よお"
+        }
+      ],
+      "id": "dayoo",
+      "input": "雨だよお"
+    },
+    {
+      "description": "君も来るよな。 - regression test",
+      "expected": [
+        {
+          "lemma": "君",
+          "pos": "Pronoun",
+          "surface": "君"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来る"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        }
+      ],
+      "id": "mo_ruyona",
+      "input": "君も来るよな。"
+    },
+    {
+      "description": "行くよな - regression test",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行く"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        }
+      ],
+      "id": "kuyona",
+      "input": "行くよな"
+    },
+    {
+      "description": "来たよな - regression test",
+      "expected": [
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        }
+      ],
+      "id": "tayona",
+      "input": "来たよな"
+    },
+    {
+      "description": "来るわな - regression test",
+      "expected": [
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来る"
+        },
+        {
+          "lemma": "わ",
+          "pos": "Particle",
+          "surface": "わ"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        }
+      ],
+      "id": "ruwana",
+      "input": "来るわな"
+    },
+    {
+      "description": "読みますよな - regression test",
+      "expected": [
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読み"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        }
+      ],
+      "id": "mimasuyona",
+      "input": "読みますよな"
+    },
+    {
+      "description": "あれはどうなったんだろうね。 - regression test",
+      "expected": [
+        {
+          "lemma": "あれ",
+          "pos": "Pronoun",
+          "surface": "あれ"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "どう",
+          "pos": "Adjective",
+          "surface": "どう"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だろ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        }
+      ],
+      "id": "arehadounatttandaroune",
+      "input": "あれはどうなったんだろうね。"
+    },
+    {
+      "description": "そうなったんだろう - regression test",
+      "expected": [
+        {
+          "lemma": "そう",
+          "pos": "Adverb",
+          "surface": "そう"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だろ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "sounatttandarou",
+      "input": "そうなったんだろう"
+    },
+    {
+      "description": "もらったんだろう - regression test",
+      "expected": [
+        {
+          "lemma": "もらう",
+          "pos": "Verb",
+          "surface": "もらっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だろ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "moratttandarou",
+      "input": "もらったんだろう"
+    },
+    {
+      "description": "食べたんだけどさ。 - regression test",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "けど",
+          "pos": "Particle",
+          "surface": "けど"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Particle",
+          "surface": "さ"
+        }
+      ],
+      "id": "betandakedosa",
+      "input": "食べたんだけどさ。"
+    },
+    {
+      "description": "行くんだけどさ - regression test",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行く"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "けど",
+          "pos": "Particle",
+          "surface": "けど"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Particle",
+          "surface": "さ"
+        }
+      ],
+      "id": "kundakedosa",
+      "input": "行くんだけどさ"
+    },
+    {
+      "description": "そうなんだけどさ - regression test",
+      "expected": [
+        {
+          "lemma": "そう",
+          "pos": "Adjective",
+          "surface": "そう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "けど",
+          "pos": "Particle",
+          "surface": "けど"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Particle",
+          "surface": "さ"
+        }
+      ],
+      "id": "sounandakedosa",
+      "input": "そうなんだけどさ"
+    },
+    {
+      "description": "雨が降るかもねえ。 - regression test",
+      "expected": [
+        {
+          "lemma": "雨",
+          "pos": "Noun",
+          "surface": "雨"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "降る",
+          "pos": "Verb",
+          "surface": "降る"
+        },
+        {
+          "lemma": "かも",
+          "pos": "Particle",
+          "surface": "かも"
+        },
+        {
+          "lemma": "ねえ",
+          "pos": "Particle",
+          "surface": "ねえ"
+        }
+      ],
+      "id": "ga_rukamonee",
+      "input": "雨が降るかもねえ。"
+    },
+    {
+      "description": "そうかもねえ - regression test",
+      "expected": [
+        {
+          "lemma": "そう",
+          "pos": "Adverb",
+          "surface": "そう"
+        },
+        {
+          "lemma": "かも",
+          "pos": "Particle",
+          "surface": "かも"
+        },
+        {
+          "lemma": "ねえ",
+          "pos": "Particle",
+          "surface": "ねえ"
+        }
+      ],
+      "id": "soukamonee",
+      "input": "そうかもねえ"
+    },
+    {
+      "description": "いいかもねえ - regression test",
+      "expected": [
+        {
+          "lemma": "いい",
+          "pos": "Adjective",
+          "surface": "いい"
+        },
+        {
+          "lemma": "かも",
+          "pos": "Particle",
+          "surface": "かも"
+        },
+        {
+          "lemma": "ねえ",
+          "pos": "Particle",
+          "surface": "ねえ"
+        }
+      ],
+      "id": "iikamonee",
+      "input": "いいかもねえ"
+    },
+    {
+      "description": "なんでだよ、意味わかんない。 - regression test",
+      "expected": [
+        {
+          "lemma": "なんで",
+          "pos": "Adverb",
+          "surface": "なんで"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        },
+        {
+          "lemma": "意味",
+          "pos": "Noun",
+          "surface": "意味"
+        },
+        {
+          "lemma": "わかる",
+          "pos": "Verb",
+          "surface": "わかん"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "nandedayo_wakannai",
+      "input": "なんでだよ、意味わかんない。"
+    },
+    {
+      "description": "なんでそう - regression test",
+      "expected": [
+        {
+          "lemma": "なんで",
+          "pos": "Adverb",
+          "surface": "なんで"
+        },
+        {
+          "lemma": "そう",
+          "pos": "Adverb",
+          "surface": "そう"
+        }
+      ],
+      "id": "nandesou",
+      "input": "なんでそう"
+    },
+    {
+      "description": "でもなんでだよ - regression test",
+      "expected": [
+        {
+          "lemma": "でも",
+          "pos": "Conjunction",
+          "surface": "でも"
+        },
+        {
+          "lemma": "なんで",
+          "pos": "Adverb",
+          "surface": "なんで"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "demonandedayo",
+      "input": "でもなんでだよ"
+    },
+    {
+      "description": "なぜだよ - regression test",
+      "expected": [
+        {
+          "lemma": "なぜ",
+          "pos": "Adverb",
+          "surface": "なぜ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "nazedayo",
+      "input": "なぜだよ"
     }
   ],
   "description": "particle_final tests",

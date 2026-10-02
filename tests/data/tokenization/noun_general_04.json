@@ -1551,6 +1551,319 @@
       ],
       "id": "ureshiihanashiwokiku",
       "input": "うれしい話を聞く"
+    },
+    {
+      "description": "少子化に歯止めをかけるには、押し付けではなく支援こそが求められる。 - regression test",
+      "expected": [
+        {
+          "lemma": "少子化",
+          "pos": "Noun",
+          "surface": "少子化"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "歯止め",
+          "pos": "Noun",
+          "surface": "歯止め"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "かける",
+          "pos": "Verb",
+          "surface": "かける"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "押し付け",
+          "pos": "Noun",
+          "surface": "押し付け"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なく"
+        },
+        {
+          "lemma": "支援",
+          "pos": "Noun",
+          "surface": "支援"
+        },
+        {
+          "lemma": "こそ",
+          "pos": "Particle",
+          "surface": "こそ"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "求める",
+          "pos": "Verb",
+          "surface": "求め"
+        },
+        {
+          "lemma": "られる",
+          "pos": "Auxiliary",
+          "surface": "られる"
+        }
+      ],
+      "id": "ni_mewokakeruniha_shi_kedehanaku_kosoga_merareru",
+      "input": "少子化に歯止めをかけるには、押し付けではなく支援こそが求められる。"
+    },
+    {
+      "description": "押し付けだ - regression test",
+      "expected": [
+        {
+          "lemma": "押し付け",
+          "pos": "Noun",
+          "surface": "押し付け"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "shi_keda",
+      "input": "押し付けだ"
+    },
+    {
+      "description": "締め付けだ - regression test",
+      "expected": [
+        {
+          "lemma": "締め付け",
+          "pos": "Noun",
+          "surface": "締め付け"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "me_keda",
+      "input": "締め付けだ"
+    },
+    {
+      "description": "決め付けではなく - regression test",
+      "expected": [
+        {
+          "lemma": "決め付け",
+          "pos": "Noun",
+          "surface": "決め付け"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なく"
+        }
+      ],
+      "id": "me_kedehanaku",
+      "input": "決め付けではなく"
+    },
+    {
+      "description": "押し付けです - regression test",
+      "expected": [
+        {
+          "lemma": "押し付け",
+          "pos": "Noun",
+          "surface": "押し付け"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "shi_kedesu",
+      "input": "押し付けです"
+    },
+    {
+      "description": "問題の根底にあるのは、制度そのものへの不信であろう。 - regression test",
+      "expected": [
+        {
+          "lemma": "問題",
+          "pos": "Noun",
+          "surface": "問題"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "根底",
+          "pos": "Noun",
+          "surface": "根底"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "制度",
+          "pos": "Noun",
+          "surface": "制度"
+        },
+        {
+          "lemma": "そのもの",
+          "pos": "Noun",
+          "surface": "そのもの"
+        },
+        {
+          "lemma": "へ",
+          "pos": "Particle",
+          "surface": "へ"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "不信",
+          "pos": "Noun",
+          "surface": "不信"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Auxiliary",
+          "surface": "あろ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "no_niarunoha_sonomonoheno_dearou",
+      "input": "問題の根底にあるのは、制度そのものへの不信であろう。"
+    },
+    {
+      "description": "社会そのものを - regression test",
+      "expected": [
+        {
+          "lemma": "社会",
+          "pos": "Noun",
+          "surface": "社会"
+        },
+        {
+          "lemma": "そのもの",
+          "pos": "Noun",
+          "surface": "そのもの"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        }
+      ],
+      "id": "sonomonowo",
+      "input": "社会そのものを"
+    },
+    {
+      "description": "制度そのものが - regression test",
+      "expected": [
+        {
+          "lemma": "制度",
+          "pos": "Noun",
+          "surface": "制度"
+        },
+        {
+          "lemma": "そのもの",
+          "pos": "Noun",
+          "surface": "そのもの"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        }
+      ],
+      "id": "sonomonoga",
+      "input": "制度そのものが"
+    },
+    {
+      "description": "制度そのものだ - regression test",
+      "expected": [
+        {
+          "lemma": "制度",
+          "pos": "Noun",
+          "surface": "制度"
+        },
+        {
+          "lemma": "そのもの",
+          "pos": "Noun",
+          "surface": "そのもの"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "sonomonoda",
+      "input": "制度そのものだ"
     }
   ],
   "description": "General nouns (part 4/4)",

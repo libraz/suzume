@@ -1529,6 +1529,114 @@
       ],
       "id": "kokoro_ochitsuku",
       "input": "心落ち着く"
+    },
+    {
+      "description": "事故を受け、同路線は一時運転を見合わせた。 - regression test",
+      "expected": [
+        {
+          "lemma": "事故",
+          "pos": "Noun",
+          "surface": "事故"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "受ける",
+          "pos": "Verb",
+          "surface": "受け"
+        },
+        {
+          "lemma": "同路線",
+          "pos": "Noun",
+          "surface": "同路線"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "一時",
+          "pos": "Noun",
+          "surface": "一時"
+        },
+        {
+          "lemma": "運転",
+          "pos": "Noun",
+          "surface": "運転"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "見合わせる",
+          "pos": "Verb",
+          "surface": "見合わせ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wo_ke_ha_wo_waseta",
+      "input": "事故を受け、同路線は一時運転を見合わせた。"
+    },
+    {
+      "description": "見合わせて - regression test",
+      "expected": [
+        {
+          "lemma": "見合わせる",
+          "pos": "Verb",
+          "surface": "見合わせ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "wasete",
+      "input": "見合わせて"
+    },
+    {
+      "description": "見合わせない - regression test",
+      "expected": [
+        {
+          "lemma": "見合わせる",
+          "pos": "Verb",
+          "surface": "見合わせ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "wasenai",
+      "input": "見合わせない"
+    },
+    {
+      "description": "持ち合わせた - regression test",
+      "expected": [
+        {
+          "lemma": "持ち合わせる",
+          "pos": "Verb",
+          "surface": "持ち合わせ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "chi_waseta",
+      "input": "持ち合わせた"
     }
   ],
   "description": "Compound verbs (part 5/5)",
