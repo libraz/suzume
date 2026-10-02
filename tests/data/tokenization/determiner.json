@@ -296,6 +296,82 @@
       ],
       "id": "taru_da_2",
       "input": "純然たる事実だ。"
+    },
+    {
+      "description": "おなじ本を読む - regression test",
+      "expected": [
+        {
+          "lemma": "おなじ",
+          "pos": "Determiner",
+          "surface": "おなじ"
+        },
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読む"
+        }
+      ],
+      "id": "onaji_wo_mu",
+      "input": "おなじ本を読む"
+    },
+    {
+      "description": "おなじなら買う - regression test",
+      "expected": [
+        {
+          "lemma": "おなじ",
+          "pos": "Adjective",
+          "surface": "おなじ"
+        },
+        {
+          "lemma": "なら",
+          "pos": "Particle",
+          "surface": "なら"
+        },
+        {
+          "lemma": "買う",
+          "pos": "Verb",
+          "surface": "買う"
+        }
+      ],
+      "id": "onajinara_u",
+      "input": "おなじなら買う"
+    },
+    {
+      "description": "おなじ色の服 - regression test",
+      "expected": [
+        {
+          "lemma": "おなじ",
+          "pos": "Determiner",
+          "surface": "おなじ"
+        },
+        {
+          "lemma": "色",
+          "pos": "Noun",
+          "surface": "色"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "服",
+          "pos": "Noun",
+          "surface": "服"
+        }
+      ],
+      "id": "onaji_no",
+      "input": "おなじ色の服"
     }
   ],
   "description": "determiner tests",
