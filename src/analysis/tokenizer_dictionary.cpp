@@ -1919,6 +1919,19 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
       continue;
     }
 
+    // The pejorative ったらしい opens on the geminate that the past た also
+    // takes after an onbin stem or the copula (言っ+た+らしい, だっ+た+らしい);
+    // a registered predicate cell ending at that っ claims it.
+    // Without the geminate, its host is a nominal, never a stem closing on っ.
+    if (result.entry->pos == core::PartOfSpeech::Adjective && utf8::endsWith(result.entry->lemma, "たらしい") &&
+        ((codepoints[start_pos] == U'っ' &&
+          (endsDictionaryVerbSpanningBack(dict_manager_, codepoints, start_pos, start_pos + 1) ||
+           (start_pos > 0 && lookupEntryInRange(dict_manager_, codepoints, start_pos - 1, start_pos + 1,
+                                                core::PartOfSpeech::Auxiliary) != nullptr))) ||
+         (codepoints[start_pos] != U'っ' && start_pos > 0 && codepoints[start_pos - 1] == U'っ'))) {
+      continue;
+    }
+
     // The one-mora contracted polite copula す stands only on the nominalizer
     // ん (行くん+す+か); everywhere else す is a verb.
     if (result.entry->extended_pos == core::ExtendedPOS::AuxCopulaDesu && end_pos == start_pos + 1 &&

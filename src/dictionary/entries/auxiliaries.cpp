@@ -610,6 +610,14 @@ EntrySpecRange getAuxiliaryEntries() {
       adj("っぽかろ", "っぽい", EPOS::AdjMizenkei),
       adj("っぽ", "っぽい", EPOS::AdjStem),
 
+      // Pejorative adjective suffix (っ)たらしい (嫌み+ったらしい, 未練+たらしい)
+      adj("ったらしい", "ったらしい", EPOS::AdjBasic),
+      adj("ったらしく", "ったらしい", EPOS::AdjRenyokei),
+      adj("ったらしかっ", "ったらしい", EPOS::AdjKatt),
+      adj("たらしい", "たらしい", EPOS::AdjBasic),
+      adj("たらしく", "たらしい", EPOS::AdjRenyokei),
+      adj("たらしかっ", "たらしい", EPOS::AdjKatt),
+
       // Polite imperative - connect after verb renyokei
       aux("なさい", "なさる", EPOS::AuxHonorific),
       // Honorific subsidiary なさる after お+連用形.  Keep its special

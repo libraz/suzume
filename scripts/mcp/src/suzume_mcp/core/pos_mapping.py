@@ -214,8 +214,8 @@ def map_mecab_pos(token: dict | str) -> str:
     if surface == "何時" and pos == "名詞" and pos_sub1 == "代名詞":
         return "Noun"
 
-    # お疲れ様: -> Interjection
-    if surface == "お疲れ様":
+    # お疲れ様 and its kana spelling: -> Interjection
+    if surface in ("お疲れ様", "おつかれさま"):
         return "Interjection"
 
     # Na-adjective overrides
