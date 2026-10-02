@@ -600,6 +600,15 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
       if (is_classical_iadjective_terminal) {
         nom1_cost += candidate::kClassicalIAdjectiveTerminalNounBonus;
       }
+      // み on an adjective stem is the property nominal (眠み, 無理み), which is
+      // a noun whatever follows it, the same as the registered 深み.
+      const std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
+      const bool is_property_nominal =
+          first_hiragana == U'み' && (verb_helpers::isAdjectiveInDictionary(dict_manager, kanji_stem) ||
+                                      verb_helpers::isAdjectiveInDictionary(dict_manager, kanji_stem + "い"));
+      if (is_property_nominal) {
+        nom1_cost += candidate::kNominalizedNounParticleBonus;
+      }
       // Each bonus above is evidence from the frame that the span is nominal.
       // With none of them a multi-kanji candidate is only a guess about an
       // open-class word, while the same span also reads as a noun heading a
@@ -656,7 +665,7 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
         // (手書き against 下書き).
         auto cand = makeCandidate(surface, start_pos, kanji_end + 1, core::PartOfSpeech::Noun, nom1_cost,
                                   has_particle_continuation || has_final_particle_continuation || nominal_compound ||
-                                      has_hiragana_noun_continuation,
+                                      has_hiragana_noun_continuation || is_property_nominal,
                                   CandidateOrigin::NominalizedNoun);
 #ifdef SUZUME_DEBUG_INFO
         cand.confidence = kNominalizedNounReportedConfidence;

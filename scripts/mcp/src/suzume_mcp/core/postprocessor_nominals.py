@@ -461,27 +461,35 @@ def postprocess_adjective_nominalizer(tokens: list[dict]) -> bool:
 
 
 def postprocess_verbal_nominalizer_mi(tokens: list[dict]) -> bool:
-    """Classify the productive nominalizing み on a verb stem as a suffix.
+    """Classify the productive nominalizing み that MeCab reads as みる.
 
     The subsidiary verb みる selects a te-form and nothing else, so a み that
-    follows a bare continuative cannot be one. It is the same nominalizer that
-    already comes back tagged Suffix on an adjective stem (しんど + み), and
-    leaving it as the subsidiary makes the token host a case particle no
-    predicate could take (分かり + み + が).
+    follows a bare continuative or an adjective stem cannot be one. On a verb
+    continuative it is the nominalizing suffix (分かり + み + が). On an
+    adjective stem it is the property nominal the merge pipeline already
+    joins when MeCab tags it as a suffix (嬉しみ, 痛み), so it joins here too
+    (しんどみ, 無理み).
     """
     changed = False
-    for idx in range(1, len(tokens)):
+    idx = 1
+    while idx < len(tokens):
         token = tokens[idx]
         previous = tokens[idx - 1]
         if (
             token.get("surface") != "み"
             or token.get("lemma") != "みる"
-            or previous.get("pos") != "Verb"
+            or previous.get("pos") not in ("Verb", "Adjective")
             or previous.get("surface", "").endswith(("て", "で"))
         ):
+            idx += 1
             continue
-        token["pos"] = "Suffix"
-        token["lemma"] = "み"
+        if previous.get("pos") == "Adjective":
+            combined = previous.get("surface", "") + "み"
+            tokens[idx - 1 : idx + 1] = [{"surface": combined, "pos": "Noun", "lemma": combined}]
+        else:
+            token["pos"] = "Suffix"
+            token["lemma"] = "み"
+            idx += 1
         changed = True
     return changed
 

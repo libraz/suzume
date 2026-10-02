@@ -703,6 +703,7 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
       {EPOS::AdjNaAdj, EPOS::AuxAspectIru, cost::kAlmostNever},   // 理性的+い(いる)
       {EPOS::AdjStem, EPOS::AuxNegativeNai, cost::kAlmostNever},  // な+ない
       {EPOS::AdjStem, EPOS::Other, cost::kAlmostNever},           // な+い(OTHER)
+      {EPOS::AdjNaAdj, EPOS::Other, cost::kAlmostNever},          // 無理+み(OTHER) for 無理み
       {EPOS::AdjStem, EPOS::AuxClassicalKi, cost::kAlmostNever},  // よ+き (the past き takes a verb)
       // An irrealis stem selects a closed set of auxiliaries; an unknown run
       // after it has swallowed one of them (言わ+んや for 言わ+ん+や).
