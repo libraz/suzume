@@ -628,14 +628,18 @@ void resolveFinalMorphemeRoles(std::vector<core::Morpheme>& result, const dictio
       (result.size() < 3 || result[2].surface != "ござい")) {
     resolver::retagNaAdjectivalSou(result[0]);
   }
-  if (result.size() >= 2 && result[0].surface == "どう" && result[0].pos == core::PartOfSpeech::Adverb &&
-      result[1].extended_pos == core::ExtendedPOS::ParticleCase && result[1].surface == "に") {
-    resolver::retag(result[0], core::PartOfSpeech::Adjective, core::ExtendedPOS::AdjNaAdj, "どう",
-                    dictionary::ConjugationType::None, grammar::ConjForm::Base);
-  }
-  for (size_t idx = 0; idx + 1 < result.size(); ++idx) {
-    if (result[idx].surface == "どう" && result[idx + 1].surface == "か") {
+  // The interrogative どう is one na-adjectival word whichever predicate
+  // follows (どうなった, どうする, どうですか); only the fixed かどうか keeps
+  // the adverb. The lattice picks either homograph by its neighbour's cost.
+  for (size_t idx = 0; idx < result.size(); ++idx) {
+    if (result[idx].surface != "どう") {
+      continue;
+    }
+    if (idx + 1 < result.size() && result[idx + 1].surface == "か") {
       resolver::retag(result[idx], core::PartOfSpeech::Adverb, core::ExtendedPOS::Adverb, "どう",
+                      dictionary::ConjugationType::None, grammar::ConjForm::Base);
+    } else if (result[idx].pos == core::PartOfSpeech::Adverb) {
+      resolver::retag(result[idx], core::PartOfSpeech::Adjective, core::ExtendedPOS::AdjNaAdj, "どう",
                       dictionary::ConjugationType::None, grammar::ConjForm::Base);
     }
   }

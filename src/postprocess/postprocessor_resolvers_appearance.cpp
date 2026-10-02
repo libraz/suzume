@@ -272,9 +272,12 @@ void resolveCopularNegative(std::vector<core::Morpheme>& result) {
         predicate.pos == core::PartOfSpeech::Suffix || predicate.extended_pos == core::ExtendedPOS::AdjNaAdj ||
         predicate.extended_pos == core::ExtendedPOS::ParticleNo ||
         predicate.extended_pos == core::ExtendedPOS::ParticleAdverbial ||
-        predicate.extended_pos == core::ExtendedPOS::ParticleBinding;
+        predicate.extended_pos == core::ExtendedPOS::ParticleBinding ||
+        // An auxiliary that hosts the copula is a predicate nominal too (べき+で+は+ない).
+        predicate.pos == core::PartOfSpeech::Auxiliary;
     if (!is_nominal_predicate || de.surface != "で" || de.extended_pos != core::ExtendedPOS::AuxCopulaDa ||
-        topic.extended_pos != core::ExtendedPOS::ParticleTopic || topic.surface != "は" || negative.surface != "ない") {
+        topic.extended_pos != core::ExtendedPOS::ParticleTopic || topic.surface != "は" ||
+        !utf8::equalsAny(negative.surface, {"ない", "なく", "なかっ"})) {
       continue;
     }
     retagNegativeNai(negative);

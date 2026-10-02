@@ -200,13 +200,13 @@ void resolveNominalCaseDe(std::vector<core::Morpheme>& result) {
          (successor->surface == "も" &&
           (((is_na_adjective || is_formal_noun || is_nominalized_clause) && idx + 2 < result.size() &&
             utf8::equalsAny(result[idx + 2].surface, {"ない", "なく", "なかっ"})) ||
-           is_adverbial_predicate || is_contracted_negative)));
+           is_adverbial_predicate)));
     const bool topic_starts_copular_aru =
         successor != nullptr && successor->extended_pos == core::ExtendedPOS::ParticleTopic &&
         idx + 2 < result.size() && utf8::equalsAny(result[idx + 2].surface, {"ある", "あり", "あろ", "あれ"});
     const bool binding_is_copular = successor != nullptr &&
                                     successor->extended_pos == core::ExtendedPOS::ParticleBinding &&
-                                    (successor->surface != "も" || is_adverbial_predicate || is_contracted_negative);
+                                    (successor->surface != "も" || is_adverbial_predicate);
     const bool is_copular_continuation =
         successor != nullptr &&
         (successor->extended_pos == core::ExtendedPOS::AuxGozaru || follows_negative || topic_starts_copular_negative ||
@@ -265,8 +265,10 @@ void resolveNominalCaseDe(std::vector<core::Morpheme>& result) {
       }
       continue;
     }
-    retag(de, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleCase, "で", dictionary::ConjugationType::None,
-          grammar::ConjForm::Base);
+    // んで is ないで contracted, so its で is the conjunctive particle.
+    retag(de, core::PartOfSpeech::Particle,
+          is_contracted_negative ? core::ExtendedPOS::ParticleConj : core::ExtendedPOS::ParticleCase, "で",
+          dictionary::ConjugationType::None, grammar::ConjForm::Base);
   }
 }
 

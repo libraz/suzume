@@ -502,10 +502,14 @@ void resolveVerbTeParticle(std::vector<core::Morpheme>& result) {
     if (!is_connective_verb_form || !grammar::isTeDeSurface(te.surface)) {
       continue;
     }
-    const bool contracted_progressive_before_past = te.extended_pos == core::ExtendedPOS::AuxAspectIru &&
-                                                    idx + 1 < result.size() &&
-                                                    result[idx + 1].extended_pos == core::ExtendedPOS::AuxTenseTa;
-    if (contracted_progressive_before_past) {
+    // The contracted progressive keeps its tag where its own continuative is
+    // inflected: before the past (待っ+て+た) or the connective て (待っ+て+て).
+    const bool contracted_progressive_inflects = te.extended_pos == core::ExtendedPOS::AuxAspectIru &&
+                                                 idx + 1 < result.size() &&
+                                                 (result[idx + 1].extended_pos == core::ExtendedPOS::AuxTenseTa ||
+                                                  (result[idx + 1].extended_pos == core::ExtendedPOS::ParticleConj &&
+                                                   grammar::isTeDeSurface(result[idx + 1].surface)));
+    if (contracted_progressive_inflects) {
       continue;
     }
     retag(te, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleConj, te.surface,
@@ -553,9 +557,9 @@ void resolveCompoundAdjectiveRenyokei(std::vector<core::Morpheme>& result) {
           dictionary::ConjugationType::IAdjective, grammar::ConjForm::Base);
   }
 
-  // The same suffixes can occur in their stem forms before appearance そう.
-  // Their lexical readings (やすい adjective / にく verb) are then unavailable:
-  // the preceding i-row stem fixes the productive compound construction.
+  // The same suffixes can occur in their stem forms before appearance そう,
+  // where the preceding i-row stem fixes the productive compound construction:
+  // やす is the stem of the adjective やすい, and にく keeps its noun tag.
   for (size_t idx = 0; idx + 2 < result.size(); ++idx) {
     auto& stem = result[idx];
     auto& suffix = result[idx + 1];
@@ -568,8 +572,8 @@ void resolveCompoundAdjectiveRenyokei(std::vector<core::Morpheme>& result) {
     }
 
     if (suffix.surface == "やす") {
-      retag(suffix, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::Unknown, "やす",
-            dictionary::ConjugationType::None, grammar::ConjForm::Base);
+      retag(suffix, core::PartOfSpeech::Adjective, core::ExtendedPOS::AdjStem, "やすい",
+            dictionary::ConjugationType::IAdjective, grammar::ConjForm::Base);
       if (idx + 3 < result.size() && isPredicativeCopula(result[idx + 3])) {
         sou.pos = core::PartOfSpeech::Adjective;
         sou.extended_pos = core::ExtendedPOS::AdjNaAdj;
