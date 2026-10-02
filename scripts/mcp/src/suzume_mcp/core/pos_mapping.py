@@ -100,6 +100,11 @@ def map_mecab_pos(token: dict | str) -> str:
     if surface == "遥か" and pos == "副詞":
         return "Adjective"
 
+    # いや: the denial/correction word is an interjection; the reference
+    # alone tags it as a conjunction before a following clause
+    if surface == "いや" and pos == "接続詞":
+        return "Interjection"
+
     # どう: Suzume treats as ナ形容詞
     if surface == "どう" and pos == "副詞":
         return "Adjective"
@@ -183,8 +188,8 @@ def map_mecab_pos(token: dict | str) -> str:
     if surface == "で" and pos == "動詞" and token.get("lemma") == "でる":
         token["lemma"] = "出る"
 
-    # いくら: 副詞/名詞 -> Pronoun (疑問代名詞)
-    if surface == "いくら" and pos in ("副詞", "名詞"):
+    # いくら and its western variant なんぼ: 副詞/名詞 -> Pronoun (疑問代名詞)
+    if surface in ("いくら", "なんぼ") and pos in ("副詞", "名詞"):
         return "Pronoun"
 
     # まして: 副詞 -> Conjunction (接続詞用法)
@@ -456,8 +461,9 @@ def correct_mecab_pos(tokens: list[dict]) -> None:
             t["pos"] = "助動詞"
             t["lemma"] = "だ"
 
-        # Fix っす: colloquial contraction of です; canonical base form is です
-        if surface in ("っす", "っした", "っすか"):
+        # Fix っす: colloquial contraction of です; canonical base form is です.
+        # っしょ is the same word's volitional cell (でしょ+う contracted).
+        if surface in ("っす", "っした", "っすか", "っしょ"):
             t["pos"] = "助動詞"
             t["lemma"] = "です"
 

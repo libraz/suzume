@@ -28,59 +28,12 @@ from .core_lexicon import core_headwords_by_length
 from .mecab import is_single_token_of_pos, mecab_analyze
 from .merge_postprocessors import (
     KARI_MIZENKEI_CELL,
-    _postprocess_adj_bungo,
-    _postprocess_adj_kari,
-    _postprocess_ascii_joiner_merge,
-    _postprocess_atode,
-    _postprocess_bound_prefix_adjective,
-    _postprocess_bound_suffix_noun_cell,
-    _postprocess_bound_voiced_suffix,
-    _postprocess_classical_kemu,
-    _postprocess_classical_ki,
-    _postprocess_classical_mu,
-    _postprocess_classical_shimu,
-    _postprocess_decomposable_adverb,
-    _postprocess_demo_copula,
-    _postprocess_derivational_nominal_suffix,
-    _postprocess_dialectal,
-    _postprocess_distributive_quantity,
-    _postprocess_epenthetic_sa,
-    _postprocess_filler_split,
-    _postprocess_gamashii,
-    _postprocess_ha_row_godan,
-    _postprocess_historical_kana_word,
-    _postprocess_honorific_split,
-    _postprocess_ichidan_imperative_yo,
-    _postprocess_izenkei_concessive,
-    _postprocess_kakari_pronoun_split,
-    _postprocess_kamo,
-    _postprocess_kanji_merge,
-    _postprocess_ku_nominalization,
-    _postprocess_kuruwa,
-    _postprocess_nde_split,
-    _postprocess_nickname_merge,
-    _postprocess_nidan_cell,
-    _postprocess_nominal_before_conjunctive_te,
-    _postprocess_nominal_classical_copula,
-    _postprocess_nominal_copula_naru,
-    _postprocess_nominal_zukeru,
-    _postprocess_noni,
-    _postprocess_onomatopoeia_tto_merge,
-    _postprocess_prefix_split,
-    _postprocess_productive_mimetics,
-    _postprocess_search_unit_split,
-    _postprocess_small_kana_head_merge,
-    _postprocess_stranded_lengthening_vowel,
-    _postprocess_stranded_okurigana,
-    _postprocess_tomo_particle,
-    _postprocess_totomoni,
-    _postprocess_variation_selector_merge,
-    _postprocess_word_internal_honorific_prefix,
+    apply_merge_postprocessors,
     classical_adjective_lemma,
     nidan_cell,
     reads_as_continuative,
 )
-from .split_rules import base_from_renyokei, bases_from_renyokei
+from .split_rules import _is_single_i_adjective, base_from_renyokei, bases_from_renyokei
 
 # Cells of the classical i-adjective paradigm that a kanji stem forms, paired
 # with the closed set of function words each one hosts.  The reference
@@ -346,7 +299,7 @@ def _denominal_ru_form(tokens: list[dict], index: int) -> str | None:
         and tail.get("pos_sub1") == "非自立"
         and tail.get("lemma") == "く"
         and index + 1 < len(tokens)
-        and tokens[index + 1].get("surface") == "た"
+        and tokens[index + 1].get("surface", "").startswith(("た", "て", "ちゃ", "ちま"))
     ):
         return surface
     if (
@@ -354,7 +307,10 @@ def _denominal_ru_form(tokens: list[dict], index: int) -> str | None:
         and tail.get("pos") == "名詞"
         and tail.get("pos_sub1") == "接尾"
         and index + 1 < len(tokens)
-        and tokens[index + 1].get("surface") == "ない"
+        and (
+            tokens[index + 1].get("surface") == "ない"
+            or (tokens[index + 1].get("pos_sub1") == "接尾" and tokens[index + 1].get("lemma") in ("せる", "れる"))
+        )
     ):
         return surface
     if (
@@ -1209,7 +1165,62 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                     if applied_rule is None:
                         applied_rule = "prefix+noun"
 
+        # The obligation and prohibition frames (〜なあかん, 〜たらあかん) end in
+        # the fixed あかん the reference already holds as one word; it splits it
+        # into a literal あく+ん only when it fails to see the frame.
+        if (
+            not merged
+            and t.get("surface") == "あか"
+            and t.get("pos") == "動詞"
+            and t.get("lemma") == "あく"
+            and i + 1 < len(tokens)
+            and tokens[i + 1].get("surface") == "ん"
+            and tokens[i + 1].get("pos") == "助動詞"
+            and result
+            and (
+                (result[-1].get("surface") == "な" and result[-1].get("lemma") == "ない")
+                or result[-1].get("surface") in ("たら", "だら")
+            )
+        ):
+            result.append({"surface": "あかん", "pos": "感動詞", "lemma": "あかん"})
+            i += 2
+            merged = True
+            if applied_rule is None:
+                applied_rule = "obligation-akan"
+
         # 3. Nai-adjective merge
+        # After a nominal, でしょ+う+が+ない spelling で + しょうがない is the
+        # continuative copula and the adjective (暇でしょうがない); the
+        # reference reads the copula's conjectural cell across the boundary.
+        if (
+            not merged
+            and t.get("surface") == "でしょ"
+            and t.get("pos") == "助動詞"
+            and result
+            and result[-1].get("pos") in ("名詞", "Noun", "Adjective")
+        ):
+            for adj in NAI_ADJECTIVES:
+                if not remaining.startswith("で" + adj):
+                    continue
+                length = 0
+                j = i
+                while j < len(tokens) and length < len(adj) + 1:
+                    length += len(tokens[j].get("surface", ""))
+                    j += 1
+                if length == len(adj) + 1 and tokens[j - 1].get("surface", "").startswith("な"):
+                    # で keeps the tag the reference gives it after the same
+                    # host elsewhere: copula after a na-stem, particle otherwise.
+                    if result[-1].get("pos_sub1") == "形容動詞語幹":
+                        result.append({"surface": "で", "pos": "助動詞", "lemma": "だ"})
+                    else:
+                        result.append({"surface": "で", "pos": "助詞", "pos_sub1": "格助詞", "lemma": "で"})
+                    result.append({"surface": adj, "pos": "形容詞", "lemma": adj})
+                    i = j
+                    merged = True
+                    if applied_rule is None:
+                        applied_rule = "copula+nai-adjective"
+                    break
+
         if not merged:
             for adj in NAI_ADJECTIVES:
                 if remaining.startswith(adj):
@@ -1417,6 +1428,27 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                 merged = True
                 if applied_rule is None:
                     applied_rule = "nominal+derived-adjective"
+
+        # っぽい after a verb continuative derives a dispositional adjective
+        # (飽きっぽい, 怒りっぽい) with no boundary inside; the continuative is
+        # often tagged a noun, so its reading is recovered by probe.
+        if (
+            not merged
+            and i + 1 < len(tokens)
+            and tokens[i + 1].get("pos") == "形容詞"
+            and tokens[i + 1].get("lemma") == "っぽい"
+            and (
+                (t.get("pos") == "動詞" and t.get("conj_form") == "連用形")
+                or (t.get("pos") == "名詞" and reads_as_continuative(t.get("surface", "")))
+            )
+        ):
+            host = t.get("surface", "")
+            nxt = tokens[i + 1]
+            result.append({"surface": host + nxt.get("surface", ""), "pos": "形容詞", "lemma": host + "っぽい"})
+            i += 2
+            merged = True
+            if applied_rule is None:
+                applied_rule = "continuative+ppoi-adjective"
 
         # 4e. Emphatic lengthening inside a word
         # A ー between two kana is emphasis, not a boundary, but the reference analyzer
@@ -1886,7 +1918,36 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
             and t.get("pos_sub1") not in ("非自立", "代名詞")
             and base_from_renyokei(v1_surface) is not None
         )
-        if not merged and not begins_fixed_subsidiary and (v1_verb_renyokei or v1_nominal_renyokei):
+        # A kana V1 spelling a whole i-adjective (いい) is that adjective, and the
+        # やっ+て after it is the exclamatory や plus the quotative って.
+        v1_is_kana_adjective = regex.fullmatch(r"\p{Hiragana}+", v1_surface) is not None and _is_single_i_adjective(
+            v1_surface
+        )
+        if (
+            not merged
+            and v1_is_kana_adjective
+            and t.get("pos") == "動詞"
+            and i + 2 < len(tokens)
+            and tokens[i + 1].get("surface") == "やっ"
+            and tokens[i + 2].get("surface") == "て"
+        ):
+            result.extend(
+                (
+                    {"surface": v1_surface, "pos": "形容詞", "lemma": v1_surface},
+                    {"surface": "や", "pos": "助詞", "pos_sub1": "終助詞", "lemma": "や"},
+                    {"surface": "って", "pos": "助詞", "pos_sub1": "格助詞", "lemma": "って"},
+                )
+            )
+            i += 3
+            merged = True
+            if applied_rule is None:
+                applied_rule = "adjective-ya-quotative"
+        if (
+            not merged
+            and not begins_fixed_subsidiary
+            and not v1_is_kana_adjective
+            and (v1_verb_renyokei or v1_nominal_renyokei)
+        ):
             j = i + 1
             if j < len(tokens):
                 nxt = tokens[j]
@@ -2130,54 +2191,4 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
             )
             i += 1
 
-    # Post-process passes
-    result = _postprocess_kamo(result, applied_rule)
-    result, applied_rule = _postprocess_totomoni(result, applied_rule)
-    result, applied_rule = _postprocess_noni(result, applied_rule)
-    result, applied_rule = _postprocess_atode(result, applied_rule)
-    _postprocess_epenthetic_sa(result)
-    result, applied_rule = _postprocess_honorific_split(result, applied_rule)
-    result, applied_rule = _postprocess_prefix_split(result, applied_rule)
-    result, applied_rule = _postprocess_nde_split(result, applied_rule)
-    result, applied_rule = _postprocess_filler_split(result, applied_rule)
-    result, applied_rule = _postprocess_kuruwa(result, applied_rule)
-    result, applied_rule = _postprocess_demo_copula(result, applied_rule)
-    result, applied_rule = _postprocess_gamashii(result, applied_rule)
-    result, applied_rule = _postprocess_adj_bungo(result, applied_rule)
-    result, applied_rule = _postprocess_adj_kari(result, applied_rule)
-    result, applied_rule = _postprocess_ha_row_godan(result, applied_rule)
-    result, applied_rule = _postprocess_nidan_cell(result, applied_rule)
-    result, applied_rule = _postprocess_nominal_classical_copula(result, applied_rule)
-    result, applied_rule = _postprocess_historical_kana_word(result, applied_rule)
-    result, applied_rule = _postprocess_kakari_pronoun_split(result, applied_rule)
-    result, applied_rule = _postprocess_classical_mu(result, applied_rule)
-    result, applied_rule = _postprocess_ku_nominalization(result, applied_rule)
-    result, applied_rule = _postprocess_classical_shimu(result, applied_rule)
-    result, applied_rule = _postprocess_classical_kemu(result, applied_rule)
-    result, applied_rule = _postprocess_classical_ki(result, applied_rule)
-    result, applied_rule = _postprocess_nominal_copula_naru(result, applied_rule)
-    result, applied_rule = _postprocess_nominal_before_conjunctive_te(result, applied_rule)
-    result, applied_rule = _postprocess_derivational_nominal_suffix(result, applied_rule)
-    result, applied_rule = _postprocess_ichidan_imperative_yo(result, applied_rule)
-    result, applied_rule = _postprocess_stranded_okurigana(result, applied_rule)
-    result, applied_rule = _postprocess_decomposable_adverb(result, applied_rule)
-    result, applied_rule = _postprocess_bound_prefix_adjective(result, applied_rule)
-    result, applied_rule = _postprocess_word_internal_honorific_prefix(result, applied_rule)
-    result, applied_rule = _postprocess_variation_selector_merge(result, applied_rule)
-    result, applied_rule = _postprocess_izenkei_concessive(result, applied_rule)
-    result, applied_rule = _postprocess_tomo_particle(result, applied_rule)
-    result, applied_rule = _postprocess_bound_voiced_suffix(result, applied_rule)
-    result, applied_rule = _postprocess_bound_suffix_noun_cell(result, applied_rule)
-    result, applied_rule = _postprocess_kanji_merge(result, applied_rule)
-    result, applied_rule = _postprocess_nickname_merge(result, applied_rule)
-    result, applied_rule = _postprocess_search_unit_split(result, applied_rule)
-    result, applied_rule = _postprocess_onomatopoeia_tto_merge(result, applied_rule)
-    result, applied_rule = _postprocess_productive_mimetics(result, applied_rule)
-    result, applied_rule = _postprocess_distributive_quantity(result, applied_rule)
-    result, applied_rule = _postprocess_nominal_zukeru(result, applied_rule)
-    result, applied_rule = _postprocess_ascii_joiner_merge(result, applied_rule)
-    result, applied_rule = _postprocess_small_kana_head_merge(result, applied_rule)
-    result, applied_rule = _postprocess_stranded_lengthening_vowel(result, applied_rule)
-    _postprocess_dialectal(result)
-
-    return result, applied_rule
+    return apply_merge_postprocessors(result, applied_rule)

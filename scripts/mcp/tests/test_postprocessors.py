@@ -1,5 +1,7 @@
 """Tests for postprocessor functions."""
 
+import pytest
+
 from suzume_mcp.core import postprocessors
 from suzume_mcp.core.postprocessors import (
     POSTPROCESSORS,
@@ -81,6 +83,35 @@ def test_postprocessor_registry_is_complete_and_has_unique_labels():
     assert len(labels) == len(set(labels))
     assert {processor for _, processor in rules} == defined
     assert rules == POSTPROCESSORS
+
+
+def test_postprocessor_registry_rejects_unexported_rule(monkeypatch):
+    """A new owner-module rule must be registered even before facade export."""
+    owner = postprocessors.postprocessor_nominals
+
+    def postprocess_unregistered(tokens):
+        return False
+
+    postprocess_unregistered.__module__ = owner.__name__
+    monkeypatch.setattr(owner, "postprocess_unregistered", postprocess_unregistered, raising=False)
+
+    with pytest.raises(RuntimeError, match="unregistered postprocessor: postprocess_unregistered"):
+        postprocessors.postprocessor_rules()
+
+
+def test_postprocessor_registry_rejects_duplicate_labels(monkeypatch):
+    monkeypatch.setattr(postprocessors, "POSTPROCESSORS", (*POSTPROCESSORS, POSTPROCESSORS[0]))
+
+    with pytest.raises(RuntimeError, match="duplicate postprocessor rule label"):
+        postprocessors.postprocessor_rules()
+
+
+def test_postprocessor_registry_rejects_duplicate_functions(monkeypatch):
+    rules = (*POSTPROCESSORS, ("second-label-for-same-processor", POSTPROCESSORS[0][1]))
+    monkeypatch.setattr(postprocessors, "POSTPROCESSORS", rules)
+
+    with pytest.raises(RuntimeError, match="duplicate postprocessor function"):
+        postprocessors.postprocessor_rules()
 
 
 class TestModifierGodanImperative:
@@ -810,7 +841,7 @@ class TestTokenizerSearchUnitNormalizers:
 
     def test_l2_noun_homograph_before_copula_is_nominal(self, monkeypatch):
         monkeypatch.setattr(
-            "suzume_mcp.core.postprocessors.core_headwords",
+            "suzume_mcp.core.postprocessor_nominals.core_headwords",
             lambda filename: frozenset({"終わり"}),
         )
         tokens = [_tok("終わり", "Verb", lemma="終わる"), _tok("だ", "Auxiliary", lemma="だ")]
@@ -820,7 +851,7 @@ class TestTokenizerSearchUnitNormalizers:
 
     def test_l2_noun_homograph_before_verbal_auxiliary_stays_verb(self, monkeypatch):
         monkeypatch.setattr(
-            "suzume_mcp.core.postprocessors.core_headwords",
+            "suzume_mcp.core.postprocessor_nominals.core_headwords",
             lambda filename: frozenset({"終わり"}),
         )
         tokens = [_tok("終わり", "Verb", lemma="終わる"), _tok("ます", "Auxiliary", lemma="ます")]

@@ -1066,6 +1066,26 @@ def apply_suzume_split(tokens: list[dict]) -> tuple[list[dict], str | None]:
                 applied_rule = "literary-volitional-n-split"
             continue
 
+        # 11b. Literary perfective り after a サ変 noun (静止せる物体): the
+        # reference reads せる as the causative suffix, but the causative takes
+        # させる after a verbal noun, and an attributive せる before a noun is
+        # the サ変 stem せ plus the attributive る of り.
+        if (
+            t.get("pos") == "動詞"
+            and t.get("pos_sub1") == "接尾"
+            and surface == "せる"
+            and result
+            and result[-1].get("pos") == "名詞"
+            and result[-1].get("pos_sub1") == "サ変接続"
+            and token_index + 1 < len(tokens)
+            and tokens[token_index + 1].get("pos") == "名詞"
+        ):
+            result.append({"surface": "せ", "pos": "動詞", "lemma": "する"})
+            result.append({"surface": "る", "pos": "助動詞", "lemma": "り"})
+            if applied_rule is None:
+                applied_rule = "suru-noun-perfective-ri"
+            continue
+
         # 11a. The same ん cell hides behind an onbin reading when the copula
         # follows. Before a nominal the dictionary reads すん as the contracted
         # サ変 stem plus ん (そうすんのか), but before だ it prefers the ま-row
@@ -1081,7 +1101,8 @@ def apply_suzume_split(tokens: list[dict]) -> tuple[list[dict], str | None]:
             and t.get("conj_form") == "連用タ接続"
             and token_index + 1 < len(tokens)
             and tokens[token_index + 1].get("pos") == "助動詞"
-            and tokens[token_index + 1].get("surface") in ("だ", "です")
+            # The copula may already carry a fused sentence-final tail (だべ).
+            and tokens[token_index + 1].get("surface", "").startswith(("だ", "です"))
         ):
             probe = mecab_analyze(surface + "の")
             if (
