@@ -23,7 +23,12 @@ EntrySpecRange getFormalNounEntries() {
       // Note: 漢字「所」は削除 - 複合語（所在、場所）の一部として分割を妨げるため
       // ひらがな「ところ」のみ残す
       formal_noun("ところ", ""),
+      // Colloquial contraction (そういうとこ, 食べたとこ); the とく volitional
+      // とこ after a verb continuative is a separate auxiliary cell.
+      formal_noun("とこ", ""),
       formal_noun("どころ", ""),
+      // Emphatic apposition (制度そのもの): a closed determiner+formal noun unit.
+      formal_noun("そのもの", ""),
       formal_noun("ころ", ""),
       formal_noun("時", ""),
       formal_noun("内", ""),

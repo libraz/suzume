@@ -108,6 +108,7 @@ EntrySpecRange getParticleEntries() {
       // The modern sentence-final reading stays alongside it.
       particle("ぞ", EPOS::ParticleBinding),
       particle("ぜ", EPOS::ParticleFinal),
+      particle("や", EPOS::ParticleFinal),            // resignation/invitation (もういいや, 行こうや)
       particle("の", EPOS::ParticleNo),               // nominalizer
       {"ん", POS::Particle, EPOS::ParticleNo, "の"},  // colloquial の
       particle("じゃん", EPOS::ParticleFinal),

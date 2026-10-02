@@ -38,6 +38,7 @@ EntrySpecRange getPronounEntries() {
       pronoun("彼女", ""),
       pronoun("彼氏", ""),
       pronoun("奴", ""),
+      pronoun("やつ", ""),
       // 彼ら/彼女ら removed - handled as pronoun + ら suffix
 
       // Archaic/Samurai (武家・古風)
@@ -124,6 +125,7 @@ EntrySpecRange getPronounEntries() {
       pronoun_interrogative("幾つ", ""),
       pronoun_interrogative("幾ら", ""),
       pronoun_interrogative("いくら", ""),
+      pronoun_interrogative("なんぼ", ""),
       // どう/いかが can take だ/です (どうですか, いかがですか)
       // Register as both adverb and na-adjective for correct copula connection
       quotative_adv("どう", ""),
@@ -132,10 +134,12 @@ EntrySpecRange getPronounEntries() {
       na_adj("いかが", "いかが"),
       na_adj("さまざま", "さまざま"),
       na_adj("同じ", "同じ"),
+      na_adj("おなじ", "おなじ"),
       // Note: どうして needs very low cost to prevent split when followed by verb
       // The te-form bonus makes どう+して+VERB cheaper than どうして+VERB
       adv("どうして", ""),
       adv("なぜ", ""),
+      adv("なんで", ""),
 
       // Classical/literary adverbs (古語・文語副詞)
       adv("かく", ""),      // 斯く - classical demonstrative adverb (=こう/such)

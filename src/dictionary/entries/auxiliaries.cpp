@@ -49,6 +49,7 @@ EntrySpecRange getAuxiliaryEntries() {
       aux("なきゃ", "ない", EPOS::AuxNegativeNai),    // 仮定形口語縮約 (なければ→なきゃ, 標準終止)
       aux("なけりゃ", "ない", EPOS::AuxNegativeNai),  // 仮定形口語縮約 (なければ→なけりゃ)
       aux("なかろ", "ない", EPOS::AuxNegativeNai),    // 推量形 (なかろ+う)
+      aux("ねえ", "ない", EPOS::AuxNegativeNai),      // colloquial ai→ee (知ら+ねえ, すごく+ねえ)
 
       // The obligation predicate in 〜てはいけない. The base form いける
       // remains lexical; this negative stem is auxiliary only in the
@@ -364,6 +365,7 @@ EntrySpecRange getAuxiliaryEntries() {
       // いい is colloquial form of よい, shares conjugated forms (よかった, よければ, etc.)
       adj("いい", "いい", EPOS::AdjBasic),  // いい天気, いいです
       adj("よい", "よい", EPOS::AdjBasic),  // よい天気, よいです
+      adj("ええ", "ええ", EPOS::AdjBasic),  // Western form of いい: これでええ
       adj("よけれ", "よい", EPOS::AdjKeForm),
       adj("よかっ", "よい", EPOS::AdjKatt),
       adj("よく", "よい", EPOS::AdjRenyokei),
@@ -735,6 +737,10 @@ EntrySpecRange getAuxiliaryEntries() {
       aux("どり", "どる", EPOS::AuxAspectIru),
       aux("どっ", "どる", EPOS::AuxAspectIru),
       verb("どれ", "どる", EPOS::VerbKateikei),
+      // The Kobe/Hiroshima contraction of ておる keeps the u-ending (終わっとう,
+      // 読んどう); it does not inflect further.
+      aux("とう", "とう", EPOS::AuxAspectIru),
+      aux("どう", "どう", EPOS::AuxAspectIru),
       // The Shikoku progressive よる and its voiced form after an n-onbin
       // (書きよる, 読んじょる) inflect the same way. Without the auxiliary
       // reading the sequence is taken for a lexical verb and the preceding
@@ -749,6 +755,7 @@ EntrySpecRange getAuxiliaryEntries() {
       // くれる is a dependent verb in benefactive constructions.
       verb("くれる", "くれる", EPOS::VerbShuushikei),
       verb("くれ", "くれる", EPOS::VerbRenyokei),
+      verb("くん", "くれる", EPOS::VerbRenyokei),  // colloquial れ→ん before ない (待って+くん+ない)
 
       // Humble continuative まいる after a te-form is a subsidiary auxiliary.
       aux("まいり", "まいる", EPOS::AuxHonorific),
@@ -843,6 +850,19 @@ EntrySpecRange getAuxiliaryEntries() {
       aux("じゃっ", "じゃう", EPOS::AuxAspectShimau),
       aux("じゃえ", "じゃう", EPOS::AuxAspectShimau),
       aux("じゃお", "じゃう", EPOS::AuxAspectShimau),
+      // ちまう/じまう are the rougher contractions of the same てしまう/でしまう.
+      aux("ちまう", "ちまう", EPOS::AuxAspectShimau),
+      aux("ちまわ", "ちまう", EPOS::AuxAspectShimau),
+      aux("ちまい", "ちまう", EPOS::AuxAspectShimau),
+      aux("ちまっ", "ちまう", EPOS::AuxAspectShimau),
+      aux("ちまえ", "ちまう", EPOS::AuxAspectShimau),
+      aux("ちまお", "ちまう", EPOS::AuxAspectShimau),
+      aux("じまう", "じまう", EPOS::AuxAspectShimau),
+      aux("じまわ", "じまう", EPOS::AuxAspectShimau),
+      aux("じまい", "じまう", EPOS::AuxAspectShimau),
+      aux("じまっ", "じまう", EPOS::AuxAspectShimau),
+      aux("じまえ", "じまう", EPOS::AuxAspectShimau),
+      aux("じまお", "じまう", EPOS::AuxAspectShimau),
 
       // Contracted forms: てる/とく (progressive/preparation)
       // MeCab: 動詞,非自立 → Auxiliary (subsidiary verbs)
@@ -900,7 +920,7 @@ EntrySpecRange getAuxiliaryEntries() {
       aux("くる", "くる", EPOS::AuxAspectKuru),
       // The one-mora renyokei き is generated contextually.  A global entry
       // reopens ordinary words ending in き (でき, 抜き, 咲き).
-      aux("く", "", EPOS::AuxAspectIku),
+      aux("く", "いく", EPOS::AuxAspectIku),
       // Note: no unconditional こ (来る mizenkei) entry — the surface is far too
       // frequent as a word fragment (こと, これ, きのこ, ...). こ is generated
       // context-gated before a ない-family negative in
@@ -944,8 +964,11 @@ EntrySpecRange getAuxiliaryEntries() {
       // which would wrongly reward a verb 音便形 + っす reading (つい+っす) over the
       // intended stem + っす split (きつい+っす).
       aux("っす", "です", EPOS::AuxCopulaDesu),
+      aux("っしょ", "です", EPOS::AuxCopulaDesu),  // でしょう contracted (行けるっしょ), lemma as でしょ
       aux("っした", "でした", EPOS::AuxCopulaDesu),
       aux("っすか", "ですか", EPOS::AuxCopulaDesu),
+      // After the nominalizer ん the same contraction drops its っ (そうなん+す+か).
+      aux("す", "です", EPOS::AuxCopulaDesu),
 
       // Rabbit-like (兎系)
       aux("ぴょん", "だ", EPOS::Unknown),

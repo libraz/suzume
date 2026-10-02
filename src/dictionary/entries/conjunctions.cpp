@@ -18,7 +18,8 @@ EntrySpecRange getConjunctionEntries() {
       conj("しかし", ""), conj("然し", ""), conj("しかしながら", ""), conj("だが", ""), conj("けれども", ""),
       conj("だけど", ""),  // colloquial variant
       conj("ところが", ""), conj("それでも", ""), conj("それなのに", ""), conj("でも", ""),
-      conj("だって", ""),  // にもかかわらず removed for MeCab compat
+      conj("だって", ""),                    // にもかかわらず removed for MeCab compat
+      conj("てか", ""), conj("ってか", ""),  // colloquial clause-initial correction (てか、それ…)
       conj("それどころか", ""), conj("されど", ""), conj("さりとて", ""), conj("しかるに", ""), conj("もっとも", ""),
       conj("尤も", ""),
 
