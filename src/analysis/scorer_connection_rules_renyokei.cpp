@@ -650,13 +650,15 @@ float computeVerbRenyokeiEarlyBonus(const core::LatticeEdge& prev, const core::L
   const bool volitional_before_quotative_determiner = prev.extended_pos == core::ExtendedPOS::AuxVolitional &&
                                                       next.extended_pos == core::ExtendedPOS::DeterminerQuotative;
 
-  // The one-mora literary volitional ん is selected only in the quotative
-  // construction ～んとする. Elsewhere the homographic contracted negative
-  // remains the productive modern analysis (読まん、食べん).
-  const bool literary_volitional_outside_quotative = prev.extended_pos == core::ExtendedPOS::AuxVolitional &&
-                                                     grammar::isSingleHiragana(prev.surface, core::hiragana::kN) &&
-                                                     !(next.extended_pos == core::ExtendedPOS::ParticleCase &&
-                                                       grammar::isSingleHiragana(next.surface, core::hiragana::kTo));
+  // The one-mora volitional ん is selected only in the quotative construction
+  // ～んとする and before the eastern べ (見+ん+べ). Elsewhere the homographic
+  // contracted negative remains the productive modern analysis (読まん、食べん).
+  const bool literary_volitional_outside_quotative =
+      prev.extended_pos == core::ExtendedPOS::AuxVolitional &&
+      grammar::isSingleHiragana(prev.surface, core::hiragana::kN) &&
+      !(next.extended_pos == core::ExtendedPOS::ParticleCase &&
+        grammar::isSingleHiragana(next.surface, core::hiragana::kTo)) &&
+      !(next.extended_pos == core::ExtendedPOS::ParticleFinal && grammar::isSingleHiragana(next.surface, U'べ'));
   if (volitional_before_compound_case || volitional_before_quotative || volitional_before_concessive ||
       volitional_before_quotative_determiner || literary_volitional_outside_quotative) {
     SUZUME_CONNECTION_ADD(
