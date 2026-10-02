@@ -167,7 +167,10 @@ float scoreAdjectiveAndForm(float base, const InflectionScoreContext& context) {
       // Only penalize ら endings - other a-row endings may be valid i-adj stems
       // E.g., やば (やばい), なさ (なさい with そう) are valid i-adjectives
       // Exception: つら (辛い), きら (嫌い) are valid i-adjective stems
-      if (stem_len == core::kTwoJapaneseCharBytes && isPureHiragana(stem) && last == "ら" &&
+      // A bare terminal い/く has no verb counterpart (no irrealis takes い),
+      // so it cannot be that pattern (えらい, からい).
+      const bool bare_adjective_ending = aux_total_len <= core::kJapaneseCharBytes;
+      if (stem_len == core::kTwoJapaneseCharBytes && isPureHiragana(stem) && last == "ら" && !bare_adjective_ending &&
           !equalsAny(stem, inflection::kValidIAdjRaStemExceptions)) {
         base -= inflection::kPenaltyIAdjMizenkeiPattern;
         logConfidenceAdjustment(-inflection::kPenaltyIAdjMizenkeiPattern, "i_adj_2char_ra_stem");

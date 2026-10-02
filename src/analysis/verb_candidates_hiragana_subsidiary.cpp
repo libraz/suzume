@@ -117,6 +117,17 @@ void appendContextualIchidanSubsidiaryForms(const std::vector<char32_t>& codepoi
 // contextual so standalone lexical uses retain their verb analysis.
 void appendIkuAuxiliaryCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                   std::vector<UnknownCandidate>& candidates) {
+  // The contracted onbin cell: 持って+っ+た, 忘れて+っ+ちゃう (いっ with い elided).
+  if (start_pos + 1 < codepoints.size() && codepoints[start_pos] == U'っ' &&
+      isClearTeFormBeforeSubsidiary(codepoints, start_pos, false) &&
+      (codepoints[start_pos + 1] == U'た' || codepoints[start_pos + 1] == core::hiragana::kTe ||
+       codepoints[start_pos + 1] == U'ち')) {
+    appendContextualSubsidiaryCandidate(codepoints, start_pos, start_pos + 1, "いく",
+                                        dictionary::ConjugationType::GodanKa, core::ExtendedPOS::AuxAspectIku,
+                                        "hiragana_iku_contracted_onbin", candidate::verb_cost::kStrongBonus,
+                                        candidates);
+    return;
+  }
   if (start_pos + 1 >= codepoints.size() || codepoints[start_pos] != core::hiragana::kI ||
       (codepoints[start_pos + 1] != U'け' && codepoints[start_pos + 1] != U'こ') ||
       !isClearTeFormBeforeSubsidiary(codepoints, start_pos, false)) {

@@ -355,14 +355,17 @@ void emitCompoundVerbCandidates(core::Lattice& lattice, std::string_view text, c
     }
 
     // A verified compound continuative directly marked by a case, topic, or
-    // nominalizer particle heads a nominal phrase.  Emit its deverbal-noun
+    // nominalizer particle, or by the copula, heads a nominal phrase.  Emit its deverbal-noun
     // reading alongside the verbal edge so the particle does not force an
     // artificial split inside the compound (押し下げを, 押し付けは).
     const bool starts_inside_kanji_run = start_pos > 0 && normalize::isKanjiCodepoint(codepoints[start_pos - 1]);
     if (v1_is_verified && !starts_inside_kanji_run && !v2_is_closed_particle &&
         !containsNegativeAuxiliary(codepoints, start_pos, compound_end_pos) &&
         compound_epos == core::ExtendedPOS::VerbRenyokei &&
-        beginsNominalForcingParticle(codepoints, compound_end_pos, dict_manager)) {
+        (beginsNominalForcingParticle(codepoints, compound_end_pos, dict_manager) ||
+         // The copula predicates over it the same way (押し付けだ, 押し付けではなく).
+         grammar::startsPredicativeCopula(extractSubstring(codepoints, compound_end_pos, codepoints.size())) ||
+         grammar::isCopulaFusedConjunction(extractSubstring(codepoints, compound_end_pos, compound_end_pos + 2)))) {
       const float noun_cost = scorer.posPrior(core::PartOfSpeech::Noun) + candidate::kCompoundVerbSuffixNounBonus;
       lattice.addEdge(compound_surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(compound_end_pos),
                       core::PartOfSpeech::Noun, noun_cost, flags, compound_surface, dictionary::ConjugationType::None,

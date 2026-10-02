@@ -498,8 +498,10 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
           }
           if (!before_tai.empty()) {
             auto last_cp = utf8::decodeFirstChar(utf8::lastChar(before_tai));
-            if (last_cp != 0 && kana::isHiraganaCodepoint(last_cp)) {
-              continue;  // Verb renyokei + たい, not a real adjective
+            const auto before_codepoints = normalize::toCodepoints(before_tai);
+            if ((last_cp != 0 && kana::isHiraganaCodepoint(last_cp)) ||
+                verb_helpers::isVerbContinuativeSpan(dict_manager, before_codepoints, 0, before_codepoints.size())) {
+              continue;  // Verb renyokei + たい (見+たい), not a real adjective
             }
           }
         }

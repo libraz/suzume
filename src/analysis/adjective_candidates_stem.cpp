@@ -142,15 +142,7 @@ bool isPossibleUnknownIAdjectiveStem(const std::string& stem, const std::string&
   // fabricated adjective stem (語り+ぐ+い, 読み+やす+い).  Productive derived
   // adjectives retain their own morpheme boundary and are emitted elsewhere.
   const auto stem_codepoints = normalize::toCodepoints(stem);
-  for (size_t boundary = 1; boundary < stem_codepoints.size(); ++boundary) {
-    const auto* verb = dict_manager == nullptr
-                           ? nullptr
-                           : lookupEntryInRange(*dict_manager, stem_codepoints, 0, boundary, core::PartOfSpeech::Verb);
-    if (verb != nullptr && verb->extended_pos == core::ExtendedPOS::VerbRenyokei) {
-      return false;
-    }
-  }
-  return true;
+  return !verb_helpers::startsWithVerbContinuative(dict_manager, stem_codepoints, 0, stem_codepoints.size());
 }
 
 // A derived i-adjective can contain a complete predicate plus a productive
@@ -242,6 +234,17 @@ float productiveIAdjectiveStemConfidence(const std::string& stem, const std::str
     // 子供 from becoming fictitious 子供い adjectives before げ/さ.
     const std::string head_base = normalize::concat(utf8::lastChar(stem), "い");
     return isAdjectiveInDictionary(dict_manager, head_base) ? confidence : candidate::kNoOriginConfidence;
+  }
+  // A compound-forming kana head is inherited the same way (照れ+くさい,
+  // 面倒+くさい), provided a host stands in front of it.
+  for (size_t head_start = 1; head_start < stem_codepoints.size(); ++head_start) {
+    std::string head_base;
+    for (size_t idx = head_start; idx < stem_codepoints.size(); ++idx) {
+      normalize::encodeUtf8(stem_codepoints[idx], head_base);
+    }
+    if (adj_detail::isCompoundFormingAdjective(head_base + "い")) {
+      return confidence;
+    }
   }
 
   // One-kanji+るい is a productive shape already recognized for complete
@@ -536,7 +539,9 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
             const bool is_complete_na_adjective =
                 adjective != nullptr && adjective->extended_pos == core::ExtendedPOS::AdjNaAdj;
             if (isVerbInDictionary(dict_manager, stem) || is_complete_na_adjective ||
-                hasVerifiedPredicateDerivedAdjective(base_form, inflection, dict_manager)) {
+                hasVerifiedPredicateDerivedAdjective(base_form, inflection, dict_manager) ||
+                verb_helpers::startsWithVerbContinuative(dict_manager, normalize::toCodepoints(stem), 0,
+                                                         normalize::utf8Length(stem))) {
               continue;
             }
           }

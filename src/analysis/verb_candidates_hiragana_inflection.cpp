@@ -51,9 +51,16 @@ bool splitsIntoContinuativePlusAspectAuxiliary(const std::vector<char32_t>& code
   const size_t max_len = std::min(kMaxAuxiliaryChars, end_pos - start_pos - 1);
   for (size_t aux_len = 2; aux_len <= max_len; ++aux_len) {
     const size_t aux_start = end_pos - aux_len;
+    // A conjunctive particle that selects the continuative (し+つつ) ends on
+    // the u-row the same way.
     const auto* auxiliary =
         lookupEntryInRange(*dict_manager, codepoints, aux_start, end_pos, core::PartOfSpeech::Auxiliary);
-    if (auxiliary == nullptr || !core::isAspectAuxiliaryType(auxiliary->extended_pos)) {
+    const auto* connective =
+        lookupEntryInRange(*dict_manager, codepoints, aux_start, end_pos, core::PartOfSpeech::Particle);
+    const bool takes_continuative =
+        (auxiliary != nullptr && core::isAspectAuxiliaryType(auxiliary->extended_pos)) ||
+        (connective != nullptr && connective->extended_pos == core::ExtendedPOS::ParticleConj);
+    if (!takes_continuative) {
       continue;
     }
     const auto* host = lookupEntryInRange(*dict_manager, codepoints, start_pos, aux_start, core::PartOfSpeech::Verb);

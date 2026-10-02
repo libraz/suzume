@@ -133,15 +133,21 @@ void adj_detail::appendKanjiIAdjPostVariants(const std::vector<char32_t>& codepo
                                     candidates);
   appendIAdjClassicalTerminalCandidates(codepoints, start_pos, kanji_end, hiragana_end, dict_manager, candidates);
   appendIAdjKaraZuCandidates(codepoints, start_pos, kanji_end, hiragana_end, inflection, dict_manager, candidates);
+  appendIAdjClassicalAttributiveCandidates(codepoints, start_pos, kanji_end, hiragana_end, dict_manager, candidates);
+}
 
-  // Add classical attributive (文語連体形) き candidates: stem + き + 体言
-  // I-adjective 連体形 in classical Japanese: 美しい → 美しき(花), 古い → 古き(良き時代)
-  // Inflection analysis does not produce this form, and the surface Xき is
-  // homographic with godan-ka verb 連用形 (書き ← 書く), so generate only when
-  // the lexical signal is decisive: the reconstructed base (stem + い) is a
-  // known dictionary adjective. The lemma normalizes to the modern base form.
+// Add classical attributive (文語連体形) き candidates: stem + き + 体言
+// I-adjective 連体形 in classical Japanese: 美しい → 美しき(花), 古い → 古き(良き時代)
+// Inflection analysis does not produce this form, and the surface Xき is
+// homographic with godan-ka verb 連用形 (書き ← 書く), so generate only when
+// the lexical signal is decisive: the reconstructed base (stem + い) is a
+// known dictionary adjective. The lemma normalizes to the modern base form.
+void appendIAdjClassicalAttributiveCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                              size_t scan_start, size_t scan_end,
+                                              const dictionary::DictionaryManager* dict_manager,
+                                              std::vector<UnknownCandidate>& candidates) {
   if (dict_manager != nullptr) {
-    for (size_t ki_pos = kanji_end; ki_pos < hiragana_end; ++ki_pos) {
+    for (size_t ki_pos = scan_start; ki_pos < scan_end; ++ki_pos) {
       if (codepoints[ki_pos] != U'き') {
         continue;
       }

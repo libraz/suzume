@@ -576,6 +576,30 @@ size_t negativeAuxiliaryLengthAt(const dictionary::DictionaryManager* dict_manag
                                           });
 }
 
+bool closedPredicateEndsAt(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
+                           size_t start_pos, size_t end_pos, bool span_lemma_attested) {
+  if (dict_manager == nullptr || end_pos > codepoints.size() || end_pos <= start_pos) {
+    return false;
+  }
+  constexpr size_t kMaxPredicateLen = 5;
+  const size_t first = end_pos - std::min(end_pos, kMaxPredicateLen);
+  const size_t last = span_lemma_attested ? start_pos : start_pos + 1;
+  for (size_t cell_start = first; cell_start < last && cell_start < end_pos; ++cell_start) {
+    const auto* entry = lookupEntryInRange(*dict_manager, codepoints, cell_start, end_pos, core::PartOfSpeech::Verb);
+    if (entry == nullptr) {
+      continue;
+    }
+    // A cell the span itself starts with only counts as a multi-mora
+    // imperative; a one-mora classical terminal (ふ) is too weak a witness.
+    const bool opens_inside = cell_start < start_pos;
+    if ((opens_inside && entry->extended_pos == core::ExtendedPOS::VerbShuushikei) ||
+        (entry->extended_pos == core::ExtendedPOS::VerbMeireikei && (opens_inside || end_pos - cell_start >= 2))) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool opensOnClosedClassWordTail(const dictionary::DictionaryManager* dict_manager,
                                 const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos) {
   if (dict_manager == nullptr || start_pos == 0 || end_pos < start_pos + 2 || end_pos > codepoints.size()) {
@@ -585,7 +609,20 @@ bool opensOnClosedClassWordTail(const dictionary::DictionaryManager* dict_manage
   // back is bounded rather than running to the start of the sentence.
   constexpr size_t kMaxClosedClassLen = 5;
   const size_t scan_start = start_pos - std::min(start_pos, kMaxClosedClassLen - 1);
+  // A match opening inside a dictionary word that ends exactly at start_pos
+  // (ちゃわ inside めっちゃ|わかる) is no tail: that word closes the left context.
+  auto opens_inside_closed_word = [&](size_t word_start) {
+    for (size_t left = start_pos - std::min(start_pos, kMaxClosedClassLen); left < word_start; ++left) {
+      if (lookupEntryInRange(*dict_manager, codepoints, left, start_pos) != nullptr) {
+        return true;
+      }
+    }
+    return false;
+  };
   for (size_t word_start = scan_start; word_start < start_pos; ++word_start) {
+    if (opens_inside_closed_word(word_start)) {
+      continue;
+    }
     const size_t max_end = std::min(end_pos - 1, word_start + kMaxClosedClassLen);
     for (size_t word_end = start_pos + 1; word_end <= max_end; ++word_end) {
       const std::string word = extractSubstring(codepoints, word_start, word_end);

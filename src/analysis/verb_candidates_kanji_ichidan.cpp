@@ -264,6 +264,7 @@ void appendSingleKanjiIchidanCandidates(const std::vector<char32_t>& codepoints,
       // continuation shares the same grammar gate.
       bool is_conjunctive_particle = false;
       bool is_classical_past_aux = false;
+      bool is_honorific_aux = false;
       constexpr size_t kMaxConjunctiveParticleLength = 4;
       const size_t max_particle_end = std::min(codepoints.size(), kanji_end + kMaxConjunctiveParticleLength);
       for (size_t particle_end = kanji_end + 1; particle_end <= max_particle_end; ++particle_end) {
@@ -304,6 +305,12 @@ void appendSingleKanjiIchidanCandidates(const std::vector<char32_t>& codepoints,
             (auxiliary != nullptr && auxiliary->extended_pos == core::ExtendedPOS::AuxClassicalKeri)) {
           is_classical_past_aux = true;
         }
+        // The honorific subsidiaries sit on the same continuative (寝+なさい,
+        // 見+たまえ); their one-mora classical pieces (ま, ふ) do not open here.
+        if (auxiliary != nullptr && auxiliary->extended_pos == core::ExtendedPOS::AuxHonorific &&
+            particle_end - kanji_end >= 2) {
+          is_honorific_aux = true;
+        }
         if (is_conjunctive_particle && is_classical_past_aux) {
           break;
         }
@@ -311,7 +318,7 @@ void appendSingleKanjiIchidanCandidates(const std::vector<char32_t>& codepoints,
 
       if (is_polite_aux || is_negative_aux || is_classical_negative_aux || is_literary_volitional_n ||
           is_classical_volitional_mu || is_classical_desiderative || is_classical_negative_mai ||
-          is_conjunctive_particle || is_classical_past_aux || is_classical_conjectural) {
+          is_conjunctive_particle || is_classical_past_aux || is_classical_conjectural || is_honorific_aux) {
         std::string surface = extractSubstring(codepoints, start_pos, kanji_end);
         // A one-kanji stem followed by して can instead be the continuative
         // form of a dictionary-confirmed Godan-sa verb. Keep that lexical
@@ -337,7 +344,7 @@ void appendSingleKanjiIchidanCandidates(const std::vector<char32_t>& codepoints,
               (is_negative_conditional || is_literary_volitional_n || is_classical_volitional_mu ||
                is_classical_negative_mai)
                   ? core::ExtendedPOS::VerbMizenkei
-              : (is_conjunctive_particle || is_classical_past_aux || is_classical_conjectural)
+              : (is_conjunctive_particle || is_classical_past_aux || is_classical_conjectural || is_honorific_aux)
                   ? core::ExtendedPOS::VerbRenyokei
                   : core::ExtendedPOS::Unknown));
         }

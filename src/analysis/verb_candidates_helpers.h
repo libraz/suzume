@@ -49,6 +49,19 @@ bool isSingleKanjiPoliteStem(char32_t c);
  */
 bool isSingleKanjiIchidanSurface(std::string_view surface);
 
+/**
+ * @brief Whether codepoints[start, end) is a verb continuative
+ *
+ * A dictionary VerbRenyokei cell (読み, 語り) or a single-kanji Ichidan stem
+ * (見, 着, 寝), whose continuative is the bare kanji.
+ */
+bool isVerbContinuativeSpan(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
+                            size_t start, size_t end);
+
+/** Whether some proper prefix of codepoints[start, end) is a verb continuative. */
+bool startsWithVerbContinuative(const dictionary::DictionaryManager* dict_manager,
+                                const std::vector<char32_t>& codepoints, size_t start, size_t end);
+
 // =============================================================================
 // Dictionary Lookup Helpers
 // =============================================================================
@@ -444,6 +457,16 @@ size_t negativeAuxiliaryLengthAt(const dictionary::DictionaryManager* dict_manag
  * is — which is why it cannot be found by scanning the candidate's own span.
  * @see fabricated closed-class absorption guards (top of this header)
  */
+/**
+ * @brief Whether a registered imperative/terminal verb cell ends at `end_pos`
+ * and covers `start_pos`.
+ *
+ * The cell must start before `start_pos` (the span opens inside it), or, when
+ * the span's own base is unattested, may start at `start_pos` itself.
+ */
+bool closedPredicateEndsAt(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
+                           size_t start_pos, size_t end_pos, bool span_lemma_attested);
+
 bool opensOnClosedClassWordTail(const dictionary::DictionaryManager* dict_manager,
                                 const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos);
 

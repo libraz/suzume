@@ -689,8 +689,7 @@ CompoundVerbMatch findCompoundVerbMatch(
     // lexical attestation of the compound itself the past reading owns that
     // boundary.  Elsewhere the V2 stays available (食べ+だす), as does any
     // kanji-spelled V2 (見+立てる).
-    if (!matched_kanji && !v1.dict_verified && !dict_compound_v1 && v2_start > start_pos &&
-        char_types[v2_start] == CharType::Hiragana) {
+    if (!matched_kanji && !dict_compound_v1 && v2_start > start_pos && char_types[v2_start] == CharType::Hiragana) {
       const char32_t v1_tail = codepoints[v2_start - 1];
       const bool past_ta = codepoints[v2_start] == U'た' && (is_ichidan || v1_tail == U'い' || v1_tail == U'っ');
       const bool past_da = codepoints[v2_start] == U'だ' && (v1_tail == U'い' || v1_tail == U'ん');

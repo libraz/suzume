@@ -13,6 +13,7 @@
 #include "dictionary/dictionary.h"
 #include "grammar/char_patterns.h"
 #include "grammar/inflection.h"
+#include "normalize/exceptions.h"
 #include "normalize/utf8.h"
 #include "verb_candidates_helpers.h"
 
@@ -89,6 +90,14 @@ size_t longestNominalVerbContinuativeStart(const std::vector<char32_t>& codepoin
     if (okurigana_length == 1 && ending == U'い' &&
         !verb_helpers::isVerbInDictionary(
             dict_manager, normalize::concat(normalize::encodeUtf8(codepoints[kanji_end - 1]), godan_ending))) {
+      continue;
+    }
+    // An e-row mora that is also a case particle (者+へ, 者+で) is the
+    // particle unless a dictionary Ichidan verb spells the stem (経て).
+    if (okurigana_length == 1 && normalize::isParticleCodepoint(ending) && grammar::isERowCodepoint(ending) &&
+        !verb_helpers::isVerbInDictionary(
+            dict_manager,
+            normalize::concat(normalize::encodeUtf8(codepoints[kanji_end - 1]), normalize::encodeUtf8(ending), "る"))) {
       continue;
     }
     const std::string continuation =

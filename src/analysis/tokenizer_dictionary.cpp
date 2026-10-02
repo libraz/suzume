@@ -210,6 +210,16 @@ bool startsInsideVerifiedPredicate(const core::Lattice& lattice, const std::vect
                                    size_t start_pos) {
   const size_t scan_start = start_pos > kDictionaryLookbehindChars ? start_pos - kDictionaryLookbehindChars : 0;
   for (size_t edge_start = scan_start; edge_start < start_pos; ++edge_start) {
+    // A predicate opening inside a dictionary function word that ends exactly
+    // at start_pos (な|んか|もう → かも) is that word's fragment, not a witness.
+    const bool opens_inside_function_word =
+        core::anyEdgeEndingAt(lattice, start_pos, [edge_start](const core::LatticeEdge& word) {
+          return word.start < edge_start && word.fromDictionary() &&
+                 (word.pos == core::PartOfSpeech::Particle || word.pos == core::PartOfSpeech::Auxiliary);
+        });
+    if (opens_inside_function_word) {
+      continue;
+    }
     if (core::anyEdgeStartingAt(lattice, edge_start, [&codepoints, start_pos](const core::LatticeEdge& edge) {
           return edge.end > start_pos && edge.lemmaVerified() &&
                  (edge.pos == core::PartOfSpeech::Verb || edge.pos == core::PartOfSpeech::Adjective ||
@@ -1370,7 +1380,14 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
       const auto following_results = dict_manager_.lookup(text, following_byte_pos);
       const bool followed_by_case_particle =
           lookupResultsHaveExtendedPOS(following_results, core::ExtendedPOS::ParticleCase);
-      if (followed_by_case_particle) {
+      // A longer nominal headword starting there is what the determiner
+      // modifies (そういう+ところ, こういう+とこ), not the particle.
+      const bool followed_by_longer_nominal =
+          std::any_of(following_results.begin(), following_results.end(), [](const auto& following) {
+            return following.entry != nullptr && following.length > 1 &&
+                   following.entry->pos == core::PartOfSpeech::Noun;
+          });
+      if (followed_by_case_particle && !followed_by_longer_nominal) {
         continue;
       }
     }
@@ -1883,8 +1900,30 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
       }
     }
 
+    // かねる takes a continuative, which a voice auxiliary also supplies
+    // (損なわ+れ+かね, 行か+せ+かね).
     if (result.entry->extended_pos == core::ExtendedPOS::AuxInability &&
-        !hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbRenyokei)) {
+        !core::anyEdgeEndingAt(lattice, start_pos, [](const core::LatticeEdge& edge) {
+          return edge.extended_pos == core::ExtendedPOS::VerbRenyokei ||
+                 edge.extended_pos == core::ExtendedPOS::AuxPassive ||
+                 edge.extended_pos == core::ExtendedPOS::AuxCausative;
+        })) {
+      continue;
+    }
+
+    // The uninflected progressive contraction とう/どう exists only on an
+    // onbin host (終わっ+とう, 読ん+どう); elsewhere it is ordinary kana.
+    if (result.entry->extended_pos == core::ExtendedPOS::AuxAspectIru &&
+        grammar::isDialectalOruContractionLemma(result.entry->lemma) && utf8::endsWith(result.entry->lemma, "う") &&
+        !hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbOnbinkei)) {
+      continue;
+    }
+
+    // The one-mora contracted polite copula す stands only on the nominalizer
+    // ん (行くん+す+か); everywhere else す is a verb.
+    if (result.entry->extended_pos == core::ExtendedPOS::AuxCopulaDesu && end_pos == start_pos + 1 &&
+        !(start_pos > 0 && codepoints[start_pos - 1] == U'ん' &&
+          hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::ParticleNo))) {
       continue;
     }
 
@@ -2339,10 +2378,18 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
           (result.entry->extended_pos == core::ExtendedPOS::VerbMizenkei ||
            result.entry->extended_pos == core::ExtendedPOS::VerbKateikei ||
            result.entry->pos == core::PartOfSpeech::Auxiliary);
-      const auto emphatic = sokuon_before_te_or_ta
-                                ? verb_helpers::EmphaticSuffixMatch{}
-                                : verb_helpers::matchEmphaticSuffix(codepoints, end_pos, result.entry->pos,
-                                                                    verb_helpers::SokuonOnsetPolicy::DictionaryEntry);
+      auto emphatic = sokuon_before_te_or_ta
+                          ? verb_helpers::EmphaticSuffixMatch{}
+                          : verb_helpers::matchEmphaticSuffix(codepoints, end_pos, result.entry->pos,
+                                                              verb_helpers::SokuonOnsetPolicy::DictionaryEntry);
+      // One repeated vowel is below the generic emphasis floor, but a final
+      // particle drawn out by its own full-size vowel (けど+さあ) is that hold.
+      if (emphatic.empty() && result.entry->extended_pos == core::ExtendedPOS::ParticleFinal &&
+          end_pos < codepoints.size() && codepoints[end_pos] == grammar::getVowelForChar(codepoints[end_pos - 1])) {
+        emphatic.suffix = extractSubstring(codepoints, end_pos, end_pos + 1);
+        emphatic.end = end_pos + 1;
+        emphatic.repeated_vowel_count = 1;
+      }
       // A bare sokuon after a predicate is one of two things: the genuine 促音便,
       // which needs て/た/で/だ behind it (と+いっ+て), or colloquial emphasis, which
       // closes the clause (行くっ！). Before any other kana it is neither, and taking
@@ -2368,8 +2415,47 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
       // the prolonged mark: after a one-mora particle that spelling is also the
       // tail of a lengthened word, and taking it there cuts the word in two
       // (おいしーー as おい + しーー).
-      const bool unlicensed_particle_lengthening = result.entry->pos == core::PartOfSpeech::Particle && !bare_sokuon;
-      if (!emphatic.empty() && !unlicensed_bare_sokuon && !unlicensed_particle_lengthening) {
+      // A sentence-final particle may hold its own vowel at a clause end
+      // (さ+あ, よ+お, さ+ー): one mora, the particle's vowel, then nothing.
+      auto holds_final_particle_vowel = [&]() {
+        // The clause ends after the held vowel, or another final particle
+        // closes it (行くけえ+ね).
+        const auto* next_final = emphatic.end < codepoints.size()
+                                     ? lookupEntryInRange(dict_manager_, codepoints, emphatic.end, emphatic.end + 1,
+                                                          core::PartOfSpeech::Particle)
+                                     : nullptr;
+        const bool closes_clause =
+            emphatic.end >= codepoints.size() ||
+            normalize::classifyChar(codepoints[emphatic.end]) == normalize::CharType::Symbol ||
+            (next_final != nullptr && next_final->extended_pos == core::ExtendedPOS::ParticleFinal);
+        if (result.entry->extended_pos != core::ExtendedPOS::ParticleFinal || emphatic.end != end_pos + 1 ||
+            !closes_clause) {
+          return false;
+        }
+        const char32_t held = codepoints[end_pos];
+        const char32_t vowel = grammar::getVowelForChar(codepoints[end_pos - 1]);
+        // Small vowels sit one codepoint below their full-size form (ぁ, あ).
+        return held == U'ー' || held == vowel || (kana::isSmallKanaCodepoint(held) && held + 1 == vowel);
+      };
+      // Exactly two repeated vowels that themselves spell a dictionary word
+      // starting there (で+ええ, そう+ああ) are that word, not emphasis.
+      auto lengthening_spells_word_at = [&]() {
+        // A content word draws its own vowel out (やばいいい); only a function
+        // word's "lengthening" can be a following word instead.
+        const bool function_word_host =
+            result.entry->pos == core::PartOfSpeech::Particle || result.entry->pos == core::PartOfSpeech::Auxiliary;
+        if (!function_word_host || emphatic.repeated_vowel_count != 2 || emphatic.standard_char_count != 0) {
+          return false;
+        }
+        const auto following_results = dict_manager_.lookup(text, byteOffsetAt(byte_offsets, end_pos));
+        return std::any_of(following_results.begin(), following_results.end(),
+                           [](const auto& following) { return following.entry != nullptr && following.length == 2; });
+      };
+      const bool lengthening_spells_word = lengthening_spells_word_at();
+      const bool unlicensed_particle_lengthening =
+          result.entry->pos == core::PartOfSpeech::Particle && !bare_sokuon && !holds_final_particle_vowel();
+      if (!emphatic.empty() && !unlicensed_bare_sokuon && !unlicensed_particle_lengthening &&
+          !lengthening_spells_word) {
         // Determine extended_pos for emphatic form
         // Sokuon-ending verb forms should be VerbOnbinkei (音便形)
         core::ExtendedPOS emphatic_epos = result.entry->extended_pos;

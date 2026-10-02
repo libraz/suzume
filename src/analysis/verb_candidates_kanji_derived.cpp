@@ -120,6 +120,14 @@ bool appendGodanIzenkeiCandidate(const std::vector<char32_t>& codepoints, size_t
       return false;
     }
   }
+  // A て/で cell after an i/e-row okurigana is the connective on an Ichidan
+  // continuative (考え+て+ばかり), not a ta-row izenkei; a real one sits right
+  // on the kanji (待て+ば, 育て+ば).
+  if (cell_end >= kanji_end + 2 && grammar::isTeDeSurface(extractSubstring(codepoints, cell_end - 1, cell_end)) &&
+      (grammar::isIRowCodepoint(codepoints[cell_end - 2]) || grammar::isERowCodepoint(codepoints[cell_end - 2])) &&
+      !vh::isVerbInDictionary(dict_manager, extractSubstring(codepoints, start_pos, cell_end - 1) + "つ")) {
+    return false;
+  }
   const std::string cell_surface = extractSubstring(codepoints, start_pos, cell_end);
   const std::string full_surface = cell_surface + "ば";
   const auto& analyses = inflection.analyze(full_surface);

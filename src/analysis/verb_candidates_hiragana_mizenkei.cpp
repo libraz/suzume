@@ -88,6 +88,11 @@ bool deriveGodanMizenkeiForms(const std::vector<char32_t>& codepoints, size_t st
   if (!grammar::isARowCodepoint(out.a_row_char)) {
     return false;
   }
+  // A Godan stem never ends in the sokuon before its irrealis mora; なった
+  // is the onbin past of なる, not the irrealis of a verb なっつ.
+  if (mizenkei_end >= start_pos + 2 && codepoints[mizenkei_end - 2] == U'っ') {
+    return false;
+  }
   out.verb_type = grammar::verbTypeFromARowCodepoint(out.a_row_char);
   out.base_suffix = grammar::godanBaseSuffixFromARow(out.a_row_char);
   if (out.verb_type == grammar::VerbType::Unknown || out.base_suffix.empty()) {

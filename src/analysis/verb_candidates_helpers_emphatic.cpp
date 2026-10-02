@@ -5,6 +5,7 @@
 
 #include "analysis/candidate_constants.h"
 #include "core/utf8_constants.h"
+#include "grammar/char_patterns.h"
 #include "normalize/char_type.h"
 #include "normalize/utf8.h"
 #include "verb_candidates_helpers.h"
@@ -157,6 +158,13 @@ void addEmphaticVariants(std::vector<UnknownCandidate>& candidates, const std::v
     }
 
     const auto emphatic = matchEmphaticSuffix(codepoints, cand.end, cand.pos);
+    // A っ after a te-form with kana behind it is the contracted いく
+    // (忘れて+っ+ちゃう), not emphasis on the verb.
+    if (!emphatic.empty() && emphatic.end < codepoints.size() && grammar::isTeDeSurface(utf8::lastChar(cand.surface)) &&
+        codepoints[cand.end] == U'っ' &&
+        normalize::classifyChar(codepoints[emphatic.end]) == normalize::CharType::Hiragana) {
+      continue;
+    }
 
     // Add emphatic variant if we found any emphatic characters
     if (!emphatic.empty()) {

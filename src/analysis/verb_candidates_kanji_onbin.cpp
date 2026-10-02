@@ -386,9 +386,21 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
         // particle's first mora in one move (資 + 料っ + て). A dictionary-backed
         // base keeps its ordinary te-form reading (見 + 合って).
         // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+        // A stem that is itself a dictionary nominal (猫, 君) is the host the
+        // particle marks (猫+って+かわいい) unless a te-continuation follows
+        // the て, which is what a denominal verb looks like (沼っ+てる).
         bool sokuon_heads_dictionary_particle = false;
-        if (!matched_via_dict && dict_manager != nullptr && start_pos > 0 &&
-            normalize::isKanjiCodepoint(codepoints[start_pos - 1]) && !followsQuantityHead(codepoints, start_pos) &&
+        const bool stem_is_dictionary_nominal =
+            dict_manager != nullptr && (dict_manager->lookupExact(kanji_stem, core::PartOfSpeech::Noun) != nullptr ||
+                                        dict_manager->lookupExact(kanji_stem, core::PartOfSpeech::Pronoun) != nullptr);
+        const bool te_continuation_follows =
+            kanji_end + 2 < codepoints.size() &&
+            (codepoints[kanji_end + 2] == U'る' || codepoints[kanji_end + 2] == U'た' ||
+             codepoints[kanji_end + 2] == U'ち' || codepoints[kanji_end + 2] == U'な');
+        const bool kanji_on_left = start_pos > 0 && normalize::isKanjiCodepoint(codepoints[start_pos - 1]) &&
+                                   !followsQuantityHead(codepoints, start_pos);
+        if (!matched_via_dict && dict_manager != nullptr &&
+            (kanji_on_left || (stem_is_dictionary_nominal && !te_continuation_follows)) &&
             kanji_end + 1 < codepoints.size()) {
           constexpr size_t kParticleProbe = 3;
           const size_t max_particle_end = std::min(codepoints.size(), kanji_end + kParticleProbe);

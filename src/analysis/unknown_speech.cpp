@@ -535,10 +535,19 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
   if (start_type == normalize::CharType::Hiragana && seq_len >= 3 && codepoints[start_pos + 1] == U'ん') {
     size_t pattern_end = start_pos;
     const char* pattern = nullptr;
-    if (codepoints[start_pos + 2] == U'と') {
+    // A verb irrealis before ん+と is the contracted negative plus the
+    // conditional と (気にせ+ん+と), not a mimetic.
+    const auto* irrealis = dict_manager_ == nullptr ? nullptr
+                                                    : lookupEntryInRange(*dict_manager_, codepoints, start_pos,
+                                                                         start_pos + 1, core::PartOfSpeech::Verb);
+    const bool opens_on_irrealis = irrealis != nullptr && irrealis->extended_pos == core::ExtendedPOS::VerbMizenkei;
+    if (codepoints[start_pos + 2] == U'と' && !opens_on_irrealis) {
       pattern_end = start_pos + 3;
       pattern = "x_nto_pattern";
-    } else if (seq_len >= 4 && codepoints[start_pos + 3] == U'り') {
+    } else if (seq_len >= 4 && codepoints[start_pos + 3] == U'り' &&
+               (dict_manager_ == nullptr || lookupEntryInRange(*dict_manager_, codepoints, start_pos, start_pos + 4,
+                                                               core::PartOfSpeech::Verb) == nullptr)) {
+      // Skipped where a registered verb continuative has the same shape (がんばり).
       pattern_end = start_pos + 4;
       pattern = "x_ny_ri_pattern";
     }

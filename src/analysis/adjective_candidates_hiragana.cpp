@@ -381,6 +381,10 @@ void generateHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints
     ++max_hiragana_end;
   }
 
+  // The classical attributive is the one cell spelled in two morae (よき).
+  appendIAdjClassicalAttributiveCandidates(codepoints, start_pos, start_pos + 1, max_hiragana_end, dict_manager,
+                                           candidates);
+
   // Need at least 3 characters for an i-adjective (e.g., あつい)
   if (max_hiragana_end <= start_pos + 2) {
     return;
@@ -392,9 +396,7 @@ void generateHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints
   // ゆる+すぎる, and きつ+すぎる share one productive path.  This must precede
   // the general genitive-particle guard: that guard correctly rejects broad
   // unknown sequences, but would prevent this independently verified stem.
-  const bool starts_with_closed_particle =
-      dict_manager != nullptr &&
-      lookupEntryInRange(*dict_manager, codepoints, start_pos, start_pos + 1, core::PartOfSpeech::Particle) != nullptr;
+  //
   // A kanji i-adjective's continuative く is already a complete edge at the
   // preceding position (高く+なり+すぎる).  Starting a second adjective stem
   // from that okurigana would reconstruct a non-word such as くなりい.  This
@@ -402,15 +404,18 @@ void generateHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints
   // the kanji-adjective boundary.
   const bool follows_kanji_continuative =
       start_pos > 0 && normalize::isKanjiCodepoint(codepoints[start_pos - 1]) && first_char == U'く';
-  if (!starts_with_closed_particle && !follows_kanji_continuative) {
-    const std::string full_surface = extractSubstring(codepoints, start_pos, max_hiragana_end);
-    static constexpr std::array<std::string_view, 3> kExcessiveSuffixes = {"すぎる", "すぎた", "すぎ"};
-    for (const std::string_view suffix : kExcessiveSuffixes) {
-      if (!utf8::endsWith(full_surface, suffix)) {
+  // すぎ opens every cell of the auxiliary (すぎて, すぎない), so it is found
+  // anywhere in the run.  A stem opening on a particle mora (や, し) is left to
+  // the inflection check of stem+い rather than rejected outright.
+  if (!follows_kanji_continuative) {
+    for (size_t stem_end = start_pos + 2; stem_end + 1 < max_hiragana_end; ++stem_end) {
+      if (codepoints[stem_end] != U'す' || codepoints[stem_end + 1] != U'ぎ') {
         continue;
       }
-      const std::string stem = full_surface.substr(0, full_surface.size() - suffix.size());
-      if (normalize::utf8Length(stem) < 2 || utf8::contains(stem, "て") || utf8::contains(stem, "で")) {
+      const std::string stem = extractSubstring(codepoints, start_pos, stem_end);
+      // A verb continuative takes すぎる too (なり+すぎ); it is not a stem.
+      if (utf8::contains(stem, "て") || utf8::contains(stem, "で") ||
+          (dict_manager != nullptr && dict_manager->lookupExact(stem, core::PartOfSpeech::Verb) != nullptr)) {
         continue;
       }
       const std::string base_form = stem + "い";
@@ -419,7 +424,6 @@ void generateHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints
       if (confidence == candidate::kNoOriginConfidence) {
         continue;
       }
-      const size_t stem_end = start_pos + normalize::utf8Length(stem);
       const float cost =
           candidate::confidenceScaledCost(candidate::kAdjStemExtCost, confidence, candidate::kAdjStemConfScale);
       candidates.push_back(makeIAdjStemCandidate(stem, start_pos, stem_end, base_form, cost,
@@ -763,10 +767,20 @@ void generateHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints
     }
 
     const std::string stem = extractSubstring(codepoints, start_pos, stem_end);
-    // A closed interjection is not an i-adjective stem.  In particular, its
-    // following さ belongs to an unknown noun reading (うわさ), not to the
-    // productive adjective nominalizer.
-    if (dict_manager != nullptr && dict_manager->lookupExact(stem, core::PartOfSpeech::Interjection) != nullptr) {
+    // A closed-class word is not an i-adjective stem.  After an interjection
+    // the さ belongs to an unknown noun reading (うわさ); after a particle or
+    // conjunction it is the interjectory particle (けど+さ).
+    bool is_closed_class_stem = false;
+    if (dict_manager != nullptr) {
+      for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, start_pos, stem_end)) {
+        const auto pos = match.entry == nullptr ? core::PartOfSpeech::Unknown : match.entry->pos;
+        is_closed_class_stem =
+            is_closed_class_stem || (match.length == stem_end - start_pos &&
+                                     (pos == core::PartOfSpeech::Interjection || pos == core::PartOfSpeech::Particle ||
+                                      pos == core::PartOfSpeech::Auxiliary || pos == core::PartOfSpeech::Conjunction));
+      }
+    }
+    if (is_closed_class_stem) {
       continue;
     }
     const std::string base_form = stem + "い";

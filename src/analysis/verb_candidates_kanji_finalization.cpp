@@ -704,11 +704,14 @@ void appendSelectedKanjiVerbCandidate(const std::vector<char32_t>& codepoints, s
     // of its own whose boundary the analysis keeps (知ら+ん, 分から+ん, 待た+ん).
     // A nasal euphony replaces the continuative's own final mora, so its stem
     // never ends in the a-row; where the spelling looks that way anyway
-    // (汗ばん+だ) the て/で/た/だ behind it already proves the cell.
-    if (utf8::endsWith(surface, "ん") && end_pos >= start_pos + 3 &&
-        grammar::isARowCodepoint(codepoints[end_pos - 2]) &&
+    // (汗ばん+だ) the て/で/た/だ behind it already proves the cell. The
+    // uncontracted ぬ has no such homograph at all (尽くさ+ぬ, 読ま+ぬ).
+    const bool irrealis_before_n =
+        utf8::endsWith(surface, "ん") &&
         (end_pos >= codepoints.size() ||
-         (codepoints[end_pos] != U'で' && codepoints[end_pos] != U'だ' && codepoints[end_pos] != U'て'))) {
+         (codepoints[end_pos] != U'で' && codepoints[end_pos] != U'だ' && codepoints[end_pos] != U'て'));
+    if ((irrealis_before_n || utf8::endsWith(surface, "ぬ")) && end_pos >= start_pos + 3 &&
+        grammar::isARowCodepoint(codepoints[end_pos - 2])) {
       SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" is an irrealis before the contracted negative\n");
       return;
     }

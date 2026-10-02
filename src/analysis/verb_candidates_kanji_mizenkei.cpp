@@ -287,12 +287,21 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
   // contraction is on the irrealis, not on the auxiliary, so every cell of
   // ない takes it (分かん+なかっ+た, 分かん+なけれ+ば) — pinning the terminal
   // cell here left the rest of the paradigm cut at the ん.
-  for (size_t n_pos = kanji_end + 1; n_pos + 2 < hiragana_end; ++n_pos) {
+  for (size_t n_pos = kanji_end; n_pos + 2 < hiragana_end; ++n_pos) {
     if (codepoints[n_pos] != U'ん' || !vh::naiNegativeFollowsAt(codepoints, n_pos + 1)) {
       continue;
     }
     const std::string stem = extractSubstring(codepoints, start_pos, n_pos);
     const std::string base_form = stem + "る";
+    // A bare kanji stem is also an Ichidan stem (見る, 着る); only an attested
+    // ら irrealis proves the Godan-ra row the contraction needs (帰ん+ない).
+    if (n_pos == kanji_end) {
+      const auto* irrealis =
+          dict_manager == nullptr ? nullptr : dict_manager->lookupExact(stem + "ら", core::PartOfSpeech::Verb);
+      if (irrealis == nullptr || irrealis->lemma != base_form) {
+        continue;
+      }
+    }
     if (!vh::isVerifiedVerbBase(dict_manager, inflection, base_form,
                                 candidate::verb_cost::kConstructedVerbMinConfidence, true)) {
       continue;

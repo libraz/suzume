@@ -240,7 +240,12 @@ void generateTemporalNounBoundaryCandidates(const std::vector<char32_t>& codepoi
     return;
   }
 
-  const size_t candidate_end = has_temporal_reference_suffix ? start_pos + 4 : start_pos + 2;
+  // 度 binds to a temporal 年 as one word (来年度|予算), so the boundary
+  // follows it.
+  const bool binds_fiscal_year =
+      normalize::isFiscalYearBindingPair(codepoints[start_pos + 1], codepoints[start_pos + 2]);
+  const size_t candidate_end =
+      has_temporal_reference_suffix ? start_pos + 4 : (binds_fiscal_year ? start_pos + 3 : start_pos + 2);
   std::string surface = extractSubstring(codepoints, start_pos, candidate_end);
   if (!surface.empty()) {
     auto cand = makeCandidate(surface, start_pos, candidate_end, core::PartOfSpeech::Noun,

@@ -826,9 +826,14 @@ void generateHumbleNominalCandidates(const std::vector<char32_t>& codepoints, si
     }
     // する closes the frame in its dictionary form or through its continuative
     // し, which carries the polite and past chains (お伝えします, おかけした).
+    // Its humble form いたす closes it in every cell (おかけいたします).
     const char32_t suru_head = codepoints[end_pos];
-    const bool closes_frame = suru_head == U'し' || (suru_head == U'す' && end_pos + 1 < codepoints.size() &&
-                                                     codepoints[end_pos + 1] == U'る');
+    const bool closes_with_itasu =
+        suru_head == U'い' && end_pos + 2 < codepoints.size() && codepoints[end_pos + 1] == U'た' &&
+        utf8::equalsAny(extractSubstring(codepoints, end_pos + 2, end_pos + 3), {"さ", "し", "す", "せ", "そ"});
+    const bool closes_frame =
+        suru_head == U'し' || closes_with_itasu ||
+        (suru_head == U'す' && end_pos + 1 < codepoints.size() && codepoints[end_pos + 1] == U'る');
     if (!closes_frame) {
       continue;
     }

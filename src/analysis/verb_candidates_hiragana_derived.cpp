@@ -432,6 +432,11 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
            !hasMatchingGodanInflection(inflection, onbin_match.base_form, onbin_match.verb_type))) {
         onbin_match.matched = false;
       }
+      // 来い|って: the っ belongs to the quotative after a finished predicate.
+      if (is_sokuonbin && onbin_match.matched &&
+          vh::closedPredicateEndsAt(dict_manager, codepoints, start_pos, onbin_end - 1, true)) {
+        onbin_match.matched = false;
+      }
       if (onbin_match.matched) {
         constexpr float kHiraganaOnbinCost = candidate::verb_cost::kStandardBonus;
         const char* origin = is_sokuonbin ? "hiragana_sokuonbin" : "hiragana_hatsuonbin";

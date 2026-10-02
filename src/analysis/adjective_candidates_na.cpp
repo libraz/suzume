@@ -212,6 +212,12 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
           }
         }
         const std::string stem = extractSubstring(codepoints, start_pos, stem_end);
+        // A te-form chain is not a nominal stem (食べ+て+み+な): the な after
+        // it is the imperative particle.
+        bool crosses_te_form = false;
+        for (size_t tail = kanji_end; tail < stem_end; ++tail) {
+          crosses_te_form = crosses_te_form || codepoints[tail] == U'て' || codepoints[tail] == U'で';
+        }
         const bool is_exact_verb_stem =
             dict_manager != nullptr && dict_manager->lookupExact(stem, core::PartOfSpeech::Verb) != nullptr;
         bool contains_passive_boundary = false;
@@ -240,9 +246,23 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
         // become an invented adjective plus a copula. The stems this rule has
         // to leave alone end in か, ら or や (静かな, 平らな, 気さくな), none
         // of which is a verbal ending.
-        const bool closes_on_verbal_ru = stem_end > start_pos && codepoints[stem_end - 1] == U'る';
+        // A final particle between the predicate and な is not part of any stem
+        // either (来るよ+な, 来たよ+な, 来るわ+な): the predicate it closes is
+        // checked through it, where any u-row terminal or た/だ ends one.
+        const auto* final_particle =
+            dict_manager == nullptr || stem_end - 1 <= kanji_end
+                ? nullptr
+                : lookupEntryInRange(*dict_manager, codepoints, stem_end - 1, stem_end, core::PartOfSpeech::Particle);
+        const bool after_final_particle =
+            final_particle != nullptr && final_particle->extended_pos == core::ExtendedPOS::ParticleFinal;
+        const size_t predicate_end = after_final_particle ? stem_end - 1 : stem_end;
+        const char32_t predicate_tail = codepoints[predicate_end - 1];
+        const bool closes_on_verbal_ru =
+            predicate_tail == U'る' || (after_final_particle && (normalize::isURowHiragana(predicate_tail) ||
+                                                                 predicate_tail == U'た' || predicate_tail == U'だ'));
         if (is_bare_attributive && !has_internal_particle && !contains_closed_suffix && !starts_closed_tail &&
-            !is_exact_verb_stem && !contains_passive_boundary && !starts_naru_after_ku && !closes_on_verbal_ru) {
+            !is_exact_verb_stem && !crosses_te_form && !contains_passive_boundary && !starts_naru_after_ku &&
+            !closes_on_verbal_ru) {
           std::string first_char_str;
           normalize::encodeUtf8(codepoints[start_pos], first_char_str);
           if (!normalize::isFormalNounSurface(first_char_str)) {

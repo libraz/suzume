@@ -326,7 +326,7 @@ bool isContractedProgressiveSurface(std::string_view surface) {
 }
 
 bool isDialectalOruContractionLemma(std::string_view lemma) {
-  return lemma == "とる" || lemma == "どる";
+  return lemma == "とる" || lemma == "どる" || lemma == "とう" || lemma == "どう";
 }
 
 bool isRenyokeiPotentialAuxiliaryLemma(std::string_view lemma) {

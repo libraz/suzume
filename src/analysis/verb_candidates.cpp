@@ -253,6 +253,29 @@ void generateKatakanaVerbCandidates(const std::vector<char32_t>& codepoints, siz
                                            core::ExtendedPOS::VerbShuushikei));
   }
 
+  // The same denominal verb spells its continuative with り before what a
+  // continuative selects (ディスり+すぎ, テンパり+ます).
+  if (kata_end - start_pos >= 2 && hira_end > kata_end + 1 && codepoints[kata_end] == U'り' &&
+      dict_manager != nullptr) {
+    bool selects_continuative = false;
+    for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, kata_end + 1, hira_end)) {
+      if (match.entry == nullptr) {
+        continue;
+      }
+      const auto epos = match.entry->extended_pos;
+      selects_continuative = selects_continuative || epos == core::ExtendedPOS::AuxExcessive ||
+                             epos == core::ExtendedPOS::AuxTenseMasu || epos == core::ExtendedPOS::AuxDesireTai ||
+                             epos == core::ExtendedPOS::AuxAppearanceSou || epos == core::ExtendedPOS::ParticleConj;
+    }
+    if (selects_continuative) {
+      const std::string stem = extractSubstring(codepoints, start_pos, kata_end);
+      candidates.push_back(makeVerbCandidate(
+          extractSubstring(codepoints, start_pos, kata_end + 1), start_pos, kata_end + 1, verb_opts.base_cost_standard,
+          stem + "る", dictionary::ConjugationType::GodanRa, true, CandidateOrigin::VerbKatakana,
+          candidate::kNoConfidence, "katakana_denominal_renyokei", core::ExtendedPOS::VerbRenyokei));
+    }
+  }
+
   // Try different ending lengths, starting from longest
   for (size_t end_pos = hira_end; !starts_quotative_tte && end_pos > kata_end; --end_pos) {
     std::string surface = extractSubstring(codepoints, start_pos, end_pos);

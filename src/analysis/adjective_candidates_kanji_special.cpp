@@ -125,6 +125,20 @@ bool appendKanjiIAdjSpecialCandidates(const std::vector<char32_t>& codepoints, s
     }
   }
 
+  // The past cell かっ+た of the same one-kanji stem (違かった). A ka-row
+  // verb owns the spelling when the dictionary attests it (分かった, 助かった).
+  if (kanji_end == start_pos + 1 && kanji_end + 2 < codepoints.size() &&
+      extractSubstring(codepoints, kanji_end, kanji_end + 3) == "かった") {
+    const std::string kanji = extractSubstring(codepoints, start_pos, kanji_end);
+    if (!verb_helpers::hasDictionaryEntry(dict_manager, kanji + "かる", core::PartOfSpeech::Verb) &&
+        !verb_helpers::hasDictionaryEntry(dict_manager, kanji + "く", core::PartOfSpeech::Verb)) {
+      const size_t adj_end = kanji_end + 2;
+      candidates.push_back(makeIAdjCandidate(extractSubstring(codepoints, start_pos, adj_end), start_pos, adj_end,
+                                             kanji + "い", candidate::kSingleKanjiKuCost, CandidateOrigin::AdjectiveI,
+                                             candidate::kIAdjConfMin, "single_kanji_katt"));
+    }
+  }
+
   // A one-kanji stem followed by るい/るく is a productive i-adjective
   // shape (明るい, 明るく). The inflection engine can prefer a homographic
   // godan analysis here, so retain the adjective candidate independently.

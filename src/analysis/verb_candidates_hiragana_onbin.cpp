@@ -29,6 +29,8 @@ namespace vh = verb_helpers;
 
 // The mora every conjugating class ends in, and the one no verb root starts with.
 constexpr char32_t kVerbEndingMora = U'る';
+// ろ is the ichidan imperative ending (食べろ) and likewise heads no root.
+constexpr char32_t kIchidanImperativeMora = U'ろ';
 
 void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, size_t start_pos, size_t hiragana_end,
                                       const grammar::Inflection& inflection,
@@ -175,9 +177,19 @@ void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, s
           is_ikuon && is_tense_pattern &&
           ((verb_type == grammar::VerbType::GodanKa && (next_char == U'た' || next_char == U'て')) ||
            (verb_type == grammar::VerbType::GodanGa && (next_char == U'だ' || next_char == U'で')));
+      // A kanji on the left closes a nominal subject whose particle was dropped
+      // (お腹+すい+た). The stem must then open a word: not on a particle
+      // (海外+に+い+た) and not on づ/ぢ, which only continue a kanji verb
+      // (近+づい+た).
+      auto follows_kanji_word_boundary = [&]() {
+        const char32_t head = codepoints[start_pos];
+        return normalize::isKanjiCodepoint(codepoints[start_pos - 1]) && !normalize::isExtendedParticle(head) &&
+               head != U'づ' && head != U'ぢ';
+      };
       const bool i_onbin_has_predicate_boundary =
           start_pos == 0 || normalize::isExtendedParticle(codepoints[start_pos - 1]) ||
-          normalize::classifyChar(codepoints[start_pos - 1]) == normalize::CharType::Symbol;
+          normalize::classifyChar(codepoints[start_pos - 1]) == normalize::CharType::Symbol ||
+          follows_kanji_word_boundary();
       // No Ka/Ga-row root ends in the conjunctive て/で. Every verb spelled that
       // way is a te-form plus a subsidiary (出て+いく, 持って+いく), so a stem
       // ending there has absorbed the clause boundary and the い behind it opens
@@ -211,7 +223,8 @@ void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, s
       // but ending (るる, るつ), and the contracted progressive gets re-cut
       // around it (書いてるって → て + るっ + て). Other u-row morae do head
       // roots (つる, うつ), so the guard is specific to this one.
-      if (!lemma_dict_verified && stem_char_count == 1 && codepoints[start_pos] == kVerbEndingMora) {
+      if (!lemma_dict_verified && stem_char_count == 1 &&
+          (codepoints[start_pos] == kVerbEndingMora || codepoints[start_pos] == kIchidanImperativeMora)) {
         continue;
       }
 
@@ -238,6 +251,22 @@ void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, s
           break;
         }
       }
+      // An i-adjective terminal right before the っ is a finished predicate
+      // whose っ opens the quotative (えぐい+って), not the stem of an unattested
+      // verb ending in い.
+      bool closes_on_adjective_terminal = false;
+      if (is_sokuonbin && !lemma_dict_verified && codepoints[onbin_pos - 1] == U'い') {
+        const std::string adjective_span = extractSubstring(codepoints, start_pos, onbin_pos);
+        const auto adjective_analyses = analysesInRange(inflection, codepoints, start_pos, onbin_pos);
+        closes_on_adjective_terminal =
+            std::any_of(adjective_analyses.begin(), adjective_analyses.end(), [&](const auto& analysis) {
+              return analysis.verb_type == grammar::VerbType::IAdjective && analysis.base_form == adjective_span;
+            });
+      }
+      if (closes_on_adjective_terminal) {
+        SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << onbin_surface << "\" adjective_terminal_before_quote\n");
+        continue;
+      }
       if (!lemma_dict_verified && contains_adjective_ku_naru) {
         SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << onbin_surface << "\" adjective_ku_naru_boundary\n");
         continue;
@@ -248,6 +277,25 @@ void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, s
       // negative predicate, not the continuative of a fabricated なかう.
       if (!lemma_dict_verified && vh::hasDictionaryEntry(dict_manager, onbin_surface, core::PartOfSpeech::Auxiliary)) {
         SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << onbin_surface << "\" registered auxiliary cell\n");
+        continue;
+      }
+      // The guards of the inflected-hiragana path apply to onbin spans too: a
+      // span may not open on the tail of a closed-class word (でし|ょっ), nor
+      // one mora inside a registered verb cell ending where it does (も|らっ).
+      // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+      if (!lemma_dict_verified &&
+          (vh::opensOnClosedClassWordTail(dict_manager, codepoints, start_pos, onbin_pos + 1) ||
+           (start_pos > 0 && vh::isVerbInDictionary(dict_manager, codepoints, start_pos - 1, onbin_pos + 1)))) {
+        SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << onbin_surface << "\" opens inside a closed word\n");
+        continue;
+      }
+      // A registered imperative or terminal ending right at the っ (食べろ|って,
+      // 来い|って) is a finished predicate, and the っ opens the quotative
+      // particle; a span reaching into that predicate is a fragment of it.
+      // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+      if (is_sokuonbin &&
+          vh::closedPredicateEndsAt(dict_manager, codepoints, start_pos, onbin_pos, lemma_dict_verified)) {
+        SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << onbin_surface << "\" follows a closed predicate\n");
         continue;
       }
       // An inflected auxiliary cell can also stand at the head of the span, and

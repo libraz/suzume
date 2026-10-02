@@ -396,6 +396,27 @@ bool isSingleKanjiIchidanSurface(std::string_view surface) {
   return !codepoints.empty() && isSingleKanjiIchidan(codepoints[0]);
 }
 
+bool isVerbContinuativeSpan(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
+                            size_t start, size_t end) {
+  if (end == start + 1 && isSingleKanjiIchidan(codepoints[start])) {
+    return true;
+  }
+  const auto* verb = dict_manager == nullptr
+                         ? nullptr
+                         : lookupEntryInRange(*dict_manager, codepoints, start, end, core::PartOfSpeech::Verb);
+  return verb != nullptr && verb->extended_pos == core::ExtendedPOS::VerbRenyokei;
+}
+
+bool startsWithVerbContinuative(const dictionary::DictionaryManager* dict_manager,
+                                const std::vector<char32_t>& codepoints, size_t start, size_t end) {
+  for (size_t boundary = start + 1; boundary < end; ++boundary) {
+    if (isVerbContinuativeSpan(dict_manager, codepoints, start, boundary)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 // =============================================================================
 // Candidate Sorting
 // =============================================================================
@@ -542,8 +563,9 @@ bool isPassiveAuxContinuation(const std::vector<char32_t>& codepoints, size_t po
   if (after_re == U'る' || after_re == U'た' || after_re == U'て') {
     return true;
   }
-  // れ + ない family (れない, れなかった, れなくて, れなければ, ...)
-  if (naiNegativeFollowsAt(codepoints, pos_after_re)) {
+  // れ + ない family (れない, れなかった, れなくて, れなければ, ...), and the
+  // classical negative on the same irrealis (れず, れずに, れぬ)
+  if (naiNegativeFollowsAt(codepoints, pos_after_re) || after_re == U'ず' || after_re == U'ぬ') {
     return true;
   }
   // れま (れます, れました); the strict form requires す/せ (excludes bare ま)

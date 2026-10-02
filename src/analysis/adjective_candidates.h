@@ -175,6 +175,22 @@ void appendIAdjClassicalTerminalCandidates(const std::vector<char32_t>& codepoin
                                            std::vector<UnknownCandidate>& candidates);
 
 /**
+ * @brief Append i-adjective classical attributive candidates (stem + き)
+ *
+ * 美しき花 / よき日: emitted only when the reconstructed base (stem + い) is a
+ * dictionary adjective, or a シク stem derived from a godan irrealis before a
+ * nominal head, and no verb claims the same spelling.
+ *
+ * @param scan_start First index where き may sit (kanji_end for a kanji stem,
+ *        start_pos + 1 for a pure-hiragana stem).
+ * @param scan_end   One past the last index to scan (hiragana region end).
+ */
+void appendIAdjClassicalAttributiveCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                              size_t scan_start, size_t scan_end,
+                                              const dictionary::DictionaryManager* dict_manager,
+                                              std::vector<UnknownCandidate>& candidates);
+
+/**
  * @brief Append i-adjective classical negative-stem candidates (stem + から + ず)
  *
  * The classical negative form 高からず / 美しからず has a verb-like から

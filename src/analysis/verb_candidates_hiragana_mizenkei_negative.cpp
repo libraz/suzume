@@ -125,6 +125,12 @@ bool hasLeadingParticleVerbBoundary(const dictionary::DictionaryManager* dict_ma
   return false;
 }
 
+// The irrealis of a na-row Godan verb (しな, いな). The class is closed: only
+// 死ぬ and 往ぬ conjugate on that row.
+bool isNaRowGodanIrrealis(const std::vector<char32_t>& codepoints, size_t start_pos, size_t mizenkei_end) {
+  return mizenkei_end - start_pos == 2 && (codepoints[start_pos] == U'し' || codepoints[start_pos] == U'い');
+}
+
 void appendMizenkeiNCandidates(const std::vector<char32_t>& codepoints, size_t start_pos, size_t hiragana_end,
                                const dictionary::DictionaryManager* dict_manager,
                                std::vector<UnknownCandidate>& candidates) {
@@ -159,6 +165,11 @@ void appendMizenkeiNCandidates(const std::vector<char32_t>& codepoints, size_t s
     // so we require dictionary confirmation to avoid false positives
     // like おねえさん → おねえさ + ん (おねえす is not a real verb)
     bool is_valid_verb = vh::isVerbInDictionary(dict_manager, base_form);
+    // The na-row Godan class is closed (しぬ, いぬ), so any other な+ん is the
+    // attributive copula plus ん (おなじ+な+ん+よ), never a new verb.
+    if (!is_valid_verb && forms.a_row_char == U'な' && !isNaRowGodanIrrealis(codepoints, start_pos, mizenkei_end)) {
+      continue;
+    }
 
     // Minimum stem length check: need at least 2 chars in mizenkei to be meaningful
     // This prevents false positives like "かん" → "か" + "ん"
@@ -233,6 +244,10 @@ void appendMizenkeiNegativeCandidates(const std::vector<char32_t>& codepoints, s
       continue;
     }
     if (!is_in_dict && vh::endsWithFocusParticleTail(dict_manager, codepoints, start_pos, mizenkei_end)) {
+      continue;
+    }
+    // The na-row Godan class is closed, as in the bare-ん scan above.
+    if (!is_in_dict && forms.a_row_char == U'な' && !isNaRowGodanIrrealis(codepoints, start_pos, mizenkei_end)) {
       continue;
     }
 
@@ -437,6 +452,17 @@ void appendNOnbinNaiCandidates(const std::vector<char32_t>& codepoints, size_t s
     // Surface: stem + ん (the ん音便 form)
     std::string onbin_surface = stem + "ん";
     size_t onbin_end = n_pos + 1;
+    // A registered irrealis/continuative cell already spells this contraction
+    // with its own lemma (くん of くれる); reconstructing a ra-row base would
+    // relabel it. An onbin cell (やん of やむ) is a different form and leaves
+    // the contraction open (やん+なきゃ).
+    if (dict_manager != nullptr) {
+      const auto* registered = dict_manager->lookupExact(onbin_surface, core::PartOfSpeech::Verb);
+      if (registered != nullptr && registered->extended_pos != core::ExtendedPOS::VerbOnbinkei &&
+          registered->lemma != base_form) {
+        continue;
+      }
+    }
 
     // Get lemma from dictionary if available
     std::string standard_mizenkei = stem + "ら";

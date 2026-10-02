@@ -294,6 +294,14 @@ size_t godanContinuationStemEnd(const std::vector<char32_t>& codepoints, size_t 
     if (has_long_noun_prefix && !(suffix_is_garu && !prefix_can_host_garu)) {
       return 0;
     }
+    // An inflected auxiliary or adjective cell already closes its own word
+    // before a predicate (まで+も+なく+やる).
+    constexpr PartOfSpeechMask kInflectedPrefixMask =
+        partOfSpeechMask(core::PartOfSpeech::Auxiliary) | partOfSpeechMask(core::PartOfSpeech::Adjective);
+    if (suffix_is_licensed_predicate && !suffix_is_garu &&
+        hasExactPartOfSpeech(*dict_manager, prefix, kInflectedPrefixMask)) {
+      return 0;
+    }
   } else if (godan_sa_end != 0) {
     return godan_sa_end;
   }
