@@ -474,6 +474,33 @@
       ],
       "id": "mou_nasaiyo",
       "input": "もう寝なさいよ"
+    },
+    {
+      "description": "雨だったらしい - regression test",
+      "expected": [
+        {
+          "lemma": "雨",
+          "pos": "Noun",
+          "surface": "雨"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "らしい",
+          "pos": "Auxiliary",
+          "surface": "らしい"
+        }
+      ],
+      "id": "datttarashii",
+      "input": "雨だったらしい"
     }
   ],
   "description": "Modality auxiliaries (たい、そう、らしい) (part 2/2)",

@@ -1864,6 +1864,23 @@
       ],
       "id": "sonomonoda",
       "input": "制度そのものだ"
+    },
+    {
+      "description": "未練たらしい - regression test",
+      "expected": [
+        {
+          "lemma": "未練",
+          "pos": "Noun",
+          "surface": "未練"
+        },
+        {
+          "lemma": "たらしい",
+          "pos": "Adjective",
+          "surface": "たらしい"
+        }
+      ],
+      "id": "tarashii",
+      "input": "未練たらしい"
     }
   ],
   "description": "General nouns (part 4/4)",

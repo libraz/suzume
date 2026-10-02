@@ -297,6 +297,52 @@
       ],
       "id": "iya_u_2",
       "input": "いや違う"
+    },
+    {
+      "description": "おつかれさまです。 - regression test",
+      "expected": [
+        {
+          "lemma": "おつかれさま",
+          "pos": "Interjection",
+          "surface": "おつかれさま"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "otsukaresamadesu",
+      "input": "おつかれさまです。"
+    },
+    {
+      "description": "おつかれさま - regression test",
+      "expected": [
+        {
+          "lemma": "おつかれさま",
+          "pos": "Interjection",
+          "surface": "おつかれさま"
+        }
+      ],
+      "id": "otsukaresama",
+      "input": "おつかれさま"
+    },
+    {
+      "description": "お疲れさまです - regression test",
+      "expected": [
+        {
+          "lemma": "お疲れさま",
+          "pos": "Interjection",
+          "surface": "お疲れさま"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "o_resamadesu",
+      "input": "お疲れさまです"
     }
   ],
   "description": "Interjections and greetings (感動詞・挨拶)",

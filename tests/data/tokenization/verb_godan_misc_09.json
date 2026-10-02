@@ -117,6 +117,28 @@
       ],
       "id": "hayo_kanaakande",
       "input": "はよ行かなあかんで。"
+    },
+    {
+      "description": "言ったらしい - regression test",
+      "expected": [
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "らしい",
+          "pos": "Auxiliary",
+          "surface": "らしい"
+        }
+      ],
+      "id": "tttarashii_3",
+      "input": "言ったらしい"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",
