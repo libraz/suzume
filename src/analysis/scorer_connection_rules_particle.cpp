@@ -144,8 +144,10 @@ float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::
   // always a misparse: the hiragana should be part of a verb (先+生きのこる) or
   // okurigana (読み+残す), not a standalone unknown token
   // E.g., 先生+き(OTHER) should lose to 先+生きのこる
-  // Needs a very high penalty to overcome prefix compound bonus advantages
-  if (prev.pos == core::PartOfSpeech::Noun && grammar::containsKanji(prev.surface) &&
+  // Needs a very high penalty to overcome prefix compound bonus advantages.
+  // An adverb has no such stray continuation either (なんで+す for なん+です).
+  if (((prev.pos == core::PartOfSpeech::Noun && grammar::containsKanji(prev.surface)) ||
+       prev.pos == core::PartOfSpeech::Adverb) &&
       next.pos == core::PartOfSpeech::Other && next.surface.size() == 3 &&  // Single char = 3 bytes UTF-8
       grammar::isPureHiragana(next.surface)) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
@@ -181,11 +183,24 @@ float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::
       next.extended_pos == core::ExtendedPOS::ParticleNo || next.pos == core::PartOfSpeech::Determiner ||
       next.pos == core::PartOfSpeech::Prefix || next.extended_pos == core::ExtendedPOS::AdjBasic ||
       next.extended_pos == core::ExtendedPOS::AdjNaAdj;
+  // An ordinary determiner selects the same heads, plus the quantity adverb a
+  // degree determiner modifies (ほんの+少し) and an adjective stem nominalized
+  // by its suffix (あまりの+暑+さ); punctuation may separate it from its head.
+  // An interrogative is not modified (おなじ+なん+です), and a copula or
+  // particle after one is the homographic adjectival noun instead (おなじ+だ).
+  const bool determiner_head =
+      (quotative_determiner_head && next.extended_pos != core::ExtendedPOS::PronounInterrogative) ||
+      next.extended_pos == core::ExtendedPOS::Adverb || next.extended_pos == core::ExtendedPOS::AdjStem ||
+      next.pos == core::PartOfSpeech::Symbol;
   // An attributive with nothing to modify is not a possible reading rather than
-  // an unlikely one. The penalty also takes back the predicate→determiner bonus
-  // on its left, which was granted on the assumption that a head follows.
-  if (prev.extended_pos == core::ExtendedPOS::DeterminerQuotative && !quotative_determiner_head) {
-    SUZUME_CONNECTION_ADD(bonus, sc::kHeadlessQuotativeDeterminerPenalty);
+  // an unlikely one. For a quotative determiner the penalty also takes back the
+  // predicate→determiner bonus on its left, granted on the assumption that a
+  // head follows.
+  const bool is_quotative_determiner = prev.extended_pos == core::ExtendedPOS::DeterminerQuotative;
+  if ((is_quotative_determiner && !quotative_determiner_head) ||
+      (prev.extended_pos == core::ExtendedPOS::Determiner && !determiner_head)) {
+    SUZUME_CONNECTION_ADD(bonus,
+                          is_quotative_determiner ? sc::kHeadlessQuotativeDeterminerPenalty : cost::kAlmostNever);
   }
 
   // Penalty for DET → non-dict single-kanji NOUN

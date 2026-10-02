@@ -340,8 +340,10 @@ float computeSuffixShortVerbBonus(const core::LatticeEdge& prev, const core::Lat
 
   // An adjective stem cannot take the past-conditional particle ったら.
   // The sequence is a verb's euphonic stem plus tense auxiliary (なっ+たら).
-  if (prev.extended_pos == core::ExtendedPOS::AdjStem && next.extended_pos == core::ExtendedPOS::ParticleFinal &&
-      utf8::equalsAny(next.surface, {"ったら"})) {
+  // Nor the plural ら, which needs a nominal host (な+ら for the particle なら).
+  if (prev.extended_pos == core::ExtendedPOS::AdjStem &&
+      ((next.extended_pos == core::ExtendedPOS::ParticleFinal && utf8::equalsAny(next.surface, {"ったら"})) ||
+       (next.pos == core::PartOfSpeech::Suffix && utf8::equalsAny(next.surface, {"ら"})))) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
 

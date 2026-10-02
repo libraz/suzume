@@ -764,7 +764,9 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
 
       // An adjective stem cannot govern an object or case particle. This
       // preserves a competing lexical noun reading before the particle.
+      // Nor can it be nominalized by の: that takes the attributive (高い+の).
       {EPOS::AdjStem, EPOS::ParticleCase, cost::kAlmostNever},
+      {EPOS::AdjStem, EPOS::ParticleNo, cost::kAlmostNever},
 
       // The contracted negative requires the irrealis form of a verb. A
       // terminal verb candidate (や+す+んで, むす+んで) is not an alternative

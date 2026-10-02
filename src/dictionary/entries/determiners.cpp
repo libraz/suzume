@@ -26,6 +26,7 @@ EntrySpecRange getDeterminerEntries() {
       det("いろんな", ""),  // colloquial variety determiner (= いろいろな), not an adjective
       det("おかしな", ""),
       det("同じ", ""),      // same - prevent VERB confusion
+      det("おなじ", ""),    // kana spelling of the same determiner
       det("単なる", ""),    // fixed attributive determiner, not a finite verb
       det("たいした", ""),  // 大した - prevent 願望たい+し+た split (たいした問題)
       det("大した", ""),    // kanji spelling of the fixed evaluative determiner
