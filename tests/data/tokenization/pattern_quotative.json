@@ -1535,6 +1535,255 @@
       ],
       "id": "sorehaiiyattte",
       "input": "それはいいやって"
+    },
+    {
+      "description": "そうだっつーの。 - regression test",
+      "expected": [
+        {
+          "lemma": "そう",
+          "pos": "Adjective",
+          "surface": "そう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "っ"
+        },
+        {
+          "lemma": "いう",
+          "pos": "Verb",
+          "surface": "つー"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        }
+      ],
+      "id": "soudatttsu_no",
+      "input": "そうだっつーの。"
+    },
+    {
+      "description": "そうだっつうの - regression test",
+      "expected": [
+        {
+          "lemma": "そう",
+          "pos": "Adjective",
+          "surface": "そう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "っ"
+        },
+        {
+          "lemma": "いう",
+          "pos": "Verb",
+          "surface": "つう"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        }
+      ],
+      "id": "soudatttsuuno",
+      "input": "そうだっつうの"
+    },
+    {
+      "description": "やるっつったらやるんだよ - regression test",
+      "expected": [
+        {
+          "lemma": "やる",
+          "pos": "Verb",
+          "surface": "やる"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "っ"
+        },
+        {
+          "lemma": "いう",
+          "pos": "Verb",
+          "surface": "つっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "たら"
+        },
+        {
+          "lemma": "やる",
+          "pos": "Verb",
+          "surface": "やる"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "yarutttsutttarayarundayo",
+      "input": "やるっつったらやるんだよ"
+    },
+    {
+      "description": "それやめろっつってんだろ - regression test",
+      "expected": [
+        {
+          "lemma": "それ",
+          "pos": "Pronoun",
+          "surface": "それ"
+        },
+        {
+          "lemma": "やめる",
+          "pos": "Verb",
+          "surface": "やめろ"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "っ"
+        },
+        {
+          "lemma": "いう",
+          "pos": "Verb",
+          "surface": "つっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だろ"
+        }
+      ],
+      "id": "soreyamerotttsutttendaro",
+      "input": "それやめろっつってんだろ"
+    },
+    {
+      "description": "高いっつっても - regression test",
+      "expected": [
+        {
+          "lemma": "高い",
+          "pos": "Adjective",
+          "surface": "高い"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "っ"
+        },
+        {
+          "lemma": "いう",
+          "pos": "Verb",
+          "surface": "つっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        }
+      ],
+      "id": "itttsutttemo",
+      "input": "高いっつっても"
+    },
+    {
+      "description": "嫌だっつってるだろ - regression test",
+      "expected": [
+        {
+          "lemma": "嫌",
+          "pos": "Adjective",
+          "surface": "嫌"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "っ"
+        },
+        {
+          "lemma": "いう",
+          "pos": "Verb",
+          "surface": "つっ"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てる"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だろ"
+        }
+      ],
+      "id": "datttsuttterudaro",
+      "input": "嫌だっつってるだろ"
+    },
+    {
+      "description": "行くっつった - regression test",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行く"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "っ"
+        },
+        {
+          "lemma": "いう",
+          "pos": "Verb",
+          "surface": "つっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "kutttsuttta",
+      "input": "行くっつった"
     }
   ],
   "description": "Quotative patterns (という, といって, etc.)",

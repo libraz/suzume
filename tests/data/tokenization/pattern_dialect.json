@@ -104,6 +104,305 @@
       ],
       "id": "benbe",
       "input": "食べんべ"
+    },
+    {
+      "description": "それはえらいこっちゃ。 - regression test",
+      "expected": [
+        {
+          "lemma": "それ",
+          "pos": "Pronoun",
+          "surface": "それ"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "えらい",
+          "pos": "Adjective",
+          "surface": "えらい"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "こっ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "ちゃ"
+        }
+      ],
+      "id": "sorehaeraikottchi",
+      "input": "それはえらいこっちゃ。"
+    },
+    {
+      "description": "大変なこっちゃ - regression test",
+      "expected": [
+        {
+          "lemma": "大変",
+          "pos": "Adjective",
+          "surface": "大変"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "こっ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "ちゃ"
+        }
+      ],
+      "id": "nakottchi",
+      "input": "大変なこっちゃ"
+    },
+    {
+      "description": "知ったこっちゃない - regression test",
+      "expected": [
+        {
+          "lemma": "知る",
+          "pos": "Verb",
+          "surface": "知っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "こっ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "ちゃ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "tttakottchi_nai",
+      "input": "知ったこっちゃない"
+    },
+    {
+      "description": "そんなこっちゃ困る - regression test",
+      "expected": [
+        {
+          "lemma": "そんな",
+          "pos": "Determiner",
+          "surface": "そんな"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "こっ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "ちゃ"
+        },
+        {
+          "lemma": "困る",
+          "pos": "Verb",
+          "surface": "困る"
+        }
+      ],
+      "id": "sonnakottchi_ru",
+      "input": "そんなこっちゃ困る"
+    },
+    {
+      "description": "肩がこっちゃ困る - regression test",
+      "expected": [
+        {
+          "lemma": "肩",
+          "pos": "Noun",
+          "surface": "肩"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "こる",
+          "pos": "Verb",
+          "surface": "こっ"
+        },
+        {
+          "lemma": "ちゃ",
+          "pos": "Particle",
+          "surface": "ちゃ"
+        },
+        {
+          "lemma": "困る",
+          "pos": "Verb",
+          "surface": "困る"
+        }
+      ],
+      "id": "gakottchi_ru",
+      "input": "肩がこっちゃ困る"
+    },
+    {
+      "description": "見んさい - regression test",
+      "expected": [
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "んさる",
+          "pos": "Auxiliary",
+          "surface": "んさい"
+        }
+      ],
+      "id": "nsai",
+      "input": "見んさい"
+    },
+    {
+      "description": "ええ加減にしときい - regression test",
+      "expected": [
+        {
+          "lemma": "ええ",
+          "pos": "Adjective",
+          "surface": "ええ"
+        },
+        {
+          "lemma": "加減",
+          "pos": "Noun",
+          "surface": "加減"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "とく",
+          "pos": "Auxiliary",
+          "surface": "ときい"
+        }
+      ],
+      "id": "ee_nishitokii",
+      "input": "ええ加減にしときい"
+    },
+    {
+      "description": "ちゃんと勉強しときい。 - regression test",
+      "expected": [
+        {
+          "lemma": "ちゃんと",
+          "pos": "Adverb",
+          "surface": "ちゃんと"
+        },
+        {
+          "lemma": "勉強",
+          "pos": "Noun",
+          "surface": "勉強"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "とく",
+          "pos": "Auxiliary",
+          "surface": "ときい"
+        }
+      ],
+      "id": "chi_nto_shitokii",
+      "input": "ちゃんと勉強しときい。"
+    },
+    {
+      "description": "待っときい - regression test",
+      "expected": [
+        {
+          "lemma": "待つ",
+          "pos": "Verb",
+          "surface": "待っ"
+        },
+        {
+          "lemma": "とく",
+          "pos": "Auxiliary",
+          "surface": "ときい"
+        }
+      ],
+      "id": "tttokii",
+      "input": "待っときい"
+    },
+    {
+      "description": "たくさん食べんさい。 - regression test",
+      "expected": [
+        {
+          "lemma": "たくさん",
+          "pos": "Adverb",
+          "surface": "たくさん"
+        },
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "んさる",
+          "pos": "Auxiliary",
+          "surface": "んさい"
+        }
+      ],
+      "id": "takusan_bensai",
+      "input": "たくさん食べんさい。"
+    },
+    {
+      "description": "帰りんさい - regression test",
+      "expected": [
+        {
+          "lemma": "帰る",
+          "pos": "Verb",
+          "surface": "帰り"
+        },
+        {
+          "lemma": "んさる",
+          "pos": "Auxiliary",
+          "surface": "んさい"
+        }
+      ],
+      "id": "rinsai",
+      "input": "帰りんさい"
+    },
+    {
+      "description": "書きんさい - regression test",
+      "expected": [
+        {
+          "lemma": "書く",
+          "pos": "Verb",
+          "surface": "書き"
+        },
+        {
+          "lemma": "んさる",
+          "pos": "Auxiliary",
+          "surface": "んさい"
+        }
+      ],
+      "id": "kinsai",
+      "input": "書きんさい"
     }
   ],
   "description": "pattern_dialect tests",

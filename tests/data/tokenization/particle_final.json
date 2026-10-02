@@ -1228,6 +1228,174 @@
       ],
       "id": "nazedayo",
       "input": "なぜだよ"
+    },
+    {
+      "description": "考えたなう - regression test",
+      "expected": [
+        {
+          "lemma": "考える",
+          "pos": "Verb",
+          "surface": "考え"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "なう",
+          "pos": "Particle",
+          "surface": "なう"
+        }
+      ],
+      "id": "etanau",
+      "input": "考えたなう"
+    },
+    {
+      "description": "ラーメン食べてるなう - regression test",
+      "expected": [
+        {
+          "lemma": "ラーメン",
+          "pos": "Noun",
+          "surface": "ラーメン"
+        },
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てる"
+        },
+        {
+          "lemma": "なう",
+          "pos": "Particle",
+          "surface": "なう"
+        }
+      ],
+      "id": "beterunau",
+      "input": "ラーメン食べてるなう"
+    },
+    {
+      "description": "東京なう - regression test",
+      "expected": [
+        {
+          "lemma": "東京",
+          "pos": "Noun",
+          "surface": "東京"
+        },
+        {
+          "lemma": "なう",
+          "pos": "Particle",
+          "surface": "なう"
+        }
+      ],
+      "id": "nau",
+      "input": "東京なう"
+    },
+    {
+      "description": "今帰ったなう。 - regression test",
+      "expected": [
+        {
+          "lemma": "今",
+          "pos": "Noun",
+          "surface": "今"
+        },
+        {
+          "lemma": "帰る",
+          "pos": "Verb",
+          "surface": "帰っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "なう",
+          "pos": "Particle",
+          "surface": "なう"
+        }
+      ],
+      "id": "tttanau",
+      "input": "今帰ったなう。"
+    },
+    {
+      "description": "家に帰るなう - regression test",
+      "expected": [
+        {
+          "lemma": "家",
+          "pos": "Noun",
+          "surface": "家"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "帰る",
+          "pos": "Verb",
+          "surface": "帰る"
+        },
+        {
+          "lemma": "なう",
+          "pos": "Particle",
+          "surface": "なう"
+        }
+      ],
+      "id": "ni_runau",
+      "input": "家に帰るなう"
+    },
+    {
+      "description": "うしなう - regression test",
+      "expected": [
+        {
+          "lemma": "うしなう",
+          "pos": "Verb",
+          "surface": "うしなう"
+        }
+      ],
+      "id": "ushinau",
+      "input": "うしなう"
+    },
+    {
+      "description": "そこなう - regression test",
+      "expected": [
+        {
+          "lemma": "そこなう",
+          "pos": "Verb",
+          "surface": "そこなう"
+        }
+      ],
+      "id": "sokonau",
+      "input": "そこなう"
+    },
+    {
+      "description": "ともなう - regression test",
+      "expected": [
+        {
+          "lemma": "ともなう",
+          "pos": "Verb",
+          "surface": "ともなう"
+        }
+      ],
+      "id": "tomonau",
+      "input": "ともなう"
+    },
+    {
+      "description": "損なう - regression test",
+      "expected": [
+        {
+          "lemma": "損なう",
+          "pos": "Verb",
+          "surface": "損なう"
+        }
+      ],
+      "id": "nau_2",
+      "input": "損なう"
     }
   ],
   "description": "particle_final tests",

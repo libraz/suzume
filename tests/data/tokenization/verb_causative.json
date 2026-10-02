@@ -4,9 +4,14 @@
       "description": "Causative renyokei + past tense",
       "expected": [
         {
-          "lemma": "眠らせる",
+          "lemma": "眠る",
           "pos": "Verb",
-          "surface": "眠らせ"
+          "surface": "眠ら"
+        },
+        {
+          "lemma": "せる",
+          "pos": "Auxiliary",
+          "surface": "せ"
         },
         {
           "lemma": "た",
@@ -21,9 +26,14 @@
       "description": "Causative renyokei + te-form",
       "expected": [
         {
-          "lemma": "眠らせる",
+          "lemma": "眠る",
           "pos": "Verb",
-          "surface": "眠らせ"
+          "surface": "眠ら"
+        },
+        {
+          "lemma": "せる",
+          "pos": "Auxiliary",
+          "surface": "せ"
         },
         {
           "lemma": "て",
@@ -1012,6 +1022,222 @@
       ],
       "id": "wo_saseru_3",
       "input": "本を見させる"
+    },
+    {
+      "description": "笑わせないでほしい。 - regression test",
+      "expected": [
+        {
+          "lemma": "笑う",
+          "pos": "Verb",
+          "surface": "笑わ"
+        },
+        {
+          "lemma": "せる",
+          "pos": "Auxiliary",
+          "surface": "せ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "ほしい",
+          "pos": "Adjective",
+          "surface": "ほしい"
+        }
+      ],
+      "id": "wasenaidehoshii",
+      "input": "笑わせないでほしい。"
+    },
+    {
+      "description": "笑わせた - regression test",
+      "expected": [
+        {
+          "lemma": "笑う",
+          "pos": "Verb",
+          "surface": "笑わ"
+        },
+        {
+          "lemma": "せる",
+          "pos": "Auxiliary",
+          "surface": "せ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "waseta",
+      "input": "笑わせた"
+    },
+    {
+      "description": "泣かせた - regression test",
+      "expected": [
+        {
+          "lemma": "泣く",
+          "pos": "Verb",
+          "surface": "泣か"
+        },
+        {
+          "lemma": "せる",
+          "pos": "Auxiliary",
+          "surface": "せ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "kaseta",
+      "input": "泣かせた"
+    },
+    {
+      "description": "寝かせない - regression test",
+      "expected": [
+        {
+          "lemma": "寝かせる",
+          "pos": "Verb",
+          "surface": "寝かせ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "kasenai",
+      "input": "寝かせない"
+    },
+    {
+      "description": "笑わせれば - regression test",
+      "expected": [
+        {
+          "lemma": "笑う",
+          "pos": "Verb",
+          "surface": "笑わ"
+        },
+        {
+          "lemma": "せる",
+          "pos": "Auxiliary",
+          "surface": "せれ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "wasereba",
+      "input": "笑わせれば"
+    },
+    {
+      "description": "手紙を書かされかけた。 - regression test",
+      "expected": [
+        {
+          "lemma": "手紙",
+          "pos": "Noun",
+          "surface": "手紙"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "書く",
+          "pos": "Verb",
+          "surface": "書か"
+        },
+        {
+          "lemma": "す",
+          "pos": "Auxiliary",
+          "surface": "さ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "かける",
+          "pos": "Verb",
+          "surface": "かけ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wo_kasarekaketa",
+      "input": "手紙を書かされかけた。"
+    },
+    {
+      "description": "書かれかけた - regression test",
+      "expected": [
+        {
+          "lemma": "書く",
+          "pos": "Verb",
+          "surface": "書か"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "かける",
+          "pos": "Verb",
+          "surface": "かけ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "karekaketa",
+      "input": "書かれかけた"
+    },
+    {
+      "description": "食べさせられかけた - regression test",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "させる",
+          "pos": "Auxiliary",
+          "surface": "させ"
+        },
+        {
+          "lemma": "られる",
+          "pos": "Auxiliary",
+          "surface": "られ"
+        },
+        {
+          "lemma": "かける",
+          "pos": "Verb",
+          "surface": "かけ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "besaserarekaketa",
+      "input": "食べさせられかけた"
     }
   ],
   "description": "verb_causative tests",
