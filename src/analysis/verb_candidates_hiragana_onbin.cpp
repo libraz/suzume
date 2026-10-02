@@ -293,8 +293,23 @@ void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, s
       // 来い|って) is a finished predicate, and the っ opens the quotative
       // particle; a span reaching into that predicate is a fragment of it.
       // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+      // The same holds inside the span where the quotative contracts to っ+つ
+      // (やる|っ|つっ+たら): a registered predicate fills the span up to it.
+      bool closes_before_contracted_quotative = false;
+      for (size_t quote_pos = start_pos + 1; is_sokuonbin && dict_manager != nullptr && quote_pos + 1 < onbin_pos;
+           ++quote_pos) {
+        if (codepoints[quote_pos] == U'っ' && codepoints[quote_pos + 1] == U'つ') {
+          const auto* host =
+              lookupEntryInRange(*dict_manager, codepoints, start_pos, quote_pos, core::PartOfSpeech::Verb);
+          closes_before_contracted_quotative =
+              host != nullptr && (host->extended_pos == core::ExtendedPOS::VerbShuushikei ||
+                                  host->extended_pos == core::ExtendedPOS::VerbMeireikei);
+          break;
+        }
+      }
       if (is_sokuonbin &&
-          vh::closedPredicateEndsAt(dict_manager, codepoints, start_pos, onbin_pos, lemma_dict_verified)) {
+          (closes_before_contracted_quotative ||
+           vh::closedPredicateEndsAt(dict_manager, codepoints, start_pos, onbin_pos, lemma_dict_verified))) {
         SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << onbin_surface << "\" follows a closed predicate\n");
         continue;
       }

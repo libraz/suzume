@@ -782,6 +782,8 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generate(std::string_view te
   // this reconstruction cannot see (読んで + みりゃ).
   analysis::generateContractedConditionalCandidates(codepoints, start_pos, char_types, inflection_, dict_manager_,
                                                     candidates);
+  analysis::generateContractedVolitionalCandidates(codepoints, start_pos, candidates);
+  analysis::generateContractedQuotativeCandidates(codepoints, start_pos, candidates);
 
   candidates.erase(
       std::remove_if(

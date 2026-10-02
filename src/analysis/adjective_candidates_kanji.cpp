@@ -750,6 +750,23 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
             continue;  // Skip - force adj + さ + そう split
           }
         }
+        // A stem closed by an auxiliary cell after okurigana is a predicate
+        // chain ending in い, not an adjective (勉強し+とき+い), unless the い is
+        // that auxiliary's own ending (珍し+らし+い is らしい).
+        // An auxiliary closing the whole span is that ending only when it
+        // inflects like an adjective; んさい (of んさる) is a predicate cell.
+        const auto* closing_auxiliary =
+            verb_helpers::auxiliaryClosingAfterOkurigana(dict_manager, codepoints, kanji_end, end_pos);
+        const bool closes_on_predicate_cell =
+            closing_auxiliary != nullptr &&
+            !utf8::endsWith(closing_auxiliary->lemma.empty() ? closing_auxiliary->surface : closing_auxiliary->lemma,
+                            "い");
+        if (utf8::endsWith(surface, "い") && !isAdjectiveInDictionary(dict_manager, cand.base_form) &&
+            (closes_on_predicate_cell ||
+             (closing_auxiliary == nullptr &&
+              verb_helpers::endsWithAuxiliaryAfterOkurigana(dict_manager, codepoints, kanji_end, end_pos - 1)))) {
+          continue;
+        }
         // Set lemma to base form from inflection analysis (e.g., 使いやすく → 使いやすい)
         auto adj_cand = makeIAdjCandidate(surface, start_pos, end_pos, cand.base_form, cost,
                                           CandidateOrigin::AdjectiveI, cand.confidence, "i_adjective");

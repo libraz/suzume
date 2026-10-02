@@ -620,6 +620,8 @@ EntrySpecRange getAuxiliaryEntries() {
 
       // Polite imperative - connect after verb renyokei
       aux("なさい", "なさる", EPOS::AuxHonorific),
+      // Chugoku contraction of the same imperative (食べ+んさい, 書き+んさい).
+      aux("んさい", "んさる", EPOS::AuxHonorific),
       // Honorific subsidiary なさる after お+連用形.  Keep its special
       // ra-row inflection as auxiliaries so お読みなさる and its negative,
       // past, and conditional forms do not fall back to lexical verbs.
@@ -996,6 +998,7 @@ EntrySpecRange getAuxiliaryEntries() {
       // Elderly/Archaic (老人・古風)
       aux("じゃ", "だ", EPOS::AuxCopulaDa),
       aux("じゃあ", "だ", EPOS::AuxCopulaDa),
+      aux("ちゃ", "だ", EPOS::AuxCopulaDa),  // じゃ assimilated to a geminate (こっ+ちゃ)
       // Contracted explanatory/copular negative: んじゃ+ない.
       aux("んじゃ", "んだ", EPOS::AuxCopulaDa),
       aux("のじゃ", "のだ", EPOS::Unknown),

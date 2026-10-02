@@ -9,6 +9,7 @@
 #include "analysis/dictionary_probe.h"
 #include "analysis/verb_candidates_helpers.h"
 #include "core/debug.h"
+#include "core/kana_constants.h"
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
@@ -180,6 +181,51 @@ void generateContractedConditionalCandidates(const std::vector<char32_t>& codepo
                                             << " conf=" << best.confidence << "\n");
     candidates.push_back(std::move(candidate));
   }
+}
+
+void generateContractedVolitionalCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                            std::vector<UnknownCandidate>& candidates) {
+  if (start_pos == 0 || codepoints[start_pos] != U'っ' || !kana::isORowCodepoint(codepoints[start_pos - 1]) ||
+      !vh::volitionalEndingFollowsAt(codepoints, start_pos)) {
+    return;
+  }
+  auto candidate = makeCandidate(codepoints, start_pos, start_pos + 1, core::PartOfSpeech::Auxiliary,
+                                 candidate::verb_cost::kStandardBonus, true, CandidateOrigin::VerbHiragana,
+                                 core::ExtendedPOS::AuxVolitional, "contracted_volitional");
+  candidate.lemma = "う";
+  candidates.push_back(std::move(candidate));
+}
+
+void generateContractedQuotativeCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                           std::vector<UnknownCandidate>& candidates) {
+  const auto at = [&](size_t pos, char32_t codepoint) {
+    return pos < codepoints.size() && codepoints[pos] == codepoint;
+  };
+  // The quotative needs a host to quote, so the sequence never opens the text.
+  if (at(start_pos, U'っ') && at(start_pos + 1, U'つ') && start_pos > 0) {
+    auto particle = makeCandidate(codepoints, start_pos, start_pos + 1, core::PartOfSpeech::Particle,
+                                  candidate::verb_cost::kStandardBonus, false, CandidateOrigin::VerbHiragana,
+                                  core::ExtendedPOS::ParticleQuote, "contracted_quotative");
+    particle.lemma = "って";
+    candidates.push_back(std::move(particle));
+    return;
+  }
+  if (start_pos == 0 || !at(start_pos - 1, U'っ') || !at(start_pos, U'つ')) {
+    return;
+  }
+  // つー/つう is the terminal, and つっ the onbin before the past or the connective.
+  // Inside this sequence いう outranks the kana-verb readings of the same spelling.
+  const bool terminal = at(start_pos + 1, U'ー') || at(start_pos + 1, U'う');
+  const bool onbin = at(start_pos + 1, U'っ') && (at(start_pos + 2, U'た') || at(start_pos + 2, U'て'));
+  if (!terminal && !onbin) {
+    return;
+  }
+  auto verb = makeVerbCandidate(codepoints, start_pos, start_pos + 2, candidate::verb_cost::kStrongBonus, "いう",
+                                dictionary::ConjugationType::GodanWa, true, CandidateOrigin::VerbHiragana,
+                                candidate::kHighOriginConfidence, "contracted_quotative_iu",
+                                terminal ? core::ExtendedPOS::VerbShuushikei : core::ExtendedPOS::VerbOnbinkei);
+  verb.lemma_verified = true;
+  candidates.push_back(std::move(verb));
 }
 
 }  // namespace suzume::analysis

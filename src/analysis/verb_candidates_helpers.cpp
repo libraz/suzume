@@ -132,6 +132,12 @@ bool naiNegativeFollowsAt(const std::vector<char32_t>& codepoints, size_t pos) {
   return naiNegativeFormLengthAt(codepoints, pos) != 0;
 }
 
+bool volitionalEndingFollowsAt(const std::vector<char32_t>& codepoints, size_t pos) {
+  return pos < codepoints.size() &&
+         (codepoints[pos] == U'う' ||
+          (codepoints[pos] == U'っ' && pos + 1 < codepoints.size() && codepoints[pos + 1] == U'か'));
+}
+
 bool startsInsideKanjiRun(const std::vector<char32_t>& codepoints, size_t pos) {
   return pos > 0 && pos < codepoints.size() && kana::isKanjiCodepoint(codepoints[pos]) &&
          kana::isKanjiCodepoint(codepoints[pos - 1]);

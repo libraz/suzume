@@ -644,6 +644,13 @@ bool endsWithARow(std::string_view stem);
 bool endsWithORow(std::string_view stem);
 
 /**
+ * @brief Check if text ends with u-row hiragana (the godan terminal cell)
+ * @param stem The text to check
+ * @return True if the final codepoint is u-row hiragana
+ */
+bool endsWithURow(std::string_view stem);
+
+/**
  * @brief Check whether text is exactly one specified hiragana codepoint
  */
 bool isSingleHiragana(std::string_view text, char32_t codepoint);

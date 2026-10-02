@@ -230,7 +230,7 @@ void appendSingleKanjiIchidanCandidates(const std::vector<char32_t>& codepoints,
       // boundary (見よ+う, 来よ+う).  The bare kanji is the renyokei/mizenkei
       // spelling in other cells, but emitting it here would let formal noun
       // よう absorb the stem.
-      bool is_modern_volitional = h1 == U'よ' && h2 == U'う';
+      bool is_modern_volitional = h1 == U'よ' && vh::volitionalEndingFollowsAt(codepoints, kanji_end + 1);
       // Negative auxiliary ない and its conjugations:
       // ない (終止/連体), なく (連用), なかっ (た接続), なけれ (仮定), なきゃ (口語縮約仮定)
       bool is_negative_aux = vh::naiNegativeFollowsAt(codepoints, kanji_end);
@@ -434,7 +434,7 @@ void appendSingleKanjiIchidanCandidates(const std::vector<char32_t>& codepoints,
       // Ichidan verbs: 見よ+う and 見よ.
       bool has_yo_form = (h1 == kYo);
       if (has_yo_form) {
-        const bool is_volitional = (h2 == kU);
+        const bool is_volitional = vh::volitionalEndingFollowsAt(codepoints, kanji_end + 1);
         std::string surface = extractSubstring(codepoints, start_pos, kanji_end + 1);
         std::string base_form = extractSubstring(codepoints, start_pos, kanji_end) + "る";
         constexpr float kCost = candidate::verb_cost::kStrongBonus;  // Strong bonus to beat compound interpretation

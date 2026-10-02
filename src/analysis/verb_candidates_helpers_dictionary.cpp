@@ -540,12 +540,18 @@ bool endsWithClassicalAuxiliary(const dictionary::DictionaryManager* dict_manage
 
 bool endsWithAuxiliaryAfterOkurigana(const dictionary::DictionaryManager* dict_manager,
                                      const std::vector<char32_t>& codepoints, size_t okurigana_start, size_t end_pos) {
+  return auxiliaryClosingAfterOkurigana(dict_manager, codepoints, okurigana_start, end_pos) != nullptr;
+}
+
+const dictionary::DictionaryEntry* auxiliaryClosingAfterOkurigana(const dictionary::DictionaryManager* dict_manager,
+                                                                  const std::vector<char32_t>& codepoints,
+                                                                  size_t okurigana_start, size_t end_pos) {
   // The closed class tops out at four codepoints, and a one-mora tail is also
   // how ordinary verbs spell their own endings, so only multi-mora auxiliaries
   // are evidence here.
   constexpr size_t kMaxAuxiliaryLen = 4;
   if (dict_manager == nullptr || end_pos > codepoints.size() || end_pos < okurigana_start + 2) {
-    return false;
+    return nullptr;
   }
   const size_t max_len = std::min(kMaxAuxiliaryLen, end_pos - okurigana_start - 1);
   for (size_t aux_len = 2; aux_len <= max_len; ++aux_len) {
@@ -554,10 +560,10 @@ bool endsWithAuxiliaryAfterOkurigana(const dictionary::DictionaryManager* dict_m
     // けり's izenkei is spelled like the hypothetical ending every i-adjective
     // carries (なけれ, 高けれ), so that cell alone is no evidence of a boundary.
     if (auxiliary != nullptr && auxiliary->extended_pos != core::ExtendedPOS::AuxClassicalKeri) {
-      return true;
+      return auxiliary;
     }
   }
-  return false;
+  return nullptr;
 }
 
 size_t negativeAuxiliaryLengthAt(const dictionary::DictionaryManager* dict_manager,

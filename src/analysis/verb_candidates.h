@@ -98,6 +98,35 @@ void generateContractedConditionalCandidates(const std::vector<char32_t>& codepo
                                              std::vector<UnknownCandidate>& candidates);
 
 /**
+ * @brief Generate the volitional う contracted to a geminate before か
+ *
+ * 行こ+っ+か and 帰っ+とこ+っ+か. The geminate is the auxiliary's own cell, but
+ * a one-mora っ is the onbin everywhere else, so it is generated here, between
+ * an o-row cell and the question particle, instead of being registered where
+ * every dictionary probe for an auxiliary would also find it.
+ *
+ * @param codepoints Text as codepoints
+ * @param start_pos Start position (character index)
+ * @param candidates Buffer the generated candidate is appended to
+ */
+void generateContractedVolitionalCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                            std::vector<UnknownCandidate>& candidates);
+
+/**
+ * @brief Generate the quotative って+いう contracted to っ+つー
+ *
+ * そうだ+っ+つー+の, やる+っ+つっ+たら: the quotative particle shrinks to its
+ * geminate and いう takes the つ onset. Both pieces are one-mora or homographic
+ * with ordinary kana, so they are generated only inside that sequence.
+ *
+ * @param codepoints Text as codepoints
+ * @param start_pos Start position (character index)
+ * @param candidates Buffer the generated candidates are appended to
+ */
+void generateContractedQuotativeCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                           std::vector<UnknownCandidate>& candidates);
+
+/**
  * @brief Check whether a span spells the colloquial hypothetical contraction
  *
  * The reconstruction and its acceptance test are the ones

@@ -413,6 +413,23 @@ void adj_detail::appendHiraganaIAdjSurfaceCandidates(const std::vector<char32_t>
         if (verb_helpers::containsKuNaruPattern(surface)) {
           continue;
         }
+        // A stem closed by an auxiliary cell is a predicate chain ending in い,
+        // not an adjective (し+とき+い), unless the い is that auxiliary's own
+        // ending (めず+らしい).
+        // An auxiliary closing the whole span is that ending only when it
+        // inflects like an adjective; んさい (of んさる) is a predicate cell.
+        const auto* closing_auxiliary =
+            verb_helpers::auxiliaryClosingAfterOkurigana(dict_manager, codepoints, start_pos, end_pos);
+        const bool closes_on_predicate_cell =
+            closing_auxiliary != nullptr &&
+            !utf8::endsWith(closing_auxiliary->lemma.empty() ? closing_auxiliary->surface : closing_auxiliary->lemma,
+                            "い");
+        if (utf8::endsWith(surface, "い") && !isAdjectiveInDictionary(dict_manager, cand.base_form) &&
+            (closes_on_predicate_cell ||
+             (closing_auxiliary == nullptr &&
+              verb_helpers::endsWithAuxiliaryAfterOkurigana(dict_manager, codepoints, start_pos, end_pos - 1)))) {
+          continue;
+        }
         // Base cost for hiragana i-adjective candidates
         // Use slightly elevated base to avoid fragments like ろしい beating
         // kanji adjectives like 恐ろしい (kanji adj base=0.2F)

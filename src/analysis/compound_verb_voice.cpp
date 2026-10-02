@@ -58,3 +58,23 @@ bool addPassiveContinuativeTailCandidates(core::Lattice& lattice, const std::vec
 }
 
 }  // namespace suzume::analysis::compound_verb_detail
+
+namespace suzume::analysis {
+
+bool subsidiaryVerbContinuativeAt(const std::vector<char32_t>& codepoints, size_t pos) {
+  for (const auto& subsidiary : compound_verb_detail::subsidiaryVerbs()) {
+    if (subsidiary.reading == nullptr) {
+      continue;
+    }
+    const std::string continuative =
+        compound_verb_detail::generateRenyokei(subsidiary.reading, "", subsidiary.verb_type);
+    const size_t length = normalize::utf8Length(continuative);
+    if (!continuative.empty() && pos + length <= codepoints.size() &&
+        extractSubstring(codepoints, pos, pos + length) == continuative) {
+      return true;
+    }
+  }
+  return false;
+}
+
+}  // namespace suzume::analysis

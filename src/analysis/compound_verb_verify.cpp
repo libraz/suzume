@@ -218,6 +218,18 @@ CompoundV1Verification verifyCompoundVerbV1(const CompoundV1VerificationRequest&
       }
     }
 
+    // An irrealis plus the passive or causative auxiliary (書か+さ+れ, 書か+せ)
+    // is a voice chain, not a lexical V1: the auxiliary never heads a compound,
+    // so the V2 behind it is a subsidiary of its own (書か+さ+れ+かけ+た).
+    if (use_inflection_fallback && is_ichidan && kanji_count == 1 && v2_start >= kanji_end + 2) {
+      const char32_t voice = codepoints[v2_start - 1];
+      const bool shortened_causative = v2_start == kanji_end + 3 && codepoints[kanji_end + 1] == U'さ';
+      if (kana::isARowCodepoint(codepoints[kanji_end]) && (voice == U'れ' || voice == U'せ') &&
+          (v2_start == kanji_end + 2 || shortened_causative)) {
+        use_inflection_fallback = false;
+      }
+    }
+
     // A particle inside the proposed V1 is a compositional boundary. Check it
     // before accepting the productive single-kanji Ichidan fallback: that
     // otherwise treats adjectival adverbs such as 静かに+続く as compounds.

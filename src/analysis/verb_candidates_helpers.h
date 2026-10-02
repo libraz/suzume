@@ -426,6 +426,15 @@ bool endsWithAuxiliaryAfterOkurigana(const dictionary::DictionaryManager* dict_m
                                      const std::vector<char32_t>& codepoints, size_t okurigana_start, size_t end_pos);
 
 /**
+ * @brief The auxiliary endsWithAuxiliaryAfterOkurigana() found, or nullptr
+ *
+ * For callers that also need to know which paradigm closes the span.
+ */
+const dictionary::DictionaryEntry* auxiliaryClosingAfterOkurigana(const dictionary::DictionaryManager* dict_manager,
+                                                                  const std::vector<char32_t>& codepoints,
+                                                                  size_t okurigana_start, size_t end_pos);
+
+/**
  * @brief Length of a multi-mora negative auxiliary written at a position
  *
  * Returns the codepoint length of the longest dictionary auxiliary starting at
@@ -906,6 +915,14 @@ size_t naiNegativeFormLengthAt(const std::vector<char32_t>& codepoints, size_t p
  * boundary evidence rather than the exact closed-paradigm span.
  */
 bool naiNegativeFollowsAt(const std::vector<char32_t>& codepoints, size_t pos);
+
+/**
+ * @brief Check whether the volitional ending begins at @p pos.
+ *
+ * That is う, or the geminate it contracts to before the question particle
+ * (食べよ+う, 食べよ+っ+か).
+ */
+bool volitionalEndingFollowsAt(const std::vector<char32_t>& codepoints, size_t pos);
 
 /**
  * @brief Check whether a candidate at @p pos would start inside a kanji run.

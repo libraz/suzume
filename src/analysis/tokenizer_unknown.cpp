@@ -542,6 +542,12 @@ bool endsWithFinalParticleAfterNominalHead(const dictionary::DictionaryManager& 
     if (particle == nullptr || particle->extended_pos != core::ExtendedPOS::ParticleFinal) {
       continue;
     }
+    // One spelled like a godan terminal ends a kana verb instead (うし+なう is
+    // the verb うしなう), as no script boundary separates it from the head.
+    if (grammar::endsWithURow(particle->surface) &&
+        grammar::isPureHiragana(textRange(text, byte_offsets, candidate.start, particle_start))) {
+      continue;
+    }
     const bool has_nominal_prefix =
         std::any_of(batch_candidates.begin(), batch_candidates.end(), [&](const UnknownCandidate& alternative) {
           return alternative.start == candidate.start && alternative.end == particle_start &&

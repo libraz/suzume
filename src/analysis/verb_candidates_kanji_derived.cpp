@@ -449,7 +449,7 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
             !godan_base_suffix.empty() && dict_manager != nullptr &&
             vh::isVerbInDictionary(dict_manager, extractSubstring(codepoints, start_pos, renyokei_end - 1) +
                                                      std::string(godan_base_suffix));
-        const bool is_volitional = renyokei_end + 1 < codepoints.size() && codepoints[renyokei_end + 1] == U'う';
+        const bool is_volitional = vh::volitionalEndingFollowsAt(codepoints, renyokei_end + 1);
         const size_t you_end = renyokei_end + 2;
         bool has_formal_method_continuation = false;
         if (is_volitional && dict_manager != nullptr && you_end <= codepoints.size()) {
@@ -537,71 +537,6 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
                                   ichidan_confidence, is_volitional ? "ichidan_volitional" : "ichidan_imperative",
                                   is_volitional ? core::ExtendedPOS::VerbMizenkei : core::ExtendedPOS::VerbMeireikei));
           }
-        }
-      }
-    }
-  }
-}
-
-// Try Causative verb renyokei pattern: kanji + ら + せ
-// Causative verbs from Godan verbs follow this pattern:
-//   知る → 知らせる (causative, Ichidan verb)
-//   乗る → 乗らせる (causative, Ichidan verb)
-//   終わる → 終わらせる (causative, Ichidan verb)
-// The renyokei of these causative verbs ends with せ (e-row):
-//   知らせ (renyokei of 知らせる), connects to ます, られる, て, た, etc.
-// Pattern: kanji + ら + せ (followed by られ for causative-passive)
-void appendCausativeRenyokeiCandidates(const std::vector<char32_t>& codepoints, size_t start_pos, size_t kanji_end,
-                                       size_t hiragana_end, const grammar::Inflection& inflection,
-                                       const dictionary::DictionaryManager* dict_manager,
-                                       const VerbCandidateOptions& verb_opts,
-                                       std::vector<UnknownCandidate>& candidates) {
-  if (kanji_end + 2 <= hiragana_end) {
-    char32_t first_hira = codepoints[kanji_end];
-    char32_t second_hira = codepoints[kanji_end + 1];
-    // ら + せ pattern (causative renyokei)
-    if (first_hira == U'ら' && second_hira == U'せ') {
-      std::string original_base = extractSubstring(codepoints, start_pos, kanji_end) + "る";
-      // When the underlying Godan verb is attested, preserve the productive
-      // mizenkei + causative-auxiliary boundary. The fallback below exists for
-      // an otherwise unavailable predicate analysis, not to replace it.
-      if (vh::isVerbInDictionary(dict_manager, original_base)) {
-        return;
-      }
-      // Generate causative renyokei when followed by valid ichidan verb endings
-      // or causative-passive (られ). This covers:
-      //   眠らせた (past), 眠らせて (te-form), 眠らせない (negative),
-      //   眠らせます (polite), 眠らせられ (passive)
-      bool followed_by_valid = false;
-      if (kanji_end + 2 < codepoints.size()) {
-        char32_t next_cp = codepoints[kanji_end + 2];
-        followed_by_valid = (next_cp == U'ら' || next_cp == U'た' || next_cp == U'て' || next_cp == U'な' ||
-                             next_cp == U'ま' || next_cp == U'ず' || next_cp == U'ば');
-      }
-      // Also allow at end of input (bare renyokei: 眠らせ)
-      if (kanji_end + 2 >= codepoints.size()) {
-        followed_by_valid = true;
-      }
-      if (followed_by_valid) {
-        size_t renyokei_end = kanji_end + 2;  // kanji + ら + せ
-        std::string surface = extractSubstring(codepoints, start_pos, renyokei_end);
-
-        // The causative base form is surface + る (e.g., 知らせ → 知らせる)
-        std::string causative_base = surface + "る";
-
-        // Verify this is a valid ichidan verb
-        const auto& all_candidates = inflection.analyze(causative_base);
-        float ichidan_confidence =
-            getIchidanConfidence(all_candidates, candidate::verb_cost::kIchidanDefaultMinConfidence);
-
-        if (ichidan_confidence >= 0.4F) {
-          float base_cost = candidate::confidenceScaledCost(verb_opts.bonus_ichidan, ichidan_confidence,
-                                                            verb_opts.confidence_cost_scale_small);
-          SUZUME_DEBUG_LOG_VERBOSE("[VERB_CAND] " << surface << " causative_renyokei lemma=" << causative_base
-                                                  << " conf=" << ichidan_confidence << " cost=" << base_cost << "\n");
-          candidates.push_back(makeVerbCandidate(surface, start_pos, renyokei_end, base_cost, causative_base,
-                                                 grammar::verbTypeToConjType(grammar::VerbType::Ichidan), true,
-                                                 CandidateOrigin::VerbKanji, ichidan_confidence, "causative_renyokei"));
         }
       }
     }

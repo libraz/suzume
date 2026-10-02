@@ -959,7 +959,8 @@ ContextualDictionaryCandidateState addContextualDictionaryCandidates(
       start_pos > 0 && codepoints[start_pos] == core::hiragana::kSa && start_pos + 1 < codepoints.size() &&
       !starts_quoted_passive && codepoints[start_pos + 1] == U'れ' &&
       hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbMizenkei) &&
-      verb_helpers::isPassiveAuxContinuation(codepoints, start_pos + 2, /*strict_masu=*/true);
+      (verb_helpers::isPassiveAuxContinuation(codepoints, start_pos + 2, /*strict_masu=*/true) ||
+       subsidiaryVerbContinuativeAt(codepoints, start_pos + 2));
   if (state.starts_shortened_causative_passive) {
     lattice.addEdge(
         "さ", static_cast<uint32_t>(start_pos), static_cast<uint32_t>(start_pos + 1), core::PartOfSpeech::Auxiliary,
@@ -1224,8 +1225,12 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     // the same two morae also close ordinary lexical verbs (のっとる, もどる),
     // and there the contraction is a coincidence of spelling that the
     // productive chain would otherwise win on connection bonuses alone.
-    if (result.entry->extended_pos == core::ExtendedPOS::AuxAspectIru &&
-        grammar::isDialectalOruContractionLemma(result.entry->lemma) &&
+    // A final particle that ends on a u-row mora is spelled like a verb
+    // terminal in the same way (考えた+なう against 損なう, 行なう).
+    if (((result.entry->extended_pos == core::ExtendedPOS::AuxAspectIru &&
+          grammar::isDialectalOruContractionLemma(result.entry->lemma)) ||
+         (result.entry->extended_pos == core::ExtendedPOS::ParticleFinal &&
+          kana::isURowCodepoint(codepoints[end_pos - 1]))) &&
         endsDictionaryVerbSpanningBack(dict_manager_, codepoints, start_pos, end_pos)) {
       continue;
     }
@@ -1922,13 +1927,15 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     // The pejorative ったらしい opens on the geminate that the past た also
     // takes after an onbin stem or the copula (言っ+た+らしい, だっ+た+らしい);
     // a registered predicate cell ending at that っ claims it.
-    // Without the geminate, its host is a nominal, never a stem closing on っ.
+    // Without the geminate, its host is a nominal written outside the kana run:
+    // after kana it is the tail of a word (あ+たらしい for あたらしい) or of a
+    // stem closing on っ.
     if (result.entry->pos == core::PartOfSpeech::Adjective && utf8::endsWith(result.entry->lemma, "たらしい") &&
         ((codepoints[start_pos] == U'っ' &&
           (endsDictionaryVerbSpanningBack(dict_manager_, codepoints, start_pos, start_pos + 1) ||
            (start_pos > 0 && lookupEntryInRange(dict_manager_, codepoints, start_pos - 1, start_pos + 1,
                                                 core::PartOfSpeech::Auxiliary) != nullptr))) ||
-         (codepoints[start_pos] != U'っ' && start_pos > 0 && codepoints[start_pos - 1] == U'っ'))) {
+         (codepoints[start_pos] != U'っ' && start_pos > 0 && kana::isHiraganaCodepoint(codepoints[start_pos - 1])))) {
       continue;
     }
 
@@ -2125,7 +2132,7 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     // words. Emit them only in their complete verb-onbin auxiliary context.
     // Other AuxAspectOku forms before う are the invalid とい+う path.
     if (result.entry->extended_pos == core::ExtendedPOS::AuxAspectOku) {
-      const bool follows_volitional = end_pos < codepoints.size() && codepoints[end_pos] == U'う';
+      const bool follows_volitional = verb_helpers::volitionalEndingFollowsAt(codepoints, end_pos);
       // The contraction is て + おく, so its host is whichever cell that て
       // selects: the onbin form of a Godan verb (書い+とこう) but the plain
       // continuative of an Ichidan or サ変 one (見+とこう, 作成し+とこう).
@@ -2396,8 +2403,18 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
                           : verb_helpers::matchEmphaticSuffix(codepoints, end_pos, result.entry->pos,
                                                               verb_helpers::SokuonOnsetPolicy::DictionaryEntry);
       // One repeated vowel is below the generic emphasis floor, but a final
-      // particle drawn out by its own full-size vowel (けど+さあ) is that hold.
-      if (emphatic.empty() && result.entry->extended_pos == core::ExtendedPOS::ParticleFinal &&
+      // particle drawn out by its own full-size vowel (けど+さあ) is that hold,
+      // and so is a continuative closing the clause as the regional imperative
+      // (見+ときい, し+ときい): an inflected i-row cell, then nothing.
+      const bool closes_after_held_vowel =
+          end_pos + 1 >= codepoints.size() ||
+          normalize::classifyChar(codepoints[end_pos + 1]) == normalize::CharType::Symbol;
+      const bool imperative_continuative =
+          (result.entry->pos == core::PartOfSpeech::Verb || result.entry->pos == core::PartOfSpeech::Auxiliary) &&
+          !result.entry->lemma.empty() && result.entry->lemma != result.entry->surface &&
+          kana::isIRowCodepoint(codepoints[end_pos - 1]) && closes_after_held_vowel;
+      if (emphatic.empty() &&
+          (result.entry->extended_pos == core::ExtendedPOS::ParticleFinal || imperative_continuative) &&
           end_pos < codepoints.size() && codepoints[end_pos] == grammar::getVowelForChar(codepoints[end_pos - 1])) {
         emphatic.suffix = extractSubstring(codepoints, end_pos, end_pos + 1);
         emphatic.end = end_pos + 1;

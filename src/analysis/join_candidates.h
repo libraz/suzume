@@ -184,6 +184,15 @@ void addVerbSuffixNounJoinCandidates(core::Lattice& lattice, std::string_view te
                                      const dictionary::DictionaryManager& dict_manager, const Scorer& scorer,
                                      const grammar::Inflection& inflection);
 
+/**
+ * @brief Whether a listed subsidiary verb's continuative starts at @p pos
+ *
+ * The kana spelling of a compound's V2 behind a voice auxiliary, where no kanji
+ * marks the word (書か+さ+れ+かけ+た). The subsidiary table is the evidence, so
+ * the answer agrees with what the compound matcher would accept as a V2.
+ */
+bool subsidiaryVerbContinuativeAt(const std::vector<char32_t>& codepoints, size_t pos);
+
 }  // namespace suzume::analysis
 
 #endif  // SUZUME_ANALYSIS_JOIN_CANDIDATES_H_

@@ -110,6 +110,7 @@ EntrySpecRange getParticleEntries() {
       particle("ぜ", EPOS::ParticleFinal),
       particle("や", EPOS::ParticleFinal),            // resignation/invitation (もういいや, 行こうや)
       particle("べ", EPOS::ParticleFinal),            // eastern conjecture/invitation (行くべ, 見るべ)
+      particle("なう", EPOS::ParticleFinal),          // colloquial "right now" (考えた+なう, 東京+なう)
       particle("の", EPOS::ParticleNo),               // nominalizer
       {"ん", POS::Particle, EPOS::ParticleNo, "の"},  // colloquial の
       particle("じゃん", EPOS::ParticleFinal),

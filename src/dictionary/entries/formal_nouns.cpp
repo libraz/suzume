@@ -16,6 +16,9 @@ EntrySpecRange getFormalNounEntries() {
       // Without it the two morae are read as a focus particle plus the
       // nominalizer, or absorbed into a fabricated verb.
       formal_noun("もん", ""),
+      // Kansai contraction of こと before the assimilated copula ちゃ
+      // (えらい+こっ+ちゃ, from ことじゃ).
+      formal_noun("こっ", "こと"),
       formal_noun("為", ""),
       formal_noun("ため", ""),
       // Formal noun in the negative-experience construction (行ったためしがない).

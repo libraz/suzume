@@ -550,6 +550,11 @@ bool endsWithORow(std::string_view stem) {
   return cp != 0 && kana::isORowCodepoint(cp);
 }
 
+bool endsWithURow(std::string_view stem) {
+  char32_t cp = utf8::decodeLastChar(stem);
+  return cp != 0 && kana::isURowCodepoint(cp);
+}
+
 bool isSingleHiragana(std::string_view text, char32_t codepoint) {
   return text.size() == core::kJapaneseCharBytes && utf8::decode3ByteUtf8At(text, 0) == codepoint;
 }

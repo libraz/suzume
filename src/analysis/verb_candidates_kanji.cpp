@@ -713,11 +713,6 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
   appendIchidanKateikeiVolitionalCandidates(codepoints, start_pos, kanji_end, hiragana_end, inflection, dict_manager,
                                             candidates);
 
-  // Keep a productive Godan causative in its inflected verb unit when the
-  // following ending confirms the renyokei or conditional form.
-  appendCausativeRenyokeiCandidates(codepoints, start_pos, kanji_end, hiragana_end, inflection, dict_manager, verb_opts,
-                                    candidates);
-
   // Try Godan passive renyokei pattern: kanji + a-row + れ
   appendGodanPassiveRenyokeiCandidates(codepoints, start_pos, kanji_end, hiragana_end, inflection, dict_manager,
                                        verb_opts, candidates);
