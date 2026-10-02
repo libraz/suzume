@@ -5,6 +5,7 @@ from itertools import pairwise
 import regex
 
 from .constants import (
+    CLOSED_HONORIFIC_SERU_LEMMAS,
     KYUJITAI_TO_SHINJITAI,
     SLANG_ADJ_STEMS,
     SLANG_VERB_STEMS,
@@ -12,7 +13,8 @@ from .constants import (
     WORD_EXCEPTION_BLOCKED_FOLLOWERS,
     WORD_EXCEPTIONS,
 )
-from .mecab import mecab_analyze
+from .core_lexicon import core_headwords
+from .mecab import is_single_token_of_pos, mecab_analyze
 from .postprocessor_common import _raw_analysis
 
 
@@ -531,3 +533,253 @@ def repair_kko_nominalizer(tokens: list[dict]) -> None:
         repaired_end += len(continuative)
         idx = repaired_end
     return
+
+
+def repair_assimilated_koto_copula(tokens: list[dict]) -> None:
+    """Rebuild こっ+ちゃ, the formal noun こと assimilated to the copula じゃ.
+
+    えらいこっちゃ and 知ったこっちゃない are ことじゃ with the copula's voiced
+    onset pulled into a geminate. The reference dictionary reads the pair as
+    the verb 凝る plus the contracted ては, or as the pronoun こっち plus an
+    unknown run that starts with ゃ. Only a modifier can host a formal noun, so
+    a particle or the start of the clause in front keeps the verb reading
+    (肩がこっちゃ). The tokens match what ことじゃ already yields.
+    """
+    idx = 1
+    while idx < len(tokens) - 1:
+        token, following = tokens[idx], tokens[idx + 1]
+        host_pos = tokens[idx - 1].get("pos")
+        verb_reading = (
+            token.get("surface") == "こっ" and token.get("pos") == "動詞" and following.get("surface") == "ちゃ"
+        )
+        pronoun_reading = token.get("surface") == "こっち" and following.get("surface", "").startswith("ゃ")
+        if host_pos in ("助詞", "記号") or not (verb_reading or pronoun_reading):
+            idx += 1
+            continue
+        rest = following.get("surface", "")[1:] if pronoun_reading else ""
+        tail_end = idx + 2
+        # A negative read against ては is the adjective; against the copula it
+        # is the auxiliary, as in ことじゃない.
+        if (
+            tail_end < len(tokens)
+            and tokens[tail_end].get("pos") == "形容詞"
+            and tokens[tail_end].get("lemma") == "ない"
+        ):
+            rest += tokens[tail_end].get("surface", "")
+            tail_end += 1
+        tokens[idx:tail_end] = [
+            {
+                "surface": "こっ",
+                "pos": "名詞",
+                "pos_sub1": "非自立",
+                "pos_sub2": "一般",
+                "lemma": "こと",
+                "reading": "コッ",
+            },
+            {
+                "surface": "ちゃ",
+                "pos": "助動詞",
+                "pos_sub1": "*",
+                "conj_type": "特殊・ダ",
+                "conj_form": "連用形",
+                "lemma": "だ",
+                "reading": "チャ",
+            },
+            # The tail is read after ことじゃ so it keeps the copula's context.
+            *(mecab_analyze("ことじゃ" + rest)[2:] if rest else []),
+        ]
+        idx += 2
+
+
+def repair_contracted_volitional(tokens: list[dict]) -> None:
+    """Rebuild the volitional う contracted to っ before the question particle.
+
+    行こっか, 食べよっか and 帰っとこっか are 行こう, 食べよう and 帰っとこう
+    with the う pulled into a geminate by か. The reference dictionary reads the
+    geminate as a verb of its own (よっ as よる, こっ as こう), so the prefix is
+    re-analyzed with the plain う, which selects the volitional cell, and the
+    geminate takes that う's place.
+    """
+    idx = 1
+    repaired_end = 0
+    while idx < len(tokens):
+        token, previous = tokens[idx], tokens[idx - 1]
+        if (
+            token.get("surface") != "か"
+            or token.get("pos") != "助詞"
+            or previous.get("pos") != "動詞"
+            or not previous.get("surface", "").endswith("っ")
+        ):
+            idx += 1
+            continue
+        prefix = "".join(t.get("surface", "") for t in tokens[repaired_end:idx])[:-1]
+        volitional = mecab_analyze(prefix + "う")
+        if (
+            len(volitional) < 2
+            or volitional[-1].get("surface") != "う"
+            or volitional[-1].get("pos") != "助動詞"
+            or volitional[-2].get("conj_form") != "未然ウ接続"
+        ):
+            idx += 1
+            continue
+        geminate = {**volitional[-1], "surface": "っ", "reading": "ッ"}
+        tokens[repaired_end:idx] = [*volitional[:-1], geminate]
+        repaired_end += len(volitional)
+        idx = repaired_end + 1
+
+
+def repair_regional_imperative(tokens: list[dict]) -> None:
+    """Rebuild two regional imperatives the reference dictionary does not know.
+
+    The Chugoku んさい is なさい contracted (食べんさい, 書きんさい): one honorific
+    imperative on the continuative, read instead as an attributive verb in ん
+    plus the noun さい. The Kansai continuative imperative of とく drawn out by
+    its own vowel (見ときい, しときい) is read as と plus a noun きい; holding a
+    final vowel keeps it one word, as for any other lengthening.
+    """
+    idx = 1
+    repaired_end = 0
+    while idx < len(tokens):
+        token, previous = tokens[idx], tokens[idx - 1]
+        following = tokens[idx + 1] if idx + 1 < len(tokens) else None
+        clause_end = following is None or following.get("pos") == "記号"
+        if (
+            token.get("surface") == "さい"
+            and token.get("pos") == "名詞"
+            and previous.get("pos") == "動詞"
+            and previous.get("surface", "").endswith("ん")
+        ):
+            prefix = "".join(t.get("surface", "") for t in tokens[repaired_end:idx])[:-1]
+            continuative = mecab_analyze(prefix + "ます")
+            if continuative and continuative[-1].get("surface") == "ます":
+                honorific = {
+                    "surface": "んさい",
+                    "pos": "助動詞",
+                    "pos_sub1": "*",
+                    "lemma": "んさる",
+                    "reading": "ンサイ",
+                }
+                tokens[repaired_end : idx + 1] = [*continuative[:-1], honorific]
+                repaired_end += len(continuative)
+                idx = repaired_end
+                continue
+        if (
+            idx >= 2
+            and token.get("surface") == "さい"
+            and token.get("pos") == "名詞"
+            and previous.get("surface") == "ん"
+            and tokens[idx - 2].get("pos") == "動詞"
+            and tokens[idx - 2].get("conj_form") == "連用形"
+        ):
+            tokens[idx - 1 : idx + 1] = [
+                {"surface": "んさい", "pos": "助動詞", "pos_sub1": "*", "lemma": "んさる", "reading": "ンサイ"}
+            ]
+            continue
+        if (
+            idx >= 2
+            and token.get("surface") == "きい"
+            and previous.get("surface") == "と"
+            and previous.get("pos") == "助詞"
+            and tokens[idx - 2].get("pos") == "動詞"
+            and clause_end
+        ):
+            tokens[idx - 1 : idx + 1] = [
+                {
+                    "surface": "ときい",
+                    "pos": "動詞",
+                    "pos_sub1": "非自立",
+                    "lemma": "とく",
+                    "conj_type": "五段・カ行イ音便",
+                    "conj_form": "連用形",
+                    "reading": "トキイ",
+                }
+            ]
+            continue
+        idx += 1
+
+
+def repair_contracted_quotative(tokens: list[dict]) -> None:
+    """Rebuild って+いう contracted to っ+つー (そうだっつーの, やるっつったら).
+
+    The quotative shrinks to its geminate and いう takes the つ onset. The
+    reference dictionary reads the geminate as part of the host (だっ, いっ) or
+    as the verb く, and the rest as つ or つる. The host is re-analyzed in front
+    of the plain quotative と, which fixes its own boundary, and the remainder
+    is いう in the cell its spelling shows: つー/つう terminal, つっ onbin.
+    """
+    idx = 1
+    repaired_end = 0
+    while idx < len(tokens):
+        token, previous = tokens[idx], tokens[idx - 1]
+        following = tokens[idx + 1] if idx + 1 < len(tokens) else None
+        surface = token.get("surface", "")
+        if not previous.get("surface", "").endswith("っ") or not surface.startswith("つ"):
+            idx += 1
+            continue
+        consumed = 1
+        if surface == "つ" and following is not None and following.get("surface") == "ー":
+            verb = {"surface": "つー", "conj_form": "基本形"}
+            consumed = 2
+        elif surface in ("つう", "つー"):
+            verb = {"surface": surface, "conj_form": "基本形"}
+        elif surface == "つっ":
+            verb = {"surface": surface, "conj_form": "連用タ接続"}
+        else:
+            idx += 1
+            continue
+        prefix = "".join(t.get("surface", "") for t in tokens[repaired_end:idx])[:-1]
+        host = mecab_analyze(prefix + "と") if prefix else []
+        if not host or host[-1].get("surface") != "と" or host[-1].get("pos") != "助詞":
+            idx += 1
+            continue
+        quote = {
+            "surface": "っ",
+            "pos": "助詞",
+            "pos_sub1": "格助詞",
+            "pos_sub2": "引用",
+            "lemma": "って",
+            "reading": "ッ",
+        }
+        verb.update({"pos": "動詞", "pos_sub1": "自立", "lemma": "いう", "conj_type": "五段・ワ行促音便"})
+        tokens[repaired_end : idx + consumed] = [*host[:-1], quote, verb]
+        repaired_end += len(host) + 1
+        idx = repaired_end + 1
+
+
+def repair_productive_causative(tokens: list[dict]) -> None:
+    """Split a productive causative the reference lexicon lists as one verb.
+
+    笑わせ+ない and 泣かせ+た are the irrealis of 笑う and 泣く plus the causative
+    せる, as 飛ば+せ+た already is; the reference dictionary keeps some of them
+    whole only because it carries the ichidan headword, and only in some cells
+    (笑わ+せる but 笑わせ+ない). Suzume's own lexicon decides which are
+    lexicalized words (知らせる, 合わせる, and compounds ending in one such as
+    組み合わせる), and a stem that is not the irrealis of a verb is no causative
+    at all (見せる).
+    """
+    from .split_rules import base_from_mizenkei
+
+    idx = 0
+    while idx < len(tokens):
+        token = tokens[idx]
+        lemma = token.get("lemma") or ""
+        surface = token.get("surface", "")
+        stem = lemma[:-2]
+        base = base_from_mizenkei(stem) if lemma.endswith("せる") and len(lemma) > 3 else None
+        if (
+            token.get("pos") != "動詞"
+            or token.get("conj_type") != "一段"
+            or base is None
+            or not surface.startswith(stem)
+            or len(surface) == len(stem)
+            or lemma in CLOSED_HONORIFIC_SERU_LEMMAS
+            or any(lemma[start:] in core_headwords("verbs.tsv") for start in range(len(lemma) - 2))
+            or not is_single_token_of_pos(base, "動詞")
+        ):
+            idx += 1
+            continue
+        tokens[idx : idx + 1] = [
+            {"surface": stem, "pos": "動詞", "pos_sub1": "自立", "lemma": base, "conj_form": "未然形"},
+            {**token, "surface": surface[len(stem) :], "lemma": "せる", "pos_sub1": "接尾"},
+        ]
+        idx += 2

@@ -12,8 +12,13 @@ from .postprocessors import (
     postprocess_mecab_tokens,
     postprocessor_rules,
     preprocess_for_mecab,
+    repair_assimilated_koto_copula,
+    repair_contracted_quotative,
+    repair_contracted_volitional,
     repair_kanji_prefix_before_kana_noun,
     repair_kko_nominalizer,
+    repair_productive_causative,
+    repair_regional_imperative,
     split_transparent_suru_te_adverb,
 )
 from .split_rules import apply_suzume_split
@@ -197,6 +202,11 @@ def get_expected_tokens(text: str, suzume_tokens: list[dict] | None = None) -> t
     raw_tokens = mecab_analyze(processed_text)
     postprocess_mecab_tokens(raw_tokens, normalized_text, replacements)
     repair_kko_nominalizer(raw_tokens)
+    repair_assimilated_koto_copula(raw_tokens)
+    repair_contracted_volitional(raw_tokens)
+    repair_contracted_quotative(raw_tokens)
+    repair_regional_imperative(raw_tokens)
+    repair_productive_causative(raw_tokens)
     _merge_ideographic_variation_selectors(raw_tokens)
 
     # Fix MeCab POS errors (before POS mapping)

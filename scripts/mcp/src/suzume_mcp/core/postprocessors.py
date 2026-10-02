@@ -80,6 +80,7 @@ postprocess_kiri_limited_particle = postprocessor_function_words.postprocess_kir
 postprocess_monono_conjunction = postprocessor_function_words.postprocess_monono_conjunction
 postprocess_nan_copula_nominalizer = postprocessor_function_words.postprocess_nan_copula_nominalizer
 postprocess_nanka_particle = postprocessor_function_words.postprocess_nanka_particle
+postprocess_now_final_particle = postprocessor_function_words.postprocess_now_final_particle
 postprocess_nano_quotative = postprocessor_function_words.postprocess_nano_quotative
 postprocess_negative_conjunctive_de = postprocessor_function_words.postprocess_negative_conjunctive_de
 postprocess_nominal_conjunction_homograph = postprocessor_function_words.postprocess_nominal_conjunction_homograph
@@ -105,6 +106,11 @@ postprocess_mecab_tokens = postprocessor_mecab.postprocess_mecab_tokens
 preprocess_for_mecab = postprocessor_mecab.preprocess_for_mecab
 repair_kanji_prefix_before_kana_noun = postprocessor_mecab.repair_kanji_prefix_before_kana_noun
 repair_kko_nominalizer = postprocessor_mecab.repair_kko_nominalizer
+repair_productive_causative = postprocessor_mecab.repair_productive_causative
+repair_assimilated_koto_copula = postprocessor_mecab.repair_assimilated_koto_copula
+repair_contracted_quotative = postprocessor_mecab.repair_contracted_quotative
+repair_contracted_volitional = postprocessor_mecab.repair_contracted_volitional
+repair_regional_imperative = postprocessor_mecab.repair_regional_imperative
 split_transparent_suru_te_adverb = postprocessor_mecab.split_transparent_suru_te_adverb
 
 # Exports from postprocessor_nominals.
@@ -191,6 +197,7 @@ postprocess_copula_negative_nee = postprocessor_subsidiaries.postprocess_copula_
 # the public applied-rule label.
 POSTPROCESSORS: tuple[tuple[str, Callable[[list[dict]], bool]], ...] = (
     ("nan-copula-nominalizer", postprocess_nan_copula_nominalizer),
+    ("now-final-particle", postprocess_now_final_particle),
     ("sou-context", postprocess_sou),
     ("ikaga-adverb", postprocess_ikaga),
     ("tada-context", postprocess_tada),

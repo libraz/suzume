@@ -49,6 +49,10 @@ NOUN_NAI_COMPOUND_ADJECTIVES: list[str] = [
 # despite their productive a-row host plus causative-す boundary.
 LEXICALIZED_CAUSATIVE_SU_LEMMAS: frozenset[str] = frozenset({"待たす", "行かす"})
 
+# The classical honorific あらせる (あらせ+られる) is a closed honorific verb, not
+# the productive causative of ある; Suzume keeps it as one L1 word.
+CLOSED_HONORIFIC_SERU_LEMMAS: frozenset[str] = frozenset({"あらせる"})
+
 # Classical volitional auxiliary followed by a quotative particle.  MeCab
 # sometimes treats the closed-class sequence as one noun token; Suzume keeps
 # both grammatical search units independent.
@@ -1069,6 +1073,8 @@ VERB_NOT_AUX_LEMMAS: set[str] = {
     "もらう",
     "始める",
     "続ける",
+    # Inceptive かける is the same aspectual verb as 始める (書か+さ+れ+かけ+た).
+    "かける",
     "終わる",
     "終える",
     "出す",

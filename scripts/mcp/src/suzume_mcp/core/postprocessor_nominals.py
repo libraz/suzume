@@ -171,6 +171,10 @@ def postprocess_deverbal_noun_context(tokens: list[dict]) -> bool:
         # clause, not the productive deverbal noun a 連用形 spells.
         if surface == lemma + "る" and lemma[-1:] in NIDAN_TERMINAL_KANA:
             continue
+        # A terminal spelling, its own final kana or held, is finite too
+        # (っ+つう+の for っていうの).
+        if surface[-1:] in (lemma[-1:], "ー"):
+            continue
         following = tokens[idx + 1]
         honorific_naru = (
             idx > 0

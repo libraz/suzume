@@ -656,6 +656,35 @@ def postprocess_nan_copula_nominalizer(tokens: list[dict]) -> bool:
     return changed
 
 
+def postprocess_now_final_particle(tokens: list[dict]) -> bool:
+    """Read the clause-final なう ("right now") as a final particle.
+
+    考えたなう and 東京なう close a predicate or a nominal with the colloquial
+    particle. The reference reads it as a colloquial ない, which this spelling
+    never is, or as な plus an interjection う after an auxiliary.
+    """
+    changed = False
+    idx = 0
+    while idx < len(tokens):
+        token = tokens[idx]
+        following = tokens[idx + 1] if idx + 1 < len(tokens) else None
+        if token.get("surface") == "なう" and token.get("pos") == "Adjective":
+            tokens[idx] = {"surface": "なう", "pos": "Particle", "lemma": "なう"}
+            changed = True
+        elif (
+            token.get("surface") == "な"
+            and token.get("pos") == "Particle"
+            and following is not None
+            and following.get("surface") == "う"
+            and following.get("pos") == "Interjection"
+            and (idx + 2 == len(tokens) or tokens[idx + 2].get("pos") in ("Symbol", "Particle"))
+        ):
+            tokens[idx : idx + 2] = [{"surface": "なう", "pos": "Particle", "lemma": "なう"}]
+            changed = True
+        idx += 1
+    return changed
+
+
 _HELD_FINAL_PARTICLES = frozenset("さよぞわ")
 _HELD_VOWELS = {"さ": "あぁー", "わ": "あぁー", "よ": "おぉー", "ぞ": "おぉー"}
 
