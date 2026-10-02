@@ -182,11 +182,10 @@ float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::
       next.pos == core::PartOfSpeech::Prefix || next.extended_pos == core::ExtendedPOS::AdjBasic ||
       next.extended_pos == core::ExtendedPOS::AdjNaAdj;
   // An attributive with nothing to modify is not a possible reading rather than
-  // an unlikely one, and the penalty also has to outweigh the closed-class
-  // bonus the determiner's own lexical cost already received on the assumption
-  // that a head follows it.
+  // an unlikely one. The penalty also takes back the predicate→determiner bonus
+  // on its left, which was granted on the assumption that a head follows.
   if (prev.extended_pos == core::ExtendedPOS::DeterminerQuotative && !quotative_determiner_head) {
-    SUZUME_CONNECTION_ADD(bonus, cost::kProhibitive);
+    SUZUME_CONNECTION_ADD(bonus, sc::kHeadlessQuotativeDeterminerPenalty);
   }
 
   // Penalty for DET → non-dict single-kanji NOUN

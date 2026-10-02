@@ -552,6 +552,8 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
       // demonstrative adverb, whose general adverbial conditional path is
       // otherwise cheaper.
       {EPOS::AuxAppearanceSou, EPOS::ParticleConj, cost::kStrongBonus},
+      // Its adverbial form そう+に (着やす+そう+に見える) likewise.
+      {EPOS::AuxAppearanceSou, EPOS::ParticleCase, cost::kModerateBonus},
 
       // Other → AuxAppearanceSou - penalty (様態そう shouldn't appear at BOS)
       // At sentence start, そう should be demonstrative na-adjective, not appearance aux
@@ -701,6 +703,10 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
       {EPOS::AdjNaAdj, EPOS::AuxAspectIru, cost::kAlmostNever},   // 理性的+い(いる)
       {EPOS::AdjStem, EPOS::AuxNegativeNai, cost::kAlmostNever},  // な+ない
       {EPOS::AdjStem, EPOS::Other, cost::kAlmostNever},           // な+い(OTHER)
+      {EPOS::AdjStem, EPOS::AuxClassicalKi, cost::kAlmostNever},  // よ+き (the past き takes a verb)
+      // An irrealis stem selects a closed set of auxiliaries; an unknown run
+      // after it has swallowed one of them (言わ+んや for 言わ+ん+や).
+      {EPOS::VerbMizenkei, EPOS::Other, cost::kAlmostNever},
 
       // Note: Particle → AdjStem is allowed for patterns like やる気がなさそう (が+な+さ+そう)
   };

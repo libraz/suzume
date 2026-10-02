@@ -156,6 +156,11 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       // Ensures 揉まれながら → 揉ま+れ+ながら over 揉まれ+ながら
       {EPOS::AuxPassive, EPOS::ParticleConj, cost::kModerateBonus},
 
+      // A voice auxiliary supplies the continuative かねる takes, as a verb
+      // continuative does (損なわ+れ+かね, 行か+せ+かね).
+      {EPOS::AuxPassive, EPOS::AuxInability, cost::kExtremeBonus},
+      {EPOS::AuxCausative, EPOS::AuxInability, cost::kExtremeBonus},
+
       // The 已然形 of the classical perfect is selected by a conjunctive
       // particle (記録し+たれ+ども), rather than by the modern past-plus-passive
       // homograph し+た+れ+ども.
@@ -385,12 +390,19 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
 
       // The progressive auxiliary conjugates as an Ichidan verb. Its stem い
       // therefore takes the negative auxiliary directly (覚えて+い+なかった).
-      // This also distinguishes subsidiary い from the independent verb いる.
-      {EPOS::AuxAspectIru, EPOS::AuxNegativeNai, cost::kStrongBonus},
+      // This also distinguishes subsidiary い from the independent verb いる,
+      // and must not lose to that verb's own negative after a te-adverb
+      // homograph (至っ+て+い+ない, not 至って+い+ない).
+      {EPOS::AuxAspectIru, EPOS::AuxNegativeNai, cost::kExtremeBonus},
 
       // A progressive auxiliary cannot take the independent adjective ない.
       // The negative in 〜ていない is always the auxiliary continuation.
       {EPOS::AuxAspectIru, EPOS::AdjBasic, cost::kAlmostNever},
+      // An interjection opens a new utterance; it never continues the
+      // progressive (〜ちゃって+ごめん is the te-particle).
+      {EPOS::AuxAspectIru, EPOS::Interjection, cost::kAlmostNever},
+      // The subsidiary いる takes the te-form, never a terminal (腹す+い+た).
+      {EPOS::VerbShuushikei, EPOS::AuxAspectIru, cost::kProhibitive},
 
       // AuxAspectIru → AuxTenseMasu (い+ます) - strong bonus for aspect plus politeness
       // Ensures 学んで+い+ます uses AuxAspectIru (auxiliary) not VerbRenyokei
@@ -843,6 +855,9 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       {EPOS::ParticleTopic, EPOS::AuxAspectKuru, cost::kProhibitive},
       {EPOS::ParticleTopic, EPOS::AuxAspectIku, cost::kProhibitive},
       {EPOS::ParticleTopic, EPOS::AuxAspectIru, cost::kSevere},
+      // The same holds for an adverbial particle inserted after the te-form
+      // (読んで+など+いない).
+      {EPOS::ParticleAdverbial, EPOS::AuxAspectIru, cost::kSevere},
 
       // NaAdj → AuxCopulaDa (静か+だ) - strong bonus
       {EPOS::AdjNaAdj, EPOS::AuxCopulaDa, cost::kVeryStrongBonus},
@@ -852,7 +867,9 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
 
       // Adverb → AuxCopulaDa/Desu - penalty: adverbs modify verbs/adjectives, they
       // don't directly take copula (そうです: そう should be na-adjective, not adverb).
-      {EPOS::Adverb, EPOS::AuxCopulaDa, cost::kStrong},
+      // The reason interrogatives are the exception (なぜ+だ, なんで+だ+よ), so the
+      // plain copula's penalty stays below an unknown kana run's cost.
+      {EPOS::Adverb, EPOS::AuxCopulaDa, cost::kRare},
       {EPOS::Adverb, EPOS::AuxCopulaDesu, cost::kStrong},
 
       // AuxCopulaDa → Noun (さすがな+人, 静かな+部屋) - strong bonus

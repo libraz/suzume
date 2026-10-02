@@ -28,7 +28,11 @@ float computeLateLexicalBoundaryBonus(const core::LatticeEdge& prev, const core:
 
   // AuxAspectIru requires a te-form; regional ておる / でおる contractions
   // are the productive direct-attachment exception.
-  const bool is_dialectal_oru_contraction = grammar::isDialectalOruContractionLemma(next.lemma);
+  // The uninflected とう/どう share their spelling with the desiderative's onbin
+  // after a continuative (食べとうない), so only an onbin host proves them.
+  const bool is_dialectal_oru_contraction =
+      grammar::isDialectalOruContractionLemma(next.lemma) &&
+      (prev.extended_pos == core::ExtendedPOS::VerbOnbinkei || !utf8::endsWith(next.lemma, "う"));
   const bool invalid_aspect_iru_attachment =
       next.extended_pos == core::ExtendedPOS::AuxAspectIru && !grammar::isContractedProgressiveSurface(next.surface) &&
       !is_dialectal_oru_contraction &&
@@ -44,9 +48,11 @@ float computeLateLexicalBoundaryBonus(const core::LatticeEdge& prev, const core:
   // A one-mora potential auxiliary is a nonterminal stem.  Before punctuation
   // it is usually the tail of a complete lexical renyokei (踏まえ、), not an
   // independent auxiliary following a fabricated mizenkei (踏ま+え、).
-  const bool incomplete_potential_before_symbol = prev.extended_pos == core::ExtendedPOS::AuxPotential &&
-                                                  normalize::utf8Length(prev.surface) == 1 &&
-                                                  next.extended_pos == core::ExtendedPOS::Symbol;
+  // The attributive copula な likewise cannot stand before punctuation (それな、).
+  const bool incomplete_potential_before_symbol =
+      next.extended_pos == core::ExtendedPOS::Symbol &&
+      ((prev.extended_pos == core::ExtendedPOS::AuxPotential && normalize::utf8Length(prev.surface) == 1) ||
+       (prev.extended_pos == core::ExtendedPOS::AuxCopulaDa && grammar::isAttributiveCopulaNa(prev.surface)));
   // が after a terminal verb has two readings, and neither is open to a
   // fabricated predicate.  The case particle requires a nominal on its left, so
   // it is barred there outright and the adversative conjunctive particle takes
@@ -62,10 +68,14 @@ float computeLateLexicalBoundaryBonus(const core::LatticeEdge& prev, const core:
   // a potential auxiliary directly before it is therefore an accidental
   // homograph chain.  Restrict this to the two nonterminal readings that can
   // fabricate い|え|だっ and いえ|だっ; terminal/modal predicates have valid
-  // productive copular continuations.
+  // productive copular continuations. A continuative (食べ, 見て+み) takes the
+  // imperative particle な, never the attributive copula.
   const bool nonterminal_predicate_before_assertive_copula =
       next.extended_pos == core::ExtendedPOS::AuxCopulaDa &&
-      (prev.extended_pos == core::ExtendedPOS::VerbKateikei || prev.extended_pos == core::ExtendedPOS::AuxPotential);
+      (prev.extended_pos == core::ExtendedPOS::VerbKateikei || prev.extended_pos == core::ExtendedPOS::AuxPotential ||
+       ((prev.extended_pos == core::ExtendedPOS::VerbRenyokei ||
+         prev.extended_pos == core::ExtendedPOS::AuxAspectMiru) &&
+        grammar::isAttributiveCopulaNa(next.surface)));
   // Colloquial emphatic extension may add っ to an adverb at a clause edge, but
   // not immediately before the past auxiliary.  In that position the sokuon is
   // the copula's onbin (名詞+だっ+た), not part of the adverb.
@@ -79,9 +89,60 @@ float computeLateLexicalBoundaryBonus(const core::LatticeEdge& prev, const core:
   const bool volitional_after_stray_kanji = next.extended_pos == core::ExtendedPOS::AuxVolitional &&
                                             prev.pos == core::PartOfSpeech::Noun && !prev.fromDictionary() &&
                                             normalize::utf8Length(prev.surface) == 1;
+  // The connective て/で takes an i-adjective only through its continuative
+  // くて, never its terminal (せんとい+て is a fabricated adjective).
+  const bool terminal_adjective_before_te = prev.extended_pos == core::ExtendedPOS::AdjBasic &&
+                                            next.extended_pos == core::ExtendedPOS::ParticleConj &&
+                                            grammar::isTeDeSurface(next.surface);
+  // The clipped polite copula す stands only on the nominalizer ん (行くん+す).
+  const bool clipped_desu_off_nominalizer = next.extended_pos == core::ExtendedPOS::AuxCopulaDesu &&
+                                            normalize::utf8Length(next.surface) == 1 &&
+                                            prev.extended_pos != core::ExtendedPOS::ParticleNo;
+  // The listing や joins nominals, and its literary use closes a terminal or
+  // attributive predicate (語るや, たるや); the past, an i-adjective-like
+  // terminal (including the negative ない) or a bare continuative in front of
+  // it is the start of やん/いや/やつ instead.
+  const bool listing_ya_after_predicate =
+      next.extended_pos == core::ExtendedPOS::ParticleConj && utf8::equalsAny(next.surface, {"や"}) &&
+      (prev.extended_pos == core::ExtendedPOS::AuxTenseTa || prev.extended_pos == core::ExtendedPOS::AdjBasic ||
+       prev.extended_pos == core::ExtendedPOS::AuxNegativeNai || prev.extended_pos == core::ExtendedPOS::VerbRenyokei);
+  // The copular ある completes で(+binding particle)+ある; directly on a nominal
+  // it is the existential verb with its case particle dropped (ことある).
+  const bool copular_aru_on_nominal = next.extended_pos == core::ExtendedPOS::AuxCopulaDa &&
+                                      prev.pos == core::PartOfSpeech::Noun &&
+                                      grammar::isCopulaPeriphrasisCell(next.surface);
+  // The concessive のに closes its clause; before a binding particle the
+  // sequence is the nominalizer plus purposive に (好きなの+に+は).
+  const bool concessive_noni_before_binding = prev.extended_pos == core::ExtendedPOS::ParticleConj &&
+                                              utf8::equalsAny(prev.surface, {"のに"}) &&
+                                              next.extended_pos == core::ExtendedPOS::ParticleTopic;
+  // The attributive な needs a nominal head, which a final particle is not;
+  // か+な in front of a predicate is an irrealis cut at its stem (行+か+な).
+  const bool attributive_na_after_final_particle = prev.extended_pos == core::ExtendedPOS::ParticleFinal &&
+                                                   next.extended_pos == core::ExtendedPOS::AuxCopulaDa &&
+                                                   grammar::isAttributiveCopulaNa(next.surface);
+  // The continuative でし of です exists only before the past (でし+た/たら) and
+  // the connective (でし+て); elsewhere で+し is a case particle and a kana run.
+  const bool polite_copula_continuative_stranded =
+      prev.extended_pos == core::ExtendedPOS::AuxCopulaDesu && utf8::equalsAny(prev.surface, {"でし"}) &&
+      next.extended_pos != core::ExtendedPOS::AuxTenseTa &&
+      !(next.extended_pos == core::ExtendedPOS::ParticleConj && grammar::isTeDeSurface(next.surface));
+  // A nominal or na-stem takes the attributive copula, so an adverb spelled
+  // from it there is the copula chain instead (好き+な+ん+で, not 好き+なんで).
+  const bool copula_spelled_adverb_on_nominal =
+      (core::isNounType(prev.extended_pos) || prev.extended_pos == core::ExtendedPOS::AdjNaAdj) &&
+      next.pos == core::PartOfSpeech::Adverb && utf8::startsWith(next.surface, "な");
+  // The contracted nominalizer ん closes a nominal; unlike の it never marks
+  // the subject of a following clause (が+ん+ばり is がんばり cut apart).
+  const bool contracted_nominalizer_before_continuative = prev.extended_pos == core::ExtendedPOS::ParticleNo &&
+                                                          utf8::equalsAny(prev.surface, {"ん"}) &&
+                                                          next.extended_pos == core::ExtendedPOS::VerbRenyokei;
   if (invalid_aspect_iru_attachment || invalid_aspect_iku_attachment || incomplete_potential_before_symbol ||
       terminal_verb_before_ga || nonterminal_predicate_before_assertive_copula || emphatic_adverb_before_past ||
-      volitional_after_stray_kanji) {
+      volitional_after_stray_kanji || terminal_adjective_before_te || clipped_desu_off_nominalizer ||
+      listing_ya_after_predicate || copular_aru_on_nominal || concessive_noni_before_binding ||
+      attributive_na_after_final_particle || polite_copula_continuative_stranded || copula_spelled_adverb_on_nominal ||
+      contracted_nominalizer_before_continuative) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
   if ((prev.extended_pos == core::ExtendedPOS::VerbRenyokei || prev.extended_pos == core::ExtendedPOS::VerbOnbinkei) &&
@@ -407,11 +468,10 @@ float Scorer::connectionCost(const core::LatticeEdge& prev, const core::LatticeE
   // the same auxiliary through its syncretic irrealis/continuative stem, which
   // ends on the i-row or the e-row and spells no such noun, so penalizing it
   // only cost 理解+でき+ず its boundary.
-  if (prev.pos == core::PartOfSpeech::Verb && prev.fromDictionary() && grammar::isPureHiragana(prev.surface) &&
-      grammar::isARowCodepoint(utf8::decodeLastChar(prev.surface)) &&
+  if (prev.extended_pos == core::ExtendedPOS::VerbMizenkei && prev.fromDictionary() &&
+      grammar::isPureHiragana(prev.surface) && grammar::isARowCodepoint(utf8::decodeLastChar(prev.surface)) &&
       prev.surface.size() <= 9 &&  // ≤3 hiragana chars (9 bytes)
-      next.extended_pos == core::ExtendedPOS::AuxNegativeNu &&
-      !(prev.extended_pos == core::ExtendedPOS::VerbMizenkei && prev.lemma == "する") && prev.lemma != "ある" &&
+      next.extended_pos == core::ExtendedPOS::AuxNegativeNu && prev.lemma != "する" && prev.lemma != "ある" &&
       prev.lemma != "なる" && utf8::equalsAny(next.surface, {"ず", "ずに"})) {
     SUZUME_CONNECTION_ADD(surface_bonus, cost::kAlmostNever);
   }
@@ -563,11 +623,15 @@ float Scorer::connectionCost(const core::LatticeEdge& prev, const core::LatticeE
   // the nominalizer-led なので/なのに forms are valid. This keeps a noun whose
   // last mora is な intact before a case particle (ひらがな+を), and keeps a
   // closed particle such as など from being split into な+ど while preserving
-  // productive copular constructions.
+  // productive copular constructions. Those two forms are in turn the expected
+  // continuation, rewarded by the same amount over な+の+に (雨+な+のに).
   if (prev.extended_pos == core::ExtendedPOS::AuxCopulaDa && grammar::isAttributiveCopulaNa(prev.surface) &&
-      (next.extended_pos == core::ExtendedPOS::ParticleCase ||
-       (next.extended_pos == core::ExtendedPOS::ParticleConj && !utf8::startsWith(next.surface, "の")))) {
-    SUZUME_CONNECTION_ADD(surface_bonus, cost::kVeryRare);  // Cancel the -0.8 bonus and add penalty
+      (next.extended_pos == core::ExtendedPOS::ParticleCase || next.extended_pos == core::ExtendedPOS::ParticleConj)) {
+    const bool nominalizer_led_conjunction =
+        next.extended_pos == core::ExtendedPOS::ParticleConj && utf8::startsWith(next.surface, "の");
+    const float attributive_continuation_weight = cost::kVeryRare;
+    SUZUME_CONNECTION_ADD(surface_bonus, nominalizer_led_conjunction ? -attributive_continuation_weight
+                                                                     : attributive_continuation_weight);
   }
 
   // Penalty for AuxCopulaDa(で) → し pattern (VerbRenyokei or ParticleConj)

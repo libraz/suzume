@@ -452,6 +452,8 @@ constexpr float kEosRenyokeiFormalNounPenalty = scale::kAlmostNever;
 // the last morpheme: something has to fill the slot it opened. Without this a
 // fabricated irrealis covering the conditional なら+ば wins over the copula
 // plus its particle when nothing follows (雨ならば as 雨+ならば).
+// The o-row cell is exempt: it is the volitional stem, which closes a clause on
+// its own in speech once う is dropped (がんばろ, 寝よ).
 constexpr float kEosMizenkeiPenalty = scale::kAlmostNever;
 // ね is the 已然形 of the classical negative ぬ, so it requires ば or ど(も)
 // after it and cannot end a sentence. Its siblings ず/ぬ/ん/じ close a clause
@@ -459,6 +461,9 @@ constexpr float kEosMizenkeiPenalty = scale::kAlmostNever;
 // auxiliary. Without it the sentence-final particle ね is read as this
 // auxiliary and drags a fabricated irrealis in front of it (らし+いよ+ね).
 constexpr float kEosIzenkeiNegativePenalty = scale::kStrong;
+// The attributive copula な needs a nominal after it, so it cannot close a
+// sentence; the final particle な (それな) takes that position.
+constexpr float kEosAttributiveCopulaPenalty = scale::kStrong;
 // The passive auxiliary's one-mora cell れ is its irrealis and continuative, so
 // it always opens a slot after itself (れ+る, れ+た, れ+ない, れ+ます). Its finite
 // cells are longer, which is why the row is gated on the form rather than on
@@ -466,6 +471,13 @@ constexpr float kEosIzenkeiNegativePenalty = scale::kStrong;
 // clause end that licenses one (心こそ定まれ as 定ま+れ) and pulls a classical
 // auxiliary cell apart with it (咲きたれ as 咲き+た+れ).
 constexpr float kEosPassiveStemPenalty = scale::kAlmostNever;
+// The one-mora potential え is a stem that needs ない/る/た after it; at the
+// end of the text it is the tail of a lengthened final particle (かも+ねえ).
+constexpr float kEosPotentialStemPenalty = scale::kAlmostNever;
+
+// A quotative determiner with no head after it takes back the predicate→
+// determiner bonus on its left as well as being prohibited (行く+って+いう+か).
+constexpr float kHeadlessQuotativeDeterminerPenalty = scale::kProhibitive - scale::kDoubleVeryStrongBonus;
 
 enum class EosBoundaryGate {
   Always,
@@ -474,6 +486,8 @@ enum class EosBoundaryGate {
   NonDictionary,
   AfterContent,
   IzenkeiNegative,
+  AttributiveCopula,
+  NonVolitionalStem,
 };
 
 struct BoundaryCost {
@@ -533,10 +547,15 @@ constexpr std::array<BoundaryCost, static_cast<size_t>(core::ExtendedPOS::Count_
   table[static_cast<size_t>(core::ExtendedPOS::VerbRenyokei)].eos = kEosShortRenyokeiPenalty;
   table[static_cast<size_t>(core::ExtendedPOS::VerbRenyokei)].eos_gate = EosBoundaryGate::SingleCodepoint;
   table[static_cast<size_t>(core::ExtendedPOS::VerbMizenkei)].eos = kEosMizenkeiPenalty;
+  table[static_cast<size_t>(core::ExtendedPOS::VerbMizenkei)].eos_gate = EosBoundaryGate::NonVolitionalStem;
   table[static_cast<size_t>(core::ExtendedPOS::AuxNegativeNu)].eos = kEosIzenkeiNegativePenalty;
   table[static_cast<size_t>(core::ExtendedPOS::AuxNegativeNu)].eos_gate = EosBoundaryGate::IzenkeiNegative;
+  table[static_cast<size_t>(core::ExtendedPOS::AuxCopulaDa)].eos = kEosAttributiveCopulaPenalty;
+  table[static_cast<size_t>(core::ExtendedPOS::AuxCopulaDa)].eos_gate = EosBoundaryGate::AttributiveCopula;
   table[static_cast<size_t>(core::ExtendedPOS::AuxPassive)].eos = kEosPassiveStemPenalty;
   table[static_cast<size_t>(core::ExtendedPOS::AuxPassive)].eos_gate = EosBoundaryGate::SingleCodepoint;
+  table[static_cast<size_t>(core::ExtendedPOS::AuxPotential)].eos = kEosPotentialStemPenalty;
+  table[static_cast<size_t>(core::ExtendedPOS::AuxPotential)].eos_gate = EosBoundaryGate::SingleCodepoint;
 
   return table;
 }();

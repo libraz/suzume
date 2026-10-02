@@ -106,8 +106,15 @@ float computeProgressiveHonorificBonus(const core::LatticeEdge& prev, const core
   // みたい immediately after a connective て/で is not the conjecture
   // auxiliary: 〜てみたい consists of the trial subsidiary み + desiderative
   // たい. This applies whether the competing connective edge was classified as a
-  // particle or as a contracted aspect auxiliary.
-  if (grammar::isTeDeSurface(prev.surface) && next.extended_pos == core::ExtendedPOS::AuxConjectureMitai) {
+  // particle or as a contracted aspect auxiliary. Likewise ない right after a
+  // connective particle or the copula is a negative auxiliary (書いといて+ない,
+  // んじゃ+ない+の),
+  // never the independent adjective.
+  const bool conjunctive_independent_nai =
+      (prev.extended_pos == core::ExtendedPOS::ParticleConj || prev.extended_pos == core::ExtendedPOS::AuxCopulaDa) &&
+      next.extended_pos == core::ExtendedPOS::AdjBasic && grammar::isIndependentNegativeAdjective(next.surface);
+  if ((grammar::isTeDeSurface(prev.surface) && next.extended_pos == core::ExtendedPOS::AuxConjectureMitai) ||
+      conjunctive_independent_nai) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
 
@@ -137,8 +144,11 @@ float computeProgressiveHonorificBonus(const core::LatticeEdge& prev, const core
   // words, prefer the connective particle て instead. A final particle is the
   // exception: it closes the clause that the contraction itself predicates
   // (待って+て+よ), so it is evidence for the contraction rather than against it.
+  // So is the connective て, which the contraction's own continuative takes
+  // before a benefactive (待っ+て+て+くれ).
   if (prev.surface == "て" && prev.extended_pos == core::ExtendedPOS::AuxAspectIru &&
       next.extended_pos != core::ExtendedPOS::ParticleFinal &&
+      !(next.extended_pos == core::ExtendedPOS::ParticleConj && grammar::isTeDeSurface(next.surface)) &&
       (next.pos == core::PartOfSpeech::Particle || next.pos == core::PartOfSpeech::Noun ||
        next.pos == core::PartOfSpeech::Pronoun || next.pos == core::PartOfSpeech::Determiner ||
        next.pos == core::PartOfSpeech::Adverb || next.pos == core::PartOfSpeech::Conjunction ||

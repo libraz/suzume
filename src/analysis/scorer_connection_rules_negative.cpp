@@ -213,7 +213,14 @@ float computeNegativeAndNounVerbBonus(const core::LatticeEdge& prev, const core:
   // particle ね; this bonus is what lets the AUX reading win after a verb mizenkei.
   // Note: lexicalized forms like 思わず(ADV) are handled by the candidate generator
   // which skips mizenkei_zu generation when verb+ず is in the dictionary.
-  if (prev.extended_pos == core::ExtendedPOS::VerbMizenkei && next.extended_pos == core::ExtendedPOS::AuxNegativeNu &&
+  // An auxiliary irrealis takes it the same way: the voice auxiliaries, whose
+  // only cell before ず is the irrealis (歌わ+さ+れ+ずに, 言わ+せ+ずに), and
+  // がら of the subsidiary がる (面倒くさ+がら+ず).
+  const bool auxiliary_irrealis =
+      prev.extended_pos == core::ExtendedPOS::AuxPassive || prev.extended_pos == core::ExtendedPOS::AuxCausative ||
+      (prev.extended_pos == core::ExtendedPOS::AuxGaru && grammar::isARowCodepoint(utf8::decodeLastChar(prev.surface)));
+  if ((prev.extended_pos == core::ExtendedPOS::VerbMizenkei || auxiliary_irrealis) &&
+      next.extended_pos == core::ExtendedPOS::AuxNegativeNu &&
       utf8::equalsAny(next.surface, {"ず", "ずに", "ざる", "ざれ", "ね"})) {
     SUZUME_CONNECTION_ADD(bonus,
                           utf8::endsWith(next.surface, "に") ? cost::kDoubleVeryStrongBonus : cost::kStrongBonus);

@@ -85,6 +85,7 @@ void setNominalParticleCosts(BigramMatrix& table) {
   static constexpr BigramRule kRules[] = {
       // Nominal particle attachment and formal-noun continuation.
       {EPOS::Noun, EPOS::ParticleConj, cost::kStrong},
+      {EPOS::NounVerbal, EPOS::ParticleConj, cost::kStrong},
       {EPOS::NounNumber, EPOS::Suffix, cost::kStrongBonus},
       {EPOS::NounProperFamily, EPOS::NounProperGiven, cost::kStrongBonus},
       {EPOS::Noun, EPOS::Conjunction, cost::kDoubleVeryStrongBonus},

@@ -147,6 +147,9 @@ void setVerbAndAdjectiveCosts(BigramMatrix& table) {
       // Mizenkei connects to ない/せる/れる/よう, never to conjunctions
       // Prevents さ(mizenkei)+まして(CONJ) over さまし(renyokei)+て
       {EPOS::VerbMizenkei, EPOS::Conjunction, cost::kVeryRare},
+      // The onbin stem takes only て/た/たら/たり, so a conjunction spelled from
+      // て after it is the connective plus what follows (寄っ+て+か+ない).
+      {EPOS::VerbOnbinkei, EPOS::Conjunction, cost::kAlmostNever},
 
       // An irrealis stem cannot take a sentence-final particle. The
       // prohibitive な attaches to the terminal form (読む+な), while negative
@@ -175,6 +178,12 @@ void setVerbAndAdjectiveCosts(BigramMatrix& table) {
       // what a hiragana run collapses into when it is cut at a mora that also
       // spells a short verb (す+すめる).
       {EPOS::VerbShuushikei, EPOS::VerbShuushikei, cost::kStrong},
+      // Likewise for a terminal verb before an onbin stem: the stem is the
+      // quotative って cut at its sokuon. An i-adjective reaches a verb only
+      // through its continuative, so its terminal/attributive cell cannot
+      // precede one at all (いい+や+って, not いい+やっ+て).
+      {EPOS::VerbShuushikei, EPOS::VerbOnbinkei, cost::kStrong},
+      {EPOS::AdjBasic, EPOS::VerbOnbinkei, cost::kAlmostNever},
 
       // VerbOnbinkei → contracted progressive auxiliary (行っ+て+た).
       {EPOS::VerbOnbinkei, EPOS::AuxAspectIru, cost::kVeryStrongBonus},
@@ -272,6 +281,9 @@ void setVerbAndAdjectiveCosts(BigramMatrix& table) {
 
       // VerbShuushikei → ParticleQuote (食べる+と言う) - neutral
       {EPOS::VerbShuushikei, EPOS::ParticleQuote, cost::kNeutral},
+      // The onbin stem only takes て/た/たら/たり; a quotative after it is the
+      // past た split off its own sokuon (行かなかっ+たっ+ていう).
+      {EPOS::VerbOnbinkei, EPOS::ParticleQuote, cost::kNever},
 
       // VerbKateikei → AdjBasic (滅びれば+いい) - strong bonus for 〜ればいい pattern
       // This helps beat the split path 滅び+れ+ば+いい where れ is misanalyzed as passive

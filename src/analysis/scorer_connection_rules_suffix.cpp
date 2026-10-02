@@ -315,9 +315,11 @@ float computeSuffixShortVerbBonus(const core::LatticeEdge& prev, const core::Lat
   }
 
   // A conditional ば requires a hypothetical verb form (書け+ば), not a
-  // terminal form. This blocks fragment paths such as す+ば+らしい.
+  // terminal form. This blocks fragment paths such as す+ば+らしい. The
+  // connective て likewise takes a te-form or continuative, never the terminal
+  // (違く+て is the adjective, not a verb 違く).
   if (prev.extended_pos == core::ExtendedPOS::VerbShuushikei && next.extended_pos == core::ExtendedPOS::ParticleConj &&
-      utf8::equalsAny(next.surface, {"ば"})) {
+      utf8::equalsAny(next.surface, {"ば", "て"})) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
 
@@ -687,8 +689,13 @@ float computeSuffixShortVerbBonus(const core::LatticeEdge& prev, const core::Lat
   // Penalty for ADV → でも (CONJ or PART_副) pattern
   // After adverbs, でも should split as で(copula)+も(particle)
   // e.g., それほどでもない → それほど+で+も+ない
+  // The interrogative of the こ・そ・あ・ど series takes the indefinite でも
+  // like any interrogative (どうでも, as なんでも).
+  const bool interrogative_adverb =
+      prev.extended_pos == core::ExtendedPOS::AdverbQuotative && utf8::startsWith(prev.surface, "ど");
   const bool adverb_before_fused_demo =
-      prev.pos == core::PartOfSpeech::Adverb && grammar::isCopulaFusedConjunction(next.surface) &&
+      prev.pos == core::PartOfSpeech::Adverb && !interrogative_adverb &&
+      grammar::isCopulaFusedConjunction(next.surface) &&
       (next.pos == core::PartOfSpeech::Conjunction || next.extended_pos == core::ExtendedPOS::ParticleAdverbial);
   const bool adverb_before_focus_mo =
       prev.pos == core::PartOfSpeech::Adverb && prev.fromDictionary() && normalize::utf8Length(prev.surface) == 2 &&

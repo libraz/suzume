@@ -43,6 +43,14 @@ float Scorer::eosCost(const core::LatticeEdge& edge, core::ExtendedPOS prev_exte
       // Only the 已然形 ね is barred: it needs ば or ど(も) after it, while the
       // other cells of the same auxiliary close a clause (読ま+ず, 知ら+ぬ).
       return grammar::isSingleHiragana(edge.surface, U'ね') ? boundary_cost.eos : sc::scale::kNeutral;
+    case sc::EosBoundaryGate::AttributiveCopula:
+      // Only after a pronoun: a trailing みたいな/静かな is an elided-head
+      // attributive, while それな is the final particle.
+      return grammar::isAttributiveCopulaNa(edge.surface) && prev_extended_pos == core::ExtendedPOS::Pronoun
+                 ? boundary_cost.eos
+                 : sc::scale::kNeutral;
+    case sc::EosBoundaryGate::NonVolitionalStem:
+      return grammar::endsWithORow(edge.surface) ? sc::scale::kNeutral : boundary_cost.eos;
     case sc::EosBoundaryGate::AfterContent:
       // The sentence start arrives here as Unknown, and a punctuation mark
       // opens a fragment; in both the token introduces what follows instead.
