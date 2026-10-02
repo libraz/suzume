@@ -1,0 +1,111 @@
+{
+  "cases": [
+    {
+      "description": "行くべ。 - regression test",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行く"
+        },
+        {
+          "lemma": "べ",
+          "pos": "Particle",
+          "surface": "べ"
+        }
+      ],
+      "id": "kube",
+      "input": "行くべ。"
+    },
+    {
+      "description": "見るべ - regression test",
+      "expected": [
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見る"
+        },
+        {
+          "lemma": "べ",
+          "pos": "Particle",
+          "surface": "べ"
+        }
+      ],
+      "id": "rube",
+      "input": "見るべ"
+    },
+    {
+      "description": "食べるべ - regression test",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べる"
+        },
+        {
+          "lemma": "べ",
+          "pos": "Particle",
+          "surface": "べ"
+        }
+      ],
+      "id": "berube",
+      "input": "食べるべ"
+    },
+    {
+      "description": "やってみんべ。 - regression test",
+      "expected": [
+        {
+          "lemma": "やる",
+          "pos": "Verb",
+          "surface": "やっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "みる",
+          "pos": "Auxiliary",
+          "surface": "み"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        },
+        {
+          "lemma": "べ",
+          "pos": "Particle",
+          "surface": "べ"
+        }
+      ],
+      "id": "yattteminbe",
+      "input": "やってみんべ。"
+    },
+    {
+      "description": "食べんべ - regression test",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        },
+        {
+          "lemma": "べ",
+          "pos": "Particle",
+          "surface": "べ"
+        }
+      ],
+      "id": "benbe",
+      "input": "食べんべ"
+    }
+  ],
+  "description": "pattern_dialect tests",
+  "version": "1.0"
+}
