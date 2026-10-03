@@ -17,7 +17,6 @@
 #include "normalize/utf8.h"
 
 namespace cost = suzume::analysis::bigram_cost;
-namespace sc = suzume::analysis::scorer;
 
 // Surface-based adjustments use cost:: namespace directly from bigram_cost.
 // See bigram_table.h and scorer_constants.h for constant values.

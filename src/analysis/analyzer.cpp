@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <iterator>
 
 #include "core/debug.h"
 #include "core/text_boundaries.h"
@@ -42,6 +43,15 @@ inline size_t countChars(std::string_view text, size_t from, size_t to) {
     }
   }
   return count;
+}
+
+std::vector<normalize::CharType> classifyCodepoints(const std::vector<char32_t>& codepoints) {
+  std::vector<normalize::CharType> char_types;
+  char_types.reserve(codepoints.size());
+  for (const char32_t codepoint : codepoints) {
+    char_types.push_back(normalize::classifyChar(codepoint));
+  }
+  return char_types;
 }
 
 // Split long text into sentence-level chunks and analyze each one.
@@ -92,9 +102,7 @@ std::vector<core::Morpheme> chunkBySentenceBoundary(
     }
 
     auto morphemes = process(text.substr(pos, chunk_end - pos), base_offset + char_pos);
-    for (auto& m : morphemes) {
-      result.push_back(std::move(m));
-    }
+    result.insert(result.end(), std::make_move_iterator(morphemes.begin()), std::make_move_iterator(morphemes.end()));
 
     char_pos += countChars(text, pos, chunk_end);
     pos = chunk_end;
@@ -211,12 +219,9 @@ std::vector<core::Morpheme> Analyzer::analyzeWithPretokenizer(std::string_view t
         is_pretoken ? pretoken_result.tokens[token_idx].start : pretoken_result.spans[span_idx].start;
 
     // Calculate character offset at this byte position
-    while (current_byte < item_start && current_byte < text.size()) {
-      if ((static_cast<unsigned char>(text[current_byte]) & 0xC0) != 0x80) {
-        ++current_char;
-      }
-      ++current_byte;
-    }
+    const size_t item_byte = std::max(current_byte, std::min(item_start, text.size()));
+    current_char += countChars(text, current_byte, item_byte);
+    current_byte = item_byte;
     size_t char_offset = base_char_offset + current_char;
 
     if (is_pretoken) {
@@ -228,27 +233,16 @@ std::vector<core::Morpheme> Analyzer::analyzeWithPretokenizer(std::string_view t
       morpheme.extended_pos = core::posToExtendedPos(tok.pos);
       morpheme.lemma = tok.surface;
 
-      // Calculate end char offset
-      size_t end_byte = current_byte;
-      size_t end_char = current_char;
-      while (end_byte < tok.end && end_byte < text.size()) {
-        if ((static_cast<unsigned char>(text[end_byte]) & 0xC0) != 0x80) {
-          ++end_char;
-        }
-        ++end_byte;
-      }
       morpheme.start = char_offset;
-      morpheme.end = base_char_offset + end_char;
+      morpheme.end = char_offset + countChars(text, current_byte, std::min(tok.end, text.size()));
       result.push_back(std::move(morpheme));
     } else {
       // Analyze span
       const auto& span = pretoken_result.spans[span_idx++];
       std::string_view span_text = text.substr(span.start, span.end - span.start);
       auto span_morphemes = analyzeSpan(span_text, char_offset);
-
-      for (auto& morph : span_morphemes) {
-        result.push_back(std::move(morph));
-      }
+      result.insert(result.end(), std::make_move_iterator(span_morphemes.begin()),
+                    std::make_move_iterator(span_morphemes.end()));
     }
   }
 
@@ -287,15 +281,8 @@ std::vector<core::Morpheme> Analyzer::analyzeChunk(std::string_view text, size_t
     return {};
   }
 
-  // Get character types
-  std::vector<normalize::CharType> char_types;
-  char_types.reserve(codepoints.size());
-  for (char32_t code : codepoints) {
-    char_types.push_back(normalize::classifyChar(code));
-  }
-
   // Build lattice
-  core::Lattice lattice = tokenizer_->buildLattice(text, codepoints, char_types);
+  core::Lattice lattice = tokenizer_->buildLattice(text, codepoints, classifyCodepoints(codepoints));
 
   // Run Viterbi
   core::ViterbiResult vresult = viterbi_.solve(lattice, scorer_);
@@ -322,11 +309,7 @@ std::vector<core::Morpheme> Analyzer::pathToMorphemes(const core::ViterbiResult&
     morpheme.start = base_char_offset + edge.start;
     morpheme.end = base_char_offset + edge.end;
 
-    if (!edge.lemma.empty()) {
-      morpheme.lemma = std::string(edge.lemma);
-    } else {
-      morpheme.lemma = morpheme.surface;
-    }
+    morpheme.lemma = edge.lemma.empty() ? morpheme.surface : std::string(edge.lemma);
 
     morpheme.flags = edge.flags;
     morpheme.origin = edge.origin;
@@ -369,12 +352,7 @@ std::vector<core::Morpheme> Analyzer::analyzeDebug(std::string_view text, core::
       }
       if (!debug_span.empty()) {
         const std::vector<char32_t> codepoints = normalize::utf8::decode(debug_span);
-        std::vector<normalize::CharType> char_types;
-        char_types.reserve(codepoints.size());
-        for (const char32_t codepoint : codepoints) {
-          char_types.push_back(normalize::classifyChar(codepoint));
-        }
-        *out_lattice = tokenizer_->buildLattice(debug_span, codepoints, char_types);
+        *out_lattice = tokenizer_->buildLattice(debug_span, codepoints, classifyCodepoints(codepoints));
       }
     }
   }

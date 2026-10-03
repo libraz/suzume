@@ -3,17 +3,6 @@
  * @brief Unknown-word candidate generation for the tokenizer
  */
 
-/**
- * @file tokenizer.cpp
- * @brief Tokenizer that builds lattice from text
- *
- * This file orchestrates candidate generation for tokenization:
- * - Dictionary candidates (direct lookup)
- * - Unknown word candidates (delegated to UnknownWordGenerator)
- * - Split candidates (delegated to split_candidates.h)
- * - Join candidates (delegated to join_candidates.h)
- */
-
 #include <algorithm>
 
 #include "analysis/category_cost.h"

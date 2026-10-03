@@ -1,28 +1,9 @@
 #include "analysis/scorer.h"
 
 #include <cmath>
+#include <limits>
 
-#include "analysis/bigram_table.h"
-#include "analysis/category_cost.h"
 #include "analysis/scorer_bigram_overrides.h"
-#include "analysis/scorer_constants.h"
-#include "analysis/verb_candidates_helpers.h"
-#include "core/debug.h"
-#include "core/kana_constants.h"
-#include "core/types.h"
-#include "core/utf8_constants.h"
-#include "grammar/char_patterns.h"
-#include "grammar/honorific_verbs.h"
-#include "normalize/utf8.h"
-
-#ifdef SUZUME_DEBUG_INFO
-using suzume::core::CandidateOrigin;
-#endif
-namespace cost = suzume::analysis::bigram_cost;
-namespace sc = suzume::analysis::scorer;
-
-// Surface-based adjustments use cost:: namespace directly from bigram_cost.
-// See bigram_table.h and scorer_constants.h for constant values.
 
 namespace {
 
