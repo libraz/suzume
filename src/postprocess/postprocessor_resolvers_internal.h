@@ -98,6 +98,7 @@ void resolveExcessiveDeverbalNoun(std::vector<core::Morpheme>& result);
 void resolveHonorificContinuativePast(std::vector<core::Morpheme>& result);
 void resolveAdverbBeforeCase(std::vector<core::Morpheme>& result);
 void resolvePredicateCellLemmas(std::vector<core::Morpheme>& result);
+void resolveFrameRepairs(std::vector<core::Morpheme>& result);
 void retagNaAdjectiveSurface(core::Morpheme& morpheme);
 void retagNounSurface(core::Morpheme& morpheme);
 

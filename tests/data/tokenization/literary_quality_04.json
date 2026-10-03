@@ -2221,7 +2221,7 @@
       "expected": [
         {
           "lemma": "より",
-          "pos": "Particle",
+          "pos": "Adverb",
           "surface": "より"
         },
         {

@@ -990,3 +990,52 @@ def postprocess_predicate_cell_lemmas(tokens: list[dict]) -> bool:
             token["pos"] = "Noun"
             changed = True
     return changed
+
+
+def postprocess_frame_repairs(tokens: list[dict]) -> bool:
+    """Repair readings the surrounding frame rules out.
+
+    - で+しか before a verb is the case particle (窓口+で+しか+受付ける); the
+      copula で+しか only precedes the adjective ない (本+で+しか+ない);
+    - で+は before ござる is the copula, as it is after a na-adjective;
+    - the adverb ことに cannot complement なる; that is こと+に+なる;
+    - より opening a clause has no comparand and is the adverb (より+いっそう);
+    - 何だ after a word is the pronoun plus the copula (いったい+何+だ);
+    - 先 after a pronoun is the noun, not a suffix (それ+先+に).
+    """
+    changed = False
+    idx = 0
+    while idx < len(tokens):
+        token = tokens[idx]
+        surface = token.get("surface", "")
+        previous = tokens[idx - 1] if idx > 0 else {}
+        following = tokens[idx + 1] if idx + 1 < len(tokens) else {}
+        after = tokens[idx + 2] if idx + 2 < len(tokens) else {}
+        if surface == "で" and following.get("surface") == "しか" and after.get("pos") == "Verb":
+            if token.get("pos") != "Particle":
+                token.update(pos="Particle", lemma="で")
+                changed = True
+        elif surface == "で" and following.get("surface") == "は" and after.get("lemma") == "ござる":
+            if token.get("pos") != "Auxiliary":
+                token.update(pos="Auxiliary", lemma="だ")
+                changed = True
+        elif surface == "ことに" and token.get("pos") == "Adverb" and following.get("lemma") == "なる":
+            tokens[idx : idx + 1] = [
+                {"surface": "こと", "pos": "Noun", "lemma": "こと"},
+                {"surface": "に", "pos": "Particle", "lemma": "に"},
+            ]
+            changed = True
+        elif surface == "より" and idx == 0 and token.get("pos") == "Particle" and len(tokens) > 1:
+            token.update(pos="Adverb", lemma="より")
+            changed = True
+        elif surface == "何だ" and idx > 0 and token.get("pos") == "Interjection":
+            tokens[idx : idx + 1] = [
+                {"surface": "何", "pos": "Pronoun", "lemma": "何"},
+                {"surface": "だ", "pos": "Auxiliary", "lemma": "だ"},
+            ]
+            changed = True
+        elif surface == "先" and token.get("pos") == "Suffix" and previous.get("pos") == "Pronoun":
+            token["pos"] = "Noun"
+            changed = True
+        idx += 1
+    return changed

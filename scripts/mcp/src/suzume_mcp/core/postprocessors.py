@@ -183,6 +183,7 @@ postprocess_sou_host = postprocessor_subsidiaries.postprocess_sou_host
 postprocess_listing_tari = postprocessor_classical.postprocess_listing_tari
 postprocess_adverb_host_context = postprocessor_subsidiaries.postprocess_adverb_host_context
 postprocess_predicate_cell_lemmas = postprocessor_subsidiaries.postprocess_predicate_cell_lemmas
+postprocess_frame_repairs = postprocessor_subsidiaries.postprocess_frame_repairs
 postprocess_closed_subsidiary_aux = postprocessor_subsidiaries.postprocess_closed_subsidiary_aux
 postprocess_contracted_iku_lemma = postprocessor_subsidiaries.postprocess_contracted_iku_lemma
 postprocess_contracted_progressive_aux = postprocessor_subsidiaries.postprocess_contracted_progressive_aux
@@ -336,6 +337,7 @@ POSTPROCESSORS: tuple[tuple[str, Callable[[list[dict]], bool]], ...] = (
     ("listing-tari", postprocess_listing_tari),
     ("adverb-host-context", postprocess_adverb_host_context),
     ("predicate-cell-lemmas", postprocess_predicate_cell_lemmas),
+    ("frame-repairs", postprocess_frame_repairs),
 )
 
 

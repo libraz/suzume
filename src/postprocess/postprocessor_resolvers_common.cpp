@@ -375,4 +375,57 @@ void resolvePredicateCellLemmas(std::vector<core::Morpheme>& result) {
   }
 }
 
+namespace {
+
+// Split a Japanese-script @p head after @p head_codepoints characters, the tail
+// becoming a new morpheme after it.
+core::Morpheme splitTail(core::Morpheme& head, size_t head_codepoints) {
+  core::Morpheme tail = head;
+  const size_t head_bytes = head_codepoints * core::kJapaneseCharBytes;
+  tail.surface = head.surface.substr(head_bytes);
+  head.surface = head.surface.substr(0, head_bytes);
+  head.end = head.start + head_codepoints;
+  tail.start = head.end;
+  return tail;
+}
+
+}  // namespace
+
+// Readings the surrounding frame rules out, mirroring the reference repairs:
+// で+しか before a verb is the case particle; で+は before ござる is the copula;
+// the adverb ことに cannot complement なる (こと+に+なる); より opening a clause
+// is the adverb; 何だ after a word is 何+だ; 先 after a pronoun is the noun.
+void resolveFrameRepairs(std::vector<core::Morpheme>& result) {
+  for (size_t idx = 0; idx < result.size(); ++idx) {
+    auto& token = result[idx];
+    const core::Morpheme* previous = idx > 0 ? &result[idx - 1] : nullptr;
+    const core::Morpheme* following = idx + 1 < result.size() ? &result[idx + 1] : nullptr;
+    const core::Morpheme* after = idx + 2 < result.size() ? &result[idx + 2] : nullptr;
+    if (utf8::equalsAny(token.surface, {"で"}) && following != nullptr &&
+        utf8::equalsAny(following->surface, {"しか"}) && after != nullptr && after->pos == core::PartOfSpeech::Verb) {
+      retagUninflected(token, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleCase, "で");
+    } else if (utf8::equalsAny(token.surface, {"で"}) && following != nullptr &&
+               utf8::equalsAny(following->surface, {"は"}) && after != nullptr && after->getLemma() == "ござる") {
+      retagCopulaDa(token);
+    } else if (utf8::equalsAny(token.surface, {"ことに"}) && token.pos == core::PartOfSpeech::Adverb &&
+               following != nullptr && following->getLemma() == "なる") {
+      core::Morpheme particle = splitTail(token, 2);
+      retagUninflected(token, core::PartOfSpeech::Noun, core::ExtendedPOS::NounFormal, "こと");
+      retagUninflected(particle, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleCase, "に");
+      result.insert(result.begin() + static_cast<std::ptrdiff_t>(idx + 1), particle);
+    } else if (idx == 0 && result.size() > 1 && utf8::equalsAny(token.surface, {"より"}) &&
+               token.pos == core::PartOfSpeech::Particle) {
+      retagUninflected(token, core::PartOfSpeech::Adverb, core::ExtendedPOS::Adverb, "より");
+    } else if (idx > 0 && utf8::equalsAny(token.surface, {"何だ"}) && token.pos == core::PartOfSpeech::Interjection) {
+      core::Morpheme copula = splitTail(token, 1);
+      retagUninflected(token, core::PartOfSpeech::Pronoun, core::ExtendedPOS::PronounInterrogative, "何");
+      retagCopulaDa(copula);
+      result.insert(result.begin() + static_cast<std::ptrdiff_t>(idx + 1), copula);
+    } else if (utf8::equalsAny(token.surface, {"先"}) && token.pos == core::PartOfSpeech::Suffix &&
+               previous != nullptr && previous->pos == core::PartOfSpeech::Pronoun) {
+      retagNounSurface(token);
+    }
+  }
+}
+
 }  // namespace suzume::postprocess::resolver

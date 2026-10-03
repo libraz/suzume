@@ -2088,9 +2088,14 @@
       "description": "result expression formal noun boundary",
       "expected": [
         {
-          "lemma": "ことに",
-          "pos": "Adverb",
-          "surface": "ことに"
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "こと"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
         },
         {
           "lemma": "なる",
