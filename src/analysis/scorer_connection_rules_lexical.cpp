@@ -230,19 +230,24 @@ float computeSugiFinalParticleBonus(const core::LatticeEdge& prev, const core::L
     SUZUME_CONNECTION_ADD(bonus, cost::kSevere);
   }
 
-  // Penalty for VerbOnbinkei(ん) → Verb(でる) pattern
-  // After ん音便, でる is almost always the contracted ている, not the verb 出る
-  // E.g., 並んでる = 並んでいる (progressive), やんでる = 病んでいる
-  // Force the で(PART_接続) + る path instead
-  if (prev.extended_pos == core::ExtendedPOS::VerbOnbinkei && utf8::endsWith(prev.surface, "ん") &&
-      next.pos == core::PartOfSpeech::Verb && next.surface == "でる") {
-    SUZUME_CONNECTION_ADD(bonus, cost::kStrong);
-  }
-
-  // The completion auxiliary after the renyokei homograph of 出る belongs
-  // to the voiced te-form chain (読ん+で+しまう), not to a lexical verb.
-  if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei && utf8::equalsAny(prev.lemma, {"出る", "でる"}) &&
-      next.extended_pos == core::ExtendedPOS::AuxAspectShimau) {
+  // Homograph readings that lose to the grammatical chain spelled the same way:
+  // - after ん音便, でる is the contracted ている, not 出る (並んでる; the
+  //   で(PART_接続) + る path is forced instead);
+  // - the completion auxiliary after the renyokei homograph of 出る belongs to
+  //   the voiced te-form chain (読ん+で+しまう), not to a lexical verb;
+  // - an adverb in く is spelled like an adjective continuative, and before a
+  //   final particle that also spells the colloquial negative (すごく+ねえ) the
+  //   negative is the predicate.
+  const bool onbin_before_deru = prev.extended_pos == core::ExtendedPOS::VerbOnbinkei &&
+                                 utf8::endsWith(prev.surface, "ん") && next.pos == core::PartOfSpeech::Verb &&
+                                 next.surface == "でる";
+  const bool deru_before_completion = prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+                                      utf8::equalsAny(prev.lemma, {"出る", "でる"}) &&
+                                      next.extended_pos == core::ExtendedPOS::AuxAspectShimau;
+  const bool ku_adverb_before_negative_homograph =
+      prev.pos == core::PartOfSpeech::Adverb && utf8::endsWith(prev.surface, "く") &&
+      next.extended_pos == core::ExtendedPOS::ParticleFinal && utf8::equalsAny(next.surface, {"ねえ", "ねぇ", "ねー"});
+  if (onbin_before_deru || deru_before_completion || ku_adverb_before_negative_homograph) {
     SUZUME_CONNECTION_ADD(bonus, cost::kStrong);
   }
 
