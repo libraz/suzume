@@ -544,6 +544,126 @@
       ],
       "id": "banda_2",
       "input": "気色ばんだ声"
+    },
+    {
+      "description": "楽しんで - regression test",
+      "expected": [
+        {
+          "lemma": "楽しむ",
+          "pos": "Verb",
+          "surface": "楽しん"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        }
+      ],
+      "id": "shinde",
+      "input": "楽しんで"
+    },
+    {
+      "description": "楽しんでね - regression test",
+      "expected": [
+        {
+          "lemma": "楽しむ",
+          "pos": "Verb",
+          "surface": "楽しん"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        }
+      ],
+      "id": "shindene",
+      "input": "楽しんでね"
+    },
+    {
+      "description": "映画を楽しんでいる - regression test",
+      "expected": [
+        {
+          "lemma": "映画",
+          "pos": "Noun",
+          "surface": "映画"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "楽しむ",
+          "pos": "Verb",
+          "surface": "楽しん"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "wo_shindeiru",
+      "input": "映画を楽しんでいる"
+    },
+    {
+      "description": "痛みに苦しんでいる - regression test",
+      "expected": [
+        {
+          "lemma": "痛み",
+          "pos": "Noun",
+          "surface": "痛み"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "苦しむ",
+          "pos": "Verb",
+          "surface": "苦しん"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "mini_shindeiru",
+      "input": "痛みに苦しんでいる"
+    },
+    {
+      "description": "汗ばんで - regression test",
+      "expected": [
+        {
+          "lemma": "汗ばむ",
+          "pos": "Verb",
+          "surface": "汗ばん"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        }
+      ],
+      "id": "bande",
+      "input": "汗ばんで"
     }
   ],
   "description": "Godan Ma-row verbs (五段マ行動詞) - verbs ending in む",

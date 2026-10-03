@@ -172,14 +172,23 @@ float computeTaFormVolitionalBonus(const core::LatticeEdge& prev, const core::La
                                   utf8::endsWith(prev.surface, "よ") &&
                                   next.extended_pos == core::ExtendedPOS::AuxVolitional &&
                                   grammar::isSingleHiragana(next.surface, core::hiragana::kU);
-  // The converse: a godan o-row irrealis exists only for that う, so a
-  // negative cannot follow it (噛む's かも+ねえ is the particle かも+ねえ).
-  const bool negative_after_godan_volitional_stem =
+  // The converse: a godan o-row irrealis exists only for that う, and an
+  // i-row godan continuative never hosts the classical negative, so neither
+  // takes one (噛む's かも+ねえ is かも+ねえ; 楽し+ん+で is 楽しん+で).
+  const bool negative_after_godan_non_irrealis =
       (next.extended_pos == core::ExtendedPOS::AuxNegativeNai ||
        next.extended_pos == core::ExtendedPOS::AuxNegativeNu) &&
-      prev.extended_pos == core::ExtendedPOS::VerbMizenkei && grammar::endsWithORow(prev.surface) &&
+      ((prev.extended_pos == core::ExtendedPOS::VerbMizenkei && grammar::endsWithORow(prev.surface)) ||
+       (prev.extended_pos == core::ExtendedPOS::VerbRenyokei && grammar::endsWithIRow(prev.surface) &&
+        next.extended_pos == core::ExtendedPOS::AuxNegativeNu)) &&
       grammar::isGodanVerbType(grammar::conjTypeToVerbType(prev.conj_type));
-  if (bare_volitional_after_non_o_row || negative_after_godan_volitional_stem)
+  // する negates its classical negative through せ (せ+ん); し+ん is the
+  // dialect contraction, which yields to a registered onbin (楽しん+で).
+  const bool suru_continuative_before_classical_negative =
+      next.extended_pos == core::ExtendedPOS::AuxNegativeNu && grammar::isSuruRenyokeiSurface(prev.surface) &&
+      (prev.conj_type == dictionary::ConjugationType::Suru || prev.lemma == "する");
+  if (bare_volitional_after_non_o_row || negative_after_godan_non_irrealis ||
+      suru_continuative_before_classical_negative)
     SUZUME_CONNECTION_ADD(bonus, cost::kSevere);
   if (modern_volitional)
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryStrongBonus + cost::kStrongBonus);

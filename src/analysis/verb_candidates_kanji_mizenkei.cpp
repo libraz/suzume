@@ -518,7 +518,15 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
           // its ma/ba/na-row 音便 (黄ばん+だ, not 黄ば+ん+だ).
           const bool past_auxiliary_follows =
               mizenkei_end + 1 < codepoints.size() && codepoints[mizenkei_end + 1] == U'だ';
-          if (!is_honorific_san && !past_auxiliary_follows) {
+          // A registered onbin cell spanning the ん is that verb's own euphony
+          // (汗ばん+で of 汗ばむ), not a negative on an unattested 汗ぶ.
+          const auto* spanning_verb = dict_manager == nullptr
+                                          ? nullptr
+                                          : lookupEntryInRange(*dict_manager, codepoints, start_pos, mizenkei_end + 1,
+                                                               core::PartOfSpeech::Verb);
+          const bool registered_onbin_spans_n =
+              spanning_verb != nullptr && spanning_verb->extended_pos == core::ExtendedPOS::VerbOnbinkei;
+          if (!is_honorific_san && !past_auxiliary_follows && !registered_onbin_spans_n) {
             is_n_pattern = true;
           }
         }

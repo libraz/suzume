@@ -726,6 +726,9 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       // A nominal ん must arise as ParticleNo after its predicate boundary,
       // while 読んだ starts from a verb onbin candidate rather than 読+ん+だ.
       {EPOS::Noun, EPOS::AuxNegativeNu, cost::kAlmostNever},
+      // A continuative turned noun has left the paradigm, so it cannot take
+      // the negative either (楽し+ん+で is the onbin 楽しん+で).
+      {EPOS::NounVerbal, EPOS::AuxNegativeNu, cost::kAlmostNever},
 
       // The contracted/classical negative auxiliary requires a predicate
       // before it.  An unknown hiragana fragment must not become a fake
@@ -750,6 +753,7 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       {EPOS::ParticleCase, EPOS::AuxVolitional, cost::kAlmostNever},
       {EPOS::ParticleAdverbial, EPOS::AuxVolitional, cost::kAlmostNever},
       {EPOS::AdjStem, EPOS::AuxVolitional, cost::kAlmostNever},
+      {EPOS::NounVerbal, EPOS::AuxVolitional, cost::kAlmostNever},
       // A volitional auxiliary must attach to an inflecting predicate. This
       // blocks a stray hiragana fragment from posing as its irrealis stem
       // (そ+う in そうとも言える).
