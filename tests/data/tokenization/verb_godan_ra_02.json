@@ -72,6 +72,57 @@
       ],
       "id": "ttteta",
       "input": "沼ってた"
+    },
+    {
+      "description": "ディスってる - regression test",
+      "expected": [
+        {
+          "lemma": "ディスる",
+          "pos": "Verb",
+          "surface": "ディスっ"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てる"
+        }
+      ],
+      "id": "ttteru_3",
+      "input": "ディスってる"
+    },
+    {
+      "description": "ハモってる - regression test",
+      "expected": [
+        {
+          "lemma": "ハモる",
+          "pos": "Verb",
+          "surface": "ハモっ"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てる"
+        }
+      ],
+      "id": "ttteru_4",
+      "input": "ハモってる"
+    },
+    {
+      "description": "事故ってる - regression test",
+      "expected": [
+        {
+          "lemma": "事故る",
+          "pos": "Verb",
+          "surface": "事故っ"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てる"
+        }
+      ],
+      "id": "ttteru_5",
+      "input": "事故ってる"
     }
   ],
   "description": "Godan Ra-row verbs (五段ラ行動詞) - verbs ending in る (part 2/2)",
