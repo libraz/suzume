@@ -347,6 +347,16 @@ def _separate_counter_case_particles(tokens: list[dict]) -> list[dict]:
     return separated
 
 
+def _is_verb_base(base: str) -> bool:
+    """Whether a reconstructed kana dictionary form is a verb in a verbal frame.
+
+    A bare kana form can be an adverb or a noun on its own (かく, のむ), so the
+    probe places it before ことができる, which only a verb can precede.
+    """
+    probe = mecab_analyze(base + "ことができる")
+    return bool(probe) and probe[0].get("surface") == base and probe[0].get("pos") == "動詞"
+
+
 def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str | None]:
     """Apply Suzume merge rules to MeCab tokens.
 
@@ -370,6 +380,33 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
         # Calculate position in text
         pos_in_text = sum(len(tokens[k].get("surface", "")) for k in range(i))
         remaining = text[pos_in_text:] if pos_in_text < len(text) else ""
+
+        # The formal noun もの takes an attributive form, so a continuative in
+        # front of it is the first member of the compound noun (たべ+もの as
+        # 食べもの, のみもの, かいもの). The reference keeps the kanji compounds
+        # whole but splits the kana ones, sometimes misreading the continuative
+        # as a noun or an adjective stem; a host whose base is a real verb is
+        # the same continuative.
+        if not merged and i + 1 < len(tokens) and tokens[i + 1].get("surface") == "もの":
+            host_surface = t.get("surface", "")
+            continuative_verb = t.get("pos") == "動詞" and t.get("conj_form") == "連用形"
+            kana_host = regex.fullmatch(r"\p{Hiragana}{2,}", host_surface) is not None
+            misread_host = (
+                kana_host
+                and (
+                    t.get("pos") in ("動詞", "名詞") or (t.get("pos") == "形容詞" and t.get("conj_form") == "ガル接続")
+                )
+                and t.get("pos_sub1") not in ("代名詞", "非自立")
+                and any(_is_verb_base(base) for base in bases_from_renyokei(host_surface))
+            )
+            if continuative_verb or misread_host:
+                compound = host_surface + "もの"
+                result.append({"surface": compound, "pos": "名詞", "pos_sub1": "一般", "lemma": compound})
+                i += 2
+                merged = True
+                if applied_rule is None:
+                    applied_rule = "continuative-mono-compound"
+                continue
 
         # A reference headword can absorb topic は into a following unknown
         # kana noun (そこ + はにわ, ここ + はいり + ぐち).  L2 evidence for the

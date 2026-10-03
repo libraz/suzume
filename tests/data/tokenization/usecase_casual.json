@@ -1172,17 +1172,12 @@
       "input": "家にもどる。"
     },
     {
-      "description": "An ambiguous e-row nominal stem remains separate before a formal noun.",
+      "description": "A kana continuative before the formal noun もの is the first member of the compound noun; the formal noun takes no continuative modifier",
       "expected": [
         {
-          "lemma": "たて",
+          "lemma": "たてもの",
           "pos": "Noun",
-          "surface": "たて"
-        },
-        {
-          "lemma": "もの",
-          "pos": "Noun",
-          "surface": "もの"
+          "surface": "たてもの"
         },
         {
           "lemma": "が",
@@ -1195,8 +1190,57 @@
           "surface": "見える"
         }
       ],
-      "id": "c3_formal_noun_boundary",
+      "id": "tatemonoga_eru",
       "input": "たてものが見える。"
+    },
+    {
+      "description": "Kana continuative + formal もの reads as one compound noun",
+      "expected": [
+        {
+          "lemma": "のりもの",
+          "pos": "Noun",
+          "surface": "のりもの"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "乗る",
+          "pos": "Verb",
+          "surface": "乗る"
+        }
+      ],
+      "id": "norimononi_ru",
+      "input": "のりものに乗る"
+    },
+    {
+      "description": "Negative control: an attributive adjective before もの keeps the formal-noun boundary",
+      "expected": [
+        {
+          "lemma": "重い",
+          "pos": "Adjective",
+          "surface": "重い"
+        },
+        {
+          "lemma": "もの",
+          "pos": "Noun",
+          "surface": "もの"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "持つ",
+          "pos": "Verb",
+          "surface": "持つ"
+        }
+      ],
+      "id": "imonowo_tsu",
+      "input": "重いものを持つ"
     }
   ],
   "version": "1.0"
