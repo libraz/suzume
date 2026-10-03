@@ -1667,6 +1667,19 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
       if (crossesAttributiveNaHonorificNominal(lattice, codepoints, start_pos, end_pos)) {
         continue;
       }
+      // A conjunction opens a clause, so it cannot start inside a registered
+      // particle that began one mora earlier (か|も of かも+って).
+      bool opens_inside_particle = false;
+      for (size_t split = 1; split < result.length; ++split) {
+        if (lookupEntryInRange(dict_manager_, codepoints, start_pos - 1, start_pos + split,
+                               core::PartOfSpeech::Particle) != nullptr) {
+          opens_inside_particle = true;
+          break;
+        }
+      }
+      if (opens_inside_particle) {
+        continue;
+      }
       bool decomposes_as_verb_particle = false;
       for (size_t split = 1; split < result.length; ++split) {
         if (lookupEntryInRange(dict_manager_, codepoints, start_pos, start_pos + split, core::PartOfSpeech::Verb) !=
