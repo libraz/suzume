@@ -816,6 +816,72 @@
       ],
       "id": "sugi",
       "input": "高すぎ"
+    },
+    {
+      "description": "けちくさそうだ - regression test",
+      "expected": [
+        {
+          "lemma": "けちくさい",
+          "pos": "Adjective",
+          "surface": "けちくさ"
+        },
+        {
+          "lemma": "そう",
+          "pos": "Adjective",
+          "surface": "そう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "kechikusasouda",
+      "input": "けちくさそうだ"
+    },
+    {
+      "description": "うそくさそうだ - regression test",
+      "expected": [
+        {
+          "lemma": "うそくさい",
+          "pos": "Adjective",
+          "surface": "うそくさ"
+        },
+        {
+          "lemma": "そう",
+          "pos": "Adjective",
+          "surface": "そう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "usokusasouda",
+      "input": "うそくさそうだ"
+    },
+    {
+      "description": "めんどくさそうだ - regression test",
+      "expected": [
+        {
+          "lemma": "めんどくさい",
+          "pos": "Adjective",
+          "surface": "めんどくさ"
+        },
+        {
+          "lemma": "そう",
+          "pos": "Adjective",
+          "surface": "そう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "mendokusasouda",
+      "input": "めんどくさそうだ"
     }
   ],
   "description": "I-adjectives compound/derived forms (複合・派生) - sou patterns, nominalization, contracted forms",
