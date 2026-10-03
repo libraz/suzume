@@ -34,14 +34,11 @@ void Trie::insert(std::string_view key, uint32_t entry_id) {
   size_t pos = 0;
 
   while (pos < key.size()) {
-    char32_t cp = normalize::decodeUtf8(key, pos);
-    auto it = node->children.find(cp);
-    if (it == node->children.end()) {
-      auto [inserted, _] = node->children.emplace(cp, std::make_unique<TrieNode>());
-      node = inserted->second.get();
-    } else {
-      node = it->second.get();
+    auto& child = node->children[normalize::decodeUtf8(key, pos)];
+    if (!child) {
+      child = std::make_unique<TrieNode>();
     }
+    node = child.get();
   }
 
   node->entry_ids.push_back(entry_id);

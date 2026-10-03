@@ -359,13 +359,7 @@ core::Expected<size_t, core::Error> Suzume::loadUserDictionaryResult(const std::
     return core::makeUnexpected(core::Error(core::ErrorCode::FileNotFound, "Failed to open dictionary file: " + path));
   }
   const std::string content{std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>()};
-  auto loaded = loadSourceDictionaryFromMemory(content.data(), content.size());
-  if (!loaded.hasValue()) {
-    return core::makeUnexpected(loaded.error());
-  }
-  impl_->analyzer.addUserDictionary(loaded.value().dictionary);
-  impl_->appendDictionaryWarnings(std::move(loaded.value().warnings));
-  return loaded.value().installed_entry_count;
+  return loadUserDictionaryFromMemoryResult(content.data(), content.size());
 #endif
 }
 
