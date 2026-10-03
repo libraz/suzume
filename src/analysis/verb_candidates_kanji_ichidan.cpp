@@ -14,6 +14,7 @@
 #include "analysis/verb_candidates_kanji_internal.h"
 #include "core/debug.h"
 #include "core/utf8_constants.h"
+#include "grammar/auxiliary_generator.h"
 #include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
 #include "grammar/inflection_scorer_constants.h"
@@ -316,9 +317,21 @@ void appendSingleKanjiIchidanCandidates(const std::vector<char32_t>& codepoints,
         }
       }
 
+      // An adjective that attaches to the continuative (見+にくい, 寝+やすい)
+      // licenses the bare stem the same way.
+      bool is_renyokei_adjective = false;
+      for (size_t adjective_end = kanji_end + 2; adjective_end <= std::min(codepoints.size(), kanji_end + 4);
+           ++adjective_end) {
+        const auto* adjective =
+            lookupEntryInRange(*dict_manager, codepoints, kanji_end, adjective_end, core::PartOfSpeech::Adjective);
+        is_renyokei_adjective =
+            is_renyokei_adjective || (adjective != nullptr && grammar::attachesToVerbRenyokei(adjective->lemma));
+      }
+
       if (is_polite_aux || is_negative_aux || is_classical_negative_aux || is_literary_volitional_n ||
           is_classical_volitional_mu || is_classical_desiderative || is_classical_negative_mai ||
-          is_conjunctive_particle || is_classical_past_aux || is_classical_conjectural || is_honorific_aux) {
+          is_conjunctive_particle || is_classical_past_aux || is_classical_conjectural || is_honorific_aux ||
+          is_renyokei_adjective) {
         std::string surface = extractSubstring(codepoints, start_pos, kanji_end);
         // A one-kanji stem followed by して can instead be the continuative
         // form of a dictionary-confirmed Godan-sa verb. Keep that lexical

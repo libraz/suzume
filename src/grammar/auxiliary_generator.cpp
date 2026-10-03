@@ -5,6 +5,7 @@
 
 #include "auxiliary_generator.h"
 
+#include <algorithm>
 #include <iterator>
 #include <string_view>
 #include <utility>
@@ -27,7 +28,7 @@ enum class AuxiliaryFormFamily : uint8_t {
 };
 
 struct AuxiliaryBase {
-  std::string_view surface;
+  std::string_view base_form;
   VerbType conj_type;
   uint16_t required_conn;
   AuxiliaryFormFamily form_family = AuxiliaryFormFamily::Standard;
@@ -105,7 +106,7 @@ constexpr ConjSuffix kMasu[] = {
 // VERB(renyokei/onbinkei) + て(PARTICLE) win over a unified te-form.
 void appendWithStem(const AuxiliaryBase& base, const ConjSuffix* suffixes, size_t suffix_count,
                     std::vector<AuxiliaryEntry>& result) {
-  const std::string stem(utf8::dropLastChar(base.surface));
+  const std::string stem(utf8::dropLastChar(base.base_form));
   result.reserve(result.size() + suffix_count);
   for (size_t suffix_index = 0; suffix_index < suffix_count; ++suffix_index) {
     const ConjSuffix& suf = suffixes[suffix_index];
@@ -133,7 +134,7 @@ void appendGodanWithStem(const AuxiliaryBase& base, bool te_attach_only, bool fo
   const std::string onbin = onbinFormOf(row);
   const std::string ta_kana = row.voiced_ta ? "だ" : "た";
   const std::string te_kana = row.voiced_ta ? "で" : "て";
-  const std::string stem(utf8::dropLastChar(base.surface));
+  const std::string stem(utf8::dropLastChar(base.base_form));
 
   result.reserve(result.size() + (te_attach_only ? 4 : (include_negative ? 9 : 6)));
   result.push_back({stem + vowels.base, conn::kAuxOutBase, base.required_conn});
@@ -165,7 +166,7 @@ void appendFullForms(const AuxiliaryBase& base, const ConjSuffix* forms, size_t 
 
 // No conjugation - single form only
 void appendNoConjForm(const AuxiliaryBase& base, std::vector<AuxiliaryEntry>& result) {
-  result.push_back({std::string(base.surface), conn::kAuxOutBase, base.required_conn});
+  result.push_back({std::string(base.base_form), conn::kAuxOutBase, base.required_conn});
 }
 
 // Add special patterns that cannot be auto-generated
@@ -700,6 +701,13 @@ std::vector<AuxiliaryEntry> orderBySurfaceLength(std::vector<AuxiliaryEntry> ent
 }
 
 }  // namespace
+
+bool attachesToVerbRenyokei(std::string_view base_form) {
+  const auto& bases = auxiliaryBases();
+  return std::any_of(std::begin(bases), std::end(bases), [&](const AuxiliaryBase& base) {
+    return base.base_form == base_form && base.required_conn == conn::kVerbRenyokei;
+  });
+}
 
 std::vector<AuxiliaryEntry> generateAllAuxiliaries() {
   std::vector<AuxiliaryEntry> result;

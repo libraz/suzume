@@ -17,6 +17,7 @@
 #include "analysis/verb_candidates_kanji_internal.h"
 #include "core/debug.h"
 #include "core/utf8_constants.h"
+#include "grammar/auxiliary_generator.h"
 #include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
 #include "grammar/inflection_scorer_constants.h"
@@ -434,6 +435,18 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
       first_hiragana == U'や' && kanji_end + 1 < codepoints.size() && codepoints[kanji_end + 1] == U'す';
   const bool has_complete_particle_initial_verb = hasCompleteParticleInitialVerbEvidence(
       codepoints, start_pos, kanji_end, hiragana_end, inflection, dict_manager, verb_opts);
+  // A one-kanji ichidan stem takes an adjective that attaches to the
+  // continuative directly (見+にくい), whose opening mora also spells に.
+  bool has_renyokei_adjective_after_stem = false;
+  if (dict_manager != nullptr && kanji_end == start_pos + 1 && vh::isSingleKanjiIchidan(codepoints[start_pos])) {
+    for (size_t adjective_end = kanji_end + 2; adjective_end <= std::min(codepoints.size(), kanji_end + 4);
+         ++adjective_end) {
+      const auto* adjective =
+          lookupEntryInRange(*dict_manager, codepoints, kanji_end, adjective_end, core::PartOfSpeech::Adjective);
+      has_renyokei_adjective_after_stem = has_renyokei_adjective_after_stem ||
+                                          (adjective != nullptr && grammar::attachesToVerbRenyokei(adjective->lemma));
+    }
+  }
 
   // Historical-kana spelling of the wa-row Godan paradigm (思ふ, 思ひけり,
   // 思へど).  Its row kana は/へ are also the topic and direction particles, so
@@ -449,7 +462,7 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
       appendKuNominalizationCandidates(codepoints, start_pos, kanji_end, hiragana_end, dict_manager, candidates);
 
   if (normalize::isNeverVerbStemAfterKanji(first_hiragana) && !is_yasu_godan_shape && !has_excessive_renyokei_tail &&
-      !has_following_renyokei_auxiliary && !has_complete_particle_initial_verb) {
+      !has_following_renyokei_auxiliary && !has_complete_particle_initial_verb && !has_renyokei_adjective_after_stem) {
     // Exception 1: A-row hiragana followed by れべき may be mizenkei pattern
     // e.g., 泳がれべき = 泳が (mizenkei) + れべき (passive + classical obligation)
     // Exception 2: A-row hiragana followed by れ is godan passive renyokei
