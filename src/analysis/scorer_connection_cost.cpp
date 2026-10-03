@@ -330,7 +330,12 @@ float computeLateLexicalBoundaryBonus(const core::LatticeEdge& prev, const core:
       next.pos == core::PartOfSpeech::Particle &&
       (next.extended_pos == core::ExtendedPOS::ParticleCase || next.extended_pos == core::ExtendedPOS::ParticleTopic ||
        next.extended_pos == core::ExtendedPOS::ParticleNo);
-  if (colloquial_sa_row_boundary || generated_nominal_before_particle) {
+  // A formal noun built on a demonstrative (そのもの, このもの) is a complete noun
+  // phrase, which an adverb may follow like any other (そのもの+ずばり).
+  const bool demonstrative_formal_noun_before_adverb =
+      prev.extended_pos == core::ExtendedPOS::NounFormal && next.pos == core::PartOfSpeech::Adverb &&
+      utf8::startsWithAny(prev.surface, {"その", "この", "あの", "どの"});
+  if (colloquial_sa_row_boundary || generated_nominal_before_particle || demonstrative_formal_noun_before_adverb) {
     SUZUME_CONNECTION_ADD(bonus, cost::kStrongBonus);
   }
   if (next.pos == core::PartOfSpeech::Conjunction && prev.pos == core::PartOfSpeech::Noun &&
