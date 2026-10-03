@@ -789,6 +789,10 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
       // conjugation's (小さかり+し). Without these the one-mora surface is read
       // as the サ変 continuative it shares its spelling with.
       {EPOS::VerbRenyokei, EPOS::AuxClassicalKi, cost::kVeryStrongBonus},
+      // Voice auxiliaries conjugate like ichidan verbs and lend the same
+      // continuative (選ば+れ+し, 書か+せ+し).
+      {EPOS::AuxPassive, EPOS::AuxClassicalKi, cost::kVeryStrongBonus},
+      {EPOS::AuxCausative, EPOS::AuxClassicalKi, cost::kVeryStrongBonus},
       // The classical past auxiliary closes or modifies a clause; it cannot
       // directly introduce a new verb continuative. This keeps a sahen
       // continuative before a following classical predicate (記録+し+終へ)

@@ -124,6 +124,60 @@
       ],
       "id": "heta",
       "input": "終へた。"
+    },
+    {
+      "description": "classical past attributive し after the passive continuative",
+      "expected": [
+        {
+          "lemma": "選ぶ",
+          "pos": "Verb",
+          "surface": "選ば"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "者",
+          "pos": "Suffix",
+          "surface": "者"
+        }
+      ],
+      "id": "bareshi",
+      "input": "選ばれし者"
+    },
+    {
+      "description": "classical past attributive し after the causative continuative",
+      "expected": [
+        {
+          "lemma": "書く",
+          "pos": "Verb",
+          "surface": "書か"
+        },
+        {
+          "lemma": "せる",
+          "pos": "Auxiliary",
+          "surface": "せ"
+        },
+        {
+          "lemma": "き",
+          "pos": "Auxiliary",
+          "surface": "し"
+        },
+        {
+          "lemma": "文",
+          "pos": "Noun",
+          "surface": "文"
+        }
+      ],
+      "id": "kaseshi",
+      "input": "書かせし文"
     }
   ],
   "description": "verb_literary tests",
