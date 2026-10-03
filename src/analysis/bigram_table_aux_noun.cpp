@@ -841,6 +841,10 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       // na-adjective then takes its adverb reading in a predicate slot
       // (たいへん+だ).
       {EPOS::Adverb, EPOS::AuxTenseTa, cost::kSevere},
+      // Likewise ます selects a continuative and the aspect いる/おる a te-form;
+      // an adverb spelled like a te-form (至って, 決して) hosts neither.
+      {EPOS::Adverb, EPOS::AuxTenseMasu, cost::kSevere},
+      {EPOS::Adverb, EPOS::AuxAspectIru, cost::kSevere},
 
       // Noun → aspect auxiliary いる/くる (驚+い, 先生+き): aspect attaches only to a
       // te-form, never a bare noun (食べて+いた, 走って+きた). Prevents 間続+い+た and

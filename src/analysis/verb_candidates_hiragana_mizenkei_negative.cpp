@@ -306,6 +306,15 @@ void appendMizenkeiNegativeCandidates(const std::vector<char32_t>& codepoints, s
         vh::hasInternalVerbChainBoundary(codepoints, start_pos, mizenkei_end, inflection, dict_manager)) {
       continue;
     }
+    // Behind the connective て/で a registered aspect auxiliary owns the same
+    // cell (書いて+おら+ず), so the lexical verb reading is not offered there.
+    const auto* aspect_cell = dict_manager == nullptr ? nullptr
+                                                      : lookupEntryInRange(*dict_manager, codepoints, start_pos,
+                                                                           mizenkei_end, core::PartOfSpeech::Auxiliary);
+    if (aspect_cell != nullptr && aspect_cell->extended_pos == core::ExtendedPOS::AuxAspectIru && start_pos > 0 &&
+        (codepoints[start_pos - 1] == U'て' || codepoints[start_pos - 1] == U'で')) {
+      continue;
+    }
     SUZUME_DEBUG_VERBOSE_BLOCK {
       SUZUME_DEBUG_STREAM << "[VERB_CAND] " << mizenkei_surface << " hiragana_mizenkei_negative lemma=" << lemma
                           << " cost=" << cost_negative << "\n";

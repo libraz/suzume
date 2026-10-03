@@ -210,6 +210,10 @@ void appendGodanMizenkeiZuCandidates(const std::vector<char32_t>& codepoints, si
               }
             }
           }
+          // So does an auxiliary standing on an onbin stem (書い+て+おら+ず).
+          contains_internal_particle =
+              contains_internal_particle ||
+              vh::embedsAuxiliaryOnOnbinStem(codepoints, start_pos, negative_pos, dict_manager);
           // Verify via dictionary or inflection analysis of conjugated form
           const bool dictionary_verified =
               !contains_internal_particle && vh::isVerbInDictionary(dict_manager, base_form);

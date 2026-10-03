@@ -734,6 +734,7 @@ EntrySpecRange getAuxiliaryEntries() {
       // Add renyokei forms separately from following politeness auxiliaries.
       aux("おる", "おる", EPOS::AuxAspectIru),
       aux("おり", "おる", EPOS::AuxAspectIru),  // renyokei for おり+ます
+      aux("おら", "おる", EPOS::AuxAspectIru),  // mizenkei for おら+ず (gated on a preceding て/で)
       // Western-Japanese contractions of ておる / でおる. These retain the
       // progressive auxiliary's Godan-ra inflection after a verb stem or
       // onbin form (食べとる, 書いとった, 読んどらん).
