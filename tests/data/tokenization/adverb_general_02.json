@@ -2448,6 +2448,40 @@
       ],
       "id": "sunnari_ru",
       "input": "すんなり通る"
+    },
+    {
+      "description": "そのものずばり - regression test",
+      "expected": [
+        {
+          "lemma": "そのもの",
+          "pos": "Noun",
+          "surface": "そのもの"
+        },
+        {
+          "lemma": "ずばり",
+          "pos": "Adverb",
+          "surface": "ずばり"
+        }
+      ],
+      "id": "sonomonozubari",
+      "input": "そのものずばり"
+    },
+    {
+      "description": "ずばり言う - regression test",
+      "expected": [
+        {
+          "lemma": "ずばり",
+          "pos": "Adverb",
+          "surface": "ずばり"
+        },
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言う"
+        }
+      ],
+      "id": "zubari_u",
+      "input": "ずばり言う"
     }
   ],
   "description": "General adverbs (part 2/2)",
