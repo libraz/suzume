@@ -488,6 +488,19 @@ bool closedPredicateEndsAt(const dictionary::DictionaryManager* dict_manager, co
 bool opensOnClosedClassWordTail(const dictionary::DictionaryManager* dict_manager,
                                 const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos);
 
+/**
+ * @brief Whether a coined verb opens on the one-mora particle marking a kanji host.
+ *
+ * Behind a kanji host a one-mora particle marks that argument, so a coined
+ * verb opening on it loses to the same verb read after it whenever the
+ * remainder reconstructs at least as well (駅+で+しらべる, not でしらべる).
+ *
+ * @param own_confidence Best inflection confidence of the candidate span
+ */
+bool coinedVerbOpensOnArgumentParticle(const dictionary::DictionaryManager* dict_manager,
+                                       const grammar::Inflection& inflection, const std::vector<char32_t>& codepoints,
+                                       size_t start_pos, size_t end_pos, float own_confidence);
+
 // True when a fabricated verb candidate starts with an exact auxiliary entry
 // and absorbs that auxiliary's negative inflection (過ぎない → 過ぎ + ない).
 // The check is POS-based: lexical verbs with the same surface are unaffected.

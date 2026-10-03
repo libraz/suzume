@@ -195,6 +195,60 @@
       ],
       "id": "deshi_beru",
       "input": "公園でしゃべる"
+    },
+    {
+      "description": "図書館でしらべます - regression test",
+      "expected": [
+        {
+          "lemma": "図書館",
+          "pos": "Noun",
+          "surface": "図書館"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "しらべる",
+          "pos": "Verb",
+          "surface": "しらべ"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "deshirabemasu",
+      "input": "図書館でしらべます"
+    },
+    {
+      "description": "図書館でしらべた - regression test",
+      "expected": [
+        {
+          "lemma": "図書館",
+          "pos": "Noun",
+          "surface": "図書館"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "しらべる",
+          "pos": "Verb",
+          "surface": "しらべ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "deshirabeta",
+      "input": "図書館でしらべた"
     }
   ],
   "description": "verb_ichidan_hiragana tests",

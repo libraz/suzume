@@ -12,6 +12,7 @@
 #include "core/debug.h"
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
+#include "grammar/inflection.h"
 #include "normalize/char_type.h"
 #include "normalize/utf8.h"
 #include "verb_candidates_helpers.h"
@@ -613,6 +614,23 @@ bool closedPredicateEndsAt(const dictionary::DictionaryManager* dict_manager, co
     }
   }
   return false;
+}
+
+bool coinedVerbOpensOnArgumentParticle(const dictionary::DictionaryManager* dict_manager,
+                                       const grammar::Inflection& inflection, const std::vector<char32_t>& codepoints,
+                                       size_t start_pos, size_t end_pos, float own_confidence) {
+  constexpr size_t kMinSpan = 4;
+  if (dict_manager == nullptr || start_pos == 0 || end_pos < start_pos + kMinSpan ||
+      !normalize::isKanjiCodepoint(codepoints[start_pos - 1]) ||
+      lookupEntryInRange(*dict_manager, codepoints, start_pos, start_pos + 1, core::PartOfSpeech::Particle) ==
+          nullptr) {
+    return false;
+  }
+  float remainder_confidence{};
+  for (const auto& analysis : inflection.analyze(extractSubstring(codepoints, start_pos + 1, end_pos))) {
+    remainder_confidence = std::max(remainder_confidence, analysis.confidence);
+  }
+  return remainder_confidence >= own_confidence;
 }
 
 bool opensOnClosedClassWordTail(const dictionary::DictionaryManager* dict_manager,
