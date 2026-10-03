@@ -19,6 +19,8 @@ namespace suzume::analysis::hiragana_verb_detail {
 bool endsWithParticleAfterVerb(const dictionary::DictionaryManager* dict_manager, const grammar::Inflection& inflection,
                                const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos);
 
+// True when start_pos opens a predicate slot: text start, a symbol, or a particle.
+bool opensPredicateSlot(const std::vector<char32_t>& codepoints, size_t start_pos);
 bool pronounEndsAt(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
                    size_t pos);
 bool hasMatchingGodanInflection(const grammar::Inflection& inflection, std::string_view base_form,

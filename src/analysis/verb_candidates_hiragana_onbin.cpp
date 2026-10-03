@@ -32,6 +32,11 @@ constexpr char32_t kVerbEndingMora = U'る';
 // ろ is the ichidan imperative ending (食べろ) and likewise heads no root.
 constexpr char32_t kIchidanImperativeMora = U'ろ';
 
+bool opensPredicateSlot(const std::vector<char32_t>& codepoints, size_t start_pos) {
+  return start_pos == 0 || normalize::classifyChar(codepoints[start_pos - 1]) == normalize::CharType::Symbol ||
+         normalize::isExtendedParticle(codepoints[start_pos - 1]);
+}
+
 void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, size_t start_pos, size_t hiragana_end,
                                       const grammar::Inflection& inflection,
                                       const dictionary::DictionaryManager* dict_manager,
@@ -98,10 +103,7 @@ void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, s
            first_char == U'が' || first_char == U'は' || first_char == U'へ');
     }
 
-    // The stem opens a predicate slot: text start, a symbol, or a particle.
-    const bool has_left_predicate_boundary =
-        start_pos == 0 || normalize::classifyChar(codepoints[start_pos - 1]) == normalize::CharType::Symbol ||
-        normalize::isExtendedParticle(codepoints[start_pos - 1]);
+    const bool has_left_predicate_boundary = opensPredicateSlot(codepoints, start_pos);
     // A kanji on the left closes a nominal subject whose particle was dropped
     // (お腹+すい+た). The stem must then open a word: not on a particle
     // (海外+に+い+た) and not on づ/ぢ, which only continue a kanji verb

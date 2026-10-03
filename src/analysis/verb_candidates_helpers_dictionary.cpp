@@ -197,71 +197,61 @@ bool isCommaClauseChainingRenyokei(const std::vector<char32_t>& codepoints, size
   return start_pos >= 2 && codepoints[start_pos - 1] == U'も' && normalize::isCounterKanji(codepoints[start_pos - 2]);
 }
 
-bool startsInsideDictionaryParticle(const std::vector<char32_t>& codepoints, size_t start_pos,
-                                    const dictionary::DictionaryManager* dict_manager) {
+namespace {
+
+// True when a @p pos entry taken by @p accept opens within @p lookback before
+// start_pos and runs past it, ending at most @p probe after it.
+bool startsInsideDictionaryEntry(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                 const dictionary::DictionaryManager* dict_manager, size_t lookback, size_t probe,
+                                 core::PartOfSpeech pos, EntryAccept accept) {
   if (dict_manager == nullptr || start_pos == 0) {
     return false;
   }
-  constexpr size_t kParticleLookback = 4;
-  constexpr size_t kParticleProbe = 5;
-  size_t first_start = start_pos > kParticleLookback ? start_pos - kParticleLookback : 0;
-  size_t probe_end = std::min(codepoints.size(), start_pos + kParticleProbe);
-  for (size_t particle_start = first_start; particle_start < start_pos; ++particle_start) {
-    for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, particle_start, probe_end)) {
-      if (match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Particle &&
-          particle_start + normalize::utf8Length(match.entry->surface) > start_pos) {
+  const size_t first_start = start_pos > lookback ? start_pos - lookback : 0;
+  const size_t probe_end = std::min(codepoints.size(), start_pos + probe);
+  for (size_t entry_start = first_start; entry_start < start_pos; ++entry_start) {
+    for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, entry_start, probe_end)) {
+      if (match.entry != nullptr && match.entry->pos == pos && (accept == nullptr || accept(*match.entry)) &&
+          entry_start + normalize::utf8Length(match.entry->surface) > start_pos) {
         return true;
       }
     }
   }
   return false;
+}
+
+}  // namespace
+
+bool startsInsideDictionaryParticle(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                    const dictionary::DictionaryManager* dict_manager) {
+  constexpr size_t kParticleLookback = 4;
+  constexpr size_t kParticleProbe = 5;
+  return startsInsideDictionaryEntry(codepoints, start_pos, dict_manager, kParticleLookback, kParticleProbe,
+                                     core::PartOfSpeech::Particle, nullptr);
 }
 
 bool startsInsideDictionaryAuxiliary(const std::vector<char32_t>& codepoints, size_t start_pos,
                                      const dictionary::DictionaryManager* dict_manager) {
-  if (dict_manager == nullptr || start_pos == 0) {
-    return false;
-  }
   constexpr size_t kAuxiliaryLookback = 4;
   constexpr size_t kAuxiliaryProbe = 5;
-  const size_t first_start = start_pos > kAuxiliaryLookback ? start_pos - kAuxiliaryLookback : 0;
-  const size_t probe_end = std::min(codepoints.size(), start_pos + kAuxiliaryProbe);
-  for (size_t auxiliary_start = first_start; auxiliary_start < start_pos; ++auxiliary_start) {
-    // Only the terminal polite copula itself owns this interior.  Its
-    // inflected dictionary cells (でし/でしたら) can occur across an ordinary
-    // conjunctive-particle boundary, as in 読んでしまう.
-    if (hasDictionaryEntryFrom(
-            dict_manager, codepoints, auxiliary_start, start_pos + 1 - auxiliary_start, probe_end - auxiliary_start,
-            core::PartOfSpeech::Auxiliary,
-            [](const dictionary::DictionaryEntry& auxiliary) { return auxiliary.surface.compare("です") == 0; })) {
-      return true;
-    }
-  }
-  return false;
+  // Only the terminal polite copula itself owns this interior.  Its
+  // inflected dictionary cells (でし/でしたら) can occur across an ordinary
+  // conjunctive-particle boundary, as in 読んでしまう.
+  return startsInsideDictionaryEntry(
+      codepoints, start_pos, dict_manager, kAuxiliaryLookback, kAuxiliaryProbe, core::PartOfSpeech::Auxiliary,
+      [](const dictionary::DictionaryEntry& auxiliary) { return auxiliary.surface.compare("です") == 0; });
 }
 
 bool startsInsideDictionaryIAdjective(const std::vector<char32_t>& codepoints, size_t start_pos,
                                       const dictionary::DictionaryManager* dict_manager) {
-  if (dict_manager == nullptr || start_pos == 0) {
-    return false;
-  }
   constexpr size_t kAdjectiveLookback = 5;
   constexpr size_t kAdjectiveProbe = 2;
-  const size_t first_start = start_pos > kAdjectiveLookback ? start_pos - kAdjectiveLookback : 0;
-  const size_t probe_end = std::min(codepoints.size(), start_pos + kAdjectiveProbe);
-  for (size_t adjective_start = first_start; adjective_start < start_pos; ++adjective_start) {
-    for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, adjective_start, probe_end)) {
-      // Only the uninflected terminal form owns its interior. An inflected cell
-      // shares its stem with the te-form and the conditional, whose kana do open
-      // a following predicate (寒く+なる).
-      if (match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Adjective &&
-          utf8::endsWith(match.entry->surface, "い") &&
-          adjective_start + normalize::utf8Length(match.entry->surface) > start_pos) {
-        return true;
-      }
-    }
-  }
-  return false;
+  // Only the uninflected terminal form owns its interior. An inflected cell
+  // shares its stem with the te-form and the conditional, whose kana do open
+  // a following predicate (寒く+なる).
+  return startsInsideDictionaryEntry(
+      codepoints, start_pos, dict_manager, kAdjectiveLookback, kAdjectiveProbe, core::PartOfSpeech::Adjective,
+      [](const dictionary::DictionaryEntry& adjective) { return utf8::endsWith(adjective.surface, "い"); });
 }
 
 bool startsWithMultiMoraDictionaryParticle(const std::vector<char32_t>& codepoints, size_t start_pos,

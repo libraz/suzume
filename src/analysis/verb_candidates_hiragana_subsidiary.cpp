@@ -174,12 +174,9 @@ void appendYaruBenefactiveCandidates(const std::vector<char32_t>& codepoints, si
       !isClearTeFormBeforeSubsidiary(codepoints, start_pos, false)) {
     return;
   }
-  if (codepoints[start_pos + 1] == U'ら' && vh::naiNegativeFollowsAt(codepoints, start_pos + 2)) {
-    appendContextualSubsidiaryCandidate(codepoints, start_pos, start_pos + 2, "やる",
-                                        dictionary::ConjugationType::GodanRa, core::ExtendedPOS::AuxBenefactive,
-                                        "hiragana_yaru_benefactive", candidate::verb_cost::kStrongBonus, candidates);
-  }
-  if (codepoints[start_pos + 1] != U'り') {
+  const bool irrealis_before_negative =
+      codepoints[start_pos + 1] == U'ら' && vh::naiNegativeFollowsAt(codepoints, start_pos + 2);
+  if (!irrealis_before_negative && codepoints[start_pos + 1] != U'り') {
     return;
   }
   appendContextualSubsidiaryCandidate(codepoints, start_pos, start_pos + 2, "やる",

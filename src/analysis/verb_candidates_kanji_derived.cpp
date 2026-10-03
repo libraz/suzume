@@ -40,22 +40,15 @@ namespace {
  */
 bool classicalPredicateTailFollowsAt(const std::vector<char32_t>& codepoints, size_t pos,
                                      const dictionary::DictionaryManager* dict_manager) {
-  if (dict_manager == nullptr) {
-    return false;
-  }
-  const size_t probe_end = std::min(codepoints.size(), pos + 3);
-  for (size_t end = pos + 1; end <= probe_end; ++end) {
-    const std::string tail = extractSubstring(codepoints, pos, end);
-    const auto* auxiliary = dict_manager->lookupExact(tail, core::PartOfSpeech::Auxiliary);
-    if (auxiliary != nullptr && core::isClassicalAuxiliaryType(auxiliary->extended_pos)) {
-      return true;
-    }
-    const auto* particle = dict_manager->lookupExact(tail, core::PartOfSpeech::Particle);
-    if (particle != nullptr && particle->extended_pos == core::ExtendedPOS::ParticleConj) {
-      return true;
-    }
-  }
-  return false;
+  constexpr size_t kConjunctionProbe = 3;
+  return vh::auxiliaryFollowsAt(dict_manager, codepoints, pos,
+                                [](const dictionary::DictionaryEntry& auxiliary) {
+                                  return core::isClassicalAuxiliaryType(auxiliary.extended_pos);
+                                }) ||
+         hasDictionaryEntryFrom(dict_manager, codepoints, pos, 1, kConjunctionProbe, core::PartOfSpeech::Particle,
+                                [](const dictionary::DictionaryEntry& particle) {
+                                  return particle.extended_pos == core::ExtendedPOS::ParticleConj;
+                                });
 }
 
 bool hasAttestedInternalGodanConditional(const std::vector<char32_t>& codepoints, size_t start_pos, size_t kanji_end,

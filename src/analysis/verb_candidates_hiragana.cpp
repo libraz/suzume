@@ -65,21 +65,17 @@ bool startsPastAuxiliaryBeforeQuote(const std::vector<char32_t>& codepoints, siz
                                              core::PartOfSpeech::Auxiliary) != nullptr;
 }
 
+// Longest kana run the predicate-boundary gates below examine.
+constexpr size_t kPredicateRunMax = 12;
+
 size_t closedOnbinTenseEnd(const std::vector<char32_t>& codepoints, size_t start_pos,
                            const std::vector<normalize::CharType>& char_types, const grammar::Inflection& inflection,
                            const dictionary::DictionaryManager* dict_manager) {
-  const bool has_left_predicate_boundary =
-      start_pos == 0 || normalize::classifyChar(codepoints[start_pos - 1]) == normalize::CharType::Symbol ||
-      normalize::isExtendedParticle(codepoints[start_pos - 1]);
-  if (!has_left_predicate_boundary) {
+  if (!opensPredicateSlot(codepoints, start_pos)) {
     return 0;
   }
 
-  size_t end_pos = start_pos;
-  while (end_pos < char_types.size() && end_pos - start_pos < 12 &&
-         char_types[end_pos] == normalize::CharType::Hiragana) {
-    ++end_pos;
-  }
+  const size_t end_pos = findCharRegionEnd(char_types, start_pos, kPredicateRunMax, normalize::CharType::Hiragana);
   for (size_t onbin_pos = start_pos + 1; onbin_pos + 1 < end_pos; ++onbin_pos) {
     const char32_t onbin = codepoints[onbin_pos];
     const char32_t tense = codepoints[onbin_pos + 1];
@@ -122,18 +118,11 @@ size_t completeIndependentGodanWaTerminalEnd(const std::vector<char32_t>& codepo
                                              const std::vector<normalize::CharType>& char_types,
                                              const grammar::Inflection& inflection,
                                              const VerbCandidateOptions& verb_opts) {
-  const bool has_left_predicate_boundary =
-      start_pos == 0 || normalize::classifyChar(codepoints[start_pos - 1]) == normalize::CharType::Symbol ||
-      normalize::isExtendedParticle(codepoints[start_pos - 1]);
-  if (!has_left_predicate_boundary) {
+  if (!opensPredicateSlot(codepoints, start_pos)) {
     return 0;
   }
 
-  size_t end_pos = start_pos;
-  while (end_pos < char_types.size() && end_pos - start_pos < 12 &&
-         char_types[end_pos] == normalize::CharType::Hiragana) {
-    ++end_pos;
-  }
+  const size_t end_pos = findCharRegionEnd(char_types, start_pos, kPredicateRunMax, normalize::CharType::Hiragana);
   // A long, complete kana run has enough structure to distinguish a lexical
   // wa-row terminal from a short closed-class sequence.  Requiring the run to
   // end here also keeps this gate out of dependent verb/auxiliary chains.
@@ -179,11 +168,7 @@ size_t completeGodanTerminalAfterCaseParticle(const std::vector<char32_t>& codep
     return 0;
   }
 
-  size_t end_pos = start_pos;
-  while (end_pos < char_types.size() && end_pos - start_pos < 12 &&
-         char_types[end_pos] == normalize::CharType::Hiragana) {
-    ++end_pos;
-  }
+  const size_t end_pos = findCharRegionEnd(char_types, start_pos, kPredicateRunMax, normalize::CharType::Hiragana);
   if (end_pos - start_pos < 3) {
     return 0;
   }
