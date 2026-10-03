@@ -240,6 +240,9 @@ float computeSugiFinalParticleBonus(const core::LatticeEdge& prev, const core::L
   //   negative is the predicate;
   // - the voiced past だ stands only on an onbin stem (読ん+だ); after an
   //   untyped run it is the copula (食べ+て+た+ん+だ, not てたん+だ(past)).
+  // - か right after an interrogative pronoun is the indefinite particle
+  //   (何+か+って), not a one-mora onbin cell (何+かっ+て); a longer verb
+  //   stays (いくら+かかる).
   const bool onbin_before_deru = prev.extended_pos == core::ExtendedPOS::VerbOnbinkei &&
                                  utf8::endsWith(prev.surface, "ん") && next.pos == core::PartOfSpeech::Verb &&
                                  next.surface == "でる";
@@ -251,7 +254,12 @@ float computeSugiFinalParticleBonus(const core::LatticeEdge& prev, const core::L
       next.extended_pos == core::ExtendedPOS::ParticleFinal && utf8::equalsAny(next.surface, {"ねえ", "ねぇ", "ねー"});
   const bool voiced_past_off_onbin = next.extended_pos == core::ExtendedPOS::AuxTenseTa &&
                                      utf8::startsWith(next.surface, "だ") && prev.pos == core::PartOfSpeech::Other;
-  if (onbin_before_deru || deru_before_completion || ku_adverb_before_negative_homograph || voiced_past_off_onbin) {
+  const bool interrogative_before_ka_verb = prev.extended_pos == core::ExtendedPOS::PronounInterrogative &&
+                                            next.extended_pos == core::ExtendedPOS::VerbOnbinkei &&
+                                            next.surface.size() == 2 * core::kJapaneseCharBytes &&
+                                            utf8::startsWith(next.surface, "か");
+  if (onbin_before_deru || deru_before_completion || ku_adverb_before_negative_homograph || voiced_past_off_onbin ||
+      interrogative_before_ka_verb) {
     SUZUME_CONNECTION_ADD(bonus, cost::kStrong);
   }
 
