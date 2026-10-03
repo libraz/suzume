@@ -494,6 +494,10 @@ void generateSelectedNominalHeadCandidates(const std::vector<char32_t>& codepoin
       isNominalBoundaryParticle(*head_initial_particle)) {
     return;
   }
+  // No word opens on a small kana (な+ったん of なった+ん).
+  if (kana::isSmallKanaCodepoint(codepoints[start_pos])) {
+    return;
+  }
   for (size_t length = 2; length <= kMaximumSelectedHeadLength; ++length) {
     const size_t head_end = start_pos + length;
     // A geminate mora needs the consonant after it, so no nominal closes on っ

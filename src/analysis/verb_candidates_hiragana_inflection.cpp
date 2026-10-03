@@ -483,6 +483,27 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
       SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << surface << "\" opens on a closed-class word tail\n");
       continue;
     }
+    // Behind a kanji host a one-mora particle marks that argument, so a coined
+    // verb opening on it loses to the same verb read after it whenever the
+    // remainder reconstructs at least as well (駅+で+しらべる, not でしらべる).
+    if (!is_dictionary_verb && follows_kanji && dict_manager != nullptr && end_pos >= start_pos + 4) {
+      const auto* head =
+          lookupEntryInRange(*dict_manager, codepoints, start_pos, start_pos + 1, core::PartOfSpeech::Particle);
+      if (head != nullptr) {
+        const auto max_confidence = [](const auto& analyses) {
+          float confidence{};
+          for (const auto& analysis : analyses) {
+            confidence = std::max(confidence, analysis.confidence);
+          }
+          return confidence;
+        };
+        const auto& remainder = inflection.analyze(extractSubstring(codepoints, start_pos + 1, end_pos));
+        if (max_confidence(remainder) >= max_confidence(all_candidates)) {
+          SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << surface << "\" opens on a case particle\n");
+          continue;
+        }
+      }
+    }
 
     // Nor may a two-mora hypothesis — the shortest base the tables endorse, and
     // the one carrying the least evidence — start one mora inside a registered

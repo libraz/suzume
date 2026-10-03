@@ -625,15 +625,40 @@ bool opensOnClosedClassWordTail(const dictionary::DictionaryManager* dict_manage
     }
     return false;
   };
+  auto is_closed_class_word = [&](size_t word_start, size_t word_end) {
+    const std::string word = extractSubstring(codepoints, word_start, word_end);
+    return dict_manager->lookupExact(word, core::PartOfSpeech::Auxiliary) != nullptr ||
+           dict_manager->lookupExact(word, core::PartOfSpeech::Particle) != nullptr;
+  };
+  // The closed word only claims its morae when what it needs comes after it
+  // (でしょ+う, でし+た); でし before ら is no copula (駅で+しらべる).
+  auto continuation_follows = [&](size_t word_end) {
+    for (size_t follow_end = word_end + 1; follow_end <= std::min(codepoints.size(), word_end + 3); ++follow_end) {
+      if (lookupEntryInRange(*dict_manager, codepoints, word_end, follow_end, core::PartOfSpeech::Auxiliary) !=
+              nullptr ||
+          lookupEntryInRange(*dict_manager, codepoints, word_end, follow_end, core::PartOfSpeech::Particle) !=
+              nullptr) {
+        return true;
+      }
+    }
+    return false;
+  };
   for (size_t word_start = scan_start; word_start < start_pos; ++word_start) {
+    // A span covered by the tail of a closed word and the closed word after it
+    // (しょ of でしょ, then う) is those words whatever closes the left context.
+    for (size_t word_end = start_pos + 1; word_end <= end_pos && word_end - word_start <= kMaxClosedClassLen;
+         ++word_end) {
+      if (is_closed_class_word(word_start, word_end) &&
+          (word_end == end_pos || is_closed_class_word(word_end, end_pos))) {
+        return true;
+      }
+    }
     if (opens_inside_closed_word(word_start)) {
       continue;
     }
     const size_t max_end = std::min(end_pos - 1, word_start + kMaxClosedClassLen);
     for (size_t word_end = start_pos + 1; word_end <= max_end; ++word_end) {
-      const std::string word = extractSubstring(codepoints, word_start, word_end);
-      if (dict_manager->lookupExact(word, core::PartOfSpeech::Auxiliary) != nullptr ||
-          dict_manager->lookupExact(word, core::PartOfSpeech::Particle) != nullptr) {
+      if (is_closed_class_word(word_start, word_end) && continuation_follows(word_end)) {
         return true;
       }
     }
