@@ -474,8 +474,10 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
         auto hatsuonbin_match = vh::firstGodanOnbinDictBase(dict_manager, kanji_stem, "ん");
         grammar::VerbType matched_verb_type = hatsuonbin_match.verb_type;
         std::string matched_base_form = std::move(hatsuonbin_match.base_form);
-        // Inflection analysis fallback (dictionary lookup above found nothing)
-        if (matched_verb_type == grammar::VerbType::Unknown) {
+        // Inflection analysis fallback (dictionary lookup above found nothing).
+        // A stem the dictionary attests as Godan-ra is the る→ん contraction
+        // (帰+ん+だ), not a nasal onbin of an unattested 帰む.
+        if (matched_verb_type == grammar::VerbType::Unknown && !vh::attestsGodanRaIrrealis(dict_manager, kanji_stem)) {
           std::string full_surface = extractSubstring(codepoints, start_pos, hiragana_end);
           OnbinInflMatch infl = bestOnbinInflMatch(inflection, full_surface, kanji_stem, hatsuonbin_types);
           if (infl.type != grammar::VerbType::Unknown) {
@@ -560,8 +562,12 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
             return analysis.base_form == lexical_stem && analysis.verb_type != grammar::VerbType::Unknown &&
                    analysis.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence;
           });
-      const bool explanatory_n_da =
-          followed_by_de_da && codepoints[n_pos + 1] == U'だ' && (exact_predicate || analyzed_complete_predicate);
+      // Before the reason で only a modern terminal (行く, 遅い) closes the
+      // predicate; a classical-looking stem (楽し, 苦し) is the onbin's own.
+      const char32_t stem_last = codepoints[n_pos - 1];
+      const bool modern_terminal = grammar::isModernGodanTerminalKana(stem_last) || stem_last == U'い';
+      const bool explanatory_n_da = followed_by_de_da && (codepoints[n_pos + 1] == U'だ' || modern_terminal) &&
+                                    (exact_predicate || analyzed_complete_predicate);
       if (explanatory_n_da) {
         break;
       }

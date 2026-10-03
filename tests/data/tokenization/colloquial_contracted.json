@@ -1042,6 +1042,112 @@
       ],
       "id": "tetandakedo",
       "input": "見てたんだけど"
+    },
+    {
+      "description": "明日行くんで休みます - regression test",
+      "expected": [
+        {
+          "lemma": "明日",
+          "pos": "Noun",
+          "surface": "明日"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行く"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "休む",
+          "pos": "Verb",
+          "surface": "休み"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "kunde_mimasu",
+      "input": "明日行くんで休みます"
+    },
+    {
+      "description": "今日は遅いんで帰ります - regression test",
+      "expected": [
+        {
+          "lemma": "今日",
+          "pos": "Noun",
+          "surface": "今日"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "遅い",
+          "pos": "Adjective",
+          "surface": "遅い"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "帰る",
+          "pos": "Verb",
+          "surface": "帰り"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "ha_inde_rimasu",
+      "input": "今日は遅いんで帰ります"
+    },
+    {
+      "description": "もう帰んだ - regression test",
+      "expected": [
+        {
+          "lemma": "もう",
+          "pos": "Adverb",
+          "surface": "もう"
+        },
+        {
+          "lemma": "帰る",
+          "pos": "Verb",
+          "surface": "帰"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "mou_nda",
+      "input": "もう帰んだ"
     }
   ],
   "description": "colloquial_contracted tests",

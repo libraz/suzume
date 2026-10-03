@@ -128,6 +128,15 @@ bool isProductiveShiiAdjectiveTerminal(std::string_view surface, const grammar::
 bool isNounInDictionary(const dictionary::DictionaryManager* dict_manager, std::string_view surface);
 
 /**
+ * @brief Whether the dictionary attests @p stem as a Godan-ra verb via its ら irrealis.
+ *
+ * A bare kanji stem is also an Ichidan stem (見る) or a nasal-onbin stem (読む);
+ * only a registered stem+ら whose lemma is stem+る proves the Godan-ra row that
+ * the colloquial る→ん contraction needs (帰ん+ない, 帰+ん+だ).
+ */
+bool attestsGodanRaIrrealis(const dictionary::DictionaryManager* dict_manager, std::string_view stem);
+
+/**
  * @brief Check if a surface exists in dictionary as a noun or adjective (exact match)
  *
  * Reports a hit only for an entry whose surface equals @p surface (see

@@ -298,30 +298,35 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
     const bool negative_follows = vh::naiNegativeFollowsAt(codepoints, n_pos + 1);
     const bool terminal_follows =
         !negative_follows && (codepoints[n_pos + 1] == U'な' || codepoints[n_pos + 1] == U'の');
-    if (codepoints[n_pos] != U'ん' || (!negative_follows && !terminal_follows)) {
+    // Before the copula and the reason で the ん is the nominalizer standing
+    // for のだ/ので, so the contracted terminal ends at the stem (帰+ん+だ).
+    const bool nominalizer_follows = codepoints[n_pos + 1] == U'だ' || codepoints[n_pos + 1] == U'で';
+    if (codepoints[n_pos] != U'ん' || (!negative_follows && !terminal_follows && !nominalizer_follows)) {
       continue;
     }
     const std::string stem = extractSubstring(codepoints, start_pos, n_pos);
     // A stem closed by the te-form is the contracted aspect (見て+ん+の), not a verb.
-    if (terminal_follows && (codepoints[n_pos - 1] == U'て' || codepoints[n_pos - 1] == U'で')) {
+    if ((terminal_follows || nominalizer_follows) &&
+        (codepoints[n_pos - 1] == U'て' || codepoints[n_pos - 1] == U'で')) {
       continue;
     }
     const std::string base_form = stem + "る";
     // A bare kanji stem is also an Ichidan stem (見る, 着る); only an attested
     // ら irrealis proves the Godan-ra row the contraction needs (帰ん+ない).
-    if (n_pos == kanji_end) {
-      const auto* irrealis =
-          dict_manager == nullptr ? nullptr : dict_manager->lookupExact(stem + "ら", core::PartOfSpeech::Verb);
-      if (irrealis == nullptr || irrealis->lemma != base_form) {
-        continue;
-      }
+    if (n_pos == kanji_end && !vh::attestsGodanRaIrrealis(dict_manager, stem)) {
+      continue;
+    }
+    // A kana okurigana before the nominalizer is a complete predicate of its
+    // own (行く+ん+で), which the explanatory path handles.
+    if (nominalizer_follows && n_pos != kanji_end) {
+      continue;
     }
     if (!vh::isVerifiedVerbBase(dict_manager, inflection, base_form,
                                 candidate::verb_cost::kConstructedVerbMinConfidence, true)) {
       continue;
     }
     candidates.push_back(makeVerbCandidate(
-        codepoints, start_pos, n_pos + 1, candidate::verb_cost::kStandardBonus, base_form,
+        codepoints, start_pos, nominalizer_follows ? n_pos : n_pos + 1, candidate::verb_cost::kStandardBonus, base_form,
         dictionary::ConjugationType::GodanRa, true, CandidateOrigin::VerbKanji, candidate::kVerifiedConfidence,
         negative_follows ? "kanji_n_onbin_nai" : "kanji_n_contracted_terminal",
         negative_follows ? core::ExtendedPOS::VerbMizenkei : core::ExtendedPOS::VerbShuushikei));

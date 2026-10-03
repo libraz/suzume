@@ -58,6 +58,15 @@ bool isNounInDictionary(const dictionary::DictionaryManager* dict_manager, std::
   return hasDictionaryEntry(dict_manager, surface, core::PartOfSpeech::Noun);
 }
 
+bool attestsGodanRaIrrealis(const dictionary::DictionaryManager* dict_manager, std::string_view stem) {
+  if (dict_manager == nullptr) {
+    return false;
+  }
+  const std::string stem_text(stem);
+  const auto* irrealis = dict_manager->lookupExact(stem_text + "ら", core::PartOfSpeech::Verb);
+  return irrealis != nullptr && irrealis->lemma == stem_text + "る";
+}
+
 bool isNounOrAdjectiveInDictionary(const dictionary::DictionaryManager* dict_manager, std::string_view surface) {
   return hasDictionaryEntry(dict_manager, surface, core::PartOfSpeech::Noun) ||
          hasDictionaryEntry(dict_manager, surface, core::PartOfSpeech::Adjective);
