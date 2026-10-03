@@ -378,6 +378,9 @@ def postprocess_productive_search_unit_boundaries(tokens: list[dict]) -> bool:
             token.get("pos") == "Noun"
             and idx > 0
             and tokens[idx - 1].get("pos") == "Prefix"
+            # ご prefixes a Sino-Japanese verbal noun (ご+あんない+し), which
+            # is not a native continuative even when it ends in i/e.
+            and tokens[idx - 1].get("surface") != "ご"
             and idx + 1 < len(tokens)
             and tokens[idx + 1].get("surface") == "し"
         ):

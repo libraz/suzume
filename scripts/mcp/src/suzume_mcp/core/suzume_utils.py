@@ -10,6 +10,7 @@ from .merge_rules import apply_suzume_merge
 from .pos_mapping import correct_mecab_pos, map_mecab_pos, normalize_pos
 from .postprocessors import (
     merge_conjunction_with_rashii,
+    merge_honorific_kana_verbal_noun,
     postprocess_mecab_tokens,
     postprocessor_rules,
     preprocess_for_mecab,
@@ -233,6 +234,7 @@ def get_expected_tokens(text: str, suzume_tokens: list[dict] | None = None) -> t
     repair_adjective_yo_quotative(raw_tokens)
     repair_mimetic_n_to_suru(raw_tokens)
     split_demonstrative_dake(raw_tokens)
+    merge_honorific_kana_verbal_noun(raw_tokens)
     _merge_ideographic_variation_selectors(raw_tokens)
 
     # Fix MeCab POS errors (before POS mapping)

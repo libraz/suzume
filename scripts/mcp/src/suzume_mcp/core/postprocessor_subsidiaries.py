@@ -303,9 +303,11 @@ def postprocess_honorific_request(tokens: list[dict]) -> bool:
             and tokens[idx + 2].get("pos") in ("Verb", "Auxiliary")
             and tokens[idx + 2].get("lemma") == "なる"
         )
+        # Only お takes a native continuative; ご takes a Sino-Japanese verbal
+        # noun even when its kana spelling ends in i/e (ご+あんない+いたし).
         if (
             prefix.get("pos") == "Prefix"
-            and prefix.get("surface") in ("お", "ご")
+            and prefix.get("surface") == "お"
             and stem.get("pos") in ("Noun", "Suffix")
             and surface
             and (is_direct_honorific_continuation or is_honorific_naru)

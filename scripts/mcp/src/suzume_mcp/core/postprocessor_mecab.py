@@ -1020,6 +1020,45 @@ def repair_kamo_quotative(tokens: list[dict]) -> None:
             ]
 
 
+def merge_honorific_kana_verbal_noun(tokens: list[dict]) -> None:
+    """Rebuild ご + a fragmented kana verbal noun + する as one noun + する.
+
+    The reference cuts the kana spelling of a Sino-Japanese verbal noun into
+    kanji-readable pieces after the prefix ご (ご+れん+らく+し, ご+あん+ない+
+    し(助詞)), while it keeps ご+あんしん whole; the run between ご and する (or
+    its humble いたす) in any cell is one noun.
+    """
+
+    def closes_frame(position: int) -> bool:
+        token = tokens[position]
+        if token.get("pos") == "動詞" and token.get("lemma") in ("する", "いたす"):
+            return True
+        return (
+            token.get("surface") == "し" and position + 1 < len(tokens) and tokens[position + 1].get("pos") == "助動詞"
+        )
+
+    idx = 0
+    while idx < len(tokens) - 3:
+        if tokens[idx].get("surface") != "ご" or tokens[idx].get("pos") != "接頭詞":
+            idx += 1
+            continue
+        end = idx + 1
+        while end < len(tokens) and regex.fullmatch(r"\p{Hiragana}+", tokens[end].get("surface", "")):
+            if closes_frame(end):
+                break
+            end += 1
+        if end - idx - 1 >= 2 and end < len(tokens) and closes_frame(end):
+            noun = "".join(token.get("surface", "") for token in tokens[idx + 1 : end])
+            verb = tokens[end]
+            if verb.get("pos") != "動詞":
+                verb = {"surface": "し", "pos": "動詞", "pos_sub1": "自立", "lemma": "する"}
+            tokens[idx + 1 : end + 1] = [
+                {"surface": noun, "pos": "名詞", "pos_sub1": "サ変接続", "lemma": noun},
+                verb,
+            ]
+        idx += 1
+
+
 def split_demonstrative_dake(tokens: list[dict]) -> None:
     """Split the reference's adverb これだけ/それだけ into pronoun + だけ.
 
