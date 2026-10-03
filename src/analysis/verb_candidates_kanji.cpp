@@ -551,9 +551,9 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
   // verb generator to absorb; retaining that fallback only fabricates verbs
   // such as 遠すぎる→遠る. The left token's lexical POS remains independent.
   if (is_sugi_pattern && kanji_end == sugi_pos) {
-    if (mid_compound_penalty != 0) {
-      for (auto& cand : candidates) {
-        cand.cost += mid_compound_penalty;
+    if (mid_compound_penalty != 0.0F) {
+      for (size_t idx = candidate_start; idx < candidates.size(); ++idx) {
+        candidates[idx].cost += mid_compound_penalty;
       }
     }
     return;
@@ -642,8 +642,8 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
     // Early return to skip generating full verb forms containing すぎ
     // Prefer the grammatical renyokei + すぎ + auxiliary path.
     if (mid_compound_penalty != 0.0F) {
-      for (auto& cand : candidates) {
-        cand.cost += mid_compound_penalty;
+      for (size_t idx = candidate_start; idx < candidates.size(); ++idx) {
+        candidates[idx].cost += mid_compound_penalty;
       }
     }
     return;
