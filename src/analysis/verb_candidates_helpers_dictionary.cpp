@@ -41,6 +41,22 @@ bool isAdjectiveInDictionary(const dictionary::DictionaryManager* dict_manager, 
   return hasDictionaryEntry(dict_manager, extractSubstring(codepoints, start, end), core::PartOfSpeech::Adjective);
 }
 
+bool namesDictionaryVerbContinuative(const dictionary::DictionaryManager* dict_manager,
+                                     const std::vector<char32_t>& codepoints, size_t okurigana_pos) {
+  if (dict_manager == nullptr || okurigana_pos == 0 || okurigana_pos >= codepoints.size()) {
+    return false;
+  }
+  const std::string stem = extractSubstring(codepoints, okurigana_pos - 1, okurigana_pos);
+  const char32_t okurigana = codepoints[okurigana_pos];
+  const std::string_view godan_ending = grammar::godanBaseSuffixFromIRow(okurigana);
+  if (!godan_ending.empty() && isVerbInDictionary(dict_manager, normalize::concat(stem, godan_ending))) {
+    return true;
+  }
+  return grammar::isMonogradeStemFinalKana(okurigana) &&
+         isVerbInDictionary(dict_manager,
+                            stem + normalize::encodeUtf8(okurigana) + normalize::encodeUtf8(core::hiragana::kRu));
+}
+
 bool isProductiveShiiAdjectiveTerminal(std::string_view surface, const grammar::Inflection& inflection) {
   // A productive formation needs a stem in front of the suffix: bare しい is
   // the classical しかり paradigm's own shape (しかるべく, しかれども), not an

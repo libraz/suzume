@@ -108,6 +108,19 @@ bool isAdjectiveInDictionary(const dictionary::DictionaryManager* dict_manager, 
                              size_t start, size_t end);
 
 /**
+ * @brief Whether the kanji before @p okurigana_pos plus the okurigana there is
+ * the continuative of a dictionary verb
+ *
+ * Both live paradigms are inverted by rule: a godan continuative replaces the
+ * dictionary form's u-row mora with the i-row one (書き → 書く), and an ichidan
+ * continuative is the dictionary form without its る (上げ → 上げる,
+ * 落ち → 落ちる). The ichidan reading needs a monograde stem-final kana, so a
+ * godan okurigana mora (分+か of 分かる) is not read as a continuative.
+ */
+bool namesDictionaryVerbContinuative(const dictionary::DictionaryManager* dict_manager,
+                                     const std::vector<char32_t>& codepoints, size_t okurigana_pos);
+
+/**
  * @brief Check if a terminal is a productively formed -しい i-adjective
  *
  * The inflection analyzer can reinterpret the same bytes as the continuative of

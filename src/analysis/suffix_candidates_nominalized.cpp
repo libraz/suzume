@@ -134,27 +134,6 @@ bool isGenitiveClauseFinalNominal(const std::vector<char32_t>& codepoints,
   return false;
 }
 
-// Whether the kanji immediately before @p okurigana_pos, taken together with
-// the single okurigana there, spells the continuative of a verb the dictionary
-// knows. Both live paradigms are inverted by rule rather than listed: a godan
-// continuative replaces the dictionary form's u-row mora with the i-row one
-// (書き → 書く), and an ichidan continuative is the dictionary form without its
-// る (上げ → 上げる, 落ち → 落ちる). Trying both is what lets the same test cover
-// an e-row okurigana, which only an ichidan verb can end on.
-bool namesDictionaryVerbContinuative(const dictionary::DictionaryManager* dict_manager,
-                                     const std::vector<char32_t>& codepoints, size_t okurigana_pos) {
-  if (dict_manager == nullptr || okurigana_pos == 0 || okurigana_pos >= codepoints.size()) {
-    return false;
-  }
-  const std::string stem = extractSubstring(codepoints, okurigana_pos - 1, okurigana_pos);
-  const std::string_view godan_ending = grammar::godanBaseSuffixFromIRow(codepoints[okurigana_pos]);
-  if (!godan_ending.empty() && verb_helpers::isVerbInDictionary(dict_manager, normalize::concat(stem, godan_ending))) {
-    return true;
-  }
-  return verb_helpers::isVerbInDictionary(dict_manager, stem + normalize::encodeUtf8(codepoints[okurigana_pos]) +
-                                                            normalize::encodeUtf8(core::hiragana::kRu));
-}
-
 // The light verb opens either on its continuative し before an auxiliary of its
 // own paradigm, or on its dictionary form. Both cells take a nominal host.
 bool startsLightVerb(const std::vector<char32_t>& codepoints, size_t pos) {
@@ -217,7 +196,7 @@ bool hasClosedSuffixBoundary(const std::vector<char32_t>& codepoints, size_t sta
     return false;
   }
   const bool ends_in_verb_continuative =
-      end_pos > start_pos + 1 && namesDictionaryVerbContinuative(dict_manager, codepoints, end_pos - 1);
+      end_pos > start_pos + 1 && verb_helpers::namesDictionaryVerbContinuative(dict_manager, codepoints, end_pos - 1);
   for (size_t split = start_pos + 1; split < end_pos; ++split) {
     const std::string suffix = extractSubstring(codepoints, split, end_pos);
     if (dict_manager->lookupExact(suffix, core::PartOfSpeech::Suffix) != nullptr) {
@@ -549,7 +528,7 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
           first_hiragana == U'み' &&
           hasClauseFinalParticleContinuation(codepoints, char_types, kanji_end + 1, dict_manager);
       const bool has_hiragana_noun_continuation =
-          namesDictionaryVerbContinuative(dict_manager, codepoints, kanji_end) &&
+          verb_helpers::namesDictionaryVerbContinuative(dict_manager, codepoints, kanji_end) &&
           hasParticleFinalHiraganaNounContinuation(codepoints, char_types, kanji_end + 1, dict_manager);
       // The honorific construction お+連用形名詞+いただく keeps the deverbal
       // search unit intact (お目通し+いただければ).  Its prefix and receptive
@@ -571,7 +550,7 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
       // but one host kanji (顔見知り, 手書き). A longer nominal prefix keeps its
       // boundary and returned above (総合|見直し, 翌月|払い).
       const bool is_deverbal_compound =
-          (kanji_count == 2 && namesDictionaryVerbContinuative(dict_manager, codepoints, kanji_end)) ||
+          (kanji_count == 2 && verb_helpers::namesDictionaryVerbContinuative(dict_manager, codepoints, kanji_end)) ||
           (kanji_count >= 3 && (following_verb_start == start_pos + 1 || following_verb_start == start_pos));
       // The compound and the [noun] + [continuative] split of the same run are
       // told apart by what selects them, so the reading holds wherever a

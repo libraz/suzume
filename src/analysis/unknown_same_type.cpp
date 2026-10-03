@@ -293,14 +293,7 @@ bool startsAtDictionaryVerbContinuative(const std::vector<char32_t>& codepoints,
       char_types[start_pos - 1] != normalize::CharType::Kanji) {
     return false;
   }
-  const std::string kanji = extractSubstring(codepoints, start_pos - 1, start_pos);
-  const std::string_view godan_ending = grammar::godanBaseSuffixFromIRow(codepoints[start_pos]);
-  if (!godan_ending.empty() && verb_helpers::isVerbInDictionary(dict_manager, normalize::concat(kanji, godan_ending))) {
-    return true;
-  }
-  return grammar::isERowCodepoint(codepoints[start_pos]) &&
-         verb_helpers::isVerbInDictionary(dict_manager, kanji + normalize::encodeUtf8(codepoints[start_pos]) +
-                                                            normalize::encodeUtf8(core::hiragana::kRu));
+  return verb_helpers::namesDictionaryVerbContinuative(dict_manager, codepoints, start_pos);
 }
 
 // A same-type run may begin at the final okurigana of a dictionary terminal
