@@ -16,7 +16,7 @@ from .constants import (
     USER_DICT_COMPOUNDS,
 )
 from .core_lexicon import core_headwords
-from .mecab import is_single_token_of_pos, mecab_analyze
+from .mecab import mecab_analyze
 
 # A plain 名詞-一般 host for re-reading a copula span. It carries no reading
 # that could fuse with what follows, so whatever the probe returns after it is
@@ -517,30 +517,23 @@ def apply_suzume_split(tokens: list[dict]) -> tuple[list[dict], str | None]:
                 applied_rule = "sahen-desiderative-boundary"
             continue
 
-        # ます is an auxiliary, so it is never part of a particle. A compound
-        # particle lexicalized together with its polite form (に関しまして,
-        # に際しまして) hides the auxiliary boundary that the plain form
-        # (に関し, に際し) keeps, which makes the same closed unit tokenize two
-        # different ways depending only on politeness.
-        #
-        # Stripping the politeness does not by itself make the head a particle.
-        # A case particle followed by an autonomous continuative (をもち, にたいし,
-        # をつうじ) is a productive chain, and the morpheme boundaries inside it
-        # stay — only a head the reference dictionary reads as one particle is a
-        # closed unit. The plain polite form is the transparent spelling of the
-        # same chain, so re-reading the head with ます restored recovers the
-        # continuative that the lexicalized entry hid.
+        # ます is an auxiliary, so it is never part of a particle, and it selects
+        # a continuative. A compound particle lexicalized together with its polite
+        # form (に関しまして, に際しまして) therefore spells the case particle plus
+        # the verb continuative plus ます; re-reading the head with ます restored
+        # recovers that continuative (に+関し+まし+て).
         if t.get("pos") == "助詞" and surface.endswith("まして") and len(surface) > 3:
             head = surface[:-3]
             head_tokens = [{"surface": head, "pos": "助詞", "lemma": head}]
-            if not is_single_token_of_pos(head, "助詞"):
-                polite = mecab_analyze(head + "ます")
-                if (
-                    len(polite) > 1
-                    and polite[-1].get("surface") == "ます"
-                    and "".join(part.get("surface", "") for part in polite) == head + "ます"
-                ):
-                    head_tokens = [dict(part) for part in polite[:-1]]
+            # ます selects a continuative, so even a head the dictionary lists as
+            # one particle (に関し) is the case particle plus the verb here.
+            polite = mecab_analyze(head + "ます")
+            if (
+                len(polite) > 1
+                and polite[-1].get("surface") == "ます"
+                and "".join(part.get("surface", "") for part in polite) == head + "ます"
+            ):
+                head_tokens = [dict(part) for part in polite[:-1]]
             result.extend(
                 [
                     *head_tokens,
@@ -648,13 +641,14 @@ def apply_suzume_split(tokens: list[dict]) -> tuple[list[dict], str | None]:
             base_tokens = _reanalyze_exact(causative_base) if causative_base is not None else None
             if base_tokens is not None and len(base_tokens) == 1 and base_tokens[0].get("pos") == "動詞":
                 result.append({"surface": causative_stem, "pos": "動詞", "lemma": causative_base})
-                result.append(
-                    {
-                        "surface": causative_tail,
-                        "pos": "助動詞",
-                        "lemma": _CAUSATIVE_TAIL_LEMMAS.get(causative_tail, _CAUSATIVE_SU),
-                    }
+                # Before ば the e-row cell is the hypothetical of す itself (飛ば+せ+ば);
+                # せる's hypothetical is せれ.
+                tail_lemma = (
+                    _CAUSATIVE_SU
+                    if productive_causative_conditional
+                    else _CAUSATIVE_TAIL_LEMMAS.get(causative_tail, _CAUSATIVE_SU)
                 )
+                result.append({"surface": causative_tail, "pos": "助動詞", "lemma": tail_lemma})
                 if applied_rule is None:
                     applied_rule = "productive-causative-su-boundary"
                 continue

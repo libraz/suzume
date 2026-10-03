@@ -327,9 +327,14 @@
           "surface": "確認"
         },
         {
-          "lemma": "しそこなう",
+          "lemma": "する",
           "pos": "Verb",
-          "surface": "しそこなう"
+          "surface": "し"
+        },
+        {
+          "lemma": "そこなう",
+          "pos": "Auxiliary",
+          "surface": "そこなう"
         }
       ],
       "id": "shisokonau",
@@ -344,9 +349,14 @@
           "surface": "確認"
         },
         {
-          "lemma": "しそこなう",
+          "lemma": "する",
           "pos": "Verb",
-          "surface": "しそこなっ"
+          "surface": "し"
+        },
+        {
+          "lemma": "そこなう",
+          "pos": "Auxiliary",
+          "surface": "そこなっ"
         },
         {
           "lemma": "た",
@@ -366,9 +376,14 @@
           "surface": "確認"
         },
         {
-          "lemma": "しそこなう",
+          "lemma": "する",
           "pos": "Verb",
-          "surface": "しそこなわ"
+          "surface": "し"
+        },
+        {
+          "lemma": "そこなう",
+          "pos": "Auxiliary",
+          "surface": "そこなわ"
         },
         {
           "lemma": "ない",
@@ -388,9 +403,14 @@
           "surface": "確認"
         },
         {
-          "lemma": "しそこなう",
+          "lemma": "する",
           "pos": "Verb",
-          "surface": "しそこなえ"
+          "surface": "し"
+        },
+        {
+          "lemma": "そこなう",
+          "pos": "Auxiliary",
+          "surface": "そこなえ"
         },
         {
           "lemma": "ば",
@@ -410,9 +430,14 @@
           "surface": "確認"
         },
         {
-          "lemma": "しそこなう",
+          "lemma": "する",
           "pos": "Verb",
-          "surface": "しそこなっ"
+          "surface": "し"
+        },
+        {
+          "lemma": "そこなう",
+          "pos": "Auxiliary",
+          "surface": "そこなっ"
         },
         {
           "lemma": "て",

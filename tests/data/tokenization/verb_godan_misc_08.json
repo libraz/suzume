@@ -1555,8 +1555,8 @@
       "description": "negative control: purposive に after a continuative keeps the case particle",
       "expected": [
         {
-          "lemma": "読み",
-          "pos": "Noun",
+          "lemma": "読む",
+          "pos": "Verb",
           "surface": "読み"
         },
         {
@@ -1978,7 +1978,7 @@
           "surface": "読ま"
         },
         {
-          "lemma": "せる",
+          "lemma": "す",
           "pos": "Auxiliary",
           "surface": "せ"
         },
@@ -2236,7 +2236,7 @@
           "surface": "書か"
         },
         {
-          "lemma": "せる",
+          "lemma": "す",
           "pos": "Auxiliary",
           "surface": "せ"
         },
@@ -2258,7 +2258,7 @@
           "surface": "待た"
         },
         {
-          "lemma": "せる",
+          "lemma": "す",
           "pos": "Auxiliary",
           "surface": "せ"
         },
@@ -2353,7 +2353,7 @@
           "surface": "飛ば"
         },
         {
-          "lemma": "せる",
+          "lemma": "す",
           "pos": "Auxiliary",
           "surface": "せ"
         },

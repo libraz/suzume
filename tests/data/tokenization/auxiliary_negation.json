@@ -1387,9 +1387,14 @@
       "description": "否定構文の「思わ + ずに」の助動詞境界を維持する",
       "expected": [
         {
-          "lemma": "思わず",
-          "pos": "Adverb",
-          "surface": "思わず"
+          "lemma": "思う",
+          "pos": "Verb",
+          "surface": "思わ"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ず"
         },
         {
           "lemma": "に",

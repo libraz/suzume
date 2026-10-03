@@ -80,9 +80,14 @@
           "surface": "確認"
         },
         {
-          "lemma": "に関し",
+          "lemma": "に",
           "pos": "Particle",
-          "surface": "に関し"
+          "surface": "に"
+        },
+        {
+          "lemma": "関する",
+          "pos": "Verb",
+          "surface": "関し"
         },
         {
           "lemma": "ます",

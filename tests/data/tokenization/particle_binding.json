@@ -2038,9 +2038,14 @@
           "surface": "も"
         },
         {
-          "lemma": "まして",
-          "pos": "Conjunction",
-          "surface": "まして"
+          "lemma": "増す",
+          "pos": "Verb",
+          "surface": "まし"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
         },
         {
           "lemma": "重要",
@@ -2075,9 +2080,14 @@
           "surface": "も"
         },
         {
-          "lemma": "まして",
-          "pos": "Conjunction",
-          "surface": "まして"
+          "lemma": "増す",
+          "pos": "Verb",
+          "surface": "まし"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
         },
         {
           "lemma": "優れる",
@@ -2107,9 +2117,14 @@
           "surface": "も"
         },
         {
-          "lemma": "まして",
-          "pos": "Conjunction",
-          "surface": "まして"
+          "lemma": "増す",
+          "pos": "Verb",
+          "surface": "まし"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
         },
         {
           "lemma": "必要",

@@ -286,9 +286,14 @@
           "surface": "て"
         },
         {
-          "lemma": "こう",
-          "pos": "Adverb",
-          "surface": "こう"
+          "lemma": "いく",
+          "pos": "Auxiliary",
+          "surface": "こ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
         }
       ],
       "id": "wo_betekou",
@@ -1664,9 +1669,14 @@
           "surface": "て"
         },
         {
-          "lemma": "こう",
-          "pos": "Adverb",
-          "surface": "こう"
+          "lemma": "いく",
+          "pos": "Auxiliary",
+          "surface": "こ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
         },
         {
           "lemma": "か",

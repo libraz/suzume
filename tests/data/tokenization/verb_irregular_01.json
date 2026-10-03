@@ -2263,12 +2263,12 @@
         {
           "lemma": "来る",
           "pos": "Verb",
-          "surface": "来さ"
+          "surface": "来"
         },
         {
-          "lemma": "せる",
+          "lemma": "させる",
           "pos": "Auxiliary",
-          "surface": "せ"
+          "surface": "させ"
         },
         {
           "lemma": "られる",

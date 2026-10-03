@@ -7,7 +7,7 @@ import regex
 from .core_lexicon import core_headwords
 from .mecab import is_single_token_of_pos
 from .postprocessor_common import reports_mutation
-from .split_rules import base_from_renyokei
+from .split_rules import base_from_mizenkei, base_from_renyokei, bases_from_renyokei
 
 
 def postprocess_closed_subsidiary_aux(tokens: list[dict]) -> bool:
@@ -970,6 +970,16 @@ def postprocess_predicate_cell_lemmas(tokens: list[dict]) -> bool:
             if token.get("pos") != "Adjective":
                 token.update(pos="Adjective", lemma=_EASE_ADJECTIVE_STEMS[surface])
                 changed = True
+        elif (
+            surface == "せ"
+            and token.get("lemma") == "せる"
+            and following.get("surface") == "ば"
+            and after_continuative
+            and previous.get("surface", "")[-1:] in "かさたなまらわがばぱ"
+        ):
+            # せる's hypothetical is せれ; before ば the cell is the す causative's.
+            token["lemma"] = "す"
+            changed = True
         elif surface == "じゃろ" and token.get("lemma") != "だ":
             token["lemma"] = "だ"
             changed = True
@@ -1036,6 +1046,67 @@ def postprocess_frame_repairs(tokens: list[dict]) -> bool:
             changed = True
         elif surface == "先" and token.get("pos") == "Suffix" and previous.get("pos") == "Pronoun":
             token["pos"] = "Noun"
+            changed = True
+        elif surface == "来さ" and token.get("lemma") == "来る" and following.get("surface", "").startswith("せ"):
+            # 来る's causative is こ+させる; 来さ is no cell of 来る.
+            tokens[idx : idx + 2] = [
+                {"surface": "来", "pos": "Verb", "lemma": "来る"},
+                {"surface": "さ" + following["surface"], "pos": "Auxiliary", "lemma": "させる"},
+            ]
+            changed = True
+        elif token.get("pos") == "Verb" and surface.startswith(("しそこな", "しそこね", "しそびれ")):
+            # する's continuative plus the closed subsidiary, as in やり+そこなう.
+            tokens[idx : idx + 1] = [
+                {"surface": "し", "pos": "Verb", "lemma": "する"},
+                {"surface": surface[1:], "pos": "Auxiliary", "lemma": token.get("lemma", surface)[1:]},
+            ]
+            changed = True
+        elif (
+            token.get("pos") == "Adverb"
+            and surface.endswith("ず")
+            and following.get("surface") == "に"
+            and base_from_mizenkei(surface[:-1]) is not None
+        ):
+            # The adverb 思わず cannot take に; 思わ+ず+に is the negative continuative.
+            tokens[idx : idx + 1] = [
+                {"surface": surface[:-1], "pos": "Verb", "lemma": base_from_mizenkei(surface[:-1])},
+                {"surface": "ず", "pos": "Auxiliary", "lemma": "ぬ"},
+            ]
+            changed = True
+        elif surface == "こう" and token.get("pos") == "Adverb" and previous.get("surface") in ("て", "で"):
+            # A te-form takes the contracted volitional of ていく (食べ+て+こ+う).
+            tokens[idx : idx + 1] = [
+                {"surface": "こ", "pos": "Auxiliary", "lemma": "いく"},
+                {"surface": "う", "pos": "Auxiliary", "lemma": "う"},
+            ]
+            changed = True
+        elif (
+            token.get("pos") == "Noun"
+            and following.get("surface") == "に"
+            and after.get("lemma") in ("行く", "来る", "いく", "くる", "ゆく")
+            and any(is_single_token_of_pos(base, "動詞") for base in bases_from_renyokei(surface))
+        ):
+            # Purpose 連用+に+motion takes the verb continuative (読み+に+行く).
+            token.update(pos="Verb", lemma=bases_from_renyokei(surface)[0])
+            changed = True
+        elif (
+            token.get("pos") == "Noun"
+            and previous.get("surface") == "お"
+            and previous.get("pos") == "Prefix"
+            and following.get("lemma") == "する"
+            and bases_from_renyokei(surface)
+            and any(is_single_token_of_pos(base, "動詞") for base in bases_from_renyokei(surface))
+        ):
+            # The humble お+連用+する takes the verb continuative, as お+連用+いたす does.
+            base = next(base for base in bases_from_renyokei(surface) if is_single_token_of_pos(base, "動詞"))
+            token.update(pos="Verb", lemma=base)
+            changed = True
+        elif surface == "まして" and token.get("pos") == "Conjunction" and previous.get("surface") == "も":
+            # Xにもまして is the te-form of 増す; the conjunction cannot follow にも.
+            tokens[idx : idx + 1] = [
+                {"surface": "まし", "pos": "Verb", "lemma": "増す"},
+                {"surface": "て", "pos": "Particle", "lemma": "て"},
+            ]
             changed = True
         idx += 1
     return changed
