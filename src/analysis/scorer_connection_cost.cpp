@@ -511,7 +511,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev, const core::LatticeE
       grammar::isPureHiragana(prev.surface) && grammar::isARowCodepoint(utf8::decodeLastChar(prev.surface)) &&
       prev.surface.size() <= 9 &&  // ≤3 hiragana chars (9 bytes)
       next.extended_pos == core::ExtendedPOS::AuxNegativeNu && prev.lemma != "する" && prev.lemma != "ある" &&
-      prev.lemma != "なる" && utf8::equalsAny(next.surface, {"ず", "ずに"})) {
+      prev.lemma != "なる" && utf8::equalsAny(next.surface, {"ず"})) {
     SUZUME_CONNECTION_ADD(surface_bonus, cost::kAlmostNever);
   }
 

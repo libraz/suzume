@@ -888,9 +888,14 @@
           "surface": "差さ"
         },
         {
-          "lemma": "ず",
+          "lemma": "ぬ",
           "pos": "Auxiliary",
-          "surface": "ずに"
+          "surface": "ず"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
         },
         {
           "lemma": "歩く",

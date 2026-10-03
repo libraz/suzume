@@ -827,14 +827,12 @@ class TestPostprocessKanjiMerge:
         assert rule == "kanji-merge"
 
 
-class TestZuNiMerge:
-    def test_zu_ni(self):
+class TestZuNiBoundary:
+    def test_negative_and_case_particle_stay_apart(self):
         tokens = [_tok("ず", pos="助動詞"), _tok("に", pos="助詞")]
-        text = "ずに"
-        result, rule = apply_suzume_merge(tokens, text)
-        assert len(result) == 1
-        assert result[0]["surface"] == "ずに"
-        assert rule == "zu-ni-merge"
+        result, rule = apply_suzume_merge(tokens, "ずに")
+        assert [token["surface"] for token in result] == ["ず", "に"]
+        assert rule is None
 
 
 class TestProductiveTateSuffixMerge:

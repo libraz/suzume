@@ -334,18 +334,17 @@ class TestProductiveCausativeVolitionalSplit:
         assert rule == "productive-causative-volitional-boundary"
 
 
-class TestZuNiWaNegativeAuxiliarySplit:
-    def test_lexicalized_negative_is_split_by_closed_frame(self):
+class TestLexicalizedNegativeAdjectiveSplit:
+    def test_kanji_spelling_follows_its_kana_analysis(self):
         tokens = [
-            _tok("ずに", pos="助動詞"),
             _tok("は", pos="助詞"),
             _tok("済まない", pos="形容詞", lemma="済まない"),
         ]
         result, rule = apply_suzume_split(tokens)
-        assert [token["surface"] for token in result] == ["ずに", "は", "済ま", "ない"]
-        assert result[2] == {"surface": "済ま", "pos": "動詞", "lemma": "済む"}
-        assert result[3] == {"surface": "ない", "pos": "助動詞", "lemma": "ない"}
-        assert rule == "zu-ni-wa-negative-auxiliary"
+        assert [token["surface"] for token in result] == ["は", "済ま", "ない"]
+        assert result[1] == {"surface": "済ま", "pos": "動詞", "lemma": "済む"}
+        assert result[2] == {"surface": "ない", "pos": "助動詞", "lemma": "ない"}
+        assert rule == "lexicalized-morpheme-boundary"
 
     def test_ordinary_lexical_adjective_is_unchanged(self):
         tokens = [_tok("仕方", pos="名詞"), _tok("が", pos="助詞"), _tok("ない", pos="形容詞")]

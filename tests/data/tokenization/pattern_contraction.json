@@ -282,9 +282,14 @@
           "surface": "食べ"
         },
         {
-          "lemma": "ず",
+          "lemma": "ぬ",
           "pos": "Auxiliary",
-          "surface": "ずに"
+          "surface": "ず"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
         },
         {
           "lemma": "帰る",
@@ -309,9 +314,14 @@
           "surface": "話さ"
         },
         {
-          "lemma": "ず",
+          "lemma": "ぬ",
           "pos": "Auxiliary",
-          "surface": "ずに"
+          "surface": "ず"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
         },
         {
           "lemma": "聞く",
@@ -331,9 +341,14 @@
           "surface": "考え"
         },
         {
-          "lemma": "ず",
+          "lemma": "ぬ",
           "pos": "Auxiliary",
-          "surface": "ずに"
+          "surface": "ず"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
         }
       ],
       "id": "ezuni",
@@ -348,9 +363,14 @@
           "surface": "帰ら"
         },
         {
-          "lemma": "ず",
+          "lemma": "ぬ",
           "pos": "Auxiliary",
-          "surface": "ずに"
+          "surface": "ず"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
         },
         {
           "lemma": "済む",

@@ -234,6 +234,30 @@ def _split_lexicalized_morpheme_boundaries(token: dict) -> list[dict] | None:
                 ),
             ]
 
+    # A kanji-spelled negative adjective the reference lexicalized (済まない)
+    # takes the analysis of its kana spelling, which the same dictionary reads
+    # as the verb irrealis plus the negative auxiliary (すま+ない).
+    if pos == "形容詞" and lemma.endswith("ない") and regex.search(r"\p{Han}", surface):
+        isolated = _reanalyze_exact(surface)
+        reading = token.get("reading") or (isolated[0].get("reading", "") if isolated and len(isolated) == 1 else "")
+        kana = "".join(chr(ord(ch) - 0x60) if "ァ" <= ch <= "ヶ" else ch for ch in reading)
+        reanalyzed = _reanalyze_exact(kana)
+        if (
+            reanalyzed is not None
+            and len(reanalyzed) == 2
+            and reanalyzed[0].get("pos") == "動詞"
+            and reanalyzed[1].get("pos") == "助動詞"
+            and reanalyzed[1].get("lemma") == "ない"
+        ):
+            tail = reanalyzed[1]["surface"]
+            stem = surface[: -len(tail)]
+            base = base_from_mizenkei(stem)
+            if surface.endswith(tail) and base is not None:
+                return [
+                    {"surface": stem, "pos": "動詞", "lemma": base},
+                    {"surface": tail, "pos": "助動詞", "lemma": "ない"},
+                ]
+
     if pos in ("名詞", "副詞") and surface.endswith("ず"):
         isolated = _reanalyze_exact(surface)
         if (
@@ -699,25 +723,6 @@ def apply_suzume_split(tokens: list[dict]) -> tuple[list[dict], str | None]:
                 result.append({"surface": "ぬ", "pos": "助動詞", "lemma": "ぬ"})
                 if applied_rule is None:
                     applied_rule = "classical-negative-boundary"
-                continue
-
-        # In the closed ずに+は frame, a reference adjective ending in ない is
-        # the productive verb mizenkei + negative auxiliary chain.  Derive the
-        # host from its inflection instead of naming the open-class verb.
-        if (
-            t.get("pos") == "形容詞"
-            and surface.endswith("ない")
-            and token_index >= 2
-            and tokens[token_index - 1].get("surface") == "は"
-            and tokens[token_index - 2].get("surface") == "ずに"
-        ):
-            stem = surface[: -len("ない")]
-            lemma = base_from_mizenkei(stem)
-            if lemma is not None:
-                result.append({"surface": stem, "pos": "動詞", "lemma": lemma})
-                result.append({"surface": "ない", "pos": "助動詞", "lemma": "ない"})
-                if applied_rule is None:
-                    applied_rule = "zu-ni-wa-negative-auxiliary"
                 continue
 
         # Productive renyokei + 尽くす keeps the subsidiary-verb boundary.

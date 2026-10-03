@@ -1221,9 +1221,14 @@
           "surface": "れ"
         },
         {
-          "lemma": "ず",
+          "lemma": "ぬ",
           "pos": "Auxiliary",
-          "surface": "ずに"
+          "surface": "ず"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
         },
         {
           "lemma": "済む",
@@ -1253,9 +1258,14 @@
           "surface": "れ"
         },
         {
-          "lemma": "ず",
+          "lemma": "ぬ",
           "pos": "Auxiliary",
-          "surface": "ずに"
+          "surface": "ず"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
         }
       ],
       "id": "warezuni",
@@ -1275,9 +1285,14 @@
           "surface": "せ"
         },
         {
-          "lemma": "ず",
+          "lemma": "ぬ",
           "pos": "Auxiliary",
-          "surface": "ずに"
+          "surface": "ず"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
         },
         {
           "lemma": "おく",
@@ -1307,9 +1322,14 @@
           "surface": "れ"
         },
         {
-          "lemma": "ず",
+          "lemma": "ぬ",
           "pos": "Auxiliary",
-          "surface": "ずに"
+          "surface": "ず"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
         }
       ],
       "id": "kasarezuni",

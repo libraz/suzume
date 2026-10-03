@@ -41,15 +41,6 @@ float computeProgressiveHonorificBonus(const core::LatticeEdge& prev, const core
     SUZUME_CONNECTION_ADD(bonus, sc::kPenaltyClosedClassBoundary);
   }
 
-  // The conjunctive negative ずに is a single closed auxiliary form. Its
-  // registered edge must outrank the otherwise valid classical-negative plus
-  // case-particle sequence, while other case-marked forms (ざるを, ぬを)
-  // retain their ordinary boundary.
-  if (prev.extended_pos == core::ExtendedPOS::AuxNegativeNu && utf8::equalsAny(prev.surface, {"ず"}) &&
-      next.extended_pos == core::ExtendedPOS::ParticleCase && utf8::equalsAny(next.surface, {"に"})) {
-    SUZUME_CONNECTION_ADD(bonus, cost::kStrong);
-  }
-
   // A nominal phrase followed by の+ある uses the existential verb in
   // attributive form (意味のある文), not the homographic copula or determiner.
   // Keep the condition on the preceding nominalizer so ordinary ある本 remains

@@ -220,7 +220,7 @@ float computeNegativeAndNounVerbBonus(const core::LatticeEdge& prev, const core:
       (prev.extended_pos == core::ExtendedPOS::AuxGaru && grammar::isARowCodepoint(utf8::decodeLastChar(prev.surface)));
   if ((prev.extended_pos == core::ExtendedPOS::VerbMizenkei || auxiliary_irrealis) &&
       next.extended_pos == core::ExtendedPOS::AuxNegativeNu &&
-      utf8::equalsAny(next.surface, {"ず", "ずに", "ざる", "ざれ", "ね"})) {
+      utf8::equalsAny(next.surface, {"ず", "ざる", "ざれ", "ね"})) {
     SUZUME_CONNECTION_ADD(bonus,
                           utf8::endsWith(next.surface, "に") ? cost::kDoubleVeryStrongBonus : cost::kStrongBonus);
   }
@@ -233,14 +233,6 @@ float computeNegativeAndNounVerbBonus(const core::LatticeEdge& prev, const core:
   if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei && next.extended_pos == core::ExtendedPOS::AuxNegativeNu &&
       next.surface == "ね" && !grammar::endsWithRenyokeiMarker(prev.surface)) {
     SUZUME_CONNECTION_ADD(bonus, cost::kRare);
-  }
-
-  // Bonus for AUX_否定古(ずに) → VERB connection
-  // ずに+帰る, ずに+済む etc. are natural patterns
-  // Without this, split path ず+に+帰る wins due to PART_格→VERB having lower default cost
-  if (prev.extended_pos == core::ExtendedPOS::AuxNegativeNu && prev.surface == "ずに" &&
-      (next.pos == core::PartOfSpeech::Verb || next.pos == core::PartOfSpeech::Adjective)) {
-    SUZUME_CONNECTION_ADD(bonus, cost::kVeryStrongBonus);
   }
 
   // A nominalized predicate can attach to the continuative form of する.

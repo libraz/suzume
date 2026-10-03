@@ -200,7 +200,6 @@ void addSpecialPatterns(std::vector<AuxiliaryEntry>& entries) {
       // === Classical negation ず (古語否定) - connects to mizenkei ===
       // 尽きず, せず, 知らず etc.
       {"ず", kAuxOutBase, kVerbMizenkei},
-      {"ずに", kAuxOutBase, kVerbMizenkei},
       {"ずとも", kAuxOutBase, kVerbMizenkei},
 
       // === Classical negation ぬ (文語否定 連体形) - connects to mizenkei ===

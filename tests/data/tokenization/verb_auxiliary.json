@@ -2040,9 +2040,14 @@
           "surface": "忘れ"
         },
         {
-          "lemma": "ず",
+          "lemma": "ぬ",
           "pos": "Auxiliary",
-          "surface": "ずに"
+          "surface": "ず"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
         },
         {
           "lemma": "書く",
@@ -2062,9 +2067,14 @@
           "surface": "行か"
         },
         {
-          "lemma": "ず",
+          "lemma": "ぬ",
           "pos": "Auxiliary",
-          "surface": "ずに"
+          "surface": "ず"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
         },
         {
           "lemma": "待つ",
@@ -2243,9 +2253,14 @@
           "surface": "負わ"
         },
         {
-          "lemma": "ず",
+          "lemma": "ぬ",
           "pos": "Auxiliary",
-          "surface": "ずに"
+          "surface": "ず"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
         }
       ],
       "id": "wazuni",

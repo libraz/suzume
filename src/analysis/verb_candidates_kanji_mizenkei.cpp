@@ -241,9 +241,7 @@ void appendGodanMizenkeiZuCandidates(const std::vector<char32_t>& codepoints, si
     bool dict_has_zu_form = false;
     if (followed_by_zu && dict_manager != nullptr) {
       std::string zu_form = surface + "ず";
-      std::string zuni_form = surface + "ずに";
-      dict_has_zu_form =
-          dict_manager->lookupExact(zu_form) != nullptr || dict_manager->lookupExact(zuni_form) != nullptr;
+      dict_has_zu_form = dict_manager->lookupExact(zu_form) != nullptr;
     }
     const bool followed_by_case_ni =
         followed_by_zu && negative_pos + 1 < codepoints.size() && codepoints[negative_pos + 1] == U'に';

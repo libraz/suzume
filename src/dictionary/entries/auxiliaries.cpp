@@ -62,9 +62,6 @@ EntrySpecRange getAuxiliaryEntries() {
       aux("ず", "ぬ", EPOS::AuxNegativeNu),  // lemma is ぬ per MeCab
       adj("なき", "ない", EPOS::AdjBasic),
       adj("がたき", "がたい", EPOS::AdjBasic),
-      // Contracted negative-conjunctive form. Keep its displayed lemma as ず
-      // because the tokenizer emits ずに as one auxiliary token.
-      aux("ずに", "ず", EPOS::AuxNegativeNu),
       aux("ざる", "ぬ", EPOS::AuxNegativeNu),           // 連体形 (せざるを得ない)
       aux("ざり", "ぬ", EPOS::AuxNegativeNu),           // 連用形 (行かざりけり)
       aux("ざれ", "ぬ", EPOS::AuxNegativeNu),           // 已然形 (あらざれば)

@@ -2123,15 +2123,6 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
             if applied_rule is None:
                 applied_rule = "dano-coordination"
 
-        # 11b. ず+に -> ずに
-        if not merged and t.get("surface") == "ず" and t.get("pos") == "助動詞":
-            if i + 1 < len(tokens) and tokens[i + 1].get("surface") == "に":
-                result.append({"surface": "ずに", "pos": "助動詞", "lemma": "ず"})
-                i += 2
-                merged = True
-                if applied_rule is None:
-                    applied_rule = "zu-ni-merge"
-
         # 11bb. Productive renyokei + たて suffix.  MeCab sometimes reads
         # the closed freshness suffix as the unrelated past auxiliary + te
         # particle (e.g. でき+た+て).  The raw token stream still contains
