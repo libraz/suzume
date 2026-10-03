@@ -21,6 +21,16 @@ bool isValidCalendarDay(const IntegerScan& day) {
   return !day.empty() && day.digit_count <= 2 && day.value >= 1 && day.value <= 31;
 }
 
+// Advances pos past the next codepoint when it is expected; leaves pos unchanged otherwise.
+bool consumeCodepoint(std::string_view text, size_t& pos, char32_t expected) {
+  size_t next = pos;
+  if (next >= text.size() || normalize::decodeUtf8(text, next) != expected) {
+    return false;
+  }
+  pos = next;
+  return true;
+}
+
 }  // namespace
 
 bool PreTokenizer::tryMatchDate(std::string_view text, size_t pos, PreToken& token) const {
@@ -38,19 +48,13 @@ bool PreTokenizer::tryMatchDate(std::string_view text, size_t pos, PreToken& tok
 
   // A month and day without a year is still an atomic calendar date. Check it
   // before requiring 年 so 7月18日 does not become two adjacent date tokens.
-  if (isValidCalendarMonth(year) && idx < text.size()) {
-    size_t byte_pos = idx;
-    char32_t codepoint = normalize::decodeUtf8(text, byte_pos);
-    if (codepoint == U'月') {
-      const IntegerScan day = scanInteger(text, byte_pos);
-      if (isValidCalendarDay(day) && day.end < text.size()) {
-        byte_pos = day.end;
-        codepoint = normalize::decodeUtf8(text, byte_pos);
-        if (codepoint == U'日') {
-          setTokenFromRange(token, text, pos, byte_pos, PreTokenType::Date, core::PartOfSpeech::Noun);
-          return true;
-        }
-      }
+  size_t byte_pos = idx;
+  if (isValidCalendarMonth(year) && consumeCodepoint(text, byte_pos, U'月')) {
+    const IntegerScan day = scanInteger(text, byte_pos);
+    byte_pos = day.end;
+    if (isValidCalendarDay(day) && consumeCodepoint(text, byte_pos, U'日')) {
+      setTokenFromRange(token, text, pos, byte_pos, PreTokenType::Date, core::PartOfSpeech::Noun);
+      return true;
     }
   }
 
@@ -59,45 +63,22 @@ bool PreTokenizer::tryMatchDate(std::string_view text, size_t pos, PreToken& tok
   }
 
   // Check for 年
-  size_t byte_pos = idx;
-  if (byte_pos >= text.size()) {
+  if (!consumeCodepoint(text, idx, U'年')) {
     return false;
   }
+  const size_t year_end = idx;  // Position right after "年", before any month match
 
-  char32_t codepoint = normalize::decodeUtf8(text, byte_pos);
-  if (codepoint != U'年') {
-    return false;
-  }
-  idx = byte_pos;
-  size_t year_end = idx;  // Position right after "年", before any month match
-
-  // Try to match month
+  // Try to match month, then day
   const IntegerScan month = scanInteger(text, idx);
-  size_t month_end = month.end;
-
+  byte_pos = month.end;
   bool matched_month = false;
-  if (isValidCalendarMonth(month)) {
-    byte_pos = month_end;
-    if (byte_pos < text.size()) {
-      codepoint = normalize::decodeUtf8(text, byte_pos);
-      if (codepoint == U'月') {
-        idx = byte_pos;
-        matched_month = true;
-
-        // Try to match day
-        const IntegerScan day = scanInteger(text, idx);
-        size_t day_end = day.end;
-
-        if (isValidCalendarDay(day)) {
-          byte_pos = day_end;
-          if (byte_pos < text.size()) {
-            codepoint = normalize::decodeUtf8(text, byte_pos);
-            if (codepoint == U'日') {
-              idx = byte_pos;
-            }
-          }
-        }
-      }
+  if (isValidCalendarMonth(month) && consumeCodepoint(text, byte_pos, U'月')) {
+    idx = byte_pos;
+    matched_month = true;
+    const IntegerScan day = scanInteger(text, idx);
+    byte_pos = day.end;
+    if (isValidCalendarDay(day) && consumeCodepoint(text, byte_pos, U'日')) {
+      idx = byte_pos;
     }
   }
 
@@ -106,19 +87,13 @@ bool PreTokenizer::tryMatchDate(std::string_view text, size_t pos, PreToken& tok
   // from a calendar date with month/day. Matching it here as part of the
   // atomic date token avoids leaving 度 stranded at a pretokenizer segment
   // boundary, where it has no context to attach to the preceding 年.
-  if (!matched_month) {
-    byte_pos = year_end;
-    if (byte_pos < text.size()) {
-      codepoint = normalize::decodeUtf8(text, byte_pos);
-      if (codepoint == U'度') {
-        idx = byte_pos;
-      } else if (codepoint == U'間' && absorbsPeriodKan(text, byte_pos)) {
-        // Duration suffix 間 (期間接尾): N年 + 間 = N年間. Absorbed only when it
-        // is not the interval signal 間 + stranded-kanji (see absorbsPeriodKan),
-        // so 3年間活動 stays 3年間|活動 while 3年間隔 splits as 3年|間隔.
-        idx = byte_pos;
-      }
-    }
+  // Duration suffix 間 (期間接尾): N年 + 間 = N年間. Absorbed only when it
+  // is not the interval signal 間 + stranded-kanji (see absorbsPeriodKan),
+  // so 3年間活動 stays 3年間|活動 while 3年間隔 splits as 3年|間隔.
+  byte_pos = year_end;
+  if (!matched_month && (consumeCodepoint(text, byte_pos, U'度') ||
+                         (consumeCodepoint(text, byte_pos, U'間') && absorbsPeriodKan(text, byte_pos)))) {
+    idx = byte_pos;
   }
 
   // Extent marker 中 (2024年中, 6年度中, 2024年12月中): the date is the quantity
@@ -127,18 +102,16 @@ bool PreTokenizer::tryMatchDate(std::string_view text, size_t pos, PreToken& tok
   // quantity that licenses the extent reading. A following kanji is excluded
   // because 中 then heads a lexical compound of its own (2024年|中止); a numeral
   // is exempt since it opens the second term of a ratio.
-  {
-    size_t byte_pos = idx;
-    if (byte_pos < text.size() && normalize::decodeUtf8(text, byte_pos) == U'中') {
-      size_t after_extent = byte_pos;
-      bool closes_phrase = true;
-      if (after_extent < text.size()) {
-        const char32_t following = normalize::decodeUtf8(text, after_extent);
-        closes_phrase = !normalize::isKanjiCodepoint(following) || normalize::isNumeralCodepoint(following);
-      }
-      if (closes_phrase) {
-        idx = byte_pos;
-      }
+  byte_pos = idx;
+  if (consumeCodepoint(text, byte_pos, U'中')) {
+    size_t after_extent = byte_pos;
+    bool closes_phrase = true;
+    if (after_extent < text.size()) {
+      const char32_t following = normalize::decodeUtf8(text, after_extent);
+      closes_phrase = !normalize::isKanjiCodepoint(following) || normalize::isNumeralCodepoint(following);
+    }
+    if (closes_phrase) {
+      idx = byte_pos;
     }
   }
 
@@ -182,28 +155,17 @@ bool PreTokenizer::tryMatchCurrency(std::string_view text, size_t pos, PreToken&
     return false;
   }
 
-  size_t byte_pos = idx;
-  if (byte_pos >= text.size()) {
-    return false;
-  }
-
-  char32_t codepoint = normalize::decodeUtf8(text, byte_pos);
-
   // Optional: 万, 億, 兆
-  if (codepoint == U'万' || codepoint == U'億' || codepoint == U'兆') {
-    idx = byte_pos;
-    if (byte_pos < text.size()) {
-      codepoint = normalize::decodeUtf8(text, byte_pos);
-    } else {
-      return false;
+  for (const char32_t multiplier : {U'万', U'億', U'兆'}) {
+    if (consumeCodepoint(text, idx, multiplier)) {
+      break;
     }
   }
 
   // Required: 円
-  if (codepoint != U'円') {
+  if (!consumeCodepoint(text, idx, U'円')) {
     return false;
   }
-  idx = byte_pos;
 
   setTokenFromRange(token, text, pos, idx, PreTokenType::Currency, core::PartOfSpeech::Noun);
   return true;
@@ -411,57 +373,27 @@ bool PreTokenizer::tryMatchTime(std::string_view text, size_t pos, PreToken& tok
   }
 
   // Check for 時
-  size_t byte_pos = idx;
-  if (byte_pos >= text.size()) {
+  if (!consumeCodepoint(text, idx, U'時')) {
     return false;
   }
-
-  char32_t codepoint = normalize::decodeUtf8(text, byte_pos);
-  if (codepoint != U'時') {
-    return false;
-  }
-  idx = byte_pos;
 
   // A duration starts with 時間 rather than 時. Consume 間 before scanning
   // its optional minute/second fields so 1時間15分 remains one quantity.
   // Leave 間 to the following span when it heads an interval word (5時|間隔).
   size_t duration_pos = idx;
-  if (duration_pos < text.size()) {
-    char32_t duration_marker = normalize::decodeUtf8(text, duration_pos);
-    if (duration_marker == U'間' && absorbsPeriodKan(text, duration_pos)) {
-      idx = duration_pos;
-    }
+  if (consumeCodepoint(text, duration_pos, U'間') && absorbsPeriodKan(text, duration_pos)) {
+    idx = duration_pos;
   }
 
-  // Try to match minutes
+  // Try to match minutes, then seconds
   const IntegerScan minute = scanInteger(text, idx);
-  size_t min_end = minute.end;
-
-  if (!minute.empty() && minute.digit_count <= 2) {
-    if (minute.value <= 59) {
-      byte_pos = min_end;
-      if (byte_pos < text.size()) {
-        codepoint = normalize::decodeUtf8(text, byte_pos);
-        if (codepoint == U'分') {
-          idx = byte_pos;
-
-          // Try to match seconds
-          const IntegerScan second = scanInteger(text, idx);
-          size_t sec_end = second.end;
-
-          if (!second.empty() && second.digit_count <= 2) {
-            if (second.value <= 59) {
-              byte_pos = sec_end;
-              if (byte_pos < text.size()) {
-                codepoint = normalize::decodeUtf8(text, byte_pos);
-                if (codepoint == U'秒') {
-                  idx = byte_pos;
-                }
-              }
-            }
-          }
-        }
-      }
+  size_t byte_pos = minute.end;
+  if (!minute.empty() && minute.digit_count <= 2 && minute.value <= 59 && consumeCodepoint(text, byte_pos, U'分')) {
+    idx = byte_pos;
+    const IntegerScan second = scanInteger(text, idx);
+    byte_pos = second.end;
+    if (!second.empty() && second.digit_count <= 2 && second.value <= 59 && consumeCodepoint(text, byte_pos, U'秒')) {
+      idx = byte_pos;
     }
   }
 
@@ -469,11 +401,8 @@ bool PreTokenizer::tryMatchTime(std::string_view text, size_t pos, PreToken& tok
   // not the interval signal 間 + stranded-kanji (see absorbsPeriodKan), so
   // 24時間営業 stays 24時間|営業 while 5時間隔 splits as 5時|間隔.
   size_t kan_pos = idx;
-  if (kan_pos < text.size()) {
-    char32_t codepoint_kan = normalize::decodeUtf8(text, kan_pos);
-    if (codepoint_kan == U'間' && absorbsPeriodKan(text, kan_pos)) {
-      idx = kan_pos;
-    }
+  if (consumeCodepoint(text, kan_pos, U'間') && absorbsPeriodKan(text, kan_pos)) {
+    idx = kan_pos;
   }
 
   if (idx > pos) {
