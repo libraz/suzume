@@ -1,0 +1,33 @@
+{
+  "cases": [
+    {
+      "description": "慰めようがない。 - regression test",
+      "expected": [
+        {
+          "lemma": "慰める",
+          "pos": "Verb",
+          "surface": "慰め"
+        },
+        {
+          "lemma": "よう",
+          "pos": "Noun",
+          "surface": "よう"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
+      "id": "meyouganai",
+      "input": "慰めようがない。"
+    }
+  ],
+  "description": "Formal nouns (こと、もの、ところ) (part 2/2)",
+  "version": "1.0"
+}

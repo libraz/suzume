@@ -3912,8 +3912,35 @@
       ],
       "id": "mouyameyouganai",
       "input": "もうやめようがない。"
+    },
+    {
+      "description": "あきらめようがない。 - regression test",
+      "expected": [
+        {
+          "lemma": "あきらめる",
+          "pos": "Verb",
+          "surface": "あきらめ"
+        },
+        {
+          "lemma": "よう",
+          "pos": "Noun",
+          "surface": "よう"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
+      "id": "akirameyouganai",
+      "input": "あきらめようがない。"
     }
   ],
-  "description": "Formal nouns (こと、もの、ところ)",
+  "description": "Formal nouns (こと、もの、ところ) (part 1/2)",
   "version": "1.0"
 }

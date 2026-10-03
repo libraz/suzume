@@ -1533,6 +1533,45 @@
       ],
       "id": "wazatorashiku_u",
       "input": "わざとらしく笑う。"
+    },
+    {
+      "description": "もっともらしい話だ。 - regression test",
+      "expected": [
+        {
+          "lemma": "もっともらしい",
+          "pos": "Adjective",
+          "surface": "もっともらしい"
+        },
+        {
+          "lemma": "話",
+          "pos": "Noun",
+          "surface": "話"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "motttomorashii_da",
+      "input": "もっともらしい話だ。"
+    },
+    {
+      "description": "もっともらしかった。 - regression test",
+      "expected": [
+        {
+          "lemma": "もっともらしい",
+          "pos": "Adjective",
+          "surface": "もっともらしかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "motttomorashikattta",
+      "input": "もっともらしかった。"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 3/3)",

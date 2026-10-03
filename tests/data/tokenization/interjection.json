@@ -343,6 +343,126 @@
       ],
       "id": "o_resamadesu",
       "input": "お疲れさまです"
+    },
+    {
+      "description": "ほんとうにありがとう。 - regression test",
+      "expected": [
+        {
+          "lemma": "ほんとう",
+          "pos": "Noun",
+          "surface": "ほんとう"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "ありがとう",
+          "pos": "Interjection",
+          "surface": "ありがとう"
+        }
+      ],
+      "id": "hontouniarigatou",
+      "input": "ほんとうにありがとう。"
+    },
+    {
+      "description": "みんなにありがとう。 - regression test",
+      "expected": [
+        {
+          "lemma": "みんな",
+          "pos": "Pronoun",
+          "surface": "みんな"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "ありがとう",
+          "pos": "Interjection",
+          "surface": "ありがとう"
+        }
+      ],
+      "id": "minnaniarigatou",
+      "input": "みんなにありがとう。"
+    },
+    {
+      "description": "心からありがとう。 - regression test",
+      "expected": [
+        {
+          "lemma": "心",
+          "pos": "Noun",
+          "surface": "心"
+        },
+        {
+          "lemma": "から",
+          "pos": "Particle",
+          "surface": "から"
+        },
+        {
+          "lemma": "ありがとう",
+          "pos": "Interjection",
+          "surface": "ありがとう"
+        }
+      ],
+      "id": "karaarigatou",
+      "input": "心からありがとう。"
+    },
+    {
+      "description": "手伝ってくれてありがとう。 - regression test",
+      "expected": [
+        {
+          "lemma": "手伝う",
+          "pos": "Verb",
+          "surface": "手伝っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くれる",
+          "pos": "Auxiliary",
+          "surface": "くれ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "ありがとう",
+          "pos": "Interjection",
+          "surface": "ありがとう"
+        }
+      ],
+      "id": "tttekuretearigatou",
+      "input": "手伝ってくれてありがとう。"
+    },
+    {
+      "description": "ほんとうにごめん。 - regression test",
+      "expected": [
+        {
+          "lemma": "ほんとう",
+          "pos": "Noun",
+          "surface": "ほんとう"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "ごめん",
+          "pos": "Interjection",
+          "surface": "ごめん"
+        }
+      ],
+      "id": "hontounigomen",
+      "input": "ほんとうにごめん。"
     }
   ],
   "description": "Interjections and greetings (感動詞・挨拶)",

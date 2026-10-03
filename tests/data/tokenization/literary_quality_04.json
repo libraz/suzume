@@ -219,14 +219,9 @@
       "description": "もっともらしく説明した。 - regression test",
       "expected": [
         {
-          "lemma": "もっとも",
-          "pos": "Conjunction",
-          "surface": "もっとも"
-        },
-        {
-          "lemma": "らしい",
-          "pos": "Auxiliary",
-          "surface": "らしく"
+          "lemma": "もっともらしい",
+          "pos": "Adjective",
+          "surface": "もっともらしく"
         },
         {
           "lemma": "説明",
