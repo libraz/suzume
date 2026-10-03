@@ -852,6 +852,70 @@
       ],
       "id": "soushitattte_jida",
       "input": "そうしたって同じだ"
+    },
+    {
+      "description": "行くやいなや走った - regression test",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行く"
+        },
+        {
+          "lemma": "やいなや",
+          "pos": "Particle",
+          "surface": "やいなや"
+        },
+        {
+          "lemma": "走る",
+          "pos": "Verb",
+          "surface": "走っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "kuyainaya_ttta",
+      "input": "行くやいなや走った"
+    },
+    {
+      "description": "家に帰るやいなや寝た - regression test",
+      "expected": [
+        {
+          "lemma": "家",
+          "pos": "Noun",
+          "surface": "家"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "帰る",
+          "pos": "Verb",
+          "surface": "帰る"
+        },
+        {
+          "lemma": "やいなや",
+          "pos": "Particle",
+          "surface": "やいなや"
+        },
+        {
+          "lemma": "寝る",
+          "pos": "Verb",
+          "surface": "寝"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ni_ruyainaya_ta",
+      "input": "家に帰るやいなや寝た"
     }
   ],
   "description": "particle_conj tests",

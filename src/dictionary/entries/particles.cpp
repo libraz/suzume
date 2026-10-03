@@ -57,10 +57,11 @@ EntrySpecRange getParticleEntries() {
       particle("ながら", EPOS::ParticleConj),
       particle("つつ", EPOS::ParticleConj),  // 反復・並行の接続助詞 (連用形接続): 重ね+つつ, 増加し+つつ+ある
       // 即時: 聞くや否や, 着くや否や. A fixed classical compound with no
-      // independent inflection inside it, so it stays one search unit; the
-      // kana-only spelling いなや is deliberately absent, being far more often
-      // the disjunctive や plus a lexical word.
+      // independent inflection inside it, so it stays one search unit. The
+      // full kana spelling やいなや is the same unit; the bare いなや is
+      // deliberately absent, being far more often a lexical word.
       particle("や否や", EPOS::ParticleConj),
+      particle("やいなや", EPOS::ParticleConj),
       particle("とともに", EPOS::ParticleConj),  // 並行・同時: 読むとともに書く
       particle("と共に", EPOS::ParticleConj),    // 漢字交じり表記
       particle("とも", EPOS::ParticleConj),      // 譲歩: 読まずとも, 食べずとも
