@@ -417,6 +417,87 @@
       ],
       "id": "honorific_metooshi_itadakereba",
       "input": "お目通しいただければ幸いです。"
+    },
+    {
+      "description": "おつたえします - regression test",
+      "expected": [
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "つたえる",
+          "pos": "Verb",
+          "surface": "つたえ"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "otsutaeshimasu",
+      "input": "おつたえします"
+    },
+    {
+      "description": "おしらせします - regression test",
+      "expected": [
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "しらせる",
+          "pos": "Verb",
+          "surface": "しらせ"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "oshiraseshimasu",
+      "input": "おしらせします"
+    },
+    {
+      "description": "おたずねします - regression test",
+      "expected": [
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "たずねる",
+          "pos": "Verb",
+          "surface": "たずね"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "otazuneshimasu",
+      "input": "おたずねします"
     }
   ],
   "description": "honorific tests",
