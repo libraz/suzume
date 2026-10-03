@@ -766,6 +766,72 @@
       ],
       "id": "majimena",
       "input": "まじめな人"
+    },
+    {
+      "description": "変なやつ - regression test",
+      "expected": [
+        {
+          "lemma": "変",
+          "pos": "Adjective",
+          "surface": "変"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "やつ",
+          "pos": "Pronoun",
+          "surface": "やつ"
+        }
+      ],
+      "id": "nayatsu",
+      "input": "変なやつ"
+    },
+    {
+      "description": "急な話 - regression test",
+      "expected": [
+        {
+          "lemma": "急",
+          "pos": "Adjective",
+          "surface": "急"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "話",
+          "pos": "Noun",
+          "surface": "話"
+        }
+      ],
+      "id": "na_11",
+      "input": "急な話"
+    },
+    {
+      "description": "変な人 - regression test",
+      "expected": [
+        {
+          "lemma": "変",
+          "pos": "Adjective",
+          "surface": "変"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "人",
+          "pos": "Noun",
+          "surface": "人"
+        }
+      ],
+      "id": "na_12",
+      "input": "変な人"
     }
   ],
   "description": "Na-adjectives (ナ形容詞) (part 2/2)",
