@@ -319,15 +319,9 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
     return;
   }
 
-  // Find kanji portion (typically 1-2 characters for verbs)
-  size_t kanji_end = vh::findCharRegionEnd(char_types, start_pos, 3, normalize::CharType::Kanji);
-
+  // Kanji portion (typically 1-2 characters for verbs) followed by hiragana
+  size_t kanji_end = vh::findCharRegionEndBeforeHiragana(char_types, start_pos, 3, normalize::CharType::Kanji);
   if (kanji_end == start_pos) {
-    return;
-  }
-
-  // Look for hiragana after kanji
-  if (kanji_end >= char_types.size() || char_types[kanji_end] != normalize::CharType::Hiragana) {
     return;
   }
 

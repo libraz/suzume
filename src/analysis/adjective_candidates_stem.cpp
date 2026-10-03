@@ -271,15 +271,9 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
     return;
   }
 
-  // Find kanji portion (1-2 characters for adjective stem)
-  size_t kanji_end = findCharRegionEnd(char_types, start_pos, 2, normalize::CharType::Kanji);
-
+  // Kanji portion (1-2 characters for adjective stem) followed by hiragana
+  size_t kanji_end = findCharRegionEndBeforeHiragana(char_types, start_pos, 2, normalize::CharType::Kanji);
   if (kanji_end == start_pos) {
-    return;
-  }
-
-  // Look for hiragana after kanji
-  if (kanji_end >= char_types.size() || char_types[kanji_end] != normalize::CharType::Hiragana) {
     return;
   }
 
@@ -925,27 +919,17 @@ core::ExtendedPOS classicalKariCell(char32_t after_ka) {
 
 bool classicalConjunctiveFollowsAt(const std::vector<char32_t>& codepoints, size_t pos,
                                    const dictionary::DictionaryManager* dict_manager) {
-  if (dict_manager == nullptr || pos >= codepoints.size()) {
-    return false;
-  }
   constexpr size_t kClassicalTailProbeChars = 3;
-  const size_t probe_end = std::min(codepoints.size(), pos + kClassicalTailProbeChars);
-  for (size_t end = pos + 1; end <= probe_end; ++end) {
-    const auto* entry = lookupEntryInRange(*dict_manager, codepoints, pos, end, core::PartOfSpeech::Particle);
-    if (entry == nullptr) {
-      continue;
-    }
-    // The optative/imperative cell can be followed by the quotative と.
-    // Its dictionary entry is often labelled as a case particle even though
-    // this construction is a clausal connective (高かれ+と願う).
-    if (entry->extended_pos == core::ExtendedPOS::ParticleConj ||
-        entry->extended_pos == core::ExtendedPOS::ParticleQuote ||
-        (entry->extended_pos == core::ExtendedPOS::ParticleCase &&
-         grammar::isSingleHiragana(entry->surface, core::hiragana::kTo))) {
-      return true;
-    }
-  }
-  return false;
+  return hasDictionaryEntryFrom(dict_manager, codepoints, pos, 1, kClassicalTailProbeChars,
+                                core::PartOfSpeech::Particle, [](const dictionary::DictionaryEntry& entry) {
+                                  // The optative/imperative cell can be followed by the quotative と.
+                                  // Its dictionary entry is often labelled as a case particle even though
+                                  // this construction is a clausal connective (高かれ+と願う).
+                                  return entry.extended_pos == core::ExtendedPOS::ParticleConj ||
+                                         entry.extended_pos == core::ExtendedPOS::ParticleQuote ||
+                                         (entry.extended_pos == core::ExtendedPOS::ParticleCase &&
+                                          grammar::isSingleHiragana(entry.surface, core::hiragana::kTo));
+                                });
 }
 
 // The imperative cell also stands in the paired concessive, where two of them are

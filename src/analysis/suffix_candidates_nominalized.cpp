@@ -275,16 +275,9 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
     return;
   }
 
-  // Find kanji portion (typically 1-3 characters for nominalized nouns)
-  size_t kanji_end = findCharRegionEnd(char_types, start_pos, 4, normalize::CharType::Kanji);
-
-  // Need at least 1 kanji
+  // Kanji portion (typically 1-3 characters) followed by 1-2 hiragana nominalization endings
+  size_t kanji_end = findCharRegionEndBeforeHiragana(char_types, start_pos, 4, normalize::CharType::Kanji);
   if (kanji_end == start_pos) {
-    return;
-  }
-
-  // Look for 1-2 hiragana after kanji (nominalization endings)
-  if (kanji_end >= char_types.size() || char_types[kanji_end] != normalize::CharType::Hiragana) {
     return;
   }
 

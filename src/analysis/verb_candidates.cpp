@@ -42,18 +42,13 @@ void generateCompoundVerbCandidates(const std::vector<char32_t>& codepoints, siz
     return;
   }
 
-  // Find first kanji portion (1-2 chars)
-  size_t kanji1_end = vh::findCharRegionEnd(char_types, start_pos, 3, normalize::CharType::Kanji);
-
-  if (kanji1_end == start_pos || kanji1_end >= char_types.size()) {
+  // First kanji portion (1-2 chars) followed by a hiragana renyoukei ending
+  size_t kanji1_end = vh::findCharRegionEndBeforeHiragana(char_types, start_pos, 3, normalize::CharType::Kanji);
+  if (kanji1_end == start_pos) {
     return;
   }
 
-  // Find first hiragana portion (1-3 chars, typically verb renyoukei ending)
-  if (char_types[kanji1_end] != normalize::CharType::Hiragana) {
-    return;
-  }
-
+  // Find first hiragana portion (1-3 chars)
   size_t hira1_end = vh::findCharRegionEnd(char_types, kanji1_end, 4, normalize::CharType::Hiragana);
 
   // Find second kanji portion (must exist for compound verb)
@@ -159,16 +154,9 @@ void generateKatakanaVerbCandidates(const std::vector<char32_t>& codepoints, siz
     return;
   }
 
-  // Find katakana portion (1-8 characters for slang verb stems)
-  size_t kata_end = vh::findCharRegionEnd(char_types, start_pos, 8, normalize::CharType::Katakana);
-
-  // Need at least 1 katakana character
+  // Katakana portion (1-8 characters for slang verb stems) followed by hiragana conjugation endings
+  size_t kata_end = vh::findCharRegionEndBeforeHiragana(char_types, start_pos, 8, normalize::CharType::Katakana);
   if (kata_end == start_pos) {
-    return;
-  }
-
-  // Must be followed by hiragana (conjugation endings)
-  if (kata_end >= char_types.size() || char_types[kata_end] != normalize::CharType::Hiragana) {
     return;
   }
 

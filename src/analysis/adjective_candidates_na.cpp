@@ -346,15 +346,14 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
   if (kanji_len < 2) {
     const size_t head = kanji_end + 1;
     const auto nominal_word_starts = [&]() {
-      for (size_t head_end = head + 1; head_end <= std::min(codepoints.size(), head + 3); ++head_end) {
-        // A formal noun takes a nominal predicate's な as well (本+な+わけ).
-        const auto* noun = lookupEntryInRange(*dict_manager, codepoints, head, head_end, core::PartOfSpeech::Noun);
-        if ((noun != nullptr && noun->extended_pos != core::ExtendedPOS::NounFormal) ||
-            lookupEntryInRange(*dict_manager, codepoints, head, head_end, core::PartOfSpeech::Pronoun) != nullptr) {
-          return true;
-        }
-      }
-      return false;
+      constexpr size_t kHeadProbeChars = 3;
+      // A formal noun takes a nominal predicate's な as well (本+な+わけ).
+      return hasDictionaryEntryFrom(dict_manager, codepoints, head, 1, kHeadProbeChars, core::PartOfSpeech::Noun,
+                                    [](const dictionary::DictionaryEntry& entry) {
+                                      return entry.extended_pos != core::ExtendedPOS::NounFormal;
+                                    }) ||
+             hasDictionaryEntryFrom(dict_manager, codepoints, head, 1, kHeadProbeChars, core::PartOfSpeech::Pronoun,
+                                    nullptr);
     };
     // Inside a longer kanji run (直接的, 再利用可能) the kanji is a suffix, not a stem.
     // A na-adjective-forming suffix (なし崩し+的) attaches rather than heads.

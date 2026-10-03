@@ -530,13 +530,8 @@ bool followsListedAdverb(const std::vector<char32_t>& codepoints, size_t start_p
   if (dict_manager == nullptr) {
     return false;
   }
-  for (size_t len = 1; len <= kMaxAdverbMorae && len <= start_pos; ++len) {
-    if (lookupEntryInRange(*dict_manager, codepoints, start_pos - len, start_pos, core::PartOfSpeech::Adverb) !=
-        nullptr) {
-      return true;
-    }
-  }
-  return false;
+  return hasDictionaryEntryEndingAt(*dict_manager, codepoints, start_pos - std::min(start_pos, kMaxAdverbMorae),
+                                    start_pos, partOfSpeechMask(core::PartOfSpeech::Adverb));
 }
 
 void appendKuruRenyokeiCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,

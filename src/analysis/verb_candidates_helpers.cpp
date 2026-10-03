@@ -39,12 +39,7 @@ bool embedsTeFormAuxiliary(std::string_view surface) {
       "てもら", "てくれ", "てあげ", "てほしい", "てくださ",  // benefactive / request
       "てある", "である",                                    // completed-state existential
   };
-  for (const std::string_view pattern : kPatterns) {
-    if (surface.find(pattern) != std::string_view::npos) {
-      return true;
-    }
-  }
-  return false;
+  return utf8::containsAny(surface, kPatterns);
 }
 
 bool embedsTeFormMiruAuxiliary(const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos) {
@@ -258,40 +253,26 @@ constexpr size_t kFollowerProbeChars = 3;
 
 bool caseParticleFollowsAt(const dictionary::DictionaryManager& dict_manager, const std::vector<char32_t>& codepoints,
                            size_t pos) {
-  const size_t probe_end = std::min(codepoints.size(), pos + kFollowerProbeChars);
-  for (size_t stop = pos + 1; stop <= probe_end; ++stop) {
-    const auto* particle = lookupEntryInRange(dict_manager, codepoints, pos, stop, core::PartOfSpeech::Particle);
-    if (particle != nullptr && particle->extended_pos == core::ExtendedPOS::ParticleCase) {
-      return true;
-    }
-  }
-  return false;
+  return hasDictionaryEntryFrom(
+      &dict_manager, codepoints, pos, 1, kFollowerProbeChars, core::PartOfSpeech::Particle,
+      [](const dictionary::DictionaryEntry& entry) { return entry.extended_pos == core::ExtendedPOS::ParticleCase; });
 }
 
 bool hypotheticalParticleFollowsAt(const dictionary::DictionaryManager& dict_manager,
                                    const std::vector<char32_t>& codepoints, size_t pos) {
-  const size_t probe_end = std::min(codepoints.size(), pos + kFollowerProbeChars);
-  for (size_t stop = pos + 1; stop <= probe_end; ++stop) {
-    const auto* particle = lookupEntryInRange(dict_manager, codepoints, pos, stop, core::PartOfSpeech::Particle);
-    if (particle != nullptr && particle->extended_pos == core::ExtendedPOS::ParticleConj &&
-        grammar::isHypotheticalSelectingConjunctiveParticle(particle->surface)) {
-      return true;
-    }
-  }
-  return false;
+  return hasDictionaryEntryFrom(&dict_manager, codepoints, pos, 1, kFollowerProbeChars, core::PartOfSpeech::Particle,
+                                [](const dictionary::DictionaryEntry& entry) {
+                                  return entry.extended_pos == core::ExtendedPOS::ParticleConj &&
+                                         grammar::isHypotheticalSelectingConjunctiveParticle(entry.surface);
+                                });
 }
 
 bool classicalPastEnvironmentFollows(const dictionary::DictionaryManager& dict_manager,
                                      const std::vector<char32_t>& codepoints, size_t end_pos, bool is_izenkei) {
-  const size_t probe_end = std::min(codepoints.size(), end_pos + kFollowerProbeChars);
   if (is_izenkei) {
-    for (size_t stop = end_pos + 1; stop <= probe_end; ++stop) {
-      const auto* particle = lookupEntryInRange(dict_manager, codepoints, end_pos, stop, core::PartOfSpeech::Particle);
-      if (particle != nullptr && particle->extended_pos == core::ExtendedPOS::ParticleConj) {
-        return true;
-      }
-    }
-    return false;
+    return hasDictionaryEntryFrom(
+        &dict_manager, codepoints, end_pos, 1, kFollowerProbeChars, core::PartOfSpeech::Particle,
+        [](const dictionary::DictionaryEntry& entry) { return entry.extended_pos == core::ExtendedPOS::ParticleConj; });
   }
   if (clauseEndsAt(codepoints, end_pos)) {
     return true;
@@ -300,25 +281,16 @@ bool classicalPastEnvironmentFollows(const dictionary::DictionaryManager& dict_m
   if (normalize::isKanjiCodepoint(following) || normalize::classifyChar(following) == normalize::CharType::Katakana) {
     return true;
   }
-  for (size_t stop = end_pos + 1; stop <= probe_end; ++stop) {
-    if (lookupEntryInRange(dict_manager, codepoints, end_pos, stop, core::PartOfSpeech::Noun) != nullptr) {
-      return true;
-    }
-  }
-  return false;
+  return hasDictionaryEntryFrom(&dict_manager, codepoints, end_pos, 1, kFollowerProbeChars, core::PartOfSpeech::Noun,
+                                nullptr);
 }
 
 bool literaryPastAuxiliaryFollowsAt(const dictionary::DictionaryManager& dict_manager,
                                     const std::vector<char32_t>& codepoints, size_t pos) {
-  const size_t probe_end = std::min(codepoints.size(), pos + kFollowerProbeChars);
-  for (size_t stop = pos + 1; stop <= probe_end; ++stop) {
-    const auto* aux = lookupEntryInRange(dict_manager, codepoints, pos, stop, core::PartOfSpeech::Auxiliary);
-    if (aux != nullptr && (aux->extended_pos == core::ExtendedPOS::AuxClassicalKeri ||
-                           aux->extended_pos == core::ExtendedPOS::AuxClassicalKi)) {
-      return true;
-    }
-  }
-  return false;
+  return auxiliaryFollowsAt(&dict_manager, codepoints, pos, [](const dictionary::DictionaryEntry& entry) {
+    return entry.extended_pos == core::ExtendedPOS::AuxClassicalKeri ||
+           entry.extended_pos == core::ExtendedPOS::AuxClassicalKi;
+  });
 }
 
 bool naiConditionalFollowsAt(const std::vector<char32_t>& codepoints, size_t pos) {

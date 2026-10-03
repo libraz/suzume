@@ -1247,6 +1247,7 @@ bool endsWithClassicalAuxiliary(const dictionary::DictionaryManager* dict_manage
 
 // Delegate to shared implementation in tokenizer_utils.h
 using ::suzume::analysis::findCharRegionEnd;
+using ::suzume::analysis::findCharRegionEndBeforeHiragana;
 
 }  // namespace suzume::analysis::verb_helpers
 

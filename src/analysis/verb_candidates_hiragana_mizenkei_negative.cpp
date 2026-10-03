@@ -35,22 +35,13 @@ namespace vh = verb_helpers;
 // split-preference penalty when this returns true.
 bool hasFormalNounPrefixBoundary(const dictionary::DictionaryManager* dict_manager,
                                  const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos) {
-  if (dict_manager == nullptr || end_pos <= start_pos) {
-    return false;
-  }
-  const size_t total_len = end_pos - start_pos;
   // Both the noun prefix and the verb remainder need at least two characters
-  if (total_len < 4) {
+  if (end_pos < start_pos + 4) {
     return false;
   }
-  for (size_t prefix_len = 2; prefix_len + 2 <= total_len; ++prefix_len) {
-    const auto* entry =
-        lookupEntryInRange(*dict_manager, codepoints, start_pos, start_pos + prefix_len, core::PartOfSpeech::Noun);
-    if (entry != nullptr && entry->extended_pos == core::ExtendedPOS::NounFormal) {
-      return true;
-    }
-  }
-  return false;
+  return hasDictionaryEntryFrom(
+      dict_manager, codepoints, start_pos, 2, end_pos - start_pos - 2, core::PartOfSpeech::Noun,
+      [](const dictionary::DictionaryEntry& entry) { return entry.extended_pos == core::ExtendedPOS::NounFormal; });
 }
 
 // A formal noun that ends immediately before the final A-row mora is not an

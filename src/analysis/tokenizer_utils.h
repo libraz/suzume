@@ -120,6 +120,18 @@ size_t findCharRegionEnd(const std::vector<normalize::CharType>& char_types, siz
                          normalize::CharType target_type);
 
 /**
+ * @brief End of a non-empty @p target_type run at @p start_pos that hiragana follows.
+ *
+ * The opening check of a stem + okurigana generator: the run is scanned as in
+ * findCharRegionEnd and accepted only when it is non-empty and the next
+ * character is hiragana.
+ *
+ * @return End position (exclusive), or @p start_pos when the run is rejected
+ */
+size_t findCharRegionEndBeforeHiragana(const std::vector<normalize::CharType>& char_types, size_t start_pos,
+                                       size_t max_len, normalize::CharType target_type);
+
+/**
  * @brief Check whether a kanji run at @p start_pos is followed by する.
  *
  * @param minimum_kanji_count Minimum length required for the kanji run.

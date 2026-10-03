@@ -650,15 +650,11 @@ bool opensOnClosedClassWordTail(const dictionary::DictionaryManager* dict_manage
   // The closed word only claims its morae when what it needs comes after it
   // (でしょ+う, でし+た); でし before ら is no copula (駅で+しらべる).
   auto continuation_follows = [&](size_t word_end) {
-    for (size_t follow_end = word_end + 1; follow_end <= std::min(codepoints.size(), word_end + 3); ++follow_end) {
-      if (lookupEntryInRange(*dict_manager, codepoints, word_end, follow_end, core::PartOfSpeech::Auxiliary) !=
-              nullptr ||
-          lookupEntryInRange(*dict_manager, codepoints, word_end, follow_end, core::PartOfSpeech::Particle) !=
-              nullptr) {
-        return true;
-      }
-    }
-    return false;
+    constexpr size_t kContinuationProbeChars = 3;
+    return hasDictionaryEntryFrom(dict_manager, codepoints, word_end, 1, kContinuationProbeChars,
+                                  core::PartOfSpeech::Auxiliary, nullptr) ||
+           hasDictionaryEntryFrom(dict_manager, codepoints, word_end, 1, kContinuationProbeChars,
+                                  core::PartOfSpeech::Particle, nullptr);
   };
   for (size_t word_start = scan_start; word_start < start_pos; ++word_start) {
     // A span covered by the tail of a closed word and the closed word after it

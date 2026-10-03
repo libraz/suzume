@@ -28,6 +28,15 @@ size_t findCharRegionEnd(const std::vector<normalize::CharType>& char_types, siz
   return end;
 }
 
+size_t findCharRegionEndBeforeHiragana(const std::vector<normalize::CharType>& char_types, size_t start_pos,
+                                       size_t max_len, normalize::CharType target_type) {
+  const size_t end = findCharRegionEnd(char_types, start_pos, max_len, target_type);
+  if (end == start_pos || end >= char_types.size() || char_types[end] != normalize::CharType::Hiragana) {
+    return start_pos;
+  }
+  return end;
+}
+
 bool hasKanjiSuruPredicateAt(const std::vector<char32_t>& codepoints,
                              const std::vector<normalize::CharType>& char_types, size_t start_pos,
                              size_t minimum_kanji_count) {
