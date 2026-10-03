@@ -721,9 +721,9 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
                        is_causative_pattern || is_classical_conjecture_pattern)
                           ? core::ExtendedPOS::VerbMizenkei
                           : core::ExtendedPOS::Unknown;
-                  candidates.push_back(makeVerbCandidate(surface, start_pos, mizenkei_end, cost, base_form,
-                                                         grammar::verbTypeToConjType(verb_type), true,
-                                                         CandidateOrigin::VerbKanji, 0.9F, info_pattern, epos));
+                  candidates.push_back(makeVerbCandidate(
+                      surface, start_pos, mizenkei_end, cost, base_form, grammar::verbTypeToConjType(verb_type), true,
+                      CandidateOrigin::VerbKanji, candidate::kHighOriginConfidence, info_pattern, epos));
                 }
               }
             }  // not Suru verb pattern
@@ -853,9 +853,10 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
                 SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface << " " << pattern << " lemma=" << base_form
                                     << " cost=" << kCost << "\n";
               }
-              candidates.push_back(makeVerbCandidate(
-                  surface, start_pos, multi_miz_end, kCost, base_form, grammar::verbTypeToConjType(verb_type), true,
-                  CandidateOrigin::VerbKanji, 0.9F, pattern, core::ExtendedPOS::VerbMizenkei));
+              candidates.push_back(makeVerbCandidate(surface, start_pos, multi_miz_end, kCost, base_form,
+                                                     grammar::verbTypeToConjType(verb_type), true,
+                                                     CandidateOrigin::VerbKanji, candidate::kHighOriginConfidence,
+                                                     pattern, core::ExtendedPOS::VerbMizenkei));
             }
           }
         }

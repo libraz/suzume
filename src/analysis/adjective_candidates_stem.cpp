@@ -194,8 +194,7 @@ float productiveIAdjectiveStemConfidence(const std::string& stem, const std::str
   // case/topic/nominalizing particles: sentence-final か is homographic with
   // the genuine i-adjective stem in 暖か+さ and must remain available.
   if (dict_manager != nullptr) {
-    const std::string final_mora(utf8::lastChar(stem));
-    const auto* particle = dict_manager->lookupExact(final_mora, core::PartOfSpeech::Particle);
+    const auto* particle = dict_manager->lookupExact(utf8::lastChar(stem), core::PartOfSpeech::Particle);
     if (particle != nullptr && (particle->extended_pos == core::ExtendedPOS::ParticleCase ||
                                 particle->extended_pos == core::ExtendedPOS::ParticleTopic ||
                                 particle->extended_pos == core::ExtendedPOS::ParticleNo)) {
@@ -239,10 +238,7 @@ float productiveIAdjectiveStemConfidence(const std::string& stem, const std::str
   // A compound-forming kana head is inherited the same way (照れ+くさい,
   // 面倒+くさい), provided a host stands in front of it.
   for (size_t head_start = 1; head_start < stem_codepoints.size(); ++head_start) {
-    std::string head_base;
-    for (size_t idx = head_start; idx < stem_codepoints.size(); ++idx) {
-      normalize::encodeUtf8(stem_codepoints[idx], head_base);
-    }
+    const std::string head_base = extractSubstring(stem_codepoints, head_start, stem_codepoints.size());
     if (adj_detail::isCompoundFormingAdjective(head_base + "い")) {
       return confidence;
     }
@@ -369,53 +365,43 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
 
       // Found potential i-adjective stem + garu-connection pattern
       // The stem is just the kanji portion (e.g., 高, 尊, 寒)
-      std::string stem = extractSubstring(codepoints, start_pos, kanji_end);
-      std::string base_form = stem + "い";  // e.g., 高 → 高い
+      const std::string& stem = kanji_part;
+      const std::string base_form = stem + "い";  // e.g., 高 → 高い
 
       // Validate that stem + い is a real i-adjective
       // Use lower threshold (0.35) for garu-connection patterns because:
       // - Single-kanji adjectives like 高い get lower confidence (0.42)
       // - The presence of すぎる/がる/さ strongly indicates adjective interpretation
-      const auto& adj_results = inflection.analyze(base_form);
-      bool is_valid_adjective = false;
-      float adj_confidence = 0.0F;
       // A single-kanji stem is validated by inflection shape alone too easily: 上い
       // (conf 0.42) looks like an i-adjective but is really the godan verb stem of
       // 上がる. Require dictionary confirmation for single-kanji stems (real ones —
       // 寒い, 高い, 痛い — are all registered), while multi-kanji/extended stems
       // (恥ずかしい) keep the inflection path.
       const bool single_kanji_stem = (kanji_end - start_pos == 1);
-      for (const auto& result : adj_results) {
-        if (result.verb_type == grammar::VerbType::IAdjective && result.confidence >= candidate::kGaruAdjConfMin) {
-          if (single_kanji_stem && !isAdjectiveInDictionary(dict_manager, base_form)) {
-            continue;
-          }
-          is_valid_adjective = true;
-          adj_confidence = result.confidence;
-          break;
-        }
-      }
+      const bool in_dictionary = isAdjectiveInDictionary(dict_manager, base_form);
+      float adj_confidence =
+          (single_kanji_stem && !in_dictionary)
+              ? candidate::kNoOriginConfidence
+              : adj_detail::firstConfidenceAtLeast(inflection.analyze(base_form), grammar::VerbType::IAdjective,
+                                                   candidate::kGaruAdjConfMin);
 
-      SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   base=\"" << base_form << "\" is_valid=" << is_valid_adjective
-                                                      << " conf=" << adj_confidence << "\n");
+      SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   base=\"" << base_form << "\" conf=" << adj_confidence << "\n");
 
       // Dictionary fallback: if inflection analysis gives low confidence but
       // the adjective exists in the dictionary, accept it.
       // E.g., 可愛い has conf=0 from inflection (all-kanji stem) but is in L2 dict.
-      if (!is_valid_adjective) {
-        if (isAdjectiveInDictionary(dict_manager, base_form)) {
-          is_valid_adjective = true;
-          adj_confidence = candidate::kDictFallbackAdjConfidence;
-          SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   dict fallback: \"" << base_form << "\" found in dictionary\n");
-        } else {
+      if (adj_confidence == candidate::kNoOriginConfidence) {
+        if (!in_dictionary) {
           continue;
         }
+        adj_confidence = candidate::kDictFallbackAdjConfidence;
+        SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   dict fallback: \"" << base_form << "\" found in dictionary\n");
       }
 
       // Check for false positives: single-kanji stems that are also verb renyokei
       // E.g., 落ちすぎ could be 落ち(verb renyokei) + すぎ(verb)
       // We should prefer the verb renyokei interpretation if kanji+ちる/きる/etc. is a verb
-      if (kanji_end - start_pos == 1) {
+      if (single_kanji_stem) {
         // Check if stem + る, stem + す, etc. forms a verb
         bool is_likely_verb_stem = false;
         for (const auto& suffix : {"ちる", "きる", "ぎる", "しる", "びる", "みる", "りる"}) {
@@ -523,7 +509,7 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
             // closed class beginning with it (飲む+さかい).
             // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
             if (dict_manager != nullptr && hiragana_part.size() > byte_pos + pattern.size()) {
-              const std::string closed_tail = hiragana_part.substr(byte_pos);
+              const std::string_view closed_tail = std::string_view(hiragana_part).substr(byte_pos);
               if (dict_manager->lookupExact(closed_tail, core::PartOfSpeech::Particle) != nullptr) {
                 continue;
               }
@@ -718,12 +704,8 @@ bool isModernIAdjective(const std::string& lemma, const grammar::Inflection& inf
   }
   const float minimum_confidence =
       grammar::containsKanji(lemma) ? candidate::kCompoundAdjConfMin : candidate::kHiraAdjConfMin;
-  for (const auto& cand : inflection.analyze(lemma)) {
-    if (cand.verb_type == grammar::VerbType::IAdjective && cand.confidence >= minimum_confidence) {
-      return true;
-    }
-  }
-  return false;
+  return adj_detail::firstConfidenceAtLeast(inflection.analyze(lemma), grammar::VerbType::IAdjective,
+                                            minimum_confidence) != candidate::kNoOriginConfidence;
 }
 
 // The modern base of a ku-paradigm stem that ends in け, when that base is a

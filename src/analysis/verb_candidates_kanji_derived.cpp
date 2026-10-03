@@ -387,14 +387,14 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
     // Check if first hiragana is e-row or i-row (ichidan renyokei ending)
     if (grammar::isERowCodepoint(first_hira) || grammar::isIRowCodepoint(first_hira)) {
       size_t renyokei_end = kanji_end + 1;  // kanji + e/i-row
+      const std::string renyokei_surface = extractSubstring(codepoints, start_pos, renyokei_end);
+      const std::string base_form = renyokei_surface + "る";  // 食べ + る = 食べる
       // Check for れ + ば pattern after renyokei
       if (renyokei_end + 1 < codepoints.size() && codepoints[renyokei_end] == U'れ' &&
           codepoints[renyokei_end + 1] == U'ば') {
         // E.g., 食べ + れ + ば → 食べれ is kateikei
         size_t kateikei_end = renyokei_end + 1;  // renyokei + れ
         std::string surface = extractSubstring(codepoints, start_pos, kateikei_end);
-        std::string renyokei_surface = extractSubstring(codepoints, start_pos, renyokei_end);
-        std::string base_form = renyokei_surface + "る";  // 食べ + る = 食べる
 
         // Disambiguate i-adjective 仮定形 from ichidan verb 仮定形 for the ければ case.
         // "高ければ"(高い) and "受ければ"(受ける) are grammatically indistinguishable by
@@ -414,9 +414,10 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
 
         // Verify using inflection analysis on the kateikei form
         const auto& all_candidates = inflection.analyze(surface);
-        float ichidan_confidence = getIchidanConfidence(all_candidates, 0.3F);
+        const float ichidan_confidence =
+            getIchidanConfidence(all_candidates, candidate::verb_cost::kIchidanKateikeiMinConfidence);
 
-        if (!is_iadj_kateikei && ichidan_confidence >= 0.3F) {
+        if (!is_iadj_kateikei && ichidan_confidence != candidate::kNoConfidence) {
           // Negative cost to beat the split path 語幹+れ(受身)+ば
           constexpr float kKateikeiCost = candidate::verb_cost::kStrongBonus;
           SUZUME_DEBUG_VERBOSE_BLOCK {
@@ -484,8 +485,6 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
           //       食べ + よ → 食べよ is the literary imperative.
           size_t volitional_end = renyokei_end + 1;  // renyokei + よ
           std::string surface = extractSubstring(codepoints, start_pos, volitional_end);
-          std::string renyokei_surface = extractSubstring(codepoints, start_pos, renyokei_end);
-          std::string base_form = renyokei_surface + "る";  // 食べ + る = 食べる
 
           // Check if renyokei looks like an adjective (kanji+い pattern)
           // E.g., 良い, 高い, 赤い - these are adjectives, not ichidan verb stems
@@ -571,7 +570,7 @@ void appendGodanPassiveRenyokeiCandidates(const std::vector<char32_t>& codepoint
       getIchidanConfidence(inflection.analyze(passive_base), candidate::verb_cost::kIchidanDefaultMinConfidence);
 
   // Passive verbs are Ichidan conjugation (言われる conjugates like 食べる)
-  if (ichidan_confidence < 0.4F) {
+  if (ichidan_confidence == candidate::kNoConfidence) {
     return;
   }
   // Check if followed by べき (classical obligation)

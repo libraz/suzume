@@ -488,7 +488,7 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
         auto onbin_candidate =
             makeVerbCandidate(onbin_surface, start_pos, onbin_end, kHiraganaOnbinCost, onbin_match.base_form,
                               grammar::verbTypeToConjType(onbin_match.verb_type), true, CandidateOrigin::VerbHiragana,
-                              0.9F, origin, core::ExtendedPOS::VerbOnbinkei);
+                              candidate::kHighOriginConfidence, origin, core::ExtendedPOS::VerbOnbinkei);
         onbin_candidate.lemma_verified = true;
         candidates.push_back(std::move(onbin_candidate));
       }

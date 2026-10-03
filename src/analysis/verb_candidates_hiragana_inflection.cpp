@@ -285,6 +285,17 @@ bool startsWithParticleThenVerifiedVerb(const std::vector<char32_t>& codepoints,
   return false;
 }
 
+// True when |cand| should replace |best|: clearly higher confidence, or a tie
+// (within 0.01) broken toward GodanWa over GodanRa/GodanTa, since う verbs
+// (しまう, あらう, まよう) dominate pure-hiragana stems.
+bool prefersOverInflection(const grammar::InflectionCandidate& cand, const grammar::InflectionCandidate& best) {
+  if (cand.confidence > best.confidence + 0.01F) {
+    return true;
+  }
+  return std::abs(cand.confidence - best.confidence) <= 0.01F && cand.verb_type == grammar::VerbType::GodanWa &&
+         (best.verb_type == grammar::VerbType::GodanRa || best.verb_type == grammar::VerbType::GodanTa);
+}
+
 }  // namespace
 
 namespace hiragana_verb_detail {
@@ -310,10 +321,6 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
   // Try different lengths, starting from longest
   for (size_t end_pos = hiragana_end; end_pos > start_pos + 1; --end_pos) {
     std::string surface = extractSubstring(codepoints, start_pos, end_pos);
-
-    if (surface.empty()) {
-      continue;
-    }
     // A predicate behind an interior case particle proves the boundary the
     // conjugation table would otherwise hide inside a fabricated stem.
     if (vh::crossesCaseParticleBeforePredicate(dict_manager, codepoints, start_pos, end_pos)) {
@@ -324,78 +331,29 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
     // First try the best match, but also check all candidates for dictionary verbs
     const auto& all_candidates = inflection.analyze(surface);
     grammar::InflectionCandidate best;
-    bool is_dictionary_verb = false;
 
-    // Look through all candidates to find ones whose base form is in the dictionary
-    // Collect all matches and select the best one based on:
-    // 1. Higher confidence
-    // 2. GodanWa > GodanRa/GodanTa when tied (う verbs are much more common for hiragana)
-    // This helps with cases like しまった where しまう (GodanWa) should beat しまる (GodanRa)
-    if (dict_manager != nullptr) {
-      std::vector<grammar::InflectionCandidate> dict_matches;
-
-      for (const auto& cand : all_candidates) {
-        if (cand.verb_type == grammar::VerbType::IAdjective || cand.base_form.empty()) {
-          continue;
-        }
-        if (vh::isVerbInDictionary(dict_manager, cand.base_form)) {
-          // Found a dictionary verb - collect this candidate
-          dict_matches.push_back(cand);
-        }
+    // The best dictionary-verified reading wins; otherwise the best reading
+    // overall. Both folds share one tie-break (prefersOverInflection).
+    const grammar::InflectionCandidate* best_dictionary = nullptr;
+    const grammar::InflectionCandidate* best_any = nullptr;
+    for (const auto& cand : all_candidates) {
+      if (cand.verb_type == grammar::VerbType::IAdjective) {
+        continue;
       }
-
-      // Select the best dictionary match
-      if (!dict_matches.empty()) {
-        is_dictionary_verb = true;
-        best = dict_matches[0];
-
-        for (size_t i = 1; i < dict_matches.size(); ++i) {
-          const auto& cand = dict_matches[i];
-          // Higher confidence wins
-          if (cand.confidence > best.confidence + 0.01F) {
-            best = cand;
-          } else if (std::abs(cand.confidence - best.confidence) <= 0.01F) {
-            // When confidence is tied (within 0.01), prefer GodanWa over GodanRa/GodanTa
-            // Rationale: For pure hiragana stems, う verbs (しまう, あらう, かう) are
-            // much more common than る/つ verbs with the same stem pattern.
-            // GodanRa: rare for pure hiragana (most are kanji: 走る, 帰る)
-            // GodanTa: rare (持つ, 勝つ, etc. - usually with kanji)
-            // GodanWa: very common in hiragana (しまう, あらう, まよう, etc.)
-            if (cand.verb_type == grammar::VerbType::GodanWa &&
-                (best.verb_type == grammar::VerbType::GodanRa || best.verb_type == grammar::VerbType::GodanTa)) {
-              best = cand;
-            }
-          }
-        }
+      if (best_any == nullptr || prefersOverInflection(cand, *best_any)) {
+        best_any = &cand;
+      }
+      if (dict_manager != nullptr && !cand.base_form.empty() &&
+          (best_dictionary == nullptr || prefersOverInflection(cand, *best_dictionary)) &&
+          vh::isVerbInDictionary(dict_manager, cand.base_form)) {
+        best_dictionary = &cand;
       }
     }
-
-    // If no dictionary match, select best candidate with GodanWa preference
-    // When confidence is tied, GodanWa should beat GodanRa/GodanTa because
-    // う verbs (あらう, かう, まよう) are much more common than る/つ verbs
-    // for pure hiragana stems
-    if (!is_dictionary_verb && !all_candidates.empty()) {
-      bool found_verb_candidate = false;
-      for (const auto& cand : all_candidates) {
-        if (cand.verb_type == grammar::VerbType::IAdjective) {
-          continue;
-        }
-        if (!found_verb_candidate) {
-          best = cand;
-          found_verb_candidate = true;
-          continue;
-        }
-        // Higher confidence wins
-        if (cand.confidence > best.confidence + 0.01F) {
-          best = cand;
-        } else if (std::abs(cand.confidence - best.confidence) <= 0.01F) {
-          // When confidence is tied (within 0.01), prefer GodanWa over GodanRa/GodanTa
-          if (cand.verb_type == grammar::VerbType::GodanWa &&
-              (best.verb_type == grammar::VerbType::GodanRa || best.verb_type == grammar::VerbType::GodanTa)) {
-            best = cand;
-          }
-        }
-      }
+    const bool is_dictionary_verb = best_dictionary != nullptr;
+    if (best_dictionary != nullptr) {
+      best = *best_dictionary;
+    } else if (best_any != nullptr) {
+      best = *best_any;
     }
 
     // A terminal hiragana run ending in く can be an unattested Godan-ka

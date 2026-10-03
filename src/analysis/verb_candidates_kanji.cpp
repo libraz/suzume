@@ -627,9 +627,9 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
           SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface << " " << label << " lemma=" << base_form
                               << " cost=" << kCost << "\n";
         }
-        candidates.push_back(makeVerbCandidate(surface, start_pos, sugi_pos, kCost, base_form,
-                                               grammar::verbTypeToConjType(verb_type), true, CandidateOrigin::VerbKanji,
-                                               0.9F, label, core::ExtendedPOS::VerbRenyokei));
+        candidates.push_back(makeVerbCandidate(
+            surface, start_pos, sugi_pos, kCost, base_form, grammar::verbTypeToConjType(verb_type), true,
+            CandidateOrigin::VerbKanji, candidate::kHighOriginConfidence, label, core::ExtendedPOS::VerbRenyokei));
       }
     }
 

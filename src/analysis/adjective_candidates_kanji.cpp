@@ -721,7 +721,7 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
         // registered adjective's own negative, whose base is the adjective.
         if (surface.size() > 2 * core::kJapaneseCharBytes && utf8::endsWith(surface, "ない") &&
             !isAdjectiveInDictionary(dict_manager, cand.base_form)) {
-          const std::string negated = surface.substr(0, surface.size() - 2 * core::kJapaneseCharBytes);
+          const std::string_view negated = utf8::dropLast2Chars(surface);
           bool negated_is_verb = verb_helpers::hasDictionaryEntry(dict_manager, negated, core::PartOfSpeech::Verb);
           if (!negated_is_verb) {
             for (const auto& negated_res : inflection.analyze(negated)) {

@@ -93,17 +93,12 @@ void appendIchidanStemRareCandidates(const std::vector<char32_t>& codepoints, si
     // never heard of. Once the verb is registered its paradigm is settled, and
     // an analyzer that reads any e-row okurigana as an Ichidan stem must not
     // get to overrule it.
-    if (!is_valid_verb && !base_in_dictionary) {
-      // Check if inflection analyzer recognizes this as Ichidan verb
-      // Use >= threshold to include edge cases like 信じる (conf=0.3)
-      // Check ALL candidates, not just best, because godan/ichidan may have same confidence
-      const auto& all_cands = inflection.analyze(base_form);
-      for (const auto& cand : all_cands) {
-        if (cand.verb_type == grammar::VerbType::Ichidan && cand.confidence >= 0.3F) {
-          is_valid_verb = true;
-          break;
-        }
-      }
+    if (!base_in_dictionary) {
+      // Any Ichidan reading counts, not just the best one: godan/ichidan may
+      // tie, and the threshold is inclusive for edge cases like 信じる (0.3).
+      is_valid_verb =
+          getIchidanConfidence(inflection.analyze(base_form), candidate::verb_cost::kIchidanKateikeiMinConfidence) !=
+          candidate::kNoConfidence;
     }
 
     if (is_valid_verb && (!has_multiple_okurigana || has_lexical_stem_evidence)) {
@@ -113,9 +108,9 @@ void appendIchidanStemRareCandidates(const std::vector<char32_t>& codepoints, si
         SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface << " ichidan_stem_rare lemma=" << base_form
                             << " cost=" << kCost << "\n";
       }
-      candidates.push_back(makeVerbCandidate(surface, start_pos, stem_end, kCost, base_form,
-                                             grammar::verbTypeToConjType(grammar::VerbType::Ichidan), true,
-                                             CandidateOrigin::VerbKanji, 0.9F, "ichidan_stem_rare"));
+      candidates.push_back(makeVerbCandidate(
+          surface, start_pos, stem_end, kCost, base_form, grammar::verbTypeToConjType(grammar::VerbType::Ichidan), true,
+          CandidateOrigin::VerbKanji, candidate::kHighOriginConfidence, "ichidan_stem_rare"));
     }
   }
 }
@@ -423,11 +418,12 @@ void appendSingleKanjiIchidanCandidates(const std::vector<char32_t>& codepoints,
                                                 : " single_kanji_ichidan_imperative lemma=")
                               << base_form << " cost=" << kCost << "\n";
         }
-        candidates.push_back(makeVerbCandidate(
-            surface, start_pos, kanji_end + 1, kCost, base_form,
-            grammar::verbTypeToConjType(grammar::VerbType::Ichidan), true, CandidateOrigin::VerbKanji, 0.9F,
-            is_volitional ? "single_kanji_ichidan_volitional" : "single_kanji_ichidan_imperative",
-            is_volitional ? core::ExtendedPOS::VerbMizenkei : core::ExtendedPOS::VerbMeireikei));
+        candidates.push_back(
+            makeVerbCandidate(surface, start_pos, kanji_end + 1, kCost, base_form,
+                              grammar::verbTypeToConjType(grammar::VerbType::Ichidan), true, CandidateOrigin::VerbKanji,
+                              candidate::kHighOriginConfidence,
+                              is_volitional ? "single_kanji_ichidan_volitional" : "single_kanji_ichidan_imperative",
+                              is_volitional ? core::ExtendedPOS::VerbMizenkei : core::ExtendedPOS::VerbMeireikei));
       }
 
       // Causative させ (見+させる, 見+させ+られ+た), not 見さ+せる like godan-sa.

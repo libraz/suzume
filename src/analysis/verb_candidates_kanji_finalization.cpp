@@ -471,10 +471,8 @@ void appendSelectedKanjiVerbCandidate(const std::vector<char32_t>& codepoints, s
     // for their own prefix and are unaffected.
     if (!in_dict && dict_manager != nullptr && best.base_form == surface &&
         surface.size() > core::kTwoJapaneseCharBytes) {
-      const auto* tail_entry =
-          dict_manager->lookupExact(std::string(utf8::lastChar(surface)), core::PartOfSpeech::Auxiliary);
-      const auto* head_entry =
-          dict_manager->lookupExact(std::string(utf8::dropLastChar(surface)), core::PartOfSpeech::Verb);
+      const auto* tail_entry = dict_manager->lookupExact(utf8::lastChar(surface), core::PartOfSpeech::Auxiliary);
+      const auto* head_entry = dict_manager->lookupExact(utf8::dropLastChar(surface), core::PartOfSpeech::Verb);
       const bool classical_irrealis_tail =
           tail_entry != nullptr && (tail_entry->extended_pos == core::ExtendedPOS::AuxVolitional ||
                                     tail_entry->extended_pos == core::ExtendedPOS::AuxNegativeNu);

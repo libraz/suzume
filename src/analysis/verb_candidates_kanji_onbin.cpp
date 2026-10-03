@@ -119,6 +119,7 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
                                 const dictionary::DictionaryManager* dict_manager, bool sokuonbin_stem_verified,
                                 const std::string& sokuonbin_lemma, grammar::VerbType sokuonbin_verb_type,
                                 std::vector<UnknownCandidate>& candidates) {
+  const std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
   // Generate Godan onbin stem candidates for contraction auxiliary patterns
   // E.g., 読んでる → 読ん (onbin of 読む) + でる (ている contraction)
   //       書いとく → 書い (onbin of 書く) + とく (ておく contraction)
@@ -168,7 +169,6 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
       } else {
         // う音便 is a closed lexical GodanWa subclass, so it occurs only in
         // the simple past/te cells and only for an attested subclass stem.
-        const std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
         is_contraction_pattern = grammar::isUOnbinStem(kanji_stem) && (next_char == U'た' || next_char == U'て');
       }
       if (is_contraction_pattern) {
@@ -177,7 +177,6 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
         std::string_view onbin_str = is_hatsuonbin ? "ん" : (is_ikuon ? "い" : "う");
         const auto& candidates_to_try = vh::getGodanTypesByOnbin(onbin_str);
         // Get the kanji stem
-        std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
         // First, check dictionary for ALL verb types before falling back to inflection
         // This ensures dictionary-verified verbs take precedence
         // Phase 1: Dictionary check
@@ -204,8 +203,8 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
           const char* pattern = is_hatsuonbin ? "kanji_hatsuonbin" : (is_ikuon ? "kanji_ikuon" : "kanji_uonbin");
           auto candidate =
               makeVerbCandidate(onbin_surface, start_pos, kanji_end + 1, kOnbinCost, matched_base_form,
-                                grammar::verbTypeToConjType(matched_verb_type), true, CandidateOrigin::VerbKanji, 0.9F,
-                                pattern, core::ExtendedPOS::VerbOnbinkei);
+                                grammar::verbTypeToConjType(matched_verb_type), true, CandidateOrigin::VerbKanji,
+                                candidate::kHighOriginConfidence, pattern, core::ExtendedPOS::VerbOnbinkei);
           candidate.lemma_verified = onbin_match.matched;
           candidates.push_back(std::move(candidate));
         }
@@ -230,7 +229,6 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
       if (is_te_ta_pattern) {
         const auto& sokuonbin_types = vh::getGodanTypesByOnbin("っ");
         // Get the kanji stem
-        std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
 
 #ifdef SUZUME_DEBUG
         // TRACE: Collect all candidates for logging (debug builds only)
@@ -432,8 +430,8 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
           }
           auto candidate =
               makeVerbCandidate(onbin_surface, start_pos, kanji_end + 1, sokuonbin_cost, matched_base_form,
-                                grammar::verbTypeToConjType(matched_verb_type), true, CandidateOrigin::VerbKanji, 0.9F,
-                                "kanji_sokuonbin", core::ExtendedPOS::VerbOnbinkei);
+                                grammar::verbTypeToConjType(matched_verb_type), true, CandidateOrigin::VerbKanji,
+                                candidate::kHighOriginConfidence, "kanji_sokuonbin", core::ExtendedPOS::VerbOnbinkei);
           // The non-dictionary fallback reaches here only for a one-kanji
           // stem whose complete sokuonbin form was validated by inflection.
           // Preserve that evidence, as the extended and te-auxiliary paths do,
@@ -465,7 +463,6 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
       if (is_de_da_pattern) {
         const auto& hatsuonbin_types = vh::getGodanTypesByOnbin("ん");
         // Get the kanji stem
-        std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
 
         // First, check dictionary for ALL verb types
         auto hatsuonbin_match = vh::firstGodanOnbinDictBase(dict_manager, kanji_stem, "ん");
@@ -493,8 +490,8 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
           }
           auto candidate =
               makeVerbCandidate(onbin_surface, start_pos, kanji_end + 1, kHatsuonbinCost, matched_base_form,
-                                grammar::verbTypeToConjType(matched_verb_type), true, CandidateOrigin::VerbKanji, 0.9F,
-                                "kanji_hatsuonbin", core::ExtendedPOS::VerbOnbinkei);
+                                grammar::verbTypeToConjType(matched_verb_type), true, CandidateOrigin::VerbKanji,
+                                candidate::kHighOriginConfidence, "kanji_hatsuonbin", core::ExtendedPOS::VerbOnbinkei);
           // Both branches above prove the complete Xん+で/だ paradigm: either
           // the base lemma is in the dictionary or full-form inflection
           // reconstructs a matching nasal-euphonic row. Preserve that evidence
@@ -525,7 +522,6 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
     if (!at_end && !followed_by_de_da)
       continue;
 
-    std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
     std::string hira_stem = (n_pos > kanji_end) ? extractSubstring(codepoints, kanji_end, n_pos) : "";
     const std::string lexical_stem = kanji_stem + hira_stem;
 
@@ -593,9 +589,10 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
         SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface << " kanji_hatsuonbin_standalone lemma=" << matched_base
                             << " cost=" << kHatsuonbinCost << "\n";
       }
-      auto candidate = makeVerbCandidate(onbin_surface, start_pos, n_pos + 1, kHatsuonbinCost, matched_base,
-                                         grammar::verbTypeToConjType(matched_type), true, CandidateOrigin::VerbKanji,
-                                         0.9F, "kanji_hatsuonbin", core::ExtendedPOS::VerbOnbinkei);
+      auto candidate =
+          makeVerbCandidate(onbin_surface, start_pos, n_pos + 1, kHatsuonbinCost, matched_base,
+                            grammar::verbTypeToConjType(matched_type), true, CandidateOrigin::VerbKanji,
+                            candidate::kHighOriginConfidence, "kanji_hatsuonbin", core::ExtendedPOS::VerbOnbinkei);
       candidate.lemma_verified = n_onbin_match.matched || followed_by_de_da;
       candidates.push_back(std::move(candidate));
     }

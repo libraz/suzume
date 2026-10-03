@@ -174,7 +174,7 @@ void adj_detail::appendHiraganaIAdjSurfaceCandidates(const std::vector<char32_t>
     // in い.  Preserve genuine adjectives such as うまい by requiring the
     // prefix itself to be a dictionary-attested verb.
     if (utf8::endsWith(surface, "まい") && surface.size() > core::kTwoJapaneseCharBytes) {
-      const std::string verb_prefix = surface.substr(0, surface.size() - core::kTwoJapaneseCharBytes);
+      const std::string_view verb_prefix = utf8::dropLast2Chars(surface);
       if (isVerbInDictionary(dict_manager, verb_prefix)) {
         continue;
       }

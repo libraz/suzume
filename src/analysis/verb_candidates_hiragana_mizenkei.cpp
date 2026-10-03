@@ -217,7 +217,8 @@ void appendPassiveMizenkeiCandidates(const std::vector<char32_t>& codepoints, si
     }
     candidates.push_back(makeVerbCandidate(surface, start_pos, split_end, cost, lemma,
                                            grammar::verbTypeToConjType(verb_type), true, CandidateOrigin::VerbHiragana,
-                                           0.9F, "hiragana_passive_mizenkei", core::ExtendedPOS::VerbMizenkei));
+                                           candidate::kHighOriginConfidence, "hiragana_passive_mizenkei",
+                                           core::ExtendedPOS::VerbMizenkei));
     break;  // Only generate one passive candidate per length
   }
 }
@@ -369,7 +370,7 @@ void appendIchidanRareruCandidates(const std::vector<char32_t>& codepoints, size
         (start_pos == 0 || vh::followsCaseParticle(dict_manager, codepoints, start_pos));
     candidates.push_back(
         makeVerbCandidate(stem, start_pos, stem_end, kCost, lemma, dictionary::ConjugationType::Ichidan, true, origin,
-                          0.9F, "hiragana_ichidan_rareru",
+                          candidate::kHighOriginConfidence, "hiragana_ichidan_rareru",
                           validated_short_predicate ? core::ExtendedPOS::VerbMizenkei : core::ExtendedPOS::Unknown));
     break;  // Only generate one ichidan rareru candidate per starting position
   }

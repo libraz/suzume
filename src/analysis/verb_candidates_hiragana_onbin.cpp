@@ -362,7 +362,7 @@ void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, s
           is_sokuonbin ? "hiragana_sokuonbin" : (is_hatsuonbin ? "hiragana_hatsuonbin" : "hiragana_ikuon");
       auto onbin_cand = makeVerbCandidate(onbin_surface, start_pos, onbin_pos + 1, cost, base_form,
                                           grammar::verbTypeToConjType(verb_type), true, CandidateOrigin::VerbHiragana,
-                                          0.9F, pattern, core::ExtendedPOS::VerbOnbinkei);
+                                          candidate::kHighOriginConfidence, pattern, core::ExtendedPOS::VerbOnbinkei);
       // The reconstructed base is dictionary-attested, irrespective of
       // whether the inflected surface also has a dictionary entry.
       onbin_cand.lemma_verified = lemma_dict_verified;

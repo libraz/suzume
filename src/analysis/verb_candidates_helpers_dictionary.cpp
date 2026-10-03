@@ -64,7 +64,7 @@ bool isProductiveShiiAdjectiveTerminal(std::string_view surface, const grammar::
   if (!utf8::endsWith(surface, "しい") || normalize::utf8Length(surface) < 3) {
     return false;
   }
-  const auto& analyses = inflection.analyze(std::string(surface));
+  const auto& analyses = inflection.analyze(surface);
   return std::any_of(analyses.begin(), analyses.end(), [&](const auto& analysis) {
     return analysis.verb_type == grammar::VerbType::IAdjective && analysis.base_form == surface &&
            analysis.confidence >= candidate::kCompoundAdjConfMin;
@@ -520,9 +520,6 @@ KakariMusubi governingKakariMusubi(const dictionary::DictionaryManager* dict_man
     }
     for (const auto& particle : kKakariParticles) {
       const size_t length = particle.tail == U'\0' ? 1 : 2;
-      if (end < length + scan_start && end < length) {
-        continue;
-      }
       if (end < length || codepoints[end - 1] != (particle.tail == U'\0' ? particle.head : particle.tail)) {
         continue;
       }

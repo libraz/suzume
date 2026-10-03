@@ -277,9 +277,10 @@ void appendExtendedSokuonbinCandidates(const std::vector<char32_t>& codepoints, 
             SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface << " extended_sokuonbin lemma=" << potential_base
                                 << (in_dict ? " [dict]" : " [infl]") << " cost=" << cost << "\n";
           }
-          auto candidate = makeVerbCandidate(
-              onbin_surface, start_pos, onbin_end, cost, potential_base, grammar::verbTypeToConjType(onbin_verb_type),
-              true, CandidateOrigin::VerbKanji, 0.9F, "extended_sokuonbin", core::ExtendedPOS::VerbOnbinkei);
+          auto candidate = makeVerbCandidate(onbin_surface, start_pos, onbin_end, cost, potential_base,
+                                             grammar::verbTypeToConjType(onbin_verb_type), true,
+                                             CandidateOrigin::VerbKanji, candidate::kHighOriginConfidence,
+                                             "extended_sokuonbin", core::ExtendedPOS::VerbOnbinkei);
           // A standalone dictionary verb tail supplies a grammatical
           // boundary, so an inflection-only compound must remain
           // unverified and receive the generic false-positive penalty.
@@ -364,9 +365,10 @@ void appendExtendedSokuonbinCandidates(const std::vector<char32_t>& codepoints, 
         SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface << " te_aux_sokuonbin lemma=" << potential_base
                             << (in_dict_check ? " [dict]" : " [infl]") << " cost=" << kTeAuxSokuonbinCost << "\n";
       }
-      auto candidate = makeVerbCandidate(onbin_surface, start_pos, onbin_end, kTeAuxSokuonbinCost, potential_base,
-                                         grammar::verbTypeToConjType(onbin_verb_type), true, CandidateOrigin::VerbKanji,
-                                         0.9F, "te_aux_sokuonbin", core::ExtendedPOS::VerbOnbinkei);
+      auto candidate =
+          makeVerbCandidate(onbin_surface, start_pos, onbin_end, kTeAuxSokuonbinCost, potential_base,
+                            grammar::verbTypeToConjType(onbin_verb_type), true, CandidateOrigin::VerbKanji,
+                            candidate::kHighOriginConfidence, "te_aux_sokuonbin", core::ExtendedPOS::VerbOnbinkei);
       candidate.lemma_verified =
           in_dict_check || (infl_verified && kanji_end == start_pos + 1 && !standalone_verb_tail);
       candidates.push_back(std::move(candidate));

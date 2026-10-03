@@ -187,7 +187,8 @@ void appendMizenkeiNCandidates(const std::vector<char32_t>& codepoints, size_t s
     }
     candidates.push_back(makeVerbCandidate(mizenkei_surface, start_pos, mizenkei_end, cost, lemma,
                                            grammar::verbTypeToConjType(verb_type), true, CandidateOrigin::VerbHiragana,
-                                           0.9F, "hiragana_mizenkei_n", core::ExtendedPOS::VerbMizenkei));
+                                           candidate::kHighOriginConfidence, "hiragana_mizenkei_n",
+                                           core::ExtendedPOS::VerbMizenkei));
     break;  // Only generate one candidate per position
   }
 }
@@ -312,7 +313,8 @@ void appendMizenkeiNegativeCandidates(const std::vector<char32_t>& codepoints, s
     }
     candidates.push_back(makeVerbCandidate(mizenkei_surface, start_pos, mizenkei_end, cost_negative, lemma,
                                            grammar::verbTypeToConjType(verb_type), true, CandidateOrigin::VerbHiragana,
-                                           0.9F, "hiragana_mizenkei_negative", core::ExtendedPOS::VerbMizenkei));
+                                           candidate::kHighOriginConfidence, "hiragana_mizenkei_negative",
+                                           core::ExtendedPOS::VerbMizenkei));
     break;  // Only generate one candidate per position
   }
 }
@@ -381,7 +383,8 @@ void appendMizenkeiNakyaCandidates(const std::vector<char32_t>& codepoints, size
     }
     candidates.push_back(makeVerbCandidate(mizenkei_surface, start_pos, mizenkei_end, cost, lemma,
                                            grammar::verbTypeToConjType(verb_type), true, CandidateOrigin::VerbHiragana,
-                                           0.9F, "hiragana_mizenkei_nakya", core::ExtendedPOS::VerbMizenkei));
+                                           candidate::kHighOriginConfidence, "hiragana_mizenkei_nakya",
+                                           core::ExtendedPOS::VerbMizenkei));
     break;  // Only generate one candidate per position
   }
 }
@@ -428,9 +431,7 @@ void appendNOnbinNaiCandidates(const std::vector<char32_t>& codepoints, size_t s
     if (!vh::naiNegativeFollowsAt(codepoints, n_pos + 1))
       continue;
 
-    // Get stem (part before ん) — need at least 1 char
-    if (n_pos <= start_pos)
-      continue;
+    // Stem is the part before ん (at least 1 char, since n_pos > start_pos)
     std::string stem = extractSubstring(codepoints, start_pos, n_pos);
 
     // Construct base form: stem + る (godan-ra)
@@ -487,8 +488,8 @@ void appendNOnbinNaiCandidates(const std::vector<char32_t>& codepoints, size_t s
     }
     candidates.push_back(makeVerbCandidate(onbin_surface, start_pos, onbin_end, cost_n_onbin, lemma,
                                            grammar::verbTypeToConjType(grammar::VerbType::GodanRa), true,
-                                           CandidateOrigin::VerbHiragana, 0.9F, "hiragana_n_onbin_nai",
-                                           core::ExtendedPOS::VerbMizenkei));
+                                           CandidateOrigin::VerbHiragana, candidate::kHighOriginConfidence,
+                                           "hiragana_n_onbin_nai", core::ExtendedPOS::VerbMizenkei));
     break;
   }
 }
