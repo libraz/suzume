@@ -104,7 +104,8 @@ def postprocess_productive_verb_suffix_stem(tokens: list[dict]) -> bool:
                 changed = True
         if suffix.get("pos") != "Suffix":
             continue
-        if stem.get("pos") == "Verb" and stem.get("lemma") != stem.get("surface"):
+        # A voice auxiliary's continuative hosts the suffix as it is (奪わ+れ+がち).
+        if stem.get("pos") == "Auxiliary" or (stem.get("pos") == "Verb" and stem.get("lemma") != stem.get("surface")):
             continue
         lemma = base_from_renyokei(stem.get("surface", ""))
         if lemma is None:

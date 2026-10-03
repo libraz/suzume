@@ -639,8 +639,21 @@ void appendGodanPassiveRenyokeiCandidates(const std::vector<char32_t>& codepoint
             // auxiliary, so it never heads a lexical compound. Every cell it
             // does host is kana, which is what separates the two cases.
             const bool is_passive_subsidiary_chain = vh::lexicalWordFollowsAt(codepoints, renyokei_end);
+            // Likewise a registered auxiliary or suffix taking the continuative
+            // (奪わ+れ+かね+ない, 奪わ+れ+がち, 奪わ+れ+そう).
+            bool is_passive_auxiliary_chain = false;
+            for (size_t aux_end = renyokei_end + 1;
+                 dict_manager != nullptr && aux_end <= std::min(codepoints.size(), renyokei_end + 3) &&
+                 !is_passive_auxiliary_chain;
+                 ++aux_end) {
+              is_passive_auxiliary_chain = lookupEntryInRange(*dict_manager, codepoints, renyokei_end, aux_end,
+                                                              core::PartOfSpeech::Auxiliary) != nullptr ||
+                                           lookupEntryInRange(*dict_manager, codepoints, renyokei_end, aux_end,
+                                                              core::PartOfSpeech::Suffix) != nullptr;
+            }
             if (!is_beki_pattern && !is_passive_causative_chain && !is_passive_negative_chain &&
-                !is_passive_polite_chain && !is_classical_predicate_chain && !is_passive_subsidiary_chain) {
+                !is_passive_polite_chain && !is_classical_predicate_chain && !is_passive_subsidiary_chain &&
+                !is_passive_auxiliary_chain) {
               candidates.push_back(makeVerbCandidate(
                   surface, start_pos, renyokei_end, base_cost, base_lemma, dictionary::ConjugationType::Ichidan, false,
                   CandidateOrigin::VerbKanji, ichidan_confidence, "godan_passive_renyokei"));
