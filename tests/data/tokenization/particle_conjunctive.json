@@ -1588,6 +1588,97 @@
       ],
       "id": "beyoukeredo_ganai",
       "input": "食べようけれど、時間がない。"
+    },
+    {
+      "description": "好きなんで - regression test",
+      "expected": [
+        {
+          "lemma": "好き",
+          "pos": "Adjective",
+          "surface": "好き"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        }
+      ],
+      "id": "kinande",
+      "input": "好きなんで"
+    },
+    {
+      "description": "雨なんで - regression test",
+      "expected": [
+        {
+          "lemma": "雨",
+          "pos": "Noun",
+          "surface": "雨"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        }
+      ],
+      "id": "nande",
+      "input": "雨なんで"
+    },
+    {
+      "description": "静かなんで帰ります - regression test",
+      "expected": [
+        {
+          "lemma": "静か",
+          "pos": "Adjective",
+          "surface": "静か"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "帰る",
+          "pos": "Verb",
+          "surface": "帰り"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "kanande_rimasu",
+      "input": "静かなんで帰ります"
     }
   ],
   "description": "particle_conjunctive tests",
