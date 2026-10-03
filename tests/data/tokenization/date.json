@@ -116,6 +116,84 @@
       ],
       "id": "unnamed_32",
       "input": "二〇二五年三月"
+    },
+    {
+      "description": "四月一日付けで - regression test",
+      "expected": [
+        {
+          "lemma": "四月一日",
+          "pos": "Noun",
+          "surface": "四月一日"
+        },
+        {
+          "lemma": "付け",
+          "pos": "Noun",
+          "surface": "付け"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        }
+      ],
+      "id": "kede",
+      "input": "四月一日付けで"
+    },
+    {
+      "description": "三月十日付けの通知 - regression test",
+      "expected": [
+        {
+          "lemma": "三月十日",
+          "pos": "Noun",
+          "surface": "三月十日"
+        },
+        {
+          "lemma": "付け",
+          "pos": "Noun",
+          "surface": "付け"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "通知",
+          "pos": "Noun",
+          "surface": "通知"
+        }
+      ],
+      "id": "keno_2",
+      "input": "三月十日付けの通知"
+    },
+    {
+      "description": "四月一日に - regression test",
+      "expected": [
+        {
+          "lemma": "四月一日",
+          "pos": "Noun",
+          "surface": "四月一日"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        }
+      ],
+      "id": "ni_6",
+      "input": "四月一日に"
+    },
+    {
+      "description": "五月五日 - regression test",
+      "expected": [
+        {
+          "lemma": "五月五日",
+          "pos": "Noun",
+          "surface": "五月五日"
+        }
+      ],
+      "id": "unnamed_41",
+      "input": "五月五日"
     }
   ],
   "description": "date tests",
