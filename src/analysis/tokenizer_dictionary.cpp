@@ -603,6 +603,19 @@ bool startsFormalNounParticleAfterPredicate(const core::Lattice& lattice,
   return false;
 }
 
+// A dictionary noun opening on the counter of a numeral+counter cuts the
+// quantity in two when what follows the counter is a formal noun (三日+付け,
+// not 三+日付け), the same boundary the counter generator binds.
+bool cutsNumeralCounterBeforeFormalNoun(const dictionary::DictionaryManager& dict_manager,
+                                        const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos) {
+  if (start_pos == 0 || end_pos <= start_pos + 1 || !normalize::isNumeralCodepoint(codepoints[start_pos - 1]) ||
+      !(normalize::isCounterKanji(codepoints[start_pos]) || normalize::isTemporalCounterKanji(codepoints[start_pos]))) {
+    return false;
+  }
+  const auto* formal = lookupEntryInRange(dict_manager, codepoints, start_pos + 1, end_pos, core::PartOfSpeech::Noun);
+  return formal != nullptr && formal->extended_pos == core::ExtendedPOS::NounFormal;
+}
+
 // A case particle immediately before an ABAB mimetic is a stronger boundary
 // than a homographic multi-mora dictionary entry beginning at that particle
 // (鈴+が+りんりんと, not がり+んりんと).
@@ -1690,6 +1703,11 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
 
     if (result.length > 1 && startsParticleBeforeReduplicatedMimetic(codepoints, start_pos) &&
         end_pos > start_pos + 1) {
+      continue;
+    }
+
+    if (result.entry->pos == core::PartOfSpeech::Noun &&
+        cutsNumeralCounterBeforeFormalNoun(dict_manager_, codepoints, start_pos, end_pos)) {
       continue;
     }
 
