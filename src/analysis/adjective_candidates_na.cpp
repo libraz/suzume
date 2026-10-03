@@ -341,7 +341,39 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
   // predicate, so generating an adjective there would turn 本だ, 水だ, and
   // other common noun predicates into adjectives.  Mixed stems such as
   // 平らだ are handled by the preceding kanji+hiragana rule.
+  // The attributive な before a nominal head is different: a noun modifies
+  // through の, so 変+な+やつ and 急+な+話 can only be the adjective.
   if (kanji_len < 2) {
+    const size_t head = kanji_end + 1;
+    const auto nominal_word_starts = [&]() {
+      for (size_t head_end = head + 1; head_end <= std::min(codepoints.size(), head + 3); ++head_end) {
+        // A formal noun takes a nominal predicate's な as well (本+な+わけ).
+        const auto* noun = lookupEntryInRange(*dict_manager, codepoints, head, head_end, core::PartOfSpeech::Noun);
+        if ((noun != nullptr && noun->extended_pos != core::ExtendedPOS::NounFormal) ||
+            lookupEntryInRange(*dict_manager, codepoints, head, head_end, core::PartOfSpeech::Pronoun) != nullptr) {
+          return true;
+        }
+      }
+      return false;
+    };
+    // Inside a longer kanji run (直接的, 再利用可能) the kanji is a suffix, not a stem.
+    // A na-adjective-forming suffix (なし崩し+的) attaches rather than heads.
+    const std::string one_kanji = extractSubstring(codepoints, start_pos, kanji_end);
+    const auto& na_suffixes = getNaAdjSuffixes();
+    const bool opens_kanji_run = (start_pos == 0 || char_types[start_pos - 1] != normalize::CharType::Kanji) &&
+                                 std::none_of(na_suffixes.begin(), na_suffixes.end(), [&](const auto& suffix) {
+                                   return std::string_view(suffix) == one_kanji;
+                                 });
+    const bool attributive_before_nominal =
+        dict_manager != nullptr && opens_kanji_run && head < codepoints.size() && codepoints[kanji_end] == U'な' &&
+        !startsLongerClosedForm(codepoints, kanji_end, dict_manager, kClosedFormAfterMixedStem, true) &&
+        (char_types[head] == normalize::CharType::Kanji || char_types[head] == normalize::CharType::Katakana ||
+         nominal_word_starts());
+    if (attributive_before_nominal) {
+      candidates.push_back(makeNaAdjCandidate(one_kanji, start_pos, kanji_end, candidate::kNaAdjYakaCost, true,
+                                              CandidateOrigin::AdjectiveNa, candidate::kHiraganaNaAdjNariConfidence,
+                                              "na_adjective_one_kanji"));
+    }
     return;
   }
 
