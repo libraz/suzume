@@ -81,9 +81,8 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
           vh::isVerbInDictionary(dict_manager, extractSubstring(codepoints, start_pos, kanji_end + 1) + "る") &&
           first_hira == U'れ';
       bool is_kuru_verb = is_single_kanji && grammar::isKuruKanjiStem(codepoints[start_pos]) && !ranuki_potential_base;
-      if ((is_common_particle && is_single_kanji) || is_i_adjective_suffix || is_kuru_verb) {
-        // Skip this pattern - almost certainly noun + particle, i-adjective, or kuru verb
-      } else {
+      // Otherwise almost certainly noun + particle, i-adjective, or kuru verb
+      if (!((is_common_particle && is_single_kanji) || is_i_adjective_suffix || is_kuru_verb)) {
         // Surface is kanji + first e/i-row hiragana only (e.g., 食べ from 食べます, 感じ from 感じる)
         size_t renyokei_end = kanji_end + 1;
         std::string surface = extractSubstring(codepoints, start_pos, renyokei_end);
@@ -376,9 +375,7 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
           // Restricted to single-kanji stems or dict-verified verbs to avoid
           // false merges like 間+炒める → 間炒める (suffix + verb)
           if (renyokei_end < codepoints.size() && codepoints[renyokei_end] == U'る') {
-            bool is_single_kanji = (kanji_end - start_pos == 1);
-            bool is_in_dict = (dict_manager != nullptr && vh::isVerbInDictionary(dict_manager, ichidan_cand.base_form));
-            if (is_single_kanji || is_in_dict || opens_with_bound_verb_prefix) {
+            if (is_single_kanji || ichidan_base_is_dict || opens_with_bound_verb_prefix) {
               size_t shuushi_end = renyokei_end + 1;
               float shuushi_cost = base_cost + 0.1F;  // Slightly higher than renyokei
               candidates.push_back(makeVerbCandidate(codepoints, start_pos, shuushi_end, shuushi_cost, lemma,
@@ -447,18 +444,14 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
                                    vh::isPassiveAuxContinuation(codepoints, renyokei_end + 2, /*strict_masu=*/true);
       const bool classical_negative_follows =
           renyokei_end < codepoints.size() && (codepoints[renyokei_end] == U'ず' || codepoints[renyokei_end] == U'ぬ');
-      bool follows_symbol_after_case_particle = false;
-      if (renyokei_end < codepoints.size() &&
-          normalize::classifyChar(codepoints[renyokei_end]) == normalize::CharType::Symbol && start_pos > 0 &&
-          dict_manager != nullptr) {
-        follows_symbol_after_case_particle = preceded_by_case_particle;
-      }
+      const bool follows_symbol_after_case_particle =
+          preceded_by_case_particle && renyokei_end < codepoints.size() &&
+          normalize::classifyChar(codepoints[renyokei_end]) == normalize::CharType::Symbol;
       bool has_ichidan_continuation =
           renyokei_end < codepoints.size() &&
           (codepoints[renyokei_end] == U'る' || codepoints[renyokei_end] == U'て' ||
            codepoints[renyokei_end] == U'た' || codepoints[renyokei_end] == U'ま' ||
-           codepoints[renyokei_end] == U'な' || codepoints[renyokei_end] == U'ず' ||
-           codepoints[renyokei_end] == U'ぬ' ||
+           codepoints[renyokei_end] == U'な' || classical_negative_follows ||
            (codepoints[renyokei_end] == U'れ' && renyokei_end + 1 < codepoints.size() &&
             codepoints[renyokei_end + 1] == U'ば') ||
            grammar::startsHonorificSubsidiaryVerb(extractClosedClassProbe(codepoints, renyokei_end)) ||
@@ -597,6 +590,7 @@ void appendGodanSaRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
 
       if (best_sa.confidence <= 0.5F)
         continue;
+      const bool base_in_dict = vh::isVerbInDictionary(dict_manager, best_sa.base_form);
 
       if (utf8::endsWith(surface, "くし")) {
         const std::string adjective_base = normalize::concat(utf8::dropLast2Chars(surface), "い");
@@ -620,7 +614,7 @@ void appendGodanSaRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
       size_t kanji_chars = kanji_end - start_pos;  // actual kanji count
       size_t hira_chars = renyokei_end - kanji_end;
       if (kanji_chars <= 1 && dict_manager != nullptr) {
-        if (!vh::isVerbInDictionary(dict_manager, best_sa.base_form)) {
+        if (!base_in_dict) {
           // A one-mora case particle followed by し and the て/た form is a
           // productive noun + particle + する construction, not an unknown
           // GodanSa verb. This covers short-noun contexts such as 本+として
@@ -690,8 +684,7 @@ void appendGodanSaRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
       // such as 荒らす keeps its dictionary path. An unverified candidate must
       // not absorb that auxiliary into a fabricated godan-sa stem.
       // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
-      if (dict_manager != nullptr && renyokei_end >= kanji_end + 2 &&
-          !vh::isVerbInDictionary(dict_manager, best_sa.base_form)) {
+      if (dict_manager != nullptr && renyokei_end >= kanji_end + 2 && !base_in_dict) {
         const auto* tail_entry =
             lookupEntryInRange(*dict_manager, codepoints, kanji_end, renyokei_end, core::PartOfSpeech::Auxiliary);
         const bool selects_godan_sa_onbin = renyokei_end < codepoints.size() &&
@@ -715,15 +708,10 @@ void appendGodanSaRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
       auto renyokei_candidate = makeVerbCandidate(surface, start_pos, renyokei_end, base_cost, best_sa.base_form,
                                                   grammar::verbTypeToConjType(best_sa.verb_type), true,
                                                   CandidateOrigin::VerbKanji, best_sa.confidence, "godan_sa_renyokei");
-      renyokei_candidate.lemma_verified = vh::isVerbInDictionary(dict_manager, best_sa.base_form);
+      renyokei_candidate.lemma_verified = base_in_dict;
       candidates.push_back(std::move(renyokei_candidate));
     }
   }
 }
-
-// Generate Ichidan stem candidates for passive/potential auxiliary patterns
-// E.g., 信じられべき (信じ + られべき), 認められた (認め + られた)
-// These connect to られ+X (passive/potential auxiliary forms)
-// Unlike Godan mizenkei which uses れ+X, Ichidan uses られ+X
 
 }  // namespace suzume::analysis::kanji_verb_detail

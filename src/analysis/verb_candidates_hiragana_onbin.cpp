@@ -79,9 +79,6 @@ void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, s
 
     // Get the stem (part before onbin character)
     std::string stem = extractSubstring(codepoints, start_pos, onbin_pos);
-    if (stem.empty()) {
-      continue;
-    }
     // っ+て after a clause-closing particle is the quotative (いいか+って).
     if (is_sokuonbin && next_char == U'て' && onbin_pos >= start_pos + 2 &&
         vh::particleClosesClauseBeforeSokuon(codepoints, onbin_pos)) {
@@ -100,6 +97,19 @@ void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, s
           (first_char == U'と' || first_char == U'を' || first_char == U'に' || first_char == U'で' ||
            first_char == U'が' || first_char == U'は' || first_char == U'へ');
     }
+
+    // The stem opens a predicate slot: text start, a symbol, or a particle.
+    const bool has_left_predicate_boundary =
+        start_pos == 0 || normalize::classifyChar(codepoints[start_pos - 1]) == normalize::CharType::Symbol ||
+        normalize::isExtendedParticle(codepoints[start_pos - 1]);
+    // A kanji on the left closes a nominal subject whose particle was dropped
+    // (お腹+すい+た). The stem must then open a word: not on a particle
+    // (海外+に+い+た) and not on づ/ぢ, which only continue a kanji verb
+    // (近+づい+た).
+    const bool i_onbin_has_predicate_boundary =
+        has_left_predicate_boundary || (normalize::isKanjiCodepoint(codepoints[start_pos - 1]) &&
+                                        !normalize::isExtendedParticle(codepoints[start_pos]) &&
+                                        codepoints[start_pos] != U'づ' && codepoints[start_pos] != U'ぢ');
 
     // Try different verb types based on onbin type
     const auto& candidates_to_try = vh::getGodanTypesByOnbin(is_sokuonbin ? "っ" : (is_hatsuonbin ? "ん" : "い"));
@@ -185,19 +195,6 @@ void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, s
           is_ikuon && is_tense_pattern &&
           ((verb_type == grammar::VerbType::GodanKa && (next_char == U'た' || next_char == U'て')) ||
            (verb_type == grammar::VerbType::GodanGa && (next_char == U'だ' || next_char == U'で')));
-      // A kanji on the left closes a nominal subject whose particle was dropped
-      // (お腹+すい+た). The stem must then open a word: not on a particle
-      // (海外+に+い+た) and not on づ/ぢ, which only continue a kanji verb
-      // (近+づい+た).
-      auto follows_kanji_word_boundary = [&]() {
-        const char32_t head = codepoints[start_pos];
-        return normalize::isKanjiCodepoint(codepoints[start_pos - 1]) && !normalize::isExtendedParticle(head) &&
-               head != U'づ' && head != U'ぢ';
-      };
-      const bool i_onbin_has_predicate_boundary =
-          start_pos == 0 || normalize::isExtendedParticle(codepoints[start_pos - 1]) ||
-          normalize::classifyChar(codepoints[start_pos - 1]) == normalize::CharType::Symbol ||
-          follows_kanji_word_boundary();
       // No Ka/Ga-row root ends in the conjunctive て/で. Every verb spelled that
       // way is a te-form plus a subsidiary (出て+いく, 持って+いく), so a stem
       // ending there has absorbed the clause boundary and the い behind it opens
@@ -217,9 +214,6 @@ void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, s
       // absent from L2. The ma/ba/na rows are surface-identical here; use the
       // productive ma-row fallback only in a predicate slot and retain
       // dictionary evidence whenever any row is attested.
-      const bool has_left_predicate_boundary =
-          start_pos == 0 || normalize::classifyChar(codepoints[start_pos - 1]) == normalize::CharType::Symbol ||
-          normalize::isExtendedParticle(codepoints[start_pos - 1]);
       if (!is_valid_verb && is_hatsuonbin && is_tense_pattern && stem_char_count >= 3 &&
           verb_type == grammar::VerbType::GodanMa && has_left_predicate_boundary) {
         is_valid_verb = true;
@@ -594,39 +588,26 @@ void appendIchidanRenyokei1CharCandidates(const std::vector<char32_t>& codepoint
   // Pattern: e-row hiragana followed by て or た
   // IMPORTANT: Only generate if the base form (stem + る) is a known verb in dictionary
   // to avoid false positives like めて → め + て (め is not a verb)
-  if (start_pos < codepoints.size()) {
-    char32_t first_char = codepoints[start_pos];
-    // Check for e-row hiragana (ichidan renyokei ending)
-    // e-row: ね(ねる), め(める), け(ける), etc.
-    if (grammar::isERowCodepoint(first_char)) {
-      // Check if followed by te/ta particle.
-      if (start_pos + 1 < codepoints.size()) {
-        char32_t next_char = codepoints[start_pos + 1];
-        bool is_valid_follow = (next_char == U'て' || next_char == U'た');
-        if (is_valid_follow) {
-          // Construct base form (stem + る)
-          std::string stem_surface = extractSubstring(codepoints, start_pos, start_pos + 1);
-          std::string base_form = stem_surface + "る";
-
-          // Require dict check to prevent false positives (め+て, け+て).
-          if (vh::isVerbInDictionary(dict_manager, base_form)) {
-            // Strong negative cost to beat particle split
-            // Particle path can be as low as -0.2, so we need lower
-            constexpr float kCost = candidate::verb_cost::kStandardBonus;
-            SUZUME_DEBUG_VERBOSE_BLOCK {
-              SUZUME_DEBUG_STREAM << "[VERB_CAND] " << stem_surface
-                                  << " hiragana_ichidan_renyokei_1char lemma=" << base_form << " cost=" << kCost
-                                  << "\n";
-            }
-            candidates.push_back(makeVerbCandidate(
-                stem_surface, start_pos, start_pos + 1, kCost, base_form, dictionary::ConjugationType::Ichidan, true,
-                CandidateOrigin::VerbHiragana, 0.8F, "hiragana_ichidan_renyokei_1char",
-                core::ExtendedPOS::VerbRenyokei));  // Explicit VerbRenyokei for て/た connection
-          }
-        }
-      }
-    }
+  if (start_pos + 1 >= codepoints.size() || !grammar::isERowCodepoint(codepoints[start_pos]) ||
+      (codepoints[start_pos + 1] != U'て' && codepoints[start_pos + 1] != U'た')) {
+    return;
   }
+  const std::string stem_surface = extractSubstring(codepoints, start_pos, start_pos + 1);
+  const std::string base_form = stem_surface + "る";
+  if (!vh::isVerbInDictionary(dict_manager, base_form)) {
+    return;
+  }
+  // Strong negative cost to beat particle split
+  // Particle path can be as low as -0.2, so we need lower
+  constexpr float kCost = candidate::verb_cost::kStandardBonus;
+  SUZUME_DEBUG_VERBOSE_BLOCK {
+    SUZUME_DEBUG_STREAM << "[VERB_CAND] " << stem_surface << " hiragana_ichidan_renyokei_1char lemma=" << base_form
+                        << " cost=" << kCost << "\n";
+  }
+  // Explicit VerbRenyokei for て/た connection
+  candidates.push_back(makeVerbCandidate(stem_surface, start_pos, start_pos + 1, kCost, base_form,
+                                         dictionary::ConjugationType::Ichidan, true, CandidateOrigin::VerbHiragana,
+                                         0.8F, "hiragana_ichidan_renyokei_1char", core::ExtendedPOS::VerbRenyokei));
 }
 
 }  // namespace suzume::analysis::hiragana_verb_detail

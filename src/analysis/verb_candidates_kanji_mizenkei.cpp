@@ -27,80 +27,78 @@
 namespace suzume::analysis::kanji_verb_detail {
 namespace vh = verb_helpers;
 
+namespace {
+
+// Whether some analysis reads the base form as the given verb type.
+bool analyzesAsVerbType(const grammar::Inflection& inflection, const std::string& base_form,
+                        grammar::VerbType verb_type) {
+  const auto& results = inflection.analyze(base_form);
+  return std::any_of(results.begin(), results.end(), [&](const grammar::InflectionCandidate& cand) {
+    return cand.verb_type == verb_type && cand.confidence >= 0.4F;
+  });
+}
+
+}  // namespace
+
 void appendGodanMizenkeiPassiveCausativeCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                                    size_t kanji_end, size_t hiragana_end,
                                                    const grammar::Inflection& inflection,
                                                    const dictionary::DictionaryManager* dict_manager,
                                                    std::vector<UnknownCandidate>& candidates) {
-  if (kanji_end - start_pos == 1 && kanji_end < hiragana_end && grammar::isARowCodepoint(codepoints[kanji_end])) {
-    char32_t a_row = codepoints[kanji_end];
-    size_t after_a_pos = kanji_end + 1;
-    if (after_a_pos < codepoints.size()) {
-      char32_t after_a = codepoints[after_a_pos];
-      // A-row + れ (passive) or A-row + せ (causative)
-      if (after_a == U'れ' || after_a == U'せ') {
-        grammar::VerbType verb_type = grammar::verbTypeFromARowCodepoint(a_row);
-        std::string_view base_suffix = grammar::godanBaseSuffixFromARow(a_row);
-        if (verb_type != grammar::VerbType::Unknown && !base_suffix.empty()) {
-          std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
-          std::string base_form = normalize::concat(kanji_stem, base_suffix);
-          std::string surface = extractSubstring(codepoints, start_pos, kanji_end + 1);
+  if (kanji_end - start_pos != 1 || kanji_end >= hiragana_end || kanji_end + 1 >= codepoints.size()) {
+    return;
+  }
+  const char32_t a_row = codepoints[kanji_end];
+  const char32_t after_a = codepoints[kanji_end + 1];
+  // A-row + れ (passive) or A-row + せ (causative)
+  if (!grammar::isARowCodepoint(a_row) || (after_a != U'れ' && after_a != U'せ')) {
+    return;
+  }
+  const grammar::VerbType verb_type = grammar::verbTypeFromARowCodepoint(a_row);
+  const std::string_view base_suffix = grammar::godanBaseSuffixFromARow(a_row);
+  if (verb_type == grammar::VerbType::Unknown || base_suffix.empty()) {
+    return;
+  }
+  const std::string base_form = normalize::concat(extractSubstring(codepoints, start_pos, kanji_end), base_suffix);
+  const std::string surface = extractSubstring(codepoints, start_pos, kanji_end + 1);
 
-          // A closed-class irregular form in L1 is authoritative over this
-          // productive Godan fallback.  In particular, do not fabricate a
-          // Godan lemma for an irregular verb's causative connection form.
-          if (dict_manager != nullptr) {
-            const dictionary::DictionaryEntry* exact = dict_manager->lookupExact(surface);
-            if (exact != nullptr && exact->pos == core::PartOfSpeech::Verb &&
-                exact->extended_pos == core::ExtendedPOS::VerbMizenkei) {
-              return;
-            }
-          }
-
-          // Verify via inflection analysis of base form
-          const auto& results = inflection.analyze(base_form);
-          bool is_valid = false;
-          for (const auto& cand : results) {
-            if (cand.verb_type == verb_type && cand.confidence >= 0.4F) {
-              is_valid = true;
-              break;
-            }
-          }
-
-          if (is_valid) {
-            // Skip if kanji+A-row+る is a known godan-ra verb in dictionary
-            // (potential form conflict). E.g., 泊まれる = potential of
-            // 泊まる (godan-ra), not passive of 泊む (godan-ma).
-            // 囲まれる = passive of 囲む is OK because 囲まる is not
-            // in the dictionary.
-            //
-            // Also skip if kanji+A-row+れる is a known ichidan verb in
-            // dictionary. E.g., 生まれる is ichidan, not passive of 生む.
-            // Without this check, 生ま(mizenkei)+れ(passive) would
-            // incorrectly win over the dictionary ichidan entry.
-            bool has_competing_verb = false;
-            if (after_a == U'れ') {
-              std::string ra_form = surface + "る";
-              has_competing_verb = vh::isVerbInDictionary(dict_manager, ra_form);
-              if (!has_competing_verb) {
-                std::string ichidan_form = surface + "れる";
-                has_competing_verb = vh::isVerbInDictionary(dict_manager, ichidan_form);
-              }
-            }
-
-            if (!has_competing_verb) {
-              constexpr float kCost = candidate::verb_cost::kWeakPenalty;
-              SUZUME_DEBUG_LOG("[VERB_CAND] " << surface << " godan_mizenkei_passive lemma=" << base_form
-                                              << " cost=" << kCost << "\n");
-              candidates.push_back(makeVerbCandidate(
-                  surface, start_pos, kanji_end + 1, kCost, base_form, grammar::verbTypeToConjType(verb_type), true,
-                  CandidateOrigin::VerbKanji, 0.8F, "godan_mizenkei_passive", core::ExtendedPOS::VerbMizenkei));
-            }
-          }
-        }
-      }
+  // A closed-class irregular form in L1 is authoritative over this
+  // productive Godan fallback.  In particular, do not fabricate a
+  // Godan lemma for an irregular verb's causative connection form.
+  if (dict_manager != nullptr) {
+    const dictionary::DictionaryEntry* exact = dict_manager->lookupExact(surface);
+    if (exact != nullptr && exact->pos == core::PartOfSpeech::Verb &&
+        exact->extended_pos == core::ExtendedPOS::VerbMizenkei) {
+      return;
     }
   }
+
+  // Verify via inflection analysis of base form
+  if (!analyzesAsVerbType(inflection, base_form, verb_type)) {
+    return;
+  }
+
+  // Skip if kanji+A-row+る is a known godan-ra verb in dictionary
+  // (potential form conflict). E.g., 泊まれる = potential of
+  // 泊まる (godan-ra), not passive of 泊む (godan-ma).
+  // 囲まれる = passive of 囲む is OK because 囲まる is not
+  // in the dictionary.
+  //
+  // Also skip if kanji+A-row+れる is a known ichidan verb in
+  // dictionary. E.g., 生まれる is ichidan, not passive of 生む.
+  // Without this check, 生ま(mizenkei)+れ(passive) would
+  // incorrectly win over the dictionary ichidan entry.
+  if (after_a == U'れ' && (vh::isVerbInDictionary(dict_manager, surface + "る") ||
+                           vh::isVerbInDictionary(dict_manager, surface + "れる"))) {
+    return;
+  }
+
+  constexpr float kCost = candidate::verb_cost::kWeakPenalty;
+  SUZUME_DEBUG_LOG("[VERB_CAND] " << surface << " godan_mizenkei_passive lemma=" << base_form << " cost=" << kCost
+                                  << "\n");
+  candidates.push_back(makeVerbCandidate(surface, start_pos, kanji_end + 1, kCost, base_form,
+                                         grammar::verbTypeToConjType(verb_type), true, CandidateOrigin::VerbKanji, 0.8F,
+                                         "godan_mizenkei_passive", core::ExtendedPOS::VerbMizenkei));
 }
 
 // Contracted sa-row mizenkei: kanji + しゃ + れ/せ/し
@@ -113,38 +111,27 @@ void appendSaRowContractedMizenkeiCandidates(const std::vector<char32_t>& codepo
                                              size_t kanji_end, size_t hiragana_end,
                                              const grammar::Inflection& inflection,
                                              std::vector<UnknownCandidate>& candidates) {
-  if (kanji_end - start_pos == 1 && kanji_end + 1 < hiragana_end && codepoints[kanji_end] == U'し' &&
-      codepoints[kanji_end + 1] == U'ゃ') {
-    size_t after_sha = kanji_end + 2;
-    if (after_sha < codepoints.size()) {
-      char32_t after = codepoints[after_sha];
-      // しゃ + れ (passive) or しゃ + せ (causative) or しゃ + し (emphatic)
-      if (after == U'れ' || after == U'せ' || after == U'し') {
-        std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
-        std::string base_form = kanji_stem + "す";
-        std::string surface = kanji_stem + "しゃ";
-
-        const auto& sa_results = inflection.analyze(base_form);
-        bool is_valid_godan_sa = false;
-        for (const auto& cand : sa_results) {
-          if (cand.verb_type == grammar::VerbType::GodanSa && cand.confidence >= 0.4F) {
-            is_valid_godan_sa = true;
-            break;
-          }
-        }
-
-        if (is_valid_godan_sa) {
-          constexpr float kCost = candidate::verb_cost::kWeakPenalty;
-          SUZUME_DEBUG_LOG("[VERB_CAND] " << surface << " godan_sa_contracted_mizenkei lemma=" << base_form
-                                          << " cost=" << kCost << "\n");
-          candidates.push_back(makeVerbCandidate(surface, start_pos, kanji_end + 2, kCost, base_form,
-                                                 grammar::verbTypeToConjType(grammar::VerbType::GodanSa), false,
-                                                 CandidateOrigin::VerbKanji, 0.8F, "godan_sa_contracted_mizenkei",
-                                                 core::ExtendedPOS::VerbMizenkei));
-        }
-      }
-    }
+  if (kanji_end - start_pos != 1 || kanji_end + 1 >= hiragana_end || codepoints[kanji_end] != U'し' ||
+      codepoints[kanji_end + 1] != U'ゃ' || kanji_end + 2 >= codepoints.size()) {
+    return;
   }
+  // しゃ + れ (passive) or しゃ + せ (causative) or しゃ + し (emphatic)
+  const char32_t after = codepoints[kanji_end + 2];
+  if (after != U'れ' && after != U'せ' && after != U'し') {
+    return;
+  }
+  const std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
+  const std::string base_form = kanji_stem + "す";
+  if (!analyzesAsVerbType(inflection, base_form, grammar::VerbType::GodanSa)) {
+    return;
+  }
+  const std::string surface = kanji_stem + "しゃ";
+  constexpr float kCost = candidate::verb_cost::kWeakPenalty;
+  SUZUME_DEBUG_LOG("[VERB_CAND] " << surface << " godan_sa_contracted_mizenkei lemma=" << base_form << " cost=" << kCost
+                                  << "\n");
+  candidates.push_back(makeVerbCandidate(
+      surface, start_pos, kanji_end + 2, kCost, base_form, grammar::verbTypeToConjType(grammar::VerbType::GodanSa),
+      false, CandidateOrigin::VerbKanji, 0.8F, "godan_sa_contracted_mizenkei", core::ExtendedPOS::VerbMizenkei));
 }
 
 // Godan mizenkei pattern: kanji + mizenkei ending + a classical negative
@@ -179,97 +166,96 @@ void appendGodanMizenkeiZuCandidates(const std::vector<char32_t>& codepoints, si
     }
     ++negative_pos;
   }
-  if (negative_pos < hiragana_end && negative_pos > kanji_end) {
-    const bool is_single_kanji_stem = kanji_end - start_pos == 1;
-    char32_t mizenkei_ending = codepoints[negative_pos - 1];
-    if (grammar::isARowCodepoint(mizenkei_ending)) {
-      grammar::VerbType verb_type = grammar::verbTypeFromARowCodepoint(mizenkei_ending);
-      if (verb_type != grammar::VerbType::Unknown) {
-        std::string_view base_suffix = grammar::godanBaseSuffixFromARow(mizenkei_ending);
-        if (!base_suffix.empty()) {
-          std::string surface = extractSubstring(codepoints, start_pos, negative_pos);
-          std::string base_form = surface.substr(0, surface.size() - core::kJapaneseCharBytes);
-          base_form += base_suffix;
+  if (negative_pos >= hiragana_end || negative_pos <= kanji_end) {
+    return;
+  }
+  const bool is_single_kanji_stem = kanji_end - start_pos == 1;
+  const char32_t mizenkei_ending = codepoints[negative_pos - 1];
+  if (!grammar::isARowCodepoint(mizenkei_ending)) {
+    return;
+  }
+  const grammar::VerbType verb_type = grammar::verbTypeFromARowCodepoint(mizenkei_ending);
+  const std::string_view base_suffix = grammar::godanBaseSuffixFromARow(mizenkei_ending);
+  if (verb_type == grammar::VerbType::Unknown || base_suffix.empty()) {
+    return;
+  }
+  std::string surface = extractSubstring(codepoints, start_pos, negative_pos);
+  std::string base_form = surface.substr(0, surface.size() - core::kJapaneseCharBytes);
+  base_form += base_suffix;
 
-          // A closed particle inside the proposed stem marks a morpheme
-          // boundary (静けさ|のみ|なら|ず).  It cannot be evidence for an
-          // unknown Godan mizenkei candidate.  Inspect the finite particle
-          // lexicon rather than enumerating particle surfaces.
-          bool contains_internal_particle = false;
-          if (dict_manager != nullptr) {
-            for (size_t particle_start = start_pos + 1; particle_start + 1 < negative_pos; ++particle_start) {
-              for (size_t particle_end = particle_start + 2; particle_end < negative_pos; ++particle_end) {
-                if (lookupEntryInRange(*dict_manager, codepoints, particle_start, particle_end,
-                                       core::PartOfSpeech::Particle) != nullptr) {
-                  contains_internal_particle = true;
-                  break;
-                }
-              }
-              if (contains_internal_particle) {
-                break;
-              }
-            }
-          }
-          // So does an auxiliary standing on an onbin stem (書い+て+おら+ず).
-          contains_internal_particle =
-              contains_internal_particle ||
-              vh::embedsAuxiliaryOnOnbinStem(codepoints, start_pos, negative_pos, dict_manager);
-          // Verify via dictionary or inflection analysis of conjugated form
-          const bool dictionary_verified =
-              !contains_internal_particle && vh::isVerbInDictionary(dict_manager, base_form);
-          bool is_valid = dictionary_verified;
-          if (!contains_internal_particle && !is_valid && is_single_kanji_stem) {
-            // Analyze mizenkei+ない form (standard negative) for better confidence
-            // Base form alone may not be recognized. Multi-kanji stems require
-            // dictionary evidence so a preceding noun cannot be absorbed.
-            std::string neg_form = surface + "ない";
-            const auto& infl_results = inflection.analyze(neg_form);
-            for (const auto& cand : infl_results) {
-              if (cand.base_form == base_form && cand.verb_type == verb_type && cand.confidence >= 0.3F) {
-                is_valid = true;
-                break;
-              }
-            }
-          }
-
-          // An irrealis whose own last mora is a registered case particle is
-          // spelled exactly like the nominative or accusative phrase it sits in
-          // (差|が|ずれる, not 差が|ず|れる). The particle reading needs no
-          // lexical evidence, so the verb reading has to bring some: 泳が+ず and
-          // 急が+ず keep their candidate because 泳ぐ and 急ぐ are attested,
-          // while 差ぐ, 刻ぐ and 程ぐ are not words at all.
-          const bool irrealis_ends_on_case_particle =
-              !dictionary_verified && dict_manager != nullptr && negative_pos > start_pos && [&] {
-                const auto* particle = lookupEntryInRange(*dict_manager, codepoints, negative_pos - 1, negative_pos,
-                                                          core::PartOfSpeech::Particle);
-                return particle != nullptr && particle->extended_pos == core::ExtendedPOS::ParticleCase;
-              }();
-          if (is_valid && !irrealis_ends_on_case_particle) {
-            // A lexicalized verb+ず entry (思わず) wins unless the following に
-            // explicitly creates the productive ずに auxiliary construction.
-            const bool followed_by_zu = codepoints[negative_pos] == U'ず';
-            bool dict_has_zu_form = false;
-            if (followed_by_zu && dict_manager != nullptr) {
-              std::string zu_form = surface + "ず";
-              std::string zuni_form = surface + "ずに";
-              dict_has_zu_form =
-                  dict_manager->lookupExact(zu_form) != nullptr || dict_manager->lookupExact(zuni_form) != nullptr;
-            }
-            const bool followed_by_case_ni =
-                followed_by_zu && negative_pos + 1 < codepoints.size() && codepoints[negative_pos + 1] == U'に';
-            if (!dict_has_zu_form || followed_by_case_ni) {
-              constexpr float kCost = candidate::verb_cost::kWeakPenalty;
-              SUZUME_DEBUG_LOG("[VERB_CAND] " << surface << " godan_mizenkei_zu lemma=" << base_form
-                                              << " cost=" << kCost << "\n");
-              auto candidate = makeVerbCandidate(
-                  surface, start_pos, negative_pos, kCost, base_form, grammar::verbTypeToConjType(verb_type), true,
-                  CandidateOrigin::VerbKanji, 0.8F, "godan_mizenkei_zu", core::ExtendedPOS::VerbMizenkei);
-              candidate.lemma_verified = dictionary_verified;
-              candidates.push_back(std::move(candidate));
-            }
-          }
+  // A closed particle inside the proposed stem marks a morpheme
+  // boundary (静けさ|のみ|なら|ず).  It cannot be evidence for an
+  // unknown Godan mizenkei candidate.  Inspect the finite particle
+  // lexicon rather than enumerating particle surfaces.
+  bool contains_internal_particle = false;
+  if (dict_manager != nullptr) {
+    for (size_t particle_start = start_pos + 1; particle_start + 1 < negative_pos; ++particle_start) {
+      for (size_t particle_end = particle_start + 2; particle_end < negative_pos; ++particle_end) {
+        if (lookupEntryInRange(*dict_manager, codepoints, particle_start, particle_end, core::PartOfSpeech::Particle) !=
+            nullptr) {
+          contains_internal_particle = true;
+          break;
         }
       }
+      if (contains_internal_particle) {
+        break;
+      }
+    }
+  }
+  // So does an auxiliary standing on an onbin stem (書い+て+おら+ず).
+  contains_internal_particle =
+      contains_internal_particle || vh::embedsAuxiliaryOnOnbinStem(codepoints, start_pos, negative_pos, dict_manager);
+  // Verify via dictionary or inflection analysis of conjugated form
+  const bool dictionary_verified = !contains_internal_particle && vh::isVerbInDictionary(dict_manager, base_form);
+  bool is_valid = dictionary_verified;
+  if (!contains_internal_particle && !is_valid && is_single_kanji_stem) {
+    // Analyze mizenkei+ない form (standard negative) for better confidence
+    // Base form alone may not be recognized. Multi-kanji stems require
+    // dictionary evidence so a preceding noun cannot be absorbed.
+    std::string neg_form = surface + "ない";
+    const auto& infl_results = inflection.analyze(neg_form);
+    for (const auto& cand : infl_results) {
+      if (cand.base_form == base_form && cand.verb_type == verb_type && cand.confidence >= 0.3F) {
+        is_valid = true;
+        break;
+      }
+    }
+  }
+
+  // An irrealis whose own last mora is a registered case particle is
+  // spelled exactly like the nominative or accusative phrase it sits in
+  // (差|が|ずれる, not 差が|ず|れる). The particle reading needs no
+  // lexical evidence, so the verb reading has to bring some: 泳が+ず and
+  // 急が+ず keep their candidate because 泳ぐ and 急ぐ are attested,
+  // while 差ぐ, 刻ぐ and 程ぐ are not words at all.
+  const bool irrealis_ends_on_case_particle =
+      !dictionary_verified && dict_manager != nullptr && negative_pos > start_pos && [&] {
+        const auto* particle =
+            lookupEntryInRange(*dict_manager, codepoints, negative_pos - 1, negative_pos, core::PartOfSpeech::Particle);
+        return particle != nullptr && particle->extended_pos == core::ExtendedPOS::ParticleCase;
+      }();
+  if (is_valid && !irrealis_ends_on_case_particle) {
+    // A lexicalized verb+ず entry (思わず) wins unless the following に
+    // explicitly creates the productive ずに auxiliary construction.
+    const bool followed_by_zu = codepoints[negative_pos] == U'ず';
+    bool dict_has_zu_form = false;
+    if (followed_by_zu && dict_manager != nullptr) {
+      std::string zu_form = surface + "ず";
+      std::string zuni_form = surface + "ずに";
+      dict_has_zu_form =
+          dict_manager->lookupExact(zu_form) != nullptr || dict_manager->lookupExact(zuni_form) != nullptr;
+    }
+    const bool followed_by_case_ni =
+        followed_by_zu && negative_pos + 1 < codepoints.size() && codepoints[negative_pos + 1] == U'に';
+    if (!dict_has_zu_form || followed_by_case_ni) {
+      constexpr float kCost = candidate::verb_cost::kWeakPenalty;
+      SUZUME_DEBUG_LOG("[VERB_CAND] " << surface << " godan_mizenkei_zu lemma=" << base_form << " cost=" << kCost
+                                      << "\n");
+      auto candidate = makeVerbCandidate(surface, start_pos, negative_pos, kCost, base_form,
+                                         grammar::verbTypeToConjType(verb_type), true, CandidateOrigin::VerbKanji, 0.8F,
+                                         "godan_mizenkei_zu", core::ExtendedPOS::VerbMizenkei);
+      candidate.lemma_verified = dictionary_verified;
+      candidates.push_back(std::move(candidate));
     }
   }
 }
@@ -459,7 +445,6 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
         // 2. Classical negation ぬ: 揃わぬ, 知らぬ, 行かぬ
         // 3. Passive patterns: 書か+れる, 言わ+れ+た
         bool is_beki_pattern = false;
-        bool is_nu_pattern = false;
         bool is_passive_pattern = false;
         if (next_char == U'れ') {
           if (mizenkei_end + 2 < codepoints.size() && codepoints[mizenkei_end + 1] == U'べ' &&
@@ -475,9 +460,7 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
         }
         // Check for classical negation ぬ pattern
         // E.g., 揃わぬ → 揃わ (mizenkei) + ぬ (AUX)
-        if (next_char == U'ぬ') {
-          is_nu_pattern = true;
-        }
+        const bool is_nu_pattern = next_char == U'ぬ';
         // The literary conjectural む selects the irrealis just as ぬ does
         // (成ら+む, 咲か+む). Its modern siblings う / よう take the o-row
         // irrealis instead, so at this a-row position an AuxVolitional entry
@@ -533,26 +516,19 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
         // Check for standard negative ない pattern
         // E.g., 行かない → 行か (mizenkei) + ない (negative AUX)
         //       書かない → 書か (mizenkei) + ない
-        bool is_nai_pattern = false;
-        if (next_char == U'な' && mizenkei_end + 1 < codepoints.size() && codepoints[mizenkei_end + 1] == U'い') {
-          is_nai_pattern = true;
-        }
+        const bool is_nai_pattern =
+            next_char == U'な' && mizenkei_end + 1 < codepoints.size() && codepoints[mizenkei_end + 1] == U'い';
         // Check for the past-negative auxiliary stem なかっ.
         // E.g., 書かなかった → 書か (mizenkei) + なかっ (negative past AUX) + た
         //       行かなかった → 行か (mizenkei) + なかっ + た
-        bool is_nakatt_pattern = false;
-        if (next_char == U'な' && mizenkei_end + 3 < codepoints.size() && codepoints[mizenkei_end + 1] == U'か' &&
-            codepoints[mizenkei_end + 2] == U'っ') {
-          is_nakatt_pattern = true;
-        }
+        const bool is_nakatt_pattern = next_char == U'な' && mizenkei_end + 3 < codepoints.size() &&
+                                       codepoints[mizenkei_end + 1] == U'か' && codepoints[mizenkei_end + 2] == U'っ';
         // Check for the negative adverbial なく (ない's 連用形).
         // E.g., 行かなくて → 行か (mizenkei) + なく (negative adj) + て
         //       食べなくなる counterpart is handled elsewhere; here we split the godan
         //       mizenkei so なく does not get absorbed into a spurious verb form.
-        bool is_naku_pattern = false;
-        if (next_char == U'な' && mizenkei_end + 1 < codepoints.size() && codepoints[mizenkei_end + 1] == U'く') {
-          is_naku_pattern = true;
-        }
+        const bool is_naku_pattern =
+            next_char == U'な' && mizenkei_end + 1 < codepoints.size() && codepoints[mizenkei_end + 1] == U'く';
         // Check for the causative auxiliary せ.
         // E.g., 聞かせられた → 聞か (mizenkei) + せ (causative AUX) + られ + た
         //       書かせる → 書か (mizenkei) + せる (causative AUX)
@@ -582,9 +558,6 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
                      vh::isPassiveAuxContinuation(codepoints, mizenkei_end + 2, /*strict_masu=*/true)) {
               is_causative_pattern = true;
               is_shortened_causative_passive = true;
-            } else if (after_se == U'れ' &&
-                       vh::isPassiveAuxContinuation(codepoints, mizenkei_end + 2, /*strict_masu=*/true)) {
-              is_causative_pattern = true;
             }
             // Bare causative inflection remains productive unless a lexical
             // verb with the same full dictionary form is attested.
@@ -602,9 +575,9 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
           if (verb_type != grammar::VerbType::Unknown) {
             // Skip GodanSa mizenkei for all-kanji stems (likely サ変名詞 + される)
             // E.g., 装飾さ should be 装飾 + される, not 装飾す mizenkei
+            const std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
             bool is_suru_verb_pattern = false;
             if (verb_type == grammar::VerbType::GodanSa) {
-              std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
               // Count the kanji run in codepoints, not bytes: the run is carved
               // out of `codepoints`, so its length is already the character count.
               const size_t kanji_count = kanji_end - start_pos;
@@ -621,14 +594,11 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
                 is_suru_verb_pattern = true;  // Skip generation
               }
             }
-            if (is_suru_verb_pattern) {
-              // Skip mizenkei generation for Suru verb patterns
-            } else {
+            if (!is_suru_verb_pattern) {
               // Get base suffix (e.g., か → く for GodanKa)
               std::string_view base_suffix = grammar::godanBaseSuffixFromARow(first_hira);
               if (!base_suffix.empty()) {
                 // Construct base form: stem + base_suffix (e.g., 書 + く = 書く)
-                std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
                 std::string base_form = normalize::concat(kanji_stem, base_suffix);
 
                 // Verify the base form is a valid verb
@@ -726,12 +696,8 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
                   // - passive pattern: negative cost (-0.5F) for the mizenkei boundary
                   //   言われる(VERB) gets ~0.15, so split (言わ+れる) needs lower cost
                   // - べき pattern: moderate cost (0.2F) for classical obligation
-                  float cost = 0.2F;  // default for beki
-                  if (is_nu_pattern || is_n_pattern || is_nai_pattern) {
-                    cost = -0.5F;
-                  } else if (is_passive_pattern) {
-                    cost = -0.5F;
-                  }
+                  const float cost =
+                      (is_nu_pattern || is_n_pattern || is_nai_pattern || is_passive_pattern) ? -0.5F : 0.2F;
                   const char* debug_pattern = is_nu_pattern                     ? "nu"
                                               : is_n_pattern                    ? "n"
                                               : is_nai_pattern                  ? "nai"
@@ -760,7 +726,7 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
                                                          CandidateOrigin::VerbKanji, 0.9F, info_pattern, epos));
                 }
               }
-            }  // else (not Suru verb pattern)
+            }  // not Suru verb pattern
           }
         }
       }
@@ -772,7 +738,7 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
   //       分からなかった → 分から (mizenkei of 分かる) + なかっ + た
   //       始まらない → 始まら (mizenkei of 始まる) + ない
   // These are Godan verbs where the okurigana includes 2+ hiragana before the A-row ending
-  if (kanji_end < hiragana_end && hiragana_end >= kanji_end + 3) {
+  if (hiragana_end >= kanji_end + 3) {
     const bool has_multi_kanji_stem = kanji_end - start_pos >= 2;
     bool follows_case_particle = false;
     if (has_multi_kanji_stem && start_pos > 0 && dict_manager != nullptr) {
@@ -787,16 +753,17 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
       char32_t cur_char = codepoints[scan_pos];
       char32_t next_char = codepoints[scan_pos + 1];
       // Check if cur_char is A-row and followed by negative pattern
-      bool is_nai_pattern = grammar::isARowCodepoint(cur_char) && next_char == U'な' &&
-                            scan_pos + 2 < codepoints.size() && codepoints[scan_pos + 2] == U'い';
-      bool is_nakatt_pattern = grammar::isARowCodepoint(cur_char) && next_char == U'な' &&
-                               scan_pos + 3 < codepoints.size() && codepoints[scan_pos + 2] == U'か' &&
-                               codepoints[scan_pos + 3] == U'っ';
+      if (!grammar::isARowCodepoint(cur_char)) {
+        continue;
+      }
+      bool is_nai_pattern = next_char == U'な' && scan_pos + 2 < codepoints.size() && codepoints[scan_pos + 2] == U'い';
+      bool is_nakatt_pattern = next_char == U'な' && scan_pos + 3 < codepoints.size() &&
+                               codepoints[scan_pos + 2] == U'か' && codepoints[scan_pos + 3] == U'っ';
       // Check for contracted negative ん pattern (分からん, 始まらん)
       // ん must be at the end of the string (hiragana_end == scan_pos + 2)
-      bool is_n_pattern = grammar::isARowCodepoint(cur_char) && next_char == U'ん' && scan_pos + 2 == hiragana_end;
+      bool is_n_pattern = next_char == U'ん' && scan_pos + 2 == hiragana_end;
       // Check for classical negative ぬ pattern (分からぬ, 変わらぬ)
-      bool is_nu_pattern = grammar::isARowCodepoint(cur_char) && next_char == U'ぬ';
+      bool is_nu_pattern = next_char == U'ぬ';
       if (is_nai_pattern || is_nakatt_pattern || is_n_pattern || is_nu_pattern) {
         // Found A-row + negative pattern at scan_pos
         // The mizenkei would be from start_pos to scan_pos + 1

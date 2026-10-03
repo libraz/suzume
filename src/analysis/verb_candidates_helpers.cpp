@@ -416,8 +416,7 @@ bool isSingleKanjiIchidanSurface(std::string_view surface) {
   if (normalize::utf8Length(surface) != 1) {
     return false;
   }
-  auto codepoints = normalize::toCodepoints(surface);
-  return !codepoints.empty() && isSingleKanjiIchidan(codepoints[0]);
+  return isSingleKanjiIchidan(utf8::decodeFirstChar(surface));
 }
 
 bool isVerbContinuativeSpan(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
@@ -466,10 +465,7 @@ void sortCandidatesByCost(std::vector<UnknownCandidate>& candidates, size_t firs
 
 bool shouldSkipMasuAuxPattern(std::string_view surface, grammar::VerbType verb_type) {
   // Check if surface ends with ます/ました/ましょう/ません
-  bool has_masu_aux = utf8::endsWith(surface, "ましょう") || utf8::endsWith(surface, "ました") ||
-                      utf8::endsWith(surface, "ません") || utf8::endsWith(surface, "ます");
-
-  if (!has_masu_aux) {
+  if (!utf8::endsWithAny(surface, {"ましょう", "ました", "ません", "ます"})) {
     return false;
   }
 
@@ -482,8 +478,7 @@ bool shouldSkipMasuAuxPattern(std::string_view surface, grammar::VerbType verb_t
 
 bool shouldSkipSouPattern(std::string_view surface, grammar::VerbType verb_type) {
   // Check for そう/そうです/そうだ at end
-  bool has_sou_pattern = utf8::endsWith(surface, "そうです") || utf8::endsWith(surface, "そうだ") ||
-                         utf8::endsWith(surface, scorer::kSuffixSou);
+  bool has_sou_pattern = utf8::endsWithAny(surface, {"そうです", "そうだ", scorer::kSuffixSou});
 
   // Don't skip i-adjective patterns
   return has_sou_pattern && verb_type != grammar::VerbType::IAdjective;
@@ -503,13 +498,11 @@ bool isCompoundAdjectivePattern(std::string_view surface) {
     return true;
   }
   // Also check stem forms at end of surface (e.g., 使いにく for 使いにく+い split)
-  return utf8::endsWith(surface, "にく") || utf8::endsWith(surface, "やす") || utf8::endsWith(surface, "がた");
+  return utf8::endsWithAny(surface, {"にく", "やす", "がた"});
 }
 
 bool containsKuNaruPattern(std::string_view surface) {
-  return surface.find("くなっ") != std::string::npos || surface.find("くなり") != std::string::npos ||
-         surface.find("くなる") != std::string::npos || surface.find("くなれ") != std::string::npos ||
-         surface.find("くなら") != std::string::npos;
+  return utf8::containsAny(surface, {"くなっ", "くなり", "くなる", "くなれ", "くなら"});
 }
 
 bool isReduplicatedShiiAdjectiveHead(const std::vector<char32_t>& codepoints, size_t start_pos) {
@@ -554,27 +547,18 @@ bool shouldSkipPassiveAuxPattern(std::string_view surface, grammar::VerbType ver
     return true;
   }
 
-  // Sahen predicates are search-tokenized as a nominal stem plus the する
-  // mizenkei and passive auxiliary: 勉強+さ+れる. Retaining a unified
-  // 勉強される candidate hides that grammatical chain.
-  if (verb_type == grammar::VerbType::Suru) {
-    const auto codepoints = normalize::utf8::decode(surface);
-    for (size_t index = 1; index < codepoints.size(); ++index) {
-      if (codepoints[index - 1] == U'さ' && isCompletePassiveAuxiliaryAt(codepoints, index)) {
-        return true;
-      }
-    }
+  // A Godan irrealis (any a-row cell) or the する irrealis さ plus a complete
+  // passive is a voice chain; Sahen predicates are search-tokenized as a
+  // nominal stem plus さ+れる (勉強+さ+れる), so a unified 勉強される hides it.
+  const bool is_suru = verb_type == grammar::VerbType::Suru;
+  if (!is_suru && !grammar::isGodanVerbType(verb_type)) {
     return false;
   }
-
-  // Only apply remaining checks to Godan verbs
-  if (!grammar::isGodanVerbType(verb_type)) {
-    return false;
-  }
-
   const auto codepoints = normalize::utf8::decode(surface);
   for (size_t index = 1; index < codepoints.size(); ++index) {
-    if (grammar::isARowCodepoint(codepoints[index - 1]) && isCompletePassiveAuxiliaryAt(codepoints, index)) {
+    const char32_t irrealis = codepoints[index - 1];
+    if ((is_suru ? irrealis == U'さ' : grammar::isARowCodepoint(irrealis)) &&
+        isCompletePassiveAuxiliaryAt(codepoints, index)) {
       return true;
     }
   }
@@ -624,9 +608,6 @@ bool isCompletePassiveAuxiliaryAt(const std::vector<char32_t>& codepoints, size_
   }
   const size_t pos_after_re = passive_re_pos + 1;
   if (!isPassiveAuxContinuation(codepoints, pos_after_re, true)) {
-    return false;
-  }
-  if (pos_after_re >= codepoints.size()) {
     return false;
   }
   const char32_t after_re = codepoints[pos_after_re];
@@ -690,12 +671,8 @@ bool shouldSkipCausativeAuxPattern(std::string_view surface, grammar::VerbType v
   // auxiliary chain, so retain each auxiliary boundary.
   // E.g., 聞かせられた → 聞か + せ + られ + た;
   //       書かれさせる → 書か + れ + させる.
-  if (utf8::endsWith(surface, "せられる") || utf8::endsWith(surface, "せられた") ||
-      utf8::endsWith(surface, "せられて") || utf8::endsWith(surface, "せられない") ||
-      utf8::containsAny(surface, {"れさせ", "られさせ"})) {
-    return true;
-  }
-  return false;
+  return utf8::endsWithAny(surface, {"せられる", "せられた", "せられて", "せられない"}) ||
+         containsPassiveCausativeAuxPattern(surface);
 }
 
 namespace {

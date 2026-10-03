@@ -90,8 +90,7 @@ void generateCompoundVerbCandidates(const std::vector<char32_t>& codepoints, siz
 
     // Keep a verb stem and the politeness auxiliary ます separate.
     // e.g., 申し上げます → 申し上げ + ます
-    if (utf8::endsWith(surface, "ます") || utf8::endsWith(surface, "ました") || utf8::endsWith(surface, "ません") ||
-        utf8::endsWith(surface, "ましょう")) {
+    if (utf8::endsWithAny(surface, {"ます", "ました", "ません", "ましょう"})) {
       continue;
     }
 
@@ -116,9 +115,7 @@ void generateCompoundVerbCandidates(const std::vector<char32_t>& codepoints, siz
       // E.g., 振る舞った → suffix="った" includes た (past tense aux)
       // The shorter form (振る舞っ, onbinkei) will be matched in a later iteration,
       // allowing proper split: 振る舞っ + た
-      if (utf8::endsWith(infl_cand.suffix, "た") || utf8::endsWith(infl_cand.suffix, "て") ||
-          utf8::endsWith(infl_cand.suffix, "で") || utf8::endsWith(infl_cand.suffix, "たら") ||
-          utf8::endsWith(infl_cand.suffix, "たり")) {
+      if (utf8::endsWithAny(infl_cand.suffix, {"た", "て", "で", "たら", "たり"})) {
         continue;
       }
 
@@ -191,55 +188,25 @@ void generateKatakanaVerbCandidates(const std::vector<char32_t>& codepoints, siz
     return;
   }
 
-  // Reject katakana stem + すぎ pattern (any length)
-  // MeCab splits KATAKANA + すぎる into separate tokens:
-  //   シンプル 名詞,一般,*,*,*,*,*
-  //   すぎる   動詞,自立,*,*,一段,基本形,すぎる,スギル,スギル
-  // So we skip verb candidates like シンプルすぎない to force split path
+  // A katakana stem followed by an auxiliary or a する cell is split rather
+  // than read as one verb: すぎ (シンプル+すぎる), the appearance そう,
+  // し/さ/せ (コピー+し+て, コピー+さ+れる, コピー+さ+せる), and the
+  // desiderative たい/たく (the past バテた is unaffected).
   std::string hira_part = extractSubstring(codepoints, kata_end, hira_end);
-  // C++17 compatible: check if starts with "すぎ" (6 bytes)
-  if (hira_part.size() >= 6 && hira_part.compare(0, 6, "すぎ") == 0) {
-    return;  // Skip this candidate - force split path
-  }
-
-  // Reject katakana stem + そう pattern (appearance auxiliary)
-  // MeCab splits カタカナ + そう into separate tokens:
-  //   キモ 名詞,一般,*,*,*,*,*  (or adjective stem)
-  //   そう 名詞,接尾,助動詞語幹,*,*,*,そう,ソウ,ソー
-  // So we skip verb candidates like キモそう to force split path
-  // C++17 compatible: check if starts with "そう" (6 bytes)
-  if (hira_part.size() >= 6 && hira_part.compare(0, 6, "そう") == 0) {
-    return;  // Skip this candidate - force split path
-  }
-
-  // Reject katakana stem + する conjugation patterns for サ変 splitting
-  // MeCab splits KATAKANA + する into separate tokens:
-  //   エッチ + し + て + いる    (progressive)
-  //   レイプ + さ + れる        (passive)
-  //   セックス + さ + せる      (causative)
-  // So we skip verb candidates where hiragana starts with し/さ/せ
-  // to force noun + する-conjugation split path
-  if (hira_part.size() >= 3 && (hira_part.compare(0, 3, "し") == 0 ||   // している, した, して, しない
-                                hira_part.compare(0, 3, "さ") == 0 ||   // される, させる, さない
-                                hira_part.compare(0, 3, "せ") == 0)) {  // せる (causative short form)
-    return;                                                             // Skip this candidate - force split path
-  }
-
-  // Reject katakana stem + たい/たく (desiderative auxiliary)
-  // MeCab splits KATAKANA + たい/たく into separate tokens:
-  //   ハメ + たい      (desiderative)
-  //   ハメ + たく + なる (desiderative renyokei + naru)
-  // Note: たXX with 2+ hiragana after た triggers skip; ハメた (past) is OK
-  if (hira_part.size() >= 6 && (hira_part.compare(0, 6, "たい") == 0 ||   // たい (desiderative)
-                                hira_part.compare(0, 6, "たく") == 0)) {  // たく (desiderative renyokei)
-    return;                                                               // Skip this candidate - force split path
+  if (utf8::startsWithAny(hira_part, {"すぎ", "そう", "し", "さ", "せ", "たい", "たく"})) {
+    return;
   }
 
   // The surface って is ambiguous between a verb's te-form and the
   // quotative particle.  A full unknown-verb candidate cannot resolve that
   // lexical ambiguity: it would make every katakana noun look like a
   // godan-ra verb.  Leave the boundary to the verified sokuonbin path below.
-  const bool starts_quotative_tte = hira_part.size() >= 6 && hira_part.compare(0, 6, "って") == 0;
+  const bool starts_quotative_tte = utf8::startsWith(hira_part, "って");
+
+  // Katakana denominal verbs are all godan-ra (バグる, メモる, トラブる), so
+  // every stem cell below shares the reconstructed lemma.
+  const std::string denominal_lemma = extractSubstring(codepoints, start_pos, kata_end) + "る";
+  const std::string stem_cell = extractSubstring(codepoints, start_pos, kata_end + 1);
 
   // A katakana stem of two or more morae productively forms a denominal
   // terminal verb with る (テンパる, バグる). This is a morphological rule,
@@ -268,11 +235,10 @@ void generateKatakanaVerbCandidates(const std::vector<char32_t>& codepoints, siz
                              epos == core::ExtendedPOS::AuxAppearanceSou || epos == core::ExtendedPOS::ParticleConj;
     }
     if (selects_continuative) {
-      const std::string stem = extractSubstring(codepoints, start_pos, kata_end);
-      candidates.push_back(makeVerbCandidate(
-          extractSubstring(codepoints, start_pos, kata_end + 1), start_pos, kata_end + 1, verb_opts.base_cost_standard,
-          stem + "る", dictionary::ConjugationType::GodanRa, true, CandidateOrigin::VerbKatakana,
-          candidate::kNoConfidence, "katakana_denominal_renyokei", core::ExtendedPOS::VerbRenyokei));
+      candidates.push_back(makeVerbCandidate(stem_cell, start_pos, kata_end + 1, verb_opts.base_cost_standard,
+                                             denominal_lemma, dictionary::ConjugationType::GodanRa, true,
+                                             CandidateOrigin::VerbKatakana, candidate::kNoConfidence,
+                                             "katakana_denominal_renyokei", core::ExtendedPOS::VerbRenyokei));
     }
   }
 
@@ -315,105 +281,44 @@ void generateKatakanaVerbCandidates(const std::vector<char32_t>& codepoints, siz
   // Add emphatic variants (パニくるっ, etc.)
   vh::addEmphaticVariants(candidates, codepoints, candidate_start);
 
-  // Generate katakana sokuonbin (っ) candidates for ta/te-form splitting
-  // E.g., バズった → バズっ (onbin of バズる) + た (auxiliary)
-  //       ググった → ググっ (onbin of ググる) + た (auxiliary)
-  // This preserves the onbin stem and tense-auxiliary boundary for katakana verbs.
-  {
-    // Check if hiragana part starts with っ followed by た/て/だ/で
-    if (hira_part.size() >= 6 &&  // っ(3 bytes) + た/て/だ/で(3 bytes) = 6 bytes min
-        hira_part.compare(0, 3, "っ") == 0) {
-      std::string_view second_char(hira_part.data() + 3, 3);
-      if (second_char == "た" || second_char == "て" || second_char == "だ" || second_char == "で") {
-        // Found katakana + っ + た/て pattern
-        // Generate sokuonbin stem candidate: カタカナ + っ
-        std::string onbin_surface = extractSubstring(codepoints, start_pos, kata_end + 1);
-        std::string kata_part = extractSubstring(codepoints, start_pos, kata_end);
-        std::string base_form = kata_part + "る";  // Assume godan-ra (most common for slang)
-
-        // A loanword noun plus the quotative って has the same shape as a
-        // godan-ra te-form, so that cell still needs lexical evidence for the
-        // reconstructed lemma. The past cell has no such homograph -- った is
-        // no particle -- and katakana denominal verbs are a productive open
-        // class that is all godan-ra (バグる, メモる, トラブる), so the
-        // conjugation row is derivable and the candidate stands on its own.
-        const bool quotative_homograph = second_char == "て" || second_char == "で";
-        bool skip_sokuonbin = quotative_homograph && !verb_helpers::isVerbInDictionary(dict_manager, base_form) &&
-                              !verb_helpers::contractedTeContinuationFollowsAt(codepoints, kata_end + 2);
-        if (skip_sokuonbin) {
-          SUZUME_DEBUG_VERBOSE_BLOCK {
-            SUZUME_DEBUG_STREAM << "[VERB_SKIP] \"" << base_form
-                                << "\" is not a verified verb, skip katakana_sokuonbin\n";
-          }
-        } else {
-          // Neutral cost — let bigram connections decide between verb+て and noun+って
-          constexpr float kSokuonbinCost = 0.1F;
-          SUZUME_DEBUG_VERBOSE_BLOCK {
-            SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface << " katakana_sokuonbin lemma=" << base_form
-                                << " cost=" << kSokuonbinCost << "\n";
-          }
-          candidates.push_back(makeVerbCandidate(
-              onbin_surface, start_pos, kata_end + 1, kSokuonbinCost, base_form, dictionary::ConjugationType::GodanRa,
-              true, CandidateOrigin::VerbKatakana, 0.9F, "katakana_sokuonbin", core::ExtendedPOS::VerbOnbinkei));
-        }
-      }
+  auto push_stem_cell = [&](float cost, const char* label, core::ExtendedPOS extended_pos) {
+    SUZUME_DEBUG_VERBOSE_BLOCK {
+      SUZUME_DEBUG_STREAM << "[VERB_CAND] " << stem_cell << " " << label << " lemma=" << denominal_lemma
+                          << " cost=" << cost << "\n";
     }
-  }
+    candidates.push_back(makeVerbCandidate(stem_cell, start_pos, kata_end + 1, cost, denominal_lemma,
+                                           dictionary::ConjugationType::GodanRa, true, CandidateOrigin::VerbKatakana,
+                                           0.9F, label, extended_pos));
+  };
 
-  // Generate katakana mizenkei (未然形) candidates for negative splitting
-  // E.g., ググらない → ググら (mizenkei of ググる) + ない (auxiliary)
-  //       バズらせる → バズら (mizenkei of バズる) + せる (auxiliary)
-  // This preserves the mizenkei and causative-auxiliary boundary for katakana verbs.
-  {
-    // Check if hiragana part starts with ら followed by ない/なく/なかっ/なけれ/せ/され
-    if (hira_part.size() >= 6 &&  // ら(3 bytes) + な/せ(3 bytes) = 6 bytes min
-        hira_part.compare(0, 3, "ら") == 0) {
-      std::string_view second_char(hira_part.data() + 3, 3);
-      bool is_negative = (second_char == "な");   // なx patterns
-      bool is_causative = (second_char == "せ");  // せる pattern
-      if (is_negative || is_causative) {
-        // Found katakana + ら + な/せ pattern
-        // Generate mizenkei stem candidate: カタカナ + ら
-        std::string mizenkei_surface = extractSubstring(codepoints, start_pos, kata_end + 1);
-        std::string kata_part = extractSubstring(codepoints, start_pos, kata_end);
-        std::string base_form = kata_part + "る";  // Assume godan-ra (most common for slang)
-
-        // Negative cost to beat unsplit forms (same as sokuonbin)
-        constexpr float kMizenkeiCost = -0.5F;
-        SUZUME_DEBUG_VERBOSE_BLOCK {
-          SUZUME_DEBUG_STREAM << "[VERB_CAND] " << mizenkei_surface << " katakana_mizenkei lemma=" << base_form
-                              << " cost=" << kMizenkeiCost << "\n";
-        }
-        candidates.push_back(makeVerbCandidate(
-            mizenkei_surface, start_pos, kata_end + 1, kMizenkeiCost, base_form, dictionary::ConjugationType::GodanRa,
-            true, CandidateOrigin::VerbKatakana, 0.9F, "katakana_mizenkei", core::ExtendedPOS::VerbMizenkei));
-      }
-    }
-  }
-
-  // Generate katakana volitional (意志形) candidates for splitting
-  // E.g., ググろう → ググろ (volitional stem of ググる) + う (auxiliary)
-  // MeCab splits these as: ググろ + う
-  {
-    // Check if hiragana part starts with ろう
-    if (hira_part.size() >= 6 &&  // ろ(3 bytes) + う(3 bytes) = 6 bytes
-        hira_part.compare(0, 6, "ろう") == 0) {
-      // Found katakana + ろう pattern
-      // Generate volitional stem candidate: カタカナ + ろ
-      std::string volitional_surface = extractSubstring(codepoints, start_pos, kata_end + 1);
-      std::string kata_part = extractSubstring(codepoints, start_pos, kata_end);
-      std::string base_form = kata_part + "る";  // Assume godan-ra
-
-      // Negative cost to beat unsplit forms
-      constexpr float kVolitionalCost = -0.5F;
+  // Sokuonbin stem before た/て/だ/で (バズっ+た, ググっ+て).
+  if (utf8::startsWithAny(hira_part, {"った", "って", "っだ", "っで"})) {
+    // A loanword noun plus the quotative って has the same shape as a
+    // godan-ra te-form, so that cell still needs lexical evidence for the
+    // reconstructed lemma. The past cell has no such homograph -- った is
+    // no particle -- and the denominal godan-ra row is productive, so the
+    // past candidate stands on its own.
+    const bool quotative_homograph = utf8::startsWithAny(hira_part, {"って", "っで"});
+    if (quotative_homograph && !verb_helpers::isVerbInDictionary(dict_manager, denominal_lemma) &&
+        !verb_helpers::contractedTeContinuationFollowsAt(codepoints, kata_end + 2)) {
       SUZUME_DEBUG_VERBOSE_BLOCK {
-        SUZUME_DEBUG_STREAM << "[VERB_CAND] " << volitional_surface << " katakana_volitional lemma=" << base_form
-                            << " cost=" << kVolitionalCost << "\n";
+        SUZUME_DEBUG_STREAM << "[VERB_SKIP] \"" << denominal_lemma
+                            << "\" is not a verified verb, skip katakana_sokuonbin\n";
       }
-      candidates.push_back(makeVerbCandidate(volitional_surface, start_pos, kata_end + 1, kVolitionalCost, base_form,
-                                             dictionary::ConjugationType::GodanRa, true, CandidateOrigin::VerbKatakana,
-                                             0.9F, "katakana_volitional", core::ExtendedPOS::VerbMizenkei));
+    } else {
+      // Neutral cost — let bigram connections decide between verb+て and noun+って
+      push_stem_cell(0.1F, "katakana_sokuonbin", core::ExtendedPOS::VerbOnbinkei);
     }
+  }
+
+  // Irrealis stems before the negative, the causative and the volitional う
+  // (ググら+ない, バズら+せる, ググろ+う); the negative cost beats unsplit forms.
+  constexpr float kIrrealisStemCost = -0.5F;
+  if (utf8::startsWithAny(hira_part, {"らな", "らせ"})) {
+    push_stem_cell(kIrrealisStemCost, "katakana_mizenkei", core::ExtendedPOS::VerbMizenkei);
+  }
+  if (utf8::startsWith(hira_part, "ろう")) {
+    push_stem_cell(kIrrealisStemCost, "katakana_volitional", core::ExtendedPOS::VerbMizenkei);
   }
 
   // Sort by cost

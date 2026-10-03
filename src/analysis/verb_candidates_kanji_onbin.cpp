@@ -193,10 +193,7 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
             matched_base_form = std::move(infl.base_form);
           }
         }
-        if (matched_verb_type == grammar::VerbType::Unknown) {
-          // No valid verb found
-        } else {
-          // Found valid verb - generate onbin stem candidate
+        if (matched_verb_type != grammar::VerbType::Unknown) {
           std::string onbin_surface = extractSubstring(codepoints, start_pos, kanji_end + 1);
           constexpr float kOnbinCost = candidate::verb_cost::kStandardBonus;
           SUZUME_DEBUG_VERBOSE_BLOCK {
@@ -514,100 +511,95 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
   // Covers cases NOT handled by the de/da handler above:
   // - Multi-hira okurigana: 汗ばんだ → 汗ばん (onbin of 汗ばむ) + だ
   // - Standalone single ん: 死ん (end of token, no following で/だ)
-  if (kanji_end < hiragana_end) {
-    for (size_t n_pos = kanji_end; n_pos < hiragana_end; ++n_pos) {
-      if (codepoints[n_pos] != U'ん')
-        continue;
+  for (size_t n_pos = kanji_end; n_pos < hiragana_end; ++n_pos) {
+    if (codepoints[n_pos] != U'ん')
+      continue;
 
-      bool at_end = (n_pos + 1 >= hiragana_end);
-      bool followed_by_de_da = (!at_end) && (codepoints[n_pos + 1] == U'で' || codepoints[n_pos + 1] == U'だ');
+    bool at_end = (n_pos + 1 >= hiragana_end);
+    bool followed_by_de_da = (!at_end) && (codepoints[n_pos + 1] == U'で' || codepoints[n_pos + 1] == U'だ');
 
-      // Skip: n_pos == kanji_end && !at_end is already handled by de/da handler above
-      if (n_pos == kanji_end && !at_end)
-        continue;
-      // Only valid: at end of hiragana region, or followed by で/だ
-      if (!at_end && !followed_by_de_da)
-        continue;
+    // Skip: n_pos == kanji_end && !at_end is already handled by de/da handler above
+    if (n_pos == kanji_end && !at_end)
+      continue;
+    // Only valid: at end of hiragana region, or followed by で/だ
+    if (!at_end && !followed_by_de_da)
+      continue;
 
-      std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
-      std::string hira_stem = (n_pos > kanji_end) ? extractSubstring(codepoints, kanji_end, n_pos) : "";
-      const std::string lexical_stem = kanji_stem + hira_stem;
+    std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
+    std::string hira_stem = (n_pos > kanji_end) ? extractSubstring(codepoints, kanji_end, n_pos) : "";
+    const std::string lexical_stem = kanji_stem + hira_stem;
 
-      // The kana between the kanji and the euphony is the verb's own okurigana,
-      // and a nasal euphony belongs to a Godan verb ending in む/ぶ/ぬ, whose
-      // okurigana never spells the connective (汗ば+ん, 苦し+ん, 慈し+ん). Where
-      // it does, the run is a continuative that has already handed its clause on
-      // and the euphony belongs to whatever follows: 見+て+くん, not a euphonic
-      // cell of the non-word 見てくむ. The kanji-only stem is unaffected, and so
-      // is the case where the onbin form settles first (書い+て+く+ん+だ).
-      const bool okurigana_spells_connective =
-          std::any_of(codepoints.begin() + static_cast<std::ptrdiff_t>(kanji_end),
-                      codepoints.begin() + static_cast<std::ptrdiff_t>(n_pos),
-                      [](char32_t kana) { return kana == U'て' || kana == U'で'; });
-      if (okurigana_spells_connective) {
-        break;
-      }
-
-      // A complete predicate followed by the nominalizer ん and copula だ is
-      // explanatory (食べる+ん+だ, 高い+ん+だ), not a nasal-euphonic verb.
-      // Genuine hatsuonbin has an incomplete stem before ん (読+ん+だ,
-      // 汗ば+ん+だ), so exact predicate evidence separates the two shapes.
-      constexpr PartOfSpeechMask kPredicateMask =
-          partOfSpeechMask(core::PartOfSpeech::Verb) | partOfSpeechMask(core::PartOfSpeech::Adjective);
-      const bool exact_predicate =
-          dict_manager != nullptr && hasExactPartOfSpeech(*dict_manager, lexical_stem, kPredicateMask);
-      const auto& predicate_analyses = inflection.analyze(lexical_stem);
-      const bool analyzed_complete_predicate =
-          std::any_of(predicate_analyses.begin(), predicate_analyses.end(), [&](const auto& analysis) {
-            return analysis.base_form == lexical_stem && analysis.verb_type != grammar::VerbType::Unknown &&
-                   analysis.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence;
-          });
-      // Before the reason で only a modern terminal (行く, 遅い) closes the
-      // predicate; a classical-looking stem (楽し, 苦し) is the onbin's own.
-      const char32_t stem_last = codepoints[n_pos - 1];
-      const bool modern_terminal = grammar::isModernGodanTerminalKana(stem_last) || stem_last == U'い';
-      const bool explanatory_n_da = followed_by_de_da && (codepoints[n_pos + 1] == U'だ' || modern_terminal) &&
-                                    (exact_predicate || analyzed_complete_predicate);
-      if (explanatory_n_da) {
-        break;
-      }
-
-      auto n_onbin_match = vh::firstGodanOnbinDictBase(dict_manager, lexical_stem, "ん");
-      grammar::VerbType matched_type = n_onbin_match.verb_type;
-      std::string matched_base = std::move(n_onbin_match.base_form);
-      // A nasal euphony replaces the continuative's own final mora (読み → 読ん,
-      // 汗ばみ → 汗ばん), so the kana in front of it is never the a-row. That row
-      // spells the irrealis, and an irrealis before ん is the contracted negative
-      // ぬ — an auxiliary of its own, whose boundary the analysis has to keep
-      // (待た+ん, 知ら+ん, 分から+ん, 読ま+ん). The euphonic reading hands its
-      // clause on to て/で/た/だ, so this only has to be settled where the kana
-      // run ends: with で or だ behind it the euphony is already proven.
-      if (at_end && n_pos > kanji_end && grammar::isARowCodepoint(codepoints[n_pos - 1])) {
-        break;
-      }
-      if (matched_type == grammar::VerbType::Unknown && followed_by_de_da) {
-        const std::string full_surface = extractSubstring(codepoints, start_pos, n_pos + 2);
-        OnbinInflMatch infl =
-            bestOnbinInflMatch(inflection, full_surface, lexical_stem, vh::getGodanTypesByOnbin("ん"));
-        matched_type = infl.type;
-        matched_base = std::move(infl.base_form);
-      }
-      if (matched_type != grammar::VerbType::Unknown) {
-        std::string onbin_surface = extractSubstring(codepoints, start_pos, n_pos + 1);
-        constexpr float kHatsuonbinCost = candidate::verb_cost::kStandardBonus;
-        SUZUME_DEBUG_VERBOSE_BLOCK {
-          SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface
-                              << " kanji_hatsuonbin_standalone lemma=" << matched_base << " cost=" << kHatsuonbinCost
-                              << "\n";
-        }
-        auto candidate = makeVerbCandidate(onbin_surface, start_pos, n_pos + 1, kHatsuonbinCost, matched_base,
-                                           grammar::verbTypeToConjType(matched_type), true, CandidateOrigin::VerbKanji,
-                                           0.9F, "kanji_hatsuonbin", core::ExtendedPOS::VerbOnbinkei);
-        candidate.lemma_verified = n_onbin_match.matched || followed_by_de_da;
-        candidates.push_back(std::move(candidate));
-      }
-      break;  // Only process first ん in the region
+    // The kana between the kanji and the euphony is the verb's own okurigana,
+    // and a nasal euphony belongs to a Godan verb ending in む/ぶ/ぬ, whose
+    // okurigana never spells the connective (汗ば+ん, 苦し+ん, 慈し+ん). Where
+    // it does, the run is a continuative that has already handed its clause on
+    // and the euphony belongs to whatever follows: 見+て+くん, not a euphonic
+    // cell of the non-word 見てくむ. The kanji-only stem is unaffected, and so
+    // is the case where the onbin form settles first (書い+て+く+ん+だ).
+    const bool okurigana_spells_connective = std::any_of(codepoints.begin() + static_cast<std::ptrdiff_t>(kanji_end),
+                                                         codepoints.begin() + static_cast<std::ptrdiff_t>(n_pos),
+                                                         [](char32_t kana) { return kana == U'て' || kana == U'で'; });
+    if (okurigana_spells_connective) {
+      break;
     }
+
+    // A complete predicate followed by the nominalizer ん and copula だ is
+    // explanatory (食べる+ん+だ, 高い+ん+だ), not a nasal-euphonic verb.
+    // Genuine hatsuonbin has an incomplete stem before ん (読+ん+だ,
+    // 汗ば+ん+だ), so exact predicate evidence separates the two shapes.
+    constexpr PartOfSpeechMask kPredicateMask =
+        partOfSpeechMask(core::PartOfSpeech::Verb) | partOfSpeechMask(core::PartOfSpeech::Adjective);
+    const bool exact_predicate =
+        dict_manager != nullptr && hasExactPartOfSpeech(*dict_manager, lexical_stem, kPredicateMask);
+    const auto& predicate_analyses = inflection.analyze(lexical_stem);
+    const bool analyzed_complete_predicate =
+        std::any_of(predicate_analyses.begin(), predicate_analyses.end(), [&](const auto& analysis) {
+          return analysis.base_form == lexical_stem && analysis.verb_type != grammar::VerbType::Unknown &&
+                 analysis.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence;
+        });
+    // Before the reason で only a modern terminal (行く, 遅い) closes the
+    // predicate; a classical-looking stem (楽し, 苦し) is the onbin's own.
+    const char32_t stem_last = codepoints[n_pos - 1];
+    const bool modern_terminal = grammar::isModernGodanTerminalKana(stem_last) || stem_last == U'い';
+    const bool explanatory_n_da = followed_by_de_da && (codepoints[n_pos + 1] == U'だ' || modern_terminal) &&
+                                  (exact_predicate || analyzed_complete_predicate);
+    if (explanatory_n_da) {
+      break;
+    }
+
+    auto n_onbin_match = vh::firstGodanOnbinDictBase(dict_manager, lexical_stem, "ん");
+    grammar::VerbType matched_type = n_onbin_match.verb_type;
+    std::string matched_base = std::move(n_onbin_match.base_form);
+    // A nasal euphony replaces the continuative's own final mora (読み → 読ん,
+    // 汗ばみ → 汗ばん), so the kana in front of it is never the a-row. That row
+    // spells the irrealis, and an irrealis before ん is the contracted negative
+    // ぬ — an auxiliary of its own, whose boundary the analysis has to keep
+    // (待た+ん, 知ら+ん, 分から+ん, 読ま+ん). The euphonic reading hands its
+    // clause on to て/で/た/だ, so this only has to be settled where the kana
+    // run ends: with で or だ behind it the euphony is already proven.
+    if (at_end && n_pos > kanji_end && grammar::isARowCodepoint(codepoints[n_pos - 1])) {
+      break;
+    }
+    if (matched_type == grammar::VerbType::Unknown && followed_by_de_da) {
+      const std::string full_surface = extractSubstring(codepoints, start_pos, n_pos + 2);
+      OnbinInflMatch infl = bestOnbinInflMatch(inflection, full_surface, lexical_stem, vh::getGodanTypesByOnbin("ん"));
+      matched_type = infl.type;
+      matched_base = std::move(infl.base_form);
+    }
+    if (matched_type != grammar::VerbType::Unknown) {
+      std::string onbin_surface = extractSubstring(codepoints, start_pos, n_pos + 1);
+      constexpr float kHatsuonbinCost = candidate::verb_cost::kStandardBonus;
+      SUZUME_DEBUG_VERBOSE_BLOCK {
+        SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface << " kanji_hatsuonbin_standalone lemma=" << matched_base
+                            << " cost=" << kHatsuonbinCost << "\n";
+      }
+      auto candidate = makeVerbCandidate(onbin_surface, start_pos, n_pos + 1, kHatsuonbinCost, matched_base,
+                                         grammar::verbTypeToConjType(matched_type), true, CandidateOrigin::VerbKanji,
+                                         0.9F, "kanji_hatsuonbin", core::ExtendedPOS::VerbOnbinkei);
+      candidate.lemma_verified = n_onbin_match.matched || followed_by_de_da;
+      candidates.push_back(std::move(candidate));
+    }
+    break;  // Only process first ん in the region
   }
 }
 

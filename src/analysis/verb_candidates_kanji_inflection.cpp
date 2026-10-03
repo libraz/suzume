@@ -158,7 +158,7 @@ void appendAnalyzedKanjiVerbCandidates(const std::vector<char32_t>& codepoints, 
       // Skip patterns that contain ください (polite request auxiliary)
       // e.g., 待ちください → 待ち + ください, not 待ちく + ださい
       // This prevents false compound verb analysis like 待ちく (待つ+来る renyokei)
-      if (hiragana_part.find("ください") != std::string::npos || hiragana_part.find("くださ") != std::string::npos) {
+      if (utf8::contains(hiragana_part, "くださ")) {
         continue;  // Skip - let VERB + ください split win
       }
 
@@ -172,18 +172,15 @@ void appendAnalyzedKanjiVerbCandidates(const std::vector<char32_t>& codepoints, 
         if (te_pos == std::string::npos) {
           te_pos = hiragana_part.find("で");
         }
-        if (te_pos != std::string::npos && te_pos >= core::kJapaneseCharBytes) {
-          // Check if there's auxiliary content after て/で
-          std::string after_te = hiragana_part.substr(te_pos + core::kJapaneseCharBytes);
-          if (!after_te.empty()) {
-            // Check if char before て/で is onbin ending (い/っ/ん) or
-            // godan-sa renyokei (し) — e.g., 過ごしてみた → 過ごし+て+み+た
-            std::string_view before_te(hiragana_part.data() + te_pos - core::kJapaneseCharBytes,
-                                       core::kJapaneseCharBytes);
-            if (before_te == "い" || before_te == "っ" || before_te == "ん" || before_te == "し") {
-              continue;  // Skip - let verb + て + auxiliary split win
-            }
-          }
+        // Auxiliary content must follow て/で, and the kana before it must be an
+        // onbin ending (い/っ/ん) or a godan-sa renyokei (し) — e.g., 過ごしてみた
+        // → 過ごし+て+み+た.
+        if (te_pos != std::string::npos && te_pos >= core::kJapaneseCharBytes &&
+            te_pos + core::kJapaneseCharBytes < hiragana_part.size() &&
+            utf8::equalsAny(
+                std::string_view(hiragana_part).substr(te_pos - core::kJapaneseCharBytes, core::kJapaneseCharBytes),
+                {"い", "っ", "ん", "し"})) {
+          continue;  // Skip - let verb + て + auxiliary split win
         }
       }
 
@@ -193,18 +190,9 @@ void appendAnalyzedKanjiVerbCandidates(const std::vector<char32_t>& codepoints, 
       // the copula opening its own predicate (届く + だろう), and treating it as
       // evidence for ください suppressed the k-row terminal of every kanji verb
       // that a copula follows.
-      {
-        size_t hira_size = hiragana_part.size();
-        if (hira_size >= core::kJapaneseCharBytes) {
-          std::string_view last_char_view(hiragana_part.data() + hira_size - core::kJapaneseCharBytes,
-                                          core::kJapaneseCharBytes);
-          if (last_char_view == "く" && end_pos < codepoints.size()) {
-            std::string remaining = extractSubstring(codepoints, end_pos, std::min(end_pos + 3, codepoints.size()));
-            if (remaining.compare(0, 6, "ださ") == 0) {
-              continue;  // Skip - likely part of ください pattern
-            }
-          }
-        }
+      if (utf8::endsWith(hiragana_part, "く") && end_pos + 1 < codepoints.size() && codepoints[end_pos] == U'だ' &&
+          codepoints[end_pos + 1] == U'さ') {
+        continue;  // Skip - likely part of ください pattern
       }
 
       // Skip patterns that end with particles (noun renyokei + particle)

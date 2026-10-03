@@ -476,18 +476,11 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
         // Skip suru-verb pattern: 漢字 + し + よう
         // Suru-verbs (勉強しよう, 説明しよう) should be split as: 漢字|しよ|う
         // Check if renyokei ends with し preceded by kanji
-        bool is_suru_pattern = false;
-        if (renyokei_end > start_pos && codepoints[renyokei_end - 1] == U'し' && renyokei_end - 1 > start_pos) {
-          // Check if there's at least one kanji before し
-          bool has_kanji_before = false;
-          for (size_t i = start_pos; i < renyokei_end - 1; ++i) {
-            if (normalize::isKanjiCodepoint(codepoints[i])) {
-              has_kanji_before = true;
-              break;
-            }
-          }
-          is_suru_pattern = has_kanji_before;
-        }
+        const auto stem_begin = codepoints.begin() + static_cast<std::ptrdiff_t>(start_pos);
+        const auto stem_last = codepoints.begin() + static_cast<std::ptrdiff_t>(renyokei_end - 1);
+        const auto is_kanji = [](char32_t codepoint) { return normalize::isKanjiCodepoint(codepoint); };
+        const bool is_suru_pattern =
+            codepoints[renyokei_end - 1] == U'し' && std::any_of(stem_begin, stem_last, is_kanji);
 
         // The Godan reading wins for a bare e-row + よ imperative (書けよ),
         // but a following う closes the distinct Ichidan volitional pattern
@@ -505,18 +498,8 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
           // E.g., 良い, 高い, 赤い - these are adjectives, not ichidan verb stems
           // Require higher confidence to avoid false volitional candidates
           // like 良いよ(う) being parsed as volitional of non-existent 良いる
-          bool could_be_adjective = false;
-          if (renyokei_end > start_pos + 1 && codepoints[renyokei_end - 1] == U'い') {
-            // Check if chars before い are all kanji
-            bool all_kanji_before_i = true;
-            for (size_t k = start_pos; k < renyokei_end - 1; ++k) {
-              if (!normalize::isKanjiCodepoint(codepoints[k])) {
-                all_kanji_before_i = false;
-                break;
-              }
-            }
-            could_be_adjective = all_kanji_before_i;
-          }
+          const bool could_be_adjective = renyokei_end > start_pos + 1 && codepoints[renyokei_end - 1] == U'い' &&
+                                          std::all_of(stem_begin, stem_last, is_kanji);
 
           // Verify using inflection analysis
           const auto& all_candidates = inflection.analyze(renyokei_surface + "よう");
@@ -556,117 +539,103 @@ void appendGodanPassiveRenyokeiCandidates(const std::vector<char32_t>& codepoint
                                           const dictionary::DictionaryManager* dict_manager,
                                           const VerbCandidateOptions& verb_opts,
                                           std::vector<UnknownCandidate>& candidates) {
-  if (kanji_end + 1 < hiragana_end) {
-    char32_t first_hira = codepoints[kanji_end];
-    char32_t second_hira = codepoints[kanji_end + 1];
-    // A-row + れ pattern (godan passive renyokei)
-    if (grammar::isARowCodepoint(first_hira) && second_hira == U'れ') {
-      // Skip suru-verb passive pattern: kanji + さ + れ
-      // e.g., 処理される should be 処理(noun) + される(aux), not godan passive
-      // Also skip single kanji + さ + れ as these are typically not real verbs
-      // e.g., 強される is not a verb (強い is adjective, 強 is noun)
-      std::string kanji_check = extractSubstring(codepoints, start_pos, kanji_end);
-      bool is_suru_passive_pattern = (first_hira == U'さ' && grammar::isAllKanji(kanji_check));
-      if (is_suru_passive_pattern) {
-        // Skip - this should be handled as noun + される auxiliary
-        // Continue to next pattern
-      } else {
-        size_t renyokei_end = kanji_end + 2;  // kanji + a-row + れ
-        std::string surface = extractSubstring(codepoints, start_pos, renyokei_end);
-
-        // Check if this is a valid passive verb stem
-        // The passive base form is surface + る (e.g., 言われ → 言われる)
-        std::string passive_base = surface + "る";
-
-        // Skip if passive_base is already a known ichidan verb in dictionary.
-        // E.g., 生まれる is a standalone ichidan verb, not passive of 生む.
-        // The dictionary entry provides the correct candidate with proper lemma.
-        if (vh::isVerbInDictionary(dict_manager, passive_base)) {
-          // Fall through to end of block - dict entry handles this
-        } else {
-          // Compute the original base verb lemma by converting A-row to U-row
-          // e.g., 言われる: 言 + わ + れる → 言 + う = 言う
-          std::string kanji_part = extractSubstring(codepoints, start_pos, kanji_end);
-          std::string_view u_row_suffix = grammar::godanBaseSuffixFromARow(first_hira);
-          std::string base_lemma = normalize::concat(kanji_part, u_row_suffix);
-
-          // Use analyze() to get all interpretations, not just the best one
-          // The best overall interpretation might be Godan (言う + れる), but
-          // there should also be an Ichidan interpretation (言われる as verb)
-          const auto& all_candidates = inflection.analyze(passive_base);
-          float ichidan_confidence =
-              getIchidanConfidence(all_candidates, candidate::verb_cost::kIchidanDefaultMinConfidence);
-
-          // Passive verbs are Ichidan conjugation (言われる conjugates like 食べる)
-          if (ichidan_confidence >= 0.4F) {
-            // Check if followed by べき (classical obligation)
-            // For 書かれべき pattern, we want 書か + れべき, not 書かれ + べき
-            bool is_beki_pattern = false;
-            if (renyokei_end < codepoints.size()) {
-              char32_t next_char = codepoints[renyokei_end];
-              if (next_char == U'べ') {
-                is_beki_pattern = true;
-              }
-            }
-
-            // Calculate base cost for passive candidates
-            // Add a penalty so the grammatical split path (縛ら+れ) can compete.
-            // Without this, the merged form (縛られ) has too low a cost (-0.16)
-            // and always beats the split path (縛ら(0.1) + れ(aux))
-            float base_cost = candidate::confidenceScaledCost(verb_opts.bonus_ichidan, ichidan_confidence,
-                                                              verb_opts.confidence_cost_scale_small) +
-                              bigram_cost::kMinor;
-
-            // A passive stem before a causative remains split as mizenkei +
-            // passive + causative (書か+れ+させる); it is not a lexical
-            // renyokei followed directly by させる. Preserve the same rule as
-            // the existing classical べき boundary.
-            const bool is_passive_causative_chain = vh::causativeSaseFollowsAt(codepoints, renyokei_end);
-            // A following ない-family form must also keep the productive
-            // voice boundary (読ま+れ+なく, 書か+れ+ない). Lexical Ichidan
-            // verbs such as 生まれる use the dictionary/Ichidan path above
-            // and do not reach this Godan-passive fallback.
-            const bool is_passive_negative_chain = vh::naiNegativeFollowsAt(codepoints, renyokei_end);
-            // So must the polite auxiliary, for the same reason: it selects a
-            // continuative, and the continuative it selects is the passive
-            // auxiliary's own (読ま+れ+まし+た). Leaving it out split the same
-            // chain two ways depending on which cell of ます followed.
-            const bool is_passive_polite_chain = vh::masuAuxFollowsAt(codepoints, renyokei_end);
-            const bool is_classical_predicate_chain =
-                classicalPredicateTailFollowsAt(codepoints, renyokei_end, dict_manager);
-            // A subsidiary verb behind the passive keeps the boundary for the
-            // same reason (使わ+れ+続ける, 使わ+れ+始める): the passive is an
-            // auxiliary, so it never heads a lexical compound. Every cell it
-            // does host is kana, which is what separates the two cases.
-            const bool is_passive_subsidiary_chain = vh::lexicalWordFollowsAt(codepoints, renyokei_end);
-            // Likewise a registered auxiliary or suffix taking the continuative
-            // (奪わ+れ+かね+ない, 奪わ+れ+がち, 奪わ+れ+そう).
-            bool is_passive_auxiliary_chain = false;
-            for (size_t aux_end = renyokei_end + 1;
-                 dict_manager != nullptr && aux_end <= std::min(codepoints.size(), renyokei_end + 3) &&
-                 !is_passive_auxiliary_chain;
-                 ++aux_end) {
-              is_passive_auxiliary_chain = lookupEntryInRange(*dict_manager, codepoints, renyokei_end, aux_end,
-                                                              core::PartOfSpeech::Auxiliary) != nullptr ||
-                                           lookupEntryInRange(*dict_manager, codepoints, renyokei_end, aux_end,
-                                                              core::PartOfSpeech::Suffix) != nullptr;
-            }
-            if (!is_beki_pattern && !is_passive_causative_chain && !is_passive_negative_chain &&
-                !is_passive_polite_chain && !is_classical_predicate_chain && !is_passive_subsidiary_chain &&
-                !is_passive_auxiliary_chain) {
-              candidates.push_back(makeVerbCandidate(
-                  surface, start_pos, renyokei_end, base_cost, base_lemma, dictionary::ConjugationType::Ichidan, false,
-                  CandidateOrigin::VerbKanji, ichidan_confidence, "godan_passive_renyokei"));
-            }
-
-            // NOTE: Passive verb conjugated forms (言われる, 言われた, etc.) are NOT generated
-            // as single tokens. MeCab splits them as: 言わ + れ + た
-            // The renyokei form (言われ) generated above connects to auxiliary た/て/ない/etc.
-          }
-        }  // end else (not dict ichidan verb)
-      }  // end else (not suru passive pattern)
-    }
+  if (kanji_end + 1 >= hiragana_end) {
+    return;
   }
+  const char32_t first_hira = codepoints[kanji_end];
+  // A-row + れ pattern (godan passive renyokei)
+  if (!grammar::isARowCodepoint(first_hira) || codepoints[kanji_end + 1] != U'れ') {
+    return;
+  }
+  // Skip suru-verb passive pattern: kanji + さ + れ
+  // e.g., 処理される should be 処理(noun) + される(aux), not godan passive
+  // Also skip single kanji + さ + れ as these are typically not real verbs
+  // e.g., 強される is not a verb (強い is adjective, 強 is noun)
+  const std::string kanji_part = extractSubstring(codepoints, start_pos, kanji_end);
+  if (first_hira == U'さ' && grammar::isAllKanji(kanji_part)) {
+    return;
+  }
+  const size_t renyokei_end = kanji_end + 2;  // kanji + a-row + れ
+  const std::string surface = extractSubstring(codepoints, start_pos, renyokei_end);
+
+  // The passive base form is surface + る (e.g., 言われ → 言われる).
+  // Skip if it is already a known ichidan verb in dictionary.
+  // E.g., 生まれる is a standalone ichidan verb, not passive of 生む.
+  // The dictionary entry provides the correct candidate with proper lemma.
+  const std::string passive_base = surface + "る";
+  if (vh::isVerbInDictionary(dict_manager, passive_base)) {
+    return;
+  }
+
+  // Compute the original base verb lemma by converting A-row to U-row
+  // e.g., 言われる: 言 + わ + れる → 言 + う = 言う
+  const std::string base_lemma = normalize::concat(kanji_part, grammar::godanBaseSuffixFromARow(first_hira));
+
+  // Use analyze() to get all interpretations, not just the best one
+  // The best overall interpretation might be Godan (言う + れる), but
+  // there should also be an Ichidan interpretation (言われる as verb)
+  const float ichidan_confidence =
+      getIchidanConfidence(inflection.analyze(passive_base), candidate::verb_cost::kIchidanDefaultMinConfidence);
+
+  // Passive verbs are Ichidan conjugation (言われる conjugates like 食べる)
+  if (ichidan_confidence < 0.4F) {
+    return;
+  }
+  // Check if followed by べき (classical obligation)
+  // For 書かれべき pattern, we want 書か + れべき, not 書かれ + べき
+  const bool is_beki_pattern = renyokei_end < codepoints.size() && codepoints[renyokei_end] == U'べ';
+
+  // Calculate base cost for passive candidates
+  // Add a penalty so the grammatical split path (縛ら+れ) can compete.
+  // Without this, the merged form (縛られ) has too low a cost (-0.16)
+  // and always beats the split path (縛ら(0.1) + れ(aux))
+  float base_cost = candidate::confidenceScaledCost(verb_opts.bonus_ichidan, ichidan_confidence,
+                                                    verb_opts.confidence_cost_scale_small) +
+                    bigram_cost::kMinor;
+
+  // A passive stem before a causative remains split as mizenkei +
+  // passive + causative (書か+れ+させる); it is not a lexical
+  // renyokei followed directly by させる. Preserve the same rule as
+  // the existing classical べき boundary.
+  const bool is_passive_causative_chain = vh::causativeSaseFollowsAt(codepoints, renyokei_end);
+  // A following ない-family form must also keep the productive
+  // voice boundary (読ま+れ+なく, 書か+れ+ない). Lexical Ichidan
+  // verbs such as 生まれる use the dictionary/Ichidan path above
+  // and do not reach this Godan-passive fallback.
+  const bool is_passive_negative_chain = vh::naiNegativeFollowsAt(codepoints, renyokei_end);
+  // So must the polite auxiliary, for the same reason: it selects a
+  // continuative, and the continuative it selects is the passive
+  // auxiliary's own (読ま+れ+まし+た). Leaving it out split the same
+  // chain two ways depending on which cell of ます followed.
+  const bool is_passive_polite_chain = vh::masuAuxFollowsAt(codepoints, renyokei_end);
+  const bool is_classical_predicate_chain = classicalPredicateTailFollowsAt(codepoints, renyokei_end, dict_manager);
+  // A subsidiary verb behind the passive keeps the boundary for the
+  // same reason (使わ+れ+続ける, 使わ+れ+始める): the passive is an
+  // auxiliary, so it never heads a lexical compound. Every cell it
+  // does host is kana, which is what separates the two cases.
+  const bool is_passive_subsidiary_chain = vh::lexicalWordFollowsAt(codepoints, renyokei_end);
+  // Likewise a registered auxiliary or suffix taking the continuative
+  // (奪わ+れ+かね+ない, 奪わ+れ+がち, 奪わ+れ+そう).
+  bool is_passive_auxiliary_chain = false;
+  for (size_t aux_end = renyokei_end + 1;
+       dict_manager != nullptr && aux_end <= std::min(codepoints.size(), renyokei_end + 3) &&
+       !is_passive_auxiliary_chain;
+       ++aux_end) {
+    is_passive_auxiliary_chain =
+        lookupEntryInRange(*dict_manager, codepoints, renyokei_end, aux_end, core::PartOfSpeech::Auxiliary) !=
+            nullptr ||
+        lookupEntryInRange(*dict_manager, codepoints, renyokei_end, aux_end, core::PartOfSpeech::Suffix) != nullptr;
+  }
+  if (!is_beki_pattern && !is_passive_causative_chain && !is_passive_negative_chain && !is_passive_polite_chain &&
+      !is_classical_predicate_chain && !is_passive_subsidiary_chain && !is_passive_auxiliary_chain) {
+    candidates.push_back(makeVerbCandidate(surface, start_pos, renyokei_end, base_cost, base_lemma,
+                                           dictionary::ConjugationType::Ichidan, false, CandidateOrigin::VerbKanji,
+                                           ichidan_confidence, "godan_passive_renyokei"));
+  }
+
+  // NOTE: Passive verb conjugated forms (言われる, 言われた, etc.) are NOT generated
+  // as single tokens. MeCab splits them as: 言わ + れ + た
+  // The renyokei form (言われ) generated above connects to auxiliary た/て/ない/etc.
 }
 
 }  // namespace suzume::analysis::kanji_verb_detail

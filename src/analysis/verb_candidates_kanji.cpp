@@ -196,13 +196,11 @@ bool hasCompleteParticleInitialVerbEvidence(const std::vector<char32_t>& codepoi
       const std::string_view negative_suffix(candidate.suffix.data() + core::kJapaneseCharBytes,
                                              candidate.suffix.size() - core::kJapaneseCharBytes);
       if (grammar::verbTypeFromARowCodepoint(mizenkei_ending) == candidate.verb_type &&
-          (utf8::startsWith(negative_suffix, "ない") || utf8::startsWith(negative_suffix, "なかった") ||
-           utf8::startsWith(negative_suffix, "なく") || utf8::startsWith(negative_suffix, "なけれ"))) {
+          utf8::startsWithAny(negative_suffix, {"ない", "なかった", "なく", "なけれ"})) {
         return true;
       }
     }
-    const float min_confidence = has_mixed_godan_ka_stem ? (utf8::startsWith(candidate.suffix, "いた") ||
-                                                                    utf8::startsWith(candidate.suffix, "いて")
+    const float min_confidence = has_mixed_godan_ka_stem ? (utf8::startsWithAny(candidate.suffix, {"いた", "いて"})
                                                                 ? verb_opts.confidence_past_te
                                                                 : verb_opts.confidence_low)
                                                          : verb_opts.confidence_standard;
@@ -214,25 +212,23 @@ bool hasCompleteParticleInitialVerbEvidence(const std::vector<char32_t>& codepoi
     bool complete_inflection = false;
     switch (candidate.verb_type) {
       case grammar::VerbType::GodanKa:
-        complete_inflection = utf8::startsWith(candidate.suffix, "いて") ||
-                              utf8::startsWith(candidate.suffix, "いた") ||
-                              utf8::startsWith(candidate.suffix, "きます");
+        complete_inflection = utf8::startsWithAny(candidate.suffix, {"いて", "いた", "きます"});
         break;
       case grammar::VerbType::GodanGa:
-        complete_inflection = utf8::startsWith(candidate.suffix, "いで") || utf8::startsWith(candidate.suffix, "いだ");
+        complete_inflection = utf8::startsWithAny(candidate.suffix, {"いで", "いだ"});
         break;
       case grammar::VerbType::GodanTa:
       case grammar::VerbType::GodanRa:
       case grammar::VerbType::GodanWa:
-        complete_inflection = utf8::startsWith(candidate.suffix, "って") || utf8::startsWith(candidate.suffix, "った");
+        complete_inflection = utf8::startsWithAny(candidate.suffix, {"って", "った"});
         break;
       case grammar::VerbType::GodanNa:
       case grammar::VerbType::GodanBa:
       case grammar::VerbType::GodanMa:
-        complete_inflection = utf8::startsWith(candidate.suffix, "んで") || utf8::startsWith(candidate.suffix, "んだ");
+        complete_inflection = utf8::startsWithAny(candidate.suffix, {"んで", "んだ"});
         break;
       case grammar::VerbType::GodanSa:
-        complete_inflection = utf8::startsWith(candidate.suffix, "して") || utf8::startsWith(candidate.suffix, "した");
+        complete_inflection = utf8::startsWithAny(candidate.suffix, {"して", "した"});
         break;
       default:
         break;
@@ -600,94 +596,46 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
     }
   }
 
-  // Generate verb renyokei candidates when followed by すぎ
+  // Generate verb renyokei candidates when followed by すぎ. The full span
+  // before すぎ is the continuative, every okurigana mora included (積もり+すぎる,
+  // 諦め+すぎる): an i-row ending is Godan, an e-row ending Ichidan.
   // E.g., 書きすぎた → 書き (renyokei of 書く) + すぎ + た (Godan)
   //       食べすぎた → 食べ (renyokei of 食べる) + すぎ + た (Ichidan)
   if (is_sugi_pattern && kanji_end < sugi_pos) {
     const char32_t renyokei_ending = codepoints[sugi_pos - 1];
+    const bool is_godan = grammar::isIRowCodepoint(renyokei_ending);
+    const grammar::VerbType verb_type = is_godan ? grammar::verbTypeFromIRowCodepoint(renyokei_ending)
+                                        : grammar::isERowCodepoint(renyokei_ending) ? grammar::VerbType::Ichidan
+                                                                                    : grammar::VerbType::Unknown;
+    const std::string_view godan_suffix = is_godan ? grammar::godanBaseSuffixFromIRow(renyokei_ending) : "";
+    if (verb_type != grammar::VerbType::Unknown && (!is_godan || !godan_suffix.empty())) {
+      const std::string surface = extractSubstring(codepoints, start_pos, sugi_pos);
+      const std::string base_form =
+          is_godan ? normalize::concat(utf8::dropLastChar(surface), godan_suffix) : surface + "る";
 
-    // Pattern 1: Godan verb renyokei (kanji + I-row hiragana + すぎ)
-    // き→GodanKa, ぎ→GodanGa, し→GodanSa, ち→GodanTa, に→GodanNa,
-    // び→GodanBa, み→GodanMa, り→GodanRa
-    if (grammar::isIRowCodepoint(renyokei_ending)) {
-      // Verify this is followed by すぎ
-      if (sugi_pos + 1 < codepoints.size() && codepoints[sugi_pos] == U'す' && codepoints[sugi_pos + 1] == U'ぎ') {
-        // Determine verb type from I-row ending
-        grammar::VerbType verb_type = grammar::verbTypeFromIRowCodepoint(renyokei_ending);
-        if (verb_type != grammar::VerbType::Unknown) {
-          // Get base suffix (e.g., き → く for GodanKa)
-          std::string_view base_suffix = grammar::godanBaseSuffixFromIRow(renyokei_ending);
-          if (!base_suffix.empty()) {
-            // Replace the final i-row mora of the entire continuative, not
-            // merely the first okurigana after the kanji run.  This covers
-            // arbitrary-length okurigana (積もり+すぎる) as well as 書き.
-            std::string surface = extractSubstring(codepoints, start_pos, sugi_pos);
-            std::string base_form = normalize::concat(utf8::dropLastChar(surface), base_suffix);
-
-            // Verify the base form is a valid verb
-            // The closed excessive follower is itself inflectional evidence.
-            // Multi-mora okurigana cannot be validated reliably by the
-            // single-stem inflection probe (積もる is seen only as もる), so the
-            // final i-row shape plus すぎ licenses the productive continuative.
-            const bool has_extended_okurigana = sugi_pos > kanji_end + 1;
-            const bool crosses_adjective_predicate =
-                has_extended_okurigana && hasAdjectiveRenyokeiPredicateBoundary(codepoints, start_pos, sugi_pos,
-                                                                                inflection, dict_manager, base_form);
-            bool is_valid_verb = (has_extended_okurigana && !crosses_adjective_predicate) ||
+      // The closed excessive follower is itself inflectional evidence.
+      // Multi-mora okurigana cannot be validated reliably by the single-stem
+      // inflection probe (積もる is seen only as もる), so the final mora shape
+      // plus すぎ licenses the productive continuative.
+      const bool has_extended_okurigana = sugi_pos > kanji_end + 1;
+      const bool crosses_adjective_predicate =
+          has_extended_okurigana &&
+          hasAdjectiveRenyokeiPredicateBoundary(codepoints, start_pos, sugi_pos, inflection, dict_manager, base_form);
+      const bool is_valid_verb = (has_extended_okurigana && !crosses_adjective_predicate) ||
                                  vh::isVerifiedVerbBase(dict_manager, inflection, base_form,
-                                                        candidate::verb_cost::kConstructedVerbMinConfidence, true);
+                                                        candidate::verb_cost::kConstructedVerbMinConfidence, is_godan);
 
-            if (is_valid_verb) {
-              size_t renyokei_end = sugi_pos;
-              // Negative cost to beat compound NOUN path
-              // Compound NOUNs like 書きすぎた get cost ~1.0, so we need much lower
-              constexpr float kCost = candidate::verb_cost::kStrongBonus;
-              SUZUME_DEBUG_VERBOSE_BLOCK {
-                SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface << " godan_renyokei_sugi lemma=" << base_form
-                                    << " cost=" << kCost << "\n";
-              }
-              candidates.push_back(makeVerbCandidate(
-                  surface, start_pos, renyokei_end, kCost, base_form, grammar::verbTypeToConjType(verb_type), true,
-                  CandidateOrigin::VerbKanji, 0.9F, "godan_renyokei_sugi", core::ExtendedPOS::VerbRenyokei));
-            }
-          }
+      if (is_valid_verb) {
+        // Negative cost to beat the compound NOUN path (書きすぎた costs ~1.0)
+        constexpr float kCost = candidate::verb_cost::kStrongBonus;
+        const char* label = is_godan ? "godan_renyokei_sugi" : "ichidan_renyokei_sugi";
+        SUZUME_DEBUG_VERBOSE_BLOCK {
+          SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface << " " << label << " lemma=" << base_form
+                              << " cost=" << kCost << "\n";
         }
-      }
-    }
-
-    // Pattern 2: Ichidan verb renyokei (kanji + E-row hiragana + すぎ)
-    // E.g., 食べすぎた → 食べ (renyokei of 食べる) + すぎ + た
-    //       見せすぎる → 見せ (renyokei of 見せる) + すぎる
-    if (grammar::isERowCodepoint(renyokei_ending)) {
-      // Verify this is followed by すぎ
-      if (sugi_pos + 1 < codepoints.size() && codepoints[sugi_pos] == U'す' && codepoints[sugi_pos + 1] == U'ぎ') {
-        // The full span before すぎ is the ichidan continuative, including
-        // every okurigana mora (諦め+すぎる, not 諦+めすぎる).
-        std::string ichidan_stem = extractSubstring(codepoints, start_pos, sugi_pos);
-        std::string base_form = ichidan_stem + "る";
-
-        // Verify the base form is a valid ichidan verb
-        const bool has_extended_okurigana = sugi_pos > kanji_end + 1;
-        const bool crosses_adjective_predicate =
-            has_extended_okurigana &&
-            hasAdjectiveRenyokeiPredicateBoundary(codepoints, start_pos, sugi_pos, inflection, dict_manager, base_form);
-        bool is_valid_verb = (has_extended_okurigana && !crosses_adjective_predicate) ||
-                             vh::isVerifiedVerbBase(dict_manager, inflection, base_form,
-                                                    candidate::verb_cost::kConstructedVerbMinConfidence, false);
-
-        if (is_valid_verb) {
-          size_t renyokei_end = sugi_pos;
-          std::string surface = ichidan_stem;
-          // Negative cost to beat compound NOUN path
-          constexpr float kCost = candidate::verb_cost::kStrongBonus;
-          SUZUME_DEBUG_VERBOSE_BLOCK {
-            SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface << " ichidan_renyokei_sugi lemma=" << base_form
-                                << " cost=" << kCost << "\n";
-          }
-          candidates.push_back(makeVerbCandidate(surface, start_pos, renyokei_end, kCost, base_form,
-                                                 dictionary::ConjugationType::Ichidan, true, CandidateOrigin::VerbKanji,
-                                                 0.9F, "ichidan_renyokei_sugi", core::ExtendedPOS::VerbRenyokei));
-        }
+        candidates.push_back(makeVerbCandidate(surface, start_pos, sugi_pos, kCost, base_form,
+                                               grammar::verbTypeToConjType(verb_type), true, CandidateOrigin::VerbKanji,
+                                               0.9F, label, core::ExtendedPOS::VerbRenyokei));
       }
     }
 
