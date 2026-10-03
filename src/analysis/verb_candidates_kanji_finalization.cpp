@@ -421,7 +421,9 @@ void appendSelectedKanjiVerbCandidate(const std::vector<char32_t>& codepoints, s
     // read as a particle where it is only okurigana: it must be strictly
     // interior, which is why 泳が+ず is untouched, and what precedes it must end
     // at the kanji run, so the が of 昔ながら and the と of 呼びとめる stay
-    // word-internal rather than inventing a phrase boundary mid-stem.
+    // word-internal rather than inventing a phrase boundary mid-stem. A lone
+    // ending after it opens no word, so the mora is a particle only when it
+    // starts a dictionary verb there (金+とる, but 転がる).
     bool spans_interior_case_particle = false;
     if (!in_dict && dict_manager != nullptr && end_pos > start_pos + 2) {
       for (size_t particle_pos = start_pos + 1; particle_pos + 1 < end_pos; ++particle_pos) {
@@ -430,10 +432,18 @@ void appendSelectedKanjiVerbCandidate(const std::vector<char32_t>& codepoints, s
         }
         const auto* particle =
             lookupEntryInRange(*dict_manager, codepoints, particle_pos, particle_pos + 1, core::PartOfSpeech::Particle);
-        if (particle != nullptr && particle->extended_pos == core::ExtendedPOS::ParticleCase) {
-          spans_interior_case_particle = true;
-          break;
+        if (particle == nullptr || particle->extended_pos != core::ExtendedPOS::ParticleCase) {
+          continue;
         }
+        if (particle_pos + 2 == end_pos) {
+          const auto* tail_verb =
+              lookupEntryInRange(*dict_manager, codepoints, particle_pos, end_pos, core::PartOfSpeech::Verb);
+          if (tail_verb == nullptr || !core::isVerbForm(tail_verb->extended_pos)) {
+            continue;
+          }
+        }
+        spans_interior_case_particle = true;
+        break;
       }
     }
     if (spans_interior_case_particle) {

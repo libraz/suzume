@@ -211,6 +211,82 @@
       ],
       "id": "ttteta_3",
       "input": "皮肉ってた"
+    },
+    {
+      "description": "kanji + がる godan verb whose interior が is okurigana",
+      "expected": [
+        {
+          "lemma": "ボール",
+          "pos": "Noun",
+          "surface": "ボール"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ころころ",
+          "pos": "Adverb",
+          "surface": "ころころ"
+        },
+        {
+          "lemma": "転がる",
+          "pos": "Verb",
+          "surface": "転がる"
+        }
+      ],
+      "id": "gakorokoro_garu",
+      "input": "ボールがころころ転がる"
+    },
+    {
+      "description": "kanji + がる godan verb at clause end",
+      "expected": [
+        {
+          "lemma": "人",
+          "pos": "Noun",
+          "surface": "人"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "群がる",
+          "pos": "Verb",
+          "surface": "群がる"
+        }
+      ],
+      "id": "ga_garu",
+      "input": "人が群がる"
+    },
+    {
+      "description": "noun + kana dictionary verb stays split when the tail after the particle-shaped mora is a verb",
+      "expected": [
+        {
+          "lemma": "年",
+          "pos": "Noun",
+          "surface": "年"
+        },
+        {
+          "lemma": "とる",
+          "pos": "Verb",
+          "surface": "とる"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "疲れる",
+          "pos": "Verb",
+          "surface": "疲れる"
+        }
+      ],
+      "id": "toruto_reru",
+      "input": "年とると疲れる"
     }
   ],
   "description": "Godan Ra-row verbs (五段ラ行動詞) - verbs ending in る (part 2/2)",
