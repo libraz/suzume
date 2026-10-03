@@ -23,22 +23,23 @@ def _is_emphatic_spelling(original: str, standard: str, host_pos: str = "") -> b
     """Whether `original` is `standard` written with emphatic lengthening or repetition.
 
     Scoped to the marks that spell emphasis rather than a morpheme: the prolonged
-    sound mark, and the utterance-final sokuon, which is dropped outright instead
-    of being respelled. Removing them and collapsing runs of the same character
-    reduces かわいーー and すごーーい to their dictionary forms, while a genuine
-    lexical substitution (にゃー → ねえ) stays distinct. Vowel repetition without a mark
-    (すごいいいい) is left alone — the tokenizer does not yet reduce it either.
+    sound mark, the utterance-final sokuon, and a repeated final vowel. Removing
+    them and collapsing runs of the same character reduces かわいーー, すごーーい,
+    すごいいいい and ですっ to their dictionary forms, while a genuine lexical
+    substitution (にゃー → ねえ) stays distinct. None of them changes the word,
+    so an auxiliary is reduced like any other host.
     """
+    del host_pos  # Emphasis reduces the same way whatever the host.
     if original == standard:
         return False
-    if original[:-1] == standard and original[-1] in _EMPHATIC_SOKUON_MARKS:
-        # An auxiliary closed on a glottal stop is a colloquial form in its own
-        # right and keeps that spelling as its lemma (ですっ, ますっ). Holding a
-        # vowel adds nothing to the word, so that case stays normalized.
-        return host_pos != "助動詞"
-    if "ー" not in original:
+    stripped = original.rstrip("".join(_EMPHATIC_SOKUON_MARKS))
+    if stripped == standard:
+        return True
+    if "ー" not in stripped and not (
+        stripped.startswith(standard) and set(stripped[len(standard) :]) <= {standard[-1:]}
+    ):
         return False
-    reduced = regex.sub(r"(.)\1+", r"\1", regex.sub(r"ー+", "", original))
+    reduced = regex.sub(r"(.)\1+", r"\1", regex.sub(r"ー+", "", stripped))
     return reduced == regex.sub(r"(.)\1+", r"\1", standard)
 
 

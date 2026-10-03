@@ -452,7 +452,7 @@
           "surface": "大丈夫"
         },
         {
-          "lemma": "ですっ",
+          "lemma": "です",
           "pos": "Auxiliary",
           "surface": "ですっ"
         }
@@ -484,7 +484,7 @@
       "description": "ますっっ - multiple emphatic sokuon",
       "expected": [
         {
-          "lemma": "ますっっ",
+          "lemma": "ます",
           "pos": "Auxiliary",
           "surface": "ますっっ"
         }
@@ -516,7 +516,7 @@
       "description": "すごいいいい - vowel repetition for emphasis",
       "expected": [
         {
-          "lemma": "すごいいいい",
+          "lemma": "すごい",
           "pos": "Adjective",
           "surface": "すごいいいい"
         }

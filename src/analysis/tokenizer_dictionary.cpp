@@ -2631,19 +2631,10 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
         }
 
         const std::string emphatic_surface = result.entry->surface + emphatic.suffix;
-        // An auxiliary closed on a glottal stop is a colloquial form of its own
-        // and keeps that spelling as its lemma (ですっ, ますっっ). Holding the
-        // final vowel adds nothing to the word, so the entry's own base form is
-        // the lemma there — otherwise a closed-class entry ends up lemmatized to
-        // a non-word (た as たああ, です as ですー).
-        const bool preserves_emphatic_surface =
-            (result.entry->pos == core::PartOfSpeech::Auxiliary && emphatic.addsSegment()) ||
-            (result.entry->pos == core::PartOfSpeech::Adjective &&
-             (emphatic.standard_char_count >= 2 || emphatic.repeated_vowel_count >= 3));
-        const std::string_view dictionary_lemma = result.entry->lemma.empty() ? std::string_view(result.entry->surface)
-                                                                              : std::string_view(result.entry->lemma);
-        const std::string_view emphatic_lemma =
-            preserves_emphatic_surface ? std::string_view(emphatic_surface) : dictionary_lemma;
+        // Emphasis adds nothing to the word, so the entry's own base form is the
+        // lemma whatever the host (ですっ → です, すごいいいい → すごい).
+        const std::string_view emphatic_lemma = result.entry->lemma.empty() ? std::string_view(result.entry->surface)
+                                                                            : std::string_view(result.entry->lemma);
         lattice.addEdge(emphatic_surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(emphatic.end),
                         result.entry->pos, cost + verb_helpers::emphaticCostAdjustment(emphatic), flags, emphatic_lemma,
                         dictionary::ConjugationType::None, core::CandidateOrigin::Dictionary, 1.0F, {}, emphatic_epos,
