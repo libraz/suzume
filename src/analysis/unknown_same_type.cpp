@@ -1027,6 +1027,13 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
           continue;
         }
       }
+      // A kana run that spells a registered suffix exactly (ごと, たび) already has
+      // that entry; an unknown noun over the same span only lets it be read as
+      // the head a determiner selects (こと+ある+ごと).
+      if (start_type == normalize::CharType::Hiragana && pos == core::PartOfSpeech::Noun && dict_manager_ != nullptr &&
+          dict_manager_->lookupExact(surface, core::PartOfSpeech::Suffix) != nullptr) {
+        continue;
+      }
       // A run of Latin letters or digits read as a nominal is one whose script
       // sets it apart from the Japanese around it, and that difference decides
       // one connection: nothing on the Japanese side modifies it attributively.

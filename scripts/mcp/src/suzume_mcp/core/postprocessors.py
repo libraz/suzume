@@ -74,6 +74,7 @@ postprocess_dewa_aru_boundary = postprocessor_function_words.postprocess_dewa_ar
 postprocess_final_particle_quotative_tte = postprocessor_function_words.postprocess_final_particle_quotative_tte
 postprocess_held_final_particle = postprocessor_function_words.postprocess_held_final_particle
 postprocess_kamo_before_final_particle = postprocessor_function_words.postprocess_kamo_before_final_particle
+postprocess_distributive_goto = postprocessor_function_words.postprocess_distributive_goto
 postprocess_indefinite_ka = postprocessor_function_words.postprocess_indefinite_ka
 postprocess_interjection_after_te = postprocessor_function_words.postprocess_interjection_after_te
 postprocess_interjection_before_copula = postprocessor_function_words.postprocess_interjection_before_copula
@@ -275,6 +276,7 @@ POSTPROCESSORS: tuple[tuple[str, Callable[[list[dict]], bool]], ...] = (
     ("tteba-emphatic-particle", postprocess_tteba_emphatic_particle),
     ("held-final-particle", postprocess_held_final_particle),
     ("kamo-final-particle", postprocess_kamo_before_final_particle),
+    ("distributive-goto", postprocess_distributive_goto),
     ("nano-quotative", postprocess_nano_quotative),
     ("final-particle-quotative-tte", postprocess_final_particle_quotative_tte),
     ("chigai-negative-adjective", postprocess_chigai_negative_adjective),

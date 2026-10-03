@@ -693,6 +693,21 @@ _HELD_FINAL_PARTICLES = frozenset("さよぞわ")
 _HELD_VOWELS = {"さ": "あぁー", "わ": "あぁー", "よ": "おぉー", "ぞ": "おぉー"}
 
 
+def postprocess_distributive_goto(tokens: list[dict]) -> bool:
+    """Tag ごと as the distributive suffix after a verb as after a noun.
+
+    The reference reads 日+ごと as a suffix but 会う+ごと as a dependent noun;
+    the core keeps one closed-class ごと, which takes the same reading in both.
+    """
+    changed = False
+    for idx in range(1, len(tokens)):
+        token = tokens[idx]
+        if token.get("surface") == "ごと" and token.get("pos") == "Noun" and tokens[idx - 1].get("pos") == "Verb":
+            token["pos"] = "Suffix"
+            changed = True
+    return changed
+
+
 def postprocess_kamo_before_final_particle(tokens: list[dict]) -> bool:
     """Tag a kana かも closed by a final particle as the adverbial particle.
 
