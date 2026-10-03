@@ -132,6 +132,11 @@ bool naiNegativeFollowsAt(const std::vector<char32_t>& codepoints, size_t pos) {
   return naiNegativeFormLengthAt(codepoints, pos) != 0;
 }
 
+bool contractedTeContinuationFollowsAt(const std::vector<char32_t>& codepoints, size_t pos) {
+  return pos < codepoints.size() &&
+         (codepoints[pos] == U'る' || codepoints[pos] == U'た' || codepoints[pos] == U'ち' || codepoints[pos] == U'な');
+}
+
 bool particleClosesClauseBeforeSokuon(const std::vector<char32_t>& codepoints, size_t sokuon_pos) {
   if (sokuon_pos < 2 || sokuon_pos >= codepoints.size()) {
     return false;

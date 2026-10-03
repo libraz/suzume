@@ -917,6 +917,15 @@ size_t naiNegativeFormLengthAt(const std::vector<char32_t>& codepoints, size_t p
 bool naiNegativeFollowsAt(const std::vector<char32_t>& codepoints, size_t pos);
 
 /**
+ * @brief Whether a contracted te-continuation opens at @p pos, right after て.
+ *
+ * てる, てた, ちゃう and てない have no quotative reading: the quotative って is
+ * never followed by る, た, ち or な, so a sokuonbin before them is a verb's
+ * te-form (沼っ+てる, ディスっ+てる), not a nominal plus って.
+ */
+bool contractedTeContinuationFollowsAt(const std::vector<char32_t>& codepoints, size_t pos);
+
+/**
  * @brief Whether the sokuon at @p sokuon_pos follows a particle that closes a clause.
  *
  * A final or nominalizing particle mora (よ, の, か, ね, わ, ぞ) right after a

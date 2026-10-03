@@ -338,7 +338,8 @@ void generateKatakanaVerbCandidates(const std::vector<char32_t>& codepoints, siz
         // class that is all godan-ra (バグる, メモる, トラブる), so the
         // conjugation row is derivable and the candidate stands on its own.
         const bool quotative_homograph = second_char == "て" || second_char == "で";
-        bool skip_sokuonbin = quotative_homograph && !verb_helpers::isVerbInDictionary(dict_manager, base_form);
+        bool skip_sokuonbin = quotative_homograph && !verb_helpers::isVerbInDictionary(dict_manager, base_form) &&
+                              !verb_helpers::contractedTeContinuationFollowsAt(codepoints, kata_end + 2);
         if (skip_sokuonbin) {
           SUZUME_DEBUG_VERBOSE_BLOCK {
             SUZUME_DEBUG_STREAM << "[VERB_SKIP] \"" << base_form

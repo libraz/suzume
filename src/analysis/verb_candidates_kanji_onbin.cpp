@@ -279,7 +279,12 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
         // This prevents false compound verb candidates like "昨日買う"
         bool starts_with_dict_noun = false;
         bool remainder_is_dict_verb = false;
-        if (dict_manager != nullptr && kanji_end - start_pos >= 2) {
+        const bool te_continuation_follows = vh::contractedTeContinuationFollowsAt(codepoints, kanji_end + 2);
+        // A whole stem that is itself a dictionary noun before a contracted
+        // te-continuation is a denominal verb (事故っ+てる), not a noun+verb.
+        const bool denominal_stem =
+            te_continuation_follows && dict_manager != nullptr && vh::isNounInDictionary(dict_manager, kanji_stem);
+        if (dict_manager != nullptr && kanji_end - start_pos >= 2 && !denominal_stem) {
           // Check if any prefix of kanji_stem is a dictionary noun
           for (size_t prefix_len = 1; prefix_len < kanji_end - start_pos; ++prefix_len) {
             std::string prefix = extractSubstring(codepoints, start_pos, start_pos + prefix_len);
@@ -338,6 +343,11 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
                 }
               }
             }
+          } else if (denominal_stem) {
+            // A denominal verb is godan-ra throughout (事故る, 沼る), so the row
+            // needs no analysis once the noun and the te-continuation attest it.
+            matched_verb_type = grammar::VerbType::GodanRa;
+            matched_base_form = normalize::concat(kanji_stem, "る");
           } else {
             SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << kanji_stem << "\" skip non-dict sokuonbin\n");
           }
@@ -393,10 +403,6 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
         const bool stem_is_dictionary_nominal =
             dict_manager != nullptr && (dict_manager->lookupExact(kanji_stem, core::PartOfSpeech::Noun) != nullptr ||
                                         dict_manager->lookupExact(kanji_stem, core::PartOfSpeech::Pronoun) != nullptr);
-        const bool te_continuation_follows =
-            kanji_end + 2 < codepoints.size() &&
-            (codepoints[kanji_end + 2] == U'る' || codepoints[kanji_end + 2] == U'た' ||
-             codepoints[kanji_end + 2] == U'ち' || codepoints[kanji_end + 2] == U'な');
         const bool kanji_on_left = start_pos > 0 && normalize::isKanjiCodepoint(codepoints[start_pos - 1]) &&
                                    !followsQuantityHead(codepoints, start_pos);
         if (!matched_via_dict && dict_manager != nullptr &&
