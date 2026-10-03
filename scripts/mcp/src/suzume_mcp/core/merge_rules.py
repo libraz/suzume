@@ -960,7 +960,19 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
             and tokens[i + 1].get("pos") == "名詞"
             and tokens[i + 1].get("pos_sub1") == "接尾"
         )
-        if not merged and t.get("pos") == "名詞" and (t.get("pos_sub1") == "数" or is_interrogative_quantity):
+        # A calendar piece the dictionary emits whole (四月) opens the chain too
+        # when a numeral follows it, as the digit spelling 4月1日 already does.
+        opens_calendar_chain = (
+            _COUNTER_CHAIN_UNIT.fullmatch(t.get("surface", "")) is not None
+            and i + 1 < len(tokens)
+            and tokens[i + 1].get("pos") == "名詞"
+            and tokens[i + 1].get("pos_sub1") == "数"
+        )
+        if (
+            not merged
+            and t.get("pos") == "名詞"
+            and (t.get("pos_sub1") == "数" or is_interrogative_quantity or opens_calendar_chain)
+        ):
             j = i + 1
             combined = t.get("surface", "")
             while j < len(tokens):

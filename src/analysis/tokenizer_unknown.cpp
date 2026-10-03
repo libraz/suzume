@@ -704,8 +704,11 @@ void Tokenizer::addUnknownCandidates(core::Lattice& lattice, std::string_view te
         endsWithFinalParticleAfterNominalHead(dict_manager_, text, byte_offsets, candidates, candidate)) {
       continue;
     }
+    // A numeral+counter carries its own boundary evidence (一日+付け), so the
+    // counter is not a noun cut into a continuative.
     if (following_verb_start < kanji_end && candidate.pos == core::PartOfSpeech::Noun &&
-        candidate.end > following_verb_start && candidate.end <= kanji_end) {
+        candidate.origin != CandidateOrigin::Counter && candidate.end > following_verb_start &&
+        candidate.end <= kanji_end) {
       continue;
     }
     if (candidate.requires_left_content_edge &&

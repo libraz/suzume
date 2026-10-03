@@ -145,11 +145,17 @@ void appendBasicNumeralCounterCandidates(const std::vector<char32_t>& codepoints
   // the suffix starts with kanji (二階|建て, 二本|立て).  Consult the suffix
   // lexicon rather than enumerating suffix spellings here, so every closed-class
   // suffix can share the same quantity boundary rule.
-  if (dict_manager != nullptr && normalize::isCounterKanji(codepoints[numeral_end])) {
+  if (dict_manager != nullptr && (normalize::isCounterKanji(codepoints[numeral_end]) ||
+                                  normalize::isTemporalCounterKanji(codepoints[numeral_end]))) {
     size_t counter_end = numeral_end + 1;
+    // A formal noun is bound the same way (四月一日+付け, 一日+付), unlike an
+    // ordinary noun that may still compound with the counter (三日月).
+    const auto following = lookupResultsInRange(*dict_manager, codepoints, counter_end, codepoints.size());
     const bool suffix_follows =
-        lookupResultsHavePartOfSpeech(lookupResultsInRange(*dict_manager, codepoints, counter_end, codepoints.size()),
-                                      partOfSpeechMask(core::PartOfSpeech::Suffix));
+        lookupResultsHavePartOfSpeech(following, partOfSpeechMask(core::PartOfSpeech::Suffix)) ||
+        std::any_of(following.begin(), following.end(), [](const auto& match) {
+          return match.entry != nullptr && match.entry->extended_pos == core::ExtendedPOS::NounFormal;
+        });
     if (closes_duration_span) {
       std::string surface = extractSubstring(codepoints, start_pos, counter_end + 1);
       auto cand = makeCandidate(surface, start_pos, counter_end + 1, core::PartOfSpeech::Noun,
