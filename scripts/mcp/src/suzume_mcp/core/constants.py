@@ -564,6 +564,7 @@ WORD_EXCEPTIONS: dict[str, str] = {
     "再確認": "確認",
     "ですっ": "です",
     "ますっっ": "ます",
+    "ようけ": "たくさん",
 }
 
 # A lexical replacement is safe only at a word boundary. These followers extend
@@ -572,6 +573,8 @@ WORD_EXCEPTIONS: dict[str, str] = {
 WORD_EXCEPTION_BLOCKED_FOLLOWERS: dict[str, tuple[str, ...]] = {
     "打ち合わせ": ("る", "た", "て", "ます", "まし", "ない", "なかっ", "ず", "ぬ", "ん", "れ", "ろ", "よう", "ば"),
     "ですっ": ("て",),
+    # The volitional よう before けど/けれど/けん spells the same kana.
+    "ようけ": ("ど", "れ", "ん"),
 }
 
 # Particles that MeCab may misclassify as Noun
@@ -934,6 +937,8 @@ ADVERB_OVERRIDES: set[str] = {
     "その後",
     "なるほど",
     "たくさん",
+    "ようけ",
+    "ぎょうさん",
     "かく",
     "あらまし",
     "めちゃ",

@@ -15,6 +15,7 @@ from .postprocessors import (
     repair_assimilated_koto_copula,
     repair_contracted_quotative,
     repair_contracted_volitional,
+    repair_euphonic_adjective_adverb,
     repair_kanji_prefix_before_kana_noun,
     repair_kko_nominalizer,
     repair_productive_causative,
@@ -207,6 +208,7 @@ def get_expected_tokens(text: str, suzume_tokens: list[dict] | None = None) -> t
     repair_contracted_quotative(raw_tokens)
     repair_regional_imperative(raw_tokens)
     repair_productive_causative(raw_tokens)
+    repair_euphonic_adjective_adverb(raw_tokens)
     _merge_ideographic_variation_selectors(raw_tokens)
 
     # Fix MeCab POS errors (before POS mapping)

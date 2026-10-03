@@ -746,6 +746,27 @@ def repair_contracted_quotative(tokens: list[dict]) -> None:
         idx = repaired_end + 1
 
 
+def repair_euphonic_adjective_adverb(tokens: list[dict]) -> None:
+    """Read an adjective's euphonic continuative as the adjective it inflects.
+
+    早う is 早く with the く softened to う, the same cell as 高う in 高うございます;
+    the reference dictionary lists some of these as adverbs of their own, so a
+    う-final adverb is re-analyzed before ございます, which selects that cell.
+    """
+    for idx, token in enumerate(tokens):
+        surface = token.get("surface", "")
+        if token.get("pos") != "副詞" or len(surface) < 2 or not surface.endswith("う"):
+            continue
+        analyzed = mecab_analyze(surface + "ございます")
+        if (
+            analyzed
+            and analyzed[0].get("surface") == surface
+            and analyzed[0].get("pos") == "形容詞"
+            and analyzed[0].get("conj_form", "").startswith("連用ゴザイ")
+        ):
+            tokens[idx] = analyzed[0]
+
+
 def repair_productive_causative(tokens: list[dict]) -> None:
     """Split a productive causative the reference lexicon lists as one verb.
 

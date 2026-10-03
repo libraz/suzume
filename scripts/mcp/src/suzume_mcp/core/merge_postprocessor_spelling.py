@@ -110,7 +110,9 @@ def _postprocess_nickname_merge(result: list[dict], applied_rule: str | None) ->
         if not prev_is_prefix and i < len(result) and hira_re.match(result[i].get("surface", "")):
             j = i
             run = ""
+            boundaries = set()
             while j < len(result) and hira_re.match(result[j].get("surface", "")):
+                boundaries.add(len(run))
                 run += result[j].get("surface", "")
                 j += 1
             matched = False
@@ -119,7 +121,9 @@ def _postprocess_nickname_merge(result: list[dict], applied_rule: str | None) ->
                     stem = run[: len(run) - len(h)]
                     # Stem 2-3 hiragana chars. 1-char stems (e.g., おさん) are
                     # too short and risk false merges (がおさん → が+おさん bad).
-                    if 2 <= len(stem) <= 3:
+                    # The honorific opens on a token of its own, and a particle
+                    # is no nickname's first mora (を+たくさん is not を+たく+さん).
+                    if 2 <= len(stem) <= 3 and len(stem) in boundaries and result[i].get("pos") != "助詞":
                         merged.append({"surface": run, "pos": "名詞", "lemma": run})
                         i = j
                         if applied_rule is None:
@@ -500,7 +504,8 @@ def _spans_one_mimetic(tokens: list[dict], following: dict | None) -> bool:
     it, すもも+も is a noun phrase and やさし+さ a derivation; ばっ+ちり puts a
     noun after a continuative cell and ばっち+り hangs an auxiliary off an
     adjective stem, and neither connection exists in the grammar.  A run
-    opening on an auxiliary is continuing a predicate that ended earlier.
+    opening on an auxiliary is continuing a predicate that ended earlier, and
+    one opening on a determiner (ほんの+ちょっと) is modifying the word after it.
 
     The attachment that disproves the run can also sit just past its right
     edge, because the shape test measures morae and stops wherever the count
@@ -509,7 +514,7 @@ def _spans_one_mimetic(tokens: list[dict], following: dict | None) -> bool:
     """
     if len(tokens) == 1:
         return tokens[0].get("pos") in {"その他", "副詞", "感動詞"}
-    if tokens[0].get("pos") == "助動詞":
+    if tokens[0].get("pos") in {"助動詞", "連体詞"}:
         return False
     if following is not None and _is_licensed_attachment(tokens[-1], following):
         return False
