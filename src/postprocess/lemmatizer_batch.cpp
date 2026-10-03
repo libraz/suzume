@@ -134,7 +134,7 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes, bool updat
     // Fix compound verbs analyzed as ichidan but actually サ変/godan-sa
     // E.g., lemma=やりなおしる → やりなおす, lemma=対しる → 対する
     if (morpheme.pos == core::PartOfSpeech::Verb && morpheme.conj_type != dictionary::ConjugationType::GodanRa) {
-      if (std::string shiru = fixShiru(morpheme.lemma); !shiru.empty()) {
+      if (std::string shiru = fixShiru(morpheme.lemma, morpheme.surface); !shiru.empty()) {
         morpheme.lemma = shiru;
       }
     }

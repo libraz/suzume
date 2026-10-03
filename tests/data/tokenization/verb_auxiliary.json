@@ -2620,6 +2620,60 @@
       ],
       "id": "woyaru",
       "input": "宿題をやる"
+    },
+    {
+      "description": "Kana godan-ra terminal はしる keeps its own surface as lemma; the サ変/godan-sa しる rewrite applies only when the surface does not witness the しる ending",
+      "expected": [
+        {
+          "lemma": "はしる",
+          "pos": "Verb",
+          "surface": "はしる"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "好き",
+          "pos": "Adjective",
+          "surface": "好き"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "hashirunoga_kida",
+      "input": "はしるのが好きだ"
+    },
+    {
+      "description": "Kana terminal ~しる after a case particle keeps lemma = surface",
+      "expected": [
+        {
+          "lemma": "子供",
+          "pos": "Noun",
+          "surface": "子供"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "はしる",
+          "pos": "Verb",
+          "surface": "はしる"
+        }
+      ],
+      "id": "gahashiru_2",
+      "input": "子供がはしる"
     }
   ],
   "description": "verb_auxiliary tests",

@@ -343,8 +343,10 @@ std::string fixSuruClassical(std::string_view lemma, dictionary::ConjugationType
 // real verb is 洗う) — the same surface-indistinguishable ambiguity as an
 // あらって→あらる misanalysis. Kept as the best available default; adding a dict check here
 // is an open question, not a bug to silently "fix".
-std::string fixShiru(std::string_view lemma) {
-  if (!utf8::endsWith(lemma, "しる")) {
+// A surface that itself ends in しる witnesses the ru-row (サ変 ends in する,
+// godan-sa in す), so its lemma is left alone (はしる stays はしる).
+std::string fixShiru(std::string_view lemma, std::string_view surface) {
+  if (!utf8::endsWith(lemma, "しる") || utf8::endsWith(surface, "しる")) {
     return "";
   }
   std::string stem(utf8::dropLast2Chars(lemma));

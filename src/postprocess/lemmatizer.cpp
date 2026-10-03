@@ -203,7 +203,7 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
       // fixShiru rewrites an ichidan-misanalyzed サ変/godan-sa ~しる (対しる→対する).
       // A genuine GodanRa verb ending in しる (走る/はしる) must not be touched.
       if (morpheme.conj_type != dictionary::ConjugationType::GodanRa) {
-        if (std::string shiru = fixShiru(grammar_result); !shiru.empty()) {
+        if (std::string shiru = fixShiru(grammar_result, morpheme.surface); !shiru.empty()) {
           return shiru;
         }
       }

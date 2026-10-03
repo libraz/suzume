@@ -11,7 +11,7 @@ namespace suzume::postprocess::lemmatizer_detail {
 
 bool hasExactVerbEntry(const dictionary::DictionaryManager* dict_manager, std::string_view surface);
 std::string fixSuruClassical(std::string_view lemma, dictionary::ConjugationType conj_type);
-std::string fixShiru(std::string_view lemma);
+std::string fixShiru(std::string_view lemma, std::string_view surface);
 std::string fixSpecialRaRowLemma(std::string_view lemma, const dictionary::DictionaryManager* dict_manager);
 std::string fixGodanRenyokeiBeforeLiteraryTe(std::string_view surface, std::string_view lemma,
                                              std::string_view next_surface,
