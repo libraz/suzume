@@ -308,6 +308,9 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       // The same holds for an adverbial particle (いつまで+たっ+て+も, never
       // いつまで+た+って+も).
       {EPOS::ParticleAdverbial, EPOS::AuxTenseTa, cost::kSevere},
+      // A quotative particle hands off to a verb of saying, never to the tense
+      // auxiliary itself (事故っ+て+た, never 事故+って+た).
+      {EPOS::ParticleQuote, EPOS::AuxTenseTa, cost::kSevere},
       // A pronoun is a nominal, so it reaches the past through the copula
       // (これ+だっ+た) and never hosts the tense auxiliary directly. Without
       // this the voiced past だ can pose as the copula behind an interrogative

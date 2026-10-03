@@ -123,6 +123,94 @@
       ],
       "id": "ttteru_5",
       "input": "事故ってる"
+    },
+    {
+      "description": "マジ卍って感じ - regression test",
+      "expected": [
+        {
+          "lemma": "マジ",
+          "pos": "Noun",
+          "surface": "マジ"
+        },
+        {
+          "lemma": "卍",
+          "pos": "Noun",
+          "surface": "卍"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "感じ",
+          "pos": "Noun",
+          "surface": "感じ"
+        }
+      ],
+      "id": "ttte_ji",
+      "input": "マジ卍って感じ"
+    },
+    {
+      "description": "皮肉ってる - regression test",
+      "expected": [
+        {
+          "lemma": "皮肉る",
+          "pos": "Verb",
+          "surface": "皮肉っ"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てる"
+        }
+      ],
+      "id": "ttteru_6",
+      "input": "皮肉ってる"
+    },
+    {
+      "description": "事故ってた - regression test",
+      "expected": [
+        {
+          "lemma": "事故る",
+          "pos": "Verb",
+          "surface": "事故っ"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "て"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ttteta_2",
+      "input": "事故ってた"
+    },
+    {
+      "description": "皮肉ってた - regression test",
+      "expected": [
+        {
+          "lemma": "皮肉る",
+          "pos": "Verb",
+          "surface": "皮肉っ"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "て"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ttteta_3",
+      "input": "皮肉ってた"
     }
   ],
   "description": "Godan Ra-row verbs (五段ラ行動詞) - verbs ending in る (part 2/2)",
