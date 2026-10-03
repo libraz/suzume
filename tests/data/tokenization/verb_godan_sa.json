@@ -393,6 +393,40 @@
       ],
       "id": "kotoarutabini_i_su",
       "input": "ことあるたびに思い出す"
+    },
+    {
+      "description": "Sentence-initial single-kanji godan-sa continuative reads as the verb, not noun + する",
+      "expected": [
+        {
+          "lemma": "許す",
+          "pos": "Verb",
+          "surface": "許し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "shite",
+      "input": "許して"
+    },
+    {
+      "description": "Sentence-initial godan-sa past keeps the verb whole",
+      "expected": [
+        {
+          "lemma": "許す",
+          "pos": "Verb",
+          "surface": "許し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "shita_9",
+      "input": "許した"
     }
   ],
   "description": "Godan Sa-row verbs (五段サ行動詞) - verbs ending in す",
