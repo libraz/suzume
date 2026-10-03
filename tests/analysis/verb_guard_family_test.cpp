@@ -313,7 +313,8 @@ TEST(CandidateGenerationRegression, KatakanaIAdjectiveNegativePastKeepsStemBound
   EXPECT_EQ(result[0].extended_pos, core::ExtendedPOS::AdjRenyokei);
   EXPECT_EQ(result[0].lemma, "エモい");
   EXPECT_EQ(result[1].surface, "なかっ");
-  EXPECT_EQ(result[1].extended_pos, core::ExtendedPOS::AuxNegativeNai);
+  // After an adjective continuative ない is the supplementary adjective.
+  EXPECT_EQ(result[1].extended_pos, core::ExtendedPOS::AdjKatt);
   EXPECT_EQ(result[2].surface, "た");
   EXPECT_EQ(result[2].extended_pos, core::ExtendedPOS::AuxTenseTa);
 }

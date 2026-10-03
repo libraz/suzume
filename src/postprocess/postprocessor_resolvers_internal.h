@@ -89,6 +89,7 @@ void retagCopulaDa(core::Morpheme& morpheme);
 bool retagGodanRenyokeiFromIRow(core::Morpheme& stem, bool set_conj_form);
 void retagNaAdjectivalSou(core::Morpheme& morpheme);
 void retagNegativeNai(core::Morpheme& morpheme);
+void resolveNegativeHost(std::vector<core::Morpheme>& result);
 void retagNaAdjectiveSurface(core::Morpheme& morpheme);
 void retagNounSurface(core::Morpheme& morpheme);
 

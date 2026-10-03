@@ -179,7 +179,7 @@ postprocess_verb_ease_adjective = postprocessor_predicates.postprocess_verb_ease
 # Exports from postprocessor_subsidiaries.
 _TE_CONTINUATION_HEADS = postprocessor_subsidiaries._TE_CONTINUATION_HEADS
 _TOKU_FABRICATED_TAILS = postprocessor_subsidiaries._TOKU_FABRICATED_TAILS
-postprocess_binding_negative_aux = postprocessor_subsidiaries.postprocess_binding_negative_aux
+postprocess_negative_host = postprocessor_subsidiaries.postprocess_negative_host
 postprocess_closed_subsidiary_aux = postprocessor_subsidiaries.postprocess_closed_subsidiary_aux
 postprocess_contracted_iku_lemma = postprocessor_subsidiaries.postprocess_contracted_iku_lemma
 postprocess_contracted_progressive_aux = postprocessor_subsidiaries.postprocess_contracted_progressive_aux
@@ -196,7 +196,6 @@ postprocess_kuru_causative = postprocessor_subsidiaries.postprocess_kuru_causati
 postprocess_miru_aux = postprocessor_subsidiaries.postprocess_miru_aux
 postprocess_mu_verb_desiderative = postprocessor_subsidiaries.postprocess_mu_verb_desiderative
 postprocess_n_kuruwa = postprocessor_subsidiaries.postprocess_n_kuruwa
-postprocess_nai_context = postprocessor_subsidiaries.postprocess_nai_context
 postprocess_nara_verb = postprocessor_subsidiaries.postprocess_nara_verb
 postprocess_obligation_nan_naru = postprocessor_subsidiaries.postprocess_obligation_nan_naru
 postprocess_shimau_aux = postprocessor_subsidiaries.postprocess_shimau_aux
@@ -325,15 +324,14 @@ POSTPROCESSORS: tuple[tuple[str, Callable[[list[dict]], bool]], ...] = (
     ("classical-nari-after-attributive", postprocess_classical_nari_after_attributive),
     ("n-kuruwa", postprocess_n_kuruwa),
     ("determiner-wake-noun", postprocess_determiner_wake_noun),
-    ("nai-context", postprocess_nai_context),
     ("obligation-nan-naru", postprocess_obligation_nan_naru),
-    ("binding-negative-aux", postprocess_binding_negative_aux),
     ("verb-negative-aux", postprocess_verb_negative_aux),
     ("copula-negative-nee", postprocess_copula_negative_nee),
     ("productive-search-unit-boundaries", postprocess_productive_search_unit_boundaries),
     ("bound-derived-adjective", postprocess_bound_derived_adjective),
     ("quotative-determiner-spelling", postprocess_quotative_determiner_spelling),
     ("adverbial-na-adjective", postprocess_adverbial_na_adjective),
+    ("negative-host", postprocess_negative_host),
 )
 
 

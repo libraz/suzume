@@ -513,22 +513,6 @@ def correct_mecab_pos(tokens: list[dict]) -> None:
             else:
                 t["pos"] = "形容詞"
 
-        # Fix ない/なかっ after じゃ: 形容詞 -> 助動詞
-        if surface in ("ない", "なかっ") and pos == "形容詞":
-            if idx > 0 and tokens[idx - 1].get("surface") == "じゃ":
-                t["pos"] = "助動詞"
-                t["lemma"] = "ない"
-
-        # Fix ない after が (particle): 形容詞 -> 助動詞 (negation auxiliary)
-        if surface == "ない" and pos == "形容詞":
-            if (
-                idx > 0
-                and tokens[idx - 1].get("surface") == "が"
-                and tokens[idx - 1].get("pos") in ("助詞", "Particle")
-            ):
-                t["pos"] = "助動詞"
-                t["lemma"] = "ない"
-
         # Fix な after じゃ: 助詞 -> 助動詞
         if surface == "な" and pos == "助詞":
             if idx > 0 and tokens[idx - 1].get("surface") == "じゃ":

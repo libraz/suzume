@@ -4,9 +4,6 @@ from itertools import pairwise
 
 import regex
 
-from .constants import (
-    COPULA_SURFACES,
-)
 from .core_lexicon import core_headwords
 from .postprocessor_common import reports_mutation
 from .split_rules import base_from_renyokei
@@ -487,22 +484,6 @@ def postprocess_copula_negative_nee(tokens: list[dict]) -> bool:
     return changed
 
 
-def postprocess_binding_negative_aux(tokens: list[dict]) -> bool:
-    """Keep the closed しか + negative predicate chain in auxiliary POS."""
-    changed = False
-    for idx in range(1, len(tokens)):
-        token = tokens[idx]
-        if token.get("surface") not in ("ない", "なく", "なかっ"):
-            continue
-        if tokens[idx - 1].get("surface") != "しか":
-            continue
-        if token.get("pos") != "Auxiliary":
-            token["pos"] = "Auxiliary"
-            token["lemma"] = "ない"
-            changed = True
-    return changed
-
-
 @reports_mutation
 def postprocess_n_kuruwa(tokens: list[dict]) -> bool:
     """Normalize closed kuruwa polite auxiliaries."""
@@ -521,78 +502,6 @@ def postprocess_n_kuruwa(tokens: list[dict]) -> bool:
         if prev.get("surface") in ("あり", "あっ"):
             t["pos"] = "Auxiliary"
             t["lemma"] = "ん"
-
-
-@reports_mutation
-def postprocess_nai_context(tokens: list[dict]) -> bool:
-    """Correct ない/なく/なかっ POS: Auxiliary → Adjective after particles.
-
-    Suzume treats standalone ない (doesn't exist) as Adjective, not Auxiliary.
-    MeCab classifies it as 助動詞 in all contexts, but when ない follows
-    particles like が/は/も, it's an existence adjective, not a negative auxiliary.
-
-    Also handles sentence-initial ない and the continuative なく, whose reading
-    follows from what it attaches to rather than from what follows it.
-    """
-    for idx, tok in enumerate(tokens):
-        surface = tok.get("surface", "")
-        pos = tok.get("pos", "")
-
-        if surface not in ("ない", "なく", "なかっ") or pos != "Auxiliary":
-            continue
-
-        # The negative auxiliary attaches to a predicate stem, so its
-        # continuative keeps that reading after a verb or a verbal auxiliary
-        # whatever follows (飲ま+なく+ちゃ, 食べ+なく+て, れ+なく+なる). The
-        # copula is excluded because its negation uses the supplementary
-        # adjective (本+で+なく), except when the topical particle separates
-        # the two (本+で+は+なく). Everything else follows a nominal or an
-        # adjective continuative and takes the adjective (休み+なく, 明るく+なく).
-        if surface == "なく" and idx > 0:
-            prev_pos = tokens[idx - 1].get("pos", "")
-            prev_surface = tokens[idx - 1].get("surface", "")
-            is_copular_topic = (
-                prev_pos == "Particle"
-                and prev_surface == "は"
-                and idx >= 2
-                and tokens[idx - 2].get("surface") == "で"
-                and tokens[idx - 2].get("pos") == "Auxiliary"
-            )
-            is_predicate_stem = prev_pos == "Verb" or (prev_pos == "Auxiliary" and prev_surface not in COPULA_SURFACES)
-            if not (is_predicate_stem or is_copular_topic):
-                tok["pos"] = "Adjective"
-                tok["lemma"] = "ない"
-            continue
-
-        should_fix = False
-
-        if idx == 0:
-            # Sentence-initial ない/なく/なかっ → Adjective
-            should_fix = True
-        else:
-            prev_pos = tokens[idx - 1].get("pos", "")
-            prev_surface = tokens[idx - 1].get("surface", "")
-
-            # After particle が/は/も → Adjective (existence negation)
-            if prev_pos == "Particle" and prev_surface in ("が", "は", "も"):
-                is_copular_negative = (
-                    prev_surface == "は"
-                    and idx >= 2
-                    and tokens[idx - 2].get("surface") == "で"
-                    and tokens[idx - 2].get("pos") == "Auxiliary"
-                )
-                should_fix = not is_copular_negative
-
-            # A negative auxiliary cannot attach directly to a noun, nor to a
-            # suffix that derives one. In a bare nominal predicate, ない is the
-            # independent adjective with an omitted nominative marker (問題ない,
-            # 関係ない, 負けっこない).
-            elif prev_pos in ("Noun", "Suffix"):
-                should_fix = True
-
-        if should_fix:
-            tok["pos"] = "Adjective"
-            tok["lemma"] = "ない"
 
 
 @reports_mutation
@@ -890,5 +799,56 @@ def postprocess_contracted_iku_lemma(tokens: list[dict]) -> bool:
             and previous.get("surface") in ("て", "で")
         ):
             token["lemma"] = "いく"
+            changed = True
+    return changed
+
+
+# Auxiliaries that do not conjugate like a verb. The negative auxiliary ない
+# selects a verbal irrealis, so after any of these ない is the adjective.
+_NON_VERBAL_AUXILIARY_LEMMAS = frozenset(
+    {
+        "だ",
+        "です",
+        "たい",
+        "ない",
+        "らしい",
+        "ます",
+        "た",
+        "う",
+        "よう",
+        "まい",
+        "ぬ",
+        "ん",
+        "ず",
+        "べし",
+        "そう",
+        "みたい",
+    }
+)
+
+
+def postprocess_negative_host(tokens: list[dict]) -> bool:
+    """Tag ない by its host: auxiliary after a verbal irrealis, adjective elsewhere.
+
+    The negative auxiliary attaches only to a verb or a verb-conjugating
+    auxiliary (食べ+ない, 食べ+させ+ない, 見+て+い+ない), and to the te-form whose
+    いる has been dropped (見+て+ない). After a particle, the copula, an adjective
+    continuative or an adjective-type auxiliary it is the (supplementary)
+    adjective: 時間+が+ない, 本+で+は+ない, 本+じゃ+ない, 水+しか+ない,
+    高く+ない, 食べ+たく+ない.
+    """
+    changed = False
+    for idx, token in enumerate(tokens):
+        if token.get("lemma") != "ない" or token.get("pos") not in ("Auxiliary", "Adjective"):
+            continue
+        previous = tokens[idx - 1] if idx > 0 else None
+        verbal_host = previous is not None and (
+            previous.get("pos") == "Verb"
+            or (previous.get("pos") == "Auxiliary" and previous.get("lemma") not in _NON_VERBAL_AUXILIARY_LEMMAS)
+            or (previous.get("pos") == "Particle" and previous.get("surface") in ("て", "で"))
+        )
+        wanted = "Auxiliary" if verbal_host else "Adjective"
+        if token.get("pos") != wanted:
+            token["pos"] = wanted
             changed = True
     return changed

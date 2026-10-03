@@ -15,8 +15,16 @@ namespace suzume::postprocess {
 namespace {
 
 bool isOnlyProlongedSoundMarks(std::string_view surface) {
-  const auto codepoints = normalize::toCodepoints(surface);
-  return !codepoints.empty() && std::all_of(codepoints.begin(), codepoints.end(), normalize::isProlongedSoundMark);
+  if (surface.empty()) {
+    return false;
+  }
+  size_t pos = 0;
+  while (pos < surface.size()) {
+    if (!normalize::isProlongedSoundMark(normalize::decodeUtf8(surface, pos))) {
+      return false;
+    }
+  }
+  return true;
 }
 
 void resolveSemanticRolesPreservingSymbols(std::vector<core::Morpheme>& result,
@@ -197,6 +205,8 @@ std::vector<core::Morpheme> Postprocessor::process(std::vector<core::Morpheme> r
 
   // Filter unwanted morphemes only after every role has been resolved.
   result = filterMorphemes(std::move(result));
+  // The POS of ない follows from its host, which is only final once symbols are gone.
+  resolver::resolveNegativeHost(result);
 
   if (!options_.lemmatize) {
     // Role resolution must still run to supply POS and conjugation annotations,

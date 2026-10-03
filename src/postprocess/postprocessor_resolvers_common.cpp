@@ -126,12 +126,47 @@ bool retagGodanRenyokeiFromIRow(core::Morpheme& stem, bool set_conj_form) {
 // a quantity as 名詞,接尾 (Suffix), whereas 後 after an ordinary noun (食事の後) stays a
 // plain noun.
 bool isCounterDurationNoun(const std::string& surface) {
-  auto codepoints = normalize::toCodepoints(surface);
-  if (codepoints.empty()) {
+  if (surface.empty()) {
     return false;
   }
-  return (normalize::isNumeralCodepoint(codepoints.front()) || normalize::isQuantityPrefixKanji(codepoints.front())) &&
-         normalize::isCounterKanji(codepoints.back());
+  size_t pos = 0;
+  const char32_t first = normalize::decodeUtf8(surface, pos);
+  if (!normalize::isNumeralCodepoint(first) && !normalize::isQuantityPrefixKanji(first)) {
+    return false;
+  }
+  char32_t last = first;
+  while (pos < surface.size()) {
+    last = normalize::decodeUtf8(surface, pos);
+  }
+  return normalize::isCounterKanji(last);
+}
+
+// The negative auxiliary ない selects a verbal irrealis: a verb, a
+// verb-conjugating auxiliary (させ+ない, い+ない) or a te-form whose いる has
+// been dropped (見て+ない). Anywhere else ない is the (supplementary) adjective:
+// after a particle (時間が, 本では, 水しか), the copula (本じゃ), an adjective
+// continuative (高く) or an adjective-type auxiliary (食べたく).
+void resolveNegativeHost(std::vector<core::Morpheme>& result) {
+  for (size_t idx = 0; idx < result.size(); ++idx) {
+    auto& negative = result[idx];
+    if (negative.lemma != "ない" ||
+        (negative.pos != core::PartOfSpeech::Auxiliary && negative.pos != core::PartOfSpeech::Adjective)) {
+      continue;
+    }
+    const core::Morpheme* host = idx > 0 ? &result[idx - 1] : nullptr;
+    const bool verbal_host =
+        host != nullptr &&
+        (host->pos == core::PartOfSpeech::Verb ||
+         (host->pos == core::PartOfSpeech::Auxiliary &&
+          !utf8::equalsAny(host->lemma, {"だ", "です", "たい", "ない", "らしい", "ます", "た", "う", "よう", "まい",
+                                         "ぬ", "ん", "ず", "べし", "そう", "みたい"})) ||
+         (host->pos == core::PartOfSpeech::Particle && utf8::equalsAny(host->surface, {"て", "で"})));
+    if (verbal_host && negative.pos == core::PartOfSpeech::Adjective) {
+      retagNegativeNai(negative);
+    } else if (!verbal_host && negative.pos == core::PartOfSpeech::Auxiliary) {
+      retagNegativeAdjectiveCell(negative);
+    }
+  }
 }
 
 }  // namespace suzume::postprocess::resolver

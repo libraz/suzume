@@ -491,21 +491,10 @@ def postprocess_copula_neg(tokens: list[dict]) -> bool:
             and topic.get("surface") == "は"
             and negative.get("surface") in ("ない", "なく", "なかっ")
         ):
-            copula["pos"] = "Auxiliary"
-            copula["lemma"] = "だ"
-            negative["pos"] = "Auxiliary"
-            negative["lemma"] = "ない"
-            changed = True
-
-    for i in range(1, len(tokens)):
-        t = tokens[i]
-        if t.get("surface") != "なく" or t.get("pos") != "Auxiliary":
-            continue
-        prev = tokens[i - 1].get("surface", "")
-        if prev in ("じゃ", "で"):
-            t["pos"] = "Adjective"
-            t["lemma"] = "ない"
-            changed = True
+            if copula.get("pos") != "Auxiliary" or copula.get("lemma") != "だ":
+                copula["pos"] = "Auxiliary"
+                copula["lemma"] = "だ"
+                changed = True
     return changed
 
 

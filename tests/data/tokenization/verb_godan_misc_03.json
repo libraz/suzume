@@ -198,7 +198,7 @@
         },
         {
           "lemma": "ない",
-          "pos": "Auxiliary",
+          "pos": "Adjective",
           "surface": "ない"
         }
       ],
@@ -3078,12 +3078,12 @@
         },
         {
           "lemma": "ない",
-          "pos": "Adjective",
+          "pos": "Auxiliary",
           "surface": "なく"
         },
         {
           "lemma": "ない",
-          "pos": "Auxiliary",
+          "pos": "Adjective",
           "surface": "ない"
         }
       ],
@@ -3110,12 +3110,12 @@
         },
         {
           "lemma": "ない",
-          "pos": "Adjective",
+          "pos": "Auxiliary",
           "surface": "なく"
         },
         {
           "lemma": "ない",
-          "pos": "Auxiliary",
+          "pos": "Adjective",
           "surface": "ない"
         }
       ],
@@ -3142,12 +3142,12 @@
         },
         {
           "lemma": "ない",
-          "pos": "Adjective",
+          "pos": "Auxiliary",
           "surface": "なく"
         },
         {
           "lemma": "ない",
-          "pos": "Auxiliary",
+          "pos": "Adjective",
           "surface": "ない"
         }
       ],

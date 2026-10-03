@@ -10,7 +10,6 @@ from suzume_mcp.core.postprocessors import (
     postprocess_adjective_nominalizer,
     postprocess_adverb_nominal_context,
     postprocess_attributive_mamonaku,
-    postprocess_binding_negative_aux,
     postprocess_classical_focus_namu,
     postprocess_classical_perfect_aux,
     postprocess_closed_function_words,
@@ -41,8 +40,8 @@ from suzume_mcp.core.postprocessors import (
     postprocess_miru_aux,
     postprocess_modifier_godan_imperative,
     postprocess_na_adj_noun,
-    postprocess_nai_context,
     postprocess_nara_verb,
+    postprocess_negative_host,
     postprocess_onaji_predicate,
     postprocess_productive_search_unit_boundaries,
     postprocess_productive_verb_suffix_stem,
@@ -1132,11 +1131,40 @@ class TestPostprocessTemporalNao:
         assert not postprocess_temporal_nao(tokens)
 
 
-class TestPostprocessNaiContext:
+class TestPostprocessNegativeHost:
     def test_bare_nominal_negative_is_adjective(self):
         tokens = [_tok("問題", "Noun"), _tok("ない", "Auxiliary")]
-        postprocess_nai_context(tokens)
+        assert postprocess_negative_host(tokens)
         assert tokens[1] == _tok("ない", "Adjective")
+
+    def test_after_particle_is_adjective(self):
+        tokens = [_tok("しか", "Particle"), _tok("ない", "Auxiliary")]
+        assert postprocess_negative_host(tokens)
+        assert tokens[1]["pos"] == "Adjective"
+
+    def test_after_copula_is_adjective(self):
+        tokens = [_tok("じゃ", "Auxiliary", lemma="だ"), _tok("なく", "Auxiliary", lemma="ない")]
+        assert postprocess_negative_host(tokens)
+        assert tokens[1]["pos"] == "Adjective"
+
+    def test_after_adjective_continuative_is_adjective(self):
+        tokens = [_tok("高く", "Adjective", lemma="高い"), _tok("ない", "Auxiliary")]
+        assert postprocess_negative_host(tokens)
+        assert tokens[1]["pos"] == "Adjective"
+
+    def test_after_verb_irrealis_is_auxiliary(self):
+        tokens = [_tok("食べ", "Verb", lemma="食べる"), _tok("ない", "Adjective")]
+        assert postprocess_negative_host(tokens)
+        assert tokens[1]["pos"] == "Auxiliary"
+
+    def test_after_verbal_auxiliary_is_auxiliary(self):
+        tokens = [_tok("させ", "Auxiliary", lemma="させる"), _tok("ない", "Auxiliary")]
+        assert not postprocess_negative_host(tokens)
+
+    def test_after_dropped_iru_te_form_is_auxiliary(self):
+        tokens = [_tok("見", "Verb", lemma="見る"), _tok("て", "Particle"), _tok("ない", "Adjective")]
+        assert postprocess_negative_host(tokens)
+        assert tokens[2]["pos"] == "Auxiliary"
 
 
 class TestPostprocessTsukeNoun:
@@ -1213,11 +1241,6 @@ class TestClosedGrammarNormalizers:
         ]
         assert not postprocess_shortened_causative_passive(tokens)
         assert tokens[1]["pos"] == "Verb"
-
-    def test_shika_nai_is_auxiliary(self):
-        tokens = [_tok("しか", "Particle"), _tok("ない", "Adjective")]
-        assert postprocess_binding_negative_aux(tokens)
-        assert tokens[1]["pos"] == "Auxiliary"
 
     def test_honorific_naru_stem_is_not_nominalized(self):
         tokens = [
@@ -1318,7 +1341,7 @@ class TestPostprocessItadakeruAux:
 
 
 class TestPostprocessCopulaNeg:
-    def test_naku_after_ja(self):
-        tokens = [_tok("じゃ", "Auxiliary"), _tok("なく", "Auxiliary")]
-        postprocess_copula_neg(tokens)
-        assert tokens[1]["pos"] == "Adjective"
+    def test_de_before_topic_negative_is_copula(self):
+        tokens = [_tok("本", "Noun"), _tok("で", "Particle"), _tok("は", "Particle"), _tok("ない", "Auxiliary")]
+        assert postprocess_copula_neg(tokens)
+        assert tokens[1] == _tok("で", "Auxiliary", lemma="だ")
