@@ -936,13 +936,13 @@
           "surface": "読み"
         },
         {
-          "lemma": "やす",
-          "pos": "Auxiliary",
+          "lemma": "やすい",
+          "pos": "Adjective",
           "surface": "やす"
         },
         {
           "lemma": "さ",
-          "pos": "Particle",
+          "pos": "Suffix",
           "surface": "さ"
         }
       ],

@@ -489,16 +489,21 @@ def postprocess_verb_ease_adjective(tokens: list[dict]) -> bool:
     changed = False
     for idx in range(1, len(tokens) - 1):
         # The reference also reads the stem やす as an auxiliary before そう+だ
-        # only (読み+やす+そう+だ, but 読み+やす(やすい)+そう+な).  The honorific
-        # imperative お読みやす is a different auxiliary and has no そう.
+        # (読み+やす+そう+だ, but 読み+やす(やすい)+そう+な) and before a final
+        # さ, which it then reads as the particle (読み+やす+さ, but 見+にく+さ
+        # with the nominalizer).  The honorific imperative お読みやす is a
+        # different auxiliary and has neither follower.
         token = tokens[idx]
+        follower = tokens[idx + 1]
         if (
             token.get("surface") == "やす"
             and token.get("pos") == "Auxiliary"
             and tokens[idx - 1].get("pos") == "Verb"
-            and tokens[idx + 1].get("surface") == "そう"
+            and follower.get("surface") in ("そう", "さ")
         ):
             token.update(pos="Adjective", lemma="やすい")
+            if follower.get("surface") == "さ":
+                follower.update(pos="Suffix", lemma="さ")
             changed = True
     idx = 0
     while idx < len(tokens):
