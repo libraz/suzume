@@ -30,6 +30,7 @@ from .postprocessors import (
     repair_mimetic_n_to_suru,
     repair_productive_causative,
     repair_regional_imperative,
+    split_demonstrative_dake,
     split_reason_nde,
     split_transparent_suru_te_adverb,
 )
@@ -231,6 +232,7 @@ def get_expected_tokens(text: str, suzume_tokens: list[dict] | None = None) -> t
     repair_kamo_quotative(raw_tokens)
     repair_adjective_yo_quotative(raw_tokens)
     repair_mimetic_n_to_suru(raw_tokens)
+    split_demonstrative_dake(raw_tokens)
     _merge_ideographic_variation_selectors(raw_tokens)
 
     # Fix MeCab POS errors (before POS mapping)

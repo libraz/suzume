@@ -559,6 +559,8 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       // prohibition ends on the conjunctive particle, and the closing particle
       // is the only thing that can follow it there.
       {EPOS::ParticleConj, EPOS::ParticleFinal, cost::kModerateBonus},
+      // An adverbial particle closes a clause the same way (かも+よ, だけ+ね).
+      {EPOS::ParticleAdverbial, EPOS::ParticleFinal, cost::kMinorBonus},
 
       // The negative auxiliary inflects like an i-adjective and closes a clause
       // the same way (行か+ない+か, 〜じゃ+ない+ね), so it earns the AdjBasic

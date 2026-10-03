@@ -360,6 +360,50 @@
       ],
       "id": "sentence_ending_ze_yo",
       "input": "やるぜよ"
+    },
+    {
+      "description": "雨かもよ - regression test",
+      "expected": [
+        {
+          "lemma": "雨",
+          "pos": "Noun",
+          "surface": "雨"
+        },
+        {
+          "lemma": "かも",
+          "pos": "Particle",
+          "surface": "かも"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "kamoyo",
+      "input": "雨かもよ"
+    },
+    {
+      "description": "それだけよ - regression test",
+      "expected": [
+        {
+          "lemma": "それ",
+          "pos": "Pronoun",
+          "surface": "それ"
+        },
+        {
+          "lemma": "だけ",
+          "pos": "Particle",
+          "surface": "だけ"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "soredakeyo",
+      "input": "それだけよ"
     }
   ],
   "description": "Sentence-ending particles (ね、よ、な)",

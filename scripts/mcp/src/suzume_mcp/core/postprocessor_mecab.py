@@ -1020,6 +1020,27 @@ def repair_kamo_quotative(tokens: list[dict]) -> None:
             ]
 
 
+def split_demonstrative_dake(tokens: list[dict]) -> None:
+    """Split the reference's adverb これだけ/それだけ into pronoun + だけ.
+
+    The reference splits それ+だけ before the copula (それ+だけ+だ) but keeps
+    one adverb before a final particle or a verb (それだけ+よ); the pronoun
+    and the adverbial particle are separate words in both positions.
+    """
+    idx = 0
+    while idx < len(tokens):
+        token = tokens[idx]
+        surface = token.get("surface", "")
+        if token.get("pos") == "副詞" and regex.fullmatch(r"[こそあど]れだけ", surface):
+            tokens[idx : idx + 1] = [
+                {"surface": surface[:2], "pos": "名詞", "pos_sub1": "代名詞", "lemma": surface[:2]},
+                {"surface": "だけ", "pos": "助詞", "pos_sub1": "副助詞", "lemma": "だけ"},
+            ]
+            idx += 2
+            continue
+        idx += 1
+
+
 def repair_mimetic_n_to_suru(tokens: list[dict]) -> None:
     """Rebuild a two-mora kana noun in ん + と + する as the mimetic adverb.
 
