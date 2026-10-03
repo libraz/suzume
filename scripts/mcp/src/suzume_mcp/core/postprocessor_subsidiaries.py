@@ -852,3 +852,38 @@ def postprocess_negative_host(tokens: list[dict]) -> bool:
             token["pos"] = wanted
             changed = True
     return changed
+
+
+def postprocess_sou_host(tokens: list[dict]) -> bool:
+    """Tag そう by its host: auxiliary after a predicate, adverb elsewhere.
+
+    The appearance auxiliary follows a continuative or stem (降り+そう, おいし+
+    そう, 食べ+な+さ+そう) and the hearsay auxiliary a terminal form (降る+そう,
+    教師+だ+そう, 読ん+だ+そう); both are the auxiliary そうだ whatever follows.
+    With no predicate in front, そう is the demonstrative adverb (そう+だ,
+    まさに+そう+だ, 彼+も+そう+言っ+た).
+    """
+    changed = False
+    for idx, token in enumerate(tokens):
+        if token.get("surface") != "そう" or token.get("pos") not in ("Adjective", "Auxiliary", "Adverb"):
+            continue
+        previous = tokens[idx - 1] if idx > 0 else None
+        following = tokens[idx + 1] if idx + 1 < len(tokens) else None
+        # A noun takes the appearance そう only as a na-adjective stem (不安+そう);
+        # before a verb it is the adverb after a temporal noun (明日+そう+する).
+        nominal_stem_host = (
+            previous is not None
+            and previous.get("pos") == "Noun"
+            and (following is None or following.get("pos") != "Verb")
+        )
+        predicate_host = previous is not None and (
+            previous.get("pos") in ("Verb", "Adjective", "Auxiliary")
+            or (previous.get("pos") == "Suffix" and previous.get("surface") == "さ")
+            or nominal_stem_host
+        )
+        wanted = "Auxiliary" if predicate_host else "Adverb"
+        if token.get("pos") != wanted:
+            token["pos"] = wanted
+            token["lemma"] = "そう"
+            changed = True
+    return changed

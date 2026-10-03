@@ -172,7 +172,6 @@ postprocess_na_adj_noun = postprocessor_predicates.postprocess_na_adj_noun
 postprocess_onaji_predicate = postprocessor_predicates.postprocess_onaji_predicate
 postprocess_short_hiragana_onbin = postprocessor_predicates.postprocess_short_hiragana_onbin
 postprocess_sou = postprocessor_predicates.postprocess_sou
-postprocess_sou_aux = postprocessor_predicates.postprocess_sou_aux
 postprocess_teki_na_adjective = postprocessor_predicates.postprocess_teki_na_adjective
 postprocess_verb_ease_adjective = postprocessor_predicates.postprocess_verb_ease_adjective
 
@@ -180,6 +179,7 @@ postprocess_verb_ease_adjective = postprocessor_predicates.postprocess_verb_ease
 _TE_CONTINUATION_HEADS = postprocessor_subsidiaries._TE_CONTINUATION_HEADS
 _TOKU_FABRICATED_TAILS = postprocessor_subsidiaries._TOKU_FABRICATED_TAILS
 postprocess_negative_host = postprocessor_subsidiaries.postprocess_negative_host
+postprocess_sou_host = postprocessor_subsidiaries.postprocess_sou_host
 postprocess_closed_subsidiary_aux = postprocessor_subsidiaries.postprocess_closed_subsidiary_aux
 postprocess_contracted_iku_lemma = postprocessor_subsidiaries.postprocess_contracted_iku_lemma
 postprocess_contracted_progressive_aux = postprocessor_subsidiaries.postprocess_contracted_progressive_aux
@@ -318,7 +318,6 @@ POSTPROCESSORS: tuple[tuple[str, Callable[[list[dict]], bool]], ...] = (
     ("adverbial-temporal-prefix", postprocess_adverbial_temporal_prefix),
     ("prolonged-sound-noun", postprocess_prolonged_sound_noun),
     ("yoshi-formal-noun", postprocess_yoshi_formal_noun),
-    ("sou-aux", postprocess_sou_aux),
     ("nara-verb", postprocess_nara_verb),
     ("classical-nari-kateikei", postprocess_classical_nari_kateikei),
     ("classical-nari-after-attributive", postprocess_classical_nari_after_attributive),
@@ -332,6 +331,7 @@ POSTPROCESSORS: tuple[tuple[str, Callable[[list[dict]], bool]], ...] = (
     ("quotative-determiner-spelling", postprocess_quotative_determiner_spelling),
     ("adverbial-na-adjective", postprocess_adverbial_na_adjective),
     ("negative-host", postprocess_negative_host),
+    ("sou-host", postprocess_sou_host),
 )
 
 

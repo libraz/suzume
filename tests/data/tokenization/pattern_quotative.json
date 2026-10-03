@@ -1541,7 +1541,7 @@
       "expected": [
         {
           "lemma": "そう",
-          "pos": "Adjective",
+          "pos": "Adverb",
           "surface": "そう"
         },
         {
@@ -1573,7 +1573,7 @@
       "expected": [
         {
           "lemma": "そう",
-          "pos": "Adjective",
+          "pos": "Adverb",
           "surface": "そう"
         },
         {

@@ -599,10 +599,6 @@ def postprocess_nano_quotative(tokens: list[dict]) -> bool:
                 {"surface": "の", "pos": "Particle", "lemma": "の"},
                 {"surface": "って", "pos": "Particle", "lemma": "って"},
             ]
-            # The copula now restored after そう selects its adjectival reading,
-            # as in そうなの (sou-context ran before the copula was visible).
-            if previous.get("surface") == "そう" and previous.get("pos") == "Adverb":
-                previous["pos"] = "Adjective"
             changed = True
             idx += 3
             continue

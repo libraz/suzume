@@ -169,4 +169,32 @@ void resolveNegativeHost(std::vector<core::Morpheme>& result) {
   }
 }
 
+// そう after a predicate is the auxiliary そうだ, appearance after a stem
+// (降り+そう, おいし+そう, 食べ+な+さ+そう) and hearsay after a terminal form
+// (降る+そう, 教師+だ+そう). A noun hosts it only as a na-adjective stem
+// (不安+そう) unless a verb follows (明日+そう+する). With no predicate in front
+// it is the demonstrative adverb (そう+だ, まさに+そう+だ).
+void resolveSouHost(std::vector<core::Morpheme>& result) {
+  for (size_t idx = 0; idx < result.size(); ++idx) {
+    auto& sou = result[idx];
+    if (sou.lemma != "そう" || (sou.pos != core::PartOfSpeech::Adjective && sou.pos != core::PartOfSpeech::Auxiliary &&
+                                sou.pos != core::PartOfSpeech::Adverb)) {
+      continue;
+    }
+    const core::Morpheme* host = idx > 0 ? &result[idx - 1] : nullptr;
+    const core::Morpheme* following = idx + 1 < result.size() ? &result[idx + 1] : nullptr;
+    const bool nominal_stem_host = host != nullptr && host->pos == core::PartOfSpeech::Noun &&
+                                   (following == nullptr || following->pos != core::PartOfSpeech::Verb);
+    const bool predicate_host =
+        host != nullptr && (host->pos == core::PartOfSpeech::Verb || host->pos == core::PartOfSpeech::Adjective ||
+                            host->pos == core::PartOfSpeech::Auxiliary ||
+                            (host->pos == core::PartOfSpeech::Suffix && host->lemma == "さ") || nominal_stem_host);
+    if (predicate_host && sou.pos != core::PartOfSpeech::Auxiliary) {
+      retagAppearanceSou(sou);
+    } else if (!predicate_host && sou.pos != core::PartOfSpeech::Adverb) {
+      retagAdverbialSou(sou);
+    }
+  }
+}
+
 }  // namespace suzume::postprocess::resolver

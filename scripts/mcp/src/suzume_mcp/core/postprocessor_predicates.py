@@ -25,55 +25,10 @@ _GODAN_ERO_TO_BASE = {
 
 @reports_mutation
 def postprocess_sou(tokens: list[dict]) -> bool:
-    """Context-dependent そう normalization."""
+    """Read a katakana host of そう as an adjective stem (エモ+そう)."""
     for i, t in enumerate(tokens):
         if t.get("surface") != "そう":
             continue
-
-        # 伝聞そう before copula -> Adjective
-        # Only when preceded by Auxiliary (だ/た etc.), not by Verb (様態そう)
-        pos = t.get("pos", "")
-        if pos in ("Adverb", "Auxiliary"):
-            if i < len(tokens) - 1 and i > 0:
-                nxt = tokens[i + 1].get("surface", "")
-                prev_pos = tokens[i - 1].get("pos", "")
-                # The explanatory な+の/ん chain takes the same reading as the
-                # bare copula: after a terminal verb, そう is the hearsay
-                # auxiliary in both (読む+そう+だ, 読む+そう+な+ん+だ).
-                if prev_pos != "Verb" and (
-                    regex.match(r"^(?:だ|です|でし|じゃ|じゃろ)", nxt)
-                    or (nxt == "な" and i + 2 < len(tokens) and tokens[i + 2].get("surface") in ("の", "ん"))
-                ):
-                    t["pos"] = "Adjective"
-                elif nxt == "で" and i + 2 < len(tokens):
-                    following = tokens[i + 2].get("surface", "")
-                    after_topic = tokens[i + 3].get("surface", "") if i + 3 < len(tokens) else ""
-                    if following in ("ある", "あり", "あれ", "あっ", "ない", "なく", "なかっ", "なけれ", "なかろ") or (
-                        following == "は" and after_topic in ("ない", "なく", "なかっ", "なけれ", "なかろ")
-                    ):
-                        t["pos"] = "Adjective"
-            elif i == 0:  # Sentence-initial そう before copula
-                if i < len(tokens) - 1:
-                    nxt = tokens[i + 1].get("surface", "")
-                    if regex.match(r"^(?:だ|です|でし|じゃ|じゃろ)", nxt) or (
-                        nxt == "な" and i + 2 < len(tokens) and tokens[i + 2].get("surface") in ("の", "ん")
-                    ):
-                        t["pos"] = "Adjective"
-                    elif nxt == "で" and i + 2 < len(tokens):
-                        following = tokens[i + 2].get("surface", "")
-                        after_topic = tokens[i + 3].get("surface", "") if i + 3 < len(tokens) else ""
-                        if following in (
-                            "ある",
-                            "あり",
-                            "あれ",
-                            "あっ",
-                            "ない",
-                            "なく",
-                            "なかっ",
-                            "なけれ",
-                            "なかろ",
-                        ) or (following == "は" and after_topic in ("ない", "なく", "なかっ", "なけれ", "なかろ")):
-                            t["pos"] = "Adjective"
 
         # Katakana adjective stem + そう: Noun -> Adjective
         if i > 0:
@@ -398,17 +353,6 @@ def postprocess_difficulty_adjective_stem(tokens: list[dict]) -> bool:
 
 
 @reports_mutation
-def postprocess_sou_aux(tokens: list[dict]) -> bool:
-    """Fix そう after Auxiliary (しまい etc.): Adverb -> Auxiliary (様態)."""
-    for i in range(1, len(tokens)):
-        t = tokens[i]
-        if t.get("surface") != "そう" or t.get("pos") != "Adverb":
-            continue
-        prev_pos = tokens[i - 1].get("pos", "")
-        if prev_pos == "Auxiliary":
-            t["pos"] = "Auxiliary"
-
-
 def postprocess_bound_derived_adjective(tokens: list[dict]) -> bool:
     """Rejoin the bound suffix がまし〜 when it was split at its first mora.
 

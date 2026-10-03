@@ -51,6 +51,7 @@ from suzume_mcp.core.postprocessors import (
     postprocess_short_hiragana_onbin,
     postprocess_shortened_causative_passive,
     postprocess_sou,
+    postprocess_sou_host,
     postprocess_state_suffix,
     postprocess_subsidiary_yuku,
     postprocess_tagaru_aux,
@@ -206,36 +207,41 @@ class TestPreprocessForMecab:
 
 
 class TestPostprocessSou:
-    def test_sou_before_copula(self):
-        tokens = [_tok("そう", "Adverb"), _tok("だ", "Auxiliary")]
-        postprocess_sou(tokens)
-        assert tokens[0]["pos"] == "Adjective"
-
-    def test_sou_standalone(self):
-        tokens = [_tok("そう", "Adverb"), _tok("食べる", "Verb")]
-        postprocess_sou(tokens)
-        assert tokens[0]["pos"] == "Adverb"
-
-    def test_sou_before_attributive_copula(self):
-        tokens = [_tok("そう", "Adverb"), _tok("な", "Auxiliary"), _tok("の", "Particle")]
-        postprocess_sou(tokens)
-        assert tokens[0]["pos"] == "Adjective"
-
-    def test_sou_before_continuative_copula(self):
-        tokens = [
-            _tok("そう", "Adverb"),
-            _tok("で", "Auxiliary"),
-            _tok("は", "Particle"),
-            _tok("ない", "Auxiliary"),
-        ]
-        postprocess_sou(tokens)
-        assert tokens[0]["pos"] == "Adjective"
-
     def test_katakana_stem_before_sou(self):
         tokens = [_tok("キモ", "Noun"), _tok("そう", "Auxiliary")]
         postprocess_sou(tokens)
         assert tokens[0]["pos"] == "Adjective"
         assert tokens[0]["lemma"] == "キモい"
+
+
+class TestPostprocessSouHost:
+    def test_demonstrative_before_copula_is_adverb(self):
+        tokens = [_tok("そう", "Adjective"), _tok("だ", "Auxiliary")]
+        assert postprocess_sou_host(tokens)
+        assert tokens[0]["pos"] == "Adverb"
+
+    def test_demonstrative_before_verb_is_adverb(self):
+        tokens = [_tok("そう", "Adverb"), _tok("食べる", "Verb")]
+        assert not postprocess_sou_host(tokens)
+
+    def test_hearsay_after_copula_is_auxiliary(self):
+        tokens = [_tok("教師", "Noun"), _tok("だ", "Auxiliary"), _tok("そう", "Adjective"), _tok("だ", "Auxiliary")]
+        assert postprocess_sou_host(tokens)
+        assert tokens[2]["pos"] == "Auxiliary"
+
+    def test_appearance_after_adjective_stem_is_auxiliary(self):
+        tokens = [_tok("おいし", "Adjective"), _tok("そう", "Adjective"), _tok("だ", "Auxiliary")]
+        assert postprocess_sou_host(tokens)
+        assert tokens[1]["pos"] == "Auxiliary"
+
+    def test_na_adjective_noun_stem_is_auxiliary(self):
+        tokens = [_tok("不安", "Noun"), _tok("そう", "Adverb"), _tok("だ", "Auxiliary")]
+        assert postprocess_sou_host(tokens)
+        assert tokens[1]["pos"] == "Auxiliary"
+
+    def test_temporal_noun_before_verb_keeps_adverb(self):
+        tokens = [_tok("明日", "Noun"), _tok("そう", "Adverb"), _tok("する", "Verb")]
+        assert not postprocess_sou_host(tokens)
 
 
 class TestPostprocessIkaga:

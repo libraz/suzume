@@ -207,6 +207,7 @@ std::vector<core::Morpheme> Postprocessor::process(std::vector<core::Morpheme> r
   result = filterMorphemes(std::move(result));
   // The POS of ない follows from its host, which is only final once symbols are gone.
   resolver::resolveNegativeHost(result);
+  resolver::resolveSouHost(result);
 
   if (!options_.lemmatize) {
     // Role resolution must still run to supply POS and conjugation annotations,
