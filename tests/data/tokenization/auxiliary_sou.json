@@ -242,6 +242,119 @@
       ],
       "id": "tsumaranasasouna",
       "input": "つまらなさそうな顔"
+    },
+    {
+      "description": "bare-kana godan continuative before the appearance そう",
+      "expected": [
+        {
+          "lemma": "雨",
+          "pos": "Noun",
+          "surface": "雨"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ふる",
+          "pos": "Verb",
+          "surface": "ふり"
+        },
+        {
+          "lemma": "そう",
+          "pos": "Auxiliary",
+          "surface": "そう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "gafurisouda",
+      "input": "雨がふりそうだ"
+    },
+    {
+      "description": "bare-kana godan ka-row continuative before そう",
+      "expected": [
+        {
+          "lemma": "花",
+          "pos": "Noun",
+          "surface": "花"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "さく",
+          "pos": "Verb",
+          "surface": "さき"
+        },
+        {
+          "lemma": "そう",
+          "pos": "Auxiliary",
+          "surface": "そう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "gasakisouda",
+      "input": "花がさきそうだ"
+    },
+    {
+      "description": "kana adjective stem ending in き stays an adjective before そう",
+      "expected": [
+        {
+          "lemma": "おおきい",
+          "pos": "Adjective",
+          "surface": "おおき"
+        },
+        {
+          "lemma": "そう",
+          "pos": "Auxiliary",
+          "surface": "そう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "箱",
+          "pos": "Noun",
+          "surface": "箱"
+        }
+      ],
+      "id": "ookisouna",
+      "input": "おおきそうな箱"
+    },
+    {
+      "description": "kana かわいそう is one adjective, not かわいい plus そう",
+      "expected": [
+        {
+          "lemma": "かわいそう",
+          "pos": "Adjective",
+          "surface": "かわいそう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "猫",
+          "pos": "Noun",
+          "surface": "猫"
+        }
+      ],
+      "id": "kawaisouna",
+      "input": "かわいそうな猫"
     }
   ],
   "description": "auxiliary_sou tests",

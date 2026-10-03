@@ -435,6 +435,12 @@ void generateHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints
       if (inserted_sa && !registered_adjective) {
         continue;
       }
+      // A word registered over the whole run owns it: かわいそう is the
+      // adjective 可哀想, not かわいい plus the appearance そう.
+      if (appearance_follows && dict_manager != nullptr &&
+          dict_manager->lookupExact(extractSubstring(codepoints, start_pos, stem_end + 2)) != nullptr) {
+        continue;
+      }
       if (!excessive_follows && !registered_adjective &&
           !adj_detail::derivesFromCompoundFormingAdjective(codepoints, start_pos, base_form, dict_manager)) {
         continue;

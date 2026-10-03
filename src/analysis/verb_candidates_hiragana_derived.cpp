@@ -171,9 +171,16 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
     if (next_char == U'な' && end_pos + 1 < codepoints.size() && codepoints[end_pos + 1] == U'い') {
       is_followed_by_nai = true;
     }
+    // The appearance そう takes a godan continuative (ふり+そう). An i-row し
+    // is left out: it ends the stems of the しい adjectives (うれし+そう), as
+    // does a stem whose い form is a dictionary adjective (おおき+そう).
+    const bool godan_before_appearance_sou =
+        grammar::isIRowCodepoint(stem_end_char) && stem_end_char != U'し' && next_char == U'そ' &&
+        end_pos + 1 < codepoints.size() && codepoints[end_pos + 1] == core::hiragana::kU &&
+        !vh::isAdjectiveInDictionary(dict_manager, extractSubstring(codepoints, start_pos, end_pos) + "い");
     if (!is_followed_by_te_ta && !is_followed_by_masu && !godan_ta_before_declared_renyokei_aux &&
         !is_followed_by_renyokei_conj && !is_followed_by_classical_adnominal_tari && !is_followed_by_reba &&
-        !is_followed_by_nai && !is_followed_by_volitional) {
+        !is_followed_by_nai && !is_followed_by_volitional && !godan_before_appearance_sou) {
       continue;
     }
 
@@ -215,7 +222,7 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
     const grammar::VerbType godan_type = grammar::verbTypeFromIRowCodepoint(stem_end_char);
     if (!stem_is_closed_auxiliary &&
         (is_followed_by_masu || is_followed_by_renyokei_conj || is_followed_by_classical_adnominal_tari ||
-         godan_sa_before_te_ta || godan_ta_before_declared_renyokei_aux)) {
+         godan_sa_before_te_ta || godan_ta_before_declared_renyokei_aux || godan_before_appearance_sou)) {
       if (godan_type != grammar::VerbType::Unknown) {
         std::string godan_base = extractSubstring(codepoints, start_pos, end_pos - 1) +
                                  std::string(grammar::godanBaseSuffixFromIRow(stem_end_char));
@@ -228,6 +235,11 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
           }
         }
       }
+    }
+
+    // Before そう only the godan reading is licensed (no ふりる).
+    if (godan_before_appearance_sou && chosen_conj == dictionary::ConjugationType::Ichidan) {
+      continue;
     }
 
     // Check if base form is in dictionary (gives confidence boost)
