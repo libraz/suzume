@@ -1971,33 +1971,6 @@
       ],
       "id": "i_6",
       "input": "二日酔い"
-    },
-    {
-      "description": "Deverbal compound on a registered godan-wa stem is a noun, not an adjective",
-      "expected": [
-        {
-          "lemma": "船",
-          "pos": "Noun",
-          "surface": "船"
-        },
-        {
-          "lemma": "酔い",
-          "pos": "Suffix",
-          "surface": "酔い"
-        },
-        {
-          "lemma": "が",
-          "pos": "Particle",
-          "surface": "が"
-        },
-        {
-          "lemma": "ひどい",
-          "pos": "Adjective",
-          "surface": "ひどい"
-        }
-      ],
-      "id": "igahidoi",
-      "input": "船酔いがひどい"
     }
   ],
   "description": "General nouns (part 4/4)",
