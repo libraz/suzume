@@ -963,6 +963,85 @@
       ],
       "id": "sugokune",
       "input": "すごくねぇ"
+    },
+    {
+      "description": "食べてたんだけどさ - regression test",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "て"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "けど",
+          "pos": "Particle",
+          "surface": "けど"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Particle",
+          "surface": "さ"
+        }
+      ],
+      "id": "betetandakedosa",
+      "input": "食べてたんだけどさ"
+    },
+    {
+      "description": "見てたんだけど - regression test",
+      "expected": [
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "て"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "けど",
+          "pos": "Particle",
+          "surface": "けど"
+        }
+      ],
+      "id": "tetandakedo",
+      "input": "見てたんだけど"
     }
   ],
   "description": "colloquial_contracted tests",
