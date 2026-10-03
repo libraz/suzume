@@ -1061,6 +1061,19 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(const std::vector<c
     }
   }
 
+  // An unattested verb covering only the first half of a reduplication cuts a
+  // mimetic in two (ぞく+ぞく+する, not ぞくぞく+する).
+  candidates.erase(std::remove_if(candidates.begin(), candidates.end(),
+                                  [&codepoints](const UnknownCandidate& verb_candidate) {
+                                    const size_t half = verb_candidate.end - verb_candidate.start;
+                                    return !verb_candidate.lemma_verified && half >= 2 &&
+                                           verb_candidate.end + half <= codepoints.size() &&
+                                           std::equal(codepoints.begin() + verb_candidate.start,
+                                                      codepoints.begin() + verb_candidate.end,
+                                                      codepoints.begin() + verb_candidate.end);
+                                  }),
+                   candidates.end());
+
   // Add emphatic variants (いくっ, するっ, etc.)
   vh::addEmphaticVariants(candidates, codepoints);
 

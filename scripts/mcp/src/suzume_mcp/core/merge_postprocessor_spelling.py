@@ -525,6 +525,10 @@ def _spans_one_mimetic(tokens: list[dict], following: dict | None) -> bool:
     たら behind it shows that the し was a verb in the cell たら selects.
     """
     if len(tokens) == 1:
+        # Before する the reference's サ変 noun tag is the same adverb the fused
+        # ぞくぞくする already yields.
+        if tokens[0].get("pos") == "名詞" and following is not None and following.get("lemma") == "する":
+            return True
         return tokens[0].get("pos") in {"その他", "副詞", "感動詞"}
     if tokens[0].get("pos") in {"助動詞", "連体詞"}:
         return False

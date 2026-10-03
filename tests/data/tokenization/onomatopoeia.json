@@ -1595,6 +1595,55 @@
       ],
       "id": "gashintoshita",
       "input": "部屋がしんとした"
+    },
+    {
+      "description": "sentence-initial reduplicated mimetic before する",
+      "expected": [
+        {
+          "lemma": "ぞくぞく",
+          "pos": "Adverb",
+          "surface": "ぞくぞく"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "zokuzokusuru",
+      "input": "ぞくぞくする"
+    },
+    {
+      "description": "reduplicated mimetic tagged as a サ変 noun by the reference reads as an adverb before する",
+      "expected": [
+        {
+          "lemma": "胸",
+          "pos": "Noun",
+          "surface": "胸"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "どきどき",
+          "pos": "Adverb",
+          "surface": "どきどき"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "gadokidokishita",
+      "input": "胸がどきどきした"
     }
   ],
   "description": "Onomatopoeia and mimetic words",
