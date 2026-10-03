@@ -807,6 +807,55 @@
       ],
       "id": "nderannai",
       "input": "読んでらんない"
+    },
+    {
+      "description": "これでいっか - regression test",
+      "expected": [
+        {
+          "lemma": "これ",
+          "pos": "Pronoun",
+          "surface": "これ"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "いい",
+          "pos": "Adjective",
+          "surface": "いっ"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "koredeittka",
+      "input": "これでいっか"
+    },
+    {
+      "description": "もういっか。 - regression test",
+      "expected": [
+        {
+          "lemma": "もう",
+          "pos": "Adverb",
+          "surface": "もう"
+        },
+        {
+          "lemma": "いい",
+          "pos": "Adjective",
+          "surface": "いっ"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "mouittka",
+      "input": "もういっか。"
     }
   ],
   "description": "colloquial_contracted tests",
