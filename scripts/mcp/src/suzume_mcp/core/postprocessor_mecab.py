@@ -141,6 +141,10 @@ def _stranded_adjective_stems(raw: tuple[int, dict[int, dict]]) -> dict[int, str
             continue
         if not tail or tail[0] not in _ADJECTIVE_INFLECTION_KANA or len(tail) > 2:
             continue
+        # A tail that is itself a real adjective (けち+くさ of くさい) is the
+        # compound's second half, not an invented ending.
+        if following.get("pos") == "形容詞" and len(following.get("lemma", "")) >= 3:
+            continue
         stems[start] = surface
     return stems
 

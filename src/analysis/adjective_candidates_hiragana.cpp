@@ -405,11 +405,14 @@ void generateHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints
   const bool follows_kanji_continuative =
       start_pos > 0 && normalize::isKanjiCodepoint(codepoints[start_pos - 1]) && first_char == U'く';
   // すぎ opens every cell of the auxiliary (すぎて, すぎない), so it is found
-  // anywhere in the run.  A stem opening on a particle mora (や, し) is left to
-  // the inflection check of stem+い rather than rejected outright.
+  // anywhere in the run, and the appearance そう takes the same bare stem of a
+  // derived adjective (けちくさ+そう).  A stem opening on a particle mora (や, し)
+  // is left to the inflection check of stem+い rather than rejected outright.
   if (!follows_kanji_continuative) {
     for (size_t stem_end = start_pos + 2; stem_end + 1 < max_hiragana_end; ++stem_end) {
-      if (codepoints[stem_end] != U'す' || codepoints[stem_end + 1] != U'ぎ') {
+      const bool excessive_follows = codepoints[stem_end] == U'す' && codepoints[stem_end + 1] == U'ぎ';
+      const bool appearance_follows = codepoints[stem_end] == U'そ' && codepoints[stem_end + 1] == U'う';
+      if (!excessive_follows && !appearance_follows) {
         continue;
       }
       const std::string stem = extractSubstring(codepoints, start_pos, stem_end);
@@ -419,6 +422,12 @@ void generateHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints
         continue;
       }
       const std::string base_form = stem + "い";
+      // そう also follows verb continuatives and phrases (ふり+そう, それは+そう),
+      // so before it the stem has to carry its own derivation (けちくさ+そう).
+      if (!excessive_follows &&
+          !adj_detail::derivesFromCompoundFormingAdjective(codepoints, start_pos, base_form, dict_manager)) {
+        continue;
+      }
       const float confidence = adj_detail::firstConfidenceAtLeast(
           inflection.analyze(base_form), grammar::VerbType::IAdjective, candidate::kCompoundAdjConfMin);
       if (confidence == candidate::kNoOriginConfidence) {
