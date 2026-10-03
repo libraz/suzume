@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <functional>
-#include <iterator>
 
 #include "core/debug.h"
 #include "core/text_boundaries.h"
@@ -102,7 +101,9 @@ std::vector<core::Morpheme> chunkBySentenceBoundary(
     }
 
     auto morphemes = process(text.substr(pos, chunk_end - pos), base_offset + char_pos);
-    result.insert(result.end(), std::make_move_iterator(morphemes.begin()), std::make_move_iterator(morphemes.end()));
+    for (auto& morpheme : morphemes) {
+      result.push_back(std::move(morpheme));
+    }
 
     char_pos += countChars(text, pos, chunk_end);
     pos = chunk_end;
@@ -241,8 +242,9 @@ std::vector<core::Morpheme> Analyzer::analyzeWithPretokenizer(std::string_view t
       const auto& span = pretoken_result.spans[span_idx++];
       std::string_view span_text = text.substr(span.start, span.end - span.start);
       auto span_morphemes = analyzeSpan(span_text, char_offset);
-      result.insert(result.end(), std::make_move_iterator(span_morphemes.begin()),
-                    std::make_move_iterator(span_morphemes.end()));
+      for (auto& morpheme : span_morphemes) {
+        result.push_back(std::move(morpheme));
+      }
     }
   }
 

@@ -12,7 +12,6 @@
 
 #include <algorithm>
 #include <cstdint>
-#include <iterator>
 #include <utility>
 
 #include "adjective_candidates.h"
@@ -33,7 +32,10 @@ namespace {
 
 void appendCandidates(std::vector<suzume::analysis::UnknownCandidate>& destination,
                       std::vector<suzume::analysis::UnknownCandidate>&& source) {
-  destination.insert(destination.end(), std::make_move_iterator(source.begin()), std::make_move_iterator(source.end()));
+  destination.reserve(destination.size() + source.size());
+  for (auto& candidate : source) {
+    destination.push_back(std::move(candidate));
+  }
 }
 
 // A closed function word is a hard lexical boundary. Unknown candidates may
