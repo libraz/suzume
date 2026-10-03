@@ -154,15 +154,9 @@ void appendStructuralCounterCandidates(const std::vector<char32_t>& codepoints, 
   // kanji noun such as 後.
   if (start_pos + 2 < codepoints.size() && codepoints[start_pos] == U'数' && codepoints[start_pos + 1] == U'か' &&
       normalize::isTemporalCounterKanji(codepoints[start_pos + 2])) {
-    std::string surface = extractSubstring(codepoints, start_pos, start_pos + 3);
-    auto cand =
-        makeCandidate(surface, start_pos, start_pos + 3, core::PartOfSpeech::Noun, candidate::kNumeralCounterMergeBonus,
-                      false, CandidateOrigin::Counter, core::ExtendedPOS::NounNumber);
-    cand.lemma = surface;
-#ifdef SUZUME_DEBUG_INFO
-    cand.pattern = "indefinite_approximate_duration";
-#endif
-    candidates.push_back(cand);
+    appendCounterCandidate(codepoints, start_pos, start_pos + 3, core::PartOfSpeech::Noun,
+                           candidate::kNumeralCounterMergeBonus, core::ExtendedPOS::NounNumber,
+                           "indefinite_approximate_duration", candidates);
   }
 
   // Repeated numeral-counter units are distributive quantity expressions
@@ -176,17 +170,9 @@ void appendStructuralCounterCandidates(const std::vector<char32_t>& codepoints, 
     if (numeral_end < codepoints.size() && normalize::isCounterKanji(codepoints[numeral_end])) {
       const size_t repeated_end = repeatedNumeralNounUnitEndAt(codepoints, char_types, start_pos);
       if (repeated_end != 0) {
-        std::string surface = extractSubstring(codepoints, start_pos, repeated_end);
-        if (!surface.empty()) {
-          auto cand = makeCandidate(surface, start_pos, repeated_end, core::PartOfSpeech::Noun,
-                                    candidate::kNumeralCounterMergeBonus, false, CandidateOrigin::Counter,
-                                    core::ExtendedPOS::NounNumber);
-          cand.lemma = surface;
-#ifdef SUZUME_DEBUG_INFO
-          cand.pattern = "repeated_numeral_counter";
-#endif
-          candidates.push_back(cand);
-        }
+        appendCounterCandidate(codepoints, start_pos, repeated_end, core::PartOfSpeech::Noun,
+                               candidate::kNumeralCounterMergeBonus, core::ExtendedPOS::NounNumber,
+                               "repeated_numeral_counter", candidates);
       }
     }
   }
@@ -214,15 +200,9 @@ void appendStructuralCounterCandidates(const std::vector<char32_t>& codepoints, 
         break;
       }
       if (repeated_end != 0) {
-        std::string surface = extractSubstring(codepoints, start_pos, repeated_end);
-        auto cand = makeCandidate(surface, start_pos, repeated_end, core::PartOfSpeech::Noun,
-                                  candidate::kMixedScriptRepeatedQuantityBonus, false, CandidateOrigin::Counter,
-                                  core::ExtendedPOS::NounNumber);
-        cand.lemma = surface;
-#ifdef SUZUME_DEBUG_INFO
-        cand.pattern = "mixed_script_repeated_quantity";
-#endif
-        candidates.push_back(cand);
+        appendCounterCandidate(codepoints, start_pos, repeated_end, core::PartOfSpeech::Noun,
+                               candidate::kMixedScriptRepeatedQuantityBonus, core::ExtendedPOS::NounNumber,
+                               "mixed_script_repeated_quantity", candidates);
       }
     }
   }
@@ -241,17 +221,9 @@ void appendStructuralCounterCandidates(const std::vector<char32_t>& codepoints, 
             lookupResultsInRange(*dict_manager, codepoints, repeated_noun_end, codepoints.size()),
             partOfSpeechMask(core::PartOfSpeech::Verb));
     if (hasKanjiSuruPredicateAt(codepoints, char_types, repeated_noun_end, 2) || has_registered_predicate) {
-      std::string surface = extractSubstring(codepoints, start_pos, repeated_noun_end);
-      if (!surface.empty()) {
-        auto cand = makeCandidate(surface, start_pos, repeated_noun_end, core::PartOfSpeech::Noun,
-                                  candidate::kRepeatedNumeralNounPredicateSplitBonus, false, CandidateOrigin::Counter,
-                                  core::ExtendedPOS::NounNumber);
-        cand.lemma = surface;
-#ifdef SUZUME_DEBUG_INFO
-        cand.pattern = "repeated_numeral_noun_predicate_split";
-#endif
-        candidates.push_back(cand);
-      }
+      appendCounterCandidate(codepoints, start_pos, repeated_noun_end, core::PartOfSpeech::Noun,
+                             candidate::kRepeatedNumeralNounPredicateSplitBonus, core::ExtendedPOS::NounNumber,
+                             "repeated_numeral_noun_predicate_split", candidates);
     }
   }
 
@@ -274,53 +246,23 @@ void appendStructuralCounterCandidates(const std::vector<char32_t>& codepoints, 
       }
       size_t tail_len = tail_end - ordinal_end;
       if (tail_len == 1 && ordinal_has_numeral && normalize::isCounterKanji(codepoints[ordinal_end])) {
-        std::string ordinal_surface = extractSubstring(codepoints, start_pos, ordinal_end);
-        std::string counter_surface = extractSubstring(codepoints, ordinal_end, tail_end);
-        if (!ordinal_surface.empty()) {
-          auto ordinal = makeCandidate(ordinal_surface, start_pos, ordinal_end, core::PartOfSpeech::Noun,
-                                       candidate::kOrdinalDigitCounterSplitBonus, false, CandidateOrigin::Counter,
-                                       core::ExtendedPOS::NounNumber);
-          ordinal.lemma = ordinal_surface;
-#ifdef SUZUME_DEBUG_INFO
-          ordinal.pattern = "ordinal_digit_counter_prefix";
-#endif
-          candidates.push_back(ordinal);
-        }
-        if (!counter_surface.empty()) {
-          auto counter = makeCandidate(counter_surface, ordinal_end, tail_end, core::PartOfSpeech::Suffix,
-                                       candidate::kOrdinalDigitCounterSplitBonus, false, CandidateOrigin::Counter);
-          counter.lemma = counter_surface;
-#ifdef SUZUME_DEBUG_INFO
-          counter.pattern = "ordinal_digit_counter_suffix";
-#endif
-          candidates.push_back(counter);
-        }
+        appendCounterCandidate(codepoints, start_pos, ordinal_end, core::PartOfSpeech::Noun,
+                               candidate::kOrdinalDigitCounterSplitBonus, core::ExtendedPOS::NounNumber,
+                               "ordinal_digit_counter_prefix", candidates);
+        appendCounterCandidate(codepoints, ordinal_end, tail_end, core::PartOfSpeech::Suffix,
+                               candidate::kOrdinalDigitCounterSplitBonus, core::ExtendedPOS::Unknown,
+                               "ordinal_digit_counter_suffix", candidates);
       } else if (tail_len == 2 && ordinal_has_numeral && normalize::isCounterKanji(codepoints[ordinal_end]) &&
                  codepoints[ordinal_end + 1] == U'目') {
-        std::string ordinal_surface = extractSubstring(codepoints, start_pos, ordinal_end);
-        std::string counter_surface = extractSubstring(codepoints, ordinal_end, ordinal_end + 1);
-        std::string ordinal_suffix_surface = extractSubstring(codepoints, ordinal_end + 1, tail_end);
-        if (!ordinal_surface.empty() && !counter_surface.empty() && !ordinal_suffix_surface.empty()) {
-          auto ordinal = makeCandidate(ordinal_surface, start_pos, ordinal_end, core::PartOfSpeech::Noun,
-                                       candidate::kOrdinalDigitCounterSplitBonus, false, CandidateOrigin::Counter,
-                                       core::ExtendedPOS::NounNumber);
-          ordinal.lemma = ordinal_surface;
-          auto counter = makeCandidate(counter_surface, ordinal_end, ordinal_end + 1, core::PartOfSpeech::Suffix,
-                                       candidate::kOrdinalDigitCounterSplitBonus, false, CandidateOrigin::Counter);
-          counter.lemma = counter_surface;
-          auto ordinal_suffix =
-              makeCandidate(ordinal_suffix_surface, ordinal_end + 1, tail_end, core::PartOfSpeech::Suffix,
-                            candidate::kOrdinalDigitCounterSplitBonus, false, CandidateOrigin::Counter);
-          ordinal_suffix.lemma = ordinal_suffix_surface;
-#ifdef SUZUME_DEBUG_INFO
-          ordinal.pattern = "ordinal_counter_ordinal_suffix_prefix";
-          counter.pattern = "ordinal_counter_ordinal_suffix_counter";
-          ordinal_suffix.pattern = "ordinal_counter_ordinal_suffix_tail";
-#endif
-          candidates.push_back(ordinal);
-          candidates.push_back(counter);
-          candidates.push_back(ordinal_suffix);
-        }
+        appendCounterCandidate(codepoints, start_pos, ordinal_end, core::PartOfSpeech::Noun,
+                               candidate::kOrdinalDigitCounterSplitBonus, core::ExtendedPOS::NounNumber,
+                               "ordinal_counter_ordinal_suffix_prefix", candidates);
+        appendCounterCandidate(codepoints, ordinal_end, ordinal_end + 1, core::PartOfSpeech::Suffix,
+                               candidate::kOrdinalDigitCounterSplitBonus, core::ExtendedPOS::Unknown,
+                               "ordinal_counter_ordinal_suffix_counter", candidates);
+        appendCounterCandidate(codepoints, ordinal_end + 1, tail_end, core::PartOfSpeech::Suffix,
+                               candidate::kOrdinalDigitCounterSplitBonus, core::ExtendedPOS::Unknown,
+                               "ordinal_counter_ordinal_suffix_tail", candidates);
       } else if (tail_len >= 2 && ordinal_has_numeral && normalize::isCounterKanji(codepoints[ordinal_end]) &&
                  codepoints[ordinal_end] != U'次') {
         // A longer kanji tail behind the ordinal is a word of its own, and the
@@ -329,39 +271,16 @@ void appendStructuralCounterCandidates(const std::vector<char32_t>& codepoints, 
         // ordinary kanji-run analysis. A tail that does not open with a counter
         // needs no boundary here, so a lexicalized ordinal noun (第三者, 第一
         // 印象) retains its whole-word path.
-        std::string ordinal_surface = extractSubstring(codepoints, start_pos, ordinal_end);
-        if (!ordinal_surface.empty()) {
-          auto ordinal = makeCandidate(ordinal_surface, start_pos, ordinal_end, core::PartOfSpeech::Noun,
-                                       candidate::kOrdinalDigitCounterSplitBonus, false, CandidateOrigin::Counter,
-                                       core::ExtendedPOS::NounNumber);
-          ordinal.lemma = ordinal_surface;
-#ifdef SUZUME_DEBUG_INFO
-          ordinal.pattern = "ordinal_kanji_word_prefix";
-#endif
-          candidates.push_back(ordinal);
-        }
+        appendCounterCandidate(codepoints, start_pos, ordinal_end, core::PartOfSpeech::Noun,
+                               candidate::kOrdinalDigitCounterSplitBonus, core::ExtendedPOS::NounNumber,
+                               "ordinal_kanji_word_prefix", candidates);
       } else if (tail_len >= 2 && codepoints[ordinal_end] == U'次') {
-        std::string ordinal_surface = extractSubstring(codepoints, start_pos, ordinal_end);
-        std::string tail_surface = extractSubstring(codepoints, ordinal_end, tail_end);
-        if (!ordinal_surface.empty()) {
-          auto ordinal = makeCandidate(ordinal_surface, start_pos, ordinal_end, core::PartOfSpeech::Noun,
-                                       candidate::kOrdinalSequentialSplitBonus, false, CandidateOrigin::Counter,
-                                       core::ExtendedPOS::NounNumber);
-          ordinal.lemma = ordinal_surface;
-#ifdef SUZUME_DEBUG_INFO
-          ordinal.pattern = "ordinal_sequential_prefix";
-#endif
-          candidates.push_back(ordinal);
-        }
-        if (!tail_surface.empty()) {
-          auto tail = makeCandidate(tail_surface, ordinal_end, tail_end, core::PartOfSpeech::Suffix,
-                                    candidate::kOrdinalSequentialSplitBonus, false, CandidateOrigin::Counter);
-          tail.lemma = tail_surface;
-#ifdef SUZUME_DEBUG_INFO
-          tail.pattern = "ordinal_sequential_tail";
-#endif
-          candidates.push_back(tail);
-        }
+        appendCounterCandidate(codepoints, start_pos, ordinal_end, core::PartOfSpeech::Noun,
+                               candidate::kOrdinalSequentialSplitBonus, core::ExtendedPOS::NounNumber,
+                               "ordinal_sequential_prefix", candidates);
+        appendCounterCandidate(codepoints, ordinal_end, tail_end, core::PartOfSpeech::Suffix,
+                               candidate::kOrdinalSequentialSplitBonus, core::ExtendedPOS::Unknown,
+                               "ordinal_sequential_tail", candidates);
       }
     }
   }
@@ -412,16 +331,9 @@ void appendStructuralCounterCandidates(const std::vector<char32_t>& codepoints, 
           trailing_two_kanji && normalize::isQuantityPhraseSuffixKanji(codepoints[counter_end + 1]);
       if (trailing_two_kanji && run_ends_after_pair && !trailing_is_reduplication && !repeated_predicate_unit &&
           !trailing_closes_quantity) {
-        std::string surface = extractSubstring(codepoints, start_pos, counter_end);
-        if (!surface.empty()) {
-          auto cand = makeCandidate(surface, start_pos, counter_end, core::PartOfSpeech::Noun,
-                                    candidate::kCounterNounSplitBonus, false, CandidateOrigin::Counter);
-          cand.lemma = surface;
-#ifdef SUZUME_DEBUG_INFO
-          cand.pattern = "counter_object_split";
-#endif
-          candidates.push_back(cand);
-        }
+        appendCounterCandidate(codepoints, start_pos, counter_end, core::PartOfSpeech::Noun,
+                               candidate::kCounterNounSplitBonus, core::ExtendedPOS::Unknown, "counter_object_split",
+                               candidates);
       }
     }
   }
@@ -453,20 +365,13 @@ void appendStructuralCounterCandidates(const std::vector<char32_t>& codepoints, 
                              (normalize::isCounterKanji(codepoints[num_end]) ||
                               (num_end < char_types.size() && char_types[num_end] == normalize::CharType::Katakana));
       if (counter_follows) {
-        std::string surface = extractSubstring(codepoints, start_pos, lead);
-        if (!surface.empty()) {
-          // An approximation prefix (約/計/総) is a Prefix modifying the quantity; a
-          // multi-kanji leading run is an ordinary Noun.
-          core::PartOfSpeech lead_pos = lead_is_prefix ? core::PartOfSpeech::Prefix : core::PartOfSpeech::Noun;
-          core::ExtendedPOS lead_epos = lead_is_prefix ? core::ExtendedPOS::Prefix : core::ExtendedPOS::Unknown;
-          auto cand = makeCandidate(surface, start_pos, lead, lead_pos, candidate::kLeadingNounCounterSplitBonus, false,
-                                    CandidateOrigin::Counter, lead_epos);
-          cand.lemma = surface;
-#ifdef SUZUME_DEBUG_INFO
-          cand.pattern = "leading_noun_counter_split";
-#endif
-          candidates.push_back(cand);
-        }
+        // An approximation prefix (約/計/総) is a Prefix modifying the quantity; a
+        // multi-kanji leading run is an ordinary Noun.
+        appendCounterCandidate(codepoints, start_pos, lead,
+                               lead_is_prefix ? core::PartOfSpeech::Prefix : core::PartOfSpeech::Noun,
+                               candidate::kLeadingNounCounterSplitBonus,
+                               lead_is_prefix ? core::ExtendedPOS::Prefix : core::ExtendedPOS::Unknown,
+                               "leading_noun_counter_split", candidates);
       }
     }
   }
@@ -490,16 +395,9 @@ void appendStructuralCounterCandidates(const std::vector<char32_t>& codepoints, 
         num_end < char_types.size() && normalize::isCounterKanji(codepoints[num_end]) &&
         (num_end + 1 >= char_types.size() || char_types[num_end + 1] != normalize::CharType::Kanji);
     if (lone_counter_at_boundary) {
-      std::string surface = extractSubstring(codepoints, start_pos, num_end + 1);
-      if (!surface.empty()) {
-        auto cand = makeCandidate(surface, start_pos, num_end + 1, core::PartOfSpeech::Noun,
-                                  candidate::kNumeralCounterMergeBonus, false, CandidateOrigin::Counter);
-        cand.lemma = surface;
-#ifdef SUZUME_DEBUG_INFO
-        cand.pattern = "quantity_prefix_counter_merge";
-#endif
-        candidates.push_back(cand);
-      }
+      appendCounterCandidate(codepoints, start_pos, num_end + 1, core::PartOfSpeech::Noun,
+                             candidate::kNumeralCounterMergeBonus, core::ExtendedPOS::Unknown,
+                             "quantity_prefix_counter_merge", candidates);
     }
 
     // An approximate quantity can also precede a kanji サ変 predicate
@@ -508,17 +406,9 @@ void appendStructuralCounterCandidates(const std::vector<char32_t>& codepoints, 
     // prefix inside the number phrase.
     if (num_end < char_types.size() && normalize::isCounterKanji(codepoints[num_end])) {
       if (hasKanjiSuruPredicateAt(codepoints, char_types, num_end + 1)) {
-        std::string surface = extractSubstring(codepoints, start_pos, num_end + 1);
-        if (!surface.empty()) {
-          auto cand = makeCandidate(surface, start_pos, num_end + 1, core::PartOfSpeech::Noun,
-                                    candidate::kCounterNounSplitBonus, false, CandidateOrigin::Counter,
-                                    core::ExtendedPOS::NounNumber);
-          cand.lemma = surface;
-#ifdef SUZUME_DEBUG_INFO
-          cand.pattern = "quantity_prefix_counter_suru_predicate_split";
-#endif
-          candidates.push_back(cand);
-        }
+        appendCounterCandidate(codepoints, start_pos, num_end + 1, core::PartOfSpeech::Noun,
+                               candidate::kCounterNounSplitBonus, core::ExtendedPOS::NounNumber,
+                               "quantity_prefix_counter_suru_predicate_split", candidates);
       }
     }
   }

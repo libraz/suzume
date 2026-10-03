@@ -3,6 +3,9 @@
  * @brief Suffix-based unknown word candidate generation
  */
 
+#include <algorithm>
+#include <utility>
+
 #include "candidate_constants.h"
 #include "core/debug.h"
 #include "core/utf8_constants.h"
@@ -20,6 +23,25 @@
 #include "verb_candidates_helpers.h"
 
 namespace suzume::analysis {
+
+namespace counter_detail {
+
+void appendCounterCandidate(const std::vector<char32_t>& codepoints, size_t start, size_t end, core::PartOfSpeech pos,
+                            float cost, core::ExtendedPOS extended_pos, [[maybe_unused]] const char* pattern,
+                            std::vector<UnknownCandidate>& candidates) {
+  std::string surface = extractSubstring(codepoints, start, end);
+  if (surface.empty()) {
+    return;
+  }
+  auto cand = makeCandidate(surface, start, end, pos, cost, false, CandidateOrigin::Counter, extended_pos);
+  cand.lemma = std::move(surface);
+#ifdef SUZUME_DEBUG_INFO
+  cand.pattern = pattern;
+#endif
+  candidates.push_back(std::move(cand));
+}
+
+}  // namespace counter_detail
 
 void generateCounterCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                const std::vector<normalize::CharType>& char_types,
@@ -55,13 +77,10 @@ void generateCounterCandidates(const std::vector<char32_t>& codepoints, size_t s
   // full-width) digits: 3キロ, 100ドル, ５センチ are one quantity token. A kanji
   // numeral before katakana (五センチ, 十キロメートル) is split at the natural
   // kanji→katakana boundary (五|センチ), matching MeCab, so it must not merge here.
-  bool numeral_is_digits = true;
-  for (size_t idx = start_pos; idx < numeral_end; ++idx) {
-    if (char_types[idx] != normalize::CharType::Digit) {
-      numeral_is_digits = false;
-      break;
-    }
-  }
+  const bool numeral_is_digits =
+      std::all_of(char_types.begin() + static_cast<std::ptrdiff_t>(start_pos),
+                  char_types.begin() + static_cast<std::ptrdiff_t>(numeral_end),
+                  [](normalize::CharType type) { return type == normalize::CharType::Digit; });
 
   // A digit run glued to a preceding letter is part of an alphanumeric
   // identifier, not a quantity: the A of A4 owns the 4, so the following
@@ -70,55 +89,41 @@ void generateCounterCandidates(const std::vector<char32_t>& codepoints, size_t s
 
   // Check for katakana unit suffix (e.g., キロ, ドル, メートル, パーセント)
   // Generate digit + katakana unit candidates like 3キロ, 100ドル, 80パーセント
-  if (numeral_is_digits && !follows_letter && numeral_end < char_types.size() &&
-      char_types[numeral_end] == normalize::CharType::Katakana) {
-    // Find end of katakana sequence (max 8 chars for reasonable unit length)
-    size_t unit_end = findCharRegionEnd(char_types, numeral_end, 8, normalize::CharType::Katakana);
-
-    // Generate candidate for digit + katakana unit
-    size_t unit_len = unit_end - numeral_end;
-    bool is_ke_kanji_counter = false;
-    // ヶ/ケ alone is not a counter — extend to include following kanji
-    // (ヶ月, ヶ所, ヶ国, ヶ年 etc.)
-    if (unit_len == 1 && (codepoints[numeral_end] == U'ヶ' || codepoints[numeral_end] == U'ケ') &&
-        unit_end < codepoints.size() && unit_end < char_types.size() &&
-        char_types[unit_end] == normalize::CharType::Kanji) {
-      // Extend unit_end to include the kanji after ヶ/ケ
-      unit_end += 1;
-      unit_len = unit_end - numeral_end;
-      is_ke_kanji_counter = true;
-    }
-    if (unit_len >= 1) {  // unit_len <= 8 guaranteed by findCharRegionEnd
-      std::string unit_surface = extractSubstring(codepoints, numeral_end, unit_end);
-      // Any all-katakana run merges with the preceding numeral (3キロ, 100メダル);
-      // MeCab treats number + katakana as one quantity token, so there is no
-      // curated unit list. (ヶ/ケ + kanji surfaces are mixed-script and fall through.)
-      if (!is_ke_kanji_counter && !normalize::isAllKatakana(unit_surface)) {
-        return;
-      }
-      std::string surface = extractSubstring(codepoints, start_pos, unit_end);
-      if (!surface.empty()) {
-        // Penalize numbers starting with 0 (e.g., "00ポイント" is unnatural)
-        // "0ドル" is fine, but "00ドル", "000キロ" are not typical Japanese patterns
-        bool starts_with_zero_prefix = false;
-        if (numeral_end - start_pos >= 2 && codepoints[start_pos] == U'0') {
-          starts_with_zero_prefix = true;
-        }
-        // Give bonus to prefer combined token over split
-        // Longer units get slightly more bonus (キロ, ドル vs キログラム, パーセント)
-        // Strong bonus (-0.5) to beat optimal_length bonuses on split candidates
-        float cost = starts_with_zero_prefix ? 2.0F  // Penalize unnatural zero-prefix numbers
-                                             : -0.5F - (static_cast<float>(unit_len) * 0.05F);
-        auto cand = makeCandidate(surface, start_pos, unit_end, core::PartOfSpeech::Noun, cost, false,
-                                  CandidateOrigin::Counter);
-#ifdef SUZUME_DEBUG_INFO
-        cand.confidence = starts_with_zero_prefix ? 0.3F : 0.9F;
-        cand.pattern = "numeric_unit_katakana";
-#endif
-        candidates.push_back(cand);
-      }
-    }
+  if (!numeral_is_digits || follows_letter || char_types[numeral_end] != normalize::CharType::Katakana) {
+    return;
   }
+  // Find end of katakana sequence (max 8 chars for reasonable unit length)
+  size_t unit_end = findCharRegionEnd(char_types, numeral_end, 8, normalize::CharType::Katakana);
+  bool is_ke_kanji_counter = false;
+  // ヶ/ケ alone is not a counter — extend to include following kanji
+  // (ヶ月, ヶ所, ヶ国, ヶ年 etc.)
+  if (unit_end == numeral_end + 1 && (codepoints[numeral_end] == U'ヶ' || codepoints[numeral_end] == U'ケ') &&
+      unit_end < codepoints.size() && char_types[unit_end] == normalize::CharType::Kanji) {
+    ++unit_end;
+    is_ke_kanji_counter = true;
+  }
+  // Any all-katakana run merges with the preceding numeral (3キロ, 100メダル);
+  // MeCab treats number + katakana as one quantity token, so there is no
+  // curated unit list. (ヶ/ケ + kanji surfaces are mixed-script and fall through.)
+  if (!is_ke_kanji_counter && !normalize::isAllKatakana(extractSubstring(codepoints, numeral_end, unit_end))) {
+    return;
+  }
+  // Penalize numbers starting with 0 (e.g., "00ポイント" is unnatural)
+  // "0ドル" is fine, but "00ドル", "000キロ" are not typical Japanese patterns
+  const bool starts_with_zero_prefix = numeral_end - start_pos >= 2 && codepoints[start_pos] == U'0';
+  // Give bonus to prefer combined token over split
+  // Longer units get slightly more bonus (キロ, ドル vs キログラム, パーセント)
+  // Strong bonus (-0.5) to beat optimal_length bonuses on split candidates
+  const size_t unit_len = unit_end - numeral_end;
+  float cost = starts_with_zero_prefix ? 2.0F  // Penalize unnatural zero-prefix numbers
+                                       : -0.5F - (static_cast<float>(unit_len) * 0.05F);
+  auto cand = makeCandidate(extractSubstring(codepoints, start_pos, unit_end), start_pos, unit_end,
+                            core::PartOfSpeech::Noun, cost, false, CandidateOrigin::Counter);
+#ifdef SUZUME_DEBUG_INFO
+  cand.confidence = starts_with_zero_prefix ? 0.3F : 0.9F;
+  cand.pattern = "numeric_unit_katakana";
+#endif
+  candidates.push_back(cand);
 }
 
 }  // namespace suzume::analysis

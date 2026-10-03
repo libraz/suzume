@@ -48,15 +48,9 @@ void appendBasicNumeralCounterCandidates(const std::vector<char32_t>& codepoints
            normalize::isNumeralCodepoint(codepoints[after_extent]);
   }();
   if (closes_quantity_extent) {
-    std::string surface = extractSubstring(codepoints, start_pos, extent_pos + 1);
-    auto cand = makeCandidate(surface, start_pos, extent_pos + 1, core::PartOfSpeech::Noun,
-                              candidate::kQuantityExtentMergeBonus, false, CandidateOrigin::Counter,
-                              core::ExtendedPOS::NounNumber);
-    cand.lemma = surface;
-#ifdef SUZUME_DEBUG_INFO
-    cand.pattern = "quantity_extent_naka";
-#endif
-    candidates.push_back(cand);
+    appendCounterCandidate(codepoints, start_pos, extent_pos + 1, core::PartOfSpeech::Noun,
+                           candidate::kQuantityExtentMergeBonus, core::ExtendedPOS::NounNumber, "quantity_extent_naka",
+                           candidates);
   }
 
   // A numeral+counter phrase can modify an i-adjective in adverbial form
@@ -66,17 +60,9 @@ void appendBasicNumeralCounterCandidates(const std::vector<char32_t>& codepoints
   // (十人|歩く), so no lexical adjective list is needed here.
   if (normalize::isCounterKanji(codepoints[numeral_end]) && numeral_end + 2 < char_types.size() &&
       char_types[numeral_end + 1] == normalize::CharType::Kanji && codepoints[numeral_end + 2] == U'く') {
-    std::string surface = extractSubstring(codepoints, start_pos, numeral_end + 1);
-    if (!surface.empty()) {
-      auto cand = makeCandidate(surface, start_pos, numeral_end + 1, core::PartOfSpeech::Noun,
-                                candidate::kCounterNounSplitBonus, false, CandidateOrigin::Counter,
-                                core::ExtendedPOS::NounNumber);
-      cand.lemma = surface;
-#ifdef SUZUME_DEBUG_INFO
-      cand.pattern = "counter_before_kanji_ku_split";
-#endif
-      candidates.push_back(cand);
-    }
+    appendCounterCandidate(codepoints, start_pos, numeral_end + 1, core::PartOfSpeech::Noun,
+                           candidate::kCounterNounSplitBonus, core::ExtendedPOS::NounNumber,
+                           "counter_before_kanji_ku_split", candidates);
   }
 
   // A numeral+counter phrase before the independent comparison expression
@@ -85,17 +71,9 @@ void appendBasicNumeralCounterCandidates(const std::vector<char32_t>& codepoints
   // kanji run cannot absorb the comparison term and a following predicate.
   if (numeral_end + 2 < codepoints.size() && normalize::isCounterKanji(codepoints[numeral_end]) &&
       codepoints[numeral_end + 1] == U'以' && codepoints[numeral_end + 2] == U'上') {
-    std::string surface = extractSubstring(codepoints, start_pos, numeral_end + 1);
-    if (!surface.empty()) {
-      auto cand = makeCandidate(surface, start_pos, numeral_end + 1, core::PartOfSpeech::Noun,
-                                candidate::kCounterComparisonSplitBonus, false, CandidateOrigin::Counter,
-                                core::ExtendedPOS::NounNumber);
-      cand.lemma = surface;
-#ifdef SUZUME_DEBUG_INFO
-      cand.pattern = "counter_comparison_split";
-#endif
-      candidates.push_back(cand);
-    }
+    appendCounterCandidate(codepoints, start_pos, numeral_end + 1, core::PartOfSpeech::Noun,
+                           candidate::kCounterComparisonSplitBonus, core::ExtendedPOS::NounNumber,
+                           "counter_comparison_split", candidates);
   }
 
   // Approximate count: numeral + 数 + counter (十数件, 百数名).  数 binds
@@ -104,17 +82,9 @@ void appendBasicNumeralCounterCandidates(const std::vector<char32_t>& codepoints
   // lexical compounds beginning with 数.
   if (numeral_end + 1 < codepoints.size() && codepoints[numeral_end] == U'数' &&
       normalize::isCounterKanji(codepoints[numeral_end + 1])) {
-    std::string surface = extractSubstring(codepoints, start_pos, numeral_end);
-    if (!surface.empty()) {
-      auto cand = makeCandidate(surface, start_pos, numeral_end, core::PartOfSpeech::Noun,
-                                candidate::kApproximateNumeralSplitBonus, false, CandidateOrigin::Counter,
-                                core::ExtendedPOS::NounNumber);
-      cand.lemma = surface;
-#ifdef SUZUME_DEBUG_INFO
-      cand.pattern = "approximate_numeral_before_su_counter";
-#endif
-      candidates.push_back(cand);
-    }
+    appendCounterCandidate(codepoints, start_pos, numeral_end, core::PartOfSpeech::Noun,
+                           candidate::kApproximateNumeralSplitBonus, core::ExtendedPOS::NounNumber,
+                           "approximate_numeral_before_su_counter", candidates);
   }
 
   // Fraction: numeral + 分 + の + numeral (三分の一, 十分の三).  The
@@ -128,17 +98,9 @@ void appendBasicNumeralCounterCandidates(const std::vector<char32_t>& codepoints
     while (denominator_end < codepoints.size() && normalize::isNumeralCodepoint(codepoints[denominator_end])) {
       ++denominator_end;
     }
-    std::string surface = extractSubstring(codepoints, start_pos, denominator_end);
-    if (!surface.empty()) {
-      auto cand =
-          makeCandidate(surface, start_pos, denominator_end, core::PartOfSpeech::Noun, candidate::kFractionMergeCost,
-                        false, CandidateOrigin::Counter, core::ExtendedPOS::NounNumber);
-      cand.lemma = surface;
-#ifdef SUZUME_DEBUG_INFO
-      cand.pattern = "fraction_numerator_bun_no_denominator";
-#endif
-      candidates.push_back(cand);
-    }
+    appendCounterCandidate(codepoints, start_pos, denominator_end, core::PartOfSpeech::Noun,
+                           candidate::kFractionMergeCost, core::ExtendedPOS::NounNumber,
+                           "fraction_numerator_bun_no_denominator", candidates);
   }
 
   // A numeral+counter preceding a registered suffix is compositional even when
@@ -157,27 +119,14 @@ void appendBasicNumeralCounterCandidates(const std::vector<char32_t>& codepoints
           return match.entry != nullptr && match.entry->extended_pos == core::ExtendedPOS::NounFormal;
         });
     if (closes_duration_span) {
-      std::string surface = extractSubstring(codepoints, start_pos, counter_end + 1);
-      auto cand = makeCandidate(surface, start_pos, counter_end + 1, core::PartOfSpeech::Noun,
-                                candidate::kNumeralCounterMergeBonus, false, CandidateOrigin::Counter,
-                                core::ExtendedPOS::NounNumber);
-      cand.lemma = surface;
-#ifdef SUZUME_DEBUG_INFO
-      cand.pattern = "temporal_counter_duration_span";
-#endif
-      candidates.push_back(cand);
+      appendCounterCandidate(codepoints, start_pos, counter_end + 1, core::PartOfSpeech::Noun,
+                             candidate::kNumeralCounterMergeBonus, core::ExtendedPOS::NounNumber,
+                             "temporal_counter_duration_span", candidates);
     }
     if (suffix_follows && !closes_duration_span && !closes_quantity_extent) {
-      std::string surface = extractSubstring(codepoints, start_pos, counter_end);
-      if (!surface.empty()) {
-        auto cand = makeCandidate(surface, start_pos, counter_end, core::PartOfSpeech::Noun,
-                                  candidate::kCounterNounSplitBonus, false, CandidateOrigin::Counter);
-        cand.lemma = surface;
-#ifdef SUZUME_DEBUG_INFO
-        cand.pattern = "counter_registered_suffix_split";
-#endif
-        candidates.push_back(cand);
-      }
+      appendCounterCandidate(codepoints, start_pos, counter_end, core::PartOfSpeech::Noun,
+                             candidate::kCounterNounSplitBonus, core::ExtendedPOS::Unknown,
+                             "counter_registered_suffix_split", candidates);
     }
   }
 
@@ -215,15 +164,9 @@ void appendBasicNumeralCounterCandidates(const std::vector<char32_t>& codepoints
     const bool has_formal_noun_counter =
         formal_noun != nullptr && formal_noun->extended_pos == core::ExtendedPOS::NounFormal;
     if ((has_deverbal_counter || has_formal_noun_counter) && !inflected_predicate) {
-      std::string surface = extractSubstring(codepoints, start_pos, counter_end);
-      auto cand =
-          makeCandidate(surface, start_pos, counter_end, core::PartOfSpeech::Noun, candidate::kCounterNounSplitBonus,
-                        false, CandidateOrigin::Counter, core::ExtendedPOS::NounNumber);
-      cand.lemma = surface;
-#ifdef SUZUME_DEBUG_INFO
-      cand.pattern = "numeral_okurigana_counter";
-#endif
-      candidates.push_back(cand);
+      appendCounterCandidate(codepoints, start_pos, counter_end, core::PartOfSpeech::Noun,
+                             candidate::kCounterNounSplitBonus, core::ExtendedPOS::NounNumber,
+                             "numeral_okurigana_counter", candidates);
     }
   }
 
@@ -251,16 +194,9 @@ void appendBasicNumeralCounterCandidates(const std::vector<char32_t>& codepoints
   // kanji noun/suffix (五度目, 五度見た, 三年間) keeps its own boundary.
   if (numeral_end < char_types.size() && normalize::isCounterKanji(codepoints[numeral_end]) &&
       (numeral_end + 1 >= char_types.size() || char_types[numeral_end + 1] != normalize::CharType::Kanji)) {
-    std::string surface = extractSubstring(codepoints, start_pos, numeral_end + 1);
-    if (!surface.empty()) {
-      auto cand = makeCandidate(surface, start_pos, numeral_end + 1, core::PartOfSpeech::Noun,
-                                candidate::kNumeralCounterMergeBonus, false, CandidateOrigin::Counter);
-      cand.lemma = surface;
-#ifdef SUZUME_DEBUG_INFO
-      cand.pattern = "numeral_kanji_counter";
-#endif
-      candidates.push_back(cand);
-    }
+    appendCounterCandidate(codepoints, start_pos, numeral_end + 1, core::PartOfSpeech::Noun,
+                           candidate::kNumeralCounterMergeBonus, core::ExtendedPOS::Unknown, "numeral_kanji_counter",
+                           candidates);
   }
 
   // A quantity followed by a kanji サ変名詞 keeps its counter boundary
@@ -272,17 +208,9 @@ void appendBasicNumeralCounterCandidates(const std::vector<char32_t>& codepoints
     const bool repeated_predicate_unit = isRepeatedNumeralNounPredicateUnitAt(codepoints, char_types, start_pos);
     if (!repeated_predicate_unit && !closes_duration_span && dict_manager != nullptr &&
         headsKanjiSuruPredicateAt(*dict_manager, codepoints, char_types, numeral_end + 1)) {
-      std::string surface = extractSubstring(codepoints, start_pos, numeral_end + 1);
-      if (!surface.empty()) {
-        auto cand = makeCandidate(surface, start_pos, numeral_end + 1, core::PartOfSpeech::Noun,
-                                  candidate::kCounterNounSplitBonus, false, CandidateOrigin::Counter,
-                                  core::ExtendedPOS::NounNumber);
-        cand.lemma = surface;
-#ifdef SUZUME_DEBUG_INFO
-        cand.pattern = "counter_suru_predicate_split";
-#endif
-        candidates.push_back(cand);
-      }
+      appendCounterCandidate(codepoints, start_pos, numeral_end + 1, core::PartOfSpeech::Noun,
+                             candidate::kCounterNounSplitBonus, core::ExtendedPOS::NounNumber,
+                             "counter_suru_predicate_split", candidates);
     }
   }
 }

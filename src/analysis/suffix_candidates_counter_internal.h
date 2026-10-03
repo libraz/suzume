@@ -10,6 +10,15 @@
 
 namespace suzume::analysis::counter_detail {
 
+/**
+ * @brief Append a Counter-origin candidate over [start, end) lemmatized to its own surface
+ *
+ * An empty span appends nothing.
+ */
+void appendCounterCandidate(const std::vector<char32_t>& codepoints, size_t start, size_t end, core::PartOfSpeech pos,
+                            float cost, core::ExtendedPOS extended_pos, const char* pattern,
+                            std::vector<UnknownCandidate>& candidates);
+
 void appendTemporalCounterCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                      const std::vector<normalize::CharType>& char_types,
                                      const dictionary::DictionaryManager* dict_manager,

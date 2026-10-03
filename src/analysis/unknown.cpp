@@ -12,6 +12,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <iterator>
 #include <utility>
 
 #include "adjective_candidates.h"
@@ -32,10 +33,7 @@ namespace {
 
 void appendCandidates(std::vector<suzume::analysis::UnknownCandidate>& destination,
                       std::vector<suzume::analysis::UnknownCandidate>&& source) {
-  destination.reserve(destination.size() + source.size());
-  for (auto& candidate : source) {
-    destination.push_back(std::move(candidate));
-  }
+  destination.insert(destination.end(), std::make_move_iterator(source.begin()), std::make_move_iterator(source.end()));
 }
 
 // A closed function word is a hard lexical boundary. Unknown candidates may
@@ -58,9 +56,7 @@ bool spansConjunctionStart(const suzume::analysis::UnknownCandidate& candidate, 
     for (size_t conjunction_end = boundary + 1; conjunction_end <= window_end; ++conjunction_end) {
       std::string conjunction = suzume::analysis::extractSubstring(codepoints, boundary, conjunction_end);
       const auto* conjunction_entry = dict_manager->lookupExact(conjunction, suzume::core::PartOfSpeech::Conjunction);
-      const bool closed_function_word = conjunction_entry != nullptr;
-      if (closed_function_word && boundary < candidate.end &&
-          (boundary > candidate.start || conjunction_end > candidate.end)) {
+      if (conjunction_entry != nullptr && (boundary > candidate.start || conjunction_end > candidate.end)) {
         // A complete generated i-adjective may contain a kana-homographic
         // conjunction (慌ただしい contains ただし).  That is ordinary native
         // morphology.  A kanji-starting closed conjunction, by contrast,
@@ -78,7 +74,7 @@ bool spansConjunctionStart(const suzume::analysis::UnknownCandidate& candidate, 
         // such as 又は remain protected by the ordinary hard boundary below.
         const bool conjunction_leaves_one_case_particle =
             boundary + 1 == candidate.end && conjunction_end == candidate.end + 1;
-        if (conjunction_entry != nullptr && conjunction_leaves_one_case_particle) {
+        if (conjunction_leaves_one_case_particle) {
           const std::string trailing = suzume::analysis::extractSubstring(codepoints, candidate.end, conjunction_end);
           const auto* particle = dict_manager->lookupExact(trailing, suzume::core::PartOfSpeech::Particle);
           if (particle != nullptr && particle->extended_pos == suzume::core::ExtendedPOS::ParticleCase) {
@@ -789,36 +785,22 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generate(std::string_view te
       std::remove_if(
           candidates.begin(), candidates.end(),
           [&](const UnknownCandidate& candidate) {
-            if (spansConjunctionStart(candidate, codepoints, dict_manager_)) {
-              return true;
-            }
-            if (containsInternalPunctuation(candidate, codepoints)) {
-              return true;
-            }
-            if (spansAdverbAdjectiveBoundary(candidate, codepoints, dict_manager_)) {
-              return true;
-            }
-            if (endsInsideNegativePast(candidate, codepoints) ||
-                fusesPastAuxiliary(candidate, codepoints, dict_manager_) || fusesPassivePastAsNoun(candidate) ||
-                endsInsideIchidanPassive(candidate, codepoints)) {
-              return true;
-            }
             // SelectedNominalHead has already proved both nominal
             // boundaries. Its first kana may still be homographic
             // with a particle, so the leading-particle filter does
             // not get to reinterpret that same evidence.
             const bool has_verified_nominal_boundaries = candidate.origin == CandidateOrigin::SelectedNominalHead;
-            if (!has_verified_nominal_boundaries &&
-                startsWithParticleBeforeRegisteredPredicate(candidate, codepoints, inflection_, dict_manager_)) {
-              return true;
-            }
-            if (spansCaseParticleBeforeVerifiedPredicate(candidate, codepoints, inflection_, dict_manager_)) {
-              return true;
-            }
-            if (startsInsideKanjiRunBeforeClosedNai(candidate, codepoints)) {
-              return true;
-            }
-            return endsInsideVerifiedCompoundVerb(candidate, codepoints, char_types, dict_manager_);
+            return spansConjunctionStart(candidate, codepoints, dict_manager_) ||
+                   containsInternalPunctuation(candidate, codepoints) ||
+                   spansAdverbAdjectiveBoundary(candidate, codepoints, dict_manager_) ||
+                   endsInsideNegativePast(candidate, codepoints) ||
+                   fusesPastAuxiliary(candidate, codepoints, dict_manager_) || fusesPassivePastAsNoun(candidate) ||
+                   endsInsideIchidanPassive(candidate, codepoints) ||
+                   (!has_verified_nominal_boundaries &&
+                    startsWithParticleBeforeRegisteredPredicate(candidate, codepoints, inflection_, dict_manager_)) ||
+                   spansCaseParticleBeforeVerifiedPredicate(candidate, codepoints, inflection_, dict_manager_) ||
+                   startsInsideKanjiRunBeforeClosedNai(candidate, codepoints) ||
+                   endsInsideVerifiedCompoundVerb(candidate, codepoints, char_types, dict_manager_);
           }),
       candidates.end());
 

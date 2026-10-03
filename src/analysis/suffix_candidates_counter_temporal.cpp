@@ -50,18 +50,8 @@ void appendCounterChainCandidate(const std::vector<char32_t>& codepoints, size_t
     return;
   }
 
-  std::string surface = extractSubstring(codepoints, start_pos, scan);
-  if (surface.empty()) {
-    return;
-  }
-  auto chain_candidate =
-      makeCandidate(surface, start_pos, scan, core::PartOfSpeech::Noun, candidate::kCounterChainMergeBonus, false,
-                    CandidateOrigin::Counter, core::ExtendedPOS::NounNumber);
-  chain_candidate.lemma = surface;
-#ifdef SUZUME_DEBUG_INFO
-  chain_candidate.pattern = "counter_chain_merge";
-#endif
-  candidates.push_back(std::move(chain_candidate));
+  appendCounterCandidate(codepoints, start_pos, scan, core::PartOfSpeech::Noun, candidate::kCounterChainMergeBonus,
+                         core::ExtendedPOS::NounNumber, "counter_chain_merge", candidates);
 }
 
 // A lexicalized duration unit is emitted as one search token, and an optional
@@ -71,36 +61,17 @@ void appendCounterChainCandidate(const std::vector<char32_t>& codepoints, size_t
 void appendDurationCandidates(const std::vector<char32_t>& codepoints, size_t start_pos, size_t unit_end,
                               char32_t completion, std::vector<UnknownCandidate>& candidates, const char* unit_pattern,
                               const char* completion_pattern) {
-#ifndef SUZUME_DEBUG_INFO
-  static_cast<void>(unit_pattern);
-  static_cast<void>(completion_pattern);
-#endif
-  std::string surface = extractSubstring(codepoints, start_pos, unit_end);
-  if (surface.empty()) {
-    return;
-  }
   const bool completion_follows = unit_end < codepoints.size() && codepoints[unit_end] == completion;
   const float unit_cost =
       completion_follows ? candidate::kNumeralKanaMonthMergeBonus : candidate::kDurationCounterMergeBonus;
-  auto cand = makeCandidate(surface, start_pos, unit_end, core::PartOfSpeech::Noun, unit_cost, false,
-                            CandidateOrigin::Counter, core::ExtendedPOS::NounNumber);
-  cand.lemma = surface;
-#ifdef SUZUME_DEBUG_INFO
-  cand.pattern = unit_pattern;
-#endif
-  candidates.push_back(cand);
-  if (unit_end >= codepoints.size() || codepoints[unit_end] != completion) {
+  appendCounterCandidate(codepoints, start_pos, unit_end, core::PartOfSpeech::Noun, unit_cost,
+                         core::ExtendedPOS::NounNumber, unit_pattern, candidates);
+  if (!completion_follows) {
     return;
   }
-  std::string completed_surface = extractSubstring(codepoints, start_pos, unit_end + 1);
-  auto completed = makeCandidate(completed_surface, start_pos, unit_end + 1, core::PartOfSpeech::Noun,
-                                 candidate::kClosedTemporalCounterMergeBonus, false, CandidateOrigin::Counter,
-                                 core::ExtendedPOS::NounNumber);
-  completed.lemma = completed_surface;
-#ifdef SUZUME_DEBUG_INFO
-  completed.pattern = completion_pattern;
-#endif
-  candidates.push_back(completed);
+  appendCounterCandidate(codepoints, start_pos, unit_end + 1, core::PartOfSpeech::Noun,
+                         candidate::kClosedTemporalCounterMergeBonus, core::ExtendedPOS::NounNumber, completion_pattern,
+                         candidates);
 }
 
 }  // namespace
@@ -183,17 +154,9 @@ void appendTemporalCounterCandidates(const std::vector<char32_t>& codepoints, si
       }
     }
     if (has_quantity && scan > counter_start && suffix_is_compositional) {
-      std::string surface = extractSubstring(codepoints, start_pos, scan);
-      if (!surface.empty()) {
-        auto cand =
-            makeCandidate(surface, start_pos, scan, core::PartOfSpeech::Noun, candidate::kCounterRelationSplitBonus,
-                          false, CandidateOrigin::Counter, core::ExtendedPOS::NounNumber);
-        cand.lemma = surface;
-#ifdef SUZUME_DEBUG_INFO
-        cand.pattern = "counter_relation_split";
-#endif
-        candidates.push_back(cand);
-      }
+      appendCounterCandidate(codepoints, start_pos, scan, core::PartOfSpeech::Noun,
+                             candidate::kCounterRelationSplitBonus, core::ExtendedPOS::NounNumber,
+                             "counter_relation_split", candidates);
       // Unlike 後/前 (single-kanji dict relation nouns), the split-off 半 only
       // exists as a generic kanji_seq NOUN, which the single-kanji-noun →
       // hiragana-verb compound protection penalizes before かかっ/すぎ etc.
@@ -201,21 +164,14 @@ void appendTemporalCounterCandidates(const std::vector<char32_t>& codepoints, si
       // while at a clause boundary it is the compositional suffix of the
       // duration expression (一時間|半。).
       if (suffix_is_half) {
-        std::string half_surface = extractSubstring(codepoints, scan, scan + 1);
-        if (!half_surface.empty()) {
-          const size_t after_half = scan + 1;
-          const bool closes_clause = after_half == codepoints.size() ||
-                                     normalize::classifyChar(codepoints[after_half]) == normalize::CharType::Symbol;
-          auto half_cand = makeCandidate(half_surface, scan, after_half,
-                                         closes_clause ? core::PartOfSpeech::Suffix : core::PartOfSpeech::Noun,
-                                         candidate::kCounterHalfSuffixCost, false, CandidateOrigin::Counter,
-                                         closes_clause ? core::ExtendedPOS::Suffix : core::ExtendedPOS::NounNumber);
-          half_cand.lemma = half_surface;
-#ifdef SUZUME_DEBUG_INFO
-          half_cand.pattern = "counter_half_suffix";
-#endif
-          candidates.push_back(half_cand);
-        }
+        const size_t after_half = scan + 1;
+        const bool closes_clause = after_half == codepoints.size() ||
+                                   normalize::classifyChar(codepoints[after_half]) == normalize::CharType::Symbol;
+        appendCounterCandidate(codepoints, scan, after_half,
+                               closes_clause ? core::PartOfSpeech::Suffix : core::PartOfSpeech::Noun,
+                               candidate::kCounterHalfSuffixCost,
+                               closes_clause ? core::ExtendedPOS::Suffix : core::ExtendedPOS::NounNumber,
+                               "counter_half_suffix", candidates);
       }
     }
   }
@@ -275,16 +231,8 @@ void appendTemporalCounterCandidates(const std::vector<char32_t>& codepoints, si
                                             normalize::isNumeralCodepoint(codepoints[scan + 1]);
     if (has_quantity && scan > unit_start && !opens_fraction_denominator &&
         (followed_by_hiragana || followed_by_quantity_particle)) {
-      std::string surface = extractSubstring(codepoints, start_pos, scan);
-      if (!surface.empty()) {
-        auto cand = makeCandidate(surface, start_pos, scan, core::PartOfSpeech::Noun, candidate::kCounterNounSplitBonus,
-                                  false, CandidateOrigin::Counter, core::ExtendedPOS::NounNumber);
-        cand.lemma = surface;
-#ifdef SUZUME_DEBUG_INFO
-        cand.pattern = "temporal_quantity_hiragana_split";
-#endif
-        candidates.push_back(cand);
-      }
+      appendCounterCandidate(codepoints, start_pos, scan, core::PartOfSpeech::Noun, candidate::kCounterNounSplitBonus,
+                             core::ExtendedPOS::NounNumber, "temporal_quantity_hiragana_split", candidates);
       if (followed_by_extent_suffix) {
         const std::string suffix_surface = extractSubstring(codepoints, scan, scan + 2);
         auto suffix = makeCandidate(suffix_surface, scan, scan + 2, core::PartOfSpeech::Suffix,
@@ -348,44 +296,22 @@ void appendTemporalCounterCandidates(const std::vector<char32_t>& codepoints, si
                                  (scan + 1 >= char_types.size() || char_types[scan + 1] != normalize::CharType::Kanji);
       if (normalize::isIntervalCompoundSecondKanji(codepoints[scan])) {
         size_t split_end = scan - 1;  // before 間
-        std::string surface = extractSubstring(codepoints, start_pos, split_end);
-        if (!surface.empty()) {
-          auto cand = makeCandidate(surface, start_pos, split_end, core::PartOfSpeech::Noun,
-                                    candidate::kDurationSpanSplitBonus, false, CandidateOrigin::Counter);
-          cand.lemma = surface;
-#ifdef SUZUME_DEBUG_INFO
-          cand.pattern = "duration_interval_split";
-#endif
-          candidates.push_back(cand);
-        }
+        appendCounterCandidate(codepoints, start_pos, split_end, core::PartOfSpeech::Noun,
+                               candidate::kDurationSpanSplitBonus, core::ExtendedPOS::Unknown,
+                               "duration_interval_split", candidates);
       } else if (!trailing_ordinal_me && !normalize::isTemporalCounterKanji(codepoints[scan]) &&
                  !normalize::isTemporalRelationSuffixKanji(codepoints[scan]) &&
                  !normalize::isTemporalSpanSuffixKanji(codepoints[scan])) {
-        std::string surface = extractSubstring(codepoints, start_pos, scan);
-        if (!surface.empty()) {
-          auto cand = makeCandidate(surface, start_pos, scan, core::PartOfSpeech::Noun,
-                                    candidate::kDurationSpanSplitBonus, false, CandidateOrigin::Counter);
-          cand.lemma = surface;
-#ifdef SUZUME_DEBUG_INFO
-          cand.pattern = "duration_span_split";
-#endif
-          candidates.push_back(cand);
-        }
+        appendCounterCandidate(codepoints, start_pos, scan, core::PartOfSpeech::Noun,
+                               candidate::kDurationSpanSplitBonus, core::ExtendedPOS::Unknown, "duration_span_split",
+                               candidates);
       }
     } else if (run_ends_in_span) {
       // Nothing continues the kanji run, so the 間-closed duration is a complete
       // quantity of its own (数年間, 三日間).
-      std::string surface = extractSubstring(codepoints, start_pos, scan);
-      if (!surface.empty()) {
-        auto cand =
-            makeCandidate(surface, start_pos, scan, core::PartOfSpeech::Noun, candidate::kNumeralCounterMergeBonus,
-                          false, CandidateOrigin::Counter, core::ExtendedPOS::NounNumber);
-        cand.lemma = surface;
-#ifdef SUZUME_DEBUG_INFO
-        cand.pattern = "duration_span_whole";
-#endif
-        candidates.push_back(cand);
-      }
+      appendCounterCandidate(codepoints, start_pos, scan, core::PartOfSpeech::Noun,
+                             candidate::kNumeralCounterMergeBonus, core::ExtendedPOS::NounNumber, "duration_span_whole",
+                             candidates);
     }
   }
 }

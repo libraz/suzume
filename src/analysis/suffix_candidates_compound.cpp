@@ -636,18 +636,17 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
   // forms one search unit (必要以上, 期待以下). Numeral+counter phrases retain
   // their compositional boundary (三名|以上, 百倍|以下), which is owned by the
   // counter generator. A following nominal selector proves the right edge.
-  size_t comparison_end = start_pos;
-  while (comparison_end < char_types.size() && char_types[comparison_end] == normalize::CharType::Kanji) {
-    ++comparison_end;
+  size_t kanji_run_end = start_pos;
+  while (kanji_run_end < char_types.size() && char_types[kanji_run_end] == normalize::CharType::Kanji) {
+    ++kanji_run_end;
   }
-  if (comparison_end >= start_pos + 4 &&
-      ((codepoints[comparison_end - 2] == U'以' && codepoints[comparison_end - 1] == U'上') ||
-       (codepoints[comparison_end - 2] == U'以' && codepoints[comparison_end - 1] == U'下')) &&
-      !normalize::isNumeralCodepoint(codepoints[comparison_end - 3]) &&
-      !normalize::isCounterKanji(codepoints[comparison_end - 3]) &&
-      hasNominalPhraseSelectorAt(dict_manager, codepoints, comparison_end)) {
-    const std::string surface = extractSubstring(codepoints, start_pos, comparison_end);
-    auto comparison = makeCandidate(surface, start_pos, comparison_end, core::PartOfSpeech::Noun,
+  if (kanji_run_end >= start_pos + 4 && codepoints[kanji_run_end - 2] == U'以' &&
+      (codepoints[kanji_run_end - 1] == U'上' || codepoints[kanji_run_end - 1] == U'下') &&
+      !normalize::isNumeralCodepoint(codepoints[kanji_run_end - 3]) &&
+      !normalize::isCounterKanji(codepoints[kanji_run_end - 3]) &&
+      hasNominalPhraseSelectorAt(dict_manager, codepoints, kanji_run_end)) {
+    const std::string surface = extractSubstring(codepoints, start_pos, kanji_run_end);
+    auto comparison = makeCandidate(surface, start_pos, kanji_run_end, core::PartOfSpeech::Noun,
                                     candidate::kComparisonCompoundNounCost, false, CandidateOrigin::SuffixPattern);
     comparison.lemma = surface;
 #ifdef SUZUME_DEBUG_INFO
@@ -658,13 +657,8 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
     return;
   }
 
-  // Find kanji portion (1 character only for compound nouns)
-  size_t kanji_end = findCharRegionEnd(char_types, start_pos, 1, normalize::CharType::Kanji);
-
-  size_t kanji_len = kanji_end - start_pos;
-  if (kanji_len == 0) {
-    return;
-  }
+  // Kanji portion is 1 character only for compound nouns
+  const size_t kanji_end = start_pos + 1;
 
   // -がかり and -がけ are nominal suffixes after a noun or a verb
   // continuative (手がかり, 通りがかり, 通りがけ, 一日がけ).  The
@@ -673,11 +667,7 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
   // keeping the complete compound as one search unit in a noun phrase.
   constexpr std::string_view kGakari = "がかり";
   constexpr std::string_view kGake = "がけ";
-  size_t nominal_stem_end = kanji_end;
-  while (nominal_stem_end < char_types.size() && char_types[nominal_stem_end] == normalize::CharType::Kanji) {
-    ++nominal_stem_end;
-  }
-  for (size_t suffix_start = nominal_stem_end;
+  for (size_t suffix_start = kanji_run_end;
        suffix_start < codepoints.size() && char_types[suffix_start] == normalize::CharType::Hiragana; ++suffix_start) {
     for (std::string_view suffix : {kGakari, kGake}) {
       const size_t suffix_end = suffix_start + normalize::utf8Length(suffix);
@@ -815,7 +805,7 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
                 // (子供 + っぽい), while verb continuatives are handled by the
                 // dedicated productive path below.
                 const bool precedes_nominalizer = ppoi_end < hira2_end && codepoints[ppoi_end] == U'さ';
-                if (kanji_len == 1 && entry.entry->lemma == "っぽい" && !precedes_nominalizer) {
+                if (entry.entry->lemma == "っぽい" && !precedes_nominalizer) {
                   const size_t derived_end = sokuon_pos + entry.length;
                   auto adjective = makeCandidate(codepoints, start_pos, derived_end, core::PartOfSpeech::Adjective,
                                                  candidate::kProductivePpoiAdjCost, false,
@@ -868,7 +858,7 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
   // pattern above. The contracted genitive の spells the same mora (店+ん+中),
   // so this only adds a candidate: where both flanking kanji are attested
   // nouns their own dictionary edges keep the split cheaper.
-  if (first_hira == U'ん' && kanji_end - start_pos == 1 && kanji_end + 1 < char_types.size() &&
+  if (first_hira == U'ん' && kanji_end + 1 < char_types.size() &&
       char_types[kanji_end + 1] == normalize::CharType::Kanji) {
     const size_t end_pos = kanji_end + 2;
     const bool second_kanji_is_single =
@@ -946,11 +936,8 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
   // e.g., さん, くん, ちゃん, たん should split as NOUN + SUFFIX
   // This is a grammatical pattern: hiragana ending with ん after single kanji
   // is typically an honorific suffix, not a compound noun
-  if (kanji_len == 1 && hiragana_len >= 2) {
-    char32_t last_hira = codepoints[hiragana_end - 1];
-    if (last_hira == U'ん') {
-      return;
-    }
+  if (hiragana_len >= 2 && codepoints[hiragana_end - 1] == U'ん') {
+    return;
   }
 
   // Check if pattern looks like a grammatical suffix

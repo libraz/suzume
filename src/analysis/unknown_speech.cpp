@@ -71,6 +71,22 @@ bool startsLongerDictionaryWord(const std::vector<char32_t>& codepoints, size_t 
   return false;
 }
 
+// A mimetic adverb over [start, end); an empty span appends nothing.
+void appendMimeticAdverb(const std::vector<char32_t>& codepoints, size_t start, size_t end, float cost,
+                         [[maybe_unused]] float confidence, [[maybe_unused]] const char* pattern,
+                         std::vector<UnknownCandidate>& candidates) {
+  std::string surface = extractSubstring(codepoints, start, end);
+  if (surface.empty()) {
+    return;
+  }
+  auto cand = makeCandidate(surface, start, end, core::PartOfSpeech::Adverb, cost, true, CandidateOrigin::Onomatopoeia);
+#ifdef SUZUME_DEBUG_INFO
+  cand.confidence = confidence;
+  cand.pattern = pattern;
+#endif
+  candidates.push_back(std::move(cand));
+}
+
 }  // namespace
 
 void UnknownWordGenerator::generateCharacterSpeechCandidates(std::string_view /*text*/,
@@ -469,16 +485,7 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
     if (!halves_match) {
       continue;
     }
-    std::string surface = extractSubstring(codepoints, start_pos, doubled_end);
-    if (!surface.empty()) {
-      auto cand = makeCandidate(surface, start_pos, doubled_end, core::PartOfSpeech::Adverb, 0.1F, true,
-                                CandidateOrigin::Onomatopoeia);
-#ifdef SUZUME_DEBUG_INFO
-      cand.confidence = 1.0F;
-      cand.pattern = "reduplicated_prefix";
-#endif
-      candidates.push_back(cand);
-    }
+    appendMimeticAdverb(codepoints, start_pos, doubled_end, 0.1F, 1.0F, "reduplicated_prefix", candidates);
     break;
   }
 
@@ -563,13 +570,8 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
       }
     }
     if (pattern != nullptr) {
-      auto cand = makeCandidate(codepoints, start_pos, pattern_end, core::PartOfSpeech::Adverb,
-                                candidate::kMimeticNtoAdverbBonus, true, CandidateOrigin::Onomatopoeia);
-#ifdef SUZUME_DEBUG_INFO
-      cand.confidence = candidate::kHighOriginConfidence;
-      cand.pattern = pattern;
-#endif
-      candidates.push_back(std::move(cand));
+      appendMimeticAdverb(codepoints, start_pos, pattern_end, candidate::kMimeticNtoAdverbBonus,
+                          candidate::kHighOriginConfidence, pattern, candidates);
     }
   }
 
@@ -598,13 +600,8 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
       if (!licensed) {
         continue;
       }
-      auto cand = makeCandidate(codepoints, start_pos, form_end, core::PartOfSpeech::Adverb,
-                                candidate::kMimeticAlternatingNasalAdverbCost, true, CandidateOrigin::Onomatopoeia);
-#ifdef SUZUME_DEBUG_INFO
-      cand.confidence = candidate::kHighOriginConfidence;
-      cand.pattern = "alternating_nasal_mimetic";
-#endif
-      candidates.push_back(std::move(cand));
+      appendMimeticAdverb(codepoints, start_pos, form_end, candidate::kMimeticAlternatingNasalAdverbCost,
+                          candidate::kHighOriginConfidence, "alternating_nasal_mimetic", candidates);
     }
   }
 
@@ -628,16 +625,7 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
                                      core::PartOfSpeech::Verb) != nullptr;
       if (!normalize::isParticleCodepoint(first) && !isBareVowelMora(first) && !kana::isRaColumnCodepoint(first) &&
           !is_godan_ra_continuative) {
-        std::string surface = extractSubstring(codepoints, start_pos, start_pos + 3);
-        if (!surface.empty()) {
-          auto cand = makeCandidate(surface, start_pos, start_pos + 3, core::PartOfSpeech::Adverb, 0.7F, true,
-                                    CandidateOrigin::Onomatopoeia);
-#ifdef SUZUME_DEBUG_INFO
-          cand.confidence = 0.7F;
-          cand.pattern = "ab_ri_pattern";
-#endif
-          candidates.push_back(cand);
-        }
+        appendMimeticAdverb(codepoints, start_pos, start_pos + 3, 0.7F, 0.7F, "ab_ri_pattern", candidates);
       }
     }
 
@@ -654,15 +642,9 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
           dict_manager_ != nullptr && hasExactPartOfSpeech(*dict_manager_, predicate_stem, kPredicateMask);
       const bool is_conjunctive_auxiliary_tail = has_exact_predicate_stem && tail_particle != nullptr &&
                                                  tail_particle->extended_pos == core::ExtendedPOS::ParticleConj;
-      std::string surface = extractSubstring(codepoints, start_pos, start_pos + 4);
-      if (!surface.empty() && !is_conjunctive_auxiliary_tail) {
-        auto cand = makeCandidate(surface, start_pos, start_pos + 4, core::PartOfSpeech::Adverb,
-                                  candidate::kMimeticSokuonMannerAdverbCost, true, CandidateOrigin::Onomatopoeia);
-#ifdef SUZUME_DEBUG_INFO
-        cand.confidence = candidate::kMimeticSokuonMannerConfidence;
-        cand.pattern = "xtu_cv_ri_pattern";
-#endif
-        candidates.push_back(cand);
+      if (!is_conjunctive_auxiliary_tail) {
+        appendMimeticAdverb(codepoints, start_pos, start_pos + 4, candidate::kMimeticSokuonMannerAdverbCost,
+                            candidate::kMimeticSokuonMannerConfidence, "xtu_cv_ri_pattern", candidates);
       }
     }
 
@@ -672,16 +654,8 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
     // predicate instead of treating its first mora as a verb stem.
     if (seq_len >= 4 && isSmallKanaAt(start_pos + 1) && codepoints[start_pos + 3] == U'ら' &&
         !normalize::isParticleCodepoint(codepoints[start_pos])) {
-      std::string surface = extractSubstring(codepoints, start_pos, start_pos + 4);
-      if (!surface.empty()) {
-        auto cand = makeCandidate(surface, start_pos, start_pos + 4, core::PartOfSpeech::Adverb,
-                                  candidate::kMimeticSokuonMannerAdverbCost, true, CandidateOrigin::Onomatopoeia);
-#ifdef SUZUME_DEBUG_INFO
-        cand.confidence = candidate::kMimeticSokuonMannerConfidence;
-        cand.pattern = "xtu_cv_ra_pattern";
-#endif
-        candidates.push_back(cand);
-      }
+      appendMimeticAdverb(codepoints, start_pos, start_pos + 4, candidate::kMimeticSokuonMannerAdverbCost,
+                          candidate::kMimeticSokuonMannerConfidence, "xtu_cv_ra_pattern", candidates);
     }
   }
 
@@ -691,16 +665,8 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
   // does not absorb ordinary one-mora words or particle sequences.
   if (seq_len >= 4 && start_type == normalize::CharType::Hiragana && codepoints[start_pos + 2] == U'ん' &&
       codepoints[start_pos + 3] == U'と' && !normalize::isParticleCodepoint(codepoints[start_pos])) {
-    std::string surface = extractSubstring(codepoints, start_pos, start_pos + 4);
-    if (!surface.empty()) {
-      auto cand = makeCandidate(surface, start_pos, start_pos + 4, core::PartOfSpeech::Adverb,
-                                candidate::kMimeticNtoAdverbBonus, true, CandidateOrigin::Onomatopoeia);
-#ifdef SUZUME_DEBUG_INFO
-      cand.confidence = candidate::kHighOriginConfidence;
-      cand.pattern = "xx_nto_pattern";
-#endif
-      candidates.push_back(cand);
-    }
+    appendMimeticAdverb(codepoints, start_pos, start_pos + 4, candidate::kMimeticNtoAdverbBonus,
+                        candidate::kHighOriginConfidence, "xx_nto_pattern", candidates);
   }
 
   // Try Xっと pattern for onomatopoeia adverbs (はっと, ぐっと, どきっと, ぷるんっと)
