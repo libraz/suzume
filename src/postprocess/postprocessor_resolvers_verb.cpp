@@ -448,6 +448,26 @@ void resolveTearuAuxiliary(std::vector<core::Morpheme>& result) {
   }
 }
 
+// In P+なら+P+で (行くなら行くで, 高いなら高いで) the echoed predicate takes
+// the copula's continuative: the clause is nominalized as "if P, then being P",
+// so で is the copula, not the case particle.
+void resolveEchoedConditionalCopula(std::vector<core::Morpheme>& result) {
+  for (size_t idx = 3; idx < result.size(); ++idx) {
+    auto& de = result[idx];
+    const auto& echo = result[idx - 1];
+    const auto& conditional = result[idx - 2];
+    const auto& predicate = result[idx - 3];
+    const bool echoed_predicate = (echo.pos == core::PartOfSpeech::Verb || echo.pos == core::PartOfSpeech::Adjective) &&
+                                  !echo.lemma.empty() && echo.lemma == predicate.lemma;
+    if (!echoed_predicate || de.pos != core::PartOfSpeech::Particle || !utf8::equalsAny(de.surface, {"で"}) ||
+        !utf8::equalsAny(conditional.surface, {"なら", "たら"})) {
+      continue;
+    }
+    retag(de, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxCopulaDa, "だ", dictionary::ConjugationType::None,
+          grammar::ConjForm::Renyokei);
+  }
+}
+
 // The Kuruwa-kotoba polite ending ありんす contains the continuative lexical
 // verb あり followed by the archaic auxiliary ん and the verb す. When it
 // follows copular で, the lattice can otherwise reinterpret あり as a copula

@@ -66,6 +66,7 @@ void resolveSahenRenyokei(std::vector<core::Morpheme>& result);
 void splitFormalNounCopularDemo(std::vector<core::Morpheme>& result);
 void resolveSimilitudeYou(std::vector<core::Morpheme>& result);
 void resolveTearuAuxiliary(std::vector<core::Morpheme>& result);
+void resolveEchoedConditionalCopula(std::vector<core::Morpheme>& result);
 void resolveTendencySuffixCopula(std::vector<core::Morpheme>& result);
 void resolveVerbTeParticle(std::vector<core::Morpheme>& result);
 void retagAdverbialSou(core::Morpheme& morpheme);
