@@ -102,13 +102,7 @@ void encodeUtf8(char32_t codepoint, std::string& out) {
 }
 
 size_t utf8Length(std::string_view str) {
-  size_t count = 0;
-  size_t pos = 0;
-  while (pos < str.size()) {
-    decodeUtf8(str, pos);
-    ++count;
-  }
-  return count;
+  return byteToCharOffset(str, str.size());
 }
 
 size_t charToByteOffset(std::string_view str, size_t char_index) {

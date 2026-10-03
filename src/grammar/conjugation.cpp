@@ -120,7 +120,7 @@ namespace {
 // カ変 is one irregular paradigm written three ways. The two kanji spellings
 // are a closed lexical set — the old form 來る is still current in classical
 // and pre-reform text — while every inflected cell is derived from them.
-constexpr std::array<std::string_view, 2> kKuruKanjiBaseForms = {"来る", "來る"};
+constexpr std::string_view kKuruKanjiBaseForms[] = {"来る", "來る"};
 
 }  // namespace
 
@@ -201,12 +201,7 @@ bool isKuruKanjiStem(char32_t code) {
 }
 
 bool isKuruKanjiBaseForm(std::string_view base_form) {
-  for (const std::string_view kanji_base : kKuruKanjiBaseForms) {
-    if (base_form == kanji_base) {
-      return true;
-    }
-  }
-  return false;
+  return utf8::equalsAny(base_form, kKuruKanjiBaseForms);
 }
 
 std::string kuruBaseFormOf(char32_t kanji_stem) {
@@ -229,15 +224,10 @@ bool isUOnbinStem(std::string_view stem) {
   // 五段ワ行のう音便は生産規則ではなく、閉じた語彙的サブクラスである。
   // This list is the same kind of lexical irregularity as 行く's 促音便;
   // callers must not infer it from the final vowel alone.
-  static constexpr std::array<std::string_view, 7> kUOnbinStems = {
+  static constexpr std::string_view kUOnbinStems[] = {
       "問", "請", "乞", "厭", "慕", "添", "訪",
   };
-  for (const std::string_view candidate : kUOnbinStems) {
-    if (stem == candidate) {
-      return true;
-    }
-  }
-  return false;
+  return utf8::equalsAny(stem, kUOnbinStems);
 }
 
 std::string onbinFormOf(const Conjugation::GodanRow& row) {

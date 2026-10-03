@@ -216,24 +216,21 @@ struct Suzume::Impl {
     return postprocess::PostprocessOptions{merge_noun_compounds, opts.lemmatize, opts.remove_symbols};
   }
 
-  void warnDictionaryLoad(const std::string& path, const core::Error& error) {
-    std::string message = "Failed to auto-load dictionary " + path + ": " + error.message;
-    dictionary_warnings.push_back(message);
+  void warnDictionary(std::string message) {
 #ifndef SUZUME_USE_EMBEDDED_DICT
     if (options.report_scorer_config) {
       std::cerr << "[dictionary] " << message << "\n";
     }
 #endif
+    dictionary_warnings.push_back(std::move(message));
+  }
+
+  void warnDictionaryLoad(const std::string& path, const core::Error& error) {
+    warnDictionary("Failed to auto-load dictionary " + path + ": " + error.message);
   }
 
   void warnDictionaryMissing(const std::string& filename) {
-    const std::string message = "Dictionary not found in automatic search paths: " + filename;
-    dictionary_warnings.push_back(message);
-#ifndef SUZUME_USE_EMBEDDED_DICT
-    if (options.report_scorer_config) {
-      std::cerr << "[dictionary] " << message << "\n";
-    }
-#endif
+    warnDictionary("Dictionary not found in automatic search paths: " + filename);
   }
 
   void appendDictionaryWarnings(std::vector<std::string> warnings) {
@@ -429,8 +426,7 @@ std::vector<core::Morpheme> Suzume::analyzeDebug(std::string_view text, core::La
 }
 
 std::vector<postprocess::TagEntry> Suzume::generateTags(std::string_view text) const {
-  auto result = generateTagsResult(text);
-  return result.hasValue() ? std::move(result).value() : std::vector<postprocess::TagEntry>{};
+  return generateTags(text, impl_->options.tag_options);
 }
 
 std::vector<postprocess::TagEntry> Suzume::generateTags(std::string_view text,

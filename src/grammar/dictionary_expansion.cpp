@@ -41,29 +41,9 @@ constexpr IAdjectiveSuffix kIAdjectiveSuffixes[] = {
 };
 
 dictionary::DictionaryEntry makeBaseEntry(const dictionary::SourceEntry& source_entry) {
-  dictionary::DictionaryEntry entry;
-  entry.surface = source_entry.surface;
-  entry.pos = source_entry.pos;
-  entry.lemma = source_entry.lemma.empty() ? source_entry.surface : source_entry.lemma;
-
-  switch (source_entry.conj_type) {
-    case dictionary::ConjugationType::Interjection:
-      // Listed interjections are the greetings; the exclamations are L1.
-      entry.extended_pos = core::ExtendedPOS::InterjectionGreeting;
-      break;
-    case dictionary::ConjugationType::NaAdjective:
-      entry.extended_pos = core::ExtendedPOS::AdjNaAdj;
-      break;
-    case dictionary::ConjugationType::ProperFamily:
-      entry.extended_pos = core::ExtendedPOS::NounProperFamily;
-      break;
-    case dictionary::ConjugationType::ProperGiven:
-      entry.extended_pos = core::ExtendedPOS::NounProperGiven;
-      break;
-    default:
-      entry.extended_pos =
-          source_entry.is_proper_noun ? core::ExtendedPOS::NounProper : core::posToExtendedPos(entry.pos);
-      break;
+  dictionary::DictionaryEntry entry = dictionary::sourceToDictionaryEntry(source_entry);
+  if (entry.lemma.empty()) {
+    entry.lemma = entry.surface;
   }
   return entry;
 }

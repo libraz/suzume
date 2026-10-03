@@ -15,15 +15,6 @@ struct ParsedRecord {
   std::string error;
 };
 
-std::string trimAsciiWhitespace(std::string_view field) {
-  const size_t field_start = field.find_first_not_of(" \t\r\n");
-  if (field_start == std::string_view::npos) {
-    return "";
-  }
-  const size_t field_end = field.find_last_not_of(" \t\r\n");
-  return std::string(field.substr(field_start, field_end - field_start + 1));
-}
-
 std::string_view trimAsciiWhitespaceView(std::string_view field) {
   const size_t field_start = field.find_first_not_of(" \t\r\n");
   if (field_start == std::string_view::npos) {
@@ -31,6 +22,10 @@ std::string_view trimAsciiWhitespaceView(std::string_view field) {
   }
   const size_t field_end = field.find_last_not_of(" \t\r\n");
   return field.substr(field_start, field_end - field_start + 1);
+}
+
+std::string trimAsciiWhitespace(std::string_view field) {
+  return std::string(trimAsciiWhitespaceView(field));
 }
 
 bool isAsciiHorizontalWhitespace(char chr) {
