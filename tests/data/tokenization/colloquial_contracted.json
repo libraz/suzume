@@ -929,6 +929,40 @@
       ],
       "id": "kamone",
       "input": "かもねぇ"
+    },
+    {
+      "description": "すごくねえ - regression test",
+      "expected": [
+        {
+          "lemma": "すごい",
+          "pos": "Adjective",
+          "surface": "すごく"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ねえ"
+        }
+      ],
+      "id": "sugokunee",
+      "input": "すごくねえ"
+    },
+    {
+      "description": "すごくねぇ - regression test",
+      "expected": [
+        {
+          "lemma": "すごい",
+          "pos": "Adjective",
+          "surface": "すごく"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ねぇ"
+        }
+      ],
+      "id": "sugokune",
+      "input": "すごくねぇ"
     }
   ],
   "description": "colloquial_contracted tests",
