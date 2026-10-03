@@ -2419,6 +2419,35 @@
       ],
       "id": "wotakusan_ttta",
       "input": "本をたくさん買った。"
+    },
+    {
+      "description": "すんなり - regression test",
+      "expected": [
+        {
+          "lemma": "すんなり",
+          "pos": "Adverb",
+          "surface": "すんなり"
+        }
+      ],
+      "id": "sunnari",
+      "input": "すんなり"
+    },
+    {
+      "description": "すんなり通る - regression test",
+      "expected": [
+        {
+          "lemma": "すんなり",
+          "pos": "Adverb",
+          "surface": "すんなり"
+        },
+        {
+          "lemma": "通る",
+          "pos": "Verb",
+          "surface": "通る"
+        }
+      ],
+      "id": "sunnari_ru",
+      "input": "すんなり通る"
     }
   ],
   "description": "General adverbs (part 2/2)",
