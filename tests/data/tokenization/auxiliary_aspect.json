@@ -194,6 +194,141 @@
       ],
       "id": "ganainode_gu",
       "input": "時間がないので急ぐ"
+    },
+    {
+      "description": "書いておらず - regression test",
+      "expected": [
+        {
+          "lemma": "書く",
+          "pos": "Verb",
+          "surface": "書い"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "おる",
+          "pos": "Auxiliary",
+          "surface": "おら"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ず"
+        }
+      ],
+      "id": "iteorazu",
+      "input": "書いておらず"
+    },
+    {
+      "description": "読んでおらず - regression test",
+      "expected": [
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読ん"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "おる",
+          "pos": "Auxiliary",
+          "surface": "おら"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ず"
+        }
+      ],
+      "id": "ndeorazu",
+      "input": "読んでおらず"
+    },
+    {
+      "description": "至っておらず - regression test",
+      "expected": [
+        {
+          "lemma": "至る",
+          "pos": "Verb",
+          "surface": "至っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "おる",
+          "pos": "Auxiliary",
+          "surface": "おら"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ず"
+        }
+      ],
+      "id": "ttteorazu",
+      "input": "至っておらず"
+    },
+    {
+      "description": "至ってません - regression test",
+      "expected": [
+        {
+          "lemma": "至る",
+          "pos": "Verb",
+          "surface": "至っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ませ"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        }
+      ],
+      "id": "tttemasen",
+      "input": "至ってません"
+    },
+    {
+      "description": "書いておらない - regression test",
+      "expected": [
+        {
+          "lemma": "書く",
+          "pos": "Verb",
+          "surface": "書い"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "おる",
+          "pos": "Auxiliary",
+          "surface": "おら"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "iteoranai",
+      "input": "書いておらない"
     }
   ],
   "description": "auxiliary_aspect tests",
