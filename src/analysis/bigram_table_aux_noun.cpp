@@ -23,6 +23,8 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       {EPOS::ParticleTopic, EPOS::AuxTenseMasu, cost::kSevere},
       {EPOS::ParticleBinding, EPOS::AuxTenseMasu, cost::kSevere},
       {EPOS::ParticleAdverbial, EPOS::AuxTenseMasu, cost::kSevere},
+      {EPOS::ParticleConj, EPOS::AuxTenseMasu, cost::kSevere},
+      {EPOS::ParticleConjFinite, EPOS::AuxTenseMasu, cost::kSevere},
 
       // AuxTenseMasu → AuxNegativeNu (ませ+ん for polite negative) - strong bonus
       // Ensures ません → ませ+ん (aux) over ませ+ん (particle の)

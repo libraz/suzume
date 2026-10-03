@@ -252,9 +252,11 @@ float computeSuffixShortVerbBonus(const core::LatticeEdge& prev, const core::Lat
   // The Sino-Japanese honorific ご takes a Sino-Japanese nominal, which is
   // written in kanji (ご確認, ご案内). A pure-hiragana host after it is a
   // native word, which takes お instead, so the pair is an accidental split of
-  // a longer kana word (ごとき as ご+とき).
+  // a longer kana word (ごとき as ご+とき). The exception is a kana verbal
+  // noun whose する frame proves its right boundary (ご+あんない+します).
   if (prev.extended_pos == core::ExtendedPOS::Prefix && grammar::isSinoHonorificPrefix(prev.surface) &&
-      next.pos == core::PartOfSpeech::Noun && grammar::isPureHiragana(next.surface)) {
+      next.pos == core::PartOfSpeech::Noun && grammar::isPureHiragana(next.surface) &&
+      next.origin != core::CandidateOrigin::SelectedNominalHead) {
     SUZUME_CONNECTION_ADD(bonus, sc::kPenaltyClosedClassBoundary);
   }
 

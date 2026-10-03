@@ -731,8 +731,10 @@ void Postprocessor::convertPrefixVerbToNoun(std::vector<core::Morpheme>& morphem
         // Restore a nominally homographic stem when a following humble or
         // honorific subsidiary supplies decisive verbal context:
         // お+知らせ+いたす, お+使い+いただく. This mirrors the preservation
-        // rule below for stems that already reached the lattice as verbs.
-        if (morpheme.pos == core::PartOfSpeech::Noun && i + 1 < morphemes.size() &&
+        // rule below for stems that already reached the lattice as verbs. ご
+        // takes a Sino-Japanese verbal noun instead (ご+あんない+いたす).
+        if (morpheme.pos == core::PartOfSpeech::Noun && !grammar::isSinoHonorificPrefix(prefix_surface) &&
+            i + 1 < morphemes.size() &&
             (grammar::isHumbleHonorificLemma(morphemes[i + 1].lemma) ||
              grammar::isPotentialBenefactiveLemma(morphemes[i + 1].lemma))) {
           const char32_t morpheme_last = utf8::decodeLastChar(morpheme.surface);
@@ -745,9 +747,11 @@ void Postprocessor::convertPrefixVerbToNoun(std::vector<core::Morpheme>& morphem
             morpheme.extended_pos = core::ExtendedPOS::VerbRenyokei;
           }
         }
-        if (morpheme.pos == core::PartOfSpeech::Noun && i + 1 < morphemes.size() &&
-            morphemes[i + 1].extended_pos == core::ExtendedPOS::VerbRenyokei && morphemes[i + 1].surface == "し" &&
-            morphemes[i + 1].lemma == "する") {
+        // ご prefixes a Sino-Japanese verbal noun (ご+あんない+し), which is
+        // not a native continuative even when it ends in i/e.
+        if (morpheme.pos == core::PartOfSpeech::Noun && !grammar::isSinoHonorificPrefix(prefix_surface) &&
+            i + 1 < morphemes.size() && morphemes[i + 1].extended_pos == core::ExtendedPOS::VerbRenyokei &&
+            morphemes[i + 1].surface == "し" && morphemes[i + 1].lemma == "する") {
           const char32_t stem_last = utf8::decodeLastChar(morpheme.surface);
           if (grammar::isIRowCodepoint(stem_last)) {
             resolver::retagGodanRenyokeiFromIRow(morpheme, true);

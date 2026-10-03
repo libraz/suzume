@@ -135,6 +135,10 @@ void setParticleAndLexicalPenaltyCosts(BigramMatrix& table) {
       {EPOS::Prefix, EPOS::ParticleAdverbial, cost::kAlmostNever},
       {EPOS::Prefix, EPOS::ParticleNo, cost::kAlmostNever},
       {EPOS::Prefix, EPOS::ParticleBinding, cost::kAlmostNever},
+      // Nor can a determiner host one: it is itself an adnominal, not a nominal
+      // (ご|あんな|… against ご|あんない|し).
+      {EPOS::Prefix, EPOS::Determiner, cost::kAlmostNever},
+      {EPOS::Prefix, EPOS::DeterminerQuotative, cost::kAlmostNever},
 
       // A prefix opens the word it binds to, so it needs a word boundary on its
       // left as well. An unreadable run is the one thing that supplies none: the
@@ -142,6 +146,9 @@ void setParticleAndLexicalPenaltyCosts(BigramMatrix& table) {
       // right pays for cutting the run in half (りん|ご|美味 instead of
       // りんご|美味).
       {EPOS::Other, EPOS::Prefix, cost::kRare},
+      // A determiner opens its phrase the same way, so it cannot start inside
+      // an unreadable run either (ご|あんな|… inside ごあんない).
+      {EPOS::Other, EPOS::Determiner, cost::kRare},
 
       // Particles do not introduce interjections within a running phrase.
       {EPOS::ParticleCase, EPOS::Interjection, cost::kAlmostNever},

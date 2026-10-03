@@ -786,7 +786,7 @@ void generateReciprocalActionNounCandidates(const std::vector<char32_t>& codepoi
 
 void generateHumbleNominalCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                      const grammar::Inflection& inflection,
-                                     const dictionary::DictionaryManager* /*dict_manager*/,
+                                     const dictionary::DictionaryManager* dict_manager,
                                      std::vector<UnknownCandidate>& candidates) {
   if (start_pos == 0 || start_pos >= codepoints.size()) {
     return;
@@ -823,6 +823,48 @@ void generateHumbleNominalCandidates(const std::vector<char32_t>& codepoints, si
     // left with nothing to oppose the fabricated verb.
     const std::string stem = extractSubstring(codepoints, start_pos, end_pos);
     if (!grammar::isPureHiragana(stem)) {
+      continue;
+    }
+    // ご prefixes a Sino-Japanese verbal noun spelled in kana (ご+あんない+し+
+    // ます), which carries no continuative shape to check.
+    if (grammar::isSinoHonorificPrefix(extractSubstring(codepoints, start_pos - 1, start_pos))) {
+      // A registered word opening on the ご mora owns it (ござい+ます, ごろごろ).
+      bool prefix_is_word_head = false;
+      if (dict_manager != nullptr) {
+        for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, start_pos - 1, end_pos + 1)) {
+          prefix_is_word_head = prefix_is_word_head || (match.entry != nullptr && match.length >= 2 &&
+                                                        match.entry->pos != core::PartOfSpeech::Prefix &&
+                                                        match.entry->pos != core::PartOfSpeech::Suffix);
+        }
+      }
+      // So does a godan-sa verb whose continuative is the frame's し (ごまかし+ます).
+      bool spans_godan_sa_continuative = false;
+      if (suru_head == U'し') {
+        for (const auto& cand : analysesInRange(inflection, codepoints, start_pos - 1, end_pos + 1)) {
+          spans_godan_sa_continuative =
+              spans_godan_sa_continuative || (cand.verb_type == grammar::VerbType::GodanSa &&
+                                              cand.confidence > candidate::kHumbleNominalStemMinConfidence);
+        }
+      }
+      // A case particle before する is the Nにする/Nとする frame, not the
+      // noun's last mora (ごはん+に+します).
+      const bool closes_on_case_particle =
+          dict_manager != nullptr &&
+          lookupEntryInRange(*dict_manager, codepoints, end_pos - 1, end_pos, core::PartOfSpeech::Particle) !=
+              nullptr &&
+          lookupEntryInRange(*dict_manager, codepoints, end_pos - 1, end_pos, core::PartOfSpeech::Particle)
+                  ->extended_pos == core::ExtendedPOS::ParticleCase;
+      if (prefix_is_word_head || spans_godan_sa_continuative || closes_on_case_particle) {
+        continue;
+      }
+      SUZUME_DEBUG_LOG_VERBOSE("[NOMINAL_CAND] \"" << stem << "\" kana verbal noun after ご\n");
+      // The prefix and the する frame prove both boundaries of the head.
+      auto cand = makeCandidate(stem, start_pos, end_pos, core::PartOfSpeech::Noun,
+                                candidate::kHumbleNominalCandidateBonus, true, CandidateOrigin::SelectedNominalHead);
+#ifdef SUZUME_DEBUG_INFO
+      cand.pattern = "humble_kana_verbal_noun";
+#endif
+      candidates.push_back(cand);
       continue;
     }
     // A continuative ends in an e-row or i-row mora. Without this the a-row

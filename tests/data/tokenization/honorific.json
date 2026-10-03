@@ -498,6 +498,151 @@
       ],
       "id": "otazuneshimasu",
       "input": "おたずねします"
+    },
+    {
+      "description": "ご + kana Sino-Japanese verbal noun + します: the prefix and the する frame bound the noun",
+      "expected": [
+        {
+          "lemma": "ご",
+          "pos": "Prefix",
+          "surface": "ご"
+        },
+        {
+          "lemma": "あんない",
+          "pos": "Noun",
+          "surface": "あんない"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "goannaishimasu",
+      "input": "ごあんないします"
+    },
+    {
+      "description": "ご + kana verbal noun + polite past; no determiner may open inside the prefixed run",
+      "expected": [
+        {
+          "lemma": "ご",
+          "pos": "Prefix",
+          "surface": "ご"
+        },
+        {
+          "lemma": "れんらく",
+          "pos": "Noun",
+          "surface": "れんらく"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "まし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "gorenrakushimashita",
+      "input": "ごれんらくしました"
+    },
+    {
+      "description": "ご + kana verbal noun + humble いたす: ご takes a Sino-Japanese noun, never a native continuative",
+      "expected": [
+        {
+          "lemma": "ご",
+          "pos": "Prefix",
+          "surface": "ご"
+        },
+        {
+          "lemma": "しょうかい",
+          "pos": "Noun",
+          "surface": "しょうかい"
+        },
+        {
+          "lemma": "いたす",
+          "pos": "Verb",
+          "surface": "いたし"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "goshi_ukaiitashimasu",
+      "input": "ごしょうかいいたします"
+    },
+    {
+      "description": "ご + kana verbal noun whose head spells the determiner あんな",
+      "expected": [
+        {
+          "lemma": "ご",
+          "pos": "Prefix",
+          "surface": "ご"
+        },
+        {
+          "lemma": "あんない",
+          "pos": "Noun",
+          "surface": "あんない"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "まし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "goannaishimashita",
+      "input": "ごあんないしました"
+    },
+    {
+      "description": "Negative control: Nにする frame; the case particle is not the last mora of a ご-prefixed noun",
+      "expected": [
+        {
+          "lemma": "ごはん",
+          "pos": "Noun",
+          "surface": "ごはん"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "gohannishimasu",
+      "input": "ごはんにします"
     }
   ],
   "description": "honorific tests",

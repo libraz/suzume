@@ -46,7 +46,8 @@ bool spansConjunctionStart(const suzume::analysis::UnknownCandidate& candidate, 
   if (dict_manager == nullptr || candidate.end <= candidate.start + 1) {
     return false;
   }
-  if (candidate.lemma_verified ||
+  // A selected nominal head has both boundaries proven by its context.
+  if (candidate.lemma_verified || candidate.origin == suzume::core::CandidateOrigin::SelectedNominalHead ||
       (candidate.pos == suzume::core::PartOfSpeech::Verb && !candidate.lemma.empty() &&
        dict_manager->lookupExact(candidate.lemma, suzume::core::PartOfSpeech::Verb) != nullptr)) {
     return false;

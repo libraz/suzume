@@ -1491,10 +1491,15 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
           }
         }
       }
+      // ご before kana is the Sino-Japanese honorific on a kana verbal noun
+      // (ご+あんない+します); a rescue would swallow the prefix into the noun.
+      const bool opens_on_sino_prefix =
+          grammar::isSinoHonorificPrefix(extractSubstring(codepoints, start_pos, start_pos + 1));
       if ((len >= min_len || short_bos_preparatory_homograph) &&
           (right_particle || right_clause || right_auxiliary || right_kanji_word) && !crossed_verified_predicate &&
           !cuts_into_predicate && !opens_on_irrealis_chain && !has_inflected_predicate_reading &&
-          !spells_contracted_hypothetical && !steals_formal_noun_head && !absorbs_copula_before_sokuon_final &&
+          !opens_on_sino_prefix && !spells_contracted_hypothetical && !steals_formal_noun_head &&
+          !absorbs_copula_before_sokuon_final &&
           (!hasAuxiliaryParticleDecomposition(codepoints, start_pos, scan, dict_manager_) ||
            has_deverbal_noun_shape_before_genitive || copula_selected_predicate_homograph) &&
           (!hasFunctionWordChainDecomposition(codepoints, start_pos, scan, dict_manager_) ||

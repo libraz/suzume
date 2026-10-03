@@ -594,6 +594,55 @@
       ],
       "id": "darekashitano",
       "input": "だれかしたの"
+    },
+    {
+      "description": "Negative control: a kana godan-sa verb opening on ご is not ご + verbal noun + する",
+      "expected": [
+        {
+          "lemma": "ごまかす",
+          "pos": "Verb",
+          "surface": "ごまかし"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "gomakashimasu",
+      "input": "ごまかします"
+    },
+    {
+      "description": "Kana godan-sa -asu verb before the polite negative: the closed し+ま tail carries the scan across か",
+      "expected": [
+        {
+          "lemma": "机",
+          "pos": "Noun",
+          "surface": "机"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "うごかす",
+          "pos": "Verb",
+          "surface": "うごかし"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ませ"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        }
+      ],
+      "id": "wougokashimasen",
+      "input": "机をうごかしません"
     }
   ],
   "description": "Godan Sa-row verbs (五段サ行動詞) - verbs ending in す",
