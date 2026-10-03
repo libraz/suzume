@@ -350,8 +350,6 @@ std::vector<Conjugation::DictionarySuffix> Conjugation::getDictionarySuffixes(Ve
     const auto& row = *row_ptr;
 
     const auto [base, a, i, e, o] = encodeGodanVowels(row);
-    std::string ta = row.voiced_ta ? "だ" : "た";
-    std::string te = row.voiced_ta ? "で" : "て";
 
     // Base form
     suffixes.push_back({base, false, core::ExtendedPOS::VerbShuushikei});
