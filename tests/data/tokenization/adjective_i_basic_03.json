@@ -1494,6 +1494,45 @@
       ],
       "id": "kawairashikute_sai",
       "input": "かわいらしくて小さい。"
+    },
+    {
+      "description": "わざとらしい態度だ。 - regression test",
+      "expected": [
+        {
+          "lemma": "わざとらしい",
+          "pos": "Adjective",
+          "surface": "わざとらしい"
+        },
+        {
+          "lemma": "態度",
+          "pos": "Noun",
+          "surface": "態度"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "wazatorashii_da",
+      "input": "わざとらしい態度だ。"
+    },
+    {
+      "description": "わざとらしく笑う。 - regression test",
+      "expected": [
+        {
+          "lemma": "わざとらしい",
+          "pos": "Adjective",
+          "surface": "わざとらしく"
+        },
+        {
+          "lemma": "笑う",
+          "pos": "Verb",
+          "surface": "笑う"
+        }
+      ],
+      "id": "wazatorashiku_u",
+      "input": "わざとらしく笑う。"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 3/3)",

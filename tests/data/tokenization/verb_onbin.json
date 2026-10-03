@@ -75,6 +75,75 @@
       ],
       "id": "banderu",
       "input": "汗ばんでる"
+    },
+    {
+      "description": "人がたくさんおった。 - regression test",
+      "expected": [
+        {
+          "lemma": "人",
+          "pos": "Noun",
+          "surface": "人"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "たくさん",
+          "pos": "Adverb",
+          "surface": "たくさん"
+        },
+        {
+          "lemma": "おる",
+          "pos": "Verb",
+          "surface": "おっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "gatakusanottta",
+      "input": "人がたくさんおった。"
+    },
+    {
+      "description": "机に本をおいた。 - regression test",
+      "expected": [
+        {
+          "lemma": "机",
+          "pos": "Noun",
+          "surface": "机"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "おく",
+          "pos": "Verb",
+          "surface": "おい"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ni_wooita",
+      "input": "机に本をおいた。"
     }
   ],
   "description": "verb_onbin tests",

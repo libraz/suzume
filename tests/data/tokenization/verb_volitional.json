@@ -785,6 +785,193 @@
       ],
       "id": "yametokottka",
       "input": "やめとこっか"
+    },
+    {
+      "description": "そろそろやめようか。 - regression test",
+      "expected": [
+        {
+          "lemma": "そろそろ",
+          "pos": "Adverb",
+          "surface": "そろそろ"
+        },
+        {
+          "lemma": "やめる",
+          "pos": "Verb",
+          "surface": "やめよ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "sorosoroyameyouka",
+      "input": "そろそろやめようか。"
+    },
+    {
+      "description": "やめようけど、また始める。 - regression test",
+      "expected": [
+        {
+          "lemma": "やめる",
+          "pos": "Verb",
+          "surface": "やめよ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        },
+        {
+          "lemma": "けど",
+          "pos": "Particle",
+          "surface": "けど"
+        },
+        {
+          "lemma": "また",
+          "pos": "Adverb",
+          "surface": "また"
+        },
+        {
+          "lemma": "始める",
+          "pos": "Verb",
+          "surface": "始める"
+        }
+      ],
+      "id": "yameyoukedo_mata_meru",
+      "input": "やめようけど、また始める。"
+    },
+    {
+      "description": "もうあきらめようか。 - regression test",
+      "expected": [
+        {
+          "lemma": "もう",
+          "pos": "Adverb",
+          "surface": "もう"
+        },
+        {
+          "lemma": "あきらめる",
+          "pos": "Verb",
+          "surface": "あきらめよ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "mouakirameyouka",
+      "input": "もうあきらめようか。"
+    },
+    {
+      "description": "プレゼントをあげようか。 - regression test",
+      "expected": [
+        {
+          "lemma": "プレゼント",
+          "pos": "Noun",
+          "surface": "プレゼント"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "あげる",
+          "pos": "Verb",
+          "surface": "あげよ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "woageyouka",
+      "input": "プレゼントをあげようか。"
+    },
+    {
+      "description": "窓をしめようか。 - regression test",
+      "expected": [
+        {
+          "lemma": "窓",
+          "pos": "Noun",
+          "surface": "窓"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "しめる",
+          "pos": "Verb",
+          "surface": "しめよ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "woshimeyouka",
+      "input": "窓をしめようか。"
+    },
+    {
+      "description": "お茶をいれようか。 - regression test",
+      "expected": [
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "茶",
+          "pos": "Noun",
+          "surface": "茶"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "いれる",
+          "pos": "Verb",
+          "surface": "いれよ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "o_woireyouka",
+      "input": "お茶をいれようか。"
     }
   ],
   "description": "verb_volitional tests",

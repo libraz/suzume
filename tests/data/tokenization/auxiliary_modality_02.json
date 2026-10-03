@@ -501,6 +501,92 @@
       ],
       "id": "datttarashii",
       "input": "雨だったらしい"
+    },
+    {
+      "description": "それはほんとうらしい。 - regression test",
+      "expected": [
+        {
+          "lemma": "それ",
+          "pos": "Pronoun",
+          "surface": "それ"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "ほんとう",
+          "pos": "Noun",
+          "surface": "ほんとう"
+        },
+        {
+          "lemma": "らしい",
+          "pos": "Auxiliary",
+          "surface": "らしい"
+        }
+      ],
+      "id": "sorehahontourashii",
+      "input": "それはほんとうらしい。"
+    },
+    {
+      "description": "それはほんとうだ。 - regression test",
+      "expected": [
+        {
+          "lemma": "それ",
+          "pos": "Pronoun",
+          "surface": "それ"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "ほんとう",
+          "pos": "Noun",
+          "surface": "ほんとう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "sorehahontouda",
+      "input": "それはほんとうだ。"
+    },
+    {
+      "description": "ほんとうの話をする。 - regression test",
+      "expected": [
+        {
+          "lemma": "ほんとう",
+          "pos": "Noun",
+          "surface": "ほんとう"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "話",
+          "pos": "Noun",
+          "surface": "話"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "hontouno_wosuru",
+      "input": "ほんとうの話をする。"
     }
   ],
   "description": "Modality auxiliaries (たい、そう、らしい) (part 2/2)",

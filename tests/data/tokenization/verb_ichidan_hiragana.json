@@ -65,6 +65,70 @@
       ],
       "id": "gasameru",
       "input": "目がさめる"
+    },
+    {
+      "description": "お茶をいれます。 - regression test",
+      "expected": [
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "茶",
+          "pos": "Noun",
+          "surface": "茶"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "いれる",
+          "pos": "Verb",
+          "surface": "いれ"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "o_woiremasu",
+      "input": "お茶をいれます。"
+    },
+    {
+      "description": "砂糖をいれて混ぜる。 - regression test",
+      "expected": [
+        {
+          "lemma": "砂糖",
+          "pos": "Noun",
+          "surface": "砂糖"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "いれる",
+          "pos": "Verb",
+          "surface": "いれ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "混ぜる",
+          "pos": "Verb",
+          "surface": "混ぜる"
+        }
+      ],
+      "id": "woirete_zeru",
+      "input": "砂糖をいれて混ぜる。"
     }
   ],
   "description": "verb_ichidan_hiragana tests",
