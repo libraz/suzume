@@ -1074,6 +1074,9 @@ INTERROGATIVES: set[str] = {
 # Non-自立 verb lemmas that stay as Verb (not Auxiliary)
 VERB_NOT_AUX_LEMMAS: set[str] = {
     "すぎる",
+    # The kanji spelling of the same excessive verb; the reference tags it as
+    # an auxiliary only because of its own lexicon (読みすぎる, 読み過ぎる).
+    "過ぎる",
     "くださる",
     "下さる",
     "いたす",

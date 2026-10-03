@@ -1168,7 +1168,7 @@ def apply_suzume_split(tokens: list[dict]) -> tuple[list[dict], str | None]:
             verb_lemma = base_from_renyokei(verb_part)
             if verb_lemma is not None:
                 result.append({"surface": verb_part, "pos": "動詞", "lemma": verb_lemma})
-                result.append({"surface": "過ぎ", "pos": "助動詞", "lemma": "過ぎる"})
+                result.append({"surface": "過ぎ", "pos": "動詞", "lemma": "過ぎる"})
                 if applied_rule is None:
                     applied_rule = "excessive-auxiliary-split"
                 continue

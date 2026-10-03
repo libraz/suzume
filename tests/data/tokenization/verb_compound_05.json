@@ -760,7 +760,7 @@
         },
         {
           "lemma": "過ぎる",
-          "pos": "Auxiliary",
+          "pos": "Verb",
           "surface": "過ぎる"
         }
       ],
@@ -1637,6 +1637,33 @@
       ],
       "id": "chi_waseta",
       "input": "持ち合わせた"
+    },
+    {
+      "description": "Kana excessive すぎ after a godan continuative heads a noun phrase before に, as the kanji spelling 使い過ぎに does",
+      "expected": [
+        {
+          "lemma": "使う",
+          "pos": "Verb",
+          "surface": "使い"
+        },
+        {
+          "lemma": "すぎ",
+          "pos": "Noun",
+          "surface": "すぎ"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "注意",
+          "pos": "Noun",
+          "surface": "注意"
+        }
+      ],
+      "id": "isugini",
+      "input": "使いすぎに注意"
     }
   ],
   "description": "Compound verbs (part 5/5)",

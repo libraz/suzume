@@ -229,7 +229,7 @@
         },
         {
           "lemma": "過ぎる",
-          "pos": "Auxiliary",
+          "pos": "Verb",
           "surface": "過ぎ"
         },
         {
@@ -261,7 +261,7 @@
         },
         {
           "lemma": "過ぎる",
-          "pos": "Auxiliary",
+          "pos": "Verb",
           "surface": "過ぎ"
         },
         {
@@ -315,7 +315,7 @@
         },
         {
           "lemma": "過ぎる",
-          "pos": "Auxiliary",
+          "pos": "Verb",
           "surface": "過ぎ"
         },
         {
@@ -342,7 +342,7 @@
         },
         {
           "lemma": "過ぎる",
-          "pos": "Auxiliary",
+          "pos": "Verb",
           "surface": "過ぎ"
         },
         {
@@ -364,7 +364,7 @@
         },
         {
           "lemma": "過ぎる",
-          "pos": "Auxiliary",
+          "pos": "Verb",
           "surface": "過ぎ"
         },
         {
@@ -401,7 +401,7 @@
         },
         {
           "lemma": "過ぎる",
-          "pos": "Auxiliary",
+          "pos": "Verb",
           "surface": "過ぎる"
         }
       ],
@@ -417,8 +417,8 @@
           "surface": "使い"
         },
         {
-          "lemma": "過ぎる",
-          "pos": "Auxiliary",
+          "lemma": "過ぎ",
+          "pos": "Noun",
           "surface": "過ぎ"
         },
         {

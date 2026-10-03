@@ -94,6 +94,7 @@ void resolveSouHost(std::vector<core::Morpheme>& result);
 void resolveCopulaAru(std::vector<core::Morpheme>& result);
 void mergeContractedTeruBeforeNominalizer(std::vector<core::Morpheme>& result);
 void resolveListingTari(std::vector<core::Morpheme>& result);
+void resolveExcessiveDeverbalNoun(std::vector<core::Morpheme>& result);
 void retagNaAdjectiveSurface(core::Morpheme& morpheme);
 void retagNounSurface(core::Morpheme& morpheme);
 

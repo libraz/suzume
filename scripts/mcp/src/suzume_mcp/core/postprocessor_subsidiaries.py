@@ -782,7 +782,16 @@ def postprocess_excessive_after_verb(tokens: list[dict]) -> bool:
     """
     changed = False
     for previous, token in pairwise(tokens):
-        if token.get("surface") == "すぎ" and token.get("pos") == "Suffix" and previous.get("pos") == "Verb":
+        if token.get("surface") != "すぎ" or token.get("pos") != "Suffix":
+            continue
+        # A godan continuative host comes back as a noun (読み+すぎ) where the
+        # ichidan one stays a verb (食べ+すぎ); both are the same construction.
+        if previous.get("pos") == "Noun":
+            base = base_from_renyokei(previous.get("surface", ""))
+            if base is None:
+                continue
+            previous.update(pos="Verb", lemma=base)
+        if previous.get("pos") == "Verb":
             token.update(pos="Verb", lemma="すぎる")
             changed = True
     return changed

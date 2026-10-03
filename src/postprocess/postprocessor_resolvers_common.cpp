@@ -285,4 +285,30 @@ void resolveListingTari(std::vector<core::Morpheme>& result) {
   }
 }
 
+// The excessive すぎ/過ぎ after a verb continuative heads a noun phrase when a
+// nominal-selecting element follows (使い+過ぎ+に+注意, 読み+すぎ+を+防ぐ,
+// 食べ+過ぎ+だ): a continuative cannot take を/が/の, a non-motion に, or the
+// copula, so it is the deverbal noun, as a plain continuative is (読み+に).
+void resolveExcessiveDeverbalNoun(std::vector<core::Morpheme>& result) {
+  for (size_t idx = 1; idx + 1 < result.size(); ++idx) {
+    auto& excess = result[idx];
+    if (excess.pos != core::PartOfSpeech::Verb || !utf8::equalsAny(excess.surface, {"すぎ", "過ぎ"}) ||
+        result[idx - 1].pos != core::PartOfSpeech::Verb) {
+      continue;
+    }
+    const auto& following = result[idx + 1];
+    const auto* after = idx + 2 < result.size() ? &result[idx + 2] : nullptr;
+    const bool case_particle =
+        following.pos == core::PartOfSpeech::Particle && utf8::equalsAny(following.surface, {"を", "が", "の"});
+    const bool non_motion_ni =
+        following.pos == core::PartOfSpeech::Particle && utf8::equalsAny(following.surface, {"に"}) &&
+        (after == nullptr || !utf8::equalsAny(after->getLemma(), {"行く", "来る", "いく", "くる", "ゆく"}));
+    const bool copula =
+        following.pos == core::PartOfSpeech::Auxiliary && utf8::equalsAny(following.getLemma(), {"だ", "です"});
+    if (case_particle || non_motion_ni || copula) {
+      retagNounSurface(excess);
+    }
+  }
+}
+
 }  // namespace suzume::postprocess::resolver
