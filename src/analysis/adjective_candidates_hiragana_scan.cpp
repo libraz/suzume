@@ -429,6 +429,14 @@ void adj_detail::appendHiraganaIAdjSurfaceCandidates(const std::vector<char32_t>
               verb_helpers::endsWithAuxiliaryAfterOkurigana(dict_manager, codepoints, start_pos, end_pos - 1)))) {
           continue;
         }
+        // A registered auxiliary cell before ない is that auxiliary plus the
+        // supplementary adjective (じゃ+ない), not one adjective じゃない.
+        if (utf8::endsWith(surface, "ない") && surface.size() > core::kTwoJapaneseCharBytes &&
+            verb_helpers::hasDictionaryEntry(dict_manager,
+                                             surface.substr(0, surface.size() - core::kTwoJapaneseCharBytes),
+                                             core::PartOfSpeech::Auxiliary)) {
+          continue;
+        }
         // Base cost for hiragana i-adjective candidates
         // Use slightly elevated base to avoid fragments like ろしい beating
         // kanji adjectives like 恐ろしい (kanji adj base=0.2F)

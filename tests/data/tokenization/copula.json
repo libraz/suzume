@@ -2772,6 +2772,28 @@
       ],
       "id": "futsuuda",
       "input": "ふつうだ"
+    },
+    {
+      "description": "The copula じゃ plus ない is not one generated adjective じゃない",
+      "expected": [
+        {
+          "lemma": "そう",
+          "pos": "Adverb",
+          "surface": "そう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "じゃ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
+      "id": "souji_nai",
+      "input": "そうじゃない"
     }
   ],
   "description": "Copula patterns (だ、です、である)",

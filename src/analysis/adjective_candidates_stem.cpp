@@ -267,6 +267,21 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
     return;
   }
 
+  // A one-kanji adjective stem before the kanji spelling of the excessive
+  // 過ぎる (高+過ぎる) takes the same stem reading as before すぎる; the kanji
+  // run scan below would otherwise read 高過 as one stem.
+  if (start_pos + 2 < codepoints.size() && codepoints[start_pos + 1] == U'過' && codepoints[start_pos + 2] == U'ぎ') {
+    const std::string stem = extractSubstring(codepoints, start_pos, start_pos + 1);
+    const std::string base_form = stem + "い";
+    if (isAdjectiveInDictionary(dict_manager, base_form)) {
+      const float cost = candidate::confidenceScaledCost(
+          candidate::kAdjStemBaseCost, candidate::kDictFallbackAdjConfidence, candidate::kAdjStemConfScale);
+      candidates.push_back(makeIAdjStemCandidate(stem, start_pos, start_pos + 1, base_form, cost,
+                                                 CandidateOrigin::AdjectiveI, candidate::kDictFallbackAdjConfidence,
+                                                 "adj_stem_before_kanji_excessive"));
+    }
+  }
+
   // Kanji portion (1-2 characters for adjective stem) followed by hiragana
   size_t kanji_end = findCharRegionEndBeforeHiragana(char_types, start_pos, 2, normalize::CharType::Kanji);
   if (kanji_end == start_pos) {

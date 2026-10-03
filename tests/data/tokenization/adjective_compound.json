@@ -948,6 +948,40 @@
       ],
       "id": "miyasusa",
       "input": "読みやすさ"
+    },
+    {
+      "description": "One-kanji adjective stem before the kanji spelling 過ぎる, as before すぎる",
+      "expected": [
+        {
+          "lemma": "高い",
+          "pos": "Adjective",
+          "surface": "高"
+        },
+        {
+          "lemma": "過ぎる",
+          "pos": "Verb",
+          "surface": "過ぎる"
+        }
+      ],
+      "id": "giru",
+      "input": "高過ぎる"
+    },
+    {
+      "description": "One-kanji adjective stem 安 before 過ぎる",
+      "expected": [
+        {
+          "lemma": "安い",
+          "pos": "Adjective",
+          "surface": "安"
+        },
+        {
+          "lemma": "過ぎる",
+          "pos": "Verb",
+          "surface": "過ぎる"
+        }
+      ],
+      "id": "giru_2",
+      "input": "安過ぎる"
     }
   ],
   "description": "Compound adjectives (〜やすい、〜にくい、〜すぎる)",
