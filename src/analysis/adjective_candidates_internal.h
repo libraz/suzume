@@ -218,8 +218,8 @@ bool derivesFromCompoundFormingAdjective(const std::vector<char32_t>& codepoints
  * connective て closes a clause and only ever sits at the end of an ending
  * (寒く|て), so a て with more span behind it means the analysis swallowed a whole
  * predicate: 悪くなってくる reads as a form of 悪い even though 悪く|なっ|て|くる is
- * four morphemes. Both leave the boundary to the stem path, which emits the stem
- * and lets the auxiliary or the particle attach on its own.
+ * four morphemes. The terminal い likewise ends the form it opens. All leave the boundary to the stem path, which emits
+ * the stem and lets the auxiliary or the particle attach on its own.
  */
 bool spansPastAdjectiveEnding(const std::string& surface, const std::string& base_form);
 

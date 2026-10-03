@@ -149,25 +149,29 @@ float computeLateLexicalBoundaryBonus(const core::LatticeEdge& prev, const core:
       geminate_formal_noun != assimilated_copula ||
       (prev.pos == core::PartOfSpeech::Particle && next.extended_pos == core::ExtendedPOS::NounFormal &&
        utf8::endsWith(next.surface, "っ"));
-  // A final particle spelled like a verb terminal (なう) closes a finished
-  // predicate or a nominal written outside the kana run; after a bare kana
-  // piece it is the tail of a kana verb (うし+なう for うしなう).
+  // A final particle spelled like a verb terminal (なう) closes an auxiliary
+  // or a word written outside the kana run; after a bare kana piece, even one
+  // that is itself a verb, it is the tail of a kana verb (うし+なう, つぐ+なう).
   const bool terminal_spelled_final_particle_in_kana_run =
       next.extended_pos == core::ExtendedPOS::ParticleFinal && grammar::endsWithURow(next.surface) &&
-      prev.pos != core::PartOfSpeech::Auxiliary && prev.extended_pos != core::ExtendedPOS::VerbShuushikei &&
-      prev.extended_pos != core::ExtendedPOS::AdjBasic && grammar::isPureHiragana(prev.surface);
+      prev.pos != core::PartOfSpeech::Auxiliary && grammar::isPureHiragana(prev.surface);
   // The contracted volitional っ is a cell of a predicate's volitional; a
   // nominal in front of it is a kana run cut apart (そこ+っ+か).
   const bool contracted_volitional_off_predicate =
       next.extended_pos == core::ExtendedPOS::AuxVolitional && utf8::equalsAny(next.surface, {"っ"}) &&
       prev.extended_pos != core::ExtendedPOS::VerbMizenkei && prev.pos != core::PartOfSpeech::Auxiliary;
+  // A final particle closes the utterance, so no conjunctive particle hangs
+  // off it (行こう+け+ど is 行こう+けど).
+  const bool conjunctive_after_final_particle =
+      prev.extended_pos == core::ExtendedPOS::ParticleFinal && next.extended_pos == core::ExtendedPOS::ParticleConj;
   if (invalid_aspect_iru_attachment || invalid_aspect_iku_attachment || incomplete_potential_before_symbol ||
       terminal_verb_before_ga || nonterminal_predicate_before_assertive_copula || emphatic_adverb_before_past ||
       volitional_after_stray_kanji || terminal_adjective_before_te || clipped_desu_off_nominalizer ||
       listing_ya_after_predicate || copular_aru_on_nominal || concessive_noni_before_binding ||
       attributive_na_after_final_particle || polite_copula_continuative_stranded || copula_spelled_adverb_on_nominal ||
       contracted_nominalizer_before_continuative || unpaired_assimilated_copula ||
-      terminal_spelled_final_particle_in_kana_run || contracted_volitional_off_predicate) {
+      terminal_spelled_final_particle_in_kana_run || contracted_volitional_off_predicate ||
+      conjunctive_after_final_particle) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
   if ((prev.extended_pos == core::ExtendedPOS::VerbRenyokei || prev.extended_pos == core::ExtendedPOS::VerbOnbinkei) &&

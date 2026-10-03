@@ -521,9 +521,10 @@ float scoreGodan(float base, const InflectionScoreContext& context) {
 
   // Particle + な stem penalty for GodanWa
   // E.g., もない → もなう is not a real verb. The pattern is も(PARTICLE) + ない(AUX).
-  // Stems like もな, はな, がな where first char is a particle are very suspicious
-  // for GodanWa verbs. Apply strong penalty.
-  if (type == VerbType::GodanWa && stem_len == core::kTwoJapaneseCharBytes && !containsKanji(stem)) {
+  // Only the continuative い and the onbin っ spell a particle + ない/なる
+  // (に+なっ+た); the other cells keep the kana verb (になう).
+  if (type == VerbType::GodanWa && stem_len == core::kTwoJapaneseCharBytes && !containsKanji(stem) &&
+      (required_conn == conn::kVerbRenyokei || required_conn == conn::kVerbOnbinkei)) {
     std::string_view first = stem.substr(0, core::kJapaneseCharBytes);
     std::string_view second = stem.substr(core::kJapaneseCharBytes);
     // If first char is a common particle and second is な, this is likely

@@ -73,6 +73,11 @@ bool spansPastAdjectiveEnding(const std::string& surface, const std::string& bas
   if (utf8::startsWith(ending, scorer::kSuffixSou)) {
     return true;
   }
+  // The terminal い ends every form that starts with it, so more span behind
+  // it is a following word (かわい|らしい is not a form of かわい).
+  if (utf8::startsWith(ending, "い") && ending.size() > core::kJapaneseCharBytes) {
+    return true;
+  }
   // The connective is medial only when the ending continues past it. Both
   // spellings close a clause, and the voiced one follows the same onbin stems the
   // analyzer mistakes for a stem (読ん|で|いく).

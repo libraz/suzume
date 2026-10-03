@@ -496,7 +496,9 @@ void generateSelectedNominalHeadCandidates(const std::vector<char32_t>& codepoin
   }
   for (size_t length = 2; length <= kMaximumSelectedHeadLength; ++length) {
     const size_t head_end = start_pos + length;
-    if (head_end > codepoints.size() ||
+    // A geminate mora needs the consonant after it, so no nominal closes on っ
+    // (ほんの+ちょっ+と is the adverb ちょっと read through its own ending).
+    if (head_end > codepoints.size() || codepoints[head_end - 1] == core::hiragana::kSmallTsu ||
         !isSelectedNominalHeadShape(char_types, start_pos, head_end, has_attributive_selector) ||
         !hasNominalClosingParticleAt(codepoints, head_end, dict_manager)) {
       continue;
