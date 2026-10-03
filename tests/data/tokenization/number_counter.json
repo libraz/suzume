@@ -1354,9 +1354,14 @@
           "surface": "第二"
         },
         {
-          "lemma": "次計画",
+          "lemma": "次",
           "pos": "Suffix",
-          "surface": "次計画"
+          "surface": "次"
+        },
+        {
+          "lemma": "計画",
+          "pos": "Noun",
+          "surface": "計画"
         },
         {
           "lemma": "を",
@@ -1886,6 +1891,23 @@
       ],
       "id": "masuka",
       "input": "何人来ますか"
+    },
+    {
+      "description": "Negative control: a counter kanji opening a two-kanji word stays inside it",
+      "expected": [
+        {
+          "lemma": "第2",
+          "pos": "Noun",
+          "surface": "第2"
+        },
+        {
+          "lemma": "部門",
+          "pos": "Noun",
+          "surface": "部門"
+        }
+      ],
+      "id": "2_2",
+      "input": "第2部門"
     }
   ],
   "description": "number_counter tests",

@@ -151,6 +151,8 @@ def _postprocess_kanji_merge(result: list[dict], applied_rule: str | None) -> tu
     merged = []
     for curr in result:
         surface = curr.get("surface", "")
+        # A counter closes its numeral (第二+次 | 計画).
+        after_counter = bool(merged) and merged[-1].get("pos_sub2", "") == "助数詞"
         # Suzume design: tokenizer use case prefers X+suffix as a single search
         # unit. These suffixes are not treated as token boundaries; X+SUFFIX
         # merges via kanji-merge.
@@ -206,6 +208,7 @@ def _postprocess_kanji_merge(result: list[dict], applied_rule: str | None) -> tu
                 and curr.get("pos_sub1", "") != "数"
                 and not prev_is_go_prefix
                 and not na_adjective_stem_boundary
+                and not after_counter
             )
             or (surface == "々" and _IDEOGRAPHIC_SEQUENCE.fullmatch(merged[-1].get("surface", "")))
             or (

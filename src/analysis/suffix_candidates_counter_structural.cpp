@@ -275,12 +275,14 @@ void appendStructuralCounterCandidates(const std::vector<char32_t>& codepoints, 
                                candidate::kOrdinalDigitCounterSplitBonus, core::ExtendedPOS::NounNumber,
                                "ordinal_kanji_word_prefix", candidates);
       } else if (tail_len >= 2 && codepoints[ordinal_end] == U'次') {
+        // The sequential 次 closes its ordinal; what follows is a word of its
+        // own (第二+次+計画).
         appendCounterCandidate(codepoints, start_pos, ordinal_end, core::PartOfSpeech::Noun,
                                candidate::kOrdinalSequentialSplitBonus, core::ExtendedPOS::NounNumber,
                                "ordinal_sequential_prefix", candidates);
-        appendCounterCandidate(codepoints, ordinal_end, tail_end, core::PartOfSpeech::Suffix,
+        appendCounterCandidate(codepoints, ordinal_end, ordinal_end + 1, core::PartOfSpeech::Suffix,
                                candidate::kOrdinalSequentialSplitBonus, core::ExtendedPOS::Unknown,
-                               "ordinal_sequential_tail", candidates);
+                               "ordinal_sequential_counter", candidates);
       }
     }
   }
