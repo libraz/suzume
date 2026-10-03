@@ -516,10 +516,6 @@ std::string_view longFinalParticleBeforeQuote(std::string_view surface) {
   return {};
 }
 
-bool startsContractedNjaNegative(std::string_view surface) {
-  return utf8::startsWith(surface, "んじゃない");
-}
-
 bool isPureKatakana(std::string_view stem) {
   return allCharsMatch(stem, kana::isKatakanaCodepoint);
 }

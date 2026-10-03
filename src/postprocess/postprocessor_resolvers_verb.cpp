@@ -1,5 +1,4 @@
 #include <string_view>
-#include <utility>
 
 #include "core/debug.h"
 #include "core/utf8_constants.h"
@@ -39,8 +38,7 @@ void resolveDeverbalStemBeforeDependentAuxiliary(std::vector<core::Morpheme>& re
           stem.surface + "る", dictionary::ConjugationType::Ichidan,
           (negative_n || negative_nai) ? grammar::ConjForm::Mizenkei : grammar::ConjForm::Renyokei);
     if (negative_n) {
-      retag(auxiliary, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxNegativeNu, "ん",
-            dictionary::ConjugationType::None, grammar::ConjForm::Base);
+      retagUninflected(auxiliary, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxNegativeNu, "ん");
     }
   }
 }
@@ -64,8 +62,7 @@ void resolveQuotativeParticleRoles(std::vector<core::Morpheme>& result) {
         reporting_predicate.pos != core::PartOfSpeech::Verb) {
       continue;
     }
-    retag(quote, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleQuote, "と",
-          dictionary::ConjugationType::None, grammar::ConjForm::Base);
+    retagUninflected(quote, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleQuote, "と");
   }
 
   for (size_t idx = 0; idx + 2 < result.size(); ++idx) {
@@ -77,8 +74,7 @@ void resolveQuotativeParticleRoles(std::vector<core::Morpheme>& result) {
     }
     retag(conjecture, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxConjectureRashii, "らしい",
           dictionary::ConjugationType::IAdjective, grammar::ConjForm::Base);
-    retag(quote, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleQuote, "と",
-          dictionary::ConjugationType::None, grammar::ConjForm::Base);
+    retagUninflected(quote, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleQuote, "と");
   }
 }
 
@@ -157,8 +153,7 @@ void resolveAmbiguousInflections(std::vector<core::Morpheme>& result) {
       const grammar::VerbType verb_type = grammar::verbTypeFromARowCodepoint(utf8::decodeFirstChar(a_row));
       retag(predicate, core::PartOfSpeech::Verb, core::ExtendedPOS::VerbShuushikei, predicate.surface,
             grammar::verbTypeToConjType(verb_type), grammar::ConjForm::Base);
-      retag(final_sa, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleFinal, "さ",
-            dictionary::ConjugationType::None, grammar::ConjForm::Base);
+      retagUninflected(final_sa, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleFinal, "さ");
     }
   }
 }
@@ -279,8 +274,7 @@ void resolveProgressiveIru(std::vector<core::Morpheme>& result) {
     const auto& immediate = result[idx - 1];
     const bool direct_te_form = followsTeFormConnective(immediate);
     const bool focused_te_form = idx >= 2 && immediate.extended_pos == core::ExtendedPOS::ParticleBinding &&
-                                 result[idx - 2].extended_pos == core::ExtendedPOS::ParticleConj &&
-                                 grammar::isTeDeSurface(result[idx - 2].surface);
+                                 followsTeFormConnective(result[idx - 2]);
     const bool finite_iru_form =
         iru.extended_pos == core::ExtendedPOS::VerbShuushikei || iru.extended_pos == core::ExtendedPOS::VerbRenyokei;
     if ((!direct_te_form && !focused_te_form) || iru.lemma != "いる" || !finite_iru_form) {
@@ -364,8 +358,7 @@ void resolveClosedInflectionalChains(std::vector<core::Morpheme>& result) {
         stem.extended_pos == core::ExtendedPOS::VerbRenyokei || stem.extended_pos == core::ExtendedPOS::VerbOnbinkei ||
         stem.extended_pos == core::ExtendedPOS::AdjKatt || stem.extended_pos == core::ExtendedPOS::AuxNegativeNai;
     if (past_surface && accepts_past && past.extended_pos != core::ExtendedPOS::AuxTenseTa) {
-      retag(past, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxTenseTa, past.surface,
-            dictionary::ConjugationType::None, grammar::ConjForm::Base);
+      retagUninflected(past, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxTenseTa, past.surface);
     }
   }
 
@@ -503,8 +496,7 @@ void resolveKuruwaPoliteAru(std::vector<core::Morpheme>& result) {
     }
     retag(aru, core::PartOfSpeech::Verb, core::ExtendedPOS::VerbRenyokei, "ある", dictionary::ConjugationType::GodanRa,
           grammar::ConjForm::Renyokei);
-    retag(n, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxNegativeNu, "ん", dictionary::ConjugationType::None,
-          grammar::ConjForm::Base);
+    retagUninflected(n, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxNegativeNu, "ん");
   }
 }
 
@@ -523,8 +515,7 @@ void resolveParticleAruOnbin(std::vector<core::Morpheme>& result) {
     }
     retag(aru, core::PartOfSpeech::Verb, core::ExtendedPOS::VerbOnbinkei, "ある", dictionary::ConjugationType::GodanRa,
           grammar::ConjForm::Onbinkei);
-    retag(te, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleConj, "て", dictionary::ConjugationType::None,
-          grammar::ConjForm::Base);
+    retagUninflected(te, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleConj, "て");
   }
 }
 
@@ -543,16 +534,13 @@ void resolveVerbTeParticle(std::vector<core::Morpheme>& result) {
     }
     // The contracted progressive keeps its tag where its own continuative is
     // inflected: before the past (待っ+て+た) or the connective て (待っ+て+て).
-    const bool contracted_progressive_inflects = te.extended_pos == core::ExtendedPOS::AuxAspectIru &&
-                                                 idx + 1 < result.size() &&
-                                                 (result[idx + 1].extended_pos == core::ExtendedPOS::AuxTenseTa ||
-                                                  (result[idx + 1].extended_pos == core::ExtendedPOS::ParticleConj &&
-                                                   grammar::isTeDeSurface(result[idx + 1].surface)));
+    const bool contracted_progressive_inflects =
+        te.extended_pos == core::ExtendedPOS::AuxAspectIru && idx + 1 < result.size() &&
+        (result[idx + 1].extended_pos == core::ExtendedPOS::AuxTenseTa || followsTeFormConnective(result[idx + 1]));
     if (contracted_progressive_inflects) {
       continue;
     }
-    retag(te, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleConj, te.surface,
-          dictionary::ConjugationType::None, grammar::ConjForm::Base);
+    retagUninflected(te, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleConj, te.surface);
   }
 }
 
@@ -620,8 +608,7 @@ void resolveCompoundAdjectiveRenyokei(std::vector<core::Morpheme>& result) {
       continue;
     }
 
-    retag(suffix, core::PartOfSpeech::Noun, core::ExtendedPOS::Noun, "にく", dictionary::ConjugationType::None,
-          grammar::ConjForm::Base);
+    retagUninflected(suffix, core::PartOfSpeech::Noun, core::ExtendedPOS::Noun, "にく");
     if (idx + 3 < result.size() && result[idx + 3].surface == "な") {
       retagAppearanceSou(sou);
       auto& na = result[idx + 3];

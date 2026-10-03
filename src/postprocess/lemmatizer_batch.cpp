@@ -14,6 +14,24 @@ namespace suzume::postprocess {
 
 using namespace lemmatizer_detail;
 
+namespace {
+
+// Retag a non-verbal host as a verb continuative: an Ichidan stem takes +る,
+// otherwise the Godan base is recovered from the final i-row kana.
+void retagAsContinuative(core::Morpheme& morpheme, bool ichidan_stem) {
+  const std::string_view godan_suffix =
+      grammar::godanBaseSuffixFromIRow(utf8::decodeFirstChar(utf8::lastChar(morpheme.surface)));
+  if (!ichidan_stem && godan_suffix.empty()) {
+    return;
+  }
+  morpheme.pos = core::PartOfSpeech::Verb;
+  morpheme.extended_pos = core::ExtendedPOS::VerbRenyokei;
+  morpheme.lemma =
+      ichidan_stem ? morpheme.surface + "る" : normalize::concat(utf8::dropLastChar(morpheme.surface), godan_suffix);
+}
+
+}  // namespace
+
 void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes, bool update_lemmas) const {
   std::vector<std::string> original_lemmas;
   if (!update_lemmas) {
@@ -62,18 +80,8 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes, bool updat
       // would undo the voice boundary (使わ+れ+始め).
     } else if (next_is_verbal_hajime && (!is_dictionary_noun || hajime_has_verbal_follower) &&
                morpheme.pos != core::PartOfSpeech::Verb && morpheme.pos != core::PartOfSpeech::Auxiliary) {
-      const char32_t final_cp = utf8::decodeFirstChar(utf8::lastChar(morpheme.surface));
-      std::string reconstructed;
-      if (grammar::endsWithERow(morpheme.surface) || final_cp == U'じ') {
-        reconstructed = morpheme.surface + "る";
-      } else if (const std::string_view suffix = grammar::godanBaseSuffixFromIRow(final_cp); !suffix.empty()) {
-        reconstructed = normalize::concat(utf8::dropLastChar(morpheme.surface), suffix);
-      }
-      if (!reconstructed.empty()) {
-        morpheme.pos = core::PartOfSpeech::Verb;
-        morpheme.extended_pos = core::ExtendedPOS::VerbRenyokei;
-        morpheme.lemma = std::move(reconstructed);
-      }
+      retagAsContinuative(morpheme, grammar::endsWithERow(morpheme.surface) ||
+                                        utf8::decodeFirstChar(utf8::lastChar(morpheme.surface)) == U'じ');
     }
 
     // The polite auxiliary selects a verbal continuative. This resolves
@@ -85,18 +93,7 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes, bool updat
     if (i + 1 < morphemes.size() && morphemes[i + 1].extended_pos == core::ExtendedPOS::AuxTenseMasu &&
         morpheme.pos != core::PartOfSpeech::Verb && morpheme.pos != core::PartOfSpeech::Auxiliary &&
         morpheme.pos != core::PartOfSpeech::Particle) {
-      const char32_t final_cp = utf8::decodeFirstChar(utf8::lastChar(morpheme.surface));
-      std::string reconstructed;
-      if (grammar::inflection::isValidKanjiIStemException(morpheme.surface)) {
-        reconstructed = morpheme.surface + "る";
-      } else if (const std::string_view suffix = grammar::godanBaseSuffixFromIRow(final_cp); !suffix.empty()) {
-        reconstructed = normalize::concat(utf8::dropLastChar(morpheme.surface), suffix);
-      }
-      if (!reconstructed.empty()) {
-        morpheme.pos = core::PartOfSpeech::Verb;
-        morpheme.extended_pos = core::ExtendedPOS::VerbRenyokei;
-        morpheme.lemma = std::move(reconstructed);
-      }
+      retagAsContinuative(morpheme, grammar::inflection::isValidKanjiIStemException(morpheme.surface));
     }
     // Preserve the ない lemma in the adjective + さ + そう pattern.
     // The adjective candidate generator sets lemma to なさい, but correct is ない

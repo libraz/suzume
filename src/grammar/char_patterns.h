@@ -530,13 +530,6 @@ bool startsClosedTemporalNominal(std::string_view surface);
 std::string_view longFinalParticleBeforeQuote(std::string_view surface);
 
 /**
- * @brief Whether text begins the contracted explanatory negative んじゃない
- * @param surface Text at a prospective auxiliary boundary
- * @return True when the sequence begins with んじゃない
- */
-bool startsContractedNjaNegative(std::string_view surface);
-
-/**
  * @brief Check if stem consists entirely of katakana characters
  * @param stem The stem to check
  * @return True if all characters are katakana (カタカナ)

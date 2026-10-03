@@ -11,6 +11,9 @@ namespace suzume::postprocess::resolver {
 
 void retag(core::Morpheme& morpheme, core::PartOfSpeech pos, core::ExtendedPOS extended_pos, std::string_view lemma,
            dictionary::ConjugationType conj_type, grammar::ConjForm conj_form);
+/// Retag as a word without inflection: no conjugation type, base form.
+void retagUninflected(core::Morpheme& morpheme, core::PartOfSpeech pos, core::ExtendedPOS extended_pos,
+                      std::string_view lemma);
 
 bool isCompoundRenyokeiShape(const std::string& surface);
 bool isCounterDurationNoun(const std::string& surface);
@@ -86,6 +89,7 @@ void retagCopulaDa(core::Morpheme& morpheme);
 bool retagGodanRenyokeiFromIRow(core::Morpheme& stem, bool set_conj_form);
 void retagNaAdjectivalSou(core::Morpheme& morpheme);
 void retagNegativeNai(core::Morpheme& morpheme);
+void retagNaAdjectiveSurface(core::Morpheme& morpheme);
 void retagNounSurface(core::Morpheme& morpheme);
 
 }  // namespace suzume::postprocess::resolver

@@ -1,17 +1,13 @@
 #include <array>
 #include <cstdint>
 #include <string_view>
-#include <utility>
 
-#include "core/debug.h"
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
-#include "grammar/honorific_verbs.h"
 #include "grammar/inflection_scorer_constants.h"
 #include "normalize/char_type.h"
 #include "normalize/utf8.h"
-#include "postprocess/postprocessor.h"
 #include "postprocess/postprocessor_resolvers_internal.h"
 
 namespace suzume::postprocess::resolver {
@@ -139,8 +135,7 @@ void resolveProgressiveContractionNominalizer(std::vector<core::Morpheme>& resul
   // nominalizer plus that copula (んじゃないか).
   if (result.size() >= 2 && result[0].extended_pos == core::ExtendedPOS::AuxNegativeNu &&
       result[1].extended_pos == core::ExtendedPOS::AuxCopulaDa) {
-    retag(result[0], core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleNo, "の",
-          dictionary::ConjugationType::None, grammar::ConjForm::Base);
+    retagUninflected(result[0], core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleNo, "の");
     // What negates that copula is the auxiliary, as in any copular negative
     // chain, not the existence adjective.
     if (result.size() >= 3 && result[2].extended_pos == core::ExtendedPOS::AdjBasic) {
@@ -152,13 +147,12 @@ void resolveProgressiveContractionNominalizer(std::vector<core::Morpheme>& resul
     const auto& connective = result[idx - 1];
     const auto& continuation = result[idx + 1];
     if (contraction.surface != "ん" || contraction.extended_pos != core::ExtendedPOS::AuxNegativeNu ||
-        connective.extended_pos != core::ExtendedPOS::ParticleConj || !grammar::isTeDeSurface(connective.surface) ||
+        !followsTeFormConnective(connective) ||
         (continuation.extended_pos != core::ExtendedPOS::ParticleNo &&
          continuation.extended_pos != core::ExtendedPOS::AuxCopulaDa)) {
       continue;
     }
-    retag(contraction, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleNo, "の",
-          dictionary::ConjugationType::None, grammar::ConjForm::Base);
+    retagUninflected(contraction, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleNo, "の");
   }
 }
 
@@ -321,8 +315,7 @@ void resolveCopularPastConditional(std::vector<core::Morpheme>& result) {
         conditional.surface != "たら" || conditional.extended_pos != core::ExtendedPOS::ParticleConj) {
       continue;
     }
-    retag(conditional, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxTenseTa, "た",
-          dictionary::ConjugationType::None, grammar::ConjForm::Base);
+    retagUninflected(conditional, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxTenseTa, "た");
   }
 }
 
@@ -346,8 +339,7 @@ void resolveTendencySuffixCopula(std::vector<core::Morpheme>& result) {
     if (tendency.surface != "がち" || de.surface != "で" || adjective.extended_pos != core::ExtendedPOS::AdjBasic) {
       continue;
     }
-    retag(tendency, core::PartOfSpeech::Suffix, core::ExtendedPOS::SuffixTendency, "がち",
-          dictionary::ConjugationType::None, grammar::ConjForm::Base);
+    retagUninflected(tendency, core::PartOfSpeech::Suffix, core::ExtendedPOS::SuffixTendency, "がち");
     retagCopulaDa(de);
   }
 }
@@ -552,8 +544,7 @@ void resolveNegativeAppearanceChain(std::vector<core::Morpheme>& result) {
     }
     retag(na, core::PartOfSpeech::Adjective, core::ExtendedPOS::AdjStem, "ない",
           dictionary::ConjugationType::IAdjective, grammar::ConjForm::Renyokei);
-    retag(sa, core::PartOfSpeech::Suffix, core::ExtendedPOS::Suffix, "さ", dictionary::ConjugationType::None,
-          grammar::ConjForm::Base);
+    retagUninflected(sa, core::PartOfSpeech::Suffix, core::ExtendedPOS::Suffix, "さ");
     retagAppearanceSou(sou);
   }
 }
@@ -648,8 +639,7 @@ void resolveSimilitudeYou(std::vector<core::Morpheme>& result) {
         purpose.extended_pos != core::ExtendedPOS::AuxVolitional) {
       continue;
     }
-    retag(purpose, core::PartOfSpeech::Noun, core::ExtendedPOS::NounFormal, "よう", dictionary::ConjugationType::None,
-          grammar::ConjForm::Base);
+    retagUninflected(purpose, core::PartOfSpeech::Noun, core::ExtendedPOS::NounFormal, "よう");
     purpose.flags = purpose.flags | core::EdgeFlags::IsFormalNoun;
   }
 

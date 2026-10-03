@@ -1,15 +1,11 @@
 #include <string_view>
-#include <utility>
 
-#include "core/debug.h"
 #include "core/utf8_constants.h"
+#include "dictionary/dictionary.h"
 #include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
-#include "grammar/honorific_verbs.h"
-#include "grammar/inflection_scorer_constants.h"
 #include "normalize/char_type.h"
 #include "normalize/utf8.h"
-#include "postprocess/postprocessor.h"
 #include "postprocess/postprocessor_resolvers_internal.h"
 
 namespace suzume::postprocess::resolver {
@@ -96,8 +92,7 @@ void resolveDeverbalNominalSuffix(std::vector<core::Morpheme>& result) {
         !grammar::isDeverbalNominalSuffix(suffix.surface)) {
       continue;
     }
-    retag(suffix, core::PartOfSpeech::Suffix, core::ExtendedPOS::Suffix, suffix.surface,
-          dictionary::ConjugationType::None, grammar::ConjForm::Base);
+    retagUninflected(suffix, core::PartOfSpeech::Suffix, core::ExtendedPOS::Suffix, suffix.surface);
   }
 }
 
@@ -266,9 +261,8 @@ void resolveNominalCaseDe(std::vector<core::Morpheme>& result) {
       continue;
     }
     // んで is ないで contracted, so its で is the conjunctive particle.
-    retag(de, core::PartOfSpeech::Particle,
-          is_contracted_negative ? core::ExtendedPOS::ParticleConj : core::ExtendedPOS::ParticleCase, "で",
-          dictionary::ConjugationType::None, grammar::ConjForm::Base);
+    retagUninflected(de, core::PartOfSpeech::Particle,
+                     is_contracted_negative ? core::ExtendedPOS::ParticleConj : core::ExtendedPOS::ParticleCase, "で");
   }
 }
 
@@ -314,8 +308,7 @@ void resolveNominalConditionalNara(std::vector<core::Morpheme>& result) {
         nara.extended_pos != core::ExtendedPOS::VerbMizenkei || completed_by_negative) {
       continue;
     }
-    retag(nara, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleConj, "なら",
-          dictionary::ConjugationType::None, grammar::ConjForm::Base);
+    retagUninflected(nara, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleConj, "なら");
   }
 }
 
@@ -347,15 +340,13 @@ void resolveComparisonNoun(std::vector<core::Morpheme>& result) {
     // predicate/adjective contexts keep the ordinary adjective 近い
     // (駅の近く, 近くない). The numeric ExtendedPOS supplies the local gate.
     if (morpheme.surface == "近く" && idx > 0 && result[idx - 1].extended_pos == core::ExtendedPOS::NounNumber) {
-      retag(morpheme, core::PartOfSpeech::Noun, core::ExtendedPOS::Noun, "近く", dictionary::ConjugationType::None,
-            grammar::ConjForm::Base);
+      retagUninflected(morpheme, core::PartOfSpeech::Noun, core::ExtendedPOS::Noun, "近く");
       continue;
     }
     if (morpheme.surface != "以上") {
       continue;
     }
-    retag(morpheme, core::PartOfSpeech::Noun, core::ExtendedPOS::Noun, "以上", dictionary::ConjugationType::None,
-          grammar::ConjForm::Base);
+    retagUninflected(morpheme, core::PartOfSpeech::Noun, core::ExtendedPOS::Noun, "以上");
   }
 }
 
@@ -377,8 +368,7 @@ void resolveGozaruPoliteAuxiliary(std::vector<core::Morpheme>& result) {
             dictionary::ConjugationType::GodanRa, grammar::ConjForm::Renyokei);
       continue;
     }
-    retag(gozai, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxGozaru, "ござる",
-          dictionary::ConjugationType::None, grammar::ConjForm::Base);
+    retagUninflected(gozai, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxGozaru, "ござる");
   }
 }
 
@@ -395,8 +385,7 @@ void resolveAdjectiveNominalizerSa(std::vector<core::Morpheme>& result) {
     if (idx + 1 < result.size() && result[idx + 1].extended_pos == core::ExtendedPOS::AuxPassive) {
       continue;
     }
-    retag(suffix, core::PartOfSpeech::Suffix, core::ExtendedPOS::Suffix, "さ", dictionary::ConjugationType::None,
-          grammar::ConjForm::Base);
+    retagUninflected(suffix, core::PartOfSpeech::Suffix, core::ExtendedPOS::Suffix, "さ");
     if (idx + 1 < result.size() && result[idx + 1].surface == "そう") {
       auto& sou = result[idx + 1];
       retagAppearanceSou(sou);
@@ -417,8 +406,7 @@ void resolveAdjectivalStemBeforeGaru(std::vector<core::Morpheme>& result) {
         host.fromDictionary()) {
       continue;
     }
-    retag(host, core::PartOfSpeech::Adjective, core::ExtendedPOS::AdjNaAdj, host.surface,
-          dictionary::ConjugationType::NaAdjective, grammar::ConjForm::Base);
+    retagNaAdjectiveSurface(host);
   }
 }
 
@@ -447,8 +435,7 @@ void resolveIndefiniteCaseDe(std::vector<core::Morpheme>& result) {
         (predicate.pos == core::PartOfSpeech::Verb && predicate.lemma == "ある")) {
       continue;
     }
-    retag(de, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleCase, "で", dictionary::ConjugationType::None,
-          grammar::ConjForm::Base);
+    retagUninflected(de, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleCase, "で");
   }
 }
 
@@ -548,8 +535,7 @@ void splitFormalNounCopularDemo(std::vector<core::Morpheme>& result) {
 
     focus.surface = "も";
     focus.start = copula.end;
-    retag(focus, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleTopic, "も",
-          dictionary::ConjugationType::None, grammar::ConjForm::Base);
+    retagUninflected(focus, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleTopic, "も");
     result.insert(result.begin() + static_cast<std::ptrdiff_t>(idx + 1), focus);
     ++idx;
   }

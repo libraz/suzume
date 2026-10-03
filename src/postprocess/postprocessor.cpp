@@ -358,11 +358,7 @@ std::vector<core::Morpheme> Postprocessor::mergeLexicalizedAdverbs(std::vector<c
       if (is_sahen_te || is_chanto) {
         core::Morpheme merged = cur;
         resolver::mergeInto(merged, nxt);
-        merged.pos = core::PartOfSpeech::Adverb;
-        merged.extended_pos = core::ExtendedPOS::Adverb;
-        merged.lemma = merged.surface;
-        merged.conj_type = dictionary::ConjugationType::None;
-        merged.conj_form = grammar::ConjForm::Base;
+        resolver::retagUninflected(merged, core::PartOfSpeech::Adverb, core::ExtendedPOS::Adverb, merged.surface);
         SUZUME_DEBUG_LOG("[POSTPROC] Merged lexicalized adverb: \"" << cur.surface << "\"+\"" << nxt.surface
                                                                     << "\" → \"" << merged.surface << "\"\n");
         result.push_back(std::move(merged));
@@ -385,38 +381,28 @@ std::vector<core::Morpheme> Postprocessor::mergeProlongedSoundMark(std::vector<c
   result.reserve(morphemes.size());
 
   for (size_t i = 0; i < morphemes.size(); ++i) {
-    if (i + 1 < morphemes.size()) {
-      const auto& next = morphemes[i + 1];
-      if (isOnlyProlongedSoundMarks(next.surface)) {
-        const auto& current = morphemes[i];
-        if (current.pos != core::PartOfSpeech::Symbol) {
-          core::Morpheme merged = current;
-          resolver::mergeInto(merged, next);
-          if (!merged.lemma.empty()) {
-            merged.lemma += next.surface;
-          }
+    const auto& current = morphemes[i];
+    size_t run_end = i + 1;
+    while (current.pos != core::PartOfSpeech::Symbol && run_end < morphemes.size() &&
+           isOnlyProlongedSoundMarks(morphemes[run_end].surface)) {
+      ++run_end;
+    }
+    if (run_end == i + 1) {
+      result.push_back(std::move(morphemes[i]));
+      continue;
+    }
 
-          size_t skip = i + 2;
-          while (skip < morphemes.size()) {
-            if (!isOnlyProlongedSoundMarks(morphemes[skip].surface)) {
-              break;
-            }
-            resolver::mergeInto(merged, morphemes[skip]);
-            if (!merged.lemma.empty()) {
-              merged.lemma += morphemes[skip].surface;
-            }
-            ++skip;
-          }
-
-          SUZUME_DEBUG_LOG("[POSTPROC] Merged prolonged sound mark: \"" << current.surface << "\" + \"ー\" → \""
-                                                                        << merged.surface << "\"\n");
-          result.push_back(std::move(merged));
-          i = skip - 1;
-          continue;
-        }
+    core::Morpheme merged = current;
+    for (size_t mark = i + 1; mark < run_end; ++mark) {
+      resolver::mergeInto(merged, morphemes[mark]);
+      if (!merged.lemma.empty()) {
+        merged.lemma += morphemes[mark].surface;
       }
     }
-    result.push_back(std::move(morphemes[i]));
+    SUZUME_DEBUG_LOG("[POSTPROC] Merged prolonged sound mark: \"" << current.surface << "\" + \"ー\" → \""
+                                                                  << merged.surface << "\"\n");
+    result.push_back(std::move(merged));
+    i = run_end - 1;
   }
 
   return result;

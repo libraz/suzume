@@ -1,15 +1,10 @@
 #include <string_view>
-#include <utility>
 
-#include "core/debug.h"
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
-#include "grammar/honorific_verbs.h"
-#include "grammar/inflection_scorer_constants.h"
 #include "normalize/char_type.h"
 #include "normalize/utf8.h"
-#include "postprocess/postprocessor.h"
 #include "postprocess/postprocessor_resolvers_internal.h"
 
 namespace suzume::postprocess::resolver {
@@ -23,29 +18,29 @@ void retag(core::Morpheme& morpheme, core::PartOfSpeech pos, core::ExtendedPOS e
   morpheme.conj_form = conj_form;
 }
 
+void retagUninflected(core::Morpheme& morpheme, core::PartOfSpeech pos, core::ExtendedPOS extended_pos,
+                      std::string_view lemma) {
+  retag(morpheme, pos, extended_pos, lemma, dictionary::ConjugationType::None, grammar::ConjForm::Base);
+}
+
 void retagAppearanceSou(core::Morpheme& sou) {
-  retag(sou, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxAppearanceSou, "そう",
-        dictionary::ConjugationType::None, grammar::ConjForm::Base);
+  retagUninflected(sou, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxAppearanceSou, "そう");
 }
 
 void retagNaAdjectivalSou(core::Morpheme& sou) {
-  retag(sou, core::PartOfSpeech::Adjective, core::ExtendedPOS::AdjNaAdj, "そう", dictionary::ConjugationType::None,
-        grammar::ConjForm::Base);
+  retagUninflected(sou, core::PartOfSpeech::Adjective, core::ExtendedPOS::AdjNaAdj, "そう");
 }
 
 void retagAdverbialSou(core::Morpheme& sou) {
-  retag(sou, core::PartOfSpeech::Adverb, core::ExtendedPOS::Adverb, "そう", dictionary::ConjugationType::None,
-        grammar::ConjForm::Base);
+  retagUninflected(sou, core::PartOfSpeech::Adverb, core::ExtendedPOS::Adverb, "そう");
 }
 
 void retagCopulaDa(core::Morpheme& copula) {
-  retag(copula, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxCopulaDa, "だ", dictionary::ConjugationType::None,
-        grammar::ConjForm::Base);
+  retagUninflected(copula, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxCopulaDa, "だ");
 }
 
 void retagNegativeNai(core::Morpheme& negative) {
-  retag(negative, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxNegativeNai, "ない",
-        dictionary::ConjugationType::None, grammar::ConjForm::Base);
+  retagUninflected(negative, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxNegativeNai, "ない");
 }
 
 void retagBasicNegativeAdjective(core::Morpheme& negative) {
@@ -74,8 +69,12 @@ void retagNegativeAdjectiveCell(core::Morpheme& negative) {
 }
 
 void retagNounSurface(core::Morpheme& morpheme) {
-  retag(morpheme, core::PartOfSpeech::Noun, core::ExtendedPOS::Noun, morpheme.surface,
-        dictionary::ConjugationType::None, grammar::ConjForm::Base);
+  retagUninflected(morpheme, core::PartOfSpeech::Noun, core::ExtendedPOS::Noun, morpheme.surface);
+}
+
+void retagNaAdjectiveSurface(core::Morpheme& morpheme) {
+  retag(morpheme, core::PartOfSpeech::Adjective, core::ExtendedPOS::AdjNaAdj, morpheme.surface,
+        dictionary::ConjugationType::NaAdjective, grammar::ConjForm::Base);
 }
 
 void mergeInto(core::Morpheme& head, const core::Morpheme& tail) {
