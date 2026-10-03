@@ -1945,6 +1945,18 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
       continue;
     }
 
+    // The contracted ておく (とく/どく) fuses the て of a predicate, so it stands
+    // only on a continuative, an onbin or a voice auxiliary (書い+とく,
+    // 読ん+どく, 見+とく, させ+とく); after a particle it is kana (と+どく).
+    if (result.entry->extended_pos == core::ExtendedPOS::AuxAspectOku &&
+        utf8::equalsAny(result.entry->lemma, {"とく", "どく"}) &&
+        !(hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbRenyokei) ||
+          hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbOnbinkei) ||
+          hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::AuxCausative) ||
+          hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::AuxPassive))) {
+      continue;
+    }
+
     // An adverb spelled like a te-form (至って, 決して) is that te-form when an
     // auxiliary selecting the te-form follows it (至っ+て+おら+ず, 至っ+て+ませ+ん).
     if (result.entry->pos == core::PartOfSpeech::Adverb && result.length >= 2 &&

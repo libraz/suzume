@@ -1045,6 +1045,55 @@
       ],
       "id": "kudarou_10",
       "input": "聞くだろう。"
+    },
+    {
+      "description": "手がとどく - regression test",
+      "expected": [
+        {
+          "lemma": "手",
+          "pos": "Noun",
+          "surface": "手"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "とどく",
+          "pos": "Verb",
+          "surface": "とどく"
+        }
+      ],
+      "id": "gatodoku",
+      "input": "手がとどく"
+    },
+    {
+      "description": "荷物がとどいた - regression test",
+      "expected": [
+        {
+          "lemma": "荷物",
+          "pos": "Noun",
+          "surface": "荷物"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "とどく",
+          "pos": "Verb",
+          "surface": "とどい"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "gatodoita",
+      "input": "荷物がとどいた"
     }
   ],
   "description": "Godan Ka-row verbs (五段カ行動詞) - verbs ending in く",
