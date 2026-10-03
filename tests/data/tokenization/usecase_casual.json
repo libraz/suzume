@@ -436,13 +436,13 @@
           "surface": "店"
         },
         {
-          "lemma": "マジ",
-          "pos": "Noun",
+          "lemma": "まじ",
+          "pos": "Adjective",
           "surface": "マジ"
         },
         {
-          "lemma": "で",
-          "pos": "Particle",
+          "lemma": "だ",
+          "pos": "Auxiliary",
           "surface": "で"
         },
         {

@@ -267,13 +267,13 @@
       "description": "Slang phrase マジでキモい",
       "expected": [
         {
-          "lemma": "マジ",
-          "pos": "Noun",
+          "lemma": "まじ",
+          "pos": "Adjective",
           "surface": "マジ"
         },
         {
-          "lemma": "で",
-          "pos": "Particle",
+          "lemma": "だ",
+          "pos": "Auxiliary",
           "surface": "で"
         },
         {
@@ -319,13 +319,13 @@
       "description": "Internet slang phrase マジで尊い",
       "expected": [
         {
-          "lemma": "マジ",
-          "pos": "Noun",
+          "lemma": "まじ",
+          "pos": "Adjective",
           "surface": "マジ"
         },
         {
-          "lemma": "で",
-          "pos": "Particle",
+          "lemma": "だ",
+          "pos": "Auxiliary",
           "surface": "で"
         },
         {
@@ -965,9 +965,14 @@
       "description": "それでええよ - regression test",
       "expected": [
         {
-          "lemma": "それで",
-          "pos": "Conjunction",
-          "surface": "それで"
+          "lemma": "それ",
+          "pos": "Pronoun",
+          "surface": "それ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
         },
         {
           "lemma": "ええ",

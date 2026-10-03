@@ -105,10 +105,6 @@ def map_mecab_pos(token: dict | str) -> str:
     if surface == "いや" and pos == "接続詞":
         return "Interjection"
 
-    # どう: Suzume treats as ナ形容詞
-    if surface == "どう" and pos == "副詞":
-        return "Adjective"
-
     # Pronoun overrides
     if surface in PRONOUN_OVERRIDES and pos == "名詞":
         return "Pronoun"

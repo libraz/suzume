@@ -47,22 +47,6 @@ def postprocess_tada(tokens: list[dict]) -> bool:
             t["lemma"] = "ただ"
 
 
-def postprocess_kadouka_adverb(tokens: list[dict]) -> bool:
-    """Keep どう adverbial in the closed interrogative frame か+どう+か."""
-    changed = False
-    for idx in range(1, len(tokens) - 1):
-        token = tokens[idx]
-        if (
-            token.get("surface") == "どう"
-            and token.get("pos") == "Adjective"
-            and tokens[idx - 1].get("surface") == "か"
-            and tokens[idx + 1].get("surface") == "か"
-        ):
-            token["pos"] = "Adverb"
-            changed = True
-    return changed
-
-
 def postprocess_l2_noun_context(tokens: list[dict]) -> bool:
     """Prefer an L2 noun homograph in contexts that select a nominal."""
     lexical_nouns = core_headwords("nouns.tsv")

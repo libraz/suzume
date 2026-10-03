@@ -113,9 +113,9 @@ class TestMapMecabPos:
         assert map_mecab_pos(token) == "Adjective"
         assert token["lemma"] == "よい"
 
-    def test_dou_adjective(self):
+    def test_dou_stays_adverb(self):
         token = {"surface": "どう", "pos": "副詞", "pos_sub1": "", "pos_sub2": ""}
-        assert map_mecab_pos(token) == "Adjective"
+        assert map_mecab_pos(token) == "Adverb"
 
     def test_cho_noun(self):
         token = {"surface": "超", "pos": "接頭詞", "pos_sub1": "", "pos_sub2": ""}

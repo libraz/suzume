@@ -5,7 +5,7 @@
       "expected": [
         {
           "lemma": "どう",
-          "pos": "Adjective",
+          "pos": "Adverb",
           "surface": "どう"
         },
         {
@@ -42,7 +42,7 @@
         },
         {
           "lemma": "どう",
-          "pos": "Adjective",
+          "pos": "Adverb",
           "surface": "どう"
         },
         {
@@ -74,7 +74,7 @@
       "expected": [
         {
           "lemma": "どう",
-          "pos": "Adjective",
+          "pos": "Adverb",
           "surface": "どう"
         },
         {
@@ -91,7 +91,7 @@
       "expected": [
         {
           "lemma": "どう",
-          "pos": "Adjective",
+          "pos": "Adverb",
           "surface": "どう"
         },
         {
@@ -123,7 +123,7 @@
         },
         {
           "lemma": "どう",
-          "pos": "Adjective",
+          "pos": "Adverb",
           "surface": "どう"
         },
         {

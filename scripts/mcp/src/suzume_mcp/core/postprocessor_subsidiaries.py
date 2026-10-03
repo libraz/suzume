@@ -1002,6 +1002,9 @@ def postprocess_predicate_cell_lemmas(tokens: list[dict]) -> bool:
     return changed
 
 
+_CONTRACTED_DEMONSTRATIVES = {"こん": "これ", "そん": "それ", "あん": "あれ", "どん": "どれ"}
+
+
 def postprocess_frame_repairs(tokens: list[dict]) -> bool:
     """Repair readings the surrounding frame rules out.
 
@@ -1100,6 +1103,46 @@ def postprocess_frame_repairs(tokens: list[dict]) -> bool:
             # The humble お+連用+する takes the verb continuative, as お+連用+いたす does.
             base = next(base for base in bases_from_renyokei(surface) if is_single_token_of_pos(base, "動詞"))
             token.update(pos="Verb", lemma=base)
+            changed = True
+        elif surface in _CONTRACTED_DEMONSTRATIVES and following.get("surface") == "だけ":
+            # こん/そん/あん/どん before だけ are the contracted これ/それ/あれ/どれ.
+            token.update(pos="Pronoun", lemma=_CONTRACTED_DEMONSTRATIVES[surface])
+            changed = True
+        elif (
+            surface == "ん"
+            and previous.get("pos") == "Verb"
+            and following.get("surface") in ("す", "し")
+            and following.get("lemma") == "する"
+        ):
+            # The courtesan polite んす (あり+んす = あります), not a negative plus する.
+            tokens[idx : idx + 2] = [{"surface": "ん" + following["surface"], "pos": "Auxiliary", "lemma": "ます"}]
+            changed = True
+        elif (
+            surface == "や"
+            and token.get("pos") == "Particle"
+            and previous.get("pos") in ("Noun", "Pronoun", "Adverb")
+            and (not following or (following.get("pos") == "Particle" and following.get("surface") != "の"))
+        ):
+            # A coordinating や needs a following noun; at a clause end after a
+            # nominal it is the western copula (そう+や+で, 雨+や+な). After an
+            # adjective it is the final particle (いい+や).
+            token.update(pos="Auxiliary", lemma="だ")
+            changed = True
+        elif (
+            surface == "それで"
+            and token.get("pos") == "Conjunction"
+            and (following.get("lemma") in ("いい", "ええ", "よい", "ござる"))
+        ):
+            # Directly before the predicate it complements, それで is それ+で (それ+で+いい).
+            tokens[idx : idx + 1] = [
+                {"surface": "それ", "pos": "Pronoun", "lemma": "それ"},
+                {"surface": "で", "pos": "Auxiliary", "lemma": "だ"},
+            ]
+            changed = True
+        elif surface == "マジ" and following.get("surface") == "で":
+            # The katakana spelling of まじ takes the same adjectival reading (まじ+で).
+            token.update(pos="Adjective", lemma="まじ")
+            following.update(pos="Auxiliary", lemma="だ")
             changed = True
         elif surface == "まして" and token.get("pos") == "Conjunction" and previous.get("surface") == "も":
             # Xにもまして is the te-form of 増す; the conjunction cannot follow にも.

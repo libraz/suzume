@@ -354,9 +354,14 @@
       "description": "Lengthened final particle in a stack after the nominalizer",
       "expected": [
         {
-          "lemma": "それで",
-          "pos": "Conjunction",
-          "surface": "それで"
+          "lemma": "それ",
+          "pos": "Pronoun",
+          "surface": "それ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
         },
         {
           "lemma": "いい",

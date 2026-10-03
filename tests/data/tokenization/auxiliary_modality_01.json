@@ -56,14 +56,9 @@
           "surface": "あり"
         },
         {
-          "lemma": "ん",
+          "lemma": "ます",
           "pos": "Auxiliary",
-          "surface": "ん"
-        },
-        {
-          "lemma": "する",
-          "pos": "Verb",
-          "surface": "す"
+          "surface": "んす"
         }
       ],
       "id": "kuruwa_dearinsu",
@@ -160,8 +155,8 @@
           "surface": "そう"
         },
         {
-          "lemma": "や",
-          "pos": "Particle",
+          "lemma": "だ",
+          "pos": "Auxiliary",
           "surface": "や"
         },
         {

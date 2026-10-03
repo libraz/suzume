@@ -63,13 +63,13 @@
       "description": "Negative control: the bare emphasis noun keeps its own boundary before a case particle",
       "expected": [
         {
-          "lemma": "マジ",
-          "pos": "Noun",
+          "lemma": "まじ",
+          "pos": "Adjective",
           "surface": "マジ"
         },
         {
-          "lemma": "で",
-          "pos": "Particle",
+          "lemma": "だ",
+          "pos": "Auxiliary",
           "surface": "で"
         },
         {

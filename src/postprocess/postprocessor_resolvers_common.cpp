@@ -1,3 +1,4 @@
+#include <iterator>
 #include <string_view>
 
 #include "core/utf8_constants.h"
@@ -424,6 +425,44 @@ void resolveFrameRepairs(std::vector<core::Morpheme>& result) {
     } else if (utf8::equalsAny(token.surface, {"先"}) && token.pos == core::PartOfSpeech::Suffix &&
                previous != nullptr && previous->pos == core::PartOfSpeech::Pronoun) {
       retagNounSurface(token);
+    } else if (following != nullptr && utf8::equalsAny(following->surface, {"だけ"}) &&
+               utf8::equalsAny(token.surface, {"こん", "そん", "あん", "どん"})) {
+      // The contracted demonstratives これ/それ/あれ/どれ before だけ.
+      static constexpr std::string_view kExpanded[] = {"これ", "それ", "あれ", "どれ"};
+      static constexpr std::string_view kContracted[] = {"こん", "そん", "あん", "どん"};
+      for (size_t form = 0; form < std::size(kContracted); ++form) {
+        if (utf8::equalsAny(token.surface, {kContracted[form]})) {
+          retagUninflected(token, core::PartOfSpeech::Pronoun, core::ExtendedPOS::Pronoun, kExpanded[form]);
+        }
+      }
+    } else if (utf8::equalsAny(token.surface, {"ん"}) && previous != nullptr &&
+               previous->pos == core::PartOfSpeech::Verb && following != nullptr &&
+               utf8::equalsAny(following->surface, {"す", "し"}) && following->getLemma() == "する") {
+      // The courtesan polite んす (あり+んす = あります), not a negative plus する.
+      mergeInto(token, *following);
+      retagUninflected(token, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxTenseMasu, "ます");
+      result.erase(result.begin() + static_cast<std::ptrdiff_t>(idx + 1));
+    } else if (utf8::equalsAny(token.surface, {"や"}) && token.pos == core::PartOfSpeech::Particle &&
+               previous != nullptr &&
+               (previous->pos == core::PartOfSpeech::Noun || previous->pos == core::PartOfSpeech::Pronoun ||
+                previous->pos == core::PartOfSpeech::Adverb) &&
+               (following == nullptr ||
+                (following->pos == core::PartOfSpeech::Particle && !utf8::equalsAny(following->surface, {"の"})))) {
+      // A coordinating や needs a following noun; at a clause end after a
+      // nominal it is the western copula (そう+や+で, 雨+や+な).
+      retagCopulaDa(token);
+    } else if (utf8::equalsAny(token.surface, {"それで"}) && token.pos == core::PartOfSpeech::Conjunction &&
+               following != nullptr && utf8::equalsAny(following->getLemma(), {"いい", "ええ", "よい", "ござる"})) {
+      // Directly before the predicate it complements, それで is それ+で.
+      core::Morpheme copula = splitTail(token, 2);
+      retagUninflected(token, core::PartOfSpeech::Pronoun, core::ExtendedPOS::Pronoun, "それ");
+      retagCopulaDa(copula);
+      result.insert(result.begin() + static_cast<std::ptrdiff_t>(idx + 1), copula);
+    } else if (utf8::equalsAny(token.surface, {"マジ"}) && following != nullptr &&
+               utf8::equalsAny(following->surface, {"で"})) {
+      // The katakana spelling of まじ takes the same adjectival reading (まじ+で).
+      retagUninflected(token, core::PartOfSpeech::Adjective, core::ExtendedPOS::AdjNaAdj, "まじ");
+      retagCopulaDa(result[idx + 1]);
     }
   }
 }

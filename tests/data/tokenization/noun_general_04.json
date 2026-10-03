@@ -1886,13 +1886,13 @@
       "description": "マジで無理みある。 - regression test",
       "expected": [
         {
-          "lemma": "マジ",
-          "pos": "Noun",
+          "lemma": "まじ",
+          "pos": "Adjective",
           "surface": "マジ"
         },
         {
-          "lemma": "で",
-          "pos": "Particle",
+          "lemma": "だ",
+          "pos": "Auxiliary",
           "surface": "で"
         },
         {

@@ -4,8 +4,8 @@
       "description": "B32: あんだけ should be single adverb",
       "expected": [
         {
-          "lemma": "あん",
-          "pos": "Noun",
+          "lemma": "あれ",
+          "pos": "Pronoun",
           "surface": "あん"
         },
         {
@@ -25,8 +25,8 @@
       "description": "B32: こんだけ should be single adverb",
       "expected": [
         {
-          "lemma": "こむ",
-          "pos": "Verb",
+          "lemma": "これ",
+          "pos": "Pronoun",
           "surface": "こん"
         },
         {
@@ -46,8 +46,8 @@
       "description": "B32: そんだけ should be single adverb",
       "expected": [
         {
-          "lemma": "そん",
-          "pos": "Noun",
+          "lemma": "それ",
+          "pos": "Pronoun",
           "surface": "そん"
         },
         {

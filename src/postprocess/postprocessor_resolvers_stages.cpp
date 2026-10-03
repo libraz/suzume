@@ -608,24 +608,11 @@ void resolveFinalMorphemeRoles(std::vector<core::Morpheme>& result, const dictio
     }
   }
 
-  // Resolve the sentence-initial demonstrative after all compound candidates
-  // have been filtered, so retagging cannot alter a copular boundary.
-  if (result.size() >= 2 && result[0].surface == "そう" && result[0].pos == core::PartOfSpeech::Adverb &&
-      result[1].extended_pos == core::ExtendedPOS::AuxCopulaDa &&
-      (result.size() < 3 || result[2].surface != "ござい")) {
-    resolver::retagNaAdjectivalSou(result[0]);
-  }
-  // The interrogative どう is one na-adjectival word whichever predicate
-  // follows (どうなった, どうする, どうですか); only the fixed かどうか keeps
-  // the adverb. The lattice picks either homograph by its neighbour's cost.
-  for (size_t idx = 0; idx < result.size(); ++idx) {
-    if (result[idx].surface != "どう") {
-      continue;
-    }
-    if (idx + 1 < result.size() && result[idx + 1].surface == "か") {
-      resolver::retagUninflected(result[idx], core::PartOfSpeech::Adverb, core::ExtendedPOS::Adverb, "どう");
-    } else if (result[idx].pos == core::PartOfSpeech::Adverb) {
-      resolver::retagUninflected(result[idx], core::PartOfSpeech::Adjective, core::ExtendedPOS::AdjNaAdj, "どう");
+  // The interrogative どう is the adverb of the こう/そう/ああ/どう series
+  // whichever predicate follows (どう+なった, どう+する, どう+だ), like そう.
+  for (auto& morpheme : result) {
+    if (utf8::equalsAny(morpheme.surface, {"どう"}) && morpheme.pos == core::PartOfSpeech::Adjective) {
+      resolver::retagUninflected(morpheme, core::PartOfSpeech::Adverb, core::ExtendedPOS::Adverb, "どう");
     }
   }
   for (size_t idx = 0; idx + 3 < result.size(); ++idx) {

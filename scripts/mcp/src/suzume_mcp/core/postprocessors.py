@@ -142,7 +142,6 @@ postprocess_fuu_formal_noun = postprocessor_nominals.postprocess_fuu_formal_noun
 postprocess_hiragana_purpose_noun = postprocessor_nominals.postprocess_hiragana_purpose_noun
 postprocess_ikaga = postprocessor_nominals.postprocess_ikaga
 postprocess_ka_suru_noun = postprocessor_nominals.postprocess_ka_suru_noun
-postprocess_kadouka_adverb = postprocessor_nominals.postprocess_kadouka_adverb
 postprocess_l2_noun_context = postprocessor_nominals.postprocess_l2_noun_context
 postprocess_prolonged_sound_noun = postprocessor_nominals.postprocess_prolonged_sound_noun
 postprocess_tada = postprocessor_nominals.postprocess_tada
@@ -228,7 +227,6 @@ POSTPROCESSORS: tuple[tuple[str, Callable[[list[dict]], bool]], ...] = (
     ("classical-past-izenkei-shika", postprocess_classical_past_izenkei_shika),
     ("honorific-i-adjective", postprocess_honorific_i_adjective),
     ("i-adjective-upper-bound", postprocess_i_adjective_upper_bound),
-    ("kadouka-adverb", postprocess_kadouka_adverb),
     ("ii-adjective", postprocess_ii),
     ("iru-aux", postprocess_iru_aux),
     ("giving-receiving-aux", postprocess_giving_aux),

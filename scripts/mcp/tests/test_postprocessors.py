@@ -33,7 +33,6 @@ from suzume_mcp.core.postprocessors import (
     postprocess_ikaga,
     postprocess_indefinite_ka,
     postprocess_iru_aux,
-    postprocess_kadouka_adverb,
     postprocess_l2_noun_context,
     postprocess_mecab_tokens,
     postprocess_miru_aux,
@@ -791,20 +790,6 @@ class TestPostprocessHonorificRequest:
 
 
 class TestTokenizerSearchUnitNormalizers:
-    def test_kadouka_keeps_dou_adverbial(self):
-        tokens = [
-            _tok("か", "Particle"),
-            _tok("どう", "Adjective"),
-            _tok("か", "Particle"),
-        ]
-        assert postprocess_kadouka_adverb(tokens)
-        assert tokens[1]["pos"] == "Adverb"
-
-    def test_dou_outside_kadouka_is_unchanged(self):
-        tokens = [_tok("どう", "Adjective"), _tok("考える", "Verb")]
-        assert not postprocess_kadouka_adverb(tokens)
-        assert tokens[0]["pos"] == "Adjective"
-
     def test_tagaru_forms_one_auxiliary(self):
         tokens = [_tok("食べ", "Verb"), _tok("た", "Auxiliary"), _tok("がる", "Verb")]
         assert postprocess_tagaru_aux(tokens)

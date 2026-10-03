@@ -56,14 +56,9 @@
           "surface": "あり"
         },
         {
-          "lemma": "ん",
+          "lemma": "ます",
           "pos": "Auxiliary",
-          "surface": "ん"
-        },
-        {
-          "lemma": "する",
-          "pos": "Verb",
-          "surface": "す"
+          "surface": "んす"
         }
       ],
       "id": "kuruwa_arinsu",
@@ -87,14 +82,9 @@
           "surface": "あり"
         },
         {
-          "lemma": "ん",
+          "lemma": "ます",
           "pos": "Auxiliary",
-          "surface": "ん"
-        },
-        {
-          "lemma": "する",
-          "pos": "Verb",
-          "surface": "し"
+          "surface": "んし"
         },
         {
           "lemma": "た",
@@ -154,9 +144,14 @@
       "description": "Samurai speech ござった",
       "expected": [
         {
-          "lemma": "それで",
-          "pos": "Conjunction",
-          "surface": "それで"
+          "lemma": "それ",
+          "pos": "Pronoun",
+          "surface": "それ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
         },
         {
           "lemma": "ござる",
