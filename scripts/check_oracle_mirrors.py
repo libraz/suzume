@@ -11,7 +11,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 CONSTANTS = ROOT / "scripts/mcp/src/suzume_mcp/core/constants.py"
 MERGE_RULES = ROOT / "scripts/mcp/src/suzume_mcp/core/merge_rules.py"
-POSTPROCESSORS = ROOT / "scripts/mcp/src/suzume_mcp/core/postprocessors.py"
+SUBSIDIARIES = ROOT / "scripts/mcp/src/suzume_mcp/core/postprocessor_subsidiaries.py"
 KANA_CONSTANTS = ROOT / "src/core/kana_constants.h"
 CHAR_TYPE = ROOT / "src/normalize/char_type.cpp"
 AUXILIARIES = ROOT / "src/dictionary/entries/auxiliaries.cpp"
@@ -91,7 +91,7 @@ def main() -> int:
             core_subsidiary_auxiliaries(),
             dict(
                 assignment_value(
-                    POSTPROCESSORS,
+                    SUBSIDIARIES,
                     "lemmas",
                     function="postprocess_closed_subsidiary_aux",
                 )
