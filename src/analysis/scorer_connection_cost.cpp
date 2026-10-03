@@ -135,10 +135,13 @@ float computeLateLexicalBoundaryBonus(const core::LatticeEdge& prev, const core:
       (core::isNounType(prev.extended_pos) || prev.extended_pos == core::ExtendedPOS::AdjNaAdj) &&
       next.pos == core::PartOfSpeech::Adverb && utf8::startsWith(next.surface, "な");
   // The contracted nominalizer ん closes a nominal; unlike の it never marks
-  // the subject of a following clause (が+ん+ばり is がんばり cut apart).
-  const bool contracted_nominalizer_before_continuative = prev.extended_pos == core::ExtendedPOS::ParticleNo &&
-                                                          utf8::equalsAny(prev.surface, {"ん"}) &&
-                                                          next.extended_pos == core::ExtendedPOS::VerbRenyokei;
+  // the subject of a following clause (が+ん+ばり is がんばり cut apart), and it
+  // does not host the conjunctive なり, which takes a verb terminal (す+ん+なり
+  // is すんなり cut apart).
+  const bool contracted_nominalizer_before_continuative =
+      prev.extended_pos == core::ExtendedPOS::ParticleNo && utf8::equalsAny(prev.surface, {"ん"}) &&
+      (next.extended_pos == core::ExtendedPOS::VerbRenyokei ||
+       (next.extended_pos == core::ExtendedPOS::ParticleConj && utf8::equalsAny(next.surface, {"なり"})));
   // The geminate こっ is こと assimilated to the copula after it, and that ちゃ
   // is じゃ assimilated to the geminate (えらい+こっ+ちゃ): neither stands alone,
   // and like any formal noun こっ needs a modifier rather than a particle
