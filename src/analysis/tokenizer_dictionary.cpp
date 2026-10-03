@@ -1980,6 +1980,24 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
       continue;
     }
 
+    // An interrogative adverb fused with か (どうか) is one adverb only when a
+    // predicate follows it (どうか+してる, どうか+助けて); in かどうか and
+    // before a particle (どうか+な) it stays the adverb plus the particle か.
+    const auto* interrogative_head =
+        result.entry->pos == core::PartOfSpeech::Adverb && result.length >= 2 && codepoints[end_pos - 1] == U'か'
+            ? lookupEntryInRange(dict_manager_, codepoints, start_pos, end_pos - 1, core::PartOfSpeech::Adverb)
+            : nullptr;
+    if (interrogative_head != nullptr && interrogative_head->extended_pos == core::ExtendedPOS::AdverbQuotative) {
+      const bool after_ka = start_pos > 0 && codepoints[start_pos - 1] == U'か';
+      const bool predicate_follows =
+          end_pos < codepoints.size() &&
+          (normalize::isKanjiCodepoint(codepoints[end_pos]) ||
+           grammar::isSuruRenyokeiSurface(extractSubstring(codepoints, end_pos, end_pos + 1)));
+      if (after_ka || !predicate_follows) {
+        continue;
+      }
+    }
+
     // The aspect おる's irrealis おら stands only behind the connective て/で
     // (書いて+おら+ず); elsewhere おら is the pronoun of おらが村 or a verb.
     if (result.entry->extended_pos == core::ExtendedPOS::AuxAspectIru && result.entry->lemma == "おる" &&

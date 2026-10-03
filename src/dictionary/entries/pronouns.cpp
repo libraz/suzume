@@ -138,6 +138,9 @@ EntrySpecRange getPronounEntries() {
       // Note: どうして needs very low cost to prevent split when followed by verb
       // The te-form bonus makes どう+して+VERB cheaper than どうして+VERB
       adv("どうして", ""),
+      // どうか is one adverb before a predicate (どうか+してる, どうか+助けて);
+      // elsewhere it is どう+か (どうかな). The tokenizer gates the context.
+      adv("どうか", ""),
       adv("なぜ", ""),
       adv("なんで", ""),
 

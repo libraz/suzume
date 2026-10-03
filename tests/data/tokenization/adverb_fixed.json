@@ -1708,6 +1708,131 @@
       ],
       "id": "mottte_ttta",
       "input": "僕もって言った"
+    },
+    {
+      "description": "どうかしてる - regression test",
+      "expected": [
+        {
+          "lemma": "どうか",
+          "pos": "Adverb",
+          "surface": "どうか"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てる"
+        }
+      ],
+      "id": "doukashiteru",
+      "input": "どうかしてる"
+    },
+    {
+      "description": "どうか助けてください - regression test",
+      "expected": [
+        {
+          "lemma": "どうか",
+          "pos": "Adverb",
+          "surface": "どうか"
+        },
+        {
+          "lemma": "助ける",
+          "pos": "Verb",
+          "surface": "助け"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くださる",
+          "pos": "Verb",
+          "surface": "ください"
+        }
+      ],
+      "id": "douka_ketekudasai",
+      "input": "どうか助けてください"
+    },
+    {
+      "description": "どうかしたの - regression test",
+      "expected": [
+        {
+          "lemma": "どうか",
+          "pos": "Adverb",
+          "surface": "どうか"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        }
+      ],
+      "id": "doukashitano",
+      "input": "どうかしたの"
+    },
+    {
+      "description": "どうかしている - regression test",
+      "expected": [
+        {
+          "lemma": "どうか",
+          "pos": "Adverb",
+          "surface": "どうか"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "doukashiteiru",
+      "input": "どうかしている"
+    },
+    {
+      "description": "どうかな - regression test",
+      "expected": [
+        {
+          "lemma": "どう",
+          "pos": "Adverb",
+          "surface": "どう"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        }
+      ],
+      "id": "doukana",
+      "input": "どうかな"
     }
   ],
   "description": "adverb_fixed tests",
