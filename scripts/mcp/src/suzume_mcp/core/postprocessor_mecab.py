@@ -767,6 +767,59 @@ def repair_euphonic_adjective_adverb(tokens: list[dict]) -> None:
             tokens[idx] = analyzed[0]
 
 
+def repair_continuative_before_manner_suffix(tokens: list[dict]) -> None:
+    """Read the host of the manner suffix よう as the verb continuative it is.
+
+    よう in 読みようがない attaches to a continuative, and the reference
+    dictionary analyzes やめ+よう that way; it lists あきらめ and 慰め as nouns of
+    their own, though, so the host is re-analyzed before ます, which selects the
+    continuative, and adopted when it reads as one.
+    """
+    for idx in range(len(tokens) - 1):
+        token, suffix = tokens[idx], tokens[idx + 1]
+        if (
+            token.get("pos") != "名詞"
+            or token.get("pos_sub1") != "一般"
+            or suffix.get("surface") != "よう"
+            or suffix.get("pos_sub1") != "接尾"
+        ):
+            continue
+        surface = token.get("surface", "")
+        analyzed = mecab_analyze(surface + "ます")
+        if (
+            analyzed
+            and analyzed[0].get("surface") == surface
+            and analyzed[0].get("pos") == "動詞"
+            and analyzed[0].get("conj_form", "").startswith("連用")
+        ):
+            tokens[idx] = analyzed[0]
+
+
+def merge_conjunction_with_rashii(tokens: list[dict]) -> None:
+    """Rebuild an adjective in らしい the reference dictionary reads as a conjunction.
+
+    A conjunction takes no auxiliary, so もっとも+らしい is not もっとも plus the
+    conjectural; it is the adjective もっともらしい the dictionary lacks, and the
+    らしい token already carries its inflection.
+    """
+    idx = 0
+    while idx < len(tokens) - 1:
+        head, tail = tokens[idx], tokens[idx + 1]
+        if head.get("pos") != "接続詞" or tail.get("pos") != "助動詞" or tail.get("lemma") != "らしい":
+            idx += 1
+            continue
+        tokens[idx : idx + 2] = [
+            {
+                **tail,
+                "surface": head.get("surface", "") + tail.get("surface", ""),
+                "pos": "形容詞",
+                "pos_sub1": "自立",
+                "lemma": head.get("surface", "") + "らしい",
+            }
+        ]
+        idx += 1
+
+
 def repair_productive_causative(tokens: list[dict]) -> None:
     """Split a productive causative the reference lexicon lists as one verb.
 

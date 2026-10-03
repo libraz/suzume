@@ -9,10 +9,12 @@ from .mecab import mecab_analyze
 from .merge_rules import apply_suzume_merge
 from .pos_mapping import correct_mecab_pos, map_mecab_pos, normalize_pos
 from .postprocessors import (
+    merge_conjunction_with_rashii,
     postprocess_mecab_tokens,
     postprocessor_rules,
     preprocess_for_mecab,
     repair_assimilated_koto_copula,
+    repair_continuative_before_manner_suffix,
     repair_contracted_quotative,
     repair_contracted_volitional,
     repair_euphonic_adjective_adverb,
@@ -209,6 +211,8 @@ def get_expected_tokens(text: str, suzume_tokens: list[dict] | None = None) -> t
     repair_regional_imperative(raw_tokens)
     repair_productive_causative(raw_tokens)
     repair_euphonic_adjective_adverb(raw_tokens)
+    repair_continuative_before_manner_suffix(raw_tokens)
+    merge_conjunction_with_rashii(raw_tokens)
     _merge_ideographic_variation_selectors(raw_tokens)
 
     # Fix MeCab POS errors (before POS mapping)
