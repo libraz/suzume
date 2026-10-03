@@ -1,0 +1,77 @@
+{
+  "cases": [
+    {
+      "description": "食べとうない - regression test",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "とう"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "betounai",
+      "input": "食べとうない"
+    },
+    {
+      "description": "行きとうない - regression test",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行き"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "とう"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "kitounai",
+      "input": "行きとうない"
+    },
+    {
+      "description": "食べとうございます - regression test",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "とう"
+        },
+        {
+          "lemma": "ござる",
+          "pos": "Auxiliary",
+          "surface": "ござい"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "betougozaimasu",
+      "input": "食べとうございます"
+    }
+  ],
+  "description": "auxiliary_desire tests",
+  "version": "1.0"
+}
