@@ -1761,10 +1761,18 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     // A one-kanji formal noun cannot head an adjacent kanji compound.  The
     // formal reading remains available at a word boundary (ない+事), while a
     // lexical compound such as 事情 or 事実 keeps its complete search unit.
+    // After a registered noun and before a kanji compound it closes the left
+    // noun instead (先月+末+決算).
     if (result.entry->extended_pos == core::ExtendedPOS::NounFormal && result.length == 1 &&
         end_pos < codepoints.size() && normalize::isKanjiCodepoint(codepoints[end_pos]) &&
         !isKanjiRunFollowedByAttributiveNa(codepoints, end_pos)) {
-      continue;
+      const bool closes_preceding_noun = start_pos >= 2 && end_pos + 2 <= codepoints.size() &&
+                                         lookupEntryInRange(dict_manager_, codepoints, start_pos - 2, start_pos,
+                                                            core::PartOfSpeech::Noun) != nullptr &&
+                                         normalize::isKanjiCodepoint(codepoints[end_pos + 1]);
+      if (!closes_preceding_noun) {
+        continue;
+      }
     }
 
     // わりに is an adverb at clause start, but after an attributive の or a

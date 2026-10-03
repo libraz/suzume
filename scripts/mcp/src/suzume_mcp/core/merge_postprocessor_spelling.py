@@ -196,6 +196,9 @@ def _postprocess_kanji_merge(result: list[dict], applied_rule: str | None) -> tu
                 and merged[-1].get("pos", "") == "名詞"
                 and "々" not in merged[-1].get("surface", "")
                 and (merged[-1].get("pos_sub1", "") not in ("副詞可能", "固有名詞", "数") or is_merge_allowed_suffix)
+                # A temporal suffix closes its time noun (先月|末|決算) the way a
+                # temporal noun itself does.
+                and not (merged[-1].get("pos_sub1", "") == "接尾" and merged[-1].get("pos_sub2", "") == "副詞可能")
                 and merged[-1].get("pos", "") != "副詞"
                 and (curr.get("pos_sub1", "") != "接尾" or is_merge_allowed_suffix or is_general_suffix)
                 # A number+counter unit (五分, 二時間, 五名) is its own search unit and
