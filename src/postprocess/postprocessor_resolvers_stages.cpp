@@ -62,6 +62,7 @@ void resolvePrePrefixMorphemeRoles(std::vector<core::Morpheme>& result,
   resolver::resolveObligationNaranai(result);
   resolver::resolveTearuAuxiliary(result);
   resolver::resolveEchoedConditionalCopula(result);
+  resolver::resolveParticleHostedDearu(result);
   resolver::resolveKuruwaPoliteAru(result);
 
   // At sentence start, なり+ける is the continuative form of lexical なる
