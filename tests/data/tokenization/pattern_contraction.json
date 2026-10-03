@@ -1175,13 +1175,13 @@
           "surface": "て"
         },
         {
-          "lemma": "らん",
-          "pos": "Noun",
+          "lemma": "られる",
+          "pos": "Auxiliary",
           "surface": "らん"
         },
         {
           "lemma": "ない",
-          "pos": "Adjective",
+          "pos": "Auxiliary",
           "surface": "ない"
         },
         {

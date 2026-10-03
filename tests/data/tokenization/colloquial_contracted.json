@@ -417,13 +417,13 @@
           "surface": "て"
         },
         {
-          "lemma": "らん",
-          "pos": "Noun",
+          "lemma": "られる",
+          "pos": "Auxiliary",
           "surface": "らん"
         },
         {
           "lemma": "ない",
-          "pos": "Adjective",
+          "pos": "Auxiliary",
           "surface": "ない"
         },
         {
@@ -486,13 +486,13 @@
           "surface": "て"
         },
         {
-          "lemma": "らん",
-          "pos": "Noun",
+          "lemma": "られる",
+          "pos": "Auxiliary",
           "surface": "らん"
         },
         {
           "lemma": "ない",
-          "pos": "Adjective",
+          "pos": "Auxiliary",
           "surface": "ない"
         }
       ],
@@ -753,6 +753,60 @@
       ],
       "id": "njimattta",
       "input": "読んじまった"
+    },
+    {
+      "description": "見てらんねえ - regression test",
+      "expected": [
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "られる",
+          "pos": "Auxiliary",
+          "surface": "らん"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ねえ"
+        }
+      ],
+      "id": "terannee",
+      "input": "見てらんねえ"
+    },
+    {
+      "description": "読んでらんない - regression test",
+      "expected": [
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読ん"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "られる",
+          "pos": "Auxiliary",
+          "surface": "らん"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "nderannai",
+      "input": "読んでらんない"
     }
   ],
   "description": "colloquial_contracted tests",
