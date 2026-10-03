@@ -1414,6 +1414,89 @@
       ],
       "id": "ji_neeka",
       "input": "じゃねえか"
+    },
+    {
+      "description": "帰んなよ - regression test",
+      "expected": [
+        {
+          "lemma": "帰る",
+          "pos": "Verb",
+          "surface": "帰ん"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "nnayo",
+      "input": "帰んなよ"
+    },
+    {
+      "description": "走んな - regression test",
+      "expected": [
+        {
+          "lemma": "走る",
+          "pos": "Verb",
+          "surface": "走ん"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        }
+      ],
+      "id": "nna",
+      "input": "走んな"
+    },
+    {
+      "description": "行くなよ - regression test",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行く"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "kunayo",
+      "input": "行くなよ"
+    },
+    {
+      "description": "分かんのよ - regression test",
+      "expected": [
+        {
+          "lemma": "分かる",
+          "pos": "Verb",
+          "surface": "分かん"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "kannoyo",
+      "input": "分かんのよ"
     }
   ],
   "description": "Contraction patterns (てる、ちゃう)",

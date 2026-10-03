@@ -663,6 +663,109 @@
       ],
       "id": "taihen_ttta",
       "input": "たいへん困った。"
+    },
+    {
+      "description": "うぶな人 - regression test",
+      "expected": [
+        {
+          "lemma": "うぶ",
+          "pos": "Adjective",
+          "surface": "うぶ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "人",
+          "pos": "Noun",
+          "surface": "人"
+        }
+      ],
+      "id": "ubuna",
+      "input": "うぶな人"
+    },
+    {
+      "description": "もうふつうなんよ - regression test",
+      "expected": [
+        {
+          "lemma": "もう",
+          "pos": "Adverb",
+          "surface": "もう"
+        },
+        {
+          "lemma": "ふつう",
+          "pos": "Adjective",
+          "surface": "ふつう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "moufutsuunanyo",
+      "input": "もうふつうなんよ"
+    },
+    {
+      "description": "ほんとなんよ - regression test",
+      "expected": [
+        {
+          "lemma": "ほんと",
+          "pos": "Adjective",
+          "surface": "ほんと"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "hontonanyo",
+      "input": "ほんとなんよ"
+    },
+    {
+      "description": "まじめな人 - regression test",
+      "expected": [
+        {
+          "lemma": "まじめ",
+          "pos": "Adjective",
+          "surface": "まじめ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "人",
+          "pos": "Noun",
+          "surface": "人"
+        }
+      ],
+      "id": "majimena",
+      "input": "まじめな人"
     }
   ],
   "description": "Na-adjectives (ナ形容詞) (part 2/2)",
