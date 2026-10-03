@@ -3,6 +3,8 @@
  * @brief Web identifier matchers for the pre-tokenizer
  */
 
+#include <algorithm>
+
 #include "normalize/char_type.h"
 #include "normalize/utf8.h"
 #include "pretokenizer/pretokenizer_internal.h"
@@ -40,6 +42,14 @@ size_t trailingUnmatchedClosingParentheses(std::string_view text, size_t start, 
   return trailing_unmatched;
 }
 
+// End of the run from `pos` of ASCII alphanumerics and the `extra` characters.
+size_t scanAsciiRun(std::string_view text, size_t pos, std::string_view extra) {
+  while (pos < text.size() && (isAsciiAlnum(text[pos]) || extra.find(text[pos]) != std::string_view::npos)) {
+    ++pos;
+  }
+  return pos;
+}
+
 void trimTrailingStopsAndCommas(std::string_view text, size_t start, size_t& end) {
   while (end > start && (text[end - 1] == '.' || text[end - 1] == ',')) {
     --end;
@@ -58,25 +68,10 @@ bool PreTokenizer::tryMatchUrl(std::string_view text, size_t pos, PreToken& toke
   }
 
   size_t start = pos;
-  size_t idx = pos + (is_https ? 8 : 7);  // Skip protocol
-  size_t apostrophe_count = 0;
-
-  // Match URL characters until whitespace or end
-  while (idx < text.size()) {
-    char chr = text[idx];
-    // URL-safe characters
-    if (isAsciiAlnum(chr) || chr == '-' || chr == '.' || chr == '_' || chr == '~' || chr == ':' || chr == '/' ||
-        chr == '?' || chr == '#' || chr == '[' || chr == ']' || chr == '@' || chr == '!' || chr == '$' || chr == '&' ||
-        chr == '\'' || chr == '(' || chr == ')' || chr == '*' || chr == '+' || chr == ',' || chr == ';' || chr == '=' ||
-        chr == '%') {
-      if (chr == '\'') {
-        ++apostrophe_count;
-      }
-      ++idx;
-    } else {
-      break;
-    }
-  }
+  const size_t body_start = pos + (is_https ? 8 : 7);  // Skip protocol
+  // Match URL-safe characters until whitespace or end
+  size_t idx = scanAsciiRun(text, body_start, "-._~:/?#[]@!$&'()*+,;=%");
+  const auto apostrophe_count = std::count(text.begin() + body_start, text.begin() + idx, '\'');
 
   // A trailing apostrophe is surrounding punctuation only when it has no mate
   // inside the URL. Paired apostrophes and balanced parentheses are URL data.
@@ -87,7 +82,7 @@ bool PreTokenizer::tryMatchUrl(std::string_view text, size_t pos, PreToken& toke
   idx -= trailingUnmatchedClosingParentheses(text, start, idx);
   trimTrailingStopsAndCommas(text, start, idx);
 
-  if (idx > start + (is_https ? 8 : 7)) {
+  if (idx > body_start) {
     setTokenFromRange(token, text, start, idx, PreTokenType::Url,
                       core::PartOfSpeech::Noun);  // Treat URLs as nouns (not symbols)
     return true;
@@ -104,17 +99,8 @@ bool PreTokenizer::tryMatchEmail(std::string_view text, size_t pos, PreToken& to
   }
 
   size_t start = pos;
-  size_t idx = pos;
-
   // Parse local-part: alphanumeric, dot, hyphen, underscore, plus
-  while (idx < text.size()) {
-    char chr = text[idx];
-    if (isAsciiAlnum(chr) || chr == '.' || chr == '-' || chr == '_' || chr == '+') {
-      ++idx;
-    } else {
-      break;
-    }
-  }
+  size_t idx = scanAsciiRun(text, pos, ".-_+");
 
   // Local-part must not be empty and must not start/end with dot
   if (idx == start || text[start] == '.' || text[idx - 1] == '.') {
@@ -129,14 +115,7 @@ bool PreTokenizer::tryMatchEmail(std::string_view text, size_t pos, PreToken& to
 
   // Parse domain: alphanumeric, dot, hyphen
   size_t domain_start = idx;
-  while (idx < text.size()) {
-    char chr = text[idx];
-    if (isAsciiAlnum(chr) || chr == '.' || chr == '-') {
-      ++idx;
-    } else {
-      break;
-    }
-  }
+  idx = scanAsciiRun(text, idx, ".-");
 
   // Domain must not be empty and must contain at least one dot
   if (idx == domain_start) {
@@ -220,7 +199,6 @@ bool PreTokenizer::tryMatchHashtag(std::string_view text, size_t pos, PreToken& 
   }
 
   // The normalizer has already folded full-width punctuation.
-  size_t idx = pos;
   size_t byte_pos = pos;
   char32_t codepoint = normalize::decodeUtf8(text, byte_pos);
 
@@ -230,13 +208,7 @@ bool PreTokenizer::tryMatchHashtag(std::string_view text, size_t pos, PreToken& 
   if (!opensHashtag(text, pos)) {
     return false;
   }
-  idx = byte_pos;
-
-  // Must have at least one valid hashtag character
-  if (idx >= text.size()) {
-    return false;
-  }
-
+  size_t idx = byte_pos;
   size_t content_start = idx;
   while (idx < text.size()) {
     byte_pos = idx;
@@ -268,49 +240,18 @@ bool PreTokenizer::tryMatchMention(std::string_view text, size_t pos, PreToken& 
   if (text[pos] != '@') {
     return false;
   }
-  size_t idx = pos + 1;
-
-  // Must have at least one valid character
-  if (idx >= text.size()) {
-    return false;
-  }
-
   // Parse username: alphanumeric and underscore only
-  size_t content_start = idx;
-  while (idx < text.size()) {
-    char chr = text[idx];
-    if (isAsciiAlnum(chr) || chr == '_') {
-      ++idx;
-    } else {
-      break;
-    }
-  }
+  size_t content_start = pos + 1;
+  size_t idx = scanAsciiRun(text, content_start, "_");
 
   // Must have content after @
   if (idx == content_start) {
     return false;
   }
 
-  // Check this is NOT an email (no @ followed by domain with dot)
-  // If followed by @, it's invalid
-  // If the content contains a dot followed by more chars, check if it's email-like
-  // Simple check: mentions don't have dots in username typically
-  // Also check if there's more content that looks like a domain
-  if (idx < text.size() && text[idx] == '.') {
-    // Might be email-like, check for domain pattern
-    size_t check_pos = idx + 1;
-    while (check_pos < text.size()) {
-      char chr = text[check_pos];
-      if (isAsciiAlnum(chr) || chr == '.' || chr == '-') {
-        ++check_pos;
-      } else {
-        break;
-      }
-    }
-    // If we found something that looks like a domain, skip this as mention
-    if (check_pos > idx + 1) {
-      return false;
-    }
+  // A dot followed by a domain-like run makes this email-like, not a mention
+  if (idx < text.size() && text[idx] == '.' && scanAsciiRun(text, idx + 1, ".-") > idx + 1) {
+    return false;
   }
 
   setTokenFromRange(token, text, pos, idx, PreTokenType::Mention, core::PartOfSpeech::Noun);
