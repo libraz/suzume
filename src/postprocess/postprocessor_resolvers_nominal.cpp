@@ -519,9 +519,14 @@ void splitFormalNounCopularDemo(std::vector<core::Morpheme>& result) {
         predicate.pos != core::PartOfSpeech::Determiner && utf8::equalsAny(predicate.getLemma(), {"ある", "ない"});
     const bool copular_head =
         host.extended_pos == core::ExtendedPOS::NounFormal || host.extended_pos == core::ExtendedPOS::ParticleNo;
-    if (!copular_head || copula.extended_pos != core::ExtendedPOS::ParticleAdverbial ||
-        !utf8::equalsAny(copula.surface, {"でも"}) || host.end != copula.start || copula.end != predicate.start ||
-        !supporting_verb) {
+    // Before the auxiliary verb ある any nominal takes the copula with も inserted
+    // (学生+で+も+ある); ない keeps the particle でも outside a formal head.
+    // An interrogative host makes でも the indefinite particle (なん+でも+あり).
+    const bool copular_frame =
+        supporting_verb && (copular_head || (predicate.getLemma() == "ある" &&
+                                             host.extended_pos != core::ExtendedPOS::PronounInterrogative));
+    if (copula.extended_pos != core::ExtendedPOS::ParticleAdverbial || !utf8::equalsAny(copula.surface, {"でも"}) ||
+        host.end != copula.start || copula.end != predicate.start || !copular_frame) {
       continue;
     }
 

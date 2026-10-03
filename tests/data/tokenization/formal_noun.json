@@ -2405,9 +2405,14 @@
           "surface": "学生"
         },
         {
-          "lemma": "でも",
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "lemma": "も",
           "pos": "Particle",
-          "surface": "でも"
+          "surface": "も"
         },
         {
           "lemma": "ある",

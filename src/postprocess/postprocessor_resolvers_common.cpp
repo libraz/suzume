@@ -197,4 +197,54 @@ void resolveSouHost(std::vector<core::Morpheme>& result) {
   }
 }
 
+// The written-style copula is the continuative で plus the auxiliary verb ある,
+// analyzed the same in every cell whatever the tense (事実+で+ある, 事実+で+
+// あっ+た, 本+で+あろ+う). After an onbin stem the で is the te-form instead
+// (読ん+で+ある), while a terminal verb takes the copula like any predicate.
+void resolveCopulaAru(std::vector<core::Morpheme>& result) {
+  for (size_t idx = 0; idx + 1 < result.size(); ++idx) {
+    auto& copula = result[idx];
+    auto& aru = result[idx + 1];
+    if (!utf8::equalsAny(copula.surface, {"で"}) || aru.getLemma() != "ある" ||
+        (aru.pos != core::PartOfSpeech::Verb && aru.pos != core::PartOfSpeech::Auxiliary)) {
+      continue;
+    }
+    if (idx > 0 && result[idx - 1].pos == core::PartOfSpeech::Verb &&
+        result[idx - 1].conj_form != grammar::ConjForm::Base) {
+      continue;
+    }
+    if (copula.extended_pos != core::ExtendedPOS::AuxCopulaDa) {
+      retagCopulaDa(copula);
+    }
+    if (aru.pos == core::PartOfSpeech::Verb) {
+      continue;
+    }
+    const char32_t cell = utf8::decodeLastChar(aru.surface);
+    core::ExtendedPOS extended_pos = core::ExtendedPOS::VerbShuushikei;
+    grammar::ConjForm conj_form = grammar::ConjForm::Base;
+    switch (cell) {
+      case U'っ':
+        extended_pos = core::ExtendedPOS::VerbOnbinkei;
+        conj_form = grammar::ConjForm::Onbinkei;
+        break;
+      case U'り':
+        extended_pos = core::ExtendedPOS::VerbRenyokei;
+        conj_form = grammar::ConjForm::Renyokei;
+        break;
+      case U'ろ':
+      case U'ら':
+        extended_pos = core::ExtendedPOS::VerbMizenkei;
+        conj_form = grammar::ConjForm::Mizenkei;
+        break;
+      case U'れ':
+        extended_pos = core::ExtendedPOS::VerbKateikei;
+        conj_form = grammar::ConjForm::Kateikei;
+        break;
+      default:
+        break;
+    }
+    retag(aru, core::PartOfSpeech::Verb, extended_pos, "ある", dictionary::ConjugationType::GodanRa, conj_form);
+  }
+}
+
 }  // namespace suzume::postprocess::resolver

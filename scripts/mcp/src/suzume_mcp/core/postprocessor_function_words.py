@@ -500,40 +500,30 @@ def postprocess_copula_neg(tokens: list[dict]) -> bool:
 
 @reports_mutation
 def postprocess_de_aru(tokens: list[dict]) -> bool:
-    """Fix copula で+ある/あり/あっ pattern based on context."""
-    for i in range(len(tokens)):
+    """Read で+ある after a nominal as the copula plus the auxiliary verb ある.
+
+    The copula of the written style is the continuative で plus ある, whose
+    cells all take the same analysis whatever the tense (事実+で+ある, 事実+で+
+    あっ+た, 本+で+あろ+う); the tense does not turn で into the case particle.
+    """
+    for i in range(len(tokens) - 1):
         t = tokens[i]
         if t.get("surface") != "で":
             continue
-        if i >= len(tokens) - 1:
-            continue
-
         nxt = tokens[i + 1]
-        nxt_surface = nxt.get("surface", "")
-
-        if nxt_surface not in ("ある", "あり", "あれ", "あっ"):
+        if nxt.get("surface") not in ("ある", "あり", "あれ", "あっ", "あろ", "あら"):
             continue
-
-        prev_pos = tokens[i - 1].get("pos", "") if i > 0 else ""
-        is_past = nxt_surface == "あっ"
-
-        if is_past and prev_pos in ("Noun", "Pronoun", "Suffix"):
-            # N+であった: で→Particle, あっ→Verb
-            t["pos"] = "Particle"
-            t["lemma"] = "で"
-            if nxt.get("pos") == "Auxiliary":
-                nxt["pos"] = "Verb"
-                nxt["lemma"] = "ある"
-        elif is_past:
-            # Na-adj+であった or other: keep as-is (copula chain)
-            pass
-        else:
-            # Present/continuous forms: で→Auxiliary(だ), ある→Verb
-            t["pos"] = "Auxiliary"
-            t["lemma"] = "だ"
-            if nxt.get("pos") == "Auxiliary":
-                nxt["pos"] = "Verb"
-                nxt["lemma"] = "ある"
+        # After an onbin stem the で is the te-form (読ん+で+ある), not the copula;
+        # a terminal verb takes the copula like any predicate (書く+で+あろ+う).
+        previous = tokens[i - 1] if i > 0 else {}
+        if previous.get("pos") == "Verb" and not previous.get("surface", "").endswith(
+            tuple("うくすつぬふむゆるぐずづぶぷ")
+        ):
+            continue
+        t["pos"] = "Auxiliary"
+        t["lemma"] = "だ"
+        nxt["pos"] = "Verb"
+        nxt["lemma"] = "ある"
 
 
 @reports_mutation

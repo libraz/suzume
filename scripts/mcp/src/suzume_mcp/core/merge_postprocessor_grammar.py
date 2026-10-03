@@ -351,6 +351,19 @@ def _postprocess_demo_copula(result: list[dict], applied_rule: str | None) -> tu
         token = result[index]
         following = result[index + 1] if index + 1 < len(result) else None
         preceding = new_result[-1] if new_result else None
+        predicate = result[index + 2] if index + 2 < len(result) else None
+        # Before the auxiliary verb ある the で is the copula with も inserted
+        # (学生+で+も+ある), a different construction from the particle でも.
+        if (
+            token.get("surface") == "で"
+            and following is not None
+            and following.get("surface") == "も"
+            and predicate is not None
+            and predicate.get("lemma") == "ある"
+        ):
+            new_result.append({"surface": "で", "pos": "助動詞", "lemma": "だ"})
+            index += 1
+            continue
         if (
             token.get("surface") == "で"
             and token.get("pos_sub1") == "格助詞"
