@@ -2239,14 +2239,9 @@
       "description": "ゆうがただった - auto-generated",
       "expected": [
         {
-          "lemma": "ゆう",
-          "pos": "Verb",
-          "surface": "ゆう"
-        },
-        {
-          "lemma": "がた",
+          "lemma": "ゆうがた",
           "pos": "Noun",
-          "surface": "がた"
+          "surface": "ゆうがた"
         },
         {
           "lemma": "だ",

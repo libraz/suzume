@@ -311,4 +311,18 @@ void resolveExcessiveDeverbalNoun(std::vector<core::Morpheme>& result) {
   }
 }
 
+// The continuative たまひ of the classical honorific takes the classical past
+// き (書き+たまひ+し); the conjunctive particle し follows a terminal form.
+void resolveHonorificContinuativePast(std::vector<core::Morpheme>& result) {
+  for (size_t idx = 1; idx < result.size(); ++idx) {
+    const auto& honorific = result[idx - 1];
+    auto& past = result[idx];
+    if (honorific.getLemma() != "たまふ" || !utf8::endsWith(honorific.surface, "ひ") ||
+        !utf8::equalsAny(past.surface, {"し"}) || past.pos == core::PartOfSpeech::Auxiliary) {
+      continue;
+    }
+    retagUninflected(past, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxClassicalKi, "き");
+  }
+}
+
 }  // namespace suzume::postprocess::resolver

@@ -279,10 +279,10 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       // 走り出したくなかった → 走り出し+たく+なかっ+た (not 走り+出したく+なかっ+た)
       {EPOS::AuxDesireTai, EPOS::AuxNegativeNai, cost::kModerateBonus},
 
-      // A desiderative predicate can modify a formal noun (確かめ+たい+こと).
-      // Without this connection, the lattice can reinterpret the final mora
-      // of the lexical verb as the start of an unrelated hiragana predicate.
-      {EPOS::AuxDesireTai, EPOS::NounFormal, cost::kStrongBonus},
+      // A desiderative predicate can modify a formal noun (確かめ+たい+こと,
+      // 見+まほしき+もの). It is an adjective-type auxiliary, so its attributive
+      // takes the same preference as an i-adjective's (美しい+こと).
+      {EPOS::AuxDesireTai, EPOS::NounFormal, cost::kDoubleVeryStrongBonus},
 
       // AuxTenseTa → verb forms - prohibit. A completed predicate cannot take a
       // second bare verb without a connective boundary. Cover every verb form;

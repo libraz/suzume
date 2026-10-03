@@ -4626,12 +4626,7 @@
         {
           "lemma": "まほし",
           "pos": "Auxiliary",
-          "surface": "ま"
-        },
-        {
-          "lemma": "ほしい",
-          "pos": "Adjective",
-          "surface": "ほしき"
+          "surface": "まほしき"
         },
         {
           "lemma": "もの",
@@ -4651,19 +4646,9 @@
           "surface": "知らせ"
         },
         {
-          "lemma": "た",
-          "pos": "Auxiliary",
-          "surface": "た"
-        },
-        {
           "lemma": "たまふ",
           "pos": "Auxiliary",
-          "surface": "ま"
-        },
-        {
-          "lemma": "たまふ",
-          "pos": "Auxiliary",
-          "surface": "ふ"
+          "surface": "たまふ"
         }
       ],
       "id": "tamafu_classical_honorific_auxiliary",

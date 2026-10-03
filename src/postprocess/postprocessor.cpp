@@ -213,6 +213,7 @@ std::vector<core::Morpheme> Postprocessor::process(std::vector<core::Morpheme> r
   resolver::mergeContractedTeruBeforeNominalizer(result);
   resolver::resolveListingTari(result);
   resolver::resolveExcessiveDeverbalNoun(result);
+  resolver::resolveHonorificContinuativePast(result);
 
   if (!options_.lemmatize) {
     // Role resolution must still run to supply POS and conjugation annotations,

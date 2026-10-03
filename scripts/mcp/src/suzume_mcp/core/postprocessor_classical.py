@@ -272,33 +272,84 @@ def postprocess_classical_ramu_boundary(tokens: list[dict]) -> None:
         idx += 1
 
 
-def postprocess_classical_desiderative_aux(tokens: list[dict]) -> bool:
-    """Normalize the split classical desiderative ま + ほし chain.
+_DESIDERATIVE_MAHOSHI_TAILS = ("ほし", "ほしき", "ほしく", "ほしけれ", "ほしから", "ほしかり")
 
-    ほし is the terminal cell of the same adjective the attributive ほしき
-    spells, and the analyzer splits both the same way.
+
+def postprocess_classical_desiderative_aux(tokens: list[dict]) -> bool:
+    """Rebuild the classical desiderative まほし the analyzer splits as ま + ほし.
+
+    まほし is one auxiliary in every cell (見+まほし, 見+まほしき+もの,
+    行か+まほしけれ); its ほし is not the modern adjective ほしい.
     """
     changed = False
-    for idx, token in enumerate(tokens[:-1]):
-        if token.get("surface") != "ま" or tokens[idx + 1].get("surface") not in ("ほし", "ほしき"):
-            continue
-        token["pos"] = "Auxiliary"
-        token["lemma"] = "まほし"
-        changed = True
+    idx = 1
+    while idx + 1 < len(tokens):
+        token, tail = tokens[idx], tokens[idx + 1]
+        if (
+            tokens[idx - 1].get("pos") == "Verb"
+            and token.get("surface") == "ま"
+            and tail.get("surface") in _DESIDERATIVE_MAHOSHI_TAILS
+        ):
+            tokens[idx : idx + 2] = [{"surface": "ま" + tail["surface"], "pos": "Auxiliary", "lemma": "まほし"}]
+            changed = True
+        idx += 1
     return changed
 
 
+_HONORIFIC_TAMAFU_CELLS = ("たまふ", "たまひ", "たまへ", "たまは", "たまう", "たまい", "たまえ", "たまわ")
+
+
+def _tamafu_lemma(cell: str) -> str:
+    """The ha-row cells belong to classical たまふ, the wa/a-row ones to modern たまう."""
+    return "たまふ" if cell[-1] in "ふひへは" else "たまう"
+
+
 def postprocess_classical_honorific_aux(tokens: list[dict]) -> bool:
-    """Normalize the split classical honorific auxiliary た + ま + ふ."""
+    """Rebuild the classical honorific auxiliary たまふ after a continuative.
+
+    The analyzer splits its terminal as た + ま + ふ and reads the other cells
+    as the lexical verb たまふ (give); after a verb continuative every cell is
+    the one honorific auxiliary (知らせ+たまふ, 書き+たまひ+し).
+    """
     changed = False
-    for idx in range(len(tokens) - 2):
-        first, second, third = tokens[idx : idx + 3]
-        if (first.get("surface"), second.get("surface"), third.get("surface")) != ("た", "ま", "ふ"):
+    idx = 1
+    while idx < len(tokens):
+        if tokens[idx - 1].get("pos") != "Verb":
+            idx += 1
             continue
-        for token in (second, third):
-            token["pos"] = "Auxiliary"
-            token["lemma"] = "たまふ"
-        changed = True
+        surfaces = "".join(token.get("surface", "") for token in tokens[idx : idx + 3])
+        if (
+            idx + 2 < len(tokens)
+            and tokens[idx].get("surface") == "た"
+            and tokens[idx + 1].get("surface") in ("ま", "まひ", "まへ")
+            and surfaces in _HONORIFIC_TAMAFU_CELLS
+        ):
+            tokens[idx : idx + 3] = [{"surface": surfaces, "pos": "Auxiliary", "lemma": _tamafu_lemma(surfaces)}]
+            changed = True
+        elif (
+            idx + 1 < len(tokens)
+            and tokens[idx].get("surface") in ("た", "たま")
+            and (tokens[idx].get("surface", "") + tokens[idx + 1].get("surface", "")) in _HONORIFIC_TAMAFU_CELLS
+        ):
+            cell = tokens[idx]["surface"] + tokens[idx + 1]["surface"]
+            tokens[idx : idx + 2] = [{"surface": cell, "pos": "Auxiliary", "lemma": _tamafu_lemma(cell)}]
+            changed = True
+        elif tokens[idx].get("surface") in _HONORIFIC_TAMAFU_CELLS and tokens[idx].get("pos") != "Auxiliary":
+            tokens[idx]["pos"] = "Auxiliary"
+            tokens[idx]["lemma"] = _tamafu_lemma(tokens[idx]["surface"])
+            changed = True
+        # The continuative たまひ takes the classical past き (書き+たまひ+し).
+        if (
+            tokens[idx].get("lemma") in ("たまふ", "たまう")
+            and tokens[idx].get("surface", "").endswith("ひ")
+            and idx + 1 < len(tokens)
+            and tokens[idx + 1].get("surface") == "し"
+            and tokens[idx + 1].get("pos") != "Auxiliary"
+        ):
+            tokens[idx + 1]["pos"] = "Auxiliary"
+            tokens[idx + 1]["lemma"] = "き"
+            changed = True
+        idx += 1
     return changed
 
 

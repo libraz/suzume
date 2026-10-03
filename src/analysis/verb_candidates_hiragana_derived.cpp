@@ -31,6 +31,23 @@ namespace vh = verb_helpers;
 
 namespace {
 
+// Subsidiary verbs conjugate as verbs and share their cells with lexical verbs
+// (いれ, おくれ, かね), unlike the closed non-verbal auxiliaries (まし, だっ).
+bool isSubsidiaryVerbAuxiliary(core::ExtendedPOS extended_pos) {
+  switch (extended_pos) {
+    case core::ExtendedPOS::AuxPassive:
+    case core::ExtendedPOS::AuxCausative:
+    case core::ExtendedPOS::AuxPotential:
+    case core::ExtendedPOS::AuxHonorific:
+    case core::ExtendedPOS::AuxExcessive:
+    case core::ExtendedPOS::AuxInability:
+    case core::ExtendedPOS::AuxBenefactive:
+      return true;
+    default:
+      return core::isAspectAuxiliaryType(extended_pos);
+  }
+}
+
 bool startsWithRenyokeiAuxiliary(std::string_view following_surface) {
   for (const auto& auxiliary : grammar::getAuxiliaries()) {
     if (auxiliary.required_conn == grammar::conn::kVerbRenyokei &&
@@ -255,6 +272,17 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
             : lookupEntryInRange(*dict_manager, codepoints, start_pos, end_pos, core::PartOfSpeech::Verb);
     if (registered_cell != nullptr && registered_cell->extended_pos != core::ExtendedPOS::VerbKateikei) {
       continue;
+    }
+    // A surface registered as a cell of a non-verbal auxiliary is that
+    // closed-class word, not an unverified lexical continuative (支払い+まし+た,
+    // not a verb ます). Subsidiary verbs share their cells with lexical verbs
+    // (いれ, おくれ, かね) and stay open.
+    if (!is_dict_verb && dict_manager != nullptr) {
+      const auto* auxiliary_cell =
+          lookupEntryInRange(*dict_manager, codepoints, start_pos, end_pos, core::PartOfSpeech::Auxiliary);
+      if (auxiliary_cell != nullptr && !isSubsidiaryVerbAuxiliary(auxiliary_cell->extended_pos)) {
+        continue;
+      }
     }
 
     // Likewise, a short candidate beginning inside a registered verb is its

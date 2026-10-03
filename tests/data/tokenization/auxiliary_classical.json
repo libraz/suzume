@@ -625,12 +625,7 @@
         {
           "lemma": "まほし",
           "pos": "Auxiliary",
-          "surface": "ま"
-        },
-        {
-          "lemma": "ほしい",
-          "pos": "Adjective",
-          "surface": "ほし"
+          "surface": "まほし"
         }
       ],
       "id": "mahoshi",

@@ -348,12 +348,23 @@ EntrySpecRange getAuxiliaryEntries() {
       aux("たがり", "たがる", EPOS::AuxDesireTai),  // 連用 (+ます)
       aux("たがっ", "たがる", EPOS::AuxDesireTai),  // 連用促音便 (+た/て)
       aux("たがれ", "たがる", EPOS::AuxDesireTai),  // 仮定 (+ば)
-      // Classical desiderative まほし: verb renyokei + ま + ほしき.
-      aux("ま", "まほし", EPOS::AuxDesireTai),
-      adj("ほしき", "ほしい", EPOS::AdjBasic),
-      // Classical honorific subsidiary たまふ: verb renyokei + た + ま + ふ.
-      aux("ま", "たまふ", EPOS::AuxHonorific),
-      aux("ふ", "たまふ", EPOS::AuxHonorific),
+      // Classical desiderative まほし after a verb irrealis, one auxiliary in
+      // every cell (見+まほし, 見+まほしき+もの, 行か+まほしけれ).
+      aux("まほし", "まほし", EPOS::AuxDesireTai),
+      aux("まほしき", "まほし", EPOS::AuxDesireTai),
+      aux("まほしく", "まほし", EPOS::AuxDesireTai),
+      aux("まほしけれ", "まほし", EPOS::AuxDesireTai),
+      aux("まほしから", "まほし", EPOS::AuxDesireTai),
+      aux("まほしかり", "まほし", EPOS::AuxDesireTai),
+      // Classical honorific subsidiary たまふ after a verb continuative; the
+      // wa/a-row cells belong to its modern form たまう (たまえ above).
+      aux("たまふ", "たまふ", EPOS::AuxHonorific),
+      aux("たまひ", "たまふ", EPOS::AuxHonorific),
+      aux("たまへ", "たまふ", EPOS::AuxHonorific),
+      aux("たまは", "たまふ", EPOS::AuxHonorific),
+      aux("たまう", "たまう", EPOS::AuxHonorific),
+      aux("たまい", "たまう", EPOS::AuxHonorific),
+      aux("たまわ", "たまう", EPOS::AuxHonorific),
       // Classical terminal component after a kanji stem (候+ふ, 思+ふ).
       // It is context-gated by the tokenizer so it cannot become a free
       // one-mora lexical verb.
