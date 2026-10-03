@@ -832,6 +832,65 @@
       ],
       "id": "na_12",
       "input": "変な人"
+    },
+    {
+      "description": "Kana na-adjective stem before genitive の is not a fabricated verb",
+      "expected": [
+        {
+          "lemma": "ふつう",
+          "pos": "Adjective",
+          "surface": "ふつう"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "人",
+          "pos": "Noun",
+          "surface": "人"
+        }
+      ],
+      "id": "futsuuno",
+      "input": "ふつうの人"
+    },
+    {
+      "description": "Kana na-adjective stem before の and a kana formal noun",
+      "expected": [
+        {
+          "lemma": "これ",
+          "pos": "Pronoun",
+          "surface": "これ"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "ふつう",
+          "pos": "Adjective",
+          "surface": "ふつう"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "こと"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "korehafutsuunokotoda",
+      "input": "これはふつうのことだ"
     }
   ],
   "description": "Na-adjectives (ナ形容詞) (part 2/2)",
