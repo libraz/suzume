@@ -100,20 +100,12 @@ bool predicateEndsAt(const std::vector<char32_t>& codepoints, size_t pos,
       partOfSpeechMask(core::PartOfSpeech::Verb) | partOfSpeechMask(core::PartOfSpeech::Auxiliary));
 }
 
-bool clauseEndsAt(const std::vector<char32_t>& codepoints, size_t pos) {
-  if (pos >= codepoints.size()) {
-    return true;
-  }
-  const char32_t next = codepoints[pos];
-  return next == U'。' || next == U'、' || next == U'！' || next == U'？' || next == U'」';
-}
-
 // A 終止形 closes its clause or carries an auxiliary that attaches to one: the
 // conjectural べし and its negative counterpart まじ, the volitional む, and the
 // hearsay なり. Anything else after the cell belongs to a different form.
 bool shuushikeiEndsAt(const std::vector<char32_t>& codepoints, size_t pos,
                       const dictionary::DictionaryManager* dict_manager) {
-  return clauseEndsAt(codepoints, pos) ||
+  return vh::clauseEndsAt(codepoints, pos) ||
          dictionaryTailFollowsAt(codepoints, pos, dict_manager, core::PartOfSpeech::Auxiliary,
                                  {core::ExtendedPOS::AuxClassicalBeshi, core::ExtendedPOS::AuxNegativeMai,
                                   core::ExtendedPOS::AuxVolitional, core::ExtendedPOS::AuxClassicalNari});
@@ -161,7 +153,7 @@ HaRowLicense haRowCellLicense(core::ExtendedPOS cell, const std::vector<char32_t
           codepoints, end_pos, dict_manager, core::PartOfSpeech::Auxiliary,
           {core::ExtendedPOS::AuxClassicalKeri, core::ExtendedPOS::AuxClassicalPerfect,
            core::ExtendedPOS::AuxClassicalTari, core::ExtendedPOS::AuxVolitional, core::ExtendedPOS::AuxDesireTai});
-      license.licensed = clauseEndsAt(codepoints, end_pos);
+      license.licensed = vh::clauseEndsAt(codepoints, end_pos);
       break;
     case core::ExtendedPOS::VerbShuushikei: {
       // 四段 spells its 終止形 and its 連体形 alike, so the adnominal position
@@ -171,7 +163,7 @@ HaRowLicense haRowCellLicense(core::ExtendedPOS cell, const std::vector<char32_t
       // outright and the weaker evidence is recorded as such.
       const bool ends_predicate = shuushikeiEndsAt(codepoints, end_pos, dict_manager);
       license.licensed = ends_predicate || vh::lexicalWordFollowsAt(codepoints, end_pos);
-      license.closed_class_tail = ends_predicate && !clauseEndsAt(codepoints, end_pos);
+      license.closed_class_tail = ends_predicate && !vh::clauseEndsAt(codepoints, end_pos);
       break;
     }
     case core::ExtendedPOS::VerbKateikei: {
@@ -194,7 +186,7 @@ HaRowLicense haRowCellLicense(core::ExtendedPOS cell, const std::vector<char32_t
       const std::string ha_row_stem = extractSubstring(codepoints, start_pos, end_pos - 1);
       const bool names_a_verb = vh::isVerbInDictionary(dict_manager, ha_row_stem + "う") ||
                                 grammar::isHumbleHonorificLemma(ha_row_stem + "ふ");
-      if (!license.closed_class_tail && names_a_verb && clauseEndsAt(codepoints, end_pos) &&
+      if (!license.closed_class_tail && names_a_verb && vh::clauseEndsAt(codepoints, end_pos) &&
           predicateEndsAt(codepoints, start_pos, dict_manager)) {
         license.licensed = true;
         license.cell = core::ExtendedPOS::VerbMeireikei;
