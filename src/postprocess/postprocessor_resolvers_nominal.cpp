@@ -277,10 +277,8 @@ void resolveCopularAro(std::vector<core::Morpheme>& result) {
         aro.extended_pos != core::ExtendedPOS::VerbMizenkei || aro.lemma != "ある") {
       continue;
     }
-    aro.pos = core::PartOfSpeech::Auxiliary;
-    aro.extended_pos = core::ExtendedPOS::AuxCopulaDa;
-    aro.conj_type = dictionary::ConjugationType::GodanRa;
-    aro.conj_form = grammar::ConjForm::Mizenkei;
+    retag(aro, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxCopulaDa, "ある",
+          dictionary::ConjugationType::GodanRa, grammar::ConjForm::Mizenkei);
   }
 }
 
