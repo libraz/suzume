@@ -26,6 +26,33 @@
       ],
       "id": "meyouganai",
       "input": "慰めようがない。"
+    },
+    {
+      "description": "ことあるごとに - regression test",
+      "expected": [
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "こと"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        },
+        {
+          "lemma": "ごと",
+          "pos": "Suffix",
+          "surface": "ごと"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        }
+      ],
+      "id": "kotoarugotoni",
+      "input": "ことあるごとに"
     }
   ],
   "description": "Formal nouns (こと、もの、ところ) (part 2/2)",
