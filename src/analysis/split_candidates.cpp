@@ -5,6 +5,8 @@
 
 #include "split_candidates.h"
 
+#include <algorithm>
+
 #include "analysis/bigram_table.h"
 #include "analysis/category_cost.h"
 #include "analysis/dictionary_probe.h"
@@ -97,12 +99,7 @@ bool hasDictionaryLexicalPrefix(const std::vector<dictionary::LookupResult>& res
 }
 
 bool containsIterationMark(const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos) {
-  for (size_t index = start_pos; index < end_pos; ++index) {
-    if (normalize::isIterationMark(codepoints[index])) {
-      return true;
-    }
-  }
-  return false;
+  return std::any_of(codepoints.begin() + start_pos, codepoints.begin() + end_pos, normalize::isIterationMark);
 }
 
 // A suru verbal-noun candidate may not start inside a dictionary-backed

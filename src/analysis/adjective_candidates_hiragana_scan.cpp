@@ -61,12 +61,7 @@ std::string normalizeProlongedSoundMark(const std::vector<char32_t>& codepoints,
 
 // Check if sequence contains a prolonged sound mark
 bool adj_detail::containsProlongedSoundMark(const std::vector<char32_t>& codepoints, size_t start, size_t end) {
-  for (size_t i = start; i < end; ++i) {
-    if (normalize::isProlongedSoundMark(codepoints[i])) {
-      return true;
-    }
-  }
-  return false;
+  return std::any_of(codepoints.begin() + start, codepoints.begin() + end, normalize::isProlongedSoundMark);
 }
 
 namespace {
