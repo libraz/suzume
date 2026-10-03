@@ -247,4 +247,22 @@ void resolveCopulaAru(std::vector<core::Morpheme>& result) {
   }
 }
 
+// Before the nominalizer の the る of てる contracts to ん (食べ+てん+の =
+// 食べてるの); a nominalizer ん directly before the nominalizer の is no reading.
+void mergeContractedTeruBeforeNominalizer(std::vector<core::Morpheme>& result) {
+  for (size_t idx = 1; idx + 2 < result.size(); ++idx) {
+    auto& te = result[idx];
+    const auto& contracted = result[idx + 1];
+    const auto& nominalizer = result[idx + 2];
+    if (result[idx - 1].pos != core::PartOfSpeech::Verb || !utf8::equalsAny(te.surface, {"て", "で"}) ||
+        !utf8::equalsAny(contracted.surface, {"ん"}) || nominalizer.getLemma() != "の" || te.end != contracted.start) {
+      continue;
+    }
+    const std::string headword = te.surface + "る";
+    mergeInto(te, contracted);
+    retagUninflected(te, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxAspectIru, headword);
+    result.erase(result.begin() + static_cast<std::ptrdiff_t>(idx + 1));
+  }
+}
+
 }  // namespace suzume::postprocess::resolver

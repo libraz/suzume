@@ -113,9 +113,26 @@ def postprocess_contracted_progressive_aux(tokens: list[dict]) -> bool:
             continue
         if not previous.get("surface", "").endswith("ん"):
             continue
+        # でる is the voiced てる after a nasal onbin; like どく it keeps its own headword.
         token["pos"] = "Auxiliary"
-        token["lemma"] = "いる"
+        token["lemma"] = "でる"
         changed = True
+    # Before の the る of てる contracts to ん (食べ+てん+の = 食べてるの); a
+    # nominalizer ん directly before the nominalizer の is not a reading.
+    idx = 1
+    while idx + 1 < len(tokens):
+        te, contracted, nominalizer = tokens[idx], tokens[idx + 1], tokens[idx + 2] if idx + 2 < len(tokens) else {}
+        if (
+            te.get("surface") in ("て", "で")
+            and tokens[idx - 1].get("pos") == "Verb"
+            and contracted.get("surface") == "ん"
+            and nominalizer.get("surface") == "の"
+        ):
+            tokens[idx : idx + 2] = [
+                {"surface": te["surface"] + "ん", "pos": "Auxiliary", "lemma": te["surface"] + "る"}
+            ]
+            changed = True
+        idx += 1
     return changed
 
 

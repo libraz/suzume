@@ -618,7 +618,7 @@
           "surface": "読ん"
         },
         {
-          "lemma": "いる",
+          "lemma": "でる",
           "pos": "Auxiliary",
           "surface": "でる"
         }
@@ -635,7 +635,7 @@
           "surface": "遊ん"
         },
         {
-          "lemma": "いる",
+          "lemma": "でる",
           "pos": "Auxiliary",
           "surface": "でる"
         }
@@ -652,7 +652,7 @@
           "surface": "飲ん"
         },
         {
-          "lemma": "いる",
+          "lemma": "でる",
           "pos": "Auxiliary",
           "surface": "でる"
         }
@@ -669,7 +669,7 @@
           "surface": "住ん"
         },
         {
-          "lemma": "いる",
+          "lemma": "でる",
           "pos": "Auxiliary",
           "surface": "でる"
         }
@@ -686,7 +686,7 @@
           "surface": "選ん"
         },
         {
-          "lemma": "いる",
+          "lemma": "でる",
           "pos": "Auxiliary",
           "surface": "でる"
         }

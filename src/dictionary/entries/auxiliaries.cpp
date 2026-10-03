@@ -880,10 +880,11 @@ EntrySpecRange getAuxiliaryEntries() {
       // MeCab: 動詞,非自立 → Auxiliary (subsidiary verbs)
       aux("てる", "てる", EPOS::AuxAspectIru),
       aux("て", "てる", EPOS::AuxAspectIru),
-      // Voiced contraction after an n-onbin: 読んでる = 読んでいる.
+      // Voiced contraction after an n-onbin: 読んでる = 読んでいる. Like どく, the
+      // voiced cell keeps its own headword.
       // Its selection is restricted by the connection scorer so lexical 出る
       // remains available outside that grammatical environment.
-      aux("でる", "いる", EPOS::AuxAspectIru),
+      aux("でる", "でる", EPOS::AuxAspectIru),
       // で remains excluded: 出たい must be で(出る連用形)+たい.
       aux("とく", "とく", EPOS::AuxAspectOku),
       aux("どく", "どく", EPOS::AuxAspectOku),

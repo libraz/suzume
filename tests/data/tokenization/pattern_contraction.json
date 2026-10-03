@@ -799,14 +799,9 @@
           "surface": "食べ"
         },
         {
-          "lemma": "て",
-          "pos": "Particle",
-          "surface": "て"
-        },
-        {
-          "lemma": "の",
-          "pos": "Particle",
-          "surface": "ん"
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てん"
         },
         {
           "lemma": "の",
@@ -819,14 +814,9 @@
           "surface": "考え"
         },
         {
-          "lemma": "て",
-          "pos": "Particle",
-          "surface": "て"
-        },
-        {
-          "lemma": "の",
-          "pos": "Particle",
-          "surface": "ん"
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てん"
         },
         {
           "lemma": "の",
@@ -919,14 +909,9 @@
           "surface": "読ん"
         },
         {
-          "lemma": "で",
-          "pos": "Particle",
-          "surface": "で"
-        },
-        {
-          "lemma": "の",
-          "pos": "Particle",
-          "surface": "ん"
+          "lemma": "でる",
+          "pos": "Auxiliary",
+          "surface": "でん"
         },
         {
           "lemma": "の",
@@ -939,14 +924,9 @@
           "surface": "飲ん"
         },
         {
-          "lemma": "で",
-          "pos": "Particle",
-          "surface": "で"
-        },
-        {
-          "lemma": "の",
-          "pos": "Particle",
-          "surface": "ん"
+          "lemma": "でる",
+          "pos": "Auxiliary",
+          "surface": "でん"
         },
         {
           "lemma": "の",
@@ -1052,14 +1032,9 @@
           "surface": "見"
         },
         {
-          "lemma": "て",
-          "pos": "Particle",
-          "surface": "て"
-        },
-        {
-          "lemma": "の",
-          "pos": "Particle",
-          "surface": "ん"
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てん"
         },
         {
           "lemma": "の",
@@ -1089,14 +1064,9 @@
           "surface": "見"
         },
         {
-          "lemma": "て",
-          "pos": "Particle",
-          "surface": "て"
-        },
-        {
-          "lemma": "の",
-          "pos": "Particle",
-          "surface": "ん"
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てん"
         },
         {
           "lemma": "の",
