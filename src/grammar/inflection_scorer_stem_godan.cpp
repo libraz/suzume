@@ -430,7 +430,8 @@ float scoreGodan(float base, const InflectionScoreContext& context) {
     // GodanTa te-form: 持つ → 持った → 持ってた
     // Only penalize when the first auxiliary actually starts with て/で.
     // Other valid renyokei auxiliaries (持ち+ます/たい) must not be affected.
-    if (required_conn == conn::kVerbRenyokei && first_aux_starts_with_te_de) {
+    if (required_conn == conn::kVerbRenyokei &&
+        (utf8::startsWith(first_aux, "て") || utf8::startsWith(first_aux, "で"))) {
       base -= inflection::kPenaltyGodanTaRenyokeiTeDeAuxInvalid;
       logConfidenceAdjustment(-inflection::kPenaltyGodanTaRenyokeiTeDeAuxInvalid,
                               "godan_ta_renyokei_te_de_aux_invalid");

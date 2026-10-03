@@ -14,7 +14,7 @@
 namespace suzume::grammar {
 
 float calculateConfidence(VerbType type, std::string_view stem, size_t aux_total_len, size_t aux_count,
-                          uint16_t required_conn, size_t suffix_len, bool first_aux_starts_with_te_de,
+                          uint16_t required_conn, size_t suffix_len, std::string_view first_aux,
                           const InflectionScorerOptions* opts) {
   float base = GET_OPT(base_confidence, inflection::kBaseConfidence);
 
@@ -23,8 +23,8 @@ float calculateConfidence(VerbType type, std::string_view stem, size_t aux_total
                                                 << " conn=" << required_conn << " suffix_len=" << suffix_len
                                                 << ": base=" << base << "\n");
 
-  const inflection_score_detail::InflectionScoreContext context{
-      type, stem, aux_total_len, aux_count, required_conn, suffix_len, first_aux_starts_with_te_de, opts};
+  const inflection_score_detail::InflectionScoreContext context{type,          stem,       aux_total_len, aux_count,
+                                                                required_conn, suffix_len, first_aux,     opts};
   base = inflection_score_detail::scoreStemAndIchidan(base, context);
   base = inflection_score_detail::scoreGodan(base, context);
   base = inflection_score_detail::scoreAdjectiveAndForm(base, context);

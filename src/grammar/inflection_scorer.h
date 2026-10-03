@@ -82,8 +82,8 @@ struct InflectionScorerOptions {
  * @param aux_count Number of matched auxiliary suffixes
  * @param required_conn The required connection ID from the auxiliary chain
  * @param suffix_len Total length of suffix (verb ending + auxiliaries)
- * @param first_aux_starts_with_te_de Whether the auxiliary adjacent to the verb
- * starts with the connective marker て/で
+ * @param first_aux The auxiliary adjacent to the stem (empty when none); its
+ * opening kana tells a connective て/で or an adjective's own ending apart
  * @param opts Optional overrides for scoring constants (nullptr = use defaults)
  * @return Confidence score in range [0.5, 0.95]
  *
@@ -95,7 +95,7 @@ struct InflectionScorerOptions {
  * - Disambiguation between similar patterns (Suru vs GodanSa)
  */
 float calculateConfidence(VerbType type, std::string_view stem, size_t aux_total_len, size_t aux_count,
-                          uint16_t required_conn, size_t suffix_len, bool first_aux_starts_with_te_de = false,
+                          uint16_t required_conn, size_t suffix_len, std::string_view first_aux = {},
                           const InflectionScorerOptions* opts = nullptr);
 
 }  // namespace suzume::grammar

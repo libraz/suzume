@@ -152,9 +152,9 @@ TEST(InflectionScorerTest, GodanTaPenaltyOnlyAppliesToTeDeStartingAuxiliary) {
   opts.confidence_floor = 0.0F;
   opts.confidence_ceiling = 1.0F;
   const float regular_aux = calculateConfidence(VerbType::GodanTa, "持", kOneKanaBytes, 1, conn::kVerbRenyokei,
-                                                kOneKanaBytes * 2, false, &opts);
+                                                kOneKanaBytes * 2, "た", &opts);
   const float te_de_aux = calculateConfidence(VerbType::GodanTa, "持", kOneKanaBytes, 1, conn::kVerbRenyokei,
-                                              kOneKanaBytes * 2, true, &opts);
+                                              kOneKanaBytes * 2, "て", &opts);
 
   EXPECT_FLOAT_EQ(regular_aux - te_de_aux, inflection::kPenaltyGodanTaRenyokeiTeDeAuxInvalid);
 }

@@ -538,7 +538,11 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
             const auto* adjective = dict_manager->lookupExact(stem, core::PartOfSpeech::Adjective);
             const bool is_complete_na_adjective =
                 adjective != nullptr && adjective->extended_pos == core::ExtendedPOS::AdjNaAdj;
-            if (isVerbInDictionary(dict_manager, stem) || is_complete_na_adjective ||
+            // A stem closed by る is a verb terminal before hearsay そう (食べる+そう)
+            // unless the adjective it builds is attested (明る+そう).
+            const bool verb_terminal_shape =
+                utf8::endsWith(stem, "る") && !isAdjectiveInDictionary(dict_manager, base_form);
+            if (verb_terminal_shape || isVerbInDictionary(dict_manager, stem) || is_complete_na_adjective ||
                 hasVerifiedPredicateDerivedAdjective(base_form, inflection, dict_manager) ||
                 verb_helpers::startsWithVerbContinuative(dict_manager, normalize::toCodepoints(stem), 0,
                                                          normalize::utf8Length(stem))) {
