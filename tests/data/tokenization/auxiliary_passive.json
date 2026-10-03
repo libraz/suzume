@@ -80,6 +80,114 @@
       ],
       "id": "ninoserareta",
       "input": "車にのせられた"
+    },
+    {
+      "description": "奪われかねない - regression test",
+      "expected": [
+        {
+          "lemma": "奪う",
+          "pos": "Verb",
+          "surface": "奪わ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "かねる",
+          "pos": "Auxiliary",
+          "surface": "かね"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "warekanenai",
+      "input": "奪われかねない"
+    },
+    {
+      "description": "失われかねない - regression test",
+      "expected": [
+        {
+          "lemma": "失う",
+          "pos": "Verb",
+          "surface": "失わ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "かねる",
+          "pos": "Auxiliary",
+          "surface": "かね"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "warekanenai_2",
+      "input": "失われかねない"
+    },
+    {
+      "description": "奪われがちだ - regression test",
+      "expected": [
+        {
+          "lemma": "奪う",
+          "pos": "Verb",
+          "surface": "奪わ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "がち",
+          "pos": "Suffix",
+          "surface": "がち"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "waregachida",
+      "input": "奪われがちだ"
+    },
+    {
+      "description": "奪われそうだ - regression test",
+      "expected": [
+        {
+          "lemma": "奪う",
+          "pos": "Verb",
+          "surface": "奪わ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "そう",
+          "pos": "Adjective",
+          "surface": "そう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "waresouda",
+      "input": "奪われそうだ"
     }
   ],
   "description": "auxiliary_passive tests",
