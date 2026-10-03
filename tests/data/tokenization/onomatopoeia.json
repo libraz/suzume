@@ -1541,6 +1541,60 @@
       ],
       "id": "ndattto",
       "input": "読んだっと"
+    },
+    {
+      "description": "しんと静まり返った - regression test",
+      "expected": [
+        {
+          "lemma": "しんと",
+          "pos": "Adverb",
+          "surface": "しんと"
+        },
+        {
+          "lemma": "静まり返る",
+          "pos": "Verb",
+          "surface": "静まり返っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "shinto_mari_ttta",
+      "input": "しんと静まり返った"
+    },
+    {
+      "description": "部屋がしんとした - regression test",
+      "expected": [
+        {
+          "lemma": "部屋",
+          "pos": "Noun",
+          "surface": "部屋"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "しんと",
+          "pos": "Adverb",
+          "surface": "しんと"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "gashintoshita",
+      "input": "部屋がしんとした"
     }
   ],
   "description": "Onomatopoeia and mimetic words",

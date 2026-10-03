@@ -1020,6 +1020,30 @@ def repair_kamo_quotative(tokens: list[dict]) -> None:
             ]
 
 
+def repair_mimetic_n_to_suru(tokens: list[dict]) -> None:
+    """Rebuild a two-mora kana noun in ん + と + する as the mimetic adverb.
+
+    The reference reads 部屋がしんとした as the noun しん (芯) + と, yet
+    returns しんと as one adverb before a content verb; a CVん mora pair
+    marked by と before する is the mimetic manner adverb (ぽつんと+した).
+    """
+    idx = 0
+    while idx < len(tokens) - 2:
+        noun, to, verb = tokens[idx], tokens[idx + 1], tokens[idx + 2]
+        surface = noun.get("surface", "")
+        if (
+            noun.get("pos") == "名詞"
+            and regex.fullmatch(r"\p{Hiragana}ん", surface)
+            and to.get("surface") == "と"
+            and to.get("pos") == "助詞"
+            and verb.get("lemma") == "する"
+        ):
+            tokens[idx : idx + 2] = [
+                {"surface": surface + "と", "pos": "副詞", "pos_sub1": "一般", "lemma": surface + "と"}
+            ]
+        idx += 1
+
+
 def repair_adjective_yo_quotative(tokens: list[dict]) -> None:
     """Split a kana verb in よっ before て that is an adjective plus よ + って.
 
