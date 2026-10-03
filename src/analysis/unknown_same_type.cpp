@@ -154,7 +154,7 @@ BoundAuxiliary boundAuxiliaryAt(const std::vector<char32_t>& codepoints, size_t 
     const size_t after = pos + length;
     if (after >= codepoints.size()) {
       // At the clause end only the copula is evidence, and only where a
-      // particle already brackets the run on the left. The copula is the one
+      // particle or the clause start brackets the run on the left. The copula is the one
       // auxiliary that selects a nominal, so its presence says the kana in
       // front of it closed a noun (これ|は|りんご|だ). Every other auxiliary
       // selects a predicate cell, and its kana are indistinguishable from a
@@ -1606,7 +1606,8 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
     // だ|と against みかん|だ|と), and stopping there would hide the run the
     // copula actually brackets.
     for (size_t trimmed = start_pos + 1; trimmed < scan; ++trimmed) {
-      if (boundAuxiliaryAt(codepoints, trimmed, dict_manager_, left_particle_bracket).length > 0) {
+      if (boundAuxiliaryAt(codepoints, trimmed, dict_manager_, left_particle_bracket || left_clause_bracket).length >
+          0) {
         emit_promoted_run(trimmed);
       }
     }

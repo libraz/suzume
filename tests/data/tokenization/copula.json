@@ -2760,6 +2760,23 @@
       ],
       "id": "soredakedearu",
       "input": "それだけである"
+    },
+    {
+      "description": "sentence-initial kana nominal before a clause-final copula",
+      "expected": [
+        {
+          "lemma": "ふつう",
+          "pos": "Noun",
+          "surface": "ふつう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "futsuuda",
+      "input": "ふつうだ"
     }
   ],
   "description": "Copula patterns (だ、です、である)",

@@ -1074,6 +1074,18 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(const std::vector<c
                                   }),
                    candidates.end());
 
+  // A terminal verb reaches the copula only through だろ (降る+だろ+う), so an
+  // unattested one before a bare だ is a nominal misread (ふつう+だ).
+  candidates.erase(std::remove_if(candidates.begin(), candidates.end(),
+                                  [&codepoints](const UnknownCandidate& verb_candidate) {
+                                    const size_t next = verb_candidate.end;
+                                    return !verb_candidate.lemma_verified &&
+                                           verb_candidate.extended_pos == core::ExtendedPOS::VerbShuushikei &&
+                                           next < codepoints.size() && codepoints[next] == U'だ' &&
+                                           (next + 1 >= codepoints.size() || codepoints[next + 1] != U'ろ');
+                                  }),
+                   candidates.end());
+
   // Add emphatic variants (いくっ, するっ, etc.)
   vh::addEmphaticVariants(candidates, codepoints);
 
