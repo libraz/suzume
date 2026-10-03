@@ -144,6 +144,50 @@
       ],
       "id": "ni_wooita",
       "input": "机に本をおいた。"
+    },
+    {
+      "description": "わかった - regression test",
+      "expected": [
+        {
+          "lemma": "わかる",
+          "pos": "Verb",
+          "surface": "わかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wakattta",
+      "input": "わかった"
+    },
+    {
+      "description": "よくわかっている - regression test",
+      "expected": [
+        {
+          "lemma": "よい",
+          "pos": "Adjective",
+          "surface": "よく"
+        },
+        {
+          "lemma": "わかる",
+          "pos": "Verb",
+          "surface": "わかっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "yokuwakattteiru",
+      "input": "よくわかっている"
     }
   ],
   "description": "verb_onbin tests",
