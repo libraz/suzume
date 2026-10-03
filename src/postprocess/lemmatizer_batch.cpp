@@ -19,8 +19,7 @@ namespace {
 // Retag a non-verbal host as a verb continuative: an Ichidan stem takes +る,
 // otherwise the Godan base is recovered from the final i-row kana.
 void retagAsContinuative(core::Morpheme& morpheme, bool ichidan_stem) {
-  const std::string_view godan_suffix =
-      grammar::godanBaseSuffixFromIRow(utf8::decodeFirstChar(utf8::lastChar(morpheme.surface)));
+  const std::string_view godan_suffix = grammar::godanBaseSuffixFromIRow(utf8::decodeLastChar(morpheme.surface));
   if (!ichidan_stem && godan_suffix.empty()) {
     return;
   }
@@ -80,8 +79,8 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes, bool updat
       // would undo the voice boundary (使わ+れ+始め).
     } else if (next_is_verbal_hajime && (!is_dictionary_noun || hajime_has_verbal_follower) &&
                morpheme.pos != core::PartOfSpeech::Verb && morpheme.pos != core::PartOfSpeech::Auxiliary) {
-      retagAsContinuative(morpheme, grammar::endsWithERow(morpheme.surface) ||
-                                        utf8::decodeFirstChar(utf8::lastChar(morpheme.surface)) == U'じ');
+      retagAsContinuative(morpheme,
+                          grammar::endsWithERow(morpheme.surface) || utf8::decodeLastChar(morpheme.surface) == U'じ');
     }
 
     // The polite auxiliary selects a verbal continuative. This resolves
@@ -247,9 +246,9 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes, bool updat
     if (morpheme.pos == core::PartOfSpeech::Verb && morpheme.extended_pos == core::ExtendedPOS::VerbRenyokei &&
         morpheme.surface.size() == core::kTwoJapaneseCharBytes && utf8::endsWith(morpheme.surface, "せ") &&
         i + 1 < morphemes.size() && morphemes[i + 1].extended_pos == core::ExtendedPOS::AuxNegativeNu) {
-      std::string stem(utf8::dropLastChar(morpheme.surface));
+      const std::string_view stem = utf8::dropLastChar(morpheme.surface);
       if (grammar::isAllKanji(stem)) {
-        morpheme.lemma = stem + "する";
+        morpheme.lemma = normalize::concat(stem, "する");
         morpheme.conj_type = dictionary::ConjugationType::Suru;
         morpheme.extended_pos = core::ExtendedPOS::VerbMizenkei;
       }
@@ -287,17 +286,15 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes, bool updat
       // deterministic and dictionary-free — do NOT route this through the dict-order
       // helper (getGodanTypesByOnbin is Ka-first and dict-gated): voicing correctly
       // handles out-of-dict verbs (凪いだ→凪ぐ) and voiced ties (ついだ→つぐ).
-      std::string stem(utf8::dropLastChar(morpheme.surface));
-      const std::string godan_wa_base = stem + "う";
-      const std::string godan_ka_base = stem + "く";
-      const std::string godan_ga_base = stem + "ぐ";
+      const std::string_view stem = utf8::dropLastChar(morpheme.surface);
+      const std::string godan_wa_base = normalize::concat(stem, "う");
+      const std::string godan_ka_base = normalize::concat(stem, "く");
+      const std::string godan_ga_base = normalize::concat(stem, "ぐ");
       const bool selected_i_onbin_base = morpheme.extended_pos == core::ExtendedPOS::VerbOnbinkei &&
                                          (morpheme.lemma == godan_ka_base || morpheme.lemma == godan_ga_base);
       const bool has_godan_wa_entry = hasExactVerbEntry(dict_manager_, godan_wa_base);
-      const bool has_godan_ka_entry =
-          dict_manager_ != nullptr && dict_manager_->lookupExact(godan_ka_base, core::PartOfSpeech::Verb) != nullptr;
-      const bool has_godan_ga_entry =
-          dict_manager_ != nullptr && dict_manager_->lookupExact(godan_ga_base, core::PartOfSpeech::Verb) != nullptr;
+      const bool has_godan_ka_entry = hasExactVerbEntry(dict_manager_, godan_ka_base);
+      const bool has_godan_ga_entry = hasExactVerbEntry(dict_manager_, godan_ga_base);
       // Check if next is voiced (だ/で) → 〜ぐ, otherwise → 〜く
       if (selected_i_onbin_base) {
         // Candidate generation has already selected an attested or
@@ -356,8 +353,7 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes, bool updat
         if (is_sentence_initial_iku) {
           morpheme.lemma = "行く";
         } else {
-          std::string stem = morpheme.lemma.substr(0, morpheme.lemma.size() - core::kTwoJapaneseCharBytes);
-          morpheme.lemma = stem + "いく";
+          morpheme.lemma = normalize::concat(utf8::dropLast2Chars(morpheme.lemma), "いく");
         }
       }
     }
@@ -374,7 +370,7 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes, bool updat
                               {"える", "ける", "げる", "せる", "てる", "ねる", "べる", "める", "れる"})) {
           // Convert ichidan potential lemma to godan base
           // Remove trailing える/ける/... (6 bytes) and get the stem
-          std::string stem(utf8::dropLast2Chars(morpheme.lemma));
+          const std::string_view stem = utf8::dropLast2Chars(morpheme.lemma);
           // Map e-row ending to godan base: え→う, け→く, げ→ぐ, etc.
           std::string_view surface_tail(morpheme.surface.data() + morpheme.surface.size() - core::kJapaneseCharBytes,
                                         core::kJapaneseCharBytes);
@@ -395,14 +391,13 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes, bool updat
             godan_base = std::string(grammar::godanBaseSuffixFromERow(tail_cp));
           }
           if (!godan_base.empty()) {
-            morpheme.lemma = stem + godan_base;
+            morpheme.lemma = normalize::concat(stem, godan_base);
           }
         } else if (utf8::endsWith(morpheme.surface, "れ") && utf8::endsWith(morpheme.lemma, "る") &&
                    morpheme.surface.size() >= core::kTwoJapaneseCharBytes) {
           // Ichidan conditional: 食べれ+ば → lemma=食べる
           // Surface = stem + れ, correct lemma = stem + る
-          std::string stem = morpheme.surface.substr(0, morpheme.surface.size() - core::kJapaneseCharBytes);
-          morpheme.lemma = stem + "る";
+          morpheme.lemma = normalize::concat(utf8::dropLastChar(morpheme.surface), "る");
         }
       }
     }
@@ -411,10 +406,10 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes, bool updat
     if (morpheme.pos == core::PartOfSpeech::Verb && utf8::endsWith(morpheme.surface, "ろ")) {
       if (utf8::endsWith(morpheme.lemma, "ろる")) {
         // Lemma incorrectly derived as 〜ろる → fix to 〜る
-        morpheme.lemma = morpheme.lemma.substr(0, morpheme.lemma.size() - core::kTwoJapaneseCharBytes) + "る";
+        morpheme.lemma = normalize::concat(utf8::dropLast2Chars(morpheme.lemma), "る");
       } else if (morpheme.lemma == morpheme.surface && morpheme.surface.size() >= core::kTwoJapaneseCharBytes) {
         // Lemma equals surface (e.g., 起きろ→起きろ) → fix to stem + る
-        morpheme.lemma = morpheme.surface.substr(0, morpheme.surface.size() - core::kJapaneseCharBytes) + "る";
+        morpheme.lemma = normalize::concat(utf8::dropLastChar(morpheme.surface), "る");
       }
     }
     // Fix たら lemma: should be た (not たら)

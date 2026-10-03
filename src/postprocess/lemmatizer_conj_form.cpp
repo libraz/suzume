@@ -62,29 +62,26 @@ grammar::ConjForm Lemmatizer::detectConjForm(std::string_view surface, std::stri
     return grammar::ConjForm::Mizenkei;
   }
 
-  // Check for passive/causative (mizenkei)
-  if (utf8::endsWithAny(surface,
-                        {"れる", "られる", "せる", "させる", "れた", "られた", "せた", "させた", "される", "された"})) {
+  // Check for passive/causative (mizenkei); れる/せる also cover られる/させる/される and the た forms
+  if (utf8::endsWithAny(surface, {"れる", "せる", "れた", "せた"})) {
     return grammar::ConjForm::Mizenkei;
   }
 
-  // Check for volitional form (ishikei)
-  if (utf8::endsWithAny(surface, {"う", "よう", "まい"})) {
-    // Distinguish from godan base form ending in う
-    if (surface != lemma) {
-      return grammar::ConjForm::Ishikei;
-    }
+  // Check for volitional form (ishikei). surface != lemma here, which
+  // distinguishes it from a godan base form ending in う; よう is covered by う.
+  if (utf8::endsWithAny(surface, {"う", "まい"})) {
+    return grammar::ConjForm::Ishikei;
   }
 
-  // Check for conditional form (kateikei)
-  if (utf8::endsWithAny(surface, {"ば", "れば"})) {
+  // Check for conditional form (kateikei); ば also covers れば
+  if (utf8::endsWith(surface, "ば")) {
     return grammar::ConjForm::Kateikei;
   }
 
   // Check for imperative form (meireikei)
   if (utf8::endsWithAny(surface, {"ろ", "よ", "なさい"})) {
     // Check if it's likely an imperative
-    if (surface.size() > core::kJapaneseCharBytes && surface != lemma) {
+    if (surface.size() > core::kJapaneseCharBytes) {
       return grammar::ConjForm::Meireikei;
     }
   }
@@ -94,27 +91,8 @@ grammar::ConjForm Lemmatizer::detectConjForm(std::string_view surface, std::stri
     return grammar::ConjForm::Onbinkei;
   }
 
-  // Check for renyokei (te-form, ta-form, masu-form, etc.)
-  if (utf8::endsWithAny(
-          surface, {"て",     "で",     "た",     "だ",     "ます",   "ました",     "まして",   "ている",  "ていた",
-                    "ておく", "てある", "てみる", "てくる", "ていく", "てしまう",   "ちゃう",   "たい",    "たかった",
-                    "たら",   "たり",   "きた",   "してる", "してた", "しています", "していた", "しました"})) {
-    return grammar::ConjForm::Renyokei;
-  }
-
-  // For i-adjectives
-  if (pos == core::PartOfSpeech::Adjective) {
-    if (utf8::endsWithAny(surface, {"く", "くて", "かった", "ければ", "さ", "そう"})) {
-      return grammar::ConjForm::Renyokei;
-    }
-  }
-
-  // Default to renyokei for conjugated forms we couldn't classify
-  if (surface != lemma) {
-    return grammar::ConjForm::Renyokei;
-  }
-
-  return grammar::ConjForm::Base;
+  // Every other conjugated form (te/ta/masu, adjective く/かった/さ, ...) is renyokei
+  return grammar::ConjForm::Renyokei;
 }
 
 }  // namespace suzume::postprocess

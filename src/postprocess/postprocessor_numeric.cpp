@@ -40,11 +40,12 @@ bool endsWithDigit(const std::string& surface) {
   if (surface.empty())
     return false;
 
-  auto codepoints = suzume::normalize::toCodepoints(surface);
-  if (codepoints.empty())
-    return false;
-
-  return isDigitChar(codepoints.back());
+  size_t pos = 0;
+  char32_t last_ch = 0;
+  while (pos < surface.size()) {
+    last_ch = suzume::normalize::decodeUtf8(surface, pos);
+  }
+  return isDigitChar(last_ch);
 }
 
 using normalize::isAllKatakana;
@@ -121,7 +122,7 @@ std::vector<core::Morpheme> Postprocessor::mergeNumericExpressions(std::vector<c
           ++merge_end;
         }
 
-        result.push_back(merged);
+        result.push_back(std::move(merged));
         idx = merge_end;
         continue;
       }
@@ -160,7 +161,7 @@ std::vector<core::Morpheme> Postprocessor::mergeNumericExpressions(std::vector<c
         SUZUME_DEBUG_STREAM << " → \"" << merged.surface << "\"\n";
       }
 
-      result.push_back(merged);
+      result.push_back(std::move(merged));
       idx = merge_end;
       continue;
     }
@@ -179,8 +180,8 @@ std::vector<core::Morpheme> Postprocessor::mergeNumericExpressions(std::vector<c
         counter.pos = core::PartOfSpeech::Suffix;
         counter.extended_pos = core::ExtendedPOS::Suffix;
         counter.lemma = counter.surface;
-        result.push_back(current);
-        result.push_back(counter);
+        result.push_back(std::move(morphemes[idx]));
+        result.push_back(std::move(counter));
         idx += 2;
         continue;
       }
@@ -199,7 +200,7 @@ std::vector<core::Morpheme> Postprocessor::mergeNumericExpressions(std::vector<c
                                                       << current.surface << "\" + \"" << next.surface << "\" → \""
                                                       << merged.surface << "\"\n");
 
-        result.push_back(merged);
+        result.push_back(std::move(merged));
         idx += 2;
         continue;
       }
@@ -221,7 +222,7 @@ std::vector<core::Morpheme> Postprocessor::mergeNumericExpressions(std::vector<c
                                  << current.surface << "\" + \"" << next.surface << "\" → \"" << merged.surface
                                  << "\"\n");
 
-        result.push_back(merged);
+        result.push_back(std::move(merged));
         idx += 2;
         continue;
       }

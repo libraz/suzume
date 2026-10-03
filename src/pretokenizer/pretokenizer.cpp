@@ -3,6 +3,8 @@
  * @brief Pre-tokenizer matcher orchestration
  */
 
+#include <utility>
+
 #include "core/text_boundaries.h"
 #include "normalize/utf8.h"
 #include "pretokenizer/pretokenizer_internal.h"
@@ -53,8 +55,8 @@ PreTokenResult PreTokenizer::process(std::string_view text) const {
         result.spans.push_back({span_start, pos});
       }
 
-      result.tokens.push_back(token);
       pos = token.end;
+      result.tokens.push_back(std::move(token));
       span_start = pos;
       previous_was_digit = false;
       continue;
@@ -69,7 +71,7 @@ PreTokenResult PreTokenizer::process(std::string_view text) const {
 
       // Add boundary token
       setTokenFromRange(token, text, pos, next_pos, PreTokenType::Boundary, core::PartOfSpeech::Symbol);
-      result.tokens.push_back(token);
+      result.tokens.push_back(std::move(token));
 
       pos = next_pos;
       span_start = pos;

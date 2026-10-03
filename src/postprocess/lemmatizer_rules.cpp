@@ -320,9 +320,9 @@ std::string fixSuruClassical(std::string_view lemma, dictionary::ConjugationType
       utf8::endsWith(lemma, "する")) {
     return "";
   }
-  std::string stem(utf8::dropLastChar(lemma));
+  const std::string_view stem = utf8::dropLastChar(lemma);
   if (stem.size() >= core::kTwoJapaneseCharBytes && grammar::isAllKanji(stem)) {
-    return stem + "する";
+    return normalize::concat(stem, "する");
   }
   return "";
 }
@@ -349,14 +349,14 @@ std::string fixShiru(std::string_view lemma, std::string_view surface) {
   if (!utf8::endsWith(lemma, "しる") || utf8::endsWith(surface, "しる")) {
     return "";
   }
-  std::string stem(utf8::dropLast2Chars(lemma));
+  const std::string_view stem = utf8::dropLast2Chars(lemma);
   if (stem.size() < core::kJapaneseCharBytes) {
     return "";
   }
   if (stem.size() == core::kJapaneseCharBytes && grammar::isAllKanji(stem)) {
-    return stem + "する";
+    return normalize::concat(stem, "する");
   }
-  return stem + "す";
+  return normalize::concat(stem, "す");
 }
 
 // Special ra-row (ラ行特殊活用) verbs: renyokei ends in い (not り), so the
@@ -458,17 +458,19 @@ std::string fixPotentialVerb(const core::Morpheme& morpheme) {
 // Tari-adjective adverb: strip trailing と, e.g., 颯爽と → 颯爽, 堂々と → 堂々.
 // Pattern: exactly 漢字2文字 + と. MeCab uses the stem as lemma.
 std::string fixTariAdverb(std::string_view surface) {
+  if (!utf8::endsWith(surface, "と")) {
+    return "";
+  }
   const auto codepoints = normalize::utf8::decode(surface);
   if (codepoints.size() != 3 || codepoints.back() != U'と') {
     return "";
   }
-  std::string stem(utf8::dropLastChar(surface));
-  const auto stem_codepoints = normalize::utf8::decode(stem);
-  if (!stem_codepoints.empty() && normalize::isNumeralCodepoint(stem_codepoints.front())) {
+  if (normalize::isNumeralCodepoint(codepoints.front())) {
     return "";
   }
-  if (grammar::isAllKanji(stem) || (stem_codepoints.size() == 2 && stem_codepoints.back() == U'々')) {
-    return stem;
+  const std::string_view stem = utf8::dropLastChar(surface);
+  if (grammar::isAllKanji(stem) || codepoints[1] == U'々') {
+    return std::string(stem);
   }
   return "";
 }
@@ -499,7 +501,7 @@ std::string fixHatsuonbin(std::string_view stem, const dictionary::DictionaryMan
 
 std::string lemmatizeGodanEnding(std::string_view surface, const VerbEnding& ending) {
   const std::string_view stem = surface.substr(0, surface.size() - ending.suffix.size());
-  const char32_t row_codepoint = utf8::decodeFirstChar(utf8::lastChar(stem));
+  const char32_t row_codepoint = utf8::decodeLastChar(stem);
   std::string_view base;
   if (ending.suffix == "る") {
     base = grammar::godanBaseSuffixFromERow(row_codepoint);
@@ -544,7 +546,7 @@ std::string lemmatizeVerbFallback(std::string_view surface) {
       // over inventing a lemma. Dictionary-backed paths retain the precise
       // Godan analysis before they reach this last-resort rule.
       const std::string_view stem = utf8::dropLastChar(surface);
-      if (grammar::isERowCodepoint(utf8::decodeFirstChar(utf8::lastChar(stem)))) {
+      if (grammar::isERowCodepoint(utf8::decodeLastChar(stem))) {
         return std::string(surface);
       }
     }
@@ -553,9 +555,7 @@ std::string lemmatizeVerbFallback(std::string_view surface) {
     }
     return std::string(surface);
   }
-  std::string result(surface.substr(0, surface.size() - best_ending->suffix.size()));
-  result += best_ending->base;
-  return result;
+  return normalize::concat(surface.substr(0, surface.size() - best_ending->suffix.size()), best_ending->base);
 }
 
 }  // namespace lemmatizer_detail
@@ -582,9 +582,7 @@ std::string Lemmatizer::lemmatizeAdjective(std::string_view surface) {
 
   for (const auto& ending : kAdjectiveEndings) {
     if (utf8::endsWith(surface, ending.suffix)) {
-      std::string result(surface.substr(0, surface.size() - ending.suffix.size()));
-      result += ending.base;
-      return result;
+      return normalize::concat(surface.substr(0, surface.size() - ending.suffix.size()), ending.base);
     }
   }
   return std::string(surface);
@@ -637,12 +635,11 @@ std::string lemmatizeContractedVerbWithDictionary(std::string_view surface,
   }
 
   for (const auto& ending : kContractedVerbEndings) {
-    if (surface.size() < ending.suffix.size() ||
-        surface.compare(surface.size() - ending.suffix.size(), ending.suffix.size(), ending.suffix) != 0) {
+    if (!utf8::endsWith(surface, ending.suffix)) {
       continue;
     }
 
-    std::string stem(surface.substr(0, surface.size() - ending.suffix.size()));
+    const std::string_view stem = surface.substr(0, surface.size() - ending.suffix.size());
     const std::string_view onbin = kOnbinSurfaces[static_cast<size_t>(ending.onbin)];
     for (const auto& [verb_type, base_suffix] : grammar::Conjugation::getGodanTypesByOnbin(onbin)) {
       (void)verb_type;
@@ -663,15 +660,15 @@ std::string lemmatizeSuruPassiveWithDictionary(std::string_view surface,
   }
 
   for (std::string_view ending : kSuruPassiveEndings) {
-    if (surface.size() < ending.size() || surface.compare(surface.size() - ending.size(), ending.size(), ending) != 0) {
+    if (!utf8::endsWith(surface, ending)) {
       continue;
     }
 
-    std::string stem(surface.substr(0, surface.size() - ending.size()));
+    const std::string_view stem = surface.substr(0, surface.size() - ending.size());
     if (stem.empty()) {
       continue;
     }
-    std::string base_form = stem + "する";
+    std::string base_form = normalize::concat(stem, "する");
     if (hasExactVerbEntry(dict_manager, base_form)) {
       return base_form;
     }

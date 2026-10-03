@@ -193,18 +193,13 @@ bool isUnicodeControlOrSpace(char32_t codepoint) {
 }
 
 bool isUnicodePunctuationOrSymbol(char32_t codepoint) {
-  return (codepoint >= 0x00A1 && codepoint <= 0x00BF) || codepoint == 0x00D7 || codepoint == 0x00F7 ||
+  // Reached only after isRetainedTextSymbol, which already claims currency, letterlike,
+  // arrows/math, technical, geometric/dingbat and full-width sign blocks.
+  return (codepoint >= 0x00A1 && codepoint <= 0x00BF) ||
          (codepoint >= 0x200B && codepoint <= 0x206F) ||  // format controls and general punctuation
-         (codepoint >= 0x20A0 && codepoint <= 0x20CF) ||  // currency symbols
-         (codepoint >= 0x2100 && codepoint <= 0x214F) ||  // letterlike symbols
-         (codepoint >= 0x2190 && codepoint <= 0x22FF) ||  // arrows and mathematical operators
-         (codepoint >= 0x2300 && codepoint <= 0x24FF) ||  // technical and enclosed symbols
-         (codepoint >= 0x2500 && codepoint <= 0x25FF) ||  // box, block, and geometric symbols
-         (codepoint >= 0x27C0 && codepoint <= 0x2BFF) ||  // supplemental arrows and mathematical symbols
          (codepoint >= 0x2E00 && codepoint <= 0x2E7F) ||  // supplemental punctuation
          (codepoint >= 0xFF00 && codepoint <= 0xFF20) || (codepoint >= 0xFF3B && codepoint <= 0xFF40) ||
-         (codepoint >= 0xFF5B && codepoint <= 0xFF65) || (codepoint >= 0xFFE0 && codepoint <= 0xFFEE) ||
-         (codepoint >= 0xFFF0 && codepoint <= 0xFFFF);
+         (codepoint >= 0xFF5B && codepoint <= 0xFF65) || (codepoint >= 0xFFF0 && codepoint <= 0xFFFF);
 }
 
 // These Unicode blocks carry text content (currency, units, technical marks,
@@ -322,30 +317,6 @@ CharType classifyChar(char32_t codepoint) {
       (codepoint >= 0x1FA00 && codepoint <= 0x1FA6F) ||  // Chess Symbols
       (codepoint >= 0x1FA70 && codepoint <= 0x1FAFF) ||  // Symbols and Pictographs Extended-A
       (codepoint >= 0x1FB00 && codepoint <= 0x1FBFF) ||  // Symbols for Legacy Computing
-      (codepoint >= 0x2600 && codepoint <= 0x26FF) ||    // Misc symbols
-      (codepoint >= 0x2700 && codepoint <= 0x27BF) ||    // Dingbats
-      (codepoint >= 0x2300 && codepoint <= 0x23FF) ||    // Misc Technical (⌚⌛⏰ etc.)
-      (codepoint >= 0x25A0 && codepoint <= 0x25FF) ||    // Geometric Shapes
-      (codepoint >= 0x2B50 && codepoint <= 0x2B55) ||    // Stars and circles (⭐⭕ etc.)
-      (codepoint >= 0x2934 && codepoint <= 0x2935) ||    // Arrows
-      (codepoint >= 0x2614 && codepoint <= 0x2615) ||    // Umbrella, hot beverage
-      (codepoint >= 0x2648 && codepoint <= 0x2653) ||    // Zodiac signs
-      (codepoint >= 0x267F && codepoint <= 0x267F) ||    // Wheelchair
-      (codepoint >= 0x2693 && codepoint <= 0x2693) ||    // Anchor
-      (codepoint >= 0x26A1 && codepoint <= 0x26A1) ||    // High voltage
-      (codepoint >= 0x26AA && codepoint <= 0x26AB) ||    // Circles
-      (codepoint >= 0x26BD && codepoint <= 0x26BE) ||    // Sports balls
-      (codepoint >= 0x26C4 && codepoint <= 0x26C5) ||    // Snowman, sun
-      (codepoint >= 0x26CE && codepoint <= 0x26CE) ||    // Ophiuchus
-      (codepoint >= 0x26D4 && codepoint <= 0x26D4) ||    // No entry
-      (codepoint >= 0x26EA && codepoint <= 0x26EA) ||    // Church
-      (codepoint >= 0x26F2 && codepoint <= 0x26F3) ||    // Fountain, golf
-      (codepoint >= 0x26F5 && codepoint <= 0x26F5) ||    // Sailboat
-      (codepoint >= 0x26FA && codepoint <= 0x26FA) ||    // Tent
-      (codepoint >= 0x26FD && codepoint <= 0x26FD) ||    // Fuel pump
-      (codepoint >= 0x231A && codepoint <= 0x231B) ||    // Watch, hourglass
-      (codepoint >= 0x23E9 && codepoint <= 0x23F3) ||    // Media controls
-      (codepoint >= 0x23F8 && codepoint <= 0x23FA) ||    // Media controls
       isEmojiModifier(codepoint) || isRegionalIndicator(codepoint)) {
     return CharType::Emoji;
   }
@@ -388,12 +359,6 @@ bool canCombine(CharType first_type, CharType second_type) {
   if ((first_type == CharType::Alphabet && second_type == CharType::Digit) ||
       (first_type == CharType::Digit && second_type == CharType::Alphabet)) {
     return true;
-  }
-
-  // Hiragana + Katakana can combine in some cases
-  if ((first_type == CharType::Hiragana && second_type == CharType::Katakana) ||
-      (first_type == CharType::Katakana && second_type == CharType::Hiragana)) {
-    return false;  // Generally separate
   }
 
   return false;
@@ -635,12 +600,7 @@ bool continuesTemporalNounCompound(char32_t prefix, char32_t next) {
   // 今本 is the adverbial 今 plus its object, not a compound.
   static constexpr std::array<char32_t, 10> kTemporalCompoundUnits = {U'度', U'期', U'時', U'分', U'秒',
                                                                       U'春', U'夏', U'秋', U'冬', U'宵'};
-  for (char32_t unit : kTemporalCompoundUnits) {
-    if (unit == next) {
-      return true;
-    }
-  }
-  return false;
+  return kana::isCodepointIn(kTemporalCompoundUnits, next);
 }
 
 bool isNumeralCodepoint(char32_t code_point) {
@@ -674,12 +634,9 @@ bool isAllKatakana(std::string_view surface) {
   if (surface.empty()) {
     return false;
   }
-  auto codepoints = toCodepoints(surface);
-  if (codepoints.empty()) {
-    return false;
-  }
-  for (char32_t cpt : codepoints) {
-    if (classifyChar(cpt) != CharType::Katakana) {
+  size_t pos = 0;
+  while (pos < surface.size()) {
+    if (classifyChar(decodeUtf8(surface, pos)) != CharType::Katakana) {
       return false;
     }
   }

@@ -25,8 +25,7 @@ bool hasDictionaryGodanBaseFromIRow(const core::Morpheme& noun, const dictionary
   if (dict_manager == nullptr || noun.surface.empty()) {
     return false;
   }
-  const std::string_view base_suffix =
-      grammar::godanBaseSuffixFromIRow(utf8::decodeFirstChar(utf8::lastChar(noun.surface)));
+  const std::string_view base_suffix = grammar::godanBaseSuffixFromIRow(utf8::decodeLastChar(noun.surface));
   if (base_suffix.empty()) {
     return false;
   }

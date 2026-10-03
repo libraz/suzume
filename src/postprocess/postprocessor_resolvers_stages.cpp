@@ -199,21 +199,28 @@ void resolveFinalMorphemeRoles(std::vector<core::Morpheme>& result, const dictio
   for (size_t idx = 0; idx + 1 < result.size(); ++idx) {
     auto& stem = result[idx];
     auto& follower = result[idx + 1];
+    const bool copula_follows = stem.pos == core::PartOfSpeech::Verb && utf8::equalsAny(follower.surface, {"だ"});
+    const bool suffix_ge_follows =
+        follower.pos == core::PartOfSpeech::Suffix && utf8::equalsAny(follower.surface, {"げ"});
+    const bool excessive_follows = utf8::startsWith(follower.surface, "すぎ");
+    if (!copula_follows && !suffix_ge_follows && !excessive_follows) {
+      continue;
+    }
     const auto* adjective =
         dict_manager != nullptr ? dict_manager->lookupExact(stem.surface, core::PartOfSpeech::Adjective) : nullptr;
     if (adjective == nullptr || adjective->extended_pos != core::ExtendedPOS::AdjNaAdj) {
       continue;
     }
-    if (stem.pos == core::PartOfSpeech::Verb && utf8::equalsAny(follower.surface, {"だ"})) {
+    if (copula_follows) {
       resolver::retagNaAdjectiveSurface(stem);
       resolver::retagCopulaDa(follower);
       continue;
     }
-    if (follower.pos == core::PartOfSpeech::Suffix && utf8::equalsAny(follower.surface, {"げ"})) {
+    if (suffix_ge_follows) {
       resolver::retagNounSurface(stem);
       continue;
     }
-    if (!utf8::startsWith(follower.surface, "すぎ")) {
+    if (!excessive_follows) {
       continue;
     }
     resolver::retagNaAdjectiveSurface(stem);
@@ -581,23 +588,23 @@ void resolveFinalMorphemeRoles(std::vector<core::Morpheme>& result, const dictio
   // The shared row table handles every Godan class without lexical enumeration.
   if (!result.empty()) {
     auto& final = result.back();
-    const char32_t tail = utf8::decodeFirstChar(utf8::lastChar(final.surface));
+    const char32_t tail = utf8::decodeLastChar(final.surface);
     const std::string_view base_suffix = grammar::godanBaseSuffixFromERow(tail);
     if (dict_manager != nullptr && final.pos == core::PartOfSpeech::Verb && !base_suffix.empty() &&
         result.size() >= 2 && result[result.size() - 2].pos == core::PartOfSpeech::Particle) {
-      const std::string stem(utf8::dropLastChar(final.surface));
-      const std::string ichidan_base = final.surface + "る";
-      const std::string godan_base = normalize::concat(stem, base_suffix);
-      [[maybe_unused]] const bool has_ichidan =
-          dict_manager->lookupExact(ichidan_base, core::PartOfSpeech::Verb) != nullptr;
+      const std::string godan_base = normalize::concat(utf8::dropLastChar(final.surface), base_suffix);
       const bool has_godan = dict_manager->lookupExact(godan_base, core::PartOfSpeech::Verb) != nullptr;
-      SUZUME_DEBUG_LOG_VERBOSE("[POSTPROC] clause-final e-row evidence: ichidan=" << has_ichidan
-                                                                                  << ", godan=" << has_godan << "\n");
+      SUZUME_DEBUG_VERBOSE_BLOCK {
+        const bool has_ichidan =
+            dict_manager->lookupExact(normalize::concat(final.surface, "る"), core::PartOfSpeech::Verb) != nullptr;
+        SUZUME_DEBUG_STREAM << "[POSTPROC] clause-final e-row evidence: ichidan=" << has_ichidan
+                            << ", godan=" << has_godan << "\n";
+      }
       if (has_godan) {
         final.lemma = godan_base;
         final.extended_pos = core::ExtendedPOS::VerbMeireikei;
-        final.conj_type = grammar::verbTypeToConjType(
-            grammar::verbTypeFromBaseCodepoint(utf8::decodeFirstChar(utf8::lastChar(godan_base))));
+        final.conj_type =
+            grammar::verbTypeToConjType(grammar::verbTypeFromBaseCodepoint(utf8::decodeLastChar(godan_base)));
         final.conj_form = grammar::ConjForm::Meireikei;
       }
     }
@@ -688,13 +695,16 @@ void resolveFinalMorphemeRoles(std::vector<core::Morpheme>& result, const dictio
   for (size_t idx = 0; idx + 1 < result.size(); ++idx) {
     auto& stem = result[idx];
     const auto& next = result[idx + 1];
-    const auto codepoints = normalize::toCodepoints(stem.surface);
-    const bool is_ichidan_te_stem = stem.pos == core::PartOfSpeech::Verb &&
-                                    stem.extended_pos == core::ExtendedPOS::VerbRenyokei && codepoints.size() == 2 &&
-                                    normalize::isKanjiCodepoint(codepoints.front()) && codepoints.back() == U'て';
     const bool inflection_follows =
         next.extended_pos == core::ExtendedPOS::AuxTenseTa || next.extended_pos == core::ExtendedPOS::ParticleConj;
-    if (is_ichidan_te_stem && inflection_follows) {
+    if (!inflection_follows || stem.pos != core::PartOfSpeech::Verb ||
+        stem.extended_pos != core::ExtendedPOS::VerbRenyokei) {
+      continue;
+    }
+    const auto codepoints = normalize::toCodepoints(stem.surface);
+    const bool is_ichidan_te_stem =
+        codepoints.size() == 2 && normalize::isKanjiCodepoint(codepoints.front()) && codepoints.back() == U'て';
+    if (is_ichidan_te_stem) {
       stem.lemma = stem.surface + "る";
       stem.conj_type = dictionary::ConjugationType::Ichidan;
       stem.conj_form = grammar::ConjForm::Renyokei;
