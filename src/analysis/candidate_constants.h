@@ -768,10 +768,6 @@ constexpr float kClassicalIAdjectiveTerminalNounBonus = -0.5F;
 // negative fragment. The context gate keeps locative ところで untouched.
 constexpr float kFormalNounCopularTopicBonus = -0.8F;
 
-// A formal copular topic before ある is a fixed syntactic unit (ではある),
-// preferred over the separately analyzed copula and topic particle.
-constexpr float kCopularTopicAruCandidateCost = -3.0F;
-
 // A sentence-initial evaluative ことに is a closed adverbial unit only when
 // the following nominal predicate is explicitly copular.  This cost keeps
 // the unit available without changing ordinary こと + に argument phrases.
@@ -792,14 +788,7 @@ constexpr float kSentenceParticleQuoteCost = -1.2F;
 // particle start penalty before its following quote particle supplies context.
 constexpr float kLongSentenceParticleQuoteCost = -2.3F;
 
-// The contracted explanatory negative んじゃない must outrank a chain of
-// one-mora auxiliary homographs at the beginning of an utterance.
-constexpr float kContractedNjaNegativeCost = -3.0F;
 constexpr float kClassicalAraNLimitCost = -4.0F;
-
-// Within that contraction, the independent negative auxiliary must remain
-// whole rather than decomposing into copular and continuative homographs.
-constexpr float kContractedNegativeAuxCost = -0.5F;
 
 // Minimum inflection confidence for treating a lexical adverb ending in
 // て/で as a productive verb te-form homograph before progressive いる.

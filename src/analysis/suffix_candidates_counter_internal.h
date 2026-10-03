@@ -19,6 +19,13 @@ void appendCounterCandidate(const std::vector<char32_t>& codepoints, size_t star
                             float cost, core::ExtendedPOS extended_pos, const char* pattern,
                             std::vector<UnknownCandidate>& candidates);
 
+/**
+ * @brief End of the quantity head at start: an optional quantity prefix kanji, then numerals
+ *
+ * Returns start when no quantity char is present.
+ */
+size_t scanQuantityHead(const std::vector<char32_t>& codepoints, size_t start, bool allow_prefix);
+
 void appendTemporalCounterCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                      const std::vector<normalize::CharType>& char_types,
                                      const dictionary::DictionaryManager* dict_manager,

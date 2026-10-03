@@ -561,6 +561,12 @@ void addVerbSuffixNounJoinCandidates(core::Lattice& lattice, std::string_view te
   if (start_pos >= codepoints.size()) {
     return;
   }
+  const auto add_join_noun_edge = [&](size_t end_pos) {
+    std::string surface(textRange(text, byte_offsets, start_pos, end_pos));
+    lattice.addEdge(surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(end_pos), core::PartOfSpeech::Noun,
+                    scorer.posPrior(core::PartOfSpeech::Noun) + candidate::kVerbSuffixNounJoinBonus,
+                    core::LatticeEdge::kFromDictionary, surface);  // lemma = surface for compound nouns
+  };
 
   // Hiragana-only stem + 方 (やり方, あり方) — V連用形 written entirely in hiragana.
   // Only emit when we're at a word boundary (start of input or preceded by
@@ -598,13 +604,7 @@ void addVerbSuffixNounJoinCandidates(core::Lattice& lattice, std::string_view te
     if (!verb_helpers::isVerbInDictionary(&dict_manager, continuative_base)) {
       return;
     }
-    size_t end_pos = start_pos + 3;
-    std::string surface(textRange(text, byte_offsets, start_pos, end_pos));
-    float base_cost = scorer.posPrior(core::PartOfSpeech::Noun);
-    float final_cost = base_cost + candidate::kVerbSuffixNounJoinBonus;
-    uint8_t flags = core::LatticeEdge::kFromDictionary;
-    lattice.addEdge(surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(end_pos), core::PartOfSpeech::Noun,
-                    final_cost, flags, surface);
+    add_join_noun_edge(start_pos + 3);
     return;
   }
 
@@ -780,19 +780,8 @@ void addVerbSuffixNounJoinCandidates(core::Lattice& lattice, std::string_view te
     }
   }
 
-  // Build the compound noun surface
-  size_t end_pos = hiragana_end + head_length;  // Include the bound noun head
-
-  std::string surface(textRange(text, byte_offsets, start_pos, end_pos));
-
-  // Calculate cost with bonus for compound noun pattern
-  float base_cost = scorer.posPrior(core::PartOfSpeech::Noun);
-  float final_cost = base_cost + candidate::kVerbSuffixNounJoinBonus;
-
-  uint8_t flags = core::LatticeEdge::kFromDictionary;
-
-  lattice.addEdge(surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(end_pos), core::PartOfSpeech::Noun,
-                  final_cost, flags, surface);  // lemma = surface for compound nouns
+  // Include the bound noun head
+  add_join_noun_edge(hiragana_end + head_length);
 }
 
 }  // namespace suzume::analysis

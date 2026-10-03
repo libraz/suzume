@@ -176,24 +176,12 @@ void appendIAdjClassicalAttributiveCandidates(const std::vector<char32_t>& codep
           isVerbInDictionary(dict_manager, ki_surface)) {
         continue;
       }
-      UnknownCandidate ki_cand;
-      ki_cand.surface = ki_surface;
-      ki_cand.start = start_pos;
-      ki_cand.end = ki_pos + 1;
-      ki_cand.pos = core::PartOfSpeech::Adjective;
-      ki_cand.lemma = ki_lemma;
       // Dictionary-verified adjective: make the 連体形 win over fake verb
       // interpretations (godan-ka 美しく etc.), mirroring the ke-form handling.
-      ki_cand.cost = candidate::verb_cost::kStrongBonus;
-      ki_cand.has_suffix = true;  // Conjugated form (連体形)
-      // Attributive form connects like the basic form (ADJ + 体言)
-      ki_cand.extended_pos = core::ExtendedPOS::AdjBasic;
-      ki_cand.origin = CandidateOrigin::AdjectiveI;
-#ifdef SUZUME_DEBUG_INFO
-      ki_cand.confidence = 0.8F;
-      ki_cand.pattern = "i_adjective_classical_ki";
-#endif
-      candidates.push_back(std::move(ki_cand));
+      // Attributive form connects like the basic form (ADJ + 体言).
+      candidates.push_back(adj_detail::makeIAdjCellCandidate(
+          ki_surface, start_pos, ki_pos + 1, ki_lemma, core::ExtendedPOS::AdjBasic, candidate::verb_cost::kStrongBonus,
+          CandidateOrigin::AdjectiveI, 0.8F, "i_adjective_classical_ki"));
     }
   }
 }

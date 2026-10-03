@@ -41,6 +41,17 @@ void appendCounterCandidate(const std::vector<char32_t>& codepoints, size_t star
   candidates.push_back(std::move(cand));
 }
 
+size_t scanQuantityHead(const std::vector<char32_t>& codepoints, size_t start, bool allow_prefix) {
+  size_t scan = start;
+  if (allow_prefix && scan < codepoints.size() && normalize::isQuantityPrefixKanji(codepoints[scan])) {
+    ++scan;
+  }
+  while (scan < codepoints.size() && normalize::isNumeralCodepoint(codepoints[scan])) {
+    ++scan;
+  }
+  return scan;
+}
+
 }  // namespace counter_detail
 
 void generateCounterCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,

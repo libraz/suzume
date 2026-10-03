@@ -24,6 +24,24 @@ bool isChainCounterKanji(char32_t codepoint) {
   return normalize::isTemporalCounterKanji(codepoint) || codepoint == U'泊' || codepoint == U'割';
 }
 
+// End of the temporal counter run at pos. ヶ/ケ heads a counter only with a
+// following kanji (ヶ月), so it joins the run only before a temporal counter (三ヶ月|後).
+size_t scanTemporalCounterRun(const std::vector<char32_t>& codepoints, size_t pos) {
+  while (pos < codepoints.size()) {
+    if (normalize::isTemporalCounterKanji(codepoints[pos])) {
+      ++pos;
+      continue;
+    }
+    if ((codepoints[pos] == U'ヶ' || codepoints[pos] == U'ケ') && pos + 1 < codepoints.size() &&
+        normalize::isTemporalCounterKanji(codepoints[pos + 1])) {
+      pos += 2;
+      continue;
+    }
+    break;
+  }
+  return pos;
+}
+
 void appendCounterChainCandidate(const std::vector<char32_t>& codepoints, size_t start_pos,
                                  std::vector<UnknownCandidate>& candidates) {
   // A time/date or ratio chain consists of two or more numeral+counter units:
@@ -113,31 +131,10 @@ void appendTemporalCounterCandidates(const std::vector<char32_t>& codepoints, si
   // counter must be temporal, keeping lexical wholes on non-temporal counters intact
   // (一人前, not 一人|前).
   {
-    size_t scan = start_pos;
-    bool has_quantity = false;
-    if (normalize::isQuantityPrefixKanji(codepoints[scan])) {
-      ++scan;
-      has_quantity = true;
-    }
-    while (scan < codepoints.size() && normalize::isNumeralCodepoint(codepoints[scan])) {
-      ++scan;
-      has_quantity = true;
-    }
-    size_t counter_start = scan;
-    while (scan < codepoints.size()) {
-      if (normalize::isTemporalCounterKanji(codepoints[scan])) {
-        ++scan;
-        continue;
-      }
-      // ヶ/ケ heads a counter only with a following kanji (ヶ月); take it as part of
-      // the temporal run when that kanji is itself a temporal counter (三ヶ月|後).
-      if ((codepoints[scan] == U'ヶ' || codepoints[scan] == U'ケ') && scan + 1 < codepoints.size() &&
-          normalize::isTemporalCounterKanji(codepoints[scan + 1])) {
-        scan += 2;
-        continue;
-      }
-      break;
-    }
+    size_t scan = scanQuantityHead(codepoints, start_pos, true);
+    const bool has_quantity = scan > start_pos;
+    const size_t counter_start = scan;
+    scan = scanTemporalCounterRun(codepoints, scan);
     // A temporal counter run followed by a suffix that is always compositional:
     //   - 後/前 relation suffix (三日|後, 十年|前)
     //   - 半 "and a half" (三時間|半, 二年|半, 五分|半, 六ヶ月|半)
@@ -181,21 +178,13 @@ void appendTemporalCounterCandidates(const std::vector<char32_t>& codepoints, si
   // 二時間+待つ, 三時間+ほど). Emit the quantity boundary so an unknown
   // word candidate cannot absorb the final temporal kanji as its stem.
   {
-    size_t scan = start_pos;
-    bool has_quantity = false;
     // An approximation prefix reads as such only at the head of its own word.
     // Inside a kanji run it is the tail of the preceding noun (人数+分, not
     // 人+数分).
     const bool prefix_inside_kanji_run =
         start_pos > 0 && start_pos - 1 < char_types.size() && char_types[start_pos - 1] == normalize::CharType::Kanji;
-    if (!prefix_inside_kanji_run && normalize::isQuantityPrefixKanji(codepoints[scan])) {
-      ++scan;
-      has_quantity = true;
-    }
-    while (scan < codepoints.size() && normalize::isNumeralCodepoint(codepoints[scan])) {
-      ++scan;
-      has_quantity = true;
-    }
+    size_t scan = scanQuantityHead(codepoints, start_pos, !prefix_inside_kanji_run);
+    const bool has_quantity = scan > start_pos;
     size_t unit_start = scan;
     while (scan < codepoints.size()) {
       if (normalize::isTemporalCounterKanji(codepoints[scan])) {
@@ -260,29 +249,10 @@ void appendTemporalCounterCandidates(const std::vector<char32_t>& codepoints, si
   // noun (数年間|海外) regardless of how its interior tokenizes — the split-after-間 here
   // only carves the following noun off; the 半年 vs 半|年 interior is decided elsewhere.
   {
-    size_t scan = start_pos;
-    bool has_quantity = false;
-    if (scan < codepoints.size() && normalize::isQuantityPrefixKanji(codepoints[scan])) {
-      ++scan;
-      has_quantity = true;
-    }
-    while (scan < codepoints.size() && normalize::isNumeralCodepoint(codepoints[scan])) {
-      ++scan;
-      has_quantity = true;
-    }
-    size_t counter_start = scan;
-    while (scan < codepoints.size()) {
-      if (normalize::isTemporalCounterKanji(codepoints[scan])) {
-        ++scan;
-        continue;
-      }
-      if ((codepoints[scan] == U'ヶ' || codepoints[scan] == U'ケ') && scan + 1 < codepoints.size() &&
-          normalize::isTemporalCounterKanji(codepoints[scan + 1])) {
-        scan += 2;
-        continue;
-      }
-      break;
-    }
+    size_t scan = scanQuantityHead(codepoints, start_pos, true);
+    const bool has_quantity = scan > start_pos;
+    const size_t counter_start = scan;
+    scan = scanTemporalCounterRun(codepoints, scan);
     // The run must end in 間, and that 間 must be preceded by another counter char in the
     // run (a bare numeral+間 is not a duration).
     bool run_ends_in_span =

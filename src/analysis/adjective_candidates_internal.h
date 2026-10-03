@@ -121,6 +121,13 @@ UnknownCandidate makeIAdjStemCandidate(const std::string& surface, size_t start,
                                        float cost, CandidateOrigin origin, float confidence, const char* pattern);
 
 /**
+ * @brief Create a conjugated i-adjective candidate for one explicit paradigm cell
+ */
+UnknownCandidate makeIAdjCellCandidate(const std::string& surface, size_t start, size_t end, const std::string& lemma,
+                                       core::ExtendedPOS extended_pos, float cost, CandidateOrigin origin,
+                                       float confidence, const char* pattern);
+
+/**
  * @brief Derive a conjugated i-adjective variant by trimming trailing kana off
  *        an existing candidate.
  *

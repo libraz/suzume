@@ -33,6 +33,7 @@ using verb_helpers::isEmphaticChar;
 using verb_helpers::isVerbInDictionary;
 
 using adj_detail::makeIAdjCandidate;
+using adj_detail::makeIAdjCellCandidate;
 using adj_detail::makeIAdjStemCandidate;
 
 namespace {
@@ -796,21 +797,9 @@ void appendIAdjClassicalTerminalCandidates(const std::vector<char32_t>& codepoin
         }
       }
     }
-    UnknownCandidate terminal;
-    terminal.surface = surface;
-    terminal.start = start_pos;
-    terminal.end = shi_pos + 1;
-    terminal.pos = core::PartOfSpeech::Adjective;
-    terminal.lemma = lemma;
-    terminal.cost = candidate::verb_cost::kStrongBonus;
-    terminal.has_suffix = true;
-    terminal.extended_pos = core::ExtendedPOS::AdjBasic;
-    terminal.origin = CandidateOrigin::AdjectiveI;
-#ifdef SUZUME_DEBUG_INFO
-    terminal.confidence = candidate::kIAdjKaroConfidence;
-    terminal.pattern = "i_adjective_classical_shi";
-#endif
-    candidates.push_back(std::move(terminal));
+    candidates.push_back(makeIAdjCellCandidate(surface, start_pos, shi_pos + 1, lemma, core::ExtendedPOS::AdjBasic,
+                                               candidate::verb_cost::kStrongBonus, CandidateOrigin::AdjectiveI,
+                                               candidate::kIAdjKaroConfidence, "i_adjective_classical_shi"));
   }
 }
 
@@ -853,21 +842,10 @@ void appendIAdjOnbinRenyokeiCandidates(const std::vector<char32_t>& codepoints, 
                     : !isAdjectiveInDictionary(dict_manager, lemma)) {
       continue;
     }
-    UnknownCandidate onbin;
-    onbin.surface = extractSubstring(codepoints, start_pos, u_pos + 1);
-    onbin.start = start_pos;
-    onbin.end = u_pos + 1;
-    onbin.pos = core::PartOfSpeech::Adjective;
-    onbin.lemma = lemma;
-    onbin.cost = candidate::verb_cost::kStrongBonus;
-    onbin.has_suffix = true;
-    onbin.extended_pos = core::ExtendedPOS::AdjRenyokei;
-    onbin.origin = CandidateOrigin::AdjectiveI;
-#ifdef SUZUME_DEBUG_INFO
-    onbin.confidence = candidate::kIAdjKaroConfidence;
-    onbin.pattern = "i_adjective_onbin_renyokei";
-#endif
-    candidates.push_back(std::move(onbin));
+    candidates.push_back(makeIAdjCellCandidate(extractSubstring(codepoints, start_pos, u_pos + 1), start_pos, u_pos + 1,
+                                               lemma, core::ExtendedPOS::AdjRenyokei,
+                                               candidate::verb_cost::kStrongBonus, CandidateOrigin::AdjectiveI,
+                                               candidate::kIAdjKaroConfidence, "i_adjective_onbin_renyokei"));
   }
 }
 
@@ -910,23 +888,13 @@ void appendIAdjKaroCandidates(const std::vector<char32_t>& codepoints, size_t st
     if (!isModernIAdjective(lemma, inflection, dict_manager)) {
       continue;
     }
-    UnknownCandidate miz_cand;
-    miz_cand.surface = extractSubstring(codepoints, start_pos, karo_pos + 2);
-    miz_cand.start = start_pos;
-    miz_cand.end = karo_pos + 2;
-    miz_cand.pos = core::PartOfSpeech::Adjective;
-    miz_cand.lemma = lemma;
     // Verified adjective: make the 未然形 win over fake verb interpretations
-    // (ichidan Xかる etc.), mirroring the ke-form handling.
-    miz_cand.cost = candidate::verb_cost::kStrongBonus;
-    miz_cand.has_suffix = true;                              // Conjugated form (未然ウ接続)
-    miz_cand.extended_pos = core::ExtendedPOS::AdjMizenkei;  // For bigram: AdjMizenkei→AuxVolitional
-    miz_cand.origin = CandidateOrigin::AdjectiveI;
-#ifdef SUZUME_DEBUG_INFO
-    miz_cand.confidence = candidate::kIAdjKaroConfidence;
-    miz_cand.pattern = "i_adjective_karo";
-#endif
-    candidates.push_back(std::move(miz_cand));
+    // (ichidan Xかる etc.), mirroring the ke-form handling. AdjMizenkei feeds the
+    // AdjMizenkei→AuxVolitional bigram.
+    candidates.push_back(makeIAdjCellCandidate(extractSubstring(codepoints, start_pos, karo_pos + 2), start_pos,
+                                               karo_pos + 2, lemma, core::ExtendedPOS::AdjMizenkei,
+                                               candidate::verb_cost::kStrongBonus, CandidateOrigin::AdjectiveI,
+                                               candidate::kIAdjKaroConfidence, "i_adjective_karo"));
   }
 }
 
@@ -1144,21 +1112,9 @@ void appendIAdjKaraZuCandidates(const std::vector<char32_t>& codepoints, size_t 
     if (dict_manager != nullptr && dict_manager->lookupExact(surface, core::PartOfSpeech::Auxiliary) != nullptr) {
       continue;
     }
-    UnknownCandidate miz_cand;
-    miz_cand.surface = surface;
-    miz_cand.start = start_pos;
-    miz_cand.end = kara_pos + 2;
-    miz_cand.pos = core::PartOfSpeech::Adjective;
-    miz_cand.lemma = lemma;
-    miz_cand.cost = candidate::verb_cost::kStrongBonus;
-    miz_cand.has_suffix = true;
-    miz_cand.extended_pos = cell;
-    miz_cand.origin = CandidateOrigin::AdjectiveI;
-#ifdef SUZUME_DEBUG_INFO
-    miz_cand.confidence = candidate::kIAdjKaroConfidence;
-    miz_cand.pattern = "i_adjective_kari";
-#endif
-    candidates.push_back(std::move(miz_cand));
+    candidates.push_back(makeIAdjCellCandidate(surface, start_pos, kara_pos + 2, lemma, cell,
+                                               candidate::verb_cost::kStrongBonus, CandidateOrigin::AdjectiveI,
+                                               candidate::kIAdjKaroConfidence, "i_adjective_kari"));
   }
 }
 

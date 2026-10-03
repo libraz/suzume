@@ -6,9 +6,9 @@
  * and UnknownWordGenerator::generateOnomatopoeiaCandidates.
  */
 
-#include <algorithm>
 #include <array>
 #include <cstdint>
+#include <utility>
 
 #include "adjective_candidates.h"
 #include "analysis/dictionary_probe.h"
@@ -59,16 +59,9 @@ bool closesContractedVolitional(const std::vector<char32_t>& codepoints, size_t 
 bool startsLongerDictionaryWord(const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos,
                                 const dictionary::DictionaryManager* dict_manager) {
   constexpr size_t kMaxTrailingChars = 3;
-  if (dict_manager == nullptr) {
-    return false;
-  }
-  const size_t probe_end = std::min(codepoints.size(), end_pos + kMaxTrailingChars);
-  for (size_t word_end = end_pos + 1; word_end <= probe_end; ++word_end) {
-    if (lookupEntryInRange(*dict_manager, codepoints, start_pos, word_end) != nullptr) {
-      return true;
-    }
-  }
-  return false;
+  const size_t span = end_pos - start_pos;
+  return hasDictionaryEntryFrom(dict_manager, codepoints, start_pos, span + 1, span + kMaxTrailingChars,
+                                core::PartOfSpeech::Unknown, nullptr);
 }
 
 // A mimetic adverb over [start, end); an empty span appends nothing.

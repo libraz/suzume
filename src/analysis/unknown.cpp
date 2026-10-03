@@ -468,27 +468,14 @@ UnknownCandidate makeVerbCandidate(const std::string& surface, size_t start, siz
 }
 
 UnknownCandidate makeNounCandidate(const std::string& surface, size_t start, size_t end, float cost, bool has_suffix,
-                                   CandidateOrigin origin, core::ExtendedPOS extended_pos,
-                                   [[maybe_unused]] const char* epos_source) {
-  UnknownCandidate candidate;
-  candidate.surface = surface;
-  candidate.start = start;
-  candidate.end = end;
-  candidate.pos = core::PartOfSpeech::Noun;
-  candidate.extended_pos = extended_pos != core::ExtendedPOS::Unknown ? extended_pos : core::ExtendedPOS::Noun;
-  candidate.cost = cost;
-  candidate.has_suffix = has_suffix;
-  candidate.origin = origin;
+                                   CandidateOrigin origin, core::ExtendedPOS extended_pos, const char* epos_source) {
 #ifdef SUZUME_DEBUG_INFO
-  if (epos_source != nullptr) {
-    candidate.epos_source = epos_source;
-  } else if (extended_pos != core::ExtendedPOS::Unknown) {
-    candidate.epos_source = "noun_cand_explicit";
-  } else {
-    candidate.epos_source = "noun_cand_default";
+  if (epos_source == nullptr) {
+    epos_source = extended_pos != core::ExtendedPOS::Unknown ? "noun_cand_explicit" : "noun_cand_default";
   }
 #endif
-  return candidate;
+  return makeCandidate(surface, start, end, core::PartOfSpeech::Noun, cost, has_suffix, origin, extended_pos,
+                       epos_source);
 }
 
 UnknownCandidate makeCandidate(const std::string& surface, size_t start, size_t end, core::PartOfSpeech pos, float cost,

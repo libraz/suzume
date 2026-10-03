@@ -107,12 +107,7 @@ bool predicateFollowsContinuative(const std::vector<char32_t>& codepoints, size_
   if (reduplicated) {
     return false;
   }
-  for (size_t verb_end = end_pos + 2; verb_end <= std::min(codepoints.size(), end_pos + 3); ++verb_end) {
-    if (lookupEntryInRange(*dict_manager, codepoints, end_pos, verb_end, core::PartOfSpeech::Verb) != nullptr) {
-      return true;
-    }
-  }
-  return false;
+  return hasDictionaryEntryFrom(dict_manager, codepoints, end_pos, 2, 3, core::PartOfSpeech::Verb, nullptr);
 }
 
 bool derivesFromCompoundFormingAdjective(const std::vector<char32_t>& codepoints, size_t start_pos,
@@ -235,10 +230,15 @@ UnknownCandidate makeNaAdjCandidate(const std::string& surface, size_t start, si
 }
 
 UnknownCandidate makeIAdjStemCandidate(const std::string& surface, size_t start, size_t end, const std::string& lemma,
-                                       float cost, [[maybe_unused]] CandidateOrigin origin,
+                                       float cost, CandidateOrigin origin, float confidence, const char* pattern) {
+  return makeIAdjCellCandidate(surface, start, end, lemma, core::ExtendedPOS::AdjStem, cost, origin, confidence,
+                               pattern);
+}
+
+UnknownCandidate makeIAdjCellCandidate(const std::string& surface, size_t start, size_t end, const std::string& lemma,
+                                       core::ExtendedPOS extended_pos, float cost, CandidateOrigin origin,
                                        [[maybe_unused]] float confidence, [[maybe_unused]] const char* pattern) {
-  auto candidate =
-      makeCandidate(surface, start, end, core::PartOfSpeech::Adjective, cost, true, origin, core::ExtendedPOS::AdjStem);
+  auto candidate = makeCandidate(surface, start, end, core::PartOfSpeech::Adjective, cost, true, origin, extended_pos);
   candidate.lemma = lemma;
 #ifdef SUZUME_DEBUG_INFO
   candidate.confidence = confidence;

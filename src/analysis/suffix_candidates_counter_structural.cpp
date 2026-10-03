@@ -301,16 +301,8 @@ void appendStructuralCounterCandidates(const std::vector<char32_t>& codepoints, 
   //   - a numeral/quantity kanji heading the trailing pair marks a reduplicated
   //     idiom (十人十色, 一日千秋) and blocks the split
   {
-    size_t scan = start_pos;
-    bool has_quantity = false;
-    if (normalize::isQuantityPrefixKanji(codepoints[scan])) {
-      ++scan;
-      has_quantity = true;
-    }
-    while (scan < codepoints.size() && normalize::isNumeralCodepoint(codepoints[scan])) {
-      ++scan;
-      has_quantity = true;
-    }
+    size_t scan = scanQuantityHead(codepoints, start_pos, true);
+    const bool has_quantity = scan > start_pos;
     if (has_quantity && scan < codepoints.size() &&
         (isObjectCounterKanji(codepoints[scan]) || normalize::isTemporalCounterKanji(codepoints[scan]))) {
       size_t counter_end = scan + 1;
