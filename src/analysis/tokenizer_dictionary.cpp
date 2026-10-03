@@ -384,8 +384,8 @@ bool isLicensedCompletiveAuxiliaryBoundary(const core::Lattice& lattice,
   if (candidate_epos != core::ExtendedPOS::AuxAspectShimau) {
     return false;
   }
-  const bool follows_verb_host = hasPrecedingExtendedPOS(lattice, candidate_start, core::ExtendedPOS::VerbRenyokei) ||
-                                 hasPrecedingExtendedPOS(lattice, candidate_start, core::ExtendedPOS::VerbOnbinkei);
+  const bool follows_verb_host = hasPrecedingExtendedPOS(
+      lattice, candidate_start, {core::ExtendedPOS::VerbRenyokei, core::ExtendedPOS::VerbOnbinkei});
   return follows_verb_host && startsClosedCompletiveContinuation(dict_manager, text, byte_offsets, candidate_end);
 }
 
@@ -412,9 +412,9 @@ bool conflictsWithVerifiedCompoundBoundary(const core::Lattice& lattice,
   // auxiliary remains grammatical even when a longer compound candidate also
   // crosses the same position.
   if (candidate_pos == core::PartOfSpeech::Auxiliary &&
-      (hasPrecedingExtendedPOS(lattice, candidate_start, core::ExtendedPOS::VerbMizenkei) ||
-       hasPrecedingExtendedPOS(lattice, candidate_start, core::ExtendedPOS::VerbRenyokei) ||
-       hasPrecedingExtendedPOS(lattice, candidate_start, core::ExtendedPOS::VerbOnbinkei))) {
+      hasPrecedingExtendedPOS(
+          lattice, candidate_start,
+          {core::ExtendedPOS::VerbMizenkei, core::ExtendedPOS::VerbRenyokei, core::ExtendedPOS::VerbOnbinkei})) {
     return false;
   }
   const size_t compound_end = verifiedCompoundEndCovering(lattice, candidate_start);
@@ -578,14 +578,11 @@ bool crossesAttributiveNaHonorificNominal(const core::Lattice& lattice, const st
 // Generate it only at that boundary instead of registering a global one-kanji
 // noun that would reopen 間もなく, 時間, or 間違える internally.
 bool hasPrecedingAttributivePredicate(const core::Lattice& lattice, size_t start_pos) {
-  return hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbShuushikei) ||
-         hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbRentaikei) ||
-         hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::AdjBasic) ||
-         hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::AuxTenseTa) ||
-         hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::AuxTenseMasu) ||
-         hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::AuxNegativeNai) ||
-         hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::AuxCopulaDa) ||
-         hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::AuxCopulaDesu);
+  return hasPrecedingExtendedPOS(
+      lattice, start_pos,
+      {core::ExtendedPOS::VerbShuushikei, core::ExtendedPOS::VerbRentaikei, core::ExtendedPOS::AdjBasic,
+       core::ExtendedPOS::AuxTenseTa, core::ExtendedPOS::AuxTenseMasu, core::ExtendedPOS::AuxNegativeNai,
+       core::ExtendedPOS::AuxCopulaDa, core::ExtendedPOS::AuxCopulaDesu});
 }
 
 // generateTemporalNounBoundaryCandidates() marks the left side of a
@@ -753,14 +750,14 @@ bool followsConjunctiveTeDe(const core::Lattice& lattice, size_t start_pos) {
 // with a dictionary irrealis one character shorter.  Both the formal-noun and
 // the irrealis reading of the span are decided by the same evidence, so they
 // ask this one question rather than each carrying its own scan.
-bool hasShorterMizenkeiBeforeNegative(const dictionary::DictionaryManager& dict_manager, std::string_view text,
-                                      size_t byte_offset, const std::vector<char32_t>& codepoints, size_t start_pos,
+bool hasShorterMizenkeiBeforeNegative(const std::vector<dictionary::LookupResult>& alternatives,
+                                      const std::vector<char32_t>& codepoints, size_t start_pos,
                                       size_t candidate_length) {
   if (candidate_length < 2 || start_pos + candidate_length > codepoints.size() ||
       codepoints[start_pos + candidate_length - 1] != U'ん') {
     return false;
   }
-  for (const auto& alternative : dict_manager.lookup(text, byte_offset)) {
+  for (const auto& alternative : alternatives) {
     if (alternative.entry != nullptr && alternative.entry->extended_pos == core::ExtendedPOS::VerbMizenkei &&
         alternative.length + 1 == candidate_length) {
       return true;
@@ -775,10 +772,9 @@ bool hasShorterMizenkeiBeforeNegative(const dictionary::DictionaryManager& dict_
 // chain, while the shorter edge would leave its remaining kana to a particle.
 // Compare dictionary spans rather than surfaces so the rule applies to every
 // homographic verb pair with this structure.
-bool hasLongerVerbBeforeNegative(const dictionary::DictionaryManager& dict_manager, std::string_view text,
-                                 size_t byte_offset, const std::vector<char32_t>& codepoints, size_t start_pos,
-                                 size_t candidate_length) {
-  for (const auto& alternative : dict_manager.lookup(text, byte_offset)) {
+bool hasLongerVerbBeforeNegative(const std::vector<dictionary::LookupResult>& alternatives,
+                                 const std::vector<char32_t>& codepoints, size_t start_pos, size_t candidate_length) {
+  for (const auto& alternative : alternatives) {
     if (alternative.entry == nullptr || alternative.entry->pos != core::PartOfSpeech::Verb ||
         alternative.length <= candidate_length || start_pos + alternative.length >= codepoints.size()) {
       continue;
@@ -998,7 +994,7 @@ bool namesVerbContinuative(const dictionary::DictionaryManager& dict_manager, st
 // Whether a surface carries lexical content on its own, either as a listed
 // entry or as the continuative of a listed verb.
 bool namesContentUnit(const dictionary::DictionaryManager& dict_manager, std::string_view surface) {
-  return dict_manager.lookupExact(std::string(surface)) != nullptr || namesVerbContinuative(dict_manager, surface);
+  return dict_manager.lookupExact(surface) != nullptr || namesVerbContinuative(dict_manager, surface);
 }
 
 // A listed noun that spells the continuative of a listed verb and divides no
@@ -1043,8 +1039,7 @@ constexpr size_t kElidedLookupWindow = 6;
 // be free to open anywhere inside a kana run and would cut into longer words
 // through the mark (the dialectal ばい inside やばーい).
 void addElidedProlongedDictionaryCandidates(core::Lattice& lattice, const dictionary::DictionaryManager& dict_manager,
-                                            const std::vector<char32_t>& codepoints, size_t start_pos,
-                                            std::vector<dictionary::LookupResult>& lookup_results) {
+                                            const std::vector<char32_t>& codepoints, size_t start_pos) {
   const size_t window_end = std::min(codepoints.size(), start_pos + kElidedLookupWindow);
   // The mark holds the mora in front of it, so it can neither open the window
   // nor be the only thing in it. Scanning for one before building anything keeps
@@ -1078,8 +1073,9 @@ void addElidedProlongedDictionaryCandidates(core::Lattice& lattice, const dictio
     ++elided_length;
   }
 
-  dict_manager.lookupInto(elided, 0, lookup_results);
-  for (const auto& result : lookup_results) {
+  std::vector<dictionary::LookupResult> elided_results;
+  dict_manager.lookupInto(elided, 0, elided_results);
+  for (const auto& result : elided_results) {
     if (result.entry == nullptr || result.length < 2 || result.length > elided_length) {
       continue;
     }
@@ -1193,19 +1189,14 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     // guards below inspect the following lexical head.
     size_t end_pos = start_pos + result.length;
 
-    if (result.entry->extended_pos == core::ExtendedPOS::NounFormal && followsNegativeQuote(lattice, start_pos) &&
-        hasShorterMizenkeiBeforeNegative(dict_manager_, text, byteOffsetAt(byte_offsets, start_pos), codepoints,
-                                         start_pos, result.length)) {
+    if ((result.entry->extended_pos == core::ExtendedPOS::NounFormal ||
+         result.entry->extended_pos == core::ExtendedPOS::VerbMizenkei) &&
+        followsNegativeQuote(lattice, start_pos) &&
+        hasShorterMizenkeiBeforeNegative(lookup_results, codepoints, start_pos, result.length)) {
       continue;
     }
     if (result.entry->pos == core::PartOfSpeech::Verb && followsNegativeQuote(lattice, start_pos) &&
-        hasLongerVerbBeforeNegative(dict_manager_, text, byteOffsetAt(byte_offsets, start_pos), codepoints, start_pos,
-                                    result.length)) {
-      continue;
-    }
-    if (result.entry->extended_pos == core::ExtendedPOS::VerbMizenkei && followsNegativeQuote(lattice, start_pos) &&
-        hasShorterMizenkeiBeforeNegative(dict_manager_, text, byteOffsetAt(byte_offsets, start_pos), codepoints,
-                                         start_pos, result.length)) {
+        hasLongerVerbBeforeNegative(lookup_results, codepoints, start_pos, result.length)) {
       continue;
     }
     // An aspect auxiliary attaches to a te-form, never directly after the
@@ -1469,10 +1460,9 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
           lookupResultsHavePartOfSpeech(lookup_results, partOfSpeechMask(core::PartOfSpeech::Adverb), result.length);
       const bool follows_genitive = hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::ParticleNo);
       const bool follows_non_genitive_nominal_particle =
-          hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::ParticleCase) ||
-          hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::ParticleTopic) ||
-          hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::ParticleBinding) ||
-          hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::ParticleAdverbial);
+          hasPrecedingExtendedPOS(lattice, start_pos,
+                                  {core::ExtendedPOS::ParticleCase, core::ExtendedPOS::ParticleTopic,
+                                   core::ExtendedPOS::ParticleBinding, core::ExtendedPOS::ParticleAdverbial});
       const bool has_formal_noun_left_context =
           follows_genitive ||
           (hasPrecedingAttributivePredicate(lattice, start_pos) && !follows_non_genitive_nominal_particle);
@@ -1584,7 +1574,6 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
       }
     }
 
-    const bool follows_volitional = hasPrecedingVerbVolitionalChain(lattice, start_pos);
     const auto starts_aspectual_iru = [&](size_t pos) {
       if (pos >= codepoints.size()) {
         return false;
@@ -1609,6 +1598,7 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
       if (compound_particle_before_aspect) {
         continue;
       }
+      const bool follows_volitional = hasPrecedingVerbVolitionalChain(lattice, start_pos);
       // After an explicit volitional auxiliary, a multi-mora case particle
       // would hide the productive quotative + suru sequence
       // (書こ+う+と+し+て). Keep the one-mora quotative candidate even when a
@@ -1968,10 +1958,9 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     // 読ん+どく, 見+とく, させ+とく); after a particle it is kana (と+どく).
     if (result.entry->extended_pos == core::ExtendedPOS::AuxAspectOku &&
         utf8::equalsAny(result.entry->lemma, {"とく", "どく"}) &&
-        !(hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbRenyokei) ||
-          hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbOnbinkei) ||
-          hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::AuxCausative) ||
-          hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::AuxPassive))) {
+        !hasPrecedingExtendedPOS(lattice, start_pos,
+                                 {core::ExtendedPOS::VerbRenyokei, core::ExtendedPOS::VerbOnbinkei,
+                                  core::ExtendedPOS::AuxCausative, core::ExtendedPOS::AuxPassive})) {
       continue;
     }
 
@@ -2004,9 +1993,7 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
         utf8::endsWith(result.entry->surface, "う") &&
         !(hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbRenyokei) &&
           (verb_helpers::naiNegativeFollowsAt(codepoints, end_pos) ||
-           utf8::startsWith(extractSubstring(codepoints, end_pos, std::min(codepoints.size(), end_pos + 2)), "ござ") ||
-           utf8::startsWith(extractSubstring(codepoints, end_pos, std::min(codepoints.size(), end_pos + 2)),
-                            "存じ")))) {
+           utf8::startsWithAny(text.substr(byteOffsetAt(byte_offsets, end_pos)), {"ござ", "存じ"})))) {
       continue;
     }
 
@@ -2093,28 +2080,7 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     const bool classical_perfect_izenkei = result.entry->extended_pos == core::ExtendedPOS::AuxClassicalPerfect &&
                                            grammar::spellsHypotheticalAuxiliaryCell(result.entry->surface);
     const bool is_classical_izenkei = classical_perfect_izenkei || end_pos - start_pos > 1;
-    // 係り結び leaves the 已然形 as the clause's own predicate, so the cell also
-    // stands with no particle after it at all (雨こそ降りたれ, 月を見しか). What
-    // marks it there is the continuative it attaches to, not the follower: a
-    // case particle in that slot leaves the same kana as the ordinary noun it
-    // introduces (料理に+たれ, 背も+たれ), and requiring the binding particle
-    // itself would reject the same cell wherever the clause carries no 係助詞,
-    // which is the reading the oracle takes (彼が知り+たれ). The continuative may
-    // belong to an auxiliary rather than the verb, because a voice auxiliary
-    // hosts the perfect from the same cell (開か+れ+たれ).
-    const bool follows_continuative =
-        hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbRenyokei) ||
-        hasPrecedingPartOfSpeech(lattice, start_pos, partOfSpeechMask(core::PartOfSpeech::Auxiliary));
-    const bool izenkei_closes_clause =
-        is_classical_izenkei && verb_helpers::clauseEndsAt(codepoints, end_pos) && follows_continuative;
-    // The 連体形 also nominalizes, and the nominal it forms takes a particle of
-    // its own (告げぬべかりし+に, 読みし+を). The host separates that from the サ変
-    // continuative the same kana spells: the classical past attaches to a
-    // continuative, while the サ変 verb takes the nominal it turns into a
-    // predicate, or the particle that introduces one (話を+し+に行く).
-    const bool rentaikei_nominalizes = !is_classical_izenkei && follows_continuative &&
-                                       verb_helpers::caseParticleFollowsAt(dict_manager_, codepoints, end_pos);
-    // The irrealis せ of that same paradigm is licensed by neither test above:
+    // The irrealis せ of that same paradigm is licensed by neither test below:
     // its cell never closes a clause and never heads a nominal, because the
     // counterfactual is the only construction that selects it. What identifies
     // it is the pair of hosts around it — the continuative it attaches to, and
@@ -2125,16 +2091,37 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     const bool classical_past_irrealis = result.entry->extended_pos == core::ExtendedPOS::AuxClassicalKi &&
                                          grammar::spellsClassicalPastIrrealis(result.entry->surface);
     if (classical_past_irrealis) {
-      const bool follows_renyokei = hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbRenyokei) ||
-                                    hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::AdjRenyokei);
+      const bool follows_renyokei = hasPrecedingExtendedPOS(
+          lattice, start_pos, {core::ExtendedPOS::VerbRenyokei, core::ExtendedPOS::AdjRenyokei});
       if (!follows_renyokei || !verb_helpers::hypotheticalParticleFollowsAt(dict_manager_, codepoints, end_pos)) {
         continue;
       }
-    } else if ((result.entry->extended_pos == core::ExtendedPOS::AuxClassicalKi || classical_perfect_izenkei) &&
-               !izenkei_closes_clause && !rentaikei_nominalizes &&
-               !verb_helpers::classicalPastEnvironmentFollows(dict_manager_, codepoints, end_pos,
-                                                              is_classical_izenkei)) {
-      continue;
+    } else if (result.entry->extended_pos == core::ExtendedPOS::AuxClassicalKi || classical_perfect_izenkei) {
+      // 係り結び leaves the 已然形 as the clause's own predicate, so the cell also
+      // stands with no particle after it at all (雨こそ降りたれ, 月を見しか). What
+      // marks it there is the continuative it attaches to, not the follower: a
+      // case particle in that slot leaves the same kana as the ordinary noun it
+      // introduces (料理に+たれ, 背も+たれ), and requiring the binding particle
+      // itself would reject the same cell wherever the clause carries no 係助詞,
+      // which is the reading the oracle takes (彼が知り+たれ). The continuative may
+      // belong to an auxiliary rather than the verb, because a voice auxiliary
+      // hosts the perfect from the same cell (開か+れ+たれ).
+      const bool follows_continuative =
+          hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbRenyokei) ||
+          hasPrecedingPartOfSpeech(lattice, start_pos, partOfSpeechMask(core::PartOfSpeech::Auxiliary));
+      const bool izenkei_closes_clause =
+          is_classical_izenkei && verb_helpers::clauseEndsAt(codepoints, end_pos) && follows_continuative;
+      // The 連体形 also nominalizes, and the nominal it forms takes a particle of
+      // its own (告げぬべかりし+に, 読みし+を). The host separates that from the サ変
+      // continuative the same kana spells: the classical past attaches to a
+      // continuative, while the サ変 verb takes the nominal it turns into a
+      // predicate, or the particle that introduces one (話を+し+に行く).
+      const bool rentaikei_nominalizes = !is_classical_izenkei && follows_continuative &&
+                                         verb_helpers::caseParticleFollowsAt(dict_manager_, codepoints, end_pos);
+      if (!izenkei_closes_clause && !rentaikei_nominalizes &&
+          !verb_helpers::classicalPastEnvironmentFollows(dict_manager_, codepoints, end_pos, is_classical_izenkei)) {
+        continue;
+      }
     }
 
     // A one-mora classical perfect is the tail of far more words than it is an
@@ -2253,8 +2240,8 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
       // back on the case particle plus the homographic adverb.
       const bool contracted_volitional =
           utf8::equalsAny(result.entry->surface, {"とこ", "どこ"}) && follows_volitional &&
-          (hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbOnbinkei) ||
-           hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbRenyokei));
+          hasPrecedingExtendedPOS(lattice, start_pos,
+                                  {core::ExtendedPOS::VerbOnbinkei, core::ExtendedPOS::VerbRenyokei});
       if ((utf8::equalsAny(result.entry->surface, {"とこ", "どこ"}) && !contracted_volitional) ||
           (follows_volitional && !contracted_volitional)) {
         continue;
@@ -2267,9 +2254,8 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     // boundary; letting its prefix reach a following particle manufactures a
     // predicate with no host.
     if (start_pos == 0 && result.entry->extended_pos == core::ExtendedPOS::VerbRenyokei && result.length == 1) {
-      const auto same_start_entries = dict_manager_.lookup(text, byteOffsetAt(byte_offsets, start_pos));
       const bool has_longer_conjunction =
-          std::any_of(same_start_entries.begin(), same_start_entries.end(), [&](const auto& candidate) {
+          std::any_of(lookup_results.begin(), lookup_results.end(), [&](const auto& candidate) {
             return candidate.entry != nullptr && candidate.entry->pos == core::PartOfSpeech::Conjunction &&
                    candidate.length > result.length;
           });
@@ -2284,9 +2270,8 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     if ((result.entry->pos == core::PartOfSpeech::Noun || result.entry->pos == core::PartOfSpeech::Suffix) &&
         result.length == 1 &&
         hasPrecedingPartOfSpeech(lattice, start_pos, partOfSpeechMask(core::PartOfSpeech::Conjunction))) {
-      const auto same_start_entries = dict_manager_.lookup(text, byteOffsetAt(byte_offsets, start_pos));
       const bool has_longer_verb =
-          std::any_of(same_start_entries.begin(), same_start_entries.end(), [&](const auto& candidate) {
+          std::any_of(lookup_results.begin(), lookup_results.end(), [&](const auto& candidate) {
             return candidate.entry != nullptr && candidate.entry->pos == core::PartOfSpeech::Verb &&
                    candidate.length > result.length;
           });
@@ -2668,9 +2653,7 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
   }
 
   tokenizer_dictionary_detail::appendSpecialGrammarCandidates(lattice, text, codepoints, start_pos, byte_pos);
-  // Runs last: it reuses the caller's buffer as scratch, which the loops above
-  // have finished with by this point.
-  addElidedProlongedDictionaryCandidates(lattice, dict_manager_, codepoints, start_pos, lookup_results);
+  addElidedProlongedDictionaryCandidates(lattice, dict_manager_, codepoints, start_pos);
 }
 
 }  // namespace suzume::analysis

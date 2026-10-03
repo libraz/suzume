@@ -817,9 +817,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev, const core::LatticeE
   if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei && normalize::utf8Length(prev.surface) == 1 &&
       next.extended_pos == core::ExtendedPOS::ParticleCase && next.surface == "を") {
     // Check if single char is hiragana
-    auto decoded = normalize::utf8::decode(prev.surface);
-    auto it = decoded.begin();
-    if (it != decoded.end() && kana::isHiraganaCodepoint(*it)) {
+    if (kana::isHiraganaCodepoint(utf8::decodeFirstChar(prev.surface))) {
       SUZUME_CONNECTION_ADD(surface_bonus, cost::kStrong);
     }
   }

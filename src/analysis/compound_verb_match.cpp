@@ -444,13 +444,13 @@ CompoundVerbMatch findCompoundVerbMatch(
         // Try different lengths for V2 inflected form (shortest match first)
         for (size_t v2_end = v2_start + 2; v2_end <= v2_hiragana_end; ++v2_end) {
           size_t v2_end_byte = byteOffsetAt(byte_offsets, v2_end);
-          std::string v2_text(text.substr(v2_start_byte, v2_end_byte - v2_start_byte));
+          const std::string_view v2_text = text.substr(v2_start_byte, v2_end_byte - v2_start_byte);
 
           // Use analyze() to get all candidates, not just the best one.
           // This is needed because for ambiguous stems (e.g., かった could be
           // from かる, かつ, or かう), we need to find the one matching our V2.
           const auto& infl_results = inflection.analyze(v2_text);
-          std::string expected_base = std::string(v2_reading);
+          const std::string_view expected_base = v2_reading;
 
           for (const auto& infl_result : infl_results) {
             // Check if this matches the V2 base form (using reading for comparison)
@@ -509,7 +509,7 @@ CompoundVerbMatch findCompoundVerbMatch(
                   // Try inflection on kanji+hiragana portion (shortest match first)
                   for (size_t v2_end = hira_start + 1; v2_end <= hira_end; ++v2_end) {
                     size_t v2_end_byte = byteOffsetAt(byte_offsets, v2_end);
-                    std::string v2_text(text.substr(v2_start_byte, v2_end_byte - v2_start_byte));
+                    const std::string_view v2_text = text.substr(v2_start_byte, v2_end_byte - v2_start_byte);
 
                     // Use analyze() to search all candidates for matching base form
                     const auto& infl_results = inflection.analyze(v2_text);

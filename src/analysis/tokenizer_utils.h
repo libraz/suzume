@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
+#include <initializer_list>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -245,6 +246,10 @@ bool hasPrecedingPartOfSpeech(const core::Lattice& lattice, size_t end_pos, Part
 
 /** Whether an edge with the requested extended part of speech ends at a boundary. */
 bool hasPrecedingExtendedPOS(const core::Lattice& lattice, size_t end_pos, core::ExtendedPOS extended_pos);
+
+/** Whether an edge with any of the requested extended parts of speech ends at a boundary. */
+bool hasPrecedingExtendedPOS(const core::Lattice& lattice, size_t end_pos,
+                             std::initializer_list<core::ExtendedPOS> extended_pos_list);
 
 /**
  * @brief Find the end of a dictionary-evidenced compound verb covering pos.

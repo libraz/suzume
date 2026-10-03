@@ -106,7 +106,7 @@ void addPrefixNounJoinCandidates(core::Lattice& lattice, std::string_view text, 
  */
 void addPronounPluralJoinCandidates(core::Lattice& lattice, std::string_view text,
                                     const std::vector<char32_t>& codepoints, const ByteOffsets& byte_offsets,
-                                    size_t start_pos, const dictionary::DictionaryManager& dict_manager,
+                                    size_t start_pos, const std::vector<dictionary::LookupResult>& dict_results,
                                     const Scorer& scorer);
 
 /**
@@ -132,6 +132,7 @@ void addDestinationSuffixNounJoinCandidates(core::Lattice& lattice, std::string_
 void addDeverbalNounBeforeIndependentNakuCandidates(core::Lattice& lattice, std::string_view text,
                                                     const std::vector<char32_t>& codepoints,
                                                     const ByteOffsets& byte_offsets, size_t start_pos,
+                                                    const std::vector<dictionary::LookupResult>& dict_results,
                                                     const dictionary::DictionaryManager& dict_manager,
                                                     const Scorer& scorer);
 

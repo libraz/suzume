@@ -51,7 +51,8 @@ class Tokenizer {
    */
   void addUnknownCandidates(core::Lattice& lattice, std::string_view text, const std::vector<char32_t>& codepoints,
                             const ByteOffsets& byte_offsets, size_t start_pos,
-                            const std::vector<normalize::CharType>& char_types) const;
+                            const std::vector<normalize::CharType>& char_types,
+                            const std::vector<dictionary::LookupResult>& dict_results) const;
 
   /**
    * @brief Drop shape-derived lexical bonuses inside user dictionary spans

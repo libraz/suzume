@@ -96,12 +96,12 @@ core::Lattice Tokenizer::buildLattice(std::string_view text, const std::vector<c
   for (size_t pos = 0; pos < codepoints.size(); ++pos) {
     // These run at every position
     addDictionaryCandidates(lattice, text, codepoints, byte_offsets, pos, dictionary_lookup_results);
-    addUnknownCandidates(lattice, text, codepoints, byte_offsets, pos, char_types);
+    addUnknownCandidates(lattice, text, codepoints, byte_offsets, pos, char_types, dictionary_lookup_results);
     if (mode_ != core::AnalysisMode::Split) {
-      addPronounPluralJoinCandidates(lattice, text, codepoints, byte_offsets, pos, dict_manager_, scorer_);
+      addPronounPluralJoinCandidates(lattice, text, codepoints, byte_offsets, pos, dictionary_lookup_results, scorer_);
       addDestinationSuffixNounJoinCandidates(lattice, text, codepoints, byte_offsets, pos, dict_manager_, scorer_);
-      addDeverbalNounBeforeIndependentNakuCandidates(lattice, text, codepoints, byte_offsets, pos, dict_manager_,
-                                                     scorer_);
+      addDeverbalNounBeforeIndependentNakuCandidates(lattice, text, codepoints, byte_offsets, pos,
+                                                     dictionary_lookup_results, dict_manager_, scorer_);
       addMixedScriptCandidates(lattice, text, codepoints, byte_offsets, pos, char_types, scorer_, dict_manager_);
     }
 
@@ -109,8 +109,8 @@ core::Lattice Tokenizer::buildLattice(std::string_view text, const std::vector<c
     auto ct = char_types[pos];
     if (ct == normalize::CharType::Kanji) {
       addCompoundSplitCandidates(lattice, text, byte_offsets, pos, char_types, dict_manager_, scorer_);
-      addNounVerbSplitCandidates(lattice, text, codepoints, byte_offsets, pos, char_types, dict_manager_, scorer_,
-                                 inflection_);
+      addNounVerbSplitCandidates(lattice, text, codepoints, byte_offsets, pos, dictionary_lookup_results, char_types,
+                                 dict_manager_, scorer_, inflection_);
       if (mode_ != core::AnalysisMode::Split) {
         addCompoundVerbJoinCandidates(lattice, text, codepoints, byte_offsets, pos, char_types, dict_manager_, scorer_,
                                       inflection_);
@@ -143,7 +143,7 @@ core::Lattice Tokenizer::buildLattice(std::string_view text, const std::vector<c
       // Generate a single-character fallback candidate with high penalty
       size_t byte_start = byteOffsetAt(byte_offsets, pos);
       size_t byte_end = byteOffsetAt(byte_offsets, pos + 1);
-      std::string surface(text.substr(byte_start, byte_end - byte_start));
+      const std::string_view surface = text.substr(byte_start, byte_end - byte_start);
 
       lattice.addEdge(surface, static_cast<uint32_t>(pos), static_cast<uint32_t>(pos + 1), core::PartOfSpeech::Other,
                       candidate::kFallbackCandidateCost, core::LatticeEdge::kIsUnknown);

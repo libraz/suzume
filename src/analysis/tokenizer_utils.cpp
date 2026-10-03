@@ -37,24 +37,35 @@ size_t findCharRegionEndBeforeHiragana(const std::vector<normalize::CharType>& c
   return end;
 }
 
+namespace {
+
+size_t kanjiPredicateEnd(const std::vector<normalize::CharType>& char_types, size_t start_pos) {
+  return findCharRegionEnd(char_types, start_pos, char_types.size() - std::min(start_pos, char_types.size()),
+                           normalize::CharType::Kanji);
+}
+
+bool kanjiRunEndsWithSuru(const std::vector<char32_t>& codepoints, size_t start_pos, size_t predicate_end,
+                          size_t minimum_kanji_count) {
+  return predicate_end - start_pos >= minimum_kanji_count && predicate_end + 1 < codepoints.size() &&
+         codepoints[predicate_end] == U'す' && codepoints[predicate_end + 1] == U'る';
+}
+
+}  // namespace
+
 bool hasKanjiSuruPredicateAt(const std::vector<char32_t>& codepoints,
                              const std::vector<normalize::CharType>& char_types, size_t start_pos,
                              size_t minimum_kanji_count) {
-  const size_t predicate_end = findCharRegionEnd(
-      char_types, start_pos, char_types.size() - std::min(start_pos, char_types.size()), normalize::CharType::Kanji);
-  return predicate_end - start_pos >= minimum_kanji_count && predicate_end + 1 < codepoints.size() &&
-         codepoints[predicate_end] == U'す' && codepoints[predicate_end + 1] == U'る';
+  return kanjiRunEndsWithSuru(codepoints, start_pos, kanjiPredicateEnd(char_types, start_pos), minimum_kanji_count);
 }
 
 bool headsKanjiSuruPredicateAt(const dictionary::DictionaryManager& dict_manager,
                                const std::vector<char32_t>& codepoints,
                                const std::vector<normalize::CharType>& char_types, size_t start_pos,
                                size_t minimum_kanji_count) {
-  if (hasKanjiSuruPredicateAt(codepoints, char_types, start_pos, minimum_kanji_count)) {
+  const size_t predicate_end = kanjiPredicateEnd(char_types, start_pos);
+  if (kanjiRunEndsWithSuru(codepoints, start_pos, predicate_end, minimum_kanji_count)) {
     return true;
   }
-  const size_t predicate_end = findCharRegionEnd(
-      char_types, start_pos, char_types.size() - std::min(start_pos, char_types.size()), normalize::CharType::Kanji);
   if (predicate_end - start_pos < minimum_kanji_count || predicate_end + 1 >= codepoints.size() ||
       !grammar::isSuruRenyokeiSurface(extractSubstring(codepoints, predicate_end, predicate_end + 1))) {
     return false;
@@ -463,6 +474,18 @@ bool hasPrecedingExtendedPOS(const core::Lattice& lattice, size_t end_pos, core:
       lattice, end_pos, [extended_pos](const core::LatticeEdge& edge) { return edge.extended_pos == extended_pos; });
 }
 
+bool hasPrecedingExtendedPOS(const core::Lattice& lattice, size_t end_pos,
+                             std::initializer_list<core::ExtendedPOS> extended_pos_list) {
+  return core::anyEdgeEndingAt(lattice, end_pos, [extended_pos_list](const core::LatticeEdge& edge) {
+    for (const core::ExtendedPOS candidate : extended_pos_list) {
+      if (edge.extended_pos == candidate) {
+        return true;
+      }
+    }
+    return false;
+  });
+}
+
 namespace {
 
 // Furthest end of an edge that starts within the lookbehind window and
@@ -531,8 +554,8 @@ bool joinsParticleToDictionaryAdverb(const core::Lattice& lattice, const diction
   // that て selects: the onbin form for a Godan verb, the plain continuative
   // for an Ichidan or サ変 one (見+とこ+う, 作成し+とこ+う).
   if (candidate_extended_pos == core::ExtendedPOS::AuxAspectOku &&
-      (hasPrecedingExtendedPOS(lattice, candidate_start, core::ExtendedPOS::VerbOnbinkei) ||
-       hasPrecedingExtendedPOS(lattice, candidate_start, core::ExtendedPOS::VerbRenyokei)) &&
+      hasPrecedingExtendedPOS(lattice, candidate_start,
+                              {core::ExtendedPOS::VerbOnbinkei, core::ExtendedPOS::VerbRenyokei}) &&
       lookupResultsHaveExtendedPOS(dict_manager.lookup(text, byteOffsetAt(byte_offsets, candidate_end)),
                                    core::ExtendedPOS::AuxVolitional, 1)) {
     return false;

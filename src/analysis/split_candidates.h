@@ -106,11 +106,13 @@ void addCompoundSplitCandidates(core::Lattice& lattice, std::string_view text, c
  * @param text Original text
  * @param codepoints Unicode codepoints
  * @param start_pos Starting position in codepoints
+ * @param dict_results Dictionary matches already looked up at start_pos
  * @param char_types Character types for each position
  * @param dict_manager Dictionary manager for lookups
  */
 void addNounVerbSplitCandidates(core::Lattice& lattice, std::string_view text, const std::vector<char32_t>& codepoints,
                                 const ByteOffsets& byte_offsets, size_t start_pos,
+                                const std::vector<dictionary::LookupResult>& dict_results,
                                 const std::vector<normalize::CharType>& char_types,
                                 const dictionary::DictionaryManager& dict_manager, const Scorer& scorer,
                                 const grammar::Inflection& inflection);

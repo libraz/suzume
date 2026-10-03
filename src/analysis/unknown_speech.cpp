@@ -225,7 +225,7 @@ void UnknownWordGenerator::generateCharacterSpeechCandidates(std::string_view /*
           std::string_view(surface).substr(0, core::kJapaneseCharBytes) == "だ" && dict_manager_ != nullptr) {
         const std::string_view tail(surface.data() + core::kJapaneseCharBytes,
                                     surface.size() - core::kJapaneseCharBytes);
-        if (dict_manager_->lookupExact(std::string(tail), core::PartOfSpeech::Particle) != nullptr) {
+        if (dict_manager_->lookupExact(tail, core::PartOfSpeech::Particle) != nullptr) {
           continue;
         }
       }

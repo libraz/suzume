@@ -377,14 +377,13 @@ void addPrefixNounJoinCandidates(core::Lattice& lattice, std::string_view text, 
 
 void addPronounPluralJoinCandidates(core::Lattice& lattice, std::string_view text,
                                     const std::vector<char32_t>& codepoints, const ByteOffsets& byte_offsets,
-                                    size_t start_pos, const dictionary::DictionaryManager& dict_manager,
+                                    size_t start_pos, const std::vector<dictionary::LookupResult>& dict_results,
                                     const Scorer& scorer) {
   if (start_pos >= codepoints.size()) {
     return;
   }
 
-  const size_t start_byte = byteOffsetAt(byte_offsets, start_pos);
-  for (const auto& result : dict_manager.lookup(text, start_byte)) {
+  for (const auto& result : dict_results) {
     if (result.entry == nullptr || result.entry->pos != core::PartOfSpeech::Pronoun) {
       continue;
     }
@@ -394,7 +393,7 @@ void addPronounPluralJoinCandidates(core::Lattice& lattice, std::string_view tex
     }
 
     const size_t end_pos = suffix_pos + 1;
-    std::string surface(textRange(text, byte_offsets, start_pos, end_pos));
+    const std::string_view surface = textRange(text, byte_offsets, start_pos, end_pos);
     const float cost = scorer.posPrior(core::PartOfSpeech::Pronoun) + candidate::kVerifiedNounBonus;
     lattice.addEdge(surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(end_pos),
                     core::PartOfSpeech::Pronoun, cost, core::LatticeEdge::kFromDictionary, surface);
@@ -485,6 +484,7 @@ void addDestinationSuffixNounJoinCandidates(core::Lattice& lattice, std::string_
 void addDeverbalNounBeforeIndependentNakuCandidates(core::Lattice& lattice, std::string_view text,
                                                     const std::vector<char32_t>& codepoints,
                                                     const ByteOffsets& byte_offsets, size_t start_pos,
+                                                    const std::vector<dictionary::LookupResult>& dict_results,
                                                     const dictionary::DictionaryManager& dict_manager,
                                                     const Scorer& scorer) {
   if (start_pos == 0 || start_pos >= codepoints.size()) {
@@ -495,8 +495,7 @@ void addDeverbalNounBeforeIndependentNakuCandidates(core::Lattice& lattice, std:
   // every なく surface as independent; the homographic auxiliary remains a
   // separate candidate in the lattice.
   size_t naku_end = start_pos;
-  const size_t start_byte = byteOffsetAt(byte_offsets, start_pos);
-  for (const auto& result : dict_manager.lookup(text, start_byte)) {
+  for (const auto& result : dict_results) {
     if (result.entry != nullptr && result.entry->pos == core::PartOfSpeech::Adjective &&
         result.entry->extended_pos == core::ExtendedPOS::AdjRenyokei &&
         grammar::isIndependentNegativeAdjective(result.entry->lemma)) {

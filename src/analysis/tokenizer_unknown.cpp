@@ -622,11 +622,19 @@ bool isNumeralOkuriganaCounterPhrase(const dictionary::DictionaryManager& dict_m
                               partOfSpeechMask(core::PartOfSpeech::Verb));
 }
 
+// Whether a surface is 第 followed only by numerals (第一, 第二十).
+bool isOrdinalNounSurface(const std::string& surface) {
+  const auto prefix_codepoints = normalize::toCodepoints(surface);
+  return prefix_codepoints.size() >= 2 && prefix_codepoints.front() == U'第' &&
+         std::all_of(prefix_codepoints.begin() + 1, prefix_codepoints.end(), normalize::isNumeralCodepoint);
+}
+
 }  // namespace
 
 void Tokenizer::addUnknownCandidates(core::Lattice& lattice, std::string_view text,
                                      const std::vector<char32_t>& codepoints, const ByteOffsets& byte_offsets,
-                                     size_t start_pos, const std::vector<normalize::CharType>& char_types) const {
+                                     size_t start_pos, const std::vector<normalize::CharType>& char_types,
+                                     const std::vector<dictionary::LookupResult>& dict_results) const {
   // A pure-hiragana sequence enclosed by brackets is a parenthetical reading
   // (東京（とうきょう）). It is annotation text, so retain it as one searchable
   // content token instead of a sequence of incidental particles and auxiliaries.
@@ -648,7 +656,6 @@ void Tokenizer::addUnknownCandidates(core::Lattice& lattice, std::string_view te
 
   // Check for dictionary entries at this position to penalize longer unknown words
   size_t byte_pos = byteOffsetAt(byte_offsets, start_pos);
-  auto dict_results = dict_manager_.lookup(text, byte_pos);
 
   size_t max_dict_length = 0;
   for (const auto& result : dict_results) {
@@ -1086,14 +1093,8 @@ void Tokenizer::addUnknownCandidates(core::Lattice& lattice, std::string_view te
           // Only when the prefix covers a significant portion (>= half)
           // to avoid splitting 自然言語処理 at 自然(2/6).
           for (const auto& result : dict_results) {
-            const auto prefix_codepoints =
-                normalize::toCodepoints(result.entry != nullptr ? result.entry->surface : "");
-            const bool is_ordinal_noun_prefix =
-                result.entry != nullptr && result.entry->pos == core::PartOfSpeech::Noun &&
-                prefix_codepoints.size() >= 2 && prefix_codepoints.front() == U'第' &&
-                std::all_of(prefix_codepoints.begin() + 1, prefix_codepoints.end(), normalize::isNumeralCodepoint);
             if (result.entry != nullptr && result.length >= 2 && result.length < len && result.length * 2 >= len &&
-                (result.entry->pos != core::PartOfSpeech::Noun || is_ordinal_noun_prefix)) {
+                (result.entry->pos != core::PartOfSpeech::Noun || isOrdinalNounSurface(result.entry->surface))) {
               // Exception: na-adjective stem + productive noun-forming suffix
               // (性, 的, etc.) is a genuine compound word (重要性, 必要性),
               // not an accidental dict-prefix overlap like その後(ADV)+猫.

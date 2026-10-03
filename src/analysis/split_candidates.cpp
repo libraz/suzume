@@ -215,7 +215,7 @@ void addMixedScriptCandidates(core::Lattice& lattice, std::string_view text, con
     for (size_t kanji_len = 1; kanji_len <= max_end - first_end; ++kanji_len) {
       size_t candidate_end = first_end + kanji_len;
       size_t end_byte = byteOffsetAt(byte_offsets, candidate_end);
-      std::string surface(text.substr(start_byte, end_byte - start_byte));
+      const std::string_view surface = text.substr(start_byte, end_byte - start_byte);
 
       // Count how many leading kanji are counter/unit kanji
       size_t counter_prefix_len = 0;
@@ -247,7 +247,7 @@ void addMixedScriptCandidates(core::Lattice& lattice, std::string_view text, con
       } else {
         // Counter prefix + non-counter kanji: allow only if the kanji run is a dict entry (2次元).
         size_t kanji_start_byte = byteOffsetAt(byte_offsets, first_end);
-        std::string kanji_part(text.substr(kanji_start_byte, end_byte - kanji_start_byte));
+        const std::string_view kanji_part = text.substr(kanji_start_byte, end_byte - kanji_start_byte);
         bool found_exact = dict_manager.lookupExact(kanji_part) != nullptr;
         if (!found_exact) {
           continue;  // Skip: kanji portion not a known word
@@ -274,7 +274,7 @@ void addMixedScriptCandidates(core::Lattice& lattice, std::string_view text, con
   } else {
     // For alphabet+kanji/katakana, generate single candidate (original behavior)
     size_t end_byte = byteOffsetAt(byte_offsets, max_end);
-    std::string surface(text.substr(start_byte, end_byte - start_byte));
+    const std::string_view surface = text.substr(start_byte, end_byte - start_byte);
     float final_cost = base_cost + base_bonus;
     SUZUME_DEBUG_LOG_VERBOSE("[SPLIT_MIX] \"" << surface << "\": alpha+"
                                               << (second_type == CharType::Kanji ? "kanji" : "katakana")
@@ -354,7 +354,7 @@ void addCompoundSplitCandidates(core::Lattice& lattice, std::string_view text, c
     // Only add split candidate if at least one part is in dictionary
     if (first_in_dict || second_in_dict) {
       // Add the first part as a candidate
-      std::string first_surface(text.substr(start_byte, first_end_byte - start_byte));
+      const std::string_view first_surface = text.substr(start_byte, first_end_byte - start_byte);
       uint8_t flags = first_in_dict ? core::LatticeEdge::kFromDictionary : core::LatticeEdge::kIsUnknown;
       if (first_is_formal_noun) {
         flags |= core::LatticeEdge::kIsFormalNoun;
@@ -372,6 +372,7 @@ void addCompoundSplitCandidates(core::Lattice& lattice, std::string_view text, c
 
 void addNounVerbSplitCandidates(core::Lattice& lattice, std::string_view text, const std::vector<char32_t>& codepoints,
                                 const ByteOffsets& byte_offsets, size_t start_pos,
+                                const std::vector<dictionary::LookupResult>& dict_results,
                                 const std::vector<normalize::CharType>& char_types,
                                 const dictionary::DictionaryManager& dict_manager, const Scorer& scorer,
                                 const grammar::Inflection& inflection) {
@@ -409,8 +410,8 @@ void addNounVerbSplitCandidates(core::Lattice& lattice, std::string_view text, c
 
   // Use inflection analysis to check if verb part looks conjugated
 
-  size_t start_byte = byteOffsetAt(byte_offsets, start_pos);
-  const auto noun_results = dict_manager.lookup(text, start_byte);
+  const size_t start_byte = byteOffsetAt(byte_offsets, start_pos);
+  const auto& noun_results = dict_results;
 
   // A kanji verbal noun before an inflected する is a separate search unit.
   // Preserve an earlier lexical noun or adjective boundary so compounds such
@@ -438,7 +439,7 @@ void addNounVerbSplitCandidates(core::Lattice& lattice, std::string_view text, c
       !containsIterationMark(codepoints, start_pos, kanji_end) && !ends_with_derivational_suffix &&
       !suffixHeadedRunAbsorbsVerifiedGodanStem(codepoints, start_pos, kanji_end, dict_manager)) {
     size_t noun_end_byte = byteOffsetAt(byte_offsets, kanji_end);
-    std::string noun_surface(text.substr(start_byte, noun_end_byte - start_byte));
+    const std::string_view noun_surface = text.substr(start_byte, noun_end_byte - start_byte);
     float noun_cost = getCategoryCost(core::ExtendedPOS::Noun) + scorer.splitOpts().noun_verb_split_bonus +
                       candidate::kSuruVerbalNounContextBonus;
     lattice.addEdge(noun_surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(kanji_end),
@@ -516,7 +517,7 @@ void addNounVerbSplitCandidates(core::Lattice& lattice, std::string_view text, c
       size_t verb_end_byte = byteOffsetAt(byte_offsets, verb_end);
 
       // Extract the potential verb part
-      std::string verb_part(text.substr(verb_start_byte, verb_end_byte - verb_start_byte));
+      const std::string_view verb_part = text.substr(verb_start_byte, verb_end_byte - verb_start_byte);
 
       // Check if the verb part looks like a conjugated verb
       bool looks_like_verb = false;
@@ -542,7 +543,7 @@ void addNounVerbSplitCandidates(core::Lattice& lattice, std::string_view text, c
 
       // Generate split candidates if conditions are met
       if ((noun_in_dict && looks_like_verb) || base_in_dict) {
-        std::string noun_surface(text.substr(start_byte, verb_start_byte - start_byte));
+        const std::string_view noun_surface = text.substr(start_byte, verb_start_byte - start_byte);
 
         // An ideographic iteration mark closes its reduplicated unit.  Do not
         // fabricate a noun+verb split whose noun side crosses that boundary
@@ -564,7 +565,7 @@ void addNounVerbSplitCandidates(core::Lattice& lattice, std::string_view text, c
         // e.g., 上+手く should not split because 上手 is a dictionary word
         if (verb_start < kanji_end) {
           size_t compound_end_byte = byteOffsetAt(byte_offsets, verb_start + 1);
-          std::string compound(text.substr(start_byte, compound_end_byte - start_byte));
+          const std::string_view compound = text.substr(start_byte, compound_end_byte - start_byte);
           bool compound_in_dict = dict_manager.lookupExact(compound) != nullptr;
           if (compound_in_dict) {
             continue;  // Skip this split, prefer compound word
