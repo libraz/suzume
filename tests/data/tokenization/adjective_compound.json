@@ -904,6 +904,50 @@
       ],
       "id": "ni_ru_shii",
       "input": "耳に残る物哀しい音楽"
+    },
+    {
+      "description": "見にくさ - regression test",
+      "expected": [
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "にくい",
+          "pos": "Adjective",
+          "surface": "にく"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Suffix",
+          "surface": "さ"
+        }
+      ],
+      "id": "nikusa",
+      "input": "見にくさ"
+    },
+    {
+      "description": "読みやすさ - regression test",
+      "expected": [
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読み"
+        },
+        {
+          "lemma": "やす",
+          "pos": "Auxiliary",
+          "surface": "やす"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Particle",
+          "surface": "さ"
+        }
+      ],
+      "id": "miyasusa",
+      "input": "読みやすさ"
     }
   ],
   "description": "Compound adjectives (〜やすい、〜にくい、〜すぎる)",

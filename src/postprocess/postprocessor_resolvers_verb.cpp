@@ -143,14 +143,17 @@ void resolveAmbiguousInflections(std::vector<core::Morpheme>& result) {
 
   // A finite godan predicate before sentence-final さ cannot be an
   // i-adjective: i-adjectives end in い.  Repair the homographic generated
-  // candidate and the role of the closed final particle together.
+  // candidate and the role of the closed final particle together. A stem on
+  // a continuative is the compound adjective's (見+にく+さ), never a verb.
   if (result.size() >= 2) {
     auto& predicate = result[result.size() - 2];
     auto& final_sa = result.back();
     const std::string_view a_row = grammar::godanARowSuffixFromURow(utf8::decodeLastChar(predicate.surface));
+    const bool on_continuative =
+        result.size() >= 3 && result[result.size() - 3].extended_pos == core::ExtendedPOS::VerbRenyokei;
     if (final_sa.surface == "さ" && final_sa.pos == core::PartOfSpeech::Suffix &&
         predicate.pos == core::PartOfSpeech::Adjective && predicate.lemma == predicate.surface + "い" &&
-        !a_row.empty()) {
+        !a_row.empty() && !on_continuative) {
       const grammar::VerbType verb_type = grammar::verbTypeFromARowCodepoint(utf8::decodeFirstChar(a_row));
       retag(predicate, core::PartOfSpeech::Verb, core::ExtendedPOS::VerbShuushikei, predicate.surface,
             grammar::verbTypeToConjType(verb_type), grammar::ConjForm::Base);
