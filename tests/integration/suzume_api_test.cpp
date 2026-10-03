@@ -624,15 +624,12 @@ TEST_F(SuzumeApiTest, LexicalMamonakuRemainsAnAdverb) {
 TEST_F(SuzumeApiTest, AdverbHomographsRespectNominalFrames) {
   Suzume instance(makeTestOptions());
 
-  for (const std::string_view text : {"一切を任せる", "一切合切を確認する", "むしろを使う"}) {
+  // An adverb takes no case of its own, so a genitive makes it a nominal too.
+  for (const std::string_view text : {"一切を任せる", "一切合切を確認する", "むしろを使う", "まったくの偶然"}) {
     auto results = instance.analyze(text);
     ASSERT_FALSE(results.empty()) << text;
     EXPECT_EQ(results.front().pos, core::PartOfSpeech::Noun) << text;
   }
-
-  auto adverbial_genitive = instance.analyze("まったくの偶然");
-  ASSERT_FALSE(adverbial_genitive.empty());
-  EXPECT_EQ(adverbial_genitive.front().pos, core::PartOfSpeech::Adverb);
 
   for (const std::string_view text : {"一切確認する", "一切合切確認する", "このほど確認した", "むしろ必要だ"}) {
     auto results = instance.analyze(text);

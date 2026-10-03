@@ -261,7 +261,7 @@
       "expected": [
         {
           "lemma": "たくさん",
-          "pos": "Adverb",
+          "pos": "Noun",
           "surface": "たくさん"
         },
         {
@@ -352,7 +352,7 @@
       "expected": [
         {
           "lemma": "いつも",
-          "pos": "Adverb",
+          "pos": "Noun",
           "surface": "いつも"
         },
         {
@@ -1639,7 +1639,7 @@
         },
         {
           "lemma": "いつか",
-          "pos": "Adverb",
+          "pos": "Noun",
           "surface": "いつか"
         },
         {

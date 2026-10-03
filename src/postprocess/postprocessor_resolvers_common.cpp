@@ -325,4 +325,17 @@ void resolveHonorificContinuativePast(std::vector<core::Morpheme>& result) {
   }
 }
 
+// An adverb takes no case of its own, so one before が/を/の is a nominal
+// (たくさん+の+本, いつも+の+店, ゆめ+の+話).
+void resolveAdverbBeforeCase(std::vector<core::Morpheme>& result) {
+  for (size_t idx = 0; idx + 1 < result.size(); ++idx) {
+    auto& adverb = result[idx];
+    const auto& particle = result[idx + 1];
+    if (adverb.pos == core::PartOfSpeech::Adverb && particle.pos == core::PartOfSpeech::Particle &&
+        utf8::equalsAny(particle.surface, {"が", "を", "の"})) {
+      retagNounSurface(adverb);
+    }
+  }
+}
+
 }  // namespace suzume::postprocess::resolver

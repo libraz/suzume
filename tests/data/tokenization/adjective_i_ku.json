@@ -873,8 +873,8 @@
       "description": "形容詞を修飾する未登録イ形容詞連用形を程度副詞として保つ",
       "expected": [
         {
-          "lemma": "恐ろしく",
-          "pos": "Adverb",
+          "lemma": "恐ろしい",
+          "pos": "Adjective",
           "surface": "恐ろしく"
         },
         {

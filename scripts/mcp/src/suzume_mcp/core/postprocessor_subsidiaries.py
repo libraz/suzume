@@ -5,6 +5,7 @@ from itertools import pairwise
 import regex
 
 from .core_lexicon import core_headwords
+from .mecab import is_single_token_of_pos
 from .postprocessor_common import reports_mutation
 from .split_rules import base_from_renyokei
 
@@ -911,5 +912,40 @@ def postprocess_sou_host(tokens: list[dict]) -> bool:
         if token.get("pos") != wanted:
             token["pos"] = wanted
             token["lemma"] = "そう"
+            changed = True
+    return changed
+
+
+def postprocess_adverb_host_context(tokens: list[dict]) -> bool:
+    """Retag an adverb by the slot its neighbours give it.
+
+    An adverb modifies a predicate and takes no case of its own, so:
+    - before the attributive な and a noun it is a na-adjective stem
+      (さすが+な+人, さんざん+な+結果);
+    - before が/を/の it is a nominal (ゆめ+の+話, すぐ+の+返事);
+    - a kanji-spelled く-form whose base form is an i-adjective is that
+      adjective's continuative (険しく, 長く), however the reference tagged it;
+      a kana one can belong to a homographic adverb (いたく is 甚く).
+    """
+    changed = False
+    for idx, token in enumerate(tokens):
+        if token.get("pos") != "Adverb":
+            continue
+        surface = token.get("surface", "")
+        following = tokens[idx + 1] if idx + 1 < len(tokens) else {}
+        after = tokens[idx + 2] if idx + 2 < len(tokens) else {}
+        if following.get("surface") == "な" and following.get("lemma") == "だ" and after.get("pos") == "Noun":
+            token["pos"] = "Adjective"
+            changed = True
+        elif following.get("pos") == "Particle" and following.get("surface") in ("が", "を", "の"):
+            token["pos"] = "Noun"
+            changed = True
+        elif (
+            surface.endswith("く")
+            and regex.search(r"\p{Han}", surface)
+            and is_single_token_of_pos(surface[:-1] + "い", "形容詞")
+        ):
+            token["pos"] = "Adjective"
+            token["lemma"] = surface[:-1] + "い"
             changed = True
     return changed

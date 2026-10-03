@@ -862,7 +862,7 @@
       "expected": [
         {
           "lemma": "いずれ",
-          "pos": "Adverb",
+          "pos": "Noun",
           "surface": "いずれ"
         },
         {
@@ -909,7 +909,7 @@
         },
         {
           "lemma": "いずれ",
-          "pos": "Adverb",
+          "pos": "Noun",
           "surface": "いずれ"
         },
         {

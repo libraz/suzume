@@ -356,21 +356,23 @@ void resolveFinalMorphemeRoles(std::vector<core::Morpheme>& result, const dictio
       resolver::retagNaAdjectiveSurface(current);
       resolver::retagCopulaDa(next);
     }
-    // A kanji predicate selected by attributive copular な is a productive
-    // na-adjective reading, even when its dictionary homograph is an adverb.
-    // The script feature keeps lexical hiragana adverbs such as さすが in
-    // their established role while avoiding an open-class word list.
-    if (idx + 2 < result.size() && current.pos == core::PartOfSpeech::Adverb && grammar::isAllKanji(current.surface) &&
-        next.surface == "な" && next.extended_pos == core::ExtendedPOS::AuxCopulaDa &&
+    // A predicate selected by attributive copular な before a noun is a
+    // na-adjective stem, even when its dictionary homograph is an adverb
+    // (さすが+な+人, 散々+な+結果): an adverb takes no copula.
+    if (idx + 2 < result.size() && current.pos == core::PartOfSpeech::Adverb && next.surface == "な" &&
+        next.extended_pos == core::ExtendedPOS::AuxCopulaDa &&
         (result[idx + 2].pos == core::PartOfSpeech::Noun ||
          result[idx + 2].extended_pos == core::ExtendedPOS::NounFormal)) {
       resolver::retagNaAdjectiveSurface(current);
     }
-    // A く-continuative directly modifying another adjective has an
-    // adverbial syntactic role. The independent negative adjective remains a
-    // conjugational continuation (高く+なくて), not a degree predicate.
+    // A kana く-continuative directly modifying another adjective takes the
+    // lexical adverb reading, since kana cannot tell 甚く from 痛く; a kanji
+    // spelling is the adjective's own continuative (恐ろしく+高い). The
+    // independent negative adjective remains a conjugational continuation
+    // (高く+なくて), not a degree predicate.
     if (current.pos == core::PartOfSpeech::Adjective && current.extended_pos == core::ExtendedPOS::AdjRenyokei &&
-        utf8::endsWith(current.surface, "く") && next.pos == core::PartOfSpeech::Adjective && next.lemma != "ない") {
+        utf8::endsWith(current.surface, "く") && !grammar::containsKanji(current.surface) &&
+        next.pos == core::PartOfSpeech::Adjective && next.lemma != "ない") {
       resolver::retagUninflected(current, core::PartOfSpeech::Adverb, core::ExtendedPOS::Adverb, current.surface);
     }
   }

@@ -1761,7 +1761,7 @@
       "expected": [
         {
           "lemma": "まったく",
-          "pos": "Adverb",
+          "pos": "Noun",
           "surface": "まったく"
         },
         {

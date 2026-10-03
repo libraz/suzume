@@ -485,7 +485,7 @@
       "expected": [
         {
           "lemma": "たくさん",
-          "pos": "Adverb",
+          "pos": "Noun",
           "surface": "たくさん"
         },
         {
