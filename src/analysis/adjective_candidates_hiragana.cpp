@@ -815,13 +815,20 @@ void generateHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints
   // the same reconstruction settles the reading; requiring the utterance end
   // keeps a genuine 促音便 (いっ+て) and a doubled consonant inside a word
   // (まっすぐ) out.
-  for (size_t stem_end = start_pos + 2; stem_end < max_hiragana_end; ++stem_end) {
+  // An adjective in いい also clips before the question particle, its second
+  // い assimilated into the sokuon (まあいっか, これでいっか); the stem then
+  // ends in い, which is what keeps a numeral such as よっか out.
+  const auto closes_utterance = [&](size_t pos) {
+    return pos >= codepoints.size() || (pos < char_types.size() && char_types[pos] == normalize::CharType::Symbol);
+  };
+  for (size_t stem_end = start_pos + 1; stem_end < max_hiragana_end; ++stem_end) {
     if (codepoints[stem_end] != core::hiragana::kSmallTsu) {
       continue;
     }
     const size_t after_sokuon = stem_end + 1;
-    if (after_sokuon < codepoints.size() &&
-        !(after_sokuon < char_types.size() && char_types[after_sokuon] == normalize::CharType::Symbol)) {
+    const bool clipped_before_ka = codepoints[stem_end - 1] == U'い' && after_sokuon < codepoints.size() &&
+                                   codepoints[after_sokuon] == U'か' && closes_utterance(after_sokuon + 1);
+    if (!clipped_before_ka && (stem_end < start_pos + 2 || !closes_utterance(after_sokuon))) {
       break;
     }
     // Reconstructing the base form is not enough on its own here: the sokuon

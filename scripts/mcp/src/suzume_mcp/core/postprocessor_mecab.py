@@ -921,6 +921,49 @@ def repair_contracted_rareru(tokens: list[dict]) -> None:
             }
 
 
+def _evaluates_iika(previous: dict) -> bool:
+    """Whether the word before いっか frames an evaluation (まあ, これで, それは)."""
+    return previous.get("pos") == "副詞" or (
+        previous.get("pos") == "助詞" and previous.get("surface") in ("で", "は", "も")
+    )
+
+
+def repair_contracted_iika(tokens: list[dict]) -> None:
+    """Split a clause-final kana いっか into いい contracted before か.
+
+    いいか shortens to いっか (まあいっか, これでいっか), which the reference
+    reads as the noun 一家 or 一過; those are written in kanji, and a kana
+    noun does not close an utterance on its own after an adverb or particle.
+    """
+    for idx, token in enumerate(tokens):
+        following = tokens[idx + 1] if idx + 1 < len(tokens) else None
+        after = tokens[idx + 2] if idx + 2 < len(tokens) else None
+        # An onbin いっ cannot carry the final か either (もういっか。).
+        if (
+            idx > 0
+            and token.get("surface") == "いっ"
+            and token.get("pos") == "動詞"
+            and _evaluates_iika(tokens[idx - 1])
+            and following is not None
+            and following.get("surface") == "か"
+            and following.get("pos_sub1", "").endswith("終助詞")
+            and (after is None or after.get("pos") == "記号")
+        ):
+            tokens[idx] = {"surface": "いっ", "pos": "形容詞", "pos_sub1": "自立", "lemma": "いい"}
+            continue
+        if (
+            idx > 0
+            and token.get("surface") == "いっか"
+            and token.get("pos") == "名詞"
+            and _evaluates_iika(tokens[idx - 1])
+            and (following is None or following.get("pos") == "記号" or following.get("pos_sub1") == "終助詞")
+        ):
+            tokens[idx : idx + 1] = [
+                {"surface": "いっ", "pos": "形容詞", "pos_sub1": "自立", "lemma": "いい"},
+                {"surface": "か", "pos": "助詞", "pos_sub1": "終助詞", "lemma": "か"},
+            ]
+
+
 def merge_conjunction_with_rashii(tokens: list[dict]) -> None:
     """Rebuild an adjective in らしい the reference dictionary reads as a conjunction.
 
