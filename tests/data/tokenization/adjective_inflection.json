@@ -458,6 +458,74 @@
       ],
       "id": "usento_rerude",
       "input": "早うせんと遅れるで。"
+    },
+    {
+      "description": "かるくやる - regression test",
+      "expected": [
+        {
+          "lemma": "かるい",
+          "pos": "Adjective",
+          "surface": "かるく"
+        },
+        {
+          "lemma": "やる",
+          "pos": "Verb",
+          "surface": "やる"
+        }
+      ],
+      "id": "karukuyaru",
+      "input": "かるくやる"
+    },
+    {
+      "description": "かるくする - regression test",
+      "expected": [
+        {
+          "lemma": "かるい",
+          "pos": "Adjective",
+          "surface": "かるく"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "karukusuru",
+      "input": "かるくする"
+    },
+    {
+      "description": "まるくなる - regression test",
+      "expected": [
+        {
+          "lemma": "まるい",
+          "pos": "Adjective",
+          "surface": "まるく"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なる"
+        }
+      ],
+      "id": "marukunaru",
+      "input": "まるくなる"
+    },
+    {
+      "description": "あつくする - regression test",
+      "expected": [
+        {
+          "lemma": "あつい",
+          "pos": "Adjective",
+          "surface": "あつく"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "atsukusuru",
+      "input": "あつくする"
     }
   ],
   "description": "adjective_inflection tests",
