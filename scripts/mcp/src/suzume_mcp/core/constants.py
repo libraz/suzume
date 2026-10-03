@@ -992,6 +992,9 @@ PRONOUN_OVERRIDES: set[str] = {
     "我輩",
 }
 
+# Kana personal pronouns the reference dictionary does not list as one word.
+KANA_PERSONAL_PRONOUNS: tuple[str, ...] = ("かのじょ",)
+
 # Na-adjective overrides (名詞 -> Adjective)
 NA_ADJ_OVERRIDES: set[str] = {
     "しんちょう",

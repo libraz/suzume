@@ -19,6 +19,7 @@ from .constants import (
     HIRAGANA_COMPOUNDS,
     KANA_COUNTER_SUFFIXES,
     KANA_NUMBER_STEMS,
+    KANA_PERSONAL_PRONOUNS,
     NAI_ADJECTIVES,
     TARI_ADVERB_STEMS,
     TEMPORAL_COMPOUND_UNITS,
@@ -380,6 +381,26 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
         # Calculate position in text
         pos_in_text = sum(len(tokens[k].get("surface", "")) for k in range(i))
         remaining = text[pos_in_text:] if pos_in_text < len(text) else ""
+
+        # A kana personal pronoun is a closed-class word the reference does not
+        # list, so its spelling falls apart into readable pieces (かの+じょ).
+        if not merged:
+            for pronoun in KANA_PERSONAL_PRONOUNS:
+                if not remaining.startswith(pronoun):
+                    continue
+                consumed, j = "", i
+                while j < len(tokens) and len(consumed) < len(pronoun):
+                    consumed += tokens[j].get("surface", "")
+                    j += 1
+                if consumed == pronoun and j - i > 1:
+                    result.append({"surface": pronoun, "pos": "名詞", "pos_sub1": "代名詞", "lemma": pronoun})
+                    i = j
+                    merged = True
+                    if applied_rule is None:
+                        applied_rule = "kana-personal-pronoun"
+                    break
+            if merged:
+                continue
 
         # The formal noun もの takes an attributive form, so a continuative in
         # front of it is the first member of the compound noun (たべ+もの as
@@ -2061,7 +2082,9 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
         # cannot see it. Reconstruct V2 through the conjugation table and
         # require both the closed V2 class and the nominalizing follower.
         v1_renyokei = t.get("pos") == "動詞" and "連用" in (t.get("conj_form") or "")
-        v1_nominal_renyokei = t.get("pos") == "名詞" and base_from_renyokei(v1_surface) is not None
+        v1_nominal_renyokei = (
+            t.get("pos") == "名詞" and t.get("pos_sub1") != "代名詞" and base_from_renyokei(v1_surface) is not None
+        )
         if not merged and (v1_renyokei or v1_nominal_renyokei):
             if i + 2 < len(tokens):
                 nxt = tokens[i + 1]

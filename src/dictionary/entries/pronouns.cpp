@@ -11,6 +11,9 @@ EntrySpecRange getPronounEntries() {
       pronoun("僕", ""),
       pronoun("俺", ""),
       // First person - hiragana/colloquial
+      pronoun("わたし", ""),
+      pronoun("ぼく", ""),
+      pronoun("おれ", ""),
       pronoun("わたくし", ""),
       pronoun("あたし", ""),
       pronoun("あたい", ""),
@@ -26,6 +29,7 @@ EntrySpecRange getPronounEntries() {
       pronoun("君", ""),
       // Second person - hiragana/mixed only
       pronoun("あなた", ""),
+      pronoun("きみ", ""),
       // Prefer お前 over the PREFIX(お)+NOUN(前) split (connection bonus -1.5).
       // PREFIX→NOUN path has cost ~-1.2, so お前 needs cost < -1.2 to win
       pronoun("お前", ""),
@@ -37,6 +41,8 @@ EntrySpecRange getPronounEntries() {
       pronoun("彼", ""),
       pronoun("彼女", ""),
       pronoun("彼氏", ""),
+      pronoun("かれ", ""),
+      pronoun("かのじょ", ""),
       pronoun("奴", ""),
       pronoun("やつ", ""),
       // 彼ら/彼女ら removed - handled as pronoun + ら suffix

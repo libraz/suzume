@@ -1298,6 +1298,175 @@
       ],
       "id": "sorenanbo",
       "input": "それなんぼ"
+    },
+    {
+      "description": "Kana first-person pronoun わたし is a closed-class pronoun",
+      "expected": [
+        {
+          "lemma": "わたし",
+          "pos": "Pronoun",
+          "surface": "わたし"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "もの",
+          "pos": "Noun",
+          "surface": "もの"
+        }
+      ],
+      "id": "watashinomono",
+      "input": "わたしのもの"
+    },
+    {
+      "description": "Kana first-person pronoun ぼく",
+      "expected": [
+        {
+          "lemma": "ぼく",
+          "pos": "Pronoun",
+          "surface": "ぼく"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        }
+      ],
+      "id": "bokuno",
+      "input": "ぼくの本"
+    },
+    {
+      "description": "Kana pronoun おれ before の; a hypothetical cell cannot host の",
+      "expected": [
+        {
+          "lemma": "おれ",
+          "pos": "Pronoun",
+          "surface": "おれ"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        }
+      ],
+      "id": "oreno",
+      "input": "おれの本"
+    },
+    {
+      "description": "Kana third-person pronoun かのじょ",
+      "expected": [
+        {
+          "lemma": "かのじょ",
+          "pos": "Pronoun",
+          "surface": "かのじょ"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        }
+      ],
+      "id": "kanoji_no",
+      "input": "かのじょの本"
+    },
+    {
+      "description": "Kana pronoun plus plural suffix たち",
+      "expected": [
+        {
+          "lemma": "わたし",
+          "pos": "Pronoun",
+          "surface": "わたし"
+        },
+        {
+          "lemma": "たち",
+          "pos": "Suffix",
+          "surface": "たち"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "町",
+          "pos": "Noun",
+          "surface": "町"
+        }
+      ],
+      "id": "watashitachino",
+      "input": "わたしたちの町"
+    },
+    {
+      "description": "Negative control: the homographic verb continuative わたし (渡す) before た stays a verb",
+      "expected": [
+        {
+          "lemma": "鍵",
+          "pos": "Noun",
+          "surface": "鍵"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "わたす",
+          "pos": "Verb",
+          "surface": "わたし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wowatashita",
+      "input": "鍵をわたした"
+    },
+    {
+      "description": "Negative control: the homographic verb continuative おれ (折れる) before た stays a verb",
+      "expected": [
+        {
+          "lemma": "枝",
+          "pos": "Noun",
+          "surface": "枝"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "おれる",
+          "pos": "Verb",
+          "surface": "おれ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "gaoreta",
+      "input": "枝がおれた"
     }
   ],
   "description": "Pronouns",
