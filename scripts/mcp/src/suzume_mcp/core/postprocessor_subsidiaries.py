@@ -861,17 +861,30 @@ def postprocess_excessive_after_verb(tokens: list[dict]) -> bool:
 
 
 def postprocess_contracted_iku_lemma(tokens: list[dict]) -> bool:
-    """Give the contracted ていく cells (持ってく, 持ってった) the lemma いく.
+    """Give the contracted ていく cells (持ってく, 持ってった, 見てかない) the lemma いく.
 
     The reference names the clipped く/っ after て by its own surface, which
     is no headword; the paradigm is that of the subsidiary いく.
     """
     changed = False
+    # The reference fuses て with the irrealis after an onbin (行っ+てか); it is
+    # the same te-form plus the contracted cell (行っ+て+か).
+    idx = 0
+    while idx < len(tokens):
+        token = tokens[idx]
+        if token.get("pos") == "Auxiliary" and token.get("lemma") == "てく" and token.get("surface", "")[:1] in "てで":
+            surface = token["surface"]
+            tokens[idx : idx + 1] = [
+                {"surface": surface[0], "pos": "Particle", "lemma": surface[0]},
+                {"surface": surface[1:], "pos": "Auxiliary", "lemma": "く"},
+            ]
+            changed = True
+        idx += 1
     for previous, token in pairwise(tokens):
         if (
             token.get("pos") == "Auxiliary"
             and token.get("lemma") == "く"
-            and token.get("surface") in ("く", "っ")
+            and token.get("surface") in ("く", "っ", "か")
             and previous.get("surface") in ("て", "で")
         ):
             token["lemma"] = "いく"

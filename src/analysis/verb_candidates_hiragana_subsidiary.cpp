@@ -128,6 +128,16 @@ void appendIkuAuxiliaryCandidates(const std::vector<char32_t>& codepoints, size_
                                         candidates);
     return;
   }
+  // The contracted irrealis cell before a negative: 見て+か+ない, 持って+か+ず.
+  if (start_pos + 1 < codepoints.size() && codepoints[start_pos] == U'か' &&
+      isClearTeFormBeforeSubsidiary(codepoints, start_pos, false) &&
+      (vh::naiNegativeFollowsAt(codepoints, start_pos + 1) || codepoints[start_pos + 1] == U'ず')) {
+    appendContextualSubsidiaryCandidate(codepoints, start_pos, start_pos + 1, "いく",
+                                        dictionary::ConjugationType::GodanKa, core::ExtendedPOS::AuxAspectIku,
+                                        "hiragana_iku_contracted_irrealis", candidate::verb_cost::kStrongBonus,
+                                        candidates);
+    return;
+  }
   if (start_pos + 1 >= codepoints.size() || codepoints[start_pos] != core::hiragana::kI ||
       (codepoints[start_pos + 1] != U'け' && codepoints[start_pos + 1] != U'こ') ||
       !isClearTeFormBeforeSubsidiary(codepoints, start_pos, false)) {
