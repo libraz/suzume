@@ -3611,6 +3611,50 @@
       ],
       "id": "ku_kino",
       "input": "曰く付きの品"
+    },
+    {
+      "description": "いわんやである - regression test",
+      "expected": [
+        {
+          "lemma": "いわんや",
+          "pos": "Adverb",
+          "surface": "いわんや"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        }
+      ],
+      "id": "iwanyadearu",
+      "input": "いわんやである"
+    },
+    {
+      "description": "あらんかぎり - regression test",
+      "expected": [
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あら"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        },
+        {
+          "lemma": "かぎり",
+          "pos": "Noun",
+          "surface": "かぎり"
+        }
+      ],
+      "id": "arankagiri",
+      "input": "あらんかぎり"
     }
   ],
   "description": "literary_classics tests",
