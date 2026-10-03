@@ -856,6 +856,79 @@
       ],
       "id": "mouittka",
       "input": "もういっか。"
+    },
+    {
+      "description": "知らねー - regression test",
+      "expected": [
+        {
+          "lemma": "知る",
+          "pos": "Verb",
+          "surface": "知ら"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ねー"
+        }
+      ],
+      "id": "rane",
+      "input": "知らねー"
+    },
+    {
+      "description": "知らねーよ - regression test",
+      "expected": [
+        {
+          "lemma": "知る",
+          "pos": "Verb",
+          "surface": "知ら"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ねー"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "rane_yo",
+      "input": "知らねーよ"
+    },
+    {
+      "description": "高くねー - regression test",
+      "expected": [
+        {
+          "lemma": "高い",
+          "pos": "Adjective",
+          "surface": "高く"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ねー"
+        }
+      ],
+      "id": "kune_2",
+      "input": "高くねー"
+    },
+    {
+      "description": "かもねぇ - regression test",
+      "expected": [
+        {
+          "lemma": "かも",
+          "pos": "Particle",
+          "surface": "かも"
+        },
+        {
+          "lemma": "ねえ",
+          "pos": "Particle",
+          "surface": "ねぇ"
+        }
+      ],
+      "id": "kamone",
+      "input": "かもねぇ"
     }
   ],
   "description": "colloquial_contracted tests",
