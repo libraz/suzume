@@ -10,7 +10,6 @@ from .merge_rules import apply_suzume_merge
 from .pos_mapping import correct_mecab_pos, map_mecab_pos, normalize_pos
 from .postprocessors import (
     merge_conjunction_with_rashii,
-    merge_reason_nde,
     postprocess_mecab_tokens,
     postprocessor_rules,
     preprocess_for_mecab,
@@ -30,6 +29,7 @@ from .postprocessors import (
     repair_lengthened_negative,
     repair_productive_causative,
     repair_regional_imperative,
+    split_reason_nde,
     split_transparent_suru_te_adverb,
 )
 from .split_rules import apply_suzume_split
@@ -223,7 +223,7 @@ def get_expected_tokens(text: str, suzume_tokens: list[dict] | None = None) -> t
     repair_continuative_before_manner_suffix(raw_tokens)
     merge_conjunction_with_rashii(raw_tokens)
     repair_interrogative_nande(raw_tokens)
-    merge_reason_nde(raw_tokens)
+    split_reason_nde(raw_tokens)
     repair_contracted_rareru(raw_tokens)
     repair_contracted_iika(raw_tokens)
     repair_lengthened_negative(raw_tokens)

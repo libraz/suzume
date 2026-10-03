@@ -854,24 +854,34 @@ def repair_interrogative_nande(tokens: list[dict]) -> None:
 _REASON_NDE_BLOCKERS = frozenset({"は", "も", "ある", "あり", "あっ", "ござい", "ござる"})
 
 
-def merge_reason_nde(tokens: list[dict]) -> None:
-    """Read nominalizer ん + で closing a clause as the reason particle んで.
+def split_reason_nde(tokens: list[dict]) -> None:
+    """Read the reason んで closing a clause as nominalizer ん + conjunctive で.
 
-    The reference keeps ので whole and does the same for its contraction after
-    な (雨なんで), but after a verb it splits ん+で. A following topic or
-    existence verb (行くんではない) keeps the copula reading.
+    The contraction of ので keeps both morae apart, as 好きなんです keeps ん+です;
+    the reference fuses them after な (雨なんで) but reads the で after a verb as
+    the copula (行くんで). A following topic or existence verb (行くんではない)
+    keeps the copula reading.
     """
     idx = 0
-    while idx < len(tokens) - 1:
-        nominalizer, de = tokens[idx], tokens[idx + 1]
+    while idx < len(tokens):
+        token = tokens[idx]
+        if token.get("surface") == "んで" and token.get("pos") == "助詞" and idx > 0:
+            tokens[idx : idx + 1] = [
+                {"surface": "ん", "pos": "名詞", "pos_sub1": "非自立", "lemma": "ん"},
+                {"surface": "で", "pos": "助詞", "pos_sub1": "接続助詞", "lemma": "で"},
+            ]
+            idx += 2
+            continue
+        de = tokens[idx + 1] if idx + 1 < len(tokens) else None
         following = tokens[idx + 2] if idx + 2 < len(tokens) else None
         if (
             idx > 0
-            and nominalizer.get("surface") == "ん"
-            and nominalizer.get("pos") == "名詞"
-            and nominalizer.get("pos_sub1") == "非自立"
+            and de is not None
+            and token.get("surface") == "ん"
+            and token.get("pos") == "名詞"
+            and token.get("pos_sub1") == "非自立"
             and de.get("surface") == "で"
-            and de.get("pos") in ("助動詞", "助詞")
+            and de.get("pos") == "助動詞"
             and (
                 following is None
                 or following.get("pos") == "記号"
@@ -882,7 +892,7 @@ def merge_reason_nde(tokens: list[dict]) -> None:
                 )
             )
         ):
-            tokens[idx : idx + 2] = [{"surface": "んで", "pos": "助詞", "pos_sub1": "接続助詞", "lemma": "んで"}]
+            tokens[idx + 1] = {"surface": "で", "pos": "助詞", "pos_sub1": "接続助詞", "lemma": "で"}
         idx += 1
 
 
