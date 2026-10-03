@@ -287,6 +287,70 @@
       ],
       "id": "toruto_reru",
       "input": "年とると疲れる"
+    },
+    {
+      "description": "Kana godan-ra terminal before conjectural だろう stays a verb",
+      "expected": [
+        {
+          "lemma": "雨",
+          "pos": "Noun",
+          "surface": "雨"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ふる",
+          "pos": "Verb",
+          "surface": "ふる"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だろ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "gafurudarou",
+      "input": "雨がふるだろう"
+    },
+    {
+      "description": "Kana godan-ra terminal before polite conjecture stays a verb",
+      "expected": [
+        {
+          "lemma": "雪",
+          "pos": "Noun",
+          "surface": "雪"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ふる",
+          "pos": "Verb",
+          "surface": "ふる"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "でしょ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "gafurudeshi_u",
+      "input": "雪がふるでしょう"
     }
   ],
   "description": "Godan Ra-row verbs (五段ラ行動詞) - verbs ending in る (part 2/2)",
