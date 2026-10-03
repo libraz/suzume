@@ -118,6 +118,59 @@ void generateHiraganaNariNaAdjectiveCandidates(const std::vector<char32_t>& code
   return;
 }
 
+// A bare hiragana stem before the attributive copula (うぶ+な+人, ふつう+な+ん+よ)
+// is a nominal adjective: a verb terminal takes the prohibitive な there, which
+// never heads a noun or the explanatory ん/の. The な must be followed by such
+// a head, which keeps なんて/なんか/なら and the prohibitive な+よ out.
+void generateHiraganaAttributiveNaStemCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                                 const std::vector<normalize::CharType>& char_types,
+                                                 const dictionary::DictionaryManager* dict_manager,
+                                                 std::vector<UnknownCandidate>& candidates) {
+  constexpr size_t kMaxStemLength = 4;
+  for (size_t stem_end = start_pos + 2; stem_end < codepoints.size() && stem_end - start_pos <= kMaxStemLength;
+       ++stem_end) {
+    if (char_types[stem_end - 1] != normalize::CharType::Hiragana) {
+      return;
+    }
+    if (codepoints[stem_end] != U'な' || stem_end + 1 >= codepoints.size()) {
+      continue;
+    }
+    const size_t head = stem_end + 1;
+    const bool nominal_head =
+        char_types[head] == normalize::CharType::Kanji || char_types[head] == normalize::CharType::Katakana;
+    const bool explanatory_head =
+        (codepoints[head] == U'ん' || codepoints[head] == U'の') && head + 1 < codepoints.size() &&
+        (codepoints[head + 1] == U'だ' || codepoints[head + 1] == U'で' || codepoints[head + 1] == U'じ' ||
+         codepoints[head + 1] == U'よ' || codepoints[head + 1] == U'ね');
+    if (!nominal_head && !explanatory_head) {
+      continue;
+    }
+    if (dict_manager == nullptr) {
+      return;
+    }
+    // A registered word is not re-read as a coined stem, and neither is a
+    // registered word plus a particle (それ+は+なんで).
+    const auto stem_matches = dict_manager->lookup(extractSubstring(codepoints, start_pos, stem_end), 0);
+    const bool registered_stem = std::any_of(stem_matches.begin(), stem_matches.end(), [&](const auto& match) {
+      return match.entry != nullptr && match.length == stem_end - start_pos;
+    });
+    bool ends_on_particle_after_word = false;
+    for (size_t split = start_pos + 1; split < stem_end && !ends_on_particle_after_word; ++split) {
+      ends_on_particle_after_word =
+          lookupEntryInRange(*dict_manager, codepoints, start_pos, split) != nullptr &&
+          lookupEntryInRange(*dict_manager, codepoints, split, stem_end, core::PartOfSpeech::Particle) != nullptr;
+    }
+    if (registered_stem || ends_on_particle_after_word) {
+      return;
+    }
+    const std::string stem = extractSubstring(codepoints, start_pos, stem_end);
+    candidates.push_back(makeNaAdjCandidate(stem, start_pos, stem_end, candidate::kNaAdjYakaCost, true,
+                                            CandidateOrigin::AdjectiveNa, candidate::kHiraganaNaAdjNariConfidence,
+                                            "hira_na_adj_attributive"));
+    return;
+  }
+}
+
 }  // namespace
 
 void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
@@ -129,6 +182,7 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
   }
   if (char_types[start_pos] == normalize::CharType::Hiragana) {
     generateHiraganaNariNaAdjectiveCandidates(codepoints, start_pos, char_types, candidates);
+    generateHiraganaAttributiveNaStemCandidates(codepoints, start_pos, char_types, dict_manager, candidates);
     return;
   }
   if (char_types[start_pos] != normalize::CharType::Kanji) {

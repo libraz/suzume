@@ -175,6 +175,9 @@ def postprocess_deverbal_noun_context(tokens: list[dict]) -> bool:
         # (っ+つう+の for っていうの).
         if surface[-1:] in (lemma[-1:], "ー"):
             continue
+        # So is the colloquial る→ん contraction of that terminal (分かん+の).
+        if surface.endswith("ん") and lemma.endswith("る") and surface[:-1] == lemma[:-1]:
+            continue
         following = tokens[idx + 1]
         honorific_naru = (
             idx > 0
