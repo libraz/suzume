@@ -399,6 +399,65 @@
       ],
       "id": "yasashisadesu",
       "input": "やさしさです"
+    },
+    {
+      "description": "早う帰りなさい。 - regression test",
+      "expected": [
+        {
+          "lemma": "早い",
+          "pos": "Adjective",
+          "surface": "早う"
+        },
+        {
+          "lemma": "帰る",
+          "pos": "Verb",
+          "surface": "帰り"
+        },
+        {
+          "lemma": "なさる",
+          "pos": "Auxiliary",
+          "surface": "なさい"
+        }
+      ],
+      "id": "u_rinasai",
+      "input": "早う帰りなさい。"
+    },
+    {
+      "description": "早うせんと遅れるで。 - regression test",
+      "expected": [
+        {
+          "lemma": "早い",
+          "pos": "Adjective",
+          "surface": "早う"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "せ"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "遅れる",
+          "pos": "Verb",
+          "surface": "遅れる"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        }
+      ],
+      "id": "usento_rerude",
+      "input": "早うせんと遅れるで。"
     }
   ],
   "description": "adjective_inflection tests",

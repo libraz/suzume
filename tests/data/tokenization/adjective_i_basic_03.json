@@ -1440,6 +1440,60 @@
       ],
       "id": "karai",
       "input": "からい"
+    },
+    {
+      "description": "かわいらしい花が咲いた。 - regression test",
+      "expected": [
+        {
+          "lemma": "かわいらしい",
+          "pos": "Adjective",
+          "surface": "かわいらしい"
+        },
+        {
+          "lemma": "花",
+          "pos": "Noun",
+          "surface": "花"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "咲く",
+          "pos": "Verb",
+          "surface": "咲い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "kawairashii_ga_ita",
+      "input": "かわいらしい花が咲いた。"
+    },
+    {
+      "description": "かわいらしくて小さい。 - regression test",
+      "expected": [
+        {
+          "lemma": "かわいらしい",
+          "pos": "Adjective",
+          "surface": "かわいらしく"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "小さい",
+          "pos": "Adjective",
+          "surface": "小さい"
+        }
+      ],
+      "id": "kawairashikute_sai",
+      "input": "かわいらしくて小さい。"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 3/3)",

@@ -1519,6 +1519,75 @@
       ],
       "id": "nanonimokakawarazu",
       "input": "雨なのにもかかわらず"
+    },
+    {
+      "description": "行こうけど、雨だ。 - regression test",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行こ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        },
+        {
+          "lemma": "けど",
+          "pos": "Particle",
+          "surface": "けど"
+        },
+        {
+          "lemma": "雨",
+          "pos": "Noun",
+          "surface": "雨"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "koukedo_da",
+      "input": "行こうけど、雨だ。"
+    },
+    {
+      "description": "食べようけれど、時間がない。 - regression test",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べよ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        },
+        {
+          "lemma": "けれど",
+          "pos": "Particle",
+          "surface": "けれど"
+        },
+        {
+          "lemma": "時間",
+          "pos": "Noun",
+          "surface": "時間"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
+      "id": "beyoukeredo_ganai",
+      "input": "食べようけれど、時間がない。"
     }
   ],
   "description": "particle_conjunctive tests",

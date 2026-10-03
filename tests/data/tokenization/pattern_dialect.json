@@ -403,6 +403,102 @@
       ],
       "id": "kinsai",
       "input": "書きんさい"
+    },
+    {
+      "description": "お菓子をようけ買った。 - regression test",
+      "expected": [
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "菓子",
+          "pos": "Noun",
+          "surface": "菓子"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "ようけ",
+          "pos": "Adverb",
+          "surface": "ようけ"
+        },
+        {
+          "lemma": "買う",
+          "pos": "Verb",
+          "surface": "買っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "o_woyouke_ttta",
+      "input": "お菓子をようけ買った。"
+    },
+    {
+      "description": "人がようけ来た。 - regression test",
+      "expected": [
+        {
+          "lemma": "人",
+          "pos": "Noun",
+          "surface": "人"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ようけ",
+          "pos": "Adverb",
+          "surface": "ようけ"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "gayouke_ta",
+      "input": "人がようけ来た。"
+    },
+    {
+      "description": "りんごがぎょうさんある。 - regression test",
+      "expected": [
+        {
+          "lemma": "りんご",
+          "pos": "Noun",
+          "surface": "りんご"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ぎょうさん",
+          "pos": "Adverb",
+          "surface": "ぎょうさん"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        }
+      ],
+      "id": "ringogagi_usanaru",
+      "input": "りんごがぎょうさんある。"
     }
   ],
   "description": "pattern_dialect tests",

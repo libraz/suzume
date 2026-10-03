@@ -1956,6 +1956,131 @@
       ],
       "id": "suttte",
       "input": "息を吸って"
+    },
+    {
+      "description": "責任をになう。 - regression test",
+      "expected": [
+        {
+          "lemma": "責任",
+          "pos": "Noun",
+          "surface": "責任"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "になう",
+          "pos": "Verb",
+          "surface": "になう"
+        }
+      ],
+      "id": "woninau",
+      "input": "責任をになう。"
+    },
+    {
+      "description": "未来をになう若者。 - regression test",
+      "expected": [
+        {
+          "lemma": "未来",
+          "pos": "Noun",
+          "surface": "未来"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "になう",
+          "pos": "Verb",
+          "surface": "になう"
+        },
+        {
+          "lemma": "若者",
+          "pos": "Noun",
+          "surface": "若者"
+        }
+      ],
+      "id": "woninau_2",
+      "input": "未来をになう若者。"
+    },
+    {
+      "description": "責任をになわない。 - regression test",
+      "expected": [
+        {
+          "lemma": "責任",
+          "pos": "Noun",
+          "surface": "責任"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "になう",
+          "pos": "Verb",
+          "surface": "になわ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "woninawanai",
+      "input": "責任をになわない。"
+    },
+    {
+      "description": "罪をつぐなう。 - regression test",
+      "expected": [
+        {
+          "lemma": "罪",
+          "pos": "Noun",
+          "surface": "罪"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "つぐなう",
+          "pos": "Verb",
+          "surface": "つぐなう"
+        }
+      ],
+      "id": "wotsugunau",
+      "input": "罪をつぐなう。"
+    },
+    {
+      "description": "罪をつぐなった。 - regression test",
+      "expected": [
+        {
+          "lemma": "罪",
+          "pos": "Noun",
+          "surface": "罪"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "つぐなう",
+          "pos": "Verb",
+          "surface": "つぐなっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wotsugunattta",
+      "input": "罪をつぐなった。"
     }
   ],
   "description": "Godan Wa-row verbs (五段ワ行動詞) - verbs ending in う",

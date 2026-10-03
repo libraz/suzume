@@ -2323,6 +2323,102 @@
       ],
       "id": "to_2",
       "input": "山々と川"
+    },
+    {
+      "description": "ほんのちょっと待ってください。 - regression test",
+      "expected": [
+        {
+          "lemma": "ほんの",
+          "pos": "Determiner",
+          "surface": "ほんの"
+        },
+        {
+          "lemma": "ちょっと",
+          "pos": "Adverb",
+          "surface": "ちょっと"
+        },
+        {
+          "lemma": "待つ",
+          "pos": "Verb",
+          "surface": "待っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くださる",
+          "pos": "Verb",
+          "surface": "ください"
+        }
+      ],
+      "id": "honnochi_ttto_tttekudasai",
+      "input": "ほんのちょっと待ってください。"
+    },
+    {
+      "description": "ほんのちょっとだけ食べた。 - regression test",
+      "expected": [
+        {
+          "lemma": "ほんの",
+          "pos": "Determiner",
+          "surface": "ほんの"
+        },
+        {
+          "lemma": "ちょっと",
+          "pos": "Adverb",
+          "surface": "ちょっと"
+        },
+        {
+          "lemma": "だけ",
+          "pos": "Particle",
+          "surface": "だけ"
+        },
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "honnochi_tttodake_beta",
+      "input": "ほんのちょっとだけ食べた。"
+    },
+    {
+      "description": "本をたくさん買った。 - regression test",
+      "expected": [
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "たくさん",
+          "pos": "Adverb",
+          "surface": "たくさん"
+        },
+        {
+          "lemma": "買う",
+          "pos": "Verb",
+          "surface": "買っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wotakusan_ttta",
+      "input": "本をたくさん買った。"
     }
   ],
   "description": "General adverbs (part 2/2)",
