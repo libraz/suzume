@@ -97,6 +97,24 @@ bool isCompoundFormingAdjective(const std::string& base_form) {
          kCompoundFormingAdjectives.end();
 }
 
+bool predicateFollowsContinuative(const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos,
+                                  const dictionary::DictionaryManager* dict_manager) {
+  if (dict_manager == nullptr || end_pos > codepoints.size()) {
+    return false;
+  }
+  const bool reduplicated = end_pos == start_pos + 4 && codepoints[start_pos] == codepoints[start_pos + 2] &&
+                            codepoints[start_pos + 1] == codepoints[start_pos + 3];
+  if (reduplicated) {
+    return false;
+  }
+  for (size_t verb_end = end_pos + 2; verb_end <= std::min(codepoints.size(), end_pos + 3); ++verb_end) {
+    if (lookupEntryInRange(*dict_manager, codepoints, end_pos, verb_end, core::PartOfSpeech::Verb) != nullptr) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool derivesFromCompoundFormingAdjective(const std::vector<char32_t>& codepoints, size_t start_pos,
                                          const std::string& base_form,
                                          const dictionary::DictionaryManager* dict_manager) {

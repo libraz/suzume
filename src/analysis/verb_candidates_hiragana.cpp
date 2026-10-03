@@ -295,11 +295,19 @@ size_t godanContinuationStemEnd(const std::vector<char32_t>& codepoints, size_t 
       return 0;
     }
     // An inflected auxiliary or adjective cell already closes its own word
-    // before a predicate (まで+も+なく+やる).
+    // before a predicate (まで+も+なく+やる), and so does a continuative the
+    // tables read as an i-adjective's く (かるく+やる).
     constexpr PartOfSpeechMask kInflectedPrefixMask =
         partOfSpeechMask(core::PartOfSpeech::Auxiliary) | partOfSpeechMask(core::PartOfSpeech::Adjective);
+    const auto prefix_analyses = analysesInRange(inflection, codepoints, start_pos, current_pos);
+    const bool adjective_continuative_prefix =
+        utf8::endsWith(prefix, "く") &&
+        std::any_of(prefix_analyses.begin(), prefix_analyses.end(), [&](const auto& candidate) {
+          return candidate.verb_type == grammar::VerbType::IAdjective &&
+                 candidate.confidence >= verb_opts.confidence_low;
+        });
     if (suffix_is_licensed_predicate && !suffix_is_garu &&
-        hasExactPartOfSpeech(*dict_manager, prefix, kInflectedPrefixMask)) {
+        (hasExactPartOfSpeech(*dict_manager, prefix, kInflectedPrefixMask) || adjective_continuative_prefix)) {
       return 0;
     }
   } else if (godan_sa_end != 0) {

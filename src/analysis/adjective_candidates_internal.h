@@ -208,6 +208,18 @@ bool derivesFromCompoundFormingAdjective(const std::vector<char32_t>& codepoints
                                          const dictionary::DictionaryManager* dict_manager);
 
 /**
+ * @brief Whether a registered verb starts at @p end_pos to take up the く continuative
+ * spelled from @p start_pos.
+ *
+ * A bare hiragana く form is normally left to the adverbial reading, but a
+ * verb right behind it (かるく+やる, まるく+なる) is what the continuative
+ * modifies, which is the evidence the bare form lacks. A reduplicated
+ * mimetic (わくわく+する) is no continuative.
+ */
+bool predicateFollowsContinuative(const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos,
+                                  const dictionary::DictionaryManager* dict_manager);
+
+/**
  * @brief Whether an analyzed span reaches past the end of the adjective paradigm.
  *
  * The engine reconstructs a base form, so what the span holds beyond that base's

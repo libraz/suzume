@@ -555,7 +555,8 @@ void generateHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints
                                         end < codepoints.size() &&
                                         (normalize::isKanjiCodepoint(codepoints[end]) ||
                                          normalize::classifyChar(codepoints[end]) == normalize::CharType::Katakana);
-      if (utf8::endsWith(test_surface, "く") && !utf8::endsWith(test_surface, "くない") && !bounded_long_ku_form) {
+      if (utf8::endsWith(test_surface, "く") && !utf8::endsWith(test_surface, "くない") && !bounded_long_ku_form &&
+          !adj_detail::predicateFollowsContinuative(codepoints, start_pos, end, dict_manager)) {
         continue;
       }
 

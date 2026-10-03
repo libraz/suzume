@@ -212,8 +212,12 @@ void adj_detail::appendHiraganaIAdjSurfaceCandidates(const std::vector<char32_t>
     const bool derived_ku_continuative =
         !adjective_ku_lemma.empty() &&
         adj_detail::derivesFromCompoundFormingAdjective(codepoints, start_pos, adjective_ku_lemma, dict_manager);
+    // So is one a registered predicate takes up directly (かるく+やる).
+    const bool predicate_follows_ku =
+        adj_detail::predicateFollowsContinuative(codepoints, start_pos, end_pos, dict_manager);
     if (utf8::endsWith(surface, "く") && !utf8::endsWith(surface, "くない") && !utf8::endsWith(surface, "なく") &&
-        !utf8::endsWith(surface, "しく") && !bounded_long_ku_form && !derived_ku_continuative) {
+        !utf8::endsWith(surface, "しく") && !bounded_long_ku_form && !derived_ku_continuative &&
+        !predicate_follows_ku) {
       continue;
     }
 
