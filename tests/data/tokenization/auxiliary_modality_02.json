@@ -587,6 +587,112 @@
       ],
       "id": "hontouno_wosuru",
       "input": "ほんとうの話をする。"
+    },
+    {
+      "description": "どうなったんでしょう - regression test",
+      "expected": [
+        {
+          "lemma": "どう",
+          "pos": "Adjective",
+          "surface": "どう"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "でしょ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "dounatttandeshi_u",
+      "input": "どうなったんでしょう"
+    },
+    {
+      "description": "行ったのでしょう - regression test",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "でしょ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "tttanodeshi_u",
+      "input": "行ったのでしょう"
+    },
+    {
+      "description": "どうなったのでしょう - regression test",
+      "expected": [
+        {
+          "lemma": "どう",
+          "pos": "Adjective",
+          "surface": "どう"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "でしょ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "dounatttanodeshi_u",
+      "input": "どうなったのでしょう"
     }
   ],
   "description": "Modality auxiliaries (たい、そう、らしい) (part 2/2)",

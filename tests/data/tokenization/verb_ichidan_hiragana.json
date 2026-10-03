@@ -129,6 +129,72 @@
       ],
       "id": "woirete_zeru",
       "input": "砂糖をいれて混ぜる。"
+    },
+    {
+      "description": "駅でしらべる - regression test",
+      "expected": [
+        {
+          "lemma": "駅",
+          "pos": "Noun",
+          "surface": "駅"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "しらべる",
+          "pos": "Verb",
+          "surface": "しらべる"
+        }
+      ],
+      "id": "deshiraberu",
+      "input": "駅でしらべる"
+    },
+    {
+      "description": "家でしらべる - regression test",
+      "expected": [
+        {
+          "lemma": "家",
+          "pos": "Noun",
+          "surface": "家"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "しらべる",
+          "pos": "Verb",
+          "surface": "しらべる"
+        }
+      ],
+      "id": "deshiraberu_2",
+      "input": "家でしらべる"
+    },
+    {
+      "description": "公園でしゃべる - regression test",
+      "expected": [
+        {
+          "lemma": "公園",
+          "pos": "Noun",
+          "surface": "公園"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "しゃべる",
+          "pos": "Verb",
+          "surface": "しゃべる"
+        }
+      ],
+      "id": "deshi_beru",
+      "input": "公園でしゃべる"
     }
   ],
   "description": "verb_ichidan_hiragana tests",
