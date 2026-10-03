@@ -750,6 +750,72 @@
       ],
       "id": "zukashigarazuni",
       "input": "恥ずかしがらずに"
+    },
+    {
+      "description": "うざすぎ - regression test",
+      "expected": [
+        {
+          "lemma": "うざい",
+          "pos": "Adjective",
+          "surface": "うざ"
+        },
+        {
+          "lemma": "すぎる",
+          "pos": "Verb",
+          "surface": "すぎ"
+        }
+      ],
+      "id": "uzasugi",
+      "input": "うざすぎ"
+    },
+    {
+      "description": "きもすぎて笑った - regression test",
+      "expected": [
+        {
+          "lemma": "きもい",
+          "pos": "Adjective",
+          "surface": "きも"
+        },
+        {
+          "lemma": "すぎる",
+          "pos": "Verb",
+          "surface": "すぎ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "笑う",
+          "pos": "Verb",
+          "surface": "笑っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "kimosugite_ttta",
+      "input": "きもすぎて笑った"
+    },
+    {
+      "description": "高すぎ - regression test",
+      "expected": [
+        {
+          "lemma": "高い",
+          "pos": "Adjective",
+          "surface": "高"
+        },
+        {
+          "lemma": "すぎる",
+          "pos": "Verb",
+          "surface": "すぎ"
+        }
+      ],
+      "id": "sugi",
+      "input": "高すぎ"
     }
   ],
   "description": "I-adjectives compound/derived forms (複合・派生) - sou patterns, nominalization, contracted forms",

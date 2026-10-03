@@ -16,6 +16,62 @@
       ],
       "id": "raseru_3",
       "input": "沼らせる"
+    },
+    {
+      "description": "沼ってる - regression test",
+      "expected": [
+        {
+          "lemma": "沼る",
+          "pos": "Verb",
+          "surface": "沼っ"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てる"
+        }
+      ],
+      "id": "ttteru",
+      "input": "沼ってる"
+    },
+    {
+      "description": "告ってる - regression test",
+      "expected": [
+        {
+          "lemma": "告る",
+          "pos": "Verb",
+          "surface": "告っ"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てる"
+        }
+      ],
+      "id": "ttteru_2",
+      "input": "告ってる"
+    },
+    {
+      "description": "沼ってた - regression test",
+      "expected": [
+        {
+          "lemma": "沼る",
+          "pos": "Verb",
+          "surface": "沼っ"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "て"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ttteta",
+      "input": "沼ってた"
     }
   ],
   "description": "Godan Ra-row verbs (五段ラ行動詞) - verbs ending in る (part 2/2)",

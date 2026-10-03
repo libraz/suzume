@@ -462,6 +462,38 @@
       ],
       "id": "sundabe",
       "input": "何すんだべ"
+    },
+    {
+      "description": "どうすんだろう - regression test",
+      "expected": [
+        {
+          "lemma": "どう",
+          "pos": "Adjective",
+          "surface": "どう"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "す"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だろ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "dousundarou",
+      "input": "どうすんだろう"
     }
   ],
   "description": "Suru-verb patterns with subsidiary verbs - MeCab互換分割 (part 2/2)",

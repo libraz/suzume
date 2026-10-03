@@ -139,6 +139,60 @@
       ],
       "id": "hadousuruno",
       "input": "明日はどうするの？"
+    },
+    {
+      "description": "なんでですか - regression test",
+      "expected": [
+        {
+          "lemma": "なんで",
+          "pos": "Adverb",
+          "surface": "なんで"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "nandedesuka",
+      "input": "なんでですか"
+    },
+    {
+      "description": "それはなんでですか。 - regression test",
+      "expected": [
+        {
+          "lemma": "それ",
+          "pos": "Pronoun",
+          "surface": "それ"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "なんで",
+          "pos": "Adverb",
+          "surface": "なんで"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "sorehanandedesuka",
+      "input": "それはなんでですか。"
     }
   ],
   "description": "pronoun_interrogative tests",

@@ -1396,6 +1396,23 @@
       ],
       "id": "nau_2",
       "input": "損なう"
+    },
+    {
+      "description": "かもよお - regression test",
+      "expected": [
+        {
+          "lemma": "かも",
+          "pos": "Particle",
+          "surface": "かも"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よお"
+        }
+      ],
+      "id": "kamoyoo",
+      "input": "かもよお"
     }
   ],
   "description": "particle_final tests",

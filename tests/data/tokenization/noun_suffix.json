@@ -314,6 +314,111 @@
       ],
       "id": "productive_role_suffix_chou",
       "input": "第3部門長"
+    },
+    {
+      "description": "改正案 - regression test",
+      "expected": [
+        {
+          "lemma": "改正案",
+          "pos": "Noun",
+          "surface": "改正案"
+        }
+      ],
+      "id": "unnamed_38",
+      "input": "改正案"
+    },
+    {
+      "description": "予算額を確認する - regression test",
+      "expected": [
+        {
+          "lemma": "予算額",
+          "pos": "Noun",
+          "surface": "予算額"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "確認",
+          "pos": "Noun",
+          "surface": "確認"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "wo_suru_7",
+      "input": "予算額を確認する"
+    },
+    {
+      "description": "交通費を払う - regression test",
+      "expected": [
+        {
+          "lemma": "交通費",
+          "pos": "Noun",
+          "surface": "交通費"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "払う",
+          "pos": "Verb",
+          "surface": "払う"
+        }
+      ],
+      "id": "wo_u_3",
+      "input": "交通費を払う"
+    },
+    {
+      "description": "説明会に出る - regression test",
+      "expected": [
+        {
+          "lemma": "説明会",
+          "pos": "Noun",
+          "surface": "説明会"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "出る",
+          "pos": "Verb",
+          "surface": "出る"
+        }
+      ],
+      "id": "ni_ru_2",
+      "input": "説明会に出る"
+    },
+    {
+      "description": "日本語版を読む - regression test",
+      "expected": [
+        {
+          "lemma": "日本語版",
+          "pos": "Noun",
+          "surface": "日本語版"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読む"
+        }
+      ],
+      "id": "wo_mu_3",
+      "input": "日本語版を読む"
     }
   ],
   "description": "noun_suffix tests",
