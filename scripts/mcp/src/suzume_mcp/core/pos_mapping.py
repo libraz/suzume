@@ -1,6 +1,5 @@
 """POS mapping and correction logic ported from SuzumeUtils.pm."""
 
-import functools
 import unicodedata
 
 import regex
@@ -28,7 +27,7 @@ from .constants import (
     VERB_NOT_AUX_LEMMAS,
     is_all_kanji,
 )
-from .mecab import is_single_token_of_pos, mecab_analyze
+from .mecab import is_na_adjective_stem, is_single_token_of_pos
 
 # The word classes a terminal predicate belongs to, in the two tag vocabularies a
 # token may still be carrying at this point in the pipeline.
@@ -310,19 +309,6 @@ def normalize_pos(pos: str) -> str:
     return SUZUME_POS_OVERRIDE.get(normalized, normalized)
 
 
-@functools.lru_cache(maxsize=4096)
-def _is_kana_na_adjective_stem(surface: str) -> bool:
-    """Whether the reference dictionary reads a kana surface as a na-adjective stem.
-
-    An unknown-looking kana word comes back as a plain noun before だ or の and
-    as a na-adjective stem only where the attributive な forces it (ふつう). The
-    kanji spelling is a stem everywhere, so the attributive probe recovers the
-    same class for the kana one instead of letting the script decide.
-    """
-    probe = mecab_analyze(surface + "な")
-    return bool(probe) and probe[0].get("surface") == surface and probe[0].get("pos_sub1") == "形容動詞語幹"
-
-
 def correct_mecab_pos(tokens: list[dict]) -> None:
     """Correct MeCab POS misclassifications (mutates tokens in-place)."""
     for idx, t in enumerate(tokens):
@@ -336,7 +322,7 @@ def correct_mecab_pos(tokens: list[dict]) -> None:
             ((pos == "名詞" and t.get("pos_sub1") == "一般") or (pos == "副詞" and before_genitive))
             and len(surface) >= 2
             and all("\u3041" <= char <= "\u3096" for char in surface)
-            and _is_kana_na_adjective_stem(surface)
+            and is_na_adjective_stem(surface)
         ):
             t["pos"] = "名詞"
             t["pos_sub1"] = "形容動詞語幹"

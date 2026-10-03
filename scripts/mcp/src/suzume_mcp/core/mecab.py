@@ -1,6 +1,7 @@
 """MeCab interface - subprocess-based MeCab analysis."""
 
 import asyncio
+import functools
 
 
 def mecab_analyze(text: str) -> list[dict]:
@@ -47,6 +48,18 @@ def is_single_token_of_pos(surface: str, pos: str) -> bool:
     """
     tokens = mecab_analyze(surface)
     return len(tokens) == 1 and tokens[0].get("pos") == pos and tokens[0].get("surface") == surface
+
+
+@functools.lru_cache(maxsize=4096)
+def is_na_adjective_stem(surface: str) -> bool:
+    """Whether the reference dictionary reads a surface as a na-adjective stem.
+
+    A stem comes back as a plain noun before だ or の and as a na-adjective stem
+    only where the attributive な forces it (ふつう, 非常), so the attributive
+    probe recovers the class whatever the surrounding context or script.
+    """
+    probe = mecab_analyze(surface + "な")
+    return bool(probe) and probe[0].get("surface") == surface and probe[0].get("pos_sub1") == "形容動詞語幹"
 
 
 def _parse_mecab_output(output: str) -> list[dict]:
