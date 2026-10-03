@@ -221,6 +221,10 @@ bool isIkuStem(std::string_view stem) {
   return stem == "行" || stem == "い";
 }
 
+bool admitsSokuonbin(VerbType verb_type, std::string_view base_form) {
+  return verb_type != VerbType::GodanKa || utf8::endsWith(base_form, "行く") || utf8::endsWith(base_form, "いく");
+}
+
 bool isUOnbinStem(std::string_view stem) {
   // 五段ワ行のう音便は生産規則ではなく、閉じた語彙的サブクラスである。
   // This list is the same kind of lexical irregularity as 行く's 促音便;

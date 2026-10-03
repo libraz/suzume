@@ -106,9 +106,19 @@ float computePassiveCausativeBonus(const core::LatticeEdge& prev, const core::La
   // The classical causative す attaches to an a-row irrealis stem
   // (いら+し+て). A non-a-row homograph cannot supply that inflectional
   // context, so it must not create a fabricated voice chain such as
-  // かも+し+れ+ない.
-  if (next.extended_pos == core::ExtendedPOS::AuxCausative && grammar::isClassicalCausativeAuxiliaryLemma(next.lemma) &&
-      (prev.extended_pos != core::ExtendedPOS::VerbMizenkei || !grammar::endsWithARow(prev.surface))) {
+  // かも+し+れ+ない. The passive れる likewise needs an a-row irrealis: a
+  // continuative takes られる (食べ+られ), so a れ cell after one is a false split
+  // (来+れ+ば for 来れ+ば, い+れよ+う for いれよ+う, し+て+い+れ+ば). Hiragana
+  // a-row stems are exempt, as a short hiragana irrealis carries the
+  // continuative tag (やら+れ+た).
+  const bool classical_causative_off_a_row =
+      next.extended_pos == core::ExtendedPOS::AuxCausative && grammar::isClassicalCausativeAuxiliaryLemma(next.lemma) &&
+      (prev.extended_pos != core::ExtendedPOS::VerbMizenkei || !grammar::endsWithARow(prev.surface));
+  const bool passive_re_off_continuative =
+      (prev.extended_pos == core::ExtendedPOS::VerbRenyokei || prev.extended_pos == core::ExtendedPOS::AuxAspectIru) &&
+      next.extended_pos == core::ExtendedPOS::AuxPassive && utf8::startsWith(next.surface, "れ") &&
+      !grammar::endsWithARow(prev.surface);
+  if (classical_causative_off_a_row || passive_re_off_continuative) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
 
@@ -149,17 +159,6 @@ float computePassiveCausativeBonus(const core::LatticeEdge& prev, const core::La
   if (prev.extended_pos == core::ExtendedPOS::AuxPassive && utf8::endsWith(prev.surface, "れれ") &&
       next.extended_pos == core::ExtendedPOS::ParticleConj && utf8::endsWith(next.surface, "ば")) {
     SUZUME_CONNECTION_ADD(bonus, cost::kStrongBonus + cost::kModerateBonus + cost::kMinorBonus);
-  }
-
-  // Penalty for VerbRenyokei → れ (AuxPassive) pattern
-  // The passive auxiliary れる attaches to godan 未然形 (VerbMizenkei), never to
-  // 連用形; the VerbRenyokei→AuxPassive strong bonus exists for られ (ichidan/
-  // kuru passive: 食べ+られ, 来+られ). A bare れ after 連用形 is a false split
-  // (来れば → 来+れ+ば instead of 来れ(仮定形)+ば). Hiragana a-row endings are
-  // exempt: short hiragana 未然形 carries VerbRenyokei EPOS (やら+れ+た).
-  if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei && next.extended_pos == core::ExtendedPOS::AuxPassive &&
-      next.surface == "れ" && !grammar::endsWithARow(prev.surface)) {
-    SUZUME_CONNECTION_ADD(bonus, cost::kRare);  // Cancel the -0.8 bonus
   }
 
   // An unverified verb candidate ending in the causative stem させ must

@@ -102,6 +102,9 @@ void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, s
     // Try each verb type and check dictionary or inflection analysis
     for (const auto& [verb_type, base_suffix] : candidates_to_try) {
       std::string base_form = normalize::concat(stem, base_suffix);
+      if (is_sokuonbin && !grammar::admitsSokuonbin(verb_type, base_form)) {
+        continue;
+      }
 
       // A registered verb is stored as its whole expanded paradigm, so the
       // godan reading has to find that paradigm's own cells in there before the

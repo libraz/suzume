@@ -2336,6 +2336,15 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     if (result.entry->pos == core::PartOfSpeech::Verb && !lemma.empty()) {
       const char32_t final_cp = utf8::decodeFirstChar(utf8::lastChar(lemma));
       conj_type = grammar::verbTypeToConjType(grammar::verbTypeFromBaseCodepoint(final_cp));
+      // The る-final row is unknown from the lemma, but stem+よ is a cell only
+      // the ichidan paradigm has (あきらめ+よ), never a godan-ra one.
+      const std::string_view surface = result.entry->surface;
+      if (conj_type == dictionary::ConjugationType::None && utf8::endsWith(lemma, "る") &&
+          utf8::endsWith(surface, "よ") &&
+          surface.substr(0, surface.size() - core::kJapaneseCharBytes) ==
+              lemma.substr(0, lemma.size() - core::kJapaneseCharBytes)) {
+        conj_type = dictionary::ConjugationType::Ichidan;
+      }
     }
 
     // A godan e-row form followed by past た cannot be a conditional or an

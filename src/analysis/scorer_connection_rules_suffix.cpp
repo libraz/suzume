@@ -444,10 +444,11 @@ float computeSuffixShortVerbBonus(const core::LatticeEdge& prev, const core::Lat
   // A dictionary-verified long hiragana renyokei can lexicalize as a
   // discourse connective before a nominal predicate (さておき説明する).
   // Requiring four moras keeps short auxiliary stems such as おき outside the
-  // rule while retaining the productive verb-form analysis and its lemma.
+  // rule while retaining the productive verb-form analysis and its lemma. A
+  // formal noun heads no predicate of its own (あきらめ+よう is あきらめよ+う).
   if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei && prev.fromDictionary() &&
       prev.surface.size() >= 4 * core::kJapaneseCharBytes && grammar::isPureHiragana(prev.surface) &&
-      next.pos == core::PartOfSpeech::Noun) {
+      next.pos == core::PartOfSpeech::Noun && next.extended_pos != core::ExtendedPOS::NounFormal) {
     SUZUME_CONNECTION_ADD(bonus, cost::kDoubleVeryStrongBonus);
   }
 

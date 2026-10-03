@@ -520,6 +520,9 @@ GodanOnbinDictMatch firstGodanOnbinDictBase(const dictionary::DictionaryManager*
                                             std::string_view onbin) {
   for (const auto& [verb_type, base_suffix] : getGodanTypesByOnbin(onbin)) {
     std::string base_form = normalize::concat(stem, base_suffix);
+    if (onbin == "っ" && !grammar::admitsSokuonbin(verb_type, base_form)) {
+      continue;
+    }
     if (isVerbInDictionary(dict_manager, base_form)) {
       return GodanOnbinDictMatch{verb_type, std::move(base_form), base_suffix, true};
     }

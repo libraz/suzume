@@ -162,6 +162,10 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
     if (next_char == U'れ' && end_pos + 1 < codepoints.size() && codepoints[end_pos + 1] == U'ば') {
       is_followed_by_reba = true;
     }
+    // The ichidan volitional opens on the irrealis stem+よ (あげ+よ+う).
+    const bool is_followed_by_volitional = grammar::isERowCodepoint(stem_end_char) && next_char == U'よ' &&
+                                           end_pos + 1 < codepoints.size() &&
+                                           codepoints[end_pos + 1] == core::hiragana::kU;
     // Check for negative ない pattern (e.g., できない → でき + ない)
     bool is_followed_by_nai = false;
     if (next_char == U'な' && end_pos + 1 < codepoints.size() && codepoints[end_pos + 1] == U'い') {
@@ -169,7 +173,7 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
     }
     if (!is_followed_by_te_ta && !is_followed_by_masu && !godan_ta_before_declared_renyokei_aux &&
         !is_followed_by_renyokei_conj && !is_followed_by_classical_adnominal_tari && !is_followed_by_reba &&
-        !is_followed_by_nai) {
+        !is_followed_by_nai && !is_followed_by_volitional) {
       continue;
     }
 
@@ -231,8 +235,13 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
 
     // A registered inflectional surface already supplies its own lemma and
     // conjugation type.  Do not overlay an unverified Ichidan reconstruction
-    // such as あり→ありる on that closed lexical evidence.
-    if (!is_dict_verb && vh::hasDictionaryEntry(dict_manager, stem_surface, core::PartOfSpeech::Verb)) {
+    // such as あり→ありる on that closed lexical evidence. A surface registered
+    // as another cell leaves this one open (いれ is the hypothetical of いる).
+    const auto* registered_cell =
+        is_dict_verb || dict_manager == nullptr
+            ? nullptr
+            : lookupEntryInRange(*dict_manager, codepoints, start_pos, end_pos, core::PartOfSpeech::Verb);
+    if (registered_cell != nullptr && registered_cell->extended_pos != core::ExtendedPOS::VerbKateikei) {
       continue;
     }
 
@@ -352,7 +361,7 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
     // the ambiguous Ichidan stem is mizenkei (さけ+ない, かけ+ない).
     const bool is_lexical_negative_continuation =
         is_negative_continuation && !isClearTeFormBeforeSubsidiary(codepoints, start_pos, true);
-    // A following て/た validates the inflectional shape, but it does not prove
+    // A following て/た/ます validates the inflectional shape, but it does not prove
     // a word boundary when the candidate begins immediately after kanji. In
     // that position the hiragana can instead be the okurigana tail of a
     // kanji-starting predicate. Keep the ordinary candidate, but reserve the
@@ -362,8 +371,9 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
     const core::CandidateOrigin origin =
         is_lexical_negative_continuation
             ? CandidateOrigin::VerbHiraganaNegativeRenyokei
-            : (is_followed_by_te_ta && !has_kanji_immediately_before ? CandidateOrigin::VerbHiraganaInflectedRenyokei
-                                                                     : CandidateOrigin::VerbHiragana);
+            : ((is_followed_by_te_ta || is_followed_by_masu) && !has_kanji_immediately_before
+                   ? CandidateOrigin::VerbHiraganaInflectedRenyokei
+                   : CandidateOrigin::VerbHiragana);
     // Ichidan stems share their surface in renyokei and mizenkei. A following
     // negative auxiliary determines the latter, which must receive the normal
     // VerbMizenkei → AuxNegativeNai connection instead of competing as a
@@ -408,6 +418,16 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
                                              dictionary::ConjugationType::Ichidan, true, CandidateOrigin::VerbHiragana,
                                              ichidan_confidence, "hiragana_ichidan_kateikei",
                                              core::ExtendedPOS::VerbKateikei));
+    }
+    if (is_followed_by_volitional) {
+      SUZUME_DEBUG_VERBOSE_BLOCK {
+        SUZUME_DEBUG_STREAM << "[VERB_CAND] " << stem_surface << "よ hiragana_ichidan_volitional lemma=" << base_form
+                            << " conf=" << ichidan_confidence << " cost=" << cost << "\n";
+      }
+      candidates.push_back(makeVerbCandidate(stem_surface + "よ", start_pos, end_pos + 1, cost, base_form,
+                                             dictionary::ConjugationType::Ichidan, true, CandidateOrigin::VerbHiragana,
+                                             ichidan_confidence, "hiragana_ichidan_volitional",
+                                             core::ExtendedPOS::VerbMizenkei));
     }
   }
 

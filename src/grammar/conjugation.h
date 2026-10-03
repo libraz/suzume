@@ -281,6 +281,12 @@ bool isIkuBaseForm(std::string_view base_form);
 bool isIkuStem(std::string_view stem);
 
 /**
+ * @brief Whether a godan base may take the 促音便 っ: Ka-row verbs use イ音便
+ * except 行く/いく and compounds ending in it (おく → おい, never おっ).
+ */
+bool admitsSokuonbin(VerbType verb_type, std::string_view base_form);
+
+/**
  * @brief Whether a GodanWa stem has the lexical う音便 (問うた), not 促音便.
  *
  * Most ワ行五段 verbs use 促音便 (買った).  A small closed lexical subclass

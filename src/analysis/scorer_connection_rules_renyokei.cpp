@@ -623,10 +623,11 @@ float computeVerbRenyokeiEarlyBonus(const core::LatticeEdge& prev, const core::L
   // A multi-mora case-particle candidate after an explicit volitional auxiliary
   // would swallow the quotative と and following verb (書こ+う+として). Keep the
   // one-mora と connection licensed, but reject compound-particle attachment so
-  // the productive う+と+し+て boundary remains available.
-  const bool volitional_before_compound_case = prev.extended_pos == core::ExtendedPOS::AuxVolitional &&
-                                               next.extended_pos == core::ExtendedPOS::ParticleCase &&
-                                               next.surface.size() >= core::kTwoJapaneseCharBytes;
+  // the productive う+と+し+て boundary remains available. A case が is the
+  // formal noun's (やめ+よう+が+ない); after a volitional が is concessive.
+  const bool volitional_before_compound_case =
+      prev.extended_pos == core::ExtendedPOS::AuxVolitional && next.extended_pos == core::ExtendedPOS::ParticleCase &&
+      (next.surface.size() >= core::kTwoJapaneseCharBytes || grammar::isSingleHiragana(next.surface, U'が'));
 
   // A volitional auxiliary followed by the quotative particle is the productive
   // intent construction (食べよう+とする). Keep it ahead of the homographic
