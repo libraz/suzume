@@ -15,6 +15,7 @@ from .postprocessors import (
     postprocessor_rules,
     preprocess_for_mecab,
     repair_adjective_stem_before_suffix,
+    repair_adjective_yo_quotative,
     repair_assimilated_koto_copula,
     repair_continuative_before_manner_suffix,
     repair_contracted_iika,
@@ -23,6 +24,7 @@ from .postprocessors import (
     repair_contracted_volitional,
     repair_euphonic_adjective_adverb,
     repair_interrogative_nande,
+    repair_kamo_quotative,
     repair_kanji_prefix_before_kana_noun,
     repair_kko_nominalizer,
     repair_lengthened_negative,
@@ -225,6 +227,8 @@ def get_expected_tokens(text: str, suzume_tokens: list[dict] | None = None) -> t
     repair_contracted_rareru(raw_tokens)
     repair_contracted_iika(raw_tokens)
     repair_lengthened_negative(raw_tokens)
+    repair_kamo_quotative(raw_tokens)
+    repair_adjective_yo_quotative(raw_tokens)
     _merge_ideographic_variation_selectors(raw_tokens)
 
     # Fix MeCab POS errors (before POS mapping)

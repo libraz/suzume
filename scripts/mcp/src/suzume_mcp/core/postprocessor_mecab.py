@@ -994,6 +994,53 @@ def repair_lengthened_negative(tokens: list[dict]) -> None:
             }
 
 
+def repair_kamo_quotative(tokens: list[dict]) -> None:
+    """Rebuild か + もって as the particle かも + quotative って.
+
+    もって (以て) opens a clause, so it cannot follow the particle か; the
+    reference reaches it only when the host before か is an adverb (そうかもって),
+    and reads 雨かもって as かも + って.
+    """
+    for idx in range(len(tokens) - 1):
+        ka, motte = tokens[idx], tokens[idx + 1]
+        if ka.get("surface") == "か" and ka.get("pos") == "助詞" and motte.get("surface") == "もって":
+            tokens[idx : idx + 2] = [
+                {"surface": "かも", "pos": "助詞", "pos_sub1": "副助詞", "lemma": "かも"},
+                {"surface": "って", "pos": "助詞", "pos_sub1": "格助詞", "pos_sub2": "連語", "lemma": "って"},
+            ]
+
+
+def repair_adjective_yo_quotative(tokens: list[dict]) -> None:
+    """Split a kana verb in よっ before て that is an adjective plus よ + って.
+
+    The reference reads いいよって as the kana spelling of 言い寄って; the
+    kana run is the finished adjective いい, the final particle よ and the
+    quotative って, as いいかって already comes back.
+    """
+    idx = 0
+    while idx < len(tokens) - 1:
+        token, te = tokens[idx], tokens[idx + 1]
+        surface = token.get("surface", "")
+        host = surface[:-2]
+        if (
+            token.get("pos") == "動詞"
+            and surface.endswith("よっ")
+            and regex.fullmatch(r"\p{Hiragana}+", surface)
+            and te.get("surface") == "て"
+            and host
+        ):
+            analyzed = mecab_analyze(host)
+            if len(analyzed) == 1 and analyzed[0].get("pos") == "形容詞" and analyzed[0].get("conj_form") == "基本形":
+                tokens[idx : idx + 2] = [
+                    analyzed[0],
+                    {"surface": "よ", "pos": "助詞", "pos_sub1": "終助詞", "lemma": "よ"},
+                    {"surface": "って", "pos": "助詞", "pos_sub1": "格助詞", "lemma": "って"},
+                ]
+                idx += 3
+                continue
+        idx += 1
+
+
 def merge_conjunction_with_rashii(tokens: list[dict]) -> None:
     """Rebuild an adjective in らしい the reference dictionary reads as a conjunction.
 

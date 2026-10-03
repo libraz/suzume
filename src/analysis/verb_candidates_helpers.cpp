@@ -132,6 +132,19 @@ bool naiNegativeFollowsAt(const std::vector<char32_t>& codepoints, size_t pos) {
   return naiNegativeFormLengthAt(codepoints, pos) != 0;
 }
 
+bool particleClosesClauseBeforeSokuon(const std::vector<char32_t>& codepoints, size_t sokuon_pos) {
+  if (sokuon_pos < 2 || sokuon_pos >= codepoints.size()) {
+    return false;
+  }
+  const char32_t particle = codepoints[sokuon_pos - 1];
+  const char32_t predicate_end = codepoints[sokuon_pos - 2];
+  const bool closing_particle = particle == U'よ' || particle == U'の' || particle == U'か' || particle == U'ね' ||
+                                particle == U'わ' || particle == U'ぞ';
+  return closing_particle &&
+         (grammar::isModernGodanTerminalKana(predicate_end) || grammar::isERowCodepoint(predicate_end) ||
+          predicate_end == U'ろ' || predicate_end == U'い' || predicate_end == U'な' || predicate_end == U'だ');
+}
+
 bool volitionalEndingFollowsAt(const std::vector<char32_t>& codepoints, size_t pos) {
   return pos < codepoints.size() &&
          (codepoints[pos] == U'う' ||

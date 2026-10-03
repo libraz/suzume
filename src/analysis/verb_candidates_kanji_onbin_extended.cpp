@@ -223,12 +223,16 @@ void appendExtendedSokuonbinCandidates(const std::vector<char32_t>& codepoints, 
           char32_t char_before_sokuon = codepoints[onbin_end - 2];
           // An imperative (行け, 食べろ, 来い) closes the predicate just as a
           // terminal does; no godan-ra okurigana ends in e-row, ろ or い.
+          const auto closes_predicate = [](char32_t cp) {
+            return cp == U'く' || cp == U'す' || cp == U'つ' || cp == U'う' || cp == U'ぐ' || cp == U'ぶ' ||
+                   cp == U'む' || cp == U'ぬ' || cp == U'る' || grammar::isERowCodepoint(cp) || cp == U'ろ' ||
+                   cp == U'い';
+          };
+          // A final or nominalizing particle may close the clause first
+          // (行くよ+って, 来るの+って).
           is_quotative_pattern =
-              (char_before_sokuon == U'く' || char_before_sokuon == U'す' || char_before_sokuon == U'つ' ||
-               char_before_sokuon == U'う' || char_before_sokuon == U'ぐ' || char_before_sokuon == U'ぶ' ||
-               char_before_sokuon == U'む' || char_before_sokuon == U'ぬ' || char_before_sokuon == U'る' ||
-               grammar::isERowCodepoint(char_before_sokuon) || char_before_sokuon == U'ろ' ||
-               char_before_sokuon == U'い');
+              closes_predicate(char_before_sokuon) ||
+              (onbin_end >= start_pos + 3 && vh::particleClosesClauseBeforeSokuon(codepoints, onbin_end - 1));
         }
         if (is_quotative_pattern) {
           // Skip: this is likely quotative って, not extended sokuonbin

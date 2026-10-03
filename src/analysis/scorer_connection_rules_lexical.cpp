@@ -82,11 +82,14 @@ float computeParticleQuoteBonus(const core::LatticeEdge& prev, const core::Latti
   }
 
   // A final particle can be quoted as a complete utterance (かしら+と
-  // 思う, かな+と考える). This relation is specific to the quotative case
-  // particle; applying it to every case particle incorrectly favors paths
-  // such as ADV+わ+から over an ordinary following predicate.
-  if (prev.extended_pos == core::ExtendedPOS::ParticleFinal && next.extended_pos == core::ExtendedPOS::ParticleCase &&
-      utf8::equalsAny(next.surface, {"と"})) {
+  // 思う, かな+と考える, 行くか+って; って only after a particle that closes
+  // the clause, not や/け inside どうやって). This relation is specific to the
+  // quotative と/って; applying it to every case particle incorrectly favors
+  // paths such as ADV+わ+から over an ordinary following predicate.
+  if (prev.extended_pos == core::ExtendedPOS::ParticleFinal &&
+      ((next.extended_pos == core::ExtendedPOS::ParticleCase && utf8::equalsAny(next.surface, {"と"})) ||
+       (next.extended_pos == core::ExtendedPOS::ParticleQuote && utf8::equalsAny(next.surface, {"って"}) &&
+        utf8::equalsAny(prev.surface, {"か", "よ", "ね", "わ", "ぞ"})))) {
     SUZUME_CONNECTION_ADD(bonus, cost::kStrongBonus);
   }
 

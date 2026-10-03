@@ -917,6 +917,16 @@ size_t naiNegativeFormLengthAt(const std::vector<char32_t>& codepoints, size_t p
 bool naiNegativeFollowsAt(const std::vector<char32_t>& codepoints, size_t pos);
 
 /**
+ * @brief Whether the sokuon at @p sokuon_pos follows a particle that closes a clause.
+ *
+ * A final or nominalizing particle mora (よ, の, か, ね, わ, ぞ) right after a
+ * predicate ending (a terminal, imperative, い, or the copula な/だ) closes the
+ * clause, so a following っ+て is the quotative って (行くよ+って, そうなの+って,
+ * いいか+って) rather than a verb's sokuonbin.
+ */
+bool particleClosesClauseBeforeSokuon(const std::vector<char32_t>& codepoints, size_t sokuon_pos);
+
+/**
  * @brief Check whether the volitional ending begins at @p pos.
  *
  * That is う, or the geminate it contracts to before the question particle

@@ -82,6 +82,11 @@ void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, s
     if (stem.empty()) {
       continue;
     }
+    // っ+て after a clause-closing particle is the quotative (いいか+って).
+    if (is_sokuonbin && next_char == U'て' && onbin_pos >= start_pos + 2 &&
+        vh::particleClosesClauseBeforeSokuon(codepoints, onbin_pos)) {
+      continue;
+    }
 
     // Check if stem starts with common case particles (と、を、に、で、が、は、へ)
     // Used later to skip short particle+verb patterns unless dictionary-verified

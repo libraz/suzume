@@ -182,7 +182,7 @@ void setVerbAndAdjectiveCosts(BigramMatrix& table) {
       // quotative って cut at its sokuon. An i-adjective reaches a verb only
       // through its continuative, so its terminal/attributive cell cannot
       // precede one at all (いい+や+って, not いい+やっ+て).
-      {EPOS::VerbShuushikei, EPOS::VerbOnbinkei, cost::kStrong},
+      {EPOS::VerbShuushikei, EPOS::VerbOnbinkei, cost::kAlmostNever},
       {EPOS::AdjBasic, EPOS::VerbOnbinkei, cost::kAlmostNever},
 
       // VerbOnbinkei → contracted progressive auxiliary (行っ+て+た).

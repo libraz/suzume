@@ -107,6 +107,15 @@ CompoundVerbMatch findCompoundVerbMatch(
       v1_base += normalize::encodeUtf8(base_ending);
     }
     hiragana_v1_in_dictionary = dict_manager.lookupExact(v1_base, core::PartOfSpeech::Verb) != nullptr;
+    // A V1 that also reads as a finished adjective (いい) followed by a final
+    // particle mora has closed its clause (いい+か+って, いい+よ+って).
+    const auto* v2_head_particle =
+        lookupEntryInRange(dict_manager, codepoints, v2_start, v2_start + 1, core::PartOfSpeech::Particle);
+    if (v2_head_particle != nullptr && v2_head_particle->extended_pos == core::ExtendedPOS::ParticleFinal &&
+        dict_manager.lookupExact(v1_surface, core::PartOfSpeech::Adjective) != nullptr) {
+      SUZUME_DEBUG_LOG_VERBOSE("[COMPOUND] rejected final particle after adjective-like V1: " << v1_surface << "\n");
+      return {};
+    }
     bool hiragana_v1_has_strong_inflection = false;
     if (!hiragana_v1_in_dictionary) {
       for (const auto& candidate : inflection.analyze(v1_surface)) {
