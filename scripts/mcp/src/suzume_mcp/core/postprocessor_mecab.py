@@ -882,6 +882,45 @@ def merge_reason_nde(tokens: list[dict]) -> None:
         idx += 1
 
 
+_CONTRACTED_NEGATIVES = frozenset({"ない", "ねえ", "ねぇ", "ねー"})
+
+
+def repair_contracted_rareru(tokens: list[dict]) -> None:
+    """Read らん before a negative as the contracted potential られ.
+
+    The reference has only the noun らん (蘭), so 見てらんない and 信じらんない
+    come back as a noun plus an independent ない. After a continuative or て
+    and before a negative it is られ with its row nasalized.
+    """
+    for idx in range(1, len(tokens) - 1):
+        host, token, negative = tokens[idx - 1], tokens[idx], tokens[idx + 1]
+        if (
+            token.get("surface") == "らん"
+            and token.get("pos") == "名詞"
+            and negative.get("surface") in _CONTRACTED_NEGATIVES
+            and (
+                # The te-particle may come fused into a misread として (こ+として).
+                (host.get("pos") == "助詞" and host.get("surface", "").endswith(("て", "で")))
+                or (host.get("pos") == "動詞" and host.get("conj_form", "").startswith("連用"))
+            )
+        ):
+            tokens[idx] = {
+                "surface": "らん",
+                "pos": "動詞",
+                "pos_sub1": "接尾",
+                "conj_type": "一段",
+                "conj_form": "未然形",
+                "lemma": "られる",
+            }
+            tokens[idx + 1] = {
+                "surface": negative.get("surface", ""),
+                "pos": "助動詞",
+                "conj_type": "特殊・ナイ",
+                "conj_form": "基本形",
+                "lemma": "ない",
+            }
+
+
 def merge_conjunction_with_rashii(tokens: list[dict]) -> None:
     """Rebuild an adjective in らしい the reference dictionary reads as a conjunction.
 

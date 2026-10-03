@@ -392,16 +392,23 @@ void appendNOnbinNaiCandidates(const std::vector<char32_t>& codepoints, size_t s
                                const grammar::Inflection& inflection, const dictionary::DictionaryManager* dict_manager,
                                std::vector<UnknownCandidate>& candidates) {
   // The progressive negative also contracts productively: V+ていられない
-  // becomes V+て+らん+ない.  The reduced tail is not a lexical adjective;
-  // emit the oracle's nominal residual only after the full te+らん+ない frame
-  // proves the contraction.
-  if (start_pos > 0 && start_pos + 3 < codepoints.size() && codepoints[start_pos - 1] == U'て' &&
-      codepoints[start_pos] == U'ら' && codepoints[start_pos + 1] == U'ん' && codepoints[start_pos + 2] == U'な' &&
-      codepoints[start_pos + 3] == U'い') {
-    candidates.push_back(makeNounCandidate(extractSubstring(codepoints, start_pos, start_pos + 2), start_pos,
-                                           start_pos + 2, candidate::verb_cost::kStrongBonus, true,
-                                           CandidateOrigin::VerbHiragana, core::ExtendedPOS::Noun,
-                                           "contracted_progressive_negative"));
+  // becomes V+て+らん+ない (or the colloquial ねえ).  The reduced らん is the
+  // potential られ with its row nasalized, so it is emitted as that auxiliary
+  // once the te+らん+negative frame proves the contraction.
+  const size_t negative_pos = start_pos + 2;
+  const bool colloquial_negative_follows =
+      negative_pos + 1 < codepoints.size() && codepoints[negative_pos] == U'ね' &&
+      (codepoints[negative_pos + 1] == U'え' || codepoints[negative_pos + 1] == U'ぇ' ||
+       codepoints[negative_pos + 1] == U'ー');
+  if (start_pos > 0 && negative_pos < codepoints.size() &&
+      (codepoints[start_pos - 1] == U'て' || codepoints[start_pos - 1] == U'で') && codepoints[start_pos] == U'ら' &&
+      codepoints[start_pos + 1] == U'ん' &&
+      (vh::naiNegativeFollowsAt(codepoints, negative_pos) || colloquial_negative_follows)) {
+    auto contracted = makeCandidate(codepoints, start_pos, start_pos + 2, core::PartOfSpeech::Auxiliary,
+                                    candidate::verb_cost::kStrongBonus, false, CandidateOrigin::VerbHiragana,
+                                    core::ExtendedPOS::AuxPassive, "contracted_progressive_negative");
+    contracted.lemma = "られる";
+    candidates.push_back(std::move(contracted));
     // The frame has already decided what these two morae are, and the scan
     // below would read the same span as a godan-ra irrealis whose base is the
     // classical passive らる rather than a verb of the modern paradigm it
