@@ -1968,6 +1968,18 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
       }
     }
 
+    // The u-onbin とう of the desiderative stands on a continuative before the
+    // negative or the humble predicates it heads (食べ+とう+ない, 行き+とう+ござる).
+    if (result.entry->extended_pos == core::ExtendedPOS::AuxDesireTai && result.entry->lemma != result.entry->surface &&
+        utf8::endsWith(result.entry->surface, "う") &&
+        !(hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbRenyokei) &&
+          (verb_helpers::naiNegativeFollowsAt(codepoints, end_pos) ||
+           utf8::startsWith(extractSubstring(codepoints, end_pos, std::min(codepoints.size(), end_pos + 2)), "ござ") ||
+           utf8::startsWith(extractSubstring(codepoints, end_pos, std::min(codepoints.size(), end_pos + 2)),
+                            "存じ")))) {
+      continue;
+    }
+
     // The aspect おる's irrealis おら stands only behind the connective て/で
     // (書いて+おら+ず); elsewhere おら is the pronoun of おらが村 or a verb.
     if (result.entry->extended_pos == core::ExtendedPOS::AuxAspectIru && result.entry->lemma == "おる" &&

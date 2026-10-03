@@ -341,6 +341,7 @@ EntrySpecRange getAuxiliaryEntries() {
       aux("たい", "たい", EPOS::AuxDesireTai),
       aux("たく", "たい", EPOS::AuxDesireTai),
       aux("たかっ", "たい", EPOS::AuxDesireTai),
+      aux("とう", "たい", EPOS::AuxDesireTai),  // u-onbin of たく (食べ+とう+ない; gated on the follower)
       aux("たけれ", "たい", EPOS::AuxDesireTai),
       aux("たし", "たい", EPOS::AuxDesireTai),  // 文語終止形 (対応たし)
       // たがる (3rd-person desiderative): conjugates like a godan-ra verb
