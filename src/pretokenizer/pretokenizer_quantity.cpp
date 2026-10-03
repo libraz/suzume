@@ -210,11 +210,7 @@ bool PreTokenizer::tryMatchStorage(std::string_view text, size_t pos, PreToken& 
   // Match patterns: 数字[KMGT]?B
   size_t idx = scanDigits(text, pos);
 
-  if (idx == pos) {
-    return false;
-  }
-
-  if (idx >= text.size()) {
+  if (idx == pos || idx >= text.size()) {
     return false;
   }
 
@@ -294,21 +290,11 @@ bool PreTokenizer::tryMatchPercentage(std::string_view text, size_t pos, PreToke
   // Match patterns: 数字%
   size_t idx = scanDigits(text, pos);
 
-  if (idx == pos) {
-    return false;
-  }
-
-  if (idx >= text.size()) {
-    return false;
-  }
-
   // The normalizer has already folded full-width punctuation.
-  char chr = text[idx];
-  if (chr == '%') {
-    ++idx;
-  } else {
+  if (idx == pos || idx >= text.size() || text[idx] != '%') {
     return false;
   }
+  ++idx;
 
   setTokenFromRange(token, text, pos, idx, PreTokenType::Percentage, core::PartOfSpeech::Noun);
   return true;

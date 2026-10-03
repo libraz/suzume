@@ -185,21 +185,20 @@ bool DictionaryManager::loadCoreDictionary(const std::string& path) {
   return loadCoreDictionaryResult(path).hasValue();
 }
 
-core::Expected<size_t, core::Error> DictionaryManager::loadCoreDictionaryResult(const std::string& path) {
+BinaryDictionary& DictionaryManager::ensureCoreBinaryDict() {
   if (!core_binary_dict_) {
     core_binary_dict_ = std::make_unique<BinaryDictionary>();
   }
+  return *core_binary_dict_;
+}
 
-  return core_binary_dict_->loadFromFile(path);
+core::Expected<size_t, core::Error> DictionaryManager::loadCoreDictionaryResult(const std::string& path) {
+  return ensureCoreBinaryDict().loadFromFile(path);
 }
 
 core::Expected<size_t, core::Error> DictionaryManager::loadCoreDictionaryFromMemoryResult(const uint8_t* data,
                                                                                           size_t size) {
-  if (!core_binary_dict_) {
-    core_binary_dict_ = std::make_unique<BinaryDictionary>();
-  }
-
-  return core_binary_dict_->loadFromMemory(data, size);
+  return ensureCoreBinaryDict().loadFromMemory(data, size);
 }
 
 bool DictionaryManager::hasCoreBinaryDictionary() const {

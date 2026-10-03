@@ -349,12 +349,7 @@ std::vector<Conjugation::DictionarySuffix> Conjugation::getDictionarySuffixes(Ve
     }
     const auto& row = *row_ptr;
 
-    const GodanVowels vowels = encodeGodanVowels(row);
-    const std::string& base = vowels.base;
-    const std::string& a = vowels.a;
-    const std::string& i = vowels.i;
-    const std::string& e = vowels.e;
-    const std::string& o = vowels.o;
+    const auto [base, a, i, e, o] = encodeGodanVowels(row);
     std::string ta = row.voiced_ta ? "だ" : "た";
     std::string te = row.voiced_ta ? "で" : "て";
 

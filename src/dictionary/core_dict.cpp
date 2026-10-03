@@ -155,10 +155,7 @@ std::vector<LookupResult> CoreDictionary::lookup(std::string_view text, size_t s
 }
 
 const DictionaryEntry* CoreDictionary::getEntry(uint32_t idx) const {
-  if (idx < entries_.size()) {
-    return &entries_[idx];
-  }
-  return nullptr;
+  return entryAt(entries_, idx);
 }
 
 const DictionaryEntry* CoreDictionary::lookupExact(std::string_view surface, core::PartOfSpeech pos) const {

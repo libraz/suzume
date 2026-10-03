@@ -65,21 +65,32 @@ bool anyCharMatches(std::string_view str, Predicate pred) {
   return false;
 }
 
+/// Whether the last character exists and satisfies a predicate.
+template <typename Predicate>
+bool lastCharMatches(std::string_view str, Predicate pred) {
+  const char32_t cp = utf8::decodeLastChar(str);
+  return cp != 0 && pred(cp);
+}
+
+/// Whether the first character exists and satisfies a predicate.
+template <typename Predicate>
+bool firstCharMatches(std::string_view str, Predicate pred) {
+  const char32_t cp = utf8::decodeFirstChar(str);
+  return cp != 0 && pred(cp);
+}
+
 }  // namespace
 
 bool endsWithIRow(std::string_view stem) {
-  const char32_t codepoint = utf8::decodeLastChar(stem);
-  return codepoint != 0 && kana::isIRowCodepoint(codepoint);
+  return lastCharMatches(stem, kana::isIRowCodepoint);
 }
 
 bool endsWithERow(std::string_view stem) {
-  const char32_t codepoint = utf8::decodeLastChar(stem);
-  return codepoint != 0 && kana::isERowCodepoint(codepoint);
+  return lastCharMatches(stem, kana::isERowCodepoint);
 }
 
 bool endsWithOnbin(std::string_view stem) {
-  const char32_t codepoint = utf8::decodeLastChar(stem);
-  return codepoint != 0 && kana::isOnbinCodepoint(codepoint);
+  return lastCharMatches(stem, kana::isOnbinCodepoint);
 }
 
 bool endsWithRenyokeiMarker(std::string_view stem) {
@@ -120,18 +131,15 @@ bool isAllKanji(std::string_view stem) {
 }
 
 bool endsWithKanji(std::string_view stem) {
-  char32_t cp = utf8::decodeLastChar(stem);
-  return cp != 0 && kana::isKanjiCodepoint(cp);
+  return lastCharMatches(stem, kana::isKanjiCodepoint);
 }
 
 bool endsWithHiragana(std::string_view stem) {
-  char32_t cp = utf8::decodeLastChar(stem);
-  return cp != 0 && kana::isHiraganaCodepoint(cp);
+  return lastCharMatches(stem, kana::isHiraganaCodepoint);
 }
 
 bool startsWithKanji(std::string_view stem) {
-  char32_t cp = utf8::decodeFirstChar(stem);
-  return cp != 0 && kana::isKanjiCodepoint(cp);
+  return firstCharMatches(stem, kana::isKanjiCodepoint);
 }
 
 bool containsKanji(std::string_view stem) {
@@ -195,7 +203,7 @@ bool isLeftBranchingPrefixKanji(char32_t code) {
   // Kanji that also end compounds (完全, 過激, 究極) are deliberately absent: for
   // those the run-final position is a real reading, not a boundary error.
   constexpr std::array<char32_t, 3> kLeftBranchingPrefixes = {U'超', U'各', U'諸'};
-  return std::find(kLeftBranchingPrefixes.begin(), kLeftBranchingPrefixes.end(), code) != kLeftBranchingPrefixes.end();
+  return kana::isCodepointIn(kLeftBranchingPrefixes, code);
 }
 
 bool isBigradeTerminalKana(char32_t code) {
@@ -203,7 +211,7 @@ bool isBigradeTerminalKana(char32_t code) {
   // sahen nominal takes, so the row would claim that construction instead.
   constexpr std::array<char32_t, 11> kBigradeTerminals = {U'う', U'く', U'ぐ', U'つ', U'づ', U'ぬ',
                                                           U'ふ', U'ぶ', U'む', U'ゆ', U'る'};
-  return std::find(kBigradeTerminals.begin(), kBigradeTerminals.end(), code) != kBigradeTerminals.end();
+  return kana::isCodepointIn(kBigradeTerminals, code);
 }
 
 std::string yaRowBigradeTerminalLemma(std::string_view base_form) {
@@ -215,18 +223,17 @@ std::string yaRowBigradeTerminalLemma(std::string_view base_form) {
 
 bool isModernGodanTerminalKana(char32_t code) {
   constexpr std::array<char32_t, 9> kGodanTerminals = {U'う', U'く', U'ぐ', U'す', U'つ', U'ぬ', U'ぶ', U'む', U'る'};
-  return std::find(kGodanTerminals.begin(), kGodanTerminals.end(), code) != kGodanTerminals.end();
+  return kana::isCodepointIn(kGodanTerminals, code);
 }
 
 bool isMonogradeStemFinalKana(char32_t code) {
   constexpr std::array<char32_t, 2> kShiftedRow = {U'ひ', U'へ'};
-  return (isIRowCodepoint(code) || isERowCodepoint(code)) &&
-         std::find(kShiftedRow.begin(), kShiftedRow.end(), code) == kShiftedRow.end();
+  return (isIRowCodepoint(code) || isERowCodepoint(code)) && !kana::isCodepointIn(kShiftedRow, code);
 }
 
 bool isClassicalAuxiliaryHomographKana(char32_t code) {
   constexpr std::array<char32_t, 6> kAuxiliaryHomographs = {U'す', U'つ', U'ぬ', U'ふ', U'む', U'る'};
-  return std::find(kAuxiliaryHomographs.begin(), kAuxiliaryHomographs.end(), code) != kAuxiliaryHomographs.end();
+  return kana::isCodepointIn(kAuxiliaryHomographs, code);
 }
 
 bool isKanjiHonorificTitle(std::string_view surface) {
@@ -521,8 +528,7 @@ bool isPureKatakana(std::string_view stem) {
 }
 
 bool isSmallKana(std::string_view ch) {
-  char32_t cp = utf8::decodeFirstChar(ch);
-  return cp != 0 && kana::isSmallKanaCodepoint(cp);
+  return firstCharMatches(ch, kana::isSmallKanaCodepoint);
 }
 
 // A-row (あ段) endings for Godan mizenkei detection.
@@ -542,13 +548,11 @@ bool endsWithARow(std::string_view stem) {
 // O-row (お段) ending: the mizenkei a Godan verb takes before volitional う.
 // Shares the kana::isORowCodepoint source of truth.
 bool endsWithORow(std::string_view stem) {
-  char32_t cp = utf8::decodeLastChar(stem);
-  return cp != 0 && kana::isORowCodepoint(cp);
+  return lastCharMatches(stem, kana::isORowCodepoint);
 }
 
 bool endsWithURow(std::string_view stem) {
-  char32_t cp = utf8::decodeLastChar(stem);
-  return cp != 0 && kana::isURowCodepoint(cp);
+  return lastCharMatches(stem, kana::isURowCodepoint);
 }
 
 bool isSingleHiragana(std::string_view text, char32_t codepoint) {

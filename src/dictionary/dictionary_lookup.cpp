@@ -30,6 +30,10 @@ std::vector<LookupResult> lookupByTrie(const DoubleArray& trie, const std::vecto
   return results;
 }
 
+const DictionaryEntry* entryAt(const std::vector<DictionaryEntry>& entries, uint32_t idx) {
+  return idx < entries.size() ? &entries[idx] : nullptr;
+}
+
 const DictionaryEntry* lookupExactByTrie(const DoubleArray& trie, const std::vector<DictionaryEntry>& entries,
                                          std::string_view surface, core::PartOfSpeech pos) {
   const int32_t first_idx = trie.exactMatch(surface);

@@ -6,6 +6,17 @@
 
 namespace suzume::core {
 
+namespace {
+
+// Out-of-range lookups yield a shared default element instead of failing.
+template <typename T>
+const T& elementOrEmpty(const std::vector<T>& vec, size_t idx) {
+  static const T empty{};
+  return idx < vec.size() ? vec[idx] : empty;
+}
+
+}  // namespace
+
 Lattice::Lattice(size_t text_length)
     : text_length_(text_length), edge_indices_by_start_(text_length + 1), edge_indices_by_end_(text_length + 1) {}
 
@@ -109,27 +120,15 @@ std::vector<LatticeEdge> Lattice::edgesAt(size_t pos) const {
 }
 
 const std::vector<uint32_t>& Lattice::edgeIdsAt(size_t pos) const {
-  static const std::vector<uint32_t> empty_ids;
-  if (pos >= edge_indices_by_start_.size()) {
-    return empty_ids;
-  }
-  return edge_indices_by_start_[pos];
+  return elementOrEmpty(edge_indices_by_start_, pos);
 }
 
 const std::vector<uint32_t>& Lattice::edgeIdsEndingAt(size_t pos) const {
-  static const std::vector<uint32_t> empty_ids;
-  if (pos >= edge_indices_by_end_.size()) {
-    return empty_ids;
-  }
-  return edge_indices_by_end_[pos];
+  return elementOrEmpty(edge_indices_by_end_, pos);
 }
 
 const LatticeEdge& Lattice::getEdge(size_t edge_id) const {
-  static const LatticeEdge empty_edge{};
-  if (edge_id < all_edges_.size()) {
-    return all_edges_[edge_id];
-  }
-  return empty_edge;
+  return elementOrEmpty(all_edges_, edge_id);
 }
 
 void Lattice::setEdgeCost(size_t edge_id, float cost) {

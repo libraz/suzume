@@ -225,6 +225,7 @@ class DictionaryManager {
   bool hasUserBinaryDictionary() const;
 
  private:
+  BinaryDictionary& ensureCoreBinaryDict();
   core::Expected<size_t, core::Error> loadUserBinaryDictionaryResultInto(
       const std::string& path, std::vector<std::unique_ptr<BinaryDictionary>>& dictionaries);
   core::Expected<size_t, core::Error> loadUserBinaryDictionaryFromMemoryResultInto(

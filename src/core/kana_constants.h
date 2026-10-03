@@ -1,6 +1,8 @@
 #ifndef SUZUME_CORE_KANA_CONSTANTS_H_
 #define SUZUME_CORE_KANA_CONSTANTS_H_
 
+#include <algorithm>
+#include <array>
 #include <cstddef>
 
 namespace suzume::kana {
@@ -130,6 +132,12 @@ inline bool isSmallKanaCodepoint(char32_t cp) {
   // ヵ/ヶ can also act as counters, but their small-kana codepoint identity is
   // still needed when they occur at the start of an otherwise impossible word.
   return false;
+}
+
+/// Membership test against a closed codepoint set.
+template <size_t Size>
+inline bool isCodepointIn(const std::array<char32_t, Size>& set, char32_t cp) {
+  return std::find(set.begin(), set.end(), cp) != set.end();
 }
 
 }  // namespace suzume::kana

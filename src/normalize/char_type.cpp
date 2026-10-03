@@ -580,7 +580,7 @@ bool isDurationCompoundHeadKanji(char32_t code_point) {
   // not a temporal counter — nothing is counted in 期間 — so the set is spelled
   // out rather than derived from the counter properties.
   static constexpr std::array<char32_t, 8> kDurationHeads = {U'時', U'期', U'週', U'年', U'月', U'日', U'分', U'秒'};
-  return std::find(kDurationHeads.begin(), kDurationHeads.end(), code_point) != kDurationHeads.end();
+  return kana::isCodepointIn(kDurationHeads, code_point);
 }
 
 bool isDerivationalNounSuffixKanji(char32_t code_point) {

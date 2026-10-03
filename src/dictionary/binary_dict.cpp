@@ -470,10 +470,7 @@ const DictionaryEntry* BinaryDictionary::lookupExact(std::string_view surface, c
 }
 
 const DictionaryEntry* BinaryDictionary::getEntry(uint32_t idx) const {
-  if (idx < entries_.size()) {
-    return &entries_[idx];
-  }
-  return nullptr;
+  return entryAt(entries_, idx);
 }
 
 // BinaryDictWriter implementation

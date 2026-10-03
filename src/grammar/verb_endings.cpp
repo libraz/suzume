@@ -50,12 +50,7 @@ std::vector<TaggedVerbEnding> generateGodanEndings() {
       continue;
     }
     const auto& row = *row_ptr;
-    const GodanVowels vowels = encodeGodanVowels(row);
-    const std::string& base = vowels.base;
-    const std::string& a_row = vowels.a;
-    const std::string& i_row = vowels.i;
-    const std::string& e_row = vowels.e;
-    const std::string& o_row = vowels.o;
+    const auto [base, a_row, i_row, e_row, o_row] = encodeGodanVowels(row);
 
     // Onbinkei (音便形): explicit onbin (い/っ/ん) or, for サ行, the い段 form.
     endings.push_back({{onbinFormOf(row), base, type, true}, conn::kVerbOnbinkei});

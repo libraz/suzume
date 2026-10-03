@@ -6,6 +6,7 @@
 #endif
 
 #include "core/types.h"
+#include "dictionary/dictionary_lookup.h"
 #include "dictionary/source_parser.h"
 #include "normalize/utf8.h"
 
@@ -89,10 +90,7 @@ const DictionaryEntry* UserDictionary::lookupExact(std::string_view surface, cor
 }
 
 const DictionaryEntry* UserDictionary::getEntry(uint32_t idx) const {
-  if (idx < entries_.size()) {
-    return &entries_[idx];
-  }
-  return nullptr;
+  return entryAt(entries_, idx);
 }
 
 void UserDictionary::clear() {

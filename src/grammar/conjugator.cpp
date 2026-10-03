@@ -52,12 +52,7 @@ std::vector<StemForm> Conjugator::generateGodanStems(const std::string& stem, co
     return forms;
   }
 
-  const GodanVowels vowels = encodeGodanVowels(*row);
-  const std::string& base_suffix = vowels.base;
-  const std::string& a_suffix = vowels.a;
-  const std::string& i_suffix = vowels.i;
-  const std::string& e_suffix = vowels.e;
-  const std::string& o_suffix = vowels.o;
+  const auto [base_suffix, a_suffix, i_suffix, e_suffix, o_suffix] = encodeGodanVowels(*row);
 
   // 終止形 (Base)
   forms.push_back({base_form, type, base_suffix, conn::kVerbBase});

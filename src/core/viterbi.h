@@ -153,15 +153,6 @@ class Viterbi {
     struct PositionStates {
       std::vector<KeyState> keys;
 
-      StateSlots* find(uint16_t epos_idx) {
-        for (auto& key : keys) {
-          if (key.epos_idx == epos_idx) {
-            return &key.slots;
-          }
-        }
-        return nullptr;
-      }
-
       const StateSlots* find(uint16_t epos_idx) const {
         for (const auto& key : keys) {
           if (key.epos_idx == epos_idx) {
@@ -170,6 +161,8 @@ class Viterbi {
         }
         return nullptr;
       }
+
+      StateSlots* find(uint16_t epos_idx) { return const_cast<StateSlots*>(std::as_const(*this).find(epos_idx)); }
 
       StateSlots& getOrCreate(uint16_t epos_idx) {
         if (StateSlots* existing = find(epos_idx); existing != nullptr) {
