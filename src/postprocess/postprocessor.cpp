@@ -210,6 +210,7 @@ std::vector<core::Morpheme> Postprocessor::process(std::vector<core::Morpheme> r
   resolver::resolveSouHost(result);
   resolver::resolveCopulaAru(result);
   resolver::mergeContractedTeruBeforeNominalizer(result);
+  resolver::resolveListingTari(result);
 
   if (!options_.lemmatize) {
     // Role resolution must still run to supply POS and conjugation annotations,

@@ -180,6 +180,7 @@ _TE_CONTINUATION_HEADS = postprocessor_subsidiaries._TE_CONTINUATION_HEADS
 _TOKU_FABRICATED_TAILS = postprocessor_subsidiaries._TOKU_FABRICATED_TAILS
 postprocess_negative_host = postprocessor_subsidiaries.postprocess_negative_host
 postprocess_sou_host = postprocessor_subsidiaries.postprocess_sou_host
+postprocess_listing_tari = postprocessor_classical.postprocess_listing_tari
 postprocess_closed_subsidiary_aux = postprocessor_subsidiaries.postprocess_closed_subsidiary_aux
 postprocess_contracted_iku_lemma = postprocessor_subsidiaries.postprocess_contracted_iku_lemma
 postprocess_contracted_progressive_aux = postprocessor_subsidiaries.postprocess_contracted_progressive_aux
@@ -332,6 +333,7 @@ POSTPROCESSORS: tuple[tuple[str, Callable[[list[dict]], bool]], ...] = (
     ("adverbial-na-adjective", postprocess_adverbial_na_adjective),
     ("negative-host", postprocess_negative_host),
     ("sou-host", postprocess_sou_host),
+    ("listing-tari", postprocess_listing_tari),
 )
 
 

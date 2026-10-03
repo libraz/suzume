@@ -265,4 +265,24 @@ void mergeContractedTeruBeforeNominalizer(std::vector<core::Morpheme>& result) {
   }
 }
 
+// The classical perfect たり takes a plain continuative (咲き+たり); an onbin
+// stem only takes the listing particle (行っ+たり, だっ+たり, 読ん+だり), and so
+// does the second member of a pair already opened in the sentence.
+void resolveListingTari(std::vector<core::Morpheme>& result) {
+  bool listing_opened = false;
+  for (size_t idx = 0; idx < result.size(); ++idx) {
+    auto& tari = result[idx];
+    if (!utf8::equalsAny(tari.surface, {"たり", "だり"})) {
+      continue;
+    }
+    const bool onbin_host =
+        idx > 0 && (utf8::endsWith(result[idx - 1].surface, "っ") || utf8::endsWith(result[idx - 1].surface, "ん") ||
+                    utf8::endsWith(result[idx - 1].surface, "い"));
+    if ((onbin_host || listing_opened) && tari.pos != core::PartOfSpeech::Particle) {
+      retagUninflected(tari, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleConj, tari.surface);
+    }
+    listing_opened = true;
+  }
+}
+
 }  // namespace suzume::postprocess::resolver

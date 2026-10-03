@@ -302,6 +302,34 @@ def postprocess_classical_honorific_aux(tokens: list[dict]) -> bool:
     return changed
 
 
+def _is_listing_tari(tokens: list[dict], idx: int) -> bool:
+    """Whether たり/だり at @p idx is the listing particle rather than the perfect.
+
+    The classical perfect たり takes a plain continuative (咲き+たり); an onbin
+    stem (行っ+たり, だっ+たり, 読ん+だり) only takes the listing particle, and so
+    does the second member of a pair already opened in the sentence.
+    """
+    if idx == 0:
+        return False
+    previous_surface = tokens[idx - 1].get("surface", "")
+    if previous_surface.endswith(("っ", "ん", "い")):
+        return True
+    return any(token.get("surface") in ("たり", "だり") for token in tokens[:idx])
+
+
+def postprocess_listing_tari(tokens: list[dict]) -> bool:
+    """Tag the listing たり/だり as the particle wherever the frame identifies it."""
+    changed = False
+    for idx, token in enumerate(tokens):
+        if token.get("surface") not in ("たり", "だり") or not _is_listing_tari(tokens, idx):
+            continue
+        if token.get("pos") != "Particle" or token.get("lemma") != token["surface"]:
+            token["pos"] = "Particle"
+            token["lemma"] = token["surface"]
+            changed = True
+    return changed
+
+
 def postprocess_classical_perfect_aux(tokens: list[dict]) -> bool:
     """Normalize たり's terminal/adnominal cells and 已然形+り."""
     changed = False
@@ -310,7 +338,11 @@ def postprocess_classical_perfect_aux(tokens: list[dict]) -> bool:
             continue
         previous = tokens[idx - 1]
         surface = token.get("surface")
-        is_terminal_perfect = surface == "たり" and (idx == len(tokens) - 1 or tokens[idx + 1].get("surface") == "けり")
+        is_terminal_perfect = (
+            surface == "たり"
+            and (idx == len(tokens) - 1 or tokens[idx + 1].get("surface") == "けり")
+            and not _is_listing_tari(tokens, idx)
+        )
         is_adnominal_perfect = surface == "たる" and token.get("pos") == "Auxiliary"
         if is_terminal_perfect or is_adnominal_perfect:
             if previous.get("pos") == "Noun":
