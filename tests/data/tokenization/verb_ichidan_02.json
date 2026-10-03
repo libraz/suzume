@@ -1477,6 +1477,62 @@
       ],
       "id": "shigotowosusumeru",
       "input": "しごとをすすめる。"
+    },
+    {
+      "description": "見にくい - regression test",
+      "expected": [
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "にくい",
+          "pos": "Adjective",
+          "surface": "にくい"
+        }
+      ],
+      "id": "nikui",
+      "input": "見にくい"
+    },
+    {
+      "description": "寝にくい - regression test",
+      "expected": [
+        {
+          "lemma": "寝る",
+          "pos": "Verb",
+          "surface": "寝"
+        },
+        {
+          "lemma": "にくい",
+          "pos": "Adjective",
+          "surface": "にくい"
+        }
+      ],
+      "id": "nikui_2",
+      "input": "寝にくい"
+    },
+    {
+      "description": "見にくかった - regression test",
+      "expected": [
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "にくい",
+          "pos": "Adjective",
+          "surface": "にくかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "nikukattta",
+      "input": "見にくかった"
     }
   ],
   "description": "Ichidan verbs (一段動詞) (part 2/2)",
