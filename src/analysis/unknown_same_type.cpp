@@ -1461,6 +1461,20 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
           }
         }
       }
+      // Nor may it absorb a registered irrealis and the auxiliary that selects
+      // it (あら+ん+や): that is a finished predicate, not a noun.
+      bool opens_on_irrealis_chain = false;
+      for (size_t stem_end = start_pos + 1; stem_end < scan && !opens_on_irrealis_chain && dict_manager_ != nullptr;
+           ++stem_end) {
+        const auto* irrealis =
+            lookupEntryInRange(*dict_manager_, codepoints, start_pos, stem_end, core::PartOfSpeech::Verb);
+        const auto* auxiliary =
+            lookupEntryInRange(*dict_manager_, codepoints, stem_end, stem_end + 1, core::PartOfSpeech::Auxiliary);
+        opens_on_irrealis_chain = irrealis != nullptr && auxiliary != nullptr &&
+                                  irrealis->extended_pos == core::ExtendedPOS::VerbMizenkei &&
+                                  (auxiliary->extended_pos == core::ExtendedPOS::AuxNegativeNu ||
+                                   auxiliary->extended_pos == core::ExtendedPOS::AuxVolitional);
+      }
       // A case particle can complete a formal noun whose first mora was
       // accidentally absorbed by this rescue candidate (くる+こと, おく+こと).
       // The right formal noun is closed-class evidence, so it wins over an
@@ -1479,8 +1493,8 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       }
       if ((len >= min_len || short_bos_preparatory_homograph) &&
           (right_particle || right_clause || right_auxiliary || right_kanji_word) && !crossed_verified_predicate &&
-          !cuts_into_predicate && !has_inflected_predicate_reading && !spells_contracted_hypothetical &&
-          !steals_formal_noun_head && !absorbs_copula_before_sokuon_final &&
+          !cuts_into_predicate && !opens_on_irrealis_chain && !has_inflected_predicate_reading &&
+          !spells_contracted_hypothetical && !steals_formal_noun_head && !absorbs_copula_before_sokuon_final &&
           (!hasAuxiliaryParticleDecomposition(codepoints, start_pos, scan, dict_manager_) ||
            has_deverbal_noun_shape_before_genitive || copula_selected_predicate_homograph) &&
           (!hasFunctionWordChainDecomposition(codepoints, start_pos, scan, dict_manager_) ||
