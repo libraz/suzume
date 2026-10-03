@@ -347,16 +347,20 @@ void resolveClosedInflectionalChains(std::vector<core::Morpheme>& result) {
     auto& stem = result[idx];
     auto& past = result[idx + 1];
     const bool past_surface = grammar::isPastMarkerTaDaSurface(past.surface);
+    const bool past_ta = past.surface == "た";
     // Surface だ is also the copula after nouns and formal nouns; it can only
     // close an already-verbal onbin chain below, never license conversion of a
-    // non-predicate predecessor by itself.
-    if (past.surface == "た" && stem.pos != core::PartOfSpeech::Verb && stem.pos != core::PartOfSpeech::Auxiliary &&
-        stem.pos != core::PartOfSpeech::Adjective) {
+    // non-predicate predecessor by itself. A particle is closed-class and
+    // never a predicate stem: quotative って+た is the colloquial ellipsis of
+    // って言ってた, not a fabricated ichidan ってる.
+    if (past_ta && stem.pos != core::PartOfSpeech::Verb && stem.pos != core::PartOfSpeech::Auxiliary &&
+        stem.pos != core::PartOfSpeech::Adjective && stem.pos != core::PartOfSpeech::Particle) {
       restore_renyokei(stem);
     }
     const bool accepts_past =
         stem.extended_pos == core::ExtendedPOS::VerbRenyokei || stem.extended_pos == core::ExtendedPOS::VerbOnbinkei ||
-        stem.extended_pos == core::ExtendedPOS::AdjKatt || stem.extended_pos == core::ExtendedPOS::AuxNegativeNai;
+        stem.extended_pos == core::ExtendedPOS::AdjKatt || stem.extended_pos == core::ExtendedPOS::AuxNegativeNai ||
+        (stem.pos == core::PartOfSpeech::Particle && past_ta);
     if (past_surface && accepts_past && past.extended_pos != core::ExtendedPOS::AuxTenseTa) {
       retagUninflected(past, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxTenseTa, past.surface);
     }

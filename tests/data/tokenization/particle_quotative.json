@@ -195,6 +195,55 @@
       ],
       "id": "kamottte_ttta",
       "input": "雨かもって思った"
+    },
+    {
+      "description": "Quotative って before past た stays a particle (ellipsis of って言ってた)",
+      "expected": [
+        {
+          "lemma": "明日",
+          "pos": "Noun",
+          "surface": "明日"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来る"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ruttteta",
+      "input": "明日来るってた"
+    },
+    {
+      "description": "Past た after a quoting particle is the past auxiliary",
+      "expected": [
+        {
+          "lemma": "雨",
+          "pos": "Noun",
+          "surface": "雨"
+        },
+        {
+          "lemma": "だって",
+          "pos": "Particle",
+          "surface": "だって"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "dattteta",
+      "input": "雨だってた"
     }
   ],
   "description": "particle_quotative tests",
