@@ -664,48 +664,43 @@ bool insideKanjiVerbOkurigana(const core::Lattice& lattice, size_t start_pos) {
   return false;
 }
 
+// Whether an edge ending at pos satisfies edge_pred while an edge ending at
+// that edge's start satisfies host_pred.
+template <typename EdgePred, typename HostPred>
+bool followsHostedEdge(const core::Lattice& lattice, size_t pos, EdgePred edge_pred, HostPred host_pred) {
+  return core::anyEdgeEndingAt(lattice, pos, [&](const core::LatticeEdge& edge) {
+    return edge_pred(edge) && core::anyEdgeEndingAt(lattice, edge.start, host_pred);
+  });
+}
+
 // A formal noun after the negative-quote frame (…ん+と) must not hide a
 // dictionary verb irrealis plus the following negative auxiliary.  This is a
 // structural ambiguity: the formal-noun edge has no predicate host there,
 // while the split supplies one.  Keep ordinary formal-noun uses (結果いかんで)
 // and unrelated quotative phrases available.
 bool followsNegativeQuote(const core::Lattice& lattice, size_t start_pos) {
-  for (const uint32_t quote_id : lattice.edgeIdsEndingAt(start_pos)) {
-    const auto& quote = lattice.getEdge(quote_id);
-    // と is lexically ambiguous between a quotation and a case particle.  In
-    // this frame the preceding negative predicate supplies the quoted clause,
-    // so either dictionary label represents the same boundary.
-    if (quote.extended_pos != core::ExtendedPOS::ParticleQuote &&
-        !(quote.extended_pos == core::ExtendedPOS::ParticleCase &&
-          grammar::isSingleHiragana(quote.surface, core::hiragana::kTo))) {
-      continue;
-    }
-    if (core::anyEdgeEndingAt(lattice, quote.start, [](const core::LatticeEdge& negative) {
-          return negative.extended_pos == core::ExtendedPOS::AuxNegativeNu;
-        })) {
-      return true;
-    }
-  }
-  return false;
+  return followsHostedEdge(
+      lattice, start_pos,
+      [](const core::LatticeEdge& quote) {
+        // と is lexically ambiguous between a quotation and a case particle.
+        // In this frame the preceding negative predicate supplies the quoted
+        // clause, so either dictionary label represents the same boundary.
+        return quote.extended_pos == core::ExtendedPOS::ParticleQuote ||
+               (quote.extended_pos == core::ExtendedPOS::ParticleCase &&
+                grammar::isSingleHiragana(quote.surface, core::hiragana::kTo));
+      },
+      [](const core::LatticeEdge& negative) { return negative.extended_pos == core::ExtendedPOS::AuxNegativeNu; });
 }
 
+// A nasal onbin happens to contain a competing one-mora ん entry (読ん+どく).
+// It is a negative only when it has an actual irrealis host, as in
+// 確認せ+ん+と.  Checking the immediate lattice predecessor keeps this guard
+// structural instead of suppressing every accidental ん edge.
 bool followsNegativeAuxiliary(const core::Lattice& lattice, size_t start_pos) {
-  for (const uint32_t negative_id : lattice.edgeIdsEndingAt(start_pos)) {
-    const auto& negative = lattice.getEdge(negative_id);
-    if (negative.extended_pos != core::ExtendedPOS::AuxNegativeNu) {
-      continue;
-    }
-    // A nasal onbin happens to contain a competing one-mora ん entry
-    // (読ん+どく).  It is a negative only when it has an actual irrealis host,
-    // as in 確認せ+ん+と.  Checking the immediate lattice predecessor keeps
-    // this guard structural instead of suppressing every accidental ん edge.
-    if (core::anyEdgeEndingAt(lattice, negative.start, [](const core::LatticeEdge& host) {
-          return host.extended_pos == core::ExtendedPOS::VerbMizenkei;
-        })) {
-      return true;
-    }
-  }
-  return false;
+  return followsHostedEdge(
+      lattice, start_pos,
+      [](const core::LatticeEdge& negative) { return negative.extended_pos == core::ExtendedPOS::AuxNegativeNu; },
+      [](const core::LatticeEdge& host) { return host.extended_pos == core::ExtendedPOS::VerbMizenkei; });
 }
 
 // The contracted explanatory nominalizer in …てん/…でん follows a
@@ -713,22 +708,17 @@ bool followsNegativeAuxiliary(const core::Lattice& lattice, size_t start_pos) {
 // irrealis host, so retaining that homograph here can only fabricate an
 // impossible analysis (読ん+で+ん+の).  Checking the preceding lattice edge
 // makes this a grammatical boundary guard rather than a surface exception.
+// The boundary is explanatory only when the conjunctive particle itself
+// follows a predicate.  A kana inside an Ichidan host (慌て+ずに) also has a
+// competing one-mora て particle edge, but its left neighbor is a noun
+// fragment rather than the te-form's predicate.
 bool followsConjunctiveTeDe(const core::Lattice& lattice, size_t start_pos) {
-  for (const uint32_t edge_id : lattice.edgeIdsEndingAt(start_pos)) {
-    const auto& edge = lattice.getEdge(edge_id);
-    if (edge.extended_pos != core::ExtendedPOS::ParticleConj || !grammar::isTeDeSurface(edge.surface)) {
-      continue;
-    }
-    // The boundary is explanatory only when the conjunctive particle itself
-    // follows a predicate.  A kana inside an Ichidan host (慌て+ずに) also has
-    // a competing one-mora て particle edge, but its left neighbor is a noun
-    // fragment rather than the te-form's predicate.
-    if (core::anyEdgeEndingAt(lattice, edge.start,
-                              [](const core::LatticeEdge& host) { return host.pos == core::PartOfSpeech::Verb; })) {
-      return true;
-    }
-  }
-  return false;
+  return followsHostedEdge(
+      lattice, start_pos,
+      [](const core::LatticeEdge& edge) {
+        return edge.extended_pos == core::ExtendedPOS::ParticleConj && grammar::isTeDeSurface(edge.surface);
+      },
+      [](const core::LatticeEdge& host) { return host.pos == core::PartOfSpeech::Verb; });
 }
 
 // A candidate span whose last character is the contracted negative ん competes
