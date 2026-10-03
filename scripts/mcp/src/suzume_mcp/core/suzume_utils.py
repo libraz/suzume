@@ -25,6 +25,7 @@ from .postprocessors import (
     repair_interrogative_nande,
     repair_kanji_prefix_before_kana_noun,
     repair_kko_nominalizer,
+    repair_lengthened_negative,
     repair_productive_causative,
     repair_regional_imperative,
     split_transparent_suru_te_adverb,
@@ -223,6 +224,7 @@ def get_expected_tokens(text: str, suzume_tokens: list[dict] | None = None) -> t
     merge_reason_nde(raw_tokens)
     repair_contracted_rareru(raw_tokens)
     repair_contracted_iika(raw_tokens)
+    repair_lengthened_negative(raw_tokens)
     _merge_ideographic_variation_selectors(raw_tokens)
 
     # Fix MeCab POS errors (before POS mapping)

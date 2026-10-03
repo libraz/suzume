@@ -2490,6 +2490,35 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
         return std::any_of(following_results.begin(), following_results.end(),
                            [](const auto& following) { return following.entry != nullptr && following.length == 2; });
       };
+      // A one-mora host whose vowel is held with ー or a small vowel can respell
+      // a registered two-mora word (ね+ー, ね+ぇ for ねえ): the span is that
+      // word, with its own class and lemma, and not the host drawn out.
+      if (normalize::utf8Length(result.entry->surface) == 1 && emphatic.end == end_pos + 1) {
+        const char32_t held = codepoints[end_pos];
+        const char32_t vowel = grammar::getVowelForChar(codepoints[end_pos - 1]);
+        if (held == U'ー' || (kana::isSmallKanaCodepoint(held) && held + 1 == vowel)) {
+          const std::string respelled = result.entry->surface + normalize::encodeUtf8(vowel);
+          bool respells_word = false;
+          for (const auto& word : dict_manager_.lookup(respelled, 0)) {
+            if (word.entry == nullptr || word.length != normalize::utf8Length(respelled)) {
+              continue;
+            }
+            respells_word = true;
+            // Each host reading at this position reaches here; one of them adds the word.
+            if (result.entry->pos == core::PartOfSpeech::Particle) {
+              lattice.addEdge(extractSubstring(codepoints, start_pos, emphatic.end), static_cast<uint32_t>(start_pos),
+                              static_cast<uint32_t>(emphatic.end), word.entry->pos,
+                              getCategoryCost(word.entry->extended_pos), core::LatticeEdge::kFromDictionary,
+                              word.entry->lemma.empty() ? respelled : word.entry->lemma,
+                              dictionary::ConjugationType::None, core::CandidateOrigin::Dictionary,
+                              candidate::kDictionaryOriginConfidence, {}, word.entry->extended_pos, "dict_respelled");
+            }
+          }
+          if (respells_word) {
+            continue;
+          }
+        }
+      }
       const bool lengthening_spells_word = lengthening_spells_word_at();
       const bool unlicensed_particle_lengthening =
           result.entry->pos == core::PartOfSpeech::Particle && !bare_sokuon && !holds_final_particle_vowel();

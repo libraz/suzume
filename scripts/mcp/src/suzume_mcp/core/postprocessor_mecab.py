@@ -968,6 +968,32 @@ def repair_contracted_iika(tokens: list[dict]) -> None:
             ]
 
 
+def repair_lengthened_negative(tokens: list[dict]) -> None:
+    """Read ねー after an irrealis or an adjective's く as the negative ない.
+
+    The reference already reads ねぇ and ねえ there as the colloquial ない, but
+    takes the ー spelling for the final particle ね; a final particle cannot
+    follow a bare irrealis or continuative.
+    """
+    for idx in range(1, len(tokens)):
+        host, token = tokens[idx - 1], tokens[idx]
+        if (
+            token.get("surface") == "ねー"
+            and token.get("pos") == "助詞"
+            and (
+                (host.get("pos") == "動詞" and host.get("conj_form") == "未然形")
+                or (host.get("pos") == "形容詞" and host.get("conj_form", "").startswith("連用"))
+            )
+        ):
+            tokens[idx] = {
+                "surface": "ねー",
+                "pos": "助動詞",
+                "conj_type": "特殊・ナイ",
+                "conj_form": "音便基本形",
+                "lemma": "ない",
+            }
+
+
 def merge_conjunction_with_rashii(tokens: list[dict]) -> None:
     """Rebuild an adjective in らしい the reference dictionary reads as a conjunction.
 

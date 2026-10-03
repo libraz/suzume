@@ -733,4 +733,8 @@ def postprocess_held_final_particle(tokens: list[dict]) -> bool:
         ):
             token.update(pos="Particle", lemma=surface[0])
             changed = True
+        # ねぇ and ねー are spellings of the registered final particle ねえ.
+        elif surface in ("ねぇ", "ねー") and token.get("pos") == "Particle" and token.get("lemma") != "ねえ":
+            token["lemma"] = "ねえ"
+            changed = True
     return changed
