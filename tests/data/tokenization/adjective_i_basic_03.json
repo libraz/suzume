@@ -1572,6 +1572,64 @@
       ],
       "id": "motttomorashikattta",
       "input": "もっともらしかった。"
+    },
+    {
+      "description": "わるい - regression test",
+      "expected": [
+        {
+          "lemma": "わるい",
+          "pos": "Adjective",
+          "surface": "わるい"
+        }
+      ],
+      "id": "warui",
+      "input": "わるい"
+    },
+    {
+      "description": "ずるい - regression test",
+      "expected": [
+        {
+          "lemma": "ずるい",
+          "pos": "Adjective",
+          "surface": "ずるい"
+        }
+      ],
+      "id": "zurui",
+      "input": "ずるい"
+    },
+    {
+      "description": "わるかった - regression test",
+      "expected": [
+        {
+          "lemma": "わるい",
+          "pos": "Adjective",
+          "surface": "わるかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "warukattta",
+      "input": "わるかった"
+    },
+    {
+      "description": "わるくない - regression test",
+      "expected": [
+        {
+          "lemma": "わるい",
+          "pos": "Adjective",
+          "surface": "わるく"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "warukunai",
+      "input": "わるくない"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 3/3)",
