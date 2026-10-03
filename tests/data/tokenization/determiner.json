@@ -372,6 +372,60 @@
       ],
       "id": "onaji_no",
       "input": "おなじ色の服"
+    },
+    {
+      "description": "kana spelling of the determiner 大きな",
+      "expected": [
+        {
+          "lemma": "おおきな",
+          "pos": "Determiner",
+          "surface": "おおきな"
+        },
+        {
+          "lemma": "犬",
+          "pos": "Noun",
+          "surface": "犬"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "いる"
+        }
+      ],
+      "id": "ookina_gairu",
+      "input": "おおきな犬がいる"
+    },
+    {
+      "description": "kana spelling of the determiner 小さな",
+      "expected": [
+        {
+          "lemma": "ちいさな",
+          "pos": "Determiner",
+          "surface": "ちいさな"
+        },
+        {
+          "lemma": "家",
+          "pos": "Noun",
+          "surface": "家"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "住む",
+          "pos": "Verb",
+          "surface": "住む"
+        }
+      ],
+      "id": "chiisana_ni_mu",
+      "input": "ちいさな家に住む"
     }
   ],
   "description": "determiner tests",

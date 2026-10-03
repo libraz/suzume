@@ -62,6 +62,8 @@ EntrySpecRange getDeterminerEntries() {
       // Kanji determiners must win over unknown-noun candidates.
       det("大きな", ""),
       det("小さな", ""),
+      det("おおきな", ""),
+      det("ちいさな", ""),
       det("おっきな", ""),  // colloquial variant of 大きな
 
       // Classical possessive determiner (我が家, 我が子, 我が国)
