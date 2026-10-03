@@ -64,9 +64,11 @@ class Trie {
    * @brief Prefix match lookup (all prefixes of key)
    * @param text Text to search
    * @param start_pos Start position in text
-   * @return Vector of (length, entry_ids) pairs
+   * @return Vector of (length, entry_ids) pairs; entry_ids point into the trie and
+   *         stay valid until the trie is modified or cleared
    */
-  std::vector<std::pair<size_t, std::vector<uint32_t>>> prefixMatch(std::string_view text, size_t start_pos = 0) const;
+  std::vector<std::pair<size_t, const std::vector<uint32_t>*>> prefixMatch(std::string_view text,
+                                                                           size_t start_pos = 0) const;
 
   /**
    * @brief Get number of entries

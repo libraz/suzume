@@ -5,11 +5,8 @@
 
 #include "patterns.h"
 
-#include <string>
-
 #include "core/kana_constants.h"
 #include "core/utf8_constants.h"
-#include "normalize/utf8.h"
 
 namespace suzume::grammar {
 
@@ -21,9 +18,8 @@ bool endsWithVerbNegative(std::string_view surface) {
   }
 
   // Godan verb mizenkei + ない (a-row + ない)
-  // か(ka), が(ga), さ(sa), た(ta), ば(ba), ま(ma), な(na), ら(ra), わ(wa)
-  if (utf8::equalsAny(last9,
-                      {"かない", "がない", "さない", "たない", "ばない", "まない", "らない", "わない", "なない"})) {
+  if (last9.substr(core::kJapaneseCharBytes) == "ない" &&
+      utf8::equalsAny(last9.substr(0, core::kJapaneseCharBytes), kana::kMizenkeiEndings)) {
     return true;
   }
 
@@ -74,13 +70,13 @@ bool endsWithNegativeBecomePattern(std::string_view surface) {
 }
 
 bool endsWithGodanNegativeRenyokei(std::string_view surface) {
-  for (std::string_view ending : kana::kMizenkeiEndings) {
-    const std::string suffix = normalize::concat(ending, "なく");
-    if (surface.size() > suffix.size() && utf8::endsWith(surface, suffix)) {
-      return true;
-    }
+  // Mizenkei ending + なく, with at least one character before it
+  if (surface.size() <= core::kThreeJapaneseCharBytes || !utf8::endsWith(surface, "なく")) {
+    return false;
   }
-  return false;
+  const std::string_view ending =
+      surface.substr(surface.size() - core::kThreeJapaneseCharBytes, core::kJapaneseCharBytes);
+  return utf8::equalsAny(ending, kana::kMizenkeiEndings);
 }
 
 }  // namespace suzume::grammar

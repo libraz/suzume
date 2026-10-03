@@ -54,22 +54,13 @@ constexpr ConjSuffix kIchidanFull[] = {
     {"ない", conn::kAuxOutBase}, {"なかった", conn::kAuxOutTa}, {"なくて", conn::kAuxOutTe},
 };
 
-// Te-attachment limited forms (4 suffixes, no negative, no masu)
-// ます/ました forms are excluded so the verb and politeness auxiliary stay separate.
-constexpr ConjSuffix kIchidanTeAttach[] = {
-    {"る", conn::kAuxOutBase},
-    {"た", conn::kAuxOutTa},
-    {"たら", conn::kAuxOutBase},
-    {"て", conn::kAuxOutTe},
-};
-
-// Progressive いる forms (6 suffixes, no negative)
-// The negative is compositional い(mizenkei) + ない(AUX).
-// E.g., 食べていない → 食べ+て+い+ない, not 食べ+て+いない
-constexpr ConjSuffix kIchidanProgressive[] = {
-    {"る", conn::kAuxOutBase}, {"た", conn::kAuxOutTa},     {"たら", conn::kAuxOutBase},
-    {"て", conn::kAuxOutTe},   {"ます", conn::kAuxOutMasu}, {"ました", conn::kAuxOutTa},
-};
+// Leading subsets of kIchidanFull, taken by count:
+// - Te-attachment forms stop after て (no negative, no masu) so the verb and
+//   politeness auxiliary stay separate.
+// - Progressive いる forms stop after ました (no negative); the negative is
+//   compositional い(mizenkei) + ない(AUX), e.g., 食べていない → 食べ+て+い+ない.
+constexpr size_t kIchidanTeAttachCount = 4;
+constexpr size_t kIchidanProgressiveCount = 6;
 
 // Godan suffix tables (Wa/Ka/Sa/Ra and the いく 促音便 irregular) are derived at
 // startup from Conjugation::getGodanRow() — see appendGodanWithStem() below — so
@@ -571,7 +562,7 @@ void addSpecialPatterns(std::vector<AuxiliaryEntry>& entries) {
       {"直している", kAuxOutBase, kVerbRenyokei},
 
       // Note: ていく forms いった/いって/いったら are generated from the いく
-      // AuxiliaryBase via the irregular 促音便 table (kGodanKaIkuIrregular), so they
+      // AuxiliaryBase with force_sokuonbin (AuxiliaryFormFamily::Sokuonbin), so they
       // are intentionally not duplicated here.
 
       // === Imperative forms for te-form compounds ===
@@ -633,11 +624,11 @@ void appendAuxiliaryBase(const AuxiliaryBase& base, std::vector<AuxiliaryEntry>&
   switch (base.conj_type) {
     case VerbType::Ichidan:
       if (base.form_family == AuxiliaryFormFamily::TeAttachment) {
-        appendWithStem(base, kIchidanTeAttach, std::size(kIchidanTeAttach), result);
+        appendWithStem(base, kIchidanFull, kIchidanTeAttachCount, result);
         return;
       }
       if (base.form_family == AuxiliaryFormFamily::Progressive) {
-        appendWithStem(base, kIchidanProgressive, std::size(kIchidanProgressive), result);
+        appendWithStem(base, kIchidanFull, kIchidanProgressiveCount, result);
         return;
       }
       appendWithStem(base, kIchidanFull, std::size(kIchidanFull), result);

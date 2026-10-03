@@ -21,12 +21,12 @@ namespace {
 // Check if auxiliary starts with voiced te-form (で/だ)
 // startsWith already covers the bare で/だ case, so no separate equalsAny check.
 inline bool isVoicedAux(std::string_view aux) {
-  return utf8::startsWith(aux, "で") || utf8::startsWith(aux, "だ");
+  return utf8::startsWithAny(aux, {"で", "だ"});
 }
 
 // Check if auxiliary starts with unvoiced te-form (て/た)
 inline bool isUnvoicedAux(std::string_view aux) {
-  return utf8::startsWith(aux, "て") || utf8::startsWith(aux, "た");
+  return utf8::startsWithAny(aux, {"て", "た"});
 }
 
 void stableSortByConfidence(std::vector<InflectionCandidate>& candidates) {
@@ -87,17 +87,14 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(std::string_view rema
 
     if (matches) {
       // Extract stem
-      std::string stem(remaining);
-      if (!ending.suffix.empty()) {
-        stem = std::string(remaining.substr(0, remaining.size() - ending.suffix.size()));
-      }
+      std::string stem(remaining.substr(0, remaining.size() - ending.suffix.size()));
 
       // Native カ変 endings are the kana sequence itself (こ/き/くれ/...),
       // so their lexical stem must be empty. A non-empty non-来 prefix is never
       // カ変, and 来 + a kana ending would be an invalid mixed spelling
       // (*来きます). Kanji 来 forms are handled by the existing zero-ending
       // Ichidan match and remapped to Kuru below.
-      if (ending.verb_type == VerbType::Kuru && (!isKuruStem(stem) || !stem.empty())) {
+      if (ending.verb_type == VerbType::Kuru && !stem.empty()) {
         continue;
       }
 
@@ -106,8 +103,7 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(std::string_view rema
       // Without this guard, 話せなくなる is misread as 話する +
       // せなくなる and ties the genuine potential form 話す + せる.
       if (ending.verb_type == VerbType::Suru && ending.suffix == "せ" &&
-          (aux_chain.empty() ||
-           !(utf8::startsWith(aux_chain.back(), "ず") || utf8::startsWith(aux_chain.back(), "ぬ")))) {
+          (aux_chain.empty() || !utf8::startsWithAny(aux_chain.back(), {"ず", "ぬ"}))) {
         continue;
       }
 
@@ -273,26 +269,21 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(std::string_view rema
         }
       }
 
-      // Build base form (use actual_base_suffix for special cases like 来→来る)
-      std::string base_form = stem + actual_base_suffix;
+      InflectionCandidate candidate;
+      // Base form uses actual_base_suffix for special cases like 来→来る
+      candidate.base_form = stem + actual_base_suffix;
 
       // Build suffix chain string
-      std::string suffix_str = ending.suffix;
+      std::string& suffix_str = candidate.suffix;
+      suffix_str = ending.suffix;
       for (auto iter = aux_chain.rbegin(); iter != aux_chain.rend(); ++iter) {
         suffix_str += *iter;
       }
 
-      // Calculate total auxiliary length
-      size_t aux_total_len = 0;
-      for (const auto& aux : aux_chain) {
-        aux_total_len += aux.size();
-      }
+      // Total auxiliary length: the suffix chain minus the verb ending itself
+      const size_t aux_total_len = suffix_str.size() - ending.suffix.size();
       const std::string_view first_aux = aux_chain.empty() ? std::string_view{} : std::string_view(aux_chain.back());
 
-      InflectionCandidate candidate;
-      candidate.base_form = base_form;
-      candidate.stem = stem;
-      candidate.suffix = suffix_str;
       candidate.verb_type = actual_verb_type;  // Use remapped type for 来→Kuru
       candidate.confidence = calculateConfidence(actual_verb_type, stem, aux_total_len, aux_chain.size(), required_conn,
                                                  suffix_str.size(), first_aux, &scorer_options_);
@@ -300,26 +291,18 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(std::string_view rema
       // Ichidan verbs use て/た for te/ta-form, NOT で/だ
       // で/だ are only used for 撥音便 Godan verbs (読む→読んで/読んだ, 遊ぶ→遊んで/遊んだ)
       // Penalize Ichidan + で/だ combinations heavily
-      if (actual_verb_type == VerbType::Ichidan && suffix_str.size() >= core::kJapaneseCharBytes) {
-        // Use string_view::substr to avoid creating temporary std::string
-        std::string_view suffix_view(suffix_str);
-        std::string_view first_char = suffix_view.substr(0, core::kJapaneseCharBytes);
-        if (utf8::equalsAny(first_char, {"で", "だ"})) {
-          candidate.confidence -= 0.6F;  // Strong penalty
-          SUZUME_DEBUG_LOG_VERBOSE("  ichidan_voiced_te_ta_invalid: -0.6\n");
-        }
+      if (actual_verb_type == VerbType::Ichidan && isVoicedAux(suffix_str)) {
+        candidate.confidence -= 0.6F;  // Strong penalty
+        SUZUME_DEBUG_LOG_VERBOSE("  ichidan_voiced_te_ta_invalid: -0.6\n");
       }
 
       // Contracted progressive past: 見てた, 食べてた should split as 見+て+た, 食べ+て+た
       // MeCab splits these, so penalize single-token analysis with suffix starting with てた/でた
       // This ensures 見 + て(VERB) + た(AUX) path wins over 見てた(VERB)
-      if (actual_verb_type == VerbType::Ichidan && suffix_str.size() >= core::kTwoJapaneseCharBytes) {
-        // Use starts_with for safer comparison
-        if (suffix_str.rfind("てた", 0) == 0 || suffix_str.rfind("でた", 0) == 0) {
-          candidate.confidence -= inflection::kPenaltyIchidanContractedProgressivePast;
-          SUZUME_DEBUG_LOG_VERBOSE("  ichidan_contracted_progressive_past: -"
-                                   << inflection::kPenaltyIchidanContractedProgressivePast << "\n");
-        }
+      if (actual_verb_type == VerbType::Ichidan && utf8::startsWithAny(suffix_str, {"てた", "でた"})) {
+        candidate.confidence -= inflection::kPenaltyIchidanContractedProgressivePast;
+        SUZUME_DEBUG_LOG_VERBOSE("  ichidan_contracted_progressive_past: -"
+                                 << inflection::kPenaltyIchidanContractedProgressivePast << "\n");
       }
 
       // Contracted progressive verb stem (〜て/〜で ending as stem of 〜てる/〜でる)
@@ -342,21 +325,18 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(std::string_view rema
       // 知ってる, 食べてる, してる should all split as 音便/連用形 + てる
       // MeCab always splits these, so penalize single-token analysis
       // E.g., 知ってる → 知っ + てる, 食べてる → 食べ + てる
-      if (suffix_str.size() >= core::kTwoJapaneseCharBytes) {
-        std::string_view suffix_view(suffix_str);
-        // Check if suffix ends with てる, てた, でる, でた
-        std::string_view suffix_end = suffix_view.substr(suffix_view.size() - core::kTwoJapaneseCharBytes);
-        if (utf8::equalsAny(suffix_end, {"てる", "てた", "でる", "でた"})) {
-          candidate.confidence -= 0.8F;  // Strong penalty to prefer split
-          SUZUME_DEBUG_LOG_VERBOSE("  contracted_progressive_ending: -0.8\n");
-        }
+      if (utf8::endsWithAny(suffix_str, {"てる", "てた", "でる", "でた"})) {
+        candidate.confidence -= 0.8F;  // Strong penalty to prefer split
+        SUZUME_DEBUG_LOG_VERBOSE("  contracted_progressive_ending: -0.8\n");
       }
 
+      candidate.stem = std::move(stem);
       candidate.morphemes = aux_chain;
 
-      SUZUME_DEBUG_LOG_TRACE("  [STEM MATCH] \"" << remaining << "\" → base=\"" << base_form << "\" stem=\"" << stem
-                                                 << "\" type=" << static_cast<int>(actual_verb_type) << " suffix=\""
-                                                 << suffix_str << "\" conf=" << candidate.confidence << "\n");
+      SUZUME_DEBUG_LOG_TRACE("  [STEM MATCH] \"" << remaining << "\" → base=\"" << candidate.base_form << "\" stem=\""
+                                                 << candidate.stem << "\" type=" << static_cast<int>(actual_verb_type)
+                                                 << " suffix=\"" << suffix_str << "\" conf=" << candidate.confidence
+                                                 << "\n");
 
       candidates.push_back(std::move(candidate));
     }
@@ -459,7 +439,7 @@ const std::vector<InflectionCandidate>& Inflection::analyze(std::string_view sur
           // Boost confidence: explanatory suffix is a strong signal
           boosted.confidence = std::max(cand.confidence, 0.8F);
           boosted.has_explanatory_suffix = true;
-          candidates.push_back(boosted);
+          candidates.push_back(std::move(boosted));
         }
       }
     }

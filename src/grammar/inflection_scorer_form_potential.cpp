@@ -122,8 +122,7 @@ float scoreAdjectiveAndForm(float base, const InflectionScoreContext& context) {
   // These are verb終止形 + そう(hearsay), not i-adjectives. An observed
   // adjective ending is its own evidence, though: わるい, ずるく and かるかった
   // carry the paradigm a verb terminal never has.
-  const bool observes_adjective_ending = utf8::startsWith(first_aux, "い") || utf8::startsWith(first_aux, "く") ||
-                                         utf8::startsWith(first_aux, "か") || utf8::startsWith(first_aux, "け");
+  const bool observes_adjective_ending = utf8::startsWithAny(first_aux, {"い", "く", "か", "け"});
   if (type == VerbType::IAdjective && stem_len >= core::kTwoJapaneseCharBytes && !observes_adjective_ending) {
     std::string_view last = utf8::lastChar(stem);
     if (last == "る") {

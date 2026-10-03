@@ -86,15 +86,6 @@ std::optional<ConjugationType> conjTypeFromAnyAlias(std::string_view str) {
   return std::nullopt;
 }
 
-#ifndef __EMSCRIPTEN__
-namespace {
-
-/**
- * @brief Get home directory path
- */
-}  // namespace
-#endif  // __EMSCRIPTEN__
-
 DictionaryManager::DictionaryManager() : core_dict_(std::make_unique<CoreDictionary>()) {}
 
 DictionaryManager::~DictionaryManager() = default;

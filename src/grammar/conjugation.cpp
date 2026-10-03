@@ -285,7 +285,7 @@ VerbType Conjugation::detectType(const std::string& base_form) {
   }
 
   // Check last character
-  std::string last(utf8::lastChar(base_form));
+  const std::string_view last = utf8::lastChar(base_form);
 
   // Special verbs
   if (base_form == "する") {
@@ -312,7 +312,8 @@ VerbType Conjugation::detectType(const std::string& base_form) {
     // If second-to-last char is え段 or い段, likely 一段
     // This is a heuristic - not always correct
     if (base_form.size() >= core::kTwoJapaneseCharBytes) {
-      std::string prev = base_form.substr(base_form.size() - core::kTwoJapaneseCharBytes, core::kJapaneseCharBytes);
+      const std::string_view prev =
+          std::string_view(base_form).substr(base_form.size() - core::kTwoJapaneseCharBytes, core::kJapaneseCharBytes);
       // An e-row (え段) or i-row (い段) hiragana before the final る marks an
       // Ichidan verb (食べ+る, 見え+る); a kanji or other kana ending falls
       // through to GodanRa.
@@ -328,7 +329,7 @@ VerbType Conjugation::detectType(const std::string& base_form) {
   // by its base_vowel. る is resolved above (Ichidan vs GodanRa) and never reaches
   // here; deriving from getGodanRows() keeps this in sync with the single
   // Godan-row source of truth instead of a parallel hand-written branch chain.
-  const char32_t last_cp = utf8::decodeFirstChar(last);
+  const char32_t last_cp = utf8::decodeLastChar(base_form);
   for (const auto& [type, row] : getGodanRows()) {
     if (row.base_vowel == last_cp) {
       return type;
@@ -342,11 +343,7 @@ std::vector<Conjugation::DictionarySuffix> Conjugation::getDictionarySuffixes(Ve
                                                                               std::string_view base_form) const {
   std::vector<DictionarySuffix> suffixes;
 
-  if (isGodanVerbType(type)) {
-    const GodanRow* row_ptr = getGodanRow(type);
-    if (row_ptr == nullptr) {
-      return suffixes;
-    }
+  if (const GodanRow* row_ptr = getGodanRow(type)) {
     const auto& row = *row_ptr;
 
     const auto [base, a, i, e, o] = encodeGodanVowels(row);

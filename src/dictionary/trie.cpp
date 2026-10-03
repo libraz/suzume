@@ -61,8 +61,9 @@ const std::vector<uint32_t>* Trie::lookupView(std::string_view key) const {
   return node->entry_ids.empty() ? nullptr : &node->entry_ids;
 }
 
-std::vector<std::pair<size_t, std::vector<uint32_t>>> Trie::prefixMatch(std::string_view text, size_t start_pos) const {
-  std::vector<std::pair<size_t, std::vector<uint32_t>>> results;
+std::vector<std::pair<size_t, const std::vector<uint32_t>*>> Trie::prefixMatch(std::string_view text,
+                                                                               size_t start_pos) const {
+  std::vector<std::pair<size_t, const std::vector<uint32_t>*>> results;
   const TrieNode* node = root_.get();
   size_t pos = start_pos;
   size_t char_count = 0;
@@ -77,7 +78,7 @@ std::vector<std::pair<size_t, std::vector<uint32_t>>> Trie::prefixMatch(std::str
     ++char_count;
 
     if (!node->entry_ids.empty()) {
-      results.emplace_back(char_count, node->entry_ids);
+      results.emplace_back(char_count, &node->entry_ids);
     }
   }
 

@@ -257,7 +257,7 @@ float scoreStemAndIchidan(float base, const InflectionScoreContext& context) {
       // Applies even in kVerbBase context (aux_count == 0): the shape is invalid regardless.
       // (E-row stems are handled in the branch above; only i-row remains as a valid ending.)
       if (stem_len >= core::kJapaneseCharBytes) {
-        char32_t last_cp = utf8::decodeFirstChar(utf8::lastChar(stem));
+        char32_t last_cp = utf8::decodeLastChar(stem);
         if (kana::isHiraganaCodepoint(last_cp) && !kana::isIRowCodepoint(last_cp) && !kana::isERowCodepoint(last_cp)) {
           // Strong penalty - this pattern is grammatically impossible for Ichidan
           base -= inflection::kPenaltyIchidanInvalidRowStem;

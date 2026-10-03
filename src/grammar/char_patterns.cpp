@@ -537,12 +537,9 @@ bool isSmallKana(std::string_view ch) {
 // Godan mizenkei endings.
 // In particular だ (copula) and は must NOT match here, so this cannot be
 // replaced by the kana::isARowCodepoint predicate the way endsWithORow uses
-// isORowCodepoint. The curated list is the source of truth for this grammar.
-const char* kARowEndings[] = {"あ", "か", "が", "さ", "た", "な", "ば", "ま", "ら", "わ"};
-const size_t kARowCount = 10;
-
+// isORowCodepoint. kana::kMizenkeiEndings plus あ is the source of truth.
 bool endsWithARow(std::string_view stem) {
-  return endsWithChar(stem, kARowEndings, kARowCount);
+  return utf8::lastChar(stem) == "あ" || endsWithChar(stem, kana::kMizenkeiEndings, kana::kMizenkeiCount);
 }
 
 // O-row (お段) ending: the mizenkei a Godan verb takes before volitional う.

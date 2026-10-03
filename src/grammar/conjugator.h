@@ -65,9 +65,7 @@ class Conjugator {
   Conjugation conjugation_;
 
   std::vector<StemForm> generateGodanStems(const std::string& stem, const std::string& base_form, VerbType type) const;
-  std::vector<StemForm> generateIchidanStems(const std::string& stem, const std::string& base_form) const;
   std::vector<StemForm> generateIAdjectiveStems(const std::string& stem, const std::string& base_form) const;
-  std::vector<StemForm> generateSuruStems(const std::string& stem, const std::string& base_form) const;
   std::vector<StemForm> generateKuruStems(const std::string& base_form) const;
 };
 

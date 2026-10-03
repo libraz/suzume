@@ -62,7 +62,7 @@ std::vector<LookupResult> UserDictionary::lookup(std::string_view text, size_t s
 
   auto matches = trie_.prefixMatch(text, start_pos);
   for (const auto& [length, entry_ids] : matches) {
-    for (uint32_t idx : entry_ids) {
+    for (uint32_t idx : *entry_ids) {
       if (idx < entries_.size()) {
         LookupResult result{};
         result.entry_id = idx;

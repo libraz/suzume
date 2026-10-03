@@ -23,7 +23,6 @@
 #include "dictionary/entries/particles.h"
 #include "dictionary/entries/pronouns.h"
 #endif
-#include "normalize/utf8.h"
 
 namespace suzume::dictionary {
 

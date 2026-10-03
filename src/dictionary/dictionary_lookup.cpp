@@ -18,11 +18,12 @@ std::vector<LookupResult> lookupByTrie(const DoubleArray& trie, const std::vecto
 
     const size_t first_idx = static_cast<size_t>(trie_result.value);
     const std::string& matched_surface = entries[first_idx].surface;
+    const size_t char_length = normalize::utf8Length(text.substr(start_pos, trie_result.length));
     for (size_t entry_idx = first_idx; entry_idx < entries.size() && entries[entry_idx].surface == matched_surface;
          ++entry_idx) {
       LookupResult result{};
       result.entry_id = static_cast<uint32_t>(entry_idx);
-      result.length = normalize::utf8Length(text.substr(start_pos, trie_result.length));
+      result.length = char_length;
       result.entry = &entries[entry_idx];
       results.push_back(result);
     }
