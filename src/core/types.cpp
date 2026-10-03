@@ -410,6 +410,8 @@ std::string_view extendedPosToString(ExtendedPOS epos) {
       return "SYMBOL";
     case ExtendedPOS::Interjection:
       return "INTJ";
+    case ExtendedPOS::InterjectionGreeting:
+      return "INTJ_挨拶";
     case ExtendedPOS::Other:
       return "OTHER";
 
@@ -464,6 +466,7 @@ PartOfSpeech extendedPosToPos(ExtendedPOS epos) {
     case ExtendedPOS::Symbol:
       return PartOfSpeech::Symbol;
     case ExtendedPOS::Interjection:
+    case ExtendedPOS::InterjectionGreeting:
       return PartOfSpeech::Interjection;
     case ExtendedPOS::Other:
     case ExtendedPOS::Unknown:

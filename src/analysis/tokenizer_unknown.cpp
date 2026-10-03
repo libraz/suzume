@@ -1272,6 +1272,15 @@ void Tokenizer::addUnknownCandidates(core::Lattice& lattice, std::string_view te
       }
     }
 
+    if (candidate.pos == core::PartOfSpeech::Other && candidate.end - candidate.start < max_dict_length &&
+        allCharsAre(char_types, codepoints, candidate.start, candidate.end, normalize::CharType::Hiragana,
+                    /*allow_choon=*/false)) {
+      adjusted_cost += candidate::kTruncatedDictionaryWordPenalty;
+      SUZUME_DEBUG_LOG_VERBOSE("[TOK_UNK] \"" << candidate.surface << "\" (OTHER): +"
+                                              << candidate::kTruncatedDictionaryWordPenalty
+                                              << " (truncates_dictionary_word, dict_max=" << max_dict_length << ")\n");
+    }
+
     // For verb candidates, check if the hiragana suffix is a known particle
     if (candidate.pos == core::PartOfSpeech::Verb && candidate.end > candidate.start) {
       size_t hiragana_start = candidate.start;

@@ -332,6 +332,7 @@ TEST(TypesExtendedTest, ExtendedPosToPosOthers) {
   EXPECT_EQ(extendedPosToPos(ExtendedPOS::DeterminerQuotative), PartOfSpeech::Determiner);
   EXPECT_EQ(extendedPosToPos(ExtendedPOS::Symbol), PartOfSpeech::Symbol);
   EXPECT_EQ(extendedPosToPos(ExtendedPOS::Interjection), PartOfSpeech::Interjection);
+  EXPECT_EQ(extendedPosToPos(ExtendedPOS::InterjectionGreeting), PartOfSpeech::Interjection);
   EXPECT_EQ(extendedPosToPos(ExtendedPOS::Other), PartOfSpeech::Other);
   EXPECT_EQ(extendedPosToPos(ExtendedPOS::Unknown), PartOfSpeech::Other);
   EXPECT_EQ(extendedPosToPos(ExtendedPOS::Count_), PartOfSpeech::Other);

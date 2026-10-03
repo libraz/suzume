@@ -25,6 +25,7 @@ EntrySpecRange getInterjectionEntries() {
       intj("あら"),    // Surprise (also the irrealis of ある; context decides)
       intj("あれ"),    // Confusion
       intj("あれっ"),  // Confusion (emphatic)
+      intj("何だ"),    // Disappointment/Realization
       intj("まあ"),    // Surprise/Moderation
       intj("さあ"),    // Prompting/Urging
       intj("ねえ"),    // Attention-getting (also particle, but standalone usage)

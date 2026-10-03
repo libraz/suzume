@@ -56,6 +56,10 @@ constexpr float kLexicalizedMixedScriptNounBonus = -1.6F;
 // kanji run.
 constexpr float kVerifiedMultiCharacterNounBonus = -0.1F;
 
+// An unanalyzed kana fragment ending inside a registered content word that
+// starts where it does cuts that word short (ほん|とうに for ほんとう|に).
+constexpr float kTruncatedDictionaryWordPenalty = bigram_cost::kRare;
+
 // Closed interrogative pronouns are strong phrase anchors and must remain
 // available ahead of homographic inflected-verb readings (どれを選ぶ).
 constexpr float kInterrogativePronounBonus = -0.3F;

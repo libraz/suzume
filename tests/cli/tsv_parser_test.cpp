@@ -16,7 +16,7 @@ TEST(TsvParserTest, CliAndRuntimeShareBomAndMarkerParsing) {
   const std::string source =
       "\xEF\xBB\xBF  東京  \t PROPER_NOUN \t FAMILY \n"
       "しほ\tPROPER_NOUN\tGIVEN\n"
-      "なるほど\tINTJ\n";
+      "ありがとう\tINTJ\n";
 
   TsvParser parser;
   auto cli_result = parser.parseString(source);
@@ -33,7 +33,7 @@ TEST(TsvParserTest, CliAndRuntimeShareBomAndMarkerParsing) {
   ASSERT_NE(runtime_dict.getEntry(1), nullptr);
   EXPECT_EQ(runtime_dict.getEntry(1)->extended_pos, core::ExtendedPOS::NounProperGiven);
   ASSERT_NE(runtime_dict.getEntry(2), nullptr);
-  EXPECT_EQ(runtime_dict.getEntry(2)->extended_pos, core::ExtendedPOS::Interjection);
+  EXPECT_EQ(runtime_dict.getEntry(2)->extended_pos, core::ExtendedPOS::InterjectionGreeting);
 }
 
 TEST(TsvParserTest, WritePreservesCanonicalMarkerAndLemma) {

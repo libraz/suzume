@@ -48,7 +48,8 @@ dictionary::DictionaryEntry makeBaseEntry(const dictionary::SourceEntry& source_
 
   switch (source_entry.conj_type) {
     case dictionary::ConjugationType::Interjection:
-      entry.extended_pos = core::ExtendedPOS::Interjection;
+      // Listed interjections are the greetings; the exclamations are L1.
+      entry.extended_pos = core::ExtendedPOS::InterjectionGreeting;
       break;
     case dictionary::ConjugationType::NaAdjective:
       entry.extended_pos = core::ExtendedPOS::AdjNaAdj;

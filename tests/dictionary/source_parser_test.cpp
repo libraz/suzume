@@ -133,14 +133,14 @@ TEST(SourceParserTest, ConvertsMarkerToRuntimeExtendedPos) {
       "東京\tPROPER_NOUN\n"
       "東京\tPROPER_NOUN\tFAMILY\n"
       "しほ\tPROPER_NOUN\tGIVEN\n"
-      "なるほど\tINTJ\n");
+      "ありがとう\tINTJ\n");
 
   ASSERT_TRUE(parsed.hasValue()) << parsed.error().message;
   ASSERT_EQ(parsed.value().entries.size(), 4);
   EXPECT_EQ(sourceToDictionaryEntry(parsed.value().entries[0]).extended_pos, core::ExtendedPOS::NounProper);
   EXPECT_EQ(sourceToDictionaryEntry(parsed.value().entries[1]).extended_pos, core::ExtendedPOS::NounProperFamily);
   EXPECT_EQ(sourceToDictionaryEntry(parsed.value().entries[2]).extended_pos, core::ExtendedPOS::NounProperGiven);
-  EXPECT_EQ(sourceToDictionaryEntry(parsed.value().entries[3]).extended_pos, core::ExtendedPOS::Interjection);
+  EXPECT_EQ(sourceToDictionaryEntry(parsed.value().entries[3]).extended_pos, core::ExtendedPOS::InterjectionGreeting);
 }
 
 }  // namespace

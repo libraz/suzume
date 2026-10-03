@@ -54,7 +54,8 @@ describe('JS API: struct layout compatibility', () => {
     expect(text(83)).toBe('VERB_仮定縮約');
     expect(text(84)).toBe('PART_接続終止');
     expect(text(85)).toBe('NOUN_非日本語');
-    expect(text(86)).toBeNull();
+    expect(text(86)).toBe('INTJ_挨拶');
+    expect(text(87)).toBeNull();
   });
 
   it('labels every serialized conjugation code and rejects the next value', () => {

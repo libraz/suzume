@@ -73,6 +73,14 @@ BigramTable::EncodedTable BigramTable::initTable() {
   // particle before a Latin run is the ordinary way a colloquial clause ends.
   table[static_cast<size_t>(core::ExtendedPOS::ParticleFinal)][static_cast<size_t>(core::ExtendedPOS::NounForeign)] =
       bigram_rules::encodeCost(bigram_cost::kNeutral);
+  // A greeting is an interjection that stands as its utterance's predicate, so
+  // it takes the complements an exclamation cannot: a case-marked one
+  // (みんな+に+ありがとう) and a connective clause (来て+くれ+て+ありがとう).
+  bigram_rules::inheritRuleProfile(table, core::ExtendedPOS::Interjection, core::ExtendedPOS::InterjectionGreeting);
+  for (const auto complement : {core::ExtendedPOS::ParticleCase, core::ExtendedPOS::ParticleConj}) {
+    table[static_cast<size_t>(complement)][static_cast<size_t>(core::ExtendedPOS::InterjectionGreeting)] =
+        bigram_rules::encodeCost(bigram_cost::kNeutral);
+  }
 
   // A quotative demonstrative cannot directly complete an adjective stem.
   // Keep appearance そう on its auxiliary path (高+そう, キモ+そう).

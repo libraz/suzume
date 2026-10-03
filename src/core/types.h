@@ -208,6 +208,11 @@ enum class ExtendedPOS : uint8_t {
   // nothing on the Japanese side reaches across it to modify the run.
   NounForeign,
 
+  // 挨拶の感動詞: ありがとう, ごめん, すみません. Unlike an exclamation (ああ, おい)
+  // it stands as the predicate of its utterance, so it takes case-marked and
+  // adverbial complements (みんなに+ありがとう, 心から+ありがとう).
+  InterjectionGreeting,
+
   // Count marker (for array sizing)
   Count_  // Total number of categories
 };
