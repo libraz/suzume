@@ -1959,6 +1959,45 @@
       ],
       "id": "migaaru_2",
       "input": "無理みがある"
+    },
+    {
+      "description": "Lexicalized numeral-headed compound stays one noun even when bare",
+      "expected": [
+        {
+          "lemma": "二日酔い",
+          "pos": "Noun",
+          "surface": "二日酔い"
+        }
+      ],
+      "id": "i_6",
+      "input": "二日酔い"
+    },
+    {
+      "description": "Deverbal compound on a registered godan-wa stem is a noun, not an adjective",
+      "expected": [
+        {
+          "lemma": "船",
+          "pos": "Noun",
+          "surface": "船"
+        },
+        {
+          "lemma": "酔い",
+          "pos": "Suffix",
+          "surface": "酔い"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ひどい",
+          "pos": "Adjective",
+          "surface": "ひどい"
+        }
+      ],
+      "id": "igahidoi",
+      "input": "船酔いがひどい"
     }
   ],
   "description": "General nouns (part 4/4)",
