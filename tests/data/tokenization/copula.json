@@ -2575,6 +2575,117 @@
       ],
       "id": "deshitara",
       "input": "雨でしたら"
+    },
+    {
+      "description": "行くなら行くでいいんだけど - regression test",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行く"
+        },
+        {
+          "lemma": "なら",
+          "pos": "Particle",
+          "surface": "なら"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行く"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "lemma": "いい",
+          "pos": "Adjective",
+          "surface": "いい"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "けど",
+          "pos": "Particle",
+          "surface": "けど"
+        }
+      ],
+      "id": "kunara_kudeiindakedo",
+      "input": "行くなら行くでいいんだけど"
+    },
+    {
+      "description": "飲むなら飲むでいい - regression test",
+      "expected": [
+        {
+          "lemma": "飲む",
+          "pos": "Verb",
+          "surface": "飲む"
+        },
+        {
+          "lemma": "なら",
+          "pos": "Particle",
+          "surface": "なら"
+        },
+        {
+          "lemma": "飲む",
+          "pos": "Verb",
+          "surface": "飲む"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "lemma": "いい",
+          "pos": "Adjective",
+          "surface": "いい"
+        }
+      ],
+      "id": "munara_mudeii",
+      "input": "飲むなら飲むでいい"
+    },
+    {
+      "description": "行くなら車で行く - regression test",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行く"
+        },
+        {
+          "lemma": "なら",
+          "pos": "Particle",
+          "surface": "なら"
+        },
+        {
+          "lemma": "車",
+          "pos": "Noun",
+          "surface": "車"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行く"
+        }
+      ],
+      "id": "kunara_de_ku",
+      "input": "行くなら車で行く"
     }
   ],
   "description": "Copula patterns (だ、です、である)",
