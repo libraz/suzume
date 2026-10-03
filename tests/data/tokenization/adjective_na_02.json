@@ -891,6 +891,55 @@
       ],
       "id": "korehafutsuunokotoda",
       "input": "これはふつうのことだ"
+    },
+    {
+      "description": "Two-mora kana na-adjective before a clause-final copula splits from it at sentence start",
+      "expected": [
+        {
+          "lemma": "うぶ",
+          "pos": "Adjective",
+          "surface": "うぶ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "ubuda",
+      "input": "うぶだ"
+    },
+    {
+      "description": "Kana na-adjective after a topic particle keeps the adjective POS before the past copula",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "うぶ",
+          "pos": "Adjective",
+          "surface": "うぶ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "haubudattta",
+      "input": "彼はうぶだった"
     }
   ],
   "description": "Na-adjectives (ナ形容詞) (part 2/2)",
