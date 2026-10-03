@@ -222,6 +222,28 @@
       ],
       "id": "aoi_sora_wo_miageru",
       "input": "蒼い空を見上げる"
+    },
+    {
+      "description": "kana i-adjective whose tail spells the voiced ておく contraction どい",
+      "expected": [
+        {
+          "lemma": "雨",
+          "pos": "Noun",
+          "surface": "雨"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ひどい",
+          "pos": "Adjective",
+          "surface": "ひどい"
+        }
+      ],
+      "id": "gahidoi",
+      "input": "雨がひどい"
     }
   ],
   "description": "adjective_i tests",

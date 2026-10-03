@@ -575,7 +575,13 @@ const dictionary::DictionaryEntry* auxiliaryClosingAfterOkurigana(const dictiona
         lookupEntryInRange(*dict_manager, codepoints, end_pos - aux_len, end_pos, core::PartOfSpeech::Auxiliary);
     // けり's izenkei is spelled like the hypothetical ending every i-adjective
     // carries (なけれ, 高けれ), so that cell alone is no evidence of a boundary.
-    if (auxiliary != nullptr && auxiliary->extended_pos != core::ExtendedPOS::AuxClassicalKeri) {
+    // The voiced ておく contraction stands only on a nasal onbin (読ん+どい), so
+    // elsewhere its kana are an ordinary ending (ひどい).
+    const bool voiced_oku_off_nasal =
+        auxiliary != nullptr && auxiliary->extended_pos == core::ExtendedPOS::AuxAspectOku &&
+        utf8::startsWith(auxiliary->surface, "ど") && codepoints[end_pos - aux_len - 1] != core::hiragana::kN;
+    if (auxiliary != nullptr && auxiliary->extended_pos != core::ExtendedPOS::AuxClassicalKeri &&
+        !voiced_oku_off_nasal) {
       return auxiliary;
     }
   }
