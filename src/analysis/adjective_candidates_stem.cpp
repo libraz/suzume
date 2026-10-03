@@ -805,8 +805,8 @@ void appendIAdjClassicalTerminalCandidates(const std::vector<char32_t>& codepoin
     terminal.cost = candidate::verb_cost::kStrongBonus;
     terminal.has_suffix = true;
     terminal.extended_pos = core::ExtendedPOS::AdjBasic;
-#ifdef SUZUME_DEBUG_INFO
     terminal.origin = CandidateOrigin::AdjectiveI;
+#ifdef SUZUME_DEBUG_INFO
     terminal.confidence = candidate::kIAdjKaroConfidence;
     terminal.pattern = "i_adjective_classical_shi";
 #endif
@@ -862,8 +862,8 @@ void appendIAdjOnbinRenyokeiCandidates(const std::vector<char32_t>& codepoints, 
     onbin.cost = candidate::verb_cost::kStrongBonus;
     onbin.has_suffix = true;
     onbin.extended_pos = core::ExtendedPOS::AdjRenyokei;
-#ifdef SUZUME_DEBUG_INFO
     onbin.origin = CandidateOrigin::AdjectiveI;
+#ifdef SUZUME_DEBUG_INFO
     onbin.confidence = candidate::kIAdjKaroConfidence;
     onbin.pattern = "i_adjective_onbin_renyokei";
 #endif
@@ -921,8 +921,8 @@ void appendIAdjKaroCandidates(const std::vector<char32_t>& codepoints, size_t st
     miz_cand.cost = candidate::verb_cost::kStrongBonus;
     miz_cand.has_suffix = true;                              // Conjugated form (未然ウ接続)
     miz_cand.extended_pos = core::ExtendedPOS::AdjMizenkei;  // For bigram: AdjMizenkei→AuxVolitional
-#ifdef SUZUME_DEBUG_INFO
     miz_cand.origin = CandidateOrigin::AdjectiveI;
+#ifdef SUZUME_DEBUG_INFO
     miz_cand.confidence = candidate::kIAdjKaroConfidence;
     miz_cand.pattern = "i_adjective_karo";
 #endif
@@ -1153,8 +1153,8 @@ void appendIAdjKaraZuCandidates(const std::vector<char32_t>& codepoints, size_t 
     miz_cand.cost = candidate::verb_cost::kStrongBonus;
     miz_cand.has_suffix = true;
     miz_cand.extended_pos = cell;
-#ifdef SUZUME_DEBUG_INFO
     miz_cand.origin = CandidateOrigin::AdjectiveI;
+#ifdef SUZUME_DEBUG_INFO
     miz_cand.confidence = candidate::kIAdjKaroConfidence;
     miz_cand.pattern = "i_adjective_kari";
 #endif

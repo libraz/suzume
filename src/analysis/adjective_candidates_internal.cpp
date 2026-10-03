@@ -258,8 +258,8 @@ UnknownCandidate makeTrimmedAdjVariant(const UnknownCandidate& candidate, size_t
   variant.cost = candidate.cost + cost_bonus;
   variant.has_suffix = true;
   variant.extended_pos = epos;
-#ifdef SUZUME_DEBUG_INFO
   variant.origin = candidate.origin;
+#ifdef SUZUME_DEBUG_INFO
   variant.confidence = candidate.confidence;
   variant.pattern = pattern;
 #endif

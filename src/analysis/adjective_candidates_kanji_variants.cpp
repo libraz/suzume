@@ -188,8 +188,8 @@ void appendIAdjClassicalAttributiveCandidates(const std::vector<char32_t>& codep
       ki_cand.has_suffix = true;  // Conjugated form (連体形)
       // Attributive form connects like the basic form (ADJ + 体言)
       ki_cand.extended_pos = core::ExtendedPOS::AdjBasic;
-#ifdef SUZUME_DEBUG_INFO
       ki_cand.origin = CandidateOrigin::AdjectiveI;
+#ifdef SUZUME_DEBUG_INFO
       ki_cand.confidence = 0.8F;
       ki_cand.pattern = "i_adjective_classical_ki";
 #endif

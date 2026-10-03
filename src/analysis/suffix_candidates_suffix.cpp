@@ -638,8 +638,8 @@ void generateWithSuffix(const std::vector<char32_t>& codepoints, size_t start_po
         stem.pos = core::PartOfSpeech::Noun;
         stem.cost = 1.0F + options.suffix_separation_bonus;
         stem.has_suffix = false;
-#ifdef SUZUME_DEBUG_INFO
         stem.origin = CandidateOrigin::SuffixPattern;
+#ifdef SUZUME_DEBUG_INFO
         stem.confidence = 1.0F;
         stem.pattern = normalize::concat("stem_before_", suffix);
 #endif
@@ -654,8 +654,8 @@ void generateWithSuffix(const std::vector<char32_t>& codepoints, size_t start_po
         whole.cost =
             forms_derived_compound ? candidate::kDerivedSuffixCompoundNounCost : candidate::kSuffixWholeCandidateCost;
         whole.has_suffix = true;
-#ifdef SUZUME_DEBUG_INFO
         whole.origin = CandidateOrigin::SuffixPattern;
+#ifdef SUZUME_DEBUG_INFO
         whole.confidence = 1.0F;
         whole.pattern = normalize::concat("with_suffix_", suffix);
 #endif
