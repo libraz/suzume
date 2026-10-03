@@ -921,6 +921,31 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                 if applied_rule is None:
                     applied_rule = "denominal-ru-verb"
 
+        # The same verb before contracted てる/てた comes back as the quotative
+        # って plus a classical る or a past た, which a quotation never takes
+        # (沼+って+る): it is the sokuonbin 沼っ plus the progressive.
+        if (
+            not merged
+            and t.get("pos") == "名詞"
+            and t.get("pos_sub1") not in ("接尾", "代名詞")
+            and i + 2 < len(tokens)
+            and tokens[i + 1].get("surface") == "って"
+            and tokens[i + 1].get("pos") == "助詞"
+            and tokens[i + 2].get("pos") == "助動詞"
+            and (
+                (tokens[i + 2].get("surface") == "る" and tokens[i + 2].get("conj_type") == "文語・ル")
+                or tokens[i + 2].get("surface") == "た"
+            )
+        ):
+            stem = t.get("surface", "") + "っ"
+            result.append({"surface": stem, "pos": "動詞", "lemma": stem[:-1] + "る"})
+            progressive = "てる" if tokens[i + 2].get("surface") == "る" else "て"
+            result.append({"surface": progressive, "pos": "動詞", "pos_sub1": "非自立", "lemma": "てる"})
+            i += 3 if progressive == "てる" else 2
+            merged = True
+            if applied_rule is None:
+                applied_rule = "denominal-ru-verb"
+
         # 2. Number + counter/katakana
         # 何 in front of a counter suffix fills the numeral slot — it is the
         # interrogative quantity, and there is no reading where a pronoun takes

@@ -689,6 +689,27 @@ _HELD_FINAL_PARTICLES = frozenset("さよぞわ")
 _HELD_VOWELS = {"さ": "あぁー", "わ": "あぁー", "よ": "おぉー", "ぞ": "おぉー"}
 
 
+def postprocess_kamo_before_final_particle(tokens: list[dict]) -> bool:
+    """Tag a kana かも closed by a final particle as the adverbial particle.
+
+    The reference reads a clause-opening かも as the noun 鴨 before よ but as
+    the particle before ね/な; a bare final particle selects the elliptical
+    conjecture in both, as it does after a host (雨かもよ).
+    """
+    changed = False
+    for idx in range(len(tokens) - 1):
+        token, following = tokens[idx], tokens[idx + 1]
+        if (
+            token.get("surface") == "かも"
+            and token.get("pos") == "Noun"
+            and following.get("pos") == "Particle"
+            and following.get("surface", "")[:1] in _HELD_FINAL_PARTICLES | {"ね", "な"}
+        ):
+            token.update(pos="Particle", lemma="かも")
+            changed = True
+    return changed
+
+
 def postprocess_held_final_particle(tokens: list[dict]) -> bool:
     """Tag a final particle drawn out on its own vowel as that particle.
 

@@ -1052,6 +1052,27 @@ def apply_suzume_split(tokens: list[dict]) -> tuple[list[dict], str | None]:
         # MeCab merges ichidan verb + ん (literary volitional =む/よう)
         # as single token with conj_form 体言接続特殊
         # e.g., 乗り越えん → 乗り越え + ん, 越えん → 越え + ん
+        # The same form is the colloquial る→ん contraction when a nominalizer
+        # or final particle follows (帰んなよ, わかんのよ): it stays one verb.
+        # Before the explanatory copula the ん is the nominalizer の with the
+        # る dropped (どうすんだろう), as rule 11a reads すん+だ.
+        following = tokens[token_index + 1] if token_index + 1 < len(tokens) else {}
+        following_surface = following.get("surface", "")
+        is_contracted_form = t.get("pos") == "動詞" and len(surface) >= 2 and t.get("conj_form") == "体言接続特殊"
+        if is_contracted_form and surface.endswith("ん") and following_surface.startswith(("な", "の", "ね", "よ")):
+            result.append(t)
+            continue
+        if (
+            is_contracted_form
+            and surface.endswith("ん")
+            and following.get("pos") == "助動詞"
+            and following_surface.startswith(("だ", "です", "でしょ"))
+        ):
+            result.append({"surface": surface[:-1], "pos": "動詞", "lemma": t.get("lemma", "")})
+            result.append({"surface": "ん", "pos": "助詞", "pos_sub1": "準体助詞", "lemma": "の"})
+            if applied_rule is None:
+                applied_rule = "contracted-explanatory-n-split"
+            continue
         if (
             t.get("pos") == "動詞"
             and surface.endswith("ん")

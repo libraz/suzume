@@ -4,20 +4,23 @@ import unicodedata
 
 import regex
 
-from .constants import SLANG_ADJ_STEMS, TEXT_SYMBOLS
+from .constants import SLANG_ADJ_FOLLOWER, SLANG_ADJ_STEMS, TEXT_SYMBOLS
 from .mecab import mecab_analyze
 from .merge_rules import apply_suzume_merge
 from .pos_mapping import correct_mecab_pos, map_mecab_pos, normalize_pos
 from .postprocessors import (
     merge_conjunction_with_rashii,
+    merge_reason_nde,
     postprocess_mecab_tokens,
     postprocessor_rules,
     preprocess_for_mecab,
+    repair_adjective_stem_before_suffix,
     repair_assimilated_koto_copula,
     repair_continuative_before_manner_suffix,
     repair_contracted_quotative,
     repair_contracted_volitional,
     repair_euphonic_adjective_adverb,
+    repair_interrogative_nande,
     repair_kanji_prefix_before_kana_noun,
     repair_kko_nominalizer,
     repair_productive_causative,
@@ -203,6 +206,7 @@ def get_expected_tokens(text: str, suzume_tokens: list[dict] | None = None) -> t
     normalized_text = _oracle_text(text)
     processed_text, replacements, preprocess_rules = preprocess_for_mecab(normalized_text)
     raw_tokens = mecab_analyze(processed_text)
+    repair_adjective_stem_before_suffix(raw_tokens)
     postprocess_mecab_tokens(raw_tokens, normalized_text, replacements)
     repair_kko_nominalizer(raw_tokens)
     repair_assimilated_koto_copula(raw_tokens)
@@ -213,6 +217,8 @@ def get_expected_tokens(text: str, suzume_tokens: list[dict] | None = None) -> t
     repair_euphonic_adjective_adverb(raw_tokens)
     repair_continuative_before_manner_suffix(raw_tokens)
     merge_conjunction_with_rashii(raw_tokens)
+    repair_interrogative_nande(raw_tokens)
+    merge_reason_nde(raw_tokens)
     _merge_ideographic_variation_selectors(raw_tokens)
 
     # Fix MeCab POS errors (before POS mapping)
@@ -362,7 +368,7 @@ def get_suzume_rule(text: str) -> str:
         return "date"
 
     for stem in SLANG_ADJ_STEMS:
-        if regex.search(regex.escape(stem) + r"[いかくけさ]", text):
+        if regex.search(regex.escape(stem) + SLANG_ADJ_FOLLOWER, text):
             return "slang-adjective"
 
     if regex.search(r"\p{Han}+然と", text):

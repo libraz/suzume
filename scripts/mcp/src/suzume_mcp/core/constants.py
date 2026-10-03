@@ -106,6 +106,12 @@ KANA_COUNTER_SUFFIXES: frozenset[str] = frozenset({"まい", "にん", "月"})
 # units after a numeral+counter phrase (二階|建て, 二本|立て).
 QUANTITY_BOUND_SUFFIXES: frozenset[str] = frozenset({"建て", "立て"})
 
+# One-kanji general suffixes that stay their own token after a noun: the
+# relational and purpose suffixes (業務|用, 期間|内, 使用|後) the core lists as
+# bound suffixes. Every other general suffix forms one search unit with its
+# host (改正案, 交通費, 説明会).
+KANJI_SUFFIXES_KEPT_SEPARATE: frozenset[str] = frozenset("用内中後間視名目方半強弱")
+
 # Slang adjective stems -> standard replacement for MeCab preprocessing.
 # The class is open and is normally found in the analysis rather than listed
 # (see _stranded_adjective_stems). What stays here is the hiragana spellings,
@@ -123,6 +129,10 @@ SLANG_ADJ_STEMS: dict[str, str] = {
     "いた": "赤",
     "やば": "赤",
 }
+
+# What may follow a slang adjective stem: an inflection kana, or the stem-taking
+# excess/appearance suffixes (うざすぎ, うざそう) that attach to the bare stem.
+SLANG_ADJ_FOLLOWER = r"(?:[いかくけさ]|すぎ|そう)"
 
 # Slang verb stems -> standard replacement for MeCab preprocessing
 SLANG_VERB_STEMS: dict[str, str] = {

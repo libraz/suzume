@@ -4,6 +4,7 @@ import regex
 
 from .constants import (
     KANJI_PREFIX_COMPOUNDS,
+    KANJI_SUFFIXES_KEPT_SEPARATE,
 )
 from .mecab import mecab_analyze
 from .merge_postprocessor_grammar import _CONTINUATIVE_CELL
@@ -156,6 +157,14 @@ def _postprocess_kanji_merge(result: list[dict], applied_rule: str | None) -> tu
         #   家/力/化/法/論/員/式/感/的/安 — productive but one search unit
         # 様/氏 keep splitting (honorific separates from name).
         is_merge_allowed_suffix = surface in ("家", "力", "化", "法", "論", "員", "式", "感", "的", "風", "安")
+        # Any other one-kanji general suffix bonds with an ordinary noun host
+        # (改正案, 交通費) but not with a temporal one (今|紙).
+        is_general_suffix = (
+            curr.get("pos_sub1", "") == "接尾"
+            and curr.get("pos_sub2", "") == "一般"
+            and len(surface) == 1
+            and surface not in KANJI_SUFFIXES_KEPT_SEPARATE
+        )
         # Suzume design: 御 is a productive prefix that always splits off
         # (御 + 尽力, 御 + 挨拶, 御 + 協力). Skip kanji-merge after 御 prefix tokens.
         prev_is_go_prefix = merged and merged[-1].get("surface", "") == "御" and merged[-1].get("pos", "") == "接頭詞"
@@ -188,7 +197,7 @@ def _postprocess_kanji_merge(result: list[dict], applied_rule: str | None) -> tu
                 and "々" not in merged[-1].get("surface", "")
                 and (merged[-1].get("pos_sub1", "") not in ("副詞可能", "固有名詞", "数") or is_merge_allowed_suffix)
                 and merged[-1].get("pos", "") != "副詞"
-                and (curr.get("pos_sub1", "") != "接尾" or is_merge_allowed_suffix)
+                and (curr.get("pos_sub1", "") != "接尾" or is_merge_allowed_suffix or is_general_suffix)
                 # A number+counter unit (五分, 二時間, 五名) is its own search unit and
                 # must not fold into a preceding noun/prefix (徒歩|五分, 約|二時間).
                 and curr.get("pos_sub1", "") != "数"

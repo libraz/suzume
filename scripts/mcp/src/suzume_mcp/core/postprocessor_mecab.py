@@ -7,6 +7,7 @@ import regex
 from .constants import (
     CLOSED_HONORIFIC_SERU_LEMMAS,
     KYUJITAI_TO_SHINJITAI,
+    SLANG_ADJ_FOLLOWER,
     SLANG_ADJ_STEMS,
     SLANG_VERB_STEMS,
     UNUSUAL_NAMES,
@@ -53,7 +54,8 @@ def _accept_slang_match(
 
     - The stem starts where a token starts, and the analysis stops there rather
       than reading on. A token that runs past the stem is already a word in its
-      own right — やばい, 痛い and 甚く spelled in kana — and is left as it stands.
+      own right — やばい, 痛い and 甚く spelled in kana — and is left as it stands,
+      as is a stem the analysis already reads in its native class (やば+すぎ).
     - Otherwise the stem starts inside a token, which is where a kana spelling is
       most often a coincidence. Only a genuine occurrence was holding the rest of
       the sentence apart, so substituting it both reads cleanly in its own right
@@ -65,7 +67,7 @@ def _accept_slang_match(
     raw_count, index = raw
     token = index.get(start)
     if token is not None:
-        return len(token["surface"]) <= len(stem)
+        return len(token["surface"]) <= len(stem) and token.get("pos") != native_pos
 
     probe = text[:start] + standard + text[start + len(stem) :]
     probe_count, probe_index = _raw_analysis(probe)
@@ -182,7 +184,7 @@ def preprocess_for_mecab(text: str) -> tuple[str, dict[tuple[int, str], dict], t
     raw: tuple[int, dict[int, dict]] | None = None
 
     slang_categories = (
-        ("slang_adj", SLANG_ADJ_STEMS, r"[いかくけさ]", "形容詞"),
+        ("slang_adj", SLANG_ADJ_STEMS, SLANG_ADJ_FOLLOWER, "形容詞"),
         ("slang_verb", SLANG_VERB_STEMS, r"[らりるれろっ]", "動詞"),
     )
     for category, stems, ending, native_pos in slang_categories:
@@ -793,6 +795,91 @@ def repair_continuative_before_manner_suffix(tokens: list[dict]) -> None:
             and analyzed[0].get("conj_form", "").startswith("連用")
         ):
             tokens[idx] = analyzed[0]
+
+
+def repair_adjective_stem_before_suffix(tokens: list[dict]) -> None:
+    """Read a bare noun before excess すぎ / appearance そう as the adjective stem.
+
+    Utterance-final 高すぎ comes back as noun+suffix although 高すぎた is the
+    adjective stem plus the continuative of すぎる; the host is re-analyzed
+    before すぎた and adopted, with its すぎ, when it reads as that stem.
+    """
+    for idx in range(len(tokens) - 1):
+        token, suffix = tokens[idx], tokens[idx + 1]
+        if (
+            token.get("pos") != "名詞"
+            or token.get("pos_sub1") != "一般"
+            or suffix.get("surface") not in ("すぎ", "そう")
+            or suffix.get("pos_sub1") != "接尾"
+        ):
+            continue
+        surface = token.get("surface", "")
+        analyzed = mecab_analyze(surface + "すぎた")
+        if (
+            len(analyzed) >= 2
+            and analyzed[0].get("surface") == surface
+            and analyzed[0].get("pos") == "形容詞"
+            and analyzed[1].get("surface") == "すぎ"
+        ):
+            tokens[idx] = analyzed[0]
+            if suffix.get("surface") == "すぎ":
+                tokens[idx + 1] = analyzed[1]
+
+
+def repair_interrogative_nande(tokens: list[dict]) -> None:
+    """Rejoin なん + copula で into the adverb なんで before a copula.
+
+    A copula continuative cannot take another copula, so なん+で+です is the
+    adverb なんで the dictionary already gives in なんでだよ.
+    """
+    idx = 0
+    while idx < len(tokens) - 2:
+        head, copula, following = tokens[idx], tokens[idx + 1], tokens[idx + 2]
+        if (
+            head.get("surface") == "なん"
+            and head.get("pos") == "名詞"
+            and copula.get("surface") == "で"
+            and copula.get("pos") == "助動詞"
+            and following.get("pos") == "助動詞"
+            and following.get("lemma") in ("です", "だ")
+        ):
+            tokens[idx : idx + 2] = [{"surface": "なんで", "pos": "副詞", "pos_sub1": "一般", "lemma": "なんで"}]
+        idx += 1
+
+
+_REASON_NDE_BLOCKERS = frozenset({"は", "も", "ある", "あり", "あっ", "ござい", "ござる"})
+
+
+def merge_reason_nde(tokens: list[dict]) -> None:
+    """Read nominalizer ん + で closing a clause as the reason particle んで.
+
+    The reference keeps ので whole and does the same for its contraction after
+    な (雨なんで), but after a verb it splits ん+で. A following topic or
+    existence verb (行くんではない) keeps the copula reading.
+    """
+    idx = 0
+    while idx < len(tokens) - 1:
+        nominalizer, de = tokens[idx], tokens[idx + 1]
+        following = tokens[idx + 2] if idx + 2 < len(tokens) else None
+        if (
+            idx > 0
+            and nominalizer.get("surface") == "ん"
+            and nominalizer.get("pos") == "名詞"
+            and nominalizer.get("pos_sub1") == "非自立"
+            and de.get("surface") == "で"
+            and de.get("pos") in ("助動詞", "助詞")
+            and (
+                following is None
+                or following.get("pos") == "記号"
+                or (
+                    following.get("pos") in ("動詞", "形容詞")
+                    and following.get("pos_sub1") == "自立"
+                    and following.get("surface") not in _REASON_NDE_BLOCKERS
+                )
+            )
+        ):
+            tokens[idx : idx + 2] = [{"surface": "んで", "pos": "助詞", "pos_sub1": "接続助詞", "lemma": "んで"}]
+        idx += 1
 
 
 def merge_conjunction_with_rashii(tokens: list[dict]) -> None:
