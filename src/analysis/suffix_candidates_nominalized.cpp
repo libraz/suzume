@@ -871,7 +871,10 @@ void generateHumbleNominalCandidates(const std::vector<char32_t>& codepoints, si
     }
     bool is_continuative = false;
     for (const auto& cand : stem_analysis) {
-      if (cand.confidence <= candidate::kHumbleNominalStemMinConfidence) {
+      // An e-row stem already has the ichidan continuative's shape, so its
+      // ichidan reading needs no confidence floor (お+つたえ+し+ます).
+      const bool ichidan_shaped = cand.verb_type == grammar::VerbType::Ichidan && grammar::isERowCodepoint(stem_end);
+      if (!ichidan_shaped && cand.confidence <= candidate::kHumbleNominalStemMinConfidence) {
         continue;
       }
       if ((cand.verb_type == grammar::VerbType::Ichidan && cand.base_form == ichidan_base) ||

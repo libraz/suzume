@@ -336,6 +336,12 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
     // But not too high to break valid patterns like してほしい
     float cost = is_dict_verb ? -0.8F : 0.5F;
     const std::string following = extractSubstring(codepoints, end_pos, std::min(end_pos + 2, codepoints.size()));
+    // An e-row stem before し+ます is an ichidan continuative plus する's し
+    // (お+つたえ+し+ます), not the godan-sa continuative of a coined verb.
+    if (!is_dict_verb && following == "ます" && end_pos >= start_pos + 3 && codepoints[end_pos - 1] == U'し' &&
+        grammar::isERowCodepoint(codepoints[end_pos - 2])) {
+      continue;
+    }
     // The polite auxiliary completes the renyokei frame for an otherwise
     // unregistered stem (くみ+ます). Its closed morphology is stronger evidence
     // than the generic bracketed-noun fallback after an object particle.
