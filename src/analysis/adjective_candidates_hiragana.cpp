@@ -415,7 +415,12 @@ void generateHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints
       if (!excessive_follows && !appearance_follows) {
         continue;
       }
-      const std::string stem = extractSubstring(codepoints, start_pos, stem_end);
+      // A ない-adjective inserts さ before the appearance そう (つまらな+さ+そう),
+      // so the stem ends one mora earlier than the run before そう.
+      const bool inserted_sa = appearance_follows && stem_end >= start_pos + 3 && codepoints[stem_end - 1] == U'さ' &&
+                               codepoints[stem_end - 2] == U'な';
+      const size_t own_stem_end = inserted_sa ? stem_end - 1 : stem_end;
+      const std::string stem = extractSubstring(codepoints, start_pos, own_stem_end);
       // A verb continuative takes すぎる too (なり+すぎ); it is not a stem.
       if (utf8::contains(stem, "て") || utf8::contains(stem, "で") ||
           (dict_manager != nullptr && dict_manager->lookupExact(stem, core::PartOfSpeech::Verb) != nullptr)) {
@@ -423,8 +428,14 @@ void generateHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints
       }
       const std::string base_form = stem + "い";
       // そう also follows verb continuatives and phrases (ふり+そう, それは+そう),
-      // so before it the stem has to carry its own derivation (けちくさ+そう).
-      if (!excessive_follows &&
+      // so before it the stem has to carry its own derivation (けちくさ+そう)
+      // or be a registered adjective (うざ+そう).
+      const bool registered_adjective =
+          dict_manager != nullptr && dict_manager->lookupExact(base_form, core::PartOfSpeech::Adjective) != nullptr;
+      if (inserted_sa && !registered_adjective) {
+        continue;
+      }
+      if (!excessive_follows && !registered_adjective &&
           !adj_detail::derivesFromCompoundFormingAdjective(codepoints, start_pos, base_form, dict_manager)) {
         continue;
       }
@@ -435,7 +446,7 @@ void generateHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints
       }
       const float cost =
           candidate::confidenceScaledCost(candidate::kAdjStemExtCost, confidence, candidate::kAdjStemConfScale);
-      candidates.push_back(makeIAdjStemCandidate(stem, start_pos, stem_end, base_form, cost,
+      candidates.push_back(makeIAdjStemCandidate(stem, start_pos, own_stem_end, base_form, cost,
                                                  CandidateOrigin::AdjectiveIHiragana, confidence,
                                                  "adj_stem_hira_excessive"));
       break;

@@ -144,6 +144,104 @@
       ],
       "id": "literary_furisou_conditional",
       "input": "降りそうなら戻る"
+    },
+    {
+      "description": "うざそう - regression test",
+      "expected": [
+        {
+          "lemma": "うざい",
+          "pos": "Adjective",
+          "surface": "うざ"
+        },
+        {
+          "lemma": "そう",
+          "pos": "Auxiliary",
+          "surface": "そう"
+        }
+      ],
+      "id": "uzasou",
+      "input": "うざそう"
+    },
+    {
+      "description": "うざそうな顔 - regression test",
+      "expected": [
+        {
+          "lemma": "うざい",
+          "pos": "Adjective",
+          "surface": "うざ"
+        },
+        {
+          "lemma": "そう",
+          "pos": "Auxiliary",
+          "surface": "そう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "顔",
+          "pos": "Noun",
+          "surface": "顔"
+        }
+      ],
+      "id": "uzasouna",
+      "input": "うざそうな顔"
+    },
+    {
+      "description": "つまらなさそう - regression test",
+      "expected": [
+        {
+          "lemma": "つまらない",
+          "pos": "Adjective",
+          "surface": "つまらな"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Suffix",
+          "surface": "さ"
+        },
+        {
+          "lemma": "そう",
+          "pos": "Auxiliary",
+          "surface": "そう"
+        }
+      ],
+      "id": "tsumaranasasou",
+      "input": "つまらなさそう"
+    },
+    {
+      "description": "つまらなさそうな顔 - regression test",
+      "expected": [
+        {
+          "lemma": "つまらない",
+          "pos": "Adjective",
+          "surface": "つまらな"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Suffix",
+          "surface": "さ"
+        },
+        {
+          "lemma": "そう",
+          "pos": "Auxiliary",
+          "surface": "そう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "顔",
+          "pos": "Noun",
+          "surface": "顔"
+        }
+      ],
+      "id": "tsumaranasasouna",
+      "input": "つまらなさそうな顔"
     }
   ],
   "description": "auxiliary_sou tests",
