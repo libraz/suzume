@@ -427,6 +427,173 @@
       ],
       "id": "shita_9",
       "input": "許した"
+    },
+    {
+      "description": "Kana godan-sa -asu transitive past: the closed し+た tail carries the scan across the particle-homograph か",
+      "expected": [
+        {
+          "lemma": "机",
+          "pos": "Noun",
+          "surface": "机"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "うごかす",
+          "pos": "Verb",
+          "surface": "うごかし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wougokashita",
+      "input": "机をうごかした"
+    },
+    {
+      "description": "Kana godan-sa -asu transitive past with a three-mora stem",
+      "expected": [
+        {
+          "lemma": "部屋",
+          "pos": "Noun",
+          "surface": "部屋"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "ちらかす",
+          "pos": "Verb",
+          "surface": "ちらかし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wochirakashita",
+      "input": "部屋をちらかした"
+    },
+    {
+      "description": "Kana godan-sa past whose stem holds the particle-homograph と",
+      "expected": [
+        {
+          "lemma": "財布",
+          "pos": "Noun",
+          "surface": "財布"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "おとす",
+          "pos": "Verb",
+          "surface": "おとし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wootoshita",
+      "input": "財布をおとした"
+    },
+    {
+      "description": "Kana godan-sa past opening on よ: the closed し+た tail lifts the never-verb-start guard",
+      "expected": [
+        {
+          "lemma": "服",
+          "pos": "Noun",
+          "surface": "服"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "よごす",
+          "pos": "Verb",
+          "surface": "よごし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "woyogoshita",
+      "input": "服をよごした"
+    },
+    {
+      "description": "Kana godan-sa -asu transitive te-form",
+      "expected": [
+        {
+          "lemma": "机",
+          "pos": "Noun",
+          "surface": "机"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "うごかす",
+          "pos": "Verb",
+          "surface": "うごかし"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "wougokashite",
+      "input": "机をうごかして"
+    },
+    {
+      "description": "Negative control: pronoun + か + サ変 し+た stays split; the closed し+た tail must not build a fabricated godan-sa verb across a pronoun",
+      "expected": [
+        {
+          "lemma": "だれ",
+          "pos": "Pronoun",
+          "surface": "だれ"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        }
+      ],
+      "id": "darekashitano",
+      "input": "だれかしたの"
     }
   ],
   "description": "Godan Sa-row verbs (五段サ行動詞) - verbs ending in す",

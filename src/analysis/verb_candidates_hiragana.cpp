@@ -110,6 +110,18 @@ size_t closedOnbinTenseEnd(const std::vector<char32_t>& codepoints, size_t start
     if (onbin == U'ん' && tense == U'だ' && onbin_pos - start_pos >= 3) {
       return onbin_pos + 2;
     }
+
+    // The sa row takes no onbin: its continuative し before た/て closes the
+    // predicate the same way (うごか+し+た, おと+し+た).
+    if (onbin == U'し' && (tense == U'た' || tense == U'て') && onbin_pos - start_pos >= 2) {
+      for (const auto& inflection_candidate : inflection.analyze(closed_surface)) {
+        if (inflection_candidate.verb_type == grammar::VerbType::GodanSa &&
+            start_pos + normalize::utf8Length(inflection_candidate.stem) == onbin_pos &&
+            inflection_candidate.confidence >= candidate::kParticleVerbBoundaryMinConfidence) {
+          return onbin_pos + 2;
+        }
+      }
+    }
   }
   return 0;
 }

@@ -585,8 +585,13 @@ float scoreGodan(float base, const InflectionScoreContext& context) {
   // Valid hiragana GodanSa verbs: なくす, もらす, こぼす (2-char stems)
   // Invalid: おねえす, おにいす (3+ char hiragana stems don't form real verbs)
   // Suru verbs almost never have pure hiragana stems (attach to kanji/katakana nouns)
+  // Exception: an a-row final mora is the transitive -asu derivation
+  // (うごかす, ちらかす, あまやかす), a productive GodanSa shape.
   bool is_godan_sa_or_suru = (type == VerbType::GodanSa || type == VerbType::Suru);
-  if (is_godan_sa_or_suru && stem_len >= core::kThreeJapaneseCharBytes && isPureHiragana(stem)) {
+  const bool is_transitive_asu_stem =
+      type == VerbType::GodanSa && !stem.empty() && isARowCodepoint(utf8::decodeLastChar(stem));
+  if (is_godan_sa_or_suru && !is_transitive_asu_stem && stem_len >= core::kThreeJapaneseCharBytes &&
+      isPureHiragana(stem)) {
     base -= inflection::kPenaltyGodanSaSuruPureHiraganaLongStem;
     logConfidenceAdjustment(-inflection::kPenaltyGodanSaSuruPureHiraganaLongStem,
                             "godan_sa_suru_pure_hiragana_long_stem");
