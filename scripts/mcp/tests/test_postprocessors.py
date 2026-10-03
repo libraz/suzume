@@ -33,7 +33,6 @@ from suzume_mcp.core.postprocessors import (
     postprocess_ikaga,
     postprocess_indefinite_ka,
     postprocess_iru_aux,
-    postprocess_itadakeru_aux,
     postprocess_kadouka_adverb,
     postprocess_l2_noun_context,
     postprocess_mecab_tokens,
@@ -43,6 +42,7 @@ from suzume_mcp.core.postprocessors import (
     postprocess_nara_verb,
     postprocess_negative_host,
     postprocess_onaji_predicate,
+    postprocess_predicate_cell_lemmas,
     postprocess_productive_search_unit_boundaries,
     postprocess_productive_verb_suffix_stem,
     postprocess_quantity_bound_suffix,
@@ -1329,21 +1329,26 @@ class TestProductiveSearchUnitBoundaries:
         assert tokens[0] == _tok("おいで", "Noun")
 
 
-class TestPostprocessItadakeruAux:
-    def test_after_te_particle_is_auxiliary(self):
-        tokens = [_tok("て", "Particle"), _tok("いただける", "Verb")]
-        assert postprocess_itadakeru_aux(tokens)
+class TestPostprocessPredicateCellLemmas:
+    def test_ta_before_appearance_sou_is_desiderative_stem(self):
+        tokens = [_tok("読み", "Verb", lemma="読む"), _tok("た", "Auxiliary"), _tok("そう", "Auxiliary")]
+        assert postprocess_predicate_cell_lemmas(tokens)
+        assert tokens[1]["lemma"] == "たい"
+
+    def test_ease_stem_before_sou_is_adjective(self):
+        tokens = [_tok("書き", "Verb", lemma="書く"), _tok("にく", "Noun"), _tok("そう", "Auxiliary")]
+        assert postprocess_predicate_cell_lemmas(tokens)
+        assert tokens[1] == _tok("にく", "Adjective", lemma="にくい")
+
+    def test_continuative_toru_contraction_is_auxiliary(self):
+        tokens = [_tok("食べ", "Verb", lemma="食べる"), _tok("とれ", "Verb", lemma="とる"), _tok("ば", "Particle")]
+        assert postprocess_predicate_cell_lemmas(tokens)
         assert tokens[1]["pos"] == "Auxiliary"
 
-    def test_inflected_form_after_honorific_nominal_is_auxiliary(self):
-        tokens = [_tok("お", "Prefix"), _tok("待ち", "Noun"), _tok("いただけ", "Verb", lemma="いただける")]
-        postprocess_itadakeru_aux(tokens)
-        assert tokens[2]["pos"] == "Auxiliary"
-
-    def test_object_marked_lexical_verb_is_unchanged(self):
-        tokens = [_tok("本", "Noun"), _tok("を", "Particle"), _tok("いただけ", "Verb", lemma="いただける")]
-        assert not postprocess_itadakeru_aux(tokens)
-        assert tokens[2]["pos"] == "Verb"
+    def test_clause_initial_suffix_is_nominal(self):
+        tokens = [_tok("がち", "Suffix"), _tok("で", "Auxiliary", lemma="だ")]
+        assert postprocess_predicate_cell_lemmas(tokens)
+        assert tokens[0]["pos"] == "Noun"
 
 
 class TestPostprocessCopulaNeg:

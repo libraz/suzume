@@ -523,7 +523,7 @@
           "surface": "読み"
         },
         {
-          "lemma": "た",
+          "lemma": "たい",
           "pos": "Auxiliary",
           "surface": "た"
         },
@@ -543,7 +543,7 @@
           "surface": "書き"
         },
         {
-          "lemma": "た",
+          "lemma": "たい",
           "pos": "Auxiliary",
           "surface": "た"
         },
@@ -1267,8 +1267,8 @@
           "surface": "書き"
         },
         {
-          "lemma": "にく",
-          "pos": "Noun",
+          "lemma": "にくい",
+          "pos": "Adjective",
           "surface": "にく"
         },
         {
@@ -3455,7 +3455,7 @@
         },
         {
           "lemma": "いただける",
-          "pos": "Auxiliary",
+          "pos": "Verb",
           "surface": "いただける"
         }
       ],

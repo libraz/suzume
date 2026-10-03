@@ -338,4 +338,41 @@ void resolveAdverbBeforeCase(std::vector<core::Morpheme>& result) {
   }
 }
 
+// Cell readings a predicate frame decides, mirroring the reference repairs:
+// - た between a godan continuative and そう is the stem of たい (読み+た+そう);
+//   an ichidan one is also the hearsay past (食べ+た+そう) and is left alone;
+// - an ease stem between a continuative and そう is that adjective (書き+にく+そう);
+// - じゃろ is the copula だ, like だろ;
+// - a one-kanji continuative directly before する is a サ変 noun (得+し+た);
+// - とれ after a continuative is the contracted ておる (食べ+とれ+ば);
+// - a suffix cannot open a clause (がち+で).
+void resolvePredicateCellLemmas(std::vector<core::Morpheme>& result) {
+  for (size_t idx = 0; idx < result.size(); ++idx) {
+    auto& cell = result[idx];
+    const core::Morpheme* previous = idx > 0 ? &result[idx - 1] : nullptr;
+    const core::Morpheme* following = idx + 1 < result.size() ? &result[idx + 1] : nullptr;
+    const bool after_verb = previous != nullptr && previous->pos == core::PartOfSpeech::Verb;
+    const bool before_sou = following != nullptr && utf8::equalsAny(following->surface, {"そう"});
+    if (utf8::equalsAny(cell.surface, {"た"}) && after_verb && before_sou &&
+        previous->conj_type != dictionary::ConjugationType::Ichidan &&
+        previous->extended_pos == core::ExtendedPOS::VerbRenyokei) {
+      cell.lemma = "たい";
+    } else if (after_verb && before_sou && utf8::equalsAny(cell.surface, {"にく", "づら", "がた", "やす"}) &&
+               cell.pos != core::PartOfSpeech::Adjective) {
+      retag(cell, core::PartOfSpeech::Adjective, core::ExtendedPOS::AdjStem, cell.surface + "い",
+            dictionary::ConjugationType::IAdjective, grammar::ConjForm::Base);
+    } else if (utf8::equalsAny(cell.surface, {"じゃろ"})) {
+      cell.lemma = "だ";
+    } else if (cell.pos == core::PartOfSpeech::Verb && normalize::utf8Length(cell.surface) == 1 &&
+               grammar::isAllKanji(cell.surface) && following != nullptr && following->getLemma() == "する" &&
+               (previous == nullptr || previous->pos != core::PartOfSpeech::Prefix)) {
+      retagNounSurface(cell);
+    } else if (utf8::equalsAny(cell.surface, {"とれ"}) && after_verb && cell.pos == core::PartOfSpeech::Verb) {
+      retagUninflected(cell, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxAspectIru, "とる");
+    } else if (idx == 0 && result.size() > 1 && cell.pos == core::PartOfSpeech::Suffix) {
+      retagNounSurface(cell);
+    }
+  }
+}
+
 }  // namespace suzume::postprocess::resolver

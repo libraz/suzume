@@ -199,17 +199,18 @@ void resolvePreparatoryVolitional(std::vector<core::Morpheme>& result) {
   }
 }
 
-// The potential humble receiving verb is a benefactive auxiliary after a
-// te-form or honorific renyokei (読んで+いただける, お待ち+いただける).
-// Its inflection does not change that dependent role: いただけ+ます/ない and
-// いただけれ+ば remain auxiliary uses. An object-marked independent use has
-// neither licensed predecessor and therefore remains a lexical verb.
+// A potential benefactive is an auxiliary after a te-form or a continuative
+// (読んで+もらえる), whatever its inflection. The humble いただける is excluded
+// and keeps the verb POS, as いただく does.
 void resolveBenefactivePotential(std::vector<core::Morpheme>& result) {
   for (size_t idx = 1; idx < result.size(); ++idx) {
     const auto& predecessor = result[idx - 1];
     auto& benefactive = result[idx];
     const bool follows_te_form = followsTeFormConnective(predecessor);
-    const bool potential_benefactive = grammar::isPotentialBenefactiveLemma(benefactive.lemma);
+    // The humble いただける keeps the verb POS of いただく, like the other humble
+    // subsidiaries (くださる, いたす); only the plain benefactives are auxiliaries.
+    const bool potential_benefactive =
+        grammar::isPotentialBenefactiveLemma(benefactive.lemma) && !utf8::equalsAny(benefactive.lemma, {"いただける"});
     if (follows_te_form && benefactive.pos == core::PartOfSpeech::Verb &&
         (grammar::isBenefactiveLemma(benefactive.lemma) || potential_benefactive)) {
       benefactive.pos = core::PartOfSpeech::Auxiliary;

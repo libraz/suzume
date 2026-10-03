@@ -1085,6 +1085,9 @@ VERB_NOT_AUX_LEMMAS: set[str] = {
     # lexicon, which would make the oracle contradict itself for 確認いたします
     # and 確認致します.
     "致す",
+    # The potential of the same humble verb いただく keeps its POS.
+    "いただける",
+    "頂ける",
     "頂く",
     "あげる",
     "くれる",

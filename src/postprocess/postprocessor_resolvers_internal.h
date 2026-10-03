@@ -97,6 +97,7 @@ void resolveListingTari(std::vector<core::Morpheme>& result);
 void resolveExcessiveDeverbalNoun(std::vector<core::Morpheme>& result);
 void resolveHonorificContinuativePast(std::vector<core::Morpheme>& result);
 void resolveAdverbBeforeCase(std::vector<core::Morpheme>& result);
+void resolvePredicateCellLemmas(std::vector<core::Morpheme>& result);
 void retagNaAdjectiveSurface(core::Morpheme& morpheme);
 void retagNounSurface(core::Morpheme& morpheme);
 

@@ -182,6 +182,7 @@ postprocess_negative_host = postprocessor_subsidiaries.postprocess_negative_host
 postprocess_sou_host = postprocessor_subsidiaries.postprocess_sou_host
 postprocess_listing_tari = postprocessor_classical.postprocess_listing_tari
 postprocess_adverb_host_context = postprocessor_subsidiaries.postprocess_adverb_host_context
+postprocess_predicate_cell_lemmas = postprocessor_subsidiaries.postprocess_predicate_cell_lemmas
 postprocess_closed_subsidiary_aux = postprocessor_subsidiaries.postprocess_closed_subsidiary_aux
 postprocess_contracted_iku_lemma = postprocessor_subsidiaries.postprocess_contracted_iku_lemma
 postprocess_contracted_progressive_aux = postprocessor_subsidiaries.postprocess_contracted_progressive_aux
@@ -192,7 +193,6 @@ postprocess_honorific_oki_aux = postprocessor_subsidiaries.postprocess_honorific
 postprocess_honorific_request = postprocessor_subsidiaries.postprocess_honorific_request
 postprocess_humble_o_itasu = postprocessor_subsidiaries.postprocess_humble_o_itasu
 postprocess_iru_aux = postprocessor_subsidiaries.postprocess_iru_aux
-postprocess_itadakeru_aux = postprocessor_subsidiaries.postprocess_itadakeru_aux
 postprocess_koto_suru_te = postprocessor_subsidiaries.postprocess_koto_suru_te
 postprocess_kuru_causative = postprocessor_subsidiaries.postprocess_kuru_causative
 postprocess_miru_aux = postprocessor_subsidiaries.postprocess_miru_aux
@@ -234,7 +234,6 @@ POSTPROCESSORS: tuple[tuple[str, Callable[[list[dict]], bool]], ...] = (
     ("teru-te-kureru", postprocess_teru_te_kureru),
     ("teru-te-order", postprocess_teru_te_order),
     ("contracted-progressive-aux", postprocess_contracted_progressive_aux),
-    ("itadakeru-aux", postprocess_itadakeru_aux),
     ("miru-aux", postprocess_miru_aux),
     ("monono-conjunction", postprocess_monono_conjunction),
     ("formal-noun-lemma", postprocess_formal_noun_lemma),
@@ -336,6 +335,7 @@ POSTPROCESSORS: tuple[tuple[str, Callable[[list[dict]], bool]], ...] = (
     ("sou-host", postprocess_sou_host),
     ("listing-tari", postprocess_listing_tari),
     ("adverb-host-context", postprocess_adverb_host_context),
+    ("predicate-cell-lemmas", postprocess_predicate_cell_lemmas),
 )
 
 

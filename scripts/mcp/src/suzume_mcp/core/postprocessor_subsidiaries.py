@@ -378,29 +378,6 @@ def postprocess_kuru_causative(tokens: list[dict]) -> bool:
 
 
 @reports_mutation
-def postprocess_itadakeru_aux(tokens: list[dict]) -> bool:
-    """Treat potential いただける as a humble subsidiary verb after a predicate."""
-    for idx, token in enumerate(tokens):
-        if (
-            token.get("lemma") != "いただける"
-            or not token.get("surface", "").startswith("いただけ")
-            or token.get("pos") != "Verb"
-            or idx == 0
-        ):
-            continue
-        previous = tokens[idx - 1]
-        follows_te_form = previous.get("pos") == "Particle" and previous.get("surface") in {"て", "で"}
-        follows_predicate = previous.get("pos") == "Verb"
-        follows_honorific_nominal = (
-            previous.get("pos") == "Noun"
-            and idx > 1
-            and tokens[idx - 2].get("pos") == "Prefix"
-            and tokens[idx - 2].get("surface") in {"お", "ご", "御"}
-        )
-        if follows_te_form or follows_predicate or follows_honorific_nominal:
-            token["pos"] = "Auxiliary"
-
-
 def postprocess_mu_verb_desiderative(tokens: list[dict]) -> bool:
     """Restore the continuative boundary in a む verb + たい read as a stem + みたい.
 
@@ -947,5 +924,69 @@ def postprocess_adverb_host_context(tokens: list[dict]) -> bool:
         ):
             token["pos"] = "Adjective"
             token["lemma"] = surface[:-1] + "い"
+            changed = True
+    return changed
+
+
+_EASE_ADJECTIVE_STEMS = {"やす": "やすい", "にく": "にくい", "づら": "づらい", "がた": "がたい"}
+
+
+def postprocess_predicate_cell_lemmas(tokens: list[dict]) -> bool:
+    """Repair cell readings a predicate frame decides.
+
+    - た between a continuative and そう is the stem of たい (読み+た+そう);
+    - an ease stem between a continuative and そう is that adjective's stem
+      (書き+にく+そう, like 読み+やす+そう);
+    - じゃろ is the copula だ, like だろ;
+    - a one-kanji continuative in し is the サ変 verb when that verb exists
+      (要し is 要する, as 要する itself is);
+    - とれ after a continuative is the contracted ておる (食べ+とれ+ば);
+    - a suffix cannot open a clause (がち+で is the slang noun).
+    """
+    changed = False
+    for idx, token in enumerate(tokens):
+        surface = token.get("surface", "")
+        previous = tokens[idx - 1] if idx > 0 else {}
+        following = tokens[idx + 1] if idx + 1 < len(tokens) else {}
+        after_continuative = previous.get("pos") == "Verb"
+        # Only a godan continuative settles た+そう: its past takes the onbin
+        # (読ん+だ), whereas 食べ+た+そう is also the hearsay past.
+        previous_surface = previous.get("surface", "")
+        previous_lemma = previous.get("lemma", "")
+        godan_continuative = (
+            after_continuative
+            and not previous_surface.endswith(("っ", "ん", "い"))
+            and not (previous_lemma.endswith("る") and previous_surface == previous_lemma[:-1])
+        )
+        if (
+            surface == "た"
+            and godan_continuative
+            and following.get("surface") == "そう"
+            and token.get("lemma") != "たい"
+        ):
+            token.update(pos="Auxiliary", lemma="たい")
+            changed = True
+        elif surface in _EASE_ADJECTIVE_STEMS and after_continuative and following.get("surface") == "そう":
+            if token.get("pos") != "Adjective":
+                token.update(pos="Adjective", lemma=_EASE_ADJECTIVE_STEMS[surface])
+                changed = True
+        elif surface == "じゃろ" and token.get("lemma") != "だ":
+            token["lemma"] = "だ"
+            changed = True
+        elif (
+            token.get("pos") == "Verb"
+            and len(surface) == 2
+            and surface.endswith("し")
+            and regex.fullmatch(r"\p{Han}", surface[0])
+            and token.get("lemma") == surface[0] + "す"
+            and is_single_token_of_pos(surface[0] + "する", "動詞")
+        ):
+            token["lemma"] = surface[0] + "する"
+            changed = True
+        elif surface == "とれ" and after_continuative and token.get("pos") == "Verb":
+            token.update(pos="Auxiliary", lemma="とる")
+            changed = True
+        elif idx == 0 and token.get("pos") == "Suffix" and len(tokens) > 1:
+            token["pos"] = "Noun"
             changed = True
     return changed

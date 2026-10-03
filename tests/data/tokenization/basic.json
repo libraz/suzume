@@ -599,7 +599,7 @@
       "expected": [
         {
           "lemma": "がち",
-          "pos": "Suffix",
+          "pos": "Noun",
           "surface": "がち"
         },
         {

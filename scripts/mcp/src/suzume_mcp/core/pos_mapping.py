@@ -505,19 +505,6 @@ def correct_mecab_pos(tokens: list[dict]) -> None:
                 t["pos"] = "助動詞"
                 t["lemma"] = "だ"
 
-        # Fix 得 before し/する: Suzume treats as 得る(ichidan) renyokei
-        # MeCab treats as sahen noun (得する), Suzume has 得る in dict
-        if surface == "得" and pos == "名詞":
-            if idx + 1 < len(tokens) and tokens[idx + 1].get("surface") in (
-                "し",
-                "する",
-                "さ",
-                "せ",
-                "でき",
-            ):
-                t["pos"] = "動詞"
-                t["lemma"] = "得る"
-
         # Fix particles misclassified as Noun
         if (
             surface in PARTICLE_CORRECTIONS
