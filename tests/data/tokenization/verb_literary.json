@@ -139,13 +139,13 @@
           "surface": "れ"
         },
         {
-          "lemma": "する",
-          "pos": "Verb",
+          "lemma": "き",
+          "pos": "Auxiliary",
           "surface": "し"
         },
         {
           "lemma": "者",
-          "pos": "Suffix",
+          "pos": "Noun",
           "surface": "者"
         }
       ],

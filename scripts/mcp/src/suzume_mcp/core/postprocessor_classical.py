@@ -455,6 +455,9 @@ def postprocess_classical_past_keri(tokens: list[dict]) -> None:
         token["lemma"] = "けり"
 
 
+_VOICE_AUXILIARY_LEMMAS = frozenset({"れる", "られる", "せる", "させる"})
+
+
 @reports_mutation
 def postprocess_classical_past_shi(tokens: list[dict]) -> bool:
     """Retag the adnominal し between a continuative and a nominal as 過去の助動詞 き.
@@ -479,7 +482,10 @@ def postprocess_classical_past_shi(tokens: list[dict]) -> bool:
         if token.get("surface") != "し" or token.get("pos") != "Verb":
             continue
         following = tokens[idx + 1]
-        if tokens[idx - 1].get("pos") != "Verb":
+        host = tokens[idx - 1]
+        # A voice auxiliary lends the same continuative (選ば+れ+し+者).
+        voice_host = host.get("pos") == "Auxiliary" and host.get("lemma") in _VOICE_AUXILIARY_LEMMAS
+        if host.get("pos") != "Verb" and not voice_host:
             continue
         modifies_nominal = following.get("pos") in ("Noun", "Suffix")
         if not modifies_nominal and following.get("pos_sub1") != "格助詞":
