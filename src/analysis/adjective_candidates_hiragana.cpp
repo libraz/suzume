@@ -836,8 +836,17 @@ void generateHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints
       continue;
     }
     const size_t after_sokuon = stem_end + 1;
+    // After a case particle the run is a verb's onbin instead (東京に+いっ+か);
+    // で is the evaluative frame itself (これで+いっ+か) and stays out.
+    const bool follows_case_particle =
+        start_pos > 0 && dict_manager != nullptr && codepoints[start_pos - 1] != U'で' &&
+        lookupEntryInRange(*dict_manager, codepoints, start_pos - 1, start_pos, core::PartOfSpeech::Particle) !=
+            nullptr &&
+        lookupEntryInRange(*dict_manager, codepoints, start_pos - 1, start_pos, core::PartOfSpeech::Particle)
+                ->extended_pos == core::ExtendedPOS::ParticleCase;
     const bool clipped_before_ka = codepoints[stem_end - 1] == U'い' && after_sokuon < codepoints.size() &&
-                                   codepoints[after_sokuon] == U'か' && closes_utterance(after_sokuon + 1);
+                                   codepoints[after_sokuon] == U'か' && closes_utterance(after_sokuon + 1) &&
+                                   !follows_case_particle;
     if (!clipped_before_ka && (stem_end < start_pos + 2 || !closes_utterance(after_sokuon))) {
       break;
     }
