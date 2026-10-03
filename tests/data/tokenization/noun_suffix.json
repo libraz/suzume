@@ -419,6 +419,50 @@
       ],
       "id": "wo_mu_3",
       "input": "日本語版を読む"
+    },
+    {
+      "description": "先月末決算 - regression test",
+      "expected": [
+        {
+          "lemma": "先月",
+          "pos": "Noun",
+          "surface": "先月"
+        },
+        {
+          "lemma": "末",
+          "pos": "Noun",
+          "surface": "末"
+        },
+        {
+          "lemma": "決算",
+          "pos": "Noun",
+          "surface": "決算"
+        }
+      ],
+      "id": "unnamed_39",
+      "input": "先月末決算"
+    },
+    {
+      "description": "来週末予定 - regression test",
+      "expected": [
+        {
+          "lemma": "来週",
+          "pos": "Noun",
+          "surface": "来週"
+        },
+        {
+          "lemma": "末",
+          "pos": "Noun",
+          "surface": "末"
+        },
+        {
+          "lemma": "予定",
+          "pos": "Noun",
+          "surface": "予定"
+        }
+      ],
+      "id": "unnamed_40",
+      "input": "来週末予定"
     }
   ],
   "description": "noun_suffix tests",
