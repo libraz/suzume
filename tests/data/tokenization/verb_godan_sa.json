@@ -349,6 +349,50 @@
       ],
       "id": "shiteiru",
       "input": "熱している"
+    },
+    {
+      "description": "sentence-initial listed verb that opens with a listed noun stays whole",
+      "expected": [
+        {
+          "lemma": "思い出す",
+          "pos": "Verb",
+          "surface": "思い出す"
+        }
+      ],
+      "id": "i_su",
+      "input": "思い出す"
+    },
+    {
+      "description": "listed verb opening with a listed noun after a particle",
+      "expected": [
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "こと"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        },
+        {
+          "lemma": "たび",
+          "pos": "Noun",
+          "surface": "たび"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "思い出す",
+          "pos": "Verb",
+          "surface": "思い出す"
+        }
+      ],
+      "id": "kotoarutabini_i_su",
+      "input": "ことあるたびに思い出す"
     }
   ],
   "description": "Godan Sa-row verbs (五段サ行動詞) - verbs ending in す",

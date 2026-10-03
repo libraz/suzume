@@ -624,6 +624,9 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       // is selected from contexts that can actually follow a determiner, not
       // by rewarding it immediately after every noun.
       {EPOS::Noun, EPOS::DeterminerQuotative, cost::kStrongBonus},
+      // A formal noun hands off to a particle or a predicate; a determiner
+      // cannot follow it bare (こと+ある+たび, not こと+ある(連体詞)).
+      {EPOS::NounFormal, EPOS::Determiner, cost::kSevere},
 
       // Formal nouns can take a sentence-final particle directly in colloquial
       // nominal predicates (どういうこと+だい, そんなこと+さ). Prefer this

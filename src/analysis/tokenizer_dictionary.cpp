@@ -54,6 +54,21 @@ bool endsDictionaryVerbSpanningBack(const dictionary::DictionaryManager& dict_ma
   return false;
 }
 
+// Whether a listed noun ending at @p start_pos opens a listed verb that ends at
+// @p end_pos, so the span is the verb's tail rather than a word of its own.
+bool splitsListedVerbAtNoun(const dictionary::DictionaryManager& dict_manager, const std::vector<char32_t>& codepoints,
+                            size_t start_pos, size_t end_pos) {
+  constexpr size_t kMaxNounChars = 4;
+  const size_t scan_start = start_pos > kMaxNounChars ? start_pos - kMaxNounChars : 0;
+  for (size_t host_start = scan_start; host_start < start_pos; ++host_start) {
+    if (lookupEntryInRange(dict_manager, codepoints, host_start, start_pos, core::PartOfSpeech::Noun) != nullptr &&
+        lookupEntryInRange(dict_manager, codepoints, host_start, end_pos, core::PartOfSpeech::Verb) != nullptr) {
+      return true;
+    }
+  }
+  return false;
+}
+
 // The passive される may follow a productive Sahen nominal, but an arbitrary
 // one-kanji unknown noun is not enough evidence for that omitted する. A
 // dictionary noun can establish the lexical exception (愛+さ+れる), while an
@@ -1224,6 +1239,12 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
          (result.entry->extended_pos == core::ExtendedPOS::ParticleFinal &&
           kana::isURowCodepoint(codepoints[end_pos - 1]))) &&
         endsDictionaryVerbSpanningBack(dict_manager_, codepoints, start_pos, end_pos)) {
+      continue;
+    }
+    // Nor does the one-mora サ変 terminal す split a listed verb into the
+    // listed noun it opens with plus す (思い出す, not 思い出+す; 提出+す stays).
+    if (result.length == 1 && result.entry->extended_pos == core::ExtendedPOS::VerbShuushikei &&
+        result.entry->lemma == "する" && splitsListedVerbAtNoun(dict_manager_, codepoints, start_pos, end_pos)) {
       continue;
     }
 
