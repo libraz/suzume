@@ -924,6 +924,38 @@
       ],
       "id": "ri_ga",
       "input": "取り沙汰が"
+    },
+    {
+      "description": "手続き方法を確認する - regression test",
+      "expected": [
+        {
+          "lemma": "手続き",
+          "pos": "Noun",
+          "surface": "手続き"
+        },
+        {
+          "lemma": "方法",
+          "pos": "Noun",
+          "surface": "方法"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "確認",
+          "pos": "Noun",
+          "surface": "確認"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "ki_wo_suru_2",
+      "input": "手続き方法を確認する"
     }
   ],
   "description": "noun_compounds tests",

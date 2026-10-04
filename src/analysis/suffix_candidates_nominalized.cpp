@@ -587,8 +587,12 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
       // continuative the grammar derives from a verb it knows (水|流れ). Price
       // the guess above that split so a fabricated compound cannot undercut its
       // own constituents.
+      // A kanji head right after the okurigana is such a frame as well: a bare
+      // continuative does not run into a noun without a comma (手続き方法).
+      const bool heads_kanji_compound =
+          kanji_end + 1 < char_types.size() && char_types[kanji_end + 1] == normalize::CharType::Kanji;
       const bool has_nominal_evidence = nom1_cost < base_nom1_cost || has_particle_continuation || nominal_compound ||
-                                        is_classical_iadjective_terminal;
+                                        is_classical_iadjective_terminal || heads_kanji_compound;
       if (!has_nominal_evidence && kanji_count >= 2) {
         nom1_cost += candidate::kUnselectedNominalizationPenalty;
       }
@@ -610,15 +614,13 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
       const bool ends_on_dictionary_adjective =
           kanji_count >= 2 &&
           verb_helpers::isAdjectiveInDictionary(dict_manager, codepoints, kanji_end - 1, kanji_end + 1);
-      // The end of the input selects a nominal too. A bare continuative is not a
-      // finite form, so it cannot close a sentence on its own — the 連用中止 use
-      // hands the clause on and shows up before a comma, never at the end (似た
-      // 輝き, 優れた働き). Without this the deverbal reading has no candidate at
-      // all wherever the frame is a clause end rather than a particle.
+      // The end of the input and a following kanji head select a nominal too. A
+      // bare continuative is not a finite form, so it cannot close a sentence on
+      // its own — the 連用中止 use hands the clause on and shows up before a
+      // comma (似た輝き, 手続き方法). Without this the deverbal reading has no
+      // candidate wherever the frame is not a particle.
       const bool has_explicit_nominal_selector =
-          has_particle_continuation || kanji_end + 1 == codepoints.size() ||
-          (kanji_end + 1 < char_types.size() && char_types[kanji_end + 1] == normalize::CharType::Hiragana &&
-           selectsNominalHost(dict_manager, codepoints, char_types, kanji_end + 1));
+          has_particle_continuation || selectsNominalHost(dict_manager, codepoints, char_types, kanji_end + 1);
       // A particle-selected continuative compound is a complete nominal even
       // when its final mora is homographic with a classical auxiliary. For
       // example, 山登りを has productive verb-shape evidence plus a case
