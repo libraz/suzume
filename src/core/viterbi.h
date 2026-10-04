@@ -114,27 +114,23 @@ class Viterbi {
       // pass is position-ordered and start < end).
       void insert(const Lattice& lattice, float cost, uint32_t edge_id, uint16_t prev_epos_idx, uint8_t prev_slot) {
         const auto& edge = lattice.getEdge(edge_id);
+        // The slot vacated for the candidate: its identity twin, else a new or the most expensive slot.
+        size_t slot = count;
         for (size_t existing = 0; existing < count; ++existing) {
           if (hasSameScoringIdentity(lattice.getEdge(entries[existing].edge_id), edge)) {
             if (cost >= entries[existing].cost) {
               return;
             }
-            size_t dedup_slot = existing;
-            while (dedup_slot > 0 && cost < entries[dedup_slot - 1].cost) {
-              entries[dedup_slot] = entries[dedup_slot - 1];
-              --dedup_slot;
-            }
-            entries[dedup_slot] = StateEntry{cost, edge_id, prev_epos_idx, prev_slot};
-            return;
+            slot = existing;
+            break;
           }
         }
-        size_t slot = count;
         if (slot == kStatesPerKey) {
           if (cost >= entries[kStatesPerKey - 1].cost) {
             return;
           }
           slot = kStatesPerKey - 1;
-        } else {
+        } else if (slot == count) {
           ++count;
         }
         while (slot > 0 && cost < entries[slot - 1].cost) {
@@ -295,28 +291,30 @@ class Viterbi {
 
     // Backtrack: follow the specific (ExtendedPOS, slot) entry that produced
     // each chosen edge.
-    if (best_cost < std::numeric_limits<float>::max()) {
-      result.total_cost = best_cost;
+    const auto backtrack = [&](size_t epos_idx, uint8_t slot) {
+      std::vector<size_t> path;
       size_t current_pos = text_len;
-      size_t current_epos_idx = best_final_epos_idx;
-      uint8_t current_slot = best_final_slot;
-
       while (current_pos > 0) {
-        const StateSlots* slots = states_by_pos[current_pos].find(static_cast<uint16_t>(current_epos_idx));
-        if (slots == nullptr || current_slot >= slots->count) {
+        const StateSlots* slots = states_by_pos[current_pos].find(static_cast<uint16_t>(epos_idx));
+        if (slots == nullptr || slot >= slots->count) {
           break;
         }
-        const auto& entry = slots->entries[current_slot];
+        const auto& entry = slots->entries[slot];
         if (entry.edge_id == kBosEdgeId) {
           break;
         }
-
-        result.path.push_back(entry.edge_id);
+        path.push_back(entry.edge_id);
         current_pos = lattice.getEdge(entry.edge_id).start;
-        current_epos_idx = entry.prev_epos_idx;
-        current_slot = entry.prev_slot;
+        epos_idx = entry.prev_epos_idx;
+        slot = entry.prev_slot;
       }
-      std::reverse(result.path.begin(), result.path.end());
+      std::reverse(path.begin(), path.end());
+      return path;
+    };
+
+    if (best_cost < std::numeric_limits<float>::max()) {
+      result.total_cost = best_cost;
+      result.path = backtrack(best_final_epos_idx, best_final_slot);
     }
 
     // Debug: print final path and runner-up comparison
@@ -338,26 +336,7 @@ class Viterbi {
       // Show runner-up path at verbose level
       SUZUME_DEBUG_VERBOSE_BLOCK {
         if (second_cost < std::numeric_limits<float>::max() && second_cost != best_cost) {
-          // Backtrack runner-up path
-          std::vector<size_t> runner_up_path;
-          size_t ru_pos = text_len;
-          size_t ru_epos_idx = second_final_epos_idx;
-          uint8_t ru_slot = second_final_slot;
-          while (ru_pos > 0) {
-            const StateSlots* slots = states_by_pos[ru_pos].find(static_cast<uint16_t>(ru_epos_idx));
-            if (slots == nullptr || ru_slot >= slots->count) {
-              break;
-            }
-            const auto& entry = slots->entries[ru_slot];
-            if (entry.edge_id == kBosEdgeId) {
-              break;
-            }
-            runner_up_path.push_back(entry.edge_id);
-            ru_pos = lattice.getEdge(entry.edge_id).start;
-            ru_epos_idx = entry.prev_epos_idx;
-            ru_slot = entry.prev_slot;
-          }
-          std::reverse(runner_up_path.begin(), runner_up_path.end());
+          const std::vector<size_t> runner_up_path = backtrack(second_final_epos_idx, second_final_slot);
 
           if (!runner_up_path.empty()) {
             SUZUME_DEBUG_STREAM << "[VITERBI] Runner-up (cost=" << second_cost << "): ";

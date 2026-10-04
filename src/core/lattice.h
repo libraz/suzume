@@ -165,10 +165,10 @@ class Lattice {
    */
   class TextStorage {
    public:
-    /** Copy text into the storage and return a view that stays valid until clear(). */
+    /** Copy text into the storage and return a view that stays valid until clear(); empty text yields an empty view. */
     std::string_view store(std::string_view text);
 
-    /** Drop every stored run, keeping the first chunk's memory for reuse. */
+    /** Drop every stored run. */
     void clear();
 
    private:

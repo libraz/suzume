@@ -541,7 +541,7 @@ ExtendedPOS detectVerbForm(std::string_view surface, std::string_view suffix, bo
       return ExtendedPOS::VerbTeForm;
     }
     // ば forms (conditional)
-    if (utf8::endsWithAny(suffix, {"ば"})) {
+    if (utf8::endsWith(suffix, "ば")) {
       return ExtendedPOS::VerbKateikei;
     }
     // ます forms indicate renyokei connection
@@ -566,7 +566,7 @@ ExtendedPOS detectVerbForm(std::string_view surface, std::string_view suffix, bo
   // Also check for い-onbin (書い from 書く).  The surface alone cannot
   // distinguish it from an ichidan continuative such as 老い/率い/用い, so
   // only candidate generation with known ka/ga-row conjugation may select it.
-  if (utf8::endsWithAny(surface, {"い"})) {
+  if (utf8::endsWith(surface, "い")) {
     if (godan_i_onbin_hint) {
       return ExtendedPOS::VerbOnbinkei;
     }
@@ -589,7 +589,7 @@ ExtendedPOS detectVerbForm(std::string_view surface, std::string_view suffix, bo
   }
 
   // ば form (conditional)
-  if (utf8::endsWithAny(surface, {"ば"})) {
+  if (utf8::endsWith(surface, "ば")) {
     return ExtendedPOS::VerbKateikei;
   }
 
@@ -634,7 +634,7 @@ ExtendedPOS detectAdjForm(std::string_view surface, bool is_na_adj) {
   // Check for specific i-adjective endings
 
   // かっ form (past stem): 美しかっ, 高かっ
-  if (utf8::endsWithAny(surface, {"かっ"})) {
+  if (utf8::endsWith(surface, "かっ")) {
     return ExtendedPOS::AdjKatt;
   }
 
@@ -644,17 +644,17 @@ ExtendedPOS detectAdjForm(std::string_view surface, bool is_na_adj) {
   }
 
   // かろ form (irrealis stem for 推量): 美しかろ, 高かろ
-  if (utf8::endsWithAny(surface, {"かろ"})) {
+  if (utf8::endsWith(surface, "かろ")) {
     return ExtendedPOS::AdjMizenkei;
   }
 
   // く form (adverbial/renyokei): 美しく, 高く
-  if (utf8::endsWithAny(surface, {"く"})) {
+  if (utf8::endsWith(surface, "く")) {
     return ExtendedPOS::AdjRenyokei;
   }
 
   // い form (basic/shuushi): 美しい, 高い
-  if (utf8::endsWithAny(surface, {"い"})) {
+  if (utf8::endsWith(surface, "い")) {
     return ExtendedPOS::AdjBasic;
   }
 

@@ -259,14 +259,6 @@ template <typename Entry, size_t Size>
   return s.size() >= n ? s.substr(s.size() - n) : std::string_view{};
 }
 
-/// Get the first N bytes of a string as a string_view
-/// @param s The source string
-/// @param n Number of bytes to get
-/// @return The first N bytes, or entire string if s.size() < n
-[[nodiscard]] inline constexpr std::string_view firstNBytes(std::string_view s, size_t n) noexcept {
-  return s.substr(0, n);
-}
-
 /// Get string without the last N bytes
 /// @param s The source string
 /// @param n Number of bytes to drop from end
@@ -275,25 +267,12 @@ template <typename Entry, size_t Size>
   return s.size() >= n ? s.substr(0, s.size() - n) : std::string_view{};
 }
 
-/// Get string without the first N bytes
-/// @param s The source string
-/// @param n Number of bytes to drop from start
-/// @return String without first N bytes, or empty if s.size() < n
-[[nodiscard]] inline constexpr std::string_view dropFirst(std::string_view s, size_t n) noexcept {
-  return s.size() >= n ? s.substr(n) : std::string_view{};
-}
-
 // Convenience aliases for common Japanese character operations
 // These use byte counts, not character counts
 
 /// Get the last Japanese character (3 bytes)
 [[nodiscard]] inline constexpr std::string_view lastChar(std::string_view s) noexcept {
   return lastNBytes(s, kJapaneseCharBytes);
-}
-
-/// Get the last 2 Japanese characters (6 bytes)
-[[nodiscard]] inline constexpr std::string_view last2Chars(std::string_view s) noexcept {
-  return lastNBytes(s, kTwoJapaneseCharBytes);
 }
 
 /// Get the last 3 Japanese characters (9 bytes)

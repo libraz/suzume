@@ -30,26 +30,11 @@ size_t Lattice::addEdge(std::string_view surface, uint32_t start, uint32_t end, 
     return static_cast<size_t>(-1);
   }
 
-  // Store surface string
-  std::string_view stored_surface = text_storage_.store(surface);
-
-  // Store lemma if provided
-  std::string_view stored_lemma;
-  if (!lemma.empty()) {
-    stored_lemma = text_storage_.store(lemma);
-  }
-
+  const std::string_view stored_surface = text_storage_.store(surface);
+  const std::string_view stored_lemma = text_storage_.store(lemma);
 #ifdef SUZUME_DEBUG_INFO
-  // Store origin_detail if provided (debug only)
-  std::string_view stored_origin_detail;
-  if (!origin_detail.empty()) {
-    stored_origin_detail = text_storage_.store(origin_detail);
-  }
-  // Store epos_source if provided (debug only)
-  std::string_view stored_epos_source;
-  if (!epos_source.empty()) {
-    stored_epos_source = text_storage_.store(epos_source);
-  }
+  const std::string_view stored_origin_detail = text_storage_.store(origin_detail);
+  const std::string_view stored_epos_source = text_storage_.store(epos_source);
 #endif
 
   LatticeEdge edge;
@@ -178,6 +163,9 @@ void Lattice::clear() {
 }
 
 std::string_view Lattice::TextStorage::store(std::string_view text) {
+  if (text.empty()) {
+    return {};
+  }
   if (used_ + text.size() > capacity_) {
     capacity_ = text.size() > kChunkBytes ? text.size() : kChunkBytes;
     chunks_.push_back(std::make_unique<char[]>(capacity_));
