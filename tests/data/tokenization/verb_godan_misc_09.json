@@ -139,6 +139,38 @@
       ],
       "id": "tttarashii_3",
       "input": "言ったらしい"
+    },
+    {
+      "description": "Irrealis + ず is not a deverbal noun",
+      "expected": [
+        {
+          "lemma": "書く",
+          "pos": "Verb",
+          "surface": "書か"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ず"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "済む",
+          "pos": "Verb",
+          "surface": "済ま"
+        },
+        {
+          "lemma": "せる",
+          "pos": "Auxiliary",
+          "surface": "せる"
+        }
+      ],
+      "id": "kazuni_maseru",
+      "input": "書かずに済ませる"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",

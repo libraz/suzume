@@ -709,8 +709,13 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
     // renyokei remains available as the productive analysis.
     const bool starts_inside_kanji_run = cand.start > 0 && normalize::isKanjiCodepoint(codepoints[cand.start - 1]) &&
                                          normalize::isKanjiCodepoint(codepoints[cand.start]);
-    if (cand.pos != core::PartOfSpeech::Verb || cand.origin != core::CandidateOrigin::VerbKanji ||
-        cand.extended_pos != core::ExtendedPOS::VerbRenyokei ||
+    // A deverbal noun is the bare continuative, which ends in an i/e-row kana
+    // or the kanji stem; a span closing on an auxiliary (行か+ず) is not one.
+    const char32_t final_char = codepoints[cand.end - 1];
+    const bool ends_in_continuative = normalize::isKanjiCodepoint(final_char) || grammar::isIRowCodepoint(final_char) ||
+                                      grammar::isERowCodepoint(final_char);
+    if (!ends_in_continuative || cand.pos != core::PartOfSpeech::Verb ||
+        cand.origin != core::CandidateOrigin::VerbKanji || cand.extended_pos != core::ExtendedPOS::VerbRenyokei ||
         (!cand.lemma_verified && cand.conj_type != dictionary::ConjugationType::GodanSa) || starts_inside_kanji_run ||
         hasDictionaryAdjectiveTail(codepoints, cand.start, cand.end, dict_manager) ||
         vh::isBoundSuffixAfterNominalHost(dict_manager, codepoints, cand.start, cand.surface) ||
