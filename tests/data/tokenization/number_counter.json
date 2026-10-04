@@ -2439,6 +2439,104 @@
       ],
       "id": "24_no",
       "input": "24時間営業の店"
+    },
+    {
+      "description": "2つ目の角を曲がる - regression test",
+      "expected": [
+        {
+          "lemma": "2つ目",
+          "pos": "Noun",
+          "surface": "2つ目"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "角",
+          "pos": "Noun",
+          "surface": "角"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "曲がる",
+          "pos": "Verb",
+          "surface": "曲がる"
+        }
+      ],
+      "id": "2tsu_no_wo_garu",
+      "input": "2つ目の角を曲がる"
+    },
+    {
+      "description": "2ステップ目に進む - regression test",
+      "expected": [
+        {
+          "lemma": "2ステップ目",
+          "pos": "Noun",
+          "surface": "2ステップ目"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "進む",
+          "pos": "Verb",
+          "surface": "進む"
+        }
+      ],
+      "id": "2_ni_mu_3",
+      "input": "2ステップ目に進む"
+    },
+    {
+      "description": "3号室に住む - regression test",
+      "expected": [
+        {
+          "lemma": "3号室",
+          "pos": "Noun",
+          "surface": "3号室"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "住む",
+          "pos": "Verb",
+          "surface": "住む"
+        }
+      ],
+      "id": "3_ni_mu",
+      "input": "3号室に住む"
+    },
+    {
+      "description": "3ページ目を開く - regression test",
+      "expected": [
+        {
+          "lemma": "3ページ目",
+          "pos": "Noun",
+          "surface": "3ページ目"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "開く",
+          "pos": "Verb",
+          "surface": "開く"
+        }
+      ],
+      "id": "3_wo_ku",
+      "input": "3ページ目を開く"
     }
   ],
   "description": "number_counter tests",

@@ -296,7 +296,7 @@ def _absorb_unevenly_cut_kanji_run(
         return j, combined
     if absorbed_counter:
         counter_len = 0
-    elif j == i + 1 and reads_as_counter(run[0]):
+    elif j == i + 1 and reads_as_counter(run[0], suffix_only=True):
         first = tokens[j].get("surface", "")
         counter_len = 1
         while counter_len < len(first) and reads_as_counter(first[counter_len]):
@@ -1133,6 +1133,16 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                     j += 1
                     last_was_counter = is_counter or is_interrogative_counter
                     if any([is_katakana_noun, is_chuu_suffix, is_me_suffix, is_counter_aux, is_percent, is_alpha_unit]):
+                        # The ordinal 目 still closes a unit that ends the chain
+                        # (2つ+目, 3ページ+目), as it does after a counter (3回目).
+                        if (
+                            (is_katakana_noun or is_counter_aux)
+                            and j < len(tokens)
+                            and tokens[j].get("surface") == "目"
+                            and tokens[j].get("pos") == "名詞"
+                        ):
+                            combined += "目"
+                            j += 1
                         break
                 else:
                     break

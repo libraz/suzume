@@ -44,13 +44,15 @@ def is_na_adjective_stem(surface: str) -> bool:
 
 
 @functools.lru_cache(maxsize=4096)
-def reads_as_counter(kanji: str) -> bool:
+def reads_as_counter(kanji: str, suffix_only: bool = False) -> bool:
     """Whether the reference dictionary reads a kanji as a counter after a numeral.
 
     A two-kanji noun led by a counter (種類, 世帯) is emitted whole, so the
     counter reading of its first kanji is only visible when that kanji stands
-    alone after a digit. A bare month (3月) reads as the noun 月, so the
-    counter is also probed before a following relational noun (3月以降).
+    alone after a digit. A bare month (3月) reads as the noun 月, so the counter
+    is also probed before a following relational noun (3月以降). With
+    ``suffix_only`` any suffix reading counts, which admits a number-taking
+    suffix outside the counter subtype (3+号).
     """
     for tail in ("", "以降"):
         probe = mecab_analyze("3" + kanji + tail)
@@ -58,7 +60,7 @@ def reads_as_counter(kanji: str) -> bool:
             len(probe) >= 2
             and probe[1].get("surface") == kanji
             and probe[1].get("pos_sub1") == "接尾"
-            and probe[1].get("pos_sub2") == "助数詞"
+            and (suffix_only or probe[1].get("pos_sub2") == "助数詞")
         ):
             return True
     return False

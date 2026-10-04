@@ -906,12 +906,15 @@ def apply_suzume_split(tokens: list[dict]) -> tuple[list[dict], str | None]:
                 applied_rule = "prefecture-city-split"
             continue
 
-        # 7. Kanji + Katakana compound nouns
+        # 7. Kanji + Katakana compound nouns; an ordinal 目 closing a quantity
+        # stays its own token after the split (三+ページ+目).
         if t.get("pos") == "名詞" and surface not in USER_DICT_COMPOUNDS:
-            m = regex.match(r"^([\p{Han}]+)([\u30A0-\u30FFー]+)$", surface)
+            m = regex.match(r"^([\p{Han}]+)([\u30A0-\u30FFー]+)(目)?$", surface)
             if m:
                 result.append({"surface": m.group(1), "pos": "名詞", "lemma": m.group(1)})
                 result.append({"surface": m.group(2), "pos": "名詞", "lemma": m.group(2)})
+                if m.group(3):
+                    result.append({"surface": "目", "pos": "名詞", "pos_sub1": "接尾", "lemma": "目"})
                 if applied_rule is None:
                     applied_rule = "kanji-katakana-split"
                 continue
