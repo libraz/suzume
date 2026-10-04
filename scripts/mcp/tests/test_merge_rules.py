@@ -1654,3 +1654,25 @@ class TestBoundVoicedSuffix:
         result, rule = _postprocess_bound_voiced_suffix(tokens, None)
         assert [t["surface"] for t in result] == ["紫", "がかれ", "ば"]
         assert rule == "bound-voiced-suffix"
+
+
+class TestQuantityPhraseKanjiRun:
+    def _merge(self, text):
+        merged, _ = apply_suzume_merge(mecab_analyze(text), text)
+        return [token["surface"] for token in merged]
+
+    def test_absorbs_lone_kanji_after_counter(self):
+        assert self._merge("3部作を読む")[0] == "3部作"
+        assert self._merge("3人分の料理")[0] == "3人分"
+
+    def test_reads_counter_led_noun_with_numeral(self):
+        assert self._merge("3種類の本")[0] == "3種類"
+        assert self._merge("2世帯が住む")[0] == "2世帯"
+
+    def test_keeps_relative_time_noun_apart(self):
+        assert self._merge("3年後に会う")[:2] == ["3年", "後"]
+
+    def test_keeps_kanji_numerals_and_longer_runs_apart(self):
+        assert self._merge("五分半かかった")[:2] == ["五分", "半"]
+        assert self._merge("3年計画書を作る")[0] == "3年"
+        assert self._merge("5年間彼を待ち続けた")[:2] == ["5年間", "彼"]

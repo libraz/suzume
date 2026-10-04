@@ -26,7 +26,7 @@ from .constants import (
     TEMPORAL_PREFIX_KANJI,
 )
 from .core_lexicon import core_headwords_by_length, kana_i_adjective_lemmas
-from .mecab import is_single_token_of_pos, mecab_analyze
+from .mecab import is_single_token_of_pos, mecab_analyze, reads_as_counter
 from .merge_postprocessors import (
     KARI_MIZENKEI_CELL,
     apply_merge_postprocessors,
@@ -249,6 +249,15 @@ def _heads_nidan_cell(tokens: list[dict], index: int) -> bool:
     """Whether the token at ``index`` is the stem of a classical 二段 finite cell."""
     following = tokens[index + 1] if index + 1 < len(tokens) else None
     return nidan_cell(tokens[index], following) is not None
+
+
+# Relative-time nouns after a duration keep their own boundary (3年+後, 5分+前).
+_TEMPORAL_RELATION_SUFFIXES = frozenset({"前", "後"})
+
+
+def _starts_with_kanji(surface: str) -> bool:
+    """Whether a surface opens with a kanji."""
+    return regex.match(r"\p{Han}", surface) is not None
 
 
 def _kanji_noun_run(tokens: list[dict], start: int) -> tuple[int, str]:
@@ -990,12 +999,46 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
         ):
             j = i + 1
             combined = t.get("surface", "")
+            last_was_counter = False
             while j < len(tokens):
                 nxt = tokens[j]
                 ns = nxt.get("surface", "")
                 np = nxt.get("pos", "")
                 ns1 = nxt.get("pos_sub1", "")
                 ns2 = nxt.get("pos_sub2", "")
+                # A quantity phrase does not strand one kanji at the end of a
+                # kanji run: a lone kanji after the counter is its suffix
+                # (3部+作, 3倍+速), and a two-kanji noun whose first kanji is
+                # itself a counter is read with the numeral (3+種類, 2+世帯).
+                # Kanji numerals take a separate path in the tokenizer, so the
+                # rule is read on digits only.
+                ends_kanji_run = j + 1 >= len(tokens) or not _starts_with_kanji(tokens[j + 1].get("surface", ""))
+                opens_with_digits = regex.match(r"^[0-9０-９]+$", t.get("surface", "")) is not None
+                is_stranded_counter_suffix = (
+                    last_was_counter
+                    and opens_with_digits
+                    and ends_kanji_run
+                    and ns not in _TEMPORAL_RELATION_SUFFIXES
+                    and np == "名詞"
+                    and ns1 in ("接尾", "一般")
+                    and len(ns) == 1
+                    and _starts_with_kanji(ns)
+                )
+                is_counter_led_noun = (
+                    j == i + 1
+                    and opens_with_digits
+                    and ends_kanji_run
+                    and np == "名詞"
+                    and ns1 not in ("数", "接尾", "固有名詞")
+                    and len(ns) == 2
+                    and _starts_with_kanji(ns)
+                    and _starts_with_kanji(ns[1])
+                    and reads_as_counter(ns[0])
+                )
+                if is_stranded_counter_suffix or is_counter_led_noun:
+                    combined += ns
+                    j += 1
+                    break
 
                 counter_continues_fraction = (
                     ns.endswith("の")
@@ -1067,6 +1110,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                 ):
                     combined += ns
                     j += 1
+                    last_was_counter = is_counter or is_interrogative_counter
                     if any([is_katakana_noun, is_chuu_suffix, is_me_suffix, is_counter_aux, is_percent, is_alpha_unit]):
                         break
                 else:

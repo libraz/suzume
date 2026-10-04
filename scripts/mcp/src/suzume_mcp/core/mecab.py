@@ -43,6 +43,23 @@ def is_na_adjective_stem(surface: str) -> bool:
     return bool(probe) and probe[0].get("surface") == surface and probe[0].get("pos_sub1") == "形容動詞語幹"
 
 
+@functools.lru_cache(maxsize=4096)
+def reads_as_counter(kanji: str) -> bool:
+    """Whether the reference dictionary reads a kanji as a counter after a numeral.
+
+    A two-kanji noun led by a counter (種類, 世帯) is emitted whole, so the
+    counter reading of its first kanji is only visible when that kanji stands
+    alone after a digit.
+    """
+    probe = mecab_analyze("3" + kanji)
+    return (
+        len(probe) == 2
+        and probe[1].get("surface") == kanji
+        and probe[1].get("pos_sub1") == "接尾"
+        and probe[1].get("pos_sub2") == "助数詞"
+    )
+
+
 def _parse_mecab_output(output: str) -> list[dict]:
     """Parse MeCab tab-separated output into token dicts.
 

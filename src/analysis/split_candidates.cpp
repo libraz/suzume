@@ -254,9 +254,10 @@ void addMixedScriptCandidates(core::Lattice& lattice, std::string_view text, con
       // fragment 階評価, while the even cut leaves the word 評価. Charge the odd
       // leftover so the even boundary wins. When the run offers no even cut the
       // charge is uniform across candidates, so the quantity phrase still beats
-      // the bare numeral (3年 + 計画書).
+      // the bare numeral (3年 + 計画書). A single stranded kanji is no word at
+      // all (3種+類, 2世+帯), so it is charged above the bare-numeral path.
       if ((kanji_run_end - candidate_end) % 2 == 1) {
-        length_adjustment += bigram_cost::kMinor;
+        length_adjustment += kanji_run_end - candidate_end == 1 ? bigram_cost::kRare : bigram_cost::kMinor;
       }
       float final_cost = base_cost + length_adjustment;
       SUZUME_DEBUG_LOG_VERBOSE("[SPLIT_MIX] \"" << surface << "\": digit+kanji" << kanji_len

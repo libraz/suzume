@@ -1908,6 +1908,153 @@
       ],
       "id": "2_2",
       "input": "第2部門"
+    },
+    {
+      "description": "3種類の花が咲く - regression test",
+      "expected": [
+        {
+          "lemma": "3種類",
+          "pos": "Noun",
+          "surface": "3種類"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "花",
+          "pos": "Noun",
+          "surface": "花"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "咲く",
+          "pos": "Verb",
+          "surface": "咲く"
+        }
+      ],
+      "id": "3_no_ga_ku",
+      "input": "3種類の花が咲く"
+    },
+    {
+      "description": "2世帯が住む - regression test",
+      "expected": [
+        {
+          "lemma": "2世帯",
+          "pos": "Noun",
+          "surface": "2世帯"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "住む",
+          "pos": "Verb",
+          "surface": "住む"
+        }
+      ],
+      "id": "2_ga_mu",
+      "input": "2世帯が住む"
+    },
+    {
+      "description": "3部作を読む - regression test",
+      "expected": [
+        {
+          "lemma": "3部作",
+          "pos": "Noun",
+          "surface": "3部作"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読む"
+        }
+      ],
+      "id": "3_wo_mu_2",
+      "input": "3部作を読む"
+    },
+    {
+      "description": "3倍速で見る - regression test",
+      "expected": [
+        {
+          "lemma": "3倍速",
+          "pos": "Noun",
+          "surface": "3倍速"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見る"
+        }
+      ],
+      "id": "3_de_ru",
+      "input": "3倍速で見る"
+    },
+    {
+      "description": "3人分の料理 - regression test",
+      "expected": [
+        {
+          "lemma": "3人分",
+          "pos": "Noun",
+          "surface": "3人分"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "料理",
+          "pos": "Noun",
+          "surface": "料理"
+        }
+      ],
+      "id": "3_no",
+      "input": "3人分の料理"
+    },
+    {
+      "description": "3年後に会う - regression test",
+      "expected": [
+        {
+          "lemma": "3年",
+          "pos": "Noun",
+          "surface": "3年"
+        },
+        {
+          "lemma": "後",
+          "pos": "Suffix",
+          "surface": "後"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "会う",
+          "pos": "Verb",
+          "surface": "会う"
+        }
+      ],
+      "id": "3_ni_u",
+      "input": "3年後に会う"
     }
   ],
   "description": "number_counter tests",
