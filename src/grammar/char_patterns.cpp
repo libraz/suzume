@@ -11,6 +11,7 @@
 
 #include "core/kana_constants.h"
 #include "core/utf8_constants.h"
+#include "normalize/char_type.h"
 #include "normalize/utf8.h"
 
 namespace suzume::grammar {
@@ -99,6 +100,13 @@ bool endsWithRenyokeiMarker(std::string_view stem) {
 
 bool isDeverbalSuffixKanji(char32_t codepoint) {
   return codepoint == U'方' || codepoint == U'手' || codepoint == U'物' || codepoint == U'所' || codepoint == U'場';
+}
+
+bool isBoundDeverbalSuffixAt(const std::vector<char32_t>& codepoints, size_t pos) {
+  if (pos >= codepoints.size() || !isDeverbalSuffixKanji(codepoints[pos])) {
+    return false;
+  }
+  return codepoints[pos] == U'物' || pos + 1 >= codepoints.size() || !normalize::isKanjiCodepoint(codepoints[pos + 1]);
 }
 
 bool isTransitiveAsuStem(std::u32string_view stem) {

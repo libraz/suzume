@@ -869,7 +869,7 @@ ContextualDictionaryCandidateState addContextualDictionaryCandidates(
                     candidate::kDictionaryOriginConfidence, {}, causal_epos, "regional_causal_ki");
   }
 
-  if (grammar::isDeverbalSuffixKanji(codepoints[start_pos]) && hasPrecedingDeverbalNoun(lattice, start_pos)) {
+  if (grammar::isBoundDeverbalSuffixAt(codepoints, start_pos) && hasPrecedingDeverbalNoun(lattice, start_pos)) {
     const std::string suffix = normalize::encodeUtf8(codepoints[start_pos]);
     lattice.addEdge(suffix, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(start_pos + 1),
                     core::PartOfSpeech::Suffix, candidate::kDeverbalMethodSuffixCost,
@@ -2277,6 +2277,18 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
                    candidate.length > result.length;
           });
       if (has_longer_verb) {
+        continue;
+      }
+    }
+
+    // A deverbal suffix after a kana continuative binds to it only when it
+    // closes the kanji run; otherwise it opens the next noun, whether listed
+    // alone or as the tail of a lexical noun (申し込み+手続き, 置き+場所).
+    if (result.entry->pos == core::PartOfSpeech::Suffix || result.entry->pos == core::PartOfSpeech::Noun) {
+      const size_t suffix_pos = start_pos + result.length - 1;
+      if (suffix_pos > 0 && kana::isHiraganaCodepoint(codepoints[suffix_pos - 1]) &&
+          grammar::isDeverbalSuffixKanji(codepoints[suffix_pos]) &&
+          !grammar::isBoundDeverbalSuffixAt(codepoints, suffix_pos)) {
         continue;
       }
     }

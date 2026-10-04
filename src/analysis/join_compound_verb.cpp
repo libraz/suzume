@@ -106,6 +106,11 @@ void addDictionaryVerifiedGodanCompoundNominalCandidate(core::Lattice& lattice, 
       !beginsNominalForcingParticle(codepoints, end_pos, dict_manager)) {
     return;
   }
+  // The V2 is one continuative, a single kanji plus its okurigana (畳み); a
+  // longer span is a noun following the compound (払い戻し+手続き).
+  if (end_pos != v2_start + 2) {
+    return;
+  }
 
   // An i-row V2 can also be an Ichidan stem (使い過ぎる).  Those known
   // subsidiary verbs are handled by the ordinary compound matcher; this

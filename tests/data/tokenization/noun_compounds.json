@@ -1177,6 +1177,131 @@
       ],
       "id": "ki_ki_wo_bu",
       "input": "古き書き方を学ぶ"
+    },
+    {
+      "description": "払い戻し手続きをする - regression test",
+      "expected": [
+        {
+          "lemma": "払い戻し",
+          "pos": "Noun",
+          "surface": "払い戻し"
+        },
+        {
+          "lemma": "手続き",
+          "pos": "Noun",
+          "surface": "手続き"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "i_shi_kiwosuru",
+      "input": "払い戻し手続きをする"
+    },
+    {
+      "description": "申し込み手続きをする - regression test",
+      "expected": [
+        {
+          "lemma": "申し込み",
+          "pos": "Noun",
+          "surface": "申し込み"
+        },
+        {
+          "lemma": "手続き",
+          "pos": "Noun",
+          "surface": "手続き"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "shi_mi_kiwosuru",
+      "input": "申し込み手続きをする"
+    },
+    {
+      "description": "置き場所を探す - regression test",
+      "expected": [
+        {
+          "lemma": "置く",
+          "pos": "Verb",
+          "surface": "置き"
+        },
+        {
+          "lemma": "場所",
+          "pos": "Noun",
+          "surface": "場所"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "探す",
+          "pos": "Verb",
+          "surface": "探す"
+        }
+      ],
+      "id": "ki_wo_su",
+      "input": "置き場所を探す"
+    },
+    {
+      "description": "置き場を探す - regression test",
+      "expected": [
+        {
+          "lemma": "置き場",
+          "pos": "Noun",
+          "surface": "置き場"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "探す",
+          "pos": "Verb",
+          "surface": "探す"
+        }
+      ],
+      "id": "ki_wo_su_2",
+      "input": "置き場を探す"
+    },
+    {
+      "description": "折り畳みを使う - regression test",
+      "expected": [
+        {
+          "lemma": "折り畳み",
+          "pos": "Noun",
+          "surface": "折り畳み"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "使う",
+          "pos": "Verb",
+          "surface": "使う"
+        }
+      ],
+      "id": "ri_miwo_u",
+      "input": "折り畳みを使う"
     }
   ],
   "description": "noun_compounds tests",

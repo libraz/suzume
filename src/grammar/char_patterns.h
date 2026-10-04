@@ -8,6 +8,7 @@
 
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include "conjugation.h"  // VerbType
 #include "core/kana_constants.h"
@@ -563,6 +564,13 @@ bool isTransitiveAsuStem(std::u32string_view stem);
  * (書き+方, 組み合わせ+方, 引き受け+手, 取り扱い+所)
  */
 bool isDeverbalSuffixKanji(char32_t codepoint);
+
+/**
+ * @brief Whether the deverbal suffix at @p pos is bound to the continuative
+ * before it: it closes its kanji run (書き+方, 使い|方法, 手|続き), except 物,
+ * which itself takes a further derivational kanji (食べ物+屋)
+ */
+bool isBoundDeverbalSuffixAt(const std::vector<char32_t>& codepoints, size_t pos);
 
 /**
  * @brief Check if stem ends with onbin marker (音便)

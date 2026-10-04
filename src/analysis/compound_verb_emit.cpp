@@ -364,8 +364,12 @@ void emitCompoundVerbCandidates(core::Lattice& lattice, std::string_view text, c
          !normalize::isNumeralCodepoint(codepoints[head_end])) {
     ++head_end;
   }
+  // The head may carry one okurigana mora of its own (払い戻し+手続きを).
   const bool modifies_marked_kanji_head =
-      head_end >= compound_end_pos + 2 && beginsNominalForcingParticle(codepoints, head_end, dict_manager);
+      head_end >= compound_end_pos + 2 &&
+      (beginsNominalForcingParticle(codepoints, head_end, dict_manager) ||
+       (head_end < codepoints.size() && kana::isHiraganaCodepoint(codepoints[head_end]) &&
+        beginsNominalForcingParticle(codepoints, head_end + 1, dict_manager)));
   if (v1_is_verified && !starts_inside_kanji_run && !v2_is_closed_particle &&
       !containsNegativeAuxiliary(codepoints, start_pos, compound_end_pos) &&
       compound_epos == core::ExtendedPOS::VerbRenyokei &&
@@ -383,8 +387,7 @@ void emitCompoundVerbCandidates(core::Lattice& lattice, std::string_view text, c
   // A deverbal suffix after a compound continuative keeps its own boundary
   // while the compound is nominalized (組み合わせ+方, 取り扱い+所, 引き受け+手);
   // only a simple continuative fuses with it (書き方).
-  if (best_match.renyokei_form && compound_end_pos < codepoints.size() &&
-      grammar::isDeverbalSuffixKanji(codepoints[compound_end_pos])) {
+  if (best_match.renyokei_form && grammar::isBoundDeverbalSuffixAt(codepoints, compound_end_pos)) {
     lattice.addEdge(compound_surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(compound_end_pos),
                     core::PartOfSpeech::Noun, verbal_noun_cost, flags, compound_surface,
                     dictionary::ConjugationType::None, core::CandidateOrigin::VerbCompound,
