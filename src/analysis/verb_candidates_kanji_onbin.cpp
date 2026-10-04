@@ -228,35 +228,12 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
       bool is_te_ta_pattern = (next_char == U'て' || next_char == U'た' || next_char == U'ち' || next_char == U'と');
       if (is_te_ta_pattern) {
         const auto& sokuonbin_types = vh::getGodanTypesByOnbin("っ");
-        // Get the kanji stem
-
-#ifdef SUZUME_DEBUG
-        // TRACE: Collect all candidates for logging (debug builds only)
-        std::string onbin_surface_for_log = extractSubstring(codepoints, start_pos, kanji_end + 1);
-        struct SokuonbinCandidate {
-          grammar::VerbType type;
-          std::string base_form;
-          bool dict_match;
-        };
-        std::vector<SokuonbinCandidate> all_sokuonbin_candidates;
-#endif
-
-        // First, check dictionary for ALL verb types
-        grammar::VerbType matched_verb_type = grammar::VerbType::Unknown;
-        std::string matched_base_form;
-        bool matched_via_dict = false;
-        for (const auto& [verb_type, base_suffix] : sokuonbin_types) {
-          std::string base_form = normalize::concat(kanji_stem, base_suffix);
-          bool dict_match = vh::isVerbInDictionary(dict_manager, base_form);
-#ifdef SUZUME_DEBUG
-          all_sokuonbin_candidates.push_back({verb_type, base_form, dict_match});
-#endif
-          if (dict_match && matched_verb_type == grammar::VerbType::Unknown) {
-            matched_verb_type = verb_type;
-            matched_base_form = base_form;
-            matched_via_dict = true;
-          }
-        }
+        // A dictionary base for the stem in any sokuonbin row (行く is the only
+        // GodanKa one, so 書く cannot license 書っ)
+        auto dict_match = vh::firstGodanOnbinDictBase(dict_manager, kanji_stem, "っ");
+        grammar::VerbType matched_verb_type = dict_match.verb_type;
+        std::string matched_base_form = std::move(dict_match.base_form);
+        bool matched_via_dict = dict_match.matched;
         // Sokuonbin compound (突っ走る) whose stem was verified via its embedded verb:
         // the compound itself is absent from the dictionary, so emit the onbin stem
         // (突っ走っ) here with the embedded verb's type/base so た/て split off exactly
@@ -296,14 +273,11 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
           if (!starts_with_dict_noun && kanji_end - start_pos == 2) {
             // Get the second kanji + verb ending
             std::string remainder_stem = extractSubstring(codepoints, start_pos + 1, kanji_end);
-            for (const auto& [verb_type, base_suffix] : sokuonbin_types) {
-              std::string remainder_base = normalize::concat(remainder_stem, base_suffix);
-              if (vh::isVerbInDictionary(dict_manager, remainder_base)) {
-                remainder_is_dict_verb = true;
-                SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << kanji_stem << "\" remainder \"" << remainder_base
-                                                          << "\" is dict verb\n");
-                break;
-              }
+            const auto remainder_match = vh::firstGodanOnbinDictBase(dict_manager, remainder_stem, "っ");
+            remainder_is_dict_verb = remainder_match.matched;
+            if (remainder_is_dict_verb) {
+              SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << kanji_stem << "\" remainder \"" << remainder_match.base_form
+                                                        << "\" is dict verb\n");
             }
           }
         }
@@ -362,27 +336,6 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
             matched_base_form = infl.base_form;
           }
         }
-
-#ifdef SUZUME_DEBUG
-        // TRACE: Log all sokuonbin candidates
-        SUZUME_DEBUG_TRACE_BLOCK {
-          SUZUME_DEBUG_STREAM << "[SOKUONBIN_CANDIDATES] \"" << onbin_surface_for_log << "\":\n";
-          constexpr float kSokuonbinCost = candidate::verb_cost::kStandardBonus;
-          for (const auto& cand : all_sokuonbin_candidates) {
-            bool is_selected = (cand.type == matched_verb_type);
-            SUZUME_DEBUG_STREAM << "  - " << cand.base_form << " (" << grammar::verbTypeToString(cand.type) << "): "
-                                << "dict_match=" << (cand.dict_match ? "YES" : "NO")
-                                << ", score=" << (cand.dict_match ? kSokuonbinCost : 0.0F)
-                                << (is_selected ? "" : " (skipped)") << "\n";
-          }
-          if (matched_verb_type != grammar::VerbType::Unknown) {
-            SUZUME_DEBUG_STREAM << "  → Selected: " << matched_base_form << " ("
-                                << grammar::verbTypeToString(matched_verb_type) << ")\n";
-          } else {
-            SUZUME_DEBUG_STREAM << "  → No match found\n";
-          }
-        }
-#endif
 
         // A non-dictionary sokuonbin candidate that begins inside a kanji run
         // must not take its っ from the head of a dictionary particle. The run
