@@ -2170,6 +2170,55 @@
       ],
       "id": "3_kakaru_2",
       "input": "3時間かかる"
+    },
+    {
+      "description": "3月末に終わる - regression test",
+      "expected": [
+        {
+          "lemma": "3月末",
+          "pos": "Noun",
+          "surface": "3月末"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "終わる",
+          "pos": "Verb",
+          "surface": "終わる"
+        }
+      ],
+      "id": "3_ni_waru",
+      "input": "3月末に終わる"
+    },
+    {
+      "description": "2024年末に来た - regression test",
+      "expected": [
+        {
+          "lemma": "2024年末",
+          "pos": "Noun",
+          "surface": "2024年末"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "2024_ni_ta",
+      "input": "2024年末に来た"
     }
   ],
   "description": "number_counter tests",

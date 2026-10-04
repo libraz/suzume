@@ -49,15 +49,19 @@ def reads_as_counter(kanji: str) -> bool:
 
     A two-kanji noun led by a counter (種類, 世帯) is emitted whole, so the
     counter reading of its first kanji is only visible when that kanji stands
-    alone after a digit.
+    alone after a digit. A bare month (3月) reads as the noun 月, so the
+    counter is also probed before a following relational noun (3月以降).
     """
-    probe = mecab_analyze("3" + kanji)
-    return (
-        len(probe) == 2
-        and probe[1].get("surface") == kanji
-        and probe[1].get("pos_sub1") == "接尾"
-        and probe[1].get("pos_sub2") == "助数詞"
-    )
+    for tail in ("", "以降"):
+        probe = mecab_analyze("3" + kanji + tail)
+        if (
+            len(probe) >= 2
+            and probe[1].get("surface") == kanji
+            and probe[1].get("pos_sub1") == "接尾"
+            and probe[1].get("pos_sub2") == "助数詞"
+        ):
+            return True
+    return False
 
 
 def _parse_mecab_output(output: str) -> list[dict]:

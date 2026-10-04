@@ -3,6 +3,7 @@
  * @brief Basic numeral and kanji-counter candidate generation
  */
 
+#include <algorithm>
 #include <string>
 #include <utility>
 
@@ -120,7 +121,17 @@ void appendBasicNumeralCounterCandidates(const std::vector<char32_t>& codepoints
                              candidate::kNumeralCounterMergeBonus, core::ExtendedPOS::NounNumber,
                              "temporal_counter_duration_span", candidates);
     }
-    if (suffix_follows && !closes_duration_span && !closes_quantity_extent) {
+    // After a digit quantity, a lone kanji closing the run is its own period
+    // suffix (3月+末, 2024年+末) rather than a word of its own; only relational
+    // 前/後 keep the boundary (3年|後).
+    const bool strands_lone_kanji =
+        char_types[start_pos] == normalize::CharType::Digit && counter_end < codepoints.size() &&
+        normalize::isKanjiCodepoint(codepoints[counter_end]) &&
+        !normalize::isNumeralCodepoint(codepoints[counter_end]) &&
+        !normalize::isTemporalRelationSuffixKanji(codepoints[counter_end]) &&
+        (counter_end + 1 >= codepoints.size() || !normalize::isKanjiCodepoint(codepoints[counter_end + 1])) &&
+        std::none_of(following.begin(), following.end(), [](const auto& match) { return match.length > 1; });
+    if (suffix_follows && !closes_duration_span && !closes_quantity_extent && !strands_lone_kanji) {
       appendCounterCandidate(codepoints, start_pos, counter_end, core::PartOfSpeech::Noun,
                              candidate::kCounterNounSplitBonus, core::ExtendedPOS::Unknown,
                              "counter_registered_suffix_split", candidates);
