@@ -171,6 +171,33 @@
       ],
       "id": "kazuni_maseru",
       "input": "書かずに済ませる"
+    },
+    {
+      "description": "荷物を担いだ - auto-generated",
+      "expected": [
+        {
+          "lemma": "荷物",
+          "pos": "Noun",
+          "surface": "荷物"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "担ぐ",
+          "pos": "Verb",
+          "surface": "担い"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "wo_ida",
+      "input": "荷物を担いだ"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",

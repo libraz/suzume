@@ -2081,6 +2081,635 @@
       ],
       "id": "wotsugunattta",
       "input": "罪をつぐなった。"
+    },
+    {
+      "description": "最後まで戦った - regression test",
+      "expected": [
+        {
+          "lemma": "最後",
+          "pos": "Noun",
+          "surface": "最後"
+        },
+        {
+          "lemma": "まで",
+          "pos": "Particle",
+          "surface": "まで"
+        },
+        {
+          "lemma": "戦う",
+          "pos": "Verb",
+          "surface": "戦っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "made_ttta",
+      "input": "最後まで戦った"
+    },
+    {
+      "description": "英語を習っている - regression test",
+      "expected": [
+        {
+          "lemma": "英語",
+          "pos": "Noun",
+          "surface": "英語"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "習う",
+          "pos": "Verb",
+          "surface": "習っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "wo_ttteiru",
+      "input": "英語を習っている"
+    },
+    {
+      "description": "道に迷った - regression test",
+      "expected": [
+        {
+          "lemma": "道",
+          "pos": "Noun",
+          "surface": "道"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "迷う",
+          "pos": "Verb",
+          "surface": "迷っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ni_ttta_3",
+      "input": "道に迷った"
+    },
+    {
+      "description": "責任を負った - regression test",
+      "expected": [
+        {
+          "lemma": "責任",
+          "pos": "Noun",
+          "surface": "責任"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "負う",
+          "pos": "Verb",
+          "surface": "負っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wo_ttta_2",
+      "input": "責任を負った"
+    },
+    {
+      "description": "誕生日を祝った - regression test",
+      "expected": [
+        {
+          "lemma": "誕生日",
+          "pos": "Noun",
+          "surface": "誕生日"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "祝う",
+          "pos": "Verb",
+          "surface": "祝っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wo_ttta_3",
+      "input": "誕生日を祝った"
+    },
+    {
+      "description": "事故に遭った - regression test",
+      "expected": [
+        {
+          "lemma": "事故",
+          "pos": "Noun",
+          "surface": "事故"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "遭う",
+          "pos": "Verb",
+          "surface": "遭っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ni_ttta_4",
+      "input": "事故に遭った"
+    },
+    {
+      "description": "体裁を繕った - regression test",
+      "expected": [
+        {
+          "lemma": "体裁",
+          "pos": "Noun",
+          "surface": "体裁"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "繕う",
+          "pos": "Verb",
+          "surface": "繕っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wo_ttta_4",
+      "input": "体裁を繕った"
+    },
+    {
+      "description": "優勝を狙っている - regression test",
+      "expected": [
+        {
+          "lemma": "優勝",
+          "pos": "Noun",
+          "surface": "優勝"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "狙う",
+          "pos": "Verb",
+          "surface": "狙っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "wo_ttteiru_2",
+      "input": "優勝を狙っている"
+    },
+    {
+      "description": "先生を慕っている - regression test",
+      "expected": [
+        {
+          "lemma": "先生",
+          "pos": "Noun",
+          "surface": "先生"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "慕う",
+          "pos": "Verb",
+          "surface": "慕っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "wo_ttteiru_3",
+      "input": "先生を慕っている"
+    },
+    {
+      "description": "家族を養っている - regression test",
+      "expected": [
+        {
+          "lemma": "家族",
+          "pos": "Noun",
+          "surface": "家族"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "養う",
+          "pos": "Verb",
+          "surface": "養っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "wo_ttteiru_4",
+      "input": "家族を養っている"
+    },
+    {
+      "description": "罪を償った - regression test",
+      "expected": [
+        {
+          "lemma": "罪",
+          "pos": "Noun",
+          "surface": "罪"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "償う",
+          "pos": "Verb",
+          "surface": "償っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wo_ttta_5",
+      "input": "罪を償った"
+    },
+    {
+      "description": "重要な役割を担った - regression test",
+      "expected": [
+        {
+          "lemma": "重要",
+          "pos": "Adjective",
+          "surface": "重要"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "役割",
+          "pos": "Noun",
+          "surface": "役割"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "担う",
+          "pos": "Verb",
+          "surface": "担っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "na_wo_ttta",
+      "input": "重要な役割を担った"
+    },
+    {
+      "description": "経験を培った - regression test",
+      "expected": [
+        {
+          "lemma": "経験",
+          "pos": "Noun",
+          "surface": "経験"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "培う",
+          "pos": "Verb",
+          "surface": "培っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wo_ttta_6",
+      "input": "経験を培った"
+    },
+    {
+      "description": "肌が潤った - regression test",
+      "expected": [
+        {
+          "lemma": "肌",
+          "pos": "Noun",
+          "surface": "肌"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "潤う",
+          "pos": "Verb",
+          "surface": "潤っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ga_ttta",
+      "input": "肌が潤った"
+    },
+    {
+      "description": "公園で憩っている - regression test",
+      "expected": [
+        {
+          "lemma": "公園",
+          "pos": "Noun",
+          "surface": "公園"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "憩う",
+          "pos": "Verb",
+          "surface": "憩っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "de_ttteiru",
+      "input": "公園で憩っている"
+    },
+    {
+      "description": "教えを請った - regression test",
+      "expected": [
+        {
+          "lemma": "教え",
+          "pos": "Noun",
+          "surface": "教え"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "請う",
+          "pos": "Verb",
+          "surface": "請っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ewo_ttta",
+      "input": "教えを請った"
+    },
+    {
+      "description": "髪を結った - regression test",
+      "expected": [
+        {
+          "lemma": "髪",
+          "pos": "Noun",
+          "surface": "髪"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "結う",
+          "pos": "Verb",
+          "surface": "結っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wo_ttta_7",
+      "input": "髪を結った"
+    },
+    {
+      "description": "床を這った - regression test",
+      "expected": [
+        {
+          "lemma": "床",
+          "pos": "Noun",
+          "surface": "床"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "這う",
+          "pos": "Verb",
+          "surface": "這っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wo_ttta_8",
+      "input": "床を這った"
+    },
+    {
+      "description": "荷物を背負った - regression test",
+      "expected": [
+        {
+          "lemma": "荷物",
+          "pos": "Noun",
+          "surface": "荷物"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "背負う",
+          "pos": "Verb",
+          "surface": "背負っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wo_ttta_9",
+      "input": "荷物を背負った"
+    },
+    {
+      "description": "先輩を見習った - regression test",
+      "expected": [
+        {
+          "lemma": "先輩",
+          "pos": "Noun",
+          "surface": "先輩"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "見習う",
+          "pos": "Verb",
+          "surface": "見習っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wo_ttta_10",
+      "input": "先輩を見習った"
+    },
+    {
+      "description": "気負っていた - regression test",
+      "expected": [
+        {
+          "lemma": "気負う",
+          "pos": "Verb",
+          "surface": "気負っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ttteita",
+      "input": "気負っていた"
+    },
+    {
+      "description": "仕事を請け負った - regression test",
+      "expected": [
+        {
+          "lemma": "仕事",
+          "pos": "Noun",
+          "surface": "仕事"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "請け負う",
+          "pos": "Verb",
+          "surface": "請け負っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wo_ke_ttta",
+      "input": "仕事を請け負った"
     }
   ],
   "description": "Godan Wa-row verbs (五段ワ行動詞) - verbs ending in う",
