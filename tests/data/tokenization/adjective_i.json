@@ -244,6 +244,50 @@
       ],
       "id": "gahidoi",
       "input": "雨がひどい"
+    },
+    {
+      "description": "L2 kana i-adjective keeps its past cell whole",
+      "expected": [
+        {
+          "lemma": "数",
+          "pos": "Noun",
+          "surface": "数"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "すくない",
+          "pos": "Adjective",
+          "surface": "すくなかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "gasukunakattta",
+      "input": "数がすくなかった"
+    },
+    {
+      "description": "L2 kana i-adjective ending in ない is one word",
+      "expected": [
+        {
+          "lemma": "きたない",
+          "pos": "Adjective",
+          "surface": "きたない"
+        },
+        {
+          "lemma": "部屋",
+          "pos": "Noun",
+          "surface": "部屋"
+        }
+      ],
+      "id": "kitanai",
+      "input": "きたない部屋"
     }
   ],
   "description": "adjective_i tests",
