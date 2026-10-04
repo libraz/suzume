@@ -434,6 +434,65 @@
       ],
       "id": "wokeshita",
       "input": "電気をけした"
+    },
+    {
+      "description": "ボールが当たった - regression test",
+      "expected": [
+        {
+          "lemma": "ボール",
+          "pos": "Noun",
+          "surface": "ボール"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "当たる",
+          "pos": "Verb",
+          "surface": "当たっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ga_tattta",
+      "input": "ボールが当たった"
+    },
+    {
+      "description": "彼はたった一人だ - regression test",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "たった",
+          "pos": "Adverb",
+          "surface": "たった"
+        },
+        {
+          "lemma": "一人",
+          "pos": "Noun",
+          "surface": "一人"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "hatattta_da",
+      "input": "彼はたった一人だ"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",

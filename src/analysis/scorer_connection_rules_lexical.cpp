@@ -160,10 +160,15 @@ float computeSugiFinalParticleBonus(const core::LatticeEdge& prev, const core::L
   // normally an artificial split through that verb's okurigana (食+べて,
   // 考+えて).  Preserve the complete kanji-verb candidate; genuine verb
   // boundaries in this position begin with a content kanji or an attested
-  // lexical form, rather than this unverified tail.
-  if (prev.pos == core::PartOfSpeech::Noun && normalize::utf8Length(prev.surface) == 1 &&
-      next.origin == core::CandidateOrigin::VerbHiragana && !next.fromDictionary() &&
-      next.extended_pos == core::ExtendedPOS::VerbTeForm && next.surface.size() >= core::kTwoJapaneseCharBytes) {
+  // lexical form, rather than this unverified tail.  A kana adverb glued to an
+  // unattested lone kanji takes the same okurigana (当+たった for 当たっ+た).
+  const bool lone_kanji_noun = prev.pos == core::PartOfSpeech::Noun && normalize::utf8Length(prev.surface) == 1;
+  const bool generated_te_tail = next.origin == core::CandidateOrigin::VerbHiragana && !next.fromDictionary() &&
+                                 next.extended_pos == core::ExtendedPOS::VerbTeForm &&
+                                 next.surface.size() >= core::kTwoJapaneseCharBytes;
+  const bool kana_adverb_tail = !prev.fromDictionary() && grammar::isAllKanji(prev.surface) &&
+                                next.pos == core::PartOfSpeech::Adverb && grammar::isPureHiragana(next.surface);
+  if (lone_kanji_noun && (generated_te_tail || kana_adverb_tail)) {
     return cost::kAlmostNever;
   }
 
