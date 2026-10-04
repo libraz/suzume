@@ -50,12 +50,11 @@ const std::vector<uint32_t>* Trie::lookupView(std::string_view key) const {
   size_t pos = 0;
 
   while (pos < key.size()) {
-    char32_t cp = normalize::decodeUtf8(key, pos);
-    auto it = node->children.find(cp);
-    if (it == node->children.end()) {
+    const auto child = node->children.find(normalize::decodeUtf8(key, pos));
+    if (child == node->children.end()) {
       return nullptr;
     }
-    node = it->second.get();
+    node = child->second.get();
   }
 
   return node->entry_ids.empty() ? nullptr : &node->entry_ids;
@@ -69,12 +68,11 @@ std::vector<std::pair<size_t, const std::vector<uint32_t>*>> Trie::prefixMatch(s
   size_t char_count = 0;
 
   while (pos < text.size()) {
-    char32_t cp = normalize::decodeUtf8(text, pos);
-    auto it = node->children.find(cp);
-    if (it == node->children.end()) {
+    const auto child = node->children.find(normalize::decodeUtf8(text, pos));
+    if (child == node->children.end()) {
       break;
     }
-    node = it->second.get();
+    node = child->second.get();
     ++char_count;
 
     if (!node->entry_ids.empty()) {

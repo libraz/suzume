@@ -159,11 +159,6 @@ class DictionaryManager {
                                      core::PartOfSpeech pos = core::PartOfSpeech::Unknown) const;
 
   /**
-   * @brief Get the core dictionary
-   */
-  const CoreDictionary& coreDictionary() const;
-
-  /**
    * @brief Load core binary dictionary from file
    * @param path File path
    * @return true if loaded successfully
@@ -184,11 +179,6 @@ class DictionaryManager {
    * @brief Check if core binary dictionary is loaded
    */
   bool hasCoreBinaryDictionary() const;
-
-  /**
-   * @brief Load user binary dictionary from file with error details
-   */
-  core::Expected<size_t, core::Error> loadUserBinaryDictionaryResult(const std::string& path);
 
   /**
    * @brief Load user binary dictionary from memory

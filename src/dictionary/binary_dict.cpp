@@ -79,6 +79,19 @@ uint16_t packEntry(const CompactEntry& entry) {
   return entry.lemma_reference | static_cast<uint16_t>(entry.grammar_index << 11U);
 }
 
+CompactEntry unpackEntry(uint16_t packed) {
+  return {static_cast<uint16_t>(packed & kPackedLemmaMask), static_cast<uint8_t>(packed >> 11U)};
+}
+
+uint16_t readLe16(const uint8_t* data) {
+  return static_cast<uint16_t>(data[0]) | static_cast<uint16_t>(static_cast<uint16_t>(data[1]) << 8U);
+}
+
+void appendLe16(std::vector<uint8_t>& output, uint16_t value) {
+  output.push_back(static_cast<uint8_t>(value & 0xFFU));
+  output.push_back(static_cast<uint8_t>(value >> 8U));
+}
+
 static_assert(sizeof(GrammarPair) == 2, "Compact grammar palette entries must remain two bytes");
 
 template <typename T>
@@ -386,37 +399,30 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData(const uint8_t* d
 
   for (uint32_t idx = 0; idx < header.entry_count; ++idx) {
     const size_t entry_pos = entry_table_offset + idx * entry_record_size;
-    uint16_t lemma_reference = 0;
-    uint8_t grammar_idx = 0;
+    CompactEntry record{};
     switch (entry_encoding) {
       case BinaryDictHeader::kRecordPaletteEntries: {
         const uint8_t record_idx = data[entry_pos];
         if (record_idx >= record_palette_size) {
           return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Invalid record palette index"));
         }
-        const uint16_t packed = readPod<uint16_t>(record_palette, record_idx * sizeof(uint16_t));
-        lemma_reference = packed & kPackedLemmaMask;
-        grammar_idx = static_cast<uint8_t>(packed >> 11U);
+        record = unpackEntry(readPod<uint16_t>(record_palette, record_idx * sizeof(uint16_t)));
         break;
       }
       case BinaryDictHeader::kGrammarOnlyEntries:
-        grammar_idx = data[entry_pos];
+        record.grammar_index = data[entry_pos];
         break;
-      case BinaryDictHeader::kPackedEntries: {
-        const uint16_t packed = static_cast<uint16_t>(data[entry_pos]) |
-                                static_cast<uint16_t>(static_cast<uint16_t>(data[entry_pos + 1]) << 8U);
-        lemma_reference = packed & kPackedLemmaMask;
-        grammar_idx = static_cast<uint8_t>(packed >> 11U);
+      case BinaryDictHeader::kPackedEntries:
+        record = unpackEntry(readLe16(data + entry_pos));
         break;
-      }
       case BinaryDictHeader::kWideEntries:
-        lemma_reference = static_cast<uint16_t>(data[entry_pos]) |
-                          static_cast<uint16_t>(static_cast<uint16_t>(data[entry_pos + 1]) << 8U);
-        grammar_idx = data[entry_pos + 2];
+        record = {readLe16(data + entry_pos), data[entry_pos + 2]};
         break;
       default:
         break;
     }
+    const uint16_t lemma_reference = record.lemma_reference;
+    const uint8_t grammar_idx = record.grammar_index;
     if (grammar_idx >= grammar_palette.size()) {
       return core::makeUnexpected(
           core::Error(core::ErrorCode::InvalidInput, "Invalid dictionary grammar palette index"));
@@ -689,8 +695,7 @@ core::Expected<std::vector<uint8_t>, core::Error> BinaryDictWriter::build() {
   if (!record_palette.empty()) {
     entry_data.push_back(static_cast<uint8_t>(record_palette.size()));
     for (uint16_t packed : record_palette) {
-      entry_data.push_back(static_cast<uint8_t>(packed & 0xFFU));
-      entry_data.push_back(static_cast<uint8_t>(packed >> 8U));
+      appendLe16(entry_data, packed);
     }
     for (const auto& entry : compact_entries) {
       entry_data.push_back(record_indices.at(packEntry(entry)));
@@ -701,12 +706,9 @@ core::Expected<std::vector<uint8_t>, core::Error> BinaryDictWriter::build() {
       if (entry_encoding == BinaryDictHeader::kGrammarOnlyEntries) {
         entry_data.push_back(entry.grammar_index);
       } else if (entry_encoding == BinaryDictHeader::kPackedEntries) {
-        const uint16_t packed = packEntry(entry);
-        entry_data.push_back(static_cast<uint8_t>(packed & 0xFFU));
-        entry_data.push_back(static_cast<uint8_t>(packed >> 8U));
+        appendLe16(entry_data, packEntry(entry));
       } else {
-        entry_data.push_back(static_cast<uint8_t>(entry.lemma_reference & 0xFFU));
-        entry_data.push_back(static_cast<uint8_t>(entry.lemma_reference >> 8U));
+        appendLe16(entry_data, entry.lemma_reference);
         entry_data.push_back(entry.grammar_index);
       }
     }

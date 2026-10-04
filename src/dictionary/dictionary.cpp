@@ -168,10 +168,6 @@ const DictionaryEntry* DictionaryManager::lookupExact(std::string_view surface, 
   return nullptr;
 }
 
-const CoreDictionary& DictionaryManager::coreDictionary() const {
-  return *core_dict_;
-}
-
 bool DictionaryManager::loadCoreDictionary(const std::string& path) {
   return loadCoreDictionaryResult(path).hasValue();
 }
@@ -194,10 +190,6 @@ core::Expected<size_t, core::Error> DictionaryManager::loadCoreDictionaryFromMem
 
 bool DictionaryManager::hasCoreBinaryDictionary() const {
   return core_binary_dict_ && core_binary_dict_->isLoaded();
-}
-
-core::Expected<size_t, core::Error> DictionaryManager::loadUserBinaryDictionaryResult(const std::string& path) {
-  return loadUserBinaryDictionaryResultInto(path, user_binary_dicts_);
 }
 
 namespace {

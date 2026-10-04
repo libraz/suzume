@@ -129,9 +129,6 @@ constexpr EntrySpec intj(const char* s, const char* lemma = "") {
   return {s, POS::Interjection, EPOS::Interjection, lemma};
 }
 
-// =============================================================================
-// Particles (助詞)
-
 }  // namespace suzume::dictionary::entries
 
 #endif  // SUZUME_DICTIONARY_ENTRIES_ENTRIES_INTERNAL_H_

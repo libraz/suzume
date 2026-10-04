@@ -83,35 +83,25 @@ void CoreDictionary::initializeEntries() {
                         static_cast<core::ExtendedPOS>(entry.extended_pos), string_data + entry.lemma_offset});
   }
 #else
-  auto particles = entries::getParticleEntries();
-  auto compound_particles = entries::getCompoundParticleEntries();
-  auto auxiliaries = entries::getAuxiliaryEntries();
-  auto conjunctions = entries::getConjunctionEntries();
-  auto determiners = entries::getDeterminerEntries();
-  auto pronouns = entries::getPronounEntries();
-  auto formal_nouns = entries::getFormalNounEntries();
-  auto interjections = entries::getInterjectionEntries();
-
-  const size_t entry_count = particles.size() + compound_particles.size() + auxiliaries.size() + conjunctions.size() +
-                             determiners.size() + pronouns.size() + formal_nouns.size() + interjections.size();
+  // Registration order matters for duplicate surfaces; packed_core_entries_sources.cmake mirrors it.
+  const entries::EntrySpecRange sources[] = {
+      entries::getParticleEntries(),    entries::getCompoundParticleEntries(), entries::getAuxiliaryEntries(),
+      entries::getConjunctionEntries(), entries::getDeterminerEntries(),       entries::getPronounEntries(),
+      entries::getFormalNounEntries(),  entries::getInterjectionEntries(),
+  };
+  size_t entry_count = 0;
+  for (const auto& source : sources) {
+    entry_count += source.size();
+  }
 
   // Sort the trivial source records before constructing owned strings. This
   // keeps all materialization in one loop and makes the stable-sort
   // instantiation much smaller than sorting DictionaryEntry objects.
   std::vector<entries::EntrySpec> entry_specs;
   entry_specs.reserve(entry_count);
-  auto addSpecs = [&entry_specs](entries::EntrySpecRange source) {
+  for (const auto& source : sources) {
     entry_specs.insert(entry_specs.end(), source.begin(), source.end());
-  };
-
-  addSpecs(particles);
-  addSpecs(compound_particles);
-  addSpecs(auxiliaries);
-  addSpecs(conjunctions);
-  addSpecs(determiners);
-  addSpecs(pronouns);
-  addSpecs(formal_nouns);
-  addSpecs(interjections);
+  }
 
   // Sort entries by surface for Double-Array compatibility while preserving
   // the registration order of duplicate surfaces.

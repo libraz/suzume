@@ -28,6 +28,31 @@ std::string trimAsciiWhitespace(std::string_view field) {
   return std::string(trimAsciiWhitespaceView(field));
 }
 
+void stripUtf8Bom(std::string_view& text) {
+  if (text.size() >= 3 && static_cast<unsigned char>(text[0]) == 0xEF && static_cast<unsigned char>(text[1]) == 0xBB &&
+      static_cast<unsigned char>(text[2]) == 0xBF) {
+    text.remove_prefix(3);
+  }
+}
+
+core::Error quotingError(size_t line_number, std::string_view detail) {
+  return core::Error(core::ErrorCode::ParseError, "Invalid legacy CSV quoting at line " +
+                                                      core::decimalDigits(line_number) + ": " + std::string(detail));
+}
+
+// Rejects any non-empty field from index `first_unused` on: those columns carry no meaning.
+std::optional<core::Error> findUnexpectedColumn(const std::vector<std::string>& fields, size_t first_unused,
+                                                size_t line_number) {
+  for (size_t field_idx = first_unused; field_idx < fields.size(); ++field_idx) {
+    if (!fields[field_idx].empty()) {
+      return core::Error(core::ErrorCode::ParseError, "Unexpected non-empty TSV column at line " +
+                                                          core::decimalDigits(line_number) + ": " +
+                                                          core::decimalDigits(field_idx + 1));
+    }
+  }
+  return std::nullopt;
+}
+
 bool isAsciiHorizontalWhitespace(char chr) {
   return chr == ' ' || chr == '\t' || chr == '\r';
 }
@@ -208,25 +233,15 @@ core::Expected<SourceEntry, core::Error> convertFields(const std::vector<std::st
       if (fields.size() > 5) {
         entry.lemma = fields[5];
       }
-      for (size_t field_idx = 6; field_idx < fields.size(); ++field_idx) {
-        if (!fields[field_idx].empty()) {
-          return core::makeUnexpected(
-              core::Error(core::ErrorCode::ParseError, "Unexpected non-empty TSV column at line " +
-                                                           core::decimalDigits(line_number) + ": " +
-                                                           core::decimalDigits(field_idx + 1)));
-        }
+      if (auto error = findUnexpectedColumn(fields, 6, line_number)) {
+        return core::makeUnexpected(std::move(*error));
       }
       return entry;
     }
 
     if (fields.size() > 4) {
-      for (size_t field_idx = 4; field_idx < fields.size(); ++field_idx) {
-        if (!fields[field_idx].empty()) {
-          return core::makeUnexpected(
-              core::Error(core::ErrorCode::ParseError, "Unexpected non-empty TSV column at line " +
-                                                           core::decimalDigits(line_number) + ": " +
-                                                           core::decimalDigits(field_idx + 1)));
-        }
+      if (auto error = findUnexpectedColumn(fields, 4, line_number)) {
+        return core::makeUnexpected(std::move(*error));
       }
       entry.ignored_empty_padding_columns = true;
     }
@@ -268,9 +283,7 @@ core::Expected<SourceEntry, core::Error> convertFields(const std::vector<std::st
 core::Expected<SourceEntry, core::Error> parseRecord(std::string_view record, size_t line_number, char delimiter) {
   auto parsed = parseDelimitedRecord(record, delimiter);
   if (!parsed.error.empty()) {
-    return core::makeUnexpected(
-        core::Error(core::ErrorCode::ParseError,
-                    "Invalid legacy CSV quoting at line " + core::decimalDigits(line_number) + ": " + parsed.error));
+    return core::makeUnexpected(quotingError(line_number, parsed.error));
   }
   return convertFields(parsed.fields, line_number, delimiter);
 }
@@ -280,10 +293,7 @@ core::Expected<SourceEntry, core::Error> parseRecord(std::string_view record, si
 core::Expected<SourceParseResult, core::Error> parseDictionarySource(std::string_view content,
                                                                      SourceParseOptions options) {
   SourceParseResult result;
-  if (content.size() >= 3 && static_cast<unsigned char>(content[0]) == 0xEF &&
-      static_cast<unsigned char>(content[1]) == 0xBB && static_cast<unsigned char>(content[2]) == 0xBF) {
-    content.remove_prefix(3);
-  }
+  stripUtf8Bom(content);
 
   std::optional<char> delimiter;
   size_t record_start = 0;
@@ -333,9 +343,7 @@ core::Expected<SourceParseResult, core::Error> parseDictionarySource(std::string
       const char record_delimiter = delimiter.value_or(detectDelimiter(record));
       auto parsed_record = parseDelimitedRecord(record, record_delimiter);
       if (!parsed_record.error.empty()) {
-        return core::makeUnexpected(core::Error(
-            core::ErrorCode::ParseError,
-            "Invalid legacy CSV quoting at line " + core::decimalDigits(record_line) + ": " + parsed_record.error));
+        return core::makeUnexpected(quotingError(record_line, parsed_record.error));
       }
       if (options.skip_single_field_records) {
         if (parsed_record.fields.size() < 2) {
@@ -373,18 +381,13 @@ core::Expected<SourceParseResult, core::Error> parseDictionarySource(std::string
   }
 
   if (in_quotes) {
-    return core::makeUnexpected(core::Error(
-        core::ErrorCode::ParseError,
-        "Invalid legacy CSV quoting at line " + core::decimalDigits(record_line) + ": unterminated quoted field"));
+    return core::makeUnexpected(quotingError(record_line, "unterminated quoted field"));
   }
   return result;
 }
 
 core::Expected<SourceEntry, core::Error> parseDictionarySourceLine(std::string_view line, size_t line_number) {
-  if (line.size() >= 3 && static_cast<unsigned char>(line[0]) == 0xEF && static_cast<unsigned char>(line[1]) == 0xBB &&
-      static_cast<unsigned char>(line[2]) == 0xBF) {
-    line.remove_prefix(3);
-  }
+  stripUtf8Bom(line);
   return parseRecord(line, line_number, detectDelimiter(line));
 }
 
