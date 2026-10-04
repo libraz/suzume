@@ -25,7 +25,7 @@ from .constants import (
     TEMPORAL_COMPOUND_UNITS,
     TEMPORAL_PREFIX_KANJI,
 )
-from .core_lexicon import core_headwords_by_length
+from .core_lexicon import core_headwords_by_length, kana_i_adjective_lemmas
 from .mecab import is_single_token_of_pos, mecab_analyze
 from .merge_postprocessors import (
     KARI_MIZENKEI_CELL,
@@ -170,6 +170,8 @@ def _fixed_te_search_unit(surface: str) -> dict | None:
 # off the following number+counter (約|二時間, 計|五名), unlike ordinal 第 which binds
 # to its number (第三十四|回). Mirrors normalize::isNumericApproxPrefixKanji in the core.
 _APPROX_NUMERIC_PREFIXES = {"約", "計", "総"}
+# Cells of an i-adjective after its stem, longest first so かっ wins over か.
+_I_ADJECTIVE_CELL_ENDINGS = ("かっ", "けれ", "かろ", "く", "い", "き")
 _PRODUCTIVE_COMPOUND_V2 = frozenset(COMPOUND_VERB_V2_GODAN + COMPOUND_VERB_V2_ICHIDAN)
 _PRODUCTIVE_ICHIDAN_COMPOUND_V2 = frozenset(COMPOUND_VERB_V2_ICHIDAN)
 _NOMINALIZING_PARTICLES = frozenset({"を", "は", "が", "の", "に", "で", "へ", "と", "も"})
@@ -1331,6 +1333,34 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                         if applied_rule is None:
                             applied_rule = "nai-adjective"
                         break
+
+        # An L2 kana i-adjective is lexical evidence for its whole inflected
+        # cell, which the reference analyzer can split into a verb or a
+        # different adjective plus ない (すく + なかっ for すくなかっ).
+        if not merged:
+            for adjective in kana_i_adjective_lemmas():
+                stem = adjective[:-1]
+                if not remaining.startswith(stem):
+                    continue
+                for ending in _I_ADJECTIVE_CELL_ENDINGS:
+                    cell = stem + ending
+                    if not remaining.startswith(cell):
+                        continue
+                    consumed = ""
+                    j = i
+                    while j < len(tokens) and len(consumed) < len(cell):
+                        consumed += tokens[j].get("surface", "")
+                        j += 1
+                    if consumed != cell or j == i + 1:
+                        continue
+                    result.append({"surface": cell, "pos": "形容詞", "lemma": adjective})
+                    i = j
+                    merged = True
+                    if applied_rule is None:
+                        applied_rule = "l2-adjective"
+                    break
+                if merged:
+                    break
 
         # 4. Elongated adjective
         if not merged and t.get("pos") == "形容詞" and t.get("conj_form") == "ガル接続":

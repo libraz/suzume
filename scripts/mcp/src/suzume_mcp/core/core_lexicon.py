@@ -60,3 +60,17 @@ def adjective_garu_stems() -> dict[str, str]:
         elif conjugation == "I_ADJ" and surface.endswith("い"):
             stems[surface[:-1]] = surface
     return stems
+
+
+def kana_i_adjective_lemmas() -> tuple[str, ...]:
+    """Return the L2 i-adjectives spelled wholly in hiragana, longest first."""
+    lemmas = (
+        entry[0]
+        for entry in core_entries("adjectives.tsv")
+        if len(entry) >= 3
+        and entry[1] == "ADJECTIVE"
+        and entry[2] == "I_ADJ"
+        and entry[0].endswith("い")
+        and all("ぁ" <= char <= "ゖ" for char in entry[0])
+    )
+    return tuple(sorted(lemmas, key=len, reverse=True))

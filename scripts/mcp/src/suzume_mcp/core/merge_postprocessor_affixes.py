@@ -184,11 +184,16 @@ def _postprocess_bound_voiced_suffix(result: list[dict], applied_rule: str | Non
         token = result[idx]
         following = result[idx + 1] if idx + 1 < len(result) else None
         host_is_nominal = bool(new_result) and new_result[-1].get("pos") in ("名詞", "Noun", "動詞", "Verb")
+        # がかる's かれ is its hypothetical, so only ば follows it; かれ before
+        # た, て or ない is the continuative of an ichidan verb (花 + が + かれ + た).
+        after_following = result[idx + 2].get("surface") if idx + 2 < len(result) else None
+        is_ichidan_kare = following is not None and following.get("surface") == "かれ" and after_following != "ば"
         if (
             host_is_nominal
             and token.get("surface") == "が"
             and following is not None
             and following.get("surface", "") in tails
+            and not is_ichidan_kare
         ):
             merged = token.get("surface", "") + following.get("surface", "")
             pos = "動詞"

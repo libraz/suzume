@@ -1,6 +1,7 @@
 """Tests for merge rules - individual pattern tests using mock token lists."""
 
 from suzume_mcp.core.mecab import mecab_analyze
+from suzume_mcp.core.merge_postprocessor_affixes import _postprocess_bound_voiced_suffix
 from suzume_mcp.core.merge_rules import apply_suzume_merge
 
 
@@ -1630,3 +1631,26 @@ class TestStrandedOkurigana:
         result, rule = apply_suzume_merge(tokens, "書類いる")
         assert [token["surface"] for token in result] == ["書類", "いる"]
         assert rule != "stranded-okurigana"
+
+
+class TestL2KanaAdjective:
+    def test_merges_inflected_cell(self):
+        tokens = [_tok("すく", pos="形容詞"), _tok("なかっ", pos="形容詞"), _tok("た", pos="助動詞")]
+        result, rule = apply_suzume_merge(tokens, "すくなかった")
+        assert [t["surface"] for t in result] == ["すくなかっ", "た"]
+        assert result[0]["lemma"] == "すくない"
+        assert rule == "l2-adjective"
+
+
+class TestBoundVoicedSuffix:
+    def test_ichidan_kare_keeps_case_particle(self):
+        tokens = [_tok("花"), _tok("が", pos="助詞"), _tok("かれ", pos="動詞"), _tok("た", pos="助動詞")]
+        result, rule = _postprocess_bound_voiced_suffix(tokens, None)
+        assert [t["surface"] for t in result] == ["花", "が", "かれ", "た"]
+        assert rule is None
+
+    def test_hypothetical_kare_rejoins_suffix(self):
+        tokens = [_tok("紫"), _tok("が", pos="助詞"), _tok("かれ", pos="動詞"), _tok("ば", pos="助詞")]
+        result, rule = _postprocess_bound_voiced_suffix(tokens, None)
+        assert [t["surface"] for t in result] == ["紫", "がかれ", "ば"]
+        assert rule == "bound-voiced-suffix"
