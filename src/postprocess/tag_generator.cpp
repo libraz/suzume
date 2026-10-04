@@ -76,12 +76,8 @@ bool TagGenerator::shouldInclude(const core::Morpheme& morpheme) const {
   }
 
   // Exclude basic words (hiragana-only lemma)
-  if (options_.exclude_basic) {
-    std::string_view lemma_sv =
-        morpheme.lemma.empty() ? std::string_view(morpheme.surface) : std::string_view(morpheme.lemma);
-    if (grammar::isPureHiragana(lemma_sv)) {
-      return false;
-    }
+  if (options_.exclude_basic && grammar::isPureHiragana(morpheme.getLemma())) {
+    return false;
   }
 
   return true;

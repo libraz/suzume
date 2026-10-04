@@ -94,15 +94,15 @@ void resolvePostPrefixMorphemeRoles(std::vector<core::Morpheme>& result) {
   resolver::resolveSimilitudeYou(result);
   resolver::resolveNominalConditionalNara(result);
 
-  for (size_t i = 0; i + 1 < result.size(); ++i) {
-    if (result[i].surface == "付け" && result[i].pos == core::PartOfSpeech::Verb && result[i + 1].surface == "で" &&
-        result[i + 1].pos == core::PartOfSpeech::Particle) {
-      resolver::retagNounSurface(result[i]);
+  for (size_t idx = 0; idx + 1 < result.size(); ++idx) {
+    if (result[idx].surface == "付け" && result[idx].pos == core::PartOfSpeech::Verb &&
+        result[idx + 1].surface == "で" && result[idx + 1].pos == core::PartOfSpeech::Particle) {
+      resolver::retagNounSurface(result[idx]);
     }
   }
-  for (size_t i = 1; i + 1 < result.size(); ++i) {
-    if (result[i - 1].surface == "あり" && result[i].surface == "ん" && result[i + 1].surface == "す") {
-      auto& suru = result[i + 1];
+  for (size_t idx = 1; idx + 1 < result.size(); ++idx) {
+    if (result[idx - 1].surface == "あり" && result[idx].surface == "ん" && result[idx + 1].surface == "す") {
+      auto& suru = result[idx + 1];
       resolver::retag(suru, core::PartOfSpeech::Verb, core::ExtendedPOS::VerbShuushikei, "する",
                       dictionary::ConjugationType::Suru, grammar::ConjForm::Base);
     }
@@ -111,24 +111,24 @@ void resolvePostPrefixMorphemeRoles(std::vector<core::Morpheme>& result) {
   // Temporal 後 after a counter/duration quantity is a suffix, not a standalone
   // noun (2時間+後, 10日+後, 5分+後 → 名詞,接尾). Runs after numeric merging so the
   // quantity token is final. 前 is never a suffix in MeCab, so this is 後-only.
-  for (size_t i = 1; i < result.size(); ++i) {
-    if (result[i].surface == "後" && result[i].pos == core::PartOfSpeech::Noun &&
-        result[i - 1].pos == core::PartOfSpeech::Noun && resolver::isCounterDurationNoun(result[i - 1].surface)) {
-      result[i].pos = core::PartOfSpeech::Suffix;
-      result[i].extended_pos = core::ExtendedPOS::Suffix;
-      result[i].lemma = "後";
+  for (size_t idx = 1; idx < result.size(); ++idx) {
+    if (result[idx].surface == "後" && result[idx].pos == core::PartOfSpeech::Noun &&
+        result[idx - 1].pos == core::PartOfSpeech::Noun && resolver::isCounterDurationNoun(result[idx - 1].surface)) {
+      result[idx].pos = core::PartOfSpeech::Suffix;
+      result[idx].extended_pos = core::ExtendedPOS::Suffix;
+      result[idx].lemma = "後";
     }
   }
 
   // Kanji 過ぎ/過ぎる directly after a verb 連用形 is the excessive subsidiary,
   // which keeps the verb POS of its kana spelling (食べ+過ぎ like 食べ+すぎ).
   // Repairs the bare-renyokei fake godan reading 過ぐ → 過ぎる.
-  for (size_t i = 1; i < result.size(); ++i) {
-    if (utf8::equalsAny(result[i].surface, {"過ぎ", "過ぎる"}) && result[i].pos == core::PartOfSpeech::Verb &&
-        result[i - 1].pos == core::PartOfSpeech::Verb &&
-        result[i - 1].extended_pos == core::ExtendedPOS::VerbRenyokei) {
-      result[i].extended_pos = core::ExtendedPOS::AuxExcessive;
-      result[i].lemma = "過ぎる";
+  for (size_t idx = 1; idx < result.size(); ++idx) {
+    if (utf8::equalsAny(result[idx].surface, {"過ぎ", "過ぎる"}) && result[idx].pos == core::PartOfSpeech::Verb &&
+        result[idx - 1].pos == core::PartOfSpeech::Verb &&
+        result[idx - 1].extended_pos == core::ExtendedPOS::VerbRenyokei) {
+      result[idx].extended_pos = core::ExtendedPOS::AuxExcessive;
+      result[idx].lemma = "過ぎる";
     }
   }
 
@@ -137,14 +137,14 @@ void resolvePostPrefixMorphemeRoles(std::vector<core::Morpheme>& result) {
   // continuative such as 差し支え must retain its dictionary form 差し支える.
   // The irrealis-plus-negative construction already selects the auxiliary and
   // therefore does not reach this recovery step.
-  for (size_t i = 1; i < result.size(); ++i) {
-    if (result[i].surface == "ない" && result[i].pos == core::PartOfSpeech::Adjective &&
-        result[i - 1].pos == core::PartOfSpeech::Verb &&
-        result[i - 1].extended_pos == core::ExtendedPOS::VerbRenyokei &&
-        result[i - 1].conj_type != dictionary::ConjugationType::Suru) {
-      result[i].pos = core::PartOfSpeech::Auxiliary;
-      result[i].extended_pos = core::ExtendedPOS::AuxNegativeNai;
-      result[i].lemma = "ない";
+  for (size_t idx = 1; idx < result.size(); ++idx) {
+    if (result[idx].surface == "ない" && result[idx].pos == core::PartOfSpeech::Adjective &&
+        result[idx - 1].pos == core::PartOfSpeech::Verb &&
+        result[idx - 1].extended_pos == core::ExtendedPOS::VerbRenyokei &&
+        result[idx - 1].conj_type != dictionary::ConjugationType::Suru) {
+      result[idx].pos = core::PartOfSpeech::Auxiliary;
+      result[idx].extended_pos = core::ExtendedPOS::AuxNegativeNai;
+      result[idx].lemma = "ない";
     }
   }
 
@@ -158,23 +158,27 @@ void resolvePostPrefixMorphemeRoles(std::vector<core::Morpheme>& result) {
   // continuative can also be the first item in a parallel deverbal-noun sequence
   // (上がり+下がりを); require the next item to have already been selected as
   // NounVerbal and to be case/topic marked before extending the same retag.
-  for (size_t i = 0; i < result.size(); ++i) {
-    const bool direct_nominal_particle = i + 1 < result.size() && result[i + 1].pos == core::PartOfSpeech::Particle &&
-                                         (resolver::isNominalForcingParticle(result[i + 1]) ||
-                                          result[i + 1].extended_pos == core::ExtendedPOS::ParticleAdverbial ||
-                                          grammar::isSingleHiragana(result[i + 1].surface, U'で'));
+  for (size_t idx = 0; idx < result.size(); ++idx) {
+    const bool direct_nominal_particle = idx + 1 < result.size() &&
+                                         result[idx + 1].pos == core::PartOfSpeech::Particle &&
+                                         (resolver::isNominalForcingParticle(result[idx + 1]) ||
+                                          result[idx + 1].extended_pos == core::ExtendedPOS::ParticleAdverbial ||
+                                          grammar::isSingleHiragana(result[idx + 1].surface, U'で'));
     const bool purpose_construction = direct_nominal_particle &&
-                                      grammar::isSingleHiragana(result[i + 1].surface, U'に') &&
-                                      i + 2 < result.size() && result[i + 2].pos == core::PartOfSpeech::Verb;
+                                      grammar::isSingleHiragana(result[idx + 1].surface, U'に') &&
+                                      idx + 2 < result.size() && result[idx + 2].pos == core::PartOfSpeech::Verb;
     const bool direct_nominal_context = direct_nominal_particle && !purpose_construction;
-    const bool compound_sentence_final = i + 1 == result.size() && resolver::isCompoundRenyokeiShape(result[i].surface);
-    const bool parallel_nominal_context =
-        i + 2 < result.size() && result[i + 1].pos == core::PartOfSpeech::Noun &&
-        result[i + 1].extended_pos == core::ExtendedPOS::NounVerbal && normalize::utf8Length(result[i].surface) >= 3 &&
-        normalize::utf8Length(result[i + 1].surface) >= 3 && resolver::isNominalForcingParticle(result[i + 2]);
-    if (result[i].pos == core::PartOfSpeech::Verb && result[i].extended_pos == core::ExtendedPOS::VerbRenyokei &&
+    const bool compound_sentence_final =
+        idx + 1 == result.size() && resolver::isCompoundRenyokeiShape(result[idx].surface);
+    const bool parallel_nominal_context = idx + 2 < result.size() && result[idx + 1].pos == core::PartOfSpeech::Noun &&
+                                          result[idx + 1].extended_pos == core::ExtendedPOS::NounVerbal &&
+                                          normalize::utf8Length(result[idx].surface) >= 3 &&
+                                          normalize::utf8Length(result[idx + 1].surface) >= 3 &&
+                                          resolver::isNominalForcingParticle(result[idx + 2]);
+    if (result[idx].pos == core::PartOfSpeech::Verb && result[idx].extended_pos == core::ExtendedPOS::VerbRenyokei &&
         (direct_nominal_context || compound_sentence_final || parallel_nominal_context)) {
-      resolver::retagUninflected(result[i], core::PartOfSpeech::Noun, core::ExtendedPOS::NounVerbal, result[i].surface);
+      resolver::retagUninflected(result[idx], core::PartOfSpeech::Noun, core::ExtendedPOS::NounVerbal,
+                                 result[idx].surface);
     }
   }
 }
@@ -216,9 +220,6 @@ void resolveFinalMorphemeRoles(std::vector<core::Morpheme>& result, const dictio
       resolver::retagNounSurface(stem);
       continue;
     }
-    if (!excessive_follows) {
-      continue;
-    }
     resolver::retagNaAdjectiveSurface(stem);
     follower.pos = core::PartOfSpeech::Verb;
     follower.extended_pos = core::ExtendedPOS::AuxExcessive;
@@ -246,7 +247,7 @@ void resolveFinalMorphemeRoles(std::vector<core::Morpheme>& result, const dictio
     v1.extended_pos = v2.extended_pos;
     v1.conj_type = v2.conj_type;
     v1.conj_form = v2.conj_form;
-    result.erase(result.begin() + static_cast<std::ptrdiff_t>(idx + 1));
+    resolver::eraseAfter(result, idx);
   }
 
   // A continuative between a period-end noun and the closed following-period

@@ -78,6 +78,14 @@ void retagNaAdjectiveSurface(core::Morpheme& morpheme) {
         dictionary::ConjugationType::NaAdjective, grammar::ConjForm::Base);
 }
 
+void insertAfter(std::vector<core::Morpheme>& result, size_t idx, const core::Morpheme& morpheme) {
+  result.insert(result.begin() + static_cast<std::ptrdiff_t>(idx + 1), morpheme);
+}
+
+void eraseAfter(std::vector<core::Morpheme>& result, size_t idx) {
+  result.erase(result.begin() + static_cast<std::ptrdiff_t>(idx + 1));
+}
+
 void mergeInto(core::Morpheme& head, const core::Morpheme& tail) {
   head.surface += tail.surface;
   head.end = tail.end;
@@ -262,7 +270,7 @@ void mergeContractedTeruBeforeNominalizer(std::vector<core::Morpheme>& result) {
     const std::string headword = te.surface + "る";
     mergeInto(te, contracted);
     retagUninflected(te, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxAspectIru, headword);
-    result.erase(result.begin() + static_cast<std::ptrdiff_t>(idx + 1));
+    eraseAfter(result, idx);
   }
 }
 
@@ -413,7 +421,7 @@ void resolveFrameRepairs(std::vector<core::Morpheme>& result) {
       core::Morpheme particle = splitTail(token, 2);
       retagUninflected(token, core::PartOfSpeech::Noun, core::ExtendedPOS::NounFormal, "こと");
       retagUninflected(particle, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleCase, "に");
-      result.insert(result.begin() + static_cast<std::ptrdiff_t>(idx + 1), particle);
+      insertAfter(result, idx, particle);
     } else if (idx == 0 && result.size() > 1 && utf8::equalsAny(token.surface, {"より"}) &&
                token.pos == core::PartOfSpeech::Particle) {
       retagUninflected(token, core::PartOfSpeech::Adverb, core::ExtendedPOS::Adverb, "より");
@@ -421,7 +429,7 @@ void resolveFrameRepairs(std::vector<core::Morpheme>& result) {
       core::Morpheme copula = splitTail(token, 1);
       retagUninflected(token, core::PartOfSpeech::Pronoun, core::ExtendedPOS::PronounInterrogative, "何");
       retagCopulaDa(copula);
-      result.insert(result.begin() + static_cast<std::ptrdiff_t>(idx + 1), copula);
+      insertAfter(result, idx, copula);
     } else if (utf8::equalsAny(token.surface, {"先"}) && token.pos == core::PartOfSpeech::Suffix &&
                previous != nullptr && previous->pos == core::PartOfSpeech::Pronoun) {
       retagNounSurface(token);
@@ -441,7 +449,7 @@ void resolveFrameRepairs(std::vector<core::Morpheme>& result) {
       // The courtesan polite んす (あり+んす = あります), not a negative plus する.
       mergeInto(token, *following);
       retagUninflected(token, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxTenseMasu, "ます");
-      result.erase(result.begin() + static_cast<std::ptrdiff_t>(idx + 1));
+      eraseAfter(result, idx);
     } else if (utf8::equalsAny(token.surface, {"や"}) && token.pos == core::PartOfSpeech::Particle &&
                previous != nullptr &&
                (previous->pos == core::PartOfSpeech::Noun || previous->pos == core::PartOfSpeech::Pronoun ||
@@ -457,7 +465,7 @@ void resolveFrameRepairs(std::vector<core::Morpheme>& result) {
       core::Morpheme copula = splitTail(token, 2);
       retagUninflected(token, core::PartOfSpeech::Pronoun, core::ExtendedPOS::Pronoun, "それ");
       retagCopulaDa(copula);
-      result.insert(result.begin() + static_cast<std::ptrdiff_t>(idx + 1), copula);
+      insertAfter(result, idx, copula);
     } else if (utf8::equalsAny(token.surface, {"マジ"}) && following != nullptr &&
                utf8::equalsAny(following->surface, {"で"})) {
       // The katakana spelling of まじ takes the same adjectival reading (まじ+で).
@@ -467,32 +475,27 @@ void resolveFrameRepairs(std::vector<core::Morpheme>& result) {
   }
 }
 
-namespace {
-
-// Godan dictionary form from an a-row irrealis stem (思わ → 思う), or empty.
-std::string godanBaseFromIrrealis(std::string_view stem) {
-  if (stem.empty()) {
-    return "";
-  }
-  const std::string_view suffix = grammar::godanBaseSuffixFromARow(utf8::decodeLastChar(stem));
-  if (suffix.empty()) {
-    return "";
-  }
-  return std::string(utf8::dropLastChar(stem)) + std::string(suffix);
-}
-
-// Retag a continuative-shaped nominal as its verb (読み → 読む, かけ → かける).
 bool retagContinuativeAsVerb(core::Morpheme& stem) {
-  const char32_t last = utf8::decodeLastChar(stem.surface);
-  if (grammar::isIRowCodepoint(last) && retagGodanRenyokeiFromIRow(stem, true)) {
+  if (retagGodanRenyokeiFromIRow(stem, true)) {
     return true;
   }
-  if (grammar::isERowCodepoint(last)) {
+  if (grammar::endsWithERow(stem.surface)) {
     retag(stem, core::PartOfSpeech::Verb, core::ExtendedPOS::VerbRenyokei, stem.surface + "る",
           dictionary::ConjugationType::Ichidan, grammar::ConjForm::Renyokei);
     return true;
   }
   return false;
+}
+
+namespace {
+
+// Godan dictionary form from an a-row irrealis stem (思わ → 思う), or empty.
+std::string godanBaseFromIrrealis(std::string_view stem) {
+  const std::string_view suffix = grammar::godanBaseSuffixFromARow(utf8::decodeLastChar(stem));
+  if (suffix.empty()) {
+    return "";
+  }
+  return normalize::concat(utf8::dropLastChar(stem), suffix);
 }
 
 }  // namespace
@@ -520,7 +523,7 @@ void resolveVerbFrameRepairs(std::vector<core::Morpheme>& result) {
         retag(token, core::PartOfSpeech::Verb, core::ExtendedPOS::VerbMizenkei, base, dictionary::ConjugationType::None,
               grammar::ConjForm::Mizenkei);
         retagUninflected(negative, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxNegativeNu, "ぬ");
-        result.insert(result.begin() + static_cast<std::ptrdiff_t>(idx + 1), negative);
+        insertAfter(result, idx, negative);
       }
     } else if (token.pos == core::PartOfSpeech::Verb && length >= 3 &&
                (utf8::startsWith(token.surface, "しそこな") || utf8::startsWith(token.surface, "しそこね") ||
@@ -531,13 +534,13 @@ void resolveVerbFrameRepairs(std::vector<core::Morpheme>& result) {
             grammar::ConjForm::Renyokei);
       subsidiary.pos = core::PartOfSpeech::Auxiliary;
       subsidiary.lemma = lemma.substr(core::kJapaneseCharBytes);
-      result.insert(result.begin() + static_cast<std::ptrdiff_t>(idx + 1), subsidiary);
+      insertAfter(result, idx, subsidiary);
     } else if (utf8::equalsAny(token.surface, {"こう"}) && token.pos == core::PartOfSpeech::Adverb &&
                previous != nullptr && utf8::equalsAny(previous->surface, {"て", "で"})) {
       core::Morpheme volitional = splitTail(token, 1);
       retagUninflected(token, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxAspectIku, "いく");
       retagUninflected(volitional, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxVolitional, "う");
-      result.insert(result.begin() + static_cast<std::ptrdiff_t>(idx + 1), volitional);
+      insertAfter(result, idx, volitional);
     } else if (token.pos == core::PartOfSpeech::Noun && following != nullptr &&
                utf8::equalsAny(following->surface, {"に"}) && after != nullptr &&
                utf8::equalsAny(after->getLemma(), {"行く", "来る", "いく", "くる", "ゆく"}) &&
@@ -554,16 +557,16 @@ void resolveVerbFrameRepairs(std::vector<core::Morpheme>& result) {
       retag(token, core::PartOfSpeech::Verb, core::ExtendedPOS::VerbRenyokei, "増す",
             dictionary::ConjugationType::GodanSa, grammar::ConjForm::Renyokei);
       retagUninflected(te, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleConj, "て");
-      result.insert(result.begin() + static_cast<std::ptrdiff_t>(idx + 1), te);
+      insertAfter(result, idx, te);
     } else if (token.pos == core::PartOfSpeech::Particle && utf8::startsWith(token.surface, "に") && length >= 3 &&
                utf8::endsWith(token.surface, "し") && following != nullptr &&
                following->extended_pos == core::ExtendedPOS::AuxTenseMasu) {
       core::Morpheme verb = splitTail(token, 1);
       retagUninflected(token, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleCase, "に");
       retag(verb, core::PartOfSpeech::Verb, core::ExtendedPOS::VerbRenyokei,
-            std::string(utf8::dropLastChar(verb.surface)) + "する", dictionary::ConjugationType::Suru,
+            normalize::concat(utf8::dropLastChar(verb.surface), "する"), dictionary::ConjugationType::Suru,
             grammar::ConjForm::Renyokei);
-      result.insert(result.begin() + static_cast<std::ptrdiff_t>(idx + 1), verb);
+      insertAfter(result, idx, verb);
     } else if (utf8::equalsAny(token.surface, {"せ"}) && token.pos == core::PartOfSpeech::Auxiliary &&
                token.getLemma() == "せる" && following != nullptr && utf8::equalsAny(following->surface, {"ば"}) &&
                previous != nullptr && previous->pos == core::PartOfSpeech::Verb &&

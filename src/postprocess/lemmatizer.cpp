@@ -101,13 +101,10 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
       // Check if lemma ends with just る but surface ends with すぎる
       // E.g., surface=ワンパターンすぎる, lemma=ワンパターンる (incorrect)
       if (has_sugiru_aux && lemma_ending == "る" && lemma.size() < surface.size()) {
-        // Check if the stem (lemma minus る) is katakana
-        std::string stem(utf8::dropLastChar(lemma));
-        if (!stem.empty()) {
-          if (normalize::classifyChar(utf8::decodeFirstChar(stem)) == normalize::CharType::Katakana) {
-            // Correct the lemma: stem + すぎる
-            return stem + "すぎる";
-          }
+        // A katakana stem (lemma minus る) takes the whole すぎる back.
+        const std::string_view stem = utf8::dropLastChar(lemma);
+        if (!stem.empty() && normalize::classifyChar(utf8::decodeFirstChar(stem)) == normalize::CharType::Katakana) {
+          return normalize::concat(stem, "すぎる");
         }
       }
     }
@@ -134,8 +131,7 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
     // The candidate generator may produce wrong lemma when dictionary lookup fails
     if (morpheme.pos == core::PartOfSpeech::Verb && utf8::endsWith(morpheme.surface, "ん") &&
         utf8::endsWith(morpheme.lemma, "む") && morpheme.lemma.size() >= core::kTwoJapaneseCharBytes) {
-      std::string stem(utf8::dropLastChar(morpheme.lemma));
-      if (std::string fixed = fixHatsuonbin(stem, dict_manager_); !fixed.empty()) {
+      if (std::string fixed = fixHatsuonbin(utf8::dropLastChar(morpheme.lemma), dict_manager_); !fixed.empty()) {
         return fixed;
       }
       // No correction found - keep the original む form
@@ -251,8 +247,7 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
       // - GodanNa (ぬ): 死ぬ
       if (utf8::endsWith(sfc, "ん") && utf8::endsWith(grammar_result, "る") &&
           grammar_result.size() >= core::kTwoJapaneseCharBytes) {
-        std::string stem(utf8::dropLastChar(grammar_result));
-        if (std::string fixed = fixHatsuonbin(stem, dict_manager_); !fixed.empty()) {
+        if (std::string fixed = fixHatsuonbin(utf8::dropLastChar(grammar_result), dict_manager_); !fixed.empty()) {
           return fixed;
         }
       }
@@ -273,7 +268,7 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
         // Reverse-derive the godan base from the イ音便 table (く before ぐ),
         // matching candidate generation's order so this fallback and the analysis
         // layer agree on ties (a stem in the dictionary as both, e.g. つく/つぐ).
-        std::string stem(utf8::dropLastChar(grammar_result));
+        const std::string_view stem = utf8::dropLastChar(grammar_result);
         for (const auto& [verb_type, base_suffix] : grammar::Conjugation::getGodanTypesByOnbin("い")) {
           (void)verb_type;
           std::string base_form = normalize::concat(stem, base_suffix);

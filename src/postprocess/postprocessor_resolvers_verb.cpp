@@ -335,15 +335,6 @@ void resolveDependentVerbHomographs(std::vector<core::Morpheme>& result) {
 // token chain is visible. Recover productive predicates from closed
 // inflectional followers rather than from an open-class surface list.
 void resolveClosedInflectionalChains(std::vector<core::Morpheme>& result) {
-  const auto restore_renyokei = [](core::Morpheme& stem) {
-    if (grammar::endsWithERow(stem.surface)) {
-      retag(stem, core::PartOfSpeech::Verb, core::ExtendedPOS::VerbRenyokei, stem.surface + "る",
-            dictionary::ConjugationType::Ichidan, grammar::ConjForm::Renyokei);
-      return true;
-    }
-    return retagGodanRenyokeiFromIRow(stem, true);
-  };
-
   // A past auxiliary cannot attach directly to an adverb or noun. Its selected
   // surface licenses the productive continuative reading of the preceding
   // token. If lemmatization already restored the verb but the lattice selected
@@ -360,7 +351,7 @@ void resolveClosedInflectionalChains(std::vector<core::Morpheme>& result) {
     // って言ってた, not a fabricated ichidan ってる.
     if (past_ta && stem.pos != core::PartOfSpeech::Verb && stem.pos != core::PartOfSpeech::Auxiliary &&
         stem.pos != core::PartOfSpeech::Adjective && stem.pos != core::PartOfSpeech::Particle) {
-      restore_renyokei(stem);
+      retagContinuativeAsVerb(stem);
     }
     const bool accepts_past =
         stem.extended_pos == core::ExtendedPOS::VerbRenyokei || stem.extended_pos == core::ExtendedPOS::VerbOnbinkei ||
@@ -384,7 +375,7 @@ void resolveClosedInflectionalChains(std::vector<core::Morpheme>& result) {
         conditional.extended_pos != core::ExtendedPOS::ParticleConj || conditional.surface != "ば") {
       continue;
     }
-    restore_renyokei(stem);
+    retagContinuativeAsVerb(stem);
   }
 
   // The independent negative adjective ない has a closed conditional form
@@ -725,108 +716,98 @@ void Postprocessor::convertPrefixVerbToNoun(std::vector<core::Morpheme>& morphem
     return;
   }
 
-  for (size_t i = 0; i < morphemes.size(); ++i) {
-    core::Morpheme& morpheme = morphemes[i];
-
-    // Check if previous morpheme was PREFIX (お or ご)
-    if (i > 0 && morphemes[i - 1].pos == core::PartOfSpeech::Prefix) {
-      const std::string& prefix_surface = morphemes[i - 1].surface;
-      // Only for honorific prefixes お and ご
-      if (utf8::equalsAny(prefix_surface, {"お", "ご", "御"})) {
-        // Restore a nominally homographic stem when a following humble or
-        // honorific subsidiary supplies decisive verbal context:
-        // お+知らせ+いたす, お+使い+いただく. This mirrors the preservation
-        // rule below for stems that already reached the lattice as verbs. ご
-        // takes a Sino-Japanese verbal noun instead (ご+あんない+いたす).
-        if (morpheme.pos == core::PartOfSpeech::Noun && !grammar::isSinoHonorificPrefix(prefix_surface) &&
-            i + 1 < morphemes.size() &&
-            (grammar::isHumbleHonorificLemma(morphemes[i + 1].lemma) ||
-             grammar::isPotentialBenefactiveLemma(morphemes[i + 1].lemma))) {
-          const char32_t morpheme_last = utf8::decodeLastChar(morpheme.surface);
-          if (grammar::isIRowCodepoint(morpheme_last)) {
-            resolver::retagGodanRenyokeiFromIRow(morpheme, false);
-          } else if (grammar::isERowCodepoint(morpheme_last)) {
-            morpheme.lemma = morpheme.surface + "る";
-            morpheme.conj_type = dictionary::ConjugationType::Ichidan;
-            morpheme.pos = core::PartOfSpeech::Verb;
-            morpheme.extended_pos = core::ExtendedPOS::VerbRenyokei;
-          }
-        }
-        // ご prefixes a Sino-Japanese verbal noun (ご+あんない+し), which is
-        // not a native continuative even when it ends in i/e.
-        if (morpheme.pos == core::PartOfSpeech::Noun && !grammar::isSinoHonorificPrefix(prefix_surface) &&
-            i + 1 < morphemes.size() && morphemes[i + 1].extended_pos == core::ExtendedPOS::VerbRenyokei &&
-            morphemes[i + 1].surface == "し" && morphemes[i + 1].lemma == "する") {
-          const char32_t stem_last = utf8::decodeLastChar(morpheme.surface);
-          if (grammar::isIRowCodepoint(stem_last)) {
-            resolver::retagGodanRenyokeiFromIRow(morpheme, true);
-          } else if (grammar::isERowCodepoint(stem_last)) {
-            resolver::retag(morpheme, core::PartOfSpeech::Verb, core::ExtendedPOS::VerbRenyokei,
-                            morpheme.surface + "る", dictionary::ConjugationType::Ichidan, grammar::ConjForm::Renyokei);
-          }
-        }
-        // Convert VERB to NOUN (renyoukei nominalization)
-        // e.g., 願い(VERB) → 願い(NOUN) after お
-        // Exception: when followed by causative auxiliary (せ/させ),
-        // the verb is part of a causative construction (お聞かせ, お知らせ)
-        // and should remain as VERB
-        // Nominalization after an honorific prefix applies to a continuative
-        // stem, not to a finite verb.  Keeping this distinction preserves
-        // literary terminal forms such as お+はす as verbs.
-        const bool honorific_nominal_stem = morpheme.extended_pos == core::ExtendedPOS::VerbRenyokei ||
-                                            (morpheme.extended_pos == core::ExtendedPOS::VerbKateikei &&
-                                             grammar::isERowCodepoint(utf8::decodeLastChar(morpheme.surface)));
-        if (morpheme.pos == core::PartOfSpeech::Verb && honorific_nominal_stem) {
-          bool preserves_verbal_reading = false;
-          if (i + 1 < morphemes.size()) {
-            const auto& next = morphemes[i + 1];
-            preserves_verbal_reading = grammar::isHumbleHonorificLemma(next.lemma) ||
-                                       grammar::isPotentialBenefactiveLemma(next.lemma) ||
-                                       next.extended_pos == core::ExtendedPOS::AuxCausative ||
-                                       // An honorific subsidiary takes a continuative, not a
-                                       // nominal, so it keeps the stem verbal (お読み+やす).
-                                       next.extended_pos == core::ExtendedPOS::AuxHonorific;
-
-            // An actual hypothetical e-row form keeps its verbal analysis
-            // before ば (お届け+ば). Without ば, the same dictionary edge is
-            // homographic with the honorific nominal stem (お+届け).
-            preserves_verbal_reading = preserves_verbal_reading ||
-                                       (morpheme.extended_pos == core::ExtendedPOS::VerbKateikei &&
-                                        next.extended_pos == core::ExtendedPOS::ParticleConj && next.surface == "ば");
-
-            // In the productive honorific construction お/ご+連用形+する,
-            // the stem remains a verb.  The closed continuation する supplies
-            // the grammatical evidence; requiring a particular open-class
-            // argument or stem would turn this into an unbounded word list.
-            bool follows_suru =
-                next.extended_pos == core::ExtendedPOS::VerbRenyokei && next.surface == "し" && next.lemma == "する";
-            preserves_verbal_reading = preserves_verbal_reading || follows_suru;
-
-            // An e-row continuative before する is an ichidan verb in the
-            // productive honorific construction (お見せする), not a nominal
-            // renyokei such as お待ちする.
-            if (grammar::isERowCodepoint(utf8::decodeLastChar(morpheme.surface)) &&
-                next.pos == core::PartOfSpeech::Verb && next.lemma == "する") {
-              preserves_verbal_reading = true;
-            }
-
-            // In the productive honorific お/ご+連用形+に+なる
-            // construction, the stem remains verbal even when it is
-            // homographic with a nominalized renyokei (お聞きになる).
-            if (next.extended_pos == core::ExtendedPOS::ParticleCase && next.surface == "に" &&
-                i + 2 < morphemes.size()) {
-              const auto& following = morphemes[i + 2];
-              preserves_verbal_reading =
-                  preserves_verbal_reading || (following.pos == core::PartOfSpeech::Verb && following.lemma == "なる");
-            }
-          }
-          if (!preserves_verbal_reading) {
-            resolver::retagNounSurface(morpheme);
-            SUZUME_DEBUG_LOG_VERBOSE("[POSTPROC] Nominalized: " << morpheme.surface << " (VERB → NOUN after "
-                                                                << prefix_surface << ")\n");
-          }
-        }
+  for (size_t idx = 1; idx < morphemes.size(); ++idx) {
+    core::Morpheme& morpheme = morphemes[idx];
+    // Only after the honorific prefixes お and ご
+    if (morphemes[idx - 1].pos != core::PartOfSpeech::Prefix) {
+      continue;
+    }
+    const std::string& prefix_surface = morphemes[idx - 1].surface;
+    if (!utf8::equalsAny(prefix_surface, {"お", "ご", "御"})) {
+      continue;
+    }
+    // Restore a nominally homographic stem when a following humble or
+    // honorific subsidiary supplies decisive verbal context:
+    // お+知らせ+いたす, お+使い+いただく. This mirrors the preservation
+    // rule below for stems that already reached the lattice as verbs. ご
+    // takes a Sino-Japanese verbal noun instead (ご+あんない+いたす).
+    if (morpheme.pos == core::PartOfSpeech::Noun && !grammar::isSinoHonorificPrefix(prefix_surface) &&
+        idx + 1 < morphemes.size() &&
+        (grammar::isHumbleHonorificLemma(morphemes[idx + 1].lemma) ||
+         grammar::isPotentialBenefactiveLemma(morphemes[idx + 1].lemma))) {
+      const char32_t morpheme_last = utf8::decodeLastChar(morpheme.surface);
+      if (grammar::isIRowCodepoint(morpheme_last)) {
+        resolver::retagGodanRenyokeiFromIRow(morpheme, false);
+      } else if (grammar::isERowCodepoint(morpheme_last)) {
+        morpheme.lemma = morpheme.surface + "る";
+        morpheme.conj_type = dictionary::ConjugationType::Ichidan;
+        morpheme.pos = core::PartOfSpeech::Verb;
+        morpheme.extended_pos = core::ExtendedPOS::VerbRenyokei;
       }
+    }
+    // ご prefixes a Sino-Japanese verbal noun (ご+あんない+し), which is
+    // not a native continuative even when it ends in i/e.
+    if (morpheme.pos == core::PartOfSpeech::Noun && !grammar::isSinoHonorificPrefix(prefix_surface) &&
+        idx + 1 < morphemes.size() && morphemes[idx + 1].extended_pos == core::ExtendedPOS::VerbRenyokei &&
+        morphemes[idx + 1].surface == "し" && morphemes[idx + 1].lemma == "する") {
+      resolver::retagContinuativeAsVerb(morpheme);
+    }
+    // A continuative after an honorific prefix is nominalized (お+願い), unless
+    // a following element keeps it verbal; a causative (お聞かせ, お知らせ)
+    // is one such element. A finite verb is never nominalized, which keeps
+    // literary terminal forms such as お+はす verbal.
+    const bool honorific_nominal_stem = morpheme.extended_pos == core::ExtendedPOS::VerbRenyokei ||
+                                        (morpheme.extended_pos == core::ExtendedPOS::VerbKateikei &&
+                                         grammar::isERowCodepoint(utf8::decodeLastChar(morpheme.surface)));
+    if (morpheme.pos != core::PartOfSpeech::Verb || !honorific_nominal_stem) {
+      continue;
+    }
+    bool preserves_verbal_reading = false;
+    if (idx + 1 < morphemes.size()) {
+      const auto& next = morphemes[idx + 1];
+      preserves_verbal_reading = grammar::isHumbleHonorificLemma(next.lemma) ||
+                                 grammar::isPotentialBenefactiveLemma(next.lemma) ||
+                                 next.extended_pos == core::ExtendedPOS::AuxCausative ||
+                                 // An honorific subsidiary takes a continuative, not a
+                                 // nominal, so it keeps the stem verbal (お読み+やす).
+                                 next.extended_pos == core::ExtendedPOS::AuxHonorific;
+
+      // An actual hypothetical e-row form keeps its verbal analysis
+      // before ば (お届け+ば). Without ば, the same dictionary edge is
+      // homographic with the honorific nominal stem (お+届け).
+      preserves_verbal_reading =
+          preserves_verbal_reading || (morpheme.extended_pos == core::ExtendedPOS::VerbKateikei &&
+                                       next.extended_pos == core::ExtendedPOS::ParticleConj && next.surface == "ば");
+
+      // In the productive honorific construction お/ご+連用形+する,
+      // the stem remains a verb.  The closed continuation する supplies
+      // the grammatical evidence; requiring a particular open-class
+      // argument or stem would turn this into an unbounded word list.
+      const bool follows_suru =
+          next.extended_pos == core::ExtendedPOS::VerbRenyokei && next.surface == "し" && next.lemma == "する";
+      preserves_verbal_reading = preserves_verbal_reading || follows_suru;
+
+      // An e-row continuative before する is an ichidan verb in the
+      // productive honorific construction (お見せする), not a nominal
+      // renyokei such as お待ちする.
+      if (grammar::isERowCodepoint(utf8::decodeLastChar(morpheme.surface)) && next.pos == core::PartOfSpeech::Verb &&
+          next.lemma == "する") {
+        preserves_verbal_reading = true;
+      }
+
+      // In the productive honorific お/ご+連用形+に+なる
+      // construction, the stem remains verbal even when it is
+      // homographic with a nominalized renyokei (お聞きになる).
+      if (next.extended_pos == core::ExtendedPOS::ParticleCase && next.surface == "に" && idx + 2 < morphemes.size()) {
+        const auto& following = morphemes[idx + 2];
+        preserves_verbal_reading =
+            preserves_verbal_reading || (following.pos == core::PartOfSpeech::Verb && following.lemma == "なる");
+      }
+    }
+    if (!preserves_verbal_reading) {
+      resolver::retagNounSurface(morpheme);
+      SUZUME_DEBUG_LOG_VERBOSE("[POSTPROC] Nominalized: " << morpheme.surface << " (VERB → NOUN after "
+                                                          << prefix_surface << ")\n");
     }
   }
 }

@@ -9,6 +9,7 @@
 #include "normalize/utf8.h"
 #include "postprocess/lemmatizer.h"
 #include "postprocess/lemmatizer_internal.h"
+#include "postprocess/postprocessor_resolvers_internal.h"
 
 namespace suzume::postprocess {
 
@@ -40,40 +41,31 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes, bool updat
     }
   }
 
-  for (size_t i = 0; i < morphemes.size(); ++i) {
-    auto& morpheme = morphemes[i];
+  for (size_t idx = 0; idx < morphemes.size(); ++idx) {
+    auto& morpheme = morphemes[idx];
 
     // A continuative immediately governing 始め is verbal even when the
     // dictionary-free lattice selected a homographic noun/adjective. Recover
     // the productive base from its final kana: e-row and じ stems are ichidan;
     // the remaining i-row endings use the shared Godan table.
-    const bool next_is_verbal_hajime = i + 1 < morphemes.size() && morphemes[i + 1].surface == "始め" &&
-                                       (morphemes[i + 1].pos == core::PartOfSpeech::Verb ||
-                                        morphemes[i + 1].extended_pos == core::ExtendedPOS::AuxAspectHajimeru);
+    const bool next_is_verbal_hajime = idx + 1 < morphemes.size() && morphemes[idx + 1].surface == "始め" &&
+                                       (morphemes[idx + 1].pos == core::PartOfSpeech::Verb ||
+                                        morphemes[idx + 1].extended_pos == core::ExtendedPOS::AuxAspectHajimeru);
     const bool is_dictionary_noun =
         dict_manager_ != nullptr && dict_manager_->lookupExact(morpheme.surface, core::PartOfSpeech::Noun) != nullptr;
     const bool hajime_has_verbal_follower =
-        i + 2 < morphemes.size() &&
-        (morphemes[i + 2].pos == core::PartOfSpeech::Auxiliary || morphemes[i + 2].pos == core::PartOfSpeech::Verb);
+        idx + 2 < morphemes.size() &&
+        (morphemes[idx + 2].pos == core::PartOfSpeech::Auxiliary || morphemes[idx + 2].pos == core::PartOfSpeech::Verb);
     const bool hajime_has_nominal_follower =
-        i + 2 == morphemes.size() ||
-        (i + 2 < morphemes.size() &&
-         (morphemes[i + 2].pos == core::PartOfSpeech::Particle || morphemes[i + 2].pos == core::PartOfSpeech::Symbol));
+        idx + 2 == morphemes.size() ||
+        (idx + 2 < morphemes.size() && (morphemes[idx + 2].pos == core::PartOfSpeech::Particle ||
+                                        morphemes[idx + 2].pos == core::PartOfSpeech::Symbol));
     const bool nominalizable_hajime_host =
         morpheme.pos == core::PartOfSpeech::Noun ||
         (morpheme.pos == core::PartOfSpeech::Verb && morpheme.extended_pos == core::ExtendedPOS::VerbRenyokei);
     if (next_is_verbal_hajime && hajime_has_nominal_follower && nominalizable_hajime_host) {
-      morpheme.pos = core::PartOfSpeech::Noun;
-      morpheme.extended_pos = core::ExtendedPOS::NounVerbal;
-      morpheme.lemma = morpheme.surface;
-      morpheme.conj_type = dictionary::ConjugationType::None;
-      morpheme.conj_form = grammar::ConjForm::Base;
-      auto& hajime = morphemes[i + 1];
-      hajime.pos = core::PartOfSpeech::Noun;
-      hajime.extended_pos = core::ExtendedPOS::Noun;
-      hajime.lemma = hajime.surface;
-      hajime.conj_type = dictionary::ConjugationType::None;
-      hajime.conj_form = grammar::ConjForm::Base;
+      resolver::retagUninflected(morpheme, core::PartOfSpeech::Noun, core::ExtendedPOS::NounVerbal, morpheme.surface);
+      resolver::retagNounSurface(morphemes[idx + 1]);
       // An auxiliary is already a member of the verbal chain, so there is no
       // homograph left to recover: rebuilding a predicate out of the passive れ
       // would undo the voice boundary (使わ+れ+始め).
@@ -89,7 +81,7 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes, bool updat
     // is exempt: a compound particle sitting here is lexicalized on top of a
     // continuative already (に関し+まし+て), so rebuilding a predicate from it
     // would undo the very analysis that put it in this slot.
-    if (i + 1 < morphemes.size() && morphemes[i + 1].extended_pos == core::ExtendedPOS::AuxTenseMasu &&
+    if (idx + 1 < morphemes.size() && morphemes[idx + 1].extended_pos == core::ExtendedPOS::AuxTenseMasu &&
         morpheme.pos != core::PartOfSpeech::Verb && morpheme.pos != core::PartOfSpeech::Auxiliary &&
         morpheme.pos != core::PartOfSpeech::Particle) {
       retagAsContinuative(morpheme, grammar::inflection::isValidKanjiIStemException(morpheme.surface));
@@ -224,10 +216,10 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes, bool updat
     std::string_view next_surface;
     std::string_view next_lemma;
     core::ExtendedPOS next_extended_pos = core::ExtendedPOS::Unknown;
-    if (i + 1 < morphemes.size()) {
-      next_surface = morphemes[i + 1].surface;
-      next_lemma = morphemes[i + 1].lemma;
-      next_extended_pos = morphemes[i + 1].extended_pos;
+    if (idx + 1 < morphemes.size()) {
+      next_surface = morphemes[idx + 1].surface;
+      next_lemma = morphemes[idx + 1].lemma;
+      next_extended_pos = morphemes[idx + 1].extended_pos;
     }
     // An e-row form before polite ます is a potential verb, not a godan
     // conditional. The potential remains one verb token (書けます, なれます),
@@ -245,7 +237,7 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes, bool updat
     // noun + せ (説明+せ+ず), so this correction is intentionally one-kanji only.
     if (morpheme.pos == core::PartOfSpeech::Verb && morpheme.extended_pos == core::ExtendedPOS::VerbRenyokei &&
         morpheme.surface.size() == core::kTwoJapaneseCharBytes && utf8::endsWith(morpheme.surface, "せ") &&
-        i + 1 < morphemes.size() && morphemes[i + 1].extended_pos == core::ExtendedPOS::AuxNegativeNu) {
+        idx + 1 < morphemes.size() && morphemes[idx + 1].extended_pos == core::ExtendedPOS::AuxNegativeNu) {
       const std::string_view stem = utf8::dropLastChar(morpheme.surface);
       if (grammar::isAllKanji(stem)) {
         morpheme.lemma = normalize::concat(stem, "する");
@@ -339,16 +331,16 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes, bool updat
     // Apply when preceded by the て particle (〜ていく construction: 出て+いっ+た),
     // a motion particle (に/へ), or adjective renyokei (〜く)
     // Do NOT apply after quotative markers (と/そう/こう etc.) where いっ = 言う
-    const bool is_sentence_initial_iku = i == 0 && morpheme.surface == "行っ";
+    const bool is_sentence_initial_iku = idx == 0 && morpheme.surface == "行っ";
     if (morpheme.pos == core::PartOfSpeech::Verb &&
         (utf8::endsWith(morpheme.surface, "いっ") || is_sentence_initial_iku) &&
         morpheme.lemma.size() >= core::kTwoJapaneseCharBytes &&
         (utf8::endsWith(morpheme.lemma, "いう") || is_sentence_initial_iku) &&
         utf8::equalsAny(next_surface, {"た", "て", "たら", "ちゃ"})) {
-      const bool has_te_particle = i > 0 && morphemes[i - 1].surface == "て";
-      const bool has_motion_particle = i > 0 && utf8::equalsAny(morphemes[i - 1].surface, {"に", "へ"});
-      const bool has_adj_renyokei = i > 0 && morphemes[i - 1].pos == core::PartOfSpeech::Adjective &&
-                                    utf8::endsWith(morphemes[i - 1].surface, "く");
+      const bool has_te_particle = idx > 0 && morphemes[idx - 1].surface == "て";
+      const bool has_motion_particle = idx > 0 && utf8::equalsAny(morphemes[idx - 1].surface, {"に", "へ"});
+      const bool has_adj_renyokei = idx > 0 && morphemes[idx - 1].pos == core::PartOfSpeech::Adjective &&
+                                    utf8::endsWith(morphemes[idx - 1].surface, "く");
       if (has_te_particle || has_motion_particle || has_adj_renyokei || is_sentence_initial_iku) {
         if (is_sentence_initial_iku) {
           morpheme.lemma = "行く";
@@ -371,24 +363,18 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes, bool updat
           // Convert ichidan potential lemma to godan base
           // Remove trailing える/ける/... (6 bytes) and get the stem
           const std::string_view stem = utf8::dropLast2Chars(morpheme.lemma);
-          // Map e-row ending to godan base: え→う, け→く, げ→ぐ, etc.
-          std::string_view surface_tail(morpheme.surface.data() + morpheme.surface.size() - core::kJapaneseCharBytes,
-                                        core::kJapaneseCharBytes);
           // Map e-row ending to godan base (け→く, せ→す, ...) via the shared
           // Conjugation-derived table. れ is ambiguous and handled separately.
-          char32_t tail_cp = utf8::decodeFirstChar(surface_tail);
-          std::string godan_base;
+          const char32_t tail_cp = utf8::decodeLastChar(morpheme.surface);
+          std::string_view godan_base;
           if (tail_cp == U'れ') {
-            // Check if this is ichidan conditional (食べれ+ば → 食べる)
-            // rather than godan-ra conditional (取れ+ば → 取る)
-            // For ichidan: surface_stem + る == original lemma
-            std::string surface_stem = morpheme.surface.substr(0, morpheme.surface.size() - core::kJapaneseCharBytes);
-            if (surface_stem + "る" != morpheme.lemma) {
+            // An ichidan conditional (食べれ+ば → 食べる) already carries its
+            // lemma; only a godan-ra one (取れ+ば → 取る) is converted.
+            if (normalize::concat(utf8::dropLastChar(morpheme.surface), "る") != morpheme.lemma) {
               godan_base = "る";
             }
-            // else: ichidan conditional - lemma is already correct, don't convert
           } else {
-            godan_base = std::string(grammar::godanBaseSuffixFromERow(tail_cp));
+            godan_base = grammar::godanBaseSuffixFromERow(tail_cp);
           }
           if (!godan_base.empty()) {
             morpheme.lemma = normalize::concat(stem, godan_base);

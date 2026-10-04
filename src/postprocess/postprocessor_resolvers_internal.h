@@ -15,6 +15,11 @@ void retag(core::Morpheme& morpheme, core::PartOfSpeech pos, core::ExtendedPOS e
 void retagUninflected(core::Morpheme& morpheme, core::PartOfSpeech pos, core::ExtendedPOS extended_pos,
                       std::string_view lemma);
 
+/// Insert @p morpheme directly after position @p idx.
+void insertAfter(std::vector<core::Morpheme>& result, size_t idx, const core::Morpheme& morpheme);
+/// Erase the morpheme directly after position @p idx.
+void eraseAfter(std::vector<core::Morpheme>& result, size_t idx);
+
 bool isCompoundRenyokeiShape(const std::string& surface);
 bool isCounterDurationNoun(const std::string& surface);
 bool followsTeFormConnective(const core::Morpheme& morpheme);
@@ -87,6 +92,8 @@ void retagBasicNegativeAdjective(core::Morpheme& morpheme);
 void retagNegativeAdjectiveCell(core::Morpheme& morpheme);
 void retagCopulaDa(core::Morpheme& morpheme);
 bool retagGodanRenyokeiFromIRow(core::Morpheme& stem, bool set_conj_form);
+/// Retag a continuative-shaped token as its verb (読み → 読む, かけ → かける).
+bool retagContinuativeAsVerb(core::Morpheme& stem);
 void retagNaAdjectivalSou(core::Morpheme& morpheme);
 void retagNegativeNai(core::Morpheme& morpheme);
 void resolveNegativeHost(std::vector<core::Morpheme>& result);

@@ -365,7 +365,7 @@ void mergeSplitCopularNegative(std::vector<core::Morpheme>& result) {
       na.extended_pos = core::ExtendedPOS::AdjBasic;
       na.conj_type = dictionary::ConjugationType::IAdjective;
     }
-    result.erase(result.begin() + static_cast<std::ptrdiff_t>(idx + 1));
+    eraseAfter(result, idx);
   }
 }
 
@@ -388,7 +388,7 @@ void mergeSplitFormalNounNegativeRenyokei(std::vector<core::Morpheme>& result) {
     na.extended_pos = core::ExtendedPOS::AdjRenyokei;
     na.conj_type = dictionary::ConjugationType::IAdjective;
     na.conj_form = grammar::ConjForm::Renyokei;
-    result.erase(result.begin() + static_cast<std::ptrdiff_t>(idx + 1));
+    eraseAfter(result, idx);
   }
 }
 

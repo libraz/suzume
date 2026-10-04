@@ -22,7 +22,7 @@ bool isNumericExpression(const std::string& surface) {
     return false;
 
   size_t pos = 0;
-  char32_t first_ch = suzume::normalize::decodeUtf8(surface, pos);
+  char32_t first_ch = normalize::decodeUtf8(surface, pos);
   return isDigitChar(first_ch);
 }
 
@@ -32,7 +32,7 @@ bool isQuantityPhraseSuffixSurface(const std::string& surface) {
     return false;
   }
   size_t pos = 0;
-  return suzume::normalize::isQuantityPhraseSuffixKanji(suzume::normalize::decodeUtf8(surface, pos));
+  return normalize::isQuantityPhraseSuffixKanji(normalize::decodeUtf8(surface, pos));
 }
 
 // Check if surface ends with a digit
@@ -43,7 +43,7 @@ bool endsWithDigit(const std::string& surface) {
   size_t pos = 0;
   char32_t last_ch = 0;
   while (pos < surface.size()) {
-    last_ch = suzume::normalize::decodeUtf8(surface, pos);
+    last_ch = normalize::decodeUtf8(surface, pos);
   }
   return isDigitChar(last_ch);
 }
@@ -71,18 +71,11 @@ bool looksLikeUnit(const std::string& surface) {
   }
 
   // Katakana nouns: any all-katakana surface merges with a preceding numeral
-  if (isAllKatakana(surface)) {
-    return true;
-  }
-
-  return false;
+  return isAllKatakana(surface);
 }
 
 // Check if surface ends with a numeric unit that can be followed by more numbers
 bool endsWithContinuableUnit(const std::string& surface) {
-  if (surface.empty())
-    return false;
-
   // Targets 兆/億/万/千/百 are all 3-byte kanji; decode only the trailing char.
   char32_t last_ch = utf8::decodeLastChar(surface);
   // Units that can be followed by more numbers (兆, 億, 万, 千, 百)
@@ -153,10 +146,10 @@ std::vector<core::Morpheme> Postprocessor::mergeNumericExpressions(std::vector<c
 
       SUZUME_DEBUG_IF(merge_end > idx + 1) {
         SUZUME_DEBUG_STREAM << "[POSTPROC] Merged numeric: ";
-        for (size_t i = idx; i < merge_end; ++i) {
-          if (i > idx)
+        for (size_t merged_idx = idx; merged_idx < merge_end; ++merged_idx) {
+          if (merged_idx > idx)
             SUZUME_DEBUG_STREAM << " + ";
-          SUZUME_DEBUG_STREAM << "\"" << morphemes[i].surface << "\"";
+          SUZUME_DEBUG_STREAM << "\"" << morphemes[merged_idx].surface << "\"";
         }
         SUZUME_DEBUG_STREAM << " → \"" << merged.surface << "\"\n";
       }

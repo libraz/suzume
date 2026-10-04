@@ -461,7 +461,7 @@ std::string fixTariAdverb(std::string_view surface) {
   if (!utf8::endsWith(surface, "と")) {
     return "";
   }
-  const auto codepoints = normalize::utf8::decode(surface);
+  const auto codepoints = normalize::toCodepoints(surface);
   if (codepoints.size() != 3 || codepoints.back() != U'と') {
     return "";
   }
@@ -593,38 +593,18 @@ bool Lemmatizer::verifyCandidateWithDictionary(const grammar::InflectionCandidat
     return false;
   }
 
-  // Look up the candidate base form in dictionary
-  auto results = dict_manager_->lookup(candidate.base_form, 0);
-
-  bool found_verb_or_adj = false;
-
-  for (const auto& result : results) {
-    if (result.entry == nullptr) {
+  // Accept if base_form exists as a verb/adjective in the dictionary. A type
+  // mismatch is acceptable: the dictionary presence validates the base form
+  // itself (見せられた → 見せる with a wrong GodanRa type is still accepted).
+  for (const auto& result : dict_manager_->lookup(candidate.base_form, 0)) {
+    if (result.entry == nullptr || result.entry->surface != candidate.base_form) {
       continue;
     }
-
-    // Check if the entry matches exactly (same surface and is a verb/adjective)
-    if (result.entry->surface != candidate.base_form) {
-      continue;
+    if (result.entry->pos == core::PartOfSpeech::Verb || result.entry->pos == core::PartOfSpeech::Adjective) {
+      return true;
     }
-
-    // Check if POS is verb or adjective
-    if (result.entry->pos != core::PartOfSpeech::Verb && result.entry->pos != core::PartOfSpeech::Adjective) {
-      continue;
-    }
-
-    // Found a verb/adjective with matching surface
-    found_verb_or_adj = true;
-
-    break;
   }
-
-  // Accept if base_form exists as verb/adjective in dictionary
-  // Type mismatch is acceptable - inflection analysis may have wrong type
-  // but dictionary presence validates the base_form itself
-  // e.g., 見せられた → base="見せる" with wrong type=GodanRa should still
-  // be accepted because 見せる exists as Ichidan verb in dictionary
-  return found_verb_or_adj;
+  return false;
 }
 
 namespace lemmatizer_detail {

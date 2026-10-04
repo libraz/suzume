@@ -33,6 +33,23 @@ bool hasDictionaryGodanBaseFromIRow(const core::Morpheme& noun, const dictionary
   return dict_manager->lookupExact(base_form, core::PartOfSpeech::Verb) != nullptr;
 }
 
+// The ある of a copular chain: a terminal ある with no auxiliary after it is
+// the lexical verb, any other cell the copular auxiliary.
+void retagCopularAru(std::vector<core::Morpheme>& result, size_t aru_idx) {
+  auto& aru = result[aru_idx];
+  const bool followed_by_auxiliary =
+      aru_idx + 1 < result.size() && result[aru_idx + 1].pos == core::PartOfSpeech::Auxiliary;
+  if (aru.conj_form == grammar::ConjForm::Base && !followed_by_auxiliary) {
+    retag(aru, core::PartOfSpeech::Verb, core::ExtendedPOS::VerbShuushikei, "ある",
+          dictionary::ConjugationType::GodanRa, grammar::ConjForm::Base);
+    return;
+  }
+  aru.pos = core::PartOfSpeech::Auxiliary;
+  aru.extended_pos = core::ExtendedPOS::AuxCopulaDa;
+  aru.lemma = "ある";
+  aru.conj_type = dictionary::ConjugationType::GodanRa;
+}
+
 }  // namespace
 
 // A duration quantity directly followed by かかる requires the predicate
@@ -221,18 +238,7 @@ void resolveNominalCaseDe(std::vector<core::Morpheme>& result) {
       }
       retagCopulaDa(de);
       if (topic_starts_copular_aru) {
-        auto& aru = result[idx + 2];
-        const bool followed_by_auxiliary =
-            idx + 3 < result.size() && result[idx + 3].pos == core::PartOfSpeech::Auxiliary;
-        if (aru.conj_form == grammar::ConjForm::Base && !followed_by_auxiliary) {
-          retag(aru, core::PartOfSpeech::Verb, core::ExtendedPOS::VerbShuushikei, "ある",
-                dictionary::ConjugationType::GodanRa, grammar::ConjForm::Base);
-        } else {
-          aru.pos = core::PartOfSpeech::Auxiliary;
-          aru.extended_pos = core::ExtendedPOS::AuxCopulaDa;
-          aru.lemma = "ある";
-          aru.conj_type = dictionary::ConjugationType::GodanRa;
-        }
+        retagCopularAru(result, idx + 2);
       }
       // The public token contract keeps the ある half of terminal である as a
       // lexical verb regardless of whether the nominal host is overt or the
@@ -240,21 +246,10 @@ void resolveNominalCaseDe(std::vector<core::Morpheme>& result) {
       // auxiliary treatment.
       if (is_nominalized_clause && successor != nullptr &&
           utf8::equalsAny(successor->surface, {"ある", "あっ", "あり", "あろ", "あれ"})) {
-        const bool followed_by_auxiliary =
-            idx + 2 < result.size() && result[idx + 2].pos == core::PartOfSpeech::Auxiliary;
-        if (successor->conj_form == grammar::ConjForm::Base && !followed_by_auxiliary) {
-          retag(*successor, core::PartOfSpeech::Verb, core::ExtendedPOS::VerbShuushikei, "ある",
-                dictionary::ConjugationType::GodanRa, grammar::ConjForm::Base);
-        } else {
-          successor->pos = core::PartOfSpeech::Auxiliary;
-          successor->extended_pos = core::ExtendedPOS::AuxCopulaDa;
-          successor->lemma = "ある";
-          successor->conj_type = dictionary::ConjugationType::GodanRa;
-        }
+        retagCopularAru(result, idx + 1);
       }
       if (successor != nullptr && successor->surface == "ござる") {
-        auto& gozaru = *successor;
-        retag(gozaru, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxGozaru, "ござる",
+        retag(*successor, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxGozaru, "ござる",
               dictionary::ConjugationType::GodanRa, grammar::ConjForm::Base);
       }
       continue;
@@ -296,7 +291,7 @@ void resolveNominalConditionalNara(std::vector<core::Morpheme>& result) {
     // by what follows it. A negative auxiliary directly behind なら is
     // therefore the verb's own cell and not a conditional at all — which holds
     // for a formal-noun host (ほか+なら+ない) exactly as it does for the
-    // obligation chain (なきゃ+なら+ない) that used to be listed on its own.
+    // obligation chain (なきゃ+なら+ない).
     // The limiting のみならず keeps the particle reading its own rule selects.
     const bool completed_by_negative = !limiting_chain && idx + 1 < result.size() &&
                                        (result[idx + 1].extended_pos == core::ExtendedPOS::AuxNegativeNai ||
@@ -538,7 +533,7 @@ void splitFormalNounCopularDemo(std::vector<core::Morpheme>& result) {
     focus.surface = "も";
     focus.start = copula.end;
     retagUninflected(focus, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleTopic, "も");
-    result.insert(result.begin() + static_cast<std::ptrdiff_t>(idx + 1), focus);
+    insertAfter(result, idx, focus);
     ++idx;
   }
 
