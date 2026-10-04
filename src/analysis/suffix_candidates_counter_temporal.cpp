@@ -8,11 +8,13 @@
 #include "analysis/dictionary_probe.h"
 #include "candidate_constants.h"
 #include "dictionary/dictionary.h"
+#include "grammar/char_patterns.h"
 #include "normalize/char_type.h"
 #include "normalize/exceptions.h"
 #include "suffix_candidates_counter_internal.h"
 #include "tokenizer_utils.h"
 #include "unknown.h"
+#include "verb_candidates_helpers.h"
 
 namespace suzume::analysis::counter_detail {
 
@@ -132,41 +134,20 @@ void appendTemporalCounterCandidates(const std::vector<char32_t>& codepoints, si
   // counter must be temporal, keeping lexical wholes on non-temporal counters intact
   // (一人前, not 一人|前).
   {
-    // A temporal counter run followed by a suffix that is always compositional:
-    //   - 後/前 relation suffix (三日|後, 十年|前)
-    //   - 半 "and a half" (三時間|半, 二年|半, 五分|半, 六ヶ月|半)
-    // The 半 case excludes a run ending in bare 時, which keeps the clock reading
-    // (三時半 = half past three), not a duration-plus-half.
-    bool suffix_is_compositional = false;
-    bool suffix_is_half = false;
-    if (counter_end < codepoints.size()) {
-      if (normalize::isTemporalRelationSuffixKanji(codepoints[counter_end])) {
-        suffix_is_compositional = true;
-      } else if (counter_end > 0 && codepoints[counter_end] == U'半' && codepoints[counter_end - 1] != U'時') {
-        suffix_is_compositional = true;
-        suffix_is_half = true;
-      }
-    }
-    if (has_counter_quantity && counter_end > counter_start && suffix_is_compositional) {
+    // A temporal counter run followed by the relation suffix 後/前 splits it
+    // off (三日|後, 十年|前). "And a half" 半 instead closes the quantity into
+    // one search unit (三時間半, 五分半, 六ヶ月半); a run ending in bare 時
+    // keeps the clock reading (三時半 = half past three) on its own path.
+    const bool has_temporal_run =
+        has_counter_quantity && counter_end > counter_start && counter_end < codepoints.size();
+    if (has_temporal_run && normalize::isTemporalRelationSuffixKanji(codepoints[counter_end])) {
       appendCounterCandidate(codepoints, start_pos, counter_end, core::PartOfSpeech::Noun,
                              candidate::kCounterRelationSplitBonus, core::ExtendedPOS::NounNumber,
                              "counter_relation_split", candidates);
-      // Unlike 後/前 (single-kanji dict relation nouns), the split-off 半 only
-      // exists as a generic kanji_seq NOUN, which the single-kanji-noun →
-      // hiragana-verb compound protection penalizes before かかっ/すぎ etc.
-      // In a continuing predicate it is a quantity noun (三時間|半|かかった),
-      // while at a clause boundary it is the compositional suffix of the
-      // duration expression (一時間|半。).
-      if (suffix_is_half) {
-        const size_t after_half = counter_end + 1;
-        const bool closes_clause = after_half == codepoints.size() ||
-                                   normalize::classifyChar(codepoints[after_half]) == normalize::CharType::Symbol;
-        appendCounterCandidate(codepoints, counter_end, after_half,
-                               closes_clause ? core::PartOfSpeech::Suffix : core::PartOfSpeech::Noun,
-                               candidate::kCounterHalfSuffixCost,
-                               closes_clause ? core::ExtendedPOS::Suffix : core::ExtendedPOS::NounNumber,
-                               "counter_half_suffix", candidates);
-      }
+    } else if (has_temporal_run && codepoints[counter_end] == U'半' && codepoints[counter_end - 1] != U'時') {
+      appendCounterCandidate(codepoints, start_pos, counter_end + 1, core::PartOfSpeech::Noun,
+                             candidate::kCounterRelationSplitBonus, core::ExtendedPOS::NounNumber, "counter_half_merge",
+                             candidates);
     }
   }
 
@@ -265,7 +246,8 @@ void appendTemporalCounterCandidates(const std::vector<char32_t>& codepoints, si
                                "duration_interval_split", candidates);
       } else if (!trailing_ordinal_me && !normalize::isTemporalCounterKanji(codepoints[counter_end]) &&
                  !normalize::isTemporalRelationSuffixKanji(codepoints[counter_end]) &&
-                 !normalize::isTemporalSpanSuffixKanji(codepoints[counter_end])) {
+                 !normalize::isTemporalSpanSuffixKanji(codepoints[counter_end]) &&
+                 !leavesUnevenNominalRun(codepoints, counter_end)) {
         appendCounterCandidate(codepoints, start_pos, counter_end, core::PartOfSpeech::Noun,
                                candidate::kDurationSpanSplitBonus, core::ExtendedPOS::Unknown, "duration_span_split",
                                candidates);

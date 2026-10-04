@@ -2281,6 +2281,21 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
       }
     }
 
+    // A one-kanji suffix closing the kanji run right after a numeral+counter is
+    // part of the quantity phrase (三割+強, 二時間+弱), which keeps no lone
+    // kanji of its own; relational 前/後 stand alone (三日|後).
+    if (result.entry->pos == core::PartOfSpeech::Suffix && result.length == 1 &&
+        verb_helpers::isQuantityClosingSuffixAt(&dict_manager_, codepoints, start_pos)) {
+      size_t counter_start = start_pos;
+      while (counter_start > 0 && normalize::isCounterKanji(codepoints[counter_start - 1])) {
+        --counter_start;
+      }
+      if (counter_start < start_pos && counter_start > 0 &&
+          normalize::isNumeralCodepoint(codepoints[counter_start - 1])) {
+        continue;
+      }
+    }
+
     // A deverbal suffix after a kana continuative binds to it only when it
     // closes the kanji run; otherwise it opens the next noun, whether listed
     // alone or as the tail of a lexical noun (申し込み+手続き, 置き+場所).

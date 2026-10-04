@@ -32,7 +32,6 @@ constexpr size_t kMaxJapaneseLen = 8;    // Reasonable limit for Japanese part
 constexpr size_t kMaxDigitKanjiLen = 3;  // Max kanji for digit+kanji (counters)
 
 using normalize::isCounterKanji;
-using normalize::isQuantityPhraseSuffixKanji;
 
 // Minimum kanji sequence length for compound splitting
 constexpr size_t kMinCompoundLen = 4;
@@ -193,16 +192,11 @@ void addMixedScriptCandidates(core::Lattice& lattice, std::string_view text, con
     // is not enough to place the cut: it only bounds how much of the run the
     // quantity phrase may take. Measure the whole run so an odd leftover can be
     // charged below.
-    size_t kanji_run_end = first_end;
-    while (kanji_run_end < char_types.size() && char_types[kanji_run_end] == CharType::Kanji) {
-      ++kanji_run_end;
-    }
     // A quantity-phrase suffix closing the run sits outside those two-kanji
     // units: it binds to the whole counter phrase on its left (段階+目, 週+間).
     // Counting it would invert the parity and push the cut one kanji early.
-    if (kanji_run_end > first_end && isQuantityPhraseSuffixKanji(codepoints[kanji_run_end - 1])) {
-      --kanji_run_end;
-    }
+    const size_t full_run_end = grammar::nominalKanjiRunEnd(codepoints, first_end);
+    const size_t kanji_run_end = first_end + grammar::countKanjiRunWords(codepoints, first_end, full_run_end);
     // For digit+kanji, generate multiple candidates with length-based costs
     // This allows Viterbi to choose the best segmentation
     for (size_t kanji_len = 1; kanji_len <= max_end - first_end; ++kanji_len) {
@@ -252,9 +246,8 @@ void addMixedScriptCandidates(core::Lattice& lattice, std::string_view text, con
       // A cut that strands an odd number of kanji has landed on the wrong
       // boundary: 3段階評価 cuts after the lone counter 段 and leaves the
       // fragment 階評価, while the even cut leaves the word 評価. Charge the odd
-      // leftover so the even boundary wins. When the run offers no even cut the
-      // charge is uniform across candidates, so the quantity phrase still beats
-      // the bare numeral (3年 + 計画書). A single stranded kanji is no word at
+      // leftover so the even boundary wins; when the counter cut itself is odd,
+      // the whole run is offered below. A single stranded kanji is no word at
       // all (3種+類, 2世+帯), so it is charged above the bare-numeral path.
       if ((kanji_run_end - candidate_end) % 2 == 1) {
         length_adjustment += kanji_run_end - candidate_end == 1 ? bigram_cost::kRare : bigram_cost::kMinor;
@@ -264,6 +257,32 @@ void addMixedScriptCandidates(core::Lattice& lattice, std::string_view text, con
                                                 << " adj=" << length_adjustment << "\n");
       lattice.addEdge(surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(candidate_end),
                       core::PartOfSpeech::Noun, final_cost, flags, "");
+    }
+
+    // The counter takes every leading counter kanji (2時間+弱, 3段階+評価). When
+    // that cut leaves an odd remainder it lands inside a two-kanji word (2世+帯住宅,
+    // 3年+計画書), so the whole run is the search unit. Relational 前/後 and a
+    // listed pronoun still open a word of their own (3年|後, 5年|彼).
+    size_t counter_cut = first_end;
+    while (counter_cut < full_run_end && isCounterKanji(codepoints[counter_cut])) {
+      ++counter_cut;
+    }
+    const bool remainder_opens_word =
+        counter_cut < codepoints.size() && (normalize::isTemporalRelationSuffixKanji(codepoints[counter_cut]) ||
+                                            lookupEntryInRange(dict_manager, codepoints, counter_cut, counter_cut + 1,
+                                                               core::PartOfSpeech::Pronoun) != nullptr);
+    if (counter_cut > first_end && verb_helpers::isQuantityClosingSuffixAt(&dict_manager, codepoints, counter_cut)) {
+      const size_t suffix_end_byte = byteOffsetAt(byte_offsets, counter_cut + 1);
+      lattice.addEdge(text.substr(start_byte, suffix_end_byte - start_byte), static_cast<uint32_t>(start_pos),
+                      static_cast<uint32_t>(counter_cut + 1), core::PartOfSpeech::Noun,
+                      base_cost + opts.digit_kanji_1_bonus, flags, "");
+    } else if (counter_cut > first_end && counter_cut < kanji_run_end && (kanji_run_end - counter_cut) % 2 == 1 &&
+               !remainder_opens_word && !grammar::mayBeOkuriganaAt(codepoints, full_run_end)) {
+      const size_t run_end_byte = byteOffsetAt(byte_offsets, full_run_end);
+      const std::string_view surface = text.substr(start_byte, run_end_byte - start_byte);
+      SUZUME_DEBUG_LOG_VERBOSE("[SPLIT_MIX] \"" << surface << "\": digit+uneven kanji run\n");
+      lattice.addEdge(surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(full_run_end),
+                      core::PartOfSpeech::Noun, base_cost + opts.digit_kanji_1_bonus, flags, "");
     }
   } else {
     // For alphabet+kanji/katakana, generate single candidate (original behavior)

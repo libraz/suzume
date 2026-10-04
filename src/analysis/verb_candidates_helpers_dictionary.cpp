@@ -63,6 +63,21 @@ bool namesDictionaryVerbContinuative(const dictionary::DictionaryManager* dict_m
                             stem + normalize::encodeUtf8(okurigana) + normalize::encodeUtf8(core::hiragana::kRu));
 }
 
+bool isQuantityClosingSuffixAt(const dictionary::DictionaryManager* dict_manager,
+                               const std::vector<char32_t>& codepoints, size_t pos) {
+  if (dict_manager == nullptr || pos >= codepoints.size() || !normalize::isKanjiCodepoint(codepoints[pos]) ||
+      normalize::isTemporalRelationSuffixKanji(codepoints[pos]) ||
+      lookupEntryInRange(*dict_manager, codepoints, pos, pos + 1, core::PartOfSpeech::Suffix) == nullptr) {
+    return false;
+  }
+  const size_t next = pos + 1;
+  if (next >= codepoints.size() || !normalize::isKanjiCodepoint(codepoints[next])) {
+    return true;
+  }
+  // A following kanji with okurigana is a predicate stem (三割強+増える).
+  return grammar::nominalKanjiRunEnd(codepoints, next) == next + 1 && grammar::mayBeOkuriganaAt(codepoints, next + 1);
+}
+
 bool isProductiveShiiAdjectiveTerminal(std::string_view surface, const grammar::Inflection& inflection) {
   // A productive formation needs a stem in front of the suffix: bare しい is
   // the classical しかり paradigm's own shape (しかるべく, しかれども), not an

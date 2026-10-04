@@ -48,32 +48,37 @@ bool absorbsPeriodKan(std::string_view text, size_t pos_after_kan) {
   return !normalize::isIntervalCompoundSecondKanji(next_cp);
 }
 
-// Whether the character at `pos` is a lone kanji closing its kanji run, a
-// quantity-phrase suffix aside (3時限+目). An atomic counter token ending right
-// before it would strand that kanji (3年|生, 3時|限), so the span is left to the
-// analyzer, which can consult the dictionary. Relational 前/後 stand on their
-// own (3年|後).
-bool strandsLoneKanji(std::string_view text, size_t pos) {
+// Whether the kanji run starting at `pos` has odd length, a closing
+// quantity-phrase suffix aside (3時限+目). Read in two-kanji words, such a run
+// cannot follow an atomic counter token without one kanji being cut off its
+// word (3年|生, 3年|計画書), so the span is left to the analyzer, which takes
+// the run whole. Relational 前/後 stand on their own (3年|後).
+bool leavesOddKanjiRun(std::string_view text, size_t pos) {
   if (pos >= text.size()) {
     return false;
   }
   size_t idx = pos;
-  const char32_t kanji = normalize::decodeUtf8(text, idx);
-  if (!normalize::isKanjiCodepoint(kanji) || normalize::isNumeralCodepoint(kanji) ||
-      normalize::isTemporalRelationSuffixKanji(kanji)) {
+  const char32_t first = normalize::decodeUtf8(text, idx);
+  if (!normalize::isKanjiCodepoint(first) || normalize::isNumeralCodepoint(first) ||
+      normalize::isTemporalRelationSuffixKanji(first)) {
     return false;
   }
-  if (idx >= text.size()) {
-    return true;
-  }
-  char32_t following = normalize::decodeUtf8(text, idx);
-  if (normalize::isQuantityPhraseSuffixKanji(following)) {
-    if (idx >= text.size()) {
-      return true;
+  size_t run_length = 1;
+  char32_t last = first;
+  while (idx < text.size()) {
+    size_t next_idx = idx;
+    const char32_t next = normalize::decodeUtf8(text, next_idx);
+    if (!normalize::isKanjiCodepoint(next) || normalize::isNumeralCodepoint(next)) {
+      break;
     }
-    following = normalize::decodeUtf8(text, idx);
+    idx = next_idx;
+    last = next;
+    ++run_length;
   }
-  return !normalize::isKanjiCodepoint(following);
+  if (run_length > 1 && normalize::isQuantityPhraseSuffixKanji(last)) {
+    --run_length;
+  }
+  return run_length % 2 == 1;
 }
 
 // Keep a duration counter in the analyzer when the closed-class interval

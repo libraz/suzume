@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <utility>
 
+#include "analysis/dictionary_probe.h"
 #include "candidate_constants.h"
 #include "core/debug.h"
 #include "core/utf8_constants.h"
@@ -52,6 +53,60 @@ size_t scanQuantityHead(const std::vector<char32_t>& codepoints, size_t start, b
   return scan;
 }
 
+bool leavesUnevenNominalRun(const std::vector<char32_t>& codepoints, size_t counter_end) {
+  const size_t run_end = grammar::nominalKanjiRunEnd(codepoints, counter_end);
+  return !grammar::mayBeOkuriganaAt(codepoints, run_end) &&
+         grammar::countKanjiRunWords(codepoints, counter_end, run_end) % 2 == 1;
+}
+
+// A kanji-numeral quantity whose counter cut leaves an odd kanji run lands
+// inside a two-kanji word (二時間+弱, 三割+強, 一日+付), so the whole run is
+// the search unit, as for a digit quantity in split_candidates. Relational
+// 前/後 and a listed pronoun open a word of their own (三日|後), and a run
+// ending before possible okurigana is left to the predicate (三枚|重ねる).
+void appendUnevenKanjiRunCandidate(const std::vector<char32_t>& codepoints, size_t start_pos, size_t numeral_end,
+                                   const dictionary::DictionaryManager* dict_manager,
+                                   std::vector<UnknownCandidate>& candidates) {
+  size_t counter_end = numeral_end;
+  while (counter_end < codepoints.size() && normalize::isCounterKanji(codepoints[counter_end])) {
+    ++counter_end;
+  }
+  // 間 heading an interval word belongs to the run (三年|間隔).
+  if (counter_end > numeral_end + 1 && counter_end < codepoints.size() && codepoints[counter_end - 1] == U'間' &&
+      normalize::isIntervalCompoundSecondKanji(codepoints[counter_end])) {
+    --counter_end;
+  }
+  if (counter_end == numeral_end || counter_end >= codepoints.size() ||
+      !normalize::isKanjiCodepoint(codepoints[counter_end]) || normalize::isNumeralCodepoint(codepoints[counter_end]) ||
+      normalize::isTemporalRelationSuffixKanji(codepoints[counter_end])) {
+    return;
+  }
+  if (dict_manager != nullptr && lookupEntryInRange(*dict_manager, codepoints, counter_end, counter_end + 1,
+                                                    core::PartOfSpeech::Pronoun) != nullptr) {
+    return;
+  }
+  if (verb_helpers::isQuantityClosingSuffixAt(dict_manager, codepoints, counter_end)) {
+    appendCounterCandidate(codepoints, start_pos, counter_end + 1, core::PartOfSpeech::Noun,
+                           candidate::kCounterRelationSplitBonus, core::ExtendedPOS::NounNumber,
+                           "numeral_closing_suffix", candidates);
+    return;
+  }
+  const size_t run_end = grammar::nominalKanjiRunEnd(codepoints, counter_end);
+  if (grammar::mayBeOkuriganaAt(codepoints, run_end)) {
+    return;
+  }
+  if (grammar::countKanjiRunWords(codepoints, counter_end, run_end) % 2 == 1) {
+    appendCounterCandidate(codepoints, start_pos, run_end, core::PartOfSpeech::Noun,
+                           candidate::kCounterRelationSplitBonus, core::ExtendedPOS::NounNumber,
+                           "numeral_uneven_kanji_run", candidates);
+  } else {
+    // An even remainder is a sequence of words after the counter (三段階|評価).
+    appendCounterCandidate(codepoints, start_pos, counter_end, core::PartOfSpeech::Noun,
+                           candidate::kCounterNounSplitBonus, core::ExtendedPOS::NounNumber,
+                           "numeral_even_kanji_run_split", candidates);
+  }
+}
+
 }  // namespace counter_detail
 
 void generateCounterCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
@@ -89,6 +144,9 @@ void generateCounterCandidates(const std::vector<char32_t>& codepoints, size_t s
       std::all_of(char_types.begin() + static_cast<std::ptrdiff_t>(start_pos),
                   char_types.begin() + static_cast<std::ptrdiff_t>(numeral_end),
                   [](normalize::CharType type) { return type == normalize::CharType::Digit; });
+  if (!numeral_is_digits) {
+    counter_detail::appendUnevenKanjiRunCandidate(codepoints, start_pos, numeral_end, dict_manager, candidates);
+  }
 
   // A digit run glued to a preceding letter is part of an alphanumeric
   // identifier, not a quantity: the A of A4 owns the 4, so the following

@@ -260,6 +260,61 @@ def _starts_with_kanji(surface: str) -> bool:
     return regex.match(r"\p{Han}", surface) is not None
 
 
+# Kanji closing a quantity phrase after the noun it measures (2段階+目, 3時限+目).
+_QUANTITY_PHRASE_SUFFIXES = frozenset({"半", "目", "間"})
+
+
+def _absorb_unevenly_cut_kanji_run(
+    tokens: list[dict], i: int, j: int, combined: str, last_was_counter: bool
+) -> tuple[int, str]:
+    """Extend a quantity phrase over a kanji run that its counter cuts unevenly.
+
+    The kanji after a numeral are read in two-kanji words once the counter is
+    taken off. When an odd number is left, the counter cut lands inside a word
+    (2世+帯住宅, 3年+計画書, 3部+作), so the whole run is the search unit; an
+    even remainder keeps the boundary (5人+家族, 24時間+営業). The counter is
+    either already absorbed into the phrase or, when the dictionary emitted it
+    inside a noun (2+世帯, 3+段階), the leading kanji of that noun that read as
+    counters. A closing quantity-phrase suffix (目, 半) binds to the whole phrase
+    and is not counted (2段階目), and relational 前/後 always stand alone (3年+後).
+    """
+    absorbed_counter = j > i + 1 and last_was_counter
+    k = j
+    run = ""
+    while k < len(tokens):
+        nxt = tokens[k]
+        ns = nxt.get("surface", "")
+        if not (
+            nxt.get("pos") == "名詞"
+            and nxt.get("pos_sub1") not in ("数", "代名詞", "固有名詞", "非自立")
+            and regex.fullmatch(r"\p{Han}+", ns)
+        ):
+            break
+        run += ns
+        k += 1
+    if not run or run[0] in _TEMPORAL_RELATION_SUFFIXES:
+        return j, combined
+    if absorbed_counter:
+        counter_len = 0
+    elif j == i + 1 and reads_as_counter(run[0]):
+        first = tokens[j].get("surface", "")
+        counter_len = 1
+        while counter_len < len(first) and reads_as_counter(first[counter_len]):
+            counter_len += 1
+    else:
+        return j, combined
+    has_closing_suffix = len(run) > 1 and run[-1] in _QUANTITY_PHRASE_SUFFIXES
+    counted = run[:-1] if has_closing_suffix else run
+    remainder = len(counted) - counter_len
+    if remainder % 2 == 1 or (remainder == 0 and has_closing_suffix):
+        return k, combined + run
+    # An even remainder after a noun made of counters alone still takes that
+    # noun as the counter (3段階+評価).
+    if not absorbed_counter and counter_len == len(tokens[j].get("surface", "")):
+        return j + 1, combined + tokens[j].get("surface", "")
+    return j, combined
+
+
 def _kanji_noun_run(tokens: list[dict], start: int) -> tuple[int, str]:
     """Return the complete mergeable kanji-noun run beginning at ``start``."""
     if start >= len(tokens):
@@ -1006,40 +1061,6 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                 np = nxt.get("pos", "")
                 ns1 = nxt.get("pos_sub1", "")
                 ns2 = nxt.get("pos_sub2", "")
-                # A quantity phrase does not strand one kanji at the end of a
-                # kanji run: a lone kanji after the counter is its suffix
-                # (3部+作, 3倍+速), and a two-kanji noun whose first kanji is
-                # itself a counter is read with the numeral (3+種類, 2+世帯).
-                # Kanji numerals take a separate path in the tokenizer, so the
-                # rule is read on digits only.
-                ends_kanji_run = j + 1 >= len(tokens) or not _starts_with_kanji(tokens[j + 1].get("surface", ""))
-                opens_with_digits = regex.match(r"^[0-9０-９]+$", t.get("surface", "")) is not None
-                is_stranded_counter_suffix = (
-                    last_was_counter
-                    and opens_with_digits
-                    and ends_kanji_run
-                    and ns not in _TEMPORAL_RELATION_SUFFIXES
-                    and np == "名詞"
-                    and ns1 in ("接尾", "一般")
-                    and len(ns) == 1
-                    and _starts_with_kanji(ns)
-                )
-                is_counter_led_noun = (
-                    j == i + 1
-                    and opens_with_digits
-                    and ends_kanji_run
-                    and np == "名詞"
-                    and ns1 not in ("数", "接尾", "固有名詞")
-                    and len(ns) == 2
-                    and _starts_with_kanji(ns)
-                    and _starts_with_kanji(ns[1])
-                    and reads_as_counter(ns[0])
-                )
-                if is_stranded_counter_suffix or is_counter_led_noun:
-                    combined += ns
-                    j += 1
-                    break
-
                 counter_continues_fraction = (
                     ns.endswith("の")
                     and j + 1 < len(tokens)
@@ -1115,6 +1136,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                         break
                 else:
                     break
+            j, combined = _absorb_unevenly_cut_kanji_run(tokens, i, j, combined, last_was_counter)
             if j > i + 1:
                 result.append({"surface": combined, "pos": "名詞", "pos_sub1": "数", "lemma": combined})
                 i = j

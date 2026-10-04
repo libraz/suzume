@@ -90,14 +90,9 @@
       "description": "三時間半かかった - auto-generated",
       "expected": [
         {
-          "lemma": "三時間",
+          "lemma": "三時間半",
           "pos": "Noun",
-          "surface": "三時間"
-        },
-        {
-          "lemma": "半",
-          "pos": "Noun",
-          "surface": "半"
+          "surface": "三時間半"
         },
         {
           "lemma": "かかる",
@@ -117,14 +112,9 @@
       "description": "五分半かかった - auto-generated",
       "expected": [
         {
-          "lemma": "五分",
+          "lemma": "五分半",
           "pos": "Noun",
-          "surface": "五分"
-        },
-        {
-          "lemma": "半",
-          "pos": "Noun",
-          "surface": "半"
+          "surface": "五分半"
         },
         {
           "lemma": "かかる",
@@ -166,14 +156,9 @@
       "description": "一ヶ月半かかる - auto-generated",
       "expected": [
         {
-          "lemma": "一ヶ月",
+          "lemma": "一ヶ月半",
           "pos": "Noun",
-          "surface": "一ヶ月"
-        },
-        {
-          "lemma": "半",
-          "pos": "Noun",
-          "surface": "半"
+          "surface": "一ヶ月半"
         },
         {
           "lemma": "かかる",
@@ -2219,6 +2204,241 @@
       ],
       "id": "2024_ni_ta",
       "input": "2024年末に来た"
+    },
+    {
+      "description": "2世帯住宅を買う - regression test",
+      "expected": [
+        {
+          "lemma": "2世帯住宅",
+          "pos": "Noun",
+          "surface": "2世帯住宅"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "買う",
+          "pos": "Verb",
+          "surface": "買う"
+        }
+      ],
+      "id": "2_wo_u",
+      "input": "2世帯住宅を買う"
+    },
+    {
+      "description": "5人家族で住む - regression test",
+      "expected": [
+        {
+          "lemma": "5人",
+          "pos": "Noun",
+          "surface": "5人"
+        },
+        {
+          "lemma": "家族",
+          "pos": "Noun",
+          "surface": "家族"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "住む",
+          "pos": "Verb",
+          "surface": "住む"
+        }
+      ],
+      "id": "5_de_mu",
+      "input": "5人家族で住む"
+    },
+    {
+      "description": "3段階評価をする - regression test",
+      "expected": [
+        {
+          "lemma": "3段階",
+          "pos": "Noun",
+          "surface": "3段階"
+        },
+        {
+          "lemma": "評価",
+          "pos": "Noun",
+          "surface": "評価"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "3_wosuru",
+      "input": "3段階評価をする"
+    },
+    {
+      "description": "三段階評価をする - regression test",
+      "expected": [
+        {
+          "lemma": "三段階",
+          "pos": "Noun",
+          "surface": "三段階"
+        },
+        {
+          "lemma": "評価",
+          "pos": "Noun",
+          "surface": "評価"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "wosuru",
+      "input": "三段階評価をする"
+    },
+    {
+      "description": "2段階目に進む - regression test",
+      "expected": [
+        {
+          "lemma": "2段階目",
+          "pos": "Noun",
+          "surface": "2段階目"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "進む",
+          "pos": "Verb",
+          "surface": "進む"
+        }
+      ],
+      "id": "2_ni_mu_2",
+      "input": "2段階目に進む"
+    },
+    {
+      "description": "3割強増える - regression test",
+      "expected": [
+        {
+          "lemma": "3割強",
+          "pos": "Noun",
+          "surface": "3割強"
+        },
+        {
+          "lemma": "増える",
+          "pos": "Verb",
+          "surface": "増える"
+        }
+      ],
+      "id": "3_eru",
+      "input": "3割強増える"
+    },
+    {
+      "description": "2時間弱で終わる - regression test",
+      "expected": [
+        {
+          "lemma": "2時間弱",
+          "pos": "Noun",
+          "surface": "2時間弱"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "終わる",
+          "pos": "Verb",
+          "surface": "終わる"
+        }
+      ],
+      "id": "2_de_waru",
+      "input": "2時間弱で終わる"
+    },
+    {
+      "description": "3種類ある - regression test",
+      "expected": [
+        {
+          "lemma": "3種類",
+          "pos": "Noun",
+          "surface": "3種類"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        }
+      ],
+      "id": "3_aru",
+      "input": "3種類ある"
+    },
+    {
+      "description": "三年間隔で開く - regression test",
+      "expected": [
+        {
+          "lemma": "三年",
+          "pos": "Noun",
+          "surface": "三年"
+        },
+        {
+          "lemma": "間隔",
+          "pos": "Noun",
+          "surface": "間隔"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "開く",
+          "pos": "Verb",
+          "surface": "開く"
+        }
+      ],
+      "id": "de_ku_2",
+      "input": "三年間隔で開く"
+    },
+    {
+      "description": "24時間営業の店 - regression test",
+      "expected": [
+        {
+          "lemma": "24時間",
+          "pos": "Noun",
+          "surface": "24時間"
+        },
+        {
+          "lemma": "営業",
+          "pos": "Noun",
+          "surface": "営業"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "店",
+          "pos": "Noun",
+          "surface": "店"
+        }
+      ],
+      "id": "24_no",
+      "input": "24時間営業の店"
     }
   ],
   "description": "number_counter tests",

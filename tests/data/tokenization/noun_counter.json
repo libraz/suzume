@@ -58,14 +58,9 @@
       "description": "数量句が漢字連の奇数残りを許す負例",
       "expected": [
         {
-          "lemma": "3年",
+          "lemma": "3年計画書",
           "pos": "Noun",
-          "surface": "3年"
-        },
-        {
-          "lemma": "計画書",
-          "pos": "Noun",
-          "surface": "計画書"
+          "surface": "3年計画書"
         },
         {
           "lemma": "を",

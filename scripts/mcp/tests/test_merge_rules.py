@@ -1672,7 +1672,15 @@ class TestQuantityPhraseKanjiRun:
     def test_keeps_relative_time_noun_apart(self):
         assert self._merge("3年後に会う")[:2] == ["3年", "後"]
 
-    def test_keeps_kanji_numerals_and_longer_runs_apart(self):
-        assert self._merge("五分半かかった")[:2] == ["五分", "半"]
-        assert self._merge("3年計画書を作る")[0] == "3年"
+    def test_absorbs_unevenly_cut_kanji_run(self):
+        assert self._merge("五分半かかった")[0] == "五分半"
+        assert self._merge("3年計画書を作る")[0] == "3年計画書"
+        assert self._merge("2世帯住宅を買う")[0] == "2世帯住宅"
+        assert self._merge("2段階目に進む")[0] == "2段階目"
+
+    def test_keeps_evenly_cut_kanji_run_apart(self):
+        assert self._merge("5人家族で住む")[:2] == ["5人", "家族"]
+        assert self._merge("24時間営業の店")[:2] == ["24時間", "営業"]
+
+    def test_stops_at_a_pronoun(self):
         assert self._merge("5年間彼を待ち続けた")[:2] == ["5年間", "彼"]

@@ -572,6 +572,23 @@ bool isDeverbalSuffixKanji(char32_t codepoint);
  */
 bool isBoundDeverbalSuffixAt(const std::vector<char32_t>& codepoints, size_t pos);
 
+/** @brief End of the kanji run at @p pos, numerals excluded */
+size_t nominalKanjiRunEnd(const std::vector<char32_t>& codepoints, size_t pos);
+
+/**
+ * @brief Length of codepoints[pos, run_end) as two-kanji words count it: a
+ * closing quantity-phrase suffix (目, 半, 間) binds to the whole phrase and is
+ * left out
+ */
+size_t countKanjiRunWords(const std::vector<char32_t>& codepoints, size_t pos, size_t run_end);
+
+/**
+ * @brief Whether the kana at @p pos may be okurigana of the kanji before it:
+ * hiragana other than a one-mora particle or the copula. Such a kanji may be a
+ * predicate stem (三枚+重ねる) rather than the end of a noun run.
+ */
+bool mayBeOkuriganaAt(const std::vector<char32_t>& codepoints, size_t pos);
+
 /**
  * @brief Check if stem ends with onbin marker (音便)
  * @param stem The stem to check

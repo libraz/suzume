@@ -130,6 +130,14 @@ bool namesDictionaryVerbContinuative(const dictionary::DictionaryManager* dict_m
                                      const std::vector<char32_t>& codepoints, size_t okurigana_pos);
 
 /**
+ * @brief Whether the kanji at @p pos is a one-kanji dictionary suffix closing a
+ * quantity phrase (三割+強, 二時間+弱): it ends the noun run, and relational
+ * 前/後 are excluded since they stand alone (三日|後)
+ */
+bool isQuantityClosingSuffixAt(const dictionary::DictionaryManager* dict_manager,
+                               const std::vector<char32_t>& codepoints, size_t pos);
+
+/**
  * @brief Check if a terminal is a productively formed -しい i-adjective
  *
  * The inflection analyzer can reinterpret the same bytes as the continuative of

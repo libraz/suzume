@@ -375,14 +375,9 @@
       "description": "一時間半。 - regression test",
       "expected": [
         {
-          "lemma": "一時間",
+          "lemma": "一時間半",
           "pos": "Noun",
-          "surface": "一時間"
-        },
-        {
-          "lemma": "半",
-          "pos": "Suffix",
-          "surface": "半"
+          "surface": "一時間半"
         }
       ],
       "id": "unnamed_31",

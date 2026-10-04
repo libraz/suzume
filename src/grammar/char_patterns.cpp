@@ -12,6 +12,7 @@
 #include "core/kana_constants.h"
 #include "core/utf8_constants.h"
 #include "normalize/char_type.h"
+#include "normalize/exceptions.h"
 #include "normalize/utf8.h"
 
 namespace suzume::grammar {
@@ -107,6 +108,36 @@ bool isBoundDeverbalSuffixAt(const std::vector<char32_t>& codepoints, size_t pos
     return false;
   }
   return codepoints[pos] == U'物' || pos + 1 >= codepoints.size() || !normalize::isKanjiCodepoint(codepoints[pos + 1]);
+}
+
+size_t nominalKanjiRunEnd(const std::vector<char32_t>& codepoints, size_t pos) {
+  size_t run_end = pos;
+  while (run_end < codepoints.size() && normalize::isKanjiCodepoint(codepoints[run_end]) &&
+         !normalize::isNumeralCodepoint(codepoints[run_end])) {
+    ++run_end;
+  }
+  return run_end;
+}
+
+size_t countKanjiRunWords(const std::vector<char32_t>& codepoints, size_t pos, size_t run_end) {
+  size_t counted = run_end - pos;
+  if (counted > 1 && normalize::isQuantityPhraseSuffixKanji(codepoints[run_end - 1])) {
+    --counted;
+  }
+  return counted;
+}
+
+bool mayBeOkuriganaAt(const std::vector<char32_t>& codepoints, size_t pos) {
+  if (pos >= codepoints.size() || !kana::isHiraganaCodepoint(codepoints[pos]) ||
+      normalize::isParticleCodepoint(codepoints[pos])) {
+    return false;
+  }
+  constexpr size_t kCopulaProbeLength = 3;
+  std::string following;
+  for (size_t idx = pos; idx < codepoints.size() && idx < pos + kCopulaProbeLength; ++idx) {
+    encodeUtf8(codepoints[idx], following);
+  }
+  return !startsPredicativeCopula(following);
 }
 
 bool isTransitiveAsuStem(std::u32string_view stem) {

@@ -245,14 +245,6 @@ constexpr float kCounterRelationSplitBonus = -1.8F;
 // comparison expression, rather than merging into a long kanji sequence.
 constexpr float kCounterComparisonSplitBonus = -1.2F;
 
-// Counter-quantity 半 suffix token (三時間|半, 五分|半). Zero defers to the
-// NounNumber category cost; the discount that lets the split beat the merged
-// kanji_seq run lives on the left counter token (kCounterRelationSplitBonus).
-// The candidate exists to carry the NounNumber EPOS, marking 半 as a quantity
-// noun so connection scoring can distinguish it from an ordinary single-kanji
-// noun in front of a hiragana verb (三時間|半|かかった).
-constexpr float kCounterHalfSuffixCost = 0.0F;
-
 // Closed extent suffix after a temporal quantity (一日|がけ).  The candidate
 // is emitted only together with a verified NounNumber duration, so lexicalized
 // continuative compounds such as 通りがけ retain their whole-word path.

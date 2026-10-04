@@ -1204,14 +1204,9 @@
       "description": "Approximation suffix keeps the quantity phrase boundary",
       "expected": [
         {
-          "lemma": "三割",
+          "lemma": "三割強",
           "pos": "Noun",
-          "surface": "三割"
-        },
-        {
-          "lemma": "強",
-          "pos": "Suffix",
-          "surface": "強"
+          "surface": "三割強"
         },
         {
           "lemma": "増える",
@@ -1226,14 +1221,9 @@
       "description": "Approximation suffix after a temporal counter",
       "expected": [
         {
-          "lemma": "二時間",
+          "lemma": "二時間弱",
           "pos": "Noun",
-          "surface": "二時間"
-        },
-        {
-          "lemma": "弱",
-          "pos": "Suffix",
-          "surface": "弱"
+          "surface": "二時間弱"
         },
         {
           "lemma": "で",
