@@ -25,14 +25,6 @@ inline size_t sentenceBoundaryLen(std::string_view text, size_t pos) {
   return core::isSentenceBoundaryCodepoint(codepoint) ? end - pos : 0;
 }
 
-// Find the last UTF-8 character boundary at or before pos.
-inline size_t findUtf8Boundary(std::string_view text, size_t pos) {
-  while (pos > 0 && (static_cast<unsigned char>(text[pos]) & 0xC0) == 0x80) {
-    --pos;
-  }
-  return pos;
-}
-
 // Count UTF-8 characters in a byte range.
 inline size_t countChars(std::string_view text, size_t from, size_t to) {
   size_t count = 0;
@@ -94,7 +86,7 @@ std::vector<core::Morpheme> chunkBySentenceBoundary(
       chunk_end = best_break;
     } else {
       // No sentence boundary found: split at UTF-8 character boundary
-      chunk_end = findUtf8Boundary(text, scan_end);
+      chunk_end = normalize::findUtf8Boundary(text, scan_end);
       if (chunk_end <= pos) {
         chunk_end = scan_end;  // Safety: advance at least to scan_end
       }
@@ -277,7 +269,7 @@ std::vector<core::Morpheme> Analyzer::analyzeChunk(std::string_view text, size_t
   unknown_gen_.inflection().rollCache();
 
   // Text is already normalized by analyze(); decode directly to codepoints.
-  std::vector<char32_t> codepoints = normalize::utf8::decode(text);
+  std::vector<char32_t> codepoints = normalize::toCodepoints(text);
   if (codepoints.empty()) {
     SUZUME_DEBUG_LOG("[ANALYZER] UTF-8 decode failed\n");
     return {};
@@ -353,7 +345,7 @@ std::vector<core::Morpheme> Analyzer::analyzeDebug(std::string_view text, core::
         }
       }
       if (!debug_span.empty()) {
-        const std::vector<char32_t> codepoints = normalize::utf8::decode(debug_span);
+        const std::vector<char32_t> codepoints = normalize::toCodepoints(debug_span);
         *out_lattice = tokenizer_->buildLattice(debug_span, codepoints, classifyCodepoints(codepoints));
       }
     }

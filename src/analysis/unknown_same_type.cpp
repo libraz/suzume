@@ -56,10 +56,8 @@ bool spellsAuxiliaryChain(const dictionary::DictionaryManager& dict_manager, con
   // A run cut short inside an auxiliary (ま of ます) duplicates it as well.
   constexpr size_t kMaxAuxiliaryChars = 8;
   for (size_t from = start; from < end; ++from) {
-    if (reachable[from - start] &&
-        hasDictionaryEntryFrom(&dict_manager, codepoints, from, end - from + 1, kMaxAuxiliaryChars,
-                               core::PartOfSpeech::Auxiliary,
-                               [](const dictionary::DictionaryEntry& /*entry*/) { return true; })) {
+    if (reachable[from - start] && hasDictionaryEntryFrom(&dict_manager, codepoints, from, end - from + 1,
+                                                          kMaxAuxiliaryChars, core::PartOfSpeech::Auxiliary, nullptr)) {
       return true;
     }
   }
@@ -329,34 +327,21 @@ bool startsAtDictionaryVerbContinuative(const std::vector<char32_t>& codepoints,
   return verb_helpers::namesDictionaryVerbContinuative(dict_manager, codepoints, start_pos);
 }
 
-// A same-type run may begin at the final okurigana of a dictionary terminal
-// verb rather than its renyokei (書く+だべ).  Once that verb is present, a
-// following closed auxiliary belongs to it and cannot be absorbed into the
-// run.  Limit the probe to the local candidate window used by this generator.
-bool startsAfterDictionaryVerb(const std::vector<char32_t>& codepoints,
-                               const std::vector<normalize::CharType>& char_types, size_t start_pos, size_t run_end,
-                               const dictionary::DictionaryManager* dict_manager) {
-  if (dict_manager == nullptr || start_pos == 0 || start_pos >= run_end ||
-      char_types[start_pos - 1] != normalize::CharType::Kanji) {
-    return false;
-  }
-  return hasDictionaryEntryFrom(dict_manager, codepoints, start_pos - 1, 2, run_end - start_pos + 1,
-                                core::PartOfSpeech::Verb, nullptr);
-}
-
-// A same-type run can also begin inside a dictionary adjective's okurigana
-// (静か+な). Keep the copular cell available instead of promoting that tail to
-// an unknown noun solely because a following nominalizer resembles a noun
-// frame.
-bool startsAfterDictionaryAdjective(const std::vector<char32_t>& codepoints,
+// A same-type run may begin at the final okurigana of a dictionary predicate of
+// @p pos that opens on the preceding kanji. For a terminal verb (書く+だべ), a
+// following closed auxiliary belongs to that verb and cannot be absorbed into
+// the run; for an adjective (静か+な), the copular cell stays available instead
+// of promoting the tail to an unknown noun. The probe is limited to the local
+// candidate window used by this generator.
+bool startsAfterDictionaryPredicate(const std::vector<char32_t>& codepoints,
                                     const std::vector<normalize::CharType>& char_types, size_t start_pos,
-                                    size_t run_end, const dictionary::DictionaryManager* dict_manager) {
+                                    size_t run_end, const dictionary::DictionaryManager* dict_manager,
+                                    core::PartOfSpeech pos) {
   if (dict_manager == nullptr || start_pos == 0 || start_pos >= run_end ||
       char_types[start_pos - 1] != normalize::CharType::Kanji) {
     return false;
   }
-  return hasDictionaryEntryFrom(dict_manager, codepoints, start_pos - 1, 2, run_end - start_pos + 1,
-                                core::PartOfSpeech::Adjective, nullptr);
+  return hasDictionaryEntryFrom(dict_manager, codepoints, start_pos - 1, 2, run_end - start_pos + 1, pos, nullptr);
 }
 
 }  // namespace
@@ -453,6 +438,13 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
   // cross (SIZE_MAX = none). Candidates extending past it get a penalty below.
   size_t crossed_particle_pos = SIZE_MAX;
 
+  // A keycap emoji is an ASCII digit, #, or * followed by an optional emoji
+  // variation selector and U+20E3.  Its base has a text character type, so
+  // preserve this grapheme cluster instead of splitting the enclosing keycap
+  // off as a standalone emoji.
+  const bool keycap_base = (codepoints[start_pos] >= U'0' && codepoints[start_pos] <= U'9') ||
+                           codepoints[start_pos] == U'#' || codepoints[start_pos] == U'*';
+
   // Find end of same-type sequence
   size_t end_pos = start_pos + 1;
   while (end_pos < char_types.size() && end_pos - start_pos < max_len) {
@@ -472,12 +464,6 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       matches_type = true;
     }
 
-    // A keycap emoji is an ASCII digit, #, or * followed by an optional emoji
-    // variation selector and U+20E3.  Its base has a text character type, so
-    // preserve this grapheme cluster instead of splitting the enclosing keycap
-    // off as a standalone emoji.
-    const bool keycap_base = (codepoints[start_pos] >= U'0' && codepoints[start_pos] <= U'9') ||
-                             codepoints[start_pos] == U'#' || codepoints[start_pos] == U'*';
     if (!matches_type && keycap_base && curr_char == 0x20E3) {
       matches_type = true;
     }
@@ -543,9 +529,6 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       // - の always breaks: genitive の marks a compound boundary in
       //   hiragana noun+noun patterns (みせ+の+まえ, こころ+の+こえ)
       // - A second particle character breaks (likely a real particle chain)
-      // - Sequences starting with を/が never cross: those characters never
-      //   start words (see hard break above), so such a sequence is already
-      //   a particle chain and must not absorb a following particle
       // - At most one character may follow the crossed particle: native
       //   words with a word-internal particle character are short (こども,
       //   おとな, ひとつ); longer tails just absorb a genuine particle
@@ -557,16 +540,12 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
         if (curr_char == U'の') {
           break;
         }
-        // Common particles は, に, へ + で, と, も, か, が (word boundaries).
-        // The nominative が behaves like the rest: it is word-internal in a few
-        // native nouns (ひがし, かがみ) and a boundary everywhere else, so it is
-        // crossed at most once and penalized. Leaving it out let an opaque run
-        // swallow a subject marker whole (見|るが, 分かり|みが).
-        // Note: Don't include「や」as it's also the stem of「やる」verb
-        if (curr_char == U'は' || curr_char == U'に' || curr_char == U'へ' || curr_char == U'で' ||
-            curr_char == U'と' || curr_char == U'も' || curr_char == U'か' || curr_char == U'が') {
-          char32_t seq_first_char = codepoints[start_pos];
-          if (crossed_particle_pos != SIZE_MAX || seq_first_char == U'を' || seq_first_char == U'が') {
+        // The nominative が behaves like the other particle characters: it is
+        // word-internal in a few native nouns (ひがし, かがみ) and a boundary
+        // everywhere else, so it is crossed at most once and penalized. Leaving
+        // it out let an opaque run swallow a subject marker whole (見|るが).
+        if (isInternalParticleChar(curr_char)) {
+          if (crossed_particle_pos != SIZE_MAX) {
             break;  // Stop before the particle character
           }
           crossed_particle_pos = end_pos;  // Cross one, penalized per length
@@ -583,10 +562,12 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
   const bool starts_at_dictionary_verb_continuative =
       start_type == normalize::CharType::Hiragana &&
       (startsAtDictionaryVerbContinuative(codepoints, char_types, start_pos, dict_manager_) ||
-       startsAfterDictionaryVerb(codepoints, char_types, start_pos, end_pos, dict_manager_));
+       startsAfterDictionaryPredicate(codepoints, char_types, start_pos, end_pos, dict_manager_,
+                                      core::PartOfSpeech::Verb));
   const bool starts_after_dictionary_adjective =
       start_type == normalize::CharType::Hiragana &&
-      startsAfterDictionaryAdjective(codepoints, char_types, start_pos, end_pos, dict_manager_);
+      startsAfterDictionaryPredicate(codepoints, char_types, start_pos, end_pos, dict_manager_,
+                                     core::PartOfSpeech::Adjective);
   for (size_t len = first_candidate_length; len <= end_pos - start_pos; ++len) {
     size_t candidate_end = start_pos + len;
     std::string surface = extractSubstring(codepoints, start_pos, candidate_end);
@@ -648,6 +629,8 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       const bool has_contracted_progressive_tail =
           closes_past_tari_collision_noun && len >= 2 &&
           grammar::isContractedProgressiveSurface(extractSubstring(codepoints, candidate_end - 2, candidate_end));
+      const bool selects_past_tari_collision_noun = closes_past_tari_collision_noun && !has_verb_tail_after_ri &&
+                                                    !has_inflected_verb_reading && !has_contracted_progressive_tail;
       const bool precedes_closed_native_number =
           start_type == normalize::CharType::Hiragana && startsClosedNativeNumber(codepoints, candidate_end);
       // What licenses the nominal reading is the genitive の with the negative
@@ -665,14 +648,11 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       // Use NOUN POS instead of OTHER to avoid exceeds_dict_length penalty
       core::PartOfSpeech pos =
           (started_with_particle || closes_particle_bracketed_hiragana_noun || brackets_medial_particle_crossing ||
-           (closes_past_tari_collision_noun && !has_verb_tail_after_ri && !has_inflected_verb_reading &&
-            !has_contracted_progressive_tail) ||
-           precedes_closed_native_number || closes_genitive_negative_noun)
+           selects_past_tari_collision_noun || precedes_closed_native_number || closes_genitive_negative_noun)
               ? core::PartOfSpeech::Noun
               : getPosForType(start_type);
       float cost = getCostForType(start_type, len);
-      if (closes_past_tari_collision_noun && !has_verb_tail_after_ri && !has_inflected_verb_reading &&
-          !has_contracted_progressive_tail) {
+      if (selects_past_tari_collision_noun) {
         cost = candidate::kSelectedNominalShortHeadCost;
       }
       if (precedes_closed_native_number || closes_genitive_negative_noun) {
@@ -684,9 +664,8 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
 
       // Penalize kanji sequences ending with honorific/title suffixes (様, 氏)
       // to encourage NOUN + SUFFIX separation (e.g., 田中様 → 田中 + 様)
-      // Note: 的 was removed — kanji_seq cost 1.0 with 1-char prefix (目+的 = 1.1)
-      // naturally keeps 目的/動的/知的/射的 as 1 token while 論理+的 still splits
-      // (2-char prefix gives 論理(1.0)+的(SUFFIX 0.5)-0.8 = 0.7 < 1.0).
+      // 的 is not listed: the plain kanji-run cost already keeps 目的/知的 whole
+      // while 論理+的 splits.
       // The host length carries no information here, unlike for the plural
       // honorific 方 below: 様 attaches to a bare surname, and a surname is an
       // open class that is routinely one kanji (辻様, 林様, 森様), so the
@@ -845,8 +824,7 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       // Penalize hiragana sequences starting with particle characters
       // These could be nouns (はし, はな, にく, にゃんこ) but are less likely than
       // the particle interpretation, unless the particle path has connection penalties
-      bool has_suffix = closes_past_tari_collision_noun && !has_verb_tail_after_ri && !has_inflected_verb_reading &&
-                        !has_contracted_progressive_tail;
+      bool has_suffix = selects_past_tari_collision_noun;
       if (started_with_particle) {
         if (len == 1) {
           continue;  // Single-char particle-start never forms a noun alone
@@ -990,8 +968,7 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
           if (particle == nullptr || particle->extended_pos != core::ExtendedPOS::ParticleCase) {
             continue;
           }
-          const size_t scan_start =
-              particle_pos > kDictionaryLookbehindChars ? particle_pos - kDictionaryLookbehindChars : 0;
+          const size_t scan_start = dictionaryLookbehindStart(particle_pos);
           if (hasDictionaryEntryEndingAt(*dict_manager_, codepoints, scan_start, particle_pos,
                                          partOfSpeechMask(core::PartOfSpeech::Verb) |
                                              partOfSpeechMask(core::PartOfSpeech::Adjective) |
@@ -1015,8 +992,7 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
         const auto* opening =
             lookupEntryInRange(*dict_manager_, codepoints, start_pos, start_pos + 1, core::PartOfSpeech::Auxiliary);
         bool opens_on_licensed_auxiliary = false;
-        for (size_t licenser_start = start_pos > kDictionaryLookbehindChars ? start_pos - kDictionaryLookbehindChars
-                                                                            : 0;
+        for (size_t licenser_start = dictionaryLookbehindStart(start_pos);
              opening != nullptr && licenser_start < start_pos; ++licenser_start) {
           const auto* licenser =
               lookupEntryInRange(*dict_manager_, codepoints, licenser_start, start_pos, core::PartOfSpeech::Auxiliary);
@@ -1046,7 +1022,7 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
         const bool ends_on_verb_head =
             (!godan_ending.empty() &&
              verb_helpers::isVerbInDictionary(dict_manager_, normalize::concat(head, godan_ending))) ||
-            (grammar::isERowCodepoint(okurigana) &&
+            (kana::isERowCodepoint(okurigana) &&
              verb_helpers::isVerbInDictionary(dict_manager_,
                                               normalize::concat(head, normalize::encodeUtf8(okurigana), "る")));
         if (ends_on_verb_head) {
@@ -1152,13 +1128,11 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
   // so the correct whole-run candidate never reaches the lattice. This dedicated
   // scan is independent of that truncation and emits an ADDITIVE Noun candidate; the
   // Other/particle candidates remain and any real dictionary/verb/adverb reading of
-  // the span still outranks the ~1.8 Noun, so it wins only when nothing better spans
-  // the bracket and never shatters the run. Left bracket: a boundary particle
-  // preceded by a non-hiragana content word (私は…, 彼は…). Right bracket: a boundary
-  // particle. の is excluded on both sides (genitive marks a compound boundary).
-  // Left bracket: a boundary particle after a non-hiragana content word (私は…), or a
-  // clause boundary — sentence start / a preceding symbol (punctuation). の is not a
-  // left boundary here (genitive marks a compound boundary).
+  // the span still outranks it, so it wins only when nothing better spans the
+  // bracket and never shatters the run. Left bracket: a boundary particle after a
+  // non-hiragana content word (私は…), or a clause boundary — sentence start / a
+  // preceding symbol. Right bracket: a boundary particle. の is not a boundary
+  // particle (genitive marks a compound boundary).
   bool left_particle_bracket = start_pos >= 1 && isLeftBoundaryParticle(codepoints[start_pos - 1]);
   const auto* left_particle =
       dict_manager_ != nullptr && start_pos >= 1
@@ -1182,9 +1156,9 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
   bool left_clause_bracket =
       (start_pos == 0) || (start_pos >= 1 && char_types[start_pos - 1] == normalize::CharType::Symbol);
   const bool left_attributive_bracket = start_pos > 0;
-  if (start_type == normalize::CharType::Hiragana &&
-      (left_particle_bracket || left_determiner_bracket || left_clause_bracket || left_attributive_bracket) &&
-      !isImpossibleHiraganaStart(codepoints[start_pos])) {
+  // Every position has some left bracket: the clause bracket covers the start,
+  // and the attributive one any later position.
+  if (start_type == normalize::CharType::Hiragana && !isImpossibleHiraganaStart(codepoints[start_pos])) {
     constexpr size_t kDefaultBracketedNounLength = 4;
     constexpr size_t kLongDeverbalNounLength = 5;
     const bool long_deverbal_object_shape =
@@ -1193,7 +1167,7 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
         std::all_of(char_types.begin() + static_cast<std::ptrdiff_t>(start_pos),
                     char_types.begin() + static_cast<std::ptrdiff_t>(start_pos + kLongDeverbalNounLength),
                     [](normalize::CharType type) { return type == normalize::CharType::Hiragana; }) &&
-        grammar::isERowCodepoint(codepoints[start_pos + kLongDeverbalNounLength - 1]) &&
+        kana::isERowCodepoint(codepoints[start_pos + kLongDeverbalNounLength - 1]) &&
         codepoints[start_pos + kLongDeverbalNounLength] == U'を';
     const size_t bracketed_noun_limit =
         long_deverbal_object_shape ? kLongDeverbalNounLength : kDefaultBracketedNounLength;
@@ -1460,7 +1434,7 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
           promoted_dictionary_reading->extended_pos == core::ExtendedPOS::AuxAspectOku;
       const auto& promoted_inflections = inflection_.analyze(promoted_surface);
       const bool has_deverbal_noun_shape_before_genitive =
-          right_genitive_after_substantive_run && grammar::isIRowCodepoint(codepoints[scan - 1]) &&
+          right_genitive_after_substantive_run && kana::isIRowCodepoint(codepoints[scan - 1]) &&
           std::any_of(promoted_inflections.begin(), promoted_inflections.end(),
                       [](const grammar::InflectionCandidate& inflection_candidate) {
                         return inflection_candidate.verb_type != grammar::VerbType::Unknown &&

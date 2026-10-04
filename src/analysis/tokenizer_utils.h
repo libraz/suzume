@@ -36,6 +36,11 @@ using PartOfSpeechMask = uint32_t;
 inline constexpr size_t kDictionaryLookbehindChars = 8;
 inline constexpr size_t kClosedClassProbeChars = 5;
 
+/** First position of the dictionary lookbehind window that ends at @p pos. */
+constexpr size_t dictionaryLookbehindStart(size_t pos) {
+  return pos > kDictionaryLookbehindChars ? pos - kDictionaryLookbehindChars : 0;
+}
+
 constexpr PartOfSpeechMask partOfSpeechMask(core::PartOfSpeech pos) {
   return 1U << static_cast<uint8_t>(pos);
 }

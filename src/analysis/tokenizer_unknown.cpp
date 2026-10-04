@@ -639,11 +639,8 @@ void Tokenizer::addUnknownCandidates(core::Lattice& lattice, std::string_view te
   // (東京（とうきょう）). It is annotation text, so retain it as one searchable
   // content token instead of a sequence of incidental particles and auxiliaries.
   if (start_pos > 0 && normalize::isOpeningBracket(codepoints[start_pos - 1])) {
-    size_t reading_end = start_pos;
-    while (reading_end < codepoints.size() && reading_end - start_pos < candidate::kParentheticalReadingMaxLength &&
-           char_types[reading_end] == normalize::CharType::Hiragana) {
-      ++reading_end;
-    }
+    const size_t reading_end = findCharRegionEnd(char_types, start_pos, candidate::kParentheticalReadingMaxLength,
+                                                 normalize::CharType::Hiragana);
     if (reading_end > start_pos && reading_end < codepoints.size() &&
         normalize::isClosingBracket(codepoints[reading_end])) {
       lattice.addEdge(textRange(text, byte_offsets, start_pos, reading_end), static_cast<uint32_t>(start_pos),
@@ -655,8 +652,6 @@ void Tokenizer::addUnknownCandidates(core::Lattice& lattice, std::string_view te
   }
 
   // Check for dictionary entries at this position to penalize longer unknown words
-  size_t byte_pos = byteOffsetAt(byte_offsets, start_pos);
-
   size_t max_dict_length = 0;
   for (const auto& result : dict_results) {
     // Closed classes mark grammatical boundaries but are not lexical evidence
@@ -809,7 +804,7 @@ void Tokenizer::addUnknownCandidates(core::Lattice& lattice, std::string_view te
     const size_t compound_end = verifiedCompoundEndCovering(lattice, candidate.start);
     if (compound_end != 0) {
       bool conflicts_with_compound = candidate.end <= compound_end;
-      if (!conflicts_with_compound && candidate.end > compound_end) {
+      if (!conflicts_with_compound) {
         const std::string_view outside_suffix = textRange(text, byte_offsets, compound_end, candidate.end);
         constexpr PartOfSpeechMask kFunctionWordMask =
             partOfSpeechMask(core::PartOfSpeech::Auxiliary) | partOfSpeechMask(core::PartOfSpeech::Particle);
@@ -941,20 +936,17 @@ void Tokenizer::addUnknownCandidates(core::Lattice& lattice, std::string_view te
         (candidate.pos == core::PartOfSpeech::Verb || candidate.pos == core::PartOfSpeech::Adjective)) {
       // Exception: Don't skip verb candidates ending with ず (adverbialized negatives)
       // e.g., 思わず, 絶えず - these are lexicalized adverbs from verb + ず
-      bool ends_with_zu =
-          (candidate.surface.size() >= 3 && candidate.surface.substr(candidate.surface.size() - 3) == "ず");
+      const bool ends_with_zu = utf8::endsWith(candidate.surface, "ず");
+      // An explicitly generated irrealis stem is already licensed by a
+      // following closed-class inflection (negative, causative, or
+      // passive).  A shorter dictionary verb/adjective must not suppress
+      // that productive boundary: 確かめ+させる is not 確か+めさせる.
+      const bool is_explicit_mizenkei =
+          candidate.origin == CandidateOrigin::VerbKanji && candidate.extended_pos == core::ExtendedPOS::VerbMizenkei;
       for (const auto& result : dict_results) {
         if (result.entry != nullptr) {
           // Case 1: Dictionary entry is also a verb/adjective
           // But allow ず-ending candidates (adverbialized forms)
-          // Case 1: Dictionary entry is also a verb/adjective
-          // But allow ず-ending candidates (adverbialized forms)
-          // An explicitly generated irrealis stem is already licensed by a
-          // following closed-class inflection (negative, causative, or
-          // passive).  A shorter dictionary verb/adjective must not suppress
-          // that productive boundary: 確かめ+させる is not 確か+めさせる.
-          const bool is_explicit_mizenkei = candidate.origin == CandidateOrigin::VerbKanji &&
-                                            candidate.extended_pos == core::ExtendedPOS::VerbMizenkei;
           if ((result.entry->pos == core::PartOfSpeech::Verb || result.entry->pos == core::PartOfSpeech::Adjective) &&
               !ends_with_zu && !candidate.lemma_verified && !is_explicit_mizenkei) {
             skip_penalty = true;
@@ -980,49 +972,33 @@ void Tokenizer::addUnknownCandidates(core::Lattice& lattice, std::string_view te
     // Case 3: Colloquial verb contraction (ておく→っとく)
     // っとく is a valid compound verb ending that shouldn't be penalized for length
     // Note: っちゃう/っじゃう are handled by Case 6 (revoke skip for ちゃう endings)
-    if (!skip_penalty && candidate.pos == core::PartOfSpeech::Verb) {
-      std::string_view surface = candidate.surface;
-      if (utf8::endsWith(surface, "っとく")) {
-        skip_penalty = true;
-        skip_reason = "colloquial_contraction";
-      }
+    if (!skip_penalty && candidate.pos == core::PartOfSpeech::Verb && utf8::endsWith(candidate.surface, "っとく")) {
+      skip_penalty = true;
+      skip_reason = "colloquial_contraction";
     }
 
     // Case 5: Short hiragana verb candidates ending with te/de-form
     // Handles cases like ねて (寝る), でて (出る), みて (見る) where
     // dictionary only has kanji form but surface is pure hiragana.
     // These 2-char patterns don't meet Case 2's ≥3 char threshold.
-    if (!skip_penalty && candidate.pos == core::PartOfSpeech::Verb) {
-      std::string_view surface = candidate.surface;
-      size_t len = candidate.end - candidate.start;
-      // Check for 2-char hiragana verbs ending in て/で
-      if (len == 2 && surface.size() >= core::kJapaneseCharBytes) {
-        if (allCharsAre(char_types, codepoints, candidate.start, candidate.end, normalize::CharType::Hiragana,
-                        /*allow_choon=*/false)) {
-          // Check if ends with て or で (te-form markers)
-          std::string_view last_char = utf8::lastChar(surface);
-          if (grammar::isTeDeSurface(last_char)) {
-            skip_penalty = true;
-            skip_reason = "short_te_form";
-          }
-        }
-      }
+    if (!skip_penalty && candidate.pos == core::PartOfSpeech::Verb && candidate.end - candidate.start == 2 &&
+        candidate.surface.size() >= core::kJapaneseCharBytes &&
+        allCharsAre(char_types, codepoints, candidate.start, candidate.end, normalize::CharType::Hiragana,
+                    /*allow_choon=*/false) &&
+        grammar::isTeDeSurface(utf8::lastChar(candidate.surface))) {
+      skip_penalty = true;
+      skip_reason = "short_te_form";
     }
 
     // Case 6: Revoke skip for long hiragana verbs ending with ちゃう/ちゃっ/ちゃい
     // These are auxiliary chains (e.g., されちゃう = さ+れ+ちゃう,
     // なっちゃう = なっ+ちゃう, やっちゃう = やっ+ちゃう) that should split.
     if (skip_penalty && candidate.pos == core::PartOfSpeech::Verb && candidate.end - candidate.start >= 4) {
-      std::string_view surface = candidate.surface;
-      bool ends_chau =
-          utf8::endsWith(surface, "ちゃう") || utf8::endsWith(surface, "ちゃっ") || utf8::endsWith(surface, "ちゃい");
-      if (ends_chau) {
-        // Check if all hiragana
-        if (allCharsAre(char_types, codepoints, candidate.start, candidate.end, normalize::CharType::Hiragana,
-                        /*allow_choon=*/false)) {
-          skip_penalty = false;
-          skip_reason = nullptr;
-        }
+      if (utf8::endsWithAny(candidate.surface, {"ちゃう", "ちゃっ", "ちゃい"}) &&
+          allCharsAre(char_types, codepoints, candidate.start, candidate.end, normalize::CharType::Hiragana,
+                      /*allow_choon=*/false)) {
+        skip_penalty = false;
+        skip_reason = nullptr;
       }
     }
 
@@ -1049,18 +1025,11 @@ void Tokenizer::addUnknownCandidates(core::Lattice& lattice, std::string_view te
                       /*allow_choon=*/true)) {
         // Reduce penalty only for varied sequences, not runs of one repeated
         // char (ーーーー, ああああ) which are usually noise.
-        bool all_same = true;
-        char32_t first_cp = 0;
-        for (size_t idx = candidate.start; idx < candidate.end && idx < codepoints.size(); ++idx) {
-          if (idx == candidate.start) {
-            first_cp = codepoints[idx];
-          } else if (codepoints[idx] != first_cp) {
-            all_same = false;
+        for (size_t idx = candidate.start + 1; idx < candidate.end && idx < codepoints.size(); ++idx) {
+          if (codepoints[idx] != codepoints[candidate.start]) {
+            reduced_penalty = true;
             break;
           }
-        }
-        if (!all_same) {
-          reduced_penalty = true;
         }
       }
     }
@@ -1203,15 +1172,11 @@ void Tokenizer::addUnknownCandidates(core::Lattice& lattice, std::string_view te
     // Check for single-kanji stem + hiragana verb (e.g., 残って, 通る, 飛ぶ)
     // Single-kanji verb stems are common in Japanese (残る, 立つ, 打つ, etc.)
     // These should not be penalized for exceeding dict length
-    bool is_kanji_stem_verb = false;
-    if (candidate.pos == core::PartOfSpeech::Verb && candidate.end - candidate.start >= 2 &&
-        candidate.start < char_types.size() && char_types[candidate.start] == normalize::CharType::Kanji) {
-      // Check: first char is kanji, rest are hiragana
-      if (allCharsAre(char_types, codepoints, candidate.start + 1, candidate.end, normalize::CharType::Hiragana,
-                      /*allow_choon=*/false)) {
-        is_kanji_stem_verb = true;
-      }
-    }
+    const bool is_kanji_stem_verb =
+        candidate.pos == core::PartOfSpeech::Verb && candidate.end - candidate.start >= 2 &&
+        candidate.start < char_types.size() && char_types[candidate.start] == normalize::CharType::Kanji &&
+        allCharsAre(char_types, codepoints, candidate.start + 1, candidate.end, normalize::CharType::Hiragana,
+                    /*allow_choon=*/false);
 
     bool exceeds_dict = (max_dict_length > 0 && candidate.end - candidate.start > max_dict_length);
     bool absorbs_suru_imperative = false;
@@ -1231,30 +1196,18 @@ void Tokenizer::addUnknownCandidates(core::Lattice& lattice, std::string_view te
       continue;
     }
     if (exceeds_dict) {
-      if (skip_penalty) {
+      const bool skips_length_penalty = skip_penalty || skip_dict_penalty || is_suru_verb || candidate.has_suffix ||
+                                        is_pure_hiragana_verb || is_kanji_stem_verb;
+      if (skips_length_penalty) {
         SUZUME_DEBUG_LOG_VERBOSE("[TOK_SKIP] \"" << candidate.surface << "\" (" << core::posToString(candidate.pos)
-                                                 << "): "
-                                                 << "skip exceeds_dict_length (" << skip_reason << ")\n");
-      } else if (skip_dict_penalty) {
-        SUZUME_DEBUG_LOG_VERBOSE("[TOK_SKIP] \"" << candidate.surface << "\" (" << core::posToString(candidate.pos)
-                                                 << "): "
-                                                 << "skip exceeds_dict_length (" << skip_dict_reason << ")\n");
-      } else if (is_suru_verb) {
-        SUZUME_DEBUG_LOG_VERBOSE("[TOK_SKIP] \"" << candidate.surface << "\" (" << core::posToString(candidate.pos)
-                                                 << "): "
-                                                 << "skip exceeds_dict_length (suru_verb)\n");
-      } else if (candidate.has_suffix) {
-        SUZUME_DEBUG_LOG_VERBOSE("[TOK_SKIP] \"" << candidate.surface << "\" (" << core::posToString(candidate.pos)
-                                                 << "): "
-                                                 << "skip exceeds_dict_length (has_suffix)\n");
-      } else if (is_pure_hiragana_verb) {
-        SUZUME_DEBUG_LOG_VERBOSE("[TOK_SKIP] \"" << candidate.surface << "\" (" << core::posToString(candidate.pos)
-                                                 << "): "
-                                                 << "skip exceeds_dict_length (pure_hiragana_verb)\n");
-      } else if (is_kanji_stem_verb) {
-        SUZUME_DEBUG_LOG_VERBOSE("[TOK_SKIP] \"" << candidate.surface << "\" (" << core::posToString(candidate.pos)
-                                                 << "): "
-                                                 << "skip exceeds_dict_length (kanji_stem_verb)\n");
+                                                 << "): " << "skip exceeds_dict_length ("
+                                                 << (skip_penalty            ? skip_reason
+                                                     : skip_dict_penalty     ? skip_dict_reason
+                                                     : is_suru_verb          ? "suru_verb"
+                                                     : candidate.has_suffix  ? "has_suffix"
+                                                     : is_pure_hiragana_verb ? "pure_hiragana_verb"
+                                                                             : "kanji_stem_verb")
+                                                 << ")\n");
       } else {
         float penalty = reduced_penalty ? 1.0F : 3.5F;
         adjusted_cost += penalty;
@@ -1283,9 +1236,7 @@ void Tokenizer::addUnknownCandidates(core::Lattice& lattice, std::string_view te
       }
 
       if (hiragana_start < candidate.end) {
-        size_t suffix_byte_start = byteOffsetAt(byte_offsets, hiragana_start);
-        size_t suffix_byte_end = byteOffsetAt(byte_offsets, candidate.end);
-        std::string_view hiragana_suffix = text.substr(suffix_byte_start, suffix_byte_end - suffix_byte_start);
+        const std::string_view hiragana_suffix = textRange(text, byte_offsets, hiragana_start, candidate.end);
 
         // Don't penalize verb conjugation endings
         // - te-form: て/で/って/んで/いて/いで

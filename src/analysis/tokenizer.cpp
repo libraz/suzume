@@ -140,13 +140,9 @@ core::Lattice Tokenizer::buildLattice(std::string_view text, const std::vector<c
   // (e.g., positions starting with small kana like っ, ゃ, ゅ, ょ)
   for (size_t pos = 0; pos < codepoints.size(); ++pos) {
     if (lattice.edgeIdsAt(pos).empty()) {
-      // Generate a single-character fallback candidate with high penalty
-      size_t byte_start = byteOffsetAt(byte_offsets, pos);
-      size_t byte_end = byteOffsetAt(byte_offsets, pos + 1);
-      const std::string_view surface = text.substr(byte_start, byte_end - byte_start);
-
-      lattice.addEdge(surface, static_cast<uint32_t>(pos), static_cast<uint32_t>(pos + 1), core::PartOfSpeech::Other,
-                      candidate::kFallbackCandidateCost, core::LatticeEdge::kIsUnknown);
+      lattice.addEdge(textRange(text, byte_offsets, pos, pos + 1), static_cast<uint32_t>(pos),
+                      static_cast<uint32_t>(pos + 1), core::PartOfSpeech::Other, candidate::kFallbackCandidateCost,
+                      core::LatticeEdge::kIsUnknown);
     }
   }
 

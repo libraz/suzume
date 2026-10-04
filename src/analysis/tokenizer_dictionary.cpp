@@ -96,7 +96,7 @@ bool hasPrecedingSahenNominal(const core::Lattice& lattice, size_t end_pos) {
 // this keeps ordinary nominal uses such as 道具としても intact.
 bool hasInterrogativeEndingAt(const dictionary::DictionaryManager& dict_manager, std::string_view text,
                               const ByteOffsets& byte_offsets, size_t end_pos) {
-  const size_t scan_start = end_pos > kDictionaryLookbehindChars ? end_pos - kDictionaryLookbehindChars : 0;
+  const size_t scan_start = dictionaryLookbehindStart(end_pos);
   for (size_t start_pos = scan_start; start_pos < end_pos; ++start_pos) {
     const size_t byte_pos = byteOffsetAt(byte_offsets, start_pos);
     for (const auto& result : dict_manager.lookup(text, byte_pos)) {
@@ -114,7 +114,7 @@ bool hasInterrogativeEndingAt(const dictionary::DictionaryManager& dict_manager,
 // backward over lattice edges that can stay inside such a phrase. The bounded
 // reverse index keeps this proportional to the local candidate count.
 bool hasInterrogativeNominalPhraseEndingAt(const core::Lattice& lattice, size_t end_pos) {
-  const size_t scan_start = end_pos > kDictionaryLookbehindChars ? end_pos - kDictionaryLookbehindChars : 0;
+  const size_t scan_start = dictionaryLookbehindStart(end_pos);
   std::array<bool, kDictionaryLookbehindChars + 1> reachable{};
   reachable[end_pos - scan_start] = true;
 
@@ -212,7 +212,7 @@ bool startsInsideKanjiLedVerb(const core::Lattice& lattice, const std::vector<ch
 // letting it suppress the adverb hands those morae to a fragment instead.
 bool startsInsideVerifiedPredicate(const core::Lattice& lattice, const std::vector<char32_t>& codepoints,
                                    size_t start_pos) {
-  const size_t scan_start = start_pos > kDictionaryLookbehindChars ? start_pos - kDictionaryLookbehindChars : 0;
+  const size_t scan_start = dictionaryLookbehindStart(start_pos);
   for (size_t edge_start = scan_start; edge_start < start_pos; ++edge_start) {
     // A predicate opening inside a dictionary function word that ends exactly
     // at start_pos (な|んか|もう → かも) is that word's fragment, not a witness.
@@ -246,11 +246,11 @@ bool startsInsideVerifiedPredicate(const core::Lattice& lattice, const std::vect
 bool hasProductiveContinuativeCrossingDeterminer(const core::Lattice& lattice, const grammar::Inflection& inflection,
                                                  const dictionary::DictionaryManager& dict_manager,
                                                  const std::vector<char32_t>& codepoints, size_t determiner_start) {
-  if (determiner_start == 0 || !grammar::isIRowCodepoint(codepoints[determiner_start])) {
+  if (determiner_start == 0 || !kana::isIRowCodepoint(codepoints[determiner_start])) {
     return false;
   }
 
-  size_t host_start = determiner_start > kDictionaryLookbehindChars ? determiner_start - kDictionaryLookbehindChars : 0;
+  size_t host_start = dictionaryLookbehindStart(determiner_start);
   for (size_t boundary = determiner_start; boundary > host_start; --boundary) {
     const bool follows_predicate_introducing_particle =
         core::anyEdgeEndingAt(lattice, boundary, [](const core::LatticeEdge& edge) {
@@ -932,7 +932,7 @@ ContextualDictionaryCandidateState addContextualDictionaryCandidates(
       // reading the が as a case particle turns the auxiliary into する. Only an
       // a-row kana can be that okurigana, which keeps a genuine quotative と in
       // the same position (確認したと+さ+れ+て).
-      !(grammar::isARowCodepoint(codepoints[start_pos - 1]) &&
+      !(kana::isARowCodepoint(codepoints[start_pos - 1]) &&
         hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbMizenkei)) &&
       verb_helpers::isPassiveAuxContinuation(codepoints, start_pos + 2, /*strict_masu=*/true);
   if (starts_quoted_passive) {
@@ -977,6 +977,13 @@ ContextualDictionaryCandidateState addContextualDictionaryCandidates(
 }
 
 // Whether a surface spells the continuative of a registered verb.
+// A multi-mora adverb ending in か before という has absorbed the question
+// particle of a quoted question (なぜか+という against なぜ+か+という).
+bool adverbAbsorbsQuotedQuestion(const std::vector<char32_t>& codepoints, size_t length, size_t end_pos) {
+  return length > 1 && codepoints[end_pos - 1] == U'か' && end_pos + 2 < codepoints.size() &&
+         codepoints[end_pos] == U'と' && codepoints[end_pos + 1] == U'い' && codepoints[end_pos + 2] == U'う';
+}
+
 bool namesVerbContinuative(const dictionary::DictionaryManager& dict_manager, std::string_view surface) {
   const char32_t tail = utf8::decodeLastChar(surface);
   const std::string_view stem = utf8::dropLastChar(surface);
@@ -987,7 +994,7 @@ bool namesVerbContinuative(const dictionary::DictionaryManager& dict_manager, st
   if (!godan_ending.empty() && verb_helpers::isVerbInDictionary(&dict_manager, normalize::concat(stem, godan_ending))) {
     return true;
   }
-  return grammar::isERowCodepoint(tail) &&
+  return kana::isERowCodepoint(tail) &&
          verb_helpers::isVerbInDictionary(&dict_manager, normalize::concat(surface, "る"));
 }
 
@@ -1109,10 +1116,7 @@ void addElidedProlongedDictionaryCandidates(core::Lattice& lattice, const dictio
 void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view text,
                                         const std::vector<char32_t>& codepoints, const ByteOffsets& byte_offsets,
                                         size_t start_pos, std::vector<dictionary::LookupResult>& lookup_results) const {
-  // Convert to byte position for dictionary lookup
-  size_t byte_pos = byteOffsetAt(byte_offsets, start_pos);
-
-  // Lookup in dictionary
+  const size_t byte_pos = byteOffsetAt(byte_offsets, start_pos);
   dict_manager_.lookupInto(text, byte_pos, lookup_results);
   const bool suppress_prefixed_noun_interior =
       startsHonorificPrefixedNounWithVerbTail(dict_manager_, text, codepoints, byte_offsets, start_pos);
@@ -1129,7 +1133,10 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
   size_t longest_noun = 0;
   size_t longest_potential_benefactive = 0;
   for (const auto& result : lookup_results) {
-    if (result.entry != nullptr && result.entry->pos == core::PartOfSpeech::Conjunction) {
+    if (result.entry == nullptr) {
+      continue;
+    }
+    if (result.entry->pos == core::PartOfSpeech::Conjunction) {
       longest_conjunction = std::max(longest_conjunction, result.length);
       // A conjunction whose surface also spells a productive chain does not own
       // its span the way a fixed expression does: でも and では are the copula
@@ -1143,22 +1150,17 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
         longest_fixed_conjunction = std::max(longest_fixed_conjunction, result.length);
       }
     }
-    if (result.entry != nullptr && result.entry->pos == core::PartOfSpeech::Interjection) {
+    if (result.entry->pos == core::PartOfSpeech::Interjection) {
       longest_interjection = std::max(longest_interjection, result.length);
     }
-    const size_t result_end = start_pos + result.length;
-    const bool adverb_absorbs_quoted_question =
-        result.entry != nullptr && result.entry->pos == core::PartOfSpeech::Adverb && result.length > 1 &&
-        codepoints[result_end - 1] == U'か' && result_end + 2 < codepoints.size() && codepoints[result_end] == U'と' &&
-        codepoints[result_end + 1] == U'い' && codepoints[result_end + 2] == U'う';
-    if (result.entry != nullptr && result.entry->pos == core::PartOfSpeech::Adverb && !has_attributive_temporal_ma &&
-        !adverb_absorbs_quoted_question) {
+    if (result.entry->pos == core::PartOfSpeech::Adverb && !has_attributive_temporal_ma &&
+        !adverbAbsorbsQuotedQuestion(codepoints, result.length, start_pos + result.length)) {
       longest_adverb = std::max(longest_adverb, result.length);
     }
-    if (result.entry != nullptr && result.entry->pos == core::PartOfSpeech::Noun) {
+    if (result.entry->pos == core::PartOfSpeech::Noun) {
       longest_noun = std::max(longest_noun, result.length);
     }
-    if (result.entry != nullptr && grammar::isPotentialBenefactiveLemma(result.entry->lemma)) {
+    if (grammar::isPotentialBenefactiveLemma(result.entry->lemma)) {
       longest_potential_benefactive = std::max(longest_potential_benefactive, result.length);
     }
   }
@@ -1187,7 +1189,8 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
 
     // Calculate end position in characters before context-sensitive candidate
     // guards below inspect the following lexical head.
-    size_t end_pos = start_pos + result.length;
+    const size_t end_pos = start_pos + result.length;
+    const std::string_view following_text = text.substr(byteOffsetAt(byte_offsets, end_pos));
 
     if ((result.entry->extended_pos == core::ExtendedPOS::NounFormal ||
          result.entry->extended_pos == core::ExtendedPOS::VerbMizenkei) &&
@@ -1554,7 +1557,7 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     if (result.entry->extended_pos == core::ExtendedPOS::AdjNaAdj && end_pos < codepoints.size()) {
       const bool has_same_surface_noun =
           lookupResultsHavePartOfSpeech(lookup_results, partOfSpeechMask(core::PartOfSpeech::Noun), result.length);
-      if (has_same_surface_noun && grammar::startsPredicativeCopula(text.substr(byteOffsetAt(byte_offsets, end_pos)))) {
+      if (has_same_surface_noun && grammar::startsPredicativeCopula(following_text)) {
         continue;
       }
     }
@@ -1636,9 +1639,8 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
       }
     }
 
-    if (result.entry->pos == core::PartOfSpeech::Adverb && result.length > 1 && codepoints[end_pos - 1] == U'か' &&
-        end_pos + 2 < codepoints.size() && codepoints[end_pos] == U'と' && codepoints[end_pos + 1] == U'い' &&
-        codepoints[end_pos + 2] == U'う') {
+    if (result.entry->pos == core::PartOfSpeech::Adverb &&
+        adverbAbsorbsQuotedQuestion(codepoints, result.length, end_pos)) {
       continue;
     }
 
@@ -1917,7 +1919,7 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     }
 
     if (result.entry->pos == core::PartOfSpeech::Noun && end_pos < codepoints.size() &&
-        normalize::isKanjiCodepoint(codepoints[end_pos]) && grammar::isIRowCodepoint(codepoints[end_pos - 1])) {
+        normalize::isKanjiCodepoint(codepoints[end_pos]) && kana::isIRowCodepoint(codepoints[end_pos - 1])) {
       const std::string_view base_suffix = grammar::godanBaseSuffixFromIRow(codepoints[end_pos - 1]);
       if (!base_suffix.empty()) {
         const std::string verb_base = normalize::concat(utf8::dropLastChar(result.entry->surface), base_suffix);
@@ -1993,7 +1995,7 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
         utf8::endsWith(result.entry->surface, "う") &&
         !(hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbRenyokei) &&
           (verb_helpers::naiNegativeFollowsAt(codepoints, end_pos) ||
-           utf8::startsWithAny(text.substr(byteOffsetAt(byte_offsets, end_pos)), {"ござ", "存じ"})))) {
+           utf8::startsWithAny(following_text, {"ござ", "存じ"})))) {
       continue;
     }
 
@@ -2052,7 +2054,7 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     // common temporal adverb such as いま from being split as い+ま.
     if (result.entry->extended_pos == core::ExtendedPOS::AuxDesireTai &&
         grammar::isClassicalDesiderativeMarker(result.entry->surface) &&
-        !grammar::startsClassicalDesiderativeSequence(text.substr(byteOffsetAt(byte_offsets, start_pos)))) {
+        !grammar::startsClassicalDesiderativeSequence(text.substr(byte_pos))) {
       continue;
     }
 
@@ -2061,8 +2063,7 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     if (result.entry->extended_pos == core::ExtendedPOS::AuxHonorific &&
         grammar::isClassicalHonorificComponent(result.entry->surface)) {
       const bool is_marker = grammar::isClassicalDesiderativeMarker(result.entry->surface);
-      const bool has_honorific_start =
-          grammar::startsClassicalHonorificSequence(text.substr(byteOffsetAt(byte_offsets, start_pos)));
+      const bool has_honorific_start = grammar::startsClassicalHonorificSequence(text.substr(byte_pos));
       const bool follows_honorific_marker = start_pos > 0 && grammar::isClassicalDesiderativeMarker(extractSubstring(
                                                                  codepoints, start_pos - 1, start_pos));
       if ((is_marker && !has_honorific_start) || (!is_marker && !follows_honorific_marker)) {
@@ -2215,7 +2216,7 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     // precede the closed classical honorific auxiliary chain たまふ.  Keep the
     // verb boundary available in that grammatical environment.
     if (result.entry->pos == core::PartOfSpeech::Noun &&
-        grammar::startsClassicalHonorificAuxiliaryChain(text.substr(byteOffsetAt(byte_offsets, end_pos)))) {
+        grammar::startsClassicalHonorificAuxiliaryChain(following_text)) {
       continue;
     }
 
@@ -2290,7 +2291,7 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     // copular connective, and topic particle independently searchable.  The
     // causal compound particle ので cannot consume its initial two morae.
     if (result.entry->extended_pos == core::ExtendedPOS::ParticleConj &&
-        grammar::isCausalParticleBeforeTopic(result.entry->surface, text.substr(byteOffsetAt(byte_offsets, end_pos)))) {
+        grammar::isCausalParticleBeforeTopic(result.entry->surface, following_text)) {
       continue;
     }
 
@@ -2304,8 +2305,6 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
       continue;
     }
 
-    // Create edge
-    // v0.8: flags derived from extended_pos, cost from getCategoryCost()
     uint8_t flags = core::LatticeEdge::kFromDictionary;
     if (result.from_user_dict) {
       flags |= core::LatticeEdge::kFromUserDict;
@@ -2313,40 +2312,39 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     if (result.entry->extended_pos == core::ExtendedPOS::NounFormal) {
       flags |= core::LatticeEdge::kIsFormalNoun;
     }
-    // Note: is_low_info removed - can be derived from extended_pos if needed
 
-    // Cost is now derived from ExtendedPOS via getCategoryCost()
     float cost = analysis::getCategoryCost(result.entry->extended_pos);
+    // A tuned cost is flagged so the scorer honours it even when it lands on
+    // exactly 0.0, which would otherwise read as unset.
+    const auto add_custom_cost = [&cost, &flags](float adjustment) {
+      cost += adjustment;
+      flags |= core::LatticeEdge::kHasCustomCost;
+    };
 
     if (result.entry->pos == core::PartOfSpeech::Noun && result.length >= 2 &&
         grammar::isAllKanji(result.entry->surface)) {
-      cost += candidate::kVerifiedMultiCharacterNounBonus;
-      flags |= core::LatticeEdge::kHasCustomCost;
+      add_custom_cost(candidate::kVerifiedMultiCharacterNounBonus);
     }
 
     if (result.entry->extended_pos == core::ExtendedPOS::PronounInterrogative &&
         result.length >= longest_interjection) {
-      cost += candidate::kInterrogativePronounBonus;
-      flags |= core::LatticeEdge::kHasCustomCost;
+      add_custom_cost(candidate::kInterrogativePronounBonus);
     }
 
     if (result.entry->pos == core::PartOfSpeech::Verb &&
         result.entry->extended_pos == core::ExtendedPOS::VerbShuushikei &&
         utf8::endsWith(result.entry->surface, "せる")) {
-      cost += candidate::kLexicalSeruBaseBonus;
-      flags |= core::LatticeEdge::kHasCustomCost;
+      add_custom_cost(candidate::kLexicalSeruBaseBonus);
     }
 
     if (result.entry->extended_pos == core::ExtendedPOS::NounFormal && end_pos + 1 < codepoints.size() &&
         codepoints[end_pos] == U'で' && (codepoints[end_pos + 1] == U'は' || codepoints[end_pos + 1] == U'も')) {
-      cost += candidate::kFormalNounCopularTopicBonus;
-      flags |= core::LatticeEdge::kHasCustomCost;
+      add_custom_cost(candidate::kFormalNounCopularTopicBonus);
     }
 
     if (result.entry->pos == core::PartOfSpeech::Adverb && end_pos + 1 < codepoints.size() &&
         codepoints[end_pos] == U'な' && codepoints[end_pos + 1] == U'の') {
-      cost += candidate::kAdverbExplanatoryCopulaBonus;
-      flags |= core::LatticeEdge::kHasCustomCost;
+      add_custom_cost(candidate::kAdverbExplanatoryCopulaBonus);
     }
 
     // In the explanatory interrogative opener, an adverb ends before the
@@ -2354,9 +2352,8 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     // Keep this productive boundary available instead of preferring an
     // accidental lexicalized adverb that absorbs か.
     if (result.entry->pos == core::PartOfSpeech::Adverb &&
-        grammar::startsInterrogativeQuoteIntroduction(text.substr(byteOffsetAt(byte_offsets, end_pos)))) {
-      cost += candidate::kInterrogativeQuoteIntroductionBonus;
-      flags |= core::LatticeEdge::kHasCustomCost;
+        grammar::startsInterrogativeQuoteIntroduction(following_text)) {
+      add_custom_cost(candidate::kInterrogativeQuoteIntroductionBonus);
     }
 
     // A dictionary-backed mixed-script noun can be a lexicalized compound
@@ -2375,8 +2372,7 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
           (codepoints[end_pos] == U'て' ||
            (end_pos + 1 < codepoints.size() && codepoints[end_pos] == U'ら' && codepoints[end_pos + 1] == U'れ'));
       if (has_kanji && has_hiragana && !ichidan_predicate_continuation) {
-        cost += candidate::kLexicalizedMixedScriptNounBonus;
-        flags |= core::LatticeEdge::kHasCustomCost;
+        add_custom_cost(candidate::kLexicalizedMixedScriptNounBonus);
       }
     }
 
@@ -2400,10 +2396,7 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
                              (codepoints[end_pos] == U'ば' ||
                               verb_helpers::isPassiveAuxContinuation(codepoints, end_pos, /*strict_masu=*/true));
       if (!continues) {
-        cost += candidate::verb_cost::kImperativeFinalBonus;
-        // Flag the tuned cost so the scorer honours it even when it lands on exactly 0.0
-        // (0.0 is otherwise read as "unset" and falls back to the category cost).
-        flags |= core::LatticeEdge::kHasCustomCost;
+        add_custom_cost(candidate::verb_cost::kImperativeFinalBonus);
       }
     }
 
@@ -2420,8 +2413,7 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
         grammar::endsWithERow(
             std::string_view(result.entry->surface).substr(0, result.entry->surface.size() - core::kJapaneseCharBytes));
     if (is_godan_potential) {
-      cost += candidate::verb_cost::kImperativeFinalBonus;
-      flags |= core::LatticeEdge::kHasCustomCost;
+      add_custom_cost(candidate::verb_cost::kImperativeFinalBonus);
     }
 
     const std::string_view lemma =

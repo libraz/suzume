@@ -9,6 +9,7 @@
 
 #include "analysis/dictionary_probe.h"
 #include "candidate_constants.h"
+#include "core/kana_constants.h"
 #include "core/utf8_constants.h"
 #include "dictionary/dictionary.h"
 #include "grammar/char_patterns.h"
@@ -75,7 +76,7 @@ bool headsKanjiSuruPredicateAt(const dictionary::DictionaryManager& dict_manager
   }
   // A particle opening with し follows a complete nominal, so it is evidence
   // against the predicate reading rather than for it (五人組しか, 一番星しも).
-  return !hasExactPartOfSpeech(dict_manager, extractSubstring(codepoints, predicate_end, predicate_end + 2),
+  return !hasExactPartOfSpeech(dict_manager, codepoints, predicate_end, predicate_end + 2,
                                partOfSpeechMask(core::PartOfSpeech::Particle));
 }
 
@@ -96,7 +97,7 @@ size_t longestNominalVerbContinuativeStart(const std::vector<char32_t>& codepoin
     const char32_t ending = codepoints[continuative_end - 1];
     const std::string_view godan_ending = grammar::godanBaseSuffixFromIRow(ending);
     const size_t okurigana_length = continuative_end - kanji_end;
-    const bool is_single_mora_continuative = !godan_ending.empty() || grammar::isERowCodepoint(ending);
+    const bool is_single_mora_continuative = !godan_ending.empty() || kana::isERowCodepoint(ending);
     const bool is_supported_two_mora_continuative =
         okurigana_length == 2 && (ending == U'げ' || ending == U'け' || ending == U'り' || ending == U'え' ||
                                   ending == U'し' || ending == U'み');
@@ -114,7 +115,7 @@ size_t longestNominalVerbContinuativeStart(const std::vector<char32_t>& codepoin
     }
     // An e-row mora that is also a case particle (者+へ, 者+で) is the
     // particle unless a dictionary Ichidan verb spells the stem (経て).
-    if (okurigana_length == 1 && normalize::isParticleCodepoint(ending) && grammar::isERowCodepoint(ending) &&
+    if (okurigana_length == 1 && normalize::isParticleCodepoint(ending) && kana::isERowCodepoint(ending) &&
         !verb_helpers::isVerbInDictionary(
             dict_manager,
             normalize::concat(normalize::encodeUtf8(codepoints[kanji_end - 1]), normalize::encodeUtf8(ending), "る"))) {
@@ -158,7 +159,7 @@ size_t longestNominalVerbContinuativeStart(const std::vector<char32_t>& codepoin
         (!godan_ending.empty() && verb_helpers::isVerbInDictionary(
                                       dict_manager, extractSubstring(codepoints, kanji_end - 1, continuative_end - 1) +
                                                         std::string(godan_ending))) ||
-        (grammar::isERowCodepoint(ending) &&
+        (kana::isERowCodepoint(ending) &&
          verb_helpers::isVerbInDictionary(dict_manager, extractSubstring(codepoints, kanji_end - 1, continuative_end) +
                                                             normalize::encodeUtf8(core::hiragana::kRu)));
     for (size_t suffix_start = kanji_start + 1; suffix_start < kanji_end; ++suffix_start) {
@@ -204,7 +205,7 @@ size_t longestNominalVerbContinuativeStart(const std::vector<char32_t>& codepoin
               dict_manager,
               normalize::concat(extractSubstring(codepoints, verb_start + 1, continuative_end - 1), godan_ending));
         }
-        if (!right_verb && grammar::isERowCodepoint(ending)) {
+        if (!right_verb && kana::isERowCodepoint(ending)) {
           right_verb = verb_helpers::isVerbInDictionary(dict_manager,
                                                         extractSubstring(codepoints, verb_start + 1, continuative_end) +
                                                             normalize::encodeUtf8(core::hiragana::kRu));
@@ -414,7 +415,7 @@ bool hasDictionaryEntryEndingAt(const dictionary::DictionaryManager& dict_manage
     return false;
   }
   for (size_t start = scan_start; start < end_pos; ++start) {
-    if (hasExactPartOfSpeech(dict_manager, extractSubstring(codepoints, start, end_pos), pos_mask)) {
+    if (hasExactPartOfSpeech(dict_manager, codepoints, start, end_pos, pos_mask)) {
       return true;
     }
   }
@@ -427,8 +428,8 @@ bool hasDictionarySplit(const dictionary::DictionaryManager& dict_manager, const
     return false;
   }
   for (size_t split = start_pos + 1; split < end_pos; ++split) {
-    if (hasExactPartOfSpeech(dict_manager, extractSubstring(codepoints, start_pos, split), left_mask) &&
-        hasExactPartOfSpeech(dict_manager, extractSubstring(codepoints, split, end_pos), right_mask)) {
+    if (hasExactPartOfSpeech(dict_manager, codepoints, start_pos, split, left_mask) &&
+        hasExactPartOfSpeech(dict_manager, codepoints, split, end_pos, right_mask)) {
       return true;
     }
   }
@@ -451,7 +452,7 @@ bool startsInsideRegisteredNoun(const dictionary::DictionaryManager& dict_manage
   if (start_pos == 0) {
     return false;
   }
-  const size_t scan_start = start_pos > kDictionaryLookbehindChars ? start_pos - kDictionaryLookbehindChars : 0;
+  const size_t scan_start = dictionaryLookbehindStart(start_pos);
   for (size_t noun_start = scan_start; noun_start < start_pos; ++noun_start) {
     for (const auto& result : dict_manager.lookup(text, byteOffsetAt(byte_offsets, noun_start))) {
       if (result.entry != nullptr && result.entry->pos == core::PartOfSpeech::Noun &&
@@ -493,7 +494,7 @@ namespace {
 template <typename Pred>
 size_t maxEndCovering(const core::Lattice& lattice, size_t pos, Pred pred) {
   size_t covering_end = 0;
-  const size_t scan_start = pos > kDictionaryLookbehindChars ? pos - kDictionaryLookbehindChars : 0;
+  const size_t scan_start = dictionaryLookbehindStart(pos);
   for (size_t edge_start = scan_start; edge_start < pos; ++edge_start) {
     for (const uint32_t edge_id : lattice.edgeIdsAt(edge_start)) {
       const auto& edge = lattice.getEdge(edge_id);

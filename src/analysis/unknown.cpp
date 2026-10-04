@@ -28,10 +28,11 @@
 #include "verb_candidates.h"
 #include "verb_candidates_helpers.h"
 
+namespace suzume::analysis {
+
 namespace {
 
-void appendCandidates(std::vector<suzume::analysis::UnknownCandidate>& destination,
-                      std::vector<suzume::analysis::UnknownCandidate>&& source) {
+void appendCandidates(std::vector<UnknownCandidate>& destination, std::vector<UnknownCandidate>&& source) {
   destination.reserve(destination.size() + source.size());
   for (auto& candidate : source) {
     destination.push_back(std::move(candidate));
@@ -41,15 +42,15 @@ void appendCandidates(std::vector<suzume::analysis::UnknownCandidate>& destinati
 // A closed function word is a hard lexical boundary. Unknown candidates may
 // not consume its prefix (あく|まで, 本又|は), even when their own surface
 // stops before the function word's final character.
-bool spansConjunctionStart(const suzume::analysis::UnknownCandidate& candidate, const std::vector<char32_t>& codepoints,
-                           const suzume::dictionary::DictionaryManager* dict_manager) {
+bool spansConjunctionStart(const UnknownCandidate& candidate, const std::vector<char32_t>& codepoints,
+                           const dictionary::DictionaryManager* dict_manager) {
   if (dict_manager == nullptr || candidate.end <= candidate.start + 1) {
     return false;
   }
   // A selected nominal head has both boundaries proven by its context.
-  if (candidate.lemma_verified || candidate.origin == suzume::core::CandidateOrigin::SelectedNominalHead ||
-      (candidate.pos == suzume::core::PartOfSpeech::Verb && !candidate.lemma.empty() &&
-       dict_manager->lookupExact(candidate.lemma, suzume::core::PartOfSpeech::Verb) != nullptr)) {
+  if (candidate.lemma_verified || candidate.origin == core::CandidateOrigin::SelectedNominalHead ||
+      (candidate.pos == core::PartOfSpeech::Verb && !candidate.lemma.empty() &&
+       dict_manager->lookupExact(candidate.lemma, core::PartOfSpeech::Verb) != nullptr)) {
     return false;
   }
 
@@ -57,17 +58,16 @@ bool spansConjunctionStart(const suzume::analysis::UnknownCandidate& candidate, 
   for (size_t boundary = candidate.start; boundary < candidate.end; ++boundary) {
     size_t window_end = std::min(codepoints.size(), boundary + kConjunctionWindowChars);
     for (size_t conjunction_end = boundary + 1; conjunction_end <= window_end; ++conjunction_end) {
-      std::string conjunction = suzume::analysis::extractSubstring(codepoints, boundary, conjunction_end);
-      const auto* conjunction_entry = dict_manager->lookupExact(conjunction, suzume::core::PartOfSpeech::Conjunction);
+      std::string conjunction = extractSubstring(codepoints, boundary, conjunction_end);
+      const auto* conjunction_entry = dict_manager->lookupExact(conjunction, core::PartOfSpeech::Conjunction);
       if (conjunction_entry != nullptr && (boundary > candidate.start || conjunction_end > candidate.end)) {
         // A complete generated i-adjective may contain a kana-homographic
         // conjunction (慌ただしい contains ただし).  That is ordinary native
         // morphology.  A kanji-starting closed conjunction, by contrast,
         // owns its lexical start against an unattested adjective spanning in
         // from the left (本+若しくは, not 本若しく+は).
-        if (candidate.pos == suzume::core::PartOfSpeech::Adjective &&
-            candidate.origin == suzume::core::CandidateOrigin::AdjectiveI && !candidate.lemma.empty() &&
-            suzume::normalize::classifyChar(codepoints[boundary]) != suzume::normalize::CharType::Kanji) {
+        if (candidate.pos == core::PartOfSpeech::Adjective && candidate.origin == core::CandidateOrigin::AdjectiveI &&
+            !candidate.lemma.empty() && normalize::classifyChar(codepoints[boundary]) != normalize::CharType::Kanji) {
           continue;
         }
         // A two-kanji content noun can overlap the first kanji of a
@@ -78,9 +78,9 @@ bool spansConjunctionStart(const suzume::analysis::UnknownCandidate& candidate, 
         const bool conjunction_leaves_one_case_particle =
             boundary + 1 == candidate.end && conjunction_end == candidate.end + 1;
         if (conjunction_leaves_one_case_particle) {
-          const std::string trailing = suzume::analysis::extractSubstring(codepoints, candidate.end, conjunction_end);
-          const auto* particle = dict_manager->lookupExact(trailing, suzume::core::PartOfSpeech::Particle);
-          if (particle != nullptr && particle->extended_pos == suzume::core::ExtendedPOS::ParticleCase) {
+          const std::string trailing = extractSubstring(codepoints, candidate.end, conjunction_end);
+          const auto* particle = dict_manager->lookupExact(trailing, core::PartOfSpeech::Particle);
+          if (particle != nullptr && particle->extended_pos == core::ExtendedPOS::ParticleCase) {
             continue;
           }
         }
@@ -96,36 +96,32 @@ bool spansConjunctionStart(const suzume::analysis::UnknownCandidate& candidate, 
 // final kanji plus the following i-row ending reconstructs an attested verb
 // and a second kanji verb follows. Dictionary verification prevents an
 // arbitrary noun-final kanji followed by し from triggering the rule.
-bool endsInsideVerifiedCompoundVerb(const suzume::analysis::UnknownCandidate& candidate,
-                                    const std::vector<char32_t>& codepoints,
-                                    const std::vector<suzume::normalize::CharType>& char_types,
-                                    const suzume::dictionary::DictionaryManager* dict_manager) {
-  if (dict_manager == nullptr || candidate.pos != suzume::core::PartOfSpeech::Noun ||
-      candidate.end <= candidate.start + 1 || candidate.end + 1 >= codepoints.size() ||
-      char_types[candidate.start] != suzume::normalize::CharType::Kanji ||
-      char_types[candidate.end] != suzume::normalize::CharType::Hiragana ||
-      char_types[candidate.end + 1] != suzume::normalize::CharType::Kanji) {
+bool endsInsideVerifiedCompoundVerb(const UnknownCandidate& candidate, const std::vector<char32_t>& codepoints,
+                                    const std::vector<normalize::CharType>& char_types,
+                                    const dictionary::DictionaryManager* dict_manager) {
+  if (dict_manager == nullptr || candidate.pos != core::PartOfSpeech::Noun || candidate.end <= candidate.start + 1 ||
+      candidate.end + 1 >= codepoints.size() || char_types[candidate.start] != normalize::CharType::Kanji ||
+      char_types[candidate.end] != normalize::CharType::Hiragana ||
+      char_types[candidate.end + 1] != normalize::CharType::Kanji) {
     return false;
   }
 
-  const std::string_view base_suffix = suzume::grammar::godanBaseSuffixFromIRow(codepoints[candidate.end]);
+  const std::string_view base_suffix = grammar::godanBaseSuffixFromIRow(codepoints[candidate.end]);
   if (base_suffix.empty()) {
     return false;
   }
-  const std::string verb_base = suzume::normalize::concat(
-      suzume::analysis::extractSubstring(codepoints, candidate.end - 1, candidate.end), base_suffix);
-  return dict_manager->lookupExact(verb_base, suzume::core::PartOfSpeech::Verb) != nullptr;
+  const std::string verb_base =
+      normalize::concat(extractSubstring(codepoints, candidate.end - 1, candidate.end), base_suffix);
+  return dict_manager->lookupExact(verb_base, core::PartOfSpeech::Verb) != nullptr;
 }
 
-bool containsInternalPunctuation(const suzume::analysis::UnknownCandidate& candidate,
-                                 const std::vector<char32_t>& codepoints) {
-  if (candidate.pos == suzume::core::PartOfSpeech::Symbol) {
+bool containsInternalPunctuation(const UnknownCandidate& candidate, const std::vector<char32_t>& codepoints) {
+  if (candidate.pos == core::PartOfSpeech::Symbol) {
     return false;
   }
   for (size_t pos = candidate.start + 1; pos < candidate.end; ++pos) {
-    if (suzume::normalize::classifyChar(codepoints[pos]) == suzume::normalize::CharType::Symbol &&
-        codepoints[pos] != U'_' && !suzume::normalize::isVariationSelector(codepoints[pos]) &&
-        !suzume::normalize::isTransparentFormatControl(codepoints[pos])) {
+    if (normalize::classifyChar(codepoints[pos]) == normalize::CharType::Symbol && codepoints[pos] != U'_' &&
+        !normalize::isVariationSelector(codepoints[pos]) && !normalize::isTransparentFormatControl(codepoints[pos])) {
       return true;
     }
   }
@@ -135,30 +131,27 @@ bool containsInternalPunctuation(const suzume::analysis::UnknownCandidate& candi
 // A closed adverb followed by an attested adjective is a grammatical phrase,
 // not an unknown all-kanji noun (比較的+安全).  Require dictionary evidence on
 // both sides so ordinary lexical compounds remain untouched.
-bool spansAdverbAdjectiveBoundary(const suzume::analysis::UnknownCandidate& candidate,
-                                  const std::vector<char32_t>& codepoints,
-                                  const suzume::dictionary::DictionaryManager* dict_manager) {
-  if (dict_manager == nullptr || candidate.pos != suzume::core::PartOfSpeech::Noun ||
-      candidate.end <= candidate.start + 1 ||
-      candidate.end - candidate.start > suzume::analysis::candidate::kMaxAdverbAdjectiveBoundaryChars) {
+bool spansAdverbAdjectiveBoundary(const UnknownCandidate& candidate, const std::vector<char32_t>& codepoints,
+                                  const dictionary::DictionaryManager* dict_manager) {
+  if (dict_manager == nullptr || candidate.pos != core::PartOfSpeech::Noun || candidate.end <= candidate.start + 1 ||
+      candidate.end - candidate.start > candidate::kMaxAdverbAdjectiveBoundaryChars) {
     return false;
   }
-  return suzume::analysis::hasDictionarySplit(
-      *dict_manager, codepoints, candidate.start, candidate.end,
-      suzume::analysis::partOfSpeechMask(suzume::core::PartOfSpeech::Adverb),
-      suzume::analysis::partOfSpeechMask(suzume::core::PartOfSpeech::Adjective));
+  return hasDictionarySplit(*dict_manager, codepoints, candidate.start, candidate.end,
+                            partOfSpeechMask(core::PartOfSpeech::Adverb),
+                            partOfSpeechMask(core::PartOfSpeech::Adjective));
 }
 
 // A leading particle followed by a registered predicate remains compositional
 // (も+よろしい). This is gated by the complete following dictionary predicate,
 // so ordinary lexical words beginning with the same mora remain untouched.
-bool startsWithParticleBeforeRegisteredPredicate(const suzume::analysis::UnknownCandidate& candidate,
+bool startsWithParticleBeforeRegisteredPredicate(const UnknownCandidate& candidate,
                                                  const std::vector<char32_t>& codepoints,
-                                                 const suzume::grammar::Inflection& inflection,
-                                                 const suzume::dictionary::DictionaryManager* dict_manager) {
+                                                 const grammar::Inflection& inflection,
+                                                 const dictionary::DictionaryManager* dict_manager) {
   if (dict_manager == nullptr || candidate.end <= candidate.start + 2 || candidate.lemma_verified ||
-      (candidate.pos != suzume::core::PartOfSpeech::Verb && candidate.pos != suzume::core::PartOfSpeech::Adjective &&
-       candidate.pos != suzume::core::PartOfSpeech::Noun)) {
+      (candidate.pos != core::PartOfSpeech::Verb && candidate.pos != core::PartOfSpeech::Adjective &&
+       candidate.pos != core::PartOfSpeech::Noun)) {
     return false;
   }
   // A complete dictionary-form predicate whose slot was fixed from outside it
@@ -167,38 +160,34 @@ bool startsWithParticleBeforeRegisteredPredicate(const suzume::analysis::Unknown
   // so it cannot be manufactured by the same kana the candidate is made of
   // (道 + を + とおる, 街 + に + でかける). Only the whole-span dictionary form
   // qualifies: a bound cell does not close the clause it would have to close.
-  if (candidate.pos == suzume::core::PartOfSpeech::Verb && !candidate.lemma.empty() &&
-      candidate.lemma == candidate.surface && candidate.start >= 2) {
+  if (candidate.pos == core::PartOfSpeech::Verb && !candidate.lemma.empty() && candidate.lemma == candidate.surface &&
+      candidate.start >= 2) {
     const size_t host_boundary = candidate.start - 1;
-    const auto* slot_particle =
-        dict_manager->lookupExact(suzume::analysis::extractSubstring(codepoints, host_boundary, candidate.start),
-                                  suzume::core::PartOfSpeech::Particle);
+    const auto* slot_particle = dict_manager->lookupExact(extractSubstring(codepoints, host_boundary, candidate.start),
+                                                          core::PartOfSpeech::Particle);
     constexpr size_t kHostLookback = 12;
-    constexpr suzume::analysis::PartOfSpeechMask kNominalHostMask =
-        suzume::analysis::partOfSpeechMask(suzume::core::PartOfSpeech::Noun) |
-        suzume::analysis::partOfSpeechMask(suzume::core::PartOfSpeech::Pronoun);
+    constexpr PartOfSpeechMask kNominalHostMask =
+        partOfSpeechMask(core::PartOfSpeech::Noun) | partOfSpeechMask(core::PartOfSpeech::Pronoun);
     const size_t min_host_start = host_boundary > kHostLookback ? host_boundary - kHostLookback : 0;
-    if (slot_particle != nullptr && slot_particle->extended_pos == suzume::core::ExtendedPOS::ParticleCase &&
-        (suzume::normalize::isKanjiCodepoint(codepoints[host_boundary - 1]) ||
-         suzume::analysis::hasDictionaryEntryEndingAt(*dict_manager, codepoints, min_host_start, host_boundary,
-                                                      kNominalHostMask))) {
+    if (slot_particle != nullptr && slot_particle->extended_pos == core::ExtendedPOS::ParticleCase &&
+        (normalize::isKanjiCodepoint(codepoints[host_boundary - 1]) ||
+         hasDictionaryEntryEndingAt(*dict_manager, codepoints, min_host_start, host_boundary, kNominalHostMask))) {
       return false;
     }
   }
 
-  const std::string particle = suzume::analysis::extractSubstring(codepoints, candidate.start, candidate.start + 1);
-  const auto* particle_entry = dict_manager->lookupExact(particle, suzume::core::PartOfSpeech::Particle);
-  if (particle_entry == nullptr || (particle_entry->extended_pos != suzume::core::ExtendedPOS::ParticleTopic &&
-                                    particle_entry->extended_pos != suzume::core::ExtendedPOS::ParticleCase &&
-                                    particle_entry->extended_pos != suzume::core::ExtendedPOS::ParticleNo)) {
+  const std::string particle = extractSubstring(codepoints, candidate.start, candidate.start + 1);
+  const auto* particle_entry = dict_manager->lookupExact(particle, core::PartOfSpeech::Particle);
+  if (particle_entry == nullptr || (particle_entry->extended_pos != core::ExtendedPOS::ParticleTopic &&
+                                    particle_entry->extended_pos != core::ExtendedPOS::ParticleCase &&
+                                    particle_entry->extended_pos != core::ExtendedPOS::ParticleNo)) {
     return false;
   }
-  const std::string predicate = suzume::analysis::extractSubstring(codepoints, candidate.start + 1, candidate.end);
+  const std::string predicate = extractSubstring(codepoints, candidate.start + 1, candidate.end);
   const size_t predicate_length = candidate.end - candidate.start - 1;
   for (const auto& result : dict_manager->lookup(predicate, 0)) {
     if (result.entry == nullptr || result.length != predicate_length ||
-        (result.entry->pos != suzume::core::PartOfSpeech::Verb &&
-         result.entry->pos != suzume::core::PartOfSpeech::Adjective)) {
+        (result.entry->pos != core::PartOfSpeech::Verb && result.entry->pos != core::PartOfSpeech::Adjective)) {
       continue;
     }
     // The predicate has to be complete, so the span must be the predicate's own
@@ -218,25 +207,23 @@ bool startsWithParticleBeforeRegisteredPredicate(const suzume::analysis::Unknown
   // be independently attested; this avoids treating particle-like kana at
   // the start of an ordinary native word as a boundary.
   for (size_t split = candidate.start + 2; split < candidate.end; ++split) {
-    const std::string content = suzume::analysis::extractSubstring(codepoints, candidate.start + 1, split);
-    constexpr suzume::analysis::PartOfSpeechMask kContentMask =
-        suzume::analysis::partOfSpeechMask(suzume::core::PartOfSpeech::Noun) |
-        suzume::analysis::partOfSpeechMask(suzume::core::PartOfSpeech::Pronoun) |
-        suzume::analysis::partOfSpeechMask(suzume::core::PartOfSpeech::Adverb);
-    const bool content_verified = suzume::analysis::hasExactPartOfSpeech(*dict_manager, content, kContentMask);
+    const std::string content = extractSubstring(codepoints, candidate.start + 1, split);
+    constexpr PartOfSpeechMask kContentMask = partOfSpeechMask(core::PartOfSpeech::Noun) |
+                                              partOfSpeechMask(core::PartOfSpeech::Pronoun) |
+                                              partOfSpeechMask(core::PartOfSpeech::Adverb);
+    const bool content_verified = hasExactPartOfSpeech(*dict_manager, content, kContentMask);
     if (!content_verified) {
       continue;
     }
-    const std::string tail = suzume::analysis::extractSubstring(codepoints, split, candidate.end);
-    constexpr suzume::analysis::PartOfSpeechMask kPredicateMask =
-        suzume::analysis::partOfSpeechMask(suzume::core::PartOfSpeech::Verb) |
-        suzume::analysis::partOfSpeechMask(suzume::core::PartOfSpeech::Adjective);
-    if (suzume::analysis::hasExactPartOfSpeech(*dict_manager, tail, kPredicateMask)) {
+    const std::string tail = extractSubstring(codepoints, split, candidate.end);
+    constexpr PartOfSpeechMask kPredicateMask =
+        partOfSpeechMask(core::PartOfSpeech::Verb) | partOfSpeechMask(core::PartOfSpeech::Adjective);
+    if (hasExactPartOfSpeech(*dict_manager, tail, kPredicateMask)) {
       return true;
     }
     const auto best = inflection.getBest(tail);
-    if (best.confidence >= suzume::analysis::candidate::verb_cost::kConstructedVerbMinConfidence &&
-        best.verb_type != suzume::grammar::VerbType::Unknown) {
+    if (best.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence &&
+        best.verb_type != grammar::VerbType::Unknown) {
       return true;
     }
   }
@@ -244,69 +231,62 @@ bool startsWithParticleBeforeRegisteredPredicate(const suzume::analysis::Unknown
 }
 
 bool hasDictionaryContentEndingAt(const std::vector<char32_t>& codepoints, size_t boundary,
-                                  const suzume::dictionary::DictionaryManager* dict_manager) {
+                                  const dictionary::DictionaryManager* dict_manager) {
   if (dict_manager == nullptr || boundary == 0) {
     return false;
   }
   constexpr size_t kContentLookback = 4;
   const size_t first = boundary > kContentLookback ? boundary - kContentLookback : 0;
-  constexpr suzume::analysis::PartOfSpeechMask kContentMask =
-      suzume::analysis::partOfSpeechMask(suzume::core::PartOfSpeech::Noun) |
-      suzume::analysis::partOfSpeechMask(suzume::core::PartOfSpeech::Pronoun) |
-      suzume::analysis::partOfSpeechMask(suzume::core::PartOfSpeech::Adverb) |
-      suzume::analysis::partOfSpeechMask(suzume::core::PartOfSpeech::Adjective) |
-      suzume::analysis::partOfSpeechMask(suzume::core::PartOfSpeech::Verb);
-  return suzume::analysis::hasDictionaryEntryEndingAt(*dict_manager, codepoints, first, boundary, kContentMask);
+  constexpr PartOfSpeechMask kContentMask =
+      partOfSpeechMask(core::PartOfSpeech::Noun) | partOfSpeechMask(core::PartOfSpeech::Pronoun) |
+      partOfSpeechMask(core::PartOfSpeech::Adverb) | partOfSpeechMask(core::PartOfSpeech::Adjective) |
+      partOfSpeechMask(core::PartOfSpeech::Verb);
+  return hasDictionaryEntryEndingAt(*dict_manager, codepoints, first, boundary, kContentMask);
 }
 
 bool isGeneratedPredicate(const std::vector<char32_t>& codepoints, size_t start, size_t end,
-                          const suzume::grammar::Inflection& inflection,
-                          const suzume::dictionary::DictionaryManager* dict_manager) {
+                          const grammar::Inflection& inflection, const dictionary::DictionaryManager* dict_manager) {
   if (start >= end) {
     return false;
   }
-  const std::string surface = suzume::analysis::extractSubstring(codepoints, start, end);
-  constexpr suzume::analysis::PartOfSpeechMask kPredicateMask =
-      suzume::analysis::partOfSpeechMask(suzume::core::PartOfSpeech::Verb) |
-      suzume::analysis::partOfSpeechMask(suzume::core::PartOfSpeech::Adjective);
-  if (suzume::analysis::hasExactPartOfSpeech(*dict_manager, surface, kPredicateMask)) {
+  const std::string surface = extractSubstring(codepoints, start, end);
+  constexpr PartOfSpeechMask kPredicateMask =
+      partOfSpeechMask(core::PartOfSpeech::Verb) | partOfSpeechMask(core::PartOfSpeech::Adjective);
+  if (hasExactPartOfSpeech(*dict_manager, surface, kPredicateMask)) {
     return true;
   }
   const auto best = inflection.getBest(surface);
-  return best.confidence >= suzume::analysis::candidate::verb_cost::kConstructedVerbMinConfidence &&
-         best.verb_type != suzume::grammar::VerbType::Unknown &&
-         best.verb_type != suzume::grammar::VerbType::IAdjective;
+  return best.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence &&
+         best.verb_type != grammar::VerbType::Unknown && best.verb_type != grammar::VerbType::IAdjective;
 }
 
 bool isKanjiContentSpan(const std::vector<char32_t>& codepoints, size_t start, size_t end) {
   if (start >= end) {
     return false;
   }
-  return std::all_of(codepoints.begin() + static_cast<std::ptrdiff_t>(start),
-                     codepoints.begin() + static_cast<std::ptrdiff_t>(end), [](char32_t codepoint) {
-                       return suzume::normalize::classifyChar(codepoint) == suzume::normalize::CharType::Kanji;
-                     });
+  return std::all_of(
+      codepoints.begin() + static_cast<std::ptrdiff_t>(start), codepoints.begin() + static_cast<std::ptrdiff_t>(end),
+      [](char32_t codepoint) { return normalize::classifyChar(codepoint) == normalize::CharType::Kanji; });
 }
 
-bool hasClosedFollowerForGeneratedVerb(const suzume::analysis::UnknownCandidate& candidate,
-                                       const std::vector<char32_t>& codepoints,
-                                       const suzume::dictionary::DictionaryManager* dict_manager) {
-  if (candidate.pos != suzume::core::PartOfSpeech::Verb || candidate.end >= codepoints.size()) {
+bool hasClosedFollowerForGeneratedVerb(const UnknownCandidate& candidate, const std::vector<char32_t>& codepoints,
+                                       const dictionary::DictionaryManager* dict_manager) {
+  if (candidate.pos != core::PartOfSpeech::Verb || candidate.end >= codepoints.size()) {
     return false;
   }
-  const std::string remaining = suzume::analysis::extractSubstring(codepoints, candidate.end, codepoints.size());
+  const std::string remaining = extractSubstring(codepoints, candidate.end, codepoints.size());
   for (const auto& result : dict_manager->lookup(remaining, 0)) {
     if (result.entry == nullptr) {
       continue;
     }
-    if (candidate.extended_pos == suzume::core::ExtendedPOS::VerbRenyokei &&
-        result.entry->extended_pos == suzume::core::ExtendedPOS::AuxAspectHajimeru) {
+    if (candidate.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+        result.entry->extended_pos == core::ExtendedPOS::AuxAspectHajimeru) {
       return true;
     }
-    if (candidate.extended_pos == suzume::core::ExtendedPOS::VerbMizenkei &&
-        (result.entry->extended_pos == suzume::core::ExtendedPOS::AuxPassive ||
-         result.entry->extended_pos == suzume::core::ExtendedPOS::AuxCausative ||
-         result.entry->extended_pos == suzume::core::ExtendedPOS::AuxPotential)) {
+    if (candidate.extended_pos == core::ExtendedPOS::VerbMizenkei &&
+        (result.entry->extended_pos == core::ExtendedPOS::AuxPassive ||
+         result.entry->extended_pos == core::ExtendedPOS::AuxCausative ||
+         result.entry->extended_pos == core::ExtendedPOS::AuxPotential)) {
       return true;
     }
   }
@@ -319,12 +299,12 @@ bool hasClosedFollowerForGeneratedVerb(const suzume::analysis::UnknownCandidate&
 // also removes candidates that begin inside the left word (よ+そに置く),
 // while lemma-verified lexical verbs and particle-like kana inside native
 // words remain untouched.
-bool spansCaseParticleBeforeVerifiedPredicate(const suzume::analysis::UnknownCandidate& candidate,
+bool spansCaseParticleBeforeVerifiedPredicate(const UnknownCandidate& candidate,
                                               const std::vector<char32_t>& codepoints,
-                                              const suzume::grammar::Inflection& inflection,
-                                              const suzume::dictionary::DictionaryManager* dict_manager) {
+                                              const grammar::Inflection& inflection,
+                                              const dictionary::DictionaryManager* dict_manager) {
   if (dict_manager == nullptr || candidate.start + 2 >= candidate.end || candidate.lemma_verified ||
-      (candidate.pos != suzume::core::PartOfSpeech::Verb && candidate.pos != suzume::core::PartOfSpeech::Adjective)) {
+      (candidate.pos != core::PartOfSpeech::Verb && candidate.pos != core::PartOfSpeech::Adjective)) {
     return false;
   }
   for (size_t boundary = candidate.start + 1; boundary < candidate.end; ++boundary) {
@@ -338,19 +318,19 @@ bool spansCaseParticleBeforeVerifiedPredicate(const suzume::analysis::UnknownCan
     // is not a particle at all (押しつけ+がまし+さ). Without this the guard
     // reads the suffix as 押しつけ+が+まし and refuses the derived adjective.
     // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
-    if (suzume::analysis::verb_helpers::startsInsideGaMashiiSuffix(codepoints, boundary)) {
+    if (verb_helpers::startsInsideGaMashiiSuffix(codepoints, boundary)) {
       continue;
     }
-    const std::string particle = suzume::analysis::extractSubstring(codepoints, boundary, boundary + 1);
-    const auto* entry = dict_manager->lookupExact(particle, suzume::core::PartOfSpeech::Particle);
-    if (entry == nullptr || (entry->extended_pos != suzume::core::ExtendedPOS::ParticleCase &&
-                             entry->extended_pos != suzume::core::ExtendedPOS::ParticleTopic &&
-                             entry->extended_pos != suzume::core::ExtendedPOS::ParticleNo)) {
+    const std::string particle = extractSubstring(codepoints, boundary, boundary + 1);
+    const auto* entry = dict_manager->lookupExact(particle, core::PartOfSpeech::Particle);
+    if (entry == nullptr || (entry->extended_pos != core::ExtendedPOS::ParticleCase &&
+                             entry->extended_pos != core::ExtendedPOS::ParticleTopic &&
+                             entry->extended_pos != core::ExtendedPOS::ParticleNo)) {
       continue;
     }
-    const bool left_content = hasDictionaryContentEndingAt(codepoints, boundary, dict_manager) ||
-                              (candidate.pos == suzume::core::PartOfSpeech::Verb &&
-                               isKanjiContentSpan(codepoints, candidate.start, boundary));
+    const bool left_content =
+        hasDictionaryContentEndingAt(codepoints, boundary, dict_manager) ||
+        (candidate.pos == core::PartOfSpeech::Verb && isKanjiContentSpan(codepoints, candidate.start, boundary));
     const bool right_predicate =
         isGeneratedPredicate(codepoints, boundary + 1, candidate.end, inflection, dict_manager) ||
         hasClosedFollowerForGeneratedVerb(candidate, codepoints, dict_manager);
@@ -364,75 +344,67 @@ bool spansCaseParticleBeforeVerifiedPredicate(const suzume::analysis::UnknownCan
 // A speculative candidate beginning inside a contiguous kanji noun cannot
 // absorb the complete closed negative ない (問+題ない versus 問題+ない).
 // Restrict this to that closed surface so productive suffixes remain intact.
-bool startsInsideKanjiRunBeforeClosedNai(const suzume::analysis::UnknownCandidate& candidate,
-                                         const std::vector<char32_t>& codepoints) {
+bool startsInsideKanjiRunBeforeClosedNai(const UnknownCandidate& candidate, const std::vector<char32_t>& codepoints) {
   if (candidate.lemma_verified || candidate.start == 0 || candidate.end <= candidate.start + 2 ||
-      suzume::normalize::classifyChar(codepoints[candidate.start - 1]) != suzume::normalize::CharType::Kanji ||
-      suzume::normalize::classifyChar(codepoints[candidate.start]) != suzume::normalize::CharType::Kanji) {
+      normalize::classifyChar(codepoints[candidate.start - 1]) != normalize::CharType::Kanji ||
+      normalize::classifyChar(codepoints[candidate.start]) != normalize::CharType::Kanji) {
     return false;
   }
   size_t boundary = candidate.start;
-  while (boundary < candidate.end &&
-         suzume::normalize::classifyChar(codepoints[boundary]) == suzume::normalize::CharType::Kanji) {
+  while (boundary < candidate.end && normalize::classifyChar(codepoints[boundary]) == normalize::CharType::Kanji) {
     ++boundary;
   }
   return boundary > candidate.start && boundary < candidate.end &&
-         suzume::analysis::extractSubstring(codepoints, boundary, candidate.end) == "ない";
+         extractSubstring(codepoints, boundary, candidate.end) == "ない";
 }
 
 // The first mora of the closed negative-past auxiliary belongs to なかっ,
 // never to the preceding speculative predicate (逃さ|なかっ, 強く|は|なかっ).
-bool endsInsideNegativePast(const suzume::analysis::UnknownCandidate& candidate,
-                            const std::vector<char32_t>& codepoints) {
+bool endsInsideNegativePast(const UnknownCandidate& candidate, const std::vector<char32_t>& codepoints) {
   return candidate.end >= candidate.start + 2 && candidate.end + 1 < codepoints.size() &&
          codepoints[candidate.end - 1] == U'な' && codepoints[candidate.end] == U'か' &&
          codepoints[candidate.end + 1] == U'っ';
 }
 
-bool fusesPastAuxiliary(const suzume::analysis::UnknownCandidate& candidate, const std::vector<char32_t>& codepoints,
-                        const suzume::dictionary::DictionaryManager* dict_manager) {
+bool fusesPastAuxiliary(const UnknownCandidate& candidate, const std::vector<char32_t>& codepoints,
+                        const dictionary::DictionaryManager* dict_manager) {
   if (dict_manager == nullptr || candidate.end < candidate.start + 2 ||
       (codepoints[candidate.end - 1] != U'た' && codepoints[candidate.end - 1] != U'だ')) {
     return false;
   }
-  if (candidate.pos == suzume::core::PartOfSpeech::Verb &&
-      candidate.extended_pos == suzume::core::ExtendedPOS::VerbTaForm) {
+  if (candidate.pos == core::PartOfSpeech::Verb && candidate.extended_pos == core::ExtendedPOS::VerbTaForm) {
     // A repeated vowel after a finite past form is a separate colloquial
     // emphasis unit (きた+ああああ), not evidence that た was swallowed from
     // an auxiliary chain. Keep the finite candidate available at that boundary.
     if (candidate.end + 1 < codepoints.size() && codepoints[candidate.end] == codepoints[candidate.end + 1] &&
-        suzume::analysis::verb_helpers::getHiraganaVowel(codepoints[candidate.end]) == codepoints[candidate.end]) {
+        verb_helpers::getHiraganaVowel(codepoints[candidate.end]) == codepoints[candidate.end]) {
       return false;
     }
     return true;
   }
-  const std::string prefix = suzume::analysis::extractSubstring(codepoints, candidate.start, candidate.end - 1);
-  constexpr suzume::analysis::PartOfSpeechMask kPredicateMask =
-      suzume::analysis::partOfSpeechMask(suzume::core::PartOfSpeech::Verb) |
-      suzume::analysis::partOfSpeechMask(suzume::core::PartOfSpeech::Adjective) |
-      suzume::analysis::partOfSpeechMask(suzume::core::PartOfSpeech::Auxiliary);
-  return suzume::analysis::hasExactPartOfSpeech(*dict_manager, prefix, kPredicateMask);
+  const std::string prefix = extractSubstring(codepoints, candidate.start, candidate.end - 1);
+  constexpr PartOfSpeechMask kPredicateMask = partOfSpeechMask(core::PartOfSpeech::Verb) |
+                                              partOfSpeechMask(core::PartOfSpeech::Adjective) |
+                                              partOfSpeechMask(core::PartOfSpeech::Auxiliary);
+  return hasExactPartOfSpeech(*dict_manager, prefix, kPredicateMask);
 }
 
-bool fusesPassivePastAsNoun(const suzume::analysis::UnknownCandidate& candidate) {
-  return candidate.pos == suzume::core::PartOfSpeech::Noun &&
-         candidate.origin == suzume::core::CandidateOrigin::KanjiHiraganaCompound &&
+bool fusesPassivePastAsNoun(const UnknownCandidate& candidate) {
+  return candidate.pos == core::PartOfSpeech::Noun &&
+         candidate.origin == core::CandidateOrigin::KanjiHiraganaCompound &&
          utf8::endsWithAny(candidate.surface, {"れた", "られた", "された", "せられた"});
 }
 
-bool endsInsideIchidanPassive(const suzume::analysis::UnknownCandidate& candidate,
-                              const std::vector<char32_t>& codepoints) {
+bool endsInsideIchidanPassive(const UnknownCandidate& candidate, const std::vector<char32_t>& codepoints) {
   if (candidate.end < candidate.start + 3 || candidate.end >= codepoints.size() ||
       codepoints[candidate.end - 1] != U'ら' || codepoints[candidate.end] != U'れ') {
     return false;
   }
   const char32_t preceding = codepoints[candidate.end - 2];
-  return suzume::grammar::isIRowCodepoint(preceding) || suzume::grammar::isERowCodepoint(preceding);
+  return kana::isIRowCodepoint(preceding) || kana::isERowCodepoint(preceding);
 }
 
 }  // namespace
-
-namespace suzume::analysis {
 
 UnknownCandidate makeVerbCandidate(const std::string& surface, size_t start, size_t end, float cost,
                                    const std::string& lemma, dictionary::ConjugationType conj_type, bool has_suffix,

@@ -6,7 +6,6 @@
  * and UnknownWordGenerator::generateOnomatopoeiaCandidates.
  */
 
-#include <array>
 #include <cstdint>
 #include <utility>
 
@@ -42,7 +41,7 @@ bool isBareVowelMora(char32_t codepoint) {
 bool closesContractedVolitional(const std::vector<char32_t>& codepoints, size_t tto_pos,
                                 const dictionary::DictionaryManager* dict_manager) {
   constexpr size_t kMaxVolitionalMorae = 4;
-  if (dict_manager == nullptr || tto_pos == 0 || !grammar::isORowCodepoint(codepoints[tto_pos - 1])) {
+  if (dict_manager == nullptr || tto_pos == 0 || !kana::isORowCodepoint(codepoints[tto_pos - 1])) {
     return false;
   }
   for (size_t len = 2; len <= kMaxVolitionalMorae && len <= tto_pos; ++len) {
@@ -90,51 +89,32 @@ void UnknownWordGenerator::generateCharacterSpeechCandidates(std::string_view /*
     return;
   }
 
-  normalize::CharType start_type = char_types[start_pos];
-
-  // Only for hiragana or katakana starting positions
-  if (start_type != normalize::CharType::Hiragana && start_type != normalize::CharType::Katakana) {
+  // Character speech is written in hiragana; a katakana run is almost always a
+  // loanword noun (パン, キロ) and is left to the same-type generator.
+  const normalize::CharType start_type = char_types[start_pos];
+  if (start_type != normalize::CharType::Hiragana) {
     return;
   }
 
-  // Skip if starting with common particles (these are handled by dictionary)
-  if (start_type == normalize::CharType::Hiragana) {
-    char32_t first_char = codepoints[start_pos];
-    if (normalize::isExtendedParticle(first_char)) {
-      return;
-    }
-    // Skip small kana (ゃゅょぁぃぅぇぉっ) - these don't start words
-    if (kana::isSmallKanaCodepoint(first_char)) {
-      return;
-    }
+  // Small kana do not start words, and common particles are handled by the
+  // dictionary.
+  const char32_t first_char = codepoints[start_pos];
+  if (kana::isSmallKanaCodepoint(first_char) || normalize::isExtendedParticle(first_char)) {
+    return;
   }
 
-  // Skip small katakana as well
-  if (start_type == normalize::CharType::Katakana) {
-    char32_t first_char = codepoints[start_pos];
-    if (kana::isSmallKanaCodepoint(first_char)) {
-      return;
-    }
-  }
-
-  // Whitelist approach: only allow char speech starting with kana that can
-  // begin valid auxiliary/character-speech patterns
-  if (start_type == normalize::CharType::Hiragana) {
-    char32_t first_char = codepoints[start_pos];
-    // Valid char speech starters: sentence-ending speech patterns (ぞ,じゃ,のう,etc.)
-    // and colloquial auxiliaries (ちゃ,じゃ,etc.)
-    // Excludes: grammar chars handled by dict (た,さ,ら,く,あ,け,い,す,る)
-    //           and kana that never start auxiliaries (ぱ行,ば行 sound-symbolics, etc.)
-    bool valid_starter = first_char == U'ぞ' || first_char == U'じ' || first_char == U'の' || first_char == U'な' ||
-                         first_char == U'ね' || first_char == U'よ' || first_char == U'わ' || first_char == U'で' ||
-                         first_char == U'だ' || first_char == U'ま' || first_char == U'や' || first_char == U'か' ||
-                         first_char == U'が' || first_char == U'べ' || first_char == U'ち' || first_char == U'に' ||
-                         first_char == U'せ' || first_char == U'ず' || first_char == U'ど' || first_char == U'て' ||
-                         first_char == U'も' || first_char == U'み' || first_char == U'ん' || first_char == U'そ' ||
-                         first_char == U'と' || first_char == U'お' || first_char == U'は' || first_char == U'へ';
-    if (!valid_starter) {
-      return;
-    }
+  // Only kana that can begin a sentence-ending speech pattern (ぞ, じゃ, のう)
+  // or a colloquial auxiliary (ちゃ) start character speech. Grammar kana handled
+  // by the dictionary (た, さ, ら, く) and sound-symbolic rows are excluded.
+  const bool valid_starter = first_char == U'ぞ' || first_char == U'じ' || first_char == U'の' || first_char == U'な' ||
+                             first_char == U'ね' || first_char == U'よ' || first_char == U'わ' || first_char == U'で' ||
+                             first_char == U'だ' || first_char == U'ま' || first_char == U'や' || first_char == U'か' ||
+                             first_char == U'が' || first_char == U'べ' || first_char == U'ち' || first_char == U'に' ||
+                             first_char == U'せ' || first_char == U'ず' || first_char == U'ど' || first_char == U'て' ||
+                             first_char == U'も' || first_char == U'み' || first_char == U'ん' || first_char == U'そ' ||
+                             first_char == U'と' || first_char == U'お' || first_char == U'は' || first_char == U'へ';
+  if (!valid_starter) {
+    return;
   }
 
   size_t max_len = options_.max_character_speech_length;
@@ -190,19 +170,9 @@ void UnknownWordGenerator::generateCharacterSpeechCandidates(std::string_view /*
       // Skip generating AUX for common particle surfaces
       // These should be handled by the particle dictionary entries, not as auxiliaries
       // This prevents だけ from being generated as AUX (which gets VerbOnbinkei → AuxTenseTa bonus)
-      static constexpr std::array<std::string_view, 13> kParticleSurfaces = {
-          "だけ", "ばかり", "ほど", "くらい", "ぐらい", "など", "なんて",
-          "しか", "まで",   "より", "から",   "かも",   "でも",
-      };
-      bool is_particle_surface = false;
-      for (const auto& p : kParticleSurfaces) {
-        if (surface == p) {
-          is_particle_surface = true;
-          break;
-        }
-      }
-      if (is_particle_surface) {
-        continue;  // Skip - let dictionary entry handle it
+      if (utf8::equalsAny(surface, {"だけ", "ばかり", "ほど", "くらい", "ぐらい", "など", "なんて", "しか", "まで",
+                                    "より", "から", "かも", "でも"})) {
+        continue;
       }
 
       // A generic character-speech auxiliary defaults to the past-tense
@@ -262,20 +232,9 @@ void UnknownWordGenerator::generateCharacterSpeechCandidates(std::string_view /*
 
       // For single-character hiragana, only allow valid auxiliary forms
       // This prevents spurious splits like 玉ね+ぎ where ぎ is misanalyzed as た
-      if (char_count == 1 && start_type == normalize::CharType::Hiragana) {
-        // Valid single-char auxiliaries: た て ぬ む ん い せ れ ず よ ろ
-        static const std::string_view kValidSingleCharAux[] = {
-            "た", "て", "ぬ", "む", "ん", "い", "せ", "れ", "ず", "よ", "ろ",
-        };
-        bool is_valid_aux = false;
-        for (const auto& valid : kValidSingleCharAux) {
-          if (surface == valid) {
-            is_valid_aux = true;
-            break;
-          }
-        }
-        if (!is_valid_aux) {
-          continue;  // Skip invalid single-char auxiliary candidates
+      if (char_count == 1) {
+        if (!utf8::equalsAny(surface, {"た", "て", "ぬ", "む", "ん", "い", "せ", "れ", "ず", "よ", "ろ"})) {
+          continue;
         }
       }
 
@@ -285,7 +244,7 @@ void UnknownWordGenerator::generateCharacterSpeechCandidates(std::string_view /*
       // single-character branch applies, any two morae at a sentence end became
       // a past-tense auxiliary and peeled the tail off an unregistered
       // hiragana noun (いちご read as い + ちご, 汗まみれ as 汗ま + みれ).
-      if (char_count >= 2 && start_type == normalize::CharType::Hiragana) {
+      if (char_count >= 2) {
         // A nominalizer followed by a second nominalizer is a compositional
         // clause boundary (〜て+ん+の), never one character-speech auxiliary.
         // Keep both dictionary particles available instead of manufacturing
@@ -293,19 +252,9 @@ void UnknownWordGenerator::generateCharacterSpeechCandidates(std::string_view /*
         if (codepoints[start_pos] == U'ん' && codepoints[start_pos + 1] == U'の') {
           continue;
         }
-        static constexpr std::string_view kAuxiliaryOpeners[] = {
-            "た", "て", "ぬ", "む", "ん", "い", "せ", "れ", "ず", "よ", "ろ", "だ", "で",
-            "じ", "ざ", "ま", "な", "の", "に", "っ", "わ", "ぜ", "ぞ", "さ", "や",
-        };
         const std::string_view opener = std::string_view(surface).substr(0, core::kJapaneseCharBytes);
-        bool opens_auxiliary = false;
-        for (const auto& valid : kAuxiliaryOpeners) {
-          if (opener == valid) {
-            opens_auxiliary = true;
-            break;
-          }
-        }
-        if (!opens_auxiliary) {
+        if (!utf8::equalsAny(opener, {"た", "て", "ぬ", "む", "ん", "い", "せ", "れ", "ず", "よ", "ろ", "だ", "で",
+                                      "じ", "ざ", "ま", "な", "の", "に", "っ", "わ", "ぜ", "ぞ", "さ", "や"})) {
           continue;
         }
       }
@@ -319,20 +268,13 @@ void UnknownWordGenerator::generateCharacterSpeechCandidates(std::string_view /*
         length_penalty = static_cast<float>(char_count - 2) * 2.0F;
       }
 
-      // Skip katakana character speech candidates entirely
-      // Katakana words are almost always loanword nouns (パン, キロ), not auxiliaries
-      // Character speech (擬態語/擬声語) is almost exclusively written in hiragana
-      if (start_type == normalize::CharType::Katakana) {
-        continue;  // Skip - let same_type kata_seq handle katakana as NOUN
-      }
-
       // Mark as Auxiliary so it connects properly after verbs/adjectives
       float cost = options_.character_speech_cost + length_penalty;
       auto cand = makeCandidate(surface, start_pos, candidate_end, core::PartOfSpeech::Auxiliary, cost, false,
                                 CandidateOrigin::CharacterSpeech);
 #ifdef SUZUME_DEBUG_INFO
       cand.confidence = 0.5F;
-      cand.pattern = (start_type == normalize::CharType::Hiragana) ? "char_speech_hira" : "char_speech_kata";
+      cand.pattern = "char_speech_hira";
 #endif
       candidates.push_back(cand);
     }
@@ -347,21 +289,13 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
     return;
   }
 
-  normalize::CharType start_type = char_types[start_pos];
+  const normalize::CharType start_type = char_types[start_pos];
 
-  // Helper to check if a character belongs to the same script group or is a modifier
+  // Same script as the start, or the prolonged sound mark (ー) that both
+  // hiragana and katakana words take.
   auto isSameScriptOrModifier = [&](size_t pos) -> bool {
-    if (pos >= char_types.size())
-      return false;
-    if (pos >= codepoints.size())
-      return false;
-    // Same char type
-    if (char_types[pos] == start_type)
-      return true;
-    // Prolonged sound mark (ー) can appear in both hiragana and katakana words
-    if (normalize::isProlongedSoundMark(codepoints[pos]))
-      return true;
-    return false;
+    return pos < char_types.size() && pos < codepoints.size() &&
+           (char_types[pos] == start_type || normalize::isProlongedSoundMark(codepoints[pos]));
   };
 
   // Helper to check if a character is small kana (part of previous mora)
@@ -501,11 +435,10 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
         // particle belongs to the next word (だっ|た+と+なる|と reads the past
         // auxiliary, the quotative and なる as one fabricated adverb たとなる).
         for (size_t split = start_pos + 1; split < mimetic_end && !decomposes_as_predicate_particle; ++split) {
-          const std::string left = extractSubstring(codepoints, start_pos, split);
           constexpr PartOfSpeechMask kPredicateMask = partOfSpeechMask(core::PartOfSpeech::Verb) |
                                                       partOfSpeechMask(core::PartOfSpeech::Adjective) |
                                                       partOfSpeechMask(core::PartOfSpeech::Auxiliary);
-          if (!hasExactPartOfSpeech(*dict_manager_, left, kPredicateMask)) {
+          if (!hasExactPartOfSpeech(*dict_manager_, codepoints, start_pos, split, kPredicateMask)) {
             continue;
           }
           for (size_t particle_end = split + 1; particle_end <= mimetic_end; ++particle_end) {
@@ -558,7 +491,7 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
         partOfSpeechMask(core::PartOfSpeech::Verb) | partOfSpeechMask(core::PartOfSpeech::Adjective);
     for (size_t word_end = pattern_end + 1; pattern != nullptr && dict_manager_ != nullptr && word_end <= seq_end;
          ++word_end) {
-      if (hasExactPartOfSpeech(*dict_manager_, extractSubstring(codepoints, start_pos, word_end), kContentMask)) {
+      if (hasExactPartOfSpeech(*dict_manager_, codepoints, start_pos, word_end, kContentMask)) {
         pattern = nullptr;
       }
     }
@@ -628,11 +561,11 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
                                       ? lookupEntryInRange(*dict_manager_, codepoints, start_pos + 2, start_pos + 4,
                                                            core::PartOfSpeech::Particle)
                                       : nullptr;
-      const std::string predicate_stem = extractSubstring(codepoints, start_pos, start_pos + 2);
       constexpr PartOfSpeechMask kPredicateMask =
           partOfSpeechMask(core::PartOfSpeech::Verb) | partOfSpeechMask(core::PartOfSpeech::Auxiliary);
       const bool has_exact_predicate_stem =
-          dict_manager_ != nullptr && hasExactPartOfSpeech(*dict_manager_, predicate_stem, kPredicateMask);
+          dict_manager_ != nullptr &&
+          hasExactPartOfSpeech(*dict_manager_, codepoints, start_pos, start_pos + 2, kPredicateMask);
       const bool is_conjunctive_auxiliary_tail = has_exact_predicate_stem && tail_particle != nullptr &&
                                                  tail_particle->extended_pos == core::ExtendedPOS::ParticleConj;
       if (!is_conjunctive_auxiliary_tail) {
@@ -667,48 +600,45 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
   // These are mimetic/onomatopoeia adverbs that precede する/くる conjugations
   // E.g., はっとした, ぐっときた, どきっとした, ぷるんっとした
   if (seq_len >= 3 && start_type == normalize::CharType::Hiragana) {
-    // Look for っと at various positions within the sequence
+    // Only the first っと within a 1-4 mora stem is considered.
     for (size_t tto_pos = start_pos + 1; tto_pos + 1 < seq_end && tto_pos <= start_pos + 4; ++tto_pos) {
-      if (codepoints[tto_pos] == U'っ' &&                               // っ (small tsu)
-          tto_pos + 1 < seq_end && codepoints[tto_pos + 1] == U'と') {  // と
-        size_t adv_end = tto_pos + 2;
-        size_t stem_len = tto_pos - start_pos;  // chars before っ
-        // Stem should be 1-4 hiragana chars
-        if (stem_len >= 1 && stem_len <= 4) {
-          // Skip if stem starts with a particle character (e.g., にもっと = に+もっと)
-          char32_t first_cp = codepoints[start_pos];
-          const bool particle_start = first_cp == U'に' || first_cp == U'は' || first_cp == U'も' ||
-                                      first_cp == U'を' || first_cp == U'が' || first_cp == U'で' ||
-                                      first_cp == U'と' || first_cp == U'か' || first_cp == U'の' || first_cp == U'へ';
-          if (stem_len > 2 && particle_start) {
-            break;
-          }
-          if (closesContractedVolitional(codepoints, tto_pos, dict_manager_)) {
-            break;
-          }
-          // A mimetic is read off the shape of the run, so it must not carve
-          // into a word the dictionary carries: the same っと closes the stem
-          // of ordinary lexical verbs (のっと+る against のっとる).
-          if (startsLongerDictionaryWord(codepoints, start_pos, adv_end, dict_manager_)) {
-            break;
-          }
-          std::string surface = extractSubstring(codepoints, start_pos, adv_end);
-          if (!surface.empty()) {
-            // Strong bonus for short patterns (はっと, ぐっと = very common)
-            // Needs to beat hiragana verb candidates that absorb the っと
-            float cost = (stem_len <= 2) ? -1.5F : -0.5F;
-            auto cand = makeCandidate(surface, start_pos, adv_end, core::PartOfSpeech::Adverb, cost, true,
-                                      CandidateOrigin::Onomatopoeia);
-            cand.rejects_preceding_content_edge = particle_start && stem_len == 2;
-#ifdef SUZUME_DEBUG_INFO
-            cand.confidence = 0.9F;
-            cand.pattern = "x_tto_pattern";
-#endif
-            candidates.push_back(cand);
-          }
-        }
-        break;  // Only match the first っと position
+      if (codepoints[tto_pos] != U'っ' || codepoints[tto_pos + 1] != U'と') {
+        continue;
       }
+      const size_t adv_end = tto_pos + 2;
+      const size_t stem_len = tto_pos - start_pos;
+      // Skip if stem starts with a particle character (e.g., にもっと = に+もっと)
+      const char32_t first_cp = codepoints[start_pos];
+      const bool particle_start = first_cp == U'に' || first_cp == U'は' || first_cp == U'も' || first_cp == U'を' ||
+                                  first_cp == U'が' || first_cp == U'で' || first_cp == U'と' || first_cp == U'か' ||
+                                  first_cp == U'の' || first_cp == U'へ';
+      if (stem_len > 2 && particle_start) {
+        break;
+      }
+      if (closesContractedVolitional(codepoints, tto_pos, dict_manager_)) {
+        break;
+      }
+      // A mimetic is read off the shape of the run, so it must not carve
+      // into a word the dictionary carries: the same っと closes the stem
+      // of ordinary lexical verbs (のっと+る against のっとる).
+      if (startsLongerDictionaryWord(codepoints, start_pos, adv_end, dict_manager_)) {
+        break;
+      }
+      std::string surface = extractSubstring(codepoints, start_pos, adv_end);
+      if (!surface.empty()) {
+        // Strong bonus for short patterns (はっと, ぐっと = very common)
+        // Needs to beat hiragana verb candidates that absorb the っと
+        float cost = (stem_len <= 2) ? -1.5F : -0.5F;
+        auto cand = makeCandidate(surface, start_pos, adv_end, core::PartOfSpeech::Adverb, cost, true,
+                                  CandidateOrigin::Onomatopoeia);
+        cand.rejects_preceding_content_edge = particle_start && stem_len == 2;
+#ifdef SUZUME_DEBUG_INFO
+        cand.confidence = 0.9F;
+        cand.pattern = "x_tto_pattern";
+#endif
+        candidates.push_back(cand);
+      }
+      break;
     }
   }
 }
