@@ -1010,6 +1010,60 @@
       ],
       "id": "te_ga_waru",
       "input": "手当て期間が終わる"
+    },
+    {
+      "description": "受け付け方法を変える - regression test",
+      "expected": [
+        {
+          "lemma": "受け付け",
+          "pos": "Noun",
+          "surface": "受け付け"
+        },
+        {
+          "lemma": "方法",
+          "pos": "Noun",
+          "surface": "方法"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "変える",
+          "pos": "Verb",
+          "surface": "変える"
+        }
+      ],
+      "id": "ke_ke_wo_eru",
+      "input": "受け付け方法を変える"
+    },
+    {
+      "description": "一人当たり千円だ - regression test",
+      "expected": [
+        {
+          "lemma": "一人",
+          "pos": "Noun",
+          "surface": "一人"
+        },
+        {
+          "lemma": "当たり",
+          "pos": "Noun",
+          "surface": "当たり"
+        },
+        {
+          "lemma": "千円",
+          "pos": "Noun",
+          "surface": "千円"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "tari_da_2",
+      "input": "一人当たり千円だ"
     }
   ],
   "description": "noun_compounds tests",

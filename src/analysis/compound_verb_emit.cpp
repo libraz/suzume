@@ -356,10 +356,19 @@ void emitCompoundVerbCandidates(core::Lattice& lattice, std::string_view text, c
   // reading alongside the verbal edge so the particle does not force an
   // artificial split inside the compound (押し下げを, 押し付けは).
   const bool starts_inside_kanji_run = start_pos > 0 && normalize::isKanjiCodepoint(codepoints[start_pos - 1]);
+  // So does one modifying a kanji noun head that is itself so marked
+  // (受け付け+方法を, 取り付け+工事が).
+  size_t head_end = compound_end_pos;
+  while (head_end < codepoints.size() && normalize::isKanjiCodepoint(codepoints[head_end]) &&
+         !normalize::isNumeralCodepoint(codepoints[head_end])) {
+    ++head_end;
+  }
+  const bool modifies_marked_kanji_head =
+      head_end >= compound_end_pos + 2 && beginsNominalForcingParticle(codepoints, head_end, dict_manager);
   if (v1_is_verified && !starts_inside_kanji_run && !v2_is_closed_particle &&
       !containsNegativeAuxiliary(codepoints, start_pos, compound_end_pos) &&
       compound_epos == core::ExtendedPOS::VerbRenyokei &&
-      (beginsNominalForcingParticle(codepoints, compound_end_pos, dict_manager) ||
+      (beginsNominalForcingParticle(codepoints, compound_end_pos, dict_manager) || modifies_marked_kanji_head ||
        // The copula predicates over it the same way (押し付けだ, 押し付けではなく).
        grammar::startsPredicativeCopula(extractSubstring(codepoints, compound_end_pos, codepoints.size())) ||
        grammar::isCopulaFusedConjunction(extractSubstring(codepoints, compound_end_pos, compound_end_pos + 2)))) {
@@ -372,9 +381,15 @@ void emitCompoundVerbCandidates(core::Lattice& lattice, std::string_view text, c
 
   // A compound verb continuative followed by a deverbal suffix is a single
   // nominal search unit.  The V1/V2 verification above keeps this productive
-  // rule from absorbing arbitrary kanji-hiragana sequences.
+  // rule from absorbing arbitrary kanji-hiragana sequences.  The suffix must
+  // close the kanji run, as for a simple continuative (受け付け/方法); only 物
+  // takes a further derivational suffix (飲み物屋).
+  const bool suffix_closes_kanji_run = compound_end_pos + 1 >= codepoints.size() ||
+                                       !normalize::isKanjiCodepoint(codepoints[compound_end_pos + 1]) ||
+                                       codepoints[compound_end_pos] == U'物';
   if (best_match.renyokei_form && compound_end_pos < codepoints.size() &&
-      isDeverbalSuffixKanji(codepoints[compound_end_pos]) && codepoints[compound_end_pos] != U'手') {
+      isDeverbalSuffixKanji(codepoints[compound_end_pos]) && codepoints[compound_end_pos] != U'手' &&
+      suffix_closes_kanji_run) {
     const size_t noun_end_pos = compound_end_pos + 1;
     const size_t noun_end_byte = byteOffsetAt(byte_offsets, noun_end_pos);
     const std::string noun_surface(text.substr(start_byte, noun_end_byte - start_byte));

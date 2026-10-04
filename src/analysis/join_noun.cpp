@@ -637,6 +637,17 @@ void addVerbSuffixNounJoinCandidates(core::Lattice& lattice, std::string_view te
     return;
   }
 
+  // A continuative opening right after another one is the second verb of a
+  // compound (受け+付け方); the compound itself then heads the deverbal noun,
+  // so this span starts inside a word.
+  const char32_t left_kana = start_pos >= 2 ? codepoints[start_pos - 1] : U'\0';
+  if (start_pos >= 2 && hiragana_end == kanji_end + 1 && kanji_end == start_pos + 1 &&
+      char_types[start_pos - 1] == CharType::Hiragana && char_types[start_pos - 2] == CharType::Kanji &&
+      (kana::isIRowCodepoint(left_kana) || kana::isERowCodepoint(left_kana)) && !isCaseParticleCodepoint(left_kana) &&
+      left_kana != U'て' && verb_helpers::namesDictionaryVerbContinuative(&dict_manager, codepoints, kanji_end)) {
+    return;
+  }
+
   // Match the bound noun that heads the compound. Longest match first, so a
   // multi-kanji head (待ち時間) wins over a prefix of it.
   if (hiragana_end >= codepoints.size()) {

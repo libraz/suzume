@@ -773,6 +773,15 @@ float Scorer::connectionCost(const core::LatticeEdge& prev, const core::LatticeE
     SUZUME_CONNECTION_ADD(surface_bonus, sc::kPenaltyUnstackableCaseTopic);
   }
 
+  // A formal noun spelled with okurigana (付け, 当たり, 通り) is itself a verb
+  // continuative; after another continuative it is the second verb of a
+  // compound (受け付け), not the nominal the 書き+方 bonus is meant for.
+  if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei && next.extended_pos == core::ExtendedPOS::NounFormal &&
+      next.fromDictionary() && !grammar::isPureHiragana(next.surface) &&
+      grammar::isPureHiragana(utf8::lastChar(next.surface))) {
+    SUZUME_CONNECTION_ADD(surface_bonus, sc::kPenaltyDeverbalFormalNounAfterRenyokei);
+  }
+
   // Penalty for で(VERB_連用 of 出る) → ない(AUX_否定): copula でない is more common
   // でない = "is not" (copula) vs "doesn't come out" (verb 出る)
   // Without context (を/から before で), copula interpretation should win

@@ -250,6 +250,10 @@ constexpr float kPenaltyHiraganaNounToSuruTip = 0.08F;
 // topic stacking bonus and price the pair like two adjacent case particles.
 constexpr float kPenaltyUnstackableCaseTopic = bigram_cost::kVeryRare - bigram_cost::kVeryStrongBonus;
 
+// A continuative-shaped formal noun after a verb continuative (受け+付け) is a
+// compound's second verb: cancel the renyokei to formal-noun bonus.
+constexpr float kPenaltyDeverbalFormalNounAfterRenyokei = -bigram_cost::kVeryStrongBonus;
+
 // =============================================================================
 // Word-Cost Length-Scaled Surface Bonuses (wordCost)
 // =============================================================================
