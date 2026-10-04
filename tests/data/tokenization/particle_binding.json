@@ -1738,7 +1738,7 @@
         },
         {
           "lemma": "いる",
-          "pos": "Verb",
+          "pos": "Auxiliary",
           "surface": "い"
         },
         {
@@ -2856,6 +2856,85 @@
       ],
       "id": "womo_oshimanai",
       "input": "命をも惜しまない"
+    },
+    {
+      "description": "Progressive いる stays auxiliary across a topic particle in the te frame",
+      "expected": [
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "い"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "wo_tehainai",
+      "input": "本を見てはいない"
+    },
+    {
+      "description": "Negative control: いる after conjunctive から stays a verb",
+      "expected": [
+        {
+          "lemma": "家",
+          "pos": "Noun",
+          "surface": "家"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "から",
+          "pos": "Particle",
+          "surface": "から"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "いる"
+        }
+      ],
+      "id": "ni_tekarairu",
+      "input": "家に来てからいる"
     }
   ],
   "description": "Binding and adverbial particles (は、も、だけ)",

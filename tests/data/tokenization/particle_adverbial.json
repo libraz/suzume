@@ -1321,7 +1321,7 @@
         },
         {
           "lemma": "いる",
-          "pos": "Verb",
+          "pos": "Auxiliary",
           "surface": "い"
         },
         {
@@ -1368,7 +1368,7 @@
         },
         {
           "lemma": "いる",
-          "pos": "Verb",
+          "pos": "Auxiliary",
           "surface": "いる"
         }
       ],
@@ -1422,7 +1422,7 @@
         },
         {
           "lemma": "いる",
-          "pos": "Verb",
+          "pos": "Auxiliary",
           "surface": "い"
         },
         {

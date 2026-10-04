@@ -381,9 +381,24 @@ class TestPostprocessIruAux:
         assert tokens[1]["pos"] == "Verb"
 
     def test_iru_after_focused_te_form(self):
-        tokens = [_tok("で", "Particle"), _tok("しか", "Particle"), _tok("い", "Verb", lemma="いる")]
+        tokens = [_tok("で", "Particle"), _tok("しか", "Particle", pos_sub1="係助詞"), _tok("い", "Verb", lemma="いる")]
         postprocess_iru_aux(tokens)
         assert tokens[2]["pos"] == "Auxiliary"
+
+    @pytest.mark.parametrize(("particle", "sub"), [("は", "係助詞"), ("など", "副助詞"), ("ばかり", "副助詞")])
+    def test_iru_after_topic_or_adverbial_particle_in_te_frame(self, particle, sub):
+        tokens = [_tok("て", "Particle"), _tok(particle, "Particle", pos_sub1=sub), _tok("いる", "Verb", lemma="いる")]
+        postprocess_iru_aux(tokens)
+        assert tokens[2]["pos"] == "Auxiliary"
+
+    def test_iru_after_conjunctive_particle_stays_verb(self):
+        tokens = [
+            _tok("て", "Particle"),
+            _tok("から", "Particle", pos_sub1="接続助詞"),
+            _tok("いる", "Verb", lemma="いる"),
+        ]
+        postprocess_iru_aux(tokens)
+        assert tokens[2]["pos"] == "Verb"
 
     def test_conditional_iru_after_focus_retains_reference_pos(self):
         tokens = [_tok("で", "Particle"), _tok("さえ", "Particle"), _tok("いれ", "Verb", lemma="いる")]

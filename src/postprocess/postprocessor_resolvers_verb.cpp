@@ -274,8 +274,12 @@ void resolveProgressiveIru(std::vector<core::Morpheme>& result) {
     auto& iru = result[idx];
     const auto& immediate = result[idx - 1];
     const bool direct_te_form = followsTeFormConnective(immediate);
-    const bool focused_te_form = idx >= 2 && immediate.extended_pos == core::ExtendedPOS::ParticleBinding &&
-                                 followsTeFormConnective(result[idx - 2]);
+    // A binding or adverbial particle may sit inside the frame (見て+は+いない,
+    // 読んで+ばかり+いる) without making いる existential.
+    const bool framed_particle = immediate.extended_pos == core::ExtendedPOS::ParticleTopic ||
+                                 immediate.extended_pos == core::ExtendedPOS::ParticleAdverbial ||
+                                 immediate.extended_pos == core::ExtendedPOS::ParticleBinding;
+    const bool focused_te_form = idx >= 2 && framed_particle && followsTeFormConnective(result[idx - 2]);
     const bool finite_iru_form =
         iru.extended_pos == core::ExtendedPOS::VerbShuushikei || iru.extended_pos == core::ExtendedPOS::VerbRenyokei;
     if ((!direct_te_form && !focused_te_form) || iru.lemma != "いる" || !finite_iru_form) {

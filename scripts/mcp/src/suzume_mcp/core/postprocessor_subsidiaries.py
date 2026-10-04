@@ -55,7 +55,6 @@ def postprocess_closed_subsidiary_aux(tokens: list[dict]) -> bool:
 @reports_mutation
 def postprocess_iru_aux(tokens: list[dict]) -> bool:
     """Fix dependent い/いる after a te-form: Verb -> Auxiliary."""
-    focus_particles = frozenset({"さえ", "しか", "こそ", "も"})
     for i in range(1, len(tokens)):
         t = tokens[i]
         surface = t.get("surface", "")
@@ -65,9 +64,12 @@ def postprocess_iru_aux(tokens: list[dict]) -> bool:
             continue
         prev_surface = tokens[i - 1].get("surface", "")
         direct_te_form = prev_surface in ("て", "で")
+        # A binding or adverbial particle may sit inside the frame (見て+は+いない,
+        # 読んで+ばかり+いる) without making いる existential.
         focused_te_form = (
             surface in ("い", "いる")
-            and prev_surface in focus_particles
+            and tokens[i - 1].get("pos") == "Particle"
+            and (tokens[i - 1].get("pos_sub1") or "").startswith(("係助詞", "副助詞"))
             and i >= 2
             and tokens[i - 2].get("surface") in ("て", "で")
         )
