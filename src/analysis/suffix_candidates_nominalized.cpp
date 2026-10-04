@@ -263,8 +263,14 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
 
   const char32_t first_hiragana = codepoints[kanji_end];
 
+  // A compound whose final kanji plus this mora is the continuative of a
+  // dictionary verb is a nominalization whatever the mora spells (手当て,
+  // 見比べ), including the particle-like て and the endings listed below.
+  const bool ends_on_dictionary_continuative =
+      kanji_end - start_pos >= 2 && verb_helpers::namesDictionaryVerbContinuative(dict_manager, codepoints, kanji_end);
+
   // Skip particles that never form nominalizations
-  if (normalize::isParticleCodepoint(first_hiragana)) {
+  if (normalize::isParticleCodepoint(first_hiragana) && !ends_on_dictionary_continuative) {
     return;
   }
 
@@ -275,7 +281,7 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
        first_hiragana == U'ぎ' || first_hiragana == U'し' || first_hiragana == U'ま' || first_hiragana == U'み' ||
        first_hiragana == U'び' || first_hiragana == U'え' || first_hiragana == U'れ' || first_hiragana == U'め');
 
-  if (!is_nominalization_ending) {
+  if (!is_nominalization_ending && !ends_on_dictionary_continuative) {
     return;
   }
 
@@ -506,9 +512,25 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
         verb_helpers::itadakuParadigmStartsAt(codepoints, kanji_end + 1);
     const bool has_temporal_nominal_continuation =
         grammar::startsClosedTemporalNominal(extractSubstring(codepoints, kanji_end + 1, codepoints.size()));
+    // A kanji noun head right after the okurigana selects a nominal the way a
+    // particle does: a bare continuative does not run into a noun without a
+    // comma (手続き方法, 手書き文字). A head that inflects is the second verb
+    // of a compound instead (読み+終わる), so the head must itself close on a
+    // nominal selector. Only a compound qualifies: a one-kanji continuative,
+    // or one whose whole span is a dictionary verb (先立ち), keeps its verb
+    // reading before a noun.
+    const size_t head_end = findCharRegionEnd(char_types, kanji_end + 1, codepoints.size(), normalize::CharType::Kanji);
+    const std::string run_stem = extractSubstring(codepoints, start_pos, kanji_end);
+    const bool whole_span_is_verb =
+        verb_helpers::hasDictionaryGodanBaseFromIRow(dict_manager, run_stem, first_hiragana) ||
+        (grammar::isMonogradeStemFinalKana(first_hiragana) &&
+         verb_helpers::isVerbInDictionary(dict_manager, run_stem + normalize::encodeUtf8(first_hiragana) + "る"));
+    const bool heads_kanji_compound = kanji_count >= 2 && !whole_span_is_verb && head_end > kanji_end + 1 &&
+                                      selectsNominalHost(dict_manager, codepoints, char_types, head_end);
     if (has_particle_continuation || has_final_particle_continuation ||
         isGenitiveClauseFinalNominal(codepoints, char_types, start_pos, kanji_end + 1, dict_manager) ||
-        has_temporal_nominal_continuation || has_hiragana_noun_continuation || has_humble_auxiliary_continuation) {
+        has_temporal_nominal_continuation || has_hiragana_noun_continuation || has_humble_auxiliary_continuation ||
+        heads_kanji_compound) {
       nom1_cost += candidate::kNominalizedNounParticleBonus;
     }
     // Deverbal compound noun (連用形転成名詞の複合). The longest verified
@@ -552,12 +574,8 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
     // continuative the grammar derives from a verb it knows (水|流れ). Price
     // the guess above that split so a fabricated compound cannot undercut its
     // own constituents.
-    // A kanji head right after the okurigana is such a frame as well: a bare
-    // continuative does not run into a noun without a comma (手続き方法).
-    const bool heads_kanji_compound =
-        kanji_end + 1 < char_types.size() && char_types[kanji_end + 1] == normalize::CharType::Kanji;
-    const bool has_nominal_evidence = nom1_cost < base_nom1_cost || has_particle_continuation || nominal_compound ||
-                                      is_classical_iadjective_terminal || heads_kanji_compound;
+    const bool has_nominal_evidence =
+        nom1_cost < base_nom1_cost || has_particle_continuation || nominal_compound || is_classical_iadjective_terminal;
     if (!has_nominal_evidence && kanji_count >= 2) {
       nom1_cost += candidate::kUnselectedNominalizationPenalty;
     }

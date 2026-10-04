@@ -956,6 +956,60 @@
       ],
       "id": "ki_wo_suru_2",
       "input": "手続き方法を確認する"
+    },
+    {
+      "description": "手書き文字を読む - regression test",
+      "expected": [
+        {
+          "lemma": "手書き",
+          "pos": "Noun",
+          "surface": "手書き"
+        },
+        {
+          "lemma": "文字",
+          "pos": "Noun",
+          "surface": "文字"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読む"
+        }
+      ],
+      "id": "ki_wo_mu_2",
+      "input": "手書き文字を読む"
+    },
+    {
+      "description": "手当て期間が終わる - regression test",
+      "expected": [
+        {
+          "lemma": "手当て",
+          "pos": "Noun",
+          "surface": "手当て"
+        },
+        {
+          "lemma": "期間",
+          "pos": "Noun",
+          "surface": "期間"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "終わる",
+          "pos": "Verb",
+          "surface": "終わる"
+        }
+      ],
+      "id": "te_ga_waru",
+      "input": "手当て期間が終わる"
     }
   ],
   "description": "noun_compounds tests",
