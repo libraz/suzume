@@ -1533,6 +1533,60 @@
       ],
       "id": "nikukattta",
       "input": "見にくかった"
+    },
+    {
+      "description": "Kana ichidan continuative after a case particle is not the bound suffix がかる",
+      "expected": [
+        {
+          "lemma": "花",
+          "pos": "Noun",
+          "surface": "花"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "かれる",
+          "pos": "Verb",
+          "surface": "かれ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "gakareta",
+      "input": "花がかれた"
+    },
+    {
+      "description": "Negative control: bound suffix がかる stays whole after a noun",
+      "expected": [
+        {
+          "lemma": "芝居",
+          "pos": "Noun",
+          "surface": "芝居"
+        },
+        {
+          "lemma": "がかる",
+          "pos": "Verb",
+          "surface": "がかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "話",
+          "pos": "Noun",
+          "surface": "話"
+        }
+      ],
+      "id": "gakattta_4",
+      "input": "芝居がかった話"
     }
   ],
   "description": "Ichidan verbs (一段動詞) (part 2/2)",

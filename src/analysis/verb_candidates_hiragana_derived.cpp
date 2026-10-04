@@ -287,8 +287,15 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
 
     // Likewise, a short candidate beginning inside a registered verb is its
     // final morae rather than an independent predicate (しまい+ます, not
-    // し+まい(まいる)+ます).
-    if (!is_dict_verb && end_pos - start_pos == 2 && start_pos > 0 &&
+    // し+まい(まいる)+ます). A case particle behind a kanji host closes that
+    // host instead (木+が+かれ, not がかれ).
+    const auto* preceding_particle =
+        start_pos > 1 && dict_manager != nullptr && normalize::isKanjiCodepoint(codepoints[start_pos - 2])
+            ? lookupEntryInRange(*dict_manager, codepoints, start_pos - 1, start_pos, core::PartOfSpeech::Particle)
+            : nullptr;
+    const bool follows_case_particle_on_kanji =
+        preceding_particle != nullptr && preceding_particle->extended_pos == core::ExtendedPOS::ParticleCase;
+    if (!is_dict_verb && end_pos - start_pos == 2 && start_pos > 0 && !follows_case_particle_on_kanji &&
         vh::isVerbInDictionary(dict_manager, codepoints, start_pos - 1, end_pos)) {
       continue;
     }
