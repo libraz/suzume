@@ -27,6 +27,7 @@ bool hasAsciiRunLeftNeighbor(std::string_view text, size_t pos, std::string_view
 bool startsWithCI(std::string_view text, size_t pos, std::string_view prefix);
 bool absorbsPeriodKan(std::string_view text, size_t pos_after_kan);
 bool hasIntervalSuffix(std::string_view text, size_t pos);
+bool strandsLoneKanji(std::string_view text, size_t pos);
 void setTokenFromRange(PreToken& token, std::string_view text, size_t start, size_t end, PreTokenType type,
                        core::PartOfSpeech pos);
 

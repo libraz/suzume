@@ -129,7 +129,8 @@ bool PreTokenizer::tryMatchDate(std::string_view text, size_t pos, PreToken& tok
     }
   }
 
-  if (idx > pos) {
+  // A bare year leaves a following lone kanji to the analyzer (3年生).
+  if (idx > pos && !(idx == year_end && strandsLoneKanji(text, idx))) {
     setTokenFromRange(token, text, pos, idx, PreTokenType::Date, core::PartOfSpeech::Noun);
     return true;
   }
@@ -353,6 +354,7 @@ bool PreTokenizer::tryMatchTime(std::string_view text, size_t pos, PreToken& tok
   if (!consumeCodepoint(text, idx, U'時')) {
     return false;
   }
+  const size_t hour_end = idx;
 
   // A duration starts with 時間 rather than 時. Consume 間 before scanning
   // its optional minute/second fields so 1時間15分 remains one quantity.
@@ -377,7 +379,8 @@ bool PreTokenizer::tryMatchTime(std::string_view text, size_t pos, PreToken& tok
   consumePeriodKan(text, idx);
 
   if (idx > pos) {
-    if (hasIntervalSuffix(text, idx)) {
+    // A bare hour leaves a following lone kanji to the analyzer (3時限).
+    if (hasIntervalSuffix(text, idx) || (idx == hour_end && strandsLoneKanji(text, idx))) {
       return false;
     }
     setTokenFromRange(token, text, pos, idx, PreTokenType::Time, core::PartOfSpeech::Noun);

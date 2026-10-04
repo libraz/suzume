@@ -2055,6 +2055,121 @@
       ],
       "id": "3_ni_u",
       "input": "3年後に会う"
+    },
+    {
+      "description": "彼は3年生です - regression test",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "3年生",
+          "pos": "Noun",
+          "surface": "3年生"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "ha3_desu",
+      "input": "彼は3年生です"
+    },
+    {
+      "description": "3時限目に行く - regression test",
+      "expected": [
+        {
+          "lemma": "3時限目",
+          "pos": "Noun",
+          "surface": "3時限目"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行く"
+        }
+      ],
+      "id": "3_ni_ku",
+      "input": "3時限目に行く"
+    },
+    {
+      "description": "3年制の学校 - regression test",
+      "expected": [
+        {
+          "lemma": "3年制",
+          "pos": "Noun",
+          "surface": "3年制"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "学校",
+          "pos": "Noun",
+          "surface": "学校"
+        }
+      ],
+      "id": "3_no_2",
+      "input": "3年制の学校"
+    },
+    {
+      "description": "平成3年生まれです - regression test",
+      "expected": [
+        {
+          "lemma": "平成",
+          "pos": "Noun",
+          "surface": "平成"
+        },
+        {
+          "lemma": "3年",
+          "pos": "Noun",
+          "surface": "3年"
+        },
+        {
+          "lemma": "生まれ",
+          "pos": "Noun",
+          "surface": "生まれ"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "3_maredesu",
+      "input": "平成3年生まれです"
+    },
+    {
+      "description": "3時間かかる - regression test",
+      "expected": [
+        {
+          "lemma": "3時間",
+          "pos": "Noun",
+          "surface": "3時間"
+        },
+        {
+          "lemma": "かかる",
+          "pos": "Verb",
+          "surface": "かかる"
+        }
+      ],
+      "id": "3_kakaru_2",
+      "input": "3時間かかる"
     }
   ],
   "description": "number_counter tests",
