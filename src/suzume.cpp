@@ -229,9 +229,30 @@ struct Suzume::Impl {
     warnDictionary("Failed to auto-load dictionary " + path + ": " + error.message);
   }
 
-  void warnDictionaryMissing(const std::string& filename) {
-    warnDictionary("Dictionary not found in automatic search paths: " + filename);
+#ifdef SUZUME_USE_EMBEDDED_DICT
+  using MemoryLoader = core::Expected<size_t, core::Error> (dictionary::DictionaryManager::*)(const uint8_t*, size_t);
+
+  void autoLoadDictionary(const char* filename, MemoryLoader load, const uint8_t* data, size_t size) {
+    auto result = (analyzer.dictionaryManager().*load)(data, size);
+    if (!result.hasValue()) {
+      warnDictionaryLoad(std::string("embedded ") + filename, result.error());
+    }
   }
+#else
+  using FileLoader = core::Expected<size_t, core::Error> (dictionary::DictionaryManager::*)(const std::string&);
+
+  void autoLoadDictionary(const char* filename, FileLoader load, const std::string& data_directory) {
+    const std::string path = findDictionary(filename, data_directory);
+    if (path.empty()) {
+      warnDictionary(std::string("Dictionary not found in automatic search paths: ") + filename);
+      return;
+    }
+    auto result = (analyzer.dictionaryManager().*load)(path);
+    if (!result.hasValue()) {
+      warnDictionaryLoad(path, result.error());
+    }
+  }
+#endif
 
   void appendDictionaryWarnings(std::vector<std::string> warnings) {
     runtime_dictionary_warnings.insert(runtime_dictionary_warnings.end(), std::make_move_iterator(warnings.begin()),
@@ -252,46 +273,21 @@ struct Suzume::Impl {
         analyzer(loaded_config.analyzer_options),
         postprocessor(&analyzer.dictionaryManager(), postprocessOptionsFor(opts)),
         dictionary_warnings(std::move(loaded_config.diagnostics)) {
-    // Auto-load core.dic if found (binary format)
+    using dictionary::DictionaryManager;
     if (!opts.skip_core_dictionary) {
 #ifdef SUZUME_USE_EMBEDDED_DICT
-      auto result = analyzer.dictionaryManager().loadCoreDictionaryFromMemoryResult(embedded::kCoreDictionary,
-                                                                                    embedded::kCoreDictionarySize);
-      if (!result.hasValue()) {
-        warnDictionaryLoad("embedded core.dic", result.error());
-      }
+      autoLoadDictionary("core.dic", &DictionaryManager::loadCoreDictionaryFromMemoryResult, embedded::kCoreDictionary,
+                         embedded::kCoreDictionarySize);
 #else
-      std::string core_path = findDictionary("core.dic", opts.data_directory);
-      if (!core_path.empty()) {
-        auto result = analyzer.dictionaryManager().loadCoreDictionaryResult(core_path);
-        if (!result.hasValue()) {
-          warnDictionaryLoad(core_path, result.error());
-        }
-      } else {
-        warnDictionaryMissing("core.dic");
-      }
+      autoLoadDictionary("core.dic", &DictionaryManager::loadCoreDictionaryResult, opts.data_directory);
 #endif
     }
-
-    // Auto-load user.dic if found (binary format)
-    // Note: user.dic is also loaded as core binary dictionary for now
     if (!opts.skip_user_dictionary) {
 #ifdef SUZUME_USE_EMBEDDED_DICT
-      auto result = analyzer.dictionaryManager().loadBundledUserBinaryDictionaryFromMemoryResult(
-          embedded::kUserDictionary, embedded::kUserDictionarySize);
-      if (!result.hasValue()) {
-        warnDictionaryLoad("embedded user.dic", result.error());
-      }
+      autoLoadDictionary("user.dic", &DictionaryManager::loadBundledUserBinaryDictionaryFromMemoryResult,
+                         embedded::kUserDictionary, embedded::kUserDictionarySize);
 #else
-      std::string user_path = findDictionary("user.dic", opts.data_directory);
-      if (!user_path.empty()) {
-        auto result = analyzer.dictionaryManager().loadBundledUserBinaryDictionaryResult(user_path);
-        if (!result.hasValue()) {
-          warnDictionaryLoad(user_path, result.error());
-        }
-      } else {
-        warnDictionaryMissing("user.dic");
-      }
+      autoLoadDictionary("user.dic", &DictionaryManager::loadBundledUserBinaryDictionaryResult, opts.data_directory);
 #endif
     }
 #ifndef SUZUME_USE_EMBEDDED_DICT
@@ -420,9 +416,7 @@ core::Expected<core::AnalysisOutput, core::Error> Suzume::analyzeWithNormalizedT
 }
 
 std::vector<core::Morpheme> Suzume::analyzeDebug(std::string_view text, core::Lattice* out_lattice) const {
-  auto morphemes = impl_->analyzer.analyzeDebug(text, out_lattice);
-  morphemes = impl_->postprocessor.process(std::move(morphemes));
-  return morphemes;
+  return impl_->postprocessor.process(impl_->analyzer.analyzeDebug(text, out_lattice));
 }
 
 std::vector<postprocess::TagEntry> Suzume::generateTags(std::string_view text) const {

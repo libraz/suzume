@@ -334,28 +334,24 @@ suzume_result_t* analyzeBytes(SuzumeHandle* handle, std::string_view text) {
   return result;
 }
 
-suzume_tags_t* generateTagsBytes(SuzumeHandle* handle, std::string_view text, const suzume_tag_options_t* options) {
-  if (options == nullptr) {
-    auto result = handle->instance.generateTagsResult(text);
-    if (!result.hasValue()) {
-      setLastError(result.error());
-      return nullptr;
-    }
-    return makeTagsResult(result.value());
-  }
-
+suzume::postprocess::TagGeneratorOptions toTagGeneratorOptions(const suzume_tag_options_t& options) {
   suzume::postprocess::TagGeneratorOptions tag_opts;
-  tag_opts.pos_filter = options->pos_filter;
-  tag_opts.exclude_basic = (options->exclude_basic != 0);
-  tag_opts.use_lemma = (options->use_lemma != 0);
-  tag_opts.min_tag_length = options->min_length;
-  tag_opts.max_tags = options->max_tags;
-  tag_opts.exclude_particles = (options->exclude_particles != 0);
-  tag_opts.exclude_auxiliaries = (options->exclude_auxiliaries != 0);
-  tag_opts.exclude_formal_nouns = (options->exclude_formal_nouns != 0);
-  tag_opts.exclude_low_info = (options->exclude_low_info != 0);
-  tag_opts.remove_duplicates = (options->remove_duplicates != 0);
-  auto result = handle->instance.generateTagsResult(text, tag_opts);
+  tag_opts.pos_filter = options.pos_filter;
+  tag_opts.exclude_basic = (options.exclude_basic != 0);
+  tag_opts.use_lemma = (options.use_lemma != 0);
+  tag_opts.min_tag_length = options.min_length;
+  tag_opts.max_tags = options.max_tags;
+  tag_opts.exclude_particles = (options.exclude_particles != 0);
+  tag_opts.exclude_auxiliaries = (options.exclude_auxiliaries != 0);
+  tag_opts.exclude_formal_nouns = (options.exclude_formal_nouns != 0);
+  tag_opts.exclude_low_info = (options.exclude_low_info != 0);
+  tag_opts.remove_duplicates = (options.remove_duplicates != 0);
+  return tag_opts;
+}
+
+suzume_tags_t* generateTagsBytes(SuzumeHandle* handle, std::string_view text, const suzume_tag_options_t* options) {
+  auto result = options == nullptr ? handle->instance.generateTagsResult(text)
+                                   : handle->instance.generateTagsResult(text, toTagGeneratorOptions(*options));
   if (!result.hasValue()) {
     setLastError(result.error());
     return nullptr;
