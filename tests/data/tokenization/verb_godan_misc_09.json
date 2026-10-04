@@ -198,6 +198,161 @@
       ],
       "id": "wo_ida",
       "input": "荷物を担いだ"
+    },
+    {
+      "description": "ちらかした - regression test",
+      "expected": [
+        {
+          "lemma": "ちらかす",
+          "pos": "Verb",
+          "surface": "ちらかし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "chirakashita",
+      "input": "ちらかした"
+    },
+    {
+      "description": "あまやかした - regression test",
+      "expected": [
+        {
+          "lemma": "あまやかす",
+          "pos": "Verb",
+          "surface": "あまやかし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "amayakashita",
+      "input": "あまやかした"
+    },
+    {
+      "description": "こどもをあまやかして育てた - regression test",
+      "expected": [
+        {
+          "lemma": "こども",
+          "pos": "Noun",
+          "surface": "こども"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "あまやかす",
+          "pos": "Verb",
+          "surface": "あまやかし"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "育てる",
+          "pos": "Verb",
+          "surface": "育て"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "kodomowoamayakashite_teta",
+      "input": "こどもをあまやかして育てた"
+    },
+    {
+      "description": "大きな音がねこをおどろかした - regression test",
+      "expected": [
+        {
+          "lemma": "大きな",
+          "pos": "Determiner",
+          "surface": "大きな"
+        },
+        {
+          "lemma": "音",
+          "pos": "Noun",
+          "surface": "音"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ねこ",
+          "pos": "Noun",
+          "surface": "ねこ"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "おどろかす",
+          "pos": "Verb",
+          "surface": "おどろかし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "kina_ganekowoodorokashita",
+      "input": "大きな音がねこをおどろかした"
+    },
+    {
+      "description": "部屋をちらかしたまま出かけた - regression test",
+      "expected": [
+        {
+          "lemma": "部屋",
+          "pos": "Noun",
+          "surface": "部屋"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "ちらかす",
+          "pos": "Verb",
+          "surface": "ちらかし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "まま",
+          "pos": "Noun",
+          "surface": "まま"
+        },
+        {
+          "lemma": "出かける",
+          "pos": "Verb",
+          "surface": "出かけ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wochirakashitamama_kaketa",
+      "input": "部屋をちらかしたまま出かけた"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",

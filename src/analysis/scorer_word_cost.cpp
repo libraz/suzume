@@ -67,32 +67,24 @@ float computeAdjectiveDictBonus(const core::LatticeEdge& edge, size_t char_len) 
     // A multi-mora pure-hiragana entry is contested the way its noun,
     // determiner and conjunction peers are: a shorter registered adverb ending
     // inside it takes the head and leaves the tail to a particle (もっと+も).
-    // The minor bonus this once carried lost that trade by two full points.
     if (grammar::isPureHiragana(edge.surface) && char_len >= 4) {
       complete_adjective_bonus += cost::kExtremeBonus;
     }
   } else if (isCompleteDictionaryAdjective(edge) && grammar::isPureHiragana(edge.surface) &&
              !utf8::endsWith(edge.surface, "ければ") && edge.surface != "ない" && edge.surface != "なく" &&
              edge.surface != "なかっ" && edge.surface != "そう") {
-    // Bonus for hiragana i-adjectives from dictionary
-    // Prevents misanalysis as verb+たい (e.g., つめたい → つめ+たい)
-    // or as adverb+verb+aux (e.g., はなはだしい → はなはだ+し+い)
-    // Longer adjectives get stronger bonus to beat split paths
-    // Exclude AdjStem (語幹) as it's not a complete i-adjective
-    // Exclude conditional forms ending in ければ (should split: よければ → よけれ + ば)
-    // Base bonus -2.5, plus 0.5 per character beyond 3
+    // Hiragana i-adjectives must beat verb+たい (つめ+たい) and adverb+verb+aux
+    // (はなはだ+し+い) splits; longer ones need more. Conditional ければ forms
+    // still split (よけれ+ば).
     complete_adjective_bonus = lengthScaledBonus(sc::kBonusHiraganaAdjBase, char_len, 3, sc::kBonusHiraganaAdjPerChar);
   }
   bonus += complete_adjective_bonus;
 
-  // Bonus for kanji+い i-adjectives from dictionary
-  // Prevents misanalysis as godan-wa verb (e.g., 暑い → 暑い(VERB wa-row renyokei))
-  // Kanji i-adjectives are common (暑い, 寒い, 熱い, 高い, 安い, etc.)
-  // The godan-wa verb candidate often beats the adjective due to connection bonuses
-  // Surface pattern: 1 kanji + い (2 codepoints total)
+  // One kanji + い must beat the godan-wa renyokei reading (暑い), which
+  // otherwise wins on connection bonuses.
   if (isCompleteDictionaryAdjective(edge) && char_len == 2 && utf8::endsWith(edge.surface, "い") &&
       normalize::isKanjiCodepoint(utf8::decodeFirstChar(edge.surface))) {
-    bonus += cost::kModerateBonus;  // -0.5 to beat godan-wa verb candidate
+    bonus += cost::kModerateBonus;
   }
 
   // Bonus for kanji+okurigana i-adjectives from dictionary (情けない, etc.)
@@ -108,6 +100,13 @@ float computeAdjectiveDictBonus(const core::LatticeEdge& edge, size_t char_len) 
   }
 
   return bonus;
+}
+
+// A godan-sa continuative whose stem is the transitive -asu derivation.
+bool isTransitiveAsuContinuative(std::string_view surface) {
+  const auto codepoints = normalize::toCodepoints(surface);
+  return codepoints.size() >= 2 && codepoints.back() == U'し' &&
+         grammar::isTransitiveAsuStem(std::u32string_view(codepoints.data(), codepoints.size() - 1));
 }
 
 /// Penalties for spurious non-dictionary verb renyokei/stem candidates.
@@ -126,10 +125,9 @@ float computeSpuriousVerbPenalty(const core::LatticeEdge& edge) {
       edge.extended_pos == core::ExtendedPOS::VerbRenyokei || edge.extended_pos == core::ExtendedPOS::VerbMizenkei;
   if (!edge.lemmaVerified() && edge.pos == core::PartOfSpeech::Verb && is_bare_verb_stem &&
       edge.surface.length() >= core::kThreeJapaneseCharBytes) {  // ≥3 chars (at least 2 kanji + 1 hiragana)
-    // Count kanji characters
     size_t kanji_count = 0;
-    for (char32_t cp : suzume::normalize::utf8::decode(edge.surface)) {
-      if (suzume::normalize::isKanjiCodepoint(cp)) {
+    for (char32_t cp : normalize::toCodepoints(edge.surface)) {
+      if (normalize::isKanjiCodepoint(cp)) {
         ++kanji_count;
       }
     }
@@ -203,10 +201,12 @@ float computeSpuriousVerbPenalty(const core::LatticeEdge& edge) {
 
   // Penalty for 5-char pure-hiragana verb renyokei not in dictionary
   // E.g., "つるつるし" as godan-sa renyokei — should be つるつる(ADV) + し(する)
-  // Only renyokei: base forms like "づけられる" (from づける) are legitimate
+  // Only renyokei: base forms like "づけられる" (from づける) are legitimate.
+  // The -asu derivation lengthens the stem by one mora (あまやか+し).
   if (!edge.fromDictionary() && edge.pos == core::PartOfSpeech::Verb &&
       edge.extended_pos == core::ExtendedPOS::VerbRenyokei && grammar::isPureHiragana(edge.surface) &&
-      edge.surface.size() >= core::kFiveJapaneseCharBytes) {  // 5+ hiragana chars (5*3=15 bytes)
+      edge.surface.size() >= core::kFiveJapaneseCharBytes &&  // 5+ hiragana chars (5*3=15 bytes)
+      !isTransitiveAsuContinuative(edge.surface)) {
     penalty += sc::kPenaltyVeryLongHiraganaVerb;
   }
 
@@ -218,7 +218,7 @@ float computeSpuriousVerbPenalty(const core::LatticeEdge& edge) {
   // Valid pattern: 漢字 + い (renyokei) vs invalid: 漢字 + いし (fake verb base 漢字いす)
   if (!edge.fromDictionary() && edge.pos == core::PartOfSpeech::Verb &&
       edge.extended_pos == core::ExtendedPOS::VerbRenyokei && grammar::containsKanji(edge.surface) &&
-      utf8::endsWith(edge.surface, "いし") && edge.surface.size() >= 9) {  // At least 1 kanji + いし (3 + 6 bytes)
+      utf8::endsWith(edge.surface, "いし") && edge.surface.size() >= core::kThreeJapaneseCharBytes) {
     penalty += sc::kPenaltyIshiVerbRenyokei;
   }
 
@@ -247,7 +247,7 @@ float computeVerbEndingPenalty(const core::LatticeEdge& edge) {
   // Exception: keep short forms (2 chars like して, きて) as they're common L1 entries
   if (!edge.fromDictionary() && edge.pos == core::PartOfSpeech::Verb &&
       edge.extended_pos == core::ExtendedPOS::VerbTeForm && grammar::isPureHiragana(edge.surface) &&
-      edge.surface.size() >= 9) {  // 3+ chars (9 bytes) - allows して, きて
+      edge.surface.size() >= core::kThreeJapaneseCharBytes) {  // keeps して, きて
     penalty += cost::kVeryRare;
   }
 
@@ -529,7 +529,7 @@ float computeAdverbDictBonus(const core::LatticeEdge& edge, size_t char_len) {
 }  // namespace
 
 float Scorer::wordCost(const core::LatticeEdge& edge) const {
-  // v0.8: Base cost from ExtendedPOS category
+  // Base cost from ExtendedPOS category
   float category_cost = getCategoryCost(edge.extended_pos);
 
   // HasCustomCost distinguishes a tuned 0.0 from "unset"; unflagged edges use non-zero edge.cost, else category.

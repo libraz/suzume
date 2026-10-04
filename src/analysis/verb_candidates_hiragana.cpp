@@ -20,6 +20,7 @@
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
+#include "grammar/inflection_scorer_constants.h"
 #include "normalize/char_type.h"
 #include "normalize/exceptions.h"
 #include "normalize/utf8.h"
@@ -115,13 +116,21 @@ size_t closedOnbinTenseEnd(const std::vector<char32_t>& codepoints, size_t start
     // ま closes the predicate the same way (うごか+し+た, ごまか+し+ます). The
     // polite tail only analyzes together with its own inflected morae.
     if (onbin == U'し' && (tense == U'た' || tense == U'て' || tense == U'ま') && onbin_pos - start_pos >= 2) {
+      // The a-row mora before し is the transitive -asu derivation (あまやか+す),
+      // so it does not lengthen the root.
+      const std::u32string_view stem(codepoints.data() + start_pos, onbin_pos - start_pos);
+      const float min_confidence =
+          grammar::isTransitiveAsuStem(stem)
+              ? candidate::kParticleVerbBoundaryMinConfidence -
+                    (grammar::inflection::kPenaltyStemVeryLong - grammar::inflection::kPenaltyStemLong)
+              : candidate::kParticleVerbBoundaryMinConfidence;
       constexpr size_t kPoliteTailMax = 4;
       const size_t probe_limit = std::min(end_pos, onbin_pos + 1 + kPoliteTailMax);
       for (size_t surface_end = onbin_pos + 2; surface_end <= probe_limit; ++surface_end) {
         for (const auto& inflection_candidate : analysesInRange(inflection, codepoints, start_pos, surface_end)) {
           if (inflection_candidate.verb_type == grammar::VerbType::GodanSa &&
               start_pos + normalize::utf8Length(inflection_candidate.stem) == onbin_pos &&
-              inflection_candidate.confidence >= candidate::kParticleVerbBoundaryMinConfidence) {
+              inflection_candidate.confidence >= min_confidence) {
             return onbin_pos + 2;
           }
         }

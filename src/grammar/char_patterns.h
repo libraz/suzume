@@ -579,6 +579,14 @@ bool isIRowCodepoint(char32_t cp);
 bool isARowCodepoint(char32_t cp);
 
 /**
+ * @brief Check if a kana stem is the transitive -asu derivation of a godan-sa verb
+ *
+ * The stem ends in an a-row mora (あまやか, ちらか) and is not a reduplicated
+ * mimetic (ひやひや), which ends in the same mora without deriving anything.
+ */
+bool isTransitiveAsuStem(std::u32string_view stem);
+
+/**
  * @brief Check if a codepoint is o-row hiragana
  */
 bool isORowCodepoint(char32_t cp);

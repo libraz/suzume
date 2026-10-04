@@ -109,6 +109,14 @@ bool isARowCodepoint(char32_t cp) {
   return kana::isARowCodepoint(cp);
 }
 
+bool isTransitiveAsuStem(std::u32string_view stem) {
+  if (stem.empty() || !isARowCodepoint(stem.back())) {
+    return false;
+  }
+  const size_t half = stem.size() / 2;
+  return stem.size() % 2 != 0 || stem.substr(0, half) != stem.substr(half);
+}
+
 bool isORowCodepoint(char32_t cp) {
   return kana::isORowCodepoint(cp);
 }
