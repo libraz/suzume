@@ -1033,7 +1033,16 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
         // a stem reconstructed from it alone would start in the middle of a
         // word (音+聞こゆれ, not 音聞+こゆれ). An attested base form is lexical
         // evidence that outweighs the orthography; a fabricated one is not.
-        if (follows_kanji && dict_manager != nullptr && !vh::isVerbInDictionary(dict_manager, best.base_form)) {
+        // So does a run behind a registered verb cell (用い+ただけれ): its kana
+        // open the next morpheme, not a stem of their own.
+        const bool follows_verb_cell =
+            dict_manager != nullptr && start_pos > 0 &&
+            hasDictionaryEntryEndingAt(
+                *dict_manager, codepoints,
+                start_pos > kDictionaryLookbehindChars ? start_pos - kDictionaryLookbehindChars : 0, start_pos,
+                partOfSpeechMask(core::PartOfSpeech::Verb));
+        if ((follows_kanji || follows_verb_cell) && dict_manager != nullptr &&
+            !vh::isVerbInDictionary(dict_manager, best.base_form)) {
           continue;
         }
         candidates.push_back(makeVerbCandidate(codepoints, start_pos, stem_end, candidate::verb_cost::kStrongBonus,

@@ -33,6 +33,39 @@ bool isNonWordType(normalize::CharType type) {
   return type == normalize::CharType::Symbol || type == normalize::CharType::Emoji;
 }
 
+// Whether [start, end) splits into registered auxiliaries, the last of which
+// may run past end.
+bool spellsAuxiliaryChain(const dictionary::DictionaryManager& dict_manager, const std::vector<char32_t>& codepoints,
+                          size_t start, size_t end) {
+  std::vector<bool> reachable(end - start + 1, false);
+  reachable[0] = true;
+  for (size_t from = start; from < end; ++from) {
+    if (!reachable[from - start]) {
+      continue;
+    }
+    for (size_t to = from + 1; to <= end; ++to) {
+      if (!reachable[to - start] &&
+          lookupEntryInRange(dict_manager, codepoints, from, to, core::PartOfSpeech::Auxiliary) != nullptr) {
+        reachable[to - start] = true;
+      }
+    }
+  }
+  if (reachable[end - start]) {
+    return true;
+  }
+  // A run cut short inside an auxiliary (ま of ます) duplicates it as well.
+  constexpr size_t kMaxAuxiliaryChars = 8;
+  for (size_t from = start; from < end; ++from) {
+    if (reachable[from - start] &&
+        hasDictionaryEntryFrom(&dict_manager, codepoints, from, end - from + 1, kMaxAuxiliaryChars,
+                               core::PartOfSpeech::Auxiliary,
+                               [](const dictionary::DictionaryEntry& /*entry*/) { return true; })) {
+      return true;
+    }
+  }
+  return false;
+}
+
 // Particle that can immediately PRECEDE a content noun (私は…, 本を…, 犬が…). Used as
 // the left bracket of a post-particle noun promotion.
 bool isLeftBoundaryParticle(char32_t code_point) {
@@ -1025,6 +1058,14 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       // the head a determiner selects (こと+ある+ごと).
       if (start_type == normalize::CharType::Hiragana && pos == core::PartOfSpeech::Noun && dict_manager_ != nullptr &&
           dict_manager_->lookupExact(surface, core::PartOfSpeech::Suffix) != nullptr) {
+        continue;
+      }
+      // Likewise a run spelled wholly by a chain of registered auxiliaries
+      // (ます, ませ+ん): an opaque duplicate only bypasses the connection that
+      // licenses the chain (だけ+ます).
+      if (start_type == normalize::CharType::Hiragana && dict_manager_ != nullptr &&
+          (len > 1 || dict_manager_->lookupExact(surface, core::PartOfSpeech::Auxiliary) == nullptr) &&
+          spellsAuxiliaryChain(*dict_manager_, codepoints, start_pos, candidate_end)) {
         continue;
       }
       // A run of Latin letters or digits read as a nominal is one whose script

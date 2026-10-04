@@ -1422,6 +1422,119 @@
       ],
       "id": "shitai",
       "input": "確認したい"
+    },
+    {
+      "description": "Kango verbal noun before potential いただける keeps its kanji run",
+      "expected": [
+        {
+          "lemma": "ご",
+          "pos": "Prefix",
+          "surface": "ご"
+        },
+        {
+          "lemma": "利用",
+          "pos": "Noun",
+          "surface": "利用"
+        },
+        {
+          "lemma": "いただける",
+          "pos": "Verb",
+          "surface": "いただけ"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "go_itadakemasu",
+      "input": "ご利用いただけます"
+    },
+    {
+      "description": "Kango verbal noun before negative polite いただけません",
+      "expected": [
+        {
+          "lemma": "信用",
+          "pos": "Noun",
+          "surface": "信用"
+        },
+        {
+          "lemma": "いただける",
+          "pos": "Verb",
+          "surface": "いただけ"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ませ"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        }
+      ],
+      "id": "itadakemasen",
+      "input": "信用いただけません"
+    },
+    {
+      "description": "Kango verbal noun before conditional いただければ",
+      "expected": [
+        {
+          "lemma": "応用",
+          "pos": "Noun",
+          "surface": "応用"
+        },
+        {
+          "lemma": "いただける",
+          "pos": "Verb",
+          "surface": "いただけれ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "itadakereba",
+      "input": "応用いただければ"
+    },
+    {
+      "description": "Negative control: 用い + た + だけ stays split",
+      "expected": [
+        {
+          "lemma": "道具",
+          "pos": "Noun",
+          "surface": "道具"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "用いる",
+          "pos": "Verb",
+          "surface": "用い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "だけ",
+          "pos": "Particle",
+          "surface": "だけ"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "wo_itadakedesu",
+      "input": "道具を用いただけです"
     }
   ],
   "description": "Politeness auxiliaries (ます、です)",
