@@ -37,6 +37,12 @@ bool isVerbInDictionary(const dictionary::DictionaryManager* dict_manager, const
   return hasDictionaryEntry(dict_manager, extractSubstring(codepoints, start, end), core::PartOfSpeech::Verb);
 }
 
+bool hasDictionaryGodanBaseFromIRow(const dictionary::DictionaryManager* dict_manager, std::string_view stem,
+                                    char32_t i_row_kana) {
+  const std::string_view godan_ending = grammar::godanBaseSuffixFromIRow(i_row_kana);
+  return !godan_ending.empty() && isVerbInDictionary(dict_manager, normalize::concat(stem, godan_ending));
+}
+
 bool isAdjectiveInDictionary(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
                              size_t start, size_t end) {
   return hasDictionaryEntry(dict_manager, extractSubstring(codepoints, start, end), core::PartOfSpeech::Adjective);
@@ -49,8 +55,7 @@ bool namesDictionaryVerbContinuative(const dictionary::DictionaryManager* dict_m
   }
   const std::string stem = extractSubstring(codepoints, okurigana_pos - 1, okurigana_pos);
   const char32_t okurigana = codepoints[okurigana_pos];
-  const std::string_view godan_ending = grammar::godanBaseSuffixFromIRow(okurigana);
-  if (!godan_ending.empty() && isVerbInDictionary(dict_manager, normalize::concat(stem, godan_ending))) {
+  if (hasDictionaryGodanBaseFromIRow(dict_manager, stem, okurigana)) {
     return true;
   }
   return grammar::isMonogradeStemFinalKana(okurigana) &&
@@ -160,7 +165,7 @@ bool followsCaseParticle(const dictionary::DictionaryManager* dict_manager, cons
     return false;
   }
   constexpr size_t kMaxParticleChars = 4;
-  const size_t min_particle_start = pos > kMaxParticleChars ? pos - kMaxParticleChars : 0;
+  const size_t min_particle_start = lookbehindStart(pos, kMaxParticleChars);
   for (size_t particle_start = pos; particle_start > min_particle_start;) {
     --particle_start;
     if (hasCaseParticleDictionaryEntry(dict_manager, extractSubstring(codepoints, particle_start, pos))) {
@@ -224,7 +229,7 @@ bool startsInsideDictionaryEntry(const std::vector<char32_t>& codepoints, size_t
   if (dict_manager == nullptr || start_pos == 0) {
     return false;
   }
-  const size_t first_start = start_pos > lookback ? start_pos - lookback : 0;
+  const size_t first_start = lookbehindStart(start_pos, lookback);
   const size_t probe_end = std::min(codepoints.size(), start_pos + probe);
   for (size_t entry_start = first_start; entry_start < start_pos; ++entry_start) {
     for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, entry_start, probe_end)) {
@@ -328,15 +333,14 @@ bool classicalAuxiliaryFollowsAt(const dictionary::DictionaryManager* dict_manag
   constexpr size_t kAuxiliaryProbe = 3;
   const size_t max_end = std::min(codepoints.size(), pos + kAuxiliaryProbe);
   for (size_t aux_end = pos + 1; aux_end <= max_end; ++aux_end) {
-    const std::string span = extractSubstring(codepoints, pos, aux_end);
-    const auto* entry = dict_manager->lookupExact(span, core::PartOfSpeech::Auxiliary);
+    const auto* entry = lookupEntryInRange(*dict_manager, codepoints, pos, aux_end, core::PartOfSpeech::Auxiliary);
     if (entry == nullptr || !core::isClassicalAuxiliaryType(entry->extended_pos)) {
       continue;
     }
     // A final particle closes a clause after any word class, so a spelling that
     // can be one says nothing about what precedes it: the 已然形 ね of ぬ and the
     // 終助詞 ね are the same mora, and only the latter stands after a noun.
-    const auto* particle = dict_manager->lookupExact(span, core::PartOfSpeech::Particle);
+    const auto* particle = lookupEntryInRange(*dict_manager, codepoints, pos, aux_end, core::PartOfSpeech::Particle);
     if (particle != nullptr && particle->extended_pos == core::ExtendedPOS::ParticleFinal) {
       continue;
     }
@@ -528,7 +532,7 @@ KakariMusubi governingKakariMusubi(const dictionary::DictionaryManager* dict_man
     return KakariMusubi::None;
   }
   const size_t scan_end = std::min(clause_pos, codepoints.size());
-  const size_t scan_start = scan_end > kMaxClauseChars ? scan_end - kMaxClauseChars : 0;
+  const size_t scan_start = lookbehindStart(scan_end, kMaxClauseChars);
   for (size_t end = scan_end; end > scan_start; --end) {
     if (normalize::classifyChar(codepoints[end - 1]) == normalize::CharType::Symbol) {
       return KakariMusubi::None;

@@ -28,11 +28,6 @@ namespace suzume::analysis {
 
 namespace {
 
-// The open lexical classes; an exact entry in one of them spells a word.
-constexpr PartOfSpeechMask kLexicalWordMask =
-    partOfSpeechMask(core::PartOfSpeech::Noun) | partOfSpeechMask(core::PartOfSpeech::Verb) |
-    partOfSpeechMask(core::PartOfSpeech::Adjective) | partOfSpeechMask(core::PartOfSpeech::Adverb);
-
 // End of the hiragana run at @p start, at most four kana and stopping before a
 // particle-like kana.
 size_t scanCompoundHiraganaEnd(const std::vector<char32_t>& codepoints,
@@ -306,7 +301,7 @@ bool hasAttributiveNominalSelector(const std::vector<char32_t>& codepoints,
     return false;
   }
   constexpr size_t kMaximumSelectorLength = 6;
-  const size_t first_selector = start_pos > kMaximumSelectorLength ? start_pos - kMaximumSelectorLength : 0;
+  const size_t first_selector = lookbehindStart(start_pos, kMaximumSelectorLength);
   const auto* attributive_copula =
       codepoints[start_pos - 1] == U'な' ? dict_manager->lookupExact("な", core::PartOfSpeech::Auxiliary) : nullptr;
   for (size_t selector_start = first_selector; selector_start < start_pos; ++selector_start) {
@@ -380,7 +375,7 @@ bool hasAuxiliaryParticleDecomposition(const std::vector<char32_t>& codepoints, 
   if (dict_manager == nullptr || end_pos < start_pos + 3) {
     return false;
   }
-  if (hasExactPartOfSpeech(*dict_manager, codepoints, start_pos, end_pos, kLexicalWordMask)) {
+  if (hasExactPartOfSpeech(*dict_manager, codepoints, start_pos, end_pos, kOpenClassPartOfSpeechMask)) {
     return false;
   }
   for (size_t split = start_pos + 1; split < end_pos; ++split) {
@@ -408,7 +403,7 @@ bool hasFunctionWordChainDecomposition(const std::vector<char32_t>& codepoints, 
   if (dict_manager == nullptr || end_pos < start_pos + 3) {
     return false;
   }
-  if (hasExactPartOfSpeech(*dict_manager, codepoints, start_pos, end_pos, kLexicalWordMask)) {
+  if (hasExactPartOfSpeech(*dict_manager, codepoints, start_pos, end_pos, kOpenClassPartOfSpeechMask)) {
     return false;
   }
   constexpr PartOfSpeechMask kFunctionMask =
@@ -467,7 +462,7 @@ bool hasFunctionWordChainDecomposition(const std::vector<char32_t>& codepoints, 
   // run that opens with one is two words however the rest reads. Requiring the
   // remainder to be attested keeps this to runs that actually have a
   // decomposition (この+すな) rather than any run that starts with those morae.
-  constexpr PartOfSpeechMask kAttestedTailMask = kLexicalWordMask | kFunctionMask |
+  constexpr PartOfSpeechMask kAttestedTailMask = kOpenClassPartOfSpeechMask | kFunctionMask |
                                                  partOfSpeechMask(core::PartOfSpeech::Pronoun) |
                                                  partOfSpeechMask(core::PartOfSpeech::Determiner);
   for (size_t split = start_pos + 1; split < end_pos; ++split) {

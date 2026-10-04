@@ -19,6 +19,14 @@ void retagUninflected(core::Morpheme& morpheme, core::PartOfSpeech pos, core::Ex
 void insertAfter(std::vector<core::Morpheme>& result, size_t idx, const core::Morpheme& morpheme);
 /// Erase the morpheme directly after position @p idx.
 void eraseAfter(std::vector<core::Morpheme>& result, size_t idx);
+/// The morpheme directly before position @p idx, or nullptr at the start.
+inline const core::Morpheme* morphemeBefore(const std::vector<core::Morpheme>& result, size_t idx) {
+  return idx > 0 ? &result[idx - 1] : nullptr;
+}
+/// The morpheme @p offset positions after @p idx, or nullptr past the end.
+inline const core::Morpheme* morphemeAfter(const std::vector<core::Morpheme>& result, size_t idx, size_t offset) {
+  return idx + offset < result.size() ? &result[idx + offset] : nullptr;
+}
 
 bool isCompoundRenyokeiShape(const std::string& surface);
 bool isCounterDurationNoun(const std::string& surface);

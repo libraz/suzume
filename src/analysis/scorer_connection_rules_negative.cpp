@@ -217,7 +217,7 @@ float computeNegativeAndNounVerbBonus(const core::LatticeEdge& prev, const core:
   // がら of the subsidiary がる (面倒くさ+がら+ず).
   const bool auxiliary_irrealis =
       prev.extended_pos == core::ExtendedPOS::AuxPassive || prev.extended_pos == core::ExtendedPOS::AuxCausative ||
-      (prev.extended_pos == core::ExtendedPOS::AuxGaru && grammar::isARowCodepoint(utf8::decodeLastChar(prev.surface)));
+      (prev.extended_pos == core::ExtendedPOS::AuxGaru && kana::isARowCodepoint(utf8::decodeLastChar(prev.surface)));
   if ((prev.extended_pos == core::ExtendedPOS::VerbMizenkei || auxiliary_irrealis) &&
       next.extended_pos == core::ExtendedPOS::AuxNegativeNu &&
       utf8::equalsAny(next.surface, {"ず", "ざる", "ざれ", "ね"})) {

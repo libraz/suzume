@@ -15,6 +15,7 @@
 #include <limits>
 #include <sstream>
 
+#include "normalize/utf8.h"
 #include "postprocess/tag_generator.h"
 #include "suzume.h"
 
@@ -264,9 +265,8 @@ std::string tabEscape(std::string_view value) {
 }
 
 void stripUtf8Bom(std::string* value) {
-  if (value != nullptr && value->size() >= 3 && static_cast<unsigned char>((*value)[0]) == 0xEF &&
-      static_cast<unsigned char>((*value)[1]) == 0xBB && static_cast<unsigned char>((*value)[2]) == 0xBF) {
-    value->erase(0, 3);
+  if (value != nullptr && normalize::startsWithUtf8Bom(*value)) {
+    value->erase(0, normalize::kUtf8Bom.size());
   }
 }
 

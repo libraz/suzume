@@ -31,8 +31,8 @@ namespace {
 constexpr float kNominalizedNounReportedConfidence = 0.6F;
 #endif
 
-bool hasNominalizedNounParticleContinuation(const std::vector<char32_t>& codepoints, size_t end_pos,
-                                            const dictionary::DictionaryManager* dict_manager) {
+bool opensStandaloneParticleCharAt(const std::vector<char32_t>& codepoints, size_t end_pos,
+                                   const dictionary::DictionaryManager* dict_manager) {
   return end_pos < codepoints.size() && normalize::isParticleCodepoint(codepoints[end_pos]) &&
          codepoints[end_pos] != U'て' && codepoints[end_pos] != U'で' &&
          !startsLongerNonParticleEntry(codepoints, end_pos, dict_manager);
@@ -97,7 +97,7 @@ bool hasParticleFinalHiraganaNounContinuation(const std::vector<char32_t>& codep
          char_types[end_pos] == normalize::CharType::Hiragana) {
     ++end_pos;
     if (end_pos - start_pos >= 2 && normalize::isParticleCodepoint(codepoints[end_pos - 1]) &&
-        hasNominalizedNounParticleContinuation(codepoints, end_pos, dict_manager)) {
+        opensStandaloneParticleCharAt(codepoints, end_pos, dict_manager)) {
       return true;
     }
   }
@@ -125,7 +125,7 @@ bool isGenitiveClauseFinalNominal(const std::vector<char32_t>& codepoints,
   if (dict_manager == nullptr) {
     return false;
   }
-  const size_t scan_start = start_pos > kDeterminerLookbehind ? start_pos - kDeterminerLookbehind : 0;
+  const size_t scan_start = lookbehindStart(start_pos, kDeterminerLookbehind);
   for (size_t determiner_start = scan_start; determiner_start < start_pos; ++determiner_start) {
     if (lookupEntryInRange(*dict_manager, codepoints, determiner_start, start_pos, core::PartOfSpeech::Determiner) !=
         nullptr) {
@@ -366,7 +366,7 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
       // the noun candidate (genuine nominalizations survive).
       const std::string surface = extractSubstring(codepoints, start_pos, hiragana_end + 1);
       const bool has_particle_continuation =
-          hasNominalizedNounParticleContinuation(codepoints, hiragana_end + 1, dict_manager) ||
+          opensStandaloneParticleCharAt(codepoints, hiragana_end + 1, dict_manager) ||
           selectsNominalHostByListedParticle(codepoints, hiragana_end + 1, dict_manager);
       // The auxiliary is recognized by its opening mora, which several
       // multi-mora particles share (まで opens like ます, から like かける). A
@@ -489,8 +489,7 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
     // A following particle makes the renyokei a nominalized search unit:
     // 答えは, 始まりは, 決まりを.  Prefer that productive noun reading over
     // a finite-verb candidate whose continuation is grammatically absent.
-    const bool has_particle_continuation =
-        hasNominalizedNounParticleContinuation(codepoints, kanji_end + 1, dict_manager);
+    const bool has_particle_continuation = opensStandaloneParticleCharAt(codepoints, kanji_end + 1, dict_manager);
     const bool has_final_particle_continuation =
         first_hiragana == U'み' &&
         hasClauseFinalParticleContinuation(codepoints, char_types, kanji_end + 1, dict_manager);

@@ -108,6 +108,15 @@ bool isAdjectiveInDictionary(const dictionary::DictionaryManager* dict_manager, 
                              size_t start, size_t end);
 
 /**
+ * @brief Whether @p stem plus the godan terminal of @p i_row_kana is a dictionary verb
+ *
+ * Reads @p i_row_kana as a godan continuative ending (書+き → 書く); a kana
+ * outside the godan i-row never matches.
+ */
+bool hasDictionaryGodanBaseFromIRow(const dictionary::DictionaryManager* dict_manager, std::string_view stem,
+                                    char32_t i_row_kana);
+
+/**
  * @brief Whether the kanji before @p okurigana_pos plus the okurigana there is
  * the continuative of a dictionary verb
  *
@@ -1262,14 +1271,6 @@ KakariMusubi governingKakariMusubi(const dictionary::DictionaryManager* dict_man
  */
 bool endsWithClassicalAuxiliary(const dictionary::DictionaryManager* dict_manager,
                                 const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos);
-
-// =============================================================================
-// Character Region Detection
-// =============================================================================
-
-// Delegate to shared implementation in tokenizer_utils.h
-using ::suzume::analysis::findCharRegionEnd;
-using ::suzume::analysis::findCharRegionEndBeforeHiragana;
 
 }  // namespace suzume::analysis::verb_helpers
 

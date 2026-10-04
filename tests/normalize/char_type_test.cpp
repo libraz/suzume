@@ -9,6 +9,8 @@
 
 #include <string_view>
 
+#include "core/kana_constants.h"
+
 namespace suzume {
 namespace normalize {
 namespace {
@@ -487,84 +489,84 @@ TEST(CharTypeTest, IsIterationMark) {
 }
 
 // ============================================================================
-// isARowHiragana through isORowHiragana - spot checks
+// kana::isARowCodepoint through kana::isORowCodepoint - spot checks
 // ============================================================================
 
 TEST(CharTypeTest, IsARowHiragana) {
-  EXPECT_TRUE(isARowHiragana(U'あ'));
-  EXPECT_TRUE(isARowHiragana(U'か'));
-  EXPECT_TRUE(isARowHiragana(U'が'));
-  EXPECT_TRUE(isARowHiragana(U'さ'));
-  EXPECT_TRUE(isARowHiragana(U'た'));
-  EXPECT_TRUE(isARowHiragana(U'な'));
-  EXPECT_TRUE(isARowHiragana(U'ま'));
-  EXPECT_TRUE(isARowHiragana(U'や'));
-  EXPECT_TRUE(isARowHiragana(U'ら'));
-  EXPECT_TRUE(isARowHiragana(U'わ'));
+  EXPECT_TRUE(kana::isARowCodepoint(U'あ'));
+  EXPECT_TRUE(kana::isARowCodepoint(U'か'));
+  EXPECT_TRUE(kana::isARowCodepoint(U'が'));
+  EXPECT_TRUE(kana::isARowCodepoint(U'さ'));
+  EXPECT_TRUE(kana::isARowCodepoint(U'た'));
+  EXPECT_TRUE(kana::isARowCodepoint(U'な'));
+  EXPECT_TRUE(kana::isARowCodepoint(U'ま'));
+  EXPECT_TRUE(kana::isARowCodepoint(U'や'));
+  EXPECT_TRUE(kana::isARowCodepoint(U'ら'));
+  EXPECT_TRUE(kana::isARowCodepoint(U'わ'));
   // Not a-row
-  EXPECT_FALSE(isARowHiragana(U'い'));
-  EXPECT_FALSE(isARowHiragana(U'う'));
-  EXPECT_FALSE(isARowHiragana(U'え'));
-  EXPECT_FALSE(isARowHiragana(U'お'));
+  EXPECT_FALSE(kana::isARowCodepoint(U'い'));
+  EXPECT_FALSE(kana::isARowCodepoint(U'う'));
+  EXPECT_FALSE(kana::isARowCodepoint(U'え'));
+  EXPECT_FALSE(kana::isARowCodepoint(U'お'));
 }
 
 TEST(CharTypeTest, IsIRowHiragana) {
-  EXPECT_TRUE(isIRowHiragana(U'い'));
-  EXPECT_TRUE(isIRowHiragana(U'き'));
-  EXPECT_TRUE(isIRowHiragana(U'し'));
-  EXPECT_TRUE(isIRowHiragana(U'ち'));
-  EXPECT_TRUE(isIRowHiragana(U'に'));
-  EXPECT_TRUE(isIRowHiragana(U'み'));
-  EXPECT_TRUE(isIRowHiragana(U'り'));
+  EXPECT_TRUE(kana::isIRowCodepoint(U'い'));
+  EXPECT_TRUE(kana::isIRowCodepoint(U'き'));
+  EXPECT_TRUE(kana::isIRowCodepoint(U'し'));
+  EXPECT_TRUE(kana::isIRowCodepoint(U'ち'));
+  EXPECT_TRUE(kana::isIRowCodepoint(U'に'));
+  EXPECT_TRUE(kana::isIRowCodepoint(U'み'));
+  EXPECT_TRUE(kana::isIRowCodepoint(U'り'));
   // Not i-row
-  EXPECT_FALSE(isIRowHiragana(U'あ'));
-  EXPECT_FALSE(isIRowHiragana(U'う'));
-  EXPECT_FALSE(isIRowHiragana(U'え'));
+  EXPECT_FALSE(kana::isIRowCodepoint(U'あ'));
+  EXPECT_FALSE(kana::isIRowCodepoint(U'う'));
+  EXPECT_FALSE(kana::isIRowCodepoint(U'え'));
 }
 
 TEST(CharTypeTest, IsURowHiragana) {
-  EXPECT_TRUE(isURowHiragana(U'う'));
-  EXPECT_TRUE(isURowHiragana(U'く'));
-  EXPECT_TRUE(isURowHiragana(U'す'));
-  EXPECT_TRUE(isURowHiragana(U'つ'));
-  EXPECT_TRUE(isURowHiragana(U'ぬ'));
-  EXPECT_TRUE(isURowHiragana(U'ふ'));
-  EXPECT_TRUE(isURowHiragana(U'む'));
-  EXPECT_TRUE(isURowHiragana(U'ゆ'));
-  EXPECT_TRUE(isURowHiragana(U'る'));
+  EXPECT_TRUE(kana::isURowCodepoint(U'う'));
+  EXPECT_TRUE(kana::isURowCodepoint(U'く'));
+  EXPECT_TRUE(kana::isURowCodepoint(U'す'));
+  EXPECT_TRUE(kana::isURowCodepoint(U'つ'));
+  EXPECT_TRUE(kana::isURowCodepoint(U'ぬ'));
+  EXPECT_TRUE(kana::isURowCodepoint(U'ふ'));
+  EXPECT_TRUE(kana::isURowCodepoint(U'む'));
+  EXPECT_TRUE(kana::isURowCodepoint(U'ゆ'));
+  EXPECT_TRUE(kana::isURowCodepoint(U'る'));
   // Not u-row
-  EXPECT_FALSE(isURowHiragana(U'あ'));
-  EXPECT_FALSE(isURowHiragana(U'い'));
+  EXPECT_FALSE(kana::isURowCodepoint(U'あ'));
+  EXPECT_FALSE(kana::isURowCodepoint(U'い'));
 }
 
 TEST(CharTypeTest, IsERowHiragana) {
-  EXPECT_TRUE(isERowHiragana(U'え'));
-  EXPECT_TRUE(isERowHiragana(U'け'));
-  EXPECT_TRUE(isERowHiragana(U'せ'));
-  EXPECT_TRUE(isERowHiragana(U'て'));
-  EXPECT_TRUE(isERowHiragana(U'ね'));
-  EXPECT_TRUE(isERowHiragana(U'め'));
-  EXPECT_TRUE(isERowHiragana(U'れ'));
+  EXPECT_TRUE(kana::isERowCodepoint(U'え'));
+  EXPECT_TRUE(kana::isERowCodepoint(U'け'));
+  EXPECT_TRUE(kana::isERowCodepoint(U'せ'));
+  EXPECT_TRUE(kana::isERowCodepoint(U'て'));
+  EXPECT_TRUE(kana::isERowCodepoint(U'ね'));
+  EXPECT_TRUE(kana::isERowCodepoint(U'め'));
+  EXPECT_TRUE(kana::isERowCodepoint(U'れ'));
   // Not e-row
-  EXPECT_FALSE(isERowHiragana(U'あ'));
-  EXPECT_FALSE(isERowHiragana(U'い'));
-  EXPECT_FALSE(isERowHiragana(U'お'));
+  EXPECT_FALSE(kana::isERowCodepoint(U'あ'));
+  EXPECT_FALSE(kana::isERowCodepoint(U'い'));
+  EXPECT_FALSE(kana::isERowCodepoint(U'お'));
 }
 
 TEST(CharTypeTest, IsORowHiragana) {
-  EXPECT_TRUE(isORowHiragana(U'お'));
-  EXPECT_TRUE(isORowHiragana(U'こ'));
-  EXPECT_TRUE(isORowHiragana(U'そ'));
-  EXPECT_TRUE(isORowHiragana(U'と'));
-  EXPECT_TRUE(isORowHiragana(U'の'));
-  EXPECT_TRUE(isORowHiragana(U'も'));
-  EXPECT_TRUE(isORowHiragana(U'よ'));
-  EXPECT_TRUE(isORowHiragana(U'ろ'));
-  EXPECT_TRUE(isORowHiragana(U'を'));
+  EXPECT_TRUE(kana::isORowCodepoint(U'お'));
+  EXPECT_TRUE(kana::isORowCodepoint(U'こ'));
+  EXPECT_TRUE(kana::isORowCodepoint(U'そ'));
+  EXPECT_TRUE(kana::isORowCodepoint(U'と'));
+  EXPECT_TRUE(kana::isORowCodepoint(U'の'));
+  EXPECT_TRUE(kana::isORowCodepoint(U'も'));
+  EXPECT_TRUE(kana::isORowCodepoint(U'よ'));
+  EXPECT_TRUE(kana::isORowCodepoint(U'ろ'));
+  EXPECT_TRUE(kana::isORowCodepoint(U'を'));
   // Not o-row
-  EXPECT_FALSE(isORowHiragana(U'あ'));
-  EXPECT_FALSE(isORowHiragana(U'い'));
-  EXPECT_FALSE(isORowHiragana(U'う'));
+  EXPECT_FALSE(kana::isORowCodepoint(U'あ'));
+  EXPECT_FALSE(kana::isORowCodepoint(U'い'));
+  EXPECT_FALSE(kana::isORowCodepoint(U'う'));
 }
 
 TEST(CharTypeTest, HiraganaRowMutualExclusion) {
@@ -573,15 +575,15 @@ TEST(CharTypeTest, HiraganaRowMutualExclusion) {
   char32_t test_chars[] = {U'あ', U'い', U'う', U'え', U'お', U'か', U'き', U'く', U'け', U'こ'};
   for (auto chr : test_chars) {
     int count = 0;
-    if (isARowHiragana(chr))
+    if (kana::isARowCodepoint(chr))
       count++;
-    if (isIRowHiragana(chr))
+    if (kana::isIRowCodepoint(chr))
       count++;
-    if (isURowHiragana(chr))
+    if (kana::isURowCodepoint(chr))
       count++;
-    if (isERowHiragana(chr))
+    if (kana::isERowCodepoint(chr))
       count++;
-    if (isORowHiragana(chr))
+    if (kana::isORowCodepoint(chr))
       count++;
     EXPECT_EQ(count, 1) << "Character should belong to exactly one row";
   }

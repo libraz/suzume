@@ -196,12 +196,12 @@ TEST_F(GodanNegativeRenyokeiTest, NotMatch) {
 TEST(CharPatternsTest, IRowEndingsUseCanonicalFullIRow) {
   EXPECT_TRUE(endsWithIRow("ひ"));
   EXPECT_TRUE(endsWithIRow("ぴ"));
-  EXPECT_TRUE(isIRowCodepoint(U'ひ'));
-  EXPECT_TRUE(isIRowCodepoint(U'ぴ'));
+  EXPECT_TRUE(kana::isIRowCodepoint(U'ひ'));
+  EXPECT_TRUE(kana::isIRowCodepoint(U'ぴ'));
 }
 
 TEST(CharPatternsTest, VowelAndORowUseCanonicalRows) {
-  EXPECT_TRUE(isORowCodepoint(U'を'));
+  EXPECT_TRUE(kana::isORowCodepoint(U'を'));
   EXPECT_EQ(getVowelForChar(U'を'), U'お');
   EXPECT_EQ(getVowelForChar(U'ぴ'), U'い');
 }

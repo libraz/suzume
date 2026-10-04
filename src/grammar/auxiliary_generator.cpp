@@ -91,18 +91,23 @@ constexpr ConjSuffix kMasu[] = {
 // Table-Driven Generation (単一ジェネレータ関数)
 // =============================================================================
 
+// Generate forms as @p stem + each suffix; an empty stem lists full forms (irregular verbs).
+void appendSuffixedForms(const AuxiliaryBase& base, std::string_view stem, const ConjSuffix* suffixes,
+                         size_t suffix_count, std::vector<AuxiliaryEntry>& result) {
+  result.reserve(result.size() + suffix_count);
+  for (size_t suffix_index = 0; suffix_index < suffix_count; ++suffix_index) {
+    const ConjSuffix& suf = suffixes[suffix_index];
+    result.push_back({std::string(stem) + suf.suffix, suf.right_id, base.required_conn});
+  }
+}
+
 // Generate forms using stem + suffix pattern
 // Note: All entries including te-form are generated for inflection analysis.
 // Connection scoring makes the grammatical path
 // VERB(renyokei/onbinkei) + て(PARTICLE) win over a unified te-form.
 void appendWithStem(const AuxiliaryBase& base, const ConjSuffix* suffixes, size_t suffix_count,
                     std::vector<AuxiliaryEntry>& result) {
-  const std::string stem(utf8::dropLastChar(base.base_form));
-  result.reserve(result.size() + suffix_count);
-  for (size_t suffix_index = 0; suffix_index < suffix_count; ++suffix_index) {
-    const ConjSuffix& suf = suffixes[suffix_index];
-    result.push_back({stem + suf.suffix, suf.right_id, base.required_conn});
-  }
+  appendSuffixedForms(base, utf8::dropLastChar(base.base_form), suffixes, suffix_count, result);
 }
 
 // Append a godan base's suffixes in the fixed order the handwritten tables
@@ -143,16 +148,6 @@ void appendGodanWithStem(const AuxiliaryBase& base, bool te_attach_only, bool fo
   result.push_back({stem + vowels.a + "ない", conn::kAuxOutBase, base.required_conn});
   result.push_back({stem + vowels.a + "なかった", conn::kAuxOutTa, base.required_conn});
   result.push_back({stem + vowels.a + "なくて", conn::kAuxOutTe, base.required_conn});
-}
-
-// Generate forms using full forms (no stem, for irregular verbs)
-void appendFullForms(const AuxiliaryBase& base, const ConjSuffix* forms, size_t form_count,
-                     std::vector<AuxiliaryEntry>& result) {
-  result.reserve(result.size() + form_count);
-  for (size_t form_index = 0; form_index < form_count; ++form_index) {
-    const ConjSuffix& form = forms[form_index];
-    result.push_back({form.suffix, form.right_id, base.required_conn});
-  }
 }
 
 // No conjugation - single form only
@@ -597,14 +592,14 @@ void appendAuxiliaryBase(const AuxiliaryBase& base, std::vector<AuxiliaryEntry>&
                           base.form_family != AuxiliaryFormFamily::Positive, result);
       return;
     case VerbType::Kuru:
-      appendFullForms(base, kKuruFull, std::size(kKuruFull), result);
+      appendSuffixedForms(base, {}, kKuruFull, std::size(kKuruFull), result);
       return;
     case VerbType::IAdjective:
       appendWithStem(base, kIAdjective, std::size(kIAdjective), result);
       return;
     case VerbType::Unknown:
       if (base.form_family == AuxiliaryFormFamily::Masu) {
-        appendFullForms(base, kMasu, std::size(kMasu), result);
+        appendSuffixedForms(base, {}, kMasu, std::size(kMasu), result);
         return;
       }
       appendNoConjForm(base, result);

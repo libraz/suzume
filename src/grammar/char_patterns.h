@@ -551,45 +551,12 @@ bool isPureKatakana(std::string_view stem);
 bool endsWithIRow(std::string_view stem);
 
 /**
- * @brief Check if a codepoint is e-row hiragana
- * @param cp Unicode codepoint to check
- * @return True if the codepoint is e-row hiragana
- *
- * E-row includes: え, け, せ, て, ね, へ, め, れ, げ, ぜ, で, べ, ぺ
- */
-bool isERowCodepoint(char32_t cp);
-
-/**
- * @brief Check if a codepoint is i-row hiragana
- * @param cp Unicode codepoint to check
- * @return True if the codepoint is i-row hiragana
- *
- * I-row includes: い, き, ぎ, し, ち, に, ひ, び, み, り
- */
-bool isIRowCodepoint(char32_t cp);
-
-/**
- * @brief Check if a codepoint is a-row hiragana
- * @param cp Unicode codepoint to check
- * @return True if the codepoint is a-row hiragana
- *
- * A-row includes: あ, か, が, さ, ざ, た, だ, な, は, ば, ぱ, ま, や, ら, わ
- * Used for verb mizenkei (未然形) detection in passive/causative patterns.
- */
-bool isARowCodepoint(char32_t cp);
-
-/**
  * @brief Check if a kana stem is the transitive -asu derivation of a godan-sa verb
  *
  * The stem ends in an a-row mora (あまやか, ちらか) and is not a reduplicated
  * mimetic (ひやひや), which ends in the same mora without deriving anything.
  */
 bool isTransitiveAsuStem(std::u32string_view stem);
-
-/**
- * @brief Check if a codepoint is o-row hiragana
- */
-bool isORowCodepoint(char32_t cp);
 
 /**
  * @brief Check if stem ends with onbin marker (音便)

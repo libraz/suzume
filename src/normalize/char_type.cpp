@@ -463,29 +463,6 @@ bool isIterationMark(char32_t ch) {
   return ch == 0x3005;
 }
 
-// Hiragana vowel-row membership. The canonical character lists live in
-// core/kana_constants.h (kana::is*RowCodepoint); these forward so the row
-// membership has a single source of truth across the normalize and core layers.
-bool isARowHiragana(char32_t ch) {
-  return kana::isARowCodepoint(ch);
-}
-
-bool isIRowHiragana(char32_t ch) {
-  return kana::isIRowCodepoint(ch);
-}
-
-bool isURowHiragana(char32_t ch) {
-  return kana::isURowCodepoint(ch);
-}
-
-bool isERowHiragana(char32_t ch) {
-  return kana::isERowCodepoint(ch);
-}
-
-bool isORowHiragana(char32_t ch) {
-  return kana::isORowCodepoint(ch);
-}
-
 bool isKanjiCodepoint(char32_t ch) {
   // Delegate to the single kanji-range definition in core/kana_constants.h.
   return kana::isKanjiCodepoint(ch);

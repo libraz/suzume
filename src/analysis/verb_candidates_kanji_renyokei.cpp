@@ -97,14 +97,9 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
         // Surface is kanji + first e/i-row hiragana only (e.g., 食べ from 食べます, 感じ from 感じる)
         size_t renyokei_end = kanji_end + 1;
         std::string surface = extractSubstring(codepoints, start_pos, renyokei_end);
-        // Get all inflection candidates, not just the best
-        // This is important for ambiguous cases like 入れ (godan 入る imperative vs ichidan 入れる renyoukei)
-        const auto& all_cands = inflection.analyze(surface);
-        // Find the best Ichidan, Suru, and Godan candidates
-        vh::VerbClassBests bests = vh::bestByVerbClass(all_cands);
-        const grammar::InflectionCandidate& ichidan_cand = bests.ichidan;
-        const grammar::InflectionCandidate& suru_cand = bests.suru;
-        const grammar::InflectionCandidate& godan_cand = bests.godan;
+        // Rank every inflection reading, not just the best: 入れ is both godan 入る
+        // imperative and ichidan 入れる continuative.
+        const auto [ichidan_cand, suru_cand, godan_cand] = vh::bestByVerbClass(inflection.analyze(surface));
         // An A-row stem followed by させ is already a Godan mizenkei plus
         // causative auxiliary (聞か+せ, 読ま+せ).  Only non-A-row stems use
         // that evidence to recover an Ichidan lexical stem.
@@ -457,11 +452,7 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
       if (!first_is_single_stem_ending && has_ichidan_continuation &&
           (kana::isERowCodepoint(second_hira) || kana::isIRowCodepoint(second_hira))) {
         std::string surface = extractSubstring(codepoints, start_pos, renyokei_end);
-        const auto& all_cands = inflection.analyze(surface);
-        vh::VerbClassBests bests = vh::bestByVerbClass(all_cands);
-        const grammar::InflectionCandidate& ichidan_cand = bests.ichidan;
-        const grammar::InflectionCandidate& suru_cand = bests.suru;
-        const grammar::InflectionCandidate& godan_cand = bests.godan;
+        const auto [ichidan_cand, suru_cand, godan_cand] = vh::bestByVerbClass(inflection.analyze(surface));
         bool prefer_suru = !causative_follows && !passive_follows && (suru_cand.confidence > ichidan_cand.confidence);
         bool prefer_godan = !causative_follows && !passive_follows && (godan_cand.confidence > ichidan_cand.confidence);
         // Higher confidence threshold for multi-char stems to avoid false positives

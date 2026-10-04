@@ -45,7 +45,7 @@ bool endsDictionaryVerbSpanningBack(const dictionary::DictionaryManager& dict_ma
                                     const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos) {
   // A headword reaching back further than this is not a contraction host.
   constexpr size_t kMaxHostChars = 4;
-  const size_t scan_start = start_pos > kMaxHostChars ? start_pos - kMaxHostChars : 0;
+  const size_t scan_start = lookbehindStart(start_pos, kMaxHostChars);
   for (size_t host_start = scan_start; host_start < start_pos; ++host_start) {
     if (lookupEntryInRange(dict_manager, codepoints, host_start, end_pos, core::PartOfSpeech::Verb) != nullptr) {
       return true;
@@ -59,7 +59,7 @@ bool endsDictionaryVerbSpanningBack(const dictionary::DictionaryManager& dict_ma
 bool splitsListedVerbAtNoun(const dictionary::DictionaryManager& dict_manager, const std::vector<char32_t>& codepoints,
                             size_t start_pos, size_t end_pos) {
   constexpr size_t kMaxNounChars = 4;
-  const size_t scan_start = start_pos > kMaxNounChars ? start_pos - kMaxNounChars : 0;
+  const size_t scan_start = lookbehindStart(start_pos, kMaxNounChars);
   for (size_t host_start = scan_start; host_start < start_pos; ++host_start) {
     if (lookupEntryInRange(dict_manager, codepoints, host_start, start_pos, core::PartOfSpeech::Noun) != nullptr &&
         lookupEntryInRange(dict_manager, codepoints, host_start, end_pos, core::PartOfSpeech::Verb) != nullptr) {
@@ -676,7 +676,7 @@ bool hasPrecedingQuantityEdge(const core::Lattice& lattice, size_t end_pos) {
 // the run it heads, so probing back that far reaches every such continuative.
 bool insideKanjiVerbOkurigana(const core::Lattice& lattice, size_t start_pos) {
   constexpr size_t kStemProbeChars = 4;
-  const size_t probe_start = start_pos > kStemProbeChars ? start_pos - kStemProbeChars : 0;
+  const size_t probe_start = lookbehindStart(start_pos, kStemProbeChars);
   for (size_t stem_start = probe_start; stem_start < start_pos; ++stem_start) {
     const bool spans = core::anyEdgeStartingAt(lattice, stem_start, [start_pos](const core::LatticeEdge& edge) {
       return edge.pos == core::PartOfSpeech::Verb && edge.extended_pos == core::ExtendedPOS::VerbRenyokei &&
@@ -990,8 +990,7 @@ bool namesVerbContinuative(const dictionary::DictionaryManager& dict_manager, st
   if (stem.empty()) {
     return false;
   }
-  const std::string_view godan_ending = grammar::godanBaseSuffixFromIRow(tail);
-  if (!godan_ending.empty() && verb_helpers::isVerbInDictionary(&dict_manager, normalize::concat(stem, godan_ending))) {
+  if (verb_helpers::hasDictionaryGodanBaseFromIRow(&dict_manager, stem, tail)) {
     return true;
   }
   return kana::isERowCodepoint(tail) &&

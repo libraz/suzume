@@ -111,7 +111,7 @@ bool isVerbalPredicateBeforeSou(const core::Morpheme& morpheme) {
 // site.
 bool retagGodanRenyokeiFromIRow(core::Morpheme& stem, bool set_conj_form) {
   const char32_t stem_last = utf8::decodeLastChar(stem.surface);
-  if (!grammar::isIRowCodepoint(stem_last)) {
+  if (!kana::isIRowCodepoint(stem_last)) {
     return false;
   }
   const std::string_view base_suffix = grammar::godanBaseSuffixFromIRow(stem_last);
@@ -162,7 +162,7 @@ void resolveNegativeHost(std::vector<core::Morpheme>& result) {
         (negative.pos != core::PartOfSpeech::Auxiliary && negative.pos != core::PartOfSpeech::Adjective)) {
       continue;
     }
-    const core::Morpheme* host = idx > 0 ? &result[idx - 1] : nullptr;
+    const core::Morpheme* host = morphemeBefore(result, idx);
     const bool verbal_host =
         host != nullptr &&
         (host->pos == core::PartOfSpeech::Verb ||
@@ -190,8 +190,8 @@ void resolveSouHost(std::vector<core::Morpheme>& result) {
                                 sou.pos != core::PartOfSpeech::Adverb)) {
       continue;
     }
-    const core::Morpheme* host = idx > 0 ? &result[idx - 1] : nullptr;
-    const core::Morpheme* following = idx + 1 < result.size() ? &result[idx + 1] : nullptr;
+    const core::Morpheme* host = morphemeBefore(result, idx);
+    const core::Morpheme* following = morphemeAfter(result, idx, 1);
     const bool nominal_stem_host = host != nullptr && host->pos == core::PartOfSpeech::Noun &&
                                    (following == nullptr || following->pos != core::PartOfSpeech::Verb);
     const bool predicate_host =
@@ -306,7 +306,7 @@ void resolveExcessiveDeverbalNoun(std::vector<core::Morpheme>& result) {
       continue;
     }
     const auto& following = result[idx + 1];
-    const auto* after = idx + 2 < result.size() ? &result[idx + 2] : nullptr;
+    const auto* after = morphemeAfter(result, idx, 2);
     const bool case_particle =
         following.pos == core::PartOfSpeech::Particle && utf8::equalsAny(following.surface, {"を", "が", "の"});
     const bool non_motion_ni =
@@ -358,8 +358,8 @@ void resolveAdverbBeforeCase(std::vector<core::Morpheme>& result) {
 void resolvePredicateCellLemmas(std::vector<core::Morpheme>& result) {
   for (size_t idx = 0; idx < result.size(); ++idx) {
     auto& cell = result[idx];
-    const core::Morpheme* previous = idx > 0 ? &result[idx - 1] : nullptr;
-    const core::Morpheme* following = idx + 1 < result.size() ? &result[idx + 1] : nullptr;
+    const core::Morpheme* previous = morphemeBefore(result, idx);
+    const core::Morpheme* following = morphemeAfter(result, idx, 1);
     const bool after_verb = previous != nullptr && previous->pos == core::PartOfSpeech::Verb;
     const bool before_sou = following != nullptr && utf8::equalsAny(following->surface, {"そう"});
     if (utf8::equalsAny(cell.surface, {"た"}) && after_verb && before_sou &&
@@ -407,9 +407,9 @@ core::Morpheme splitTail(core::Morpheme& head, size_t head_codepoints) {
 void resolveFrameRepairs(std::vector<core::Morpheme>& result) {
   for (size_t idx = 0; idx < result.size(); ++idx) {
     auto& token = result[idx];
-    const core::Morpheme* previous = idx > 0 ? &result[idx - 1] : nullptr;
-    const core::Morpheme* following = idx + 1 < result.size() ? &result[idx + 1] : nullptr;
-    const core::Morpheme* after = idx + 2 < result.size() ? &result[idx + 2] : nullptr;
+    const core::Morpheme* previous = morphemeBefore(result, idx);
+    const core::Morpheme* following = morphemeAfter(result, idx, 1);
+    const core::Morpheme* after = morphemeAfter(result, idx, 2);
     if (utf8::equalsAny(token.surface, {"で"}) && following != nullptr &&
         utf8::equalsAny(following->surface, {"しか"}) && after != nullptr && after->pos == core::PartOfSpeech::Verb) {
       retagUninflected(token, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleCase, "で");
@@ -510,9 +510,9 @@ std::string godanBaseFromIrrealis(std::string_view stem) {
 void resolveVerbFrameRepairs(std::vector<core::Morpheme>& result) {
   for (size_t idx = 0; idx < result.size(); ++idx) {
     auto& token = result[idx];
-    const core::Morpheme* previous = idx > 0 ? &result[idx - 1] : nullptr;
-    const core::Morpheme* following = idx + 1 < result.size() ? &result[idx + 1] : nullptr;
-    const core::Morpheme* after = idx + 2 < result.size() ? &result[idx + 2] : nullptr;
+    const core::Morpheme* previous = morphemeBefore(result, idx);
+    const core::Morpheme* following = morphemeAfter(result, idx, 1);
+    const core::Morpheme* after = morphemeAfter(result, idx, 2);
     const size_t length = normalize::utf8Length(token.surface);
     if (token.pos == core::PartOfSpeech::Adverb && utf8::endsWith(token.surface, "ず") && following != nullptr &&
         utf8::equalsAny(following->surface, {"に"}) && length >= 2) {
@@ -545,7 +545,7 @@ void resolveVerbFrameRepairs(std::vector<core::Morpheme>& result) {
                utf8::equalsAny(following->surface, {"に"}) && after != nullptr &&
                utf8::equalsAny(after->getLemma(), {"行く", "来る", "いく", "くる", "ゆく"}) &&
                (token.extended_pos == core::ExtendedPOS::NounVerbal || grammar::isPureHiragana(token.surface)) &&
-               grammar::isIRowCodepoint(utf8::decodeLastChar(token.surface))) {
+               kana::isIRowCodepoint(utf8::decodeLastChar(token.surface))) {
       retagContinuativeAsVerb(token);
     } else if (token.pos == core::PartOfSpeech::Noun && previous != nullptr &&
                previous->pos == core::PartOfSpeech::Prefix && utf8::equalsAny(previous->surface, {"お"}) &&
@@ -570,7 +570,7 @@ void resolveVerbFrameRepairs(std::vector<core::Morpheme>& result) {
     } else if (utf8::equalsAny(token.surface, {"せ"}) && token.pos == core::PartOfSpeech::Auxiliary &&
                token.getLemma() == "せる" && following != nullptr && utf8::equalsAny(following->surface, {"ば"}) &&
                previous != nullptr && previous->pos == core::PartOfSpeech::Verb &&
-               grammar::isARowCodepoint(utf8::decodeLastChar(previous->surface))) {
+               kana::isARowCodepoint(utf8::decodeLastChar(previous->surface))) {
       token.lemma = "す";
     } else if (utf8::equalsAny(token.surface, {"来さ"}) && token.pos == core::PartOfSpeech::Verb &&
                following != nullptr && utf8::startsWith(following->surface, "せ")) {

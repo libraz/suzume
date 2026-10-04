@@ -24,7 +24,7 @@ void resolveDeverbalStemBeforeDependentAuxiliary(std::vector<core::Morpheme>& re
     const bool negative_nai = auxiliary.extended_pos == core::ExtendedPOS::AuxNegativeNai;
     const bool nominal_stem = stem.pos == core::PartOfSpeech::Noun;
     if ((!nominal_stem || (!negative_nai && stem.extended_pos != core::ExtendedPOS::NounVerbal)) ||
-        !grammar::isERowCodepoint(utf8::decodeLastChar(stem.surface))) {
+        !kana::isERowCodepoint(utf8::decodeLastChar(stem.surface))) {
       continue;
     }
     const bool negative_n = auxiliary.surface == "ん" && (auxiliary.extended_pos == core::ExtendedPOS::AuxNegativeNu ||
@@ -736,9 +736,9 @@ void Postprocessor::convertPrefixVerbToNoun(std::vector<core::Morpheme>& morphem
         (grammar::isHumbleHonorificLemma(morphemes[idx + 1].lemma) ||
          grammar::isPotentialBenefactiveLemma(morphemes[idx + 1].lemma))) {
       const char32_t morpheme_last = utf8::decodeLastChar(morpheme.surface);
-      if (grammar::isIRowCodepoint(morpheme_last)) {
+      if (kana::isIRowCodepoint(morpheme_last)) {
         resolver::retagGodanRenyokeiFromIRow(morpheme, false);
-      } else if (grammar::isERowCodepoint(morpheme_last)) {
+      } else if (kana::isERowCodepoint(morpheme_last)) {
         morpheme.lemma = morpheme.surface + "る";
         morpheme.conj_type = dictionary::ConjugationType::Ichidan;
         morpheme.pos = core::PartOfSpeech::Verb;
@@ -758,7 +758,7 @@ void Postprocessor::convertPrefixVerbToNoun(std::vector<core::Morpheme>& morphem
     // literary terminal forms such as お+はす verbal.
     const bool honorific_nominal_stem = morpheme.extended_pos == core::ExtendedPOS::VerbRenyokei ||
                                         (morpheme.extended_pos == core::ExtendedPOS::VerbKateikei &&
-                                         grammar::isERowCodepoint(utf8::decodeLastChar(morpheme.surface)));
+                                         kana::isERowCodepoint(utf8::decodeLastChar(morpheme.surface)));
     if (morpheme.pos != core::PartOfSpeech::Verb || !honorific_nominal_stem) {
       continue;
     }
@@ -790,7 +790,7 @@ void Postprocessor::convertPrefixVerbToNoun(std::vector<core::Morpheme>& morphem
       // An e-row continuative before する is an ichidan verb in the
       // productive honorific construction (お見せする), not a nominal
       // renyokei such as お待ちする.
-      if (grammar::isERowCodepoint(utf8::decodeLastChar(morpheme.surface)) && next.pos == core::PartOfSpeech::Verb &&
+      if (kana::isERowCodepoint(utf8::decodeLastChar(morpheme.surface)) && next.pos == core::PartOfSpeech::Verb &&
           next.lemma == "する") {
         preserves_verbal_reading = true;
       }

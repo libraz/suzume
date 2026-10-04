@@ -138,26 +138,13 @@ std::string fromCodepoints(const std::vector<char32_t>& codepoints);
  */
 std::string encodeRange(const std::vector<char32_t>& codepoints, size_t start, size_t end);
 
-/**
- * @brief Namespace alias for convenience
- */
-namespace utf8 {
+/** UTF-8 encoding of the byte order mark U+FEFF. */
+inline constexpr std::string_view kUtf8Bom = "\xEF\xBB\xBF";
 
-/**
- * @brief Decode UTF-8 string to codepoints
- */
-inline std::vector<char32_t> decode(std::string_view str) {
-  return toCodepoints(str);
+/** @brief Whether @p text opens with a UTF-8 byte order mark */
+inline bool startsWithUtf8Bom(std::string_view text) {
+  return text.substr(0, kUtf8Bom.size()) == kUtf8Bom;
 }
-
-/**
- * @brief Encode codepoints to UTF-8 string
- */
-inline std::string encode(const std::vector<char32_t>& codepoints) {
-  return fromCodepoints(codepoints);
-}
-
-}  // namespace utf8
 
 }  // namespace suzume::normalize
 

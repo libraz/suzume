@@ -75,8 +75,7 @@ bool pronounEndsAt(const dictionary::DictionaryManager* dict_manager, const std:
   if (dict_manager == nullptr || pos == 0) {
     return false;
   }
-  const size_t max_len = pos < 3 ? pos : 3;
-  return hasDictionaryEntryEndingAt(*dict_manager, codepoints, pos - max_len, pos,
+  return hasDictionaryEntryEndingAt(*dict_manager, codepoints, lookbehindStart(pos, 3), pos,
                                     partOfSpeechMask(core::PartOfSpeech::Pronoun));
 }
 

@@ -97,28 +97,12 @@ bool endsWithRenyokeiMarker(std::string_view stem) {
   return endsWithIRow(stem) || endsWithERow(stem);
 }
 
-bool isERowCodepoint(char32_t cp) {
-  return kana::isERowCodepoint(cp);
-}
-
-bool isIRowCodepoint(char32_t cp) {
-  return kana::isIRowCodepoint(cp);
-}
-
-bool isARowCodepoint(char32_t cp) {
-  return kana::isARowCodepoint(cp);
-}
-
 bool isTransitiveAsuStem(std::u32string_view stem) {
-  if (stem.empty() || !isARowCodepoint(stem.back())) {
+  if (stem.empty() || !kana::isARowCodepoint(stem.back())) {
     return false;
   }
   const size_t half = stem.size() / 2;
   return stem.size() % 2 != 0 || stem.substr(0, half) != stem.substr(half);
-}
-
-bool isORowCodepoint(char32_t cp) {
-  return kana::isORowCodepoint(cp);
 }
 
 bool endsWithChar(std::string_view stem, const char* const chars[], size_t count) {
@@ -236,7 +220,7 @@ bool isModernGodanTerminalKana(char32_t code) {
 
 bool isMonogradeStemFinalKana(char32_t code) {
   constexpr std::array<char32_t, 2> kShiftedRow = {U'ひ', U'へ'};
-  return (isIRowCodepoint(code) || isERowCodepoint(code)) && !kana::isCodepointIn(kShiftedRow, code);
+  return (kana::isIRowCodepoint(code) || kana::isERowCodepoint(code)) && !kana::isCodepointIn(kShiftedRow, code);
 }
 
 bool isClassicalAuxiliaryHomographKana(char32_t code) {
@@ -545,7 +529,7 @@ bool isSmallKana(std::string_view ch) {
 // Godan mizenkei endings.
 // In particular だ (copula) and は must NOT match here, so this cannot be
 // replaced by the kana::isARowCodepoint predicate the way endsWithORow uses
-// isORowCodepoint. kana::kMizenkeiEndings plus あ is the source of truth.
+// kana::isORowCodepoint. kana::kMizenkeiEndings plus あ is the source of truth.
 bool endsWithARow(std::string_view stem) {
   return utf8::lastChar(stem) == "あ" || endsWithChar(stem, kana::kMizenkeiEndings, kana::kMizenkeiCount);
 }

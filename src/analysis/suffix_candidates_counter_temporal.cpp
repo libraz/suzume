@@ -119,6 +119,12 @@ void appendTemporalCounterCandidates(const std::vector<char32_t>& codepoints, si
     }
   }
 
+  // The relation-suffix and 間-span splits below read the same quantity head
+  // and the temporal-counter run after it.
+  const size_t counter_start = scanQuantityHead(codepoints, start_pos, true);
+  const bool has_counter_quantity = counter_start > start_pos;
+  const size_t counter_end = scanTemporalCounterRun(codepoints, counter_start);
+
   // Quantified time + relational suffix: split 後/前 off a numeral/quantity run that
   // ends in a temporal counter (三日|後, 十年|前, 数日|後, 半年|前). The whole run is
   // otherwise emitted as one kanji_seq token; the left counter token already exists
@@ -126,10 +132,6 @@ void appendTemporalCounterCandidates(const std::vector<char32_t>& codepoints, si
   // counter must be temporal, keeping lexical wholes on non-temporal counters intact
   // (一人前, not 一人|前).
   {
-    size_t scan = scanQuantityHead(codepoints, start_pos, true);
-    const bool has_quantity = scan > start_pos;
-    const size_t counter_start = scan;
-    scan = scanTemporalCounterRun(codepoints, scan);
     // A temporal counter run followed by a suffix that is always compositional:
     //   - 後/前 relation suffix (三日|後, 十年|前)
     //   - 半 "and a half" (三時間|半, 二年|半, 五分|半, 六ヶ月|半)
@@ -137,16 +139,16 @@ void appendTemporalCounterCandidates(const std::vector<char32_t>& codepoints, si
     // (三時半 = half past three), not a duration-plus-half.
     bool suffix_is_compositional = false;
     bool suffix_is_half = false;
-    if (scan < codepoints.size()) {
-      if (normalize::isTemporalRelationSuffixKanji(codepoints[scan])) {
+    if (counter_end < codepoints.size()) {
+      if (normalize::isTemporalRelationSuffixKanji(codepoints[counter_end])) {
         suffix_is_compositional = true;
-      } else if (scan > 0 && codepoints[scan] == U'半' && codepoints[scan - 1] != U'時') {
+      } else if (counter_end > 0 && codepoints[counter_end] == U'半' && codepoints[counter_end - 1] != U'時') {
         suffix_is_compositional = true;
         suffix_is_half = true;
       }
     }
-    if (has_quantity && scan > counter_start && suffix_is_compositional) {
-      appendCounterCandidate(codepoints, start_pos, scan, core::PartOfSpeech::Noun,
+    if (has_counter_quantity && counter_end > counter_start && suffix_is_compositional) {
+      appendCounterCandidate(codepoints, start_pos, counter_end, core::PartOfSpeech::Noun,
                              candidate::kCounterRelationSplitBonus, core::ExtendedPOS::NounNumber,
                              "counter_relation_split", candidates);
       // Unlike 後/前 (single-kanji dict relation nouns), the split-off 半 only
@@ -156,10 +158,10 @@ void appendTemporalCounterCandidates(const std::vector<char32_t>& codepoints, si
       // while at a clause boundary it is the compositional suffix of the
       // duration expression (一時間|半。).
       if (suffix_is_half) {
-        const size_t after_half = scan + 1;
+        const size_t after_half = counter_end + 1;
         const bool closes_clause = after_half == codepoints.size() ||
                                    normalize::classifyChar(codepoints[after_half]) == normalize::CharType::Symbol;
-        appendCounterCandidate(codepoints, scan, after_half,
+        appendCounterCandidate(codepoints, counter_end, after_half,
                                closes_clause ? core::PartOfSpeech::Suffix : core::PartOfSpeech::Noun,
                                candidate::kCounterHalfSuffixCost,
                                closes_clause ? core::ExtendedPOS::Suffix : core::ExtendedPOS::NounNumber,
@@ -244,36 +246,34 @@ void appendTemporalCounterCandidates(const std::vector<char32_t>& codepoints, si
   // noun (数年間|海外) regardless of how its interior tokenizes — the split-after-間 here
   // only carves the following noun off; the 半年 vs 半|年 interior is decided elsewhere.
   {
-    size_t scan = scanQuantityHead(codepoints, start_pos, true);
-    const bool has_quantity = scan > start_pos;
-    const size_t counter_start = scan;
-    scan = scanTemporalCounterRun(codepoints, scan);
     // The run must end in 間, and that 間 must be preceded by another counter char in the
     // run (a bare numeral+間 is not a duration).
-    bool run_ends_in_span = has_quantity && scan > counter_start + 1 && codepoints[scan - 1] == U'間';
-    if (run_ends_in_span && scan < char_types.size() && char_types[scan] == normalize::CharType::Kanji) {
+    bool run_ends_in_span =
+        has_counter_quantity && counter_end > counter_start + 1 && codepoints[counter_end - 1] == U'間';
+    if (run_ends_in_span && counter_end < char_types.size() && char_types[counter_end] == normalize::CharType::Kanji) {
       // 間 heading the interval word 間隔 splits the numeral+counter off before 間
       // (三年|間隔); otherwise an ordinary kanji noun after 間 splits after it (三年間|勉強).
       // A lone ordinal 目 binds to the duration (二時間目 = one word); 目 heading a noun
       // still splits (五年間|目標, gate: 目 followed by a non-kanji).
-      bool trailing_ordinal_me = codepoints[scan] == U'目' &&
-                                 (scan + 1 >= char_types.size() || char_types[scan + 1] != normalize::CharType::Kanji);
-      if (normalize::isIntervalCompoundSecondKanji(codepoints[scan])) {
-        size_t split_end = scan - 1;  // before 間
+      bool trailing_ordinal_me =
+          codepoints[counter_end] == U'目' &&
+          (counter_end + 1 >= char_types.size() || char_types[counter_end + 1] != normalize::CharType::Kanji);
+      if (normalize::isIntervalCompoundSecondKanji(codepoints[counter_end])) {
+        size_t split_end = counter_end - 1;  // before 間
         appendCounterCandidate(codepoints, start_pos, split_end, core::PartOfSpeech::Noun,
                                candidate::kDurationSpanSplitBonus, core::ExtendedPOS::Unknown,
                                "duration_interval_split", candidates);
-      } else if (!trailing_ordinal_me && !normalize::isTemporalCounterKanji(codepoints[scan]) &&
-                 !normalize::isTemporalRelationSuffixKanji(codepoints[scan]) &&
-                 !normalize::isTemporalSpanSuffixKanji(codepoints[scan])) {
-        appendCounterCandidate(codepoints, start_pos, scan, core::PartOfSpeech::Noun,
+      } else if (!trailing_ordinal_me && !normalize::isTemporalCounterKanji(codepoints[counter_end]) &&
+                 !normalize::isTemporalRelationSuffixKanji(codepoints[counter_end]) &&
+                 !normalize::isTemporalSpanSuffixKanji(codepoints[counter_end])) {
+        appendCounterCandidate(codepoints, start_pos, counter_end, core::PartOfSpeech::Noun,
                                candidate::kDurationSpanSplitBonus, core::ExtendedPOS::Unknown, "duration_span_split",
                                candidates);
       }
     } else if (run_ends_in_span) {
       // Nothing continues the kanji run, so the 間-closed duration is a complete
       // quantity of its own (数年間, 三日間).
-      appendCounterCandidate(codepoints, start_pos, scan, core::PartOfSpeech::Noun,
+      appendCounterCandidate(codepoints, start_pos, counter_end, core::PartOfSpeech::Noun,
                              candidate::kNumeralCounterMergeBonus, core::ExtendedPOS::NounNumber, "duration_span_whole",
                              candidates);
     }

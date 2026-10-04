@@ -465,8 +465,8 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
   // Generate dictionary-verified Godan っ/ん onbin candidates before their
   // respective te/past continuations.  The general onbin generator owns all
   // unregistered-stem fallbacks, so this path emits only a verified lemma.
-  const size_t hira_extent_end = vh::findCharRegionEnd(char_types, start_pos, candidate::kMaxHiraganaOnbinProbeChars,
-                                                       normalize::CharType::Hiragana);
+  const size_t hira_extent_end =
+      findCharRegionEnd(char_types, start_pos, candidate::kMaxHiraganaOnbinProbeChars, normalize::CharType::Hiragana);
   if (hira_extent_end - start_pos >= 3) {
     const char32_t onbin_char = codepoints[hira_extent_end - 2];
     const char32_t continuation = codepoints[hira_extent_end - 1];

@@ -43,20 +43,20 @@ void generateCompoundVerbCandidates(const std::vector<char32_t>& codepoints, siz
   }
 
   // First kanji portion (1-2 chars) followed by a hiragana renyoukei ending
-  size_t kanji1_end = vh::findCharRegionEndBeforeHiragana(char_types, start_pos, 3, normalize::CharType::Kanji);
+  size_t kanji1_end = findCharRegionEndBeforeHiragana(char_types, start_pos, 3, normalize::CharType::Kanji);
   if (kanji1_end == start_pos) {
     return;
   }
 
   // Find first hiragana portion (1-3 chars)
-  size_t hira1_end = vh::findCharRegionEnd(char_types, kanji1_end, 4, normalize::CharType::Hiragana);
+  size_t hira1_end = findCharRegionEnd(char_types, kanji1_end, 4, normalize::CharType::Hiragana);
 
   // Find second kanji portion (must exist for compound verb)
   if (hira1_end >= char_types.size() || char_types[hira1_end] != normalize::CharType::Kanji) {
     return;
   }
 
-  size_t kanji2_end = vh::findCharRegionEnd(char_types, hira1_end, 3, normalize::CharType::Kanji);
+  size_t kanji2_end = findCharRegionEnd(char_types, hira1_end, 3, normalize::CharType::Kanji);
 
   // Skip compound verb candidates when second verb is aspectual/grammatical
   // These remain separate grammatical/aspectual search units:
@@ -74,7 +74,7 @@ void generateCompoundVerbCandidates(const std::vector<char32_t>& codepoints, siz
     return;
   }
 
-  size_t hira2_end = vh::findCharRegionEnd(char_types, kanji2_end, 10, normalize::CharType::Hiragana);
+  size_t hira2_end = findCharRegionEnd(char_types, kanji2_end, 10, normalize::CharType::Hiragana);
 
   // Try different ending lengths
   for (size_t end_pos = hira2_end; end_pos > kanji2_end; --end_pos) {
@@ -152,7 +152,7 @@ void generateKatakanaVerbCandidates(const std::vector<char32_t>& codepoints, siz
   }
 
   // Katakana portion (1-8 characters for slang verb stems) followed by hiragana conjugation endings
-  size_t kata_end = vh::findCharRegionEndBeforeHiragana(char_types, start_pos, 8, normalize::CharType::Katakana);
+  size_t kata_end = findCharRegionEndBeforeHiragana(char_types, start_pos, 8, normalize::CharType::Katakana);
   if (kata_end == start_pos) {
     return;
   }
@@ -166,7 +166,7 @@ void generateKatakanaVerbCandidates(const std::vector<char32_t>& codepoints, siz
   }
 
   // Find hiragana portion (conjugation endings, up to 10 chars)
-  size_t hira_end = vh::findCharRegionEnd(char_types, kata_end, 10, normalize::CharType::Hiragana);
+  size_t hira_end = findCharRegionEnd(char_types, kata_end, 10, normalize::CharType::Hiragana);
 
   // Need at least 1 hiragana for conjugation
   if (hira_end <= kata_end) {

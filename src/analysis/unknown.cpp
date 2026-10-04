@@ -106,13 +106,8 @@ bool endsInsideVerifiedCompoundVerb(const UnknownCandidate& candidate, const std
     return false;
   }
 
-  const std::string_view base_suffix = grammar::godanBaseSuffixFromIRow(codepoints[candidate.end]);
-  if (base_suffix.empty()) {
-    return false;
-  }
-  const std::string verb_base =
-      normalize::concat(extractSubstring(codepoints, candidate.end - 1, candidate.end), base_suffix);
-  return dict_manager->lookupExact(verb_base, core::PartOfSpeech::Verb) != nullptr;
+  return verb_helpers::hasDictionaryGodanBaseFromIRow(
+      dict_manager, extractSubstring(codepoints, candidate.end - 1, candidate.end), codepoints[candidate.end]);
 }
 
 bool containsInternalPunctuation(const UnknownCandidate& candidate, const std::vector<char32_t>& codepoints) {
@@ -168,7 +163,7 @@ bool startsWithParticleBeforeRegisteredPredicate(const UnknownCandidate& candida
     constexpr size_t kHostLookback = 12;
     constexpr PartOfSpeechMask kNominalHostMask =
         partOfSpeechMask(core::PartOfSpeech::Noun) | partOfSpeechMask(core::PartOfSpeech::Pronoun);
-    const size_t min_host_start = host_boundary > kHostLookback ? host_boundary - kHostLookback : 0;
+    const size_t min_host_start = lookbehindStart(host_boundary, kHostLookback);
     if (slot_particle != nullptr && slot_particle->extended_pos == core::ExtendedPOS::ParticleCase &&
         (normalize::isKanjiCodepoint(codepoints[host_boundary - 1]) ||
          hasDictionaryEntryEndingAt(*dict_manager, codepoints, min_host_start, host_boundary, kNominalHostMask))) {
@@ -236,11 +231,8 @@ bool hasDictionaryContentEndingAt(const std::vector<char32_t>& codepoints, size_
     return false;
   }
   constexpr size_t kContentLookback = 4;
-  const size_t first = boundary > kContentLookback ? boundary - kContentLookback : 0;
-  constexpr PartOfSpeechMask kContentMask =
-      partOfSpeechMask(core::PartOfSpeech::Noun) | partOfSpeechMask(core::PartOfSpeech::Pronoun) |
-      partOfSpeechMask(core::PartOfSpeech::Adverb) | partOfSpeechMask(core::PartOfSpeech::Adjective) |
-      partOfSpeechMask(core::PartOfSpeech::Verb);
+  const size_t first = lookbehindStart(boundary, kContentLookback);
+  constexpr PartOfSpeechMask kContentMask = kOpenClassPartOfSpeechMask | partOfSpeechMask(core::PartOfSpeech::Pronoun);
   return hasDictionaryEntryEndingAt(*dict_manager, codepoints, first, boundary, kContentMask);
 }
 

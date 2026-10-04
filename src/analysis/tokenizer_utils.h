@@ -36,14 +36,24 @@ using PartOfSpeechMask = uint32_t;
 inline constexpr size_t kDictionaryLookbehindChars = 8;
 inline constexpr size_t kClosedClassProbeChars = 5;
 
+/** First position of a window of at most @p chars characters that ends at @p pos. */
+constexpr size_t lookbehindStart(size_t pos, size_t chars) {
+  return pos > chars ? pos - chars : 0;
+}
+
 /** First position of the dictionary lookbehind window that ends at @p pos. */
 constexpr size_t dictionaryLookbehindStart(size_t pos) {
-  return pos > kDictionaryLookbehindChars ? pos - kDictionaryLookbehindChars : 0;
+  return lookbehindStart(pos, kDictionaryLookbehindChars);
 }
 
 constexpr PartOfSpeechMask partOfSpeechMask(core::PartOfSpeech pos) {
   return 1U << static_cast<uint8_t>(pos);
 }
+
+/** The open lexical classes; an exact entry in one of them spells a word. */
+inline constexpr PartOfSpeechMask kOpenClassPartOfSpeechMask =
+    partOfSpeechMask(core::PartOfSpeech::Noun) | partOfSpeechMask(core::PartOfSpeech::Verb) |
+    partOfSpeechMask(core::PartOfSpeech::Adjective) | partOfSpeechMask(core::PartOfSpeech::Adverb);
 
 /** Whether an exact dictionary surface has any of the requested parts of speech. */
 bool hasExactPartOfSpeech(const dictionary::DictionaryManager& dict_manager, std::string_view surface,

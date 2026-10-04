@@ -29,9 +29,8 @@ std::string trimAsciiWhitespace(std::string_view field) {
 }
 
 void stripUtf8Bom(std::string_view& text) {
-  if (text.size() >= 3 && static_cast<unsigned char>(text[0]) == 0xEF && static_cast<unsigned char>(text[1]) == 0xBB &&
-      static_cast<unsigned char>(text[2]) == 0xBF) {
-    text.remove_prefix(3);
+  if (normalize::startsWithUtf8Bom(text)) {
+    text.remove_prefix(normalize::kUtf8Bom.size());
   }
 }
 

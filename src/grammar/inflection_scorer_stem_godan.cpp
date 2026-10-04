@@ -537,7 +537,7 @@ float scoreGodan(float base, const InflectionScoreContext& context) {
   // (うごかす, ちらかす, あまやかす), a productive GodanSa shape.
   bool is_godan_sa_or_suru = (type == VerbType::GodanSa || type == VerbType::Suru);
   const bool is_transitive_asu_stem =
-      type == VerbType::GodanSa && !stem.empty() && isARowCodepoint(utf8::decodeLastChar(stem));
+      type == VerbType::GodanSa && !stem.empty() && kana::isARowCodepoint(utf8::decodeLastChar(stem));
   if (is_godan_sa_or_suru && !is_transitive_asu_stem && stem_len >= core::kThreeJapaneseCharBytes &&
       isPureHiragana(stem)) {
     applyPenalty(base, inflection::kPenaltyGodanSaSuruPureHiraganaLongStem, "godan_sa_suru_pure_hiragana_long_stem");

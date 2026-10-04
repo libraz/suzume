@@ -94,7 +94,7 @@ bool predicateEndsAt(const std::vector<char32_t>& codepoints, size_t pos,
   if (dict_manager == nullptr || pos == 0) {
     return false;
   }
-  const size_t probe_start = (pos >= 2) ? pos - 2 : 0;
+  const size_t probe_start = lookbehindStart(pos, 2);
   return hasDictionaryEntryEndingAt(
       *dict_manager, codepoints, probe_start, pos,
       partOfSpeechMask(core::PartOfSpeech::Verb) | partOfSpeechMask(core::PartOfSpeech::Auxiliary));
@@ -245,7 +245,7 @@ bool opensPredicateSlot(const std::vector<char32_t>& codepoints, size_t start_po
   // one, which any particle boundary establishes. Its members run to two morae,
   // so probe back that far.
   constexpr size_t kFocusParticleChars = 2;
-  const size_t scan_start = start_pos > kFocusParticleChars ? start_pos - kFocusParticleChars : 0;
+  const size_t scan_start = lookbehindStart(start_pos, kFocusParticleChars);
   for (size_t particle_start = scan_start; dict_manager != nullptr && particle_start < start_pos; ++particle_start) {
     const auto* particle =
         lookupEntryInRange(*dict_manager, codepoints, particle_start, start_pos, core::PartOfSpeech::Particle);

@@ -1018,10 +1018,8 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
           dict_manager_->lookupExact(surface) == nullptr) {
         const char32_t okurigana = codepoints[candidate_end];
         const std::string head = normalize::encodeUtf8(codepoints[candidate_end - 1]);
-        const std::string_view godan_ending = grammar::godanBaseSuffixFromIRow(okurigana);
         const bool ends_on_verb_head =
-            (!godan_ending.empty() &&
-             verb_helpers::isVerbInDictionary(dict_manager_, normalize::concat(head, godan_ending))) ||
+            verb_helpers::hasDictionaryGodanBaseFromIRow(dict_manager_, head, okurigana) ||
             (kana::isERowCodepoint(okurigana) &&
              verb_helpers::isVerbInDictionary(dict_manager_,
                                               normalize::concat(head, normalize::encodeUtf8(okurigana), "る")));

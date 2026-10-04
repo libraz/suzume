@@ -107,16 +107,6 @@ TEST(Utf8Test, Utf8Substr) {
   EXPECT_EQ(utf8Substr(text, 1, 2), "本語");
 }
 
-TEST(Utf8Test, DecodeEncodeNamespace) {
-  // Test the utf8 namespace functions
-  auto cps = utf8::decode("こんにちは");
-  ASSERT_EQ(cps.size(), 5);
-  EXPECT_EQ(cps[0], U'こ');
-
-  std::string encoded = utf8::encode(cps);
-  EXPECT_EQ(encoded, "こんにちは");
-}
-
 // ===== Emoji Tests =====
 
 TEST(Utf8Test, Emoji_Basic) {

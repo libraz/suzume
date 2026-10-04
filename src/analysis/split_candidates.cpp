@@ -19,6 +19,7 @@
 #include "normalize/char_type.h"
 #include "normalize/utf8.h"
 #include "tokenizer_utils.h"
+#include "verb_candidates_helpers.h"
 
 namespace suzume::analysis {
 
@@ -70,11 +71,8 @@ bool suffixHeadedRunAbsorbsVerifiedGodanStem(const std::vector<char32_t>& codepo
       lookupEntryInRange(dict_manager, codepoints, start_pos, start_pos + 1, core::PartOfSpeech::Suffix) == nullptr) {
     return false;
   }
-  const std::string_view base_suffix = grammar::godanBaseSuffixFromIRow(codepoints[kanji_end]);
-  return !base_suffix.empty() &&
-         dict_manager.lookupExact(
-             normalize::concat(extractSubstring(codepoints, kanji_end - 1, kanji_end), base_suffix),
-             core::PartOfSpeech::Verb) != nullptr;
+  return verb_helpers::hasDictionaryGodanBaseFromIRow(
+      &dict_manager, extractSubstring(codepoints, kanji_end - 1, kanji_end), codepoints[kanji_end]);
 }
 
 bool hasDictionaryLexicalPrefix(const std::vector<dictionary::LookupResult>& results, size_t full_length) {

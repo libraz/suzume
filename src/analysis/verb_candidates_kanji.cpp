@@ -140,8 +140,8 @@ bool hasFinitePredicateCaseParticleTail(const std::vector<char32_t>& codepoints,
          kana::isERowCodepoint(codepoints[predicate_end - 2]);
 }
 
-bool hasNominalizedNounParticleContinuation(const std::vector<char32_t>& codepoints, size_t end_pos,
-                                            const dictionary::DictionaryManager* dict_manager) {
+bool hasNonTeNominalForcingParticleAt(const std::vector<char32_t>& codepoints, size_t end_pos,
+                                      const dictionary::DictionaryManager* dict_manager) {
   if (dict_manager == nullptr || end_pos >= codepoints.size() || codepoints[end_pos] == U'て' ||
       codepoints[end_pos] == U'で') {
     return false;
@@ -315,7 +315,7 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
   }
 
   // Kanji portion (typically 1-2 characters for verbs) followed by hiragana
-  size_t kanji_end = vh::findCharRegionEndBeforeHiragana(char_types, start_pos, 3, normalize::CharType::Kanji);
+  size_t kanji_end = findCharRegionEndBeforeHiragana(char_types, start_pos, 3, normalize::CharType::Kanji);
   if (kanji_end == start_pos) {
     return;
   }
@@ -341,14 +341,14 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
   grammar::VerbType sokuonbin_verb_type = grammar::VerbType::Unknown;
   if (dict_manager != nullptr && kanji_end == start_pos + 1 && codepoints[kanji_end] == core::hiragana::kSmallTsu &&
       kanji_end + 1 < char_types.size() && char_types[kanji_end + 1] == normalize::CharType::Kanji) {
-    size_t kanji2_end = vh::findCharRegionEnd(char_types, kanji_end + 1, 3, normalize::CharType::Kanji);
+    size_t kanji2_end = findCharRegionEnd(char_types, kanji_end + 1, 3, normalize::CharType::Kanji);
     // Skip hatsuonbin (ん) continuations: 吹っ飛んだ's ん is onbin-ambiguous (ぶ/む/ぬ)
     // and 漢っ漢+ん compounds are already resolved by the dedicated
     // sokuon_kanji_hatsuonbin suffix candidate with the correct base. The verbs this
     // probe is needed for (走る っ-onbin, 掻く い-onbin) never use ん-onbin.
     if (kanji2_end < char_types.size() && char_types[kanji2_end] == normalize::CharType::Hiragana &&
         codepoints[kanji2_end] != U'ん') {
-      size_t probe_end = vh::findCharRegionEnd(char_types, kanji2_end, 12, normalize::CharType::Hiragana);
+      size_t probe_end = findCharRegionEnd(char_types, kanji2_end, 12, normalize::CharType::Hiragana);
       std::string embedded = extractSubstring(codepoints, kanji_end + 1, probe_end);
       for (const auto& res : inflection.analyze(embedded)) {
         // Shuushikei (surface == base, 走る) or a multi-character conjugation suffix
@@ -379,7 +379,7 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
   // Scan the complete okurigana before applying the first-mora particle
   // guard. A later closed excessive suffix can prove that an initially
   // particle-like mora belongs inside a longer continuative (積もり+すぎる).
-  const size_t hiragana_end = vh::findCharRegionEnd(char_types, kanji_end, 12, normalize::CharType::Hiragana);
+  const size_t hiragana_end = findCharRegionEnd(char_types, kanji_end, 12, normalize::CharType::Hiragana);
   bool has_excessive_renyokei_tail = false;
   for (size_t pos = kanji_end + 1; pos + 1 < hiragana_end; ++pos) {
     if (codepoints[pos] == U'す' && codepoints[pos + 1] == U'ぎ' &&
@@ -688,7 +688,7 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
         (!cand.lemma_verified && cand.conj_type != dictionary::ConjugationType::GodanSa) || starts_inside_kanji_run ||
         hasDictionaryAdjectiveTail(codepoints, cand.start, cand.end, dict_manager) ||
         vh::isBoundSuffixAfterNominalHost(dict_manager, codepoints, cand.start, cand.surface) ||
-        !hasNominalizedNounParticleContinuation(codepoints, cand.end, dict_manager)) {
+        !hasNonTeNominalForcingParticleAt(codepoints, cand.end, dict_manager)) {
       continue;
     }
     nominalized_candidates.push_back(makeNounCandidate(

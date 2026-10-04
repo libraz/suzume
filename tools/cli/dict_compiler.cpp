@@ -44,7 +44,7 @@ bool isTrivialEntry(std::string_view surface) {
     return false;
   }
 
-  auto codepoints = normalize::utf8::decode(surface);
+  auto codepoints = normalize::toCodepoints(surface);
 
   // 2-char entries are always non-trivial (short words need dict help)
   if (codepoints.size() <= 2) {

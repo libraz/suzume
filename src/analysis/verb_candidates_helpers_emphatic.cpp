@@ -74,7 +74,7 @@ bool isSuppressedSokuonOnset(const std::vector<char32_t>& codepoints, size_t sok
   if (next == U'す' || next == U'さ' || next == U'せ') {
     return true;
   }
-  const bool u_row_verb = base_pos == core::PartOfSpeech::Verb && normalize::isURowHiragana(base_final);
+  const bool u_row_verb = base_pos == core::PartOfSpeech::Verb && kana::isURowCodepoint(base_final);
   if (next == U'と') {
     return u_row_verb;
   }

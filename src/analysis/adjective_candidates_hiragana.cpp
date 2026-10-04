@@ -50,7 +50,7 @@ bool startsInsideMultiMoraParticle(const std::vector<char32_t>& codepoints, size
     return false;
   }
   constexpr size_t kMaxParticleChars = 4;
-  const size_t earliest_start = start_pos > kMaxParticleChars ? start_pos - kMaxParticleChars : 0;
+  const size_t earliest_start = lookbehindStart(start_pos, kMaxParticleChars);
   for (size_t particle_start = earliest_start; particle_start < start_pos; ++particle_start) {
     if (end_pos - particle_start < 2) {
       continue;
@@ -68,10 +68,7 @@ bool isParticleSequenceWithoutLexicalReading(const std::vector<char32_t>& codepo
   if (dict_manager == nullptr || start_pos >= end_pos) {
     return false;
   }
-  constexpr PartOfSpeechMask kLexicalMask =
-      partOfSpeechMask(core::PartOfSpeech::Noun) | partOfSpeechMask(core::PartOfSpeech::Verb) |
-      partOfSpeechMask(core::PartOfSpeech::Adjective) | partOfSpeechMask(core::PartOfSpeech::Adverb);
-  if (hasExactPartOfSpeech(*dict_manager, codepoints, start_pos, end_pos, kLexicalMask)) {
+  if (hasExactPartOfSpeech(*dict_manager, codepoints, start_pos, end_pos, kOpenClassPartOfSpeechMask)) {
     return false;
   }
   return maximalSegmentCount(*dict_manager, codepoints, start_pos, end_pos, core::PartOfSpeech::Particle) > 0;

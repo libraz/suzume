@@ -546,7 +546,7 @@ std::string lemmatizeVerbFallback(std::string_view surface) {
       // over inventing a lemma. Dictionary-backed paths retain the precise
       // Godan analysis before they reach this last-resort rule.
       const std::string_view stem = utf8::dropLastChar(surface);
-      if (grammar::isERowCodepoint(utf8::decodeLastChar(stem))) {
+      if (kana::isERowCodepoint(utf8::decodeLastChar(stem))) {
         return std::string(surface);
       }
     }

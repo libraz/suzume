@@ -261,6 +261,13 @@ void addCompoundVerbJoinCandidates(core::Lattice& lattice, std::string_view text
   // not duplicate rule-handled compounds (走り出す, 話し合う).
   bool dict_compound_v1 = false;
   std::string dict_compound_v1_lemma;
+  // Adopt a dictionary-verified V1 whose stem ends where V2 starts.
+  const auto adopt_dictionary_v1 = [&](size_t verified_v2_start) {
+    v2_start = verified_v2_start;
+    is_sokuonbin = false;
+    is_ichidan = true;  // makes v1_renyokei_end == v2_start_byte below (multi-hiragana stem)
+    dict_compound_v1 = true;
+  };
   {
     size_t probe_byte = byteOffsetAt(byte_offsets, start_pos);
     size_t best_len = 0;
@@ -287,10 +294,7 @@ void addCompoundVerbJoinCandidates(core::Lattice& lattice, std::string_view text
     // subsidiary chain is what this path is for. A hiragana continuation is an auxiliary
     // (引きずり|ます) that the plain dict renyokei edge already handles, so leave it alone.
     if (best_len > 0 && char_types[start_pos + best_len] == CharType::Kanji) {
-      v2_start = start_pos + best_len;
-      is_sokuonbin = false;
-      is_ichidan = true;  // makes v1_renyokei_end == v2_start_byte below (multi-hiragana stem)
-      dict_compound_v1 = true;
+      adopt_dictionary_v1(start_pos + best_len);
     }
   }
 
@@ -304,10 +308,7 @@ void addCompoundVerbJoinCandidates(core::Lattice& lattice, std::string_view text
       (kana::isERowCodepoint(renyokei_char) || kana::isIRowCodepoint(renyokei_char))) {
     const std::string multi_kanji_ichidan_base = extractSubstring(codepoints, start_pos, kanji_end + 1) + "る";
     if (dict_manager.lookupExact(multi_kanji_ichidan_base, core::PartOfSpeech::Verb) != nullptr) {
-      v2_start = kanji_end + 1;
-      is_sokuonbin = false;
-      is_ichidan = true;
-      dict_compound_v1 = true;
+      adopt_dictionary_v1(kanji_end + 1);
       dict_compound_v1_lemma = multi_kanji_ichidan_base;
     }
   }
@@ -332,10 +333,7 @@ void addCompoundVerbJoinCandidates(core::Lattice& lattice, std::string_view text
           std::string embedded2(textRange(text, byte_offsets, k2_start, k2_end));
           embedded2 += normalize::encodeUtf8(base2);
           if (dict_manager.lookupExact(embedded2, core::PartOfSpeech::Verb) != nullptr) {
-            v2_start = k2_end + 1;
-            is_sokuonbin = false;
-            is_ichidan = true;
-            dict_compound_v1 = true;
+            adopt_dictionary_v1(k2_end + 1);
             dict_compound_v1_lemma = embedded2;  // best-effort; unused once verified
           }
         }

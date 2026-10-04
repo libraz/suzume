@@ -170,7 +170,8 @@ float scoreAdjectiveAndForm(float base, const InflectionScoreContext& context) {
         // A/i/e-row kana cover Godan mizenkei/renyokei and Ichidan stems.
         // Use the canonical vowel predicates so や and へ cannot drift out of
         // a hand-maintained surface list. 促音 is the independent onbin marker.
-        if (isARowCodepoint(previous) || isIRowCodepoint(previous) || isERowCodepoint(previous) || previous == U'っ') {
+        if (kana::isARowCodepoint(previous) || kana::isIRowCodepoint(previous) || kana::isERowCodepoint(previous) ||
+            previous == U'っ') {
           applyPenalty(base, inflection::kPenaltyIAdjMizenkeiPattern, "i_adj_mizenkei_pattern");
         }
       }

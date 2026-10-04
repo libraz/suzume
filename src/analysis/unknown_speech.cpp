@@ -486,12 +486,9 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
     }
     // The shape ending inside a longer registered word is that word cut short
     // (ほんと|う for ほんとう), not a mimetic of its own.
-    constexpr PartOfSpeechMask kContentMask =
-        partOfSpeechMask(core::PartOfSpeech::Noun) | partOfSpeechMask(core::PartOfSpeech::Adverb) |
-        partOfSpeechMask(core::PartOfSpeech::Verb) | partOfSpeechMask(core::PartOfSpeech::Adjective);
     for (size_t word_end = pattern_end + 1; pattern != nullptr && dict_manager_ != nullptr && word_end <= seq_end;
          ++word_end) {
-      if (hasExactPartOfSpeech(*dict_manager_, codepoints, start_pos, word_end, kContentMask)) {
+      if (hasExactPartOfSpeech(*dict_manager_, codepoints, start_pos, word_end, kOpenClassPartOfSpeechMask)) {
         pattern = nullptr;
       }
     }
