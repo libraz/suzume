@@ -154,12 +154,6 @@ inline bool isMizenkeiAuxiliaryStarter(char32_t codepoint, char32_t following) {
          codepoint == U'ね' || codepoint == U'む' || codepoint == U'じ';
 }
 
-// Deverbal suffixes that nominalize a preceding compound continuative
-// (組み合わせ+方, 引き受け+手).
-inline bool isDeverbalSuffixKanji(char32_t codepoint) {
-  return codepoint == U'方' || codepoint == U'手' || codepoint == U'物' || codepoint == U'所' || codepoint == U'場';
-}
-
 // Emits the continuative subsidiary behind a voice auxiliary (the 続ける of
 // れ続ける and its inflections) and returns true when that grammar-owned path
 // consumes the candidate span.

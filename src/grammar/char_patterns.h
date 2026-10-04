@@ -559,6 +559,12 @@ bool endsWithIRow(std::string_view stem);
 bool isTransitiveAsuStem(std::u32string_view stem);
 
 /**
+ * @brief Whether a kanji is a deverbal suffix nominalizing a verb continuative
+ * (書き+方, 組み合わせ+方, 引き受け+手, 取り扱い+所)
+ */
+bool isDeverbalSuffixKanji(char32_t codepoint);
+
+/**
  * @brief Check if stem ends with onbin marker (音便)
  * @param stem The stem to check
  * @return True if the stem ends with い, っ, or ん

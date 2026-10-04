@@ -1064,6 +1064,119 @@
       ],
       "id": "tari_da_2",
       "input": "一人当たり千円だ"
+    },
+    {
+      "description": "受け付け方を変える - regression test",
+      "expected": [
+        {
+          "lemma": "受け付け",
+          "pos": "Noun",
+          "surface": "受け付け"
+        },
+        {
+          "lemma": "方",
+          "pos": "Suffix",
+          "surface": "方"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "変える",
+          "pos": "Verb",
+          "surface": "変える"
+        }
+      ],
+      "id": "ke_ke_wo_eru_2",
+      "input": "受け付け方を変える"
+    },
+    {
+      "description": "入れ替え方を説明する - regression test",
+      "expected": [
+        {
+          "lemma": "入れ替え",
+          "pos": "Noun",
+          "surface": "入れ替え"
+        },
+        {
+          "lemma": "方",
+          "pos": "Suffix",
+          "surface": "方"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "説明",
+          "pos": "Noun",
+          "surface": "説明"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "re_e_wo_suru",
+      "input": "入れ替え方を説明する"
+    },
+    {
+      "description": "取り扱い所で聞く - regression test",
+      "expected": [
+        {
+          "lemma": "取り扱い",
+          "pos": "Noun",
+          "surface": "取り扱い"
+        },
+        {
+          "lemma": "所",
+          "pos": "Suffix",
+          "surface": "所"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "聞く",
+          "pos": "Verb",
+          "surface": "聞く"
+        }
+      ],
+      "id": "ri_i_de_ku",
+      "input": "取り扱い所で聞く"
+    },
+    {
+      "description": "古き書き方を学ぶ - regression test",
+      "expected": [
+        {
+          "lemma": "古い",
+          "pos": "Adjective",
+          "surface": "古き"
+        },
+        {
+          "lemma": "書き方",
+          "pos": "Noun",
+          "surface": "書き方"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "学ぶ",
+          "pos": "Verb",
+          "surface": "学ぶ"
+        }
+      ],
+      "id": "ki_ki_wo_bu",
+      "input": "古き書き方を学ぶ"
     }
   ],
   "description": "noun_compounds tests",

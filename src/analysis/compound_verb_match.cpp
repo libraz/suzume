@@ -3,6 +3,7 @@
  * @brief V1 verification and V2 matching for compound verbs
  */
 #include "analysis/dictionary_probe.h"
+#include "grammar/char_patterns.h"
 #include "join_compound_verb_internal.h"
 
 namespace suzume::analysis::compound_verb_detail {
@@ -741,7 +742,7 @@ CompoundVerbMatch findCompoundVerbMatch(
       const size_t renyokei_end_pos =
           advanceCharsToBytePos(codepoints, v2_start, v2_start_byte, v2_start_byte + matched_len);
       const bool followed_by_deverbal_suffix =
-          renyokei_end_pos < codepoints.size() && isDeverbalSuffixKanji(codepoints[renyokei_end_pos]);
+          renyokei_end_pos < codepoints.size() && grammar::isDeverbalSuffixKanji(codepoints[renyokei_end_pos]);
       const bool followed_by_nominal_particle =
           beginsNominalForcingParticle(codepoints, renyokei_end_pos, dict_manager);
       const bool followed_by_ichidan_conditional =

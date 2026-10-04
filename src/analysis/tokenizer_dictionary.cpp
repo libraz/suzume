@@ -869,12 +869,13 @@ ContextualDictionaryCandidateState addContextualDictionaryCandidates(
                     candidate::kDictionaryOriginConfidence, {}, causal_epos, "regional_causal_ki");
   }
 
-  if (codepoints[start_pos] == U'方' && hasPrecedingDeverbalNoun(lattice, start_pos)) {
-    lattice.addEdge("方", static_cast<uint32_t>(start_pos), static_cast<uint32_t>(start_pos + 1),
+  if (grammar::isDeverbalSuffixKanji(codepoints[start_pos]) && hasPrecedingDeverbalNoun(lattice, start_pos)) {
+    const std::string suffix = normalize::encodeUtf8(codepoints[start_pos]);
+    lattice.addEdge(suffix, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(start_pos + 1),
                     core::PartOfSpeech::Suffix, candidate::kDeverbalMethodSuffixCost,
-                    core::LatticeEdge::kFromDictionary, "方", dictionary::ConjugationType::None,
+                    core::LatticeEdge::kFromDictionary, suffix, dictionary::ConjugationType::None,
                     core::CandidateOrigin::SuffixPattern, candidate::kDictionaryOriginConfidence, {},
-                    core::ExtendedPOS::Suffix, "deverbal_method_suffix");
+                    core::ExtendedPOS::Suffix, "deverbal_suffix");
   }
 
   state.has_attributive_temporal_ma =

@@ -3,6 +3,7 @@
  * @brief Post-match validation, scoring, and edge emission for compound verbs
  */
 #include "analysis/dictionary_probe.h"
+#include "grammar/char_patterns.h"
 #include "grammar/honorific_verbs.h"
 #include "join_compound_verb_internal.h"
 
@@ -190,7 +191,7 @@ void emitCompoundVerbCandidates(core::Lattice& lattice, std::string_view text, c
       // nominal candidate, not retained as a verb.
       followed_by_aux = next_cp == U'た' || next_cp == U'て' || next_cp == U'で' || next_cp == U'な' ||
                         next_cp == U'れ' || next_cp == U'ら' || next_cp == U'ま' || next_cp == U'ず' ||
-                        isDeverbalSuffixKanji(next_cp);
+                        grammar::isDeverbalSuffixKanji(next_cp);
     }
     if (!followed_by_aux) {
       SUZUME_DEBUG_LOG("[COMPOUND_SKIP] \"" << compound_surface << "\" is dict NOUN, skipping compound verb\n");
@@ -379,34 +380,16 @@ void emitCompoundVerbCandidates(core::Lattice& lattice, std::string_view text, c
                     "compound_renyokei_nominal");
   }
 
-  // A compound verb continuative followed by a deverbal suffix is a single
-  // nominal search unit.  The V1/V2 verification above keeps this productive
-  // rule from absorbing arbitrary kanji-hiragana sequences.  The suffix must
-  // close the kanji run, as for a simple continuative (受け付け/方法); only 物
-  // takes a further derivational suffix (飲み物屋).
-  const bool suffix_closes_kanji_run = compound_end_pos + 1 >= codepoints.size() ||
-                                       !normalize::isKanjiCodepoint(codepoints[compound_end_pos + 1]) ||
-                                       codepoints[compound_end_pos] == U'物';
+  // A deverbal suffix after a compound continuative keeps its own boundary
+  // while the compound is nominalized (組み合わせ+方, 取り扱い+所, 引き受け+手);
+  // only a simple continuative fuses with it (書き方).
   if (best_match.renyokei_form && compound_end_pos < codepoints.size() &&
-      isDeverbalSuffixKanji(codepoints[compound_end_pos]) && codepoints[compound_end_pos] != U'手' &&
-      suffix_closes_kanji_run) {
-    const size_t noun_end_pos = compound_end_pos + 1;
-    const size_t noun_end_byte = byteOffsetAt(byte_offsets, noun_end_pos);
-    const std::string noun_surface(text.substr(start_byte, noun_end_byte - start_byte));
-    lattice.addEdge(noun_surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(noun_end_pos),
-                    core::PartOfSpeech::Noun, verbal_noun_cost, flags, noun_surface, dictionary::ConjugationType::None,
-                    core::CandidateOrigin::VerbCompound, candidate::kNoOriginConfidence,
-                    "compound_renyokei_suffix_noun", core::ExtendedPOS::NounVerbal, "compound_renyokei_suffix_noun");
-  }
-
-  // The agentive 手 remains a suffix search unit, while the preceding
-  // compound continuative is nominalized (引き受け+手).
-  if (best_match.renyokei_form && compound_end_pos < codepoints.size() && codepoints[compound_end_pos] == U'手') {
+      grammar::isDeverbalSuffixKanji(codepoints[compound_end_pos])) {
     lattice.addEdge(compound_surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(compound_end_pos),
                     core::PartOfSpeech::Noun, verbal_noun_cost, flags, compound_surface,
                     dictionary::ConjugationType::None, core::CandidateOrigin::VerbCompound,
-                    candidate::kNoOriginConfidence, "compound_renyokei_agentive_suffix", core::ExtendedPOS::NounVerbal,
-                    "compound_renyokei_agentive_suffix");
+                    candidate::kNoOriginConfidence, "compound_renyokei_before_suffix", core::ExtendedPOS::NounVerbal,
+                    "compound_renyokei_before_suffix");
   }
 
   // An ichidan V2 forms its conditional from the compound renyokei plus

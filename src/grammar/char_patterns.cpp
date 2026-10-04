@@ -97,6 +97,10 @@ bool endsWithRenyokeiMarker(std::string_view stem) {
   return endsWithIRow(stem) || endsWithERow(stem);
 }
 
+bool isDeverbalSuffixKanji(char32_t codepoint) {
+  return codepoint == U'方' || codepoint == U'手' || codepoint == U'物' || codepoint == U'所' || codepoint == U'場';
+}
+
 bool isTransitiveAsuStem(std::u32string_view stem) {
   if (stem.empty() || !kana::isARowCodepoint(stem.back())) {
     return false;

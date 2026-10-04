@@ -638,13 +638,18 @@ void addVerbSuffixNounJoinCandidates(core::Lattice& lattice, std::string_view te
   }
 
   // A continuative opening right after another one is the second verb of a
-  // compound (受け+付け方); the compound itself then heads the deverbal noun,
-  // so this span starts inside a word.
+  // compound (受け+付け方, 入れ+替え方); the compound itself then heads the
+  // deverbal noun, so this span starts inside a word. A classical adjective
+  // attributive in the same shape modifies the noun instead (古き+書き方).
   const char32_t left_kana = start_pos >= 2 ? codepoints[start_pos - 1] : U'\0';
   if (start_pos >= 2 && hiragana_end == kanji_end + 1 && kanji_end == start_pos + 1 &&
       char_types[start_pos - 1] == CharType::Hiragana && char_types[start_pos - 2] == CharType::Kanji &&
       (kana::isIRowCodepoint(left_kana) || kana::isERowCodepoint(left_kana)) && !isCaseParticleCodepoint(left_kana) &&
-      left_kana != U'て' && verb_helpers::namesDictionaryVerbContinuative(&dict_manager, codepoints, kanji_end)) {
+      left_kana != U'て' &&
+      !(left_kana == U'き' && verb_helpers::isAdjectiveInDictionary(
+                                  &dict_manager, extractSubstring(codepoints, start_pos - 2, start_pos - 1) + "い")) &&
+      (verb_helpers::namesDictionaryVerbContinuative(&dict_manager, codepoints, start_pos - 1) ||
+       verb_helpers::namesDictionaryVerbContinuative(&dict_manager, codepoints, kanji_end))) {
     return;
   }
 
