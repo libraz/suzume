@@ -7,11 +7,11 @@ import shutil
 import pytest
 
 from suzume_mcp.core import bug_store
+from suzume_mcp.core.diff_utils import normalize_width as _normalize_width
 from suzume_mcp.tools.thread_tools import (
     _append_issue,
     _is_japanese,
     _load_progress,
-    _normalize_width,
     _process_lines,
     _save_progress,
     classify_diff,

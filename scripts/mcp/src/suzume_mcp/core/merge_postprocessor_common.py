@@ -1,5 +1,7 @@
 """Shared probes and conjugation helpers for merge post-processing."""
 
+from .mecab import mecab_analyze
+
 _A_ROW_TO_U_ROW = {
     "か": "く",
     "が": "ぐ",
@@ -13,14 +15,6 @@ _A_ROW_TO_U_ROW = {
 }
 
 
-def _is_single_verb(surface: str) -> bool:
-    """Whether the reference dictionary reads a surface as exactly one verb."""
-    from .mecab import mecab_analyze
-
-    tokens = mecab_analyze(surface)
-    return len(tokens) == 1 and tokens[0].get("pos") == "動詞" and tokens[0].get("surface") == surface
-
-
 _CONTINUATIVE_PROBE_AUXILIARY = "ます"
 
 
@@ -30,8 +24,6 @@ def _plain(token: dict) -> dict:
 
 def _probe_continuative(surface: str) -> list[dict] | None:
     """The reference dictionary's reading of a surface followed by 〜ます."""
-    from .mecab import mecab_analyze
-
     tokens = mecab_analyze(surface + _CONTINUATIVE_PROBE_AUXILIARY)
     if len(tokens) < 2 or tokens[-1].get("surface") != _CONTINUATIVE_PROBE_AUXILIARY:
         return None
@@ -70,8 +62,6 @@ def _continuative_verb_tokens(surface: str) -> list[dict] | None:
     Probing each tail in turn recovers the boundary there: the tail is the verb
     and the head is what modifies it.
     """
-    from .mecab import mecab_analyze
-
     whole = _probe_continuative(surface)
     if whole is not None:
         return whole

@@ -8,13 +8,14 @@ from ..core.constants import TARI_ADVERB_STEMS
 from ..core.json_utils import json_error as _json_error  # noqa: F401
 from ..core.json_utils import json_result as _json_result  # noqa: F401
 from ..core.pos_mapping import normalize_pos
-from ..core.suzume_cli import (
-    format_expected_from_tokens as format_expected,
-)
 from ..core.suzume_cli import get_cli_path
 from ..core.test_file_utils import (
+    find_test_by_id,
+    find_test_by_input,
+    get_cases,
     get_test_data_dir,
     get_test_files,
+    load_json,
     normalize_test_file_name,
 )
 from ..server import PROJECT_ROOT
@@ -71,10 +72,10 @@ def _get_suzume_tokens(text: str) -> list[dict]:
 
 
 def _format_expected_checked(tokens: list[dict], source: str) -> list[dict]:
-    """Format expected tokens, rejecting empty oracle output before any write."""
+    """Return the oracle tokens to store as `expected`, rejecting empty output before any write."""
     if not tokens:
         raise RuntimeError(f"{source} produced no tokens; refusing to write empty expected output")
-    return format_expected(tokens)
+    return tokens
 
 
 def _get_test_files_filtered(file_filter: str = "") -> list[Path]:
@@ -89,6 +90,33 @@ def _get_test_files_filtered(file_filter: str = "") -> list[Path]:
         path = get_test_data_dir(PROJECT_ROOT) / f"{file_name}.json"
         return [path] if path.exists() else []
     return get_test_files(PROJECT_ROOT)
+
+
+def _load_test_cases(files: list[Path]) -> tuple[list[tuple[Path, dict, list[dict]]], str | None]:
+    """Load each file's case array, or report the first file that does not parse."""
+    loaded = []
+    for path in files:
+        try:
+            data = load_json(path)
+        except Exception as exc:
+            return [], f"Failed to parse JSON file {path}: {exc}"
+        loaded.append((path, data, get_cases(data, str(path))))
+    return loaded, None
+
+
+def _case_id(case: dict, index: int) -> str:
+    return case.get("id", str(index))
+
+
+def _find_case(project_root: Path, input_text: str, test_id: str) -> tuple[dict | None, str]:
+    """Find one case by id, else by input, returning an error message when absent."""
+    if test_id:
+        found = find_test_by_id(project_root, test_id)
+        return found, "" if found else f"Test not found: {test_id}"
+    if input_text:
+        found = find_test_by_input(project_root, input_text)
+        return found, "" if found else f"No test found for input: {input_text}"
+    return None, "Either input_text or test_id is required."
 
 
 def _detect_segmentation_pattern(correct_str: str, suzume_str: str, input_text: str) -> str:

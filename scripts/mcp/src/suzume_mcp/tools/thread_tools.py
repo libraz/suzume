@@ -6,10 +6,12 @@ listing, rechecking, and closing what a scan files here.
 
 import contextlib
 import re
+from collections.abc import Callable
 from pathlib import Path
 
 from ..core import bug_store
-from ..core.diff_utils import classify_surface_diff, normalize_width
+from ..core.diff_utils import classify_surface_diff
+from ..core.json_utils import json_error as _json_error
 from ..core.json_utils import json_result as _json_result
 from ..core.suzume_cli import get_expected_tokens_subprocess, get_suzume_surfaces
 from ..server import PROJECT_ROOT, mcp
@@ -25,11 +27,6 @@ SCAN_SOURCE = "thread"
 # ============================================================================
 # Diff classification
 # ============================================================================
-
-
-def _normalize_width(text: str) -> str:
-    """Compatibility facade for callers of the former local helper."""
-    return normalize_width(text)
 
 
 def classify_diff(expected: str, suzume: str) -> str:
@@ -183,33 +180,17 @@ def _process_lines(
             processed += 1
             continue
 
+        max_line = current_line
+        processed += 1
         try:
             result = _compare_surfaces(line)
         except Exception as e:
-            issues.append(
-                {
-                    "line_num": current_line,
-                    "text": line,
-                    "error": str(e),
-                    "diff_type": "error",
-                }
-            )
-            max_line = current_line
-            processed += 1
+            issues.append({"line_num": current_line, "text": line, "error": str(e), "diff_type": "error"})
             continue
-
-        max_line = current_line
-        processed += 1
 
         if result["match"]:
             if verbose:
-                issues.append(
-                    {
-                        "line_num": current_line,
-                        "text": line,
-                        "match": True,
-                    }
-                )
+                issues.append({"line_num": current_line, "text": line, "match": True})
         else:
             problems += 1
             progress["problems_found"] += 1
@@ -233,6 +214,110 @@ def _process_lines(
 # ============================================================================
 
 
+def _input_path(input_file: str) -> Path:
+    return Path(input_file) if input_file else DEFAULT_FILE
+
+
+def _scan(
+    count: int,
+    from_line: int,
+    input_file: str,
+    dry_run: bool,
+    *,
+    verbose: bool,
+    rows_key: str,
+    row: Callable[[dict], dict | None],
+) -> str:
+    """Compare the next lines, file new issues unless dry-run, and shape the rows."""
+    filepath = _input_path(input_file)
+    if not filepath.exists():
+        return _json_error(f"Input file not found: {filepath}")
+
+    progress = _load_progress(str(filepath))
+    if dry_run:
+        progress = progress.copy()
+    start = from_line if from_line > 0 else progress["last_checked"] + 1
+
+    all_lines = filepath.read_text(encoding="utf-8").splitlines()
+    filed_texts = None
+    next_record_id = None
+    if not dry_run:
+        known = bug_store.load_open(SCAN_SOURCE) + bug_store.load_resolved(SCAN_SOURCE)
+        filed_texts = {(record.get("text") or "").strip() for record in known}
+        next_record_id = [bug_store.next_id(SCAN_SOURCE)]
+    issues, processed, problems, skipped, max_line = _process_lines(
+        all_lines,
+        start,
+        count,
+        progress,
+        verbose=verbose,
+        record_issues=not dry_run,
+        filed_texts=filed_texts,
+        next_record_id=next_record_id,
+    )
+
+    if max_line > 0 and not dry_run:
+        progress["last_checked"] = max_line
+        _save_progress(progress)
+
+    return _json_result(
+        {
+            "range": {"from": start, "to": max_line},
+            "processed": processed,
+            "problems": problems,
+            "skipped": skipped,
+            rows_key: [shaped for issue in issues if (shaped := row(issue)) is not None],
+            "diff_types": summarize_diffs([i for i in issues if not i.get("match", True)]),
+            "total_problems": progress["problems_found"],
+            "dry_run": dry_run,
+        }
+    )
+
+
+def _problem_row(issue: dict) -> dict | None:
+    """A scan row: problems and errors only."""
+    if issue.get("error"):
+        return {
+            "line_num": issue["line_num"],
+            "text": issue["text"],
+            "diff_type": "error",
+            "expected": "",
+            "suzume": "",
+        }
+    if not issue.get("match", True):
+        return {
+            "line_num": issue["line_num"],
+            "text": issue["text"],
+            "diff_type": issue["diff_type"],
+            "expected": issue["expected"],
+            "suzume": issue["suzume"],
+        }
+    return None
+
+
+def _result_row(issue: dict) -> dict:
+    """An interactive row: every checked line, including matches."""
+    if issue.get("error"):
+        return {
+            "line_num": issue["line_num"],
+            "text": issue["text"],
+            "match": False,
+            "diff_type": "error",
+            "expected": "",
+            "suzume": "",
+        }
+    if issue.get("match"):
+        return {"line_num": issue["line_num"], "text": issue["text"], "match": True}
+    return {
+        "line_num": issue["line_num"],
+        "text": issue["text"],
+        "match": False,
+        "diff_type": issue.get("diff_type", "unknown"),
+        "expected": issue["expected"],
+        "suzume": issue["suzume"],
+    }
+
+
 @mcp.tool()
 async def thread_status(input_file: str = "") -> str:
     """Show thread check progress stats.
@@ -241,12 +326,12 @@ async def thread_status(input_file: str = "") -> str:
         input_file: Path to thread names file. Defaults to the repository's
             thread-quality-check corpus.
     """
-    filepath = Path(input_file) if input_file else DEFAULT_FILE
+    filepath = _input_path(input_file)
     if not filepath.exists():
-        return _json_result({"status": "error", "message": f"Input file not found: {filepath}"})
+        return _json_error(f"Input file not found: {filepath}")
 
     progress = _load_progress(str(filepath))
-    total = sum(1 for _ in filepath.read_text(encoding="utf-8").splitlines())
+    total = len(filepath.read_text(encoding="utf-8").splitlines())
 
     result = {
         "file": str(filepath),
@@ -278,75 +363,7 @@ async def thread_scan(
             thread-quality-check corpus.
         dry_run: Inspect lines without writing issue JSON or updating progress.
     """
-    filepath = Path(input_file) if input_file else DEFAULT_FILE
-    if not filepath.exists():
-        return _json_result({"status": "error", "message": f"Input file not found: {filepath}"})
-
-    progress = _load_progress(str(filepath))
-    if dry_run:
-        progress = progress.copy()
-    start = from_line if from_line > 0 else progress["last_checked"] + 1
-
-    all_lines = filepath.read_text(encoding="utf-8").splitlines()
-    filed_texts = None
-    next_record_id = None
-    if not dry_run:
-        known = bug_store.load_open(SCAN_SOURCE) + bug_store.load_resolved(SCAN_SOURCE)
-        filed_texts = {(record.get("text") or "").strip() for record in known}
-        next_record_id = [bug_store.next_id(SCAN_SOURCE)]
-    issues, processed, problems, skipped, max_line = _process_lines(
-        all_lines,
-        start,
-        count,
-        progress,
-        verbose=False,
-        record_issues=not dry_run,
-        filed_texts=filed_texts,
-        next_record_id=next_record_id,
-    )
-
-    # Build issue list for JSON (only problems)
-    json_issues = []
-    for issue in issues:
-        if issue.get("error"):
-            json_issues.append(
-                {
-                    "line_num": issue["line_num"],
-                    "text": issue["text"],
-                    "diff_type": "error",
-                    "expected": "",
-                    "suzume": "",
-                }
-            )
-        elif not issue.get("match", True):
-            json_issues.append(
-                {
-                    "line_num": issue["line_num"],
-                    "text": issue["text"],
-                    "diff_type": issue["diff_type"],
-                    "expected": issue["expected"],
-                    "suzume": issue["suzume"],
-                }
-            )
-
-    if max_line > 0 and not dry_run:
-        progress["last_checked"] = max_line
-        _save_progress(progress)
-
-    type_counts = summarize_diffs([i for i in issues if not i.get("match", True)])
-
-    result = {
-        "range": {"from": start, "to": max_line},
-        "processed": processed,
-        "problems": problems,
-        "skipped": skipped,
-        "issues": json_issues,
-        "diff_types": type_counts,
-        "total_problems": progress["problems_found"],
-        "dry_run": dry_run,
-    }
-
-    return _json_result(result)
+    return _scan(count, from_line, input_file, dry_run, verbose=False, rows_key="issues", row=_problem_row)
 
 
 @mcp.tool()
@@ -365,85 +382,7 @@ async def thread_next(
             thread-quality-check corpus.
         dry_run: Inspect lines without writing issue JSON or updating progress.
     """
-    filepath = Path(input_file) if input_file else DEFAULT_FILE
-    if not filepath.exists():
-        return _json_result({"status": "error", "message": f"Input file not found: {filepath}"})
-
-    progress = _load_progress(str(filepath))
-    if dry_run:
-        progress = progress.copy()
-    start = from_line if from_line > 0 else progress["last_checked"] + 1
-
-    all_lines = filepath.read_text(encoding="utf-8").splitlines()
-    filed_texts = None
-    next_record_id = None
-    if not dry_run:
-        known = bug_store.load_open(SCAN_SOURCE) + bug_store.load_resolved(SCAN_SOURCE)
-        filed_texts = {(record.get("text") or "").strip() for record in known}
-        next_record_id = [bug_store.next_id(SCAN_SOURCE)]
-    issues, processed, problems, skipped, max_line = _process_lines(
-        all_lines,
-        start,
-        count,
-        progress,
-        verbose=True,
-        record_issues=not dry_run,
-        filed_texts=filed_texts,
-        next_record_id=next_record_id,
-    )
-
-    # Build results list for JSON (all entries including matches)
-    results = []
-    for issue in issues:
-        if issue.get("error"):
-            results.append(
-                {
-                    "line_num": issue["line_num"],
-                    "text": issue["text"],
-                    "match": False,
-                    "diff_type": "error",
-                    "expected": "",
-                    "suzume": "",
-                }
-            )
-        elif issue.get("match"):
-            results.append(
-                {
-                    "line_num": issue["line_num"],
-                    "text": issue["text"],
-                    "match": True,
-                }
-            )
-        else:
-            results.append(
-                {
-                    "line_num": issue["line_num"],
-                    "text": issue["text"],
-                    "match": False,
-                    "diff_type": issue.get("diff_type", "unknown"),
-                    "expected": issue["expected"],
-                    "suzume": issue["suzume"],
-                }
-            )
-
-    if max_line > 0 and not dry_run:
-        progress["last_checked"] = max_line
-        _save_progress(progress)
-
-    type_counts = summarize_diffs([i for i in issues if not i.get("match", True)])
-
-    result = {
-        "range": {"from": start, "to": max_line},
-        "processed": processed,
-        "problems": problems,
-        "skipped": skipped,
-        "results": results,
-        "diff_types": type_counts,
-        "total_problems": progress["problems_found"],
-        "dry_run": dry_run,
-    }
-
-    return _json_result(result)
+    return _scan(count, from_line, input_file, dry_run, verbose=True, rows_key="results", row=_result_row)
 
 
 @mcp.tool()

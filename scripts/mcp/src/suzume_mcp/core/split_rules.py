@@ -14,6 +14,7 @@ from .constants import (
     TTARA_STEMS,
     TTEBA_STEMS,
     USER_DICT_COMPOUNDS,
+    katakana_to_hiragana,
 )
 from .core_lexicon import core_headwords
 from .mecab import mecab_analyze
@@ -240,7 +241,7 @@ def _split_lexicalized_morpheme_boundaries(token: dict) -> list[dict] | None:
     if pos == "形容詞" and lemma.endswith("ない") and regex.search(r"\p{Han}", surface):
         isolated = _reanalyze_exact(surface)
         reading = token.get("reading") or (isolated[0].get("reading", "") if isolated and len(isolated) == 1 else "")
-        kana = "".join(chr(ord(ch) - 0x60) if "ァ" <= ch <= "ヶ" else ch for ch in reading)
+        kana = katakana_to_hiragana(reading)
         reanalyzed = _reanalyze_exact(kana)
         if (
             reanalyzed is not None

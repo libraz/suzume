@@ -3,6 +3,7 @@
 import regex
 
 from .constants import (
+    ADVERBIAL_NA_ADJECTIVES,
     COPULA_SURFACES,
 )
 from .core_lexicon import adjective_garu_stems, core_headwords
@@ -413,8 +414,6 @@ def postprocess_adverbial_na_adjective(tokens: list[dict]) -> bool:
     copula, so a word from the set carrying it in that cell is the adjectival
     reading (もっとも+です).
     """
-    from .constants import ADVERBIAL_NA_ADJECTIVES
-
     changed = False
     for idx, token in enumerate(tokens[:-1]):
         follower = tokens[idx + 1]

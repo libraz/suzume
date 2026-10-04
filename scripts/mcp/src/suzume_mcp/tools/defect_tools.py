@@ -51,6 +51,26 @@ async def _current_outputs(texts: list[str]) -> list[list[str]]:
     return await asyncio.gather(*(one(text) for text in texts), return_exceptions=True)
 
 
+async def _compare_texts(texts: list[str]) -> list[dict]:
+    """Run the oracle once and the CLI concurrently; one {error} or {current, expected} per text."""
+    oracle = get_expected_tokens_batch_subprocess(texts)
+    outputs = await _current_outputs(texts)
+    rows = []
+    for (tokens, source, rule), output in zip(oracle, outputs, strict=True):
+        if source == "error":
+            rows.append({"error": rule})
+        elif isinstance(output, BaseException):
+            rows.append({"error": str(output)})
+        else:
+            rows.append(
+                {
+                    "current": bug_store.join_tokens(list(output)),
+                    "expected": bug_store.join_tokens([tok["surface"] for tok in tokens]),
+                }
+            )
+    return rows
+
+
 async def _recheck_records(records: list[dict]) -> dict[int, dict]:
     """Re-run every record and classify its current state.
 
@@ -63,37 +83,26 @@ async def _recheck_records(records: list[dict]) -> dict[int, dict]:
     """
     if not records:
         return {}
-    texts = [record.get("text", "") for record in records]
     try:
-        oracle = get_expected_tokens_batch_subprocess(texts)
+        compared = await _compare_texts([record.get("text", "") for record in records])
     except Exception as exc:
         return {record["id"]: {"state": "error", "error": str(exc)} for record in records}
 
-    outputs = await _current_outputs(texts)
     results: dict[int, dict] = {}
-    for record, tokens, output in zip(records, oracle, outputs, strict=True):
-        if tokens[1] == "error":
-            results[record["id"]] = {"state": "error", "error": tokens[2]}
+    for record, row in zip(records, compared, strict=True):
+        if "error" in row:
+            results[record["id"]] = {"state": "error", "error": row["error"]}
             continue
-        if isinstance(output, BaseException):
-            results[record["id"]] = {"state": "error", "error": str(output)}
-            continue
-        current = bug_store.join_tokens(list(output))
-        expected_now = bug_store.join_tokens([tok["surface"] for tok in tokens[0]])
-        matches = current == expected_now
+        current = row["current"]
         if record.get("check") == bug_store.CHECK_MANUAL:
             state = "needs-manual"
-        elif matches:
+        elif current == row["expected"]:
             state = "resolved"
         elif current != record.get("suzume", ""):
             state = "stale"
         else:
             state = "open"
-        results[record["id"]] = {
-            "state": state,
-            "current": current,
-            "oracle": expected_now,
-        }
+        results[record["id"]] = {"state": state, "current": current, "oracle": row["expected"]}
     return results
 
 
@@ -138,22 +147,17 @@ async def _screen(texts: list[str], source: str) -> list[dict]:
     One oracle subprocess plus concurrent CLI runs, so a whole family of
     generated sentences costs a single call.
     """
-    oracle = get_expected_tokens_batch_subprocess(texts)
-    outputs = await _current_outputs(texts)
+    compared = await _compare_texts(texts)
 
     open_by_text = {rec.get("text", ""): rec for rec in bug_store.load_open(source)}
     closed_by_text = {rec.get("text", ""): rec for rec in bug_store.load_resolved(source)}
 
     rows: list[dict] = []
-    for text, tokens, output in zip(texts, oracle, outputs, strict=True):
-        if tokens[1] == "error":
-            rows.append({"text": text, "state": "error", "error": tokens[2]})
+    for text, compare in zip(texts, compared, strict=True):
+        if "error" in compare:
+            rows.append({"text": text, "state": "error", "error": compare["error"]})
             continue
-        if isinstance(output, BaseException):
-            rows.append({"text": text, "state": "error", "error": str(output)})
-            continue
-        current = bug_store.join_tokens(list(output))
-        expected = bug_store.join_tokens([tok["surface"] for tok in tokens[0]])
+        current, expected = compare["current"], compare["expected"]
         if current == expected:
             rows.append({"text": text, "state": "match"})
             continue
@@ -181,6 +185,41 @@ async def _screen(texts: list[str], source: str) -> list[dict]:
                 )
         rows.append(row)
     return rows
+
+
+async def _derive_tokenizations(text: str, expected: str, suzume: str) -> tuple[str, str]:
+    """Fill an omitted oracle or observed tokenization from the pipeline and the CLI."""
+    if not expected:
+        tokens, oracle_source, rule = get_expected_tokens_batch_subprocess([text])[0]
+        if oracle_source == "error":
+            raise RuntimeError(rule)
+        expected = bug_store.join_tokens([tok["surface"] for tok in tokens])
+    if not suzume:
+        suzume = bug_store.join_tokens(list(await get_suzume_surfaces_async(text, skip_user_dict=False)))
+    return expected, suzume
+
+
+def _duplicate(existing: dict, verb: str) -> str:
+    return _json_result(
+        {
+            "status": "duplicate",
+            "message": f"Already {verb} as #{existing['id']} ({existing['status']})",
+            "existing": _entry(existing, compact=False),
+        }
+    )
+
+
+def _load_by_ids(source: str, wanted: list[int], include_resolved: bool = True) -> tuple[list[dict], list[int]]:
+    """Load the named records in request order, listing the ids that do not exist."""
+    records = []
+    missing = []
+    for bug_id in wanted:
+        record = bug_store.load_one(source, bug_id, include_resolved=include_resolved)
+        if record is None:
+            missing.append(bug_id)
+        else:
+            records.append(record)
+    return records, missing
 
 
 # ---------------------------------------------------------------------------
@@ -282,22 +321,8 @@ async def defect_dismiss(
     try:
         existing = bug_store.find_by_text(source, text)
         if existing is not None:
-            return _json_result(
-                {
-                    "status": "duplicate",
-                    "message": f"Already recorded as #{existing['id']} ({existing['status']})",
-                    "existing": _entry(existing, compact=False),
-                }
-            )
-        if not expected:
-            tokens, oracle_source, rule = get_expected_tokens_batch_subprocess([text])[0]
-            if oracle_source == "error":
-                raise RuntimeError(rule)
-            expected = bug_store.join_tokens([tok["surface"] for tok in tokens])
-        if not suzume:
-            surfaces = await get_suzume_surfaces_async(text, skip_user_dict=False)
-            suzume = bug_store.join_tokens(list(surfaces))
-
+            return _duplicate(existing, "recorded")
+        expected, suzume = await _derive_tokenizations(text, expected, suzume)
         record = bug_store.dismiss(
             source,
             text=text,
@@ -308,8 +333,6 @@ async def defect_dismiss(
             pattern=pattern,
             kind=kind,
         )
-    except bug_store.BugStoreError as exc:
-        return json_error(str(exc))
     except Exception as exc:
         return json_error(str(exc))
 
@@ -405,23 +428,9 @@ async def defect_add(
     try:
         existing = bug_store.find_by_text(source, text)
         if existing and not force:
-            return _json_result(
-                {
-                    "status": "duplicate",
-                    "message": f"Already filed as #{existing['id']} ({existing['status']})",
-                    "existing": _entry(existing, compact=False),
-                }
-            )
+            return _duplicate(existing, "filed")
 
-        if not expected:
-            tokens, oracle_source, rule = get_expected_tokens_batch_subprocess([text])[0]
-            if oracle_source == "error":
-                raise RuntimeError(rule)
-            expected = bug_store.join_tokens([tok["surface"] for tok in tokens])
-        if not suzume:
-            surfaces = await get_suzume_surfaces_async(text, skip_user_dict=False)
-            suzume = bug_store.join_tokens(list(surfaces))
-
+        expected, suzume = await _derive_tokenizations(text, expected, suzume)
         if priority and priority.lower() not in bug_store.PRIORITIES:
             return json_error(f"priority must be one of {bug_store.PRIORITIES}")
 
@@ -544,15 +553,7 @@ async def defect_get(ids: str, source: str = "defect", live: bool = True) -> str
     except ValueError as exc:
         return json_error(str(exc))
 
-    records = []
-    missing = []
-    for bug_id in wanted:
-        record = bug_store.load_one(source, bug_id)
-        if record is None:
-            missing.append(bug_id)
-        else:
-            records.append(record)
-
+    records, missing = _load_by_ids(source, wanted)
     states = await _recheck_records([rec for rec in records if rec["status"] == "open"]) if live else {}
     entries = []
     for record in records:
@@ -706,15 +707,7 @@ async def defect_resolve(ids: str, source: str = "defect", note: str = "", force
     if force and not note.strip():
         return json_error("force=True requires note explaining why the record is closed while still failing")
 
-    records = []
-    missing = []
-    for bug_id in wanted:
-        record = bug_store.load_one(source, bug_id, include_resolved=False)
-        if record is None:
-            missing.append(bug_id)
-        else:
-            records.append(record)
-
+    records, missing = _load_by_ids(source, wanted, include_resolved=False)
     states = await _recheck_records(records)
     resolved: list[dict] = []
     refused: list[dict] = []

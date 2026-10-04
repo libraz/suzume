@@ -1,14 +1,11 @@
 """Read-only test inspection and comparison MCP tools."""
 
-import json
 import re
+from itertools import zip_longest
 from pathlib import Path
 
 from ..core.diff_utils import classify_surface_diff
 from ..core.pos_mapping import normalize_pos
-from ..core.suzume_cli import (
-    format_expected_from_tokens as format_expected,
-)
 from ..core.suzume_cli import (
     get_expected_tokens_batch_subprocess,
     get_mecab_tokens_batch_subprocess,
@@ -19,11 +16,9 @@ from ..core.suzume_cli import (
 )
 from ..core.suzume_utils import tokens_match
 from ..core.test_file_utils import (
-    cases_key as canonical_cases_key,
-)
-from ..core.test_file_utils import (
     find_test_by_id,
     find_test_by_input,
+    get_cases,
     get_failures_from_test_output,
     get_test_data_dir,
     get_test_files,
@@ -32,13 +27,19 @@ from ..core.test_file_utils import (
 )
 from ..server import PROJECT_ROOT, mcp
 from ._test_tools_common import (
+    _case_id,
     _detect_segmentation_pattern,
     _format_expected_checked,
     _get_suzume_tokens,
     _get_test_files_filtered,
     _json_error,
     _json_result,
+    _load_test_cases,
 )
+
+
+def _surfaces(tokens: list[dict]) -> str:
+    return "|".join(t.get("surface", "") for t in tokens)
 
 
 @mcp.tool()
@@ -70,19 +71,12 @@ async def test_show(
     diff_details = []
 
     if not surface_match:
-        e_count = len(expected_surfaces)
-        s_count = len(suzume_surfaces)
-        max_len = max(e_count, s_count)
-        for idx in range(max_len):
-            exp = expected_surfaces[idx] if idx < e_count else ""
-            suz = suzume_surfaces[idx] if idx < s_count else ""
+        for idx, (exp, suz) in enumerate(zip_longest(expected_surfaces, suzume_surfaces, fillvalue="")):
             if exp != suz:
                 diff_details.append({"index": idx, "expected": exp, "suzume": suz, "type": "surface"})
     elif not full_match:
         diff_type = "pos-lemma"
-        for idx in range(len(expected_tokens)):
-            exp = expected_tokens[idx]
-            suz = suzume_tokens[idx]
+        for idx, (exp, suz) in enumerate(zip(expected_tokens, suzume_tokens, strict=True)):
             e_pos = normalize_pos(exp.get("pos", ""))
             s_pos = normalize_pos(suz.get("pos", ""))
             e_lemma = exp.get("lemma", exp["surface"])
@@ -106,27 +100,18 @@ async def test_show(
             lines.append(line)
         return "\n".join(lines)
 
-    # JSON mode - keep as-is (already returns JSON)
     if mode == "json":
-        return json.dumps(format_expected(expected_tokens), ensure_ascii=False, indent=2)
-
-    # Build result dict for default/brief/debug modes
-    test_exists = None
-    if found:
-        test_exists = {
-            "file": found["basename"],
-            "id": found["case"].get("id", str(found["index"])),
-        }
+        return _json_result(expected_tokens)
 
     result = {
         "input": input_text,
         "expected": expected_surfaces,
-        "suzume": suzume_surfaces if suzume_surfaces else None,
+        "suzume": suzume_surfaces or None,
         "match": full_match,
         "diff_type": diff_type,
         "diff_details": diff_details,
         "rule": rule,
-        "test_exists": test_exists,
+        "test_exists": {"file": found["basename"], "id": _case_id(found["case"], found["index"])} if found else None,
     }
 
     if mode == "brief":
@@ -156,9 +141,7 @@ async def test_list() -> str:
     total = 0
     for path in sorted(test_dir.glob("*.json")):
         try:
-            data = load_json(path)
-            cases = data.get(canonical_cases_key(data, str(path))) or []
-            count = len(cases)
+            count = len(get_cases(load_json(path), str(path)))
         except Exception:
             count = 0
         total += count
@@ -180,39 +163,21 @@ async def test_search(pattern: str, limit: int = 0) -> str:
     except re.error as exc:
         return _json_error(f"Invalid regex: {exc}")
 
+    loaded, error = _load_test_cases(get_test_files(PROJECT_ROOT))
+    if error:
+        return _json_error(error)
+
     matches = []
-    for path in get_test_files(PROJECT_ROOT):
-        try:
-            data = load_json(path)
-        except Exception as exc:
-            return _json_error(f"Failed to parse JSON file {path}: {exc}")
-        basename = path.stem
-        cases = data.get(canonical_cases_key(data, str(path))) or []
+    for path, _data, cases in loaded:
         for idx, case in enumerate(cases):
-            case_id = case.get("id", str(idx))
+            case_id = _case_id(case, idx)
             inp = case.get("input", "")
             surfaces = " ".join(t.get("surface", "") for t in (case.get("expected") or []))
             if regex.search(inp) or regex.search(surfaces) or regex.search(str(case_id)):
-                entry = {
-                    "file": basename,
-                    "index": idx,
-                    "id": case_id,
-                    "input": inp,
-                    "expected": surfaces,
-                }
-                matches.append(entry)
-
-    if limit > 0:
-        matches_limited = matches[:limit]
-    else:
-        matches_limited = matches
+                matches.append({"file": path.stem, "index": idx, "id": case_id, "input": inp, "expected": surfaces})
 
     return _json_result(
-        {
-            "pattern": pattern,
-            "matches": matches_limited,
-            "total": len(matches),
-        }
+        {"pattern": pattern, "matches": matches[:limit] if limit > 0 else matches, "total": len(matches)}
     )
 
 
@@ -233,13 +198,7 @@ async def test_failed(
     """
     failures = get_failures_from_test_output(test_output_file)
     if not failures:
-        return _json_result(
-            {
-                "source": test_output_file,
-                "failures": [],
-                "total": 0,
-            }
-        )
+        return _json_result({"source": test_output_file, "failures": [], "total": 0})
 
     if grep:
         try:
@@ -248,15 +207,11 @@ async def test_failed(
             return _json_error(f"Invalid grep pattern: {grep}")
         failures = [f for f in failures if rxp.search(f["input"]) or rxp.search(f["id"])]
 
-    if limit > 0:
-        failures_limited = failures[:limit]
-    else:
-        failures_limited = failures
-
+    shown = failures[:limit] if limit > 0 else failures
     return _json_result(
         {
             "source": test_output_file,
-            "failures": [{"input": f["input"], "id": f["id"]} for f in failures_limited],
+            "failures": [{"input": f["input"], "id": f["id"]} for f in shown],
             "total": len(failures),
         }
     )
@@ -287,18 +242,13 @@ async def test_compare(before_file: str, after_file: str) -> str:
     before = extract_failures(before_file)
     after = extract_failures(after_file)
 
-    improved = sorted([{"id": key, "input": before[key]} for key in before if key not in after], key=lambda x: x["id"])
-    regressed = sorted([{"id": key, "input": after[key]} for key in after if key not in before], key=lambda x: x["id"])
-
-    net_change = len(after) - len(before)
-
     return _json_result(
         {
             "before_failures": len(before),
             "after_failures": len(after),
-            "improved": improved,
-            "regressed": regressed,
-            "net_change": net_change,
+            "improved": [{"id": key, "input": before[key]} for key in sorted(before.keys() - after.keys())],
+            "regressed": [{"id": key, "input": after[key]} for key in sorted(after.keys() - before.keys())],
+            "net_change": len(after) - len(before),
         }
     )
 
@@ -315,22 +265,10 @@ async def test_diff_suzume(
         test_output_file: Path to ctest output file.
     """
     failures = get_failures_from_test_output(test_output_file)
-    if not failures:
-        return _json_result(
-            {
-                "categories": {"matches_correct": [], "segmentation": {}, "pos_only": []},
-                "summary": {
-                    "matches_correct": 0,
-                    "segmentation": 0,
-                    "pos_only": 0,
-                    "total_failures": 0,
-                    "processed": 0,
-                },
-            }
-        )
-
-    total_failures = len(failures)
     max_process = limit * 5 if limit > 0 else 0
+
+    def capped(items):
+        return items[:limit] if limit > 0 else items
 
     categories: dict[str, list[dict]] = {"matches_correct": [], "segmentation": [], "pos_only": []}
     processed = 0
@@ -342,54 +280,36 @@ async def test_diff_suzume(
         if not found:
             continue
 
-        test_expected = found["case"].get("expected") or []
         correct_tokens, source, rule = get_expected_tokens(failure["input"])
         suzume_tokens = _get_suzume_tokens(failure["input"])
         processed += 1
 
-        test_str = "|".join(t.get("surface", "") for t in test_expected)
-        suz_str = "|".join(t["surface"] for t in suzume_tokens)
-        cor_str = "|".join(t["surface"] for t in correct_tokens)
-
         entry = {
             "id": failure["id"],
             "input": failure["input"],
-            "test_expected": test_str,
-            "suzume": suz_str,
-            "correct": cor_str,
+            "test_expected": _surfaces(found["case"].get("expected") or []),
+            "suzume": _surfaces(suzume_tokens),
+            "correct": _surfaces(correct_tokens),
             "source": source,
             "rule": rule,
         }
 
         if tokens_match(correct_tokens, suzume_tokens):
             categories["matches_correct"].append(entry)
-        elif cor_str != suz_str and len(cor_str.split("|")) != len(suz_str.split("|")):
+        elif entry["correct"] != entry["suzume"] and len(entry["correct"].split("|")) != len(
+            entry["suzume"].split("|")
+        ):
             categories["segmentation"].append(entry)
         else:
             categories["pos_only"].append(entry)
 
-    # Group segmentation by pattern
     seg_patterns: dict[str, list[dict]] = {}
     for entry in categories["segmentation"]:
         pat = _detect_segmentation_pattern(entry["correct"], entry["suzume"], entry["input"])
         seg_patterns.setdefault(pat, []).append(entry)
 
-    per_cat = limit if limit > 0 else 0
-
-    # Build output categories
-    matches_correct_out = categories["matches_correct"][:per_cat] if per_cat else categories["matches_correct"]
-    pos_only_out = categories["pos_only"][:per_cat] if per_cat else categories["pos_only"]
-
-    seg_out = {}
-    for pat in sorted(seg_patterns.keys(), key=lambda p: -len(seg_patterns[p])):
-        entries = seg_patterns[pat]
-        seg_out[pat] = {
-            "count": len(entries),
-            "examples": [
-                {"id": ent["id"], "input": ent["input"], "correct": ent["correct"], "suzume": ent["suzume"]}
-                for ent in (entries[:per_cat] if per_cat else entries)
-            ],
-        }
+    def brief(ent: dict) -> dict:
+        return {"id": ent["id"], "input": ent["input"], "correct": ent["correct"], "suzume": ent["suzume"]}
 
     return _json_result(
         {
@@ -404,23 +324,33 @@ async def test_diff_suzume(
                         "rule": ent["rule"],
                         "source": ent["source"],
                     }
-                    for ent in matches_correct_out
+                    for ent in capped(categories["matches_correct"])
                 ],
-                "segmentation": seg_out,
-                "pos_only": [
-                    {"id": ent["id"], "input": ent["input"], "correct": ent["correct"], "suzume": ent["suzume"]}
-                    for ent in pos_only_out
-                ],
+                "segmentation": {
+                    pat: {"count": len(entries), "examples": [brief(ent) for ent in capped(entries)]}
+                    for pat, entries in sorted(seg_patterns.items(), key=lambda item: -len(item[1]))
+                },
+                "pos_only": [brief(ent) for ent in capped(categories["pos_only"])],
             },
             "summary": {
                 "matches_correct": len(categories["matches_correct"]),
                 "segmentation": len(categories["segmentation"]),
                 "pos_only": len(categories["pos_only"]),
-                "total_failures": total_failures,
+                "total_failures": len(failures),
                 "processed": processed,
             },
         }
     )
+
+
+def _cases_with_input(loaded: list[tuple[Path, dict, list[dict]]]) -> list[dict]:
+    """Every case that carries an input, with its qualified basename/id."""
+    return [
+        {"path": path, "data": data, "case": case, "input": case["input"], "id": f"{path.stem}/{_case_id(case, idx)}"}
+        for path, data, cases in loaded
+        for idx, case in enumerate(cases)
+        if case.get("input", "")
+    ]
 
 
 @mcp.tool()
@@ -433,54 +363,29 @@ async def test_diff_mecab(file: str = "") -> str:
     files = _get_test_files_filtered(file)
     if not files:
         return _json_error("No test files found")
+    loaded, error = _load_test_cases(files)
+    if error:
+        return _json_error(error)
 
-    categories: dict[str, list[dict]] = {
-        "intentional": [],
-        "segmentation": [],
-        "pos_only": [],
-        "lemma_only": [],
-    }
-    total_cases = 0
+    categories: dict[str, list[dict]] = {"intentional": [], "segmentation": [], "pos_only": [], "lemma_only": []}
     mecab_compatible = 0
     errors: list[dict] = []
-    case_metadata: list[dict] = []
-    inputs: list[str] = []
+    metas = _cases_with_input(loaded)
 
-    for path in files:
-        try:
-            data = load_json(path)
-        except Exception as exc:
-            return _json_error(f"Failed to parse JSON file {path}: {exc}")
-        basename = path.stem
-        cases = data.get(canonical_cases_key(data, str(path))) or []
-        for idx, case in enumerate(cases):
-            inp = case.get("input", "")
-            if not inp:
-                continue
-            total_cases += 1
-            case_metadata.append({"basename": basename, "index": idx, "case": case, "input": inp})
-            inputs.append(inp)
-
-    mecab_results = get_mecab_tokens_batch_subprocess(inputs)
-    for meta, (mecab, source, rule) in zip(case_metadata, mecab_results, strict=True):
-        case = meta["case"]
-        inp = meta["input"]
-        idx = meta["index"]
-        basename = meta["basename"]
-        case_id = case.get("id", str(idx))
+    mecab_results = get_mecab_tokens_batch_subprocess([meta["input"] for meta in metas])
+    for meta, (mecab, source, rule) in zip(metas, mecab_results, strict=True):
         if source == "error":
-            errors.append({"id": f"{basename}/{case_id}", "input": inp, "error": rule})
+            errors.append({"id": meta["id"], "input": meta["input"], "error": rule})
             continue
-        expected = case.get("expected") or []
+        expected = meta["case"].get("expected") or []
 
         if tokens_match(expected, mecab):
             mecab_compatible += 1
             continue
 
-        exp_str = "|".join(t.get("surface", "") for t in expected)
-        mec_str = "|".join(t["surface"] for t in mecab)
-
-        entry = {"id": f"{basename}/{case_id}", "input": inp, "expected": exp_str, "mecab": mec_str, "rule": rule}
+        exp_str = _surfaces(expected)
+        mec_str = _surfaces(mecab)
+        entry = {"id": meta["id"], "input": meta["input"], "expected": exp_str, "mecab": mec_str, "rule": rule}
 
         if exp_str == mec_str:
             exp_pos = "|".join(t.get("pos", "") for t in expected)
@@ -501,20 +406,14 @@ async def test_diff_mecab(file: str = "") -> str:
         else:
             categories["intentional" if rule else "segmentation"].append(entry)
 
+    total_cases = len(metas)
     if total_cases == 0:
         return _json_error("No test cases found")
 
     processed = total_cases - len(errors)
-    incompatible = processed - mecab_compatible
-
-    # Limit each category to 20 items in output
-    cat_out: dict[str, list[dict]] = {}
-    for cat_name in ("intentional", "segmentation", "pos_only", "lemma_only"):
-        cat_out[cat_name] = categories[cat_name][:20]
-
     return _json_result(
         {
-            "categories": cat_out,
+            "categories": {name: entries[:20] for name, entries in categories.items()},
             "errors": errors[:20],
             "summary": {
                 "total_cases": total_cases,
@@ -522,11 +421,8 @@ async def test_diff_mecab(file: str = "") -> str:
                 "errors": len(errors),
                 "mecab_compatible": mecab_compatible,
                 "mecab_compatible_pct": round(100.0 * mecab_compatible / processed, 1) if processed else 0,
-                "incompatible": incompatible,
-                "intentional": len(categories["intentional"]),
-                "segmentation": len(categories["segmentation"]),
-                "pos_only": len(categories["pos_only"]),
-                "lemma_only": len(categories["lemma_only"]),
+                "incompatible": processed - mecab_compatible,
+                **{name: len(entries) for name, entries in categories.items()},
             },
         }
     )
@@ -552,151 +448,70 @@ async def test_needs_suzume_update(
     files = _get_test_files_filtered(file)
     if not files:
         return _json_error("No test files found")
+    loaded, error = _load_test_cases(files)
+    if error:
+        return _json_error(error)
 
-    needs_update = []
-    by_rule: dict[str, list[dict]] = {}
-    normalization_errors: list[dict] = []
-
-    # Collect all cases with their metadata for batch processing
-    all_cases_meta: list[dict] = []
-    all_inputs: list[str] = []
-
-    for path in files:
-        try:
-            data = load_json(path)
-        except Exception as exc:
-            return _json_error(f"Failed to parse JSON file {path}: {exc}")
-        basename = path.stem
-        cases_key = canonical_cases_key(data, str(path))
-        cases = data.get(cases_key) or []
-
-        for idx, case in enumerate(cases):
-            inp = case.get("input", "")
-            if not inp:
-                continue
-            case_id = case.get("id", str(idx))
-            qualified_id = f"{basename}/{case_id}"
-            if selected_ids and qualified_id not in selected_ids:
-                continue
-            all_cases_meta.append(
-                {
-                    "path": path,
-                    "basename": basename,
-                    "cases_key": cases_key,
-                    "idx": idx,
-                    "case": case,
-                    "data": data,
-                    "input": inp,
-                }
-            )
-            all_inputs.append(inp)
-
+    metas = [meta for meta in _cases_with_input(loaded) if not selected_ids or meta["id"] in selected_ids]
     if selected_ids:
-        found_ids = {f"{meta['basename']}/{meta['case'].get('id', str(meta['idx']))}" for meta in all_cases_meta}
-        missing_ids = sorted(selected_ids - found_ids)
+        missing_ids = sorted(selected_ids - {meta["id"] for meta in metas})
         if missing_ids:
             return _json_error(f"No tests found for ids: {', '.join(missing_ids)}")
 
-    # Batch subprocess call: one process for all inputs
-    if all_inputs:
-        batch_results = get_expected_tokens_batch_subprocess(all_inputs)
-    else:
-        batch_results = []
+    # One oracle subprocess for every input.
+    batch_results = get_expected_tokens_batch_subprocess([meta["input"] for meta in metas]) if metas else []
 
-    for meta, (correct, source, rule) in zip(all_cases_meta, batch_results, strict=True):
+    needs_update = []
+    by_rule: dict[str, list[str]] = {}
+    normalization_errors: list[dict] = []
+    for meta, (correct, source, rule) in zip(metas, batch_results, strict=True):
         if source == "error":
-            case_id = meta["case"].get("id", str(meta["idx"]))
-            normalization_errors.append({"id": f"{meta['basename']}/{case_id}", "input": meta["input"], "error": rule})
+            normalization_errors.append({"id": meta["id"], "input": meta["input"], "error": rule})
             continue
         expected = meta["case"].get("expected") or []
-        rule = rule or ""
+        if tokens_match(expected, correct):
+            continue
 
-        if not tokens_match(expected, correct):
-            case_id = meta["case"].get("id", str(meta["idx"]))
-            exp_str = "|".join(t.get("surface", "") for t in expected)
-            cor_str = "|".join(t["surface"] for t in correct)
-            exp_pos = "|".join(t.get("pos", "") for t in expected)
-            cor_pos = "|".join(t["pos"] for t in correct)
-            diff_type = "surface" if exp_str != cor_str else ("pos" if exp_pos != cor_pos else "lemma")
-
-            entry = {
-                "id": f"{meta['basename']}/{case_id}",
-                "file": meta["path"],
-                "basename": meta["basename"],
-                "index": meta["idx"],
-                "input": meta["input"],
-                "rule": rule or "mecab-only",
-                "expected": exp_str,
-                "correct": cor_str,
-                "expected_pos": exp_pos,
-                "correct_pos": cor_pos,
-                "diff_type": diff_type,
+        exp_str = _surfaces(expected)
+        cor_str = _surfaces(correct)
+        exp_pos = "|".join(t.get("pos", "") for t in expected)
+        cor_pos = "|".join(t["pos"] for t in correct)
+        rule_label = rule or "mecab-only"
+        needs_update.append(
+            {
+                "meta": meta,
+                "rule": rule_label,
                 "correct_tokens": correct,
-                "data": meta["data"],
-                "cases_key": meta["cases_key"],
-            }
-            needs_update.append(entry)
-            by_rule.setdefault(rule or "mecab-only", []).append(entry)
-
-    if not needs_update:
-        return _json_result(
-            {
-                "needs_update": [],
-                "by_rule": {},
-                "total": 0,
-                "errors": normalization_errors,
-                "applied": False,
+                "out": {
+                    "id": meta["id"],
+                    "input": meta["input"],
+                    "rule": rule_label,
+                    "diff_type": "surface" if exp_str != cor_str else ("pos" if exp_pos != cor_pos else "lemma"),
+                    "expected": exp_str,
+                    "correct": cor_str,
+                },
             }
         )
+        by_rule.setdefault(rule_label, []).append(meta["id"])
 
-    # Build output entries (without internal data/path objects)
-    output_entries = []
-    for entry in needs_update:
-        output_entries.append(
-            {
-                "id": entry["id"],
-                "input": entry["input"],
-                "rule": entry["rule"],
-                "diff_type": entry["diff_type"],
-                "expected": entry["expected"],
-                "correct": entry["correct"],
-            }
-        )
-
-    by_rule_out: dict[str, list[str]] = {}
-    for rule_name in sorted(by_rule.keys()):
-        by_rule_out[rule_name] = [ent["id"] for ent in by_rule[rule_name]]
-
-    if not apply:
-        return _json_result(
-            {
-                "needs_update": output_entries,
-                "by_rule": by_rule_out,
-                "total": len(needs_update),
-                "errors": normalization_errors,
-                "applied": False,
-            }
-        )
-
-    # Apply updates
-    files_to_save: dict[Path, dict] = {}
-    for entry in needs_update:
-        try:
-            formatted = _format_expected_checked(entry["correct_tokens"], entry["rule"])
-        except RuntimeError as exc:
-            return _json_error(str(exc))
-        entry["data"][entry["cases_key"]][entry["index"]]["expected"] = formatted
-        files_to_save[entry["file"]] = entry["data"]
-
-    for path, data in files_to_save.items():
-        save_json(path, data)
+    if apply and needs_update:
+        files_to_save: dict[Path, dict] = {}
+        for entry in needs_update:
+            try:
+                formatted = _format_expected_checked(entry["correct_tokens"], entry["rule"])
+            except RuntimeError as exc:
+                return _json_error(str(exc))
+            entry["meta"]["case"]["expected"] = formatted
+            files_to_save[entry["meta"]["path"]] = entry["meta"]["data"]
+        for path, data in files_to_save.items():
+            save_json(path, data)
 
     return _json_result(
         {
-            "needs_update": output_entries,
-            "by_rule": by_rule_out,
+            "needs_update": [entry["out"] for entry in needs_update],
+            "by_rule": dict(sorted(by_rule.items())),
             "total": len(needs_update),
             "errors": normalization_errors,
-            "applied": True,
+            "applied": apply and bool(needs_update),
         }
     )

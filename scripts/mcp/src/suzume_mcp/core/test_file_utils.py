@@ -1,6 +1,8 @@
 """Test file utilities ported from TestFileUtils.pm."""
 
 import json
+import re
+from collections.abc import Iterator
 from pathlib import Path
 
 from .file_utils import atomic_write_text
@@ -59,54 +61,39 @@ def save_json(path: Path, data: dict) -> None:
     atomic_write_text(path, content + "\n")
 
 
+def _load_cases(path: Path) -> tuple[dict, list[dict]]:
+    try:
+        data = load_json(path)
+    except Exception as exc:
+        raise RuntimeError(f"Failed to parse JSON file: {path}") from exc
+    return data, get_cases(data, str(path))
+
+
+def _case_record(path: Path, basename: str, index: int, case: dict, data: dict) -> dict:
+    return {"file": path, "basename": basename, "index": index, "case": case, "data": data}
+
+
+def _iter_cases_by_input(project_root: Path, input_text: str) -> Iterator[dict]:
+    """Yield every case with the given input, loading files lazily in name order."""
+    for path in get_test_files(project_root):
+        data, cases = _load_cases(path)
+        for index, case in enumerate(cases):
+            if case.get("input") == input_text:
+                yield _case_record(path, path.stem, index, case, data)
+
+
 def find_test_by_input(project_root: Path, input_text: str) -> dict | None:
     """Find a test case by input text across all test files.
 
     Returns:
         Dict with keys: file, basename, index, case, data; or None.
     """
-    for path in get_test_files(project_root):
-        try:
-            data = load_json(path)
-        except Exception as exc:
-            raise RuntimeError(f"Failed to parse JSON file: {path}") from exc
-
-        cases = get_cases(data, str(path))
-        for i, case in enumerate(cases):
-            if case.get("input") == input_text:
-                basename = path.stem
-                return {
-                    "file": path,
-                    "basename": basename,
-                    "index": i,
-                    "case": case,
-                    "data": data,
-                }
-    return None
+    return next(_iter_cases_by_input(project_root, input_text), None)
 
 
 def find_tests_by_input(project_root: Path, input_text: str) -> list[dict]:
     """Find every test case matching an input across all test files."""
-    matches = []
-    for path in get_test_files(project_root):
-        try:
-            data = load_json(path)
-        except Exception as exc:
-            raise RuntimeError(f"Failed to parse JSON file: {path}") from exc
-
-        cases = get_cases(data, str(path))
-        for index, case in enumerate(cases):
-            if case.get("input") == input_text:
-                matches.append(
-                    {
-                        "file": path,
-                        "basename": path.stem,
-                        "index": index,
-                        "case": case,
-                        "data": data,
-                    }
-                )
-    return matches
+    return list(_iter_cases_by_input(project_root, input_text))
 
 
 def find_test_by_id(project_root: Path, test_id: str) -> dict | None:
@@ -124,35 +111,16 @@ def find_test_by_id(project_root: Path, test_id: str) -> dict | None:
     if not path.exists():
         return None
 
-    try:
-        data = load_json(path)
-    except Exception as exc:
-        raise RuntimeError(f"Failed to parse JSON file: {path}") from exc
-
-    cases = get_cases(data, str(path))
+    data, cases = _load_cases(path)
 
     # Try numeric index first
-    if idx.isdigit():
-        i = int(idx)
-        if i < len(cases):
-            return {
-                "file": path,
-                "basename": basename,
-                "index": i,
-                "case": cases[i],
-                "data": data,
-            }
+    if idx.isdigit() and int(idx) < len(cases):
+        return _case_record(path, basename, int(idx), cases[int(idx)], data)
 
     # Try matching by case id
-    for i, case in enumerate(cases):
+    for index, case in enumerate(cases):
         if case.get("id", "") == idx:
-            return {
-                "file": path,
-                "basename": basename,
-                "index": i,
-                "case": case,
-                "data": data,
-            }
+            return _case_record(path, basename, index, case, data)
 
     return None
 
@@ -171,8 +139,6 @@ def get_failures_from_test_output(test_output_file: str = "/tmp/test.txt") -> li
     current_input = ""
 
     for line in path.read_text(encoding="utf-8").splitlines():
-        import re
-
         m_input = re.search(r"Input:\s*(.+)", line)
         if m_input:
             current_input = m_input.group(1)
@@ -278,8 +244,6 @@ def generate_id(input_text: str) -> str:
         result = result.replace(char, romaji)
 
     # Replace remaining non-ASCII with underscore
-    import re
-
     result = re.sub(r"[^\x00-\x7F]+", "_", result)
     result = re.sub(r"\s+", "_", result)
     result = re.sub(r"_+", "_", result)

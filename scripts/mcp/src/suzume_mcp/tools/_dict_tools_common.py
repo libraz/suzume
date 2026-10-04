@@ -1,11 +1,12 @@
 """Dictionary tools ported from dict_tool.pl - MCP tool registration."""
 
-from collections.abc import Awaitable, Callable, Iterator
+import tempfile
+from collections.abc import Awaitable, Callable, Iterable, Iterator
 from pathlib import Path
 
-from ..core.file_utils import append_lines_atomic as _append_lines_atomic  # noqa: F401
 from ..core.file_utils import atomic_write_text as _atomic_write_text
-from ..core.json_utils import json_result as _json_result  # noqa: F401
+from ..core.json_utils import json_error as _json_error
+from ..core.json_utils import json_result as _json_result
 from ..core.suzume_cli import get_cli_path, recompile_dic
 from ..server import PROJECT_ROOT
 
@@ -90,6 +91,9 @@ ALL_DICT_FILES = [
 
 VALID_POS = tuple(POS_ALIASES)
 
+# Marker that keeps an entry in its source file while excluding it from compilation.
+DISABLED_PREFIX = "#DISABLED# "
+
 VALID_CONJ = [
     "ICHIDAN",
     "GODAN_KA",
@@ -115,10 +119,14 @@ def _canonical_pos(pos: str) -> str:
     return POS_ALIASES.get(pos, pos)
 
 
-def _has_pos_entry(entries: list[dict], pos: str) -> bool:
-    """Whether entries already contain the same grammatical POS."""
+def _files_with_pos(entries: list[dict], pos: str) -> list[str]:
+    """Files whose entries already hold the same grammatical POS; empty when none do."""
     canonical = _canonical_pos(pos)
-    return any(_canonical_pos(entry.get("pos", "")) == canonical for entry in entries)
+    return sorted({entry["file"] for entry in entries if _canonical_pos(entry.get("pos", "")) == canonical})
+
+
+def _invalid_value(kind: str, value: str, valid: Iterable[str], label: str = "Valid values") -> str:
+    return f"Invalid {kind}: {value}. {label}: {', '.join(valid)}"
 
 
 def _validate_surface(word: str) -> str | None:
@@ -185,15 +193,14 @@ def _map_conj_type(token: dict) -> str:
 
 def _iter_dictionary_lines(file_list: list[str], *, include_disabled: bool = False) -> Iterator[tuple[str, int, str]]:
     """Yield (relative path, line number, active entry text) for dictionary data."""
-    disabled_prefix = "#DISABLED# "
     for file_rel in file_list:
         filepath = PROJECT_ROOT / file_rel
         if not filepath.exists():
             continue
         for line_num, line in enumerate(filepath.read_text(encoding="utf-8").splitlines(), 1):
-            if line.startswith(disabled_prefix):
+            if line.startswith(DISABLED_PREFIX):
                 if include_disabled:
-                    yield file_rel, line_num, line[len(disabled_prefix) :]
+                    yield file_rel, line_num, line[len(DISABLED_PREFIX) :]
                 continue
             if line.startswith("#") or not line.strip():
                 continue
@@ -224,30 +231,48 @@ def _load_dictionary() -> tuple[list[dict], dict[str, list[dict]]]:
     return _load_entries_from_files(list(ALL_DICT_FILES))
 
 
+def _user_file(user: str) -> str:
+    return f"data/user/{user}.tsv"
+
+
 def _all_user_files() -> list[str]:
     """Return list of all user dictionary file paths."""
-    return [f"data/user/{cat}.tsv" for cat in USER_CATEGORIES]
+    return [_user_file(cat) for cat in USER_CATEGORIES]
+
+
+def _dict_files(user: str = "", search_all: bool = False) -> list[str]:
+    """Return one user dictionary, the core dictionaries, or core plus every user dictionary."""
+    if user:
+        return [_user_file(user)]
+    return list(ALL_DICT_FILES) + (_all_user_files() if search_all else [])
 
 
 def _load_all_entries() -> tuple[list[dict], dict[str, list[dict]]]:
     """Load all dictionary entries (core + user)."""
-    return _load_entries_from_files(list(ALL_DICT_FILES) + _all_user_files())
+    return _load_entries_from_files(_dict_files(search_all=True))
 
 
-def _find_word_in_files(word: str) -> str | None:
-    """Find word in core dict files, return file path or None."""
-    for file_rel, _, line in _iter_dictionary_lines(list(ALL_DICT_FILES), include_disabled=True):
-        if line.split("\t")[0] == word:
-            return file_rel
-    return None
+def _group_by_pos(entries: list[dict]) -> dict[str, list[dict]]:
+    by_pos: dict[str, list[dict]] = {}
+    for entry in entries:
+        by_pos.setdefault(_canonical_pos(entry.get("pos", "")), []).append(entry)
+    return by_pos
 
 
-def _find_word_in_user_files(word: str) -> str | None:
-    """Find word in user dict files."""
-    for file_rel, _, line in _iter_dictionary_lines(_all_user_files()):
-        if line.split("\t")[0] == word:
-            return file_rel
-    return None
+def _entry_line(word: str, pos: str, conj_type: str = "") -> str:
+    return f"{word}\t{pos}\t{conj_type}" if conj_type else f"{word}\t{pos}"
+
+
+def _dict_add_command(word: str, pos: str, conj_type: str = "") -> str:
+    command = f'dict_add word="{word}" pos="{pos}"'
+    return f'{command} conj_type="{conj_type}"' if conj_type else command
+
+
+def _with_appended_lines(path: Path, lines: list[str]) -> str:
+    """Return the file content with complete lines appended."""
+    previous = path.read_text(encoding="utf-8") if path.exists() else ""
+    separator = "" if not previous or previous.endswith("\n") else "\n"
+    return previous + separator + "\n".join(lines) + "\n"
 
 
 def _token_to_dict(token: dict) -> dict:
@@ -261,46 +286,30 @@ def _token_to_dict(token: dict) -> dict:
     }
 
 
-async def _recompile_core_dic() -> str:
-    """Recompile core dictionary."""
-    cli = get_cli_path()
-    if not cli.exists():
+async def _recompile(source_glob: str, output_rel: str) -> str:
+    """Compile sources into a temporary file and replace the output only on success."""
+    if not get_cli_path().exists():
         return "not_found"
 
-    import tempfile
-
-    output_path = PROJECT_ROOT / "data/core.dic"
+    output_path = PROJECT_ROOT / output_rel
     with tempfile.NamedTemporaryFile(dir=output_path.parent, suffix=".dic", delete=False) as output:
         tmp_output_path = Path(output.name)
 
     try:
-        if await recompile_dic("data/core/*.tsv", str(tmp_output_path)):
+        if await recompile_dic(source_glob, str(tmp_output_path)):
             tmp_output_path.replace(output_path)
             return "ok"
         return "failed"
     finally:
         tmp_output_path.unlink(missing_ok=True)
+
+
+async def _recompile_core_dic() -> str:
+    return await _recompile("data/core/*.tsv", "data/core.dic")
 
 
 async def _recompile_user_dic() -> str:
-    """Recompile user dictionary."""
-    cli = get_cli_path()
-    if not cli.exists():
-        return "not_found"
-
-    import tempfile
-
-    output_path = PROJECT_ROOT / "data/user.dic"
-    with tempfile.NamedTemporaryFile(dir=output_path.parent, suffix=".dic", delete=False) as output:
-        tmp_output_path = Path(output.name)
-
-    try:
-        if await recompile_dic("data/user/*.tsv", str(tmp_output_path)):
-            tmp_output_path.replace(output_path)
-            return "ok"
-        return "failed"
-    finally:
-        tmp_output_path.unlink(missing_ok=True)
+    return await _recompile("data/user/*.tsv", "data/user.dic")
 
 
 async def _write_files_and_recompile(
@@ -336,3 +345,20 @@ async def _write_files_and_recompile(
     if rollback_errors:
         message += " Rollback errors: " + "; ".join(rollback_errors)
     return recompile_status, message
+
+
+def _recompile_response(fields: dict, recompile_status: str, error: str | None) -> str:
+    """Report a write-and-recompile outcome, flagging the rollback on failure."""
+    if error:
+        return _json_error(error, **fields, recompile=recompile_status, rolled_back=True)
+    return _json_result({"status": "ok", **fields, "recompile": recompile_status})
+
+
+def _apply_recompile_outcome(result: dict, recompile_status: str, error: str | None) -> str:
+    """Extend a dry-run style result with a write-and-recompile outcome."""
+    if error:
+        result.update({"status": "error", "message": error, "recompile": recompile_status, "rolled_back": True})
+    else:
+        result["applied"] = True
+        result["recompile"] = recompile_status
+    return _json_result(result)

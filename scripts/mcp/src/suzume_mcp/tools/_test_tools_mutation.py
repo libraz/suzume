@@ -9,12 +9,9 @@ from ..core.suzume_cli import (
 )
 from ..core.test_file_suggestions import suggest_test_files
 from ..core.test_file_utils import (
-    cases_key as canonical_cases_key,
-)
-from ..core.test_file_utils import (
-    find_test_by_id,
     find_test_by_input,
     generate_id,
+    get_cases,
     get_test_data_dir,
     load_json,
     normalize_test_file_name,
@@ -23,10 +20,12 @@ from ..core.test_file_utils import (
 from ..server import PROJECT_ROOT, mcp
 from ._test_tools_common import (
     ORACLE_OVERRIDE_REMEDIATION,
+    _find_case,
     _format_expected_checked,
     _get_test_files_filtered,
     _json_error,
     _json_result,
+    _load_test_cases,
 )
 from ._test_tools_organization import append_cases_partitioned
 
@@ -40,9 +39,7 @@ def _deduplicate_generated_ids(items: list[dict]) -> None:
     existing_ids = set()
     test_dir = get_test_data_dir(PROJECT_ROOT)
     for path in test_dir.glob("*.json"):
-        data = load_json(path)
-        cases_key = canonical_cases_key(data, str(path))
-        existing_ids.update(str(case.get("id", "")) for case in data.get(cases_key) or [])
+        existing_ids.update(str(case.get("id", "")) for case in get_cases(load_json(path), str(path)))
 
     for item in items:
         base_id = item["id"]
@@ -78,20 +75,12 @@ async def test_add(
     # Check for duplicates
     existing = find_test_by_input(PROJECT_ROOT, input_text)
     if existing:
-        return _json_result(
-            {
-                "status": "error",
-                "message": "Duplicate input rejected",
-                "existing": {"file": existing["basename"], "index": existing["index"]},
-            }
+        return _json_error(
+            "Duplicate input rejected", existing={"file": existing["basename"], "index": existing["index"]}
         )
 
     try:
         tokens, source, rule = get_expected_tokens(input_text)
-    except RuntimeError as exc:
-        return _json_error(str(exc))
-
-    try:
         expected = _format_expected_checked(tokens, source)
     except RuntimeError as exc:
         return _json_error(str(exc))
@@ -159,35 +148,21 @@ async def test_update(
     if use_suzume:
         return _json_error(_USE_SUZUME_REFUSAL)
 
+    found, error = _find_case(PROJECT_ROOT, input_text, test_id)
+    if not found:
+        return _json_error(error)
     if test_id:
-        found = find_test_by_id(PROJECT_ROOT, test_id)
-        if not found:
-            return _json_error(f"Test not found: {test_id}")
         input_text = found["case"]["input"]
-    elif input_text:
-        found = find_test_by_input(PROJECT_ROOT, input_text)
-        if not found:
-            return _json_error(f"No test found for input: {input_text}")
-    else:
-        return _json_error("Either input_text or test_id is required.")
 
     try:
-        tokens, source, rule = get_expected_tokens(input_text)
-    except RuntimeError as exc:
-        return _json_error(str(exc))
-
-    try:
+        tokens, source, _rule = get_expected_tokens(input_text)
         expected = _format_expected_checked(tokens, source)
     except RuntimeError as exc:
         return _json_error(str(exc))
-    cases_key = canonical_cases_key(found["data"], str(found["file"]))
     old_expected = found["case"].get("expected", [])
 
-    found["data"][cases_key][found["index"]]["expected"] = expected
+    found["case"]["expected"] = expected
     save_json(found["file"], found["data"])
-
-    old_surfaces = "|".join(t.get("surface", "") for t in old_expected)
-    new_surfaces = "|".join(t["surface"] for t in expected)
 
     return _json_result(
         {
@@ -195,8 +170,8 @@ async def test_update(
             "file": found["basename"],
             "index": found["index"],
             "input": input_text,
-            "old_surfaces": old_surfaces,
-            "new_surfaces": new_surfaces,
+            "old_surfaces": "|".join(t.get("surface", "") for t in old_expected),
+            "new_surfaces": "|".join(t["surface"] for t in expected),
             "source": source,
         }
     )
@@ -213,23 +188,15 @@ async def test_delete(
         input_text: Input text to find and delete.
         test_id: Test ID to delete (format: file/index or file/id_string).
     """
-    if test_id:
-        found = find_test_by_id(PROJECT_ROOT, test_id)
-        if not found:
-            return _json_error(f"Test not found: {test_id}")
-    elif input_text:
-        found = find_test_by_input(PROJECT_ROOT, input_text)
-        if not found:
-            return _json_error(f"No test found for input: {input_text}")
-    else:
-        return _json_error("Either input_text or test_id is required.")
+    found, error = _find_case(PROJECT_ROOT, input_text, test_id)
+    if not found:
+        return _json_error(error)
 
     case = found["case"]
     case_id = case.get("id", found["index"])
     surfaces = " ".join(t.get("surface", "") for t in (case.get("expected") or []))
 
-    cases_key = canonical_cases_key(found["data"], str(found["file"]))
-    del found["data"][cases_key][found["index"]]
+    del get_cases(found["data"], str(found["file"]))[found["index"]]
     save_json(found["file"], found["data"])
 
     return _json_result(
@@ -273,9 +240,9 @@ async def test_batch_add(
     skipped = []
 
     # First pass: filter existing, collect new inputs
-    new_inputs: list[tuple[int, str]] = []  # (original_index, input_text)
+    new_inputs: list[str] = []
     seen_inputs: set[str] = set()
-    for i, inp in enumerate(inputs):
+    for inp in inputs:
         if inp in seen_inputs:
             skipped.append({"input": inp, "reason": "duplicate within request"})
             continue
@@ -284,13 +251,10 @@ async def test_batch_add(
         if existing:
             skipped.append({"input": inp, "reason": f"exists at {existing['basename']}/{existing['index']}"})
             continue
-        new_inputs.append((i, inp))
+        new_inputs.append(inp)
 
-    # Batch get expected tokens for all new inputs
-    batch_results = get_expected_tokens_batch_subprocess([inp for _, inp in new_inputs]) if new_inputs else []
-
-    for batch_idx, (_orig_idx, inp) in enumerate(new_inputs):
-        tokens, source, rule = batch_results[batch_idx]
+    batch_results = get_expected_tokens_batch_subprocess(new_inputs) if new_inputs else []
+    for inp, (tokens, source, rule) in zip(new_inputs, batch_results, strict=True):
         if source == "error":
             skipped.append({"input": inp, "reason": rule})
             continue
@@ -335,49 +299,50 @@ async def test_batch_add(
         for item, location in zip(items, placement["case_locations"], strict=True):
             item["file"] = location["file"]
 
-    if not apply:
-        # Strip internal fields for output
-        to_add_out = [
-            {
-                "input": item["input"],
-                "id": item["id"],
-                "surfaces": item["surfaces"],
-                "source": item["source"],
-                "rule": item["rule"],
-                "file": item["file"],
-            }
-            for item in to_add
-        ]
-        return _json_result(
-            {
-                "file": file_name,
-                "files": [entry for placement in placements for entry in placement["files"]],
-                "to_add": to_add_out,
-                "skipped": skipped,
-                "applied": False,
-            }
-        )
-
-    to_add_out = [
-        {
-            "input": item["input"],
-            "id": item["id"],
-            "surfaces": item["surfaces"],
-            "source": item["source"],
-            "rule": item["rule"],
-            "file": item["file"],
-        }
-        for item in to_add
-    ]
     return _json_result(
         {
             "file": file_name,
             "files": [entry for placement in placements for entry in placement["files"]],
-            "to_add": to_add_out,
+            "to_add": [
+                {key: item[key] for key in ("input", "id", "surfaces", "source", "rule", "file")} for item in to_add
+            ],
             "skipped": skipped,
-            "applied": True,
+            "applied": apply,
         }
     )
+
+
+_ORACLE_OWNED_POS = (
+    "POS expectations are oracle-owned and cannot be edited case-by-case. "
+    "Update the normalization pipeline, then run test_needs_suzume_update(apply=True)."
+)
+
+
+def _preview_pos_occurrences(old_pos: str, new_pos: str, file: str, apply: bool, surface: str | None) -> str:
+    """List expected tokens tagged *old_pos* (optionally only for *surface*); never writes."""
+    if new_pos not in VALID_POS:
+        return _json_error(f"Invalid new_pos: {new_pos}. Valid values: {', '.join(sorted(VALID_POS))}")
+    if apply:
+        return _json_error(_ORACLE_OWNED_POS)
+
+    files = _get_test_files_filtered(file or "all")
+    if not files:
+        return _json_error("No test files found")
+    loaded, error = _load_test_cases(files)
+    if error:
+        return _json_error(error)
+
+    changes = [
+        {"file": path.stem, "case_id": case.get("id", ""), "surface": token["surface"]}
+        for path, _data, cases in loaded
+        for case in cases
+        for token in case.get("expected") or []
+        if token.get("pos") == old_pos and (surface is None or token.get("surface") == surface)
+    ]
+    result = {"old_pos": old_pos, "new_pos": new_pos}
+    if surface is not None:
+        result["surface"] = surface
+    return _json_result({**result, "changes": changes, "total": len(changes), "applied": apply})
 
 
 @mcp.tool()
@@ -396,54 +361,7 @@ async def test_replace_pos(
         apply: Reserved for compatibility. POS expectations are oracle-owned
             and can never be changed by this tool.
     """
-    if new_pos not in VALID_POS:
-        return _json_error(f"Invalid new_pos: {new_pos}. Valid values: {', '.join(sorted(VALID_POS))}")
-    if apply:
-        return _json_error(
-            "POS expectations are oracle-owned and cannot be edited case-by-case. "
-            "Update the normalization pipeline, then run test_needs_suzume_update(apply=True)."
-        )
-
-    files = _get_test_files_filtered(file or "all")
-    if not files:
-        return _json_error("No test files found")
-
-    changes = []
-    for path in files:
-        try:
-            data = load_json(path)
-        except Exception as exc:
-            return _json_error(f"Failed to parse JSON file {path}: {exc}")
-        cases_key = canonical_cases_key(data, str(path))
-        cases = data.get(cases_key) or []
-        file_changes = 0
-
-        for case in cases:
-            for token in case.get("expected") or []:
-                if token.get("pos") == old_pos:
-                    changes.append({"file": path.stem, "case_id": case.get("id", ""), "surface": token["surface"]})
-                    file_changes += 1
-
-    if not changes:
-        return _json_result(
-            {
-                "old_pos": old_pos,
-                "new_pos": new_pos,
-                "changes": [],
-                "total": 0,
-                "applied": apply,
-            }
-        )
-
-    return _json_result(
-        {
-            "old_pos": old_pos,
-            "new_pos": new_pos,
-            "changes": changes,
-            "total": len(changes),
-            "applied": apply,
-        }
-    )
+    return _preview_pos_occurrences(old_pos, new_pos, file, apply, surface=None)
 
 
 @mcp.tool()
@@ -464,56 +382,7 @@ async def test_map_pos(
         apply: Reserved for compatibility. POS expectations are oracle-owned
             and can never be changed by this tool.
     """
-    if new_pos not in VALID_POS:
-        return _json_error(f"Invalid new_pos: {new_pos}. Valid values: {', '.join(sorted(VALID_POS))}")
-    if apply:
-        return _json_error(
-            "POS expectations are oracle-owned and cannot be edited case-by-case. "
-            "Update the normalization pipeline, then run test_needs_suzume_update(apply=True)."
-        )
-
-    files = _get_test_files_filtered(file or "all")
-    if not files:
-        return _json_error("No test files found")
-
-    changes = []
-    for path in files:
-        try:
-            data = load_json(path)
-        except Exception as exc:
-            return _json_error(f"Failed to parse JSON file {path}: {exc}")
-        cases_key = canonical_cases_key(data, str(path))
-        cases = data.get(cases_key) or []
-        file_changes = 0
-
-        for case in cases:
-            for token in case.get("expected") or []:
-                if token.get("surface") == surface and token.get("pos") == old_pos:
-                    changes.append({"file": path.stem, "case_id": case.get("id", ""), "surface": surface})
-                    file_changes += 1
-
-    if not changes:
-        return _json_result(
-            {
-                "old_pos": old_pos,
-                "new_pos": new_pos,
-                "surface": surface,
-                "changes": [],
-                "total": 0,
-                "applied": apply,
-            }
-        )
-
-    return _json_result(
-        {
-            "old_pos": old_pos,
-            "new_pos": new_pos,
-            "surface": surface,
-            "changes": changes,
-            "total": len(changes),
-            "applied": apply,
-        }
-    )
+    return _preview_pos_occurrences(old_pos, new_pos, file, apply, surface=surface)
 
 
 @mcp.tool()
@@ -527,32 +396,26 @@ async def test_list_pos(file: str = "") -> str:
     if not files:
         return _json_error("No test files found")
 
+    loaded, error = _load_test_cases(files)
+    if error:
+        return _json_error(error)
+
     pos_counts: dict[str, int] = {}
     pos_examples: dict[str, list[str]] = {}
-
-    for path in files:
-        try:
-            data = load_json(path)
-        except Exception as exc:
-            return _json_error(f"Failed to parse JSON file {path}: {exc}")
-        cases = data.get(canonical_cases_key(data, str(path))) or []
+    for _path, _data, cases in loaded:
         for case in cases:
             for token in case.get("expected") or []:
                 pos = token.get("pos", "UNKNOWN")
                 pos_counts[pos] = pos_counts.get(pos, 0) + 1
-                if pos not in pos_examples:
-                    pos_examples[pos] = []
-                if len(pos_examples[pos]) < 3:
-                    pos_examples[pos].append(token.get("surface", ""))
+                examples = pos_examples.setdefault(pos, [])
+                if len(examples) < 3:
+                    examples.append(token.get("surface", ""))
 
-    pos_values = []
-    for pos in sorted(pos_counts.keys(), key=lambda p: -pos_counts[p]):
-        pos_values.append(
-            {
-                "pos": pos,
-                "count": pos_counts[pos],
-                "examples": pos_examples[pos],
-            }
-        )
-
-    return _json_result({"pos_values": pos_values})
+    return _json_result(
+        {
+            "pos_values": [
+                {"pos": pos, "count": pos_counts[pos], "examples": pos_examples[pos]}
+                for pos in sorted(pos_counts, key=lambda p: -pos_counts[p])
+            ]
+        }
+    )

@@ -9,6 +9,6 @@ def json_result(value: Any) -> str:
     return json.dumps(value, ensure_ascii=False, indent=2)
 
 
-def json_error(message: str) -> str:
-    """Serialize the standard MCP error envelope."""
-    return json_result({"status": "error", "message": message})
+def json_error(message: str, **fields: Any) -> str:
+    """Serialize the standard MCP error envelope, followed by any context fields."""
+    return json_result({"status": "error", "message": message, **fields})

@@ -224,14 +224,8 @@ def load_resolved(source: str = DEFAULT_SOURCE) -> list[dict]:
 
 def load_one(source: str, bug_id: int, include_resolved: bool = True) -> dict | None:
     """Find a single record by id."""
-    for record in load_open(source):
-        if record["id"] == bug_id:
-            return record
-    if include_resolved:
-        for record in load_resolved(source):
-            if record["id"] == bug_id:
-                return record
-    return None
+    loaders = (load_open, load_resolved) if include_resolved else (load_open,)
+    return next((record for load in loaders for record in load(source) if record["id"] == bug_id), None)
 
 
 def find_by_text(source: str, text: str, include_resolved: bool = True) -> dict | None:
@@ -312,6 +306,23 @@ def write_record(source: str, record: dict, directory: Path | None = None) -> Pa
     return path
 
 
+def _persist(source: str, record: dict, directory: Path | None = None) -> dict:
+    """Write a record and point its private location fields at the written file."""
+    path = write_record(source, record, directory)
+    record["_file"] = path.name
+    record["_path"] = str(path)
+    return record
+
+
+def _move(source: str, record: dict, moved: dict, directory: Path) -> Path:
+    """Write the moved copy of a record, then remove the file it came from."""
+    path = write_record(source, moved, directory)
+    origin = Path(record["_path"])
+    if origin.is_file() and origin != path:
+        origin.unlink()
+    return path
+
+
 def _build(
     source: str,
     text: str,
@@ -365,10 +376,7 @@ def create(
     if record_id is not None:
         record["id"] = record_id
     record["status"] = "open"
-    path = write_record(source, record)
-    record["_file"] = path.name
-    record["_path"] = str(path)
-    return record
+    return _persist(source, record)
 
 
 def dismiss(
@@ -400,10 +408,7 @@ def dismiss(
     record["resolution"] = resolution
     record["resolved_at"] = today()
     record["resolved_note"] = reason
-    path = write_record(source, record, resolved_dir(source))
-    record["_file"] = path.name
-    record["_path"] = str(path)
-    return record
+    return _persist(source, record, resolved_dir(source))
 
 
 def update(source: str, record: dict, changes: dict) -> dict:
@@ -419,10 +424,7 @@ def update(source: str, record: dict, changes: dict) -> dict:
             updated["diff_type"] = classify_surface_diff(normalize_tokens(expected), normalize_tokens(suzume))
         if changes.get("check") is None:
             updated["check"] = detect_check(expected, suzume)
-    path = write_record(source, updated, Path(record["_path"]).parent)
-    updated["_file"] = path.name
-    updated["_path"] = str(path)
-    return updated
+    return _persist(source, updated, Path(record["_path"]).parent)
 
 
 def resolve(source: str, record: dict, note: str, output: str) -> Path:
@@ -435,12 +437,7 @@ def resolve(source: str, record: dict, note: str, output: str) -> Path:
         retired["resolved_note"] = note
     if output:
         retired["resolved_output"] = canonical_tokens(output)
-    target = resolved_dir(source)
-    path = write_record(source, retired, target)
-    origin = Path(record["_path"])
-    if origin.is_file() and origin != path:
-        origin.unlink()
-    return path
+    return _move(source, record, retired, resolved_dir(source))
 
 
 def reopen(source: str, record: dict) -> Path:
@@ -449,11 +446,7 @@ def reopen(source: str, record: dict) -> Path:
     restored["status"] = "open"
     for key in ("resolution", "resolved_at", "resolved_note", "resolved_output"):
         restored.pop(key, None)
-    path = write_record(source, restored, store_dir(source))
-    origin = Path(record["_path"])
-    if origin.is_file() and origin != path:
-        origin.unlink()
-    return path
+    return _move(source, record, restored, store_dir(source))
 
 
 def archive(source: str, stamp: str) -> tuple[Path, int]:

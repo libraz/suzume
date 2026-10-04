@@ -139,6 +139,21 @@ def _classical_adjective_cells(remaining: str) -> list[dict] | None:
     return None
 
 
+def _consume_span(tokens: list[dict], start: int, length: int) -> tuple[str, int]:
+    """Join surfaces from `start` until they cover `length` characters; return them and the end index."""
+    consumed, end = "", start
+    while end < len(tokens) and len(consumed) < length:
+        consumed += tokens[end].get("surface", "")
+        end += 1
+    return consumed, end
+
+
+def _covered_length(tokens: list[dict], start: int, length: int) -> tuple[int, int]:
+    """Like `_consume_span`, but return how many characters the joined surfaces cover."""
+    consumed, end = _consume_span(tokens, start, length)
+    return len(consumed), end
+
+
 def _reads_as_one_verb(lemma: str) -> bool:
     """Whether the reference dictionary reads `lemma` as a single verb."""
     if not lemma:
@@ -173,7 +188,6 @@ _APPROX_NUMERIC_PREFIXES = {"約", "計", "総"}
 # Cells of an i-adjective after its stem, longest first so かっ wins over か.
 _I_ADJECTIVE_CELL_ENDINGS = ("かっ", "けれ", "かろ", "く", "い", "き")
 _PRODUCTIVE_COMPOUND_V2 = frozenset(COMPOUND_VERB_V2_GODAN + COMPOUND_VERB_V2_ICHIDAN)
-_PRODUCTIVE_ICHIDAN_COMPOUND_V2 = frozenset(COMPOUND_VERB_V2_ICHIDAN)
 _NOMINALIZING_PARTICLES = frozenset({"を", "は", "が", "の", "に", "で", "へ", "と", "も"})
 _KANA_NUMBER_COUNTERS = tuple(
     sorted((stem + suffix for stem in KANA_NUMBER_STEMS for suffix in KANA_COUNTER_SUFFIXES), key=len, reverse=True)
@@ -390,10 +404,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
             for pronoun in KANA_PERSONAL_PRONOUNS:
                 if not remaining.startswith(pronoun):
                     continue
-                consumed, j = "", i
-                while j < len(tokens) and len(consumed) < len(pronoun):
-                    consumed += tokens[j].get("surface", "")
-                    j += 1
+                consumed, j = _consume_span(tokens, i, len(pronoun))
                 if consumed == pronoun and j - i > 1:
                     result.append({"surface": pronoun, "pos": "名詞", "pos_sub1": "代名詞", "lemma": pronoun})
                     i = j
@@ -447,11 +458,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                 topic_noun = "は" + noun
                 if not remaining.startswith(topic_noun):
                     continue
-                consumed = ""
-                j = i
-                while j < len(tokens) and len(consumed) < len(topic_noun):
-                    consumed += tokens[j].get("surface", "")
-                    j += 1
+                consumed, j = _consume_span(tokens, i, len(topic_noun))
                 if consumed != topic_noun:
                     continue
                 result.extend(
@@ -492,41 +499,25 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
         # Preserve a classical kari adjective before generic noun recovery can
         # absorb its kanji stem. The classical terminal cell validates the open
         # adjective class and supplies its headword; the suffix/auxiliary cells
-        # are grammatical.
-        if not merged:
-            cells = _classical_adjective_cells(remaining)
+        # are grammatical. The ハ行四段 irrealis needs the same protection, and
+        # for the same reason: its cell kana is the topic particle, so generic
+        # noun recovery takes the stem in front of it as a word of its own (言|は|しむ).
+        for cells_of, label in (
+            (_classical_adjective_cells, "classical-adjective-kari"),
+            (_ha_row_irrealis_cells, "classical-ha-row-irrealis"),
+        ):
+            if merged:
+                break
+            cells = cells_of(remaining)
             if cells is not None:
                 source_span = "".join(cell["surface"] for cell in cells)
-                consumed = ""
-                j = i
-                while j < len(tokens) and len(consumed) < len(source_span):
-                    consumed += tokens[j].get("surface", "")
-                    j += 1
+                consumed, j = _consume_span(tokens, i, len(source_span))
                 if consumed == source_span:
                     result.extend(cells)
                     i = j
                     merged = True
                     if applied_rule is None:
-                        applied_rule = "classical-adjective-kari"
-
-        # The ハ行四段 irrealis needs the same protection, and for the same
-        # reason: its cell kana is the topic particle, so generic noun recovery
-        # takes the stem in front of it as a word of its own (言|は|しむ).
-        if not merged:
-            cells = _ha_row_irrealis_cells(remaining)
-            if cells is not None:
-                source_span = "".join(cell["surface"] for cell in cells)
-                consumed = ""
-                j = i
-                while j < len(tokens) and len(consumed) < len(source_span):
-                    consumed += tokens[j].get("surface", "")
-                    j += 1
-                if consumed == source_span:
-                    result.extend(cells)
-                    i = j
-                    merged = True
-                    if applied_rule is None:
-                        applied_rule = "classical-ha-row-irrealis"
+                        applied_rule = label
 
         # The parallel particle とか is a closed unit after a predicate or
         # copula.  The reference lattice can split its final occurrence into
@@ -606,11 +597,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                 pretokenized_rule = "email"
             if pretokenized_match is not None:
                 unit = pretokenized_match.group(0)
-                consumed = ""
-                j = i
-                while j < len(tokens) and len(consumed) < len(unit):
-                    consumed += tokens[j].get("surface", "")
-                    j += 1
+                consumed, j = _consume_span(tokens, i, len(unit))
                 if consumed == unit:
                     result.append({"surface": unit, "pos": "名詞", "lemma": unit})
                     i = j
@@ -630,11 +617,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                 )
                 if counter:
                     source_span = number + counter
-                    consumed = ""
-                    j = i
-                    while j < len(tokens) and len(consumed) < len(source_span):
-                        consumed += tokens[j].get("surface", "")
-                        j += 1
+                    consumed, j = _consume_span(tokens, i, len(source_span))
                     if consumed == source_span:
                         result.extend(
                             (
@@ -660,11 +643,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
         if not merged:
             fixed_form = next((form for form in _FIXED_INFLECTED_FUNCTION_UNITS if remaining.startswith(form)), "")
             if fixed_form:
-                consumed = ""
-                j = i
-                while j < len(tokens) and len(consumed) < len(fixed_form):
-                    consumed += tokens[j].get("surface", "")
-                    j += 1
+                consumed, j = _consume_span(tokens, i, len(fixed_form))
                 pos, lemma, followers = FIXED_INFLECTED_FUNCTION_UNITS[fixed_form]
                 following = tokens[j].get("surface", "") if j < len(tokens) else ""
                 if consumed == fixed_form and any(following.startswith(follower) for follower in followers):
@@ -681,11 +660,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
         if not merged:
             fixed_word = next((word for word in _FIXED_FUNCTION_SEARCH_UNITS if remaining.startswith(word)), "")
             if fixed_word:
-                consumed = ""
-                j = i
-                while j < len(tokens) and len(consumed) < len(fixed_word):
-                    consumed += tokens[j].get("surface", "")
-                    j += 1
+                consumed, j = _consume_span(tokens, i, len(fixed_word))
                 if consumed == fixed_word:
                     result.append(
                         {
@@ -706,11 +681,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
             for noun in core_headwords_by_length("nouns.tsv"):
                 if not remaining.startswith(noun):
                     continue
-                consumed = ""
-                j = i
-                while j < len(tokens) and len(consumed) < len(noun):
-                    consumed += tokens[j].get("surface", "")
-                    j += 1
+                consumed, j = _consume_span(tokens, i, len(noun))
                 if consumed != noun or j == i + 1:
                     continue
                 starts_as_closed_class = t.get("pos") in ("助詞", "助動詞", "連体詞")
@@ -770,11 +741,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
         if not merged:
             kana_quantity = next((quantity for quantity in _KANA_NUMBER_COUNTERS if remaining.startswith(quantity)), "")
             if kana_quantity:
-                consumed = ""
-                j = i
-                while j < len(tokens) and len(consumed) < len(kana_quantity):
-                    consumed += tokens[j].get("surface", "")
-                    j += 1
+                consumed, j = _consume_span(tokens, i, len(kana_quantity))
                 if consumed == kana_quantity:
                     result.append({"surface": kana_quantity, "pos": "名詞", "pos_sub1": "数", "lemma": kana_quantity})
                     i = j
@@ -845,11 +812,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
         # bare えりゃー verb by surface alone.
         if not merged and regex.match(r"^どえ(?:らい|りゃー)", remaining):
             intensifier = "どえりゃー" if remaining.startswith("どえりゃー") else "どえらい"
-            consumed = ""
-            j = i
-            while j < len(tokens) and len(consumed) < len(intensifier):
-                consumed += tokens[j].get("surface", "")
-                j += 1
+            consumed, j = _consume_span(tokens, i, len(intensifier))
             if consumed == intensifier and j < len(tokens) and tokens[j].get("pos") not in ("助詞", "記号"):
                 result.append({"surface": intensifier, "pos": "副詞", "lemma": intensifier})
                 i = j
@@ -862,11 +825,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
             m = regex.match(r"^(\d+年\d+月\d+日)", remaining)
             if m:
                 date = m.group(1)
-                length = 0
-                j = i
-                while j < len(tokens) and length < len(date):
-                    length += len(tokens[j].get("surface", ""))
-                    j += 1
+                length, j = _covered_length(tokens, i, len(date))
                 if length == len(date):
                     result.append({"surface": date, "pos": "名詞", "lemma": date})
                     i = j
@@ -906,11 +865,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
             if m:
                 url = m.group(1)
                 url = regex.sub(r"[.,)\]']+$", "", url)
-                length = 0
-                j = i
-                while j < len(tokens) and length < len(url):
-                    length += len(tokens[j].get("surface", ""))
-                    j += 1
+                length, j = _covered_length(tokens, i, len(url))
                 if length == len(url):
                     result.append({"surface": url, "pos": "名詞", "lemma": url})
                     i = j
@@ -1299,11 +1254,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
             for adj in NAI_ADJECTIVES:
                 if not remaining.startswith("で" + adj):
                     continue
-                length = 0
-                j = i
-                while j < len(tokens) and length < len(adj) + 1:
-                    length += len(tokens[j].get("surface", ""))
-                    j += 1
+                length, j = _covered_length(tokens, i, len(adj) + 1)
                 if length == len(adj) + 1 and tokens[j - 1].get("surface", "").startswith("な"):
                     # で keeps the tag the reference gives it after the same
                     # host elsewhere: copula after a na-stem, particle otherwise.
@@ -1321,11 +1272,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
         if not merged:
             for adj in NAI_ADJECTIVES:
                 if remaining.startswith(adj):
-                    length = 0
-                    j = i
-                    while j < len(tokens) and length < len(adj):
-                        length += len(tokens[j].get("surface", ""))
-                        j += 1
+                    length, j = _covered_length(tokens, i, len(adj))
                     if length == len(adj):
                         result.append({"surface": adj, "pos": "形容詞", "lemma": adj})
                         i = j
@@ -1346,11 +1293,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                     cell = stem + ending
                     if not remaining.startswith(cell):
                         continue
-                    consumed = ""
-                    j = i
-                    while j < len(tokens) and len(consumed) < len(cell):
-                        consumed += tokens[j].get("surface", "")
-                        j += 1
+                    consumed, j = _consume_span(tokens, i, len(cell))
                     if consumed != cell or j == i + 1:
                         continue
                     result.append({"surface": cell, "pos": "形容詞", "lemma": adjective})
@@ -1513,11 +1456,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                 contracted = "もう"
             if contracted:
                 source_span = contracted + tail
-                consumed = 0
-                j = i
-                while j < len(tokens) and consumed < len(source_span):
-                    consumed += len(tokens[j].get("surface", ""))
-                    j += 1
+                consumed, j = _covered_length(tokens, i, len(source_span))
                 if consumed == len(source_span):
                     result.append({"surface": contracted, "pos": "助動詞", "lemma": "しまう"})
                     if tail:
@@ -1596,11 +1535,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                         plain,
                     )
                     if base is not None:
-                        consumed = 0
-                        j = i
-                        while j < len(tokens) and consumed < len(candidate):
-                            consumed += len(tokens[j].get("surface", ""))
-                            j += 1
+                        consumed, j = _covered_length(tokens, i, len(candidate))
                         if consumed == len(candidate):
                             result.append(
                                 {
@@ -1652,11 +1587,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                     derived_tari = None
             if derived_tari is not None:
                 adverb = derived_tari.group(0)
-                length = 0
-                j = i
-                while j < len(tokens) and length < len(adverb):
-                    length += len(tokens[j].get("surface", ""))
-                    j += 1
+                length, j = _covered_length(tokens, i, len(adverb))
                 if length == len(adverb):
                     result.append({"surface": adverb, "pos": "副詞", "lemma": adverb[:-1]})
                     i = j
@@ -1698,11 +1629,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
             for stem in TARI_ADVERB_STEMS:
                 adverb = stem + "と"
                 if remaining.startswith(adverb):
-                    length = 0
-                    j = i
-                    while j < len(tokens) and length < len(adverb):
-                        length += len(tokens[j].get("surface", ""))
-                        j += 1
+                    length, j = _covered_length(tokens, i, len(adverb))
                     if length == len(adverb):
                         result.append({"surface": adverb, "pos": "副詞", "lemma": stem})
                         i = j
@@ -1975,11 +1902,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
             body_match = HASHTAG_BODY_RUN.match(remaining, len(marker)) if _opens_hashtag(text, pos_in_text) else None
             body = body_match.group(0) if body_match else ""
             if body:
-                consumed = 0
-                j = i + 1
-                while j < len(tokens) and consumed < len(body):
-                    consumed += len(tokens[j].get("surface", ""))
-                    j += 1
+                consumed, j = _covered_length(tokens, i + 1, len(body))
                 if consumed == len(body):
                     combined = marker + body
                     result.append({"surface": combined, "pos": "名詞", "lemma": combined})
@@ -1992,11 +1915,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
         if not merged:
             for pronoun in COLLOQUIAL_PRONOUNS:
                 if remaining.startswith(pronoun):
-                    length = 0
-                    j = i
-                    while j < len(tokens) and length < len(pronoun):
-                        length += len(tokens[j].get("surface", ""))
-                        j += 1
+                    length, j = _covered_length(tokens, i, len(pronoun))
                     if length == len(pronoun):
                         result.append({"surface": pronoun, "pos": "代名詞", "lemma": pronoun})
                         i = j
@@ -2082,17 +2001,13 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                 # relative clause. Membership of the closed second-member class
                 # below is the evidence; the tag it arrived with is not.
                 v2_is_adnominal_homograph = nxt.get("pos") == "連体詞" and (
-                    nxt.get("surface", "") in COMPOUND_VERB_V2_GODAN + COMPOUND_VERB_V2_ICHIDAN
+                    nxt.get("surface", "") in _PRODUCTIVE_COMPOUND_V2
                 )
                 if (nxt.get("pos") == "動詞" or v2_is_adnominal_homograph) and (
                     nxt.get("lemma") or nxt.get("surface", "")
                 ) != "でる":
                     next_lemma = nxt.get("lemma") or nxt.get("surface", "")
-                    v2_base = ""
-                    for v2 in COMPOUND_VERB_V2_GODAN + COMPOUND_VERB_V2_ICHIDAN:
-                        if next_lemma == v2:
-                            v2_base = v2
-                            break
+                    v2_base = next_lemma if next_lemma in _PRODUCTIVE_COMPOUND_V2 else ""
                     v1_is_suru = (t.get("lemma") or v1_surface) == "する"
                     restricted = COMPOUND_VERB_V2_NOT_AFTER_SURU if v1_is_suru else COMPOUND_VERB_V2_SURU_ONLY
                     if v2_base in restricted:

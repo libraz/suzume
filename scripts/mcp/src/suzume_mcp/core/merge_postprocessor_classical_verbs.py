@@ -10,7 +10,7 @@ from .constants import (
     LITERARY_VOLITIONAL_PARTICLE_COMPOUNDS,
 )
 from .mecab import is_single_token_of_pos, mecab_analyze
-from .merge_postprocessor_common import _A_ROW_TO_U_ROW, _continuative_verb_tokens, _is_single_verb, _plain
+from .merge_postprocessor_common import _A_ROW_TO_U_ROW, _continuative_verb_tokens, _plain
 
 _CLASSICAL_IRREALIS_AUX = "む"
 _HIRAGANA_TAIL = regex.compile(r"\p{Hiragana}$")
@@ -79,8 +79,6 @@ def _postprocess_classical_mu(result: list[dict], applied_rule: str | None) -> t
     lexical verb spanning the boundary (書+かむ, read as 噛む) or swallows む into
     a longer idiom (読ま+むとする). Rebuild 未然形 + む and re-analyze the rest.
     """
-    from .mecab import mecab_analyze
-
     merged: list[dict] = []
     idx = 0
     while idx < len(result):
@@ -97,7 +95,7 @@ def _postprocess_classical_mu(result: list[dict], applied_rule: str | None) -> t
         ):
             stem = previous.get("surface", "")
             lemma = stem + _A_ROW_TO_U_ROW[surface[0]]
-            if stem and _is_single_verb(lemma):
+            if stem and is_single_token_of_pos(lemma, "動詞"):
                 merged[-1] = {"surface": stem + surface[0], "pos": "動詞", "lemma": lemma}
                 merged.append({"surface": surface[1], "pos": "助動詞", "lemma": surface[1]})
                 idx += 1
@@ -135,7 +133,7 @@ def _postprocess_classical_mu(result: list[dict], applied_rule: str | None) -> t
             elif previous.get("pos") == "名詞":
                 stem = previous.get("surface", "")
                 lemma = stem + "る"
-                if _is_single_verb(lemma):
+                if is_single_token_of_pos(lemma, "動詞"):
                     merged[-1] = {"surface": stem, "pos": "動詞", "lemma": lemma}
             merged.append({"surface": surface[0], "pos": "助動詞", "lemma": surface[0]})
             # Re-analysis loses the context the fused token supplied, and a
@@ -261,7 +259,7 @@ def _postprocess_izenkei_concessive(result: list[dict], applied_rule: str | None
             and surface[-1:] in _E_ROW_TO_U_ROW
         ):
             plain = surface[:-1] + _E_ROW_TO_U_ROW[surface[-1]]
-            if _is_single_verb(plain):
+            if is_single_token_of_pos(plain, "動詞"):
                 tagged.append({**token, "lemma": plain})
                 if applied_rule is None:
                     applied_rule = "izenkei-concessive-lemma"
@@ -351,8 +349,6 @@ def _postprocess_nominal_copula_naru(result: list[dict], applied_rule: str | Non
     back from the dictionary as one token (異なる, 重なる, 連なる); a fused one
     comes back as its parts, and that split is where the surface divides too.
     """
-    from .mecab import mecab_analyze
-
     normalized: list[dict] = []
     for token in result:
         lemma = token.get("lemma") or ""
@@ -463,8 +459,6 @@ def _ha_row_cell_auxiliary(surface: str) -> dict | None:
     the dictionary does carry settles what the cell actually hosts, and that
     frame cannot be misread because the row is listed for it.
     """
-    from .mecab import mecab_analyze
-
     if len(surface) < 2 or surface[0] not in _HA_ROW_DETACHED_TAILS:
         return None
     probe = mecab_analyze(_HA_ROW_FRAME_STEM + surface)

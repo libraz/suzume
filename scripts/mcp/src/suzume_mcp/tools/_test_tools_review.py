@@ -8,23 +8,21 @@ from ..core.suzume_cli import (
 )
 from ..core.test_file_suggestions import suggest_test_files
 from ..core.test_file_utils import (
-    cases_key as canonical_cases_key,
-)
-from ..core.test_file_utils import (
     find_test_by_id,
     find_test_by_input,
     find_tests_by_input,
     generate_id,
-    load_json,
     save_json,
 )
 from ..server import PROJECT_ROOT, mcp
 from ._test_tools_common import (
     BANNED_ORACLE_KEYS,
     ORACLE_OVERRIDE_REMEDIATION,
+    _case_id,
     _get_test_files_filtered,
     _json_error,
     _json_result,
+    _load_test_cases,
 )
 
 
@@ -33,8 +31,7 @@ def _banned_keys_in(case: dict) -> list[str]:
 
 
 def _case_location(found: dict) -> str:
-    case_id = found["case"].get("id", str(found["index"]))
-    return f"{found['basename']}/{case_id}"
+    return f"{found['basename']}/{_case_id(found['case'], found['index'])}"
 
 
 def _resolve_single_test(input_text: str, test_id: str) -> tuple[dict | None, str]:
@@ -99,65 +96,43 @@ async def test_reset_suzume(
         file: Optional test file filter (without .json), used with all_tests.
         apply: If True, apply changes. Default is dry-run.
     """
-    to_reset = []
-
     if all_tests:
-        files = _get_test_files_filtered(file or "all")
-        for path in files:
-            try:
-                data = load_json(path)
-            except Exception as exc:
-                return _json_error(f"Failed to parse JSON file {path}: {exc}")
-            basename = path.stem
-            cases_key = canonical_cases_key(data, str(path))
-            cases = data.get(cases_key) or []
-            for idx, case in enumerate(cases):
-                if _banned_keys_in(case):
-                    to_reset.append(
-                        {
-                            "found": {
-                                "file": path,
-                                "data": data,
-                                "case": case,
-                                "index": idx,
-                                "basename": basename,
-                            },
-                        }
-                    )
+        loaded, error = _load_test_cases(_get_test_files_filtered(file or "all"))
+        if error:
+            return _json_error(error)
+        to_reset = [
+            {"file": path, "data": data, "case": case, "index": idx, "basename": path.stem}
+            for path, data, cases in loaded
+            for idx, case in enumerate(cases)
+            if _banned_keys_in(case)
+        ]
     elif input_text or test_id:
         found, error = _resolve_single_test(input_text, test_id)
         if not found:
             return _json_error(error)
         if not _banned_keys_in(found["case"]):
             return _json_error(f"Test has no oracle override to strip: {_case_location(found)}")
-        to_reset.append({"found": found})
+        to_reset = [found]
     else:
         return _json_error("Either input_text or all_tests=True, or test_id is required.")
 
-    reset_entries = []
-    files_to_save: dict[Path, dict] = {}
-
-    for item in to_reset:
-        found = item["found"]
-        case = found["case"]
-        reset_entries.append(
-            {
-                "id": _case_location(found),
-                "file": found["basename"],
-                "index": found["index"],
-                "input": case.get("input", ""),
-                "removed": _banned_keys_in(case),
-            }
-        )
-
-        if apply:
-            cases_key = canonical_cases_key(found["data"], str(found["file"]))
-            stored = found["data"][cases_key][found["index"]]
-            for key in BANNED_ORACLE_KEYS:
-                stored.pop(key, None)
-            files_to_save[found["file"]] = found["data"]
+    reset_entries = [
+        {
+            "id": _case_location(found),
+            "file": found["basename"],
+            "index": found["index"],
+            "input": found["case"].get("input", ""),
+            "removed": _banned_keys_in(found["case"]),
+        }
+        for found in to_reset
+    ]
 
     if apply:
+        files_to_save: dict[Path, dict] = {}
+        for found in to_reset:
+            for key in BANNED_ORACLE_KEYS:
+                found["case"].pop(key, None)
+            files_to_save[found["file"]] = found["data"]
         for path, data in files_to_save.items():
             save_json(path, data)
 
@@ -187,17 +162,13 @@ async def test_validate_ids(
     if not files:
         return _json_error("No test files found")
 
-    problems = []
+    loaded, error = _load_test_cases(files)
+    if error:
+        return _json_error(error)
 
-    for path in files:
-        try:
-            data = load_json(path)
-        except Exception as exc:
-            return _json_error(f"Failed to parse JSON file {path}: {exc}")
-        basename = path.stem
-        cases_key = canonical_cases_key(data, str(path))
-        cases = data.get(cases_key) or []
-        file_ids: dict[str, bool] = {}
+    problems = []
+    for path, data, cases in loaded:
+        file_ids: set[str] = set()
 
         for idx, case in enumerate(cases):
             case_id = case.get("id", "")
@@ -225,65 +196,32 @@ async def test_validate_ids(
                 )
                 problems.append(
                     {
-                        "file": path,
-                        "basename": basename,
-                        "index": idx,
-                        "old_id": case_id,
-                        "new_id": new_id,
-                        "input": inp,
-                        "reason": reason,
+                        "path": path,
                         "data": data,
-                        "cases_key": cases_key,
+                        "case": case,
+                        "out": {
+                            "file": path.stem,
+                            "index": idx,
+                            "old_id": case_id,
+                            "new_id": new_id,
+                            "reason": reason,
+                        },
                     }
                 )
-                file_ids[new_id] = True
+                file_ids.add(new_id)
             else:
-                file_ids[sanitized] = True
+                file_ids.add(sanitized)
 
-    if not problems:
-        return _json_result(
-            {
-                "problems": [],
-                "total": 0,
-                "applied": False,
-            }
-        )
+    applied = apply and bool(problems)
+    if applied:
+        files_to_save: dict[Path, dict] = {}
+        for prob in problems:
+            prob["case"]["id"] = prob["out"]["new_id"]
+            files_to_save[prob["path"]] = prob["data"]
+        for path, data in files_to_save.items():
+            save_json(path, data)
 
-    problems_out = [
-        {
-            "file": p["basename"],
-            "index": p["index"],
-            "old_id": p["old_id"],
-            "new_id": p["new_id"],
-            "reason": p["reason"],
-        }
-        for p in problems
-    ]
-
-    if not apply:
-        return _json_result(
-            {
-                "problems": problems_out,
-                "total": len(problems),
-                "applied": False,
-            }
-        )
-
-    files_to_save: dict[Path, dict] = {}
-    for prob in problems:
-        prob["data"][prob["cases_key"]][prob["index"]]["id"] = prob["new_id"]
-        files_to_save[prob["file"]] = prob["data"]
-
-    for path, data in files_to_save.items():
-        save_json(path, data)
-
-    return _json_result(
-        {
-            "problems": problems_out,
-            "total": len(problems),
-            "applied": True,
-        }
-    )
+    return _json_result({"problems": [prob["out"] for prob in problems], "total": len(problems), "applied": applied})
 
 
 @mcp.tool()
@@ -323,14 +261,10 @@ async def test_suggest_file(input_text: str) -> str:
     if not tokens:
         return _json_error("No tokens found for input")
 
-    suggestions = suggest_test_files(input_text, tokens)
-
-    token_list = [{"surface": tok["surface"], "pos": tok["pos"]} for tok in tokens]
-
     return _json_result(
         {
             "input": input_text,
-            "tokens": token_list,
-            "suggestions": suggestions,
+            "tokens": [{"surface": tok["surface"], "pos": tok["pos"]} for tok in tokens],
+            "suggestions": suggest_test_files(input_text, tokens),
         }
     )

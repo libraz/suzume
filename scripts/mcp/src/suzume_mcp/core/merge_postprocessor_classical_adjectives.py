@@ -3,7 +3,8 @@
 from .constants import (
     CLASSICAL_ADJECTIVE_LEMMA_OVERRIDES,
 )
-from .merge_postprocessor_common import _A_ROW_TO_U_ROW, _is_single_verb
+from .mecab import is_single_token_of_pos, mecab_analyze
+from .merge_postprocessor_common import _A_ROW_TO_U_ROW
 
 
 def _postprocess_adj_bungo(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
@@ -53,8 +54,6 @@ _KARI_MAX_TOKEN_RUN = 4
 
 def _kari_probe_token(surface: str, cell: str, expected_pos: tuple[str, ...]) -> dict | None:
     """The single token the reference dictionary reads a probe cell as, if any."""
-    from .mecab import mecab_analyze
-
     probe = surface[: -len(KARI_MIZENKEI_CELL)] + cell
     tokens = mecab_analyze(probe)
     if len(tokens) != 1:
@@ -198,7 +197,7 @@ def _postprocess_ku_nominalization(result: list[dict], applied_rule: str | None)
             and surface[1] == _KU_NOMINALIZER
         ):
             stem = previous.get("surface", "")
-            if stem and _is_single_verb(stem + _A_ROW_TO_U_ROW[surface[0]]):
+            if stem and is_single_token_of_pos(stem + _A_ROW_TO_U_ROW[surface[0]], "動詞"):
                 combined = stem + surface
                 merged[-1] = {"surface": combined, "pos": "名詞", "lemma": combined}
                 idx += 1

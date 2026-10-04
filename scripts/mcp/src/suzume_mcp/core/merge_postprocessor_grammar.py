@@ -564,8 +564,6 @@ _INTERROGATIVE_HEADS = frozenset({"どう", "いか", "なぜ", "なに", "な�
 
 def _decomposed_adverb_head(surface: str, probe_suffix: str, head_pos: str) -> dict | None:
     """Read an adverb's head back as the word the construction needs there."""
-    from .mecab import mecab_analyze
-
     if surface in _INTERROGATIVE_HEADS:
         return None
     tokens = mecab_analyze(surface + probe_suffix)

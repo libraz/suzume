@@ -4,7 +4,7 @@ import unicodedata
 
 import regex
 
-from .constants import SLANG_ADJ_FOLLOWER, SLANG_ADJ_STEMS, TEXT_SYMBOLS
+from .constants import NAI_ADJECTIVES, SLANG_ADJ_FOLLOWER, SLANG_ADJ_STEMS, TARI_ADVERB_STEMS, TEXT_SYMBOLS
 from .mecab import mecab_analyze
 from .merge_rules import apply_suzume_merge
 from .pos_mapping import correct_mecab_pos, map_mecab_pos, normalize_pos
@@ -371,8 +371,6 @@ def get_char_types(s: str) -> list[str]:
 
 def get_suzume_rule(text: str) -> str:
     """Check if text matches Suzume normalization rules."""
-    from .constants import NAI_ADJECTIVES, TARI_ADVERB_STEMS
-
     for adj in NAI_ADJECTIVES:
         if adj in text:
             return "nai-adjective"

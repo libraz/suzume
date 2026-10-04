@@ -1,13 +1,11 @@
 """MeCab interface - subprocess-based MeCab analysis."""
 
-import asyncio
 import functools
+import subprocess
 
 
 def mecab_analyze(text: str) -> list[dict]:
     """Run MeCab on text and return parsed tokens (synchronous)."""
-    import subprocess
-
     result = subprocess.run(
         ["mecab"],
         input=text + "\n",
@@ -19,23 +17,6 @@ def mecab_analyze(text: str) -> list[dict]:
     if "EOS" not in result.stdout.splitlines():
         raise RuntimeError("MeCab failed: missing EOS marker")
     return _parse_mecab_output(result.stdout)
-
-
-async def mecab_analyze_async(text: str) -> list[dict]:
-    """Run MeCab on text and return parsed tokens (async)."""
-    proc = await asyncio.create_subprocess_exec(
-        "mecab",
-        stdin=asyncio.subprocess.PIPE,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-    stdout, stderr = await proc.communicate(input=(text + "\n").encode("utf-8"))
-    if proc.returncode != 0:
-        raise RuntimeError(f"MeCab failed: {stderr.decode('utf-8').strip() or 'non-zero exit'}")
-    output = stdout.decode("utf-8")
-    if "EOS" not in output.splitlines():
-        raise RuntimeError("MeCab failed: missing EOS marker")
-    return _parse_mecab_output(output)
 
 
 def is_single_token_of_pos(surface: str, pos: str) -> bool:
@@ -75,8 +56,6 @@ def _parse_mecab_output(output: str) -> list[dict]:
         if line == "EOS" or line == "":
             continue
         parts = line.split("\t", 1)
-        if len(parts) < 1:
-            continue
         surface = parts[0]
         if not surface:
             continue

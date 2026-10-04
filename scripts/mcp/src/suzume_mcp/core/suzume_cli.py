@@ -9,6 +9,7 @@ the latest normalization code from disk.
 import asyncio
 import json
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -40,32 +41,24 @@ def get_cli_path(project_root: Path | None = None) -> Path:
     return next((candidate for candidate in candidates if candidate.is_file()), candidates[0])
 
 
-def get_suzume_surfaces(text: str, cli_path: Path | None = None, skip_user_dict: bool = False) -> list[str]:
-    """Get surface tokens from Suzume CLI output (synchronous).
-
-    Args:
-        skip_user_dict: When True, pass --no-user-dict to match the C++ tokenization
-            test runner oracle (skip_user_dictionary=true). When False (default), the
-            CLI auto-loads user.dic, matching real-world CLI behavior — this is what
-            thread checking wants so that dict_add fixes are reflected.
-    """
-    import subprocess
-
+def _existing_cli(cli_path: Path | None) -> Path:
     cli = cli_path or get_cli_path()
     if not cli.exists():
         raise RuntimeError(f"Suzume CLI not found: {cli}")
+    return cli
 
-    cmd = [str(cli), "analyze"] + (["--no-user-dict"] if skip_user_dict else []) + ["--", text]
-    result = subprocess.run(
-        cmd,
-        capture_output=True,
-        text=True,
-        cwd=PROJECT_ROOT,
-    )
-    if result.returncode != 0:
-        raise RuntimeError(f"Suzume CLI failed: {result.stderr.strip() or 'non-zero exit'}")
+
+def _analyze_args(text: str, skip_user_dict: bool) -> list[str]:
+    return ["analyze"] + (["--no-user-dict"] if skip_user_dict else []) + ["--", text]
+
+
+def _cli_failure(stderr: str) -> RuntimeError:
+    return RuntimeError(f"Suzume CLI failed: {stderr.strip() or 'non-zero exit'}")
+
+
+def _surfaces_from_output(stdout: str) -> list[str]:
     surfaces = []
-    for line in result.stdout.split("\n"):
+    for line in stdout.split("\n"):
         if not line or line == "EOS":
             continue
         surface = line.split("\t")[0]
@@ -74,56 +67,8 @@ def get_suzume_surfaces(text: str, cli_path: Path | None = None, skip_user_dict:
     return surfaces
 
 
-async def get_suzume_surfaces_async(text: str, cli_path: Path | None = None, skip_user_dict: bool = False) -> list[str]:
-    """Get surface tokens from Suzume CLI output (async).
-
-    Args:
-        skip_user_dict: When True, pass --no-user-dict to match the C++ tokenization
-            test runner oracle. When False (default), the CLI auto-loads user.dic.
-    """
-    cli = cli_path or get_cli_path()
-    if not cli.exists():
-        raise RuntimeError(f"Suzume CLI not found: {cli}")
-
-    args = ["analyze"] + (["--no-user-dict"] if skip_user_dict else []) + ["--", text]
-    proc = await asyncio.create_subprocess_exec(
-        str(cli),
-        *args,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-        cwd=PROJECT_ROOT,
-    )
-    stdout, stderr = await proc.communicate()
-    if proc.returncode != 0:
-        raise RuntimeError(f"Suzume CLI failed: {stderr.decode('utf-8').strip() or 'non-zero exit'}")
-    surfaces = []
-    for line in stdout.decode("utf-8").split("\n"):
-        if not line or line == "EOS":
-            continue
-        surface = line.split("\t")[0]
-        if surface:
-            surfaces.append(surface)
-    return surfaces
-
-
-async def get_suzume_debug_info(text: str, cli_path: Path | None = None, skip_user_dict: bool = True) -> dict:
-    """Get debug info from Suzume CLI (SUZUME_DEBUG=2).
-
-    Args:
-        skip_user_dict: Defaults to True so test_show debug output matches the test
-            oracle (the C++ runner uses skip_user_dictionary=true). Pass False to
-            inspect real-world CLI behavior with user.dic loaded.
-    """
-    import re
-
-    cli = cli_path or get_cli_path()
-    if not cli.exists():
-        raise RuntimeError(f"Suzume CLI not found: {cli}")
-
-    env = os.environ.copy()
-    env["SUZUME_DEBUG"] = "2"
-
-    args = ["analyze"] + (["--no-user-dict"] if skip_user_dict else []) + ["--", text]
+async def _run_cli_async(cli: Path, args: list[str], env: dict[str, str] | None = None) -> tuple[str, str]:
+    """Run the CLI without blocking the event loop; raise on a non-zero exit."""
     proc = await asyncio.create_subprocess_exec(
         str(cli),
         *args,
@@ -134,8 +79,54 @@ async def get_suzume_debug_info(text: str, cli_path: Path | None = None, skip_us
     )
     stdout, stderr = await proc.communicate()
     if proc.returncode != 0:
-        raise RuntimeError(f"Suzume CLI failed: {stderr.decode('utf-8').strip() or 'non-zero exit'}")
-    output = stdout.decode("utf-8") + stderr.decode("utf-8")
+        raise _cli_failure(stderr.decode("utf-8"))
+    return stdout.decode("utf-8"), stderr.decode("utf-8")
+
+
+def get_suzume_surfaces(text: str, cli_path: Path | None = None, skip_user_dict: bool = False) -> list[str]:
+    """Get surface tokens from Suzume CLI output (synchronous).
+
+    Args:
+        skip_user_dict: When True, pass --no-user-dict to match the C++ tokenization
+            test runner oracle (skip_user_dictionary=true). When False (default), the
+            CLI auto-loads user.dic, matching real-world CLI behavior — this is what
+            thread checking wants so that dict_add fixes are reflected.
+    """
+    cli = _existing_cli(cli_path)
+    result = subprocess.run(
+        [str(cli), *_analyze_args(text, skip_user_dict)],
+        capture_output=True,
+        text=True,
+        cwd=PROJECT_ROOT,
+    )
+    if result.returncode != 0:
+        raise _cli_failure(result.stderr)
+    return _surfaces_from_output(result.stdout)
+
+
+async def get_suzume_surfaces_async(text: str, cli_path: Path | None = None, skip_user_dict: bool = False) -> list[str]:
+    """Get surface tokens from Suzume CLI output (async).
+
+    Args:
+        skip_user_dict: When True, pass --no-user-dict to match the C++ tokenization
+            test runner oracle. When False (default), the CLI auto-loads user.dic.
+    """
+    stdout, _ = await _run_cli_async(_existing_cli(cli_path), _analyze_args(text, skip_user_dict))
+    return _surfaces_from_output(stdout)
+
+
+async def get_suzume_debug_info(text: str, cli_path: Path | None = None, skip_user_dict: bool = True) -> dict:
+    """Get debug info from Suzume CLI (SUZUME_DEBUG=2).
+
+    Args:
+        skip_user_dict: Defaults to True so test_show debug output matches the test
+            oracle (the C++ runner uses skip_user_dictionary=true). Pass False to
+            inspect real-world CLI behavior with user.dic loaded.
+    """
+    stdout, stderr = await _run_cli_async(
+        _existing_cli(cli_path), _analyze_args(text, skip_user_dict), {**os.environ, "SUZUME_DEBUG": "2"}
+    )
+    output = stdout + stderr
 
     info: dict = {"best_path": "", "total_cost": 0, "margin": 0, "tokens": [], "connections": [], "word_costs": []}
 
@@ -249,19 +240,23 @@ def get_expected_tokens_subprocess(text: str) -> tuple[list[dict], str, str]:
     return r["tokens"], r["source"], r["rule"]
 
 
+def _batch_subprocess(texts: list[str], *, raw_mecab: bool, failure: str) -> list[tuple[list[dict], str, str]]:
+    results = _run_normalize_cli(texts, raw_mecab=raw_mecab)
+    return [
+        ([], "error", f"{failure} for {text!r}: {result['error']}")
+        if "error" in result
+        else (result["tokens"], result["source"], result["rule"])
+        for text, result in zip(texts, results, strict=True)
+    ]
+
+
 def get_expected_tokens_batch_subprocess(texts: list[str]) -> list[tuple[list[dict], str, str]]:
     """Batch version: process multiple texts in one subprocess call.
 
     Returns list of (tokens, source, rule) tuples. A failed item is represented
     as ([], "error", message), preserving the batch's other results.
     """
-    results = _run_normalize_cli(texts)
-    return [
-        ([], "error", f"normalization failed for {text!r}: {result['error']}")
-        if "error" in result
-        else (result["tokens"], result["source"], result["rule"])
-        for text, result in zip(texts, results, strict=True)
-    ]
+    return _batch_subprocess(texts, raw_mecab=False, failure="normalization failed")
 
 
 def get_mecab_tokens_batch_subprocess(texts: list[str]) -> list[tuple[list[dict], str, str]]:
@@ -270,19 +265,4 @@ def get_mecab_tokens_batch_subprocess(texts: list[str]) -> list[tuple[list[dict]
     A failed item uses the same ([], "error", message) representation as the
     normalized batch API.
     """
-    results = _run_normalize_cli(texts, raw_mecab=True)
-    return [
-        ([], "error", f"MeCab comparison failed for {text!r}: {result['error']}")
-        if "error" in result
-        else (result["tokens"], result["source"], result["rule"])
-        for text, result in zip(texts, results, strict=True)
-    ]
-
-
-def format_expected_from_tokens(tokens: list[dict]) -> list[dict]:
-    """Format tokens for JSON output (subprocess-compatible version).
-
-    The CLI already returns formatted tokens (lemma omitted if == surface),
-    so this is a pass-through. Kept for API compatibility with callers.
-    """
-    return tokens
+    return _batch_subprocess(texts, raw_mecab=True, failure="MeCab comparison failed")

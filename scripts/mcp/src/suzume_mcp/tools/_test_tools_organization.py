@@ -7,9 +7,8 @@ import re
 from pathlib import Path
 
 from ..core.test_file_utils import (
-    cases_key as canonical_cases_key,
-)
-from ..core.test_file_utils import (
+    TEST_CASES_KEY,
+    get_cases,
     get_test_data_dir,
     get_test_files,
     load_json,
@@ -17,7 +16,7 @@ from ..core.test_file_utils import (
     save_json,
 )
 from ..server import PROJECT_ROOT, mcp
-from ._test_tools_common import _json_error, _json_result
+from ._test_tools_common import _json_error, _json_result, _load_test_cases
 
 MAX_TEST_CASES_PER_FILE = 100
 MAX_TEST_FILE_BYTES = 131072
@@ -83,41 +82,40 @@ def _balanced_chunks(cases: list[dict], max_cases: int) -> list[list[dict]]:
     return chunks
 
 
-def _fits_limits(data: dict, cases_key: str, cases: list[dict], max_cases: int, max_bytes: int) -> bool:
-    candidate = dict(data)
-    candidate[cases_key] = cases
+def _fits_limits(data: dict, cases: list[dict], max_cases: int, max_bytes: int) -> bool:
+    candidate = {**data, TEST_CASES_KEY: cases}
     return len(cases) <= max_cases and _serialized_size(candidate) <= max_bytes
 
 
-def _limited_chunks(
-    source_data: dict,
-    cases_key: str,
-    cases: list[dict],
-    max_cases: int,
-    max_bytes: int,
-) -> list[list[dict]]:
+def _oversized_case_error(case: dict, max_bytes: int) -> ValueError:
+    return ValueError(f"A single test case exceeds the {max_bytes}-byte file limit: {case.get('id', '')}")
+
+
+def _limited_chunks(source_data: dict, cases: list[dict], max_cases: int, max_bytes: int) -> list[list[dict]]:
     chunks: list[list[dict]] = []
     current: list[dict] = []
     for case in cases:
         candidate = [*current, case]
-        conservative_data = _part_data(source_data, cases_key, candidate, 9999, 9999)
-        if _fits_limits(conservative_data, cases_key, candidate, max_cases, max_bytes):
+        if _fits_limits(_part_data(source_data, candidate, 9999, 9999), candidate, max_cases, max_bytes):
             current = candidate
             continue
         if current:
             chunks.append(current)
         current = [case]
-        conservative_data = _part_data(source_data, cases_key, current, 9999, 9999)
-        if not _fits_limits(conservative_data, cases_key, current, max_cases, max_bytes):
-            raise ValueError(f"A single test case exceeds the {max_bytes}-byte file limit: {case.get('id', '')}")
+        if not _fits_limits(_part_data(source_data, current, 9999, 9999), current, max_cases, max_bytes):
+            raise _oversized_case_error(case, max_bytes)
     if current:
         chunks.append(current)
     return chunks
 
 
-def _part_data(source_data: dict, cases_key: str, cases: list[dict], part_number: int, part_count: int) -> dict:
-    data = dict(source_data)
-    data[cases_key] = cases
+def _part_path(test_dir: Path, family: str, part_number: int, part_count: int) -> Path:
+    width = max(2, len(str(part_count)))
+    return test_dir / f"{family}_{str(part_number).zfill(width)}.json"
+
+
+def _part_data(source_data: dict, cases: list[dict], part_number: int, part_count: int) -> dict:
+    data = {**source_data, TEST_CASES_KEY: cases}
     description = str(source_data.get("description", "Tokenization tests"))
     data["description"] = f"{description} (part {part_number}/{part_count})"
     return data
@@ -147,14 +145,26 @@ def _base_description(data: dict, family: str) -> str:
     return _PART_DESCRIPTION_RE.sub("", description)
 
 
-def _planned_case_locations(planned: list[tuple[Path, dict]], cases_key: str, new_cases: list[dict]) -> list[dict]:
+def _planned_case_locations(planned: list[tuple[Path, dict]], new_cases: list[dict]) -> list[dict]:
     new_case_ids = {id(case) for case in new_cases}
     locations = []
     for path, data in planned:
-        for case in data[cases_key]:
+        for case in data[TEST_CASES_KEY]:
             if id(case) in new_case_ids:
                 locations.append({"id": case.get("id", ""), "input": case.get("input", ""), "file": path.stem})
     return locations
+
+
+def _cross_file_collisions(project_root: Path, planned_names: set[str], skipped: set[Path]) -> list[str]:
+    """Report generated GoogleTest names already used by files outside the plan."""
+    problems = []
+    for path in get_test_files(project_root):
+        if path in skipped:
+            continue
+        other_cases = get_cases(load_json(path), str(path))
+        for parameter_name in sorted(planned_names.intersection(_parameter_names(path, other_cases))):
+            problems.append(f"GoogleTest name collides with {path.name}: {parameter_name}")
+    return problems
 
 
 def _apply_partition_plan(
@@ -203,50 +213,31 @@ def append_cases_partitioned(
     source_to_remove: Path | None = None
 
     if numbered_paths:
-        expected_numbers = list(range(1, len(numbered_paths) + 1))
-        actual_numbers = [number for number, _path in numbered_paths]
-        if actual_numbers != expected_numbers:
+        if [number for number, _path in numbered_paths] != list(range(1, len(numbered_paths) + 1)):
             raise ValueError(f"Test family has non-contiguous part numbers: {family}")
 
-        loaded = []
+        loaded: list[tuple[Path, dict]] = []
         for _number, path in numbered_paths:
             data = load_json(path)
-            cases_key = canonical_cases_key(data, str(path))
-            cases = data.get(cases_key)
-            if not isinstance(cases, list):
-                raise ValueError(f"{path.name} has no test case array")
+            get_cases(data, str(path))  # rejects a part with an unsupported schema
             originals[path] = load_json(path)
-            loaded.append((path, data, cases_key))
+            loaded.append((path, data))
 
-        cases_key = loaded[0][2]
-        if any(key != cases_key for _path, _data, key in loaded):
-            raise ValueError(f"Test family mixes cases and test_cases fields: {family}")
-        pending = list(new_cases)
-        while pending:
-            path, data, _key = loaded[-1]
-            case = pending[0]
-            candidate = [*data[cases_key], case]
-            if _fits_limits(data, cases_key, candidate, max_cases, max_bytes):
-                data[cases_key] = candidate
-                del pending[0]
-            else:
-                part_number = len(loaded) + 1
-                width = max(2, len(str(part_number)))
-                path = test_dir / f"{family}_{str(part_number).zfill(width)}.json"
-                template = loaded[0][1]
-                data = dict(template)
-                data[cases_key] = [case]
-                if not _fits_limits(data, cases_key, data[cases_key], max_cases, max_bytes):
-                    raise ValueError(
-                        f"A single test case exceeds the {max_bytes}-byte file limit: {case.get('id', '')}"
-                    )
-                loaded.append((path, data, cases_key))
-                del pending[0]
+        for case in new_cases:
+            data = loaded[-1][1]
+            candidate = [*data[TEST_CASES_KEY], case]
+            if _fits_limits(data, candidate, max_cases, max_bytes):
+                data[TEST_CASES_KEY] = candidate
+                continue
+            part_number = len(loaded) + 1
+            data = {**loaded[0][1], TEST_CASES_KEY: [case]}
+            if not _fits_limits(data, data[TEST_CASES_KEY], max_cases, max_bytes):
+                raise _oversized_case_error(case, max_bytes)
+            loaded.append((_part_path(test_dir, family, part_number, part_number), data))
 
-        part_count = len(loaded)
         description = _base_description(loaded[0][1], family)
-        for part_number, (path, data, _key) in enumerate(loaded, start=1):
-            data["description"] = f"{description} (part {part_number}/{part_count})"
+        for part_number, (path, data) in enumerate(loaded, start=1):
+            data["description"] = f"{description} (part {part_number}/{len(loaded)})"
             planned.append((path, data))
     else:
         if base_path.exists():
@@ -254,30 +245,22 @@ def append_cases_partitioned(
             originals[base_path] = load_json(base_path)
         else:
             source_data = {"version": "1.0", "description": f"{family} tests", "cases": []}
-        cases_key = canonical_cases_key(source_data, str(base_path))
-        existing_cases = source_data.get(cases_key)
-        if not isinstance(existing_cases, list):
-            raise ValueError(f"{base_path.name} has no test case array")
-        combined = [*existing_cases, *new_cases]
-        if _fits_limits(source_data, cases_key, combined, max_cases, max_bytes):
-            data = dict(source_data)
-            data[cases_key] = combined
-            planned.append((base_path, data))
+        combined = [*get_cases(source_data, str(base_path)), *new_cases]
+        if _fits_limits(source_data, combined, max_cases, max_bytes):
+            planned.append((base_path, {**source_data, TEST_CASES_KEY: combined}))
         else:
-            chunks = _limited_chunks(source_data, cases_key, combined, max_cases, max_bytes)
-            width = max(2, len(str(len(chunks))))
+            chunks = _limited_chunks(source_data, combined, max_cases, max_bytes)
             for part_number, chunk in enumerate(chunks, start=1):
-                path = test_dir / f"{family}_{str(part_number).zfill(width)}.json"
+                path = _part_path(test_dir, family, part_number, len(chunks))
                 if path.exists():
                     raise ValueError(f"Destination file already exists: {path.name}")
-                planned.append((path, _part_data(source_data, cases_key, chunk, part_number, len(chunks))))
+                planned.append((path, _part_data(source_data, chunk, part_number, len(chunks))))
             source_to_remove = base_path if base_path.exists() else None
 
     problems = []
-    planned_paths = {path for path, _data in planned}
     planned_names: set[str] = set()
     for path, data in planned:
-        cases = data[cases_key]
+        cases = data[TEST_CASES_KEY]
         problems.extend(_validate_cases(path, cases))
         if len(cases) > max_cases:
             problems.append(f"{path.name} exceeds the {max_cases}-case limit")
@@ -287,17 +270,12 @@ def append_cases_partitioned(
             if parameter_name in planned_names:
                 problems.append(f"Generated GoogleTest name collision: {parameter_name}")
             planned_names.add(parameter_name)
-    for path in get_test_files(project_root):
-        if path in planned_paths or path == source_to_remove:
-            continue
-        data = load_json(path)
-        other_cases = data.get(canonical_cases_key(data, str(path))) or []
-        for parameter_name in sorted(planned_names.intersection(_parameter_names(path, other_cases))):
-            problems.append(f"GoogleTest name collides with {path.name}: {parameter_name}")
+    skipped = {path for path, _data in planned} | {source_to_remove}
+    problems.extend(_cross_file_collisions(project_root, planned_names, skipped))
     if problems:
         raise ValueError("Partition validation failed: " + "; ".join(problems))
 
-    locations = _planned_case_locations(planned, cases_key, new_cases)
+    locations = _planned_case_locations(planned, new_cases)
     if len(locations) != len(new_cases):
         raise ValueError("Partition plan did not place every new test case")
     if apply:
@@ -306,7 +284,7 @@ def append_cases_partitioned(
     return {
         "requested_file": file_name,
         "family": family,
-        "files": [{"file": path.stem, "cases": len(data[cases_key])} for path, data in planned],
+        "files": [{"file": path.stem, "cases": len(data[TEST_CASES_KEY])} for path, data in planned],
         "case_locations": locations,
         "split": len(planned) > 1 or source_to_remove is not None,
         "applied": apply,
@@ -327,14 +305,13 @@ async def test_audit_layout(
     if max_cases < 1 or max_bytes < 1:
         return _json_error("max_cases and max_bytes must be positive")
 
+    loaded, error = _load_test_cases(get_test_files(PROJECT_ROOT))
+    if error:
+        return _json_error(error)
+
     files = []
     total_cases = 0
-    for path in get_test_files(PROJECT_ROOT):
-        try:
-            data = load_json(path)
-        except Exception as exc:
-            return _json_error(f"Failed to parse JSON file {path}: {exc}")
-        cases = data.get(canonical_cases_key(data, str(path))) or []
+    for path, _data, cases in loaded:
         case_count = len(cases)
         byte_count = path.stat().st_size
         total_cases += case_count
@@ -396,10 +373,7 @@ async def test_split_file(
         source_data = load_json(source_path)
     except Exception as exc:
         return _json_error(f"Failed to parse JSON file {source_path}: {exc}")
-    cases_key = canonical_cases_key(source_data, str(source_path))
-    cases = source_data.get(cases_key)
-    if not isinstance(cases, list):
-        return _json_error(f"{source_path.name} has no test case array")
+    cases = get_cases(source_data, str(source_path))
     if len(cases) <= max_cases:
         return _json_result(
             {
@@ -413,13 +387,13 @@ async def test_split_file(
         )
 
     chunks = _balanced_chunks(cases, max_cases)
-    width = max(2, len(str(len(chunks))))
-    destinations: list[tuple[Path, dict]] = []
-    for part_index, chunk in enumerate(chunks, start=1):
-        suffix = str(part_index).zfill(width)
-        destination = test_dir / f"{file_name}_{suffix}.json"
-        part_data = _part_data(source_data, cases_key, chunk, part_index, len(chunks))
-        destinations.append((destination, part_data))
+    destinations = [
+        (
+            _part_path(test_dir, file_name, part_index, len(chunks)),
+            _part_data(source_data, chunk, part_index, len(chunks)),
+        )
+        for part_index, chunk in enumerate(chunks, start=1)
+    ]
 
     existing = [path.name for path, _data in destinations if path.exists()]
     if existing:
@@ -428,37 +402,25 @@ async def test_split_file(
     problems = _validate_cases(source_path, cases)
     planned_names: set[str] = set()
     for path, data in destinations:
-        part_cases = data[cases_key]
+        part_cases = data[TEST_CASES_KEY]
         problems.extend(_validate_cases(path, part_cases))
         for parameter_name in _parameter_names(path, part_cases):
             if parameter_name in planned_names:
                 problems.append(f"Generated GoogleTest name collision: {parameter_name}")
             planned_names.add(parameter_name)
-
-    for path in get_test_files(PROJECT_ROOT):
-        if path == source_path:
-            continue
-        data = load_json(path)
-        other_cases = data.get(canonical_cases_key(data, str(path))) or []
-        overlap = planned_names.intersection(_parameter_names(path, other_cases))
-        for parameter_name in sorted(overlap):
-            problems.append(f"GoogleTest name collides with {path.name}: {parameter_name}")
+    problems.extend(_cross_file_collisions(PROJECT_ROOT, planned_names, {source_path}))
 
     source_digest = _case_digest(cases)
-    combined_cases = [case for _path, data in destinations for case in data[cases_key]]
+    combined_cases = [case for _path, data in destinations for case in data[TEST_CASES_KEY]]
     if len(combined_cases) != len(cases):
         problems.append("Generated parts do not preserve the source case count")
     if _case_digest(combined_cases) != source_digest:
         problems.append("Generated parts do not preserve source case content and order")
     if problems:
-        return _json_result({"status": "error", "message": "Split validation failed", "problems": problems})
+        return _json_error("Split validation failed", problems=problems)
 
     parts = [
-        {
-            "file": path.stem,
-            "cases": len(data[cases_key]),
-            "bytes": _serialized_size(data),
-        }
+        {"file": path.stem, "cases": len(data[TEST_CASES_KEY]), "bytes": _serialized_size(data)}
         for path, data in destinations
     ]
     result = {
@@ -473,15 +435,9 @@ async def test_split_file(
     if not apply:
         return _json_result(result)
 
-    written: list[Path] = []
     try:
-        for path, data in destinations:
-            save_json(path, data)
-            written.append(path)
-        source_path.unlink()
+        _apply_partition_plan(destinations, {}, source_path)
     except Exception as exc:
-        for path in written:
-            path.unlink(missing_ok=True)
         return _json_error(f"Failed to apply split; generated files were rolled back: {exc}")
 
     return _json_result(result)

@@ -1,24 +1,95 @@
 """Dictionary search, sorting, and cleanup MCP tools."""
 
 import re
+import subprocess
 
+import regex
+
+from ..core.constants import katakana_to_hiragana
 from ..core.mecab import mecab_analyze
 from ..core.suzume_cli import get_cli_path
 from ..core.suzume_utils import get_char_types
 from ..server import PROJECT_ROOT, mcp
 from ._dict_tools_common import (
-    ALL_DICT_FILES,
+    DISABLED_PREFIX,
     USER_CATEGORIES,
     VALID_CONJ,
     VALID_POS,
-    _all_user_files,
+    _apply_recompile_outcome,
     _atomic_write_text,
+    _dict_files,
+    _invalid_value,
     _iter_dictionary_lines,
+    _json_error,
     _json_result,
     _recompile_core_dic,
     _recompile_user_dic,
+    _user_file,
     _write_files_and_recompile,
 )
+
+_CONJ_LABELS = {
+    "I_ADJ": "I-adjectives (い形容詞)",
+    "NA_ADJ": "NA-adjectives (な形容詞)",
+    "GODAN_KA": "Godan-KA verbs (カ行五段)",
+    "GODAN_GA": "Godan-GA verbs (ガ行五段)",
+    "GODAN_SA": "Godan-SA verbs (サ行五段)",
+    "GODAN_TA": "Godan-TA verbs (タ行五段)",
+    "GODAN_NA": "Godan-NA verbs (ナ行五段)",
+    "GODAN_BA": "Godan-BA verbs (バ行五段)",
+    "GODAN_MA": "Godan-MA verbs (マ行五段)",
+    "GODAN_RA": "Godan-RA verbs (ラ行五段)",
+    "GODAN_WA": "Godan-WA verbs (ワ行五段)",
+    "ICHIDAN": "Ichidan verbs (一段動詞)",
+    "SURU": "Suru verbs (サ変)",
+    "KURU": "Kuru verbs (カ変)",
+    "IRREGULAR": "Irregular verbs (不規則)",
+}
+
+_POS_LABELS = {
+    "ADJECTIVE": "Adjectives (形容詞)",
+    "ADVERB": "Adverbs (副詞)",
+    "VERB": "Verbs (動詞)",
+    "NOUN": "Nouns (名詞)",
+    "PROPER_NOUN": "Proper Nouns (固有名詞)",
+    "PRONOUN": "Pronouns (代名詞)",
+    "PREFIX": "Prefixes (接頭辞)",
+    "SUFFIX": "Suffixes (接尾辞)",
+    "INTERJECTION": "Interjections (感動詞)",
+    "ADNOMINAL": "Adnominals (連体詞)",
+    "CONJUNCTION": "Conjunctions (接続詞)",
+    "PARTICLE": "Particles (助詞)",
+    "AUX": "Auxiliaries (助動詞)",
+    "OTHER": "Other (その他)",
+    "PHRASE": "Phrases (フレーズ)",
+}
+
+
+def _matching_entries(pattern: str, user: str, search_all: bool = False) -> tuple[list[dict] | None, str | None]:
+    """Return active entries whose surface matches *pattern*, or a validation error."""
+    if user and user not in USER_CATEGORIES:
+        return None, _invalid_value("user category", user, USER_CATEGORIES, "Valid")
+    try:
+        rx = re.compile(pattern)
+    except re.error as exc:
+        return None, f"Invalid regex: {exc}"
+    matches = []
+    for file_rel, _, line in _iter_dictionary_lines(_dict_files(user, search_all)):
+        surface = line.split("\t")[0]
+        if rx.search(surface):
+            matches.append({"file": file_rel, "surface": surface, "entry": line})
+    return matches, None
+
+
+def _group_order(entries: list[dict], key: str, canonical_order) -> list[str]:
+    """Known values in canonical order, then unknown values, then the empty group."""
+    order = [value for value in canonical_order if any(ent[key] == value for ent in entries)]
+    for ent in entries:
+        if ent[key] and ent[key] not in order:
+            order.append(ent[key])
+    if any(not ent[key] for ent in entries):
+        order.append("")
+    return order
 
 
 @mcp.tool()
@@ -30,30 +101,16 @@ async def dict_grep(pattern: str, user: str = "", search_all: bool = False) -> s
         user: Search specific user category dict. Empty for core dict.
         search_all: Search both core and all user dicts.
     """
-    if user and user not in USER_CATEGORIES:
-        return _json_result(
-            {"status": "error", "message": f"Invalid user category: {user}. Valid: {', '.join(USER_CATEGORIES)}"}
-        )
-    try:
-        rx = re.compile(pattern)
-    except re.error as exc:
-        return _json_result({"status": "error", "message": f"Invalid regex: {exc}"})
-
-    files: list[str] = []
-    if user:
-        files.append(f"data/user/{user}.tsv")
-    elif search_all:
-        files = list(ALL_DICT_FILES) + _all_user_files()
-    else:
-        files = list(ALL_DICT_FILES)
-
-    matches = [
-        {"file": file_rel, "entry": line}
-        for file_rel, _, line in _iter_dictionary_lines(files)
-        if rx.search(line.split("\t")[0])
-    ]
-
-    return _json_result({"pattern": pattern, "matches": matches, "total": len(matches)})
+    matches, error = _matching_entries(pattern, user, search_all)
+    if error:
+        return _json_error(error)
+    return _json_result(
+        {
+            "pattern": pattern,
+            "matches": [{"file": match["file"], "entry": match["entry"]} for match in matches],
+            "total": len(matches),
+        }
+    )
 
 
 @mcp.tool()
@@ -74,20 +131,16 @@ async def dict_sort(
     """
     if user:
         if user not in USER_CATEGORIES:
-            return _json_result(
-                {"status": "error", "message": f"Invalid user category: {user}. Valid: {', '.join(USER_CATEGORIES)}"}
-            )
-        target_rel = f"data/user/{user}.tsv"
+            return _json_error(_invalid_value("user category", user, USER_CATEGORIES, "Valid"))
+        target_rel = _user_file(user)
     elif file:
         target_rel = file
     else:
-        return _json_result(
-            {"status": "error", "message": "Specify file (e.g. 'data/core/verbs.tsv') or user category."}
-        )
+        return _json_error("Specify file (e.g. 'data/core/verbs.tsv') or user category.")
 
     filepath = PROJECT_ROOT / target_rel
     if not filepath.exists():
-        return _json_result({"status": "error", "message": f"File not found: {target_rel}"})
+        return _json_error(f"File not found: {target_rel}")
 
     content = filepath.read_text(encoding="utf-8")
     raw_lines = content.splitlines()
@@ -109,7 +162,7 @@ async def dict_sort(
     for line in raw_lines[data_start:]:
         if not line.strip():
             continue
-        if line.startswith("#DISABLED# "):
+        if line.startswith(DISABLED_PREFIX):
             disabled_entries.append({"raw": line, "comments": pending_comments})
             pending_comments = []
             continue
@@ -131,7 +184,7 @@ async def dict_sort(
     trailing_comments = pending_comments
 
     if not entries:
-        return _json_result({"status": "error", "message": f"No entries found in {target_rel}"})
+        return _json_error(f"No entries found in {target_rel}")
 
     # Get readings for sorting (あいうえお order)
     reading_cache: dict[str, str] = {}
@@ -140,77 +193,17 @@ async def dict_sort(
         if surface not in reading_cache:
             reading_cache[surface] = await _get_reading(surface)
 
-    # Determine grouping strategy
-    has_conj = any(ent["conj_type"] for ent in entries)
-    has_mixed_pos = len(set(ent["pos"] for ent in entries)) > 1
-
-    if has_conj:
-        # Group by conj_type (verbs.tsv, adjectives.tsv)
+    # Group by conj_type (verbs.tsv, adjectives.tsv), else by POS (user dicts,
+    # expressions.tsv); a single POS without conj_type is one alphabetical group.
+    if any(ent["conj_type"] for ent in entries):
         group_key = "conj_type"
-        # Order: defined conjugation types first, then ungrouped
-        group_order = [ctype for ctype in VALID_CONJ if any(ent["conj_type"] == ctype for ent in entries)]
-        # Add any conj_type not in VALID_CONJ
-        for ent in entries:
-            if ent["conj_type"] and ent["conj_type"] not in group_order:
-                group_order.append(ent["conj_type"])
-        # Entries without conj_type go last
-        if any(not ent["conj_type"] for ent in entries):
-            group_order.append("")
-    elif has_mixed_pos:
-        # Group by POS (user dicts, expressions.tsv)
+        group_order = _group_order(entries, group_key, VALID_CONJ)
+    elif len(set(ent["pos"] for ent in entries)) > 1:
         group_key = "pos"
-        group_order = [pos for pos in VALID_POS if any(ent["pos"] == pos for ent in entries)]
-        for ent in entries:
-            if ent["pos"] and ent["pos"] not in group_order:
-                group_order.append(ent["pos"])
-        if any(not ent["pos"] for ent in entries):
-            group_order.append("")
+        group_order = _group_order(entries, group_key, VALID_POS)
     else:
-        # Single POS, no conj_type — just sort alphabetically
         group_key = None
         group_order = [None]
-
-    # Group and sort
-    groups: dict[str | None, list[dict]] = {}
-    for ent in entries:
-        key = ent.get(group_key, None) if group_key else None
-        groups.setdefault(key, []).append(ent)
-
-    _CONJ_LABELS = {
-        "I_ADJ": "I-adjectives (い形容詞)",
-        "NA_ADJ": "NA-adjectives (な形容詞)",
-        "GODAN_KA": "Godan-KA verbs (カ行五段)",
-        "GODAN_GA": "Godan-GA verbs (ガ行五段)",
-        "GODAN_SA": "Godan-SA verbs (サ行五段)",
-        "GODAN_TA": "Godan-TA verbs (タ行五段)",
-        "GODAN_NA": "Godan-NA verbs (ナ行五段)",
-        "GODAN_BA": "Godan-BA verbs (バ行五段)",
-        "GODAN_MA": "Godan-MA verbs (マ行五段)",
-        "GODAN_RA": "Godan-RA verbs (ラ行五段)",
-        "GODAN_WA": "Godan-WA verbs (ワ行五段)",
-        "ICHIDAN": "Ichidan verbs (一段動詞)",
-        "SURU": "Suru verbs (サ変)",
-        "KURU": "Kuru verbs (カ変)",
-        "IRREGULAR": "Irregular verbs (不規則)",
-    }
-
-    _POS_LABELS = {
-        "ADJECTIVE": "Adjectives (形容詞)",
-        "ADVERB": "Adverbs (副詞)",
-        "VERB": "Verbs (動詞)",
-        "NOUN": "Nouns (名詞)",
-        "PROPER_NOUN": "Proper Nouns (固有名詞)",
-        "PRONOUN": "Pronouns (代名詞)",
-        "PREFIX": "Prefixes (接頭辞)",
-        "SUFFIX": "Suffixes (接尾辞)",
-        "INTERJECTION": "Interjections (感動詞)",
-        "ADNOMINAL": "Adnominals (連体詞)",
-        "CONJUNCTION": "Conjunctions (接続詞)",
-        "PARTICLE": "Particles (助詞)",
-        "AUX": "Auxiliaries (助動詞)",
-        "OTHER": "Other (その他)",
-        "PHRASE": "Phrases (フレーズ)",
-    }
 
     # Deduplicate exact grammatical entries while preserving legitimate
     # homographs that differ by POS or conjugation type.
@@ -226,8 +219,7 @@ async def dict_sort(
         deduped_entries.append(ent)
     entries = deduped_entries
 
-    # Re-group after dedup
-    groups = {}
+    groups: dict[str | None, list[dict]] = {}
     for ent in entries:
         key = ent.get(group_key, None) if group_key else None
         groups.setdefault(key, []).append(ent)
@@ -243,12 +235,9 @@ async def dict_sort(
         # Sort by reading
         group_entries.sort(key=lambda ent: reading_cache.get(ent["surface"], ent["surface"]))
 
-        # Section comment
         if group_key:
-            if group_key == "conj_type":
-                label = _CONJ_LABELS.get(key, key or "Other")
-            else:
-                label = _POS_LABELS.get(key, key or "Other")
+            labels = _CONJ_LABELS if group_key == "conj_type" else _POS_LABELS
+            label = labels.get(key, key or "Other")
             output_lines.append(f"\n# --- {label} ---")
             group_stats.append({"name": label, "count": len(group_entries)})
 
@@ -286,49 +275,25 @@ async def dict_sort(
         result["preview"] = preview
         return _json_result(result)
 
-    is_user = target_rel.startswith("data/user/")
     recompile_status, error = await _write_files_and_recompile(
         {filepath: sorted_content},
-        _recompile_user_dic if is_user else _recompile_core_dic,
+        _recompile_user_dic if target_rel.startswith("data/user/") else _recompile_core_dic,
     )
-    if error:
-        result.update(
-            {
-                "status": "error",
-                "message": error,
-                "recompile": recompile_status,
-                "rolled_back": True,
-            }
-        )
-        return _json_result(result)
-    result["applied"] = True
-    result["recompile"] = recompile_status
-    return _json_result(result)
+    return _apply_recompile_outcome(result, recompile_status, error)
 
 
 async def _get_reading(surface: str) -> str:
     """Get hiragana reading for a surface using MeCab, for sort ordering."""
-    import regex
-
-    # If already all hiragana/katakana, convert to hiragana for sorting
     if regex.fullmatch(r"[\p{Hiragana}\p{Katakana}ー]+", surface):
-        # Convert katakana to hiragana
-        return "".join(chr(ord(c) - 0x60) if "\u30a1" <= c <= "\u30f6" else c for c in surface)
+        return katakana_to_hiragana(surface)
 
-    # Use MeCab to get reading
     tokens = mecab_analyze(surface)
-    if tokens:
-        readings = []
-        for tok in tokens:
-            reading = tok.get("reading", "")
-            if reading and reading != "*":
-                # Convert katakana reading to hiragana
-                readings.append("".join(chr(ord(c) - 0x60) if "\u30a1" <= c <= "\u30f6" else c for c in reading))
-            else:
-                readings.append(tok["surface"])
-        return "".join(readings)
-
-    return surface
+    if not tokens:
+        return surface
+    return "".join(
+        katakana_to_hiragana(tok["reading"]) if tok.get("reading", "") not in ("", "*") else tok["surface"]
+        for tok in tokens
+    )
 
 
 @mcp.tool()
@@ -344,37 +309,13 @@ async def dict_remove_matching(
         user: User dictionary category (empty for core dict).
         dry_run: If True (default), preview without removing. Set False to apply.
     """
-    if user and user not in USER_CATEGORIES:
-        return _json_result(
-            {"status": "error", "message": f"Invalid user category: {user}. Valid: {', '.join(USER_CATEGORIES)}"}
-        )
-    try:
-        rx = re.compile(pattern)
-    except re.error as exc:
-        return _json_result({"status": "error", "message": f"Invalid regex: {exc}"})
-
-    files: list[str] = []
-    if user:
-        files.append(f"data/user/{user}.tsv")
-    else:
-        files = list(ALL_DICT_FILES)
-
-    matches = []
-    for file_rel, _, line in _iter_dictionary_lines(files):
-        surface = line.split("\t")[0]
-        if rx.search(surface):
-            matches.append({"file": file_rel, "surface": surface, "entry": line})
-
+    matches, error = _matching_entries(pattern, user)
+    if error:
+        return _json_error(error)
     if not matches:
         return _json_result({"pattern": pattern, "matches": [], "total": 0, "applied": False})
 
-    result: dict = {
-        "pattern": pattern,
-        "matches": matches,
-        "total": len(matches),
-        "applied": False,
-    }
-
+    result: dict = {"pattern": pattern, "matches": matches, "total": len(matches), "applied": False}
     if dry_run:
         result["dry_run"] = True
         return _json_result(result)
@@ -401,19 +342,7 @@ async def dict_remove_matching(
         updates,
         _recompile_user_dic if user else _recompile_core_dic,
     )
-    if error:
-        result.update(
-            {
-                "status": "error",
-                "message": error,
-                "recompile": recompile_status,
-                "rolled_back": True,
-            }
-        )
-        return _json_result(result)
-    result["applied"] = True
-    result["recompile"] = recompile_status
-    return _json_result(result)
+    return _apply_recompile_outcome(result, recompile_status, error)
 
 
 @mcp.tool()
@@ -430,22 +359,18 @@ async def dict_cleanup(
         input_file: Path to TSV dictionary file to analyze (relative to project root).
         dry_run: If True (default), only report. Set False to write keep/noise files.
     """
-    import subprocess
-
     filepath = (PROJECT_ROOT / input_file).resolve()
     data_dir = (PROJECT_ROOT / "data").resolve()
     if not filepath.is_relative_to(data_dir):
-        return _json_result({"status": "error", "message": "input_file must be inside data/"})
+        return _json_error("input_file must be inside data/")
     if not filepath.exists() or not filepath.is_file():
-        return _json_result({"status": "error", "message": f"File not found: {input_file}"})
+        return _json_error(f"File not found: {input_file}")
 
     cli = get_cli_path()
     if not cli.exists():
-        return _json_result({"status": "error", "message": "suzume-cli not found (build first)"})
+        return _json_error("suzume-cli not found (build first)")
 
     def is_fixed_expression(surface: str) -> bool:
-        import regex
-
         return bool(regex.search(r"[\p{Han}][\p{Hiragana}][\p{Han}\p{Hiragana}\p{Katakana}]", surface))
 
     def is_split_by_suzume(surface: str) -> bool:
@@ -513,7 +438,7 @@ async def dict_cleanup(
             else:
                 noise_lines.append(f"{line}\t# {reason}")
     except (OSError, subprocess.SubprocessError, RuntimeError) as exc:
-        return _json_result({"status": "error", "message": f"Cleanup analysis failed: {exc}"})
+        return _json_error(f"Cleanup analysis failed: {exc}")
 
     result: dict = {
         "file": input_file,

@@ -1127,9 +1127,6 @@ BOUND_SUFFIX_VERB_NOUN_CELLS: dict[str, tuple[str, str, str]] = {
     "ばった": ("ばっ", "ばる", "た"),
 }
 
-# Plural suffix split targets
-PLURAL_RA_STEMS: list[str] = ["彼女", "彼", "僕", "奴", "我"]
-
 # ったら split pronoun stems
 TTARA_STEMS: set[str] = {
     "あなた",
@@ -1181,6 +1178,11 @@ def is_kanji(char: str) -> bool:
 def is_all_kanji(surface: str) -> bool:
     """Whether a surface is non-empty and made entirely of kanji."""
     return bool(surface) and all(is_kanji(char) for char in surface)
+
+
+def katakana_to_hiragana(text: str) -> str:
+    """Fold katakana ァ..ヶ onto hiragana, leaving every other character as is."""
+    return "".join(chr(ord(char) - 0x60) if "ァ" <= char <= "ヶ" else char for char in text)
 
 
 # Heads that stand for a copular predicate rather than naming a thing: the
