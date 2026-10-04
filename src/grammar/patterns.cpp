@@ -34,39 +34,17 @@ bool endsWithVerbNegative(std::string_view surface) {
   }
 
   // Suru verb + ない
-  if (last9 == "しない") {
-    return true;
-  }
-
-  return false;
+  return last9 == "しない";
 }
 
 bool endsWithPassiveCausativeNegativeRenyokei(std::string_view surface) {
-  // Check from longest to shortest patterns
-
-  // させなく (12 bytes): causative + negative renyokei
-  // されなく (12 bytes): passive + negative renyokei
-  // られなく (12 bytes): passive/potential + negative renyokei
-  if (utf8::endsWithAny(surface, {"させなく", "されなく", "られなく"})) {
-    return true;
-  }
-
-  // せなく (9 bytes): short causative + negative renyokei
-  // れなく (9 bytes): short passive/potential + negative renyokei
-  if (utf8::endsWithAny(surface, {"せなく", "れなく"})) {
-    return true;
-  }
-
-  return false;
+  // Every causative and passive/potential variant ends in せなく or れなく.
+  return utf8::endsWithAny(surface, {"せなく", "れなく"});
 }
 
 bool endsWithNegativeBecomePattern(std::string_view surface) {
-  // Check from longest to shortest patterns
-  // させられなくなった (27 bytes): causative-passive + negative + become + past
-  // せられなくなった (24 bytes): short causative-passive + negative + become
-  // られなくなった (21 bytes): passive/potential + negative + become + past
-  // れなくなった (18 bytes): short passive/potential + negative + become + past
-  return utf8::endsWithAny(surface, {"させられなくなった", "せられなくなった", "られなくなった", "れなくなった"});
+  // Every passive/potential and causative-passive variant ends in れなくなった.
+  return utf8::endsWith(surface, "れなくなった");
 }
 
 bool endsWithGodanNegativeRenyokei(std::string_view surface) {

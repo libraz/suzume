@@ -8,9 +8,6 @@
 #include "inflection_scorer_constants.h"
 #include "inflection_scorer_internal.h"
 
-#define GET_OPT(field, default_val) \
-  (opts ? InflectionScorerOptions::getOrDefault(opts->field, default_val) : default_val)
-
 namespace suzume::grammar {
 
 float calculateConfidence(VerbType type, std::string_view stem, size_t aux_total_len, size_t aux_count,
@@ -38,5 +35,3 @@ float calculateConfidence(VerbType type, std::string_view stem, size_t aux_total
 }
 
 }  // namespace suzume::grammar
-
-#undef GET_OPT

@@ -167,6 +167,10 @@ struct SpecialPattern {
   uint16_t required_conn;
 };
 
+// Multi-word constructions (volitional+とする, ことができる, のだ/んだ, はいけない,
+// もいい, べきだ, ところだ, ざるを得ない, わけにはいかない, ...) are deliberately
+// absent: they split into separate tokens, and absorbing them as auxiliary
+// suffixes fuses whole phrases into one verb token (忘れることができなかった).
 void addSpecialPatterns(std::vector<AuxiliaryEntry>& entries) {
   using namespace conn;
   static constexpr SpecialPattern kPatterns[] = {
@@ -218,11 +222,6 @@ void addSpecialPatterns(std::vector<AuxiliaryEntry>& entries) {
       // - Suru 未然形: しまい
       {"まい", kAuxOutBase, kVerbBase},
       {"まい", kAuxOutBase, kVerbMizenkei},
-
-      // Removed: Volitional + とする (うとする, ようとする, etc.)
-      // These are multi-word constructions (volitional + quotative と + する) that
-      // should be split as う+と+する, not absorbed as single auxiliary suffixes.
-      // See also: DoesNotGenerateMultiWordConstructions test.
 
       // === Renyokei compounds ===
       {"ながら", kAuxOutBase, kVerbRenyokei},
@@ -456,34 +455,10 @@ void addSpecialPatterns(std::vector<AuxiliaryEntry>& entries) {
       {"たくなってくる", kAuxOutBase, kVerbRenyokei},
       {"たくなってきます", kAuxOutMasu, kVerbRenyokei},
 
-      // Removed: ことができる/ことができた/ことができない — multi-word constructions
-      // (こと+が+でき+る), not conjugation suffixes. Causes false verb absorption
-      // (e.g., 忘れることができなかった → single VERB token).
-
       // === ようになる ===
       {"ようになる", kAuxOutBase, kAuxOutBase},
       {"ようになった", kAuxOutTa, kAuxOutBase},
       {"ようになって", kAuxOutTe, kAuxOutBase},
-
-      // === Explanatory のだ/んだ ===
-      // Removed: のだ/んだ/のです/んです are discourse-level constructions,
-      // not conjugation suffixes. Including them extends verb candidate surfaces
-      // (e.g., 窺うのだ as single verb), preventing proper tokenization.
-      // Verb base forms are still detected from shorter substrings.
-
-      // Removed: はいけない, はならない, もいい, もいいですか — multi-word constructions
-      // (V-て+は+いけない etc.), not conjugation suffixes. Causes false verb absorption.
-
-      // === べき patterns ===
-      // Note: べきだ/べきだった/べきではない/べきです removed — MeCab splits as
-      // べき+だ, べき+だっ+た, etc. The L1 entry for べき (AuxVolitional) handles
-      // the independent token. Compound suffix chains caused false merging
-      // (e.g., 聞くべきだ → single VERB token instead of 聞く+べき+だ).
-
-      // Removed: ところだ/ばかりだ/っぱなし/ざるを得ない/ずにはいられない/
-      // わけにはいかない/うとしている/ようとしている/ようになっている — all are
-      // multi-word constructions (formal noun+copula, particle chains, etc.) that
-      // should be split into individual tokens, not absorbed as auxiliary suffixes.
 
       // === Causative-passive + たい (させられ) ===
       {"させられたい", kAuxOutBase, kVerbMizenkei},
@@ -527,32 +502,13 @@ void addSpecialPatterns(std::vector<AuxiliaryEntry>& entries) {
       {"なくてはいけなかった", kAuxOutTa, kVerbMizenkei},
       {"なきゃならない", kAuxOutBase, kVerbMizenkei},
 
-      // Removed: はいけなかった, はだめだ, はならなかった, べきではなかった,
-      // もかまわない, もかまわなかった, ばかりなのに, っぱなしにする,
-      // ざるを得ません, ずにはいられなかった
-      // (extended forms of removed multi-word constructions above)
-
       // === てみる conditional ===
       {"みれば", kAuxOutBase, kAuxOutTe},
-
-      // === Explanatory んだ variants (removed) ===
-      // んだもの/んだもん removed along with のだ/んだ entries above.
 
       // === Polite request forms ===
       {"いただけますか", kAuxOutMasu, kAuxOutTe},
       {"くださいました", kAuxOutTa, kAuxOutTe},
       {"おりまして", kAuxOutTe, kAuxOutTe},
-
-      // Removed: ことができて/ことができなかった — multi-word constructions
-      // (see ことができる removal above).
-
-      // ばかりなのに removed (multi-word construction)
-
-      // っぱなしにする removed (multi-word construction)
-
-      // ざるを得ません removed (multi-word construction)
-
-      // ずにはいられなかった removed (multi-word construction)
 
       // === ている extended for compound verbs ===
       {"すぎている", kAuxOutBase, kVerbRenyokei},

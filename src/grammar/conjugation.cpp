@@ -52,14 +52,14 @@ ConjForm conjFormFromExtendedPos(core::ExtendedPOS extended_pos, core::ExtendedP
 Conjugation::Conjugation() = default;
 
 const std::array<Conjugation::GodanEntry, Conjugation::kGodanRowCount>& Conjugation::getGodanRows() {
-  // 五段動詞の各行の活用パターン
+  // Conjugation cells of each Godan row.
   // base_vowel: 終止形語尾 (く, ぐ, す...)
   // a_row: 未然形 (か, が, さ...)
   // i_row: 連用形 (き, ぎ, し...)
   // e_row: 仮定形・命令形 (け, げ, せ...)
   // o_row: 意志形 (こ, ご, そ...)
   // onbin: 音便形 (い, っ, ん, "" for さ行)
-  // voiced_ta: 連用形+た が だ になるか
+  // voiced_ta: whether 連用形+た voices to だ
   static constexpr std::array<GodanEntry, kGodanRowCount> kGodanRows = {{
       {VerbType::GodanKa, {U'く', U'か', U'き', U'け', U'こ', "い", false}},
       {VerbType::GodanGa, {U'ぐ', U'が', U'ぎ', U'げ', U'ご', "い", true}},
@@ -208,10 +208,6 @@ std::string kuruBaseFormOf(char32_t kanji_stem) {
   return normalize::concat(encodeUtf8(kanji_stem), "る");
 }
 
-bool isIkuBaseForm(std::string_view base_form) {
-  return base_form == "行く" || base_form == "いく";
-}
-
 bool isIkuStem(std::string_view stem) {
   return stem == "行" || stem == "い";
 }
@@ -221,7 +217,7 @@ bool admitsSokuonbin(VerbType verb_type, std::string_view base_form) {
 }
 
 bool isUOnbinStem(std::string_view stem) {
-  // 五段ワ行のう音便は生産規則ではなく、閉じた語彙的サブクラスである。
+  // Godan-Wa u-onbin is a closed lexical subclass, not a productive rule.
   // This list is the same kind of lexical irregularity as 行く's 促音便;
   // callers must not infer it from the final vowel alone.
   static constexpr std::string_view kUOnbinStems[] = {
@@ -280,11 +276,10 @@ std::string Conjugation::getStem(const std::string& base_form, VerbType type) {
 }
 
 VerbType Conjugation::detectType(const std::string& base_form) {
-  if (base_form.empty() || base_form.size() < core::kJapaneseCharBytes) {
+  if (base_form.size() < core::kJapaneseCharBytes) {
     return VerbType::Unknown;
   }
 
-  // Check last character
   const std::string_view last = utf8::lastChar(base_form);
 
   // Special verbs
@@ -302,25 +297,16 @@ VerbType Conjugation::detectType(const std::string& base_form) {
 
   // い形容詞
   if (last == "い") {
-    // Check if second-to-last is a kanji (not hiragana)
-    // Simple heuristic: if ends with かしい, たしい, etc. → adjective
     return VerbType::IAdjective;
   }
 
-  // 一段 vs 五段 (heuristic based on ending)
+  // An e-row (え段) or i-row (い段) hiragana before the final る marks an
+  // Ichidan verb (食べ+る, 見え+る); a kanji or other kana ending falls
+  // through to GodanRa. This is a heuristic, not always correct.
   if (last == "る") {
-    // If second-to-last char is え段 or い段, likely 一段
-    // This is a heuristic - not always correct
-    if (base_form.size() >= core::kTwoJapaneseCharBytes) {
-      const std::string_view prev =
-          std::string_view(base_form).substr(base_form.size() - core::kTwoJapaneseCharBytes, core::kJapaneseCharBytes);
-      // An e-row (え段) or i-row (い段) hiragana before the final る marks an
-      // Ichidan verb (食べ+る, 見え+る); a kanji or other kana ending falls
-      // through to GodanRa.
-      char32_t prev_cp = utf8::decodeFirstChar(prev);
-      if (kana::isERowCodepoint(prev_cp) || kana::isIRowCodepoint(prev_cp)) {
-        return VerbType::Ichidan;
-      }
+    const char32_t prev_cp = utf8::decodeLastChar(utf8::dropLastChar(base_form));
+    if (kana::isERowCodepoint(prev_cp) || kana::isIRowCodepoint(prev_cp)) {
+      return VerbType::Ichidan;
     }
     return VerbType::GodanRa;
   }

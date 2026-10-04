@@ -7,9 +7,6 @@
 #include "inflection_scorer_constants.h"
 #include "inflection_scorer_internal.h"
 
-#define GET_OPT(field, default_val) \
-  (opts ? InflectionScorerOptions::getOrDefault(opts->field, default_val) : default_val)
-
 namespace suzume::grammar::inflection_score_detail {
 
 float scoreStemAndIchidan(float base, const InflectionScoreContext& context) {
@@ -18,22 +15,15 @@ float scoreStemAndIchidan(float base, const InflectionScoreContext& context) {
   // Stem length penalties/bonuses
   // Very long stems are suspicious (likely wrong analysis)
   if (stem_len >= core::kFourJapaneseCharBytes) {
-    float pen = GET_OPT(penalty_stem_very_long, inflection::kPenaltyStemVeryLong);
-    base -= pen;
-    logConfidenceAdjustment(-pen, "stem_very_long");
+    applyPenalty(base, GET_OPT(penalty_stem_very_long, inflection::kPenaltyStemVeryLong), "stem_very_long");
   } else if (stem_len >= core::kThreeJapaneseCharBytes) {
-    float pen = GET_OPT(penalty_stem_long, inflection::kPenaltyStemLong);
-    base -= pen;
-    logConfidenceAdjustment(-pen, "stem_long");
+    applyPenalty(base, GET_OPT(penalty_stem_long, inflection::kPenaltyStemLong), "stem_long");
   } else if (stem_len >= core::kTwoJapaneseCharBytes) {
     // 2-char stems (6 bytes) are common
-    float bon = GET_OPT(bonus_stem_two_char, inflection::kBonusStemTwoChar);
-    base += bon;
-    logConfidenceAdjustment(bon, "stem_two_char");
+    applyBonus(base, GET_OPT(bonus_stem_two_char, inflection::kBonusStemTwoChar), "stem_two_char");
   } else if (stem_len >= core::kJapaneseCharBytes) {
     // 1-char stems (3 bytes) are possible but less common
-    base += inflection::kBonusStemOneChar;
-    logConfidenceAdjustment(inflection::kBonusStemOneChar, "stem_one_char");
+    applyBonus(base, inflection::kBonusStemOneChar, "stem_one_char");
   }
 
   // Small kana (拗音) cannot start a verb stem
@@ -43,22 +33,18 @@ float scoreStemAndIchidan(float base, const InflectionScoreContext& context) {
     std::string_view first_char = stem.substr(0, core::kJapaneseCharBytes);
     if (isSmallKana(first_char)) {
       // Heavily penalize - this is grammatically impossible
-      base -= inflection::kPenaltySmallKanaStemInvalid;
-      logConfidenceAdjustment(-inflection::kPenaltySmallKanaStemInvalid, "small_kana_stem_invalid");
+      applyPenalty(base, inflection::kPenaltySmallKanaStemInvalid, "small_kana_stem_invalid");
     }
     // ん cannot start a verb stem in Japanese
     // E.g., んじゃする is impossible - should be ん + じゃない
     if (first_char == "ん") {
-      base -= inflection::kPenaltyNStartStemInvalid;
-      logConfidenceAdjustment(-inflection::kPenaltyNStartStemInvalid, "n_start_stem_invalid");
+      applyPenalty(base, inflection::kPenaltyNStartStemInvalid, "n_start_stem_invalid");
     }
   }
 
   // Longer auxiliary chain = higher confidence (matched more grammar)
   float aux_per_byte = GET_OPT(bonus_aux_length_per_byte, inflection::kBonusAuxLengthPerByte);
-  float aux_bonus = static_cast<float>(aux_total_len) * aux_per_byte;
-  base += aux_bonus;
-  logConfidenceAdjustment(aux_bonus, "aux_length");
+  applyBonus(base, static_cast<float>(aux_total_len) * aux_per_byte, "aux_length");
 
   // Ichidan validation based on connection context
   if (type == VerbType::Ichidan) {
@@ -72,33 +58,28 @@ float scoreStemAndIchidan(float base, const InflectionScoreContext& context) {
     // Only apply penalty to stems that shouldn't be Ichidan (not E-row, not I-row)
     if (required_conn == conn::kVerbOnbinkei && !endsWithERow(stem) && !endsWithIRow(stem) &&
         !equalsAny(stem, inflection::kValidHiraganaStemExceptions)) {
-      base -= inflection::kPenaltyIchidanOnbinInvalid;
-      logConfidenceAdjustment(-inflection::kPenaltyIchidanOnbinInvalid, "ichidan_onbin_invalid");
+      applyPenalty(base, inflection::kPenaltyIchidanOnbinInvalid, "ichidan_onbin_invalid");
     }
 
     // Ichidan stems cannot end with onbin markers (っ, ん, い)
     // These are Godan onbin forms: 行っ(く), 読ん(む), 書い(く)
     // If Ichidan stem ends with these, it's a false match
     // E.g., 行っ + てた → 行っる (wrong) - should be 行く
-    // P5-2: Exception for specific kanji + い ichidan stems (用い, 率い, 報い)
+    // Exception for specific kanji + い ichidan stems (用い, 率い, 報い)
     if (stem_len >= core::kJapaneseCharBytes) {
       std::string_view last_char = utf8::lastChar(stem);
       if (utf8::equalsAny(last_char, {"っ", "ん"})) {
         // っ and ん are always onbin markers
-        base -= inflection::kPenaltyIchidanOnbinMarkerStemInvalid;
-        logConfidenceAdjustment(-inflection::kPenaltyIchidanOnbinMarkerStemInvalid,
-                                "ichidan_onbin_marker_stem_invalid");
+        applyPenalty(base, inflection::kPenaltyIchidanOnbinMarkerStemInvalid, "ichidan_onbin_marker_stem_invalid");
       } else if (last_char == "い") {
         // い can be onbin marker OR part of legitimate ichidan stem
         // Valid い-ending ichidan stems:
-        // - Single-char い (from いる - to exist/be) P5-3
-        // - 用い (用いる - to use), 率い (率いる - to lead), 報い (報いる - to repay) P5-2
-        bool is_valid_i_stem = (stem == "い" ||  // P5-3: いる
+        // - Single-char い (from いる - to exist/be)
+        // - 用い (用いる - to use), 率い (率いる - to lead), 報い (報いる - to repay)
+        bool is_valid_i_stem = (stem == "い" ||  // いる
                                 inflection::isValidKanjiIStemException(stem));
         if (!is_valid_i_stem) {
-          base -= inflection::kPenaltyIchidanOnbinMarkerStemInvalid;
-          logConfidenceAdjustment(-inflection::kPenaltyIchidanOnbinMarkerStemInvalid,
-                                  "ichidan_onbin_marker_stem_invalid");
+          applyPenalty(base, inflection::kPenaltyIchidanOnbinMarkerStemInvalid, "ichidan_onbin_marker_stem_invalid");
         }
       }
     }
@@ -110,8 +91,7 @@ float scoreStemAndIchidan(float base, const InflectionScoreContext& context) {
       std::string_view last_char = utf8::lastChar(stem);
       bool is_godan_base_ending = utf8::equalsAny(last_char, {"く", "す", "ぐ", "つ", "ぬ", "む", "ぶ", "う"});
       if (is_godan_base_ending) {
-        base -= inflection::kPenaltyIchidanVolitionalGodanStem;
-        logConfidenceAdjustment(-inflection::kPenaltyIchidanVolitionalGodanStem, "ichidan_volitional_godan_stem");
+        applyPenalty(base, inflection::kPenaltyIchidanVolitionalGodanStem, "ichidan_volitional_godan_stem");
       }
     }
 
@@ -151,7 +131,6 @@ float scoreStemAndIchidan(float base, const InflectionScoreContext& context) {
       // Note: kVerbBase is included because pure potential forms like 読める
       // are parsed as Ichidan with る base ending, but should prefer Godan potential
       // WHEN auxiliaries are attached (e.g., 読めない → 読む potential + ない).
-      // P5-1: Verified - current design is intentional:
       // Pure potential forms (書ける, 読める) are treated as independent Ichidan verbs
       // when aux_count==0. This is a deliberate design choice.
       // With auxiliaries (書けない, 読めなかった), they correctly trace back to Godan.
@@ -194,31 +173,24 @@ float scoreStemAndIchidan(float base, const InflectionScoreContext& context) {
       if (is_te_stem_in_base_context) {
         // Strong penalty: て-ending as base form is usually wrong
         // e.g., 来てる, 食べてる should be analyzed as て-form, not Ichidan base
-        base -= inflection::kPenaltyIchidanTeStemBaseInvalid;
-        logConfidenceAdjustment(-inflection::kPenaltyIchidanTeStemBaseInvalid, "ichidan_te_stem_base_invalid");
+        applyPenalty(base, inflection::kPenaltyIchidanTeStemBaseInvalid, "ichidan_te_stem_base_invalid");
       } else if (is_copula_de_pattern) {
         // Strong penalty: kanji + で is almost always copula (だ/です), not Ichidan
         // e.g., 公園で = NOUN + copula, 嫌でない = 嫌 + で + ない
-        base -= inflection::kPenaltyIchidanCopulaDePattern;
-        logConfidenceAdjustment(-inflection::kPenaltyIchidanCopulaDePattern, "ichidan_copula_de_pattern");
+        applyPenalty(base, inflection::kPenaltyIchidanCopulaDePattern, "ichidan_copula_de_pattern");
       } else if (is_suru_imperative_pattern) {
         // Strong penalty: kanji+ + せ is suru-verb imperative, not Ichidan
         // e.g., 勉強せ = 勉強する imperative, not 勉強せる
-        base -= inflection::kPenaltyIchidanSuruImperativeSePattern;
-        logConfidenceAdjustment(-inflection::kPenaltyIchidanSuruImperativeSePattern,
-                                "ichidan_suru_imperative_se_pattern");
+        applyPenalty(base, inflection::kPenaltyIchidanSuruImperativeSePattern, "ichidan_suru_imperative_se_pattern");
       } else if (stem_len == core::kTwoJapaneseCharBytes && is_potential_context &&
                  endsWithKanji(stem.substr(0, core::kJapaneseCharBytes)) && is_common_potential_ending) {
         // 読め could be Ichidan 読める or Godan potential of 読む
         // Prefer Godan potential interpretation (読む is more common than treating 読める as Ichidan)
         // Strong penalty to overcome the 0.95 cap tie
-        float pen = GET_OPT(penalty_ichidan_potential_ambiguity, inflection::kPenaltyIchidanPotentialAmbiguity);
-        base -= pen;
-        logConfidenceAdjustment(-pen, "ichidan_potential_ambiguity");
+        applyPenalty(base, GET_OPT(penalty_ichidan_potential_ambiguity, inflection::kPenaltyIchidanPotentialAmbiguity),
+                     "ichidan_potential_ambiguity");
       } else {
-        float bon = GET_OPT(bonus_ichidan_e_row, inflection::kBonusIchidanERow);
-        base += bon;
-        logConfidenceAdjustment(bon, "ichidan_e_row");
+        applyBonus(base, GET_OPT(bonus_ichidan_e_row, inflection::kBonusIchidanERow), "ichidan_e_row");
       }
     } else {
       // Check for context-specific Godan patterns
@@ -244,9 +216,8 @@ float scoreStemAndIchidan(float base, const InflectionScoreContext& context) {
       // onbin-marker path above, so both paths agree via one source of truth.
       if (looks_godan && !inflection::isValidKanjiIStemException(stem)) {
         // Stem matches Godan conjugation pattern for this context
-        float pen = GET_OPT(penalty_ichidan_looks_godan, inflection::kPenaltyIchidanLooksGodan);
-        base -= pen;
-        logConfidenceAdjustment(-pen, "ichidan_looks_godan");
+        applyPenalty(base, GET_OPT(penalty_ichidan_looks_godan, inflection::kPenaltyIchidanLooksGodan),
+                     "ichidan_looks_godan");
       }
 
       // Ichidan verb stems can only end in i-row or e-row hiragana (見, 起き, 食べ, 分かれ).
@@ -260,8 +231,7 @@ float scoreStemAndIchidan(float base, const InflectionScoreContext& context) {
         char32_t last_cp = utf8::decodeLastChar(stem);
         if (kana::isHiraganaCodepoint(last_cp) && !kana::isIRowCodepoint(last_cp) && !kana::isERowCodepoint(last_cp)) {
           // Strong penalty - this pattern is grammatically impossible for Ichidan
-          base -= inflection::kPenaltyIchidanInvalidRowStem;
-          logConfidenceAdjustment(-inflection::kPenaltyIchidanInvalidRowStem, "ichidan_invalid_row_stem");
+          applyPenalty(base, inflection::kPenaltyIchidanInvalidRowStem, "ichidan_invalid_row_stem");
         }
       }
 
@@ -281,9 +251,8 @@ float scoreStemAndIchidan(float base, const InflectionScoreContext& context) {
         if (last3 == "い" && endsWithKanji(prev3)) {
           // Stem ends with kanji + い, likely Godan renyokei misanalysis
           // Use stronger penalty than generic "looks godan"
-          float pen = GET_OPT(penalty_ichidan_kanji_i, inflection::kPenaltyIchidanKanjiI);
-          base -= pen;
-          logConfidenceAdjustment(-pen, "ichidan_kanji_i_renyokei");
+          applyPenalty(base, GET_OPT(penalty_ichidan_kanji_i, inflection::kPenaltyIchidanKanjiI),
+                       "ichidan_kanji_i_renyokei");
         }
       }
     }
@@ -305,8 +274,7 @@ float scoreStemAndIchidan(float base, const InflectionScoreContext& context) {
         // NOTE: Threshold is 15 bytes (5 chars) to exclude せられる (12 bytes)
         //       寄せられた (lemma: 寄せる) should NOT get this bonus
         //       見させられた (lemma: 見る) SHOULD get this bonus
-        base += inflection::kBonusIchidanCausativePassive;
-        logConfidenceAdjustment(inflection::kBonusIchidanCausativePassive, "ichidan_causative_passive");
+        applyBonus(base, inflection::kBonusIchidanCausativePassive, "ichidan_causative_passive");
       } else if (aux_count == 1 && aux_total_len == core::kJapaneseCharBytes) {
         // Simple te-form: て/た (3 bytes only)
         // These are common for 見る, 着る, 寝る, etc.
@@ -316,9 +284,7 @@ float scoreStemAndIchidan(float base, const InflectionScoreContext& context) {
         if (required_conn == conn::kVerbOnbinkei) {
           // Ichidan verbs don't have onbin - this is wrong analysis
           // e.g., 侍で should NOT be analyzed as Ichidan stem + で (te-form)
-          base -= inflection::kPenaltyIchidanSingleKanjiOnbinInvalid;
-          logConfidenceAdjustment(-inflection::kPenaltyIchidanSingleKanjiOnbinInvalid,
-                                  "ichidan_single_kanji_onbin_invalid");
+          applyPenalty(base, inflection::kPenaltyIchidanSingleKanjiOnbinInvalid, "ichidan_single_kanji_onbin_invalid");
         }
       } else if (aux_count == 1 && aux_total_len == core::kTwoJapaneseCharBytes &&
                  required_conn == conn::kVerbRenyokei) {
@@ -328,15 +294,14 @@ float scoreStemAndIchidan(float base, const InflectionScoreContext& context) {
         // NOTE: 3-char patterns like すぎた should still get penalty (高い + すぎた, not 高る + すぎた)
       } else if (aux_count == 1 && aux_total_len == core::kTwoJapaneseCharBytes &&
                  required_conn == conn::kVerbMizenkei) {
-        // P5-4: 2-char aux with mizenkei connection: ない, ぬ, etc.
+        // 2-char aux with mizenkei connection: ない, ぬ, etc.
         // Valid negative forms for single-kanji Ichidan (見ない → 見る + ない)
         // No penalty - these are legitimate conjugations
       } else {
         // Multiple aux matches or longer single match (like せる, されて)
         // Likely wrong match via potential/passive pattern
         // Apply penalty to prefer the Godan interpretation
-        base -= inflection::kPenaltyIchidanSingleKanjiMultiAux;
-        logConfidenceAdjustment(-inflection::kPenaltyIchidanSingleKanjiMultiAux, "ichidan_single_kanji_multi_aux");
+        applyPenalty(base, inflection::kPenaltyIchidanSingleKanjiMultiAux, "ichidan_single_kanji_multi_aux");
       }
     }
   }
@@ -346,7 +311,7 @@ float scoreStemAndIchidan(float base, const InflectionScoreContext& context) {
   // Real Ichidan verbs have e-row stems (食べ, 見え, 出来) not i-row
   // Kanji + i-row patterns are likely NOUN + verb (いる) misanalysis
   // E.g., 人いる = 人 + いる (not 人い + る)
-  // P5-2: Exception for specific kanji + い stems (用い, 率い, 報い) - valid kami-ichidan
+  // Exception for specific kanji + い stems (用い, 率い, 報い) - valid kami-ichidan
   if (type == VerbType::Ichidan && stem_len == core::kTwoJapaneseCharBytes && aux_count == 0) {
     // 6 bytes = 2 chars (kanji + hiragana)
     // Check if pattern is kanji + i-row hiragana
@@ -357,9 +322,8 @@ float scoreStemAndIchidan(float base, const InflectionScoreContext& context) {
     // Exception: specific known kanji + い stems are valid
     bool is_known_kanji_i_stem = inflection::isValidKanjiIStemException(stem);
     if (first_is_kanji && is_i_row && !is_known_kanji_i_stem) {
-      float pen = GET_OPT(penalty_ichidan_kanji_hiragana_stem, inflection::kPenaltyIchidanKanjiHiraganaStem);
-      base -= pen;
-      logConfidenceAdjustment(-pen, "ichidan_kanji_i_row_stem");
+      applyPenalty(base, GET_OPT(penalty_ichidan_kanji_hiragana_stem, inflection::kPenaltyIchidanKanjiHiraganaStem),
+                   "ichidan_kanji_i_row_stem");
     }
   }
 
@@ -373,13 +337,12 @@ float scoreStemAndIchidan(float base, const InflectionScoreContext& context) {
   //   - Used after verb renyokei: 食べすぎる (eat too much)
   //   - Used after i-adjective stem: 高すぎる (too expensive)
   //   - Must be recognized as legitimate Ichidan verb
-  // P5-3: Added exception for でき (from できる - to be able)
+  // Also でき (from できる - to be able)
   bool is_valid_hiragana_stem = equalsAny(stem, inflection::kValidHiraganaStemExceptions);
   if (type == VerbType::Ichidan && stem_len >= core::kTwoJapaneseCharBytes && isPureHiragana(stem) &&
       !is_valid_hiragana_stem) {
-    float pen = GET_OPT(penalty_pure_hiragana_stem, inflection::kPenaltyPureHiraganaStem);
-    base -= pen;
-    logConfidenceAdjustment(-pen, "ichidan_pure_hiragana_stem");
+    applyPenalty(base, GET_OPT(penalty_pure_hiragana_stem, inflection::kPenaltyPureHiraganaStem),
+                 "ichidan_pure_hiragana_stem");
   }
 
   return base;
@@ -394,8 +357,7 @@ float scoreGodan(float base, const InflectionScoreContext& context) {
   // Apply penalty to GodanRa interpretation for single-hiragana stems
   if (type == VerbType::GodanRa && stem_len == core::kJapaneseCharBytes && !endsWithKanji(stem)) {
     // Single hiragana stem (み, き, に, etc.) - likely Ichidan, not GodanRa
-    base -= inflection::kPenaltyGodanRaSingleHiragana;
-    logConfidenceAdjustment(-inflection::kPenaltyGodanRaSingleHiragana, "godan_ra_single_hiragana");
+    applyPenalty(base, inflection::kPenaltyGodanRaSingleHiragana, "godan_ra_single_hiragana");
   }
 
   // In kVerbKatei (conditional) context, stems ending in i-row hiragana suggest Ichidan
@@ -406,11 +368,9 @@ float scoreGodan(float base, const InflectionScoreContext& context) {
     bool has_irow_ending = endsWithChar(stem, kRenyokeiEndings, kRenyokeiCount);
     if (has_irow_ending) {
       if (type == VerbType::Ichidan) {
-        base += inflection::kBonusIchidanKateiIRow;
-        logConfidenceAdjustment(inflection::kBonusIchidanKateiIRow, "ichidan_katei_i_row");
+        applyBonus(base, inflection::kBonusIchidanKateiIRow, "ichidan_katei_i_row");
       } else if (type == VerbType::GodanRa) {
-        base -= inflection::kPenaltyGodanRaKateiIRow;
-        logConfidenceAdjustment(-inflection::kPenaltyGodanRaKateiIRow, "godan_ra_katei_i_row");
+        applyPenalty(base, inflection::kPenaltyGodanRaKateiIRow, "godan_ra_katei_i_row");
       }
     }
   }
@@ -422,8 +382,7 @@ float scoreGodan(float base, const InflectionScoreContext& context) {
   if (type == VerbType::GodanTa && stem_len >= core::kJapaneseCharBytes) {
     std::string_view last_char = utf8::lastChar(stem);
     if (utf8::equalsAny(last_char, {"っ", "ん", "い"})) {
-      base -= inflection::kPenaltyGodanTaOnbinStemInvalid;
-      logConfidenceAdjustment(-inflection::kPenaltyGodanTaOnbinStemInvalid, "godan_ta_onbin_stem_invalid");
+      applyPenalty(base, inflection::kPenaltyGodanTaOnbinStemInvalid, "godan_ta_onbin_stem_invalid");
     }
     // GodanTa uses った for te-form onbin, not てた.
     // 見てた should be Ichidan 見る, not GodanTa 見つ
@@ -432,9 +391,7 @@ float scoreGodan(float base, const InflectionScoreContext& context) {
     // Other valid renyokei auxiliaries (持ち+ます/たい) must not be affected.
     if (required_conn == conn::kVerbRenyokei &&
         (utf8::startsWith(first_aux, "て") || utf8::startsWith(first_aux, "で"))) {
-      base -= inflection::kPenaltyGodanTaRenyokeiTeDeAuxInvalid;
-      logConfidenceAdjustment(-inflection::kPenaltyGodanTaRenyokeiTeDeAuxInvalid,
-                              "godan_ta_renyokei_te_de_aux_invalid");
+      applyPenalty(base, inflection::kPenaltyGodanTaRenyokeiTeDeAuxInvalid, "godan_ta_renyokei_te_de_aux_invalid");
     }
   }
 
@@ -444,8 +401,7 @@ float scoreGodan(float base, const InflectionScoreContext& context) {
   // stems are left neutral so dictionary evidence decides the verb class.
   if (required_conn == conn::kVerbOnbinkei && isAllKanji(stem)) {
     if (type == VerbType::GodanRa && stem_len == core::kJapaneseCharBytes) {
-      base += inflection::scale::kMinorBonus;
-      logConfidenceAdjustment(inflection::scale::kMinorBonus, "godan_ra_single_kanji");
+      applyBonus(base, inflection::scale::kMinorBonus, "godan_ra_single_kanji");
     }
   }
 
@@ -461,12 +417,10 @@ float scoreGodan(float base, const InflectionScoreContext& context) {
     if (ends_with_sha || ends_with_sa) {
       if (type == VerbType::GodanWa) {
         // Strong penalty: stems ending in しゃ/さ are not typical GodanWa
-        base -= inflection::scale::kMinor;
-        logConfidenceAdjustment(-inflection::scale::kMinor, "godan_wa_sha_sa_stem");
+        applyPenalty(base, inflection::scale::kMinor, "godan_wa_sha_sa_stem");
       } else if (type == VerbType::GodanRa) {
         // Boost: honorific verbs are GodanRa
-        base += inflection::scale::kMinor;
-        logConfidenceAdjustment(inflection::scale::kMinor, "godan_ra_sha_sa_stem");
+        applyBonus(base, inflection::scale::kMinor, "godan_ra_sha_sa_stem");
       }
     }
   }
@@ -478,8 +432,7 @@ float scoreGodan(float base, const InflectionScoreContext& context) {
   if (type == VerbType::Kuru) {
     if (!isKuruStem(stem)) {
       // Any stem other than 来 or empty is invalid for Kuru
-      base -= inflection::kPenaltyKuruInvalidStem;
-      logConfidenceAdjustment(-inflection::kPenaltyKuruInvalidStem, "kuru_invalid_stem");
+      applyPenalty(base, inflection::kPenaltyKuruInvalidStem, "kuru_invalid_stem");
     }
   }
 
@@ -487,8 +440,7 @@ float scoreGodan(float base, const InflectionScoreContext& context) {
   // These must win over competing Ichidan/Godan interpretations
   // (しろ vs しる, こい vs こう)
   if (stem.empty() && required_conn == conn::kVerbMeireikei && (type == VerbType::Suru || type == VerbType::Kuru)) {
-    base += inflection::kBonusSuruKuruImperative;
-    logConfidenceAdjustment(inflection::kBonusSuruKuruImperative, "suru_kuru_imperative");
+    applyBonus(base, inflection::kBonusSuruKuruImperative, "suru_kuru_imperative");
   }
 
   // Ichidan validation: reject base forms that would be irregular verbs
@@ -499,9 +451,8 @@ float scoreGodan(float base, const InflectionScoreContext& context) {
   // E.g., こなかった should NOT be parsed as Ichidan こ + なかった = こる
   if (type == VerbType::Ichidan && stem_len == core::kJapaneseCharBytes) {
     if (equalsAny(stem, inflection::kInvalidIchidanSingleStems)) {
-      float pen = GET_OPT(penalty_ichidan_irregular_stem, inflection::kPenaltyIchidanIrregularStem);
-      base -= pen;
-      logConfidenceAdjustment(-pen, "ichidan_irregular_stem");
+      applyPenalty(base, GET_OPT(penalty_ichidan_irregular_stem, inflection::kPenaltyIchidanIrregularStem),
+                   "ichidan_irregular_stem");
     }
   }
 
@@ -513,10 +464,10 @@ float scoreGodan(float base, const InflectionScoreContext& context) {
       !endsWithKanji(stem)) {
     // Check if stem is a common particle
     if (equalsAny(stem, inflection::kParticleStemList)) {
-      float pen =
-          GET_OPT(penalty_ichidan_single_hiragana_particle, inflection::kPenaltyIchidanSingleHiraganaParticleStem);
-      base -= pen;
-      logConfidenceAdjustment(-pen, "ichidan_single_hiragana_particle_stem");
+      applyPenalty(
+          base,
+          GET_OPT(penalty_ichidan_single_hiragana_particle, inflection::kPenaltyIchidanSingleHiraganaParticleStem),
+          "ichidan_single_hiragana_particle_stem");
     }
   }
 
@@ -531,8 +482,7 @@ float scoreGodan(float base, const InflectionScoreContext& context) {
     // If first char is a common particle and second is な, this is likely
     // a misparse of PARTICLE + ない(adjective/aux)
     if (second == "な" && equalsAny(first, inflection::kParticleStemList)) {
-      base -= inflection::kPenaltyGodanWaParticleNaStem;
-      logConfidenceAdjustment(-inflection::kPenaltyGodanWaParticleNaStem, "godan_wa_particle_na_stem");
+      applyPenalty(base, inflection::kPenaltyGodanWaParticleNaStem, "godan_wa_particle_na_stem");
     }
   }
 
@@ -560,9 +510,8 @@ float scoreGodan(float base, const InflectionScoreContext& context) {
     bool is_godan_wa_base = (type == VerbType::GodanWa && required_conn == conn::kVerbBase && aux_count == 0 &&
                              suffix_len == core::kJapaneseCharBytes);
     if (!is_iku && !is_godan_ta_renyokei_aux && !is_godan_wa_base) {
-      float pen = GET_OPT(penalty_godan_single_hiragana_stem, inflection::kPenaltyGodanSingleHiraganaStem);
-      base -= pen;
-      logConfidenceAdjustment(-pen, "godan_single_hiragana_stem");
+      applyPenalty(base, GET_OPT(penalty_godan_single_hiragana_stem, inflection::kPenaltyGodanSingleHiraganaStem),
+                   "godan_single_hiragana_stem");
     }
   }
 
@@ -576,9 +525,8 @@ float scoreGodan(float base, const InflectionScoreContext& context) {
   bool is_godan_hiragana_rare = (type == VerbType::GodanMa || type == VerbType::GodanGa || type == VerbType::GodanNa ||
                                  type == VerbType::GodanBa);
   if (is_godan_hiragana_rare && stem_len >= core::kTwoJapaneseCharBytes && isPureHiragana(stem)) {
-    float pen = GET_OPT(penalty_godan_non_ra_pure_hiragana, inflection::kPenaltyGodanNonRaPureHiraganaStem);
-    base -= pen;
-    logConfidenceAdjustment(-pen, "godan_hiragana_rare_stem");
+    applyPenalty(base, GET_OPT(penalty_godan_non_ra_pure_hiragana, inflection::kPenaltyGodanNonRaPureHiraganaStem),
+                 "godan_hiragana_rare_stem");
   }
 
   // GodanSa/Suru with pure hiragana long stem (3+ chars) is very rare
@@ -592,9 +540,7 @@ float scoreGodan(float base, const InflectionScoreContext& context) {
       type == VerbType::GodanSa && !stem.empty() && isARowCodepoint(utf8::decodeLastChar(stem));
   if (is_godan_sa_or_suru && !is_transitive_asu_stem && stem_len >= core::kThreeJapaneseCharBytes &&
       isPureHiragana(stem)) {
-    base -= inflection::kPenaltyGodanSaSuruPureHiraganaLongStem;
-    logConfidenceAdjustment(-inflection::kPenaltyGodanSaSuruPureHiraganaLongStem,
-                            "godan_sa_suru_pure_hiragana_long_stem");
+    applyPenalty(base, inflection::kPenaltyGodanSaSuruPureHiraganaLongStem, "godan_sa_suru_pure_hiragana_long_stem");
   }
 
   // Godan verbs with stems ending in て/で are almost always invalid
@@ -606,9 +552,7 @@ float scoreGodan(float base, const InflectionScoreContext& context) {
   if (is_godan_non_ra && stem_len >= core::kTwoJapaneseCharBytes) {
     std::string_view last_char = utf8::lastChar(stem);
     if (isTeDeSurface(last_char)) {
-      float pen = GET_OPT(penalty_godan_te_stem, inflection::kPenaltyGodanTeStem);
-      base -= pen;
-      logConfidenceAdjustment(-pen, "godan_te_stem_invalid");
+      applyPenalty(base, GET_OPT(penalty_godan_te_stem, inflection::kPenaltyGodanTeStem), "godan_te_stem_invalid");
     }
   }
 
@@ -617,8 +561,7 @@ float scoreGodan(float base, const InflectionScoreContext& context) {
   // Valid Suru stems: 勉強, ダウンロード (kanji or katakana)
   // Note: GodanSa 2-char stems ARE valid (なくす, もらす), so this only applies to Suru
   if (type == VerbType::Suru && stem_len <= core::kTwoJapaneseCharBytes && isPureHiragana(stem)) {
-    base -= inflection::kPenaltyGodanSaSuruPureHiraganaLongStem;
-    logConfidenceAdjustment(-inflection::kPenaltyGodanSaSuruPureHiraganaLongStem, "suru_short_hiragana_stem");
+    applyPenalty(base, inflection::kPenaltyGodanSaSuruPureHiraganaLongStem, "suru_short_hiragana_stem");
   }
 
   // GodanNa (ナ行五段) is extremely rare - only 死ぬ exists in modern Japanese
@@ -630,15 +573,13 @@ float scoreGodan(float base, const InflectionScoreContext& context) {
     // Exception for 死ぬ - the only GodanNa verb in modern Japanese
     // Boost 死 stem to beat GodanMa/GodanBa and VERB+ぬ interpretations
     if (stem == "死") {
-      base += inflection::scale::kMinorBonus;
-      logConfidenceAdjustment(inflection::scale::kMinorBonus, "godan_na_shinu_boost");
+      applyBonus(base, inflection::scale::kMinorBonus, "godan_na_shinu_boost");
     } else {
       // For base form context (〜ぬ as dictionary form), apply strong penalty
       // to prefer VERB(未然形)+ぬ(AUX) interpretation (文語否定)
       // E.g., 消えぬ → 消え(消える)+ぬ(AUX), not 消えぬ(GodanNa verb)
       // E.g., 揃わぬ → 揃わ(揃う)+ぬ(AUX), not 揃わぬ(GodanNa verb)
-      base -= inflection::kPenaltyGodanNaRare;
-      logConfidenceAdjustment(-inflection::kPenaltyGodanNaRare, "godan_na_rare");
+      applyPenalty(base, inflection::kPenaltyGodanNaRare, "godan_na_rare");
     }
   }
 
@@ -648,5 +589,3 @@ float scoreGodan(float base, const InflectionScoreContext& context) {
 }
 
 }  // namespace suzume::grammar::inflection_score_detail
-
-#undef GET_OPT

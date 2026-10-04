@@ -26,6 +26,18 @@ inline void logConfidenceAdjustment(float amount, [[maybe_unused]] const char* r
   }
 }
 
+/// Lower @p base by @p penalty and log the adjustment under @p reason.
+inline void applyPenalty(float& base, float penalty, const char* reason) {
+  base -= penalty;
+  logConfidenceAdjustment(-penalty, reason);
+}
+
+/// Raise @p base by @p bonus and log the adjustment under @p reason.
+inline void applyBonus(float& base, float bonus, const char* reason) {
+  base += bonus;
+  logConfidenceAdjustment(bonus, reason);
+}
+
 using ::utf8::equalsAny;
 
 /// Bind every InflectionScoreContext field, plus the stem length every scoring
@@ -42,6 +54,10 @@ using ::utf8::equalsAny;
   [[maybe_unused]] const std::string_view first_aux = (ctx).first_aux; \
   [[maybe_unused]] const InflectionScorerOptions* opts = (ctx).opts;   \
   [[maybe_unused]] const size_t stem_len = stem.size()
+
+/// A tunable from the bound `opts`, or @p default_val when none is set.
+#define GET_OPT(field, default_val) \
+  (opts ? InflectionScorerOptions::getOrDefault(opts->field, default_val) : default_val)
 
 float scoreStemAndIchidan(float base, const InflectionScoreContext& context);
 float scoreGodan(float base, const InflectionScoreContext& context);

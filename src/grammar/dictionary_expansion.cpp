@@ -1,6 +1,7 @@
 #include "grammar/dictionary_expansion.h"
 
 #include <cstdint>
+#include <iterator>
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -61,9 +62,7 @@ std::string yoiVariantOf(std::string_view surface) {
   if (!utf8::endsWith(surface, "いい")) {
     return "";
   }
-  std::string result(surface);
-  result.resize(result.size() - core::kTwoJapaneseCharBytes);
-  return result + "よい";
+  return normalize::concat(utf8::dropLast2Chars(surface), "よい");
 }
 
 std::vector<dictionary::DictionaryEntry> expandIAdjective(const dictionary::DictionaryEntry& base_entry,
@@ -78,7 +77,7 @@ std::vector<dictionary::DictionaryEntry> expandIAdjective(const dictionary::Dict
 
   const std::string stem(utf8::dropLastChar(base_entry.surface));
   std::vector<dictionary::DictionaryEntry> result;
-  result.reserve(sizeof(kIAdjectiveSuffixes) / sizeof(kIAdjectiveSuffixes[0]));
+  result.reserve(std::size(kIAdjectiveSuffixes));
   for (const auto& suffix : kIAdjectiveSuffixes) {
     result.push_back({stem + suffix.suffix, core::PartOfSpeech::Adjective, suffix.extended_pos, base_entry.lemma});
   }
@@ -141,6 +140,22 @@ std::vector<dictionary::DictionaryEntry> expandVerb(const dictionary::Dictionary
   return result.empty() ? std::vector<dictionary::DictionaryEntry>{base_entry} : result;
 }
 
+std::vector<dictionary::DictionaryEntry> expandSourceEntry(const dictionary::SourceEntry& source_entry,
+                                                           bool has_yoi_variant) {
+  auto base_entry = makeBaseEntry(source_entry);
+  if (!needsExpansion(source_entry)) {
+    return {std::move(base_entry)};
+  }
+
+  if (source_entry.pos == core::PartOfSpeech::Adjective) {
+    base_entry.extended_pos = core::ExtendedPOS::AdjBasic;
+    return expandIAdjective(base_entry, has_yoi_variant);
+  }
+
+  base_entry.extended_pos = core::ExtendedPOS::VerbShuushikei;
+  return expandVerb(base_entry, conjTypeToVerbType(source_entry.conj_type));
+}
+
 }  // namespace
 
 std::string dictionaryConjugationTypeIssue(const dictionary::SourceEntry& source_entry) {
@@ -184,18 +199,7 @@ std::string dictionaryConjugationTypeIssue(const dictionary::SourceEntry& source
 }
 
 std::vector<dictionary::DictionaryEntry> expandDictionarySourceEntry(const dictionary::SourceEntry& source_entry) {
-  auto base_entry = makeBaseEntry(source_entry);
-  if (!needsExpansion(source_entry)) {
-    return {std::move(base_entry)};
-  }
-
-  if (source_entry.pos == core::PartOfSpeech::Adjective) {
-    base_entry.extended_pos = core::ExtendedPOS::AdjBasic;
-    return expandIAdjective(base_entry, /*has_yoi_variant=*/false);
-  }
-
-  base_entry.extended_pos = core::ExtendedPOS::VerbShuushikei;
-  return expandVerb(base_entry, conjTypeToVerbType(source_entry.conj_type));
+  return expandSourceEntry(source_entry, /*has_yoi_variant=*/false);
 }
 
 DictionaryExpansionResult expandDictionarySourceEntries(const std::vector<dictionary::SourceEntry>& source_entries,
@@ -243,18 +247,9 @@ DictionaryExpansionResult expandDictionarySourceEntries(const std::vector<dictio
   std::unordered_map<std::string, SeenSurface> seen_surface_pos;
 
   auto append_source = [&](const dictionary::SourceEntry& source_entry) {
-    auto base_entry = makeBaseEntry(source_entry);
-    std::vector<dictionary::DictionaryEntry> expanded_entries;
-    if (!needsExpansion(source_entry)) {
-      expanded_entries = {std::move(base_entry)};
-    } else if (source_entry.pos == core::PartOfSpeech::Adjective) {
-      base_entry.extended_pos = core::ExtendedPOS::AdjBasic;
-      expanded_entries =
-          expandIAdjective(base_entry, suppletive_yoi_variants.count(yoiVariantOf(source_entry.surface)) > 0);
-    } else {
-      base_entry.extended_pos = core::ExtendedPOS::VerbShuushikei;
-      expanded_entries = expandVerb(base_entry, conjTypeToVerbType(source_entry.conj_type));
-    }
+    const bool has_yoi_variant = source_entry.pos == core::PartOfSpeech::Adjective &&
+                                 suppletive_yoi_variants.count(yoiVariantOf(source_entry.surface)) > 0;
+    std::vector<dictionary::DictionaryEntry> expanded_entries = expandSourceEntry(source_entry, has_yoi_variant);
     const bool is_expanded = expanded_entries.size() > 1;
     for (auto& entry : expanded_entries) {
       const bool is_explicit_surface = entry.surface.compare(source_entry.surface) == 0;

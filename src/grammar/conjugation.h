@@ -271,11 +271,6 @@ bool isKuruKanjiBaseForm(std::string_view base_form);
 std::string kuruBaseFormOf(char32_t kanji_stem);
 
 /**
- * @brief Whether a base form is the irregular 促音便 verb 行く/いく.
- */
-bool isIkuBaseForm(std::string_view base_form);
-
-/**
  * @brief Whether a Godan-Ka stem is the irregular 促音便 stem 行/い.
  */
 bool isIkuStem(std::string_view stem);
