@@ -10,6 +10,7 @@
 #include "analysis/dictionary_probe.h"
 #include "analysis/tokenizer_utils.h"
 #include "core/debug.h"
+#include "core/kana_constants.h"
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "grammar/inflection.h"
@@ -144,13 +145,13 @@ bool hasCaseParticleDictionaryEntry(const dictionary::DictionaryManager* dict_ma
   return entry != nullptr && entry->extended_pos == core::ExtendedPOS::ParticleCase;
 }
 
-bool hasConjunctiveParticleDictionaryEntry(const dictionary::DictionaryManager* dict_manager,
-                                           std::string_view surface) {
-  if (dict_manager == nullptr) {
+bool oneMoraParticleEndsAt(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
+                           size_t pos, core::ExtendedPOS particle_pos) {
+  if (dict_manager == nullptr || pos == 0) {
     return false;
   }
-  const auto* entry = dict_manager->lookupExact(surface, core::PartOfSpeech::Particle);
-  return entry != nullptr && entry->extended_pos == core::ExtendedPOS::ParticleConj;
+  const auto* particle = lookupEntryInRange(*dict_manager, codepoints, pos - 1, pos, core::PartOfSpeech::Particle);
+  return particle != nullptr && particle->extended_pos == particle_pos;
 }
 
 bool followsCaseParticle(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
@@ -292,6 +293,20 @@ bool embedsAuxiliaryOnOnbinStem(const std::vector<char32_t>& codepoints, size_t 
     }
     if (hasDictionaryEntryFrom(dict_manager, codepoints, aux_start, 1, end_pos - aux_start,
                                core::PartOfSpeech::Auxiliary, nullptr)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool embedsTeFormVerbCell(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
+                          size_t start_pos, size_t end_pos) {
+  if (dict_manager == nullptr) {
+    return false;
+  }
+  for (size_t te_pos = start_pos + 1; te_pos + 1 < end_pos; ++te_pos) {
+    if (codepoints[te_pos] == core::hiragana::kTe &&
+        lookupEntryInRange(*dict_manager, codepoints, te_pos + 1, end_pos, core::PartOfSpeech::Verb) != nullptr) {
       return true;
     }
   }
@@ -472,7 +487,7 @@ bool endsWithCaseParticleAfterContinuative(const dictionary::DictionaryManager* 
   // godan stem. No godan verb spells its own irrealis with that mora before the
   // one this guard rejects, which is why the shape can be required here even
   // though the particle is a single mora (和らが, 揺るが keep their candidates).
-  if (!grammar::isIRowCodepoint(codepoints[particle_pos - 1])) {
+  if (!kana::isIRowCodepoint(codepoints[particle_pos - 1])) {
     return false;
   }
   const std::string host = extractSubstring(codepoints, start_pos, particle_pos);
@@ -636,7 +651,7 @@ bool coinedVerbOpensOnArgumentParticle(const dictionary::DictionaryManager* dict
     return false;
   }
   float remainder_confidence{};
-  for (const auto& analysis : inflection.analyze(extractSubstring(codepoints, start_pos + 1, end_pos))) {
+  for (const auto& analysis : analysesInRange(inflection, codepoints, start_pos + 1, end_pos)) {
     remainder_confidence = std::max(remainder_confidence, analysis.confidence);
   }
   return remainder_confidence >= own_confidence;
@@ -662,9 +677,9 @@ bool opensOnClosedClassWordTail(const dictionary::DictionaryManager* dict_manage
     return false;
   };
   auto is_closed_class_word = [&](size_t word_start, size_t word_end) {
-    const std::string word = extractSubstring(codepoints, word_start, word_end);
-    return dict_manager->lookupExact(word, core::PartOfSpeech::Auxiliary) != nullptr ||
-           dict_manager->lookupExact(word, core::PartOfSpeech::Particle) != nullptr;
+    return hasExactPartOfSpeech(
+        *dict_manager, codepoints, word_start, word_end,
+        partOfSpeechMask(core::PartOfSpeech::Auxiliary) | partOfSpeechMask(core::PartOfSpeech::Particle));
   };
   // The closed word only claims its morae when what it needs comes after it
   // (でしょ+う, でし+た); でし before ら is no copula (駅で+しらべる).

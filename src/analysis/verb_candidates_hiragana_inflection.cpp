@@ -85,24 +85,6 @@ bool immediatelyFollowsParticleHost(const std::vector<char32_t>& codepoints, siz
   return hasDictionaryEntryEndingAt(*dict_manager, codepoints, min_host_start, start_pos, kHostMask);
 }
 
-bool followsKanjiOrNominalHostBeforeCaseParticle(const std::vector<char32_t>& codepoints, size_t start_pos,
-                                                 const dictionary::DictionaryManager* dict_manager,
-                                                 const dictionary::DictionaryEntry* preceding_particle) {
-  if (dict_manager == nullptr || preceding_particle == nullptr || start_pos < 2 ||
-      preceding_particle->extended_pos != core::ExtendedPOS::ParticleCase) {
-    return false;
-  }
-  const size_t particle_start = start_pos - 1;
-  if (normalize::isKanjiCodepoint(codepoints[particle_start - 1])) {
-    return true;
-  }
-  constexpr size_t kMaxHostChars = 12;
-  constexpr PartOfSpeechMask kNominalHostMask =
-      partOfSpeechMask(core::PartOfSpeech::Noun) | partOfSpeechMask(core::PartOfSpeech::Pronoun);
-  const size_t min_host_start = particle_start > kMaxHostChars ? particle_start - kMaxHostChars : 0;
-  return hasDictionaryEntryEndingAt(*dict_manager, codepoints, min_host_start, particle_start, kNominalHostMask);
-}
-
 bool startsWithParticleThenVerifiedVerb(const std::vector<char32_t>& codepoints, size_t start_pos, size_t hiragana_end,
                                         const std::vector<normalize::CharType>& char_types,
                                         const grammar::Inflection& inflection,
@@ -112,7 +94,7 @@ bool startsWithParticleThenVerifiedVerb(const std::vector<char32_t>& codepoints,
     return false;
   }
   size_t probe_end = hiragana_end;
-  while (probe_end < char_types.size() && probe_end - start_pos < 12 &&
+  while (probe_end < char_types.size() && probe_end - start_pos < hiragana_verb_detail::kPredicateRunMax &&
          char_types[probe_end] == normalize::CharType::Hiragana) {
     ++probe_end;
   }
@@ -122,8 +104,6 @@ bool startsWithParticleThenVerifiedVerb(const std::vector<char32_t>& codepoints,
   const bool full_surface_is_dictionary_verb =
       dict_manager->lookupExact(full_surface, core::PartOfSpeech::Verb) != nullptr;
   const auto& full_surface_candidates = inflection.analyze(full_surface);
-  const auto* preceding_particle =
-      lookupEntryInRange(*dict_manager, codepoints, start_pos - 1, start_pos, core::PartOfSpeech::Particle);
   // The predicate slot is fixed by the case particle and its own host, so the
   // span that has to be a complete dictionary form is the one filling the slot.
   // The kana run can continue past it into a closed auxiliary the predicate
@@ -131,7 +111,7 @@ bool startsWithParticleThenVerifiedVerb(const std::vector<char32_t>& codepoints,
   // terminal is tested. Only a registered auxiliary is stripped: an arbitrary
   // tail would let any prefix certify the slot for the whole run.
   const bool follows_fixed_predicate_slot =
-      followsKanjiOrNominalHostBeforeCaseParticle(codepoints, start_pos, dict_manager, preceding_particle);
+      hiragana_verb_detail::followsKanjiOrNominalHostBeforeCaseParticle(codepoints, start_pos, dict_manager);
   // A run standing bare in the predicate slot is one word only while nothing
   // reads it as an inflected form of an attested one. The analyzer's own
   // confidence cannot decide that: it scores the shape of the kana, so a coined
@@ -299,6 +279,23 @@ bool prefersOverInflection(const grammar::InflectionCandidate& cand, const gramm
 }  // namespace
 
 namespace hiragana_verb_detail {
+
+bool followsKanjiOrNominalHostBeforeCaseParticle(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                                 const dictionary::DictionaryManager* dict_manager) {
+  if (dict_manager == nullptr || start_pos < 2 ||
+      !vh::oneMoraParticleEndsAt(dict_manager, codepoints, start_pos, core::ExtendedPOS::ParticleCase)) {
+    return false;
+  }
+  const size_t particle_start = start_pos - 1;
+  if (normalize::isKanjiCodepoint(codepoints[particle_start - 1])) {
+    return true;
+  }
+  constexpr size_t kMaxHostChars = 12;
+  constexpr PartOfSpeechMask kNominalHostMask =
+      partOfSpeechMask(core::PartOfSpeech::Noun) | partOfSpeechMask(core::PartOfSpeech::Pronoun);
+  const size_t min_host_start = particle_start > kMaxHostChars ? particle_start - kMaxHostChars : 0;
+  return hasDictionaryEntryEndingAt(*dict_manager, codepoints, min_host_start, particle_start, kNominalHostMask);
+}
 
 bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                            size_t hiragana_end, char32_t first_char,
@@ -476,13 +473,11 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
     // u-row endings conservatively.
     // Also allow れ (Ichidan renyokei/meireikei like くれ from くれる).
     // This prevents false positives like まじ, ため from being recognized as verbs
-    if (pre_filter_len == 2 && surface.size() >= core::kJapaneseCharBytes) {
-      // Use string_view directly into surface to avoid dangling reference
-      // (surface.substr() returns a temporary std::string)
-      std::string_view last_char(surface.data() + surface.size() - core::kJapaneseCharBytes, core::kJapaneseCharBytes);
+    if (pre_filter_len == 2) {
       const core::ExtendedPOS detected_form = core::detectVerbForm(surface);
       if (detected_form != core::ExtendedPOS::VerbShuushikei && detected_form != core::ExtendedPOS::VerbTeForm &&
-          detected_form != core::ExtendedPOS::VerbTaForm && last_char != "れ" && !looks_like_short_godan_base) {
+          detected_form != core::ExtendedPOS::VerbTaForm && utf8::lastChar(surface) != "れ" &&
+          !looks_like_short_godan_base) {
         continue;  // Skip 2-char hiragana not ending with valid verb suffix
       }
     }
@@ -526,7 +521,7 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
     // path, so suppress the merged candidate. Dictionary evidence normally
     // licenses the split. An immediately quoted volitional supplies equivalent
     // closed right context, allowing an open verb without a word entry.
-    if (pre_filter_len >= 2 && codepoints[end_pos - 1] == U'う' && grammar::isORowCodepoint(codepoints[end_pos - 2]) &&
+    if (pre_filter_len >= 2 && codepoints[end_pos - 1] == U'う' && kana::isORowCodepoint(codepoints[end_pos - 2]) &&
         best.base_form != surface) {
       bool base_is_dict_aux = vh::hasDictionaryEntry(dict_manager, best.base_form, core::PartOfSpeech::Auxiliary);
       bool has_internal_auxiliary_suffix = false;
@@ -595,27 +590,19 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
     //       してくれます → し+て+くれ+ます
     // These contain て+auxiliary patterns that should be analyzed separately
     // Only skip for longer forms (5+ chars) to avoid blocking short verbs
-    if (end_pos - start_pos >= 5) {
-      // Check for ており/ていま/てい/てお/てくださ/てほしい/てくれ/てもら patterns
-      // (te-form + auxiliary verb patterns)
-      if (surface.find("ており") != std::string::npos || surface.find("ていま") != std::string::npos ||
-          surface.find("ている") != std::string::npos || surface.find("ていた") != std::string::npos ||
-          surface.find("てくださ") != std::string::npos || surface.find("てほしい") != std::string::npos ||
-          surface.find("てくれ") != std::string::npos || surface.find("てもら") != std::string::npos ||
-          surface.find("てお") != std::string::npos) {
-        SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << surface << "\" skip te_compound_pattern\n");
-        continue;  // Skip - let te-form split win
-      }
+    if (end_pos - start_pos >= 5 && utf8::containsAny(surface, {"ており", "ていま", "ている", "ていた", "てくださ",
+                                                                "てほしい", "てくれ", "てもら", "てお"})) {
+      SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << surface << "\" skip te_compound_pattern\n");
+      continue;  // Skip - let te-form split win
     }
     // Filter ていく/ていっ/ていけ (te + iku directional aspect) at 4+ chars
     // E.g., していく → し+て+いく (not a single verb)
     //       していった → し+て+いっ+た, していって → し+て+いっ+て
-    if (end_pos - start_pos >= 4) {
-      if (vh::guardIsWired(vh::GuardMember::EmbedTeAuxiliary, vh::GuardOrigin::HiraganaInflection) &&
-          vh::embedsTeFormAuxiliary(surface)) {
-        SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << surface << "\" skip te_iku_pattern\n");
-        continue;  // Skip - let te + iku split win
-      }
+    if (end_pos - start_pos >= 4 &&
+        vh::guardIsWired(vh::GuardMember::EmbedTeAuxiliary, vh::GuardOrigin::HiraganaInflection) &&
+        vh::embedsTeFormAuxiliary(surface)) {
+      SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << surface << "\" skip te_iku_pattern\n");
+      continue;  // Skip - let te + iku split win
     }
 
     // Check for 3-4 char hiragana verb ending with た/だ (past form) BEFORE threshold check
@@ -649,7 +636,7 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
         // E-row: 食べる, 見える, 調べる
         // I-row: 感じる, 信じる (kanji + i-row + る pattern)
         char32_t stem_end = codepoints[end_pos - 2];
-        if (grammar::isERowCodepoint(stem_end) || grammar::isIRowCodepoint(stem_end)) {
+        if (kana::isERowCodepoint(stem_end) || kana::isIRowCodepoint(stem_end)) {
           // Exclude てる pattern (ている contraction) - this should be suru/godan + ている
           // not ichidan dictionary form
           bool is_te_iru_contraction = (stem_end == U'て' || stem_end == U'で');
@@ -657,11 +644,8 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
           // These should be split as particle + いる (existence verb), not a single verb
           // Valid hiragana verbs starting with particle chars: にる (煮る), にげる (逃げる)
           // But にいる, であるいる, etc. are not valid verbs
-          bool is_particle_iru = false;
-          if (pre_check_len == 3 && stem_end == U'い' && normalize::isCommonParticle(first_char)) {
-            // 3-char pattern: particle + いる
-            is_particle_iru = true;
-          }
+          const bool is_particle_iru =
+              pre_check_len == 3 && stem_end == U'い' && normalize::isCommonParticle(first_char);
           if (!is_te_iru_contraction && !is_particle_iru) {
             // Find ichidan candidate to use for verb type and base form
             // For dictionary forms (e-row stem + る), prefer longer valid stems
@@ -672,12 +656,8 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
               if (cand.verb_type == grammar::VerbType::Ichidan &&
                   cand.confidence >= verb_opts.confidence_ichidan_dict) {
                 // Skip invalid るる pattern (e.g., つかれるる)
-                if (cand.base_form.size() >= 2 * core::kJapaneseCharBytes) {
-                  std::string_view ending(cand.base_form.data() + cand.base_form.size() - 2 * core::kJapaneseCharBytes,
-                                          2 * core::kJapaneseCharBytes);
-                  if (ending == "るる") {
-                    continue;  // Skip invalid pattern
-                  }
+                if (utf8::endsWith(cand.base_form, "るる")) {
+                  continue;
                 }
                 if (!found_ichidan) {
                   best_ichidan = cand;
@@ -690,11 +670,9 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
             }
             if (found_ichidan) {
               looks_like_ichidan_dict_form = true;
-              // Use ichidan candidate as best if pattern matches
-              if (best.verb_type != grammar::VerbType::Ichidan) {
-                best = best_ichidan;
-              } else if (best_ichidan.base_form.size() > best.base_form.size()) {
-                // Even if already Ichidan, prefer longer base form
+              // Use the ichidan candidate, or a longer ichidan base form
+              if (best.verb_type != grammar::VerbType::Ichidan ||
+                  best_ichidan.base_form.size() > best.base_form.size()) {
                 best = best_ichidan;
               }
             }
@@ -744,7 +722,7 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
     }
     const bool comma_clause_chaining_renyokei =
         best.morphemes.empty() && best.suffix.size() == core::kJapaneseCharBytes &&
-        grammar::isIRowCodepoint(codepoints[end_pos - 1]) &&
+        kana::isIRowCodepoint(codepoints[end_pos - 1]) &&
         vh::isCommaClauseChainingRenyokei(codepoints, start_pos, end_pos, dict_manager);
     if (comma_clause_chaining_renyokei) {
       conf_threshold = std::min(conf_threshold, verb_opts.confidence_ichidan_dict);
@@ -823,10 +801,8 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
       bool is_teoku_contraction = utf8::endsWith(surface, "っとく");
       // Check for short te/de-form (e.g., ねて, でて, みて)
       // These are 2-char hiragana verbs that need a bonus to beat particle splits
-      bool is_short_te_form = false;
-      if (candidate_len == 2 && best.confidence >= verb_opts.confidence_high) {
-        is_short_te_form = utf8::endsWithAny(surface, {"て", "で"});
-      }
+      const bool is_short_te_form = candidate_len == 2 && best.confidence >= verb_opts.confidence_high &&
+                                    utf8::endsWithAny(surface, {"て", "で"});
 
       // Check for 3-4 char hiragana verb ending with た/だ (past form)
       // e.g., つかれた (疲れた), ねむった (眠った), おきた (起きた)
@@ -834,17 +810,10 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
       // Note: Lower confidence threshold (0.25) because ichidan_pure_hiragana_stem penalty
       // reduces confidence significantly for pure hiragana verbs
       // Skip if stem (without た/だ) is a known auxiliary (e.g., そうだ → そう is AUX)
-      bool is_medium_past_form = false;
-      if ((candidate_len == 3 || candidate_len == 4) && best.confidence >= verb_opts.confidence_past_te) {
-        if (grammar::isPastMarkerTaDaSurface(utf8::lastChar(surface))) {
-          // Extract stem (surface without last た/だ)
-          std::string_view stem(surface.data(), surface.size() - core::kJapaneseCharBytes);
-          // Skip if stem is a known auxiliary (e.g., そう+だ should not be verb candidate)
-          if (!vh::hasDictionaryEntry(dict_manager, stem, core::PartOfSpeech::Auxiliary)) {
-            is_medium_past_form = true;
-          }
-        }
-      }
+      const bool is_medium_past_form =
+          (candidate_len == 3 || candidate_len == 4) && best.confidence >= verb_opts.confidence_past_te &&
+          grammar::isPastMarkerTaDaSurface(utf8::lastChar(surface)) &&
+          !vh::hasDictionaryEntry(dict_manager, utf8::dropLastChar(surface), core::PartOfSpeech::Auxiliary);
 
       if (is_dictionary_verb && (candidate_len >= 5 || is_conditional || is_teoku_contraction)) {
         base_cost = candidate::confidenceScaledCost(verb_opts.base_cost_verified, best.confidence,
@@ -865,10 +834,7 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
             (first_char == U'で' || first_char == U'に' || first_char == U'が' || first_char == U'を' ||
              first_char == U'は' || first_char == U'の' || first_char == U'へ');
         // Check if 1-char stem + る is a known verb (e.g., でる, ねる)
-        std::string one_char_stem = extractSubstring(codepoints, start_pos, start_pos + 1);
-        std::string potential_verb = one_char_stem + "る";
-        bool has_1char_verb_in_dict = vh::isVerbInDictionary(dict_manager, potential_verb);
-        if (has_1char_verb_in_dict) {
+        if (vh::isVerbInDictionary(dict_manager, extractSubstring(codepoints, start_pos, start_pos + 1) + "る")) {
           // Prefer split path (で+て) over combined (でて) when verb is in dictionary
           // Use moderate cost that can be beaten by 1-char renyokei candidate
           base_cost = candidate::confidenceScaledCost(verb_opts.base_cost_low, best.confidence,
@@ -937,7 +903,7 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
       //   viable for verb+aux splits: ま(ます), そ(そう), な(ながら/なさい),
       //   た(たい/たがる), や(やすい), に(にくい/purpose に), つ(つつ)
       if (!is_dictionary_verb && best.morphemes.empty() && best.suffix.size() == core::kJapaneseCharBytes &&
-          grammar::isIRowCodepoint(codepoints[end_pos - 1])) {
+          kana::isIRowCodepoint(codepoints[end_pos - 1])) {
         char32_t next_after = (end_pos < codepoints.size()) ? codepoints[end_pos] : 0;
         bool licenses_renyokei =
             (next_after == U'ま' || next_after == U'そ' || next_after == U'な' || next_after == U'た' ||
@@ -954,13 +920,8 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
       // When it also follows a nominal case-marked argument, retain that
       // predicate reading over a whole-span unknown noun (友と+わかれ+た).
       if (!is_dictionary_verb && end_pos < codepoints.size() && codepoints[end_pos] == U'た' &&
-          best.morphemes.empty() && grammar::isIRowCodepoint(codepoints[end_pos - 1]) &&
-          followsKanjiOrNominalHostBeforeCaseParticle(
-              codepoints, start_pos, dict_manager,
-              dict_manager == nullptr || start_pos == 0
-                  ? nullptr
-                  : lookupEntryInRange(*dict_manager, codepoints, start_pos - 1, start_pos,
-                                       core::PartOfSpeech::Particle))) {
+          best.morphemes.empty() && kana::isIRowCodepoint(codepoints[end_pos - 1]) &&
+          followsKanjiOrNominalHostBeforeCaseParticle(codepoints, start_pos, dict_manager)) {
         base_cost += candidate::verb_cost::kModerateBonus;
       }
 
@@ -974,8 +935,7 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
         base_cost += bigram_cost::kStrong;
       }
       // Penalty for negative auxiliary chains (なくなる = become unable to)
-      if (utf8::contains(surface, "なくなる") || utf8::contains(surface, "なくなっ") ||
-          utf8::contains(surface, "なくなり")) {
+      if (utf8::containsAny(surface, {"なくなる", "なくなっ", "なくなり"})) {
         base_cost += bigram_cost::kRare;
       }
       // Penalty for verb candidates absorbing auxiliary まい (negative volitional)
@@ -994,18 +954,8 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
           vh::embedsTeFormMiruAuxiliary(codepoints, start_pos, end_pos);
       const bool ends_with_focus_particle = vh::endsWithFocusParticleTail(dict_manager, codepoints, start_pos, end_pos);
       const bool is_exact_dictionary_verb = vh::hasDictionaryEntry(dict_manager, surface, core::PartOfSpeech::Verb);
-      bool embeds_te_conditional_auxiliary = false;
-      if (is_conditional && dict_manager != nullptr) {
-        const size_t conditional_stem_end = end_pos - 1;
-        for (size_t te_pos = start_pos + 1; te_pos + 1 < conditional_stem_end; ++te_pos) {
-          if (codepoints[te_pos] == core::hiragana::kTe &&
-              lookupEntryInRange(*dict_manager, codepoints, te_pos + 1, conditional_stem_end,
-                                 core::PartOfSpeech::Verb) != nullptr) {
-            embeds_te_conditional_auxiliary = true;
-            break;
-          }
-        }
-      }
+      const bool embeds_te_conditional_auxiliary =
+          is_conditional && vh::embedsTeFormVerbCell(dict_manager, codepoints, start_pos, end_pos - 1);
       if (!is_exact_dictionary_verb &&
           (embeds_te_miru || ends_with_focus_particle || embeds_te_conditional_auxiliary)) {
         continue;
@@ -1037,10 +987,8 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
         // open the next morpheme, not a stem of their own.
         const bool follows_verb_cell =
             dict_manager != nullptr && start_pos > 0 &&
-            hasDictionaryEntryEndingAt(
-                *dict_manager, codepoints,
-                start_pos > kDictionaryLookbehindChars ? start_pos - kDictionaryLookbehindChars : 0, start_pos,
-                partOfSpeechMask(core::PartOfSpeech::Verb));
+            hasDictionaryEntryEndingAt(*dict_manager, codepoints, dictionaryLookbehindStart(start_pos), start_pos,
+                                       partOfSpeechMask(core::PartOfSpeech::Verb));
         if ((follows_kanji || follows_verb_cell) && dict_manager != nullptr &&
             !vh::isVerbInDictionary(dict_manager, best.base_form)) {
           continue;

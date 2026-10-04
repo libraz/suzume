@@ -13,6 +13,7 @@
 #include "analysis/verb_candidates_helpers.h"
 #include "analysis/verb_candidates_kanji_internal.h"
 #include "core/debug.h"
+#include "core/kana_constants.h"
 #include "core/utf8_constants.h"
 #include "grammar/auxiliary_generator.h"
 #include "grammar/char_patterns.h"
@@ -28,12 +29,26 @@
 namespace suzume::analysis::kanji_verb_detail {
 namespace vh = verb_helpers;
 
+bool renyokeiAdjectiveFollowsAt(const dictionary::DictionaryManager* dict_manager,
+                                const std::vector<char32_t>& codepoints, size_t pos) {
+  if (dict_manager == nullptr) {
+    return false;
+  }
+  for (size_t adjective_end = pos + 2; adjective_end <= std::min(codepoints.size(), pos + 4); ++adjective_end) {
+    const auto* adjective =
+        lookupEntryInRange(*dict_manager, codepoints, pos, adjective_end, core::PartOfSpeech::Adjective);
+    if (adjective != nullptr && grammar::attachesToVerbRenyokei(adjective->lemma)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 void appendIchidanStemRareCandidates(const std::vector<char32_t>& codepoints, size_t start_pos, size_t kanji_end,
                                      size_t hiragana_end, const grammar::Inflection& inflection,
                                      const dictionary::DictionaryManager* dict_manager,
                                      std::vector<UnknownCandidate>& candidates) {
   // Check if followed by られ+X pattern (られた, られる, られべき, られます, etc.)
-  bool has_rare_suffix = false;
   size_t stem_end = 0;
 
   // Pattern 1: Kanji + Ichidan stem + られ+X (信じ+られべき,
@@ -46,8 +61,7 @@ void appendIchidanStemRareCandidates(const std::vector<char32_t>& codepoints, si
       continue;
     }
     const char32_t stem_last = codepoints[suffix_start - 1];
-    if (grammar::isERowCodepoint(stem_last) || grammar::isIRowCodepoint(stem_last)) {
-      has_rare_suffix = true;
+    if (kana::isERowCodepoint(stem_last) || kana::isIRowCodepoint(stem_last)) {
       stem_end = suffix_start;
       break;
     }
@@ -55,19 +69,13 @@ void appendIchidanStemRareCandidates(const std::vector<char32_t>& codepoints, si
 
   // Pattern 2: Single kanji + られ+X (e.g., 見+られべき)
   // Only for known single-kanji Ichidan verbs
-  if (!has_rare_suffix && kanji_end == start_pos + 1) {
-    char32_t kanji_char = codepoints[start_pos];
-    if (vh::isSingleKanjiIchidan(kanji_char)) {
-      // Check for られ suffix right after the single kanji
-      using namespace suzume::core::hiragana;
-      if (kanji_end + 1 < codepoints.size() && codepoints[kanji_end] == kRa && codepoints[kanji_end + 1] == kRe) {
-        has_rare_suffix = true;
-        stem_end = kanji_end;
-      }
-    }
+  if (stem_end == 0 && kanji_end == start_pos + 1 && vh::isSingleKanjiIchidan(codepoints[start_pos]) &&
+      kanji_end + 1 < codepoints.size() && codepoints[kanji_end] == core::hiragana::kRa &&
+      codepoints[kanji_end + 1] == core::hiragana::kRe) {
+    stem_end = kanji_end;
   }
 
-  if (has_rare_suffix && stem_end > start_pos) {
+  if (stem_end > start_pos) {
     std::string surface = extractSubstring(codepoints, start_pos, stem_end);
     // Construct base form: stem + る (e.g., 信じ → 信じる, 見 → 見る)
     std::string base_form = surface + "る";
@@ -260,6 +268,15 @@ void appendSingleKanjiIchidanCandidates(const std::vector<char32_t>& codepoints,
       bool is_conjunctive_particle = false;
       bool is_classical_past_aux = false;
       bool is_honorific_aux = false;
+      // The plain classical past き selects the same bare continuative as けり
+      // (山|見|き). Unlike けり it is a single i-row mora, which after a kanji
+      // is also how a ka-row godan verb spells its own continuative. The stem
+      // is already one of the ichidan verbs this branch knows, so the only
+      // thing left to rule out is that homograph: 着き belongs to 着く and not
+      // to 着る, while 見, 寝 and the rest have no ka-row counterpart.
+      const bool has_godan_ka_competitor =
+          dict_manager->lookupExact(extractSubstring(codepoints, start_pos, kanji_end) + "く",
+                                    core::PartOfSpeech::Verb) != nullptr;
       constexpr size_t kMaxConjunctiveParticleLength = 4;
       const size_t max_particle_end = std::min(codepoints.size(), kanji_end + kMaxConjunctiveParticleLength);
       for (size_t particle_end = kanji_end + 1; particle_end <= max_particle_end; ++particle_end) {
@@ -278,19 +295,10 @@ void appendSingleKanjiIchidanCandidates(const std::vector<char32_t>& codepoints,
         // with a perfect too.
         const bool continuative_perfect = auxiliary != nullptr &&
                                           auxiliary->extended_pos == core::ExtendedPOS::AuxClassicalPerfect &&
-                                          !grammar::isIRowCodepoint(h1) &&
+                                          !kana::isIRowCodepoint(h1) &&
                                           vh::classicalPastEnvironmentFollows(*dict_manager, codepoints, particle_end,
                                                                               /*is_izenkei=*/false);
-        // The plain classical past き selects the same bare continuative as けり
-        // (山|見|き). Unlike けり it is a single i-row mora, which after a kanji
-        // is also how a ka-row godan verb spells its own continuative. The stem
-        // is already one of the ichidan verbs this branch knows, so the only
-        // thing left to rule out is that homograph: 着き belongs to 着く and not
-        // to 着る, while 見, 寝 and the rest have no ka-row counterpart.
-        const bool has_godan_ka_competitor =
-            dict_manager->lookupExact(extractSubstring(codepoints, start_pos, kanji_end) + "く",
-                                      core::PartOfSpeech::Verb) != nullptr;
-        // The auxiliary is terminal, so it also has to be able to close the
+        // The plain classical past き is terminal, so it also has to be able to close the
         // clause where it sits — otherwise 着きます would open with one.
         const bool continuative_past_ki =
             auxiliary != nullptr && !has_godan_ka_competitor &&
@@ -313,14 +321,7 @@ void appendSingleKanjiIchidanCandidates(const std::vector<char32_t>& codepoints,
 
       // An adjective that attaches to the continuative (見+にくい, 寝+やすい)
       // licenses the bare stem the same way.
-      bool is_renyokei_adjective = false;
-      for (size_t adjective_end = kanji_end + 2; adjective_end <= std::min(codepoints.size(), kanji_end + 4);
-           ++adjective_end) {
-        const auto* adjective =
-            lookupEntryInRange(*dict_manager, codepoints, kanji_end, adjective_end, core::PartOfSpeech::Adjective);
-        is_renyokei_adjective =
-            is_renyokei_adjective || (adjective != nullptr && grammar::attachesToVerbRenyokei(adjective->lemma));
-      }
+      const bool is_renyokei_adjective = renyokeiAdjectiveFollowsAt(dict_manager, codepoints, kanji_end);
 
       if (is_polite_aux || is_negative_aux || is_classical_negative_aux || is_literary_volitional_n ||
           is_classical_volitional_mu || is_classical_desiderative || is_classical_negative_mai ||
@@ -406,8 +407,7 @@ void appendSingleKanjiIchidanCandidates(const std::vector<char32_t>& codepoints,
 
       // Handle both volitional and literary-imperative forms for single-kanji
       // Ichidan verbs: 見よ+う and 見よ.
-      bool has_yo_form = (h1 == kYo);
-      if (has_yo_form) {
+      if (h1 == kYo) {
         const bool is_volitional = vh::volitionalEndingFollowsAt(codepoints, kanji_end + 1);
         std::string surface = extractSubstring(codepoints, start_pos, kanji_end + 1);
         std::string base_form = extractSubstring(codepoints, start_pos, kanji_end) + "る";

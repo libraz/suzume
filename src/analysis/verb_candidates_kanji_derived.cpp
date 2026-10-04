@@ -14,6 +14,7 @@
 #include "analysis/verb_candidates_helpers.h"
 #include "analysis/verb_candidates_kanji_internal.h"
 #include "core/debug.h"
+#include "core/kana_constants.h"
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
@@ -53,7 +54,26 @@ bool classicalPredicateTailFollowsAt(const std::vector<char32_t>& codepoints, si
 
 bool hasAttestedInternalGodanConditional(const std::vector<char32_t>& codepoints, size_t start_pos, size_t kanji_end,
                                          size_t particle_pos, const grammar::InflectionCandidate& whole,
-                                         const dictionary::DictionaryManager* dict_manager);
+                                         const dictionary::DictionaryManager* dict_manager) {
+  if (dict_manager == nullptr || vh::isVerbInDictionary(dict_manager, whole.base_form) || kanji_end <= start_pos + 1) {
+    return false;
+  }
+  const std::string base_suffix = vh::baseFormSuffix(whole.verb_type);
+  if (base_suffix.empty()) {
+    return false;
+  }
+  // Only adjacent kanji can hide a particleless noun + predicate boundary
+  // here.  Mixed-script compounds have already exposed their V1/V2 boundary
+  // to the compound-verb generator and must not be reopened by this guard.
+  for (size_t predicate_start = start_pos + 1; predicate_start < kanji_end; ++predicate_start) {
+    std::string internal_base = extractSubstring(codepoints, predicate_start, particle_pos - 1);
+    internal_base += base_suffix;
+    if (vh::isVerbInDictionary(dict_manager, internal_base)) {
+      return true;
+    }
+  }
+  return false;
+}
 
 /**
  * @brief Whether a one-mora auxiliary closes the cell over an attested irrealis.
@@ -81,7 +101,7 @@ bool oneMoraAuxiliaryClosesAttestedIrrealis(const std::vector<char32_t>& codepoi
   }
   const char32_t irrealis = codepoints[cell_end - 2];
   const std::string_view base_suffix = grammar::godanBaseSuffixFromARow(irrealis);
-  if (!grammar::isARowCodepoint(irrealis) || base_suffix.empty()) {
+  if (!kana::isARowCodepoint(irrealis) || base_suffix.empty()) {
     return false;
   }
   const std::string host = normalize::concat(extractSubstring(codepoints, start_pos, cell_end - 2), base_suffix);
@@ -108,8 +128,7 @@ bool appendGodanIzenkeiCandidate(const std::vector<char32_t>& codepoints, size_t
   constexpr size_t kNakereLength = 3;
   for (size_t negative_pos = kanji_end; negative_pos + kNakereLength <= cell_end; ++negative_pos) {
     if (negative_pos > start_pos && vh::naiConditionalFollowsAt(codepoints, negative_pos) &&
-        (grammar::isARowCodepoint(codepoints[negative_pos - 1]) ||
-         grammar::isERowCodepoint(codepoints[negative_pos - 1]))) {
+        (kana::isARowCodepoint(codepoints[negative_pos - 1]) || kana::isERowCodepoint(codepoints[negative_pos - 1]))) {
       return false;
     }
   }
@@ -117,7 +136,7 @@ bool appendGodanIzenkeiCandidate(const std::vector<char32_t>& codepoints, size_t
   // continuative (考え+て+ばかり), not a ta-row izenkei; a real one sits right
   // on the kanji (待て+ば, 育て+ば).
   if (cell_end >= kanji_end + 2 && grammar::isTeDeSurface(extractSubstring(codepoints, cell_end - 1, cell_end)) &&
-      (grammar::isIRowCodepoint(codepoints[cell_end - 2]) || grammar::isERowCodepoint(codepoints[cell_end - 2])) &&
+      (kana::isIRowCodepoint(codepoints[cell_end - 2]) || kana::isERowCodepoint(codepoints[cell_end - 2])) &&
       !vh::isVerbInDictionary(dict_manager, extractSubstring(codepoints, start_pos, cell_end - 1) + "つ")) {
     return false;
   }
@@ -182,29 +201,6 @@ bool appendGodanIzenkeiCandidate(const std::vector<char32_t>& codepoints, size_t
   return true;
 }
 
-bool hasAttestedInternalGodanConditional(const std::vector<char32_t>& codepoints, size_t start_pos, size_t kanji_end,
-                                         size_t particle_pos, const grammar::InflectionCandidate& whole,
-                                         const dictionary::DictionaryManager* dict_manager) {
-  if (dict_manager == nullptr || vh::isVerbInDictionary(dict_manager, whole.base_form) || kanji_end <= start_pos + 1) {
-    return false;
-  }
-  const std::string base_suffix = vh::baseFormSuffix(whole.verb_type);
-  if (base_suffix.empty()) {
-    return false;
-  }
-  // Only adjacent kanji can hide a particleless noun + predicate boundary
-  // here.  Mixed-script compounds have already exposed their V1/V2 boundary
-  // to the compound-verb generator and must not be reopened by this guard.
-  for (size_t predicate_start = start_pos + 1; predicate_start < kanji_end; ++predicate_start) {
-    std::string internal_base = extractSubstring(codepoints, predicate_start, particle_pos - 1);
-    internal_base += base_suffix;
-    if (vh::isVerbInDictionary(dict_manager, internal_base)) {
-      return true;
-    }
-  }
-  return false;
-}
-
 }  // namespace
 
 // Try Ichidan verb kateikei (conditional) + volitional stem patterns.
@@ -237,7 +233,7 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
   // and require its row's actual o-row mora, so an i-adjective conjectural
   // form (高かろう) or an ordinary dictionary-form verb is not manufactured
   // into this path.
-  if (kanji_end + 1 < codepoints.size() && grammar::isORowCodepoint(codepoints[kanji_end]) &&
+  if (kanji_end + 1 < codepoints.size() && kana::isORowCodepoint(codepoints[kanji_end]) &&
       codepoints[kanji_end + 1] == U'う') {
     const size_t full_end = kanji_end + 2;
     const std::string full_surface = extractSubstring(codepoints, start_pos, full_end);
@@ -320,7 +316,7 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
   // The cell is emitted as VerbKateikei rather than under an ExtendedPOS of its
   // own: the godan 已然形 and 仮定形 are one cell of one paradigm, and every
   // connection rule that already reasons about it applies here unchanged.
-  if (hiragana_end > kanji_end && grammar::isERowCodepoint(codepoints[hiragana_end - 1]) &&
+  if (hiragana_end > kanji_end && kana::isERowCodepoint(codepoints[hiragana_end - 1]) &&
       (hiragana_end == codepoints.size() ||
        normalize::classifyChar(codepoints[hiragana_end]) == normalize::CharType::Symbol) &&
       vh::governingKakariMusubi(dict_manager, codepoints, start_pos) == vh::KakariMusubi::Izenkei) {
@@ -347,7 +343,7 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
   // A Godan causative is itself an Ichidan-form predicate. Its conditional
   // surface is stem + a-row + せれ + ば (遊ばせれば), so preserve the full
   // conditional stem instead of splitting the causative auxiliary midway.
-  if (kanji_end + 3 < codepoints.size() && grammar::isARowCodepoint(codepoints[kanji_end]) &&
+  if (kanji_end + 3 < codepoints.size() && kana::isARowCodepoint(codepoints[kanji_end]) &&
       codepoints[kanji_end + 1] == U'せ' && codepoints[kanji_end + 2] == U'れ' && codepoints[kanji_end + 3] == U'ば') {
     size_t kateikei_end = kanji_end + 3;
     std::string surface = extractSubstring(codepoints, start_pos, kateikei_end);
@@ -385,7 +381,7 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
   if (kanji_end < hiragana_end) {
     char32_t first_hira = codepoints[kanji_end];
     // Check if first hiragana is e-row or i-row (ichidan renyokei ending)
-    if (grammar::isERowCodepoint(first_hira) || grammar::isIRowCodepoint(first_hira)) {
+    if (kana::isERowCodepoint(first_hira) || kana::isIRowCodepoint(first_hira)) {
       size_t renyokei_end = kanji_end + 1;  // kanji + e/i-row
       const std::string renyokei_surface = extractSubstring(codepoints, start_pos, renyokei_end);
       const std::string base_form = renyokei_surface + "る";  // 食べ + る = 食べる
@@ -536,7 +532,7 @@ void appendGodanPassiveRenyokeiCandidates(const std::vector<char32_t>& codepoint
   }
   const char32_t first_hira = codepoints[kanji_end];
   // A-row + れ pattern (godan passive renyokei)
-  if (!grammar::isARowCodepoint(first_hira) || codepoints[kanji_end + 1] != U'れ') {
+  if (!kana::isARowCodepoint(first_hira) || codepoints[kanji_end + 1] != U'れ') {
     return;
   }
   // Skip suru-verb passive pattern: kanji + さ + れ
@@ -613,10 +609,9 @@ void appendGodanPassiveRenyokeiCandidates(const std::vector<char32_t>& codepoint
        dict_manager != nullptr && aux_end <= std::min(codepoints.size(), renyokei_end + 3) &&
        !is_passive_auxiliary_chain;
        ++aux_end) {
-    is_passive_auxiliary_chain =
-        lookupEntryInRange(*dict_manager, codepoints, renyokei_end, aux_end, core::PartOfSpeech::Auxiliary) !=
-            nullptr ||
-        lookupEntryInRange(*dict_manager, codepoints, renyokei_end, aux_end, core::PartOfSpeech::Suffix) != nullptr;
+    is_passive_auxiliary_chain = hasExactPartOfSpeech(
+        *dict_manager, codepoints, renyokei_end, aux_end,
+        partOfSpeechMask(core::PartOfSpeech::Auxiliary) | partOfSpeechMask(core::PartOfSpeech::Suffix));
   }
   if (!is_beki_pattern && !is_passive_causative_chain && !is_passive_negative_chain && !is_passive_polite_chain &&
       !is_classical_predicate_chain && !is_passive_subsidiary_chain && !is_passive_auxiliary_chain) {

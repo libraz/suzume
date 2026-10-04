@@ -12,6 +12,7 @@
 #include "analysis/verb_candidates_helpers.h"
 #include "analysis/verb_candidates_kanji_internal.h"
 #include "core/debug.h"
+#include "core/kana_constants.h"
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
@@ -45,13 +46,10 @@ void appendSelectedKanjiVerbCandidate(const std::vector<char32_t>& codepoints, s
   // an i-adjective. Admit the candidate at the dictionary threshold when
   // a kanji continuation follows; connection scoring will retain it only
   // before a verified verb.
-  bool is_multi_kanji_godan_wa_renyokei = best.verb_type == grammar::VerbType::GodanWa &&
-                                          utf8::endsWith(surface, "い") && normalize::utf8Length(best.stem) >= 2 &&
-                                          end_pos < codepoints.size() &&
-                                          normalize::isKanjiCodepoint(codepoints[end_pos]);
+  const bool is_multi_kanji_godan_wa_renyokei = isMultiKanjiGodanWaRenyokei(best, surface, codepoints, end_pos);
   const bool has_mixed_godan_ka_stem =
       best.verb_type == grammar::VerbType::GodanKa && stem_end > kanji_end + 1 &&
-      vh::hasConjunctiveParticleDictionaryEntry(dict_manager, normalize::encodeUtf8(codepoints[kanji_end]));
+      vh::oneMoraParticleEndsAt(dict_manager, codepoints, kanji_end + 1, core::ExtendedPOS::ParticleConj);
 
   // A case particle followed by する in its て/た form is a productive
   // nominal construction. Do not reinterpret a short noun plus that
@@ -66,7 +64,7 @@ void appendSelectedKanjiVerbCandidate(const std::vector<char32_t>& codepoints, s
     }
   }
   if (is_unregistered_godan_sa && stem_end == kanji_end + 1 && (best.suffix == "して" || best.suffix == "した") &&
-      vh::hasCaseParticleDictionaryEntry(dict_manager, normalize::encodeUtf8(codepoints[stem_end - 1]))) {
+      vh::oneMoraParticleEndsAt(dict_manager, codepoints, stem_end, core::ExtendedPOS::ParticleCase)) {
     SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" godan_sa case-particle+する pattern\n");
     return;
   }
@@ -82,13 +80,10 @@ void appendSelectedKanjiVerbCandidate(const std::vector<char32_t>& codepoints, s
   }
   // Dictionary-verified candidates use lower threshold (0.3)
   // This allows hiragana verbs like いわれる (conf=0.33) to be recognized
-  float proceed_threshold =
-      (is_dict_verified || proceed_is_i_row_ichidan || is_multi_kanji_godan_wa_renyokei)
-          ? verb_opts.confidence_ichidan_dict
-          : (has_mixed_godan_ka_stem ? (utf8::startsWith(best.suffix, "いた") || utf8::startsWith(best.suffix, "いて")
-                                            ? verb_opts.confidence_past_te
-                                            : verb_opts.confidence_low)
-                                     : verb_opts.confidence_standard);
+  const float proceed_threshold = (is_dict_verified || proceed_is_i_row_ichidan || is_multi_kanji_godan_wa_renyokei)
+                                      ? verb_opts.confidence_ichidan_dict
+                                  : has_mixed_godan_ka_stem ? mixedGodanKaStemThreshold(best, verb_opts)
+                                                            : verb_opts.confidence_standard;
   if (best.confidence > proceed_threshold ||
       (follows_reduplicated_noun && best.confidence >= verb_opts.confidence_ichidan_dict) ||
       (is_multi_kanji_godan_wa_renyokei && best.confidence >= proceed_threshold)) {
@@ -101,27 +96,18 @@ void appendSelectedKanjiVerbCandidate(const std::vector<char32_t>& codepoints, s
     // E.g., "伝えいた" falsely matches as GodanKa "伝えく" but 伝える is ichidan
     // Exception: GodanRa (passive/causative) with "られ" suffix is valid
     // E.g., "定められた" has stem "定め" (ichidan) + passive suffix
-    bool is_godan = grammar::isGodanVerbType(best.verb_type);
-    if (is_godan && stem_end > kanji_end && stem_end <= codepoints.size()) {
-      // Check if the last character of the stem is e-row hiragana
-      char32_t last_char = codepoints[stem_end - 1];
-      if (grammar::isERowCodepoint(last_char)) {
-        // Exception: GodanRa with passive/causative suffix (られ) is valid
-        // This occurs with ichidan verb stem + passive auxiliary
-        bool is_passive_pattern = (best.verb_type == grammar::VerbType::GodanRa && utf8::contains(surface, "られ"));
-        if (!is_passive_pattern) {
-          return;  // Skip - e-row stem is typically ichidan, not godan
-        }
-      }
+    if (grammar::isGodanVerbType(best.verb_type) && stem_end > kanji_end && stem_end <= codepoints.size() &&
+        kana::isERowCodepoint(codepoints[stem_end - 1]) &&
+        !(best.verb_type == grammar::VerbType::GodanRa && utf8::contains(surface, "られ"))) {
+      return;  // Skip - e-row stem is typically ichidan, not godan
     }
 
     // Skip Suru verb renyokei (し) if followed by te/ta form particles
     // e.g., "勉強して" should be parsed as single token, not "勉強し" + "て"
-    if (best.verb_type == grammar::VerbType::Suru && hiragana_part == "し" && end_pos < codepoints.size()) {
-      char32_t next_char = codepoints[end_pos];
-      if (next_char == U'て' || next_char == U'た' || next_char == U'で' || next_char == U'だ') {
-        return;  // Skip - let the longer te-form candidate win
-      }
+    if (best.verb_type == grammar::VerbType::Suru && hiragana_part == "し" && end_pos < codepoints.size() &&
+        (codepoints[end_pos] == U'て' || codepoints[end_pos] == U'た' || codepoints[end_pos] == U'で' ||
+         codepoints[end_pos] == U'だ')) {
+      return;  // Skip - let the longer te-form candidate win
     }
 
     // Skip GodanSa renyokei (漢字+し/漢字+とし etc.) when not in dictionary
@@ -224,34 +210,25 @@ void appendSelectedKanjiVerbCandidate(const std::vector<char32_t>& codepoints, s
     // Preserve the onbin stem and contracted auxiliary boundary: 買っとく → 買っ + とく,
     // 読んどく → 読ん + どく. Check whether the suffix after a sokuon or
     // hatsuonbin is a registered aspect auxiliary.
-    bool skip_sokuonbin_aux = false;
-    if (dict_manager && surface.size() >= 9) {  // っ(3) + 2char auxiliary minimum
-      // Find an onbin position and check the following auxiliary in the dictionary.
-      auto surface_cps = normalize::utf8::decode(surface);
-      for (size_t i = 1; i < surface_cps.size() && !skip_sokuonbin_aux; ++i) {
-        if ((surface_cps[i] == U'っ' || surface_cps[i] == U'ん') && i + 1 < surface_cps.size()) {
-          // Get the suffix after the onbin.
-          std::vector<char32_t> suffix_cps(surface_cps.begin() + i + 1, surface_cps.end());
-          std::string suffix = normalize::utf8::encode(suffix_cps);
-          // A nasal contraction licenses only the preparatory とく/どく.
-          // Completion forms retain their verb-class-dependent analyses
-          // after ん, while both aspect auxiliaries are valid after っ.
-          auto results = dict_manager->lookup(suffix, 0);
-          for (const auto& r : results) {
-            const bool is_preparatory = r.entry && r.entry->extended_pos == core::ExtendedPOS::AuxAspectOku;
-            const bool is_sokuon_completion =
-                r.entry && surface_cps[i] == U'っ' && r.entry->extended_pos == core::ExtendedPOS::AuxAspectShimau;
-            if (r.entry && r.entry->surface == suffix && (is_preparatory || is_sokuon_completion)) {
-              SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << surface << "\" sokuonbin+aux (" << suffix << ")\n");
-              skip_sokuonbin_aux = true;
-              break;
-            }
+    if (dict_manager != nullptr && surface.size() >= 9) {  // っ(3) + 2char auxiliary minimum
+      for (size_t onbin_pos = start_pos + 1; onbin_pos + 1 < end_pos; ++onbin_pos) {
+        const char32_t onbin = codepoints[onbin_pos];
+        if (onbin != U'っ' && onbin != U'ん') {
+          continue;
+        }
+        // A nasal contraction licenses only the preparatory とく/どく.
+        // Completion forms retain their verb-class-dependent analyses
+        // after ん, while both aspect auxiliaries are valid after っ.
+        const std::string suffix = extractSubstring(codepoints, onbin_pos + 1, end_pos);
+        for (const auto& result : dict_manager->lookup(suffix, 0)) {
+          if (result.entry != nullptr && result.entry->surface == suffix &&
+              (result.entry->extended_pos == core::ExtendedPOS::AuxAspectOku ||
+               (onbin == U'っ' && result.entry->extended_pos == core::ExtendedPOS::AuxAspectShimau))) {
+            SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << surface << "\" sokuonbin+aux (" << suffix << ")\n");
+            return;  // Skip - let the split (verb sokuonbin + auxiliary) win
           }
         }
       }
-    }
-    if (skip_sokuonbin_aux) {
-      return;  // Skip - let the split (verb sokuonbin + auxiliary) win
     }
 
     // Lower cost for higher confidence matches
@@ -283,7 +260,7 @@ void appendSelectedKanjiVerbCandidate(const std::vector<char32_t>& codepoints, s
     // e.g., 本買った → 本 + 買った, where 買う is a dict verb
     // This handles particleless noun+verb patterns: 本買った, 服買った, 車買った
     if (dict_manager != nullptr && kanji_count == 2 && !follows_reduplicated_noun) {
-      auto stem_cps = normalize::utf8::decode(best.stem);
+      auto stem_cps = normalize::toCodepoints(best.stem);
       if (stem_cps.size() == 2) {
         // Get second kanji as potential verb stem
         std::string remainder_stem = normalize::encodeUtf8(stem_cps[1]);
@@ -305,15 +282,10 @@ void appendSelectedKanjiVerbCandidate(const std::vector<char32_t>& codepoints, s
     // Most single kanji + いる patterns are NOUN + existence verb いる
     // Valid single-kanji verbs: 入る, 走る, 居る (いる), 見る, etc.
     // These should be in dictionary, so dictionary bonus will override
-    {
-      auto surface_cps = normalize::utf8::decode(surface);
-      // Check if pattern is: 1 kanji + いる
-      if (surface_cps.size() == 3 && normalize::isKanjiCodepoint(surface_cps[0]) && surface_cps[1] == U'い' &&
-          surface_cps[2] == U'る') {
-        // Single kanji + いる pattern - penalize to prefer NOUN + いる split
-        base_cost += candidate::kSingleKanjiIruVerbSplitPenalty;
-        SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +2.5 (single_kanji_iru_penalty)\n");
-      }
+    if (end_pos - start_pos == 3 && normalize::isKanjiCodepoint(codepoints[start_pos]) &&
+        codepoints[start_pos + 1] == U'い' && codepoints[start_pos + 2] == U'る') {
+      base_cost += candidate::kSingleKanjiIruVerbSplitPenalty;
+      SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +2.5 (single_kanji_iru_penalty)\n");
     }
     // Check if base form exists in dictionary - significant bonus for known verbs
     // This helps 行われた (base=行う) beat 行(suffix)+われた split
@@ -525,10 +497,9 @@ void appendSelectedKanjiVerbCandidate(const std::vector<char32_t>& codepoints, s
       const bool has_attributive_content_follower =
           end_pos < codepoints.size() && normalize::isKanjiCodepoint(codepoints[end_pos]);
       if (!penalized && !has_attributive_content_follower) {
-        auto base_cps = normalize::utf8::decode(best.base_form);
+        const auto base_cps = normalize::toCodepoints(best.base_form);
         if (base_cps.size() >= 3 && normalize::isKanjiCodepoint(base_cps[0])) {
-          std::vector<char32_t> hira_only(base_cps.begin() + 1, base_cps.end());
-          std::string hira_portion = normalize::utf8::encode(hira_only);
+          const std::string hira_portion = extractSubstring(base_cps, 1, base_cps.size());
           // A dictionary verb in the tail settles the split on its own: the
           // compound reading would need a nominal as its first element, and no
           // compound verb is built that way (我+ある).
@@ -698,7 +669,7 @@ void appendSelectedKanjiVerbCandidate(const std::vector<char32_t>& codepoints, s
         (end_pos >= codepoints.size() ||
          (codepoints[end_pos] != U'で' && codepoints[end_pos] != U'だ' && codepoints[end_pos] != U'て'));
     if ((irrealis_before_n || utf8::endsWith(surface, "ぬ")) && end_pos >= start_pos + 3 &&
-        grammar::isARowCodepoint(codepoints[end_pos - 2])) {
+        kana::isARowCodepoint(codepoints[end_pos - 2])) {
       SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" is an irrealis before the contracted negative\n");
       return;
     }

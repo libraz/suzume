@@ -10,6 +10,9 @@
 
 namespace suzume::analysis::hiragana_verb_detail {
 
+// Longest kana run a hiragana verb scan examines.
+inline constexpr size_t kPredicateRunMax = 12;
+
 // Guard (fabricated closed-class absorption family, tail class): true when the
 // hiragana run [start_pos, end_pos) is a verb prefix followed by a 副助詞
 // (しか/さえ/すら), so the run is verb + particle rather than a single fabricated
@@ -25,6 +28,10 @@ bool pronounEndsAt(const dictionary::DictionaryManager* dict_manager, const std:
                    size_t pos);
 bool hasMatchingGodanInflection(const grammar::Inflection& inflection, std::string_view base_form,
                                 grammar::VerbType expected_type);
+// True when start_pos follows a case particle whose host is a kanji or a
+// dictionary noun/pronoun, which fixes start_pos as a predicate slot.
+bool followsKanjiOrNominalHostBeforeCaseParticle(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                                 const dictionary::DictionaryManager* dict_manager);
 
 struct GodanMizenkeiForms {
   char32_t a_row_char;

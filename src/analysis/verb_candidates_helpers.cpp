@@ -141,7 +141,7 @@ bool particleClosesClauseBeforeSokuon(const std::vector<char32_t>& codepoints, s
   const bool closing_particle = particle == U'よ' || particle == U'の' || particle == U'か' || particle == U'ね' ||
                                 particle == U'わ' || particle == U'ぞ';
   return closing_particle &&
-         (grammar::isModernGodanTerminalKana(predicate_end) || grammar::isERowCodepoint(predicate_end) ||
+         (grammar::isModernGodanTerminalKana(predicate_end) || kana::isERowCodepoint(predicate_end) ||
           predicate_end == U'ろ' || predicate_end == U'い' || predicate_end == U'な' || predicate_end == U'だ');
 }
 
@@ -436,24 +436,16 @@ void sortCandidatesByCost(std::vector<UnknownCandidate>& candidates, size_t firs
 // =============================================================================
 
 bool shouldSkipMasuAuxPattern(std::string_view surface, grammar::VerbType verb_type) {
-  // Check if surface ends with ます/ました/ましょう/ません
   if (!utf8::endsWithAny(surface, {"ましょう", "ました", "ません", "ます"})) {
     return false;
   }
-
-  // Don't skip suru-verb passive/causative patterns (され, させ)
-  bool is_suru_passive_causative =
-      (verb_type == grammar::VerbType::Suru && utf8::containsAny(surface, {"され", "させ"}));
-
-  return !is_suru_passive_causative;
+  // Suru-verb passive/causative chains (され, させ) are kept whole
+  return verb_type != grammar::VerbType::Suru || !utf8::containsAny(surface, {"され", "させ"});
 }
 
 bool shouldSkipSouPattern(std::string_view surface, grammar::VerbType verb_type) {
-  // Check for そう/そうです/そうだ at end
-  bool has_sou_pattern = utf8::endsWithAny(surface, {"そうです", "そうだ", scorer::kSuffixSou});
-
-  // Don't skip i-adjective patterns
-  return has_sou_pattern && verb_type != grammar::VerbType::IAdjective;
+  return verb_type != grammar::VerbType::IAdjective &&
+         utf8::endsWithAny(surface, {"そうです", "そうだ", scorer::kSuffixSou});
 }
 
 bool isCompoundAdjectivePattern(std::string_view surface) {
@@ -526,10 +518,10 @@ bool shouldSkipPassiveAuxPattern(std::string_view surface, grammar::VerbType ver
   if (!is_suru && !grammar::isGodanVerbType(verb_type)) {
     return false;
   }
-  const auto codepoints = normalize::utf8::decode(surface);
+  const auto codepoints = normalize::toCodepoints(surface);
   for (size_t index = 1; index < codepoints.size(); ++index) {
     const char32_t irrealis = codepoints[index - 1];
-    if ((is_suru ? irrealis == U'さ' : grammar::isARowCodepoint(irrealis)) &&
+    if ((is_suru ? irrealis == U'さ' : kana::isARowCodepoint(irrealis)) &&
         isCompletePassiveAuxiliaryAt(codepoints, index)) {
       return true;
     }
@@ -586,10 +578,7 @@ bool isCompletePassiveAuxiliaryAt(const std::vector<char32_t>& codepoints, size_
   if (after_re == U'る' || after_re == U'た' || after_re == U'て') {
     return pos_after_re + 1 == codepoints.size();
   }
-  if (after_re == U'ま') {
-    return pos_after_re + 2 == codepoints.size();
-  }
-  if (after_re == U'れ') {
+  if (after_re == U'ま' || after_re == U'れ') {
     return pos_after_re + 2 == codepoints.size();
   }
   const size_t negative_length = naiNegativeFormLengthAt(codepoints, pos_after_re);
@@ -597,8 +586,7 @@ bool isCompletePassiveAuxiliaryAt(const std::vector<char32_t>& codepoints, size_
 }
 
 bool isCompleteCausativeAuxiliaryAt(const std::vector<char32_t>& codepoints, size_t causative_se_pos) {
-  if (causative_se_pos >= codepoints.size() || codepoints[causative_se_pos] != U'せ' ||
-      causative_se_pos + 1 >= codepoints.size()) {
+  if (causative_se_pos + 1 >= codepoints.size() || codepoints[causative_se_pos] != U'せ') {
     return false;
   }
   const char32_t after_se = codepoints[causative_se_pos + 1];
@@ -618,9 +606,9 @@ bool shouldSkipCausativeAuxPattern(std::string_view surface, grammar::VerbType v
   // Godan causative: derive every closed auxiliary cell through the shared
   // continuation helper instead of a surface-form list.
   if (grammar::isGodanVerbType(verb_type)) {
-    const auto codepoints = normalize::utf8::decode(surface);
+    const auto codepoints = normalize::toCodepoints(surface);
     for (size_t index = 1; index < codepoints.size(); ++index) {
-      if (grammar::isARowCodepoint(codepoints[index - 1]) && isCompleteCausativeAuxiliaryAt(codepoints, index)) {
+      if (kana::isARowCodepoint(codepoints[index - 1]) && isCompleteCausativeAuxiliaryAt(codepoints, index)) {
         return true;
       }
     }
@@ -631,8 +619,8 @@ bool shouldSkipCausativeAuxPattern(std::string_view surface, grammar::VerbType v
   // Godan causative (読ま+せ, 書か+せ), not an independent verb. Dictionary
   // candidates remain available for lexicalized derivatives such as 泳がせる.
   if (verb_type == grammar::VerbType::Ichidan) {
-    const auto codepoints = normalize::utf8::decode(surface);
-    if (codepoints.size() >= 2 && grammar::isARowCodepoint(codepoints[codepoints.size() - 2]) &&
+    const auto codepoints = normalize::toCodepoints(surface);
+    if (codepoints.size() >= 2 && kana::isARowCodepoint(codepoints[codepoints.size() - 2]) &&
         codepoints.back() == U'せ') {
       return true;
     }

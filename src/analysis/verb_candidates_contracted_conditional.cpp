@@ -53,7 +53,7 @@ bool namesAttestedPredicate(const dictionary::DictionaryManager* dict_manager, c
   if (!utf8::endsWith(base_form, "る") || normalize::utf8Length(base_form) < 3) {
     return false;
   }
-  const std::vector<char32_t> base_points = normalize::utf8::decode(base_form);
+  const std::vector<char32_t> base_points = normalize::toCodepoints(base_form);
   const std::string_view godan_ending = grammar::godanBaseSuffixFromERow(base_points[base_points.size() - 2]);
   if (godan_ending.empty()) {
     return false;
@@ -83,10 +83,10 @@ const grammar::InflectionCandidate* readContractedHypothetical(const std::vector
   // inflections then continue past it (おっしゃ+い+ます, いらっしゃ+る). Reading
   // that stem as a whole contraction cuts the verb in half, so a span the
   // dictionary already knows as a stem is not one.
+  const std::string stem_span = extractSubstring(codepoints, start_pos, contracted_end);
   for (const auto& [godan_type, godan_row] : grammar::Conjugation::getGodanRows()) {
     static_cast<void>(godan_type);
-    if (vh::isVerbInDictionary(dict_manager, extractSubstring(codepoints, start_pos, contracted_end) +
-                                                 normalize::encodeUtf8(godan_row.base_vowel))) {
+    if (vh::isVerbInDictionary(dict_manager, stem_span + normalize::encodeUtf8(godan_row.base_vowel))) {
       return nullptr;
     }
   }

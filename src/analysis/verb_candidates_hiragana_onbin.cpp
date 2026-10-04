@@ -94,14 +94,12 @@ void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, s
     // Used later to skip short particle+verb patterns unless dictionary-verified
     // E.g., となっ (stem=とな, 2 chars) → skip, particle + なる is more likely
     //       はじまっ (stem=はじま, 3 chars) → allow, longer stems are more likely verbs
-    bool starts_with_short_particle_stem = false;
-    size_t stem_char_count = suzume::normalize::utf8Length(stem);
-    if (stem_char_count == 2) {  // Only skip 2-char stems
-      char32_t first_char = codepoints[start_pos];
-      starts_with_short_particle_stem =
-          (first_char == U'と' || first_char == U'を' || first_char == U'に' || first_char == U'で' ||
-           first_char == U'が' || first_char == U'は' || first_char == U'へ');
-    }
+    const size_t stem_char_count = normalize::utf8Length(stem);
+    const char32_t first_char = codepoints[start_pos];
+    const bool starts_with_short_particle_stem =
+        stem_char_count == 2 &&
+        (first_char == U'と' || first_char == U'を' || first_char == U'に' || first_char == U'で' ||
+         first_char == U'が' || first_char == U'は' || first_char == U'へ');
 
     const bool has_left_predicate_boundary = opensPredicateSlot(codepoints, start_pos);
     // A kanji on the left closes a nominal subject whose particle was dropped
@@ -372,17 +370,6 @@ void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, s
   }
 }
 
-// Irregular 来る (カ変) mizenkei こ before a selecting closed auxiliary: the
-// ない family (こない, こなかった), passive/potential られる (こられる),
-// or causative させる (こさせる). Its volitional stem こよ is likewise emitted
-// only in the directional auxiliary context (読んでこよう). The short surface
-// is far too frequent as an unconditional dictionary entry (こと, これ,
-// きのこ, ...), so every candidate requires its inflectional continuation.
-// The reading is chosen from the preceding context:
-//   - after a clear て/で form: directional auxiliary てくる → Auxiliary / AuxAspectKuru
-//   - otherwise: main verb 来る before a selecting auxiliary → Verb / VerbMizenkei
-// Emitting a single context-appropriate reading avoids relying on a broad
-// AuxAspectKuru connection rule that could mis-flip other subsidiary verbs.
 void appendKkoNominalizerCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                     std::vector<UnknownCandidate>& candidates) {
   // The colloquial negative-possibility construction V連用形+っこ+ない
@@ -450,6 +437,17 @@ void appendEruObligationCandidates(const std::vector<char32_t>& codepoints, size
   candidates.push_back(std::move(eru_candidate));
 }
 
+// Irregular 来る (カ変) mizenkei こ before a selecting closed auxiliary: the
+// ない family (こない, こなかった), passive/potential られる (こられる),
+// or causative させる (こさせる). Its volitional stem こよ is likewise emitted
+// only in the directional auxiliary context (読んでこよう). The short surface
+// is far too frequent as an unconditional dictionary entry (こと, これ,
+// きのこ, ...), so every candidate requires its inflectional continuation.
+// The reading is chosen from the preceding context:
+//   - after a clear て/で form: directional auxiliary てくる → Auxiliary / AuxAspectKuru
+//   - otherwise: main verb 来る before a selecting auxiliary → Verb / VerbMizenkei
+// Emitting a single context-appropriate reading avoids relying on a broad
+// AuxAspectKuru connection rule that could mis-flip other subsidiary verbs.
 void appendKuruMizenkeiCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                   std::vector<UnknownCandidate>& candidates) {
   // The conditional stem くれ is distinct from benefactive くれる when it
@@ -585,7 +583,7 @@ void appendIchidanRenyokei1CharCandidates(const std::vector<char32_t>& codepoint
   // Pattern: e-row hiragana followed by て or た
   // IMPORTANT: Only generate if the base form (stem + る) is a known verb in dictionary
   // to avoid false positives like めて → め + て (め is not a verb)
-  if (start_pos + 1 >= codepoints.size() || !grammar::isERowCodepoint(codepoints[start_pos]) ||
+  if (start_pos + 1 >= codepoints.size() || !kana::isERowCodepoint(codepoints[start_pos]) ||
       (codepoints[start_pos + 1] != U'て' && codepoints[start_pos + 1] != U'た')) {
     return;
   }

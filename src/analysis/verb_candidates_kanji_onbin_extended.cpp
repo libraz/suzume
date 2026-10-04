@@ -9,6 +9,7 @@
 #include "analysis/verb_candidates_helpers.h"
 #include "analysis/verb_candidates_kanji_internal.h"
 #include "core/debug.h"
+#include "core/kana_constants.h"
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
@@ -45,14 +46,6 @@ bool isGodanTerminalEnding(char32_t codepoint) {
     }
   }
   return false;
-}
-
-bool hasStandaloneVerbTail(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
-                           size_t tail_start, size_t tail_end) {
-  if (dict_manager == nullptr || tail_start >= tail_end) {
-    return false;
-  }
-  return vh::isVerbInDictionary(dict_manager, codepoints, tail_start, tail_end);
 }
 
 /**
@@ -174,119 +167,109 @@ void appendExtendedSokuonbinCandidates(const std::vector<char32_t>& codepoints, 
   // - Hiragana portion (before っ) should be 1-2 chars (まった, まりった)
   // - Base form must exist in dictionary (prevents false positives)
   // - Require at least kanji + 2 hiragana (e.g., 閉まっ = 閉 + ま + っ)
-  if (hiragana_end - kanji_end >= 2) {
-    // Check for pattern ending in っ + た/て
-    // Look for っ at position hiragana_end - 2 (second to last)
-    char32_t second_last = codepoints[hiragana_end - 2];
-    char32_t last_char = codepoints[hiragana_end - 1];
-    bool is_sokuonbin_te_ta = (second_last == U'っ' && (last_char == U'た' || last_char == U'て'));
-    // Hiragana between kanji and っ should be 1-2 chars. Longer spans can
-    // contain productive auxiliary or compound boundaries and are handled by
-    // their dedicated generators.
-    // hiragana_end - kanji_end = total hiragana chars (including っ and た/て)
-    // So hiragana before っ = (hiragana_end - kanji_end) - 2
-    size_t hiragana_before_onbin = (hiragana_end - kanji_end) - 2;
-    bool reasonable_length = (hiragana_before_onbin >= 1 && hiragana_before_onbin <= 2);
-    if (is_sokuonbin_te_ta && reasonable_length) {
-      // We have kanji + 1-2 hiragana + っ + た/て
-      // Generate candidate for kanji + hiragana + っ (without the た/て)
-      size_t onbin_end = hiragana_end - 1;  // Position after っ
-      std::string onbin_surface = extractSubstring(codepoints, start_pos, onbin_end);
-      std::string hiragana_part = extractSubstring(codepoints, kanji_end, onbin_end);
-      const bool crosses_completed_past =
-          pastAuxiliaryClosesPredicateBefore(inflection, dict_manager, codepoints, start_pos, onbin_end - 1);
-      // Preserve an already complete auxiliary or embedded dictionary verb
-      // boundary (見+たがっ, 早く+いっ) instead of absorbing it into X...る.
-      const bool closes_before_sokuon = hasClosedAuxiliaryTail(dict_manager, codepoints, kanji_end, onbin_end) ||
-                                        hasVerifiedInternalOnbinPredicate(inflection, dict_manager, codepoints,
-                                                                          kanji_end, onbin_end - 1, hiragana_end) ||
-                                        spellsClosedSequenceBeforeSokuon(hiragana_part);
-      const char32_t char_before_sokuon = codepoints[onbin_end - 2];
-      // Skip godan終止形 + っ + て pattern - this is verb + って(quotative)
-      // E.g., 行くって = 行く + って, 食べるって = 食べる + って
-      // The sokuonbin of godan verbs drops the ending (行く→行っ), not adds っ (行くっ is invalid)
-      // An imperative (行け, 食べろ, 来い) closes the predicate just as a
-      // terminal does; no godan-ra okurigana ends in e-row, ろ or い.
-      const auto closes_predicate = [](char32_t cp) {
-        return cp == U'く' || cp == U'す' || cp == U'つ' || cp == U'う' || cp == U'ぐ' || cp == U'ぶ' || cp == U'む' ||
-               cp == U'ぬ' || cp == U'る' || grammar::isERowCodepoint(cp) || cp == U'ろ' || cp == U'い';
-      };
-      // A final or nominalizing particle may close the clause first
-      // (行くよ+って, 来るの+って).
-      const bool is_quotative_pattern =
-          last_char == U'て' &&
-          (closes_predicate(char_before_sokuon) ||
-           (onbin_end >= start_pos + 3 && vh::particleClosesClauseBeforeSokuon(codepoints, onbin_end - 1)));
-      // だ before っ is the copula (本+だっ+た), not a verb stem (閉まっ+た).
-      if (!closes_before_sokuon && !is_quotative_pattern && char_before_sokuon != U'だ') {
-        // Build potential base form and verify it exists in dictionary or inflection
-        // This prevents false positives like 食べてしまる
-        std::string stem = extractSubstring(codepoints, start_pos, onbin_end - 1);
-        const SokuonbinBase sokuon = resolveSokuonbinBase(dict_manager, stem);
-        const std::string& potential_base = sokuon.base;
-        const grammar::VerbType onbin_verb_type = sokuon.type;
+  // Hiragana between kanji and っ should be 1-2 chars. Longer spans can
+  // contain productive auxiliary or compound boundaries and are handled by
+  // their dedicated generators.
+  const size_t hiragana_before_onbin = hiragana_end - kanji_end >= 2 ? hiragana_end - kanji_end - 2 : 0;
+  const char32_t last_char = codepoints[hiragana_end - 1];
+  if (hiragana_before_onbin >= 1 && hiragana_before_onbin <= 2 && codepoints[hiragana_end - 2] == U'っ' &&
+      (last_char == U'た' || last_char == U'て')) {
+    // We have kanji + 1-2 hiragana + っ + た/て
+    // Generate candidate for kanji + hiragana + っ (without the た/て)
+    size_t onbin_end = hiragana_end - 1;  // Position after っ
+    std::string onbin_surface = extractSubstring(codepoints, start_pos, onbin_end);
+    std::string hiragana_part = extractSubstring(codepoints, kanji_end, onbin_end);
+    const bool crosses_completed_past =
+        pastAuxiliaryClosesPredicateBefore(inflection, dict_manager, codepoints, start_pos, onbin_end - 1);
+    // Preserve an already complete auxiliary or embedded dictionary verb
+    // boundary (見+たがっ, 早く+いっ) instead of absorbing it into X...る.
+    const bool closes_before_sokuon = hasClosedAuxiliaryTail(dict_manager, codepoints, kanji_end, onbin_end) ||
+                                      hasVerifiedInternalOnbinPredicate(inflection, dict_manager, codepoints, kanji_end,
+                                                                        onbin_end - 1, hiragana_end) ||
+                                      spellsClosedSequenceBeforeSokuon(hiragana_part);
+    const char32_t char_before_sokuon = codepoints[onbin_end - 2];
+    // Skip godan終止形 + っ + て pattern - this is verb + って(quotative)
+    // E.g., 行くって = 行く + って, 食べるって = 食べる + って
+    // The sokuonbin of godan verbs drops the ending (行く→行っ), not adds っ (行くっ is invalid)
+    // An imperative (行け, 食べろ, 来い) closes the predicate just as a
+    // terminal does; no godan-ra okurigana ends in e-row, ろ or い.
+    const auto closes_predicate = [](char32_t cp) {
+      return cp == U'く' || cp == U'す' || cp == U'つ' || cp == U'う' || cp == U'ぐ' || cp == U'ぶ' || cp == U'む' ||
+             cp == U'ぬ' || cp == U'る' || kana::isERowCodepoint(cp) || cp == U'ろ' || cp == U'い';
+    };
+    // A final or nominalizing particle may close the clause first
+    // (行くよ+って, 来るの+って).
+    const bool is_quotative_pattern =
+        last_char == U'て' &&
+        (closes_predicate(char_before_sokuon) ||
+         (onbin_end >= start_pos + 3 && vh::particleClosesClauseBeforeSokuon(codepoints, onbin_end - 1)));
+    // だ before っ is the copula (本+だっ+た), not a verb stem (閉まっ+た).
+    if (!closes_before_sokuon && !is_quotative_pattern && char_before_sokuon != U'だ') {
+      // Build potential base form and verify it exists in dictionary or inflection
+      // This prevents false positives like 食べてしまる
+      std::string stem = extractSubstring(codepoints, start_pos, onbin_end - 1);
+      const SokuonbinBase sokuon = resolveSokuonbinBase(dict_manager, stem);
+      const std::string& potential_base = sokuon.base;
+      const grammar::VerbType onbin_verb_type = sokuon.type;
 
-        // Check dictionary first
-        bool in_dict = vh::isVerbInDictionary(dict_manager, potential_base);
+      // Check dictionary first
+      bool in_dict = vh::isVerbInDictionary(dict_manager, potential_base);
 
-        // Fallback: exact full-form inflection evidence for productive
-        // verbs absent from the dictionary.  Initial particle-like morae
-        // have already been rejected by generateVerbCandidates(), so a
-        // phrase such as N+が+V cannot enter through this path.
-        // 〜かっ is shared by Godan-ra sokuonbin and i-adjective past.
-        // Without lexical evidence the row is not recoverable, so do not
-        // let a mechanical verb analysis steal the adjective path.
-        const bool ambiguous_katt = char_before_sokuon == U'か';
-        bool infl_verified = !in_dict && !ambiguous_katt &&
-                             sokuonbinInflVerified(inflection, onbin_surface, potential_base, hiragana_before_onbin);
-        const bool standalone_verb_tail = hasStandaloneVerbTail(dict_manager, codepoints, kanji_end, onbin_end);
+      // Fallback: exact full-form inflection evidence for productive
+      // verbs absent from the dictionary.  Initial particle-like morae
+      // have already been rejected by generateVerbCandidates(), so a
+      // phrase such as N+が+V cannot enter through this path.
+      // 〜かっ is shared by Godan-ra sokuonbin and i-adjective past.
+      // Without lexical evidence the row is not recoverable, so do not
+      // let a mechanical verb analysis steal the adjective path.
+      const bool ambiguous_katt = char_before_sokuon == U'か';
+      bool infl_verified = !in_dict && !ambiguous_katt &&
+                           sokuonbinInflVerified(inflection, onbin_surface, potential_base, hiragana_before_onbin);
+      const bool standalone_verb_tail = vh::isVerbInDictionary(dict_manager, codepoints, kanji_end, onbin_end);
 
-        // Skip if this is an i-adjective katt-form (美しかっ → 美しい, 高かっ → 高い)
-        // The stem ends with か, so remove か and add い to get adjective base form
-        // E.g., stem="美しか" → adj_base="美しい"
-        bool is_adj_katt_form = false;
-        if (stem.size() >= core::kTwoJapaneseCharBytes && utf8::endsWith(stem, "か")) {
-          std::string adj_base = stem.substr(0, stem.size() - core::kJapaneseCharBytes) + "い";
-          if (vh::isAdjectiveInDictionary(dict_manager, adj_base)) {
-            is_adj_katt_form = true;
-            SUZUME_DEBUG_LOG_VERBOSE("[VERB_CAND] " << onbin_surface << " skip: i-adj \"" << adj_base
-                                                    << "\" in dict\n");
-          }
+      // Skip if this is an i-adjective katt-form (美しかっ → 美しい, 高かっ → 高い)
+      // The stem ends with か, so remove か and add い to get adjective base form
+      // E.g., stem="美しか" → adj_base="美しい"
+      bool is_adj_katt_form = false;
+      if (stem.size() >= core::kTwoJapaneseCharBytes && utf8::endsWith(stem, "か")) {
+        std::string adj_base = stem.substr(0, stem.size() - core::kJapaneseCharBytes) + "い";
+        if (vh::isAdjectiveInDictionary(dict_manager, adj_base)) {
+          is_adj_katt_form = true;
+          SUZUME_DEBUG_LOG_VERBOSE("[VERB_CAND] " << onbin_surface << " skip: i-adj \"" << adj_base << "\" in dict\n");
         }
+      }
 
-        // A verb that exists only as a derivational suffix on a nominal host
-        // carries its own left boundary, so the kanji in front of it is that
-        // host and not the stem of a verb (嘘 + ばっ + た). A dictionary base
-        // is the exemption, since a lexicalized compound spelled the same
-        // way is a word of its own.
-        // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
-        const bool onbin_spells_bound_suffix =
-            !in_dict &&
-            (grammar::spellsBoundDerivationalSuffixCell(extractSubstring(codepoints, kanji_end, onbin_end)) ||
-             opensOnCaseParticleThenDictVerb(dict_manager, codepoints, kanji_end, onbin_end - 1));
-        if (!is_adj_katt_form && !onbin_spells_bound_suffix && (in_dict || infl_verified)) {
-          // Verified - generate candidate
-          float cost = candidate::verb_cost::kModerateBonus;
-          if (crosses_completed_past) {
-            // A completed predicate before the quotative って is stronger
-            // evidence than a fabricated long-verb analysis. Keep the
-            // candidate available, but price it out of that boundary.
-            cost += candidate::verb_cost::kGeneratedSpanParticlePenalty;
-          }
-          SUZUME_DEBUG_VERBOSE_BLOCK {
-            SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface << " extended_sokuonbin lemma=" << potential_base
-                                << (in_dict ? " [dict]" : " [infl]") << " cost=" << cost << "\n";
-          }
-          auto candidate = makeVerbCandidate(onbin_surface, start_pos, onbin_end, cost, potential_base,
-                                             grammar::verbTypeToConjType(onbin_verb_type), true,
-                                             CandidateOrigin::VerbKanji, candidate::kHighOriginConfidence,
-                                             "extended_sokuonbin", core::ExtendedPOS::VerbOnbinkei);
-          // A standalone dictionary verb tail supplies a grammatical
-          // boundary, so an inflection-only compound must remain
-          // unverified and receive the generic false-positive penalty.
-          candidate.lemma_verified = in_dict || (infl_verified && kanji_end == start_pos + 1 && !standalone_verb_tail);
-          candidates.push_back(std::move(candidate));
+      // A verb that exists only as a derivational suffix on a nominal host
+      // carries its own left boundary, so the kanji in front of it is that
+      // host and not the stem of a verb (嘘 + ばっ + た). A dictionary base
+      // is the exemption, since a lexicalized compound spelled the same
+      // way is a word of its own.
+      // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+      const bool onbin_spells_bound_suffix =
+          !in_dict && (grammar::spellsBoundDerivationalSuffixCell(extractSubstring(codepoints, kanji_end, onbin_end)) ||
+                       opensOnCaseParticleThenDictVerb(dict_manager, codepoints, kanji_end, onbin_end - 1));
+      if (!is_adj_katt_form && !onbin_spells_bound_suffix && (in_dict || infl_verified)) {
+        // Verified - generate candidate
+        float cost = candidate::verb_cost::kModerateBonus;
+        if (crosses_completed_past) {
+          // A completed predicate before the quotative って is stronger
+          // evidence than a fabricated long-verb analysis. Keep the
+          // candidate available, but price it out of that boundary.
+          cost += candidate::verb_cost::kGeneratedSpanParticlePenalty;
         }
+        SUZUME_DEBUG_VERBOSE_BLOCK {
+          SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface << " extended_sokuonbin lemma=" << potential_base
+                              << (in_dict ? " [dict]" : " [infl]") << " cost=" << cost << "\n";
+        }
+        auto candidate =
+            makeVerbCandidate(onbin_surface, start_pos, onbin_end, cost, potential_base,
+                              grammar::verbTypeToConjType(onbin_verb_type), true, CandidateOrigin::VerbKanji,
+                              candidate::kHighOriginConfidence, "extended_sokuonbin", core::ExtendedPOS::VerbOnbinkei);
+        // A standalone dictionary verb tail supplies a grammatical
+        // boundary, so an inflection-only compound must remain
+        // unverified and receive the generic false-positive penalty.
+        candidate.lemma_verified = in_dict || (infl_verified && kanji_end == start_pos + 1 && !standalone_verb_tail);
+        candidates.push_back(std::move(candidate));
       }
     }
   }
@@ -345,8 +328,7 @@ void appendExtendedSokuonbinCandidates(const std::vector<char32_t>& codepoints, 
       const std::string_view continuative_base_suffix = grammar::godanBaseSuffixFromIRow(utf8::decodeLastChar(stem));
       const bool stem_is_registered_continuative =
           !continuative_base_suffix.empty() &&
-          vh::isVerbInDictionary(dict_manager, stem.substr(0, stem.size() - core::kJapaneseCharBytes) +
-                                                   std::string(continuative_base_suffix));
+          vh::isVerbInDictionary(dict_manager, normalize::concat(utf8::dropLastChar(stem), continuative_base_suffix));
       if ((stem_entry != nullptr && stem_entry->pos != core::PartOfSpeech::Verb) || stem_is_registered_continuative) {
         continue;
       }
@@ -357,7 +339,7 @@ void appendExtendedSokuonbinCandidates(const std::vector<char32_t>& codepoints, 
     }
     bool infl_verified =
         !in_dict_check && sokuonbinInflVerified(inflection, onbin_surface, potential_base, hiragana_before_onbin);
-    const bool standalone_verb_tail = hasStandaloneVerbTail(dict_manager, codepoints, kanji_end, onbin_end);
+    const bool standalone_verb_tail = vh::isVerbInDictionary(dict_manager, codepoints, kanji_end, onbin_end);
 
     if (in_dict_check || infl_verified) {
       constexpr float kTeAuxSokuonbinCost = candidate::verb_cost::kModerateBonus;

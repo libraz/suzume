@@ -66,9 +66,6 @@ bool startsPastAuxiliaryBeforeQuote(const std::vector<char32_t>& codepoints, siz
                                              core::PartOfSpeech::Auxiliary) != nullptr;
 }
 
-// Longest kana run the predicate-boundary gates below examine.
-constexpr size_t kPredicateRunMax = 12;
-
 size_t closedOnbinTenseEnd(const std::vector<char32_t>& codepoints, size_t start_pos,
                            const std::vector<normalize::CharType>& char_types, const grammar::Inflection& inflection,
                            const dictionary::DictionaryManager* dict_manager) {
@@ -171,26 +168,11 @@ size_t completeGodanTerminalAfterCaseParticle(const std::vector<char32_t>& codep
                                               const grammar::Inflection& inflection,
                                               const dictionary::DictionaryManager* dict_manager,
                                               const VerbCandidateOptions& verb_opts) {
-  if (dict_manager == nullptr || start_pos == 0) {
-    return 0;
-  }
-  const auto* preceding_particle =
-      lookupEntryInRange(*dict_manager, codepoints, start_pos - 1, start_pos, core::PartOfSpeech::Particle);
-  if (preceding_particle == nullptr || preceding_particle->extended_pos != core::ExtendedPOS::ParticleCase) {
-    return 0;
-  }
   // A case-particle homograph inside a kana predicate (読んでみよう,
   // ぷにぷにしてる) does not open a new predicate slot. Unknown kanji nouns
   // remain valid hosts without requiring lexical registration; kana hosts need
   // an explicit nominal entry ending before the particle.
-  const size_t particle_start = start_pos - 1;
-  const bool follows_kanji_host = particle_start > 0 && normalize::isKanjiCodepoint(codepoints[particle_start - 1]);
-  constexpr PartOfSpeechMask kNominalHostMask =
-      partOfSpeechMask(core::PartOfSpeech::Noun) | partOfSpeechMask(core::PartOfSpeech::Pronoun);
-  const size_t min_host_start = particle_start > 12 ? particle_start - 12 : 0;
-  const bool follows_nominal_host =
-      hasDictionaryEntryEndingAt(*dict_manager, codepoints, min_host_start, particle_start, kNominalHostMask);
-  if (!follows_kanji_host && !follows_nominal_host) {
+  if (!followsKanjiOrNominalHostBeforeCaseParticle(codepoints, start_pos, dict_manager)) {
     return 0;
   }
 
@@ -211,8 +193,8 @@ size_t completeGodanTerminalAfterCaseParticle(const std::vector<char32_t>& codep
 
 bool hasLongGodanWaNegativeEvidence(const std::vector<char32_t>& codepoints, size_t start_pos, size_t current_pos,
                                     const std::vector<normalize::CharType>& char_types) {
-  for (size_t negative_pos = current_pos + 1; negative_pos + 2 < codepoints.size() && negative_pos - start_pos < 12;
-       ++negative_pos) {
+  for (size_t negative_pos = current_pos + 1;
+       negative_pos + 2 < codepoints.size() && negative_pos - start_pos < kPredicateRunMax; ++negative_pos) {
     if (char_types[negative_pos] != normalize::CharType::Hiragana) {
       break;
     }
@@ -247,7 +229,7 @@ size_t godanContinuationStemEnd(const std::vector<char32_t>& codepoints, size_t 
     return 0;
   }
   size_t run_end = current_pos;
-  while (run_end < char_types.size() && run_end - start_pos < 12 &&
+  while (run_end < char_types.size() && run_end - start_pos < kPredicateRunMax &&
          char_types[run_end] == normalize::CharType::Hiragana) {
     ++run_end;
   }
@@ -326,7 +308,7 @@ size_t godanContinuationStemEnd(const std::vector<char32_t>& codepoints, size_t 
   }
 
   const char32_t onbin = utf8::decodeFirstChar(grammar::onbinFormOf(*row));
-  for (size_t pos = current_pos + 1; pos < char_types.size() && pos - start_pos < 12; ++pos) {
+  for (size_t pos = current_pos + 1; pos < char_types.size() && pos - start_pos < kPredicateRunMax; ++pos) {
     if (char_types[pos] != normalize::CharType::Hiragana) {
       break;
     }
@@ -340,6 +322,42 @@ size_t godanContinuationStemEnd(const std::vector<char32_t>& codepoints, size_t 
   }
 
   return 0;
+}
+
+// Whether a か inside a kana run continues a verb conjugation rather than
+// standing as the particle.
+bool kaContinuesConjugation(const std::vector<char32_t>& codepoints, size_t ka_pos) {
+  // なかった (negative past)
+  if (codepoints[ka_pos - 1] == U'な') {
+    return true;
+  }
+  const char32_t next = ka_pos + 1 < codepoints.size() ? codepoints[ka_pos + 1] : 0;
+  const char32_t after_next = ka_pos + 2 < codepoints.size() ? codepoints[ka_pos + 2] : 0;
+  // Godan-ra endings (わかり, わかる, わかれ, わかっ), the godan-ka irrealis
+  // before ない (いかない), causative/transitive/classical negative (つかせる,
+  // つかさどる, いかず), and the godan-wa terminal (つかう). Scoring rejects the
+  // impossible mizenkei+volitional reading (つか+う) separately.
+  if (next == U'り' || next == U'る' || next == U'れ' || next == U'ろ' || next == U'っ' || next == U'な' ||
+      next == U'せ' || next == U'さ' || next == U'ず' || next == U'う') {
+    return true;
+  }
+  // GodanMa/Na/Ba onbin te/ta-form (つかんで, 歩かんで)
+  if (next == U'ん' && (after_next == U'で' || after_next == U'だ')) {
+    return true;
+  }
+  // Mizenkei + contracted negative (わからん), godan-ra irrealis + negative
+  // (わからない), and godan-wa irrealis (つかわない, つかわれる, つかわせる, つかわず)
+  if ((kana::isARowCodepoint(next) && after_next == U'ん') || (next == U'ら' && after_next == U'な') ||
+      (next == U'わ' && (after_next == U'な' || after_next == U'れ' || after_next == U'せ' || after_next == U'ず'))) {
+    return true;
+  }
+  // Godan-ra ん音便 + the negative paradigm (わかんない, わかんなかった)
+  if (next == U'ん' && vh::naiNegativeFollowsAt(codepoints, ka_pos + 2)) {
+    return true;
+  }
+  // Godan-wa continuative before ます (つかい→使う, むかい→向かう). The
+  // following ま keeps bare か + いる (誰か+いる) breaking here.
+  return next == U'い' && after_next == U'ま';
 }
 
 bool hasInternalLexicalParticleBoundary(const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos,
@@ -406,7 +424,7 @@ void appendHiraganaRenyokeiBeforeAspect(const std::vector<char32_t>& codepoints,
   const char32_t final_cp = codepoints[stem_end - 1];
   const std::string_view suffix = grammar::godanBaseSuffixFromIRow(final_cp);
   std::string lemma;
-  if (grammar::isERowCodepoint(final_cp) || final_cp == U'じ') {
+  if (kana::isERowCodepoint(final_cp) || final_cp == U'じ') {
     lemma = extractSubstring(codepoints, start_pos, stem_end) + "る";
   } else if (!suffix.empty()) {
     lemma = normalize::concat(extractSubstring(codepoints, start_pos, stem_end - 1), suffix);
@@ -431,11 +449,7 @@ void appendHiraganaRenyokeiBeforeFormalNoun(const std::vector<char32_t>& codepoi
   if (dict_manager == nullptr) {
     return;
   }
-  size_t run_end = start_pos;
-  while (run_end < char_types.size() && run_end - start_pos < 12 &&
-         char_types[run_end] == normalize::CharType::Hiragana) {
-    ++run_end;
-  }
+  const size_t run_end = findCharRegionEnd(char_types, start_pos, kPredicateRunMax, normalize::CharType::Hiragana);
 
   // A two-or-more-mora e-row stem immediately before a formal noun is the
   // productive verb-continuative nominal construction (たて+もの). The
@@ -448,7 +462,7 @@ void appendHiraganaRenyokeiBeforeFormalNoun(const std::vector<char32_t>& codepoi
     const std::string following = extractSubstring(codepoints, stem_end, stem_end + 2);
     if (following != "もの" ||
         !lookupResultsHaveExtendedPOS(dict_manager->lookup(following, 0), core::ExtendedPOS::NounFormal) ||
-        !grammar::isERowCodepoint(codepoints[stem_end - 1])) {
+        !kana::isERowCodepoint(codepoints[stem_end - 1])) {
       continue;
     }
     const std::string stem = extractSubstring(codepoints, start_pos, stem_end);
@@ -572,7 +586,7 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(const std::vector<c
   bool has_verified_initial_inflection = false;
   if (first_char == U'の') {
     size_t probe_end = start_pos;
-    while (probe_end < char_types.size() && probe_end - start_pos < 12 &&
+    while (probe_end < char_types.size() && probe_end - start_pos < kPredicateRunMax &&
            char_types[probe_end] == normalize::CharType::Hiragana) {
       ++probe_end;
       if (probe_end <= start_pos + 1) {
@@ -647,14 +661,11 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(const std::vector<c
     // E.g., 「たくなる」→「たく」+「なる」, not a verb「くなる」
     //       「くなってきた」→「く」+「なっ」+「て」+...
     // Note: くる (来る) is a valid verb but has kanji and is handled by dictionary
-    if (first_char == U'く') {
-      // く + な行 hiragana = i-adjective pattern
-      if (second_char == U'な' || second_char == U'に' || second_char == U'ぬ' || second_char == U'ね' ||
-          second_char == U'の') {
-        SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] pos=" << start_pos
-                                                    << " ku_naru_pattern (i-adjective ku-form + なる/ない)\n");
-        return candidates;
-      }
+    if (first_char == U'く' && (second_char == U'な' || second_char == U'に' || second_char == U'ぬ' ||
+                                second_char == U'ね' || second_char == U'の')) {
+      SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] pos=" << start_pos
+                                                  << " ku_naru_pattern (i-adjective ku-form + なる/ない)\n");
+      return candidates;
     }
 
     // Skip if starting with 「であり」(copula de + aru renyokei)
@@ -674,11 +685,7 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(const std::vector<c
   // complete run first using both the left case-particle context and the
   // inflection analyzer; only then may the scanner cross those internal morae.
   size_t comma_clause_end = 0;
-  size_t comma_probe = start_pos;
-  while (comma_probe < char_types.size() && comma_probe - start_pos < 12 &&
-         char_types[comma_probe] == normalize::CharType::Hiragana) {
-    ++comma_probe;
-  }
+  const size_t comma_probe = findCharRegionEnd(char_types, start_pos, kPredicateRunMax, normalize::CharType::Hiragana);
   if (comma_probe > start_pos + 1 &&
       vh::isCommaClauseChainingRenyokei(codepoints, start_pos, comma_probe, dict_manager)) {
     const auto& comma_inflections = analysesInRange(inflection, codepoints, start_pos, comma_probe);
@@ -687,7 +694,7 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(const std::vector<c
           return candidate.verb_type != grammar::VerbType::Unknown &&
                  candidate.verb_type != grammar::VerbType::IAdjective && candidate.morphemes.empty() &&
                  candidate.suffix.size() == core::kJapaneseCharBytes &&
-                 grammar::isIRowCodepoint(codepoints[comma_probe - 1]) &&
+                 kana::isIRowCodepoint(codepoints[comma_probe - 1]) &&
                  candidate.confidence >= verb_opts.confidence_ichidan_dict;
         });
     if (has_valid_renyokei) {
@@ -702,7 +709,7 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(const std::vector<c
   //   - も can be part of ても (even if) or もらう (receiving verb)
   size_t hiragana_end = start_pos;
   size_t godan_ra_continuation_stem_end = 0;
-  while (hiragana_end < char_types.size() && hiragana_end - start_pos < 12 &&  // Max 12 hiragana for verb + endings
+  while (hiragana_end < char_types.size() && hiragana_end - start_pos < kPredicateRunMax &&
          char_types[hiragana_end] == normalize::CharType::Hiragana) {
     // Don't include particles that appear after the first hiragana character.
     // E.g., for "りにする", stop at "り" to not include "にする".
@@ -742,11 +749,10 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(const std::vector<c
       // window only widens here — the particle keeps its own edge and every
       // candidate the split reading already had, so the two readings still
       // compete on score rather than on which one was generated.
-      const bool particle_lacks_nominal_host =
-          hiragana_end == start_pos + 1 && dict_manager != nullptr &&
-          lookupEntryInRange(*dict_manager, codepoints, start_pos, hiragana_end, core::PartOfSpeech::Noun) == nullptr &&
-          lookupEntryInRange(*dict_manager, codepoints, start_pos, hiragana_end, core::PartOfSpeech::Pronoun) ==
-              nullptr;
+      const bool particle_lacks_nominal_host = hiragana_end == start_pos + 1 && dict_manager != nullptr &&
+                                               !hasExactPartOfSpeech(*dict_manager, codepoints, start_pos, hiragana_end,
+                                                                     partOfSpeechMask(core::PartOfSpeech::Noun) |
+                                                                         partOfSpeechMask(core::PartOfSpeech::Pronoun));
       if (normalize::isNeverVerbStemAfterKanji(curr) && !(curr == U'の' && has_godan_wa_negative) &&
           !particle_lacks_nominal_host && godan_ra_stem_end == 0) {
         SUZUME_DEBUG_LOG_TRACE("[HIRA_SEQ] pos=" << hiragana_end << " char=U+" << std::hex
@@ -758,126 +764,13 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(const std::vector<c
       // For か, で, も, と: check if they're part of verb conjugation patterns
       // Don't break if they appear in known conjugation contexts
       if (curr == U'か' || curr == U'で' || curr == U'も' || curr == U'と') {
-        // Check the preceding character for conjugation patterns
-        char32_t prev = codepoints[hiragana_end - 1];
-
-        // か: OK if preceded by な (なかった = negative past)
-        //    Also OK if followed by れ (かれ = ichidan stem like つかれる, ふざける)
-        //    Also OK if followed by んで/んだ (onbin te/ta-form: つかんで, 歩かんで)
-        //    Also OK if followed by A-row + ん (mizenkei + contracted negative: わからん)
-        if (curr == U'か') {
-          if (prev == U'な') {
-            ++hiragana_end;
-            continue;
-          }
-          // Check if followed by れ (ichidan stem pattern)
-          if (hiragana_end + 1 < codepoints.size() && codepoints[hiragana_end + 1] == U'れ') {
-            ++hiragana_end;
-            continue;
-          }
-          // Check if followed by んで/んだ (GodanMa/Na/Ba onbin te/ta-form)
-          // e.g., つかんで (掴んで), 歩かんで (歩かない colloquial negative te-form)
-          if (hiragana_end + 2 < codepoints.size() && codepoints[hiragana_end + 1] == U'ん' &&
-              (codepoints[hiragana_end + 2] == U'で' || codepoints[hiragana_end + 2] == U'だ')) {
-            ++hiragana_end;
-            continue;
-          }
-          // Check if followed by A-row + ん (mizenkei + contracted negative)
-          // e.g., わからん = わから (mizenkei of わかる) + ん
-          if (hiragana_end + 2 < codepoints.size() && grammar::isARowCodepoint(codepoints[hiragana_end + 1]) &&
-              codepoints[hiragana_end + 2] == U'ん') {
-            ++hiragana_end;
-            continue;
-          }
-          // Check if followed by ら + な (godan-ra mizenkei + negative auxiliary)
-          // e.g., わからない = わから (mizenkei of わかる) + ない
-          if (hiragana_end + 2 < codepoints.size() && codepoints[hiragana_end + 1] == U'ら' &&
-              codepoints[hiragana_end + 2] == U'な') {
-            ++hiragana_end;
-            continue;
-          }
-          // Check if followed by ない (godan-ka mizenkei + negative auxiliary)
-          // e.g., いかない = いか (mizenkei of いく) + ない
-          if (hiragana_end + 1 < codepoints.size() && codepoints[hiragana_end + 1] == U'な') {
-            ++hiragana_end;
-            continue;
-          }
-          // Check if followed by ん + the negative (godan-ra ん音便 + negative
-          // auxiliary), e.g. わかんない = わか + ん (ら→ん音便) + ない. The
-          // contraction is licensed by the negative that selects the irrealis,
-          // and every cell of that paradigm selects the same one, so ask for
-          // the paradigm rather than for its dictionary form: enumerating ない
-          // alone stopped the run one mora in for わかんなかった.
-          if (hiragana_end + 1 < codepoints.size() && codepoints[hiragana_end + 1] == U'ん' &&
-              vh::naiNegativeFollowsAt(codepoints, hiragana_end + 2)) {
-            ++hiragana_end;
-            continue;
-          }
-          // Check if followed by godan-ra conjugation endings (り、る、れ、ろ、っ)
-          // e.g., わかり (renyokei), わかる (shuushikei), わかれ (kateikei/meireikei)
-          if (hiragana_end + 1 < codepoints.size()) {
-            char32_t next = codepoints[hiragana_end + 1];
-            if (next == U'り' || next == U'る' || next == U'れ' || next == U'ろ' || next == U'っ') {
-              ++hiragana_end;
-              continue;
-            }
-          }
-          // Check if followed by せ/さ/ず (causative/transitive/classical negative)
-          // e.g., つかせる, つかさどる, いかず
-          if (hiragana_end + 1 < codepoints.size()) {
-            char32_t next = codepoints[hiragana_end + 1];
-            if (next == U'せ' || next == U'さ' || next == U'ず') {
-              ++hiragana_end;
-              continue;
-            }
-          }
-          // Check if followed by い + ま (godan-wa renyokei before ます:
-          // つかい→使う, むかい→向かう). Guarded by the following ま so bare
-          // か + いる sequences (誰か+いる) still break here; the pronoun-か
-          // cases are additionally discouraged by the renyokei cost gate.
-          if (hiragana_end + 2 < codepoints.size() && codepoints[hiragana_end + 1] == U'い' &&
-              codepoints[hiragana_end + 2] == U'ま') {
-            ++hiragana_end;
-            continue;
-          }
-          // Check if followed by う (godan-wa shuushikei/rentaikei base form:
-          // つかう→使う, むかう→向かう, すう is not か-initial). Scoring rejects
-          // the impossible mizenkei+volitational reading (つか+う) separately.
-          if (hiragana_end + 1 < codepoints.size() && codepoints[hiragana_end + 1] == U'う') {
-            ++hiragana_end;
-            continue;
-          }
-          // Check if followed by わ + {な,れ,せ,ず} (godan-wa mizenkei:
-          // つかわない, つかわれる, つかわせる, つかわず). か+わ+ん is already
-          // covered by the A-row + ん rule above.
-          if (hiragana_end + 2 < codepoints.size() && codepoints[hiragana_end + 1] == U'わ' &&
-              (codepoints[hiragana_end + 2] == U'な' || codepoints[hiragana_end + 2] == U'れ' ||
-               codepoints[hiragana_end + 2] == U'せ' || codepoints[hiragana_end + 2] == U'ず')) {
-            ++hiragana_end;
-            continue;
-          }
-        }
-
-        // で: OK if preceded by ん (んで = te-form) or き (できる)
-        if (curr == U'で' && (prev == U'ん' || prev == U'き')) {
-          ++hiragana_end;
-          continue;
-        }
-
-        // も: OK if preceded by て (ても = even if)
-        if (curr == U'も' && prev == U'て') {
-          ++hiragana_end;
-          continue;
-        }
-
-        // と: OK if preceded by っ (っとく = ておく contraction)
-        // やっとく = やって + おく where ておく → とく
-        if (curr == U'と' && prev == U'っ') {
-          ++hiragana_end;
-          continue;
-        }
-
-        if (curr == U'と' && has_godan_wa_negative) {
+        // か continues its own conjugation, で follows ん (んで) or き (できる), も
+        // follows て (ても), and と follows っ (やっとく = やって + おく) or opens a
+        // long godan-wa negative.
+        const char32_t prev = codepoints[hiragana_end - 1];
+        if ((curr == U'か' && kaContinuesConjugation(codepoints, hiragana_end)) ||
+            (curr == U'で' && (prev == U'ん' || prev == U'き')) || (curr == U'も' && prev == U'て') ||
+            (curr == U'と' && (prev == U'っ' || has_godan_wa_negative))) {
           ++hiragana_end;
           continue;
         }
@@ -941,8 +834,9 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(const std::vector<c
     // A lexical inflection (notably たがっ or ちがっ) must retain its
     // dictionary POS and conjugation class; the open-class fallback merely
     // fills a dictionary-free gap.
-    if (dict_manager != nullptr && (dict_manager->lookupExact(surface, core::PartOfSpeech::Auxiliary) != nullptr ||
-                                    dict_manager->lookupExact(surface, core::PartOfSpeech::Verb) != nullptr)) {
+    if (dict_manager != nullptr && hasExactPartOfSpeech(*dict_manager, surface,
+                                                        partOfSpeechMask(core::PartOfSpeech::Auxiliary) |
+                                                            partOfSpeechMask(core::PartOfSpeech::Verb))) {
       godan_ra_continuation_stem_end = 0;
     }
   }

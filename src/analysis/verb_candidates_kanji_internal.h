@@ -7,6 +7,20 @@ namespace suzume::analysis::kanji_verb_detail {
 
 float getIchidanConfidence(const std::vector<grammar::InflectionCandidate>& candidates, float min_threshold);
 
+// Acceptance threshold for a mixed-script godan-ka stem (羽ばた+く): its complete
+// い-onbin past/te cell clears the past/te bar, every other cell the low bar.
+float mixedGodanKaStemThreshold(const grammar::InflectionCandidate& candidate, const VerbCandidateOptions& verb_opts);
+
+// A multi-kanji godan-wa continuative ending in い before a kanji continuation
+// (背負い+進む), which the inflection scorer underrates as an i-adjective shape.
+// Whether an adjective that attaches to a verb continuative (にくい, やすい)
+// starts at @p pos.
+bool renyokeiAdjectiveFollowsAt(const dictionary::DictionaryManager* dict_manager,
+                                const std::vector<char32_t>& codepoints, size_t pos);
+
+bool isMultiKanjiGodanWaRenyokei(const grammar::InflectionCandidate& candidate, std::string_view surface,
+                                 const std::vector<char32_t>& codepoints, size_t end_pos);
+
 void appendGodanMizenkeiPassiveCausativeCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                                    size_t kanji_end, size_t hiragana_end,
                                                    const grammar::Inflection& inflection,

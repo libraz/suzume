@@ -77,16 +77,13 @@ MizenkeiEvidence judgeMizenkeiForms(const dictionary::DictionaryManager* dict_ma
                                     const GodanMizenkeiForms& forms, const std::vector<char32_t>& codepoints,
                                     size_t start_pos, size_t mizenkei_end) {
   MizenkeiEvidence evidence{};
-  for (const auto& cand : inflection.analyze(full_form)) {
-    if (cand.verb_type == forms.verb_type && cand.base_form == forms.base_form) {
-      evidence.is_valid_verb = true;
-      break;
-    }
-  }
+  const auto& analyses = inflection.analyze(full_form);
   evidence.is_in_dict = vh::isVerbInDictionary(dict_manager, forms.base_form);
-  if (!evidence.is_valid_verb) {
-    evidence.is_valid_verb = evidence.is_in_dict;
-  }
+  evidence.is_valid_verb = std::any_of(analyses.begin(), analyses.end(),
+                                       [&](const auto& cand) {
+                                         return cand.verb_type == forms.verb_type && cand.base_form == forms.base_form;
+                                       }) ||
+                           evidence.is_in_dict;
   const bool formal_noun_stem_homograph = hasFormalNounStemHomograph(dict_manager, codepoints, start_pos, mizenkei_end);
   evidence.unattested_sa_irrealis = forms.verb_type == grammar::VerbType::GodanSa && !evidence.is_in_dict &&
                                     grammar::isPureHiragana(forms.stem) && !formal_noun_stem_homograph;
@@ -133,10 +130,7 @@ void appendMizenkeiNCandidates(const std::vector<char32_t>& codepoints, size_t s
       continue;
     }
 
-    // Check if position end_pos-1 is A-row hiragana (mizenkei ending)
-    size_t mizenkei_end = end_pos;  // Position of ん (exclusive end of mizenkei)
-    if (mizenkei_end <= start_pos)
-      continue;
+    const size_t mizenkei_end = end_pos;
 
     GodanMizenkeiForms forms;
     if (!deriveGodanMizenkeiForms(codepoints, start_pos, mizenkei_end, forms)) {
@@ -210,10 +204,7 @@ void appendMizenkeiNegativeCandidates(const std::vector<char32_t>& codepoints, s
       continue;
     }
 
-    // Check if position end_pos-1 is A-row hiragana (mizenkei ending)
-    size_t mizenkei_end = end_pos;  // Position of な (exclusive end of mizenkei)
-    if (mizenkei_end <= start_pos)
-      continue;
+    const size_t mizenkei_end = end_pos;
 
     GodanMizenkeiForms forms;
     if (!deriveGodanMizenkeiForms(codepoints, start_pos, mizenkei_end, forms)) {
@@ -276,13 +267,9 @@ void appendMizenkeiNegativeCandidates(const std::vector<char32_t>& codepoints, s
         dict_manager == nullptr
             ? nullptr
             : lookupEntryInRange(*dict_manager, codepoints, end_pos, end_pos + aux_len, core::PartOfSpeech::Auxiliary);
-    const auto* preceding_particle =
-        start_pos == 0 || dict_manager == nullptr
-            ? nullptr
-            : lookupEntryInRange(*dict_manager, codepoints, start_pos - 1, start_pos, core::PartOfSpeech::Particle);
     if (!is_in_dict && following_auxiliary != nullptr &&
-        following_auxiliary->extended_pos == core::ExtendedPOS::AuxNegativeNu && preceding_particle != nullptr &&
-        preceding_particle->extended_pos == core::ExtendedPOS::ParticleCase) {
+        following_auxiliary->extended_pos == core::ExtendedPOS::AuxNegativeNu &&
+        vh::oneMoraParticleEndsAt(dict_manager, codepoints, start_pos, core::ExtendedPOS::ParticleCase)) {
       cost_negative += candidate::verb_cost::kStrongBonus;
     }
     // Unverified stems starting with a formal noun are noun + verb sequences
@@ -338,11 +325,7 @@ void appendMizenkeiNakyaCandidates(const std::vector<char32_t>& codepoints, size
       continue;
     }
 
-    // Check if position end_pos-1 is A-row hiragana (godan mizenkei ending)
-    size_t mizenkei_end = end_pos;
-    if (mizenkei_end <= start_pos) {
-      continue;
-    }
+    const size_t mizenkei_end = end_pos;
     GodanMizenkeiForms forms;
     if (!deriveGodanMizenkeiForms(codepoints, start_pos, mizenkei_end, forms)) {
       continue;
@@ -439,23 +422,14 @@ void appendNOnbinNaiCandidates(const std::vector<char32_t>& codepoints, size_t s
 
     // Validate: check if the standard form (stem + らない) is a valid verb
     std::string standard_form = stem + "らない";
-    const auto& analysis = inflection.analyze(standard_form);
-    bool is_valid_verb = false;
-    for (const auto& cand : analysis) {
-      if (cand.verb_type == grammar::VerbType::GodanRa && cand.base_form == base_form) {
-        is_valid_verb = true;
-        break;
-      }
-    }
-
-    // Also check if base form exists in dictionary
-    bool is_in_dict = vh::isVerbInDictionary(dict_manager, base_form);
-    if (!is_valid_verb) {
-      is_valid_verb = is_in_dict;
-    }
-
-    if (!is_valid_verb)
+    // (or that the base form is in the dictionary)
+    const auto& analyses = inflection.analyze(standard_form);
+    const bool is_in_dict = vh::isVerbInDictionary(dict_manager, base_form);
+    if (!is_in_dict && std::none_of(analyses.begin(), analyses.end(), [&](const auto& cand) {
+          return cand.verb_type == grammar::VerbType::GodanRa && cand.base_form == base_form;
+        })) {
       continue;
+    }
 
     // Surface: stem + ん (the ん音便 form)
     std::string onbin_surface = stem + "ん";
@@ -493,8 +467,5 @@ void appendNOnbinNaiCandidates(const std::vector<char32_t>& codepoints, size_t s
     break;
   }
 }
-
-// Godan onbin stems before contraction/tense auxiliaries. Handles
-// っ + と/ち/た/て (GodanRa/Ta/Wa) and ん + ど/じ/で/だ (GodanMa/Ba/Na).
 
 }  // namespace suzume::analysis::hiragana_verb_detail

@@ -51,8 +51,7 @@ bool isSubsidiaryVerbAuxiliary(core::ExtendedPOS extended_pos) {
 bool startsWithRenyokeiAuxiliary(std::string_view following_surface) {
   for (const auto& auxiliary : grammar::getAuxiliaries()) {
     if (auxiliary.required_conn == grammar::conn::kVerbRenyokei &&
-        following_surface.size() >= auxiliary.surface.size() &&
-        following_surface.substr(0, auxiliary.surface.size()) == auxiliary.surface) {
+        utf8::startsWith(following_surface, auxiliary.surface)) {
       return true;
     }
   }
@@ -136,7 +135,7 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
     // E-row: 食べる, 見える → 食べ, 見え
     // I-row: 感じる, 過ぎる → 感じ, すぎ
     char32_t stem_end_char = codepoints[end_pos - 1];
-    if (!grammar::isERowCodepoint(stem_end_char) && !grammar::isIRowCodepoint(stem_end_char)) {
+    if (!kana::isERowCodepoint(stem_end_char) && !kana::isIRowCodepoint(stem_end_char)) {
       continue;
     }
 
@@ -151,48 +150,40 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
     }
     char32_t next_char = codepoints[end_pos];
     bool is_followed_by_te_ta = (next_char == U'て' || next_char == U'た');
-    bool is_followed_by_renyokei_conj = next_char == U'な' && end_pos + 2 < codepoints.size() &&
-                                        codepoints[end_pos + 1] == U'が' && codepoints[end_pos + 2] == U'ら';
-    if (!is_followed_by_renyokei_conj) {
-      is_followed_by_renyokei_conj =
-          next_char == U'つ' && end_pos + 1 < codepoints.size() && codepoints[end_pos + 1] == U'つ';
-    }
-    bool is_followed_by_reba = false;
+    // ながら / つつ
+    const bool is_followed_by_renyokei_conj =
+        (next_char == U'な' && end_pos + 2 < codepoints.size() && codepoints[end_pos + 1] == U'が' &&
+         codepoints[end_pos + 2] == U'ら') ||
+        (next_char == U'つ' && end_pos + 1 < codepoints.size() && codepoints[end_pos + 1] == U'つ');
     // For Godan-ta, any auxiliary whose declared required connection is
     // VerbRenyokei licenses the continuative reading (もち+たい, たち+ます).
     // Derive this from the grammar table instead of enumerating ます/たい/etc.
     // Other rows retain their established, narrower gates because enabling every
     // Ichidan-looking stem here would fabricate verbs such as られ+ちゃう.
     const std::string following_surface = extractSubstring(codepoints, end_pos, hiragana_end);
-    bool is_followed_by_renyokei_aux = startsWithRenyokeiAuxiliary(following_surface);
+    const bool is_followed_by_renyokei_aux =
+        !leading_de_after_hatsuonbin && startsWithRenyokeiAuxiliary(following_surface);
     const auto* following_auxiliary =
         dict_manager != nullptr ? dict_manager->lookupExact(following_surface, core::PartOfSpeech::Auxiliary) : nullptr;
     const bool is_followed_by_classical_adnominal_tari =
         following_auxiliary != nullptr && following_auxiliary->extended_pos == core::ExtendedPOS::AuxClassicalTari;
     const bool is_followed_by_masu = vh::masuAuxFollowsAt(codepoints, end_pos) && !leading_de_after_hatsuonbin;
-    if (leading_de_after_hatsuonbin) {
-      is_followed_by_renyokei_aux = false;
-    }
     const bool godan_ta_before_declared_renyokei_aux = stem_end_char == U'ち' && is_followed_by_renyokei_aux;
-    // Check for conditional れば pattern (e.g., できれば → でき + れ + ば)
-    // This case is handled separately below for kateikei stem generation
-    if (next_char == U'れ' && end_pos + 1 < codepoints.size() && codepoints[end_pos + 1] == U'ば') {
-      is_followed_by_reba = true;
-    }
+    // Conditional れば (できれば → でき + れ + ば), handled below for the kateikei stem
+    const bool is_followed_by_reba =
+        next_char == U'れ' && end_pos + 1 < codepoints.size() && codepoints[end_pos + 1] == U'ば';
     // The ichidan volitional opens on the irrealis stem+よ (あげ+よ+う).
-    const bool is_followed_by_volitional = grammar::isERowCodepoint(stem_end_char) && next_char == U'よ' &&
+    const bool is_followed_by_volitional = kana::isERowCodepoint(stem_end_char) && next_char == U'よ' &&
                                            end_pos + 1 < codepoints.size() &&
                                            codepoints[end_pos + 1] == core::hiragana::kU;
-    // Check for negative ない pattern (e.g., できない → でき + ない)
-    bool is_followed_by_nai = false;
-    if (next_char == U'な' && end_pos + 1 < codepoints.size() && codepoints[end_pos + 1] == U'い') {
-      is_followed_by_nai = true;
-    }
+    // Negative ない (できない → でき + ない)
+    const bool is_followed_by_nai =
+        next_char == U'な' && end_pos + 1 < codepoints.size() && codepoints[end_pos + 1] == U'い';
     // The appearance そう takes a godan continuative (ふり+そう). An i-row し
     // is left out: it ends the stems of the しい adjectives (うれし+そう), as
     // does a stem whose い form is a dictionary adjective (おおき+そう).
     const bool godan_before_appearance_sou =
-        grammar::isIRowCodepoint(stem_end_char) && stem_end_char != U'し' && next_char == U'そ' &&
+        kana::isIRowCodepoint(stem_end_char) && stem_end_char != U'し' && next_char == U'そ' &&
         end_pos + 1 < codepoints.size() && codepoints[end_pos + 1] == core::hiragana::kU &&
         !vh::isAdjectiveInDictionary(dict_manager, extractSubstring(codepoints, start_pos, end_pos) + "い");
     if (!is_followed_by_te_ta && !is_followed_by_masu && !godan_ta_before_declared_renyokei_aux &&
@@ -289,12 +280,9 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
     // final morae rather than an independent predicate (しまい+ます, not
     // し+まい(まいる)+ます). A case particle behind a kanji host closes that
     // host instead (木+が+かれ, not がかれ).
-    const auto* preceding_particle =
-        start_pos > 1 && dict_manager != nullptr && normalize::isKanjiCodepoint(codepoints[start_pos - 2])
-            ? lookupEntryInRange(*dict_manager, codepoints, start_pos - 1, start_pos, core::PartOfSpeech::Particle)
-            : nullptr;
     const bool follows_case_particle_on_kanji =
-        preceding_particle != nullptr && preceding_particle->extended_pos == core::ExtendedPOS::ParticleCase;
+        start_pos > 1 && normalize::isKanjiCodepoint(codepoints[start_pos - 2]) &&
+        vh::oneMoraParticleEndsAt(dict_manager, codepoints, start_pos, core::ExtendedPOS::ParticleCase);
     if (!is_dict_verb && end_pos - start_pos == 2 && start_pos > 0 && !follows_case_particle_on_kanji &&
         vh::isVerbInDictionary(dict_manager, codepoints, start_pos - 1, end_pos)) {
       continue;
@@ -334,7 +322,7 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
       }
       // Pure hiragana stems with sokuon ending in し are almost always
       // false サ変 patterns (noun+する where noun contains っ)
-      if (stem_surface.find("っ") != std::string::npos) {
+      if (utf8::contains(stem_surface, "っ")) {
         continue;
       }
     }
@@ -343,8 +331,7 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
     // E.g., "してくれ" should be し + て + くれ, not single verb
     //       "してもら" should be し + て + もら, not single verb
     // These patterns contain て-form (して) followed by subsidiary verb stem
-    if (stem_surface.find("てくれ") != std::string::npos || stem_surface.find("てもら") != std::string::npos ||
-        stem_surface.find("てあげ") != std::string::npos) {
+    if (utf8::containsAny(stem_surface, {"てくれ", "てもら", "てあげ"})) {
       continue;
     }
 
@@ -386,7 +373,7 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
     // An e-row stem before し+ます is an ichidan continuative plus する's し
     // (お+つたえ+し+ます), not the godan-sa continuative of a coined verb.
     if (!is_dict_verb && following == "ます" && end_pos >= start_pos + 3 && codepoints[end_pos - 1] == U'し' &&
-        grammar::isERowCodepoint(codepoints[end_pos - 2])) {
+        kana::isERowCodepoint(codepoints[end_pos - 2])) {
       continue;
     }
     // The polite auxiliary completes the renyokei frame for an otherwise
@@ -406,7 +393,7 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
                           << " conf=" << chosen_confidence << (is_dict_verb ? " [dict]" : "") << " cost=" << cost
                           << "\n";
     }
-    const bool is_negative_continuation = utf8::startsWith(following, "ない") || utf8::startsWith(following, "なか");
+    const bool is_negative_continuation = utf8::startsWithAny(following, {"ない", "なか"});
     // A stem after a clear te/de boundary belongs to a subsidiary-verb
     // construction.  Leave that category to its dedicated candidate so an
     // otherwise valid Ichidan reconstruction cannot turn 〜てやらない into a
@@ -447,20 +434,9 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
     // Skip suru-verb negative patterns: しなけれ should be し + なけれ, not single verb
     // Pattern: し + な (negative stem prefix)
     // stem_surface = しなけ → base_form = しなける (false ichidan)
-    bool is_suru_negative_pattern = (stem_surface.size() >= 6 &&  // しな = 6 bytes
-                                     stem_surface.substr(0, 3) == "し" && stem_surface.substr(3, 3) == "な");
-    bool embeds_te_conditional_auxiliary = false;
-    if (is_followed_by_reba && dict_manager != nullptr) {
-      const size_t kateikei_end = end_pos + 1;
-      for (size_t te_pos = start_pos + 1; te_pos + 1 < kateikei_end; ++te_pos) {
-        if (codepoints[te_pos] == core::hiragana::kTe &&
-            lookupEntryInRange(*dict_manager, codepoints, te_pos + 1, kateikei_end, core::PartOfSpeech::Verb) !=
-                nullptr) {
-          embeds_te_conditional_auxiliary = true;
-          break;
-        }
-      }
-    }
+    const bool is_suru_negative_pattern = utf8::startsWith(stem_surface, "しな");
+    const bool embeds_te_conditional_auxiliary =
+        is_followed_by_reba && vh::embedsTeFormVerbCell(dict_manager, codepoints, start_pos, end_pos + 1);
     if (is_followed_by_reba && !is_suru_negative_pattern && !embeds_te_conditional_auxiliary) {
       std::string kateikei_surface = stem_surface + "れ";  // 連用形 + れ = 仮定形
       size_t kateikei_end = end_pos + 1;                   // renyokei + れ

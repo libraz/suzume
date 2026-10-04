@@ -16,6 +16,7 @@
 #include "analysis/verb_candidates_helpers.h"
 #include "analysis/verb_candidates_kanji_internal.h"
 #include "core/debug.h"
+#include "core/kana_constants.h"
 #include "core/utf8_constants.h"
 #include "grammar/auxiliary_generator.h"
 #include "grammar/char_patterns.h"
@@ -95,14 +96,14 @@ bool hasAdjectiveRenyokeiPredicateBoundary(const std::vector<char32_t>& codepoin
       return true;
     }
     const char32_t predicate_ending = codepoints[end_pos - 1];
-    if (grammar::isIRowCodepoint(predicate_ending)) {
+    if (kana::isIRowCodepoint(predicate_ending)) {
       const std::string_view base_suffix = grammar::godanBaseSuffixFromIRow(predicate_ending);
       const std::string predicate_base = normalize::concat(utf8::dropLastChar(predicate_surface), base_suffix);
       if (vh::isVerifiedVerbBase(dict_manager, inflection, predicate_base,
                                  candidate::verb_cost::kConstructedVerbMinConfidence, true)) {
         return true;
       }
-    } else if (grammar::isERowCodepoint(predicate_ending)) {
+    } else if (kana::isERowCodepoint(predicate_ending)) {
       if (vh::isVerifiedVerbBase(dict_manager, inflection, predicate_surface + "る",
                                  candidate::verb_cost::kConstructedVerbMinConfidence, false)) {
         return true;
@@ -120,16 +121,13 @@ bool hasAdjectiveRenyokeiPredicateBoundary(const std::vector<char32_t>& codepoin
 bool hasFinitePredicateCaseParticleTail(const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos,
                                         const grammar::Inflection& inflection,
                                         const dictionary::DictionaryManager* dict_manager) {
-  if (dict_manager == nullptr || end_pos <= start_pos + 1) {
-    return false;
-  }
-  const auto* particle =
-      lookupEntryInRange(*dict_manager, codepoints, end_pos - 1, end_pos, core::PartOfSpeech::Particle);
-  if (particle == nullptr || particle->extended_pos != core::ExtendedPOS::ParticleCase) {
+  if (dict_manager == nullptr || end_pos <= start_pos + 1 ||
+      !vh::oneMoraParticleEndsAt(dict_manager, codepoints, end_pos, core::ExtendedPOS::ParticleCase)) {
     return false;
   }
 
-  const std::string predicate_surface = extractSubstring(codepoints, start_pos, end_pos - 1);
+  const size_t predicate_end = end_pos - 1;
+  const std::string predicate_surface = extractSubstring(codepoints, start_pos, predicate_end);
   if (dict_manager->lookupExact(predicate_surface, core::PartOfSpeech::Verb) != nullptr) {
     return true;
   }
@@ -138,9 +136,8 @@ bool hasFinitePredicateCaseParticleTail(const std::vector<char32_t>& codepoints,
       return true;
     }
   }
-  const auto predicate_codepoints = normalize::toCodepoints(predicate_surface);
-  return predicate_codepoints.size() >= 3 && predicate_codepoints.back() == U'る' &&
-         grammar::isERowCodepoint(predicate_codepoints[predicate_codepoints.size() - 2]);
+  return predicate_end - start_pos >= 3 && codepoints[predicate_end - 1] == U'る' &&
+         kana::isERowCodepoint(codepoints[predicate_end - 2]);
 }
 
 bool hasNominalizedNounParticleContinuation(const std::vector<char32_t>& codepoints, size_t end_pos,
@@ -179,7 +176,7 @@ bool hasCompleteParticleInitialVerbEvidence(const std::vector<char32_t>& codepoi
   const std::string surface = extractSubstring(codepoints, start_pos, hiragana_end);
   const std::string expected_stem = extractSubstring(codepoints, start_pos, kanji_end + 1);
   const bool has_conjunctive_initial =
-      vh::hasConjunctiveParticleDictionaryEntry(dict_manager, normalize::encodeUtf8(codepoints[kanji_end]));
+      vh::oneMoraParticleEndsAt(dict_manager, codepoints, kanji_end + 1, core::ExtendedPOS::ParticleConj);
   for (const auto& candidate : inflection.analyze(surface)) {
     const bool has_mixed_godan_ka_stem = has_conjunctive_initial && candidate.verb_type == grammar::VerbType::GodanKa &&
                                          utf8::startsWith(candidate.stem, expected_stem) &&
@@ -200,10 +197,8 @@ bool hasCompleteParticleInitialVerbEvidence(const std::vector<char32_t>& codepoi
         return true;
       }
     }
-    const float min_confidence = has_mixed_godan_ka_stem ? (utf8::startsWithAny(candidate.suffix, {"いた", "いて"})
-                                                                ? verb_opts.confidence_past_te
-                                                                : verb_opts.confidence_low)
-                                                         : verb_opts.confidence_standard;
+    const float min_confidence =
+        has_mixed_godan_ka_stem ? mixedGodanKaStemThreshold(candidate, verb_opts) : verb_opts.confidence_standard;
     if (candidate.verb_type == grammar::VerbType::IAdjective ||
         (candidate.stem != expected_stem && !has_mixed_godan_ka_stem) || candidate.confidence <= min_confidence) {
       continue;
@@ -388,7 +383,7 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
   bool has_excessive_renyokei_tail = false;
   for (size_t pos = kanji_end + 1; pos + 1 < hiragana_end; ++pos) {
     if (codepoints[pos] == U'す' && codepoints[pos + 1] == U'ぎ' &&
-        (grammar::isIRowCodepoint(codepoints[pos - 1]) || grammar::isERowCodepoint(codepoints[pos - 1]))) {
+        (kana::isIRowCodepoint(codepoints[pos - 1]) || kana::isERowCodepoint(codepoints[pos - 1]))) {
       has_excessive_renyokei_tail = true;
       break;
     }
@@ -396,8 +391,7 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
   bool has_following_renyokei_auxiliary = false;
   if (dict_manager != nullptr && hiragana_end < char_types.size() &&
       char_types[hiragana_end] == normalize::CharType::Kanji && hiragana_end > kanji_end + 1 &&
-      (grammar::isIRowCodepoint(codepoints[hiragana_end - 1]) ||
-       grammar::isERowCodepoint(codepoints[hiragana_end - 1]))) {
+      (kana::isIRowCodepoint(codepoints[hiragana_end - 1]) || kana::isERowCodepoint(codepoints[hiragana_end - 1]))) {
     size_t predicate_end = hiragana_end;
     while (predicate_end < char_types.size() && predicate_end - hiragana_end < 6 &&
            (char_types[predicate_end] == normalize::CharType::Kanji ||
@@ -427,16 +421,9 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
       codepoints, start_pos, kanji_end, hiragana_end, inflection, dict_manager, verb_opts);
   // A one-kanji ichidan stem takes an adjective that attaches to the
   // continuative directly (見+にくい), whose opening mora also spells に.
-  bool has_renyokei_adjective_after_stem = false;
-  if (dict_manager != nullptr && kanji_end == start_pos + 1 && vh::isSingleKanjiIchidan(codepoints[start_pos])) {
-    for (size_t adjective_end = kanji_end + 2; adjective_end <= std::min(codepoints.size(), kanji_end + 4);
-         ++adjective_end) {
-      const auto* adjective =
-          lookupEntryInRange(*dict_manager, codepoints, kanji_end, adjective_end, core::PartOfSpeech::Adjective);
-      has_renyokei_adjective_after_stem = has_renyokei_adjective_after_stem ||
-                                          (adjective != nullptr && grammar::attachesToVerbRenyokei(adjective->lemma));
-    }
-  }
+  const bool has_renyokei_adjective_after_stem = kanji_end == start_pos + 1 &&
+                                                 vh::isSingleKanjiIchidan(codepoints[start_pos]) &&
+                                                 renyokeiAdjectiveFollowsAt(dict_manager, codepoints, kanji_end);
 
   // Historical-kana spelling of the wa-row Godan paradigm (思ふ, 思ひけり,
   // 思へど).  Its row kana は/へ are also the topic and direction particles, so
@@ -460,36 +447,19 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
     // Exception 3: が followed by る is godan-ra verb pattern
     // e.g., 上がる, 下がる, 受かる - these are common godan-ra verbs
     // For patterns like 金がない, the が should remain NOUN + PARTICLE + ADJ
-    bool is_verb_pattern = false;
-    if (grammar::isARowCodepoint(first_hiragana)) {
-      size_t next_pos = kanji_end + 1;
-      if (next_pos < codepoints.size()) {
-        char32_t next_char = codepoints[next_pos];
-        if (next_char == U'れ') {
-          // A-row + れ pattern: could be passive verb stem (言われ, 書かれ, etc.)
-          is_verb_pattern = true;
-        } else if (first_hiragana == U'が') {
-          // が + る/ら/り/っ pattern: could be godan-ra verb (上がる, 下がる, 受かる)
-          // Also handle conjugations: がら(mizenkei), がり(renyokei), がっ(onbin)
-          // が + せ/さ/ず: godan-ga verb mizenkei patterns
-          // E.g., 脱がせる, 脱がさない, 脱がず
-          // が+な: only allow if kanji+ぐ is a known godan-ga verb
-          // E.g., 脱がない (脱ぐ exists) vs 金がない (金ぐ doesn't exist)
-          if (next_char == U'る' || next_char == U'ら' || next_char == U'り' || next_char == U'っ' ||
-              next_char == U'れ' || next_char == U'せ' || next_char == U'さ' || next_char == U'ず') {
-            is_verb_pattern = true;
-          }
-          // が+な: verify kanji+ぐ exists as godan-ga verb in dictionary
-          if (!is_verb_pattern && next_char == U'な' && dict_manager != nullptr) {
-            std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
-            std::string gu_form = kanji_stem + "ぐ";
-            if (vh::isVerbInDictionary(dict_manager, gu_form)) {
-              is_verb_pattern = true;
-            }
-          }
-        }
-      }
-    }
+    // A-row + れ: passive verb stem (言われ, 書かれ). が + る/ら/り/っ: godan-ra
+    // cells (上がる, 下がら, 上がり, 上がっ); が + せ/さ/ず: godan-ga irrealis
+    // (脱がせる, 脱がさない, 脱がず); が + な only when kanji+ぐ is a known
+    // godan-ga verb (脱がない, but 金がない).
+    const char32_t next_char = kanji_end + 1 < codepoints.size() ? codepoints[kanji_end + 1] : 0;
+    const bool is_verb_pattern =
+        kana::isARowCodepoint(first_hiragana) &&
+        (next_char == U'れ' ||
+         (first_hiragana == U'が' &&
+          (next_char == U'る' || next_char == U'ら' || next_char == U'り' || next_char == U'っ' || next_char == U'せ' ||
+           next_char == U'さ' || next_char == U'ず' ||
+           (next_char == U'な' && dict_manager != nullptr &&
+            vh::isVerbInDictionary(dict_manager, extractSubstring(codepoints, start_pos, kanji_end) + "ぐ")))));
     if (!is_verb_pattern) {
       return;  // Not a verb - these particles follow nouns
     }
@@ -522,11 +492,18 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
                                                             << "\" is dict word)\n");
     }
   }
+  // Applied to everything this generator appended, on every exit below.
+  const auto apply_mid_compound_penalty = [&]() {
+    if (mid_compound_penalty != 0.0F) {
+      for (size_t idx = candidate_start; idx < candidates.size(); ++idx) {
+        candidates[idx].cost += mid_compound_penalty;
+      }
+    }
+  };
 
   // Detect a kanji verb renyokei followed by the excessive auxiliary すぎ;
   // 書きすぎる is compositional 書き + すぎる, not a single lexical verb.
   // Pattern: kanji + (き/ぎ/し/ち/に/び/み/り/い) + すぎ...
-  std::string hira_part = extractSubstring(codepoints, kanji_end, hiragana_end);
   size_t sugi_pos = hiragana_end;
   for (size_t pos = kanji_end; pos + 1 < hiragana_end; ++pos) {
     if (codepoints[pos] == U'す' && codepoints[pos + 1] == U'ぎ') {
@@ -545,11 +522,7 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
   // verb generator to absorb; retaining that fallback only fabricates verbs
   // such as 遠すぎる→遠る. The left token's lexical POS remains independent.
   if (is_sugi_pattern && kanji_end == sugi_pos) {
-    if (mid_compound_penalty != 0.0F) {
-      for (size_t idx = candidate_start; idx < candidates.size(); ++idx) {
-        candidates[idx].cost += mid_compound_penalty;
-      }
-    }
+    apply_mid_compound_penalty();
     return;
   }
 
@@ -561,7 +534,7 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
       !hasFinitePredicateCaseParticleTail(codepoints, start_pos, hiragana_end, inflection, dict_manager)) {
     const char32_t ending = codepoints[hiragana_end - 1];
     const std::string surface = extractSubstring(codepoints, start_pos, hiragana_end);
-    if (grammar::isIRowCodepoint(ending)) {
+    if (kana::isIRowCodepoint(ending)) {
       const std::string_view base_suffix = grammar::godanBaseSuffixFromIRow(ending);
       if (!base_suffix.empty()) {
         const std::string base_form = normalize::concat(utf8::dropLastChar(surface), base_suffix);
@@ -572,13 +545,13 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
                                                candidate::verb_cost::kConstructedVerbMinConfidence,
                                                "extended_okurigana_renyokei", core::ExtendedPOS::VerbRenyokei));
       }
-    } else if (grammar::isERowCodepoint(ending)) {
+    } else if (kana::isERowCodepoint(ending)) {
       // A span whose okurigana closes on the voice auxiliary (a-row + れ) is a
       // verb plus its passive, not a longer lexical V1: 使わ+れ+始める, never
       // 使われ+始める. A dictionary headword spelled the same way (生まれる)
       // keeps the whole span, which is what tells the two apart.
       const bool ends_on_passive = ending == U'れ' && hiragana_end >= kanji_end + 2 &&
-                                   grammar::isARowCodepoint(codepoints[hiragana_end - 2]) &&
+                                   kana::isARowCodepoint(codepoints[hiragana_end - 2]) &&
                                    !vh::isVerbInDictionary(dict_manager, surface + "る");
       if (!ends_on_passive) {
         candidates.push_back(makeVerbCandidate(surface, start_pos, hiragana_end, candidate::verb_cost::kStrongBonus,
@@ -597,10 +570,10 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
   //       食べすぎた → 食べ (renyokei of 食べる) + すぎ + た (Ichidan)
   if (is_sugi_pattern && kanji_end < sugi_pos) {
     const char32_t renyokei_ending = codepoints[sugi_pos - 1];
-    const bool is_godan = grammar::isIRowCodepoint(renyokei_ending);
+    const bool is_godan = kana::isIRowCodepoint(renyokei_ending);
     const grammar::VerbType verb_type = is_godan ? grammar::verbTypeFromIRowCodepoint(renyokei_ending)
-                                        : grammar::isERowCodepoint(renyokei_ending) ? grammar::VerbType::Ichidan
-                                                                                    : grammar::VerbType::Unknown;
+                                        : kana::isERowCodepoint(renyokei_ending) ? grammar::VerbType::Ichidan
+                                                                                 : grammar::VerbType::Unknown;
     const std::string_view godan_suffix = is_godan ? grammar::godanBaseSuffixFromIRow(renyokei_ending) : "";
     if (verb_type != grammar::VerbType::Unknown && (!is_godan || !godan_suffix.empty())) {
       const std::string surface = extractSubstring(codepoints, start_pos, sugi_pos);
@@ -635,11 +608,7 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
 
     // Early return to skip generating full verb forms containing すぎ
     // Prefer the grammatical renyokei + すぎ + auxiliary path.
-    if (mid_compound_penalty != 0.0F) {
-      for (size_t idx = candidate_start; idx < candidates.size(); ++idx) {
-        candidates[idx].cost += mid_compound_penalty;
-      }
-    }
+    apply_mid_compound_penalty();
     return;
   }
 
@@ -712,8 +681,8 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
     // A deverbal noun is the bare continuative, which ends in an i/e-row kana
     // or the kanji stem; a span closing on an auxiliary (行か+ず) is not one.
     const char32_t final_char = codepoints[cand.end - 1];
-    const bool ends_in_continuative = normalize::isKanjiCodepoint(final_char) || grammar::isIRowCodepoint(final_char) ||
-                                      grammar::isERowCodepoint(final_char);
+    const bool ends_in_continuative = normalize::isKanjiCodepoint(final_char) || kana::isIRowCodepoint(final_char) ||
+                                      kana::isERowCodepoint(final_char);
     if (!ends_in_continuative || cand.pos != core::PartOfSpeech::Verb ||
         cand.origin != core::CandidateOrigin::VerbKanji || cand.extended_pos != core::ExtendedPOS::VerbRenyokei ||
         (!cand.lemma_verified && cand.conj_type != dictionary::ConjugationType::GodanSa) || starts_inside_kanji_run ||
@@ -789,17 +758,10 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
     }
   }
 
-  // Apply mid-kanji-run dictionary compound penalty (see comment above)
-  if (mid_compound_penalty != 0.0F) {
-    for (size_t idx = candidate_start; idx < candidates.size(); ++idx) {
-      candidates[idx].cost += mid_compound_penalty;
-    }
-  }
+  apply_mid_compound_penalty();
 
   // Sort by cost and return best candidates
   vh::sortCandidatesByCost(candidates, candidate_start);
-
-  return;
 }
 
 }  // namespace suzume::analysis

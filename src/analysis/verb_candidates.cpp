@@ -79,9 +79,6 @@ void generateCompoundVerbCandidates(const std::vector<char32_t>& codepoints, siz
   // Try different ending lengths
   for (size_t end_pos = hira2_end; end_pos > kanji2_end; --end_pos) {
     std::string surface = extractSubstring(codepoints, start_pos, end_pos);
-    if (surface.empty()) {
-      continue;
-    }
 
     // Keep a verb stem and the politeness auxiliary ます separate.
     // e.g., 申し上げます → 申し上げ + ます
@@ -233,10 +230,6 @@ void generateKatakanaVerbCandidates(const std::vector<char32_t>& codepoints, siz
   // Try different ending lengths, starting from longest
   for (size_t end_pos = hira_end; !starts_quotative_tte && end_pos > kata_end; --end_pos) {
     std::string surface = extractSubstring(codepoints, start_pos, end_pos);
-
-    if (surface.empty()) {
-      continue;
-    }
 
     // Check if this looks like a conjugated verb using inflection analyzer
     auto best = inflection.getBest(surface);

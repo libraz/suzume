@@ -13,6 +13,7 @@
 #include "analysis/verb_candidates_helpers.h"
 #include "analysis/verb_candidates_kanji_internal.h"
 #include "core/debug.h"
+#include "core/kana_constants.h"
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
@@ -27,6 +28,16 @@
 
 namespace suzume::analysis::kanji_verb_detail {
 namespace vh = verb_helpers;
+
+namespace {
+
+// The ichidan passive/potential られ followed by a complete auxiliary cell.
+bool rarePassiveFollowsAt(const std::vector<char32_t>& codepoints, size_t pos) {
+  return pos + 1 < codepoints.size() && codepoints[pos] == U'ら' && codepoints[pos + 1] == U'れ' &&
+         vh::isPassiveAuxContinuation(codepoints, pos + 2, /*strict_masu=*/true);
+}
+
+}  // namespace
 
 float getIchidanConfidence(const std::vector<grammar::InflectionCandidate>& candidates, float min_threshold) {
   float best = candidate::kNoConfidence;
@@ -59,7 +70,7 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
     char32_t first_hira = codepoints[kanji_end];
     // E-row hiragana: え, け, せ, て, ね, へ, め, れ, げ, ぜ, で, べ, ぺ
     // I-row hiragana: い, き, し, ち, に, ひ, み, り, ぎ, じ, ぢ, び, ぴ
-    if (grammar::isERowCodepoint(first_hira) || grammar::isIRowCodepoint(first_hira)) {
+    if (kana::isERowCodepoint(first_hira) || kana::isIRowCodepoint(first_hira)) {
       // Skip hiragana commonly used as particles after single kanji
       // で (te-form/particle), に (particle), へ (particle) are rarely Ichidan stem endings
       // These almost always represent kanji + particle (雨で→雨+で, 本に→本+に)
@@ -98,10 +109,8 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
         // causative auxiliary (聞か+せ, 読ま+せ).  Only non-A-row stems use
         // that evidence to recover an Ichidan lexical stem.
         const bool causative_follows =
-            vh::causativeSaseFollowsAt(codepoints, renyokei_end) && !grammar::isARowCodepoint(first_hira);
-        const bool passive_follows = renyokei_end + 1 < codepoints.size() && codepoints[renyokei_end] == U'ら' &&
-                                     codepoints[renyokei_end + 1] == U'れ' &&
-                                     vh::isPassiveAuxContinuation(codepoints, renyokei_end + 2, /*strict_masu=*/true);
+            vh::causativeSaseFollowsAt(codepoints, renyokei_end) && !kana::isARowCodepoint(first_hira);
+        const bool passive_follows = rarePassiveFollowsAt(codepoints, renyokei_end);
         // Skip if there's a suru-verb or godan-verb candidate with higher confidence
         // e.g., 勉強し has suru conf=0.82 vs ichidan conf=0.3 - prefer suru
         // e.g., 走り has godan conf=0.61 vs ichidan conf=0.3 - prefer godan
@@ -112,11 +121,8 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
         const char32_t continuation = renyokei_end < codepoints.size() ? codepoints[renyokei_end] : U'\0';
         const bool negative_aux_follows =
             continuation == U'な' && renyokei_end + 1 < codepoints.size() && codepoints[renyokei_end + 1] == U'い';
-        const bool follows_topic_particle = start_pos > 0 && dict_manager != nullptr && [&] {
-          const auto* preceding =
-              lookupEntryInRange(*dict_manager, codepoints, start_pos - 1, start_pos, core::PartOfSpeech::Particle);
-          return preceding != nullptr && preceding->extended_pos == core::ExtendedPOS::ParticleTopic;
-        }();
+        const bool follows_topic_particle =
+            vh::oneMoraParticleEndsAt(dict_manager, codepoints, start_pos, core::ExtendedPOS::ParticleTopic);
         const bool follows_quotative_determiner =
             negative_aux_follows && renyokei_end + 5 <= codepoints.size() && dict_manager != nullptr &&
             lookupEntryInRange(*dict_manager, codepoints, renyokei_end + 2, renyokei_end + 5,
@@ -306,12 +312,9 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
         // only in conjugation contexts: renyokei + た/て or mizenkei + られ/させ.
         // Elsewhere (predicate/attributive use: 力が強い, 強い風) the adjective
         // reading is correct, so skip the verb candidate.
-        bool adj_homograph_blocked = false;
-        if (vh::isAdjectiveInDictionary(dict_manager, surface)) {
-          char32_t next_cp = (renyokei_end < codepoints.size()) ? codepoints[renyokei_end] : U'\0';
-          adj_homograph_blocked = !(next_cp == U'た' || next_cp == U'て' || next_cp == U'ら' || next_cp == U'さ' ||
-                                    next_cp == U'る' || next_cp == U'れ');
-        }
+        const bool adj_homograph_blocked = vh::isAdjectiveInDictionary(dict_manager, surface) &&
+                                           !(continuation == U'た' || continuation == U'て' || continuation == U'ら' ||
+                                             continuation == U'さ' || continuation == U'る' || continuation == U'れ');
         // A bare, unverified multi-kanji Ichidan continuative immediately
         // before a closed temporal nominal is itself a deverbal temporal noun
         // (夜明け+前, 夕暮れ+どき), not evidence for a fabricated predicate such
@@ -395,7 +398,7 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
       char32_t first_hira = codepoints[kanji_end];
       char32_t second_hira = codepoints[kanji_end + 1];
       size_t renyokei_end = kanji_end + 2;
-      bool first_is_single_stem_ending = grammar::isERowCodepoint(first_hira) || grammar::isIRowCodepoint(first_hira);
+      bool first_is_single_stem_ending = kana::isERowCodepoint(first_hira) || kana::isIRowCodepoint(first_hira);
       size_t following_kanji_end = renyokei_end;
       while (following_kanji_end < codepoints.size() && normalize::isKanjiCodepoint(codepoints[following_kanji_end])) {
         ++following_kanji_end;
@@ -405,12 +408,8 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
           codepoints[following_kanji_end] == U'す' && codepoints[following_kanji_end + 1] == U'る';
       // The object marker in front of the stem is what makes it the head of its
       // own clause rather than the first half of a compound verb.
-      bool preceded_by_case_particle = false;
-      if (start_pos > 0 && dict_manager != nullptr) {
-        const auto* preceding =
-            lookupEntryInRange(*dict_manager, codepoints, start_pos - 1, start_pos, core::PartOfSpeech::Particle);
-        preceded_by_case_particle = preceding != nullptr && preceding->extended_pos == core::ExtendedPOS::ParticleCase;
-      }
+      const bool preceded_by_case_particle =
+          vh::oneMoraParticleEndsAt(dict_manager, codepoints, start_pos, core::ExtendedPOS::ParticleCase);
       // A bare continuative also chains straight into the predicate that follows
       // it (計画を+踏まえ+進める), and the サ変 probe above recognizes only one
       // lexical class of predicate. Accept the following kanji run whenever it
@@ -439,9 +438,7 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
         }
       }
       const bool causative_follows = vh::causativeSaseFollowsAt(codepoints, renyokei_end);
-      const bool passive_follows = renyokei_end + 1 < codepoints.size() && codepoints[renyokei_end] == U'ら' &&
-                                   codepoints[renyokei_end + 1] == U'れ' &&
-                                   vh::isPassiveAuxContinuation(codepoints, renyokei_end + 2, /*strict_masu=*/true);
+      const bool passive_follows = rarePassiveFollowsAt(codepoints, renyokei_end);
       const bool classical_negative_follows =
           renyokei_end < codepoints.size() && (codepoints[renyokei_end] == U'ず' || codepoints[renyokei_end] == U'ぬ');
       const bool follows_symbol_after_case_particle =
@@ -458,7 +455,7 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
            follows_kanji_sahen_predicate || follows_kanji_predicate || causative_follows || passive_follows ||
            follows_symbol_after_case_particle);
       if (!first_is_single_stem_ending && has_ichidan_continuation &&
-          (grammar::isERowCodepoint(second_hira) || grammar::isIRowCodepoint(second_hira))) {
+          (kana::isERowCodepoint(second_hira) || kana::isIRowCodepoint(second_hira))) {
         std::string surface = extractSubstring(codepoints, start_pos, renyokei_end);
         const auto& all_cands = inflection.analyze(surface);
         vh::VerbClassBests bests = vh::bestByVerbClass(all_cands);
@@ -480,7 +477,7 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
         // stem (読ま+せる, 読ま+れる). Keep a genuinely lexicalized Ichidan
         // verb such as 泳がせる, but do not generate an unverified long
         // Ichidan candidate that absorbs a causative or passive chain.
-        bool is_unverified_godan_voice = grammar::isARowCodepoint(first_hira) &&
+        bool is_unverified_godan_voice = kana::isARowCodepoint(first_hira) &&
                                          (second_hira == U'せ' || second_hira == U'れ') &&
                                          !vh::isVerbInDictionary(dict_manager, ichidan_cand.base_form);
         if (!prefer_suru && !prefer_godan && !is_nai_adjective_okurigana && !is_unverified_godan_voice &&
@@ -621,8 +618,7 @@ void appendGodanSaRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
           // and 本+とした without suppressing real stems such as 話し or 尽くし.
           if (hira_chars == 2 && renyokei_end < codepoints.size() &&
               (codepoints[renyokei_end] == U'て' || codepoints[renyokei_end] == U'た') &&
-              vh::hasCaseParticleDictionaryEntry(dict_manager,
-                                                 extractSubstring(codepoints, kanji_end, kanji_end + 1))) {
+              vh::oneMoraParticleEndsAt(dict_manager, codepoints, kanji_end + 1, core::ExtendedPOS::ParticleCase)) {
             SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" godan_sa case-particle+する pattern\n");
             continue;
           }
@@ -666,7 +662,7 @@ void appendGodanSaRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
             // e-row (ichidan) renyokei vowel before し means the godan-sa base
             // (待ちす/伝えす) is fabricated and would glue the humble form.
             char32_t before_shi = codepoints[renyokei_end - 2];
-            if ((grammar::isIRowCodepoint(before_shi) || grammar::isERowCodepoint(before_shi)) &&
+            if ((kana::isIRowCodepoint(before_shi) || kana::isERowCodepoint(before_shi)) &&
                 renyokei_end < codepoints.size() && vh::isSuruAuxiliaryStarter(codepoints[renyokei_end])) {
               SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" godan_sa verb-renyokei+し+する-aux pattern\n");
               continue;

@@ -85,6 +85,18 @@ bool hasAttestedDeverbalNominalization(const grammar::InflectionCandidate& candi
 
 }  // namespace
 
+float mixedGodanKaStemThreshold(const grammar::InflectionCandidate& candidate, const VerbCandidateOptions& verb_opts) {
+  return utf8::startsWithAny(candidate.suffix, {"いた", "いて"}) ? verb_opts.confidence_past_te
+                                                                 : verb_opts.confidence_low;
+}
+
+bool isMultiKanjiGodanWaRenyokei(const grammar::InflectionCandidate& candidate, std::string_view surface,
+                                 const std::vector<char32_t>& codepoints, size_t end_pos) {
+  return candidate.verb_type == grammar::VerbType::GodanWa && utf8::endsWith(surface, "い") &&
+         normalize::utf8Length(candidate.stem) >= 2 && end_pos < codepoints.size() &&
+         normalize::isKanjiCodepoint(codepoints[end_pos]);
+}
+
 void appendAnalyzedKanjiVerbCandidates(const std::vector<char32_t>& codepoints, size_t start_pos, size_t kanji_end,
                                        size_t hiragana_end, const grammar::Inflection& inflection,
                                        const dictionary::DictionaryManager* dict_manager,
@@ -97,7 +109,7 @@ void appendAnalyzedKanjiVerbCandidates(const std::vector<char32_t>& codepoints, 
   const bool follows_reduplicated_noun = start_pos >= 2 && normalize::isIterationMark(codepoints[start_pos - 1]) &&
                                          normalize::isKanjiCodepoint(codepoints[start_pos - 2]);
   const bool has_conjunctive_initial =
-      vh::hasConjunctiveParticleDictionaryEntry(dict_manager, normalize::encodeUtf8(codepoints[kanji_end]));
+      vh::oneMoraParticleEndsAt(dict_manager, codepoints, kanji_end + 1, core::ExtendedPOS::ParticleConj);
 
   // Try different stem lengths. Most verbs use a kanji-only stem, while
   // ichidan verbs add one hiragana and productive mixed-script k-row stems can
@@ -106,10 +118,6 @@ void appendAnalyzedKanjiVerbCandidates(const std::vector<char32_t>& codepoints, 
     // Try different ending lengths, starting from longest
     for (size_t end_pos = hiragana_end; end_pos > stem_end; --end_pos) {
       std::string surface = extractSubstring(codepoints, start_pos, end_pos);
-
-      if (surface.empty()) {
-        continue;
-      }
 
       // Check for particle/copula patterns that should NOT be treated as verbs
       // Kanji + particle or copula (で, に, を, が, は, も, へ, と, や, か, の, etc.)
@@ -198,19 +206,14 @@ void appendAnalyzedKanjiVerbCandidates(const std::vector<char32_t>& codepoints, 
       // Skip patterns that end with particles (noun renyokei + particle)
       // e.g., 切りに (切り + に), 飲みに (飲み + に), 行きに (行き + に)
       // These are nominalized verb stems followed by particles, not verb forms
-      size_t hp_size = hiragana_part.size();
-      if (hp_size >= core::kTwoJapaneseCharBytes) {  // At least 2 hiragana
-        // Get last hiragana character (particle candidate)
-        char32_t last_char = codepoints[end_pos - 1];
-        if (normalize::isParticleCodepoint(last_char)) {
-          // Check if the preceding part could be a valid verb renyokei
-          // Renyokei typically ends in い/り/き/ぎ/し/み/び/ち/に
-          char32_t second_last_char = codepoints[end_pos - 2];
-          if (second_last_char == U'い' || second_last_char == U'り' || second_last_char == U'き' ||
-              second_last_char == U'ぎ' || second_last_char == U'し' || second_last_char == U'み' ||
-              second_last_char == U'び' || second_last_char == U'ち') {
-            continue;  // Skip - likely nominalized noun + particle
-          }
+      // Renyokei typically ends in い/り/き/ぎ/し/み/び/ち before the particle.
+      if (hiragana_part.size() >= core::kTwoJapaneseCharBytes &&
+          normalize::isParticleCodepoint(codepoints[end_pos - 1])) {
+        const char32_t second_last_char = codepoints[end_pos - 2];
+        if (second_last_char == U'い' || second_last_char == U'り' || second_last_char == U'き' ||
+            second_last_char == U'ぎ' || second_last_char == U'し' || second_last_char == U'み' ||
+            second_last_char == U'び' || second_last_char == U'ち') {
+          continue;  // Skip - likely nominalized noun + particle
         }
       }
 
@@ -243,17 +246,10 @@ void appendAnalyzedKanjiVerbCandidates(const std::vector<char32_t>& codepoints, 
         bool is_i_row_ichidan = cand.verb_type == grammar::VerbType::Ichidan && vh::isValidIRowIchidanStem(cand.stem);
         const bool has_mixed_godan_ka_stem =
             has_conjunctive_initial && stem_end > kanji_end + 1 && cand.verb_type == grammar::VerbType::GodanKa;
-        float conf_threshold = (is_i_row_ichidan || sokuonbin_stem_verified)
-                                   ? verb_opts.confidence_ichidan_dict
-                                   : (has_mixed_godan_ka_stem ? (utf8::startsWith(cand.suffix, "いた") ||
-                                                                         utf8::startsWith(cand.suffix, "いて")
-                                                                     ? verb_opts.confidence_past_te
-                                                                     : verb_opts.confidence_low)
-                                                              : verb_opts.confidence_standard);
-        bool is_multi_kanji_godan_wa_renyokei = cand.verb_type == grammar::VerbType::GodanWa &&
-                                                utf8::endsWith(surface, "い") &&
-                                                normalize::utf8Length(cand.stem) >= 2 && end_pos < codepoints.size() &&
-                                                normalize::isKanjiCodepoint(codepoints[end_pos]);
+        const float conf_threshold = (is_i_row_ichidan || sokuonbin_stem_verified) ? verb_opts.confidence_ichidan_dict
+                                     : has_mixed_godan_ka_stem ? mixedGodanKaStemThreshold(cand, verb_opts)
+                                                               : verb_opts.confidence_standard;
+        const bool is_multi_kanji_godan_wa_renyokei = isMultiKanjiGodanWaRenyokei(cand, surface, codepoints, end_pos);
         if (cand.stem == expected_stem && (stem_end <= kanji_end + 1 || has_mixed_godan_ka_stem) &&
             (cand.confidence > conf_threshold ||
              (follows_reduplicated_noun && cand.confidence >= verb_opts.confidence_ichidan_dict) ||
@@ -263,13 +259,9 @@ void appendAnalyzedKanjiVerbCandidates(const std::vector<char32_t>& codepoints, 
           // verb. The lookup is by surface, so disambiguation among っ-onbin types
           // (GodanRa/Ta/Wa/Ka) comes from each candidate carrying its own base_form
           // (e.g. 経る vs 経つ), not from a type-aware lookup.
-          bool in_dict = vh::isVerbInDictionary(dict_manager, cand.base_form);
-
-          if (in_dict) {
-            // Prefer dictionary-verified candidates
-            if (cand.confidence > dict_verified_best.confidence) {
-              dict_verified_best = cand;
-            }
+          // Prefer dictionary-verified candidates
+          if (vh::isVerbInDictionary(dict_manager, cand.base_form) && cand.confidence > dict_verified_best.confidence) {
+            dict_verified_best = cand;
           }
           if (cand.confidence > best.confidence) {
             best = cand;

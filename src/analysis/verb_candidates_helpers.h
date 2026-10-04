@@ -195,9 +195,9 @@ bool hasParticleDictionaryEntry(const dictionary::DictionaryManager* dict_manage
 // noun+case-particle+する guard.
 bool hasCaseParticleDictionaryEntry(const dictionary::DictionaryManager* dict_manager, std::string_view surface);
 
-// Exact one-token conjunctive-particle lookup. Used when a particle-homographic
-// mora is licensed inside a longer, fully inflected lexical stem.
-bool hasConjunctiveParticleDictionaryEntry(const dictionary::DictionaryManager* dict_manager, std::string_view surface);
+// True when the mora ending at @p pos is a one-mora particle of @p particle_pos.
+bool oneMoraParticleEndsAt(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
+                           size_t pos, core::ExtendedPOS particle_pos);
 
 // True when a complete case-particle entry ends exactly at @p pos.
 bool followsCaseParticle(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
@@ -682,6 +682,15 @@ bool embedsTeFormMiruAuxiliary(const std::vector<char32_t>& codepoints, size_t s
  */
 bool embedsAuxiliaryOnOnbinStem(const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos,
                                 const dictionary::DictionaryManager* dict_manager);
+
+/**
+ * @brief True when an internal て opens a dictionary verb cell ending at @p end_pos.
+ *
+ * A conditional cell built on a te-form subsidiary (やって+みれ+ば) is the
+ * te-form plus that verb, never one conditional stem.
+ */
+bool embedsTeFormVerbCell(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
+                          size_t start_pos, size_t end_pos);
 
 /**
  * @brief True when a dictionary auxiliary accepted by @p accept starts at @p pos.

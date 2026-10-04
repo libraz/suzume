@@ -13,6 +13,7 @@
 #include "analysis/verb_candidates_helpers.h"
 #include "analysis/verb_candidates_kanji_internal.h"
 #include "core/debug.h"
+#include "core/kana_constants.h"
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
@@ -176,7 +177,6 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
         // Uses centralized GodanRow data instead of manual enumeration
         std::string_view onbin_str = is_hatsuonbin ? "ん" : (is_ikuon ? "い" : "う");
         const auto& candidates_to_try = vh::getGodanTypesByOnbin(onbin_str);
-        // Get the kanji stem
         // First, check dictionary for ALL verb types before falling back to inflection
         // This ensures dictionary-verified verbs take precedence
         // Phase 1: Dictionary check
@@ -219,180 +219,174 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
   //       買って → 買っ (onbin of 買う) + て (particle)
   // Key patterns:
   // - kanji + っ + て/た/たら/たり: GodanRa/GodanTa/GodanWa verbs
-  if (kanji_end < hiragana_end) {
-    char32_t first_hira = codepoints[kanji_end];
-    // Check for sokuonbin (っ) pattern
-    if (first_hira == U'っ' && kanji_end + 1 < hiragana_end) {
-      char32_t next_char = codepoints[kanji_end + 1];
-      // Basic te/ta form patterns (て, た, たら, たり), ちゃう (ち), and とく (と) contractions
-      bool is_te_ta_pattern = (next_char == U'て' || next_char == U'た' || next_char == U'ち' || next_char == U'と');
-      if (is_te_ta_pattern) {
-        const auto& sokuonbin_types = vh::getGodanTypesByOnbin("っ");
-        // A dictionary base for the stem in any sokuonbin row (行く is the only
-        // GodanKa one, so 書く cannot license 書っ)
-        auto dict_match = vh::firstGodanOnbinDictBase(dict_manager, kanji_stem, "っ");
-        grammar::VerbType matched_verb_type = dict_match.verb_type;
-        std::string matched_base_form = std::move(dict_match.base_form);
-        bool matched_via_dict = dict_match.matched;
-        // Sokuonbin compound (突っ走る) whose stem was verified via its embedded verb:
-        // the compound itself is absent from the dictionary, so emit the onbin stem
-        // (突っ走っ) here with the embedded verb's type/base so た/て split off exactly
-        // like a plain verb (走った → 走っ + た), rather than the whole form winning.
-        if (matched_verb_type == grammar::VerbType::Unknown && sokuonbin_stem_verified &&
-            sokuonbin_verb_type != grammar::VerbType::Unknown && !sokuonbin_lemma.empty()) {
-          matched_verb_type = sokuonbin_verb_type;
-          matched_base_form = sokuonbin_lemma;
-          matched_via_dict = true;
-        }
-        // Phase 2: Inflection analysis fallback
-        // Try progressively shorter surfaces to handle cases where hiragana_end
-        // includes particles (e.g., "使っているが" vs "使っている")
-        // Skip if kanji stem starts with a dictionary noun (e.g., 昨日買っ → skip)
-        // This prevents false compound verb candidates like "昨日買う"
-        bool starts_with_dict_noun = false;
-        bool remainder_is_dict_verb = false;
-        const bool te_continuation_follows = vh::contractedTeContinuationFollowsAt(codepoints, kanji_end + 2);
-        // A whole stem that is itself a dictionary noun before a contracted
-        // te-continuation is a denominal verb (事故っ+てる), not a noun+verb.
-        const bool denominal_stem =
-            te_continuation_follows && dict_manager != nullptr && vh::isNounInDictionary(dict_manager, kanji_stem);
-        if (dict_manager != nullptr && kanji_end - start_pos >= 2 && !denominal_stem) {
-          // Check if any prefix of kanji_stem is a dictionary noun
-          for (size_t prefix_len = 1; prefix_len < kanji_end - start_pos; ++prefix_len) {
-            std::string prefix = extractSubstring(codepoints, start_pos, start_pos + prefix_len);
-            if (verb_helpers::isNounInDictionary(dict_manager, prefix)) {
-              starts_with_dict_noun = true;
-              SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << kanji_stem << "\" starts with dict noun \"" << prefix
-                                                        << "\"\n");
-              break;
-            }
-          }
-          // Also check: if removing single-kanji prefix leaves a valid dict verb
-          // E.g., 本買う → 本 + 買う, where 買う is a dict verb
-          // This handles patterns like 本買った, 服買った, 車買った
-          if (!starts_with_dict_noun && kanji_end - start_pos == 2) {
-            // Get the second kanji + verb ending
-            std::string remainder_stem = extractSubstring(codepoints, start_pos + 1, kanji_end);
-            const auto remainder_match = vh::firstGodanOnbinDictBase(dict_manager, remainder_stem, "っ");
-            remainder_is_dict_verb = remainder_match.matched;
-            if (remainder_is_dict_verb) {
-              SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << kanji_stem << "\" remainder \"" << remainder_match.base_form
-                                                        << "\" is dict verb\n");
-            }
-          }
-        }
-        if (matched_verb_type == grammar::VerbType::Unknown && !starts_with_dict_noun && !remainder_is_dict_verb) {
-          // A one-kanji stem picked out of the middle of a dictionary word
-          // splits that word and invents a verb from its tail (事故った as
-          // 事 + 故る). Only the analyzer's guess licenses this branch, so it is
-          // no evidence against a registered headword.
-          if (kanji_stem.size() == core::kJapaneseCharBytes &&
-              !vh::splitsDictionaryKanjiWord(dict_manager, codepoints, start_pos, kanji_end)) {
-            // Single-kanji stem: use inflection analysis of the longer surface
-            // (kanji + っ + following chars) to find verb type.
-            // Common verbs like 残る, 立つ, 打つ may not be in L2 dictionary.
-            // Try surfaces of increasing length to get inflection result.
-            for (size_t try_end = kanji_end + 2; try_end <= codepoints.size() && try_end <= kanji_end + 4; ++try_end) {
-              auto infl_result = analysesInRange(inflection, codepoints, start_pos, try_end);
-              if (!infl_result.empty()) {
-                const auto& best = infl_result[0];
-                if (best.confidence >= 0.6F) {
-                  for (const auto& [verb_type, base_suffix] : sokuonbin_types) {
-                    if (best.verb_type == verb_type) {
-                      matched_verb_type = verb_type;
-                      matched_base_form = normalize::concat(kanji_stem, base_suffix);
-                      SUZUME_DEBUG_LOG_VERBOSE("[VERB_CAND] \"" << kanji_stem << "\" single-kanji sokuonbin → "
-                                                                << matched_base_form
-                                                                << " (infl, conf=" << best.confidence << ")\n");
-                      break;
-                    }
-                  }
-                  if (matched_verb_type != grammar::VerbType::Unknown)
-                    break;
-                }
-              }
-            }
-          } else if (denominal_stem) {
-            // A denominal verb is godan-ra throughout (事故る, 沼る), so the row
-            // needs no analysis once the noun and the te-continuation attest it.
-            matched_verb_type = grammar::VerbType::GodanRa;
-            matched_base_form = normalize::concat(kanji_stem, "る");
-          } else {
-            SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << kanji_stem << "\" skip non-dict sokuonbin\n");
-          }
-        }
-
-        // A multi-kanji stem can itself be an unregistered open-class verb.
-        // A dictionary noun prefix alone is not proof of a boundary (戸 is a
-        // noun but 戸惑う is one predicate); the decisive counter-evidence is
-        // a dictionary verb in the remainder, as in 本+買った.  When no such
-        // remainder exists, admit only an exact full-form inflection match and
-        // keep it unverified/neutral so stronger lexical boundaries still win.
-        if (matched_verb_type == grammar::VerbType::Unknown && kanji_end > start_pos + 1 && !remainder_is_dict_verb) {
-          const std::string full_surface = extractSubstring(codepoints, start_pos, hiragana_end);
-          const OnbinInflMatch infl = bestOnbinInflMatch(inflection, full_surface, kanji_stem, sokuonbin_types);
-          if (infl.type != grammar::VerbType::Unknown) {
-            matched_verb_type = infl.type;
-            matched_base_form = infl.base_form;
-          }
-        }
-
-        // A non-dictionary sokuonbin candidate that begins inside a kanji run
-        // must not take its っ from the head of a dictionary particle. The run
-        // is a compound nominal that the particle marks (資料 + って, 確認 +
-        // って), so the fabricated predicate splits the nominal and steals the
-        // particle's first mora in one move (資 + 料っ + て). A dictionary-backed
-        // base keeps its ordinary te-form reading (見 + 合って).
-        // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
-        // A stem that is itself a dictionary nominal (猫, 君) is the host the
-        // particle marks (猫+って+かわいい) unless a te-continuation follows
-        // the て, which is what a denominal verb looks like (沼っ+てる).
-        bool sokuon_heads_dictionary_particle = false;
-        const bool stem_is_dictionary_nominal =
-            dict_manager != nullptr && (dict_manager->lookupExact(kanji_stem, core::PartOfSpeech::Noun) != nullptr ||
-                                        dict_manager->lookupExact(kanji_stem, core::PartOfSpeech::Pronoun) != nullptr);
-        const bool kanji_on_left = start_pos > 0 && normalize::isKanjiCodepoint(codepoints[start_pos - 1]) &&
-                                   !followsQuantityHead(codepoints, start_pos);
-        if (!matched_via_dict && dict_manager != nullptr &&
-            (kanji_on_left || (stem_is_dictionary_nominal && !te_continuation_follows)) &&
-            kanji_end + 1 < codepoints.size()) {
-          constexpr size_t kParticleProbe = 3;
-          const size_t max_particle_end = std::min(codepoints.size(), kanji_end + kParticleProbe);
-          for (size_t particle_end = kanji_end + 2; particle_end <= max_particle_end; ++particle_end) {
-            if (lookupEntryInRange(*dict_manager, codepoints, kanji_end, particle_end, core::PartOfSpeech::Particle) !=
-                nullptr) {
-              sokuon_heads_dictionary_particle = true;
-              SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << kanji_stem << "\" sokuon heads a dictionary particle\n");
-              break;
-            }
-          }
-        }
-
-        if (matched_verb_type != grammar::VerbType::Unknown && !sokuon_heads_dictionary_particle) {
-          // Found valid verb - generate sokuonbin stem candidate
-          // Dict-matched verbs get bonus (-0.5) to beat unsplit forms
-          // Inflection-only matches get neutral cost (0) to avoid false positives
-          // like 像っ (from 像る which is not a real verb)
-          std::string onbin_surface = extractSubstring(codepoints, start_pos, kanji_end + 1);
-          // Dict-matched verbs get bonus (-0.5) to beat unsplit forms
-          // Inflection-only matches (2-kanji stems only) get neutral cost
-          const float sokuonbin_cost = matched_via_dict ? candidate::verb_cost::kStandardBonus : bigram_cost::kNeutral;
-          SUZUME_DEBUG_VERBOSE_BLOCK {
-            SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface << " kanji_sokuonbin lemma=" << matched_base_form
-                                << " cost=" << sokuonbin_cost << (matched_via_dict ? " (dict)" : " (infl)") << "\n";
-          }
-          auto candidate =
-              makeVerbCandidate(onbin_surface, start_pos, kanji_end + 1, sokuonbin_cost, matched_base_form,
-                                grammar::verbTypeToConjType(matched_verb_type), true, CandidateOrigin::VerbKanji,
-                                candidate::kHighOriginConfidence, "kanji_sokuonbin", core::ExtendedPOS::VerbOnbinkei);
-          // The non-dictionary fallback reaches here only for a one-kanji
-          // stem whose complete sokuonbin form was validated by inflection.
-          // Preserve that evidence, as the extended and te-auxiliary paths do,
-          // so an ordinary verb does not lose to a fabricated noun boundary.
-          candidate.lemma_verified = matched_via_dict || kanji_end == start_pos + 1;
-          candidates.push_back(std::move(candidate));
+  // - the ちゃう (ち) and とく (と) contractions take the same stem
+  if (kanji_end + 1 < hiragana_end && codepoints[kanji_end] == U'っ' &&
+      (codepoints[kanji_end + 1] == U'て' || codepoints[kanji_end + 1] == U'た' || codepoints[kanji_end + 1] == U'ち' ||
+       codepoints[kanji_end + 1] == U'と')) {
+    const auto& sokuonbin_types = vh::getGodanTypesByOnbin("っ");
+    // A dictionary base for the stem in any sokuonbin row (行く is the only
+    // GodanKa one, so 書く cannot license 書っ)
+    auto dict_match = vh::firstGodanOnbinDictBase(dict_manager, kanji_stem, "っ");
+    grammar::VerbType matched_verb_type = dict_match.verb_type;
+    std::string matched_base_form = std::move(dict_match.base_form);
+    bool matched_via_dict = dict_match.matched;
+    // Sokuonbin compound (突っ走る) whose stem was verified via its embedded verb:
+    // the compound itself is absent from the dictionary, so emit the onbin stem
+    // (突っ走っ) here with the embedded verb's type/base so た/て split off exactly
+    // like a plain verb (走った → 走っ + た), rather than the whole form winning.
+    if (matched_verb_type == grammar::VerbType::Unknown && sokuonbin_stem_verified &&
+        sokuonbin_verb_type != grammar::VerbType::Unknown && !sokuonbin_lemma.empty()) {
+      matched_verb_type = sokuonbin_verb_type;
+      matched_base_form = sokuonbin_lemma;
+      matched_via_dict = true;
+    }
+    // Phase 2: Inflection analysis fallback
+    // Try progressively shorter surfaces to handle cases where hiragana_end
+    // includes particles (e.g., "使っているが" vs "使っている")
+    // Skip if kanji stem starts with a dictionary noun (e.g., 昨日買っ → skip)
+    // This prevents false compound verb candidates like "昨日買う"
+    bool starts_with_dict_noun = false;
+    bool remainder_is_dict_verb = false;
+    const bool te_continuation_follows = vh::contractedTeContinuationFollowsAt(codepoints, kanji_end + 2);
+    // A whole stem that is itself a dictionary noun before a contracted
+    // te-continuation is a denominal verb (事故っ+てる), not a noun+verb.
+    const bool denominal_stem =
+        te_continuation_follows && dict_manager != nullptr && vh::isNounInDictionary(dict_manager, kanji_stem);
+    if (dict_manager != nullptr && kanji_end - start_pos >= 2 && !denominal_stem) {
+      // Check if any prefix of kanji_stem is a dictionary noun
+      for (size_t prefix_len = 1; prefix_len < kanji_end - start_pos; ++prefix_len) {
+        std::string prefix = extractSubstring(codepoints, start_pos, start_pos + prefix_len);
+        if (verb_helpers::isNounInDictionary(dict_manager, prefix)) {
+          starts_with_dict_noun = true;
+          SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << kanji_stem << "\" starts with dict noun \"" << prefix << "\"\n");
+          break;
         }
       }
+      // Also check: if removing single-kanji prefix leaves a valid dict verb
+      // E.g., 本買う → 本 + 買う, where 買う is a dict verb
+      // This handles patterns like 本買った, 服買った, 車買った
+      if (!starts_with_dict_noun && kanji_end - start_pos == 2) {
+        // Get the second kanji + verb ending
+        std::string remainder_stem = extractSubstring(codepoints, start_pos + 1, kanji_end);
+        const auto remainder_match = vh::firstGodanOnbinDictBase(dict_manager, remainder_stem, "っ");
+        remainder_is_dict_verb = remainder_match.matched;
+        if (remainder_is_dict_verb) {
+          SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << kanji_stem << "\" remainder \"" << remainder_match.base_form
+                                                    << "\" is dict verb\n");
+        }
+      }
+    }
+    if (matched_verb_type == grammar::VerbType::Unknown && !starts_with_dict_noun && !remainder_is_dict_verb) {
+      // A one-kanji stem picked out of the middle of a dictionary word
+      // splits that word and invents a verb from its tail (事故った as
+      // 事 + 故る). Only the analyzer's guess licenses this branch, so it is
+      // no evidence against a registered headword.
+      if (kanji_stem.size() == core::kJapaneseCharBytes &&
+          !vh::splitsDictionaryKanjiWord(dict_manager, codepoints, start_pos, kanji_end)) {
+        // Single-kanji stem: use inflection analysis of the longer surface
+        // (kanji + っ + following chars) to find verb type.
+        // Common verbs like 残る, 立つ, 打つ may not be in L2 dictionary.
+        // Try surfaces of increasing length to get inflection result.
+        for (size_t try_end = kanji_end + 2; try_end <= codepoints.size() && try_end <= kanji_end + 4; ++try_end) {
+          auto infl_result = analysesInRange(inflection, codepoints, start_pos, try_end);
+          if (!infl_result.empty()) {
+            const auto& best = infl_result[0];
+            if (best.confidence >= 0.6F) {
+              for (const auto& [verb_type, base_suffix] : sokuonbin_types) {
+                if (best.verb_type == verb_type) {
+                  matched_verb_type = verb_type;
+                  matched_base_form = normalize::concat(kanji_stem, base_suffix);
+                  SUZUME_DEBUG_LOG_VERBOSE("[VERB_CAND] \"" << kanji_stem << "\" single-kanji sokuonbin → "
+                                                            << matched_base_form << " (infl, conf=" << best.confidence
+                                                            << ")\n");
+                  break;
+                }
+              }
+              if (matched_verb_type != grammar::VerbType::Unknown)
+                break;
+            }
+          }
+        }
+      } else if (denominal_stem) {
+        // A denominal verb is godan-ra throughout (事故る, 沼る), so the row
+        // needs no analysis once the noun and the te-continuation attest it.
+        matched_verb_type = grammar::VerbType::GodanRa;
+        matched_base_form = normalize::concat(kanji_stem, "る");
+      } else {
+        SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << kanji_stem << "\" skip non-dict sokuonbin\n");
+      }
+    }
+
+    // A multi-kanji stem can itself be an unregistered open-class verb.
+    // A dictionary noun prefix alone is not proof of a boundary (戸 is a
+    // noun but 戸惑う is one predicate); the decisive counter-evidence is
+    // a dictionary verb in the remainder, as in 本+買った.  When no such
+    // remainder exists, admit only an exact full-form inflection match and
+    // keep it unverified/neutral so stronger lexical boundaries still win.
+    if (matched_verb_type == grammar::VerbType::Unknown && kanji_end > start_pos + 1 && !remainder_is_dict_verb) {
+      const std::string full_surface = extractSubstring(codepoints, start_pos, hiragana_end);
+      const OnbinInflMatch infl = bestOnbinInflMatch(inflection, full_surface, kanji_stem, sokuonbin_types);
+      if (infl.type != grammar::VerbType::Unknown) {
+        matched_verb_type = infl.type;
+        matched_base_form = infl.base_form;
+      }
+    }
+
+    // A non-dictionary sokuonbin candidate that begins inside a kanji run
+    // must not take its っ from the head of a dictionary particle. The run
+    // is a compound nominal that the particle marks (資料 + って, 確認 +
+    // って), so the fabricated predicate splits the nominal and steals the
+    // particle's first mora in one move (資 + 料っ + て). A dictionary-backed
+    // base keeps its ordinary te-form reading (見 + 合って).
+    // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+    // A stem that is itself a dictionary nominal (猫, 君) is the host the
+    // particle marks (猫+って+かわいい) unless a te-continuation follows
+    // the て, which is what a denominal verb looks like (沼っ+てる).
+    bool sokuon_heads_dictionary_particle = false;
+    const bool stem_is_dictionary_nominal =
+        dict_manager != nullptr && hasExactPartOfSpeech(*dict_manager, kanji_stem,
+                                                        partOfSpeechMask(core::PartOfSpeech::Noun) |
+                                                            partOfSpeechMask(core::PartOfSpeech::Pronoun));
+    const bool kanji_on_left = start_pos > 0 && normalize::isKanjiCodepoint(codepoints[start_pos - 1]) &&
+                               !followsQuantityHead(codepoints, start_pos);
+    if (!matched_via_dict && dict_manager != nullptr &&
+        (kanji_on_left || (stem_is_dictionary_nominal && !te_continuation_follows)) &&
+        kanji_end + 1 < codepoints.size()) {
+      constexpr size_t kParticleProbe = 3;
+      const size_t max_particle_end = std::min(codepoints.size(), kanji_end + kParticleProbe);
+      for (size_t particle_end = kanji_end + 2; particle_end <= max_particle_end; ++particle_end) {
+        if (lookupEntryInRange(*dict_manager, codepoints, kanji_end, particle_end, core::PartOfSpeech::Particle) !=
+            nullptr) {
+          sokuon_heads_dictionary_particle = true;
+          SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << kanji_stem << "\" sokuon heads a dictionary particle\n");
+          break;
+        }
+      }
+    }
+
+    if (matched_verb_type != grammar::VerbType::Unknown && !sokuon_heads_dictionary_particle) {
+      // Found valid verb - generate sokuonbin stem candidate
+      // Dict-matched verbs get bonus (-0.5) to beat unsplit forms
+      // Inflection-only matches get neutral cost (0) to avoid false positives
+      // like 像っ (from 像る which is not a real verb)
+      std::string onbin_surface = extractSubstring(codepoints, start_pos, kanji_end + 1);
+      // Dict-matched verbs get bonus (-0.5) to beat unsplit forms
+      // Inflection-only matches (2-kanji stems only) get neutral cost
+      const float sokuonbin_cost = matched_via_dict ? candidate::verb_cost::kStandardBonus : bigram_cost::kNeutral;
+      SUZUME_DEBUG_VERBOSE_BLOCK {
+        SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface << " kanji_sokuonbin lemma=" << matched_base_form
+                            << " cost=" << sokuonbin_cost << (matched_via_dict ? " (dict)" : " (infl)") << "\n";
+      }
+      auto candidate =
+          makeVerbCandidate(onbin_surface, start_pos, kanji_end + 1, sokuonbin_cost, matched_base_form,
+                            grammar::verbTypeToConjType(matched_verb_type), true, CandidateOrigin::VerbKanji,
+                            candidate::kHighOriginConfidence, "kanji_sokuonbin", core::ExtendedPOS::VerbOnbinkei);
+      // The non-dictionary fallback reaches here only for a one-kanji
+      // stem whose complete sokuonbin form was validated by inflection.
+      // Preserve that evidence, as the extended and te-auxiliary paths do,
+      // so an ordinary verb does not lose to a fabricated noun boundary.
+      candidate.lemma_verified = matched_via_dict || kanji_end == start_pos + 1;
+      candidates.push_back(std::move(candidate));
     }
   }
 
@@ -406,54 +400,44 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
   //       死んだ → 死ん (onbin of 死ぬ) + だ (auxiliary)
   // Key patterns:
   // - kanji + ん + で/だ: GodanMa/GodanBa/GodanNa verbs
-  if (kanji_end < hiragana_end) {
-    char32_t first_hira = codepoints[kanji_end];
-    // Check for hatsuonbin (ん) pattern
-    if (first_hira == U'ん' && kanji_end + 1 < hiragana_end) {
-      char32_t next_char = codepoints[kanji_end + 1];
-      // Basic te/ta form patterns (で, だ)
-      bool is_de_da_pattern = (next_char == U'で' || next_char == U'だ');
-      if (is_de_da_pattern) {
-        const auto& hatsuonbin_types = vh::getGodanTypesByOnbin("ん");
-        // Get the kanji stem
-
-        // First, check dictionary for ALL verb types
-        auto hatsuonbin_match = vh::firstGodanOnbinDictBase(dict_manager, kanji_stem, "ん");
-        grammar::VerbType matched_verb_type = hatsuonbin_match.verb_type;
-        std::string matched_base_form = std::move(hatsuonbin_match.base_form);
-        // Inflection analysis fallback (dictionary lookup above found nothing).
-        // A stem the dictionary attests as Godan-ra is the る→ん contraction
-        // (帰+ん+だ), not a nasal onbin of an unattested 帰む.
-        if (matched_verb_type == grammar::VerbType::Unknown && !vh::attestsGodanRaIrrealis(dict_manager, kanji_stem)) {
-          std::string full_surface = extractSubstring(codepoints, start_pos, hiragana_end);
-          OnbinInflMatch infl = bestOnbinInflMatch(inflection, full_surface, kanji_stem, hatsuonbin_types);
-          if (infl.type != grammar::VerbType::Unknown) {
-            matched_verb_type = infl.type;
-            matched_base_form = std::move(infl.base_form);
-          }
-        }
-
-        if (matched_verb_type != grammar::VerbType::Unknown) {
-          // Found valid verb - generate hatsuonbin stem candidate
-          std::string onbin_surface = extractSubstring(codepoints, start_pos, kanji_end + 1);
-          constexpr float kHatsuonbinCost = candidate::verb_cost::kStandardBonus;
-          SUZUME_DEBUG_VERBOSE_BLOCK {
-            SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface << " kanji_hatsuonbin lemma=" << matched_base_form
-                                << " cost=" << kHatsuonbinCost << "\n";
-          }
-          auto candidate =
-              makeVerbCandidate(onbin_surface, start_pos, kanji_end + 1, kHatsuonbinCost, matched_base_form,
-                                grammar::verbTypeToConjType(matched_verb_type), true, CandidateOrigin::VerbKanji,
-                                candidate::kHighOriginConfidence, "kanji_hatsuonbin", core::ExtendedPOS::VerbOnbinkei);
-          // Both branches above prove the complete Xん+で/だ paradigm: either
-          // the base lemma is in the dictionary or full-form inflection
-          // reconstructs a matching nasal-euphonic row. Preserve that evidence
-          // on this first candidate too; otherwise later dedup can discard the
-          // already-verified duplicate emitted by the extended handler.
-          candidate.lemma_verified = true;
-          candidates.push_back(std::move(candidate));
-        }
+  if (kanji_end + 1 < hiragana_end && codepoints[kanji_end] == U'ん' &&
+      (codepoints[kanji_end + 1] == U'で' || codepoints[kanji_end + 1] == U'だ')) {
+    const auto& hatsuonbin_types = vh::getGodanTypesByOnbin("ん");
+    // First, check dictionary for ALL verb types
+    auto hatsuonbin_match = vh::firstGodanOnbinDictBase(dict_manager, kanji_stem, "ん");
+    grammar::VerbType matched_verb_type = hatsuonbin_match.verb_type;
+    std::string matched_base_form = std::move(hatsuonbin_match.base_form);
+    // Inflection analysis fallback (dictionary lookup above found nothing).
+    // A stem the dictionary attests as Godan-ra is the る→ん contraction
+    // (帰+ん+だ), not a nasal onbin of an unattested 帰む.
+    if (matched_verb_type == grammar::VerbType::Unknown && !vh::attestsGodanRaIrrealis(dict_manager, kanji_stem)) {
+      std::string full_surface = extractSubstring(codepoints, start_pos, hiragana_end);
+      OnbinInflMatch infl = bestOnbinInflMatch(inflection, full_surface, kanji_stem, hatsuonbin_types);
+      if (infl.type != grammar::VerbType::Unknown) {
+        matched_verb_type = infl.type;
+        matched_base_form = std::move(infl.base_form);
       }
+    }
+
+    if (matched_verb_type != grammar::VerbType::Unknown) {
+      // Found valid verb - generate hatsuonbin stem candidate
+      std::string onbin_surface = extractSubstring(codepoints, start_pos, kanji_end + 1);
+      constexpr float kHatsuonbinCost = candidate::verb_cost::kStandardBonus;
+      SUZUME_DEBUG_VERBOSE_BLOCK {
+        SUZUME_DEBUG_STREAM << "[VERB_CAND] " << onbin_surface << " kanji_hatsuonbin lemma=" << matched_base_form
+                            << " cost=" << kHatsuonbinCost << "\n";
+      }
+      auto candidate =
+          makeVerbCandidate(onbin_surface, start_pos, kanji_end + 1, kHatsuonbinCost, matched_base_form,
+                            grammar::verbTypeToConjType(matched_verb_type), true, CandidateOrigin::VerbKanji,
+                            candidate::kHighOriginConfidence, "kanji_hatsuonbin", core::ExtendedPOS::VerbOnbinkei);
+      // Both branches above prove the complete Xん+で/だ paradigm: either
+      // the base lemma is in the dictionary or full-form inflection
+      // reconstructs a matching nasal-euphonic row. Preserve that evidence
+      // on this first candidate too; otherwise later dedup can discard the
+      // already-verified duplicate emitted by the extended handler.
+      candidate.lemma_verified = true;
+      candidates.push_back(std::move(candidate));
     }
   }
 
@@ -526,7 +510,7 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
     // (待た+ん, 知ら+ん, 分から+ん, 読ま+ん). The euphonic reading hands its
     // clause on to て/で/た/だ, so this only has to be settled where the kana
     // run ends: with で or だ behind it the euphony is already proven.
-    if (at_end && n_pos > kanji_end && grammar::isARowCodepoint(codepoints[n_pos - 1])) {
+    if (at_end && n_pos > kanji_end && kana::isARowCodepoint(codepoints[n_pos - 1])) {
       break;
     }
     if (matched_type == grammar::VerbType::Unknown && followed_by_de_da) {
