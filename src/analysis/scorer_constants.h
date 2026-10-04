@@ -246,6 +246,10 @@ constexpr float kBonusCompoundAdjPerChar = 0.5F;
 // Tips balance: はなし(gap=0.013) vs なんし(gap=0.102)
 constexpr float kPenaltyHiraganaNounToSuruTip = 0.08F;
 
+// を and が take no topic particle after them (をは, がは): cancel the case to
+// topic stacking bonus and price the pair like two adjacent case particles.
+constexpr float kPenaltyUnstackableCaseTopic = bigram_cost::kVeryRare - bigram_cost::kVeryStrongBonus;
+
 // =============================================================================
 // Word-Cost Length-Scaled Surface Bonuses (wordCost)
 // =============================================================================

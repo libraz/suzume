@@ -765,6 +765,14 @@ float Scorer::connectionCost(const core::LatticeEdge& prev, const core::LatticeE
     SUZUME_CONNECTION_ADD(surface_bonus, cost::kVeryStrongBonus);  // -1.6
   }
 
+  // The stacked-particle bonus covers には/では/とは; the object and subject
+  // markers take no topic particle after them (をは, がは), so those pairs
+  // are priced like two adjacent case particles.
+  if (prev.extended_pos == core::ExtendedPOS::ParticleCase && utf8::equalsAny(prev.surface, {"を", "が"}) &&
+      next.extended_pos == core::ExtendedPOS::ParticleTopic && utf8::equalsAny(next.surface, {"は"})) {
+    SUZUME_CONNECTION_ADD(surface_bonus, sc::kPenaltyUnstackableCaseTopic);
+  }
+
   // Penalty for で(VERB_連用 of 出る) → ない(AUX_否定): copula でない is more common
   // でない = "is not" (copula) vs "doesn't come out" (verb 出る)
   // Without context (を/から before で), copula interpretation should win

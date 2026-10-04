@@ -43,13 +43,12 @@ float computeTaFormVolitionalBonus(const core::LatticeEdge& prev, const core::La
   // the left context keeps a sentence-initial compound from being split into a
   // fabricated lemma plus the past auxiliary. The sa row needs no such context:
   // its continuative し takes the past directly, with no onbin to mistake.
-  const bool hiragana_inflected_renyokei = prev.origin == core::CandidateOrigin::VerbHiraganaInflectedRenyokei;
   const bool lexical_renyokei_past =
       prev.extended_pos == core::ExtendedPOS::VerbRenyokei && utf8::equalsAny(next.surface, {"た", "たら"}) &&
       next.extended_pos == core::ExtendedPOS::AuxTenseTa &&
       (grammar::containsKanji(prev.surface) || prev.lemmaVerified() ||
-       (hiragana_inflected_renyokei &&
-        (prev.start > 0 || grammar::conjTypeToVerbType(prev.conj_type) == grammar::VerbType::GodanSa)));
+       grammar::conjTypeToVerbType(prev.conj_type) == grammar::VerbType::GodanSa ||
+       (prev.start > 0 && prev.origin == core::CandidateOrigin::VerbHiraganaInflectedRenyokei));
   const bool hiragana_onbin_past =
       prev.extended_pos == core::ExtendedPOS::VerbOnbinkei && prev.origin == core::CandidateOrigin::VerbHiragana &&
       utf8::endsWith(prev.surface, "い") && next.extended_pos == core::ExtendedPOS::AuxTenseTa;

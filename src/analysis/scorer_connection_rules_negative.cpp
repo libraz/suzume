@@ -238,11 +238,10 @@ float computeNegativeAndNounVerbBonus(const core::LatticeEdge& prev, const core:
   // A nominalized predicate can attach to the continuative form of する.
   // This includes productive honorific-prefix constructions and ordinary
   // verbal-noun predicates, so prefer it over an unrelated lexical verb chain.
-  // An unregistered kana run carries no evidence of being a verbal noun, and
-  // there the bonus outbids the sa-row continuative it overlaps (ちらか+し).
+  // A kana run carries no evidence of being a verbal noun, and there the
+  // bonus outbids the sa-row continuative it overlaps (ちらか+し, はな+し).
   if (prev.extended_pos == core::ExtendedPOS::Noun && next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
-      grammar::isSuruRenyokeiSurface(next.surface) &&
-      (prev.fromDictionary() || !grammar::isPureHiragana(prev.surface))) {
+      grammar::isSuruRenyokeiSurface(next.surface) && !grammar::isPureHiragana(prev.surface)) {
     SUZUME_CONNECTION_ADD(bonus, cost::kStrongBonus + cost::kMinorBonus);
   }
 

@@ -315,9 +315,14 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
     // Skip stems ending in し where the prefix is a dictionary noun (サ変 pattern)
     // E.g., しっぱいし → しっぱい(dict NOUN) + し(する連用), not しっぱいしる
     // This prevents false ichidan candidates from サ変 noun + する patterns
+    // Directly after the object or subject marker a one-mora prefix cannot be
+    // the closed-class word it spells (を+だ, が+か), so there it is a verb
+    // stem (手紙を+だし+た).
     if (!is_dict_verb && utf8::endsWith(stem_surface, "し") && stem_surface.size() > 3) {  // More than just し
       std::string prefix = stem_surface.substr(0, stem_surface.size() - 3);
-      if (vh::hasNonVerbDictionaryEntry(dict_manager, prefix)) {
+      const bool follows_argument_marker = prefix.size() == core::kJapaneseCharBytes && start_pos > 0 &&
+                                           (codepoints[start_pos - 1] == U'を' || codepoints[start_pos - 1] == U'が');
+      if (!follows_argument_marker && vh::hasNonVerbDictionaryEntry(dict_manager, prefix)) {
         continue;
       }
       // Pure hiragana stems with sokuon ending in し are almost always

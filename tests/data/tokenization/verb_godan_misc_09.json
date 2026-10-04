@@ -353,6 +353,87 @@
       ],
       "id": "wochirakashitamama_kaketa",
       "input": "部屋をちらかしたまま出かけた"
+    },
+    {
+      "description": "手をはなした - regression test",
+      "expected": [
+        {
+          "lemma": "手",
+          "pos": "Noun",
+          "surface": "手"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "はなす",
+          "pos": "Verb",
+          "surface": "はなし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wohanashita",
+      "input": "手をはなした"
+    },
+    {
+      "description": "手紙をだした - regression test",
+      "expected": [
+        {
+          "lemma": "手紙",
+          "pos": "Noun",
+          "surface": "手紙"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "だす",
+          "pos": "Verb",
+          "surface": "だし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wodashita",
+      "input": "手紙をだした"
+    },
+    {
+      "description": "電気をけした - regression test",
+      "expected": [
+        {
+          "lemma": "電気",
+          "pos": "Noun",
+          "surface": "電気"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "けす",
+          "pos": "Verb",
+          "surface": "けし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wokeshita",
+      "input": "電気をけした"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",
