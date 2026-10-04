@@ -5,50 +5,52 @@
 
 #include "analysis/scorer_bigram_overrides.h"
 
+namespace suzume::analysis {
+
 namespace {
 
 // Convert POS to array index
-constexpr size_t posToIndex(suzume::core::PartOfSpeech pos) {
+constexpr size_t posToIndex(core::PartOfSpeech pos) {
   switch (pos) {
-    case suzume::core::PartOfSpeech::Noun:
+    case core::PartOfSpeech::Noun:
       return 0;
-    case suzume::core::PartOfSpeech::Verb:
+    case core::PartOfSpeech::Verb:
       return 1;
-    case suzume::core::PartOfSpeech::Adjective:
+    case core::PartOfSpeech::Adjective:
       return 2;
-    case suzume::core::PartOfSpeech::Adverb:
+    case core::PartOfSpeech::Adverb:
       return 3;
-    case suzume::core::PartOfSpeech::Particle:
+    case core::PartOfSpeech::Particle:
       return 4;
-    case suzume::core::PartOfSpeech::Auxiliary:
+    case core::PartOfSpeech::Auxiliary:
       return 5;
-    case suzume::core::PartOfSpeech::Conjunction:
+    case core::PartOfSpeech::Conjunction:
       return 6;
-    case suzume::core::PartOfSpeech::Determiner:
+    case core::PartOfSpeech::Determiner:
       return 7;
-    case suzume::core::PartOfSpeech::Pronoun:
+    case core::PartOfSpeech::Pronoun:
       return 8;
-    case suzume::core::PartOfSpeech::Prefix:
+    case core::PartOfSpeech::Prefix:
       return 9;
-    case suzume::core::PartOfSpeech::Suffix:
+    case core::PartOfSpeech::Suffix:
       return 10;
-    case suzume::core::PartOfSpeech::Symbol:
+    case core::PartOfSpeech::Symbol:
       return 11;
-    case suzume::core::PartOfSpeech::Interjection:
-    case suzume::core::PartOfSpeech::Other:
-    case suzume::core::PartOfSpeech::Unknown:
-    case suzume::core::PartOfSpeech::Count_:
+    case core::PartOfSpeech::Interjection:
+    case core::PartOfSpeech::Other:
+    case core::PartOfSpeech::Unknown:
+    case core::PartOfSpeech::Count_:
       return 12;
   }
   return 12;
 }
 
-suzume::analysis::BigramOverrideCostTable makeBigramOverrideTable(const suzume::analysis::ScorerOptions& options) {
-  suzume::analysis::BigramOverrideCostTable table{};
+BigramOverrideCostTable makeBigramOverrideTable(const ScorerOptions& options) {
+  BigramOverrideCostTable table{};
   for (auto& row : table) {
     row.fill(std::numeric_limits<float>::quiet_NaN());
   }
-  for (const suzume::analysis::BigramOverrideSpec& spec : suzume::analysis::kBigramOverrideSpecs) {
+  for (const BigramOverrideSpec& spec : kBigramOverrideSpecs) {
     const size_t prev_index = posToIndex(spec.prev);
     const size_t next_index = posToIndex(spec.next);
     table[prev_index][next_index] = options.bigram.*(spec.value);
@@ -63,14 +65,14 @@ suzume::analysis::BigramOverrideCostTable makeBigramOverrideTable(const suzume::
 constexpr float kBigramCostTable[13][13] = {
     //        Noun  Verb  Adj   Adv   Part  Aux   Conj  Det   Pron  Pref  Suff  Sym   Other
     /* Noun */ {0.0F, 0.5F, 0.5F, 0.3F, 0.0F, 0.0F, 0.5F, 0.5F, 0.5F, 1.0F,-0.8F, 0.5F, 0.5F},
-    /* Verb */ {0.2F, 0.8F, 0.8F, 0.5F, 0.0F, 0.0F, 0.5F, 0.5F, 0.2F, 1.0F, 1.5F, 0.5F, 0.5F},  // Suff: 0.8→1.5 (知ってる人: NOUN優先)
-    /* Adj  */ {0.2F, 0.5F, 0.8F, 0.3F, 0.0F, 0.0F, 0.5F, 0.5F, 0.2F, 1.0F, 0.8F, 0.5F, 0.5F},  // Aux: 0.5→0.0 for おいしそう (ADJ_STEM+AUX)
+    /* Verb */ {0.2F, 0.8F, 0.8F, 0.5F, 0.0F, 0.0F, 0.5F, 0.5F, 0.2F, 1.0F, 1.5F, 0.5F, 0.5F},  // Suff: 人 in 知ってる+人 is a noun
+    /* Adj  */ {0.2F, 0.5F, 0.8F, 0.3F, 0.0F, 0.0F, 0.5F, 0.5F, 0.2F, 1.0F, 0.8F, 0.5F, 0.5F},  // Aux: おいし+そう (ADJ_STEM+AUX)
     /* Adv  */ {0.0F, 0.3F, 0.0F, 0.5F, 0.5F, 0.5F, 0.5F, 0.5F, 0.0F, 1.0F, 0.8F, 0.5F, 0.5F},
-    /* Part */ {0.0F, 0.2F, 0.2F, 0.3F, 0.5F, 0.5F, 0.5F, 0.3F, 0.0F, 0.3F, 1.0F, 0.5F, 0.5F},  // Pref: 1.0→0.3 (何番線: は→何PREFIX)
+    /* Part */ {0.0F, 0.2F, 0.2F, 0.3F, 0.5F, 0.5F, 0.5F, 0.3F, 0.0F, 0.3F, 1.0F, 0.5F, 0.5F},  // Pref: は+何 PREFIX (何番線)
     /* Aux  */ {0.5F, 0.5F, 0.5F, 0.5F, 0.0F, 0.3F, 0.5F, 0.5F, 0.5F, 1.0F, 0.8F, 0.5F, 0.5F},
     /* Conj */ {0.0F, 0.2F, 0.2F, 0.2F, 0.3F, 0.5F, 0.5F, 0.2F, 0.0F, 0.3F, 1.0F, 0.3F, 0.3F},
-    /* Det  */ {0.0F, 0.5F, 0.5F, 0.5F, 0.5F, 0.5F, 0.5F, 0.8F, 0.0F, 1.0F, 1.5F, 0.5F, 0.5F},  // Suff: 0.8→1.5 (あんな人: NOUN優先)
-    /* Pron */ {0.0F, 0.5F, 0.5F, 0.3F, 0.0F, 0.2F, 0.5F, 0.5F, 0.5F, 1.0F,-0.8F, 0.5F, 0.5F},  // P3-1: Aux 1.0→0.2 (私だ is basic); Suff: 0.0→-0.8 (彼女+ら)
+    /* Det  */ {0.0F, 0.5F, 0.5F, 0.5F, 0.5F, 0.5F, 0.5F, 0.8F, 0.0F, 1.0F, 1.5F, 0.5F, 0.5F},  // Suff: 人 in あんな+人 is a noun
+    /* Pron */ {0.0F, 0.5F, 0.5F, 0.3F, 0.0F, 0.2F, 0.5F, 0.5F, 0.5F, 1.0F,-0.8F, 0.5F, 0.5F},  // Aux: 私+だ; Suff: 彼女+ら
     /* Pref */{-0.5F,-0.5F, 0.0F, 0.5F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F},
     /* Suff */ {0.5F, 0.8F, 0.8F, 0.5F, 0.0F, 0.5F, 0.5F, 0.5F, 0.5F, 1.0F, 0.3F, 0.5F, 0.5F},
     /* Sym  */ {0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.2F, 0.5F, 0.0F, 0.2F},
@@ -83,8 +85,6 @@ constexpr float kBigramCostTable[13][13] = {
 // clang-format on
 
 }  // namespace
-
-namespace suzume::analysis {
 
 Scorer::Scorer(const ScorerOptions& options)
     : options_(options), bigram_override_costs_(makeBigramOverrideTable(options)) {}

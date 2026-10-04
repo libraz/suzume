@@ -126,8 +126,8 @@ float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::
   // Pure hiragana unknown sequences split before し/き/etc. are usually wrong
   // Does not apply when prev is a known particle/aux (those have specific EPOS)
   if (prev.pos == core::PartOfSpeech::Other && grammar::isPureHiragana(prev.surface) &&
-      prev.surface.size() >= 6 &&                                                          // 2+ hiragana chars
-      next.extended_pos == core::ExtendedPOS::VerbRenyokei && next.surface.size() <= 3) {  // Single char (し, き, etc.)
+      prev.surface.size() >= 6 &&  // 2+ hiragana chars
+      next.extended_pos == core::ExtendedPOS::VerbRenyokei && next.surface.size() <= core::kJapaneseCharBytes) {
     SUZUME_CONNECTION_ADD(bonus, cost::kUncommon);
   }
 
@@ -287,7 +287,7 @@ float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::
 // particle is a single mora that never carries it.
 float computeCompoundParticlePoliteBonus(const core::LatticeEdge& prev, const core::LatticeEdge& next) {
   if (next.extended_pos != core::ExtendedPOS::AuxTenseMasu || prev.extended_pos != core::ExtendedPOS::ParticleCase ||
-      normalize::utf8Length(prev.surface) < 3 || !grammar::isIRowCodepoint(utf8::decodeLastChar(prev.surface))) {
+      normalize::utf8Length(prev.surface) < 3 || !kana::isIRowCodepoint(utf8::decodeLastChar(prev.surface))) {
     return cost::kNeutral;
   }
   return -cost::kSevere;
@@ -342,7 +342,7 @@ float computePrefixSymbolBonus(const core::LatticeEdge& prev, const core::Lattic
                                         grammar::isHonorificPrefix(prev.surface) && next.fromDictionary() &&
                                         grammar::isHumbleHonorificLemma(next.lemma);
   if (prev.pos == core::PartOfSpeech::Prefix && next.pos == core::PartOfSpeech::Verb && !is_honorific_prefix_verb &&
-      grammar::isPureHiragana(next.surface) && next.surface.size() <= 6) {  // 2 chars or less
+      grammar::isPureHiragana(next.surface) && next.surface.size() <= core::kTwoJapaneseCharBytes) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
 
@@ -350,7 +350,7 @@ float computePrefixSymbolBonus(const core::LatticeEdge& prev, const core::Lattic
   // E.g., お+はよう in おはよう - はよう is not a real verb
   // Valid patterns like お+待ち have kanji, お+召し would be in dictionary
   if (prev.pos == core::PartOfSpeech::Prefix && next.pos == core::PartOfSpeech::Verb && !next.fromDictionary() &&
-      grammar::isPureHiragana(next.surface) && next.surface.size() == 9) {  // Exactly 3 chars (9 bytes)
+      grammar::isPureHiragana(next.surface) && next.surface.size() == core::kThreeJapaneseCharBytes) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
 
@@ -364,8 +364,7 @@ float computePrefixSymbolBonus(const core::LatticeEdge& prev, const core::Lattic
   // carries the same lexical weight as a listed entry (ぐっと+き+た).
   if (prev.pos == core::PartOfSpeech::Adverb && isSingleHiraganaVerbRenyokei(next) && !next.fromDictionary() &&
       next.conj_type != dictionary::ConjugationType::Kuru) {
-    // This rule formerly contributed kVeryRare in two call sites. Preserve
-    // that effective magnitude while owning the rule here only.
+    // The bar weighs twice kVeryRare.
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryRare + cost::kVeryRare);
   }
 
@@ -382,7 +381,7 @@ float computePrefixSymbolBonus(const core::LatticeEdge& prev, const core::Lattic
   // E.g., 東京（とうきょう） - the hiragana in parentheses is reading/furigana
   // Long hiragana sequences after symbols should stay as single tokens
   if (prev.pos == core::PartOfSpeech::Symbol && next.pos == core::PartOfSpeech::Other &&
-      grammar::isPureHiragana(next.surface) && next.surface.size() >= 12) {  // 4+ chars (12 bytes in UTF-8)
+      grammar::isPureHiragana(next.surface) && next.surface.size() >= core::kFourJapaneseCharBytes) {
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryStrongBonus);
   }
 

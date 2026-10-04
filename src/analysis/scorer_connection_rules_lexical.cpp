@@ -378,7 +378,7 @@ float computeSugiFinalParticleBonus(const core::LatticeEdge& prev, const core::L
   // (されど+も, だけど+も).
   if (prev.pos == core::PartOfSpeech::Conjunction && grammar::isPureHiragana(prev.surface) &&
       next.pos != core::PartOfSpeech::Particle && grammar::isPureHiragana(next.surface) &&
-      next.surface.size() <= 3) {  // Single hiragana (3 bytes)
+      next.surface.size() <= core::kJapaneseCharBytes) {
     SUZUME_CONNECTION_ADD(bonus, cost::kNever);
   }
 

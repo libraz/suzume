@@ -94,8 +94,8 @@ float computeVerbRenyokeiEarlyBonus(const core::LatticeEdge& prev, const core::L
   // unregistered base verb has no access to. Ichidan stems are outside both
   // rules — their irrealis and continuative are syncretic, so 消え+ぬ is either
   // reading — as is the e-row passive れ, which must still split (行か+れ+ぬ).
-  const bool godan_continuative = prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
-                                  grammar::isIRowCodepoint(utf8::decodeLastChar(prev.surface));
+  const bool godan_continuative =
+      prev.extended_pos == core::ExtendedPOS::VerbRenyokei && kana::isIRowCodepoint(utf8::decodeLastChar(prev.surface));
   const bool topicalized_continuative = godan_continuative && next.extended_pos == core::ExtendedPOS::ParticleTopic &&
                                         prev.surface.size() >= core::kTwoJapaneseCharBytes;
   const bool literary_perfect = godan_continuative && next.extended_pos == core::ExtendedPOS::AuxNegativeNu &&

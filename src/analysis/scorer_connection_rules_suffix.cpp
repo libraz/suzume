@@ -102,7 +102,7 @@ float computeSuffixShortVerbBonus(const core::LatticeEdge& prev, const core::Lat
   // while the nominalized candidate has no independent evidence.  Keep this
   // narrowly scoped to generated candidates so dictionary nouns are unchanged.
   if (prev.origin == core::CandidateOrigin::NominalizedNoun && prev.pos == core::PartOfSpeech::Noun &&
-      grammar::isIRowCodepoint(utf8::decodeLastChar(prev.surface)) && next.pos == core::PartOfSpeech::Suffix) {
+      kana::isIRowCodepoint(utf8::decodeLastChar(prev.surface)) && next.pos == core::PartOfSpeech::Suffix) {
     return cost::kMinor;
   }
 

@@ -508,7 +508,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev, const core::LatticeE
   // ends on the i-row or the e-row and spells no such noun, so penalizing it
   // only cost 理解+でき+ず its boundary.
   if (prev.extended_pos == core::ExtendedPOS::VerbMizenkei && prev.fromDictionary() &&
-      grammar::isPureHiragana(prev.surface) && grammar::isARowCodepoint(utf8::decodeLastChar(prev.surface)) &&
+      grammar::isPureHiragana(prev.surface) && kana::isARowCodepoint(utf8::decodeLastChar(prev.surface)) &&
       prev.surface.size() <= 9 &&  // ≤3 hiragana chars (9 bytes)
       next.extended_pos == core::ExtendedPOS::AuxNegativeNu && prev.lemma != "する" && prev.lemma != "ある" &&
       prev.lemma != "なる" && utf8::equalsAny(next.surface, {"ず"})) {
@@ -646,7 +646,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev, const core::LatticeE
   // 認識+せ, 期待+せ: favors split over merged 認識せ/期待せ verb candidate
   // Only for 2+ kanji nouns (sahen-compatible), not single-kanji like 下+さ
   if (prev.pos == core::PartOfSpeech::Noun && next.extended_pos == core::ExtendedPOS::VerbMizenkei &&
-      next.surface == "せ" && prev.surface.size() >= 6) {  // 2+ kanji = 6+ bytes in UTF-8
+      next.surface == "せ" && prev.surface.size() >= core::kTwoJapaneseCharBytes) {
     SUZUME_CONNECTION_ADD(surface_bonus, cost::kVeryStrongBonus);
   }
 
