@@ -55,9 +55,7 @@ void appendCounterChainCandidate(const std::vector<char32_t>& codepoints, size_t
   size_t unit_count = 0;
   while (scan < codepoints.size()) {
     const size_t numeral_start = scan;
-    while (scan < codepoints.size() && normalize::isNumeralCodepoint(codepoints[scan])) {
-      ++scan;
-    }
+    scan = scanQuantityHead(codepoints, scan, false);
     if (scan == numeral_start || scan >= codepoints.size() || !isChainCounterKanji(codepoints[scan])) {
       break;
     }
@@ -104,10 +102,7 @@ void appendTemporalCounterCandidates(const std::vector<char32_t>& codepoints, si
   // 月 (一か月, 一ヶ月, 一ケ月). Keep the complete duration together before
   // any following comparison expression.
   if (normalize::isNumeralCodepoint(codepoints[start_pos])) {
-    size_t numeral_end = start_pos;
-    while (numeral_end < codepoints.size() && normalize::isNumeralCodepoint(codepoints[numeral_end])) {
-      ++numeral_end;
-    }
+    const size_t numeral_end = scanQuantityHead(codepoints, start_pos, false);
     // 時間 is a lexicalized duration unit. The regular counter scan recognizes
     // 時 first, so retain a competing numeral+時+間 candidate for kanji
     // numerals as well as digit-based pretokenized durations.
@@ -255,8 +250,7 @@ void appendTemporalCounterCandidates(const std::vector<char32_t>& codepoints, si
     scan = scanTemporalCounterRun(codepoints, scan);
     // The run must end in 間, and that 間 must be preceded by another counter char in the
     // run (a bare numeral+間 is not a duration).
-    bool run_ends_in_span =
-        has_quantity && scan > counter_start && scan - 1 > counter_start && codepoints[scan - 1] == U'間';
+    bool run_ends_in_span = has_quantity && scan > counter_start + 1 && codepoints[scan - 1] == U'間';
     if (run_ends_in_span && scan < char_types.size() && char_types[scan] == normalize::CharType::Kanji) {
       // 間 heading the interval word 間隔 splits the numeral+counter off before 間
       // (三年|間隔); otherwise an ordinary kanji noun after 間 splits after it (三年間|勉強).

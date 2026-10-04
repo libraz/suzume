@@ -9,18 +9,20 @@ namespace suzume::analysis::compound_verb_detail {
 
 namespace {
 
-const grammar::Conjugation::GodanEntry* findGodanRowByEnding(std::string_view base_ending) {
-  if (base_ending.size() != core::kJapaneseCharBytes) {
-    return nullptr;
-  }
-
-  const char32_t ending = utf8::decodeFirstChar(base_ending);
+const grammar::Conjugation::GodanEntry* findGodanRowByBaseVowel(char32_t base_vowel) {
   for (const auto& entry : grammar::Conjugation::getGodanRows()) {
-    if (entry.second.base_vowel == ending) {
+    if (entry.second.base_vowel == base_vowel) {
       return &entry;
     }
   }
   return nullptr;
+}
+
+const grammar::Conjugation::GodanEntry* findGodanRowByEnding(std::string_view base_ending) {
+  if (base_ending.size() != core::kJapaneseCharBytes) {
+    return nullptr;
+  }
+  return findGodanRowByBaseVowel(utf8::decodeFirstChar(base_ending));
 }
 
 dictionary::ConjugationType toDictionaryConjugationType(grammar::VerbType verb_type) {
@@ -53,16 +55,13 @@ std::string replaceGodanEnding(std::string_view base, bool use_o_row) {
     return "";
   }
 
-  const char32_t last_cp = utf8::decodeLastChar(base);
-  for (const auto& [row_verb_type, row] : grammar::Conjugation::getGodanRows()) {
-    (void)row_verb_type;
-    if (row.base_vowel == last_cp) {
-      std::string result(base.substr(0, base.size() - core::kJapaneseCharBytes));
-      result += normalize::encodeUtf8(use_o_row ? row.o_row : row.e_row);
-      return result;
-    }
+  const auto* godan_entry = findGodanRowByBaseVowel(utf8::decodeLastChar(base));
+  if (godan_entry == nullptr) {
+    return "";
   }
-  return "";
+  const auto& row = godan_entry->second;
+  return normalize::concat(base.substr(0, base.size() - core::kJapaneseCharBytes),
+                           normalize::encodeUtf8(use_o_row ? row.o_row : row.e_row));
 }
 
 }  // namespace
@@ -82,25 +81,22 @@ namespace {
 // same column. Only the target row differs between the two forms.
 std::string generateGodanRowStem(std::string_view surface, std::string_view reading, V2VerbType verb_type,
                                  bool use_a_row) {
-  std::string_view base = reading.empty() ? surface : reading;
-  if (base.empty())
+  const std::string_view base = reading.empty() ? surface : reading;
+  if (base.size() < core::kJapaneseCharBytes) {
     return "";
-
+  }
+  const std::string_view stem = base.substr(0, base.size() - core::kJapaneseCharBytes);
   if (verb_type == V2VerbType::Ichidan) {
-    return base.size() >= core::kJapaneseCharBytes ? std::string(base.substr(0, base.size() - core::kJapaneseCharBytes))
-                                                   : "";
+    return std::string(stem);
   }
 
-  if (base.size() < core::kJapaneseCharBytes)
-    return "";
   const char32_t final_mora = utf8::decodeLastChar(base);
   const std::string_view row =
       use_a_row ? grammar::godanARowSuffixFromURow(final_mora) : grammar::godanIRowSuffixFromURow(final_mora);
-  if (row.empty())
+  if (row.empty()) {
     return "";
-  std::string result(base.substr(0, base.size() - core::kJapaneseCharBytes));
-  result += row;
-  return result;
+  }
+  return normalize::concat(stem, row);
 }
 
 }  // namespace
@@ -169,7 +165,7 @@ TeFormType getTeFormType(std::string_view base_ending) {
 std::pair<std::string, bool> generateTeFormStem(std::string_view surface, std::string_view reading,
                                                 V2VerbType verb_type, std::string_view base_ending) {
   const std::string_view base = reading.empty() ? surface : reading;
-  if (base.empty() || base.size() < core::kJapaneseCharBytes)
+  if (base.size() < core::kJapaneseCharBytes)
     return {"", false};
 
   if (verb_type == V2VerbType::Ichidan) {

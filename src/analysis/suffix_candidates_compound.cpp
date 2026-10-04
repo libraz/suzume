@@ -9,6 +9,7 @@
 #include "analysis/dictionary_probe.h"
 #include "candidate_constants.h"
 #include "core/debug.h"
+#include "core/kana_constants.h"
 #include "core/utf8_constants.h"
 #include "dictionary/dictionary.h"
 #include "grammar/char_patterns.h"
@@ -26,6 +27,23 @@
 namespace suzume::analysis {
 
 namespace {
+
+// The open lexical classes; an exact entry in one of them spells a word.
+constexpr PartOfSpeechMask kLexicalWordMask =
+    partOfSpeechMask(core::PartOfSpeech::Noun) | partOfSpeechMask(core::PartOfSpeech::Verb) |
+    partOfSpeechMask(core::PartOfSpeech::Adjective) | partOfSpeechMask(core::PartOfSpeech::Adverb);
+
+// End of the hiragana run at @p start, at most four kana and stopping before a
+// particle-like kana.
+size_t scanCompoundHiraganaEnd(const std::vector<char32_t>& codepoints,
+                               const std::vector<normalize::CharType>& char_types, size_t start) {
+  size_t end = start;
+  while (end < char_types.size() && end - start < 4 && char_types[end] == normalize::CharType::Hiragana &&
+         !normalize::isParticleCodepoint(codepoints[end])) {
+    ++end;
+  }
+  return end;
+}
 
 bool hasNominalPhraseSelectorAt(const dictionary::DictionaryManager* dict_manager,
                                 const std::vector<char32_t>& codepoints, size_t pos) {
@@ -362,11 +380,7 @@ bool hasAuxiliaryParticleDecomposition(const std::vector<char32_t>& codepoints, 
   if (dict_manager == nullptr || end_pos < start_pos + 3) {
     return false;
   }
-  const std::string whole = extractSubstring(codepoints, start_pos, end_pos);
-  constexpr PartOfSpeechMask kLexicalMask =
-      partOfSpeechMask(core::PartOfSpeech::Noun) | partOfSpeechMask(core::PartOfSpeech::Verb) |
-      partOfSpeechMask(core::PartOfSpeech::Adjective) | partOfSpeechMask(core::PartOfSpeech::Adverb);
-  if (hasExactPartOfSpeech(*dict_manager, whole, kLexicalMask)) {
+  if (hasExactPartOfSpeech(*dict_manager, codepoints, start_pos, end_pos, kLexicalWordMask)) {
     return false;
   }
   for (size_t split = start_pos + 1; split < end_pos; ++split) {
@@ -394,10 +408,7 @@ bool hasFunctionWordChainDecomposition(const std::vector<char32_t>& codepoints, 
   if (dict_manager == nullptr || end_pos < start_pos + 3) {
     return false;
   }
-  constexpr PartOfSpeechMask kLexicalMask =
-      partOfSpeechMask(core::PartOfSpeech::Noun) | partOfSpeechMask(core::PartOfSpeech::Verb) |
-      partOfSpeechMask(core::PartOfSpeech::Adjective) | partOfSpeechMask(core::PartOfSpeech::Adverb);
-  if (hasExactPartOfSpeech(*dict_manager, codepoints, start_pos, end_pos, kLexicalMask)) {
+  if (hasExactPartOfSpeech(*dict_manager, codepoints, start_pos, end_pos, kLexicalWordMask)) {
     return false;
   }
   constexpr PartOfSpeechMask kFunctionMask =
@@ -456,7 +467,7 @@ bool hasFunctionWordChainDecomposition(const std::vector<char32_t>& codepoints, 
   // run that opens with one is two words however the rest reads. Requiring the
   // remainder to be attested keeps this to runs that actually have a
   // decomposition (この+すな) rather than any run that starts with those morae.
-  constexpr PartOfSpeechMask kAttestedTailMask = kLexicalMask | kFunctionMask |
+  constexpr PartOfSpeechMask kAttestedTailMask = kLexicalWordMask | kFunctionMask |
                                                  partOfSpeechMask(core::PartOfSpeech::Pronoun) |
                                                  partOfSpeechMask(core::PartOfSpeech::Determiner);
   for (size_t split = start_pos + 1; split < end_pos; ++split) {
@@ -613,7 +624,6 @@ void generateSelectedNominalHeadCandidates(const std::vector<char32_t>& codepoin
 #endif
     candidates.push_back(std::move(noun_candidate));
   }
-  return;
 }
 
 void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
@@ -692,18 +702,9 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
   if (kanji_end >= char_types.size() || char_types[kanji_end] != normalize::CharType::Hiragana) {
     return;
   }
-  size_t hiragana_end = kanji_end;
-  while (hiragana_end < char_types.size() && hiragana_end - kanji_end < 4 &&
-         char_types[hiragana_end] == normalize::CharType::Hiragana) {
-    char32_t ch = codepoints[hiragana_end];
-    if (normalize::isParticleCodepoint(ch)) {
-      break;
-    }
-    ++hiragana_end;
-  }
-
-  size_t hiragana_len = hiragana_end - kanji_end;
-  char32_t first_hira = codepoints[kanji_end];
+  const size_t hiragana_end = scanCompoundHiraganaEnd(codepoints, char_types, kanji_end);
+  const size_t hiragana_len = hiragana_end - kanji_end;
+  const char32_t first_hira = codepoints[kanji_end];
 
   // A kanji numeral followed by つ is already a complete native counter
   // (一つ, 二つ). Do not extend it into an invented kanji-hiragana compound
@@ -728,16 +729,13 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
 
         // Generate candidates for each length
         for (size_t end_pos = sokuon_pos + 2; end_pos <= kanji2_end; ++end_pos) {
-          std::string surface = extractSubstring(codepoints, start_pos, end_pos);
-          if (!surface.empty()) {
-            auto cand = makeCandidate(surface, start_pos, end_pos, core::PartOfSpeech::Noun,
-                                      candidate::kInfixCompoundNounCost, false, CandidateOrigin::KanjiHiraganaCompound);
+          auto cand = makeCandidate(codepoints, start_pos, end_pos, core::PartOfSpeech::Noun,
+                                    candidate::kInfixCompoundNounCost, false, CandidateOrigin::KanjiHiraganaCompound);
 #ifdef SUZUME_DEBUG_INFO
-            cand.confidence = 0.9F;
-            cand.pattern = "kanji_sokuon_kanji";
+          cand.confidence = 0.9F;
+          cand.pattern = "kanji_sokuon_kanji";
 #endif
-            candidates.push_back(cand);
-          }
+          candidates.push_back(cand);
         }
 
         // Check for hatsuonbin verb: 漢字+っ+漢字+ん (e.g., 吹っ飛ん from 吹っ飛ぶ)
@@ -774,15 +772,7 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
         if (next_hira == U'た' || next_hira == U'て') {
           return;  // Skip - this is a verb conjugation, not a compound noun
         }
-        size_t hira2_end = sokuon_pos + 1;
-        while (hira2_end < char_types.size() && hira2_end - (sokuon_pos + 1) < 4 &&
-               char_types[hira2_end] == normalize::CharType::Hiragana) {
-          char32_t ch = codepoints[hira2_end];
-          if (normalize::isParticleCodepoint(ch)) {
-            break;
-          }
-          ++hira2_end;
-        }
+        const size_t hira2_end = scanCompoundHiraganaEnd(codepoints, char_types, sokuon_pos + 1);
 
         if (hira2_end > sokuon_pos + 1) {
           // A registered adjective beginning at the sokuon is a productive
@@ -836,16 +826,13 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
             }
           }
 
-          std::string surface = extractSubstring(codepoints, start_pos, hira2_end);
-          if (!surface.empty()) {
-            auto cand = makeCandidate(surface, start_pos, hira2_end, core::PartOfSpeech::Noun, 1.0F, false,
-                                      CandidateOrigin::KanjiHiraganaCompound);
+          auto cand = makeCandidate(codepoints, start_pos, hira2_end, core::PartOfSpeech::Noun, 1.0F, false,
+                                    CandidateOrigin::KanjiHiraganaCompound);
 #ifdef SUZUME_DEBUG_INFO
-            cand.confidence = 0.7F;
-            cand.pattern = "kanji_sokuon_hira";
+          cand.confidence = 0.7F;
+          cand.pattern = "kanji_sokuon_hira";
 #endif
-            candidates.push_back(cand);
-          }
+          candidates.push_back(cand);
         }
       }
     }
@@ -863,12 +850,11 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
     const size_t end_pos = kanji_end + 2;
     const bool second_kanji_is_single =
         end_pos >= char_types.size() || char_types[end_pos] != normalize::CharType::Kanji;
-    std::string surface = extractSubstring(codepoints, start_pos, end_pos);
-    if (second_kanji_is_single && !surface.empty()) {
+    if (second_kanji_is_single) {
       // An attributive copula right after the compound identifies it as a
       // na-adjective stem rather than a plain noun (真ん丸+な+月).
       const bool has_attributive_copula = end_pos < codepoints.size() && codepoints[end_pos] == U'な';
-      auto cand = makeCandidate(surface, start_pos, end_pos,
+      auto cand = makeCandidate(codepoints, start_pos, end_pos,
                                 has_attributive_copula ? core::PartOfSpeech::Adjective : core::PartOfSpeech::Noun,
                                 candidate::kInfixCompoundNounCost, false, CandidateOrigin::KanjiHiraganaCompound);
       if (has_attributive_copula) {
@@ -905,7 +891,7 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
   if (hiragana_len < 2) {
     return;
   }
-  char32_t second_hira = (hiragana_len >= 2) ? codepoints[kanji_end + 1] : 0;
+  const char32_t second_hira = codepoints[kanji_end + 1];
 
   // A kanji verb continuative stem productively combines with the resemblance
   // suffix っぽい to form one i-adjective search unit (忘れっぽい, 飽きっぽい).
@@ -913,7 +899,7 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
   // continuative stems and e-row marks Ichidan continuative stems.
   const std::string hiragana_candidate = extractSubstring(codepoints, kanji_end, hiragana_end);
   if (utf8::endsWith(hiragana_candidate, "っぽい") &&
-      (grammar::isIRowCodepoint(first_hira) || grammar::isERowCodepoint(first_hira))) {
+      (kana::isIRowCodepoint(first_hira) || kana::isERowCodepoint(first_hira))) {
     const std::string derived = extractSubstring(codepoints, start_pos, hiragana_end);
     auto adjective = makeCandidate(derived, start_pos, hiragana_end, core::PartOfSpeech::Adjective,
                                    candidate::kProductivePpoiAdjCost, false, CandidateOrigin::KanjiHiraganaCompound,
@@ -936,7 +922,7 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
   // e.g., さん, くん, ちゃん, たん should split as NOUN + SUFFIX
   // This is a grammatical pattern: hiragana ending with ん after single kanji
   // is typically an honorific suffix, not a compound noun
-  if (hiragana_len >= 2 && codepoints[hiragana_end - 1] == U'ん') {
+  if (codepoints[hiragana_end - 1] == U'ん') {
     return;
   }
 
@@ -944,150 +930,119 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
   // These get high cost to let verb/adjective candidates win
   bool looks_like_aux = false;
 
-  if (hiragana_len >= 2) {
-    // te/ta form, copula patterns
-    if (second_hira == U'て' || second_hira == U'た' || second_hira == U'で' || second_hira == U'だ') {
+  // te/ta form, copula patterns
+  if (second_hira == U'て' || second_hira == U'た' || second_hira == U'で' || second_hira == U'だ') {
+    looks_like_aux = true;
+  }
+  // ます, ない
+  if ((first_hira == U'ま' && second_hira == U'す') || (first_hira == U'な' && second_hira == U'い')) {
+    looks_like_aux = true;
+  }
+  // れる, られる, せる, させる
+  if ((first_hira == U'れ' && second_hira == U'る') || (first_hira == U'せ' && second_hira == U'る')) {
+    looks_like_aux = true;
+  }
+  // だった, だろう
+  if (first_hira == U'だ' && (second_hira == U'っ' || second_hira == U'ろ')) {
+    looks_like_aux = true;
+  }
+  // なら, なかった
+  if (first_hira == U'な' && (second_hira == U'ら' || second_hira == U'か')) {
+    looks_like_aux = true;
+  }
+  // Godan verb shuushikei (終止形) pattern
+  // e.g., 休む, 行く, 泳ぐ, 話す, 立つ, 死ぬ, 飛ぶ, 取る
+  // If first hiragana is a godan verb ending, kanji+first hiragana likely forms
+  // a complete verb, and the rest starts a new word
+  // 休むこと → 休む(VERB) + こと(NOUN), not 休むこ(NOUN) + と(PARTICLE)
+  const bool is_godan_shuushikei =
+      (first_hira == U'む' || first_hira == U'う' || first_hira == U'く' || first_hira == U'ぐ' ||
+       first_hira == U'す' || first_hira == U'つ' || first_hira == U'ぬ' || first_hira == U'ぶ' || first_hira == U'る');
+  if (is_godan_shuushikei) {
+    // The 終止形 split hypothesis (kanji+first_hira is a complete verb, the rest starts
+    // a new word) is only sound when the stranded remainder is lexically realizable.
+    // When exactly one hiragana would be orphaned (hiragana_len == 2), require that a
+    // dictionary word can start there; otherwise the "verb" reading strands junk (宝く|じ)
+    // and we must keep the kanji+hiragana noun (宝くじ) whole. Standalone single hiragana
+    // are a closed class (final particles よ/ね/な, copula, …) all in L1, and formal-noun
+    // continuations (こと) are caught by scanning across the particle break — so 休むこと,
+    // 飲むな, 帰るね, 行くよ still split as before.
+    const size_t orphan_pos = kanji_end + 1;
+    const bool orphan_split_viable =
+        hiragana_len != 2 || dict_manager == nullptr ||
+        lookupResultsHavePartOfSpeech(
+            lookupResultsInRange(*dict_manager, codepoints, orphan_pos,
+                                 findCharRegionEnd(char_types, orphan_pos, 3, normalize::CharType::Hiragana)),
+            partOfSpeechMask(core::PartOfSpeech::Particle));
+    if (orphan_split_viable) {
       looks_like_aux = true;
     }
-    // ます, ない
-    if ((first_hira == U'ま' && second_hira == U'す') || (first_hira == U'な' && second_hira == U'い')) {
-      looks_like_aux = true;
-    }
-    // れる, られる, せる, させる
-    if ((first_hira == U'れ' && second_hira == U'る') || (first_hira == U'せ' && second_hira == U'る')) {
-      looks_like_aux = true;
-    }
-    // だった, だろう
-    if (first_hira == U'だ' && (second_hira == U'っ' || second_hira == U'ろ')) {
-      looks_like_aux = true;
-    }
-    // なら, なかった
-    if (first_hira == U'な' && (second_hira == U'ら' || second_hira == U'か')) {
-      looks_like_aux = true;
-    }
-    // Godan verb shuushikei (終止形) pattern
-    // e.g., 休む, 行く, 泳ぐ, 話す, 立つ, 死ぬ, 飛ぶ, 取る
-    // If first hiragana is a godan verb ending, kanji+first hiragana likely forms
-    // a complete verb, and the rest starts a new word
-    // 休むこと → 休む(VERB) + こと(NOUN), not 休むこ(NOUN) + と(PARTICLE)
-    bool is_godan_shuushikei = (first_hira == U'む' || first_hira == U'う' || first_hira == U'く' ||
-                                first_hira == U'ぐ' || first_hira == U'す' || first_hira == U'つ' ||
-                                first_hira == U'ぬ' || first_hira == U'ぶ' || first_hira == U'る');
-    if (is_godan_shuushikei) {
-      // The 終止形 split hypothesis (kanji+first_hira is a complete verb, the rest starts
-      // a new word) is only sound when the stranded remainder is lexically realizable.
-      // When exactly one hiragana would be orphaned (hiragana_len == 2), require that a
-      // dictionary word can start there; otherwise the "verb" reading strands junk (宝く|じ)
-      // and we must keep the kanji+hiragana noun (宝くじ) whole. Standalone single hiragana
-      // are a closed class (final particles よ/ね/な, copula, …) all in L1, and formal-noun
-      // continuations (こと) are caught by scanning across the particle break — so 休むこと,
-      // 飲むな, 帰るね, 行くよ still split as before.
-      bool orphan_split_viable = true;
-      if (hiragana_len == 2 && dict_manager != nullptr) {
-        size_t orphan_pos = kanji_end + 1;
-        size_t ctx_end = orphan_pos;
-        while (ctx_end < char_types.size() && ctx_end - orphan_pos < 3 &&
-               char_types[ctx_end] == normalize::CharType::Hiragana) {
-          ++ctx_end;
-        }
-        orphan_split_viable =
-            lookupResultsHavePartOfSpeech(lookupResultsInRange(*dict_manager, codepoints, orphan_pos, ctx_end),
-                                          partOfSpeechMask(core::PartOfSpeech::Particle));
-      }
-      if (orphan_split_viable) {
-        looks_like_aux = true;
-      }
-    }
-    // Renyokei + そう/たい/ます
-    // For godan verbs: し,み,き,ぎ,ち,り,い,び (i-row)
-    // For ichidan verbs: べ,め,け,せ,て,ね,れ,え (e-row) - these are verb stems
-    bool is_renyokei = (first_hira == U'し' || first_hira == U'み' || first_hira == U'き' || first_hira == U'ぎ' ||
-                        first_hira == U'ち' || first_hira == U'り' || first_hira == U'い' || first_hira == U'び');
-    bool is_ichidan_stem = (first_hira == U'べ' || first_hira == U'め' || first_hira == U'け' || first_hira == U'せ' ||
-                            first_hira == U'て' || first_hira == U'ね' || first_hira == U'れ' || first_hira == U'え' ||
-                            first_hira == U'げ' || first_hira == U'ぜ' || first_hira == U'で' || first_hira == U'へ' ||
-                            first_hira == U'ぺ');
-    if ((is_renyokei || is_ichidan_stem) && (second_hira == U'そ' || second_hira == U'た' || second_hira == U'ま')) {
-      looks_like_aux = true;
-    }
-    // Negative + 様態 そう (なさそう): the negative auxiliary ない nominalized as
-    // なさ, carrying 様態 そう. Attaches to a verb stem (見なさそう = 見 + なさそう,
-    // 食べなさそう = 食べ + なさそう) and is never a compound noun. This is the
-    // negative counterpart of the renyokei + そう handling above, so let the
-    // verb + な + さ + そう decomposition win instead of merging into one noun.
-    if (hiragana_len >= 3) {
-      std::string hira_portion = extractSubstring(codepoints, kanji_end, hiragana_end);
-      if (hira_portion.find("なさそ") != std::string::npos) {
-        looks_like_aux = true;
-      }
-    }
-    // Renyokei + なさい (polite imperative)
-    // e.g., 書きなさい, 起きなさい - these should split as verb + なさい
-    if ((is_renyokei || is_ichidan_stem) && hiragana_len >= 4) {
-      // Check if hiragana portion ends with "さい" (last 2 chars of なさい)
-      char32_t h_minus2 = codepoints[hiragana_end - 2];
-      char32_t h_minus1 = codepoints[hiragana_end - 1];
-      if (h_minus2 == U'さ' && h_minus1 == U'い') {
-        looks_like_aux = true;
-      }
-    }
-    // Renyokei + べき (classical auxiliary)
-    // e.g., 読むべき, 食べるべき - these should split as verb + べき
-    if (hiragana_len >= 3) {
-      char32_t h_minus2 = codepoints[hiragana_end - 2];
-      char32_t h_minus1 = codepoints[hiragana_end - 1];
-      if (h_minus2 == U'べ' && h_minus1 == U'き') {
-        looks_like_aux = true;
-      }
-    }
-    // Patterns containing くださ (part of ください auxiliary)
-    // e.g., 待ちくださ, 行きくださ - these should be verb + ください
-    // Check if hiragana portion contains くださ
-    if (hiragana_len >= 3) {
-      std::string hira_portion = extractSubstring(codepoints, kanji_end, hiragana_end);
-      if (hira_portion.find("くださ") != std::string::npos || hira_portion.find("ください") != std::string::npos) {
-        looks_like_aux = true;
-      }
-    }
+  }
+  // Renyokei + そう/たい/ます
+  // For godan verbs: し,み,き,ぎ,ち,り,い,び (i-row)
+  // For ichidan verbs: べ,め,け,せ,て,ね,れ,え (e-row) - these are verb stems
+  const bool is_renyokei = (first_hira == U'し' || first_hira == U'み' || first_hira == U'き' || first_hira == U'ぎ' ||
+                            first_hira == U'ち' || first_hira == U'り' || first_hira == U'い' || first_hira == U'び');
+  const bool is_ichidan_stem =
+      (first_hira == U'べ' || first_hira == U'め' || first_hira == U'け' || first_hira == U'せ' ||
+       first_hira == U'て' || first_hira == U'ね' || first_hira == U'れ' || first_hira == U'え' ||
+       first_hira == U'げ' || first_hira == U'ぜ' || first_hira == U'で' || first_hira == U'へ' || first_hira == U'ぺ');
+  if ((is_renyokei || is_ichidan_stem) && (second_hira == U'そ' || second_hira == U'た' || second_hira == U'ま')) {
+    looks_like_aux = true;
+  }
+  // Negative + 様態 そう (なさそう): the negative auxiliary ない nominalized as
+  // なさ, carrying 様態 そう. Attaches to a verb stem (見なさそう = 見 + なさそう,
+  // 食べなさそう = 食べ + なさそう) and is never a compound noun. This is the
+  // negative counterpart of the renyokei + そう handling above, so let the
+  // verb + な + さ + そう decomposition win instead of merging into one noun.
+  if (hiragana_len >= 3 && hiragana_candidate.find("なさそ") != std::string::npos) {
+    looks_like_aux = true;
+  }
+  // Renyokei + なさい (polite imperative)
+  // e.g., 書きなさい, 起きなさい - these should split as verb + なさい
+  const char32_t last_hira = codepoints[hiragana_end - 1];
+  const char32_t before_last_hira = codepoints[hiragana_end - 2];
+  if ((is_renyokei || is_ichidan_stem) && hiragana_len >= 4 && before_last_hira == U'さ' && last_hira == U'い') {
+    looks_like_aux = true;
+  }
+  // Renyokei + べき (classical auxiliary)
+  // e.g., 読むべき, 食べるべき - these should split as verb + べき
+  if (hiragana_len >= 3 && before_last_hira == U'べ' && last_hira == U'き') {
+    looks_like_aux = true;
+  }
+  // Patterns containing くださ (part of ください auxiliary)
+  // e.g., 待ちくださ, 行きくださ - these should be verb + ください
+  if (hiragana_len >= 3 && hiragana_candidate.find("くださ") != std::string::npos) {
+    looks_like_aux = true;
   }
 
   // Ichidan verb pattern (e-row + る)
-  bool is_e_row =
+  const bool is_e_row =
       (first_hira == U'え' || first_hira == U'け' || first_hira == U'げ' || first_hira == U'せ' ||
        first_hira == U'て' || first_hira == U'ね' || first_hira == U'べ' || first_hira == U'め' || first_hira == U'れ');
-  if (is_e_row && hiragana_len >= 2 && second_hira == U'る') {
+  if (is_e_row && second_hira == U'る') {
     looks_like_aux = true;
   }
 
   // Patterns ending with る
-  char32_t last_hira = codepoints[hiragana_end - 1];
-  if (last_hira == U'る' && hiragana_len >= 2) {
+  if (last_hira == U'る') {
     looks_like_aux = true;
   }
 
   // Patterns ending with るそう (verb dictionary form + hearsay そう)
   // e.g., 食べるそう, 降るそう - these are verb終止形 + そう(hearsay), not compound nouns
   // Valid i-adj+そう like 美味しそう are handled separately (don't have る before そう)
-  if (hiragana_len >= 3 && last_hira == U'う') {
-    char32_t h_minus2 = codepoints[hiragana_end - 2];
-    char32_t h_minus3 = (hiragana_end >= 3) ? codepoints[hiragana_end - 3] : U'\0';
-    // Check for るそう pattern (verb終止形 + hearsay)
-    if (h_minus2 == U'そ' && h_minus3 == U'る') {
-      looks_like_aux = true;
-    }
-    // Check for くそう pattern (godan-ku終止形 + hearsay: 行くそう)
-    if (h_minus2 == U'そ' && h_minus3 == U'く') {
-      looks_like_aux = true;
-    }
-    // Check for すそう pattern (godan-sa終止形 + hearsay: 話すそう, するそう)
-    if (h_minus2 == U'そ' && h_minus3 == U'す') {
+  // The same holds for godan-ku/sa terminals (行くそう, 話すそう, するそう).
+  if (hiragana_len >= 3 && last_hira == U'う' && before_last_hira == U'そ') {
+    const char32_t terminal = codepoints[hiragana_end - 3];
+    if (terminal == U'る' || terminal == U'く' || terminal == U'す') {
       looks_like_aux = true;
     }
   }
 
   // Patterns ending with て/で (verb te-form)
   // e.g., 基づいて, 考えて - these are verb conjugations, not compound nouns
-  if ((last_hira == U'て' || last_hira == U'で') && hiragana_len >= 2) {
+  if (last_hira == U'て' || last_hira == U'で') {
     looks_like_aux = true;
   }
 
@@ -1096,7 +1051,7 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
   // (嘘じみた, 夢じみた). This is the past-tense half of the check above; the
   // fixed nouns that happen to end in the same mora (花かるた) keep an ordinary
   // candidate, only priced as the auxiliary-shaped span it looks like.
-  if (last_hira == U'た' && hiragana_len >= 2) {
+  if (last_hira == U'た') {
     looks_like_aux = true;
   }
 
@@ -1130,14 +1085,10 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
   // Skip NOUN generation for pure auxiliary patterns
   // These should always be verb stem + auxiliary, never a compound noun
   // e.g., 寝ます should be 寝(VERB) + ます(AUX), not 寝ます(NOUN)
-  if (hiragana_len == 2) {
-    using namespace suzume::core::hiragana;
-    char32_t h1 = codepoints[kanji_end];
-    char32_t h2 = codepoints[kanji_end + 1];
-    // ます, ない - pure polite/negative auxiliaries
-    if ((h1 == kMa && h2 == kSu) || (h1 == kNa && h2 == kI)) {
-      return;  // Skip NOUN generation entirely
-    }
+  // ます, ない - pure polite/negative auxiliaries
+  if (hiragana_len == 2 && ((first_hira == core::hiragana::kMa && second_hira == core::hiragana::kSu) ||
+                            (first_hira == core::hiragana::kNa && second_hira == core::hiragana::kI))) {
+    return;
   }
 
   // Check if the hiragana portion is a known dictionary word (exact match)
@@ -1151,11 +1102,8 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
 
   // Skip compound generation if the full surface is a known verb in dictionary
   // E.g., 下さい is dict verb (くださる), not compound noun
-  {
-    std::string full_surface = extractSubstring(codepoints, start_pos, hiragana_end);
-    if (verb_helpers::isVerbInDictionary(dict_manager, full_surface)) {
-      return;  // Skip - dict verb should win
-    }
+  if (verb_helpers::isVerbInDictionary(dict_manager, extractSubstring(codepoints, start_pos, hiragana_end))) {
+    return;
   }
 
   // Skip when the hiragana portion ends in a focus particle (副助詞/係助詞)
@@ -1179,29 +1127,23 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
   }
 
   // Generate candidate with cost based on pattern
-  std::string surface = extractSubstring(codepoints, start_pos, hiragana_end);
-  if (!surface.empty()) {
-    float cost = looks_like_aux ? 3.5F : 1.0F;
-    // A clause that ends on the span is the same nominal frame a following case
-    // particle provides: nothing there can be a predicate ending, so whatever
-    // occupies the position is a nominal (草むら。 alongside 草むらに). Without
-    // this the identical compound would be priced as an unverified run purely
-    // because the sentence stopped.
-    const bool ends_clause =
-        hiragana_end >= char_types.size() || char_types[hiragana_end] == normalize::CharType::Symbol;
-    const bool nominal_context =
-        !looks_like_aux && (ends_clause || hasNominalPhraseSelectorAt(dict_manager, codepoints, hiragana_end));
-    auto cand = makeCandidate(
-        surface, start_pos, hiragana_end, core::PartOfSpeech::Noun, cost, false,
-        nominal_context ? CandidateOrigin::KanjiHiraganaNominalCompound : CandidateOrigin::KanjiHiraganaCompound);
+  const float cost = looks_like_aux ? 3.5F : 1.0F;
+  // A clause that ends on the span is the same nominal frame a following case
+  // particle provides: nothing there can be a predicate ending, so whatever
+  // occupies the position is a nominal (草むら。 alongside 草むらに). Without
+  // this the identical compound would be priced as an unverified run purely
+  // because the sentence stopped.
+  const bool ends_clause = hiragana_end >= char_types.size() || char_types[hiragana_end] == normalize::CharType::Symbol;
+  const bool nominal_context =
+      !looks_like_aux && (ends_clause || hasNominalPhraseSelectorAt(dict_manager, codepoints, hiragana_end));
+  auto cand = makeCandidate(
+      codepoints, start_pos, hiragana_end, core::PartOfSpeech::Noun, cost, false,
+      nominal_context ? CandidateOrigin::KanjiHiraganaNominalCompound : CandidateOrigin::KanjiHiraganaCompound);
 #ifdef SUZUME_DEBUG_INFO
-    cand.confidence = looks_like_aux ? 0.3F : 0.8F;
-    cand.pattern = looks_like_aux ? "aux_like" : (nominal_context ? "nominal_compound" : "compound");
+  cand.confidence = looks_like_aux ? 0.3F : 0.8F;
+  cand.pattern = looks_like_aux ? "aux_like" : (nominal_context ? "nominal_compound" : "compound");
 #endif
-    candidates.push_back(cand);
-  }
-
-  return;
+  candidates.push_back(cand);
 }
 
 }  // namespace suzume::analysis

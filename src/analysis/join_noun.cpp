@@ -8,6 +8,7 @@
 #include "bigram_table.h"
 #include "candidate_constants.h"
 #include "core/debug.h"
+#include "core/kana_constants.h"
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "grammar/inflection.h"
@@ -86,8 +87,6 @@ const ProductivePrefix kProductivePrefixes[] = {
     {U'半', candidate::kProductivePrefixJoinBonus, true},   // 半分, 半額
 };
 
-constexpr size_t kNumPrefixes = sizeof(kProductivePrefixes) / sizeof(kProductivePrefixes[0]);
-
 // Maximum noun length for prefix joining
 constexpr size_t kMaxNounLenForPrefix = 6;
 
@@ -103,9 +102,6 @@ bool hasNaAdjectiveContinuation(const std::vector<char32_t>& codepoints, size_t 
   }
   return pos + 1 < codepoints.size() && codepoints[pos] == U'そ' && codepoints[pos + 1] == U'う';
 }
-
-// Cost bonus imported from candidate_constants.h:
-// candidate::kVerifiedNounBonus
 
 bool isHiraganaHonorificPrefix(char32_t codepoint) {
   return codepoint == U'お' || codepoint == U'ご';
@@ -215,13 +211,10 @@ void addPrefixNounJoinCandidates(core::Lattice& lattice, std::string_view text, 
   addStandaloneHonorificPrefixInterjectionCandidate(lattice, text, codepoints, byte_offsets, start_pos, char_types,
                                                     scorer);
 
-  // Check if current character is a productive prefix
-  char32_t current_char = codepoints[start_pos];
   const ProductivePrefix* matched_prefix = nullptr;
-
-  for (size_t idx = 0; idx < kNumPrefixes; ++idx) {
-    if (kProductivePrefixes[idx].codepoint == current_char) {
-      matched_prefix = &kProductivePrefixes[idx];
+  for (const auto& prefix : kProductivePrefixes) {
+    if (prefix.codepoint == codepoints[start_pos]) {
+      matched_prefix = &prefix;
       break;
     }
   }
@@ -237,18 +230,11 @@ void addPrefixNounJoinCandidates(core::Lattice& lattice, std::string_view text, 
   }
 
   // For most prefixes, the noun part should start with kanji
-  if (matched_prefix->needs_kanji) {
-    if (char_types[noun_start] != CharType::Kanji) {
-      return;
-    }
-  } else {
-    if (char_types[noun_start] != CharType::Kanji && char_types[noun_start] != CharType::Katakana) {
-      return;
-    }
+  const CharType noun_type = char_types[noun_start];
+  if (noun_type != CharType::Kanji && (matched_prefix->needs_kanji || noun_type != CharType::Katakana)) {
+    return;
   }
 
-  // Find the end of the noun part
-  CharType noun_type = char_types[noun_start];
   size_t noun_end = findCharRegionEnd(char_types, noun_start, kMaxNounLenForPrefix, noun_type);
   if (noun_type == CharType::Kanji) {
     const size_t following_verb_start =
@@ -355,7 +341,7 @@ void addPrefixNounJoinCandidates(core::Lattice& lattice, std::string_view text, 
   // 使用可能). Their following な is the attributive copula, not evidence that
   // the whole productive prefix compound should be reclassified as an
   // adjective.
-  bool is_nominal_capability_compound = utf8::endsWith(surface, "可能");
+  const bool is_nominal_capability_compound = utf8::endsWith(surface, "可能");
   // A dictionary-backed adjective after a productive prefix remains the
   // predicate head (超|簡単, 最|重要); the prefix+noun join must not turn that
   // host into a larger adjective merely because the same surface can also be
@@ -364,10 +350,8 @@ void addPrefixNounJoinCandidates(core::Lattice& lattice, std::string_view text, 
   // unit is absent from the compact dictionary. Keep the nominal path too so
   // non-adjectival contexts can still select it.
   if (!is_nominal_capability_compound && is_predicative_negation_compound) {
-    float adjective_cost = scorer.posPrior(core::PartOfSpeech::Adjective) + matched_prefix->bonus;
-    if (is_predicative_negation_compound) {
-      adjective_cost += candidate::kPredicativeNegationPrefixAdjectiveBonus;
-    }
+    const float adjective_cost = scorer.posPrior(core::PartOfSpeech::Adjective) + matched_prefix->bonus +
+                                 candidate::kPredicativeNegationPrefixAdjectiveBonus;
     lattice.addEdge(surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(noun_end),
                     core::PartOfSpeech::Adjective, adjective_cost, flags, surface, dictionary::ConjugationType::None,
                     core::CandidateOrigin::PrefixCompound, candidate::kNoOriginConfidence, "prefix_na_adjective",
@@ -590,16 +574,16 @@ void addVerbSuffixNounJoinCandidates(core::Lattice& lattice, std::string_view te
     // Allow godan-ra renyokei (り: やる→やり, ある→あり) and godan-wa renyokei
     // (い: 言う→いい). 言う often has its stem-only renyokei written as いい
     // even when the kanji 言 is omitted.
-    char32_t c1 = codepoints[start_pos + 1];
-    if (c1 != U'り' && c1 != U'い') {
+    const char32_t continuative_kana = codepoints[start_pos + 1];
+    if (continuative_kana != U'り' && continuative_kana != U'い') {
       return;
     }
     // Verbs are an open class, but a two-mora hiragana continuative is short
     // enough to be a coincidence: the tail of an i-adjective written across a
     // kanji stem has the same shape (望まし+い方 out of 望ましい+方向). Require
     // the reconstructed base to be attested before joining.
-    const std::string continuative_base =
-        normalize::concat(extractSubstring(codepoints, start_pos, start_pos + 1), grammar::godanBaseSuffixFromIRow(c1));
+    const std::string continuative_base = normalize::concat(extractSubstring(codepoints, start_pos, start_pos + 1),
+                                                            grammar::godanBaseSuffixFromIRow(continuative_kana));
     if (!verb_helpers::isVerbInDictionary(&dict_manager, continuative_base)) {
       return;
     }
@@ -614,58 +598,18 @@ void addVerbSuffixNounJoinCandidates(core::Lattice& lattice, std::string_view te
 
   // Look for patterns: Kanji + Hiragana + Suffix(物/方/所)
   // Examples: 食べ物, 飲み物, 読み方, 居場所
-  size_t pos = start_pos;
-
-  // Find kanji portion (verb stem)
-  size_t kanji_end = pos;
+  size_t kanji_end = start_pos;
   while (kanji_end < codepoints.size() && char_types[kanji_end] == CharType::Kanji) {
     ++kanji_end;
   }
 
-  if (kanji_end == pos) {
-    return;  // No kanji found
-  }
-
-  // Look for optional hiragana (verb renyokei suffix like べ, み, き)
-  size_t hiragana_end = kanji_end;
-  while (hiragana_end < codepoints.size() && char_types[hiragana_end] == CharType::Hiragana) {
-    // Only allow 1-2 hiragana characters for renyokei
-    if (hiragana_end - kanji_end >= 2) {
-      break;
-    }
-    ++hiragana_end;
-  }
-  // Reject if hiragana ends with な (na-adjective 連体形, not verb renyokei)
-  // e.g., 効率的な方 should NOT become a compound noun (it's 効率+的+な+方)
-  if (hiragana_end > kanji_end && codepoints[hiragana_end - 1] == U'な') {
-    return;
-  }
-
-  // Reject if hiragana ends with た (past form, not verb renyokei)
-  // e.g., 書いた方 should NOT become a compound noun (it's 書い+た+方)
-  // Correct patterns: 歩き方, 食べ方 (V連用形+方)
-  if (hiragana_end > kanji_end && (codepoints[hiragana_end - 1] == U'た' || codepoints[hiragana_end - 1] == U'だ')) {
-    return;
-  }
-
-  // Reject if hiragana ends with の (genitive particle, not verb renyokei)
-  // e.g., 今後の方針 should NOT become 今後の方 + 針 (it's 今後+の+方針)
-  // の is a case particle, not a verb renyokei ending
-  if (hiragana_end > kanji_end && codepoints[hiragana_end - 1] == U'の') {
-    return;
-  }
+  // Look for 1-2 optional hiragana (verb renyokei suffix like べ, み, き)
+  const size_t hiragana_end = findCharRegionEnd(char_types, kanji_end, 2, CharType::Hiragana);
 
   // Reject if hiragana ends with い AND hiragana run is 2+ chars (i-adjective).
   // e.g., 美しい方 (kanji+しい) is an adjective + noun, not a compound.
   // But 言い方 (kanji+い, single hiragana い) is godan-wa V連用形 + 方 — valid.
   if (hiragana_end > kanji_end + 1 && codepoints[hiragana_end - 1] == U'い') {
-    return;
-  }
-
-  // Reject if hiragana ends with る (verb rentaikei/dictionary form, not renyokei)
-  // e.g., 見渡せる所 should NOT become a compound noun (it's 見渡せる + 所)
-  // Valid patterns: 食べ物, 居場所 (verb renyokei + suffix)
-  if (hiragana_end > kanji_end && codepoints[hiragana_end - 1] == U'る') {
     return;
   }
 
@@ -685,8 +629,11 @@ void addVerbSuffixNounJoinCandidates(core::Lattice& lattice, std::string_view te
   if (utf8::equalsAny(hiragana_portion, {"から", "より", "まで"})) {
     return;
   }
-  if (hiragana_end > kanji_end && !grammar::isIRowCodepoint(codepoints[hiragana_end - 1]) &&
-      !grammar::isERowCodepoint(codepoints[hiragana_end - 1])) {
+  // A continuative ends on the i-row or e-row. Any other final kana is an
+  // attributive, past, genitive or terminal form instead (効率的な方, 書いた方,
+  // 今後の方針, 見渡せる所), not a verb continuative heading the compound.
+  if (hiragana_end > kanji_end && !kana::isIRowCodepoint(codepoints[hiragana_end - 1]) &&
+      !kana::isERowCodepoint(codepoints[hiragana_end - 1])) {
     return;
   }
 
@@ -758,11 +705,11 @@ void addVerbSuffixNounJoinCandidates(core::Lattice& lattice, std::string_view te
     if (is_closed_modifier && !has_verb_reading) {
       return;
     }
-    const char32_t final_kana = codepoints[hiragana_end - 1];
-    const std::string_view godan_ending = grammar::godanBaseSuffixFromIRow(final_kana);
+    const std::string_view renyokei_stem =
+        std::string_view(renyokei).substr(0, renyokei.size() - core::kJapaneseCharBytes);
+    const std::string_view godan_ending = grammar::godanBaseSuffixFromIRow(codepoints[hiragana_end - 1]);
     if (!godan_ending.empty()) {
-      const std::string base_form =
-          normalize::concat(renyokei.substr(0, renyokei.size() - core::kJapaneseCharBytes), godan_ending);
+      const std::string base_form = normalize::concat(renyokei_stem, godan_ending);
       if (dict_manager.lookupExact(base_form, core::PartOfSpeech::Verb) == nullptr) {
         return;
       }
@@ -772,7 +719,7 @@ void addVerbSuffixNounJoinCandidates(core::Lattice& lattice, std::string_view te
       // The latter cannot form a deverbal 手/場 compound, so reject it when
       // the reconstructed i-adjective is attested; otherwise retain the
       // productive Ichidan reading.
-      const std::string adjective_base = renyokei.substr(0, renyokei.size() - core::kJapaneseCharBytes) + "い";
+      const std::string adjective_base = normalize::concat(renyokei_stem, "い");
       if (verb_helpers::isAdjectiveInDictionary(&dict_manager, adjective_base)) {
         return;
       }

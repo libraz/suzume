@@ -94,10 +94,7 @@ void appendBasicNumeralCounterCandidates(const std::vector<char32_t>& codepoints
   // (三分の一秒).
   if (numeral_end + 2 < codepoints.size() && codepoints[numeral_end] == U'分' && codepoints[numeral_end + 1] == U'の' &&
       normalize::isNumeralCodepoint(codepoints[numeral_end + 2])) {
-    size_t denominator_end = numeral_end + 2;
-    while (denominator_end < codepoints.size() && normalize::isNumeralCodepoint(codepoints[denominator_end])) {
-      ++denominator_end;
-    }
+    const size_t denominator_end = scanQuantityHead(codepoints, numeral_end + 2, false);
     appendCounterCandidate(codepoints, start_pos, denominator_end, core::PartOfSpeech::Noun,
                            candidate::kFractionMergeCost, core::ExtendedPOS::NounNumber,
                            "fraction_numerator_bun_no_denominator", candidates);
@@ -109,7 +106,7 @@ void appendBasicNumeralCounterCandidates(const std::vector<char32_t>& codepoints
   // suffix can share the same quantity boundary rule.
   if (dict_manager != nullptr && (normalize::isCounterKanji(codepoints[numeral_end]) ||
                                   normalize::isTemporalCounterKanji(codepoints[numeral_end]))) {
-    size_t counter_end = numeral_end + 1;
+    const size_t counter_end = numeral_end + 1;
     // A formal noun is bound the same way (四月一日+付け, 一日+付), unlike an
     // ordinary noun that may still compound with the counter (三日月).
     const auto following = lookupResultsInRange(*dict_manager, codepoints, counter_end, codepoints.size());
@@ -170,20 +167,15 @@ void appendBasicNumeralCounterCandidates(const std::vector<char32_t>& codepoints
     }
   }
 
-  // Check for counter suffix (つ for native counters)
-  char32_t next = codepoints[numeral_end];
-  if (next == U'つ') {
-    // Generate counter candidate: Nつ
-    std::string surface = extractSubstring(codepoints, start_pos, numeral_end + 1);
-    if (!surface.empty()) {
-      auto cand = makeCandidate(surface, start_pos, numeral_end + 1, core::PartOfSpeech::Noun,
-                                candidate::kNativeTsuCounterBonus, false, CandidateOrigin::Counter);
+  // Native counter つ: Nつ
+  if (codepoints[numeral_end] == U'つ') {
+    auto cand = makeCandidate(codepoints, start_pos, numeral_end + 1, core::PartOfSpeech::Noun,
+                              candidate::kNativeTsuCounterBonus, false, CandidateOrigin::Counter);
 #ifdef SUZUME_DEBUG_INFO
-      cand.confidence = 0.95F;
-      cand.pattern = "counter_tsu";
+    cand.confidence = 0.95F;
+    cand.pattern = "counter_tsu";
 #endif
-      candidates.push_back(cand);
-    }
+    candidates.push_back(cand);
   }
 
   // Numeral(s) + a single kanji counter at a kanji→non-kanji boundary (三十度, 九十度,

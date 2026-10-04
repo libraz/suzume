@@ -71,10 +71,7 @@ void generateCounterCandidates(const std::vector<char32_t>& codepoints, size_t s
   }
 
   // Find the end of the numeral sequence
-  size_t numeral_end = start_pos;
-  while (numeral_end < codepoints.size() && normalize::isNumeralCodepoint(codepoints[numeral_end])) {
-    ++numeral_end;
-  }
+  const size_t numeral_end = counter_detail::scanQuantityHead(codepoints, start_pos, false);
 
   // Must have at least one character after numerals
   if (numeral_end >= codepoints.size()) {
@@ -128,8 +125,8 @@ void generateCounterCandidates(const std::vector<char32_t>& codepoints, size_t s
   const size_t unit_len = unit_end - numeral_end;
   float cost = starts_with_zero_prefix ? 2.0F  // Penalize unnatural zero-prefix numbers
                                        : -0.5F - (static_cast<float>(unit_len) * 0.05F);
-  auto cand = makeCandidate(extractSubstring(codepoints, start_pos, unit_end), start_pos, unit_end,
-                            core::PartOfSpeech::Noun, cost, false, CandidateOrigin::Counter);
+  auto cand =
+      makeCandidate(codepoints, start_pos, unit_end, core::PartOfSpeech::Noun, cost, false, CandidateOrigin::Counter);
 #ifdef SUZUME_DEBUG_INFO
   cand.confidence = starts_with_zero_prefix ? 0.3F : 0.9F;
   cand.pattern = "numeric_unit_katakana";

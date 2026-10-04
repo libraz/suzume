@@ -3,6 +3,8 @@
  * @brief Kanji-led compound-verb join candidate generation
  */
 
+#include <algorithm>
+
 #include "grammar/honorific_verbs.h"
 #include "join_compound_verb_internal.h"
 
@@ -46,7 +48,7 @@ void addDictionaryVerifiedIchidanCompoundNominalCandidate(core::Lattice& lattice
   }
 
   if (end_pos >= codepoints.size() || end_pos - start_pos < min_length ||
-      !(has_kanji_after_hiragana || bare_ichidan_v1_shape) || !grammar::isERowCodepoint(codepoints[end_pos - 1]) ||
+      !(has_kanji_after_hiragana || bare_ichidan_v1_shape) || !kana::isERowCodepoint(codepoints[end_pos - 1]) ||
       !beginsNominalForcingParticle(codepoints, end_pos, dict_manager)) {
     return;
   }
@@ -74,7 +76,7 @@ void addDictionaryVerifiedGodanCompoundNominalCandidate(core::Lattice& lattice, 
                                                         const Scorer& scorer) {
   const size_t v1_kanji_end = findCharRegionEnd(char_types, start_pos, 3, CharType::Kanji);
   if (v1_kanji_end >= codepoints.size() || char_types[v1_kanji_end] != CharType::Hiragana ||
-      !grammar::isIRowCodepoint(codepoints[v1_kanji_end])) {
+      !kana::isIRowCodepoint(codepoints[v1_kanji_end])) {
     return;
   }
   const std::string_view v1_base_ending = grammar::godanBaseSuffixFromIRow(codepoints[v1_kanji_end]);
@@ -100,7 +102,7 @@ void addDictionaryVerifiedGodanCompoundNominalCandidate(core::Lattice& lattice, 
     }
     ++end_pos;
   }
-  if (end_pos >= codepoints.size() || end_pos <= v2_start + 1 || !grammar::isIRowCodepoint(codepoints[end_pos - 1]) ||
+  if (end_pos >= codepoints.size() || end_pos <= v2_start + 1 || !kana::isIRowCodepoint(codepoints[end_pos - 1]) ||
       !beginsNominalForcingParticle(codepoints, end_pos, dict_manager)) {
     return;
   }
@@ -227,38 +229,22 @@ void addCompoundVerbJoinCandidates(core::Lattice& lattice, std::string_view text
     // - Kami-ichidan (上一段): い-row (落ち from 落ちる, 起き from 起きる)
     // - Suru-variant: じ/ぢ (演じ from 演じる, 感じ from 感じる)
     // This hiragana belongs to V1, so V2 begins after it.
-    char32_t hira = codepoints[kanji_end];
-    bool is_e_row_stem = grammar::isERowCodepoint(hira);
-    // Note: I-row includes some chars that are also Godan renyokei endings
-    // (き, ぎ, し, ち, etc.), but by the time we reach this branch
-    // (is_ichidan=true) those cases have already set base_ending above.
-    bool is_i_row_stem = grammar::isIRowCodepoint(hira);
-
-    if (is_e_row_stem || is_i_row_stem) {
-      // Single-char ichidan stem: 食べ+込む, 落ち+着く
+    // The i-row Godan continuatives (き, し, ...) already set base_ending above,
+    // so an e/i-row kana here is a single-kana ichidan stem: 食べ+込む, 落ち+着く.
+    const char32_t hira = codepoints[kanji_end];
+    if (kana::isERowCodepoint(hira) || kana::isIRowCodepoint(hira)) {
       v2_start = kanji_end + 1;
     } else {
-      // Check for multi-char ichidan stem: 生まれ+変わる (生まれる has stem まれ)
-      // Scan hiragana sequence to see if last char is e-row/i-row (ichidan marker)
-      bool found_multi_ichidan = false;
-      size_t scan_pos = kanji_end + 1;
-      // Limit scan to 3 additional hiragana chars (max stem like まれ = 2 chars)
-      size_t scan_limit = std::min(scan_pos + 2, codepoints.size());
-      while (scan_pos < scan_limit && char_types[scan_pos] == CharType::Hiragana) {
-        char32_t scan_char = codepoints[scan_pos];
-        if (grammar::isERowCodepoint(scan_char) || grammar::isIRowCodepoint(scan_char)) {
-          // Found e/i-row ending: valid multi-char ichidan stem
-          // V2 starts after this character
+      // A multi-kana ichidan stem ends on the next e/i-row kana (生まれ+変わる);
+      // without one, V2 may start at the kana itself (見+つける).
+      v2_start = kanji_end;
+      const size_t scan_limit = std::min(kanji_end + 3, codepoints.size());
+      for (size_t scan_pos = kanji_end + 1; scan_pos < scan_limit && char_types[scan_pos] == CharType::Hiragana;
+           ++scan_pos) {
+        if (kana::isERowCodepoint(codepoints[scan_pos]) || kana::isIRowCodepoint(codepoints[scan_pos])) {
           v2_start = scan_pos + 1;
-          found_multi_ichidan = true;
           break;
         }
-        ++scan_pos;
-      }
-      if (!found_multi_ichidan) {
-        // For non-E/I-row, look for V2 starting at the hiragana position
-        // This allows patterns like 見 + つける = 見つける where つ is U-row
-        v2_start = kanji_end;
       }
     }
   } else {
@@ -289,21 +275,9 @@ void addCompoundVerbJoinCandidates(core::Lattice& lattice, std::string_view text
       if (char_types[start_pos + 1] != CharType::Hiragana) {
         continue;
       }
-      size_t kanji_runs = 0;
-      bool in_kanji = false;
-      bool shape_ok = true;
-      for (size_t idx = start_pos; idx < start_pos + res.length; ++idx) {
-        const bool is_kanji = char_types[idx] == CharType::Kanji;
-        if (is_kanji && !in_kanji) {
-          ++kanji_runs;
-        }
-        in_kanji = is_kanji;
-        if (kanji_runs > 1) {
-          shape_ok = false;
-          break;
-        }
-      }
-      if (!shape_ok || kanji_runs != 1) {
+      const auto span_end = char_types.begin() + static_cast<std::ptrdiff_t>(start_pos + res.length);
+      if (std::find(char_types.begin() + static_cast<std::ptrdiff_t>(start_pos + 2), span_end, CharType::Kanji) !=
+          span_end) {
         continue;
       }
       best_len = res.length;
@@ -327,7 +301,7 @@ void addCompoundVerbJoinCandidates(core::Lattice& lattice, std::string_view text
   // retain its entire stem and begin matching the subsidiary V2 after it.
   if (!dict_compound_v1 && has_kanji_v2_after_bare_ichidan && kanji_end > start_pos + 1 &&
       kanji_end + 1 < codepoints.size() && char_types[kanji_end + 1] == CharType::Kanji &&
-      (grammar::isERowCodepoint(renyokei_char) || grammar::isIRowCodepoint(renyokei_char))) {
+      (kana::isERowCodepoint(renyokei_char) || kana::isIRowCodepoint(renyokei_char))) {
     const std::string multi_kanji_ichidan_base = extractSubstring(codepoints, start_pos, kanji_end + 1) + "る";
     if (dict_manager.lookupExact(multi_kanji_ichidan_base, core::PartOfSpeech::Verb) != nullptr) {
       v2_start = kanji_end + 1;
@@ -351,7 +325,7 @@ void addCompoundVerbJoinCandidates(core::Lattice& lattice, std::string_view text
       // Require a further kanji-written verb after the renyokei (引っ張り + 出す): this path
       // only chains a trailing subsidiary. Without it, 引っ越しました (引っ越す + aux) would be
       // hijacked and the plain 引っ越す compound lost.
-      if (k2_end < codepoints.size() && k2_end + 1 < codepoints.size() && char_types[k2_end] == CharType::Hiragana &&
+      if (k2_end + 1 < codepoints.size() && char_types[k2_end] == CharType::Hiragana &&
           char_types[k2_end + 1] == CharType::Kanji) {
         char32_t base2 = godanRenyokeiBaseCp(codepoints[k2_end]);
         if (base2 != 0) {

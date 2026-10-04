@@ -24,11 +24,6 @@ namespace suzume::analysis {
 
 namespace {
 
-// Cost bonuses imported from candidate_constants.h:
-// candidate::kAlphaKanjiBonus, kAlphaKatakanaBonus
-// candidate::kDictSplitBonus, kSplitBaseCost
-// candidate::kNounVerbSplitBonus, kVerifiedVerbBonus
-
 // Maximum lengths for mixed script segments
 constexpr size_t kMaxAlphaLen = 12;      // Reasonable limit for English words
 constexpr size_t kMaxDigitLen = 8;       // Reasonable limit for numbers
@@ -550,14 +545,7 @@ void addNounVerbSplitCandidates(core::Lattice& lattice, std::string_view text, c
         // (月々支+払う): the regular 月々 candidate and the verb beginning at
         // 支 already express the grammatical segmentation.  Full repeated
         // compounds remain available through the ordinary same-type path.
-        bool extends_past_iteration_mark = false;
-        for (size_t index = start_pos; index + 1 < verb_start; ++index) {
-          if (normalize::isIterationMark(codepoints[index])) {
-            extends_past_iteration_mark = true;
-            break;
-          }
-        }
-        if (extends_past_iteration_mark) {
+        if (containsIterationMark(codepoints, start_pos, verb_start - 1)) {
           continue;
         }
 
@@ -566,9 +554,8 @@ void addNounVerbSplitCandidates(core::Lattice& lattice, std::string_view text, c
         if (verb_start < kanji_end) {
           size_t compound_end_byte = byteOffsetAt(byte_offsets, verb_start + 1);
           const std::string_view compound = text.substr(start_byte, compound_end_byte - start_byte);
-          bool compound_in_dict = dict_manager.lookupExact(compound) != nullptr;
-          if (compound_in_dict) {
-            continue;  // Skip this split, prefer compound word
+          if (dict_manager.lookupExact(compound) != nullptr) {
+            continue;
           }
         }
         // Skip split if last kanji of noun + first kanji of verb forms a known
@@ -577,12 +564,11 @@ void addNounVerbSplitCandidates(core::Lattice& lattice, std::string_view text, c
         // like 大掃除+する → skip because 掃除 is a dict word.
         if (noun_surface.size() >= 6) {  // Noun has at least 2 kanji (6 bytes UTF-8)
           const std::string last_kanji = normalize::encodeUtf8(codepoints[verb_start - 1]);
-          // Check last_kanji + verb_part (e.g., 除+する = 掃除する? no, but 除する? no)
           std::string alt_word = normalize::concat(last_kanji, verb_part);
           if (dict_manager.lookupExact(alt_word) != nullptr) {
             SUZUME_DEBUG_LOG_VERBOSE("[SPLIT_NV] skip \"" << noun_surface << "\" + \"" << verb_part
                                                           << "\": alt dict word \"" << alt_word << "\" exists\n");
-            goto next_split;
+            continue;
           }
           // Check last_kanji + first_kanji_of_verb (e.g., 崩+壊 = 崩壊)
           // This catches compounds where the verb's kanji belongs to a noun
@@ -592,48 +578,45 @@ void addNounVerbSplitCandidates(core::Lattice& lattice, std::string_view text, c
             if (dict_manager.lookupExact(compound) != nullptr) {
               SUZUME_DEBUG_LOG_VERBOSE("[SPLIT_NV] skip \"" << noun_surface << "\" + \"" << verb_part
                                                             << "\": compound \"" << compound << "\" is dict word\n");
-              goto next_split;
+              continue;
             }
           }
         }
 
-        {
-          const auto& opts = scorer.splitOpts();
-          float final_noun_cost = noun_cost + opts.noun_verb_split_bonus;
+        const auto& opts = scorer.splitOpts();
+        float final_noun_cost = noun_cost + opts.noun_verb_split_bonus;
 
-          // Credit the verified-verb bonus only when the noun part is a real
-          // dictionary noun or a single kanji. A fabricated multi-kanji noun
-          // (noun_in_dict=0) would otherwise become cheaper than genuine
-          // dictionary words and absorb characters across word boundaries
-          // (やる気丸出し → やる + 気丸 + 出し). Single-kanji nouns are safe
-          // because they already carry the single-kanji split penalty below.
-          if (base_in_dict && (noun_in_dict || noun_len == 1)) {
-            final_noun_cost += opts.verified_verb_bonus;
-          }
+        // Credit the verified-verb bonus only when the noun part is a real
+        // dictionary noun or a single kanji. A fabricated multi-kanji noun
+        // (noun_in_dict=0) would otherwise become cheaper than genuine
+        // dictionary words and absorb characters across word boundaries
+        // (やる気丸出し → やる + 気丸 + 出し). Single-kanji nouns are safe
+        // because they already carry the single-kanji split penalty below.
+        if (base_in_dict && (noun_in_dict || noun_len == 1)) {
+          final_noun_cost += opts.verified_verb_bonus;
+        }
 
-          if (noun_in_dict && base_in_dict) {
-            final_noun_cost -= 0.2F;
-          }
+        if (noun_in_dict && base_in_dict) {
+          final_noun_cost -= 0.2F;
+        }
 
-          // Penalty for single-kanji noun + verb split
-          // E.g., 勘+違い should prefer 勘違い (compound noun)
-          // Single-kanji nouns rarely form valid noun+verb compounds
-          if (noun_len == 1) {
-            final_noun_cost += bigram_cost::kStrong;
-          }
+        // Penalty for single-kanji noun + verb split
+        // E.g., 勘+違い should prefer 勘違い (compound noun)
+        // Single-kanji nouns rarely form valid noun+verb compounds
+        if (noun_len == 1) {
+          final_noun_cost += bigram_cost::kStrong;
+        }
 
-          SUZUME_DEBUG_LOG_VERBOSE("[SPLIT_NV] \"" << noun_surface << "\" + \"" << verb_part
-                                                   << "\": noun_dict=" << noun_in_dict << " verb_dict=" << base_in_dict
-                                                   << " cost=" << final_noun_cost << "\n");
+        SUZUME_DEBUG_LOG_VERBOSE("[SPLIT_NV] \"" << noun_surface << "\" + \"" << verb_part
+                                                 << "\": noun_dict=" << noun_in_dict << " verb_dict=" << base_in_dict
+                                                 << " cost=" << final_noun_cost << "\n");
 
-          uint8_t noun_flags = noun_in_dict ? core::LatticeEdge::kFromDictionary : core::LatticeEdge::kIsUnknown;
+        uint8_t noun_flags = noun_in_dict ? core::LatticeEdge::kFromDictionary : core::LatticeEdge::kIsUnknown;
 
-          lattice.addEdge(noun_surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(verb_start),
-                          core::PartOfSpeech::Noun, final_noun_cost, noun_flags, "");
+        lattice.addEdge(noun_surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(verb_start),
+                        core::PartOfSpeech::Noun, final_noun_cost, noun_flags, "");
 
-          break;
-        }  // end alt-dict-word check scope
-      next_split:;
+        break;
       }
     }
   }

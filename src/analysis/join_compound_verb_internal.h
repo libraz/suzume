@@ -7,6 +7,7 @@
 #include "bigram_table.h"
 #include "candidate_constants.h"
 #include "core/debug.h"
+#include "core/kana_constants.h"
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "grammar/inflection.h"
@@ -153,6 +154,12 @@ inline bool isMizenkeiAuxiliaryStarter(char32_t codepoint, char32_t following) {
          codepoint == U'ね' || codepoint == U'む' || codepoint == U'じ';
 }
 
+// Deverbal suffixes that nominalize a preceding compound continuative
+// (組み合わせ+方, 引き受け+手).
+inline bool isDeverbalSuffixKanji(char32_t codepoint) {
+  return codepoint == U'方' || codepoint == U'手' || codepoint == U'物' || codepoint == U'所' || codepoint == U'場';
+}
+
 // Emits the continuative subsidiary behind a voice auxiliary (the 続ける of
 // れ続ける and its inflections) and returns true when that grammar-owned path
 // consumes the candidate span.
@@ -168,13 +175,26 @@ CompoundVerbMatch findCompoundVerbMatch(
     std::string_view dict_compound_v1_lemma, const dictionary::DictionaryManager& dict_manager,
     const grammar::Inflection& inflection, bool hiragana_v1 = false, bool allow_closed_onbin_v1 = false);
 
+// The dictionary form a hiragana V1 continuative reconstructs to: する for the
+// サ変 continuative, the stem plus る for an Ichidan V1, and the Godan i-row
+// replaced by @p base_ending otherwise.
+std::string hiraganaV1Base(std::string_view v1_surface, bool is_ichidan, char32_t base_ending);
+
+// A continuative can be ambiguous across conjugation classes (降り → 降りる /
+// 降る). Compound-verb generation has already reconstructed the V1 base from
+// the continuative ending, so validate that base against every inflection
+// candidate instead of discarding it merely because another analysis scores
+// higher in isolation.
+bool hasInflectionCandidateForBase(const grammar::Inflection& inflection, std::string_view surface,
+                                   std::string_view base_form, float min_confidence);
+
 // Reconstructs and verifies V1 before the V2 matching policy compares it with
 // competing subsidiary-verb matches.
 CompoundV1Verification verifyCompoundVerbV1(const CompoundV1VerificationRequest& request);
 
 void emitCompoundVerbCandidates(core::Lattice& lattice, std::string_view text, const std::vector<char32_t>& codepoints,
                                 const ByteOffsets& byte_offsets, size_t start_pos, size_t v2_start,
-                                const CompoundVerbMatch& match, const dictionary::DictionaryManager& dict_manager,
+                                const CompoundVerbMatch& best_match, const dictionary::DictionaryManager& dict_manager,
                                 const Scorer& scorer);
 
 // True when the following dictionary context forces the preceding renyokei
@@ -234,9 +254,6 @@ std::string generateKanjiRenyokei(std::string_view kanji_surface, std::string_vi
 // ending. Backed by the shared Conjugation-derived table in grammar so the
 // い段→終止形 mapping lives in exactly one place.
 char32_t godanRenyokeiBaseCp(char32_t renyokei_cp);
-
-// Cost bonuses imported from candidate_constants.h:
-// candidate::kCompoundVerbBonus, candidate::kVerifiedV1Bonus
 
 }  // namespace suzume::analysis::compound_verb_detail
 

@@ -9,11 +9,32 @@ namespace suzume::analysis::compound_verb_detail {
 
 namespace {
 
-// A continuative can be ambiguous across conjugation classes (降り → 降りる /
-// 降る). Compound-verb generation has already reconstructed the V1 base from
-// the continuative ending, so validate that base against every inflection
-// candidate instead of discarding it merely because another analysis scores
-// higher in isolation.
+// Whether a dictionary particle spells the tail of @p v1_renyokei from some
+// kana boundary at or after @p first_split bytes: a particle there is a
+// compositional boundary, not part of the V1.
+bool endsInDictionaryParticle(const dictionary::DictionaryManager& dict_manager, std::string_view v1_renyokei,
+                              size_t first_split) {
+  for (size_t split = first_split; split < v1_renyokei.size(); split += core::kJapaneseCharBytes) {
+    if (dict_manager.lookupExact(v1_renyokei.substr(split), core::PartOfSpeech::Particle) != nullptr) {
+      return true;
+    }
+  }
+  return false;
+}
+
+}  // namespace
+
+std::string hiraganaV1Base(std::string_view v1_surface, bool is_ichidan, char32_t base_ending) {
+  if (grammar::isSuruRenyokeiSurface(v1_surface)) {
+    return "する";
+  }
+  if (is_ichidan) {
+    return normalize::concat(v1_surface, "る");
+  }
+  return normalize::concat(v1_surface.substr(0, v1_surface.size() - core::kJapaneseCharBytes),
+                           normalize::encodeUtf8(base_ending));
+}
+
 bool hasInflectionCandidateForBase(const grammar::Inflection& inflection, std::string_view surface,
                                    std::string_view base_form, float min_confidence) {
   for (const auto& candidate : inflection.analyze(surface)) {
@@ -24,8 +45,6 @@ bool hasInflectionCandidateForBase(const grammar::Inflection& inflection, std::s
   return false;
 }
 
-}  // namespace
-
 CompoundV1Verification verifyCompoundVerbV1(const CompoundV1VerificationRequest& request) {
   const std::string_view text = request.text;
   const auto& codepoints = request.codepoints;
@@ -35,7 +54,7 @@ CompoundV1Verification verifyCompoundVerbV1(const CompoundV1VerificationRequest&
   const size_t v2_start = request.v2_start;
   const size_t start_byte = request.start_byte;
   const size_t v2_start_byte = request.v2_start_byte;
-  char32_t base_ending = request.base_ending;
+  const char32_t base_ending = request.base_ending;
   const bool is_sokuonbin = request.is_sokuonbin;
   const bool is_ichidan = request.is_ichidan;
   const bool has_kanji_v2_after_bare_ichidan = request.has_kanji_v2_after_bare_ichidan;
@@ -56,14 +75,7 @@ CompoundV1Verification verifyCompoundVerbV1(const CompoundV1VerificationRequest&
 
   if (hiragana_v1) {
     const std::string_view v1_surface = text.substr(start_byte, v2_start_byte - start_byte);
-    if (grammar::isSuruRenyokeiSurface(v1_surface)) {
-      v1_base = "する";
-    } else if (!is_ichidan) {
-      v1_base = std::string(v1_surface.substr(0, v1_surface.size() - core::kJapaneseCharBytes));
-      v1_base += normalize::encodeUtf8(base_ending);
-    } else {
-      v1_base = normalize::concat(v1_surface, "る");
-    }
+    v1_base = hiraganaV1Base(v1_surface, is_ichidan, base_ending);
 
     const auto* verb_entry = dict_manager.lookupExact(v1_base, core::PartOfSpeech::Verb);
     v1_verified = verb_entry != nullptr || grammar::isSuruRenyokeiSurface(v1_surface);
@@ -81,15 +93,11 @@ CompoundV1Verification verifyCompoundVerbV1(const CompoundV1VerificationRequest&
               : (is_ichidan && v2_start < codepoints.size() && normalize::isKanjiCodepoint(codepoints[v2_start])
                      ? candidate::verb_cost::kCompoundVerbIchidanMinConfidence
                      : candidate::verb_cost::kConstructedVerbMinConfidence);
-      if (!verb_helpers::hasNonVerbDictionaryEntry(&dict_manager, v1_surface)) {
-        for (const auto& candidate : inflection.analyze(v1_surface)) {
-          if (candidate.base_form == v1_base && candidate.confidence >= min_confidence) {
-            v1_verified = true;
-            v1_ichidan_inflection = is_ichidan;
-            v1_godan_inflection = !is_ichidan;
-            break;
-          }
-        }
+      if (!verb_helpers::hasNonVerbDictionaryEntry(&dict_manager, v1_surface) &&
+          hasInflectionCandidateForBase(inflection, v1_surface, v1_base, min_confidence)) {
+        v1_verified = true;
+        v1_ichidan_inflection = is_ichidan;
+        v1_godan_inflection = !is_ichidan;
       }
     }
     return result;
@@ -185,6 +193,8 @@ CompoundV1Verification verifyCompoundVerbV1(const CompoundV1VerificationRequest&
     }
 
     bool use_inflection_fallback = !v1_verified;
+    const size_t v1_renyokei_end = is_ichidan ? v2_start_byte : byteOffsetAt(byte_offsets, kanji_end + 1);
+    const std::string_view v1_renyokei = text.substr(start_byte, v1_renyokei_end - start_byte);
 
     // Multi-kanji stems require direct dictionary evidence. The inflection
     // analyzer accepts long kanji sequences too freely for this boundary.
@@ -202,8 +212,6 @@ CompoundV1Verification verifyCompoundVerbV1(const CompoundV1VerificationRequest&
     // A known non-verb continuative blocks fallback unless an exact
     // single-kanji Godan analysis proves the productive V1.
     if (use_inflection_fallback) {
-      const size_t v1_renyokei_end = is_ichidan ? v2_start_byte : byteOffsetAt(byte_offsets, kanji_end + 1);
-      const std::string v1_renyokei(text.substr(start_byte, v1_renyokei_end - start_byte));
       if (verb_helpers::hasNonVerbDictionaryEntry(&dict_manager, v1_renyokei)) {
         const auto inflection_candidate = inflection.getBest(v1_renyokei);
         const bool is_complete_dictionary_adjective =
@@ -233,18 +241,9 @@ CompoundV1Verification verifyCompoundVerbV1(const CompoundV1VerificationRequest&
     // A particle inside the proposed V1 is a compositional boundary. Check it
     // before accepting the productive single-kanji Ichidan fallback: that
     // otherwise treats adjectival adverbs such as 静かに+続く as compounds.
-    if (use_inflection_fallback && is_ichidan && kanji_count == 1) {
-      const std::string v1_renyokei(text.substr(start_byte, v2_start_byte - start_byte));
-      for (size_t split = core::kJapaneseCharBytes; split < v1_renyokei.size(); split += core::kJapaneseCharBytes) {
-        if (normalize::utf8Length(std::string_view(v1_renyokei).substr(0, split)) < 2) {
-          continue;
-        }
-        const std::string_view suffix(v1_renyokei.data() + split, v1_renyokei.size() - split);
-        if (dict_manager.lookupExact(suffix, core::PartOfSpeech::Particle) != nullptr) {
-          use_inflection_fallback = false;
-          break;
-        }
-      }
+    if (use_inflection_fallback && is_ichidan && kanji_count == 1 &&
+        endsInDictionaryParticle(dict_manager, v1_renyokei, core::kTwoJapaneseCharBytes)) {
+      use_inflection_fallback = false;
     }
 
     // The continuative of a coined V1 must not be the stem of a registered
@@ -290,8 +289,6 @@ CompoundV1Verification verifyCompoundVerbV1(const CompoundV1VerificationRequest&
 
     // A single-kanji Godan renyokei must reconstruct exactly to its V1 base.
     if (use_inflection_fallback && !is_ichidan && kanji_count == 1) {
-      const size_t v1_renyokei_end = byteOffsetAt(byte_offsets, kanji_end + 1);
-      const std::string v1_renyokei(text.substr(start_byte, v1_renyokei_end - start_byte));
       if (hasInflectionCandidateForBase(inflection, v1_renyokei, v1_base,
                                         candidate::verb_cost::kConstructedVerbMinConfidence)) {
         v1_verified = true;
@@ -300,22 +297,11 @@ CompoundV1Verification verifyCompoundVerbV1(const CompoundV1VerificationRequest&
       }
     }
 
-    if (use_inflection_fallback) {
-      const size_t v1_renyokei_end = is_ichidan ? v2_start_byte : byteOffsetAt(byte_offsets, kanji_end + 1);
-      const std::string v1_renyokei(text.substr(start_byte, v1_renyokei_end - start_byte));
-      // A particle at the end of the proposed V1 marks a compositional boundary.
-      for (size_t split = core::kJapaneseCharBytes; split < v1_renyokei.size(); split += core::kJapaneseCharBytes) {
-        const std::string_view suffix(v1_renyokei.data() + split, v1_renyokei.size() - split);
-        if (dict_manager.lookupExact(suffix, core::PartOfSpeech::Particle) != nullptr) {
-          use_inflection_fallback = false;
-          break;
-        }
-      }
+    if (use_inflection_fallback && endsInDictionaryParticle(dict_manager, v1_renyokei, core::kJapaneseCharBytes)) {
+      use_inflection_fallback = false;
     }
 
     if (use_inflection_fallback) {
-      const size_t v1_renyokei_end = is_ichidan ? v2_start_byte : byteOffsetAt(byte_offsets, kanji_end + 1);
-      const std::string v1_renyokei(text.substr(start_byte, v1_renyokei_end - start_byte));
       const auto infl_result = inflection.getBest(v1_renyokei);
       const float min_confidence = is_ichidan ? candidate::verb_cost::kCompoundVerbIchidanMinConfidence
                                               : candidate::verb_cost::kConstructedVerbMinConfidence;

@@ -25,8 +25,7 @@ bool addPassiveContinuativeTailCandidates(core::Lattice& lattice, const std::vec
       continue;
     }
 
-    const bool follows_godan_mizenkei =
-        passive_pos > kanji_end && grammar::isARowCodepoint(codepoints[passive_pos - 1]);
+    const bool follows_godan_mizenkei = passive_pos > kanji_end && kana::isARowCodepoint(codepoints[passive_pos - 1]);
     const bool follows_ichidan_passive = passive_pos == kanji_end + 1 && codepoints[kanji_end] == U'ら';
     // Causative-passive chains retain their voice boundaries, but the
     // passive-continuative tail itself remains one search unit: サ変/一段

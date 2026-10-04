@@ -151,24 +151,17 @@ void generatePrefixCompoundCandidates(const std::vector<char32_t>& codepoints, s
   }
 
   if (!followed_by_kanji || followed_by_span_suffix) {
-    std::string surface = extractSubstring(codepoints, start_pos, start_pos + 2);
-    if (!surface.empty()) {
-      // Strong bonus to prefer compound over split
-      // Must beat: single_kanji(1.4+2) + single_kanji(1.4+2) = 6.8
-      // And compete with dictionary entries
-      auto cand = makeCandidate(surface, start_pos, start_pos + 2, core::PartOfSpeech::Noun, -1.0F, false,
-                                CandidateOrigin::PrefixCompound);
+    // Strong bonus to prefer compound over split
+    // Must beat: single_kanji(1.4+2) + single_kanji(1.4+2) = 6.8
+    // And compete with dictionary entries
+    auto cand = makeCandidate(codepoints, start_pos, start_pos + 2, core::PartOfSpeech::Noun, -1.0F, false,
+                              CandidateOrigin::PrefixCompound);
 #ifdef SUZUME_DEBUG_INFO
-      cand.confidence = 0.9F;
-      cand.pattern = "prefix_single_kanji";
+    cand.confidence = 0.9F;
+    cand.pattern = "prefix_single_kanji";
 #endif
-      candidates.push_back(cand);
-    }
+    candidates.push_back(cand);
   }
-
-  // Note: N中 compounds (今日中, 一日中, 世界中) are now split per MeCab:
-  // 今日中 → 今日 + 中 (noun + suffix)
-  // The 中 suffix is registered in L1 dictionary (entries.cpp)
 }
 
 void generateTemporalNounBoundaryCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
@@ -246,16 +239,13 @@ void generateTemporalNounBoundaryCandidates(const std::vector<char32_t>& codepoi
       normalize::isFiscalYearBindingPair(codepoints[start_pos + 1], codepoints[start_pos + 2]);
   const size_t candidate_end =
       has_temporal_reference_suffix ? start_pos + 4 : (binds_fiscal_year ? start_pos + 3 : start_pos + 2);
-  std::string surface = extractSubstring(codepoints, start_pos, candidate_end);
-  if (!surface.empty()) {
-    auto cand = makeCandidate(surface, start_pos, candidate_end, core::PartOfSpeech::Noun,
-                              candidate::kTemporalNounBoundarySplitBonus, false, CandidateOrigin::PrefixCompound);
+  auto cand = makeCandidate(codepoints, start_pos, candidate_end, core::PartOfSpeech::Noun,
+                            candidate::kTemporalNounBoundarySplitBonus, false, CandidateOrigin::PrefixCompound);
 #ifdef SUZUME_DEBUG_INFO
-    cand.confidence = candidate::kHighOriginConfidence;
-    cand.pattern = "temporal_noun_boundary";
+  cand.confidence = candidate::kHighOriginConfidence;
+  cand.pattern = "temporal_noun_boundary";
 #endif
-    candidates.push_back(cand);
-  }
+  candidates.push_back(cand);
 }
 
 }  // namespace suzume::analysis

@@ -179,7 +179,7 @@ bool spellsGodanMaSuffixVerbCell(std::string_view okurigana) {
 // =============================================================================
 
 /**
- * @brief Create a suffix pattern candidate with lemma
+ * @brief Create a suffix pattern candidate
  */
 inline UnknownCandidate makeSuffixCandidate(const std::string& surface, size_t start, size_t end,
                                             core::PartOfSpeech pos, float cost, const std::string& lemma,
@@ -188,21 +188,6 @@ inline UnknownCandidate makeSuffixCandidate(const std::string& surface, size_t s
   auto cand = makeCandidate(surface, start, end, pos, cost, true, CandidateOrigin::SuffixPattern);
   cand.lemma = lemma;
   cand.conj_type = conj_type;
-#ifdef SUZUME_DEBUG_INFO
-  cand.confidence = confidence;
-  cand.pattern = pattern;
-#endif
-  return cand;
-}
-
-/**
- * @brief Create a suffix pattern candidate without lemma
- */
-inline UnknownCandidate makeSuffixCandidateNoLemma(const std::string& surface, size_t start, size_t end,
-                                                   core::PartOfSpeech pos, float cost,
-                                                   [[maybe_unused]] float confidence,
-                                                   [[maybe_unused]] const char* pattern) {
-  auto cand = makeCandidate(surface, start, end, pos, cost, true, CandidateOrigin::SuffixPattern);
 #ifdef SUZUME_DEBUG_INFO
   cand.confidence = confidence;
   cand.pattern = pattern;
@@ -271,24 +256,14 @@ void generateProductiveSuffixCandidates(const std::vector<char32_t>& codepoints,
   }
 
   constexpr size_t kPpoiLen = 9;  // "っぽい" = 3 chars * 3 bytes
+  constexpr size_t kMaxHiraganaLen = 8;
+  const size_t hiragana_end = findCharRegionEnd(char_types, start_pos, kMaxHiraganaLen, normalize::CharType::Hiragana);
 
-  // Try different lengths of hiragana (3 to 6 chars for stem + がち/っぽい)
-  for (size_t hira_len = 3; hira_len <= 8; ++hira_len) {
-    size_t candidate_end = start_pos + hira_len;
-    if (candidate_end > char_types.size()) {
+  // Try different lengths of the hiragana run (stem + っぽい / honorific)
+  for (size_t hira_len = 3; hira_len <= kMaxHiraganaLen; ++hira_len) {
+    const size_t candidate_end = start_pos + hira_len;
+    if (candidate_end > hiragana_end) {
       break;
-    }
-
-    // Check all positions are hiragana
-    bool all_hiragana = true;
-    for (size_t i = start_pos; i < candidate_end; ++i) {
-      if (char_types[i] != normalize::CharType::Hiragana) {
-        all_hiragana = false;
-        break;
-      }
-    }
-    if (!all_hiragana) {
-      break;  // No more hiragana
     }
 
     std::string surface = extractSubstring(codepoints, start_pos, candidate_end);
@@ -316,19 +291,18 @@ void generateProductiveSuffixCandidates(const std::vector<char32_t>& codepoints,
     // nicknames merely because they precede it. Lexicalized family terms are
     // supplied by the dictionary.
     if (surface.size() >= 9) {  // at least 1-char stem (3 bytes) + 2+ char honorific
-      for (const auto* honorific : {"ちゃん", "くん", "さん"}) {
-        std::string_view h(honorific);
-        if (!utf8::endsWith(surface, h)) {
+      for (const std::string_view honorific : {"ちゃん", "くん", "さん"}) {
+        if (!utf8::endsWith(surface, honorific)) {
           continue;
         }
-        std::string_view stem = std::string_view(surface).substr(0, surface.size() - h.size());
+        std::string_view stem = std::string_view(surface).substr(0, surface.size() - honorific.size());
         size_t stem_chars = stem.size() / 3;  // Each hiragana = 3 bytes in UTF-8
         if (stem_chars >= 2 && stem_chars <= 3) {
           // Only an honorific-style stem can lexicalize with さん. Ordinary
           // さん terms remain dictionary-backed or split above.
           bool starts_with_honorific_prefix =
               stem.size() >= 3 && (stem.compare(0, 3, "お") == 0 || stem.compare(0, 3, "ご") == 0);
-          if (h == "さん" && !starts_with_honorific_prefix) {
+          if (honorific == "さん" && !starts_with_honorific_prefix) {
             break;
           }
           float cost = starts_with_honorific_prefix ? -1.5F : -0.5F;
@@ -352,9 +326,6 @@ void generateProductiveSuffixVerbCandidates(const std::vector<char32_t>& codepoi
   size_t base_end = start_pos;
   while (base_end < char_types.size() && char_types[base_end] == normalize::CharType::Kanji) {
     ++base_end;
-  }
-  if (base_end == start_pos) {
-    return;
   }
 
   // A productive suffix verb may attach after a repeated quantity unit, but
@@ -398,7 +369,7 @@ void generateProductiveSuffixVerbCandidates(const std::vector<char32_t>& codepoi
   // Both halves attach to the same nominal bases, so they share one admission
   // test: the kanji run ends in the suffix character and leaves a non-empty
   // base in front of it.
-  const size_t tsukeru_base_end = base_end > start_pos ? base_end - 1 : start_pos;
+  const size_t tsukeru_base_end = base_end - 1;
   const bool has_kanji_tsuku_base =
       !numeral_led_base && tsukeru_base_end > start_pos && codepoints[tsukeru_base_end] == U'付';
   if (has_kanji_tsuku_base) {
@@ -562,16 +533,10 @@ void generateAdminBoundaryCandidates(const std::vector<char32_t>& codepoints, si
       break;
     }
 
-    char32_t cp = codepoints[pos];
-    bool is_admin_suffix = std::find(admin_suffixes.begin(), admin_suffixes.end(), cp) != admin_suffixes.end();
-
-    if (is_admin_suffix) {
-      // Found administrative suffix at position pos
-      // Generate candidate from start_pos to pos+1 (including the suffix)
-      size_t end_with_suffix = pos + 1;
-      std::string surface = extractSubstring(codepoints, start_pos, end_with_suffix);
-      candidates.push_back(makeSuffixCandidateNoLemma(surface, start_pos, end_with_suffix, core::PartOfSpeech::Noun,
-                                                      0.3F, 0.95F, "admin_boundary"));
+    // The candidate runs through the administrative suffix itself.
+    if (std::find(admin_suffixes.begin(), admin_suffixes.end(), codepoints[pos]) != admin_suffixes.end()) {
+      candidates.push_back(makeSuffixCandidate(extractSubstring(codepoints, start_pos, pos + 1), start_pos, pos + 1,
+                                               core::PartOfSpeech::Noun, 0.3F, std::string(), 0.95F, "admin_boundary"));
     }
   }
 }
@@ -602,8 +567,7 @@ void generateWithSuffix(const std::vector<char32_t>& codepoints, size_t start_po
 
   // Check for suffixes
   for (const auto& [suffix, forms_derived_compound] : suffixes) {
-    if (kanji_seq.size() > suffix.size() &&
-        kanji_seq.compare(kanji_seq.size() - suffix.size(), suffix.size(), suffix) == 0) {
+    if (kanji_seq.size() > suffix.size() && utf8::endsWith(kanji_seq, suffix)) {
       // Calculate stem length in codepoints
       const size_t suffix_length = normalize::utf8Length(suffix);
       size_t stem_end = end_pos - suffix_length;
@@ -628,11 +592,8 @@ void generateWithSuffix(const std::vector<char32_t>& codepoints, size_t start_po
       }
 
       if (stem_end > start_pos + 1) {
-        // Add stem candidate
-        std::string stem_surface = extractSubstring(codepoints, start_pos, stem_end);
-
         UnknownCandidate stem;
-        stem.surface = stem_surface;
+        stem.surface = extractSubstring(codepoints, start_pos, stem_end);
         stem.start = start_pos;
         stem.end = stem_end;
         stem.pos = core::PartOfSpeech::Noun;

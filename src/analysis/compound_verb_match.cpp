@@ -55,6 +55,17 @@ bool beginsMizenkeiAuxiliary(std::string_view text, size_t start_byte, std::stri
   return utf8::startsWithAny(passive_tail, {"る", "た", "て", "ない", "なかっ", "なけれ", "ます", "ませ", "ば"});
 }
 
+// Whether the non-empty @p form is spelled in @p text starting at @p start_byte.
+bool spellsAt(std::string_view text, size_t start_byte, std::string_view form) {
+  return !form.empty() && utf8::startsWith(text.substr(start_byte), form);
+}
+
+// The closed causative conditional せ+れ+ば starting at @p pos.
+bool startsCausativeConditional(const std::vector<char32_t>& codepoints, size_t pos) {
+  return pos + 2 < codepoints.size() && codepoints[pos] == U'せ' && codepoints[pos + 1] == U'れ' &&
+         codepoints[pos + 2] == U'ば';
+}
+
 bool isCompoundVerbOrNominalizationAttested(const dictionary::DictionaryManager& dict_manager, std::string_view base,
                                             V2VerbType verb_type) {
   if (base.empty()) {
@@ -93,19 +104,11 @@ CompoundVerbMatch findCompoundVerbMatch(
     // build a lexical verb on top of a finished clause. The V2 side of this
     // boundary is guarded by the past-auxiliary test further down.
     // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
-    if (v2_start > start_pos && grammar::isARowCodepoint(codepoints[v2_start - 1])) {
+    if (v2_start > start_pos && kana::isARowCodepoint(codepoints[v2_start - 1])) {
       SUZUME_DEBUG_LOG_VERBOSE("[COMPOUND] rejected a-row tail on hiragana V1: " << v1_surface << "\n");
       return {};
     }
-    std::string v1_base;
-    if (grammar::isSuruRenyokeiSurface(v1_surface)) {
-      v1_base = "する";
-    } else if (is_ichidan) {
-      v1_base = normalize::concat(v1_surface, "る");
-    } else {
-      v1_base = std::string(v1_surface.substr(0, v1_surface.size() - core::kJapaneseCharBytes));
-      v1_base += normalize::encodeUtf8(base_ending);
-    }
+    const std::string v1_base = hiraganaV1Base(v1_surface, is_ichidan, base_ending);
     hiragana_v1_in_dictionary = dict_manager.lookupExact(v1_base, core::PartOfSpeech::Verb) != nullptr;
     // A V1 that also reads as a finished adjective (いい) followed by a final
     // particle mora has closed its clause (いい+か+って, いい+よ+って).
@@ -116,16 +119,10 @@ CompoundVerbMatch findCompoundVerbMatch(
       SUZUME_DEBUG_LOG_VERBOSE("[COMPOUND] rejected final particle after adjective-like V1: " << v1_surface << "\n");
       return {};
     }
-    bool hiragana_v1_has_strong_inflection = false;
-    if (!hiragana_v1_in_dictionary) {
-      for (const auto& candidate : inflection.analyze(v1_surface)) {
-        if (candidate.base_form == v1_base &&
-            candidate.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence) {
-          hiragana_v1_has_strong_inflection = true;
-          break;
-        }
-      }
-    }
+    const bool hiragana_v1_has_strong_inflection =
+        !hiragana_v1_in_dictionary &&
+        hasInflectionCandidateForBase(inflection, v1_surface, v1_base,
+                                      candidate::verb_cost::kConstructedVerbMinConfidence);
     if (!hiragana_v1_in_dictionary && !allow_closed_onbin_v1) {
       for (size_t pos = start_pos; pos < v2_start; ++pos) {
         // A particle reading is unmistakable at V1's own start and behind the
@@ -152,7 +149,7 @@ CompoundVerbMatch findCompoundVerbMatch(
   // A compound verb joins two verbal components directly. If a closed-class
   // particle occurs between the prospective V1 and V2 boundaries, the span is
   // compositional instead (読む+だけ+あって), not a compound verb.
-  for (size_t particle_start = start_pos; particle_start < v2_start; ++particle_start) {
+  for (size_t particle_start = start_pos; particle_start < v2_start && !hiragana_v1_in_dictionary; ++particle_start) {
     const std::string particle_probe = extractSubstring(codepoints, particle_start, v2_start);
     // Away from the span's own start, the same u-row evidence the single-char
     // check below relies on decides whether a clause actually closed there.
@@ -161,11 +158,11 @@ CompoundVerbMatch findCompoundVerbMatch(
     // particle), and the compound is rejected before V1 is ever analyzed.
     const bool closes_preceding_clause =
         particle_start == start_pos || kana::isURowCodepoint(codepoints[particle_start - 1]);
-    for (const auto& match : dict_manager.lookup(particle_probe, 0)) {
-      if (closes_preceding_clause && match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Particle &&
-          normalize::utf8Length(match.entry->surface) > 1 &&
-          particle_start + normalize::utf8Length(match.entry->surface) <= v2_start) {
-        if (!hiragana_v1_in_dictionary) {
+    if (closes_preceding_clause) {
+      for (const auto& match : dict_manager.lookup(particle_probe, 0)) {
+        if (match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Particle &&
+            normalize::utf8Length(match.entry->surface) > 1 &&
+            particle_start + normalize::utf8Length(match.entry->surface) <= v2_start) {
           return {};
         }
       }
@@ -174,15 +171,11 @@ CompoundVerbMatch findCompoundVerbMatch(
     // A terminal u-row verb followed by a case particle is a clause boundary,
     // even when the particle is a single character (行く+に+越した).  A
     // continuative ending such as し remains eligible for lexical compounds.
-    const auto* particle = dict_manager.lookupExact(particle_probe, core::PartOfSpeech::Particle);
-    if (particle != nullptr && particle_start > start_pos && kana::isURowCodepoint(codepoints[particle_start - 1])) {
-      if (!hiragana_v1_in_dictionary) {
-        return {};
-      }
+    if (particle_start > start_pos && kana::isURowCodepoint(codepoints[particle_start - 1]) &&
+        dict_manager.lookupExact(particle_probe, core::PartOfSpeech::Particle) != nullptr) {
+      return {};
     }
   }
-
-  // Inflection analyzer for V2 detection (shared instance from Tokenizer)
 
   // Find extent of hiragana after v2_start for inflection analysis
   size_t v2_hiragana_end = findCharRegionEnd(char_types, v2_start, 8, CharType::Hiragana);
@@ -236,12 +229,9 @@ CompoundVerbMatch findCompoundVerbMatch(
     bool inflection_includes_aux = false;
 
     // Try kanji match first
-    if (v2_verb.joins_surface && v2_start_byte + v2_surface.size() <= text.size()) {
-      std::string_view text_at_v2 = text.substr(v2_start_byte, v2_surface.size());
-      if (text_at_v2 == v2_surface) {
-        matched_kanji = true;
-        matched_len = v2_surface.size();
-      }
+    if (v2_verb.joins_surface && spellsAt(text, v2_start_byte, v2_surface)) {
+      matched_kanji = true;
+      matched_len = v2_surface.size();
     }
 
     // The hiragana spellings とる and どる are contracted progressive
@@ -265,12 +255,9 @@ CompoundVerbMatch findCompoundVerbMatch(
     }
 
     // Try reading (hiragana) match if kanji didn't match
-    if (!matched_kanji && !v2_reading.empty() && v2_start_byte + v2_reading.size() <= text.size()) {
-      std::string_view text_at_v2 = text.substr(v2_start_byte, v2_reading.size());
-      if (text_at_v2 == v2_reading) {
-        matched_reading = true;
-        matched_len = v2_reading.size();
-      }
+    if (!matched_kanji && spellsAt(text, v2_start_byte, v2_reading)) {
+      matched_reading = true;
+      matched_len = v2_reading.size();
     }
 
     // Try a V2 renyokei match so a following auxiliary stays separate.
@@ -283,31 +270,23 @@ CompoundVerbMatch findCompoundVerbMatch(
       std::string hira_renyokei = generateRenyokei(v2_reading, "", v2_verb.verb_type);
 
       // Try kanji renyokei match
-      if (!kanji_renyokei.empty() && v2_start_byte + kanji_renyokei.size() <= text.size()) {
-        std::string_view text_at_v2 = text.substr(v2_start_byte, kanji_renyokei.size());
-        if (text_at_v2 == kanji_renyokei) {
-          matched_renyokei = true;
-          matched_len = kanji_renyokei.size();
-          is_renyokei_entry = true;  // Mark as renyokei match
-        }
+      if (spellsAt(text, v2_start_byte, kanji_renyokei)) {
+        matched_renyokei = true;
+        matched_len = kanji_renyokei.size();
+        is_renyokei_entry = true;
       }
 
       // Try hiragana renyokei match if kanji didn't match
-      if (!matched_renyokei && !hira_renyokei.empty() && v2_start_byte + hira_renyokei.size() <= text.size()) {
-        std::string_view text_at_v2 = text.substr(v2_start_byte, hira_renyokei.size());
-        if (text_at_v2 == hira_renyokei) {
-          // Skip Ichidan V1 + V2「出る」renyokei (で) match
-          // Ichidan verbs use て for te-form, never で.
-          // E.g., 付けで should be 付け(VERB)+で(PARTICLE), not 付け出る (compound)
-          // But Godan+出る is valid: 飛び出る (飛ぶ→飛び+出る)
-          if (is_ichidan && hira_renyokei == "で") {
-            continue;  // Skip V2「出る」for Ichidan V1
-          }
-          matched_renyokei = true;
-          matched_renyokei_via_reading = true;
-          matched_len = hira_renyokei.size();
-          is_renyokei_entry = true;  // Mark as renyokei match
+      if (!matched_renyokei && spellsAt(text, v2_start_byte, hira_renyokei)) {
+        // Ichidan verbs take て, never で, so an Ichidan V1 before the 出る
+        // renyokei で is a te-form boundary (付け+で), unlike Godan 飛び出る.
+        if (is_ichidan && hira_renyokei == "で") {
+          continue;
         }
+        matched_renyokei = true;
+        matched_renyokei_via_reading = true;
+        matched_len = hira_renyokei.size();
+        is_renyokei_entry = true;
       }
     }
 
@@ -318,12 +297,10 @@ CompoundVerbMatch findCompoundVerbMatch(
       std::string kanji_potential =
           v2_verb.joins_surface ? generateGodanPotential(v2_surface, "", v2_verb.verb_type) : "";
       std::string hira_potential = generateGodanPotential(v2_reading, "", v2_verb.verb_type);
-      if (!kanji_potential.empty() && v2_start_byte + kanji_potential.size() <= text.size() &&
-          text.substr(v2_start_byte, kanji_potential.size()) == kanji_potential) {
+      if (spellsAt(text, v2_start_byte, kanji_potential)) {
         matched_potential = true;
         matched_len = kanji_potential.size();
-      } else if (!hira_potential.empty() && v2_start_byte + hira_potential.size() <= text.size() &&
-                 text.substr(v2_start_byte, hira_potential.size()) == hira_potential) {
+      } else if (spellsAt(text, v2_start_byte, hira_potential)) {
         matched_potential = true;
         matched_len = hira_potential.size();
         matched_renyokei_via_reading = true;
@@ -442,17 +419,14 @@ CompoundVerbMatch findCompoundVerbMatch(
                                         "える", "げる", "てる", "せる", "ちる"})) {
         // Case 1: Hiragana V2 inflected forms (e.g., きった from きる, かった from かう)
         // Try different lengths for V2 inflected form (shortest match first)
-        for (size_t v2_end = v2_start + 2; v2_end <= v2_hiragana_end; ++v2_end) {
+        for (size_t v2_end = v2_start + 2; v2_end <= v2_hiragana_end && !matched_inflected; ++v2_end) {
           size_t v2_end_byte = byteOffsetAt(byte_offsets, v2_end);
           const std::string_view v2_text = text.substr(v2_start_byte, v2_end_byte - v2_start_byte);
 
           // Use analyze() to get all candidates, not just the best one.
           // This is needed because for ambiguous stems (e.g., かった could be
           // from かる, かつ, or かう), we need to find the one matching our V2.
-          const auto& infl_results = inflection.analyze(v2_text);
-          const std::string_view expected_base = v2_reading;
-
-          for (const auto& infl_result : infl_results) {
+          for (const auto& infl_result : inflection.analyze(v2_text)) {
             // Check if this matches the V2 base form (using reading for comparison)
             // Use 0.3 threshold for inflected forms since short stems get lower confidence
             // Require the suffix to contain actual auxiliary patterns (た/て/etc.),
@@ -461,72 +435,44 @@ CompoundVerbMatch findCompoundVerbMatch(
             // Verify verb type consistency: if V2 is godan, reject ichidan
             // inflection matches (and vice versa). This prevents e.g. いた
             // (ichidan いる ta-form) from falsely matching godan 入る(いる).
-            if (infl_result.confidence >= 0.3F && infl_result.base_form == expected_base &&
+            if (infl_result.confidence >= 0.3F && infl_result.base_form == v2_reading &&
                 hasAuxiliarySuffix(infl_result.suffix) &&
                 !(v2_verb.verb_type == V2VerbType::Godan && infl_result.verb_type == grammar::VerbType::Ichidan) &&
                 !(v2_verb.verb_type == V2VerbType::Ichidan && infl_result.verb_type != grammar::VerbType::Ichidan)) {
               matched_inflected = true;
               matched_len = v2_end_byte - v2_start_byte;
-              inflection_includes_aux = true;  // Mark that this match includes aux
+              inflection_includes_aux = true;
               break;
             }
           }
-          if (matched_inflected)
-            break;
         }
 
-        // Case 2: Kanji V2 inflected forms (e.g., 巡った from 巡る)
-        // Check if text starts with V2 kanji prefix, then analyze hiragana suffix
+        // Case 2: Kanji V2 inflected forms (e.g., 巡った from 巡る): match the
+        // V2's kanji prefix (all 3-byte CJK codepoints), then analyze the
+        // kanji+hiragana span after it.
         if (!matched_inflected && char_types[v2_start] == CharType::Kanji) {
-          // Extract kanji prefix from V2 surface (e.g., "巡" from "巡る")
-          auto v2_surface_decoded = normalize::utf8::decode(v2_surface);
+          const auto v2_surface_decoded = normalize::toCodepoints(v2_surface);
           size_t kanji_prefix_len = 0;
-          for (size_t idx = 0; idx < v2_surface_decoded.size(); ++idx) {
-            char32_t c = v2_surface_decoded[idx];
-            if (kana::isKanjiCodepoint(c)) {
-              ++kanji_prefix_len;
-            } else {
-              break;
-            }
+          while (kanji_prefix_len < v2_surface_decoded.size() &&
+                 kana::isKanjiCodepoint(v2_surface_decoded[kanji_prefix_len])) {
+            ++kanji_prefix_len;
           }
-
-          if (kanji_prefix_len > 0 && kanji_prefix_len < v2_surface_decoded.size()) {
-            // Check if text at v2_start matches the kanji prefix
-            // (kanji prefixes here are all 3-byte CJK codepoints).
-            size_t kanji_prefix_byte_len = kanji_prefix_len * core::kJapaneseCharBytes;
-
-            if (v2_start_byte + kanji_prefix_byte_len <= text.size()) {
-              std::string_view text_kanji_prefix = text.substr(v2_start_byte, kanji_prefix_byte_len);
-              std::string v2_kanji_prefix = normalize::utf8::encode(
-                  std::vector<char32_t>(v2_surface_decoded.begin(), v2_surface_decoded.begin() + kanji_prefix_len));
-
-              if (text_kanji_prefix == v2_kanji_prefix) {
-                // Find the hiragana suffix after the kanji prefix
-                size_t hira_start = v2_start + kanji_prefix_len;
-                if (hira_start < codepoints.size() && char_types[hira_start] == CharType::Hiragana) {
-                  size_t hira_end = findCharRegionEnd(char_types, hira_start, 6, CharType::Hiragana);
-
-                  // Try inflection on kanji+hiragana portion (shortest match first)
-                  for (size_t v2_end = hira_start + 1; v2_end <= hira_end; ++v2_end) {
-                    size_t v2_end_byte = byteOffsetAt(byte_offsets, v2_end);
-                    const std::string_view v2_text = text.substr(v2_start_byte, v2_end_byte - v2_start_byte);
-
-                    // Use analyze() to search all candidates for matching base form
-                    const auto& infl_results = inflection.analyze(v2_text);
-                    for (const auto& infl_result : infl_results) {
-                      // Check if base form matches V2 surface (kanji form)
-                      // Require the suffix to contain actual auxiliary patterns
-                      if (infl_result.confidence >= 0.35F && infl_result.base_form == v2_surface &&
-                          hasAuxiliarySuffix(infl_result.suffix)) {
-                        matched_inflected = true;
-                        matched_len = v2_end_byte - v2_start_byte;
-                        inflection_includes_aux = true;  // Mark that this match includes aux
-                        break;
-                      }
-                    }
-                    if (matched_inflected)
-                      break;
-                  }
+          const size_t hira_start = v2_start + kanji_prefix_len;
+          if (kanji_prefix_len > 0 && kanji_prefix_len < v2_surface_decoded.size() &&
+              spellsAt(text, v2_start_byte, v2_surface.substr(0, kanji_prefix_len * core::kJapaneseCharBytes)) &&
+              hira_start < codepoints.size() && char_types[hira_start] == CharType::Hiragana) {
+            const size_t hira_end = findCharRegionEnd(char_types, hira_start, 6, CharType::Hiragana);
+            // Shortest match first; the suffix must carry an actual auxiliary.
+            for (size_t v2_end = hira_start + 1; v2_end <= hira_end && !matched_inflected; ++v2_end) {
+              const size_t v2_end_byte = byteOffsetAt(byte_offsets, v2_end);
+              const std::string_view v2_text = text.substr(v2_start_byte, v2_end_byte - v2_start_byte);
+              for (const auto& infl_result : inflection.analyze(v2_text)) {
+                if (infl_result.confidence >= 0.35F && infl_result.base_form == v2_surface &&
+                    hasAuxiliarySuffix(infl_result.suffix)) {
+                  matched_inflected = true;
+                  matched_len = v2_end_byte - v2_start_byte;
+                  inflection_includes_aux = true;
+                  break;
                 }
               }
             }
@@ -540,16 +486,10 @@ CompoundVerbMatch findCompoundVerbMatch(
     bool matched_mizenkei = false;
     if (!matched_kanji && !matched_reading && !matched_renyokei && !matched_potential && !matched_kateikei &&
         !matched_volitional && !matched_inflected) {
-      auto tryMizenMatch = [&](const std::string& mizen) -> bool {
-        return beginsMizenkeiAuxiliary(text, v2_start_byte, mizen);
-      };
-
-      if (tryMizenMatch(kanji_mizen)) {
+      if (mizenkei_before_aux) {
         matched_mizenkei = true;
-        matched_len = kanji_mizen.size();
-      } else if (tryMizenMatch(hira_mizen)) {
-        matched_mizenkei = true;
-        matched_len = hira_mizen.size();
+        matched_len =
+            beginsMizenkeiAuxiliary(text, v2_start_byte, kanji_mizen) ? kanji_mizen.size() : hira_mizen.size();
       }
     }
 
@@ -570,10 +510,7 @@ CompoundVerbMatch findCompoundVerbMatch(
     if (!matched_kanji && !matched_reading && !matched_potential && !matched_kateikei && !matched_volitional &&
         !matched_inflected && !matched_mizenkei && (!matched_renyokei || v2_verb.verb_type == V2VerbType::Ichidan)) {
       auto tryImperative = [&](const std::string& imperative, bool via_reading) {
-        if (matched_imperative || imperative.empty() || v2_start_byte + imperative.size() > text.size()) {
-          return;
-        }
-        if (text.substr(v2_start_byte, imperative.size()) != imperative) {
+        if (matched_imperative || !spellsAt(text, v2_start_byte, imperative)) {
           return;
         }
         // Nothing predicative follows an imperative. That is the end of the
@@ -614,7 +551,6 @@ CompoundVerbMatch findCompoundVerbMatch(
     // remaining ださい is not a valid auxiliary boundary.  The check is
     // surface-independent and leaves real V2 compounds untouched.
     if (matched_len >= core::kJapaneseCharBytes && v2_start_byte + matched_len < text.size() &&
-        text[v2_start_byte + matched_len - core::kJapaneseCharBytes] == '\xE3' &&
         text.substr(v2_start_byte + matched_len - core::kJapaneseCharBytes, core::kJapaneseCharBytes) == "く" &&
         utf8::startsWith(text.substr(v2_start_byte + matched_len), "ださい")) {
       continue;
@@ -746,20 +682,14 @@ CompoundVerbMatch findCompoundVerbMatch(
     // the input. A hiragana V2 is a deliberate spelling choice (読みかける),
     // not an instruction to normalize it to the table's kanji representative
     // (読み掛ける).
-    std::string compound_base;
-    size_t v1_renyokei_end = is_ichidan ? v2_start_byte : byteOffsetAt(byte_offsets, kanji_end + 1);
-    compound_base = std::string(text.substr(start_byte, v1_renyokei_end - start_byte));
-    std::string compound_source_base = compound_base;
-    const bool v2_is_hiragana = char_types[v2_start] == CharType::Hiragana;
-    if (matched_potential) {
-      std::string potential = generateGodanPotential(v2_surface, "", v2_verb.verb_type);
-      compound_base +=
-          v2_is_hiragana && !v2_reading.empty() ? generateGodanPotential(v2_reading, "", v2_verb.verb_type) : potential;
-      compound_source_base += v2_is_hiragana && !v2_reading.empty() ? v2_reading : v2_surface;
-    } else {
-      compound_base += v2_is_hiragana && !v2_reading.empty() ? v2_reading : v2_surface;
-      compound_source_base = compound_base;
-    }
+    const size_t v1_renyokei_end = is_ichidan ? v2_start_byte : byteOffsetAt(byte_offsets, kanji_end + 1);
+    const std::string_view v1_renyokei = text.substr(start_byte, v1_renyokei_end - start_byte);
+    const std::string_view v2_spelling =
+        char_types[v2_start] == CharType::Hiragana && !v2_reading.empty() ? v2_reading : v2_surface;
+    const std::string compound_source_base = normalize::concat(v1_renyokei, v2_spelling);
+    const std::string compound_base =
+        matched_potential ? normalize::concat(v1_renyokei, generateGodanPotential(v2_spelling, "", v2_verb.verb_type))
+                          : compound_source_base;
 
     // Compare with best match and update if this is better
     // Priority:
@@ -774,14 +704,11 @@ CompoundVerbMatch findCompoundVerbMatch(
     const size_t matched_end_pos =
         advanceCharsToBytePos(codepoints, v2_start, v2_start_byte, v2_start_byte + matched_len);
     const bool matched_causative_conditional =
-        matched_mizenkei && matched_end_pos + 2 < codepoints.size() && codepoints[matched_end_pos] == U'せ' &&
-        codepoints[matched_end_pos + 1] == U'れ' && codepoints[matched_end_pos + 2] == U'ば';
+        matched_mizenkei && startsCausativeConditional(codepoints, matched_end_pos);
     const size_t best_mizenkei_end_pos =
         advanceCharsToBytePos(codepoints, v2_start, v2_start_byte, v2_start_byte + best_match.matched_len);
     const bool best_mizenkei_has_causative_conditional =
-        best_match.is_mizenkei && best_mizenkei_end_pos + 2 < codepoints.size() &&
-        codepoints[best_mizenkei_end_pos] == U'せ' && codepoints[best_mizenkei_end_pos + 1] == U'れ' &&
-        codepoints[best_mizenkei_end_pos + 2] == U'ば';
+        best_match.is_mizenkei && startsCausativeConditional(codepoints, best_mizenkei_end_pos);
     bool should_update = false;
     if (best_match.matched_len == 0) {
       // First valid match
@@ -814,10 +741,7 @@ CompoundVerbMatch findCompoundVerbMatch(
       const size_t renyokei_end_pos =
           advanceCharsToBytePos(codepoints, v2_start, v2_start_byte, v2_start_byte + matched_len);
       const bool followed_by_deverbal_suffix =
-          renyokei_end_pos < codepoints.size() &&
-          (codepoints[renyokei_end_pos] == U'方' || codepoints[renyokei_end_pos] == U'手' ||
-           codepoints[renyokei_end_pos] == U'物' || codepoints[renyokei_end_pos] == U'所' ||
-           codepoints[renyokei_end_pos] == U'場');
+          renyokei_end_pos < codepoints.size() && isDeverbalSuffixKanji(codepoints[renyokei_end_pos]);
       const bool followed_by_nominal_particle =
           beginsNominalForcingParticle(codepoints, renyokei_end_pos, dict_manager);
       const bool followed_by_ichidan_conditional =

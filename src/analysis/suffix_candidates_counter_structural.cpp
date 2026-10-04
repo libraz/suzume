@@ -58,10 +58,7 @@ size_t repeatedNumeralNounUnitEndAt(const std::vector<char32_t>& codepoints,
     return 0;
   }
 
-  size_t numeral_end = start_pos;
-  while (numeral_end < codepoints.size() && normalize::isNumeralCodepoint(codepoints[numeral_end])) {
-    ++numeral_end;
-  }
+  const size_t numeral_end = counter_detail::scanQuantityHead(codepoints, start_pos, false);
   if (numeral_end >= codepoints.size() || numeral_end >= char_types.size() ||
       char_types[numeral_end] != normalize::CharType::Kanji) {
     return 0;
@@ -85,10 +82,7 @@ bool isRepeatedNumeralNounPredicateUnitAt(const std::vector<char32_t>& codepoint
                                           const std::vector<normalize::CharType>& char_types, size_t start_pos) {
   size_t repeated_end = repeatedNumeralNounUnitEndAt(codepoints, char_types, start_pos);
   if (repeated_end == 0 && start_pos < codepoints.size() && normalize::isNumeralCodepoint(codepoints[start_pos])) {
-    size_t numeral_end = start_pos;
-    while (numeral_end < codepoints.size() && normalize::isNumeralCodepoint(codepoints[numeral_end])) {
-      ++numeral_end;
-    }
+    const size_t numeral_end = counter_detail::scanQuantityHead(codepoints, start_pos, false);
     if (numeral_end < char_types.size() && char_types[numeral_end] == normalize::CharType::Kanji) {
       const size_t unit_end = numeral_end + 1;
       const size_t unit_length = unit_end - start_pos;
@@ -163,10 +157,7 @@ void appendStructuralCounterCandidates(const std::vector<char32_t>& codepoints, 
   // (一人一人, 一日一日). Keep two identical units as one search unit rather
   // than allowing each discounted counter candidate to split the expression.
   if (normalize::isNumeralCodepoint(codepoints[start_pos])) {
-    size_t numeral_end = start_pos;
-    while (numeral_end < codepoints.size() && normalize::isNumeralCodepoint(codepoints[numeral_end])) {
-      ++numeral_end;
-    }
+    const size_t numeral_end = scanQuantityHead(codepoints, start_pos, false);
     if (numeral_end < codepoints.size() && normalize::isCounterKanji(codepoints[numeral_end])) {
       const size_t repeated_end = repeatedNumeralNounUnitEndAt(codepoints, char_types, start_pos);
       if (repeated_end != 0) {
@@ -183,10 +174,7 @@ void appendStructuralCounterCandidates(const std::vector<char32_t>& codepoints, 
   // ordinary kana run behind a quantity cannot enter the rule and neither can a
   // short kana numeral that also opens a common word (一つ|とおもう).
   if (dict_manager != nullptr && normalize::isNumeralCodepoint(codepoints[start_pos])) {
-    size_t numeral_end = start_pos;
-    while (numeral_end < codepoints.size() && normalize::isNumeralCodepoint(codepoints[numeral_end])) {
-      ++numeral_end;
-    }
+    const size_t numeral_end = scanQuantityHead(codepoints, start_pos, false);
     if (numeral_end < codepoints.size() && codepoints[numeral_end] == U'つ') {
       const size_t unit_end = numeral_end + 1;
       size_t repeated_end = 0;
@@ -233,26 +221,21 @@ void appendStructuralCounterCandidates(const std::vector<char32_t>& codepoints, 
   // noun following an ordinal from being fabricated as a compound.
   if (start_pos + 1 < codepoints.size() && codepoints[start_pos] == U'第' &&
       normalize::isNumeralCodepoint(codepoints[start_pos + 1])) {
-    size_t ordinal_end = start_pos + 1;
-    bool ordinal_has_numeral = false;
-    while (ordinal_end < codepoints.size() && normalize::isNumeralCodepoint(codepoints[ordinal_end])) {
-      ordinal_has_numeral = true;
-      ++ordinal_end;
-    }
+    const size_t ordinal_end = scanQuantityHead(codepoints, start_pos + 1, false);
     if (ordinal_end < char_types.size() && char_types[ordinal_end] == normalize::CharType::Kanji) {
       size_t tail_end = ordinal_end;
       while (tail_end < char_types.size() && char_types[tail_end] == normalize::CharType::Kanji) {
         ++tail_end;
       }
       size_t tail_len = tail_end - ordinal_end;
-      if (tail_len == 1 && ordinal_has_numeral && normalize::isCounterKanji(codepoints[ordinal_end])) {
+      if (tail_len == 1 && normalize::isCounterKanji(codepoints[ordinal_end])) {
         appendCounterCandidate(codepoints, start_pos, ordinal_end, core::PartOfSpeech::Noun,
                                candidate::kOrdinalDigitCounterSplitBonus, core::ExtendedPOS::NounNumber,
                                "ordinal_digit_counter_prefix", candidates);
         appendCounterCandidate(codepoints, ordinal_end, tail_end, core::PartOfSpeech::Suffix,
                                candidate::kOrdinalDigitCounterSplitBonus, core::ExtendedPOS::Unknown,
                                "ordinal_digit_counter_suffix", candidates);
-      } else if (tail_len == 2 && ordinal_has_numeral && normalize::isCounterKanji(codepoints[ordinal_end]) &&
+      } else if (tail_len == 2 && normalize::isCounterKanji(codepoints[ordinal_end]) &&
                  codepoints[ordinal_end + 1] == U'目') {
         appendCounterCandidate(codepoints, start_pos, ordinal_end, core::PartOfSpeech::Noun,
                                candidate::kOrdinalDigitCounterSplitBonus, core::ExtendedPOS::NounNumber,
@@ -263,7 +246,7 @@ void appendStructuralCounterCandidates(const std::vector<char32_t>& codepoints, 
         appendCounterCandidate(codepoints, ordinal_end + 1, tail_end, core::PartOfSpeech::Suffix,
                                candidate::kOrdinalDigitCounterSplitBonus, core::ExtendedPOS::Unknown,
                                "ordinal_counter_ordinal_suffix_tail", candidates);
-      } else if (tail_len >= 2 && ordinal_has_numeral && normalize::isCounterKanji(codepoints[ordinal_end]) &&
+      } else if (tail_len >= 2 && normalize::isCounterKanji(codepoints[ordinal_end]) &&
                  codepoints[ordinal_end] != U'次') {
         // A longer kanji tail behind the ordinal is a word of its own, and the
         // counter reading of its first kanji cuts inside it (第2|部門, not
@@ -351,10 +334,7 @@ void appendStructuralCounterCandidates(const std::vector<char32_t>& codepoints, 
     bool lead_is_prefix = lead_len == 1 && normalize::isNumericApproxPrefixKanji(codepoints[start_pos]);
     if ((lead_len >= 2 || lead_is_prefix) && lead < codepoints.size() &&
         normalize::isNumeralCodepoint(codepoints[lead])) {
-      size_t num_end = lead;
-      while (num_end < codepoints.size() && normalize::isNumeralCodepoint(codepoints[num_end])) {
-        ++num_end;
-      }
+      const size_t num_end = scanQuantityHead(codepoints, lead, false);
       bool counter_follows = num_end < codepoints.size() &&
                              (normalize::isCounterKanji(codepoints[num_end]) ||
                               (num_end < char_types.size() && char_types[num_end] == normalize::CharType::Katakana));
@@ -381,10 +361,7 @@ void appendStructuralCounterCandidates(const std::vector<char32_t>& codepoints, 
   // (十数年: 数 binds the following 年, not the preceding numeral) never fire.
   if (normalize::isQuantityPrefixKanji(codepoints[start_pos]) &&
       normalize::isNumeralCodepoint(codepoints[start_pos + 1])) {
-    size_t num_end = start_pos + 1;
-    while (num_end < codepoints.size() && normalize::isNumeralCodepoint(codepoints[num_end])) {
-      ++num_end;
-    }
+    const size_t num_end = scanQuantityHead(codepoints, start_pos + 1, false);
     bool lone_counter_at_boundary =
         num_end < char_types.size() && normalize::isCounterKanji(codepoints[num_end]) &&
         (num_end + 1 >= char_types.size() || char_types[num_end + 1] != normalize::CharType::Kanji);

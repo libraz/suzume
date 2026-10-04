@@ -31,19 +31,13 @@ size_t findParticleInitialClosedOnbinSplit(std::string_view text, const std::vec
   }
 
   const size_t start_byte = byteOffsetAt(byte_offsets, start_pos);
+  const size_t hiragana_end = findCharRegionEnd(char_types, start_pos, 4, CharType::Hiragana);
   for (size_t v1_len = 3; v1_len <= 4; ++v1_len) {
     const size_t v2_start = start_pos + v1_len;
-    if (v2_start >= codepoints.size()) {
+    if (v2_start >= codepoints.size() || v2_start > hiragana_end) {
       break;
     }
-    bool all_hiragana = true;
-    for (size_t pos = start_pos; pos < v2_start; ++pos) {
-      if (char_types[pos] != CharType::Hiragana) {
-        all_hiragana = false;
-        break;
-      }
-    }
-    if (!all_hiragana || !grammar::isERowCodepoint(codepoints[v2_start - 1])) {
+    if (!kana::isERowCodepoint(codepoints[v2_start - 1])) {
       continue;
     }
 
@@ -143,18 +137,8 @@ void addHiraganaCompoundVerbJoinCandidates(core::Lattice& lattice, std::string_v
   const size_t min_v1_len = codepoints[start_pos] == U'し' ? 1 : 2;
   for (size_t v1_len = min_v1_len; v1_len <= 4; ++v1_len) {
     const size_t v2_start = start_pos + v1_len;
-    if (v2_start >= codepoints.size()) {
+    if (v2_start >= codepoints.size() || v2_start > hiragana_end) {
       break;
-    }
-    bool all_hiragana = true;
-    for (size_t pos = start_pos; pos < v2_start; ++pos) {
-      if (char_types[pos] != CharType::Hiragana) {
-        all_hiragana = false;
-        break;
-      }
-    }
-    if (!all_hiragana) {
-      continue;
     }
 
     const size_t v2_start_byte = byteOffsetAt(byte_offsets, v2_start);
@@ -188,7 +172,7 @@ void addHiraganaCompoundVerbJoinCandidates(core::Lattice& lattice, std::string_v
     bool v1_embeds_conjunctive_particle = false;
     for (size_t particle_start = start_pos + 1; particle_start + 1 < v2_start; ++particle_start) {
       const char32_t host_tail = codepoints[particle_start - 1];
-      if (!grammar::isIRowCodepoint(host_tail) && !grammar::isERowCodepoint(host_tail)) {
+      if (!kana::isIRowCodepoint(host_tail) && !kana::isERowCodepoint(host_tail)) {
         continue;
       }
       const auto* particle =
@@ -204,11 +188,11 @@ void addHiraganaCompoundVerbJoinCandidates(core::Lattice& lattice, std::string_v
 
     // An e-row form after topic は is an independently closed Godan
     // conditional when its reconstructed lemma is attested.
-    if (is_ichidan && grammar::isERowCodepoint(v1_tail) && start_pos > 0 && codepoints[start_pos - 1] == U'は') {
+    if (is_ichidan && kana::isERowCodepoint(v1_tail) && start_pos > 0 && codepoints[start_pos - 1] == U'は') {
       const std::string_view godan_suffix = grammar::godanBaseSuffixFromERow(v1_tail);
       if (!godan_suffix.empty()) {
-        std::string godan_base(v1_surface.substr(0, v1_surface.size() - core::kJapaneseCharBytes));
-        godan_base += godan_suffix;
+        const std::string godan_base =
+            normalize::concat(v1_surface.substr(0, v1_surface.size() - core::kJapaneseCharBytes), godan_suffix);
         if (dict_manager.lookupExact(godan_base, core::PartOfSpeech::Verb) != nullptr) {
           continue;
         }
