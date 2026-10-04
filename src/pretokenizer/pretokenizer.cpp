@@ -13,10 +13,6 @@ namespace suzume::pretokenizer {
 
 using namespace pretokenizer_detail;
 
-bool PreTokenizer::isSentenceBoundary(char32_t codepoint) const {
-  return core::isSentenceBoundaryCodepoint(codepoint);
-}
-
 PreTokenResult PreTokenizer::process(std::string_view text) const {
   PreTokenResult result;
 
@@ -63,7 +59,7 @@ PreTokenResult PreTokenizer::process(std::string_view text) const {
     }
 
     // Check for sentence boundary
-    if (isSentenceBoundary(codepoint)) {
+    if (core::isSentenceBoundaryCodepoint(codepoint)) {
       // Add span before boundary if any
       if (pos > span_start) {
         result.spans.push_back({span_start, pos});

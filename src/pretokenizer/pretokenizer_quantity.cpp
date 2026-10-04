@@ -13,12 +13,17 @@ using namespace pretokenizer_detail;
 
 namespace {
 
+// Whether a scanned one- or two-digit field lies within [min_value, max_value].
+bool isTwoDigitFieldInRange(const IntegerScan& field, int min_value, int max_value) {
+  return !field.empty() && field.digit_count <= 2 && field.value >= min_value && field.value <= max_value;
+}
+
 bool isValidCalendarMonth(const IntegerScan& month) {
-  return !month.empty() && month.digit_count <= 2 && month.value >= 1 && month.value <= 12;
+  return isTwoDigitFieldInRange(month, 1, 12);
 }
 
 bool isValidCalendarDay(const IntegerScan& day) {
-  return !day.empty() && day.digit_count <= 2 && day.value >= 1 && day.value <= 31;
+  return isTwoDigitFieldInRange(day, 1, 31);
 }
 
 // Advances pos past the next codepoint when it is expected; leaves pos unchanged otherwise.
@@ -28,6 +33,16 @@ bool consumeCodepoint(std::string_view text, size_t& pos, char32_t expected) {
     return false;
   }
   pos = next;
+  return true;
+}
+
+// Advances pos past a duration suffix 間 when absorbsPeriodKan keeps it in the counter.
+bool consumePeriodKan(std::string_view text, size_t& pos) {
+  size_t after_kan = pos;
+  if (!consumeCodepoint(text, after_kan, U'間') || !absorbsPeriodKan(text, after_kan)) {
+    return false;
+  }
+  pos = after_kan;
   return true;
 }
 
@@ -91,8 +106,7 @@ bool PreTokenizer::tryMatchDate(std::string_view text, size_t pos, PreToken& tok
   // is not the interval signal 間 + stranded-kanji (see absorbsPeriodKan),
   // so 3年間活動 stays 3年間|活動 while 3年間隔 splits as 3年|間隔.
   byte_pos = year_end;
-  if (!matched_month && (consumeCodepoint(text, byte_pos, U'度') ||
-                         (consumeCodepoint(text, byte_pos, U'間') && absorbsPeriodKan(text, byte_pos)))) {
+  if (!matched_month && (consumeCodepoint(text, byte_pos, U'度') || consumePeriodKan(text, byte_pos))) {
     idx = byte_pos;
   }
 
@@ -247,36 +261,24 @@ bool PreTokenizer::tryMatchVersion(std::string_view text, size_t pos, PreToken& 
     ++idx;
   }
 
-  // First number (integer-only scan avoids consuming decimal points)
-  IntegerScan number = scanInteger(text, idx);
-  size_t num_end = number.end;
-  if (number.empty()) {
-    return false;
-  }
-  idx = num_end;
-
-  // Must have at least one .number
-  if (idx >= text.size() || text[idx] != '.') {
-    return false;
-  }
-  ++idx;
-
-  number = scanInteger(text, idx);
-  num_end = number.end;
-  if (number.empty()) {
-    return false;
-  }
-  idx = num_end;
-
-  // Additional .number segments
-  while (idx < text.size() && text[idx] == '.') {
-    size_t next = idx + 1;
-    number = scanInteger(text, next);
-    num_end = number.end;
+  // Dot-separated integer segments (integer-only scans avoid consuming decimal
+  // points); a trailing dot without digits is left outside the token.
+  size_t segment_count = 0;
+  size_t segment_start = idx;
+  while (true) {
+    const IntegerScan number = scanInteger(text, segment_start);
     if (number.empty()) {
       break;
     }
-    idx = num_end;
+    idx = number.end;
+    ++segment_count;
+    if (idx >= text.size() || text[idx] != '.') {
+      break;
+    }
+    segment_start = idx + 1;
+  }
+  if (segment_count < 2) {
+    return false;
   }
 
   setTokenFromRange(token, text, pos, idx, PreTokenType::Version, core::PartOfSpeech::Noun);
@@ -336,22 +338,14 @@ bool PreTokenizer::tryMatchAddressNumber(std::string_view text, size_t pos, PreT
 bool PreTokenizer::tryMatchTime(std::string_view text, size_t pos, PreToken& token) const {
   // Match patterns: HH時, HH時MM分, HH時MM分SS秒
   // Check that we're not starting in the middle of a number
-  if (pos > 0) {
-    char prev = text[pos - 1];
-    if (isAsciiDigit(prev)) {
-      return false;
-    }
-  }
-
-  const IntegerScan hour = scanInteger(text, pos);
-  size_t idx = hour.end;
-
-  if (hour.empty() || hour.digit_count > 2) {
+  if (pos > 0 && isAsciiDigit(text[pos - 1])) {
     return false;
   }
 
   // Validate hour (0-23 or 1-24)
-  if (hour.value > 24) {
+  const IntegerScan hour = scanInteger(text, pos);
+  size_t idx = hour.end;
+  if (!isTwoDigitFieldInRange(hour, 0, 24)) {
     return false;
   }
 
@@ -363,19 +357,16 @@ bool PreTokenizer::tryMatchTime(std::string_view text, size_t pos, PreToken& tok
   // A duration starts with 時間 rather than 時. Consume 間 before scanning
   // its optional minute/second fields so 1時間15分 remains one quantity.
   // Leave 間 to the following span when it heads an interval word (5時|間隔).
-  size_t duration_pos = idx;
-  if (consumeCodepoint(text, duration_pos, U'間') && absorbsPeriodKan(text, duration_pos)) {
-    idx = duration_pos;
-  }
+  consumePeriodKan(text, idx);
 
   // Try to match minutes, then seconds
   const IntegerScan minute = scanInteger(text, idx);
   size_t byte_pos = minute.end;
-  if (!minute.empty() && minute.digit_count <= 2 && minute.value <= 59 && consumeCodepoint(text, byte_pos, U'分')) {
+  if (isTwoDigitFieldInRange(minute, 0, 59) && consumeCodepoint(text, byte_pos, U'分')) {
     idx = byte_pos;
     const IntegerScan second = scanInteger(text, idx);
     byte_pos = second.end;
-    if (!second.empty() && second.digit_count <= 2 && second.value <= 59 && consumeCodepoint(text, byte_pos, U'秒')) {
+    if (isTwoDigitFieldInRange(second, 0, 59) && consumeCodepoint(text, byte_pos, U'秒')) {
       idx = byte_pos;
     }
   }
@@ -383,10 +374,7 @@ bool PreTokenizer::tryMatchTime(std::string_view text, size_t pos, PreToken& tok
   // Duration suffix 間 (期間接尾): HH時 + 間 = HH時間. Absorbed only when it is
   // not the interval signal 間 + stranded-kanji (see absorbsPeriodKan), so
   // 24時間営業 stays 24時間|営業 while 5時間隔 splits as 5時|間隔.
-  size_t kan_pos = idx;
-  if (consumeCodepoint(text, kan_pos, U'間') && absorbsPeriodKan(text, kan_pos)) {
-    idx = kan_pos;
-  }
+  consumePeriodKan(text, idx);
 
   if (idx > pos) {
     if (hasIntervalSuffix(text, idx)) {

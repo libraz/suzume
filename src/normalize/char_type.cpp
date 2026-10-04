@@ -232,24 +232,10 @@ CharType classifyChar(char32_t codepoint) {
     return CharType::Katakana;
   }
 
-  // Ideographic iteration mark (々) - treat as Kanji
-  // U+3005 repeats preceding kanji: 人々, 日々, 痛々しい
-  // Must check before CJK Symbols range (0x3000-0x303F)
-  if (codepoint == 0x3005) {
-    return CharType::Kanji;
-  }
-
-  // Ideographic closing mark (〆) - treat as Kanji so it remains part of
-  // lexical compounds such as 〆切. Unicode assigns U+3006 the Ideographic
-  // property even though it lives in the CJK Symbols block.
-  if (codepoint == 0x3006) {
-    return CharType::Kanji;
-  }
-
-  // Ideographic number zero (〇) - treat as Kanji so it joins numeral runs
-  // (二〇二五年, 一〇〇). U+3007 lives in the CJK Symbols block, so it must be
-  // caught before the symbol range below or it is dropped as a symbol.
-  if (codepoint == 0x3007) {
+  // Ideographic characters inside the CJK Symbols block (0x3000-0x303F), caught
+  // before its symbol range: the iteration mark 々 (人々, 痛々しい), the closing
+  // mark 〆 (〆切), and the number zero 〇 that joins numeral runs (二〇二五年).
+  if (codepoint >= 0x3005 && codepoint <= 0x3007) {
     return CharType::Kanji;
   }
 

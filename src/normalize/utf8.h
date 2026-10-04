@@ -72,6 +72,14 @@ size_t byteToCharOffset(std::string_view str, size_t byte_offset);
 std::string_view utf8Substr(std::string_view str, size_t start, size_t length);
 
 /**
+ * @brief Find the start of the UTF-8 character containing a byte position
+ * @param str UTF-8 string
+ * @param pos Byte position (must be < str.size())
+ * @return Byte offset of the nearest non-continuation byte at or before pos
+ */
+size_t findUtf8Boundary(std::string_view str, size_t pos);
+
+/**
  * @brief Rebuild a string with its last character swapped for another one
  * @param str UTF-8 string
  * @param replacement UTF-8 text to put in place of the last character

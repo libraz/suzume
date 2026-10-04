@@ -206,13 +206,6 @@ class PreTokenizer {
    * @return true if matched
    */
   bool tryMatchAsciiWithJoiners(std::string_view text, size_t pos, PreToken& token) const;
-
-  /**
-   * @brief Check if character is sentence boundary
-   * @param codepoint Unicode codepoint
-   * @return true if sentence boundary
-   */
-  bool isSentenceBoundary(char32_t codepoint) const;
 };
 
 }  // namespace suzume::pretokenizer

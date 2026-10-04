@@ -136,11 +136,11 @@ char32_t combineKanaWithSoundMark(char32_t base, bool handakuten) {
   if (hiragana_base >= 0x306F && hiragana_base <= 0x307D && ((hiragana_base - 0x306F) % 3 == 0)) {
     combined = hiragana_base + (handakuten ? 2 : 1);
   } else if (!handakuten) {
+    // か/さ rows alternate plain and voiced forms; た row is irregular around っ.
     if ((hiragana_base >= 0x304B && hiragana_base <= 0x3053 && ((hiragana_base - 0x304B) % 2 == 0)) ||
-        (hiragana_base >= 0x3055 && hiragana_base <= 0x305D && ((hiragana_base - 0x3055) % 2 == 0))) {
-      combined = hiragana_base + 1;
-    } else if (hiragana_base == 0x305F || hiragana_base == 0x3061 || hiragana_base == 0x3064 ||
-               hiragana_base == 0x3066 || hiragana_base == 0x3068) {
+        (hiragana_base >= 0x3055 && hiragana_base <= 0x305D && ((hiragana_base - 0x3055) % 2 == 0)) ||
+        hiragana_base == 0x305F || hiragana_base == 0x3061 || hiragana_base == 0x3064 || hiragana_base == 0x3066 ||
+        hiragana_base == 0x3068) {
       combined = hiragana_base + 1;
     } else if (hiragana_base == 0x3046) {  // う -> ゔ
       combined = 0x3094;
@@ -238,9 +238,9 @@ core::Result<std::string> Normalizer::normalize(std::string_view text) const {
     // preceding kana (combinable ones are consumed in the look-ahead below).
     // Map such a stray mark to its full-width standalone form so that both
     // encodings classify and segment identically (e.g. ｱﾞ matches ア゛).
-    if (normalized_cp == kHalfwidthDakuten || normalized_cp == kCombiningDakuten) {
+    if (isDakutenMark(normalized_cp)) {
       normalized_cp = kDakuten;
-    } else if (normalized_cp == kHalfwidthHandakuten || normalized_cp == kCombiningHandakuten) {
+    } else if (isHandakutenMark(normalized_cp)) {
       normalized_cp = kHandakuten;
     }
 
@@ -275,11 +275,11 @@ core::Result<std::string> Normalizer::normalize(std::string_view text) const {
     // elongation, not the in-word emphasis used in すごーーい. Retain one
     // mark for the preceding token and collapse only the redundant marks in
     // this boundary context (長いーー音 → 長いー音).
-    if (options_.collapse_repeated_prolonged_marks && codepoint == 0x30FC) {
+    if (options_.collapse_repeated_prolonged_marks && isProlongedSoundMark(codepoint)) {
       size_t repeated_end = pos;
       while (repeated_end < text.size()) {
         size_t mark_pos = repeated_end;
-        if (normalizeWidthAndKana(decodeUtf8(text, mark_pos), options_.preserve_case) != 0x30FC) {
+        if (!isProlongedSoundMark(normalizeWidthAndKana(decodeUtf8(text, mark_pos), options_.preserve_case))) {
           break;
         }
         repeated_end = mark_pos;
@@ -295,9 +295,8 @@ core::Result<std::string> Normalizer::normalize(std::string_view text) const {
     if (!options_.preserve_vu && (codepoint == kKatakanaVu || codepoint == kHiraganaVu)) {
       next_pos = pos;
       if (next_pos < text.size()) {
-        char32_t next_cp = decodeUtf8(text, next_pos);
-        next_cp = normalizeWidthAndKana(next_cp, options_.preserve_case);
-        char32_t normalized = normalizeVuSequence(codepoint, next_cp);
+        const char32_t next_cp = normalizeWidthAndKana(decodeUtf8(text, next_pos), options_.preserve_case);
+        const char32_t normalized = normalizeVuSequence(codepoint, next_cp);
         if (normalized != 0) {
           // Consume the small vowel and output normalized character
           pos = next_pos;

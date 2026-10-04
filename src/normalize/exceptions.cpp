@@ -1,20 +1,14 @@
 #include "normalize/exceptions.h"
 
-#include <algorithm>
-#include <array>
+#include "core/utf8_constants.h"
 
 namespace suzume::normalize {
 
 namespace {
 
-template <typename T, size_t Size>
-bool contains(const std::array<T, Size>& values, const T& value) {
-  return std::find(values.begin(), values.end(), value) != values.end();
-}
-
 // Particles that should not be treated as verb endings when generating
 // verb candidates from kanji + hiragana patterns.
-constexpr std::array<std::string_view, 15> kParticleStrings = {
+constexpr std::string_view kParticleStrings[] = {
     // Case particles (格助詞)
     "が",
     "を",
@@ -37,7 +31,7 @@ constexpr std::array<std::string_view, 15> kParticleStrings = {
 };
 
 // Copula and auxiliary patterns that should not be treated as verb endings.
-constexpr std::array<std::string_view, 6> kCopulaStrings = {
+constexpr std::string_view kCopulaStrings[] = {
     // Basic copula (基本形)
     "だ",
     "です",
@@ -52,18 +46,18 @@ constexpr std::array<std::string_view, 6> kCopulaStrings = {
 
 // Formal nouns (形式名詞) with abstract grammatical functions. These remain
 // recognizable even when a dictionary lookup did not flag the candidate.
-constexpr std::array<std::string_view, 6> kFormalNounStrings = {
+constexpr std::string_view kFormalNounStrings[] = {
     "所", "物", "事", "時", "方", "為",
 };
 
 }  // namespace
 
 bool isParticle(std::string_view surface) {
-  return contains(kParticleStrings, surface);
+  return utf8::equalsAny(surface, kParticleStrings);
 }
 
 bool isCopula(std::string_view surface) {
-  return contains(kCopulaStrings, surface);
+  return utf8::equalsAny(surface, kCopulaStrings);
 }
 
 bool isParticleOrCopula(std::string_view surface) {
@@ -71,7 +65,7 @@ bool isParticleOrCopula(std::string_view surface) {
 }
 
 bool isFormalNounSurface(std::string_view surface) {
-  return contains(kFormalNounStrings, surface);
+  return utf8::equalsAny(surface, kFormalNounStrings);
 }
 
 bool isParticleCodepoint(char32_t ch) {

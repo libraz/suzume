@@ -40,16 +40,11 @@ bool absorbsPeriodKan(std::string_view text, size_t pos_after_kan) {
   if (normalize::isTemporalRelationSuffixKanji(next_cp)) {
     return true;  // 間 + 後/前 → duration + relational suffix (2時間|後, 5年間|前)
   }
-  if (idx >= text.size()) {
-    // 間 + lone kanji at end: interval only for an 間X compound (…間隔), else duration
-    return !normalize::isIntervalCompoundSecondKanji(next_cp);
-  }
-  char32_t after_cp = normalize::decodeUtf8(text, idx);
-  if (normalize::isKanjiCodepoint(after_cp)) {
+  if (idx < text.size() && normalize::isKanjiCodepoint(normalize::decodeUtf8(text, idx))) {
     return true;  // 2+ kanji → duration (時間営業, 年間活動)
   }
-  // 間 + single kanji + non-kanji: interval only when the kanji forms an 間X compound
-  // (間隔で), else the counter takes the duration reading (年間|続けた, 時間|半).
+  // 間 + single kanji at the end or before a non-kanji: interval only when the kanji
+  // forms an 間X compound (間隔で), else the duration reading (年間|続けた, 時間|半).
   return !normalize::isIntervalCompoundSecondKanji(next_cp);
 }
 
@@ -77,19 +72,12 @@ IntegerScan scanInteger(std::string_view text, size_t pos) {
   size_t idx = pos;
   size_t digit_count = 0;
   int value = 0;
-  while (idx < text.size()) {
-    char chr = text[idx];
-    int digit = 0;
-    if (isAsciiDigit(chr)) {
-      digit = chr - '0';
-      ++idx;
-    } else {
-      break;
-    }
+  while (idx < text.size() && isAsciiDigit(text[idx])) {
     if (digit_count < 2) {
-      value = value * 10 + digit;
+      value = value * 10 + (text[idx] - '0');
     }
     ++digit_count;
+    ++idx;
   }
   return {idx, digit_count, value};
 }

@@ -177,10 +177,7 @@ bool isHashtagChar(char32_t codepoint) {
 bool opensHashtag(std::string_view text, size_t pos) {
   size_t cursor = pos;
   while (cursor > 0) {
-    size_t start = cursor - 1;
-    while (start > 0 && (static_cast<unsigned char>(text[start]) & 0xC0U) == 0x80U) {
-      --start;
-    }
+    const size_t start = normalize::findUtf8Boundary(text, cursor - 1);
     size_t decode_pos = start;
     if (!isHashtagChar(normalize::decodeUtf8(text, decode_pos))) {
       return true;
