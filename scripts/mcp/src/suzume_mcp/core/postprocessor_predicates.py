@@ -259,11 +259,16 @@ def postprocess_onaji_predicate(tokens: list[dict]) -> bool:
     return changed
 
 
+# Particles that mark an argument or a modifier of a nominal; a stem before one
+# is used as a noun (安全を守る, 安全が第一, 安全の確保).
+_ARGUMENT_PARTICLES = frozenset({"を", "が", "は", "も", "の"})
+
+
 def postprocess_na_adj_noun(tokens: list[dict]) -> bool:
     """Treat a bare na-adjective stem in a syntactic noun position as a noun.
 
-    An i-adjective cannot directly take を, while a na-adjective stem can be
-    used nominally (for example, 平静を保つ). A predicate immediately before
+    An i-adjective cannot directly take a case or binding particle, while a
+    na-adjective stem can be used nominally (平静を保つ, 安全が第一). A predicate immediately before
     the stem also closes a relative clause, making the following stem its
     nominal head (落ち着いた雰囲気). These are syntactic corrections, not
     lexical exceptions; adjective readings before な/に/すぎる remain untouched.
@@ -282,8 +287,13 @@ def postprocess_na_adj_noun(tokens: list[dict]) -> bool:
             and tokens[idx - 1].get("lemma") == "た"
             and following is None
         )
-        precedes_accusative = idx + 1 < len(tokens) and tokens[idx + 1].get("surface") == "を"
-        if not follows_past_relative_clause and not precedes_accusative:
+        precedes_argument_particle = following is not None and following.get("surface") in _ARGUMENT_PARTICLES
+        # The appearance suffix げ derives a new stem from the word as a noun
+        # (得意げ, 不安げ), the same whichever class the reference assigns it.
+        precedes_appearance_suffix = (
+            following is not None and following.get("surface") == "げ" and following.get("pos") == "Suffix"
+        )
+        if not follows_past_relative_clause and not precedes_argument_particle and not precedes_appearance_suffix:
             continue
         token["pos"] = "Noun"
         token["lemma"] = token.get("surface", "")

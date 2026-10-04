@@ -544,6 +544,9 @@ constexpr float kLexicalizedAdverbialAdjCost = -0.8F;
 constexpr float kNaAdjYakaCost = 0.2F;  // やか/らか/か + な (華やかな, 静かな)
 constexpr float kNaAdjTekiCost = 0.4F;  // 的 suffix (論理的) as one na-adjective search unit
 constexpr float kNaAdjStemCost = 0.5F;  // kanji compound + な (獰猛な)
+// Noun + dictionary na-adjective head + な (交通安全な, 再利用可能な): the head is
+// attested, so the compound must beat the noun + adjective split.
+constexpr float kNaAdjHeadedCompoundCost = bigram_cost::kMinorBonus;
 
 // Hiragana i-adjective confidence thresholds
 constexpr float kHiraAdjConfMin = 0.55F;        // default hiragana-only

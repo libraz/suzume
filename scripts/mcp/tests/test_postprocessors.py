@@ -824,13 +824,26 @@ class TestTokenizerSearchUnitNormalizers:
             _tok("がる", "Verb", lemma="がる"),
         ]
 
-    def test_nominalized_adjectival_host_keeps_noun_pos_before_garu(self):
-        tokens = [_tok("不安", "Noun"), _tok("がる", "Auxiliary")]
+    def test_registered_noun_host_keeps_noun_pos_before_garu(self, monkeypatch):
+        from suzume_mcp.core import postprocessor_predicates
+
+        real_headwords = postprocessor_predicates.core_headwords
+        monkeypatch.setattr(
+            postprocessor_predicates,
+            "core_headwords",
+            lambda name: frozenset({"心配"}) if name == "nouns.tsv" else real_headwords(name),
+        )
+        tokens = [_tok("心配", "Noun"), _tok("がる", "Auxiliary")]
         assert postprocess_adjective_garu(tokens)
         assert tokens == [
-            _tok("不安", "Noun"),
+            _tok("心配", "Noun"),
             _tok("がる", "Verb", lemma="がる"),
         ]
+
+    def test_registered_na_adjective_host_is_adjective_before_garu(self):
+        tokens = [_tok("不安", "Noun"), _tok("がる", "Auxiliary")]
+        assert postprocess_adjective_garu(tokens)
+        assert tokens[0]["pos"] == "Adjective"
 
     def test_unregistered_noun_does_not_license_garu(self):
         tokens = [_tok("ころ", "Noun"), _tok("がる", "Auxiliary")]

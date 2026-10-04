@@ -1036,7 +1036,7 @@
         },
         {
           "lemma": "不安",
-          "pos": "Noun",
+          "pos": "Adjective",
           "surface": "不安"
         },
         {
@@ -1151,7 +1151,7 @@
       "expected": [
         {
           "lemma": "再利用可能",
-          "pos": "Noun",
+          "pos": "Adjective",
           "surface": "再利用可能"
         },
         {

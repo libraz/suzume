@@ -57,7 +57,7 @@
         },
         {
           "lemma": "はじめる",
-          "pos": "Auxiliary",
+          "pos": "Verb",
           "surface": "はじめる"
         },
         {
@@ -67,7 +67,7 @@
         },
         {
           "lemma": "はじめる",
-          "pos": "Auxiliary",
+          "pos": "Verb",
           "surface": "はじめる"
         },
         {
@@ -77,7 +77,7 @@
         },
         {
           "lemma": "はじめる",
-          "pos": "Auxiliary",
+          "pos": "Verb",
           "surface": "はじめる"
         }
       ],
@@ -3758,6 +3758,38 @@
       ],
       "id": "sonnakotoha_karittkonai",
       "input": "そんなことは分かりっこない"
+    },
+    {
+      "description": "Kana inceptive はじめる is a verb like its kanji spelling",
+      "expected": [
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読み"
+        },
+        {
+          "lemma": "はじめる",
+          "pos": "Verb",
+          "surface": "はじめ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wo_mihajimeta",
+      "input": "本を読みはじめた"
     }
   ],
   "description": "auxiliary tests",

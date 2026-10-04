@@ -217,6 +217,10 @@ def _postprocess_kanji_merge(result: list[dict], applied_rule: str | None) -> tu
                 and merged[-1].get("pos") != "Noun"
             )
         ):
+            # A compound is right-headed, so whether it is a na-adjective stem
+            # is decided by its last piece (交通+安全 is one, 安全+対策 is not).
+            if "形容動詞語幹" in (merged[-1].get("pos_sub1"), curr.get("pos_sub1")):
+                merged[-1]["pos_sub1"] = "形容動詞語幹" if curr.get("pos_sub1") == "形容動詞語幹" else "一般"
             merged[-1]["surface"] += surface
             merged[-1]["lemma"] = merged[-1]["surface"]
             merged[-1]["pos"] = "名詞"

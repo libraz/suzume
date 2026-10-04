@@ -1971,6 +1971,38 @@
       ],
       "id": "i_6",
       "input": "二日酔い"
+    },
+    {
+      "description": "彼氏 is a common noun, not a pronoun",
+      "expected": [
+        {
+          "lemma": "彼氏",
+          "pos": "Noun",
+          "surface": "彼氏"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "映画",
+          "pos": "Noun",
+          "surface": "映画"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見る"
+        }
+      ],
+      "id": "to_wo_ru",
+      "input": "彼氏と映画を見る"
     }
   ],
   "description": "General nouns (part 4/4)",

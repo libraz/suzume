@@ -709,7 +709,7 @@
         },
         {
           "lemma": "はじめる",
-          "pos": "Auxiliary",
+          "pos": "Verb",
           "surface": "はじめ"
         },
         {
@@ -877,7 +877,7 @@
         },
         {
           "lemma": "不安",
-          "pos": "Noun",
+          "pos": "Adjective",
           "surface": "不安"
         },
         {

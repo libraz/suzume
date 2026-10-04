@@ -899,7 +899,7 @@
       "expected": [
         {
           "lemma": "不安",
-          "pos": "Noun",
+          "pos": "Adjective",
           "surface": "不安"
         }
       ],
@@ -915,7 +915,7 @@
       "expected": [
         {
           "lemma": "不要",
-          "pos": "Noun",
+          "pos": "Adjective",
           "surface": "不要"
         }
       ],
@@ -931,7 +931,7 @@
       "expected": [
         {
           "lemma": "不便",
-          "pos": "Noun",
+          "pos": "Adjective",
           "surface": "不便"
         }
       ],

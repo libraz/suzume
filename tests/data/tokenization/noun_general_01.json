@@ -1710,7 +1710,7 @@
       "expected": [
         {
           "lemma": "彼氏",
-          "pos": "Pronoun",
+          "pos": "Noun",
           "surface": "彼氏"
         },
         {

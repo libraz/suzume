@@ -25,13 +25,21 @@ using verb_helpers::findCharRegionEnd;
 
 namespace {
 
+// Whether a dictionary adjective closing the run stands apart from what is in
+// front of it: one bound kanji (超|重要, 最|簡単) or a quantity phrase, which
+// its counter closes (何部|必要). A full noun compounds with it (交通安全).
 bool hasIndependentAdjectiveHost(const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos,
                                  const dictionary::DictionaryManager* dict_manager) {
   if (dict_manager == nullptr || end_pos <= start_pos + 1) {
     return false;
   }
-  return hasDictionaryEntryEndingAt(*dict_manager, codepoints, start_pos + 1, end_pos,
-                                    partOfSpeechMask(core::PartOfSpeech::Adjective));
+  if (lookupEntryInRange(*dict_manager, codepoints, start_pos + 1, end_pos, core::PartOfSpeech::Adjective) != nullptr) {
+    return true;
+  }
+  const bool opens_quantity_phrase =
+      normalize::isNumeralCodepoint(codepoints[start_pos]) || normalize::isQuantityPrefixKanji(codepoints[start_pos]);
+  return opens_quantity_phrase && hasDictionaryEntryEndingAt(*dict_manager, codepoints, start_pos + 1, end_pos,
+                                                             partOfSpeechMask(core::PartOfSpeech::Adjective));
 }
 
 // The な that would be the attributive copula may instead be the first mora of
@@ -416,32 +424,21 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
         codepoints[kanji_end + 1] != U'り'));
   const bool followed_by_sou =
       kanji_end + 1 < codepoints.size() && codepoints[kanji_end] == U'そ' && codepoints[kanji_end + 1] == U'う';
-  // Productive X+可能 is a capability noun compound whose following な is
-  // the attributive copula (再利用可能な, 使用可能な).  Preserve an exact
-  // lexical adjective such as 不可能, but do not let the generic "all-kanji
-  // before な" fallback reclassify every open left-hand compound as AdjNa.
-  const bool is_unlexicalized_capability_compound =
-      kanji_len > 2 && utf8::endsWith(kanji_seq, "可能") &&
-      (dict_manager == nullptr || dict_manager->lookupExact(kanji_seq, core::PartOfSpeech::Adjective) == nullptr);
-  // An internal dictionary adjective is the predicate head, so a preceding
-  // productive prefix must not be swallowed by the generic "all kanji before
-  // な" fallback (超|重要な, 最|簡単な). Productive negation compounds are
+  // A dictionary adjective after one bound kanji is the predicate head, so
+  // that prefix must not be swallowed by the generic "all kanji before な"
+  // fallback (超|重要な, 最|簡単な). Productive negation compounds are
   // licensed as new adjective units by their prefix semantics (不十分な), and
   // keep the existing compound reading.
   const bool has_independent_adjective_host =
       hasIndependentAdjectiveHost(codepoints, start_pos, kanji_end, dict_manager);
   const bool is_productive_negation_compound = scorer::startsWithNegationPrefix(kanji_seq);
-  if (is_unlexicalized_capability_compound) {
-    auto capability_noun = makeCandidate(kanji_seq, start_pos, kanji_end, core::PartOfSpeech::Noun,
-                                         candidate::kNaAdjStemCost, true, CandidateOrigin::SuffixPattern);
-    capability_noun.lemma = kanji_seq;
-#ifdef SUZUME_DEBUG_INFO
-    capability_noun.confidence = candidate::kDictionaryOriginConfidence;
-    capability_noun.pattern = "capability_noun_compound";
-#endif
-    candidates.push_back(std::move(capability_noun));
-  }
-  if ((followed_by_na || followed_by_sou) && !is_unlexicalized_capability_compound &&
+  // A noun in front of a dictionary na-adjective head compounds with it, and
+  // that attested head also licenses the predicative copula (利用可能だ).
+  const bool has_dictionary_head = dict_manager != nullptr && kanji_end >= start_pos + 3 &&
+                                   hasDictionaryEntryEndingAt(*dict_manager, codepoints, start_pos + 2, kanji_end,
+                                                              partOfSpeechMask(core::PartOfSpeech::Adjective));
+  const bool followed_by_da = kanji_end < codepoints.size() && codepoints[kanji_end] == U'だ';
+  if ((followed_by_na || followed_by_sou || (has_dictionary_head && followed_by_da)) &&
       (!has_independent_adjective_host || is_productive_negation_compound)) {
     // Skip if first character is a formal noun (形式名詞)
     // e.g., 時妙な should be 時+妙な, not 時妙(ADJ)+な
@@ -474,8 +471,9 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
 
     // Found kanji compound + な - potential na-adjective stem
     // Cost similar to dictionary na-adjectives but with small penalty for unknown
-    candidates.push_back(makeNaAdjCandidate(kanji_seq, start_pos, kanji_end, candidate::kNaAdjStemCost, true,
-                                            CandidateOrigin::AdjectiveNa, 0.8F, "na_adjective_stem"));
+    const float cost = has_dictionary_head ? candidate::kNaAdjHeadedCompoundCost : candidate::kNaAdjStemCost;
+    candidates.push_back(makeNaAdjCandidate(kanji_seq, start_pos, kanji_end, cost, true, CandidateOrigin::AdjectiveNa,
+                                            0.8F, "na_adjective_stem"));
   }
 
   return;

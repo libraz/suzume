@@ -838,7 +838,7 @@
       "expected": [
         {
           "lemma": "ふつう",
-          "pos": "Adjective",
+          "pos": "Noun",
           "surface": "ふつう"
         },
         {
@@ -870,7 +870,7 @@
         },
         {
           "lemma": "ふつう",
-          "pos": "Adjective",
+          "pos": "Noun",
           "surface": "ふつう"
         },
         {
@@ -940,6 +940,151 @@
       ],
       "id": "haubudattta",
       "input": "彼はうぶだった"
+    },
+    {
+      "description": "Na-adjective stem before appearance そう is adjectival like 安全そう",
+      "expected": [
+        {
+          "lemma": "不安",
+          "pos": "Adjective",
+          "surface": "不安"
+        },
+        {
+          "lemma": "そう",
+          "pos": "Auxiliary",
+          "surface": "そう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "顔",
+          "pos": "Noun",
+          "surface": "顔"
+        }
+      ],
+      "id": "souna_2",
+      "input": "不安そうな顔"
+    },
+    {
+      "description": "Na-adjective stem before a case particle is in nominal use",
+      "expected": [
+        {
+          "lemma": "安全",
+          "pos": "Noun",
+          "surface": "安全"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "第一",
+          "pos": "Noun",
+          "surface": "第一"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "ga_da_10",
+      "input": "安全が第一だ"
+    },
+    {
+      "description": "Noun plus a dictionary na-adjective head compounds into one na-adjective",
+      "expected": [
+        {
+          "lemma": "交通安全",
+          "pos": "Adjective",
+          "surface": "交通安全"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "道",
+          "pos": "Noun",
+          "surface": "道"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "歩く",
+          "pos": "Verb",
+          "surface": "歩く"
+        }
+      ],
+      "id": "na_wo_ku",
+      "input": "交通安全な道を歩く"
+    },
+    {
+      "description": "Headed na-adjective compound before the predicative copula",
+      "expected": [
+        {
+          "lemma": "この",
+          "pos": "Determiner",
+          "surface": "この"
+        },
+        {
+          "lemma": "機能",
+          "pos": "Noun",
+          "surface": "機能"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "利用可能",
+          "pos": "Adjective",
+          "surface": "利用可能"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "kono_ha_da_4",
+      "input": "この機能は利用可能だ"
+    },
+    {
+      "description": "Negative control: a bound one-kanji prefix stays apart from the adjective head",
+      "expected": [
+        {
+          "lemma": "超",
+          "pos": "Noun",
+          "surface": "超"
+        },
+        {
+          "lemma": "重要",
+          "pos": "Adjective",
+          "surface": "重要"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "話",
+          "pos": "Noun",
+          "surface": "話"
+        }
+      ],
+      "id": "na_13",
+      "input": "超重要な話"
     }
   ],
   "description": "Na-adjectives (ナ形容詞) (part 2/2)",

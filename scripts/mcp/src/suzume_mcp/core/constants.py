@@ -1016,20 +1016,14 @@ ADVERBIAL_NA_ADJECTIVES: frozenset[str] = frozenset({"大変", "たいへん", "
 # Words to keep as Noun despite 形容動詞語幹 classification
 KEEP_AS_NOUN_NOT_ADJ: set[str] = {
     "マジ",
-    "不安",
-    "不要",
     "乙",
-    "不便",
     "公式",
-    "可能",
-    "容易",
     "積極",
-    "健康",
     "傍若無人",
 }
 
 # Noun -> Pronoun overrides
-NOUN_AS_PRONOUN: set[str] = {"彼氏", "彼女", "奴", "我", "わし"}
+NOUN_AS_PRONOUN: set[str] = {"彼女", "奴", "我", "わし"}
 
 # Suffix -> Noun overrides
 SUFFIX_AS_NOUN: set[str] = {"様", "末", "ごろ", "行き", "毛"}
@@ -1080,6 +1074,8 @@ VERB_NOT_AUX_LEMMAS: set[str] = {
     # The kanji spelling of the same excessive verb; the reference tags it as
     # an auxiliary only because of its own lexicon (読みすぎる, 読み過ぎる).
     "過ぎる",
+    # The inceptive verb in kana; its kanji spelling 始める is already a verb.
+    "はじめる",
     "くださる",
     "下さる",
     "いたす",

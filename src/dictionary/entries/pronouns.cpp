@@ -40,7 +40,6 @@ EntrySpecRange getPronounEntries() {
       // Third person (三人称) - kanji with reading
       pronoun("彼", ""),
       pronoun("彼女", ""),
-      pronoun("彼氏", ""),
       pronoun("かれ", ""),
       pronoun("かのじょ", ""),
       pronoun("奴", ""),

@@ -790,12 +790,11 @@ EntrySpecRange getAuxiliaryEntries() {
       verb("過ぎる", "過ぎる", EPOS::AuxExcessive),
       verb("過ぎ", "過ぎる", EPOS::AuxExcessive),
 
-      // Inceptive subsidiary verb: 読みはじめる, 食べはじめる.
-      aux("はじめる", "はじめる", EPOS::AuxAspectHajimeru),
-      aux("はじめ", "はじめる", EPOS::AuxAspectHajimeru),
-      // The kanji spelling is the same closed inceptive use. Keep POS=Verb to
-      // preserve the lexical-verb surface category while ExtendedPOS carries
-      // the dependent, renyokei-selecting grammar used by the scorer.
+      // Inceptive subsidiary verb in either spelling: 読みはじめる, 読み始める.
+      // POS=Verb keeps the lexical-verb surface category while ExtendedPOS
+      // carries the dependent, renyokei-selecting grammar used by the scorer.
+      verb("はじめる", "はじめる", EPOS::AuxAspectHajimeru),
+      verb("はじめ", "はじめる", EPOS::AuxAspectHajimeru),
       verb("始める", "始める", EPOS::AuxAspectHajimeru),
       verb("始め", "始める", EPOS::AuxAspectHajimeru),
       aux("そこね", "そこねる", EPOS::AuxInability),

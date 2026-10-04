@@ -328,11 +328,11 @@ void resolveFinalMorphemeRoles(std::vector<core::Morpheme>& result, const dictio
     if (current.pos == core::PartOfSpeech::Adverb && next.pos == core::PartOfSpeech::Particle && next.surface == "を") {
       resolver::retagNounSurface(current);
     }
-    // A bare na-adjective stem cannot directly govern accusative を as an
-    // adjective.  In this closed syntactic context it is the nominal use
-    // (平静を保つ, 困難を乗り越える), while adjectival uses retain な/に/だ.
+    // A bare na-adjective stem cannot directly take an argument particle as
+    // an adjective.  In this closed syntactic context it is the nominal use
+    // (平静を保つ, 安全が第一, 健康のため), while adjectival uses retain な/に/だ.
     if (current.pos == core::PartOfSpeech::Adjective && current.extended_pos == core::ExtendedPOS::AdjNaAdj &&
-        next.extended_pos == core::ExtendedPOS::ParticleCase && next.surface == "を") {
+        next.pos == core::PartOfSpeech::Particle && utf8::equalsAny(next.surface, {"を", "が", "は", "も", "の"})) {
       resolver::retagNounSurface(current);
     }
     // A non-lexical noun candidate ending in い cannot take conjectural だろ
@@ -458,8 +458,10 @@ void resolveFinalMorphemeRoles(std::vector<core::Morpheme>& result, const dictio
         previous.extended_pos == core::ExtendedPOS::VerbRenyokei) {
       const auto epos =
           current.surface == "はじめ" ? core::ExtendedPOS::AuxAspectHajimeru : core::ExtendedPOS::AuxInability;
-      resolver::retag(current, core::PartOfSpeech::Auxiliary, epos, current.surface + "る",
-                      dictionary::ConjugationType::Ichidan, grammar::ConjForm::Renyokei);
+      // The inceptive keeps the verb category its kanji spelling has (始め).
+      const auto pos = current.surface == "はじめ" ? core::PartOfSpeech::Verb : core::PartOfSpeech::Auxiliary;
+      resolver::retag(current, pos, epos, current.surface + "る", dictionary::ConjugationType::Ichidan,
+                      grammar::ConjForm::Renyokei);
     }
     if (current.surface == "な" && previous.pos == core::PartOfSpeech::Adjective &&
         (previous.conj_type == dictionary::ConjugationType::NaAdjective ||
