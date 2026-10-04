@@ -128,22 +128,6 @@ UnknownCandidate makeIAdjCellCandidate(const std::string& surface, size_t start,
                                        float confidence, const char* pattern);
 
 /**
- * @brief Derive a conjugated i-adjective variant by trimming trailing kana off
- *        an existing candidate.
- *
- * Spins the renyokei/katt/ke conjugation forms out of a full adjective surface
- * to preserve inflection/auxiliary boundaries (良くない → 良く + ない,
- * 美しかった → 美しかっ + た).
- * The variant keeps the source lemma/origin/confidence, drops @p char_trim
- * trailing characters (all such tails are 3-byte kana), applies @p cost_bonus on
- * top of the source cost, and carries the connection-form @p epos. Callers keep
- * their own endsWith() guard and may override the cost afterward (e.g. the
- * ke-form dictionary-adjective disambiguation).
- */
-UnknownCandidate makeTrimmedAdjVariant(const UnknownCandidate& cand, size_t char_trim, float cost_bonus,
-                                       core::ExtendedPOS epos, const char* pattern);
-
-/**
  * @brief Append table-driven connection-form variants without temporary vectors.
  *
  * Rule groups are evaluated outermost to retain the historical candidate ordering.

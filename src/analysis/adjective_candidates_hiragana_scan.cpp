@@ -34,23 +34,22 @@ std::string normalizeProlongedSoundMark(const std::vector<char32_t>& codepoints,
   std::string result;
   result.reserve((end - start) * 3);  // Japanese chars are typically 3 bytes
 
-  for (size_t i = start; i < end; ++i) {
-    char32_t ch = codepoints[i];
+  for (size_t pos = start; pos < end; ++pos) {
+    const char32_t current = codepoints[pos];
 
     // Check for prolonged sound mark (ー, U+30FC)
-    if (normalize::isProlongedSoundMark(ch) && i > start) {
+    if (normalize::isProlongedSoundMark(current) && pos > start) {
       // Find the first non-ー character before this position
       char32_t prev = 0;
-      for (size_t j = i; j > start; --j) {
-        if (!normalize::isProlongedSoundMark(codepoints[j - 1])) {
-          prev = codepoints[j - 1];
+      for (size_t back = pos; back > start; --back) {
+        if (!normalize::isProlongedSoundMark(codepoints[back - 1])) {
+          prev = codepoints[back - 1];
           break;
         }
       }
-      char32_t vowel = grammar::getVowelForChar(prev);
-      normalize::encodeUtf8(vowel, result);
+      normalize::encodeUtf8(grammar::getVowelForChar(prev), result);
     } else {
-      normalize::encodeUtf8(ch, result);
+      normalize::encodeUtf8(current, result);
     }
   }
 
@@ -83,10 +82,10 @@ std::string normalizeBaseForm(const std::string& base_form, const std::vector<ch
   // Count total prolonged marks in the original
   size_t choon_count = 0;
   size_t first_choon_pos = 0;
-  for (size_t i = start; i < end; ++i) {
-    if (normalize::isProlongedSoundMark(original_codepoints[i])) {
+  for (size_t pos = start; pos < end; ++pos) {
+    if (normalize::isProlongedSoundMark(original_codepoints[pos])) {
       if (choon_count == 0) {
-        first_choon_pos = i;
+        first_choon_pos = pos;
       }
       ++choon_count;
     }
@@ -113,8 +112,8 @@ std::string normalizeBaseForm(const std::string& base_form, const std::vector<ch
     if (base_form.size() > extra_i_bytes) {
       // Verify the end has multiple い's
       bool all_is = true;
-      for (size_t i = 0; i < extra_i_count && all_is; ++i) {
-        size_t pos = base_form.size() - (i + 1) * core::kJapaneseCharBytes;
+      for (size_t index = 0; index < extra_i_count && all_is; ++index) {
+        const size_t pos = base_form.size() - (index + 1) * core::kJapaneseCharBytes;
         if (base_form.substr(pos, core::kJapaneseCharBytes) != "い") {
           all_is = false;
         }
@@ -139,7 +138,7 @@ std::string normalizeBaseForm(const std::string& base_form, const std::vector<ch
     std::string_view suffix(base_form.data() + check_pos, total_extra_bytes + core::kJapaneseCharBytes);
 
     std::string expected_suffix;
-    for (size_t i = 0; i < choon_count; ++i) {
+    for (size_t index = 0; index < choon_count; ++index) {
       expected_suffix += vowel_str;
     }
     expected_suffix += "い";
@@ -162,11 +161,7 @@ void adj_detail::appendHiraganaIAdjSurfaceCandidates(const std::vector<char32_t>
                                                      std::vector<UnknownCandidate>& candidates) {
   // Try different lengths, starting from longest
   for (size_t end_pos = hiragana_end; end_pos > start_pos + 2; --end_pos) {
-    std::string surface = extractSubstring(codepoints, start_pos, end_pos);
-
-    if (surface.empty()) {
-      continue;
-    }
+    const std::string surface = extractSubstring(codepoints, start_pos, end_pos);
 
     // Negative-conjectural まい is an independent auxiliary after a terminal
     // verb form (ある+まい, 行く+まい).  The generic i-adjective analyzer can
@@ -226,15 +221,10 @@ void adj_detail::appendHiraganaIAdjSurfaceCandidates(const std::vector<char32_t>
     // Skip short patterns starting with common case particles (で, に, を, と)
     // These are likely particle + adjective splits (でやばい = で + やばい)
     // Longer sequences (5+ chars) are less likely to be splits
-    if (starts_with_particle) {
-      size_t char_count = end_pos - start_pos;
-      char32_t first_char = codepoints[start_pos];
-      // Common case particles that frequently precede adjectives
-      bool starts_with_case_particle =
-          (first_char == U'で' || first_char == U'に' || first_char == U'を' || first_char == U'と');
-      if (starts_with_case_particle && char_count <= 4) {
-        continue;  // Skip - likely particle + adjective split
-      }
+    const char32_t first_char = codepoints[start_pos];
+    if (starts_with_particle && end_pos - start_pos <= 4 &&
+        (first_char == U'で' || first_char == U'に' || first_char == U'を' || first_char == U'と')) {
+      continue;  // Skip - likely particle + adjective split
     }
 
     // Normalize prolonged sound marks before analysis
@@ -316,19 +306,9 @@ void adj_detail::appendHiraganaIAdjSurfaceCandidates(const std::vector<char32_t>
         // non-word base にかい. Gate on a た/て/だ/で ending so a bare renyokei tail
         // (でかい → で + 買い) cannot fire — those are genuine adjectives, not verbs.
         if (starts_with_particle && !isAdjectiveInDictionary(dict_manager, cand.base_form) &&
-            (utf8::endsWith(surface, "た") || utf8::endsWith(surface, "て") || utf8::endsWith(surface, "だ") ||
-             utf8::endsWith(surface, "で"))) {
-          bool tail_is_dict_verb = false;
-          for (const auto& vres : analysesInRange(inflection, codepoints, start_pos + 1, end_pos)) {
-            if (vres.verb_type == grammar::VerbType::IAdjective) {
-              continue;
-            }
-            if (isVerbInDictionary(dict_manager, vres.base_form)) {
-              tail_is_dict_verb = true;
-              break;
-            }
-          }
-          if (tail_is_dict_verb) {
+            utf8::endsWithAny(surface, {"た", "て", "だ", "で"})) {
+          if (adj_detail::hasDictionaryVerbAnalysis(analysesInRange(inflection, codepoints, start_pos + 1, end_pos),
+                                                    dict_manager)) {
             SUZUME_DEBUG_LOG_VERBOSE("[HIRA_ADJ_SKIP] \"" << surface << "\" particle + dict verb, skipping\n");
             continue;
           }
@@ -341,27 +321,21 @@ void adj_detail::appendHiraganaIAdjSurfaceCandidates(const std::vector<char32_t>
         // e.g., ばーい → ばあい → ばい → stem "ば" (1 char) = invalid, skip
         //       やばーい → やばあい → やばい → stem "やば" (2 chars) = valid
         if (has_prolonged) {
-          std::string normalized_base = normalizeBaseForm(cand.base_form, codepoints, start_pos, end_pos);
-          // Stem = base form minus trailing い (3 bytes in UTF-8)
-          size_t normalized_stem_len = normalize::utf8Length(normalized_base);
-          if (normalized_stem_len >= 1) {
-            // Subtract 1 for the trailing い
-            if (normalized_stem_len - 1 < 2) {
-              continue;  // Normalized stem too short for a valid adjective
-            }
+          // The normalized base minus its trailing い is the stem.
+          const size_t normalized_base_len =
+              normalize::utf8Length(normalizeBaseForm(cand.base_form, codepoints, start_pos, end_pos));
+          if (normalized_base_len >= 1 && normalized_base_len - 1 < 2) {
+            continue;  // Normalized stem too short for a valid adjective
           }
         }
         // Skip なさそう pattern - should be split as な(ADJ stem) + さ(Suffix) + そう(AUX)
         // This pattern is the nominalization of ない + そう (appearance auxiliary)
         // The inflection analyzer incorrectly treats なさ as stem of なさい (honorific)
         // Check: surface ends with さそう AND (stem ends with さ OR surface is exactly なさそう)
-        if (utf8::endsWith(surface, "さそう")) {
-          // Check if this is the な+さ+そう pattern (ない nominalization)
-          // Pattern: 1 char before さそう (like なさそう where な is the ない stem)
-          size_t surface_len = normalize::utf8Length(surface);
-          if (surface_len == 4 && utf8::endsWith(cand.stem, "さ")) {
-            continue;  // Skip - should be split as な+さ+そう
-          }
+        // Pattern: 1 char before さそう (like なさそう where な is the ない stem)
+        if (utf8::endsWith(surface, "さそう") && normalize::utf8Length(surface) == 4 &&
+            utf8::endsWith(cand.stem, "さ")) {
+          continue;  // Skip - should be split as な+さ+そう
         }
         // Skip んかった pattern - this is contracted negative (ん) + past (かった)
         // e.g., らんかった would create らんい which is invalid
@@ -372,8 +346,7 @@ void adj_detail::appendHiraganaIAdjSurfaceCandidates(const std::vector<char32_t>
         // Skip surfaces that are honorific verb renyokei (ending with さ)
         // e.g., くださ + い = ください is VERB (くださる renyokei), not i-adjective
         // These are typically honorific verb conjugations ending with さ
-        if (surface == "くださ" || surface == "なさ" || surface == "いらっしゃ" || surface == "おっしゃ" ||
-            surface == "ござ") {
+        if (utf8::equalsAny(surface, {"くださ", "なさ", "いらっしゃ", "おっしゃ", "ござ"})) {
           continue;  // Skip - honorific verb renyokei, not i-adjective
         }
         // Skip hiragana patterns ending with たい - these are verb renyokei + tai (desire)
@@ -393,18 +366,16 @@ void adj_detail::appendHiraganaIAdjSurfaceCandidates(const std::vector<char32_t>
         // Skip さそう patterns (adj nominalization + appearance auxiliary)
         // e.g., よさそうに → よ + さ + そう + に, not よさい (invalid adj)
         //       なさそう → な + さ + そう (handled separately)
-        if (utf8::endsWith(surface, "さそう") || utf8::endsWith(surface, "さそうに") ||
-            utf8::endsWith(surface, "さそうな") || utf8::endsWith(surface, "さそうだ")) {
+        if (utf8::endsWithAny(surface, {"さそう", "さそうに", "さそうな", "さそうだ"})) {
           continue;  // Skip - should be split as adj-stem + さ + そう
         }
         // Skip candidates containing て/で in stem - indicates verb te-form boundary
         // No genuine i-adjective has て or で in its stem
         // e.g., さましてほしい should be さまし+て+ほしい, not a single i-adj
-        {
-          auto stem = surface.substr(0, surface.size() - 3);  // Remove trailing い (3 bytes)
-          if (stem.find("て") != std::string::npos || stem.find("で") != std::string::npos) {
-            continue;
-          }
+        const std::string_view stem_part =
+            std::string_view(surface).substr(0, surface.size() - 3);  // Remove trailing い (3 bytes)
+        if (utf8::contains(stem_part, "て") || utf8::contains(stem_part, "で")) {
+          continue;
         }
         // Skip adj renyokei + なる patterns — these are adj く-form + auxiliary verb なる
         // e.g., なくなった = なく(adj renyokei) + なっ(なる) + た, not a single adjective
@@ -449,13 +420,10 @@ void adj_detail::appendHiraganaIAdjSurfaceCandidates(const std::vector<char32_t>
         // Length-based bonus for adjectives starting with particle characters
         // Short sequences (3-4 chars like につい, でやばい) are likely splits
         // Longer sequences (5+ chars like かわいい, はなはだしい) are real adjectives
-        if (starts_with_particle) {
-          size_t char_count = end_pos - start_pos;
-          if (char_count >= 5) {
-            cost += candidate::kLongParticleAdjBonus;  // Strong bonus for long adjectives (はなはだしい)
-            SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" -0.5 (long_particle_adj_bonus)\n");
-          }
-          // No bonus for 3-4 char sequences (につい, でやばい) - likely particle + adjective split
+        // No bonus for 3-4 char sequences (につい, でやばい) - likely particle + adjective split
+        if (starts_with_particle && end_pos - start_pos >= 5) {
+          cost += candidate::kLongParticleAdjBonus;  // Strong bonus for long adjectives (はなはだしい)
+          SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" -0.5 (long_particle_adj_bonus)\n");
         }
         if (bounded_long_ku_form) {
           cost += candidate::kBoundedHiraganaKuAdjBonus;
@@ -467,7 +435,7 @@ void adj_detail::appendHiraganaIAdjSurfaceCandidates(const std::vector<char32_t>
         // normalizeBaseForm already collapses however many marks the emphasis used, so
         // the count does not change the dictionary form: すごーい and すごーーい are both
         // すごい. Falling back to the surface here left a non-word as the lemma.
-        std::string lemma =
+        const std::string lemma =
             has_prolonged ? normalizeBaseForm(cand.base_form, codepoints, start_pos, end_pos) : cand.base_form;
         const char* pattern = has_prolonged ? "i_adjective_hira_choon" : "i_adjective_hira";
         auto adjective = makeIAdjCandidate(surface, start_pos, end_pos, lemma, cost,

@@ -12,6 +12,7 @@
 #include "analysis/dictionary_probe.h"
 #include "analysis/scorer_constants.h"
 #include "core/debug.h"
+#include "core/kana_constants.h"
 #include "core/utf8_constants.h"
 #include "grammar/auxiliaries.h"
 #include "grammar/char_patterns.h"
@@ -27,7 +28,6 @@
 namespace suzume::analysis {
 
 using verb_helpers::addEmphaticVariants;
-using verb_helpers::findCharRegionEnd;
 using verb_helpers::isAdjectiveInDictionary;
 using verb_helpers::isEmphaticChar;
 using verb_helpers::isVerbInDictionary;
@@ -126,7 +126,7 @@ bool isPossibleUnknownIAdjectiveStem(const std::string& stem, const std::string&
   // e-row okurigana (静け+い).  This is a conjugational shape constraint, not
   // a lexical whitelist; kanji-final stems and the a/i/u/o rows remain open.
   const char32_t stem_last = utf8::decodeFirstChar(utf8::lastChar(stem));
-  if (grammar::isERowCodepoint(stem_last)) {
+  if (kana::isERowCodepoint(stem_last)) {
     return false;
   }
 
@@ -295,8 +295,8 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
     return;
   }
 
-  std::string hiragana_part = extractSubstring(codepoints, kanji_end, hiragana_end);
-  std::string kanji_part = extractSubstring(codepoints, start_pos, kanji_end);
+  const std::string hiragana_part = extractSubstring(codepoints, kanji_end, hiragana_end);
+  const std::string kanji_part = extractSubstring(codepoints, start_pos, kanji_end);
   SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM] pos=" << start_pos << " kanji=\"" << kanji_part << "\" hiragana=\""
                                              << hiragana_part << "\"\n");
 
@@ -316,15 +316,15 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
   // AuxGaru/AuxExcessive/AuxAppearanceSou are discovered from their canonical
   // dictionary EPOS paradigm. Productive nominal suffixes remain structural.
   for (const std::string_view pattern : iAdjectiveStemFollowers(hiragana_part, 0, dict_manager)) {
-    if (hiragana_part.size() >= pattern.size() && hiragana_part.substr(0, pattern.size()) == pattern) {
+    if (utf8::startsWith(hiragana_part, pattern)) {
       SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   pattern=\"" << pattern << "\" matched, hiragana=\"" << hiragana_part
                                                          << "\"\n");
 
       // Check for サ変 passive/causative pattern: さ + れ/せ
       // E.g., 処理される, 勉強させる - these are NOT adjective nominalization
-      if (std::string_view(pattern) == "さ" && hiragana_part.size() > 3) {
-        std::string after_sa = hiragana_part.substr(3);  // Skip さ (3 bytes)
-        if (after_sa.size() >= 3 && (after_sa.substr(0, 3) == "れ" || after_sa.substr(0, 3) == "せ")) {
+      if (pattern == "さ" && hiragana_part.size() > 3) {
+        const std::string_view after_sa = std::string_view(hiragana_part).substr(3);  // Skip さ (3 bytes)
+        if (utf8::startsWithAny(after_sa, {"れ", "せ"})) {
           SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   skip: サ変 passive/causative (さ+" << after_sa.substr(0, 3) << ")\n");
           continue;  // Skip - this is likely サ変 passive/causative, not adjective
         }
@@ -342,7 +342,7 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
       // Check for compound adjective pattern: み + やすい/にくい/がたい
       // E.g., 読みやすい, 使いにくい - these are verb renyokei + auxiliary adjective
       // NOT kanji stem + み nominalization
-      if (std::string_view(pattern) == "み" && verb_helpers::isCompoundAdjectivePattern(hiragana_part)) {
+      if (pattern == "み" && verb_helpers::isCompoundAdjectivePattern(hiragana_part)) {
         SUZUME_DEBUG_VERBOSE_BLOCK {
           // Extract the compound suffix for detailed logging
           const char* compound_suffix = "compound";
@@ -465,13 +465,14 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
   if (hiragana_part.size() >= 6) {  // Need at least 2 hiragana chars (prefix + pattern)
     // Search at each hiragana boundary and query the canonical follower
     // paradigms there. This includes the AuxGaru mizenkei がら.
-    for (size_t byte_pos = 3; byte_pos < hiragana_part.size(); byte_pos += 3) {
+    bool found_ext_garu = false;
+    for (size_t byte_pos = 3; byte_pos < hiragana_part.size() && !found_ext_garu; byte_pos += 3) {
       for (const std::string_view pattern : iAdjectiveStemFollowers(hiragana_part, byte_pos, dict_manager)) {
-        if (hiragana_part.substr(byte_pos, pattern.size()) == pattern) {
+        if (utf8::startsWith(std::string_view(hiragana_part).substr(byte_pos), pattern)) {
           // Found pattern at byte_pos within hiragana_part
-          std::string ext_okurigana = hiragana_part.substr(0, byte_pos);
-          std::string stem = kanji_part + ext_okurigana;
-          std::string base_form = stem + "い";
+          const std::string ext_okurigana = hiragana_part.substr(0, byte_pos);
+          const std::string stem = kanji_part + ext_okurigana;
+          const std::string base_form = stem + "い";
 
           // A productive kanji suffix followed by the independent Sahen
           // continuative has a complete nominal analysis (簡素+化+し+すぎ).
@@ -505,7 +506,7 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
             continue;
           }
 
-          if (std::string_view(pattern) == "さ") {
+          if (pattern == "さ") {
             if (!isPossibleUnknownIAdjectiveStem(stem, base_form, dict_manager) ||
                 hasNaAdjectiveStemEvidence(stem, dict_manager) ||
                 hasInternalNominalDerivationalBoundary(stem, dict_manager)) {
@@ -530,7 +531,7 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
               }
             }
           }
-          if (std::string_view(pattern) == "そう" && dict_manager != nullptr) {
+          if (pattern == "そう" && dict_manager != nullptr) {
             const auto* adjective = dict_manager->lookupExact(stem, core::PartOfSpeech::Adjective);
             const bool is_complete_na_adjective =
                 adjective != nullptr && adjective->extended_pos == core::ExtendedPOS::AdjNaAdj;
@@ -551,8 +552,7 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
           const bool is_verified_adjective = adjective_confidence != candidate::kNoOriginConfidence;
           if (is_verified_adjective) {
             // Count hiragana chars in okurigana for stem_end calculation
-            size_t okurigana_chars = byte_pos / 3;
-            size_t stem_end = kanji_end + okurigana_chars;
+            const size_t stem_end = kanji_end + byte_pos / 3;
 
             // The okurigana scan runs past a case particle and reaches the next
             // word's kana (水 + を + くみ read as the stem of the non-word 水をくい).
@@ -561,35 +561,35 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
               continue;
             }
 
-            float cost = candidate::kAdjStemExtCost;
+            const float cost = candidate::kAdjStemExtCost;
             SUZUME_DEBUG_LOG("[ADJ_STEM]   ✓ ext_garu candidate stem=\""
                              << stem << "\" base=\"" << base_form << "\" pattern=\"" << pattern << "\" cost=" << cost
                              << "\n");
             candidates.push_back(makeIAdjStemCandidate(stem, start_pos, stem_end, base_form, cost,
                                                        CandidateOrigin::AdjectiveI, adjective_confidence,
                                                        "adj_stem_ext_garu"));
-            goto ext_garu_done;  // Found a match, skip remaining patterns
+            found_ext_garu = true;  // Found a match, skip remaining patterns
+            break;
           }
         }
       }
     }
   }
-ext_garu_done:;
 
   // Check for しそう, しすぎ patterns (adjective stem + auxiliary)
   // The stem ends with し, and is followed by そう/すぎる/etc.
   // E.g., 難しそう → 難し (stem) + そう
   // E.g., 美しすぎる → 美し (stem) + すぎる
   for (const std::string_view pattern : adj_detail::kIAdjStemAuxPatterns) {
-    if (hiragana_part.size() >= pattern.size() && hiragana_part.substr(0, pattern.size()) == pattern) {
+    if (utf8::startsWith(hiragana_part, pattern)) {
       SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   shii pattern=\"" << pattern << "\" matched\n");
 
       // Found adjective stem + auxiliary pattern
       // The stem is: kanji + し
-      size_t stem_end = kanji_end + 1;  // kanji + し (one hiragana)
+      const size_t stem_end = kanji_end + 1;  // kanji + し (one hiragana)
 
-      std::string stem = extractSubstring(codepoints, start_pos, stem_end);
-      std::string base_form = stem + "い";  // e.g., 難し → 難しい
+      const std::string stem = extractSubstring(codepoints, start_pos, stem_end);
+      const std::string base_form = stem + "い";  // e.g., 難し → 難しい
 
       // Validate that this looks like a real adjective
       const auto& adj_results = inflection.analyze(base_form);
@@ -607,8 +607,7 @@ ext_garu_done:;
       // Also check that this is NOT a verb renyokei (話し from 話す)
       // by comparing adjective vs verb confidence
       // The verb form would be: kanji_stem + す (e.g., 話 + す = 話す)
-      std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
-      std::string verb_form = kanji_stem + "す";  // e.g., 話す (not 話しす)
+      const std::string verb_form = kanji_part + "す";  // e.g., 話す (not 話しす)
       const auto& verb_results = inflection.analyze(verb_form);
       const float verb_confidence =
           adj_detail::maxConfidenceFor(verb_results, {grammar::VerbType::GodanSa, grammar::VerbType::Suru});
@@ -617,7 +616,7 @@ ext_garu_done:;
       // If it is, this is likely a verb renyokei, not an adjective stem
       // E.g., 話す is in dictionary → 話し is verb renyokei, not adjective
       // E.g., 難す is NOT in dictionary → 難し could be adjective stem
-      bool is_dict_verb = isVerbInDictionary(dict_manager, verb_form);
+      const bool is_dict_verb = isVerbInDictionary(dict_manager, verb_form);
       SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   verb_form=\"" << verb_form << "\" is_dict_verb=" << is_dict_verb << "\n");
       if (is_dict_verb) {
         SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   skip: verb in dictionary\n");
@@ -628,7 +627,7 @@ ext_garu_done:;
       // If it is, we trust the dictionary entry over confidence comparison
       // E.g., 美味しい is in dictionary → 美味し is adjective stem (skip conf check)
       // E.g., 難しい is in dictionary → 難し is adjective stem (skip conf check)
-      bool is_dict_adjective = isAdjectiveInDictionary(dict_manager, base_form);
+      const bool is_dict_adjective = isAdjectiveInDictionary(dict_manager, base_form);
       SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   is_dict_adj=" << is_dict_adjective << "\n");
 
       // A single-kanji Xしい reconstruction is too permissive without lexical
@@ -696,21 +695,19 @@ ext_garu_done:;
   // Check if kanji + full hiragana_part + い is a dictionary adjective.
   // Only applies when hiragana_part is 2+ chars (Pattern 2 handles 1-char "し").
   if (hiragana_part.size() >= 6) {  // 2+ hiragana chars (6+ bytes)
-    std::string stem = kanji_part + hiragana_part;
-    std::string base_form = stem + "い";
-
-    bool is_dict_adj = isAdjectiveInDictionary(dict_manager, base_form);
-    if (is_dict_adj) {
-      float cost = candidate::kAdjStemExtCost;
+    const std::string stem = kanji_part + hiragana_part;
+    const std::string base_form = stem + "い";
+    if (isAdjectiveInDictionary(dict_manager, base_form)) {
+      const float cost = candidate::kAdjStemExtCost;
       SUZUME_DEBUG_LOG("[ADJ_STEM]   ✓ ext_adj candidate stem=\"" << stem << "\" base=\"" << base_form
                                                                   << "\" cost=" << cost << "\n");
       candidates.push_back(makeIAdjStemCandidate(stem, start_pos, hiragana_end, base_form, cost,
                                                  CandidateOrigin::AdjectiveI, 1.0F, "adj_stem_ext_adj"));
     }
   }
-
-  return;
 }
+
+namespace {
 
 bool isModernIAdjective(const std::string& lemma, const grammar::Inflection& inflection,
                         const dictionary::DictionaryManager* dict_manager) {
@@ -734,11 +731,7 @@ std::string classicalKuStemNaAdjectiveBase(const std::string& stem, const dictio
   return isAdjectiveInDictionary(dict_manager, base) ? base : std::string{};
 }
 
-bool hasDictionaryVerifiedVerbAnalysis(const std::string& surface, const grammar::Inflection& inflection,
-                                       const dictionary::DictionaryManager* dict_manager) {
-  const auto& analyses = inflection.analyze(surface);
-  return adj_detail::hasDictionaryVerbAnalysis(analyses, dict_manager);
-}
+}  // namespace
 
 void appendIAdjClassicalTerminalCandidates(const std::vector<char32_t>& codepoints, size_t start_pos, size_t scan_start,
                                            size_t scan_end, const dictionary::DictionaryManager* dict_manager,
@@ -814,7 +807,7 @@ void appendIAdjOnbinRenyokeiCandidates(const std::vector<char32_t>& codepoints, 
     size_t stem_end = u_pos;
     bool glide_shape = false;
     if (codepoints[u_pos - 1] == U'ゅ') {
-      if (u_pos < start_pos + 2 || !grammar::isIRowCodepoint(codepoints[u_pos - 2])) {
+      if (u_pos < start_pos + 2 || !kana::isIRowCodepoint(codepoints[u_pos - 2])) {
         continue;
       }
       stem_end = u_pos - 1;
@@ -869,8 +862,8 @@ void appendIAdjKaroCandidates(const std::vector<char32_t>& codepoints, size_t st
     if (lemma == "ない" || (utf8::endsWith(lemma, "ない") && !isAdjectiveInDictionary(dict_manager, lemma))) {
       continue;
     }
-    const std::string whole_surface = extractSubstring(codepoints, start_pos, karo_pos + 3);
-    if (hasDictionaryVerifiedVerbAnalysis(whole_surface, inflection, dict_manager)) {
+    if (adj_detail::hasDictionaryVerbAnalysis(analysesInRange(inflection, codepoints, start_pos, karo_pos + 3),
+                                              dict_manager)) {
       continue;
     }
     // Decisive lexical signal: the reconstructed base is a dictionary adjective,
@@ -1085,8 +1078,8 @@ void appendIAdjKaraZuCandidates(const std::vector<char32_t>& codepoints, size_t 
     // particle instead, which no verb analysis spans, so the probe stops at the
     // cell itself — that is what still recognizes 分かれ as 分かれる before と.
     const size_t probe_end = is_kare ? cell_end : std::min(kara_pos + 3, scan_end);
-    const std::string whole_surface = extractSubstring(codepoints, start_pos, probe_end);
-    if (hasDictionaryVerifiedVerbAnalysis(whole_surface, inflection, dict_manager)) {
+    if (adj_detail::hasDictionaryVerbAnalysis(analysesInRange(inflection, codepoints, start_pos, probe_end),
+                                              dict_manager)) {
       continue;
     }
     const std::string surface = extractSubstring(codepoints, start_pos, kara_pos + 2);

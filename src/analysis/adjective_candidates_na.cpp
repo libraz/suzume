@@ -7,6 +7,7 @@
 #include "adjective_candidates_internal.h"
 #include "analysis/candidate_constants.h"
 #include "analysis/dictionary_probe.h"
+#include "core/kana_constants.h"
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "normalize/char_type.h"
@@ -21,7 +22,6 @@
 namespace suzume::analysis {
 
 using adj_detail::makeNaAdjCandidate;
-using verb_helpers::findCharRegionEnd;
 
 namespace {
 
@@ -61,9 +61,8 @@ bool startsLongerClosedForm(const std::vector<char32_t>& codepoints, size_t na_p
     return false;
   }
   constexpr size_t kMaxClosedFormLength = 3;
-  const std::string continuation =
-      extractSubstring(codepoints, na_pos, std::min(codepoints.size(), na_pos + kMaxClosedFormLength));
-  for (const auto& match : dict_manager->lookup(continuation, 0)) {
+  const size_t probe_end = std::min(codepoints.size(), na_pos + kMaxClosedFormLength);
+  for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, na_pos, probe_end)) {
     if (match.entry != nullptr && match.length > 1 &&
         ((pos_mask & partOfSpeechMask(match.entry->pos)) != 0 ||
          (include_final_particle && match.entry->extended_pos == core::ExtendedPOS::ParticleFinal))) {
@@ -123,7 +122,6 @@ void generateHiraganaNariNaAdjectiveCandidates(const std::vector<char32_t>& code
                                             "hira_na_adj_yaka_raka_nari"));
     return;
   }
-  return;
 }
 
 // A bare hiragana stem before the attributive copula (うぶ+な+人, ふつう+な+ん+よ)
@@ -158,7 +156,7 @@ void generateHiraganaAttributiveNaStemCandidates(const std::vector<char32_t>& co
     }
     // A registered word is not re-read as a coined stem, and neither is a
     // registered word plus a particle (それ+は+なんで).
-    const auto stem_matches = dict_manager->lookup(extractSubstring(codepoints, start_pos, stem_end), 0);
+    const auto stem_matches = lookupResultsInRange(*dict_manager, codepoints, start_pos, stem_end);
     const bool registered_stem = std::any_of(stem_matches.begin(), stem_matches.end(), [&](const auto& match) {
       return match.entry != nullptr && match.length == stem_end - start_pos;
     });
@@ -202,9 +200,8 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
   // content-word-sized run, but do not truncate the very evidence needed to
   // recognize the right boundary.
   constexpr size_t kMaxNaAdjKanjiLength = 6;
-  size_t kanji_end = findCharRegionEnd(char_types, start_pos, kMaxNaAdjKanjiLength, normalize::CharType::Kanji);
-
-  size_t kanji_len = kanji_end - start_pos;
+  const size_t kanji_end = findCharRegionEnd(char_types, start_pos, kMaxNaAdjKanjiLength, normalize::CharType::Kanji);
+  const size_t kanji_len = kanji_end - start_pos;
 
   // Pattern 0: Kanji(1) + やか/らか + na-adjective inflection. These productive
   // derivatives can be followed by attributive な, adverbial に, or a copula
@@ -289,7 +286,7 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
         bool contains_passive_boundary = false;
         if (dict_manager != nullptr) {
           for (size_t auxiliary_start = kanji_end + 1; auxiliary_start < stem_end; ++auxiliary_start) {
-            if (!grammar::isARowCodepoint(codepoints[auxiliary_start - 1])) {
+            if (!kana::isARowCodepoint(codepoints[auxiliary_start - 1])) {
               continue;
             }
             const auto* auxiliary =
@@ -324,14 +321,12 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
         const size_t predicate_end = after_final_particle ? stem_end - 1 : stem_end;
         const char32_t predicate_tail = codepoints[predicate_end - 1];
         const bool closes_on_verbal_ru =
-            predicate_tail == U'る' || (after_final_particle && (normalize::isURowHiragana(predicate_tail) ||
+            predicate_tail == U'る' || (after_final_particle && (kana::isURowCodepoint(predicate_tail) ||
                                                                  predicate_tail == U'た' || predicate_tail == U'だ'));
         if (is_bare_attributive && !has_internal_particle && !contains_closed_suffix && !starts_closed_tail &&
             !is_exact_verb_stem && !crosses_te_form && !contains_passive_boundary && !starts_naru_after_ku &&
             !closes_on_verbal_ru) {
-          std::string first_char_str;
-          normalize::encodeUtf8(codepoints[start_pos], first_char_str);
-          if (!normalize::isFormalNounSurface(first_char_str)) {
+          if (!normalize::isFormalNounSurface(normalize::encodeUtf8(codepoints[start_pos]))) {
             candidates.push_back(makeNaAdjCandidate(stem, start_pos, stem_end, candidate::kNaAdjStemCost, true,
                                                     CandidateOrigin::AdjectiveNa, candidate::kNaAdjPredicateConfidence,
                                                     "mixed_na_adjective_stem"));
@@ -384,20 +379,17 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
     return;
   }
 
-  std::string kanji_seq = extractSubstring(codepoints, start_pos, kanji_end);
+  const std::string kanji_seq = extractSubstring(codepoints, start_pos, kanji_end);
 
   // Pattern 1: Check for na-adjective suffixes (的)
   // Keep X+的 as one tokenizer search unit while preserving its na-adjective
   // class.  A bare noun path remains available for contexts that do not
   // license the derived adjective.
   for (const auto& suffix : getNaAdjSuffixes()) {
-    if (kanji_seq.size() >= suffix.size()) {
-      std::string_view kanji_suffix(kanji_seq.data() + kanji_seq.size() - suffix.size(), suffix.size());
-      if (kanji_suffix == suffix) {
-        candidates.push_back(makeNaAdjCandidate(kanji_seq, start_pos, kanji_end, candidate::kNaAdjTekiCost, true,
-                                                CandidateOrigin::AdjectiveNa, 1.0F, "na_adjective_teki"));
-        break;
-      }
+    if (utf8::endsWith(kanji_seq, suffix)) {
+      candidates.push_back(makeNaAdjCandidate(kanji_seq, start_pos, kanji_end, candidate::kNaAdjTekiCost, true,
+                                              CandidateOrigin::AdjectiveNa, 1.0F, "na_adjective_teki"));
+      break;
     }
   }
 
@@ -443,9 +435,7 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
     // Skip if first character is a formal noun (形式名詞)
     // e.g., 時妙な should be 時+妙な, not 時妙(ADJ)+な
     // Formal nouns (時, 事, 所, etc.) are standalone grammatical words
-    std::string first_char_str;
-    normalize::encodeUtf8(codepoints[start_pos], first_char_str);
-    if (normalize::isFormalNounSurface(first_char_str)) {
+    if (normalize::isFormalNounSurface(normalize::encodeUtf8(codepoints[start_pos]))) {
       return;
     }
 
@@ -462,11 +452,10 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
     //   仕方ない → 仕方 + ない (not 仕方(ADJ_NA) + い)
     //   関係なかった → 関係 + なかっ (か triggers naかった past form)
     // Real な-adjectives followed by these forms (静かなく) are not standard Japanese.
-    if (followed_by_na && kanji_end + 1 < codepoints.size()) {
-      char32_t after_na = codepoints[kanji_end + 1];
-      if (after_na == U'く' || after_na == U'い' || after_na == U'か') {
-        return;
-      }
+    if (followed_by_na && kanji_end + 1 < codepoints.size() &&
+        (codepoints[kanji_end + 1] == U'く' || codepoints[kanji_end + 1] == U'い' ||
+         codepoints[kanji_end + 1] == U'か')) {
+      return;
     }
 
     // Found kanji compound + な - potential na-adjective stem
@@ -475,8 +464,6 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
     candidates.push_back(makeNaAdjCandidate(kanji_seq, start_pos, kanji_end, cost, true, CandidateOrigin::AdjectiveNa,
                                             0.8F, "na_adjective_stem"));
   }
-
-  return;
 }
 
 }  // namespace suzume::analysis

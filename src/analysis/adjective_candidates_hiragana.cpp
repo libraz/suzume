@@ -28,7 +28,6 @@ namespace suzume::analysis {
 
 using verb_helpers::addEmphaticVariants;
 using verb_helpers::embedsCaseParticle;
-using verb_helpers::findCharRegionEnd;
 using verb_helpers::isAdjectiveInDictionary;
 using verb_helpers::isEmphaticChar;
 using verb_helpers::isVerbInDictionary;
@@ -69,11 +68,10 @@ bool isParticleSequenceWithoutLexicalReading(const std::vector<char32_t>& codepo
   if (dict_manager == nullptr || start_pos >= end_pos) {
     return false;
   }
-  const std::string whole_surface = extractSubstring(codepoints, start_pos, end_pos);
   constexpr PartOfSpeechMask kLexicalMask =
       partOfSpeechMask(core::PartOfSpeech::Noun) | partOfSpeechMask(core::PartOfSpeech::Verb) |
       partOfSpeechMask(core::PartOfSpeech::Adjective) | partOfSpeechMask(core::PartOfSpeech::Adverb);
-  if (hasExactPartOfSpeech(*dict_manager, whole_surface, kLexicalMask)) {
+  if (hasExactPartOfSpeech(*dict_manager, codepoints, start_pos, end_pos, kLexicalMask)) {
     return false;
   }
   return maximalSegmentCount(*dict_manager, codepoints, start_pos, end_pos, core::PartOfSpeech::Particle) > 0;
@@ -138,7 +136,7 @@ void addReduplicatedShiiAdjective(std::vector<UnknownCandidate>& candidates, con
   }
   // し and every inflection ending after it are hiragana; scan that run.
   size_t shi_pos = start_pos + 4;
-  size_t hira_end = verb_helpers::findCharRegionEnd(char_types, shi_pos, 8, normalize::CharType::Hiragana);
+  size_t hira_end = findCharRegionEnd(char_types, shi_pos, 8, normalize::CharType::Hiragana);
   // Longest-first so the full conjugated surface (…しくない) is chosen; the caller's
   // trim loops then derive …しく. Minimum end covers し + い (base form しい).
   for (size_t end_pos = hira_end; end_pos >= shi_pos + 2; --end_pos) {
@@ -336,7 +334,7 @@ void generateHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints
     return;
   }
 
-  char32_t first_char = codepoints[start_pos];
+  const char32_t first_char = codepoints[start_pos];
 
   // Skip if first character is を (wo) - this is always a particle, never an adjective stem
   // Unlike other particles (は, か, わ, etc.) that can start valid adjectives,
@@ -363,21 +361,11 @@ void generateHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints
   // STEP 1: Find maximum hiragana sequence (without breaking at particles)
   // This allows us to analyze the full sequence first for adjectives like
   // はなはだしい, かわいい, わびしい that contain particle characters
+  // Hiragana and the prolonged sound mark (ー), at most 10 chars for adjective + endings.
   size_t max_hiragana_end = start_pos;
-  while (max_hiragana_end < char_types.size() &&
-         max_hiragana_end - start_pos < 10) {  // Max 10 chars for adjective + endings
-    normalize::CharType curr_type = char_types[max_hiragana_end];
-    char32_t curr_char = codepoints[max_hiragana_end];
-
-    // Allow hiragana and prolonged sound mark (ー)
-    bool is_valid = (curr_type == normalize::CharType::Hiragana);
-    if (!is_valid && normalize::isProlongedSoundMark(curr_char)) {
-      is_valid = true;
-    }
-
-    if (!is_valid) {
-      break;
-    }
+  while (max_hiragana_end < char_types.size() && max_hiragana_end - start_pos < 10 &&
+         (char_types[max_hiragana_end] == normalize::CharType::Hiragana ||
+          normalize::isProlongedSoundMark(codepoints[max_hiragana_end]))) {
     ++max_hiragana_end;
   }
 
@@ -438,7 +426,7 @@ void generateHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints
       // A word registered over the whole run owns it: かわいそう is the
       // adjective 可哀想, not かわいい plus the appearance そう.
       if (appearance_follows && dict_manager != nullptr &&
-          dict_manager->lookupExact(extractSubstring(codepoints, start_pos, stem_end + 2)) != nullptr) {
+          lookupEntryInRange(*dict_manager, codepoints, start_pos, stem_end + 2) != nullptr) {
         continue;
       }
       if (!excessive_follows && !registered_adjective &&
@@ -690,25 +678,22 @@ void generateHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints
 
   // Add stem candidates for pure hiragana adjective + auxiliary patterns
   // This handles patterns like おいしそう → おいし (stem) + そう (aux)
-  // Similar to the kanji adjective stem logic at lines 1673-1785
-  // Check for しそう, しすぎ patterns (adjective stem + auxiliary)
-  // Start from maximum hiragana sequence
-  std::string full_surface = extractSubstring(codepoints, start_pos, max_hiragana_end);
-
+  // Check for しそう, しすぎ patterns (adjective stem + auxiliary) over the
+  // maximum hiragana sequence.
   for (size_t pattern_index = 0; pattern_index < adj_detail::kHiraganaIAdjStemAuxPatternCount; ++pattern_index) {
     const std::string_view aux_pattern = adj_detail::kIAdjStemAuxPatterns[pattern_index];
-    if (full_surface.size() >=
-            aux_pattern.size() + core::kTwoJapaneseCharBytes &&  // Need at least 2 chars before pattern
-        full_surface.find(aux_pattern) != std::string::npos) {
-      // Find where the pattern starts
-      size_t pattern_pos = full_surface.find(aux_pattern);
+    // Need at least 2 chars before pattern
+    const size_t pattern_pos = full_hiragana_surface.size() >= aux_pattern.size() + core::kTwoJapaneseCharBytes
+                                   ? full_hiragana_surface.find(aux_pattern)
+                                   : std::string::npos;
+    if (pattern_pos != std::string::npos) {
       if (pattern_pos < core::kTwoJapaneseCharBytes) {
         continue;  // Stem too short (need at least 2 chars like おいし, うれし)
       }
 
       // The stem is everything before the auxiliary pattern, including the し
-      std::string stem = full_surface.substr(0, pattern_pos + 3);  // +3 for し
-      std::string base_form = stem + "い";                         // e.g., おいし → おいしい
+      const std::string stem = full_hiragana_surface.substr(0, pattern_pos + 3);  // +3 for し
+      const std::string base_form = stem + "い";                                  // e.g., おいし → おいしい
 
       // A te-form connective cannot be part of an i-adjective stem. Keep its
       // boundary in desiderative-looking chains (読ん+で+ほし+そう,
@@ -729,8 +714,8 @@ void generateHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints
       // Check that this is NOT a verb renyokei (e.g., 話し from 話す)
       // For pure hiragana, check if stem + す would be a valid verb
       // We compare adjective vs verb confidence - if adjective is significantly higher, prefer it
-      std::string verb_stem = stem.substr(0, stem.size() - 3);  // Remove し
-      std::string verb_form = verb_stem + "す";                 // e.g., おい + す = おいす (not real)
+      // e.g., おい + す = おいす (not real)
+      const std::string verb_form = normalize::concat(std::string_view(stem).substr(0, stem.size() - 3), "す");
 
       // Check verb confidence from inflection analyzer
       const auto& verb_results = inflection.analyze(verb_form);
@@ -812,7 +797,7 @@ void generateHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints
     }
     const std::string base_form = stem + "い";
     const bool is_dict_adjective = isAdjectiveInDictionary(dict_manager, base_form);
-    if (!is_dict_adjective && grammar::isERowCodepoint(codepoints[stem_end - 1])) {
+    if (!is_dict_adjective && kana::isERowCodepoint(codepoints[stem_end - 1])) {
       continue;
     }
     const float adjective_confidence =
@@ -848,19 +833,19 @@ void generateHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints
   const auto closes_utterance = [&](size_t pos) {
     return pos >= codepoints.size() || (pos < char_types.size() && char_types[pos] == normalize::CharType::Symbol);
   };
+  // After a case particle the run is a verb's onbin instead (東京に+いっ+か);
+  // で is the evaluative frame itself (これで+いっ+か) and stays out.
+  const auto* preceding_particle =
+      start_pos > 0 && dict_manager != nullptr && codepoints[start_pos - 1] != U'で'
+          ? lookupEntryInRange(*dict_manager, codepoints, start_pos - 1, start_pos, core::PartOfSpeech::Particle)
+          : nullptr;
+  const bool follows_case_particle =
+      preceding_particle != nullptr && preceding_particle->extended_pos == core::ExtendedPOS::ParticleCase;
   for (size_t stem_end = start_pos + 1; stem_end < max_hiragana_end; ++stem_end) {
     if (codepoints[stem_end] != core::hiragana::kSmallTsu) {
       continue;
     }
     const size_t after_sokuon = stem_end + 1;
-    // After a case particle the run is a verb's onbin instead (東京に+いっ+か);
-    // で is the evaluative frame itself (これで+いっ+か) and stays out.
-    const bool follows_case_particle =
-        start_pos > 0 && dict_manager != nullptr && codepoints[start_pos - 1] != U'で' &&
-        lookupEntryInRange(*dict_manager, codepoints, start_pos - 1, start_pos, core::PartOfSpeech::Particle) !=
-            nullptr &&
-        lookupEntryInRange(*dict_manager, codepoints, start_pos - 1, start_pos, core::PartOfSpeech::Particle)
-                ->extended_pos == core::ExtendedPOS::ParticleCase;
     const bool clipped_before_ka = codepoints[stem_end - 1] == U'い' && after_sokuon < codepoints.size() &&
                                    codepoints[after_sokuon] == U'か' && closes_utterance(after_sokuon + 1) &&
                                    !follows_case_particle;
@@ -891,8 +876,6 @@ void generateHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints
 
   // Sort by cost
   verb_helpers::sortCandidatesByCost(candidates, candidate_start);
-
-  return;
 }
 
 void generateKatakanaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
@@ -939,11 +922,7 @@ void generateKatakanaAdjectiveCandidates(const std::vector<char32_t>& codepoints
 
       // Try different ending lengths, starting from longest
       for (size_t end_pos = hira_end; end_pos > kata_end; --end_pos) {
-        std::string surface = extractSubstring(codepoints, start_pos, end_pos);
-
-        if (surface.empty()) {
-          continue;
-        }
+        const std::string surface = extractSubstring(codepoints, start_pos, end_pos);
 
         // Check all candidates for IAdjective
         const auto& all_candidates = inflection.analyze(surface);
@@ -986,8 +965,6 @@ void generateKatakanaAdjectiveCandidates(const std::vector<char32_t>& codepoints
 
   // Sort by cost
   verb_helpers::sortCandidatesByCost(candidates, candidate_start);
-
-  return;
 }
 
 }  // namespace suzume::analysis

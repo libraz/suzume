@@ -46,7 +46,7 @@ bool derivesShikuFromGodanMizenkei(const std::vector<char32_t>& codepoints, size
   if (base_suffix.empty()) {
     return false;
   }
-  const std::string base = extractSubstring(codepoints, start_pos, shi_pos - 1) + std::string(base_suffix);
+  const std::string base = normalize::concat(extractSubstring(codepoints, start_pos, shi_pos - 1), base_suffix);
   return verb_helpers::isVerbInDictionary(dict_manager, base);
 }
 
@@ -74,55 +74,36 @@ void adj_detail::appendKanjiIAdjPostVariants(const std::vector<char32_t>& codepo
   }};
   adj_detail::appendTrimmedAdjVariants(candidates, kTrimRules.data(), kTrimRules.size(), candidate_start, dict_manager);
 
-  // The past た is always a separate auxiliary: an i-adjective past never stands
-  // as one かった token (難しかっ|た, 良くなかっ|た). Every span ending in かった
-  // produced its trimmed かっ variant above, so drop the merged span itself —
-  // it only ever wins over the split when a preceding modifier's connection
-  // bonus favors the terminal-form EPOS, which is exactly the wrong parse.
-  // Restrict removal to this generator's own [candidate_start, size) sub-range:
-  // earlier generators may have shared the buffer and their candidates must not
-  // be dropped here.
-  candidates.erase(std::remove_if(candidates.begin() + candidate_start, candidates.end(),
-                                  [](const UnknownCandidate& cand) { return utf8::endsWith(cand.surface, "かった"); }),
-                   candidates.end());
-
-  // The nominalizer っこ carries its own ない-family predicate (負け|っこ|なかっ|た),
-  // so an adjective span reaching across the suffix is a fabrication: no
-  // adjective paradigm puts a sokuon inside its stem.
+  // Drop the whole-span readings the trimmed variants above replace or that
+  // fabricate an adjective across a boundary. Only this generator's own
+  // [candidate_start, size) sub-range is swept: earlier generators may have
+  // shared the buffer and their candidates must not be dropped here.
   candidates.erase(std::remove_if(candidates.begin() + candidate_start, candidates.end(),
                                   [&codepoints](const UnknownCandidate& cand) {
+                                    // The past た is always a separate auxiliary (難しかっ|た, 良くなかっ|た);
+                                    // every span ending in かった produced its trimmed かっ variant above.
+                                    if (utf8::endsWith(cand.surface, "かった")) {
+                                      return true;
+                                    }
                                     if (cand.pos != core::PartOfSpeech::Adjective) {
                                       return false;
                                     }
+                                    // The nominalizer っこ carries its own ない-family predicate
+                                    // (負け|っこ|なかっ|た); no adjective stem holds a sokuon.
                                     for (size_t pos = cand.start + 1; pos + 2 < cand.end; ++pos) {
                                       if (codepoints[pos] == U'っ' && codepoints[pos + 1] == U'こ' &&
                                           verb_helpers::naiNegativeFollowsAt(codepoints, pos + 2)) {
                                         return true;
                                       }
                                     }
-                                    return false;
-                                  }),
-                   candidates.end());
-
-  // 書か+なく+ない is a verb irrealis followed by the negative auxiliary, not an
-  // adjective continuative. What separates it from a genuine stem is where the
-  // な sits: on the kanji itself in 少+なく and 危+なく, but behind the irrealis
-  // a-row kana that the negative selects in 書か+なく.
-  candidates.erase(std::remove_if(candidates.begin() + candidate_start, candidates.end(),
-                                  [&codepoints](const UnknownCandidate& cand) {
-                                    return cand.pos == core::PartOfSpeech::Adjective && cand.end >= 3 &&
-                                           utf8::endsWith(cand.surface, "なく") &&
-                                           grammar::isARowCodepoint(codepoints[cand.end - 3]);
-                                  }),
-                   candidates.end());
-
-  // The conjunctive くて is never an adjective terminal form. Its trimmed
-  // continuative candidate is emitted above, so remove the whole-span
-  // alternative that would otherwise hide the connective particle.
-  candidates.erase(std::remove_if(candidates.begin() + candidate_start, candidates.end(),
-                                  [](const UnknownCandidate& cand) {
-                                    return cand.pos == core::PartOfSpeech::Adjective &&
-                                           utf8::endsWith(cand.surface, "くて");
+                                    // な behind an irrealis a-row kana is the negative auxiliary
+                                    // (書か+なく), not a stem's own な (少+なく, 危+なく).
+                                    if (cand.end >= 3 && utf8::endsWith(cand.surface, "なく") &&
+                                        kana::isARowCodepoint(codepoints[cand.end - 3])) {
+                                      return true;
+                                    }
+                                    // The conjunctive くて is never an adjective terminal form.
+                                    return utf8::endsWith(cand.surface, "くて");
                                   }),
                    candidates.end());
 
@@ -146,43 +127,44 @@ void appendIAdjClassicalAttributiveCandidates(const std::vector<char32_t>& codep
                                               size_t scan_start, size_t scan_end,
                                               const dictionary::DictionaryManager* dict_manager,
                                               std::vector<UnknownCandidate>& candidates) {
-  if (dict_manager != nullptr) {
-    for (size_t ki_pos = scan_start; ki_pos < scan_end; ++ki_pos) {
-      if (codepoints[ki_pos] != U'き') {
-        continue;
-      }
-      std::string ki_stem = extractSubstring(codepoints, start_pos, ki_pos);
-      std::string ki_lemma = ki_stem + "い";
-      // The シク活用 subclass derives productively off a godan 未然形 (喜ばしい ←
-      // 喜ぶ, 疑わしい ← 疑う), so its members cannot be enumerated; the base verb
-      // carries the evidence instead. Adnominal position settles the competing
-      // reading: it spells the classical past き, whose 終止形 cannot modify the
-      // nominal that follows, and whose 連体形 is spelled し.
-      const bool productive_shiku_attributive =
-          ki_pos > start_pos && codepoints[ki_pos - 1] == U'し' && nominalHeadFollowsAt(codepoints, ki_pos + 1) &&
-          derivesShikuFromGodanMizenkei(codepoints, start_pos, ki_pos - 1, dict_manager);
-      if (!productive_shiku_attributive && !isAdjectiveInDictionary(dict_manager, ki_lemma)) {
-        continue;
-      }
-      // If stem + く is a real godan-ka verb, Xき is its 連用形 (行き, 焼き),
-      // not the classical adjective form — leave it to the verb paths.
-      if (isVerbInDictionary(dict_manager, ki_stem + "く")) {
-        continue;
-      }
-      // If the surface itself is a dictionary entry (好き, 大好き), the
-      // dictionary interpretation wins — do not shadow it.
-      std::string ki_surface = extractSubstring(codepoints, start_pos, ki_pos + 1);
-      if (verb_helpers::hasNonVerbDictionaryEntry(dict_manager, ki_surface) ||
-          isVerbInDictionary(dict_manager, ki_surface)) {
-        continue;
-      }
-      // Dictionary-verified adjective: make the 連体形 win over fake verb
-      // interpretations (godan-ka 美しく etc.), mirroring the ke-form handling.
-      // Attributive form connects like the basic form (ADJ + 体言).
-      candidates.push_back(adj_detail::makeIAdjCellCandidate(
-          ki_surface, start_pos, ki_pos + 1, ki_lemma, core::ExtendedPOS::AdjBasic, candidate::verb_cost::kStrongBonus,
-          CandidateOrigin::AdjectiveI, 0.8F, "i_adjective_classical_ki"));
+  if (dict_manager == nullptr) {
+    return;
+  }
+  for (size_t ki_pos = scan_start; ki_pos < scan_end; ++ki_pos) {
+    if (codepoints[ki_pos] != U'き') {
+      continue;
     }
+    const std::string ki_stem = extractSubstring(codepoints, start_pos, ki_pos);
+    const std::string ki_lemma = ki_stem + "い";
+    // The シク活用 subclass derives productively off a godan 未然形 (喜ばしい ←
+    // 喜ぶ, 疑わしい ← 疑う), so its members cannot be enumerated; the base verb
+    // carries the evidence instead. Adnominal position settles the competing
+    // reading: it spells the classical past き, whose 終止形 cannot modify the
+    // nominal that follows, and whose 連体形 is spelled し.
+    const bool productive_shiku_attributive =
+        ki_pos > start_pos && codepoints[ki_pos - 1] == U'し' && nominalHeadFollowsAt(codepoints, ki_pos + 1) &&
+        derivesShikuFromGodanMizenkei(codepoints, start_pos, ki_pos - 1, dict_manager);
+    if (!productive_shiku_attributive && !isAdjectiveInDictionary(dict_manager, ki_lemma)) {
+      continue;
+    }
+    // If stem + く is a real godan-ka verb, Xき is its 連用形 (行き, 焼き),
+    // not the classical adjective form — leave it to the verb paths.
+    if (isVerbInDictionary(dict_manager, ki_stem + "く")) {
+      continue;
+    }
+    // If the surface itself is a dictionary entry (好き, 大好き), the
+    // dictionary interpretation wins — do not shadow it.
+    const std::string ki_surface = extractSubstring(codepoints, start_pos, ki_pos + 1);
+    if (verb_helpers::hasNonVerbDictionaryEntry(dict_manager, ki_surface) ||
+        isVerbInDictionary(dict_manager, ki_surface)) {
+      continue;
+    }
+    // Dictionary-verified adjective: make the 連体形 win over fake verb
+    // interpretations (godan-ka 美しく etc.), mirroring the ke-form handling.
+    // Attributive form connects like the basic form (ADJ + 体言).
+    candidates.push_back(adj_detail::makeIAdjCellCandidate(
+        ki_surface, start_pos, ki_pos + 1, ki_lemma, core::ExtendedPOS::AdjBasic, candidate::verb_cost::kStrongBonus,
+        CandidateOrigin::AdjectiveI, 0.8F, "i_adjective_classical_ki"));
   }
 }
 
