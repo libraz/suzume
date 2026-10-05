@@ -457,6 +457,8 @@ EntrySpecRange getAuxiliaryEntries() {
       suffix("ちゃん", "ちゃん"),
       suffix("くん", "くん"),
       suffix("さま", "さま"),
+      suffix("君", "君"),
+      suffix("殿", "殿"),
       suffix("たん", "たん"),
       suffix("にゃん", "にゃん"),
       suffix("っ娘", "っ娘"),

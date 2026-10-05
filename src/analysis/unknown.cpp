@@ -682,7 +682,7 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generate(std::string_view te
                                                   candidates);
 
     // Generate productive suffix candidates (ありがち, 忘れっぽい, etc.)
-    generateProductiveSuffixCandidates(codepoints, start_pos, char_types, candidates);
+    generateProductiveSuffixCandidates(codepoints, start_pos, char_types, dict_manager_, candidates);
 
     // Generate finite kana NounNumber + quantitative Suffix search units.
     generateCounterCandidates(codepoints, start_pos, char_types, dict_manager_, candidates);

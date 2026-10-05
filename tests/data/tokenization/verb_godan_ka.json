@@ -1094,6 +1094,50 @@
       ],
       "id": "gatodoita",
       "input": "荷物がとどいた"
+    },
+    {
+      "description": "はたらくんだ - auto-generated",
+      "expected": [
+        {
+          "lemma": "はたらく",
+          "pos": "Verb",
+          "surface": "はたらく"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "hatarakunda",
+      "input": "はたらくんだ"
+    },
+    {
+      "description": "とどくんです - auto-generated",
+      "expected": [
+        {
+          "lemma": "とどく",
+          "pos": "Verb",
+          "surface": "とどく"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "todokundesu",
+      "input": "とどくんです"
     }
   ],
   "description": "Godan Ka-row verbs (五段カ行動詞) - verbs ending in く",

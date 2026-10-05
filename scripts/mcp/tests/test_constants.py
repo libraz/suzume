@@ -66,7 +66,12 @@ def test_slang_verb_stems_nonempty():
 
 
 def test_tari_adverb_stems_nonempty():
-    assert len(TARI_ADVERB_STEMS) >= 20
+    assert len(TARI_ADVERB_STEMS) >= 5
+
+
+def test_tari_adverb_stems_exclude_derived_zen_stems():
+    # X然 stems are derived from their shape; a listed one would bypass that rule's guards.
+    assert not [stem for stem in TARI_ADVERB_STEMS if stem.endswith("然")]
 
 
 def test_compound_verb_lists_nonempty():

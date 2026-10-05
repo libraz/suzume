@@ -8,6 +8,8 @@
 #include <cstdint>
 #include <string_view>
 
+#include "analysis/dictionary_probe.h"
+#include "analysis/scorer_constants.h"
 #include "candidate_constants.h"
 #include "core/debug.h"
 #include "core/utf8_constants.h"
@@ -247,8 +249,49 @@ const std::array<std::string_view, 1>& getNaAdjSuffixes() {
 // Productive Hiragana Suffix Patterns (生産的接尾辞)
 // =============================================================================
 
+namespace {
+
+// Whether a listed verb starting at or before @p stem_start, inside the same
+// hiragana run, ends exactly at @p verb_end.
+bool closesListedVerbBeforeN(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
+                             const std::vector<normalize::CharType>& char_types, size_t stem_start, size_t verb_end) {
+  if (dict_manager == nullptr) {
+    return false;
+  }
+  for (size_t verb_start = stem_start + 1; verb_start-- > 0;) {
+    if (lookupEntryInRange(*dict_manager, codepoints, verb_start, verb_end, core::PartOfSpeech::Verb) != nullptr) {
+      return true;
+    }
+    if (verb_start == 0 || char_types[verb_start - 1] != normalize::CharType::Hiragana) {
+      return false;
+    }
+  }
+  return false;
+}
+
+// Whether a listed word of two or more characters from a closed standalone
+// class opens codepoints[start, end).
+bool opensWithListedClosedClassWord(const dictionary::DictionaryManager* dict_manager,
+                                    const std::vector<char32_t>& codepoints, size_t start, size_t end) {
+  if (dict_manager == nullptr) {
+    return false;
+  }
+  for (size_t word_end = start + 2; word_end <= end; ++word_end) {
+    for (const core::PartOfSpeech pos : {core::PartOfSpeech::Pronoun, core::PartOfSpeech::Determiner,
+                                         core::PartOfSpeech::Adverb, core::PartOfSpeech::Conjunction}) {
+      if (lookupEntryInRange(*dict_manager, codepoints, start, word_end, pos) != nullptr) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+}  // namespace
+
 void generateProductiveSuffixCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                         const std::vector<normalize::CharType>& char_types,
+                                        const dictionary::DictionaryManager* dict_manager,
                                         std::vector<UnknownCandidate>& candidates) {
   // Only for hiragana sequences
   if (start_pos >= char_types.size() || char_types[start_pos] != normalize::CharType::Hiragana) {
@@ -305,7 +348,34 @@ void generateProductiveSuffixCandidates(const std::vector<char32_t>& codepoints,
           if (honorific == "さん" && !starts_with_honorific_prefix) {
             break;
           }
-          float cost = starts_with_honorific_prefix ? -1.5F : -0.5F;
+          // A listed verb closing on the く makes the run that verb plus the
+          // nominalizer ん (とどくんです, は|たらくん of はたらくんだ), not a
+          // nickname, whether the verb opens at the stem or earlier in the run.
+          if (honorific == "くん" &&
+              closesListedVerbBeforeN(dict_manager, codepoints, char_types, start_pos, candidate_end - 1)) {
+            break;
+          }
+          // Before the negative ない/なかっ, くん is the contracted くれ of a
+          // benefactive (見てて+くん+ない), not an honorific.
+          const bool before_negative =
+              candidate_end + 1 < codepoints.size() && codepoints[candidate_end] == U'な' &&
+              (codepoints[candidate_end + 1] == U'い' || codepoints[candidate_end + 1] == U'か');
+          if (honorific == "くん" && before_negative) {
+            break;
+          }
+          // A pronoun, determiner, adverb or conjunction stands on its own and
+          // never opens a nickname stem (みんな+ちゃんと, これ+は+くんれん).
+          if (opensWithListedClosedClassWord(dict_manager, codepoints, start_pos, start_pos + stem_chars)) {
+            break;
+          }
+          // One unit, priced to beat both a listed stem + suffix split, which
+          // also collects the SUFFIX→particle bonus (もも+ちゃん+が), and a guessed
+          // godan-ka verb + nominalizer ん, whose く+ん spells くん. A prefixed
+          // family term outranks the nickname nested inside it (お+ばあちゃん).
+          float cost = bigram_cost::kVeryStrongBonus + bigram_cost::kModerateBonus;
+          if (starts_with_honorific_prefix) {
+            cost += bigram_cost::kStrongBonus;
+          }
           candidates.push_back(makeSuffixCandidate(surface, start_pos, candidate_end, core::PartOfSpeech::Noun, cost,
                                                    surface, 0.9F, "hira_nickname"));
           return;

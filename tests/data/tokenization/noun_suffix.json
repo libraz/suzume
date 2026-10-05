@@ -463,6 +463,217 @@
       ],
       "id": "unnamed_40",
       "input": "来週末予定"
+    },
+    {
+      "description": "佐藤君が来た - auto-generated",
+      "expected": [
+        {
+          "lemma": "佐藤",
+          "pos": "Noun",
+          "surface": "佐藤"
+        },
+        {
+          "lemma": "君",
+          "pos": "Suffix",
+          "surface": "君"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ga_ta",
+      "input": "佐藤君が来た"
+    },
+    {
+      "description": "山田君は来た - auto-generated",
+      "expected": [
+        {
+          "lemma": "山田",
+          "pos": "Noun",
+          "surface": "山田"
+        },
+        {
+          "lemma": "君",
+          "pos": "Suffix",
+          "surface": "君"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ha_ta",
+      "input": "山田君は来た"
+    },
+    {
+      "description": "先生殿へ送る - auto-generated",
+      "expected": [
+        {
+          "lemma": "先生",
+          "pos": "Noun",
+          "surface": "先生"
+        },
+        {
+          "lemma": "殿",
+          "pos": "Suffix",
+          "surface": "殿"
+        },
+        {
+          "lemma": "へ",
+          "pos": "Particle",
+          "surface": "へ"
+        },
+        {
+          "lemma": "送る",
+          "pos": "Verb",
+          "surface": "送る"
+        }
+      ],
+      "id": "he_ru_2",
+      "input": "先生殿へ送る"
+    },
+    {
+      "description": "社長殿に届ける - auto-generated",
+      "expected": [
+        {
+          "lemma": "社長",
+          "pos": "Noun",
+          "surface": "社長"
+        },
+        {
+          "lemma": "殿",
+          "pos": "Suffix",
+          "surface": "殿"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "届ける",
+          "pos": "Verb",
+          "surface": "届ける"
+        }
+      ],
+      "id": "ni_keru_2",
+      "input": "社長殿に届ける"
+    },
+    {
+      "description": "主君に仕える - auto-generated",
+      "expected": [
+        {
+          "lemma": "主君",
+          "pos": "Noun",
+          "surface": "主君"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "仕える",
+          "pos": "Verb",
+          "surface": "仕える"
+        }
+      ],
+      "id": "ni_eru_2",
+      "input": "主君に仕える"
+    },
+    {
+      "description": "宮殿に住む - auto-generated",
+      "expected": [
+        {
+          "lemma": "宮殿",
+          "pos": "Noun",
+          "surface": "宮殿"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "住む",
+          "pos": "Verb",
+          "surface": "住む"
+        }
+      ],
+      "id": "ni_mu",
+      "input": "宮殿に住む"
+    },
+    {
+      "description": "御殿に住む - auto-generated",
+      "expected": [
+        {
+          "lemma": "御殿",
+          "pos": "Noun",
+          "surface": "御殿"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "住む",
+          "pos": "Verb",
+          "surface": "住む"
+        }
+      ],
+      "id": "ni_mu_2",
+      "input": "御殿に住む"
+    },
+    {
+      "description": "暴君が倒れた - auto-generated",
+      "expected": [
+        {
+          "lemma": "暴君",
+          "pos": "Noun",
+          "surface": "暴君"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "倒れる",
+          "pos": "Verb",
+          "surface": "倒れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ga_reta",
+      "input": "暴君が倒れた"
     }
   ],
   "description": "noun_suffix tests",

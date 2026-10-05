@@ -88,55 +88,70 @@ def _postprocess_stranded_okurigana(result: list[dict], applied_rule: str | None
 
 
 def _postprocess_nickname_merge(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
-    """Merge hiragana nickname + honorific into a single token.
+    """Merge hiragana nickname + ちゃん/くん into a single token.
 
-    Tokenizer use case: short hiragana nicknames like たっちゃん / ゆうちゃん /
-    けんちゃん / わんちゃん should be one search unit, not split as stem+suffix.
-    Kanji or katakana names (太郎+ちゃん, ピー+ちゃん) keep splitting.
+    Tokenizer use case: short hiragana nicknames like たっちゃん / ゆうくん /
+    けんちゃん / わんちゃん are one search unit, wherever they stand in the
+    sentence (ゆうくんが来た). Kanji or katakana names (太郎+ちゃん, ピー+ちゃん)
+    keep splitting, and さん stays a separate suffix after an ordinary stem.
 
-    Also handles MeCab's misparses where the nickname spans 3+ tokens
-    (e.g., たっちゃん → たっ + ちゃ + ん). The scan greedily concatenates
-    consecutive hiragana tokens (preceding `prev_is_prefix == False`) and
-    merges when the concatenated surface is short hiragana stem + honorific.
+    The reference analyzer often cuts across the stem/honorific boundary
+    (ゆう+たく+ん, たっ+ちゃ+ん), so the span is matched on the concatenated
+    surface of whole tokens, not on token boundaries inside it. A verb ending
+    in く followed by the nominalizer ん (はたらく+ん+だ) is that construction,
+    not a nickname, and neither is a closed-class word followed by them.
     """
-    honorifics = ("ちゃん", "くん", "さん")
+    honorifics = ("ちゃん", "くん")
     hira_re = regex.compile(r"^[\p{Hiragana}っー]+$")
+
+    def is_closed_class_word(token: dict) -> bool:
+        # A pronoun, determiner, adverb or conjunction stands on its own and
+        # never hosts an honorific (みんな+ちゃんと, その+くんれん).
+        return token.get("pos") in {"連体詞", "副詞", "接続詞"} or (
+            token.get("pos") == "名詞" and token.get("pos_sub1") == "代名詞"
+        )
+
+    def nickname_end(i: int) -> int:
+        run = ""
+        for j in range(i, len(result)):
+            surface = result[j].get("surface", "")
+            if not hira_re.match(surface):
+                return -1
+            if j == i and is_closed_class_word(result[j]) and 2 <= len(surface) <= 3:
+                return -1
+            run += surface
+            for h in honorifics:
+                stem_len = len(run) - len(h)
+                if not run.endswith(h) or not 2 <= stem_len <= 3:
+                    continue
+                verb_nominalizer = (
+                    h == "くん"
+                    and surface == "ん"
+                    and j > i
+                    and result[j - 1].get("pos") == "動詞"
+                    and result[j - 1].get("surface", "").endswith("く")
+                )
+                return -1 if verb_nominalizer else j + 1
+            if len(run) > 3 + max(len(h) for h in honorifics):
+                return -1
+        return -1
 
     merged: list[dict] = []
     i = 0
     while i < len(result):
-        # Hiragana run starting at i that ends with a honorific. Skip if prev
-        # is a prefix (お/ご) — let family-merge handle those.
+        # Skip if prev is a prefix (お/ご) — let family-merge handle those. A
+        # particle is no nickname's first mora (を+たくさん is not を+たく+さん),
+        # but nothing can be a particle at the start of the text (けん+くん).
         prev_is_prefix = merged and merged[-1].get("pos", "") == "接頭詞"
-        if not prev_is_prefix and i < len(result) and hira_re.match(result[i].get("surface", "")):
-            j = i
-            run = ""
-            boundaries = set()
-            while j < len(result) and hira_re.match(result[j].get("surface", "")):
-                boundaries.add(len(run))
-                run += result[j].get("surface", "")
-                j += 1
-            matched = False
-            for h in honorifics:
-                if run.endswith(h):
-                    stem = run[: len(run) - len(h)]
-                    # Stem 2-3 hiragana chars. 1-char stems (e.g., おさん) are
-                    # too short and risk false merges (がおさん → が+おさん bad).
-                    # The honorific opens on a token of its own, and a particle
-                    # is no nickname's first mora (を+たくさん is not を+たく+さん).
-                    if 2 <= len(stem) <= 3 and len(stem) in boundaries and result[i].get("pos") != "助詞":
-                        merged.append({"surface": run, "pos": "名詞", "lemma": run})
-                        i = j
-                        if applied_rule is None:
-                            applied_rule = "nickname-merge"
-                        matched = True
-                        break
-            if matched:
+        if not prev_is_prefix and (result[i].get("pos") != "助詞" or not merged):
+            j = nickname_end(i)
+            if j > 0:
+                run = "".join(t.get("surface", "") for t in result[i:j])
+                merged.append({"surface": run, "pos": "名詞", "lemma": run})
+                i = j
+                if applied_rule is None:
+                    applied_rule = "nickname-merge"
                 continue
-            # No nickname match — append the current token and continue
-            merged.append(result[i])
-            i += 1
-            continue
         merged.append(result[i])
         i += 1
     return merged, applied_rule

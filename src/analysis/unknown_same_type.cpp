@@ -672,9 +672,14 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       // penalty has to reach a two-kanji run. The lexicalized compounds that
       // share the shape (異様, 同様, 王様, 神様, 殿様, 奥様) are a closed set and
       // are held in the dictionary instead.
+      // 君 and 殿 are the same titles, but each also closes many two-kanji words
+      // (主君, 暴君, 宮殿, 沈殿) that are not a closed set, so only a host of two
+      // or more kanji is split off (佐藤君, 先生殿).
       if (start_type == normalize::CharType::Kanji && len >= 2) {
         char32_t last_char = codepoints[candidate_end - 1];
-        if (last_char == U'様' || last_char == U'氏') {
+        const bool closes_title =
+            last_char == U'様' || last_char == U'氏' || (len >= 3 && (last_char == U'君' || last_char == U'殿'));
+        if (closes_title) {
           cost += 4.0F;  // Strong penalty to prefer NOUN + SUFFIX path
         }
       }

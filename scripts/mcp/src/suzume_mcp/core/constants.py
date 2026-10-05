@@ -153,29 +153,11 @@ SLANG_VERB_STEMS: dict[str, str] = {
 TARI_ADVERB_STEMS: list[str] = [
     "煌々",
     "黒々",
-    "泰然",
     "堂々",
     "悠々",
     "淡々",
     "粛々",
     "颯爽",
-    "毅然",
-    "漫然",
-    "茫然",
-    "呆然",
-    "唖然",
-    "愕然",
-    "断然",
-    "俄然",
-    "歴然",
-    "整然",
-    "雑然",
-    "騒然",
-    "憮然",
-    "黙然",
-    "昂然",
-    "凛然",
-    "厳然",
 ]
 
 # Compound verb subsidiary verbs (V2)
@@ -837,8 +819,11 @@ STATE_NOUN_SUFFIXES: tuple[str, ...] = ("まみれ", "っぱなし")
 # Colloquial pronouns to merge
 COLLOQUIAL_PRONOUNS: list[str] = ["どいつ", "こいつ", "そいつ", "あいつ"]
 
-# Honorific suffixes regex pattern
-HONORIFIC_SUFFIXES: list[str] = ["さん", "ちゃん", "様", "君", "殿", "さま"]
+# Honorific suffixes restored from inside a single reference token. 君 and 殿
+# are honorifics too, but the analyzer already separates them after a name or
+# title (佐藤+君, 先生+殿); a single token ending in either is a lexical compound
+# (主君, 暴君, 貴殿, 御殿, 宮殿) that must stay whole.
+HONORIFIC_SUFFIXES: list[str] = ["さん", "ちゃん", "様", "さま"]
 
 # Words where honorific suffix is part of the lexeme
 HONORIFIC_EXCEPTIONS: set[str] = (

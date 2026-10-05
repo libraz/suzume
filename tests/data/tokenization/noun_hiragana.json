@@ -291,6 +291,158 @@
       ],
       "id": "uwasada",
       "input": "うわさだ"
+    },
+    {
+      "description": "ゆうくんが来た - auto-generated",
+      "expected": [
+        {
+          "lemma": "ゆうくん",
+          "pos": "Noun",
+          "surface": "ゆうくん"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "yuukunga_ta",
+      "input": "ゆうくんが来た"
+    },
+    {
+      "description": "あやくんと遊ぶ - auto-generated",
+      "expected": [
+        {
+          "lemma": "あやくん",
+          "pos": "Noun",
+          "surface": "あやくん"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "遊ぶ",
+          "pos": "Verb",
+          "surface": "遊ぶ"
+        }
+      ],
+      "id": "ayakunto_bu",
+      "input": "あやくんと遊ぶ"
+    },
+    {
+      "description": "けんくんは元気だ - auto-generated",
+      "expected": [
+        {
+          "lemma": "けんくん",
+          "pos": "Noun",
+          "surface": "けんくん"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "元気",
+          "pos": "Adjective",
+          "surface": "元気"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "kenkunha_da",
+      "input": "けんくんは元気だ"
+    },
+    {
+      "description": "ももちゃんが来た - auto-generated",
+      "expected": [
+        {
+          "lemma": "ももちゃん",
+          "pos": "Noun",
+          "surface": "ももちゃん"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "momochi_nga_ta",
+      "input": "ももちゃんが来た"
+    },
+    {
+      "description": "ゆうたちゃんが泣いた - auto-generated",
+      "expected": [
+        {
+          "lemma": "ゆうたちゃん",
+          "pos": "Noun",
+          "surface": "ゆうたちゃん"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "泣く",
+          "pos": "Verb",
+          "surface": "泣い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "yuutachi_nga_ita",
+      "input": "ゆうたちゃんが泣いた"
+    },
+    {
+      "description": "みんなちゃんとして - auto-generated",
+      "expected": [
+        {
+          "lemma": "みんな",
+          "pos": "Pronoun",
+          "surface": "みんな"
+        },
+        {
+          "lemma": "ちゃん",
+          "pos": "Suffix",
+          "surface": "ちゃん"
+        },
+        {
+          "lemma": "として",
+          "pos": "Particle",
+          "surface": "として"
+        }
+      ],
+      "id": "minnachi_ntoshite",
+      "input": "みんなちゃんとして"
     }
   ],
   "description": "noun_hiragana tests",

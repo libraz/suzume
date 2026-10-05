@@ -229,10 +229,12 @@ bool hasFunctionWordChainDecomposition(const std::vector<char32_t>& codepoints, 
  * @param codepoints Text as codepoints
  * @param start_pos Start position (character index)
  * @param char_types Character types for each position
+ * @param dict_manager Dictionary that tells a listed verb + ん from a nickname
  * @param candidates Output candidates, appended in generation order
  */
 void generateProductiveSuffixCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                         const std::vector<normalize::CharType>& char_types,
+                                        const dictionary::DictionaryManager* dict_manager,
                                         std::vector<UnknownCandidate>& candidates);
 
 /**
