@@ -48,6 +48,65 @@
       ],
       "id": "itsumonaraba",
       "input": "いつもならば"
+    },
+    {
+      "description": "いつかきっと再会したい - auto-generated",
+      "expected": [
+        {
+          "lemma": "いつか",
+          "pos": "Adverb",
+          "surface": "いつか"
+        },
+        {
+          "lemma": "きっと",
+          "pos": "Adverb",
+          "surface": "きっと"
+        },
+        {
+          "lemma": "再会",
+          "pos": "Noun",
+          "surface": "再会"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たい"
+        }
+      ],
+      "id": "itsukakittto_shitai",
+      "input": "いつかきっと再会したい"
+    },
+    {
+      "description": "もうちょっと待って - auto-generated",
+      "expected": [
+        {
+          "lemma": "もう",
+          "pos": "Adverb",
+          "surface": "もう"
+        },
+        {
+          "lemma": "ちょっと",
+          "pos": "Adverb",
+          "surface": "ちょっと"
+        },
+        {
+          "lemma": "待つ",
+          "pos": "Verb",
+          "surface": "待っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "mouchi_ttto_ttte",
+      "input": "もうちょっと待って"
     }
   ],
   "description": "General adverbs (part 3/3)",

@@ -559,6 +559,23 @@ def _is_licensed_attachment(left: dict, right: dict) -> bool:
     return True
 
 
+def _is_lexical_tto_adverb(token: dict) -> bool:
+    """Whether a token is a whole adverb in っと of three morae or more (きっと, ちょっと)."""
+    surface = token.get("surface", "")
+    morae = regex.sub(r"[ゃゅょぁぃぅぇぉ]", "", surface)
+    return token.get("pos") == "副詞" and surface.endswith("っと") and len(morae) >= 3
+
+
+def _is_interjection_quote(tokens: list[dict]) -> bool:
+    """Whether a run is an interjection followed by the particle と."""
+    return (
+        len(tokens) == 2
+        and tokens[0].get("pos") == "感動詞"
+        and tokens[1].get("surface") == "と"
+        and tokens[1].get("pos") in {"助詞", "フィラー"}
+    )
+
+
 def _spans_one_mimetic(tokens: list[dict], following: dict | None) -> bool:
     """Whether a run of tokens is one mimetic the reference dictionary tore up.
 
@@ -588,6 +605,15 @@ def _spans_one_mimetic(tokens: list[dict], following: dict | None) -> bool:
         return tokens[0].get("pos") in {"その他", "副詞", "感動詞"}
     if tokens[0].get("pos") in {"助動詞", "連体詞"}:
         return False
+    # A run opening on a dependent or bound token continues the word before it
+    # (知っ+てる+ん+じゃん), and one closing on a whole lexical っと adverb of
+    # three morae or more is that adverb after another word (いつか+きっと).
+    if tokens[0].get("pos_sub1") in {"非自立", "接尾"} or _is_lexical_tto_adverb(tokens[-1]):
+        return False
+    # An interjection plus と is the filler えっと unless a predicate follows,
+    # where the と quotes the interjection (えっと驚いた).
+    if _is_interjection_quote(tokens):
+        return following is None or following.get("pos") not in {"動詞", "形容詞"}
     if following is not None and _is_licensed_attachment(tokens[-1], following):
         return False
     return not any(_is_licensed_attachment(tokens[pos - 1], token) for pos, token in enumerate(tokens) if pos > 0)
@@ -658,7 +684,8 @@ def _postprocess_productive_mimetics(result: list[dict], applied_rule: str | Non
                 and regex.fullmatch(r"[\p{Hiragana}ー]{3,12}", combined)
                 and _spans_one_mimetic(result[idx:end], result[end] if end < len(result) else None)
             ):
-                normalized.append({"surface": combined, "pos": "副詞", "lemma": combined})
+                pos = "感動詞" if _is_interjection_quote(result[idx:end]) else "副詞"
+                normalized.append({"surface": combined, "pos": pos, "lemma": combined})
                 idx = end
                 matched = True
             elif (

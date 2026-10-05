@@ -463,6 +463,50 @@
       ],
       "id": "hontounigomen",
       "input": "ほんとうにごめん。"
+    },
+    {
+      "description": "えっと、本を読む - auto-generated",
+      "expected": [
+        {
+          "lemma": "えっと",
+          "pos": "Interjection",
+          "surface": "えっと"
+        },
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読む"
+        }
+      ],
+      "id": "ettto_wo_mu",
+      "input": "えっと、本を読む"
+    },
+    {
+      "description": "えっと本 - auto-generated",
+      "expected": [
+        {
+          "lemma": "えっと",
+          "pos": "Interjection",
+          "surface": "えっと"
+        },
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        }
+      ],
+      "id": "ettto",
+      "input": "えっと本"
     }
   ],
   "description": "Interjections and greetings (感動詞・挨拶)",

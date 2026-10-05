@@ -542,3 +542,22 @@ class TestTeAdverbAfterObject:
     def test_keeps_the_clause_initial_adverb(self):
         tokens, _, _ = get_expected_tokens("果たして現状で十分だろうか")
         assert tokens[0]["surface"] == "果たして"
+
+
+class TestMimeticRunGate:
+    @pytest.mark.parametrize(
+        ("text", "head"),
+        [("いつかきっと再会したい", ["いつか", "きっと"]), ("もうちょっと待って", ["もう", "ちょっと"])],
+    )
+    def test_leaves_a_lexical_tto_adverb_after_another_word(self, text, head):
+        tokens, _, _ = get_expected_tokens(text)
+        assert [token["surface"] for token in tokens][:2] == head
+
+    def test_leaves_a_run_opening_on_a_dependent_token(self):
+        tokens, _, _ = get_expected_tokens("知ってるんじゃん。")
+        assert [token["surface"] for token in tokens] == ["知っ", "てる", "ん", "じゃん"]
+
+    @pytest.mark.parametrize(("text", "first"), [("えっと本", "えっと"), ("えっと驚いた", "えっ")])
+    def test_reads_etto_as_the_filler_unless_a_predicate_follows(self, text, first):
+        tokens, _, _ = get_expected_tokens(text)
+        assert tokens[0]["surface"] == first

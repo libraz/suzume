@@ -680,6 +680,60 @@
       ],
       "id": "eteroyo",
       "input": "覚えてろよ"
+    },
+    {
+      "description": "知ってるんじゃん。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "知る",
+          "pos": "Verb",
+          "surface": "知っ"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てる"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "じゃん",
+          "pos": "Particle",
+          "surface": "じゃん"
+        }
+      ],
+      "id": "ttterunji_n",
+      "input": "知ってるんじゃん。"
+    },
+    {
+      "description": "食べてるんじゃん - auto-generated",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てる"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "じゃん",
+          "pos": "Particle",
+          "surface": "じゃん"
+        }
+      ],
+      "id": "beterunji_n",
+      "input": "食べてるんじゃん"
     }
   ],
   "description": "auxiliary_colloquial tests",
