@@ -528,9 +528,13 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
       continue;
     }
     const std::string stem = extractSubstring(codepoints, start_pos, n_pos);
-    // A stem closed by the te-form is the contracted aspect (見て+ん+の), not a verb.
+    // A stem closed by the te-form is the contracted aspect (見て+ん+の), and
+    // one that passes through it is a subsidiary verb's contraction
+    // (走って+くん+の), not a verb of its own.
     if ((terminal_follows || nominalizer_follows) &&
-        (codepoints[n_pos - 1] == U'て' || codepoints[n_pos - 1] == U'で')) {
+        std::any_of(codepoints.begin() + static_cast<std::ptrdiff_t>(kanji_end),
+                    codepoints.begin() + static_cast<std::ptrdiff_t>(n_pos),
+                    [](char32_t kana) { return kana == U'て' || kana == U'で'; })) {
       continue;
     }
     // A stem ending on the irrealis of a registered Godan verb puts the

@@ -360,6 +360,11 @@ void generateProductiveSuffixCandidates(const std::vector<char32_t>& codepoints,
               closesListedVerbBeforeN(dict_manager, codepoints, char_types, start_pos, candidate_end - 1)) {
             break;
           }
+          // A stem right after a kanji is that kanji's okurigana (歩+いて+くん
+          // is 歩い+て+くん), never the opening of a nickname.
+          if (start_pos > 0 && char_types[start_pos - 1] == normalize::CharType::Kanji) {
+            break;
+          }
           // Before the negative ない/なかっ, くん is the contracted くれ of a
           // benefactive (見てて+くん+ない), not an honorific.
           const bool before_negative =

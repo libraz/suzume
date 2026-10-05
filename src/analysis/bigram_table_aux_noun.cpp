@@ -370,6 +370,10 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       // impossible 〜て+い+く auxiliary chain.
       {EPOS::AuxAspectIru, EPOS::AuxAspectIku, cost::kAlmostNever},
       {EPOS::AuxAspectKuru, EPOS::AuxVolitional, cost::kStrongBonus},
+      // Its terminal closes an utterance before a final particle (見て+くる+よ),
+      // and the contracted くん carries the nominalizer that the ていく reading
+      // spells separately (見て+くん+じゃん against 見て+く+ん+じゃん).
+      {EPOS::AuxAspectKuru, EPOS::ParticleFinal, cost::kMinorBonus},
 
       // Directional くる inflects after a te-form as well: 読ん+で+き+た,
       // 読ん+で+き+まし+た, 読ん+で+き+て. These rules keep its auxiliary

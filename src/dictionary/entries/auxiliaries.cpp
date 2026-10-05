@@ -941,6 +941,9 @@ EntrySpecRange getAuxiliaryEntries() {
       // the productive prefix boundary お + はす.
       verb("はす", "はする", EPOS::VerbShuushikei),
       aux("くる", "くる", EPOS::AuxAspectKuru),
+      // Colloquial る→ん of the terminal before the nominalizer, the copula or
+      // じゃん (歩いて+くん+じゃん, 持って+くん+だ), beside the くれ contraction above.
+      aux("くん", "くる", EPOS::AuxAspectKuru),
       // The one-mora renyokei き is generated contextually.  A global entry
       // reopens ordinary words ending in き (でき, 抜き, 咲き).
       aux("く", "いく", EPOS::AuxAspectIku),

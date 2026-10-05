@@ -1508,6 +1508,114 @@
       ],
       "id": "iku",
       "input": "会社いく"
+    },
+    {
+      "description": "歩いてくんじゃん。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "歩く",
+          "pos": "Verb",
+          "surface": "歩い"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くる",
+          "pos": "Auxiliary",
+          "surface": "くん"
+        },
+        {
+          "lemma": "じゃん",
+          "pos": "Particle",
+          "surface": "じゃん"
+        }
+      ],
+      "id": "itekunji_n",
+      "input": "歩いてくんじゃん。"
+    },
+    {
+      "description": "見てくんじゃん - auto-generated",
+      "expected": [
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くる",
+          "pos": "Auxiliary",
+          "surface": "くん"
+        },
+        {
+          "lemma": "じゃん",
+          "pos": "Particle",
+          "surface": "じゃん"
+        }
+      ],
+      "id": "tekunji_n",
+      "input": "見てくんじゃん"
+    },
+    {
+      "description": "持ってくんだ - auto-generated",
+      "expected": [
+        {
+          "lemma": "持つ",
+          "pos": "Verb",
+          "surface": "持っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くる",
+          "pos": "Auxiliary",
+          "surface": "くん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "tttekunda",
+      "input": "持ってくんだ"
+    },
+    {
+      "description": "走ってくんの - auto-generated",
+      "expected": [
+        {
+          "lemma": "走る",
+          "pos": "Verb",
+          "surface": "走っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くる",
+          "pos": "Auxiliary",
+          "surface": "くん"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        }
+      ],
+      "id": "tttekunno",
+      "input": "走ってくんの"
     }
   ],
   "description": "colloquial_contracted tests",
