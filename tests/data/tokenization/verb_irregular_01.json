@@ -2231,12 +2231,12 @@
         {
           "lemma": "来る",
           "pos": "Verb",
-          "surface": "来ら"
+          "surface": "来"
         },
         {
-          "lemma": "れる",
+          "lemma": "られる",
           "pos": "Auxiliary",
-          "surface": "れる"
+          "surface": "られる"
         },
         {
           "lemma": "時間",

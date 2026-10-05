@@ -1088,6 +1088,13 @@ def postprocess_frame_repairs(tokens: list[dict]) -> bool:
                 {"surface": "さ" + following["surface"], "pos": "Auxiliary", "lemma": "させる"},
             ]
             changed = True
+        elif surface == "来ら" and token.get("lemma") == "来る" and following.get("surface", "").startswith("れ"):
+            # Likewise its passive/potential is こ+られる; 来ら is no cell of 来る.
+            tokens[idx : idx + 2] = [
+                {"surface": "来", "pos": "Verb", "lemma": "来る"},
+                {"surface": "ら" + following["surface"], "pos": "Auxiliary", "lemma": "られる"},
+            ]
+            changed = True
         elif token.get("pos") == "Verb" and surface.startswith(("しそこな", "しそこね", "しそびれ")):
             # する's continuative plus the closed subsidiary, as in やり+そこなう.
             tokens[idx : idx + 1] = [
