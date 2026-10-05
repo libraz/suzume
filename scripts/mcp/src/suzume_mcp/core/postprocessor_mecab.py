@@ -1243,12 +1243,43 @@ def repair_contracted_iika(tokens: list[dict]) -> None:
 def repair_lengthened_negative(tokens: list[dict]) -> None:
     """Read a colloquial ねえ/ねぇ/ねー after an irrealis as the negative ない.
 
+    A ra-row verb's ん-contracted irrealis that the reference cut into another
+    verb's irrealis plus ん (わか+ん) is rejoined first.
+
     The reference reads ねぇ and ねえ as the colloquial ない after a plain
     irrealis, but takes the ー spelling, and every spelling after the
     ん-contracted irrealis of a ra-row verb (変わん, わかん), for the final
     particle ね; a final particle cannot follow a bare irrealis or an
     adjective's continuative.
     """
+    # The ん-contracted irrealis can come back cut as another verb's irrealis
+    # plus the negative ん (わか+ん for わかん of わかる); a negative after that
+    # would be a double negative. When the stem reads as the ra-row verb, the
+    # two pieces are its contracted irrealis.
+    idx = 1
+    while idx + 1 < len(tokens):
+        host, nasal, following = tokens[idx - 1], tokens[idx], tokens[idx + 1]
+        if (
+            host.get("pos") == "動詞"
+            and host.get("conj_form") == "未然形"
+            and nasal.get("surface") == "ん"
+            and nasal.get("pos") == "助動詞"
+            and following.get("surface") in _CONTRACTED_NEGATIVES
+            and following.get("pos") == "助詞"
+        ):
+            ra_row = mecab_analyze(host.get("surface", "") + "らない")
+            if ra_row and ra_row[0].get("pos") == "動詞" and ra_row[0].get("surface") == host.get("surface", "") + "ら":
+                tokens[idx - 1 : idx + 1] = [
+                    {
+                        "surface": host.get("surface", "") + "ん",
+                        "pos": "動詞",
+                        "pos_sub1": "自立",
+                        "conj_form": "未然特殊",
+                        "lemma": ra_row[0].get("lemma", ""),
+                    }
+                ]
+                continue
+        idx += 1
     for idx in range(1, len(tokens)):
         host, token = tokens[idx - 1], tokens[idx]
         if token.get("pos") != "助詞" or token.get("surface") not in _CONTRACTED_NEGATIVES:

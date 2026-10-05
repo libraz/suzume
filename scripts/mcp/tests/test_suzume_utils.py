@@ -839,3 +839,17 @@ class TestSubsidiaryVerbHeadsNoCompound:
     def test_lexical_itadaku_still_compounds(self):
         surfaces = [token["surface"] for token in get_expected_tokens("ご支援をいただき続ける")[0]]
         assert surfaces[-1] == "いただき続ける"
+
+
+class TestCutContractedIrrealis:
+    @pytest.mark.parametrize("text", ["わかんねえ", "わかんねー"])
+    def test_wakan_is_the_contracted_irrealis_before_the_negative(self, text):
+        tokens, _, _ = get_expected_tokens(text)
+        assert [(token["surface"], token["pos"], token["lemma"]) for token in tokens[:2]] == [
+            ("わかん", "Verb", "わかる"),
+            (text[3:], "Auxiliary", "ない"),
+        ]
+
+    def test_particle_nee_after_a_real_negative_stays(self):
+        tokens, _, _ = get_expected_tokens("知らんねえ")
+        assert tokens[-1]["pos"] == "Particle"
