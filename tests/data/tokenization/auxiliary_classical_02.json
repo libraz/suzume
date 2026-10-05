@@ -109,6 +109,28 @@
       ],
       "id": "shikereba",
       "input": "若々しければ"
+    },
+    {
+      "description": "咲きぬべし - auto-generated",
+      "expected": [
+        {
+          "lemma": "咲く",
+          "pos": "Verb",
+          "surface": "咲き"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬ"
+        },
+        {
+          "lemma": "べし",
+          "pos": "Auxiliary",
+          "surface": "べし"
+        }
+      ],
+      "id": "kinubeshi",
+      "input": "咲きぬべし"
     }
   ],
   "description": "auxiliary_classical tests (part 2/2)",

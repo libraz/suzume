@@ -831,6 +831,82 @@
       ],
       "id": "yubeshi",
       "input": "燃ゆべし"
+    },
+    {
+      "description": "音もなく去りゆきぬ - auto-generated",
+      "expected": [
+        {
+          "lemma": "音",
+          "pos": "Noun",
+          "surface": "音"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "なく"
+        },
+        {
+          "lemma": "去る",
+          "pos": "Verb",
+          "surface": "去り"
+        },
+        {
+          "lemma": "ゆく",
+          "pos": "Verb",
+          "surface": "ゆき"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬ"
+        }
+      ],
+      "id": "monaku_riyukinu",
+      "input": "音もなく去りゆきぬ"
+    },
+    {
+      "description": "消えゆきぬ - auto-generated",
+      "expected": [
+        {
+          "lemma": "消える",
+          "pos": "Verb",
+          "surface": "消え"
+        },
+        {
+          "lemma": "ゆく",
+          "pos": "Verb",
+          "surface": "ゆき"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬ"
+        }
+      ],
+      "id": "eyukinu",
+      "input": "消えゆきぬ"
+    },
+    {
+      "description": "見ゆらむ - auto-generated",
+      "expected": [
+        {
+          "lemma": "見ゆ",
+          "pos": "Verb",
+          "surface": "見ゆ"
+        },
+        {
+          "lemma": "らむ",
+          "pos": "Auxiliary",
+          "surface": "らむ"
+        }
+      ],
+      "id": "yuramu",
+      "input": "見ゆらむ"
     }
   ],
   "description": "classical tests",
