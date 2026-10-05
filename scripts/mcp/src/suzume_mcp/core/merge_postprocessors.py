@@ -30,6 +30,7 @@ classical_adjective_lemma = merge_postprocessor_classical_adjectives.classical_a
 NIDAN_TERMINAL_KANA = merge_postprocessor_classical_verbs.NIDAN_TERMINAL_KANA
 _postprocess_classical_kemu = merge_postprocessor_classical_verbs._postprocess_classical_kemu
 _postprocess_classical_ki = merge_postprocessor_classical_verbs._postprocess_classical_ki
+_postprocess_classical_continuative_host = merge_postprocessor_classical_verbs._postprocess_classical_continuative_host
 _postprocess_classical_mu = merge_postprocessor_classical_verbs._postprocess_classical_mu
 _postprocess_classical_shimu = merge_postprocessor_classical_verbs._postprocess_classical_shimu
 _postprocess_ha_row_godan = merge_postprocessor_classical_verbs._postprocess_ha_row_godan
@@ -105,6 +106,7 @@ def apply_merge_postprocessors(result: list[dict], applied_rule: str | None) -> 
     result, applied_rule = _postprocess_classical_shimu(result, applied_rule)
     result, applied_rule = _postprocess_classical_kemu(result, applied_rule)
     result, applied_rule = _postprocess_classical_ki(result, applied_rule)
+    result, applied_rule = _postprocess_classical_continuative_host(result, applied_rule)
     result, applied_rule = _postprocess_nominal_copula_naru(result, applied_rule)
     result, applied_rule = _postprocess_nominal_before_conjunctive_te(result, applied_rule)
     result, applied_rule = _postprocess_derivational_nominal_suffix(result, applied_rule)

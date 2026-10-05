@@ -361,3 +361,25 @@ class TestEmphaticFinalSokuon:
     def test_leaves_the_copula_onbin_cell_alone(self):
         tokens, _, _ = get_expected_tokens("だめだっ")
         assert [token["surface"] for token in tokens] == ["だめ", "だっ"]
+
+
+class TestClassicalContinuativeHost:
+    @pytest.mark.parametrize(
+        ("text", "expected"),
+        [
+            ("月見ぬべし", [("月", "Noun"), ("見", "Verb"), ("ぬ", "Auxiliary"), ("べし", "Auxiliary")]),
+            ("水落ちぬれば", [("水", "Noun"), ("落ち", "Verb"), ("ぬれ", "Auxiliary"), ("ば", "Particle")]),
+            ("日暮れぬれば", [("日", "Noun"), ("暮れ", "Verb"), ("ぬれ", "Auxiliary"), ("ば", "Particle")]),
+            ("咲きければ", [("咲き", "Verb"), ("けれ", "Auxiliary"), ("ば", "Particle")]),
+            ("月出づべし", [("月", "Noun"), ("出づ", "Verb"), ("べし", "Auxiliary")]),
+        ],
+    )
+    def test_recovers_the_verb_a_continuative_cell_attaches_to(self, text, expected):
+        tokens, _, _ = get_expected_tokens(text)
+        assert [(token["surface"], token["pos"]) for token in tokens] == expected
+
+    @pytest.mark.parametrize("text", ["花見に行く", "月見をする", "壁にける", "提出す", "谷深く"])
+    def test_leaves_nominals_without_a_continuative_cell(self, text):
+        before = {"花見に行く": "花見", "月見をする": "月見", "壁にける": "壁", "提出す": "提出", "谷深く": "谷"}[text]
+        tokens, _, _ = get_expected_tokens(text)
+        assert tokens[0]["surface"] == before

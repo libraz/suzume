@@ -1,6 +1,7 @@
 """Context-dependent classical inflection and auxiliary restoration."""
 
 from .mecab import mecab_analyze
+from .merge_postprocessor_common import _continuative_verb_tokens
 from .postprocessor_common import reports_mutation
 from .split_rules import base_from_renyokei
 
@@ -440,28 +441,21 @@ def _classical_past_starts_at(tokens: list[dict], idx: int) -> bool:
     return token.get("surface") == "き" and token.get("pos") == "Auxiliary"
 
 
+_MAPPED_HOST_POS = {"名詞": "Noun", "動詞": "Verb"}
+
+
 def _nominal_plus_continuative(surface: str) -> list[dict] | None:
     """Split a compound headword whose tail is a verb continuative, else None.
 
     The reference dictionary carries a handful of noun+continuative compounds as
     single headwords (雨降り, 山登り). They are nominals everywhere except in
     front of a predicate cell, where the tail is the verb the cell attaches to.
-    The same ます probe as @ref _verb_continuative_reading recovers the parts,
-    and the split is taken only when the probe reproduces the whole surface.
+    The shared continuative probe recovers the parts in the mapped tag set.
     """
-
-    probe = mecab_analyze(surface + "ます")
-    if len(probe) != 3 or probe[2].get("surface") != "ます":
+    parts = _continuative_verb_tokens(surface)
+    if parts is None or len(parts) != 2 or [part.get("pos") for part in parts] != ["名詞", "動詞"]:
         return None
-    head, tail = probe[0], probe[1]
-    if head.get("pos") != "名詞" or tail.get("pos") != "動詞" or tail.get("conj_form") != "連用形":
-        return None
-    if f"{head.get('surface', '')}{tail.get('surface', '')}" != surface:
-        return None
-    return [
-        {"surface": head["surface"], "pos": "Noun", "lemma": head.get("lemma", head["surface"])},
-        {"surface": tail["surface"], "pos": "Verb", "lemma": tail.get("lemma", tail["surface"])},
-    ]
+    return [{**part, "pos": _MAPPED_HOST_POS[part["pos"]]} for part in parts]
 
 
 @reports_mutation

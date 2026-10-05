@@ -1985,6 +1985,163 @@
       ],
       "id": "ni_kimasu",
       "input": "港に着きます"
+    },
+    {
+      "description": "Nidan terminal cell after a nominal fused into the kanji run",
+      "expected": [
+        {
+          "lemma": "月",
+          "pos": "Noun",
+          "surface": "月"
+        },
+        {
+          "lemma": "出づ",
+          "pos": "Verb",
+          "surface": "出づ"
+        },
+        {
+          "lemma": "べし",
+          "pos": "Auxiliary",
+          "surface": "べし"
+        }
+      ],
+      "id": "dubeshi",
+      "input": "月出づべし"
+    },
+    {
+      "description": "Terminal perfect nu recovers the continuative from a nominal headword",
+      "expected": [
+        {
+          "lemma": "月",
+          "pos": "Noun",
+          "surface": "月"
+        },
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬ"
+        },
+        {
+          "lemma": "べし",
+          "pos": "Auxiliary",
+          "surface": "べし"
+        }
+      ],
+      "id": "nubeshi",
+      "input": "月見ぬべし"
+    },
+    {
+      "description": "Perfect nure recovers the continuative okurigana fused into the cell",
+      "expected": [
+        {
+          "lemma": "水",
+          "pos": "Noun",
+          "surface": "水"
+        },
+        {
+          "lemma": "落ちる",
+          "pos": "Verb",
+          "surface": "落ち"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬれ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "chinureba",
+      "input": "水落ちぬれば"
+    },
+    {
+      "description": "Perfect nure recovers the continuative okurigana fused into the cell",
+      "expected": [
+        {
+          "lemma": "花",
+          "pos": "Noun",
+          "surface": "花"
+        },
+        {
+          "lemma": "落ちる",
+          "pos": "Verb",
+          "surface": "落ち"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬれ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "chinureba_2",
+      "input": "花落ちぬれば"
+    },
+    {
+      "description": "Perfect nure recovers the continuative from a nominal headword",
+      "expected": [
+        {
+          "lemma": "日",
+          "pos": "Noun",
+          "surface": "日"
+        },
+        {
+          "lemma": "暮れる",
+          "pos": "Verb",
+          "surface": "暮れ"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬれ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "renureba",
+      "input": "日暮れぬれば"
+    },
+    {
+      "description": "Terminal perfect nu after a nominal headword with a continuative tail",
+      "expected": [
+        {
+          "lemma": "日",
+          "pos": "Noun",
+          "surface": "日"
+        },
+        {
+          "lemma": "暮れる",
+          "pos": "Verb",
+          "surface": "暮れ"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬ"
+        },
+        {
+          "lemma": "べし",
+          "pos": "Auxiliary",
+          "surface": "べし"
+        }
+      ],
+      "id": "renubeshi",
+      "input": "日暮れぬべし"
     }
   ],
   "description": "auxiliary_classical tests",

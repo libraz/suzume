@@ -436,6 +436,74 @@ def _postprocess_classical_ki(result: list[dict], applied_rule: str | None) -> t
     return normalized, applied_rule
 
 
+# Classical auxiliaries that select a continuative, keyed by the cell the
+# reference dictionary misreads, with the cell's own lemma and the followers that
+# identify it.  ぬる/ぬれ and けれ come back as lexical verbs (塗る/濡れる, 蹴る),
+# しか as the exclusive particle, and the terminal ぬ/つ are already auxiliaries.
+_CONTINUATIVE_AUXILIARY_CELLS: dict[str, tuple[frozenset[str], str, frozenset[str] | None]] = {
+    "ぬる": (frozenset({"動詞"}), "ぬ", None),
+    "ぬれ": (frozenset({"動詞"}), "ぬ", None),
+    "けれ": (frozenset({"動詞"}), "けり", frozenset({"ば", "ど", "ども"})),
+    "しか": (frozenset({"助詞"}), "き", frozenset({"ば", "ど", "ども"})),
+    # The terminal perfect is told from the negative ぬ (which closes on ず) by
+    # an auxiliary that takes a terminal.
+    "ぬ": (frozenset({"助動詞"}), "ぬ", frozenset({"べし", "らむ", "めり", "なり", "まじ", "らし"})),
+    "つ": (frozenset({"助動詞"}), "つ", frozenset({"べし", "らむ", "めり", "なり", "まじ", "らし"})),
+}
+
+
+def _continuative_auxiliary_cell(token: dict, following: dict | None) -> tuple[str, str, str] | None:
+    """Return (carried kana, cell, lemma) when a token spells a continuative-taking cell."""
+    surface = token.get("surface", "")
+    for cell, (pos_set, lemma, followers) in _CONTINUATIVE_AUXILIARY_CELLS.items():
+        if not surface.endswith(cell) or token.get("pos") not in pos_set:
+            continue
+        carried = surface[: -len(cell)]
+        # Only a fused verb cell carries the host's ending in front of it (落+ちぬれ).
+        if carried and (token.get("pos") != "動詞" or regex.fullmatch(r"\p{Hiragana}", carried) is None):
+            continue
+        if followers is not None and (following is None or following.get("surface") not in followers):
+            continue
+        return carried, cell, lemma
+    return None
+
+
+def _postprocess_classical_continuative_host(
+    result: list[dict], applied_rule: str | None
+) -> tuple[list[dict], str | None]:
+    """Read a nominal in front of a continuative-taking classical cell back as its verb.
+
+    The perfect ぬ, the past き/けり and the perfect つ attach to a continuative,
+    so the token in front of them is a predicate whatever the dictionary made of
+    it.  Where the dictionary holds the kanji pair as a nominal headword (月見,
+    日暮れ) or cuts the okurigana into the cell (水落+ちぬれ), the polite-auxiliary
+    probe recovers the verb and the nominal in front of it.
+    """
+    normalized: list[dict] = []
+    for index, token in enumerate(result):
+        following = result[index + 1] if index + 1 < len(result) else None
+        matched = _continuative_auxiliary_cell(token, following)
+        if matched is None or not normalized or normalized[-1].get("pos") != "名詞":
+            normalized.append(token)
+            continue
+        carried, cell, lemma = matched
+        recovered = _continuative_verb_tokens(normalized[-1].get("surface", "") + carried)
+        # The carried kana is the continuative's ending, so the verb has to reach
+        # back past it into the nominal (see the same guard in classical-past-ki).
+        if (
+            recovered is None
+            or recovered[-1].get("pos") != "動詞"
+            or len(recovered[-1].get("surface", "")) <= len(carried)
+        ):
+            normalized.append(token)
+            continue
+        normalized[-1:] = recovered
+        normalized.append({"surface": cell, "pos": "助動詞", "lemma": lemma})
+        if applied_rule is None:
+            applied_rule = "classical-continuative-host"
+    return normalized, applied_rule
+
+
 _HA_ROW_TAILS = ("は", "ひ", "ふ", "へ")
 _HA_ROW_DETACHED_TAILS = ("ひ", "ふ", "へ")
 _HA_ROW_STEM_POS = ("名詞", "動詞", "形容詞", "副詞", "接尾辞")
@@ -609,8 +677,20 @@ def _nidan_cell_match(token: dict, following: dict) -> tuple[regex.Match, str] |
     return None
 
 
-def nidan_cell(token: dict, following: dict | None) -> tuple[str, str, str] | None:
-    """Return (surface, 終止形, remainder) when two tokens spell one 二段 finite cell.
+@cache
+def _is_common_noun(surface: str) -> bool:
+    """Whether the dictionary reads a surface as one noun that is not a proper name."""
+    tokens = mecab_analyze(surface)
+    return (
+        len(tokens) == 1
+        and tokens[0].get("surface") == surface
+        and tokens[0].get("pos") == "名詞"
+        and tokens[0].get("pos_sub1") != "固有名詞"
+    )
+
+
+def nidan_cell(token: dict, following: dict | None) -> tuple[str, str, str, str] | None:
+    """Return (host, surface, 終止形, remainder) when two tokens spell one 二段 finite cell.
 
     終止形 is the stem plus one U-row kana, 連体形 adds る and 已然形 adds れ.  The
     stem keeps whatever 送り仮名 the modern headword carries (聞こ|ゆ), so it is
@@ -618,7 +698,8 @@ def nidan_cell(token: dict, following: dict | None) -> tuple[str, str, str] | No
     stem would swallow the 連体形 る of 消|ゆ|る.  Asking the dictionary for the
     modern 一段 headword the same stem builds decides whether the pair is a verb,
     without listing the classical paradigm.  The remainder is whatever the window
-    matched past the cell, and is left for the caller to re-analyze.
+    matched past the cell, and is left for the caller to re-analyze; the host is
+    a nominal the dictionary fused in front of the stem.
     """
     if following is None:
         return None
@@ -639,8 +720,26 @@ def nidan_cell(token: dict, following: dict | None) -> tuple[str, str, str] | No
         and token.get("lemma") != stem + terminal
     ):
         return None
-    lemma = _nidan_terminal_lemma(stem, terminal)
-    return None if lemma is None else (lemma + inflection, lemma, remainder)
+    # A nominal fused in front of the verb (月+出|づ) shares the kanji run, so the
+    # stem may start at any kanji of it; the longest stem the dictionary knows wins.
+    # A run the dictionary holds as a common noun is that noun, and the kana after
+    # it is its own (提出+す), so only a run it cannot read as one is reopened.
+    for offset in range(len(stem)):
+        if offset and (
+            regex.fullmatch(r"\p{Han}+", stem[:offset]) is None
+            or regex.match(r"\p{Han}", stem[offset:]) is None
+            or _is_common_noun(stem)
+            or not is_single_token_of_pos(stem[:offset], "名詞")
+        ):
+            break
+        # A reopened stem whose kana already completes an adjective cell (谷+深く)
+        # is that adjective, not a 二段 verb.
+        if offset and is_single_token_of_pos(stem[offset:] + terminal, "形容詞"):
+            break
+        lemma = _nidan_terminal_lemma(stem[offset:], terminal)
+        if lemma is not None:
+            return stem[:offset], lemma + inflection, lemma, remainder
+    return None
 
 
 def _postprocess_nidan_cell(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
@@ -658,7 +757,9 @@ def _postprocess_nidan_cell(result: list[dict], applied_rule: str | None) -> tup
         token = result[idx]
         cell = nidan_cell(token, result[idx + 1] if idx + 1 < len(result) else None)
         if cell is not None:
-            surface, lemma, remainder = cell
+            host, surface, lemma, remainder = cell
+            if host:
+                merged.append({"surface": host, "pos": "名詞", "lemma": host})
             merged.append({"surface": surface, "pos": "動詞", "lemma": lemma})
             if remainder:
                 merged.extend(mecab_analyze(remainder))

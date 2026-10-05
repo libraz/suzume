@@ -841,9 +841,9 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       // Causative auxiliary only follows verb mizenkei, never nouns
       {EPOS::Noun, EPOS::AuxCausative, cost::kStrong},
 
-      // Noun → AuxPassive (色褪+れる) - strong penalty
+      // Noun → AuxPassive (色褪+れる, 日暮+れ) - severe penalty
       // Passive auxiliary only follows verb mizenkei, never nouns
-      {EPOS::Noun, EPOS::AuxPassive, cost::kStrong},
+      {EPOS::Noun, EPOS::AuxPassive, cost::kSevere},
 
       // An adverb is no more a 未然形 host than a noun is, and the same two rows
       // are missing on that side: 一切+れ steals the okurigana off a counter
