@@ -533,6 +533,18 @@ bool closesOnPoliteCopula(const dictionary::DictionaryManager* dict_manager, con
  * registered verb and its auxiliary, not a word of its own.
  * @see fabricated closed-class absorption guards (top of this header)
  */
+/**
+ * @brief Whether codepoints ending at @p stem_end close on a registered
+ * auxiliary in its terminal form plus a one-mora conjunctive particle
+ *
+ * Such a span is a predicate chain (やり+たい+し), never an adjective stem,
+ * whichever script opens it. A non-terminal cell (おい of おく) says nothing
+ * (おいし+さ).
+ * @see fabricated closed-class absorption guards (top of this header)
+ */
+bool closesOnTerminalAuxiliaryAndConjunctive(const dictionary::DictionaryManager* dict_manager,
+                                             const std::vector<char32_t>& codepoints, size_t stem_end);
+
 bool spellsContinuativeBeforePolite(const dictionary::DictionaryManager* dict_manager,
                                     const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos);
 

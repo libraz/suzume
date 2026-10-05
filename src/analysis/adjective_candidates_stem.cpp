@@ -564,6 +564,12 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
             // Count hiragana chars in okurigana for stem_end calculation
             const size_t stem_end = kanji_end + byte_pos / 3;
 
+            // Nor may it end on a terminal auxiliary and a conjunctive particle
+            // (食べ+たい+し+さ): that is a predicate chain.
+            if (!isAdjectiveInDictionary(dict_manager, base_form) &&
+                verb_helpers::closesOnTerminalAuxiliaryAndConjunctive(dict_manager, codepoints, stem_end)) {
+              continue;
+            }
             // The okurigana scan runs past a case particle and reaches the next
             // word's kana (水 + を + くみ read as the stem of the non-word 水をくい).
             // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)

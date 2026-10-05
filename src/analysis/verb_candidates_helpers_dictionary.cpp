@@ -653,6 +653,29 @@ bool closesOnPoliteCopula(const dictionary::DictionaryManager* dict_manager, con
   return auxiliary != nullptr && auxiliary->extended_pos == core::ExtendedPOS::AuxCopulaDesu;
 }
 
+bool closesOnTerminalAuxiliaryAndConjunctive(const dictionary::DictionaryManager* dict_manager,
+                                             const std::vector<char32_t>& codepoints, size_t stem_end) {
+  constexpr size_t kMinAuxiliaryLen = 2;
+  constexpr size_t kMaxAuxiliaryLen = 4;
+  if (dict_manager == nullptr || stem_end == 0 || stem_end > codepoints.size()) {
+    return false;
+  }
+  const auto* particle =
+      lookupEntryInRange(*dict_manager, codepoints, stem_end - 1, stem_end, core::PartOfSpeech::Particle);
+  if (particle == nullptr || particle->extended_pos != core::ExtendedPOS::ParticleConj) {
+    return false;
+  }
+  const size_t aux_end = stem_end - 1;
+  for (size_t aux_len = kMinAuxiliaryLen; aux_len <= kMaxAuxiliaryLen && aux_len <= aux_end; ++aux_len) {
+    const auto* auxiliary =
+        lookupEntryInRange(*dict_manager, codepoints, aux_end - aux_len, aux_end, core::PartOfSpeech::Auxiliary);
+    if (auxiliary != nullptr && auxiliary->lemma == extractSubstring(codepoints, aux_end - aux_len, aux_end)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool spellsContinuativeBeforePolite(const dictionary::DictionaryManager* dict_manager,
                                     const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos) {
   const auto* auxiliary = auxiliaryClosingAfterOkurigana(dict_manager, codepoints, start_pos, end_pos);
