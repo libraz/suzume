@@ -173,6 +173,87 @@
       ],
       "id": "ni_i",
       "input": "今日更に寒い"
+    },
+    {
+      "description": "一緒にいようよずっと - auto-generated",
+      "expected": [
+        {
+          "lemma": "一緒",
+          "pos": "Noun",
+          "surface": "一緒"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "いよ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        },
+        {
+          "lemma": "ずっと",
+          "pos": "Adverb",
+          "surface": "ずっと"
+        }
+      ],
+      "id": "niiyouyozuttto",
+      "input": "一緒にいようよずっと"
+    },
+    {
+      "description": "行こうよずっと - auto-generated",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行こ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        },
+        {
+          "lemma": "ずっと",
+          "pos": "Adverb",
+          "surface": "ずっと"
+        }
+      ],
+      "id": "kouyozuttto",
+      "input": "行こうよずっと"
+    },
+    {
+      "description": "にもっと - auto-generated",
+      "expected": [
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "もっと",
+          "pos": "Adverb",
+          "surface": "もっと"
+        }
+      ],
+      "id": "nimottto",
+      "input": "にもっと"
     }
   ],
   "description": "General adverbs (part 3/3)",

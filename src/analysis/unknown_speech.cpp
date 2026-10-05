@@ -610,12 +610,24 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
       }
       const size_t adv_end = tto_pos + 2;
       const size_t stem_len = tto_pos - start_pos;
-      // Skip if stem starts with a particle character (e.g., にもっと = に+もっと)
+      // Skip if stem starts with a particle character (e.g., にもっと = に+もっと),
+      // final particles included (行こう+よ+ずっと).
       const char32_t first_cp = codepoints[start_pos];
-      const bool particle_start = first_cp == U'に' || first_cp == U'は' || first_cp == U'も' || first_cp == U'を' ||
-                                  first_cp == U'が' || first_cp == U'で' || first_cp == U'と' || first_cp == U'か' ||
-                                  first_cp == U'の' || first_cp == U'へ';
+      const auto* first_particle =
+          dict_manager_ != nullptr
+              ? lookupEntryInRange(*dict_manager_, codepoints, start_pos, start_pos + 1, core::PartOfSpeech::Particle)
+              : nullptr;
+      const bool particle_start =
+          normalize::isParticleCodepoint(first_cp) ||
+          (first_particle != nullptr && first_particle->extended_pos == core::ExtendedPOS::ParticleFinal);
       if (stem_len > 2 && particle_start) {
+        break;
+      }
+      // A particle mora in front of a registered adverb is that particle and
+      // the adverb (よ+ずっと, よ+そっと, に+もっと).
+      if (particle_start && dict_manager_ != nullptr &&
+          lookupEntryInRange(*dict_manager_, codepoints, start_pos + 1, adv_end, core::PartOfSpeech::Adverb) !=
+              nullptr) {
         break;
       }
       if (closesContractedVolitional(codepoints, tto_pos, dict_manager_)) {
