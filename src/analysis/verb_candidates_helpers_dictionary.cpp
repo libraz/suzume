@@ -749,7 +749,24 @@ const dictionary::DictionaryEntry* auxiliaryClosingAfterOkurigana(const dictiona
     const bool voiced_oku_off_nasal =
         auxiliary != nullptr && auxiliary->extended_pos == core::ExtendedPOS::AuxAspectOku &&
         utf8::startsWith(auxiliary->surface, "ど") && codepoints[end_pos - aux_len - 1] != core::hiragana::kN;
-    if (auxiliary != nullptr && auxiliary->extended_pos != core::ExtendedPOS::AuxClassicalKeri &&
+    // After an i-row continuative that does not close a dictionary adjective
+    // stem, the cell is けり's after all (咲き+けれ). し and じ are left out:
+    // the シク adjectives end their stem on them (若々し+けれ, 凄まじ+けれ), far
+    // more often than a continuative plus けり does.
+    const size_t aux_start = end_pos - aux_len;
+    size_t stem_start = okurigana_start;
+    // The stem is the kanji run, iteration mark included, before the okurigana (若々, 美).
+    while (stem_start > 0 &&
+           (normalize::isKanjiCodepoint(codepoints[stem_start - 1]) || codepoints[stem_start - 1] == U'々')) {
+      --stem_start;
+    }
+    const bool keri_after_continuative =
+        auxiliary != nullptr && auxiliary->extended_pos == core::ExtendedPOS::AuxClassicalKeri &&
+        kana::isIRowCodepoint(codepoints[aux_start - 1]) && codepoints[aux_start - 1] != U'し' &&
+        codepoints[aux_start - 1] != U'じ' &&
+        !isAdjectiveInDictionary(dict_manager, extractSubstring(codepoints, stem_start, aux_start) + "い");
+    if (auxiliary != nullptr &&
+        (auxiliary->extended_pos != core::ExtendedPOS::AuxClassicalKeri || keri_after_continuative) &&
         !voiced_oku_off_nasal) {
       return auxiliary;
     }

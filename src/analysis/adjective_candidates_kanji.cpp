@@ -713,6 +713,17 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
               verb_helpers::endsWithAuxiliaryAfterOkurigana(dict_manager, codepoints, kanji_end, end_pos - 1)))) {
           continue;
         }
+        // The hypothetical けれ after a verb continuative is けり's (咲き+けれ+ば);
+        // the helper accepts that cell only where no adjective stem closes there.
+        bool closes_on_keri = false;
+        for (size_t kere_end = kanji_end + 3; kere_end <= end_pos && !closes_on_keri; ++kere_end) {
+          const auto* keri =
+              verb_helpers::auxiliaryClosingAfterOkurigana(dict_manager, codepoints, kanji_end, kere_end);
+          closes_on_keri = keri != nullptr && keri->extended_pos == core::ExtendedPOS::AuxClassicalKeri;
+        }
+        if (closes_on_keri && !isAdjectiveInDictionary(dict_manager, cand.base_form)) {
+          continue;
+        }
         // Set lemma to base form from inflection analysis (e.g., 使いやすく → 使いやすい)
         auto adj_cand = makeIAdjCandidate(surface, start_pos, end_pos, cand.base_form, cost,
                                           CandidateOrigin::AdjectiveI, cand.confidence, "i_adjective");

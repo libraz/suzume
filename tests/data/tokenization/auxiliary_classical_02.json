@@ -48,6 +48,67 @@
       ],
       "id": "kikeruzo",
       "input": "咲きけるぞ"
+    },
+    {
+      "description": "咲きければ - auto-generated",
+      "expected": [
+        {
+          "lemma": "咲く",
+          "pos": "Verb",
+          "surface": "咲き"
+        },
+        {
+          "lemma": "けり",
+          "pos": "Auxiliary",
+          "surface": "けれ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "kikereba",
+      "input": "咲きければ"
+    },
+    {
+      "description": "散りければ - auto-generated",
+      "expected": [
+        {
+          "lemma": "散る",
+          "pos": "Verb",
+          "surface": "散り"
+        },
+        {
+          "lemma": "けり",
+          "pos": "Auxiliary",
+          "surface": "けれ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "rikereba",
+      "input": "散りければ"
+    },
+    {
+      "description": "若々しければ - auto-generated",
+      "expected": [
+        {
+          "lemma": "若々しい",
+          "pos": "Adjective",
+          "surface": "若々しけれ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "shikereba",
+      "input": "若々しければ"
     }
   ],
   "description": "auxiliary_classical tests (part 2/2)",
