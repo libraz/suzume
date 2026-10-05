@@ -335,9 +335,12 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
             final_particle != nullptr && final_particle->extended_pos == core::ExtendedPOS::ParticleFinal;
         const size_t predicate_end = after_final_particle ? stem_end - 1 : stem_end;
         const char32_t predicate_tail = codepoints[predicate_end - 1];
+        // The terminal る contracts to ん before the prohibitive な (忘れん+な);
+        // only a bare kanji keeps ん as a stem ending (盛んな).
         const bool closes_on_verbal_ru =
-            predicate_tail == U'る' || (after_final_particle && (kana::isURowCodepoint(predicate_tail) ||
-                                                                 predicate_tail == U'た' || predicate_tail == U'だ'));
+            predicate_tail == U'る' || (predicate_tail == U'ん' && predicate_end - 1 > kanji_end) ||
+            (after_final_particle &&
+             (kana::isURowCodepoint(predicate_tail) || predicate_tail == U'た' || predicate_tail == U'だ'));
         if (is_bare_attributive && !has_internal_particle && !contains_closed_suffix && !starts_closed_tail &&
             !is_exact_verb_stem && !crosses_te_form && !contains_passive_boundary && !starts_naru_after_ku &&
             !closes_on_verbal_ru) {

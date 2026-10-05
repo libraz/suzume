@@ -1531,6 +1531,50 @@
       ],
       "id": "ranna",
       "input": "知らんな"
+    },
+    {
+      "description": "ichidan terminal ru contracted to n before the prohibitive na",
+      "expected": [
+        {
+          "lemma": "忘れる",
+          "pos": "Verb",
+          "surface": "忘れん"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "rennayo",
+      "input": "忘れんなよ"
+    },
+    {
+      "description": "okurigana ichidan terminal contracted before the prohibitive na",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べん"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "bennayo",
+      "input": "食べんなよ"
     }
   ],
   "description": "Contraction patterns (てる、ちゃう)",

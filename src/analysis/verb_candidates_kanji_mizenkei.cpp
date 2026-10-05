@@ -561,13 +561,21 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
     if (nominalizer_follows && n_pos != kanji_end) {
       continue;
     }
-    if (!vh::isVerifiedVerbBase(dict_manager, inflection, base_form,
-                                candidate::verb_cost::kConstructedVerbMinConfidence, true)) {
+    // An okurigana stem contracts its Ichidan terminal the same way
+    // (忘れん+な ← 忘れるな); only the negative needs the Godan-ra irrealis.
+    const bool ichidan_terminal =
+        bare_ichidan_terminal || (terminal_follows && n_pos != kanji_end &&
+                                  !vh::isVerifiedVerbBase(dict_manager, inflection, base_form,
+                                                          candidate::verb_cost::kConstructedVerbMinConfidence, true) &&
+                                  vh::isVerifiedVerbBase(dict_manager, inflection, base_form,
+                                                         candidate::verb_cost::kConstructedVerbMinConfidence, false));
+    if (!ichidan_terminal && !vh::isVerifiedVerbBase(dict_manager, inflection, base_form,
+                                                     candidate::verb_cost::kConstructedVerbMinConfidence, true)) {
       continue;
     }
     candidates.push_back(makeVerbCandidate(
         codepoints, start_pos, nominalizer_follows ? n_pos : n_pos + 1, candidate::verb_cost::kStandardBonus, base_form,
-        bare_ichidan_terminal ? dictionary::ConjugationType::Ichidan : dictionary::ConjugationType::GodanRa, true,
+        ichidan_terminal ? dictionary::ConjugationType::Ichidan : dictionary::ConjugationType::GodanRa, true,
         CandidateOrigin::VerbKanji, candidate::kVerifiedConfidence,
         negative_follows ? "kanji_n_onbin_nai" : "kanji_n_contracted_terminal",
         negative_follows ? core::ExtendedPOS::VerbMizenkei : core::ExtendedPOS::VerbShuushikei));
