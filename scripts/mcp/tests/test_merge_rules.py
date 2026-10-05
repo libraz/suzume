@@ -2,6 +2,7 @@
 
 from suzume_mcp.core.mecab import mecab_analyze
 from suzume_mcp.core.merge_postprocessor_affixes import _postprocess_bound_voiced_suffix
+from suzume_mcp.core.merge_postprocessor_grammar import _postprocess_prefix_split
 from suzume_mcp.core.merge_rules import apply_suzume_merge
 
 
@@ -1338,9 +1339,14 @@ class TestHonorificPrefixKanji:
 
     def test_merges_prefix_before_pronoun_into_one_noun(self):
         tokens = [_tok("お", pos="接頭詞"), _tok("やつ", pos="名詞", pos_sub1="代名詞")]
-        result, rule = apply_suzume_merge(tokens, "おやつ")
+        result, rule = _postprocess_prefix_split(tokens, None)
         assert result == [{"surface": "おやつ", "pos": "名詞", "pos_sub1": "一般", "lemma": "おやつ"}]
         assert rule == "prefix-pronoun-merge"
+
+    def test_registered_noun_with_prefix_spelling_stays_one_noun(self):
+        tokens = [_tok("お", pos="接頭詞"), _tok("やつ", pos="名詞", pos_sub1="代名詞")]
+        result, _ = apply_suzume_merge(tokens, "おやつ")
+        assert [token["surface"] for token in result] == ["おやつ"]
 
 
 class TestLaughter:
