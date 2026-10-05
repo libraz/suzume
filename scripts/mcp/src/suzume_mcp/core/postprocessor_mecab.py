@@ -218,6 +218,54 @@ def _reads_as_adjective(text: str, start: int, stem: str, standard: str) -> bool
     return landed is not None and landed.get("pos") == "形容詞"
 
 
+# The e-row kana of a fused long e and the kana it fused from: the stem's last
+# mora on the a row (たかい → たけえ) or on the o row (すごい → すげえ).
+_FUSED_E_SOURCES: dict[str, tuple[str, ...]] = {
+    "え": ("あ", "お"),
+    "け": ("か", "こ"),
+    "げ": ("が", "ご"),
+    "せ": ("さ", "そ"),
+    "ぜ": ("ざ", "ぞ"),
+    "て": ("た", "と"),
+    "で": ("だ", "ど"),
+    "ね": ("な", "の"),
+    "へ": ("は", "ほ"),
+    "べ": ("ば", "ぼ"),
+    "ぺ": ("ぱ", "ぽ"),
+    "め": ("ま", "も"),
+    "れ": ("ら", "ろ"),
+}
+
+
+def _vowel_fused_adjectives(text: str) -> dict[int, tuple[str, str]]:
+    """Spans spelling an i-adjective with its ending fused into a long e.
+
+    Keyed by start; the value is the written span and the standard form. The
+    stem is the longest kana run before the e-row kana for which the standard
+    form is one adjective.
+    """
+    spans: dict[int, tuple[str, str]] = {}
+    for m in regex.finditer(r"(?<=\p{Hiragana})[えけげせぜてでねへべぺめれ](?=え)", text):
+        fused_at = m.start()
+        run_start = fused_at
+        while run_start > 0 and fused_at - run_start < 4 and regex.fullmatch(r"\p{Hiragana}", text[run_start - 1]):
+            run_start -= 1
+        for start in range(run_start, fused_at):
+            stem = text[start:fused_at]
+            standard = next(
+                (
+                    stem + source + "い"
+                    for source in _FUSED_E_SOURCES[text[fused_at]]
+                    if is_single_token_of_pos(stem + source + "い", "形容詞")
+                ),
+                "",
+            )
+            if standard:
+                spans[start] = (text[start : fused_at + 2], standard)
+                break
+    return spans
+
+
 def _non_overlapping_replacements(candidates: dict[tuple[int, str], dict]) -> dict[tuple[int, str], dict]:
     """Keep leftmost, longest pre-analysis replacements with disjoint spans."""
     selected: dict[tuple[int, str], dict] = {}
@@ -375,6 +423,26 @@ def preprocess_for_mecab(text: str) -> tuple[str, dict[tuple[int, str], dict], t
                 "length": 2,
             }
 
+    # A colloquial i-adjective fuses its last vowel with い into a long e
+    # (すごい → すげえ, うまい → うめえ). The dictionary reads the e-row kana
+    # plus え as a verb, a noun or a filler, so the standard form is put back in
+    # its place when it reads as one adjective, and the surface is restored
+    # afterwards with the standard lemma kept. A negative auxiliary already
+    # read there (知らねえ) is the same fusion on ない and is left alone.
+    for start, (original, standard) in _vowel_fused_adjectives(text).items():
+        if raw is None:
+            raw = _raw_analysis(text)
+        fused_at = start + len(original) - 2
+        covering = [token for at, token in raw[1].items() if at <= fused_at < at + len(token.get("surface", ""))]
+        if covering and covering[0].get("pos") == "助動詞":
+            continue
+        replacements[(start, "vowel_fused_adjective")] = {
+            "original": original,
+            "replacement": standard,
+            "length": len(original),
+            "keeps_lemma": True,
+        }
+
     # Pre-1946 kanji forms the dictionary has no entry for come back as unknown
     # tokens (lemma "*"), and the compound rules then glue the run into a
     # non-word noun (心 + 亂 → 心亂), stranding the okurigana. Folding only the
@@ -428,6 +496,7 @@ def preprocess_for_mecab(text: str) -> tuple[str, dict[tuple[int, str], dict], t
         "emphatic_sokuon": "emphatic-sokuon",
         "kyujitai": "kyujitai-fold",
         "kanji_verb_frame": "kanji-verb-frame",
+        "vowel_fused_adjective": "vowel-fused-adjective",
     }
     rules = tuple(dict.fromkeys(rule_names[category] for _, category in replacements))
     return text, replacements, rules
@@ -461,22 +530,24 @@ def postprocess_mecab_tokens(
                         replacement_end - token_start,
                         replacement["original"],
                         replacement["replacement"],
+                        replacement.get("keeps_lemma", False),
                     )
                 )
 
         if not patches:
             continue
         surface = token.get("surface", "")
-        for local_start, local_end, original, _ in sorted(patches, reverse=True):
+        for local_start, local_end, original, _, _ in sorted(patches, reverse=True):
             surface = surface[:local_start] + original + surface[local_end:]
         token["surface"] = surface
 
         lemma = token.get("lemma", "")
-        for _, _, original, standard in patches:
+        for _, _, original, standard, keeps_lemma in patches:
             # An emphatic spelling keeps the dictionary form as its lemma: かわいーー is
             # still かわいい. Restoring the original there would make the lemma a non-word
             # and contradict the lengthening rules, which already yield the plain form.
-            if _is_emphatic_spelling(original, standard, token.get("pos", "")):
+            # A colloquial sound change (すげえ for すごい) is the same word too.
+            if keeps_lemma or _is_emphatic_spelling(original, standard, token.get("pos", "")):
                 continue
             if lemma and standard in lemma:
                 lemma = lemma.replace(standard, original, 1)

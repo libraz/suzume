@@ -586,3 +586,19 @@ class TestPhraseFinalSmallVowel:
     def test_leaves_a_small_vowel_inside_a_word(self):
         tokens, _, _ = get_expected_tokens("ファイル")
         assert [token["surface"] for token in tokens] == ["ファイル"]
+
+
+class TestVowelFusedAdjective:
+    @pytest.mark.parametrize(
+        ("text", "word", "lemma"),
+        [("すげえな", "すげえ", "すごい"), ("これうめえ", "うめえ", "うまい"), ("ひでえ話だ", "ひでえ", "ひどい")],
+    )
+    def test_reads_the_fused_long_e_as_the_adjective(self, text, word, lemma):
+        tokens, _, _ = get_expected_tokens(text)
+        token = next(token for token in tokens if token["surface"] == word)
+        assert (token["pos"], token["lemma"]) == ("Adjective", lemma)
+
+    @pytest.mark.parametrize("text", ["知らねえ", "かもねえ", "食べるけえ"])
+    def test_leaves_other_e_endings(self, text):
+        tokens, _, _ = get_expected_tokens(text)
+        assert all(token["pos"] != "Adjective" or token["lemma"] in ("ない",) for token in tokens)
