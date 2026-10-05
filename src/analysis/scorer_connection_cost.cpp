@@ -157,9 +157,12 @@ float computeLateLexicalBoundaryBonus(const core::LatticeEdge& prev, const core:
   // A final particle spelled like a verb terminal (なう) closes an auxiliary
   // or a word written outside the kana run; after a bare kana piece, even one
   // that is itself a verb, it is the tail of a kana verb (うし+なう, つぐ+なう).
+  // The light verb する is the exception: it closes the noun that hosts it
+  // and opens no longer kana verb (参加+する+もふ).
   const bool terminal_spelled_final_particle_in_kana_run =
       next.extended_pos == core::ExtendedPOS::ParticleFinal && grammar::endsWithURow(next.surface) &&
-      prev.pos != core::PartOfSpeech::Auxiliary && grammar::isPureHiragana(prev.surface);
+      prev.pos != core::PartOfSpeech::Auxiliary && !grammar::isSuruBaseForm(prev.lemma) &&
+      grammar::isPureHiragana(prev.surface);
   // The contracted volitional っ is a cell of a predicate's volitional; a
   // nominal in front of it is a kana run cut apart (そこ+っ+か).
   const bool contracted_volitional_off_predicate =

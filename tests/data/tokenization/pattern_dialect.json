@@ -683,6 +683,67 @@
       ],
       "id": "zamasu",
       "input": "学生ざます"
+    },
+    {
+      "description": "我が参加するもふ - auto-generated",
+      "expected": [
+        {
+          "lemma": "我が",
+          "pos": "Determiner",
+          "surface": "我が"
+        },
+        {
+          "lemma": "参加",
+          "pos": "Noun",
+          "surface": "参加"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        },
+        {
+          "lemma": "もふ",
+          "pos": "Particle",
+          "surface": "もふ"
+        }
+      ],
+      "id": "ga_surumofu",
+      "input": "我が参加するもふ"
+    },
+    {
+      "description": "走るもふ - auto-generated",
+      "expected": [
+        {
+          "lemma": "走る",
+          "pos": "Verb",
+          "surface": "走る"
+        },
+        {
+          "lemma": "もふ",
+          "pos": "Particle",
+          "surface": "もふ"
+        }
+      ],
+      "id": "rumofu",
+      "input": "走るもふ"
+    },
+    {
+      "description": "楽しいもふ - auto-generated",
+      "expected": [
+        {
+          "lemma": "楽しい",
+          "pos": "Adjective",
+          "surface": "楽しい"
+        },
+        {
+          "lemma": "もふ",
+          "pos": "Particle",
+          "surface": "もふ"
+        }
+      ],
+      "id": "shiimofu",
+      "input": "楽しいもふ"
     }
   ],
   "description": "pattern_dialect tests",

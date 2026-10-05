@@ -1746,6 +1746,24 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
           }
         }
       }
+      // Nor may it open inside a registered predicate that the word in front of
+      // the kana run hosts (参加+す|る+もふ cuts the light verb する in half).
+      bool opens_inside_hosted_predicate = false;
+      constexpr size_t kPredicateLookbehind = 3;
+      for (size_t probe = start_pos > kPredicateLookbehind ? start_pos - kPredicateLookbehind : 0;
+           probe < start_pos && !opens_inside_hosted_predicate && dict_manager_ != nullptr; ++probe) {
+        if (probe == 0 || char_types[probe - 1] == normalize::CharType::Hiragana ||
+            char_types[probe] != normalize::CharType::Hiragana) {
+          continue;
+        }
+        for (size_t probe_end = start_pos + 1; probe_end <= scan; ++probe_end) {
+          if (hasExactPartOfSpeech(*dict_manager_, codepoints, probe, probe_end,
+                                   partOfSpeechMask(core::PartOfSpeech::Verb))) {
+            opens_inside_hosted_predicate = true;
+            break;
+          }
+        }
+      }
       // Nor may it absorb a registered irrealis and the auxiliary that selects
       // it (あら+ん+や): that is a finished predicate, not a noun.
       bool opens_on_irrealis_chain = false;
@@ -1838,10 +1856,11 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       if ((len >= min_len || short_bos_preparatory_homograph) &&
           (right_particle || right_clause || right_auxiliary || right_kanji_word || right_suffix ||
            (right_short_genitive && unread_short_run_bracketed)) &&
-          !crossed_verified_predicate && !cuts_into_predicate && !opens_on_irrealis_chain &&
-          !has_inflected_predicate_reading && !opens_on_sino_prefix && !absorbs_trailing_suffix &&
-          !opens_on_te_connective && !closes_registered_word_predicate && !finishes_auxiliary_chain &&
-          !spells_contracted_hypothetical && !steals_formal_noun_head && !absorbs_copula_before_sokuon_final &&
+          !crossed_verified_predicate && !cuts_into_predicate && !opens_inside_hosted_predicate &&
+          !opens_on_irrealis_chain && !has_inflected_predicate_reading && !opens_on_sino_prefix &&
+          !absorbs_trailing_suffix && !opens_on_te_connective && !closes_registered_word_predicate &&
+          !finishes_auxiliary_chain && !spells_contracted_hypothetical && !steals_formal_noun_head &&
+          !absorbs_copula_before_sokuon_final &&
           ((!hasAuxiliaryParticleDecomposition(codepoints, start_pos, scan, dict_manager_) &&
             !spells_auxiliary_chain) ||
            has_deverbal_noun_shape_before_genitive || copula_selected_predicate_homograph) &&

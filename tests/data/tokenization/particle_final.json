@@ -1457,6 +1457,28 @@
       ],
       "id": "dayone",
       "input": "だよね"
+    },
+    {
+      "description": "勉強するなう - auto-generated",
+      "expected": [
+        {
+          "lemma": "勉強",
+          "pos": "Noun",
+          "surface": "勉強"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        },
+        {
+          "lemma": "なう",
+          "pos": "Particle",
+          "surface": "なう"
+        }
+      ],
+      "id": "surunau",
+      "input": "勉強するなう"
     }
   ],
   "description": "particle_final tests",
