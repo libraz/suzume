@@ -637,6 +637,12 @@ bool endsWithAuxiliaryAfterOkurigana(const dictionary::DictionaryManager* dict_m
   return auxiliaryClosingAfterOkurigana(dict_manager, codepoints, okurigana_start, end_pos) != nullptr;
 }
 
+bool closesOnPoliteCopula(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
+                          size_t okurigana_start, size_t end_pos) {
+  const auto* auxiliary = auxiliaryClosingAfterOkurigana(dict_manager, codepoints, okurigana_start, end_pos);
+  return auxiliary != nullptr && auxiliary->extended_pos == core::ExtendedPOS::AuxCopulaDesu;
+}
+
 const dictionary::DictionaryEntry* auxiliaryClosingAfterOkurigana(const dictionary::DictionaryManager* dict_manager,
                                                                   const std::vector<char32_t>& codepoints,
                                                                   size_t okurigana_start, size_t end_pos) {

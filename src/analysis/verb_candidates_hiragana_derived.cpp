@@ -426,6 +426,7 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
     const core::ExtendedPOS extended_pos =
         is_lexical_negative_continuation ? core::ExtendedPOS::VerbMizenkei : core::ExtendedPOS::VerbRenyokei;
     if (!is_dict_verb && (vh::endsWithFocusParticleTail(dict_manager, codepoints, start_pos, end_pos) ||
+                          vh::closesOnPoliteCopula(dict_manager, codepoints, start_pos, end_pos) ||
                           vh::coinedVerbOpensOnArgumentParticle(dict_manager, inflection, codepoints, start_pos,
                                                                 end_pos, chosen_confidence))) {
       continue;

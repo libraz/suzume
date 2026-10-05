@@ -1652,6 +1652,28 @@
       ],
       "id": "ikedo",
       "input": "駅遠いけど…"
+    },
+    {
+      "description": "おいしいですね - auto-generated",
+      "expected": [
+        {
+          "lemma": "おいしい",
+          "pos": "Adjective",
+          "surface": "おいしい"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        }
+      ],
+      "id": "oishiidesune",
+      "input": "おいしいですね"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 3/3)",

@@ -1592,14 +1592,20 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       // predicate reading of the whole span is the modifier (おおきい|の, 楽しい|の)
       // and the nominal promotion must stand down, just as it does at a clause
       // boundary.
+      // A copula or auxiliary behind the run takes an adjective terminal as
+      // readily as a noun (おいしい+です), so there only the productive -しい
+      // terminal counts: its suffix is grammatical evidence of the シク class,
+      // while a bare い ending is as often a noun's last mora (ぶたい+です).
       const bool has_inflected_predicate_reading =
-          ((right_clause && !(left_genitive_bracket && len == 2)) || right_kanji_word ||
-           (right_genitive_after_substantive_run && !has_deverbal_noun_shape_before_genitive)) &&
-          std::any_of(promoted_inflections.begin(), promoted_inflections.end(),
-                      [](const grammar::InflectionCandidate& inflection_candidate) {
-                        return !inflection_candidate.suffix.empty() &&
-                               inflection_candidate.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence;
-                      });
+          (((right_clause && !(left_genitive_bracket && len == 2)) || right_kanji_word ||
+            (right_genitive_after_substantive_run && !has_deverbal_noun_shape_before_genitive)) &&
+           std::any_of(promoted_inflections.begin(), promoted_inflections.end(),
+                       [](const grammar::InflectionCandidate& inflection_candidate) {
+                         return !inflection_candidate.suffix.empty() &&
+                                inflection_candidate.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence;
+                       })) ||
+          ((right_copula || right_auxiliary) &&
+           verb_helpers::isProductiveShiiAdjectiveTerminal(promoted_surface, inflection_));
       // The colloquial contraction of the hypothetical is a predicate reading
       // of the whole run even though the contracted surface itself does not
       // analyze as a conjugation, because the conjunctive particle has fused
@@ -1653,6 +1659,49 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
           }
         }
       }
+      // A registered word of two morae or more followed by the copula or by
+      // auxiliaries it licenses is that word's predicate (なぜ+だ, これ+です),
+      // not an unregistered noun. Particles and auxiliaries are excluded as the
+      // word: their kana as often begin a noun (から+だ, く+つ+だっ+た).
+      bool closes_registered_word_predicate = false;
+      for (size_t word_end = start_pos + 2;
+           word_end < scan && !closes_registered_word_predicate && dict_manager_ != nullptr; ++word_end) {
+        const auto* word = lookupEntryInRange(*dict_manager_, codepoints, start_pos, word_end);
+        if (word == nullptr || word->pos == core::PartOfSpeech::Particle ||
+            word->pos == core::PartOfSpeech::Auxiliary) {
+          continue;
+        }
+        for (size_t aux_end = word_end + 1; aux_end <= scan && !closes_registered_word_predicate; ++aux_end) {
+          const auto* auxiliary =
+              lookupEntryInRange(*dict_manager_, codepoints, word_end, aux_end, core::PartOfSpeech::Auxiliary);
+          closes_registered_word_predicate =
+              auxiliary != nullptr &&
+              (auxiliary->extended_pos == core::ExtendedPOS::AuxCopulaDa ||
+               auxiliary->extended_pos == core::ExtendedPOS::AuxCopulaDesu ||
+               BigramTable::getCost(word->extended_pos, auxiliary->extended_pos) < bigram_cost::kNeutral) &&
+              (aux_end == scan ||
+               maximalSegmentCount(*dict_manager_, codepoints, aux_end, scan, core::PartOfSpeech::Auxiliary) > 0);
+        }
+      }
+      // Nor may it finish an auxiliary that opens on the particle-shaped kana in
+      // front of it when what is left is particles (なん+で|す+よ+ね is
+      // なん+です+よ+ね): the run is the tail of a function-word chain.
+      bool finishes_auxiliary_chain = false;
+      for (size_t aux_end = start_pos + 1;
+           aux_end <= scan && !finishes_auxiliary_chain && dict_manager_ != nullptr && start_pos >= 1; ++aux_end) {
+        finishes_auxiliary_chain = lookupEntryInRange(*dict_manager_, codepoints, start_pos - 1, aux_end,
+                                                      core::PartOfSpeech::Auxiliary) != nullptr &&
+                                   (aux_end == scan || maximalSegmentCount(*dict_manager_, codepoints, aux_end, scan,
+                                                                           core::PartOfSpeech::Particle) > 0);
+      }
+      // A run spelled wholly by two or more auxiliaries (い+です) is a predicate
+      // tail. The classical perfect is left out, as in the function-word chain
+      // check: its one-mora cells are admitted only inside their own chain and
+      // would otherwise decompose ordinary nouns (に+おい).
+      const bool spells_auxiliary_chain =
+          dict_manager_ != nullptr && len >= 3 &&
+          maximalSegmentCount(*dict_manager_, codepoints, start_pos, scan, core::PartOfSpeech::Auxiliary,
+                              core::ExtendedPOS::AuxClassicalPerfect) >= 2;
       // ご before kana is the Sino-Japanese honorific on a kana verbal noun
       // (ご+あんない+します); a rescue would swallow the prefix into the noun.
       const bool opens_on_sino_prefix =
@@ -1669,8 +1718,10 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
           (right_particle || right_clause || right_auxiliary || right_kanji_word || right_suffix) &&
           !crossed_verified_predicate && !cuts_into_predicate && !opens_on_irrealis_chain &&
           !has_inflected_predicate_reading && !opens_on_sino_prefix && !absorbs_trailing_suffix &&
-          !spells_contracted_hypothetical && !steals_formal_noun_head && !absorbs_copula_before_sokuon_final &&
-          (!hasAuxiliaryParticleDecomposition(codepoints, start_pos, scan, dict_manager_) ||
+          !closes_registered_word_predicate && !finishes_auxiliary_chain && !spells_contracted_hypothetical &&
+          !steals_formal_noun_head && !absorbs_copula_before_sokuon_final &&
+          ((!hasAuxiliaryParticleDecomposition(codepoints, start_pos, scan, dict_manager_) &&
+            !spells_auxiliary_chain) ||
            has_deverbal_noun_shape_before_genitive || copula_selected_predicate_homograph) &&
           (!hasFunctionWordChainDecomposition(codepoints, start_pos, scan, dict_manager_) ||
            has_deverbal_noun_shape_before_genitive || copula_selected_predicate_homograph)) {

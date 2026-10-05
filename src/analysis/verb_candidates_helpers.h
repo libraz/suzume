@@ -508,6 +508,16 @@ const dictionary::DictionaryEntry* auxiliaryClosingAfterOkurigana(const dictiona
                                                                   size_t okurigana_start, size_t end_pos);
 
 /**
+ * @brief Whether the auxiliary closing the span after its okurigana is the polite copula
+ *
+ * No verb's own cell spells です/でし: a coined hiragana verb ending in one is a
+ * nominal plus the copula (ごはん+です, ごはん+でし+た).
+ * @see fabricated closed-class absorption guards (top of this header)
+ */
+bool closesOnPoliteCopula(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
+                          size_t okurigana_start, size_t end_pos);
+
+/**
  * @brief Length of a multi-mora negative auxiliary written at a position
  *
  * Returns the codepoint length of the longest dictionary auxiliary starting at

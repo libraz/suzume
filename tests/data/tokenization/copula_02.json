@@ -1,0 +1,124 @@
+{
+  "cases": [
+    {
+      "description": "毎日のブログ更新って大変なんですよね。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "毎日",
+          "pos": "Noun",
+          "surface": "毎日"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "ブログ",
+          "pos": "Noun",
+          "surface": "ブログ"
+        },
+        {
+          "lemma": "更新",
+          "pos": "Noun",
+          "surface": "更新"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "大変",
+          "pos": "Adjective",
+          "surface": "大変"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        }
+      ],
+      "id": "no_ttte_nandesuyone",
+      "input": "毎日のブログ更新って大変なんですよね。"
+    },
+    {
+      "description": "ごはんです - auto-generated",
+      "expected": [
+        {
+          "lemma": "ごはん",
+          "pos": "Noun",
+          "surface": "ごはん"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "gohandesu",
+      "input": "ごはんです"
+    },
+    {
+      "description": "なぜだ - auto-generated",
+      "expected": [
+        {
+          "lemma": "なぜ",
+          "pos": "Adverb",
+          "surface": "なぜ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "nazeda",
+      "input": "なぜだ"
+    },
+    {
+      "description": "ごはんでした - auto-generated",
+      "expected": [
+        {
+          "lemma": "ごはん",
+          "pos": "Noun",
+          "surface": "ごはん"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "でし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "gohandeshita",
+      "input": "ごはんでした"
+    }
+  ],
+  "description": "Copula patterns (だ、です、である) (part 2/2)",
+  "version": "1.0"
+}

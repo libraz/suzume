@@ -378,6 +378,13 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
     // same run are unaffected. The GodanWa row is excluded because its terminal
     // う is also the volitional auxiliary and a frequent noun ending
     // (とうきょう, でしょう); that row keeps its own scanner-verified gate below.
+    // A run closing on the polite copula after its okurigana is a nominal plus
+    // です (ごはん+です), which no verb's own terminal spells.
+    // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+    if (!is_dictionary_verb && vh::closesOnPoliteCopula(dict_manager, codepoints, start_pos, end_pos)) {
+      SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << surface << "\" closes on the polite copula\n");
+      continue;
+    }
     if (!is_dictionary_verb && end_pos == hiragana_end && end_pos - start_pos >= 3 &&
         grammar::isGodanVerbType(best.verb_type) && best.verb_type != grammar::VerbType::GodanWa &&
         best.base_form == surface && best.confidence < candidate::verb_cost::kTerminalHiraganaGodanConfidence) {

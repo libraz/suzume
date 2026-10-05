@@ -124,6 +124,97 @@
       ],
       "id": "desiderative_listing_shi_before_ne",
       "input": "遊びたいしね"
+    },
+    {
+      "description": "家計管理の工夫をシェアしたいです。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "家計管理",
+          "pos": "Noun",
+          "surface": "家計管理"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "工夫",
+          "pos": "Noun",
+          "surface": "工夫"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "シェア",
+          "pos": "Noun",
+          "surface": "シェア"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たい"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "no_wo_shitaidesu",
+      "input": "家計管理の工夫をシェアしたいです。"
+    },
+    {
+      "description": "見たいです - auto-generated",
+      "expected": [
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たい"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "taidesu",
+      "input": "見たいです"
+    },
+    {
+      "description": "したいです - auto-generated",
+      "expected": [
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たい"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "shitaidesu",
+      "input": "したいです"
     }
   ],
   "description": "auxiliary_desire tests",
