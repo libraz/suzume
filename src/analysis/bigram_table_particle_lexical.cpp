@@ -157,8 +157,9 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
       {EPOS::AuxVolitional, EPOS::AuxTenseTa, cost::kAlmostNever},
 
       // The contracted negative followed by the copula is the productive
-      // んで construction (読まんで).
-      {EPOS::AuxNegativeNu, EPOS::AuxCopulaDa, cost::kDoubleVeryStrongBonus},
+      // んで construction (読まんで). The bonus stays below the attributive-copula
+      // penalty, since the attributive な never follows the negative.
+      {EPOS::AuxNegativeNu, EPOS::AuxCopulaDa, cost::kExtremeBonus},
 
       // ParticleCase → Noun (が+学生) - neutral
       {EPOS::ParticleCase, EPOS::Noun, cost::kNeutral},

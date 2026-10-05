@@ -70,13 +70,15 @@ float computeLateLexicalBoundaryBonus(const core::LatticeEdge& prev, const core:
   // fabricate い|え|だっ and いえ|だっ; terminal/modal predicates have valid
   // productive copular continuations. A continuative (食べ, 見て+み) takes the
   // imperative particle な and a terminal (帰る, 帰ん) the prohibitive one,
-  // never the attributive copula.
+  // never the attributive copula; nor does the negative ぬ/ん, which is
+  // attributive itself (見ん+な is the prohibitive, 知らん+な the final particle).
   const bool nonterminal_predicate_before_assertive_copula =
       next.extended_pos == core::ExtendedPOS::AuxCopulaDa &&
       (prev.extended_pos == core::ExtendedPOS::VerbKateikei || prev.extended_pos == core::ExtendedPOS::AuxPotential ||
        ((prev.extended_pos == core::ExtendedPOS::VerbRenyokei ||
          prev.extended_pos == core::ExtendedPOS::AuxAspectMiru ||
-         prev.extended_pos == core::ExtendedPOS::VerbShuushikei) &&
+         prev.extended_pos == core::ExtendedPOS::VerbShuushikei ||
+         prev.extended_pos == core::ExtendedPOS::AuxNegativeNu) &&
         grammar::isAttributiveCopulaNa(next.surface)));
   // Colloquial emphatic extension may add っ to an adverb at a clause edge, but
   // not immediately before the past auxiliary.  In that position the sokuon is

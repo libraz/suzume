@@ -1487,6 +1487,50 @@
       ],
       "id": "kannoyo",
       "input": "分かんのよ"
+    },
+    {
+      "description": "見んなよ - auto-generated",
+      "expected": [
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見ん"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "nnayo_2",
+      "input": "見んなよ"
+    },
+    {
+      "description": "知らんな - auto-generated",
+      "expected": [
+        {
+          "lemma": "知る",
+          "pos": "Verb",
+          "surface": "知ら"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        }
+      ],
+      "id": "ranna",
+      "input": "知らんな"
     }
   ],
   "description": "Contraction patterns (てる、ちゃう)",

@@ -548,8 +548,12 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
     }
     const std::string base_form = stem + "る";
     // A bare kanji stem is also an Ichidan stem (見る, 着る); only an attested
-    // ら irrealis proves the Godan-ra row the contraction needs (帰ん+ない).
-    if (n_pos == kanji_end && !vh::attestsGodanRaIrrealis(dict_manager, stem)) {
+    // ら irrealis proves the Godan-ra row the negative contraction needs
+    // (帰ん+ない). The terminal contracts る→ん on either row, so before な/の a
+    // bare Ichidan stem qualifies as well (見ん+な, 寝ん+な).
+    const bool bare_ichidan_terminal = terminal_follows && n_pos == kanji_end && n_pos == start_pos + 1 &&
+                                       vh::isSingleKanjiIchidan(codepoints[start_pos]);
+    if (n_pos == kanji_end && !bare_ichidan_terminal && !vh::attestsGodanRaIrrealis(dict_manager, stem)) {
       continue;
     }
     // A kana okurigana before the nominalizer is a complete predicate of its
@@ -563,7 +567,8 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
     }
     candidates.push_back(makeVerbCandidate(
         codepoints, start_pos, nominalizer_follows ? n_pos : n_pos + 1, candidate::verb_cost::kStandardBonus, base_form,
-        dictionary::ConjugationType::GodanRa, true, CandidateOrigin::VerbKanji, candidate::kVerifiedConfidence,
+        bare_ichidan_terminal ? dictionary::ConjugationType::Ichidan : dictionary::ConjugationType::GodanRa, true,
+        CandidateOrigin::VerbKanji, candidate::kVerifiedConfidence,
         negative_follows ? "kanji_n_onbin_nai" : "kanji_n_contracted_terminal",
         negative_follows ? core::ExtendedPOS::VerbMizenkei : core::ExtendedPOS::VerbShuushikei));
     break;

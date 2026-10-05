@@ -104,7 +104,7 @@ TEST(BigramTableTest, PureExtendedPosRulesKeepTheirConnectionCosts) {
       {POS::Particle, EPOS::ParticleCase, POS::Particle, EPOS::ParticleFinal, 3.5F},
       {POS::Determiner, EPOS::Determiner, POS::Adjective, EPOS::AdjStem, -0.3F},
       {POS::Auxiliary, EPOS::AuxVolitional, POS::Auxiliary, EPOS::AuxTenseTa, 3.3F},
-      {POS::Auxiliary, EPOS::AuxNegativeNu, POS::Auxiliary, EPOS::AuxCopulaDa, -2.9F},
+      {POS::Auxiliary, EPOS::AuxNegativeNu, POS::Auxiliary, EPOS::AuxCopulaDa, -1.7F},
   }};
 
   const Scorer scorer;
