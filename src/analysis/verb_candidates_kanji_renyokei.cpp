@@ -682,8 +682,14 @@ void appendGodanSaRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
       if (dict_manager != nullptr && renyokei_end >= kanji_end + 2 && !base_in_dict) {
         const auto* tail_entry =
             lookupEntryInRange(*dict_manager, codepoints, kanji_end, renyokei_end, core::PartOfSpeech::Auxiliary);
-        const bool selects_godan_sa_onbin = renyokei_end < codepoints.size() &&
-                                            (codepoints[renyokei_end] == U'た' || codepoints[renyokei_end] == U'て');
+        // The conjectural らし never takes た/て or ます, and a clause chained
+        // through 、 after a case-marked argument wants a continuative
+        // (頭を揺らし、), so each of these selects the verb cell instead.
+        const bool selects_godan_sa_onbin =
+            renyokei_end < codepoints.size() &&
+            (codepoints[renyokei_end] == U'た' || codepoints[renyokei_end] == U'て' ||
+             vh::masuAuxFollowsAt(codepoints, renyokei_end) ||
+             vh::isCommaClauseChainingRenyokei(codepoints, start_pos, renyokei_end, dict_manager));
         if (tail_entry != nullptr &&
             (tail_entry->extended_pos == core::ExtendedPOS::AuxCopulaDa ||
              tail_entry->extended_pos == core::ExtendedPOS::AuxCopulaDesu ||

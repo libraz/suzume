@@ -687,6 +687,102 @@
       ],
       "id": "kusanai",
       "input": "失くさない"
+    },
+    {
+      "description": "godan sa continuative ending in rashi before a comma-chained clause",
+      "expected": [
+        {
+          "lemma": "頭",
+          "pos": "Noun",
+          "surface": "頭"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "揺らす",
+          "pos": "Verb",
+          "surface": "揺らし"
+        },
+        {
+          "lemma": "静か",
+          "pos": "Adjective",
+          "surface": "静か"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "眠る",
+          "pos": "Verb",
+          "surface": "眠る"
+        }
+      ],
+      "id": "wo_rashi_kani_ru",
+      "input": "頭を揺らし、静かに眠る"
+    },
+    {
+      "description": "godan sa continuative ending in rashi before a comma-chained clause",
+      "expected": [
+        {
+          "lemma": "道",
+          "pos": "Noun",
+          "surface": "道"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "照らす",
+          "pos": "Verb",
+          "surface": "照らし"
+        },
+        {
+          "lemma": "進む",
+          "pos": "Verb",
+          "surface": "進む"
+        }
+      ],
+      "id": "wo_rashi_mu",
+      "input": "道を照らし、進む"
+    },
+    {
+      "description": "godan sa continuative ending in rashi before the polite masu",
+      "expected": [
+        {
+          "lemma": "旗",
+          "pos": "Noun",
+          "surface": "旗"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "揺らす",
+          "pos": "Verb",
+          "surface": "揺らし"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ませ"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        }
+      ],
+      "id": "wo_rashimasen",
+      "input": "旗を揺らしません"
     }
   ],
   "description": "Godan Sa-row verbs (五段サ行動詞) - verbs ending in す",
