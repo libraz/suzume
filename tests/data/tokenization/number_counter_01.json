@@ -2537,8 +2537,65 @@
       ],
       "id": "3_wo_ku",
       "input": "3ページ目を開く"
+    },
+    {
+      "description": "旅行の予算は1泊5000円で考えてます。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "旅行",
+          "pos": "Noun",
+          "surface": "旅行"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "予算",
+          "pos": "Noun",
+          "surface": "予算"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "1泊",
+          "pos": "Noun",
+          "surface": "1泊"
+        },
+        {
+          "lemma": "5000円",
+          "pos": "Noun",
+          "surface": "5000円"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "考える",
+          "pos": "Verb",
+          "surface": "考え"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "no_ha1_5000_de_etemasu",
+      "input": "旅行の予算は1泊5000円で考えてます。"
     }
   ],
-  "description": "number_counter tests",
+  "description": "number_counter tests (part 1/2)",
   "version": "1.0"
 }

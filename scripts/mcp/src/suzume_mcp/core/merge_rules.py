@@ -331,6 +331,29 @@ _COUNTER_CHAIN_TAILS = frozenset({"年", "月", "日", "週", "時", "分", "秒
 _COUNTER_CHAIN_UNIT = regex.compile(r"[0-9０-９〇零一二三四五六七八九十百千万億兆]+[年月日時分秒間泊割]$")
 
 
+# Counter tails that chain into a following quantity of the same dimension.
+_TIME_COUNTER_TAILS = frozenset("年月週日時間分秒")
+_COUNTER_DIMENSION_SUCCESSORS = {"泊": frozenset("日"), "割": frozenset("分厘")}
+
+
+def _same_counter_dimension(tail: str, next_tail: str) -> bool:
+    """Whether a quantity ending in `next_tail` continues one ending in `tail`."""
+    if tail in _TIME_COUNTER_TAILS:
+        return next_tail in _TIME_COUNTER_TAILS
+    return next_tail in _COUNTER_DIMENSION_SUCCESSORS.get(tail, frozenset())
+
+
+def _continues_counter_dimension(tail: str, tokens: list[dict], number_index: int) -> bool:
+    """Whether the numeral at `number_index` opens a quantity of the same dimension as `tail`."""
+    index = number_index
+    while index < len(tokens) and tokens[index].get("pos") == "名詞" and tokens[index].get("pos_sub1") == "数":
+        index += 1
+    if index >= len(tokens):
+        return False
+    counter = tokens[index].get("surface", "")
+    return counter != "" and _same_counter_dimension(tail, counter[-1])
+
+
 def _heads_nidan_cell(tokens: list[dict], index: int) -> bool:
     """Whether the token at ``index`` is the stem of a classical 二段 finite cell."""
     following = tokens[index + 1] if index + 1 < len(tokens) else None
@@ -1365,18 +1388,35 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                 is_me_suffix = ns == "目" and np == "名詞" and ns1 == "接尾"
                 is_large_unit = np == "名詞" and ns1 == "数" and ns in ("万", "億", "兆")
                 is_number_after_large = combined.endswith(("万", "億", "兆")) and np == "名詞" and ns1 == "数"
-                is_number_after_counter_chain = combined[-1:] in _COUNTER_CHAIN_TAILS and np == "名詞" and ns1 == "数"
+                # A quantity chains on only within one dimension (1時間30分,
+                # 1泊2日); where the dimension changes the second quantity is a
+                # rate over the first (1泊+5000円, 1日+3回).
+                is_number_after_counter_chain = (
+                    combined[-1:] in _COUNTER_CHAIN_TAILS
+                    and np == "名詞"
+                    and ns1 == "数"
+                    and _continues_counter_dimension(combined[-1], tokens, j)
+                )
                 # IPADIC also emits calendar pieces such as 三月 as one
                 # non-numeric token. It is still the next numeral+counter
                 # member of a chain whose left member has already been read.
                 is_compact_counter_chain_unit = (
-                    combined[-1:] in _COUNTER_CHAIN_TAILS and _COUNTER_CHAIN_UNIT.fullmatch(ns) is not None
+                    combined[-1:] in _COUNTER_CHAIN_TAILS
+                    and _COUNTER_CHAIN_UNIT.fullmatch(ns) is not None
+                    and _same_counter_dimension(combined[-1], ns[-1])
                 )
                 is_number_after_decimal = combined.endswith(".") and np == "名詞" and ns1 == "数"
                 is_counter_aux = ns == "つ" and np in ("助動詞", "動詞")
                 is_percent = ns == "%"
                 is_decimal = ns == "."
-                is_consecutive_number = np == "名詞" and ns1 == "数" and regex.match(r"^[0-9０-９]+$", ns)
+                is_consecutive_number = (
+                    np == "名詞"
+                    and ns1 == "数"
+                    and regex.match(r"^[0-9０-９]+$", ns)
+                    # A digit run cut into pieces, or the denominator of a
+                    # fraction (3分の+1); a counter in between ends the quantity.
+                    and regex.match(r"[0-9０-９,，.．の]", combined[-1:])
+                )
                 is_kanji_number_run = (
                     np == "名詞" and ns1 == "数" and regex.match(r"^[一二三四五六七八九十百千万億兆〇零]+$", ns)
                 )

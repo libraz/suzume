@@ -751,3 +751,18 @@ class TestGeNaiAdjective:
     def test_splits_when_the_ge_noun_stands_alone(self, text, tail):
         tokens, _, _ = get_expected_tokens(text)
         assert [(token["surface"], token["pos"]) for token in tokens[:2]] == [("危なげ", "Noun"), (tail, "Adjective")]
+
+
+class TestRateQuantities:
+    @pytest.mark.parametrize(
+        ("text", "quantities"),
+        [("1泊5000円", ["1泊", "5000円"]), ("1日3回", ["1日", "3回"]), ("1個300円", ["1個", "300円"])],
+    )
+    def test_rate_splits_where_the_dimension_changes(self, text, quantities):
+        tokens, _, _ = get_expected_tokens(text)
+        assert [token["surface"] for token in tokens] == quantities
+
+    @pytest.mark.parametrize("text", ["1泊2日", "2泊3日", "1時間30分", "3割5分", "3分の1"])
+    def test_one_dimension_stays_one_quantity(self, text):
+        tokens, _, _ = get_expected_tokens(text)
+        assert [token["surface"] for token in tokens] == [text]

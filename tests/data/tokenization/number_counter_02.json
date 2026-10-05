@@ -1,0 +1,55 @@
+{
+  "cases": [
+    {
+      "description": "1日3回の水やり - auto-generated",
+      "expected": [
+        {
+          "lemma": "1日",
+          "pos": "Noun",
+          "surface": "1日"
+        },
+        {
+          "lemma": "3回",
+          "pos": "Noun",
+          "surface": "3回"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "水",
+          "pos": "Noun",
+          "surface": "水"
+        },
+        {
+          "lemma": "やる",
+          "pos": "Verb",
+          "surface": "やり"
+        }
+      ],
+      "id": "1_3_no_yari",
+      "input": "1日3回の水やり"
+    },
+    {
+      "description": "1個300円 - auto-generated",
+      "expected": [
+        {
+          "lemma": "1個",
+          "pos": "Noun",
+          "surface": "1個"
+        },
+        {
+          "lemma": "300円",
+          "pos": "Noun",
+          "surface": "300円"
+        }
+      ],
+      "id": "1_300",
+      "input": "1個300円"
+    }
+  ],
+  "description": "number_counter tests (part 2/2)",
+  "version": "1.0"
+}
