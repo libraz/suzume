@@ -1355,6 +1355,152 @@
       "tags": [
         "restaurant"
       ]
+    },
+    {
+      "description": "散歩してみた結果がこれなんですよ。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "散歩",
+          "pos": "Noun",
+          "surface": "散歩"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "みる",
+          "pos": "Auxiliary",
+          "surface": "み"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "結果",
+          "pos": "Noun",
+          "surface": "結果"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "これ",
+          "pos": "Pronoun",
+          "surface": "これ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "shitemita_gakorenandesuyo",
+      "input": "散歩してみた結果がこれなんですよ。"
+    },
+    {
+      "description": "結果がそれなんです - auto-generated",
+      "expected": [
+        {
+          "lemma": "結果",
+          "pos": "Noun",
+          "surface": "結果"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "それ",
+          "pos": "Pronoun",
+          "surface": "それ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "gasorenandesu",
+      "input": "結果がそれなんです"
+    },
+    {
+      "description": "答えがあれなんだよ - auto-generated",
+      "expected": [
+        {
+          "lemma": "答え",
+          "pos": "Noun",
+          "surface": "答え"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "あれ",
+          "pos": "Pronoun",
+          "surface": "あれ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "egaarenandayo",
+      "input": "答えがあれなんだよ"
     }
   ],
   "version": "1.0"

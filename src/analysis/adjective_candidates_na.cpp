@@ -156,19 +156,23 @@ void generateHiraganaAttributiveNaStemCandidates(const std::vector<char32_t>& co
     }
     // A registered word is not re-read as a coined stem, and neither is a
     // registered word plus a particle (それ+は+なんで) or a bound suffix
-    // (らし+げ+な).
+    // (らし+げ+な), nor a particle plus a registered word (が+これ+なんです).
     const auto stem_matches = lookupResultsInRange(*dict_manager, codepoints, start_pos, stem_end);
     const bool registered_stem = std::any_of(stem_matches.begin(), stem_matches.end(), [&](const auto& match) {
       return match.entry != nullptr && match.length == stem_end - start_pos;
     });
-    bool ends_on_particle_after_word = false;
-    for (size_t split = start_pos + 1; split < stem_end && !ends_on_particle_after_word; ++split) {
-      ends_on_particle_after_word =
+    bool splits_at_particle = false;
+    for (size_t split = start_pos + 1; split < stem_end && !splits_at_particle; ++split) {
+      const bool word_then_particle =
           lookupEntryInRange(*dict_manager, codepoints, start_pos, split) != nullptr &&
           (lookupEntryInRange(*dict_manager, codepoints, split, stem_end, core::PartOfSpeech::Particle) != nullptr ||
            lookupEntryInRange(*dict_manager, codepoints, split, stem_end, core::PartOfSpeech::Suffix) != nullptr);
+      const bool particle_then_word =
+          lookupEntryInRange(*dict_manager, codepoints, start_pos, split, core::PartOfSpeech::Particle) != nullptr &&
+          lookupEntryInRange(*dict_manager, codepoints, split, stem_end) != nullptr;
+      splits_at_particle = word_then_particle || particle_then_word;
     }
-    if (registered_stem || ends_on_particle_after_word) {
+    if (registered_stem || splits_at_particle) {
       return;
     }
     const std::string stem = extractSubstring(codepoints, start_pos, stem_end);
