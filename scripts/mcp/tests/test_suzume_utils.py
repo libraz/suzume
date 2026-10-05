@@ -383,3 +383,28 @@ class TestClassicalContinuativeHost:
         before = {"花見に行く": "花見", "月見をする": "月見", "壁にける": "壁", "提出す": "提出", "谷深く": "谷"}[text]
         tokens, _, _ = get_expected_tokens(text)
         assert tokens[0]["surface"] == before
+
+
+class TestClassicalTerminalAuxiliaryHost:
+    @pytest.mark.parametrize(
+        ("text", "expected"),
+        [
+            ("鳴くらむ", [("鳴く", "Verb"), ("らむ", "Auxiliary")]),
+            ("花咲くらむ", [("花", "Noun"), ("咲く", "Verb"), ("らむ", "Auxiliary")]),
+            ("見ゆらむ", [("見ゆ", "Verb"), ("らむ", "Auxiliary")]),
+            ("恋ふらむ", [("恋ふ", "Verb"), ("らむ", "Auxiliary")]),
+            ("見ゆめり", [("見ゆ", "Verb"), ("めり", "Auxiliary")]),
+            ("漕ぐめり", [("漕ぐ", "Verb"), ("めり", "Auxiliary")]),
+        ],
+    )
+    def test_restores_the_terminal_host(self, text, expected):
+        tokens, _, _ = get_expected_tokens(text)
+        assert [(token["surface"], token["pos"]) for token in tokens] == expected
+
+    @pytest.mark.parametrize(
+        ("text", "surfaces"),
+        [("目がくらむ", ["目", "が", "くらむ"]), ("事故る", ["事故る"]), ("子供らむ", ["子供", "らむ"])],
+    )
+    def test_leaves_non_terminal_hosts(self, text, surfaces):
+        tokens, _, _ = get_expected_tokens(text)
+        assert [token["surface"] for token in tokens] == surfaces

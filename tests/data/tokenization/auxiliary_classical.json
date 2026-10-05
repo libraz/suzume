@@ -2142,6 +2142,84 @@
       ],
       "id": "renubeshi",
       "input": "日暮れぬべし"
+    },
+    {
+      "description": "Present conjecture ramu after a godan-ka terminal",
+      "expected": [
+        {
+          "lemma": "鳴く",
+          "pos": "Verb",
+          "surface": "鳴く"
+        },
+        {
+          "lemma": "らむ",
+          "pos": "Auxiliary",
+          "surface": "らむ"
+        }
+      ],
+      "id": "kuramu",
+      "input": "鳴くらむ"
+    },
+    {
+      "description": "Present conjecture ramu after a godan-ka terminal with a fused subject",
+      "expected": [
+        {
+          "lemma": "花",
+          "pos": "Noun",
+          "surface": "花"
+        },
+        {
+          "lemma": "咲く",
+          "pos": "Verb",
+          "surface": "咲く"
+        },
+        {
+          "lemma": "らむ",
+          "pos": "Auxiliary",
+          "surface": "らむ"
+        }
+      ],
+      "id": "kuramu_2",
+      "input": "花咲くらむ"
+    },
+    {
+      "description": "Present conjecture ramu after a ha-row nidan terminal",
+      "expected": [
+        {
+          "lemma": "恋ふ",
+          "pos": "Verb",
+          "surface": "恋ふ"
+        },
+        {
+          "lemma": "らむ",
+          "pos": "Auxiliary",
+          "surface": "らむ"
+        }
+      ],
+      "id": "furamu",
+      "input": "恋ふらむ"
+    },
+    {
+      "description": "Present conjecture ramu after a godan-ka terminal with a fused subject",
+      "expected": [
+        {
+          "lemma": "風",
+          "pos": "Noun",
+          "surface": "風"
+        },
+        {
+          "lemma": "吹く",
+          "pos": "Verb",
+          "surface": "吹く"
+        },
+        {
+          "lemma": "らむ",
+          "pos": "Auxiliary",
+          "surface": "らむ"
+        }
+      ],
+      "id": "kuramu_3",
+      "input": "風吹くらむ"
     }
   ],
   "description": "auxiliary_classical tests",

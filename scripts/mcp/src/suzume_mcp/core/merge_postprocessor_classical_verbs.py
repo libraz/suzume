@@ -644,6 +644,7 @@ _NIDAN_INFLECTED_STEM_FORMS = frozenset({"未然形", "連用形"})
 
 
 _NIDAN_CELL = regex.compile(rf"^(\p{{Han}}[\p{{Han}}\p{{Hiragana}}]*?)([{''.join(_NIDAN_TERMINAL_ROWS)}])([るれ]?)$")
+_HA_ROW_TERMINAL = "ふ"
 # The kana a 二段 終止形 ends in, for callers that only see a rebuilt cell.
 NIDAN_TERMINAL_KANA = frozenset(_NIDAN_TERMINAL_ROWS)
 
@@ -654,10 +655,19 @@ def _nidan_terminal_lemma(stem: str, terminal: str) -> str | None:
     for vowel in _NIDAN_TERMINAL_ROWS[terminal]:
         if is_single_token_of_pos(stem + vowel + "る", "動詞"):
             return stem + terminal
+    # The ハ行 二段 verbs whose modern reflex moved to the ワ行 五段 (恋ふ → 恋う)
+    # have no 一段 headword; the 五段 one carries the same stem.
+    if terminal == _HA_ROW_TERMINAL and is_single_token_of_pos(stem + "う", "動詞"):
+        return stem + terminal
     return None
 
 
-def _nidan_cell_match(token: dict, following: dict) -> tuple[regex.Match, str] | None:
+# Auxiliaries that take a terminal, which the dictionary splits across the kana
+# it reads as a lexical verb in front (見+ゆら+む, 見+ゆめ+り).
+_TERMINAL_AUXILIARIES = frozenset({"らむ", "らし", "めり", "なり", "べし", "まじ"})
+
+
+def _nidan_cell_match(token: dict, following: dict, beyond: str = "") -> tuple[regex.Match, str] | None:
     """Match a 二段 cell across a token pair, allowing an unanalyzed tail.
 
     Where the cell ends the phrase the dictionary reads its kana as one unknown
@@ -669,10 +679,15 @@ def _nidan_cell_match(token: dict, following: dict) -> tuple[regex.Match, str] |
     cell = _NIDAN_CELL.match(head + tail)
     if cell is not None:
         return cell, ""
-    if following.get("lemma") not in ("*", "", None):
-        return None
+    unanalyzed = following.get("lemma") in ("*", "", None)
     for width in (2, 1):  # the cell's kana tail is the terminal plus an optional る
-        if width < len(tail) and (cell := _NIDAN_CELL.match(head + tail[:width])) is not None:
+        if width >= len(tail):
+            continue
+        # A lexical reading of the tail is kept unless what is left of it opens a
+        # terminal-taking auxiliary together with the next token.
+        if not unanalyzed and tail[width:] + beyond not in _TERMINAL_AUXILIARIES:
+            continue
+        if (cell := _NIDAN_CELL.match(head + tail[:width])) is not None:
             return cell, tail[width:]
     return None
 
@@ -689,7 +704,7 @@ def _is_common_noun(surface: str) -> bool:
     )
 
 
-def nidan_cell(token: dict, following: dict | None) -> tuple[str, str, str, str] | None:
+def nidan_cell(token: dict, following: dict | None, beyond: str = "") -> tuple[str, str, str, str] | None:
     """Return (host, surface, 終止形, remainder) when two tokens spell one 二段 finite cell.
 
     終止形 is the stem plus one U-row kana, 連体形 adds る and 已然形 adds れ.  The
@@ -703,7 +718,7 @@ def nidan_cell(token: dict, following: dict | None) -> tuple[str, str, str, str]
     """
     if following is None:
         return None
-    matched = _nidan_cell_match(token, following)
+    matched = _nidan_cell_match(token, following, beyond)
     if matched is None:
         return None
     cell, remainder = matched
@@ -755,15 +770,19 @@ def _postprocess_nidan_cell(result: list[dict], applied_rule: str | None) -> tup
     idx = 0
     while idx < len(result):
         token = result[idx]
-        cell = nidan_cell(token, result[idx + 1] if idx + 1 < len(result) else None)
+        beyond = result[idx + 2].get("surface", "") if idx + 2 < len(result) else ""
+        cell = nidan_cell(token, result[idx + 1] if idx + 1 < len(result) else None, beyond)
         if cell is not None:
             host, surface, lemma, remainder = cell
             if host:
                 merged.append({"surface": host, "pos": "名詞", "lemma": host})
             merged.append({"surface": surface, "pos": "動詞", "lemma": lemma})
-            if remainder:
-                merged.extend(mecab_analyze(remainder))
             idx += 2
+            if remainder + beyond in _TERMINAL_AUXILIARIES:
+                merged.append({"surface": remainder + beyond, "pos": "助動詞", "lemma": remainder + beyond})
+                idx += 1
+            elif remainder:
+                merged.extend(mecab_analyze(remainder))
             if applied_rule is None:
                 applied_rule = "classical-nidan-cell"
             continue

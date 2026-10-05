@@ -1,6 +1,8 @@
 """Context-dependent classical inflection and auxiliary restoration."""
 
-from .mecab import mecab_analyze
+import regex
+
+from .mecab import is_single_token_of_pos, mecab_analyze
 from .merge_postprocessor_common import _continuative_verb_tokens
 from .postprocessor_common import reports_mutation
 from .split_rules import base_from_renyokei
@@ -233,6 +235,17 @@ _CLASSICAL_RAMU = "らむ"
 _RAMU_HOST_POS = ("Verb", "Adjective", "Auxiliary")
 
 
+def _godan_ka_stem_offset(host: str) -> int | None:
+    """Where the godan-ka stem starts in an all-kanji host, else None.
+
+    The stem is the longest kanji tail the dictionary conjugates with く; a
+    subject fused in front of it is a nominal of its own (花|咲く).
+    """
+    if regex.fullmatch(r"\p{Han}+", host) is None:
+        return None
+    return next((start for start in range(len(host)) if is_single_token_of_pos(host[start:] + "く", "動詞")), None)
+
+
 @reports_mutation
 def postprocess_classical_ramu_boundary(tokens: list[dict]) -> None:
     """Repair the boundaries around the classical present conjecture らむ.
@@ -251,14 +264,17 @@ def postprocess_classical_ramu_boundary(tokens: list[dict]) -> None:
         token = tokens[idx]
         previous = tokens[idx - 1]
         if token.get("surface") == "くらむ" and token.get("pos") == "Verb":
-            stem = previous.get("surface", "")
-            if previous.get("pos") == "Noun" and len(stem) == 1:
-                previous["surface"] = f"{stem}く"
-                previous["pos"] = "Verb"
-                previous["lemma"] = f"{stem}く"
-                token["surface"] = _CLASSICAL_RAMU
-                token["pos"] = "Auxiliary"
-                token["lemma"] = _CLASSICAL_RAMU
+            host = previous.get("surface", "")
+            offset = _godan_ka_stem_offset(host) if previous.get("pos") in ("Noun", "Verb") else None
+            if offset is not None:
+                stem = host[offset:]
+                head = [{"surface": host[:offset], "pos": "Noun", "lemma": host[:offset]}] if offset else []
+                tokens[idx - 1 : idx + 1] = [
+                    *head,
+                    {"surface": f"{stem}く", "pos": "Verb", "lemma": f"{stem}く"},
+                    {"surface": _CLASSICAL_RAMU, "pos": "Auxiliary", "lemma": _CLASSICAL_RAMU},
+                ]
+                idx += len(head)
         elif (
             token.get("surface") == "ら"
             and idx + 1 < len(tokens)

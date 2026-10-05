@@ -1096,6 +1096,27 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                 if applied_rule is None:
                     applied_rule = "duration+span-kan"
 
+        # The classical inferential めり takes a terminal predicate; the
+        # dictionary has no entry and reads it as a noun め plus the perfect り,
+        # which a noun cannot carry.  A predicate is never a nominal host, so the
+        # denominal verb reading below does not apply after one either.
+        if (
+            not merged
+            and t.get("surface") == "め"
+            and t.get("pos") == "名詞"
+            and i > 0
+            and tokens[i - 1].get("pos") in ("動詞", "形容詞", "助動詞")
+            and tokens[i - 1].get("conj_form") == "基本形"
+            and i + 1 < len(tokens)
+            and tokens[i + 1].get("surface") == "り"
+            and tokens[i + 1].get("pos") == "助動詞"
+        ):
+            result.append({"surface": "めり", "pos": "助動詞", "lemma": "めり"})
+            i += 2
+            merged = True
+            if applied_rule is None:
+                applied_rule = "classical-meri"
+
         # A noun-derived Godan-る verb is one lexical predicate.  Rejoin a
         # malformed reference tail (事故+る, 事故+っ+た, ミ+スっ+た) by its
         # inflectional evidence; the rule also covers productive hosts that
