@@ -982,6 +982,57 @@
       ],
       "id": "giru_2",
       "input": "安過ぎる"
+    },
+    {
+      "description": "恩着せがましくない - auto-generated",
+      "expected": [
+        {
+          "lemma": "恩着せがましい",
+          "pos": "Adjective",
+          "surface": "恩着せがましく"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
+      "id": "segamashikunai",
+      "input": "恩着せがましくない"
+    },
+    {
+      "description": "恩着せがましかった - auto-generated",
+      "expected": [
+        {
+          "lemma": "恩着せがましい",
+          "pos": "Adjective",
+          "surface": "恩着せがましかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "segamashikattta",
+      "input": "恩着せがましかった"
+    },
+    {
+      "description": "言い訳がましく話す - auto-generated",
+      "expected": [
+        {
+          "lemma": "言い訳がましい",
+          "pos": "Adjective",
+          "surface": "言い訳がましく"
+        },
+        {
+          "lemma": "話す",
+          "pos": "Verb",
+          "surface": "話す"
+        }
+      ],
+      "id": "i_gamashiku_su",
+      "input": "言い訳がましく話す"
     }
   ],
   "description": "Compound adjectives (〜やすい、〜にくい、〜すぎる)",

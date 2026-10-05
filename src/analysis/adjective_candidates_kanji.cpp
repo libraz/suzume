@@ -760,7 +760,10 @@ void generateGaMashiiHostAdjectiveCandidates(const std::vector<char32_t>& codepo
       // i-adjective form, but the tokenizer must keep the adjective stem and
       // suffix as separate search units.
       const bool ends_with_nominalizer = grammar::isSingleHiragana(inflection_candidate->suffix, core::hiragana::kSa);
-      const size_t adjective_end = ends_with_nominalizer ? end_pos - 1 : end_pos;
+      // The past auxiliary after the かっ cell is its own token, as after any
+      // other i-adjective (高かっ+た).
+      const bool ends_with_past = utf8::endsWith(inflection_candidate->suffix, "かった");
+      const size_t adjective_end = (ends_with_nominalizer || ends_with_past) ? end_pos - 1 : end_pos;
       const std::string adjective_surface = extractSubstring(codepoints, start_pos, adjective_end);
       const bool already_generated =
           std::any_of(candidates.begin(), candidates.end(), [&](const UnknownCandidate& candidate) {
