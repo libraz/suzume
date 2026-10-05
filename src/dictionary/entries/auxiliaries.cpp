@@ -618,6 +618,14 @@ EntrySpecRange getAuxiliaryEntries() {
       adj("っぽけれ", "っぽい", EPOS::AdjKeForm),
       adj("っぽかろ", "っぽい", EPOS::AdjMizenkei),
       adj("っぽ", "っぽい", EPOS::AdjStem),
+      // Adjective suffix っこい (～っこい: 油っこい, 丸っこい), the same
+      // sokuon-initial shape as っぽい. No bare stem cell: っこ is also the
+      // nominal suffix (隅っこ, 根っこ, 負けっこ)
+      adj("っこい", "っこい", EPOS::AdjBasic),
+      adj("っこく", "っこい", EPOS::AdjRenyokei),
+      adj("っこかっ", "っこい", EPOS::AdjKatt),
+      adj("っこけれ", "っこい", EPOS::AdjKeForm),
+      adj("っこかろ", "っこい", EPOS::AdjMizenkei),
 
       // Pejorative adjective suffix (っ)たらしい (嫌み+ったらしい, 未練+たらしい)
       adj("ったらしい", "ったらしい", EPOS::AdjBasic),

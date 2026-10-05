@@ -6,6 +6,7 @@
 #include <algorithm>
 
 #include "adjective_candidates.h"
+#include "adjective_candidates_internal.h"
 #include "analysis/dictionary_probe.h"
 #include "candidate_constants.h"
 #include "core/debug.h"
@@ -875,43 +876,56 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
           // single compound noun across it; the dictionary candidates retain
           // the suffix inflection and any following nominalizer.
           if (dict_manager != nullptr) {
-            for (const auto& entry : lookupResultsInRange(*dict_manager, codepoints, sokuon_pos, hira2_end)) {
+            // The suffix's inflected cells may run past the compound scan,
+            // which stops before an auxiliary-like tail (油っこ+かった).
+            const size_t hiragana_run_end = findCharRegionEnd(char_types, sokuon_pos, codepoints.size() - sokuon_pos,
+                                                              normalize::CharType::Hiragana);
+            for (const auto& entry : lookupResultsInRange(*dict_manager, codepoints, sokuon_pos, hiragana_run_end)) {
               if (entry.entry != nullptr && entry.entry->pos == core::PartOfSpeech::Adjective) {
-                const size_t ppoi_end = sokuon_pos + 2;
-                const bool ppoi_stem_before_inflection = entry.entry->lemma == "っぽい" &&
-                                                         entry.entry->extended_pos == core::ExtendedPOS::AdjStem &&
-                                                         ppoi_end < hira2_end && codepoints[ppoi_end] != U'さ';
-                if (ppoi_stem_before_inflection) {
+                // っぽい and っこい: a sokuon, one mora, and the adjective ending.
+                const std::string& suffix_lemma = entry.entry->lemma;
+                const bool sokuon_suffix =
+                    utf8::startsWith(suffix_lemma, "っ") && adj_detail::isCompoundFormingAdjective(suffix_lemma);
+                if (!sokuon_suffix && sokuon_pos + entry.length > hira2_end) {
+                  continue;
+                }
+                const size_t suffix_stem_end = sokuon_pos + 2;
+                const bool stem_before_inflection =
+                    sokuon_suffix && entry.entry->extended_pos == core::ExtendedPOS::AdjStem &&
+                    suffix_stem_end < hiragana_run_end && codepoints[suffix_stem_end] != U'さ';
+                if (stem_before_inflection) {
                   continue;
                 }
                 // A single-kanji nominal/adjectival host forms one search unit
-                // with the productive resemblance suffix (安っぽい, 水っぽい).
+                // with the productive suffix (安っぽい, 水っぽい, 油っこい).
                 // Longer nominal hosts retain the noun + suffix boundary
                 // (子供 + っぽい), while verb continuatives are handled by the
                 // dedicated productive path below.
-                const bool precedes_nominalizer = ppoi_end < hira2_end && codepoints[ppoi_end] == U'さ';
-                if (entry.entry->lemma == "っぽい" && !precedes_nominalizer) {
+                const bool precedes_nominalizer =
+                    suffix_stem_end < hiragana_run_end && codepoints[suffix_stem_end] == U'さ';
+                if (sokuon_suffix && !precedes_nominalizer) {
                   const size_t derived_end = sokuon_pos + entry.length;
                   auto adjective = makeCandidate(codepoints, start_pos, derived_end, core::PartOfSpeech::Adjective,
                                                  candidate::kProductivePpoiAdjCost, false,
                                                  CandidateOrigin::KanjiHiraganaCompound, entry.entry->extended_pos);
-                  adjective.lemma = extractSubstring(codepoints, start_pos, sokuon_pos) + "っぽい";
+                  adjective.lemma = extractSubstring(codepoints, start_pos, sokuon_pos) + suffix_lemma;
                   adjective.conj_type = dictionary::ConjugationType::IAdjective;
                   candidates.push_back(std::move(adjective));
                   return;
                 }
                 const std::string base = extractSubstring(codepoints, start_pos, sokuon_pos);
-                // An i-adjective stem productively forms 〜っぽい.  Keep its
+                // An i-adjective stem productively forms the suffix.  Keep its
                 // stem before the following nominalizer (安っぽ+さ), while a
                 // nominal base such as 男 retains the ordinary noun+suffix
                 // boundary.  The dictionary gate is on the adjective base,
                 // not on individual derived words.
-                if (ppoi_end <= codepoints.size() && extractSubstring(codepoints, sokuon_pos, ppoi_end) == "っぽ") {
+                if (sokuon_suffix && suffix_stem_end <= codepoints.size() &&
+                    extractSubstring(codepoints, sokuon_pos, suffix_stem_end) + "い" == suffix_lemma) {
                   if (dict_manager->lookupExact(base + "い", core::PartOfSpeech::Adjective) != nullptr) {
-                    auto stem = makeCandidate(codepoints, start_pos, ppoi_end, core::PartOfSpeech::Adjective,
+                    auto stem = makeCandidate(codepoints, start_pos, suffix_stem_end, core::PartOfSpeech::Adjective,
                                               candidate::kCompoundAdjBaseCost, true,
                                               CandidateOrigin::KanjiHiraganaCompound, core::ExtendedPOS::AdjStem);
-                    stem.lemma = base + "っぽい";
+                    stem.lemma = base + suffix_lemma;
                     stem.conj_type = dictionary::ConjugationType::IAdjective;
                     candidates.push_back(std::move(stem));
                   }

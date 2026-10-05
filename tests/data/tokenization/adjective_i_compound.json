@@ -892,6 +892,148 @@
       ],
       "id": "mendokusasouda",
       "input": "めんどくさそうだ"
+    },
+    {
+      "description": "油っこくない料理が好きだ。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "油っこい",
+          "pos": "Adjective",
+          "surface": "油っこく"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        },
+        {
+          "lemma": "料理",
+          "pos": "Noun",
+          "surface": "料理"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "好き",
+          "pos": "Adjective",
+          "surface": "好き"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "ttkokunai_ga_kida",
+      "input": "油っこくない料理が好きだ。"
+    },
+    {
+      "description": "丸っこくて柔らかい印象だ。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "丸っこい",
+          "pos": "Adjective",
+          "surface": "丸っこく"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "柔らかい",
+          "pos": "Adjective",
+          "surface": "柔らかい"
+        },
+        {
+          "lemma": "印象",
+          "pos": "Noun",
+          "surface": "印象"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "ttkokute_rakai_da",
+      "input": "丸っこくて柔らかい印象だ。"
+    },
+    {
+      "description": "脂っこい料理 - auto-generated",
+      "expected": [
+        {
+          "lemma": "脂っこい",
+          "pos": "Adjective",
+          "surface": "脂っこい"
+        },
+        {
+          "lemma": "料理",
+          "pos": "Noun",
+          "surface": "料理"
+        }
+      ],
+      "id": "ttkoi",
+      "input": "脂っこい料理"
+    },
+    {
+      "description": "粘っこかった - auto-generated",
+      "expected": [
+        {
+          "lemma": "粘っこい",
+          "pos": "Adjective",
+          "surface": "粘っこかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ttkokattta",
+      "input": "粘っこかった"
+    },
+    {
+      "description": "安っぽかった - auto-generated",
+      "expected": [
+        {
+          "lemma": "安っぽい",
+          "pos": "Adjective",
+          "surface": "安っぽかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ttpokattta",
+      "input": "安っぽかった"
+    },
+    {
+      "description": "隅っこに座る - auto-generated",
+      "expected": [
+        {
+          "lemma": "隅っこ",
+          "pos": "Noun",
+          "surface": "隅っこ"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "座る",
+          "pos": "Verb",
+          "surface": "座る"
+        }
+      ],
+      "id": "ttkoni_ru",
+      "input": "隅っこに座る"
     }
   ],
   "description": "I-adjectives compound/derived forms (複合・派生) - sou patterns, nominalization, contracted forms",

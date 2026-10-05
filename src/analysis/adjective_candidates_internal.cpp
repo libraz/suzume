@@ -23,9 +23,9 @@ namespace {
 // Productive second elements of compound adjectives: they attach to a nominal
 // or a verb continuative to derive a new adjective rather than predicating over
 // a separate preceding word.
-constexpr std::array<std::string_view, 15> kCompoundFormingAdjectives = {
+constexpr std::array<std::string_view, 16> kCompoundFormingAdjectives = {
     "苦しい", "深い", "強い",   "臭い",   "くさい", "難い",   "にくい", "易い",
-    "やすい", "辛い", "づらい", "がたい", "ぽい",   "っぽい", "らしい"};
+    "やすい", "辛い", "づらい", "がたい", "ぽい",   "っぽい", "っこい", "らしい"};
 
 // A one-mora host is indistinguishable from an inflectional ending that the
 // analyzer folded into the reconstructed base, so a derivation needs two.
