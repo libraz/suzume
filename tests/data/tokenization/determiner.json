@@ -208,9 +208,14 @@
           "surface": "水"
         },
         {
-          "lemma": "とかいう",
-          "pos": "Determiner",
-          "surface": "とかいう"
+          "lemma": "とか",
+          "pos": "Particle",
+          "surface": "とか"
+        },
+        {
+          "lemma": "いう",
+          "pos": "Verb",
+          "surface": "いう"
         }
       ],
       "id": "toka_tokaiu",

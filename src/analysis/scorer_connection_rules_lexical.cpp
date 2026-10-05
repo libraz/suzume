@@ -58,6 +58,13 @@ float computeAdjectiveDerivationHostPenalty(const core::LatticeEdge& prev, const
 float computeParticleQuoteBonus(const core::LatticeEdge& prev, const core::LatticeEdge& next) {
   float bonus{};
 
+  // The contracted quotative ていう follows ん (なん+ていう). After a sokuon the
+  // っ and the て spell the quotative って instead (食べる+って+いう, not 食べ+るっ+ていう).
+  if (next.extended_pos == core::ExtendedPOS::ParticleQuote && utf8::startsWith(next.surface, "て") &&
+      utf8::endsWith(prev.surface, "っ")) {
+    SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
+  }
+
   // The focus particle も attaches to a complete lexical adverb or
   // conjunction (あまりに+も, だけど+も).  Its dictionary EPOS is
   // ParticleTopic, so rules for ParticleBinding cannot express this

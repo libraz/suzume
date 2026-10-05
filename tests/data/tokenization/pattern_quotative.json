@@ -309,9 +309,14 @@
           "surface": "読む"
         },
         {
-          "lemma": "という",
-          "pos": "Determiner",
-          "surface": "という"
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "いう",
+          "pos": "Verb",
+          "surface": "いう"
         }
       ],
       "id": "predicate_quotative_terminal",
@@ -326,9 +331,14 @@
           "surface": "書く"
         },
         {
-          "lemma": "という",
-          "pos": "Determiner",
-          "surface": "という"
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "いう",
+          "pos": "Verb",
+          "surface": "いう"
         }
       ],
       "id": "predicate_quotative_godan",
@@ -343,9 +353,14 @@
           "surface": "食べる"
         },
         {
-          "lemma": "という",
-          "pos": "Determiner",
-          "surface": "という"
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "いう",
+          "pos": "Verb",
+          "surface": "いう"
         }
       ],
       "id": "predicate_quotative_ichidan",
@@ -365,9 +380,14 @@
           "surface": "だ"
         },
         {
-          "lemma": "という",
-          "pos": "Determiner",
-          "surface": "という"
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "いう",
+          "pos": "Verb",
+          "surface": "いう"
         }
       ],
       "id": "predicate_quotative_past_onbin",
@@ -387,9 +407,14 @@
           "surface": "た"
         },
         {
-          "lemma": "という",
-          "pos": "Determiner",
-          "surface": "という"
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "いう",
+          "pos": "Verb",
+          "surface": "いう"
         }
       ],
       "id": "predicate_quotative_past",
@@ -414,9 +439,14 @@
           "surface": "いる"
         },
         {
-          "lemma": "という",
-          "pos": "Determiner",
-          "surface": "という"
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "いう",
+          "pos": "Verb",
+          "surface": "いう"
         }
       ],
       "id": "predicate_quotative_progressive",
@@ -431,9 +461,14 @@
           "surface": "読む"
         },
         {
-          "lemma": "っていう",
-          "pos": "Determiner",
-          "surface": "っていう"
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "いう",
+          "pos": "Verb",
+          "surface": "いう"
         }
       ],
       "id": "predicate_quotative_colloquial_terminal",
@@ -448,9 +483,14 @@
           "surface": "書く"
         },
         {
-          "lemma": "っていう",
-          "pos": "Determiner",
-          "surface": "っていう"
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "いう",
+          "pos": "Verb",
+          "surface": "いう"
         }
       ],
       "id": "predicate_quotative_colloquial_godan",
@@ -465,9 +505,14 @@
           "surface": "食べる"
         },
         {
-          "lemma": "っていう",
-          "pos": "Determiner",
-          "surface": "っていう"
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "いう",
+          "pos": "Verb",
+          "surface": "いう"
         }
       ],
       "id": "predicate_quotative_colloquial_ichidan",
@@ -1784,6 +1829,169 @@
       ],
       "id": "kutttsuttta",
       "input": "行くっつった"
+    },
+    {
+      "description": "という before a noun head is the quotative determiner after an imperative host",
+      "expected": [
+        {
+          "lemma": "習う",
+          "pos": "Verb",
+          "surface": "習う"
+        },
+        {
+          "lemma": "より",
+          "pos": "Particle",
+          "surface": "より"
+        },
+        {
+          "lemma": "慣れる",
+          "pos": "Verb",
+          "surface": "慣れろ"
+        },
+        {
+          "lemma": "という",
+          "pos": "Determiner",
+          "surface": "という"
+        },
+        {
+          "lemma": "わけ",
+          "pos": "Noun",
+          "surface": "わけ"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "続ける",
+          "pos": "Verb",
+          "surface": "続ける"
+        }
+      ],
+      "id": "imperative_toiu_wake",
+      "input": "習うより慣れろというわけで続ける。"
+    },
+    {
+      "description": "という before こと is the quotative determiner after an imperative host",
+      "expected": [
+        {
+          "lemma": "早い",
+          "pos": "Adjective",
+          "surface": "早く"
+        },
+        {
+          "lemma": "慣れる",
+          "pos": "Verb",
+          "surface": "慣れろ"
+        },
+        {
+          "lemma": "という",
+          "pos": "Determiner",
+          "surface": "という"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "こと"
+        }
+      ],
+      "id": "imperative_toiu_koto",
+      "input": "早く慣れろということ"
+    },
+    {
+      "description": "Clause-final hearsay という is と+いう",
+      "expected": [
+        {
+          "lemma": "業界団体",
+          "pos": "Noun",
+          "surface": "業界団体"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "よる",
+          "pos": "Verb",
+          "surface": "よる"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "改善",
+          "pos": "Noun",
+          "surface": "改善"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "進む",
+          "pos": "Verb",
+          "surface": "進ん"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "いう",
+          "pos": "Verb",
+          "surface": "いう"
+        }
+      ],
+      "id": "clause_final_hearsay_toiu",
+      "input": "業界団体によると改善が進んでいるという。"
+    },
+    {
+      "description": "Sentence-final という with no head is と+いう",
+      "expected": [
+        {
+          "lemma": "雨",
+          "pos": "Noun",
+          "surface": "雨"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "降る",
+          "pos": "Verb",
+          "surface": "降る"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "いう",
+          "pos": "Verb",
+          "surface": "いう"
+        }
+      ],
+      "id": "final_toiu_after_terminal",
+      "input": "雨が降るという"
     }
   ],
   "description": "Quotative patterns (という, といって, etc.)",

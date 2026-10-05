@@ -66,6 +66,7 @@ postprocess_nano_quotative = postprocessor_function_words.postprocess_nano_quota
 postprocess_negative_conjunctive_de = postprocessor_function_words.postprocess_negative_conjunctive_de
 postprocess_nominal_conjunction_homograph = postprocessor_function_words.postprocess_nominal_conjunction_homograph
 postprocess_quotative_determiner_spelling = postprocessor_function_words.postprocess_quotative_determiner_spelling
+postprocess_quotative_determiner_head = postprocessor_function_words.postprocess_quotative_determiner_head
 postprocess_renyokei_compound_particle = postprocessor_function_words.postprocess_renyokei_compound_particle
 postprocess_te_form_contraction = postprocessor_function_words.postprocess_te_form_contraction
 postprocess_to_areba_conditional = postprocessor_function_words.postprocess_to_areba_conditional
@@ -293,6 +294,7 @@ POSTPROCESSORS: tuple[tuple[str, Callable[[list[dict]], bool]], ...] = (
     ("productive-search-unit-boundaries", postprocess_productive_search_unit_boundaries),
     ("bound-derived-adjective", postprocess_bound_derived_adjective),
     ("quotative-determiner-spelling", postprocess_quotative_determiner_spelling),
+    ("quotative-determiner-head", postprocess_quotative_determiner_head),
     ("adverbial-na-adjective", postprocess_adverbial_na_adjective),
     ("negative-host", postprocess_negative_host),
     ("sou-host", postprocess_sou_host),

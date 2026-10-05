@@ -552,6 +552,10 @@ constexpr std::array<BoundaryCost, static_cast<size_t>(core::ExtendedPOS::Count_
   table[static_cast<size_t>(core::ExtendedPOS::Prefix)].eos = kEosPrefixPenalty;
   table[static_cast<size_t>(core::ExtendedPOS::Determiner)].eos = kEosDeterminerPenalty;
   table[static_cast<size_t>(core::ExtendedPOS::Determiner)].eos_gate = EosBoundaryGate::NonDictionary;
+  // A quotative determiner closing a clause has no head to modify, so the quote
+  // ends in と+いう instead (降る+と+いう). A host-less という is the headword.
+  table[static_cast<size_t>(core::ExtendedPOS::DeterminerQuotative)].eos = kHeadlessQuotativeDeterminerPenalty;
+  table[static_cast<size_t>(core::ExtendedPOS::DeterminerQuotative)].eos_gate = EosBoundaryGate::AfterContent;
   table[static_cast<size_t>(core::ExtendedPOS::VerbRenyokei)].eos = kEosShortRenyokeiPenalty;
   table[static_cast<size_t>(core::ExtendedPOS::VerbRenyokei)].eos_gate = EosBoundaryGate::SingleCodepoint;
   table[static_cast<size_t>(core::ExtendedPOS::VerbMizenkei)].eos = kEosMizenkeiPenalty;

@@ -1369,3 +1369,43 @@ class TestPostprocessCopulaNeg:
         tokens = [_tok("本", "Noun"), _tok("で", "Particle"), _tok("は", "Particle"), _tok("ない", "Auxiliary")]
         assert postprocess_copula_neg(tokens)
         assert tokens[1] == _tok("で", "Auxiliary", lemma="だ")
+
+
+class TestQuotativeDeterminerHead:
+    @staticmethod
+    def _surfaces(tokens: list[dict]) -> list[str]:
+        return [token["surface"] for token in tokens]
+
+    def test_toiu_before_a_noun_head_is_the_determiner(self):
+        tokens = [
+            {"surface": "慣れろ", "pos": "Verb"},
+            {"surface": "と", "pos": "Particle"},
+            {"surface": "いう", "pos": "Verb"},
+            {"surface": "わけ", "pos": "Noun"},
+        ]
+        assert postprocessors.postprocess_quotative_determiner_head(tokens)
+        assert self._surfaces(tokens) == ["慣れろ", "という", "わけ"]
+        assert tokens[1]["pos"] == "Determiner"
+
+    def test_headless_determiner_is_the_quotation(self):
+        tokens = [{"surface": "降る", "pos": "Verb"}, {"surface": "という", "pos": "Determiner"}]
+        assert postprocessors.postprocess_quotative_determiner_head(tokens)
+        assert self._surfaces(tokens) == ["降る", "と", "いう"]
+
+    def test_headless_family_members_split_the_same_way(self):
+        tokens = [{"surface": "読む", "pos": "Verb"}, {"surface": "っていう", "pos": "Determiner"}]
+        assert postprocessors.postprocess_quotative_determiner_head(tokens)
+        assert self._surfaces(tokens) == ["読む", "って", "いう"]
+        tokens = [{"surface": "行く", "pos": "Verb"}, {"surface": "といった", "pos": "Determiner"}]
+        assert postprocessors.postprocess_quotative_determiner_head(tokens)
+        assert self._surfaces(tokens) == ["行く", "と", "いっ", "た"]
+
+    def test_hostless_and_nominalizer_contexts_are_left_alone(self):
+        bare = [{"surface": "という", "pos": "Determiner"}]
+        before_no = [
+            {"surface": "行く", "pos": "Verb"},
+            {"surface": "という", "pos": "Determiner"},
+            {"surface": "の", "pos": "Particle"},
+        ]
+        assert not postprocessors.postprocess_quotative_determiner_head(bare)
+        assert not postprocessors.postprocess_quotative_determiner_head(before_no)

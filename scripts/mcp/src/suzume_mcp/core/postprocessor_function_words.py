@@ -566,6 +566,63 @@ def postprocess_quotative_determiner_spelling(tokens: list[dict]) -> bool:
     return changed
 
 
+def _opens_noun_phrase(tokens: list[dict], start: int) -> bool:
+    """Whether a noun head follows at ``start``, past closed adnominals and prefixes."""
+    idx = start
+    while idx < len(tokens) and tokens[idx].get("pos") in ("Determiner", "Prefix"):
+        idx += 1
+    return idx < len(tokens) and tokens[idx].get("pos") == "Noun"
+
+
+# The quotative determiners split back into the quoting particle and the verb
+# いう when no head follows them.
+_HEADLESS_QUOTATIVE_DETERMINERS: dict[str, tuple[tuple[str, str, str], ...]] = {
+    "という": (("と", "Particle", "と"), ("いう", "Verb", "いう")),
+    "っていう": (("って", "Particle", "って"), ("いう", "Verb", "いう")),
+    "とかいう": (("とか", "Particle", "とか"), ("いう", "Verb", "いう")),
+    "といった": (("と", "Particle", "と"), ("いっ", "Verb", "いう"), ("た", "Auxiliary", "た")),
+}
+
+
+def postprocess_quotative_determiner_head(tokens: list[dict]) -> bool:
+    """Read a quotative determiner exactly when a noun head follows it.
+
+    という is the adnominal quotative only while it modifies a noun (行く|という|話,
+    慣れろ|という|わけ); with no noun after it, the quote is closed by the
+    particle and the verb いう (降る|と|いう), and the same holds for っていう,
+    とかいう and といった. The reference makes the choice by host instead, so
+    both directions are restored here. A host-less determiner and one before
+    the nominalizer の are left to the reference.
+    """
+    changed = False
+    idx = 1
+    while idx < len(tokens):
+        token = tokens[idx]
+        following = tokens[idx + 1] if idx + 1 < len(tokens) else None
+        cells = _HEADLESS_QUOTATIVE_DETERMINERS.get(token.get("surface", ""))
+        if (
+            token.get("surface") == "と"
+            and token.get("pos") == "Particle"
+            and following is not None
+            and following.get("surface") == "いう"
+            and following.get("pos") == "Verb"
+            and _opens_noun_phrase(tokens, idx + 2)
+        ):
+            tokens[idx : idx + 2] = [{"surface": "という", "pos": "Determiner", "lemma": "という"}]
+            changed = True
+        elif (
+            cells
+            and token.get("pos") == "Determiner"
+            and (following is None or following.get("surface") != "の")
+            and not _opens_noun_phrase(tokens, idx + 1)
+        ):
+            tokens[idx : idx + 1] = [{"surface": surface, "pos": pos, "lemma": lemma} for surface, pos, lemma in cells]
+            changed = True
+            idx += len(cells) - 1
+        idx += 1
+    return changed
+
+
 def postprocess_nano_quotative(tokens: list[dict]) -> bool:
     """Undo the kana 名乗る the reference reads into な+の+って.
 
