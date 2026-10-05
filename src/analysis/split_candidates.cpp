@@ -267,17 +267,14 @@ void addMixedScriptCandidates(core::Lattice& lattice, std::string_view text, con
     while (counter_cut < full_run_end && isCounterKanji(codepoints[counter_cut])) {
       ++counter_cut;
     }
-    const bool remainder_opens_word =
-        counter_cut < codepoints.size() && (normalize::isTemporalRelationSuffixKanji(codepoints[counter_cut]) ||
-                                            lookupEntryInRange(dict_manager, codepoints, counter_cut, counter_cut + 1,
-                                                               core::PartOfSpeech::Pronoun) != nullptr);
     if (counter_cut > first_end && verb_helpers::isQuantityClosingSuffixAt(&dict_manager, codepoints, counter_cut)) {
       const size_t suffix_end_byte = byteOffsetAt(byte_offsets, counter_cut + 1);
       lattice.addEdge(text.substr(start_byte, suffix_end_byte - start_byte), static_cast<uint32_t>(start_pos),
                       static_cast<uint32_t>(counter_cut + 1), core::PartOfSpeech::Noun,
                       base_cost + opts.digit_kanji_1_bonus, flags, "");
     } else if (counter_cut > first_end && counter_cut < kanji_run_end && (kanji_run_end - counter_cut) % 2 == 1 &&
-               !remainder_opens_word && !grammar::mayBeOkuriganaAt(codepoints, full_run_end)) {
+               !verb_helpers::opensWordAfterQuantity(&dict_manager, codepoints, counter_cut) &&
+               !grammar::mayBeOkuriganaAt(codepoints, full_run_end)) {
       const size_t run_end_byte = byteOffsetAt(byte_offsets, full_run_end);
       const std::string_view surface = text.substr(start_byte, run_end_byte - start_byte);
       SUZUME_DEBUG_LOG_VERBOSE("[SPLIT_MIX] \"" << surface << "\": digit+uneven kanji run\n");

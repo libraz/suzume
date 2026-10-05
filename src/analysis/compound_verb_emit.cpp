@@ -359,11 +359,7 @@ void emitCompoundVerbCandidates(core::Lattice& lattice, std::string_view text, c
   const bool starts_inside_kanji_run = start_pos > 0 && normalize::isKanjiCodepoint(codepoints[start_pos - 1]);
   // So does one modifying a kanji noun head that is itself so marked
   // (受け付け+方法を, 取り付け+工事が).
-  size_t head_end = compound_end_pos;
-  while (head_end < codepoints.size() && normalize::isKanjiCodepoint(codepoints[head_end]) &&
-         !normalize::isNumeralCodepoint(codepoints[head_end])) {
-    ++head_end;
-  }
+  const size_t head_end = grammar::nominalKanjiRunEnd(codepoints, compound_end_pos);
   // The head may carry one okurigana mora of its own (払い戻し+手続きを).
   const bool modifies_marked_kanji_head =
       head_end >= compound_end_pos + 2 &&

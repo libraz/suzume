@@ -117,8 +117,8 @@ bool hasDictionaryGodanBaseFromIRow(const dictionary::DictionaryManager* dict_ma
                                     char32_t i_row_kana);
 
 /**
- * @brief Whether the kanji before @p okurigana_pos plus the okurigana there is
- * the continuative of a dictionary verb
+ * @brief Whether codepoints[stem_start, okurigana_pos) plus the okurigana there
+ * is the continuative of a dictionary verb
  *
  * Both live paradigms are inverted by rule: a godan continuative replaces the
  * dictionary form's u-row mora with the i-row one (書き → 書く), and an ichidan
@@ -127,7 +127,14 @@ bool hasDictionaryGodanBaseFromIRow(const dictionary::DictionaryManager* dict_ma
  * godan okurigana mora (分+か of 分かる) is not read as a continuative.
  */
 bool namesDictionaryVerbContinuative(const dictionary::DictionaryManager* dict_manager,
-                                     const std::vector<char32_t>& codepoints, size_t okurigana_pos);
+                                     const std::vector<char32_t>& codepoints, size_t stem_start, size_t okurigana_pos);
+
+/** @brief namesDictionaryVerbContinuative over the one kanji before @p okurigana_pos */
+inline bool namesDictionaryVerbContinuative(const dictionary::DictionaryManager* dict_manager,
+                                            const std::vector<char32_t>& codepoints, size_t okurigana_pos) {
+  return okurigana_pos > 0 &&
+         namesDictionaryVerbContinuative(dict_manager, codepoints, okurigana_pos - 1, okurigana_pos);
+}
 
 /**
  * @brief Whether the kanji at @p pos is a one-kanji dictionary suffix closing a
@@ -136,6 +143,13 @@ bool namesDictionaryVerbContinuative(const dictionary::DictionaryManager* dict_m
  */
 bool isQuantityClosingSuffixAt(const dictionary::DictionaryManager* dict_manager,
                                const std::vector<char32_t>& codepoints, size_t pos);
+
+/**
+ * @brief Whether the kanji at @p pos after a quantity opens a word of its own:
+ * relational 前/後 or a listed pronoun (三日|後, 5年|彼)
+ */
+bool opensWordAfterQuantity(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
+                            size_t pos);
 
 /**
  * @brief Check if a terminal is a productively formed -しい i-adjective

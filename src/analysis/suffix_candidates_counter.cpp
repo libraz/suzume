@@ -6,7 +6,6 @@
 #include <algorithm>
 #include <utility>
 
-#include "analysis/dictionary_probe.h"
 #include "candidate_constants.h"
 #include "core/debug.h"
 #include "core/utf8_constants.h"
@@ -76,13 +75,9 @@ void appendUnevenKanjiRunCandidate(const std::vector<char32_t>& codepoints, size
       normalize::isIntervalCompoundSecondKanji(codepoints[counter_end])) {
     --counter_end;
   }
-  if (counter_end == numeral_end || counter_end >= codepoints.size() ||
-      !normalize::isKanjiCodepoint(codepoints[counter_end]) || normalize::isNumeralCodepoint(codepoints[counter_end]) ||
-      normalize::isTemporalRelationSuffixKanji(codepoints[counter_end])) {
-    return;
-  }
-  if (dict_manager != nullptr && lookupEntryInRange(*dict_manager, codepoints, counter_end, counter_end + 1,
-                                                    core::PartOfSpeech::Pronoun) != nullptr) {
+  const size_t run_end = grammar::nominalKanjiRunEnd(codepoints, counter_end);
+  if (counter_end == numeral_end || run_end == counter_end ||
+      verb_helpers::opensWordAfterQuantity(dict_manager, codepoints, counter_end)) {
     return;
   }
   if (verb_helpers::isQuantityClosingSuffixAt(dict_manager, codepoints, counter_end)) {
@@ -91,7 +86,6 @@ void appendUnevenKanjiRunCandidate(const std::vector<char32_t>& codepoints, size
                            "numeral_closing_suffix", candidates);
     return;
   }
-  const size_t run_end = grammar::nominalKanjiRunEnd(codepoints, counter_end);
   if (grammar::mayBeOkuriganaAt(codepoints, run_end)) {
     return;
   }

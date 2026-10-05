@@ -133,11 +133,8 @@ bool mayBeOkuriganaAt(const std::vector<char32_t>& codepoints, size_t pos) {
     return false;
   }
   constexpr size_t kCopulaProbeLength = 3;
-  std::string following;
-  for (size_t idx = pos; idx < codepoints.size() && idx < pos + kCopulaProbeLength; ++idx) {
-    encodeUtf8(codepoints[idx], following);
-  }
-  return !startsPredicativeCopula(following);
+  return !startsPredicativeCopula(
+      normalize::encodeRange(codepoints, pos, std::min(pos + kCopulaProbeLength, codepoints.size())));
 }
 
 bool isTransitiveAsuStem(std::u32string_view stem) {

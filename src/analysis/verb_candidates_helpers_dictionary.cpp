@@ -49,11 +49,11 @@ bool isAdjectiveInDictionary(const dictionary::DictionaryManager* dict_manager, 
 }
 
 bool namesDictionaryVerbContinuative(const dictionary::DictionaryManager* dict_manager,
-                                     const std::vector<char32_t>& codepoints, size_t okurigana_pos) {
-  if (dict_manager == nullptr || okurigana_pos == 0 || okurigana_pos >= codepoints.size()) {
+                                     const std::vector<char32_t>& codepoints, size_t stem_start, size_t okurigana_pos) {
+  if (dict_manager == nullptr || stem_start >= okurigana_pos || okurigana_pos >= codepoints.size()) {
     return false;
   }
-  const std::string stem = extractSubstring(codepoints, okurigana_pos - 1, okurigana_pos);
+  const std::string stem = extractSubstring(codepoints, stem_start, okurigana_pos);
   const char32_t okurigana = codepoints[okurigana_pos];
   if (hasDictionaryGodanBaseFromIRow(dict_manager, stem, okurigana)) {
     return true;
@@ -76,6 +76,14 @@ bool isQuantityClosingSuffixAt(const dictionary::DictionaryManager* dict_manager
   }
   // A following kanji with okurigana is a predicate stem (三割強+増える).
   return grammar::nominalKanjiRunEnd(codepoints, next) == next + 1 && grammar::mayBeOkuriganaAt(codepoints, next + 1);
+}
+
+bool opensWordAfterQuantity(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
+                            size_t pos) {
+  return pos < codepoints.size() &&
+         (normalize::isTemporalRelationSuffixKanji(codepoints[pos]) ||
+          (dict_manager != nullptr &&
+           lookupEntryInRange(*dict_manager, codepoints, pos, pos + 1, core::PartOfSpeech::Pronoun) != nullptr));
 }
 
 bool isProductiveShiiAdjectiveTerminal(std::string_view surface, const grammar::Inflection& inflection) {
