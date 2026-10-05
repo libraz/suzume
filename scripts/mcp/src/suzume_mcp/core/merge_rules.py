@@ -2452,8 +2452,12 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
         # auxiliaries share the 動詞 tag but carry 接尾, and letting them through
         # builds a headword out of an auxiliary and the subsidiary that follows
         # it (れ続ける), which drops the passive from the analysis entirely.
+        # A subsidiary verb (て+いただき, て+み) is bound to the te-form before it
+        # and heads no compound either (いただき+重ね, not いただき重ねる).
         v1_verb_renyokei = (
-            t.get("pos") == "動詞" and t.get("pos_sub1") != "接尾" and "連用" in (t.get("conj_form") or "")
+            t.get("pos") == "動詞"
+            and t.get("pos_sub1") not in ("接尾", "非自立")
+            and "連用" in (t.get("conj_form") or "")
         )
         # MeCab frequently lexicalizes a bare renyokei as a noun (座り, 入り).
         # Reconstructing its base is a productive morphology check; the closed

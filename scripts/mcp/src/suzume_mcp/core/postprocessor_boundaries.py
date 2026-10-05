@@ -235,9 +235,11 @@ def postprocess_productive_search_unit_boundaries(tokens: list[dict]) -> bool:
                     if potential_base in _PRODUCTIVE_COMPOUND_V2:
                         v2_base = potential_base
                 renyokei_base = base_from_renyokei(surface)
+                # A subsidiary verb (いただき, み) heads no compound.
                 if (
                     v2_base in _PRODUCTIVE_COMPOUND_V2
                     and token.get("pos") == "Verb"
+                    and token.get("pos_sub1") != "非自立"
                     and renyokei_base == token.get("lemma")
                 ):
                     combined = surface + following.get("surface", "")

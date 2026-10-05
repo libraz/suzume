@@ -824,3 +824,18 @@ class TestTruncatedAdverb:
     def test_interjection_stays(self):
         tokens, _, _ = get_expected_tokens("あっ、そうだ")
         assert tokens[0]["pos"] == "Interjection"
+
+
+class TestSubsidiaryVerbHeadsNoCompound:
+    @pytest.mark.parametrize(
+        ("text", "pair"),
+        [("ご協力いただき重ねて", ["いただき", "重ね"]), ("読ませていただき続ける", ["いただき", "続ける"])],
+    )
+    def test_subsidiary_itadaku_stays_apart(self, text, pair):
+        surfaces = [token["surface"] for token in get_expected_tokens(text)[0]]
+        at = surfaces.index(pair[0])
+        assert surfaces[at : at + 2] == pair
+
+    def test_lexical_itadaku_still_compounds(self):
+        surfaces = [token["surface"] for token in get_expected_tokens("ご支援をいただき続ける")[0]]
+        assert surfaces[-1] == "いただき続ける"
