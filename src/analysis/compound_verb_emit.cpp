@@ -96,6 +96,18 @@ void emitCompoundVerbCandidates(core::Lattice& lattice, std::string_view text, c
   if (best_match.matched_len == 0) {
     return;
   }
+  // A humble verb in its subsidiary use closes the construction in front of it
+  // (ご協力+いただき, 読ませて+いただき) and heads no compound there
+  // (いただき+重ね+て); taking its own object it is lexical and compounds like
+  // any verb (支援を+いただき続ける).
+  if (start_pos > 0 && grammar::isHumbleHonorificRenyokei(extractSubstring(codepoints, start_pos, v2_start))) {
+    const char32_t before = codepoints[start_pos - 1];
+    const normalize::CharType before_type = normalize::classifyChar(before);
+    if (before_type == normalize::CharType::Kanji || before_type == normalize::CharType::Katakana || before == U'て' ||
+        before == U'で') {
+      return;
+    }
+  }
   // A kanji+し compound may begin after a closed suffix (時間 / 話し込ん,
   // 長い / 間 / 話し込ん).  A bare adjacent kanji has no such boundary
   // evidence and must not license a compound from inside a Sino compound

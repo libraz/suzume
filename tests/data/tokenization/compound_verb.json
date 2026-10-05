@@ -711,6 +711,97 @@
       ],
       "id": "ku_4",
       "input": "道行く車"
+    },
+    {
+      "description": "ご協力いただき重ねて - auto-generated",
+      "expected": [
+        {
+          "lemma": "ご",
+          "pos": "Prefix",
+          "surface": "ご"
+        },
+        {
+          "lemma": "協力",
+          "pos": "Noun",
+          "surface": "協力"
+        },
+        {
+          "lemma": "いただく",
+          "pos": "Verb",
+          "surface": "いただき"
+        },
+        {
+          "lemma": "重ねる",
+          "pos": "Verb",
+          "surface": "重ね"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "go_itadaki_nete",
+      "input": "ご協力いただき重ねて"
+    },
+    {
+      "description": "読ませていただき続ける - auto-generated",
+      "expected": [
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読ま"
+        },
+        {
+          "lemma": "せる",
+          "pos": "Auxiliary",
+          "surface": "せ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いただく",
+          "pos": "Verb",
+          "surface": "いただき"
+        },
+        {
+          "lemma": "続ける",
+          "pos": "Verb",
+          "surface": "続ける"
+        }
+      ],
+      "id": "maseteitadaki_keru",
+      "input": "読ませていただき続ける"
+    },
+    {
+      "description": "ご支援をいただき続ける - auto-generated",
+      "expected": [
+        {
+          "lemma": "ご",
+          "pos": "Prefix",
+          "surface": "ご"
+        },
+        {
+          "lemma": "支援",
+          "pos": "Noun",
+          "surface": "支援"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "いただき続ける",
+          "pos": "Verb",
+          "surface": "いただき続ける"
+        }
+      ],
+      "id": "go_woitadaki_keru",
+      "input": "ご支援をいただき続ける"
     }
   ],
   "description": "compound_verb tests",
