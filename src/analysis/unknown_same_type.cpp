@@ -1304,6 +1304,22 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       }
       ++scan;
     }
+    // Length of the longest registered suffix of two or more kana that opens at
+    // @p pos, or 0. A suffix is bound leftward to a nominal host.
+    auto suffix_length_at = [&](size_t pos) -> size_t {
+      constexpr size_t kSuffixProbe = 3;
+      size_t longest = 0;
+      if (dict_manager_ == nullptr || pos >= codepoints.size()) {
+        return longest;
+      }
+      const size_t probe_end = std::min(codepoints.size(), pos + kSuffixProbe);
+      for (const auto& match : lookupResultsInRange(*dict_manager_, codepoints, pos, probe_end)) {
+        if (match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Suffix && match.length >= 2) {
+          longest = std::max(longest, match.length);
+        }
+      }
+      return longest;
+    };
     auto emit_promoted_run = [&](size_t run_end) {
       size_t len = run_end - start_pos;
       // The nominalizer ん closes an attributive predicate, so a run ending on
@@ -1366,6 +1382,26 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       // brackets impose: a registered reading and an inflected predicate reading
       // both keep it from firing.
       const bool right_kanji_word = scan < codepoints.size() && char_types[scan] == normalize::CharType::Kanji;
+      // A registered suffix brackets its host the same way: it needs a nominal in
+      // front of it (かな+さん), so it both opens the run and selects it. A listed
+      // predicate is the host instead when it closes the run (こと+ある+ごと) or
+      // spans it into the suffix (とどく+ん+です); one that merely starts inside
+      // the run, or a one-mora stem (か+な of ない), says nothing about it.
+      const size_t right_suffix_len = len >= 2 ? suffix_length_at(scan) : 0;
+      bool predicate_closes_on_suffix = false;
+      for (size_t pred_start = start_pos; pred_start < scan && right_suffix_len > 0 && !predicate_closes_on_suffix;
+           ++pred_start) {
+        const size_t probe_end = std::min(codepoints.size(), scan + right_suffix_len);
+        for (const auto& match : lookupResultsInRange(*dict_manager_, codepoints, pred_start, probe_end)) {
+          if (match.entry != nullptr && match.length >= 2 &&
+              (match.entry->pos == core::PartOfSpeech::Verb || match.entry->pos == core::PartOfSpeech::Adjective) &&
+              (pred_start + match.length == scan || (pred_start == start_pos && pred_start + match.length > scan))) {
+            predicate_closes_on_suffix = true;
+            break;
+          }
+        }
+      }
+      const bool right_suffix = right_suffix_len > 0 && !predicate_closes_on_suffix;
       // A two-mora run is safe when particles bracket it (私は|はし|を), or
       // when an unambiguous single case particle selects an otherwise
       // unregistered run at a clause boundary (さき|に). Quotative と and
@@ -1430,7 +1466,7 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
           (left_particle_bracket && (right_particle || right_copula)) || short_bos_case_particle_bracket ||
           (left_genitive_bracket && right_clause && !normalize::isExtendedParticle(codepoints[start_pos])) ||
           (right_copula && left_clause_bracket && promoted_dictionary_reading == nullptr) ||
-          copula_selected_predicate_homograph;
+          (right_suffix && promoted_dictionary_reading == nullptr) || copula_selected_predicate_homograph;
       size_t min_len = short_run_bracketed ? 2 : 3;
       const bool short_bos_preparatory_homograph =
           start_pos == 0 && len == 2 && right_particle && promoted_dictionary_reading != nullptr &&
@@ -1513,11 +1549,19 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       // (ご+あんない+します); a rescue would swallow the prefix into the noun.
       const bool opens_on_sino_prefix =
           grammar::isSinoHonorificPrefix(extractSubstring(codepoints, start_pos, start_pos + 1));
+      // Nor may it close on, or cut into, a registered suffix after a stem of
+      // its own (かな+さん, not かなさん or かなさ+ん): the suffix attaches to the
+      // noun before it, which the suffix bracket below offers instead.
+      bool absorbs_trailing_suffix = false;
+      for (size_t suffix_start = start_pos + 2; suffix_start < scan && !absorbs_trailing_suffix; ++suffix_start) {
+        const size_t suffix_len = suffix_length_at(suffix_start);
+        absorbs_trailing_suffix = suffix_len > 0 && suffix_start + suffix_len >= scan;
+      }
       if ((len >= min_len || short_bos_preparatory_homograph) &&
-          (right_particle || right_clause || right_auxiliary || right_kanji_word) && !crossed_verified_predicate &&
-          !cuts_into_predicate && !opens_on_irrealis_chain && !has_inflected_predicate_reading &&
-          !opens_on_sino_prefix && !spells_contracted_hypothetical && !steals_formal_noun_head &&
-          !absorbs_copula_before_sokuon_final &&
+          (right_particle || right_clause || right_auxiliary || right_kanji_word || right_suffix) &&
+          !crossed_verified_predicate && !cuts_into_predicate && !opens_on_irrealis_chain &&
+          !has_inflected_predicate_reading && !opens_on_sino_prefix && !absorbs_trailing_suffix &&
+          !spells_contracted_hypothetical && !steals_formal_noun_head && !absorbs_copula_before_sokuon_final &&
           (!hasAuxiliaryParticleDecomposition(codepoints, start_pos, scan, dict_manager_) ||
            has_deverbal_noun_shape_before_genitive || copula_selected_predicate_homograph) &&
           (!hasFunctionWordChainDecomposition(codepoints, start_pos, scan, dict_manager_) ||
@@ -1549,8 +1593,8 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
         const bool right_predicate_quote = right_particle && scan < codepoints.size() &&
                                            codepoints[scan] == core::hiragana::kTo && has_terminal_i_adjective_reading;
         const bool selected_nominal =
-            (right_particle || auxiliary_bracket_before_particle) && !right_genitive_after_substantive_run &&
-            !right_predicate_quote &&
+            (right_particle || auxiliary_bracket_before_particle || right_suffix) &&
+            !right_genitive_after_substantive_run && !right_predicate_quote &&
             (left_determiner_bracket || left_clause_bracket || (start_pos > 0 && codepoints[start_pos - 1] == U'の'));
         // This is an unknown-noun rescue path.  Keep the homographic noun
         // candidate when an exact lexical reading exists, but do not give it
@@ -1630,7 +1674,8 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
     // copula actually brackets.
     for (size_t trimmed = start_pos + 1; trimmed < scan; ++trimmed) {
       if (boundAuxiliaryAt(codepoints, trimmed, dict_manager_, left_particle_bracket || left_clause_bracket).length >
-          0) {
+              0 ||
+          (trimmed >= start_pos + 2 && suffix_length_at(trimmed) > 0)) {
         emit_promoted_run(trimmed);
       }
     }

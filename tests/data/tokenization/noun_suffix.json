@@ -674,6 +674,107 @@
       ],
       "id": "ga_reta",
       "input": "暴君が倒れた"
+    },
+    {
+      "description": "かなさんが来た - regression test",
+      "expected": [
+        {
+          "lemma": "かな",
+          "pos": "Noun",
+          "surface": "かな"
+        },
+        {
+          "lemma": "さん",
+          "pos": "Suffix",
+          "surface": "さん"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "kanasanga_ta",
+      "input": "かなさんが来た"
+    },
+    {
+      "description": "りんごさんが来た - regression test",
+      "expected": [
+        {
+          "lemma": "りんご",
+          "pos": "Noun",
+          "surface": "りんご"
+        },
+        {
+          "lemma": "さん",
+          "pos": "Suffix",
+          "surface": "さん"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ringosanga_ta",
+      "input": "りんごさんが来た"
+    },
+    {
+      "description": "まりさまへ手紙を書く - regression test",
+      "expected": [
+        {
+          "lemma": "まり",
+          "pos": "Noun",
+          "surface": "まり"
+        },
+        {
+          "lemma": "さま",
+          "pos": "Suffix",
+          "surface": "さま"
+        },
+        {
+          "lemma": "へ",
+          "pos": "Particle",
+          "surface": "へ"
+        },
+        {
+          "lemma": "手紙",
+          "pos": "Noun",
+          "surface": "手紙"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "書く",
+          "pos": "Verb",
+          "surface": "書く"
+        }
+      ],
+      "id": "marisamahe_wo_ku",
+      "input": "まりさまへ手紙を書く"
     }
   ],
   "description": "noun_suffix tests",
