@@ -246,7 +246,7 @@ class TestSurfaceIsNeverLost:
 
     def test_unknown_non_punctuation_symbol_is_retained_as_other(self):
         raw_symbol = [{"surface": "↯", "pos": "記号", "pos_sub1": "一般", "lemma": "↯"}]
-        with patch("suzume_mcp.core.suzume_utils.mecab_analyze", return_value=raw_symbol):
+        with patch("suzume_mcp.core.postprocessor_mecab.mecab_analyze", return_value=raw_symbol):
             tokens, _, _ = get_expected_tokens("↯")
         assert tokens[0]["surface"] == "↯"
         assert tokens[0]["pos"] == "Other"
@@ -602,3 +602,28 @@ class TestVowelFusedAdjective:
     def test_leaves_other_e_endings(self, text):
         tokens, _, _ = get_expected_tokens(text)
         assert all(token["pos"] != "Adjective" or token["lemma"] in ("ない",) for token in tokens)
+
+
+class TestStraddlingReplacement:
+    def test_drops_a_replacement_the_analysis_splits_and_reanalyzes(self):
+        from suzume_mcp.core.postprocessor_mecab import _apply_replacements, analyze_preprocessed
+
+        def fake_preprocess(text):
+            replacements = {(0, "word_exception"): {"original": "にゃー", "replacement": "ねえ", "length": 3}}
+            return _apply_replacements(text, replacements)
+
+        def split_first_char(text):
+            return [{"surface": text[:1]}, {"surface": text[1:]}]
+
+        with (
+            patch("suzume_mcp.core.postprocessor_mecab.preprocess_for_mecab", side_effect=fake_preprocess),
+            patch("suzume_mcp.core.postprocessor_mecab.mecab_analyze", side_effect=split_first_char),
+        ):
+            tokens, replacements, _ = analyze_preprocessed("にゃー")
+        assert replacements == {}
+        assert "".join(token["surface"] for token in tokens) == "にゃー"
+
+    @pytest.mark.parametrize(("text", "particle"), [("遊ぼうにゃーん", "にゃーん"), ("行くにゃー", "にゃー")])
+    def test_keeps_the_character_speech_particle_whole(self, text, particle):
+        tokens, _, _ = get_expected_tokens(text)
+        assert (tokens[-1]["surface"], tokens[-1]["pos"], tokens[-1]["lemma"]) == (particle, "Particle", particle)

@@ -1908,6 +1908,25 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                         break
                 end -= 1
 
+        # 8b. Character speech: にゃ + ー* + ん? is one sentence-final particle
+        # (にゃ, にゃー, にゃーん, にゃん). It runs before the prolonged-mark merge
+        # so the marks and the closing ん stay inside the particle.
+        if not merged and t.get("surface") == "にゃ":
+            j = i + 1
+            particle = "にゃ"
+            while j < len(tokens) and regex.fullmatch(r"ー+", tokens[j].get("surface", "")):
+                particle += tokens[j].get("surface", "")
+                j += 1
+            if j < len(tokens) and tokens[j].get("surface") == "ん":
+                particle += "ん"
+                j += 1
+            if j > i + 1:
+                result.append({"surface": particle, "pos": "助詞", "lemma": particle})
+                i = j
+                merged = True
+                if applied_rule is None:
+                    applied_rule = "character-speech"
+
         # 4f. Prolonged sound mark (ー) merge
         # Merge a trailing ー with the preceding token. Every mark is kept, because
         # dropping the repeats would leave the token sequence no longer covering the
@@ -2279,15 +2298,6 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                         if applied_rule is None:
                             applied_rule = "colloquial-pronoun"
                         break
-
-        # 8b. Character speech: にゃ+ん -> にゃん
-        if not merged and t.get("surface") == "にゃ":
-            if i + 1 < len(tokens) and tokens[i + 1].get("surface") == "ん":
-                result.append({"surface": "にゃん", "pos": "助詞", "lemma": "にゃん"})
-                i += 2
-                merged = True
-                if applied_rule is None:
-                    applied_rule = "character-speech"
 
         # 9. Compound verbs
         following_source = remaining[len(t.get("surface", "")) :]

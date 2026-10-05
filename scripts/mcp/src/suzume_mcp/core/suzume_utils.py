@@ -5,15 +5,14 @@ import unicodedata
 import regex
 
 from .constants import NAI_ADJECTIVES, SLANG_ADJ_FOLLOWER, SLANG_ADJ_STEMS, TARI_ADVERB_STEMS, TEXT_SYMBOLS
-from .mecab import mecab_analyze
 from .merge_rules import apply_suzume_merge
 from .pos_mapping import correct_mecab_pos, map_mecab_pos, normalize_pos
 from .postprocessors import (
+    analyze_preprocessed,
     merge_conjunction_with_rashii,
     merge_honorific_kana_verbal_noun,
     postprocess_mecab_tokens,
     postprocessor_rules,
-    preprocess_for_mecab,
     repair_adjective_stem_before_suffix,
     repair_adjective_yo_quotative,
     repair_assimilated_koto_copula,
@@ -155,8 +154,7 @@ def get_mecab_tokens(text: str) -> list[dict]:
     if len(segments) > 1:
         return [token for segment in segments for token in get_mecab_tokens(segment)]
     normalized_text = _oracle_text(text)
-    processed_text, replacements, _ = preprocess_for_mecab(normalized_text)
-    raw_tokens = mecab_analyze(processed_text)
+    raw_tokens, replacements, _ = analyze_preprocessed(normalized_text)
 
     tokens = []
     for t in raw_tokens:
@@ -236,8 +234,7 @@ def get_expected_tokens(text: str, suzume_tokens: list[dict] | None = None) -> t
 
     # Get raw MeCab tokens
     normalized_text = _oracle_text(text)
-    processed_text, replacements, preprocess_rules = preprocess_for_mecab(normalized_text)
-    raw_tokens = mecab_analyze(processed_text)
+    raw_tokens, replacements, preprocess_rules = analyze_preprocessed(normalized_text)
     repair_adjective_stem_before_suffix(raw_tokens)
     postprocess_mecab_tokens(raw_tokens, normalized_text, replacements)
     repair_kko_nominalizer(raw_tokens)

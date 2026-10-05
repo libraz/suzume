@@ -472,6 +472,25 @@ def preprocess_for_mecab(text: str) -> tuple[str, dict[tuple[int, str], dict], t
     # two passes always describe the same disjoint spans.
     replacements = _non_overlapping_replacements(replacements)
 
+    return _apply_replacements(text, replacements)
+
+
+_REPLACEMENT_RULE_NAMES = {
+    "slang_adj": "slang-adjective",
+    "slang_verb": "slang-verb",
+    "unusual_name": "unusual-name",
+    "word_exception": "word-exception",
+    "emphatic_sokuon": "emphatic-sokuon",
+    "kyujitai": "kyujitai-fold",
+    "kanji_verb_frame": "kanji-verb-frame",
+    "vowel_fused_adjective": "vowel-fused-adjective",
+}
+
+
+def _apply_replacements(
+    text: str, replacements: dict[tuple[int, str], dict]
+) -> tuple[str, dict[tuple[int, str], dict], tuple[str, ...]]:
+    """Rewrite `text` with disjoint replacements and record their processed spans."""
     # Apply replacements in reverse position order
     for key in sorted(replacements, key=lambda k: k[0], reverse=True):
         pos = key[0]
@@ -488,18 +507,43 @@ def preprocess_for_mecab(text: str) -> tuple[str, dict[tuple[int, str], dict], t
         replacement["processed_length"] = len(replacement["replacement"])
         offset_delta += replacement["processed_length"] - replacement["length"]
 
-    rule_names = {
-        "slang_adj": "slang-adjective",
-        "slang_verb": "slang-verb",
-        "unusual_name": "unusual-name",
-        "word_exception": "word-exception",
-        "emphatic_sokuon": "emphatic-sokuon",
-        "kyujitai": "kyujitai-fold",
-        "kanji_verb_frame": "kanji-verb-frame",
-        "vowel_fused_adjective": "vowel-fused-adjective",
-    }
-    rules = tuple(dict.fromkeys(rule_names[category] for _, category in replacements))
+    rules = tuple(dict.fromkeys(_REPLACEMENT_RULE_NAMES[category] for _, category in replacements))
     return text, replacements, rules
+
+
+def analyze_preprocessed(text: str) -> tuple[list[dict], dict[tuple[int, str], dict], tuple[str, ...]]:
+    """Analyze `text` through the preprocessing replacements.
+
+    A replacement is restored token by token, so one the analysis does not keep
+    inside a single token cannot be put back (にゃー read as ね + ゃー). Such a
+    replacement is dropped and the text analyzed again without it, rather than
+    leaving the restoration to guess where its characters went.
+    """
+    processed_text, replacements, rules = preprocess_for_mecab(text)
+    while True:
+        raw_tokens = mecab_analyze(processed_text)
+        starts = []
+        position = 0
+        for token in raw_tokens:
+            starts.append((position, position + len(token.get("surface", ""))))
+            position += len(token.get("surface", ""))
+        straddling = [
+            key
+            for key, replacement in replacements.items()
+            if not any(
+                token_start <= replacement["processed_start"]
+                and replacement["processed_start"] + replacement["processed_length"] <= token_end
+                for token_start, token_end in starts
+            )
+        ]
+        if not straddling:
+            return raw_tokens, replacements, rules
+        kept = {
+            key: {k: v for k, v in replacement.items() if not k.startswith("processed_")}
+            for key, replacement in replacements.items()
+            if key not in straddling
+        }
+        processed_text, replacements, rules = _apply_replacements(text, kept)
 
 
 def postprocess_mecab_tokens(
