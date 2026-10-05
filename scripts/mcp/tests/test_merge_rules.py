@@ -403,6 +403,26 @@ class TestContractedProgressiveImperative:
         assert rule is None
 
 
+class TestNominalTomoni:
+    def test_merges_suffix_tomo_and_ni_after_noun(self):
+        tokens = [
+            _tok("男女"),
+            _tok("とも", pos_sub1="接尾"),
+            _tok("に", pos="助詞", pos_sub1="格助詞"),
+            _tok("参加"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "男女ともに参加")
+        assert [token["surface"] for token in result] == ["男女", "ともに", "参加"]
+        assert result[1]["pos"] == "副詞"
+        assert rule == "nominal-tomoni"
+
+    def test_keeps_adverbial_particle_tomo(self):
+        tokens = [_tok("心身"), _tok("とも", pos="助詞", pos_sub1="副助詞"), _tok("健康")]
+        result, rule = apply_suzume_merge(tokens, "心身とも健康")
+        assert [token["surface"] for token in result] == ["心身", "とも", "健康"]
+        assert rule is None
+
+
 class TestNumberUnit:
     def test_number_counter(self):
         tokens = [

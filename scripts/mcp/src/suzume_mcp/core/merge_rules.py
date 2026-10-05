@@ -661,6 +661,26 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
             if applied_rule is None:
                 applied_rule = "volitional-tomo"
 
+        # After a nominal, the reference reads ともに as the suffix とも plus the
+        # case particle に, but after a counter it keeps the adverb ともに
+        # (二人ともに).  Both are the same adverb of joint inclusion.
+        if (
+            not merged
+            and t.get("surface") == "とも"
+            and t.get("pos") == "名詞"
+            and t.get("pos_sub1") == "接尾"
+            and i > 0
+            and tokens[i - 1].get("pos") == "名詞"
+            and i + 1 < len(tokens)
+            and tokens[i + 1].get("surface") == "に"
+            and tokens[i + 1].get("pos") == "助詞"
+        ):
+            result.append({"surface": "ともに", "pos": "副詞", "pos_sub1": "一般", "lemma": "ともに"})
+            i += 2
+            merged = True
+            if applied_rule is None:
+                applied_rule = "nominal-tomoni"
+
         # A nominalizer (ん/の) followed by だって carries the same adverbial
         # particle as a nominal host (学生だって).  Punctuation makes IPADIC
         # choose the compositional copula + quotative lattice only here.

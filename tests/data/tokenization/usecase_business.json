@@ -2252,6 +2252,100 @@
       ],
       "id": "adverbial_taihen_after_kanji_noun",
       "input": "時間大変かかる"
+    },
+    {
+      "description": "Adverb tomoni after a nominal",
+      "expected": [
+        {
+          "lemma": "新緑",
+          "pos": "Noun",
+          "surface": "新緑"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "候",
+          "pos": "Noun",
+          "surface": "候"
+        },
+        {
+          "lemma": "心身",
+          "pos": "Noun",
+          "surface": "心身"
+        },
+        {
+          "lemma": "ともに",
+          "pos": "Adverb",
+          "surface": "ともに"
+        },
+        {
+          "lemma": "リフレッシュ",
+          "pos": "Noun",
+          "surface": "リフレッシュ"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "さ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れる"
+        },
+        {
+          "lemma": "この",
+          "pos": "Determiner",
+          "surface": "この"
+        },
+        {
+          "lemma": "季節",
+          "pos": "Noun",
+          "surface": "季節"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "no_tomoni_sarerukono_desu",
+      "input": "新緑の候、心身ともにリフレッシュされるこの季節です。"
+    },
+    {
+      "description": "Adverb tomoni after a nominal",
+      "expected": [
+        {
+          "lemma": "男女",
+          "pos": "Noun",
+          "surface": "男女"
+        },
+        {
+          "lemma": "ともに",
+          "pos": "Adverb",
+          "surface": "ともに"
+        },
+        {
+          "lemma": "参加",
+          "pos": "Noun",
+          "surface": "参加"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "tomoni_shita",
+      "input": "男女ともに参加した"
     }
   ],
   "version": "1.0"
