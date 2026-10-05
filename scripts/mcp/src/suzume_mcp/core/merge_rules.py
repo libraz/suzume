@@ -21,6 +21,7 @@ from .constants import (
     KANA_COUNTER_SUFFIXES,
     KANA_NUMBER_STEMS,
     KANA_PERSONAL_PRONOUNS,
+    LETTER_FORMULAS,
     NAI_ADJECTIVES,
     TARI_ADVERB_STEMS,
     TEMPORAL_COMPOUND_UNITS,
@@ -320,6 +321,7 @@ def _kanji_noun_run(tokens: list[dict], start: int) -> tuple[int, str]:
         regex.match(r"^[\p{Han}]+$", token.get("surface", ""))
         and token.get("pos") == "名詞"
         and token.get("pos_sub1", "") not in ("接尾", "固有名詞", "副詞可能")
+        and token.get("surface", "") not in LETTER_FORMULAS
     ):
         return start, ""
     # A kanji the dictionary reads as a bare noun is the stem of a classical 二段
@@ -341,6 +343,8 @@ def _kanji_noun_run(tokens: list[dict], start: int) -> tuple[int, str]:
         )
         # A pronoun is a phrase of its own (俺|失敗, 彼|仕事); it opens a
         # compound only with a bound one-kanji element (何+気).
+        if surface in LETTER_FORMULAS:
+            is_mergeable = False
         if is_mergeable and index == start + 1 and token.get("pos_sub1", "") == "代名詞":
             is_mergeable = len(surface) == 1
         if not is_mergeable or _heads_nidan_cell(tokens, index):

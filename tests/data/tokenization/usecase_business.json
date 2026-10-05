@@ -2203,6 +2203,55 @@
       ],
       "id": "comma_separates_itadaki_kasanete",
       "input": "この度のご協力をいただき、重ねてお礼申し上げます。"
+    },
+    {
+      "description": "Letter opener and adverbial na-adjective stem stay separate",
+      "expected": [
+        {
+          "lemma": "前略",
+          "pos": "Noun",
+          "surface": "前略"
+        },
+        {
+          "lemma": "大変",
+          "pos": "Adverb",
+          "surface": "大変"
+        },
+        {
+          "lemma": "恐れ入る",
+          "pos": "Verb",
+          "surface": "恐れ入り"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "letter_opener_before_adverbial_taihen",
+      "input": "前略大変恐れ入ります"
+    },
+    {
+      "description": "Adverbial na-adjective stem before a verb does not join the preceding noun",
+      "expected": [
+        {
+          "lemma": "時間",
+          "pos": "Noun",
+          "surface": "時間"
+        },
+        {
+          "lemma": "大変",
+          "pos": "Adverb",
+          "surface": "大変"
+        },
+        {
+          "lemma": "かかる",
+          "pos": "Verb",
+          "surface": "かかる"
+        }
+      ],
+      "id": "adverbial_taihen_after_kanji_noun",
+      "input": "時間大変かかる"
     }
   ],
   "version": "1.0"

@@ -112,6 +112,10 @@ QUANTITY_BOUND_SUFFIXES: frozenset[str] = frozenset({"建て", "立て"})
 # host (改正案, 交通費, 説明会).
 KANJI_SUFFIXES_KEPT_SEPARATE: frozenset[str] = frozenset("用内中後間視名目方半強弱")
 
+# Letter openers and closers (拝啓, 前略, 敬具 ...) are formulaic words that stand
+# outside the sentence they frame, so they never join a kanji compound.
+LETTER_FORMULAS: frozenset[str] = frozenset(("拝啓", "謹啓", "前略", "草々", "敬具", "追伸"))
+
 # Slang adjective stems -> standard replacement for MeCab preprocessing.
 # The class is open and is normally found in the analysis rather than listed
 # (see _stranded_adjective_stems). What stays here is the hiragana spellings,

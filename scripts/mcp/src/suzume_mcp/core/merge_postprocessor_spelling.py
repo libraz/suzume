@@ -5,6 +5,7 @@ import regex
 from .constants import (
     KANJI_PREFIX_COMPOUNDS,
     KANJI_SUFFIXES_KEPT_SEPARATE,
+    LETTER_FORMULAS,
 )
 from .mecab import mecab_analyze
 from .merge_postprocessor_grammar import _CONTINUATIVE_CELL
@@ -164,8 +165,9 @@ def _postprocess_kanji_merge(result: list[dict], applied_rule: str | None) -> tu
     splits compound words (e.g., 微+笑み → 微笑み).
     """
     merged = []
-    for curr in result:
+    for position, curr in enumerate(result):
         surface = curr.get("surface", "")
+        following = result[position + 1] if position + 1 < len(result) else {}
         # A counter closes its numeral (第二+次 | 計画).
         after_counter = bool(merged) and merged[-1].get("pos_sub2", "") == "助数詞"
         # Suzume design: tokenizer use case prefers X+suffix as a single search
@@ -227,6 +229,15 @@ def _postprocess_kanji_merge(result: list[dict], applied_rule: str | None) -> tu
                 # with a bound one-kanji element (何+気) and never closes one.
                 and curr.get("pos_sub1", "") != "代名詞"
                 and (merged[-1].get("pos_sub1", "") != "代名詞" or len(surface) == 1)
+                and surface not in LETTER_FORMULAS
+                and merged[-1].get("surface", "") not in LETTER_FORMULAS
+                # A na-adjective stem directly before an independent predicate
+                # is used adverbially (大変|恐れ入る) and heads no compound.
+                and not (
+                    curr.get("pos_sub1", "") == "形容動詞語幹"
+                    and following.get("pos", "") in ("動詞", "形容詞")
+                    and following.get("pos_sub1", "") == "自立"
+                )
                 and not after_counter
             )
             or (surface == "々" and _IDEOGRAPHIC_SEQUENCE.fullmatch(merged[-1].get("surface", "")))

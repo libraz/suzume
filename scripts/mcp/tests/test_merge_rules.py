@@ -807,6 +807,20 @@ class TestPostprocessKanjiMerge:
         result, _ = apply_suzume_merge(tokens, "何気")
         assert [token["surface"] for token in result] == ["何気"]
 
+    def test_letter_formula_stays_outside_a_kanji_compound(self):
+        tokens = [_tok("前略"), _tok("失礼", pos_sub1="サ変接続")]
+        result, _ = apply_suzume_merge(tokens, "前略失礼")
+        assert [token["surface"] for token in result] == ["前略", "失礼"]
+
+    def test_adverbial_na_adjective_stem_does_not_join_its_host(self):
+        tokens = [
+            _tok("時間"),
+            _tok("大変", pos_sub1="形容動詞語幹"),
+            _tok("かかる", pos="動詞", pos_sub1="自立"),
+        ]
+        result, _ = apply_suzume_merge(tokens, "時間大変かかる")
+        assert [token["surface"] for token in result] == ["時間", "大変", "かかる"]
+
     def test_ascii_joiner_merge_chains_single_joiners(self):
         tokens = [_tok("U"), _tok(".", pos="記号"), _tok("S"), _tok(".", pos="記号"), _tok("A")]
         result, _ = apply_suzume_merge(tokens, "U.S.A")
