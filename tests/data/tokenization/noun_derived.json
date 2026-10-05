@@ -97,6 +97,90 @@
       ],
       "id": "miga_i",
       "input": "酸みが強い果物"
+    },
+    {
+      "description": "心を打つのは、やさしさだけではない。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "心",
+          "pos": "Noun",
+          "surface": "心"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "打つ",
+          "pos": "Verb",
+          "surface": "打つ"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "やさしい",
+          "pos": "Adjective",
+          "surface": "やさし"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Suffix",
+          "surface": "さ"
+        },
+        {
+          "lemma": "だけ",
+          "pos": "Particle",
+          "surface": "だけ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
+      "id": "wo_tsunoha_yasashisadakedehanai",
+      "input": "心を打つのは、やさしさだけではない。"
+    },
+    {
+      "description": "、やさしさが - auto-generated",
+      "expected": [
+        {
+          "lemma": "やさしい",
+          "pos": "Adjective",
+          "surface": "やさし"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Suffix",
+          "surface": "さ"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        }
+      ],
+      "id": "yasashisaga",
+      "input": "、やさしさが"
     }
   ],
   "description": "noun_derived tests",

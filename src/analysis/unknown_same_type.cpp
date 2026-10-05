@@ -1886,12 +1886,23 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
             exact_dictionary_reading != nullptr &&
             exact_dictionary_reading->extended_pos == core::ExtendedPOS::ParticleFinal && scan < codepoints.size() &&
             grammar::isSingleHiragana(extractSubstring(codepoints, scan, scan + 1), U'と');
+        // A run spelled as an i-adjective stem and the nominalizer さ/み
+        // (やさし+さ) has a derivation that owns the span the way a lexical
+        // reading does, so the rescue offers the noun but does not select it.
+        const bool spells_adjective_nominalization =
+            std::any_of(promoted_inflections.begin(), promoted_inflections.end(),
+                        [](const grammar::InflectionCandidate& inflection_candidate) {
+                          return inflection_candidate.verb_type == grammar::VerbType::IAdjective &&
+                                 (inflection_candidate.suffix == "さ" || inflection_candidate.suffix == "み") &&
+                                 inflection_candidate.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence;
+                        });
         const bool exact_reading_owns_context =
-            exact_dictionary_reading != nullptr &&
-            (exact_dictionary_reading->pos != core::PartOfSpeech::Particle || quoted_final_particle) &&
-            !(has_exact_noun && has_competing_exact_predicate) &&
-            !(right_particle && exact_dictionary_reading->pos == core::PartOfSpeech::Auxiliary) &&
-            !copula_selected_predicate_homograph;
+            spells_adjective_nominalization ||
+            (exact_dictionary_reading != nullptr &&
+             (exact_dictionary_reading->pos != core::PartOfSpeech::Particle || quoted_final_particle) &&
+             !(has_exact_noun && has_competing_exact_predicate) &&
+             !(right_particle && exact_dictionary_reading->pos == core::PartOfSpeech::Auxiliary) &&
+             !copula_selected_predicate_homograph);
         if (selected_nominal && !exact_reading_owns_context) {
           noun_cost += scorer::kBonusDoubleVeryStrong;
         }
