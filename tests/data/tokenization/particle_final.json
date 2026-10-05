@@ -1413,6 +1413,50 @@
       ],
       "id": "kamoyoo",
       "input": "かもよお"
+    },
+    {
+      "description": "だよねっ - auto-generated",
+      "expected": [
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ねっ"
+        }
+      ],
+      "id": "dayonett",
+      "input": "だよねっ"
+    },
+    {
+      "description": "だよね - auto-generated",
+      "expected": [
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        }
+      ],
+      "id": "dayone",
+      "input": "だよね"
     }
   ],
   "description": "particle_final tests",

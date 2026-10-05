@@ -1149,10 +1149,12 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       }
       // Likewise a run spelled wholly by a chain of registered auxiliaries
       // (ます, ませ+ん): an opaque duplicate only bypasses the connection that
-      // licenses the chain (だけ+ます).
+      // licenses the chain (だけ+ます). The same holds for an auxiliary closed by
+      // its particles (だ+よ+ね).
       if (start_type == normalize::CharType::Hiragana && dict_manager_ != nullptr &&
           (len > 1 || dict_manager_->lookupExact(surface, core::PartOfSpeech::Auxiliary) == nullptr) &&
-          spellsAuxiliaryChain(*dict_manager_, codepoints, start_pos, candidate_end)) {
+          (spellsAuxiliaryChain(*dict_manager_, codepoints, start_pos, candidate_end) ||
+           hasAuxiliaryParticleDecomposition(codepoints, start_pos, candidate_end, dict_manager_))) {
         continue;
       }
       // A run of Latin letters or digits read as a nominal is one whose script
@@ -1433,12 +1435,20 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       // The nominalizer ん closes an attributive predicate, so a run ending on
       // it is that predicate plus the particle, never one unregistered noun
       // (できる+ん+じゃ+ない). A registered predicate in front of it is the
-      // evidence; runs whose kana merely happen to spell a particle keep their
-      // whole-run candidate (りんご, たなばた).
+      // evidence, and so is an i-adjective terminal, which no noun is before ん
+      // (つらい+ん+だ); runs whose kana merely happen to spell a particle keep
+      // their whole-run candidate (りんご, たなばた).
       if (dict_manager_ != nullptr && run_end > start_pos + 1 && codepoints[run_end - 1] == U'ん' &&
-          hasExactPartOfSpeech(
-              *dict_manager_, codepoints, start_pos, run_end - 1,
-              partOfSpeechMask(core::PartOfSpeech::Verb) | partOfSpeechMask(core::PartOfSpeech::Adjective))) {
+          (hasExactPartOfSpeech(
+               *dict_manager_, codepoints, start_pos, run_end - 1,
+               partOfSpeechMask(core::PartOfSpeech::Verb) | partOfSpeechMask(core::PartOfSpeech::Adjective)) ||
+           verb_helpers::readsAsIAdjectiveTerminal(extractSubstring(codepoints, start_pos, run_end - 1),
+                                                   inflection_))) {
+        return;
+      }
+      // No noun ends on a sokuon: a run closing on one carries the emphatic っ
+      // of a final particle or a predicate (だよ+ねっ, つらい+もんねっ).
+      if (run_end > start_pos && codepoints[run_end - 1] == U'っ') {
         return;
       }
       // A modal chain closing on the presumptive is a predicate, not an

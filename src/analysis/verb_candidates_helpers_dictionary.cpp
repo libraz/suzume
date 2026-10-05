@@ -101,6 +101,16 @@ bool isProductiveShiiAdjectiveTerminal(std::string_view surface, const grammar::
   });
 }
 
+bool readsAsIAdjectiveTerminal(std::string_view surface, const grammar::Inflection& inflection) {
+  if (!utf8::endsWith(surface, "い")) {
+    return false;
+  }
+  const auto& analyses = inflection.analyze(surface);
+  return std::any_of(analyses.begin(), analyses.end(), [&](const auto& analysis) {
+    return analysis.verb_type == grammar::VerbType::IAdjective && analysis.base_form == surface;
+  });
+}
+
 bool isNounInDictionary(const dictionary::DictionaryManager* dict_manager, std::string_view surface) {
   return hasDictionaryEntry(dict_manager, surface, core::PartOfSpeech::Noun);
 }

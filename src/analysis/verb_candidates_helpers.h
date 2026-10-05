@@ -163,6 +163,15 @@ bool opensWordAfterQuantity(const dictionary::DictionaryManager* dict_manager, c
 bool isProductiveShiiAdjectiveTerminal(std::string_view surface, const grammar::Inflection& inflection);
 
 /**
+ * @brief Whether the analyzer reads @p surface as an i-adjective terminal
+ *
+ * Before the nominalizer ん or the quotative っ only a finished predicate stands
+ * (つらい+ん+だ, えぐい+って); a noun cannot take either directly, so the
+ * terminal reading needs no lexical support there.
+ */
+bool readsAsIAdjectiveTerminal(std::string_view surface, const grammar::Inflection& inflection);
+
+/**
  * @brief Check if a surface exists in dictionary as a noun (exact match)
  *
  * Reports a hit only for an entry whose surface equals @p surface, so a shorter

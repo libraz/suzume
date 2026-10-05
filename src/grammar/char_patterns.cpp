@@ -462,7 +462,9 @@ bool isFinalParticleStackTail(std::string_view surface) {
     const bool matches_row = (kana::isARowCodepoint(head) && lengthening == U'あ') ||
                              (kana::isERowCodepoint(head) && lengthening == U'え') ||
                              (kana::isORowCodepoint(head) && lengthening == U'お');
-    if (lengthening != U'ー' && !matches_row) {
+    // So does the emphatic sokuon that closes the utterance (よ+ねっ).
+    const bool emphatic_close = lengthening == U'っ' && byte_pos == surface.size();
+    if (lengthening != U'ー' && !matches_row && !emphatic_close) {
       return false;
     }
   }

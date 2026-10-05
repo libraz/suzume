@@ -2,6 +2,7 @@
 #include "analysis/scorer_constants.h"
 #include "core/types.h"
 #include "grammar/char_patterns.h"
+#include "normalize/utf8.h"
 
 namespace sc = suzume::analysis::scorer;
 
@@ -28,6 +29,10 @@ float Scorer::eosCost(const core::LatticeEdge& edge, core::ExtendedPOS prev_exte
   if (edge.extended_pos == core::ExtendedPOS::NounFormal && prev_extended_pos == core::ExtendedPOS::VerbRenyokei &&
       !grammar::isSubstantiveFormalNoun(edge.surface)) {
     return sc::kEosRenyokeiFormalNounPenalty;
+  }
+
+  if (edge.extended_pos == core::ExtendedPOS::VerbOnbinkei && utf8::endsWith(edge.surface, "っ")) {
+    return sc::kEosSokuonOnbinPenalty;
   }
 
   const sc::BoundaryCost boundary_cost = sc::getBoundaryCost(edge.extended_pos);

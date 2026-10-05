@@ -456,6 +456,9 @@ constexpr float kEosShortRenyokeiPenalty = scale::kStrong;
 // of a sentence leaves the competing volitional reading of the same run — the
 // only reading available there — to win (やめよう as やめよ+う, not やめ+よう).
 constexpr float kEosRenyokeiFormalNounPenalty = scale::kAlmostNever;
+// A sokuon onbin cell exists only before た/て/たり (言っ+た); at the end of an
+// utterance the っ is the emphatic one on a final particle (だから+ねっ).
+constexpr float kEosSokuonOnbinPenalty = scale::kAlmostNever;
 // An irrealis form is the bare stem of an auxiliary chain, so it can never be
 // the last morpheme: something has to fill the slot it opened. Without this a
 // fabricated irrealis covering the conditional なら+ば wins over the copula

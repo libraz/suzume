@@ -253,18 +253,12 @@ void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, s
           break;
         }
       }
-      // An i-adjective terminal right before the っ is a finished predicate
-      // whose っ opens the quotative (えぐい+って), not the stem of an unattested
-      // verb ending in い.
-      bool closes_on_adjective_terminal = false;
-      if (is_sokuonbin && !lemma_dict_verified && codepoints[onbin_pos - 1] == U'い') {
-        const std::string adjective_span = extractSubstring(codepoints, start_pos, onbin_pos);
-        const auto adjective_analyses = analysesInRange(inflection, codepoints, start_pos, onbin_pos);
-        closes_on_adjective_terminal =
-            std::any_of(adjective_analyses.begin(), adjective_analyses.end(), [&](const auto& analysis) {
-              return analysis.verb_type == grammar::VerbType::IAdjective && analysis.base_form == adjective_span;
-            });
-      }
+      // An i-adjective terminal right before the っ or ん is a finished
+      // predicate whose っ opens the quotative (えぐい+って) and whose ん is the
+      // nominalizer (つらい+ん+だ), not the stem of an unattested verb ending in い.
+      const bool closes_on_adjective_terminal =
+          (is_sokuonbin || is_hatsuonbin) && !lemma_dict_verified &&
+          vh::readsAsIAdjectiveTerminal(extractSubstring(codepoints, start_pos, onbin_pos), inflection);
       if (closes_on_adjective_terminal) {
         SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << onbin_surface << "\" adjective_terminal_before_quote\n");
         continue;

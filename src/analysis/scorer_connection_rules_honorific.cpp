@@ -340,9 +340,13 @@ float computeProgressiveHonorificBonus(const core::LatticeEdge& prev, const core
   // Penalty for だ(AuxTenseTa) after non-ん/non-い words
   // だ as past tense follows ん-onbin (読んだ, 飲んだ) or い-onbin (泳いだ, 注いだ)
   // Without this, てる+だ(past) beats てる+だけ(adverbial particle)
-  // because AuxAspectIru→AuxTenseTa bonus applies to both た and だ
+  // because AuxAspectIru→AuxTenseTa bonus applies to both た and だ.
+  // The onbin is a verb's continuative cell, so an irrealis or a negative
+  // that merely ends in ん is no host either (the contracted irrealis いん and
+  // the negative ん of つら+い+ん+だ, for つらい+ん+だ).
   if (next.surface == "だ" && next.extended_pos == core::ExtendedPOS::AuxTenseTa &&
-      !utf8::endsWith(prev.surface, "ん") && !utf8::endsWith(prev.surface, "い")) {
+      ((!utf8::endsWith(prev.surface, "ん") && !utf8::endsWith(prev.surface, "い")) ||
+       prev.extended_pos == core::ExtendedPOS::VerbMizenkei || prev.extended_pos == core::ExtendedPOS::AuxNegativeNu)) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
 

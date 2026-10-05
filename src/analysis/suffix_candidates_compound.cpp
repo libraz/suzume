@@ -378,10 +378,25 @@ bool hasAuxiliaryParticleDecomposition(const std::vector<char32_t>& codepoints, 
   if (hasExactPartOfSpeech(*dict_manager, codepoints, start_pos, end_pos, kOpenClassPartOfSpeechMask)) {
     return false;
   }
+  // Behind the auxiliary stands one particle, or a final particle plus the
+  // modal tail that licenses a stack (だ+よ+ね, but not う+わ+べ).
+  const auto final_particle_at = [&](size_t from, size_t to) {
+    const auto* particle = lookupEntryInRange(*dict_manager, codepoints, from, to, core::PartOfSpeech::Particle);
+    return particle != nullptr && particle->extended_pos == core::ExtendedPOS::ParticleFinal ? particle : nullptr;
+  };
   for (size_t split = start_pos + 1; split < end_pos; ++split) {
-    if (lookupEntryInRange(*dict_manager, codepoints, start_pos, split, core::PartOfSpeech::Auxiliary) != nullptr &&
-        lookupEntryInRange(*dict_manager, codepoints, split, end_pos, core::PartOfSpeech::Particle) != nullptr) {
+    if (lookupEntryInRange(*dict_manager, codepoints, start_pos, split, core::PartOfSpeech::Auxiliary) == nullptr) {
+      continue;
+    }
+    if (lookupEntryInRange(*dict_manager, codepoints, split, end_pos, core::PartOfSpeech::Particle) != nullptr) {
       return true;
+    }
+    for (size_t tail_start = split + 1; tail_start < end_pos; ++tail_start) {
+      const auto* tail = final_particle_at(tail_start, end_pos);
+      if (final_particle_at(split, tail_start) != nullptr && tail != nullptr &&
+          grammar::isFinalParticleStackTail(tail->surface)) {
+        return true;
+      }
     }
   }
   return false;

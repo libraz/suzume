@@ -194,6 +194,7 @@ bool hasAuxiliaryChainDecomposition(const std::vector<char32_t>& codepoints, siz
 
 /**
  * @brief Return true when a span is exactly a closed auxiliary+particle chain
+ *        (です+よ), the particle being possibly a final-particle stack (だ+よ+ね)
  *
  * Three morae is the floor, for the reason its auxiliary+auxiliary sibling above
  * states: two morae are spelled by too many one-mora closed-class forms to be

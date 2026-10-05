@@ -2707,9 +2707,12 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
       if (!emphatic.empty() && !unlicensed_bare_sokuon && !unlicensed_particle_lengthening &&
           !lengthening_spells_word) {
         // Determine extended_pos for emphatic form
-        // Sokuon-ending verb forms should be VerbOnbinkei (音便形)
+        // A sokuon on a continuative reads as its onbin cell (い → いっ for
+        // と+いっ+て); on a finished form (待て+っ) it is only emphasis, and the
+        // form keeps its own cell.
         core::ExtendedPOS emphatic_epos = result.entry->extended_pos;
-        if (result.entry->pos == core::PartOfSpeech::Verb && emphatic.suffix == "っ") {
+        if (result.entry->pos == core::PartOfSpeech::Verb && emphatic.suffix == "っ" &&
+            result.entry->extended_pos == core::ExtendedPOS::VerbRenyokei) {
           // E.g., い(連用形) + っ → いっ(音便形) for と+いっ+て pattern
           emphatic_epos = core::ExtendedPOS::VerbOnbinkei;
         }

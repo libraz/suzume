@@ -547,8 +547,16 @@ void generateHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints
   if (starts_with_particle && !has_prolonged) {
     // Check if the full sequence (or any length) forms a valid adjective
     // Use lower threshold (0.50) for particle-starting sequences to catch
-    // words like かわいい (confidence=0.51)
-    for (size_t end = max_hiragana_end; end > start_pos + 2; --end) {
+    // words like かわいい (confidence=0.51). The nominalizer ん closes the
+    // terminal here too (から+い is からい+ん+だ, not one adjective からいんだ).
+    size_t particle_scan_end = max_hiragana_end;
+    for (size_t pos = start_pos + 3; pos < max_hiragana_end; ++pos) {
+      if (codepoints[pos] == U'ん') {
+        particle_scan_end = pos;
+        break;
+      }
+    }
+    for (size_t end = particle_scan_end; end > start_pos + 2; --end) {
       std::string test_surface = extractSubstring(codepoints, start_pos, end);
 
       // A bare -く is an adverbial connective, not an adjective terminal.
@@ -634,7 +642,9 @@ void generateHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints
           // かっ must still break — the rare ない-family adjective (少なかった) is left to the
           // pre-existing split rather than mis-scored as one token.
           bool is_katt_past = adj_detail::opensAdjectivePastConnective(codepoints, hiragana_end);
-          if (!is_katt_past && (normalize::isExtendedParticle(curr_char) || curr_char == U'や')) {
+          // The contracted nominalizer ん closes the terminal the way の does
+          // (つらい+ん+だ, つらい+の).
+          if (!is_katt_past && (normalize::isExtendedParticle(curr_char) || curr_char == U'や' || curr_char == U'ん')) {
             break;  // Stop before the particle
           }
         }

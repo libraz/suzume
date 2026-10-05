@@ -1674,6 +1674,82 @@
       ],
       "id": "oishiidesune",
       "input": "おいしいですね"
+    },
+    {
+      "description": "つらいんだからねっ。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "つらい",
+          "pos": "Adjective",
+          "surface": "つらい"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "から",
+          "pos": "Particle",
+          "surface": "から"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ねっ"
+        }
+      ],
+      "id": "tsuraindakaranett",
+      "input": "つらいんだからねっ。"
+    },
+    {
+      "description": "からいんだ - auto-generated",
+      "expected": [
+        {
+          "lemma": "からい",
+          "pos": "Adjective",
+          "surface": "からい"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "karainda",
+      "input": "からいんだ"
+    },
+    {
+      "description": "おいしいんだ - auto-generated",
+      "expected": [
+        {
+          "lemma": "おいしい",
+          "pos": "Adjective",
+          "surface": "おいしい"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "oishiinda",
+      "input": "おいしいんだ"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 3/3)",
