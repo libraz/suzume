@@ -2301,6 +2301,72 @@
       ],
       "id": "zo_enuru",
       "input": "人ぞ見えぬる"
+    },
+    {
+      "description": "Past ki realis shika after a bare kanji continuative",
+      "expected": [
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "き",
+          "pos": "Auxiliary",
+          "surface": "しか"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "shikaba_2",
+      "input": "来しかば"
+    },
+    {
+      "description": "Past ki realis shika before concessive do",
+      "expected": [
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "き",
+          "pos": "Auxiliary",
+          "surface": "しか"
+        },
+        {
+          "lemma": "ど",
+          "pos": "Particle",
+          "surface": "ど"
+        }
+      ],
+      "id": "shikado",
+      "input": "来しかど"
+    },
+    {
+      "description": "Past ki realis shika after a bare kanji continuative",
+      "expected": [
+        {
+          "lemma": "出る",
+          "pos": "Verb",
+          "surface": "出"
+        },
+        {
+          "lemma": "き",
+          "pos": "Auxiliary",
+          "surface": "しか"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "shikaba_3",
+      "input": "出しかば"
     }
   ],
   "description": "auxiliary_classical tests",

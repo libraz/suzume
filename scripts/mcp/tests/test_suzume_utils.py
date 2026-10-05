@@ -429,3 +429,15 @@ class TestClassicalPerfectNuru:
     def test_keeps_the_negative_before_a_noun(self):
         tokens, _, _ = get_expected_tokens("見ぬ人")
         assert [token["surface"] for token in tokens] == ["見", "ぬ", "人"]
+
+
+class TestClassicalPastShikaFusedHost:
+    @pytest.mark.parametrize("text", ["来しかば", "来しかど", "出しかば"])
+    def test_splits_the_realis_off_a_fused_host(self, text):
+        tokens, _, _ = get_expected_tokens(text)
+        assert [(token["surface"], token["pos"]) for token in tokens][:2] == [(text[0], "Verb"), ("しか", "Auxiliary")]
+
+    @pytest.mark.parametrize("text", ["来すか", "話しかば"])
+    def test_leaves_a_host_whose_stem_is_no_continuative(self, text):
+        tokens, _, _ = get_expected_tokens(text)
+        assert "しか" not in [token["surface"] for token in tokens]

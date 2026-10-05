@@ -99,6 +99,39 @@ def postprocess_classical_past_izenkei_shika(tokens: list[dict]) -> bool:
     return changed
 
 
+_CONCESSIVE_CONDITIONAL_PARTICLES = ("ば", "ど", "ども")
+
+
+@reports_mutation
+def postprocess_classical_past_shika_fused_host(tokens: list[dict]) -> None:
+    """Split the past き's realis しか back off a host the analyzer fused it into.
+
+    Behind a bare kanji continuative (来, 出) the dictionary reads the し of
+    しか as the end of a 五段サ行 verb it makes up (来す) or a noun (出し), and
+    the か that remains as a particle.  Before ば/ど the pair is the realis of
+    き on the bare continuative, which the same probe as the sibling rule
+    confirms for the shortened host.
+    """
+    idx = 1
+    while idx + 1 < len(tokens):
+        token, host = tokens[idx], tokens[idx - 1]
+        stem = host.get("surface", "")[:-1]
+        if (
+            token.get("surface") == "か"
+            and token.get("pos") == "Particle"
+            and tokens[idx + 1].get("surface") in _CONCESSIVE_CONDITIONAL_PARTICLES
+            and host.get("surface", "").endswith("し")
+            and host.get("pos") in ("Verb", "Noun")
+            and stem
+            and (reading := _verb_continuative_reading(stem)) is not None
+        ):
+            tokens[idx - 1 : idx + 1] = [
+                {"surface": stem, "pos": "Verb", "lemma": reading.get("lemma", stem)},
+                {"surface": "しか", "pos": "Auxiliary", "lemma": "き"},
+            ]
+        idx += 1
+
+
 @reports_mutation
 def postprocess_classical_conjecture_aux(tokens: list[dict]) -> bool:
     """Treat classical けむ/らむ after a predicate as auxiliaries.
