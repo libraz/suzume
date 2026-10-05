@@ -783,6 +783,60 @@
       ],
       "id": "wo_rashimasen",
       "input": "旗を揺らしません"
+    },
+    {
+      "description": "kanji plus ya godan sa continuative before masu",
+      "expected": [
+        {
+          "lemma": "予算",
+          "pos": "Noun",
+          "surface": "予算"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "増やす",
+          "pos": "Verb",
+          "surface": "増やし"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "wo_yashimasu",
+      "input": "予算を増やします"
+    },
+    {
+      "description": "kanji plus ya godan sa irrealis before nai",
+      "expected": [
+        {
+          "lemma": "頭",
+          "pos": "Noun",
+          "surface": "頭"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "冷やす",
+          "pos": "Verb",
+          "surface": "冷やさ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "wo_yasanai",
+      "input": "頭を冷やさない"
     }
   ],
   "description": "Godan Sa-row verbs (五段サ行動詞) - verbs ending in す",

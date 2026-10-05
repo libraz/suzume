@@ -1449,6 +1449,80 @@
       ],
       "id": "rarenai",
       "input": "来られない"
+    },
+    {
+      "description": "kanji plus ya godan sa irrealis before the passive",
+      "expected": [
+        {
+          "lemma": "人数",
+          "pos": "Noun",
+          "surface": "人数"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "増やす",
+          "pos": "Verb",
+          "surface": "増やさ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "しまう",
+          "pos": "Auxiliary",
+          "surface": "しまえ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "wo_yasareteshimaeba",
+      "input": "人数を増やされてしまえば"
+    },
+    {
+      "description": "kanji plus ya godan sa irrealis before the passive",
+      "expected": [
+        {
+          "lemma": "時間",
+          "pos": "Noun",
+          "surface": "時間"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "費やす",
+          "pos": "Verb",
+          "surface": "費やさ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ga_yasareta",
+      "input": "時間が費やされた"
     }
   ],
   "description": "Passive voice verbs (受身形) - MeCab-compatible split format",

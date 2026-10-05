@@ -413,10 +413,13 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
     }
   }
   // や is usually the enumerating particle, but kanji + やす is the regular
-  // Godan-sa shape of verbs such as 増やす and 費やす.  The final す supplies
-  // the inflectional evidence that distinguishes it from the particle.
+  // Godan-sa shape of verbs such as 増やす and 費やす.  A sa-row cell after
+  // や supplies the inflectional evidence that distinguishes it from the
+  // particle (増やさ+れる, 増やし+ます, 増やせ+ば, 増やそ+う).
+  const char32_t after_ya = kanji_end + 1 < codepoints.size() ? codepoints[kanji_end + 1] : 0;
   const bool is_yasu_godan_shape =
-      first_hiragana == U'や' && kanji_end + 1 < codepoints.size() && codepoints[kanji_end + 1] == U'す';
+      first_hiragana == U'や' &&
+      (after_ya == U'さ' || after_ya == U'し' || after_ya == U'す' || after_ya == U'せ' || after_ya == U'そ');
   const bool has_complete_particle_initial_verb = hasCompleteParticleInitialVerbEvidence(
       codepoints, start_pos, kanji_end, hiragana_end, inflection, dict_manager, verb_opts);
   // A one-kanji ichidan stem takes an adjective that attaches to the
