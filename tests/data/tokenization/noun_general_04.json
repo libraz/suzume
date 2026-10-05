@@ -2003,6 +2003,94 @@
       ],
       "id": "to_wo_ru",
       "input": "彼氏と映画を見る"
+    },
+    {
+      "description": "久しぶりだね。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "久しぶり",
+          "pos": "Noun",
+          "surface": "久しぶり"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        }
+      ],
+      "id": "shiburidane",
+      "input": "久しぶりだね。"
+    },
+    {
+      "description": "久しぶりだった - auto-generated",
+      "expected": [
+        {
+          "lemma": "久しぶり",
+          "pos": "Noun",
+          "surface": "久しぶり"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "shiburidattta",
+      "input": "久しぶりだった"
+    },
+    {
+      "description": "お久しぶりだね - auto-generated",
+      "expected": [
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "久しぶり",
+          "pos": "Noun",
+          "surface": "久しぶり"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        }
+      ],
+      "id": "o_shiburidane",
+      "input": "お久しぶりだね"
+    },
+    {
+      "description": "久しぶりね - auto-generated",
+      "expected": [
+        {
+          "lemma": "久しぶり",
+          "pos": "Noun",
+          "surface": "久しぶり"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        }
+      ],
+      "id": "shiburine",
+      "input": "久しぶりね"
     }
   ],
   "description": "General nouns (part 4/4)",

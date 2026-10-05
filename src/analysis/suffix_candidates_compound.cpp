@@ -29,12 +29,29 @@ namespace suzume::analysis {
 namespace {
 
 // End of the hiragana run at @p start, at most four kana and stopping before a
-// particle-like kana.
+// particle-like kana. The terminal copula だ opens a predicate over the noun
+// in front (久しぶり+だ, 宝くじ+だ, 本+だ), and a final particle closing the
+// clause ends it once past the first kana (久しぶり+ね).
 size_t scanCompoundHiraganaEnd(const std::vector<char32_t>& codepoints,
-                               const std::vector<normalize::CharType>& char_types, size_t start) {
+                               const std::vector<normalize::CharType>& char_types, size_t start,
+                               const dictionary::DictionaryManager* dict_manager) {
   size_t end = start;
   while (end < char_types.size() && end - start < 4 && char_types[end] == normalize::CharType::Hiragana &&
          !normalize::isParticleCodepoint(codepoints[end])) {
+    if (dict_manager != nullptr) {
+      const auto* copula = lookupEntryInRange(*dict_manager, codepoints, end, end + 1, core::PartOfSpeech::Auxiliary);
+      const bool terminal_copula = copula != nullptr && copula->extended_pos == core::ExtendedPOS::AuxCopulaDa &&
+                                   copula->lemma == extractSubstring(codepoints, end, end + 1);
+      const auto* final_particle =
+          lookupEntryInRange(*dict_manager, codepoints, end, end + 1, core::PartOfSpeech::Particle);
+      const bool closes_clause_after =
+          end + 1 >= codepoints.size() || char_types[end + 1] != normalize::CharType::Hiragana;
+      if (terminal_copula ||
+          (end > start && final_particle != nullptr &&
+           final_particle->extended_pos == core::ExtendedPOS::ParticleFinal && closes_clause_after)) {
+        break;
+      }
+    }
     ++end;
   }
   return end;
@@ -712,7 +729,7 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
   if (kanji_end >= char_types.size() || char_types[kanji_end] != normalize::CharType::Hiragana) {
     return;
   }
-  const size_t hiragana_end = scanCompoundHiraganaEnd(codepoints, char_types, kanji_end);
+  const size_t hiragana_end = scanCompoundHiraganaEnd(codepoints, char_types, kanji_end, dict_manager);
   const size_t hiragana_len = hiragana_end - kanji_end;
   const char32_t first_hira = codepoints[kanji_end];
 
@@ -782,7 +799,7 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
         if (next_hira == U'た' || next_hira == U'て') {
           return;  // Skip - this is a verb conjugation, not a compound noun
         }
-        const size_t hira2_end = scanCompoundHiraganaEnd(codepoints, char_types, sokuon_pos + 1);
+        const size_t hira2_end = scanCompoundHiraganaEnd(codepoints, char_types, sokuon_pos + 1, dict_manager);
 
         if (hira2_end > sokuon_pos + 1) {
           // A registered adjective beginning at the sokuon is a productive
@@ -1076,13 +1093,6 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
   // into compound nouns
   if (last_hira == U'お') {
     looks_like_aux = true;
-  }
-
-  // A terminal copular だ is always a separate grammatical boundary after a
-  // nominal or na-adjective stem (平ら+だ), never part of an unknown mixed-
-  // script compound noun.
-  if (last_hira == U'だ') {
-    return;
   }
 
   // X+さ is an adjective nominalization when X is a verified adjective stem;

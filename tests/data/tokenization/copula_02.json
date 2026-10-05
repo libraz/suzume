@@ -117,6 +117,23 @@
       ],
       "id": "gohandeshita",
       "input": "ごはんでした"
+    },
+    {
+      "description": "宝くじだ - auto-generated",
+      "expected": [
+        {
+          "lemma": "宝くじ",
+          "pos": "Noun",
+          "surface": "宝くじ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "kujida",
+      "input": "宝くじだ"
     }
   ],
   "description": "Copula patterns (だ、です、である) (part 2/2)",
