@@ -17,7 +17,8 @@ namespace suzume::postprocess::resolver {
 // noun homograph can win before a short dependent auxiliary.  The follower
 // resolves the category without lexical enumeration: 食べ+ん is negative,
 // while 食べ+とく is the preparatory subsidiary.
-void resolveDeverbalStemBeforeDependentAuxiliary(std::vector<core::Morpheme>& result) {
+void resolveDeverbalStemBeforeDependentAuxiliary(std::vector<core::Morpheme>& result,
+                                                 const dictionary::DictionaryManager* dict_manager) {
   for (size_t idx = 0; idx + 1 < result.size(); ++idx) {
     auto& stem = result[idx];
     auto& auxiliary = result[idx + 1];
@@ -26,6 +27,17 @@ void resolveDeverbalStemBeforeDependentAuxiliary(std::vector<core::Morpheme>& re
     if ((!nominal_stem || (!negative_nai && stem.extended_pos != core::ExtendedPOS::NounVerbal)) ||
         !kana::isERowCodepoint(utf8::decodeLastChar(stem.surface))) {
       continue;
+    }
+    // The suffix げ on an adjective stem or a kanji compound forms the noun
+    // that ない takes as its subject (危なげ+ない, 大人げ+ない), not an
+    // unlisted Ichidan stem; candidate generation emits it on the same terms.
+    if (dict_manager != nullptr && utf8::decodeLastChar(stem.surface) == U'げ' &&
+        dict_manager->lookupExact(stem.surface + "る", core::PartOfSpeech::Verb) == nullptr) {
+      const std::string host(utf8::dropLastChar(stem.surface));
+      const bool kanji_compound_host = normalize::utf8Length(host) >= 2 && grammar::isAllKanji(host);
+      if (kanji_compound_host || dict_manager->lookupExact(host + "い", core::PartOfSpeech::Adjective) != nullptr) {
+        continue;
+      }
     }
     const bool negative_n = auxiliary.surface == "ん" && (auxiliary.extended_pos == core::ExtendedPOS::AuxNegativeNu ||
                                                           auxiliary.extended_pos == core::ExtendedPOS::ParticleNo);

@@ -48,7 +48,8 @@ void resolveBenefactivePotential(std::vector<core::Morpheme>& result);
 void resolveBindingParticleNegative(std::vector<core::Morpheme>& result);
 void resolveComparisonNoun(std::vector<core::Morpheme>& result);
 void resolveCompoundAdjectiveRenyokei(std::vector<core::Morpheme>& result);
-void resolveDeverbalStemBeforeDependentAuxiliary(std::vector<core::Morpheme>& result);
+void resolveDeverbalStemBeforeDependentAuxiliary(std::vector<core::Morpheme>& result,
+                                                 const dictionary::DictionaryManager* dict_manager);
 void resolveQuotativeParticleRoles(std::vector<core::Morpheme>& result);
 void resolveCopularAro(std::vector<core::Morpheme>& result);
 void resolveCopularForms(std::vector<core::Morpheme>& result);

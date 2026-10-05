@@ -17,7 +17,7 @@ namespace suzume::postprocess {
 // the resulting noun/verb category.
 void resolvePrePrefixMorphemeRoles(std::vector<core::Morpheme>& result,
                                    const dictionary::DictionaryManager* dict_manager) {
-  resolver::resolveDeverbalStemBeforeDependentAuxiliary(result);
+  resolver::resolveDeverbalStemBeforeDependentAuxiliary(result, dict_manager);
   resolver::resolveQuotativeParticleRoles(result);
   resolver::resolveAmbiguousInflections(result);
 

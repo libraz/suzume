@@ -721,6 +721,26 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
                                                  CandidateOrigin::AdjectiveI, 1.0F, "adj_stem_ext_adj"));
     }
   }
+
+  // The suffix げ forms a noun that the supplementary ない takes as its
+  // subject, on an adjective stem (危なげ+ない) and on a kanji compound
+  // (大人げ+ない) alike; elsewhere it stays stem+げ (寂し+げ+な). A compound
+  // whose last kanji spells an ichidan verb with げ keeps that verb (引上げ).
+  for (size_t ge_pos = kanji_end; ge_pos + 2 < hiragana_end; ++ge_pos) {
+    if (codepoints[ge_pos] != U'げ' || !verb_helpers::naiNegativeFollowsAt(codepoints, ge_pos + 1)) {
+      continue;
+    }
+    const std::string stem = extractSubstring(codepoints, start_pos, ge_pos);
+    const bool kanji_compound_host = ge_pos == kanji_end && kanji_end >= start_pos + 2 &&
+                                     !verb_helpers::isVerbInDictionary(dict_manager, stem + "げる") &&
+                                     !verb_helpers::isVerbInDictionary(
+                                         dict_manager, extractSubstring(codepoints, kanji_end - 1, kanji_end) + "げる");
+    if (kanji_compound_host || isAdjectiveInDictionary(dict_manager, stem + "い")) {
+      candidates.push_back(makeNounCandidate(stem + "げ", start_pos, ge_pos + 1, candidate::kAdjStemExtCost, false,
+                                             CandidateOrigin::AdjectiveI, core::ExtendedPOS::Noun));
+    }
+    break;
+  }
 }
 
 namespace {

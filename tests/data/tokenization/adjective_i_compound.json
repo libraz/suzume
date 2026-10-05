@@ -1034,6 +1034,79 @@
       ],
       "id": "ttkoni_ru",
       "input": "隅っこに座る"
+    },
+    {
+      "description": "adjective stem plus ge is a noun before the supplementary nai",
+      "expected": [
+        {
+          "lemma": "危なげ",
+          "pos": "Noun",
+          "surface": "危なげ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
+      "id": "nagenai",
+      "input": "危なげない"
+    },
+    {
+      "description": "adjective stem plus ge is a noun before the supplementary naku",
+      "expected": [
+        {
+          "lemma": "危なげ",
+          "pos": "Noun",
+          "surface": "危なげ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "なく"
+        },
+        {
+          "lemma": "勝つ",
+          "pos": "Verb",
+          "surface": "勝っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "nagenaku_ttta",
+      "input": "危なげなく勝った"
+    },
+    {
+      "description": "kanji compound plus ge is a noun before the supplementary nai",
+      "expected": [
+        {
+          "lemma": "大人げ",
+          "pos": "Noun",
+          "surface": "大人げ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
+      "id": "genai",
+      "input": "大人げない"
+    },
+    {
+      "description": "bound stem sarige: sarigenai is one adjective",
+      "expected": [
+        {
+          "lemma": "さりげない",
+          "pos": "Adjective",
+          "surface": "さりげない"
+        }
+      ],
+      "id": "sarigenai",
+      "input": "さりげない"
     }
   ],
   "description": "I-adjectives compound/derived forms (複合・派生) - sou patterns, nominalization, contracted forms",

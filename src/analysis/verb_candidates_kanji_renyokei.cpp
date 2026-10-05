@@ -470,8 +470,13 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
         // first two kana misses the conditional and fabricates 危なける from
         // 危なけれ+ば.
         const std::string okurigana = extractSubstring(codepoints, kanji_end, hiragana_end);
+        // Its stem also takes the appearance suffix げ (危な+げ), which is no
+        // ichidan continuative (危なげる).
         const bool is_nai_adjective_okurigana =
-            utf8::startsWithAny(okurigana, {"ない", "なく", "なかっ", "なけれ", "なかろ"});
+            utf8::startsWithAny(okurigana, {"ない", "なく", "なかっ", "なけれ", "なかろ"}) ||
+            (codepoints[renyokei_end - 1] == U'げ' &&
+             vh::isAdjectiveInDictionary(dict_manager,
+                                         extractSubstring(codepoints, start_pos, renyokei_end - 1) + "い"));
         // A-row + せ/れ before an auxiliary continuation is a Godan voice
         // stem (読ま+せる, 読ま+れる). Keep a genuinely lexicalized Ichidan
         // verb such as 泳がせる, but do not generate an unverified long
