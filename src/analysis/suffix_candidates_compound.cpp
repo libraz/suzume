@@ -381,6 +381,26 @@ bool isSelectedNominalHeadShape(const std::vector<normalize::CharType>& char_typ
                      [](normalize::CharType type) { return type == normalize::CharType::Hiragana; });
 }
 
+// True when a registered suffix, particle or auxiliary starts in
+// [first_start, end_pos) and ends after end_pos.
+bool closedClassEntryCrossesEnd(const dictionary::DictionaryManager& dict_manager,
+                                const std::vector<char32_t>& codepoints, size_t first_start, size_t end_pos) {
+  for (size_t split = first_start; split < end_pos; ++split) {
+    const std::string rest = extractSubstring(codepoints, split, codepoints.size());
+    for (const auto& match : dict_manager.lookup(rest, 0)) {
+      if (match.entry == nullptr || split + match.length <= end_pos) {
+        continue;
+      }
+      const auto pos = match.entry->pos;
+      if (pos == core::PartOfSpeech::Suffix || pos == core::PartOfSpeech::Particle ||
+          pos == core::PartOfSpeech::Auxiliary) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 }  // namespace
 
 bool hasAuxiliaryParticleDecomposition(const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos,
@@ -622,6 +642,12 @@ void generateSelectedNominalHeadCandidates(const std::vector<char32_t>& codepoin
       }
     }
     if (contains_predicate_auxiliary_boundary) {
+      continue;
+    }
+
+    // A registered function word that opens inside the head and runs past its
+    // end owns that right edge, so the head would cut it in two (店+ならでは).
+    if (closedClassEntryCrossesEnd(*dict_manager, codepoints, start_pos + 1, head_end)) {
       continue;
     }
 

@@ -53,6 +53,102 @@
       ],
       "id": "kotoarugotoni",
       "input": "ことあるごとに"
+    },
+    {
+      "description": "この店ならではの味わいがある - auto-generated",
+      "expected": [
+        {
+          "lemma": "この",
+          "pos": "Determiner",
+          "surface": "この"
+        },
+        {
+          "lemma": "店",
+          "pos": "Noun",
+          "surface": "店"
+        },
+        {
+          "lemma": "ならでは",
+          "pos": "Suffix",
+          "surface": "ならでは"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "味わい",
+          "pos": "Noun",
+          "surface": "味わい"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        }
+      ],
+      "id": "kono_naradehano_waigaaru",
+      "input": "この店ならではの味わいがある"
+    },
+    {
+      "description": "その町ならではの - auto-generated",
+      "expected": [
+        {
+          "lemma": "その",
+          "pos": "Determiner",
+          "surface": "その"
+        },
+        {
+          "lemma": "町",
+          "pos": "Noun",
+          "surface": "町"
+        },
+        {
+          "lemma": "ならでは",
+          "pos": "Suffix",
+          "surface": "ならでは"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        }
+      ],
+      "id": "sono_naradehano",
+      "input": "その町ならではの"
+    },
+    {
+      "description": "あの人ならではだ - auto-generated",
+      "expected": [
+        {
+          "lemma": "あの",
+          "pos": "Determiner",
+          "surface": "あの"
+        },
+        {
+          "lemma": "人",
+          "pos": "Noun",
+          "surface": "人"
+        },
+        {
+          "lemma": "ならでは",
+          "pos": "Suffix",
+          "surface": "ならでは"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "ano_naradehada",
+      "input": "あの人ならではだ"
     }
   ],
   "description": "Formal nouns (こと、もの、ところ) (part 2/2)",
