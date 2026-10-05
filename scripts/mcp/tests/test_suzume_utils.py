@@ -708,3 +708,19 @@ class TestPejorativeYagaru:
     def test_leaves_other_ya_ga_sequences(self, text):
         tokens, _, _ = get_expected_tokens(text)
         assert all(token["lemma"] != "やがる" for token in tokens)
+
+
+class TestColloquialNegative:
+    @pytest.mark.parametrize(
+        ("text", "host"),
+        [("変わんねえ。", "変わん"), ("帰んねえよ", "帰ん"), ("知らねえ", "知ら"), ("変わらねえ", "変わら")],
+    )
+    def test_nee_after_an_irrealis_is_the_negative(self, text, host):
+        tokens, _, _ = get_expected_tokens(text)
+        surfaces = [token["surface"] for token in tokens]
+        at = surfaces.index(host)
+        assert (tokens[at + 1]["pos"], tokens[at + 1]["lemma"]) == ("Auxiliary", "ない")
+
+    def test_final_particle_nee_stays_after_a_finite_form(self):
+        tokens, _, _ = get_expected_tokens("いいねえ")
+        assert tokens[-1]["pos"] == "Particle"

@@ -1241,24 +1241,30 @@ def repair_contracted_iika(tokens: list[dict]) -> None:
 
 
 def repair_lengthened_negative(tokens: list[dict]) -> None:
-    """Read ねー after an irrealis or an adjective's く as the negative ない.
+    """Read a colloquial ねえ/ねぇ/ねー after an irrealis as the negative ない.
 
-    The reference already reads ねぇ and ねえ there as the colloquial ない, but
-    takes the ー spelling for the final particle ね; a final particle cannot
-    follow a bare irrealis or continuative.
+    The reference reads ねぇ and ねえ as the colloquial ない after a plain
+    irrealis, but takes the ー spelling, and every spelling after the
+    ん-contracted irrealis of a ra-row verb (変わん, わかん), for the final
+    particle ね; a final particle cannot follow a bare irrealis or an
+    adjective's continuative.
     """
     for idx in range(1, len(tokens)):
         host, token = tokens[idx - 1], tokens[idx]
-        if (
-            token.get("surface") == "ねー"
-            and token.get("pos") == "助詞"
-            and (
-                (host.get("pos") == "動詞" and host.get("conj_form") == "未然形")
-                or (host.get("pos") == "形容詞" and host.get("conj_form", "").startswith("連用"))
-            )
-        ):
+        if token.get("pos") != "助詞" or token.get("surface") not in _CONTRACTED_NEGATIVES:
+            continue
+        contracted_irrealis = (
+            host.get("pos") == "動詞"
+            and host.get("surface", "").endswith("ん")
+            and host.get("conj_form") in ("未然特殊", "体言接続特殊")
+        )
+        lengthened_after_irrealis = token.get("surface") == "ねー" and (
+            (host.get("pos") == "動詞" and host.get("conj_form") == "未然形")
+            or (host.get("pos") == "形容詞" and host.get("conj_form", "").startswith("連用"))
+        )
+        if contracted_irrealis or lengthened_after_irrealis:
             tokens[idx] = {
-                "surface": "ねー",
+                "surface": token.get("surface", ""),
                 "pos": "助動詞",
                 "conj_type": "特殊・ナイ",
                 "conj_form": "音便基本形",
