@@ -472,6 +472,16 @@ def _split_quotative_headword(token: dict, following: list[dict]) -> list[dict] 
     return None
 
 
+# An adjective spelled as a げ noun plus a cell of ない.
+_GE_NAI_ADJECTIVE = regex.compile(r"(.+げ)(な(?:い|く|かっ|けれ|さ|き))")
+
+
+def _reads_as_one_noun(surface: str) -> bool:
+    """Whether the reference dictionary reads `surface` alone as one noun."""
+    tokens = mecab_analyze(surface)
+    return len(tokens) == 1 and tokens[0].get("pos") == "名詞"
+
+
 def apply_suzume_split(tokens: list[dict]) -> tuple[list[dict], str | None]:
     """Apply Suzume split rules to MeCab tokens.
 
@@ -1150,6 +1160,16 @@ def apply_suzume_split(tokens: list[dict]) -> tuple[list[dict], str | None]:
                 result.append({"surface": verb_part, "pos": "動詞", "lemma": "する"})
             if applied_rule is None:
                 applied_rule = "onomatopoeia-tto-suru-split"
+            continue
+
+        # 10a. An adjective Xげない (危なげない, 危なげなく) is the noun Xげ plus the
+        # supplementary ない when Xげ stands as a noun of its own (危なげ+が+ない).
+        ge_nai = _GE_NAI_ADJECTIVE.fullmatch(surface) if t.get("pos") == "形容詞" else None
+        if ge_nai is not None and _reads_as_one_noun(ge_nai.group(1)):
+            result.append({"surface": ge_nai.group(1), "pos": "名詞", "lemma": ge_nai.group(1)})
+            result.append({"surface": ge_nai.group(2), "pos": "形容詞", "lemma": "ない"})
+            if applied_rule is None:
+                applied_rule = "noun-nai-compound-split"
             continue
 
         # 10. Nominal + ない lexical adjective split. A Godan negative would

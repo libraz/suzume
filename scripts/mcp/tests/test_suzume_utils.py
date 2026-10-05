@@ -744,3 +744,10 @@ class TestNominalSuffixAfterHost:
     def test_recollective_particle_after_a_predicate(self, text):
         tokens, _, _ = get_expected_tokens(text)
         assert tokens[-1]["pos"] == "Particle"
+
+
+class TestGeNaiAdjective:
+    @pytest.mark.parametrize(("text", "tail"), [("危なげない", "ない"), ("危なげなく勝つ", "なく")])
+    def test_splits_when_the_ge_noun_stands_alone(self, text, tail):
+        tokens, _, _ = get_expected_tokens(text)
+        assert [(token["surface"], token["pos"]) for token in tokens[:2]] == [("危なげ", "Noun"), (tail, "Adjective")]
