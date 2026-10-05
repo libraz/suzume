@@ -1173,6 +1173,14 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
            hasAuxiliaryParticleDecomposition(codepoints, start_pos, candidate_end, dict_manager_))) {
         continue;
       }
+      // An opaque kana fragment does not open on the ら column inside a kana
+      // run: no native word starts there, so the run began inside a word
+      // (あつく+るしい); the one-mora fallback still covers the span.
+      if (start_type == normalize::CharType::Hiragana && pos == core::PartOfSpeech::Other && len > 1 && start_pos > 0 &&
+          char_types[start_pos - 1] == normalize::CharType::Hiragana &&
+          kana::isRaColumnCodepoint(codepoints[start_pos])) {
+        continue;
+      }
       // A run of Latin letters or digits read as a nominal is one whose script
       // sets it apart from the Japanese around it, and that difference decides
       // one connection: nothing on the Japanese side modifies it attributively.

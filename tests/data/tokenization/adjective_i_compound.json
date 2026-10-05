@@ -1107,6 +1107,40 @@
       ],
       "id": "sarigenai",
       "input": "さりげない"
+    },
+    {
+      "description": "kana compound adjective is not cut after a listed adjective continuative",
+      "expected": [
+        {
+          "lemma": "部屋",
+          "pos": "Noun",
+          "surface": "部屋"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "あつくるしい",
+          "pos": "Adjective",
+          "surface": "あつくるしい"
+        }
+      ],
+      "id": "gaatsukurushii",
+      "input": "部屋があつくるしい"
+    },
+    {
+      "description": "no kana word opens on the ra column inside a kana run",
+      "expected": [
+        {
+          "lemma": "あつくるしい",
+          "pos": "Adjective",
+          "surface": "あつくるしい"
+        }
+      ],
+      "id": "atsukurushii",
+      "input": "あつくるしい"
     }
   ],
   "description": "I-adjectives compound/derived forms (複合・派生) - sou patterns, nominalization, contracted forms",

@@ -762,6 +762,13 @@ void Tokenizer::addUnknownCandidates(core::Lattice& lattice, std::string_view te
     if (consumesInitialSuruConditional(dict_manager_, text, codepoints, byte_offsets, candidates, candidate)) {
       continue;
     }
+    // No native predicate opens on the ら column, so an unattested one starting
+    // there inside a kana run has begun inside a word (あつく+るしい).
+    if (is_unattested_predicate(candidate) && candidate.start > 0 &&
+        char_types[candidate.start - 1] == normalize::CharType::Hiragana &&
+        kana::isRaColumnCodepoint(codepoints[candidate.start])) {
+      continue;
+    }
     if (reopensObservedVerbAuxiliaryBoundary(lattice, dict_manager_, text, byte_offsets, candidate)) {
       continue;
     }
