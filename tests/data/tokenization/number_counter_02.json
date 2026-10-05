@@ -48,6 +48,174 @@
       ],
       "id": "1_300",
       "input": "1個300円"
+    },
+    {
+      "description": "ren counts only after a numeral, so after a counter it opens the next word",
+      "expected": [
+        {
+          "lemma": "5日",
+          "pos": "Noun",
+          "surface": "5日"
+        },
+        {
+          "lemma": "連続",
+          "pos": "Noun",
+          "surface": "連続"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "雨",
+          "pos": "Noun",
+          "surface": "雨"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "散歩",
+          "pos": "Noun",
+          "surface": "散歩"
+        },
+        {
+          "lemma": "できる",
+          "pos": "Verb",
+          "surface": "でき"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "5_no_de_dekinakattta",
+      "input": "5日連続の雨で散歩できなかった"
+    },
+    {
+      "description": "ren after a counter opens the next word",
+      "expected": [
+        {
+          "lemma": "3回",
+          "pos": "Noun",
+          "surface": "3回"
+        },
+        {
+          "lemma": "連続",
+          "pos": "Noun",
+          "surface": "連続"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "優勝",
+          "pos": "Noun",
+          "surface": "優勝"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "3_de_shita",
+      "input": "3回連続で優勝した"
+    },
+    {
+      "description": "ren after a kanji-numeral counter opens the next word",
+      "expected": [
+        {
+          "lemma": "五日",
+          "pos": "Noun",
+          "surface": "五日"
+        },
+        {
+          "lemma": "連続",
+          "pos": "Noun",
+          "surface": "連続"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "雨",
+          "pos": "Noun",
+          "surface": "雨"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "降る",
+          "pos": "Verb",
+          "surface": "降っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "de_ga_ttta",
+      "input": "五日連続で雨が降った"
+    },
+    {
+      "description": "ren after a kanji-numeral counter opens the next word",
+      "expected": [
+        {
+          "lemma": "三年",
+          "pos": "Noun",
+          "surface": "三年"
+        },
+        {
+          "lemma": "連続",
+          "pos": "Noun",
+          "surface": "連続"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "受賞",
+          "pos": "Noun",
+          "surface": "受賞"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "de_shita",
+      "input": "三年連続で受賞した"
     }
   ],
   "description": "number_counter tests (part 2/2)",

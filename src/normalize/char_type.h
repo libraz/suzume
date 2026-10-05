@@ -297,6 +297,17 @@ bool isDerivationalNounSuffixKanji(char32_t code_point);
 bool isQuantityPhraseSuffixKanji(char32_t code_point);
 
 /**
+ * @brief Check if a counter kanji counts only straight after the numeral
+ *
+ * 連 counts a run of events (3連勝) but never continues another counter, so
+ * after one it opens the next word (5日|連続, 3年|連休).
+ *
+ * @param code_point Unicode codepoint
+ * @return true if the counter kanji cannot follow another counter kanji
+ */
+bool isQuantityOpeningCounterKanji(char32_t code_point);
+
+/**
  * @brief Check if a kanji heads a duration noun when 間 follows it (時間, 期間)
  *
  * Closed class of period units. A three-kanji run whose middle character is one

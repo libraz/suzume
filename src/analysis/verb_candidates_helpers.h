@@ -152,6 +152,15 @@ bool opensWordAfterQuantity(const dictionary::DictionaryManager* dict_manager, c
                             size_t pos);
 
 /**
+ * @brief End of the counter kanji run that starts at @p pos and stops before @p limit
+ *
+ * Every leading counter kanji belongs to the counter (時間, 段階) except one
+ * that counts only straight after the numeral, which opens the next word
+ * (5日|連続, but 3連勝).
+ */
+size_t counterKanjiRunEnd(const std::vector<char32_t>& codepoints, size_t pos, size_t limit);
+
+/**
  * @brief Check if a terminal is a productively formed -しい i-adjective
  *
  * The inflection analyzer can reinterpret the same bytes as the continuative of

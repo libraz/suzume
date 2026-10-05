@@ -66,10 +66,7 @@ bool leavesUnevenNominalRun(const std::vector<char32_t>& codepoints, size_t coun
 void appendUnevenKanjiRunCandidate(const std::vector<char32_t>& codepoints, size_t start_pos, size_t numeral_end,
                                    const dictionary::DictionaryManager* dict_manager,
                                    std::vector<UnknownCandidate>& candidates) {
-  size_t counter_end = numeral_end;
-  while (counter_end < codepoints.size() && normalize::isCounterKanji(codepoints[counter_end])) {
-    ++counter_end;
-  }
+  size_t counter_end = verb_helpers::counterKanjiRunEnd(codepoints, numeral_end, codepoints.size());
   // 間 heading an interval word belongs to the run (三年|間隔).
   if (counter_end > numeral_end + 1 && counter_end < codepoints.size() && codepoints[counter_end - 1] == U'間' &&
       normalize::isIntervalCompoundSecondKanji(codepoints[counter_end])) {

@@ -87,6 +87,15 @@ bool opensWordAfterQuantity(const dictionary::DictionaryManager* dict_manager, c
            lookupEntryInRange(*dict_manager, codepoints, pos, pos + 1, core::PartOfSpeech::Pronoun) != nullptr));
 }
 
+size_t counterKanjiRunEnd(const std::vector<char32_t>& codepoints, size_t pos, size_t limit) {
+  size_t end = pos;
+  while (end < limit && normalize::isCounterKanji(codepoints[end]) &&
+         (end == pos || !normalize::isQuantityOpeningCounterKanji(codepoints[end]))) {
+    ++end;
+  }
+  return end;
+}
+
 bool isProductiveShiiAdjectiveTerminal(std::string_view surface, const grammar::Inflection& inflection) {
   // A productive formation needs a stem in front of the suffix: bare しい is
   // the classical しかり paradigm's own shape (しかるべく, しかれども), not an

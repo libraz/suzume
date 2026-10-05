@@ -263,10 +263,7 @@ void addMixedScriptCandidates(core::Lattice& lattice, std::string_view text, con
     // that cut leaves an odd remainder it lands inside a two-kanji word (2世+帯住宅,
     // 3年+計画書), so the whole run is the search unit. Relational 前/後 and a
     // listed pronoun still open a word of their own (3年|後, 5年|彼).
-    size_t counter_cut = first_end;
-    while (counter_cut < full_run_end && isCounterKanji(codepoints[counter_cut])) {
-      ++counter_cut;
-    }
+    const size_t counter_cut = verb_helpers::counterKanjiRunEnd(codepoints, first_end, full_run_end);
     if (counter_cut > first_end && verb_helpers::isQuantityClosingSuffixAt(&dict_manager, codepoints, counter_cut)) {
       const size_t suffix_end_byte = byteOffsetAt(byte_offsets, counter_cut + 1);
       lattice.addEdge(text.substr(start_byte, suffix_end_byte - start_byte), static_cast<uint32_t>(start_pos),

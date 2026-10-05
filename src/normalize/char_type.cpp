@@ -23,6 +23,7 @@ enum CharProperty : uint16_t {
   kTemporalSpanSuffix = 1 << 6,
   kDerivationalNounSuffix = 1 << 7,
   kQuantityPhraseSuffix = 1 << 8,
+  kQuantityOpeningCounter = 1 << 9,
 };
 
 struct CharPropertyEntry {
@@ -112,7 +113,7 @@ constexpr std::array<CharPropertyEntry, 91> kCharProperties = {
      {U'足', kCounter},
      {U'軒', kCounter},
      {U'通', kCounter},
-     {U'連', kCounter},
+     {U'連', kCounter | kQuantityOpeningCounter},
      {U'週', kCounter | kTemporalCounter},
      {U'部', kCounter},
      {U'銭', kCounter},
@@ -517,6 +518,10 @@ bool isDerivationalNounSuffixKanji(char32_t code_point) {
 
 bool isQuantityPhraseSuffixKanji(char32_t code_point) {
   return hasCharProperty(code_point, kQuantityPhraseSuffix);
+}
+
+bool isQuantityOpeningCounterKanji(char32_t code_point) {
+  return hasCharProperty(code_point, kQuantityOpeningCounter);
 }
 
 bool isFiscalYearBindingPair(char32_t stem_last, char32_t suffix) {
