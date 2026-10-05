@@ -1492,6 +1492,31 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
     // A te-form on the left closes its clause, so the run after it needs neither
     // a nominal nor an attributive in front of the connective (嬉しく+て+うれぴ).
     const bool left_te_bracket = start_pos > 0 && closes_te_form_at(start_pos - 1);
+    // A registered i-adjective of three morae or more opening inside the kana
+    // starts a predicate of its own, just as a kanji run does (ねこ+かわいい,
+    // ごはん+うまかった); its bare stem counts before the excessive すぎ or the
+    // appearance そう that select it (ねこ+かわい+すぎ).
+    auto registered_adjective_opens_at = [&](size_t pos) {
+      constexpr size_t kMinAdjectiveMorae = 3;
+      constexpr size_t kMaxAdjectiveProbe = 6;
+      if (dict_manager_ == nullptr || pos >= codepoints.size() || char_types[pos] != normalize::CharType::Hiragana) {
+        return false;
+      }
+      for (size_t adj_end = pos + 2; adj_end <= codepoints.size() && adj_end - pos <= kMaxAdjectiveProbe; ++adj_end) {
+        if (adj_end - pos >= kMinAdjectiveMorae &&
+            lookupEntryInRange(*dict_manager_, codepoints, pos, adj_end, core::PartOfSpeech::Adjective) != nullptr) {
+          return true;
+        }
+        const bool stem_selected =
+            adj_end + 1 < codepoints.size() && ((codepoints[adj_end] == U'す' && codepoints[adj_end + 1] == U'ぎ') ||
+                                                (codepoints[adj_end] == U'そ' && codepoints[adj_end + 1] == U'う'));
+        if (stem_selected &&
+            verb_helpers::isAdjectiveInDictionary(dict_manager_, extractSubstring(codepoints, pos, adj_end) + "い")) {
+          return true;
+        }
+      }
+      return false;
+    };
     auto emit_promoted_run = [&](size_t run_end) {
       size_t len = run_end - start_pos;
       // The nominalizer ん closes an attributive predicate, so a run ending on
@@ -1561,7 +1586,9 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       // an adverb instead, so the promotion carries the same conditions the other
       // brackets impose: a registered reading and an inflected predicate reading
       // both keep it from firing.
-      const bool right_kanji_word = scan < codepoints.size() && char_types[scan] == normalize::CharType::Kanji;
+      const bool right_adjective_word = registered_adjective_opens_at(scan);
+      const bool right_kanji_word =
+          (scan < codepoints.size() && char_types[scan] == normalize::CharType::Kanji) || right_adjective_word;
       // A registered suffix brackets its host the same way: it needs a nominal in
       // front of it (かな+さん), so it both opens the run and selects it. A listed
       // predicate is the host instead when it closes the run (こと+ある+ごと) or
@@ -1685,7 +1712,8 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
                                                    (codepoints[scan] != U'は' || unread_short_run);
       const bool unread_short_run_bracketed =
           unread_short_run &&
-          (((left_clause_bracket || left_determiner_bracket) && right_clause) || right_short_genitive);
+          (((left_clause_bracket || left_determiner_bracket) && (right_clause || right_adjective_word)) ||
+           right_short_genitive);
       const bool short_run_bracketed =
           (left_particle_bracket && (right_particle || right_copula)) || short_bos_case_particle_bracket ||
           unread_short_run_bracketed ||
@@ -2003,6 +2031,14 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
     for (size_t particle_pos = start_pos + 2; left_clause_bracket && particle_pos < scan; ++particle_pos) {
       if (closesShortNounAt(dict_manager_, codepoints, particle_pos)) {
         emit_promoted_run(particle_pos);
+      }
+    }
+    // A registered adjective opening inside the scanned run closes the noun in
+    // front of it, so that shorter run is offered too (ねこ|かわいすぎ).
+    for (size_t adjective_pos = start_pos + 2; adjective_pos < scan; ++adjective_pos) {
+      if (registered_adjective_opens_at(adjective_pos)) {
+        emit_promoted_run(adjective_pos);
+        break;
       }
     }
     // The scan runs on through a genitive inside its first three morae, so the

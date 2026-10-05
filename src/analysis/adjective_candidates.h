@@ -95,10 +95,12 @@ void generateHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints
  * @param start_pos Start position (character index)
  * @param char_types Character types for each position
  * @param inflection Inflection analyzer for conjugation detection
+ * @param dict_manager Dictionary that vetoes a coined stem running into a registered adjective
  */
 void generateKatakanaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                          const std::vector<normalize::CharType>& char_types,
                                          const grammar::Inflection& inflection,
+                                         const dictionary::DictionaryManager* dict_manager,
                                          std::vector<UnknownCandidate>& candidates);
 
 /**

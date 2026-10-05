@@ -176,6 +176,116 @@
       ],
       "id": "yamuoenai_fixed_adjective",
       "input": "やむを得ない事情"
+    },
+    {
+      "description": "ねこかわいすぎ💕 - auto-generated",
+      "expected": [
+        {
+          "lemma": "ねこ",
+          "pos": "Noun",
+          "surface": "ねこ"
+        },
+        {
+          "lemma": "かわいい",
+          "pos": "Adjective",
+          "surface": "かわい"
+        },
+        {
+          "lemma": "すぎる",
+          "pos": "Verb",
+          "surface": "すぎ"
+        },
+        {
+          "lemma": "💕",
+          "pos": "Other",
+          "surface": "💕"
+        }
+      ],
+      "id": "nekokawaisugi",
+      "input": "ねこかわいすぎ💕"
+    },
+    {
+      "description": "ごはんうまーい😋 - auto-generated",
+      "expected": [
+        {
+          "lemma": "ごはん",
+          "pos": "Noun",
+          "surface": "ごはん"
+        },
+        {
+          "lemma": "うまい",
+          "pos": "Adjective",
+          "surface": "うまーい"
+        },
+        {
+          "lemma": "😋",
+          "pos": "Other",
+          "surface": "😋"
+        }
+      ],
+      "id": "gohanuma_i",
+      "input": "ごはんうまーい😋"
+    },
+    {
+      "description": "ごはんうまかった - auto-generated",
+      "expected": [
+        {
+          "lemma": "ごはん",
+          "pos": "Noun",
+          "surface": "ごはん"
+        },
+        {
+          "lemma": "うまい",
+          "pos": "Adjective",
+          "surface": "うまかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "gohanumakattta",
+      "input": "ごはんうまかった"
+    },
+    {
+      "description": "マジヤバかった - auto-generated",
+      "expected": [
+        {
+          "lemma": "マジ",
+          "pos": "Noun",
+          "surface": "マジ"
+        },
+        {
+          "lemma": "ヤバい",
+          "pos": "Adjective",
+          "surface": "ヤバかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "kattta_3",
+      "input": "マジヤバかった"
+    },
+    {
+      "description": "ねこかわいい - auto-generated",
+      "expected": [
+        {
+          "lemma": "ねこ",
+          "pos": "Noun",
+          "surface": "ねこ"
+        },
+        {
+          "lemma": "かわいい",
+          "pos": "Adjective",
+          "surface": "かわいい"
+        }
+      ],
+      "id": "nekokawaii",
+      "input": "ねこかわいい"
     }
   ],
   "description": "Taru-adjectives and irregular adjectives",

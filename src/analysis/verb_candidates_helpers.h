@@ -527,6 +527,16 @@ bool closesOnPoliteCopula(const dictionary::DictionaryManager* dict_manager, con
                           size_t okurigana_start, size_t end_pos);
 
 /**
+ * @brief Whether the span is a registered verb continuative plus the polite ます
+ *
+ * A coined hiragana verb spelled that way (し+ます as one godan-sa verb) is the
+ * registered verb and its auxiliary, not a word of its own.
+ * @see fabricated closed-class absorption guards (top of this header)
+ */
+bool spellsContinuativeBeforePolite(const dictionary::DictionaryManager* dict_manager,
+                                    const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos);
+
+/**
  * @brief Length of a multi-mora negative auxiliary written at a position
  *
  * Returns the codepoint length of the longest dictionary auxiliary starting at

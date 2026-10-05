@@ -653,6 +653,17 @@ bool closesOnPoliteCopula(const dictionary::DictionaryManager* dict_manager, con
   return auxiliary != nullptr && auxiliary->extended_pos == core::ExtendedPOS::AuxCopulaDesu;
 }
 
+bool spellsContinuativeBeforePolite(const dictionary::DictionaryManager* dict_manager,
+                                    const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos) {
+  const auto* auxiliary = auxiliaryClosingAfterOkurigana(dict_manager, codepoints, start_pos, end_pos);
+  if (auxiliary == nullptr || auxiliary->extended_pos != core::ExtendedPOS::AuxTenseMasu) {
+    return false;
+  }
+  const size_t aux_len = normalize::utf8Length(auxiliary->surface);
+  return end_pos >= start_pos + aux_len + 1 &&
+         isVerbContinuativeSpan(dict_manager, codepoints, start_pos, end_pos - aux_len);
+}
+
 const dictionary::DictionaryEntry* auxiliaryClosingAfterOkurigana(const dictionary::DictionaryManager* dict_manager,
                                                                   const std::vector<char32_t>& codepoints,
                                                                   size_t okurigana_start, size_t end_pos) {

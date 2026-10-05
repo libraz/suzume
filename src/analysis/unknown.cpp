@@ -693,7 +693,8 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generate(std::string_view te
     analysis::generateKatakanaVerbCandidates(codepoints, start_pos, char_types, inflection_, dict_manager_,
                                              options_.verb_candidate_options, candidates);
 
-    analysis::generateKatakanaAdjectiveCandidates(codepoints, start_pos, char_types, inflection_, candidates);
+    analysis::generateKatakanaAdjectiveCandidates(codepoints, start_pos, char_types, inflection_, dict_manager_,
+                                                  candidates);
   }
 
   // Generate counter candidates for digit + つ patterns (e.g., 3つ, 10個)

@@ -707,6 +707,33 @@
       ],
       "id": "go_itadakemasudeshi_uka",
       "input": "ご助言いただけますでしょうか。"
+    },
+    {
+      "description": "これにします - auto-generated",
+      "expected": [
+        {
+          "lemma": "これ",
+          "pos": "Pronoun",
+          "surface": "これ"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "korenishimasu",
+      "input": "これにします"
     }
   ],
   "description": "honorific tests",
