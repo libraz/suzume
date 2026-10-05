@@ -684,3 +684,27 @@ class TestSokuonAfterPast:
         tokens, _, _ = get_expected_tokens(text)
         assert [token["surface"] for token in tokens] == surfaces
         assert all(token["lemma"] == "た" for token in tokens if token["surface"] in ("た", "たっ"))
+
+
+class TestPejorativeYagaru:
+    @pytest.mark.parametrize(
+        ("text", "host", "cell"),
+        [
+            ("来やがった、覚悟しろ", "来", "やがっ"),
+            ("食べやがった", "食べ", "やがっ"),
+            ("待たせやがって", "せ", "やがっ"),
+            ("来やがれ", "来", "やがれ"),
+            ("書きやがらない", "書き", "やがら"),
+        ],
+    )
+    def test_auxiliary_follows_the_continuative(self, text, host, cell):
+        tokens, _, _ = get_expected_tokens(text)
+        surfaces = [token["surface"] for token in tokens]
+        at = surfaces.index(cell)
+        assert surfaces[at - 1] == host
+        assert (tokens[at]["pos"], tokens[at]["lemma"]) == ("Auxiliary", "やがる")
+
+    @pytest.mark.parametrize("text", ["寒がる", "やがて", "嫌やがな"])
+    def test_leaves_other_ya_ga_sequences(self, text):
+        tokens, _, _ = get_expected_tokens(text)
+        assert all(token["lemma"] != "やがる" for token in tokens)

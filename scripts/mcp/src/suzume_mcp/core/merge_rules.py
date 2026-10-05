@@ -227,6 +227,10 @@ _COPULA_HOST_POS = frozenset({"名詞", "副詞", "動詞", "形容詞", "助動
 _UTTERANCE_FINAL_PARTICLE_HEADS = frozenset("よねなかぞぜわさ")
 
 
+# The cells of がる after the や of やがる (やがら, やがり, やがる, やがれ, やがろ, やがっ).
+_YAGARU_TAIL = regex.compile(r"が[らりるれろっ]")
+
+
 def _closes_utterance(following: str) -> bool:
     """Whether nothing but punctuation, the text end or a final particle follows."""
     return (
@@ -2355,6 +2359,33 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                         if applied_rule is None:
                             applied_rule = "colloquial-pronoun"
                         break
+
+        # 8d. The pejorative auxiliary やがる takes a verb continuative (来+やがっ+た,
+        # 待たせ+やがっ+て). The reference cuts it into や (read as a particle, the
+        # copula or a cell of やる) and a がる suffix, or a noun for がれ; each
+        # cut is put back into one auxiliary after the continuative.
+        if (
+            not merged
+            and (
+                (t.get("pos") == "動詞" and "連用" in (t.get("conj_form") or ""))
+                or (t.get("pos") == "名詞" and reads_as_continuative(t.get("surface", "")))
+            )
+            and i + 2 < len(tokens)
+            and tokens[i + 1].get("surface") == "や"
+            and _YAGARU_TAIL.fullmatch(tokens[i + 2].get("surface", ""))
+        ):
+            if t.get("pos") == "名詞":
+                t = {
+                    "surface": t["surface"],
+                    "pos": "動詞",
+                    "lemma": base_from_renyokei(t["surface"]) or t.get("lemma"),
+                }
+            result.append(t)
+            result.append({"surface": "や" + tokens[i + 2]["surface"], "pos": "助動詞", "lemma": "やがる"})
+            i += 3
+            merged = True
+            if applied_rule is None:
+                applied_rule = "pejorative-yagaru"
 
         # 9. Compound verbs
         following_source = remaining[len(t.get("surface", "")) :]
