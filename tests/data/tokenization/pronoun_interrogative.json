@@ -193,6 +193,112 @@
       ],
       "id": "sorehanandedesuka",
       "input": "それはなんでですか。"
+    },
+    {
+      "description": "Interrogative pronoun itsu before to-mo-naku",
+      "expected": [
+        {
+          "lemma": "いつ",
+          "pos": "Pronoun",
+          "surface": "いつ"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "なく"
+        },
+        {
+          "lemma": "始まる",
+          "pos": "Verb",
+          "surface": "始まっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "この",
+          "pos": "Determiner",
+          "surface": "この"
+        },
+        {
+          "lemma": "儚い",
+          "pos": "Adjective",
+          "surface": "儚い"
+        },
+        {
+          "lemma": "時間",
+          "pos": "Noun",
+          "surface": "時間"
+        }
+      ],
+      "id": "itsutomonaku_matttakono_i",
+      "input": "いつともなく始まったこの儚い時間。"
+    },
+    {
+      "description": "Interrogative pronoun itsu before the polite copula",
+      "expected": [
+        {
+          "lemma": "いつ",
+          "pos": "Pronoun",
+          "surface": "いつ"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "itsudesuka",
+      "input": "いつですか"
+    },
+    {
+      "description": "Interrogative pronoun itsu after a topic",
+      "expected": [
+        {
+          "lemma": "水",
+          "pos": "Noun",
+          "surface": "水"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "いつ",
+          "pos": "Pronoun",
+          "surface": "いつ"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "haitsudesuka",
+      "input": "水はいつですか"
     }
   ],
   "description": "pronoun_interrogative tests",

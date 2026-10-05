@@ -764,6 +764,30 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
             if applied_rule is None:
                 applied_rule = "nominal-tomoni"
 
+        # The interrogative pronoun いつ is read as the continuative of いる plus
+        # the classical perfect つ when a particle or the copula follows.  A
+        # phrase-initial pair closed by a particle, the copula or punctuation is
+        # the nominal phrase the pronoun heads, not a finite classical predicate.
+        if (
+            not merged
+            and t.get("surface") == "い"
+            and t.get("pos") == "動詞"
+            and (i == 0 or tokens[i - 1].get("pos") in ("助詞", "記号"))
+            and i + 1 < len(tokens)
+            and tokens[i + 1].get("surface") == "つ"
+            and tokens[i + 1].get("pos") == "助動詞"
+            and (
+                i + 2 == len(tokens)
+                or tokens[i + 2].get("pos") in ("助詞", "記号")
+                or (tokens[i + 2].get("pos") == "助動詞" and tokens[i + 2].get("lemma") in ("だ", "です"))
+            )
+        ):
+            result.append({"surface": "いつ", "pos": "名詞", "pos_sub1": "代名詞", "lemma": "いつ"})
+            i += 2
+            merged = True
+            if applied_rule is None:
+                applied_rule = "interrogative-itsu"
+
         # The interrogative adverb いかが is read as いか+が whenever a predicate
         # rather than a copula follows.  An honorific prefix or a polite verb
         # chain after it is the register of the adverb, never of a noun subject.

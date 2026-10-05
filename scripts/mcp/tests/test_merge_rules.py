@@ -509,6 +509,24 @@ class TestArchaicPersonalPronoun:
         assert rule is None
 
 
+class TestInterrogativeItsu:
+    def test_merges_i_and_perfect_tsu_before_the_copula(self):
+        tokens = [
+            _tok("い", pos="動詞", lemma="いる"),
+            _tok("つ", pos="助動詞"),
+            _tok("です", pos="助動詞", lemma="です"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "いつです")
+        assert (result[0]["surface"], result[0]["pos_sub1"]) == ("いつ", "代名詞")
+        assert rule == "interrogative-itsu"
+
+    def test_keeps_a_clause_final_perfect(self):
+        tokens = [_tok("雨"), _tok("降り", pos="動詞"), _tok("つ", pos="助動詞")]
+        result, rule = apply_suzume_merge(tokens, "雨降りつ")
+        assert [token["surface"] for token in result] == ["雨", "降り", "つ"]
+        assert rule is None
+
+
 class TestNumberUnit:
     def test_number_counter(self):
         tokens = [
