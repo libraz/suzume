@@ -858,7 +858,8 @@ HONORIFIC_FRAME_TAILS: set[str] = {
     "なさい",
 }
 
-# Words where お/ご is part of the lexeme (not separable prefix).
+# Words where お/ご/御 is part of the lexeme (not separable prefix): the
+# remainder does not keep the word's meaning on its own.
 # Only kanji-bearing lexemes need listing: an all-hiragana remainder separates
 # solely inside the honorific frame above.
 PREFIX_EXCEPTIONS: set[str] = _PREFIXED_FAMILY_TERMS | {
@@ -866,6 +867,13 @@ PREFIX_EXCEPTIONS: set[str] = _PREFIXED_FAMILY_TERMS | {
     "お疲れ様",
     "お金",
     "お前",
+    "ご免",
+    "御免",
+    "御座",
+    "御殿",
+    "御所",
+    "御中",
+    "御曹司",
 }
 
 # User-dict registered kanji+katakana compounds (skip splitting)

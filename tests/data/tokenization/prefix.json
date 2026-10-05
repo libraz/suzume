@@ -1706,6 +1706,70 @@
       ],
       "id": "chou_juuyou_kadai",
       "input": "超重要課題"
+    },
+    {
+      "description": "御礼の品を差し上げます - auto-generated",
+      "expected": [
+        {
+          "lemma": "御",
+          "pos": "Prefix",
+          "surface": "御"
+        },
+        {
+          "lemma": "礼",
+          "pos": "Noun",
+          "surface": "礼"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "品",
+          "pos": "Noun",
+          "surface": "品"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "差し上げる",
+          "pos": "Verb",
+          "surface": "差し上げ"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "no_wo_shi_gemasu",
+      "input": "御礼の品を差し上げます"
+    },
+    {
+      "description": "御用です - auto-generated",
+      "expected": [
+        {
+          "lemma": "御",
+          "pos": "Prefix",
+          "surface": "御"
+        },
+        {
+          "lemma": "用",
+          "pos": "Noun",
+          "surface": "用"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "desu_2",
+      "input": "御用です"
     }
   ],
   "description": "Prefixes (お、ご、不、無)",

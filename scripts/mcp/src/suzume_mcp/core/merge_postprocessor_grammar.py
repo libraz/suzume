@@ -246,15 +246,33 @@ def _postprocess_prefix_split(result: list[dict], applied_rule: str | None) -> t
     all-hiragana remainder is part of the lexeme far more often than not
     (おなか, おだやか, おごそか, おかず) and its leading mora is not a prefix at
     all, so it only separates inside the humble/honorific frame that requires a
-    verb stem after the prefix (ご迷惑をおかけする).
+    verb stem after the prefix (ご迷惑をおかけする). 御 is the kanji spelling of
+    the same prefix and follows the same criterion.
+
+    An honorific prefix never attaches to a pronoun, so a prefix the reference
+    reads before one (お/やつ for おやつ) belongs to a different noun and the
+    pair is merged back into it.
     """
-    new_result = []
+    new_result: list[dict] = []
     for index, t in enumerate(result):
         surface = t.get("surface", "")
         pos = t.get("pos", "")
         pos_sub1 = t.get("pos_sub1", "")
+        previous = new_result[-1] if new_result else None
+        if (
+            pos == "名詞"
+            and pos_sub1 == "代名詞"
+            and previous is not None
+            and previous.get("pos") == "接頭詞"
+            and previous.get("surface") in ("お", "ご", "御")
+        ):
+            merged = previous["surface"] + surface
+            new_result[-1] = {"surface": merged, "pos": "名詞", "pos_sub1": "一般", "lemma": merged}
+            if applied_rule is None:
+                applied_rule = "prefix-pronoun-merge"
+            continue
         if pos == "名詞" and pos_sub1 != "接尾" and surface not in PREFIX_EXCEPTIONS:
-            m = regex.match(r"^(お|ご)([\p{Han}\p{Hiragana}]+)$", surface)
+            m = regex.match(r"^(お|ご|御)([\p{Han}\p{Hiragana}]+)$", surface)
             following = result[index + 1].get("surface", "") if index + 1 < len(result) else ""
             separable = regex.search(r"\p{Han}", m.group(2)) is not None if m else False
             if m and (separable or following in HONORIFIC_FRAME_TAILS):

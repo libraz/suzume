@@ -1326,6 +1326,23 @@ class TestHonorificPredicateBoundary:
         assert rule == "prefix-split"
 
 
+class TestHonorificPrefixKanji:
+    def test_splits_kanji_honorific_prefix_like_kana(self):
+        result, rule = apply_suzume_merge([_tok("御礼", pos="名詞")], "御礼")
+        assert [token["surface"] for token in result] == ["御", "礼"]
+        assert rule == "prefix-split"
+
+    def test_keeps_kanji_prefix_lexeme_whose_remainder_loses_its_meaning(self):
+        result, _ = apply_suzume_merge([_tok("御殿", pos="名詞")], "御殿")
+        assert [token["surface"] for token in result] == ["御殿"]
+
+    def test_merges_prefix_before_pronoun_into_one_noun(self):
+        tokens = [_tok("お", pos="接頭詞"), _tok("やつ", pos="名詞", pos_sub1="代名詞")]
+        result, rule = apply_suzume_merge(tokens, "おやつ")
+        assert result == [{"surface": "おやつ", "pos": "名詞", "pos_sub1": "一般", "lemma": "おやつ"}]
+        assert rule == "prefix-pronoun-merge"
+
+
 class TestStrandedLengtheningVowel:
     def test_merges_filler_vowel_into_the_lengthened_word(self):
         tokens = [
