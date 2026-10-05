@@ -493,6 +493,65 @@
       ],
       "id": "hatattta_da",
       "input": "彼はたった一人だ"
+    },
+    {
+      "description": "もう詰んだかもしれない。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "もう",
+          "pos": "Adverb",
+          "surface": "もう"
+        },
+        {
+          "lemma": "詰む",
+          "pos": "Verb",
+          "surface": "詰ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "かも",
+          "pos": "Particle",
+          "surface": "かも"
+        },
+        {
+          "lemma": "しれる",
+          "pos": "Verb",
+          "surface": "しれ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "mou_ndakamoshirenai",
+      "input": "もう詰んだかもしれない。"
+    },
+    {
+      "description": "詰んだよ - auto-generated",
+      "expected": [
+        {
+          "lemma": "詰む",
+          "pos": "Verb",
+          "surface": "詰ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "ndayo",
+      "input": "詰んだよ"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",

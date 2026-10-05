@@ -410,8 +410,12 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
     // Inflection analysis fallback (dictionary lookup above found nothing).
     // A stem the dictionary attests as Godan-ra is the る→ん contraction
     // (帰+ん+だ), not a nasal onbin of an unattested 帰む.
+    // The inference reads only the closed cell Xん+で/だ: the kana behind it
+    // start the next word, and a longer run hands the analyzer a shape no
+    // paradigm has, which it answers with a fabricated Ichidan lemma (詰んだか
+    // → 詰んだかる) instead of the nasal-euphonic row the cell spells.
     if (matched_verb_type == grammar::VerbType::Unknown && !vh::attestsGodanRaIrrealis(dict_manager, kanji_stem)) {
-      std::string full_surface = extractSubstring(codepoints, start_pos, hiragana_end);
+      std::string full_surface = extractSubstring(codepoints, start_pos, kanji_end + 2);
       OnbinInflMatch infl = bestOnbinInflMatch(inflection, full_surface, kanji_stem, hatsuonbin_types);
       if (infl.type != grammar::VerbType::Unknown) {
         matched_verb_type = infl.type;

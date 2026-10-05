@@ -1300,6 +1300,109 @@
       ],
       "id": "wakanneeyo",
       "input": "わかんねえよ"
+    },
+    {
+      "description": "電車混んでた - auto-generated",
+      "expected": [
+        {
+          "lemma": "電車",
+          "pos": "Noun",
+          "surface": "電車"
+        },
+        {
+          "lemma": "混む",
+          "pos": "Verb",
+          "surface": "混ん"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ndeta",
+      "input": "電車混んでた"
+    },
+    {
+      "description": "道混んでた - auto-generated",
+      "expected": [
+        {
+          "lemma": "道",
+          "pos": "Noun",
+          "surface": "道"
+        },
+        {
+          "lemma": "混む",
+          "pos": "Verb",
+          "surface": "混ん"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ndeta_2",
+      "input": "道混んでた"
+    },
+    {
+      "description": "店混んでた - auto-generated",
+      "expected": [
+        {
+          "lemma": "店",
+          "pos": "Noun",
+          "surface": "店"
+        },
+        {
+          "lemma": "混む",
+          "pos": "Verb",
+          "surface": "混ん"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ndeta_3",
+      "input": "店混んでた"
+    },
+    {
+      "description": "道混んでる - auto-generated",
+      "expected": [
+        {
+          "lemma": "道",
+          "pos": "Noun",
+          "surface": "道"
+        },
+        {
+          "lemma": "混む",
+          "pos": "Verb",
+          "surface": "混ん"
+        },
+        {
+          "lemma": "でる",
+          "pos": "Auxiliary",
+          "surface": "でる"
+        }
+      ],
+      "id": "nderu_5",
+      "input": "道混んでる"
     }
   ],
   "description": "colloquial_contracted tests",
