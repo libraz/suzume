@@ -149,9 +149,17 @@ void appendBasicNumeralCounterCandidates(const std::vector<char32_t>& codepoints
       normalize::isKanjiCodepoint(codepoints[numeral_end]) &&
       normalize::classifyChar(codepoints[numeral_end + 1]) == normalize::CharType::Hiragana) {
     const size_t counter_end = numeral_end + 2;
-    const bool has_deverbal_counter =
-        lookupResultsHavePartOfSpeech(lookupResultsInRange(*dict_manager, codepoints, numeral_end, counter_end),
-                                      partOfSpeechMask(core::PartOfSpeech::Verb));
+    // The counter is a deverbal noun, i.e. a verb's continuative (一切れ, 三重ね);
+    // an onbin cell (入っ, 取っ) is the verb inflecting, not a counter.
+    bool has_deverbal_counter = false;
+    if (codepoints[counter_end - 1] != U'っ') {
+      for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, numeral_end, counter_end)) {
+        has_deverbal_counter =
+            has_deverbal_counter || (match.entry != nullptr && match.length == counter_end - numeral_end &&
+                                     match.entry->pos == core::PartOfSpeech::Verb &&
+                                     match.entry->extended_pos == core::ExtendedPOS::VerbRenyokei);
+      }
+    }
     // A longer registered form of the same verb is an inflected predicate, and
     // it owns the span rather than the counter reading (二重ねる, 三切れる).
     bool inflected_predicate = false;

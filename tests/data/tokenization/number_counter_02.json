@@ -216,6 +216,60 @@
       ],
       "id": "de_shita",
       "input": "三年連続で受賞した"
+    },
+    {
+      "description": "an onbin verb cell after a numeral is no deverbal counter",
+      "expected": [
+        {
+          "lemma": "経験値",
+          "pos": "Noun",
+          "surface": "経験値"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "五百",
+          "pos": "Noun",
+          "surface": "五百"
+        },
+        {
+          "lemma": "入る",
+          "pos": "Verb",
+          "surface": "入っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ga_ttta_2",
+      "input": "経験値が五百入った"
+    },
+    {
+      "description": "an onbin verb cell after a numeral is no deverbal counter",
+      "expected": [
+        {
+          "lemma": "三百",
+          "pos": "Noun",
+          "surface": "三百"
+        },
+        {
+          "lemma": "入る",
+          "pos": "Verb",
+          "surface": "入っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ttta_8",
+      "input": "三百入った"
     }
   ],
   "description": "number_counter tests (part 2/2)",
