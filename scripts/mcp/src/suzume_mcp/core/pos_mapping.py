@@ -512,6 +512,25 @@ def correct_mecab_pos(tokens: list[dict]) -> None:
             else:
                 t["pos"] = "形容詞"
 
+        # がけ after a nominal host is the suffix of 掛ける's continuative (声+がけ,
+        # 一日+がけ). The reference tags it a plain noun before する and a suffix
+        # elsewhere; the host, not what follows, decides it.
+        if surface == "がけ" and pos == "名詞" and idx > 0 and tokens[idx - 1].get("pos") == "名詞":
+            t["pos_sub1"] = "接尾"
+
+        # っけ after a nominal (色+っけ, 飾り+っけ) is the suffix 気, not the
+        # recollective final particle, which closes a predicate (行った+っけ,
+        # どこ+だ+っけ).
+        if (
+            surface == "っけ"
+            and pos == "助詞"
+            and idx > 0
+            and tokens[idx - 1].get("pos") == "名詞"
+            and tokens[idx - 1].get("pos_sub1") != "代名詞"
+        ):
+            t["pos"] = "名詞"
+            t["pos_sub1"] = "接尾"
+
         # Fix な after じゃ: 助詞 -> 助動詞
         if surface == "な" and pos == "助詞":
             if idx > 0 and tokens[idx - 1].get("surface") == "じゃ":

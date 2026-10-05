@@ -724,3 +724,23 @@ class TestColloquialNegative:
     def test_final_particle_nee_stays_after_a_finite_form(self):
         tokens, _, _ = get_expected_tokens("いいねえ")
         assert tokens[-1]["pos"] == "Particle"
+
+
+class TestNominalSuffixAfterHost:
+    @pytest.mark.parametrize(
+        ("text", "suffix"),
+        [
+            ("お声がけする", "がけ"),
+            ("一日がけの仕事", "がけ"),
+            ("飾りっけのない態度", "っけ"),
+            ("塩っけがない", "っけ"),
+        ],
+    )
+    def test_suffix_after_a_nominal(self, text, suffix):
+        tokens, _, _ = get_expected_tokens(text)
+        assert next(token for token in tokens if token["surface"] == suffix)["pos"] == "Suffix"
+
+    @pytest.mark.parametrize("text", ["何だったっけ", "行ったっけ", "どこだっけ"])
+    def test_recollective_particle_after_a_predicate(self, text):
+        tokens, _, _ = get_expected_tokens(text)
+        assert tokens[-1]["pos"] == "Particle"
