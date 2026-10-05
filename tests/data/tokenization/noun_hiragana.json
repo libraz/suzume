@@ -616,6 +616,62 @@
       ],
       "id": "ttteurepi",
       "input": "言ってうれぴ"
+    },
+    {
+      "description": "おやつ、食べたい。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "おやつ",
+          "pos": "Noun",
+          "surface": "おやつ"
+        },
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たい"
+        }
+      ],
+      "id": "oyatsu_betai",
+      "input": "おやつ、食べたい。"
+    },
+    {
+      "description": "おなか、 - auto-generated",
+      "expected": [
+        {
+          "lemma": "おなか",
+          "pos": "Noun",
+          "surface": "おなか"
+        }
+      ],
+      "id": "onaka",
+      "input": "おなか、"
+    },
+    {
+      "description": "おふくろの味 - auto-generated",
+      "expected": [
+        {
+          "lemma": "おふくろ",
+          "pos": "Noun",
+          "surface": "おふくろ"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "味",
+          "pos": "Noun",
+          "surface": "味"
+        }
+      ],
+      "id": "ofukurono",
+      "input": "おふくろの味"
     }
   ],
   "description": "noun_hiragana tests",

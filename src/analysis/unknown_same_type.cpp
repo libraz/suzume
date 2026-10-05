@@ -1972,6 +1972,26 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
         noun_cand.pattern = "bracketed_hira_noun";
 #endif
         candidates.push_back(noun_cand);
+        // The beautifying お is productive on native nouns (お+ふろ, お+さんぽ),
+        // so the noun behind it is offered with the same evidence. A
+        // lexicalized お-word whose remainder means nothing alone (おなか,
+        // おふくろ) carries a registered reading that owns the whole run. A run
+        // ending on an i-row or e-row mora may be a deverbal continuative whose
+        // first mora belongs to the verb stem (およぎ, おどり, おばけ), so the
+        // prefix is not split off there.
+        const char32_t last_mora = codepoints[scan - 1];
+        const bool opens_on_native_prefix = codepoints[start_pos] == U'お' && len >= 3 &&
+                                            promoted_dictionary_reading == nullptr &&
+                                            !kana::isIRowCodepoint(last_mora) && !kana::isERowCodepoint(last_mora);
+        if (opens_on_native_prefix) {
+          auto host_cand =
+              makeCandidate(extractSubstring(codepoints, start_pos + 1, scan), start_pos + 1, scan,
+                            core::PartOfSpeech::Noun, noun_cost, /*has_suffix=*/true, CandidateOrigin::BracketedNoun);
+#ifdef SUZUME_DEBUG_INFO
+          host_cand.pattern = "prefixed_hira_noun";
+#endif
+          candidates.push_back(host_cand);
+        }
       }
     };
     emit_promoted_run(scan);

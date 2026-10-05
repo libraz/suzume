@@ -1770,6 +1770,77 @@
       ],
       "id": "desu_2",
       "input": "御用です"
+    },
+    {
+      "description": "おふろ、気持ちいい。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "ふろ",
+          "pos": "Noun",
+          "surface": "ふろ"
+        },
+        {
+          "lemma": "気持ちいい",
+          "pos": "Adjective",
+          "surface": "気持ちいい"
+        }
+      ],
+      "id": "ofuro_chiii",
+      "input": "おふろ、気持ちいい。"
+    },
+    {
+      "description": "おさんぽ、楽しい - auto-generated",
+      "expected": [
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "さんぽ",
+          "pos": "Noun",
+          "surface": "さんぽ"
+        },
+        {
+          "lemma": "楽しい",
+          "pos": "Adjective",
+          "surface": "楽しい"
+        }
+      ],
+      "id": "osanpo_shii",
+      "input": "おさんぽ、楽しい"
+    },
+    {
+      "description": "おちゃを飲む - auto-generated",
+      "expected": [
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "ちゃ",
+          "pos": "Noun",
+          "surface": "ちゃ"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "飲む",
+          "pos": "Verb",
+          "surface": "飲む"
+        }
+      ],
+      "id": "ochi_wo_mu",
+      "input": "おちゃを飲む"
     }
   ],
   "description": "Prefixes (お、ご、不、無)",
