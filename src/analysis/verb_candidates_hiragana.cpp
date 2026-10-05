@@ -623,9 +623,30 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(const std::vector<c
   // The initial の is normally a particle, but a following っ+た/て sequence
   // is independent Godan inflectional evidence.  Admit that structurally
   // verified path so kana-written verbs are not cut through their onbin stem.
+  // A ra-row irrealis contracted to ん before the colloquial negative
+  // (わかん+ねえ) is no inflected run of its own, but its uncontracted spelling
+  // (わから+ない) verifies the same cell the derived generators read before ない.
+  bool contracted_before_colloquial_negative = false;
+  size_t contracted_irrealis_end = 0;
+  for (size_t pos = start_pos + 1; pos < char_types.size() && char_types[pos] == normalize::CharType::Hiragana &&
+                                   !contracted_before_colloquial_negative;
+       ++pos) {
+    if (codepoints[pos] != U'ん' || !vh::colloquialNegativeFollowsAt(codepoints, pos + 1)) {
+      continue;
+    }
+    const std::string stem = extractSubstring(codepoints, start_pos, pos);
+    const std::string base_form = stem + "る";
+    const auto& analyses = inflection.analyze(stem + "らない");
+    contracted_before_colloquial_negative =
+        vh::isVerbInDictionary(dict_manager, base_form) ||
+        std::any_of(analyses.begin(), analyses.end(), [&](const auto& cand) {
+          return cand.verb_type == grammar::VerbType::GodanRa && cand.base_form == base_form;
+        });
+    contracted_irrealis_end = contracted_before_colloquial_negative ? pos + 1 : 0;
+  }
   bool crossed_particle_guard = normalize::isNeverVerbStemAtStart(first_char);
   if (crossed_particle_guard && closed_onbin_tense_end == 0 && complete_godan_wa_terminal_end == 0 &&
-      !has_verified_initial_inflection) {
+      !has_verified_initial_inflection && !contracted_before_colloquial_negative) {
     SUZUME_DEBUG_LOG_VERBOSE("[VERB_BLACKLIST] pos=" << start_pos << " char=U+" << std::hex
                                                      << static_cast<uint32_t>(first_char) << std::dec
                                                      << " blocked (isNeverVerbStemAtStart)\n");
@@ -806,6 +827,10 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(const std::vector<c
     }
   }
 
+  // The verified contraction spans its own ん even where the boundary scan
+  // stopped at a particle-homographic mora (わ+かん).
+  hiragana_end = std::max(hiragana_end, contracted_irrealis_end);
+
   // Log final hiragana sequence bounds
   SUZUME_DEBUG_LOG_TRACE("[HIRA_SEQ] final: start=" << start_pos << " end=" << hiragana_end
                                                     << " len=" << (hiragana_end - start_pos) << "\n");
@@ -888,10 +913,10 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(const std::vector<c
       lookupEntryInRange(*dict_manager, codepoints, hiragana_end, hiragana_end + 3, core::PartOfSpeech::Determiner) !=
           nullptr;
   if (!has_inflected_candidate && !negative_before_quotative && closed_onbin_tense_end == 0 &&
-      godan_ra_continuation_stem_end == 0) {
+      godan_ra_continuation_stem_end == 0 && !contracted_before_colloquial_negative) {
     return candidates;
   }
-  if (has_inflected_candidate || negative_before_quotative) {
+  if (has_inflected_candidate || negative_before_quotative || contracted_before_colloquial_negative) {
     appendHiraganaDerivedCandidates(codepoints, start_pos, hiragana_end, char_types, inflection, dict_manager,
                                     candidates);
   }

@@ -992,6 +992,11 @@ size_t naiNegativeFormLengthAt(const std::vector<char32_t>& codepoints, size_t p
 bool naiNegativeFollowsAt(const std::vector<char32_t>& codepoints, size_t pos);
 
 /**
+ * @brief Whether the colloquial negative ねえ/ねぇ/ねー (知ら+ねえ) starts at @p pos.
+ */
+bool colloquialNegativeFollowsAt(const std::vector<char32_t>& codepoints, size_t pos);
+
+/**
  * @brief Whether a contracted te-continuation opens at @p pos, right after て.
  *
  * てる, てた, ちゃう and てない have no quotative reading: the quotative って is

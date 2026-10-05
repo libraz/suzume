@@ -1244,6 +1244,62 @@
       ],
       "id": "retetttena",
       "input": "連れてってな"
+    },
+    {
+      "description": "わかんねえ - auto-generated",
+      "expected": [
+        {
+          "lemma": "わかる",
+          "pos": "Verb",
+          "surface": "わかん"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ねえ"
+        }
+      ],
+      "id": "wakannee",
+      "input": "わかんねえ"
+    },
+    {
+      "description": "わかんない - auto-generated",
+      "expected": [
+        {
+          "lemma": "わかる",
+          "pos": "Verb",
+          "surface": "わかん"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "wakannai",
+      "input": "わかんない"
+    },
+    {
+      "description": "わかんねえよ - auto-generated",
+      "expected": [
+        {
+          "lemma": "わかる",
+          "pos": "Verb",
+          "surface": "わかん"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ねえ"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "wakanneeyo",
+      "input": "わかんねえよ"
     }
   ],
   "description": "colloquial_contracted tests",

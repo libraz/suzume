@@ -127,6 +127,11 @@ bool naiNegativeFollowsAt(const std::vector<char32_t>& codepoints, size_t pos) {
   return naiNegativeFormLengthAt(codepoints, pos) != 0;
 }
 
+bool colloquialNegativeFollowsAt(const std::vector<char32_t>& codepoints, size_t pos) {
+  return pos + 1 < codepoints.size() && codepoints[pos] == U'ね' &&
+         (codepoints[pos + 1] == U'え' || codepoints[pos + 1] == U'ぇ' || codepoints[pos + 1] == U'ー');
+}
+
 bool contractedTeContinuationFollowsAt(const std::vector<char32_t>& codepoints, size_t pos) {
   return pos < codepoints.size() &&
          (codepoints[pos] == U'る' || codepoints[pos] == U'た' || codepoints[pos] == U'ち' || codepoints[pos] == U'な');

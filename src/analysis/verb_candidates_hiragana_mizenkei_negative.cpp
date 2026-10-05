@@ -382,10 +382,7 @@ void appendNOnbinNaiCandidates(const std::vector<char32_t>& codepoints, size_t s
   // potential られ with its row nasalized, so it is emitted as that auxiliary
   // once the te+らん+negative frame proves the contraction.
   const size_t negative_pos = start_pos + 2;
-  const bool colloquial_negative_follows =
-      negative_pos + 1 < codepoints.size() && codepoints[negative_pos] == U'ね' &&
-      (codepoints[negative_pos + 1] == U'え' || codepoints[negative_pos + 1] == U'ぇ' ||
-       codepoints[negative_pos + 1] == U'ー');
+  const bool colloquial_negative_follows = vh::colloquialNegativeFollowsAt(codepoints, negative_pos);
   if (start_pos > 0 && negative_pos < codepoints.size() &&
       (codepoints[start_pos - 1] == U'て' || codepoints[start_pos - 1] == U'で') && codepoints[start_pos] == U'ら' &&
       codepoints[start_pos + 1] == U'ん' &&
@@ -411,7 +408,8 @@ void appendNOnbinNaiCandidates(const std::vector<char32_t>& codepoints, size_t s
     // and every cell of that paradigm selects the same one (わかん+ない,
     // やん+なきゃ, やん+なかっ+た). Reading only the dictionary form left the
     // remaining cells to fall back on a particle sequence.
-    if (!vh::naiNegativeFollowsAt(codepoints, n_pos + 1))
+    // The colloquial negative ねえ selects the same cell (わかん+ねえ).
+    if (!vh::naiNegativeFollowsAt(codepoints, n_pos + 1) && !vh::colloquialNegativeFollowsAt(codepoints, n_pos + 1))
       continue;
 
     // Stem is the part before ん (at least 1 char, since n_pos > start_pos)
