@@ -456,3 +456,24 @@ class TestKanjiVerbFrame:
     def test_leaves_a_noun_before_a_kana_word(self):
         tokens, _, _ = get_expected_tokens("雪たくさん")
         assert [token["surface"] for token in tokens] == ["雪", "たくさん"]
+
+
+class TestUnlistedKanaWords:
+    @pytest.mark.parametrize(
+        ("text", "word", "pos", "lemma"),
+        [
+            ("ぶっちゃけると", "ぶっちゃける", "Verb", "ぶっちゃける"),
+            ("ぶっちゃけ無理です", "ぶっちゃけ", "Verb", "ぶっちゃける"),
+            ("頑なに拒む", "頑な", "Adjective", "頑な"),
+            ("ふとんで寝る", "ふとん", "Noun", "ふとん"),
+            ("うれしくてうれぴい。", "うれぴい", "Adjective", "うれぴい"),
+        ],
+    )
+    def test_keeps_a_word_the_reference_lacks_whole(self, text, word, pos, lemma):
+        tokens, _, _ = get_expected_tokens(text)
+        token = next(token for token in tokens if token["surface"] == word)
+        assert (token["pos"], token["lemma"]) == (pos, lemma)
+
+    def test_leaves_the_adverb_futo(self):
+        tokens, _, _ = get_expected_tokens("ふと思った")
+        assert tokens[0]["surface"] == "ふと"

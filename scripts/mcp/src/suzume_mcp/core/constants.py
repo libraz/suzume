@@ -561,6 +561,11 @@ WORD_EXCEPTIONS: dict[str, str] = {
     "ですっ": "です",
     "ますっっ": "ます",
     "ようけ": "たくさん",
+    # Spellings the reference lacks, read through a known word of the same
+    # inflection class so every cell follows: ぶっちゃけ is the continuative of
+    # the ichidan ぶっちゃける, 頑 the stem of the na-adjective 頑な.
+    "ぶっちゃけ": "打ち明け",
+    "頑な": "静か",
 }
 
 # A lexical replacement is safe only at a word boundary. These followers extend
@@ -641,6 +646,11 @@ HIRAGANA_COMPOUNDS: dict[str, str] = {
     "ひこうき": "名詞",
     "みっつ": "名詞",
     "よっつ": "名詞",
+    "ふとん": "名詞",
+    # Coinages stay whole: neither piece of the reference's split carries the
+    # meaning.
+    "うれぴい": "形容詞",
+    "うれぴ": "名詞",
 }
 
 # Closed function words and fixed formal/search units whose internal split in

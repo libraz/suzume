@@ -1241,6 +1241,28 @@
       ],
       "id": "imonowo_tsu",
       "input": "重いものを持つ"
+    },
+    {
+      "description": "うれしくてうれぴい。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "うれしい",
+          "pos": "Adjective",
+          "surface": "うれしく"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "うれぴい",
+          "pos": "Adjective",
+          "surface": "うれぴい"
+        }
+      ],
+      "id": "ureshikuteurepii",
+      "input": "うれしくてうれぴい。"
     }
   ],
   "version": "1.0"
