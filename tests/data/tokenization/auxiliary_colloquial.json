@@ -734,6 +734,60 @@
       ],
       "id": "beterunji_n",
       "input": "食べてるんじゃん"
+    },
+    {
+      "description": "そのご希望ですっしょ - auto-generated",
+      "expected": [
+        {
+          "lemma": "その",
+          "pos": "Determiner",
+          "surface": "その"
+        },
+        {
+          "lemma": "ご",
+          "pos": "Prefix",
+          "surface": "ご"
+        },
+        {
+          "lemma": "希望",
+          "pos": "Noun",
+          "surface": "希望"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "っしょ"
+        }
+      ],
+      "id": "sonogo_desuttshi",
+      "input": "そのご希望ですっしょ"
+    },
+    {
+      "description": "本当ですっしょ - auto-generated",
+      "expected": [
+        {
+          "lemma": "本当",
+          "pos": "Noun",
+          "surface": "本当"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "っしょ"
+        }
+      ],
+      "id": "desuttshi",
+      "input": "本当ですっしょ"
     }
   ],
   "description": "auxiliary_colloquial tests",

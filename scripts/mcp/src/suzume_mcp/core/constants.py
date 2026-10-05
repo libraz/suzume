@@ -558,7 +558,6 @@ WORD_EXCEPTIONS: dict[str, str] = {
     "おつかれさま": "お願い",
     "日付け": "日付",
     "再確認": "確認",
-    "ですっ": "です",
     "ますっっ": "ます",
     "ようけ": "たくさん",
     # Spellings the reference lacks, read through a known word of the same
@@ -573,7 +572,6 @@ WORD_EXCEPTIONS: dict[str, str] = {
 # the raw verb or quotative sequence available to MeCab instead.
 WORD_EXCEPTION_BLOCKED_FOLLOWERS: dict[str, tuple[str, ...]] = {
     "打ち合わせ": ("る", "た", "て", "ます", "まし", "ない", "なかっ", "ず", "ぬ", "ん", "れ", "ろ", "よう", "ば"),
-    "ですっ": ("て",),
     # The volitional よう before けど/けれど/けん spells the same kana.
     "ようけ": ("ど", "れ", "ん"),
 }

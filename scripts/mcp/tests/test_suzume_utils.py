@@ -47,7 +47,7 @@ class TestGetExpectedTokens:
         [
             ("バズった", "slang-verb"),
             ("打ち合わせをする", "word-exception"),
-            ("ですっ", "word-exception"),
+            ("ですっ", "emphatic-sokuon"),
         ],
     )
     def test_preprocessed_mecab_input_reports_its_actual_rule(self, text, expected_rule):
