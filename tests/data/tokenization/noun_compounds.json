@@ -1302,6 +1302,97 @@
       ],
       "id": "ri_miwo_u",
       "input": "折り畳みを使う"
+    },
+    {
+      "description": "砂糖は小さじ1で足りる。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "砂糖",
+          "pos": "Noun",
+          "surface": "砂糖"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "小さじ",
+          "pos": "Noun",
+          "surface": "小さじ"
+        },
+        {
+          "lemma": "1",
+          "pos": "Noun",
+          "surface": "1"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "足りる",
+          "pos": "Verb",
+          "surface": "足りる"
+        }
+      ],
+      "id": "ha_saji1de_riru",
+      "input": "砂糖は小さじ1で足りる。"
+    },
+    {
+      "description": "塩は小さじ1杯。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "塩",
+          "pos": "Noun",
+          "surface": "塩"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "小さじ",
+          "pos": "Noun",
+          "surface": "小さじ"
+        },
+        {
+          "lemma": "1杯",
+          "pos": "Noun",
+          "surface": "1杯"
+        }
+      ],
+      "id": "ha_saji1",
+      "input": "塩は小さじ1杯。"
+    },
+    {
+      "description": "大さじ2の醤油 - auto-generated",
+      "expected": [
+        {
+          "lemma": "大さじ",
+          "pos": "Noun",
+          "surface": "大さじ"
+        },
+        {
+          "lemma": "2",
+          "pos": "Noun",
+          "surface": "2"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "醤油",
+          "pos": "Noun",
+          "surface": "醤油"
+        }
+      ],
+      "id": "saji2no",
+      "input": "大さじ2の醤油"
     }
   ],
   "description": "noun_compounds tests",
