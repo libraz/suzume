@@ -983,6 +983,9 @@ PRONOUN_OVERRIDES: set[str] = {
 
 # Kana personal pronouns the reference dictionary does not list as one word.
 KANA_PERSONAL_PRONOUNS: tuple[str, ...] = ("かのじょ",)
+# Archaic personal pronouns the reference does not list. なんじ is left out: in
+# kana it is just as often 何時.
+ARCHAIC_PERSONAL_PRONOUNS: tuple[str, ...] = ("そなた", "おぬし", "わて", "それがし", "わらわ", "拙僧", "そち")
 
 # Na-adjective overrides (名詞 -> Adjective)
 NA_ADJ_OVERRIDES: set[str] = {

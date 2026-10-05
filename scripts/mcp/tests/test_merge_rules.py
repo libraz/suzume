@@ -485,6 +485,30 @@ class TestClassicalSourou:
         assert result[-1]["pos"] == "名詞"
 
 
+class TestArchaicPersonalPronoun:
+    def test_rejoins_pronoun_before_a_particle(self):
+        tokens = [
+            _tok("それ", pos_sub1="代名詞"),
+            _tok("が", pos="助詞"),
+            _tok("し", pos="動詞"),
+            _tok("が", pos="助詞"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "それがしが")
+        assert [token["surface"] for token in result] == ["それがし", "が"]
+        assert rule == "kana-personal-pronoun"
+
+    def test_keeps_the_clause_before_a_predicate_auxiliary(self):
+        tokens = [
+            _tok("それ", pos_sub1="代名詞"),
+            _tok("が", pos="助詞"),
+            _tok("し", pos="動詞"),
+            _tok("たい", pos="助動詞"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "それがしたい")
+        assert [token["surface"] for token in result] == ["それ", "が", "し", "たい"]
+        assert rule is None
+
+
 class TestNumberUnit:
     def test_number_counter(self):
         tokens = [

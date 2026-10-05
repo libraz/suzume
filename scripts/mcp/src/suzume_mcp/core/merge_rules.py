@@ -6,6 +6,7 @@ import regex
 
 from .constants import (
     ADVERBIAL_NA_ADJECTIVES,
+    ARCHAIC_PERSONAL_PRONOUNS,
     COLLOQUIAL_PRONOUNS,
     COMPOUND_VERB_V2_GODAN,
     COMPOUND_VERB_V2_ICHIDAN,
@@ -565,12 +566,27 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
 
         # A kana personal pronoun is a closed-class word the reference does not
         # list, so its spelling falls apart into readable pieces (かの+じょ).
+        # The archaic personal pronouns (それがし, わらわ, 拙僧) share their kana
+        # with ordinary words (それ+が+し, 笑わ), so they are taken only where a
+        # nominal phrase can stand: opening a phrase and closed by a particle, the
+        # copula, punctuation or the end of the input.
         if not merged:
-            for pronoun in KANA_PERSONAL_PRONOUNS:
+            for pronoun in (*KANA_PERSONAL_PRONOUNS, *ARCHAIC_PERSONAL_PRONOUNS):
                 if not remaining.startswith(pronoun):
                     continue
                 consumed, j = _consume_span(tokens, i, len(pronoun))
-                if consumed == pronoun and j - i > 1:
+                if pronoun in ARCHAIC_PERSONAL_PRONOUNS and not (
+                    (i == 0 or tokens[i - 1].get("pos") in ("助詞", "記号"))
+                    and (
+                        j == len(tokens)
+                        or tokens[j].get("pos") in ("助詞", "記号")
+                        or (tokens[j].get("pos") == "助動詞" and tokens[j].get("lemma") in ("だ", "です"))
+                    )
+                ):
+                    continue
+                # A pronoun the reference read as one other word (わらわ as 笑わ)
+                # is retagged; one it already split is rejoined.
+                if consumed == pronoun and (j - i > 1 or pronoun in ARCHAIC_PERSONAL_PRONOUNS):
                     result.append({"surface": pronoun, "pos": "名詞", "pos_sub1": "代名詞", "lemma": pronoun})
                     i = j
                     merged = True
