@@ -72,14 +72,9 @@
       "description": "Negative auxiliary boundary control.",
       "expected": [
         {
-          "lemma": "さりげ",
-          "pos": "Noun",
-          "surface": "さりげ"
-        },
-        {
-          "lemma": "ない",
+          "lemma": "さりげない",
           "pos": "Adjective",
-          "surface": "なく"
+          "surface": "さりげなく"
         }
       ],
       "id": "c2_adverbial_control_sarigenaku",

@@ -1181,8 +1181,13 @@ def apply_suzume_split(tokens: list[dict]) -> tuple[list[dict], str | None]:
 
         # 10a. An adjective Xげない (危なげない, 危なげなく) is the noun Xげ plus the
         # supplementary ない when Xげ stands as a noun of its own (危なげ+が+ない).
+        # One the core lexicon lists whole has a bound stem (さりげない).
         ge_nai = _GE_NAI_ADJECTIVE.fullmatch(surface) if t.get("pos") == "形容詞" else None
-        if ge_nai is not None and _reads_as_one_noun(ge_nai.group(1)):
+        if (
+            ge_nai is not None
+            and _reads_as_one_noun(ge_nai.group(1))
+            and ge_nai.group(1) + "ない" not in core_headwords("adjectives.tsv")
+        ):
             result.append({"surface": ge_nai.group(1), "pos": "名詞", "lemma": ge_nai.group(1)})
             result.append({"surface": ge_nai.group(2), "pos": "形容詞", "lemma": "ない"})
             if applied_rule is None:
