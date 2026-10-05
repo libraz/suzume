@@ -506,3 +506,28 @@ class TestSlangAdjectiveStems:
     def test_leaves_a_lexeme_or_a_predicate_suffix(self, text, word):
         tokens, _, _ = get_expected_tokens(text)
         assert word in [token["surface"] for token in tokens]
+
+
+class TestDerivedVerbSuffixSplit:
+    @pytest.mark.parametrize(
+        ("text", "host", "suffix", "lemma"),
+        [
+            ("春めいた日差し", "春", "めい", "めく"),
+            ("謎めいた話", "謎", "めい", "めく"),
+            ("冗談めかした言い方", "冗談", "めかし", "めかす"),
+            ("大人ぶった発言が嫌い。", "大人", "ぶっ", "ぶる"),
+            ("学者ぶって話す", "学者", "ぶっ", "ぶる"),
+            ("謎めきたる文字", "謎", "めき", "めく"),
+        ],
+    )
+    def test_keeps_host_and_suffix_apart(self, text, host, suffix, lemma):
+        tokens, _, _ = get_expected_tokens(text)
+        surfaces = [token["surface"] for token in tokens]
+        index = surfaces.index(host)
+        assert surfaces[index + 1] == suffix
+        assert (tokens[index + 1]["pos"], tokens[index + 1]["lemma"]) == ("Verb", lemma)
+
+    @pytest.mark.parametrize("text", ["時めく", "ときめく", "古めかしい建物", "艶めかしい"])
+    def test_leaves_lexicalized_words_whole(self, text):
+        tokens, _, _ = get_expected_tokens(text)
+        assert len(tokens[0]["surface"]) >= 3

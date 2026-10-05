@@ -5,9 +5,11 @@ import regex
 from .constants import (
     COMPOUND_VERB_V2_ICHIDAN,
     COPULAR_PREDICATE_HEADS,
+    DERIVED_VERB_SUFFIX_LEMMAS,
     FIXED_FUNCTION_SEARCH_UNITS,
     FIXED_LEADING_SEARCH_UNITS,
     LEXICALIZED_CAUSATIVE_SU_LEMMAS,
+    LEXICALIZED_DERIVED_VERBS,
     LITERARY_VOLITIONAL_PARTICLE_COMPOUNDS,
     NOUN_NAI_COMPOUND_ADJECTIVES,
     STATE_NOUN_SUFFIXES,
@@ -17,7 +19,7 @@ from .constants import (
     katakana_to_hiragana,
 )
 from .core_lexicon import core_headwords
-from .mecab import mecab_analyze
+from .mecab import is_single_token_of_pos, mecab_analyze
 
 # A plain 名詞-一般 host for re-reading a copula span. It carries no reading
 # that could fuse with what follows, so whatever the probe returns after it is
@@ -857,6 +859,62 @@ def apply_suzume_split(tokens: list[dict]) -> tuple[list[dict], str | None]:
                 if applied_rule is None:
                     applied_rule = "adverb-ni-split"
                 continue
+
+        # 0ab. A noun + derivational suffix verb the reference holds as one
+        # headword (春めく, 大人ぶる) keeps the host/suffix boundary like the
+        # productive rest (謎/めく, 学者/ぶる).
+        suffix_lemma = next(
+            (lemma for lemma in DERIVED_VERB_SUFFIX_LEMMAS if (t.get("lemma") or "").endswith(lemma)),
+            "",
+        )
+        host = (t.get("lemma") or "")[: -len(suffix_lemma)] if suffix_lemma else ""
+        if (
+            t.get("pos") == "動詞"
+            and host
+            and surface.startswith(host)
+            and len(surface) > len(host)
+            and not regex.fullmatch(r"\p{Hiragana}+", host)
+            and t.get("lemma") not in LEXICALIZED_DERIVED_VERBS
+            and is_single_token_of_pos(host, "名詞")
+        ):
+            result.append({"surface": host, "pos": "名詞", "lemma": host})
+            result.append({**t, "surface": surface[len(host) :], "lemma": suffix_lemma, "pos_sub1": "自立"})
+            if applied_rule is None:
+                applied_rule = "derived-verb-suffix-split"
+            continue
+
+        # The reference tags the suffix itself as a dependent verb when it is
+        # already split (謎+めい), which would read it as an auxiliary; it is
+        # the derived verb's head.
+        if (
+            t.get("pos") == "動詞"
+            and t.get("lemma") in DERIVED_VERB_SUFFIX_LEMMAS
+            and t.get("pos_sub1") == "非自立"
+            and result
+            and result[-1].get("pos") == "名詞"
+        ):
+            # The host is nominal even where the reference lists the word as
+            # a na-adjective stem (皮肉+めい).
+            if result[-1].get("pos_sub1") == "形容動詞語幹":
+                result[-1] = {**result[-1], "pos_sub1": "一般"}
+            result.append({**t, "pos_sub1": "自立"})
+            if applied_rule is None:
+                applied_rule = "derived-verb-suffix-split"
+            continue
+
+        # The suffix ぶる after a bare noun is read as the verb ぶつ in its onbin
+        # cell (学者+ぶっ+て); ぶつ needs its object marked, so this is ぶる.
+        if (
+            t.get("pos") == "動詞"
+            and surface == "ぶっ"
+            and t.get("lemma") == "ぶつ"
+            and result
+            and result[-1].get("pos") == "名詞"
+        ):
+            result.append({**t, "lemma": "ぶる"})
+            if applied_rule is None:
+                applied_rule = "derived-verb-suffix-split"
+            continue
 
         # 0aa. After a locative に the kana いた- is いる plus the desiderative
         # (そばにいたい, 家にいたかった), not the adjective 痛い, which takes its

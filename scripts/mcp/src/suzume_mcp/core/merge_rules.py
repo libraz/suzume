@@ -2039,35 +2039,34 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                     if applied_rule is None:
                         applied_rule = "verb-renyokei+kata"
 
-        # 5a''. Noun + verb-forming derivational suffix (謎めく, 冗談めかす).
-        # The suffix builds one godan paradigm with its host, so the whole
-        # derived verb inflects as a unit and carries no internal boundary.
-        # The reference dictionary merges only the entries it happens to hold
-        # (春めい) and splits the rest.
-        if not merged and t.get("pos") == "名詞" and t.get("pos_sub1") != "接尾" and i + 1 < len(tokens):
-            nxt = tokens[i + 1]
-            suffix_lemma = DERIVED_VERB_SUFFIX_FORMS.get(nxt.get("surface", ""))
-            if suffix_lemma is not None and nxt.get("pos") == "動詞":
-                combined = t.get("surface", "") + nxt.get("surface", "")
-                result.append(
-                    {
-                        "surface": combined,
-                        "pos": "動詞",
-                        "lemma": t.get("surface", "") + suffix_lemma,
-                    }
-                )
-                i += 2
-                merged = True
-                if applied_rule is None:
-                    applied_rule = "noun+derived-verb-suffix"
+        # 5a''. Noun + adjective-forming めかしい (艶めかしい, 古めかしい). The
+        # reference holds a few as single adjectives and reads the rest as the
+        # verb めかす plus a stray いる; like がましい, the host plus the suffix
+        # is one adjective.
+        if (
+            not merged
+            and t.get("pos") == "名詞"
+            and t.get("pos_sub1") != "接尾"
+            and i + 2 < len(tokens)
+            and tokens[i + 1].get("surface") == "めかし"
+            and tokens[i + 1].get("pos") == "動詞"
+            and tokens[i + 2].get("surface") == "い"
+        ):
+            adjective = t.get("surface", "") + "めかしい"
+            result.append({"surface": adjective, "pos": "形容詞", "lemma": adjective})
+            i += 3
+            merged = True
+            if applied_rule is None:
+                applied_rule = "noun+mekashii-adjective"
 
-        # 5a'''. The same derived verb, when the cell it stands in is one the
-        # reference dictionary has no entry for. It then cuts a bound suffix out
-        # of the derived verb's own material and reads whatever is left as some
-        # other word (謎 + め as a suffix + きたる as an adnominal), so the
-        # paradigm has to be found across the fragments rather than on one
-        # token. The bound-suffix tag is the evidence that the cut went through
-        # the derivation: an ordinary noun after a noun is left alone.
+        # 5a'''. A noun + verb-forming derivational suffix (謎めく, 冗談めかす)
+        # keeps the boundary between host and suffix, but when the cell the
+        # suffix stands in is one the reference dictionary has no entry for, it
+        # cuts a bound suffix out of the suffix's own material and reads
+        # whatever is left as some other word (謎 + め as a suffix + きたる as an
+        # adnominal). The paradigm is found across the fragments, and the
+        # bound-suffix tag is the evidence that the cut went through the
+        # derivation: an ordinary noun after a noun is left alone.
         if (
             not merged
             and t.get("pos") == "名詞"
@@ -2085,13 +2084,10 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                 )
                 if not form:
                     continue
-                result.append(
-                    {
-                        "surface": t.get("surface", "") + form,
-                        "pos": "動詞",
-                        "lemma": t.get("surface", "") + DERIVED_VERB_SUFFIX_FORMS[form],
-                    }
-                )
+                # The host of the derivation is nominal even where the
+                # reference lists the word as a na-adjective stem (皮肉).
+                result.append({**t, "pos_sub1": "一般"})
+                result.append({"surface": form, "pos": "動詞", "lemma": DERIVED_VERB_SUFFIX_FORMS[form]})
                 result.extend(mecab_analyze(joined[len(form) :]))
                 i = span + 1
                 merged = True

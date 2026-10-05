@@ -1811,17 +1811,17 @@ class TestDecomposableAdverb:
 
 
 class TestDerivedVerbFragments:
-    def test_recovers_a_derived_verb_cut_into_a_suffix_and_another_word(self):
+    def test_recovers_a_derived_verb_suffix_cut_into_a_suffix_and_another_word(self):
         tokens = [
             _tok("謎", pos="名詞", pos_sub1="一般", lemma="謎"),
             _tok("め", pos="名詞", pos_sub1="接尾", lemma="め"),
             _tok("きたる", pos="連体詞", lemma="きたる"),
         ]
         result, rule = apply_suzume_merge(tokens, "謎めきたる")
-        assert [token["surface"] for token in result] == ["謎めき", "たる"]
-        assert result[0]["pos"] == "動詞"
-        assert result[0]["lemma"] == "謎めく"
-        assert result[1]["pos"] == "助動詞"
+        assert [token["surface"] for token in result] == ["謎", "めき", "たる"]
+        assert result[1]["pos"] == "動詞"
+        assert result[1]["lemma"] == "めく"
+        assert result[2]["pos"] == "助動詞"
         assert rule == "noun+derived-verb-suffix"
 
     def test_leaves_an_ordinary_noun_after_a_noun_alone(self):

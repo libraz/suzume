@@ -820,12 +820,22 @@ def _godan_suffix_forms(lemma: str) -> set[str]:
 
 
 # Verb-forming derivational suffixes. A noun takes them freely (春めく, 謎めく,
-# 冗談めかす), but the reference dictionary holds only the lexicalized results
-# as single tokens and splits the rest, so the boundary has to be restored from
-# the paradigm rather than from a word list.
+# 冗談めかす) and the host and the suffix stay separate search units. The
+# reference dictionary sometimes cuts the suffix itself into fragments, so its
+# paradigm is spelled out to find it again.
 DERIVED_VERB_SUFFIX_FORMS: dict[str, str] = {
     form: lemma for lemma in ("めく", "めかす") for form in _godan_suffix_forms(lemma)
 }
+
+# Lemmas of the verb-forming derivational suffixes. The reference holds some
+# host + suffix verbs as single headwords (春めく, 大人ぶる); they are split the
+# same way as the productive rest.
+DERIVED_VERB_SUFFIX_LEMMAS: tuple[str, ...] = ("めかす", "めく", "ぶる")
+
+# Headwords whose host no longer carries its own meaning inside the verb
+# (時めく is to throb or to prosper, not to seem like a time), so they stay one
+# word. Hiragana hosts (ときめく, きらめく) are mimetic roots and never split.
+LEXICALIZED_DERIVED_VERBS: frozenset[str] = frozenset({"時めく", "色めく"})
 
 # How many tokens a cut-up derived verb can be spread over. The suffix itself is
 # at most three morae, and the fragment carrying its tail is one more token.
