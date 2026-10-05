@@ -813,3 +813,14 @@ class TestNounIkuHeadword:
     def test_noun_michiyuki_stays_whole(self):
         tokens, _, _ = get_expected_tokens("道行きが寂しい")
         assert tokens[0]["surface"] == "道行き"
+
+
+class TestTruncatedAdverb:
+    @pytest.mark.parametrize("text", ["ちょっ…待ってください", "ちょっ、待って"])
+    def test_cut_adverb_before_a_resumed_pause(self, text):
+        tokens, _, _ = get_expected_tokens(text)
+        assert (tokens[0]["surface"], tokens[0]["pos"], tokens[0]["lemma"]) == ("ちょっ", "Adverb", "ちょっと")
+
+    def test_interjection_stays(self):
+        tokens, _, _ = get_expected_tokens("あっ、そうだ")
+        assert tokens[0]["pos"] == "Interjection"

@@ -512,6 +512,27 @@ def correct_mecab_pos(tokens: list[dict]) -> None:
             else:
                 t["pos"] = "形容詞"
 
+        # Interrupted speech cuts an adverb before its closing と at the sokuon
+        # (ちょっ…待って for ちょっと); the dictionary has no such word and reads
+        # the kana as a nominal fragment. Before a pause that the utterance
+        # resumes after, the truncated form is the adverb; an interjection (あっ)
+        # is a word of its own.
+        resumes_after_pause = (
+            idx + 1 < len(tokens)
+            and tokens[idx + 1].get("pos") == "記号"
+            and any(token.get("pos") != "記号" for token in tokens[idx + 2 :])
+        )
+        if (
+            resumes_after_pause
+            and len(surface) >= 2
+            and surface.endswith("っ")
+            and pos == "名詞"
+            and is_single_token_of_pos(surface + "と", "副詞")
+        ):
+            t["pos"] = "副詞"
+            t["pos_sub1"] = None
+            t["lemma"] = surface + "と"
+
         # がけ after a nominal host is the suffix of 掛ける's continuative (声+がけ,
         # 一日+がけ). The reference tags it a plain noun before する and a suffix
         # elsewhere; the host, not what follows, decides it.
