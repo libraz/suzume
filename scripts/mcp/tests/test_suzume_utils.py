@@ -531,3 +531,14 @@ class TestDerivedVerbSuffixSplit:
     def test_leaves_lexicalized_words_whole(self, text):
         tokens, _, _ = get_expected_tokens(text)
         assert len(tokens[0]["surface"]) >= 3
+
+
+class TestTeAdverbAfterObject:
+    def test_reads_the_adverb_after_wo_as_the_verb_te_form(self):
+        tokens, _, _ = get_expected_tokens("約束を果たして帰る")
+        assert [token["surface"] for token in tokens][2:4] == ["果たし", "て"]
+        assert tokens[2]["lemma"] == "果たす"
+
+    def test_keeps_the_clause_initial_adverb(self):
+        tokens, _, _ = get_expected_tokens("果たして現状で十分だろうか")
+        assert tokens[0]["surface"] == "果たして"

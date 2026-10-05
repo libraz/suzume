@@ -590,6 +590,30 @@ def _decomposed_adverb_head(surface: str, probe_suffix: str, head_pos: str) -> d
     return head if head.get("pos") == head_pos else None
 
 
+def _te_form_after_object(token: dict, previous: dict | None) -> list[dict] | None:
+    """Read an adverb in て after a direct object as the verb's te-form.
+
+    The reference lists 果たして as an adverb and gives it that tag even where
+    the object marker in front of it makes it the verb 果たす (約束を果たして).
+    An adverb takes no object, so behind を the headword is the continuative
+    plus the conjunctive て whenever the same stem reads as a verb before た.
+    """
+    surface = token.get("surface", "")
+    if (
+        token.get("pos") != "副詞"
+        or not surface.endswith("て")
+        or len(surface) < 3
+        or previous is None
+        or previous.get("surface") != "を"
+        or previous.get("pos") != "助詞"
+    ):
+        return None
+    probe = mecab_analyze(surface[:-1] + "た")
+    if len(probe) != 2 or probe[0].get("pos") != "動詞" or probe[0].get("surface") != surface[:-1]:
+        return None
+    return [probe[0], {"surface": "て", "pos": "助詞", "pos_sub1": "接続助詞", "lemma": "て"}]
+
+
 def _postprocess_decomposable_adverb(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
     """Give back the boundary an adverb headword swallowed.
 
@@ -609,6 +633,12 @@ def _postprocess_decomposable_adverb(result: list[dict], applied_rule: str | Non
     expanded: list[dict] = []
     for token in result:
         surface = token.get("surface", "")
+        te_form = _te_form_after_object(token, expanded[-1] if expanded else None)
+        if te_form is not None:
+            expanded.extend(te_form)
+            if applied_rule is None:
+                applied_rule = "decomposable-adverb"
+            continue
         tail = next(
             (tail for tail in _DECOMPOSABLE_ADVERB_TAILS if surface.endswith(tail) and len(surface) > len(tail)),
             "",
