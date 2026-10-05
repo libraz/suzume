@@ -518,7 +518,10 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
   // nominalizer の (帰ん+な+よ ← 帰るなよ, 分かん+の ← 分かるの); a ない-family
   // cell after ん is the irrealis case above.
   for (size_t n_pos = kanji_end; n_pos + 1 < hiragana_end; ++n_pos) {
-    const bool negative_follows = vh::naiNegativeFollowsAt(codepoints, n_pos + 1);
+    // The colloquial ねえ is the same negative (分かん+ねえ), as the hiragana
+    // sibling of this scan already reads it.
+    const bool negative_follows =
+        vh::naiNegativeFollowsAt(codepoints, n_pos + 1) || vh::colloquialNegativeFollowsAt(codepoints, n_pos + 1);
     const bool terminal_follows =
         !negative_follows && (codepoints[n_pos + 1] == U'な' || codepoints[n_pos + 1] == U'の');
     // Before the copula and the reason で the ん is the nominalizer standing

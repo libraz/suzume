@@ -1616,6 +1616,57 @@
       ],
       "id": "tttekunno",
       "input": "走ってくんの"
+    },
+    {
+      "description": "変わんねえ。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "変わる",
+          "pos": "Verb",
+          "surface": "変わん"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ねえ"
+        }
+      ],
+      "id": "wannee",
+      "input": "変わんねえ。"
+    },
+    {
+      "description": "終わんねえ - auto-generated",
+      "expected": [
+        {
+          "lemma": "終わる",
+          "pos": "Verb",
+          "surface": "終わん"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ねえ"
+        }
+      ],
+      "id": "wannee_2",
+      "input": "終わんねえ"
+    },
+    {
+      "description": "分かんねえ - auto-generated",
+      "expected": [
+        {
+          "lemma": "分かる",
+          "pos": "Verb",
+          "surface": "分かん"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ねえ"
+        }
+      ],
+      "id": "kannee",
+      "input": "分かんねえ"
     }
   ],
   "description": "colloquial_contracted tests",
