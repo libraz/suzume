@@ -86,12 +86,13 @@ SLANG_ADJ_SUBSTITUTE = "赤"
 _EMPHATIC_SOKUON_MARKS = frozenset("っッ")
 
 
-def _emphatic_final_sokuon(text: str) -> int | None:
-    """Where a sokuon closes the utterance, with a host in front of it to carry."""
-    body = regex.sub(r"[\p{P}\p{S}\p{Z}]+$", "", text)
-    if len(body) < 2 or body[-1] not in _EMPHATIC_SOKUON_MARKS:
-        return None
-    return len(body) - 1 if body[-2] not in _EMPHATIC_SOKUON_MARKS else None
+def _emphatic_sokuons(text: str) -> list[int]:
+    """Where a sokuon closes an utterance or a phrase, with a host in front of it.
+
+    The phrase ends where punctuation, a symbol, a space or the text end
+    follows; nothing is left behind the mark for a sokuon-onbin to carry.
+    """
+    return [m.start() for m in regex.finditer(r"(?<=[^\s\p{P}\p{S}っッ])[っッ](?=[\p{P}\p{S}\p{Z}]|$)", text)]
 
 
 def _invents_a_word_for(raw: tuple[int, dict[int, dict]], position: int) -> bool:
@@ -108,7 +109,11 @@ def _invents_a_word_for(raw: tuple[int, dict[int, dict]], position: int) -> bool
     if token.get("pos") == "助動詞":
         return False
     lemma = token.get("lemma", "")
-    return bool(lemma) and lemma != "*" and lemma != token.get("surface")
+    # An unknown token glued around the mark is a guess as well, unless the
+    # mark is all there is to it.
+    if lemma in ("", "*"):
+        return token.get("surface") not in _EMPHATIC_SOKUON_MARKS
+    return lemma != token.get("surface")
 
 
 def _stranded_adjective_stems(raw: tuple[int, dict[int, dict]]) -> dict[int, str]:
@@ -338,7 +343,8 @@ def preprocess_for_mecab(text: str) -> tuple[str, dict[tuple[int, str], dict], t
                 "length": len(word),
             }
 
-    # An utterance-final sokuon is emphasis rather than a morpheme: the real
+    # A sokuon closing an utterance or a phrase (before punctuation) is
+    # emphasis rather than a morpheme: the real
     # sokuon-onbin exists only to carry the past and conjunctive suffixes, and
     # nothing follows this one for it to carry. The dictionary still has to place
     # the kana and invents a word for it — a bare っ read as the adjective's
@@ -346,8 +352,7 @@ def preprocess_for_mecab(text: str) -> tuple[str, dict[tuple[int, str], dict], t
     # mark is dropped before the analysis and put back into the surface
     # afterwards. A final sokuon the dictionary already reads as a word in its
     # own right (あっ, えっ) has itself for a lemma and is left alone.
-    emphatic_sokuon = _emphatic_final_sokuon(text)
-    if emphatic_sokuon is not None:
+    for emphatic_sokuon in _emphatic_sokuons(text):
         if raw is None:
             raw = _raw_analysis(text)
         if _invents_a_word_for(raw, emphatic_sokuon):

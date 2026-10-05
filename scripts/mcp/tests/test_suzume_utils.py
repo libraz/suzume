@@ -561,3 +561,17 @@ class TestMimeticRunGate:
     def test_reads_etto_as_the_filler_unless_a_predicate_follows(self, text, first):
         tokens, _, _ = get_expected_tokens(text)
         assert tokens[0]["surface"] == first
+
+
+class TestPhraseFinalEmphaticSokuon:
+    @pytest.mark.parametrize(
+        ("text", "word"),
+        [("来たぞっ！やったぜ", "ぞっ"), ("ちょっ…待ってください", "ちょっ"), ("ドアがバタンっ。", "バタンっ")],
+    )
+    def test_keeps_the_mark_on_its_host_before_punctuation(self, text, word):
+        tokens, _, _ = get_expected_tokens(text)
+        assert word in [token["surface"] for token in tokens]
+
+    def test_leaves_a_sokuon_carrying_a_suffix(self):
+        tokens, _, _ = get_expected_tokens("行ったって")
+        assert [token["surface"] for token in tokens][:2] == ["行っ", "た"]

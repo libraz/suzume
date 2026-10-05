@@ -108,6 +108,43 @@
         "sokuon",
         "verb"
       ]
+    },
+    {
+      "description": "来たぞっ！やったぜ - auto-generated",
+      "expected": [
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "ぞ",
+          "pos": "Particle",
+          "surface": "ぞっ"
+        },
+        {
+          "lemma": "やる",
+          "pos": "Verb",
+          "surface": "やっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "ぜ",
+          "pos": "Particle",
+          "surface": "ぜ"
+        }
+      ],
+      "id": "tazott_yatttaze",
+      "input": "来たぞっ！やったぜ"
     }
   ],
   "description": "Tests for sokuon (促音) patterns: 漢字+っ+漢字/平仮名",
