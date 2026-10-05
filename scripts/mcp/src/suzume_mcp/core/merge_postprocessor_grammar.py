@@ -286,13 +286,21 @@ def _postprocess_prefix_split(result: list[dict], applied_rule: str | None) -> t
     return new_result, applied_rule
 
 
-# Inflections that can only follow the adjective-forming suffix がましい, never
-# the verb 増す. 増す is also written in kanji here, so the kana surface below
-# already separates the two; these tails are the second, independent check.
-_GAMASHII_TAILS: tuple[tuple[str, str], ...] = (
-    ("い", "動詞"),
-    ("さ", "名詞"),
-)
+# A derivation the reference does hold as one adjective. Its cells are read off
+# this frame, so every cell the suffix がましい inflects into is recognized
+# without listing them.
+_GAMASHII_FRAME_HOST = "未練"
+
+
+def _gamashii_cell(pieces: str) -> list[dict] | None:
+    """Read がまし + a cell through the frame; return the adjective and a trailing さ."""
+    probe = mecab_analyze(_GAMASHII_FRAME_HOST + pieces)
+    if not probe or probe[0].get("pos") != "形容詞" or probe[0].get("lemma") != f"{_GAMASHII_FRAME_HOST}がましい":
+        return None
+    rest = probe[1:]
+    if rest and not (len(rest) == 1 and rest[0].get("surface") == "さ" and rest[0].get("pos_sub1") == "接尾"):
+        return None
+    return probe
 
 
 def _postprocess_gamashii(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
@@ -300,34 +308,29 @@ def _postprocess_gamashii(result: list[dict], applied_rule: str | None) -> tuple
 
     The reference dictionary holds the lexicalized derivations (押しつけがましい,
     未練がましい) as single adjectives but has no entry for the productive rest,
-    where it reads the が as a case particle and まし as the verb 増す
-    (恩/着せ/が/まし/さ). The host plus がましい is one adjective either way.
+    where it reads the が as a case particle or a suffix and the rest as the
+    verbs 増す, しく or しかる (恩/着せ/が/まし/さ, 言い訳/がま/しく). The host plus
+    がましい is one adjective either way; which cell the pieces spell is read off
+    a lexicalized derivation the reference does know.
     """
     new_result: list[dict] = []
     index = 0
     while index < len(result):
-        tail = result[index + 2] if index + 2 < len(result) else None
-        matched_tail = (
-            next(
-                (
-                    surface
-                    for surface, pos in _GAMASHII_TAILS
-                    if tail is not None and tail.get("surface") == surface and tail.get("pos") == pos
-                ),
-                "",
-            )
-            if tail is not None
-            else ""
+        head = result[index]
+        opens = (head.get("surface") == "が" and head.get("pos") == "助詞") or (
+            head.get("surface") == "がま" and head.get("pos_sub1") == "接尾"
         )
-        if (
-            matched_tail
-            and result[index].get("surface") == "が"
-            and result[index].get("pos") == "助詞"
-            and result[index + 1].get("surface") == "まし"
-            and result[index + 1].get("pos") == "動詞"
-            and new_result
-        ):
-            # The host is whatever precedes the particle: a bare noun
+        cell: list[dict] | None = None
+        end = index
+        if opens and new_result:
+            for end in range(min(len(result), index + 3), index + 1, -1):
+                pieces = "".join(t.get("surface", "") for t in result[index:end])
+                if pieces.startswith("がまし") and len(pieces) > 3:
+                    cell = _gamashii_cell(pieces)
+                    if cell is not None:
+                        break
+        if cell is not None:
+            # The host is whatever precedes the suffix: a bare noun
             # (言い訳がましい) or a noun plus a continuative verb (恩着せがましい).
             host_size = (
                 2
@@ -339,18 +342,14 @@ def _postprocess_gamashii(result: list[dict], applied_rule: str | None) -> tuple
             )
             host = "".join(t.get("surface", "") for t in new_result[-host_size:])
             del new_result[-host_size:]
-            stem = f"{host}がまし"
-            lemma = f"{stem}い"
-            if matched_tail == "い":
-                new_result.append({"surface": lemma, "pos": "形容詞", "lemma": lemma})
-            else:
-                new_result.append({"surface": stem, "pos": "形容詞", "lemma": lemma})
-                new_result.append({"surface": "さ", "pos": "名詞", "pos_sub1": "接尾", "lemma": "さ"})
-            index += 3
+            adjective = cell[0]["surface"][len(_GAMASHII_FRAME_HOST) :]
+            new_result.append({"surface": host + adjective, "pos": "形容詞", "lemma": f"{host}がましい"})
+            new_result.extend({"surface": "さ", "pos": "名詞", "pos_sub1": "接尾", "lemma": "さ"} for _ in cell[1:])
+            index = end
             if applied_rule is None:
                 applied_rule = "gamashii-adjective"
             continue
-        new_result.append(result[index])
+        new_result.append(head)
         index += 1
     return new_result, applied_rule
 

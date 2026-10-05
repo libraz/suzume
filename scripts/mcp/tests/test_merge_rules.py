@@ -1374,6 +1374,30 @@ class TestGreetingInterjection:
         assert [token["surface"] for token in result] == ["あざ", "すぎる"]
 
 
+class TestGamashiiCells:
+    def test_rebuilds_the_continuative_cell_from_suffix_pieces(self):
+        tokens = [
+            _tok("言い訳"),
+            _tok("がま", pos_sub1="接尾"),
+            _tok("しく", pos="動詞", lemma="しく"),
+            _tok("話す", pos="動詞"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "言い訳がましく話す")
+        assert [token["surface"] for token in result] == ["言い訳がましく", "話す"]
+        assert result[0]["lemma"] == "言い訳がましい"
+        assert rule == "gamashii-adjective"
+
+    def test_leaves_the_comparative_mashi_after_ga(self):
+        tokens = [
+            _tok("気"),
+            _tok("が", pos="助詞"),
+            _tok("まし", pos="動詞", lemma="ます"),
+            _tok("ます", pos="助動詞"),
+        ]
+        result, _ = apply_suzume_merge(tokens, "気がまします")
+        assert [token["surface"] for token in result] == ["気", "が", "まし", "ます"]
+
+
 class TestStrandedLengtheningVowel:
     def test_merges_filler_vowel_into_the_lengthened_word(self):
         tokens = [
