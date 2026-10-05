@@ -1343,6 +1343,24 @@ class TestHonorificPrefixKanji:
         assert rule == "prefix-pronoun-merge"
 
 
+class TestLaughter:
+    def test_rejoins_vowel_plus_ha_row_laugh_as_interjection(self):
+        tokens = [_tok("お", pos="接頭詞"), _tok("ほほ", pos="副詞")]
+        result, rule = apply_suzume_merge(tokens, "おほほ")
+        assert result == [{"surface": "おほほ", "pos": "感動詞", "lemma": "おほほ"}]
+        assert rule == "productive-mimetic"
+
+    def test_rejoins_laugh_torn_into_doubled_particles(self):
+        tokens = [_tok("え", pos="フィラー"), _tok("へ", pos="助詞"), _tok("へ", pos="助詞")]
+        result, _ = apply_suzume_merge(tokens, "えへへ")
+        assert [(token["surface"], token["pos"]) for token in result] == [("えへへ", "感動詞")]
+
+    def test_keeps_prefix_on_a_noun(self):
+        tokens = [_tok("お", pos="接頭詞"), _tok("頬")]
+        result, _ = apply_suzume_merge(tokens, "お頬")
+        assert [token["surface"] for token in result] == ["お", "頬"]
+
+
 class TestStrandedLengtheningVowel:
     def test_merges_filler_vowel_into_the_lengthened_word(self):
         tokens = [

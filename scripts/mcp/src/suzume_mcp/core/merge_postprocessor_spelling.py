@@ -453,10 +453,29 @@ def _postprocess_onomatopoeia_tto_merge(result: list[dict], applied_rule: str | 
     return merged, applied_rule
 
 
+# A laugh is a bare vowel followed by the ha-row mora of the same vowel,
+# repeated (あはは, うふふ, おほほ).
+_LAUGHTER_HA_ROW = {"あ": "は", "い": "ひ", "う": "ふ", "え": "へ", "お": "ほ"}
+
+
+def _is_laughter(surface: str) -> bool:
+    """Whether a hiragana run is a laugh: vowel plus its ha-row mora twice or more."""
+    if len(surface) < 3 or surface[0] not in _LAUGHTER_HA_ROW:
+        return False
+    return set(surface[1:]) == {_LAUGHTER_HA_ROW[surface[0]]}
+
+
+def _mimetic_pos(surface: str) -> str:
+    """A laugh is an interjection like the listed うふふ; other mimetics are adverbs."""
+    return "感動詞" if _is_laughter(surface) else "副詞"
+
+
 def _is_productive_mimetic_stem(surface: str) -> bool:
     """Recognize productive hiragana mimetic shapes without a word list."""
     if not regex.fullmatch(r"[\p{Hiragana}ー]{3,12}", surface):
         return False
+    if _is_laughter(surface):
+        return True
     length = len(surface)
     if length % 2 == 0 and surface[: length // 2] == surface[length // 2 :]:
         return True
@@ -648,16 +667,24 @@ def _postprocess_productive_mimetics(result: list[dict], applied_rule: str | Non
                 and _is_productive_mimetic_stem(combined[:-1])
             ):
                 stem = combined[:-1]
-                normalized.append({"surface": stem, "pos": "副詞", "lemma": stem})
+                normalized.append({"surface": stem, "pos": _mimetic_pos(stem), "lemma": stem})
                 normalized.append({"surface": "と", "pos": "助詞", "lemma": "と"})
                 idx = end
                 matched = True
-            elif _is_split_reduplication(result[idx:end]) or (
-                starts_at_real_boundary
-                and _is_productive_mimetic_stem(combined)
-                and _spans_one_mimetic(result[idx:end], result[end] if end < len(result) else None)
+            elif (
+                _is_split_reduplication(result[idx:end])
+                or (
+                    starts_at_real_boundary
+                    and _is_productive_mimetic_stem(combined)
+                    # A doubled particle (は+は, へ+へ) attaches nowhere, so a laugh
+                    # needs no attachment test.
+                    and (
+                        _is_laughter(combined)
+                        or _spans_one_mimetic(result[idx:end], result[end] if end < len(result) else None)
+                    )
+                )
             ):
-                normalized.append({"surface": combined, "pos": "副詞", "lemma": combined})
+                normalized.append({"surface": combined, "pos": _mimetic_pos(combined), "lemma": combined})
                 idx = end
                 matched = True
             if matched:
