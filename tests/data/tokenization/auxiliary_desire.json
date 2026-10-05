@@ -70,6 +70,60 @@
       ],
       "id": "betougozaimasu",
       "input": "食べとうございます"
+    },
+    {
+      "description": "Desiderative たい + listing し before final さ",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行き"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たい"
+        },
+        {
+          "lemma": "し",
+          "pos": "Particle",
+          "surface": "し"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Particle",
+          "surface": "さ"
+        }
+      ],
+      "id": "desiderative_listing_shi_before_sa",
+      "input": "行きたいしさ。"
+    },
+    {
+      "description": "Desiderative たい + listing し before final ね",
+      "expected": [
+        {
+          "lemma": "遊ぶ",
+          "pos": "Verb",
+          "surface": "遊び"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たい"
+        },
+        {
+          "lemma": "し",
+          "pos": "Particle",
+          "surface": "し"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        }
+      ],
+      "id": "desiderative_listing_shi_before_ne",
+      "input": "遊びたいしね"
     }
   ],
   "description": "auxiliary_desire tests",

@@ -136,6 +136,24 @@ class TestGetExpectedTokens:
         tokens, _, _ = get_expected_tokens(text)
         assert [token["surface"] for token in tokens] == surfaces
 
+    @pytest.mark.parametrize(
+        ("text", "surfaces"),
+        [
+            ("好きになるしさ", ["好き", "に", "なる", "し", "さ"]),
+            ("行きたいしさ", ["行き", "たい", "し", "さ"]),
+            ("遊びたいしね", ["遊び", "たい", "し", "ね"]),
+        ],
+    )
+    def test_predicate_and_listing_shi_are_restored(self, text, surfaces):
+        tokens, _, rule = get_expected_tokens(text)
+        assert [token["surface"] for token in tokens] == surfaces
+        assert tokens[-1]["pos"] == "Particle"
+        assert rule == "predicate-shi"
+
+    def test_classical_terminal_without_a_modern_final_particle_is_kept(self):
+        tokens, _, _ = get_expected_tokens("春はあけぼの、白し")
+        assert tokens[-1]["surface"] == "白し"
+
     def test_postprocessors_do_not_join_across_removed_punctuation(self):
         tokens, _, _ = get_expected_tokens("書き、直して")
         assert [token["surface"] for token in tokens] == ["書き", "直し", "て"]

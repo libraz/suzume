@@ -40,6 +40,86 @@ def _postprocess_adj_bungo(result: list[dict], applied_rule: str | None) -> tupl
     return new_result, applied_rule
 
 
+# Modern sentence-final particles. A clause closed by one is colloquial, so a
+# し before it is the listing particle, not a classical adjective terminal.
+_MODERN_FINAL_PARTICLES = frozenset(("さ", "よ", "ね", "な", "わ"))
+
+
+def _predicate_before_shi(host: str, stem: str) -> tuple[list[dict], list[dict]] | None:
+    """The reference's reading of ``host`` + ``stem`` when the stem ends in a finite predicate.
+
+    The host is analyzed together with the stem so each is read in context;
+    only a reading with a token boundary exactly where the host ends counts.
+    Returns the host tokens and the stem tokens.
+    """
+    if not stem:
+        return None
+    tokens = mecab_analyze(host + stem)
+    consumed = 0
+    for index, token in enumerate(tokens):
+        if consumed == len(host):
+            tail = tokens[index:]
+            if (
+                "".join(token.get("surface", "") for token in tail) == stem
+                and tail[-1].get("pos") in ("動詞", "形容詞", "助動詞")
+                and tail[-1].get("conj_form") == "基本形"
+            ):
+                return tokens[:index], tail
+            return None
+        consumed += len(token.get("surface", ""))
+    return None
+
+
+def _postprocess_predicate_shi(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
+    """Restore predicate + listing し where the reference fused し into one word.
+
+    Two fusions occur: a finite predicate + し before a modern final particle is
+    read as a classical adjective terminal (なる+し → なるし, lemma なるい), and an
+    auxiliary + し after a continuative is read as an unrelated サ行 verb
+    (行き+たいし, lemma たいす), sometimes with the continuative itself read as a
+    noun. In both, the probe of the material before し must come back as a
+    finite predicate, and in the second its first token must be an auxiliary.
+    """
+    new_result: list[dict] = []
+    for index, curr in enumerate(result):
+        surface = curr.get("surface", "")
+        following = result[index + 1] if index + 1 < len(result) else {}
+        previous = new_result[-1] if new_result else {}
+        classical_terminal = (
+            curr.get("pos") == "形容詞"
+            and curr.get("conj_form") == "文語基本形"
+            and following.get("surface") in _MODERN_FINAL_PARTICLES
+        )
+        sa_row_verb = curr.get("pos") == "動詞" and curr.get("lemma", "").endswith("す") and bool(previous)
+        reading = None
+        if surface.endswith("し") and (classical_terminal or sa_row_verb):
+            reading = _predicate_before_shi(previous.get("surface", ""), surface[:-1])
+            if reading and not classical_terminal:
+                host_tokens, predicate = reading
+                if not (
+                    predicate[0].get("pos") == "助動詞"
+                    and host_tokens
+                    and host_tokens[-1].get("pos") == "動詞"
+                    and host_tokens[-1].get("conj_form") == "連用形"
+                ):
+                    reading = None
+        if reading is None:
+            new_result.append(curr)
+            continue
+        host_tokens, predicate = reading
+        if not classical_terminal and previous:
+            new_result.pop()
+            new_result.extend(dict(token) for token in host_tokens)
+        new_result.extend(dict(token) for token in predicate)
+        new_result.append({"surface": "し", "pos": "助詞", "pos_sub1": "接続助詞", "lemma": "し"})
+        # The reference reads さ after the fused verb as the nominalizing suffix.
+        if following.get("surface") == "さ" and following.get("pos") == "名詞":
+            following.update(pos="助詞", pos_sub1="終助詞", lemma="さ")
+        if applied_rule is None:
+            applied_rule = "predicate-shi"
+    return new_result, applied_rule
+
+
 _KARI_TAILS = ("かり", "かる", "かれ")
 KARI_MIZENKEI_CELL = "から"
 # The supplementary conjugation offers two cells the reference dictionary
