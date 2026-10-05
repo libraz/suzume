@@ -369,6 +369,11 @@ EntrySpecRange getAuxiliaryEntries() {
       // It is context-gated by the tokenizer so it cannot become a free
       // one-mora lexical verb.
       verb("ふ", "ふる", EPOS::VerbShuushikei),
+      // The epistolary 候ふ is written with the bare kanji in its finite cells
+      // (申し+候, 御座+候, 候+間) and in its continuative before て (候+て); the
+      // okurigana-spelled cells come from the classical ハ行四段 generator.
+      verb("候", "候ふ", EPOS::VerbShuushikei),
+      verb("候", "候ふ", EPOS::VerbRenyokei),
       // Irregular i-adjective よい/いい (形容詞・アウオ段)
       // MeCab: よければ → よけれ(仮定形) + ば, よかった → よかっ(連用タ接続) + た
       // いい is colloquial form of よい, shares conjugated forms (よかった, よければ, etc.)

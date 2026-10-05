@@ -184,10 +184,15 @@ float computePassiveCausativeBonus(const core::LatticeEdge& prev, const core::La
   // verb's renyokei/onbinkei, or a verbal noun. Favor its dictionary-confirmed
   // lemma over paths that split the subsidiary into short homographs. This
   // covers both ordinary te-form attachment and honorific-prefix constructions.
+  // The particle it follows is the connective て/で; any other particle (the
+  // listing し) closes a clause the subsidiary cannot attach to. The nominal
+  // host is a verbal noun (確認+致す); a continuative read as a deverbal noun
+  // (致し) is the verb the subsidiary attaches to, not a host of its own.
   const bool can_precede_humble_subsidiary =
-      prev.pos == core::PartOfSpeech::Particle || prev.extended_pos == core::ExtendedPOS::VerbRenyokei ||
-      prev.extended_pos == core::ExtendedPOS::VerbOnbinkei || prev.extended_pos == core::ExtendedPOS::AuxCausative ||
-      prev.pos == core::PartOfSpeech::Noun;
+      (prev.pos == core::PartOfSpeech::Particle && grammar::isTeDeSurface(prev.surface)) ||
+      prev.extended_pos == core::ExtendedPOS::VerbRenyokei || prev.extended_pos == core::ExtendedPOS::VerbOnbinkei ||
+      prev.extended_pos == core::ExtendedPOS::AuxCausative ||
+      (prev.pos == core::PartOfSpeech::Noun && prev.origin != core::CandidateOrigin::NominalizedNoun);
   if (can_precede_humble_subsidiary && next.pos == core::PartOfSpeech::Verb &&
       grammar::isHumbleHonorificLemma(next.lemma)) {
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryStrongBonus + cost::kModerateBonus);

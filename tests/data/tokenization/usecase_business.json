@@ -2457,6 +2457,73 @@
       ],
       "id": "ikaganasaimasuka",
       "input": "いかがなさいますか"
+    },
+    {
+      "description": "Seasonal noun sourou after the genitive stays a noun",
+      "expected": [
+        {
+          "lemma": "新緑",
+          "pos": "Noun",
+          "surface": "新緑"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "候",
+          "pos": "Noun",
+          "surface": "候"
+        },
+        {
+          "lemma": "心",
+          "pos": "Noun",
+          "surface": "心"
+        },
+        {
+          "lemma": "ばかり",
+          "pos": "Particle",
+          "surface": "ばかり"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "品",
+          "pos": "Noun",
+          "surface": "品"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "送る",
+          "pos": "Verb",
+          "surface": "送り"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "no_bakarino_woo_rishimasu",
+      "input": "新緑の候、心ばかりの品をお送りします。"
     }
   ],
   "version": "1.0"

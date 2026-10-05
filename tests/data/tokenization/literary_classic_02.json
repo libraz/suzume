@@ -987,6 +987,177 @@
       ],
       "id": "hedomo_2",
       "input": "言へども"
+    },
+    {
+      "description": "Epistolary sourou after a humble continuative",
+      "expected": [
+        {
+          "lemma": "致す",
+          "pos": "Verb",
+          "surface": "致し"
+        },
+        {
+          "lemma": "候ふ",
+          "pos": "Verb",
+          "surface": "候"
+        }
+      ],
+      "id": "shi_7",
+      "input": "致し候。"
+    },
+    {
+      "description": "Epistolary sourou before the formal noun aida",
+      "expected": [
+        {
+          "lemma": "候ふ",
+          "pos": "Verb",
+          "surface": "候"
+        },
+        {
+          "lemma": "間",
+          "pos": "Noun",
+          "surface": "間"
+        }
+      ],
+      "id": "unnamed_42",
+      "input": "候間"
+    },
+    {
+      "description": "Bare-kanji sourou continuative before te",
+      "expected": [
+        {
+          "lemma": "候ふ",
+          "pos": "Verb",
+          "surface": "候"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "te_2",
+      "input": "候て"
+    },
+    {
+      "description": "Epistolary sourou after a continuative",
+      "expected": [
+        {
+          "lemma": "申す",
+          "pos": "Verb",
+          "surface": "申し"
+        },
+        {
+          "lemma": "候ふ",
+          "pos": "Verb",
+          "surface": "候"
+        }
+      ],
+      "id": "shi_8",
+      "input": "申し候"
+    },
+    {
+      "description": "Epistolary sourou before the formal noun aida",
+      "expected": [
+        {
+          "lemma": "申す",
+          "pos": "Verb",
+          "surface": "申し"
+        },
+        {
+          "lemma": "候ふ",
+          "pos": "Verb",
+          "surface": "候"
+        },
+        {
+          "lemma": "間",
+          "pos": "Noun",
+          "surface": "間"
+        }
+      ],
+      "id": "shi_9",
+      "input": "申し候間"
+    },
+    {
+      "description": "Epistolary sourou after an ichidan continuative",
+      "expected": [
+        {
+          "lemma": "存じる",
+          "pos": "Verb",
+          "surface": "存じ"
+        },
+        {
+          "lemma": "候ふ",
+          "pos": "Verb",
+          "surface": "候"
+        }
+      ],
+      "id": "ji",
+      "input": "存じ候"
+    },
+    {
+      "description": "Epistolary sourou closing a humble request",
+      "expected": [
+        {
+          "lemma": "ご",
+          "pos": "Prefix",
+          "surface": "ご"
+        },
+        {
+          "lemma": "容赦",
+          "pos": "Noun",
+          "surface": "容赦"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "ほど",
+          "pos": "Particle",
+          "surface": "ほど"
+        },
+        {
+          "lemma": "願う",
+          "pos": "Verb",
+          "surface": "願い"
+        },
+        {
+          "lemma": "申す",
+          "pos": "Verb",
+          "surface": "申し"
+        },
+        {
+          "lemma": "候ふ",
+          "pos": "Verb",
+          "surface": "候"
+        }
+      ],
+      "id": "go_nohodo_i_shi",
+      "input": "ご容赦のほど願い申し候。"
+    },
+    {
+      "description": "Ha-row realis of sourou after a continuative",
+      "expected": [
+        {
+          "lemma": "存じる",
+          "pos": "Verb",
+          "surface": "存じ"
+        },
+        {
+          "lemma": "候ふ",
+          "pos": "Verb",
+          "surface": "候へ"
+        },
+        {
+          "lemma": "ども",
+          "pos": "Particle",
+          "surface": "ども"
+        }
+      ],
+      "id": "ji_hedomo",
+      "input": "存じ候へども"
     }
   ],
   "description": "literary_classic tests (part 2/2)",

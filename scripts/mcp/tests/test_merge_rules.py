@@ -474,6 +474,11 @@ class TestClassicalSourou:
         result, _ = apply_suzume_merge(tokens, "御座候")
         assert [token["surface"] for token in result] == ["御座", "候"]
 
+    def test_reads_a_suffix_behind_the_verb_as_the_formal_noun(self):
+        tokens = [_tok("候", pos_sub1="一般"), _tok("間", pos_sub1="接尾")]
+        result, _ = apply_suzume_merge(tokens, "候間")
+        assert [(token["surface"], token["pos_sub1"]) for token in result] == [("候", "自立"), ("間", "非自立")]
+
     def test_keeps_the_seasonal_noun_after_no(self):
         tokens = [_tok("新緑"), _tok("の", pos="助詞", pos_sub1="連体化"), _tok("候", pos_sub1="一般")]
         result, _ = apply_suzume_merge(tokens, "新緑の候")

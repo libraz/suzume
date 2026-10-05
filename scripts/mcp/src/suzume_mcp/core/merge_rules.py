@@ -513,6 +513,11 @@ def _retag_classical_sourou(tokens: list[dict]) -> list[dict]:
         modified = previous is not None and (
             previous.get("pos") == "連体詞" or (previous.get("pos") == "助詞" and previous.get("pos_sub1") == "連体化")
         )
+        # A suffix needs a nominal host, so behind the verb it is the formal noun
+        # the predicate modifies (候+間).
+        if previous is not None and previous.get("lemma") == "候ふ" and token.get("pos_sub1") == "接尾":
+            retagged.append({**token, "pos_sub1": "非自立"})
+            continue
         if token.get("surface") != _SOUROU or token.get("pos") != "名詞" or modified:
             retagged.append(token)
             continue
@@ -520,7 +525,7 @@ def _retag_classical_sourou(tokens: list[dict]) -> list[dict]:
             reading = _continuative_verb_tokens(previous.get("surface", ""))
             if reading is not None and len(reading) == 1:
                 retagged[-1] = {**previous, **reading[0], "conj_form": "連用形"}
-        retagged.append({"surface": _SOUROU, "pos": "動詞", "pos_sub1": "自立", "lemma": "候ふ"})
+        retagged.append({"surface": _SOUROU, "pos": "動詞", "pos_sub1": "自立", "conj_form": "基本形", "lemma": "候ふ"})
     return retagged
 
 

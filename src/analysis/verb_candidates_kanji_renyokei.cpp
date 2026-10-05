@@ -153,8 +153,13 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
         // (見+て+る, 見+て+た, 経+て). No member of that closed class heads a
         // lexical verb whose own base ends in てる, so the mora is the
         // conjunctive particle and never the stem of a fabricated 見てる/経てる.
+        // A kanji run the dictionary already holds as a complete verb cell (the
+        // bare-kanji 候 of 候ふ) closes there too: its te-form is that cell + て.
         const bool single_kanji_te_form =
-            is_single_kanji && first_hira == U'て' && vh::isSingleKanjiIchidan(codepoints[start_pos]);
+            first_hira == U'て' &&
+            ((is_single_kanji && vh::isSingleKanjiIchidan(codepoints[start_pos])) ||
+             vh::hasDictionaryEntry(dict_manager, extractSubstring(codepoints, start_pos, kanji_end),
+                                    core::PartOfSpeech::Verb));
         // An Ichidan verb writes its irrealis with the same stem it writes its
         // continuative with, so which of the two a stem is depends entirely on
         // what follows it. Read that off the auxiliary's class rather than its
