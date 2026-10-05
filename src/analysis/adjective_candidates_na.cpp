@@ -155,7 +155,8 @@ void generateHiraganaAttributiveNaStemCandidates(const std::vector<char32_t>& co
       return;
     }
     // A registered word is not re-read as a coined stem, and neither is a
-    // registered word plus a particle (それ+は+なんで).
+    // registered word plus a particle (それ+は+なんで) or a bound suffix
+    // (らし+げ+な).
     const auto stem_matches = lookupResultsInRange(*dict_manager, codepoints, start_pos, stem_end);
     const bool registered_stem = std::any_of(stem_matches.begin(), stem_matches.end(), [&](const auto& match) {
       return match.entry != nullptr && match.length == stem_end - start_pos;
@@ -164,7 +165,8 @@ void generateHiraganaAttributiveNaStemCandidates(const std::vector<char32_t>& co
     for (size_t split = start_pos + 1; split < stem_end && !ends_on_particle_after_word; ++split) {
       ends_on_particle_after_word =
           lookupEntryInRange(*dict_manager, codepoints, start_pos, split) != nullptr &&
-          lookupEntryInRange(*dict_manager, codepoints, split, stem_end, core::PartOfSpeech::Particle) != nullptr;
+          (lookupEntryInRange(*dict_manager, codepoints, split, stem_end, core::PartOfSpeech::Particle) != nullptr ||
+           lookupEntryInRange(*dict_manager, codepoints, split, stem_end, core::PartOfSpeech::Suffix) != nullptr);
     }
     if (registered_stem || ends_on_particle_after_word) {
       return;
@@ -272,6 +274,15 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
               starts_closed_tail = starts_closed_tail || match.entry->extended_pos == core::ExtendedPOS::AuxCopulaDa ||
                                    match.entry->extended_pos == core::ExtendedPOS::AuxCopulaDesu;
             }
+          }
+          // An auxiliary stem plus a nominal suffix on a compound noun is that
+          // chain, not a stem (子供+らし+げ+な), as the i-adjective stem path holds.
+          for (size_t aux_end = kanji_end + 2; aux_end < stem_end && kanji_end >= start_pos + 2; ++aux_end) {
+            contains_closed_suffix =
+                contains_closed_suffix || (lookupEntryInRange(*dict_manager, codepoints, kanji_end, aux_end,
+                                                              core::PartOfSpeech::Auxiliary) != nullptr &&
+                                           lookupEntryInRange(*dict_manager, codepoints, aux_end, stem_end,
+                                                              core::PartOfSpeech::Suffix) != nullptr);
           }
         }
         const std::string stem = extractSubstring(codepoints, start_pos, stem_end);

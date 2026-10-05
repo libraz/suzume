@@ -505,6 +505,16 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
           if (has_nominal_sahen_suffix_boundary) {
             continue;
           }
+          // A multi-mora okurigana that is itself an auxiliary cell is that
+          // auxiliary on a compound noun (子供+らし+げ, as 子供+らし+さ), unless the
+          // whole adjective is attested (男らしい). A single kanji is left alone:
+          // it is usually a bound stem (誇らし+げ).
+          if (ext_okurigana.size() >= core::kTwoJapaneseCharBytes && normalize::utf8Length(kanji_part) >= 2 &&
+              dict_manager != nullptr &&
+              dict_manager->lookupExact(ext_okurigana, core::PartOfSpeech::Auxiliary) != nullptr &&
+              !isAdjectiveInDictionary(dict_manager, base_form)) {
+            continue;
+          }
 
           if (pattern == "さ") {
             if (!isPossibleUnknownIAdjectiveStem(stem, base_form, dict_manager) ||

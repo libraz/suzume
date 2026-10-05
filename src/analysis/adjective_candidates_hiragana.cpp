@@ -523,7 +523,10 @@ void generateHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints
     const float adjective_confidence = adj_detail::firstConfidenceAtLeast(
         base_candidates, grammar::VerbType::IAdjective, candidate::kDerivedSuffixAdjectiveConfidence);
     const bool has_verified_verb_reading = adj_detail::hasDictionaryVerbAnalysis(base_candidates, dict_manager);
-    if (adjective_confidence != candidate::kNoOriginConfidence && !has_verified_verb_reading) {
+    // A registered auxiliary cell (らし of らしい) keeps its own reading before
+    // げ (子供+らし+げ+な); it is no coined adjective stem.
+    const bool is_auxiliary_cell = verb_helpers::hasDictionaryEntry(dict_manager, stem, core::PartOfSpeech::Auxiliary);
+    if (adjective_confidence != candidate::kNoOriginConfidence && !has_verified_verb_reading && !is_auxiliary_cell) {
       candidates.push_back(makeIAdjStemCandidate(
           stem, start_pos, start_pos + normalize::utf8Length(stem), base_form, candidate::kDerivedSuffixAdjectiveCost,
           CandidateOrigin::AdjectiveIHiragana, adjective_confidence, "i_adjective_ge_stem"));

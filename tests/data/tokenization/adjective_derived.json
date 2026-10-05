@@ -1,0 +1,60 @@
+{
+  "cases": [
+    {
+      "description": "子供らしげな顔 - auto-generated",
+      "expected": [
+        {
+          "lemma": "子供",
+          "pos": "Noun",
+          "surface": "子供"
+        },
+        {
+          "lemma": "らしい",
+          "pos": "Auxiliary",
+          "surface": "らし"
+        },
+        {
+          "lemma": "げ",
+          "pos": "Suffix",
+          "surface": "げ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "顔",
+          "pos": "Noun",
+          "surface": "顔"
+        }
+      ],
+      "id": "rashigena",
+      "input": "子供らしげな顔"
+    },
+    {
+      "description": "大人らしげ - auto-generated",
+      "expected": [
+        {
+          "lemma": "大人",
+          "pos": "Noun",
+          "surface": "大人"
+        },
+        {
+          "lemma": "らしい",
+          "pos": "Auxiliary",
+          "surface": "らし"
+        },
+        {
+          "lemma": "げ",
+          "pos": "Suffix",
+          "surface": "げ"
+        }
+      ],
+      "id": "rashige",
+      "input": "大人らしげ"
+    }
+  ],
+  "description": "adjective_derived tests",
+  "version": "1.0"
+}
