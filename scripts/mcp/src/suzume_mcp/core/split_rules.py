@@ -235,6 +235,38 @@ def _split_lexicalized_morpheme_boundaries(token: dict) -> list[dict] | None:
                 ),
             ]
 
+    # A verb headword spelled as a te-form plus a subsidiary verb (やってくる,
+    # やって来る) is the same productive chain as 持って+き: the host is a
+    # continuative verb on its own, and the reference itself reads the tail as
+    # a subsidiary verb after any other te-form (し+て+くる).
+    te_compound = regex.fullmatch(r"(.+?)([てで])(.+)", lemma) if pos == "動詞" else None
+    if te_compound is not None:
+        host, te, subsidiary_lemma = te_compound.groups()
+        host_tokens = _reanalyze_exact(host)
+        probe = _reanalyze_exact("して" + subsidiary_lemma)
+        if (
+            surface.startswith(host + te)
+            and len(surface) > len(host + te)
+            and host_tokens is not None
+            and len(host_tokens) == 1
+            and host_tokens[0].get("pos") == "動詞"
+            and str(host_tokens[0].get("conj_form", "")).startswith("連用")
+            and probe is not None
+            and len(probe) == 3
+            and probe[2].get("pos") == "動詞"
+            and probe[2].get("pos_sub1") == "非自立"
+            and probe[2].get("lemma") == subsidiary_lemma
+        ):
+            subsidiary = dict(token)
+            subsidiary["surface"] = surface[len(host + te) :]
+            subsidiary["lemma"] = subsidiary_lemma
+            subsidiary["pos_sub1"] = "非自立"
+            return [
+                dict(host_tokens[0]),
+                {"surface": te, "pos": "助詞", "pos_sub1": "接続助詞", "lemma": te},
+                subsidiary,
+            ]
+
     # A kanji-spelled negative adjective the reference lexicalized (済まない)
     # takes the analysis of its kana spelling, which the same dictionary reads
     # as the verb irrealis plus the negative auxiliary (すま+ない).

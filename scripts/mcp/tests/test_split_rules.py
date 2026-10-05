@@ -404,3 +404,21 @@ class TestNoSplit:
         result, rule = apply_suzume_split(tokens)
         assert len(result) == 2
         assert rule is None
+
+
+class TestLexicalizedTeCompoundVerb:
+    def test_splits_te_form_plus_subsidiary_verb_headword(self):
+        token = _tok(
+            "やってき", pos="動詞", pos_sub1="自立", conj_type="カ変・クル", conj_form="連用形", lemma="やってくる"
+        )
+        result, rule = apply_suzume_split([token])
+        assert [part["surface"] for part in result] == ["やっ", "て", "き"]
+        assert [part["lemma"] for part in result] == ["やる", "て", "くる"]
+        assert result[2]["pos_sub1"] == "非自立"
+        assert rule == "lexicalized-morpheme-boundary"
+
+    def test_keeps_verb_whose_te_is_part_of_the_stem(self):
+        token = _tok("捨て", pos="動詞", pos_sub1="自立", conj_type="一段", conj_form="連用形", lemma="捨てる")
+        result, rule = apply_suzume_split([token])
+        assert [part["surface"] for part in result] == ["捨て"]
+        assert rule is None
