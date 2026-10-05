@@ -253,31 +253,31 @@ _ASCII_WORD_JOINERS = ".-'&/"
 
 
 def _postprocess_ascii_joiner_merge(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
-    """Merge ASCII + word-internal joiner + ASCII/number tokens."""
+    """Merge a letter-initial ASCII word with each following joiner + ASCII/number pair.
+
+    One scan per word: only a single-character joiner between two alphanumeric
+    tokens is absorbed, so a multi-character symbol run (...) never opens a word
+    or attaches to the following one.
+    """
     merged = []
-    for j, curr in enumerate(result):
-        surface = curr.get("surface", "")
-        if (
-            len(surface) == 1
-            and surface in _ASCII_WORD_JOINERS
-            and merged
-            and regex.match(r"^[a-zA-Z]+$", merged[-1].get("surface", ""))
-            and j + 1 < len(result)
-            and regex.match(r"^[a-zA-Z0-9]+$", result[j + 1].get("surface", ""))
+    idx = 0
+    while idx < len(result):
+        curr = result[idx]
+        idx += 1
+        merged.append(curr)
+        if not regex.match(r"^[a-zA-Z][a-zA-Z0-9]*$", curr.get("surface", "")):
+            continue
+        while (
+            idx + 1 < len(result)
+            and len(result[idx].get("surface", "")) == 1
+            and result[idx].get("surface", "") in _ASCII_WORD_JOINERS
+            and regex.match(r"^[a-zA-Z0-9]+$", result[idx + 1].get("surface", ""))
         ):
-            merged[-1]["surface"] += surface
-            merged[-1]["lemma"] = merged[-1]["surface"]
+            curr["surface"] += result[idx].get("surface", "") + result[idx + 1].get("surface", "")
+            curr["lemma"] = curr["surface"]
+            idx += 2
             if applied_rule is None:
                 applied_rule = "ascii-joiner-merge"
-        elif (
-            merged
-            and merged[-1].get("surface", "").endswith(tuple(_ASCII_WORD_JOINERS))
-            and regex.match(r"^[a-zA-Z0-9]+$", surface)
-        ):
-            merged[-1]["surface"] += surface
-            merged[-1]["lemma"] = merged[-1]["surface"]
-        else:
-            merged.append(curr)
     return merged, applied_rule
 
 

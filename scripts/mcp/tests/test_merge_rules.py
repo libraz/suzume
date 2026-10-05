@@ -794,6 +794,16 @@ class TestPostprocessKanjiMerge:
             assert [token["surface"] for token in result] == [surface]
             assert rule == "ascii-joiner-merge"
 
+    def test_ascii_joiner_merge_chains_single_joiners(self):
+        tokens = [_tok("U"), _tok(".", pos="記号"), _tok("S"), _tok(".", pos="記号"), _tok("A")]
+        result, _ = apply_suzume_merge(tokens, "U.S.A")
+        assert [token["surface"] for token in result] == ["U.S.A"]
+
+    def test_ascii_joiner_merge_never_absorbs_a_symbol_run(self):
+        tokens = [_tok("えっ", pos="感動詞"), _tok("...", pos="記号"), _tok("OK")]
+        result, _ = apply_suzume_merge(tokens, "えっ...OK")
+        assert [token["surface"] for token in result] == ["えっ", "...", "OK"]
+
     def test_kanji_merge_post(self):
         """Post-process kanji merge after main pass."""
         tokens = [

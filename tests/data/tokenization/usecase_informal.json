@@ -172,6 +172,52 @@
         "contraction",
         "colloquial"
       ]
+    },
+    {
+      "description": "Ellipsis run never attaches to a following ASCII word",
+      "expected": [
+        {
+          "lemma": "やばい",
+          "pos": "Adjective",
+          "surface": "やばい"
+        },
+        {
+          "lemma": "orz",
+          "pos": "Noun",
+          "surface": "orz"
+        }
+      ],
+      "id": "ellipsis_space_ascii_emoticon",
+      "input": "やばい... orz"
+    },
+    {
+      "description": "Ellipsis run is dropped, not glued to the ASCII word",
+      "expected": [
+        {
+          "lemma": "えっ",
+          "pos": "Interjection",
+          "surface": "えっ"
+        },
+        {
+          "lemma": "OK",
+          "pos": "Noun",
+          "surface": "OK"
+        }
+      ],
+      "id": "ellipsis_before_ascii_word",
+      "input": "えっ...OK"
+    },
+    {
+      "description": "Single joiners chain into one ASCII word",
+      "expected": [
+        {
+          "lemma": "U.S.A",
+          "pos": "Noun",
+          "surface": "U.S.A"
+        }
+      ],
+      "id": "dotted_ascii_abbreviation",
+      "input": "U.S.A"
     }
   ],
   "description": "usecase_informal tests",
