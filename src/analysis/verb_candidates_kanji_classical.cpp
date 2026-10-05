@@ -67,14 +67,14 @@ bool dictionaryTailFollowsAt(const std::vector<char32_t>& codepoints, size_t pos
   if (dict_manager == nullptr || pos >= codepoints.size()) {
     return false;
   }
+  // Every entry a spelling carries counts: ぞ is a final particle and a 係助詞.
   const size_t probe_end = std::min(codepoints.size(), pos + kClassicalTailProbeChars);
-  for (size_t end = pos + 1; end <= probe_end; ++end) {
-    const auto* entry = lookupEntryInRange(*dict_manager, codepoints, pos, end, pos_class);
-    if (entry == nullptr) {
+  for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, pos, probe_end)) {
+    if (match.entry == nullptr || match.entry->pos != pos_class) {
       continue;
     }
     for (const core::ExtendedPOS candidate_pos : accepted) {
-      if (entry->extended_pos == candidate_pos) {
+      if (match.entry->extended_pos == candidate_pos) {
         return true;
       }
     }
@@ -154,6 +154,15 @@ HaRowLicense haRowCellLicense(core::ExtendedPOS cell, const std::vector<char32_t
           {core::ExtendedPOS::AuxClassicalKeri, core::ExtendedPOS::AuxClassicalPerfect,
            core::ExtendedPOS::AuxClassicalTari, core::ExtendedPOS::AuxVolitional, core::ExtendedPOS::AuxDesireTai});
       license.licensed = vh::clauseEndsAt(codepoints, end_pos);
+      // A 係助詞 stands on the continuative as on a nominal (思ひ+ぞ, 恋ひ+こそ).
+      // The particle says nothing about the stem, so it must name a verb, as
+      // the 未然形 cell asks above.
+      if (!license.closed_class_tail &&
+          dictionaryTailFollowsAt(codepoints, end_pos, dict_manager, core::PartOfSpeech::Particle,
+                                  {core::ExtendedPOS::ParticleBinding}) &&
+          vh::isVerbInDictionary(dict_manager, extractSubstring(codepoints, start_pos, end_pos - 1) + "う")) {
+        license.closed_class_tail = true;
+      }
       break;
     case core::ExtendedPOS::VerbShuushikei: {
       // 四段 spells its 終止形 and its 連体形 alike, so the adnominal position

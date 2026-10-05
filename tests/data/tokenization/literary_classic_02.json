@@ -1185,6 +1185,50 @@
       ],
       "id": "kishikaba",
       "input": "道行きしかば"
+    },
+    {
+      "description": "思ひぞ深き - auto-generated",
+      "expected": [
+        {
+          "lemma": "思ふ",
+          "pos": "Verb",
+          "surface": "思ひ"
+        },
+        {
+          "lemma": "ぞ",
+          "pos": "Particle",
+          "surface": "ぞ"
+        },
+        {
+          "lemma": "深い",
+          "pos": "Adjective",
+          "surface": "深き"
+        }
+      ],
+      "id": "hizo_ki",
+      "input": "思ひぞ深き"
+    },
+    {
+      "description": "思ひこそ深けれ - auto-generated",
+      "expected": [
+        {
+          "lemma": "思ふ",
+          "pos": "Verb",
+          "surface": "思ひ"
+        },
+        {
+          "lemma": "こそ",
+          "pos": "Particle",
+          "surface": "こそ"
+        },
+        {
+          "lemma": "深い",
+          "pos": "Adjective",
+          "surface": "深けれ"
+        }
+      ],
+      "id": "hikoso_kere",
+      "input": "思ひこそ深けれ"
     }
   ],
   "description": "literary_classic tests (part 2/2)",
