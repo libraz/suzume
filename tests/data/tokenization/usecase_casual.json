@@ -1263,6 +1263,23 @@
       ],
       "id": "ureshikuteurepii",
       "input": "うれしくてうれぴい。"
+    },
+    {
+      "description": "マジヤバい - auto-generated",
+      "expected": [
+        {
+          "lemma": "マジ",
+          "pos": "Noun",
+          "surface": "マジ"
+        },
+        {
+          "lemma": "ヤバい",
+          "pos": "Adjective",
+          "surface": "ヤバい"
+        }
+      ],
+      "id": "i_7",
+      "input": "マジヤバい"
     }
   ],
   "version": "1.0"

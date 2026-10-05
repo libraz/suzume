@@ -477,3 +477,32 @@ class TestUnlistedKanaWords:
     def test_leaves_the_adverb_futo(self):
         tokens, _, _ = get_expected_tokens("ふと思った")
         assert tokens[0]["surface"] == "ふと"
+
+
+class TestSlangAdjectiveStems:
+    @pytest.mark.parametrize("text", ["ずっと共にいたい", "ここにいたい", "家にいたかった"])
+    def test_reads_locative_ni_itai_as_iru_plus_desiderative(self, text):
+        tokens, _, _ = get_expected_tokens(text)
+        surfaces = [token["surface"] for token in tokens]
+        assert surfaces[surfaces.index("に") + 1] == "い"
+        assert tokens[surfaces.index("に") + 1]["lemma"] == "いる"
+
+    def test_keeps_the_adjective_after_ga(self):
+        tokens, _, _ = get_expected_tokens("頭がいたい")
+        assert (tokens[-1]["surface"], tokens[-1]["pos"]) == ("いたい", "Adjective")
+
+    @pytest.mark.parametrize(("text", "stem"), [("マジヤバい", "ヤバい"), ("マジヤバかった", "ヤバかっ")])
+    def test_takes_the_stem_out_of_an_unknown_katakana_run(self, text, stem):
+        tokens, _, _ = get_expected_tokens(text)
+        assert [token["surface"] for token in tokens][:2] == ["マジ", stem]
+
+    @pytest.mark.parametrize("text", ["ねこかわいすぎ", "ねこがかわいすぎ"])
+    def test_reads_a_kana_stem_before_sugi(self, text):
+        tokens, _, _ = get_expected_tokens(text)
+        stem = next(token for token in tokens if token["surface"] == "かわい")
+        assert (stem["pos"], stem["lemma"]) == ("Adjective", "かわいい")
+
+    @pytest.mark.parametrize(("text", "word"), [("かわいそうな猫", "かわいそう"), ("読みやすそうだ。", "やす")])
+    def test_leaves_a_lexeme_or_a_predicate_suffix(self, text, word):
+        tokens, _, _ = get_expected_tokens(text)
+        assert word in [token["surface"] for token in tokens]

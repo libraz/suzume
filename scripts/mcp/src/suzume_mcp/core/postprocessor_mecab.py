@@ -137,8 +137,14 @@ def _stranded_adjective_stems(raw: tuple[int, dict[int, dict]]) -> dict[int, str
             and token.get("lemma") in (None, "*")
             and (tail in ("かっ", "けれ") or (tail == "く" and after.startswith(("な", "て"))))
         )
+        # An unknown katakana run (マジヤバ) glues an intensifier onto the stem;
+        # its last two morae are the stem the inflection belongs to.
+        unknown_katakana = regex.fullmatch(r"\p{Katakana}{3,}", surface) is not None and token.get("lemma") in (
+            None,
+            "*",
+        )
         if token.get("pos") != "名詞" or not (
-            regex.fullmatch(r"[\p{Hiragana}\p{Katakana}]{2}", surface) or unknown_kanji
+            regex.fullmatch(r"[\p{Hiragana}\p{Katakana}]{2}", surface) or unknown_kanji or unknown_katakana
         ):
             continue
         if not tail or tail[0] not in _ADJECTIVE_INFLECTION_KANA or len(tail) > 2:
@@ -147,7 +153,43 @@ def _stranded_adjective_stems(raw: tuple[int, dict[int, dict]]) -> dict[int, str
         # compound's second half, not an invented ending.
         if following.get("pos") == "形容詞" and len(following.get("lemma", "")) >= 3:
             continue
-        stems[start] = surface
+        if unknown_katakana:
+            stems[start + len(surface) - 2] = surface[-2:]
+        else:
+            stems[start] = surface
+    return stems
+
+
+def _kana_adjective_stems_before_suffix(text: str, raw: tuple[int, dict[int, dict]]) -> dict[int, str]:
+    """Kana adjective stems the analysis tore up before excess すぎ / appearance そう.
+
+    Both suffixes take the bare stem, and a kana stem the dictionary does not
+    expect there comes back as mora pieces (ねこ+か+わい+すぎ). The stem is the
+    longest kana run R in front of the suffix for which R+い is one adjective,
+    taken only where R starts and ends on token edges and is not already read
+    as an adjective, so a lexeme that runs on through the suffix (かわいそう)
+    stays whole. A run behind a predicate is that predicate's own suffix
+    (読み+やす+そう), not a free stem.
+    """
+    ends = {start + len(token.get("surface", "")): token for start, token in raw[1].items()}
+    stems: dict[int, str] = {}
+    for m in regex.finditer(r"(?<=\p{Hiragana}{2})(?:すぎ|そう)", text):
+        suffix_start = m.start()
+        if suffix_start not in raw[1]:
+            continue
+        run_start = suffix_start
+        while run_start > 0 and regex.fullmatch(r"\p{Hiragana}", text[run_start - 1]):
+            run_start -= 1
+        for start in range(run_start, suffix_start - 1):
+            stem = text[start:suffix_start]
+            token = raw[1].get(start)
+            if token is None or token.get("pos") == "形容詞":
+                continue
+            if ends.get(start, {}).get("pos") in ("動詞", "形容詞", "助動詞"):
+                continue
+            if is_single_token_of_pos(stem + "い", "形容詞"):
+                stems[start] = stem
+                break
     return stems
 
 
@@ -212,6 +254,19 @@ def preprocess_for_mecab(text: str) -> tuple[str, dict[tuple[int, str], dict], t
     # an inflection kana stranded behind it that it had to invent a word for.
     if raw is None:
         raw = _raw_analysis(text)
+    for start, stem in _kana_adjective_stems_before_suffix(text, raw).items():
+        # The dictionary leaves a stem before these suffixes as a noun, which
+        # the stem repair later reads as the adjective; the substitute only has
+        # to land as one token directly in front of the suffix.
+        probe_index = _raw_analysis(text[:start] + SLANG_ADJ_SUBSTITUTE + text[start + len(stem) :])[1]
+        landed = probe_index.get(start)
+        if landed is None or landed.get("surface") != SLANG_ADJ_SUBSTITUTE or start + 1 not in probe_index:
+            continue
+        replacements[(start, "slang_adj")] = {
+            "original": stem,
+            "replacement": SLANG_ADJ_SUBSTITUTE,
+            "length": len(stem),
+        }
     for start, stem in _stranded_adjective_stems(raw).items():
         if (start, "slang_adj") in replacements:
             continue

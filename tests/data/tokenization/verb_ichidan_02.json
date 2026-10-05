@@ -1587,6 +1587,65 @@
       ],
       "id": "gakattta_4",
       "input": "芝居がかった話"
+    },
+    {
+      "description": "ずっと共にいたい - auto-generated",
+      "expected": [
+        {
+          "lemma": "ずっと",
+          "pos": "Adverb",
+          "surface": "ずっと"
+        },
+        {
+          "lemma": "共",
+          "pos": "Noun",
+          "surface": "共"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "い"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たい"
+        }
+      ],
+      "id": "zuttto_niitai",
+      "input": "ずっと共にいたい"
+    },
+    {
+      "description": "ここにいたい - auto-generated",
+      "expected": [
+        {
+          "lemma": "ここ",
+          "pos": "Pronoun",
+          "surface": "ここ"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "い"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たい"
+        }
+      ],
+      "id": "kokoniitai",
+      "input": "ここにいたい"
     }
   ],
   "description": "Ichidan verbs (一段動詞) (part 2/2)",

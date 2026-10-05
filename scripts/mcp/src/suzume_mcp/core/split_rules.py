@@ -858,6 +858,23 @@ def apply_suzume_split(tokens: list[dict]) -> tuple[list[dict], str | None]:
                     applied_rule = "adverb-ni-split"
                 continue
 
+        # 0aa. After a locative に the kana いた- is いる plus the desiderative
+        # (そばにいたい, 家にいたかった), not the adjective 痛い, which takes its
+        # experiencer with が.
+        if (
+            t.get("pos") == "形容詞"
+            and t.get("lemma") == "いたい"
+            and surface.startswith("いた")
+            and result
+            and result[-1].get("surface") == "に"
+            and result[-1].get("pos") == "助詞"
+        ):
+            result.append({"surface": "い", "pos": "動詞", "lemma": "いる", "conj_form": "連用形"})
+            result.append({"surface": surface[1:], "pos": "助動詞", "lemma": "たい"})
+            if applied_rule is None:
+                applied_rule = "locative-iru-desiderative"
+            continue
+
         # 0. Plural suffix ら
         m = regex.match(r"^(彼女|彼|僕|奴|我)ら$", surface)
         if m:
