@@ -788,6 +788,23 @@
       ],
       "id": "beyoupi_n",
       "input": "食べようぴょん"
+    },
+    {
+      "description": "遊ばん - auto-generated",
+      "expected": [
+        {
+          "lemma": "遊ぶ",
+          "pos": "Verb",
+          "surface": "遊ば"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        }
+      ],
+      "id": "ban",
+      "input": "遊ばん"
     }
   ],
   "description": "pattern_dialect tests",
