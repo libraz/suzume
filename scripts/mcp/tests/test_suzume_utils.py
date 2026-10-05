@@ -802,3 +802,14 @@ class TestRashiiGe:
         surfaces = [token["surface"] for token in tokens]
         at = surfaces.index("らし")
         assert (tokens[at]["lemma"], surfaces[at + 1], tokens[at + 1]["pos"]) == ("らしい", "げ", "Suffix")
+
+
+class TestNounIkuHeadword:
+    @pytest.mark.parametrize(("text", "verb"), [("道行く人", "行く"), ("道行きしかば", "行き")])
+    def test_noun_and_iku_stay_apart(self, text, verb):
+        tokens, _, _ = get_expected_tokens(text)
+        assert [(token["surface"], token["lemma"]) for token in tokens[:2]] == [("道", "道"), (verb, "行く")]
+
+    def test_noun_michiyuki_stays_whole(self):
+        tokens, _, _ = get_expected_tokens("道行きが寂しい")
+        assert tokens[0]["surface"] == "道行き"

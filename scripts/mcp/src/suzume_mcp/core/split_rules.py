@@ -1162,6 +1162,23 @@ def apply_suzume_split(tokens: list[dict]) -> tuple[list[dict], str | None]:
                 applied_rule = "onomatopoeia-tto-suru-split"
             continue
 
+        # 10b. A dictionary headword spelling a kanji noun plus 行く (道行く) is a
+        # noun with its case particle dropped and the verb 行く; both keep their
+        # meaning apart (道を行く), so they stay two search units.
+        lemma = t.get("lemma") or ""
+        noun_head = lemma[: -len("行く")] if t.get("pos") == "動詞" and lemma.endswith("行く") else ""
+        if (
+            regex.fullmatch(r"\p{Han}+", noun_head)
+            and surface.startswith(noun_head)
+            and len(surface) > len(noun_head)
+            and _reads_as_one_noun(noun_head)
+        ):
+            result.append({"surface": noun_head, "pos": "名詞", "lemma": noun_head})
+            result.append({**t, "surface": surface[len(noun_head) :], "lemma": "行く"})
+            if applied_rule is None:
+                applied_rule = "noun-iku-headword-split"
+            continue
+
         # 10a. An adjective Xげない (危なげない, 危なげなく) is the noun Xげ plus the
         # supplementary ない when Xげ stands as a noun of its own (危なげ+が+ない).
         ge_nai = _GE_NAI_ADJECTIVE.fullmatch(surface) if t.get("pos") == "形容詞" else None

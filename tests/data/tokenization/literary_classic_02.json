@@ -1158,6 +1158,33 @@
       ],
       "id": "ji_hedomo",
       "input": "存じ候へども"
+    },
+    {
+      "description": "道行きしかば - auto-generated",
+      "expected": [
+        {
+          "lemma": "道",
+          "pos": "Noun",
+          "surface": "道"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行き"
+        },
+        {
+          "lemma": "き",
+          "pos": "Auxiliary",
+          "surface": "しか"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "kishikaba",
+      "input": "道行きしかば"
     }
   ],
   "description": "literary_classic tests (part 2/2)",

@@ -667,6 +667,50 @@
       ],
       "id": "noyouni_bi_ru",
       "input": "鳥のように飛び去る少年"
+    },
+    {
+      "description": "道行く人 - auto-generated",
+      "expected": [
+        {
+          "lemma": "道",
+          "pos": "Noun",
+          "surface": "道"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行く"
+        },
+        {
+          "lemma": "人",
+          "pos": "Noun",
+          "surface": "人"
+        }
+      ],
+      "id": "ku_3",
+      "input": "道行く人"
+    },
+    {
+      "description": "道行く車 - auto-generated",
+      "expected": [
+        {
+          "lemma": "道",
+          "pos": "Noun",
+          "surface": "道"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行く"
+        },
+        {
+          "lemma": "車",
+          "pos": "Noun",
+          "surface": "車"
+        }
+      ],
+      "id": "ku_4",
+      "input": "道行く車"
     }
   ],
   "description": "compound_verb tests",
