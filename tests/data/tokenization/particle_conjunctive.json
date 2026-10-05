@@ -1679,6 +1679,117 @@
       ],
       "id": "kanande_rimasu",
       "input": "静かなんで帰ります"
+    },
+    {
+      "description": "Concessive ものの after a past predicate",
+      "expected": [
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "ものの",
+          "pos": "Particle",
+          "surface": "ものの"
+        },
+        {
+          "lemma": "分かる",
+          "pos": "Verb",
+          "surface": "分から"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "monono_after_past_auxiliary",
+      "input": "本を読んだものの分からなかった"
+    },
+    {
+      "description": "Concessive ものの after an i-adjective",
+      "expected": [
+        {
+          "lemma": "高い",
+          "pos": "Adjective",
+          "surface": "高い"
+        },
+        {
+          "lemma": "ものの",
+          "pos": "Particle",
+          "surface": "ものの"
+        },
+        {
+          "lemma": "買う",
+          "pos": "Verb",
+          "surface": "買っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "monono_after_i_adjective",
+      "input": "高いものの買った"
+    },
+    {
+      "description": "Concessive ものの after a past verb",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "ものの",
+          "pos": "Particle",
+          "surface": "ものの"
+        },
+        {
+          "lemma": "会える",
+          "pos": "Verb",
+          "surface": "会え"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "monono_after_onbin_past",
+      "input": "行ったものの会えなかった"
     }
   ],
   "description": "particle_conjunctive tests",

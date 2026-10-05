@@ -342,7 +342,7 @@ class TestNaAdjectiveMonono:
         ]
         result, rule = apply_suzume_merge(tokens, "静かなものの落ち着か")
         assert [token["surface"] for token in result] == ["静か", "な", "ものの", "落ち着か"]
-        assert rule == "na-adjective-monono"
+        assert rule == "predicate-monono"
 
     def test_keeps_nominal_genitive_before_noun(self):
         tokens = [
@@ -355,6 +355,18 @@ class TestNaAdjectiveMonono:
         result, rule = apply_suzume_merge(tokens, "静かなものの色")
         assert [token["surface"] for token in result] == ["静か", "な", "もの", "の", "色"]
         assert rule is None
+
+    def test_merges_concessive_monono_after_past_auxiliary(self):
+        tokens = [
+            _tok("読ん", pos="動詞"),
+            _tok("だ", pos="助動詞"),
+            _tok("もの", pos="名詞"),
+            _tok("の", pos="助詞"),
+            _tok("分から", pos="動詞"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "読んだものの分から")
+        assert [token["surface"] for token in result] == ["読ん", "だ", "ものの", "分から"]
+        assert rule == "predicate-monono"
 
 
 class TestNumberUnit:

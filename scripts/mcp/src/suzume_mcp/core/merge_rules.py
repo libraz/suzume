@@ -572,18 +572,21 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                     applied_rule = "topic+l2-noun-boundary"
                 break
 
-        # After the attributive copula of a na-adjective, ものの is a closed
-        # concessive particle when a predicate follows.  IPADIC happens to
-        # split this host class into formal noun + genitive, unlike the same
-        # connective after a verb.  A following predicate keeps a genuine
-        # nominal genitive (静かなものの色) out of this rule.
+        # After a clause-final predicate (a verb, an i-adjective, or the
+        # auxiliaries た/だ/ない/な), ものの is a closed concessive particle when a
+        # predicate follows.  IPADIC splits it into formal noun + genitive
+        # depending on the host and the follower.  A following predicate keeps
+        # a genuine nominal genitive (静かなものの色, 読んだものの数) out of
+        # this rule.
         if (
             not merged
             and t.get("surface") == "もの"
             and t.get("pos") == "名詞"
             and i > 0
-            and tokens[i - 1].get("surface") == "な"
-            and tokens[i - 1].get("pos") == "助動詞"
+            and (
+                tokens[i - 1].get("pos") in ("動詞", "形容詞")
+                or (tokens[i - 1].get("pos") == "助動詞" and tokens[i - 1].get("surface") in ("た", "だ", "ない", "な"))
+            )
             and i + 2 < len(tokens)
             and tokens[i + 1].get("surface") == "の"
             and tokens[i + 1].get("pos") == "助詞"
@@ -593,7 +596,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
             i += 2
             merged = True
             if applied_rule is None:
-                applied_rule = "na-adjective-monono"
+                applied_rule = "predicate-monono"
 
         # Preserve a classical kari adjective before generic noun recovery can
         # absorb its kanji stem. The classical terminal cell validates the open
