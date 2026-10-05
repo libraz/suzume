@@ -188,6 +188,104 @@
       ],
       "id": "waresouda",
       "input": "奪われそうだ"
+    },
+    {
+      "description": "香りに包まれ、眠る - auto-generated",
+      "expected": [
+        {
+          "lemma": "香り",
+          "pos": "Noun",
+          "surface": "香り"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "包む",
+          "pos": "Verb",
+          "surface": "包ま"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "眠る",
+          "pos": "Verb",
+          "surface": "眠る"
+        }
+      ],
+      "id": "rini_mare_ru",
+      "input": "香りに包まれ、眠る"
+    },
+    {
+      "description": "叱られ - auto-generated",
+      "expected": [
+        {
+          "lemma": "叱る",
+          "pos": "Verb",
+          "surface": "叱ら"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        }
+      ],
+      "id": "rare",
+      "input": "叱られ"
+    },
+    {
+      "description": "守られ - auto-generated",
+      "expected": [
+        {
+          "lemma": "守る",
+          "pos": "Verb",
+          "surface": "守ら"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        }
+      ],
+      "id": "rare_2",
+      "input": "守られ"
+    },
+    {
+      "description": "優しい香りに包まれ - auto-generated",
+      "expected": [
+        {
+          "lemma": "優しい",
+          "pos": "Adjective",
+          "surface": "優しい"
+        },
+        {
+          "lemma": "香り",
+          "pos": "Noun",
+          "surface": "香り"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "包む",
+          "pos": "Verb",
+          "surface": "包ま"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        }
+      ],
+      "id": "shii_rini_mare",
+      "input": "優しい香りに包まれ"
     }
   ],
   "description": "auxiliary_passive tests",

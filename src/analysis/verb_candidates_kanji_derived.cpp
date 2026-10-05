@@ -613,8 +613,14 @@ void appendGodanPassiveRenyokeiCandidates(const std::vector<char32_t>& codepoint
         *dict_manager, codepoints, renyokei_end, aux_end,
         partOfSpeechMask(core::PartOfSpeech::Auxiliary) | partOfSpeechMask(core::PartOfSpeech::Suffix));
   }
+  // So does a phrase end, where the passive continuative stands on its own
+  // (香りに包ま+れ、眠る), unless こそ demands the 已然形 there.
+  const bool closes_phrase =
+      (renyokei_end >= codepoints.size() ||
+       normalize::classifyChar(codepoints[renyokei_end]) == normalize::CharType::Symbol) &&
+      vh::governingKakariMusubi(dict_manager, codepoints, start_pos) != vh::KakariMusubi::Izenkei;
   if (!is_beki_pattern && !is_passive_causative_chain && !is_passive_negative_chain && !is_passive_polite_chain &&
-      !is_classical_predicate_chain && !is_passive_subsidiary_chain && !is_passive_auxiliary_chain) {
+      !is_classical_predicate_chain && !is_passive_subsidiary_chain && !is_passive_auxiliary_chain && !closes_phrase) {
     candidates.push_back(makeVerbCandidate(surface, start_pos, renyokei_end, base_cost, base_lemma,
                                            dictionary::ConjugationType::Ichidan, false, CandidateOrigin::VerbKanji,
                                            ichidan_confidence, "godan_passive_renyokei"));
