@@ -627,3 +627,44 @@ class TestStraddlingReplacement:
     def test_keeps_the_character_speech_particle_whole(self, text, particle):
         tokens, _, _ = get_expected_tokens(text)
         assert (tokens[-1]["surface"], tokens[-1]["pos"], tokens[-1]["lemma"]) == (particle, "Particle", particle)
+
+
+class TestCharacterSpeech:
+    @pytest.mark.parametrize(
+        ("text", "host", "particle"),
+        [
+            ("走るっぴ", "走る", "っぴ"),
+            ("我が参加するもふ", "する", "もふ"),
+            ("わかったぞい", "た", "ぞい"),
+            ("遊ぶわん", "遊ぶ", "わん"),
+        ],
+    )
+    def test_final_particle_closes_the_intact_predicate(self, text, host, particle):
+        tokens, _, _ = get_expected_tokens(text)
+        assert tokens[-2]["surface"] == host
+        assert (tokens[-1]["surface"], tokens[-1]["pos"], tokens[-1]["lemma"]) == (particle, "Particle", particle)
+
+    @pytest.mark.parametrize(
+        ("text", "copula", "lemma"),
+        [
+            ("学生ざます", "ざます", "ざます"),
+            ("彼も応じてくれるでやんす", "やんす", "やんす"),
+            ("そうでござんす", "ござんす", "ござる"),
+            ("やるっス", "っス", "です"),
+        ],
+    )
+    def test_copula_is_one_auxiliary(self, text, copula, lemma):
+        tokens, _, _ = get_expected_tokens(text)
+        assert (tokens[-1]["surface"], tokens[-1]["pos"], tokens[-1]["lemma"]) == (copula, "Auxiliary", lemma)
+
+    @pytest.mark.parametrize(
+        ("text", "surfaces"),
+        [
+            ("それはえらいこっちゃ。", ["それ", "は", "えらい", "こっ", "ちゃ"]),
+            ("ざまを見ろ", ["ざま", "を", "見ろ"]),
+            ("お茶わん", ["お", "茶わん"]),
+        ],
+    )
+    def test_leaves_homographs_outside_a_predicate_tail(self, text, surfaces):
+        tokens, _, _ = get_expected_tokens(text)
+        assert [token["surface"] for token in tokens] == surfaces

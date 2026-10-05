@@ -5,7 +5,9 @@ from itertools import pairwise
 import regex
 
 from .constants import (
+    CHARACTER_SPEECH_FINAL_PARTICLES,
     CLOSED_HONORIFIC_SERU_LEMMAS,
+    FINITE_PREDECESSOR_CONJ_FORM,
     KANJI_VERB_ROW_FRAMES,
     KYUJITAI_TO_SHINJITAI,
     SLANG_ADJ_FOLLOWER,
@@ -106,6 +108,39 @@ def _emphatic_sokuons(text: str) -> list[int]:
     follows; nothing is left behind the mark for a sokuon-onbin to carry.
     """
     return [m.start() for m in regex.finditer(r"(?<=[^\s\p{P}\p{S}っッ])[っッ](?=[\p{P}\p{S}\p{Z}]|$)", text)]
+
+
+# The standard final particle analyzed in place of a role-language one.
+_STANDARD_FINAL_PARTICLE = "よ"
+_PREDICATE_POS = frozenset({"動詞", "形容詞", "助動詞"})
+
+
+def _character_speech_particles(text: str, raw: tuple[int, dict[int, dict]]) -> dict[int, str]:
+    """Where a role-language final particle closes a predicate the dictionary misreads.
+
+    The particle must close the utterance or a phrase, and the text with a
+    standard final particle in its place must read as a terminal-form predicate
+    followed by that particle, so a kana word merely ending in the same mora
+    does not count. One the dictionary already reads as a final particle
+    (走る+のう) is left alone.
+    """
+    found: dict[int, str] = {}
+    for tail in CHARACTER_SPEECH_FINAL_PARTICLES:
+        for m in regex.finditer(r"(?<=[^\s\p{P}\p{S}])" + regex.escape(tail) + r"(?=[\p{P}\p{S}\p{Z}]|$)", text):
+            start = m.start()
+            existing = raw[1].get(start)
+            if existing is not None and existing.get("surface") == tail and existing.get("pos") == "助詞":
+                continue
+            probe = _raw_analysis(text[:start] + _STANDARD_FINAL_PARTICLE + text[m.end() :])[1]
+            landed = probe.get(start)
+            if landed is None or landed.get("surface") != _STANDARD_FINAL_PARTICLE or landed.get("pos") != "助詞":
+                continue
+            host_starts = [at for at in probe if at < start]
+            host = probe[max(host_starts)] if host_starts else {}
+            if host.get("pos") not in _PREDICATE_POS or host.get("conj_form") != FINITE_PREDECESSOR_CONJ_FORM:
+                continue
+            found[start] = tail
+    return found
 
 
 def _invents_a_word_for(raw: tuple[int, dict[int, dict]], position: int) -> bool:
@@ -423,6 +458,19 @@ def preprocess_for_mecab(text: str) -> tuple[str, dict[tuple[int, str], dict], t
                 "length": 2,
             }
 
+    # Role-language and regional final particles (もふ, ぴょん, っぴ) are not
+    # in the dictionary, which invents words for their kana and can pull the
+    # predicate's last mora into them. A standard final particle is analyzed in
+    # their place, and restoration puts the surface back as the lemma.
+    if raw is None:
+        raw = _raw_analysis(text)
+    for start, tail in _character_speech_particles(text, raw).items():
+        replacements[(start, "character_speech")] = {
+            "original": tail,
+            "replacement": _STANDARD_FINAL_PARTICLE,
+            "length": len(tail),
+        }
+
     # A colloquial i-adjective fuses its last vowel with い into a long e
     # (すごい → すげえ, うまい → うめえ). The dictionary reads the e-row kana
     # plus え as a verb, a noun or a filler, so the standard form is put back in
@@ -484,6 +532,7 @@ _REPLACEMENT_RULE_NAMES = {
     "kyujitai": "kyujitai-fold",
     "kanji_verb_frame": "kanji-verb-frame",
     "vowel_fused_adjective": "vowel-fused-adjective",
+    "character_speech": "character-speech",
 }
 
 

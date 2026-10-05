@@ -7,6 +7,7 @@ import regex
 from .constants import (
     ADVERBIAL_NA_ADJECTIVES,
     ARCHAIC_PERSONAL_PRONOUNS,
+    CHARACTER_SPEECH_COPULAS,
     COLLOQUIAL_PRONOUNS,
     COMPOUND_VERB_V2_GODAN,
     COMPOUND_VERB_V2_ICHIDAN,
@@ -219,6 +220,20 @@ def _covered_length(tokens: list[dict], start: int, length: int) -> tuple[int, i
     """Like `_consume_span`, but return how many characters the joined surfaces cover."""
     consumed, end = _consume_span(tokens, start, length)
     return len(consumed), end
+
+
+_CHARACTER_SPEECH_COPULAS = tuple(sorted(CHARACTER_SPEECH_COPULAS, key=len, reverse=True))
+_COPULA_HOST_POS = frozenset({"名詞", "副詞", "動詞", "形容詞", "助動詞"})
+_UTTERANCE_FINAL_PARTICLE_HEADS = frozenset("よねなかぞぜわさ")
+
+
+def _closes_utterance(following: str) -> bool:
+    """Whether nothing but punctuation, the text end or a final particle follows."""
+    return (
+        not following
+        or regex.match(r"[\p{P}\p{S}\p{Z}]", following) is not None
+        or following[0] in _UTTERANCE_FINAL_PARTICLE_HEADS
+    )
 
 
 def _reads_as_one_verb(lemma: str) -> bool:
@@ -1926,6 +1941,30 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                 merged = True
                 if applied_rule is None:
                     applied_rule = "character-speech"
+
+        # 8c. Role-language copulas (ざます, やんす, ござんす, っス) are split by the
+        # reference into homographic pieces (ざま+す, やん+す, っ+ス). Each closes
+        # a nominal or a predicate as one auxiliary, so it is taken only there
+        # and only where the utterance, a phrase or a final particle follows.
+        if not merged and result:
+            copula = next((word for word in _CHARACTER_SPEECH_COPULAS if remaining.startswith(word)), "")
+            host = result[-1]
+            if (
+                copula
+                and _closes_utterance(remaining[len(copula) :])
+                and (host.get("pos") in _COPULA_HOST_POS or host.get("surface") == "で")
+            ):
+                consumed, j = _covered_length(tokens, i, len(copula))
+                if consumed == len(copula):
+                    if host.get("surface") == "で":
+                        # The で in front is the copula's continuative, which
+                        # the reference reads as the case particle here.
+                        result[-1] = {**host, "pos": "助動詞", "pos_sub1": None, "lemma": "だ"}
+                    result.append({"surface": copula, "pos": "助動詞", "lemma": CHARACTER_SPEECH_COPULAS[copula]})
+                    i = j
+                    merged = True
+                    if applied_rule is None:
+                        applied_rule = "character-speech"
 
         # 4f. Prolonged sound mark (ー) merge
         # Merge a trailing ー with the preceding token. Every mark is kept, because

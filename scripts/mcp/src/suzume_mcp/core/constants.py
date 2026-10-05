@@ -614,6 +614,32 @@ PARTICLE_CORRECTIONS: dict[str, str] = {
     "って": "Particle",
 }
 
+# Role-language and regional sentence-final particles the reference dictionary
+# lacks. Each closes a predicate as one particle (走る+もふ, 走る+っぴ), but
+# the dictionary invents words for the kana and can pull the predicate's last
+# mora into them.
+CHARACTER_SPEECH_FINAL_PARTICLES: tuple[str, ...] = (
+    "ぴょん",
+    "ピョン",
+    "ぞい",
+    "のう",
+    "もふ",
+    "わん",
+    "っぴ",
+)
+
+# Role-language copulas the reference splits into homographic pieces (ざま+す,
+# やん+す, っ+ス), mapped to the dictionary form the tokenizer's L1 gives them.
+# A connective で in front is the copula's own continuative and stays a token
+# of its own (で+やんす).
+CHARACTER_SPEECH_COPULAS: dict[str, str] = {
+    "ござんす": "ござる",
+    "ざます": "ざます",
+    "ざんす": "ある",
+    "やんす": "やんす",
+    "っス": "です",
+}
+
 # Regional sentence-final particles. They are absent from the reference
 # dictionary, so they surface as a bare noun or an interjection and are told
 # apart from those only by the predicate in front of them.
