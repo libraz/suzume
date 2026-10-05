@@ -2346,6 +2346,117 @@
       ],
       "id": "tomoni_shita",
       "input": "男女ともに参加した"
+    },
+    {
+      "description": "Interrogative adverb ikaga before an honorific noun",
+      "expected": [
+        {
+          "lemma": "春暖",
+          "pos": "Noun",
+          "surface": "春暖"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "候",
+          "pos": "Noun",
+          "surface": "候"
+        },
+        {
+          "lemma": "いかが",
+          "pos": "Adverb",
+          "surface": "いかが"
+        },
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "過ごし",
+          "pos": "Noun",
+          "surface": "過ごし"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "でしょ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "no_ikagao_goshideshi_uka",
+      "input": "春暖の候、いかがお過ごしでしょうか。"
+    },
+    {
+      "description": "Interrogative adverb ikaga before an honorific prefix",
+      "expected": [
+        {
+          "lemma": "いかが",
+          "pos": "Adverb",
+          "surface": "いかが"
+        },
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "考え",
+          "pos": "Noun",
+          "surface": "考え"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "ikagao_edesuka",
+      "input": "いかがお考えですか"
+    },
+    {
+      "description": "Interrogative adverb ikaga before a polite verb chain",
+      "expected": [
+        {
+          "lemma": "いかが",
+          "pos": "Adverb",
+          "surface": "いかが"
+        },
+        {
+          "lemma": "なさる",
+          "pos": "Verb",
+          "surface": "なさい"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "ikaganasaimasuka",
+      "input": "いかがなさいますか"
     }
   ],
   "version": "1.0"

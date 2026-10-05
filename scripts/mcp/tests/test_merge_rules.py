@@ -423,6 +423,31 @@ class TestNominalTomoni:
         assert rule is None
 
 
+class TestInterrogativeIkaga:
+    def test_merges_before_honorific_prefix(self):
+        tokens = [_tok("いか"), _tok("が", pos="助詞"), _tok("お", pos="接頭詞"), _tok("考え")]
+        result, rule = apply_suzume_merge(tokens, "いかがお考え")
+        assert [token["surface"] for token in result] == ["いかが", "お", "考え"]
+        assert result[0]["pos"] == "副詞"
+        assert rule == "interrogative-ikaga"
+
+    def test_merges_before_polite_verb_chain(self):
+        tokens = [
+            _tok("いか"),
+            _tok("が", pos="助詞"),
+            _tok("なさい", pos="動詞", lemma="なさる"),
+            _tok("ます", pos="助動詞"),
+        ]
+        result, _ = apply_suzume_merge(tokens, "いかがなさいます")
+        assert [token["surface"] for token in result] == ["いかが", "なさい", "ます"]
+
+    def test_keeps_noun_subject_before_plain_predicate(self):
+        tokens = [_tok("いか"), _tok("が", pos="助詞"), _tok("好き", pos_sub1="形容動詞語幹")]
+        result, rule = apply_suzume_merge(tokens, "いかが好き")
+        assert [token["surface"] for token in result] == ["いか", "が", "好き"]
+        assert rule is None
+
+
 class TestNumberUnit:
     def test_number_counter(self):
         tokens = [

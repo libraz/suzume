@@ -681,6 +681,37 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
             if applied_rule is None:
                 applied_rule = "nominal-tomoni"
 
+        # The interrogative adverb いかが is read as いか+が whenever a predicate
+        # rather than a copula follows.  An honorific prefix or a polite verb
+        # chain after it is the register of the adverb, never of a noun subject.
+        if (
+            not merged
+            and t.get("surface") == "いか"
+            and t.get("pos") == "名詞"
+            and i + 2 < len(tokens)
+            and tokens[i + 1].get("surface") == "が"
+            and tokens[i + 1].get("pos") == "助詞"
+            and (
+                tokens[i + 2].get("pos") == "接頭詞"
+                # The reference lexicalizes some honorific nouns whole (お過ごし).
+                or (
+                    tokens[i + 2].get("pos") == "名詞"
+                    and str(tokens[i + 2].get("surface", "")).startswith(("お", "ご", "御"))
+                )
+                or (
+                    tokens[i + 2].get("pos") == "動詞"
+                    and i + 3 < len(tokens)
+                    and tokens[i + 3].get("lemma") == "ます"
+                    and tokens[i + 3].get("pos") == "助動詞"
+                )
+            )
+        ):
+            result.append({"surface": "いかが", "pos": "副詞", "pos_sub1": "一般", "lemma": "いかが"})
+            i += 2
+            merged = True
+            if applied_rule is None:
+                applied_rule = "interrogative-ikaga"
+
         # A nominalizer (ん/の) followed by だって carries the same adverbial
         # particle as a nominal host (学生だって).  Punctuation makes IPADIC
         # choose the compositional copula + quotative lattice only here.
