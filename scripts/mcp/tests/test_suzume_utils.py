@@ -793,3 +793,12 @@ class TestDoubledNasalMimetic:
     def test_single_half_keeps_its_verb(self):
         tokens, _, _ = get_expected_tokens("ころんで")
         assert [token["surface"] for token in tokens] == ["ころん", "で"]
+
+
+class TestRashiiGe:
+    @pytest.mark.parametrize("text", ["大人らしげ", "本らしげ", "子供らしげな顔"])
+    def test_rashi_plus_ge_after_a_noun(self, text):
+        tokens, _, _ = get_expected_tokens(text)
+        surfaces = [token["surface"] for token in tokens]
+        at = surfaces.index("らし")
+        assert (tokens[at]["lemma"], surfaces[at + 1], tokens[at + 1]["pos"]) == ("らしい", "げ", "Suffix")

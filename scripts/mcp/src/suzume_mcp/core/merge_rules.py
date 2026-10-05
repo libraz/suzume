@@ -2400,6 +2400,23 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                             applied_rule = "colloquial-pronoun"
                         break
 
+        # 8e. The reference reads Xらしげ as the plural suffix ら plus a name
+        # しげ (大人+ら+しげ) unless context steers it to らし+げ (子供+らし+げ).
+        # ら directly before しげ is the stem of らしい with the suffix げ.
+        if (
+            not merged
+            and t.get("surface") == "ら"
+            and t.get("pos_sub1") == "接尾"
+            and i + 1 < len(tokens)
+            and tokens[i + 1].get("surface") == "しげ"
+        ):
+            result.append({"surface": "らし", "pos": "助動詞", "conj_form": "ガル接続", "lemma": "らしい"})
+            result.append({"surface": "げ", "pos": "名詞", "pos_sub1": "接尾", "lemma": "げ"})
+            i += 2
+            merged = True
+            if applied_rule is None:
+                applied_rule = "degree-suffix-ge"
+
         # 8d. The pejorative auxiliary やがる takes a verb continuative (来+やがっ+た,
         # 待たせ+やがっ+て). The reference cuts it into や (read as a particle, the
         # copula or a cell of やる) and a がる suffix, or a noun for がれ; each
