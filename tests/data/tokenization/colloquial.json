@@ -445,6 +445,62 @@
       ],
       "id": "kittte_ttta",
       "input": "好きって言った"
+    },
+    {
+      "description": "すげえ、面白い - auto-generated",
+      "expected": [
+        {
+          "lemma": "すごい",
+          "pos": "Adjective",
+          "surface": "すげえ"
+        },
+        {
+          "lemma": "面白い",
+          "pos": "Adjective",
+          "surface": "面白い"
+        }
+      ],
+      "id": "sugee_i",
+      "input": "すげえ、面白い"
+    },
+    {
+      "description": "うめえ、弁当だ - auto-generated",
+      "expected": [
+        {
+          "lemma": "うまい",
+          "pos": "Adjective",
+          "surface": "うめえ"
+        },
+        {
+          "lemma": "弁当",
+          "pos": "Noun",
+          "surface": "弁当"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "umee_da",
+      "input": "うめえ、弁当だ"
+    },
+    {
+      "description": "やべえな - auto-generated",
+      "expected": [
+        {
+          "lemma": "やばい",
+          "pos": "Adjective",
+          "surface": "やべえ"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        }
+      ],
+      "id": "yabeena",
+      "input": "やべえな"
     }
   ],
   "description": "colloquial tests",

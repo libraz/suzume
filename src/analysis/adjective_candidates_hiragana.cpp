@@ -318,6 +318,69 @@ void appendHiraganaPrefixedKanjiIAdjCandidates(std::vector<UnknownCandidate>& ca
   }
 }
 
+// The kana a fused long e respells: the stem's last mora on the a row
+// (やばい → やべえ) or on the o row (すごい → すげえ).
+struct FusedESource {
+  char32_t fused;
+  char32_t a_row;
+  char32_t o_row;
+};
+constexpr std::array<FusedESource, 13> kFusedESources = {{
+    {U'え', U'あ', U'お'},
+    {U'け', U'か', U'こ'},
+    {U'げ', U'が', U'ご'},
+    {U'せ', U'さ', U'そ'},
+    {U'ぜ', U'ざ', U'ぞ'},
+    {U'て', U'た', U'と'},
+    {U'で', U'だ', U'ど'},
+    {U'ね', U'な', U'の'},
+    {U'へ', U'は', U'ほ'},
+    {U'べ', U'ば', U'ぼ'},
+    {U'ぺ', U'ぱ', U'ぽ'},
+    {U'め', U'ま', U'も'},
+    {U'れ', U'ら', U'ろ'},
+}};
+
+// A registered i-adjective whose ending has fused into a long e (すげえ for
+// すごい, やべえ for やばい) is that adjective, with its standard lemma.
+void appendVowelFusedAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                         size_t max_hiragana_end, const dictionary::DictionaryManager* dict_manager,
+                                         std::vector<UnknownCandidate>& candidates) {
+  constexpr size_t kMaxStemMorae = 4;
+  if (dict_manager == nullptr) {
+    return;
+  }
+  for (size_t fused_at = start_pos + 1; fused_at + 1 < max_hiragana_end && fused_at - start_pos <= kMaxStemMorae;
+       ++fused_at) {
+    if (codepoints[fused_at + 1] != U'え') {
+      continue;
+    }
+    const auto* source = std::find_if(kFusedESources.begin(), kFusedESources.end(),
+                                      [&](const FusedESource& entry) { return entry.fused == codepoints[fused_at]; });
+    if (source == kFusedESources.end()) {
+      continue;
+    }
+    const std::string stem = extractSubstring(codepoints, start_pos, fused_at);
+    for (const char32_t restored : {source->a_row, source->o_row}) {
+      const std::string base_form = stem + normalize::encodeUtf8(restored) + "い";
+      if (!isAdjectiveInDictionary(dict_manager, base_form)) {
+        continue;
+      }
+      auto fused = makeCandidate(codepoints, start_pos, fused_at + 2, core::PartOfSpeech::Adjective,
+                                 candidate::kAdjStemDictionaryCost, true, CandidateOrigin::AdjectiveIHiragana,
+                                 core::ExtendedPOS::AdjBasic);
+      fused.lemma = base_form;
+      fused.lemma_verified = true;
+#ifdef SUZUME_DEBUG_INFO
+      fused.confidence = candidate::kDictionaryOriginConfidence;
+      fused.pattern = "adj_vowel_fused_e";
+#endif
+      candidates.push_back(std::move(fused));
+      return;
+    }
+  }
+}
+
 // Whether a word can open at @p pos: the text starts there, the script
 // changes, or a case or topic particle closes what stands in front.
 bool opensWordAt(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
@@ -442,6 +505,8 @@ void appendHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints, 
   }
 
   // The classical attributive is the one cell spelled in two morae (よき).
+  appendVowelFusedAdjectiveCandidates(codepoints, start_pos, max_hiragana_end, dict_manager, candidates);
+
   appendIAdjClassicalAttributiveCandidates(codepoints, start_pos, start_pos + 1, max_hiragana_end, dict_manager,
                                            candidates);
 
