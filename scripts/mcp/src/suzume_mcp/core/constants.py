@@ -754,11 +754,11 @@ TEMPORAL_COMPOUND_UNITS: frozenset[str] = frozenset(
 )
 
 # Productive second elements that derive an i-adjective from a nominal host
-# (めんどくさい, うそくさい, 素人くさい). The derivation is not a predication over
+# (めんどくさい, うそくさい, 素人くさい, 汗臭い). The derivation is not a predication over
 # the host, so the two are one search unit. The reference dictionary lists a few
 # of these compounds (面倒くさい, 古くさい, ばかくさい) and leaves the rest split,
 # which is a lexical gap in its lexicon rather than a morpheme boundary.
-DERIVED_ADJECTIVE_SUFFIX_LEMMAS: frozenset[str] = frozenset({"くさい"})
+DERIVED_ADJECTIVE_SUFFIX_LEMMAS: frozenset[str] = frozenset({"くさい", "臭い"})
 
 # Search-unit compounds: kanji+okurigana words MeCab splits but Suzume keeps as one token
 SEARCH_UNIT_COMPOUNDS: dict[str, str] = {}
