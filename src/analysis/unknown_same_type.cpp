@@ -1266,8 +1266,7 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       }
     }
   }
-  bool left_clause_bracket =
-      (start_pos == 0) || (start_pos >= 1 && char_types[start_pos - 1] == normalize::CharType::Symbol);
+  bool left_clause_bracket = (start_pos == 0) || (start_pos >= 1 && isNonWordType(char_types[start_pos - 1]));
   const bool left_attributive_bracket = start_pos > 0;
   // Every position has some left bracket: the clause bracket covers the start,
   // and the attributive one any later position.
@@ -1397,7 +1396,9 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
           break;  // stop before a multi-char particle boundary
         }
       }
-      if (isInternalParticleChar(curr)) {
+      // A particle-initial run's own first mora is not internal: the run already
+      // carries its cap (max_internal 0) for the morae after it (へ+や).
+      if ((scan > start_pos || !particle_initial) && isInternalParticleChar(curr)) {
         // A particle char followed by a fresh (non-hiragana) word is a trailing case
         // particle (…およぎ|に|行く): stop before it so the right-bracket test sees it.
         // At the run's end it is word-final (こども), so keep it, capped by max_internal.
@@ -1484,8 +1485,8 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
           }
         }
       }
-      bool right_clause =
-          (scan == codepoints.size()) || (scan < codepoints.size() && char_types[scan] == normalize::CharType::Symbol);
+      // An emoji closes the clause the way punctuation does (いたずら😂).
+      bool right_clause = (scan == codepoints.size()) || (scan < codepoints.size() && isNonWordType(char_types[scan]));
       // An auxiliary is bound leftward, so it brackets the run in front of it just
       // as a particle does. It does not select the run the way a case particle
       // does, so it only makes the candidate available.
@@ -1580,8 +1581,51 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       const bool short_bos_case_particle_bracket =
           left_clause_bracket && promoted_dictionary_reading == nullptr && short_right_particle != nullptr &&
           short_right_particle->extended_pos == core::ExtendedPOS::ParticleCase && codepoints[scan] != U'と';
+      // A two-mora run with no reading of its own at all — neither registered
+      // nor inflected — is a noun when the clause start or a determiner opens it
+      // and the clause closes it (この|へや|、), or when it opens the clause and
+      // a genitive の closes it (ねこ|の|いたずら). Any reading, even a fragment
+      // one, keeps the short adverbs and particles out (もう, すぐ, ため).
+      // The の must not be the last stem mora of a predicate inflecting right
+      // after it and running to the end of the kana (ととの+わ+ない is
+      // ととのわ+ない); a reading that stops inside the kana (ねこのい+た+ずら)
+      // accounts for nothing.
+      const auto predicate_spans_genitive = [&]() {
+        constexpr size_t kPredicateProbe = 6;
+        for (size_t reading_end = scan + 2;
+             reading_end <= codepoints.size() && reading_end - start_pos <= kPredicateProbe &&
+             char_types[reading_end - 1] == normalize::CharType::Hiragana;
+             ++reading_end) {
+          const bool closes_kana =
+              reading_end == codepoints.size() || char_types[reading_end] != normalize::CharType::Hiragana ||
+              (dict_manager_ != nullptr && lookupEntryInRange(*dict_manager_, codepoints, reading_end, reading_end + 1,
+                                                              core::PartOfSpeech::Particle) != nullptr);
+          if (!closes_kana) {
+            continue;
+          }
+          for (const auto& reading : inflection_.analyze(extractSubstring(codepoints, start_pos, reading_end))) {
+            if (reading.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence &&
+                normalize::utf8Length(reading.stem) == len + 1) {
+              return true;
+            }
+          }
+        }
+        return false;
+      };
+      const bool right_short_genitive = len == 2 && left_clause_bracket && scan < codepoints.size() &&
+                                        codepoints[scan] == U'の' && !predicate_spans_genitive();
+      const bool unread_short_run = len == 2 && promoted_dictionary_reading == nullptr && [&]() {
+        const auto& readings = inflection_.analyze(promoted_surface);
+        return std::none_of(readings.begin(), readings.end(), [](const grammar::InflectionCandidate& reading) {
+          return reading.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence;
+        });
+      }();
+      const bool unread_short_run_bracketed =
+          unread_short_run &&
+          (((left_clause_bracket || left_determiner_bracket) && right_clause) || right_short_genitive);
       const bool short_run_bracketed =
           (left_particle_bracket && (right_particle || right_copula)) || short_bos_case_particle_bracket ||
+          unread_short_run_bracketed ||
           (left_genitive_bracket && right_clause && !normalize::isExtendedParticle(codepoints[start_pos])) ||
           (right_copula && left_clause_bracket && promoted_dictionary_reading == nullptr) ||
           (right_suffix && promoted_dictionary_reading == nullptr) || copula_selected_predicate_homograph;
@@ -1725,7 +1769,8 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
         absorbs_trailing_suffix = suffix_len > 0 && suffix_start + suffix_len >= scan;
       }
       if ((len >= min_len || short_bos_preparatory_homograph) &&
-          (right_particle || right_clause || right_auxiliary || right_kanji_word || right_suffix) &&
+          (right_particle || right_clause || right_auxiliary || right_kanji_word || right_suffix ||
+           (right_short_genitive && unread_short_run_bracketed)) &&
           !crossed_verified_predicate && !cuts_into_predicate && !opens_on_irrealis_chain &&
           !has_inflected_predicate_reading && !opens_on_sino_prefix && !absorbs_trailing_suffix &&
           !closes_registered_word_predicate && !finishes_auxiliary_chain && !spells_contracted_hypothetical &&
@@ -1790,8 +1835,9 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
         // case-particle frame, but it must still outrank the fallback Other-token
         // alternative.
         const bool closes_unverified_nominal_head =
-            (right_clause || right_genitive_after_substantive_run || right_kanji_word) && !exact_reading_owns_context &&
-            !has_inflected_predicate_reading;
+            (right_clause || right_genitive_after_substantive_run || right_kanji_word ||
+             (right_short_genitive && unread_short_run_bracketed)) &&
+            !exact_reading_owns_context && !has_inflected_predicate_reading;
         if (closes_unverified_nominal_head) {
           noun_cost += scorer::scale::kStrongBonus;
         }
@@ -1813,7 +1859,16 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
         auto noun_cand = makeCandidate(promoted_surface, start_pos, scan, core::PartOfSpeech::Noun, noun_cost,
                                        /*has_suffix=*/true, CandidateOrigin::BracketedNoun);
         noun_cand.bracketed_noun_rescue = !copula_selected_predicate_homograph;
-        noun_cand.requires_left_content_edge = left_particle_bracket;
+        // A particle-shaped last mora of a determiner (その, この) is no particle,
+        // so a run the determiner opens and the clause end or a case or topic
+        // particle closes needs no content word in front of it (その+へや,
+        // この+へや+で). Any other right bracket keeps the requirement
+        // (その+もの|ず+ば+り is そのもの+ずばり).
+        const bool right_case_or_topic =
+            short_right_particle != nullptr && (short_right_particle->extended_pos == core::ExtendedPOS::ParticleCase ||
+                                                short_right_particle->extended_pos == core::ExtendedPOS::ParticleTopic);
+        noun_cand.requires_left_content_edge =
+            left_particle_bracket && !(left_determiner_bracket && (right_clause || right_case_or_topic));
         noun_cand.requires_left_attributive_edge =
             left_attributive_bracket && !left_particle_bracket && !left_determiner_bracket && !left_clause_bracket;
 #ifdef SUZUME_DEBUG_INFO
@@ -1823,6 +1878,12 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       }
     };
     emit_promoted_run(scan);
+    // The scan runs on through a genitive inside its first three morae, so the
+    // two-mora run it closes at the clause start is offered on its own.
+    constexpr size_t kShortRunLength = 2;
+    if (left_clause_bracket && start_pos + kShortRunLength < scan && codepoints[start_pos + kShortRunLength] == U'の') {
+      emit_promoted_run(start_pos + kShortRunLength);
+    }
     // The run that stops in front of a trailing auxiliary is offered beside the
     // maximal one, so the copula after an unregistered hiragana noun has
     // something to attach to (りんご|だ|と instead of りんごだ|と, which the scan

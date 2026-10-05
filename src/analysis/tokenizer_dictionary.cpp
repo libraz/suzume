@@ -1450,7 +1450,34 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
             return following.entry != nullptr && following.length > 1 &&
                    following.entry->pos == core::PartOfSpeech::Noun;
           });
-      if (followed_by_case_particle && !followed_by_longer_nominal) {
+      // So is an unregistered kana noun the rescue path offers there: a run
+      // with no reading of its own, closed by the clause end or a particle
+      // (この+へや+、, この+へや+で). Its first mora only spells the particle.
+      const auto opens_unread_kana_noun = [&]() {
+        constexpr size_t kMaxUnreadNounLength = 4;
+        size_t run_end = end_pos;
+        while (run_end < codepoints.size() && run_end - end_pos < kMaxUnreadNounLength &&
+               normalize::classifyChar(codepoints[run_end]) == normalize::CharType::Hiragana) {
+          ++run_end;
+        }
+        for (size_t noun_end = end_pos + 2; noun_end <= run_end; ++noun_end) {
+          const bool closed = noun_end >= codepoints.size() ||
+                              normalize::classifyChar(codepoints[noun_end]) != normalize::CharType::Hiragana ||
+                              lookupEntryInRange(dict_manager_, codepoints, noun_end, noun_end + 1,
+                                                 core::PartOfSpeech::Particle) != nullptr;
+          if (!closed || lookupEntryInRange(dict_manager_, codepoints, end_pos, noun_end) != nullptr) {
+            continue;
+          }
+          const auto& readings = inflection_.analyze(extractSubstring(codepoints, end_pos, noun_end));
+          if (std::none_of(readings.begin(), readings.end(), [](const grammar::InflectionCandidate& reading) {
+                return reading.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence;
+              })) {
+            return true;
+          }
+        }
+        return false;
+      };
+      if (followed_by_case_particle && !followed_by_longer_nominal && !opens_unread_kana_noun()) {
         continue;
       }
     }

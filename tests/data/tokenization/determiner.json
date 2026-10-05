@@ -431,6 +431,72 @@
       ],
       "id": "chiisana_ni_mu",
       "input": "ちいさな家に住む"
+    },
+    {
+      "description": "このへや、寒い。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "この",
+          "pos": "Determiner",
+          "surface": "この"
+        },
+        {
+          "lemma": "へや",
+          "pos": "Noun",
+          "surface": "へや"
+        },
+        {
+          "lemma": "寒い",
+          "pos": "Adjective",
+          "surface": "寒い"
+        }
+      ],
+      "id": "konoheya_i",
+      "input": "このへや、寒い。"
+    },
+    {
+      "description": "このへやで寝る - auto-generated",
+      "expected": [
+        {
+          "lemma": "この",
+          "pos": "Determiner",
+          "surface": "この"
+        },
+        {
+          "lemma": "へや",
+          "pos": "Noun",
+          "surface": "へや"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "寝る",
+          "pos": "Verb",
+          "surface": "寝る"
+        }
+      ],
+      "id": "konoheyade_ru",
+      "input": "このへやで寝る"
+    },
+    {
+      "description": "そのへや - auto-generated",
+      "expected": [
+        {
+          "lemma": "その",
+          "pos": "Determiner",
+          "surface": "その"
+        },
+        {
+          "lemma": "へや",
+          "pos": "Noun",
+          "surface": "へや"
+        }
+      ],
+      "id": "sonoheya",
+      "input": "そのへや"
     }
   ],
   "description": "determiner tests",

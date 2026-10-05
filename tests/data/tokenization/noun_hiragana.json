@@ -443,6 +443,67 @@
       ],
       "id": "minnachi_ntoshite",
       "input": "みんなちゃんとして"
+    },
+    {
+      "description": "ねこのいたずら😂 - auto-generated",
+      "expected": [
+        {
+          "lemma": "ねこ",
+          "pos": "Noun",
+          "surface": "ねこ"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "いたずら",
+          "pos": "Noun",
+          "surface": "いたずら"
+        },
+        {
+          "lemma": "😂",
+          "pos": "Other",
+          "surface": "😂"
+        }
+      ],
+      "id": "nekonoitazura",
+      "input": "ねこのいたずら😂"
+    },
+    {
+      "description": "ねこ、 - auto-generated",
+      "expected": [
+        {
+          "lemma": "ねこ",
+          "pos": "Noun",
+          "surface": "ねこ"
+        }
+      ],
+      "id": "neko",
+      "input": "ねこ、"
+    },
+    {
+      "description": "ねこのしっぽ - auto-generated",
+      "expected": [
+        {
+          "lemma": "ねこ",
+          "pos": "Noun",
+          "surface": "ねこ"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "しっぽ",
+          "pos": "Noun",
+          "surface": "しっぽ"
+        }
+      ],
+      "id": "nekonoshittpo",
+      "input": "ねこのしっぽ"
     }
   ],
   "description": "noun_hiragana tests",
