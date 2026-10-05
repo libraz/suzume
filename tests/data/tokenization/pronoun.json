@@ -1467,6 +1467,139 @@
       ],
       "id": "gaoreta",
       "input": "枝がおれた"
+    },
+    {
+      "description": "Pronoun stays separate from a following pronoun",
+      "expected": [
+        {
+          "lemma": "俺",
+          "pos": "Pronoun",
+          "surface": "俺"
+        },
+        {
+          "lemma": "何",
+          "pos": "Pronoun",
+          "surface": "何"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "pronoun_before_interrogative_pronoun",
+      "input": "俺何かしたか"
+    },
+    {
+      "description": "Pronoun stays separate from a following kanji noun",
+      "expected": [
+        {
+          "lemma": "俺",
+          "pos": "Pronoun",
+          "surface": "俺"
+        },
+        {
+          "lemma": "失敗",
+          "pos": "Noun",
+          "surface": "失敗"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "い"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "pronoun_before_verbal_noun",
+      "input": "俺失敗していないか"
+    },
+    {
+      "description": "Pronoun stays separate from 何",
+      "expected": [
+        {
+          "lemma": "私",
+          "pos": "Pronoun",
+          "surface": "私"
+        },
+        {
+          "lemma": "何",
+          "pos": "Pronoun",
+          "surface": "何"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "first_person_before_nani",
+      "input": "私何かした"
+    },
+    {
+      "description": "Pronoun stays separate from noun + suffix",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "仕事",
+          "pos": "Noun",
+          "surface": "仕事"
+        },
+        {
+          "lemma": "中",
+          "pos": "Suffix",
+          "surface": "中"
+        }
+      ],
+      "id": "pronoun_before_noun_suffix",
+      "input": "彼仕事中"
     }
   ],
   "description": "Pronouns",

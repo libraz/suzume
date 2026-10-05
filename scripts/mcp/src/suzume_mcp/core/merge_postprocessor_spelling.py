@@ -223,6 +223,10 @@ def _postprocess_kanji_merge(result: list[dict], applied_rule: str | None) -> tu
                 and curr.get("pos_sub1", "") != "数"
                 and not prev_is_go_prefix
                 and not na_adjective_stem_boundary
+                # A pronoun is a phrase of its own; it opens a compound only
+                # with a bound one-kanji element (何+気) and never closes one.
+                and curr.get("pos_sub1", "") != "代名詞"
+                and (merged[-1].get("pos_sub1", "") != "代名詞" or len(surface) == 1)
                 and not after_counter
             )
             or (surface == "々" and _IDEOGRAPHIC_SEQUENCE.fullmatch(merged[-1].get("surface", "")))

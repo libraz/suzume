@@ -337,8 +337,12 @@ def _kanji_noun_run(tokens: list[dict], start: int) -> tuple[int, str]:
         is_mergeable = (
             regex.match(r"^[\p{Han}]+$", surface)
             and following.get("pos") == "名詞"
-            and following.get("pos_sub1", "") not in ("接尾", "固有名詞", "形容動詞語幹", "副詞可能", "数")
+            and following.get("pos_sub1", "") not in ("接尾", "固有名詞", "形容動詞語幹", "副詞可能", "数", "代名詞")
         )
+        # A pronoun is a phrase of its own (俺|失敗, 彼|仕事); it opens a
+        # compound only with a bound one-kanji element (何+気).
+        if is_mergeable and index == start + 1 and token.get("pos_sub1", "") == "代名詞":
+            is_mergeable = len(surface) == 1
         if not is_mergeable or _heads_nidan_cell(tokens, index):
             break
         combined += surface

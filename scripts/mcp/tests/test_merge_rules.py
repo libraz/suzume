@@ -794,6 +794,19 @@ class TestPostprocessKanjiMerge:
             assert [token["surface"] for token in result] == [surface]
             assert rule == "ascii-joiner-merge"
 
+    def test_pronoun_does_not_join_a_kanji_noun_run(self):
+        tokens = [_tok("俺", pos="名詞", pos_sub1="代名詞"), _tok("失敗", pos="名詞", pos_sub1="サ変接続")]
+        result, _ = apply_suzume_merge(tokens, "俺失敗")
+        assert [token["surface"] for token in result] == ["俺", "失敗"]
+        tokens = [_tok("俺", pos="名詞", pos_sub1="代名詞"), _tok("何", pos="名詞", pos_sub1="代名詞")]
+        result, _ = apply_suzume_merge(tokens, "俺何")
+        assert [token["surface"] for token in result] == ["俺", "何"]
+
+    def test_pronoun_opens_a_compound_with_a_bound_kanji(self):
+        tokens = [_tok("何", pos="名詞", pos_sub1="代名詞"), _tok("気", pos="名詞")]
+        result, _ = apply_suzume_merge(tokens, "何気")
+        assert [token["surface"] for token in result] == ["何気"]
+
     def test_ascii_joiner_merge_chains_single_joiners(self):
         tokens = [_tok("U"), _tok(".", pos="記号"), _tok("S"), _tok(".", pos="記号"), _tok("A")]
         result, _ = apply_suzume_merge(tokens, "U.S.A")
