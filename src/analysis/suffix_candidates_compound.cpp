@@ -552,8 +552,10 @@ void generateSelectedNominalHeadCandidates(const std::vector<char32_t>& codepoin
       isNominalBoundaryParticle(*head_initial_particle)) {
     return;
   }
-  // No word opens on a small kana (な+ったん of なった+ん).
-  if (kana::isSmallKanaCodepoint(codepoints[start_pos])) {
+  // No word opens on a small kana (な+ったん of なった+ん), and no native
+  // word on the ら column, so a hiragana head there starts mid-word
+  // (なき+らい of な+きらい).
+  if (kana::isSmallKanaCodepoint(codepoints[start_pos]) || kana::isRaColumnCodepoint(codepoints[start_pos])) {
     return;
   }
   for (size_t length = 2; length <= kMaximumSelectedHeadLength; ++length) {

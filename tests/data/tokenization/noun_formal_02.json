@@ -149,6 +149,53 @@
       ],
       "id": "ano_naradehada",
       "input": "あの人ならではだ"
+    },
+    {
+      "description": "楽観的なきらいがある見通しである - auto-generated",
+      "expected": [
+        {
+          "lemma": "楽観的",
+          "pos": "Adjective",
+          "surface": "楽観的"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "きらい",
+          "pos": "Noun",
+          "surface": "きらい"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        },
+        {
+          "lemma": "見通し",
+          "pos": "Noun",
+          "surface": "見通し"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        }
+      ],
+      "id": "nakiraigaaru_shidearu",
+      "input": "楽観的なきらいがある見通しである"
     }
   ],
   "description": "Formal nouns (こと、もの、ところ) (part 2/2)",
