@@ -572,6 +572,50 @@
       ],
       "id": "heyaha",
       "input": "へやは"
+    },
+    {
+      "description": "嬉しくてうれぴ。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "嬉しい",
+          "pos": "Adjective",
+          "surface": "嬉しく"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "うれぴ",
+          "pos": "Noun",
+          "surface": "うれぴ"
+        }
+      ],
+      "id": "shikuteurepi",
+      "input": "嬉しくてうれぴ。"
+    },
+    {
+      "description": "言ってうれぴ - auto-generated",
+      "expected": [
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "うれぴ",
+          "pos": "Noun",
+          "surface": "うれぴ"
+        }
+      ],
+      "id": "ttteurepi",
+      "input": "言ってうれぴ"
     }
   ],
   "description": "noun_hiragana tests",

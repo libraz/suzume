@@ -1463,6 +1463,35 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       }
       return longest;
     };
+    // Whether the connective て/で at @p pos closes a te-form: the analyzer reads
+    // the host in front of it plus that mora as one (嬉しく+て, 言っ+て, 読ん+で).
+    // A host ending on a registered one-mora particle is no continuative
+    // (手+で|て+ぶくろ).
+    auto closes_te_form_at = [&](size_t pos) {
+      constexpr size_t kHostProbe = 5;
+      if (dict_manager_ == nullptr || pos == 0 || pos >= codepoints.size() ||
+          (codepoints[pos] != U'て' && codepoints[pos] != U'で') ||
+          lookupEntryInRange(*dict_manager_, codepoints, pos, pos + 1, core::PartOfSpeech::Particle) == nullptr ||
+          lookupEntryInRange(*dict_manager_, codepoints, pos - 1, pos, core::PartOfSpeech::Particle) != nullptr) {
+        return false;
+      }
+      const std::string connective = normalize::encodeUtf8(codepoints[pos]);
+      for (size_t host_start = pos; host_start-- > 0 && pos - host_start <= kHostProbe;) {
+        if (isNonWordType(char_types[host_start])) {
+          break;
+        }
+        for (const auto& reading : inflection_.analyze(extractSubstring(codepoints, host_start, pos + 1))) {
+          if (reading.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence &&
+              utf8::endsWith(reading.suffix, connective)) {
+            return true;
+          }
+        }
+      }
+      return false;
+    };
+    // A te-form on the left closes its clause, so the run after it needs neither
+    // a nominal nor an attributive in front of the connective (嬉しく+て+うれぴ).
+    const bool left_te_bracket = start_pos > 0 && closes_te_form_at(start_pos - 1);
     auto emit_promoted_run = [&](size_t run_end) {
       size_t len = run_end - start_pos;
       // The nominalizer ん closes an attributive predicate, so a run ending on
@@ -1792,6 +1821,9 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
                               core::ExtendedPOS::AuxClassicalPerfect) >= 2;
       // ご before kana is the Sino-Japanese honorific on a kana verbal noun
       // (ご+あんない+します); a rescue would swallow the prefix into the noun.
+      // Nor may it open on the te-form connective that a continuative right in
+      // front of it selects (嬉しく+て|うれぴ, 言っ+て, 読ん+で).
+      const bool opens_on_te_connective = closes_te_form_at(start_pos);
       const bool opens_on_sino_prefix =
           grammar::isSinoHonorificPrefix(extractSubstring(codepoints, start_pos, start_pos + 1));
       // Nor may it close on, or cut into, a registered suffix after a stem of
@@ -1808,8 +1840,8 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
            (right_short_genitive && unread_short_run_bracketed)) &&
           !crossed_verified_predicate && !cuts_into_predicate && !opens_on_irrealis_chain &&
           !has_inflected_predicate_reading && !opens_on_sino_prefix && !absorbs_trailing_suffix &&
-          !closes_registered_word_predicate && !finishes_auxiliary_chain && !spells_contracted_hypothetical &&
-          !steals_formal_noun_head && !absorbs_copula_before_sokuon_final &&
+          !opens_on_te_connective && !closes_registered_word_predicate && !finishes_auxiliary_chain &&
+          !spells_contracted_hypothetical && !steals_formal_noun_head && !absorbs_copula_before_sokuon_final &&
           ((!hasAuxiliaryParticleDecomposition(codepoints, start_pos, scan, dict_manager_) &&
             !spells_auxiliary_chain) ||
            has_deverbal_noun_shape_before_genitive || copula_selected_predicate_homograph) &&
@@ -1902,10 +1934,10 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
         const bool right_case_or_topic =
             short_right_particle != nullptr && (short_right_particle->extended_pos == core::ExtendedPOS::ParticleCase ||
                                                 short_right_particle->extended_pos == core::ExtendedPOS::ParticleTopic);
-        noun_cand.requires_left_content_edge =
-            left_particle_bracket && !(left_determiner_bracket && (right_clause || right_case_or_topic));
-        noun_cand.requires_left_attributive_edge =
-            left_attributive_bracket && !left_particle_bracket && !left_determiner_bracket && !left_clause_bracket;
+        noun_cand.requires_left_content_edge = left_particle_bracket && !left_te_bracket &&
+                                               !(left_determiner_bracket && (right_clause || right_case_or_topic));
+        noun_cand.requires_left_attributive_edge = left_attributive_bracket && !left_particle_bracket &&
+                                                   !left_determiner_bracket && !left_clause_bracket && !left_te_bracket;
 #ifdef SUZUME_DEBUG_INFO
         noun_cand.pattern = "bracketed_hira_noun";
 #endif
