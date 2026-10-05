@@ -316,8 +316,23 @@ float computeLateLexicalBoundaryBonus(const core::LatticeEdge& prev, const core:
   }
 
   // Only quotative と can follow a sentence-final particle as a case phrase.
-  if (prev.extended_pos == core::ExtendedPOS::ParticleFinal && next.extended_pos == core::ExtendedPOS::ParticleCase &&
-      !grammar::isSingleHiragana(next.surface, core::hiragana::kTo)) {
+  const bool case_after_final_particle = prev.extended_pos == core::ExtendedPOS::ParticleFinal &&
+                                         next.extended_pos == core::ExtendedPOS::ParticleCase &&
+                                         !grammar::isSingleHiragana(next.surface, core::hiragana::kTo);
+  // Nor can a binding particle follow a finite predicate that closed its
+  // clause. The copula's bonus before one is for its continuative で (でこそ,
+  // でさえ), not the terminal だ; the binding ぞ takes a nominal or a
+  // continuative (花+ぞ, 散り+ぞ+する), so after a finite form it is the final
+  // particle (そうだ+ぞい, 行く+ぞい). しか after a terminal verb stays
+  // (する+しか+ない).
+  const bool finite_predicate = prev.extended_pos == core::ExtendedPOS::VerbShuushikei ||
+                                prev.extended_pos == core::ExtendedPOS::AdjBasic ||
+                                prev.extended_pos == core::ExtendedPOS::AuxTenseTa;
+  const bool binding_after_finite =
+      next.extended_pos == core::ExtendedPOS::ParticleBinding &&
+      ((prev.extended_pos == core::ExtendedPOS::AuxCopulaDa && grammar::isSingleHiragana(prev.surface, U'だ')) ||
+       (finite_predicate && grammar::isSingleHiragana(next.surface, U'ぞ')));
+  if (case_after_final_particle || binding_after_finite) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
 

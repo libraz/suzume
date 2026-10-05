@@ -400,6 +400,13 @@ void adj_detail::appendHiraganaIAdjSurfaceCandidates(const std::vector<char32_t>
               verb_helpers::endsWithAuxiliaryAfterOkurigana(dict_manager, codepoints, start_pos, end_pos - 1)))) {
           continue;
         }
+        // The terminal copula plus a final particle closes a nominal predicate
+        // (そうだ+ぞい, そうだ+わい); it is not an adjective spelled だ+….
+        if (codepoints[start_pos] == U'だ' && !isAdjectiveInDictionary(dict_manager, cand.base_form) &&
+            verb_helpers::hasDictionaryEntry(dict_manager, std::string_view(surface).substr(core::kJapaneseCharBytes),
+                                             core::PartOfSpeech::Particle)) {
+          continue;
+        }
         // A registered auxiliary cell before ない is that auxiliary plus the
         // supplementary adjective (じゃ+ない), not one adjective じゃない.
         if (utf8::endsWith(surface, "ない") && surface.size() > core::kTwoJapaneseCharBytes &&

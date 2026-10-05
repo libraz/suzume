@@ -170,8 +170,10 @@ void setVerbAndAdjectiveCosts(BigramMatrix& table) {
       {EPOS::VerbOnbinkei, EPOS::AuxTenseTa, cost::kStrongBonus},
 
       // The onbin stem exists only to carry て/た and their contractions, so a
-      // predicate in the irrealis cannot follow it (できっこない is not で+きっ+こ).
+      // predicate in the irrealis or a terminal cannot follow it (できっこない is
+      // not で+きっ+こ, でやんす is not で+やん+す).
       {EPOS::VerbOnbinkei, EPOS::VerbMizenkei, cost::kSevere},
+      {EPOS::VerbOnbinkei, EPOS::VerbShuushikei, cost::kSevere},
 
       // A terminal form closes its clause, so a second one cannot follow it
       // without a particle or a conjunction in between. Two of them in a row is

@@ -965,8 +965,11 @@ EntrySpecRange getAuxiliaryEntries() {
       aux("ありんせん", "ある", EPOS::Unknown),
       aux("ざんす", "ある", EPOS::Unknown),
       aux("ざんせん", "ある", EPOS::Unknown),
-      aux("でありんす", "だ", EPOS::Unknown),
-      aux("でありんした", "だ", EPOS::Unknown),
+      // Role-language polite copulas. A connective で in front is the copula's
+      // own continuative and keeps its token (で+やんす, で+ござんす).
+      aux("ござんす", "ござる", EPOS::AuxGozaru),
+      aux("ざます", "ざます", EPOS::AuxCopulaDesu),
+      aux("やんす", "やんす", EPOS::AuxGozaru),
       aux("なんし", "ます", EPOS::AuxKuruwaPolite),
       aux("なんした", "ます", EPOS::AuxKuruwaPolite),
 
@@ -997,12 +1000,14 @@ EntrySpecRange getAuxiliaryEntries() {
       aux("っしょ", "です", EPOS::AuxCopulaDesu),  // でしょう contracted (行けるっしょ), lemma as でしょ
       aux("っした", "でした", EPOS::AuxCopulaDesu),
       aux("っすか", "ですか", EPOS::AuxCopulaDesu),
+      aux("っス", "です", EPOS::AuxCopulaDesu),
       // After the nominalizer ん the same contraction drops its っ (そうなん+す+か).
       aux("す", "です", EPOS::AuxCopulaDesu),
 
-      // Rabbit-like (兎系)
-      aux("ぴょん", "だ", EPOS::Unknown),
-      aux("ピョン", "だ", EPOS::Unknown),
+      // Rabbit-like (兎系) final particle: it closes a predicate without
+      // replacing a copula (走ろ+う+ぴょん).
+      particle("ぴょん", EPOS::ParticleFinal),
+      particle("ピョン", EPOS::ParticleFinal),
 
       // Ninja/Old-fashioned (忍者・古風)
       aux("ござる", "だ", EPOS::Unknown),

@@ -124,6 +124,12 @@ EntrySpecRange getParticleEntries() {
       particle("やんけ", EPOS::ParticleFinal),
       particle("ねん", EPOS::ParticleFinal),  // Kansai explanatory (読む+ねん)
       particle("え", EPOS::ParticleFinal),    // Kyoto clause-final (ます+え)
+      particle("のう", EPOS::ParticleFinal),  // western/elderly (走る+のう)
+      particle("ぞい", EPOS::ParticleFinal),
+      // Role-language tails close a predicate terminal the same way and never
+      // absorb it (走る+もふ, 走る+っぴ).
+      particle("もふ", EPOS::ParticleFinal),
+      particle("っぴ", EPOS::ParticleFinal),
       // Regional causal conjunctions, attaching to a predicate terminal
       // (飲む+さかい, 読む+けん). Both are homographic with a frequent
       // standard-language piece — the nominalizer さ, the final particle け —

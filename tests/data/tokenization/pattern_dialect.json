@@ -499,6 +499,190 @@
       ],
       "id": "ringogagi_usanaru",
       "input": "りんごがぎょうさんある。"
+    },
+    {
+      "description": "わかったぞい - auto-generated",
+      "expected": [
+        {
+          "lemma": "わかる",
+          "pos": "Verb",
+          "surface": "わかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "ぞい",
+          "pos": "Particle",
+          "surface": "ぞい"
+        }
+      ],
+      "id": "wakatttazoi",
+      "input": "わかったぞい"
+    },
+    {
+      "description": "そうだぞい - auto-generated",
+      "expected": [
+        {
+          "lemma": "そう",
+          "pos": "Adverb",
+          "surface": "そう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "ぞい",
+          "pos": "Particle",
+          "surface": "ぞい"
+        }
+      ],
+      "id": "soudazoi",
+      "input": "そうだぞい"
+    },
+    {
+      "description": "某が走るのう - auto-generated",
+      "expected": [
+        {
+          "lemma": "某",
+          "pos": "Pronoun",
+          "surface": "某"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "走る",
+          "pos": "Verb",
+          "surface": "走る"
+        },
+        {
+          "lemma": "のう",
+          "pos": "Particle",
+          "surface": "のう"
+        }
+      ],
+      "id": "ga_runou",
+      "input": "某が走るのう"
+    },
+    {
+      "description": "彼も応じてくれるでやんす - auto-generated",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "応じる",
+          "pos": "Verb",
+          "surface": "応じ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くれる",
+          "pos": "Auxiliary",
+          "surface": "くれる"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "lemma": "やんす",
+          "pos": "Auxiliary",
+          "surface": "やんす"
+        }
+      ],
+      "id": "mo_jitekurerudeyansu",
+      "input": "彼も応じてくれるでやんす"
+    },
+    {
+      "description": "そうでやんす - auto-generated",
+      "expected": [
+        {
+          "lemma": "そう",
+          "pos": "Adverb",
+          "surface": "そう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "lemma": "やんす",
+          "pos": "Auxiliary",
+          "surface": "やんす"
+        }
+      ],
+      "id": "soudeyansu",
+      "input": "そうでやんす"
+    },
+    {
+      "description": "言っちゃだめだよ - auto-generated",
+      "expected": [
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言っ"
+        },
+        {
+          "lemma": "ちゃ",
+          "pos": "Particle",
+          "surface": "ちゃ"
+        },
+        {
+          "lemma": "だめ",
+          "pos": "Adjective",
+          "surface": "だめ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "ttchi_damedayo",
+      "input": "言っちゃだめだよ"
+    },
+    {
+      "description": "学生ざます - auto-generated",
+      "expected": [
+        {
+          "lemma": "学生",
+          "pos": "Noun",
+          "surface": "学生"
+        },
+        {
+          "lemma": "ざます",
+          "pos": "Auxiliary",
+          "surface": "ざます"
+        }
+      ],
+      "id": "zamasu",
+      "input": "学生ざます"
     }
   ],
   "description": "pattern_dialect tests",
