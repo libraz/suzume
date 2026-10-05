@@ -835,15 +835,19 @@ def apply_suzume_split(tokens: list[dict]) -> tuple[list[dict], str | None]:
                 applied_rule = "ra-suffix-split"
             continue
 
-        # 0b. だって after a na-adjective stem is the copula plus the quotative,
-        # not the binding particle. The binding particle attaches to a nominal
-        # that already stands on its own (子供だって分かる); a 形容動詞語幹 needs a
-        # copula before anything can attach to it at all, so reading the whole
-        # thing as one particle deletes the predicate's assertion (無理|だ|って).
-        if surface == "だって" and t.get("pos") == "助詞" and token_index > 0:
+        # 0b. たって/だって after a host that cannot take a particle directly is
+        # the auxiliary plus the quotative, not one particle. The binding particle
+        # attaches to a nominal that already stands on its own (子供だって分かる);
+        # a 形容動詞語幹 needs a copula before anything can attach to it (無理|だ|って),
+        # and a 連用タ接続 cell needs the past auxiliary (言っ|た|って, 脱い|だ|って).
+        if surface in ("たって", "だって") and t.get("pos") == "助詞" and token_index > 0:
             previous = tokens[token_index - 1]
-            if previous.get("pos") == "名詞" and previous.get("pos_sub1") == "形容動詞語幹":
-                result.append({"surface": "だ", "pos": "助動詞", "lemma": "だ"})
+            after_stem = (
+                surface == "だって" and previous.get("pos") == "名詞" and previous.get("pos_sub1") == "形容動詞語幹"
+            )
+            after_ta_cell = previous.get("pos") in ("動詞", "形容詞") and previous.get("conj_form") == "連用タ接続"
+            if after_stem or after_ta_cell:
+                result.append({"surface": surface[0], "pos": "助動詞", "lemma": surface[0]})
                 result.append({"surface": "って", "pos": "助詞", "lemma": "って"})
                 if applied_rule is None:
                     applied_rule = "copula-quotative-split"

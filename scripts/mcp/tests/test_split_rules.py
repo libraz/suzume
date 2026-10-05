@@ -94,6 +94,19 @@ class TestPluralRaSplit:
         assert rule == "ra-suffix-split"
 
 
+class TestPastQuotativeSplit:
+    def test_splits_tatte_after_a_ta_connective_cell(self):
+        tokens = [_tok("言っ", pos="動詞", conj_form="連用タ接続"), _tok("たって", pos="助詞")]
+        result, rule = apply_suzume_split(tokens)
+        assert [token["surface"] for token in result] == ["言っ", "た", "って"]
+        assert rule == "copula-quotative-split"
+
+    def test_keeps_binding_datte_after_a_nominal(self):
+        tokens = [_tok("子供"), _tok("だって", pos="助詞")]
+        result, _ = apply_suzume_split(tokens)
+        assert [token["surface"] for token in result] == ["子供", "だって"]
+
+
 class TestTtaraSplit:
     def test_anata_ttara(self):
         tokens = [_tok("あなたったら")]

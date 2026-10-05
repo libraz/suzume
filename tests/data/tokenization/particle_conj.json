@@ -916,6 +916,82 @@
       ],
       "id": "ni_ruyainaya_ta",
       "input": "家に帰るやいなや寝た"
+    },
+    {
+      "description": "たって after a ta-connective cell is past た + quotative って",
+      "expected": [
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        }
+      ],
+      "id": "past_quotative_tatte_final",
+      "input": "言ったって。"
+    },
+    {
+      "description": "たって after a ta-connective cell is past た + って before a predicate",
+      "expected": [
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "無理",
+          "pos": "Adjective",
+          "surface": "無理"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "past_quotative_tatte_before_predicate",
+      "input": "言ったって無理だ"
+    },
+    {
+      "description": "たって after a ta-connective cell is past た + quotative って",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        }
+      ],
+      "id": "past_quotative_tatte_bare",
+      "input": "行ったって"
     }
   ],
   "description": "particle_conj tests",
