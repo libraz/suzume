@@ -1753,17 +1753,35 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                 if applied_rule is None:
                     applied_rule = "vowel-repeat"
 
-        # 4c. Emphatic sokuon in past tense
-        if not merged and t.get("pos") == "動詞" and "連用" in (t.get("conj_form") or ""):
-            j = i + 1
-            if j < len(tokens) and tokens[j].get("surface") == "たっ":
-                combined = t.get("surface", "") + "たっ"
-                lemma = t.get("lemma") or t.get("surface", "")
-                result.append({"surface": combined, "pos": "動詞", "lemma": lemma})
-                i = j + 1
-                merged = True
-                if applied_rule is None:
-                    applied_rule = "emphatic-sokuon"
+        # 4c. A sokuon after the past auxiliary: the reference reads た+っ as
+        # the verb たつ (or たる). Before the phrase end it is emphasis on the
+        # past, which keeps its own token (来+たっ, やっ+たっ); before more kana
+        # it geminates onto what follows (し+た+っちゃ, 泣い+た+っぴ).
+        if (
+            not merged
+            and t.get("pos") in ("動詞", "助動詞", "形容詞")
+            and "連用" in (t.get("conj_form") or "")
+            and i + 1 < len(tokens)
+            and tokens[i + 1].get("surface") == "たっ"
+            and tokens[i + 1].get("pos") == "動詞"
+        ):
+            result.append(t)
+            following = tokens[i + 2] if i + 2 < len(tokens) else None
+            if following is None or following.get("pos") == "記号":
+                result.append({"surface": "たっ", "pos": "助動詞", "lemma": "た"})
+            else:
+                result.append({"surface": "た", "pos": "助動詞", "lemma": "た"})
+                geminated = dict(following)
+                geminated["surface"] = "っ" + following.get("surface", "")
+                if (following.get("lemma") or following.get("surface")) == following.get("surface"):
+                    geminated["lemma"] = geminated["surface"]
+                # Keep the running text offsets: the mark moves, it is not added.
+                tokens[i + 1] = {**tokens[i + 1], "surface": "た"}
+                tokens[i + 2] = geminated
+            i += 2
+            merged = True
+            if applied_rule is None:
+                applied_rule = "emphatic-sokuon"
 
         # 4c-2. The colloquial negative elides the ら of a ra-row godan verb
         # (帰らない -> 帰んない, やらない -> やんない). The reference analyzer has

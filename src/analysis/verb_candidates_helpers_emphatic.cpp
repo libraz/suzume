@@ -166,6 +166,12 @@ void addEmphaticVariants(std::vector<UnknownCandidate>& candidates, const std::v
       continue;
     }
 
+    // A ta-form candidate ends in the past auxiliary, which keeps its own token
+    // and carries the emphasis itself (来+たっ, like やっ+たっ).
+    if (cand.extended_pos == core::ExtendedPOS::VerbTaForm) {
+      continue;
+    }
+
     // Add emphatic variant if we found any emphatic characters
     if (!emphatic.empty()) {
       UnknownCandidate emphatic_cand = cand;

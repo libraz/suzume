@@ -668,3 +668,19 @@ class TestCharacterSpeech:
     def test_leaves_homographs_outside_a_predicate_tail(self, text, surfaces):
         tokens, _, _ = get_expected_tokens(text)
         assert [token["surface"] for token in tokens] == surfaces
+
+
+class TestSokuonAfterPast:
+    @pytest.mark.parametrize(
+        ("text", "surfaces"),
+        [
+            ("来たっ", ["来", "たっ"]),
+            ("やったっ！すごい", ["やっ", "たっ", "すごい"]),
+            ("妾も同行したっちゃ", ["妾", "も", "同行", "し", "た", "っちゃ"]),
+            ("そうだったっちゃ", ["そう", "だっ", "た", "っちゃ"]),
+        ],
+    )
+    def test_past_auxiliary_keeps_its_token(self, text, surfaces):
+        tokens, _, _ = get_expected_tokens(text)
+        assert [token["surface"] for token in tokens] == surfaces
+        assert all(token["lemma"] == "た" for token in tokens if token["surface"] in ("た", "たっ"))
