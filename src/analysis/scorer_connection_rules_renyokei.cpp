@@ -89,16 +89,17 @@ float computeVerbRenyokeiEarlyBonus(const core::LatticeEdge& prev, const core::L
   // one-mora verb homographs stay available for closed particles such as しも.
   // Before ぬ the reading can only be the literary perfect: the negative ぬ
   // selects the irrealis, and for a Godan verb the two cells are distinct (摘ま
-  // vs 摘み). That boundary needs a decisive weight because the registered
-  // siblings win it only through their dictionary edge (積み+ぬ), which an
-  // unregistered base verb has no access to. Ichidan stems are outside both
+  // vs 摘み), so the perfect's own terminal entry takes it. That boundary needs
+  // a decisive weight because the registered siblings win it only through
+  // their dictionary edge (積み+ぬ), which an unregistered base verb has no
+  // access to. Ichidan stems are outside both
   // rules — their irrealis and continuative are syncretic, so 消え+ぬ is either
   // reading — as is the e-row passive れ, which must still split (行か+れ+ぬ).
   const bool godan_continuative =
       prev.extended_pos == core::ExtendedPOS::VerbRenyokei && kana::isIRowCodepoint(utf8::decodeLastChar(prev.surface));
   const bool topicalized_continuative = godan_continuative && next.extended_pos == core::ExtendedPOS::ParticleTopic &&
                                         prev.surface.size() >= core::kTwoJapaneseCharBytes;
-  const bool literary_perfect = godan_continuative && next.extended_pos == core::ExtendedPOS::AuxNegativeNu &&
+  const bool literary_perfect = godan_continuative && next.extended_pos == core::ExtendedPOS::AuxClassicalPerfect &&
                                 utf8::equalsAny(next.surface, {"ぬ"});
   if (topicalized_continuative)
     SUZUME_CONNECTION_ADD(bonus, cost::kModerateBonus);

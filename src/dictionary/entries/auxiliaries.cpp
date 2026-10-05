@@ -107,9 +107,11 @@ EntrySpecRange getAuxiliaryEntries() {
       // a clause end.
       aux("つ", "つ", EPOS::AuxClassicalPerfect),
       aux("り", "り", EPOS::AuxClassicalPerfect),  // 存続 (行けり)
-      // 完了 ぬ (ナ変). Its terminal shares a spelling with the negative ぬ, which
-      // is already registered; the cells that do not are the ones a continuative
-      // hosts (花散り+ぬる, 心こそ定まり+ぬれ).
+      // 完了 ぬ (ナ変). Its terminal shares a spelling with the negative ぬ; the
+      // two are told apart by the cell in front (散り+ぬ is the perfect on a
+      // continuative, 知ら+ぬ the negative on an irrealis). The imperative ね is
+      // left out: it is also the negative's 已然形 and the final particle.
+      aux("ぬ", "ぬ", EPOS::AuxClassicalPerfect),    // 終止形 (秋来ぬ, 散りぬ)
       aux("ぬる", "ぬ", EPOS::AuxClassicalPerfect),  // 連体形 (花ぞ散りぬる)
       aux("ぬれ", "ぬ", EPOS::AuxClassicalPerfect),  // 已然形 (花こそ散りぬれ)
       // 連用形 に. One mora, and the spelling of the commonest case particle, so

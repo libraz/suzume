@@ -2212,9 +2212,13 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     // The continuative cell is licensed by a different follower: it hands the
     // predicate to the literary past instead of closing the clause its own form
     // would end (来+に+けり).
+    // The terminal also hands its clause to a further literary auxiliary
+    // (散り+ぬ+べし, 確認し+ぬ+らむ), which is as decisive as the clause end.
     const bool continuative_environment =
-        grammar::spellsClassicalPerfectContinuative(result.entry->surface) &&
-        verb_helpers::literaryPastAuxiliaryFollowsAt(dict_manager_, codepoints, end_pos);
+        (grammar::spellsClassicalPerfectContinuative(result.entry->surface) &&
+         verb_helpers::literaryPastAuxiliaryFollowsAt(dict_manager_, codepoints, end_pos)) ||
+        (!grammar::spellsClassicalPerfectContinuative(result.entry->surface) &&
+         verb_helpers::classicalAuxiliaryFollowsAt(&dict_manager_, codepoints, end_pos));
     if (result.entry->extended_pos == core::ExtendedPOS::AuxClassicalPerfect && end_pos == start_pos + 1 &&
         !hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbKateikei) &&
         !(hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbRenyokei) &&
