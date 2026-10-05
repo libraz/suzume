@@ -635,6 +635,21 @@ def _spans_one_mimetic(tokens: list[dict], following: dict | None) -> bool:
     return not any(_is_licensed_attachment(tokens[pos - 1], token) for pos, token in enumerate(tokens) if pos > 0)
 
 
+_DOUBLED_NASAL_MIMETIC = regex.compile(r"(\p{Hiragana}{2,4}ん)\1")
+
+
+def _doubled_nasal_mimetic_end(tokens: list[dict], start: int) -> int | None:
+    """End index of tokens from `start` that spell exactly a doubled Xん, if any."""
+    combined = ""
+    for end in range(start, len(tokens)):
+        combined += tokens[end].get("surface", "")
+        if len(combined) > 10:
+            return None
+        if _DOUBLED_NASAL_MIMETIC.fullmatch(combined):
+            return end + 1
+    return None
+
+
 def _postprocess_productive_mimetics(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
     """Rebuild productive mimetic search units from arbitrary MeCab splits.
 
@@ -681,6 +696,19 @@ def _postprocess_productive_mimetics(result: list[dict], applied_rule: str | Non
             idx += 1
             if applied_rule is None:
                 applied_rule = "productive-mimetic-suru"
+            continue
+
+        # A doubled Xん (ごろん+ごろん, ぽろん+ぽろん) is one mimetic whatever the
+        # pieces were read as: the reference cuts each half into bound nouns,
+        # verb cells or adjective stems, and an exact doubling of a nasal-closed
+        # stem is no phrase. A one-mora X (なん+なん) is left to the general rule.
+        doubled_end = _doubled_nasal_mimetic_end(result, idx)
+        if doubled_end is not None and (result[idx].get("pos") != "助詞" or idx == 0):
+            combined = "".join(token.get("surface", "") for token in result[idx:doubled_end])
+            normalized.append({"surface": combined, "pos": "副詞", "lemma": combined})
+            idx = doubled_end
+            if applied_rule is None:
+                applied_rule = "productive-mimetic"
             continue
 
         matched = False

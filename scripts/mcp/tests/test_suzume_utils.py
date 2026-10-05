@@ -782,3 +782,14 @@ class TestContractedKuru:
         tokens, _, _ = get_expected_tokens(text)
         kun = next(token for token in tokens if token["surface"] == "くん")
         assert (kun["pos"], kun["lemma"]) == ("Auxiliary", lemma)
+
+
+class TestDoubledNasalMimetic:
+    @pytest.mark.parametrize("text", ["ごろんごろん", "ころんころん", "ぽろんぽろん"])
+    def test_doubling_is_one_adverb(self, text):
+        tokens, _, _ = get_expected_tokens(text)
+        assert [(token["surface"], token["pos"]) for token in tokens] == [(text, "Adverb")]
+
+    def test_single_half_keeps_its_verb(self):
+        tokens, _, _ = get_expected_tokens("ころんで")
+        assert [token["surface"] for token in tokens] == ["ころん", "で"]

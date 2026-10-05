@@ -1644,6 +1644,47 @@
       ],
       "id": "gadokidokishita",
       "input": "胸がどきどきした"
+    },
+    {
+      "description": "ごろんごろん転がる - auto-generated",
+      "expected": [
+        {
+          "lemma": "ごろんごろん",
+          "pos": "Adverb",
+          "surface": "ごろんごろん"
+        },
+        {
+          "lemma": "転がる",
+          "pos": "Verb",
+          "surface": "転がる"
+        }
+      ],
+      "id": "gorongoron_garu",
+      "input": "ごろんごろん転がる"
+    },
+    {
+      "description": "ころんころん - auto-generated",
+      "expected": [
+        {
+          "lemma": "ころんころん",
+          "pos": "Adverb",
+          "surface": "ころんころん"
+        }
+      ],
+      "id": "koronkoron",
+      "input": "ころんころん"
+    },
+    {
+      "description": "ぽろんぽろん - auto-generated",
+      "expected": [
+        {
+          "lemma": "ぽろんぽろん",
+          "pos": "Adverb",
+          "surface": "ぽろんぽろん"
+        }
+      ],
+      "id": "poronporon",
+      "input": "ぽろんぽろん"
     }
   ],
   "description": "Onomatopoeia and mimetic words",
