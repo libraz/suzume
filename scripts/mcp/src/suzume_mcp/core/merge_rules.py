@@ -255,13 +255,17 @@ def _heads_nidan_cell(tokens: list[dict], index: int) -> bool:
 _TEMPORAL_RELATION_SUFFIXES = frozenset({"前", "後"})
 
 
-def _starts_with_kanji(surface: str) -> bool:
-    """Whether a surface opens with a kanji."""
-    return regex.match(r"\p{Han}", surface) is not None
-
-
 # Kanji closing a quantity phrase after the noun it measures (2段階+目, 3時限+目).
 _QUANTITY_PHRASE_SUFFIXES = frozenset({"半", "目", "間"})
+
+
+def _is_plain_kanji_noun(token: dict) -> bool:
+    """Whether a token is an all-kanji common noun that can extend a quantity phrase."""
+    return (
+        token.get("pos") == "名詞"
+        and token.get("pos_sub1") not in ("数", "代名詞", "固有名詞", "非自立")
+        and regex.fullmatch(r"\p{Han}+", token.get("surface", "")) is not None
+    )
 
 
 def _absorb_unevenly_cut_kanji_run(
@@ -280,26 +284,17 @@ def _absorb_unevenly_cut_kanji_run(
     """
     absorbed_counter = j > i + 1 and last_was_counter
     k = j
-    run = ""
-    while k < len(tokens):
-        nxt = tokens[k]
-        ns = nxt.get("surface", "")
-        if not (
-            nxt.get("pos") == "名詞"
-            and nxt.get("pos_sub1") not in ("数", "代名詞", "固有名詞", "非自立")
-            and regex.fullmatch(r"\p{Han}+", ns)
-        ):
-            break
-        run += ns
+    while k < len(tokens) and _is_plain_kanji_noun(tokens[k]):
         k += 1
+    run = "".join(tok["surface"] for tok in tokens[j:k])
     if not run or run[0] in _TEMPORAL_RELATION_SUFFIXES:
         return j, combined
+    noun = tokens[j].get("surface", "")
     if absorbed_counter:
         counter_len = 0
     elif j == i + 1 and reads_as_counter(run[0], suffix_only=True):
-        first = tokens[j].get("surface", "")
         counter_len = 1
-        while counter_len < len(first) and reads_as_counter(first[counter_len]):
+        while counter_len < len(noun) and reads_as_counter(noun[counter_len]):
             counter_len += 1
     else:
         return j, combined
@@ -310,8 +305,8 @@ def _absorb_unevenly_cut_kanji_run(
         return k, combined + run
     # An even remainder after a noun made of counters alone still takes that
     # noun as the counter (3段階+評価).
-    if not absorbed_counter and counter_len == len(tokens[j].get("surface", "")):
-        return j + 1, combined + tokens[j].get("surface", "")
+    if not absorbed_counter and counter_len == len(noun):
+        return j + 1, combined + noun
     return j, combined
 
 
