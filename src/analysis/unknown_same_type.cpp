@@ -345,6 +345,20 @@ bool startsAfterDictionaryPredicate(const std::vector<char32_t>& codepoints,
   return hasDictionaryEntryFrom(dict_manager, codepoints, start_pos - 1, 2, run_end - start_pos + 1, pos, nullptr);
 }
 
+// Whether the one-mora particle at @p pos closes a short noun at the clause
+// start: a case particle other than the quotative と and genitive の, or the
+// topic は, whose word-final use is the particle alone (そら|は, さき|に).
+bool closesShortNounAt(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
+                       size_t pos) {
+  if (dict_manager == nullptr || pos >= codepoints.size() || codepoints[pos] == U'と' || codepoints[pos] == U'の') {
+    return false;
+  }
+  const auto* particle = lookupEntryInRange(*dict_manager, codepoints, pos, pos + 1, core::PartOfSpeech::Particle);
+  return particle != nullptr &&
+         (particle->extended_pos == core::ExtendedPOS::ParticleCase ||
+          (particle->extended_pos == core::ExtendedPOS::ParticleTopic && codepoints[pos] == U'は'));
+}
+
 // Whether the kanji just before @p kana_start heads a predicate whose
 // okurigana starts at @p kana_start (外|飲み|たい, 地|固まる, 駅|遠い). A
 // registered verb gives the proof directly; otherwise the inflection analyzer
@@ -1401,8 +1415,10 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       if ((scan > start_pos || !particle_initial) && isInternalParticleChar(curr)) {
         // A particle char followed by a fresh (non-hiragana) word is a trailing case
         // particle (…およぎ|に|行く): stop before it so the right-bracket test sees it.
-        // At the run's end it is word-final (こども), so keep it, capped by max_internal.
-        bool word_follows = scan + 1 < codepoints.size() && char_types[scan + 1] != normalize::CharType::Hiragana;
+        // At the run's end, before punctuation as at the end of the text, it is
+        // word-final (こども、 like こども), so keep it, capped by max_internal.
+        bool word_follows = scan + 1 < codepoints.size() && char_types[scan + 1] != normalize::CharType::Hiragana &&
+                            !isNonWordType(char_types[scan + 1]);
         // A particle is only word-internal where no word has ended yet. Once the
         // run so far is itself a listed content word, the particle attaches to
         // that word (ただ+で), and swallowing it invents a nominal that then
@@ -1426,6 +1442,22 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       const size_t probe_end = std::min(codepoints.size(), pos + kSuffixProbe);
       for (const auto& match : lookupResultsInRange(*dict_manager_, codepoints, pos, probe_end)) {
         if (match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Suffix && match.length >= 2) {
+          longest = std::max(longest, match.length);
+        }
+      }
+      return longest;
+    };
+    // Length of the longest registered pronoun of two or more kana that opens
+    // at @p pos, or 0. A pronoun stands on its own and never closes a noun.
+    auto pronoun_length_at = [&](size_t pos) -> size_t {
+      constexpr size_t kPronounProbe = 4;
+      size_t longest = 0;
+      if (dict_manager_ == nullptr || pos >= codepoints.size()) {
+        return longest;
+      }
+      const size_t probe_end = std::min(codepoints.size(), pos + kPronounProbe);
+      for (const auto& match : lookupResultsInRange(*dict_manager_, codepoints, pos, probe_end)) {
+        if (match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Pronoun && match.length >= 2) {
           longest = std::max(longest, match.length);
         }
       }
@@ -1578,9 +1610,6 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
           dict_manager_ != nullptr && scan < codepoints.size()
               ? lookupEntryInRange(*dict_manager_, codepoints, scan, scan + 1, core::PartOfSpeech::Particle)
               : nullptr;
-      const bool short_bos_case_particle_bracket =
-          left_clause_bracket && promoted_dictionary_reading == nullptr && short_right_particle != nullptr &&
-          short_right_particle->extended_pos == core::ExtendedPOS::ParticleCase && codepoints[scan] != U'と';
       // A two-mora run with no reading of its own at all — neither registered
       // nor inflected — is a noun when the clause start or a determiner opens it
       // and the clause closes it (この|へや|、), or when it opens the clause and
@@ -1620,6 +1649,11 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
           return reading.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence;
         });
       }();
+      // The topic は closes only a run with no reading at all (して+は is a
+      // te-form plus the topic, not a noun).
+      const bool short_bos_case_particle_bracket = left_clause_bracket && promoted_dictionary_reading == nullptr &&
+                                                   closesShortNounAt(dict_manager_, codepoints, scan) &&
+                                                   (codepoints[scan] != U'は' || unread_short_run);
       const bool unread_short_run_bracketed =
           unread_short_run &&
           (((left_clause_bracket || left_determiner_bracket) && right_clause) || right_short_genitive);
@@ -1762,10 +1796,11 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
           grammar::isSinoHonorificPrefix(extractSubstring(codepoints, start_pos, start_pos + 1));
       // Nor may it close on, or cut into, a registered suffix after a stem of
       // its own (かな+さん, not かなさん or かなさ+ん): the suffix attaches to the
-      // noun before it, which the suffix bracket below offers instead.
+      // noun before it, which the suffix bracket below offers instead. A
+      // registered pronoun there is closed the same way (わて+ここ).
       bool absorbs_trailing_suffix = false;
       for (size_t suffix_start = start_pos + 2; suffix_start < scan && !absorbs_trailing_suffix; ++suffix_start) {
-        const size_t suffix_len = suffix_length_at(suffix_start);
+        const size_t suffix_len = std::max(suffix_length_at(suffix_start), pronoun_length_at(suffix_start));
         absorbs_trailing_suffix = suffix_len > 0 && suffix_start + suffix_len >= scan;
       }
       if ((len >= min_len || short_bos_preparatory_homograph) &&
@@ -1878,6 +1913,16 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       }
     };
     emit_promoted_run(scan);
+    // At the clause start a case particle or the topic は inside the scanned
+    // run may equally close a short noun (そら|は|いつも, ねこ|が), so the run
+    // that stops there is offered beside the maximal one and scoring weighs
+    // them. Word-final は is read as the particle alone; も, か and the other
+    // focus particles end native nouns as often as not (こども, くも).
+    for (size_t particle_pos = start_pos + 2; left_clause_bracket && particle_pos < scan; ++particle_pos) {
+      if (closesShortNounAt(dict_manager_, codepoints, particle_pos)) {
+        emit_promoted_run(particle_pos);
+      }
+    }
     // The scan runs on through a genitive inside its first three morae, so the
     // two-mora run it closes at the clause start is offered on its own.
     constexpr size_t kShortRunLength = 2;
@@ -1905,7 +1950,7 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
     for (size_t trimmed = start_pos + 1; trimmed < scan; ++trimmed) {
       if (boundAuxiliaryAt(codepoints, trimmed, dict_manager_, left_particle_bracket || left_clause_bracket).length >
               0 ||
-          (trimmed >= start_pos + 2 && suffix_length_at(trimmed) > 0)) {
+          (trimmed >= start_pos + 2 && (suffix_length_at(trimmed) > 0 || pronoun_length_at(trimmed) > 0))) {
         emit_promoted_run(trimmed);
       }
     }

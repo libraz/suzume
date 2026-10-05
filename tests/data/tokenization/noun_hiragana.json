@@ -504,6 +504,74 @@
       ],
       "id": "nekonoshittpo",
       "input": "ねこのしっぽ"
+    },
+    {
+      "description": "ねこが。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "ねこ",
+          "pos": "Noun",
+          "surface": "ねこ"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        }
+      ],
+      "id": "nekoga",
+      "input": "ねこが。"
+    },
+    {
+      "description": "こども、 - auto-generated",
+      "expected": [
+        {
+          "lemma": "こども",
+          "pos": "Noun",
+          "surface": "こども"
+        }
+      ],
+      "id": "kodomo_2",
+      "input": "こども、"
+    },
+    {
+      "description": "へやはいつも - auto-generated",
+      "expected": [
+        {
+          "lemma": "へや",
+          "pos": "Noun",
+          "surface": "へや"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "いつも",
+          "pos": "Adverb",
+          "surface": "いつも"
+        }
+      ],
+      "id": "heyahaitsumo",
+      "input": "へやはいつも"
+    },
+    {
+      "description": "へやは - auto-generated",
+      "expected": [
+        {
+          "lemma": "へや",
+          "pos": "Noun",
+          "surface": "へや"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        }
+      ],
+      "id": "heyaha",
+      "input": "へやは"
     }
   ],
   "description": "noun_hiragana tests",
