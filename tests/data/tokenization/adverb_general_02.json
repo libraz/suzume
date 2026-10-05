@@ -2558,8 +2558,194 @@
       ],
       "id": "yaru_ga_ta",
       "input": "俄然やる気が出た"
+    },
+    {
+      "description": "当然と思う - regression test",
+      "expected": [
+        {
+          "lemma": "当然",
+          "pos": "Adverb",
+          "surface": "当然"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "思う",
+          "pos": "Verb",
+          "surface": "思う"
+        }
+      ],
+      "id": "to_u_2",
+      "input": "当然と思う"
+    },
+    {
+      "description": "当然知っている - regression test",
+      "expected": [
+        {
+          "lemma": "当然",
+          "pos": "Adverb",
+          "surface": "当然"
+        },
+        {
+          "lemma": "知る",
+          "pos": "Verb",
+          "surface": "知っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "ttteiru_3",
+      "input": "当然知っている"
+    },
+    {
+      "description": "当然だ - regression test",
+      "expected": [
+        {
+          "lemma": "当然",
+          "pos": "Adjective",
+          "surface": "当然"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "da_9",
+      "input": "当然だ"
+    },
+    {
+      "description": "偶然と必然 - regression test",
+      "expected": [
+        {
+          "lemma": "偶然",
+          "pos": "Noun",
+          "surface": "偶然"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "必然",
+          "pos": "Noun",
+          "surface": "必然"
+        }
+      ],
+      "id": "to_3",
+      "input": "偶然と必然"
+    },
+    {
+      "description": "天然と養殖 - regression test",
+      "expected": [
+        {
+          "lemma": "天然",
+          "pos": "Noun",
+          "surface": "天然"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "養殖",
+          "pos": "Noun",
+          "surface": "養殖"
+        }
+      ],
+      "id": "to_4",
+      "input": "天然と養殖"
+    },
+    {
+      "description": "必然と言える - regression test",
+      "expected": [
+        {
+          "lemma": "必然",
+          "pos": "Noun",
+          "surface": "必然"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "言える",
+          "pos": "Verb",
+          "surface": "言える"
+        }
+      ],
+      "id": "to_eru",
+      "input": "必然と言える"
+    },
+    {
+      "description": "同然と言える - regression test",
+      "expected": [
+        {
+          "lemma": "同然",
+          "pos": "Adjective",
+          "surface": "同然"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "言える",
+          "pos": "Verb",
+          "surface": "言える"
+        }
+      ],
+      "id": "to_eru_2",
+      "input": "同然と言える"
+    },
+    {
+      "description": "自然と笑顔になる - regression test",
+      "expected": [
+        {
+          "lemma": "自然",
+          "pos": "Adjective",
+          "surface": "自然"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "笑顔",
+          "pos": "Noun",
+          "surface": "笑顔"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なる"
+        }
+      ],
+      "id": "to_ninaru",
+      "input": "自然と笑顔になる"
     }
   ],
-  "description": "General adverbs (part 2/2)",
+  "description": "General adverbs (part 2/3)",
   "version": "1.0"
 }

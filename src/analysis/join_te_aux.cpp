@@ -81,12 +81,15 @@ void addTaruAdjectiveJoinCandidates(core::Lattice& lattice, std::string_view tex
   // own, and with the iteration mark that reading is usually a plural whose と
   // is the comitative case particle (人々と話す, 我々と行く) — the opposite
   // analysis. Any part of speech but an adverb counts here, since the plural
-  // pronouns are not nouns; a listed adverb (俄然) is the same manner reading.
+  // pronouns are not nouns; a listed adverb (俄然) is the same manner reading,
+  // but one that is also an adjectival noun (当然) is not a taru nominal.
   // Only the whole nominal is matched: a listed first kanji (a given name 凛)
   // says nothing about 凛然, except as the base of a reduplicated plural.
-  const auto* listed = lookupEntryInRange(dict_manager, codepoints, start_pos, kanji_end);
-  if (listed != nullptr && listed->pos != core::PartOfSpeech::Adverb) {
-    return;
+  const size_t nominal_len = kanji_end - start_pos;
+  for (const auto& match : lookupResultsInRange(dict_manager, codepoints, start_pos, kanji_end)) {
+    if (match.length == nominal_len && match.entry != nullptr && match.entry->pos != core::PartOfSpeech::Adverb) {
+      return;
+    }
   }
   if (last_kanji == U'々' && lookupEntryInRange(dict_manager, codepoints, start_pos, kanji_end - 1) != nullptr) {
     return;

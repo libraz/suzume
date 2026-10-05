@@ -3,6 +3,7 @@
 import regex
 
 from .constants import (
+    ADVERBIAL_NA_ADJECTIVES,
     COLLOQUIAL_PRONOUNS,
     COMPOUND_VERB_V2_GODAN,
     COMPOUND_VERB_V2_ICHIDAN,
@@ -25,7 +26,7 @@ from .constants import (
     TEMPORAL_COMPOUND_UNITS,
     TEMPORAL_PREFIX_KANJI,
 )
-from .core_lexicon import core_headwords_by_length, kana_i_adjective_lemmas
+from .core_lexicon import core_headwords, core_headwords_by_length, kana_i_adjective_lemmas
 from .mecab import is_single_token_of_pos, mecab_analyze, reads_as_counter
 from .merge_postprocessors import (
     KARI_MIZENKEI_CELL,
@@ -1654,7 +1655,10 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                 adverb = derived_tari.group(0)
                 previous_surface = result[-1].get("surface", "") if result else ""
                 following_surface = remaining[len(adverb) : len(adverb) + 1]
-                if previous_surface == "の" and following_surface == "は":
+                if (previous_surface == "の" and following_surface == "は") or (
+                    adverb[:-1] in core_headwords("nouns.tsv") | core_headwords("adjectives.tsv")
+                    or adverb[:-1] in ADVERBIAL_NA_ADJECTIVES
+                ):
                     derived_tari = None
             if derived_tari is not None:
                 adverb = derived_tari.group(0)

@@ -178,6 +178,9 @@ EntrySpecRange getPronounEntries() {
       na_adj("たいへん", "たいへん"),
       adv("大変", ""),
       na_adj("大変", "大変"),
+      // 当然 is the same double word (当然知っている, 当然だ, 当然な結果).
+      adv("当然", ""),
+      na_adj("当然", "当然"),
       adv("すごく", ""),
       adv("ちょっと", ""),
       adv("もっと", ""),
