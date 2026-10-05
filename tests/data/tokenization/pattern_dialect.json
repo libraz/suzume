@@ -744,6 +744,50 @@
       ],
       "id": "shiimofu",
       "input": "楽しいもふ"
+    },
+    {
+      "description": "走ろうぴょん - auto-generated",
+      "expected": [
+        {
+          "lemma": "走る",
+          "pos": "Verb",
+          "surface": "走ろ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        },
+        {
+          "lemma": "ぴょん",
+          "pos": "Particle",
+          "surface": "ぴょん"
+        }
+      ],
+      "id": "roupi_n",
+      "input": "走ろうぴょん"
+    },
+    {
+      "description": "食べようぴょん - auto-generated",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べよ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        },
+        {
+          "lemma": "ぴょん",
+          "pos": "Particle",
+          "surface": "ぴょん"
+        }
+      ],
+      "id": "beyoupi_n",
+      "input": "食べようぴょん"
     }
   ],
   "description": "pattern_dialect tests",

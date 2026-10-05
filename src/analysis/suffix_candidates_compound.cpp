@@ -977,6 +977,11 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
   if (first_hira == U'な' && (second_hira == U'ら' || second_hira == U'か')) {
     looks_like_aux = true;
   }
+  // An o-row irrealis followed by the volitional う (走ろ+う, 食べよ+う) is a
+  // predicate, not the inside of a compound noun.
+  if (kana::isORowCodepoint(first_hira) && verb_helpers::volitionalEndingFollowsAt(codepoints, kanji_end + 1)) {
+    looks_like_aux = true;
+  }
   // Godan verb shuushikei (終止形) pattern
   // e.g., 休む, 行く, 泳ぐ, 話す, 立つ, 死ぬ, 飛ぶ, 取る
   // If first hiragana is a godan verb ending, kanji+first hiragana likely forms
