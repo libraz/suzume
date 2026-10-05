@@ -17,6 +17,7 @@
 #include "grammar/honorific_verbs.h"
 #include "grammar/verb_endings.h"
 #include "normalize/char_type.h"
+#include "normalize/utf8.h"
 #include "tokenizer_utils.h"
 #include "unknown.h"
 #include "verb_candidates.h"
@@ -295,42 +296,58 @@ void appendClassicalNidanCandidates(const std::vector<char32_t>& codepoints, siz
     return;
   }
   const size_t stem_start = kanji_end - 1;
-  if (!opensPredicateSlot(codepoints, stem_start, dict_manager)) {
-    return;
+  // The stem may carry one okurigana mora before the row's ending (聞こ+ゆ). That
+  // spelling is admitted only where the modern lower-monograde verb it became
+  // is attested (聞こえる), since the okurigana is otherwise any word's tail.
+  for (size_t terminal_pos = kanji_end; terminal_pos <= kanji_end + 1 && terminal_pos < hiragana_end; ++terminal_pos) {
+    const char32_t terminal = codepoints[terminal_pos];
+    if (!grammar::isBigradeTerminalKana(terminal)) {
+      continue;
+    }
+    if (terminal_pos > kanji_end) {
+      const char32_t e_row = grammar::bigradeIrrealisKana(terminal);
+      if (e_row == 0 || !vh::isVerbInDictionary(dict_manager, extractSubstring(codepoints, stem_start, terminal_pos) +
+                                                                  normalize::encodeUtf8(e_row) + "る")) {
+        continue;
+      }
+    }
+    // A sentence opens a predicate slot as well, but only a terminal the modern
+    // paradigm never spells can rely on it (燃ゆ+べし, 見ゆ).
+    if (!opensPredicateSlot(codepoints, stem_start, dict_manager) &&
+        !(stem_start == 0 && !grammar::isModernGodanTerminalKana(terminal))) {
+      continue;
+    }
+    const bool is_attributive = terminal_pos + 1 < hiragana_end && codepoints[terminal_pos + 1] == core::hiragana::kRu;
+    // The same kana spell classical auxiliaries that take a 未然形 or a 連用形
+    // (見+つる, 見+ぬる). Behind a stem that is a verb on its own, the kana is that
+    // auxiliary and not the row's ending.
+    if (terminal_pos == kanji_end && grammar::isClassicalAuxiliaryHomographKana(terminal) &&
+        vh::isSingleKanjiIchidan(codepoints[stem_start])) {
+      continue;
+    }
+    // The 連体形 needs a candidate on every row, since its trailing る otherwise
+    // reads as a separate auxiliary. The 終止形 needs one only where the modern
+    // paradigm cannot reach the form: the rows it kept are built by the
+    // conjugation table on their own (受く, 過ぐ), and the ha row has its own
+    // paradigm above, which leaves 越ゆ and 出づ.
+    if (!is_attributive &&
+        (grammar::isModernGodanTerminalKana(terminal) || classicalHaRowCell(terminal) != core::ExtendedPOS::Unknown ||
+         !shuushikeiEndsAt(codepoints, terminal_pos + 1, dict_manager))) {
+      continue;
+    }
+    const size_t end_pos = is_attributive ? terminal_pos + 2 : terminal_pos + 1;
+    // Inside a kanji run, kana that spell a bound derivational suffix verb belong
+    // to that suffix and the run is its host (学者+ぶる, not 学+者ぶる).
+    if (stem_start > 0 && normalize::classifyChar(codepoints[stem_start - 1]) == normalize::CharType::Kanji &&
+        grammar::spellsBoundDerivationalSuffixCell(extractSubstring(codepoints, kanji_end, end_pos))) {
+      continue;
+    }
+    const std::string lemma = extractSubstring(codepoints, stem_start, terminal_pos + 1);
+    candidates.push_back(makeVerbCandidate(
+        codepoints, stem_start, end_pos, candidate::verb_cost::kClassicalHaRowLicensedCost, lemma,
+        dictionary::ConjugationType::Ichidan, true, CandidateOrigin::VerbKanji, candidate::kNoConfidence,
+        "classical_nidan_cell", is_attributive ? core::ExtendedPOS::VerbRentaikei : core::ExtendedPOS::VerbShuushikei));
   }
-  const char32_t terminal = codepoints[kanji_end];
-  const bool is_attributive = kanji_end + 1 < hiragana_end && codepoints[kanji_end + 1] == core::hiragana::kRu;
-  // The same kana spell classical auxiliaries that take a 未然形 or a 連用形
-  // (見+つる, 見+ぬる). Behind a stem that is a verb on its own, the kana is that
-  // auxiliary and not the row's ending.
-  if (grammar::isClassicalAuxiliaryHomographKana(terminal) && vh::isSingleKanjiIchidan(codepoints[stem_start])) {
-    return;
-  }
-  if (!grammar::isBigradeTerminalKana(terminal)) {
-    return;
-  }
-  // The 連体形 needs a candidate on every row, since its trailing る otherwise
-  // reads as a separate auxiliary. The 終止形 needs one only where the modern
-  // paradigm cannot reach the form: the rows it kept are built by the
-  // conjugation table on their own (受く, 過ぐ), and the ha row has its own
-  // paradigm above, which leaves 越ゆ and 出づ.
-  if (!is_attributive &&
-      (grammar::isModernGodanTerminalKana(terminal) || classicalHaRowCell(terminal) != core::ExtendedPOS::Unknown ||
-       !shuushikeiEndsAt(codepoints, kanji_end + 1, dict_manager))) {
-    return;
-  }
-  const size_t end_pos = is_attributive ? kanji_end + 2 : kanji_end + 1;
-  // Inside a kanji run, kana that spell a bound derivational suffix verb belong
-  // to that suffix and the run is its host (学者+ぶる, not 学+者ぶる).
-  if (stem_start > 0 && normalize::classifyChar(codepoints[stem_start - 1]) == normalize::CharType::Kanji &&
-      grammar::spellsBoundDerivationalSuffixCell(extractSubstring(codepoints, kanji_end, end_pos))) {
-    return;
-  }
-  const std::string lemma = extractSubstring(codepoints, stem_start, kanji_end + 1);
-  candidates.push_back(makeVerbCandidate(
-      codepoints, stem_start, end_pos, candidate::verb_cost::kClassicalHaRowLicensedCost, lemma,
-      dictionary::ConjugationType::Ichidan, true, CandidateOrigin::VerbKanji, candidate::kNoConfidence,
-      "classical_nidan_cell", is_attributive ? core::ExtendedPOS::VerbRentaikei : core::ExtendedPOS::VerbShuushikei));
 }
 
 }  // namespace

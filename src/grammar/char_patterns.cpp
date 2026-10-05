@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <array>
 #include <string>
+#include <utility>
 
 #include "core/kana_constants.h"
 #include "core/utf8_constants.h"
@@ -244,6 +245,26 @@ bool isBigradeTerminalKana(char32_t code) {
   constexpr std::array<char32_t, 11> kBigradeTerminals = {U'う', U'く', U'ぐ', U'つ', U'づ', U'ぬ',
                                                           U'ふ', U'ぶ', U'む', U'ゆ', U'る'};
   return kana::isCodepointIn(kBigradeTerminals, code);
+}
+
+char32_t bigradeIrrealisKana(char32_t terminal) {
+  constexpr std::array<std::pair<char32_t, char32_t>, 11> kIrrealis = {{{U'う', U'え'},
+                                                                        {U'く', U'け'},
+                                                                        {U'ぐ', U'げ'},
+                                                                        {U'つ', U'て'},
+                                                                        {U'づ', U'で'},
+                                                                        {U'ぬ', U'ね'},
+                                                                        {U'ふ', U'へ'},
+                                                                        {U'ぶ', U'べ'},
+                                                                        {U'む', U'め'},
+                                                                        {U'ゆ', U'え'},
+                                                                        {U'る', U'れ'}}};
+  for (const auto& [u_row, e_row] : kIrrealis) {
+    if (u_row == terminal) {
+      return e_row;
+    }
+  }
+  return 0;
 }
 
 std::string yaRowBigradeTerminalLemma(std::string_view base_form) {

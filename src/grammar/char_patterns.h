@@ -163,6 +163,14 @@ bool isLeftBranchingPrefixKanji(char32_t code);
 bool isBigradeTerminalKana(char32_t code);
 
 /**
+ * @brief The irrealis (え段) kana of a bigrade terminal kana (ゆ → え, む → め)
+ *
+ * The lower-bigrade verbs became the modern lower-monograde ones on this kana
+ * (聞こゆ → 聞こえる). Returns 0 for a kana that is not a bigrade terminal.
+ */
+char32_t bigradeIrrealisKana(char32_t terminal);
+
+/**
  * @brief Terminal form behind a ヤ行 bigrade attributive, or empty
  *
  * A ヤ行 bigrade verb has no modern headword, so a reverse analysis reaches its

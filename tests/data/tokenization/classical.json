@@ -753,6 +753,84 @@
       ],
       "id": "ha_shi",
       "input": "空は青し"
+    },
+    {
+      "description": "声ぞ聞こゆべき - auto-generated",
+      "expected": [
+        {
+          "lemma": "声",
+          "pos": "Noun",
+          "surface": "声"
+        },
+        {
+          "lemma": "ぞ",
+          "pos": "Particle",
+          "surface": "ぞ"
+        },
+        {
+          "lemma": "聞こゆ",
+          "pos": "Verb",
+          "surface": "聞こゆ"
+        },
+        {
+          "lemma": "べし",
+          "pos": "Auxiliary",
+          "surface": "べき"
+        }
+      ],
+      "id": "zo_koyubeki",
+      "input": "声ぞ聞こゆべき"
+    },
+    {
+      "description": "声ぞ聞こゆる - auto-generated",
+      "expected": [
+        {
+          "lemma": "声",
+          "pos": "Noun",
+          "surface": "声"
+        },
+        {
+          "lemma": "ぞ",
+          "pos": "Particle",
+          "surface": "ぞ"
+        },
+        {
+          "lemma": "聞こゆ",
+          "pos": "Verb",
+          "surface": "聞こゆる"
+        }
+      ],
+      "id": "zo_koyuru",
+      "input": "声ぞ聞こゆる"
+    },
+    {
+      "description": "見ゆ - auto-generated",
+      "expected": [
+        {
+          "lemma": "見ゆ",
+          "pos": "Verb",
+          "surface": "見ゆ"
+        }
+      ],
+      "id": "yu",
+      "input": "見ゆ"
+    },
+    {
+      "description": "燃ゆべし - auto-generated",
+      "expected": [
+        {
+          "lemma": "燃ゆ",
+          "pos": "Verb",
+          "surface": "燃ゆ"
+        },
+        {
+          "lemma": "べし",
+          "pos": "Auxiliary",
+          "surface": "べし"
+        }
+      ],
+      "id": "yubeshi",
+      "input": "燃ゆべし"
     }
   ],
   "description": "classical tests",
