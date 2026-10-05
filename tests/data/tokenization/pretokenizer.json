@@ -35,6 +35,67 @@
       ],
       "id": "unnamed_25",
       "input": "ｔｅｓｔ＠ｅｘａｍｐｌｅ．ｊｐ"
+    },
+    {
+      "description": "Whitespace is a hard boundary for ASCII words",
+      "expected": [
+        {
+          "lemma": "Baby",
+          "pos": "Noun",
+          "surface": "Baby"
+        },
+        {
+          "lemma": "I",
+          "pos": "Noun",
+          "surface": "I"
+        },
+        {
+          "lemma": "need",
+          "pos": "Noun",
+          "surface": "need"
+        },
+        {
+          "lemma": "you",
+          "pos": "Noun",
+          "surface": "you"
+        }
+      ],
+      "id": "baby,_i_need_you",
+      "input": "Baby, I need you"
+    },
+    {
+      "description": "Kanji nouns are not joined across a space",
+      "expected": [
+        {
+          "lemma": "犬",
+          "pos": "Noun",
+          "surface": "犬"
+        },
+        {
+          "lemma": "猫",
+          "pos": "Noun",
+          "surface": "猫"
+        }
+      ],
+      "id": "space_separated_kanji_nouns",
+      "input": "犬 猫"
+    },
+    {
+      "description": "Katakana words are not joined across a space",
+      "expected": [
+        {
+          "lemma": "ハロー",
+          "pos": "Noun",
+          "surface": "ハロー"
+        },
+        {
+          "lemma": "ワールド",
+          "pos": "Noun",
+          "surface": "ワールド"
+        }
+      ],
+      "id": "space_separated_katakana_words",
+      "input": "ハロー ワールド"
     }
   ],
   "description": "pretokenizer tests",

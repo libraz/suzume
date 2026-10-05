@@ -1349,6 +1349,99 @@
         "complex",
         "academic"
       ]
+    },
+    {
+      "description": "Hashtag after a space opens a tag",
+      "expected": [
+        {
+          "lemma": "今日",
+          "pos": "Noun",
+          "surface": "今日"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "仕事",
+          "pos": "Noun",
+          "surface": "仕事"
+        },
+        {
+          "lemma": "#社畜",
+          "pos": "Noun",
+          "surface": "#社畜"
+        }
+      ],
+      "id": "hashtag_after_space",
+      "input": "今日も仕事 #社畜"
+    },
+    {
+      "description": "Hashtag body ends at a space",
+      "expected": [
+        {
+          "lemma": "#社畜",
+          "pos": "Noun",
+          "surface": "#社畜"
+        },
+        {
+          "lemma": "仕事",
+          "pos": "Noun",
+          "surface": "仕事"
+        }
+      ],
+      "id": "hashtag_body_ends_at_space",
+      "input": "#社畜 仕事"
+    },
+    {
+      "description": "Consecutive space-separated hashtags",
+      "expected": [
+        {
+          "lemma": "仕事",
+          "pos": "Noun",
+          "surface": "仕事"
+        },
+        {
+          "lemma": "#東京",
+          "pos": "Noun",
+          "surface": "#東京"
+        },
+        {
+          "lemma": "#テスト",
+          "pos": "Noun",
+          "surface": "#テスト"
+        }
+      ],
+      "id": "hashtag_space_separated_pair",
+      "input": "仕事 #東京 #テスト"
+    },
+    {
+      "description": "Hashtag after an ideographic space",
+      "expected": [
+        {
+          "lemma": "今日",
+          "pos": "Noun",
+          "surface": "今日"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "仕事",
+          "pos": "Noun",
+          "surface": "仕事"
+        },
+        {
+          "lemma": "#社畜",
+          "pos": "Noun",
+          "surface": "#社畜"
+        }
+      ],
+      "id": "hashtag_after_ideographic_space",
+      "input": "今日も仕事　#社畜"
     }
   ],
   "version": "1.0"

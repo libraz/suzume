@@ -139,8 +139,21 @@ def _merge_ideographic_variation_selectors(tokens: list[dict]) -> None:
     tokens[:] = merged
 
 
+def _whitespace_segments(text: str) -> list[str]:
+    """Split the input at whitespace, which the tokenizer treats as a hard boundary.
+
+    Each segment runs through the whole pipeline on its own, so no merge or
+    postprocessor can join tokens across a space and every offset-based rule
+    sees a segment-local coordinate system.
+    """
+    return text.split()
+
+
 def get_mecab_tokens(text: str) -> list[dict]:
     """Get MeCab tokens with slang handling and POS mapping."""
+    segments = _whitespace_segments(text)
+    if len(segments) > 1:
+        return [token for segment in segments for token in get_mecab_tokens(segment)]
     normalized_text = _oracle_text(text)
     processed_text, replacements, _ = preprocess_for_mecab(normalized_text)
     raw_tokens = mecab_analyze(processed_text)
@@ -210,6 +223,17 @@ def get_expected_tokens(text: str, suzume_tokens: list[dict] | None = None) -> t
     Returns:
         Tuple of (tokens, source_label, applied_rule).
     """
+    segments = _whitespace_segments(text)
+    if len(segments) > 1:
+        tokens: list[dict] = []
+        rules: list[str] = []
+        for segment in segments:
+            segment_tokens, _source, segment_rule = get_expected_tokens(segment)
+            tokens.extend(segment_tokens)
+            rules.extend(rule for rule in segment_rule.split("+") if rule and rule not in rules)
+        applied_rule = "+".join(rules)
+        return tokens, ("MeCab+SuzumeRules" if applied_rule else "MeCab"), applied_rule
+
     # Get raw MeCab tokens
     normalized_text = _oracle_text(text)
     processed_text, replacements, preprocess_rules = preprocess_for_mecab(normalized_text)

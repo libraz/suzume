@@ -121,6 +121,21 @@ class TestGetExpectedTokens:
         assert [token["surface"] for token in tokens] == ["彼", "は", "そんなら", "行く"]
         assert rule == "fixed-function-search-unit"
 
+    @pytest.mark.parametrize(
+        ("text", "surfaces"),
+        [
+            ("Baby, I need you", ["Baby", "I", "need", "you"]),
+            ("犬 猫", ["犬", "猫"]),
+            ("ワタシハ ロボット デス", ["ワタシハ", "ロボット", "デス"]),
+            ("今日も仕事 #社畜", ["今日", "も", "仕事", "#社畜"]),
+            ("#社畜 仕事", ["#社畜", "仕事"]),
+            ("今日も仕事　#社畜", ["今日", "も", "仕事", "#社畜"]),
+        ],
+    )
+    def test_whitespace_is_a_hard_boundary(self, text, surfaces):
+        tokens, _, _ = get_expected_tokens(text)
+        assert [token["surface"] for token in tokens] == surfaces
+
 
 class TestSurfaceIsNeverLost:
     """The expected tokens must cover every non-punctuation character.
