@@ -636,6 +636,11 @@ FINITE_PREDECESSOR_CONJ_FORM: str = "基本形"
 # reference dictionary does know, so only a preceding te-form selects them.
 BENEFACTIVE_REQUEST_LEMMAS: dict[str, str] = {"おくれ": "おくれる", "けろ": "けろ"}
 
+# Greetings are one interjection (おつかれ, not お + the verb 疲れる). The
+# reference lists only some of them and cuts the rest into a prefix plus a
+# verb or a filler plus a verb.
+GREETING_INTERJECTIONS: tuple[str, ...] = ("おつかれさま", "おやすみなさい", "おつかれ", "あざす")
+
 # Hiragana compounds that MeCab splits but should stay together
 HIRAGANA_COMPOUNDS: dict[str, str] = {
     "ふともも": "名詞",

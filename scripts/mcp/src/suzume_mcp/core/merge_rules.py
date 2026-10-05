@@ -20,6 +20,7 @@ from .constants import (
     FIXED_FUNCTION_LEMMAS,
     FIXED_FUNCTION_SEARCH_UNITS,
     FIXED_INFLECTED_FUNCTION_UNITS,
+    GREETING_INTERJECTIONS,
     HIRAGANA_COMPOUNDS,
     KANA_COUNTER_SUFFIXES,
     KANA_NUMBER_STEMS,
@@ -960,6 +961,17 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                     merged = True
                     if applied_rule is None:
                         applied_rule = "fixed-function-search-unit"
+
+        if not merged:
+            greeting = next((word for word in GREETING_INTERJECTIONS if remaining.startswith(word)), "")
+            if greeting:
+                consumed, j = _consume_span(tokens, i, len(greeting))
+                if consumed == greeting:
+                    result.append({"surface": greeting, "pos": "感動詞", "lemma": greeting})
+                    i = j
+                    merged = True
+                    if applied_rule is None:
+                        applied_rule = "greeting-interjection"
 
         # An L2 noun is lexical evidence that an otherwise ambiguous sequence
         # is one search unit. Recover only whole adjacent MeCab tokens: a

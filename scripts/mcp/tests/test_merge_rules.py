@@ -1361,6 +1361,19 @@ class TestLaughter:
         assert [token["surface"] for token in result] == ["お", "頬"]
 
 
+class TestGreetingInterjection:
+    def test_rejoins_prefix_and_verb_into_the_greeting(self):
+        tokens = [_tok("お", pos="接頭詞"), _tok("つかれ", pos="動詞", lemma="つかれる"), _tok("！", pos="記号")]
+        result, rule = apply_suzume_merge(tokens, "おつかれ！")
+        assert result[0] == {"surface": "おつかれ", "pos": "感動詞", "lemma": "おつかれ"}
+        assert rule == "greeting-interjection"
+
+    def test_does_not_take_a_greeting_prefix_out_of_a_longer_token(self):
+        tokens = [_tok("あざ"), _tok("すぎる", pos="動詞")]
+        result, _ = apply_suzume_merge(tokens, "あざすぎる")
+        assert [token["surface"] for token in result] == ["あざ", "すぎる"]
+
+
 class TestStrandedLengtheningVowel:
     def test_merges_filler_vowel_into_the_lengthened_word(self):
         tokens = [
