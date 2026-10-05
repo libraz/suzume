@@ -1059,6 +1059,26 @@ void appendHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints, 
     candidates.push_back(std::move(exclamative));
     break;
   }
+  // The bare stem closes the utterance the same way without the sokuon
+  // (ありがた。, めでた。). Three morae and a registered adjective keep short
+  // stems and verb fragments out (すご, やば, あり+がた).
+  constexpr size_t kMinBareExclamativeMorae = 3;
+  if (closes_utterance(max_hiragana_end) && max_hiragana_end >= start_pos + kMinBareExclamativeMorae &&
+      codepoints[max_hiragana_end - 1] != core::hiragana::kSmallTsu) {
+    const std::string base_form = extractSubstring(codepoints, start_pos, max_hiragana_end) + "い";
+    if (isAdjectiveInDictionary(dict_manager, base_form)) {
+      auto exclamative = makeCandidate(codepoints, start_pos, max_hiragana_end, core::PartOfSpeech::Adjective,
+                                       candidate::kAdjStemDictionaryCost, true, CandidateOrigin::AdjectiveIHiragana,
+                                       core::ExtendedPOS::AdjBasic);
+      exclamative.lemma = base_form;
+      exclamative.lemma_verified = true;
+#ifdef SUZUME_DEBUG_INFO
+      exclamative.confidence = candidate::kDictionaryOriginConfidence;
+      exclamative.pattern = "adj_stem_hira_exclamative_bare";
+#endif
+      candidates.push_back(std::move(exclamative));
+    }
+  }
 
   // Sort by cost
   verb_helpers::sortCandidatesByCost(candidates, candidate_start);

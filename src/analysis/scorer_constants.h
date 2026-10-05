@@ -459,6 +459,8 @@ constexpr float kEosRenyokeiFormalNounPenalty = scale::kAlmostNever;
 // A sokuon onbin cell exists only before た/て/たり (言っ+た); at the end of an
 // utterance the っ is the emphatic one on a final particle (だから+ねっ).
 constexpr float kEosSokuonOnbinPenalty = scale::kAlmostNever;
+// A one-mora adjective stem closing the utterance (行くって+な read as ない).
+constexpr float kEosShortAdjStemPenalty = scale::kAlmostNever;
 // An irrealis form is the bare stem of an auxiliary chain, so it can never be
 // the last morpheme: something has to fill the slot it opened. Without this a
 // fabricated irrealis covering the conditional なら+ば wins over the copula
@@ -571,6 +573,10 @@ constexpr std::array<BoundaryCost, static_cast<size_t>(core::ExtendedPOS::Count_
   table[static_cast<size_t>(core::ExtendedPOS::AuxPassive)].eos_gate = EosBoundaryGate::SingleCodepoint;
   table[static_cast<size_t>(core::ExtendedPOS::AuxPotential)].eos = kEosPotentialStemPenalty;
   table[static_cast<size_t>(core::ExtendedPOS::AuxPotential)].eos_gate = EosBoundaryGate::SingleCodepoint;
+  // A one-mora adjective stem (な of ない) needs さ/そう/すぎ behind it; the
+  // exclamative bare stem is a multi-mora AdjBasic cell of its own.
+  table[static_cast<size_t>(core::ExtendedPOS::AdjStem)].eos = kEosShortAdjStemPenalty;
+  table[static_cast<size_t>(core::ExtendedPOS::AdjStem)].eos_gate = EosBoundaryGate::SingleCodepoint;
 
   return table;
 }();

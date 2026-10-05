@@ -286,6 +286,45 @@
       ],
       "id": "nekokawaii",
       "input": "ねこかわいい"
+    },
+    {
+      "description": "その優しさありがた。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "その",
+          "pos": "Determiner",
+          "surface": "その"
+        },
+        {
+          "lemma": "優しい",
+          "pos": "Adjective",
+          "surface": "優し"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Suffix",
+          "surface": "さ"
+        },
+        {
+          "lemma": "ありがたい",
+          "pos": "Adjective",
+          "surface": "ありがた"
+        }
+      ],
+      "id": "sono_shisaarigata",
+      "input": "その優しさありがた。"
+    },
+    {
+      "description": "おもしろ。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "おもしろい",
+          "pos": "Adjective",
+          "surface": "おもしろ"
+        }
+      ],
+      "id": "omoshiro",
+      "input": "おもしろ。"
     }
   ],
   "description": "Taru-adjectives and irregular adjectives",
