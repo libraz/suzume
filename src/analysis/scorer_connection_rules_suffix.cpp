@@ -342,10 +342,14 @@ float computeSuffixShortVerbBonus(const core::LatticeEdge& prev, const core::Lat
 
   // An adjective stem cannot take the past-conditional particle ったら.
   // The sequence is a verb's euphonic stem plus tense auxiliary (なっ+たら).
-  // Nor the plural ら, which needs a nominal host (な+ら for the particle なら).
+  // Nor a suffix that needs a nominal host: the plural ら (な+ら for the
+  // particle なら) or any kanji suffix (問題+視, not 無+視 for 無視). The
+  // suffixes an adjective stem takes are kana (高+さ, 重+み, 不安+げ).
   if (prev.extended_pos == core::ExtendedPOS::AdjStem &&
       ((next.extended_pos == core::ExtendedPOS::ParticleFinal && utf8::equalsAny(next.surface, {"ったら"})) ||
-       (next.pos == core::PartOfSpeech::Suffix && utf8::equalsAny(next.surface, {"ら"})))) {
+       (next.pos == core::PartOfSpeech::Suffix &&
+        (utf8::equalsAny(next.surface, {"ら"}) ||
+         (!next.surface.empty() && normalize::isKanjiCodepoint(utf8::decodeFirstChar(next.surface))))))) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
 

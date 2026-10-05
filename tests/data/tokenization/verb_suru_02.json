@@ -494,6 +494,87 @@
       ],
       "id": "dousundarou",
       "input": "どうすんだろう"
+    },
+    {
+      "description": "問題を無視する。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "問題",
+          "pos": "Noun",
+          "surface": "問題"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "無視",
+          "pos": "Noun",
+          "surface": "無視"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "wo_suru_8",
+      "input": "問題を無視する。"
+    },
+    {
+      "description": "意見を無視する - auto-generated",
+      "expected": [
+        {
+          "lemma": "意見",
+          "pos": "Noun",
+          "surface": "意見"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "無視",
+          "pos": "Noun",
+          "surface": "無視"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "wo_suru_9",
+      "input": "意見を無視する"
+    },
+    {
+      "description": "無視は危険だ - auto-generated",
+      "expected": [
+        {
+          "lemma": "無視",
+          "pos": "Noun",
+          "surface": "無視"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "危険",
+          "pos": "Adjective",
+          "surface": "危険"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "ha_da_4",
+      "input": "無視は危険だ"
     }
   ],
   "description": "Suru-verb patterns with subsidiary verbs - MeCab互換分割 (part 2/2)",
