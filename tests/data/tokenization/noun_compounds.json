@@ -1393,6 +1393,191 @@
       ],
       "id": "saji2no",
       "input": "大さじ2の醤油"
+    },
+    {
+      "description": "何か必要でしたら、遠慮なくお声がけください。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "何",
+          "pos": "Pronoun",
+          "surface": "何"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "必要",
+          "pos": "Adjective",
+          "surface": "必要"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "でし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "たら"
+        },
+        {
+          "lemma": "遠慮ない",
+          "pos": "Adjective",
+          "surface": "遠慮なく"
+        },
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "声",
+          "pos": "Noun",
+          "surface": "声"
+        },
+        {
+          "lemma": "がけ",
+          "pos": "Suffix",
+          "surface": "がけ"
+        },
+        {
+          "lemma": "くださる",
+          "pos": "Verb",
+          "surface": "ください"
+        }
+      ],
+      "id": "ka_deshitara_nakuo_gakekudasai",
+      "input": "何か必要でしたら、遠慮なくお声がけください。"
+    },
+    {
+      "description": "お声がけいたします - auto-generated",
+      "expected": [
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "声",
+          "pos": "Noun",
+          "surface": "声"
+        },
+        {
+          "lemma": "がけ",
+          "pos": "Suffix",
+          "surface": "がけ"
+        },
+        {
+          "lemma": "いたす",
+          "pos": "Verb",
+          "surface": "いたし"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "o_gakeitashimasu",
+      "input": "お声がけいたします"
+    },
+    {
+      "description": "声がけが大切だ - auto-generated",
+      "expected": [
+        {
+          "lemma": "声",
+          "pos": "Noun",
+          "surface": "声"
+        },
+        {
+          "lemma": "がけ",
+          "pos": "Suffix",
+          "surface": "がけ"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "大切",
+          "pos": "Adjective",
+          "surface": "大切"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "gakega_da",
+      "input": "声がけが大切だ"
+    },
+    {
+      "description": "心がけが大切だ - auto-generated",
+      "expected": [
+        {
+          "lemma": "心がけ",
+          "pos": "Noun",
+          "surface": "心がけ"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "大切",
+          "pos": "Adjective",
+          "surface": "大切"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "gakega_da_2",
+      "input": "心がけが大切だ"
+    },
+    {
+      "description": "出がけに雨が降った - auto-generated",
+      "expected": [
+        {
+          "lemma": "出がけ",
+          "pos": "Noun",
+          "surface": "出がけ"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "雨",
+          "pos": "Noun",
+          "surface": "雨"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "降る",
+          "pos": "Verb",
+          "surface": "降っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "gakeni_ga_ttta",
+      "input": "出がけに雨が降った"
     }
   ],
   "description": "noun_compounds tests",

@@ -14,6 +14,7 @@
 #include "dictionary/dictionary.h"
 #include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
+#include "grammar/honorific_verbs.h"
 #include "grammar/inflection.h"
 #include "normalize/char_type.h"
 #include "normalize/exceptions.h"
@@ -730,14 +731,53 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
   // nominal-phrase-particle gate distinguishes these closed nominal constructions
   // from an ordinary subject marker followed by unrelated hiragana, while
   // keeping the complete compound as one search unit in a noun phrase.
+  // After a bare nominal host, がけ is a suffix of its own (声+がけ, as 一日+がけ);
+  // a verbal-noun predicate (する, the request/humble verbs) may close it too.
+  // A continuative host keeps the deverbal compound whole (通りがけ, 出がけ).
   constexpr std::string_view kGakari = "がかり";
   constexpr std::string_view kGake = "がけ";
+  const auto verbal_noun_predicate_at = [&](size_t pos) {
+    if (dict_manager == nullptr || pos >= codepoints.size()) {
+      return false;
+    }
+    for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, pos, codepoints.size())) {
+      if (match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Verb &&
+          (grammar::isSuruBaseForm(match.entry->lemma) || grammar::isHumbleHonorificLemma(match.entry->lemma))) {
+        return true;
+      }
+    }
+    return false;
+  };
+  // An ichidan stem written as the bare kanji (出 of 出る) is a continuative
+  // host, and a host that heads a lexical がける verb (心がける) is that
+  // verb's deverbal noun.
+  const std::string gake_host = extractSubstring(codepoints, start_pos, kanji_run_end);
+  const bool nominal_host =
+      dict_manager != nullptr &&
+      lookupEntryInRange(*dict_manager, codepoints, start_pos, kanji_run_end, core::PartOfSpeech::Verb) == nullptr &&
+      !(kanji_run_end == start_pos + 1 && verb_helpers::isSingleKanjiIchidan(codepoints[start_pos])) &&
+      !verb_helpers::isVerbInDictionary(dict_manager, gake_host + "る") &&
+      !verb_helpers::isVerbInDictionary(dict_manager, gake_host + "がける");
   for (size_t suffix_start = kanji_run_end;
        suffix_start < codepoints.size() && char_types[suffix_start] == normalize::CharType::Hiragana; ++suffix_start) {
     for (std::string_view suffix : {kGakari, kGake}) {
       const size_t suffix_end = suffix_start + normalize::utf8Length(suffix);
-      if (suffix_end > codepoints.size() || extractSubstring(codepoints, suffix_start, suffix_end) != suffix ||
-          !hasNominalPhraseSelectorAt(dict_manager, codepoints, suffix_end)) {
+      if (suffix_end > codepoints.size() || extractSubstring(codepoints, suffix_start, suffix_end) != suffix) {
+        continue;
+      }
+      if (suffix == kGake && suffix_start == kanji_run_end && nominal_host &&
+          (hasNominalPhraseSelectorAt(dict_manager, codepoints, suffix_end) || verbal_noun_predicate_at(suffix_end))) {
+        auto gake = makeCandidate(std::string(kGake), suffix_start, suffix_end, core::PartOfSpeech::Suffix,
+                                  candidate::kCounterExtentSuffixCost, true, CandidateOrigin::SuffixPattern,
+                                  core::ExtendedPOS::Suffix);
+        gake.lemma = std::string(kGake);
+#ifdef SUZUME_DEBUG_INFO
+        gake.pattern = "nominal_gake_suffix";
+#endif
+        candidates.push_back(std::move(gake));
+        return;
+      }
+      if (!hasNominalPhraseSelectorAt(dict_manager, codepoints, suffix_end)) {
         continue;
       }
       const std::string surface = extractSubstring(codepoints, start_pos, suffix_end);

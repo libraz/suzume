@@ -64,8 +64,10 @@ float computeSuffixShortVerbBonus(const core::LatticeEdge& prev, const core::Lat
   // particle plus the next predicate's first mora (雲+が+たなびく). It does
   // not earn the generic NOUN→SUFFIX bonus in that ambiguous shape; genuine
   // suffix constructions retain their lexical candidate and all other
-  // noun-suffix connections keep the base preference.
-  if (prev.pos == core::PartOfSpeech::Noun && next.pos == core::PartOfSpeech::Suffix &&
+  // noun-suffix connections keep the base preference. A generated suffix was
+  // emitted only after its generator checked the right context (声+がけ+する),
+  // so the ambiguity this guards against is the dictionary spelling's alone.
+  if (prev.pos == core::PartOfSpeech::Noun && next.pos == core::PartOfSpeech::Suffix && next.fromDictionary() &&
       normalize::utf8Length(next.surface) >= 2 && startsWithCaseParticleMora(next.surface)) {
     SUZUME_CONNECTION_ADD(bonus, sc::kPenaltyAmbiguousSuffixBoundary);
   }
