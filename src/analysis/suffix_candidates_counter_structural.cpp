@@ -338,6 +338,11 @@ void appendStructuralCounterCandidates(const std::vector<char32_t>& codepoints, 
       bool counter_follows = num_end < codepoints.size() &&
                              (normalize::isCounterKanji(codepoints[num_end]) ||
                               (num_end < char_types.size() && char_types[num_end] == normalize::CharType::Katakana));
+      // A multi-kanji run closed by an approximation prefix ends its noun before
+      // the prefix, which modifies the quantity (年間|約|2000件).
+      if (lead_len >= 3 && normalize::isNumericApproxPrefixKanji(codepoints[lead - 1])) {
+        --lead;
+      }
       if (counter_follows) {
         // An approximation prefix (約/計/総) is a Prefix modifying the quantity; a
         // multi-kanji leading run is an ordinary Noun.

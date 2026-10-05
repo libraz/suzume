@@ -1761,6 +1761,85 @@
       ],
       "id": "long_news_article",
       "input": "政府は新しい経済政策をきちんと決定した"
+    },
+    {
+      "description": "approximation prefix after a noun modifies the quantity",
+      "expected": [
+        {
+          "lemma": "年間",
+          "pos": "Noun",
+          "surface": "年間"
+        },
+        {
+          "lemma": "約",
+          "pos": "Prefix",
+          "surface": "約"
+        },
+        {
+          "lemma": "2000件",
+          "pos": "Noun",
+          "surface": "2000件"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "相談",
+          "pos": "Noun",
+          "surface": "相談"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "対応",
+          "pos": "Noun",
+          "surface": "対応"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "2000_no_ni_suru",
+      "input": "年間約2000件の相談に対応する。"
+    },
+    {
+      "description": "approximation prefix after a noun modifies the quantity",
+      "expected": [
+        {
+          "lemma": "月間",
+          "pos": "Noun",
+          "surface": "月間"
+        },
+        {
+          "lemma": "約",
+          "pos": "Prefix",
+          "surface": "約"
+        },
+        {
+          "lemma": "300人",
+          "pos": "Noun",
+          "surface": "300人"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "訪れる",
+          "pos": "Verb",
+          "surface": "訪れる"
+        }
+      ],
+      "id": "300_ga_reru",
+      "input": "月間約300人が訪れる"
     }
   ],
   "version": "1.0"
