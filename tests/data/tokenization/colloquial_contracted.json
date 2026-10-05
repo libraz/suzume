@@ -1403,6 +1403,94 @@
       ],
       "id": "nderu_5",
       "input": "道混んでる"
+    },
+    {
+      "description": "知らんなあ。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "知る",
+          "pos": "Verb",
+          "surface": "知ら"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        },
+        {
+          "lemma": "なあ",
+          "pos": "Particle",
+          "surface": "なあ"
+        }
+      ],
+      "id": "rannaa",
+      "input": "知らんなあ。"
+    },
+    {
+      "description": "書かんなあ - auto-generated",
+      "expected": [
+        {
+          "lemma": "書く",
+          "pos": "Verb",
+          "surface": "書か"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        },
+        {
+          "lemma": "なあ",
+          "pos": "Particle",
+          "surface": "なあ"
+        }
+      ],
+      "id": "kannaa",
+      "input": "書かんなあ"
+    },
+    {
+      "description": "走らんなあ - auto-generated",
+      "expected": [
+        {
+          "lemma": "走る",
+          "pos": "Verb",
+          "surface": "走ら"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        },
+        {
+          "lemma": "なあ",
+          "pos": "Particle",
+          "surface": "なあ"
+        }
+      ],
+      "id": "rannaa_2",
+      "input": "走らんなあ"
+    },
+    {
+      "description": "知らんの - auto-generated",
+      "expected": [
+        {
+          "lemma": "知る",
+          "pos": "Verb",
+          "surface": "知ら"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        }
+      ],
+      "id": "ranno",
+      "input": "知らんの"
     }
   ],
   "description": "colloquial_contracted tests",

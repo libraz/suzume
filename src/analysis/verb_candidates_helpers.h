@@ -181,6 +181,17 @@ bool isNounInDictionary(const dictionary::DictionaryManager* dict_manager, std::
 bool attestsGodanRaIrrealis(const dictionary::DictionaryManager* dict_manager, std::string_view stem);
 
 /**
+ * @brief Whether [@p start_pos, @p end_pos) ends on the irrealis of a registered Godan verb.
+ *
+ * The last kana must be the a-row cell of a Godan row and the stem before it
+ * plus that row's terminal must be a dictionary verb (知ら ← 知る, 分から ← 分かる).
+ * A ん after such a cell is the contracted negative, not the る→ん contraction
+ * of a verb whose stem happens to end in that kana (分か+ん ← 分かる).
+ */
+bool endsOnRegisteredGodanIrrealis(const dictionary::DictionaryManager* dict_manager,
+                                   const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos);
+
+/**
  * @brief Check if a surface exists in dictionary as a noun or adjective (exact match)
  *
  * Reports a hit only for an entry whose surface equals @p surface (see

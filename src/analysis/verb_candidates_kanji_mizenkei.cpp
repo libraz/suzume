@@ -524,6 +524,12 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
         (codepoints[n_pos - 1] == U'て' || codepoints[n_pos - 1] == U'で')) {
       continue;
     }
+    // A stem ending on the irrealis of a registered Godan verb puts the
+    // contracted negative before な/の (知ら+ん+なあ ← 知る), not the る→ん
+    // contraction of a coined 知らる.
+    if (terminal_follows && vh::endsOnRegisteredGodanIrrealis(dict_manager, codepoints, start_pos, n_pos)) {
+      continue;
+    }
     const std::string base_form = stem + "る";
     // A bare kanji stem is also an Ichidan stem (見る, 着る); only an attested
     // ら irrealis proves the Godan-ra row the contraction needs (帰ん+ない).

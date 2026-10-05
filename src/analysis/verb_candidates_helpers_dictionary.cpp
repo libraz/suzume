@@ -13,6 +13,7 @@
 #include "core/kana_constants.h"
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
+#include "grammar/conjugation.h"
 #include "grammar/inflection.h"
 #include "normalize/char_type.h"
 #include "normalize/utf8.h"
@@ -111,6 +112,25 @@ bool attestsGodanRaIrrealis(const dictionary::DictionaryManager* dict_manager, s
   const std::string stem_text(stem);
   const auto* irrealis = dict_manager->lookupExact(stem_text + "ら", core::PartOfSpeech::Verb);
   return irrealis != nullptr && irrealis->lemma == stem_text + "る";
+}
+
+bool endsOnRegisteredGodanIrrealis(const dictionary::DictionaryManager* dict_manager,
+                                   const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos) {
+  if (dict_manager == nullptr || end_pos < start_pos + 2 || end_pos > codepoints.size()) {
+    return false;
+  }
+  const char32_t irrealis = codepoints[end_pos - 1];
+  for (const auto& [verb_type, row] : grammar::Conjugation::getGodanRows()) {
+    if (row.a_row != irrealis) {
+      continue;
+    }
+    const std::string base_form =
+        normalize::encodeRange(codepoints, start_pos, end_pos - 1) + normalize::encodeUtf8(row.base_vowel);
+    if (isVerbInDictionary(dict_manager, base_form)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 bool isNounOrAdjectiveInDictionary(const dictionary::DictionaryManager* dict_manager, std::string_view surface) {
