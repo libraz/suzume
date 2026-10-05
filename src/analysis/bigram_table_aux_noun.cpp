@@ -967,6 +967,10 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       // off, which otherwise buys a name suffix out of a past stem so that the
       // strong past-to-conjunctive bonus can pay for it (なかっ+たん+だ+けど).
       {EPOS::Suffix, EPOS::AuxTenseTa, cost::kAlmostNever},
+      // The volitional/conjectural selects an irrealis form, and a suffix
+      // derives a nominal; it takes the same cost as after a bare nominal
+      // (今日+さ+むっ for the clipped adjective さむっ).
+      {EPOS::Suffix, EPOS::AuxVolitional, cost::kStrong},
 
       // VerbRenyokei → recent-completion suffix (焼き+たて, 作り+たて).
       // This productive suffix competes directly with the past た + connective

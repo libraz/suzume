@@ -1198,6 +1198,67 @@
       ],
       "id": "sa_3",
       "input": "ダサさ"
+    },
+    {
+      "description": "Clipped emphatic hiragana adjective after a nominal",
+      "expected": [
+        {
+          "lemma": "今日",
+          "pos": "Noun",
+          "surface": "今日"
+        },
+        {
+          "lemma": "さむい",
+          "pos": "Adjective",
+          "surface": "さむっ"
+        }
+      ],
+      "id": "samutt",
+      "input": "今日さむっ。"
+    },
+    {
+      "description": "Clipped emphatic hiragana adjective after a comma",
+      "expected": [
+        {
+          "lemma": "この",
+          "pos": "Determiner",
+          "surface": "この"
+        },
+        {
+          "lemma": "部屋",
+          "pos": "Noun",
+          "surface": "部屋"
+        },
+        {
+          "lemma": "さむい",
+          "pos": "Adjective",
+          "surface": "さむっ"
+        }
+      ],
+      "id": "kono_samutt",
+      "input": "この部屋、さむっ。"
+    },
+    {
+      "description": "Clipped emphatic hiragana adjective あつい",
+      "expected": [
+        {
+          "lemma": "この",
+          "pos": "Determiner",
+          "surface": "この"
+        },
+        {
+          "lemma": "部屋",
+          "pos": "Noun",
+          "surface": "部屋"
+        },
+        {
+          "lemma": "あつい",
+          "pos": "Adjective",
+          "surface": "あつっ"
+        }
+      ],
+      "id": "kono_atsutt",
+      "input": "この部屋、あつっ。"
     }
   ],
   "description": "Colloquial and slang patterns",
