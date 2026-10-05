@@ -305,6 +305,9 @@ def normalize_pos(pos: str) -> str:
     return SUZUME_POS_OVERRIDE.get(normalized, normalized)
 
 
+_CONTRACTED_DEMONSTRATIVE_ADVERBS = {"そっ": "そう", "こっ": "こう"}
+
+
 def correct_mecab_pos(tokens: list[dict]) -> None:
     """Correct MeCab POS misclassifications (mutates tokens in-place)."""
     for idx, t in enumerate(tokens):
@@ -322,6 +325,20 @@ def correct_mecab_pos(tokens: list[dict]) -> None:
         ):
             t["pos"] = "名詞"
             t["pos_sub1"] = "形容動詞語幹"
+
+        # The contracted demonstrative adverb in そっか/こっか ("so it is") comes
+        # back as a pronoun with itself as the lemma. It is そう/こう with the
+        # sokuon before the final particle.
+        if (
+            surface in _CONTRACTED_DEMONSTRATIVE_ADVERBS
+            and pos == "名詞"
+            and idx + 1 < len(tokens)
+            and tokens[idx + 1].get("surface") == "か"
+        ):
+            t["pos"] = "副詞"
+            t["pos_sub1"] = "一般"
+            t["lemma"] = _CONTRACTED_DEMONSTRATIVE_ADVERBS[surface]
+            continue
 
         # 記号 tokens are dropped by the symbol filter in get_expected_tokens,
         # so a token that carries real text must not stay labelled 記号 or the

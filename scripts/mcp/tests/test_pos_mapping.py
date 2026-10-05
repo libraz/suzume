@@ -193,3 +193,12 @@ class TestNormalizePos:
         assert normalize_pos("AUX") == "Auxiliary"
         assert normalize_pos("DET") == "Determiner"
         assert normalize_pos("PRON") == "Pronoun"
+
+
+def test_contracted_sou_before_ka_is_the_demonstrative_adverb():
+    tokens = [
+        {"surface": "そっ", "pos": "名詞", "pos_sub1": "代名詞", "lemma": "そっ"},
+        {"surface": "か", "pos": "助詞", "lemma": "か"},
+    ]
+    correct_mecab_pos(tokens)
+    assert (tokens[0]["pos"], tokens[0]["lemma"]) == ("副詞", "そう")
