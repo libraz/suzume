@@ -2416,6 +2416,90 @@
       ],
       "id": "etekeri",
       "input": "見えてけり"
+    },
+    {
+      "description": "雲が空を流れるがごとく静かに進む。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "雲",
+          "pos": "Noun",
+          "surface": "雲"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "空",
+          "pos": "Noun",
+          "surface": "空"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "流れる",
+          "pos": "Verb",
+          "surface": "流れる"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ごとし",
+          "pos": "Auxiliary",
+          "surface": "ごとく"
+        },
+        {
+          "lemma": "静か",
+          "pos": "Adjective",
+          "surface": "静か"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "進む",
+          "pos": "Verb",
+          "surface": "進む"
+        }
+      ],
+      "id": "ga_wo_rerugagotoku_kani_mu",
+      "input": "雲が空を流れるがごとく静かに進む。"
+    },
+    {
+      "description": "鳥がごとく舞う - auto-generated",
+      "expected": [
+        {
+          "lemma": "鳥",
+          "pos": "Noun",
+          "surface": "鳥"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ごとし",
+          "pos": "Auxiliary",
+          "surface": "ごとく"
+        },
+        {
+          "lemma": "舞う",
+          "pos": "Verb",
+          "surface": "舞う"
+        }
+      ],
+      "id": "gagotoku_u",
+      "input": "鳥がごとく舞う"
     }
   ],
   "description": "auxiliary_classical tests",

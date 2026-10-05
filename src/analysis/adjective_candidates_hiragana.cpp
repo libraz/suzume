@@ -444,12 +444,42 @@ bool sharesEndWithDictionaryAdjective(const dictionary::DictionaryManager* dict_
   return false;
 }
 
+// A coined adjective spelling a registered function word (ごとく), or a
+// one-mora case particle or past auxiliary in front of one (が+ごとく), is
+// those words, not an adjective.
+bool spansClosedHeadAndClosedWord(const dictionary::DictionaryManager* dict_manager,
+                                  const std::vector<char32_t>& codepoints, const UnknownCandidate& cand) {
+  if (dict_manager == nullptr || cand.lemma_verified || cand.pos != core::PartOfSpeech::Adjective ||
+      cand.end < cand.start + 2) {
+    return false;
+  }
+  // Nor is a span the dictionary already carries as a function word of
+  // another lemma (ごとく of ごとし read as ごとい).
+  const auto* whole = lookupEntryInRange(*dict_manager, codepoints, cand.start, cand.end);
+  if (whole != nullptr && (whole->pos == core::PartOfSpeech::Auxiliary || whole->pos == core::PartOfSpeech::Particle) &&
+      !whole->lemma.empty() && whole->lemma != cand.lemma) {
+    return true;
+  }
+  if (cand.end < cand.start + 3) {
+    return false;
+  }
+  const auto* head = lookupEntryInRange(*dict_manager, codepoints, cand.start, cand.start + 1);
+  const bool closed_head = head != nullptr && (head->extended_pos == core::ExtendedPOS::ParticleCase ||
+                                               head->extended_pos == core::ExtendedPOS::AuxTenseTa);
+  if (!closed_head) {
+    return false;
+  }
+  const auto* rest = lookupEntryInRange(*dict_manager, codepoints, cand.start + 1, cand.end);
+  return rest != nullptr && (rest->pos == core::PartOfSpeech::Auxiliary || rest->pos == core::PartOfSpeech::Particle);
+}
+
 void dropCoinedAdjectivesOverDictionaryAdjective(const dictionary::DictionaryManager* dict_manager,
                                                  const std::vector<char32_t>& codepoints,
                                                  std::vector<UnknownCandidate>& candidates, size_t candidate_start) {
   candidates.erase(std::remove_if(candidates.begin() + static_cast<std::ptrdiff_t>(candidate_start), candidates.end(),
                                   [&](const UnknownCandidate& cand) {
-                                    return sharesEndWithDictionaryAdjective(dict_manager, codepoints, cand);
+                                    return sharesEndWithDictionaryAdjective(dict_manager, codepoints, cand) ||
+                                           spansClosedHeadAndClosedWord(dict_manager, codepoints, cand);
                                   }),
                    candidates.end());
 }
