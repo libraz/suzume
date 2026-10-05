@@ -1111,6 +1111,44 @@ void addElidedProlongedDictionaryCandidates(core::Lattice& lattice, const dictio
   }
 }
 
+// Interrupted speech cuts an adverb before its closing と at the sokuon
+// (ちょっ…待って for ちょっと). The cut form ends at a pause the utterance resumes
+// after, so a kana run closed by っ in front of punctuation followed by more
+// text is looked up with the と put back, and an adverb found that way spans
+// the cut surface with its own lemma.
+void addTruncatedAdverbCandidates(core::Lattice& lattice, const dictionary::DictionaryManager& dict_manager,
+                                  const std::vector<char32_t>& codepoints, size_t start_pos) {
+  const size_t window_end = std::min(codepoints.size(), start_pos + kElidedLookupWindow);
+  for (size_t pos = start_pos + 1; pos < window_end; ++pos) {
+    if (normalize::classifyChar(codepoints[pos]) != normalize::CharType::Hiragana) {
+      return;
+    }
+    if (codepoints[pos] != U'っ') {
+      continue;
+    }
+    const size_t end_pos = pos + 1;
+    size_t resume_pos = end_pos;
+    while (resume_pos < codepoints.size() &&
+           normalize::classifyChar(codepoints[resume_pos]) == normalize::CharType::Symbol) {
+      ++resume_pos;
+    }
+    if (resume_pos == end_pos || resume_pos >= codepoints.size()) {
+      return;
+    }
+    const std::string surface = extractSubstring(codepoints, start_pos, end_pos);
+    const auto* adverb = dict_manager.lookupExact(surface + "と", core::PartOfSpeech::Adverb);
+    if (adverb == nullptr) {
+      return;
+    }
+    lattice.addEdge(surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(end_pos), adverb->pos,
+                    getCategoryCost(adverb->extended_pos), core::LatticeEdge::kFromDictionary,
+                    adverb->lemma.empty() ? std::string_view(adverb->surface) : std::string_view(adverb->lemma),
+                    dictionary::ConjugationType::None, core::CandidateOrigin::Dictionary,
+                    candidate::kDictionaryOriginConfidence, {}, adverb->extended_pos, "dict_truncated_adverb");
+    return;
+  }
+}
+
 }  // namespace
 
 void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view text,
@@ -2678,6 +2716,7 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
 
   tokenizer_dictionary_detail::appendSpecialGrammarCandidates(lattice, text, codepoints, start_pos, byte_pos);
   addElidedProlongedDictionaryCandidates(lattice, dict_manager_, codepoints, start_pos);
+  addTruncatedAdverbCandidates(lattice, dict_manager_, codepoints, start_pos);
 }
 
 }  // namespace suzume::analysis

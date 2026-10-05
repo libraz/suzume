@@ -1063,6 +1063,55 @@
       ],
       "id": "tatt",
       "input": "見たっ"
+    },
+    {
+      "description": "ちょっ…待ってください - auto-generated",
+      "expected": [
+        {
+          "lemma": "ちょっと",
+          "pos": "Adverb",
+          "surface": "ちょっ"
+        },
+        {
+          "lemma": "待つ",
+          "pos": "Verb",
+          "surface": "待っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くださる",
+          "pos": "Verb",
+          "surface": "ください"
+        }
+      ],
+      "id": "chi_tt_tttekudasai",
+      "input": "ちょっ…待ってください"
+    },
+    {
+      "description": "ちょっ、待って - auto-generated",
+      "expected": [
+        {
+          "lemma": "ちょっと",
+          "pos": "Adverb",
+          "surface": "ちょっ"
+        },
+        {
+          "lemma": "待つ",
+          "pos": "Verb",
+          "surface": "待っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "chi_tt_ttte",
+      "input": "ちょっ、待って"
     }
   ],
   "description": "Colloquial and slang patterns",
