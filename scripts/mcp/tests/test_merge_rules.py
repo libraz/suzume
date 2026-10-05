@@ -821,6 +821,16 @@ class TestPostprocessKanjiMerge:
         result, _ = apply_suzume_merge(tokens, "時間大変かかる")
         assert [token["surface"] for token in result] == ["時間", "大変", "かかる"]
 
+    def test_prefix_joins_a_run_headed_by_a_plain_noun(self):
+        prefix = _tok("最", pos="接頭詞", pos_sub1="名詞接続")
+        stem = _tok("重要", pos_sub1="形容動詞語幹")
+        result, _ = apply_suzume_merge([prefix, stem, _tok("課題")], "最重要課題")
+        assert [token["surface"] for token in result] == ["最重要課題"]
+        prefix = _tok("最", pos="接頭詞", pos_sub1="名詞接続")
+        stem = _tok("重要", pos_sub1="形容動詞語幹")
+        result, _ = apply_suzume_merge([prefix, stem], "最重要")
+        assert [token["surface"] for token in result] == ["最", "重要"]
+
     def test_ascii_joiner_merge_chains_single_joiners(self):
         tokens = [_tok("U"), _tok(".", pos="記号"), _tok("S"), _tok(".", pos="記号"), _tok("A")]
         result, _ = apply_suzume_merge(tokens, "U.S.A")

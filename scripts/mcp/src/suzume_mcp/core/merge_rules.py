@@ -1281,7 +1281,9 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
             # 超|重要) while a plain noun host still yields one search unit
             # (超高速, 超大型).
             noun_end, noun_surface = _kanji_noun_run(tokens, i + 1)
-            if noun_surface and nxt.get("pos_sub1") != "形容動詞語幹":
+            # A compound is right-headed, so the run's last piece decides
+            # (最|重要 but 最重要課題).
+            if noun_surface and tokens[noun_end - 1].get("pos_sub1") != "形容動詞語幹":
                 combined = t.get("surface", "") + noun_surface
                 # A temporal prefix heads a temporal noun, so only a temporal unit
                 # continues it (今週, 今度, 毎時). Before an ordinary noun the prefix

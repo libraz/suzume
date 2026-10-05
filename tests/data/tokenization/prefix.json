@@ -1640,6 +1640,72 @@
       ],
       "id": "na_10",
       "input": "バリ重要なポイント"
+    },
+    {
+      "description": "Prefix joins a compound headed by a plain noun even when it opens with a na-adjective stem",
+      "expected": [
+        {
+          "lemma": "就中",
+          "pos": "Noun",
+          "surface": "就中"
+        },
+        {
+          "lemma": "この",
+          "pos": "Determiner",
+          "surface": "この"
+        },
+        {
+          "lemma": "項目",
+          "pos": "Noun",
+          "surface": "項目"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "最重要課題",
+          "pos": "Noun",
+          "surface": "最重要課題"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        }
+      ],
+      "id": "prefix_before_na_stem_noun_compound_sentence",
+      "input": "就中この項目が最重要課題である"
+    },
+    {
+      "description": "Prefix + na-stem + noun compound is one search unit",
+      "expected": [
+        {
+          "lemma": "最重要項目",
+          "pos": "Noun",
+          "surface": "最重要項目"
+        }
+      ],
+      "id": "sai_juuyou_koumoku",
+      "input": "最重要項目"
+    },
+    {
+      "description": "Prefix + na-stem + noun compound is one search unit",
+      "expected": [
+        {
+          "lemma": "超重要課題",
+          "pos": "Noun",
+          "surface": "超重要課題"
+        }
+      ],
+      "id": "chou_juuyou_kadai",
+      "input": "超重要課題"
     }
   ],
   "description": "Prefixes (お、ご、不、無)",
