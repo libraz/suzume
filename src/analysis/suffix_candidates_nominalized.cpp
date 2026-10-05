@@ -416,9 +416,21 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
   // Generate 1-hiragana candidate
   bool skip_single_char =
       grammar::startsClassicalConjecturalAuxiliary(extractSubstring(codepoints, kanji_end + 1, codepoints.size()));
-  if (kanji_end + 1 < char_types.size() && char_types[kanji_end + 1] == normalize::CharType::Hiragana &&
-      codepoints[kanji_end + 1] == U'な') {
-    skip_single_char = true;
+  // A continuation that selects the verb cell (片付け+ない, 片付け+ながら,
+  // 片付け+なさい) rules the noun out; the copula and particles opening on な
+  // take a nominal host as well (片付け+な+の+だ, 手伝い+なら).
+  if (dict_manager != nullptr && kanji_end + 1 < char_types.size() && codepoints[kanji_end + 1] == U'な') {
+    const size_t probe_end = std::min(codepoints.size(), kanji_end + 1 + static_cast<size_t>(4));
+    for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, kanji_end + 1, probe_end)) {
+      if (match.entry == nullptr) {
+        continue;
+      }
+      const core::ExtendedPOS epos = match.entry->extended_pos;
+      skip_single_char = skip_single_char || epos == core::ExtendedPOS::AuxNegativeNai ||
+                         epos == core::ExtendedPOS::AuxHonorific ||
+                         (epos == core::ExtendedPOS::ParticleConj &&
+                          grammar::isContinuativeSelectingConjunctiveParticle(match.entry->surface));
+    }
   }
   // Skip kanji+い when kanji ends with 的 (teki na-adjective suffix)
   // 理性的い, 経済的い don't make sense — 的 forms na-adjectives, not i-adjectives

@@ -951,6 +951,107 @@
       ],
       "id": "ga_shimidesu",
       "input": "旅行が楽しみです"
+    },
+    {
+      "description": "deverbal noun before the attributive copula na",
+      "expected": [
+        {
+          "lemma": "部屋",
+          "pos": "Noun",
+          "surface": "部屋"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "片付け",
+          "pos": "Noun",
+          "surface": "片付け"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "wo_kenanoda",
+      "input": "部屋を片付けなのだ"
+    },
+    {
+      "description": "deverbal noun before the attributive copula na",
+      "expected": [
+        {
+          "lemma": "片付け",
+          "pos": "Noun",
+          "surface": "片付け"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "ので",
+          "pos": "Particle",
+          "surface": "ので"
+        },
+        {
+          "lemma": "遅れる",
+          "pos": "Verb",
+          "surface": "遅れる"
+        }
+      ],
+      "id": "kenanode_reru",
+      "input": "片付けなので遅れる"
+    },
+    {
+      "description": "deverbal noun before the attributive copula na",
+      "expected": [
+        {
+          "lemma": "今日",
+          "pos": "Noun",
+          "surface": "今日"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "手伝い",
+          "pos": "Noun",
+          "surface": "手伝い"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "ha_inanoda",
+      "input": "今日は手伝いなのだ"
     }
   ],
   "description": "noun_deverbal tests",
