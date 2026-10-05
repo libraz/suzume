@@ -579,6 +579,28 @@
       ],
       "id": "kashishita",
       "input": "夜更かしした"
+    },
+    {
+      "description": "ichidan terminal ru contracted to n before the prohibitive na",
+      "expected": [
+        {
+          "lemma": "寝る",
+          "pos": "Verb",
+          "surface": "寝ん"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "nnayo_3",
+      "input": "寝んなよ"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",

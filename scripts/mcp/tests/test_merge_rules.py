@@ -2021,3 +2021,17 @@ class TestQuantityPhraseKanjiRun:
 
     def test_stops_at_a_pronoun(self):
         assert self._merge("5年間彼を待ち続けた")[:2] == ["5年間", "彼"]
+
+
+class TestIchidanProhibitiveContraction:
+    def _merge(self, text):
+        merged, _ = apply_suzume_merge(mecab_analyze(text), text)
+        return [token["surface"] for token in merged]
+
+    def test_reads_phrase_final_na_as_prohibitive(self):
+        assert self._merge("寝んなよ") == ["寝ん", "な", "よ"]
+        assert self._merge("忘れんな") == ["忘れん", "な"]
+
+    def test_keeps_negative_n_before_other_particles(self):
+        assert self._merge("寝んなあ")[:2] == ["寝", "ん"]
+        assert self._merge("寝んぞ")[:2] == ["寝", "ん"]

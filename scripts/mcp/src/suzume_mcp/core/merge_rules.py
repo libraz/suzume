@@ -1859,6 +1859,30 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
             if applied_rule is None:
                 applied_rule = "ra-row-negative-contraction"
 
+        # 4c-3. The prohibitive な takes the terminal form, whose ichidan る
+        # contracts to ん before it (見んなよ, 食べんなよ). The reference gives
+        # most stems that cell but reads some (寝, 忘れ) as the irrealis plus the
+        # negative ん; a phrase-final な (alone or before よ) is the prohibitive.
+        if (
+            not merged
+            and t.get("pos") == "動詞"
+            and t.get("conj_type") == "一段"
+            and "未然" in (t.get("conj_form") or "")
+            and i + 2 < len(tokens)
+            and tokens[i + 1].get("surface") == "ん"
+            and tokens[i + 1].get("pos") == "助動詞"
+            and tokens[i + 2].get("surface") == "な"
+            and tokens[i + 2].get("pos_sub1") == "終助詞"
+        ):
+            after = tokens[i + 3] if i + 3 < len(tokens) else None
+            if after is None or after.get("pos") == "記号" or after.get("surface") == "よ":
+                stem = t.get("surface", "")
+                result.append({**t, "surface": stem + "ん", "conj_form": "体言接続特殊"})
+                i += 2
+                merged = True
+                if applied_rule is None:
+                    applied_rule = "ichidan-prohibitive-contraction"
+
         # 4d. Adjective vowel repetition
         if not merged and t.get("pos") == "形容詞" and t.get("surface", "").endswith("い"):
             j = i + 1
