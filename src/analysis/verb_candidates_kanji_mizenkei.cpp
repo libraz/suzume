@@ -761,8 +761,9 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
               }
             }
             // Verify this is a valid verb
-            bool is_valid_verb = vh::isVerifiedVerbBase(dict_manager, inflection, base_form,
-                                                        candidate::verb_cost::kConstructedVerbMinConfidence, true);
+            const bool verified_base = vh::isVerifiedVerbBase(
+                dict_manager, inflection, base_form, candidate::verb_cost::kConstructedVerbMinConfidence, true);
+            bool is_valid_verb = verified_base;
             if (!is_valid_verb) {
               for (const auto& inflected : analysesInRange(inflection, codepoints, start_pos, hiragana_end)) {
                 if (inflected.verb_type == verb_type && inflected.base_form == base_form &&
@@ -796,6 +797,14 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
                                                           multi_miz_end)) {
               SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << extractSubstring(codepoints, start_pos, multi_miz_end)
                                                 << "\" fabricated mizenkei absorbing case particle\n");
+              is_valid_verb = false;
+            }
+            // As in the single-okurigana irrealis: one ending on a registered
+            // case particle needs a verified base (泳が+ない, 和らが+ない), not
+            // just a whole-span reading, or it is the nominative phrase it is
+            // spelled like (塩っけ+が+ない).
+            if (is_valid_verb && !verified_base &&
+                vh::oneMoraParticleEndsAt(dict_manager, codepoints, multi_miz_end, core::ExtendedPOS::ParticleCase)) {
               is_valid_verb = false;
             }
             if (is_valid_verb) {

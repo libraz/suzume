@@ -816,6 +816,67 @@
       ],
       "id": "nnakattta",
       "input": "帰んなかった"
+    },
+    {
+      "description": "色気がない - auto-generated",
+      "expected": [
+        {
+          "lemma": "色気",
+          "pos": "Noun",
+          "surface": "色気"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
+      "id": "ganai_2",
+      "input": "色気がない"
+    },
+    {
+      "description": "嫌みがない - auto-generated",
+      "expected": [
+        {
+          "lemma": "嫌み",
+          "pos": "Noun",
+          "surface": "嫌み"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
+      "id": "miganai",
+      "input": "嫌みがない"
+    },
+    {
+      "description": "和らがない - auto-generated",
+      "expected": [
+        {
+          "lemma": "和らぐ",
+          "pos": "Verb",
+          "surface": "和らが"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "raganai",
+      "input": "和らがない"
     }
   ],
   "description": "verb_negative tests",
