@@ -78,6 +78,16 @@ void appendSelectedKanjiVerbCandidate(const std::vector<char32_t>& codepoints, s
     SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << surface << "\" stem ends with さ (suru-verb causative pattern)\n");
     return;
   }
+  // A coined verb whose span is a verb cell plus classical auxiliaries has
+  // swallowed the chain into its ending (来+べし, 月見+ぬれ+ば, 咲き+たら+む).
+  // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+  if (!is_dict_verified &&
+      vh::guardIsWired(vh::GuardMember::ClassicalAuxiliaryTail, vh::GuardOrigin::KanjiFinalization) &&
+      vh::spellsVerbCellWithClassicalAuxiliaries(dict_manager, codepoints, start_pos, end_pos)) {
+    SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << surface << "\" verb cell + classical auxiliary chain\n");
+    return;
+  }
+
   // Dictionary-verified candidates use lower threshold (0.3)
   // This allows hiragana verbs like いわれる (conf=0.33) to be recognized
   const float proceed_threshold = (is_dict_verified || proceed_is_i_row_ichidan || is_multi_kanji_godan_wa_renyokei)

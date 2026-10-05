@@ -642,6 +642,47 @@ bool endsWithClassicalAuxiliary(const dictionary::DictionaryManager* dict_manage
   return false;
 }
 
+bool spellsVerbCellWithClassicalAuxiliaries(const dictionary::DictionaryManager* dict_manager,
+                                            const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos) {
+  if (dict_manager == nullptr || end_pos > codepoints.size() || end_pos < start_pos + 2) {
+    return false;
+  }
+  const size_t chain_end = codepoints[end_pos - 1] == U'ば' || codepoints[end_pos - 1] == U'ど' ? end_pos - 1 : end_pos;
+  // chain_starts[i]: [i, chain_end) is a run of classical auxiliary cells.
+  std::vector<bool> chain_starts(chain_end + 1, false);
+  chain_starts[chain_end] = true;
+  for (size_t from = chain_end; from-- > start_pos + 1;) {
+    for (size_t to = from + 1; to <= chain_end && !chain_starts[from]; ++to) {
+      if (!chain_starts[to]) {
+        continue;
+      }
+      const auto* auxiliary = lookupEntryInRange(*dict_manager, codepoints, from, to, core::PartOfSpeech::Auxiliary);
+      chain_starts[from] = auxiliary != nullptr && core::isClassicalAuxiliaryType(auxiliary->extended_pos);
+    }
+  }
+  // The usual 2+ mora floor: き, し, つ, り, に, ぬ alone are also okurigana
+  // (着き, 飛ばし, 染まり), so a one-mora chain is no evidence.
+  constexpr size_t kMinChainLength = 2;
+  for (size_t aux_start = start_pos + 1; aux_start + kMinChainLength <= chain_end; ++aux_start) {
+    if (!chain_starts[aux_start]) {
+      continue;
+    }
+    const char32_t head_last = codepoints[aux_start - 1];
+    const bool kanji_stem = normalize::isKanjiCodepoint(head_last) &&
+                            (isSingleKanjiIchidan(head_last) || grammar::isKuruKanjiStem(head_last));
+    // A kanji stem with one i/e-row okurigana is a continuative cell (咲き, 起き).
+    const bool continuative_shape = aux_start >= start_pos + 2 &&
+                                    normalize::isKanjiCodepoint(codepoints[aux_start - 2]) &&
+                                    (kana::isIRowCodepoint(head_last) || kana::isERowCodepoint(head_last));
+    if (kanji_stem || continuative_shape ||
+        (!normalize::isKanjiCodepoint(head_last) &&
+         lookupEntryInRange(*dict_manager, codepoints, start_pos, aux_start, core::PartOfSpeech::Verb) != nullptr)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool endsWithAuxiliaryAfterOkurigana(const dictionary::DictionaryManager* dict_manager,
                                      const std::vector<char32_t>& codepoints, size_t okurigana_start, size_t end_pos) {
   return auxiliaryClosingAfterOkurigana(dict_manager, codepoints, okurigana_start, end_pos) != nullptr;

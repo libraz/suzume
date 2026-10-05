@@ -1,0 +1,55 @@
+{
+  "cases": [
+    {
+      "description": "花見ぬれば - auto-generated",
+      "expected": [
+        {
+          "lemma": "花",
+          "pos": "Noun",
+          "surface": "花"
+        },
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬれ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "nureba_2",
+      "input": "花見ぬれば"
+    },
+    {
+      "description": "咲きけるぞ - auto-generated",
+      "expected": [
+        {
+          "lemma": "咲く",
+          "pos": "Verb",
+          "surface": "咲き"
+        },
+        {
+          "lemma": "けり",
+          "pos": "Auxiliary",
+          "surface": "ける"
+        },
+        {
+          "lemma": "ぞ",
+          "pos": "Particle",
+          "surface": "ぞ"
+        }
+      ],
+      "id": "kikeruzo",
+      "input": "咲きけるぞ"
+    }
+  ],
+  "description": "auxiliary_classical tests (part 2/2)",
+  "version": "1.0"
+}

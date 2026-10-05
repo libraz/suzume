@@ -692,6 +692,12 @@ void appendGodanSaRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
           continue;
         }
       }
+      // Nor may it end in a classical auxiliary chain on a verb cell (来+べし).
+      if (!base_in_dict && vh::guardIsWired(vh::GuardMember::ClassicalAuxiliaryTail, vh::GuardOrigin::KanjiRenyokei) &&
+          vh::spellsVerbCellWithClassicalAuxiliaries(dict_manager, codepoints, start_pos, renyokei_end)) {
+        SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" verb cell + classical auxiliary chain\n");
+        continue;
+      }
 
       float base_cost = candidate::confidenceScaledCost(verb_opts.bonus_ichidan, best_sa.confidence,
                                                         verb_opts.confidence_cost_scale_small) +

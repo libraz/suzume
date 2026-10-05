@@ -2500,8 +2500,52 @@
       ],
       "id": "gagotoku_u",
       "input": "鳥がごとく舞う"
+    },
+    {
+      "description": "来べし - auto-generated",
+      "expected": [
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "べし",
+          "pos": "Auxiliary",
+          "surface": "べし"
+        }
+      ],
+      "id": "beshi_2",
+      "input": "来べし"
+    },
+    {
+      "description": "月見ぬれば - auto-generated",
+      "expected": [
+        {
+          "lemma": "月",
+          "pos": "Noun",
+          "surface": "月"
+        },
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬれ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "nureba",
+      "input": "月見ぬれば"
     }
   ],
-  "description": "auxiliary_classical tests",
+  "description": "auxiliary_classical tests (part 1/2)",
   "version": "1.0"
 }

@@ -174,7 +174,7 @@ TEST(VerbGuardFamilyWiring, EveryGuardedOriginIsDeclared) {
   using verb_helpers::GuardMember;
   using verb_helpers::GuardOrigin;
 
-  constexpr std::array<std::pair<GuardMember, GuardOrigin>, 8> expected = {{
+  constexpr std::array<std::pair<GuardMember, GuardOrigin>, 10> expected = {{
       {GuardMember::EmbedTeAuxiliary, GuardOrigin::HiraganaInflection},
       {GuardMember::EmbedTeAuxiliary, GuardOrigin::KanjiFinalization},
       {GuardMember::EmbedTeAuxiliary, GuardOrigin::KanjiMizenkei},
@@ -183,6 +183,8 @@ TEST(VerbGuardFamilyWiring, EveryGuardedOriginIsDeclared) {
       {GuardMember::EmbedTeMiruAuxiliary, GuardOrigin::KanjiFinalization},
       {GuardMember::FocusParticleHead, GuardOrigin::KanjiAdjective},
       {GuardMember::FocusParticleHead, GuardOrigin::KanjiCompoundAdjective},
+      {GuardMember::ClassicalAuxiliaryTail, GuardOrigin::KanjiFinalization},
+      {GuardMember::ClassicalAuxiliaryTail, GuardOrigin::KanjiRenyokei},
   }};
 
   EXPECT_EQ(verb_helpers::kGuardWiring.size(), expected.size());

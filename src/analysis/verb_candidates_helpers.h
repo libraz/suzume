@@ -319,6 +319,7 @@ enum class GuardMember {
   EmbedTeAuxiliary,
   EmbedTeMiruAuxiliary,
   FocusParticleHead,
+  ClassicalAuxiliaryTail,
 };
 
 enum class GuardOrigin {
@@ -326,6 +327,7 @@ enum class GuardOrigin {
   HiraganaDerived,
   KanjiFinalization,
   KanjiMizenkei,
+  KanjiRenyokei,
   KanjiAdjective,
   KanjiCompoundAdjective,
 };
@@ -336,7 +338,7 @@ struct GuardWiring {
   std::string_view origin_name;
 };
 
-inline constexpr std::array<GuardWiring, 8> kGuardWiring = {{
+inline constexpr std::array<GuardWiring, 10> kGuardWiring = {{
     {GuardMember::EmbedTeAuxiliary, GuardOrigin::HiraganaInflection, "hiragana_inflection"},
     {GuardMember::EmbedTeAuxiliary, GuardOrigin::KanjiFinalization, "kanji_finalization"},
     {GuardMember::EmbedTeAuxiliary, GuardOrigin::KanjiMizenkei, "kanji_mizenkei"},
@@ -345,6 +347,8 @@ inline constexpr std::array<GuardWiring, 8> kGuardWiring = {{
     {GuardMember::EmbedTeMiruAuxiliary, GuardOrigin::KanjiFinalization, "kanji_finalization"},
     {GuardMember::FocusParticleHead, GuardOrigin::KanjiAdjective, "kanji_adjective"},
     {GuardMember::FocusParticleHead, GuardOrigin::KanjiCompoundAdjective, "kanji_compound_adjective"},
+    {GuardMember::ClassicalAuxiliaryTail, GuardOrigin::KanjiFinalization, "kanji_finalization"},
+    {GuardMember::ClassicalAuxiliaryTail, GuardOrigin::KanjiRenyokei, "kanji_renyokei"},
 }};
 
 constexpr bool guardIsWired(GuardMember member, GuardOrigin origin) {
@@ -1359,6 +1363,19 @@ KakariMusubi governingKakariMusubi(const dictionary::DictionaryManager* dict_man
  */
 bool endsWithClassicalAuxiliary(const dictionary::DictionaryManager* dict_manager,
                                 const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos);
+
+/**
+ * @brief Whether [start_pos, end_pos) is a verb cell followed by classical auxiliaries.
+ *
+ * The head is a dictionary verb cell, a kanji stem with one i/e-row okurigana
+ * (咲き), or a bare-kanji verb stem (見, 来, 月+見),
+ * and the rest is classical auxiliary cells of 2+ morae in total, optionally
+ * closed by the conjunctive ば/ど (来+べし, 月見+ぬれ+ば, 咲き+ける). A coined verb
+ * spanning such a run has absorbed the auxiliary chain into its ending.
+ * @see fabricated closed-class absorption guards (top of this header)
+ */
+bool spellsVerbCellWithClassicalAuxiliaries(const dictionary::DictionaryManager* dict_manager,
+                                            const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos);
 
 }  // namespace suzume::analysis::verb_helpers
 
