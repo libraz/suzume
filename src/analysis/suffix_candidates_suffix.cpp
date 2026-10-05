@@ -297,6 +297,11 @@ void generateProductiveSuffixCandidates(const std::vector<char32_t>& codepoints,
   if (start_pos >= char_types.size() || char_types[start_pos] != normalize::CharType::Hiragana) {
     return;
   }
+  // No word starts with a small kana; a stem here would cut a digraph or a
+  // geminate in half (もっ|とちゃん).
+  if (kana::isSmallKanaCodepoint(codepoints[start_pos])) {
+    return;
+  }
 
   constexpr size_t kPpoiLen = 9;  // "っぽい" = 3 chars * 3 bytes
   constexpr size_t kMaxHiraganaLen = 8;

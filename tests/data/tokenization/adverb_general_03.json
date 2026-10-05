@@ -1,0 +1,55 @@
+{
+  "cases": [
+    {
+      "description": "もっとちゃんとして - regression test",
+      "expected": [
+        {
+          "lemma": "もっと",
+          "pos": "Adverb",
+          "surface": "もっと"
+        },
+        {
+          "lemma": "ちゃんと",
+          "pos": "Adverb",
+          "surface": "ちゃんと"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "motttochi_ntoshite",
+      "input": "もっとちゃんとして"
+    },
+    {
+      "description": "いつもならば - regression test",
+      "expected": [
+        {
+          "lemma": "いつも",
+          "pos": "Adverb",
+          "surface": "いつも"
+        },
+        {
+          "lemma": "なら",
+          "pos": "Particle",
+          "surface": "なら"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "itsumonaraba",
+      "input": "いつもならば"
+    }
+  ],
+  "description": "General adverbs (part 3/3)",
+  "version": "1.0"
+}

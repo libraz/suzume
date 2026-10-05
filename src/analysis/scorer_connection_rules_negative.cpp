@@ -197,7 +197,7 @@ float computeNegativeAndNounVerbBonus(const core::LatticeEdge& prev, const core:
     }
   }
   // じゃ is the voiced member of the same contracted pair as ちゃ (読ん+じゃ+いけ+ない).
-  if (prev.extended_pos == core::ExtendedPOS::ParticleConj && utf8::equalsAny(prev.surface, {"ちゃ", "じゃ"}) &&
+  if (prev.extended_pos == core::ExtendedPOS::ParticleConj && grammar::isContractedTeWaParticle(prev.surface) &&
       ((next.extended_pos == core::ExtendedPOS::AuxPotential && utf8::equalsAny(next.surface, {"いけ"})) ||
        (next.extended_pos == core::ExtendedPOS::VerbMizenkei && utf8::equalsAny(next.surface, {"なら"})))) {
     SUZUME_CONNECTION_ADD(bonus, cost::kDoubleVeryStrongBonus);

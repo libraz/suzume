@@ -149,7 +149,7 @@ float computeLateLexicalBoundaryBonus(const core::LatticeEdge& prev, const core:
   const bool geminate_formal_noun =
       prev.extended_pos == core::ExtendedPOS::NounFormal && utf8::endsWith(prev.surface, "っ");
   const bool assimilated_copula =
-      next.extended_pos == core::ExtendedPOS::AuxCopulaDa && utf8::equalsAny(next.surface, {"ちゃ"});
+      next.extended_pos == core::ExtendedPOS::AuxCopulaDa && grammar::isGeminateAssimilatedCopula(next.surface);
   const bool unpaired_assimilated_copula =
       geminate_formal_noun != assimilated_copula ||
       (prev.pos == core::PartOfSpeech::Particle && next.extended_pos == core::ExtendedPOS::NounFormal &&
@@ -165,6 +165,11 @@ float computeLateLexicalBoundaryBonus(const core::LatticeEdge& prev, const core:
   const bool contracted_volitional_off_predicate =
       next.extended_pos == core::ExtendedPOS::AuxVolitional && utf8::equalsAny(next.surface, {"っ"}) &&
       prev.extended_pos != core::ExtendedPOS::VerbMizenkei && prev.pos != core::PartOfSpeech::Auxiliary;
+  // Contracted ては/では fuses a te-form, so an adverb cannot host it
+  // (もっと+ちゃんと is not もっと+ちゃ+ん+と).
+  const bool contracted_te_wa_off_adverb = prev.pos == core::PartOfSpeech::Adverb &&
+                                           next.extended_pos == core::ExtendedPOS::ParticleConj &&
+                                           grammar::isContractedTeWaParticle(next.surface);
   // A final particle closes the utterance, so no conjunctive particle hangs
   // off it (行こう+け+ど is 行こう+けど).
   const bool conjunctive_after_final_particle =
@@ -176,7 +181,7 @@ float computeLateLexicalBoundaryBonus(const core::LatticeEdge& prev, const core:
       attributive_na_after_final_particle || polite_copula_continuative_stranded || copula_spelled_adverb_on_nominal ||
       contracted_nominalizer_before_continuative || unpaired_assimilated_copula ||
       terminal_spelled_final_particle_in_kana_run || contracted_volitional_off_predicate ||
-      conjunctive_after_final_particle) {
+      conjunctive_after_final_particle || contracted_te_wa_off_adverb) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
   if ((prev.extended_pos == core::ExtendedPOS::VerbRenyokei || prev.extended_pos == core::ExtendedPOS::VerbOnbinkei) &&

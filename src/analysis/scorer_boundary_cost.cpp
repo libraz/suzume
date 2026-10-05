@@ -17,6 +17,10 @@ float Scorer::bosCost(const core::LatticeEdge& edge) const {
   if (edge.extended_pos == core::ExtendedPOS::ParticleConj && grammar::isFormalNounConjunctiveParticle(edge.surface)) {
     return sc::scale::kAlmostNever;
   }
+  // The geminate the copula assimilated to cannot precede the sentence.
+  if (edge.extended_pos == core::ExtendedPOS::AuxCopulaDa && grammar::isGeminateAssimilatedCopula(edge.surface)) {
+    return sc::scale::kAlmostNever;
+  }
   return sc::getBoundaryCost(edge.extended_pos).bos;
 }
 

@@ -432,6 +432,14 @@ bool isFormalNounConjunctiveParticle(std::string_view surface) {
   return utf8::equalsAny(surface, {"ものの"});
 }
 
+bool isGeminateAssimilatedCopula(std::string_view surface) {
+  return utf8::equalsAny(surface, {"ちゃ"});
+}
+
+bool isContractedTeWaParticle(std::string_view surface) {
+  return utf8::equalsAny(surface, {"ちゃ", "じゃ"});
+}
+
 bool isDurationPredicateKakaru(std::string_view surface) {
   return surface == "かかる";
 }

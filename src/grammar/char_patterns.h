@@ -412,6 +412,22 @@ bool isDeverbalNominalSuffix(std::string_view surface);
 bool isFormalNounConjunctiveParticle(std::string_view surface);
 
 /**
+ * @brief Whether a copula surface is じゃ assimilated to a preceding geminate
+ *
+ * The form (こっ+ちゃ) exists only right after the っ it assimilated to, so it
+ * never stands alone and never opens a sentence.
+ */
+bool isGeminateAssimilatedCopula(std::string_view surface);
+
+/**
+ * @brief Whether a conjunctive particle is contracted ては/では (ちゃ, じゃ)
+ *
+ * The contraction fuses the te-form's て, so it needs a predicate continuative
+ * on its left (読ん+じゃ+いけ+ない).
+ */
+bool isContractedTeWaParticle(std::string_view surface);
+
+/**
  * @brief Whether a surface is the duration predicate かかる
  * @param surface Candidate predicate surface
  * @return True when the surface is かかる

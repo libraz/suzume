@@ -115,6 +115,8 @@ void setParticleAndLexicalPenaltyCosts(BigramMatrix& table) {
       {EPOS::Adverb, EPOS::AdjNaAdj, cost::kStrongBonus},
       {EPOS::Adverb, EPOS::AdjKatt, cost::kStrongBonus},
       {EPOS::Adverb, EPOS::AdjStem, cost::kVeryRare},
+      // A suffix needs a nominal host, which an adverb is not (もっと+ちゃんと).
+      {EPOS::Adverb, EPOS::Suffix, cost::kNever},
       {EPOS::Adverb, EPOS::VerbRenyokei, cost::kModerateBonus},
       {EPOS::Adverb, EPOS::VerbShuushikei, cost::kModerateBonus},
       {EPOS::Adverb, EPOS::VerbOnbinkei, cost::kModerateBonus},
