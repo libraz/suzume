@@ -1132,6 +1132,14 @@ void generateKatakanaAdjectiveCandidates(const std::vector<char32_t>& codepoints
             // Cost: 0.2-0.35 based on confidence (lower = better)
             float cost = candidate::confidenceScaledCost(candidate::kKanjiAdjBaseCost, cand.confidence,
                                                          candidate::kKanjiAdjConfScale);
+            // The nominalizer さ is a suffix on the bare stem (エモ+さ), as on the
+            // kana and kanji sides, not a cell of the adjective.
+            if (end_pos == kata_end + 1 && first_hira == U'さ') {
+              candidates.push_back(makeIAdjStemCandidate(extractSubstring(codepoints, start_pos, kata_end), start_pos,
+                                                         kata_end, cand.base_form, cost, CandidateOrigin::AdjectiveI,
+                                                         cand.confidence, "i_adjective_kata_stem_sa"));
+              break;
+            }
             auto adj_cand = makeIAdjCandidate(surface, start_pos, end_pos, cand.base_form, cost,
                                               CandidateOrigin::AdjectiveI, cand.confidence, "i_adjective_kata");
             // Skip exceeds_dict_length penalty - this is a morphologically recognized pattern

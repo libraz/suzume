@@ -1112,6 +1112,92 @@
       ],
       "id": "chi_tt_ttte",
       "input": "ちょっ、待って"
+    },
+    {
+      "description": "今の気分、何かエモさがある。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "今",
+          "pos": "Noun",
+          "surface": "今"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "気分",
+          "pos": "Noun",
+          "surface": "気分"
+        },
+        {
+          "lemma": "何",
+          "pos": "Pronoun",
+          "surface": "何"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "エモい",
+          "pos": "Adjective",
+          "surface": "エモ"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Suffix",
+          "surface": "さ"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        }
+      ],
+      "id": "no_ka_sagaaru",
+      "input": "今の気分、何かエモさがある。"
+    },
+    {
+      "description": "ヤバさ - auto-generated",
+      "expected": [
+        {
+          "lemma": "ヤバい",
+          "pos": "Adjective",
+          "surface": "ヤバ"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Suffix",
+          "surface": "さ"
+        }
+      ],
+      "id": "sa_2",
+      "input": "ヤバさ"
+    },
+    {
+      "description": "ダサさ - auto-generated",
+      "expected": [
+        {
+          "lemma": "ダサい",
+          "pos": "Adjective",
+          "surface": "ダサ"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Suffix",
+          "surface": "さ"
+        }
+      ],
+      "id": "sa_3",
+      "input": "ダサさ"
     }
   ],
   "description": "Colloquial and slang patterns",
