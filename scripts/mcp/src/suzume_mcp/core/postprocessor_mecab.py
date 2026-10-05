@@ -17,6 +17,7 @@ from .constants import (
 )
 from .core_lexicon import core_headwords
 from .mecab import is_single_token_of_pos, mecab_analyze
+from .merge_postprocessor_spelling import _MORA_VOWEL
 from .postprocessor_common import _raw_analysis
 
 
@@ -33,7 +34,7 @@ def _is_emphatic_spelling(original: str, standard: str, host_pos: str = "") -> b
     del host_pos  # Emphasis reduces the same way whatever the host.
     if original == standard:
         return False
-    stripped = original.rstrip("".join(_EMPHATIC_SOKUON_MARKS))
+    stripped = original.rstrip("".join(_EMPHATIC_SOKUON_MARKS) + _EMPHATIC_SMALL_VOWELS)
     if stripped == standard:
         return True
     if "ー" not in stripped and not (
@@ -84,6 +85,18 @@ SLANG_ADJ_SUBSTITUTE = "赤"
 
 
 _EMPHATIC_SOKUON_MARKS = frozenset("っッ")
+# Small vowels that draw out the mora before them (ますぅ, だよぉ).
+_EMPHATIC_SMALL_VOWELS = "ぁぃぅぇぉ"
+
+
+def _emphatic_small_vowels(text: str) -> list[int]:
+    """Where a small vowel repeating the previous mora's vowel closes a phrase."""
+    return [
+        m.start()
+        for m in regex.finditer(r"(?<=\p{Hiragana})[ぁぃぅぇぉ](?=[\p{P}\p{S}\p{Z}]|$)", text)
+        if text[m.start() - 1] not in _EMPHATIC_SMALL_VOWELS
+        and _MORA_VOWEL.get(text[m.start() - 1]) == _MORA_VOWEL.get(text[m.start()])
+    ]
 
 
 def _emphatic_sokuons(text: str) -> list[int]:
@@ -352,7 +365,7 @@ def preprocess_for_mecab(text: str) -> tuple[str, dict[tuple[int, str], dict], t
     # mark is dropped before the analysis and put back into the surface
     # afterwards. A final sokuon the dictionary already reads as a word in its
     # own right (あっ, えっ) has itself for a lemma and is left alone.
-    for emphatic_sokuon in _emphatic_sokuons(text):
+    for emphatic_sokuon in [*_emphatic_sokuons(text), *_emphatic_small_vowels(text)]:
         if raw is None:
             raw = _raw_analysis(text)
         if _invents_a_word_for(raw, emphatic_sokuon):

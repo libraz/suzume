@@ -1535,6 +1535,67 @@
       ],
       "id": "wo_itadakedesu",
       "input": "道具を用いただけです"
+    },
+    {
+      "description": "待ってますぅ - auto-generated",
+      "expected": [
+        {
+          "lemma": "待つ",
+          "pos": "Verb",
+          "surface": "待っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ますぅ"
+        }
+      ],
+      "id": "tttemasu",
+      "input": "待ってますぅ"
+    },
+    {
+      "description": "知ってますぅ - auto-generated",
+      "expected": [
+        {
+          "lemma": "知る",
+          "pos": "Verb",
+          "surface": "知っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ますぅ"
+        }
+      ],
+      "id": "tttemasu_2",
+      "input": "知ってますぅ"
+    },
+    {
+      "description": "行きますぅ - auto-generated",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行き"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ますぅ"
+        }
+      ],
+      "id": "kimasu",
+      "input": "行きますぅ"
     }
   ],
   "description": "Politeness auxiliaries (ます、です)",

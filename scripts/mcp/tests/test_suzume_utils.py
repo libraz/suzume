@@ -575,3 +575,14 @@ class TestPhraseFinalEmphaticSokuon:
     def test_leaves_a_sokuon_carrying_a_suffix(self):
         tokens, _, _ = get_expected_tokens("行ったって")
         assert [token["surface"] for token in tokens][:2] == ["行っ", "た"]
+
+
+class TestPhraseFinalSmallVowel:
+    @pytest.mark.parametrize("text", ["待ってますぅ", "行きますぅ！"])
+    def test_keeps_the_drawn_out_auxiliary_with_its_lemma(self, text):
+        tokens, _, _ = get_expected_tokens(text)
+        assert (tokens[-1]["surface"], tokens[-1]["lemma"]) == ("ますぅ", "ます")
+
+    def test_leaves_a_small_vowel_inside_a_word(self):
+        tokens, _, _ = get_expected_tokens("ファイル")
+        assert [token["surface"] for token in tokens] == ["ファイル"]

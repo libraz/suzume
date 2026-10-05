@@ -251,8 +251,16 @@ def _postprocess_kanji_merge(result: list[dict], applied_rule: str | None) -> tu
             # is decided by its last piece (交通+安全 is one, 安全+対策 is not).
             if "形容動詞語幹" in (merged[-1].get("pos_sub1"), curr.get("pos_sub1")):
                 merged[-1]["pos_sub1"] = "形容動詞語幹" if curr.get("pos_sub1") == "形容動詞語幹" else "一般"
+            # A lone small vowel repeating the mora before it only draws that
+            # mora out (ますぅ), so the word keeps its dictionary lemma.
+            lengthens = (
+                len(surface) == 1
+                and _MORA_VOWEL.get(surface) is not None
+                and _MORA_VOWEL.get(surface) == _MORA_VOWEL.get(merged[-1]["surface"][-1:])
+            )
             merged[-1]["surface"] += surface
-            merged[-1]["lemma"] = merged[-1]["surface"]
+            if not lengthens:
+                merged[-1]["lemma"] = merged[-1]["surface"]
             merged[-1]["pos"] = "名詞"
             if applied_rule is None:
                 applied_rule = "kanji-merge"
@@ -327,8 +335,16 @@ def _postprocess_small_kana_head_merge(result: list[dict], applied_rule: str | N
                 if applied_rule is None:
                     applied_rule = "small-kana-head-merge"
                 continue
+            # A lone small vowel repeating the mora before it only draws that
+            # mora out (ますぅ), so the word keeps its dictionary lemma.
+            lengthens = (
+                len(surface) == 1
+                and _MORA_VOWEL.get(surface) is not None
+                and _MORA_VOWEL.get(surface) == _MORA_VOWEL.get(merged[-1]["surface"][-1:])
+            )
             merged[-1]["surface"] += surface
-            merged[-1]["lemma"] = merged[-1]["surface"]
+            if not lengthens:
+                merged[-1]["lemma"] = merged[-1]["surface"]
             if applied_rule is None:
                 applied_rule = "small-kana-head-merge"
             continue
