@@ -1409,3 +1409,28 @@ class TestQuotativeDeterminerHead:
         ]
         assert not postprocessors.postprocess_quotative_determiner_head(bare)
         assert not postprocessors.postprocess_quotative_determiner_head(before_no)
+
+
+class TestContractedIkuTteNa:
+    def test_splits_tte_na_after_te_form_into_iku_cell(self):
+        tokens = [
+            {"surface": "持っ", "pos": "Verb", "lemma": "持つ"},
+            {"surface": "て", "pos": "Particle", "lemma": "て"},
+            {"surface": "ってな", "pos": "Particle", "lemma": "ってな"},
+        ]
+        assert postprocessors.postprocess_contracted_iku_tte_na(tokens)
+        assert [(t["surface"], t["pos"]) for t in tokens] == [
+            ("持っ", "Verb"),
+            ("て", "Particle"),
+            ("っ", "Auxiliary"),
+            ("て", "Particle"),
+            ("な", "Particle"),
+        ]
+
+    def test_splits_tte_na_elsewhere_into_quotative_and_na(self):
+        tokens = [
+            {"surface": "行く", "pos": "Verb", "lemma": "行く"},
+            {"surface": "ってな", "pos": "Particle", "lemma": "ってな"},
+        ]
+        assert postprocessors.postprocess_contracted_iku_tte_na(tokens)
+        assert [t["surface"] for t in tokens] == ["行く", "って", "な"]

@@ -1148,6 +1148,102 @@
       ],
       "id": "mou_nda",
       "input": "もう帰んだ"
+    },
+    {
+      "description": "Contracted te-iku cell plus te and final na after a te-form",
+      "expected": [
+        {
+          "lemma": "起こす",
+          "pos": "Verb",
+          "surface": "起こし"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いく",
+          "pos": "Auxiliary",
+          "surface": "っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        }
+      ],
+      "id": "koshitetttena",
+      "input": "起こしてってな。"
+    },
+    {
+      "description": "Contracted te-iku cell plus te and final na after a te-form",
+      "expected": [
+        {
+          "lemma": "持つ",
+          "pos": "Verb",
+          "surface": "持っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いく",
+          "pos": "Auxiliary",
+          "surface": "っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        }
+      ],
+      "id": "tttetttena",
+      "input": "持ってってな"
+    },
+    {
+      "description": "Contracted te-iku cell plus te and final na after a te-form",
+      "expected": [
+        {
+          "lemma": "連れる",
+          "pos": "Verb",
+          "surface": "連れ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いく",
+          "pos": "Auxiliary",
+          "surface": "っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        }
+      ],
+      "id": "retetttena",
+      "input": "連れてってな"
     }
   ],
   "description": "colloquial_contracted tests",

@@ -777,6 +777,35 @@ def postprocess_excessive_after_verb(tokens: list[dict]) -> bool:
     return changed
 
 
+def postprocess_contracted_iku_tte_na(tokens: list[dict]) -> bool:
+    """Split the reference's compound particle ってな into its cells.
+
+    After a te-form (持って+ってな) it is the contracted ていく cell っ, the
+    connective て and the final particle な; elsewhere it is the quotative って
+    plus な. Neither reading is one particle.
+    """
+    changed = False
+    idx = 0
+    while idx < len(tokens):
+        token = tokens[idx]
+        if token.get("surface") == "ってな" and token.get("pos") == "Particle":
+            after_te_form = idx > 0 and tokens[idx - 1].get("surface") in ("て", "で")
+            if after_te_form:
+                cells = [
+                    {"surface": "っ", "pos": "Auxiliary", "lemma": "く"},
+                    {"surface": "て", "pos": "Particle", "lemma": "て"},
+                ]
+            else:
+                cells = [{"surface": "って", "pos": "Particle", "lemma": "って"}]
+            cells.append({"surface": "な", "pos": "Particle", "lemma": "な"})
+            tokens[idx : idx + 1] = cells
+            idx += len(cells)
+            changed = True
+            continue
+        idx += 1
+    return changed
+
+
 def postprocess_contracted_iku_lemma(tokens: list[dict]) -> bool:
     """Give the contracted ていく cells (持ってく, 持ってった, 見てかない) the lemma いく.
 

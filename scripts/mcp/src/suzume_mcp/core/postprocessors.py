@@ -150,6 +150,7 @@ postprocess_predicate_cell_lemmas = postprocessor_subsidiaries.postprocess_predi
 postprocess_frame_repairs = postprocessor_subsidiaries.postprocess_frame_repairs
 postprocess_closed_subsidiary_aux = postprocessor_subsidiaries.postprocess_closed_subsidiary_aux
 postprocess_contracted_iku_lemma = postprocessor_subsidiaries.postprocess_contracted_iku_lemma
+postprocess_contracted_iku_tte_na = postprocessor_subsidiaries.postprocess_contracted_iku_tte_na
 postprocess_contracted_progressive_aux = postprocessor_subsidiaries.postprocess_contracted_progressive_aux
 postprocess_contracted_toku_aux = postprocessor_subsidiaries.postprocess_contracted_toku_aux
 postprocess_excessive_after_verb = postprocessor_subsidiaries.postprocess_excessive_after_verb
@@ -227,6 +228,7 @@ POSTPROCESSORS: tuple[tuple[str, Callable[[list[dict]], bool]], ...] = (
     ("fuu-formal-noun", postprocess_fuu_formal_noun),
     ("indefinite-ka", postprocess_indefinite_ka),
     ("subsidiary-yuku", postprocess_subsidiary_yuku),
+    ("contracted-iku-tte-na", postprocess_contracted_iku_tte_na),
     ("contracted-iku-lemma", postprocess_contracted_iku_lemma),
     ("hiragana-purpose-noun", postprocess_hiragana_purpose_noun),
     ("short-hiragana-onbin", postprocess_short_hiragana_onbin),
