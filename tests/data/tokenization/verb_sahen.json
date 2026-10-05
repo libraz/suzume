@@ -174,6 +174,53 @@
       ],
       "id": "suru_19",
       "input": "達する。"
+    },
+    {
+      "description": "Kanji sahen-ji verb missing from the reference dictionary",
+      "expected": [
+        {
+          "lemma": "その",
+          "pos": "Determiner",
+          "surface": "その"
+        },
+        {
+          "lemma": "評価",
+          "pos": "Noun",
+          "surface": "評価"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "断じる",
+          "pos": "Verb",
+          "surface": "断じ"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ざる"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "得る",
+          "pos": "Verb",
+          "surface": "得"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "sono_to_jizaruwo_nai",
+      "input": "その評価と断じざるを得ない"
     }
   ],
   "description": "verb_sahen tests",

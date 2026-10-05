@@ -643,6 +643,50 @@
       ],
       "id": "wougokashimasen",
       "input": "机をうごかしません"
+    },
+    {
+      "description": "Kanji godan-sa spelling missing from the reference dictionary",
+      "expected": [
+        {
+          "lemma": "何もかも",
+          "pos": "Adverb",
+          "surface": "何もかも"
+        },
+        {
+          "lemma": "失くす",
+          "pos": "Verb",
+          "surface": "失くし"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        }
+      ],
+      "id": "mokamo_kushitemo",
+      "input": "何もかも失くしても"
+    },
+    {
+      "description": "Kanji godan-sa spelling missing from the reference dictionary",
+      "expected": [
+        {
+          "lemma": "失くす",
+          "pos": "Verb",
+          "surface": "失くさ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "kusanai",
+      "input": "失くさない"
     }
   ],
   "description": "Godan Sa-row verbs (五段サ行動詞) - verbs ending in す",

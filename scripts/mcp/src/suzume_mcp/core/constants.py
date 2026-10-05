@@ -1270,3 +1270,13 @@ _KYUJITAI_PAIRS = (
 KYUJITAI_TO_SHINJITAI: dict[str, str] = {
     _KYUJITAI_PAIRS[index]: _KYUJITAI_PAIRS[index + 1] for index in range(0, len(_KYUJITAI_PAIRS), 2)
 }
+
+
+# Frame kanji of a known verb, keyed by the first okurigana kana of its
+# conjugation row: a kanji the dictionary has no verb spelling for is probed in
+# the frame's place (俟+た as 待+た, 失+く as 無+く, 断+じ as 論+じ).
+KANJI_VERB_ROW_FRAMES: dict[str, str] = {
+    "た": "待",
+    "く": "無",
+    "じ": "論",
+}

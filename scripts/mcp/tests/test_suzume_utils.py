@@ -441,3 +441,18 @@ class TestClassicalPastShikaFusedHost:
     def test_leaves_a_host_whose_stem_is_no_continuative(self, text):
         tokens, _, _ = get_expected_tokens(text)
         assert "しか" not in [token["surface"] for token in tokens]
+
+
+class TestKanjiVerbFrame:
+    @pytest.mark.parametrize(
+        ("text", "verb", "lemma"),
+        [("論を俟たない", "俟た", "俟つ"), ("失くさない", "失くさ", "失くす"), ("断じざるを得ない", "断じ", "断じる")],
+    )
+    def test_reads_an_unlisted_kanji_verb_through_a_row_frame(self, text, verb, lemma):
+        tokens, _, _ = get_expected_tokens(text)
+        token = next(token for token in tokens if token["surface"] == verb)
+        assert (token["pos"], token["lemma"]) == ("Verb", lemma)
+
+    def test_leaves_a_noun_before_a_kana_word(self):
+        tokens, _, _ = get_expected_tokens("雪たくさん")
+        assert [token["surface"] for token in tokens] == ["雪", "たくさん"]

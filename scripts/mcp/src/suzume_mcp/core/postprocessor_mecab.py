@@ -6,6 +6,7 @@ import regex
 
 from .constants import (
     CLOSED_HONORIFIC_SERU_LEMMAS,
+    KANJI_VERB_ROW_FRAMES,
     KYUJITAI_TO_SHINJITAI,
     SLANG_ADJ_FOLLOWER,
     SLANG_ADJ_STEMS,
@@ -239,6 +240,28 @@ def preprocess_for_mecab(text: str) -> tuple[str, dict[tuple[int, str], dict], t
             continue
         replacements[(start, "slang_verb")] = {"original": stem, "replacement": "走", "length": len(stem)}
 
+    # A kanji verb spelling the dictionary lacks (断じる, 俟つ, 失くす) leaves the
+    # kanji stranded as a noun before its okurigana. Its conjugation row shows in
+    # the kana behind it, so a frame kanji of a known verb on that row stands in
+    # for it; the substitution is kept only when the frame reads as a verb and
+    # the analysis gets strictly shorter, i.e. the okurigana rejoins its stem.
+    for start, head in raw[1].items():
+        surface = head.get("surface", "")
+        frame = KANJI_VERB_ROW_FRAMES.get(text[start + 1 : start + 2])
+        if (
+            frame is None
+            or len(surface) != 1
+            or regex.fullmatch(r"\p{Han}", surface) is None
+            or head.get("pos") == "動詞"
+            or (start, "kanji_verb_frame") in replacements
+        ):
+            continue
+        probe_count, probe_index = _raw_analysis(text[:start] + frame + text[start + 1 :])
+        landed = probe_index.get(start)
+        if landed is None or landed["pos"] != "動詞" or len(landed["surface"]) < 2 or probe_count >= raw[0]:
+            continue
+        replacements[(start, "kanji_verb_frame")] = {"original": surface, "replacement": frame, "length": 1}
+
     # Unusual names
     for name, standard in UNUSUAL_NAMES.items():
         for m in regex.finditer(regex.escape(name) + r"(さん|ちゃん|様|君|殿)", text):
@@ -331,6 +354,7 @@ def preprocess_for_mecab(text: str) -> tuple[str, dict[tuple[int, str], dict], t
         "word_exception": "word-exception",
         "emphatic_sokuon": "emphatic-sokuon",
         "kyujitai": "kyujitai-fold",
+        "kanji_verb_frame": "kanji-verb-frame",
     }
     rules = tuple(dict.fromkeys(rule_names[category] for _, category in replacements))
     return text, replacements, rules

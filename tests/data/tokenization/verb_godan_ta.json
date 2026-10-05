@@ -79,6 +79,48 @@
         "kanji-verb",
         "te-form"
       ]
+    },
+    {
+      "description": "Kanji godan-ta verb missing from the reference dictionary",
+      "expected": [
+        {
+          "lemma": "この",
+          "pos": "Determiner",
+          "surface": "この"
+        },
+        {
+          "lemma": "事実",
+          "pos": "Noun",
+          "surface": "事実"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "論",
+          "pos": "Noun",
+          "surface": "論"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "俟つ",
+          "pos": "Verb",
+          "surface": "俟た"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "kono_ha_wo_tanai",
+      "input": "この事実は論を俟たない"
     }
   ],
   "description": "Godan Ta-row verbs (五段タ行動詞) - verbs ending in つ",
