@@ -418,3 +418,14 @@ class TestClassicalMuAfterAuxiliaryIrrealis:
             ("たら", "Auxiliary"),
             ("む", "Auxiliary"),
         ]
+
+
+class TestClassicalPerfectNuru:
+    def test_joins_nu_and_ru_after_a_continuative(self):
+        tokens, _, _ = get_expected_tokens("時ぞ過ぎぬる")
+        assert [(token["surface"], token["pos"]) for token in tokens][-1] == ("ぬる", "Auxiliary")
+        assert tokens[-1]["lemma"] == "ぬ"
+
+    def test_keeps_the_negative_before_a_noun(self):
+        tokens, _, _ = get_expected_tokens("見ぬ人")
+        assert [token["surface"] for token in tokens] == ["見", "ぬ", "人"]

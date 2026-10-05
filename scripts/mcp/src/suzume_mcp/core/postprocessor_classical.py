@@ -641,6 +641,22 @@ def postprocess_classical_perfect_nu(tokens: list[dict]) -> bool:
     and a continuative cannot be followed by another verb's own terminal, so the
     reading the terminal already gets covers all three.
     """
+    # The analyzer also spells the two cells as the terminal ぬ plus a stray
+    # classical る/れ (忘れ+ぬ+る); the negative ぬ never takes either, so the
+    # pair is the same cell.
+    idx = 1
+    while idx + 1 < len(tokens):
+        token, tail = tokens[idx], tokens[idx + 1]
+        if (
+            token.get("surface") == "ぬ"
+            and token.get("pos") == "Auxiliary"
+            and tail.get("pos") == "Auxiliary"
+            and "ぬ" + tail.get("surface", "") in _PERFECT_NU_CELLS
+            and tokens[idx - 1].get("pos") == "Verb"
+            and _spells_verb_continuative(tokens[idx - 1].get("surface", ""))
+        ):
+            tokens[idx : idx + 2] = [{"surface": "ぬ" + tail["surface"], "pos": "Auxiliary", "lemma": "ぬ"}]
+        idx += 1
     for idx, token in enumerate(tokens):
         if idx == 0 or token.get("pos") != "Verb" or token.get("surface") not in _PERFECT_NU_CELLS:
             continue

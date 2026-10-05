@@ -2220,6 +2220,87 @@
       ],
       "id": "kuramu_3",
       "input": "風吹くらむ"
+    },
+    {
+      "description": "Perfect nuru after a kakari particle",
+      "expected": [
+        {
+          "lemma": "心",
+          "pos": "Noun",
+          "surface": "心"
+        },
+        {
+          "lemma": "なむ",
+          "pos": "Particle",
+          "surface": "なむ"
+        },
+        {
+          "lemma": "忘れる",
+          "pos": "Verb",
+          "surface": "忘れ"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬる"
+        }
+      ],
+      "id": "namu_renuru",
+      "input": "心なむ忘れぬる"
+    },
+    {
+      "description": "Perfect nuru after an ichidan continuative",
+      "expected": [
+        {
+          "lemma": "時",
+          "pos": "Noun",
+          "surface": "時"
+        },
+        {
+          "lemma": "ぞ",
+          "pos": "Particle",
+          "surface": "ぞ"
+        },
+        {
+          "lemma": "過ぎる",
+          "pos": "Verb",
+          "surface": "過ぎ"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬる"
+        }
+      ],
+      "id": "zo_ginuru",
+      "input": "時ぞ過ぎぬる"
+    },
+    {
+      "description": "Perfect nuru after an ichidan continuative",
+      "expected": [
+        {
+          "lemma": "人",
+          "pos": "Noun",
+          "surface": "人"
+        },
+        {
+          "lemma": "ぞ",
+          "pos": "Particle",
+          "surface": "ぞ"
+        },
+        {
+          "lemma": "見える",
+          "pos": "Verb",
+          "surface": "見え"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬる"
+        }
+      ],
+      "id": "zo_enuru",
+      "input": "人ぞ見えぬる"
     }
   ],
   "description": "auxiliary_classical tests",
