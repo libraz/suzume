@@ -107,6 +107,72 @@
       ],
       "id": "mouchi_ttto_ttte",
       "input": "もうちょっと待って"
+    },
+    {
+      "description": "私少し休む - auto-generated",
+      "expected": [
+        {
+          "lemma": "私",
+          "pos": "Pronoun",
+          "surface": "私"
+        },
+        {
+          "lemma": "少し",
+          "pos": "Adverb",
+          "surface": "少し"
+        },
+        {
+          "lemma": "休む",
+          "pos": "Verb",
+          "surface": "休む"
+        }
+      ],
+      "id": "shi_mu",
+      "input": "私少し休む"
+    },
+    {
+      "description": "明日少し休む - auto-generated",
+      "expected": [
+        {
+          "lemma": "明日",
+          "pos": "Noun",
+          "surface": "明日"
+        },
+        {
+          "lemma": "少し",
+          "pos": "Adverb",
+          "surface": "少し"
+        },
+        {
+          "lemma": "休む",
+          "pos": "Verb",
+          "surface": "休む"
+        }
+      ],
+      "id": "shi_mu_2",
+      "input": "明日少し休む"
+    },
+    {
+      "description": "今日更に寒い - auto-generated",
+      "expected": [
+        {
+          "lemma": "今日",
+          "pos": "Noun",
+          "surface": "今日"
+        },
+        {
+          "lemma": "更に",
+          "pos": "Adverb",
+          "surface": "更に"
+        },
+        {
+          "lemma": "寒い",
+          "pos": "Adjective",
+          "surface": "寒い"
+        }
+      ],
+      "id": "ni_i",
+      "input": "今日更に寒い"
     }
   ],
   "description": "General adverbs (part 3/3)",

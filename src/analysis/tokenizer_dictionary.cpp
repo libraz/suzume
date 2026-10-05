@@ -338,10 +338,23 @@ bool opensOnContentWordTailBeforeParticle(const core::Lattice& lattice,
     return false;
   }
   const size_t content_end = start_pos + 1;
+  // An unverified content edge is evidence only when no dictionary word ends
+  // inside it: 事実 is one opaque run, while 私+少 and 明日+少 are fabricated
+  // across a registered word's boundary (私+少し, 明日+少し).
+  const auto crosses_dictionary_boundary = [&lattice](const core::LatticeEdge& edge) {
+    for (size_t interior = edge.start + 1; interior < edge.end; ++interior) {
+      if (core::anyEdgeEndingAt(lattice, interior,
+                                [](const core::LatticeEdge& inner) { return inner.fromDictionary(); })) {
+        return true;
+      }
+    }
+    return false;
+  };
   for (size_t content_start = 0; content_start < start_pos; ++content_start) {
-    if (core::anyEdgeStartingAt(lattice, content_start, [content_end](const core::LatticeEdge& edge) {
+    if (core::anyEdgeStartingAt(lattice, content_start, [&](const core::LatticeEdge& edge) {
           return edge.end == content_end &&
-                 (edge.pos == core::PartOfSpeech::Noun || edge.pos == core::PartOfSpeech::Adjective);
+                 (edge.pos == core::PartOfSpeech::Noun || edge.pos == core::PartOfSpeech::Adjective) &&
+                 (edge.lemmaVerified() || !crosses_dictionary_boundary(edge));
         })) {
       return true;
     }
