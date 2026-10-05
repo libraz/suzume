@@ -161,15 +161,16 @@ bool opensWordAfterQuantity(const dictionary::DictionaryManager* dict_manager, c
 size_t counterKanjiRunEnd(const std::vector<char32_t>& codepoints, size_t pos, size_t limit);
 
 /**
- * @brief Whether the kana at @p run_end may be okurigana on the kanji run before it
+ * @brief Whether the word on the kanji run before @p run_end may continue past it
  *
- * grammar::mayBeOkuriganaAt() answers from the kana alone; here a registered
+ * A numeral kanji there may still belong to the word (100円+均一). Otherwise
+ * grammar::mayBeOkuriganaAt() answers from the kana alone, and a registered
  * particle of two or more morae starting there settles it unless the last
  * kanji opens a registered predicate through it (1万人超+まで). A one-mora
  * particle stays ambiguous with okurigana (三枚+重ねる).
  */
-bool okuriganaMayFollowKanjiRun(const dictionary::DictionaryManager* dict_manager,
-                                const std::vector<char32_t>& codepoints, size_t run_end);
+bool kanjiRunMayContinueAt(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
+                           size_t run_end);
 
 /**
  * @brief Check if a terminal is a productively formed -しい i-adjective

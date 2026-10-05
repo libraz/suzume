@@ -197,6 +197,10 @@ void addMixedScriptCandidates(core::Lattice& lattice, std::string_view text, con
     // Counting it would invert the parity and push the cut one kanji early.
     const size_t full_run_end = grammar::nominalKanjiRunEnd(codepoints, first_end);
     const size_t kanji_run_end = first_end + grammar::countKanjiRunWords(codepoints, first_end, full_run_end);
+    // A run cut short by a numeral kanji has not been measured (100円+均一), so
+    // its parity says nothing about the cut.
+    const bool run_continues_into_numeral =
+        full_run_end < codepoints.size() && normalize::isKanjiCodepoint(codepoints[full_run_end]);
     // For digit+kanji, generate multiple candidates with length-based costs
     // This allows Viterbi to choose the best segmentation
     for (size_t kanji_len = 1; kanji_len <= max_end - first_end; ++kanji_len) {
@@ -249,7 +253,7 @@ void addMixedScriptCandidates(core::Lattice& lattice, std::string_view text, con
       // leftover so the even boundary wins; when the counter cut itself is odd,
       // the whole run is offered below. A single stranded kanji is no word at
       // all (3種+類, 2世+帯), so it is charged above the bare-numeral path.
-      if ((kanji_run_end - candidate_end) % 2 == 1) {
+      if ((kanji_run_end - candidate_end) % 2 == 1 && !run_continues_into_numeral) {
         length_adjustment += kanji_run_end - candidate_end == 1 ? bigram_cost::kRare : bigram_cost::kMinor;
       }
       float final_cost = base_cost + length_adjustment;
@@ -271,7 +275,7 @@ void addMixedScriptCandidates(core::Lattice& lattice, std::string_view text, con
                       base_cost + opts.digit_kanji_1_bonus, flags, "");
     } else if (counter_cut > first_end && counter_cut < kanji_run_end && (kanji_run_end - counter_cut) % 2 == 1 &&
                !verb_helpers::opensWordAfterQuantity(&dict_manager, codepoints, counter_cut) &&
-               !verb_helpers::okuriganaMayFollowKanjiRun(&dict_manager, codepoints, full_run_end)) {
+               !verb_helpers::kanjiRunMayContinueAt(&dict_manager, codepoints, full_run_end)) {
       const size_t run_end_byte = byteOffsetAt(byte_offsets, full_run_end);
       const std::string_view surface = text.substr(start_byte, run_end_byte - start_byte);
       SUZUME_DEBUG_LOG_VERBOSE("[SPLIT_MIX] \"" << surface << "\": digit+uneven kanji run\n");

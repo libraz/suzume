@@ -181,6 +181,14 @@ bool PreTokenizer::tryMatchCurrency(std::string_view text, size_t pos, PreToken&
   if (!consumeCodepoint(text, idx, U'円')) {
     return false;
   }
+  // A kanji after 円 may continue the quantity phrase (10万円超, 1万円札), which
+  // the lattice's counter scan decides by its kanji-run rule, as after 人.
+  if (idx < text.size()) {
+    size_t next = idx;
+    if (normalize::isKanjiCodepoint(normalize::decodeUtf8(text, next))) {
+      return false;
+    }
+  }
 
   setTokenFromRange(token, text, pos, idx, PreTokenType::Currency, core::PartOfSpeech::Noun);
   return true;

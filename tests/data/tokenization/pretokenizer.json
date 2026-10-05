@@ -96,6 +96,55 @@
       ],
       "id": "space_separated_katakana_words",
       "input": "ハロー ワールド"
+    },
+    {
+      "description": "currency before a kanji is left to the counter run rule",
+      "expected": [
+        {
+          "lemma": "10万円超",
+          "pos": "Noun",
+          "surface": "10万円超"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "取引",
+          "pos": "Noun",
+          "surface": "取引"
+        }
+      ],
+      "id": "10_no",
+      "input": "10万円超の取引"
+    },
+    {
+      "description": "a kanji run cut by a numeral kanji keeps the counter boundary",
+      "expected": [
+        {
+          "lemma": "100円",
+          "pos": "Noun",
+          "surface": "100円"
+        },
+        {
+          "lemma": "均一",
+          "pos": "Noun",
+          "surface": "均一"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "店",
+          "pos": "Noun",
+          "surface": "店"
+        }
+      ],
+      "id": "100_no",
+      "input": "100円均一の店"
     }
   ],
   "description": "pretokenizer tests",

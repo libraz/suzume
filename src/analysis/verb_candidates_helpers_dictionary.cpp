@@ -96,8 +96,11 @@ size_t counterKanjiRunEnd(const std::vector<char32_t>& codepoints, size_t pos, s
   return end;
 }
 
-bool okuriganaMayFollowKanjiRun(const dictionary::DictionaryManager* dict_manager,
-                                const std::vector<char32_t>& codepoints, size_t run_end) {
+bool kanjiRunMayContinueAt(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
+                           size_t run_end) {
+  if (run_end < codepoints.size() && normalize::isKanjiCodepoint(codepoints[run_end])) {
+    return true;
+  }
   if (!grammar::mayBeOkuriganaAt(codepoints, run_end)) {
     return false;
   }
