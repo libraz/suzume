@@ -682,6 +682,33 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
             if applied_rule is None:
                 applied_rule = "nominalizer-datte"
 
+        # The contracted progressive imperative てろ/でろ is one subsidiary-verb
+        # cell; without a following particle IPADIC reads it as te-form plus a
+        # stray noun ろ.  Re-emit the shape it gives the same cell before よ.
+        if (
+            not merged
+            and t.get("surface") in ("て", "で")
+            and t.get("pos") == "助詞"
+            and t.get("pos_sub1") == "接続助詞"
+            and i + 1 < len(tokens)
+            and tokens[i + 1].get("surface") == "ろ"
+            and tokens[i + 1].get("pos") == "名詞"
+        ):
+            result.append(
+                {
+                    "surface": t["surface"] + "ろ",
+                    "pos": "動詞",
+                    "pos_sub1": "非自立",
+                    "conj_type": "一段",
+                    "conj_form": "命令ｒｏ",
+                    "lemma": t["surface"] + "る",
+                }
+            )
+            i += 2
+            merged = True
+            if applied_rule is None:
+                applied_rule = "contracted-progressive-imperative"
+
         # Native pre-tokenization sees the normalized ASCII punctuation before
         # analysis. Recover its open-pattern quantity and email units when
         # MeCab emitted their punctuation as separate records.

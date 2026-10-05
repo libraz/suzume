@@ -268,9 +268,9 @@ float computeSugiFinalParticleBonus(const core::LatticeEdge& prev, const core::L
   }
 
   // The voiced progressive contraction follows an n-onbin: 読んでる,
-  // 飲んでる. Outside this environment でる retains its lexical-verb reading.
+  // 飲んでる, 読んでろ. Outside this environment でる retains its lexical-verb reading.
   if (prev.extended_pos == core::ExtendedPOS::VerbOnbinkei && utf8::endsWith(prev.surface, "ん") &&
-      next.extended_pos == core::ExtendedPOS::AuxAspectIru && next.surface == "でる") {
+      next.extended_pos == core::ExtendedPOS::AuxAspectIru && next.lemma == "でる") {
     SUZUME_CONNECTION_ADD(bonus, cost::kStrongBonus);
   }
 

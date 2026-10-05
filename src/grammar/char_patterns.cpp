@@ -361,7 +361,7 @@ bool isDirectAttachmentTemporalSuffix(std::string_view surface) {
 }
 
 bool isContractedProgressiveSurface(std::string_view surface) {
-  return isTeDeSurface(surface) || surface == "てる";
+  return isTeDeSurface(surface) || utf8::equalsAny(surface, {"てる", "てろ"});
 }
 
 bool isDialectalOruContractionLemma(std::string_view lemma) {

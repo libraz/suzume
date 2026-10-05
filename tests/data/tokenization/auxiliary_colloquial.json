@@ -592,6 +592,94 @@
       ],
       "id": "umaittshi",
       "input": "うまいっしょ"
+    },
+    {
+      "description": "Contracted progressive imperative teru-ro after an ichidan continuative",
+      "expected": [
+        {
+          "lemma": "こいつ",
+          "pos": "Pronoun",
+          "surface": "こいつ"
+        },
+        {
+          "lemma": "覚える",
+          "pos": "Verb",
+          "surface": "覚え"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てろ"
+        }
+      ],
+      "id": "koitsu_etero",
+      "input": "こいつ覚えてろ。"
+    },
+    {
+      "description": "Contracted progressive imperative after a godan onbin",
+      "expected": [
+        {
+          "lemma": "ここ",
+          "pos": "Pronoun",
+          "surface": "ここ"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "待つ",
+          "pos": "Verb",
+          "surface": "待っ"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てろ"
+        }
+      ],
+      "id": "kokode_tttero",
+      "input": "ここで待ってろ"
+    },
+    {
+      "description": "Voiced contracted progressive imperative de-ro after an n-onbin",
+      "expected": [
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読ん"
+        },
+        {
+          "lemma": "でる",
+          "pos": "Auxiliary",
+          "surface": "でろ"
+        }
+      ],
+      "id": "ndero",
+      "input": "読んでろ"
+    },
+    {
+      "description": "Contracted progressive imperative before a final particle",
+      "expected": [
+        {
+          "lemma": "覚える",
+          "pos": "Verb",
+          "surface": "覚え"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てろ"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "eteroyo",
+      "input": "覚えてろよ"
     }
   ],
   "description": "auxiliary_colloquial tests",

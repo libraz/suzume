@@ -369,6 +369,40 @@ class TestNaAdjectiveMonono:
         assert rule == "predicate-monono"
 
 
+class TestContractedProgressiveImperative:
+    def test_merges_te_and_stray_ro_noun(self):
+        tokens = [
+            _tok("覚え", pos="動詞"),
+            _tok("て", pos="助詞", pos_sub1="接続助詞"),
+            _tok("ろ", pos="名詞", pos_sub1="一般"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "覚えてろ")
+        assert [token["surface"] for token in result] == ["覚え", "てろ"]
+        assert result[1]["lemma"] == "てる"
+        assert result[1]["pos_sub1"] == "非自立"
+        assert rule == "contracted-progressive-imperative"
+
+    def test_voiced_cell_keeps_its_own_headword(self):
+        tokens = [
+            _tok("読ん", pos="動詞"),
+            _tok("で", pos="助詞", pos_sub1="接続助詞"),
+            _tok("ろ", pos="名詞", pos_sub1="一般"),
+        ]
+        result, _ = apply_suzume_merge(tokens, "読んでろ")
+        assert [token["surface"] for token in result] == ["読ん", "でろ"]
+        assert result[1]["lemma"] == "でる"
+
+    def test_keeps_te_before_a_longer_noun(self):
+        tokens = [
+            _tok("見", pos="動詞"),
+            _tok("て", pos="助詞", pos_sub1="接続助詞"),
+            _tok("ろ過", pos="名詞", pos_sub1="サ変接続"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "見てろ過")
+        assert [token["surface"] for token in result] == ["見", "て", "ろ過"]
+        assert rule is None
+
+
 class TestNumberUnit:
     def test_number_counter(self):
         tokens = [
