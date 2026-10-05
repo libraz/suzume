@@ -136,6 +136,12 @@ class TestGetExpectedTokens:
         tokens, _, _ = get_expected_tokens(text)
         assert [token["surface"] for token in tokens] == surfaces
 
+    def test_postprocessors_do_not_join_across_removed_punctuation(self):
+        tokens, _, _ = get_expected_tokens("書き、直して")
+        assert [token["surface"] for token in tokens] == ["書き", "直し", "て"]
+        tokens, _, _ = get_expected_tokens("書き直して")
+        assert [token["surface"] for token in tokens] == ["書き直し", "て"]
+
 
 class TestSurfaceIsNeverLost:
     """The expected tokens must cover every non-punctuation character.

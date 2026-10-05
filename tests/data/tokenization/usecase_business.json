@@ -2131,6 +2131,78 @@
       ],
       "id": "gaottshi_imashita",
       "input": "先生がおっしゃいました"
+    },
+    {
+      "description": "Compound-verb merge does not cross a removed comma",
+      "expected": [
+        {
+          "lemma": "この",
+          "pos": "Determiner",
+          "surface": "この"
+        },
+        {
+          "lemma": "度",
+          "pos": "Noun",
+          "surface": "度"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "ご",
+          "pos": "Prefix",
+          "surface": "ご"
+        },
+        {
+          "lemma": "協力",
+          "pos": "Noun",
+          "surface": "協力"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "いただく",
+          "pos": "Verb",
+          "surface": "いただき"
+        },
+        {
+          "lemma": "重ねる",
+          "pos": "Verb",
+          "surface": "重ね"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "礼",
+          "pos": "Noun",
+          "surface": "礼"
+        },
+        {
+          "lemma": "申し上げる",
+          "pos": "Verb",
+          "surface": "申し上げ"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "comma_separates_itadaki_kasanete",
+      "input": "この度のご協力をいただき、重ねてお礼申し上げます。"
     }
   ],
   "version": "1.0"

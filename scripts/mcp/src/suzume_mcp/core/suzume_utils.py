@@ -283,8 +283,9 @@ def get_expected_tokens(text: str, suzume_tokens: list[dict] | None = None) -> t
     if preprocess_rules:
         applied_rule = "+".join((*preprocess_rules, *(rule for rule in (applied_rule,) if rule)))
 
-    # Map POS and filter symbols
-    tokens = []
+    # Map POS and filter symbols. A removed symbol still separates clauses, so
+    # the tokens on either side form separate runs for the postprocessors.
+    runs: list[list[dict]] = [[]]
     removed_symbol = False
     retained_surface_parts = []
     for t in split_tokens:
@@ -293,9 +294,11 @@ def get_expected_tokens(text: str, suzume_tokens: list[dict] | None = None) -> t
         if pos == "Symbol" or _is_deliberately_removed_symbol(surface):
             _reject_lossy_symbol_drop(t.get("surface", ""), text)
             removed_symbol = True
+            if runs[-1]:
+                runs.append([])
             continue
         retained_surface_parts.append(surface)
-        tokens.append(
+        runs[-1].append(
             {
                 "surface": t.get("surface", ""),
                 "pos": pos,
@@ -310,8 +313,10 @@ def get_expected_tokens(text: str, suzume_tokens: list[dict] | None = None) -> t
     # Postprocessors mutate the same token list in a deliberately fixed order.
     # Preserve the first change as the public applied-rule label.
     for label, postprocessor in postprocessor_rules():
-        if postprocessor(tokens) and applied_rule is None:
-            applied_rule = label
+        for run in runs:
+            if postprocessor(run) and applied_rule is None:
+                applied_rule = label
+    tokens = [token for run in runs for token in run]
 
     # Normalize full-width alphanumeric to half-width
     fullwidth_applied = False

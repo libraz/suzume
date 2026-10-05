@@ -1664,6 +1664,28 @@
       ],
       "id": "isugini",
       "input": "使いすぎに注意"
+    },
+    {
+      "description": "Comma between renyokei and verb blocks the compound merge",
+      "expected": [
+        {
+          "lemma": "書く",
+          "pos": "Verb",
+          "surface": "書き"
+        },
+        {
+          "lemma": "直す",
+          "pos": "Verb",
+          "surface": "直し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "comma_separates_compound_verb",
+      "input": "書き、直して"
     }
   ],
   "description": "Compound verbs (part 5/5)",
