@@ -158,12 +158,11 @@ std::vector<KuruDictionaryForm> getKuruDictionaryForms() {
       {kanji.kateikei, old_kanji.kateikei, kana.kateikei, core::ExtendedPOS::VerbKateikei},
       {kanji.ishikei, old_kanji.ishikei, kana.ishikei, core::ExtendedPOS::VerbMizenkei},
       {kanji.meireikei, old_kanji.meireikei, kana.meireikei, core::ExtendedPOS::VerbMeireikei},
-      // Standard potential/passive is a mizenkei + auxiliary chain. The
-      // unambiguous kanji spelling remains a dictionary form, while the kana
-      // spelling is generated contextually so its one-mora stem cannot split
-      // ordinary hiragana words.
+      // Standard potential/passive is a mizenkei + auxiliary chain (来+られる),
+      // segmented like the causative below, so neither spelling becomes a
+      // whole-word dictionary edge.
       {kanji.mizenkei + "られる", old_kanji.mizenkei + "られる", kana.mizenkei + "られる",
-       core::ExtendedPOS::VerbShuushikei, /*emit_kanji=*/true, /*emit_kana=*/false},
+       core::ExtendedPOS::VerbShuushikei, /*emit_kanji=*/false, /*emit_kana=*/false},
       // The colloquial ra-nuki potential is a lexical terminal form. Its
       // kanji spelling is safe as a dictionary entry; its kana spelling is
       // generated as a context-gated irregular candidate to avoid reopening

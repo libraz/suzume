@@ -711,6 +711,12 @@ void appendSelectedKanjiVerbCandidate(const std::vector<char32_t>& codepoints, s
       SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" is a one-kanji Ichidan stem before the classical perfect\n");
       return;
     }
+    // 来る's voice auxiliaries are tokens of their own on the irrealis 来
+    // (来+られる, 来+させる), as they are after every other verb.
+    if (best.verb_type == grammar::VerbType::Kuru && utf8::startsWithAny(best.suffix, {"られ", "させ"})) {
+      SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" kuru voice auxiliary belongs to its own token\n");
+      return;
+    }
     // Penalize verb candidates absorbing adj く-form + なる suffix chain
     // e.g., 得なくなった should split as 得+なく+なっ+た, not merge as 得る(ichidan)
     // The suffix contains くなっ/くなり/くなる/くなれ = adj renyokei + なる conjugation

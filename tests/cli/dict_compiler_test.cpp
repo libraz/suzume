@@ -200,7 +200,8 @@ TEST_F(DictCompilerTest, KuruExpansionGeneratesSafeKanjiAndKanaSurfaces) {
   EXPECT_TRUE(has_surface("来れ"));
   EXPECT_TRUE(has_surface("来よ"));
   EXPECT_TRUE(has_surface("来い"));
-  EXPECT_TRUE(has_surface("来られる"));
+  // The passive/potential is the irrealis 来 plus られる, like the causative.
+  EXPECT_FALSE(has_surface("来られる"));
   EXPECT_TRUE(has_surface("来れる"));
   EXPECT_TRUE(has_surface("くる"));
   EXPECT_TRUE(has_surface("くれ"));

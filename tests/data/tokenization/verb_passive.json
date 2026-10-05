@@ -436,12 +436,12 @@
         {
           "lemma": "来る",
           "pos": "Verb",
-          "surface": "来ら"
+          "surface": "来"
         },
         {
-          "lemma": "れる",
+          "lemma": "られる",
           "pos": "Auxiliary",
-          "surface": "れる"
+          "surface": "られる"
         }
       ],
       "id": "kuru_passive",
@@ -1356,6 +1356,99 @@
       ],
       "id": "rarenu",
       "input": "知られぬ"
+    },
+    {
+      "description": "来られていく - auto-generated",
+      "expected": [
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "られる",
+          "pos": "Auxiliary",
+          "surface": "られ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いく",
+          "pos": "Auxiliary",
+          "surface": "いく"
+        }
+      ],
+      "id": "rareteiku",
+      "input": "来られていく"
+    },
+    {
+      "description": "来られて - auto-generated",
+      "expected": [
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "られる",
+          "pos": "Auxiliary",
+          "surface": "られ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "rarete",
+      "input": "来られて"
+    },
+    {
+      "description": "来られます - auto-generated",
+      "expected": [
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "られる",
+          "pos": "Auxiliary",
+          "surface": "られ"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "raremasu",
+      "input": "来られます"
+    },
+    {
+      "description": "来られない - auto-generated",
+      "expected": [
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "られる",
+          "pos": "Auxiliary",
+          "surface": "られ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "rarenai",
+      "input": "来られない"
     }
   ],
   "description": "Passive voice verbs (受身形) - MeCab-compatible split format",

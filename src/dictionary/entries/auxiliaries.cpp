@@ -273,20 +273,13 @@ EntrySpecRange getAuxiliaryEntries() {
       // Kuru verb stem form (カ変動詞語幹活用形) - VERB, not AUX
       // MeCab: 来た → 来(連用形) + た(過去)
       verb("来", "来る", EPOS::VerbRenyokei),
-      // The kanji passive spelling keeps the established dictionary boundary
-      // 来ら+れる. Kana uses the context-gated こ + られる candidate path,
-      // because its one-mora stem would otherwise split ordinary hiragana.
-      verb("来ら", "来る", EPOS::VerbMizenkei),
-      // Likewise retain the established kanji causative boundary while the
-      // canonical Kuru paradigm drives the corresponding kana path.
-      verb("来さ", "来る", EPOS::VerbMizenkei),
-      // The old kanji spelling is the same paradigm and needs the same three
-      // cells here rather than only in the expanded dictionary: these are what
-      // the analyzer falls back on when no compiled dictionary is loaded, so
-      // leaving them out would make the two spellings diverge in that build.
+      // The passive/potential and causative attach to the irrealis 来 as
+      // られる/させる (来+られる, 来+させる); 来ら and 来さ are no cells of 来る.
+      // The old kanji spelling is the same paradigm and needs the same cell
+      // here rather than only in the expanded dictionary: this is what the
+      // analyzer falls back on when no compiled dictionary is loaded, so
+      // leaving it out would make the two spellings diverge in that build.
       verb("來", "來る", EPOS::VerbRenyokei),
-      verb("來ら", "來る", EPOS::VerbMizenkei),
-      verb("來さ", "來る", EPOS::VerbMizenkei),
 
       // Deru verb stem form (一段動詞「出る」) - VERB
       // で+たい/ます needs this to split correctly (外にでたい → 外|に|で|たい)

@@ -394,7 +394,10 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
     // This covers stems such as 聞こえ and 踏まえ. The first hiragana alone is
     // not a sufficient signal, so require an actual ichidan continuation after
     // the stem before generating an unknown-word candidate.
-    if (hiragana_end >= kanji_end + 2) {
+    // The kuru kanji stem takes its auxiliaries on the irrealis 来 itself
+    // (来+られ+ない); no lexical Ichidan verb is spelled 来 plus two kana.
+    const bool kuru_stem = kanji_end == start_pos + 1 && grammar::isKuruKanjiStem(codepoints[start_pos]);
+    if (hiragana_end >= kanji_end + 2 && !kuru_stem) {
       char32_t first_hira = codepoints[kanji_end];
       char32_t second_hira = codepoints[kanji_end + 1];
       size_t renyokei_end = kanji_end + 2;

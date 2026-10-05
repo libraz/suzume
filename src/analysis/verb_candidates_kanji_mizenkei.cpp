@@ -157,6 +157,11 @@ void appendSingleOkuriganaMizenkeiCandidates(const std::vector<char32_t>& codepo
   // an ichidan verb + させ (見+させ+られ+た, not 見さ+せ of a non-word 見す);
   // real godan-sa verbs (話す, 出す, 消す) have multi-char stems.
   const size_t kanji_count = kanji_end - start_pos;
+  // The kuru kanji is no Godan stem: its irrealis is 来 itself (来+させる,
+  // 来+られる), never 来さ or 来ら.
+  if (kanji_count == 1 && grammar::isKuruKanjiStem(codepoints[start_pos])) {
+    return;
+  }
   if (verb_type == grammar::VerbType::GodanSa &&
       ((grammar::isAllKanji(kanji_stem) && kanji_count >= 2) || (is_causative_pattern && kanji_count == 1))) {
     return;
@@ -291,6 +296,10 @@ void appendGodanMizenkeiPassiveCausativeCandidates(const std::vector<char32_t>& 
   const std::string base_form = normalize::concat(extractSubstring(codepoints, start_pos, kanji_end), base_suffix);
   const std::string surface = extractSubstring(codepoints, start_pos, kanji_end + 1);
 
+  // The kuru kanji takes its voice auxiliaries on the irrealis 来 itself.
+  if (grammar::isKuruKanjiStem(codepoints[start_pos])) {
+    return;
+  }
   // A closed-class irregular form in L1 is authoritative over this
   // productive Godan fallback.  In particular, do not fabricate a
   // Godan lemma for an irregular verb's causative connection form.
