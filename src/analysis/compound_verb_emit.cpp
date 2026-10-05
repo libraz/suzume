@@ -181,12 +181,17 @@ void emitCompoundVerbCandidates(core::Lattice& lattice, std::string_view text, c
   }
 
   // A ka/ga-row i-onbin followed by で is a conjunctive te-form, not a
-  // compound with the homographic V2 でる (急い+で+も). The following
-  // particle supplies the closed right boundary for this distinction.
+  // compound with the homographic V2 でる (急い+で+も, 脱い+で+る). A V1 the
+  // dictionary attests with a continuative in い (願い+でる) is the compound
+  // unless a following particle closes the te-form; an inferred one (脱う from
+  // 脱い) has no continuative to offer, so the te-form wins wherever the span
+  // ends.
   if (v2_start > start_pos && v2_start < codepoints.size() && codepoints[v2_start] == U'で' &&
-      codepoints[v2_start - 1] == U'い' && compound_end_pos < codepoints.size() &&
-      lookupEntryInRange(dict_manager, codepoints, compound_end_pos, compound_end_pos + 1,
-                         core::PartOfSpeech::Particle) != nullptr) {
+      codepoints[v2_start - 1] == U'い' &&
+      (!best_match.v1_dict_verified ||
+       (compound_end_pos < codepoints.size() &&
+        lookupEntryInRange(dict_manager, codepoints, compound_end_pos, compound_end_pos + 1,
+                           core::PartOfSpeech::Particle) != nullptr))) {
     return;
   }
 

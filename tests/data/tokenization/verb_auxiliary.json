@@ -2689,6 +2689,67 @@
       ],
       "id": "gahashiru_2",
       "input": "子供がはしる"
+    },
+    {
+      "description": "ga-row i-onbin plus contracted deru is no compound with deru",
+      "expected": [
+        {
+          "lemma": "服",
+          "pos": "Noun",
+          "surface": "服"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "脱ぐ",
+          "pos": "Verb",
+          "surface": "脱い"
+        },
+        {
+          "lemma": "でる",
+          "pos": "Auxiliary",
+          "surface": "でる"
+        }
+      ],
+      "id": "wo_ideru",
+      "input": "服を脱いでる。"
+    },
+    {
+      "description": "ga-row i-onbin plus contracted deru is no compound with deru",
+      "expected": [
+        {
+          "lemma": "急ぐ",
+          "pos": "Verb",
+          "surface": "急い"
+        },
+        {
+          "lemma": "でる",
+          "pos": "Auxiliary",
+          "surface": "でる"
+        }
+      ],
+      "id": "ideru",
+      "input": "急いでる"
+    },
+    {
+      "description": "ga-row i-onbin plus contracted deru is no compound with deru",
+      "expected": [
+        {
+          "lemma": "泳ぐ",
+          "pos": "Verb",
+          "surface": "泳い"
+        },
+        {
+          "lemma": "でる",
+          "pos": "Auxiliary",
+          "surface": "でる"
+        }
+      ],
+      "id": "ideru_2",
+      "input": "泳いでる"
     }
   ],
   "description": "verb_auxiliary tests",
