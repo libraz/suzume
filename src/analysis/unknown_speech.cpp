@@ -546,8 +546,14 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
           dict_manager_ != nullptr &&
           dict_manager_->lookupExact(extractSubstring(codepoints, start_pos, start_pos + 2) + "る",
                                      core::PartOfSpeech::Verb) != nullptr;
+      // The te-form connective followed by a registered auxiliary is a predicate
+      // chain (道行き+て+けり), not a mimetic.
+      const bool opens_te_auxiliary_chain =
+          dict_manager_ != nullptr && grammar::isTeDeSurface(extractSubstring(codepoints, start_pos, start_pos + 1)) &&
+          lookupEntryInRange(*dict_manager_, codepoints, start_pos + 1, start_pos + 3, core::PartOfSpeech::Auxiliary) !=
+              nullptr;
       if (!normalize::isParticleCodepoint(first) && !isBareVowelMora(first) && !kana::isRaColumnCodepoint(first) &&
-          !is_godan_ra_continuative) {
+          !is_godan_ra_continuative && !opens_te_auxiliary_chain) {
         appendMimeticAdverb(codepoints, start_pos, start_pos + 3, 0.7F, 0.7F, "ab_ri_pattern", candidates);
       }
     }

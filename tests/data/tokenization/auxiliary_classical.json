@@ -2367,6 +2367,55 @@
       ],
       "id": "shikaba_3",
       "input": "出しかば"
+    },
+    {
+      "description": "道行きてけり - auto-generated",
+      "expected": [
+        {
+          "lemma": "道",
+          "pos": "Noun",
+          "surface": "道"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行き"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "けり",
+          "pos": "Auxiliary",
+          "surface": "けり"
+        }
+      ],
+      "id": "kitekeri",
+      "input": "道行きてけり"
+    },
+    {
+      "description": "見えてけり - auto-generated",
+      "expected": [
+        {
+          "lemma": "見える",
+          "pos": "Verb",
+          "surface": "見え"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "けり",
+          "pos": "Auxiliary",
+          "surface": "けり"
+        }
+      ],
+      "id": "etekeri",
+      "input": "見えてけり"
     }
   ],
   "description": "auxiliary_classical tests",
