@@ -552,6 +552,33 @@
       ],
       "id": "ndayo",
       "input": "詰んだよ"
+    },
+    {
+      "description": "夜更かしした - auto-generated",
+      "expected": [
+        {
+          "lemma": "夜",
+          "pos": "Noun",
+          "surface": "夜"
+        },
+        {
+          "lemma": "更かす",
+          "pos": "Verb",
+          "surface": "更かし"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "kashishita",
+      "input": "夜更かしした"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",

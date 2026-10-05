@@ -1630,6 +1630,28 @@
       ],
       "id": "warukunai",
       "input": "わるくない"
+    },
+    {
+      "description": "駅遠いけど… - auto-generated",
+      "expected": [
+        {
+          "lemma": "駅",
+          "pos": "Noun",
+          "surface": "駅"
+        },
+        {
+          "lemma": "遠い",
+          "pos": "Adjective",
+          "surface": "遠い"
+        },
+        {
+          "lemma": "けど",
+          "pos": "Particle",
+          "surface": "けど"
+        }
+      ],
+      "id": "ikedo",
+      "input": "駅遠いけど…"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 3/3)",

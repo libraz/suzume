@@ -1491,6 +1491,23 @@
       ],
       "id": "ranno",
       "input": "知らんの"
+    },
+    {
+      "description": "会社いく - auto-generated",
+      "expected": [
+        {
+          "lemma": "会社",
+          "pos": "Noun",
+          "surface": "会社"
+        },
+        {
+          "lemma": "いく",
+          "pos": "Verb",
+          "surface": "いく"
+        }
+      ],
+      "id": "iku",
+      "input": "会社いく"
     }
   ],
   "description": "colloquial_contracted tests",

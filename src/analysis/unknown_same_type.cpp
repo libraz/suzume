@@ -17,6 +17,7 @@
 #include "core/kana_constants.h"
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
+#include "grammar/honorific_verbs.h"
 #include "normalize/char_type.h"
 #include "normalize/exceptions.h"
 #include "normalize/utf8.h"
@@ -342,6 +343,120 @@ bool startsAfterDictionaryPredicate(const std::vector<char32_t>& codepoints,
     return false;
   }
   return hasDictionaryEntryFrom(dict_manager, codepoints, start_pos - 1, 2, run_end - start_pos + 1, pos, nullptr);
+}
+
+// Whether the kanji just before @p kana_start heads a predicate whose
+// okurigana starts at @p kana_start (外|飲み|たい, 地|固まる, 駅|遠い). A
+// registered verb gives the proof directly; otherwise the inflection analyzer
+// must read the kanji plus a prefix of the kana run as a verb or i-adjective
+// on that one-kanji stem.
+bool kanjiHeadsPredicateAt(const std::vector<char32_t>& codepoints, const std::vector<normalize::CharType>& char_types,
+                           size_t kana_start, const grammar::Inflection& inflection,
+                           const dictionary::DictionaryManager& dict_manager) {
+  constexpr size_t kPredicateProbe = 4;
+  size_t kana_end = kana_start;
+  while (kana_end < codepoints.size() && kana_end < kana_start + kPredicateProbe &&
+         char_types[kana_end] == normalize::CharType::Hiragana) {
+    ++kana_end;
+  }
+  const auto opening_entry = [&](size_t length, core::PartOfSpeech pos) {
+    return lookupEntryInRange(dict_manager, codepoints, kana_start, kana_start + length, pos);
+  };
+  // A registered content word of three kana or more opening on the kana
+  // leaves the kanji to the run (助言|いただく, 質問|うざい, 学生|いかに).
+  // Two-kana verbs are weighed after the direct proofs below, because they
+  // are also spelled by the okurigana of a predicate (遠+いけ+ど, 鳴+かむ).
+  constexpr size_t kOpeningContentWordMinLength = 3;
+  for (size_t length = kOpeningContentWordMinLength; kana_start + length <= kana_end; ++length) {
+    if (opening_entry(length, core::PartOfSpeech::Verb) != nullptr ||
+        opening_entry(length, core::PartOfSpeech::Adjective) != nullptr ||
+        opening_entry(length, core::PartOfSpeech::Adverb) != nullptr) {
+      return false;
+    }
+  }
+  const char32_t okurigana = codepoints[kana_start];
+  const std::string head = normalize::encodeUtf8(codepoints[kana_start - 1]);
+  if (verb_helpers::hasDictionaryGodanBaseFromIRow(&dict_manager, head, okurigana) ||
+      (kana::isERowCodepoint(okurigana) &&
+       verb_helpers::isVerbInDictionary(&dict_manager,
+                                        normalize::concat(head, normalize::encodeUtf8(okurigana), "る"))) ||
+      (okurigana == U'い' && verb_helpers::isAdjectiveInDictionary(&dict_manager, normalize::concat(head, "い")))) {
+    return true;
+  }
+  // A word a noun takes opening on the kana makes the run plus that word a
+  // reading of its own, so nothing is proven from the right: a non-final
+  // particle (が, より, って), an auxiliary the noun licenses (だ, らしい), a
+  // bound suffix (たち, ぶる, っぽ) or a cell of する (研究+さ+れる).
+  // An auxiliary of two kana or more needs only to be one a noun is not
+  // barred from (確認+たる, 対応+たし); a one-kana one is spelled by okurigana
+  // too often (吹+き) and must be one a noun selects.
+  for (const auto& match : lookupResultsInRange(dict_manager, codepoints, kana_start, kana_end)) {
+    if (match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Verb && match.entry->lemma == "する") {
+      return false;
+    }
+  }
+  for (size_t length = 1; kana_start + length <= kana_end; ++length) {
+    const auto* particle = opening_entry(length, core::PartOfSpeech::Particle);
+    const auto* auxiliary = opening_entry(length, core::PartOfSpeech::Auxiliary);
+    const auto* adjective = opening_entry(length, core::PartOfSpeech::Adjective);
+    const float noun_to_auxiliary = auxiliary != nullptr
+                                        ? BigramTable::getCost(core::ExtendedPOS::Noun, auxiliary->extended_pos)
+                                        : bigram_cost::kNeutral;
+    const bool noun_takes_auxiliary =
+        auxiliary != nullptr &&
+        (noun_to_auxiliary < bigram_cost::kNeutral || (length >= 2 && noun_to_auxiliary <= bigram_cost::kNeutral));
+    if ((particle != nullptr && particle->extended_pos != core::ExtendedPOS::ParticleFinal) || noun_takes_auxiliary ||
+        opening_entry(length, core::PartOfSpeech::Suffix) != nullptr ||
+        (adjective != nullptr && length >= 2 && adjective->extended_pos == core::ExtendedPOS::AdjStem) ||
+        grammar::spellsBoundDerivationalSuffixCell(
+            normalize::encodeRange(codepoints, kana_start, kana_start + length))) {
+      return false;
+    }
+  }
+  // An a-row kana followed by an auxiliary that selects the irrealis is a
+  // Godan irrealis cell on the kanji (鳴か+む, 咲か+む), unless the kana opens
+  // a function word of its own (確認+まじ).
+  const bool opens_two_kana_function_word =
+      kana_start + 2 <= kana_end && (opening_entry(2, core::PartOfSpeech::Auxiliary) != nullptr ||
+                                     opening_entry(2, core::PartOfSpeech::Particle) != nullptr);
+  if (kana::isARowCodepoint(okurigana) && !opens_two_kana_function_word && kana_start + 1 < kana_end) {
+    for (size_t aux_end = kana_start + 2; aux_end <= kana_end; ++aux_end) {
+      const auto* auxiliary =
+          lookupEntryInRange(dict_manager, codepoints, kana_start + 1, aux_end, core::PartOfSpeech::Auxiliary);
+      if (auxiliary != nullptr &&
+          BigramTable::getCost(core::ExtendedPOS::VerbMizenkei, auxiliary->extended_pos) < bigram_cost::kNeutral &&
+          BigramTable::getCost(core::ExtendedPOS::Noun, auxiliary->extended_pos) > bigram_cost::kNeutral) {
+        return true;
+      }
+    }
+  }
+  // A registered two-kana verb opening on the kana is the predicate of a
+  // particle-dropped noun (会社|いく, 部屋|いる).
+  if (kana_start + 2 <= kana_end && opening_entry(2, core::PartOfSpeech::Verb) != nullptr) {
+    return false;
+  }
+  // Of the inferred readings of the kanji plus each prefix of the kana, any
+  // that is a bound derivational suffix verb on the kanji (肉+めく) makes the
+  // kanji that suffix's host, so none of them proves a head.
+  // A sa-hen reading makes the kanji a verbal noun, and one whose stem the
+  // dictionary conjugates in another row (味わ+く against 味わう) is refuted by
+  // that entry.
+  bool proven = false;
+  for (size_t reading_end = kana_start + 1; reading_end <= kana_end; ++reading_end) {
+    for (const auto& analysis : inflection.analyze(normalize::encodeRange(codepoints, kana_start - 1, reading_end))) {
+      if (!utf8::startsWith(analysis.stem, head) || analysis.verb_type == grammar::VerbType::Unknown ||
+          analysis.confidence < candidate::verb_cost::kConstructedVerbMinConfidence) {
+        continue;
+      }
+      if (grammar::isBoundDerivationalSuffixVerbLemma(std::string_view(analysis.base_form).substr(head.size()))) {
+        return false;
+      }
+      proven =
+          proven || (analysis.verb_type != grammar::VerbType::Suru &&
+                     !verb_helpers::stemHasDictionaryVerbOnOtherRow(&dict_manager, analysis.stem, analysis.base_form));
+    }
+  }
+  return proven;
 }
 
 }  // namespace
@@ -1011,26 +1126,19 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
           continue;
         }
       }
-      // A kanji fallback run must not end on a kanji that heads a verb whose
-      // okurigana is the very next character: that boundary is proven from the
-      // right (外|飲み|たい, not 外飲|みたい), and the auxiliary spelled by the
-      // stolen mora plus what follows it (みたい) is cheap enough to pay for
-      // the fabrication. A shorter run ending before that kanji keeps its
-      // candidate, which is what supplies 外 here, and a one-kanji run is
-      // exempt because there is no fabrication to reject (夢|みたい).
+      // A kanji fallback run must not end on a kanji that heads a predicate
+      // whose okurigana is the very next character: that boundary is proven
+      // from the right (外|飲み|たい, not 外飲|みたい; 地|固まる, not 地固|まる),
+      // and the kana spelled by the stolen mora plus what follows it are cheap
+      // enough to pay for the fabrication. A shorter run ending before that
+      // kanji keeps its candidate, which is what supplies 外 here, and a
+      // one-kanji run is exempt because there is no fabrication to reject
+      // (夢|みたい).
       if (start_type == normalize::CharType::Kanji && len > 1 && dict_manager_ != nullptr &&
           candidate_end < codepoints.size() && char_types[candidate_end] == normalize::CharType::Hiragana &&
-          dict_manager_->lookupExact(surface) == nullptr) {
-        const char32_t okurigana = codepoints[candidate_end];
-        const std::string head = normalize::encodeUtf8(codepoints[candidate_end - 1]);
-        const bool ends_on_verb_head =
-            verb_helpers::hasDictionaryGodanBaseFromIRow(dict_manager_, head, okurigana) ||
-            (kana::isERowCodepoint(okurigana) &&
-             verb_helpers::isVerbInDictionary(dict_manager_,
-                                              normalize::concat(head, normalize::encodeUtf8(okurigana), "る")));
-        if (ends_on_verb_head) {
-          continue;
-        }
+          dict_manager_->lookupExact(surface) == nullptr &&
+          kanjiHeadsPredicateAt(codepoints, char_types, candidate_end, inflection_, *dict_manager_)) {
+        continue;
       }
       // A kana run that spells a registered suffix exactly (ごと, たび) already has
       // that entry; an unknown noun over the same span only lets it be read as

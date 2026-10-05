@@ -181,6 +181,15 @@ bool isNounInDictionary(const dictionary::DictionaryManager* dict_manager, std::
 bool attestsGodanRaIrrealis(const dictionary::DictionaryManager* dict_manager, std::string_view stem);
 
 /**
+ * @brief Whether the dictionary has a verb on @p stem other than @p base_form.
+ *
+ * An inferred reading whose stem the dictionary already conjugates in another
+ * row (味わ+く against the registered 味わう) is refuted by that entry.
+ */
+bool stemHasDictionaryVerbOnOtherRow(const dictionary::DictionaryManager* dict_manager, std::string_view stem,
+                                     std::string_view base_form);
+
+/**
  * @brief Whether [@p start_pos, @p end_pos) ends on the irrealis of a registered Godan verb.
  *
  * The last kana must be the a-row cell of a Godan row and the stem before it

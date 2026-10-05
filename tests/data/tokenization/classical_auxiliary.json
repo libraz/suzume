@@ -97,6 +97,28 @@
       ],
       "id": "ishi_i",
       "input": "寒いし暗い"
+    },
+    {
+      "description": "鳥鳴かむ - auto-generated",
+      "expected": [
+        {
+          "lemma": "鳥",
+          "pos": "Noun",
+          "surface": "鳥"
+        },
+        {
+          "lemma": "鳴く",
+          "pos": "Verb",
+          "surface": "鳴か"
+        },
+        {
+          "lemma": "む",
+          "pos": "Auxiliary",
+          "surface": "む"
+        }
+      ],
+      "id": "kamu",
+      "input": "鳥鳴かむ"
     }
   ],
   "description": "classical_auxiliary tests",

@@ -114,6 +114,25 @@ bool attestsGodanRaIrrealis(const dictionary::DictionaryManager* dict_manager, s
   return irrealis != nullptr && irrealis->lemma == stem_text + "る";
 }
 
+bool stemHasDictionaryVerbOnOtherRow(const dictionary::DictionaryManager* dict_manager, std::string_view stem,
+                                     std::string_view base_form) {
+  if (dict_manager == nullptr || stem.empty()) {
+    return false;
+  }
+  const auto other_registered = [&](const std::string& candidate) {
+    return candidate != base_form && isVerbInDictionary(dict_manager, candidate);
+  };
+  if (other_registered(normalize::concat(stem, "る"))) {
+    return true;
+  }
+  for (const auto& [verb_type, row] : grammar::Conjugation::getGodanRows()) {
+    if (other_registered(normalize::concat(stem, normalize::encodeUtf8(row.base_vowel)))) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool endsOnRegisteredGodanIrrealis(const dictionary::DictionaryManager* dict_manager,
                                    const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos) {
   if (dict_manager == nullptr || end_pos < start_pos + 2 || end_pos > codepoints.size()) {

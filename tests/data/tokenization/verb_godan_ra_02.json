@@ -351,6 +351,53 @@
       ],
       "id": "gafurudeshi_u",
       "input": "雪がふるでしょう"
+    },
+    {
+      "description": "雨降って地固まるという通り進める。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "雨",
+          "pos": "Noun",
+          "surface": "雨"
+        },
+        {
+          "lemma": "降る",
+          "pos": "Verb",
+          "surface": "降っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "地",
+          "pos": "Noun",
+          "surface": "地"
+        },
+        {
+          "lemma": "固まる",
+          "pos": "Verb",
+          "surface": "固まる"
+        },
+        {
+          "lemma": "という",
+          "pos": "Determiner",
+          "surface": "という"
+        },
+        {
+          "lemma": "通り",
+          "pos": "Noun",
+          "surface": "通り"
+        },
+        {
+          "lemma": "進める",
+          "pos": "Verb",
+          "surface": "進める"
+        }
+      ],
+      "id": "ttte_marutoiu_ri_meru",
+      "input": "雨降って地固まるという通り進める。"
     }
   ],
   "description": "Godan Ra-row verbs (五段ラ行動詞) - verbs ending in る (part 2/2)",

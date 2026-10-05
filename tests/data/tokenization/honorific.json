@@ -643,6 +643,70 @@
       ],
       "id": "gohannishimasu",
       "input": "ごはんにします"
+    },
+    {
+      "description": "発言いたします - auto-generated",
+      "expected": [
+        {
+          "lemma": "発言",
+          "pos": "Noun",
+          "surface": "発言"
+        },
+        {
+          "lemma": "いたす",
+          "pos": "Verb",
+          "surface": "いたし"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "itashimasu_2",
+      "input": "発言いたします"
+    },
+    {
+      "description": "ご助言いただけますでしょうか。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "ご",
+          "pos": "Prefix",
+          "surface": "ご"
+        },
+        {
+          "lemma": "助言",
+          "pos": "Noun",
+          "surface": "助言"
+        },
+        {
+          "lemma": "いただける",
+          "pos": "Verb",
+          "surface": "いただけ"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "でしょ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "go_itadakemasudeshi_uka",
+      "input": "ご助言いただけますでしょうか。"
     }
   ],
   "description": "honorific tests",
