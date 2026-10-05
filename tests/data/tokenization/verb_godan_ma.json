@@ -664,6 +664,60 @@
       ],
       "id": "bande",
       "input": "汗ばんで"
+    },
+    {
+      "description": "unlisted godan ma continuative before nagara",
+      "expected": [
+        {
+          "lemma": "霧",
+          "pos": "Noun",
+          "surface": "霧"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "霞む",
+          "pos": "Verb",
+          "surface": "霞み"
+        },
+        {
+          "lemma": "ながら",
+          "pos": "Particle",
+          "surface": "ながら"
+        },
+        {
+          "lemma": "消える",
+          "pos": "Verb",
+          "surface": "消え"
+        },
+        {
+          "lemma": "ゆく",
+          "pos": "Verb",
+          "surface": "ゆく"
+        }
+      ],
+      "id": "ga_minagara_eyuku",
+      "input": "霧が霞みながら消えゆく"
+    },
+    {
+      "description": "unlisted godan ma continuative before nagara",
+      "expected": [
+        {
+          "lemma": "病む",
+          "pos": "Verb",
+          "surface": "病み"
+        },
+        {
+          "lemma": "ながら",
+          "pos": "Particle",
+          "surface": "ながら"
+        }
+      ],
+      "id": "minagara",
+      "input": "病みながら"
     }
   ],
   "description": "Godan Ma-row verbs (五段マ行動詞) - verbs ending in む",

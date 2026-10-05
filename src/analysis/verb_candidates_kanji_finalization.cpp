@@ -145,7 +145,17 @@ void appendSelectedKanjiVerbCandidate(const std::vector<char32_t>& codepoints, s
     // A literary auxiliary standing on the み supplies the missing evidence by
     // itself: みたい is one auxiliary, so it can never be followed by a second
     // one that selects a continuative (花を摘み+ぬ, 花を摘み+けり).
-    if (best.verb_type == grammar::VerbType::GodanMa && hiragana_part == "み" && kanji_end - start_pos <= 3) {
+    bool continuative_conjunctive_follows = false;
+    for (size_t particle_end = end_pos + 2; particle_end <= std::min(end_pos + 3, codepoints.size()); ++particle_end) {
+      continuative_conjunctive_follows =
+          continuative_conjunctive_follows ||
+          grammar::isContinuativeSelectingConjunctiveParticle(extractSubstring(codepoints, end_pos, particle_end));
+    }
+    // A conjunctive particle that selects the continuative (霞み+ながら,
+    // 霞み+つつ) or a clause chained through 、 is that evidence as well.
+    if (best.verb_type == grammar::VerbType::GodanMa && hiragana_part == "み" && kanji_end - start_pos <= 3 &&
+        !continuative_conjunctive_follows &&
+        !vh::isCommaClauseChainingRenyokei(codepoints, start_pos, end_pos, dict_manager)) {
       std::string base_form = extractSubstring(codepoints, start_pos, kanji_end) + "む";
       if (!vh::isVerbInDictionary(dict_manager, base_form) &&
           !vh::classicalAuxiliaryFollowsAt(dict_manager, codepoints, end_pos)) {
@@ -328,6 +338,20 @@ void appendSelectedKanjiVerbCandidate(const std::vector<char32_t>& codepoints, s
     if (!in_dict && grammar::spellsBoundDerivationalSuffixCell(hiragana_part)) {
       SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" fabricated verb absorbing bound derivational suffix\n");
       return;
+    }
+    // Nor may it close on a conjunctive particle (霞み+ながら, 病み+つつ): the
+    // particle selects the continuative, which is a token of its own.
+    if (!in_dict && dict_manager != nullptr) {
+      bool absorbs_conjunctive_particle = false;
+      for (size_t tail = kanji_end + 1; tail + 2 <= end_pos && !absorbs_conjunctive_particle; ++tail) {
+        const auto* particle =
+            lookupEntryInRange(*dict_manager, codepoints, tail, end_pos, core::PartOfSpeech::Particle);
+        absorbs_conjunctive_particle = particle != nullptr && particle->extended_pos == core::ExtendedPOS::ParticleConj;
+      }
+      if (absorbs_conjunctive_particle) {
+        SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" fabricated verb absorbing conjunctive particle\n");
+        return;
+      }
     }
     if (!in_dict && vh::hasAuxiliaryNegativeBoundary(dict_manager, codepoints, start_pos, end_pos)) {
       SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" fabricated verb absorbing auxiliary negative\n");

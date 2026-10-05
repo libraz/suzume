@@ -346,6 +346,14 @@ bool isListingParticleTariSurface(std::string_view surface);
 bool isHypotheticalSelectingConjunctiveParticle(std::string_view surface);
 
 /**
+ * @brief Whether a conjunctive particle selects the continuative (ながら, つつ)
+ *
+ * Its host is a verb's continuative cell, never a noun or a finite form, so
+ * it is evidence for a continuative reading of what precedes it.
+ */
+bool isContinuativeSelectingConjunctiveParticle(std::string_view surface);
+
+/**
  * @brief Whether an auxiliary surface spells the cell ば/ど/ども select
  *
  * Each paradigm names that cell by its tail: the modern passive spells it

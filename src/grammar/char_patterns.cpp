@@ -417,6 +417,10 @@ bool isHypotheticalSelectingConjunctiveParticle(std::string_view surface) {
   return utf8::equalsAny(surface, {"ば", "ど", "ども", "り"});
 }
 
+bool isContinuativeSelectingConjunctiveParticle(std::string_view surface) {
+  return utf8::equalsAny(surface, {"ながら", "つつ"});
+}
+
 bool spellsHypotheticalAuxiliaryCell(std::string_view surface) {
   return utf8::endsWithAny(surface, {"れれ", "たれ", "るれ"});
 }
