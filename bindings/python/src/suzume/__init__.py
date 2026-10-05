@@ -1,4 +1,4 @@
-"""Suzume — lightweight Japanese morphological analyzer.
+"""Suzume — lightweight Japanese tokenizer.
 
 Dictionary-independent tokenizer with part-of-speech tagging, distributed as a
 thin ctypes binding over the native suzume C-ABI library.

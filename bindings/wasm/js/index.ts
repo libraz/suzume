@@ -1,5 +1,5 @@
 /**
- * Suzume - Lightweight Japanese morphological analyzer
+ * Suzume - Lightweight Japanese tokenizer
  *
  * @example
  * ```typescript
@@ -128,7 +128,7 @@ const EXTENDED_OPTION_DEFAULTS = {
 } as const;
 
 /**
- * Morpheme - A single unit of morphological analysis
+ * Morpheme - A single token produced by analysis
  */
 export interface Morpheme {
   /** Surface form (as it appears in the text) */
@@ -275,7 +275,7 @@ const registry = new FinalizationRegistry((ref: CleanupRef) => {
 });
 
 /**
- * Suzume instance for Japanese morphological analysis.
+ * Suzume instance for Japanese tokenization.
  *
  * Error contract note: under the WebAssembly build, a memory-allocation failure
  * aborts the module rather than returning NULL, so the C++ allocation-failure

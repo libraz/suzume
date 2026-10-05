@@ -1,6 +1,6 @@
 /**
  * @file suzume_c.h
- * @brief C API for Suzume Japanese morphological analyzer
+ * @brief C API for Suzume Japanese tokenizer
  *
  * This header provides a C-compatible API for use with WebAssembly
  * and other language bindings.

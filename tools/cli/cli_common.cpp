@@ -374,7 +374,7 @@ std::string getVersionString() {
 
 void printVersion() {
   std::cout << "suzume-cli " << getVersionString() << "\n";
-  std::cout << "Japanese morphological analyzer\n";
+  std::cout << "Japanese tokenizer\n";
 }
 
 CommandArgs parseArgs(int argc, char* argv[]) {
@@ -717,13 +717,13 @@ CommandArgs parseArgs(int argc, char* argv[]) {
 }
 
 void printHelp(std::ostream& output) {
-  output << R"(suzume-cli - Japanese morphological analyzer
+  output << R"(suzume-cli - Japanese tokenizer
 
 Usage:
   suzume-cli [command] [options] [arguments]
 
 Commands:
-  analyze     Morphological analysis (default)
+  analyze     Tokenize text (default)
   dict        Dictionary management
   test        Verification and testing
   version     Show version information
@@ -778,7 +778,7 @@ Use 'suzume-cli [command] --help' for command-specific help.
 }
 
 void printAnalyzeHelp(std::ostream& output) {
-  output << R"(suzume-cli analyze - Morphological analysis
+  output << R"(suzume-cli analyze - Tokenize text
 
 Usage:
   suzume-cli analyze [options] [text]
@@ -864,7 +864,7 @@ Subcommands:
                          Compile multiple inputs or glob matches into one file
       --filter-trivial   Omit 3+ character pure-kanji/katakana entries and report the count
   decompile <in.dic> [out.tsv]
-                         Dump expanded entries to TSV (default: in.tsv).
+                         Dump expanded entries to TSV (default: in.dump.tsv).
                          A dump is for inspection, not compiler input.
   -i, --interactive [file.tsv]
                          Interactive mode

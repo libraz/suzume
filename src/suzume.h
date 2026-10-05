@@ -37,7 +37,7 @@ struct SuzumeOptions {
 /**
  * @brief Main Suzume API class
  *
- * Provides a simple interface for Japanese morphological analysis
+ * Provides a simple interface for Japanese tokenization
  * and tag generation.
  *
  * Instances are not safe for concurrent calls, including const analysis
