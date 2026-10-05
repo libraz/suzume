@@ -271,7 +271,7 @@ void addMixedScriptCandidates(core::Lattice& lattice, std::string_view text, con
                       base_cost + opts.digit_kanji_1_bonus, flags, "");
     } else if (counter_cut > first_end && counter_cut < kanji_run_end && (kanji_run_end - counter_cut) % 2 == 1 &&
                !verb_helpers::opensWordAfterQuantity(&dict_manager, codepoints, counter_cut) &&
-               !grammar::mayBeOkuriganaAt(codepoints, full_run_end)) {
+               !verb_helpers::okuriganaMayFollowKanjiRun(&dict_manager, codepoints, full_run_end)) {
       const size_t run_end_byte = byteOffsetAt(byte_offsets, full_run_end);
       const std::string_view surface = text.substr(start_byte, run_end_byte - start_byte);
       SUZUME_DEBUG_LOG_VERBOSE("[SPLIT_MIX] \"" << surface << "\": digit+uneven kanji run\n");

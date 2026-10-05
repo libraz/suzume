@@ -270,6 +270,65 @@
       ],
       "id": "ttta_8",
       "input": "三百入った"
+    },
+    {
+      "description": "a multi-mora particle after a quantity suffix is no okurigana",
+      "expected": [
+        {
+          "lemma": "利用者",
+          "pos": "Noun",
+          "surface": "利用者"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "1万人超",
+          "pos": "Noun",
+          "surface": "1万人超"
+        },
+        {
+          "lemma": "まで",
+          "pos": "Particle",
+          "surface": "まで"
+        },
+        {
+          "lemma": "拡大",
+          "pos": "Noun",
+          "surface": "拡大"
+        }
+      ],
+      "id": "ha1_made",
+      "input": "利用者は1万人超まで拡大。"
+    },
+    {
+      "description": "a multi-mora particle after a quantity suffix is no okurigana",
+      "expected": [
+        {
+          "lemma": "100人超",
+          "pos": "Noun",
+          "surface": "100人超"
+        },
+        {
+          "lemma": "まで",
+          "pos": "Particle",
+          "surface": "まで"
+        },
+        {
+          "lemma": "増える",
+          "pos": "Verb",
+          "surface": "増え"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "100_made_eta",
+      "input": "100人超まで増えた"
     }
   ],
   "description": "number_counter tests (part 2/2)",

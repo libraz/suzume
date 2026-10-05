@@ -83,7 +83,7 @@ void appendUnevenKanjiRunCandidate(const std::vector<char32_t>& codepoints, size
                            "numeral_closing_suffix", candidates);
     return;
   }
-  if (grammar::mayBeOkuriganaAt(codepoints, run_end)) {
+  if (verb_helpers::okuriganaMayFollowKanjiRun(dict_manager, codepoints, run_end)) {
     return;
   }
   if (grammar::countKanjiRunWords(codepoints, counter_end, run_end) % 2 == 1) {

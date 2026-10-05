@@ -96,6 +96,35 @@ size_t counterKanjiRunEnd(const std::vector<char32_t>& codepoints, size_t pos, s
   return end;
 }
 
+bool okuriganaMayFollowKanjiRun(const dictionary::DictionaryManager* dict_manager,
+                                const std::vector<char32_t>& codepoints, size_t run_end) {
+  if (!grammar::mayBeOkuriganaAt(codepoints, run_end)) {
+    return false;
+  }
+  // A small kana after a kanji is always an onbin ending (残っ+て), whatever
+  // particle it also spells (って).
+  if (dict_manager == nullptr || run_end == 0 || kana::isSmallKanaCodepoint(codepoints[run_end])) {
+    return true;
+  }
+  constexpr size_t kProbeLength = 6;
+  const size_t probe_end = std::min(codepoints.size(), run_end + kProbeLength);
+  bool particle_starts = false;
+  for (const auto& match : dict_manager->lookup(extractSubstring(codepoints, run_end, probe_end), 0)) {
+    particle_starts = particle_starts ||
+                      (match.entry != nullptr && match.length >= 2 && match.entry->pos == core::PartOfSpeech::Particle);
+  }
+  if (!particle_starts) {
+    return true;
+  }
+  for (const auto& match : dict_manager->lookup(extractSubstring(codepoints, run_end - 1, probe_end), 0)) {
+    if (match.entry != nullptr && match.length >= 2 &&
+        (match.entry->pos == core::PartOfSpeech::Verb || match.entry->pos == core::PartOfSpeech::Adjective)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool isProductiveShiiAdjectiveTerminal(std::string_view surface, const grammar::Inflection& inflection) {
   // A productive formation needs a stem in front of the suffix: bare しい is
   // the classical しかり paradigm's own shape (しかるべく, しかれども), not an
