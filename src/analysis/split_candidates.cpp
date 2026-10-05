@@ -442,8 +442,17 @@ void addNounVerbSplitCandidates(core::Lattice& lattice, std::string_view text, c
           ? kanji_end - 1
           : kanji_end;
   const bool ends_at_humble_subsidiary = humble_subsidiary_start < kanji_end;
+  // A run whose continuative し is a listed godan-sa verb cell (目指し, 見逃し)
+  // is that verb's stem, not a verbal noun, unless the run is a listed noun.
+  const auto* run_continuative =
+      kanji_end < codepoints.size() && codepoints[kanji_end] == U'し'
+          ? lookupEntryInRange(dict_manager, codepoints, start_pos, kanji_end + 1, core::PartOfSpeech::Verb)
+          : nullptr;
+  const bool spells_listed_godan_sa_continuative =
+      run_continuative != nullptr && run_continuative->extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      lookupEntryInRange(dict_manager, codepoints, start_pos, kanji_end, core::PartOfSpeech::Noun) == nullptr;
   if (hasSuruContinuation(codepoints, kanji_end) && following_verb_start == kanji_end && !ends_at_humble_subsidiary &&
-      !hasDictionaryLexicalPrefix(noun_results, kanji_length) &&
+      !spells_listed_godan_sa_continuative && !hasDictionaryLexicalPrefix(noun_results, kanji_length) &&
       !crossesModifierBoundaryForSuruNoun(text, byte_offsets, start_pos, kanji_end, dict_manager) &&
       !(start_pos > 0 && normalize::isIterationMark(codepoints[start_pos - 1])) &&
       !containsIterationMark(codepoints, start_pos, kanji_end) && !ends_with_derivational_suffix &&

@@ -837,6 +837,90 @@
       ],
       "id": "wo_yasanai",
       "input": "頭を冷やさない"
+    },
+    {
+      "description": "listed godan sa continuative is not a verbal noun plus suru",
+      "expected": [
+        {
+          "lemma": "新しい",
+          "pos": "Adjective",
+          "surface": "新しい"
+        },
+        {
+          "lemma": "施設",
+          "pos": "Noun",
+          "surface": "施設"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "3月末",
+          "pos": "Noun",
+          "surface": "3月末"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "完成",
+          "pos": "Noun",
+          "surface": "完成"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "目指す",
+          "pos": "Verb",
+          "surface": "目指し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "shii_ha3_no_wo_shiteiru",
+      "input": "新しい施設は3月末の完成を目指している。"
+    },
+    {
+      "description": "listed godan sa continuative is not a verbal noun plus suru",
+      "expected": [
+        {
+          "lemma": "優勝",
+          "pos": "Noun",
+          "surface": "優勝"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "目指す",
+          "pos": "Verb",
+          "surface": "目指し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wo_shita_3",
+      "input": "優勝を目指した"
     }
   ],
   "description": "Godan Sa-row verbs (五段サ行動詞) - verbs ending in す",
