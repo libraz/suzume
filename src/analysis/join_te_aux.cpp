@@ -80,12 +80,18 @@ void addTaruAdjectiveJoinCandidates(core::Lattice& lattice, std::string_view tex
   // The nominal without と is the lemma. A listed nominal has a reading of its
   // own, and with the iteration mark that reading is usually a plural whose と
   // is the comitative case particle (人々と話す, 我々と行く) — the opposite
-  // analysis. Any part of speech counts here, since the plural pronouns are not
-  // nouns.
-  std::string lemma(textRange(text, byte_offsets, start_pos, kanji_end));
-  if (!dict_manager.lookup(lemma, 0).empty()) {
+  // analysis. Any part of speech but an adverb counts here, since the plural
+  // pronouns are not nouns; a listed adverb (俄然) is the same manner reading.
+  // Only the whole nominal is matched: a listed first kanji (a given name 凛)
+  // says nothing about 凛然, except as the base of a reduplicated plural.
+  const auto* listed = lookupEntryInRange(dict_manager, codepoints, start_pos, kanji_end);
+  if (listed != nullptr && listed->pos != core::PartOfSpeech::Adverb) {
     return;
   }
+  if (last_kanji == U'々' && lookupEntryInRange(dict_manager, codepoints, start_pos, kanji_end - 1) != nullptr) {
+    return;
+  }
+  std::string lemma(textRange(text, byte_offsets, start_pos, kanji_end));
 
   // Calculate cost with bonus for this pattern
   float base_cost = scorer.posPrior(core::PartOfSpeech::Adverb);

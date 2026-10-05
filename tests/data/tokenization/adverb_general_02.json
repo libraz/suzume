@@ -2482,6 +2482,82 @@
       ],
       "id": "zubari_u",
       "input": "ずばり言う"
+    },
+    {
+      "description": "凛然とした態度 - auto-generated",
+      "expected": [
+        {
+          "lemma": "凛然",
+          "pos": "Adverb",
+          "surface": "凛然と"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "態度",
+          "pos": "Noun",
+          "surface": "態度"
+        }
+      ],
+      "id": "toshita",
+      "input": "凛然とした態度"
+    },
+    {
+      "description": "俄然と張り切る - auto-generated",
+      "expected": [
+        {
+          "lemma": "俄然",
+          "pos": "Adverb",
+          "surface": "俄然と"
+        },
+        {
+          "lemma": "張り切る",
+          "pos": "Verb",
+          "surface": "張り切る"
+        }
+      ],
+      "id": "to_ri_ru",
+      "input": "俄然と張り切る"
+    },
+    {
+      "description": "俄然やる気が出た - auto-generated",
+      "expected": [
+        {
+          "lemma": "俄然",
+          "pos": "Adverb",
+          "surface": "俄然"
+        },
+        {
+          "lemma": "やる気",
+          "pos": "Noun",
+          "surface": "やる気"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "出る",
+          "pos": "Verb",
+          "surface": "出"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "yaru_ga_ta",
+      "input": "俄然やる気が出た"
     }
   ],
   "description": "General adverbs (part 2/2)",
