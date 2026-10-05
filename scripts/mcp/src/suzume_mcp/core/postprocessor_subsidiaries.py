@@ -78,12 +78,31 @@ def postprocess_iru_aux(tokens: list[dict]) -> bool:
             t["lemma"] = "いる"
 
 
+# What selects the nasalized terminal of くる (くん) after a te-form.
+_CONTRACTED_KURU_FOLLOWERS = ("じゃん", "だ", "です", "でしょ", "の")
+
+
 def postprocess_giving_aux(tokens: list[dict]) -> bool:
     """Classify productive て/で + giving/receiving verbs as auxiliaries."""
     auxiliary_lemmas = frozenset({"あげる", "くれる", "もらう"})
     changed = False
     for idx in range(1, len(tokens)):
         token = tokens[idx]
+        following = tokens[idx + 1].get("surface", "") if idx + 1 < len(tokens) else ""
+        # Before じゃん, the copula and the nominalizer, くん after a te-form is
+        # くる with its る nasalized (走って+くん+の, 歩いて+くん+じゃん), as the
+        # reference already reads it before の; くれる contracts to くん only
+        # before its negative (待って+くん+ない).
+        if (
+            token.get("surface") == "くん"
+            and tokens[idx - 1].get("surface") in ("て", "で")
+            and following.startswith(_CONTRACTED_KURU_FOLLOWERS)
+        ):
+            if (token.get("pos"), token.get("lemma")) != ("Auxiliary", "くる"):
+                token["pos"] = "Auxiliary"
+                token["lemma"] = "くる"
+                changed = True
+            continue
         if token.get("lemma") not in auxiliary_lemmas:
             continue
         if tokens[idx - 1].get("surface") not in ("て", "で"):

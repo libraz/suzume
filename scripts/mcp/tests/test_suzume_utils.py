@@ -766,3 +766,19 @@ class TestRateQuantities:
     def test_one_dimension_stays_one_quantity(self, text):
         tokens, _, _ = get_expected_tokens(text)
         assert [token["surface"] for token in tokens] == [text]
+
+
+class TestContractedKuru:
+    @pytest.mark.parametrize(
+        ("text", "lemma"),
+        [
+            ("歩いてくんじゃん。", "くる"),
+            ("走ってくんだ", "くる"),
+            ("走ってくんの", "くる"),
+            ("待ってくんない", "くれる"),
+        ],
+    )
+    def test_kun_lemma_follows_what_selects_it(self, text, lemma):
+        tokens, _, _ = get_expected_tokens(text)
+        kun = next(token for token in tokens if token["surface"] == "くん")
+        assert (kun["pos"], kun["lemma"]) == ("Auxiliary", lemma)
