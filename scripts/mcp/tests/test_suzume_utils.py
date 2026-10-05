@@ -408,3 +408,13 @@ class TestClassicalTerminalAuxiliaryHost:
     def test_leaves_non_terminal_hosts(self, text, surfaces):
         tokens, _, _ = get_expected_tokens(text)
         assert [token["surface"] for token in tokens] == surfaces
+
+
+class TestClassicalMuAfterAuxiliaryIrrealis:
+    def test_reads_mu_after_tara_as_the_conjectural(self):
+        tokens, _, _ = get_expected_tokens("来たらむ")
+        assert [(token["surface"], token["pos"]) for token in tokens] == [
+            ("来", "Verb"),
+            ("たら", "Auxiliary"),
+            ("む", "Auxiliary"),
+        ]

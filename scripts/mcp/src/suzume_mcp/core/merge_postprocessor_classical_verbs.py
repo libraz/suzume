@@ -160,7 +160,8 @@ def _postprocess_classical_mu(result: list[dict], applied_rule: str | None) -> t
             and token.get("pos") != "助動詞"
             and (
                 bare_kanji_lemma is not None
-                or (previous.get("pos") == "動詞" and previous.get("surface", "")[-1:] in _A_ROW_TO_U_ROW)
+                # An auxiliary's own irrealis hosts it the same way (来+たら+む, 花+なら+む).
+                or (previous.get("pos") in ("動詞", "助動詞") and previous.get("surface", "")[-1:] in _A_ROW_TO_U_ROW)
             )
         ):
             if bare_kanji_lemma is not None:
