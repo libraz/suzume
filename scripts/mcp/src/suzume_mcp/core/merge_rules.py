@@ -1,5 +1,7 @@
 """Merge rules ported from SuzumeUtils.pm apply_suzume_merge()."""
 
+import functools
+
 import regex
 
 from .constants import (
@@ -139,6 +141,35 @@ def _classical_adjective_cells(remaining: str) -> list[dict] | None:
             ]
         return None
     return None
+
+
+# Verbs whose て-form after に lexicalized into a closed compound case particle
+# (について, にあたって, に対して), keyed by the dictionary lemma.
+_COMPOUND_CASE_PARTICLE_VERBS = frozenset(("つく", "あたる", "当たる", "対する"))
+
+
+@functools.lru_cache(maxsize=4096)
+def _reads_as_compound_case_particle(host: str, span: str) -> bool:
+    """Whether the reference reads ``span`` as one particle after ``host`` in a noun frame.
+
+    The adnominal frame (X+について+の意見) removes the follower that made the
+    reference pick the literal verb, so its answer reflects the host alone.
+    """
+    probe = mecab_analyze(host + span + "の意見")
+    return any(token.get("surface") == span and token.get("pos") == "助詞" for token in probe)
+
+
+def _selects_te_form(token: dict) -> bool:
+    """Whether a follower selects a verb's て-form rather than a particle phrase.
+
+    Auxiliary verbs (いる, しまう, ください), the existential ある and the
+    sequential から all attach to a literal verb (席に|つい|て|ください).
+    """
+    return (
+        (token.get("pos") == "動詞" and (token.get("pos_sub1") == "非自立" or token.get("lemma") in ("いる", "ある")))
+        or (token.get("pos") == "形容詞" and token.get("pos_sub1") == "非自立")
+        or token.get("surface") == "から"
+    )
 
 
 def _consume_span(tokens: list[dict], start: int, length: int) -> tuple[str, int]:
@@ -1264,6 +1295,29 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                     merged = True
                     if applied_rule is None:
                         applied_rule = "brand+number"
+
+        # The closed compound case particles (について, にあたって, に対して) stay
+        # one word whatever follows, unless the follower selects the literal
+        # verb's て-form (駅に|つい|て|から).
+        if (
+            not merged
+            and result
+            and i + 2 < len(tokens)
+            and t.get("surface") == "に"
+            and t.get("pos") == "助詞"
+            and tokens[i + 1].get("pos") == "動詞"
+            and tokens[i + 1].get("lemma") in _COMPOUND_CASE_PARTICLE_VERBS
+            and tokens[i + 2].get("surface") == "て"
+            and tokens[i + 2].get("pos") == "助詞"
+            and (i + 3 >= len(tokens) or not _selects_te_form(tokens[i + 3]))
+        ):
+            span = "に" + tokens[i + 1].get("surface", "") + "て"
+            if _reads_as_compound_case_particle(result[-1].get("surface", ""), span):
+                result.append({"surface": span, "pos": "助詞", "pos_sub1": "格助詞", "pos_sub2": "連語", "lemma": span})
+                i += 3
+                merged = True
+                if applied_rule is None:
+                    applied_rule = "compound-case-particle"
 
         # 2d. Prefix + Noun (kanji only)
         # Suzume design: 御 is a productive prefix that always splits off

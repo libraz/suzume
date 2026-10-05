@@ -730,6 +730,147 @@
       ],
       "id": "koutoshite",
       "input": "書こうとして"
+    },
+    {
+      "description": "Compound case particle stays whole before a quotative",
+      "expected": [
+        {
+          "lemma": "紙",
+          "pos": "Noun",
+          "surface": "紙"
+        },
+        {
+          "lemma": "について",
+          "pos": "Particle",
+          "surface": "について"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "いう",
+          "pos": "Verb",
+          "surface": "いっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "全部",
+          "pos": "Noun",
+          "surface": "全部"
+        },
+        {
+          "lemma": "覚える",
+          "pos": "Verb",
+          "surface": "覚える"
+        },
+        {
+          "lemma": "必要",
+          "pos": "Noun",
+          "surface": "必要"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
+      "id": "nitsuite_before_quotative_concessive",
+      "input": "紙についてといっても、全部覚える必要はない。"
+    },
+    {
+      "description": "Compound case particle stays whole before とはいえ",
+      "expected": [
+        {
+          "lemma": "計画",
+          "pos": "Noun",
+          "surface": "計画"
+        },
+        {
+          "lemma": "にあたって",
+          "pos": "Particle",
+          "surface": "にあたって"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "いう",
+          "pos": "Verb",
+          "surface": "いえ"
+        },
+        {
+          "lemma": "時間",
+          "pos": "Noun",
+          "surface": "時間"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
+      "id": "niatatte_before_tohaie",
+      "input": "計画にあたってとはいえ、時間がない"
+    },
+    {
+      "description": "Compound case particle stays whole before quotative と",
+      "expected": [
+        {
+          "lemma": "紙",
+          "pos": "Noun",
+          "surface": "紙"
+        },
+        {
+          "lemma": "について",
+          "pos": "Particle",
+          "surface": "について"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "nitsuite_before_quotative_to",
+      "input": "紙についてと言った"
     }
   ],
   "description": "particle_compound tests",

@@ -310,6 +310,27 @@ class TestFixedParallelParticles:
         assert rule == "volitional-tomo"
 
 
+class TestCompoundCaseParticle:
+    @staticmethod
+    def _tokens(follower: dict) -> list[dict]:
+        return [
+            _tok("紙"),
+            _tok("に", pos="助詞", pos_sub1="格助詞"),
+            _tok("つい", pos="動詞", pos_sub1="自立", lemma="つく"),
+            _tok("て", pos="助詞", pos_sub1="接続助詞"),
+            follower,
+        ]
+
+    def test_merges_before_a_quotative(self):
+        result, rule = apply_suzume_merge(self._tokens(_tok("と", pos="助詞")), "紙についてと")
+        assert [token["surface"] for token in result] == ["紙", "について", "と"]
+        assert rule == "compound-case-particle"
+
+    def test_keeps_the_literal_verb_before_a_te_selecting_follower(self):
+        result, _ = apply_suzume_merge(self._tokens(_tok("から", pos="助詞")), "紙についてから")
+        assert [token["surface"] for token in result] == ["紙", "に", "つい", "て", "から"]
+
+
 class TestNaAdjectiveMonono:
     def test_merges_concessive_monono_after_attributive_copula(self):
         tokens = [
