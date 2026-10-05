@@ -1646,6 +1646,97 @@
       ],
       "id": "kokoniitai",
       "input": "ここにいたい"
+    },
+    {
+      "description": "no coined verb spans a case particle plus the existence verb iru",
+      "expected": [
+        {
+          "lemma": "ずっと",
+          "pos": "Adverb",
+          "surface": "ずっと"
+        },
+        {
+          "lemma": "傍",
+          "pos": "Noun",
+          "surface": "傍"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "い"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "ほしい",
+          "pos": "Adjective",
+          "surface": "ほしい"
+        }
+      ],
+      "id": "zuttto_niitehoshii",
+      "input": "ずっと傍にいてほしい"
+    },
+    {
+      "description": "no coined verb spans a case particle plus the existence verb iru",
+      "expected": [
+        {
+          "lemma": "家",
+          "pos": "Noun",
+          "surface": "家"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "い"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "niite",
+      "input": "家にいて"
+    },
+    {
+      "description": "no coined verb spans a case particle plus the existence verb iru",
+      "expected": [
+        {
+          "lemma": "側",
+          "pos": "Noun",
+          "surface": "側"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "い"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "niite_2",
+      "input": "側にいて"
     }
   ],
   "description": "Ichidan verbs (一段動詞) (part 2/2)",
