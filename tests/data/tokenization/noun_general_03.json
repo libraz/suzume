@@ -1408,9 +1408,14 @@
       "description": "過去連体節後の形容動詞語幹を名詞主要部として分類",
       "expected": [
         {
-          "lemma": "春めく",
+          "lemma": "春",
+          "pos": "Noun",
+          "surface": "春"
+        },
+        {
+          "lemma": "めく",
           "pos": "Verb",
-          "surface": "春めい"
+          "surface": "めい"
         },
         {
           "lemma": "た",

@@ -39,7 +39,12 @@ constexpr std::string_view kAspectualSubsidiaryLemmas[] = {"始める", "はじ�
 // Verbs that exist only as a derivational suffix on a nominal host (形式ばる,
 // 芝居がかる). Their conjugation lives in the dictionary; the host requirement
 // cannot, so callers gate the entry on it.
-constexpr std::string_view kBoundDerivationalSuffixVerbLemmas[] = {"ばる", "がかる", "じみる"};
+constexpr std::string_view kBoundDerivationalSuffixVerbLemmas[] = {"ばる", "がかる", "じみる",
+                                                                   "ぶる", "めく",   "めかす"};
+// The subset whose cells can stand for the okurigana of a fabricated verb. めく
+// is left out: its cells (めか, めき, めこ) are also an ichidan め-stem plus a
+// following verb (決め+かねる, 攻め+こむ), so its spelling proves nothing.
+constexpr std::string_view kBoundSuffixCellLemmas[] = {"ばる", "がかる", "じみる", "ぶる", "めかす"};
 // Suffixes that address or name a person. 様/氏 are absent on purpose: their
 // kanji orthography cannot be confused with predicate material, so no caller
 // needs a host check for them.
@@ -91,7 +96,7 @@ bool spellsBoundDerivationalSuffixCell(std::string_view okurigana) {
   // every verb class's generator for the two classes this closed set uses.
   static const std::vector<std::string> kCells = [] {
     std::vector<std::string> cells;
-    for (const std::string_view lemma : kBoundDerivationalSuffixVerbLemmas) {
+    for (const std::string_view lemma : kBoundSuffixCellLemmas) {
       const std::string base(lemma);
       cells.push_back(base);
       const VerbType type = Conjugation::detectType(base);

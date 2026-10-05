@@ -310,8 +310,14 @@ void appendClassicalNidanCandidates(const std::vector<char32_t>& codepoints, siz
        !shuushikeiEndsAt(codepoints, kanji_end + 1, dict_manager))) {
     return;
   }
-  const std::string lemma = extractSubstring(codepoints, stem_start, kanji_end + 1);
   const size_t end_pos = is_attributive ? kanji_end + 2 : kanji_end + 1;
+  // Inside a kanji run, kana that spell a bound derivational suffix verb belong
+  // to that suffix and the run is its host (学者+ぶる, not 学+者ぶる).
+  if (stem_start > 0 && normalize::classifyChar(codepoints[stem_start - 1]) == normalize::CharType::Kanji &&
+      grammar::spellsBoundDerivationalSuffixCell(extractSubstring(codepoints, kanji_end, end_pos))) {
+    return;
+  }
+  const std::string lemma = extractSubstring(codepoints, stem_start, kanji_end + 1);
   candidates.push_back(makeVerbCandidate(
       codepoints, stem_start, end_pos, candidate::verb_cost::kClassicalHaRowLicensedCost, lemma,
       dictionary::ConjugationType::Ichidan, true, CandidateOrigin::VerbKanji, candidate::kNoConfidence,

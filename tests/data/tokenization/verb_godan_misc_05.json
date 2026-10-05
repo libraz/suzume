@@ -1710,9 +1710,14 @@
       "description": "Noun plus the verb-forming suffix めく is one derived verb",
       "expected": [
         {
-          "lemma": "謎めく",
+          "lemma": "謎",
+          "pos": "Noun",
+          "surface": "謎"
+        },
+        {
+          "lemma": "めく",
           "pos": "Verb",
-          "surface": "謎めい"
+          "surface": "めい"
         },
         {
           "lemma": "た",
@@ -1732,9 +1737,14 @@
       "description": "Noun plus the verb-forming suffix めかす is one derived verb",
       "expected": [
         {
-          "lemma": "冗談めかす",
+          "lemma": "冗談",
+          "pos": "Noun",
+          "surface": "冗談"
+        },
+        {
+          "lemma": "めかす",
           "pos": "Verb",
-          "surface": "冗談めかし"
+          "surface": "めかし"
         },
         {
           "lemma": "た",
@@ -1808,9 +1818,14 @@
       "description": "Lexicalized めく host keeps the same single-verb boundary",
       "expected": [
         {
-          "lemma": "春めく",
+          "lemma": "春",
+          "pos": "Noun",
+          "surface": "春"
+        },
+        {
+          "lemma": "めく",
           "pos": "Verb",
-          "surface": "春めい"
+          "surface": "めい"
         },
         {
           "lemma": "た",

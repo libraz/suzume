@@ -26,6 +26,136 @@
       ],
       "id": "dutaini_ku",
       "input": "線路づたいに歩く"
+    },
+    {
+      "description": "知識人ぶる態度は見苦しい。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "知識人",
+          "pos": "Noun",
+          "surface": "知識人"
+        },
+        {
+          "lemma": "ぶる",
+          "pos": "Verb",
+          "surface": "ぶる"
+        },
+        {
+          "lemma": "態度",
+          "pos": "Noun",
+          "surface": "態度"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "見苦しい",
+          "pos": "Adjective",
+          "surface": "見苦しい"
+        }
+      ],
+      "id": "buru_ha_shii",
+      "input": "知識人ぶる態度は見苦しい。"
+    },
+    {
+      "description": "学者ぶる - auto-generated",
+      "expected": [
+        {
+          "lemma": "学者",
+          "pos": "Noun",
+          "surface": "学者"
+        },
+        {
+          "lemma": "ぶる",
+          "pos": "Verb",
+          "surface": "ぶる"
+        }
+      ],
+      "id": "buru",
+      "input": "学者ぶる"
+    },
+    {
+      "description": "紳士ぶる - auto-generated",
+      "expected": [
+        {
+          "lemma": "紳士",
+          "pos": "Noun",
+          "surface": "紳士"
+        },
+        {
+          "lemma": "ぶる",
+          "pos": "Verb",
+          "surface": "ぶる"
+        }
+      ],
+      "id": "buru_2",
+      "input": "紳士ぶる"
+    },
+    {
+      "description": "大人ぶった発言が嫌い。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "大人",
+          "pos": "Noun",
+          "surface": "大人"
+        },
+        {
+          "lemma": "ぶる",
+          "pos": "Verb",
+          "surface": "ぶっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "発言",
+          "pos": "Noun",
+          "surface": "発言"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "嫌い",
+          "pos": "Adjective",
+          "surface": "嫌い"
+        }
+      ],
+      "id": "buttta_ga_i",
+      "input": "大人ぶった発言が嫌い。"
+    },
+    {
+      "description": "学者ぶって話す - auto-generated",
+      "expected": [
+        {
+          "lemma": "学者",
+          "pos": "Noun",
+          "surface": "学者"
+        },
+        {
+          "lemma": "ぶる",
+          "pos": "Verb",
+          "surface": "ぶっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "話す",
+          "pos": "Verb",
+          "surface": "話す"
+        }
+      ],
+      "id": "buttte_su",
+      "input": "学者ぶって話す"
     }
   ],
   "description": "suffix_bound tests",

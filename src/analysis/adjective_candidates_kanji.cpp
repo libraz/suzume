@@ -15,6 +15,7 @@
 #include "core/kana_constants.h"
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
+#include "grammar/honorific_verbs.h"
 #include "grammar/patterns.h"
 #include "normalize/char_type.h"
 #include "normalize/exceptions.h"
@@ -99,9 +100,14 @@ bool containsDictionaryVerbBoundary(const std::vector<char32_t>& codepoints, siz
     return false;
   }
   constexpr size_t kMinimumVerbLength = 2;
+  // A bound derivational suffix verb is no boundary: it only exists inside a
+  // derivation, and the adjective derived from it (古+めかし+い) is one word.
+  const auto independent_verb = [](const dictionary::DictionaryEntry& entry) {
+    return !grammar::isBoundDerivationalSuffixVerbLemma(entry.lemma);
+  };
   for (size_t verb_start = start_pos + 1; verb_start + 1 < end_pos; ++verb_start) {
     if (hasDictionaryEntryFrom(dict_manager, codepoints, verb_start, kMinimumVerbLength, end_pos - 1 - verb_start,
-                               core::PartOfSpeech::Verb, nullptr)) {
+                               core::PartOfSpeech::Verb, independent_verb)) {
       return true;
     }
   }

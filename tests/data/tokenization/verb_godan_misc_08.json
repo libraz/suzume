@@ -1074,9 +1074,14 @@
       "description": "Derived verb continuative recovered from the fragments it was cut into",
       "expected": [
         {
-          "lemma": "謎めく",
+          "lemma": "謎",
+          "pos": "Noun",
+          "surface": "謎"
+        },
+        {
+          "lemma": "めく",
           "pos": "Verb",
-          "surface": "謎めき"
+          "surface": "めき"
         },
         {
           "lemma": "たり",
@@ -1121,9 +1126,14 @@
       "description": "Same recovery on a different host nominal",
       "expected": [
         {
-          "lemma": "皮肉めく",
+          "lemma": "皮肉",
+          "pos": "Noun",
+          "surface": "皮肉"
+        },
+        {
+          "lemma": "めく",
           "pos": "Verb",
-          "surface": "皮肉めき"
+          "surface": "めき"
         },
         {
           "lemma": "たり",

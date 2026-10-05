@@ -1334,9 +1334,14 @@
       "description": "接尾動詞めくの音便形と過去助動詞",
       "expected": [
         {
-          "lemma": "秋めく",
+          "lemma": "秋",
+          "pos": "Noun",
+          "surface": "秋"
+        },
+        {
+          "lemma": "めく",
           "pos": "Verb",
-          "surface": "秋めい"
+          "surface": "めい"
         },
         {
           "lemma": "た",
@@ -2223,9 +2228,14 @@
       "description": "接尾動詞「めく」の音便形と過去助動詞",
       "expected": [
         {
-          "lemma": "春めく",
+          "lemma": "春",
+          "pos": "Noun",
+          "surface": "春"
+        },
+        {
+          "lemma": "めく",
           "pos": "Verb",
-          "surface": "春めい"
+          "surface": "めい"
         },
         {
           "lemma": "た",

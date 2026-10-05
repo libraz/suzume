@@ -532,40 +532,12 @@ void generateProductiveSuffixVerbCandidates(const std::vector<char32_t>& codepoi
     return;
   }
 
-  // めかす derives a transitive verb from the same nominal bases as めく
-  // (冗談めかす, 秘密めかした) but inflects as Godan-sa, so its cells are not
-  // reachable from the Godan-ka table below. Without them the surface is read
-  // as めく's irrealis plus the classical causative す, which puts the boundary
-  // one mora early and turns the continuative into an auxiliary.
-  static constexpr std::array<SuffixVerbForm, 5> kMekasuForms = {{
-      {"めかす", core::ExtendedPOS::VerbShuushikei},
-      {"めかさ", core::ExtendedPOS::VerbMizenkei},
-      {"めかし", core::ExtendedPOS::VerbRenyokei},
-      {"めかせ", core::ExtendedPOS::VerbKateikei},
-      {"めかそ", core::ExtendedPOS::VerbMizenkei},
-  }};
-  static constexpr ProductiveSuffixVerb kMekasu = {kMekasuForms.data(),
-                                                   kMekasuForms.size(),
-                                                   "めかす",
-                                                   dictionary::ConjugationType::GodanSa,
-                                                   "nominal_godan_sa_mekasu_suffix",
-                                                   kGateNone};
-  if (appendProductiveSuffixVerbCells(codepoints, start_pos, base_end, kMekasu, candidates)) {
-    return;
-  }
-
-  // ～めく and ～づく are the Godan-ka pair over the same nominal bases. Their
-  // conditional cell is spelled like the Ichidan stem of ～づける, so it keeps
-  // its valid conditional context (～づけば) while the impossible voice
-  // attachment (～づけられ) is rejected.
-  static constexpr std::array<SuffixVerbForm, 6> kMekuForms = {{
-      {"めく", core::ExtendedPOS::VerbShuushikei},
-      {"めか", core::ExtendedPOS::VerbMizenkei},
-      {"めき", core::ExtendedPOS::VerbRenyokei},
-      {"めい", core::ExtendedPOS::VerbOnbinkei},
-      {"めけ", core::ExtendedPOS::VerbKateikei},
-      {"めこ", core::ExtendedPOS::VerbMizenkei},
-  }};
+  // ～づく is a Godan-ka suffix over nominal bases. Its conditional cell is
+  // spelled like the Ichidan stem of ～づける, so it keeps its valid
+  // conditional context (～づけば) while the impossible voice attachment
+  // (～づけられ) is rejected. The derivational めく/めかす are not fused here:
+  // they are bound suffix verbs in the dictionary and keep their own token
+  // after the host (謎/めく, 冗談/めかす).
   static constexpr std::array<SuffixVerbForm, 6> kZukuForms = {{
       {"づく", core::ExtendedPOS::VerbShuushikei},
       {"づか", core::ExtendedPOS::VerbMizenkei},
@@ -574,17 +546,10 @@ void generateProductiveSuffixVerbCandidates(const std::vector<char32_t>& codepoi
       {"づけ", core::ExtendedPOS::VerbKateikei},
       {"づこ", core::ExtendedPOS::VerbMizenkei},
   }};
-  static constexpr std::array<ProductiveSuffixVerb, 2> kGodanKaSuffixes = {{
-      {kMekuForms.data(), kMekuForms.size(), "めく", dictionary::ConjugationType::GodanKa, "nominal_godan_ka_suffix",
-       kGateKateikeiRejectsPassive},
-      {kZukuForms.data(), kZukuForms.size(), "づく", dictionary::ConjugationType::GodanKa, "nominal_godan_ka_suffix",
-       kGateKateikeiRejectsPassive},
-  }};
-  for (const auto& spec : kGodanKaSuffixes) {
-    if (appendProductiveSuffixVerbCells(codepoints, start_pos, base_end, spec, candidates)) {
-      return;
-    }
-  }
+  static constexpr ProductiveSuffixVerb kZuku = {
+      kZukuForms.data(),         kZukuForms.size(),          "づく", dictionary::ConjugationType::GodanKa,
+      "nominal_godan_ka_suffix", kGateKateikeiRejectsPassive};
+  appendProductiveSuffixVerbCells(codepoints, start_pos, base_end, kZuku, candidates);
 }
 
 // Administrative suffix codepoints for intermediate boundary detection
