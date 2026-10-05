@@ -81,6 +81,22 @@ void appendMimeticAdverb(const std::vector<char32_t>& codepoints, size_t start, 
 
 }  // namespace
 
+size_t laughterLengthAt(const std::vector<char32_t>& codepoints, size_t start_pos) {
+  constexpr size_t kMinRepeats = 2;
+  if (start_pos >= codepoints.size() || !isBareVowelMora(codepoints[start_pos])) {
+    return 0;
+  }
+  const char32_t vowel = codepoints[start_pos];
+  size_t end = start_pos + 1;
+  auto is_ha_row = [](char32_t mora) {
+    return mora == U'は' || mora == U'ひ' || mora == U'ふ' || mora == U'へ' || mora == U'ほ';
+  };
+  while (end < codepoints.size() && is_ha_row(codepoints[end]) && grammar::getVowelForChar(codepoints[end]) == vowel) {
+    ++end;
+  }
+  return end - start_pos - 1 >= kMinRepeats ? end - start_pos : 0;
+}
+
 void UnknownWordGenerator::generateCharacterSpeechCandidates(std::string_view /*text*/,
                                                              const std::vector<char32_t>& codepoints, size_t start_pos,
                                                              const std::vector<normalize::CharType>& char_types,
@@ -290,6 +306,19 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
   }
 
   const normalize::CharType start_type = char_types[start_pos];
+
+  // A laugh is an interjection of its own, not the honorific お on 頬 or a
+  // noun followed by particle へ (おほほ, えへへ).
+  if (const size_t laugh_len = laughterLengthAt(codepoints, start_pos); laugh_len > 0) {
+    auto laugh = makeCandidate(extractSubstring(codepoints, start_pos, start_pos + laugh_len), start_pos,
+                               start_pos + laugh_len, core::PartOfSpeech::Interjection,
+                               candidate::kLaughterInterjectionCost, true, CandidateOrigin::Onomatopoeia);
+#ifdef SUZUME_DEBUG_INFO
+    laugh.confidence = candidate::kHighOriginConfidence;
+    laugh.pattern = "laughter";
+#endif
+    candidates.push_back(std::move(laugh));
+  }
 
   // Same script as the start, or the prolonged sound mark (ー) that both
   // hiragana and katakana words take.

@@ -507,6 +507,62 @@
       ],
       "id": "ettto",
       "input": "えっと本"
+    },
+    {
+      "description": "おほほ、楽しいですわ - auto-generated",
+      "expected": [
+        {
+          "lemma": "おほほ",
+          "pos": "Interjection",
+          "surface": "おほほ"
+        },
+        {
+          "lemma": "楽しい",
+          "pos": "Adjective",
+          "surface": "楽しい"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        },
+        {
+          "lemma": "わ",
+          "pos": "Particle",
+          "surface": "わ"
+        }
+      ],
+      "id": "ohoho_shiidesuwa",
+      "input": "おほほ、楽しいですわ"
+    },
+    {
+      "description": "えへへ、ありがとう - auto-generated",
+      "expected": [
+        {
+          "lemma": "えへへ",
+          "pos": "Interjection",
+          "surface": "えへへ"
+        },
+        {
+          "lemma": "ありがとう",
+          "pos": "Interjection",
+          "surface": "ありがとう"
+        }
+      ],
+      "id": "ehehe_arigatou",
+      "input": "えへへ、ありがとう"
+    },
+    {
+      "description": "あはは - auto-generated",
+      "expected": [
+        {
+          "lemma": "あはは",
+          "pos": "Interjection",
+          "surface": "あはは"
+        }
+      ],
+      "id": "ahaha",
+      "input": "あはは"
     }
   ],
   "description": "Interjections and greetings (感動詞・挨拶)",

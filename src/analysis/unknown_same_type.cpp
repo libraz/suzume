@@ -1872,6 +1872,9 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       // Nor may it open on the te-form connective that a continuative right in
       // front of it selects (嬉しく+て|うれぴ, 言っ+て, 読ん+で).
       const bool opens_on_te_connective = closes_te_form_at(start_pos);
+      // A laugh is an interjection, which its own generator offers (あはは).
+      const size_t laugh_len = laughterLengthAt(codepoints, start_pos);
+      const bool spans_laugh = laugh_len > 0 && scan <= start_pos + laugh_len;
       const bool opens_on_sino_prefix =
           grammar::isSinoHonorificPrefix(extractSubstring(codepoints, start_pos, start_pos + 1));
       // Nor may it close on, or cut into, a registered suffix after a stem of
@@ -1888,7 +1891,7 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
            (right_short_genitive && unread_short_run_bracketed)) &&
           !crossed_verified_predicate && !cuts_into_predicate && !opens_inside_hosted_predicate &&
           !opens_on_irrealis_chain && !has_inflected_predicate_reading && !opens_on_sino_prefix &&
-          !absorbs_trailing_suffix && !opens_on_te_connective && !closes_registered_word_predicate &&
+          !absorbs_trailing_suffix && !opens_on_te_connective && !spans_laugh && !closes_registered_word_predicate &&
           !finishes_auxiliary_chain && !spells_contracted_hypothetical && !steals_formal_noun_head &&
           !absorbs_copula_before_sokuon_final &&
           ((!hasAuxiliaryParticleDecomposition(codepoints, start_pos, scan, dict_manager_) &&

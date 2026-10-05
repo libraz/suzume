@@ -419,6 +419,10 @@ constexpr size_t kMaxAdverbAdjectiveBoundaryChars = 16;
 // are handled by bounded local candidates instead.
 constexpr size_t kMaxHiraganaOnbinProbeChars = 12;
 
+// A laugh (vowel + same-vowel ha-row mora twice or more) must beat the
+// prefix + noun and noun + particle readings of its kana (お+ほほ, えへ+へ).
+constexpr float kLaughterInterjectionCost = -1.5F;
+
 // Four-mora mimetic adverbs followed by the quotative particle (ちくたくと).
 constexpr float kMimeticHeterogeneousAdverbCost = -0.5F;
 

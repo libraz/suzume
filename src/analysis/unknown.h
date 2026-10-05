@@ -252,5 +252,13 @@ class UnknownWordGenerator {
   static float getCostForType(normalize::CharType ctype, size_t length);
 };
 
+/**
+ * @brief Length of a laugh opening at @p start_pos, or 0
+ *
+ * A bare vowel followed by the ha-row mora of the same vowel twice or more
+ * (あはは, えへへ, おほほ).
+ */
+size_t laughterLengthAt(const std::vector<char32_t>& codepoints, size_t start_pos);
+
 }  // namespace suzume::analysis
 #endif  // SUZUME_ANALYSIS_UNKNOWN_H_
