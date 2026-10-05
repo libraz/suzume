@@ -136,12 +136,20 @@ CompoundV1Verification verifyCompoundVerbV1(const CompoundV1VerificationRequest&
     }
   }
 
+  // A kana span of two or more morae that is a registered particle is a phrase
+  // boundary (予定+より+遅れる), not okurigana; a one-mora span stays open to
+  // the continuative (立て+直す).
+  const size_t kanji_end_byte = byteOffsetAt(byte_offsets, kanji_end);
+  const bool kana_span_is_particle =
+      v2_start >= kanji_end + 2 && dict_manager.lookupExact(text.substr(kanji_end_byte, v2_start_byte - kanji_end_byte),
+                                                            core::PartOfSpeech::Particle) != nullptr;
+
   // A kanji-led V1 can have more than one kana before its continuative
   // ending (混じり+合う). The first kana may look like an Ichidan stem, but
   // the complete span can instead prove a Godan continuative. Preserve the
   // Ichidan reading unless inflection recognizes the whole span as Godan
   // and its final kana is that row's continuative form.
-  if (!v1_verified && !dict_compound_v1 && is_ichidan && v2_start > kanji_end + 1) {
+  if (!v1_verified && !dict_compound_v1 && is_ichidan && v2_start > kanji_end + 1 && !kana_span_is_particle) {
     const std::string v1_renyokei(text.substr(start_byte, v2_start_byte - start_byte));
     // Weigh every reading rather than the top-scoring one alone: the Godan
     // continuative ending い is also the i-adjective ending, so a span such as
@@ -242,7 +250,7 @@ CompoundV1Verification verifyCompoundVerbV1(const CompoundV1VerificationRequest&
     // before accepting the productive single-kanji Ichidan fallback: that
     // otherwise treats adjectival adverbs such as 静かに+続く as compounds.
     if (use_inflection_fallback && is_ichidan && kanji_count == 1 &&
-        endsInDictionaryParticle(dict_manager, v1_renyokei, core::kTwoJapaneseCharBytes)) {
+        (kana_span_is_particle || endsInDictionaryParticle(dict_manager, v1_renyokei, core::kTwoJapaneseCharBytes))) {
       use_inflection_fallback = false;
     }
 

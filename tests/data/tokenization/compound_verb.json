@@ -802,6 +802,107 @@
       ],
       "id": "go_woitadaki_keru",
       "input": "ご支援をいただき続ける"
+    },
+    {
+      "description": "a multi-mora particle span is no compound V1 okurigana",
+      "expected": [
+        {
+          "lemma": "予定",
+          "pos": "Noun",
+          "surface": "予定"
+        },
+        {
+          "lemma": "より",
+          "pos": "Particle",
+          "surface": "より"
+        },
+        {
+          "lemma": "遅れる",
+          "pos": "Verb",
+          "surface": "遅れる"
+        },
+        {
+          "lemma": "可能性",
+          "pos": "Noun",
+          "surface": "可能性"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "指摘",
+          "pos": "Noun",
+          "surface": "指摘"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "さ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "yori_reru_mo_sareteiru",
+      "input": "予定より遅れる可能性も指摘されている。"
+    },
+    {
+      "description": "a multi-mora particle span is no compound V1 okurigana",
+      "expected": [
+        {
+          "lemma": "計画",
+          "pos": "Noun",
+          "surface": "計画"
+        },
+        {
+          "lemma": "より",
+          "pos": "Particle",
+          "surface": "より"
+        },
+        {
+          "lemma": "遅れる",
+          "pos": "Verb",
+          "surface": "遅れる"
+        }
+      ],
+      "id": "yori_reru",
+      "input": "計画より遅れる"
+    },
+    {
+      "description": "a multi-mora particle span is no compound V1 okurigana",
+      "expected": [
+        {
+          "lemma": "予定",
+          "pos": "Noun",
+          "surface": "予定"
+        },
+        {
+          "lemma": "より",
+          "pos": "Particle",
+          "surface": "より"
+        },
+        {
+          "lemma": "乱れる",
+          "pos": "Verb",
+          "surface": "乱れる"
+        }
+      ],
+      "id": "yori_reru_2",
+      "input": "予定より乱れる"
     }
   ],
   "description": "compound_verb tests",
