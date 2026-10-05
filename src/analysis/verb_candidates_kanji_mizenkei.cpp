@@ -747,6 +747,19 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
             if (vh::opensOnCompleteAuxiliary(dict_manager, codepoints, start_pos, multi_miz_end)) {
               continue;
             }
+            // A formal noun written in kanji is a word of its own, so kana after
+            // it that open a dictionary verb cell belong to that verb (他+なら+ない),
+            // not to an unregistered verb built on the noun.
+            // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+            if (dict_manager != nullptr && !vh::isVerbInDictionary(dict_manager, base_form)) {
+              const auto* host =
+                  lookupEntryInRange(*dict_manager, codepoints, start_pos, kanji_end, core::PartOfSpeech::Noun);
+              if (host != nullptr && host->extended_pos == core::ExtendedPOS::NounFormal &&
+                  lookupEntryInRange(*dict_manager, codepoints, kanji_end, multi_miz_end, core::PartOfSpeech::Verb) !=
+                      nullptr) {
+                continue;
+              }
+            }
             // Verify this is a valid verb
             bool is_valid_verb = vh::isVerifiedVerbBase(dict_manager, inflection, base_form,
                                                         candidate::verb_cost::kConstructedVerbMinConfidence, true);

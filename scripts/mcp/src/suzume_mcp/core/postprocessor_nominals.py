@@ -413,6 +413,13 @@ def postprocess_formal_noun_lemma(tokens: list[dict]) -> bool:
                 token["lemma"] = "ため"
                 changed = True
             continue
+        # A standalone 他 is the formal noun ほか (他ならない, 他の色); MeCab's
+        # choice between its ほか and た entries is not a lexical distinction.
+        if token.get("surface") == "他" and token.get("pos") == "Noun":
+            if token.get("lemma") != "ほか":
+                token["lemma"] = "ほか"
+                changed = True
+            continue
         lemma = canonical.get(token.get("surface"))
         if lemma is None or token.get("pos") != "Noun" or idx == 0:
             continue

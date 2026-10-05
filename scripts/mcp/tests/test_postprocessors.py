@@ -1221,6 +1221,11 @@ class TestClosedGrammarNormalizers:
         assert postprocess_formal_noun_lemma(tokens)
         assert tokens[1]["lemma"] == "もの"
 
+    def test_standalone_hoka_takes_kana_lemma(self):
+        tokens = [_tok("に", "Particle"), _tok("他", "Noun", lemma="他"), _tok("なら", "Verb", lemma="なる")]
+        assert postprocess_formal_noun_lemma(tokens)
+        assert tokens[1]["lemma"] == "ほか"
+
     def test_lexical_thing_keeps_kanji_lemma(self):
         tokens = [_tok("物", "Noun")]
         assert not postprocess_formal_noun_lemma(tokens)

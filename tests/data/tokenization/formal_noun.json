@@ -2853,6 +2853,122 @@
       ],
       "id": "betatokonandakedo",
       "input": "食べたとこなんだけど"
+    },
+    {
+      "description": "エネルギー転換は必然に他ならない。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "エネルギー",
+          "pos": "Noun",
+          "surface": "エネルギー"
+        },
+        {
+          "lemma": "転換",
+          "pos": "Noun",
+          "surface": "転換"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "必然",
+          "pos": "Noun",
+          "surface": "必然"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "ほか",
+          "pos": "Noun",
+          "surface": "他"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なら"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "ha_ni_naranai",
+      "input": "エネルギー転換は必然に他ならない。"
+    },
+    {
+      "description": "彼に他ならなかった - auto-generated",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "ほか",
+          "pos": "Noun",
+          "surface": "他"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なら"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ni_naranakattta",
+      "input": "彼に他ならなかった"
+    },
+    {
+      "description": "彼に他ならぬ - auto-generated",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "ほか",
+          "pos": "Noun",
+          "surface": "他"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なら"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬ"
+        }
+      ],
+      "id": "ni_naranu",
+      "input": "彼に他ならぬ"
     }
   ],
   "description": "formal_noun tests",
