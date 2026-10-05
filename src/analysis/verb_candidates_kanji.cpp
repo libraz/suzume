@@ -686,7 +686,15 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
     const char32_t final_char = codepoints[cand.end - 1];
     const bool ends_in_continuative = normalize::isKanjiCodepoint(final_char) || kana::isIRowCodepoint(final_char) ||
                                       kana::isERowCodepoint(final_char);
-    if (!ends_in_continuative || cand.pos != core::PartOfSpeech::Verb ||
+    // The noun is the continuative itself: at most the row mora follows the
+    // stem, never an inflectional suffix (読み+たい is no deverbal noun).
+    const auto& analyses = inflection.analyze(cand.surface);
+    const bool bare_continuative =
+        std::any_of(analyses.begin(), analyses.end(), [&](const grammar::InflectionCandidate& analysis) {
+          return normalize::utf8Length(analysis.suffix) <= 1 &&
+                 grammar::verbTypeToConjType(analysis.verb_type) == cand.conj_type;
+        });
+    if (!ends_in_continuative || !bare_continuative || cand.pos != core::PartOfSpeech::Verb ||
         cand.origin != core::CandidateOrigin::VerbKanji || cand.extended_pos != core::ExtendedPOS::VerbRenyokei ||
         (!cand.lemma_verified && cand.conj_type != dictionary::ConjugationType::GodanSa) || starts_inside_kanji_run ||
         hasDictionaryAdjectiveTail(codepoints, cand.start, cand.end, dict_manager) ||

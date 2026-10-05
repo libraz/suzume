@@ -215,6 +215,28 @@
       ],
       "id": "shitaidesu",
       "input": "したいです"
+    },
+    {
+      "description": "no deverbal noun spans the desiderative tai",
+      "expected": [
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読み"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たい"
+        },
+        {
+          "lemma": "ぞ",
+          "pos": "Particle",
+          "surface": "ぞ"
+        }
+      ],
+      "id": "mitaizo",
+      "input": "読みたいぞ"
     }
   ],
   "description": "auxiliary_desire tests",
