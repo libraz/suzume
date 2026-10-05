@@ -448,6 +448,21 @@ class TestInterrogativeIkaga:
         assert rule is None
 
 
+class TestHaRowRealis:
+    def test_splits_realis_cell_from_concessive(self):
+        tokens = [_tok("言"), _tok("へ", pos="助詞"), _tok("ども", pos="助詞")]
+        result, rule = apply_suzume_merge(tokens, "言へども")
+        assert [(token["surface"], token["pos"]) for token in result] == [("言へ", "動詞"), ("ども", "助詞")]
+        assert result[0]["lemma"] == "言ふ"
+        assert rule == "classical-ha-row-realis"
+
+    def test_keeps_directional_particle_after_a_noun(self):
+        tokens = [_tok("家"), _tok("へ", pos="助詞"), _tok("ば", pos="助詞")]
+        result, rule = apply_suzume_merge(tokens, "家へば")
+        assert [token["surface"] for token in result] == ["家", "へ", "ば"]
+        assert rule is None
+
+
 class TestNumberUnit:
     def test_number_counter(self):
         tokens = [

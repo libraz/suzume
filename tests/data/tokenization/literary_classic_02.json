@@ -953,6 +953,40 @@
       ],
       "id": "woka_wanya_2",
       "input": "何をか言わんや。"
+    },
+    {
+      "description": "Ha-row yodan realis before concessive domo",
+      "expected": [
+        {
+          "lemma": "候ふ",
+          "pos": "Verb",
+          "surface": "候へ"
+        },
+        {
+          "lemma": "ども",
+          "pos": "Particle",
+          "surface": "ども"
+        }
+      ],
+      "id": "hedomo",
+      "input": "候へども"
+    },
+    {
+      "description": "Ha-row yodan realis before concessive domo",
+      "expected": [
+        {
+          "lemma": "言ふ",
+          "pos": "Verb",
+          "surface": "言へ"
+        },
+        {
+          "lemma": "ども",
+          "pos": "Particle",
+          "surface": "ども"
+        }
+      ],
+      "id": "hedomo_2",
+      "input": "言へども"
     }
   ],
   "description": "literary_classic tests (part 2/2)",

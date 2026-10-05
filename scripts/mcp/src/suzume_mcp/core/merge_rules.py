@@ -106,6 +106,37 @@ def _ha_row_irrealis_cells(remaining: str) -> list[dict] | None:
     return None
 
 
+_HA_ROW_REALIS_TAILS = ("ども", "ど", "ば")
+
+
+def _ha_row_realis_cells(remaining: str) -> list[dict] | None:
+    """Split the ハ行四段 已然形 from the concessive/conditional it hosts (言|へ|ども).
+
+    The cell kana is the directional case particle, so the dictionary reads the
+    stem in front as a noun of its own.  As for the irrealis, the modern ワ行五段
+    spelling of the stem (stem + う) tells a real verb from a nominal that takes
+    the case particle (家へ).
+    """
+    match = regex.match(
+        rf"^(\p{{Han}}+)(へ)({'|'.join(_HA_ROW_REALIS_TAILS)})(?=$|[^\p{{Hiragana}}])",
+        remaining,
+    )
+    if match is None:
+        return None
+    run, cell, tail = match.groups()
+    for offset in range(len(run)):
+        stem = run[offset:]
+        if not is_single_token_of_pos(stem + "う", "動詞"):
+            continue
+        host = run[:offset]
+        return [
+            *([{"surface": host, "pos": "名詞", "lemma": host}] if host else []),
+            {"surface": stem + cell, "pos": "動詞", "lemma": stem + "ふ"},
+            {"surface": tail, "pos": "助詞", "pos_sub1": "接続助詞", "lemma": tail},
+        ]
+    return None
+
+
 def _classical_adjective_cells(remaining: str) -> list[dict] | None:
     """Split a classical i-adjective cell from the function word it hosts.
 
@@ -607,6 +638,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
         for cells_of, label in (
             (_classical_adjective_cells, "classical-adjective-kari"),
             (_ha_row_irrealis_cells, "classical-ha-row-irrealis"),
+            (_ha_row_realis_cells, "classical-ha-row-realis"),
         ):
             if merged:
                 break
