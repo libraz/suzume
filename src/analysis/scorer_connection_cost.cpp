@@ -142,6 +142,11 @@ float computeLateLexicalBoundaryBonus(const core::LatticeEdge& prev, const core:
       prev.extended_pos == core::ExtendedPOS::ParticleNo && utf8::equalsAny(prev.surface, {"ん"}) &&
       (next.extended_pos == core::ExtendedPOS::VerbRenyokei ||
        (next.extended_pos == core::ExtendedPOS::ParticleConj && utf8::equalsAny(next.surface, {"なり"})));
+  // The contracted nominalizer ん closes an attributive predicate; an adverb
+  // has no attributive form to host it (ふと+ん is ふとん).
+  const bool contracted_nominalizer_after_adverb = prev.pos == core::PartOfSpeech::Adverb &&
+                                                   next.extended_pos == core::ExtendedPOS::ParticleNo &&
+                                                   utf8::equalsAny(next.surface, {"ん"});
   // The geminate こっ is こと assimilated to the copula after it, and that ちゃ
   // is じゃ assimilated to the geminate (えらい+こっ+ちゃ): neither stands alone,
   // and like any formal noun こっ needs a modifier rather than a particle
@@ -182,9 +187,9 @@ float computeLateLexicalBoundaryBonus(const core::LatticeEdge& prev, const core:
       volitional_after_stray_kanji || terminal_adjective_before_te || clipped_desu_off_nominalizer ||
       listing_ya_after_predicate || copular_aru_on_nominal || concessive_noni_before_binding ||
       attributive_na_after_final_particle || polite_copula_continuative_stranded || copula_spelled_adverb_on_nominal ||
-      contracted_nominalizer_before_continuative || unpaired_assimilated_copula ||
-      terminal_spelled_final_particle_in_kana_run || contracted_volitional_off_predicate ||
-      conjunctive_after_final_particle || contracted_te_wa_off_adverb) {
+      contracted_nominalizer_before_continuative || contracted_nominalizer_after_adverb ||
+      unpaired_assimilated_copula || terminal_spelled_final_particle_in_kana_run ||
+      contracted_volitional_off_predicate || conjunctive_after_final_particle || contracted_te_wa_off_adverb) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
   if ((prev.extended_pos == core::ExtendedPOS::VerbRenyokei || prev.extended_pos == core::ExtendedPOS::VerbOnbinkei) &&

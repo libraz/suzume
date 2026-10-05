@@ -672,6 +672,67 @@
       ],
       "id": "ofukurono",
       "input": "おふくろの味"
+    },
+    {
+      "description": "ふとん、最高。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "ふとん",
+          "pos": "Noun",
+          "surface": "ふとん"
+        },
+        {
+          "lemma": "最高",
+          "pos": "Noun",
+          "surface": "最高"
+        }
+      ],
+      "id": "futon",
+      "input": "ふとん、最高。"
+    },
+    {
+      "description": "ふとんを敷く - auto-generated",
+      "expected": [
+        {
+          "lemma": "ふとん",
+          "pos": "Noun",
+          "surface": "ふとん"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "敷く",
+          "pos": "Verb",
+          "surface": "敷く"
+        }
+      ],
+      "id": "futonwo_ku",
+      "input": "ふとんを敷く"
+    },
+    {
+      "description": "ふとんで寝る - auto-generated",
+      "expected": [
+        {
+          "lemma": "ふとん",
+          "pos": "Noun",
+          "surface": "ふとん"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "寝る",
+          "pos": "Verb",
+          "surface": "寝る"
+        }
+      ],
+      "id": "futonde_ru",
+      "input": "ふとんで寝る"
     }
   ],
   "description": "noun_hiragana tests",

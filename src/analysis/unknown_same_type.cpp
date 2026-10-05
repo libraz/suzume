@@ -206,10 +206,12 @@ BoundAuxiliary boundAuxiliaryAt(const std::vector<char32_t>& codepoints, size_t 
 // True when [start_pos, end_pos) is itself a listed content word. Function
 // words are excluded: a run that has so far spelled only a particle or an
 // auxiliary has not ended a word, which is exactly the position where a
-// following particle char is still word-internal (と in ともだち).
+// following particle char is still word-internal (と in ともだち). So is a
+// one-mora entry, which is as often a word's first mora (ふ of ふとん, the
+// classical terminal ふ).
 bool closesContentWord(const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos,
                        const dictionary::DictionaryManager* dict_manager) {
-  if (dict_manager == nullptr || end_pos <= start_pos) {
+  if (dict_manager == nullptr || end_pos < start_pos + 2) {
     return false;
   }
   const auto* entry = lookupEntryInRange(*dict_manager, codepoints, start_pos, end_pos);

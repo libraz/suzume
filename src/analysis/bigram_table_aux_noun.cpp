@@ -854,6 +854,9 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       // (一切れ), 少々+せる off a verb stem.
       {EPOS::Adverb, EPOS::AuxPassive, cost::kStrong},
       {EPOS::Adverb, EPOS::AuxCausative, cost::kStrong},
+      // The classical negative ぬ/ん selects an irrealis, which no adverb has
+      // (ふと+ん is ふとん).
+      {EPOS::Adverb, EPOS::AuxNegativeNu, cost::kNever},
       // The past auxiliary attaches to a predicate's onbin stem, so an adverb
       // cannot carry it. The pair is reachable only because だ spells both the
       // past auxiliary and the copula, and a stem that is both an adverb and a
