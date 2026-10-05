@@ -463,6 +463,23 @@ class TestHaRowRealis:
         assert rule is None
 
 
+class TestClassicalSourou:
+    def test_reads_sourou_after_a_continuative_as_the_verb(self):
+        tokens = [_tok("申し", pos="動詞", lemma="申す"), _tok("候", pos_sub1="一般")]
+        result, _ = apply_suzume_merge(tokens, "申し候")
+        assert [(token["surface"], token["pos"], token["lemma"]) for token in result][-1] == ("候", "動詞", "候ふ")
+
+    def test_keeps_the_kanji_compound_from_absorbing_sourou(self):
+        tokens = [_tok("御座", pos_sub1="一般"), _tok("候", pos_sub1="一般")]
+        result, _ = apply_suzume_merge(tokens, "御座候")
+        assert [token["surface"] for token in result] == ["御座", "候"]
+
+    def test_keeps_the_seasonal_noun_after_no(self):
+        tokens = [_tok("新緑"), _tok("の", pos="助詞", pos_sub1="連体化"), _tok("候", pos_sub1="一般")]
+        result, _ = apply_suzume_merge(tokens, "新緑の候")
+        assert result[-1]["pos"] == "名詞"
+
+
 class TestNumberUnit:
     def test_number_counter(self):
         tokens = [

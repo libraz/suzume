@@ -31,6 +31,7 @@ from .constants import (
 )
 from .core_lexicon import core_headwords, core_headwords_by_length, kana_i_adjective_lemmas
 from .mecab import is_single_token_of_pos, mecab_analyze, reads_as_counter
+from .merge_postprocessor_common import _continuative_verb_tokens
 from .merge_postprocessors import (
     KARI_MIZENKEI_CELL,
     apply_merge_postprocessors,
@@ -494,6 +495,35 @@ def _separate_counter_case_particles(tokens: list[dict]) -> list[dict]:
     return separated
 
 
+_SOUROU = "候"
+
+
+def _retag_classical_sourou(tokens: list[dict]) -> list[dict]:
+    """Read a standalone 候 as the epistolary verb 候ふ unless something modifies it.
+
+    The dictionary knows 候 only as the noun of 時候 (新緑の候), which is a head
+    that takes an adnominal modifier.  Everywhere else the character is the
+    classical verb: after a continuative (申し+候), after a nominal predicate
+    (御座+候), or opening a clause (候+て, 候+間).  A continuative the dictionary
+    filed as a noun (存じ, 見え) is read back as the verb it is.
+    """
+    retagged: list[dict] = []
+    for token in tokens:
+        previous = retagged[-1] if retagged else None
+        modified = previous is not None and (
+            previous.get("pos") == "連体詞" or (previous.get("pos") == "助詞" and previous.get("pos_sub1") == "連体化")
+        )
+        if token.get("surface") != _SOUROU or token.get("pos") != "名詞" or modified:
+            retagged.append(token)
+            continue
+        if previous is not None and previous.get("pos") == "名詞":
+            reading = _continuative_verb_tokens(previous.get("surface", ""))
+            if reading is not None and len(reading) == 1:
+                retagged[-1] = {**previous, **reading[0], "conj_form": "連用形"}
+        retagged.append({"surface": _SOUROU, "pos": "動詞", "pos_sub1": "自立", "lemma": "候ふ"})
+    return retagged
+
+
 def _is_verb_base(base: str) -> bool:
     """Whether a reconstructed kana dictionary form is a verb in a verbal frame.
 
@@ -510,7 +540,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
     Returns:
         Tuple of (merged tokens, applied rule name or None).
     """
-    tokens = _separate_counter_case_particles(tokens)
+    tokens = _retag_classical_sourou(_separate_counter_case_particles(tokens))
     result: list[dict] = []
     i = 0
     applied_rule: str | None = None
