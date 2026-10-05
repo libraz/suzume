@@ -195,6 +195,11 @@ _CONCESSIVE_PARTICLES = ("ど", "ども")
 _TOMO_CONCESSIVE_AUXILIARIES = frozenset({"ず"})
 
 
+# Prefixes that make a noun denote a whole set (両者, 全員, 双方, 各自), the
+# hosts the universal とも quantifies over.
+_COLLECTIVE_PREFIXES = ("両", "全", "双", "各")
+
+
 def _postprocess_tomo_particle(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
     """Keep とも whole where it is one particle rather than と plus も.
 
@@ -204,7 +209,10 @@ def _postprocess_tomo_particle(result: list[dict], applied_rule: str | None) -> 
     (読まずとも, 少なくとも). The reference dictionary lexicalizes only
     the handful of quantities it happens to list and splits the rest, so the
     boundary is restored from the host instead. Every other host keeps the
-    case particle と plus the binding particle も (願いとも違う).
+    case particle と plus the binding particle も (願いとも違う), and so does a
+    noun the reference fuses with とも in front of the negative (風ともなし,
+    風ともなく): the quantifier needs a set to range over, and a collective
+    noun (両者, 全員) is the one host where it still reads that way.
     """
     merged: list[dict] = []
     skip_next = False
@@ -234,6 +242,23 @@ def _postprocess_tomo_particle(result: list[dict], applied_rule: str | None) -> 
                 if applied_rule is None:
                     applied_rule = "tomo-particle-boundary"
                 continue
+        if (
+            host is not None
+            and following is not None
+            and following.get("lemma") == "ない"
+            and token.get("surface") == "とも"
+            and token.get("pos") == "助詞"
+            and host.get("pos") == "名詞"
+            and host.get("pos_sub1") not in ("数", "接尾")
+            and not host.get("surface", "").startswith(_COLLECTIVE_PREFIXES)
+            # A nominalized adjective continuative (多く) takes the concessive.
+            and not host.get("surface", "").endswith("く")
+        ):
+            merged.append({"surface": "と", "pos": "助詞", "pos_sub1": "格助詞", "lemma": "と"})
+            merged.append({"surface": "も", "pos": "助詞", "pos_sub1": "係助詞", "lemma": "も"})
+            if applied_rule is None:
+                applied_rule = "tomo-particle-boundary"
+            continue
         merged.append(token)
     return merged, applied_rule
 

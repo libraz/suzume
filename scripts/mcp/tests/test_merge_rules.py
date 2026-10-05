@@ -1398,6 +1398,27 @@ class TestGamashiiCells:
         assert [token["surface"] for token in result] == ["気", "が", "まし", "ます"]
 
 
+class TestFusedTomoAfterNoun:
+    def test_splits_tomo_after_a_noun_before_the_negative(self):
+        tokens = [
+            _tok("風", pos_sub1="一般"),
+            _tok("とも", pos="助詞", pos_sub1="副助詞"),
+            _tok("なし", pos="形容詞", lemma="ない"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "風ともなし")
+        assert [token["surface"] for token in result] == ["風", "と", "も", "なし"]
+        assert rule == "tomo-particle-boundary"
+
+    def test_keeps_the_quantifier_after_a_collective_noun(self):
+        tokens = [
+            _tok("両者", pos_sub1="一般"),
+            _tok("とも", pos="助詞", pos_sub1="副助詞"),
+            _tok("なく", pos="形容詞", lemma="ない"),
+        ]
+        result, _ = apply_suzume_merge(tokens, "両者ともなく")
+        assert [token["surface"] for token in result][:2] == ["両者", "とも"]
+
+
 class TestStrandedLengtheningVowel:
     def test_merges_filler_vowel_into_the_lengthened_word(self):
         tokens = [
