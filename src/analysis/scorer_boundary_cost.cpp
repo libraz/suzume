@@ -51,6 +51,14 @@ float Scorer::eosCost(const core::LatticeEdge& edge, core::ExtendedPOS prev_exte
     return sc::kEosNounContinuativePenalty;
   }
 
+  // A 連体詞 modifies the nominal after it, so after a conjunctive て/で, which
+  // asks for a predicate, closing the utterance on a listed one means its
+  // homographic predicate reading instead (罰されて+しかる+べき).
+  if (edge.extended_pos == core::ExtendedPOS::Determiner && edge.fromDictionary() &&
+      prev_extended_pos == core::ExtendedPOS::ParticleConj) {
+    return sc::kEosDeterminerPenalty;
+  }
+
   // A subsidiary verb after the te-form is an imperative (読んで+くれ), not a noun.
   if (edge.extended_pos == core::ExtendedPOS::VerbRenyokei && edge.end - edge.start > 1 &&
       prev_extended_pos != core::ExtendedPOS::ParticleConj && grammar::endsWithERow(edge.surface)) {

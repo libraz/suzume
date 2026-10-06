@@ -2319,6 +2319,70 @@
       ],
       "id": "kenai",
       "input": "片付けない"
+    },
+    {
+      "description": "罰されてしかるべき - auto-generated",
+      "expected": [
+        {
+          "lemma": "罰す",
+          "pos": "Verb",
+          "surface": "罰さ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "しかる",
+          "pos": "Verb",
+          "surface": "しかる"
+        },
+        {
+          "lemma": "べし",
+          "pos": "Auxiliary",
+          "surface": "べき"
+        }
+      ],
+      "id": "sareteshikarubeki",
+      "input": "罰されてしかるべき"
+    },
+    {
+      "description": "叱られてしかるべき - auto-generated",
+      "expected": [
+        {
+          "lemma": "叱る",
+          "pos": "Verb",
+          "surface": "叱ら"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "しかる",
+          "pos": "Verb",
+          "surface": "しかる"
+        },
+        {
+          "lemma": "べし",
+          "pos": "Auxiliary",
+          "surface": "べき"
+        }
+      ],
+      "id": "rareteshikarubeki",
+      "input": "叱られてしかるべき"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",
