@@ -427,6 +427,66 @@ def postprocess_modifier_godan_imperative(tokens: list[dict]) -> bool:
     return changed
 
 
+_CLAUSE_FINAL_PARTICLES = frozenset({"よ", "ね", "ぞ", "ぜ", "か", "な", "わ", "さ"})
+
+
+def _names_godan_sa_verb(stem: str) -> bool:
+    """Whether stem+す ends in a registered godan-sa verb (走り出+す → 出す)."""
+    headwords = core_headwords("verbs.tsv")
+    # A lone kana tail (か+す) names too many unrelated verbs to count.
+    return any(
+        stem[start:] + "す" in headwords
+        for start in range(len(stem))
+        if len(stem) - start > 1 or regex.match(r"\p{Han}", stem[start])
+    )
+
+
+def postprocess_bare_sa_row_imperative(tokens: list[dict]) -> bool:
+    """Read a clause-final Xせ as the imperative of the godan-sa verb Xす.
+
+    A continuative cannot close a predicate, so a bare e-row form that ends the
+    clause is the imperative (走り出せ, 転がせ, 動かせ), not the potential the
+    reference lemmatizes it as (走り出せる) nor the causative stem it cuts it
+    into (動か+せ). Ichidan verbs in せ (見せ, 任せ) have no godan-sa base and
+    keep their lemma.
+    """
+    changed = False
+    idx = 0
+    while idx < len(tokens):
+        token = tokens[idx]
+        following_idx = idx + 1
+        causative_stem = (
+            token.get("pos") == "Verb"
+            and idx + 1 < len(tokens)
+            and tokens[idx + 1].get("surface") == "せ"
+            and tokens[idx + 1].get("pos") == "Auxiliary"
+            and token.get("surface", "")[-1:] in "かがさたなばまらわ"
+            and not token.get("surface", "").endswith("せ")
+        )
+        if causative_stem:
+            following_idx = idx + 2
+        following = tokens[following_idx] if following_idx < len(tokens) else None
+        clause_final = (
+            following is None or following.get("pos") == "Symbol" or following.get("surface") in _CLAUSE_FINAL_PARTICLES
+        )
+        if causative_stem and clause_final:
+            stem = token["surface"] + "せ"
+            if _names_godan_sa_verb(token["surface"]):
+                tokens[idx : idx + 2] = [{"surface": stem, "pos": "Verb", "lemma": stem[:-1] + "す"}]
+                changed = True
+        elif (
+            token.get("pos") == "Verb"
+            and token.get("surface", "").endswith("せ")
+            and token.get("lemma") == token["surface"] + "る"
+            and clause_final
+            and _names_godan_sa_verb(token["surface"][:-1])
+        ):
+            token["lemma"] = token["surface"][:-1] + "す"
+            changed = True
+        idx += 1
+    return changed
+
+
 def postprocess_difficulty_adjective_stem(tokens: list[dict]) -> bool:
     """Normalize にく before さ as the productive difficulty adjective stem."""
     changed = False

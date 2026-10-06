@@ -1478,6 +1478,30 @@ class TestQuotativeDeterminerHead:
         assert not postprocessors.postprocess_quotative_determiner_head(before_no)
 
 
+class TestBareSaRowImperative:
+    def test_clause_final_potential_lemma_becomes_the_godan_sa_imperative(self):
+        tokens = [_tok("走り出せ", "Verb", lemma="走り出せる")]
+
+        assert postprocessors.postprocess_bare_sa_row_imperative(tokens)
+        assert tokens[0]["lemma"] == "走り出す"
+
+    def test_causative_shaped_stem_is_rejoined_as_the_imperative(self):
+        tokens = [_tok("動か", "Verb", lemma="動く"), _tok("せ", "Auxiliary", lemma="せる")]
+
+        assert postprocessors.postprocess_bare_sa_row_imperative(tokens)
+        assert [(t["surface"], t["lemma"]) for t in tokens] == [("動かせ", "動かす")]
+
+    def test_ichidan_in_se_keeps_its_lemma(self):
+        tokens = [_tok("見せ", "Verb", lemma="見せる")]
+
+        assert not postprocessors.postprocess_bare_sa_row_imperative(tokens)
+
+    def test_causative_before_an_auxiliary_is_untouched(self):
+        tokens = [_tok("動か", "Verb", lemma="動く"), _tok("せ", "Auxiliary", lemma="せる"), _tok("ない", "Auxiliary")]
+
+        assert not postprocessors.postprocess_bare_sa_row_imperative(tokens)
+
+
 class TestBareVowelInterjection:
     def test_lone_vowel_run_is_an_interjection(self):
         for surface, pos in (("え", "Other"), ("お", "Prefix"), ("い", "Verb")):

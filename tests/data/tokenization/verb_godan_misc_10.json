@@ -1168,6 +1168,84 @@
       ],
       "id": "itashimashita",
       "input": "前略大変失礼いたしました"
+    },
+    {
+      "description": "走り出せ - auto-generated",
+      "expected": [
+        {
+          "lemma": "走り出す",
+          "pos": "Verb",
+          "surface": "走り出せ"
+        }
+      ],
+      "id": "ri_se_2",
+      "input": "走り出せ"
+    },
+    {
+      "description": "書き直せ - auto-generated",
+      "expected": [
+        {
+          "lemma": "書き直す",
+          "pos": "Verb",
+          "surface": "書き直せ"
+        }
+      ],
+      "id": "ki_se",
+      "input": "書き直せ"
+    },
+    {
+      "description": "ボールを転がせ - auto-generated",
+      "expected": [
+        {
+          "lemma": "ボール",
+          "pos": "Noun",
+          "surface": "ボール"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "転がす",
+          "pos": "Verb",
+          "surface": "転がせ"
+        }
+      ],
+      "id": "wo_gase",
+      "input": "ボールを転がせ"
+    },
+    {
+      "description": "そこの石を動かせ - auto-generated",
+      "expected": [
+        {
+          "lemma": "そこ",
+          "pos": "Pronoun",
+          "surface": "そこ"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "石",
+          "pos": "Noun",
+          "surface": "石"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "動かす",
+          "pos": "Verb",
+          "surface": "動かせ"
+        }
+      ],
+      "id": "sokono_wo_kase",
+      "input": "そこの石を動かせ"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",

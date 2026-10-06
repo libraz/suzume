@@ -146,6 +146,7 @@ postprocess_i_adjective_upper_bound = postprocessor_predicates.postprocess_i_adj
 postprocess_ii = postprocessor_predicates.postprocess_ii
 postprocess_kusai_garu = postprocessor_predicates.postprocess_kusai_garu
 postprocess_modifier_godan_imperative = postprocessor_predicates.postprocess_modifier_godan_imperative
+postprocess_bare_sa_row_imperative = postprocessor_predicates.postprocess_bare_sa_row_imperative
 postprocess_katakana_ichidan_continuative = postprocessor_predicates.postprocess_katakana_ichidan_continuative
 postprocess_katakana_godan_te_form = postprocessor_predicates.postprocess_katakana_godan_te_form
 postprocess_na_adj_noun = postprocessor_predicates.postprocess_na_adj_noun
@@ -225,6 +226,7 @@ POSTPROCESSORS: tuple[tuple[str, Callable[[list[dict]], bool]], ...] = (
     ("mu-verb-desiderative", postprocess_mu_verb_desiderative),
     ("shortened-causative-passive", postprocess_shortened_causative_passive),
     ("modifier-godan-imperative", postprocess_modifier_godan_imperative),
+    ("bare-sa-row-imperative", postprocess_bare_sa_row_imperative),
     ("contracted-shimau-aux", postprocess_shimau_aux),
     ("contracted-toku-aux", postprocess_contracted_toku_aux),
     ("koto-suru-te", postprocess_koto_suru_te),
