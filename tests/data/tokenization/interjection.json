@@ -621,6 +621,72 @@
       ],
       "id": "arigatone",
       "input": "ありがとね"
+    },
+    {
+      "description": "ふん、俺の勝ち。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "ふん",
+          "pos": "Interjection",
+          "surface": "ふん"
+        },
+        {
+          "lemma": "俺",
+          "pos": "Pronoun",
+          "surface": "俺"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "勝ち",
+          "pos": "Noun",
+          "surface": "勝ち"
+        }
+      ],
+      "id": "fun_no_chi",
+      "input": "ふん、俺の勝ち。"
+    },
+    {
+      "description": "ふん、笑うなよ。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "ふん",
+          "pos": "Interjection",
+          "surface": "ふん"
+        },
+        {
+          "lemma": "笑う",
+          "pos": "Verb",
+          "surface": "笑う"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "fun_unayo",
+      "input": "ふん、笑うなよ。"
+    },
+    {
+      "description": "ふん！ - auto-generated",
+      "expected": [
+        {
+          "lemma": "ふん",
+          "pos": "Interjection",
+          "surface": "ふん"
+        }
+      ],
+      "id": "fun",
+      "input": "ふん！"
     }
   ],
   "description": "Interjections and greetings (感動詞・挨拶)",

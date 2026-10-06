@@ -17,6 +17,7 @@ EntrySpecRange getInterjectionEntries() {
       intj("いやー"),  // Prolonged conversational variant
       intj("わあ"),    // Amazement
       intj("へえ"),    // Interest
+      intj("ふん"),    // Dismissive snort
       intj("ふーん"),  // Understanding/Disinterest
       intj("ふうん"),  // Understanding
       // Note: ほう removed - formal noun usage (ほうがいい) is more common
