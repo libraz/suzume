@@ -1318,6 +1318,92 @@
       ],
       "id": "ano_nihaarimasu",
       "input": "あの店にはあります。"
+    },
+    {
+      "description": "もっと生きたい。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "もっと",
+          "pos": "Adverb",
+          "surface": "もっと"
+        },
+        {
+          "lemma": "生きる",
+          "pos": "Verb",
+          "surface": "生き"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たい"
+        }
+      ],
+      "id": "mottto_kitai",
+      "input": "もっと生きたい。"
+    },
+    {
+      "description": "力が尽きます。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "力",
+          "pos": "Noun",
+          "surface": "力"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "尽きる",
+          "pos": "Verb",
+          "surface": "尽き"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "ga_kimasu",
+      "input": "力が尽きます。"
+    },
+    {
+      "description": "彼は毎日を生きます。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "毎日",
+          "pos": "Noun",
+          "surface": "毎日"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "生きる",
+          "pos": "Verb",
+          "surface": "生き"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "ha_wo_kimasu",
+      "input": "彼は毎日を生きます。"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",
