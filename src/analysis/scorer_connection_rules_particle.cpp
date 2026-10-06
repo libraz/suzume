@@ -335,6 +335,16 @@ float computeAdverbialNiAfterPredicatePenalty(const core::LatticeEdge& prev, con
 float computePrefixSymbolBonus(const core::LatticeEdge& prev, const core::LatticeEdge& next) {
   float bonus{};  // value-init to 0
 
+  // A ん (the contracted nominalizer or the volitional) after an unverified
+  // pure-hiragana terminal is the tail of a mimetic word (ぐう+ん), not a
+  // grammatical morpheme.
+  if (prev.extended_pos == core::ExtendedPOS::VerbShuushikei && !prev.lemmaVerified() &&
+      grammar::isPureHiragana(prev.surface) &&
+      (next.extended_pos == core::ExtendedPOS::ParticleNo || next.extended_pos == core::ExtendedPOS::AuxVolitional) &&
+      grammar::isSingleHiragana(next.surface, U'ん')) {
+    SUZUME_CONNECTION_ADD(bonus, sc::kPenaltyUnverifiedVerbNominalizer);
+  }
+
   // Penalty for PREFIX → short pure-hiragana verb pattern
   // E.g., お+い in において should not happen (お is prefix, い is not a verb here)
   // Valid お+verb patterns: お待ち, お願い (longer, often with kanji)

@@ -2797,19 +2797,20 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
       // (おいしーー as おい + しーー).
       // A sentence-final particle may hold its own vowel at a clause end
       // (さ+あ, よ+お, さ+ー): one mora, the particle's vowel, then nothing.
-      auto holds_final_particle_vowel = [&]() {
-        // The clause ends after the held vowel, or another final particle
-        // closes it (行くけえ+ね).
+      // The clause ends after the emphatic, or a final particle closes it
+      // (行くけえ+ね).
+      auto closes_clause_after_emphatic = [&]() {
         const auto* next_final = emphatic.end < codepoints.size()
                                      ? lookupEntryInRange(dict_manager_, codepoints, emphatic.end, emphatic.end + 1,
                                                           core::PartOfSpeech::Particle)
                                      : nullptr;
-        const bool closes_clause =
-            emphatic.end >= codepoints.size() ||
-            normalize::classifyChar(codepoints[emphatic.end]) == normalize::CharType::Symbol ||
-            (next_final != nullptr && next_final->extended_pos == core::ExtendedPOS::ParticleFinal);
+        return emphatic.end >= codepoints.size() ||
+               normalize::classifyChar(codepoints[emphatic.end]) == normalize::CharType::Symbol ||
+               (next_final != nullptr && next_final->extended_pos == core::ExtendedPOS::ParticleFinal);
+      };
+      auto holds_final_particle_vowel = [&]() {
         if (result.entry->extended_pos != core::ExtendedPOS::ParticleFinal || emphatic.end != end_pos + 1 ||
-            !closes_clause) {
+            !closes_clause_after_emphatic()) {
           return false;
         }
         const char32_t held = codepoints[end_pos];
@@ -2863,8 +2864,14 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
       const bool lengthening_spells_word = lengthening_spells_word_at();
       const bool unlicensed_particle_lengthening =
           result.entry->pos == core::PartOfSpeech::Particle && !bare_sokuon && !holds_final_particle_vowel();
+      // A conjugated word drawn out with the prolonged mark closes the
+      // utterance; a following word means the mark belongs to that word instead
+      // (しー+ん is the mimetic しーん, not する continuative plus ん).
+      const bool unlicensed_open_prolongation =
+          (result.entry->pos == core::PartOfSpeech::Verb || result.entry->pos == core::PartOfSpeech::Auxiliary) &&
+          utf8::endsWith(emphatic.suffix, "ー") && !closes_clause_after_emphatic();
       if (!emphatic.empty() && !unlicensed_bare_sokuon && !unlicensed_particle_lengthening &&
-          !lengthening_spells_word) {
+          !unlicensed_open_prolongation && !lengthening_spells_word) {
         // Determine extended_pos for emphatic form
         // A sokuon on a continuative reads as its onbin cell (い → いっ for
         // と+いっ+て); on a finished form (待て+っ) it is only emphasis, and the

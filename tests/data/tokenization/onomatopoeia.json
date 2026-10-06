@@ -1685,6 +1685,97 @@
       ],
       "id": "poronporon",
       "input": "ぽろんぽろん"
+    },
+    {
+      "description": "しーん…静寂。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "しーん",
+          "pos": "Other",
+          "surface": "しーん"
+        },
+        {
+          "lemma": "静寂",
+          "pos": "Noun",
+          "surface": "静寂"
+        }
+      ],
+      "id": "shi_n",
+      "input": "しーん…静寂。"
+    },
+    {
+      "description": "ぐうん、と背が伸びた。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "ぐうん",
+          "pos": "Noun",
+          "surface": "ぐうん"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "背",
+          "pos": "Noun",
+          "surface": "背"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "伸びる",
+          "pos": "Verb",
+          "surface": "伸び"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "guun_to_ga_bita",
+      "input": "ぐうん、と背が伸びた。"
+    },
+    {
+      "description": "ぐうん、とスピードが上がった。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "ぐうん",
+          "pos": "Noun",
+          "surface": "ぐうん"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "スピード",
+          "pos": "Noun",
+          "surface": "スピード"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "上がる",
+          "pos": "Verb",
+          "surface": "上がっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "guun_to_ga_gattta",
+      "input": "ぐうん、とスピードが上がった。"
     }
   ],
   "description": "Onomatopoeia and mimetic words",

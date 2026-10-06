@@ -254,6 +254,11 @@ constexpr float kPenaltyUnstackableCaseTopic = bigram_cost::kVeryRare - bigram_c
 // covered by the renyokei to formal-noun bonus: cancel it.
 constexpr float kPenaltyDeverbalFormalNounAfterRenyokei = -bigram_cost::kVeryStrongBonus;
 
+// The terminal-form to nominalizer-ん bonus presumes a verified verb: an
+// unverified pure-hiragana verb is more likely the stem of a mimetic word that
+// ends in ん (ぐうん, しーん), so it takes a severe penalty instead.
+constexpr float kPenaltyUnverifiedVerbNominalizer = bigram_cost::kSevere;
+
 // =============================================================================
 // Word-Cost Length-Scaled Surface Bonuses (wordCost)
 // =============================================================================

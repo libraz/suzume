@@ -2022,11 +2022,15 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                     if base is not None:
                         consumed, j = _covered_length(tokens, i, len(candidate))
                         if consumed == len(candidate):
+                            # A mark inside a two-mora X+ん is the mimetic (しーん,
+                            # ずーん): an unlexicalized word that is its own lemma,
+                            # not the noun it homographs (芯).
+                            mimetic = len(plain) == 2 and plain.endswith("ん")
                             result.append(
                                 {
                                     "surface": candidate,
-                                    "pos": base.get("pos", ""),
-                                    "lemma": base.get("lemma") or plain,
+                                    "pos": "その他" if mimetic else base.get("pos", ""),
+                                    "lemma": candidate if mimetic else base.get("lemma") or plain,
                                 }
                             )
                             i = j
