@@ -43,6 +43,77 @@
       ],
       "id": "no_21",
       "input": "將來の夢"
+    },
+    {
+      "description": "②散歩の健康効果について調べました。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "②",
+          "pos": "Other",
+          "surface": "②"
+        },
+        {
+          "lemma": "散歩",
+          "pos": "Noun",
+          "surface": "散歩"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "健康効果",
+          "pos": "Noun",
+          "surface": "健康効果"
+        },
+        {
+          "lemma": "について",
+          "pos": "Particle",
+          "surface": "について"
+        },
+        {
+          "lemma": "調べる",
+          "pos": "Verb",
+          "surface": "調べ"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "まし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "no_nitsuite_bemashita",
+      "input": "②散歩の健康効果について調べました。"
+    },
+    {
+      "description": "安全管理 - auto-generated",
+      "expected": [
+        {
+          "lemma": "安全管理",
+          "pos": "Noun",
+          "surface": "安全管理"
+        }
+      ],
+      "id": "unnamed_43",
+      "input": "安全管理"
+    },
+    {
+      "description": "便利機能 - auto-generated",
+      "expected": [
+        {
+          "lemma": "便利機能",
+          "pos": "Noun",
+          "surface": "便利機能"
+        }
+      ],
+      "id": "unnamed_44",
+      "input": "便利機能"
     }
   ],
   "description": "noun_kanji_compound tests",

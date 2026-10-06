@@ -1069,41 +1069,13 @@ void Tokenizer::addUnknownCandidates(core::Lattice& lattice, std::string_view te
           // Only when the prefix covers a significant portion (>= half)
           // to avoid splitting 自然言語処理 at 自然(2/6).
           for (const auto& result : dict_results) {
+            // A na-adjective stem heads compounds as freely as a noun does
+            // (健康管理, 安全対策, 重要性), so only heads that form none — adverbs,
+            // determiners, ordinals — mark the prefix as a separate word.
             if (result.entry != nullptr && result.length >= 2 && result.length < len && result.length * 2 >= len &&
-                (result.entry->pos != core::PartOfSpeech::Noun || isOrdinalNounSurface(result.entry->surface))) {
-              // Exception: na-adjective stem + productive noun-forming suffix
-              // (性, 的, etc.) is a genuine compound word (重要性, 必要性),
-              // not an accidental dict-prefix overlap like その後(ADV)+猫.
-              // The productive suffix mechanism (getSuffixEntries/getNaAdjSuffixes)
-              // already scores this pattern on its own merits, so skip the
-              // generic dict-prefix penalty here.
-              if (result.entry->pos == core::PartOfSpeech::Adjective &&
-                  result.entry->extended_pos == core::ExtendedPOS::AdjNaAdj) {
-                const std::string_view tail_surface =
-                    textRange(text, byte_offsets, candidate.start + result.length, candidate.end);
-                bool tail_is_productive_suffix = false;
-                for (const auto& suffix_entry : getSuffixEntries()) {
-                  if (tail_surface == suffix_entry.suffix) {
-                    tail_is_productive_suffix = true;
-                    break;
-                  }
-                }
-                if (!tail_is_productive_suffix) {
-                  for (const auto& na_suffix : getNaAdjSuffixes()) {
-                    if (tail_surface == na_suffix) {
-                      tail_is_productive_suffix = true;
-                      break;
-                    }
-                  }
-                }
-                // A na-adjective stem also forms a lexical comparison compound
-                // with 以上 (必要以上, 予想以上). Numeral+counter expressions
-                // retain their dedicated split candidates in the counter layer.
-                bool tail_is_comparison_bound = (tail_surface == "以上");
-                if (tail_is_productive_suffix || tail_is_comparison_bound) {
-                  continue;
-                }
-              }
+                ((result.entry->pos != core::PartOfSpeech::Noun &&
+                  result.entry->extended_pos != core::ExtendedPOS::AdjNaAdj) ||
+                 isOrdinalNounSurface(result.entry->surface))) {
               constexpr float kDictPrefixPenalty = 1.5F;
               adjusted_cost += kDictPrefixPenalty;
               SUZUME_DEBUG_LOG_VERBOSE("[TOK_UNK] \"" << candidate.surface << "\" (NOUN): +" << kDictPrefixPenalty
