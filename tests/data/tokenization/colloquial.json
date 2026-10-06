@@ -501,6 +501,94 @@
       ],
       "id": "yabeena",
       "input": "やべえな"
+    },
+    {
+      "description": "ぶっちゃけわかりません。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "ぶっちゃける",
+          "pos": "Verb",
+          "surface": "ぶっちゃけ"
+        },
+        {
+          "lemma": "わかる",
+          "pos": "Verb",
+          "surface": "わかり"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ませ"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        }
+      ],
+      "id": "buttchi_kewakarimasen",
+      "input": "ぶっちゃけわかりません。"
+    },
+    {
+      "description": "ぶっちゃけ無理です - auto-generated",
+      "expected": [
+        {
+          "lemma": "ぶっちゃける",
+          "pos": "Verb",
+          "surface": "ぶっちゃけ"
+        },
+        {
+          "lemma": "無理",
+          "pos": "Adjective",
+          "surface": "無理"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "buttchi_ke_desu",
+      "input": "ぶっちゃけ無理です"
+    },
+    {
+      "description": "ぶっちゃけると - auto-generated",
+      "expected": [
+        {
+          "lemma": "ぶっちゃける",
+          "pos": "Verb",
+          "surface": "ぶっちゃける"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        }
+      ],
+      "id": "buttchi_keruto",
+      "input": "ぶっちゃけると"
+    },
+    {
+      "description": "ぶっちゃけて話す - auto-generated",
+      "expected": [
+        {
+          "lemma": "ぶっちゃける",
+          "pos": "Verb",
+          "surface": "ぶっちゃけ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "話す",
+          "pos": "Verb",
+          "surface": "話す"
+        }
+      ],
+      "id": "buttchi_kete_su",
+      "input": "ぶっちゃけて話す"
     }
   ],
   "description": "colloquial tests",

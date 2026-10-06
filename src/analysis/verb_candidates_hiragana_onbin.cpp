@@ -37,6 +37,22 @@ bool opensPredicateSlot(const std::vector<char32_t>& codepoints, size_t start_po
          normalize::isExtendedParticle(codepoints[start_pos - 1]);
 }
 
+// A registered verb that opens the span and reaches past the contraction mora
+// (ぶっちゃける against ぶっ+ちゃ) already spells the contraction as part of its
+// own paradigm, so the contraction reading would cut a dictionary word.
+bool contractionCutsRegisteredVerb(const dictionary::DictionaryManager* dict_manager,
+                                   const std::vector<char32_t>& codepoints, size_t start_pos, size_t contraction_end,
+                                   size_t hiragana_end) {
+  if (dict_manager == nullptr) {
+    return false;
+  }
+  const auto results = lookupResultsInRange(*dict_manager, codepoints, start_pos, hiragana_end);
+  return std::any_of(results.begin(), results.end(), [&](const auto& result) {
+    return result.entry != nullptr && result.entry->pos == core::PartOfSpeech::Verb &&
+           start_pos + result.length > contraction_end;
+  });
+}
+
 void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, size_t start_pos, size_t hiragana_end,
                                       const grammar::Inflection& inflection,
                                       const dictionary::DictionaryManager* dict_manager,
@@ -79,6 +95,11 @@ void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, s
     }
 
     if (!is_contraction_pattern && !is_tense_pattern) {
+      continue;
+    }
+
+    if (is_contraction_pattern &&
+        contractionCutsRegisteredVerb(dict_manager, codepoints, start_pos, onbin_pos + 1, hiragana_end)) {
       continue;
     }
 
