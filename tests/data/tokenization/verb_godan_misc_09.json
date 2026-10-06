@@ -1126,6 +1126,55 @@
       ],
       "id": "tomo_nda",
       "input": "二人とも休んだ。"
+    },
+    {
+      "description": "もう寝ろってさ。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "もう",
+          "pos": "Adverb",
+          "surface": "もう"
+        },
+        {
+          "lemma": "寝る",
+          "pos": "Verb",
+          "surface": "寝ろ"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Particle",
+          "surface": "さ"
+        }
+      ],
+      "id": "mou_rotttesa",
+      "input": "もう寝ろってさ。"
+    },
+    {
+      "description": "行けってな - auto-generated",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行け"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        }
+      ],
+      "id": "ketttena",
+      "input": "行けってな"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",

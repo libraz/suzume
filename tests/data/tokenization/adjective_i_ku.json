@@ -1539,6 +1539,60 @@
       ],
       "id": "kattta_2",
       "input": "違かった"
+    },
+    {
+      "description": "早く行けってな。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "早い",
+          "pos": "Adjective",
+          "surface": "早く"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行け"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        }
+      ],
+      "id": "ku_ketttena",
+      "input": "早く行けってな。"
+    },
+    {
+      "description": "早く食べろってな。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "早い",
+          "pos": "Adjective",
+          "surface": "早く"
+        },
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べろ"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        }
+      ],
+      "id": "ku_berotttena",
+      "input": "早く食べろってな。"
     }
   ],
   "description": "I-adjectives ku-forms (連用形) - adverbial, negative, te-form, ku-naru patterns",

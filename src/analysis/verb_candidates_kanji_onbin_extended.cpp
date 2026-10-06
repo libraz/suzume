@@ -323,6 +323,15 @@ void appendExtendedSokuonbinCandidates(const std::vector<char32_t>& codepoints, 
     // — a dictionary entry of another word class, and the continuative cell of
     // a registered verb, which cannot also head a new paradigm.
     const bool in_dict_check = vh::isVerbInDictionary(dict_manager, potential_base);
+    // A kana e-row or i-row mora before る is the stem of an ichidan verb
+    // (行ける, 立てる, 起きる), and ろ is its imperative ending (食べろ). An
+    // ichidan verb has no onbin: 行け+って.
+    const char32_t stem_last = utf8::decodeLastChar(stem);
+    if (hiragana_before_onbin >= 1 &&
+        (kana::isERowCodepoint(stem_last) || kana::isIRowCodepoint(stem_last) || stem_last == U'ろ') &&
+        potential_base == stem + "る") {
+      continue;
+    }
     if (!in_dict_check && dict_manager != nullptr) {
       const auto* stem_entry = dict_manager->lookupExact(stem);
       const std::string_view continuative_base_suffix = grammar::godanBaseSuffixFromIRow(utf8::decodeLastChar(stem));

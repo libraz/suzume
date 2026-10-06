@@ -75,9 +75,10 @@ float Scorer::eosCost(const core::LatticeEdge& edge, core::ExtendedPOS prev_exte
       // other cells of the same auxiliary close a clause (読ま+ず, 知ら+ぬ).
       return grammar::isSingleHiragana(edge.surface, U'ね') ? boundary_cost.eos : sc::scale::kNeutral;
     case sc::EosBoundaryGate::AttributiveCopula:
-      // Only after a pronoun: a trailing みたいな/静かな is an elided-head
-      // attributive, while それな is the final particle.
-      return grammar::isAttributiveCopulaNa(edge.surface) && prev_extended_pos == core::ExtendedPOS::Pronoun
+      // Only after a pronoun or the quotative: a trailing みたいな/静かな is an
+      // elided-head attributive, while それな and 行けってな are the final particle.
+      return grammar::isAttributiveCopulaNa(edge.surface) && (prev_extended_pos == core::ExtendedPOS::Pronoun ||
+                                                              prev_extended_pos == core::ExtendedPOS::ParticleQuote)
                  ? boundary_cost.eos
                  : sc::scale::kNeutral;
     case sc::EosBoundaryGate::NonVolitionalStem:
