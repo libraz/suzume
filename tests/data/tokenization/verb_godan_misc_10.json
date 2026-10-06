@@ -1830,6 +1830,97 @@
       ],
       "id": "kono_ha_senai",
       "input": "この仕事は全部任せない"
+    },
+    {
+      "description": "東京までならいける - auto-generated",
+      "expected": [
+        {
+          "lemma": "東京",
+          "pos": "Noun",
+          "surface": "東京"
+        },
+        {
+          "lemma": "まで",
+          "pos": "Particle",
+          "surface": "まで"
+        },
+        {
+          "lemma": "なら",
+          "pos": "Particle",
+          "surface": "なら"
+        },
+        {
+          "lemma": "いける",
+          "pos": "Verb",
+          "surface": "いける"
+        }
+      ],
+      "id": "madenaraikeru",
+      "input": "東京までならいける"
+    },
+    {
+      "description": "彼女ならいくらでも出せる - auto-generated",
+      "expected": [
+        {
+          "lemma": "彼女",
+          "pos": "Pronoun",
+          "surface": "彼女"
+        },
+        {
+          "lemma": "なら",
+          "pos": "Particle",
+          "surface": "なら"
+        },
+        {
+          "lemma": "いくら",
+          "pos": "Pronoun",
+          "surface": "いくら"
+        },
+        {
+          "lemma": "でも",
+          "pos": "Particle",
+          "surface": "でも"
+        },
+        {
+          "lemma": "出せる",
+          "pos": "Verb",
+          "surface": "出せる"
+        }
+      ],
+      "id": "naraikurademo_seru",
+      "input": "彼女ならいくらでも出せる"
+    },
+    {
+      "description": "駅までならいけるよ - auto-generated",
+      "expected": [
+        {
+          "lemma": "駅",
+          "pos": "Noun",
+          "surface": "駅"
+        },
+        {
+          "lemma": "まで",
+          "pos": "Particle",
+          "surface": "まで"
+        },
+        {
+          "lemma": "なら",
+          "pos": "Particle",
+          "surface": "なら"
+        },
+        {
+          "lemma": "いける",
+          "pos": "Verb",
+          "surface": "いける"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "madenaraikeruyo",
+      "input": "駅までならいけるよ"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",

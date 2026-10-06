@@ -201,8 +201,16 @@ float computeTaFormVolitionalBonus(const core::LatticeEdge& prev, const core::La
        next.extended_pos == core::ExtendedPOS::AuxTenseMasu) &&
       prev.extended_pos == core::ExtendedPOS::VerbMizenkei && grammar::isSuruMizenkeiSurface(prev.surface) &&
       (prev.conj_type == dictionary::ConjugationType::Suru || prev.lemma == "する");
+  // The attributive ける of the classical past is bound to a classical clause
+  // and needs the nominal it modifies; after a modern continuative it is the
+  // potential or a verb tail (彼女なら+いける, not 習い+ける), which outweighs
+  // the continuative bonus that けり enjoys.
+  const bool attributive_keri_after_continuative = prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+                                                   next.extended_pos == core::ExtendedPOS::AuxClassicalKeri &&
+                                                   utf8::endsWith(next.surface, "る");
   if (bare_volitional_after_non_o_row || negative_after_godan_non_irrealis ||
-      suru_continuative_before_classical_negative || suru_irrealis_before_modern_aux)
+      suru_continuative_before_classical_negative || suru_irrealis_before_modern_aux ||
+      attributive_keri_after_continuative)
     SUZUME_CONNECTION_ADD(bonus, cost::kSevere);
   if (modern_volitional)
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryStrongBonus + cost::kStrongBonus);

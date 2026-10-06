@@ -851,6 +851,7 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       {EPOS::VerbMizenkei, EPOS::NounVerbal, cost::kAlmostNever},
       {EPOS::VerbMizenkei, EPOS::NounProper, cost::kAlmostNever},
       {EPOS::VerbMizenkei, EPOS::Pronoun, cost::kAlmostNever},
+      {EPOS::VerbMizenkei, EPOS::PronounInterrogative, cost::kAlmostNever},
 
       // The volitional closes its predicate, so what follows it is a particle
       // or another auxiliary -- never a fresh verb stem. Without this the final
