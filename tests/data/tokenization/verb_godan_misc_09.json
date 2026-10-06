@@ -1887,6 +1887,87 @@
       ],
       "id": "wannai",
       "input": "変わんない"
+    },
+    {
+      "description": "仕事を終わらすであります - auto-generated",
+      "expected": [
+        {
+          "lemma": "仕事",
+          "pos": "Noun",
+          "surface": "仕事"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "終わらす",
+          "pos": "Verb",
+          "surface": "終わらす"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あり"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "wo_warasudearimasu",
+      "input": "仕事を終わらすであります"
+    },
+    {
+      "description": "用事を済ます - auto-generated",
+      "expected": [
+        {
+          "lemma": "用事",
+          "pos": "Noun",
+          "surface": "用事"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "済ます",
+          "pos": "Verb",
+          "surface": "済ます"
+        }
+      ],
+      "id": "wo_masu",
+      "input": "用事を済ます"
+    },
+    {
+      "description": "数を減らす - auto-generated",
+      "expected": [
+        {
+          "lemma": "数",
+          "pos": "Noun",
+          "surface": "数"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "減らす",
+          "pos": "Verb",
+          "surface": "減らす"
+        }
+      ],
+      "id": "wo_rasu_2",
+      "input": "数を減らす"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",

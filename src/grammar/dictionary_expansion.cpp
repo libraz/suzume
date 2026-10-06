@@ -8,6 +8,7 @@
 #include <unordered_set>
 #include <utility>
 
+#include "core/kana_constants.h"
 #include "core/utf8_constants.h"
 #include "grammar/conjugation.h"
 #include "grammar/honorific_verbs.h"
@@ -128,8 +129,19 @@ std::vector<dictionary::DictionaryEntry> expandVerb(const dictionary::Dictionary
   // from the base entry, which is kept, and it sees the host. Longer stems are
   // unambiguous enough to materialize (がかっ, がかり).
   const bool bound_suffix_verb = isBoundDerivationalSuffixVerbLemma(base_entry.lemma);
+  // An a-row stem before す (終わらす, 済ます, 減らす) is also the irrealis of
+  // the verb it is built on, and that verb's causative spells the same え-row
+  // cells (終わら+せる, 済ま+せる, 減ら+せる). The two readings are told apart
+  // only by what follows, which analysis sees and a materialized entry cannot,
+  // so those cells are left to the productive causative and to reverse analysis.
+  const bool stem_is_a_row_irrealis = verb_type == VerbType::GodanSa && !stem.empty() &&
+                                      kana::isARowCodepoint(utf8::decodeFirstChar(utf8::lastChar(stem)));
   result.reserve(suffixes.size());
   for (const auto& suffix : suffixes) {
+    if (stem_is_a_row_irrealis && (suffix.extended_pos == core::ExtendedPOS::VerbKateikei ||
+                                   suffix.extended_pos == core::ExtendedPOS::VerbMeireikei || suffix.is_potential)) {
+      continue;
+    }
     std::string surface = stem + suffix.suffix;
     if (bound_suffix_verb && suffix.extended_pos != core::ExtendedPOS::VerbShuushikei &&
         surface.size() <= 2 * core::kJapaneseCharBytes) {
