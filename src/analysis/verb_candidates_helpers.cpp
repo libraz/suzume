@@ -13,6 +13,7 @@
 #include "analysis/scorer_constants.h"
 #include "core/debug.h"
 #include "core/kana_constants.h"
+#include "core/stable_insertion_sort.h"
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
@@ -462,18 +463,9 @@ bool startsWithVerbContinuative(const dictionary::DictionaryManager* dict_manage
 // =============================================================================
 
 void sortCandidatesByCost(std::vector<UnknownCandidate>& candidates, size_t first_index) {
-  // Candidate lists are small and already close to generation order. A stable
-  // insertion sort avoids pulling the generic introsort implementation into
-  // WASM while keeping equal-cost candidates deterministic.
-  for (size_t idx = first_index + 1; idx < candidates.size(); ++idx) {
-    UnknownCandidate candidate = std::move(candidates[idx]);
-    size_t insert_at = idx;
-    while (insert_at > first_index && candidates[insert_at - 1].cost > candidate.cost) {
-      candidates[insert_at] = std::move(candidates[insert_at - 1]);
-      --insert_at;
-    }
-    candidates[insert_at] = std::move(candidate);
-  }
+  core::stableInsertionSort(candidates, first_index, [](const UnknownCandidate& lhs, const UnknownCandidate& rhs) {
+    return lhs.cost < rhs.cost;
+  });
 }
 
 // =============================================================================

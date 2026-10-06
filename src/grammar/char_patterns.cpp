@@ -82,6 +82,13 @@ bool firstCharMatches(std::string_view str, Predicate pred) {
   return cp != 0 && pred(cp);
 }
 
+/// The codepoint the text consists of, or 0 when it is not exactly one codepoint.
+char32_t soleCodepoint(std::string_view text) {
+  size_t byte_pos = 0;
+  const char32_t codepoint = normalize::decodeUtf8(text, byte_pos);
+  return !text.empty() && byte_pos == text.size() ? codepoint : 0;
+}
+
 }  // namespace
 
 bool endsWithIRow(std::string_view stem) {
@@ -236,8 +243,7 @@ bool isHonorificPrefix(std::string_view surface) {
 }
 
 bool isSinoHonorificPrefix(std::string_view surface) {
-  size_t byte_pos = 0;
-  return normalize::decodeUtf8(surface, byte_pos) == U'ご' && byte_pos == surface.size();
+  return soleCodepoint(surface) == U'ご';
 }
 
 bool startsWithSuperlativePrefix(std::string_view surface) {
@@ -246,17 +252,15 @@ bool startsWithSuperlativePrefix(std::string_view surface) {
 }
 
 bool isSuperlativePrefix(std::string_view surface) {
-  size_t byte_pos = 0;
-  return normalize::decodeUtf8(surface, byte_pos) == U'最' && byte_pos == surface.size();
+  return soleCodepoint(surface) == U'最';
 }
 
 bool isBoundVerbPrefix(std::string_view surface) {
   // Kanji that only ever open a compound verb. They have no standalone nominal
   // use that could stand as the verb's argument, so the split a free noun would
   // license (血+浴びる) is not available to them (仕上げる, 片付ける).
-  size_t byte_pos = 0;
-  const char32_t prefix = normalize::decodeUtf8(surface, byte_pos);
-  return byte_pos == surface.size() && (prefix == U'仕' || prefix == U'片');
+  const char32_t prefix = soleCodepoint(surface);
+  return prefix == U'仕' || prefix == U'片';
 }
 
 bool isLeftBranchingPrefixKanji(char32_t code) {

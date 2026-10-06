@@ -11,6 +11,7 @@
 
 #include "char_patterns.h"
 #include "core/debug.h"
+#include "core/stable_insertion_sort.h"
 #include "core/utf8_constants.h"
 #include "inflection_scorer.h"
 #include "verb_endings.h"
@@ -28,18 +29,6 @@ inline bool isVoicedAux(std::string_view aux) {
 // Check if auxiliary starts with unvoiced te-form (て/た)
 inline bool isUnvoicedAux(std::string_view aux) {
   return utf8::startsWithAny(aux, {"て", "た"});
-}
-
-void stableSortByConfidence(std::vector<InflectionCandidate>& candidates) {
-  for (size_t idx = 1; idx < candidates.size(); ++idx) {
-    InflectionCandidate candidate = std::move(candidates[idx]);
-    size_t insert_at = idx;
-    while (insert_at > 0 && candidates[insert_at - 1].confidence < candidate.confidence) {
-      candidates[insert_at] = std::move(candidates[insert_at - 1]);
-      --insert_at;
-    }
-    candidates[insert_at] = std::move(candidate);
-  }
 }
 
 void appendCandidates(std::vector<InflectionCandidate>& target, std::vector<InflectionCandidate>&& source) {
@@ -447,7 +436,9 @@ const std::vector<InflectionCandidate>& Inflection::analyze(std::string_view sur
 
   // Sort by confidence (descending)
   // Preserve the original order for candidates with equal confidence.
-  stableSortByConfidence(candidates);
+  core::stableInsertionSort(candidates, 0, [](const InflectionCandidate& lhs, const InflectionCandidate& rhs) {
+    return lhs.confidence > rhs.confidence;
+  });
 
   // Remove duplicates (same base_form and verb_type)
   auto dup_end = std::unique(candidates.begin(), candidates.end(),

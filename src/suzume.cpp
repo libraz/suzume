@@ -404,11 +404,7 @@ std::vector<core::Morpheme> Suzume::analyze(std::string_view text) const {
 }
 
 core::Expected<std::vector<core::Morpheme>, core::Error> Suzume::analyzeResult(std::string_view text) const {
-  auto result = analyzeWithNormalizedTextResult(text);
-  if (!result.hasValue()) {
-    return core::makeUnexpected(result.error());
-  }
-  return std::move(result.value().morphemes);
+  return core::takeMorphemes(analyzeWithNormalizedTextResult(text));
 }
 
 core::Expected<core::AnalysisOutput, core::Error> Suzume::analyzeWithNormalizedTextResult(std::string_view text) const {

@@ -113,6 +113,7 @@ src/core/error.h	0	0	0
 src/core/kana_constants.h	0	0	0
 src/core/lattice.h	0	3	0
 src/core/morpheme.h	0	1	0
+src/core/stable_insertion_sort.h	0	0	0
 src/core/text_boundaries.h	0	0	0
 src/core/types.h	0	0	0
 src/core/utf8_constants.h	0	0	0

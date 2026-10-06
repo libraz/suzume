@@ -369,7 +369,7 @@ std::string fixSpecialRaRowLemma(std::string_view lemma, const dictionary::Dicti
     return "";
   }
   std::string ru_form = normalize::concat(utf8::dropLast2Chars(lemma), "る");
-  if (dict->lookupExact(ru_form, core::PartOfSpeech::Verb) != nullptr) {
+  if (hasExactVerbEntry(dict, ru_form)) {
     return ru_form;
   }
   return "";

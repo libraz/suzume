@@ -137,11 +137,7 @@ void Analyzer::setMode(core::AnalysisMode mode) {
 }
 
 core::Expected<std::vector<core::Morpheme>, core::Error> Analyzer::analyze(std::string_view text) const {
-  auto result = analyzeWithNormalizedText(text);
-  if (!result.hasValue()) {
-    return core::makeUnexpected(result.error());
-  }
-  return std::move(result.value().morphemes);
+  return core::takeMorphemes(analyzeWithNormalizedText(text));
 }
 
 core::Expected<core::AnalysisOutput, core::Error> Analyzer::analyzeWithNormalizedText(std::string_view text) const {

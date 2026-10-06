@@ -4,10 +4,12 @@
 #include <cstddef>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include "dictionary/dictionary.h"
 #include "edge_flags.h"
+#include "error.h"
 #include "grammar/conjugation.h"
 #include "types.h"
 
@@ -59,6 +61,14 @@ struct AnalysisOutput {
   std::string normalized_text;
   std::vector<Morpheme> morphemes;
 };
+
+/// The morphemes of an analysis result, or its error.
+inline Expected<std::vector<Morpheme>, Error> takeMorphemes(Expected<AnalysisOutput, Error>&& analyzed) {
+  if (!analyzed.hasValue()) {
+    return makeUnexpected(analyzed.error());
+  }
+  return std::move(analyzed).value().morphemes;
+}
 
 }  // namespace suzume::core
 
