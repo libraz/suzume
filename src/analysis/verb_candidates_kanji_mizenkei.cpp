@@ -770,8 +770,11 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
             // A span that is already a complete terminal form (遊ぶ, 行く) closes
             // its verb there; the a-row mora after it opens the next word
             // (遊ぶ+わん), not the irrealis of a verb spelled 遊ぶう.
-            if (is_n_pattern && vh::isVerifiedVerbBase(dict_manager, inflection, stem,
-                                                       candidate::verb_cost::kConstructedVerbMinConfidence, true)) {
+            // The same holds for a complete i-adjective: the a-row mora after
+            // it opens the next word (楽しい+わん), not a verb spelled 楽しいう.
+            if (is_n_pattern && (vh::isVerifiedVerbBase(dict_manager, inflection, stem,
+                                                        candidate::verb_cost::kConstructedVerbMinConfidence, true) ||
+                                 vh::isAdjectiveInDictionary(dict_manager, stem))) {
               continue;
             }
             // A formal noun written in kanji is a word of its own, so kana after
