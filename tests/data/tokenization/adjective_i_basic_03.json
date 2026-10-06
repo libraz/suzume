@@ -2248,6 +2248,38 @@
       ],
       "id": "sayoudegozaimasu",
       "input": "さようでございます"
+    },
+    {
+      "description": "好きになるしさ。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "好き",
+          "pos": "Adjective",
+          "surface": "好き"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なる"
+        },
+        {
+          "lemma": "し",
+          "pos": "Particle",
+          "surface": "し"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Particle",
+          "surface": "さ"
+        }
+      ],
+      "id": "kininarushisa",
+      "input": "好きになるしさ。"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 3/3)",

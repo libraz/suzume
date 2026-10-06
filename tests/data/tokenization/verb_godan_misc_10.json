@@ -2163,6 +2163,100 @@
       ],
       "id": "ha_buru",
       "input": "彼は学者ぶる"
+    },
+    {
+      "description": "来月は暑くなるし、遊びに行こう - auto-generated",
+      "expected": [
+        {
+          "lemma": "来月",
+          "pos": "Noun",
+          "surface": "来月"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "暑い",
+          "pos": "Adjective",
+          "surface": "暑く"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なる"
+        },
+        {
+          "lemma": "し",
+          "pos": "Particle",
+          "surface": "し"
+        },
+        {
+          "lemma": "遊ぶ",
+          "pos": "Verb",
+          "surface": "遊び"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行こ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "ha_kunarushi_bini_kou",
+      "input": "来月は暑くなるし、遊びに行こう"
+    },
+    {
+      "description": "春になるし花も咲く - auto-generated",
+      "expected": [
+        {
+          "lemma": "春",
+          "pos": "Noun",
+          "surface": "春"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なる"
+        },
+        {
+          "lemma": "し",
+          "pos": "Particle",
+          "surface": "し"
+        },
+        {
+          "lemma": "花",
+          "pos": "Noun",
+          "surface": "花"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "咲く",
+          "pos": "Verb",
+          "surface": "咲く"
+        }
+      ],
+      "id": "ninarushi_mo_ku",
+      "input": "春になるし花も咲く"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",

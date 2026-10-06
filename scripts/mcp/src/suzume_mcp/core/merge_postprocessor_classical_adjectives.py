@@ -120,6 +120,27 @@ def _postprocess_predicate_shi(result: list[dict], applied_rule: str | None) -> 
     return new_result, applied_rule
 
 
+def _postprocess_terminal_listing_shi(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
+    """Read し after a verb in its terminal form as the listing particle.
+
+    The past き attaches to a continuative, so the reference's き(体言接続) after
+    a terminal verb (なる+し+花) is the listing し of a finite predicate.
+    """
+    for index in range(1, len(result)):
+        curr, previous = result[index], result[index - 1]
+        if (
+            curr.get("surface") == "し"
+            and curr.get("pos") == "助動詞"
+            and curr.get("lemma") == "き"
+            and previous.get("pos") == "動詞"
+            and previous.get("conj_form") == "基本形"
+        ):
+            result[index] = {"surface": "し", "pos": "助詞", "pos_sub1": "接続助詞", "lemma": "し"}
+            if applied_rule is None:
+                applied_rule = "terminal-listing-shi"
+    return result, applied_rule
+
+
 _KARI_TAILS = ("かり", "かる", "かれ")
 KARI_MIZENKEI_CELL = "から"
 # The supplementary conjugation offers two cells the reference dictionary

@@ -594,6 +594,17 @@ bool closesOnPoliteCopula(const dictionary::DictionaryManager* dict_manager, con
 bool closesOnTerminalAuxiliaryAndConjunctive(const dictionary::DictionaryManager* dict_manager,
                                              const std::vector<char32_t>& codepoints, size_t stem_end);
 
+/**
+ * @brief Whether the span from @p start_pos to @p stem_end is a registered verb
+ * in its terminal form plus a one-mora conjunctive particle, standing right
+ * after the case particle that gives it its argument (好きに+なる+し)
+ *
+ * The argument slot is the evidence: elsewhere the same kana can open an
+ * adjective stem (くる+し+さ).
+ */
+bool closesOnTerminalVerbAndConjunctive(const dictionary::DictionaryManager* dict_manager,
+                                        const std::vector<char32_t>& codepoints, size_t start_pos, size_t stem_end);
+
 bool spellsContinuativeBeforePolite(const dictionary::DictionaryManager* dict_manager,
                                     const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos);
 

@@ -281,8 +281,14 @@ float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::
   const bool unlicensed_nominative_stacking = prev.extended_pos == core::ExtendedPOS::ParticleCase &&
                                               utf8::equalsAny(prev.surface, {"が"}) &&
                                               next.extended_pos == core::ExtendedPOS::ParticleTopic;
+  // Only the 已然形 なれ hosts the conjunctive particles of the classical copula
+  // (春なれ+ば); its attributive なる is followed by a nominal, while the modern
+  // し and the like select a finite predicate (春に+なる+し).
+  const bool unlicensed_attributive_nari = prev.extended_pos == core::ExtendedPOS::AuxClassicalNari &&
+                                           next.extended_pos == core::ExtendedPOS::ParticleConj &&
+                                           !utf8::endsWith(prev.surface, "れ");
   if (quantifier_host || unlicensed_tomo || unlicensed_hypothetical || unlicensed_nominative_stacking ||
-      unlicensed_listing_shi) {
+      unlicensed_listing_shi || unlicensed_attributive_nari) {
     SUZUME_CONNECTION_ADD(bonus, quantifier_host ? cost::kExtremeBonus : cost::kAlmostNever);
   }
 

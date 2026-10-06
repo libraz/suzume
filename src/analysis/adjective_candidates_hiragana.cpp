@@ -1064,7 +1064,8 @@ void appendHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints, 
     // A terminal auxiliary closed by a conjunctive particle is a predicate
     // chain (やり+たい+し+さ), not a stem.
     if (!is_dict_adjective &&
-        verb_helpers::closesOnTerminalAuxiliaryAndConjunctive(dict_manager, codepoints, stem_end)) {
+        (verb_helpers::closesOnTerminalAuxiliaryAndConjunctive(dict_manager, codepoints, stem_end) ||
+         verb_helpers::closesOnTerminalVerbAndConjunctive(dict_manager, codepoints, start_pos, stem_end))) {
       continue;
     }
     const float adjective_confidence =

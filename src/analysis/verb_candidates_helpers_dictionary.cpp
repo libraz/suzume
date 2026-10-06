@@ -789,6 +789,37 @@ bool closesOnTerminalAuxiliaryAndConjunctive(const dictionary::DictionaryManager
   return false;
 }
 
+bool closesOnTerminalVerbAndConjunctive(const dictionary::DictionaryManager* dict_manager,
+                                        const std::vector<char32_t>& codepoints, size_t start_pos, size_t stem_end) {
+  constexpr size_t kMinVerbLen = 2;
+  constexpr size_t kMaxVerbLen = 4;
+  if (dict_manager == nullptr || stem_end < start_pos + kMinVerbLen + 1 || stem_end > codepoints.size()) {
+    return false;
+  }
+  // The run may open on the case particle itself (大人+になるし), which hands
+  // the verb to the position after it.
+  const auto* opening_case =
+      lookupEntryInRange(*dict_manager, codepoints, start_pos, start_pos + 1, core::PartOfSpeech::Particle);
+  if (opening_case != nullptr && opening_case->extended_pos == core::ExtendedPOS::ParticleCase) {
+    return closesOnTerminalVerbAndConjunctive(dict_manager, codepoints, start_pos + 1, stem_end);
+  }
+  if (!followsCaseParticle(dict_manager, codepoints, start_pos)) {
+    return false;
+  }
+  const auto* particle =
+      lookupEntryInRange(*dict_manager, codepoints, stem_end - 1, stem_end, core::PartOfSpeech::Particle);
+  if (particle == nullptr || particle->extended_pos != core::ExtendedPOS::ParticleConj) {
+    return false;
+  }
+  // The verb must be the whole of what stands between the argument and the particle.
+  const size_t verb_end = stem_end - 1;
+  if (verb_end - start_pos < kMinVerbLen || verb_end - start_pos > kMaxVerbLen) {
+    return false;
+  }
+  const auto* verb = lookupEntryInRange(*dict_manager, codepoints, start_pos, verb_end, core::PartOfSpeech::Verb);
+  return verb != nullptr && verb->lemma == extractSubstring(codepoints, start_pos, verb_end);
+}
+
 bool spellsContinuativeBeforePolite(const dictionary::DictionaryManager* dict_manager,
                                     const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos) {
   const auto* auxiliary = auxiliaryClosingAfterOkurigana(dict_manager, codepoints, start_pos, end_pos);

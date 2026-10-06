@@ -23,6 +23,7 @@ _kari_cell_analysis = merge_postprocessor_classical_adjectives._kari_cell_analys
 _postprocess_adj_bungo = merge_postprocessor_classical_adjectives._postprocess_adj_bungo
 _postprocess_adj_kari = merge_postprocessor_classical_adjectives._postprocess_adj_kari
 _postprocess_predicate_shi = merge_postprocessor_classical_adjectives._postprocess_predicate_shi
+_postprocess_terminal_listing_shi = merge_postprocessor_classical_adjectives._postprocess_terminal_listing_shi
 _postprocess_ku_nominalization = merge_postprocessor_classical_adjectives._postprocess_ku_nominalization
 classical_adjective_lemma = merge_postprocessor_classical_adjectives.classical_adjective_lemma
 
@@ -96,6 +97,7 @@ def apply_merge_postprocessors(result: list[dict], applied_rule: str | None) -> 
     result, applied_rule = _postprocess_gamashii(result, applied_rule)
     result, applied_rule = _postprocess_adj_bungo(result, applied_rule)
     result, applied_rule = _postprocess_predicate_shi(result, applied_rule)
+    result, applied_rule = _postprocess_terminal_listing_shi(result, applied_rule)
     result, applied_rule = _postprocess_adj_kari(result, applied_rule)
     result, applied_rule = _postprocess_ha_row_godan(result, applied_rule)
     result, applied_rule = _postprocess_nidan_cell(result, applied_rule)
