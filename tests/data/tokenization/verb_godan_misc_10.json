@@ -1104,6 +1104,33 @@
       ],
       "id": "wo_yagattte",
       "input": "何を見やがって"
+    },
+    {
+      "description": "時折風が吹く - auto-generated",
+      "expected": [
+        {
+          "lemma": "時折",
+          "pos": "Adverb",
+          "surface": "時折"
+        },
+        {
+          "lemma": "風",
+          "pos": "Noun",
+          "surface": "風"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "吹く",
+          "pos": "Verb",
+          "surface": "吹く"
+        }
+      ],
+      "id": "ga_ku_2",
+      "input": "時折風が吹く"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",

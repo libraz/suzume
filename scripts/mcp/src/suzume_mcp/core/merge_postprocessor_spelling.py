@@ -10,6 +10,7 @@ from .constants import (
 )
 from .mecab import mecab_analyze
 from .merge_postprocessor_grammar import _CONTINUATIVE_CELL
+from .pos_mapping import map_mecab_pos
 
 _IDEOGRAPHIC_SEQUENCE = regex.compile(r"^[\p{Han}\uFE00-\uFE0F\U000E0100-\U000E01EF]+$")
 
@@ -176,7 +177,23 @@ def _postprocess_kanji_merge(result: list[dict], applied_rule: str | None) -> tu
         # merges via kanji-merge.
         #   家/力/化/法/論/員/式/感/的/安 — productive but one search unit
         # 様/氏 keep splitting (honorific separates from name).
-        is_merge_allowed_suffix = surface in ("家", "力", "化", "法", "論", "員", "式", "感", "的", "風", "安")
+        # An adverb of time (時折) is no nominal host, so 風 after it is the noun wind.
+        after_time_adverb = bool(merged) and map_mecab_pos(merged[-1]) == "Adverb"
+        if surface == "風" and after_time_adverb and curr.get("pos_sub1") == "接尾":
+            curr = {**curr, "pos_sub1": "一般"}
+        is_merge_allowed_suffix = surface in (
+            "家",
+            "力",
+            "化",
+            "法",
+            "論",
+            "員",
+            "式",
+            "感",
+            "的",
+            "風",
+            "安",
+        ) and not (surface == "風" and after_time_adverb)
         # Any other one-kanji general suffix bonds with an ordinary noun host
         # (改正案, 交通費) but not with a temporal one (今|紙).
         is_general_suffix = (

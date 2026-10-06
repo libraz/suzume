@@ -1738,6 +1738,26 @@ class TestPejorativeYagaru:
         assert [token["surface"] for token in result] == ["見や", "っ"]
 
 
+class TestKazeAfterTimeAdverb:
+    def test_kaze_after_a_time_adverb_is_the_noun_wind(self):
+        tokens = [
+            _tok("時折", pos="名詞", pos_sub1="副詞可能", lemma="時折"),
+            _tok("風", pos="名詞", pos_sub1="接尾", pos_sub2="一般", lemma="風"),
+            _tok("が", pos="助詞", pos_sub1="格助詞", lemma="が"),
+        ]
+        result, _ = apply_suzume_merge(tokens, "時折風が")
+        assert [token["surface"] for token in result] == ["時折", "風", "が"]
+        assert result[1]["pos_sub1"] == "一般"
+
+    def test_kaze_after_a_noun_still_joins_it(self):
+        tokens = [
+            _tok("都会", pos="名詞", pos_sub1="一般", lemma="都会"),
+            _tok("風", pos="名詞", pos_sub1="接尾", pos_sub2="一般", lemma="風"),
+        ]
+        result, _ = apply_suzume_merge(tokens, "都会風")
+        assert [token["surface"] for token in result] == ["都会風"]
+
+
 class TestGreetingHeldVowel:
     def test_greeting_takes_its_held_final_vowel(self):
         tokens = [
