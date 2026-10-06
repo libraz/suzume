@@ -486,6 +486,38 @@
       ],
       "id": "ha_nakattta",
       "input": "彼はキレなかった"
+    },
+    {
+      "description": "机やいすを買う - auto-generated",
+      "expected": [
+        {
+          "lemma": "机",
+          "pos": "Noun",
+          "surface": "机"
+        },
+        {
+          "lemma": "や",
+          "pos": "Particle",
+          "surface": "や"
+        },
+        {
+          "lemma": "いす",
+          "pos": "Noun",
+          "surface": "いす"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "買う",
+          "pos": "Verb",
+          "surface": "買う"
+        }
+      ],
+      "id": "yaisuwo_u",
+      "input": "机やいすを買う"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",

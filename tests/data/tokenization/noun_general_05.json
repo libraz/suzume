@@ -77,6 +77,65 @@
       ],
       "id": "ni_suru_5",
       "input": "事項に関する"
+    },
+    {
+      "description": "犬やせみが好きだ - auto-generated",
+      "expected": [
+        {
+          "lemma": "犬",
+          "pos": "Noun",
+          "surface": "犬"
+        },
+        {
+          "lemma": "や",
+          "pos": "Particle",
+          "surface": "や"
+        },
+        {
+          "lemma": "せみ",
+          "pos": "Noun",
+          "surface": "せみ"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "好き",
+          "pos": "Adjective",
+          "surface": "好き"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "yasemiga_kida",
+      "input": "犬やせみが好きだ"
+    },
+    {
+      "description": "桜やさつき - auto-generated",
+      "expected": [
+        {
+          "lemma": "桜",
+          "pos": "Noun",
+          "surface": "桜"
+        },
+        {
+          "lemma": "や",
+          "pos": "Particle",
+          "surface": "や"
+        },
+        {
+          "lemma": "さつき",
+          "pos": "Noun",
+          "surface": "さつき"
+        }
+      ],
+      "id": "yasatsuki",
+      "input": "桜やさつき"
     }
   ],
   "description": "General nouns (part 5/5)",

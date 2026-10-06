@@ -1340,7 +1340,13 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
   // non-hiragana content word (私は…), or a clause boundary — sentence start / a
   // preceding symbol. Right bracket: a boundary particle. の is not a boundary
   // particle (genitive marks a compound boundary).
-  bool left_particle_bracket = start_pos >= 1 && isLeftBoundaryParticle(codepoints[start_pos - 1]);
+  // The enumerating や after a kanji or katakana noun lists the next noun (犬や+せみ).
+  // After kana it may just as well end a word (おじや), so it brackets only here.
+  const bool left_enumerating_bracket = start_pos >= 2 && codepoints[start_pos - 1] == U'や' &&
+                                        (char_types[start_pos - 2] == normalize::CharType::Kanji ||
+                                         char_types[start_pos - 2] == normalize::CharType::Katakana);
+  bool left_particle_bracket =
+      (start_pos >= 1 && isLeftBoundaryParticle(codepoints[start_pos - 1])) || left_enumerating_bracket;
   const auto* left_particle =
       dict_manager_ != nullptr && start_pos >= 1
           ? lookupEntryInRange(*dict_manager_, codepoints, start_pos - 1, start_pos, core::PartOfSpeech::Particle)
@@ -1796,8 +1802,8 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
           (((left_clause_bracket || left_determiner_bracket) && (right_clause || right_adjective_word)) ||
            right_short_genitive);
       const bool short_run_bracketed =
-          (left_particle_bracket && (right_particle || right_copula)) || short_bos_case_particle_bracket ||
-          unread_short_run_bracketed ||
+          (left_particle_bracket && (right_particle || right_copula)) || (left_enumerating_bracket && right_clause) ||
+          short_bos_case_particle_bracket || unread_short_run_bracketed ||
           (left_genitive_bracket && right_clause && !normalize::isExtendedParticle(codepoints[start_pos])) ||
           (right_copula && left_clause_bracket && promoted_dictionary_reading == nullptr) ||
           (right_suffix && promoted_dictionary_reading == nullptr) || copula_selected_predicate_homograph;
@@ -1822,14 +1828,17 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       // readily as a noun (おいしい+です), so there only the productive -しい
       // terminal counts: its suffix is grammatical evidence of the シク class,
       // while a bare い ending is as often a noun's last mora (ぶたい+です).
+      // An enumerated item is nominal, so the predicate reading of its kana does not apply.
       const bool has_inflected_predicate_reading =
-          (((right_clause && !(left_genitive_bracket && len == 2)) || right_kanji_word ||
-            (right_genitive_after_substantive_run && !has_deverbal_noun_shape_before_genitive)) &&
-           std::any_of(promoted_inflections.begin(), promoted_inflections.end(),
-                       [](const grammar::InflectionCandidate& inflection_candidate) {
-                         return !inflection_candidate.suffix.empty() &&
-                                inflection_candidate.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence;
-                       })) ||
+          !left_enumerating_bracket &&
+              (((right_clause && !(left_genitive_bracket && len == 2)) || right_kanji_word ||
+                (right_genitive_after_substantive_run && !has_deverbal_noun_shape_before_genitive)) &&
+               std::any_of(promoted_inflections.begin(), promoted_inflections.end(),
+                           [](const grammar::InflectionCandidate& inflection_candidate) {
+                             return !inflection_candidate.suffix.empty() &&
+                                    inflection_candidate.confidence >=
+                                        candidate::verb_cost::kConstructedVerbMinConfidence;
+                           })) ||
           ((right_copula || right_auxiliary) &&
            verb_helpers::isProductiveShiiAdjectiveTerminal(promoted_surface, inflection_));
       // The colloquial contraction of the hypothetical is a predicate reading
@@ -2006,10 +2015,12 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
         // such as ともだち+と retain the selection evidence.
         const bool right_predicate_quote = right_particle && scan < codepoints.size() &&
                                            codepoints[scan] == core::hiragana::kTo && has_terminal_i_adjective_reading;
-        const bool selected_nominal =
-            (right_particle || auxiliary_bracket_before_particle || right_suffix) &&
-            !right_genitive_after_substantive_run && !right_predicate_quote &&
-            (left_determiner_bracket || left_clause_bracket || (start_pos > 0 && codepoints[start_pos - 1] == U'の'));
+        // The enumerating や asks for a nominal item whatever follows it.
+        const bool selected_nominal = (((right_particle || auxiliary_bracket_before_particle || right_suffix) &&
+                                        !right_genitive_after_substantive_run && !right_predicate_quote &&
+                                        (left_determiner_bracket || left_clause_bracket ||
+                                         (start_pos > 0 && codepoints[start_pos - 1] == U'の'))) ||
+                                       (left_enumerating_bracket && (right_particle || right_clause || right_copula)));
         // This is an unknown-noun rescue path.  Keep the homographic noun
         // candidate when an exact lexical reading exists, but do not give it
         // the rescue bonus that would erase the dictionary POS (きれい, しかれ,
