@@ -300,15 +300,17 @@ void UnknownWordGenerator::generateCharacterSpeechCandidates(std::string_view /*
 void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                                           const std::vector<normalize::CharType>& char_types,
                                                           std::vector<UnknownCandidate>& candidates) const {
-  // A bare vowel mora that opens a clause and is closed by the comma is an
-  // interjection (あ、そうか; え、そうなの), not a fragment of kana.
+  // A bare vowel mora that fills a whole clause (あ、そうか; え、そうなの) is an
+  // interjection, not a fragment of kana. Punctuation or the end of the input
+  // closes it, and the start or punctuation opens it.
   constexpr size_t kBareVowelLength = 1;
-  if (start_pos + kBareVowelLength < codepoints.size() && isBareVowelMora(codepoints[start_pos]) &&
-      (codepoints[start_pos + kBareVowelLength] == U'、' || codepoints[start_pos + kBareVowelLength] == U',') &&
+  const size_t after_vowel = start_pos + kBareVowelLength;
+  if (isBareVowelMora(codepoints[start_pos]) &&
+      (after_vowel >= codepoints.size() || char_types[after_vowel] == normalize::CharType::Symbol) &&
       (start_pos == 0 || char_types[start_pos - 1] == normalize::CharType::Symbol)) {
-    auto interjection = makeCandidate(extractSubstring(codepoints, start_pos, start_pos + kBareVowelLength), start_pos,
-                                      start_pos + kBareVowelLength, core::PartOfSpeech::Interjection,
-                                      candidate::kLaughterInterjectionCost, true, CandidateOrigin::Onomatopoeia);
+    auto interjection = makeCandidate(extractSubstring(codepoints, start_pos, after_vowel), start_pos, after_vowel,
+                                      core::PartOfSpeech::Interjection, candidate::kLaughterInterjectionCost, true,
+                                      CandidateOrigin::Onomatopoeia);
 #ifdef SUZUME_DEBUG_INFO
     interjection.pattern = "bare_vowel_interjection";
 #endif

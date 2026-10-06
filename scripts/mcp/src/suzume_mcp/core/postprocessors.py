@@ -52,6 +52,7 @@ postprocess_closed_function_words = postprocessor_function_words.postprocess_clo
 postprocess_compound_case_particle_aru = postprocessor_function_words.postprocess_compound_case_particle_aru
 postprocess_copula_neg = postprocessor_function_words.postprocess_copula_neg
 postprocess_dai_final_particle = postprocessor_function_words.postprocess_dai_final_particle
+postprocess_bare_vowel_interjection = postprocessor_function_words.postprocess_bare_vowel_interjection
 postprocess_copular_formal_noun_de = postprocessor_function_words.postprocess_copular_formal_noun_de
 postprocess_de_after_nominal = postprocessor_function_words.postprocess_de_after_nominal
 postprocess_de_aru = postprocessor_function_words.postprocess_de_aru
@@ -318,6 +319,7 @@ POSTPROCESSORS: tuple[tuple[str, Callable[[list[dict]], bool]], ...] = (
     ("quotative-determiner-spelling", postprocess_quotative_determiner_spelling),
     ("quotative-determiner-head", postprocess_quotative_determiner_head),
     ("copular-formal-noun-de", postprocess_copular_formal_noun_de),
+    ("bare-vowel-interjection", postprocess_bare_vowel_interjection),
     ("adverbial-na-adjective", postprocess_adverbial_na_adjective),
     ("negative-host", postprocess_negative_host),
     ("sou-host", postprocess_sou_host),

@@ -262,6 +262,23 @@ def postprocess_copular_formal_noun_de(tokens: list[dict]) -> bool:
             token["lemma"] = "だ"
 
 
+_BARE_VOWEL_MORAE = frozenset("あいうえお")
+
+
+@reports_mutation
+def postprocess_bare_vowel_interjection(tokens: list[dict]) -> bool:
+    """Read a bare vowel mora standing alone between punctuation as an interjection.
+
+    The punctuation has already split the clauses into runs, so a run that is one
+    vowel mora is the utterance's interjection (あ、そうか; え、そうなの). The
+    reference reads the え as an unclassified fragment, the お as the honorific
+    prefix and the い as the verb 居る.
+    """
+    if len(tokens) == 1 and tokens[0].get("surface") in _BARE_VOWEL_MORAE and tokens[0].get("pos") != "Interjection":
+        tokens[0]["pos"] = "Interjection"
+        tokens[0]["lemma"] = tokens[0]["surface"]
+
+
 def postprocess_te_form_contraction(tokens: list[dict]) -> bool:
     """Tag じゃ after an onbin verb as the te-form contraction, like ちゃ.
 

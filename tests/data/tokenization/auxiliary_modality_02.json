@@ -894,6 +894,33 @@
       ],
       "id": "ha_keda",
       "input": "空は朝焼けだ。"
+    },
+    {
+      "description": "え、そうなの。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "え",
+          "pos": "Interjection",
+          "surface": "え"
+        },
+        {
+          "lemma": "そう",
+          "pos": "Adverb",
+          "surface": "そう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        }
+      ],
+      "id": "e_sounano",
+      "input": "え、そうなの。"
     }
   ],
   "description": "Modality auxiliaries (たい、そう、らしい) (part 2/2)",

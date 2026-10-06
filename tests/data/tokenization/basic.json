@@ -21,7 +21,7 @@
       "expected": [
         {
           "lemma": "あ",
-          "pos": "Other",
+          "pos": "Interjection",
           "surface": "あ"
         }
       ],
@@ -1271,6 +1271,28 @@
       ],
       "id": "noseiyo",
       "input": "アタシのせいよ"
+    },
+    {
+      "description": "お、いいね。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "お",
+          "pos": "Interjection",
+          "surface": "お"
+        },
+        {
+          "lemma": "いい",
+          "pos": "Adjective",
+          "surface": "いい"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        }
+      ],
+      "id": "o_iine",
+      "input": "お、いいね。"
     }
   ],
   "description": "Basic tokenization tests",

@@ -1478,6 +1478,21 @@ class TestQuotativeDeterminerHead:
         assert not postprocessors.postprocess_quotative_determiner_head(before_no)
 
 
+class TestBareVowelInterjection:
+    def test_lone_vowel_run_is_an_interjection(self):
+        for surface, pos in (("え", "Other"), ("お", "Prefix"), ("い", "Verb")):
+            tokens = [_tok(surface, pos)]
+
+            assert postprocessors.postprocess_bare_vowel_interjection(tokens)
+            assert (tokens[0]["pos"], tokens[0]["lemma"]) == ("Interjection", surface)
+
+    def test_vowel_inside_a_longer_run_is_untouched(self):
+        tokens = [_tok("お", "Prefix"), _tok("待ち", "Verb")]
+
+        assert not postprocessors.postprocess_bare_vowel_interjection(tokens)
+        assert tokens[0]["pos"] == "Prefix"
+
+
 class TestPrefixBeforeVerb:
     def test_non_honorific_prefix_before_verb_is_a_noun(self):
         tokens = [_tok("の", "Particle"), _tok("名", "Prefix"), _tok("覚え", "Verb")]
