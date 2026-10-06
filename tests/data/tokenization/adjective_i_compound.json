@@ -1351,6 +1351,23 @@
       ],
       "id": "i_11",
       "input": "汗臭い"
+    },
+    {
+      "description": "恥ずかしそう - auto-generated",
+      "expected": [
+        {
+          "lemma": "恥ずかしい",
+          "pos": "Adjective",
+          "surface": "恥ずかし"
+        },
+        {
+          "lemma": "そう",
+          "pos": "Auxiliary",
+          "surface": "そう"
+        }
+      ],
+      "id": "zukashisou",
+      "input": "恥ずかしそう"
     }
   ],
   "description": "I-adjectives compound/derived forms (複合・派生) - sou patterns, nominalization, contracted forms",

@@ -561,6 +561,14 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
             continue;
           }
 
+          // A pattern opening on し whose stem plus しい is a listed adjective
+          // has taken the し from the adjective's own ending (恥ずか+しそう is
+          // 恥ずかし+そう, the stem of 恥ずかしい).
+          if (utf8::startsWith(pattern, "し") && !isAdjectiveInDictionary(dict_manager, base_form) &&
+              isAdjectiveInDictionary(dict_manager, normalize::concat(stem, "しい"))) {
+            continue;
+          }
+
           // A single mora other than the shiku し that sits between a kanji and
           // what follows is a particle of the phrase, not okurigana of an
           // unattested adjective (花+や+さくら, not the stem of 花やい).

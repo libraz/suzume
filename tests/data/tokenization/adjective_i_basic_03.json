@@ -2017,6 +2017,33 @@
       ],
       "id": "rana",
       "input": "平らな"
+    },
+    {
+      "description": "恥ずかしそうに笑う - auto-generated",
+      "expected": [
+        {
+          "lemma": "恥ずかしい",
+          "pos": "Adjective",
+          "surface": "恥ずかし"
+        },
+        {
+          "lemma": "そう",
+          "pos": "Auxiliary",
+          "surface": "そう"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "笑う",
+          "pos": "Verb",
+          "surface": "笑う"
+        }
+      ],
+      "id": "zukashisouni_u",
+      "input": "恥ずかしそうに笑う"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 3/3)",
