@@ -2496,6 +2496,70 @@
       ],
       "id": "tomo_wo_ttteiru",
       "input": "両方とも資料を持っている"
+    },
+    {
+      "description": "花は咲かじ - auto-generated",
+      "expected": [
+        {
+          "lemma": "花",
+          "pos": "Noun",
+          "surface": "花"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "咲く",
+          "pos": "Verb",
+          "surface": "咲か"
+        },
+        {
+          "lemma": "じ",
+          "pos": "Auxiliary",
+          "surface": "じ"
+        }
+      ],
+      "id": "ha_kaji",
+      "input": "花は咲かじ"
+    },
+    {
+      "description": "鳥は鳴かじと思う - auto-generated",
+      "expected": [
+        {
+          "lemma": "鳥",
+          "pos": "Noun",
+          "surface": "鳥"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "鳴く",
+          "pos": "Verb",
+          "surface": "鳴か"
+        },
+        {
+          "lemma": "じ",
+          "pos": "Auxiliary",
+          "surface": "じ"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "思う",
+          "pos": "Verb",
+          "surface": "思う"
+        }
+      ],
+      "id": "ha_kajito_u",
+      "input": "鳥は鳴かじと思う"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",

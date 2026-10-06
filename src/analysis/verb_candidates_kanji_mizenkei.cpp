@@ -457,16 +457,18 @@ void appendGodanMizenkeiZuCandidates(const std::vector<char32_t>& codepoints, si
   // Verify via dictionary or inflection analysis of conjugated form
   const bool dictionary_verified = !contains_internal_particle && vh::isVerbInDictionary(dict_manager, base_form);
   bool is_valid = dictionary_verified;
-  // The one-kana conjecture じ also spells a noun tail (小さじ, 大さじ), so
-  // inference alone does not license a stem before it; it needs a dictionary
-  // base (行か+じ). The ぬ paradigm and まじ keep the inferred stem.
+  // The one-kana conjecture じ also spells a noun tail after the sa-row (小さじ,
+  // 大さじ), so inference alone does not license a sa-row stem before it; it
+  // needs a dictionary base (話さ+じ). Every other row has no such noun, so the
+  // stem is inferred (咲か+じ). The ぬ paradigm and まじ keep the inferred stem.
   const bool non_ji_auxiliary_follows =
       vh::auxiliaryFollowsAt(dict_manager, codepoints, negative_pos, [](const dictionary::DictionaryEntry& entry) {
         return (entry.extended_pos == core::ExtendedPOS::AuxNegativeNu ||
                 entry.extended_pos == core::ExtendedPOS::AuxNegativeMai) &&
                entry.lemma != "じ";
       });
-  if (!contains_internal_particle && !is_valid && is_single_kanji_stem && non_ji_auxiliary_follows) {
+  const bool inferred_stem_licensed = non_ji_auxiliary_follows || mizenkei_ending != U'さ';
+  if (!contains_internal_particle && !is_valid && is_single_kanji_stem && inferred_stem_licensed) {
     // Analyze mizenkei+ない form (standard negative) for better confidence
     // Base form alone may not be recognized. Multi-kanji stems require
     // dictionary evidence so a preceding noun cannot be absorbed.
