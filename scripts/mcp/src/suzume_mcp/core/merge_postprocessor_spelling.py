@@ -4,6 +4,7 @@ import regex
 
 from .constants import (
     ADDRESS_CLOSING_NOUNS,
+    ADVERBIAL_NA_ADJECTIVES,
     KANJI_PREFIX_COMPOUNDS,
     KANJI_SUFFIXES_KEPT_SEPARATE,
     LETTER_FORMULAS,
@@ -247,6 +248,8 @@ def _postprocess_kanji_merge(result: list[dict], applied_rule: str | None) -> tu
                 # with a bound one-kanji element (何+気) and never closes one.
                 and curr.get("pos_sub1", "") != "代名詞"
                 and (merged[-1].get("pos_sub1", "") != "代名詞" or len(surface) == 1)
+                # A degree stem modifies the predicate noun after it (大変|失礼).
+                and merged[-1].get("surface", "") not in ADVERBIAL_NA_ADJECTIVES
                 and surface not in LETTER_FORMULAS
                 and surface not in ADDRESS_CLOSING_NOUNS
                 and merged[-1].get("surface", "") not in LETTER_FORMULAS

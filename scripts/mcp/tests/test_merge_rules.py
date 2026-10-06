@@ -1738,6 +1738,24 @@ class TestPejorativeYagaru:
         assert [token["surface"] for token in result] == ["見や", "っ"]
 
 
+class TestDegreeStemBeforePredicateNoun:
+    def test_taihen_stays_apart_from_the_noun_it_modifies(self):
+        tokens = [
+            _tok("大変", pos="名詞", pos_sub1="形容動詞語幹", lemma="大変"),
+            _tok("失礼", pos="名詞", pos_sub1="サ変接続", lemma="失礼"),
+        ]
+        result, _ = apply_suzume_merge(tokens, "大変失礼")
+        assert [token["surface"] for token in result] == ["大変", "失礼"]
+
+    def test_ordinary_kanji_nouns_still_compound(self):
+        tokens = [
+            _tok("交通", pos="名詞", pos_sub1="一般", lemma="交通"),
+            _tok("安全", pos="名詞", pos_sub1="形容動詞語幹", lemma="安全"),
+        ]
+        result, _ = apply_suzume_merge(tokens, "交通安全")
+        assert [token["surface"] for token in result] == ["交通安全"]
+
+
 class TestKazeAfterTimeAdverb:
     def test_kaze_after_a_time_adverb_is_the_noun_wind(self):
         tokens = [

@@ -1131,6 +1131,43 @@
       ],
       "id": "ga_ku_2",
       "input": "時折風が吹く"
+    },
+    {
+      "description": "前略大変失礼いたしました - auto-generated",
+      "expected": [
+        {
+          "lemma": "前略",
+          "pos": "Interjection",
+          "surface": "前略"
+        },
+        {
+          "lemma": "大変",
+          "pos": "Adverb",
+          "surface": "大変"
+        },
+        {
+          "lemma": "失礼",
+          "pos": "Noun",
+          "surface": "失礼"
+        },
+        {
+          "lemma": "いたす",
+          "pos": "Verb",
+          "surface": "いたし"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "まし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "itashimashita",
+      "input": "前略大変失礼いたしました"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",

@@ -2,7 +2,7 @@
 
 import regex
 
-from .constants import FIXED_INFLECTED_FUNCTION_UNITS, LETTER_FORMULAS
+from .constants import ADVERBIAL_NA_ADJECTIVES, FIXED_INFLECTED_FUNCTION_UNITS, LETTER_FORMULAS
 from .merge_postprocessors import nidan_cell
 
 
@@ -43,6 +43,8 @@ def _kanji_noun_run(tokens: list[dict], start: int) -> tuple[int, str]:
         and token.get("pos") == "名詞"
         and token.get("pos_sub1", "") not in ("接尾", "固有名詞", "副詞可能")
         and token.get("surface", "") not in LETTER_FORMULAS
+        # A degree stem modifies the predicate noun after it (大変|失礼).
+        and token.get("surface", "") not in ADVERBIAL_NA_ADJECTIVES
     ):
         return start, ""
     # A kanji the dictionary reads as a bare noun is the stem of a classical 二段
