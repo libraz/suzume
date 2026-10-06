@@ -2049,7 +2049,9 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                 particle += "ん"
                 j += 1
             if j > i + 1:
-                result.append({"surface": particle, "pos": "助詞", "lemma": particle})
+                # A mark held inside the particle (にゃーん) is emphasis on にゃん.
+                lemma = regex.sub(r"ー+", "", particle) if particle.endswith("ん") else particle
+                result.append({"surface": particle, "pos": "助詞", "lemma": lemma})
                 i = j
                 merged = True
                 if applied_rule is None:

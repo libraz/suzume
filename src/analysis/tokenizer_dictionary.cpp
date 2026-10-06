@@ -1064,6 +1064,16 @@ bool namesSimplexDeverbalNoun(const dictionary::DictionaryManager& dict_manager,
 // scan below runs at every position, so the window is bounded rather than open.
 constexpr size_t kElidedLookupWindow = 6;
 
+// What closes in front of a final particle holding an interior mora. A
+// predicate reaching across the particle's span is the word the mark draws out
+// (やばーい), and owns the mark instead.
+constexpr PartOfSpeechMask kHeldFinalParticlePredicateMask = partOfSpeechMask(core::PartOfSpeech::Verb) |
+                                                             partOfSpeechMask(core::PartOfSpeech::Adjective) |
+                                                             partOfSpeechMask(core::PartOfSpeech::Auxiliary);
+constexpr PartOfSpeechMask kHeldFinalParticleHostMask = kHeldFinalParticlePredicateMask |
+                                                        partOfSpeechMask(core::PartOfSpeech::Noun) |
+                                                        partOfSpeechMask(core::PartOfSpeech::Pronoun);
+
 // Colloquial emphasis may hold a mora in the middle of a function word rather
 // than at its end (飲みたーい, ませーん, でーす). The mark carries no segment of
 // its own, so the word is still there — but a lookup over the literal text
@@ -1117,14 +1127,26 @@ void addElidedProlongedDictionaryCandidates(core::Lattice& lattice, const dictio
     if (result.entry == nullptr || result.length < 2 || result.length > elided_length) {
       continue;
     }
-    if (result.entry->pos != core::PartOfSpeech::Auxiliary) {
-      continue;
-    }
     // A match that stops before the first elided mark is the plain reading the
     // ordinary lookup already produced.
     const size_t end_pos = elided_to_original[result.length - 1] + 1;
     const size_t elided_marks = (end_pos - start_pos) - result.length;
     if (elided_marks == 0) {
+      continue;
+    }
+    // A sentence-final particle may hold the mora before its last one
+    // (にゃ+ー+ん) once a predicate or nominal has closed in front of it: that
+    // host fixes its left edge the way inflection fixes an auxiliary's, which
+    // keeps it out of a drawn-out word (やばーい is no ば+い).
+    const size_t last_mora = elided_to_original[result.length - 1];
+    const bool held_final_particle =
+        result.entry->extended_pos == core::ExtendedPOS::ParticleFinal &&
+        last_mora == elided_to_original[result.length - 2] + 1 + elided_marks &&
+        hasPrecedingPartOfSpeech(lattice, start_pos, kHeldFinalParticleHostMask) &&
+        !core::anyEdgeEndingAt(lattice, end_pos, [start_pos](const core::LatticeEdge& edge) {
+          return edge.start < start_pos && (partOfSpeechMask(edge.pos) & kHeldFinalParticlePredicateMask) != 0;
+        });
+    if (result.entry->pos != core::PartOfSpeech::Auxiliary && !held_final_particle) {
       continue;
     }
     const std::string surface = extractSubstring(codepoints, start_pos, end_pos);

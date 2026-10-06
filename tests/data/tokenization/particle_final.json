@@ -1646,6 +1646,57 @@
       ],
       "id": "betaina",
       "input": "食べたいな"
+    },
+    {
+      "description": "role-language final particle holding an interior mora",
+      "expected": [
+        {
+          "lemma": "眠い",
+          "pos": "Adjective",
+          "surface": "眠い"
+        },
+        {
+          "lemma": "にゃん",
+          "pos": "Particle",
+          "surface": "にゃーん"
+        }
+      ],
+      "id": "ini_n",
+      "input": "眠いにゃーん"
+    },
+    {
+      "description": "role-language final particle holding an interior mora",
+      "expected": [
+        {
+          "lemma": "寒い",
+          "pos": "Adjective",
+          "surface": "寒い"
+        },
+        {
+          "lemma": "にゃん",
+          "pos": "Particle",
+          "surface": "にゃーん"
+        }
+      ],
+      "id": "ini_n_2",
+      "input": "寒いにゃーん"
+    },
+    {
+      "description": "held final particle after a noun",
+      "expected": [
+        {
+          "lemma": "猫",
+          "pos": "Noun",
+          "surface": "猫"
+        },
+        {
+          "lemma": "にゃん",
+          "pos": "Particle",
+          "surface": "にゃーん"
+        }
+      ],
+      "id": "ni_n",
+      "input": "猫にゃーん"
     }
   ],
   "description": "particle_final tests",

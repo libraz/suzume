@@ -623,10 +623,12 @@ class TestStraddlingReplacement:
         assert replacements == {}
         assert "".join(token["surface"] for token in tokens) == "にゃー"
 
-    @pytest.mark.parametrize(("text", "particle"), [("遊ぼうにゃーん", "にゃーん"), ("行くにゃー", "にゃー")])
-    def test_keeps_the_character_speech_particle_whole(self, text, particle):
+    @pytest.mark.parametrize(
+        ("text", "particle", "lemma"), [("遊ぼうにゃーん", "にゃーん", "にゃん"), ("行くにゃー", "にゃー", "にゃー")]
+    )
+    def test_keeps_the_character_speech_particle_whole(self, text, particle, lemma):
         tokens, _, _ = get_expected_tokens(text)
-        assert (tokens[-1]["surface"], tokens[-1]["pos"], tokens[-1]["lemma"]) == (particle, "Particle", particle)
+        assert (tokens[-1]["surface"], tokens[-1]["pos"], tokens[-1]["lemma"]) == (particle, "Particle", lemma)
 
 
 class TestCharacterSpeech:

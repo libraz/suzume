@@ -304,6 +304,11 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
   if (start_pos + 2 >= codepoints.size()) {
     return;
   }
+  // A small kana belongs to the mora in front of it, so no mimetic opens on
+  // one (に+ゃーんと is the tail of にゃーん cut off its head).
+  if (kana::isSmallKanaCodepoint(codepoints[start_pos])) {
+    return;
+  }
 
   const normalize::CharType start_type = char_types[start_pos];
 
