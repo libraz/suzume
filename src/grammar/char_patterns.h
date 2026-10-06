@@ -291,6 +291,11 @@ bool isSubstantiveFormalNoun(std::string_view surface);
  */
 bool selectsVerbContinuative(std::string_view surface);
 
+/**
+ * @brief Whether a surface closes on the ichidan or adjectival terminal kana (る, い).
+ */
+bool endsInTerminalCellKana(std::string_view surface);
+
 /** @brief Whether a surface is the independent negative adjective ない */
 bool isIndependentNegativeAdjective(std::string_view surface);
 

@@ -318,9 +318,12 @@ float computeConjunctiveParticleCopulaPenalty(const core::LatticeEdge& prev, con
 // a past auxiliary actually selects (確認した+ことに+なる is 確認した+こと+に+なる,
 // while clause-initial ことに夜風が冷たかった keeps the adverb).
 float computeAdverbialNiAfterPredicatePenalty(const core::LatticeEdge& prev, const core::LatticeEdge& next) {
-  const bool finished_predicate = prev.extended_pos == core::ExtendedPOS::VerbShuushikei ||
-                                  prev.extended_pos == core::ExtendedPOS::AuxTenseTa ||
-                                  prev.extended_pos == core::ExtendedPOS::AdjBasic;
+  // An auxiliary in its ichidan terminal/attributive cell (てる, れる, せる)
+  // or its adjectival cell (たい, ない) closes the predicate the same way.
+  const bool finished_predicate =
+      prev.extended_pos == core::ExtendedPOS::VerbShuushikei || prev.extended_pos == core::ExtendedPOS::AuxTenseTa ||
+      prev.extended_pos == core::ExtendedPOS::AdjBasic ||
+      (prev.pos == core::PartOfSpeech::Auxiliary && grammar::endsInTerminalCellKana(prev.surface));
   if (!finished_predicate || next.pos != core::PartOfSpeech::Adverb || !next.fromDictionary() ||
       !utf8::endsWith(next.surface, "に")) {
     return cost::kNeutral;

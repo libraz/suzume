@@ -2969,6 +2969,117 @@
       ],
       "id": "ni_naranu",
       "input": "彼に他ならぬ"
+    },
+    {
+      "description": "ミスってることに気づいた。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "ミスる",
+          "pos": "Verb",
+          "surface": "ミスっ"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てる"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "こと"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "気づく",
+          "pos": "Verb",
+          "surface": "気づい"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ttterukotoni_duita",
+      "input": "ミスってることに気づいた。"
+    },
+    {
+      "description": "言われることに気づいた - auto-generated",
+      "expected": [
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言わ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れる"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "こと"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "気づく",
+          "pos": "Verb",
+          "surface": "気づい"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "warerukotoni_duita",
+      "input": "言われることに気づいた"
+    },
+    {
+      "description": "立ってることに驚いた - auto-generated",
+      "expected": [
+        {
+          "lemma": "立つ",
+          "pos": "Verb",
+          "surface": "立っ"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てる"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "こと"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "驚く",
+          "pos": "Verb",
+          "surface": "驚い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ttterukotoni_ita",
+      "input": "立ってることに驚いた"
     }
   ],
   "description": "formal_noun tests",

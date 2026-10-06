@@ -341,6 +341,11 @@ bool isSubstantiveFormalNoun(std::string_view surface) {
   return utf8::equalsAny(surface, {"もの", "物", "こと", "事"});
 }
 
+bool endsInTerminalCellKana(std::string_view surface) {
+  const char32_t last = utf8::decodeLastChar(surface);
+  return last == U'る' || last == U'い';
+}
+
 bool selectsVerbContinuative(std::string_view surface) {
   return utf8::equalsAny(surface, {"よう", "様", "もの", "物", "ごろ", "どき", "どころ", "仕方", "しかた"});
 }
