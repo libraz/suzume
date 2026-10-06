@@ -779,6 +779,28 @@
       ],
       "id": "nasasouni_su",
       "input": "自信なさそうに話す"
+    },
+    {
+      "description": "見逃しました - auto-generated",
+      "expected": [
+        {
+          "lemma": "見逃す",
+          "pos": "Verb",
+          "surface": "見逃し"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "まし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "shimashita_4",
+      "input": "見逃しました"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",

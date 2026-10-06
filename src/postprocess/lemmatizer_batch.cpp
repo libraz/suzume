@@ -24,8 +24,14 @@ void retagAsContinuative(core::Morpheme& morpheme, bool ichidan_stem) {
   if (!ichidan_stem && godan_suffix.empty()) {
     return;
   }
+  // The conjugation type travels with the lemma, so the classical-suru repair
+  // that follows leaves a rebuilt godan-sa base (見逃す) alone.
+  const grammar::VerbType verb_type = ichidan_stem
+                                          ? grammar::VerbType::Ichidan
+                                          : grammar::verbTypeFromIRowCodepoint(utf8::decodeLastChar(morpheme.surface));
   morpheme.pos = core::PartOfSpeech::Verb;
   morpheme.extended_pos = core::ExtendedPOS::VerbRenyokei;
+  morpheme.conj_type = grammar::verbTypeToConjType(verb_type);
   morpheme.lemma =
       ichidan_stem ? morpheme.surface + "る" : normalize::concat(utf8::dropLastChar(morpheme.surface), godan_suffix);
 }

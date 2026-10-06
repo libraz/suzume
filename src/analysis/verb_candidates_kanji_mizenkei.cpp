@@ -315,6 +315,15 @@ void appendGodanMizenkeiPassiveCausativeCandidates(const std::vector<char32_t>& 
     }
   }
 
+  // A causative せ needs an auxiliary after it, so a bare せ that closes the word is
+  // the imperative of a registered godan-sa verb (転がせ ← 転がす, not 転が+せ).
+  const bool closes_word = kanji_end + 2 >= codepoints.size() || !kana::isHiraganaCodepoint(codepoints[kanji_end + 2]);
+  if (after_a == U'せ' && closes_word &&
+      vh::isVerbInDictionary(dict_manager,
+                             normalize::concat(extractSubstring(codepoints, start_pos, kanji_end + 1), "す"))) {
+    return;
+  }
+
   // Verify via inflection analysis of base form
   if (!analyzesAsVerbType(inflection, base_form, verb_type)) {
     return;
