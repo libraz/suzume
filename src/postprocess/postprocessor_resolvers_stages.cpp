@@ -401,6 +401,13 @@ void resolveFinalMorphemeRoles(std::vector<core::Morpheme>& result, const dictio
     resolver::retagUninflected(result[0], core::PartOfSpeech::Prefix, core::ExtendedPOS::Prefix, "本");
   }
 
+  // A standalone 最 is the superlative prefix, never a noun of its own.
+  for (auto& morpheme : result) {
+    if (morpheme.pos == core::PartOfSpeech::Noun && grammar::isSuperlativePrefix(morpheme.surface)) {
+      resolver::retagUninflected(morpheme, core::PartOfSpeech::Prefix, core::ExtendedPOS::Prefix, morpheme.surface);
+    }
+  }
+
   // The registered formal noun 他 carries its kana lemma in the productive
   // adnominal frame 他+の, even if an unknown noun edge won the lattice.
   for (size_t idx = 0; idx + 1 < result.size(); ++idx) {

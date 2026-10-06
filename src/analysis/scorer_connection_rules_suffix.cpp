@@ -638,8 +638,13 @@ float computeSuffixShortVerbBonus(const core::LatticeEdge& prev, const core::Lat
   const bool one_kanji_suffix_before_noun = prev.pos == core::PartOfSpeech::Suffix &&
                                             next.pos == core::PartOfSpeech::Noun && grammar::isAllKanji(prev.surface) &&
                                             grammar::isAllKanji(next.surface);
-  if (normalize::utf8Length(prev.surface) == 1 && normalize::utf8Length(next.surface) == 1 &&
-      (one_kanji_noun_before_suffix || one_kanji_suffix_before_noun)) {
+  // A prefix plus one kanji of its head (最優+先) is no suffix host either.
+  const bool prefixed_run_before_suffix =
+      prev.pos == core::PartOfSpeech::Noun && !prev.fromDictionary() && next.pos == core::PartOfSpeech::Suffix &&
+      normalize::utf8Length(prev.surface) == 2 && grammar::startsWithSuperlativePrefix(prev.surface);
+  if ((normalize::utf8Length(prev.surface) == 1 && normalize::utf8Length(next.surface) == 1 &&
+       (one_kanji_noun_before_suffix || one_kanji_suffix_before_noun)) ||
+      prefixed_run_before_suffix) {
     // The split collects the -0.8 bigram bonus here and the SUFFIX→PART_格
     // bonus on the next edge (最+中+に), so a penalty that only offsets the
     // first one still leaves the broken kango cheaper.

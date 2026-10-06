@@ -2264,6 +2264,72 @@
       ],
       "id": "rittkenonai_2",
       "input": "飾りっけのない"
+    },
+    {
+      "description": "最優先 - auto-generated",
+      "expected": [
+        {
+          "lemma": "最優先",
+          "pos": "Noun",
+          "surface": "最優先"
+        }
+      ],
+      "id": "unnamed_48",
+      "input": "最優先"
+    },
+    {
+      "description": "最高 - auto-generated",
+      "expected": [
+        {
+          "lemma": "最高",
+          "pos": "Noun",
+          "surface": "最高"
+        }
+      ],
+      "id": "unnamed_49",
+      "input": "最高"
+    },
+    {
+      "description": "この問題を最優先で対応する - auto-generated",
+      "expected": [
+        {
+          "lemma": "この",
+          "pos": "Determiner",
+          "surface": "この"
+        },
+        {
+          "lemma": "問題",
+          "pos": "Noun",
+          "surface": "問題"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "最優先",
+          "pos": "Noun",
+          "surface": "最優先"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "対応",
+          "pos": "Noun",
+          "surface": "対応"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "kono_wo_de_suru",
+      "input": "この問題を最優先で対応する"
     }
   ],
   "description": "General nouns (part 4/4)",

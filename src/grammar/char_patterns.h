@@ -145,6 +145,17 @@ bool isHonorificPrefix(std::string_view surface);
 bool isSinoHonorificPrefix(std::string_view surface);
 
 /**
+ * @brief Whether a surface begins with the superlative prefix 最
+ *
+ * 最 binds to the whole following nominal (最優先, 最重要), so a two-kanji run
+ * opening with it is the prefix plus one kanji of its head.
+ */
+bool startsWithSuperlativePrefix(std::string_view surface);
+
+/** @brief Whether a surface is exactly the superlative prefix 最 */
+bool isSuperlativePrefix(std::string_view surface);
+
+/**
  * @brief Whether a surface is a bound prefix that forms a lexical verb with V2
  *
  * Unlike a verb continuative, this closed-class prefix has no independent

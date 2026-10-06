@@ -1070,6 +1070,23 @@
       ],
       "id": "unnamed_46",
       "input": "前略"
+    },
+    {
+      "description": "最重要 - auto-generated",
+      "expected": [
+        {
+          "lemma": "最",
+          "pos": "Prefix",
+          "surface": "最"
+        },
+        {
+          "lemma": "重要",
+          "pos": "Adjective",
+          "surface": "重要"
+        }
+      ],
+      "id": "unnamed_47",
+      "input": "最重要"
     }
   ],
   "description": "Basic tokenization tests",
