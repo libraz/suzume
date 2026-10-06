@@ -473,13 +473,26 @@ bool spansClosedHeadAndClosedWord(const dictionary::DictionaryManager* dict_mana
   return rest != nullptr && (rest->pos == core::PartOfSpeech::Auxiliary || rest->pos == core::PartOfSpeech::Particle);
 }
 
+// A coined adjective spelling a registered auxiliary cell with that cell's own
+// lemma (らしかっ of らしい) is the auxiliary itself, read with the wrong class.
+bool respellsAuxiliaryCell(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
+                           const UnknownCandidate& cand) {
+  if (dict_manager == nullptr || cand.pos != core::PartOfSpeech::Adjective || cand.lemma.empty()) {
+    return false;
+  }
+  const auto* auxiliary =
+      lookupEntryInRange(*dict_manager, codepoints, cand.start, cand.end, core::PartOfSpeech::Auxiliary);
+  return auxiliary != nullptr && auxiliary->lemma == cand.lemma;
+}
+
 void dropCoinedAdjectivesOverDictionaryAdjective(const dictionary::DictionaryManager* dict_manager,
                                                  const std::vector<char32_t>& codepoints,
                                                  std::vector<UnknownCandidate>& candidates, size_t candidate_start) {
   candidates.erase(std::remove_if(candidates.begin() + static_cast<std::ptrdiff_t>(candidate_start), candidates.end(),
                                   [&](const UnknownCandidate& cand) {
                                     return sharesEndWithDictionaryAdjective(dict_manager, codepoints, cand) ||
-                                           spansClosedHeadAndClosedWord(dict_manager, codepoints, cand);
+                                           spansClosedHeadAndClosedWord(dict_manager, codepoints, cand) ||
+                                           respellsAuxiliaryCell(dict_manager, codepoints, cand);
                                   }),
                    candidates.end());
 }

@@ -124,8 +124,10 @@ constexpr std::array<float, static_cast<size_t>(ExtendedPOS::Count_)> kCategoryC
   // Appearance/Conjecture
   table[static_cast<size_t>(ExtendedPOS::AuxAppearanceSou)] = 0.4F;     // そう
   table[static_cast<size_t>(ExtendedPOS::AuxConjectureRashii)] = 0.3F;  // らしい
-  table[static_cast<size_t>(ExtendedPOS::AuxConjectureMitai)] = 0.4F;   // みたい
-  table[static_cast<size_t>(ExtendedPOS::AuxSimilitudeYou)] = 0.4F;     // よう
+  table[static_cast<size_t>(ExtendedPOS::AuxConjectureRashiiStem)] =
+      table[static_cast<size_t>(ExtendedPOS::AuxConjectureRashii)];
+  table[static_cast<size_t>(ExtendedPOS::AuxConjectureMitai)] = 0.4F;  // みたい
+  table[static_cast<size_t>(ExtendedPOS::AuxSimilitudeYou)] = 0.4F;    // よう
 
   // Copula
   table[static_cast<size_t>(ExtendedPOS::AuxCopulaDa)] = 0.2F;    // だ

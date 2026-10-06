@@ -82,6 +82,20 @@ BigramTable::EncodedTable BigramTable::initTable() {
         bigram_rules::encodeCost(bigram_cost::kNeutral);
   }
 
+  // The bare stem of らしい is what the auxiliary's hosts precede, but it only
+  // nominalizes (本+らし+さ, 子供+らし+げ); every other cell carries its own
+  // ending, so nothing else may follow the stem (春+らし+かっ is no reading).
+  {
+    const size_t rashii = static_cast<size_t>(core::ExtendedPOS::AuxConjectureRashii);
+    const size_t stem = static_cast<size_t>(core::ExtendedPOS::AuxConjectureRashiiStem);
+    for (size_t idx = 0; idx < BigramTable::kSize; ++idx) {
+      table[idx][stem] = table[idx][rashii];
+      table[stem][idx] = bigram_rules::encodeCost(bigram_cost::kAlmostNever);
+    }
+    table[stem][static_cast<size_t>(core::ExtendedPOS::Suffix)] =
+        table[rashii][static_cast<size_t>(core::ExtendedPOS::Suffix)];
+  }
+
   // A quotative demonstrative cannot directly complete an adjective stem.
   // Keep appearance そう on its auxiliary path (高+そう, キモ+そう).
   table[static_cast<size_t>(core::ExtendedPOS::AdjStem)][static_cast<size_t>(core::ExtendedPOS::AdverbQuotative)] =

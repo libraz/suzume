@@ -213,6 +213,11 @@ enum class ExtendedPOS : uint8_t {
   // adverbial complements (みんなに+ありがとう, 心から+ありがとう).
   InterjectionGreeting,
 
+  // 推定 らしい の語幹 らし: the bare stem only nominalizes (本らし+さ, 子供らし+げ).
+  // Every other cell of the auxiliary carries its own ending, so the stem gets
+  // its own category to keep it from standing before anything else (春+らし+かっ).
+  AuxConjectureRashiiStem,
+
   // Count marker (for array sizing)
   Count_  // Total number of categories
 };
@@ -389,7 +394,15 @@ constexpr bool isAuxiliaryType(ExtendedPOS epos) {
          epos == ExtendedPOS::AuxClassicalTari || epos == ExtendedPOS::AuxClassicalPerfect ||
          epos == ExtendedPOS::AuxClassicalBeshi || epos == ExtendedPOS::AuxInability ||
          epos == ExtendedPOS::AuxBenefactive || epos == ExtendedPOS::AuxSimilitudeYou ||
-         epos == ExtendedPOS::AuxKuruwaPolite || epos == ExtendedPOS::AuxClassicalKi;
+         epos == ExtendedPOS::AuxKuruwaPolite || epos == ExtendedPOS::AuxClassicalKi ||
+         epos == ExtendedPOS::AuxConjectureRashiiStem;
+}
+
+/**
+ * @brief Whether ExtendedPOS is a cell of the conjecture auxiliary らしい, its stem included
+ */
+constexpr bool isConjectureRashiiType(ExtendedPOS epos) {
+  return epos == ExtendedPOS::AuxConjectureRashii || epos == ExtendedPOS::AuxConjectureRashiiStem;
 }
 
 /**

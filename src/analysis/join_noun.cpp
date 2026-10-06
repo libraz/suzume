@@ -418,7 +418,7 @@ void addDestinationSuffixNounJoinCandidates(core::Lattice& lattice, std::string_
       }
       const auto extended_pos = result.entry->extended_pos;
       if (result.entry->pos == core::PartOfSpeech::Particle || extended_pos == core::ExtendedPOS::AuxCopulaDa ||
-          extended_pos == core::ExtendedPOS::AuxCopulaDesu || extended_pos == core::ExtendedPOS::AuxConjectureRashii ||
+          extended_pos == core::ExtendedPOS::AuxCopulaDesu || core::isConjectureRashiiType(extended_pos) ||
           extended_pos == core::ExtendedPOS::AuxConjectureMitai) {
         nominal_right_context = true;
         break;

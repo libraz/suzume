@@ -217,7 +217,7 @@ bool hasClosedSuffixBoundary(const std::vector<char32_t>& codepoints, size_t sta
         !overlaps_final_verb_continuative) {
       return true;
     }
-    if (auxiliary != nullptr && auxiliary->extended_pos == core::ExtendedPOS::AuxConjectureRashii) {
+    if (auxiliary != nullptr && core::isConjectureRashiiType(auxiliary->extended_pos)) {
       const bool rashii_paradigm_continues =
           end_pos < codepoints.size() &&
           (codepoints[end_pos] == U'い' || codepoints[end_pos] == U'さ' || codepoints[end_pos] == U'く' ||

@@ -752,6 +752,77 @@
       ],
       "id": "rashigena_3",
       "input": "誇らしげな顔"
+    },
+    {
+      "description": "past cell of the conjecture auxiliary rashii",
+      "expected": [
+        {
+          "lemma": "春",
+          "pos": "Noun",
+          "surface": "春"
+        },
+        {
+          "lemma": "らしい",
+          "pos": "Auxiliary",
+          "surface": "らしかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "rashikattta",
+      "input": "春らしかった"
+    },
+    {
+      "description": "past cell of the conjecture auxiliary rashii",
+      "expected": [
+        {
+          "lemma": "子供",
+          "pos": "Noun",
+          "surface": "子供"
+        },
+        {
+          "lemma": "らしい",
+          "pos": "Auxiliary",
+          "surface": "らしかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "rashikattta_2",
+      "input": "子供らしかった"
+    },
+    {
+      "description": "past cell of the conjecture auxiliary rashii before desu",
+      "expected": [
+        {
+          "lemma": "春",
+          "pos": "Noun",
+          "surface": "春"
+        },
+        {
+          "lemma": "らしい",
+          "pos": "Auxiliary",
+          "surface": "らしかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "rashikatttadesu",
+      "input": "春らしかったです"
     }
   ],
   "description": "Modality auxiliaries (たい、そう、らしい) (part 2/2)",

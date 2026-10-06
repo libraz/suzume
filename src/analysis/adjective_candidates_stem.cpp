@@ -109,7 +109,7 @@ bool hasInternalNominalDerivationalBoundary(const std::string& stem,
       return true;
     }
     const auto* auxiliary = dict_manager->lookupExact(right, core::PartOfSpeech::Auxiliary);
-    if (auxiliary != nullptr && auxiliary->extended_pos == core::ExtendedPOS::AuxConjectureRashii) {
+    if (auxiliary != nullptr && core::isConjectureRashiiType(auxiliary->extended_pos)) {
       return true;
     }
   }

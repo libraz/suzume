@@ -298,7 +298,8 @@ TEST(SuzumeCApiTest, CanonicalLabelFunctionsCoverSerializedBoundaries) {
   EXPECT_STREQ(suzume_extended_pos_label(84), "PART_接続終止");
   EXPECT_STREQ(suzume_extended_pos_label(85), "NOUN_非日本語");
   EXPECT_STREQ(suzume_extended_pos_label(86), "INTJ_挨拶");
-  EXPECT_EQ(suzume_extended_pos_label(87), nullptr);
+  EXPECT_STREQ(suzume_extended_pos_label(87), "AUX_推定語幹");
+  EXPECT_EQ(suzume_extended_pos_label(88), nullptr);
 
   EXPECT_STREQ(suzume_conjugation_form_label(6), "意志形");
   EXPECT_EQ(suzume_conjugation_form_label(7), nullptr);

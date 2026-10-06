@@ -920,6 +920,10 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       // 本らしさ → 本 + らし + さ.
       {EPOS::AuxConjectureRashii, EPOS::Suffix, cost::kVeryStrongBonus},
 
+      // The past cell らしかっ takes the past auxiliary like any i-adjective's
+      // かっ (春+らしかっ+た, as 高かっ+た).
+      {EPOS::AuxConjectureRashii, EPOS::AuxTenseTa, cost::kStrongBonus},
+
       // The attributive form of らしい modifies a following noun:
       // 本らしい本 → 本 + らしい + 本.
       {EPOS::AuxConjectureRashii, EPOS::Noun, cost::kMinorBonus},

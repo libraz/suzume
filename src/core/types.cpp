@@ -328,6 +328,8 @@ std::string_view extendedPosToString(ExtendedPOS epos) {
       return "AUX_様態";
     case ExtendedPOS::AuxConjectureRashii:
       return "AUX_推定";
+    case ExtendedPOS::AuxConjectureRashiiStem:
+      return "AUX_推定語幹";
     case ExtendedPOS::AuxConjectureMitai:
       return "AUX_みたい";
     case ExtendedPOS::AuxSimilitudeYou:

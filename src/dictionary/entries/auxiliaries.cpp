@@ -170,7 +170,7 @@ EntrySpecRange getAuxiliaryEntries() {
       aux("らしから", "らしい", EPOS::AuxConjectureRashii),
       // Nominalizing stem: 本らしさ → 本 + らし + さ. It remains a form
       // of the conjecture auxiliary rather than an independent adjective.
-      aux("らし", "らしい", EPOS::AuxConjectureRashii),
+      aux("らし", "らしい", EPOS::AuxConjectureRashiiStem),
 
       // Conjecture - みたい (様態推定)
       // Note: みたいだ/みたいに removed - MeCab splits as みたい+だ/に

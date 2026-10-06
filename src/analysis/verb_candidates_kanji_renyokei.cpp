@@ -702,7 +702,7 @@ void appendGodanSaRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
         if (tail_entry != nullptr &&
             (tail_entry->extended_pos == core::ExtendedPOS::AuxCopulaDa ||
              tail_entry->extended_pos == core::ExtendedPOS::AuxCopulaDesu ||
-             (tail_entry->extended_pos == core::ExtendedPOS::AuxConjectureRashii && !selects_godan_sa_onbin))) {
+             (core::isConjectureRashiiType(tail_entry->extended_pos) && !selects_godan_sa_onbin))) {
           SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" hiragana tail is a closed auxiliary\n");
           continue;
         }
