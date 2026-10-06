@@ -1516,3 +1516,24 @@ class TestNegativeAppearanceSuffix:
             {"surface": "なげ", "pos": "Verb", "lemma": "なげる"},
         ]
         assert not postprocessors.postprocess_negative_appearance_suffix(tokens)
+
+
+class TestDeverbalNounContextGenitiveHead:
+    def test_final_continuative_after_genitive_noun_is_a_noun(self):
+        tokens = [
+            {"surface": "毎日", "pos": "Noun", "lemma": "毎日"},
+            {"surface": "の", "pos": "Particle", "lemma": "の"},
+            {"surface": "水", "pos": "Noun", "lemma": "水"},
+            {"surface": "やり", "pos": "Verb", "lemma": "やる"},
+        ]
+        assert postprocessors.postprocess_deverbal_noun_context(tokens)
+        assert (tokens[-1]["pos"], tokens[-1]["lemma"]) == ("Noun", "やり")
+
+    def test_final_terminal_form_stays_a_verb(self):
+        tokens = [
+            {"surface": "毎日", "pos": "Noun", "lemma": "毎日"},
+            {"surface": "の", "pos": "Particle", "lemma": "の"},
+            {"surface": "水", "pos": "Noun", "lemma": "水"},
+            {"surface": "やる", "pos": "Verb", "lemma": "やる"},
+        ]
+        assert not postprocessors.postprocess_deverbal_noun_context(tokens)

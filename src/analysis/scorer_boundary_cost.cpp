@@ -51,6 +51,12 @@ float Scorer::eosCost(const core::LatticeEdge& edge, core::ExtendedPOS prev_exte
     return sc::kEosNounContinuativePenalty;
   }
 
+  // A subsidiary verb after the te-form is an imperative (読んで+くれ), not a noun.
+  if (edge.extended_pos == core::ExtendedPOS::VerbRenyokei && edge.end - edge.start > 1 &&
+      prev_extended_pos != core::ExtendedPOS::ParticleConj && grammar::endsWithERow(edge.surface)) {
+    return sc::kEosBareERowRenyokeiPenalty;
+  }
+
   // An attributive compound particle needs the noun it modifies; closing the
   // utterance on it means the case particle plus the predicate (場合+に+よる).
   if (connection_rules::isAttributiveCompoundParticle(edge)) {

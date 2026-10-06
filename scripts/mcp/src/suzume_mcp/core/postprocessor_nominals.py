@@ -139,7 +139,7 @@ def postprocess_deverbal_noun_context(tokens: list[dict]) -> bool:
     not a bare continuative verb.
     """
     changed = False
-    for idx, token in enumerate(tokens[:-1]):
+    for idx, token in enumerate(tokens):
         if token.get("pos") != "Verb":
             continue
         surface = token.get("surface", "")
@@ -162,7 +162,16 @@ def postprocess_deverbal_noun_context(tokens: list[dict]) -> bool:
         # So is the colloquial る→ん contraction of that terminal (分かん+の).
         if surface.endswith("ん") and lemma.endswith("る") and surface[:-1] == lemma[:-1]:
             continue
-        following = tokens[idx + 1]
+        following = tokens[idx + 1] if idx + 1 < len(tokens) else {}
+        # A continuative closing a genitive noun phrase (毎日の水やり) is its head:
+        # の selects a nominal, and nothing follows to take the verb's own cells.
+        genitive_phrase_head = (
+            idx >= 2
+            and following.get("pos", "Symbol") == "Symbol"
+            and tokens[idx - 1].get("pos") == "Noun"
+            and tokens[idx - 2].get("pos") == "Particle"
+            and tokens[idx - 2].get("surface") == "の"
+        )
         honorific_naru = (
             idx > 0
             and tokens[idx - 1].get("pos") == "Prefix"
@@ -205,7 +214,13 @@ def postprocess_deverbal_noun_context(tokens: list[dict]) -> bool:
             and following.get("lemma") == "ない"
             and not _is_irrealis_before_negative(surface)
         )
-        if not nominal_particle and not nominal_follower and not predicative_copula and not nominal_negative:
+        if (
+            not nominal_particle
+            and not nominal_follower
+            and not predicative_copula
+            and not nominal_negative
+            and not genitive_phrase_head
+        ):
             continue
         token["pos"] = "Noun"
         token["lemma"] = surface

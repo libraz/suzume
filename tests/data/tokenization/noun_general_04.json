@@ -2460,6 +2460,79 @@
       ],
       "id": "shi_nasagena",
       "input": "申し訳なさげな顔"
+    },
+    {
+      "description": "答え - auto-generated",
+      "expected": [
+        {
+          "lemma": "答え",
+          "pos": "Noun",
+          "surface": "答え"
+        }
+      ],
+      "id": "e_2",
+      "input": "答え"
+    },
+    {
+      "description": "考え - auto-generated",
+      "expected": [
+        {
+          "lemma": "考え",
+          "pos": "Noun",
+          "surface": "考え"
+        }
+      ],
+      "id": "e_3",
+      "input": "考え"
+    },
+    {
+      "description": "先生の教え - auto-generated",
+      "expected": [
+        {
+          "lemma": "先生",
+          "pos": "Noun",
+          "surface": "先生"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "教え",
+          "pos": "Noun",
+          "surface": "教え"
+        }
+      ],
+      "id": "no_e",
+      "input": "先生の教え"
+    },
+    {
+      "description": "毎日の水やり - auto-generated",
+      "expected": [
+        {
+          "lemma": "毎日",
+          "pos": "Noun",
+          "surface": "毎日"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "水",
+          "pos": "Noun",
+          "surface": "水"
+        },
+        {
+          "lemma": "やり",
+          "pos": "Noun",
+          "surface": "やり"
+        }
+      ],
+      "id": "no_yari",
+      "input": "毎日の水やり"
     }
   ],
   "description": "General nouns (part 4/4)",

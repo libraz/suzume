@@ -469,6 +469,10 @@ constexpr float kEosSokuonOnbinPenalty = scale::kAlmostNever;
 constexpr float kEosTeEndingAdverbPenalty = scale::kNever;
 // A fabricated continuative after a one-character noun closing the utterance.
 constexpr float kEosNounContinuativePenalty = scale::kStrong;
+// An e-row continuative closing the utterance has no
+// auxiliary or particle to serve: it is the deverbal noun (答え, 考え), since
+// only a comma-chained clause ends on the bare continuative.
+constexpr float kEosBareERowRenyokeiPenalty = scale::kStrong;
 
 // A formal noun does not follow the bare-kanji terminal of a classical verb (候+はず).
 constexpr float kPenaltyBareClassicalTerminalBeforeFormalNoun = scale::kStrong;

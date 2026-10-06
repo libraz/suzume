@@ -552,4 +552,21 @@ void splitFormalNounCopularDemo(std::vector<core::Morpheme>& result) {
   }
 }
 
+// A continuative closing a genitive noun phrase (毎日+の+水+やり) is its head:
+// の selects a nominal and nothing follows to take the verb's own cells.
+void resolveGenitivePhraseHead(std::vector<core::Morpheme>& result) {
+  if (result.size() < 3) {
+    return;
+  }
+  const size_t last = result.size() - 1;
+  auto& head = result[last];
+  if (head.pos != core::PartOfSpeech::Verb || head.extended_pos != core::ExtendedPOS::VerbRenyokei ||
+      head.lemma == "する" || result[last - 1].pos != core::PartOfSpeech::Noun ||
+      result[last - 2].extended_pos != core::ExtendedPOS::ParticleNo ||
+      !utf8::equalsAny(result[last - 2].surface, {"の"})) {
+    return;
+  }
+  retagUninflected(head, core::PartOfSpeech::Noun, core::ExtendedPOS::NounVerbal, head.surface);
+}
+
 }  // namespace suzume::postprocess::resolver
