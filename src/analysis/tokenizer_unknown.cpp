@@ -952,6 +952,14 @@ void Tokenizer::addUnknownCandidates(core::Lattice& lattice, std::string_view te
       skip_reason = "numeral_okurigana_counter";
     }
 
+    // A quantity phrase is licensed by its own numeral and counter structure, so
+    // a shorter registered word that spells its head (十分 in 十分の三) does not
+    // make it a fabricated span.
+    if (!skip_penalty && candidate.origin == CandidateOrigin::Counter && candidate.pos == core::PartOfSpeech::Noun) {
+      skip_penalty = true;
+      skip_reason = "counter_quantity";
+    }
+
     if (!skip_penalty &&
         (candidate.pos == core::PartOfSpeech::Verb || candidate.pos == core::PartOfSpeech::Adjective)) {
       // Exception: Don't skip verb candidates ending with ず (adverbialized negatives)

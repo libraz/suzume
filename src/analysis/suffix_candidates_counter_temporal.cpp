@@ -196,7 +196,24 @@ void appendTemporalCounterCandidates(const std::vector<char32_t>& codepoints, si
     const bool opens_fraction_denominator = scan > unit_start && codepoints[scan - 1] == U'分' &&
                                             scan + 1 < codepoints.size() && codepoints[scan] == U'の' &&
                                             normalize::isNumeralCodepoint(codepoints[scan + 1]);
-    if (has_quantity && scan > unit_start && !opens_fraction_denominator &&
+    // A registered na-adjective spelled like a quantity (十分) is the adjective
+    // before the copula that na-adjectives take, not a duration (十分+だ,
+    // 十分+な準備).
+    bool na_adjective_before_copula = false;
+    if (has_quantity && scan > unit_start && followed_by_hiragana) {
+      const auto* na_adjective =
+          dict_manager->lookupExact(extractSubstring(codepoints, start_pos, scan), core::PartOfSpeech::Adjective);
+      for (size_t copula_end = scan + 1;
+           na_adjective != nullptr && na_adjective->extended_pos == core::ExtendedPOS::AdjNaAdj &&
+           copula_end <= std::min(codepoints.size(), scan + kMaxQuantityParticleLength) && !na_adjective_before_copula;
+           ++copula_end) {
+        const auto* copula =
+            lookupEntryInRange(*dict_manager, codepoints, scan, copula_end, core::PartOfSpeech::Auxiliary);
+        na_adjective_before_copula = copula != nullptr && (copula->extended_pos == core::ExtendedPOS::AuxCopulaDa ||
+                                                           copula->extended_pos == core::ExtendedPOS::AuxCopulaDesu);
+      }
+    }
+    if (has_quantity && scan > unit_start && !opens_fraction_denominator && !na_adjective_before_copula &&
         (followed_by_hiragana || followed_by_quantity_particle)) {
       appendCounterCandidate(codepoints, start_pos, scan, core::PartOfSpeech::Noun, candidate::kCounterNounSplitBonus,
                              core::ExtendedPOS::NounNumber, "temporal_quantity_hiragana_split", candidates);
