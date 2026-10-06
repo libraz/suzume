@@ -136,6 +136,18 @@
       ],
       "id": "yasatsuki",
       "input": "桜やさつき"
+    },
+    {
+      "description": "御中 - auto-generated",
+      "expected": [
+        {
+          "lemma": "御中",
+          "pos": "Noun",
+          "surface": "御中"
+        }
+      ],
+      "id": "unnamed_50",
+      "input": "御中"
     }
   ],
   "description": "General nouns (part 5/5)",
