@@ -1448,6 +1448,65 @@
       ],
       "id": "ji_hazu",
       "input": "存じ候はず"
+    },
+    {
+      "description": "ここにいたい。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "ここ",
+          "pos": "Pronoun",
+          "surface": "ここ"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "い"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たい"
+        }
+      ],
+      "id": "kokoniitai_2",
+      "input": "ここにいたい。"
+    },
+    {
+      "description": "家にいたいです。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "家",
+          "pos": "Noun",
+          "surface": "家"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "い"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たい"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "niitaidesu",
+      "input": "家にいたいです。"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",

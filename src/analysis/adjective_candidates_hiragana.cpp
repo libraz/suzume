@@ -154,6 +154,45 @@ void addReduplicatedShiiAdjective(std::vector<UnknownCandidate>& candidates, con
   }
 }
 
+// The kana spelling いたい is the existential いる plus the desiderative たい and
+// also the adjective 痛い. After the nominative が the verb would mark its own
+// subject as the wanted one, so the adjective of what hurts (頭がいたい) is
+// offered; after any other morpheme the verb reading stays the only one.
+void appendPainAdjectiveAfterNominative(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                        const std::vector<normalize::CharType>& char_types,
+                                        const grammar::Inflection& inflection,
+                                        const dictionary::DictionaryManager* dict_manager,
+                                        std::vector<UnknownCandidate>& candidates) {
+  if (dict_manager == nullptr || start_pos == 0 || start_pos >= char_types.size() ||
+      char_types[start_pos] != normalize::CharType::Hiragana ||
+      lookupEntryInRange(*dict_manager, codepoints, start_pos - 1, start_pos, core::PartOfSpeech::Particle) ==
+          nullptr ||
+      codepoints[start_pos - 1] != U'が') {
+    return;
+  }
+  const size_t hira_end = findCharRegionEnd(char_types, start_pos, 6, normalize::CharType::Hiragana);
+  for (size_t end_pos = start_pos + 3; end_pos <= hira_end; ++end_pos) {
+    const std::string surface = extractSubstring(codepoints, start_pos, end_pos);
+    for (const auto& cand : inflection.analyze(surface)) {
+      if (cand.verb_type != grammar::VerbType::IAdjective || cand.confidence < candidate::kIAdjConfMin ||
+          !utf8::startsWith(cand.base_form, "いた") || utf8::endsWithAny(surface, {"た", "て"}) ||
+          !isAdjectiveInDictionary(
+              dict_manager,
+              normalize::concat("痛", std::string_view(cand.base_form).substr(core::kTwoJapaneseCharBytes)))) {
+        continue;
+      }
+      const float cost = candidate::confidenceScaledCost(candidate::kKanjiAdjBaseCost, cand.confidence,
+                                                         candidate::kKanjiAdjConfScale) +
+                         candidate::kReduplicatedShiiAdjBonus;
+      auto adj = makeIAdjCandidate(surface, start_pos, end_pos, cand.base_form, cost,
+                                   CandidateOrigin::AdjectiveIHiragana, cand.confidence, "i_adjective_pain_nominative");
+      adj.has_suffix = true;
+      candidates.push_back(std::move(adj));
+      return;
+    }
+  }
+}
+
 void appendHiraganaPrefixedKanjiIAdjCandidates(std::vector<UnknownCandidate>& candidates,
                                                const std::vector<char32_t>& codepoints, size_t start_pos,
                                                const std::vector<normalize::CharType>& char_types,
@@ -1121,6 +1160,7 @@ void generateHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints
                                          std::vector<UnknownCandidate>& candidates) {
   const size_t candidate_start = candidates.size();
   appendHiraganaAdjectiveCandidates(codepoints, start_pos, char_types, inflection, dict_manager, candidates);
+  appendPainAdjectiveAfterNominative(codepoints, start_pos, char_types, inflection, dict_manager, candidates);
   dropCoinedAdjectivesOverDictionaryAdjective(dict_manager, codepoints, candidates, candidate_start);
 }
 

@@ -2171,6 +2171,28 @@
       ],
       "id": "jidattta",
       "input": "結局皆同じだった。"
+    },
+    {
+      "description": "頭がいたい - auto-generated",
+      "expected": [
+        {
+          "lemma": "頭",
+          "pos": "Noun",
+          "surface": "頭"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "いたい",
+          "pos": "Adjective",
+          "surface": "いたい"
+        }
+      ],
+      "id": "gaitai",
+      "input": "頭がいたい"
     }
   ],
   "description": "General nouns (part 4/4)",

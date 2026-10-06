@@ -1811,6 +1811,38 @@
       ],
       "id": "o_nishimasu",
       "input": "お茶にします"
+    },
+    {
+      "description": "お腹がいたいです。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "腹",
+          "pos": "Noun",
+          "surface": "腹"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "いたい",
+          "pos": "Adjective",
+          "surface": "いたい"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "o_gaitaidesu",
+      "input": "お腹がいたいです。"
     }
   ],
   "description": "Politeness auxiliaries (ます、です)",
