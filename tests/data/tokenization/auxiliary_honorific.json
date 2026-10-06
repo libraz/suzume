@@ -747,6 +747,117 @@
       ],
       "id": "o_neshitemoyoroshiideshi_uka",
       "input": "お尋ねしてもよろしいでしょうか。"
+    },
+    {
+      "description": "盛夏の候、お変わりございませんか - auto-generated",
+      "expected": [
+        {
+          "lemma": "盛夏",
+          "pos": "Noun",
+          "surface": "盛夏"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "候",
+          "pos": "Noun",
+          "surface": "候"
+        },
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "変わり",
+          "pos": "Noun",
+          "surface": "変わり"
+        },
+        {
+          "lemma": "ござる",
+          "pos": "Auxiliary",
+          "surface": "ござい"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ませ"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "no_o_warigozaimasenka",
+      "input": "盛夏の候、お変わりございませんか"
+    },
+    {
+      "description": "お変わりございません - auto-generated",
+      "expected": [
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "変わり",
+          "pos": "Noun",
+          "surface": "変わり"
+        },
+        {
+          "lemma": "ござる",
+          "pos": "Auxiliary",
+          "surface": "ござい"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ませ"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        }
+      ],
+      "id": "o_warigozaimasen",
+      "input": "お変わりございません"
+    },
+    {
+      "description": "変わりございません - auto-generated",
+      "expected": [
+        {
+          "lemma": "変わる",
+          "pos": "Verb",
+          "surface": "変わり"
+        },
+        {
+          "lemma": "ござる",
+          "pos": "Auxiliary",
+          "surface": "ござい"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ませ"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        }
+      ],
+      "id": "warigozaimasen",
+      "input": "変わりございません"
     }
   ],
   "description": "auxiliary_honorific tests",

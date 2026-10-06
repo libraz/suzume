@@ -307,7 +307,13 @@ def postprocess_honorific_request(tokens: list[dict]) -> bool:
     for idx in range(1, len(tokens)):
         prefix = tokens[idx - 1]
         stem = tokens[idx]
-        nominal_context = idx + 1 == len(tokens) or tokens[idx + 1].get("pos") == "Particle"
+        # An existential predicate (ある, ござる) takes the honorific nominal as
+        # its subject (お変わりございません, お変わりありません).
+        nominal_context = (
+            idx + 1 == len(tokens)
+            or tokens[idx + 1].get("pos") == "Particle"
+            or tokens[idx + 1].get("lemma") in ("ある", "ござる", "ございる")
+        )
         if (
             prefix.get("pos") == "Prefix"
             and prefix.get("surface") in ("お", "ご")
