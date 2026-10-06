@@ -1039,16 +1039,11 @@ bool opensOnCompleteAuxiliary(const dictionary::DictionaryManager* dict_manager,
   if (dict_manager == nullptr || end_pos < start_pos + 2 || end_pos > codepoints.size()) {
     return false;
   }
-  for (size_t aux_end = start_pos + 2; aux_end < end_pos; ++aux_end) {
-    const auto* entry =
-        lookupEntryInRange(*dict_manager, codepoints, start_pos, aux_end, core::PartOfSpeech::Auxiliary);
-    // An empty lemma is the dictionary's shorthand for "same as the surface",
-    // so it marks a base form exactly as an equal lemma does.
-    if (entry != nullptr && !entry->lemma.empty() && entry->lemma != entry->surface) {
-      return true;
-    }
-  }
-  return false;
+  // An empty lemma is the dictionary's shorthand for "same as the surface",
+  // so it marks a base form exactly as an equal lemma does.
+  return hasDictionaryEntryFrom(
+      dict_manager, codepoints, start_pos, 2, end_pos - start_pos - 1, core::PartOfSpeech::Auxiliary,
+      [](const dictionary::DictionaryEntry& entry) { return !entry.lemma.empty() && entry.lemma != entry.surface; });
 }
 
 bool formalNounFollowsAt(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,

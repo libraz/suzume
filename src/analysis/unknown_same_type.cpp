@@ -1523,33 +1523,15 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
     // @p pos, or 0. A suffix is bound leftward to a nominal host.
     auto suffix_length_at = [&](size_t pos) -> size_t {
       constexpr size_t kSuffixProbe = 3;
-      size_t longest = 0;
-      if (dict_manager_ == nullptr || pos >= codepoints.size()) {
-        return longest;
-      }
-      const size_t probe_end = std::min(codepoints.size(), pos + kSuffixProbe);
-      for (const auto& match : lookupResultsInRange(*dict_manager_, codepoints, pos, probe_end)) {
-        if (match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Suffix && match.length >= 2) {
-          longest = std::max(longest, match.length);
-        }
-      }
-      return longest;
+      return longestDictionaryEntryLengthFrom(dict_manager_, codepoints, pos, 2, kSuffixProbe,
+                                              core::PartOfSpeech::Suffix, nullptr);
     };
     // Length of the longest registered pronoun of two or more kana that opens
     // at @p pos, or 0. A pronoun stands on its own and never closes a noun.
     auto pronoun_length_at = [&](size_t pos) -> size_t {
       constexpr size_t kPronounProbe = 4;
-      size_t longest = 0;
-      if (dict_manager_ == nullptr || pos >= codepoints.size()) {
-        return longest;
-      }
-      const size_t probe_end = std::min(codepoints.size(), pos + kPronounProbe);
-      for (const auto& match : lookupResultsInRange(*dict_manager_, codepoints, pos, probe_end)) {
-        if (match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Pronoun && match.length >= 2) {
-          longest = std::max(longest, match.length);
-        }
-      }
-      return longest;
+      return longestDictionaryEntryLengthFrom(dict_manager_, codepoints, pos, 2, kPronounProbe,
+                                              core::PartOfSpeech::Pronoun, nullptr);
     };
     // Whether the connective て/で at @p pos closes a te-form: the analyzer reads
     // the host in front of it plus that mora as one (嬉しく+て, 言っ+て, 読ん+で).

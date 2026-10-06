@@ -33,6 +33,7 @@ using verb_helpers::isEmphaticChar;
 using verb_helpers::isVerbInDictionary;
 
 using adj_detail::makeIAdjCandidate;
+using adj_detail::makeIAdjCellCandidate;
 using adj_detail::makeIAdjStemCandidate;
 using adj_detail::makeNaAdjCandidate;
 
@@ -1129,15 +1130,11 @@ void appendHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints, 
     if (!isAdjectiveInDictionary(dict_manager, base_form)) {
       break;
     }
-    auto exclamative = makeCandidate(codepoints, start_pos, after_sokuon, core::PartOfSpeech::Adjective,
-                                     candidate::kAdjStemDictionaryCost, true, CandidateOrigin::AdjectiveIHiragana,
-                                     core::ExtendedPOS::AdjBasic);
-    exclamative.lemma = base_form;
+    auto exclamative = makeIAdjCellCandidate(
+        extractSubstring(codepoints, start_pos, after_sokuon), start_pos, after_sokuon, base_form,
+        core::ExtendedPOS::AdjBasic, candidate::kAdjStemDictionaryCost, CandidateOrigin::AdjectiveIHiragana,
+        candidate::kDictionaryOriginConfidence, "adj_stem_hira_exclamative_sokuon");
     exclamative.lemma_verified = true;
-#ifdef SUZUME_DEBUG_INFO
-    exclamative.confidence = candidate::kDictionaryOriginConfidence;
-    exclamative.pattern = "adj_stem_hira_exclamative_sokuon";
-#endif
     candidates.push_back(std::move(exclamative));
     break;
   }
@@ -1149,15 +1146,11 @@ void appendHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints, 
       codepoints[max_hiragana_end - 1] != core::hiragana::kSmallTsu) {
     const std::string base_form = extractSubstring(codepoints, start_pos, max_hiragana_end) + "い";
     if (isAdjectiveInDictionary(dict_manager, base_form)) {
-      auto exclamative = makeCandidate(codepoints, start_pos, max_hiragana_end, core::PartOfSpeech::Adjective,
-                                       candidate::kAdjStemDictionaryCost, true, CandidateOrigin::AdjectiveIHiragana,
-                                       core::ExtendedPOS::AdjBasic);
-      exclamative.lemma = base_form;
+      auto exclamative = makeIAdjCellCandidate(
+          extractSubstring(codepoints, start_pos, max_hiragana_end), start_pos, max_hiragana_end, base_form,
+          core::ExtendedPOS::AdjBasic, candidate::kAdjStemDictionaryCost, CandidateOrigin::AdjectiveIHiragana,
+          candidate::kDictionaryOriginConfidence, "adj_stem_hira_exclamative_bare");
       exclamative.lemma_verified = true;
-#ifdef SUZUME_DEBUG_INFO
-      exclamative.confidence = candidate::kDictionaryOriginConfidence;
-      exclamative.pattern = "adj_stem_hira_exclamative_bare";
-#endif
       candidates.push_back(std::move(exclamative));
     }
   }

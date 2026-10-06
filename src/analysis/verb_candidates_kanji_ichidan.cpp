@@ -31,32 +31,17 @@ namespace vh = verb_helpers;
 
 bool renyokeiAdjectiveFollowsAt(const dictionary::DictionaryManager* dict_manager,
                                 const std::vector<char32_t>& codepoints, size_t pos) {
-  if (dict_manager == nullptr) {
-    return false;
-  }
-  for (size_t adjective_end = pos + 2; adjective_end <= std::min(codepoints.size(), pos + 4); ++adjective_end) {
-    const auto* adjective =
-        lookupEntryInRange(*dict_manager, codepoints, pos, adjective_end, core::PartOfSpeech::Adjective);
-    if (adjective != nullptr && grammar::attachesToVerbRenyokei(adjective->lemma)) {
-      return true;
-    }
-  }
-  return false;
+  return hasDictionaryEntryFrom(
+      dict_manager, codepoints, pos, 2, 4, core::PartOfSpeech::Adjective,
+      [](const dictionary::DictionaryEntry& entry) { return grammar::attachesToVerbRenyokei(entry.lemma); });
 }
 
 bool pejorativeAuxiliaryFollowsAt(const dictionary::DictionaryManager* dict_manager,
                                   const std::vector<char32_t>& codepoints, size_t pos) {
-  if (dict_manager == nullptr) {
-    return false;
-  }
-  for (size_t auxiliary_end = pos + 2; auxiliary_end <= std::min(codepoints.size(), pos + 4); ++auxiliary_end) {
-    const auto* auxiliary =
-        lookupEntryInRange(*dict_manager, codepoints, pos, auxiliary_end, core::PartOfSpeech::Auxiliary);
-    if (auxiliary != nullptr && auxiliary->extended_pos == core::ExtendedPOS::AuxPejorativeYagaru) {
-      return true;
-    }
-  }
-  return false;
+  return hasDictionaryEntryFrom(dict_manager, codepoints, pos, 2, 4, core::PartOfSpeech::Auxiliary,
+                                [](const dictionary::DictionaryEntry& entry) {
+                                  return entry.extended_pos == core::ExtendedPOS::AuxPejorativeYagaru;
+                                });
 }
 
 void appendIchidanStemRareCandidates(const std::vector<char32_t>& codepoints, size_t start_pos, size_t kanji_end,

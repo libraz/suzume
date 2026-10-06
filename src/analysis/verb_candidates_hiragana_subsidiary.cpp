@@ -3,6 +3,9 @@
  * @brief Context-gated hiragana subsidiary-verb candidates
  */
 
+#include <algorithm>
+#include <cstddef>
+#include <string_view>
 #include <utility>
 
 #include "analysis/bigram_table.h"
@@ -76,11 +79,14 @@ bool grammaticalStemFollowerStartsAt(const std::vector<char32_t>& codepoints, si
 // stem is allowed only before a grammatical follower, while its finite,
 // conditional, imperative, and volitional forms retain the whole surface.
 // Keeping this in the subsidiary owner centralizes the shared te-form grammar.
-void appendContextualIchidanSubsidiaryForms(const std::vector<char32_t>& codepoints, size_t start_pos, size_t stem_end,
-                                            std::string_view lemma, const char* pattern,
+void appendContextualIchidanSubsidiaryForms(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                            std::u32string_view stem, std::string_view lemma, const char* pattern,
                                             const dictionary::DictionaryManager* dict_manager,
                                             std::vector<UnknownCandidate>& candidates) {
-  if (stem_end >= codepoints.size()) {
+  const size_t stem_end = start_pos + stem.size();
+  if (stem_end >= codepoints.size() ||
+      !std::equal(stem.begin(), stem.end(), codepoints.begin() + static_cast<std::ptrdiff_t>(start_pos)) ||
+      !isClearTeFormBeforeSubsidiary(codepoints, start_pos, true)) {
     return;
   }
 
@@ -193,13 +199,8 @@ void appendYaruBenefactiveCandidates(const std::vector<char32_t>& codepoints, si
 void appendMiruAuxiliaryCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                    const dictionary::DictionaryManager* dict_manager,
                                    std::vector<UnknownCandidate>& candidates) {
-  if (start_pos >= codepoints.size() || codepoints[start_pos] != U'み' ||
-      !isClearTeFormBeforeSubsidiary(codepoints, start_pos, true)) {
-    return;
-  }
-
-  appendContextualIchidanSubsidiaryForms(codepoints, start_pos, start_pos + 1, "みる", "hiragana_miru_auxiliary",
-                                         dict_manager, candidates);
+  appendContextualIchidanSubsidiaryForms(codepoints, start_pos, U"み", "みる", "hiragana_miru_auxiliary", dict_manager,
+                                         candidates);
 }
 
 // 見せる is a closed subsidiary verb after a te-form (読んでみせる). Its
@@ -208,11 +209,7 @@ void appendMiruAuxiliaryCandidates(const std::vector<char32_t>& codepoints, size
 void appendMiseruAuxiliaryCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                      const dictionary::DictionaryManager* dict_manager,
                                      std::vector<UnknownCandidate>& candidates) {
-  if (start_pos + 1 >= codepoints.size() || codepoints[start_pos] != U'み' || codepoints[start_pos + 1] != U'せ' ||
-      !isClearTeFormBeforeSubsidiary(codepoints, start_pos, true)) {
-    return;
-  }
-  appendContextualIchidanSubsidiaryForms(codepoints, start_pos, start_pos + 2, "みせる", "hiragana_miseru_auxiliary",
+  appendContextualIchidanSubsidiaryForms(codepoints, start_pos, U"みせ", "みせる", "hiragana_miseru_auxiliary",
                                          dict_manager, candidates);
 }
 
