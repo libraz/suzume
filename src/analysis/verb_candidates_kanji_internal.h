@@ -18,6 +18,11 @@ float mixedGodanKaStemThreshold(const grammar::InflectionCandidate& candidate, c
 bool renyokeiAdjectiveFollowsAt(const dictionary::DictionaryManager* dict_manager,
                                 const std::vector<char32_t>& codepoints, size_t pos);
 
+// Whether the pejorative auxiliary やがる starts at @p pos. It sits on a bare
+// continuative (見+やがって) and opens with the particle や.
+bool pejorativeAuxiliaryFollowsAt(const dictionary::DictionaryManager* dict_manager,
+                                  const std::vector<char32_t>& codepoints, size_t pos);
+
 bool isMultiKanjiGodanWaRenyokei(const grammar::InflectionCandidate& candidate, std::string_view surface,
                                  const std::vector<char32_t>& codepoints, size_t end_pos);
 

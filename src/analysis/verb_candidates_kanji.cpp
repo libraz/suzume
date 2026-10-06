@@ -424,9 +424,12 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
       codepoints, start_pos, kanji_end, hiragana_end, inflection, dict_manager, verb_opts);
   // A one-kanji ichidan stem takes an adjective that attaches to the
   // continuative directly (見+にくい), whose opening mora also spells に.
+  // The pejorative やがる sits on the same bare stem and opens with the same
+  // particle-like mora (見+やがって).
   const bool has_renyokei_adjective_after_stem = kanji_end == start_pos + 1 &&
                                                  vh::isSingleKanjiIchidan(codepoints[start_pos]) &&
-                                                 renyokeiAdjectiveFollowsAt(dict_manager, codepoints, kanji_end);
+                                                 (renyokeiAdjectiveFollowsAt(dict_manager, codepoints, kanji_end) ||
+                                                  pejorativeAuxiliaryFollowsAt(dict_manager, codepoints, kanji_end));
 
   // Historical-kana spelling of the wa-row Godan paradigm (思ふ, 思ひけり,
   // 思へど).  Its row kana は/へ are also the topic and direction particles, so

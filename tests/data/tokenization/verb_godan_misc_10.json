@@ -85,6 +85,70 @@
       ],
       "id": "kunayo_2",
       "input": "驚くなよ"
+    },
+    {
+      "description": "いつまで寝やがって - auto-generated",
+      "expected": [
+        {
+          "lemma": "いつ",
+          "pos": "Pronoun",
+          "surface": "いつ"
+        },
+        {
+          "lemma": "まで",
+          "pos": "Particle",
+          "surface": "まで"
+        },
+        {
+          "lemma": "寝る",
+          "pos": "Verb",
+          "surface": "寝"
+        },
+        {
+          "lemma": "やがる",
+          "pos": "Auxiliary",
+          "surface": "やがっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "itsumade_yagattte",
+      "input": "いつまで寝やがって"
+    },
+    {
+      "description": "いつまで着やがって - auto-generated",
+      "expected": [
+        {
+          "lemma": "いつ",
+          "pos": "Pronoun",
+          "surface": "いつ"
+        },
+        {
+          "lemma": "まで",
+          "pos": "Particle",
+          "surface": "まで"
+        },
+        {
+          "lemma": "着る",
+          "pos": "Verb",
+          "surface": "着"
+        },
+        {
+          "lemma": "やがる",
+          "pos": "Auxiliary",
+          "surface": "やがっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "itsumade_yagattte_2",
+      "input": "いつまで着やがって"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",

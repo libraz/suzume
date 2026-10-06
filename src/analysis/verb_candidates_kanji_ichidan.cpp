@@ -44,6 +44,21 @@ bool renyokeiAdjectiveFollowsAt(const dictionary::DictionaryManager* dict_manage
   return false;
 }
 
+bool pejorativeAuxiliaryFollowsAt(const dictionary::DictionaryManager* dict_manager,
+                                  const std::vector<char32_t>& codepoints, size_t pos) {
+  if (dict_manager == nullptr) {
+    return false;
+  }
+  for (size_t auxiliary_end = pos + 2; auxiliary_end <= std::min(codepoints.size(), pos + 4); ++auxiliary_end) {
+    const auto* auxiliary =
+        lookupEntryInRange(*dict_manager, codepoints, pos, auxiliary_end, core::PartOfSpeech::Auxiliary);
+    if (auxiliary != nullptr && auxiliary->extended_pos == core::ExtendedPOS::AuxPejorativeYagaru) {
+      return true;
+    }
+  }
+  return false;
+}
+
 void appendIchidanStemRareCandidates(const std::vector<char32_t>& codepoints, size_t start_pos, size_t kanji_end,
                                      size_t hiragana_end, const grammar::Inflection& inflection,
                                      const dictionary::DictionaryManager* dict_manager,
@@ -309,8 +324,11 @@ void appendSingleKanjiIchidanCandidates(const std::vector<char32_t>& codepoints,
           is_classical_past_aux = true;
         }
         // The honorific subsidiaries sit on the same continuative (寝+なさい,
-        // 見+たまえ); their one-mora classical pieces (ま, ふ) do not open here.
-        if (auxiliary != nullptr && auxiliary->extended_pos == core::ExtendedPOS::AuxHonorific &&
+        // 見+たまえ), and so does the pejorative やがる (見+やがって); their
+        // one-mora classical pieces (ま, ふ) do not open here.
+        if (auxiliary != nullptr &&
+            (auxiliary->extended_pos == core::ExtendedPOS::AuxHonorific ||
+             auxiliary->extended_pos == core::ExtendedPOS::AuxPejorativeYagaru) &&
             particle_end - kanji_end >= 2) {
           is_honorific_aux = true;
         }
