@@ -1050,9 +1050,9 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
         continue;
       }
       // The polite ます after a registered continuative is that verb and its
-      // auxiliary (し+ます), not the terminal of a coined godan-sa verb.
-      if (is_godan_dictionary_form && !vh::isVerbInDictionary(dict_manager, best.base_form) &&
-          vh::spellsContinuativeBeforePolite(dict_manager, codepoints, start_pos, end_pos)) {
+      // auxiliary (し+ます, あり+ます), never one span — neither the terminal of
+      // a coined godan-sa verb nor the attested verb with ます folded in.
+      if (vh::spellsContinuativeBeforePolite(dict_manager, codepoints, start_pos, end_pos)) {
         SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << surface << "\" godan_form_over_polite\n");
         continue;
       }
