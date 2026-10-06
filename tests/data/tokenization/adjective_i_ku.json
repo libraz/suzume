@@ -1615,6 +1615,38 @@
       ],
       "id": "ku_nasai_2",
       "input": "早く寝なさい"
+    },
+    {
+      "description": "平らな道を歩く - auto-generated",
+      "expected": [
+        {
+          "lemma": "平ら",
+          "pos": "Adjective",
+          "surface": "平ら"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "道",
+          "pos": "Noun",
+          "surface": "道"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "歩く",
+          "pos": "Verb",
+          "surface": "歩く"
+        }
+      ],
+      "id": "rana_wo_ku",
+      "input": "平らな道を歩く"
     }
   ],
   "description": "I-adjectives ku-forms (連用形) - adverbial, negative, te-form, ku-naru patterns",

@@ -295,11 +295,17 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
         bool contains_closed_suffix = false;
         bool starts_closed_tail = false;
         if (dict_manager != nullptr) {
+          // The plural suffix ら pluralizes a pronoun or a person noun, so
+          // after any other host it is the stem's own ending (平ら+な).
+          const bool plural_host = lookupEntryInRange(*dict_manager, codepoints, start_pos, kanji_end,
+                                                      core::PartOfSpeech::Pronoun) != nullptr;
           for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, kanji_end, stem_end)) {
             if (match.entry != nullptr &&
                 (match.entry->pos == core::PartOfSpeech::Auxiliary || match.entry->pos == core::PartOfSpeech::Suffix ||
                  match.entry->pos == core::PartOfSpeech::Particle)) {
-              contains_closed_suffix = contains_closed_suffix || match.length == stem_end - kanji_end;
+              const bool plural_ra = !plural_host && match.entry->pos == core::PartOfSpeech::Suffix &&
+                                     grammar::isSingleHiragana(match.entry->surface, U'ら');
+              contains_closed_suffix = contains_closed_suffix || (match.length == stem_end - kanji_end && !plural_ra);
               starts_closed_tail = starts_closed_tail || match.entry->extended_pos == core::ExtendedPOS::AuxCopulaDa ||
                                    match.entry->extended_pos == core::ExtendedPOS::AuxCopulaDesu;
             }

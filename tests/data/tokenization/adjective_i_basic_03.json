@@ -2000,6 +2000,23 @@
       ],
       "id": "nagena_ri",
       "input": "危なげな足取り"
+    },
+    {
+      "description": "平らな - auto-generated",
+      "expected": [
+        {
+          "lemma": "平ら",
+          "pos": "Adjective",
+          "surface": "平ら"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        }
+      ],
+      "id": "rana",
+      "input": "平らな"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 3/3)",
