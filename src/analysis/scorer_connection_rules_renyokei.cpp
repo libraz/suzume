@@ -273,17 +273,21 @@ float computeVerbRenyokeiEarlyBonus(const core::LatticeEdge& prev, const core::L
   if (next.extended_pos == core::ExtendedPOS::ParticleConj && utf8::equalsAny(next.surface, {"なら"})) {
     if (prev.extended_pos == core::ExtendedPOS::AdjNaAdj) {
       SUZUME_CONNECTION_ADD(bonus, cost::kStrongBonus);
-    } else if (prev.extended_pos == core::ExtendedPOS::Noun || prev.extended_pos == core::ExtendedPOS::Suffix) {
+    } else if (prev.pos == core::PartOfSpeech::Noun || prev.extended_pos == core::ExtendedPOS::Suffix) {
       // A nominal suffix takes the same conditional copula as its host
       // (作業中+なら). Cancel the generic suffix→conjunctive penalty.
       SUZUME_CONNECTION_ADD(
-          bonus, prev.extended_pos == core::ExtendedPOS::Suffix ? cost::kDoubleVeryStrongBonus : cost::kModerateBonus);
+          bonus, prev.extended_pos == core::ExtendedPOS::Suffix ? cost::kDoubleVeryStrongBonus : cost::kStrongBonus);
     } else if (prev.extended_pos == core::ExtendedPOS::Adverb ||
                prev.extended_pos == core::ExtendedPOS::AdverbQuotative ||
-               prev.extended_pos == core::ExtendedPOS::AdverbInterrogative) {
+               prev.extended_pos == core::ExtendedPOS::AdverbInterrogative ||
+               prev.extended_pos == core::ExtendedPOS::VerbRenyokei) {
       // Demonstrative adverb + conditional (そう+なら) is a productive
-      // conditional construction, not the mizenkei of なる.
-      SUZUME_CONNECTION_ADD(bonus, cost::kStrongBonus);
+      // conditional construction, not the mizenkei of なる. A continuative takes
+      // no conditional at all (手伝い+なら is the noun), so it loses the class
+      // bonus that serves the te-form and ながら.
+      SUZUME_CONNECTION_ADD(bonus,
+                            cost::kStrongBonus * (prev.extended_pos == core::ExtendedPOS::VerbRenyokei ? -1 : 1));
     }
   }
 

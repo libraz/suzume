@@ -518,6 +518,92 @@
       ],
       "id": "yaisuwo_u",
       "input": "机やいすを買う"
+    },
+    {
+      "description": "手伝いなら任せて - auto-generated",
+      "expected": [
+        {
+          "lemma": "手伝い",
+          "pos": "Noun",
+          "surface": "手伝い"
+        },
+        {
+          "lemma": "なら",
+          "pos": "Particle",
+          "surface": "なら"
+        },
+        {
+          "lemma": "任せる",
+          "pos": "Verb",
+          "surface": "任せ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "inara_sete",
+      "input": "手伝いなら任せて"
+    },
+    {
+      "description": "草刈りなら慣れている - auto-generated",
+      "expected": [
+        {
+          "lemma": "草刈り",
+          "pos": "Noun",
+          "surface": "草刈り"
+        },
+        {
+          "lemma": "なら",
+          "pos": "Particle",
+          "surface": "なら"
+        },
+        {
+          "lemma": "慣れる",
+          "pos": "Verb",
+          "surface": "慣れ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "rinara_reteiru",
+      "input": "草刈りなら慣れている"
+    },
+    {
+      "description": "走りなら負けない - auto-generated",
+      "expected": [
+        {
+          "lemma": "走り",
+          "pos": "Noun",
+          "surface": "走り"
+        },
+        {
+          "lemma": "なら",
+          "pos": "Particle",
+          "surface": "なら"
+        },
+        {
+          "lemma": "負ける",
+          "pos": "Verb",
+          "surface": "負け"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "rinara_kenai",
+      "input": "走りなら負けない"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",

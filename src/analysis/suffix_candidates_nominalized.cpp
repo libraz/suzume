@@ -51,6 +51,13 @@ bool selectsNominalHostByListedParticle(const std::vector<char32_t>& codepoints,
          !startsLongerNonParticleEntry(codepoints, end_pos, dict_manager);
 }
 
+// The conditional なら takes a noun, never a continuative, so a continuative-shaped
+// run in front of it is the nominalization (手伝い+なら). It has no first mora of
+// its own that counts as a particle, which is why the test above cannot see it.
+bool opensNominalConditionalNara(const std::vector<char32_t>& codepoints, size_t end_pos) {
+  return end_pos + 1 < codepoints.size() && codepoints[end_pos] == U'な' && codepoints[end_pos + 1] == U'ら';
+}
+
 bool hasInferredVerbContinuative(const grammar::Inflection& inflection, std::string_view surface) {
   const auto& analyses = inflection.analyze(surface);
   return std::any_of(analyses.begin(), analyses.end(), [](const auto& analysis) {
@@ -535,7 +542,8 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
     // A following particle makes the renyokei a nominalized search unit:
     // 答えは, 始まりは, 決まりを.  Prefer that productive noun reading over
     // a finite-verb candidate whose continuation is grammatically absent.
-    const bool has_particle_continuation = opensStandaloneParticleCharAt(codepoints, kanji_end + 1, dict_manager);
+    const bool has_particle_continuation = opensStandaloneParticleCharAt(codepoints, kanji_end + 1, dict_manager) ||
+                                           opensNominalConditionalNara(codepoints, kanji_end + 1);
     const bool has_final_particle_continuation =
         first_hiragana == U'み' &&
         hasClauseFinalParticleContinuation(codepoints, char_types, kanji_end + 1, dict_manager);
