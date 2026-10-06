@@ -187,6 +187,10 @@ bool isQuotativeSuruTeCompoundParticle(std::string_view surface) {
   return surface == "として";
 }
 
+bool isAttributiveCompoundParticleSurface(std::string_view surface) {
+  return normalize::utf8Length(surface) >= 3 && utf8::endsWith(surface, "る");
+}
+
 bool isSuruRenyokeiSurface(std::string_view surface) {
   return surface == "し";
 }

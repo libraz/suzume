@@ -1779,6 +1779,7 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
             const size_t other_end = start_pos + other.length;
             return other.entry != nullptr && other.entry->pos == core::PartOfSpeech::Particle &&
                    other.entry->extended_pos == result.entry->extended_pos && other.length > result.length &&
+                   !grammar::isAttributiveCompoundParticleSurface(other.entry->surface) &&
                    !(other.entry->extended_pos == core::ExtendedPOS::ParticleCase && other.length > 1 &&
                      starts_aspectual_iru(other_end));
           });

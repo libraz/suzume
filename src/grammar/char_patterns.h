@@ -105,6 +105,13 @@ bool isPureHiragana(std::string_view stem);
 bool isQuotativeSuruTeCompoundParticle(std::string_view surface);
 
 /**
+ * @brief Whether a compound case particle is in its attributive る cell
+ * @param surface Dictionary particle surface (による, に関する, に対する)
+ * @return True when the surface is three or more codepoints and ends in る
+ */
+bool isAttributiveCompoundParticleSurface(std::string_view surface);
+
+/**
  * @brief Whether a surface is the renyokei form of the irregular verb する
  * @param surface Candidate surface
  * @return True for し

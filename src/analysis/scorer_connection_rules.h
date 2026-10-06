@@ -45,6 +45,12 @@ float computePrefixSymbolBonus(const core::LatticeEdge& prev, const core::Lattic
 /** @brief Waives the particle→polite-auxiliary bar for a continuative-based compound particle. */
 float computeCompoundParticlePoliteBonus(const core::LatticeEdge& prev, const core::LatticeEdge& next);
 
+/** @brief Whether an edge is a compound case particle in its attributive る cell (による, に関する). */
+bool isAttributiveCompoundParticle(const core::LatticeEdge& edge);
+
+/** @brief Bars an attributive compound particle from closing its modifier (before a particle, symbol or auxiliary). */
+float computeAttributiveCompoundParticlePenalty(const core::LatticeEdge& prev, const core::LatticeEdge& next);
+
 /** @brief Bars a multi-mora conjunctive particle ending in で from governing the copular ある. */
 float computeConjunctiveParticleCopulaPenalty(const core::LatticeEdge& prev, const core::LatticeEdge& next);
 

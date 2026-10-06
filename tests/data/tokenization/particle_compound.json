@@ -871,6 +871,159 @@
       ],
       "id": "nitsuite_before_quotative_to",
       "input": "紙についてと言った"
+    },
+    {
+      "description": "医療機関の統合による影響。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "医療機関",
+          "pos": "Noun",
+          "surface": "医療機関"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "統合",
+          "pos": "Noun",
+          "surface": "統合"
+        },
+        {
+          "lemma": "による",
+          "pos": "Particle",
+          "surface": "による"
+        },
+        {
+          "lemma": "影響",
+          "pos": "Noun",
+          "surface": "影響"
+        }
+      ],
+      "id": "no_niyoru",
+      "input": "医療機関の統合による影響。"
+    },
+    {
+      "description": "事故による渋滞が起きた。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "事故",
+          "pos": "Noun",
+          "surface": "事故"
+        },
+        {
+          "lemma": "による",
+          "pos": "Particle",
+          "surface": "による"
+        },
+        {
+          "lemma": "渋滞",
+          "pos": "Noun",
+          "surface": "渋滞"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "起きる",
+          "pos": "Verb",
+          "surface": "起き"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "niyoru_ga_kita",
+      "input": "事故による渋滞が起きた。"
+    },
+    {
+      "description": "関係者によると、調査は続いている。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "関係者",
+          "pos": "Noun",
+          "surface": "関係者"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "よる",
+          "pos": "Verb",
+          "surface": "よる"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "調査",
+          "pos": "Noun",
+          "surface": "調査"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "続く",
+          "pos": "Verb",
+          "surface": "続い"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "niyoruto_ha_iteiru",
+      "input": "関係者によると、調査は続いている。"
+    },
+    {
+      "description": "それは場合による。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "それ",
+          "pos": "Pronoun",
+          "surface": "それ"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "場合",
+          "pos": "Noun",
+          "surface": "場合"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "よる",
+          "pos": "Verb",
+          "surface": "よる"
+        }
+      ],
+      "id": "soreha_niyoru",
+      "input": "それは場合による。"
     }
   ],
   "description": "particle_compound tests",

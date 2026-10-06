@@ -1,4 +1,5 @@
 #include "analysis/scorer.h"
+#include "analysis/scorer_connection_rules.h"
 #include "analysis/scorer_constants.h"
 #include "core/types.h"
 #include "grammar/char_patterns.h"
@@ -41,6 +42,12 @@ float Scorer::eosCost(const core::LatticeEdge& edge, core::ExtendedPOS prev_exte
       (utf8::endsWith(edge.surface, "て") || utf8::endsWith(edge.surface, "で")) &&
       prev_extended_pos != core::ExtendedPOS::Unknown && prev_extended_pos != core::ExtendedPOS::Symbol) {
     return sc::kEosTeEndingAdverbPenalty;
+  }
+
+  // An attributive compound particle needs the noun it modifies; closing the
+  // utterance on it means the case particle plus the predicate (場合+に+よる).
+  if (connection_rules::isAttributiveCompoundParticle(edge)) {
+    return sc::kPenaltyAttributiveCompoundParticleClose;
   }
 
   const sc::BoundaryCost boundary_cost = sc::getBoundaryCost(edge.extended_pos);

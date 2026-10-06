@@ -293,6 +293,22 @@ float computeCompoundParticlePoliteBonus(const core::LatticeEdge& prev, const co
   return -cost::kSevere;
 }
 
+// A compound case particle in its attributive る cell (による, に関する, に対する,
+// における) modifies a following noun. Closing the modifier on a particle,
+// symbol or auxiliary means the case particle plus the predicate, which keeps
+// its own boundaries (によると = に+よる+と).
+bool isAttributiveCompoundParticle(const core::LatticeEdge& edge) {
+  return edge.extended_pos == core::ExtendedPOS::ParticleCase && edge.fromDictionary() &&
+         grammar::isAttributiveCompoundParticleSurface(edge.surface);
+}
+
+float computeAttributiveCompoundParticlePenalty(const core::LatticeEdge& prev, const core::LatticeEdge& next) {
+  const bool closes_modifier = next.pos == core::PartOfSpeech::Particle || next.pos == core::PartOfSpeech::Symbol ||
+                               next.pos == core::PartOfSpeech::Auxiliary || next.pos == core::PartOfSpeech::Other;
+  return isAttributiveCompoundParticle(prev) && closes_modifier ? sc::kPenaltyAttributiveCompoundParticleClose
+                                                                : sc::scale::kNeutral;
+}
+
 // The copula である is the auxiliary で plus ある, so a conjunctive particle that
 // merely ends in で cannot govern ある: its で would have to be the particle's
 // own tail and the copula at once. The reading that fits is the formal noun

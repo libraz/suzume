@@ -467,6 +467,9 @@ constexpr float kEosSokuonOnbinPenalty = scale::kAlmostNever;
 // A registered adverb ending in the connective て/で is a clause opener
 // (続いて, 改めて); closing the utterance on one means the verb's te-form.
 constexpr float kEosTeEndingAdverbPenalty = scale::kNever;
+// An attributive compound particle (による) closing its modifier at a particle,
+// symbol, auxiliary or the end of the utterance has no noun to modify.
+constexpr float kPenaltyAttributiveCompoundParticleClose = scale::kProhibitive;
 // A one-mora adjective stem closing the utterance (行くって+な read as ない).
 constexpr float kEosShortAdjStemPenalty = scale::kAlmostNever;
 // An irrealis form is the bare stem of an auxiliary chain, so it can never be

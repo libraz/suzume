@@ -22,10 +22,8 @@ EntrySpecRange getCompoundParticleEntries() {
       particle("に従って", EPOS::ParticleCase),  // formal compliance/sequence marker
       particle("に従い", EPOS::ParticleCase),
       particle("にかけて", EPOS::ParticleCase),  // beat にか(noun)+けて(verb) split
-      // Note: による removed - grammatically に+よる (格助詞+動詞連体形)
-      // Note: によると removed - MeCab splits as に+よる+と (引用表現)
-      // Note: によれば removed - grammatically に+よれ+ば
-      // These compound particles are better split for grammatical accuracy
+      particle("による", EPOS::ParticleCase),    // adnominal form, same tier as に関する/に対する
+      // によると/によれば stay split: に + よる + と/ば crosses the quotative と / conditional ば.
 
       // Place/Situation (場所・状況)
       particle("において", EPOS::ParticleCase),  // prevent に+おい(verb)+て split
