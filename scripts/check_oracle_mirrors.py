@@ -9,8 +9,8 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
-CONSTANTS = ROOT / "scripts/mcp/src/suzume_mcp/core/constants.py"
-MERGE_RULES = ROOT / "scripts/mcp/src/suzume_mcp/core/merge_rules.py"
+CONSTANTS_TEXT = ROOT / "scripts/mcp/src/suzume_mcp/core/constants_text.py"
+MERGE_RULES_QUANTITIES = ROOT / "scripts/mcp/src/suzume_mcp/core/merge_rules_quantities.py"
 SUBSIDIARIES = ROOT / "scripts/mcp/src/suzume_mcp/core/postprocessor_subsidiaries.py"
 KANA_CONSTANTS = ROOT / "src/core/kana_constants.h"
 CHAR_TYPE = ROOT / "src/normalize/char_type.cpp"
@@ -79,12 +79,12 @@ def main() -> int:
         (
             "KANJI_RANGES",
             core_kanji_ranges(),
-            tuple(assignment_value(CONSTANTS, "KANJI_RANGES")),
+            tuple(assignment_value(CONSTANTS_TEXT, "KANJI_RANGES")),
         ),
         (
             "_APPROX_NUMERIC_PREFIXES",
             core_numeric_prefixes(),
-            set(assignment_value(MERGE_RULES, "_APPROX_NUMERIC_PREFIXES")),
+            set(assignment_value(MERGE_RULES_QUANTITIES, "_APPROX_NUMERIC_PREFIXES")),
         ),
         (
             "postprocess_closed_subsidiary_aux",
