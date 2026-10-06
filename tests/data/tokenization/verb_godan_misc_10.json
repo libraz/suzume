@@ -1285,6 +1285,100 @@
       ],
       "id": "toshite_ku",
       "input": "先生として働く"
+    },
+    {
+      "description": "地面を平らになるまでならす - auto-generated",
+      "expected": [
+        {
+          "lemma": "地面",
+          "pos": "Noun",
+          "surface": "地面"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "平ら",
+          "pos": "Adjective",
+          "surface": "平ら"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なる"
+        },
+        {
+          "lemma": "まで",
+          "pos": "Particle",
+          "surface": "まで"
+        },
+        {
+          "lemma": "ならす",
+          "pos": "Verb",
+          "surface": "ならす"
+        }
+      ],
+      "id": "wo_raninarumadenarasu",
+      "input": "地面を平らになるまでならす"
+    },
+    {
+      "description": "雨が降るまでならすのは大変だ - auto-generated",
+      "expected": [
+        {
+          "lemma": "雨",
+          "pos": "Noun",
+          "surface": "雨"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "降る",
+          "pos": "Verb",
+          "surface": "降る"
+        },
+        {
+          "lemma": "まで",
+          "pos": "Particle",
+          "surface": "まで"
+        },
+        {
+          "lemma": "ならす",
+          "pos": "Verb",
+          "surface": "ならす"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "大変",
+          "pos": "Adjective",
+          "surface": "大変"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "ga_rumadenarasunoha_da",
+      "input": "雨が降るまでならすのは大変だ"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",

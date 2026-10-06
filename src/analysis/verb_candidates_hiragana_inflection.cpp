@@ -306,8 +306,20 @@ namespace hiragana_verb_detail {
 
 bool followsKanjiOrNominalHostBeforeCaseParticle(const std::vector<char32_t>& codepoints, size_t start_pos,
                                                  const dictionary::DictionaryManager* dict_manager) {
-  if (dict_manager == nullptr || start_pos < 2 ||
-      !vh::oneMoraParticleEndsAt(dict_manager, codepoints, start_pos, core::ExtendedPOS::ParticleCase)) {
+  if (dict_manager == nullptr || start_pos < 2) {
+    return false;
+  }
+  // A two-mora limiting particle closes its clause the same way (降るまで+ならす):
+  // the predicate that follows starts a fresh slot whatever the host was.
+  constexpr size_t kLimitingParticleMorae = 2;
+  const auto* limiting = start_pos > kLimitingParticleMorae
+                             ? lookupEntryInRange(*dict_manager, codepoints, start_pos - kLimitingParticleMorae,
+                                                  start_pos, core::PartOfSpeech::Particle)
+                             : nullptr;
+  if (limiting != nullptr && limiting->extended_pos == core::ExtendedPOS::ParticleAdverbial) {
+    return true;
+  }
+  if (!vh::oneMoraParticleEndsAt(dict_manager, codepoints, start_pos, core::ExtendedPOS::ParticleCase)) {
     return false;
   }
   const size_t particle_start = start_pos - 1;

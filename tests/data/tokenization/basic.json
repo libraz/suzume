@@ -1329,6 +1329,33 @@
       ],
       "id": "oyasumi",
       "input": "おやすみー"
+    },
+    {
+      "description": "ここまでならいい - auto-generated",
+      "expected": [
+        {
+          "lemma": "ここ",
+          "pos": "Pronoun",
+          "surface": "ここ"
+        },
+        {
+          "lemma": "まで",
+          "pos": "Particle",
+          "surface": "まで"
+        },
+        {
+          "lemma": "なら",
+          "pos": "Particle",
+          "surface": "なら"
+        },
+        {
+          "lemma": "いい",
+          "pos": "Adjective",
+          "surface": "いい"
+        }
+      ],
+      "id": "kokomadenaraii",
+      "input": "ここまでならいい"
     }
   ],
   "description": "Basic tokenization tests",
