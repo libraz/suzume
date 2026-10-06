@@ -341,6 +341,10 @@ bool isSubstantiveFormalNoun(std::string_view surface) {
   return utf8::equalsAny(surface, {"もの", "物", "こと", "事"});
 }
 
+bool selectsVerbContinuative(std::string_view surface) {
+  return utf8::equalsAny(surface, {"よう", "様", "もの", "物", "ごろ", "どき", "どころ", "仕方", "しかた"});
+}
+
 bool isIndependentNegativeAdjective(std::string_view surface) {
   return surface == "ない";
 }

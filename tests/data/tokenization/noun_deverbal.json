@@ -1101,6 +1101,28 @@
       ],
       "id": "yariga",
       "input": "水やりが"
+    },
+    {
+      "description": "夜明けゆえに - auto-generated",
+      "expected": [
+        {
+          "lemma": "夜明け",
+          "pos": "Noun",
+          "surface": "夜明け"
+        },
+        {
+          "lemma": "ゆえ",
+          "pos": "Suffix",
+          "surface": "ゆえ"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        }
+      ],
+      "id": "keyueni",
+      "input": "夜明けゆえに"
     }
   ],
   "description": "noun_deverbal tests",

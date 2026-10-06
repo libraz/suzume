@@ -803,12 +803,12 @@ float Scorer::connectionCost(const core::LatticeEdge& prev, const core::LatticeE
     SUZUME_CONNECTION_ADD(surface_bonus, sc::kPenaltyUnstackableCaseTopic);
   }
 
-  // A formal noun spelled with okurigana (付け, 当たり, 通り) is itself a verb
-  // continuative; after another continuative it is the second verb of a
-  // compound (受け付け), not the nominal the 書き+方 bonus is meant for.
+  // The renyokei to formal-noun bonus is meant for the formal nouns that take
+  // a continuative (書き+方, 読み+よう). A formal noun that selects an
+  // attributive (夜明け+ゆえ) or is itself a continuative (受け+付け) follows a
+  // deverbal noun or is the second verb of a compound instead.
   if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei && next.extended_pos == core::ExtendedPOS::NounFormal &&
-      next.fromDictionary() && !grammar::isPureHiragana(next.surface) &&
-      grammar::isPureHiragana(utf8::lastChar(next.surface))) {
+      next.fromDictionary() && !grammar::selectsVerbContinuative(next.surface)) {
     SUZUME_CONNECTION_ADD(surface_bonus, sc::kPenaltyDeverbalFormalNounAfterRenyokei);
   }
 

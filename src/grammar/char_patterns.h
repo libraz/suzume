@@ -282,6 +282,15 @@ bool isBenefactiveFormalNoun(std::string_view surface);
  */
 bool isSubstantiveFormalNoun(std::string_view surface);
 
+/**
+ * @brief Whether a formal noun attaches to a verb continuative (読み+よう,
+ * 飲み+物, 食べ+ごろ).
+ *
+ * The other formal nouns select an attributive or a particle (読む+ゆえ,
+ * 読む+ため), so a continuative before one is a deverbal noun's stem instead.
+ */
+bool selectsVerbContinuative(std::string_view surface);
+
 /** @brief Whether a surface is the independent negative adjective ない */
 bool isIndependentNegativeAdjective(std::string_view surface);
 
