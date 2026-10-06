@@ -233,13 +233,23 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
   // and require its row's actual o-row mora, so an i-adjective conjectural
   // form (高かろう) or an ordinary dictionary-form verb is not manufactured
   // into this path.
-  if (kanji_end + 1 < codepoints.size() && kana::isORowCodepoint(codepoints[kanji_end]) &&
-      codepoints[kanji_end + 1] == U'う') {
-    const size_t full_end = kanji_end + 2;
+  // The okurigana may run to more than one mora before the o-row (伸ば+そ+う,
+  // 動か+そ+う), so every o-row mora followed by う within a short kana tail is
+  // tried, and the analysis taken is one whose row actually ends on that mora.
+  constexpr size_t kMaxVolitionalOkurigana = 3;
+  for (size_t vol_pos = kanji_end; vol_pos + 1 < codepoints.size() && vol_pos < kanji_end + kMaxVolitionalOkurigana;
+       ++vol_pos) {
+    if (!kana::isHiraganaCodepoint(codepoints[vol_pos])) {
+      break;
+    }
+    if (!kana::isORowCodepoint(codepoints[vol_pos]) || codepoints[vol_pos + 1] != U'う') {
+      continue;
+    }
+    const size_t full_end = vol_pos + 2;
     const std::string full_surface = extractSubstring(codepoints, start_pos, full_end);
     const auto& analyses = inflection.analyze(full_surface);
     if (!analyses.empty()) {
-      const std::string stem_surface = extractSubstring(codepoints, start_pos, kanji_end + 1);
+      const std::string stem_surface = extractSubstring(codepoints, start_pos, vol_pos + 1);
       const grammar::InflectionCandidate* selected = nullptr;
       bool selected_from_dictionary = false;
 
@@ -256,7 +266,7 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
           }
           for (const auto& analysis : analyses) {
             const auto* row = grammar::Conjugation::getGodanRow(analysis.verb_type);
-            if (row != nullptr && row->o_row == codepoints[kanji_end] && analysis.base_form == result.entry->lemma &&
+            if (row != nullptr && row->o_row == codepoints[vol_pos] && analysis.base_form == result.entry->lemma &&
                 (selected == nullptr || analysis.confidence > selected->confidence)) {
               selected = &analysis;
               selected_from_dictionary = true;
@@ -265,8 +275,38 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
         }
       }
 
+      // Without a listed lemma, take the most confident analysis on the row the
+      // o-row mora names — the front one may be a coined adjective (伸ばい). A
+      // listed adjective owns its own cells (高+そう, 暖か+そう, 高かろ+う).
       if (selected == nullptr) {
-        selected = &analyses.front();
+        const std::string adjective_stem = extractSubstring(codepoints, start_pos, vol_pos);
+        const bool listed_adjective_cell =
+            vh::isAdjectiveInDictionary(dict_manager, adjective_stem + "い") ||
+            vh::isAdjectiveInDictionary(dict_manager, adjective_stem) ||
+            vh::hasDictionaryEntry(dict_manager, stem_surface, core::PartOfSpeech::Adjective) ||
+            std::any_of(analyses.begin(), analyses.end(), [&](const auto& analysis) {
+              return analysis.verb_type == grammar::VerbType::IAdjective &&
+                     vh::isAdjectiveInDictionary(dict_manager, analysis.base_form);
+            });
+        // A longer okurigana is admitted only in the shape of a sa-row
+        // derivative, one kanji plus one a-row mora (伸ば+そ, 動か+そ): more
+        // kana or a kanji compound in front is a predicate chain that closes on
+        // a closed-class word (遠い+だろ+う, 教師+だ+そう, 読み+た+そう).
+        const bool derivative_shape =
+            kanji_end == start_pos + 1 && vol_pos == kanji_end + 1 && kana::isARowCodepoint(codepoints[kanji_end]);
+        if (listed_adjective_cell || (vol_pos > kanji_end && !derivative_shape)) {
+          break;
+        }
+        for (const auto& analysis : analyses) {
+          const auto* row = grammar::Conjugation::getGodanRow(analysis.verb_type);
+          if (row != nullptr && row->o_row == codepoints[vol_pos] &&
+              (selected == nullptr || analysis.confidence > selected->confidence)) {
+            selected = &analysis;
+          }
+        }
+        if (selected == nullptr) {
+          break;
+        }
       }
       const auto& best = *selected;
       const auto* godan_row = grammar::Conjugation::getGodanRow(best.verb_type);
@@ -278,12 +318,12 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
       // them is whether the reconstructed base is a verb at all — and every
       // productive case that needs this mora is a common lexical verb.
       const bool completing_mora_is_particle =
-          vh::hasParticleDictionaryEntry(dict_manager, extractSubstring(codepoints, kanji_end, kanji_end + 1));
+          vh::hasParticleDictionaryEntry(dict_manager, extractSubstring(codepoints, vol_pos, vol_pos + 1));
       const bool base_attested = selected_from_dictionary || vh::isVerbInDictionary(dict_manager, best.base_form);
       if ((selected_from_dictionary || best.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence) &&
           (base_attested || !completing_mora_is_particle) && godan_row != nullptr &&
-          godan_row->o_row == codepoints[kanji_end] && best.base_form != full_surface) {
-        const size_t stem_end = kanji_end + 1;
+          godan_row->o_row == codepoints[vol_pos] && best.base_form != full_surface) {
+        const size_t stem_end = vol_pos + 1;
         auto volitional =
             makeVerbCandidate(stem_surface, start_pos, stem_end, candidate::verb_cost::kStrongBonus, best.base_form,
                               grammar::verbTypeToConjType(best.verb_type), true, CandidateOrigin::VerbKanji,
@@ -292,6 +332,7 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
         candidates.push_back(std::move(volitional));
       }
     }
+    break;
   }
 
   // Productive Godan conditional: e-row 仮定形 + ば (伸ばせ+ば,

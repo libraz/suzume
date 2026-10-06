@@ -972,6 +972,94 @@
       ],
       "id": "o_woireyouka",
       "input": "お茶をいれようか。"
+    },
+    {
+      "description": "羽を伸ばそう。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "羽",
+          "pos": "Noun",
+          "surface": "羽"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "伸ばす",
+          "pos": "Verb",
+          "surface": "伸ばそ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "wo_basou",
+      "input": "羽を伸ばそう。"
+    },
+    {
+      "description": "水に流そう。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "水",
+          "pos": "Noun",
+          "surface": "水"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "流す",
+          "pos": "Verb",
+          "surface": "流そ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "ni_sou",
+      "input": "水に流そう。"
+    },
+    {
+      "description": "動かそう - auto-generated",
+      "expected": [
+        {
+          "lemma": "動かす",
+          "pos": "Verb",
+          "surface": "動かそ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "kasou",
+      "input": "動かそう"
+    },
+    {
+      "description": "飛ばそう - auto-generated",
+      "expected": [
+        {
+          "lemma": "飛ばす",
+          "pos": "Verb",
+          "surface": "飛ばそ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "basou",
+      "input": "飛ばそう"
     }
   ],
   "description": "verb_volitional tests",

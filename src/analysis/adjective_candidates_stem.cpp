@@ -556,8 +556,20 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
             // unless the adjective it builds is attested (明る+そう).
             const bool verb_terminal_shape =
                 utf8::endsWith(stem, "る") && !isAdjectiveInDictionary(dict_manager, base_form);
-            if (verb_terminal_shape || isVerbInDictionary(dict_manager, stem) || is_complete_na_adjective ||
-                hasVerifiedPredicateDerivedAdjective(base_form, inflection, dict_manager) ||
+            // そ+う is also the volitional of a sa-row derivative, one kanji plus
+            // an a-row irrealis (伸ば+そ+う), so an unlisted adjective of that
+            // shape needs its own evidence there.
+            const auto& sou_analyses = inflection.analyze(normalize::concat(stem, pattern));
+            const bool reads_as_sa_row_volitional =
+                !isAdjectiveInDictionary(dict_manager, base_form) && normalize::utf8Length(stem) == 2 &&
+                normalize::isKanjiCodepoint(utf8::decodeFirstChar(stem)) &&
+                kana::isARowCodepoint(utf8::decodeLastChar(stem)) &&
+                std::any_of(sou_analyses.begin(), sou_analyses.end(), [&](const auto& analysis) {
+                  return analysis.verb_type == grammar::VerbType::GodanSa &&
+                         analysis.base_form == normalize::concat(stem, "す");
+                });
+            if (verb_terminal_shape || reads_as_sa_row_volitional || isVerbInDictionary(dict_manager, stem) ||
+                is_complete_na_adjective || hasVerifiedPredicateDerivedAdjective(base_form, inflection, dict_manager) ||
                 verb_helpers::startsWithVerbContinuative(dict_manager, normalize::toCodepoints(stem), 0,
                                                          normalize::utf8Length(stem))) {
               continue;
