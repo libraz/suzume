@@ -134,6 +134,38 @@
       ],
       "id": "kujida",
       "input": "宝くじだ"
+    },
+    {
+      "description": "私は特に好きだ - auto-generated",
+      "expected": [
+        {
+          "lemma": "私",
+          "pos": "Pronoun",
+          "surface": "私"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "特に",
+          "pos": "Adverb",
+          "surface": "特に"
+        },
+        {
+          "lemma": "好き",
+          "pos": "Adjective",
+          "surface": "好き"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "ha_ni_kida",
+      "input": "私は特に好きだ"
     }
   ],
   "description": "Copula patterns (だ、です、である) (part 2/2)",

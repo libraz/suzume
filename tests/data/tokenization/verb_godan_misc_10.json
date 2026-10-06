@@ -2560,6 +2560,28 @@
       ],
       "id": "ha_kajito_u",
       "input": "鳥は鳴かじと思う"
+    },
+    {
+      "description": "彼常に笑う - auto-generated",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "常に",
+          "pos": "Adverb",
+          "surface": "常に"
+        },
+        {
+          "lemma": "笑う",
+          "pos": "Verb",
+          "surface": "笑う"
+        }
+      ],
+      "id": "ni_u_3",
+      "input": "彼常に笑う"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",

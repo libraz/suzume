@@ -119,6 +119,9 @@ HIRAGANA_COMPOUNDS: dict[str, str] = {
 FIXED_FUNCTION_SEARCH_UNITS: dict[str, str] = {
     "然程": "副詞",
     "更に": "副詞",
+    # 特 and 常 have no adverbial use of their own, so the に is part of the word.
+    "特に": "副詞",
+    "常に": "副詞",
     # Lexicalized adverbs whose stem never stands alone in this sense. 実 is
     # the fruit or the truth, not the degree, and しも is an archaic particle
     # with no independent use left.

@@ -938,14 +938,9 @@
           "surface": "ない"
         },
         {
-          "lemma": "特",
-          "pos": "Noun",
-          "surface": "特"
-        },
-        {
-          "lemma": "に",
-          "pos": "Particle",
-          "surface": "に"
+          "lemma": "特に",
+          "pos": "Adverb",
+          "surface": "特に"
         },
         {
           "lemma": "問題",

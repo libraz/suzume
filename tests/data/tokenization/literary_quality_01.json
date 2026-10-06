@@ -384,14 +384,9 @@
           "surface": "は"
         },
         {
-          "lemma": "常",
-          "pos": "Noun",
-          "surface": "常"
-        },
-        {
-          "lemma": "に",
-          "pos": "Particle",
-          "surface": "に"
+          "lemma": "常に",
+          "pos": "Adverb",
+          "surface": "常に"
         },
         {
           "lemma": "変転",
@@ -2931,14 +2926,9 @@
       "description": "特に静かな夜だった。 - regression test",
       "expected": [
         {
-          "lemma": "特",
-          "pos": "Noun",
-          "surface": "特"
-        },
-        {
-          "lemma": "に",
-          "pos": "Particle",
-          "surface": "に"
+          "lemma": "特に",
+          "pos": "Adverb",
+          "surface": "特に"
         },
         {
           "lemma": "静か",
