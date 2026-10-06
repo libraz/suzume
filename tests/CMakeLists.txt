@@ -146,8 +146,11 @@ if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.18)
   list(APPEND SUZUME_TEST_DISCOVERY_ARGS DISCOVERY_MODE PRE_TEST)
 endif()
 
+# Discovery parses one name per tokenization case; at ~9000 cases it takes ~55 s,
+# far past the 5 s default.
 gtest_discover_tests(suzume_test
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  DISCOVERY_TIMEOUT 300
   ${SUZUME_TEST_DISCOVERY_ARGS}
 )
 
