@@ -145,6 +145,11 @@ def map_mecab_pos(token: dict | str) -> str:
     if surface == "時々" and pos == "副詞":
         return "Noun"
 
+    # 時折: 名詞,副詞可能 -> Adverb (an adverb of time; 時々 above is the Noun
+    # exception because it also takes の as a nominal)
+    if surface == "時折" and pos == "名詞" and pos_sub1 == "副詞可能":
+        return "Adverb"
+
     # 推し: 動詞 -> Noun
     if surface == "推し" and pos == "動詞":
         token["lemma"] = "推し"

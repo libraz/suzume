@@ -446,6 +446,115 @@
       ],
       "id": "tashite_ha_surudarouka",
       "input": "果たして状況は改善するだろうか。"
+    },
+    {
+      "description": "時折頭を下げた - auto-generated",
+      "expected": [
+        {
+          "lemma": "時折",
+          "pos": "Adverb",
+          "surface": "時折"
+        },
+        {
+          "lemma": "頭",
+          "pos": "Noun",
+          "surface": "頭"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "下げる",
+          "pos": "Verb",
+          "surface": "下げ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wo_geta",
+      "input": "時折頭を下げた"
+    },
+    {
+      "description": "彼は時折頭を揺らし、静かに夢を見ていた。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "時折",
+          "pos": "Adverb",
+          "surface": "時折"
+        },
+        {
+          "lemma": "頭",
+          "pos": "Noun",
+          "surface": "頭"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "揺らす",
+          "pos": "Verb",
+          "surface": "揺らし"
+        },
+        {
+          "lemma": "静か",
+          "pos": "Adjective",
+          "surface": "静か"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "夢",
+          "pos": "Noun",
+          "surface": "夢"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ha_wo_rashi_kani_wo_teita",
+      "input": "彼は時折頭を揺らし、静かに夢を見ていた。"
     }
   ],
   "description": "General adverbs (part 3/3)",
