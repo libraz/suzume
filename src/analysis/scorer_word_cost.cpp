@@ -315,7 +315,10 @@ float computeNounSuffixVerbDictBonus(const core::LatticeEdge& edge, size_t char_
   // Bonus for multi-char hiragana suffixes from dictionary (e.g., まみれ, だらけ, ごと)
   // These are L1 closed-class morphemes that should beat false verb candidates
   // E.g., 血まみれ should be 血+まみれ(SUFFIX), not 血まみ(VERB)+れ(AUX)
-  if (edge.fromDictionary() && edge.pos == core::PartOfSpeech::Suffix && grammar::isPureHiragana(edge.surface) &&
+  // A suffix attaches to a host, so none opens the input (ちゃんと+して is not
+  // ちゃん+として).
+  if (edge.fromDictionary() && edge.pos == core::PartOfSpeech::Suffix && edge.start > 0 &&
+      grammar::isPureHiragana(edge.surface) &&
       edge.surface.size() >= core::kThreeJapaneseCharBytes) {  // 3+ chars (9+ bytes)
     bonus += sc::kBonusLongSuffix;
   }

@@ -254,6 +254,55 @@
       ],
       "id": "nimottto",
       "input": "にもっと"
+    },
+    {
+      "description": "ちゃんとして - auto-generated",
+      "expected": [
+        {
+          "lemma": "ちゃんと",
+          "pos": "Adverb",
+          "surface": "ちゃんと"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "chi_ntoshite",
+      "input": "ちゃんとして"
+    },
+    {
+      "description": "ちゃんとしてください - auto-generated",
+      "expected": [
+        {
+          "lemma": "ちゃんと",
+          "pos": "Adverb",
+          "surface": "ちゃんと"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くださる",
+          "pos": "Verb",
+          "surface": "ください"
+        }
+      ],
+      "id": "chi_ntoshitekudasai",
+      "input": "ちゃんとしてください"
     }
   ],
   "description": "General adverbs (part 3/3)",
