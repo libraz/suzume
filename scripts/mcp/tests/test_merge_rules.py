@@ -1738,6 +1738,20 @@ class TestPejorativeYagaru:
         assert [token["surface"] for token in result] == ["見や", "っ"]
 
 
+class TestClassicalNidanCompoundEnding:
+    def test_compound_verb_cell_takes_the_attributive_ru(self):
+        tokens = [
+            _tok("張り", pos="名詞", pos_sub1="一般", lemma="張り"),
+            _tok("詰む", pos="動詞", pos_sub1="自立", conj_form="基本形", lemma="詰む"),
+            _tok("る", pos="助動詞", conj_form="体言接続", lemma="り"),
+            _tok("心", pos="名詞", pos_sub1="一般", lemma="心"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "張り詰むる心")
+        assert [token["surface"] for token in result] == ["張り詰むる", "心"]
+        assert result[0]["lemma"] == "張り詰む"
+        assert rule == "classical-nidan-cell"
+
+
 class TestDegreeStemBeforePredicateNoun:
     def test_taihen_stays_apart_from_the_noun_it_modifies(self):
         tokens = [

@@ -815,8 +815,21 @@ def _postprocess_nidan_cell(result: list[dict], applied_rule: str | None) -> tup
             host, surface, lemma, remainder = cell
             if host:
                 merged.append({"surface": host, "pos": "名詞", "lemma": host})
-            merged.append({"surface": surface, "pos": "動詞", "lemma": lemma})
             idx += 2
+            # A compound verb's cell is matched on the pair that closes its stem
+            # (張り+詰む), which leaves the 連体形 る / 已然形 れ behind as the
+            # perfect り the reference reads it as; the ending belongs to the verb.
+            ending = result[idx] if idx < len(result) and not remainder else None
+            if (
+                ending is not None
+                and ending.get("surface") in ("る", "れ")
+                and ending.get("pos") == "助動詞"
+                and ending.get("lemma") == "り"
+                and surface == lemma
+            ):
+                surface += ending["surface"]
+                idx += 1
+            merged.append({"surface": surface, "pos": "動詞", "lemma": lemma})
             if remainder + beyond in _TERMINAL_AUXILIARIES:
                 merged.append({"surface": remainder + beyond, "pos": "助動詞", "lemma": remainder + beyond})
                 idx += 1

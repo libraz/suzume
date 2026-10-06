@@ -1246,6 +1246,23 @@
       ],
       "id": "sokono_wo_kase",
       "input": "そこの石を動かせ"
+    },
+    {
+      "description": "張り詰むる心 - auto-generated",
+      "expected": [
+        {
+          "lemma": "張り詰む",
+          "pos": "Verb",
+          "surface": "張り詰むる"
+        },
+        {
+          "lemma": "心",
+          "pos": "Noun",
+          "surface": "心"
+        }
+      ],
+      "id": "ri_muru",
+      "input": "張り詰むる心"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",
