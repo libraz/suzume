@@ -154,7 +154,9 @@ KEEP_AS_NOUN_NOT_ADJ: set[str] = {
 
 
 # Noun -> Pronoun overrides
-NOUN_AS_PRONOUN: set[str] = {"彼女", "奴", "我", "わし"}
+# The katakana first-person spellings are unknown words to the reference, which lists only
+# some of them as pronouns (ボク, オレ, オイラ).
+NOUN_AS_PRONOUN: set[str] = {"彼女", "奴", "我", "わし", "ワタシ", "アタシ", "ワタクシ"}
 
 
 # Suffix -> Noun overrides

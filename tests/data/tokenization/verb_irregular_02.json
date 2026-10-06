@@ -311,6 +311,33 @@
       ],
       "id": "tachihamina_ta",
       "input": "私たちはみな来た"
+    },
+    {
+      "description": "ワタシが来た - auto-generated",
+      "expected": [
+        {
+          "lemma": "ワタシ",
+          "pos": "Pronoun",
+          "surface": "ワタシ"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ga_ta_2",
+      "input": "ワタシが来た"
     }
   ],
   "description": "Irregular verbs (する、くる) (part 2/2)",

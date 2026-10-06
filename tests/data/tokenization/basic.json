@@ -1244,6 +1244,33 @@
       ],
       "id": "ni_surumono",
       "input": "彼に関するもの"
+    },
+    {
+      "description": "アタシのせいよ - auto-generated",
+      "expected": [
+        {
+          "lemma": "アタシ",
+          "pos": "Pronoun",
+          "surface": "アタシ"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "せい",
+          "pos": "Noun",
+          "surface": "せい"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "noseiyo",
+      "input": "アタシのせいよ"
     }
   ],
   "description": "Basic tokenization tests",
