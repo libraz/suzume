@@ -799,7 +799,7 @@ bool isMixedHiraganaKanji(std::string_view stem) {
 }
 
 bool isRenyokeiNominalizingSuffix(std::string_view suffix) {
-  return suffix == "気味";
+  return utf8::equalsAny(suffix, {"気味", "っけ"});
 }
 
 }  // namespace suzume::grammar

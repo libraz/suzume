@@ -451,6 +451,11 @@ EntrySpecRange getAuxiliaryEntries() {
       // i-adjective stems and nominal bases, retaining the suffix boundary.
       suffix("げ", "げ"),
 
+      // Trace suffix っけ (気: 飾りっけ, 色っけ, 塩っけ) after a nominal or a
+      // continuative. The sentence-final っけ stays a final particle in
+      // particles.cpp; the host picks the reading.
+      suffix_trace("っけ", "っけ"),
+
       // Productive viewpoint/evaluation suffix (重要視, 問題視).  It remains
       // separate from the preceding noun and the following サ変 verb.
       suffix("視", "視"),

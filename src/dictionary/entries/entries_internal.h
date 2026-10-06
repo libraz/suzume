@@ -94,6 +94,11 @@ constexpr EntrySpec interrogative_adv(const char* s, const char* lemma = "") {
   return {s, POS::Adverb, EPOS::AdverbInterrogative, lemma};
 }
 
+// Trace suffix helper (気: っけ), which also stands directly on a continuative.
+constexpr EntrySpec suffix_trace(const char* s, const char* lemma = "") {
+  return {s, POS::Suffix, EPOS::SuffixTrace, lemma};
+}
+
 // Suffix helper: creates SUFFIX entry
 // Usage: suffix("さん")
 constexpr EntrySpec suffix(const char* s, const char* lemma = "") {

@@ -69,6 +69,13 @@ BigramTable::EncodedTable BigramTable::initTable() {
          [static_cast<size_t>(core::ExtendedPOS::AuxPejorativeYagaru)] =
              bigram_rules::encodeCost(bigram_cost::kStrongBonus);
   }
+  // The trace suffix っけ continues like any suffix, and stands on a continuative
+  // firmly enough to outrank the homographic final particle (飾り+っけ).
+  {
+    bigram_rules::inheritRuleProfile(table, core::ExtendedPOS::Suffix, core::ExtendedPOS::SuffixTrace);
+    table[static_cast<size_t>(core::ExtendedPOS::VerbRenyokei)][static_cast<size_t>(core::ExtendedPOS::SuffixTrace)] =
+        bigram_rules::encodeCost(bigram_cost::kDoubleVeryStrongBonus);
+  }
   // The colloquial contraction of the hypothetical is a single word that closes
   // a conditional clause. What may follow it is therefore what may follow the
   // conjunctive particle it absorbed, while what may precede it is what may

@@ -881,6 +881,11 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
             const size_t hiragana_run_end = findCharRegionEnd(char_types, sokuon_pos, codepoints.size() - sokuon_pos,
                                                               normalize::CharType::Hiragana);
             for (const auto& entry : lookupResultsInRange(*dict_manager, codepoints, sokuon_pos, hiragana_run_end)) {
+              // A registered derivational suffix opening at the sokuon (色+っけ)
+              // keeps its own boundary, as the adjectival suffixes below do.
+              if (entry.entry != nullptr && entry.entry->pos == core::PartOfSpeech::Suffix) {
+                return;
+              }
               if (entry.entry != nullptr && entry.entry->pos == core::PartOfSpeech::Adjective) {
                 // っぽい and っこい: a sokuon, one mora, and the adjective ending.
                 const std::string& suffix_lemma = entry.entry->lemma;
@@ -1198,6 +1203,15 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
         lookupEntryInRange(*dict_manager, codepoints, kanji_end, aux_end, core::PartOfSpeech::Auxiliary) != nullptr &&
         lookupEntryInRange(*dict_manager, codepoints, aux_end, hiragana_end, core::PartOfSpeech::Suffix) != nullptr &&
         !verb_helpers::isAdjectiveInDictionary(dict_manager, extractSubstring(codepoints, start_pos, aux_end) + "い");
+  }
+
+  // A derivational suffix opening with a sokuon keeps its boundary after the
+  // host's okurigana (飾り+っけ, as 色+っけ), so no single noun spans it.
+  for (size_t suffix_pos = kanji_end + 1; dict_manager != nullptr && suffix_pos + 1 < hiragana_end; ++suffix_pos) {
+    if (codepoints[suffix_pos] == U'っ' && lookupEntryInRange(*dict_manager, codepoints, suffix_pos, hiragana_end,
+                                                              core::PartOfSpeech::Suffix) != nullptr) {
+      return;
+    }
   }
 
   // Skip NOUN generation for pure auxiliary patterns

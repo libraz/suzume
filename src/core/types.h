@@ -232,6 +232,11 @@ enum class ExtendedPOS : uint8_t {
   // the progressive いる needs a て form, and inflects like a godan-ra verb.
   AuxPejorativeYagaru,
 
+  // 気配の接尾辞 っけ (飾りっけ, 色っけ). Like a plain suffix it follows a nominal, and
+  // it also stands directly on a continuative, where the homographic sentence-final
+  // っけ (行ったっけ) is the competing reading.
+  SuffixTrace,
+
   // Count marker (for array sizing)
   Count_  // Total number of categories
 };

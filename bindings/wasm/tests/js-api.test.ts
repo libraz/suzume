@@ -59,7 +59,8 @@ describe('JS API: struct layout compatibility', () => {
     expect(text(88)).toBe('AUX_現在推量');
     expect(text(89)).toBe('ADV_疑問');
     expect(text(90)).toBe('AUX_卑罵');
-    expect(text(91)).toBeNull();
+    expect(text(91)).toBe('SUFFIX_気配');
+    expect(text(92)).toBeNull();
   });
 
   it('labels every serialized conjugation code and rejects the next value', () => {

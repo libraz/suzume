@@ -711,6 +711,149 @@
       ],
       "id": "rettpoi",
       "input": "惚れっぽい"
+    },
+    {
+      "description": "飾りっけのない態度が爽やかだ。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "飾り",
+          "pos": "Noun",
+          "surface": "飾り"
+        },
+        {
+          "lemma": "っけ",
+          "pos": "Suffix",
+          "surface": "っけ"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        },
+        {
+          "lemma": "態度",
+          "pos": "Noun",
+          "surface": "態度"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "爽やか",
+          "pos": "Adjective",
+          "surface": "爽やか"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "rittkenonai_ga_yakada",
+      "input": "飾りっけのない態度が爽やかだ。"
+    },
+    {
+      "description": "湿りっけのない空気 - auto-generated",
+      "expected": [
+        {
+          "lemma": "湿り",
+          "pos": "Noun",
+          "surface": "湿り"
+        },
+        {
+          "lemma": "っけ",
+          "pos": "Suffix",
+          "surface": "っけ"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        },
+        {
+          "lemma": "空気",
+          "pos": "Noun",
+          "surface": "空気"
+        }
+      ],
+      "id": "rittkenonai",
+      "input": "湿りっけのない空気"
+    },
+    {
+      "description": "色っけのない話 - auto-generated",
+      "expected": [
+        {
+          "lemma": "色",
+          "pos": "Noun",
+          "surface": "色"
+        },
+        {
+          "lemma": "っけ",
+          "pos": "Suffix",
+          "surface": "っけ"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        },
+        {
+          "lemma": "話",
+          "pos": "Noun",
+          "surface": "話"
+        }
+      ],
+      "id": "ttkenonai",
+      "input": "色っけのない話"
+    },
+    {
+      "description": "塩っけが足りない - auto-generated",
+      "expected": [
+        {
+          "lemma": "塩",
+          "pos": "Noun",
+          "surface": "塩"
+        },
+        {
+          "lemma": "っけ",
+          "pos": "Suffix",
+          "surface": "っけ"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "足りる",
+          "pos": "Verb",
+          "surface": "足り"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "ttkega_rinai",
+      "input": "塩っけが足りない"
     }
   ],
   "description": "suffix_general tests",

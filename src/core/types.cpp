@@ -306,6 +306,8 @@ std::string_view extendedPosToString(ExtendedPOS epos) {
       return "SUFFIX_直後";
     case ExtendedPOS::SuffixTendency:
       return "SUFFIX_傾向";
+    case ExtendedPOS::SuffixTrace:
+      return "SUFFIX_気配";
     case ExtendedPOS::DeterminerQuotative:
       return "DET_引用";
 
@@ -471,6 +473,7 @@ PartOfSpeech extendedPosToPos(ExtendedPOS epos) {
     case ExtendedPOS::Suffix:
     case ExtendedPOS::SuffixRecentCompletion:
     case ExtendedPOS::SuffixTendency:
+    case ExtendedPOS::SuffixTrace:
       return PartOfSpeech::Suffix;
     case ExtendedPOS::Symbol:
       return PartOfSpeech::Symbol;
