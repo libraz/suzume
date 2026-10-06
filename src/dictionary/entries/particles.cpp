@@ -130,6 +130,7 @@ EntrySpecRange getParticleEntries() {
       particle("っちゃ", EPOS::ParticleFinal),  // Sendai/Kitakyushu assertive (行った+っちゃ)
       // Role-language tails close a predicate terminal the same way and never
       // absorb it (走る+もふ, 走る+っぴ).
+      particle("わん", EPOS::ParticleFinal),
       particle("もふ", EPOS::ParticleFinal),
       particle("っぴ", EPOS::ParticleFinal),
       // Regional causal conjunctions, attaching to a predicate terminal

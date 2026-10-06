@@ -521,7 +521,12 @@ bool endsWithFinalParticleAfterNominalHead(const dictionary::DictionaryManager& 
                                            const ByteOffsets& byte_offsets,
                                            const std::vector<UnknownCandidate>& batch_candidates,
                                            const UnknownCandidate& candidate) {
-  if (candidate.lemma_verified || candidate.end <= candidate.start + 2) {
+  // A cell closing on ん is the contracted negative or terminal of its own
+  // stem (終わ+ん+ない, 終わ+ん+の ← 終わる), whose ん no final particle can claim.
+  const bool contracted_cell = (candidate.extended_pos == core::ExtendedPOS::VerbMizenkei ||
+                                candidate.extended_pos == core::ExtendedPOS::VerbShuushikei) &&
+                               utf8::endsWith(candidate.surface, "ん");
+  if (candidate.lemma_verified || candidate.end <= candidate.start + 2 || contracted_cell) {
     return false;
   }
   constexpr size_t kMaxFinalParticleChars = 4;

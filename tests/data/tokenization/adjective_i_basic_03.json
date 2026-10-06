@@ -1939,6 +1939,40 @@
       ],
       "id": "da_10",
       "input": "使用可能だ"
+    },
+    {
+      "description": "楽しいわん - auto-generated",
+      "expected": [
+        {
+          "lemma": "楽しい",
+          "pos": "Adjective",
+          "surface": "楽しい"
+        },
+        {
+          "lemma": "わん",
+          "pos": "Particle",
+          "surface": "わん"
+        }
+      ],
+      "id": "shiiwan",
+      "input": "楽しいわん"
+    },
+    {
+      "description": "嬉しいわん - auto-generated",
+      "expected": [
+        {
+          "lemma": "嬉しい",
+          "pos": "Adjective",
+          "surface": "嬉しい"
+        },
+        {
+          "lemma": "わん",
+          "pos": "Particle",
+          "surface": "わん"
+        }
+      ],
+      "id": "shiiwan_2",
+      "input": "嬉しいわん"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 3/3)",

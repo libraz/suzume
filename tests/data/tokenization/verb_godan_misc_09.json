@@ -1853,6 +1853,40 @@
       ],
       "id": "nubeshi_2",
       "input": "尋ぬべし"
+    },
+    {
+      "description": "遊ぶわん - auto-generated",
+      "expected": [
+        {
+          "lemma": "遊ぶ",
+          "pos": "Verb",
+          "surface": "遊ぶ"
+        },
+        {
+          "lemma": "わん",
+          "pos": "Particle",
+          "surface": "わん"
+        }
+      ],
+      "id": "buwan",
+      "input": "遊ぶわん"
+    },
+    {
+      "description": "変わんない - auto-generated",
+      "expected": [
+        {
+          "lemma": "変わる",
+          "pos": "Verb",
+          "surface": "変わん"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "wannai",
+      "input": "変わんない"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",
