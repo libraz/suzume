@@ -99,6 +99,9 @@ void setNominalParticleCosts(BigramMatrix& table) {
       {EPOS::ParticleAdverbial, EPOS::ParticleBinding, cost::kStrongBonus},
       {EPOS::ParticleBinding, EPOS::AdjBasic, cost::kStrongBonus},
       {EPOS::ParticleBinding, EPOS::AdjRenyokei, cost::kStrongBonus},
+      // The adjective irrealis heads a predicate after a binding particle just
+      // as the verb irrealis does (秋+ぞ+深から+む, like 花+ぞ+咲か+む).
+      {EPOS::ParticleBinding, EPOS::AdjMizenkei, cost::kVeryStrongBonus},
       {EPOS::Noun, EPOS::AdjNaAdj, cost::kStrongBonus},
       {EPOS::NounFormal, EPOS::AdjNaAdj, cost::kModerateBonus},
       {EPOS::Noun, EPOS::NounFormal, cost::kMinorBonus},

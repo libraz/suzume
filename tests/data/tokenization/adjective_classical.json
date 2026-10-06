@@ -237,6 +237,114 @@
       ],
       "id": "shito_ru",
       "input": "高しと見る"
+    },
+    {
+      "description": "kari irrealis plus mu after a binding particle",
+      "expected": [
+        {
+          "lemma": "秋",
+          "pos": "Noun",
+          "surface": "秋"
+        },
+        {
+          "lemma": "ぞ",
+          "pos": "Particle",
+          "surface": "ぞ"
+        },
+        {
+          "lemma": "深い",
+          "pos": "Adjective",
+          "surface": "深から"
+        },
+        {
+          "lemma": "む",
+          "pos": "Auxiliary",
+          "surface": "む"
+        }
+      ],
+      "id": "zo_karamu",
+      "input": "秋ぞ深からむ"
+    },
+    {
+      "description": "kari irrealis plus mu after a binding particle",
+      "expected": [
+        {
+          "lemma": "花",
+          "pos": "Noun",
+          "surface": "花"
+        },
+        {
+          "lemma": "ぞ",
+          "pos": "Particle",
+          "surface": "ぞ"
+        },
+        {
+          "lemma": "深い",
+          "pos": "Adjective",
+          "surface": "深から"
+        },
+        {
+          "lemma": "む",
+          "pos": "Auxiliary",
+          "surface": "む"
+        }
+      ],
+      "id": "zo_karamu_2",
+      "input": "花ぞ深からむ"
+    },
+    {
+      "description": "kari irrealis plus mu after a binding particle",
+      "expected": [
+        {
+          "lemma": "水",
+          "pos": "Noun",
+          "surface": "水"
+        },
+        {
+          "lemma": "ぞ",
+          "pos": "Particle",
+          "surface": "ぞ"
+        },
+        {
+          "lemma": "高い",
+          "pos": "Adjective",
+          "surface": "高から"
+        },
+        {
+          "lemma": "む",
+          "pos": "Auxiliary",
+          "surface": "む"
+        }
+      ],
+      "id": "zo_karamu_3",
+      "input": "水ぞ高からむ"
+    },
+    {
+      "description": "ha-row continuative and kari irrealis around a binding particle",
+      "expected": [
+        {
+          "lemma": "思ふ",
+          "pos": "Verb",
+          "surface": "思ひ"
+        },
+        {
+          "lemma": "ぞ",
+          "pos": "Particle",
+          "surface": "ぞ"
+        },
+        {
+          "lemma": "深い",
+          "pos": "Adjective",
+          "surface": "深から"
+        },
+        {
+          "lemma": "む",
+          "pos": "Auxiliary",
+          "surface": "む"
+        }
+      ],
+      "id": "hizo_karamu",
+      "input": "思ひぞ深からむ"
     }
   ],
   "description": "adjective_classical tests",
