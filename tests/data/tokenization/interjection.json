@@ -687,6 +687,52 @@
       ],
       "id": "fun",
       "input": "ふん！"
+    },
+    {
+      "description": "おやすみなさい。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "おやすみなさい",
+          "pos": "Interjection",
+          "surface": "おやすみなさい"
+        }
+      ],
+      "id": "oyasuminasai",
+      "input": "おやすみなさい。"
+    },
+    {
+      "description": "おやすみなさい、また明日。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "おやすみなさい",
+          "pos": "Interjection",
+          "surface": "おやすみなさい"
+        },
+        {
+          "lemma": "また",
+          "pos": "Adverb",
+          "surface": "また"
+        },
+        {
+          "lemma": "明日",
+          "pos": "Noun",
+          "surface": "明日"
+        }
+      ],
+      "id": "oyasuminasai_mata",
+      "input": "おやすみなさい、また明日。"
+    },
+    {
+      "description": "おつかれ！ - auto-generated",
+      "expected": [
+        {
+          "lemma": "おつかれ",
+          "pos": "Interjection",
+          "surface": "おつかれ"
+        }
+      ],
+      "id": "otsukare",
+      "input": "おつかれ！"
     }
   ],
   "description": "Interjections and greetings (感動詞・挨拶)",
