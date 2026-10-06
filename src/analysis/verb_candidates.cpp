@@ -218,12 +218,13 @@ void generateKatakanaVerbCandidates(const std::vector<char32_t>& codepoints, siz
       }
     }
     const bool selects_continuative = selecting_end > 0 && content_end <= selecting_end;
+    // Near-neutral, so the selecting auxiliary's connection decides against the noun.
     if (selects_continuative) {
       const std::string stem = extractSubstring(codepoints, start_pos, kata_end);
-      candidates.push_back(
-          makeVerbCandidate(stem, start_pos, kata_end, candidate::verb_cost::kKatakanaIchidanRenyokeiCost, stem + "る",
-                            dictionary::ConjugationType::Ichidan, true, CandidateOrigin::VerbKatakana,
-                            candidate::kNoConfidence, "katakana_ichidan_renyokei", core::ExtendedPOS::VerbRenyokei));
+      candidates.push_back(makeVerbCandidate(stem, start_pos, kata_end, candidate::verb_cost::kWeakPenalty, stem + "る",
+                                             dictionary::ConjugationType::Ichidan, true, CandidateOrigin::VerbKatakana,
+                                             candidate::kNoConfidence, "katakana_ichidan_renyokei",
+                                             core::ExtendedPOS::VerbRenyokei));
     }
   }
 
