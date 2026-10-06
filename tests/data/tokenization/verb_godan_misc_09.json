@@ -1556,6 +1556,28 @@
       ],
       "id": "berotoiu_da",
       "input": "食べろという話だ"
+    },
+    {
+      "description": "規則に従って行う - auto-generated",
+      "expected": [
+        {
+          "lemma": "規則",
+          "pos": "Noun",
+          "surface": "規則"
+        },
+        {
+          "lemma": "に従って",
+          "pos": "Particle",
+          "surface": "に従って"
+        },
+        {
+          "lemma": "行う",
+          "pos": "Verb",
+          "surface": "行う"
+        }
+      ],
+      "id": "ni_ttte_u_2",
+      "input": "規則に従って行う"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",

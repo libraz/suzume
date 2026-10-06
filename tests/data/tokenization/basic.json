@@ -1087,6 +1087,60 @@
       ],
       "id": "unnamed_47",
       "input": "最重要"
+    },
+    {
+      "description": "従って、結論は正しい - auto-generated",
+      "expected": [
+        {
+          "lemma": "従って",
+          "pos": "Conjunction",
+          "surface": "従って"
+        },
+        {
+          "lemma": "結論",
+          "pos": "Noun",
+          "surface": "結論"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "正しい",
+          "pos": "Adjective",
+          "surface": "正しい"
+        }
+      ],
+      "id": "ttte_ha_shii",
+      "input": "従って、結論は正しい"
+    },
+    {
+      "description": "従って結論は正しい - auto-generated",
+      "expected": [
+        {
+          "lemma": "従って",
+          "pos": "Conjunction",
+          "surface": "従って"
+        },
+        {
+          "lemma": "結論",
+          "pos": "Noun",
+          "surface": "結論"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "正しい",
+          "pos": "Adjective",
+          "surface": "正しい"
+        }
+      ],
+      "id": "ttte_ha_shii_2",
+      "input": "従って結論は正しい"
     }
   ],
   "description": "Basic tokenization tests",

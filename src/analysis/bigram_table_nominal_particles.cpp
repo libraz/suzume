@@ -91,6 +91,10 @@ void setNominalParticleCosts(BigramMatrix& table) {
       {EPOS::Noun, EPOS::Conjunction, cost::kDoubleVeryStrongBonus},
       {EPOS::Conjunction, EPOS::Noun, cost::kStrongBonus},
       {EPOS::Conjunction, EPOS::Pronoun, cost::kMinorBonus},
+      // A listed conjunction closed by punctuation is a complete clause opener;
+      // its te-form verb homograph needs a complement the punctuation leaves
+      // unfilled (従って、結論は).
+      {EPOS::Conjunction, EPOS::Symbol, cost::kStrongBonus},
       {EPOS::ParticleCase, EPOS::ParticleBinding, cost::kStrongBonus},
       // An adverbial particle stacks with a binding particle just as a case
       // particle does (だけしか, までしか, ばかりしか). Without the row the chain
