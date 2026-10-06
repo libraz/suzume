@@ -2889,7 +2889,32 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
           }
         }
       }
-      const bool lengthening_spells_word = lengthening_spells_word_at();
+      // A vowel drawn out after a verb continuative can instead complete an
+      // i-adjective spelled in kana (おい+し+い is おいしい, not おい+しい), so
+      // the span from a hiragana run in front of it reads as an adjective.
+      auto lengthening_completes_adjective = [&]() {
+        constexpr size_t kMaxAdjectiveLookback = 6;
+        if (result.entry->pos != core::PartOfSpeech::Verb || emphatic.standard_char_count != 0 ||
+            emphatic.repeated_vowel_count != 1 || start_pos == 0) {
+          return false;
+        }
+        size_t run_start = start_pos;
+        while (run_start > 0 && start_pos - run_start < kMaxAdjectiveLookback &&
+               normalize::classifyChar(codepoints[run_start - 1]) == normalize::CharType::Hiragana) {
+          --run_start;
+        }
+        for (size_t from = run_start; from < start_pos; ++from) {
+          const auto& spans = analysesInRange(inflection_, codepoints, from, emphatic.end);
+          if (std::any_of(spans.begin(), spans.end(), [](const grammar::InflectionCandidate& inflection_candidate) {
+                return inflection_candidate.verb_type == grammar::VerbType::IAdjective &&
+                       inflection_candidate.confidence >= candidate::kIAdjConfMin;
+              })) {
+            return true;
+          }
+        }
+        return false;
+      };
+      const bool lengthening_spells_word = lengthening_spells_word_at() || lengthening_completes_adjective();
       const bool unlicensed_particle_lengthening =
           result.entry->pos == core::PartOfSpeech::Particle && !bare_sokuon && !holds_final_particle_vowel();
       // A conjugated word drawn out with the prolonged mark closes the

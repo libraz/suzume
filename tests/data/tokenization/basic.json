@@ -1356,6 +1356,33 @@
       ],
       "id": "kokomadenaraii",
       "input": "ここまでならいい"
+    },
+    {
+      "description": "このパンはおいしい - auto-generated",
+      "expected": [
+        {
+          "lemma": "この",
+          "pos": "Determiner",
+          "surface": "この"
+        },
+        {
+          "lemma": "パン",
+          "pos": "Noun",
+          "surface": "パン"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "おいしい",
+          "pos": "Adjective",
+          "surface": "おいしい"
+        }
+      ],
+      "id": "kono_haoishii",
+      "input": "このパンはおいしい"
     }
   ],
   "description": "Basic tokenization tests",

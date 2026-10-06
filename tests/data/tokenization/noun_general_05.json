@@ -347,6 +347,60 @@
       ],
       "id": "sorahaitsumo_i",
       "input": "そらはいつも青い"
+    },
+    {
+      "description": "ごはんおいしい - auto-generated",
+      "expected": [
+        {
+          "lemma": "ごはん",
+          "pos": "Noun",
+          "surface": "ごはん"
+        },
+        {
+          "lemma": "おいしい",
+          "pos": "Adjective",
+          "surface": "おいしい"
+        }
+      ],
+      "id": "gohanoishii",
+      "input": "ごはんおいしい"
+    },
+    {
+      "description": "昨日のごはんはおいしいです - auto-generated",
+      "expected": [
+        {
+          "lemma": "昨日",
+          "pos": "Noun",
+          "surface": "昨日"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "ごはん",
+          "pos": "Noun",
+          "surface": "ごはん"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "おいしい",
+          "pos": "Adjective",
+          "surface": "おいしい"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "nogohanhaoishiidesu",
+      "input": "昨日のごはんはおいしいです"
     }
   ],
   "description": "General nouns (part 5/5)",
