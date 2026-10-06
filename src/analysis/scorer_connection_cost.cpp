@@ -691,7 +691,9 @@ float Scorer::connectionCost(const core::LatticeEdge& prev, const core::LatticeE
   // Penalty for PART_準体(の) → で to prevent ので splitting
   // High penalty keeps ので merged in conjunctive use (寒いので出かけた)
   // For のではない pattern, the downstream で→は surface bonus overcomes this
-  if (prev.extended_pos == core::ExtendedPOS::ParticleNo && prev.surface == "の" && next.surface == "で") {
+  // The enumerating や cannot follow it either (彼のやさしさ is not 彼の+や+さし+さ).
+  if (prev.extended_pos == core::ExtendedPOS::ParticleNo && prev.surface == "の" &&
+      utf8::equalsAny(next.surface, {"で", "や"})) {
     SUZUME_CONNECTION_ADD(surface_bonus, cost::kVeryRare);  // 1.8
   }
 

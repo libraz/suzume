@@ -1195,6 +1195,33 @@
       ],
       "id": "a_souka",
       "input": "あ、そうか。"
+    },
+    {
+      "description": "彼女のやさしい声 - auto-generated",
+      "expected": [
+        {
+          "lemma": "彼女",
+          "pos": "Pronoun",
+          "surface": "彼女"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "やさしい",
+          "pos": "Adjective",
+          "surface": "やさしい"
+        },
+        {
+          "lemma": "声",
+          "pos": "Noun",
+          "surface": "声"
+        }
+      ],
+      "id": "noyasashii",
+      "input": "彼女のやさしい声"
     }
   ],
   "description": "Basic tokenization tests",
