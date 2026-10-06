@@ -85,7 +85,8 @@ TEST(ScorerBoundaryCostTest, FixedBosAndEosAdjustmentsComeFromOneExtendedPosTabl
       {core::ExtendedPOS::AuxHonorific, scorer::kBosHonorificAuxPenalty, 0.0F},
       {core::ExtendedPOS::ParticleFinal, scorer::kBosFinalParticlePenalty, 0.0F},
       {core::ExtendedPOS::ParticleTopic, scorer::kBosTopicParticlePenalty, 0.0F},
-      {core::ExtendedPOS::ParticleConj, scorer::kBosConjunctiveParticlePenalty, scorer::kEosListingParticlePenalty},
+      {core::ExtendedPOS::ParticleConj, scorer::kBosConjunctiveParticlePenalty,
+       scorer::kEosClauseDependentParticlePenalty},
       {core::ExtendedPOS::ParticleBinding, scorer::kBosBindingParticlePenalty, scorer::kEosBindingParticleBonus},
       {core::ExtendedPOS::Prefix, 0.0F, scorer::kEosPrefixPenalty},
       {core::ExtendedPOS::Noun, 0.0F, 0.0F},
@@ -119,7 +120,7 @@ TEST(ScorerBoundaryCostTest, AppliesSurfaceGatesAfterExtendedPosLookup) {
                   scorer::kEosAspectKuruPenalty);
   EXPECT_FLOAT_EQ(scorer.eosCost(makeBoundaryEdge(core::ExtendedPOS::AuxAspectKuru, "くる")), bigram_cost::kNeutral);
   EXPECT_FLOAT_EQ(scorer.eosCost(makeBoundaryEdge(core::ExtendedPOS::ParticleConj, "たり")),
-                  scorer::kEosListingParticlePenalty);
+                  scorer::kEosClauseDependentParticlePenalty);
   EXPECT_FLOAT_EQ(scorer.eosCost(makeBoundaryEdge(core::ExtendedPOS::ParticleConj, "ので")), bigram_cost::kNeutral);
 
   // A conjunction closing a sentence that already has content is penalized,

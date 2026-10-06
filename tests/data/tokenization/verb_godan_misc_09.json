@@ -1792,6 +1792,67 @@
       ],
       "id": "ri_meta",
       "input": "張り詰めた心"
+    },
+    {
+      "description": "見ゆなり - auto-generated",
+      "expected": [
+        {
+          "lemma": "見ゆ",
+          "pos": "Verb",
+          "surface": "見ゆ"
+        },
+        {
+          "lemma": "なり",
+          "pos": "Auxiliary",
+          "surface": "なり"
+        }
+      ],
+      "id": "yunari",
+      "input": "見ゆなり"
+    },
+    {
+      "description": "山を越ゆなり - auto-generated",
+      "expected": [
+        {
+          "lemma": "山",
+          "pos": "Noun",
+          "surface": "山"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "越ゆ",
+          "pos": "Verb",
+          "surface": "越ゆ"
+        },
+        {
+          "lemma": "なり",
+          "pos": "Auxiliary",
+          "surface": "なり"
+        }
+      ],
+      "id": "wo_yunari",
+      "input": "山を越ゆなり"
+    },
+    {
+      "description": "尋ぬべし - auto-generated",
+      "expected": [
+        {
+          "lemma": "尋ぬ",
+          "pos": "Verb",
+          "surface": "尋ぬ"
+        },
+        {
+          "lemma": "べし",
+          "pos": "Auxiliary",
+          "surface": "べし"
+        }
+      ],
+      "id": "nubeshi_2",
+      "input": "尋ぬべし"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",

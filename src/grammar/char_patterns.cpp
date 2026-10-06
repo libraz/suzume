@@ -312,6 +312,12 @@ bool isModernGodanTerminalKana(char32_t code) {
   return kana::isCodepointIn(kGodanTerminals, code);
 }
 
+bool isUnproductiveGodanTerminalKana(char32_t code) {
+  // ナ行 Godan is closed (死ぬ, 往ぬ), so a ぬ-ending verb outside it is a
+  // classical bigrade verb the modern conjugation table cannot derive.
+  return code == U'ぬ';
+}
+
 bool isMonogradeStemFinalKana(char32_t code) {
   constexpr std::array<char32_t, 2> kShiftedRow = {U'ひ', U'へ'};
   return (kana::isIRowCodepoint(code) || kana::isERowCodepoint(code)) && !kana::isCodepointIn(kShiftedRow, code);
@@ -451,8 +457,8 @@ bool isConcessiveParticleTomoSurface(std::string_view surface) {
   return surface == "とも";
 }
 
-bool isListingParticleTariSurface(std::string_view surface) {
-  return surface == "たり";
+bool isClauseDependentConjunctiveParticle(std::string_view surface) {
+  return utf8::equalsAny(surface, {"たり", "なり"});
 }
 
 bool isHypotheticalSelectingConjunctiveParticle(std::string_view surface) {

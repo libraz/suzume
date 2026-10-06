@@ -281,8 +281,9 @@ void appendClassicalNidanCandidates(const std::vector<char32_t>& codepoints, siz
     }
     // A sentence opens a predicate slot as well, but only a terminal the modern
     // paradigm never spells can rely on it (燃ゆ+べし, 見ゆ).
-    if (!opensPredicateSlot(codepoints, stem_start, dict_manager) &&
-        !(stem_start == 0 && !grammar::isModernGodanTerminalKana(terminal))) {
+    const bool reachable_as_godan =
+        grammar::isModernGodanTerminalKana(terminal) && !grammar::isUnproductiveGodanTerminalKana(terminal);
+    if (!opensPredicateSlot(codepoints, stem_start, dict_manager) && !(stem_start == 0 && !reachable_as_godan)) {
       continue;
     }
     const bool is_attributive = terminal_pos + 1 < hiragana_end && codepoints[terminal_pos + 1] == core::hiragana::kRu;
@@ -290,7 +291,7 @@ void appendClassicalNidanCandidates(const std::vector<char32_t>& codepoints, siz
     // (見+つる, 見+ぬる). Behind a stem that is a verb on its own, the kana is that
     // auxiliary and not the row's ending.
     if (terminal_pos == kanji_end && grammar::isClassicalAuxiliaryHomographKana(terminal) &&
-        vh::isSingleKanjiIchidan(codepoints[stem_start])) {
+        vh::isSingleKanjiPoliteStem(codepoints[stem_start])) {
       continue;
     }
     // The 連体形 needs a candidate on every row, since its trailing る otherwise
@@ -298,9 +299,8 @@ void appendClassicalNidanCandidates(const std::vector<char32_t>& codepoints, siz
     // paradigm cannot reach the form: the rows it kept are built by the
     // conjugation table on their own (受く, 過ぐ), and the ha row has its own
     // paradigm above, which leaves 越ゆ and 出づ.
-    if (!is_attributive &&
-        (grammar::isModernGodanTerminalKana(terminal) || classicalHaRowCell(terminal) != core::ExtendedPOS::Unknown ||
-         !shuushikeiEndsAt(codepoints, terminal_pos + 1, dict_manager))) {
+    if (!is_attributive && (reachable_as_godan || classicalHaRowCell(terminal) != core::ExtendedPOS::Unknown ||
+                            !shuushikeiEndsAt(codepoints, terminal_pos + 1, dict_manager))) {
       continue;
     }
     const size_t end_pos = is_attributive ? terminal_pos + 2 : terminal_pos + 1;

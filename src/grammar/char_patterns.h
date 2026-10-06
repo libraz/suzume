@@ -219,6 +219,14 @@ std::string yaRowBigradeTerminalLemma(std::string_view base_form);
 bool isModernGodanTerminalKana(char32_t code);
 
 /**
+ * @brief Whether a modern Godan terminal kana heads a closed row (ぬ)
+ *
+ * A verb in such a row is attested only as a listed word, so a bigrade verb
+ * spelled the same way is never reachable through the Godan conjugation table.
+ */
+bool isUnproductiveGodanTerminalKana(char32_t code);
+
+/**
  * @brief Whether a kana can end the stem of a modern Ichidan verb
  *
  * ハ行 is the one row the monograde paradigm lost: its intervocalic morae
@@ -373,8 +381,8 @@ bool isAccusativeParticleWoSurface(std::string_view surface);
 /** @brief Whether a conjunctive-particle surface is the concessive とも */
 bool isConcessiveParticleTomoSurface(std::string_view surface);
 
-/** @brief Whether a conjunctive-particle surface is the listing たり */
-bool isListingParticleTariSurface(std::string_view surface);
+/** @brief Whether a conjunctive particle needs a predicate after it (listing たり, immediate-succession なり) */
+bool isClauseDependentConjunctiveParticle(std::string_view surface);
 
 /**
  * @brief Whether a conjunctive particle can only complete a 已然形/hypothetical slot

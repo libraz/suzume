@@ -440,7 +440,7 @@ constexpr float kBosCopulaPenalty = scale::kRare;
 // columns are intentionally asymmetric: a final particle can naturally close a
 // sentence, while a prefix cannot.
 constexpr float kEosAspectKuruPenalty = 3.0F;  // き (来 aspect) needs a following stem (ひこうき → ひこう+き)
-constexpr float kEosListingParticlePenalty = 2.0F;  // たり listing particle needs a parallel predicate
+constexpr float kEosClauseDependentParticlePenalty = scale::kSevere;  // たり/なり need the predicate they link to
 constexpr float kEosBindingParticleBonus = scale::kExtraStrongBonus;  // Keep standalone こそ/さえ intact
 constexpr float kEosPrefixPenalty = scale::kAlmostNever;              // Prefix requires a following host
 // A conjunction joins what precedes it to what follows, so it cannot be the last
@@ -518,7 +518,7 @@ constexpr float kHeadlessQuotativeDeterminerPenalty = scale::kProhibitive - scal
 enum class EosBoundaryGate {
   Always,
   SingleCodepoint,
-  ListingParticle,
+  ClauseDependentParticle,
   NonDictionary,
   AfterContent,
   IzenkeiNegative,
@@ -572,8 +572,8 @@ constexpr std::array<BoundaryCost, static_cast<size_t>(core::ExtendedPOS::Count_
   table[static_cast<size_t>(core::ExtendedPOS::AuxAspectKuru)].eos_gate = EosBoundaryGate::SingleCodepoint;
   // No other aspect auxiliary has an EOS row: its full finite form may close
   // a sentence. Kuru is exceptional only for the one-mora continuative き.
-  table[static_cast<size_t>(core::ExtendedPOS::ParticleConj)].eos = kEosListingParticlePenalty;
-  table[static_cast<size_t>(core::ExtendedPOS::ParticleConj)].eos_gate = EosBoundaryGate::ListingParticle;
+  table[static_cast<size_t>(core::ExtendedPOS::ParticleConj)].eos = kEosClauseDependentParticlePenalty;
+  table[static_cast<size_t>(core::ExtendedPOS::ParticleConj)].eos_gate = EosBoundaryGate::ClauseDependentParticle;
   table[static_cast<size_t>(core::ExtendedPOS::ParticleBinding)].eos = kEosBindingParticleBonus;
   table[static_cast<size_t>(core::ExtendedPOS::Conjunction)].eos = kEosConjunctionPenalty;
   table[static_cast<size_t>(core::ExtendedPOS::Conjunction)].eos_gate = EosBoundaryGate::AfterContent;

@@ -66,8 +66,8 @@ float Scorer::eosCost(const core::LatticeEdge& edge, core::ExtendedPOS prev_exte
       // The bare renyokei き needs a following た/て/ます, while the
       // 終止形 くる/くれる legitimately ends a sentence.
       return edge.end - edge.start == 1 ? boundary_cost.eos : sc::scale::kNeutral;
-    case sc::EosBoundaryGate::ListingParticle:
-      return grammar::isListingParticleTariSurface(edge.surface) ? boundary_cost.eos : sc::scale::kNeutral;
+    case sc::EosBoundaryGate::ClauseDependentParticle:
+      return grammar::isClauseDependentConjunctiveParticle(edge.surface) ? boundary_cost.eos : sc::scale::kNeutral;
     case sc::EosBoundaryGate::NonDictionary:
       return edge.fromDictionary() ? sc::scale::kNeutral : boundary_cost.eos;
     case sc::EosBoundaryGate::IzenkeiNegative:

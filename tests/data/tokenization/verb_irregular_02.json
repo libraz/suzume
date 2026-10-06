@@ -210,6 +210,33 @@
       ],
       "id": "ka_nubeshi",
       "input": "誰か来ぬべし"
+    },
+    {
+      "description": "来るなり泣いた - auto-generated",
+      "expected": [
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来る"
+        },
+        {
+          "lemma": "なり",
+          "pos": "Particle",
+          "surface": "なり"
+        },
+        {
+          "lemma": "泣く",
+          "pos": "Verb",
+          "surface": "泣い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "runari_ita",
+      "input": "来るなり泣いた"
     }
   ],
   "description": "Irregular verbs (する、くる) (part 2/2)",
