@@ -398,6 +398,82 @@
       ],
       "id": "ttte_marutoiu_ri_meru",
       "input": "雨降って地固まるという通り進める。"
+    },
+    {
+      "description": "雲が重なっている - auto-generated",
+      "expected": [
+        {
+          "lemma": "雲",
+          "pos": "Noun",
+          "surface": "雲"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "重なる",
+          "pos": "Verb",
+          "surface": "重なっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "ga_nattteiru",
+      "input": "雲が重なっている"
+    },
+    {
+      "description": "積み重なっている - auto-generated",
+      "expected": [
+        {
+          "lemma": "積み重なる",
+          "pos": "Verb",
+          "surface": "積み重なっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "mi_nattteiru",
+      "input": "積み重なっている"
+    },
+    {
+      "description": "重なっている - auto-generated",
+      "expected": [
+        {
+          "lemma": "重なる",
+          "pos": "Verb",
+          "surface": "重なっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "nattteiru",
+      "input": "重なっている"
     }
   ],
   "description": "Godan Ra-row verbs (五段ラ行動詞) - verbs ending in る (part 2/2)",

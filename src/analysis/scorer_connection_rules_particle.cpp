@@ -335,6 +335,13 @@ float computeAdverbialNiAfterPredicatePenalty(const core::LatticeEdge& prev, con
 float computePrefixSymbolBonus(const core::LatticeEdge& prev, const core::LatticeEdge& next) {
   float bonus{};  // value-init to 0
 
+  // The attributive copula な selects a nominal, so it cannot be followed by
+  // the quotative って (重+な+って is 重なっ+て): only the terminal だ quotes.
+  if (prev.extended_pos == core::ExtendedPOS::AuxCopulaDa && grammar::isAttributiveCopulaNa(prev.surface) &&
+      next.extended_pos == core::ExtendedPOS::ParticleQuote) {
+    SUZUME_CONNECTION_ADD(bonus, sc::kPenaltyIncompatibleInflection);
+  }
+
   // A ん (the contracted nominalizer or the volitional) after an unverified
   // pure-hiragana terminal is the tail of a mimetic word (ぐう+ん), not a
   // grammatical morpheme.
