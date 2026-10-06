@@ -873,6 +873,114 @@
       ],
       "id": "surutt",
       "input": "するっス"
+    },
+    {
+      "description": "regional final particle tcha after the past auxiliary",
+      "expected": [
+        {
+          "lemma": "妾",
+          "pos": "Noun",
+          "surface": "妾"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "同行",
+          "pos": "Noun",
+          "surface": "同行"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "っちゃ",
+          "pos": "Particle",
+          "surface": "っちゃ"
+        }
+      ],
+      "id": "mo_shitattchi",
+      "input": "妾も同行したっちゃ"
+    },
+    {
+      "description": "regional final particle tcha after the past auxiliary",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "っちゃ",
+          "pos": "Particle",
+          "surface": "っちゃ"
+        }
+      ],
+      "id": "tttattchi",
+      "input": "行ったっちゃ"
+    },
+    {
+      "description": "regional final particle tcha after the past copula",
+      "expected": [
+        {
+          "lemma": "そう",
+          "pos": "Adverb",
+          "surface": "そう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "っちゃ",
+          "pos": "Particle",
+          "surface": "っちゃ"
+        }
+      ],
+      "id": "soudatttattchi",
+      "input": "そうだったっちゃ"
+    },
+    {
+      "description": "contracted teha keeps the onbin sokuon",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行っ"
+        },
+        {
+          "lemma": "ちゃ",
+          "pos": "Particle",
+          "surface": "ちゃ"
+        },
+        {
+          "lemma": "だめ",
+          "pos": "Adjective",
+          "surface": "だめ"
+        }
+      ],
+      "id": "ttchi_dame",
+      "input": "行っちゃだめ"
     }
   ],
   "description": "pattern_dialect tests",

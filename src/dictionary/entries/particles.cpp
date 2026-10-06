@@ -126,6 +126,7 @@ EntrySpecRange getParticleEntries() {
       particle("え", EPOS::ParticleFinal),    // Kyoto clause-final (ます+え)
       particle("のう", EPOS::ParticleFinal),  // western/elderly (走る+のう)
       particle("ぞい", EPOS::ParticleFinal),
+      particle("っちゃ", EPOS::ParticleFinal),  // Sendai/Kitakyushu assertive (行った+っちゃ)
       // Role-language tails close a predicate terminal the same way and never
       // absorb it (走る+もふ, 走る+っぴ).
       particle("もふ", EPOS::ParticleFinal),

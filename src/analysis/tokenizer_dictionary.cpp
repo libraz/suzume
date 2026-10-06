@@ -1064,15 +1064,14 @@ bool namesSimplexDeverbalNoun(const dictionary::DictionaryManager& dict_manager,
 // scan below runs at every position, so the window is bounded rather than open.
 constexpr size_t kElidedLookupWindow = 6;
 
-// What closes in front of a final particle holding an interior mora. A
-// predicate reaching across the particle's span is the word the mark draws out
+// The word classes that close a predicate. One in front hosts a final particle;
+// one reaching across a held particle's span is the word the mark draws out
 // (やばーい), and owns the mark instead.
-constexpr PartOfSpeechMask kHeldFinalParticlePredicateMask = partOfSpeechMask(core::PartOfSpeech::Verb) |
-                                                             partOfSpeechMask(core::PartOfSpeech::Adjective) |
-                                                             partOfSpeechMask(core::PartOfSpeech::Auxiliary);
-constexpr PartOfSpeechMask kHeldFinalParticleHostMask = kHeldFinalParticlePredicateMask |
-                                                        partOfSpeechMask(core::PartOfSpeech::Noun) |
-                                                        partOfSpeechMask(core::PartOfSpeech::Pronoun);
+constexpr PartOfSpeechMask kPredicateHostMask = partOfSpeechMask(core::PartOfSpeech::Verb) |
+                                                partOfSpeechMask(core::PartOfSpeech::Adjective) |
+                                                partOfSpeechMask(core::PartOfSpeech::Auxiliary);
+constexpr PartOfSpeechMask kHeldFinalParticleHostMask =
+    kPredicateHostMask | partOfSpeechMask(core::PartOfSpeech::Noun) | partOfSpeechMask(core::PartOfSpeech::Pronoun);
 
 // Colloquial emphasis may hold a mora in the middle of a function word rather
 // than at its end (飲みたーい, ませーん, でーす). The mark carries no segment of
@@ -1144,7 +1143,7 @@ void addElidedProlongedDictionaryCandidates(core::Lattice& lattice, const dictio
         last_mora == elided_to_original[result.length - 2] + 1 + elided_marks &&
         hasPrecedingPartOfSpeech(lattice, start_pos, kHeldFinalParticleHostMask) &&
         !core::anyEdgeEndingAt(lattice, end_pos, [start_pos](const core::LatticeEdge& edge) {
-          return edge.start < start_pos && (partOfSpeechMask(edge.pos) & kHeldFinalParticlePredicateMask) != 0;
+          return edge.start < start_pos && (partOfSpeechMask(edge.pos) & kPredicateHostMask) != 0;
         });
     if (result.entry->pos != core::PartOfSpeech::Auxiliary && !held_final_particle) {
       continue;
@@ -1830,6 +1829,15 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     // A conjunction that is also a productive verb+particle sequence is
     // lexical only at a clause boundary. Inside a phrase, keep the ordinary
     // predicate boundary (もしか+する+と).
+    // A final particle spelled with a leading sokuon (っちゃ, っぴ) geminates
+    // onto a finished predicate; with none in front, the sokuon belongs to the
+    // word before it (行っ+ちゃ+だめ, not 行+っちゃ).
+    if (result.entry->extended_pos == core::ExtendedPOS::ParticleFinal &&
+        codepoints[start_pos] == core::hiragana::kSmallTsu &&
+        !hasPrecedingPartOfSpeech(lattice, start_pos, kPredicateHostMask)) {
+      continue;
+    }
+
     if (result.entry->pos == core::PartOfSpeech::Conjunction && start_pos > 0) {
       if (crossesAttributiveNaHonorificNominal(lattice, codepoints, start_pos, end_pos)) {
         continue;
