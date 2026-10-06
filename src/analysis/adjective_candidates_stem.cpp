@@ -237,8 +237,14 @@ float productiveIAdjectiveStemConfidence(const std::string& stem, const std::str
   }
   // A compound-forming kana head is inherited the same way (照れ+くさい,
   // 面倒+くさい), provided a host stands in front of it.
+  // A head the dictionary lists as an auxiliary makes no adjective: its cells
+  // are that auxiliary's own (本+らし+げ, as 本+らし+さ), unless the whole
+  // adjective is listed, which the first check above already accepted.
   for (size_t head_start = 1; head_start < stem_codepoints.size(); ++head_start) {
     const std::string head_base = extractSubstring(stem_codepoints, head_start, stem_codepoints.size());
+    if (verb_helpers::hasDictionaryEntry(dict_manager, head_base + "い", core::PartOfSpeech::Auxiliary)) {
+      return candidate::kNoOriginConfidence;
+    }
     if (adj_detail::isCompoundFormingAdjective(head_base + "い")) {
       return confidence;
     }

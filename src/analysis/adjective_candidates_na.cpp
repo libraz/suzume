@@ -285,14 +285,17 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
                                    match.entry->extended_pos == core::ExtendedPOS::AuxCopulaDesu;
             }
           }
-          // An auxiliary stem plus a nominal suffix on a compound noun is that
-          // chain, not a stem (子供+らし+げ+な), as the i-adjective stem path holds.
-          for (size_t aux_end = kanji_end + 2; aux_end < stem_end && kanji_end >= start_pos + 2; ++aux_end) {
+          // An auxiliary stem plus a nominal suffix on a noun is that chain, not a
+          // stem (子供+らし+げ+な, 本+らし+げ+な), as the i-adjective stem path
+          // holds, unless the adjective it spells is listed (誇らし+げ).
+          for (size_t aux_end = kanji_end + 2; aux_end < stem_end; ++aux_end) {
             contains_closed_suffix =
                 contains_closed_suffix || (lookupEntryInRange(*dict_manager, codepoints, kanji_end, aux_end,
                                                               core::PartOfSpeech::Auxiliary) != nullptr &&
                                            lookupEntryInRange(*dict_manager, codepoints, aux_end, stem_end,
-                                                              core::PartOfSpeech::Suffix) != nullptr);
+                                                              core::PartOfSpeech::Suffix) != nullptr &&
+                                           !verb_helpers::isAdjectiveInDictionary(
+                                               dict_manager, extractSubstring(codepoints, start_pos, aux_end) + "い"));
           }
         }
         const std::string stem = extractSubstring(codepoints, start_pos, stem_end);

@@ -1189,6 +1189,17 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
     looks_like_aux = true;
   }
 
+  // An auxiliary stem plus a nominal suffix is that chain on the noun before it
+  // (本+らし+げ, as 本+らし+さ), the same reading the adjective-stem paths take,
+  // unless the adjective it spells is listed (誇らし+げ).
+  for (size_t aux_end = kanji_end + 2; dict_manager != nullptr && aux_end < hiragana_end && !looks_like_aux;
+       ++aux_end) {
+    looks_like_aux =
+        lookupEntryInRange(*dict_manager, codepoints, kanji_end, aux_end, core::PartOfSpeech::Auxiliary) != nullptr &&
+        lookupEntryInRange(*dict_manager, codepoints, aux_end, hiragana_end, core::PartOfSpeech::Suffix) != nullptr &&
+        !verb_helpers::isAdjectiveInDictionary(dict_manager, extractSubstring(codepoints, start_pos, aux_end) + "い");
+  }
+
   // Skip NOUN generation for pure auxiliary patterns
   // These should always be verb stem + auxiliary, never a compound noun
   // e.g., 寝ます should be 寝(VERB) + ます(AUX), not 寝ます(NOUN)

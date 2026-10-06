@@ -693,6 +693,65 @@
       ],
       "id": "dounatttanodeshi_u",
       "input": "どうなったのでしょう"
+    },
+    {
+      "description": "本らしげな話 - auto-generated",
+      "expected": [
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        },
+        {
+          "lemma": "らしい",
+          "pos": "Auxiliary",
+          "surface": "らし"
+        },
+        {
+          "lemma": "げ",
+          "pos": "Suffix",
+          "surface": "げ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "話",
+          "pos": "Noun",
+          "surface": "話"
+        }
+      ],
+      "id": "rashigena_2",
+      "input": "本らしげな話"
+    },
+    {
+      "description": "誇らしげな顔 - auto-generated",
+      "expected": [
+        {
+          "lemma": "誇らしい",
+          "pos": "Adjective",
+          "surface": "誇らし"
+        },
+        {
+          "lemma": "げ",
+          "pos": "Suffix",
+          "surface": "げ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "顔",
+          "pos": "Noun",
+          "surface": "顔"
+        }
+      ],
+      "id": "rashigena_3",
+      "input": "誇らしげな顔"
     }
   ],
   "description": "Modality auxiliaries (たい、そう、らしい) (part 2/2)",
