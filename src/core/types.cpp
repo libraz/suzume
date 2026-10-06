@@ -402,6 +402,8 @@ std::string_view extendedPosToString(ExtendedPOS epos) {
       return "ADV";
     case ExtendedPOS::AdverbQuotative:
       return "ADV_引用";
+    case ExtendedPOS::AdverbInterrogative:
+      return "ADV_疑問";
     case ExtendedPOS::Conjunction:
       return "CONJ";
     case ExtendedPOS::Determiner:
@@ -455,6 +457,7 @@ PartOfSpeech extendedPosToPos(ExtendedPOS epos) {
   switch (epos) {
     case ExtendedPOS::Adverb:
     case ExtendedPOS::AdverbQuotative:
+    case ExtendedPOS::AdverbInterrogative:
       return PartOfSpeech::Adverb;
     case ExtendedPOS::Conjunction:
       return PartOfSpeech::Conjunction;

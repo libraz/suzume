@@ -51,6 +51,16 @@ BigramTable::EncodedTable BigramTable::initTable() {
   // cost remains distinct, while their syntactic continuations stay complete
   // as the general adverb profile evolves.
   bigram_rules::inheritRuleProfile(table, core::ExtendedPOS::Adverb, core::ExtendedPOS::AdverbQuotative);
+  // An interrogative adverb continues like any adverb except that it stands
+  // directly on a nominal predicate (なぜ+だ, なぜ+です), so the copula cells
+  // carry the connection of a neutral head instead of the manner-adverb penalty.
+  {
+    bigram_rules::inheritRuleProfile(table, core::ExtendedPOS::Adverb, core::ExtendedPOS::AdverbInterrogative);
+    const size_t interrogative = static_cast<size_t>(core::ExtendedPOS::AdverbInterrogative);
+    for (const auto copula : {core::ExtendedPOS::AuxCopulaDa, core::ExtendedPOS::AuxCopulaDesu}) {
+      table[interrogative][static_cast<size_t>(copula)] = bigram_rules::encodeCost(bigram_cost::kMinorBonus);
+    }
+  }
   // The colloquial contraction of the hypothetical is a single word that closes
   // a conditional clause. What may follow it is therefore what may follow the
   // conjunctive particle it absorbed, while what may precede it is what may

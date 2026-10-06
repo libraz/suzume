@@ -190,8 +190,8 @@ float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::
   // particle after one is the homographic adjectival noun instead (おなじ+だ).
   const bool determiner_head =
       (quotative_determiner_head && next.extended_pos != core::ExtendedPOS::PronounInterrogative) ||
-      next.extended_pos == core::ExtendedPOS::Adverb || next.extended_pos == core::ExtendedPOS::AdjStem ||
-      next.pos == core::PartOfSpeech::Symbol;
+      next.extended_pos == core::ExtendedPOS::Adverb || next.extended_pos == core::ExtendedPOS::AdverbInterrogative ||
+      next.extended_pos == core::ExtendedPOS::AdjStem || next.pos == core::PartOfSpeech::Symbol;
   // An attributive with nothing to modify is not a possible reading rather than
   // an unlikely one. For a quotative determiner the penalty also takes back the
   // predicate→determiner bonus on its left, granted on the assumption that a

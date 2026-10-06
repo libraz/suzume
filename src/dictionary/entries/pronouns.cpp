@@ -152,12 +152,12 @@ EntrySpecRange getPronounEntries() {
       na_adj("おなじ", "おなじ"),
       // Note: どうして needs very low cost to prevent split when followed by verb
       // The te-form bonus makes どう+して+VERB cheaper than どうして+VERB
-      adv("どうして", ""),
+      interrogative_adv("どうして", ""),
       // どうか is one adverb before a predicate (どうか+してる, どうか+助けて);
       // elsewhere it is どう+か (どうかな). The tokenizer gates the context.
       adv("どうか", ""),
-      adv("なぜ", ""),
-      adv("なんで", ""),
+      interrogative_adv("なぜ", ""),
+      interrogative_adv("なんで", ""),
 
       // Classical/literary adverbs (古語・文語副詞)
       adv("かく", ""),      // 斯く - classical demonstrative adverb (=こう/such)

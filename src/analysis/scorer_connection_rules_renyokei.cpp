@@ -279,7 +279,8 @@ float computeVerbRenyokeiEarlyBonus(const core::LatticeEdge& prev, const core::L
       SUZUME_CONNECTION_ADD(
           bonus, prev.extended_pos == core::ExtendedPOS::Suffix ? cost::kDoubleVeryStrongBonus : cost::kModerateBonus);
     } else if (prev.extended_pos == core::ExtendedPOS::Adverb ||
-               prev.extended_pos == core::ExtendedPOS::AdverbQuotative) {
+               prev.extended_pos == core::ExtendedPOS::AdverbQuotative ||
+               prev.extended_pos == core::ExtendedPOS::AdverbInterrogative) {
       // Demonstrative adverb + conditional (そう+なら) is a productive
       // conditional construction, not the mizenkei of なる.
       SUZUME_CONNECTION_ADD(bonus, cost::kStrongBonus);

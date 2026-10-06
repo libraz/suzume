@@ -89,6 +89,11 @@ constexpr EntrySpec quotative_adv(const char* s, const char* lemma = "") {
   return {s, POS::Adverb, EPOS::AdverbQuotative, lemma};
 }
 
+// Interrogative adverbs that ask for a reason (なぜ, なんで, どうして).
+constexpr EntrySpec interrogative_adv(const char* s, const char* lemma = "") {
+  return {s, POS::Adverb, EPOS::AdverbInterrogative, lemma};
+}
+
 // Suffix helper: creates SUFFIX entry
 // Usage: suffix("さん")
 constexpr EntrySpec suffix(const char* s, const char* lemma = "") {

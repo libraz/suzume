@@ -427,6 +427,94 @@
       ],
       "id": "haitsu",
       "input": "誕生日はいつ"
+    },
+    {
+      "description": "なぜです - auto-generated",
+      "expected": [
+        {
+          "lemma": "なぜ",
+          "pos": "Adverb",
+          "surface": "なぜ"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "nazedesu",
+      "input": "なぜです"
+    },
+    {
+      "description": "なぜですか - auto-generated",
+      "expected": [
+        {
+          "lemma": "なぜ",
+          "pos": "Adverb",
+          "surface": "なぜ"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "nazedesuka",
+      "input": "なぜですか"
+    },
+    {
+      "description": "なんでだ - auto-generated",
+      "expected": [
+        {
+          "lemma": "なんで",
+          "pos": "Adverb",
+          "surface": "なんで"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "nandeda",
+      "input": "なんでだ"
+    },
+    {
+      "description": "行くのか、なぜだ - auto-generated",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行く"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "なぜ",
+          "pos": "Adverb",
+          "surface": "なぜ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "kunoka_nazeda",
+      "input": "行くのか、なぜだ"
     }
   ],
   "description": "pronoun_interrogative tests",

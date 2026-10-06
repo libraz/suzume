@@ -182,6 +182,7 @@ constexpr std::array<float, static_cast<size_t>(ExtendedPOS::Count_)> kCategoryC
   // A quotative adverb is a semantic subtype, not an intrinsically cheaper
   // candidate. Contextual connection rules select it over homographs.
   table[static_cast<size_t>(ExtendedPOS::AdverbQuotative)] = table[static_cast<size_t>(ExtendedPOS::Adverb)];
+  table[static_cast<size_t>(ExtendedPOS::AdverbInterrogative)] = table[static_cast<size_t>(ExtendedPOS::Adverb)];
   table[static_cast<size_t>(ExtendedPOS::Conjunction)] = 0.4F;   // 接続詞
   table[static_cast<size_t>(ExtendedPOS::Determiner)] = 0.4F;    // 連体詞
   table[static_cast<size_t>(ExtendedPOS::Prefix)] = 0.5F;        // 接頭辞

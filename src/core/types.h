@@ -223,6 +223,11 @@ enum class ExtendedPOS : uint8_t {
   // is た's irrealis たら plus む).
   AuxClassicalConjectureTerminal,
 
+  // 疑問副詞: なぜ, なんで, どうして. An interrogative adverb asks for the reason of a
+  // proposition, so it stands directly on a nominal predicate (なぜ+だ, なぜ+です),
+  // which a manner or degree adverb does not.
+  AdverbInterrogative,
+
   // Count marker (for array sizing)
   Count_  // Total number of categories
 };

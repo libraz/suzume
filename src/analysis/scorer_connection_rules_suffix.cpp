@@ -337,7 +337,8 @@ float computeSuffixShortVerbBonus(const core::LatticeEdge& prev, const core::Lat
 
   // A connective し also cannot attach to an interjection or an adverb. Those
   // paths split i-adjective stems (おい+し, バカバカ+し) without a predicate.
-  if ((prev.pos == core::PartOfSpeech::Interjection || prev.extended_pos == core::ExtendedPOS::Adverb) &&
+  if ((prev.pos == core::PartOfSpeech::Interjection || prev.extended_pos == core::ExtendedPOS::Adverb ||
+       prev.extended_pos == core::ExtendedPOS::AdverbInterrogative) &&
       next.extended_pos == core::ExtendedPOS::ParticleConj && grammar::isConjunctiveParticleShi(next.surface)) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
