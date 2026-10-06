@@ -375,6 +375,14 @@ bool fusesPastAuxiliary(const UnknownCandidate& candidate, const std::vector<cha
     return true;
   }
   const std::string prefix = extractSubstring(codepoints, candidate.start, candidate.end - 1);
+  // The past auxiliary selects a continuative, so a one-mora verb registered
+  // only in its terminal cell (the classical ふ) has no past: ふ+た is the
+  // noun ふた.
+  const auto* single_mora_verb =
+      candidate.end == candidate.start + 2 ? dict_manager->lookupExact(prefix, core::PartOfSpeech::Verb) : nullptr;
+  if (single_mora_verb != nullptr && single_mora_verb->extended_pos == core::ExtendedPOS::VerbShuushikei) {
+    return false;
+  }
   constexpr PartOfSpeechMask kPredicateMask = partOfSpeechMask(core::PartOfSpeech::Verb) |
                                               partOfSpeechMask(core::PartOfSpeech::Adjective) |
                                               partOfSpeechMask(core::PartOfSpeech::Auxiliary);

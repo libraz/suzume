@@ -704,6 +704,92 @@
       ],
       "id": "idattte_u",
       "input": "願いだって叶う"
+    },
+    {
+      "description": "そのりんごを食べた。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "その",
+          "pos": "Determiner",
+          "surface": "その"
+        },
+        {
+          "lemma": "りんご",
+          "pos": "Noun",
+          "surface": "りんご"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "sonoringowo_beta",
+      "input": "そのりんごを食べた。"
+    },
+    {
+      "description": "ふたを開ける - auto-generated",
+      "expected": [
+        {
+          "lemma": "ふた",
+          "pos": "Noun",
+          "surface": "ふた"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "開ける",
+          "pos": "Verb",
+          "surface": "開ける"
+        }
+      ],
+      "id": "futawo_keru",
+      "input": "ふたを開ける"
+    },
+    {
+      "description": "鍋のふたが閉まる。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "鍋",
+          "pos": "Noun",
+          "surface": "鍋"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "ふた",
+          "pos": "Noun",
+          "surface": "ふた"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "閉まる",
+          "pos": "Verb",
+          "surface": "閉まる"
+        }
+      ],
+      "id": "nofutaga_maru",
+      "input": "鍋のふたが閉まる。"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",

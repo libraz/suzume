@@ -1014,6 +1014,50 @@
       ],
       "id": "sousuruto_ga_i",
       "input": "そうすると話が早い。"
+    },
+    {
+      "description": "このりんご - auto-generated",
+      "expected": [
+        {
+          "lemma": "この",
+          "pos": "Determiner",
+          "surface": "この"
+        },
+        {
+          "lemma": "りんご",
+          "pos": "Noun",
+          "surface": "りんご"
+        }
+      ],
+      "id": "konoringo",
+      "input": "このりんご"
+    },
+    {
+      "description": "あのねこがかわいい。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "あの",
+          "pos": "Determiner",
+          "surface": "あの"
+        },
+        {
+          "lemma": "ねこ",
+          "pos": "Noun",
+          "surface": "ねこ"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "かわいい",
+          "pos": "Adjective",
+          "surface": "かわいい"
+        }
+      ],
+      "id": "anonekogakawaii",
+      "input": "あのねこがかわいい。"
     }
   ],
   "description": "Basic tokenization tests",
