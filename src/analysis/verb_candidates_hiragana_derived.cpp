@@ -19,6 +19,7 @@
 #include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
 #include "grammar/connection.h"
+#include "grammar/honorific_verbs.h"
 #include "normalize/char_type.h"
 #include "normalize/exceptions.h"
 #include "normalize/utf8.h"
@@ -252,6 +253,13 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
 
     // Check if base form is in dictionary (gives confidence boost)
     bool is_dict_verb = vh::isVerbInDictionary(dict_manager, chosen_base);
+
+    // A verb that exists only behind the honorific prefix お is not a stem on
+    // its own: は+し+ます is the topic particle plus する, not はす.
+    if (is_dict_verb && grammar::isPrefixBoundHonorificVerbLemma(chosen_base) &&
+        !(start_pos > 0 && codepoints[start_pos - 1] == U'お')) {
+      continue;
+    }
 
     // A registered inflectional surface already supplies its own lemma and
     // conjugation type.  Do not overlay an unverified Ichidan reconstruction

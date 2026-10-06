@@ -39,6 +39,8 @@ constexpr std::string_view kAspectualSubsidiaryLemmas[] = {"始める", "はじ�
 // Verbs that exist only as a derivational suffix on a nominal host (形式ばる,
 // 芝居がかる). Their conjugation lives in the dictionary; the host requirement
 // cannot, so callers gate the entry on it.
+// Verbs that exist only behind the honorific prefix お (おはす, おはします).
+constexpr std::string_view kPrefixBoundHonorificVerbLemmas[] = {"はす"};
 constexpr std::string_view kBoundDerivationalSuffixVerbLemmas[] = {"ばる", "がかる", "じみる",
                                                                    "ぶる", "めく",   "めかす"};
 // The subset whose cells can stand for the okurigana of a fabricated verb. めく
@@ -82,6 +84,10 @@ bool startsHonorificSubsidiaryVerb(std::string_view surface) {
 
 bool isAspectualSubsidiaryLemma(std::string_view lemma) {
   return equalsAny(lemma, kAspectualSubsidiaryLemmas);
+}
+
+bool isPrefixBoundHonorificVerbLemma(std::string_view lemma) {
+  return equalsAny(lemma, kPrefixBoundHonorificVerbLemmas);
 }
 
 bool isBoundDerivationalSuffixVerbLemma(std::string_view lemma) {

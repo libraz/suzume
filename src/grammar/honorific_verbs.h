@@ -86,6 +86,17 @@ bool startsHonorificSubsidiaryVerb(std::string_view surface);
 bool isBoundDerivationalSuffixVerbLemma(std::string_view lemma);
 
 /**
+ * @brief Check whether a verb exists only behind the honorific prefix お
+ * @param lemma Verb base form
+ * @return true for the classical honorific verb stem (おはす)
+ *
+ * The dictionary entry carries the conjugation table; callers require the
+ * prefix in front of it, since without it the one-mora stem is the particle は
+ * plus する's continuative (私はします).
+ */
+bool isPrefixBoundHonorificVerbLemma(std::string_view lemma);
+
+/**
  * @brief Check whether an okurigana run spells a cell of one of those verbs
  * @param okurigana Hiragana run following a kanji (UTF-8)
  * @return true if the run is exactly one inflected form of a bound suffix verb

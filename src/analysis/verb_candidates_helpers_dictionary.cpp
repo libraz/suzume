@@ -888,17 +888,32 @@ bool coinedVerbOpensOnArgumentParticle(const dictionary::DictionaryManager* dict
                                        const grammar::Inflection& inflection, const std::vector<char32_t>& codepoints,
                                        size_t start_pos, size_t end_pos, float own_confidence) {
   constexpr size_t kMinSpan = 4;
-  if (dict_manager == nullptr || start_pos == 0 || end_pos < start_pos + kMinSpan ||
-      !normalize::isKanjiCodepoint(codepoints[start_pos - 1]) ||
-      lookupEntryInRange(*dict_manager, codepoints, start_pos, start_pos + 1, core::PartOfSpeech::Particle) ==
-          nullptr) {
+  constexpr size_t kMinTopicSpan = 3;
+  if (dict_manager == nullptr || start_pos == 0 || end_pos < start_pos + kMinTopicSpan) {
+    return false;
+  }
+  const auto* opener =
+      lookupEntryInRange(*dict_manager, codepoints, start_pos, start_pos + 1, core::PartOfSpeech::Particle);
+  if (opener == nullptr) {
+    return false;
+  }
+  // The topic は after a case particle that ends its own argument (店に+は+あり)
+  // is that particle whenever a registered verb follows; any other opener needs
+  // a kanji host and the remainder's own confidence.
+  const bool topic_after_case_particle = opener->extended_pos == core::ExtendedPOS::ParticleTopic &&
+                                         followsCaseParticle(dict_manager, codepoints, start_pos);
+  const bool kanji_host_run = end_pos >= start_pos + kMinSpan && normalize::isKanjiCodepoint(codepoints[start_pos - 1]);
+  if (!topic_after_case_particle && !kanji_host_run) {
     return false;
   }
   float remainder_confidence{};
   for (const auto& analysis : analysesInRange(inflection, codepoints, start_pos + 1, end_pos)) {
+    if (topic_after_case_particle && isVerbInDictionary(dict_manager, analysis.base_form)) {
+      return true;
+    }
     remainder_confidence = std::max(remainder_confidence, analysis.confidence);
   }
-  return remainder_confidence >= own_confidence;
+  return kanji_host_run && remainder_confidence >= own_confidence;
 }
 
 bool opensOnClosedClassWordTail(const dictionary::DictionaryManager* dict_manager,
