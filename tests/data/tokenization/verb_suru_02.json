@@ -762,6 +762,43 @@
       ],
       "id": "motttokichintoshite_ku_nasai",
       "input": "もっときちんとして、早く寝なさい。"
+    },
+    {
+      "description": "ということで解散した - auto-generated",
+      "expected": [
+        {
+          "lemma": "という",
+          "pos": "Determiner",
+          "surface": "という"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "こと"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "lemma": "解散",
+          "pos": "Noun",
+          "surface": "解散"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "toiukotode_shita",
+      "input": "ということで解散した"
     }
   ],
   "description": "Suru-verb patterns with subsidiary verbs - MeCab互換分割 (part 2/2)",

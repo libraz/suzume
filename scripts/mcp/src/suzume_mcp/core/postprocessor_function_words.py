@@ -234,6 +234,34 @@ def postprocess_de_after_nominal(tokens: list[dict]) -> bool:
         token["lemma"] = "で"
 
 
+# Formal nouns that only head a copular predicate (わけだ, はずだ, つもりだ): never
+# a place or a means, so the で behind one is the copula's continuative.
+_COPULAR_PREDICATE_FORMAL_NOUNS = frozenset({"わけ", "はず", "つもり"})
+
+
+@reports_mutation
+def postprocess_copular_formal_noun_de(tokens: list[dict]) -> bool:
+    """Read the で behind a copular formal noun as the copula whatever follows it.
+
+    The reference tags で an auxiliary only at the end of the input (そういうわけで)
+    and a case particle before a predicate (そういうわけで帰る), although the
+    formal noun heads the same copular predicate in both. The こと that a
+    quotation closes (ということで) is the same predicate; a content こと (そのことで
+    悩む) keeps the case particle.
+    """
+    for idx in range(1, len(tokens)):
+        token = tokens[idx]
+        if token.get("surface") != "で" or token.get("pos") not in ("Particle", "Auxiliary"):
+            continue
+        previous = tokens[idx - 1]
+        if previous.get("pos") != "Noun":
+            continue
+        closes_quotation = previous.get("surface") == "こと" and idx >= 2 and tokens[idx - 2].get("surface") == "という"
+        if previous.get("surface") in _COPULAR_PREDICATE_FORMAL_NOUNS or closes_quotation:
+            token["pos"] = "Auxiliary"
+            token["lemma"] = "だ"
+
+
 def postprocess_te_form_contraction(tokens: list[dict]) -> bool:
     """Tag じゃ after an onbin verb as the te-form contraction, like ちゃ.
 

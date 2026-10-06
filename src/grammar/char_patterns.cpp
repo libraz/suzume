@@ -380,6 +380,10 @@ bool isSubstantiveFormalNoun(std::string_view surface) {
   return utf8::equalsAny(surface, {"もの", "物", "こと", "事"});
 }
 
+bool isCopularPredicateFormalNoun(std::string_view surface) {
+  return utf8::equalsAny(surface, {"わけ", "はず", "つもり"});
+}
+
 bool endsInTerminalCellKana(std::string_view surface) {
   const char32_t last = utf8::decodeLastChar(surface);
   return last == U'る' || last == U'い';

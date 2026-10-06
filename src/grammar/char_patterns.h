@@ -317,6 +317,14 @@ bool isBenefactiveFormalNoun(std::string_view surface);
 bool isSubstantiveFormalNoun(std::string_view surface);
 
 /**
+ * @brief Whether a formal noun only heads a copular predicate (わけだ, はずだ, つもりだ)
+ * @param surface Formal noun surface
+ * @return True for the formal nouns that are never a location or a means, so a
+ *         following で is the continuative of the copula rather than a case particle
+ */
+bool isCopularPredicateFormalNoun(std::string_view surface);
+
+/**
  * @brief Whether a formal noun attaches to a verb continuative (読み+よう,
  * 飲み+物, 食べ+ごろ).
  *

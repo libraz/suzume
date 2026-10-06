@@ -1464,6 +1464,37 @@ class TestQuotativeDeterminerHead:
         assert not postprocessors.postprocess_quotative_determiner_head(before_no)
 
 
+class TestCopularFormalNounDe:
+    def test_de_after_copular_formal_noun_is_the_copula(self):
+        tokens = [
+            {"surface": "そういう", "pos": "Determiner"},
+            {"surface": "わけ", "pos": "Noun"},
+            {"surface": "で", "pos": "Particle", "lemma": "で"},
+            {"surface": "帰る", "pos": "Verb"},
+        ]
+        assert postprocessors.postprocess_copular_formal_noun_de(tokens)
+        assert (tokens[2]["pos"], tokens[2]["lemma"]) == ("Auxiliary", "だ")
+
+    def test_quotation_closing_koto_takes_the_copula(self):
+        tokens = [
+            {"surface": "という", "pos": "Determiner"},
+            {"surface": "こと", "pos": "Noun"},
+            {"surface": "で", "pos": "Particle", "lemma": "で"},
+        ]
+        assert postprocessors.postprocess_copular_formal_noun_de(tokens)
+        assert tokens[2]["pos"] == "Auxiliary"
+
+    def test_content_koto_and_places_keep_the_case_particle(self):
+        content = [
+            {"surface": "その", "pos": "Determiner"},
+            {"surface": "こと", "pos": "Noun"},
+            {"surface": "で", "pos": "Particle", "lemma": "で"},
+        ]
+        place = [{"surface": "学校", "pos": "Noun"}, {"surface": "で", "pos": "Particle", "lemma": "で"}]
+        assert not postprocessors.postprocess_copular_formal_noun_de(content)
+        assert not postprocessors.postprocess_copular_formal_noun_de(place)
+
+
 class TestContractedIkuTteNa:
     def test_splits_tte_na_after_te_form_into_iku_cell(self):
         tokens = [

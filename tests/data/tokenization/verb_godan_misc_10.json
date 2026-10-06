@@ -314,6 +314,124 @@
       ],
       "id": "kokoniitakattta",
       "input": "ここにいたかった"
+    },
+    {
+      "description": "そういうわけで帰る - auto-generated",
+      "expected": [
+        {
+          "lemma": "そういう",
+          "pos": "Determiner",
+          "surface": "そういう"
+        },
+        {
+          "lemma": "わけ",
+          "pos": "Noun",
+          "surface": "わけ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "lemma": "帰る",
+          "pos": "Verb",
+          "surface": "帰る"
+        }
+      ],
+      "id": "souiuwakede_ru",
+      "input": "そういうわけで帰る"
+    },
+    {
+      "description": "行くはずで待った - auto-generated",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行く"
+        },
+        {
+          "lemma": "はず",
+          "pos": "Noun",
+          "surface": "はず"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "lemma": "待つ",
+          "pos": "Verb",
+          "surface": "待っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "kuhazude_ttta",
+      "input": "行くはずで待った"
+    },
+    {
+      "description": "そのことで悩む - auto-generated",
+      "expected": [
+        {
+          "lemma": "その",
+          "pos": "Determiner",
+          "surface": "その"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "こと"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "悩む",
+          "pos": "Verb",
+          "surface": "悩む"
+        }
+      ],
+      "id": "sonokotode_mu",
+      "input": "そのことで悩む"
+    },
+    {
+      "description": "行くことで解決する - auto-generated",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行く"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "こと"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "解決",
+          "pos": "Noun",
+          "surface": "解決"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "kukotode_suru",
+      "input": "行くことで解決する"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",

@@ -186,6 +186,13 @@ void resolveNominalCaseDe(std::vector<core::Morpheme>& result) {
     // heads a copular predicate rather than naming a thing, so it belongs with
     // the na-adjective stem and the adverb rather than with a referential noun.
     const bool is_formal_noun = predecessor.extended_pos == core::ExtendedPOS::NounFormal;
+    // A formal noun that only heads a copular predicate (わけ, はず, つもり), or the
+    // こと a quotation closes (ということ), is followed by the copula's
+    // continuative で that joins the clauses (そういうわけで帰る), never by the
+    // case particle of a place or a means (そのことで悩む).
+    const bool is_copular_formal_noun =
+        is_formal_noun && (grammar::isCopularPredicateFormalNoun(predecessor.surface) ||
+                           (idx >= 2 && result[idx - 2].extended_pos == core::ExtendedPOS::DeterminerQuotative));
     const bool is_contracted_negative =
         predecessor.extended_pos == core::ExtendedPOS::AuxNegativeNu && predecessor.surface == "ん";
     const bool is_tendency_suffix = predecessor.extended_pos == core::ExtendedPOS::SuffixTendency;
@@ -230,7 +237,8 @@ void resolveNominalCaseDe(std::vector<core::Morpheme>& result) {
     // A na-adjective cannot take the case-particle reading of で. Its
     // continuative form remains the copula even before an independent noun
     // (無鉄砲で小供の時から).
-    if (is_na_adjective || is_tendency_suffix || is_copular_continuation || na_adjective_coordination) {
+    if (is_na_adjective || is_tendency_suffix || is_copular_continuation || na_adjective_coordination ||
+        is_copular_formal_noun) {
       if (is_tendency_suffix) {
         auto& tendency = result[idx - 1];
         tendency.pos = core::PartOfSpeech::Suffix;
