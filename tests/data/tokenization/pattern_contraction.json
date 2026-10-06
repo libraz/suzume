@@ -1575,6 +1575,45 @@
       ],
       "id": "bennayo",
       "input": "食べんなよ"
+    },
+    {
+      "description": "触んなよ。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "触る",
+          "pos": "Verb",
+          "surface": "触ん"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "nnayo_4",
+      "input": "触んなよ。"
+    },
+    {
+      "description": "触んな。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "触る",
+          "pos": "Verb",
+          "surface": "触ん"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        }
+      ],
+      "id": "nna_2",
+      "input": "触んな。"
     }
   ],
   "description": "Contraction patterns (てる、ちゃう)",
