@@ -127,6 +127,9 @@ EntrySpecRange getPronounEntries() {
       pronoun_interrogative("どれ", ""),
       pronoun_interrogative("どこ", ""),
       pronoun_interrogative("どちら", ""),
+      // Contracted indefinite どこか: one pronoun, not the dialectal aspect
+      // auxiliary どっ (どる) plus か.
+      pronoun("どっか", ""),
       pronoun_interrogative("どなた", ""),
 
       // Indefinite (不定代名詞) - kanji with reading

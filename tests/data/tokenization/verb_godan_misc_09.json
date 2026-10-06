@@ -2835,8 +2835,57 @@
       ],
       "id": "a_wakattta",
       "input": "あ、わかった。"
+    },
+    {
+      "description": "食べてどっか行く - auto-generated",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "どっか",
+          "pos": "Pronoun",
+          "surface": "どっか"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行く"
+        }
+      ],
+      "id": "betedottka_ku",
+      "input": "食べてどっか行く"
+    },
+    {
+      "description": "どっか行こう - auto-generated",
+      "expected": [
+        {
+          "lemma": "どっか",
+          "pos": "Pronoun",
+          "surface": "どっか"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行こ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "dottka_kou",
+      "input": "どっか行こう"
     }
   ],
-  "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",
+  "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/10)",
   "version": "1.0"
 }

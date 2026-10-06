@@ -1,0 +1,43 @@
+{
+  "cases": [
+    {
+      "description": "どっかの店で会おう - auto-generated",
+      "expected": [
+        {
+          "lemma": "どっか",
+          "pos": "Pronoun",
+          "surface": "どっか"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "店",
+          "pos": "Noun",
+          "surface": "店"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "会う",
+          "pos": "Verb",
+          "surface": "会お"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "dottkano_de_ou",
+      "input": "どっかの店で会おう"
+    }
+  ],
+  "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",
+  "version": "1.0"
+}
