@@ -577,6 +577,23 @@ bool startsSentenceParticleKanaQuote(std::string_view surface) {
   return startsFinalParticleBeforeQuote(surface, "かな");
 }
 
+bool startsContractedDemonstrativeBeforeKa(std::string_view surface) {
+  constexpr std::string_view kContraction = "そっか";
+  if (!utf8::startsWithAny(surface, {kContraction, "こっか"})) {
+    return false;
+  }
+  // か must close the word: a kana that continues a lexeme (こっかい) is not
+  // the contracted question.
+  const std::string_view rest = surface.substr(kContraction.size());
+  if (rest.empty()) {
+    return true;
+  }
+  size_t pos = 0;
+  const char32_t next = normalize::decodeUtf8(rest, pos);
+  return normalize::classifyChar(next) != normalize::CharType::Hiragana ||
+         utf8::startsWithAny(rest, {"あ", "ぁ", "ね", "な", "よ", "と", "も", "の", "さ", "って"});
+}
+
 bool startsInterrogativeQuoteIntroduction(std::string_view surface) {
   return utf8::startsWith(surface, "かというと");
 }

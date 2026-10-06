@@ -787,6 +787,11 @@ constexpr float kSentenceParticleQuoteCost = -1.2F;
 // particle start penalty before its following quote particle supplies context.
 constexpr float kLongSentenceParticleQuoteCost = -2.3F;
 
+// The contracted demonstrative adverb そっ/こっ (そうか/こうか) competes with a
+// fabricated kana noun spanning the question particle; it needs the same
+// margin as the two-mora final particle that opens a sentence.
+constexpr float kContractedDemonstrativeCost = kLongSentenceParticleQuoteCost;
+
 constexpr float kClassicalAraNLimitCost = -4.0F;
 
 // Minimum inflection confidence for treating a lexical adverb ending in

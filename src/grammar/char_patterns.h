@@ -549,6 +549,13 @@ bool isCausalParticleBeforeTopic(std::string_view particle_surface, std::string_
 bool startsSentenceParticleKanaQuote(std::string_view surface);
 
 /**
+ * @brief Whether text begins the contracted demonstrative adverb そっ/こっ before か
+ * @param surface Text at a prospective adverb boundary
+ * @return True for そっか/こっか when か closes the contraction of そうか/こうか
+ */
+bool startsContractedDemonstrativeBeforeKa(std::string_view surface);
+
+/**
  * @brief Whether text begins the interrogative quotative introduction かというと
  * @param surface Text immediately after an adverb candidate
  * @return True for the explanatory quote opener

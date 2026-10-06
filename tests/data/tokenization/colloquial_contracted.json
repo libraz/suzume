@@ -1667,6 +1667,50 @@
       ],
       "id": "kannee",
       "input": "分かんねえ"
+    },
+    {
+      "description": "そっかあ - auto-generated",
+      "expected": [
+        {
+          "lemma": "そう",
+          "pos": "Adverb",
+          "surface": "そっ"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "かあ"
+        }
+      ],
+      "id": "sottkaa",
+      "input": "そっかあ"
+    },
+    {
+      "description": "そっか、わかった。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "そう",
+          "pos": "Adverb",
+          "surface": "そっ"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "わかる",
+          "pos": "Verb",
+          "surface": "わかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "sottka_wakattta",
+      "input": "そっか、わかった。"
     }
   ],
   "description": "colloquial_contracted tests",

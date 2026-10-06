@@ -103,6 +103,17 @@ void appendSpecialGrammarCandidates(core::Lattice& lattice, std::string_view tex
                     "long_sentence_particle_quote");
   }
 
+  // そっか/こっか is the contracted demonstrative adverb (そう/こう) plus the
+  // question particle か, not one kana noun.
+  if (grammar::startsContractedDemonstrativeBeforeKa(text.substr(byte_pos))) {
+    const std::string lemma = codepoints[start_pos] == U'そ' ? "そう" : "こう";
+    lattice.addEdge(normalize::utf8Substr(text.substr(byte_pos), 0, 2), static_cast<uint32_t>(start_pos),
+                    static_cast<uint32_t>(start_pos + 2), core::PartOfSpeech::Adverb,
+                    candidate::kContractedDemonstrativeCost, 0, lemma, dictionary::ConjugationType::None,
+                    core::CandidateOrigin::Unknown, candidate::kDictionaryOriginConfidence, {},
+                    core::ExtendedPOS::Adverb, "contracted_demonstrative_ka");
+  }
+
   // Edition 版 is a suffix only after a numeral or ordinal component
   // (第3版, 第三版).  Elsewhere it retains the independent noun reading
   // (新しい版), so do not register it as an unconditional dictionary suffix.
