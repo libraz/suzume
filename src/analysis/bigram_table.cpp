@@ -86,6 +86,23 @@ BigramTable::EncodedTable BigramTable::initTable() {
     table[idx][static_cast<size_t>(core::ExtendedPOS::VerbContractedKateikei)] =
         table[idx][static_cast<size_t>(core::ExtendedPOS::VerbShuushikei)];
   }
+  // The choice か stands where the final か does, and differs only in what it
+  // hands on: it joins a following item, so a nominal head may follow it where
+  // the final か prohibits one. After a nominal the final か already serves
+  // (雨か雪), and a split-off か there would outbid a longer particle ending in
+  // か (どころか), so only a predicate may precede the choice か.
+  {
+    bigram_rules::inheritRuleProfile(table, core::ExtendedPOS::ParticleFinal, core::ExtendedPOS::ParticleChoice);
+    const size_t choice = static_cast<size_t>(core::ExtendedPOS::ParticleChoice);
+    for (size_t idx = 0; idx < BigramTable::kSize; ++idx) {
+      const auto other = static_cast<core::ExtendedPOS>(idx);
+      if (core::isNounType(other) || other == core::ExtendedPOS::Pronoun ||
+          other == core::ExtendedPOS::PronounInterrogative) {
+        table[choice][idx] = bigram_rules::encodeCost(bigram_cost::kNeutral);
+        table[idx][choice] = bigram_rules::encodeCost(bigram_cost::kNever);
+      }
+    }
+  }
   // A nominal in Latin letters or digits is a noun in every respect the general
   // category covers, so it inherits that profile whole rather than restating
   // it. The one cell that differs is set below.

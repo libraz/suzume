@@ -155,6 +155,8 @@ constexpr std::array<float, static_cast<size_t>(ExtendedPOS::Count_)> kCategoryC
   // form it attaches to differs.
   table[static_cast<size_t>(ExtendedPOS::ParticleConjFinite)] =
       table[static_cast<size_t>(ExtendedPOS::ParticleConj)];  // が(逆接)
+  table[static_cast<size_t>(ExtendedPOS::ParticleChoice)] =
+      table[static_cast<size_t>(ExtendedPOS::ParticleFinal)];  // か(選択・並立)
 
   // ===========================================================================
   // Nouns (0.5-0.6)

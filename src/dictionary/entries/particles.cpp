@@ -94,6 +94,9 @@ EntrySpecRange getParticleEntries() {
 
       // Final particles (終助詞)
       particle("か", EPOS::ParticleFinal),
+      // The choice/listing か of A か B (雨か雪, 行くか行かないか) joins the next
+      // item, where the final か closes the clause.
+      particle("か", EPOS::ParticleChoice),
       particle("かい", EPOS::ParticleFinal),
       particle("け", EPOS::ParticleFinal),  // colloquial variant (こんだけ → こん+だ+け)
       particle("な", EPOS::ParticleFinal),

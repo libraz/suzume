@@ -2545,6 +2545,75 @@
       ],
       "id": "ninabikite",
       "input": "風になびきて"
+    },
+    {
+      "description": "雨というか雪 - auto-generated",
+      "expected": [
+        {
+          "lemma": "雨",
+          "pos": "Noun",
+          "surface": "雨"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "いう",
+          "pos": "Verb",
+          "surface": "いう"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "雪",
+          "pos": "Noun",
+          "surface": "雪"
+        }
+      ],
+      "id": "toiuka",
+      "input": "雨というか雪"
+    },
+    {
+      "description": "行くか行かないか迷う - auto-generated",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行く"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行か"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "迷う",
+          "pos": "Verb",
+          "surface": "迷う"
+        }
+      ],
+      "id": "kuka_kanaika_u",
+      "input": "行くか行かないか迷う"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",

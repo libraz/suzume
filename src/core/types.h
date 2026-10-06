@@ -237,6 +237,11 @@ enum class ExtendedPOS : uint8_t {
   // っけ (行ったっけ) is the competing reading.
   SuffixTrace,
 
+  // 選択・並立の副助詞 か (雨か雪, 行くか行かないか, 雨というか雪). Unlike the final か
+  // it joins the next item instead of closing the clause, so a nominal or a
+  // predicate may follow it.
+  ParticleChoice,
+
   // Count marker (for array sizing)
   Count_  // Total number of categories
 };
@@ -467,7 +472,7 @@ constexpr bool isParticleType(ExtendedPOS epos) {
   // appended after it because ExtendedPOS is serialized as uint8 in the
   // compiled dictionaries, so the range alone no longer covers the class.
   return (epos >= ExtendedPOS::ParticleCase && epos <= ExtendedPOS::ParticleBinding) ||
-         epos == ExtendedPOS::ParticleConjFinite;
+         epos == ExtendedPOS::ParticleConjFinite || epos == ExtendedPOS::ParticleChoice;
 }
 
 /**

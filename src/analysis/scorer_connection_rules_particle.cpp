@@ -255,6 +255,7 @@ float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::
   // ながら; do not reject that productive classical construction.
   const bool unlicensed_hypothetical_host =
       prev.extended_pos == core::ExtendedPOS::ParticleAdverbial ||
+      prev.extended_pos == core::ExtendedPOS::ParticleChoice ||
       prev.extended_pos == core::ExtendedPOS::ParticleBinding ||
       (prev.extended_pos == core::ExtendedPOS::AuxPassive && !grammar::spellsHypotheticalAuxiliaryCell(prev.surface) &&
        utf8::equalsAny(next.surface, {"ば"}));

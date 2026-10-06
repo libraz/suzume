@@ -368,6 +368,8 @@ std::string_view extendedPosToString(ExtendedPOS epos) {
       return "PART_接続";
     case ExtendedPOS::ParticleConjFinite:
       return "PART_接続終止";
+    case ExtendedPOS::ParticleChoice:
+      return "PART_選択";
     case ExtendedPOS::ParticleQuote:
       return "PART_引用";
     case ExtendedPOS::ParticleAdverbial:

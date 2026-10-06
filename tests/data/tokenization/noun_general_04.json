@@ -2533,6 +2533,55 @@
       ],
       "id": "no_yari",
       "input": "毎日の水やり"
+    },
+    {
+      "description": "紅茶かコーヒーか - auto-generated",
+      "expected": [
+        {
+          "lemma": "紅茶",
+          "pos": "Noun",
+          "surface": "紅茶"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "コーヒー",
+          "pos": "Noun",
+          "surface": "コーヒー"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "ka_ka",
+      "input": "紅茶かコーヒーか"
+    },
+    {
+      "description": "雨か雪 - auto-generated",
+      "expected": [
+        {
+          "lemma": "雨",
+          "pos": "Noun",
+          "surface": "雨"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "雪",
+          "pos": "Noun",
+          "surface": "雪"
+        }
+      ],
+      "id": "ka_2",
+      "input": "雨か雪"
     }
   ],
   "description": "General nouns (part 4/4)",
