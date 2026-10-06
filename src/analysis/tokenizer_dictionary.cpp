@@ -1738,13 +1738,19 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
       }
     }
 
-    const auto starts_aspectual_iru = [&](size_t pos) {
+    // A word that selects a te-form: the progressive いる, the benefactive verbs, the
+    // humble honorific ください, and the conjunctive から (てから).
+    const auto starts_te_selecting_word = [&](size_t pos) {
       if (pos >= codepoints.size()) {
         return false;
       }
       const auto following = dict_manager_.lookup(text, byteOffsetAt(byte_offsets, pos));
       return std::any_of(following.begin(), following.end(), [](const auto& candidate) {
-        return candidate.entry != nullptr && candidate.entry->lemma == "いる";
+        const auto* entry = candidate.entry;
+        return entry != nullptr &&
+               (entry->lemma == "いる" || grammar::isBenefactiveLemma(entry->lemma) ||
+                grammar::isHumbleHonorificLemma(entry->lemma) ||
+                (entry->extended_pos == core::ExtendedPOS::ParticleConj && utf8::equalsAny(entry->surface, {"から"})));
       });
     };
 
@@ -1754,11 +1760,13 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     // grammatical role (で+も, と+も).
     if (result.entry->pos == core::PartOfSpeech::Particle) {
       // A compound case particle ends an adpositional phrase and cannot host
-      // the aspectual いる. When that continuation is
-      // present, keep the shorter internal case-particle boundary so the
-      // adjoining verb te-form can carry the auxiliary (目を+通し+て+いる).
+      // a word that selects a te-form (the aspectual いる, ください, てから).
+      // When that continuation is present, keep the shorter internal
+      // case-particle boundary so the adjoining verb te-form can carry it
+      // (目を+通し+て+いる, 席に+つい+て+ください).
       const bool compound_particle_before_aspect = result.entry->extended_pos == core::ExtendedPOS::ParticleCase &&
-                                                   result.length > 1 && starts_aspectual_iru(end_pos);
+                                                   result.length > 1 && utf8::endsWith(result.entry->surface, "て") &&
+                                                   starts_te_selecting_word(end_pos);
       if (compound_particle_before_aspect) {
         continue;
       }
@@ -1781,7 +1789,7 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
                    other.entry->extended_pos == result.entry->extended_pos && other.length > result.length &&
                    !grammar::isAttributiveCompoundParticleSurface(other.entry->surface) &&
                    !(other.entry->extended_pos == core::ExtendedPOS::ParticleCase && other.length > 1 &&
-                     starts_aspectual_iru(other_end));
+                     utf8::endsWith(other.entry->surface, "て") && starts_te_selecting_word(other_end));
           });
       const bool keep_interrogative_quotative =
           result.entry->extended_pos == core::ExtendedPOS::ParticleCase && result.length == 1 &&

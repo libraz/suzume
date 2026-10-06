@@ -1175,6 +1175,112 @@
       ],
       "id": "ketttena",
       "input": "行けってな"
+    },
+    {
+      "description": "駅についてから連絡する。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "駅",
+          "pos": "Noun",
+          "surface": "駅"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "つく",
+          "pos": "Verb",
+          "surface": "つい"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "から",
+          "pos": "Particle",
+          "surface": "から"
+        },
+        {
+          "lemma": "連絡",
+          "pos": "Noun",
+          "surface": "連絡"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "nitsuitekara_suru",
+      "input": "駅についてから連絡する。"
+    },
+    {
+      "description": "席についてください。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "席",
+          "pos": "Noun",
+          "surface": "席"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "つく",
+          "pos": "Verb",
+          "surface": "つい"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くださる",
+          "pos": "Verb",
+          "surface": "ください"
+        }
+      ],
+      "id": "nitsuitekudasai",
+      "input": "席についてください。"
+    },
+    {
+      "description": "問題について考えてください。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "問題",
+          "pos": "Noun",
+          "surface": "問題"
+        },
+        {
+          "lemma": "について",
+          "pos": "Particle",
+          "surface": "について"
+        },
+        {
+          "lemma": "考える",
+          "pos": "Verb",
+          "surface": "考え"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くださる",
+          "pos": "Verb",
+          "surface": "ください"
+        }
+      ],
+      "id": "nitsuite_etekudasai",
+      "input": "問題について考えてください。"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",
