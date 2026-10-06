@@ -1073,6 +1073,102 @@
       ],
       "id": "tomo_suru_2",
       "input": "先生とも相談する"
+    },
+    {
+      "description": "先生に声がけする - auto-generated",
+      "expected": [
+        {
+          "lemma": "先生",
+          "pos": "Noun",
+          "surface": "先生"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "声",
+          "pos": "Noun",
+          "surface": "声"
+        },
+        {
+          "lemma": "がけ",
+          "pos": "Suffix",
+          "surface": "がけ"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "ni_gakesuru",
+      "input": "先生に声がけする"
+    },
+    {
+      "description": "新入生に声がけする - auto-generated",
+      "expected": [
+        {
+          "lemma": "新入生",
+          "pos": "Noun",
+          "surface": "新入生"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "声",
+          "pos": "Noun",
+          "surface": "声"
+        },
+        {
+          "lemma": "がけ",
+          "pos": "Suffix",
+          "surface": "がけ"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "ni_gakesuru_2",
+      "input": "新入生に声がけする"
+    },
+    {
+      "description": "祖母の肩をさする - auto-generated",
+      "expected": [
+        {
+          "lemma": "祖母",
+          "pos": "Noun",
+          "surface": "祖母"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "肩",
+          "pos": "Noun",
+          "surface": "肩"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "さする",
+          "pos": "Verb",
+          "surface": "さする"
+        }
+      ],
+      "id": "no_wosasuru",
+      "input": "祖母の肩をさする"
     }
   ],
   "description": "Suru-verb patterns with subsidiary verbs - MeCab互換分割 (part 2/2)",

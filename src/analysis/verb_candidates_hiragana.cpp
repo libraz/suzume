@@ -182,6 +182,12 @@ size_t completeGodanTerminalAfterCaseParticle(const std::vector<char32_t>& codep
   }
 
   const std::string surface = extractSubstring(codepoints, start_pos, end_pos);
+  // One mora before する is a light-verb host, not a Godan stem: 声が+け+する is
+  // the noun plus the suru-verb, while the Godan verbs of that shape (こする,
+  // ゆする) are registered.
+  if (end_pos - start_pos == 3 && utf8::endsWith(surface, "する") && !vh::isVerbInDictionary(dict_manager, surface)) {
+    return 0;
+  }
   for (const auto& candidate : inflection.analyze(surface)) {
     if (grammar::isGodanVerbType(candidate.verb_type) && candidate.base_form == surface &&
         candidate.morphemes.empty() && candidate.confidence >= verb_opts.confidence_standard) {
