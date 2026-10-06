@@ -29,6 +29,25 @@ bool isVerbInDictionary(const dictionary::DictionaryManager* dict_manager, std::
   return hasDictionaryEntry(dict_manager, base_form, core::PartOfSpeech::Verb);
 }
 
+bool isVerbBaseFormInDictionary(const dictionary::DictionaryManager* dict_manager, std::string_view base_form) {
+  if (dict_manager == nullptr || base_form.empty()) {
+    return false;
+  }
+  const auto matches = dict_manager->lookup(base_form, 0);
+  return std::any_of(matches.begin(), matches.end(), [&](const auto& match) {
+    const auto* entry = match.entry;
+    return entry != nullptr && entry->pos == core::PartOfSpeech::Verb && entry->surface.size() == base_form.size() &&
+           (entry->lemma.empty() || entry->lemma == base_form);
+  });
+}
+
+bool isStrandedPotentialStem(const dictionary::DictionaryManager* dict_manager, std::string_view ichidan_base,
+                             const std::vector<char32_t>& codepoints, size_t stem_end) {
+  const bool kana_follows = stem_end < codepoints.size() && kana::isHiraganaCodepoint(codepoints[stem_end]);
+  return !kana_follows && isVerbInDictionary(dict_manager, ichidan_base) &&
+         !isVerbBaseFormInDictionary(dict_manager, ichidan_base);
+}
+
 bool isAdjectiveInDictionary(const dictionary::DictionaryManager* dict_manager, std::string_view base_form) {
   return hasDictionaryEntry(dict_manager, base_form, core::PartOfSpeech::Adjective);
 }

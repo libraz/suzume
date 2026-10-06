@@ -118,6 +118,12 @@ void generateCompoundVerbCandidates(const std::vector<char32_t>& codepoints, siz
         continue;
       }
 
+      // A bare potential stem with nothing to carry is the listed verb's own
+      // e-row cell (咲き誇れ+心), not the potential (見つけ出せ+なかった).
+      if (infl_cand.verb_type == grammar::VerbType::Ichidan && infl_cand.suffix.empty() &&
+          verb_helpers::isStrandedPotentialStem(dict_manager, infl_cand.base_form, codepoints, end_pos)) {
+        continue;
+      }
       // Check if base form exists in dictionary as a verb
       if (verb_helpers::isVerbInDictionary(dict_manager, infl_cand.base_form)) {
         // v0.8: conj_type removed - just verify verb exists in dictionary

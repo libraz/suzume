@@ -9,6 +9,7 @@ from .constants import (
     KYUJITAI_TO_SHINJITAI,
     LITERARY_VOLITIONAL_PARTICLE_COMPOUNDS,
 )
+from .core_lexicon import core_headwords
 from .mecab import is_single_token_of_pos, mecab_analyze
 from .merge_postprocessor_common import _A_ROW_TO_U_ROW, _continuative_verb_tokens, _plain
 
@@ -263,32 +264,44 @@ def _postprocess_tomo_particle(result: list[dict], applied_rule: str | None) -> 
     return merged, applied_rule
 
 
-def _postprocess_izenkei_concessive(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
-    """Give the 已然形 before a concessive conjunction its plain verb lemma.
+def _postprocess_plain_verb_e_row_lemma(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
+    """Give a bare e-row form the plain verb lemma where the potential cannot stand.
 
     ど/ども select the 已然形, which the modern paradigm spells like the
     hypothetical (書け+ど, 飲め+ど). The potential verb of the same stem reaches
     that conjunction only through its own 已然形 (書けれ+ど), so a bare e-row form
     here belongs to the plain verb. The reference dictionary splits the two
     readings by row, giving 飲む for one and 書ける for the other.
+
+    The same holds before a noun when nothing lists the e-row form as a verb
+    of its own: a potential's bare stem runs on into the next word only through
+    an auxiliary or particle, so there the e-row is the plain verb's imperative
+    (走れ+目標 is 走る). The evidence is the core lexicon listing the plain verb
+    and not the ichidan one (合わせ+技法 keeps 合わせる), or an adverbial noun
+    opening the next clause (走り出せ+今 is 走り出す).
     """
+    listed_verbs = core_headwords("verbs.tsv")
     tagged: list[dict] = []
     for idx, token in enumerate(result):
         following = result[idx + 1] if idx + 1 < len(result) else None
         surface = token.get("surface", "")
+        plain = surface[:-1] + _E_ROW_TO_U_ROW.get(surface[-1:], "")
+        before_noun = following is not None and following.get("pos") == "名詞"
+        selects_e_row_cell = following is not None and (
+            (before_noun and following.get("pos_sub1") == "副詞可能")
+            or (before_noun and plain in listed_verbs and surface + "る" not in listed_verbs)
+            or (following.get("surface") in _CONCESSIVE_PARTICLES and following.get("pos") == "助詞")
+        )
         if (
-            following is not None
-            and following.get("surface") in _CONCESSIVE_PARTICLES
-            and following.get("pos") == "助詞"
+            selects_e_row_cell
             and token.get("pos") == "動詞"
             and token.get("lemma") == surface + "る"
             and surface[-1:] in _E_ROW_TO_U_ROW
         ):
-            plain = surface[:-1] + _E_ROW_TO_U_ROW[surface[-1]]
             if is_single_token_of_pos(plain, "動詞"):
                 tagged.append({**token, "lemma": plain})
                 if applied_rule is None:
-                    applied_rule = "izenkei-concessive-lemma"
+                    applied_rule = "plain-verb-e-row-lemma"
                 continue
         tagged.append(token)
     return tagged, applied_rule

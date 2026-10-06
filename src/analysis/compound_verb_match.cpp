@@ -515,9 +515,13 @@ CompoundVerbMatch findCompoundVerbMatch(
           return;
         }
         // Nothing predicative follows an imperative. That is the end of the
-        // text, or a punctuation mark closing the clause for it (呼び続けよ、…).
+        // text, a punctuation mark closing the clause for it (呼び続けよ、…), or
+        // the next word starting on kanji (走り出せ今). The competing readings
+        // all need kana right after: ば for the conditional, the auxiliary for
+        // the potential's stem.
         const size_t imperative_end = v2_start + normalize::utf8Length(imperative);
-        if (imperative_end < char_types.size() && char_types[imperative_end] != CharType::Symbol) {
+        if (imperative_end < char_types.size() && char_types[imperative_end] != CharType::Symbol &&
+            char_types[imperative_end] != CharType::Kanji) {
           return;
         }
         matched_imperative = true;
@@ -777,7 +781,8 @@ CompoundVerbMatch findCompoundVerbMatch(
       // Any lexical V2 match outranks an imperative generated off a different
       // Godan V2 that happens to spell the same characters: つけ is the
       // continuative of the listed つける before it is the imperative of つく.
-      should_update = true;
+      // A shorter match spells fewer of them (the 出 of 出る inside 出せ).
+      should_update = matched_len >= best_match.matched_len;
     } else if ((matched_kanji || matched_reading) && !inflection_includes_aux && !best_match.includes_aux &&
                !best_match.is_renyokei && !best_match.renyokei_form && !best_match.is_mizenkei &&
                !best_match.is_potential && !best_match.is_kateikei && !best_match.is_volitional &&

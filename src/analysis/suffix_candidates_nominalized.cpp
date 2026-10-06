@@ -657,7 +657,7 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
         (!base_ending.empty() &&
          verb_helpers::isVerbInDictionary(
              dict_manager, normalize::concat(normalize::encodeUtf8(codepoints[kanji_end - 1]), base_ending))) ||
-        (kana::isERowCodepoint(first_hiragana) && verb_helpers::isVerbInDictionary(dict_manager, stem + "る"));
+        (kana::isERowCodepoint(first_hiragana) && verb_helpers::isVerbBaseFormInDictionary(dict_manager, stem + "る"));
     // Without that evidence the shape alone still describes the compound, and
     // the paradigm it names is the same one (枯れ葉, 焼き魚, 巻き貝 differ from
     // 立ち木 only in whether their base verb happens to be listed). What the
@@ -670,8 +670,27 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
     // branch (笑い声, 買い物); without it the adjective is by far the commoner
     // word, so the shape alone does not earn the discounted compound there.
     const bool ambiguous_with_adjective_terminal = first_hiragana == U'い' && !is_verb_continuative;
-    const bool has_continuative_shape =
-        (!base_ending.empty() && !ambiguous_with_adjective_terminal) || kana::isERowCodepoint(first_hiragana);
+    // An e-row okurigana is a continuative only on the ichidan paradigm. When
+    // the kanji plus the matching u-row mora closes a listed verb, the same
+    // e-row is that verb's own imperative/hypothetical cell (出せ ← 出す,
+    // 咲き誇れ ← 咲き誇る), not a continuative (受け皿 still passes on 受ける).
+    const bool e_row_is_listed_verb_cell = [&] {
+      const std::string_view u_row = grammar::godanBaseSuffixFromERow(first_hiragana);
+      if (!kana::isERowCodepoint(first_hiragana) || is_verb_continuative || u_row.empty()) {
+        return false;
+      }
+      constexpr size_t kVerbHeadProbe = 4;
+      const size_t probe_start = start_pos > kVerbHeadProbe ? start_pos - kVerbHeadProbe : 0;
+      for (size_t verb_start = start_pos + 1; verb_start-- > probe_start;) {
+        if (verb_helpers::isVerbInDictionary(
+                dict_manager, normalize::concat(extractSubstring(codepoints, verb_start, kanji_end), u_row))) {
+          return true;
+        }
+      }
+      return false;
+    }();
+    const bool has_continuative_shape = (!base_ending.empty() && !ambiguous_with_adjective_terminal) ||
+                                        (kana::isERowCodepoint(first_hiragana) && !e_row_is_listed_verb_cell);
     // A closed suffix on the right is its own morpheme (書き|先, 崩し|的), so it
     // never becomes the second half of a lexical compound.
     const bool crosses_suffix = hasClosedSuffixBoundary(codepoints, start_pos, kanji_end + 2, dict_manager);

@@ -246,6 +246,72 @@
       ],
       "id": "temina",
       "input": "来てみな"
+    },
+    {
+      "description": "走り出せ今 - auto-generated",
+      "expected": [
+        {
+          "lemma": "走り出す",
+          "pos": "Verb",
+          "surface": "走り出せ"
+        },
+        {
+          "lemma": "今",
+          "pos": "Noun",
+          "surface": "今"
+        }
+      ],
+      "id": "ri_se",
+      "input": "走り出せ今"
+    },
+    {
+      "description": "書け今 - auto-generated",
+      "expected": [
+        {
+          "lemma": "書く",
+          "pos": "Verb",
+          "surface": "書け"
+        },
+        {
+          "lemma": "今",
+          "pos": "Noun",
+          "surface": "今"
+        }
+      ],
+      "id": "ke_2",
+      "input": "書け今"
+    },
+    {
+      "description": "咲き誇れ心の花よ - auto-generated",
+      "expected": [
+        {
+          "lemma": "咲き誇る",
+          "pos": "Verb",
+          "surface": "咲き誇れ"
+        },
+        {
+          "lemma": "心",
+          "pos": "Noun",
+          "surface": "心"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "花",
+          "pos": "Noun",
+          "surface": "花"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "ki_re_no_yo",
+      "input": "咲き誇れ心の花よ"
     }
   ],
   "description": "verb_imperative tests",

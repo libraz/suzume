@@ -1027,7 +1027,7 @@
       "description": "A bound head does not take the first kanji of a following compound",
       "expected": [
         {
-          "lemma": "走れる",
+          "lemma": "走る",
           "pos": "Verb",
           "surface": "走れ"
         },

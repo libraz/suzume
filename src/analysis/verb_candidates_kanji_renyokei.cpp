@@ -328,11 +328,15 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
         // opens the next word instead (肩+ひじ, not 肩ひ + じ). A registered
         // lemma keeps its candidate, so a lexical exception stays spellable.
         const bool shifted_row_ichidan_stem = !ichidan_base_is_dict && !grammar::isMonogradeStemFinalKana(first_hira);
+        // A bare potential stem with nothing to carry is the listed verb's own
+        // e-row cell (書け+今), not the potential (書け+ない).
+        const bool stranded_potential_stem =
+            vh::isStrandedPotentialStem(dict_manager, ichidan_cand.base_form, codepoints, renyokei_end);
         if (!prefer_suru && !prefer_godan && ichidan_cand.confidence > conf_threshold && !surface_is_dict_noun &&
             !single_kanji_te_form && !suffix_is_dict_verb && !trailing_span_is_dict_suffix &&
             !suffix_is_godan_before_auxiliary && !adj_homograph_blocked && !okurigana_opens_auxiliary &&
             !okurigana_opens_bound_suffix && !unverified_multi_kanji_suru_mizen &&
-            !unverified_before_temporal_nominal && !shifted_row_ichidan_stem) {
+            !unverified_before_temporal_nominal && !shifted_row_ichidan_stem && !stranded_potential_stem) {
           // Negative cost to strongly favor split over combined analysis
           // Combined forms get optimal_length bonus (-0.5), so we need to be lower
           // A bound verb prefix is the one multi-kanji stem that cannot be read

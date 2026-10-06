@@ -35,7 +35,7 @@ _postprocess_classical_mu = merge_postprocessor_classical_verbs._postprocess_cla
 _postprocess_classical_shimu = merge_postprocessor_classical_verbs._postprocess_classical_shimu
 _postprocess_ha_row_godan = merge_postprocessor_classical_verbs._postprocess_ha_row_godan
 _postprocess_historical_kana_word = merge_postprocessor_classical_verbs._postprocess_historical_kana_word
-_postprocess_izenkei_concessive = merge_postprocessor_classical_verbs._postprocess_izenkei_concessive
+_postprocess_plain_verb_e_row_lemma = merge_postprocessor_classical_verbs._postprocess_plain_verb_e_row_lemma
 _postprocess_kakari_pronoun_split = merge_postprocessor_classical_verbs._postprocess_kakari_pronoun_split
 _postprocess_nidan_cell = merge_postprocessor_classical_verbs._postprocess_nidan_cell
 _postprocess_nominal_classical_copula = merge_postprocessor_classical_verbs._postprocess_nominal_classical_copula
@@ -116,7 +116,7 @@ def apply_merge_postprocessors(result: list[dict], applied_rule: str | None) -> 
     result, applied_rule = _postprocess_bound_prefix_adjective(result, applied_rule)
     result, applied_rule = _postprocess_word_internal_honorific_prefix(result, applied_rule)
     result, applied_rule = _postprocess_variation_selector_merge(result, applied_rule)
-    result, applied_rule = _postprocess_izenkei_concessive(result, applied_rule)
+    result, applied_rule = _postprocess_plain_verb_e_row_lemma(result, applied_rule)
     result, applied_rule = _postprocess_tomo_particle(result, applied_rule)
     result, applied_rule = _postprocess_bound_voiced_suffix(result, applied_rule)
     result, applied_rule = _postprocess_bound_suffix_noun_cell(result, applied_rule)

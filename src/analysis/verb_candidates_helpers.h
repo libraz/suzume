@@ -90,6 +90,26 @@ bool hasInternalVerbChainBoundary(const std::vector<char32_t>& codepoints, size_
 bool isVerbInDictionary(const dictionary::DictionaryManager* dict_manager, std::string_view base_form);
 
 /**
+ * @brief Whether @p base_form is listed as a verb's own dictionary form
+ *
+ * Unlike isVerbInDictionary, a conjugated cell the dictionary expands from
+ * another verb does not count: 書ける is listed as the potential of 書く,
+ * not as an ichidan verb in its own right.
+ */
+bool isVerbBaseFormInDictionary(const dictionary::DictionaryManager* dict_manager, std::string_view base_form);
+
+/**
+ * @brief Whether an ichidan stem ending at @p stem_end is a stranded potential
+ *
+ * True when the dictionary lists @p ichidan_base only as another verb's
+ * potential (書ける of 書く) and no kana follows the stem for it to carry. A
+ * potential stem needs its auxiliary or particle (書け+ない); without one the
+ * e-row is the listed verb's own imperative/hypothetical cell (書け+今).
+ */
+bool isStrandedPotentialStem(const dictionary::DictionaryManager* dict_manager, std::string_view ichidan_base,
+                             const std::vector<char32_t>& codepoints, size_t stem_end);
+
+/**
  * @brief Check if a base form exists in dictionary as an adjective
  */
 bool isAdjectiveInDictionary(const dictionary::DictionaryManager* dict_manager, std::string_view base_form);
