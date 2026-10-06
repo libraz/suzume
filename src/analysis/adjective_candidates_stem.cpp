@@ -630,7 +630,8 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
             // The okurigana scan runs past a case particle and reaches the next
             // word's kana (水 + を + くみ read as the stem of the non-word 水をくい).
             // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
-            if (verb_helpers::embedsCaseParticle(dict_manager, codepoints, start_pos, stem_end)) {
+            if (verb_helpers::embedsCaseParticle(dict_manager, codepoints, start_pos, stem_end,
+                                                 /*include_genitive_and_wa=*/true)) {
               continue;
             }
             if (!isAdjectiveInDictionary(dict_manager, base_form) &&

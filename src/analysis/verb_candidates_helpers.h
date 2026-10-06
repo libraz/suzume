@@ -491,10 +491,13 @@ bool startsWithFocusParticleHead(const dictionary::DictionaryManager* dict_manag
  * particle marks an argument boundary, so no single lexical word can span one:
  * a candidate that does was assembled out of [noun] + particle + [predicate]
  * (さきに食べとく read as one adjective, 水をく as the stem of the non-word 水をくい).
+ * @param include_genitive_and_wa Also count the genitive の and the topic は
+ *        as argument boundaries, for spans whose kanji host makes a word-internal
+ *        occurrence of either implausible (彼のはやさし)
  * @see fabricated closed-class absorption guards (top of this header)
  */
 bool embedsCaseParticle(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
-                        size_t start_pos, size_t end_pos);
+                        size_t start_pos, size_t end_pos, bool include_genitive_and_wa = false);
 
 /**
  * @brief Check if a span ends in a one-mora case particle written onto a continuative

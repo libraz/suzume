@@ -578,7 +578,7 @@ bool opensDerivationalGaSuffix(const std::vector<char32_t>& codepoints, size_t p
 }  // namespace
 
 bool embedsCaseParticle(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
-                        size_t start_pos, size_t end_pos) {
+                        size_t start_pos, size_t end_pos, bool include_genitive_and_wa) {
   if (dict_manager == nullptr || end_pos < start_pos + 3 || end_pos > codepoints.size()) {
     return false;
   }
@@ -595,10 +595,20 @@ bool embedsCaseParticle(const dictionary::DictionaryManager* dict_manager, const
       continue;
     }
     const size_t max_len = std::min(kMaxParticleLen, end_pos - particle_start - 1);
-    if (hasDictionaryEntryFrom(dict_manager, codepoints, particle_start, 1, max_len, core::PartOfSpeech::Unknown,
-                               [](const dictionary::DictionaryEntry& entry) {
-                                 return entry.extended_pos == core::ExtendedPOS::ParticleCase;
-                               })) {
+    const bool embeds =
+        include_genitive_and_wa
+            ? hasDictionaryEntryFrom(dict_manager, codepoints, particle_start, 1, max_len, core::PartOfSpeech::Unknown,
+                                     [](const dictionary::DictionaryEntry& entry) {
+                                       return entry.extended_pos == core::ExtendedPOS::ParticleCase ||
+                                              entry.extended_pos == core::ExtendedPOS::ParticleNo ||
+                                              (entry.extended_pos == core::ExtendedPOS::ParticleTopic &&
+                                               grammar::isSingleHiragana(entry.surface, U'は'));
+                                     })
+            : hasDictionaryEntryFrom(dict_manager, codepoints, particle_start, 1, max_len, core::PartOfSpeech::Unknown,
+                                     [](const dictionary::DictionaryEntry& entry) {
+                                       return entry.extended_pos == core::ExtendedPOS::ParticleCase;
+                                     });
+    if (embeds) {
       return true;
     }
   }

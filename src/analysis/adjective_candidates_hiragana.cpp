@@ -993,6 +993,21 @@ void appendHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints, 
     if (!is_dict_adjective && kana::isERowCodepoint(codepoints[stem_end - 1])) {
       continue;
     }
+    // The topic は in front of a stem that is itself a valid adjective (の+は+やさし+さ)
+    // is that particle, not the first mora of an unregistered stem.
+    const auto* opening_particle =
+        dict_manager != nullptr
+            ? lookupEntryInRange(*dict_manager, codepoints, start_pos, start_pos + 1, core::PartOfSpeech::Particle)
+            : nullptr;
+    if (!is_dict_adjective && stem_end > start_pos + 2 && opening_particle != nullptr &&
+        opening_particle->extended_pos == core::ExtendedPOS::ParticleTopic) {
+      const std::string remainder_base = extractSubstring(codepoints, start_pos + 1, stem_end) + "い";
+      if (isAdjectiveInDictionary(dict_manager, remainder_base) ||
+          adj_detail::firstConfidenceAtLeast(inflection.analyze(remainder_base), grammar::VerbType::IAdjective,
+                                             candidate::kIAdjConfMin) != candidate::kNoOriginConfidence) {
+        continue;
+      }
+    }
     // A terminal auxiliary closed by a conjunctive particle is a predicate
     // chain (やり+たい+し+さ), not a stem.
     if (!is_dict_adjective &&

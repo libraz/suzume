@@ -790,6 +790,105 @@
       ],
       "id": "nofutaga_maru",
       "input": "鍋のふたが閉まる。"
+    },
+    {
+      "description": "心を打つのはやさしさだけ - auto-generated",
+      "expected": [
+        {
+          "lemma": "心",
+          "pos": "Noun",
+          "surface": "心"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "打つ",
+          "pos": "Verb",
+          "surface": "打つ"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "やさしい",
+          "pos": "Adjective",
+          "surface": "やさし"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Suffix",
+          "surface": "さ"
+        },
+        {
+          "lemma": "だけ",
+          "pos": "Particle",
+          "surface": "だけ"
+        }
+      ],
+      "id": "wo_tsunohayasashisadake",
+      "input": "心を打つのはやさしさだけ"
+    },
+    {
+      "description": "彼のはやさしさを知っている。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "やさしい",
+          "pos": "Adjective",
+          "surface": "やさし"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Suffix",
+          "surface": "さ"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "知る",
+          "pos": "Verb",
+          "surface": "知っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "nohayasashisawo_ttteiru",
+      "input": "彼のはやさしさを知っている。"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",
