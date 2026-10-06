@@ -1041,6 +1041,38 @@
       ],
       "id": "wo_sezaruwo_nai",
       "input": "失敗を認識せざるを得ない"
+    },
+    {
+      "description": "先生とも相談する - auto-generated",
+      "expected": [
+        {
+          "lemma": "先生",
+          "pos": "Noun",
+          "surface": "先生"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "相談",
+          "pos": "Noun",
+          "surface": "相談"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "tomo_suru_2",
+      "input": "先生とも相談する"
     }
   ],
   "description": "Suru-verb patterns with subsidiary verbs - MeCab互換分割 (part 2/2)",

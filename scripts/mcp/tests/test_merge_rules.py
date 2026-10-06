@@ -417,11 +417,17 @@ class TestNominalTomoni:
         assert result[1]["pos"] == "副詞"
         assert rule == "nominal-tomoni"
 
-    def test_keeps_adverbial_particle_tomo(self):
+    def test_keeps_adverbial_particle_tomo_after_collective_noun(self):
+        tokens = [_tok("両者"), _tok("とも", pos="助詞", pos_sub1="副助詞"), _tok("健康")]
+        result, rule = apply_suzume_merge(tokens, "両者とも健康")
+        assert [token["surface"] for token in result] == ["両者", "とも", "健康"]
+        assert rule is None
+
+    def test_splits_tomo_after_paired_noun(self):
         tokens = [_tok("心身"), _tok("とも", pos="助詞", pos_sub1="副助詞"), _tok("健康")]
         result, rule = apply_suzume_merge(tokens, "心身とも健康")
-        assert [token["surface"] for token in result] == ["心身", "とも", "健康"]
-        assert rule is None
+        assert [token["surface"] for token in result] == ["心身", "と", "も", "健康"]
+        assert rule == "tomo-particle-boundary"
 
 
 class TestInterrogativeIkaga:

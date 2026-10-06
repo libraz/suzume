@@ -1005,6 +1005,33 @@
       ],
       "id": "kono_no_saha_da",
       "input": "この仕事の大変さは想像以上だ"
+    },
+    {
+      "description": "両者とも賛成だ - auto-generated",
+      "expected": [
+        {
+          "lemma": "両者",
+          "pos": "Noun",
+          "surface": "両者"
+        },
+        {
+          "lemma": "とも",
+          "pos": "Particle",
+          "surface": "とも"
+        },
+        {
+          "lemma": "賛成",
+          "pos": "Noun",
+          "surface": "賛成"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "tomo_da_2",
+      "input": "両者とも賛成だ"
     }
   ],
   "description": "Modality auxiliaries (たい、そう、らしい) (part 2/2)",

@@ -248,7 +248,11 @@ float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::
   // (だけ+なら, ほど+なら) and would otherwise buy the fabricated だけ+ど over the
   // copula plus けど (〜んだけど).
   const bool tomo_particle = next.pos == core::PartOfSpeech::Particle && utf8::equalsAny(next.surface, {"とも"});
-  const bool quantifier_host = tomo_particle && prev.origin == core::CandidateOrigin::Counter;
+  // A collective noun (両者, 全員) ranges over a set just as a counted quantity does.
+  const bool quantifier_host =
+      tomo_particle &&
+      (prev.origin == core::CandidateOrigin::Counter ||
+       (prev.pos == core::PartOfSpeech::Noun && grammar::startsWithCollectiveQuantifier(prev.surface)));
   const bool unlicensed_tomo = tomo_particle && prev.extended_pos != core::ExtendedPOS::AuxNegativeNu &&
                                prev.extended_pos != core::ExtendedPOS::AuxNegativeNai &&
                                prev.extended_pos != core::ExtendedPOS::AuxVolitional &&

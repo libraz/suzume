@@ -199,6 +199,14 @@ bool isSuruMizenkeiSurface(std::string_view surface) {
   return surface == "せ";
 }
 
+bool startsWithCollectiveQuantifier(std::string_view surface) {
+  if (surface.empty()) {
+    return false;
+  }
+  const char32_t first = utf8::decodeFirstChar(surface);
+  return first == U'両' || first == U'全' || first == U'双' || first == U'各';
+}
+
 bool isEpistolaryTerminalSurface(std::string_view surface) {
   return surface == "候";
 }

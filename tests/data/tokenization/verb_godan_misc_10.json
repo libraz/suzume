@@ -2454,6 +2454,48 @@
       ],
       "id": "buttteinaika_da",
       "input": "大人ぶっていないか心配だ。"
+    },
+    {
+      "description": "両方とも資料を持っている - auto-generated",
+      "expected": [
+        {
+          "lemma": "両方",
+          "pos": "Noun",
+          "surface": "両方"
+        },
+        {
+          "lemma": "とも",
+          "pos": "Particle",
+          "surface": "とも"
+        },
+        {
+          "lemma": "資料",
+          "pos": "Noun",
+          "surface": "資料"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "持つ",
+          "pos": "Verb",
+          "surface": "持っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "tomo_wo_ttteiru",
+      "input": "両方とも資料を持っている"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",

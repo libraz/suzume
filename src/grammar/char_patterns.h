@@ -119,6 +119,8 @@ bool isAttributiveCompoundParticleSurface(std::string_view surface);
 bool isSuruRenyokeiSurface(std::string_view surface);
 /** @brief Whether a surface is the classical irrealis stem せ of the irregular verb する */
 bool isSuruMizenkeiSurface(std::string_view surface);
+/** @brief Whether a surface opens with a collective quantifier kanji (両者, 全員, 双方, 各自) */
+bool startsWithCollectiveQuantifier(std::string_view surface);
 /** @brief Whether a surface is the epistolary clause-closing 候 */
 bool isEpistolaryTerminalSurface(std::string_view surface);
 /** @brief Whether a surface is the base form of the irregular verb する */

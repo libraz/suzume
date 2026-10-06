@@ -233,7 +233,9 @@ def _postprocess_tomo_particle(result: list[dict], applied_rule: str | None) -> 
         ):
             host_surface = host.get("surface", "")
             host_pos = host.get("pos", "")
-            quantifier_host = host_pos == "名詞" and host.get("pos_sub1") == "数"
+            quantifier_host = host_pos == "名詞" and (
+                host.get("pos_sub1") == "数" or host_surface.startswith(_COLLECTIVE_PREFIXES)
+            )
             concessive_host = (host_pos == "助動詞" and host_surface in _TOMO_CONCESSIVE_AUXILIARIES) or (
                 host_pos == "形容詞" and host_surface.endswith("く")
             )
@@ -245,8 +247,6 @@ def _postprocess_tomo_particle(result: list[dict], applied_rule: str | None) -> 
                 continue
         if (
             host is not None
-            and following is not None
-            and following.get("lemma") == "ない"
             and token.get("surface") == "とも"
             and token.get("pos") == "助詞"
             and host.get("pos") == "名詞"

@@ -288,6 +288,38 @@
       ],
       "id": "ganekoha_kida",
       "input": "犬がねこは好きだ"
+    },
+    {
+      "description": "心身とも健康だ - auto-generated",
+      "expected": [
+        {
+          "lemma": "心身",
+          "pos": "Noun",
+          "surface": "心身"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "健康",
+          "pos": "Adjective",
+          "surface": "健康"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "tomo_da_3",
+      "input": "心身とも健康だ"
     }
   ],
   "description": "General nouns (part 5/5)",
