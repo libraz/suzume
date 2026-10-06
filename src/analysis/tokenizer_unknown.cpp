@@ -249,6 +249,28 @@ bool absorbsPastAfterProvenAuxiliary(const dictionary::DictionaryManager& dict_m
   return inner != nullptr;
 }
 
+// True unless the する form spelled by |suffix| is an irrealis that no
+// auxiliary selecting an irrealis follows.
+bool suruIrrealisHasSelectedAuxiliary(const dictionary::DictionaryManager& dict_manager, std::string_view text,
+                                      const ByteOffsets& byte_offsets, const UnknownCandidate& candidate,
+                                      std::string_view suffix) {
+  const size_t suffix_length = normalize::utf8Length(suffix);
+  const auto suru_forms = dict_manager.lookup(suffix, 0);
+  const bool is_irrealis = std::any_of(suru_forms.begin(), suru_forms.end(), [&](const auto& match) {
+    return match.entry != nullptr && match.length == suffix_length && match.entry->pos == core::PartOfSpeech::Verb &&
+           match.entry->extended_pos == core::ExtendedPOS::VerbMizenkei;
+  });
+  if (!is_irrealis) {
+    return true;
+  }
+  const auto followers = dict_manager.lookup(text, byteOffsetAt(byte_offsets, candidate.end));
+  return std::any_of(followers.begin(), followers.end(), [](const auto& match) {
+    return match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Auxiliary &&
+           (match.entry->extended_pos == core::ExtendedPOS::AuxNegativeNu ||
+            match.entry->extended_pos == core::ExtendedPOS::AuxPassive);
+  });
+}
+
 // A complete multi-kanji nominal stem owns its full span before a closed する
 // inflection. Unknown verbs starting inside that noun must not absorb the last
 // kanji together with する (勉強+すれ+ば, not 勉+強すれ+ば). This is the
@@ -268,6 +290,12 @@ bool startsInsideVerifiedNounAndAbsorbsSuru(const core::Lattice& lattice,
   for (size_t suru_start = candidate.start + 1; suru_start < candidate.end; ++suru_start) {
     const std::string_view suffix = textRange(text, byte_offsets, suru_start, candidate.end);
     if (!hasCompleteVerbLemma(dict_manager, suffix, candidate.end - suru_start, "する")) {
+      continue;
+    }
+    // The irrealis of する is only a host for the auxiliary it selects, so a
+    // candidate ending there is a サ変 chain only when that auxiliary follows
+    // (勉強+せ+ず); before た or て it is a different verb (全部+任せ+た).
+    if (!suruIrrealisHasSelectedAuxiliary(dict_manager, text, byte_offsets, candidate, suffix)) {
       continue;
     }
     if (core::anyEdgeEndingAt(lattice, suru_start, [&candidate](const core::LatticeEdge& noun) {

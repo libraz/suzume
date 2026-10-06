@@ -1507,6 +1507,60 @@
       ],
       "id": "nakatttanode_kattta",
       "input": "ピンチなかったので助かった"
+    },
+    {
+      "description": "彼女は全部任せた - auto-generated",
+      "expected": [
+        {
+          "lemma": "彼女",
+          "pos": "Pronoun",
+          "surface": "彼女"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "全部",
+          "pos": "Noun",
+          "surface": "全部"
+        },
+        {
+          "lemma": "任せる",
+          "pos": "Verb",
+          "surface": "任せ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ha_seta",
+      "input": "彼女は全部任せた"
+    },
+    {
+      "description": "全部見せた - auto-generated",
+      "expected": [
+        {
+          "lemma": "全部",
+          "pos": "Noun",
+          "surface": "全部"
+        },
+        {
+          "lemma": "見せる",
+          "pos": "Verb",
+          "surface": "見せ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "seta",
+      "input": "全部見せた"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",
