@@ -173,9 +173,13 @@ void appendPainAdjectiveAfterNominative(const std::vector<char32_t>& codepoints,
   const size_t hira_end = findCharRegionEnd(char_types, start_pos, 6, normalize::CharType::Hiragana);
   for (size_t end_pos = start_pos + 3; end_pos <= hira_end; ++end_pos) {
     const std::string surface = extractSubstring(codepoints, start_pos, end_pos);
+    // The past cell かっ is analyzed only together with its た (いたかった), and
+    // the adjective itself is the span up to かっ.
+    const bool past_cell = utf8::endsWith(surface, "かった");
+    const size_t cell_end = past_cell ? end_pos - 1 : end_pos;
     for (const auto& cand : inflection.analyze(surface)) {
       if (cand.verb_type != grammar::VerbType::IAdjective || cand.confidence < candidate::kIAdjConfMin ||
-          !utf8::startsWith(cand.base_form, "いた") || utf8::endsWithAny(surface, {"た", "て"}) ||
+          !utf8::startsWith(cand.base_form, "いた") || (utf8::endsWithAny(surface, {"た", "て"}) && !past_cell) ||
           !isAdjectiveInDictionary(
               dict_manager,
               normalize::concat("痛", std::string_view(cand.base_form).substr(core::kTwoJapaneseCharBytes)))) {
@@ -184,8 +188,9 @@ void appendPainAdjectiveAfterNominative(const std::vector<char32_t>& codepoints,
       const float cost = candidate::confidenceScaledCost(candidate::kKanjiAdjBaseCost, cand.confidence,
                                                          candidate::kKanjiAdjConfScale) +
                          candidate::kReduplicatedShiiAdjBonus;
-      auto adj = makeIAdjCandidate(surface, start_pos, end_pos, cand.base_form, cost,
-                                   CandidateOrigin::AdjectiveIHiragana, cand.confidence, "i_adjective_pain_nominative");
+      auto adj =
+          makeIAdjCandidate(extractSubstring(codepoints, start_pos, cell_end), start_pos, cell_end, cand.base_form,
+                            cost, CandidateOrigin::AdjectiveIHiragana, cand.confidence, "i_adjective_pain_nominative");
       adj.has_suffix = true;
       candidates.push_back(std::move(adj));
       return;

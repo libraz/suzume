@@ -1,0 +1,33 @@
+{
+  "cases": [
+    {
+      "description": "歯がいたかった - auto-generated",
+      "expected": [
+        {
+          "lemma": "歯",
+          "pos": "Noun",
+          "surface": "歯"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "いたい",
+          "pos": "Adjective",
+          "surface": "いたかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "gaitakattta",
+      "input": "歯がいたかった"
+    }
+  ],
+  "description": "General nouns (part 5/5)",
+  "version": "1.0"
+}

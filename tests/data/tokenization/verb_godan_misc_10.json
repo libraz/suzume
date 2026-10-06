@@ -245,6 +245,75 @@
       ],
       "id": "mi_wattta",
       "input": "読み終わった"
+    },
+    {
+      "description": "頭がいたくて眠れない - auto-generated",
+      "expected": [
+        {
+          "lemma": "頭",
+          "pos": "Noun",
+          "surface": "頭"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "いたい",
+          "pos": "Adjective",
+          "surface": "いたく"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "眠れる",
+          "pos": "Verb",
+          "surface": "眠れ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "gaitakute_renai",
+      "input": "頭がいたくて眠れない"
+    },
+    {
+      "description": "ここにいたかった - auto-generated",
+      "expected": [
+        {
+          "lemma": "ここ",
+          "pos": "Pronoun",
+          "surface": "ここ"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "い"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "kokoniitakattta",
+      "input": "ここにいたかった"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",
