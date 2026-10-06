@@ -1937,6 +1937,75 @@
       ],
       "id": "ttteka",
       "input": "ってか、無理"
+    },
+    {
+      "description": "nai+shi before a comma, not the conjunction naishi",
+      "expected": [
+        {
+          "lemma": "時間",
+          "pos": "Noun",
+          "surface": "時間"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        },
+        {
+          "lemma": "し",
+          "pos": "Particle",
+          "surface": "し"
+        },
+        {
+          "lemma": "待てる",
+          "pos": "Verb",
+          "surface": "待て"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        },
+        {
+          "lemma": "し",
+          "pos": "Particle",
+          "surface": "し"
+        }
+      ],
+      "id": "naishi_tenaishi",
+      "input": "時間ないし、待てないし"
+    },
+    {
+      "description": "nai+shi before a comma, not the conjunction naishi",
+      "expected": [
+        {
+          "lemma": "暇",
+          "pos": "Noun",
+          "surface": "暇"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        },
+        {
+          "lemma": "し",
+          "pos": "Particle",
+          "surface": "し"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行か"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "naishi_kanai",
+      "input": "暇ないし、行かない"
     }
   ],
   "description": "conjunction tests",

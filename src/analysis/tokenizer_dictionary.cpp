@@ -1781,6 +1781,16 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
       if (opens_inside_particle) {
         continue;
       }
+      // A conjunction introduces what follows, so one closed off by punctuation
+      // or the sentence end right after a content word has nothing to join
+      // (時間+ない+し、 not 時間+ないし、) — the EOS AfterContent gate, mirrored.
+      constexpr PartOfSpeechMask kContentMask =
+          partOfSpeechMask(core::PartOfSpeech::Noun) | partOfSpeechMask(core::PartOfSpeech::Pronoun) |
+          partOfSpeechMask(core::PartOfSpeech::Verb) | partOfSpeechMask(core::PartOfSpeech::Adjective);
+      if (verb_helpers::clauseEndsAt(codepoints, end_pos) &&
+          hasPrecedingPartOfSpeech(lattice, start_pos, kContentMask)) {
+        continue;
+      }
       bool decomposes_as_verb_particle = false;
       for (size_t split = 1; split < result.length; ++split) {
         if (lookupEntryInRange(dict_manager_, codepoints, start_pos, start_pos + split, core::PartOfSpeech::Verb) !=
