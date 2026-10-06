@@ -530,7 +530,7 @@ def apply_suzume_split(tokens: list[dict]) -> tuple[list[dict], str | None]:
             and surface == "ぶっ"
             and t.get("lemma") == "ぶつ"
             and result
-            and result[-1].get("pos") == "名詞"
+            and result[-1].get("pos") in ("名詞", "形容詞")
         ):
             result.append({**t, "lemma": "ぶる"})
             if applied_rule is None:

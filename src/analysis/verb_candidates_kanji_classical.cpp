@@ -315,6 +315,12 @@ void appendClassicalNidanCandidates(const std::vector<char32_t>& codepoints, siz
         grammar::spellsBoundDerivationalSuffixCell(extractSubstring(codepoints, kanji_end, end_pos))) {
       continue;
     }
+    // The tail of an adjective stem that spells a bound suffix verb is that
+    // derivation (偉+ぶる), not a bigrade verb on the stem.
+    if (grammar::spellsBoundDerivationalSuffixCell(extractSubstring(codepoints, kanji_end, end_pos)) &&
+        vh::isAdjectiveInDictionary(dict_manager, extractSubstring(codepoints, start_pos, kanji_end) + "い")) {
+      continue;
+    }
     const std::string lemma = extractSubstring(codepoints, stem_start, terminal_pos + 1);
     candidates.push_back(makeVerbCandidate(
         codepoints, stem_start, end_pos, candidate::verb_cost::kClassicalHaRowLicensedCost, lemma,

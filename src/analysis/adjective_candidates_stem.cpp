@@ -17,6 +17,7 @@
 #include "grammar/auxiliaries.h"
 #include "grammar/char_patterns.h"
 #include "grammar/connection.h"
+#include "grammar/honorific_verbs.h"
 #include "grammar/patterns.h"
 #include "normalize/char_type.h"
 #include "normalize/exceptions.h"
@@ -81,6 +82,17 @@ std::vector<std::string_view> iAdjectiveStemFollowers(std::string_view hiragana,
   }
 
   const std::string_view remaining = hiragana.substr(byte_pos);
+  // A bound derivational suffix verb takes the adjective stem as its host
+  // (偉+ぶる, 偉+ぶっ+た) just as it takes a noun; any of its cells opens it.
+  for (const size_t cell_chars : {2U, 3U}) {
+    const size_t cell_bytes = cell_chars * core::kJapaneseCharBytes;
+    const std::string_view cell = remaining.substr(0, cell_bytes);
+    // A cell that is also a nominal suffix (久し+ぶり) stays with the suffix reading.
+    if (remaining.size() >= cell_bytes && grammar::spellsBoundDerivationalSuffixCell(cell) &&
+        !verb_helpers::hasDictionaryEntry(dict_manager, cell, core::PartOfSpeech::Suffix)) {
+      followers.push_back(cell);
+    }
+  }
   static constexpr std::array<std::string_view, 3> kDerivedSuffixes = {"さ", "み", "げ"};
   for (const std::string_view suffix : kDerivedSuffixes) {
     if (utf8::startsWith(remaining, suffix)) {

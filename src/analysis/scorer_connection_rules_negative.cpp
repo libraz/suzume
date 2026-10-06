@@ -313,6 +313,13 @@ float computeNegativeAndNounVerbBonus(const core::LatticeEdge& prev, const core:
     SUZUME_CONNECTION_ADD(bonus, cost::kRare);  // Cancel the bigram bonus
   }
 
+  // The same verb also takes an adjective stem as its host (偉+ぶる): the
+  // stem-to-verb prohibition is lifted, and the stem is preferred over a bare
+  // noun there, since a stem and its suffix verb only exist together.
+  if (prev.extended_pos == core::ExtendedPOS::AdjStem && bound_derivational_suffix) {
+    SUZUME_CONNECTION_ADD(bonus, scorer::kBonusBoundSuffixAfterAdjStem);
+  }
+
   // Penalty for Noun/ナ形容詞 → い (VerbRenyokei of いる); mirrors the
   // Noun→AuxAspectIru bigram severity so both readings of a bare-noun-plus-い
   // are rejected (彼が+いる needs a particle; 間続+い beaten by 間+続い).

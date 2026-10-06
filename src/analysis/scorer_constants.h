@@ -342,6 +342,8 @@ constexpr float kBonusHonorificGoNounPerChar = 0.3F;
 // Double very-strong bonus to overcome an AdjStem→Verb / strong compound penalty
 // Used by AdjStem→すぎ, all-kanji NOUN→すぎ, で→ある patterns
 constexpr float kBonusDoubleVeryStrong = scale::kVeryStrongBonus * 2;  // -3.2
+// Lifts the stem-to-verb prohibition and prefers the stem over a bare noun before a bound suffix verb.
+constexpr float kBonusBoundSuffixAfterAdjStem = -scale::kAlmostNever + scale::kVeryStrongBonus;
 
 // Bonus for a split productive kanji V1連用 + kanji V2連用 compound verb
 // (読み+終え, 書き+始め). Two kanji content-verb 連用形 halves that already split

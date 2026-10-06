@@ -2280,6 +2280,43 @@
       ],
       "id": "kininarushisa",
       "input": "好きになるしさ。"
+    },
+    {
+      "description": "偉ぶった態度をとる - auto-generated",
+      "expected": [
+        {
+          "lemma": "偉い",
+          "pos": "Adjective",
+          "surface": "偉"
+        },
+        {
+          "lemma": "ぶる",
+          "pos": "Verb",
+          "surface": "ぶっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "態度",
+          "pos": "Noun",
+          "surface": "態度"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "とる",
+          "pos": "Verb",
+          "surface": "とる"
+        }
+      ],
+      "id": "buttta_wotoru",
+      "input": "偉ぶった態度をとる"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 3/3)",

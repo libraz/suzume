@@ -2375,6 +2375,85 @@
       ],
       "id": "woo_i_shimasu",
       "input": "書類をお願い致します"
+    },
+    {
+      "description": "彼はいつも偉ぶる - auto-generated",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "いつも",
+          "pos": "Adverb",
+          "surface": "いつも"
+        },
+        {
+          "lemma": "偉い",
+          "pos": "Adjective",
+          "surface": "偉"
+        },
+        {
+          "lemma": "ぶる",
+          "pos": "Verb",
+          "surface": "ぶる"
+        }
+      ],
+      "id": "haitsumo_buru",
+      "input": "彼はいつも偉ぶる"
+    },
+    {
+      "description": "大人ぶっていないか心配だ。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "大人",
+          "pos": "Noun",
+          "surface": "大人"
+        },
+        {
+          "lemma": "ぶる",
+          "pos": "Verb",
+          "surface": "ぶっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "い"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "心配",
+          "pos": "Noun",
+          "surface": "心配"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "buttteinaika_da",
+      "input": "大人ぶっていないか心配だ。"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",
