@@ -845,6 +845,85 @@
       ],
       "id": "etekudasarouto",
       "input": "教えてくださろうと"
+    },
+    {
+      "description": "お手伝いさせていただきます - auto-generated",
+      "expected": [
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "手伝う",
+          "pos": "Verb",
+          "surface": "手伝い"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "さ"
+        },
+        {
+          "lemma": "せる",
+          "pos": "Auxiliary",
+          "surface": "せ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いただく",
+          "pos": "Verb",
+          "surface": "いただき"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "o_isaseteitadakimasu",
+      "input": "お手伝いさせていただきます"
+    },
+    {
+      "description": "お手伝いさせてください - auto-generated",
+      "expected": [
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "手伝う",
+          "pos": "Verb",
+          "surface": "手伝い"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "さ"
+        },
+        {
+          "lemma": "せる",
+          "pos": "Auxiliary",
+          "surface": "せ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くださる",
+          "pos": "Verb",
+          "surface": "ください"
+        }
+      ],
+      "id": "o_isasetekudasai",
+      "input": "お手伝いさせてください"
     }
   ],
   "description": "honorific tests",

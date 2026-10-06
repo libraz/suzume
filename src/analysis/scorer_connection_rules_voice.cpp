@@ -4,6 +4,7 @@
 #include "analysis/category_cost.h"
 #include "analysis/scorer.h"
 #include "analysis/scorer_connection_rules.h"
+#include "analysis/scorer_connection_rules_internal.h"
 #include "analysis/scorer_constants.h"
 #include "analysis/verb_candidates_helpers.h"
 #include "core/debug.h"
@@ -232,9 +233,19 @@ float computePassiveCausativeBonus(const core::LatticeEdge& prev, const core::La
   // MeCab treats させる as a single causative auxiliary for ichidan verbs
   // E.g., 食べ+させ+られ+た (not 食べ+さ+せ+られ+た).  The irregular Kuru
   // form has its own L1 mizenkei connection (来さ+せ), so it is excluded.
-  if ((prev.extended_pos == core::ExtendedPOS::VerbRenyokei || prev.extended_pos == core::ExtendedPOS::VerbMizenkei) &&
-      !grammar::isKuruKanjiBaseForm(prev.lemma) && next.extended_pos == core::ExtendedPOS::AuxCausative &&
+  // A godan continuative does not take させ (手伝い+さ+せる, never 手伝い+させる):
+  // its causative is the irrealis plus せる, so the pair is an incompatible
+  // inflection whether させ is read as the auxiliary or as a verb continuative.
+  if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      (isGodanRenyokeiOfLemma(prev.surface, prev.lemma) ||
+       grammar::isGodanVerbType(grammar::conjTypeToVerbType(prev.conj_type))) &&
+      (next.extended_pos == core::ExtendedPOS::AuxCausative || next.pos == core::PartOfSpeech::Verb) &&
       utf8::startsWith(next.surface, "させ")) {
+    SUZUME_CONNECTION_ADD(bonus, sc::kPenaltyIncompatibleInflection);
+  } else if ((prev.extended_pos == core::ExtendedPOS::VerbRenyokei ||
+              prev.extended_pos == core::ExtendedPOS::VerbMizenkei) &&
+             !grammar::isKuruKanjiBaseForm(prev.lemma) && next.extended_pos == core::ExtendedPOS::AuxCausative &&
+             utf8::startsWith(next.surface, "させ")) {
     SUZUME_CONNECTION_ADD(bonus, cost::kDoubleVeryStrongBonus);
   }
 
