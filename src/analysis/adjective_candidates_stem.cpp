@@ -783,8 +783,32 @@ void appendIAdjClassicalTerminalCandidates(const std::vector<char32_t>& codepoin
     // the modern ending しい is written when the vowel is drawn out, so the
     // mora belongs to that adjective (おいしーー is おいしい elongated, not a
     // literary terminal followed by emphasis).
+    // A quotation or the copula is the exception: each takes a complete clause
+    // or a quoted phrase, and the terminal is exactly that (暗し+という,
+    // 暗し+だ, 高し+と).
+    const auto takes_closed_terminal = [&](size_t pos) {
+      if (codepoints[pos] == core::hiragana::kTo) {
+        return true;
+      }
+      constexpr size_t kQuoteProbe = 4;
+      if (dict_manager != nullptr) {
+        const size_t probe_end = std::min(codepoints.size(), pos + kQuoteProbe);
+        for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, pos, probe_end)) {
+          if (match.entry != nullptr && (match.entry->extended_pos == core::ExtendedPOS::ParticleQuote ||
+                                         match.entry->extended_pos == core::ExtendedPOS::DeterminerQuotative)) {
+            return true;
+          }
+        }
+      }
+      return verb_helpers::auxiliaryFollowsAt(dict_manager, codepoints, pos,
+                                              [](const dictionary::DictionaryEntry& entry) {
+                                                return entry.extended_pos == core::ExtendedPOS::AuxCopulaDa ||
+                                                       entry.extended_pos == core::ExtendedPOS::AuxCopulaDesu;
+                                              });
+    };
     if (shi_pos + 1 < codepoints.size() &&
-        (normalize::classifyChar(codepoints[shi_pos + 1]) == normalize::CharType::Hiragana ||
+        ((normalize::classifyChar(codepoints[shi_pos + 1]) == normalize::CharType::Hiragana &&
+          !takes_closed_terminal(shi_pos + 1)) ||
          normalize::isProlongedSoundMark(codepoints[shi_pos + 1]))) {
       continue;
     }

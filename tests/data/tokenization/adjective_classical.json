@@ -166,6 +166,77 @@
       ],
       "id": "binding_sae_sureba",
       "input": "勉強さえすれば受かる"
+    },
+    {
+      "description": "灯台下暗しという現象 - auto-generated",
+      "expected": [
+        {
+          "lemma": "灯台下",
+          "pos": "Noun",
+          "surface": "灯台下"
+        },
+        {
+          "lemma": "暗い",
+          "pos": "Adjective",
+          "surface": "暗し"
+        },
+        {
+          "lemma": "という",
+          "pos": "Determiner",
+          "surface": "という"
+        },
+        {
+          "lemma": "現象",
+          "pos": "Noun",
+          "surface": "現象"
+        }
+      ],
+      "id": "shitoiu",
+      "input": "灯台下暗しという現象"
+    },
+    {
+      "description": "灯台下暗しだ - auto-generated",
+      "expected": [
+        {
+          "lemma": "灯台下",
+          "pos": "Noun",
+          "surface": "灯台下"
+        },
+        {
+          "lemma": "暗い",
+          "pos": "Adjective",
+          "surface": "暗し"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "shida_2",
+      "input": "灯台下暗しだ"
+    },
+    {
+      "description": "高しと見る - auto-generated",
+      "expected": [
+        {
+          "lemma": "高い",
+          "pos": "Adjective",
+          "surface": "高し"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見る"
+        }
+      ],
+      "id": "shito_ru",
+      "input": "高しと見る"
     }
   ],
   "description": "adjective_classical tests",
