@@ -582,6 +582,9 @@ constexpr float kAdjVerbConfDiffMin = 0.15F;
 
 // Shared cost values for verb candidate generation
 namespace verb_cost {
+// A katakana ichidan continuative (ウケ+ました, バテ+た): neutral, so the selecting
+// auxiliary's own connection decides against the katakana noun reading.
+constexpr float kKatakanaIchidanRenyokeiCost = 0.1F;
 // Standard bonus for verb candidates (mizenkei, passive, etc.)
 constexpr float kStandardBonus = -0.5F;
 // Strong evidence from a contracted auxiliary follower (やっ+とく).

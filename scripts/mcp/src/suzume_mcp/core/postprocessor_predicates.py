@@ -44,6 +44,32 @@ def postprocess_sou(tokens: list[dict]) -> bool:
                 prev["lemma"] = prev_surface + "い"
 
 
+_KATAKANA_ICHIDAN_STEM = regex.compile(
+    r"[\p{Katakana}--[ー]]*[エケゲセゼテデネヘベペメレイキギシジチヂニヒビピミリ]", regex.V1
+)
+
+
+def postprocess_katakana_ichidan_continuative(tokens: list[dict]) -> bool:
+    """Read a katakana noun before a continuative-selecting word as an ichidan stem (バテ+まし+た)."""
+    changed = False
+    for idx in range(len(tokens) - 1):
+        token, following = tokens[idx], tokens[idx + 1]
+        surface = token.get("surface", "")
+        selects_continuative = (
+            following.get("pos") == "Auxiliary" and following.get("lemma") in ("ます", "た", "たい")
+        ) or (following.get("pos") == "Particle" and following.get("surface") == "て")
+        if (
+            token.get("pos") == "Noun"
+            and selects_continuative
+            and _KATAKANA_ICHIDAN_STEM.fullmatch(surface) is not None
+            and (idx == 0 or regex.search(r"\p{Katakana}$", tokens[idx - 1].get("surface", "")) is None)
+        ):
+            token["pos"] = "Verb"
+            token["lemma"] = surface + "る"
+            changed = True
+    return changed
+
+
 def postprocess_honorific_i_adjective(tokens: list[dict]) -> bool:
     """Restore an i-adjective ending in -しい after honorific prefix お."""
     changed = False

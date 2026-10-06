@@ -136,6 +136,7 @@ postprocess_i_adjective_upper_bound = postprocessor_predicates.postprocess_i_adj
 postprocess_ii = postprocessor_predicates.postprocess_ii
 postprocess_kusai_garu = postprocessor_predicates.postprocess_kusai_garu
 postprocess_modifier_godan_imperative = postprocessor_predicates.postprocess_modifier_godan_imperative
+postprocess_katakana_ichidan_continuative = postprocessor_predicates.postprocess_katakana_ichidan_continuative
 postprocess_na_adj_noun = postprocessor_predicates.postprocess_na_adj_noun
 postprocess_onaji_predicate = postprocessor_predicates.postprocess_onaji_predicate
 postprocess_short_hiragana_onbin = postprocessor_predicates.postprocess_short_hiragana_onbin
@@ -184,6 +185,7 @@ POSTPROCESSORS: tuple[tuple[str, Callable[[list[dict]], bool]], ...] = (
     ("nan-copula-nominalizer", postprocess_nan_copula_nominalizer),
     ("now-final-particle", postprocess_now_final_particle),
     ("sou-context", postprocess_sou),
+    ("katakana-ichidan-continuative", postprocess_katakana_ichidan_continuative),
     ("ikaga-adverb", postprocess_ikaga),
     ("tada-context", postprocess_tada),
     ("demo-particle", postprocess_demo),

@@ -191,6 +191,136 @@
       ],
       "id": "saremasu",
       "input": "リセットされます"
+    },
+    {
+      "description": "katakana ichidan continuative before masu",
+      "expected": [
+        {
+          "lemma": "ウケる",
+          "pos": "Verb",
+          "surface": "ウケ"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "まし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "w",
+          "pos": "Noun",
+          "surface": "w"
+        }
+      ],
+      "id": "mashita_3",
+      "input": "ウケましたｗ"
+    },
+    {
+      "description": "katakana ichidan continuative before masu",
+      "expected": [
+        {
+          "lemma": "バテる",
+          "pos": "Verb",
+          "surface": "バテ"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "まし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "mashita_4",
+      "input": "バテました"
+    },
+    {
+      "description": "katakana ichidan continuative before masu",
+      "expected": [
+        {
+          "lemma": "コケる",
+          "pos": "Verb",
+          "surface": "コケ"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "まし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "mashita_5",
+      "input": "コケました"
+    },
+    {
+      "description": "katakana ichidan continuative before past ta",
+      "expected": [
+        {
+          "lemma": "ウケる",
+          "pos": "Verb",
+          "surface": "ウケ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ta_2",
+      "input": "ウケた"
+    },
+    {
+      "description": "katakana ichidan continuative before te",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "すぐ",
+          "pos": "Adverb",
+          "surface": "すぐ"
+        },
+        {
+          "lemma": "バテる",
+          "pos": "Verb",
+          "surface": "バテ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "休む",
+          "pos": "Verb",
+          "surface": "休ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "hasugu_te_nda",
+      "input": "彼はすぐバテて休んだ"
     }
   ],
   "description": "katakana tests",

@@ -33,6 +33,7 @@ from suzume_mcp.core.postprocessors import (
     postprocess_ikaga,
     postprocess_indefinite_ka,
     postprocess_iru_aux,
+    postprocess_katakana_ichidan_continuative,
     postprocess_l2_noun_context,
     postprocess_mecab_tokens,
     postprocess_miru_aux,
@@ -140,6 +141,26 @@ class TestModifierGodanImperative:
 
         assert not postprocess_modifier_godan_imperative(tokens)
         assert tokens[1]["lemma"] == "忘れる"
+
+
+class TestKatakanaIchidanContinuative:
+    def test_katakana_noun_before_masu_is_ichidan_stem(self):
+        tokens = [_tok("バテ", "Noun"), _tok("まし", "Auxiliary", lemma="ます"), _tok("た", "Auxiliary")]
+
+        assert postprocess_katakana_ichidan_continuative(tokens)
+        assert tokens[0]["pos"] == "Verb"
+        assert tokens[0]["lemma"] == "バテる"
+
+    def test_loanword_with_long_vowel_stays_noun(self):
+        tokens = [_tok("ケーキ", "Noun"), _tok("た", "Auxiliary", lemma="た")]
+
+        assert not postprocess_katakana_ichidan_continuative(tokens)
+        assert tokens[0]["pos"] == "Noun"
+
+    def test_other_rows_stay_noun(self):
+        tokens = [_tok("メモ", "Noun"), _tok("て", "Particle")]
+
+        assert not postprocess_katakana_ichidan_continuative(tokens)
 
 
 class TestPreprocessForMecab:

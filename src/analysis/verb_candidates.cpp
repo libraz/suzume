@@ -179,6 +179,54 @@ void generateKatakanaVerbCandidates(const std::vector<char32_t>& codepoints, siz
     return;
   }
 
+  // A katakana run closing on an e-row or i-row mora is an ichidan stem when
+  // what follows selects a continuative (ウケ+ました, バテ+た, コケ+て). The
+  // negative is left out: it selects the irrealis, which for an ichidan verb is
+  // the same cell and is no evidence of a verb over a noun (ペン+ない). A
+  // long-vowel mark spells a loanword, never a native ichidan stem (ケーキ), and
+  // the stem is the whole katakana run, not its tail (ケー+キ).
+  const bool opens_katakana_run = start_pos == 0 || char_types[start_pos - 1] != normalize::CharType::Katakana;
+  const bool has_long_vowel_mark = std::find(codepoints.begin() + static_cast<std::ptrdiff_t>(start_pos),
+                                             codepoints.begin() + static_cast<std::ptrdiff_t>(kata_end),
+                                             U'ー') != codepoints.begin() + static_cast<std::ptrdiff_t>(kata_end);
+  if (dict_manager != nullptr && opens_katakana_run && !has_long_vowel_mark) {
+    constexpr char32_t kKatakanaFirst = U'ァ';
+    constexpr char32_t kKatakanaLast = U'ヶ';
+    constexpr char32_t kKatakanaToHiragana = U'ァ' - U'ぁ';
+    const char32_t stem_final = codepoints[kata_end - 1];
+    const char32_t stem_final_hiragana =
+        stem_final >= kKatakanaFirst && stem_final <= kKatakanaLast ? stem_final - kKatakanaToHiragana : 0;
+    // A content word reaching past the selecting auxiliary is the reading the
+    // kana belongs to (ケーキ+たべた, ケーキ+たのしみ), not the auxiliary.
+    size_t selecting_end = 0;
+    size_t content_end = 0;
+    if (kana::isERowCodepoint(stem_final_hiragana) || kana::isIRowCodepoint(stem_final_hiragana)) {
+      for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, kata_end, hira_end)) {
+        if (match.entry == nullptr) {
+          continue;
+        }
+        const auto epos = match.entry->extended_pos;
+        const size_t match_end = kata_end + match.length;
+        if (epos == core::ExtendedPOS::AuxTenseMasu || epos == core::ExtendedPOS::AuxTenseTa ||
+            epos == core::ExtendedPOS::AuxDesireTai ||
+            (epos == core::ExtendedPOS::ParticleConj && codepoints[kata_end] == U'て')) {
+          selecting_end = std::max(selecting_end, match_end);
+        } else if (match.entry->pos == core::PartOfSpeech::Verb || match.entry->pos == core::PartOfSpeech::Adjective ||
+                   match.entry->pos == core::PartOfSpeech::Noun || match.entry->pos == core::PartOfSpeech::Adverb) {
+          content_end = std::max(content_end, match_end);
+        }
+      }
+    }
+    const bool selects_continuative = selecting_end > 0 && content_end <= selecting_end;
+    if (selects_continuative) {
+      const std::string stem = extractSubstring(codepoints, start_pos, kata_end);
+      candidates.push_back(
+          makeVerbCandidate(stem, start_pos, kata_end, candidate::verb_cost::kKatakanaIchidanRenyokeiCost, stem + "る",
+                            dictionary::ConjugationType::Ichidan, true, CandidateOrigin::VerbKatakana,
+                            candidate::kNoConfidence, "katakana_ichidan_renyokei", core::ExtendedPOS::VerbRenyokei));
+    }
+  }
+
   // A katakana stem followed by an auxiliary or a する cell is split rather
   // than read as one verb: すぎ (シンプル+すぎる), the appearance そう,
   // し/さ/せ (コピー+し+て, コピー+さ+れる, コピー+さ+せる), and the
