@@ -561,8 +561,11 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
       continue;
     }
     // A kana okurigana before the nominalizer is a complete predicate of its
-    // own (行く+ん+で), which the explanatory path handles.
-    if (nominalizer_follows && n_pos != kanji_end) {
+    // own (行く+ん+で), which the explanatory path handles, unless the stem is
+    // a registered verb whose る the contraction removed (終わ+んだ ← 終わるんだ).
+    const bool contracts_godan_ra_okurigana =
+        nominalizer_follows && n_pos != kanji_end && vh::isVerbInDictionary(dict_manager, base_form);
+    if (nominalizer_follows && n_pos != kanji_end && !contracts_godan_ra_okurigana) {
       continue;
     }
     // An okurigana stem contracts its Ichidan terminal the same way
