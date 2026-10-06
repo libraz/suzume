@@ -286,6 +286,134 @@
       ],
       "id": "shii_rini_mare",
       "input": "優しい香りに包まれ"
+    },
+    {
+      "description": "対象者は約500名とされる。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "対象者",
+          "pos": "Noun",
+          "surface": "対象者"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "約",
+          "pos": "Prefix",
+          "surface": "約"
+        },
+        {
+          "lemma": "500名",
+          "pos": "Noun",
+          "surface": "500名"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "さ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れる"
+        }
+      ],
+      "id": "ha_500_tosareru",
+      "input": "対象者は約500名とされる。"
+    },
+    {
+      "description": "安全とされる - auto-generated",
+      "expected": [
+        {
+          "lemma": "安全",
+          "pos": "Adjective",
+          "surface": "安全"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "さ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れる"
+        }
+      ],
+      "id": "tosareru",
+      "input": "安全とされる"
+    },
+    {
+      "description": "重要とされる。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "重要",
+          "pos": "Adjective",
+          "surface": "重要"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "さ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れる"
+        }
+      ],
+      "id": "tosareru_2",
+      "input": "重要とされる。"
+    },
+    {
+      "description": "安全とされれば - auto-generated",
+      "expected": [
+        {
+          "lemma": "安全",
+          "pos": "Adjective",
+          "surface": "安全"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "さ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れれ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "tosarereba",
+      "input": "安全とされれば"
     }
   ],
   "description": "auxiliary_passive tests",

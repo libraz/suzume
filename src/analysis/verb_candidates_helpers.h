@@ -981,13 +981,6 @@ bool shouldSkipPassiveAuxPattern(std::string_view surface, grammar::VerbType ver
  */
 bool isPassiveAuxContinuation(const std::vector<char32_t>& codepoints, size_t pos_after_re, bool strict_masu);
 
-/**
- * @brief Whether れ begins the passive auxiliary's conditional cell れれ+ば.
- *
- * The first れ is the passive auxiliary stem; the second is its 仮定形.
- */
-bool isPassiveAuxConditionalAt(const std::vector<char32_t>& codepoints, size_t passive_re_pos);
-
 /** @brief Whether the passive auxiliary starting at @p passive_re_pos consumes the surface remainder. */
 bool isCompletePassiveAuxiliaryAt(const std::vector<char32_t>& codepoints, size_t passive_re_pos);
 

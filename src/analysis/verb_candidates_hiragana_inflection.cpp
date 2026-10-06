@@ -967,6 +967,16 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
           (embeds_te_miru || ends_with_focus_particle || embeds_te_conditional_auxiliary)) {
         continue;
       }
+      // An irrealis plus a complete passive is a voice chain, as the kanji
+      // path holds; the する irrealis さ heads one whatever row the analysis
+      // guessed (安全と+さ+れる, not a coined される or されれ+ば).
+      const std::vector<char32_t> span(codepoints.begin() + static_cast<std::ptrdiff_t>(start_pos),
+                                       codepoints.begin() + static_cast<std::ptrdiff_t>(end_pos));
+      const bool opens_suru_passive = span.front() == U'さ' && vh::isCompletePassiveAuxiliaryAt(span, 1);
+      if (!is_exact_dictionary_verb && !vh::isVerbInDictionary(dict_manager, best.base_form) &&
+          (opens_suru_passive || vh::shouldSkipPassiveAuxPattern(surface, best.verb_type))) {
+        continue;
+      }
 
       // A confident Godan analysis of e-row + ば identifies the productive
       // conditional boundary even when the pure-hiragana open-class lemma is

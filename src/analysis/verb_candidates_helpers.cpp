@@ -566,11 +566,6 @@ bool isPassiveAuxContinuation(const std::vector<char32_t>& codepoints, size_t po
   return lexicalWordFollowsAt(codepoints, pos_after_re);
 }
 
-bool isPassiveAuxConditionalAt(const std::vector<char32_t>& codepoints, size_t passive_re_pos) {
-  return passive_re_pos + 2 < codepoints.size() && codepoints[passive_re_pos] == U'れ' &&
-         codepoints[passive_re_pos + 1] == U'れ' && codepoints[passive_re_pos + 2] == U'ば';
-}
-
 bool isCompletePassiveAuxiliaryAt(const std::vector<char32_t>& codepoints, size_t passive_re_pos) {
   if (passive_re_pos >= codepoints.size() || codepoints[passive_re_pos] != U'れ') {
     return false;

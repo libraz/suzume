@@ -844,16 +844,9 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(const std::vector<c
     return candidates;
   }
 
-  // する未然形 + passive conditional is always a morpheme chain.  Starting a
-  // fresh hiragana verb at its さ would manufacture されれ as an independent
-  // predicate and hide the verbal-noun boundary before it.
-  const bool starts_suru_passive_conditional =
-      codepoints[start_pos] == U'さ' && vh::isPassiveAuxConditionalAt(codepoints, start_pos + 1);
-  const bool has_inflected_candidate =
-      !starts_suru_passive_conditional &&
-      appendInflectedHiraganaVerbCandidates(codepoints, start_pos, hiragana_end, first_char, char_types, inflection,
-                                            dict_manager, verb_opts, complete_godan_wa_terminal_end != 0,
-                                            complete_case_particle_terminal_end != 0, candidates);
+  const bool has_inflected_candidate = appendInflectedHiraganaVerbCandidates(
+      codepoints, start_pos, hiragana_end, first_char, char_types, inflection, dict_manager, verb_opts,
+      complete_godan_wa_terminal_end != 0, complete_case_particle_terminal_end != 0, candidates);
   if (godan_ra_continuation_stem_end != 0) {
     const std::string surface = extractSubstring(codepoints, start_pos, godan_ra_continuation_stem_end);
     // A lexical inflection (notably たがっ or ちがっ) must retain its

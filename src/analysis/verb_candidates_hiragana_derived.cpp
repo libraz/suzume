@@ -425,6 +425,16 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
     // continuative verb (さけ+ない, かけ+ない).
     const core::ExtendedPOS extended_pos =
         is_lexical_negative_continuation ? core::ExtendedPOS::VerbMizenkei : core::ExtendedPOS::VerbRenyokei;
+    // The する irrealis さ plus the passive is a voice chain, not the stem of a
+    // coined ichidan verb (と+さ+れ+て, と+さ+れれ+ば), as the inflected path holds.
+    const auto embeds_suru_passive = [&](size_t chain_end) {
+      return chain_end <= codepoints.size() &&
+             vh::shouldSkipPassiveAuxPattern(extractSubstring(codepoints, start_pos, chain_end),
+                                             grammar::VerbType::Suru);
+    };
+    if (!is_dict_verb && (embeds_suru_passive(end_pos + 1) || embeds_suru_passive(end_pos + 2))) {
+      continue;
+    }
     if (!is_dict_verb && (vh::endsWithFocusParticleTail(dict_manager, codepoints, start_pos, end_pos) ||
                           vh::closesOnPoliteCopula(dict_manager, codepoints, start_pos, end_pos) ||
                           vh::coinedVerbOpensOnArgumentParticle(dict_manager, inflection, codepoints, start_pos,
