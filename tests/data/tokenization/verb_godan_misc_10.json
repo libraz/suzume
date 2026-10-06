@@ -1561,6 +1561,75 @@
       ],
       "id": "seta",
       "input": "全部見せた"
+    },
+    {
+      "description": "野郎どもが集まった - auto-generated",
+      "expected": [
+        {
+          "lemma": "野郎",
+          "pos": "Noun",
+          "surface": "野郎"
+        },
+        {
+          "lemma": "ども",
+          "pos": "Suffix",
+          "surface": "ども"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "集まる",
+          "pos": "Verb",
+          "surface": "集まっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "domoga_mattta",
+      "input": "野郎どもが集まった"
+    },
+    {
+      "description": "言えども彼は来ない - auto-generated",
+      "expected": [
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言え"
+        },
+        {
+          "lemma": "ども",
+          "pos": "Particle",
+          "surface": "ども"
+        },
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "edomo_ha_nai",
+      "input": "言えども彼は来ない"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",

@@ -486,6 +486,10 @@ EntrySpecRange getAuxiliaryEntries() {
       // MeCab treats these as single tokens, but grammatically ら is a suffix
       suffix("ら", "ら"),
 
+      // Plural suffix ども after a person noun or pronoun (私ども, 野郎ども); the
+      // concessive particle ども (いえども) is a separate entry.
+      suffix("ども", "ども"),
+
       // Reason/consequence suffix after a demonstrative (それゆえ, これゆえ).
       suffix("ゆえ", "ゆえ"),
 

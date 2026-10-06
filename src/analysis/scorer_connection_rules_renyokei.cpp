@@ -604,11 +604,11 @@ float computeVerbRenyokeiEarlyBonus(const core::LatticeEdge& prev, const core::L
   // Compound particle (≥2 chars) → topic/binding particle (は, も, が)
   // E.g., まで+も, より+も, にとって+も, について+は
   // Excludes one-char particles to avoid boosting て+も, し+は, で+も, and the
-  // clause-final concessive のに, which takes no topic (好きなの+に+は).
+  // clause-final concessive のに and ども, which take no topic (好きなの+に+は).
   // Needs to overcome ADV→NOUN bonus advantage in competing paths
   if ((prev.extended_pos == core::ExtendedPOS::ParticleConj || prev.extended_pos == core::ExtendedPOS::ParticleCase) &&
       next.extended_pos == core::ExtendedPOS::ParticleTopic && prev.surface.size() >= core::kTwoJapaneseCharBytes &&
-      !utf8::equalsAny(prev.surface, {"のに"})) {
+      !utf8::equalsAny(prev.surface, {"のに", "ども"})) {
     SUZUME_CONNECTION_ADD(bonus, sc::kBonusCompoundParticleToTopic);
   }
 

@@ -957,6 +957,43 @@
       ],
       "id": "ha_sezuni_nda",
       "input": "彼は勉強せずに遊んだ"
+    },
+    {
+      "description": "私どもは参加します - auto-generated",
+      "expected": [
+        {
+          "lemma": "私",
+          "pos": "Pronoun",
+          "surface": "私"
+        },
+        {
+          "lemma": "ども",
+          "pos": "Suffix",
+          "surface": "ども"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "参加",
+          "pos": "Noun",
+          "surface": "参加"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "domoha_shimasu",
+      "input": "私どもは参加します"
     }
   ],
   "description": "Suru-verb patterns with subsidiary verbs - MeCab互換分割 (part 2/2)",
