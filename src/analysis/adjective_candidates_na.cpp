@@ -537,10 +537,12 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
     //   私心なく → 私心 + ない連用 (not 私心(ADJ_NA) + く)
     //   仕方ない → 仕方 + ない (not 仕方(ADJ_NA) + い)
     //   関係なかった → 関係 + なかっ (か triggers naかった past form)
+    //   自信なげに → 自信 + なげ, 自信なさそう → 自信 + なさ+そう, 自信なければ → 自信 + なけれ
     // Real な-adjectives followed by these forms (静かなく) are not standard Japanese.
     if (followed_by_na && kanji_end + 1 < codepoints.size() &&
         (codepoints[kanji_end + 1] == U'く' || codepoints[kanji_end + 1] == U'い' ||
-         codepoints[kanji_end + 1] == U'か')) {
+         codepoints[kanji_end + 1] == U'か' || codepoints[kanji_end + 1] == U'げ' ||
+         codepoints[kanji_end + 1] == U'さ' || codepoints[kanji_end + 1] == U'け')) {
       return;
     }
 

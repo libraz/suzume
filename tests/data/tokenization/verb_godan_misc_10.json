@@ -710,6 +710,75 @@
       ],
       "id": "mo_ga_manda",
       "input": "今日も仕事が始まんだ。"
+    },
+    {
+      "description": "自信なげに話す - auto-generated",
+      "expected": [
+        {
+          "lemma": "自信",
+          "pos": "Noun",
+          "surface": "自信"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "な"
+        },
+        {
+          "lemma": "げ",
+          "pos": "Suffix",
+          "surface": "げ"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "話す",
+          "pos": "Verb",
+          "surface": "話す"
+        }
+      ],
+      "id": "nageni_su",
+      "input": "自信なげに話す"
+    },
+    {
+      "description": "自信なさそうに話す - auto-generated",
+      "expected": [
+        {
+          "lemma": "自信",
+          "pos": "Noun",
+          "surface": "自信"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "な"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Suffix",
+          "surface": "さ"
+        },
+        {
+          "lemma": "そう",
+          "pos": "Auxiliary",
+          "surface": "そう"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "話す",
+          "pos": "Verb",
+          "surface": "話す"
+        }
+      ],
+      "id": "nasasouni_su",
+      "input": "自信なさそうに話す"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",
