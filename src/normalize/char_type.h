@@ -293,6 +293,15 @@ bool isTemporalSpanSuffixKanji(char32_t code_point);
 bool isDerivationalNounSuffixKanji(char32_t code_point);
 
 /**
+ * @brief Check if a kanji is the style suffix 風 (和風, 今風).
+ *
+ * The suffix forms a manner noun from any nominal, including a temporal noun
+ * that otherwise detaches from a following kanji, provided it closes the run
+ * (今風 but not 今|風邪).
+ */
+bool isStyleSuffixKanji(char32_t code_point);
+
+/**
  * @brief Check if a kanji closes a number+counter phrase
  *
  * These kanji only attach to a quantity expression on their left (三年+間,

@@ -920,6 +920,8 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       if (start_type == normalize::CharType::Kanji && len >= 2 && dict_manager_ != nullptr &&
           isPrefixLikeKanji(codepoints[start_pos]) &&
           !normalize::continuesTemporalNounCompound(codepoints[start_pos], codepoints[start_pos + 1]) &&
+          !(len == 2 && normalize::isStyleSuffixKanji(codepoints[start_pos + 1]) &&
+            (candidate_end >= codepoints.size() || char_types[candidate_end] != normalize::CharType::Kanji)) &&
           (start_pos == 0 || char_types[start_pos - 1] != normalize::CharType::Kanji)) {
         const auto* head =
             lookupEntryInRange(*dict_manager_, codepoints, start_pos, start_pos + 1, core::PartOfSpeech::Noun);

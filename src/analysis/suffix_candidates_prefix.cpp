@@ -110,7 +110,13 @@ void generatePrefixCompoundCandidates(const std::vector<char32_t>& codepoints, s
   // the noun is its own word (今|紙, 今|水). The sibling prefixes are bound — 先
   // is a suffix and 来 a verb stem — so their compound stays available and keeps
   // marking the boundary before it (佐藤|先生).
-  if (dict_manager != nullptr && !normalize::continuesTemporalNounCompound(first_char, second_char)) {
+  // The style suffix 風 closes such a compound (今風) unless a longer kanji word
+  // takes it (今|風邪).
+  const bool closes_style_compound =
+      normalize::isStyleSuffixKanji(second_char) &&
+      (start_pos + 2 >= char_types.size() || char_types[start_pos + 2] != normalize::CharType::Kanji);
+  if (dict_manager != nullptr && !closes_style_compound &&
+      !normalize::continuesTemporalNounCompound(first_char, second_char)) {
     const auto* head =
         lookupEntryInRange(*dict_manager, codepoints, start_pos, start_pos + 1, core::PartOfSpeech::Noun);
     if (head != nullptr && head->extended_pos == core::ExtendedPOS::Noun) {

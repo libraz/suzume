@@ -24,6 +24,7 @@ enum CharProperty : uint16_t {
   kDerivationalNounSuffix = 1 << 7,
   kQuantityPhraseSuffix = 1 << 8,
   kQuantityOpeningCounter = 1 << 9,
+  kStyleSuffix = 1 << 10,
 };
 
 struct CharPropertyEntry {
@@ -31,7 +32,7 @@ struct CharPropertyEntry {
   uint16_t properties;
 };
 
-constexpr std::array<CharPropertyEntry, 94> kCharProperties = {
+constexpr std::array<CharPropertyEntry, 95> kCharProperties = {
     {{U'丁', kCounter},
      {U'万', kCounter},
      {U'世', kCounter},
@@ -125,6 +126,7 @@ constexpr std::array<CharPropertyEntry, 94> kCharProperties = {
      {U'隻', kCounter},
      {U'面', kCounter},
      {U'頭', kCounter},
+     {U'風', kStyleSuffix},
      {U'食', kCounter}}};
 
 bool hasCharProperty(char32_t codepoint, CharProperty property) {
@@ -523,6 +525,10 @@ bool isDurationCompoundHeadKanji(char32_t code_point) {
 
 bool isDerivationalNounSuffixKanji(char32_t code_point) {
   return hasCharProperty(code_point, kDerivationalNounSuffix);
+}
+
+bool isStyleSuffixKanji(char32_t code_point) {
+  return hasCharProperty(code_point, kStyleSuffix);
 }
 
 bool isQuantityPhraseSuffixKanji(char32_t code_point) {

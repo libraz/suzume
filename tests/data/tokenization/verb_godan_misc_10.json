@@ -1379,6 +1379,97 @@
       ],
       "id": "ga_rumadenarasunoha_da",
       "input": "雨が降るまでならすのは大変だ"
+    },
+    {
+      "description": "今風の服を着る - auto-generated",
+      "expected": [
+        {
+          "lemma": "今風",
+          "pos": "Noun",
+          "surface": "今風"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "服",
+          "pos": "Noun",
+          "surface": "服"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "着る",
+          "pos": "Verb",
+          "surface": "着る"
+        }
+      ],
+      "id": "no_wo_ru",
+      "input": "今風の服を着る"
+    },
+    {
+      "description": "今風邪をひいた - auto-generated",
+      "expected": [
+        {
+          "lemma": "今",
+          "pos": "Noun",
+          "surface": "今"
+        },
+        {
+          "lemma": "風邪",
+          "pos": "Noun",
+          "surface": "風邪"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "ひく",
+          "pos": "Verb",
+          "surface": "ひい"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wohiita",
+      "input": "今風邪をひいた"
+    },
+    {
+      "description": "今風呂に入る - auto-generated",
+      "expected": [
+        {
+          "lemma": "今",
+          "pos": "Noun",
+          "surface": "今"
+        },
+        {
+          "lemma": "風呂",
+          "pos": "Noun",
+          "surface": "風呂"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "入る",
+          "pos": "Verb",
+          "surface": "入る"
+        }
+      ],
+      "id": "ni_ru_3",
+      "input": "今風呂に入る"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",
