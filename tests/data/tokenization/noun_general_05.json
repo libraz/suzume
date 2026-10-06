@@ -214,6 +214,43 @@
       ],
       "id": "santoshite",
       "input": "田中さんとして"
+    },
+    {
+      "description": "今回はピンチない状況だ - auto-generated",
+      "expected": [
+        {
+          "lemma": "今回",
+          "pos": "Noun",
+          "surface": "今回"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "ピンチ",
+          "pos": "Noun",
+          "surface": "ピンチ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        },
+        {
+          "lemma": "状況",
+          "pos": "Noun",
+          "surface": "状況"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "ha_nai_da",
+      "input": "今回はピンチない状況だ"
     }
   ],
   "description": "General nouns (part 5/5)",

@@ -332,7 +332,9 @@ void generateKatakanaVerbCandidates(const std::vector<char32_t>& codepoints, siz
       if (whole_negative_form && splits_negative_stem) {
         continue;
       }
-      if (whole_negative_form && !ichidan_stem_final) {
+      // After an i-row mora the noun plus the adjective nai is the natural
+      // reading (ピンチ+ない), so the fused whole verb is discouraged there too.
+      if (whole_negative_form && (!ichidan_stem_final || kana::isIRowCodepoint(stem_final_hiragana))) {
         cost += candidate::verb_cost::kKatakanaIchidanNegativePenalty;
       }
       candidates.push_back(makeVerbCandidate(

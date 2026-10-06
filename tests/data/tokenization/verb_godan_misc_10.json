@@ -1470,6 +1470,43 @@
       ],
       "id": "ni_ru_3",
       "input": "今風呂に入る"
+    },
+    {
+      "description": "ピンチなかったので助かった - auto-generated",
+      "expected": [
+        {
+          "lemma": "ピンチ",
+          "pos": "Noun",
+          "surface": "ピンチ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "なかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "ので",
+          "pos": "Particle",
+          "surface": "ので"
+        },
+        {
+          "lemma": "助かる",
+          "pos": "Verb",
+          "surface": "助かっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "nakatttanode_kattta",
+      "input": "ピンチなかったので助かった"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",
