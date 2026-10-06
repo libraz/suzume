@@ -2139,6 +2139,38 @@
       ],
       "id": "ke_5",
       "input": "雪解け"
+    },
+    {
+      "description": "結局皆同じだった。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "結局",
+          "pos": "Noun",
+          "surface": "結局"
+        },
+        {
+          "lemma": "皆",
+          "pos": "Pronoun",
+          "surface": "皆"
+        },
+        {
+          "lemma": "同じ",
+          "pos": "Adjective",
+          "surface": "同じ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "jidattta",
+      "input": "結局皆同じだった。"
     }
   ],
   "description": "General nouns (part 4/4)",

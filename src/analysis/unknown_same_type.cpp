@@ -40,6 +40,21 @@ bool opensOnParticleBeforePronoun(const dictionary::DictionaryManager* dict_mana
          lookupEntryInRange(*dict_manager, codepoints, start + 1, end, core::PartOfSpeech::Pronoun) != nullptr;
 }
 
+// Whether [start, end) is an opaque run that closes on a registered kanji
+// pronoun after a registered noun (結局+皆). A pronoun is a phrase of its own, so
+// no unregistered run spans it and the noun in front of it. A left side that is
+// no registered word (暴+君) leaves the run alone.
+bool closesOnPronounAfterRegisteredNoun(const dictionary::DictionaryManager& dict_manager,
+                                        const std::vector<char32_t>& codepoints, size_t start, size_t end) {
+  for (size_t pronoun_start = start + 2; pronoun_start < end; ++pronoun_start) {
+    if (lookupEntryInRange(dict_manager, codepoints, pronoun_start, end, core::PartOfSpeech::Pronoun) != nullptr &&
+        lookupEntryInRange(dict_manager, codepoints, start, pronoun_start, core::PartOfSpeech::Noun) != nullptr) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool isNonWordType(normalize::CharType type) {
   return type == normalize::CharType::Symbol || type == normalize::CharType::Emoji;
 }
@@ -1061,6 +1076,11 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
         if (numeral_counter_head || quantity_noun_head) {
           continue;
         }
+      }
+      if (start_type == normalize::CharType::Kanji && len > 1 && dict_manager_ != nullptr &&
+          dict_manager_->lookupExact(surface) == nullptr &&
+          closesOnPronounAfterRegisteredNoun(*dict_manager_, codepoints, start_pos, candidate_end)) {
+        continue;
       }
       // The mirror boundary: a kanji run must not open with a registered
       // multi-kanji formal noun (以来|問題, 途中|経過). A formal noun is a bound

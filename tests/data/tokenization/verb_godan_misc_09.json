@@ -973,6 +973,38 @@
       ],
       "id": "ha_nari_yueni_gubekida",
       "input": "時は金なり。ゆえに急ぐべきだ。"
+    },
+    {
+      "description": "結局皆様に伝えた。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "結局",
+          "pos": "Noun",
+          "surface": "結局"
+        },
+        {
+          "lemma": "皆様",
+          "pos": "Noun",
+          "surface": "皆様"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "伝える",
+          "pos": "Verb",
+          "surface": "伝え"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ni_eta",
+      "input": "結局皆様に伝えた。"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",
