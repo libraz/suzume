@@ -1234,6 +1234,123 @@
       ],
       "id": "i_9",
       "input": "関心深い"
+    },
+    {
+      "description": "紙くさかった - auto-generated",
+      "expected": [
+        {
+          "lemma": "紙くさい",
+          "pos": "Adjective",
+          "surface": "紙くさかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "kusakattta_2",
+      "input": "紙くさかった"
+    },
+    {
+      "description": "照れくさくて顔が赤くなった。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "照れくさい",
+          "pos": "Adjective",
+          "surface": "照れくさく"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "顔",
+          "pos": "Noun",
+          "surface": "顔"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "赤い",
+          "pos": "Adjective",
+          "surface": "赤く"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "rekusakute_ga_kunattta",
+      "input": "照れくさくて顔が赤くなった。"
+    },
+    {
+      "description": "照れくさかった - auto-generated",
+      "expected": [
+        {
+          "lemma": "照れくさい",
+          "pos": "Adjective",
+          "surface": "照れくさかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "rekusakattta",
+      "input": "照れくさかった"
+    },
+    {
+      "description": "政治臭い - auto-generated",
+      "expected": [
+        {
+          "lemma": "政治臭い",
+          "pos": "Adjective",
+          "surface": "政治臭い"
+        }
+      ],
+      "id": "i_10",
+      "input": "政治臭い"
+    },
+    {
+      "description": "政治臭かった - auto-generated",
+      "expected": [
+        {
+          "lemma": "政治臭い",
+          "pos": "Adjective",
+          "surface": "政治臭かっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "kattta_5",
+      "input": "政治臭かった"
+    },
+    {
+      "description": "汗臭い - auto-generated",
+      "expected": [
+        {
+          "lemma": "汗臭い",
+          "pos": "Adjective",
+          "surface": "汗臭い"
+        }
+      ],
+      "id": "i_11",
+      "input": "汗臭い"
     }
   ],
   "description": "I-adjectives compound/derived forms (複合・派生) - sou patterns, nominalization, contracted forms",

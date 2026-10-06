@@ -96,6 +96,11 @@ bool spansPastAdjectiveEnding(const std::string& surface, const std::string& bas
   return false;
 }
 
+bool isHostFusedSuffixAdjective(const std::string& base_form) {
+  return std::find(kHostFusedSuffixAdjectives.begin(), kHostFusedSuffixAdjectives.end(), base_form) !=
+         kHostFusedSuffixAdjectives.end();
+}
+
 bool isLexicalCompoundHeadAdjective(const std::string& base_form) {
   return std::find(kLexicalCompoundHeadAdjectives.begin(), kLexicalCompoundHeadAdjectives.end(), base_form) !=
          kLexicalCompoundHeadAdjectives.end();

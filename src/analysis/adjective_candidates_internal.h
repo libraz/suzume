@@ -152,6 +152,16 @@ void appendKanjiIAdjPostVariants(const std::vector<char32_t>& codepoints, size_t
                                  std::vector<UnknownCandidate>& candidates, size_t candidate_start);
 
 /**
+ * @brief Host plus host-fused suffix adjective candidates (汗+臭かっ, 照れ+くさく)
+ *
+ * The host is a kanji run that is not a listed non-noun, or a continuative
+ * already among @p candidates; every cell of the suffix becomes one adjective.
+ */
+void appendHostFusedSuffixAdjective(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                    const dictionary::DictionaryManager* dict_manager,
+                                    std::vector<UnknownCandidate>& candidates);
+
+/**
  * @brief Append compound i-adjective candidates for a kanji stem.
  */
 void appendKanjiCompoundIAdjCandidates(const std::vector<char32_t>& codepoints, size_t start_pos, size_t kanji_end,
@@ -190,6 +200,20 @@ bool isCompoundFormingAdjective(const std::string& base_form);
  * (にくい, っぽい) attach to any host.
  */
 bool isLexicalCompoundHeadAdjective(const std::string& base_form);
+
+/// Host-fused suffixes: the derived adjective and its host are one word in every
+/// cell (汗臭かった, 照れくさくて); other derivational suffixes keep their own token
+/// (子供+っぽい, 読み+にくい).
+inline constexpr std::array<std::string_view, 2> kHostFusedSuffixAdjectives = {"臭い", "くさい"};
+
+/**
+ * @brief Whether a derivational suffix adjective fuses with its host (臭い, くさい)
+ *
+ * The derived adjective is one word with its nominal or continuative host in
+ * every cell (汗臭かった, 照れくさくて), unlike the suffixes that keep their own
+ * token (子供+っぽい).
+ */
+bool isHostFusedSuffixAdjective(const std::string& base_form);
 
 /**
  * @brief Check whether a base form is a nominal host plus a productive second element.

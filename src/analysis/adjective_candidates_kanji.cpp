@@ -272,6 +272,7 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
   if (normalize::isIterationMark(codepoints[start_pos])) {
     return;
   }
+  adj_detail::appendHostFusedSuffixAdjective(codepoints, start_pos, dict_manager, candidates);
 
   // A productive adjective-forming second element may follow a multi-kanji
   // nominal host (用心+深い, 我慢+強い). Extend the ordinary two-kanji scan only

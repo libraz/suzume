@@ -9,9 +9,13 @@
 
 #include "adjective_candidates_internal.h"
 #include "analysis/candidate_constants.h"
+#include "analysis/dictionary_probe.h"
 #include "core/debug.h"
+#include "dictionary/source_parser.h"
+#include "grammar/dictionary_expansion.h"
 #include "grammar/inflection.h"
 #include "normalize/char_type.h"
+#include "normalize/utf8.h"
 #include "tokenizer_utils.h"
 #include "unknown.h"
 #include "verb_candidates_helpers.h"
@@ -315,6 +319,81 @@ void adj_detail::appendKanjiCompoundIAdjCandidates(const std::vector<char32_t>& 
   // intervening kanji, so bridge it only when another generator has already
   // established the entire host as a 連用形.
   appendRenyokeiHostCompound(codepoints, start_pos, hiragana_end, inflection, dict_manager, candidates);
+}
+
+// A nominal or continuative host plus a host-fused suffix adjective (汗+臭い,
+// 紙+くさい, 照れ+くさい) is one adjective, and every cell the suffix inflects
+// to belongs to it (汗臭かっ+た, 照れくさく+て). The host is a kanji run that is
+// not a listed non-noun (an adverb in front predicates instead: 全然+くさく), or
+// a continuative another generator has already proposed.
+void adj_detail::appendHostFusedSuffixAdjective(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                                const dictionary::DictionaryManager* dict_manager,
+                                                std::vector<UnknownCandidate>& candidates) {
+  constexpr size_t kMaxHostLength = 6;
+  constexpr size_t kMaxTailLength = 6;
+  std::vector<size_t> host_ends;
+  for (size_t pos = start_pos + 1;
+       pos < codepoints.size() && pos - start_pos <= kMaxHostLength && normalize::isKanjiCodepoint(codepoints[pos - 1]);
+       ++pos) {
+    const std::string host = extractSubstring(codepoints, start_pos, pos);
+    bool listed_non_noun = false;
+    if (dict_manager != nullptr) {
+      for (const auto& match : dict_manager->lookup(host, 0)) {
+        listed_non_noun = listed_non_noun || (match.entry != nullptr && match.length == pos - start_pos &&
+                                              match.entry->pos != core::PartOfSpeech::Noun);
+      }
+    }
+    if (!listed_non_noun) {
+      host_ends.push_back(pos);
+    }
+  }
+  for (const auto& candidate : candidates) {
+    if (candidate.start == start_pos && candidate.pos == core::PartOfSpeech::Verb &&
+        candidate.extended_pos == core::ExtendedPOS::VerbRenyokei) {
+      host_ends.push_back(candidate.end);
+    }
+  }
+  // The suffix's cells are the dictionary's expansion of it (臭かっ, くさく).
+  const auto emit = [&](size_t host_end, size_t end_pos, const std::string& suffix_lemma, core::ExtendedPOS epos) {
+    auto adjective = adj_detail::makeIAdjCellCandidate(
+        extractSubstring(codepoints, start_pos, end_pos), start_pos, end_pos,
+        extractSubstring(codepoints, start_pos, host_end) + suffix_lemma, epos,
+        candidate::kCompoundAdjBaseCost + candidate::kCompoundIAdjectiveLexicalBonus, CandidateOrigin::AdjectiveI,
+        candidate::kDictFallbackAdjConfidence, "host_fused_suffix_adjective");
+    adjective.has_suffix = true;
+    candidates.push_back(std::move(adjective));
+  };
+  for (const size_t host_end : host_ends) {
+    const size_t tail_limit = std::min(codepoints.size(), host_end + kMaxTailLength);
+    if (dict_manager != nullptr) {
+      for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, host_end, tail_limit)) {
+        const auto* entry = match.entry;
+        if (entry != nullptr && entry->pos == core::PartOfSpeech::Adjective &&
+            adj_detail::isHostFusedSuffixAdjective(entry->lemma.empty() ? entry->surface : entry->lemma)) {
+          emit(host_end, host_end + match.length, entry->lemma.empty() ? entry->surface : entry->lemma,
+               entry->extended_pos);
+        }
+      }
+    }
+    // A spelling the dictionary does not list is expanded the way the
+    // dictionary expands a listed one, so both spellings get the same cells.
+    for (const std::string_view suffix : adj_detail::kHostFusedSuffixAdjectives) {
+      if (verb_helpers::isAdjectiveInDictionary(dict_manager, suffix)) {
+        continue;
+      }
+      dictionary::SourceEntry source;
+      source.surface = std::string(suffix);
+      source.pos = core::PartOfSpeech::Adjective;
+      source.conj_type = dictionary::ConjugationType::IAdjective;
+      for (const auto& cell : grammar::expandDictionarySourceEntry(source)) {
+        const size_t cell_length = normalize::utf8Length(cell.surface);
+        if (host_end + cell_length <= codepoints.size() &&
+            extractSubstring(codepoints, host_end, host_end + cell_length) == cell.surface) {
+          emit(host_end, host_end + cell_length, std::string(suffix), cell.extended_pos);
+        }
+      }
+    }
+  }
 }
 
 }  // namespace suzume::analysis
