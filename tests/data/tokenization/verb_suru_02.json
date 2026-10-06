@@ -698,6 +698,70 @@
       ],
       "id": "kashi_reta",
       "input": "何かし忘れた"
+    },
+    {
+      "description": "fragment before a te-form compound case particle",
+      "expected": [
+        {
+          "lemma": "きちんと",
+          "pos": "Adverb",
+          "surface": "きちんと"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "kichintoshite",
+      "input": "きちんとして"
+    },
+    {
+      "description": "もっときちんとして、早く寝なさい。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "もっと",
+          "pos": "Adverb",
+          "surface": "もっと"
+        },
+        {
+          "lemma": "きちんと",
+          "pos": "Adverb",
+          "surface": "きちんと"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "早い",
+          "pos": "Adjective",
+          "surface": "早く"
+        },
+        {
+          "lemma": "寝る",
+          "pos": "Verb",
+          "surface": "寝"
+        },
+        {
+          "lemma": "なさる",
+          "pos": "Auxiliary",
+          "surface": "なさい"
+        }
+      ],
+      "id": "motttokichintoshite_ku_nasai",
+      "input": "もっときちんとして、早く寝なさい。"
     }
   ],
   "description": "Suru-verb patterns with subsidiary verbs - MeCab互換分割 (part 2/2)",

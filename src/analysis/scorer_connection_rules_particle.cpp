@@ -134,8 +134,12 @@ float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::
   // An unknown hiragana fragment cannot directly introduce an onbin verb.
   // Such a path is an over-segmentation of one inflected word (よろこんで),
   // whereas ordinary adverbial modifiers have their own lexical categories.
+  // The compound case particles built on a te-form (として, について) are
+  // closed-class strings of the same kind: a fragment in front of one is the
+  // stem of an adverb or a word cut short (きちん+として of きちんと+して).
   if (prev.pos == core::PartOfSpeech::Other && grammar::isPureHiragana(prev.surface) &&
-      next.extended_pos == core::ExtendedPOS::VerbOnbinkei) {
+      (next.extended_pos == core::ExtendedPOS::VerbOnbinkei ||
+       (next.extended_pos == core::ExtendedPOS::ParticleCase && normalize::utf8Length(next.surface) >= 3))) {
     SUZUME_CONNECTION_ADD(bonus, cost::kStrong);
   }
 
