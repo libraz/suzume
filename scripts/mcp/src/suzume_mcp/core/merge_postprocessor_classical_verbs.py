@@ -483,6 +483,8 @@ _CONTINUATIVE_AUXILIARY_CELLS: dict[str, tuple[frozenset[str], str, frozenset[st
     "ぬる": (frozenset({"動詞"}), "ぬ", None),
     "ぬれ": (frozenset({"動詞"}), "ぬ", None),
     "けれ": (frozenset({"動詞"}), "けり", frozenset({"ば", "ど", "ども"})),
+    # The attributive cell is told from 蹴る by the question or exclamatory か (咲きけるかな).
+    "ける": (frozenset({"動詞"}), "けり", frozenset({"か"})),
     "しか": (frozenset({"助詞"}), "き", frozenset({"ば", "ど", "ども"})),
     # The terminal perfect is told from the negative ぬ (which closes on ず) by
     # an auxiliary that takes a terminal.
