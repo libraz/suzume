@@ -321,9 +321,11 @@ float computeVerbRenyokeiEarlyBonus(const core::LatticeEdge& prev, const core::L
       next.extended_pos == core::ExtendedPOS::AuxClassicalPerfect && utf8::equalsAny(next.surface, {"たり", "たれ"})) {
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryStrongBonus);
   }
-  // The perfect つ needs the narrower margin: a one-mora continuative in front
-  // of it is also the opening kana of ordinary words (いつ, かつ).
-  if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+  // The perfect つ needs the narrower margin, and none at all after a bare
+  // one-mora kana continuative: that kana plus つ is the opening of ordinary
+  // words (いつ, かつ), while a kanji stem (見+つ) keeps the construction.
+  const bool bare_kana_mora = normalize::utf8Length(prev.surface) == 1 && !grammar::containsKanji(prev.surface);
+  if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei && !bare_kana_mora &&
       next.extended_pos == core::ExtendedPOS::AuxClassicalPerfect && utf8::equalsAny(next.surface, {"つ"})) {
     SUZUME_CONNECTION_ADD(bonus, cost::kStrongBonus);
   }

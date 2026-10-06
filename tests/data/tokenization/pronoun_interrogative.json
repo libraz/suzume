@@ -299,6 +299,134 @@
       ],
       "id": "haitsudesuka",
       "input": "水はいつですか"
+    },
+    {
+      "description": "水が来るのはいつですか - auto-generated",
+      "expected": [
+        {
+          "lemma": "水",
+          "pos": "Noun",
+          "surface": "水"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来る"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "いつ",
+          "pos": "Pronoun",
+          "surface": "いつ"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "ga_runohaitsudesuka",
+      "input": "水が来るのはいつですか"
+    },
+    {
+      "description": "行くのはいつ？ - auto-generated",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行く"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "いつ",
+          "pos": "Pronoun",
+          "surface": "いつ"
+        }
+      ],
+      "id": "kunohaitsu",
+      "input": "行くのはいつ？"
+    },
+    {
+      "description": "会うのはいつまで - auto-generated",
+      "expected": [
+        {
+          "lemma": "会う",
+          "pos": "Verb",
+          "surface": "会う"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "いつ",
+          "pos": "Pronoun",
+          "surface": "いつ"
+        },
+        {
+          "lemma": "まで",
+          "pos": "Particle",
+          "surface": "まで"
+        }
+      ],
+      "id": "unohaitsumade",
+      "input": "会うのはいつまで"
+    },
+    {
+      "description": "誕生日はいつ - auto-generated",
+      "expected": [
+        {
+          "lemma": "誕生日",
+          "pos": "Noun",
+          "surface": "誕生日"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "いつ",
+          "pos": "Pronoun",
+          "surface": "いつ"
+        }
+      ],
+      "id": "haitsu",
+      "input": "誕生日はいつ"
     }
   ],
   "description": "pronoun_interrogative tests",

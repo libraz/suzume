@@ -1,6 +1,7 @@
 """Merge rules ported from SuzumeUtils.pm apply_suzume_merge()."""
 
 import functools
+import unicodedata
 
 import regex
 
@@ -73,6 +74,11 @@ _HA_ROW_IRREALIS_CELLS: dict[str, tuple[str, str]] = {
 }
 KU_NOMINALIZER = "く"
 _HA_ROW_IRREALIS_TAILS = "|".join(sorted(_HA_ROW_IRREALIS_CELLS, key=len, reverse=True))
+
+
+def _is_punctuation_surface(surface: str) -> bool:
+    """Return whether every character of the surface is punctuation."""
+    return bool(surface) and all(unicodedata.category(char).startswith("P") for char in surface)
 
 
 def _ha_row_irrealis_cells(remaining: str) -> list[dict] | None:
@@ -811,6 +817,8 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
         # the classical perfect つ when a particle or the copula follows.  A
         # phrase-initial pair closed by a particle, the copula or punctuation is
         # the nominal phrase the pronoun heads, not a finite classical predicate.
+        # Punctuation is recognized by its characters too: the reference tags
+        # the ASCII ? the oracle text normalizes to as a noun.
         if (
             not merged
             and t.get("surface") == "い"
@@ -822,6 +830,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
             and (
                 i + 2 == len(tokens)
                 or tokens[i + 2].get("pos") in ("助詞", "記号")
+                or _is_punctuation_surface(tokens[i + 2].get("surface", ""))
                 or (tokens[i + 2].get("pos") == "助動詞" and tokens[i + 2].get("lemma") in ("だ", "です"))
             )
         ):

@@ -30,6 +30,16 @@ namespace suzume::analysis {
 
 namespace {
 
+// Whether a one-mora particle opens [start, end) and a registered pronoun fills
+// the rest (は+いつ): the pronoun is the noun the particle stands in front of,
+// so no opaque run spans the two.
+bool opensOnParticleBeforePronoun(const dictionary::DictionaryManager* dict_manager,
+                                  const std::vector<char32_t>& codepoints, size_t start, size_t end) {
+  return dict_manager != nullptr && end > start + 2 &&
+         lookupEntryInRange(*dict_manager, codepoints, start, start + 1, core::PartOfSpeech::Particle) != nullptr &&
+         lookupEntryInRange(*dict_manager, codepoints, start + 1, end, core::PartOfSpeech::Pronoun) != nullptr;
+}
+
 bool isNonWordType(normalize::CharType type) {
   return type == normalize::CharType::Symbol || type == normalize::CharType::Emoji;
 }
@@ -1156,6 +1166,10 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
           kanjiHeadsPredicateAt(codepoints, char_types, candidate_end, inflection_, *dict_manager_)) {
         continue;
       }
+      if (start_type == normalize::CharType::Hiragana &&
+          opensOnParticleBeforePronoun(dict_manager_, codepoints, start_pos, candidate_end)) {
+        continue;
+      }
       // A kana run that spells a registered suffix exactly (ごと, たび) already has
       // that entry; an unknown noun over the same span only lets it be read as
       // the head a determiner selects (こと+ある+ごと).
@@ -1894,6 +1908,8 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
         const size_t suffix_len = std::max(suffix_length_at(suffix_start), pronoun_length_at(suffix_start));
         absorbs_trailing_suffix = suffix_len > 0 && suffix_start + suffix_len >= scan;
       }
+      absorbs_trailing_suffix =
+          absorbs_trailing_suffix || opensOnParticleBeforePronoun(dict_manager_, codepoints, start_pos, scan);
       if ((len >= min_len || short_bos_preparatory_homograph) &&
           (right_particle || right_clause || right_auxiliary || right_kanji_word || right_suffix ||
            (right_short_genitive && unread_short_run_bracketed)) &&

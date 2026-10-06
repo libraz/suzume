@@ -201,6 +201,30 @@ bool startsWithParticleThenVerifiedVerb(const std::vector<char32_t>& codepoints,
       continue;
     }
     SUZUME_DEBUG_LOG_VERBOSE("[VERB_PARTICLE] \"" << particle_surface << "\" at pos=" << start_pos << "\n");
+    // A closed nominal after a case or topic particle proves the boundary too,
+    // when it ends the run or meets the copula or a particle (は+いつ+です,
+    // は+いつ+まで): a predicate run has no pronoun inside it.
+    if (particle_entry->extended_pos == core::ExtendedPOS::ParticleCase ||
+        particle_entry->extended_pos == core::ExtendedPOS::ParticleTopic) {
+      for (size_t nominal_end = particle_end + 2; nominal_end <= probe_end; ++nominal_end) {
+        if (lookupEntryInRange(*dict_manager, codepoints, particle_end, nominal_end, core::PartOfSpeech::Pronoun) ==
+            nullptr) {
+          continue;
+        }
+        const bool closes_nominal =
+            nominal_end >= codepoints.size() || char_types[nominal_end] != normalize::CharType::Hiragana ||
+            lookupEntryInRange(*dict_manager, codepoints, nominal_end, nominal_end + 1, core::PartOfSpeech::Particle) !=
+                nullptr ||
+            vh::auxiliaryFollowsAt(dict_manager, codepoints, nominal_end, [](const dictionary::DictionaryEntry& entry) {
+              return entry.extended_pos == core::ExtendedPOS::AuxCopulaDa ||
+                     entry.extended_pos == core::ExtendedPOS::AuxCopulaDesu;
+            });
+        if (closes_nominal) {
+          SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << particle_surface << "\" particle_then_closed_nominal\n");
+          return true;
+        }
+      }
+    }
     size_t verb_start = particle_end;
     for (size_t verb_end = probe_end; verb_end > verb_start + 1; --verb_end) {
       std::string verb_surface = extractSubstring(codepoints, verb_start, verb_end);
