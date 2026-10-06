@@ -192,6 +192,28 @@
       ],
       "id": "unnamed_51",
       "input": "営業部御中"
+    },
+    {
+      "description": "田中さんとして - auto-generated",
+      "expected": [
+        {
+          "lemma": "田中",
+          "pos": "Noun",
+          "surface": "田中"
+        },
+        {
+          "lemma": "さん",
+          "pos": "Suffix",
+          "surface": "さん"
+        },
+        {
+          "lemma": "として",
+          "pos": "Particle",
+          "surface": "として"
+        }
+      ],
+      "id": "santoshite",
+      "input": "田中さんとして"
     }
   ],
   "description": "General nouns (part 5/5)",

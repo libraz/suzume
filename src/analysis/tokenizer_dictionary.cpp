@@ -550,8 +550,12 @@ bool hasPrecedingVerbVolitionalChain(const core::Lattice& lattice, size_t start_
       continue;
     }
     const bool licensed = core::anyEdgeEndingAt(lattice, edge.start, [&edge](const core::LatticeEdge& verb) {
-      const bool licenses_volitional =
-          edge.extended_pos == core::ExtendedPOS::AuxVolitional && verb.extended_pos == core::ExtendedPOS::VerbMizenkei;
+      // The a-row mizenkei of する (さ) only hosts the passive/causative, never ん
+      // (田中さ+ん+と+し+て is 田中+さん+として).
+      const bool is_suru_passive_stem =
+          grammar::isSuruBaseForm(verb.lemma) && kana::isARowCodepoint(utf8::decodeFirstChar(verb.surface));
+      const bool licenses_volitional = edge.extended_pos == core::ExtendedPOS::AuxVolitional &&
+                                       verb.extended_pos == core::ExtendedPOS::VerbMizenkei && !is_suru_passive_stem;
       const bool licenses_negative_intent = edge.extended_pos == core::ExtendedPOS::AuxNegativeMai &&
                                             verb.extended_pos == core::ExtendedPOS::VerbShuushikei;
       return licenses_volitional || licenses_negative_intent;

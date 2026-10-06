@@ -873,6 +873,43 @@
       ],
       "id": "doun_to_kina_gashita",
       "input": "どうん、と大きな音がした。"
+    },
+    {
+      "description": "山田さんとして参加した - auto-generated",
+      "expected": [
+        {
+          "lemma": "山田",
+          "pos": "Noun",
+          "surface": "山田"
+        },
+        {
+          "lemma": "さん",
+          "pos": "Suffix",
+          "surface": "さん"
+        },
+        {
+          "lemma": "として",
+          "pos": "Particle",
+          "surface": "として"
+        },
+        {
+          "lemma": "参加",
+          "pos": "Noun",
+          "surface": "参加"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "santoshite_shita",
+      "input": "山田さんとして参加した"
     }
   ],
   "description": "Suru-verb patterns with subsidiary verbs - MeCab互換分割 (part 2/2)",

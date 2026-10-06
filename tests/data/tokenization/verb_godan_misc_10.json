@@ -1263,6 +1263,28 @@
       ],
       "id": "ri_muru",
       "input": "張り詰むる心"
+    },
+    {
+      "description": "先生として働く - auto-generated",
+      "expected": [
+        {
+          "lemma": "先生",
+          "pos": "Noun",
+          "surface": "先生"
+        },
+        {
+          "lemma": "として",
+          "pos": "Particle",
+          "surface": "として"
+        },
+        {
+          "lemma": "働く",
+          "pos": "Verb",
+          "surface": "働く"
+        }
+      ],
+      "id": "toshite_ku",
+      "input": "先生として働く"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",
