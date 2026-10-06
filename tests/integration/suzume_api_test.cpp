@@ -219,6 +219,21 @@ TEST_F(SuzumeApiTest, DifficultySuffixPastFormKeepsItsAdjectiveBoundary) {
   EXPECT_EQ(results[2].surface, "た");
 }
 
+TEST_F(SuzumeApiTest, ClassicalContinuativeBeforePerfectTeKeepsItsGodanLemma) {
+  Suzume instance(makeTestOptions());
+
+  // て before けり is the perfect つ, which takes the bare godan continuative.
+  const auto classical = instance.analyze("鳥鳴きてけり");
+  ASSERT_EQ(classical.size(), 4u);
+  EXPECT_EQ(classical[1].surface, "鳴き");
+  EXPECT_EQ(classical[1].lemma, "鳴く");
+
+  // The modern te-form still reads an unlisted i-row continuative as ichidan.
+  const auto modern = instance.analyze("借りて");
+  ASSERT_EQ(modern.size(), 2u);
+  EXPECT_EQ(modern[0].lemma, "借りる");
+}
+
 TEST_F(SuzumeApiTest, KyotoHonorificYasuRequiresItsHonorificHost) {
   Suzume instance(makeTestOptions());
 
