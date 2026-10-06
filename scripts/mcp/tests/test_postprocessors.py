@@ -1537,3 +1537,23 @@ class TestDeverbalNounContextGenitiveHead:
             {"surface": "やる", "pos": "Verb", "lemma": "やる"},
         ]
         assert not postprocessors.postprocess_deverbal_noun_context(tokens)
+
+
+class TestClassicalPerfectTe:
+    def test_te_before_keri_is_the_perfect_tsu(self):
+        tokens = [
+            {"surface": "咲き", "pos": "Verb", "lemma": "咲く"},
+            {"surface": "て", "pos": "Particle", "lemma": "て"},
+            {"surface": "けり", "pos": "Auxiliary", "lemma": "けり"},
+        ]
+        assert postprocessors.postprocess_classical_perfect_te(tokens)
+        assert (tokens[1]["pos"], tokens[1]["lemma"]) == ("Auxiliary", "つ")
+
+    def test_te_before_aspectual_ki_is_left_alone(self):
+        tokens = [
+            {"surface": "歩い", "pos": "Verb", "lemma": "歩く"},
+            {"surface": "て", "pos": "Particle", "lemma": "て"},
+            {"surface": "き", "pos": "Auxiliary", "lemma": "くる"},
+            {"surface": "た", "pos": "Auxiliary", "lemma": "た"},
+        ]
+        assert not postprocessors.postprocess_classical_perfect_te(tokens)

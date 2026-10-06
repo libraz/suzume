@@ -2427,6 +2427,97 @@
       ],
       "id": "tttekudasai_2",
       "input": "バズってください"
+    },
+    {
+      "description": "風ともなしに靡きて - auto-generated",
+      "expected": [
+        {
+          "lemma": "風",
+          "pos": "Noun",
+          "surface": "風"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "なし"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "靡く",
+          "pos": "Verb",
+          "surface": "靡き"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "tomonashini_kite",
+      "input": "風ともなしに靡きて"
+    },
+    {
+      "description": "咲きてけり - auto-generated",
+      "expected": [
+        {
+          "lemma": "咲く",
+          "pos": "Verb",
+          "surface": "咲き"
+        },
+        {
+          "lemma": "つ",
+          "pos": "Auxiliary",
+          "surface": "て"
+        },
+        {
+          "lemma": "けり",
+          "pos": "Auxiliary",
+          "surface": "けり"
+        }
+      ],
+      "id": "kitekeri_2",
+      "input": "咲きてけり"
+    },
+    {
+      "description": "鳥鳴きてけり - auto-generated",
+      "expected": [
+        {
+          "lemma": "鳥",
+          "pos": "Noun",
+          "surface": "鳥"
+        },
+        {
+          "lemma": "鳴く",
+          "pos": "Verb",
+          "surface": "鳴き"
+        },
+        {
+          "lemma": "つ",
+          "pos": "Auxiliary",
+          "surface": "て"
+        },
+        {
+          "lemma": "けり",
+          "pos": "Auxiliary",
+          "surface": "けり"
+        }
+      ],
+      "id": "kitekeri_3",
+      "input": "鳥鳴きてけり"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",

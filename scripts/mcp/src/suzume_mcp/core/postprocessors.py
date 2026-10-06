@@ -39,6 +39,7 @@ postprocess_classical_past_keri = postprocessor_classical.postprocess_classical_
 postprocess_classical_past_shi = postprocessor_classical.postprocess_classical_past_shi
 postprocess_classical_perfect_aux = postprocessor_classical.postprocess_classical_perfect_aux
 postprocess_classical_perfect_ni = postprocessor_classical.postprocess_classical_perfect_ni
+postprocess_classical_perfect_te = postprocessor_classical.postprocess_classical_perfect_te
 postprocess_classical_perfect_nu = postprocessor_classical.postprocess_classical_perfect_nu
 postprocess_classical_ramu_boundary = postprocessor_classical.postprocess_classical_ramu_boundary
 
@@ -286,6 +287,7 @@ POSTPROCESSORS: tuple[tuple[str, Callable[[list[dict]], bool]], ...] = (
     ("classical-b-row-moteiku", postprocess_classical_b_row_moteiku),
     ("classical-perfect-aux", postprocess_classical_perfect_aux),
     ("classical-perfect-ni", postprocess_classical_perfect_ni),
+    ("classical-perfect-te", postprocess_classical_perfect_te),
     ("classical-past-keri", postprocess_classical_past_keri),
     ("classical-past-shi", postprocess_classical_past_shi),
     ("classical-perfect-nu", postprocess_classical_perfect_nu),

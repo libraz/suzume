@@ -72,6 +72,7 @@ void resolveNominalConditionalNara(std::vector<core::Morpheme>& result);
 void resolveNominalDeAru(std::vector<core::Morpheme>& result);
 void resolveNominalPredicateNai(std::vector<core::Morpheme>& result);
 void resolveGenitivePhraseHead(std::vector<core::Morpheme>& result);
+void resolveClassicalPerfectTe(std::vector<core::Morpheme>& result);
 void resolveNominalizedRenyokeiPredicate(std::vector<core::Morpheme>& result);
 void resolveObligationNaranai(std::vector<core::Morpheme>& result);
 void resolveParticleAruOnbin(std::vector<core::Morpheme>& result);

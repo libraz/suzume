@@ -59,6 +59,7 @@ void resolvePrePrefixMorphemeRoles(std::vector<core::Morpheme>& result,
   resolver::resolveComparisonNoun(result);
   resolver::resolveNegativeRenyokei(result);
   resolver::resolveVerbTeParticle(result);
+  resolver::resolveClassicalPerfectTe(result);
   resolver::resolveObligationNaranai(result);
   resolver::resolveTearuAuxiliary(result);
   resolver::resolveEchoedConditionalCopula(result);

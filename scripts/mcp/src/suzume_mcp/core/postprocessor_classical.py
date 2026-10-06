@@ -554,6 +554,31 @@ def postprocess_classical_perfect_ni(tokens: list[dict]) -> None:
 
 
 @reports_mutation
+def postprocess_classical_perfect_te(tokens: list[dict]) -> None:
+    """Retag て between a continuative and the classical past as the perfect つ.
+
+    The perfective つ has the continuative て, and the classical past けり takes
+    it just as it takes に (咲き+て+けり, 鳴き+て+けり). The reference reads that
+    て either as the conjunctive particle or as the progressive てる, neither of
+    which can stand in front of けり.
+    """
+    for idx in range(1, len(tokens) - 1):
+        token = tokens[idx]
+        if token.get("surface") != "て" or token.get("pos") not in ("Particle", "Auxiliary"):
+            continue
+        # The けり cells only: き after て is the aspectual 来る (歩い+て+き+た).
+        following = tokens[idx + 1]
+        if (
+            tokens[idx - 1].get("pos") != "Verb"
+            or following.get("surface") not in _CLASSICAL_PAST_KERI_CELLS
+            or following.get("pos") == "Noun"
+        ):
+            continue
+        token["pos"] = "Auxiliary"
+        token["lemma"] = "つ"
+
+
+@reports_mutation
 def postprocess_classical_past_keri(tokens: list[dict]) -> None:
     """Restore the classical past けり after the perfective continuative に.
 

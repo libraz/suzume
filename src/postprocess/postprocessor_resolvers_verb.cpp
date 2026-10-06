@@ -55,6 +55,21 @@ void resolveDeverbalStemBeforeDependentAuxiliary(std::vector<core::Morpheme>& re
   }
 }
 
+// The perfective つ has the continuative て, and the classical past けり takes it
+// as it takes に (咲き+て+けり): a conjunctive て cannot stand in front of け
+// り, so the mora between a verb and the past auxiliary is that auxiliary.
+void resolveClassicalPerfectTe(std::vector<core::Morpheme>& result) {
+  for (size_t idx = 1; idx + 1 < result.size(); ++idx) {
+    auto& te = result[idx];
+    if (te.extended_pos != core::ExtendedPOS::ParticleConj || !grammar::isTeDeSurface(te.surface) ||
+        result[idx - 1].pos != core::PartOfSpeech::Verb ||
+        result[idx + 1].extended_pos != core::ExtendedPOS::AuxClassicalKeri) {
+      continue;
+    }
+    retagUninflected(te, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxClassicalPerfect, "つ");
+  }
+}
+
 // Assign quotation roles that require the selected clause context. A final
 // particle after a finite predicate closes a quoted clause (行く+か+と+尋ねる),
 // whereas an interrogative pronoun remains a case phrase (誰+か+と+話す).
