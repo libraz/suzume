@@ -212,10 +212,20 @@ float computeTaFormVolitionalBonus(const core::LatticeEdge& prev, const core::La
   // particle ends a modern clause, so い+た+し+候 is the continuative いたし plus 候.
   const bool epistolary_terminal_after_conjunctive =
       prev.extended_pos == core::ExtendedPOS::ParticleConj && grammar::isEpistolaryTerminalSurface(next.surface);
+  // The voiced past だ follows an onbin stem; the contracted くん already holds
+  // the nominalizer ん of くる+の, so a だ after it is the copula (持って+くん+だ).
+  const bool voiced_past_after_contracted_kuru = prev.extended_pos == core::ExtendedPOS::AuxAspectKuru &&
+                                                 utf8::endsWith(prev.surface, "ん") &&
+                                                 next.extended_pos == core::ExtendedPOS::AuxTenseTa;
   if (bare_volitional_after_non_o_row || negative_after_godan_non_irrealis ||
       suru_continuative_before_classical_negative || suru_irrealis_before_modern_aux ||
       attributive_keri_after_continuative || epistolary_terminal_after_conjunctive)
     SUZUME_CONNECTION_ADD(bonus, cost::kSevere);
+  if (voiced_past_after_contracted_kuru)
+    SUZUME_CONNECTION_ADD(bonus, scorer::kPenaltyVoicedPastAfterContractedKuru);
+  if (prev.extended_pos == core::ExtendedPOS::AuxAspectKuru && utf8::endsWith(prev.surface, "ん") &&
+      next.extended_pos == core::ExtendedPOS::AuxCopulaDa)
+    SUZUME_CONNECTION_ADD(bonus, scorer::kBonusCopulaAfterContractedKuru);
   if (modern_volitional)
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryStrongBonus + cost::kStrongBonus);
   if (directional_volitional)

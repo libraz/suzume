@@ -344,6 +344,10 @@ constexpr float kBonusHonorificGoNounPerChar = 0.3F;
 constexpr float kBonusDoubleVeryStrong = scale::kVeryStrongBonus * 2;  // -3.2
 // Lifts the stem-to-verb prohibition and prefers the stem over a bare noun before a bound suffix verb.
 constexpr float kBonusBoundSuffixAfterAdjStem = -scale::kAlmostNever + scale::kVeryStrongBonus;
+// Withdraws the continuative-to-past bonus for the contracted くん, whose ん is already the nominalizer.
+constexpr float kPenaltyVoicedPastAfterContractedKuru = scale::kStrong + scale::kNegligible;
+// Its ん holds the nominalizer, so the copula follows it as it does a nominalizer ん.
+constexpr float kBonusCopulaAfterContractedKuru = scale::kVeryStrongBonus;
 
 // Bonus for a split productive kanji V1連用 + kanji V2連用 compound verb
 // (読み+終え, 書き+始め). Two kanji content-verb 連用形 halves that already split
