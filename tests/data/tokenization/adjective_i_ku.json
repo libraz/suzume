@@ -1647,6 +1647,60 @@
       ],
       "id": "rana_wo_ku",
       "input": "平らな道を歩く"
+    },
+    {
+      "description": "早く来いってさ - auto-generated",
+      "expected": [
+        {
+          "lemma": "早い",
+          "pos": "Adjective",
+          "surface": "早く"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来い"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Particle",
+          "surface": "さ"
+        }
+      ],
+      "id": "ku_itttesa",
+      "input": "早く来いってさ"
+    },
+    {
+      "description": "早く来いってよ - auto-generated",
+      "expected": [
+        {
+          "lemma": "早い",
+          "pos": "Adjective",
+          "surface": "早く"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来い"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "ku_ittteyo",
+      "input": "早く来いってよ"
     }
   ],
   "description": "I-adjectives ku-forms (連用形) - adverbial, negative, te-form, ku-naru patterns",

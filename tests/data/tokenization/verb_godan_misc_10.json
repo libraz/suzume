@@ -223,6 +223,28 @@
       ],
       "id": "ya_wo_tsu",
       "input": "本やノートを持つ"
+    },
+    {
+      "description": "読み終わった - auto-generated",
+      "expected": [
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読み"
+        },
+        {
+          "lemma": "終わる",
+          "pos": "Verb",
+          "surface": "終わっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "mi_wattta",
+      "input": "読み終わった"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",

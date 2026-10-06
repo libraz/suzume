@@ -67,7 +67,14 @@ float computePassiveCausativeBonus(const core::LatticeEdge& prev, const core::La
   // よう), not directly to an adjective. Without this grammatical guard,
   // passive + desire chains can fabricate an i-adjective spanning both
   // auxiliaries: 行か+れたく instead of 行か+れ+たく.
-  if (prev.extended_pos == core::ExtendedPOS::VerbMizenkei && next.pos == core::PartOfSpeech::Adjective) {
+  // The irregular continuative 来 likewise heads no compound: a verb stem in
+  // the onbin cell right after it is the quotative で/って path read wrongly
+  // (来い+って+さ, not 来+いっ+て+さ).
+  const bool kuru_continuative_before_onbin = prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+                                              grammar::isKuruKanjiBaseForm(prev.lemma) &&
+                                              next.extended_pos == core::ExtendedPOS::VerbOnbinkei;
+  if ((prev.extended_pos == core::ExtendedPOS::VerbMizenkei && next.pos == core::PartOfSpeech::Adjective) ||
+      kuru_continuative_before_onbin) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
 
