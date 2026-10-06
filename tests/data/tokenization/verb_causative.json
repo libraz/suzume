@@ -1238,6 +1238,132 @@
       ],
       "id": "besaserarekaketa",
       "input": "食べさせられかけた"
+    },
+    {
+      "description": "資料を磨かされていけば - auto-generated",
+      "expected": [
+        {
+          "lemma": "資料",
+          "pos": "Noun",
+          "surface": "資料"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "磨く",
+          "pos": "Verb",
+          "surface": "磨か"
+        },
+        {
+          "lemma": "す",
+          "pos": "Auxiliary",
+          "surface": "さ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いく",
+          "pos": "Auxiliary",
+          "surface": "いけ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "wo_kasareteikeba",
+      "input": "資料を磨かされていけば"
+    },
+    {
+      "description": "道を歩かされたくない - auto-generated",
+      "expected": [
+        {
+          "lemma": "道",
+          "pos": "Noun",
+          "surface": "道"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "歩く",
+          "pos": "Verb",
+          "surface": "歩か"
+        },
+        {
+          "lemma": "す",
+          "pos": "Auxiliary",
+          "surface": "さ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たく"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
+      "id": "wo_kasaretakunai",
+      "input": "道を歩かされたくない"
+    },
+    {
+      "description": "靴を磨かされた - auto-generated",
+      "expected": [
+        {
+          "lemma": "靴",
+          "pos": "Noun",
+          "surface": "靴"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "磨く",
+          "pos": "Verb",
+          "surface": "磨か"
+        },
+        {
+          "lemma": "す",
+          "pos": "Auxiliary",
+          "surface": "さ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wo_kasareta",
+      "input": "靴を磨かされた"
     }
   ],
   "description": "verb_causative tests",
