@@ -67,7 +67,7 @@ float Scorer::eosCost(const core::LatticeEdge& edge, core::ExtendedPOS prev_exte
 
   // An attributive compound particle needs the noun it modifies; closing the
   // utterance on it means the case particle plus the predicate (場合+に+よる).
-  if (connection_rules::isAttributiveCompoundParticle(edge)) {
+  if (connection_rules::isDependenceIdiomCompoundParticle(edge)) {
     return sc::kPenaltyAttributiveCompoundParticleClose;
   }
 

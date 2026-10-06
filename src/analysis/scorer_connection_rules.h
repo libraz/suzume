@@ -48,6 +48,9 @@ float computeCompoundParticlePoliteBonus(const core::LatticeEdge& prev, const co
 /** @brief Whether an edge is a compound case particle in its attributive る cell (による, に関する). */
 bool isAttributiveCompoundParticle(const core::LatticeEdge& edge);
 
+/** @brief Whether an edge is による, which doubles as the predicate of dependence (場合による). */
+bool isDependenceIdiomCompoundParticle(const core::LatticeEdge& edge);
+
 /** @brief Bars an attributive compound particle from closing its modifier (before a particle, symbol or auxiliary). */
 float computeAttributiveCompoundParticlePenalty(const core::LatticeEdge& prev, const core::LatticeEdge& next);
 

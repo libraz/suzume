@@ -313,8 +313,17 @@ bool isAttributiveCompoundParticle(const core::LatticeEdge& edge) {
          grammar::isAttributiveCompoundParticleSurface(edge.surface);
 }
 
+// による alone is also the idiom of dependence (場合による), so at the end of
+// the input or before a mark it is the case particle plus that predicate. The
+// others (に関する, に対する, における) have no such reading, so a bare
+// fragment keeps them whole like any member of the family.
+bool isDependenceIdiomCompoundParticle(const core::LatticeEdge& edge) {
+  return isAttributiveCompoundParticle(edge) && utf8::endsWith(edge.surface, "よる");
+}
+
 float computeAttributiveCompoundParticlePenalty(const core::LatticeEdge& prev, const core::LatticeEdge& next) {
-  const bool closes_modifier = next.pos == core::PartOfSpeech::Particle || next.pos == core::PartOfSpeech::Symbol ||
+  const bool closes_modifier = next.pos == core::PartOfSpeech::Particle ||
+                               (next.pos == core::PartOfSpeech::Symbol && isDependenceIdiomCompoundParticle(prev)) ||
                                next.pos == core::PartOfSpeech::Auxiliary || next.pos == core::PartOfSpeech::Other;
   return isAttributiveCompoundParticle(prev) && closes_modifier ? sc::kPenaltyAttributiveCompoundParticleClose
                                                                 : sc::scale::kNeutral;

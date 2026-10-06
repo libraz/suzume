@@ -1222,6 +1222,28 @@
       ],
       "id": "noyasashii",
       "input": "彼女のやさしい声"
+    },
+    {
+      "description": "彼に関するもの - auto-generated",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "に関する",
+          "pos": "Particle",
+          "surface": "に関する"
+        },
+        {
+          "lemma": "もの",
+          "pos": "Noun",
+          "surface": "もの"
+        }
+      ],
+      "id": "ni_surumono",
+      "input": "彼に関するもの"
     }
   ],
   "description": "Basic tokenization tests",

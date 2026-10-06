@@ -26,6 +26,57 @@
       ],
       "id": "gaitakattta",
       "input": "歯がいたかった"
+    },
+    {
+      "description": "日本における - auto-generated",
+      "expected": [
+        {
+          "lemma": "日本",
+          "pos": "Noun",
+          "surface": "日本"
+        },
+        {
+          "lemma": "における",
+          "pos": "Particle",
+          "surface": "における"
+        }
+      ],
+      "id": "niokeru",
+      "input": "日本における"
+    },
+    {
+      "description": "事例における - auto-generated",
+      "expected": [
+        {
+          "lemma": "事例",
+          "pos": "Noun",
+          "surface": "事例"
+        },
+        {
+          "lemma": "における",
+          "pos": "Particle",
+          "surface": "における"
+        }
+      ],
+      "id": "niokeru_2",
+      "input": "事例における"
+    },
+    {
+      "description": "事項に関する - auto-generated",
+      "expected": [
+        {
+          "lemma": "事項",
+          "pos": "Noun",
+          "surface": "事項"
+        },
+        {
+          "lemma": "に関する",
+          "pos": "Particle",
+          "surface": "に関する"
+        }
+      ],
+      "id": "ni_suru_5",
+      "input": "事項に関する"
     }
   ],
   "description": "General nouns (part 5/5)",
