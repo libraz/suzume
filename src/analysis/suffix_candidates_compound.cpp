@@ -326,6 +326,14 @@ bool hasAttributiveNominalSelector(const std::vector<char32_t>& codepoints,
   const size_t first_selector = lookbehindStart(start_pos, kMaximumSelectorLength);
   const auto* attributive_copula =
       codepoints[start_pos - 1] == U'な' ? dict_manager->lookupExact("な", core::PartOfSpeech::Auxiliary) : nullptr;
+  constexpr size_t kClosedClassProbeChars = 3;
+  const auto head_matches = lookupResultsInRange(*dict_manager, codepoints, start_pos,
+                                                 std::min(codepoints.size(), start_pos + kClosedClassProbeChars));
+  const bool startsClosedClassWord = std::any_of(head_matches.begin(), head_matches.end(), [](const auto& match) {
+    return match.entry != nullptr && match.length >= 2 &&
+           (match.entry->pos == core::PartOfSpeech::Particle || match.entry->pos == core::PartOfSpeech::Auxiliary ||
+            match.entry->pos == core::PartOfSpeech::Suffix);
+  });
   for (size_t selector_start = first_selector; selector_start < start_pos; ++selector_start) {
     // A na-adjective selects a nominal head through its explicit attributive
     // copula (AdjNa+な+X).  The existing adjective probe only recognizes a
@@ -357,6 +365,14 @@ bool hasAttributiveNominalSelector(const std::vector<char32_t>& codepoints,
     }
     const auto* exact_adjective = dict_manager->lookupExact(selector_surface, core::PartOfSpeech::Adjective);
     if (exact_adjective != nullptr && exact_adjective->extended_pos == core::ExtendedPOS::AdjBasic) {
+      return true;
+    }
+    // A verb's attributive form is its terminal one (疑う+きらい, すぎる+きらい),
+    // which selects a nominal head just as an adjective does. The head cannot
+    // open on a registered closed-class word of two morae or more, though: that
+    // word is the next morpheme of the clause (やる+べき+こと, 急ぐ+より+ほか).
+    const auto* exact_verb = dict_manager->lookupExact(selector_surface, core::PartOfSpeech::Verb);
+    if (exact_verb != nullptr && selector_surface == exact_verb->lemma && !startsClosedClassWord) {
       return true;
     }
   }

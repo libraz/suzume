@@ -2750,6 +2750,53 @@
       ],
       "id": "sorawo_geru",
       "input": "そらを見上げる"
+    },
+    {
+      "description": "彼は人を疑うきらいがある - auto-generated",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "人",
+          "pos": "Noun",
+          "surface": "人"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "疑う",
+          "pos": "Verb",
+          "surface": "疑う"
+        },
+        {
+          "lemma": "きらい",
+          "pos": "Noun",
+          "surface": "きらい"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        }
+      ],
+      "id": "ha_wo_ukiraigaaru",
+      "input": "彼は人を疑うきらいがある"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",

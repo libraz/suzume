@@ -80,6 +80,12 @@ bool startsLongerClosedForm(const std::vector<char32_t>& codepoints, size_t na_p
   constexpr size_t kMaxClosedFormLength = 3;
   const size_t probe_end = std::min(codepoints.size(), na_pos + kMaxClosedFormLength);
   for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, na_pos, probe_end)) {
+    // A word cannot be followed by a ら-column mora, which opens no native
+    // word, so the form is the start of a longer word instead (な+きらい, not なき+らい).
+    const size_t form_end = na_pos + match.length;
+    if (form_end < codepoints.size() && kana::isRaColumnCodepoint(codepoints[form_end])) {
+      continue;
+    }
     if (match.entry != nullptr && match.length > 1 &&
         ((pos_mask & partOfSpeechMask(match.entry->pos)) != 0 ||
          (include_final_particle && match.entry->extended_pos == core::ExtendedPOS::ParticleFinal))) {
