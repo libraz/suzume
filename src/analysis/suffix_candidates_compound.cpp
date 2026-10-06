@@ -1135,11 +1135,11 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
     looks_like_aux = true;
   }
 
-  // Ichidan verb pattern (e-row + る)
+  // Ichidan verb pattern (e-row + る, or the imperative ろ: 慣れ+ろ)
   const bool is_e_row =
       (first_hira == U'え' || first_hira == U'け' || first_hira == U'げ' || first_hira == U'せ' ||
        first_hira == U'て' || first_hira == U'ね' || first_hira == U'べ' || first_hira == U'め' || first_hira == U'れ');
-  if (is_e_row && second_hira == U'る') {
+  if (is_e_row && (second_hira == U'る' || second_hira == U'ろ')) {
     looks_like_aux = true;
   }
 

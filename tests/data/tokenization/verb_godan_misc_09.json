@@ -1507,6 +1507,55 @@
       ],
       "id": "niitaidesu",
       "input": "家にいたいです。"
+    },
+    {
+      "description": "慣れろということ - auto-generated",
+      "expected": [
+        {
+          "lemma": "慣れる",
+          "pos": "Verb",
+          "surface": "慣れろ"
+        },
+        {
+          "lemma": "という",
+          "pos": "Determiner",
+          "surface": "という"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "こと"
+        }
+      ],
+      "id": "rerotoiukoto",
+      "input": "慣れろということ"
+    },
+    {
+      "description": "食べろという話だ - auto-generated",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べろ"
+        },
+        {
+          "lemma": "という",
+          "pos": "Determiner",
+          "surface": "という"
+        },
+        {
+          "lemma": "話",
+          "pos": "Noun",
+          "surface": "話"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "berotoiu_da",
+      "input": "食べろという話だ"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",
