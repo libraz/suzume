@@ -1843,6 +1843,28 @@
       ],
       "id": "o_gaitaidesu",
       "input": "お腹がいたいです。"
+    },
+    {
+      "description": "追伸、返事不要です - auto-generated",
+      "expected": [
+        {
+          "lemma": "追伸",
+          "pos": "Interjection",
+          "surface": "追伸"
+        },
+        {
+          "lemma": "返事不要",
+          "pos": "Adjective",
+          "surface": "返事不要"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "desu_3",
+      "input": "追伸、返事不要です"
     }
   ],
   "description": "Politeness auxiliaries (ます、です)",

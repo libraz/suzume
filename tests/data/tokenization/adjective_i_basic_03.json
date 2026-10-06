@@ -1905,6 +1905,40 @@
       ],
       "id": "nanohayasashisadesu",
       "input": "大事なのはやさしさです。"
+    },
+    {
+      "description": "利用可能です - auto-generated",
+      "expected": [
+        {
+          "lemma": "利用可能",
+          "pos": "Adjective",
+          "surface": "利用可能"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "desu_4",
+      "input": "利用可能です"
+    },
+    {
+      "description": "使用可能だ - auto-generated",
+      "expected": [
+        {
+          "lemma": "使用可能",
+          "pos": "Adjective",
+          "surface": "使用可能"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "da_10",
+      "input": "使用可能だ"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 3/3)",

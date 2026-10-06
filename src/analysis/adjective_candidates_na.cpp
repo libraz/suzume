@@ -42,6 +42,23 @@ bool hasIndependentAdjectiveHost(const std::vector<char32_t>& codepoints, size_t
                                                              partOfSpeechMask(core::PartOfSpeech::Adjective));
 }
 
+// Whether the kanji run closes on a dictionary adjective opening with a negation
+// prefix (返事+不要). Such a head carries the lexical bonus the dictionary gives
+// it, which the run as a whole must match to stay one unit beside the split.
+bool closesOnNegationPrefixedAdjective(const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos,
+                                       const dictionary::DictionaryManager* dict_manager) {
+  if (dict_manager == nullptr) {
+    return false;
+  }
+  for (size_t head_pos = start_pos + 2; head_pos + 2 <= end_pos; ++head_pos) {
+    const std::string head = extractSubstring(codepoints, head_pos, end_pos);
+    if (scorer::startsWithNegationPrefix(head) && dict_manager->lookupExact(head, core::PartOfSpeech::Adjective)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 // The な that would be the attributive copula may instead be the first mora of
 // a longer closed-class word (なら, ない, など, なし). When the dictionary can
 // name one starting there, that word is the reading and the material before it
@@ -486,7 +503,11 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
   const bool has_dictionary_head = dict_manager != nullptr && kanji_end >= start_pos + 3 &&
                                    hasDictionaryEntryEndingAt(*dict_manager, codepoints, start_pos + 2, kanji_end,
                                                               partOfSpeechMask(core::PartOfSpeech::Adjective));
-  const bool followed_by_da = kanji_end < codepoints.size() && codepoints[kanji_end] == U'だ';
+  // The polite copula です/でし(た) licenses the stem exactly as だ does.
+  const bool followed_by_da =
+      kanji_end < codepoints.size() &&
+      (codepoints[kanji_end] == U'だ' || (codepoints[kanji_end] == U'で' && kanji_end + 1 < codepoints.size() &&
+                                          (codepoints[kanji_end + 1] == U'す' || codepoints[kanji_end + 1] == U'し')));
   if ((followed_by_na || followed_by_sou || (has_dictionary_head && followed_by_da)) &&
       (!has_independent_adjective_host || is_productive_negation_compound)) {
     // Skip if first character is a formal noun (形式名詞)
@@ -517,7 +538,10 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
 
     // Found kanji compound + な - potential na-adjective stem
     // Cost similar to dictionary na-adjectives but with small penalty for unknown
-    const float cost = has_dictionary_head ? candidate::kNaAdjHeadedCompoundCost : candidate::kNaAdjStemCost;
+    float cost = has_dictionary_head ? candidate::kNaAdjHeadedCompoundCost : candidate::kNaAdjStemCost;
+    if (has_dictionary_head && closesOnNegationPrefixedAdjective(codepoints, start_pos, kanji_end, dict_manager)) {
+      cost += scorer::kBonusNegationPrefixBase;
+    }
     candidates.push_back(makeNaAdjCandidate(kanji_seq, start_pos, kanji_end, cost, true, CandidateOrigin::AdjectiveNa,
                                             0.8F, "na_adjective_stem"));
   }
