@@ -2383,6 +2383,50 @@
       ],
       "id": "rareteshikarubeki",
       "input": "叱られてしかるべき"
+    },
+    {
+      "description": "ハマってください - auto-generated",
+      "expected": [
+        {
+          "lemma": "ハマる",
+          "pos": "Verb",
+          "surface": "ハマっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くださる",
+          "pos": "Verb",
+          "surface": "ください"
+        }
+      ],
+      "id": "tttekudasai",
+      "input": "ハマってください"
+    },
+    {
+      "description": "バズってください - auto-generated",
+      "expected": [
+        {
+          "lemma": "バズる",
+          "pos": "Verb",
+          "surface": "バズっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くださる",
+          "pos": "Verb",
+          "surface": "ください"
+        }
+      ],
+      "id": "tttekudasai_2",
+      "input": "バズってください"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",

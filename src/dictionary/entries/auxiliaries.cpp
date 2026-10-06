@@ -738,8 +738,8 @@ EntrySpecRange getAuxiliaryEntries() {
       // Request - ください is VERB (くださる) in MeCab
       // くださる is special ra-row godan with irregular imperative form ください
       // Uses VerbRenyokei to allow connection to ます (くださいました)
-      verb("ください", "くださる", EPOS::VerbRenyokei),
-      verb("下さい", "下さる", EPOS::VerbRenyokei),
+      verb("ください", "くださる", EPOS::AuxBenefactive),
+      verb("下さい", "下さる", EPOS::AuxBenefactive),
 
       // Special ra-row godan verbs (五段ラ行特殊) with い-form renyokei
       // These honorific/humble verbs use い instead of り for renyokei:
