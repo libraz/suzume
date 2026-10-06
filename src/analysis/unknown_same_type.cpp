@@ -2054,7 +2054,13 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
         if (right_genitive_after_internal_particle) {
           noun_cost += scorer::scale::kStrongBonus;
         }
-        if (left_genitive_bracket && right_clause && len == 2) {
+        // An adjective or auxiliary reading of the run is what follows の as the
+        // predicate (色+の+ない); only a nominal head is a two-mora noun there.
+        const bool exact_adjectival_predicate =
+            dict_manager_ != nullptr && hasExactPartOfSpeech(*dict_manager_, promoted_surface,
+                                                             partOfSpeechMask(core::PartOfSpeech::Adjective) |
+                                                                 partOfSpeechMask(core::PartOfSpeech::Auxiliary));
+        if (left_genitive_bracket && right_clause && len == 2 && !exact_adjectival_predicate) {
           noun_cost += scorer::scale::kVeryStrongBonus;
         }
         // A bound copula selects a nominal, so it is evidence for the run being

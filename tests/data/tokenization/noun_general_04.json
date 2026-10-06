@@ -2193,6 +2193,77 @@
       ],
       "id": "gaitai",
       "input": "頭がいたい"
+    },
+    {
+      "description": "色のない - auto-generated",
+      "expected": [
+        {
+          "lemma": "色",
+          "pos": "Noun",
+          "surface": "色"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
+      "id": "nonai",
+      "input": "色のない"
+    },
+    {
+      "description": "本のない - auto-generated",
+      "expected": [
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
+      "id": "nonai_2",
+      "input": "本のない"
+    },
+    {
+      "description": "飾りっけのない - auto-generated",
+      "expected": [
+        {
+          "lemma": "飾り",
+          "pos": "Noun",
+          "surface": "飾り"
+        },
+        {
+          "lemma": "っけ",
+          "pos": "Suffix",
+          "surface": "っけ"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
+      "id": "rittkenonai_2",
+      "input": "飾りっけのない"
     }
   ],
   "description": "General nouns (part 4/4)",
