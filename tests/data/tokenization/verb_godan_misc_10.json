@@ -1697,6 +1697,65 @@
       ],
       "id": "wo_rashi_kani_wo_teita",
       "input": "時折頭を揺らし、静かに夢を見ていた。"
+    },
+    {
+      "description": "大変さが増す - auto-generated",
+      "expected": [
+        {
+          "lemma": "大変",
+          "pos": "Adjective",
+          "surface": "大変"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Suffix",
+          "surface": "さ"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "増す",
+          "pos": "Verb",
+          "surface": "増す"
+        }
+      ],
+      "id": "saga_su",
+      "input": "大変さが増す"
+    },
+    {
+      "description": "ちょっとさ、聞いてよ - auto-generated",
+      "expected": [
+        {
+          "lemma": "ちょっと",
+          "pos": "Adverb",
+          "surface": "ちょっと"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Particle",
+          "surface": "さ"
+        },
+        {
+          "lemma": "聞く",
+          "pos": "Verb",
+          "surface": "聞い"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "chi_tttosa_iteyo",
+      "input": "ちょっとさ、聞いてよ"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",

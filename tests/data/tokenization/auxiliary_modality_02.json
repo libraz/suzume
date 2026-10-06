@@ -958,6 +958,53 @@
       ],
       "id": "yanekomo_da",
       "input": "犬やねこも家族だ"
+    },
+    {
+      "description": "この仕事の大変さは想像以上だ - auto-generated",
+      "expected": [
+        {
+          "lemma": "この",
+          "pos": "Determiner",
+          "surface": "この"
+        },
+        {
+          "lemma": "仕事",
+          "pos": "Noun",
+          "surface": "仕事"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "大変",
+          "pos": "Adjective",
+          "surface": "大変"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Suffix",
+          "surface": "さ"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "想像以上",
+          "pos": "Noun",
+          "surface": "想像以上"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "kono_no_saha_da",
+      "input": "この仕事の大変さは想像以上だ"
     }
   ],
   "description": "Modality auxiliaries (たい、そう、らしい) (part 2/2)",

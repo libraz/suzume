@@ -320,11 +320,15 @@ def postprocess_tsuke_noun(tokens: list[dict]) -> bool:
 
 @reports_mutation
 def postprocess_taihen(tokens: list[dict]) -> bool:
-    """Fix 大変 before な: Adverb -> Adjective (na-adjective use)."""
+    """Fix 大変 before な or the nominalizing さ: Adverb -> Adjective (na-adjective use)."""
     for i, t in enumerate(tokens):
         if t.get("surface") == "大変" and t.get("pos") == "Adverb":
-            if i < len(tokens) - 1 and tokens[i + 1].get("surface") == "な":
-                t["pos"] = "Adjective"
+            if i < len(tokens) - 1:
+                following = tokens[i + 1]
+                if following.get("surface") == "な" or (
+                    following.get("surface") == "さ" and following.get("pos") == "Suffix"
+                ):
+                    t["pos"] = "Adjective"
 
 
 @reports_mutation

@@ -504,6 +504,11 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
       // Surface-specific valid stacks are restored by connection rules.
       {EPOS::ParticleFinal, EPOS::ParticleFinal, cost::kStrong},
 
+      // A sentence-final particle does not hand over to the concessive が or a
+      // topic particle, so 大変さが・大変さは keep the nominalizing さ.
+      {EPOS::ParticleFinal, EPOS::ParticleConjFinite, cost::kStrong},
+      {EPOS::ParticleFinal, EPOS::ParticleTopic, cost::kStrong},
+
       // ParticleFinal → ParticleNo (か+の) - moderate bonus (indefinite pronoun pattern)
       // いくつかの, 何かの, 誰かの, どれかの - か functions as indefinite marker, not sentence-ender
       {EPOS::ParticleFinal, EPOS::ParticleNo, cost::kModerateBonus},
