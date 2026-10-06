@@ -36,6 +36,55 @@
       ],
       "id": "dottkano_de_ou",
       "input": "どっかの店で会おう"
+    },
+    {
+      "description": "ふん、驚くなよ。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "ふん",
+          "pos": "Interjection",
+          "surface": "ふん"
+        },
+        {
+          "lemma": "驚く",
+          "pos": "Verb",
+          "surface": "驚く"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "fun_kunayo",
+      "input": "ふん、驚くなよ。"
+    },
+    {
+      "description": "驚くなよ - auto-generated",
+      "expected": [
+        {
+          "lemma": "驚く",
+          "pos": "Verb",
+          "surface": "驚く"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "kunayo_2",
+      "input": "驚くなよ"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",

@@ -100,7 +100,16 @@ bool appendKanjiIAdjSpecialCandidates(const std::vector<char32_t>& codepoints, s
       // もの (動くもの). Treat it as adjective evidence only when it opens a
       // negative continuation such as 高くもない.
       const bool is_mo_negative = next == U'も' && adj_end + 1 < codepoints.size() && codepoints[adj_end + 1] == U'な';
-      is_adj_context = next == U'て' || (next == U'な' && (!starts_nara || nara_is_negative_change)) || is_mo_negative;
+      // な opens the negative or the change of state (高くない, 高くなる, 高くなかった,
+      // 高くなさそう) only when a cell of ない/なる follows it; a final な or one
+      // before a sentence-final particle is the prohibitive (驚くなよ).
+      const bool opens_nai_or_naru =
+          next == U'な' && adj_end + 1 < codepoints.size() &&
+          (codepoints[adj_end + 1] == U'い' || codepoints[adj_end + 1] == U'く' || codepoints[adj_end + 1] == U'か' ||
+           codepoints[adj_end + 1] == U'け' || codepoints[adj_end + 1] == U'さ' || codepoints[adj_end + 1] == U'っ' ||
+           codepoints[adj_end + 1] == U'る' || codepoints[adj_end + 1] == U'れ');
+      is_adj_context =
+          next == U'て' || (opens_nai_or_naru && (!starts_nara || nara_is_negative_change)) || is_mo_negative;
     }
     const std::string surface = extractSubstring(codepoints, start_pos, adj_end);
     const std::string lemma = extractSubstring(codepoints, start_pos, kanji_end) + "い";
