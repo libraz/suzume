@@ -1246,6 +1246,82 @@
       ],
       "id": "nihao_yakanio_goshinokototo_jimasu",
       "input": "皆様にはお健やかにお過ごしのことと存じます。"
+    },
+    {
+      "description": "心奥底に眠る頑なな感情。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "心奥底",
+          "pos": "Noun",
+          "surface": "心奥底"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "眠る",
+          "pos": "Verb",
+          "surface": "眠る"
+        },
+        {
+          "lemma": "頑な",
+          "pos": "Adjective",
+          "surface": "頑な"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "感情",
+          "pos": "Noun",
+          "surface": "感情"
+        }
+      ],
+      "id": "ni_ru_nana",
+      "input": "心奥底に眠る頑なな感情。"
+    },
+    {
+      "description": "頑なに拒む - auto-generated",
+      "expected": [
+        {
+          "lemma": "頑な",
+          "pos": "Adjective",
+          "surface": "頑な"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "拒む",
+          "pos": "Verb",
+          "surface": "拒む"
+        }
+      ],
+      "id": "nani_mu",
+      "input": "頑なに拒む"
+    },
+    {
+      "description": "頑なだ - auto-generated",
+      "expected": [
+        {
+          "lemma": "頑な",
+          "pos": "Adjective",
+          "surface": "頑な"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "nada",
+      "input": "頑なだ"
     }
   ],
   "description": "Na-adjectives (ナ形容詞) (part 2/2)",
