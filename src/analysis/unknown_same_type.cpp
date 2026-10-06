@@ -1201,8 +1201,16 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       const bool names_foreign_nominal =
           pos == core::PartOfSpeech::Noun &&
           (start_type == normalize::CharType::Alphabet || start_type == normalize::CharType::Digit);
+      // A pictograph keeps its own output class but scores as the phrase
+      // boundary it marks (歌っ+てる+わ+よ+♪), like the punctuation it stands in for.
+      core::ExtendedPOS scoring_epos = core::ExtendedPOS::Unknown;
+      if (names_foreign_nominal) {
+        scoring_epos = core::ExtendedPOS::NounForeign;
+      } else if (pos == core::PartOfSpeech::Other && normalize::isPhraseClosingPictograph(codepoints[start_pos])) {
+        scoring_epos = core::ExtendedPOS::Symbol;
+      }
       auto cand = makeCandidate(surface, start_pos, candidate_end, pos, cost, has_suffix, CandidateOrigin::SameType,
-                                names_foreign_nominal ? core::ExtendedPOS::NounForeign : core::ExtendedPOS::Unknown);
+                                scoring_epos);
 #ifdef SUZUME_DEBUG_INFO
       cand.confidence = started_with_particle ? 0.7F : 1.0F;
       switch (start_type) {

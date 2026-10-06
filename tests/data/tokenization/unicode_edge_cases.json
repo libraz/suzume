@@ -335,6 +335,109 @@
       ],
       "id": "ga",
       "input": "水が氷…❄️"
+    },
+    {
+      "description": "pictograph closes the phrase like punctuation",
+      "expected": [
+        {
+          "lemma": "歌う",
+          "pos": "Verb",
+          "surface": "歌っ"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てる"
+        },
+        {
+          "lemma": "わ",
+          "pos": "Particle",
+          "surface": "わ"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        },
+        {
+          "lemma": "♪",
+          "pos": "Other",
+          "surface": "♪"
+        }
+      ],
+      "id": "ttteruwayo",
+      "input": "歌ってるわよ♪"
+    },
+    {
+      "description": "pictograph closes the phrase like punctuation",
+      "expected": [
+        {
+          "lemma": "楽しい",
+          "pos": "Adjective",
+          "surface": "楽しい"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        },
+        {
+          "lemma": "♪",
+          "pos": "Other",
+          "surface": "♪"
+        }
+      ],
+      "id": "shiine",
+      "input": "楽しいね♪"
+    },
+    {
+      "description": "pictograph closes the phrase like punctuation",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てる"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        },
+        {
+          "lemma": "♪",
+          "pos": "Other",
+          "surface": "♪"
+        }
+      ],
+      "id": "beteruyo",
+      "input": "食べてるよ♪"
+    },
+    {
+      "description": "emoji closes the phrase like punctuation",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行く"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        },
+        {
+          "lemma": "😂",
+          "pos": "Other",
+          "surface": "😂"
+        }
+      ],
+      "id": "kuyo",
+      "input": "行くよ😂"
     }
   ],
   "description": "unicode_edge_cases tests",

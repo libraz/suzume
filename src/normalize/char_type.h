@@ -155,6 +155,15 @@ bool isProlongedSoundMark(char32_t ch);
 bool isEmojiModifier(char32_t ch);
 
 /**
+ * @brief Whether a character is a pictograph closing a phrase like punctuation
+ *
+ * Emoji and the Miscellaneous Symbols/Dingbats pictographs (♪, ☆, ♡) mark the
+ * end of a phrase in casual text. Currency, units and arrows carry content and
+ * are not included.
+ */
+bool isPhraseClosingPictograph(char32_t ch);
+
+/**
  * @brief Check if character is a Unicode variation selector
  *
  * Covers the BMP variation selectors (U+FE00-U+FE0F) and the ideographic

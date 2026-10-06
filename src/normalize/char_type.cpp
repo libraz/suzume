@@ -422,6 +422,12 @@ bool isProlongedSoundMark(char32_t ch) {
   return ch == 0x30FC;
 }
 
+bool isPhraseClosingPictograph(char32_t ch) {
+  constexpr char32_t kMiscSymbolsFirst = 0x2600;
+  constexpr char32_t kDingbatsLast = 0x27BF;
+  return classifyChar(ch) == CharType::Emoji || (ch >= kMiscSymbolsFirst && ch <= kDingbatsLast);
+}
+
 bool isEmojiModifier(char32_t ch) {
   // ZWJ (Zero Width Joiner) - combines emojis
   if (ch == 0x200D)
