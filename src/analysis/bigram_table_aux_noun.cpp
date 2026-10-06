@@ -606,6 +606,11 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       // internally segmented particle chain before the predicate.
       {EPOS::Pronoun, EPOS::VerbRenyokei, cost::kStrongBonus},
 
+      // A pronoun's bound suffix (私+たち, 彼+ら) outbids a homographic
+      // continuative, which would otherwise read the pronoun as a dropped
+      // subject (私+立ち+は).
+      {EPOS::Pronoun, EPOS::Suffix, cost::kExtraStrongBonus},
+
       // An interrogative pronoun cannot directly govern a continuative verb.
       // This preserves the indefinite particle boundary in 誰+か+いる.
       {EPOS::PronounInterrogative, EPOS::VerbRenyokei, cost::kAlmostNever},

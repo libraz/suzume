@@ -111,6 +111,11 @@ EntrySpecRange getPronounEntries() {
       // Fixed demonstrative collection: keep the closed expression as one
       // search unit instead of two independent demonstratives.
       pronoun("あれこれ", ""),
+      // The demonstrative plurals are lexical words; ら after a personal
+      // pronoun is the productive plural suffix and stays a separate token.
+      pronoun("これら", ""),
+      pronoun("それら", ""),
+      pronoun("あれら", ""),
 
       // Demonstrative - person reference (こそあど+いつ)
       pronoun("こいつ", ""),

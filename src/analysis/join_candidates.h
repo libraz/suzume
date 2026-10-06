@@ -99,17 +99,6 @@ void addPrefixNounJoinCandidates(core::Lattice& lattice, std::string_view text, 
                                  const grammar::Inflection& inflection);
 
 /**
- * @brief Add pronoun + plural-suffix join candidates
- *
- * Combines a dictionary-backed pronoun with the closed plural suffix ら into
- * one pronoun search unit, e.g. これら and 彼ら.
- */
-void addPronounPluralJoinCandidates(core::Lattice& lattice, std::string_view text,
-                                    const std::vector<char32_t>& codepoints, const ByteOffsets& byte_offsets,
-                                    size_t start_pos, const std::vector<dictionary::LookupResult>& dict_results,
-                                    const Scorer& scorer);
-
-/**
  * @brief Add noun + destination 行き join candidates
  *
  * Combines a noun host directly followed by the bound destination use of 行き

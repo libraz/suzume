@@ -2754,6 +2754,65 @@
       ],
       "id": "ha_ku",
       "input": "オレは行く"
+    },
+    {
+      "description": "先生たちは笑った - auto-generated",
+      "expected": [
+        {
+          "lemma": "先生",
+          "pos": "Noun",
+          "surface": "先生"
+        },
+        {
+          "lemma": "たち",
+          "pos": "Suffix",
+          "surface": "たち"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "笑う",
+          "pos": "Verb",
+          "surface": "笑っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "tachiha_ttta",
+      "input": "先生たちは笑った"
+    },
+    {
+      "description": "僕らは行く - auto-generated",
+      "expected": [
+        {
+          "lemma": "僕",
+          "pos": "Pronoun",
+          "surface": "僕"
+        },
+        {
+          "lemma": "ら",
+          "pos": "Suffix",
+          "surface": "ら"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行く"
+        }
+      ],
+      "id": "raha_ku",
+      "input": "僕らは行く"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",

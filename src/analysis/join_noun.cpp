@@ -359,31 +359,6 @@ void addPrefixNounJoinCandidates(core::Lattice& lattice, std::string_view text, 
   }
 }
 
-void addPronounPluralJoinCandidates(core::Lattice& lattice, std::string_view text,
-                                    const std::vector<char32_t>& codepoints, const ByteOffsets& byte_offsets,
-                                    size_t start_pos, const std::vector<dictionary::LookupResult>& dict_results,
-                                    const Scorer& scorer) {
-  if (start_pos >= codepoints.size()) {
-    return;
-  }
-
-  for (const auto& result : dict_results) {
-    if (result.entry == nullptr || result.entry->pos != core::PartOfSpeech::Pronoun) {
-      continue;
-    }
-    const size_t suffix_pos = start_pos + result.length;
-    if (suffix_pos >= codepoints.size() || codepoints[suffix_pos] != U'ら') {
-      continue;
-    }
-
-    const size_t end_pos = suffix_pos + 1;
-    const std::string_view surface = textRange(text, byte_offsets, start_pos, end_pos);
-    const float cost = scorer.posPrior(core::PartOfSpeech::Pronoun) + candidate::kVerifiedNounBonus;
-    lattice.addEdge(surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(end_pos),
-                    core::PartOfSpeech::Pronoun, cost, core::LatticeEdge::kFromDictionary, surface);
-  }
-}
-
 void addDestinationSuffixNounJoinCandidates(core::Lattice& lattice, std::string_view text,
                                             const std::vector<char32_t>& codepoints, const ByteOffsets& byte_offsets,
                                             size_t start_pos, const dictionary::DictionaryManager& dict_manager,

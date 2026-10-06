@@ -98,7 +98,6 @@ core::Lattice Tokenizer::buildLattice(std::string_view text, const std::vector<c
     addDictionaryCandidates(lattice, text, codepoints, byte_offsets, pos, dictionary_lookup_results);
     addUnknownCandidates(lattice, text, codepoints, byte_offsets, pos, char_types, dictionary_lookup_results);
     if (mode_ != core::AnalysisMode::Split) {
-      addPronounPluralJoinCandidates(lattice, text, codepoints, byte_offsets, pos, dictionary_lookup_results, scorer_);
       addDestinationSuffixNounJoinCandidates(lattice, text, codepoints, byte_offsets, pos, dict_manager_, scorer_);
       addDeverbalNounBeforeIndependentNakuCandidates(lattice, text, codepoints, byte_offsets, pos,
                                                      dictionary_lookup_results, dict_manager_, scorer_);

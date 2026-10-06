@@ -237,6 +237,80 @@
       ],
       "id": "runari_ita",
       "input": "来るなり泣いた"
+    },
+    {
+      "description": "彼らはみな来た - auto-generated",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "ら",
+          "pos": "Suffix",
+          "surface": "ら"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "みな",
+          "pos": "Pronoun",
+          "surface": "みな"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "rahamina_ta",
+      "input": "彼らはみな来た"
+    },
+    {
+      "description": "私たちはみな来た - auto-generated",
+      "expected": [
+        {
+          "lemma": "私",
+          "pos": "Pronoun",
+          "surface": "私"
+        },
+        {
+          "lemma": "たち",
+          "pos": "Suffix",
+          "surface": "たち"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "みな",
+          "pos": "Pronoun",
+          "surface": "みな"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "tachihamina_ta",
+      "input": "私たちはみな来た"
     }
   ],
   "description": "Irregular verbs (する、くる) (part 2/2)",

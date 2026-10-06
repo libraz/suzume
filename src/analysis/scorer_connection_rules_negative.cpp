@@ -292,16 +292,24 @@ float computeNegativeAndNounVerbBonus(const core::LatticeEdge& prev, const core:
   // own kanji stem (三枚重+ね for 三枚+重ね). A genuine one-mora ichidan stem writes
   // that mora in kanji after kanji material (毎日+寝+て), so nothing legitimate has
   // this shape. Longer hiragana continuatives keep the exemption (外出+でき+ない).
-  const bool bare_kanji_host = normalize::utf8Length(prev.surface) == 1 ||
-                               (grammar::isAllKanji(prev.surface) && isSingleHiraganaVerbRenyokei(next));
+  // A registered kana continuative has no okurigana to mark it as a separate
+  // content word either, and a bare noun cannot stand directly before one
+  // (先生+たち is the plural suffix, not 先生+立ち). The sa-row continuative and
+  // the potential of する (外出+でき) are the productive exceptions.
+  const bool bare_kana_continuative_host = next.fromDictionary() && grammar::isPureHiragana(next.surface) &&
+                                           !grammar::isSuruRenyokeiSurface(next.surface) && next.lemma != "できる";
+  const bool bare_kanji_host =
+      normalize::utf8Length(prev.surface) == 1 ||
+      (grammar::isAllKanji(prev.surface) && (isSingleHiraganaVerbRenyokei(next) || bare_kana_continuative_host));
   // A verb that exists only as a derivational suffix on a nominal host inverts
   // the argument: its host is a bare noun by definition (子供じみる, 形式ばる),
   // so a one-kanji one is exactly what it takes rather than evidence of a
   // swallowed stem.
   const bool bound_derivational_suffix = grammar::isBoundDerivationalSuffixVerbLemma(next.lemma);
-  if (prev.extended_pos == core::ExtendedPOS::Noun && next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
-      !grammar::isSuruRenyokeiSurface(next.surface) && next.surface != "せ" && next.surface.size() <= 6 &&
-      bare_kanji_host && !renyokei_has_okurigana && !bound_derivational_suffix) {
+  if ((prev.extended_pos == core::ExtendedPOS::Noun || prev.extended_pos == core::ExtendedPOS::Pronoun) &&
+      next.extended_pos == core::ExtendedPOS::VerbRenyokei && !grammar::isSuruRenyokeiSurface(next.surface) &&
+      next.surface != "せ" && next.surface.size() <= 6 && bare_kanji_host && !renyokei_has_okurigana &&
+      !bound_derivational_suffix) {
     SUZUME_CONNECTION_ADD(bonus, cost::kRare);  // Cancel the bigram bonus
   }
 
