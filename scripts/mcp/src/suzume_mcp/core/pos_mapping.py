@@ -14,6 +14,7 @@ from .constants import (
     FINITE_PREDECESSOR_CONJ_FORM,
     HISTORICAL_KANA_RESPELLING,
     KEEP_AS_NOUN_NOT_ADJ,
+    LETTER_FORMULAS,
     NA_ADJ_OVERRIDES,
     NOUN_AS_PRONOUN,
     PARTICLE_CORRECTIONS,
@@ -221,6 +222,11 @@ def map_mecab_pos(token: dict | str) -> str:
 
     # お疲れ様 and its kana spelling: -> Interjection
     if surface in ("お疲れ様", "おつかれさま"):
+        return "Interjection"
+
+    # Letter openers and closers stand outside the sentence they frame, like
+    # the greetings: -> Interjection
+    if surface in LETTER_FORMULAS:
         return "Interjection"
 
     # Na-adjective overrides

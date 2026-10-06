@@ -55,6 +55,28 @@ bool closesOnPronounAfterRegisteredNoun(const dictionary::DictionaryManager& dic
   return false;
 }
 
+// Whether a registered multi-kanji interjection opens or closes [start, end)
+// beside more kanji (前略+失礼). An interjection stands outside the clause it
+// opens or closes, so no unregistered run spans it and its neighbour.
+bool spansInterjectionBoundary(const dictionary::DictionaryManager& dict_manager,
+                               const std::vector<char32_t>& codepoints, size_t start, size_t end) {
+  const auto registered_interjection = [&](size_t from, size_t to) {
+    return to > from + 1 &&
+           lookupEntryInRange(dict_manager, codepoints, from, to, core::PartOfSpeech::Interjection) != nullptr;
+  };
+  for (size_t split = start + 2; split + 1 < end; ++split) {
+    if (registered_interjection(start, split)) {
+      return true;
+    }
+  }
+  for (size_t split = start + 1; split + 2 < end; ++split) {
+    if (registered_interjection(split, end)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool isNonWordType(normalize::CharType type) {
   return type == normalize::CharType::Symbol || type == normalize::CharType::Emoji;
 }
@@ -1076,6 +1098,11 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
         if (numeral_counter_head || quantity_noun_head) {
           continue;
         }
+      }
+      if (start_type == normalize::CharType::Kanji && len > 2 && dict_manager_ != nullptr &&
+          dict_manager_->lookupExact(surface) == nullptr &&
+          spansInterjectionBoundary(*dict_manager_, codepoints, start_pos, candidate_end)) {
+        continue;
       }
       if (start_type == normalize::CharType::Kanji && len > 1 && dict_manager_ != nullptr &&
           dict_manager_->lookupExact(surface) == nullptr &&

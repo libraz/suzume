@@ -41,6 +41,14 @@ EntrySpecRange getInterjectionEntries() {
       intj("ええと"),  // Hesitation
       intj("あの"),    // Hesitation (also determiner)
       intj("その"),    // Hesitation (rare, also determiner)
+      // Letter openers and closers: formulaic words that stand outside the
+      // sentence they frame, so no kanji run spans them and the text next to them.
+      intj("拝啓"),
+      intj("謹啓"),
+      intj("前略"),
+      intj("草々"),
+      intj("敬具"),
+      intj("追伸"),
   };
   return makeEntrySpecRange(kEntries);
 }

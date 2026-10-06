@@ -1058,6 +1058,18 @@
       ],
       "id": "anonekogakawaii",
       "input": "あのねこがかわいい。"
+    },
+    {
+      "description": "前略 - auto-generated",
+      "expected": [
+        {
+          "lemma": "前略",
+          "pos": "Interjection",
+          "surface": "前略"
+        }
+      ],
+      "id": "unnamed_46",
+      "input": "前略"
     }
   ],
   "description": "Basic tokenization tests",
