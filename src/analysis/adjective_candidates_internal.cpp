@@ -23,9 +23,13 @@ namespace {
 // Productive second elements of compound adjectives: they attach to a nominal
 // or a verb continuative to derive a new adjective rather than predicating over
 // a separate preceding word.
-constexpr std::array<std::string_view, 16> kCompoundFormingAdjectives = {
-    "苦しい", "深い", "強い",   "臭い",   "くさい", "難い",   "にくい", "易い",
-    "やすい", "辛い", "づらい", "がたい", "ぽい",   "っぽい", "っこい", "らしい"};
+// Derivational suffixes: any host takes them (読みにくい, 子供っぽい).
+constexpr std::array<std::string_view, 12> kDerivationalSuffixAdjectives = {
+    "臭い", "くさい", "難い", "にくい", "易い", "やすい", "づらい", "がたい", "ぽい", "っぽい", "っこい", "らしい"};
+// Lexical heads: they also form compounds (用心深い, 我慢強い), but each compound
+// is its own word, so whether a host takes one is lexical (奥行き+深い stays a
+// noun plus a predicate).
+constexpr std::array<std::string_view, 4> kLexicalCompoundHeadAdjectives = {"苦しい", "深い", "強い", "辛い"};
 
 // A one-mora host is indistinguishable from an inflectional ending that the
 // analyzer folded into the reconstructed base, so a derivation needs two.
@@ -92,9 +96,15 @@ bool spansPastAdjectiveEnding(const std::string& surface, const std::string& bas
   return false;
 }
 
+bool isLexicalCompoundHeadAdjective(const std::string& base_form) {
+  return std::find(kLexicalCompoundHeadAdjectives.begin(), kLexicalCompoundHeadAdjectives.end(), base_form) !=
+         kLexicalCompoundHeadAdjectives.end();
+}
+
 bool isCompoundFormingAdjective(const std::string& base_form) {
-  return std::find(kCompoundFormingAdjectives.begin(), kCompoundFormingAdjectives.end(), base_form) !=
-         kCompoundFormingAdjectives.end();
+  return isLexicalCompoundHeadAdjective(base_form) ||
+         std::find(kDerivationalSuffixAdjectives.begin(), kDerivationalSuffixAdjectives.end(), base_form) !=
+             kDerivationalSuffixAdjectives.end();
 }
 
 bool predicateFollowsContinuative(const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos,
@@ -119,11 +129,15 @@ bool derivesFromCompoundFormingAdjective(const std::vector<char32_t>& codepoints
   // Longest match: ぽい and っぽい share a tail, and the shorter one would
   // leave the promoted っ at the end of the host.
   size_t suffix_length = 0;
-  for (const std::string_view suffix : kCompoundFormingAdjectives) {
-    if (utf8::endsWith(base_form, suffix)) {
-      suffix_length = std::max(suffix_length, normalize::utf8Length(suffix));
+  const auto measure = [&](const auto& suffixes) {
+    for (const std::string_view suffix : suffixes) {
+      if (utf8::endsWith(base_form, suffix)) {
+        suffix_length = std::max(suffix_length, normalize::utf8Length(suffix));
+      }
     }
-  }
+  };
+  measure(kDerivationalSuffixAdjectives);
+  measure(kLexicalCompoundHeadAdjectives);
   if (suffix_length == 0) {
     return false;
   }

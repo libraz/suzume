@@ -291,7 +291,8 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
       const bool has_productive_tail =
           std::any_of(tail_analyses.begin(), tail_analyses.end(), [](const grammar::InflectionCandidate& candidate) {
             return candidate.verb_type == grammar::VerbType::IAdjective &&
-                   adj_detail::isCompoundFormingAdjective(candidate.base_form);
+                   adj_detail::isCompoundFormingAdjective(candidate.base_form) &&
+                   !adj_detail::isLexicalCompoundHeadAdjective(candidate.base_form);
           });
       if (has_productive_tail) {
         kanji_end = extended_kanji_end;
@@ -647,7 +648,8 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
             for (const auto& tail_res : analysesInRange(inflection, codepoints, tail_start, end_pos)) {
               if (tail_res.verb_type == grammar::VerbType::IAdjective &&
                   isAdjectiveInDictionary(dict_manager, tail_res.base_form) &&
-                  !isCompoundFormingAdjective(tail_res.base_form)) {
+                  (!isCompoundFormingAdjective(tail_res.base_form) ||
+                   adj_detail::isLexicalCompoundHeadAdjective(tail_res.base_form))) {
                 prefixes_dictionary_adjective = true;
                 break;
               }

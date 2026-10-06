@@ -72,7 +72,9 @@ bool isIndependentPredicateTail(const std::string& tail_surface, const grammar::
 }
 
 void appendRenyokeiHostCompound(const std::vector<char32_t>& codepoints, size_t start_pos, size_t hiragana_end,
-                                const grammar::Inflection& inflection, std::vector<UnknownCandidate>& candidates) {
+                                const grammar::Inflection& inflection,
+                                const dictionary::DictionaryManager* dict_manager,
+                                std::vector<UnknownCandidate>& candidates) {
   const bool has_renyokei_host =
       std::any_of(candidates.begin(), candidates.end(), [&](const UnknownCandidate& candidate) {
         return candidate.start == start_pos && candidate.end == hiragana_end &&
@@ -107,6 +109,10 @@ void appendRenyokeiHostCompound(const std::vector<char32_t>& codepoints, size_t 
         continue;
       }
       const std::string lemma = extractSubstring(codepoints, start_pos, hiragana_end) + analysis.base_form;
+      if (adj_detail::isLexicalCompoundHeadAdjective(analysis.base_form) &&
+          !verb_helpers::isAdjectiveInDictionary(dict_manager, lemma)) {
+        continue;
+      }
       const float cost = candidate::confidenceScaledCost(candidate::kCompoundAdjBaseCost, analysis.confidence,
                                                          candidate::kKanjiAdjConfScale) +
                          candidate::kCompoundIAdjectiveLexicalBonus;
@@ -308,7 +314,7 @@ void adj_detail::appendKanjiCompoundIAdjCandidates(const std::vector<char32_t>& 
   // second element (粘り+強い). The ordinary kanji-adjective scan stops at that
   // intervening kanji, so bridge it only when another generator has already
   // established the entire host as a 連用形.
-  appendRenyokeiHostCompound(codepoints, start_pos, hiragana_end, inflection, candidates);
+  appendRenyokeiHostCompound(codepoints, start_pos, hiragana_end, inflection, dict_manager, candidates);
 }
 
 }  // namespace suzume::analysis

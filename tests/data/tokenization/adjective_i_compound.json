@@ -1141,6 +1141,99 @@
       ],
       "id": "atsukurushii",
       "input": "あつくるしい"
+    },
+    {
+      "description": "この本は奥行き深い。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "この",
+          "pos": "Determiner",
+          "surface": "この"
+        },
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "奥行き",
+          "pos": "Noun",
+          "surface": "奥行き"
+        },
+        {
+          "lemma": "深い",
+          "pos": "Adjective",
+          "surface": "深い"
+        }
+      ],
+      "id": "kono_ha_ki_i",
+      "input": "この本は奥行き深い。"
+    },
+    {
+      "description": "意味深い話 - auto-generated",
+      "expected": [
+        {
+          "lemma": "意味",
+          "pos": "Noun",
+          "surface": "意味"
+        },
+        {
+          "lemma": "深い",
+          "pos": "Adjective",
+          "surface": "深い"
+        },
+        {
+          "lemma": "話",
+          "pos": "Noun",
+          "surface": "話"
+        }
+      ],
+      "id": "i_8",
+      "input": "意味深い話"
+    },
+    {
+      "description": "意味深かった - auto-generated",
+      "expected": [
+        {
+          "lemma": "意味",
+          "pos": "Noun",
+          "surface": "意味"
+        },
+        {
+          "lemma": "深い",
+          "pos": "Adjective",
+          "surface": "深かっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "kattta_4",
+      "input": "意味深かった"
+    },
+    {
+      "description": "関心深い - auto-generated",
+      "expected": [
+        {
+          "lemma": "関心",
+          "pos": "Noun",
+          "surface": "関心"
+        },
+        {
+          "lemma": "深い",
+          "pos": "Adjective",
+          "surface": "深い"
+        }
+      ],
+      "id": "i_9",
+      "input": "関心深い"
     }
   ],
   "description": "I-adjectives compound/derived forms (複合・派生) - sou patterns, nominalization, contracted forms",

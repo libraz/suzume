@@ -183,6 +183,15 @@ bool opensAdjectivePastConnective(const std::vector<char32_t>& codepoints, size_
 bool isCompoundFormingAdjective(const std::string& base_form);
 
 /**
+ * @brief Whether a compound-forming adjective is a lexical head (深い, 強い)
+ *
+ * Its compounds are words in their own right (用心深い), so a host fuses with it
+ * only when the dictionary lists the compound; the derivational suffixes
+ * (にくい, っぽい) attach to any host.
+ */
+bool isLexicalCompoundHeadAdjective(const std::string& base_form);
+
+/**
  * @brief Check whether a base form is a nominal host plus a productive second element.
  *
  * A derivation is its own evidence: the second element cannot take a host and
