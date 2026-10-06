@@ -473,6 +473,19 @@ def correct_mecab_pos(tokens: list[dict]) -> None:
                     following["lemma"] = "ある"
             continue
 
+        # The honorific なさる directly behind a noun is the honorific of the
+        # light verb する (勉強なさい), a full verb like する itself; the
+        # reference lexicon tags it subsidiary in every slot.
+        if (
+            pos == "動詞"
+            and t.get("pos_sub1") == "非自立"
+            and t.get("lemma") == "なさる"
+            and idx > 0
+            and tokens[idx - 1].get("pos") == "名詞"
+        ):
+            t["pos_sub1"] = "自立"
+            continue
+
         # Fix adjective 連用形 (〜く): always 形容詞, not 副詞
         # Excludes pure hiragana adverbs: わくわく, せっかく, とにかく, etc.
         if surface.endswith("く") and pos == "副詞" and surface not in ADVERB_OVERRIDES:

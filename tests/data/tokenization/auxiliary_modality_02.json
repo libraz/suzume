@@ -823,6 +823,23 @@
       ],
       "id": "rashikatttadesu",
       "input": "春らしかったです"
+    },
+    {
+      "description": "御免なさい - auto-generated",
+      "expected": [
+        {
+          "lemma": "御免",
+          "pos": "Noun",
+          "surface": "御免"
+        },
+        {
+          "lemma": "なさる",
+          "pos": "Verb",
+          "surface": "なさい"
+        }
+      ],
+      "id": "nasai_2",
+      "input": "御免なさい"
     }
   ],
   "description": "Modality auxiliaries (たい、そう、らしい) (part 2/2)",

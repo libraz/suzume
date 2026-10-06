@@ -1593,6 +1593,28 @@
       ],
       "id": "ku_berotttena",
       "input": "早く食べろってな。"
+    },
+    {
+      "description": "早く寝なさい - auto-generated",
+      "expected": [
+        {
+          "lemma": "早い",
+          "pos": "Adjective",
+          "surface": "早く"
+        },
+        {
+          "lemma": "寝る",
+          "pos": "Verb",
+          "surface": "寝"
+        },
+        {
+          "lemma": "なさる",
+          "pos": "Auxiliary",
+          "surface": "なさい"
+        }
+      ],
+      "id": "ku_nasai_2",
+      "input": "早く寝なさい"
     }
   ],
   "description": "I-adjectives ku-forms (連用形) - adverbial, negative, te-form, ku-naru patterns",
