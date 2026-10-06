@@ -1035,6 +1035,43 @@
       ],
       "id": "no_eteroyo",
       "input": "奴の名覚えてろよ。"
+    },
+    {
+      "description": "どうん、と地面が揺れた。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "どうん",
+          "pos": "Noun",
+          "surface": "どうん"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "地面",
+          "pos": "Noun",
+          "surface": "地面"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "揺れる",
+          "pos": "Verb",
+          "surface": "揺れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "doun_to_ga_reta",
+      "input": "どうん、と地面が揺れた。"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",

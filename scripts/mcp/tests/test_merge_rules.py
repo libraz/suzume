@@ -1718,6 +1718,22 @@ class TestPlaceNameKanjiMerge:
 
 
 class TestGuessedMimeticSpan:
+    def test_rebuilds_an_impact_mimetic_cut_into_an_adverb_and_a_nasal(self):
+        tokens = [
+            _tok("どう", pos="副詞", pos_sub1="助詞類接続", lemma="どう"),
+            _tok("ん", pos="助詞", pos_sub1="連語", lemma="ん"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "どうん")
+        assert [token["surface"] for token in result] == ["どうん"]
+        assert result[0]["pos"] == "名詞"
+        assert rule == "productive-mimetic"
+
+    def test_leaves_the_interjection_fuun_alone(self):
+        tokens = [_tok("ふうん", pos="感動詞", lemma="ふうん")]
+        result, _ = apply_suzume_merge(tokens, "ふうん")
+        assert [token["surface"] for token in result] == ["ふうん"]
+        assert result[0]["pos"] == "感動詞"
+
     def test_rebuilds_a_mimetic_guessed_as_a_verb_plus_a_noun(self):
         tokens = [
             _tok("ばっ", pos="動詞", pos_sub1="自立", conj_form="連用タ接続", lemma="ばる"),

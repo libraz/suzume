@@ -481,8 +481,16 @@ def _is_laughter(surface: str) -> bool:
     return set(surface[1:]) == {_LAUGHTER_HA_ROW[surface[0]]}
 
 
+# A heavy impact or hum: a voiced obstruent, a long vowel and a closing nasal
+# (どうん, ぐうん, ごうん). The reference lists some of these as one noun and cuts
+# the rest into an adverb and a nasal, so the shape decides.
+_IMPACT_MIMETIC = regex.compile(r"[がぎぐげござじずぜぞだぢづでどばびぶべぼ][うー]ん")
+
+
 def _mimetic_pos(surface: str) -> str:
     """A laugh is an interjection like the listed うふふ; other mimetics are adverbs."""
+    if _IMPACT_MIMETIC.fullmatch(surface):
+        return "名詞"
     return "感動詞" if _is_laughter(surface) else "副詞"
 
 
@@ -498,6 +506,8 @@ def _is_productive_mimetic_stem(surface: str) -> bool:
     if regex.fullmatch(r".{2,4}ん.{2,4}ん", surface):
         return True
     if regex.fullmatch(r".っ.[らり]", surface):
+        return True
+    if _IMPACT_MIMETIC.fullmatch(surface):
         return True
     # One mora held for three or more beats is emphasis, and the whole run is
     # the word.  The dictionary segments it by whatever entries its length
@@ -751,6 +761,7 @@ def _postprocess_productive_mimetics(result: list[dict], applied_rule: str | Non
                     # needs no attachment test.
                     and (
                         _is_laughter(combined)
+                        or _IMPACT_MIMETIC.fullmatch(combined)
                         or _spans_one_mimetic(result[idx:end], result[end] if end < len(result) else None)
                     )
                 )

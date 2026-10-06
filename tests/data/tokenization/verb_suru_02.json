@@ -831,6 +831,48 @@
       ],
       "id": "wo_ranisuru",
       "input": "表面を平らにする"
+    },
+    {
+      "description": "どうん、と大きな音がした。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "どうん",
+          "pos": "Noun",
+          "surface": "どうん"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "大きな",
+          "pos": "Determiner",
+          "surface": "大きな"
+        },
+        {
+          "lemma": "音",
+          "pos": "Noun",
+          "surface": "音"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "doun_to_kina_gashita",
+      "input": "どうん、と大きな音がした。"
     }
   ],
   "description": "Suru-verb patterns with subsidiary verbs - MeCab互換分割 (part 2/2)",
