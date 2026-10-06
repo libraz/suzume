@@ -867,6 +867,33 @@
       ],
       "id": "rinanoda",
       "input": "見張りなのだ"
+    },
+    {
+      "description": "空は朝焼けだ。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "空",
+          "pos": "Noun",
+          "surface": "空"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "朝焼け",
+          "pos": "Noun",
+          "surface": "朝焼け"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "ha_keda",
+      "input": "空は朝焼けだ。"
     }
   ],
   "description": "Modality auxiliaries (たい、そう、らしい) (part 2/2)",

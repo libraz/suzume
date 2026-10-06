@@ -2582,6 +2582,18 @@
       ],
       "id": "ka_2",
       "input": "雨か雪"
+    },
+    {
+      "description": "朝焼け - auto-generated",
+      "expected": [
+        {
+          "lemma": "朝焼け",
+          "pos": "Noun",
+          "surface": "朝焼け"
+        }
+      ],
+      "id": "ke_6",
+      "input": "朝焼け"
     }
   ],
   "description": "General nouns (part 4/4)",
