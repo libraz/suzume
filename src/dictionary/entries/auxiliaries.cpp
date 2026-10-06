@@ -85,12 +85,21 @@ EntrySpecRange getAuxiliaryEntries() {
       // 連体形 なる (壮大なる, 静かなる): kept distinct from the verb なる (成る) by the higher
       // AuxClassicalNari category cost, winning only via the AdjNaAdj/Noun→なる→Noun bigram bonus.
       aux("なる", "なり", EPOS::AuxClassicalNari),
-      aux("なれ", "なり", EPOS::AuxClassicalNari),                // 已然形 (重要なれば)
-      aux("けり", "けり", EPOS::AuxClassicalKeri),                // 過去・詠嘆 (なりけり)
-      aux("ける", "けり", EPOS::AuxClassicalKeri),                // Adnominal form (なりける)
-      aux("けれ", "けり", EPOS::AuxClassicalKeri),                // 已然形 (見ければ)
-      aux("けむ", "けむ", EPOS::AuxVolitional),                   // 過去推量 (行きけむ)
+      aux("なれ", "なり", EPOS::AuxClassicalNari),  // 已然形 (重要なれば)
+      aux("けり", "けり", EPOS::AuxClassicalKeri),  // 過去・詠嘆 (なりけり)
+      aux("ける", "けり", EPOS::AuxClassicalKeri),  // Adnominal form (なりける)
+      aux("けれ", "けり", EPOS::AuxClassicalKeri),  // 已然形 (見ければ)
+      aux("けむ", "けむ", EPOS::AuxVolitional),     // 過去推量 (行きけむ)
+      // 反実仮想 まし shares the conjecture of む and selects an irrealis (思はまし,
+      // 見ましかば). The 已然 ましか takes ば. The modern ますの連用 まし above is
+      // a separate entry of the same spelling.
+      aux("まし", "まし", EPOS::AuxVolitional),
+      aux("ましか", "まし", EPOS::AuxVolitional),
       aux("らむ", "らむ", EPOS::AuxClassicalConjectureTerminal),  // 現在推量 (行くらむ)
+      // 推定 めり selects a terminal like らむ (漕ぐめり, 聞くめり). Its 連体 める
+      // and 已然 めれ are not registered: they spell the ending of every ichidan
+      // verb in め and would split すすめる.
+      aux("めり", "めり", EPOS::AuxClassicalConjectureTerminal),
       // Classical タリ活用 連体形 たる (堂々たる, 確固たる). Only 連体形 is registered:
       // 終止 たり and 未然 たら collide with the parallel particle たり and the
       // conditional たら, and neither collision has a follower that separates it.

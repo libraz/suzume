@@ -1305,6 +1305,77 @@
       ],
       "id": "kashi",
       "input": "夜更かし案件確定"
+    },
+    {
+      "description": "見えたるや - auto-generated",
+      "expected": [
+        {
+          "lemma": "見える",
+          "pos": "Verb",
+          "surface": "見え"
+        },
+        {
+          "lemma": "たり",
+          "pos": "Auxiliary",
+          "surface": "たる"
+        },
+        {
+          "lemma": "や",
+          "pos": "Particle",
+          "surface": "や"
+        }
+      ],
+      "id": "etaruya",
+      "input": "見えたるや"
+    },
+    {
+      "description": "消えたるや - auto-generated",
+      "expected": [
+        {
+          "lemma": "消える",
+          "pos": "Verb",
+          "surface": "消え"
+        },
+        {
+          "lemma": "たり",
+          "pos": "Auxiliary",
+          "surface": "たる"
+        },
+        {
+          "lemma": "や",
+          "pos": "Particle",
+          "surface": "や"
+        }
+      ],
+      "id": "etaruya_2",
+      "input": "消えたるや"
+    },
+    {
+      "description": "晴れたるかな - auto-generated",
+      "expected": [
+        {
+          "lemma": "晴れる",
+          "pos": "Verb",
+          "surface": "晴れ"
+        },
+        {
+          "lemma": "たり",
+          "pos": "Auxiliary",
+          "surface": "たる"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        }
+      ],
+      "id": "retarukana",
+      "input": "晴れたるかな"
     }
   ],
   "description": "literary_classic tests (part 2/2)",

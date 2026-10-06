@@ -1305,6 +1305,23 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
             if applied_rule is None:
                 applied_rule = "classical-meri"
 
+        # The counterfactual まし has the 已然/未然 ましか before ば (見ましかば);
+        # the reference reads the か as a particle after the terminal まし.
+        if (
+            not merged
+            and t.get("surface") == "まし"
+            and t.get("pos") == "助動詞"
+            and i + 2 < len(tokens)
+            and tokens[i + 1].get("surface") == "か"
+            and tokens[i + 2].get("surface") == "ば"
+            and tokens[i + 2].get("pos") == "助詞"
+        ):
+            result.append({"surface": "ましか", "pos": "助動詞", "lemma": "まし"})
+            i += 2
+            merged = True
+            if applied_rule is None:
+                applied_rule = "classical-mashika"
+
         # A noun-derived Godan-る verb is one lexical predicate.  Rejoin a
         # malformed reference tail (事故+る, 事故+っ+た, ミ+スっ+た) by its
         # inflectional evidence; the rule also covers productive hosts that

@@ -192,6 +192,79 @@
       ],
       "id": "kuramu_4",
       "input": "行くらむ"
+    },
+    {
+      "description": "漕ぐめり - auto-generated",
+      "expected": [
+        {
+          "lemma": "漕ぐ",
+          "pos": "Verb",
+          "surface": "漕ぐ"
+        },
+        {
+          "lemma": "めり",
+          "pos": "Auxiliary",
+          "surface": "めり"
+        }
+      ],
+      "id": "gumeri",
+      "input": "漕ぐめり"
+    },
+    {
+      "description": "思はまし - auto-generated",
+      "expected": [
+        {
+          "lemma": "思ふ",
+          "pos": "Verb",
+          "surface": "思は"
+        },
+        {
+          "lemma": "まし",
+          "pos": "Auxiliary",
+          "surface": "まし"
+        }
+      ],
+      "id": "hamashi",
+      "input": "思はまし"
+    },
+    {
+      "description": "言はまし - auto-generated",
+      "expected": [
+        {
+          "lemma": "言ふ",
+          "pos": "Verb",
+          "surface": "言は"
+        },
+        {
+          "lemma": "まし",
+          "pos": "Auxiliary",
+          "surface": "まし"
+        }
+      ],
+      "id": "hamashi_2",
+      "input": "言はまし"
+    },
+    {
+      "description": "見ましかば - auto-generated",
+      "expected": [
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "まし",
+          "pos": "Auxiliary",
+          "surface": "ましか"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "mashikaba",
+      "input": "見ましかば"
     }
   ],
   "description": "auxiliary_classical tests (part 2/2)",
