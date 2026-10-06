@@ -303,7 +303,8 @@ TEST(SuzumeCApiTest, CanonicalLabelFunctionsCoverSerializedBoundaries) {
   EXPECT_STREQ(suzume_extended_pos_label(89), "ADV_疑問");
   EXPECT_STREQ(suzume_extended_pos_label(90), "AUX_卑罵");
   EXPECT_STREQ(suzume_extended_pos_label(91), "SUFFIX_気配");
-  EXPECT_EQ(suzume_extended_pos_label(92), nullptr);
+  EXPECT_STREQ(suzume_extended_pos_label(92), "PART_選択");
+  EXPECT_EQ(suzume_extended_pos_label(93), nullptr);
 
   EXPECT_STREQ(suzume_conjugation_form_label(6), "意志形");
   EXPECT_EQ(suzume_conjugation_form_label(7), nullptr);
