@@ -429,6 +429,15 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
       // already closed the clause, so a following む belongs to a predicate that
       // starts inside the run in front of it (花咲か+む, not 花咲+か+む).
       {EPOS::ParticleFinal, EPOS::AuxVolitional, cost::kAlmostNever},
+      // The same holds for every classical auxiliary: each selects a predicate
+      // cell, and a final particle has already closed the clause (散らかし is
+      // no 散ら+か+し).
+      {EPOS::ParticleFinal, EPOS::AuxClassicalKi, cost::kAlmostNever},
+      {EPOS::ParticleFinal, EPOS::AuxClassicalKeri, cost::kAlmostNever},
+      {EPOS::ParticleFinal, EPOS::AuxClassicalTari, cost::kAlmostNever},
+      {EPOS::ParticleFinal, EPOS::AuxClassicalPerfect, cost::kAlmostNever},
+      {EPOS::ParticleFinal, EPOS::AuxClassicalBeshi, cost::kAlmostNever},
+      {EPOS::ParticleFinal, EPOS::AuxClassicalConjectureTerminal, cost::kAlmostNever},
 
       // ParticleFinal → VerbOnbinkei (な+いん) - prohibit
       // (prevents ないんだ → な+いん+だ over ない+ん+だ)
@@ -866,6 +875,11 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
       // itself still has to follow it. The perfect's adnominal ぬる spells the
       // hiragana verb 塗る, which does take that position (ペンキを+ぬる).
       {EPOS::ParticleCase, EPOS::AuxClassicalPerfect, cost::kNever},
+      // The past and completion auxiliaries select a verb cell in the same way
+      // (風+吹き+に+けり, where に is the perfect ぬ, not a case particle).
+      {EPOS::ParticleCase, EPOS::AuxClassicalKi, cost::kAlmostNever},
+      {EPOS::ParticleCase, EPOS::AuxClassicalKeri, cost::kAlmostNever},
+      {EPOS::ParticleCase, EPOS::AuxClassicalTari, cost::kAlmostNever},
       // A conjunctive particle closes the clause it joins, so no predicate cell
       // may hang off it either. Without the row the one-mora continuative
       // rescues a mis-analyzed nominal by taking that particle as its host

@@ -1229,6 +1229,82 @@
       ],
       "id": "hikoso_kere",
       "input": "思ひこそ深けれ"
+    },
+    {
+      "description": "perfect nu plus keri after a verb continuative, not a case particle",
+      "expected": [
+        {
+          "lemma": "風",
+          "pos": "Noun",
+          "surface": "風"
+        },
+        {
+          "lemma": "吹く",
+          "pos": "Verb",
+          "surface": "吹き"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "に"
+        },
+        {
+          "lemma": "けり",
+          "pos": "Auxiliary",
+          "surface": "けり"
+        }
+      ],
+      "id": "kinikeri",
+      "input": "風吹きにけり"
+    },
+    {
+      "description": "perfect nu plus keri after a verb continuative, not a case particle",
+      "expected": [
+        {
+          "lemma": "水",
+          "pos": "Noun",
+          "surface": "水"
+        },
+        {
+          "lemma": "落ちる",
+          "pos": "Verb",
+          "surface": "落ち"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "に"
+        },
+        {
+          "lemma": "けり",
+          "pos": "Auxiliary",
+          "surface": "けり"
+        }
+      ],
+      "id": "chinikeri",
+      "input": "水落ちにけり"
+    },
+    {
+      "description": "godan-sa continuative, not a final particle plus classical past",
+      "expected": [
+        {
+          "lemma": "夜",
+          "pos": "Noun",
+          "surface": "夜"
+        },
+        {
+          "lemma": "更かす",
+          "pos": "Verb",
+          "surface": "更かし"
+        },
+        {
+          "lemma": "案件確定",
+          "pos": "Noun",
+          "surface": "案件確定"
+        }
+      ],
+      "id": "kashi",
+      "input": "夜更かし案件確定"
     }
   ],
   "description": "literary_classic tests (part 2/2)",
