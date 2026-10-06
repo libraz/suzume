@@ -3,6 +3,7 @@
 import regex
 
 from .constants import (
+    ADDRESS_CLOSING_NOUNS,
     KANJI_PREFIX_COMPOUNDS,
     KANJI_SUFFIXES_KEPT_SEPARATE,
     LETTER_FORMULAS,
@@ -230,6 +231,7 @@ def _postprocess_kanji_merge(result: list[dict], applied_rule: str | None) -> tu
                 and curr.get("pos_sub1", "") != "代名詞"
                 and (merged[-1].get("pos_sub1", "") != "代名詞" or len(surface) == 1)
                 and surface not in LETTER_FORMULAS
+                and surface not in ADDRESS_CLOSING_NOUNS
                 and merged[-1].get("surface", "") not in LETTER_FORMULAS
                 # A na-adjective stem directly before an independent predicate
                 # is used adverbially (大変|恐れ入る) and heads no compound.

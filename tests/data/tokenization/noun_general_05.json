@@ -175,6 +175,23 @@
       ],
       "id": "ringokamikanka",
       "input": "りんごかみかんか"
+    },
+    {
+      "description": "営業部御中 - auto-generated",
+      "expected": [
+        {
+          "lemma": "営業部",
+          "pos": "Noun",
+          "surface": "営業部"
+        },
+        {
+          "lemma": "御中",
+          "pos": "Noun",
+          "surface": "御中"
+        }
+      ],
+      "id": "unnamed_51",
+      "input": "営業部御中"
     }
   ],
   "description": "General nouns (part 5/5)",

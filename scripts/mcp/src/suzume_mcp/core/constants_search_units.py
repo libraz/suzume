@@ -63,6 +63,11 @@ KANJI_SUFFIXES_KEPT_SEPARATE: frozenset[str] = frozenset("用内中後間視名�
 LETTER_FORMULAS: frozenset[str] = frozenset(("拝啓", "謹啓", "前略", "草々", "敬具", "追伸"))
 
 
+# The address closing 御中 stands after the addressee like 様, so it never joins the
+# name before it (営業部|御中); unlike the formulas above it is a noun.
+ADDRESS_CLOSING_NOUNS: frozenset[str] = frozenset(("御中",))
+
+
 # The regional causal conjunctive particle き is homographic with the classical
 # past auxiliary, and the reference dictionary only knows the latter. The two
 # are told apart by what they attach to: the classical auxiliary takes a

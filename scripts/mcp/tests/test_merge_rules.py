@@ -1738,6 +1738,18 @@ class TestPejorativeYagaru:
         assert [token["surface"] for token in result] == ["見や", "っ"]
 
 
+class TestAddressClosingNoun:
+    def test_ontyu_stays_apart_from_the_addressee(self):
+        tokens = [
+            _tok("営業", pos="名詞", pos_sub1="一般", lemma="営業"),
+            _tok("部", pos="名詞", pos_sub1="接尾", pos_sub2="一般", lemma="部"),
+            _tok("御中", pos="名詞", pos_sub1="一般", lemma="御中"),
+        ]
+        result, _ = apply_suzume_merge(tokens, "営業部御中")
+        assert [token["surface"] for token in result][-1] == "御中"
+        assert "営業部御中" not in [token["surface"] for token in result]
+
+
 class TestKanaSayouStem:
     def test_rejoins_sa_and_you_before_the_attributive_copula(self):
         tokens = [
