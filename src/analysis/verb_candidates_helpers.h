@@ -1288,6 +1288,15 @@ bool shuushikeiEndsAt(const std::vector<char32_t>& codepoints, size_t pos,
                       const dictionary::DictionaryManager* dict_manager);
 
 /**
+ * @brief Whether the run [start, end) plus a following し is the continuative of a listed Godan-sa verb.
+ *
+ * 見逃し is the stem of the registered 見逃す, so the run 見逃 is no verbal
+ * noun for する to follow. A run that is itself a listed noun is excluded.
+ */
+bool isListedGodanSaContinuativeRun(const dictionary::DictionaryManager* dict_manager,
+                                    const std::vector<char32_t>& codepoints, size_t start, size_t end);
+
+/**
  * @brief Whether a case particle begins at @p pos.
  *
  * A 連体形 nominalizes as well as modifies, and the nominal it forms fills an

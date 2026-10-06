@@ -694,6 +694,12 @@ void Tokenizer::addUnknownCandidates(core::Lattice& lattice, std::string_view te
         })) {
       continue;
     }
+    // A run whose continuative し is a listed Godan-sa verb (見逃し of 見逃す) is
+    // that verb's stem; read as a noun it would take する, which the verb forecloses.
+    if (candidate.pos == core::PartOfSpeech::Noun && candidate.end < codepoints.size() &&
+        verb_helpers::isListedGodanSaContinuativeRun(&dict_manager_, codepoints, candidate.start, candidate.end)) {
+      continue;
+    }
     if (candidate.pos != core::PartOfSpeech::Particle &&
         startsAtBindingParticleAfterTerminalVerb(lattice, dict_manager_, text, byte_offsets, candidate)) {
       continue;

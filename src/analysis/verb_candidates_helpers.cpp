@@ -286,6 +286,16 @@ bool shuushikeiEndsAt(const std::vector<char32_t>& codepoints, size_t pos,
               core::ExtendedPOS::AuxClassicalNari, core::ExtendedPOS::AuxClassicalConjectureTerminal});
 }
 
+bool isListedGodanSaContinuativeRun(const dictionary::DictionaryManager* dict_manager,
+                                    const std::vector<char32_t>& codepoints, size_t start, size_t end) {
+  if (dict_manager == nullptr || end >= codepoints.size() || codepoints[end] != U'し' || end <= start) {
+    return false;
+  }
+  return lookupEntryInRange(*dict_manager, codepoints, start, end, core::PartOfSpeech::Noun) == nullptr &&
+         dict_manager->lookupExact(normalize::concat(extractSubstring(codepoints, start, end), "す"),
+                                   core::PartOfSpeech::Verb) != nullptr;
+}
+
 bool caseParticleFollowsAt(const dictionary::DictionaryManager& dict_manager, const std::vector<char32_t>& codepoints,
                            size_t pos) {
   return hasDictionaryEntryFrom(

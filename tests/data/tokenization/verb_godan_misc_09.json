@@ -2167,6 +2167,114 @@
       ],
       "id": "wo_gashita",
       "input": "鳥を逃がした"
+    },
+    {
+      "description": "見逃した - auto-generated",
+      "expected": [
+        {
+          "lemma": "見逃す",
+          "pos": "Verb",
+          "surface": "見逃し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "shita_10",
+      "input": "見逃した"
+    },
+    {
+      "description": "ミスを見逃した - auto-generated",
+      "expected": [
+        {
+          "lemma": "ミス",
+          "pos": "Noun",
+          "surface": "ミス"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "見逃す",
+          "pos": "Verb",
+          "surface": "見逃し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wo_shita_4",
+      "input": "ミスを見逃した"
+    },
+    {
+      "description": "部屋が散らかった - auto-generated",
+      "expected": [
+        {
+          "lemma": "部屋",
+          "pos": "Noun",
+          "surface": "部屋"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "散らかる",
+          "pos": "Verb",
+          "surface": "散らかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ga_rakattta",
+      "input": "部屋が散らかった"
+    },
+    {
+      "description": "部屋を散らかして出かけた - auto-generated",
+      "expected": [
+        {
+          "lemma": "部屋",
+          "pos": "Noun",
+          "surface": "部屋"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "散らかす",
+          "pos": "Verb",
+          "surface": "散らかし"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "出かける",
+          "pos": "Verb",
+          "surface": "出かけ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wo_rakashite_kaketa",
+      "input": "部屋を散らかして出かけた"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",

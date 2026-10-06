@@ -450,8 +450,9 @@ void addNounVerbSplitCandidates(core::Lattice& lattice, std::string_view text, c
           ? lookupEntryInRange(dict_manager, codepoints, start_pos, kanji_end + 1, core::PartOfSpeech::Verb)
           : nullptr;
   const bool spells_listed_godan_sa_continuative =
-      run_continuative != nullptr && run_continuative->extended_pos == core::ExtendedPOS::VerbRenyokei &&
-      lookupEntryInRange(dict_manager, codepoints, start_pos, kanji_end, core::PartOfSpeech::Noun) == nullptr;
+      (run_continuative != nullptr && run_continuative->extended_pos == core::ExtendedPOS::VerbRenyokei &&
+       lookupEntryInRange(dict_manager, codepoints, start_pos, kanji_end, core::PartOfSpeech::Noun) == nullptr) ||
+      verb_helpers::isListedGodanSaContinuativeRun(&dict_manager, codepoints, start_pos, kanji_end);
   if (hasSuruContinuation(codepoints, kanji_end) && following_verb_start == kanji_end && !ends_at_humble_subsidiary &&
       !spells_listed_godan_sa_continuative && !hasDictionaryLexicalPrefix(noun_results, kanji_length) &&
       !crossesModifierBoundaryForSuruNoun(text, byte_offsets, start_pos, kanji_end, dict_manager) &&
