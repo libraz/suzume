@@ -538,6 +538,114 @@
       ],
       "id": "tekureyo",
       "input": "見てくれよ"
+    },
+    {
+      "description": "忘れてろよ - auto-generated",
+      "expected": [
+        {
+          "lemma": "忘れる",
+          "pos": "Verb",
+          "surface": "忘れ"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てろ"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "reteroyo",
+      "input": "忘れてろよ"
+    },
+    {
+      "description": "待ってろよ - auto-generated",
+      "expected": [
+        {
+          "lemma": "待つ",
+          "pos": "Verb",
+          "surface": "待っ"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てろ"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "ttteroyo",
+      "input": "待ってろよ"
+    },
+    {
+      "description": "見てろよ - auto-generated",
+      "expected": [
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てろ"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "teroyo",
+      "input": "見てろよ"
+    },
+    {
+      "description": "奴の名前を覚えてろよ。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "奴",
+          "pos": "Pronoun",
+          "surface": "奴"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "名前",
+          "pos": "Noun",
+          "surface": "名前"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "覚える",
+          "pos": "Verb",
+          "surface": "覚え"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てろ"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "no_wo_eteroyo",
+      "input": "奴の名前を覚えてろよ。"
     }
   ],
   "description": "auxiliary_aspect tests",
