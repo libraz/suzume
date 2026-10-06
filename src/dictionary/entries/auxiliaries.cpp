@@ -85,12 +85,12 @@ EntrySpecRange getAuxiliaryEntries() {
       // 連体形 なる (壮大なる, 静かなる): kept distinct from the verb なる (成る) by the higher
       // AuxClassicalNari category cost, winning only via the AdjNaAdj/Noun→なる→Noun bigram bonus.
       aux("なる", "なり", EPOS::AuxClassicalNari),
-      aux("なれ", "なり", EPOS::AuxClassicalNari),  // 已然形 (重要なれば)
-      aux("けり", "けり", EPOS::AuxClassicalKeri),  // 過去・詠嘆 (なりけり)
-      aux("ける", "けり", EPOS::AuxClassicalKeri),  // Adnominal form (なりける)
-      aux("けれ", "けり", EPOS::AuxClassicalKeri),  // 已然形 (見ければ)
-      aux("けむ", "けむ", EPOS::AuxVolitional),     // 過去推量 (行きけむ)
-      aux("らむ", "らむ", EPOS::AuxVolitional),     // 現在推量 (行くらむ)
+      aux("なれ", "なり", EPOS::AuxClassicalNari),                // 已然形 (重要なれば)
+      aux("けり", "けり", EPOS::AuxClassicalKeri),                // 過去・詠嘆 (なりけり)
+      aux("ける", "けり", EPOS::AuxClassicalKeri),                // Adnominal form (なりける)
+      aux("けれ", "けり", EPOS::AuxClassicalKeri),                // 已然形 (見ければ)
+      aux("けむ", "けむ", EPOS::AuxVolitional),                   // 過去推量 (行きけむ)
+      aux("らむ", "らむ", EPOS::AuxClassicalConjectureTerminal),  // 現在推量 (行くらむ)
       // Classical タリ活用 連体形 たる (堂々たる, 確固たる). Only 連体形 is registered:
       // 終止 たり and 未然 たら collide with the parallel particle たり and the
       // conditional たら, and neither collision has a follower that separates it.

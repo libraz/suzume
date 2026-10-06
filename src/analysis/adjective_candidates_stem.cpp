@@ -1068,21 +1068,11 @@ bool classicalAuxiliaryFollowsAt(const std::vector<char32_t>& codepoints, size_t
     if (entry == nullptr || entry->pos != core::PartOfSpeech::Auxiliary) {
       continue;
     }
-    switch (entry->extended_pos) {
-      case core::ExtendedPOS::AuxNegativeNu:
-      case core::ExtendedPOS::AuxClassicalNari:
-      case core::ExtendedPOS::AuxClassicalKeri:
-      case core::ExtendedPOS::AuxClassicalTari:
-      case core::ExtendedPOS::AuxClassicalPerfect:
-      case core::ExtendedPOS::AuxClassicalKi:
-      case core::ExtendedPOS::AuxClassicalBeshi:
-      case core::ExtendedPOS::AuxVolitional:
-      // The negative conjecture takes a terminal exactly as the affirmative one
-      // does, so the cell it selects is the same (高かる+まじ next to 高かる+らむ).
-      case core::ExtendedPOS::AuxNegativeMai:
-        return true;
-      default:
-        break;
+    // The negative conjecture takes a terminal exactly as the affirmative one
+    // does, so the cell it selects is the same (高かる+まじ next to 高かる+らむ).
+    if (core::isClassicalAuxiliaryType(entry->extended_pos) ||
+        entry->extended_pos == core::ExtendedPOS::AuxNegativeMai) {
+      return true;
     }
   }
   return false;

@@ -288,6 +288,8 @@ std::string_view extendedPosToString(ExtendedPOS epos) {
       return "AUX_願望";
     case ExtendedPOS::AuxVolitional:
       return "AUX_意志";
+    case ExtendedPOS::AuxClassicalConjectureTerminal:
+      return "AUX_現在推量";
 
     // Auxiliaries - Voice
     case ExtendedPOS::AuxPassive:

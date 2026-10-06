@@ -334,6 +334,7 @@ TEST(TypesExtendedTest, ExtendedPosToPosOthers) {
   EXPECT_EQ(extendedPosToPos(ExtendedPOS::Interjection), PartOfSpeech::Interjection);
   EXPECT_EQ(extendedPosToPos(ExtendedPOS::InterjectionGreeting), PartOfSpeech::Interjection);
   EXPECT_EQ(extendedPosToPos(ExtendedPOS::AuxConjectureRashiiStem), PartOfSpeech::Auxiliary);
+  EXPECT_EQ(extendedPosToPos(ExtendedPOS::AuxClassicalConjectureTerminal), PartOfSpeech::Auxiliary);
   EXPECT_EQ(extendedPosToPos(ExtendedPOS::Other), PartOfSpeech::Other);
   EXPECT_EQ(extendedPosToPos(ExtendedPOS::Unknown), PartOfSpeech::Other);
   EXPECT_EQ(extendedPosToPos(ExtendedPOS::Count_), PartOfSpeech::Other);

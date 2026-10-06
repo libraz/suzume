@@ -262,7 +262,8 @@ bool spansPresumptiveAuxiliary(const std::vector<char32_t>& codepoints, size_t s
     }
     const auto* presumptive =
         lookupEntryInRange(*dict_manager, codepoints, host_end, end_pos, core::PartOfSpeech::Auxiliary);
-    if (presumptive != nullptr && presumptive->extended_pos == core::ExtendedPOS::AuxVolitional) {
+    if (presumptive != nullptr && (presumptive->extended_pos == core::ExtendedPOS::AuxVolitional ||
+                                   presumptive->extended_pos == core::ExtendedPOS::AuxClassicalConjectureTerminal)) {
       return true;
     }
   }

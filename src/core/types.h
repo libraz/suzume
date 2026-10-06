@@ -218,6 +218,11 @@ enum class ExtendedPOS : uint8_t {
   // its own category to keep it from standing before anything else (春+らし+かっ).
   AuxConjectureRashiiStem,
 
+  // 終止形接続の古典推量: らむ (行くらむ). It shares the conjecture of む but selects
+  // a terminal rather than an irrealis, so it cannot stand on the past た (来たらむ
+  // is た's irrealis たら plus む).
+  AuxClassicalConjectureTerminal,
+
   // Count marker (for array sizing)
   Count_  // Total number of categories
 };
@@ -395,7 +400,7 @@ constexpr bool isAuxiliaryType(ExtendedPOS epos) {
          epos == ExtendedPOS::AuxClassicalBeshi || epos == ExtendedPOS::AuxInability ||
          epos == ExtendedPOS::AuxBenefactive || epos == ExtendedPOS::AuxSimilitudeYou ||
          epos == ExtendedPOS::AuxKuruwaPolite || epos == ExtendedPOS::AuxClassicalKi ||
-         epos == ExtendedPOS::AuxConjectureRashiiStem;
+         epos == ExtendedPOS::AuxConjectureRashiiStem || epos == ExtendedPOS::AuxClassicalConjectureTerminal;
 }
 
 /**
@@ -423,7 +428,8 @@ constexpr bool isClassicalAuxiliaryType(ExtendedPOS epos) {
   return epos == ExtendedPOS::AuxNegativeNu || epos == ExtendedPOS::AuxVolitional ||
          epos == ExtendedPOS::AuxClassicalNari || epos == ExtendedPOS::AuxClassicalKeri ||
          epos == ExtendedPOS::AuxClassicalTari || epos == ExtendedPOS::AuxClassicalPerfect ||
-         epos == ExtendedPOS::AuxClassicalBeshi || epos == ExtendedPOS::AuxClassicalKi;
+         epos == ExtendedPOS::AuxClassicalBeshi || epos == ExtendedPOS::AuxClassicalKi ||
+         epos == ExtendedPOS::AuxClassicalConjectureTerminal;
 }
 
 /**

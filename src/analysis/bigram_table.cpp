@@ -96,6 +96,22 @@ BigramTable::EncodedTable BigramTable::initTable() {
         table[rashii][static_cast<size_t>(core::ExtendedPOS::Suffix)];
   }
 
+  // The terminal-selecting conjecture らむ continues like the volitional/
+  // conjectural む, and takes the hosts む takes except for the cell: a terminal
+  // (行く+らむ, 高かる+らむ) instead of an irrealis, and never the past た
+  // (来+たら+む, not 来+た+らむ).
+  {
+    bigram_rules::inheritRuleProfile(table, core::ExtendedPOS::AuxVolitional,
+                                     core::ExtendedPOS::AuxClassicalConjectureTerminal);
+    const size_t ramu = static_cast<size_t>(core::ExtendedPOS::AuxClassicalConjectureTerminal);
+    for (const auto irrealis :
+         {core::ExtendedPOS::VerbMizenkei, core::ExtendedPOS::AdjMizenkei, core::ExtendedPOS::AuxTenseTa}) {
+      table[static_cast<size_t>(irrealis)][ramu] = bigram_rules::encodeCost(bigram_cost::kAlmostNever);
+    }
+    table[static_cast<size_t>(core::ExtendedPOS::VerbShuushikei)][ramu] =
+        bigram_rules::encodeCost(bigram_cost::kStrongBonus);
+  }
+
   // A quotative demonstrative cannot directly complete an adjective stem.
   // Keep appearance そう on its auxiliary path (高+そう, キモ+そう).
   table[static_cast<size_t>(core::ExtendedPOS::AdjStem)][static_cast<size_t>(core::ExtendedPOS::AdverbQuotative)] =

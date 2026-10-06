@@ -104,6 +104,8 @@ constexpr std::array<float, static_cast<size_t>(ExtendedPOS::Count_)> kCategoryC
   // Desire/Volition
   table[static_cast<size_t>(ExtendedPOS::AuxDesireTai)] = 0.3F;   // たい
   table[static_cast<size_t>(ExtendedPOS::AuxVolitional)] = 0.3F;  // う/よう
+  table[static_cast<size_t>(ExtendedPOS::AuxClassicalConjectureTerminal)] =
+      table[static_cast<size_t>(ExtendedPOS::AuxVolitional)];
 
   // Voice
   table[static_cast<size_t>(ExtendedPOS::AuxPassive)] = 0.3F;      // れる/られる

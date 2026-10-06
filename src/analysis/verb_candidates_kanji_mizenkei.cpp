@@ -82,7 +82,11 @@ void appendSingleOkuriganaMizenkeiCandidates(const std::vector<char32_t>& codepo
   const auto is_volitional = [](const dictionary::DictionaryEntry& entry) {
     return entry.extended_pos == core::ExtendedPOS::AuxVolitional;
   };
-  const bool okurigana_opens_auxiliary = vh::auxiliaryFollowsAt(dict_manager, codepoints, kanji_end, is_volitional);
+  const auto is_conjectural = [](const dictionary::DictionaryEntry& entry) {
+    return entry.extended_pos == core::ExtendedPOS::AuxVolitional ||
+           entry.extended_pos == core::ExtendedPOS::AuxClassicalConjectureTerminal;
+  };
+  const bool okurigana_opens_auxiliary = vh::auxiliaryFollowsAt(dict_manager, codepoints, kanji_end, is_conjectural);
   const bool is_classical_conjecture_pattern =
       (stem_is_lone_kanji || !okurigana_opens_auxiliary) && kanji_end - start_pos == 1 &&
       vh::auxiliaryFollowsAt(dict_manager, codepoints, mizenkei_end, is_volitional);

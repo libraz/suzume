@@ -107,9 +107,10 @@ bool predicateEndsAt(const std::vector<char32_t>& codepoints, size_t pos,
 bool shuushikeiEndsAt(const std::vector<char32_t>& codepoints, size_t pos,
                       const dictionary::DictionaryManager* dict_manager) {
   return vh::clauseEndsAt(codepoints, pos) ||
-         dictionaryTailFollowsAt(codepoints, pos, dict_manager, core::PartOfSpeech::Auxiliary,
-                                 {core::ExtendedPOS::AuxClassicalBeshi, core::ExtendedPOS::AuxNegativeMai,
-                                  core::ExtendedPOS::AuxVolitional, core::ExtendedPOS::AuxClassicalNari});
+         dictionaryTailFollowsAt(
+             codepoints, pos, dict_manager, core::PartOfSpeech::Auxiliary,
+             {core::ExtendedPOS::AuxClassicalBeshi, core::ExtendedPOS::AuxNegativeMai, core::ExtendedPOS::AuxVolitional,
+              core::ExtendedPOS::AuxClassicalNari, core::ExtendedPOS::AuxClassicalConjectureTerminal});
 }
 
 /**

@@ -131,6 +131,67 @@
       ],
       "id": "kinubeshi",
       "input": "咲きぬべし"
+    },
+    {
+      "description": "tari irrealis plus mu, not ta plus ramu",
+      "expected": [
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "たら"
+        },
+        {
+          "lemma": "む",
+          "pos": "Auxiliary",
+          "surface": "む"
+        }
+      ],
+      "id": "taramu",
+      "input": "来たらむ"
+    },
+    {
+      "description": "tari irrealis plus mu, not ta plus ramu",
+      "expected": [
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "たら"
+        },
+        {
+          "lemma": "む",
+          "pos": "Auxiliary",
+          "surface": "む"
+        }
+      ],
+      "id": "taramu_2",
+      "input": "見たらむ"
+    },
+    {
+      "description": "ramu after a terminal form",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行く"
+        },
+        {
+          "lemma": "らむ",
+          "pos": "Auxiliary",
+          "surface": "らむ"
+        }
+      ],
+      "id": "kuramu_4",
+      "input": "行くらむ"
     }
   ],
   "description": "auxiliary_classical tests (part 2/2)",

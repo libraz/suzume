@@ -314,7 +314,9 @@ bool verbFormLicensesAuxiliary(core::ExtendedPOS verb_epos, core::ExtendedPOS au
            auxiliary_epos == core::ExtendedPOS::AuxPassive || auxiliary_epos == core::ExtendedPOS::AuxCausative ||
            auxiliary_epos == core::ExtendedPOS::AuxVolitional) &&
           verb_epos == core::ExtendedPOS::VerbMizenkei) ||
-         (auxiliary_epos == core::ExtendedPOS::AuxClassicalBeshi && verb_epos == core::ExtendedPOS::VerbShuushikei);
+         ((auxiliary_epos == core::ExtendedPOS::AuxClassicalBeshi ||
+           auxiliary_epos == core::ExtendedPOS::AuxClassicalConjectureTerminal) &&
+          verb_epos == core::ExtendedPOS::VerbShuushikei);
 }
 
 // An open verb candidate cannot restart inside a complete verb form and then

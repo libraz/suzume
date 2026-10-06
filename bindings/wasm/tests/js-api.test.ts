@@ -56,7 +56,8 @@ describe('JS API: struct layout compatibility', () => {
     expect(text(85)).toBe('NOUN_非日本語');
     expect(text(86)).toBe('INTJ_挨拶');
     expect(text(87)).toBe('AUX_推定語幹');
-    expect(text(88)).toBeNull();
+    expect(text(88)).toBe('AUX_現在推量');
+    expect(text(89)).toBeNull();
   });
 
   it('labels every serialized conjugation code and rejects the next value', () => {
