@@ -31,6 +31,105 @@
       ],
       "id": "ndenadoinai",
       "input": "読んでなどいない"
+    },
+    {
+      "description": "施策は実行されてしかるべきだ。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "施策",
+          "pos": "Noun",
+          "surface": "施策"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "実行",
+          "pos": "Noun",
+          "surface": "実行"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "さ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "しかる",
+          "pos": "Verb",
+          "surface": "しかる"
+        },
+        {
+          "lemma": "べし",
+          "pos": "Auxiliary",
+          "surface": "べき"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "ha_sareteshikarubekida",
+      "input": "施策は実行されてしかるべきだ。"
+    },
+    {
+      "description": "制度は見直されてしかるべきだ - auto-generated",
+      "expected": [
+        {
+          "lemma": "制度",
+          "pos": "Noun",
+          "surface": "制度"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "見直す",
+          "pos": "Verb",
+          "surface": "見直さ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "しかる",
+          "pos": "Verb",
+          "surface": "しかる"
+        },
+        {
+          "lemma": "べし",
+          "pos": "Auxiliary",
+          "surface": "べき"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "ha_sareteshikarubekida_2",
+      "input": "制度は見直されてしかるべきだ"
     }
   ],
   "description": "literary_quality tests (part 5/5)",

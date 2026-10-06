@@ -1154,6 +1154,19 @@ void appendIAdjKaraZuCandidates(const std::vector<char32_t>& codepoints, size_t 
         !verb_helpers::isProductiveShiiAdjectiveTerminal(lemma, inflection)) {
       continue;
     }
+    // A productive stem stays inside one word: a conjunctive て/で after a kana
+    // closes a te-form clause, and what follows it starts the next predicate
+    // (実行され+て+しかる+べき, not a coined 実行されてしい).
+    if (!isAdjectiveInDictionary(dict_manager, lemma)) {
+      bool embeds_te_form = false;
+      for (size_t te_pos = start_pos + 1; te_pos < kara_pos && !embeds_te_form; ++te_pos) {
+        embeds_te_form = (codepoints[te_pos] == core::hiragana::kTe || codepoints[te_pos] == U'で') &&
+                         kana::isHiraganaCodepoint(codepoints[te_pos - 1]);
+      }
+      if (embeds_te_form) {
+        continue;
+      }
+    }
     // A カリ form is also an ordinary godan-ra inflection plus a classical
     // auxiliary. A complete analysis whose reconstructed verb lemma is
     // dictionary-attested is stronger than the weak, generic i-adjective
