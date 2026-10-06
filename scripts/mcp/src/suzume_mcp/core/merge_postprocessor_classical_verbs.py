@@ -843,6 +843,38 @@ def _postprocess_nidan_cell(result: list[dict], applied_rule: str | None) -> tup
     return merged, applied_rule
 
 
+def _postprocess_verb_terminal_ru(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
+    """Rejoin a verb in its terminal form with the る the reference reads as the perfect り.
+
+    The perfect り attaches to a 已然形 or 命令形 (行け+り), never to a terminal
+    U-row cell, so 荒ぶ+る is the verb 荒ぶる spelled in the 五段ラ行 and not a
+    verb followed by an auxiliary.
+    """
+    merged: list[dict] = []
+    idx = 0
+    while idx < len(result):
+        token = result[idx]
+        ending = result[idx + 1] if idx + 1 < len(result) else None
+        if (
+            ending is not None
+            and token.get("pos") == "動詞"
+            and token.get("conj_form") == "基本形"
+            and token.get("lemma") == token.get("surface")
+            and ending.get("surface") == "る"
+            and ending.get("pos") == "助動詞"
+            and ending.get("lemma") == "り"
+        ):
+            surface = token["surface"] + "る"
+            merged.append({"surface": surface, "pos": "動詞", "lemma": surface})
+            idx += 2
+            if applied_rule is None:
+                applied_rule = "verb-terminal-ru"
+            continue
+        merged.append(token)
+        idx += 1
+    return merged, applied_rule
+
+
 # The closed set of 係助詞 a 係り結び opens with.  The reference dictionary
 # lexicalizes one demonstrative + 係助詞 pair as an adverb, which buries the
 # particle that governs the clause's final form.

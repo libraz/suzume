@@ -2082,6 +2082,87 @@
       ],
       "id": "ha_mi_ha_ttta",
       "input": "父は好み、母は嫌った"
+    },
+    {
+      "description": "荒ぶる神が降りた - auto-generated",
+      "expected": [
+        {
+          "lemma": "荒ぶる",
+          "pos": "Verb",
+          "surface": "荒ぶる"
+        },
+        {
+          "lemma": "神",
+          "pos": "Noun",
+          "surface": "神"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "降りる",
+          "pos": "Verb",
+          "surface": "降り"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "buru_ga_rita",
+      "input": "荒ぶる神が降りた"
+    },
+    {
+      "description": "心が荒ぶる - auto-generated",
+      "expected": [
+        {
+          "lemma": "心",
+          "pos": "Noun",
+          "surface": "心"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "荒ぶる",
+          "pos": "Verb",
+          "surface": "荒ぶる"
+        }
+      ],
+      "id": "ga_buru",
+      "input": "心が荒ぶる"
+    },
+    {
+      "description": "彼は学者ぶる - auto-generated",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "学者",
+          "pos": "Noun",
+          "surface": "学者"
+        },
+        {
+          "lemma": "ぶる",
+          "pos": "Verb",
+          "surface": "ぶる"
+        }
+      ],
+      "id": "ha_buru",
+      "input": "彼は学者ぶる"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",

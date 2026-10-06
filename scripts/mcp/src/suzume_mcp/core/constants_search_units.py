@@ -305,7 +305,7 @@ DERIVED_VERB_SUFFIX_LEMMAS: tuple[str, ...] = ("めかす", "めく", "ぶる")
 # Headwords whose host no longer carries its own meaning inside the verb
 # (時めく is to throb or to prosper, not to seem like a time), so they stay one
 # word. Hiragana hosts (ときめく, きらめく) are mimetic roots and never split.
-LEXICALIZED_DERIVED_VERBS: frozenset[str] = frozenset({"時めく", "色めく"})
+LEXICALIZED_DERIVED_VERBS: frozenset[str] = frozenset({"時めく", "色めく", "荒ぶる"})
 
 
 # How many tokens a cut-up derived verb can be spread over. The suffix itself is

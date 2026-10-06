@@ -38,6 +38,7 @@ _postprocess_historical_kana_word = merge_postprocessor_classical_verbs._postpro
 _postprocess_plain_verb_e_row_lemma = merge_postprocessor_classical_verbs._postprocess_plain_verb_e_row_lemma
 _postprocess_kakari_pronoun_split = merge_postprocessor_classical_verbs._postprocess_kakari_pronoun_split
 _postprocess_nidan_cell = merge_postprocessor_classical_verbs._postprocess_nidan_cell
+_postprocess_verb_terminal_ru = merge_postprocessor_classical_verbs._postprocess_verb_terminal_ru
 _postprocess_nominal_classical_copula = merge_postprocessor_classical_verbs._postprocess_nominal_classical_copula
 _postprocess_nominal_copula_naru = merge_postprocessor_classical_verbs._postprocess_nominal_copula_naru
 _postprocess_tomo_particle = merge_postprocessor_classical_verbs._postprocess_tomo_particle
@@ -98,6 +99,7 @@ def apply_merge_postprocessors(result: list[dict], applied_rule: str | None) -> 
     result, applied_rule = _postprocess_adj_kari(result, applied_rule)
     result, applied_rule = _postprocess_ha_row_godan(result, applied_rule)
     result, applied_rule = _postprocess_nidan_cell(result, applied_rule)
+    result, applied_rule = _postprocess_verb_terminal_ru(result, applied_rule)
     result, applied_rule = _postprocess_nominal_classical_copula(result, applied_rule)
     result, applied_rule = _postprocess_historical_kana_word(result, applied_rule)
     result, applied_rule = _postprocess_kakari_pronoun_split(result, applied_rule)

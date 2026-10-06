@@ -304,6 +304,11 @@ void appendClassicalNidanCandidates(const std::vector<char32_t>& codepoints, siz
       continue;
     }
     const size_t end_pos = is_attributive ? terminal_pos + 2 : terminal_pos + 1;
+    // A modern verb spelled the same as the attributive cell (荒ぶる) is that
+    // verb, not the bigrade verb it descends from.
+    if (is_attributive && vh::isVerbInDictionary(dict_manager, extractSubstring(codepoints, stem_start, end_pos))) {
+      continue;
+    }
     // Inside a kanji run, kana that spell a bound derivational suffix verb belong
     // to that suffix and the run is its host (学者+ぶる, not 学+者ぶる).
     if (stem_start > 0 && normalize::classifyChar(codepoints[stem_start - 1]) == normalize::CharType::Kanji &&
