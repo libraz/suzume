@@ -2184,6 +2184,70 @@
       ],
       "id": "degozaimasu_2",
       "input": "左様でございます"
+    },
+    {
+      "description": "さようなことは言わない - auto-generated",
+      "expected": [
+        {
+          "lemma": "さよう",
+          "pos": "Adjective",
+          "surface": "さよう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "こと"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言わ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "sayounakotoha_wanai",
+      "input": "さようなことは言わない"
+    },
+    {
+      "description": "さようでございます - auto-generated",
+      "expected": [
+        {
+          "lemma": "さよう",
+          "pos": "Adjective",
+          "surface": "さよう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "lemma": "ござる",
+          "pos": "Auxiliary",
+          "surface": "ござい"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "sayoudegozaimasu",
+      "input": "さようでございます"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 3/3)",

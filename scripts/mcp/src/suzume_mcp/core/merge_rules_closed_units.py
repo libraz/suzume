@@ -239,6 +239,37 @@ def _merge_closed_function_units(state: MergeState) -> bool:
             if merged:
                 return True
 
+        # The kana spelling of 左様 is one na-adjective stem; the reference cuts it
+        # into さ+よう (a degree adverb and the formal noun) before the copula.
+        if (
+            not merged
+            and t.get("surface") == "さ"
+            and i + 2 < len(tokens)
+            and tokens[i + 1].get("surface") == "よう"
+            and tokens[i + 2].get("surface") in ("な", "で", "だ", "です")
+        ):
+            result.append({"surface": "さよう", "pos": "名詞", "pos_sub1": "形容動詞語幹", "lemma": "さよう"})
+            i += 2
+            merged = True
+            if applied_rule is None:
+                applied_rule = "kana-sayou-stem"
+            return True
+        # Where the reference does list さよう, it tags the adverb; the word is the
+        # same na-adjective stem before its copula or adverbial に.
+        if (
+            not merged
+            and t.get("surface") == "さよう"
+            and t.get("pos") == "副詞"
+            and i + 1 < len(tokens)
+            and tokens[i + 1].get("surface") in ("な", "に", "で", "だ", "です")
+        ):
+            result.append({"surface": "さよう", "pos": "名詞", "pos_sub1": "形容動詞語幹", "lemma": "さよう"})
+            i += 1
+            merged = True
+            if applied_rule is None:
+                applied_rule = "kana-sayou-stem"
+            return True
+
         # The formal noun もの takes an attributive form, so a continuative in
         # front of it is the first member of the compound noun (たべ+もの as
         # 食べもの, のみもの, かいもの). The reference keeps the kanji compounds

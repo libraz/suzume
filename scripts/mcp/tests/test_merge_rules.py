@@ -1738,6 +1738,28 @@ class TestPejorativeYagaru:
         assert [token["surface"] for token in result] == ["見や", "っ"]
 
 
+class TestKanaSayouStem:
+    def test_rejoins_sa_and_you_before_the_attributive_copula(self):
+        tokens = [
+            _tok("さ", pos="副詞", pos_sub1="助詞類接続", lemma="さ"),
+            _tok("よう", pos="名詞", pos_sub1="非自立", lemma="よう"),
+            _tok("な", pos="助動詞", conj_form="特殊・ダ", lemma="だ"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "さような")
+        assert [token["surface"] for token in result] == ["さよう", "な"]
+        assert result[0]["pos_sub1"] == "形容動詞語幹"
+        assert rule == "kana-sayou-stem"
+
+    def test_leaves_sa_you_before_a_noun_alone(self):
+        tokens = [
+            _tok("さ", pos="副詞", pos_sub1="助詞類接続", lemma="さ"),
+            _tok("よう", pos="名詞", pos_sub1="非自立", lemma="よう"),
+            _tok("に", pos="助詞", lemma="に"),
+        ]
+        result, _ = apply_suzume_merge(tokens, "さように")
+        assert [token["surface"] for token in result][:2] == ["さ", "よう"]
+
+
 class TestPejorativeYagaruAfterOneKanjiStem:
     def test_regroups_the_yaru_continuative_and_the_garu_suffix(self):
         tokens = [
