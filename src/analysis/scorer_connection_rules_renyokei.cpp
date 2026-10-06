@@ -679,8 +679,13 @@ float computeVerbRenyokeiEarlyBonus(const core::LatticeEdge& prev, const core::L
   // The conjunctive-particle homograph なり cannot follow an i-adjective's
   // adverbial form. 高くなり is 高く+なり(なる), whereas 鳴るなり uses the
   // particle after a finite verb.
-  if (prev.extended_pos == core::ExtendedPOS::AdjRenyokei && next.extended_pos == core::ExtendedPOS::ParticleConj &&
-      utf8::equalsAny(next.surface, {"なり"})) {
+  // Likewise a continuative is no finite predicate for the final particle な
+  // (見張り+な+の+だ is the noun 見張り with the copula; the imperative
+  // 食べ+な needs no help from this pair, which only costs the verb reading).
+  if ((prev.extended_pos == core::ExtendedPOS::AdjRenyokei && next.extended_pos == core::ExtendedPOS::ParticleConj &&
+       utf8::equalsAny(next.surface, {"なり"})) ||
+      (prev.extended_pos == core::ExtendedPOS::VerbRenyokei && next.extended_pos == core::ExtendedPOS::ParticleFinal &&
+       utf8::equalsAny(next.surface, {"な"}))) {
     SUZUME_CONNECTION_ADD(bonus, cost::kStrong);
   }
 

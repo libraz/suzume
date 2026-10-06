@@ -840,6 +840,33 @@
       ],
       "id": "nasai_2",
       "input": "御免なさい"
+    },
+    {
+      "description": "見張りなのだ - auto-generated",
+      "expected": [
+        {
+          "lemma": "見張り",
+          "pos": "Noun",
+          "surface": "見張り"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "rinanoda",
+      "input": "見張りなのだ"
     }
   ],
   "description": "Modality auxiliaries (たい、そう、らしい) (part 2/2)",

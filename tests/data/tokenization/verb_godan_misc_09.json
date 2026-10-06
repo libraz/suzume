@@ -2275,6 +2275,50 @@
       ],
       "id": "wo_rakashite_kaketa",
       "input": "部屋を散らかして出かけた"
+    },
+    {
+      "description": "部屋を片付けない - auto-generated",
+      "expected": [
+        {
+          "lemma": "部屋",
+          "pos": "Noun",
+          "surface": "部屋"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "片付ける",
+          "pos": "Verb",
+          "surface": "片付け"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "wo_kenai",
+      "input": "部屋を片付けない"
+    },
+    {
+      "description": "片付けない - auto-generated",
+      "expected": [
+        {
+          "lemma": "片付ける",
+          "pos": "Verb",
+          "surface": "片付け"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "kenai",
+      "input": "片付けない"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",
