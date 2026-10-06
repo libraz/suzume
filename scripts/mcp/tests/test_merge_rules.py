@@ -43,7 +43,7 @@ class TestFixedFunctionSearchUnits:
 class TestL2NounMerge:
     def test_does_not_start_an_l2_noun_inside_a_closed_class_token(self, monkeypatch):
         monkeypatch.setattr(
-            "suzume_mcp.core.merge_rules.core_headwords_by_length",
+            "suzume_mcp.core.merge_rules_closed_units.core_headwords_by_length",
             lambda filename: ("がお",),
         )
         tokens = [_tok("が", pos="助詞"), _tok("お", pos="名詞")]
@@ -55,7 +55,7 @@ class TestL2NounMerge:
 
     def test_recovers_l2_noun_after_multiple_closed_class_misreads(self, monkeypatch):
         monkeypatch.setattr(
-            "suzume_mcp.core.merge_rules.core_headwords_by_length",
+            "suzume_mcp.core.merge_rules_closed_units.core_headwords_by_length",
             lambda filename: ("てがみ",),
         )
         tokens = [
@@ -73,7 +73,7 @@ class TestL2NounMerge:
 
     def test_recovers_l2_noun_after_particle_pos_correction(self, monkeypatch):
         monkeypatch.setattr(
-            "suzume_mcp.core.merge_rules.core_headwords_by_length",
+            "suzume_mcp.core.merge_rules_closed_units.core_headwords_by_length",
             lambda filename: ("にわ",),
         )
         tokens = [
@@ -90,7 +90,7 @@ class TestL2NounMerge:
 
     def test_splits_topic_absorbed_into_l2_noun(self, monkeypatch):
         monkeypatch.setattr(
-            "suzume_mcp.core.merge_rules.core_headwords_by_length",
+            "suzume_mcp.core.merge_rules_closed_units.core_headwords_by_length",
             lambda filename: ("にわ",),
         )
         tokens = [
@@ -106,7 +106,7 @@ class TestL2NounMerge:
 
     def test_splits_topic_from_multicell_l2_noun(self, monkeypatch):
         monkeypatch.setattr(
-            "suzume_mcp.core.merge_rules.core_headwords_by_length",
+            "suzume_mcp.core.merge_rules_closed_units.core_headwords_by_length",
             lambda filename: ("いりぐち",),
         )
         tokens = [
@@ -123,7 +123,7 @@ class TestL2NounMerge:
 
     def test_keeps_standalone_noun_starting_with_topic_homograph(self, monkeypatch):
         monkeypatch.setattr(
-            "suzume_mcp.core.merge_rules.core_headwords_by_length",
+            "suzume_mcp.core.merge_rules_closed_units.core_headwords_by_length",
             lambda filename: ("にわ", "はにわ"),
         )
         tokens = [_tok("はにわ", pos="名詞")]
@@ -135,7 +135,7 @@ class TestL2NounMerge:
 
     def test_merges_whole_adjacent_reference_tokens(self, monkeypatch):
         monkeypatch.setattr(
-            "suzume_mcp.core.merge_rules.core_headwords_by_length",
+            "suzume_mcp.core.merge_rules_closed_units.core_headwords_by_length",
             lambda filename: ("うがい",),
         )
         tokens = [_token("う", "感動詞"), _token("がい", "名詞"), _token("薬", "名詞")]
@@ -151,7 +151,7 @@ class TestL2NounMerge:
 
     def test_prefers_longest_matching_headword(self, monkeypatch):
         monkeypatch.setattr(
-            "suzume_mcp.core.merge_rules.core_headwords_by_length",
+            "suzume_mcp.core.merge_rules_closed_units.core_headwords_by_length",
             lambda filename: ("うがい薬", "うがい"),
         )
         tokens = [_token("う", "感動詞"), _token("がい", "名詞"), _token("薬", "名詞")]
@@ -163,7 +163,7 @@ class TestL2NounMerge:
 
     def test_does_not_absorb_a_partial_reference_token(self, monkeypatch):
         monkeypatch.setattr(
-            "suzume_mcp.core.merge_rules.core_headwords_by_length",
+            "suzume_mcp.core.merge_rules_closed_units.core_headwords_by_length",
             lambda filename: ("うがい",),
         )
         tokens = [_token("うがい薬", "名詞")]
@@ -175,11 +175,11 @@ class TestL2NounMerge:
 
     def test_restores_standalone_noun_role_after_recovered_l2_noun(self, monkeypatch):
         monkeypatch.setattr(
-            "suzume_mcp.core.merge_rules.core_headwords_by_length",
+            "suzume_mcp.core.merge_rules_closed_units.core_headwords_by_length",
             lambda filename: ("うがい",),
         )
         monkeypatch.setattr(
-            "suzume_mcp.core.merge_rules.mecab_analyze",
+            "suzume_mcp.core.merge_rules_closed_units.mecab_analyze",
             lambda text: [{"surface": text, "pos": "名詞", "pos_sub1": "一般", "lemma": text}],
         )
         tokens = [
@@ -206,7 +206,7 @@ class TestL2NounMerge:
 
     def test_keeps_l2_noun_boundary_before_productive_counter(self, monkeypatch):
         monkeypatch.setattr(
-            "suzume_mcp.core.merge_rules.core_headwords_by_length",
+            "suzume_mcp.core.merge_rules_closed_units.core_headwords_by_length",
             lambda filename: ("第一",),
         )
         tokens = [
@@ -223,7 +223,7 @@ class TestL2NounMerge:
 
     def test_does_not_merge_classical_ha_row_auxiliary_as_l2_noun(self, monkeypatch):
         monkeypatch.setattr(
-            "suzume_mcp.core.merge_rules.core_headwords_by_length",
+            "suzume_mcp.core.merge_rules_closed_units.core_headwords_by_length",
             lambda filename: ("たま",),
         )
         tokens = [
