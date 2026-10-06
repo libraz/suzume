@@ -189,6 +189,14 @@ bool isBigradeTerminalKana(char32_t code);
 char32_t bigradeIrrealisKana(char32_t terminal);
 
 /**
+ * @brief The bigrade terminal kana behind an え段 stem-final kana (め → む, れ → る)
+ *
+ * The inverse of @ref bigradeIrrealisKana, for reading a modern lower-monograde
+ * stem back to its classical 終止形. Returns 0 for a kana that is no such stem end.
+ */
+char32_t bigradeTerminalFromIrrealis(char32_t irrealis);
+
+/**
  * @brief Terminal form behind a ヤ行 bigrade attributive, or empty
  *
  * A ヤ行 bigrade verb has no modern headword, so a reverse analysis reaches its

@@ -5,6 +5,7 @@
 
 #include "verb_candidates_helpers.h"
 
+#include <algorithm>
 #include <utility>
 
 #include "analysis/candidate_constants.h"
@@ -255,6 +256,35 @@ bool clauseEndsAt(const std::vector<char32_t>& codepoints, size_t pos) {
 // The function words that follow a classical cell are at most three kana long
 // (ども, ばや), so a probe of that width reaches every one of them.
 constexpr size_t kFollowerProbeChars = 3;
+
+bool dictionaryTailFollowsAt(const std::vector<char32_t>& codepoints, size_t pos,
+                             const dictionary::DictionaryManager* dict_manager, core::PartOfSpeech pos_class,
+                             std::initializer_list<core::ExtendedPOS> accepted) {
+  if (dict_manager == nullptr || pos >= codepoints.size()) {
+    return false;
+  }
+  const size_t probe_end = std::min(codepoints.size(), pos + kFollowerProbeChars);
+  for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, pos, probe_end)) {
+    if (match.entry == nullptr || match.entry->pos != pos_class) {
+      continue;
+    }
+    for (const core::ExtendedPOS candidate_pos : accepted) {
+      if (match.entry->extended_pos == candidate_pos) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+bool shuushikeiEndsAt(const std::vector<char32_t>& codepoints, size_t pos,
+                      const dictionary::DictionaryManager* dict_manager) {
+  return clauseEndsAt(codepoints, pos) ||
+         dictionaryTailFollowsAt(
+             codepoints, pos, dict_manager, core::PartOfSpeech::Auxiliary,
+             {core::ExtendedPOS::AuxClassicalBeshi, core::ExtendedPOS::AuxNegativeMai, core::ExtendedPOS::AuxVolitional,
+              core::ExtendedPOS::AuxClassicalNari, core::ExtendedPOS::AuxClassicalConjectureTerminal});
+}
 
 bool caseParticleFollowsAt(const dictionary::DictionaryManager& dict_manager, const std::vector<char32_t>& codepoints,
                            size_t pos) {

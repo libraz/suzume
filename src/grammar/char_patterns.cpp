@@ -281,6 +281,25 @@ char32_t bigradeIrrealisKana(char32_t terminal) {
   return 0;
 }
 
+char32_t bigradeTerminalFromIrrealis(char32_t irrealis) {
+  // え is shared by ア行 and ヤ行; the ヤ行 verbs (見ゆ, 消ゆ, 越ゆ) are the ones
+  // that survive as modern え-ending lower-monograde stems, so it maps there.
+  constexpr std::array<std::pair<char32_t, char32_t>, 8> kTerminals = {{{U'け', U'く'},
+                                                                        {U'げ', U'ぐ'},
+                                                                        {U'て', U'つ'},
+                                                                        {U'で', U'づ'},
+                                                                        {U'ね', U'ぬ'},
+                                                                        {U'べ', U'ぶ'},
+                                                                        {U'め', U'む'},
+                                                                        {U'え', U'ゆ'}}};
+  for (const auto& [e_row, u_row] : kTerminals) {
+    if (e_row == irrealis) {
+      return u_row;
+    }
+  }
+  return irrealis == U'れ' ? U'る' : 0;
+}
+
 std::string yaRowBigradeTerminalLemma(std::string_view base_form) {
   if (!utf8::endsWith(base_form, "ゆる") || base_form.size() <= core::kTwoJapaneseCharBytes) {
     return {};

@@ -11,6 +11,7 @@
 #define SUZUME_ANALYSIS_VERB_CANDIDATES_HELPERS_H_
 
 #include <array>
+#include <initializer_list>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -1265,6 +1266,26 @@ bool literaryPastAuxiliaryFollowsAt(const dictionary::DictionaryManager& dict_ma
  * @param pos Index just past the form being judged
  */
 bool clauseEndsAt(const std::vector<char32_t>& codepoints, size_t pos);
+
+/**
+ * @brief Whether a dictionary entry of the given class and extended POS starts at @p pos.
+ *
+ * Every entry a spelling carries counts (ぞ is a final particle and a 係助詞),
+ * and the probe reaches the longest classical function word (ども, ばや).
+ */
+bool dictionaryTailFollowsAt(const std::vector<char32_t>& codepoints, size_t pos,
+                             const dictionary::DictionaryManager* dict_manager, core::PartOfSpeech pos_class,
+                             std::initializer_list<core::ExtendedPOS> accepted);
+
+/**
+ * @brief Whether a classical 終止形 may end at @p pos.
+ *
+ * A 終止形 closes its clause or carries an auxiliary that attaches to one: the
+ * conjectural べし and its negative counterpart まじ, the volitional む, and the
+ * hearsay なり. Anything else after the cell belongs to a different form.
+ */
+bool shuushikeiEndsAt(const std::vector<char32_t>& codepoints, size_t pos,
+                      const dictionary::DictionaryManager* dict_manager);
 
 /**
  * @brief Whether a case particle begins at @p pos.

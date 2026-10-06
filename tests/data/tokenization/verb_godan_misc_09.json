@@ -1701,6 +1701,97 @@
       ],
       "id": "niha_yasakuraga_iteiru",
       "input": "庭には花やさくらが咲いている"
+    },
+    {
+      "description": "classical lower-bigrade terminal of a compound verb stays whole",
+      "expected": [
+        {
+          "lemma": "泣く",
+          "pos": "Verb",
+          "surface": "泣か"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        },
+        {
+          "lemma": "ばかり",
+          "pos": "Particle",
+          "surface": "ばかり"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "心",
+          "pos": "Noun",
+          "surface": "心"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "張り詰む",
+          "pos": "Verb",
+          "surface": "張り詰む"
+        }
+      ],
+      "id": "kanbakarini_ha_ri_mu",
+      "input": "泣かんばかりに心は張り詰む"
+    },
+    {
+      "description": "心は張り詰むべし - auto-generated",
+      "expected": [
+        {
+          "lemma": "心",
+          "pos": "Noun",
+          "surface": "心"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "張り詰む",
+          "pos": "Verb",
+          "surface": "張り詰む"
+        },
+        {
+          "lemma": "べし",
+          "pos": "Auxiliary",
+          "surface": "べし"
+        }
+      ],
+      "id": "ha_ri_mubeshi",
+      "input": "心は張り詰むべし"
+    },
+    {
+      "description": "張り詰めた心 - auto-generated",
+      "expected": [
+        {
+          "lemma": "張り詰める",
+          "pos": "Verb",
+          "surface": "張り詰め"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "心",
+          "pos": "Noun",
+          "surface": "心"
+        }
+      ],
+      "id": "ri_meta",
+      "input": "張り詰めた心"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",

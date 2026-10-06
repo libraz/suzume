@@ -3,6 +3,7 @@
  * @brief V1 verification and V2 matching for compound verbs
  */
 #include "analysis/dictionary_probe.h"
+#include "analysis/verb_candidates_helpers.h"
 #include "grammar/char_patterns.h"
 #include "join_compound_verb_internal.h"
 
@@ -553,8 +554,47 @@ CompoundVerbMatch findCompoundVerbMatch(
       }
     }
 
+    // Case 5: the classical lower-bigrade 終止形 and 連体形 of an Ichidan V2
+    // (詰める → 詰む, 詰むる). Their kana is also a modern Godan ending, so no
+    // other V2 reading claims the span; they are read only where the classical
+    // paradigm is named, a clause end or a classical auxiliary behind a finite
+    // cell, or the 連体形's own trailing る.
+    bool matched_classical = false;
+    bool classical_attributive = false;
+    std::string classical_terminal;
     if (!matched_kanji && !matched_reading && !matched_renyokei && !matched_potential && !matched_kateikei &&
-        !matched_volitional && !matched_inflected && !matched_mizenkei && !matched_imperative) {
+        !matched_volitional && !matched_inflected && !matched_mizenkei && !matched_imperative &&
+        v2_verb.verb_type == V2VerbType::Ichidan) {
+      auto tryClassical = [&](const std::string& stem) {
+        if (matched_classical || stem.size() <= core::kJapaneseCharBytes) {
+          return;
+        }
+        const std::string stem_head = stem.substr(0, stem.size() - core::kJapaneseCharBytes);
+        size_t tail_pos = stem_head.size();
+        const char32_t terminal_kana = grammar::bigradeTerminalFromIrrealis(normalize::decodeUtf8(stem, tail_pos));
+        if (terminal_kana == 0) {
+          return;
+        }
+        const std::string terminal = stem_head + normalize::encodeUtf8(terminal_kana);
+        if (!spellsAt(text, v2_start_byte, terminal)) {
+          return;
+        }
+        const size_t terminal_end = v2_start + normalize::utf8Length(terminal);
+        const bool attributive = terminal_end < codepoints.size() && codepoints[terminal_end] == core::hiragana::kRu;
+        if (!attributive && !verb_helpers::shuushikeiEndsAt(codepoints, terminal_end, &dict_manager)) {
+          return;
+        }
+        matched_classical = true;
+        classical_attributive = attributive;
+        classical_terminal = terminal;
+        matched_len = terminal.size() + (attributive ? core::kJapaneseCharBytes : 0);
+      };
+      tryClassical(v2_verb.joins_surface ? generateRenyokei(v2_surface, "", v2_verb.verb_type) : "");
+      tryClassical(!v2_reading.empty() ? generateRenyokei(v2_reading, "", v2_verb.verb_type) : "");
+    }
+
+    if (!matched_kanji && !matched_reading && !matched_renyokei && !matched_potential && !matched_kateikei &&
+        !matched_volitional && !matched_inflected && !matched_mizenkei && !matched_imperative && !matched_classical) {
       continue;
     }
 
@@ -701,8 +741,9 @@ CompoundVerbMatch findCompoundVerbMatch(
         char_types[v2_start] == CharType::Hiragana && !v2_reading.empty() ? v2_reading : v2_surface;
     const std::string compound_source_base = normalize::concat(v1_renyokei, v2_spelling);
     const std::string compound_base =
-        matched_potential ? normalize::concat(v1_renyokei, generateGodanPotential(v2_spelling, "", v2_verb.verb_type))
-                          : compound_source_base;
+        matched_classical   ? normalize::concat(v1_renyokei, classical_terminal)
+        : matched_potential ? normalize::concat(v1_renyokei, generateGodanPotential(v2_spelling, "", v2_verb.verb_type))
+                            : compound_source_base;
 
     // Compare with best match and update if this is better
     // Priority:
@@ -726,6 +767,10 @@ CompoundVerbMatch findCompoundVerbMatch(
     if (best_match.matched_len == 0) {
       // First valid match
       should_update = true;
+    } else if (matched_classical || best_match.is_classical_terminal) {
+      // The classical cells are the weakest reading: any lexical V2 match of the
+      // same text outranks them, and they never replace one.
+      should_update = best_match.is_classical_terminal && !matched_classical;
     } else if (matched_causative_conditional && !best_match.is_mizenkei) {
       // A Godan compound mizenkei followed by the closed causative
       // conditional (V1+V2あ+せれ+ば) retains the auxiliary boundary.
@@ -826,6 +871,8 @@ CompoundVerbMatch findCompoundVerbMatch(
       best_match.is_kateikei = matched_kateikei;
       best_match.is_imperative = matched_imperative;
       best_match.is_potential = matched_potential;
+      best_match.is_classical_terminal = matched_classical;
+      best_match.is_classical_attributive = classical_attributive;
       best_match.includes_aux = inflection_includes_aux;
       best_match.matched_via_reading = matched_reading || matched_inflected || matched_renyokei_via_reading;
       best_match.v2_verb = &v2_verb;

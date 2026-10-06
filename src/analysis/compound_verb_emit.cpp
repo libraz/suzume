@@ -334,6 +334,17 @@ void emitCompoundVerbCandidates(core::Lattice& lattice, std::string_view text, c
   dictionary::ConjugationType compound_conj_type =
       compoundConjugationType(matched_v2.verb_type, matched_v2.base_ending);
 
+  // Classical lower-bigrade cell (張り詰む, 張り詰むる): the terminal is the lemma.
+  if (best_match.is_classical_terminal) {
+    lattice.addEdge(
+        compound_surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(compound_end_pos),
+        core::PartOfSpeech::Verb, final_cost, flags, compound_lemma, compound_conj_type,
+        core::CandidateOrigin::VerbCompound, candidate::kNoOriginConfidence, "compound_classical",
+        best_match.is_classical_attributive ? core::ExtendedPOS::VerbRentaikei : core::ExtendedPOS::VerbShuushikei,
+        "compound_classical");
+    return;
+  }
+
   // Mizenkei match: add VerbMizenkei edge and return (no te-stem/mizenkei derivation)
   // E.g., 打ち込ま (mizenkei of 打ち込む) for passive 打ち込まれ
   if (best_match.is_mizenkei || best_match.is_volitional) {

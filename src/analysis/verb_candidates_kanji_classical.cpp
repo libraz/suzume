@@ -27,9 +27,6 @@ namespace vh = verb_helpers;
 
 namespace {
 
-// Longest closed-class tail probed after a paradigm cell (ざり, ども).
-constexpr size_t kClassicalTailProbeChars = 3;
-
 // Longest okurigana run allowed between the kanji stem and the row kana
 // (移ろ+ひ, 恥ぢら+ひ).
 constexpr size_t kOkuriganaProbeChars = 2;
@@ -62,26 +59,8 @@ core::ExtendedPOS classicalHaRowCell(char32_t tail) {
   }
 }
 
-bool dictionaryTailFollowsAt(const std::vector<char32_t>& codepoints, size_t pos,
-                             const dictionary::DictionaryManager* dict_manager, core::PartOfSpeech pos_class,
-                             std::initializer_list<core::ExtendedPOS> accepted) {
-  if (dict_manager == nullptr || pos >= codepoints.size()) {
-    return false;
-  }
-  // Every entry a spelling carries counts: ぞ is a final particle and a 係助詞.
-  const size_t probe_end = std::min(codepoints.size(), pos + kClassicalTailProbeChars);
-  for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, pos, probe_end)) {
-    if (match.entry == nullptr || match.entry->pos != pos_class) {
-      continue;
-    }
-    for (const core::ExtendedPOS candidate_pos : accepted) {
-      if (match.entry->extended_pos == candidate_pos) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
+using vh::dictionaryTailFollowsAt;
+using vh::shuushikeiEndsAt;
 
 /**
  * @brief Whether a predicate form ends exactly where this span begins.
@@ -99,18 +78,6 @@ bool predicateEndsAt(const std::vector<char32_t>& codepoints, size_t pos,
   return hasDictionaryEntryEndingAt(
       *dict_manager, codepoints, probe_start, pos,
       partOfSpeechMask(core::PartOfSpeech::Verb) | partOfSpeechMask(core::PartOfSpeech::Auxiliary));
-}
-
-// A 終止形 closes its clause or carries an auxiliary that attaches to one: the
-// conjectural べし and its negative counterpart まじ, the volitional む, and the
-// hearsay なり. Anything else after the cell belongs to a different form.
-bool shuushikeiEndsAt(const std::vector<char32_t>& codepoints, size_t pos,
-                      const dictionary::DictionaryManager* dict_manager) {
-  return vh::clauseEndsAt(codepoints, pos) ||
-         dictionaryTailFollowsAt(
-             codepoints, pos, dict_manager, core::PartOfSpeech::Auxiliary,
-             {core::ExtendedPOS::AuxClassicalBeshi, core::ExtendedPOS::AuxNegativeMai, core::ExtendedPOS::AuxVolitional,
-              core::ExtendedPOS::AuxClassicalNari, core::ExtendedPOS::AuxClassicalConjectureTerminal});
 }
 
 /**

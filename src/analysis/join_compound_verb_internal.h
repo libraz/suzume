@@ -68,6 +68,8 @@ struct CompoundVerbMatch {
   bool is_kateikei = false;
   bool is_imperative = false;
   bool is_potential = false;
+  bool is_classical_terminal = false;
+  bool is_classical_attributive = false;
   bool includes_aux = false;
   bool matched_via_reading = false;
   float confidence = 0.0F;
