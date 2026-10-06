@@ -5,10 +5,10 @@ namespace suzume::dictionary::entries {
 EntrySpecRange getConjunctionEntries() {
   static constexpr EntrySpec kEntries[] = {
       // Sequential (順接)
-      conj("従って", ""), conj("故に", ""), conj("ゆえに", ""), conj("そして", ""), conj("そうして", ""),
-      conj("そうすると", ""), conj("すると", ""), conj("それから", ""), conj("それで", ""), conj("だから", ""),
-      conj("したがって", ""), conj("ついては", ""), conj("もって", ""), conj("よって", ""), conj("だからといって", ""),
-      conj("だからこそ", ""),
+      conj("従って", ""), conj("翻って", ""), conj("故に", ""), conj("ゆえに", ""), conj("そして", ""),
+      conj("そうして", ""), conj("そうすると", ""), conj("すると", ""), conj("それから", ""), conj("それで", ""),
+      conj("だから", ""), conj("したがって", ""), conj("ついては", ""), conj("もって", ""), conj("よって", ""),
+      conj("だからといって", ""), conj("だからこそ", ""),
       // Note: そのため is not listed. Unlike the copula-initial connectives
       // above it has no clause-opening reading of its own — it is the
       // determiner plus a formal noun in every position, exactly as このため

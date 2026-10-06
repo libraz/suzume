@@ -35,6 +35,14 @@ float Scorer::eosCost(const core::LatticeEdge& edge, core::ExtendedPOS prev_exte
     return sc::kEosSokuonOnbinPenalty;
   }
 
+  // Only after content: a lone adverb (the whole input or a fragment after a
+  // punctuation mark) is the clause opener itself.
+  if (edge.pos == core::PartOfSpeech::Adverb && edge.fromDictionary() &&
+      (utf8::endsWith(edge.surface, "て") || utf8::endsWith(edge.surface, "で")) &&
+      prev_extended_pos != core::ExtendedPOS::Unknown && prev_extended_pos != core::ExtendedPOS::Symbol) {
+    return sc::kEosTeEndingAdverbPenalty;
+  }
+
   const sc::BoundaryCost boundary_cost = sc::getBoundaryCost(edge.extended_pos);
 
   switch (boundary_cost.eos_gate) {

@@ -2006,6 +2006,53 @@
       ],
       "id": "naishi_kanai",
       "input": "暇ないし、行かない"
+    },
+    {
+      "description": "翻って個人の努力が必要である。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "翻って",
+          "pos": "Conjunction",
+          "surface": "翻って"
+        },
+        {
+          "lemma": "個人",
+          "pos": "Noun",
+          "surface": "個人"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "努力",
+          "pos": "Noun",
+          "surface": "努力"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "必要",
+          "pos": "Adjective",
+          "surface": "必要"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        }
+      ],
+      "id": "ttte_no_ga_dearu",
+      "input": "翻って個人の努力が必要である。"
     }
   ],
   "description": "conjunction tests",

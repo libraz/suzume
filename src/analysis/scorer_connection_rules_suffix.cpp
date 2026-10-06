@@ -497,11 +497,11 @@ float computeSuffixShortVerbBonus(const core::LatticeEdge& prev, const core::Lat
     SUZUME_CONNECTION_ADD(bonus, desiderative_conditional ? cost::kDoubleVeryStrongBonus : cost::kStrongBonus);
   }
 
-  // An adverb ending in the connective mora て cannot directly introduce the
-  // progressive auxiliary. Preserve the productive verb-onbin + て + いる
+  // An adverb ending in the connective mora て cannot directly introduce an
+  // aspect auxiliary. Preserve the productive verb-onbin + て + いる/くる/いく
   // path (続い+て+いる) over a lexicalized adverb candidate (続いて).
   if (prev.pos == core::PartOfSpeech::Adverb && utf8::endsWith(prev.surface, "て") &&
-      (next.extended_pos == core::ExtendedPOS::AuxAspectIru ||
+      (core::isAspectAuxiliaryType(next.extended_pos) ||
        (next.pos == core::PartOfSpeech::Verb && next.lemma == "いる"))) {
     SUZUME_CONNECTION_ADD(bonus, cost::kSevere);
   }

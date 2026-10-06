@@ -464,6 +464,9 @@ constexpr float kEosRenyokeiFormalNounPenalty = scale::kAlmostNever;
 // A sokuon onbin cell exists only before た/て/たり (言っ+た); at the end of an
 // utterance the っ is the emphatic one on a final particle (だから+ねっ).
 constexpr float kEosSokuonOnbinPenalty = scale::kAlmostNever;
+// A registered adverb ending in the connective て/で is a clause opener
+// (続いて, 改めて); closing the utterance on one means the verb's te-form.
+constexpr float kEosTeEndingAdverbPenalty = scale::kNever;
 // A one-mora adjective stem closing the utterance (行くって+な read as ない).
 constexpr float kEosShortAdjStemPenalty = scale::kAlmostNever;
 // An irrealis form is the bare stem of an auxiliary chain, so it can never be

@@ -2378,6 +2378,15 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
       continue;
     }
 
+    // An adverb takes no object, so a te-ending adverb behind the object
+    // marker is the continuative of a verb plus the conjunctive て whenever the
+    // stem names a dictionary verb (約束を+果たし+て, never 果たして).
+    if (result.entry->pos == core::PartOfSpeech::Adverb && end_pos - start_pos >= 3 && start_pos > 0 &&
+        codepoints[start_pos - 1] == U'を' && codepoints[end_pos - 1] == U'て' &&
+        verb_helpers::namesDictionaryVerbContinuative(&dict_manager_, codepoints, start_pos, end_pos - 2)) {
+      continue;
+    }
+
     // A pure-hiragana adnominal begins with a kana that is also an inflectional
     // ending, so it cannot start where a productive verb continuative already
     // straddles the boundary (書き+たる, たなびき+たる).  A real boundary

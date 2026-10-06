@@ -192,6 +192,10 @@ def map_mecab_pos(token: dict | str) -> str:
     if surface == "まして" and pos == "副詞":
         return "Conjunction"
 
+    # 翻って: 副詞 -> Conjunction (話題を転じる接続詞用法、従って と同じ)
+    if surface == "翻って" and pos == "副詞":
+        return "Conjunction"
+
     # いわば: -> Conjunction
     if surface == "いわば" and pos == "副詞":
         token["lemma"] = "言わば"

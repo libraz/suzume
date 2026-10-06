@@ -303,6 +303,149 @@
       ],
       "id": "chi_ntoshitekudasai",
       "input": "ちゃんとしてください"
+    },
+    {
+      "description": "道は続いて - auto-generated",
+      "expected": [
+        {
+          "lemma": "道",
+          "pos": "Noun",
+          "surface": "道"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "続く",
+          "pos": "Verb",
+          "surface": "続い"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "ha_ite",
+      "input": "道は続いて"
+    },
+    {
+      "description": "道は続いてきた - auto-generated",
+      "expected": [
+        {
+          "lemma": "道",
+          "pos": "Noun",
+          "surface": "道"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "続く",
+          "pos": "Verb",
+          "surface": "続い"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くる",
+          "pos": "Auxiliary",
+          "surface": "き"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ha_itekita",
+      "input": "道は続いてきた"
+    },
+    {
+      "description": "約束を果たして帰る - auto-generated",
+      "expected": [
+        {
+          "lemma": "約束",
+          "pos": "Noun",
+          "surface": "約束"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "果たす",
+          "pos": "Verb",
+          "surface": "果たし"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "帰る",
+          "pos": "Verb",
+          "surface": "帰る"
+        }
+      ],
+      "id": "wo_tashite_ru",
+      "input": "約束を果たして帰る"
+    },
+    {
+      "description": "果たして状況は改善するだろうか。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "果たして",
+          "pos": "Adverb",
+          "surface": "果たして"
+        },
+        {
+          "lemma": "状況",
+          "pos": "Noun",
+          "surface": "状況"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "改善",
+          "pos": "Noun",
+          "surface": "改善"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だろ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "tashite_ha_surudarouka",
+      "input": "果たして状況は改善するだろうか。"
     }
   ],
   "description": "General adverbs (part 3/3)",
