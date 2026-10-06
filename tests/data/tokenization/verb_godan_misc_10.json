@@ -801,6 +801,80 @@
       ],
       "id": "shimashita_4",
       "input": "見逃しました"
+    },
+    {
+      "description": "部屋を散らかし放題にする - auto-generated",
+      "expected": [
+        {
+          "lemma": "部屋",
+          "pos": "Noun",
+          "surface": "部屋"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "散らかす",
+          "pos": "Verb",
+          "surface": "散らかし"
+        },
+        {
+          "lemma": "放題",
+          "pos": "Suffix",
+          "surface": "放題"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "wo_rakashi_nisuru",
+      "input": "部屋を散らかし放題にする"
+    },
+    {
+      "description": "食べ放題の店に行く - auto-generated",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "放題",
+          "pos": "Suffix",
+          "surface": "放題"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "店",
+          "pos": "Noun",
+          "surface": "店"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行く"
+        }
+      ],
+      "id": "be_no_ni_ku",
+      "input": "食べ放題の店に行く"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",

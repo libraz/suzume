@@ -492,6 +492,9 @@ EntrySpecRange getAuxiliaryEntries() {
       // Tendency suffix after a verb renyokei (読みがち, 食べがち).
       suffix_tendency("がち", "がち"),
 
+      // Unrestrained-doing suffix after a verb renyokei (食べ放題, 散らかし放題).
+      suffix("放題", "放題"),
+
       // Quantitative bound suffixes: 1kg未満, 5cm以上, 十件以下, 十件程度.
       suffix("未満", "未満"),
       suffix("以下", "以下"),
