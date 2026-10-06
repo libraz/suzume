@@ -889,6 +889,90 @@
       ],
       "id": "nohayasashisawo_ttteiru",
       "input": "彼のはやさしさを知っている。"
+    },
+    {
+      "description": "時は金なりと言う。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "時",
+          "pos": "Noun",
+          "surface": "時"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "金",
+          "pos": "Noun",
+          "surface": "金"
+        },
+        {
+          "lemma": "なり",
+          "pos": "Auxiliary",
+          "surface": "なり"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言う"
+        }
+      ],
+      "id": "ha_narito_u",
+      "input": "時は金なりと言う。"
+    },
+    {
+      "description": "時は金なり。ゆえに急ぐべきだ。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "時",
+          "pos": "Noun",
+          "surface": "時"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "金",
+          "pos": "Noun",
+          "surface": "金"
+        },
+        {
+          "lemma": "なり",
+          "pos": "Auxiliary",
+          "surface": "なり"
+        },
+        {
+          "lemma": "ゆえに",
+          "pos": "Conjunction",
+          "surface": "ゆえに"
+        },
+        {
+          "lemma": "急ぐ",
+          "pos": "Verb",
+          "surface": "急ぐ"
+        },
+        {
+          "lemma": "べし",
+          "pos": "Auxiliary",
+          "surface": "べき"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "ha_nari_yueni_gubekida",
+      "input": "時は金なり。ゆえに急ぐべきだ。"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",
