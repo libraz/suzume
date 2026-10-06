@@ -65,6 +65,10 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       // list decomposes at the end of a clause (読んだり書い+た+り).
       {EPOS::AuxTenseTa, EPOS::AuxClassicalPerfect, cost::kSevere},
       {EPOS::VerbTaForm, EPOS::AuxAspectIku, cost::kAlmostNever},
+      // Nor can the potential follow a past form: it selects an irrealis (見+た+いけ
+      // is 見+たい+けど).
+      {EPOS::AuxTenseTa, EPOS::AuxPotential, cost::kAlmostNever},
+      {EPOS::VerbTaForm, EPOS::AuxPotential, cost::kAlmostNever},
 
       // AuxTenseMasu → ParticleConj (まし+て, ますれ+ば) - decisive bonus
       // for the closed polite paradigm.  In ますれ+ば it must beat the
@@ -369,6 +373,11 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       // auxiliary く. Keep 〜て+いく as one directional verb rather than the
       // impossible 〜て+い+く auxiliary chain.
       {EPOS::AuxAspectIru, EPOS::AuxAspectIku, cost::kAlmostNever},
+      // The listed cell of directional いく is its terminal く, which carries
+      // no voice: passive and causative select the irrealis (見て+く+れよ is
+      // くれ+よ, not く+れよ).
+      {EPOS::AuxAspectIku, EPOS::AuxPassive, cost::kAlmostNever},
+      {EPOS::AuxAspectIku, EPOS::AuxCausative, cost::kAlmostNever},
       {EPOS::AuxAspectKuru, EPOS::AuxVolitional, cost::kStrongBonus},
       // Its terminal closes an utterance before a final particle (見て+くる+よ),
       // and the contracted くん carries the nominalizer that the ていく reading

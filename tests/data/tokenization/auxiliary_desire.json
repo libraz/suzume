@@ -237,6 +237,55 @@
       ],
       "id": "mitaizo",
       "input": "読みたいぞ"
+    },
+    {
+      "description": "desiderative tai before kedo, not past ta plus potential",
+      "expected": [
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たい"
+        },
+        {
+          "lemma": "けど",
+          "pos": "Particle",
+          "surface": "けど"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        }
+      ],
+      "id": "taikedone",
+      "input": "見たいけどね…"
+    },
+    {
+      "description": "desiderative tai before kedo, not past ta plus potential",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たい"
+        },
+        {
+          "lemma": "けど",
+          "pos": "Particle",
+          "surface": "けど"
+        }
+      ],
+      "id": "betaikedo",
+      "input": "食べたいけど"
     }
   ],
   "description": "auxiliary_desire tests",
