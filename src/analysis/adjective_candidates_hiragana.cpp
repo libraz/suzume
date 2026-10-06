@@ -399,8 +399,8 @@ void appendVowelFusedAdjectiveCandidates(const std::vector<char32_t>& codepoints
     if (codepoints[fused_at + 1] != U'え') {
       continue;
     }
-    const auto* source = std::find_if(kFusedESources.begin(), kFusedESources.end(),
-                                      [&](const FusedESource& entry) { return entry.fused == codepoints[fused_at]; });
+    const auto source = std::find_if(kFusedESources.begin(), kFusedESources.end(),
+                                     [&](const FusedESource& entry) { return entry.fused == codepoints[fused_at]; });
     if (source == kFusedESources.end()) {
       continue;
     }
