@@ -23,7 +23,8 @@ def test_extended_pos_labels_match_the_serialized_range() -> None:
     assert lib.suzume_extended_pos_label(87).decode() == "AUX_推定語幹"
     assert lib.suzume_extended_pos_label(88).decode() == "AUX_現在推量"
     assert lib.suzume_extended_pos_label(89).decode() == "ADV_疑問"
-    assert lib.suzume_extended_pos_label(90) is None
+    assert lib.suzume_extended_pos_label(90).decode() == "AUX_卑罵"
+    assert lib.suzume_extended_pos_label(91) is None
 
 
 def test_conjugation_labels_match_the_serialized_range() -> None:

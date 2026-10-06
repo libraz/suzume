@@ -115,7 +115,8 @@ constexpr std::array<float, static_cast<size_t>(ExtendedPOS::Count_)> kCategoryC
   table[static_cast<size_t>(ExtendedPOS::AuxBenefactive)] = 0.3F;  // あげる
 
   // Aspect
-  table[static_cast<size_t>(ExtendedPOS::AuxAspectIru)] = 0.3F;       // いる
+  table[static_cast<size_t>(ExtendedPOS::AuxAspectIru)] = 0.3F;  // いる
+  table[static_cast<size_t>(ExtendedPOS::AuxPejorativeYagaru)] = table[static_cast<size_t>(ExtendedPOS::AuxAspectIru)];
   table[static_cast<size_t>(ExtendedPOS::AuxAspectShimau)] = 0.3F;    // しまう
   table[static_cast<size_t>(ExtendedPOS::AuxAspectOku)] = 0.3F;       // おく
   table[static_cast<size_t>(ExtendedPOS::AuxAspectMiru)] = 0.3F;      // みる

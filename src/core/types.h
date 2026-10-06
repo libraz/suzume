@@ -228,6 +228,10 @@ enum class ExtendedPOS : uint8_t {
   // which a manner or degree adverb does not.
   AdverbInterrogative,
 
+  // 卑罵の補助動詞 やがる (来やがった). It attaches straight to a continuative, where
+  // the progressive いる needs a て form, and inflects like a godan-ra verb.
+  AuxPejorativeYagaru,
+
   // Count marker (for array sizing)
   Count_  // Total number of categories
 };
@@ -405,7 +409,8 @@ constexpr bool isAuxiliaryType(ExtendedPOS epos) {
          epos == ExtendedPOS::AuxClassicalBeshi || epos == ExtendedPOS::AuxInability ||
          epos == ExtendedPOS::AuxBenefactive || epos == ExtendedPOS::AuxSimilitudeYou ||
          epos == ExtendedPOS::AuxKuruwaPolite || epos == ExtendedPOS::AuxClassicalKi ||
-         epos == ExtendedPOS::AuxConjectureRashiiStem || epos == ExtendedPOS::AuxClassicalConjectureTerminal;
+         epos == ExtendedPOS::AuxConjectureRashiiStem || epos == ExtendedPOS::AuxClassicalConjectureTerminal ||
+         epos == ExtendedPOS::AuxPejorativeYagaru;
 }
 
 /**

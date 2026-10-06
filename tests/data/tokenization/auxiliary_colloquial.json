@@ -788,6 +788,104 @@
       ],
       "id": "desuttshi",
       "input": "本当ですっしょ"
+    },
+    {
+      "description": "来やがった、覚悟しろ - auto-generated",
+      "expected": [
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "やがる",
+          "pos": "Auxiliary",
+          "surface": "やがっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "覚悟",
+          "pos": "Noun",
+          "surface": "覚悟"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "しろ"
+        }
+      ],
+      "id": "yagattta_shiro",
+      "input": "来やがった、覚悟しろ"
+    },
+    {
+      "description": "食べやがった - auto-generated",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "やがる",
+          "pos": "Auxiliary",
+          "surface": "やがっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "beyagattta",
+      "input": "食べやがった"
+    },
+    {
+      "description": "待たせやがって - auto-generated",
+      "expected": [
+        {
+          "lemma": "待つ",
+          "pos": "Verb",
+          "surface": "待た"
+        },
+        {
+          "lemma": "せる",
+          "pos": "Auxiliary",
+          "surface": "せ"
+        },
+        {
+          "lemma": "やがる",
+          "pos": "Auxiliary",
+          "surface": "やがっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "taseyagattte",
+      "input": "待たせやがって"
+    },
+    {
+      "description": "来やがれ - auto-generated",
+      "expected": [
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "やがる",
+          "pos": "Auxiliary",
+          "surface": "やがれ"
+        }
+      ],
+      "id": "yagare",
+      "input": "来やがれ"
     }
   ],
   "description": "auxiliary_colloquial tests",

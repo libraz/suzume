@@ -312,6 +312,8 @@ std::string_view extendedPosToString(ExtendedPOS epos) {
     // Auxiliaries - Aspect
     case ExtendedPOS::AuxAspectIru:
       return "AUX_継続";
+    case ExtendedPOS::AuxPejorativeYagaru:
+      return "AUX_卑罵";
     case ExtendedPOS::AuxAspectShimau:
       return "AUX_完了";
     case ExtendedPOS::AuxAspectOku:

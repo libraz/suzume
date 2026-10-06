@@ -261,6 +261,30 @@ float productiveIAdjectiveStemConfidence(const std::string& stem, const std::str
   return candidate::kNoOriginConfidence;
 }
 
+// A stem whose okurigana ends inside a multi-mora auxiliary cell, one that
+// begins after at least one host mora and runs past the stem, has swallowed the
+// head of that auxiliary (食べや+がっ is 食べ+やがっ, not a stem 食べや).
+bool opensAuxiliaryInsideStem(const dictionary::DictionaryManager* dict_manager,
+                              const std::vector<char32_t>& codepoints, size_t start_pos, size_t stem_end) {
+  if (dict_manager == nullptr) {
+    return false;
+  }
+  constexpr size_t kLongestAuxiliaryCell = 4;
+  for (size_t cell_start = start_pos + 1; cell_start < stem_end; ++cell_start) {
+    if (!kana::isHiraganaCodepoint(codepoints[cell_start])) {
+      continue;
+    }
+    const size_t last_end = std::min(codepoints.size(), cell_start + kLongestAuxiliaryCell);
+    for (size_t cell_end = std::max(stem_end + 1, cell_start + 2); cell_end <= last_end; ++cell_end) {
+      if (dict_manager->lookupExact(extractSubstring(codepoints, cell_start, cell_end),
+                                    core::PartOfSpeech::Auxiliary) != nullptr) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 }  // namespace
 
 void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
@@ -529,6 +553,14 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
             continue;
           }
 
+          // A verb continuative plus a closed continuation is a predicate chain,
+          // not a stem of an unlisted adjective (来+やがる, 食べ+やがる).
+          if (!isAdjectiveInDictionary(dict_manager, base_form) &&
+              verb_helpers::startsWithVerbContinuative(dict_manager, normalize::toCodepoints(stem), 0,
+                                                       normalize::utf8Length(stem))) {
+            continue;
+          }
+
           if (pattern == "さ") {
             if (!isPossibleUnknownIAdjectiveStem(stem, base_form, dict_manager) ||
                 hasNaAdjectiveStemEvidence(stem, dict_manager) ||
@@ -599,6 +631,10 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
             // word's kana (水 + を + くみ read as the stem of the non-word 水をくい).
             // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
             if (verb_helpers::embedsCaseParticle(dict_manager, codepoints, start_pos, stem_end)) {
+              continue;
+            }
+            if (!isAdjectiveInDictionary(dict_manager, base_form) &&
+                opensAuxiliaryInsideStem(dict_manager, codepoints, start_pos, stem_end)) {
               continue;
             }
 

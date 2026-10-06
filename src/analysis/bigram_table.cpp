@@ -61,6 +61,14 @@ BigramTable::EncodedTable BigramTable::initTable() {
       table[interrogative][static_cast<size_t>(copula)] = bigram_rules::encodeCost(bigram_cost::kMinorBonus);
     }
   }
+  // The pejorative subsidiary やがる continues like the progressive auxiliary but
+  // stands directly on a continuative instead of a て form.
+  {
+    bigram_rules::inheritRuleProfile(table, core::ExtendedPOS::AuxAspectIru, core::ExtendedPOS::AuxPejorativeYagaru);
+    table[static_cast<size_t>(core::ExtendedPOS::VerbRenyokei)]
+         [static_cast<size_t>(core::ExtendedPOS::AuxPejorativeYagaru)] =
+             bigram_rules::encodeCost(bigram_cost::kStrongBonus);
+  }
   // The colloquial contraction of the hypothetical is a single word that closes
   // a conditional clause. What may follow it is therefore what may follow the
   // conjunctive particle it absorbed, while what may precede it is what may

@@ -789,6 +789,14 @@ EntrySpecRange getAuxiliaryEntries() {
       aux("じょる", "じょる", EPOS::AuxAspectIru),
       aux("じょっ", "じょる", EPOS::AuxAspectIru),
 
+      // Pejorative subsidiary やがる after a continuative (来やがった, 食べやがる).
+      // It inflects as a godan-ra verb and is not the adjective-forming がる.
+      aux("やがる", "やがる", EPOS::AuxPejorativeYagaru),
+      aux("やがっ", "やがる", EPOS::AuxPejorativeYagaru),
+      aux("やがり", "やがる", EPOS::AuxPejorativeYagaru),
+      aux("やがら", "やがる", EPOS::AuxPejorativeYagaru),
+      aux("やがれ", "やがる", EPOS::AuxPejorativeYagaru),
+
       // Benefactive auxiliary - くれる (giving, receiving benefit)
       // Used in subsidiary verb patterns: してくれる, 買ってくれた
       // くれる is a dependent verb in benefactive constructions.
