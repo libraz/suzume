@@ -805,6 +805,74 @@
       ],
       "id": "ban",
       "input": "遊ばん"
+    },
+    {
+      "description": "role-language particle keeps the predicate whole",
+      "expected": [
+        {
+          "lemma": "走る",
+          "pos": "Verb",
+          "surface": "走る"
+        },
+        {
+          "lemma": "っぴ",
+          "pos": "Particle",
+          "surface": "っぴ"
+        }
+      ],
+      "id": "ruttpi",
+      "input": "走るっぴ"
+    },
+    {
+      "description": "role-language particle keeps the predicate whole",
+      "expected": [
+        {
+          "lemma": "笑う",
+          "pos": "Verb",
+          "surface": "笑う"
+        },
+        {
+          "lemma": "っぴ",
+          "pos": "Particle",
+          "surface": "っぴ"
+        }
+      ],
+      "id": "uttpi",
+      "input": "笑うっぴ"
+    },
+    {
+      "description": "katakana role-language copula",
+      "expected": [
+        {
+          "lemma": "やる",
+          "pos": "Verb",
+          "surface": "やる"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "っス"
+        }
+      ],
+      "id": "yarutt",
+      "input": "やるっス"
+    },
+    {
+      "description": "katakana role-language copula",
+      "expected": [
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "っス"
+        }
+      ],
+      "id": "surutt",
+      "input": "するっス"
     }
   ],
   "description": "pattern_dialect tests",
