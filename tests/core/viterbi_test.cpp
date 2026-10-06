@@ -14,7 +14,10 @@ struct ExtendedPosScorer {
 
   float bosCost(const LatticeEdge& /*edge*/) const { return 0.0F; }
 
-  float eosCost(const LatticeEdge& /*edge*/, ExtendedPOS /*prev*/ = ExtendedPOS::Unknown) const { return 0.0F; }
+  float eosCost(const LatticeEdge& /*edge*/, ExtendedPOS /*prev*/ = ExtendedPOS::Unknown,
+                size_t /*prev_length*/ = 0) const {
+    return 0.0F;
+  }
 
   float connectionCost(const LatticeEdge& prev, const LatticeEdge& next) const {
     if (prev.extended_pos == ExtendedPOS::VerbRenyokei && next.extended_pos == ExtendedPOS::AuxTenseMasu) {
@@ -40,7 +43,7 @@ struct IdentityScorer {
 
   float wordCost(const LatticeEdge& edge) const { return edge.cost; }
   float bosCost(const LatticeEdge&) const { return 0.0F; }
-  float eosCost(const LatticeEdge&, ExtendedPOS = ExtendedPOS::Unknown) const { return 0.0F; }
+  float eosCost(const LatticeEdge&, ExtendedPOS = ExtendedPOS::Unknown, size_t = 0) const { return 0.0F; }
 
   float connectionCost(const LatticeEdge& prev, const LatticeEdge& next) const {
     if (next.surface != "tail") {
@@ -163,7 +166,7 @@ TEST(ViterbiTest, DedupPreservesVerifiedLemmaAlternative) {
 struct BeamBoundaryScorer {
   float wordCost(const LatticeEdge& edge) const { return edge.cost; }
   float bosCost(const LatticeEdge&) const { return 0.0F; }
-  float eosCost(const LatticeEdge&, ExtendedPOS = ExtendedPOS::Unknown) const { return 0.0F; }
+  float eosCost(const LatticeEdge&, ExtendedPOS = ExtendedPOS::Unknown, size_t = 0) const { return 0.0F; }
   float connectionCost(const LatticeEdge& prev, const LatticeEdge& next) const {
     return prev.surface == "second" && next.surface == "tail" ? -100.0F : 0.0F;
   }
@@ -216,7 +219,8 @@ struct BoundaryScorer {
     return edge.extended_pos == ExtendedPOS::ParticleTopic ? kBoundaryPenalty : 0.0F;
   }
 
-  float eosCost(const LatticeEdge& edge, ExtendedPOS /*prev*/ = ExtendedPOS::Unknown) const {
+  float eosCost(const LatticeEdge& edge, ExtendedPOS /*prev*/ = ExtendedPOS::Unknown,
+                size_t /*prev_length*/ = 0) const {
     return edge.extended_pos == ExtendedPOS::AuxAspectKuru ? kBoundaryPenalty : 0.0F;
   }
 

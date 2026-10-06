@@ -450,6 +450,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev, const core::LatticeE
                                            connection_rules::computeAdjectiveDerivationHostPenalty(prev, next));
 
   SUZUME_CONNECTION_ADD(surface_bonus, connection_rules::computeBarePotentialRenyokeiPenalty(prev, next));
+  SUZUME_CONNECTION_ADD(surface_bonus, connection_rules::computeBareNounRecollectiveKePenalty(prev, next));
 
   SUZUME_CONNECTION_ADD(surface_bonus, computeLateLexicalBoundaryBonus(prev, next));
 

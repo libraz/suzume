@@ -66,6 +66,9 @@ float computePastConditionalVerbBonus(const core::LatticeEdge& prev, const core:
 float computeExistentialAruNominalPredicateBonus(const core::LatticeEdge& prev, const core::LatticeEdge& next);
 float computeCompletionAuxiliaryBonus(const core::LatticeEdge& prev, const core::LatticeEdge& next);
 float computeBarePotentialRenyokeiPenalty(const core::LatticeEdge& prev, const core::LatticeEdge& next);
+
+/** @brief Penalizes the recollective final particle け directly after a bare common noun. */
+float computeBareNounRecollectiveKePenalty(const core::LatticeEdge& prev, const core::LatticeEdge& next);
 float computeAdjectiveTePredicatePenalty(const core::LatticeEdge& prev, const core::LatticeEdge& next);
 float computeClassicalNegativeBoundaryPenalty(const core::LatticeEdge& prev, const core::LatticeEdge& next);
 float computeAdjectiveDerivationHostPenalty(const core::LatticeEdge& prev, const core::LatticeEdge& next);

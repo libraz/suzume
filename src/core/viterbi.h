@@ -25,9 +25,10 @@ inline constexpr size_t kNumExtendedPosTypes = static_cast<size_t>(ExtendedPOS::
 // eosCost(edge, prev) for one that closes it. Keeping them out of core also
 // keeps them inside the guardrail ratchet's named-constant rule.
 //
-// eosCost takes the preceding category because whether a morpheme can close a
-// sentence is not always a property of that morpheme alone: a bound nominal
-// closes one when a modifier heads it and does not when a continuative does.
+// eosCost takes the preceding category and length because whether a morpheme
+// can close a sentence is not always a property of that morpheme alone: a
+// bound nominal closes one when a modifier heads it and does not when a
+// continuative does.
 // The BOS state has no preceding morpheme and passes ExtendedPOS::Unknown.
 
 // Per-transition tie-break: slightly prefer fewer, longer morphemes.
@@ -206,10 +207,12 @@ class Viterbi {
 
             float conn_cost = 0.0F;
             ExtendedPOS prev_extended_pos = ExtendedPOS::Unknown;
+            size_t prev_length = 0;
             if (entry.edge_id != kBosEdgeId) {
               const auto& prev_edge = lattice.getEdge(entry.edge_id);
               conn_cost = scorer.connectionCost(prev_edge, edge);
               prev_extended_pos = prev_edge.extended_pos;
+              prev_length = prev_edge.end - prev_edge.start;
             } else {
               // BOS (beginning of sentence) connection cost
               conn_cost = scorer.bosCost(edge);
@@ -217,7 +220,7 @@ class Viterbi {
 
             // EOS penalty: an edge that terminates the sentence but cannot
             // naturally end one (mirror of the BOS cost above).
-            const float eos_cost = closes_sentence ? scorer.eosCost(edge, prev_extended_pos) : 0.0F;
+            const float eos_cost = closes_sentence ? scorer.eosCost(edge, prev_extended_pos, prev_length) : 0.0F;
 
             const float total = entry.cost + word_cost + conn_cost + eos_cost + kTransitionCost;
 

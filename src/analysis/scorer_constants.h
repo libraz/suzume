@@ -467,6 +467,12 @@ constexpr float kEosSokuonOnbinPenalty = scale::kAlmostNever;
 // A registered adverb ending in the connective て/で is a clause opener
 // (続いて, 改めて); closing the utterance on one means the verb's te-form.
 constexpr float kEosTeEndingAdverbPenalty = scale::kNever;
+// A fabricated continuative after a one-character noun closing the utterance.
+constexpr float kEosNounContinuativePenalty = scale::kStrong;
+
+// The recollective け after a bare common noun is the tail of a nominalized verb.
+constexpr float kPenaltyBareNounRecollectiveKe = scale::kStrong;
+
 // An attributive compound particle (による) closing its modifier at a particle,
 // symbol, auxiliary or the end of the utterance has no noun to modify.
 constexpr float kPenaltyAttributiveCompoundParticleClose = scale::kProhibitive;

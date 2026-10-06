@@ -2091,6 +2091,54 @@
       ],
       "id": "shiburine",
       "input": "久しぶりね"
+    },
+    {
+      "description": "夜明け - auto-generated",
+      "expected": [
+        {
+          "lemma": "夜明け",
+          "pos": "Noun",
+          "surface": "夜明け"
+        }
+      ],
+      "id": "ke_3",
+      "input": "夜明け"
+    },
+    {
+      "description": "日暮れ - auto-generated",
+      "expected": [
+        {
+          "lemma": "日暮れ",
+          "pos": "Noun",
+          "surface": "日暮れ"
+        }
+      ],
+      "id": "re_3",
+      "input": "日暮れ"
+    },
+    {
+      "description": "夕焼け - auto-generated",
+      "expected": [
+        {
+          "lemma": "夕焼け",
+          "pos": "Noun",
+          "surface": "夕焼け"
+        }
+      ],
+      "id": "ke_4",
+      "input": "夕焼け"
+    },
+    {
+      "description": "雪解け - auto-generated",
+      "expected": [
+        {
+          "lemma": "雪解け",
+          "pos": "Noun",
+          "surface": "雪解け"
+        }
+      ],
+      "id": "ke_5",
+      "input": "雪解け"
     }
   ],
   "description": "General nouns (part 4/4)",

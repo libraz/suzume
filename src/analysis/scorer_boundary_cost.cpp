@@ -26,7 +26,7 @@ float Scorer::bosCost(const core::LatticeEdge& edge) const {
   return sc::getBoundaryCost(edge.extended_pos).bos;
 }
 
-float Scorer::eosCost(const core::LatticeEdge& edge, core::ExtendedPOS prev_extended_pos) const {
+float Scorer::eosCost(const core::LatticeEdge& edge, core::ExtendedPOS prev_extended_pos, size_t prev_length) const {
   if (edge.extended_pos == core::ExtendedPOS::NounFormal && prev_extended_pos == core::ExtendedPOS::VerbRenyokei &&
       !grammar::isSubstantiveFormalNoun(edge.surface)) {
     return sc::kEosRenyokeiFormalNounPenalty;
@@ -42,6 +42,13 @@ float Scorer::eosCost(const core::LatticeEdge& edge, core::ExtendedPOS prev_exte
       (utf8::endsWith(edge.surface, "て") || utf8::endsWith(edge.surface, "で")) &&
       prev_extended_pos != core::ExtendedPOS::Unknown && prev_extended_pos != core::ExtendedPOS::Symbol) {
     return sc::kEosTeEndingAdverbPenalty;
+  }
+
+  // A fabricated continuative after a one-character noun that closes the
+  // utterance is the okurigana tail of a nominalized verb compound (日暮れ).
+  if (edge.extended_pos == core::ExtendedPOS::VerbRenyokei && !edge.fromDictionary() &&
+      prev_extended_pos == core::ExtendedPOS::Noun && prev_length == 1) {
+    return sc::kEosNounContinuativePenalty;
   }
 
   // An attributive compound particle needs the noun it modifies; closing the

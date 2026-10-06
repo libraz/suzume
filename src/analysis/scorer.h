@@ -124,9 +124,12 @@ class Scorer {
    * @param prev_extended_pos Category of the morpheme before it, or
    *                          ExtendedPOS::Unknown when the edge opens the
    *                          sentence as well as closing it
+   * @param prev_length Length in codepoints of the morpheme before it, or 0
+   *                    when there is none
    * @return EOS cost
    */
-  float eosCost(const core::LatticeEdge& edge, core::ExtendedPOS prev_extended_pos = core::ExtendedPOS::Unknown) const;
+  float eosCost(const core::LatticeEdge& edge, core::ExtendedPOS prev_extended_pos = core::ExtendedPOS::Unknown,
+                size_t prev_length = 0) const;
 
   /**
    * @brief Get POS prior

@@ -413,6 +413,17 @@ float computeBarePotentialRenyokeiPenalty(const core::LatticeEdge& prev, const c
   return penalty;
 }
 
+/// The recollective final particle け (誰だっけ, あったっけ) attaches to a
+/// finished predicate, not to a bare common noun; after one, け is the final
+/// kana of a nominalized verb (夜明け, 夕焼け, 雪解け).
+float computeBareNounRecollectiveKePenalty(const core::LatticeEdge& prev, const core::LatticeEdge& next) {
+  const bool bare_noun_host =
+      prev.pos == core::PartOfSpeech::Noun && prev.extended_pos != core::ExtendedPOS::NounFormal;
+  const bool recollective_ke =
+      next.extended_pos == core::ExtendedPOS::ParticleFinal && utf8::equalsAny(next.surface, {"け"});
+  return bare_noun_host && recollective_ke ? sc::kPenaltyBareNounRecollectiveKe : sc::scale::kNeutral;
+}
+
 float computeCopulaConditionalBonus(const core::LatticeEdge& prev, const core::LatticeEdge& next) {
   // The literary concessive/conditional construction であれ(ば) is the
   // continuative copula followed by the hypothetical form of ある. Favor this
