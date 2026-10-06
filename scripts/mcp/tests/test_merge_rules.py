@@ -1717,6 +1717,48 @@ class TestPlaceNameKanjiMerge:
         assert rule != "proper-noun"
 
 
+class TestPejorativeYagaru:
+    def test_moves_the_ya_of_miya_back_to_the_auxiliary(self):
+        tokens = [
+            _tok("見や", pos="動詞", pos_sub1="自立", conj_form="連用形", lemma="見やる"),
+            _tok("がっ", pos="助動詞", conj_form="連用タ接続", lemma="がる"),
+            _tok("て", pos="助詞", pos_sub1="接続助詞", lemma="て"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "見やがって")
+        assert [token["surface"] for token in result] == ["見", "やがっ", "て"]
+        assert result[0]["lemma"] == "見る"
+        assert rule == "pejorative-yagaru"
+
+    def test_leaves_the_verb_miyaru_alone(self):
+        tokens = [
+            _tok("見や", pos="動詞", pos_sub1="自立", conj_form="連用形", lemma="見やる"),
+            _tok("っ", pos="助動詞", lemma="た"),
+        ]
+        result, _ = apply_suzume_merge(tokens, "見やっ")
+        assert [token["surface"] for token in result] == ["見や", "っ"]
+
+
+class TestPejorativeYagaruAfterOneKanjiStem:
+    def test_regroups_the_yaru_continuative_and_the_garu_suffix(self):
+        tokens = [
+            _tok("見や", pos="動詞", pos_sub1="自立", conj_form="連用形", lemma="見やる"),
+            _tok("がっ", pos="助動詞", conj_form="連用タ接続", lemma="がる"),
+            _tok("て", pos="助詞", pos_sub1="接続助詞", lemma="て"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "見やがって")
+        assert [token["surface"] for token in result] == ["見", "やがっ", "て"]
+        assert result[1]["lemma"] == "やがる"
+        assert rule == "pejorative-yagaru"
+
+    def test_keeps_the_verb_yaru_when_no_garu_follows(self):
+        tokens = [
+            _tok("見や", pos="動詞", pos_sub1="自立", conj_form="連用形", lemma="見やる"),
+            _tok("り", pos="助詞", lemma="り"),
+        ]
+        result, _ = apply_suzume_merge(tokens, "見やり")
+        assert [token["surface"] for token in result] == ["見や", "り"]
+
+
 class TestGuessedMimeticSpan:
     def test_rebuilds_an_impact_mimetic_cut_into_an_adverb_and_a_nasal(self):
         tokens = [

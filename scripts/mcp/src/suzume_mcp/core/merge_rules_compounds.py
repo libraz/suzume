@@ -495,6 +495,26 @@ def _merge_colloquial_forms(state: MergeState) -> bool:
             merged = True
             if applied_rule is None:
                 applied_rule = "pejorative-yagaru"
+
+        # 8d'. The same auxiliary after a one-kanji ichidan stem comes back as the
+        # continuative of やる (見+や+がっ+て as 見や+がっ+て, from 見やる) plus a
+        # がる suffix; the や belongs to the auxiliary, not to the verb.
+        if (
+            not merged
+            and t.get("pos") == "動詞"
+            and len(t.get("surface", "")) == 2
+            and t["surface"].endswith("や")
+            and (t.get("lemma") or "").endswith("やる")
+            and i + 1 < len(tokens)
+            and _YAGARU_TAIL.fullmatch(tokens[i + 1].get("surface", ""))
+        ):
+            stem = t["surface"][:-1]
+            result.append({"surface": stem, "pos": "動詞", "lemma": base_from_renyokei(stem) or stem + "る"})
+            result.append({"surface": "や" + tokens[i + 1]["surface"], "pos": "助動詞", "lemma": "やがる"})
+            i += 2
+            merged = True
+            if applied_rule is None:
+                applied_rule = "pejorative-yagaru"
     finally:
         state.i = i
         state.t = t
