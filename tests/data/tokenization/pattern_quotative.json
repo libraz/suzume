@@ -1992,6 +1992,102 @@
       ],
       "id": "final_toiu_after_terminal",
       "input": "雨が降るという"
+    },
+    {
+      "description": "headless teiu splits into quotative te, iu and ka",
+      "expected": [
+        {
+          "lemma": "いや",
+          "pos": "Interjection",
+          "surface": "いや"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いう",
+          "pos": "Verb",
+          "surface": "いう"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "違う",
+          "pos": "Verb",
+          "surface": "違う"
+        }
+      ],
+      "id": "iya_teiuka_u",
+      "input": "いや、ていうか違う"
+    },
+    {
+      "description": "headless teiu splits into quotative te, iu and ka",
+      "expected": [
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いう",
+          "pos": "Verb",
+          "surface": "いう"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "駅",
+          "pos": "Noun",
+          "surface": "駅"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "遠い",
+          "pos": "Adjective",
+          "surface": "遠い"
+        }
+      ],
+      "id": "teiuka_ha_i",
+      "input": "ていうか、駅は遠い"
+    },
+    {
+      "description": "toiuka splits into to, iu and ka",
+      "expected": [
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "いう",
+          "pos": "Verb",
+          "surface": "いう"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "違う",
+          "pos": "Verb",
+          "surface": "違う"
+        }
+      ],
+      "id": "toiuka_u",
+      "input": "というか違う"
     }
   ],
   "description": "Quotative patterns (という, といって, etc.)",

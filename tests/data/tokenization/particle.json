@@ -498,7 +498,7 @@
       "expected": [
         {
           "lemma": "ていう",
-          "pos": "Particle",
+          "pos": "Determiner",
           "surface": "ていう"
         },
         {

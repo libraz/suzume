@@ -579,6 +579,7 @@ def _opens_noun_phrase(tokens: list[dict], start: int) -> bool:
 _HEADLESS_QUOTATIVE_DETERMINERS: dict[str, tuple[tuple[str, str, str], ...]] = {
     "という": (("と", "Particle", "と"), ("いう", "Verb", "いう")),
     "っていう": (("って", "Particle", "って"), ("いう", "Verb", "いう")),
+    "ていう": (("て", "Particle", "て"), ("いう", "Verb", "いう")),
     "とかいう": (("とか", "Particle", "とか"), ("いう", "Verb", "いう")),
     "といった": (("と", "Particle", "と"), ("いっ", "Verb", "いう"), ("た", "Auxiliary", "た")),
 }

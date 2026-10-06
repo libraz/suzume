@@ -377,11 +377,13 @@ float computePrefixSymbolBonus(const core::LatticeEdge& prev, const core::Lattic
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
 
-  // Bonus for SYMBOL → long pure-hiragana OTHER (furigana pattern)
-  // E.g., 東京（とうきょう） - the hiragana in parentheses is reading/furigana
-  // Long hiragana sequences after symbols should stay as single tokens
+  // Bonus for opening bracket → long pure-hiragana OTHER (furigana pattern)
+  // E.g., 東京（とうきょう） - the hiragana in parentheses is reading/furigana.
+  // Like the two furigana rules around it, it is gated to an opening bracket:
+  // after punctuation the kana opens an ordinary clause (、+て+いう+か).
   if (prev.pos == core::PartOfSpeech::Symbol && next.pos == core::PartOfSpeech::Other &&
-      grammar::isPureHiragana(next.surface) && next.surface.size() >= core::kFourJapaneseCharBytes) {
+      normalize::isOpeningBracket(firstCodepoint(prev.surface)) && grammar::isPureHiragana(next.surface) &&
+      next.surface.size() >= core::kFourJapaneseCharBytes) {
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryStrongBonus);
   }
 

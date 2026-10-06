@@ -1445,6 +1445,13 @@ class TestQuotativeDeterminerHead:
         tokens = [{"surface": "行く", "pos": "Verb"}, {"surface": "といった", "pos": "Determiner"}]
         assert postprocessors.postprocess_quotative_determiner_head(tokens)
         assert self._surfaces(tokens) == ["行く", "と", "いっ", "た"]
+        tokens = [
+            {"surface": "いや", "pos": "Interjection"},
+            {"surface": "ていう", "pos": "Determiner"},
+            {"surface": "か", "pos": "Particle"},
+        ]
+        assert postprocessors.postprocess_quotative_determiner_head(tokens)
+        assert self._surfaces(tokens) == ["いや", "て", "いう", "か"]
 
     def test_hostless_and_nominalizer_contexts_are_left_alone(self):
         bare = [{"surface": "という", "pos": "Determiner"}]

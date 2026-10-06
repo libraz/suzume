@@ -134,7 +134,6 @@ EntrySpecRange getConjunctionEntries() {
       adv("つねに", ""),        // 恒常副詞
       adv("おそらくは", ""),    // Fixed probability adverb
       particle("がてら", EPOS::ParticleConj),     // purpose-combining conjunctive expression
-      particle("ていう", EPOS::ParticleQuote),    // 口語引用表現
       particle("やら", EPOS::ParticleAdverbial),  // 列挙助詞
   };
   return makeEntrySpecRange(kEntries);

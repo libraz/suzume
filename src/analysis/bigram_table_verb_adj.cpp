@@ -286,6 +286,9 @@ void setVerbAndAdjectiveCosts(BigramMatrix& table) {
       // The onbin stem only takes て/た/たら/たり; a quotative after it is the
       // past た split off its own sokuon (行かなかっ+たっ+ていう).
       {EPOS::VerbOnbinkei, EPOS::ParticleQuote, cost::kNever},
+      // Nor the quotative adnominal spelled with the same て (本+って+いう, not
+      // 本っ+ていう).
+      {EPOS::VerbOnbinkei, EPOS::DeterminerQuotative, cost::kNever},
 
       // VerbKateikei → AdjBasic (滅びれば+いい) - strong bonus for 〜ればいい pattern
       // This helps beat the split path 滅び+れ+ば+いい where れ is misanalyzed as passive

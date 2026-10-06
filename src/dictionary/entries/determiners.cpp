@@ -52,6 +52,7 @@ EntrySpecRange getDeterminerEntries() {
       quotative_det("という", ""),
       quotative_det("といった", ""),
       quotative_det("っていう", ""),  // colloquial
+      quotative_det("ていう", ""),    // colloquial, after a vowel (本ていう話)
       // Naming quotative built on the 並立助詞 とか (確認とかいう話). It heads the
       // same attributive slot as という, so without the entry the shared trailing
       // い is read as adjective okurigana on the noun to its left.

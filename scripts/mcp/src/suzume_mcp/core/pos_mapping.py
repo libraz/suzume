@@ -166,8 +166,8 @@ def map_mecab_pos(token: dict | str) -> str:
     if surface == "大変" and pos in ("名詞", "副詞"):
         return "Adverb"
 
-    # っていう: -> Determiner
-    if surface == "っていう" and pos == "助詞":
+    # っていう / ていう: -> Determiner (one quotative adnominal, two spellings)
+    if surface in ("っていう", "ていう") and pos == "助詞":
         return "Determiner"
 
     # じゃん: -> Particle
