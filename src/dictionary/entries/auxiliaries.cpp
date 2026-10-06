@@ -992,12 +992,12 @@ EntrySpecRange getAuxiliaryEntries() {
       aux("ありんす", "ある", EPOS::Unknown),
       aux("ありんした", "ある", EPOS::Unknown),
       aux("ありんせん", "ある", EPOS::Unknown),
-      aux("ざんす", "ある", EPOS::Unknown),
       aux("ざんせん", "ある", EPOS::Unknown),
       // Role-language polite copulas. A connective で in front is the copula's
       // own continuative and keeps its token (で+やんす, で+ござんす).
       aux("ござんす", "ござる", EPOS::AuxGozaru),
       aux("ざます", "ざます", EPOS::AuxCopulaDesu),
+      aux("ざんす", "ある", EPOS::AuxCopulaDesu),
       aux("やんす", "やんす", EPOS::AuxGozaru),
       aux("なんし", "ます", EPOS::AuxKuruwaPolite),
       aux("なんした", "ます", EPOS::AuxKuruwaPolite),

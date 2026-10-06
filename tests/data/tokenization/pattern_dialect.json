@@ -981,6 +981,40 @@
       ],
       "id": "ttchi_dame",
       "input": "行っちゃだめ"
+    },
+    {
+      "description": "そうざんす - auto-generated",
+      "expected": [
+        {
+          "lemma": "そう",
+          "pos": "Adverb",
+          "surface": "そう"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Auxiliary",
+          "surface": "ざんす"
+        }
+      ],
+      "id": "souzansu",
+      "input": "そうざんす"
+    },
+    {
+      "description": "学生ざんす - auto-generated",
+      "expected": [
+        {
+          "lemma": "学生",
+          "pos": "Noun",
+          "surface": "学生"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Auxiliary",
+          "surface": "ざんす"
+        }
+      ],
+      "id": "zansu",
+      "input": "学生ざんす"
     }
   ],
   "description": "pattern_dialect tests",
