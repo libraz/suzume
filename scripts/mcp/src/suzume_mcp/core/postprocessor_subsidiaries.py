@@ -350,6 +350,7 @@ def postprocess_honorific_request(tokens: list[dict]) -> bool:
         ) in (
             "くださる",
             "いたす",
+            "致す",
             "いただく",
             "いただける",
             "申し上げる",

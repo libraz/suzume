@@ -199,6 +199,10 @@ bool isSuruMizenkeiSurface(std::string_view surface) {
   return surface == "せ";
 }
 
+bool isEpistolaryTerminalSurface(std::string_view surface) {
+  return surface == "候";
+}
+
 bool isSuruBaseForm(std::string_view surface) {
   return surface == "する";
 }

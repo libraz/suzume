@@ -208,9 +208,13 @@ float computeTaFormVolitionalBonus(const core::LatticeEdge& prev, const core::La
   const bool attributive_keri_after_continuative = prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
                                                    next.extended_pos == core::ExtendedPOS::AuxClassicalKeri &&
                                                    utf8::endsWith(next.surface, "る");
+  // The epistolary 候 closes a clause after a continuative; a conjunctive
+  // particle ends a modern clause, so い+た+し+候 is the continuative いたし plus 候.
+  const bool epistolary_terminal_after_conjunctive =
+      prev.extended_pos == core::ExtendedPOS::ParticleConj && grammar::isEpistolaryTerminalSurface(next.surface);
   if (bare_volitional_after_non_o_row || negative_after_godan_non_irrealis ||
       suru_continuative_before_classical_negative || suru_irrealis_before_modern_aux ||
-      attributive_keri_after_continuative)
+      attributive_keri_after_continuative || epistolary_terminal_after_conjunctive)
     SUZUME_CONNECTION_ADD(bonus, cost::kSevere);
   if (modern_volitional)
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryStrongBonus + cost::kStrongBonus);

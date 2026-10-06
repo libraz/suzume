@@ -2257,6 +2257,124 @@
       ],
       "id": "ninarushi_mo_ku",
       "input": "春になるし花も咲く"
+    },
+    {
+      "description": "参考にいたし候 - auto-generated",
+      "expected": [
+        {
+          "lemma": "参考",
+          "pos": "Noun",
+          "surface": "参考"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "いたす",
+          "pos": "Verb",
+          "surface": "いたし"
+        },
+        {
+          "lemma": "候ふ",
+          "pos": "Verb",
+          "surface": "候"
+        }
+      ],
+      "id": "niitashi",
+      "input": "参考にいたし候"
+    },
+    {
+      "description": "お送り致します - auto-generated",
+      "expected": [
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "送る",
+          "pos": "Verb",
+          "surface": "送り"
+        },
+        {
+          "lemma": "致す",
+          "pos": "Verb",
+          "surface": "致し"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "o_ri_shimasu",
+      "input": "お送り致します"
+    },
+    {
+      "description": "お知らせ致します - auto-generated",
+      "expected": [
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "知らせる",
+          "pos": "Verb",
+          "surface": "知らせ"
+        },
+        {
+          "lemma": "致す",
+          "pos": "Verb",
+          "surface": "致し"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "o_rase_shimasu",
+      "input": "お知らせ致します"
+    },
+    {
+      "description": "書類をお願い致します - auto-generated",
+      "expected": [
+        {
+          "lemma": "書類",
+          "pos": "Noun",
+          "surface": "書類"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "願う",
+          "pos": "Verb",
+          "surface": "願い"
+        },
+        {
+          "lemma": "致す",
+          "pos": "Verb",
+          "surface": "致し"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "woo_i_shimasu",
+      "input": "書類をお願い致します"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",
