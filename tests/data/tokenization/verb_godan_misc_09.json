@@ -2813,6 +2813,28 @@
       ],
       "id": "raha_ku",
       "input": "僕らは行く"
+    },
+    {
+      "description": "あ、わかった。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "あ",
+          "pos": "Interjection",
+          "surface": "あ"
+        },
+        {
+          "lemma": "わかる",
+          "pos": "Verb",
+          "surface": "わかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "a_wakattta",
+      "input": "あ、わかった。"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",

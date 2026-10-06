@@ -300,6 +300,21 @@ void UnknownWordGenerator::generateCharacterSpeechCandidates(std::string_view /*
 void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                                           const std::vector<normalize::CharType>& char_types,
                                                           std::vector<UnknownCandidate>& candidates) const {
+  // A bare vowel mora that opens a clause and is closed by the comma is an
+  // interjection (あ、そうか; え、そうなの), not a fragment of kana.
+  constexpr size_t kBareVowelLength = 1;
+  if (start_pos + kBareVowelLength < codepoints.size() && isBareVowelMora(codepoints[start_pos]) &&
+      (codepoints[start_pos + kBareVowelLength] == U'、' || codepoints[start_pos + kBareVowelLength] == U',') &&
+      (start_pos == 0 || char_types[start_pos - 1] == normalize::CharType::Symbol)) {
+    auto interjection = makeCandidate(extractSubstring(codepoints, start_pos, start_pos + kBareVowelLength), start_pos,
+                                      start_pos + kBareVowelLength, core::PartOfSpeech::Interjection,
+                                      candidate::kLaughterInterjectionCost, true, CandidateOrigin::Onomatopoeia);
+#ifdef SUZUME_DEBUG_INFO
+    interjection.pattern = "bare_vowel_interjection";
+#endif
+    candidates.push_back(std::move(interjection));
+  }
+
   // Need at least 3 characters for ABり pattern (4 for ABAB/AA patterns)
   if (start_pos + 2 >= codepoints.size()) {
     return;

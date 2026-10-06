@@ -1173,6 +1173,28 @@
       ],
       "id": "kono_ni_nai",
       "input": "この辺にカフェない？"
+    },
+    {
+      "description": "あ、そうか。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "あ",
+          "pos": "Interjection",
+          "surface": "あ"
+        },
+        {
+          "lemma": "そう",
+          "pos": "Adverb",
+          "surface": "そう"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "a_souka",
+      "input": "あ、そうか。"
     }
   ],
   "description": "Basic tokenization tests",
