@@ -432,6 +432,60 @@
       ],
       "id": "kukotode_suru",
       "input": "行くことで解決する"
+    },
+    {
+      "description": "最近ブレない - auto-generated",
+      "expected": [
+        {
+          "lemma": "最近",
+          "pos": "Noun",
+          "surface": "最近"
+        },
+        {
+          "lemma": "ブレる",
+          "pos": "Verb",
+          "surface": "ブレ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "nai_5",
+      "input": "最近ブレない"
+    },
+    {
+      "description": "彼はキレなかった - auto-generated",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "キレる",
+          "pos": "Verb",
+          "surface": "キレ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ha_nakattta",
+      "input": "彼はキレなかった"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",

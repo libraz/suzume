@@ -2480,6 +2480,33 @@
       ],
       "id": "nisento",
       "input": "気にせんと"
+    },
+    {
+      "description": "彼はセンスない - auto-generated",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "センス",
+          "pos": "Noun",
+          "surface": "センス"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
+      "id": "ha_nai",
+      "input": "彼はセンスない"
     }
   ],
   "description": "Negation auxiliaries (ない、ぬ)",

@@ -163,6 +163,20 @@ class TestKatakanaIchidanContinuative:
 
         assert not postprocess_katakana_ichidan_continuative(tokens)
 
+    def test_e_row_noun_before_negative_is_ichidan_stem(self):
+        tokens = [_tok("ブレ", "Noun"), _tok("ない", "Adjective", lemma="ない")]
+
+        assert postprocess_katakana_ichidan_continuative(tokens)
+        assert (tokens[0]["pos"], tokens[0]["lemma"]) == ("Verb", "ブレる")
+        assert tokens[1]["pos"] == "Auxiliary"
+
+    def test_u_row_and_i_row_nouns_stay_before_adjective_nai(self):
+        for noun in ("センス", "ピンチ"):
+            tokens = [_tok(noun, "Noun"), _tok("ない", "Adjective", lemma="ない")]
+
+            assert not postprocess_katakana_ichidan_continuative(tokens)
+            assert tokens[1]["pos"] == "Adjective"
+
 
 class TestKatakanaGodanTeForm:
     def test_quotative_before_masu_is_te_form(self):

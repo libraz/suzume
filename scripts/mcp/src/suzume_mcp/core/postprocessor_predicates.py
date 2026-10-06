@@ -49,12 +49,40 @@ _KATAKANA_ICHIDAN_STEM = regex.compile(
 )
 
 
+# The negative selects the irrealis, which for an ichidan verb is the stem itself, so
+# it proves a verb only after an e-row mora (ブレ+ない); after an i-row one the noun
+# plus the adjective ない is as likely (ピンチ+ない).
+_KATAKANA_ICHIDAN_E_ROW_STEM = regex.compile(r"[\p{Katakana}--[ー]]*[エケゲセゼテデネヘベペメレ]", regex.V1)
+_NEGATIVE_CELLS = frozenset({"ない", "なく", "なかっ", "なけれ"})
+
+
+def _read_katakana_ichidan_negative(tokens: list[dict], idx: int) -> bool:
+    """Read katakana noun + ない as an ichidan stem plus the negative auxiliary."""
+    token, following = tokens[idx], tokens[idx + 1]
+    if (
+        token.get("pos") != "Noun"
+        or following.get("pos") != "Adjective"
+        or following.get("lemma") != "ない"
+        or following.get("surface") not in _NEGATIVE_CELLS
+        or _KATAKANA_ICHIDAN_E_ROW_STEM.fullmatch(token.get("surface", "")) is None
+        or (idx > 0 and regex.search(r"\p{Katakana}$", tokens[idx - 1].get("surface", "")) is not None)
+    ):
+        return False
+    token["pos"] = "Verb"
+    token["lemma"] = token["surface"] + "る"
+    following["pos"] = "Auxiliary"
+    return True
+
+
 def postprocess_katakana_ichidan_continuative(tokens: list[dict]) -> bool:
     """Read a katakana noun before a continuative-selecting word as an ichidan stem (バテ+まし+た)."""
     changed = False
     for idx in range(len(tokens) - 1):
         token, following = tokens[idx], tokens[idx + 1]
         surface = token.get("surface", "")
+        if _read_katakana_ichidan_negative(tokens, idx):
+            changed = True
+            continue
         selects_continuative = (
             following.get("pos") == "Auxiliary" and following.get("lemma") in ("ます", "た", "たい")
         ) or (following.get("pos") == "Particle" and following.get("surface") == "て")

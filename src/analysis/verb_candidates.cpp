@@ -182,10 +182,12 @@ void generateKatakanaVerbCandidates(const std::vector<char32_t>& codepoints, siz
 
   // A katakana run closing on an e-row or i-row mora is an ichidan stem when
   // what follows selects a continuative (ウケ+ました, バテ+た, コケ+て). The
-  // negative is left out: it selects the irrealis, which for an ichidan verb is
-  // the same cell and is no evidence of a verb over a noun (ペン+ない). A
+  // negative selects the irrealis, which for an ichidan verb is the same cell
+  // and no evidence of a verb over a noun (ペン+ない), so it counts only after
+  // an e-row mora, where the noun reading is rare (ブレ+ない, ズレ+なかった). A
   // long-vowel mark spells a loanword, never a native ichidan stem (ケーキ), and
   // the stem is the whole katakana run, not its tail (ケー+キ).
+  bool splits_negative_stem = false;
   const bool opens_katakana_run = start_pos == 0 || char_types[start_pos - 1] != normalize::CharType::Katakana;
   const bool has_long_vowel_mark = std::find(codepoints.begin() + static_cast<std::ptrdiff_t>(start_pos),
                                              codepoints.begin() + static_cast<std::ptrdiff_t>(kata_end),
@@ -201,6 +203,7 @@ void generateKatakanaVerbCandidates(const std::vector<char32_t>& codepoints, siz
     // kana belongs to (ケーキ+たべた, ケーキ+たのしみ), not the auxiliary.
     size_t selecting_end = 0;
     size_t content_end = 0;
+    bool selects_irrealis = false;
     if (kana::isERowCodepoint(stem_final_hiragana) || kana::isIRowCodepoint(stem_final_hiragana)) {
       for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, kata_end, hira_end)) {
         if (match.entry == nullptr) {
@@ -208,10 +211,13 @@ void generateKatakanaVerbCandidates(const std::vector<char32_t>& codepoints, siz
         }
         const auto epos = match.entry->extended_pos;
         const size_t match_end = kata_end + match.length;
+        const bool negative_after_e_row =
+            epos == core::ExtendedPOS::AuxNegativeNai && kana::isERowCodepoint(stem_final_hiragana);
         if (epos == core::ExtendedPOS::AuxTenseMasu || epos == core::ExtendedPOS::AuxTenseTa ||
-            epos == core::ExtendedPOS::AuxDesireTai ||
+            epos == core::ExtendedPOS::AuxDesireTai || negative_after_e_row ||
             (epos == core::ExtendedPOS::ParticleConj && codepoints[kata_end] == U'て')) {
           selecting_end = std::max(selecting_end, match_end);
+          selects_irrealis = selects_irrealis || negative_after_e_row;
         } else if (match.entry->pos == core::PartOfSpeech::Verb || match.entry->pos == core::PartOfSpeech::Adjective ||
                    match.entry->pos == core::PartOfSpeech::Noun || match.entry->pos == core::PartOfSpeech::Adverb) {
           content_end = std::max(content_end, match_end);
@@ -222,11 +228,15 @@ void generateKatakanaVerbCandidates(const std::vector<char32_t>& codepoints, siz
     // Near-neutral, so the selecting auxiliary's connection decides against the noun.
     if (selects_continuative) {
       const std::string stem = extractSubstring(codepoints, start_pos, kata_end);
-      candidates.push_back(makeVerbCandidate(stem, start_pos, kata_end, candidate::verb_cost::kWeakPenalty, stem + "る",
-                                             dictionary::ConjugationType::Ichidan, true, CandidateOrigin::VerbKatakana,
-                                             candidate::kNoConfidence, "katakana_ichidan_renyokei",
-                                             core::ExtendedPOS::VerbRenyokei));
+      candidates.push_back(
+          makeVerbCandidate(stem, start_pos, kata_end, candidate::verb_cost::kWeakPenalty, stem + "る",
+                            dictionary::ConjugationType::Ichidan, true, CandidateOrigin::VerbKatakana,
+                            candidate::kNoConfidence, "katakana_ichidan_renyokei",
+                            selects_irrealis ? core::ExtendedPOS::VerbMizenkei : core::ExtendedPOS::VerbRenyokei));
     }
+    // The stem and the negative are separate tokens, as for a kanji ichidan
+    // verb (食べ+ない), so the whole-verb candidate below is not offered.
+    splits_negative_stem = selects_continuative && selects_irrealis;
   }
 
   // A katakana stem followed by an auxiliary or a する cell is split rather
@@ -317,8 +327,12 @@ void generateKatakanaVerbCandidates(const std::vector<char32_t>& codepoints, siz
           stem_final >= U'ァ' && stem_final <= U'ヶ' ? stem_final - (U'ァ' - U'ぁ') : 0;
       const bool ichidan_stem_final =
           !small_vowel && (kana::isERowCodepoint(stem_final_hiragana) || kana::isIRowCodepoint(stem_final_hiragana));
-      if (best.verb_type == grammar::VerbType::Ichidan && !ichidan_stem_final &&
-          vh::naiNegativeFormLengthAt(codepoints, kata_end) == end_pos - kata_end) {
+      const bool whole_negative_form = best.verb_type == grammar::VerbType::Ichidan &&
+                                       vh::naiNegativeFormLengthAt(codepoints, kata_end) == end_pos - kata_end;
+      if (whole_negative_form && splits_negative_stem) {
+        continue;
+      }
+      if (whole_negative_form && !ichidan_stem_final) {
         cost += candidate::verb_cost::kKatakanaIchidanNegativePenalty;
       }
       candidates.push_back(makeVerbCandidate(
