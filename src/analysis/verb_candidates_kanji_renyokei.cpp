@@ -332,11 +332,23 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
         // e-row cell (書け+今), not the potential (書け+ない).
         const bool stranded_potential_stem =
             vh::isStrandedPotentialStem(dict_manager, ichidan_cand.base_form, codepoints, renyokei_end);
+        // An unattested stem whose okurigana is a final particle that attaches to
+        // a bare nominal (水+ね, 花+ね) is that particle wherever the particle can
+        // close: at the clause end or held on its own vowel (水+ねえ). There the
+        // stem needs predicate evidence of its own — a case-marked argument, a
+        // comma-chained clause — before it outranks the nominal plus the particle.
+        const bool particle_closes_at_okurigana = vh::clauseEndsAt(codepoints, renyokei_end) ||
+                                                  normalize::isProlongedSoundMark(continuation) ||
+                                                  continuation == grammar::getVowelForChar(first_hira);
+        const bool okurigana_is_nominal_final_particle =
+            !ichidan_base_is_dict && grammar::isNominalHostFinalParticle(first_hira) && particle_closes_at_okurigana &&
+            !comma_clause_chaining && !vh::followsCaseParticle(dict_manager, codepoints, start_pos);
         if (!prefer_suru && !prefer_godan && ichidan_cand.confidence > conf_threshold && !surface_is_dict_noun &&
             !single_kanji_te_form && !suffix_is_dict_verb && !trailing_span_is_dict_suffix &&
             !suffix_is_godan_before_auxiliary && !adj_homograph_blocked && !okurigana_opens_auxiliary &&
             !okurigana_opens_bound_suffix && !unverified_multi_kanji_suru_mizen &&
-            !unverified_before_temporal_nominal && !shifted_row_ichidan_stem && !stranded_potential_stem) {
+            !unverified_before_temporal_nominal && !shifted_row_ichidan_stem && !stranded_potential_stem &&
+            !okurigana_is_nominal_final_particle) {
           // Negative cost to strongly favor split over combined analysis
           // Combined forms get optimal_length bonus (-0.5), so we need to be lower
           // A bound verb prefix is the one multi-kanji stem that cannot be read

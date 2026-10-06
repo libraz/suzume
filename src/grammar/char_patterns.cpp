@@ -572,6 +572,10 @@ bool startsInterrogativeQuoteIntroduction(std::string_view surface) {
   return utf8::startsWith(surface, "かというと");
 }
 
+bool isNominalHostFinalParticle(char32_t mora) {
+  return mora == U'ね' || mora == U'よ' || mora == U'さ' || mora == U'な';
+}
+
 bool startsClassicalConjecturalAuxiliary(std::string_view surface) {
   return utf8::startsWith(surface, "けむ");
 }

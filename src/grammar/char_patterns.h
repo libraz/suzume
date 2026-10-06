@@ -542,6 +542,15 @@ bool startsSentenceParticleKanaQuote(std::string_view surface);
 bool startsInterrogativeQuoteIntroduction(std::string_view surface);
 
 /**
+ * @brief Whether a one-mora final particle attaches directly to a nominal
+ *
+ * ね, よ, さ and な close a bare noun phrase as well as a predicate (水+ね,
+ * それ+さ). べ, え and the regional particles close a predicate terminal only,
+ * so their mora after a kanji says nothing against a verb stem (食べ, 考え).
+ */
+bool isNominalHostFinalParticle(char32_t mora);
+
+/**
  * @brief Whether text begins the classical conjectural auxiliary けむ
  * @param surface Text immediately after a prospective verb stem
  * @return True when the classical continuative auxiliary follows

@@ -1697,6 +1697,109 @@
       ],
       "id": "ni_n",
       "input": "猫にゃーん"
+    },
+    {
+      "description": "final particle ne after a bare noun, not an ichidan stem",
+      "expected": [
+        {
+          "lemma": "水",
+          "pos": "Noun",
+          "surface": "水"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        },
+        {
+          "lemma": "大事",
+          "pos": "Adjective",
+          "surface": "大事"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "ne_da",
+      "input": "水ね、大事だ"
+    },
+    {
+      "description": "final particle ne after a bare noun, not an ichidan stem",
+      "expected": [
+        {
+          "lemma": "それ",
+          "pos": "Pronoun",
+          "surface": "それ"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        }
+      ],
+      "id": "soreha_ne",
+      "input": "それは本ね。"
+    },
+    {
+      "description": "drawn-out final particle after a bare noun",
+      "expected": [
+        {
+          "lemma": "水",
+          "pos": "Noun",
+          "surface": "水"
+        },
+        {
+          "lemma": "ねえ",
+          "pos": "Particle",
+          "surface": "ねえ"
+        }
+      ],
+      "id": "nee",
+      "input": "水ねえ"
+    },
+    {
+      "description": "ichidan continuative with a case-marked argument keeps its verb reading",
+      "expected": [
+        {
+          "lemma": "髪",
+          "pos": "Noun",
+          "surface": "髪"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "束ねる",
+          "pos": "Verb",
+          "surface": "束ね"
+        },
+        {
+          "lemma": "結ぶ",
+          "pos": "Verb",
+          "surface": "結ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "wo_ne_nda",
+      "input": "髪を束ね、結んだ"
     }
   ],
   "description": "particle_final tests",
