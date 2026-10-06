@@ -1438,6 +1438,87 @@
       ],
       "id": "betebakariitemo",
       "input": "食べてばかりいても"
+    },
+    {
+      "description": "focus particle demo before a volitional irrealis",
+      "expected": [
+        {
+          "lemma": "何度",
+          "pos": "Noun",
+          "surface": "何度"
+        },
+        {
+          "lemma": "でも",
+          "pos": "Particle",
+          "surface": "でも"
+        },
+        {
+          "lemma": "立ち上がる",
+          "pos": "Verb",
+          "surface": "立ち上がろ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "demo_chi_garou",
+      "input": "何度でも立ち上がろう"
+    },
+    {
+      "description": "focus particle demo before a volitional irrealis",
+      "expected": [
+        {
+          "lemma": "何度",
+          "pos": "Noun",
+          "surface": "何度"
+        },
+        {
+          "lemma": "でも",
+          "pos": "Particle",
+          "surface": "でも"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行こ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "demo_kou",
+      "input": "何度でも行こう"
+    },
+    {
+      "description": "focus particle demo before a volitional irrealis",
+      "expected": [
+        {
+          "lemma": "いつ",
+          "pos": "Pronoun",
+          "surface": "いつ"
+        },
+        {
+          "lemma": "でも",
+          "pos": "Particle",
+          "surface": "でも"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来よ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "itsudemo_you",
+      "input": "いつでも来よう"
     }
   ],
   "description": "particle_adverbial tests",

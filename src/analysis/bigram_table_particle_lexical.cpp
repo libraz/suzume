@@ -70,6 +70,10 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
       // ParticleAdverbial → VerbShuushikei (でも+行く) - strong bonus
       // This favors でも+行く over で+も+行く
       {EPOS::ParticleAdverbial, EPOS::VerbShuushikei, cost::kStrongBonus},
+      // The same particle scopes over the volitional and attributive cells of
+      // that predicate (何度+でも+立ち上がろ+う), as the binding particles do.
+      {EPOS::ParticleAdverbial, EPOS::VerbMizenkei, cost::kStrongBonus},
+      {EPOS::ParticleAdverbial, EPOS::VerbRentaikei, cost::kStrongBonus},
 
       // Adverbial particles scope naturally over an evaluative adjective
       // (何でも+いい, どちらでも+よい).
