@@ -799,6 +799,38 @@
       ],
       "id": "toiukotode_shita",
       "input": "ということで解散した"
+    },
+    {
+      "description": "表面を平らにする - auto-generated",
+      "expected": [
+        {
+          "lemma": "表面",
+          "pos": "Noun",
+          "surface": "表面"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "平ら",
+          "pos": "Adjective",
+          "surface": "平ら"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "wo_ranisuru",
+      "input": "表面を平らにする"
     }
   ],
   "description": "Suru-verb patterns with subsidiary verbs - MeCab互換分割 (part 2/2)",

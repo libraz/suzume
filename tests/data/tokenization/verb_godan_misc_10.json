@@ -875,6 +875,65 @@
       ],
       "id": "be_no_ni_ku",
       "input": "食べ放題の店に行く"
+    },
+    {
+      "description": "彼らに会う - auto-generated",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "ら",
+          "pos": "Suffix",
+          "surface": "ら"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "会う",
+          "pos": "Verb",
+          "surface": "会う"
+        }
+      ],
+      "id": "rani_u",
+      "input": "彼らに会う"
+    },
+    {
+      "description": "地面が平らになる - auto-generated",
+      "expected": [
+        {
+          "lemma": "地面",
+          "pos": "Noun",
+          "surface": "地面"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "平ら",
+          "pos": "Adjective",
+          "surface": "平ら"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なる"
+        }
+      ],
+      "id": "ga_raninaru",
+      "input": "地面が平らになる"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",
