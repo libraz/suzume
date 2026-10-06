@@ -339,8 +339,10 @@ bool isCommaClauseChainingRenyokei(const std::vector<char32_t>& codepoints, size
   }
   const std::string particle_surface = extractSubstring(codepoints, start_pos - 1, start_pos);
   const auto* particle = dict_manager->lookupExact(particle_surface, core::PartOfSpeech::Particle);
-  const bool follows_argument = particle != nullptr && particle->extended_pos == core::ExtendedPOS::ParticleCase &&
-                                particle_surface != "と" && particle_surface != "で";
+  // A topic marker closes its argument just as a case particle does (彼は+微睡み、).
+  const bool follows_argument = particle != nullptr && particle_surface != "と" && particle_surface != "で" &&
+                                (particle->extended_pos == core::ExtendedPOS::ParticleCase ||
+                                 particle->extended_pos == core::ExtendedPOS::ParticleTopic);
   if (follows_argument) {
     return true;
   }

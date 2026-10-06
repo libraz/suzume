@@ -1921,6 +1921,167 @@
       ],
       "id": "madenaraikeruyo",
       "input": "駅までならいけるよ"
+    },
+    {
+      "description": "彼は微睡み、時折頭を揺らし、静かに夢を見ていた。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "微睡む",
+          "pos": "Verb",
+          "surface": "微睡み"
+        },
+        {
+          "lemma": "時折",
+          "pos": "Adverb",
+          "surface": "時折"
+        },
+        {
+          "lemma": "頭",
+          "pos": "Noun",
+          "surface": "頭"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "揺らす",
+          "pos": "Verb",
+          "surface": "揺らし"
+        },
+        {
+          "lemma": "静か",
+          "pos": "Adjective",
+          "surface": "静か"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "夢",
+          "pos": "Noun",
+          "surface": "夢"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ha_mi_wo_rashi_kani_wo_teita",
+      "input": "彼は微睡み、時折頭を揺らし、静かに夢を見ていた。"
+    },
+    {
+      "description": "彼は微睡みを楽しんだ - auto-generated",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "微睡み",
+          "pos": "Noun",
+          "surface": "微睡み"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "楽しむ",
+          "pos": "Verb",
+          "surface": "楽しん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "ha_miwo_shinda",
+      "input": "彼は微睡みを楽しんだ"
+    },
+    {
+      "description": "父は好み、母は嫌った - auto-generated",
+      "expected": [
+        {
+          "lemma": "父",
+          "pos": "Noun",
+          "surface": "父"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "好む",
+          "pos": "Verb",
+          "surface": "好み"
+        },
+        {
+          "lemma": "母",
+          "pos": "Noun",
+          "surface": "母"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "嫌う",
+          "pos": "Verb",
+          "surface": "嫌っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ha_mi_ha_ttta",
+      "input": "父は好み、母は嫌った"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",
