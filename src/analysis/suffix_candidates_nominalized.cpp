@@ -447,6 +447,18 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
       (codepoints[kanji_end + 1] == U'た' || codepoints[kanji_end + 1] == U'て')) {
     skip_single_char = true;
   }
+  // Before だ/で the い of a verb that exists only as its ガ行 base (泳ぐ, 脱ぐ)
+  // is the voiced onbin, not a wa-row continuative; a wa-row base (度合う,
+  // 願う) keeps the nominal reading.
+  if (first_hiragana == U'い' && dict_manager != nullptr && kanji_end + 1 < codepoints.size() &&
+      (codepoints[kanji_end + 1] == U'だ' || codepoints[kanji_end + 1] == U'で')) {
+    const std::string stem_head = normalize::encodeUtf8(codepoints[kanji_end - 1]);
+    if (verb_helpers::isVerbInDictionary(dict_manager, normalize::concat(stem_head, "ぐ")) &&
+        !verb_helpers::isVerbInDictionary(dict_manager, normalize::concat(stem_head, "う"))) {
+      skip_single_char = true;
+    }
+  }
+
   // A dictionary i-adjective (甘い、辛い) is not a deverbal noun merely
   // because its final mora is also an i-row renyokei ending.
   if (first_hiragana == U'い' && dict_manager != nullptr &&

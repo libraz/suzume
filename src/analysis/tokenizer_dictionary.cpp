@@ -2365,14 +2365,16 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
 
     // A 副助詞 attaches to a 体言 and a 接続詞 opens a clause; neither follows a
     // verb onbin stem.  Where one that begins with だ appears to (読ん+だって,
-    // 読ん+だから), the だ is the voiced past auxiliary and the rest is its own
-    // word (読ん+だ+って).  The hatsuonbin shape is kanji + ん, which keeps an
-    // ordinary noun ending in ん (みかん+だって) and every other left context
-    // untouched.
+    // 脱い+だって), the だ is the voiced past auxiliary and the rest is its own
+    // word (読ん+だ+って).  The stem is a kanji verb whose dictionary base takes
+    // the voiced allomorph, or the hatsuonbin shape kanji + ん; an ordinary
+    // noun (みかん+だって) and every other left context stay untouched.
     if ((result.entry->extended_pos == core::ExtendedPOS::ParticleAdverbial ||
          result.entry->pos == core::PartOfSpeech::Conjunction) &&
-        start_pos >= 2 && codepoints[start_pos] == U'だ' && codepoints[start_pos - 1] == U'ん' &&
-        normalize::isKanjiCodepoint(codepoints[start_pos - 2])) {
+        start_pos >= 2 && codepoints[start_pos] == U'だ' &&
+        ((codepoints[start_pos - 1] == U'ん' && normalize::isKanjiCodepoint(codepoints[start_pos - 2])) ||
+         (normalize::isKanjiCodepoint(codepoints[start_pos - 2]) &&
+          isDictionaryOnbinPast(dict_manager_, extractSubstring(codepoints, start_pos - 2, start_pos + 1))))) {
       continue;
     }
 

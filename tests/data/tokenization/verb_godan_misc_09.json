@@ -601,6 +601,109 @@
       ],
       "id": "nnayo_3",
       "input": "寝んなよ"
+    },
+    {
+      "description": "服を脱いだって。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "服",
+          "pos": "Noun",
+          "surface": "服"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "脱ぐ",
+          "pos": "Verb",
+          "surface": "脱い"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        }
+      ],
+      "id": "wo_idattte",
+      "input": "服を脱いだって。"
+    },
+    {
+      "description": "泳いだって - auto-generated",
+      "expected": [
+        {
+          "lemma": "泳ぐ",
+          "pos": "Verb",
+          "surface": "泳い"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        }
+      ],
+      "id": "idattte",
+      "input": "泳いだって"
+    },
+    {
+      "description": "脱いだっていい - auto-generated",
+      "expected": [
+        {
+          "lemma": "脱ぐ",
+          "pos": "Verb",
+          "surface": "脱い"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "いい",
+          "pos": "Adjective",
+          "surface": "いい"
+        }
+      ],
+      "id": "idattteii",
+      "input": "脱いだっていい"
+    },
+    {
+      "description": "願いだって叶う - auto-generated",
+      "expected": [
+        {
+          "lemma": "願い",
+          "pos": "Noun",
+          "surface": "願い"
+        },
+        {
+          "lemma": "だって",
+          "pos": "Particle",
+          "surface": "だって"
+        },
+        {
+          "lemma": "叶う",
+          "pos": "Verb",
+          "surface": "叶う"
+        }
+      ],
+      "id": "idattte_u",
+      "input": "願いだって叶う"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",
