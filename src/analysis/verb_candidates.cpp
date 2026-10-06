@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <cmath>
 
+#include "analysis/bigram_table.h"
 #include "analysis/candidate_constants.h"
 #include "analysis/scorer_constants.h"
 #include "analysis/verb_candidates_helpers.h"
@@ -335,8 +336,24 @@ void generateKatakanaVerbCandidates(const std::vector<char32_t>& codepoints, siz
     // no particle -- and the denominal godan-ra row is productive, so the
     // past candidate stands on its own.
     const bool quotative_homograph = utf8::startsWithAny(hira_part, {"って", "っで"});
+    // A follower the quotative cannot take but the te-form can (ます, the
+    // aspectual いる) leaves only the te-form reading for って. One neither
+    // takes (おい as an interjection) is no evidence either way.
+    bool quotative_cannot_continue = false;
+    if (dict_manager != nullptr && kata_end + 2 < codepoints.size()) {
+      for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, kata_end + 2, codepoints.size())) {
+        if (match.entry == nullptr) {
+          continue;
+        }
+        const auto epos = match.entry->extended_pos;
+        quotative_cannot_continue =
+            quotative_cannot_continue ||
+            (BigramTable::getCost(core::ExtendedPOS::ParticleQuote, epos) >= bigram_cost::kAlmostNever &&
+             BigramTable::getCost(core::ExtendedPOS::ParticleConj, epos) < bigram_cost::kAlmostNever);
+      }
+    }
     if (quotative_homograph && !verb_helpers::isVerbInDictionary(dict_manager, denominal_lemma) &&
-        !verb_helpers::contractedTeContinuationFollowsAt(codepoints, kata_end + 2)) {
+        !verb_helpers::contractedTeContinuationFollowsAt(codepoints, kata_end + 2) && !quotative_cannot_continue) {
       SUZUME_DEBUG_VERBOSE_BLOCK {
         SUZUME_DEBUG_STREAM << "[VERB_SKIP] \"" << denominal_lemma
                             << "\" is not a verified verb, skip katakana_sokuonbin\n";

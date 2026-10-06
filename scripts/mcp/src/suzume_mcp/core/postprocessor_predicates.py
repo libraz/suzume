@@ -70,6 +70,28 @@ def postprocess_katakana_ichidan_continuative(tokens: list[dict]) -> bool:
     return changed
 
 
+def postprocess_katakana_godan_te_form(tokens: list[dict]) -> bool:
+    """Read katakana noun + quotative って before ます/いる as a godan te-form (メモっ+て+まし+た)."""
+    changed = False
+    for idx in range(len(tokens) - 2):
+        token, particle, following = tokens[idx], tokens[idx + 1], tokens[idx + 2]
+        surface = token.get("surface", "")
+        if (
+            token.get("pos") == "Noun"
+            and regex.fullmatch(r"\p{Katakana}+", surface) is not None
+            and particle.get("pos") == "Particle"
+            and particle.get("surface") == "って"
+            and following.get("pos") == "Auxiliary"
+            and following.get("lemma") in ("ます", "いる")
+        ):
+            token["surface"] = surface + "っ"
+            token["pos"] = "Verb"
+            token["lemma"] = surface + "る"
+            tokens[idx + 1] = {**particle, "surface": "て", "lemma": "て"}
+            changed = True
+    return changed
+
+
 def postprocess_honorific_i_adjective(tokens: list[dict]) -> bool:
     """Restore an i-adjective ending in -しい after honorific prefix お."""
     changed = False

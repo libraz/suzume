@@ -321,6 +321,102 @@
       ],
       "id": "hasugu_te_nda",
       "input": "彼はすぐバテて休んだ"
+    },
+    {
+      "description": "katakana godan te-form before masu",
+      "expected": [
+        {
+          "lemma": "読書",
+          "pos": "Noun",
+          "surface": "読書"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "ハマる",
+          "pos": "Verb",
+          "surface": "ハマっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "ni_tttemasu",
+      "input": "読書にハマってます。"
+    },
+    {
+      "description": "katakana godan te-form before aspectual iru",
+      "expected": [
+        {
+          "lemma": "映画",
+          "pos": "Noun",
+          "surface": "映画"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "ハマる",
+          "pos": "Verb",
+          "surface": "ハマっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "い"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "ni_ttteimasu",
+      "input": "映画にハマっています"
+    },
+    {
+      "description": "katakana godan te-form before masu",
+      "expected": [
+        {
+          "lemma": "メモる",
+          "pos": "Verb",
+          "surface": "メモっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "まし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "tttemashita",
+      "input": "メモってました"
     }
   ],
   "description": "katakana tests",

@@ -33,6 +33,7 @@ from suzume_mcp.core.postprocessors import (
     postprocess_ikaga,
     postprocess_indefinite_ka,
     postprocess_iru_aux,
+    postprocess_katakana_godan_te_form,
     postprocess_katakana_ichidan_continuative,
     postprocess_l2_noun_context,
     postprocess_mecab_tokens,
@@ -161,6 +162,25 @@ class TestKatakanaIchidanContinuative:
         tokens = [_tok("メモ", "Noun"), _tok("て", "Particle")]
 
         assert not postprocess_katakana_ichidan_continuative(tokens)
+
+
+class TestKatakanaGodanTeForm:
+    def test_quotative_before_masu_is_te_form(self):
+        tokens = [
+            _tok("メモ", "Noun"),
+            _tok("って", "Particle"),
+            _tok("まし", "Auxiliary", lemma="ます"),
+            _tok("た", "Auxiliary"),
+        ]
+
+        assert postprocess_katakana_godan_te_form(tokens)
+        assert [t["surface"] for t in tokens] == ["メモっ", "て", "まし", "た"]
+        assert tokens[0]["lemma"] == "メモる"
+
+    def test_quotative_before_predicate_stays(self):
+        tokens = [_tok("カレー", "Noun"), _tok("って", "Particle"), _tok("何", "Pronoun")]
+
+        assert not postprocess_katakana_godan_te_form(tokens)
 
 
 class TestPreprocessForMecab:

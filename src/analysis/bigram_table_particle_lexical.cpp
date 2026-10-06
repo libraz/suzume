@@ -295,6 +295,11 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
       // (〜っておいて). Keep that auxiliary chain ahead of a fabricated
       // katakana onbin verb that would consume the quotation's っ.
       {EPOS::ParticleQuote, EPOS::AuxAspectOku, cost::kVeryStrongBonus},
+      // The polite auxiliary and the aspectual いる select a continuative or a
+      // te-form, never a quotation, so 〜って+ます and 〜って+います are a te-form
+      // (ハマっ+て+ます), not a noun plus って.
+      {EPOS::ParticleQuote, EPOS::AuxTenseMasu, cost::kAlmostNever},
+      {EPOS::ParticleQuote, EPOS::AuxAspectIru, cost::kAlmostNever},
 
       // ParticleConj → AuxAspectMiru (て+みる) - strong bonus
       {EPOS::ParticleConj, EPOS::AuxAspectMiru, cost::kVeryStrongBonus},
