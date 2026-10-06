@@ -1738,6 +1738,18 @@ class TestPejorativeYagaru:
         assert [token["surface"] for token in result] == ["見や", "っ"]
 
 
+class TestGreetingHeldVowel:
+    def test_greeting_takes_its_held_final_vowel(self):
+        tokens = [
+            _tok("おつかれ", pos="感動詞", lemma="おつかれ"),
+            _tok("ー", pos="名詞", pos_sub1="一般", lemma="ー"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "おつかれー")
+        assert [token["surface"] for token in result] == ["おつかれー"]
+        assert result[0]["lemma"] == "おつかれ"
+        assert rule == "greeting-interjection"
+
+
 class TestAddressClosingNoun:
     def test_ontyu_stays_apart_from_the_addressee(self):
         tokens = [

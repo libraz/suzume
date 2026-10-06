@@ -385,7 +385,9 @@ std::vector<core::Morpheme> Postprocessor::mergeProlongedSoundMark(std::vector<c
     core::Morpheme merged = current;
     for (size_t mark = idx + 1; mark < run_end; ++mark) {
       resolver::mergeInto(merged, morphemes[mark]);
-      if (!merged.lemma.empty()) {
+      // A held vowel stretches an interjection without changing it, so its lemma
+      // stays the greeting itself (おつかれー → おつかれ).
+      if (!merged.lemma.empty() && merged.pos != core::PartOfSpeech::Interjection) {
         merged.lemma += morphemes[mark].surface;
       }
     }

@@ -1293,6 +1293,42 @@
       ],
       "id": "o_iine",
       "input": "お、いいね。"
+    },
+    {
+      "description": "おつかれー - auto-generated",
+      "expected": [
+        {
+          "lemma": "おつかれ",
+          "pos": "Interjection",
+          "surface": "おつかれー"
+        }
+      ],
+      "id": "otsukare_2",
+      "input": "おつかれー"
+    },
+    {
+      "description": "おつかれさまー - auto-generated",
+      "expected": [
+        {
+          "lemma": "おつかれさま",
+          "pos": "Interjection",
+          "surface": "おつかれさまー"
+        }
+      ],
+      "id": "otsukaresama_2",
+      "input": "おつかれさまー"
+    },
+    {
+      "description": "おやすみー - auto-generated",
+      "expected": [
+        {
+          "lemma": "おやすみ",
+          "pos": "Interjection",
+          "surface": "おやすみー"
+        }
+      ],
+      "id": "oyasumi",
+      "input": "おやすみー"
     }
   ],
   "description": "Basic tokenization tests",

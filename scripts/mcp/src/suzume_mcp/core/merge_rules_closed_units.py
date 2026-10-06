@@ -658,9 +658,12 @@ def _merge_fixed_search_units(state: MergeState) -> bool:
         if not merged:
             greeting = next((word for word in GREETING_INTERJECTIONS if remaining.startswith(word)), "")
             if greeting:
-                consumed, j = _consume_span(tokens, i, len(greeting))
-                if consumed == greeting:
-                    result.append({"surface": greeting, "pos": "感動詞", "lemma": greeting})
+                # A held final vowel is part of the greeting (おつかれー), as it is
+                # for the clipped forms below.
+                span = greeting + regex.match(r"[ー〜～]*", remaining[len(greeting) :]).group()
+                consumed, j = _consume_span(tokens, i, len(span))
+                if consumed == span:
+                    result.append({"surface": span, "pos": "感動詞", "lemma": greeting})
                     i = j
                     merged = True
                     if applied_rule is None:
