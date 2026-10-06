@@ -561,6 +561,14 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
             continue;
           }
 
+          // A single mora other than the shiku し that sits between a kanji and
+          // what follows is a particle of the phrase, not okurigana of an
+          // unattested adjective (花+や+さくら, not the stem of 花やい).
+          if (ext_okurigana.size() == core::kJapaneseCharBytes && ext_okurigana != "し" &&
+              !isAdjectiveInDictionary(dict_manager, base_form)) {
+            continue;
+          }
+
           if (pattern == "さ") {
             if (!isPossibleUnknownIAdjectiveStem(stem, base_form, dict_manager) ||
                 hasNaAdjectiveStemEvidence(stem, dict_manager) ||

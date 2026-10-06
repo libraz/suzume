@@ -2364,6 +2364,28 @@
       ],
       "id": "nai_4",
       "input": "ペンない"
+    },
+    {
+      "description": "花やさくら - auto-generated",
+      "expected": [
+        {
+          "lemma": "花",
+          "pos": "Noun",
+          "surface": "花"
+        },
+        {
+          "lemma": "や",
+          "pos": "Particle",
+          "surface": "や"
+        },
+        {
+          "lemma": "さくら",
+          "pos": "Noun",
+          "surface": "さくら"
+        }
+      ],
+      "id": "yasakura",
+      "input": "花やさくら"
     }
   ],
   "description": "General nouns (part 4/4)",

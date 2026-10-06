@@ -1644,6 +1644,63 @@
       ],
       "id": "ki_seto_wareta",
       "input": "書き直せと言われた"
+    },
+    {
+      "description": "庭には花やさくらが咲いている - auto-generated",
+      "expected": [
+        {
+          "lemma": "庭",
+          "pos": "Noun",
+          "surface": "庭"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "花",
+          "pos": "Noun",
+          "surface": "花"
+        },
+        {
+          "lemma": "や",
+          "pos": "Particle",
+          "surface": "や"
+        },
+        {
+          "lemma": "さくら",
+          "pos": "Noun",
+          "surface": "さくら"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "咲く",
+          "pos": "Verb",
+          "surface": "咲い"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "niha_yasakuraga_iteiru",
+      "input": "庭には花やさくらが咲いている"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",
