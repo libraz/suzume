@@ -2411,10 +2411,16 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     // a clause, so it follows a continuative, a particle or a clause boundary.
     // After another kanji it is the second element of a compound noun
     // (天候, 兆候), and after the genitive or an adnominal it is the noun a
-    // modifier heads (新緑の候).
+    // modifier heads (新緑の候). A registered multi-kanji noun that ends here
+    // (御座) is a complete host instead, and the honorific is its predicate.
     if (result.entry->pos == core::PartOfSpeech::Verb && grammar::isHumbleHonorificLemma(result.entry->lemma) &&
         result.length == 1 && normalize::isKanjiCodepoint(codepoints[start_pos]) && start_pos > 0 &&
-        (normalize::isKanjiCodepoint(codepoints[start_pos - 1]) ||
+        ((normalize::isKanjiCodepoint(codepoints[start_pos - 1]) &&
+          !core::anyEdgeEndingAt(lattice, start_pos,
+                                 [](const core::LatticeEdge& edge) {
+                                   return edge.pos == core::PartOfSpeech::Noun && edge.fromDictionary() &&
+                                          edge.end - edge.start >= 2;
+                                 })) ||
          core::anyEdgeEndingAt(lattice, start_pos, [](const core::LatticeEdge& edge) {
            return edge.extended_pos == core::ExtendedPOS::ParticleNo || edge.pos == core::PartOfSpeech::Determiner;
          }))) {

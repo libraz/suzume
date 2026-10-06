@@ -1376,6 +1376,67 @@
       ],
       "id": "retarukana",
       "input": "晴れたるかな"
+    },
+    {
+      "description": "御座候 - auto-generated",
+      "expected": [
+        {
+          "lemma": "御座",
+          "pos": "Noun",
+          "surface": "御座"
+        },
+        {
+          "lemma": "候ふ",
+          "pos": "Verb",
+          "surface": "候"
+        }
+      ],
+      "id": "unnamed_45",
+      "input": "御座候"
+    },
+    {
+      "description": "御座候へども - auto-generated",
+      "expected": [
+        {
+          "lemma": "御座",
+          "pos": "Noun",
+          "surface": "御座"
+        },
+        {
+          "lemma": "候ふ",
+          "pos": "Verb",
+          "surface": "候へ"
+        },
+        {
+          "lemma": "ども",
+          "pos": "Particle",
+          "surface": "ども"
+        }
+      ],
+      "id": "hedomo_3",
+      "input": "御座候へども"
+    },
+    {
+      "description": "まことに御座候 - auto-generated",
+      "expected": [
+        {
+          "lemma": "まことに",
+          "pos": "Adverb",
+          "surface": "まことに"
+        },
+        {
+          "lemma": "御座",
+          "pos": "Noun",
+          "surface": "御座"
+        },
+        {
+          "lemma": "候ふ",
+          "pos": "Verb",
+          "surface": "候"
+        }
+      ],
+      "id": "makotoni",
+      "input": "まことに御座候"
     }
   ],
   "description": "literary_classic tests (part 2/2)",
