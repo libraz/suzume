@@ -20,6 +20,14 @@ EntrySpecRange getPronounEntries() {
       pronoun("あちき", ""),
       pronoun("わし", ""),
       pronoun("おいら", ""),
+      // Katakana spellings of the same first-person set (emphatic or stylized
+      // writing); ワシ is left out because it is also the bird.
+      pronoun("ボク", ""),
+      pronoun("オレ", ""),
+      pronoun("ワタシ", ""),
+      pronoun("ワタクシ", ""),
+      pronoun("アタシ", ""),
+      pronoun("オイラ", ""),
 
       // First person plural: 僕ら/俺ら handled as pronoun + ら suffix
       pronoun("我々", ""),

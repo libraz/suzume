@@ -2700,6 +2700,60 @@
       ],
       "id": "keyueni_reta",
       "input": "夜明けゆえに遅れた"
+    },
+    {
+      "description": "ボクが笑ったわい - auto-generated",
+      "expected": [
+        {
+          "lemma": "ボク",
+          "pos": "Pronoun",
+          "surface": "ボク"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "笑う",
+          "pos": "Verb",
+          "surface": "笑っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "わい",
+          "pos": "Particle",
+          "surface": "わい"
+        }
+      ],
+      "id": "ga_tttawai_2",
+      "input": "ボクが笑ったわい"
+    },
+    {
+      "description": "オレは行く - auto-generated",
+      "expected": [
+        {
+          "lemma": "オレ",
+          "pos": "Pronoun",
+          "surface": "オレ"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行く"
+        }
+      ],
+      "id": "ha_ku",
+      "input": "オレは行く"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",
