@@ -89,11 +89,17 @@ void generateHiraganaNariNaAdjectiveCandidates(const std::vector<char32_t>& code
   // あきらかに), not a sequence of short verb candidates.
   // Keep the bounded scan local to one adjective-sized word so an earlier
   // hiragana adverb cannot be absorbed into the stem.
+  // Every character of the stem is checked, the ones inside the minimum length
+  // too: a kanji there makes the run a kanji word's okurigana (を+明らか).
+  constexpr size_t kMinHiraganaNaAdjectiveLength = 3;
   constexpr size_t kMaxHiraganaNaAdjectiveLength = 6;
-  for (size_t stem_end = start_pos + 3;
+  for (size_t stem_end = start_pos + 1;
        stem_end <= codepoints.size() && stem_end - start_pos <= kMaxHiraganaNaAdjectiveLength; ++stem_end) {
     if (char_types[stem_end - 1] != normalize::CharType::Hiragana) {
       break;
+    }
+    if (stem_end - start_pos < kMinHiraganaNaAdjectiveLength) {
+      continue;
     }
     if (stem_end >= codepoints.size()) {
       break;

@@ -1085,6 +1085,167 @@
       ],
       "id": "na_13",
       "input": "超重要な話"
+    },
+    {
+      "description": "県内の企業が生産停止を明らかにした。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "県内",
+          "pos": "Noun",
+          "surface": "県内"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "企業",
+          "pos": "Noun",
+          "surface": "企業"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "生産停止",
+          "pos": "Noun",
+          "surface": "生産停止"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "明らか",
+          "pos": "Adjective",
+          "surface": "明らか"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "no_ga_wo_rakanishita",
+      "input": "県内の企業が生産停止を明らかにした。"
+    },
+    {
+      "description": "事実を明らかにする - auto-generated",
+      "expected": [
+        {
+          "lemma": "事実",
+          "pos": "Noun",
+          "surface": "事実"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "明らか",
+          "pos": "Adjective",
+          "surface": "明らか"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "wo_rakanisuru",
+      "input": "事実を明らかにする"
+    },
+    {
+      "description": "皆様にはお健やかにお過ごしのことと存じます。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "皆様",
+          "pos": "Noun",
+          "surface": "皆様"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "健やか",
+          "pos": "Adjective",
+          "surface": "健やか"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "過ごし",
+          "pos": "Noun",
+          "surface": "過ごし"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "こと"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "存じる",
+          "pos": "Verb",
+          "surface": "存じ"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "nihao_yakanio_goshinokototo_jimasu",
+      "input": "皆様にはお健やかにお過ごしのことと存じます。"
     }
   ],
   "description": "Na-adjectives (ナ形容詞) (part 2/2)",
