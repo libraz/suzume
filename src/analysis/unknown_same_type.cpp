@@ -1604,11 +1604,12 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       // (できる+ん+じゃ+ない). A registered predicate in front of it is the
       // evidence, and so is an i-adjective terminal, which no noun is before ん
       // (つらい+ん+だ); runs whose kana merely happen to spell a particle keep
-      // their whole-run candidate (りんご, たなばた).
+      // their whole-run candidate (りんご, たなばた). A na-adjective stem is no
+      // such predicate, because it takes な before ん (どうん is no どう+ん).
       if (dict_manager_ != nullptr && run_end > start_pos + 1 && codepoints[run_end - 1] == U'ん' &&
-          (hasExactPartOfSpeech(
-               *dict_manager_, codepoints, start_pos, run_end - 1,
-               partOfSpeechMask(core::PartOfSpeech::Verb) | partOfSpeechMask(core::PartOfSpeech::Adjective)) ||
+          (hasExactPartOfSpeech(*dict_manager_, codepoints, start_pos, run_end - 1,
+                                partOfSpeechMask(core::PartOfSpeech::Verb)) ||
+           hasExactAdjectiveOtherThanNaStem(*dict_manager_, extractSubstring(codepoints, start_pos, run_end - 1)) ||
            verb_helpers::readsAsIAdjectiveTerminal(extractSubstring(codepoints, start_pos, run_end - 1),
                                                    inflection_))) {
         return;
@@ -1944,7 +1945,7 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       const bool spells_auxiliary_chain =
           dict_manager_ != nullptr && len >= 3 &&
           maximalSegmentCount(*dict_manager_, codepoints, start_pos, scan, core::PartOfSpeech::Auxiliary,
-                              core::ExtendedPOS::AuxClassicalPerfect) >= 2;
+                              core::ExtendedPOS::AuxClassicalPerfect, hasLeftHost(codepoints, start_pos)) >= 2;
       // ご before kana is the Sino-Japanese honorific on a kana verbal noun
       // (ご+あんない+します); a rescue would swallow the prefix into the noun.
       // Nor may it open on the te-form connective that a continuative right in

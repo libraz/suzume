@@ -55,6 +55,13 @@ inline constexpr PartOfSpeechMask kOpenClassPartOfSpeechMask =
     partOfSpeechMask(core::PartOfSpeech::Noun) | partOfSpeechMask(core::PartOfSpeech::Verb) |
     partOfSpeechMask(core::PartOfSpeech::Adjective) | partOfSpeechMask(core::PartOfSpeech::Adverb);
 
+/**
+ * Whether @p surface is a registered adjective that is not a na-adjective stem.
+ * Only the i-adjective can stand in front of the nominalizer ん as it is; a
+ * na-adjective stem takes な first.
+ */
+bool hasExactAdjectiveOtherThanNaStem(const dictionary::DictionaryManager& dict_manager, std::string_view surface);
+
 /** Whether an exact dictionary surface has any of the requested parts of speech. */
 bool hasExactPartOfSpeech(const dictionary::DictionaryManager& dict_manager, std::string_view surface,
                           PartOfSpeechMask pos_mask);
@@ -77,6 +84,12 @@ bool lookupResultsHaveExtendedPOS(const std::vector<dictionary::LookupResult>& r
                                   size_t length = 0);
 
 /**
+ * Whether a word stands in front of @p start_pos that could host a bound
+ * auxiliary: false at the start of the text and after a symbol.
+ */
+bool hasLeftHost(const std::vector<char32_t>& codepoints, size_t start_pos);
+
+/**
  * Largest number of registered words of one part of speech a span can be
  * segmented into, or -1 when no segmentation covers it entirely. Multi-mora
  * entries stay whole, so a span that is one such word counts as one part
@@ -85,11 +98,12 @@ bool lookupResultsHaveExtendedPOS(const std::vector<dictionary::LookupResult>& r
  * @p excluded drops one category from the segmentation. Callers use it for the
  * cells the tokenizer itself admits only inside a named chain: a registered
  * surface the analyzer would never place here is not evidence about what the
- * span spells.
+ * span spells. Without a @p host_in_front, the aspect auxiliaries, which attach
+ * only to a verb stem, cannot open the segmentation.
  */
 int maximalSegmentCount(const dictionary::DictionaryManager& dict_manager, const std::vector<char32_t>& codepoints,
                         size_t start_pos, size_t end_pos, core::PartOfSpeech pos,
-                        core::ExtendedPOS excluded = core::ExtendedPOS::Count_);
+                        core::ExtendedPOS excluded = core::ExtendedPOS::Count_, bool host_in_front = true);
 
 /**
  * Whether some span ending at @p end_pos, and starting at or after

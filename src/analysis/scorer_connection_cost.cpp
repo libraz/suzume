@@ -522,8 +522,12 @@ float Scorer::connectionCost(const core::LatticeEdge& prev, const core::LatticeE
   // real verb is (せ+ん, いか+ん, あら+ん), while the misreading only ever comes
   // out of the hiragana candidate generator. Kanji stems are unaffected either
   // way (押さ+ん). ん can be AUX_否定古 or PART_準体, both are penalized.
-  if (prev.extended_pos == core::ExtendedPOS::VerbMizenkei && !prev.fromDictionary() &&
-      grammar::isPureHiragana(prev.surface) && prev.surface.size() <= 6 &&  // 2 chars or less (6 bytes in UTF-8)
+  // Neither an adverb nor a na-adjective stem takes ん directly (どう+ん of どうん;
+  // a na-adjective stem takes な first).
+  if (((prev.extended_pos == core::ExtendedPOS::VerbMizenkei && !prev.fromDictionary() &&
+        grammar::isPureHiragana(prev.surface) && prev.surface.size() <= 6) ||  // 2 chars or less (6 bytes in UTF-8)
+       prev.pos == core::PartOfSpeech::Adverb ||
+       prev.extended_pos == core::ExtendedPOS::AdjNaAdj) &&
       next.surface == "ん") {
     SUZUME_CONNECTION_ADD(surface_bonus, cost::kAlmostNever);
   }

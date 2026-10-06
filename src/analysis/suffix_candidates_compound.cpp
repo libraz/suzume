@@ -417,6 +417,9 @@ bool hasAuxiliaryParticleDecomposition(const std::vector<char32_t>& codepoints, 
   if (hasExactPartOfSpeech(*dict_manager, codepoints, start_pos, end_pos, kOpenClassPartOfSpeechMask)) {
     return false;
   }
+  // The aspect auxiliaries attach only to a verb stem, so with no word in front
+  // of the run none of them opens it (どうん is not どう+ん).
+  const bool lacks_left_host = !hasLeftHost(codepoints, start_pos);
   // Behind the auxiliary stands one particle, or a final particle plus the
   // modal tail that licenses a stack (だ+よ+ね, but not う+わ+べ).
   const auto final_particle_at = [&](size_t from, size_t to) {
@@ -424,7 +427,9 @@ bool hasAuxiliaryParticleDecomposition(const std::vector<char32_t>& codepoints, 
     return particle != nullptr && particle->extended_pos == core::ExtendedPOS::ParticleFinal ? particle : nullptr;
   };
   for (size_t split = start_pos + 1; split < end_pos; ++split) {
-    if (lookupEntryInRange(*dict_manager, codepoints, start_pos, split, core::PartOfSpeech::Auxiliary) == nullptr) {
+    const auto* auxiliary =
+        lookupEntryInRange(*dict_manager, codepoints, start_pos, split, core::PartOfSpeech::Auxiliary);
+    if (auxiliary == nullptr || (lacks_left_host && auxiliary->extended_pos == core::ExtendedPOS::AuxAspectIru)) {
       continue;
     }
     if (lookupEntryInRange(*dict_manager, codepoints, split, end_pos, core::PartOfSpeech::Particle) != nullptr) {
@@ -472,7 +477,7 @@ bool hasFunctionWordChainDecomposition(const std::vector<char32_t>& codepoints, 
     // what an ordinary hiragana run spells: the one-mora continuative alone
     // would decompose にんじん as に+ん+じ+ん.
     if (maximalSegmentCount(*dict_manager, codepoints, start_pos, particle_start, core::PartOfSpeech::Auxiliary,
-                            core::ExtendedPOS::AuxClassicalPerfect) >= 1) {
+                            core::ExtendedPOS::AuxClassicalPerfect, hasLeftHost(codepoints, start_pos)) >= 1) {
       return true;
     }
   }

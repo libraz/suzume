@@ -364,6 +364,11 @@ bool hasExactPartOfSpeech(const dictionary::DictionaryManager& dict_manager, std
   return false;
 }
 
+bool hasExactAdjectiveOtherThanNaStem(const dictionary::DictionaryManager& dict_manager, std::string_view surface) {
+  const auto* entry = dict_manager.lookupExact(surface, core::PartOfSpeech::Adjective);
+  return entry != nullptr && entry->extended_pos != core::ExtendedPOS::AdjNaAdj;
+}
+
 bool hasExactPartOfSpeech(const dictionary::DictionaryManager& dict_manager, const std::vector<char32_t>& codepoints,
                           size_t start, size_t end, PartOfSpeechMask pos_mask) {
   return hasExactPartOfSpeech(dict_manager, extractSubstring(codepoints, start, end), pos_mask);
@@ -385,8 +390,13 @@ bool lookupResultsHaveExtendedPOS(const std::vector<dictionary::LookupResult>& r
   });
 }
 
+bool hasLeftHost(const std::vector<char32_t>& codepoints, size_t start_pos) {
+  return start_pos > 0 && normalize::classifyChar(codepoints[start_pos - 1]) != normalize::CharType::Symbol;
+}
+
 int maximalSegmentCount(const dictionary::DictionaryManager& dict_manager, const std::vector<char32_t>& codepoints,
-                        size_t start_pos, size_t end_pos, core::PartOfSpeech pos, core::ExtendedPOS excluded) {
+                        size_t start_pos, size_t end_pos, core::PartOfSpeech pos, core::ExtendedPOS excluded,
+                        bool host_in_front) {
   if (start_pos >= end_pos) {
     return -1;
   }
@@ -400,7 +410,8 @@ int maximalSegmentCount(const dictionary::DictionaryManager& dict_manager, const
     for (size_t relative_end = relative_start + 1; relative_end <= span; ++relative_end) {
       const auto* entry =
           lookupEntryInRange(dict_manager, codepoints, start_pos + relative_start, start_pos + relative_end, pos);
-      if (entry != nullptr && entry->extended_pos != excluded) {
+      if (entry != nullptr && entry->extended_pos != excluded &&
+          (host_in_front || relative_start > 0 || entry->extended_pos != core::ExtendedPOS::AuxAspectIru)) {
         part_count[relative_end] = std::max(part_count[relative_end], part_count[relative_start] + 1);
       }
     }
