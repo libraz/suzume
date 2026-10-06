@@ -17,6 +17,7 @@ from . import (
 postprocess_exclusion_suffix = postprocessor_boundaries.postprocess_exclusion_suffix
 postprocess_productive_search_unit_boundaries = postprocessor_boundaries.postprocess_productive_search_unit_boundaries
 postprocess_productive_verb_suffix_stem = postprocessor_boundaries.postprocess_productive_verb_suffix_stem
+postprocess_negative_appearance_suffix = postprocessor_boundaries.postprocess_negative_appearance_suffix
 postprocess_quantity_bound_suffix = postprocessor_boundaries.postprocess_quantity_bound_suffix
 postprocess_state_suffix = postprocessor_boundaries.postprocess_state_suffix
 
@@ -302,6 +303,7 @@ POSTPROCESSORS: tuple[tuple[str, Callable[[list[dict]], bool]], ...] = (
     ("copula-negative-nee", postprocess_copula_negative_nee),
     ("productive-search-unit-boundaries", postprocess_productive_search_unit_boundaries),
     ("bound-derived-adjective", postprocess_bound_derived_adjective),
+    ("negative-appearance-suffix", postprocess_negative_appearance_suffix),
     ("quotative-determiner-spelling", postprocess_quotative_determiner_spelling),
     ("quotative-determiner-head", postprocess_quotative_determiner_head),
     ("adverbial-na-adjective", postprocess_adverbial_na_adjective),

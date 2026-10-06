@@ -35,6 +35,7 @@ void resolvePrePrefixMorphemeRoles(std::vector<core::Morpheme>& result,
   }
 
   resolver::resolveNegativeAppearanceChain(result);
+  resolver::resolveNegativeAppearanceSuffix(result);
   resolver::resolveAdjectivalStemBeforeGaru(result);
   resolver::resolveAdjectiveNominalizerSa(result);
   resolver::resolveAppearanceSouPredicate(result);

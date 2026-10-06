@@ -405,3 +405,54 @@ def postprocess_productive_search_unit_boundaries(tokens: list[dict]) -> bool:
 
         idx += 1
     return changed
+
+
+def postprocess_negative_appearance_suffix(tokens: list[dict]) -> bool:
+    """Split the appearance suffix げ from the negative adjective stem な.
+
+    A nominal host takes ない's stem plus げ (頼り+な+げ, 危+な+げ), which the
+    reference dictionary reads as the verb なげる or as one adjective 危なげない.
+    The stem keeps its own token and げ is the same suffix it is after 寂し+げ.
+    The reference dictionary also reads なげ as a noun (申し訳+なげ).
+    """
+    changed = False
+    idx = 0
+    while idx < len(tokens):
+        token = tokens[idx]
+        surface = token.get("surface", "")
+        if (
+            surface == "なげ"
+            and (token.get("pos"), token.get("lemma")) in (("Verb", "なげる"), ("Noun", "なげ"))
+            and idx > 0
+            and tokens[idx - 1].get("pos") in ("Noun", "Verb")
+        ):
+            # Verbal ない takes an irrealis, so a continuative before な+げ is
+            # the deverbal noun (頼り), not a verb.
+            if tokens[idx - 1].get("pos") == "Verb":
+                tokens[idx - 1].update(pos="Noun", lemma=tokens[idx - 1].get("surface", ""))
+            tokens[idx : idx + 1] = [
+                {"surface": "な", "pos": "Adjective", "lemma": "ない"},
+                {"surface": "げ", "pos": "Suffix", "lemma": "げ"},
+            ]
+            changed = True
+            idx += 2
+        elif (
+            token.get("pos") == "Adjective"
+            and token.get("lemma", "").endswith("なげない")
+            and surface == token["lemma"][:-1]
+        ):
+            stem = token["lemma"][:-3]
+            tokens[idx : idx + 1] = [
+                {"surface": stem, "pos": "Adjective", "lemma": stem + "い"},
+                {"surface": "げ", "pos": "Suffix", "lemma": "げ"},
+                {"surface": "な", "pos": "Auxiliary", "lemma": "だ"},
+            ]
+            changed = True
+            idx += 3
+        else:
+            idx += 1
+            continue
+        following = tokens[idx] if idx < len(tokens) else None
+        if following is not None and following.get("surface") == "な" and following.get("pos") == "Particle":
+            following.update(pos="Auxiliary", lemma="だ")
+    return changed

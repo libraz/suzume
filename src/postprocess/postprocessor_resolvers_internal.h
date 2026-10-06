@@ -65,6 +65,7 @@ void resolveInitialInabilityVerb(std::vector<core::Morpheme>& result);
 void resolveInitialNegativeAdjective(std::vector<core::Morpheme>& result);
 void resolveKuruwaPoliteAru(std::vector<core::Morpheme>& result);
 void resolveNegativeAppearanceChain(std::vector<core::Morpheme>& result);
+void resolveNegativeAppearanceSuffix(std::vector<core::Morpheme>& result);
 void resolveNegativeRenyokei(std::vector<core::Morpheme>& result);
 void resolveNominalCaseDe(std::vector<core::Morpheme>& result);
 void resolveNominalConditionalNara(std::vector<core::Morpheme>& result);

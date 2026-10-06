@@ -1487,3 +1487,32 @@ class TestContractedIkuTteNa:
         ]
         assert postprocessors.postprocess_contracted_iku_tte_na(tokens)
         assert [t["surface"] for t in tokens] == ["行く", "って", "な"]
+
+
+class TestNegativeAppearanceSuffix:
+    def test_splits_verb_reading_of_nage_into_stem_and_suffix(self):
+        tokens = [
+            {"surface": "頼り", "pos": "Verb", "lemma": "頼る"},
+            {"surface": "なげ", "pos": "Verb", "lemma": "なげる"},
+            {"surface": "な", "pos": "Particle", "lemma": "な"},
+        ]
+        assert postprocessors.postprocess_negative_appearance_suffix(tokens)
+        assert [(t["surface"], t["pos"]) for t in tokens] == [
+            ("頼り", "Noun"),
+            ("な", "Adjective"),
+            ("げ", "Suffix"),
+            ("な", "Auxiliary"),
+        ]
+
+    def test_splits_one_word_adjective_into_stem_suffix_and_copula(self):
+        tokens = [{"surface": "危なげな", "pos": "Adjective", "lemma": "危なげない"}]
+        assert postprocessors.postprocess_negative_appearance_suffix(tokens)
+        assert [(t["surface"], t["lemma"]) for t in tokens] == [("危な", "危ない"), ("げ", "げ"), ("な", "だ")]
+
+    def test_leaves_a_real_verb_nageru_alone(self):
+        tokens = [
+            {"surface": "ボール", "pos": "Noun", "lemma": "ボール"},
+            {"surface": "を", "pos": "Particle", "lemma": "を"},
+            {"surface": "なげ", "pos": "Verb", "lemma": "なげる"},
+        ]
+        assert not postprocessors.postprocess_negative_appearance_suffix(tokens)

@@ -2386,6 +2386,80 @@
       ],
       "id": "yasakura",
       "input": "花やさくら"
+    },
+    {
+      "description": "頼りなさげな表情 - auto-generated",
+      "expected": [
+        {
+          "lemma": "頼り",
+          "pos": "Noun",
+          "surface": "頼り"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "な"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Suffix",
+          "surface": "さ"
+        },
+        {
+          "lemma": "げ",
+          "pos": "Suffix",
+          "surface": "げ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "表情",
+          "pos": "Noun",
+          "surface": "表情"
+        }
+      ],
+      "id": "rinasagena",
+      "input": "頼りなさげな表情"
+    },
+    {
+      "description": "申し訳なさげな顔 - auto-generated",
+      "expected": [
+        {
+          "lemma": "申し訳",
+          "pos": "Noun",
+          "surface": "申し訳"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "な"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Suffix",
+          "surface": "さ"
+        },
+        {
+          "lemma": "げ",
+          "pos": "Suffix",
+          "surface": "げ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "顔",
+          "pos": "Noun",
+          "surface": "顔"
+        }
+      ],
+      "id": "shi_nasagena",
+      "input": "申し訳なさげな顔"
     }
   ],
   "description": "General nouns (part 4/4)",

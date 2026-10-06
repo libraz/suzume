@@ -549,6 +549,33 @@ void resolveNegativeAppearanceChain(std::vector<core::Morpheme>& result) {
   }
 }
 
+// The suffix げ on a nominal host takes the negative adjective's stem (申し訳+な+げ)
+// or its nominalized form (申し訳+な+さ+げ), the same chain そう takes above.
+// A verbal host keeps the auxiliary reading the host selects.
+void resolveNegativeAppearanceSuffix(std::vector<core::Morpheme>& result) {
+  for (size_t idx = 0; idx + 1 < result.size(); ++idx) {
+    auto& na = result[idx];
+    if (!grammar::isSingleHiragana(na.surface, U'な')) {
+      continue;
+    }
+    const bool nominalized = idx + 2 < result.size() && grammar::isSingleHiragana(result[idx + 1].surface, U'さ');
+    const core::Morpheme& suffix = result[idx + (nominalized ? 2 : 1)];
+    if (!grammar::isSingleHiragana(suffix.surface, U'げ') || suffix.pos != core::PartOfSpeech::Suffix) {
+      continue;
+    }
+    // Verbal ない takes an irrealis, so a continuative before な+げ is the
+    // deverbal noun (頼り), not a verb.
+    if (idx > 0 && result[idx - 1].pos == core::PartOfSpeech::Verb) {
+      retagUninflected(result[idx - 1], core::PartOfSpeech::Noun, core::ExtendedPOS::Noun, result[idx - 1].surface);
+    }
+    retag(na, core::PartOfSpeech::Adjective, core::ExtendedPOS::AdjStem, "ない",
+          dictionary::ConjugationType::IAdjective, grammar::ConjForm::Renyokei);
+    if (nominalized) {
+      retagUninflected(result[idx + 1], core::PartOfSpeech::Suffix, core::ExtendedPOS::Suffix, "さ");
+    }
+  }
+}
+
 // A predicate stem is what the negative auxiliary can attach to: a verb or a
 // verbal auxiliary. The copula is not one — its negation takes the
 // supplementary adjective instead.

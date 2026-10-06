@@ -748,7 +748,16 @@ void appendHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints, 
     // A registered auxiliary cell (らし of らしい) keeps its own reading before
     // げ (子供+らし+げ+な); it is no coined adjective stem.
     const bool is_auxiliary_cell = verb_helpers::hasDictionaryEntry(dict_manager, stem, core::PartOfSpeech::Auxiliary);
-    if (adjective_confidence != candidate::kNoOriginConfidence && !has_verified_verb_reading && !is_auxiliary_cell) {
+    // Right behind a kanji, a coined stem is that kanji's okurigana run plus
+    // the suffix's host (頼り+なげ), not an adjective of its own.
+    // A base that is a registered closed-class word (なさい) is no coined
+    // adjective; its stem is the negative stem plus さ (頼り+な+さ+げ).
+    const bool closed_class_base =
+        verb_helpers::hasDictionaryEntry(dict_manager, base_form, core::PartOfSpeech::Auxiliary);
+    const bool coined_behind_kanji = start_pos > 0 && normalize::isKanjiCodepoint(codepoints[start_pos - 1]) &&
+                                     !verb_helpers::isAdjectiveInDictionary(dict_manager, base_form);
+    if (adjective_confidence != candidate::kNoOriginConfidence && !has_verified_verb_reading && !is_auxiliary_cell &&
+        !coined_behind_kanji && !closed_class_base) {
       candidates.push_back(makeIAdjStemCandidate(
           stem, start_pos, start_pos + normalize::utf8Length(stem), base_form, candidate::kDerivedSuffixAdjectiveCost,
           CandidateOrigin::AdjectiveIHiragana, adjective_confidence, "i_adjective_ge_stem"));

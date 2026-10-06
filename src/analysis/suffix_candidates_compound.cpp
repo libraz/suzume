@@ -1205,6 +1205,23 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
         !verb_helpers::isAdjectiveInDictionary(dict_manager, extractSubstring(codepoints, start_pos, aux_end) + "い");
   }
 
+  // The same chain behind a host that carries one okurigana mora of its own
+  // (頼り+な+げ): the negative adjective stem plus the nominal suffix.
+  const size_t stem_end = kanji_end + 2;
+  if (dict_manager != nullptr && !looks_like_aux && stem_end < hiragana_end) {
+    const bool names_stem = lookupEntryInRange(*dict_manager, codepoints, kanji_end + 1, stem_end,
+                                               core::PartOfSpeech::Auxiliary) != nullptr ||
+                            lookupEntryInRange(*dict_manager, codepoints, kanji_end + 1, stem_end,
+                                               core::PartOfSpeech::Adjective) != nullptr;
+    // The stem may carry the nominalizer さ before the suffix (頼り+な+さ+げ).
+    const size_t suffix_start = codepoints[stem_end] == U'さ' ? stem_end + 1 : stem_end;
+    looks_like_aux =
+        names_stem && suffix_start < hiragana_end &&
+        lookupEntryInRange(*dict_manager, codepoints, suffix_start, hiragana_end, core::PartOfSpeech::Suffix) !=
+            nullptr &&
+        !verb_helpers::isAdjectiveInDictionary(dict_manager, extractSubstring(codepoints, start_pos, stem_end) + "い");
+  }
+
   // A derivational suffix opening with a sokuon keeps its boundary after the
   // host's okurigana (飾り+っけ, as 色+っけ), so no single noun spans it.
   for (size_t suffix_pos = kanji_end + 1; dict_manager != nullptr && suffix_pos + 1 < hiragana_end; ++suffix_pos) {

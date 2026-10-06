@@ -195,10 +195,12 @@ void generateHiraganaAttributiveNaStemCandidates(const std::vector<char32_t>& co
           lookupEntryInRange(*dict_manager, codepoints, split, stem_end) != nullptr;
       splits_at_particle = word_then_particle || particle_then_word;
     }
-    if (registered_stem || splits_at_particle) {
+    const std::string stem = extractSubstring(codepoints, start_pos, stem_end);
+    // A stem closing on げ is a host plus the appearance suffix (頼り+な+げ),
+    // which keeps its own boundary instead of forming a nominal adjective.
+    if (registered_stem || splits_at_particle || utf8::endsWith(stem, "げ")) {
       return;
     }
-    const std::string stem = extractSubstring(codepoints, start_pos, stem_end);
     candidates.push_back(makeNaAdjCandidate(stem, start_pos, stem_end, candidate::kNaAdjYakaCost, true,
                                             CandidateOrigin::AdjectiveNa, candidate::kHiraganaNaAdjNariConfidence,
                                             "hira_na_adj_attributive"));

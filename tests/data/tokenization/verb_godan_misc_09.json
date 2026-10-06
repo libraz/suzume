@@ -1968,6 +1968,90 @@
       ],
       "id": "wo_rasu_2",
       "input": "数を減らす"
+    },
+    {
+      "description": "頼りなげな表情を浮かべる - auto-generated",
+      "expected": [
+        {
+          "lemma": "頼り",
+          "pos": "Noun",
+          "surface": "頼り"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "な"
+        },
+        {
+          "lemma": "げ",
+          "pos": "Suffix",
+          "surface": "げ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "表情",
+          "pos": "Noun",
+          "surface": "表情"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "浮かべる",
+          "pos": "Verb",
+          "surface": "浮かべる"
+        }
+      ],
+      "id": "rinagena_wo_kaberu",
+      "input": "頼りなげな表情を浮かべる"
+    },
+    {
+      "description": "申し訳なげに頭を下げる - auto-generated",
+      "expected": [
+        {
+          "lemma": "申し訳",
+          "pos": "Noun",
+          "surface": "申し訳"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "な"
+        },
+        {
+          "lemma": "げ",
+          "pos": "Suffix",
+          "surface": "げ"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "頭",
+          "pos": "Noun",
+          "surface": "頭"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "下げる",
+          "pos": "Verb",
+          "surface": "下げる"
+        }
+      ],
+      "id": "shi_nageni_wo_geru",
+      "input": "申し訳なげに頭を下げる"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",
