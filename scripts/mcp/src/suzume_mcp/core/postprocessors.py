@@ -8,9 +8,13 @@ from . import (
     postprocessor_common,
     postprocessor_function_words,
     postprocessor_mecab,
+    postprocessor_mecab_contractions,
+    postprocessor_mecab_nominal_repairs,
     postprocessor_nominals,
+    postprocessor_predicate_hosts,
     postprocessor_predicates,
     postprocessor_subsidiaries,
+    postprocessor_te_chains,
 )
 
 # Exports from postprocessor_boundaries.
@@ -323,10 +327,14 @@ POSTPROCESSORS: tuple[tuple[str, Callable[[list[dict]], bool]], ...] = (
 POSTPROCESSOR_MODULES = (
     postprocessor_common,
     postprocessor_mecab,
+    postprocessor_mecab_contractions,
+    postprocessor_mecab_nominal_repairs,
     postprocessor_function_words,
     postprocessor_predicates,
     postprocessor_nominals,
     postprocessor_subsidiaries,
+    postprocessor_te_chains,
+    postprocessor_predicate_hosts,
     postprocessor_classical,
     postprocessor_boundaries,
 )
