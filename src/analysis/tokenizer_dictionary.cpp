@@ -2819,7 +2819,7 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
       };
       auto holds_final_particle_vowel = [&]() {
         if (result.entry->extended_pos != core::ExtendedPOS::ParticleFinal || emphatic.end != end_pos + 1 ||
-            !closes_clause_after_emphatic()) {
+            normalize::utf8Length(result.entry->surface) != 1 || !closes_clause_after_emphatic()) {
           return false;
         }
         const char32_t held = codepoints[end_pos];

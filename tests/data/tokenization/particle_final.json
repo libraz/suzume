@@ -1871,6 +1871,109 @@
       ],
       "id": "kuzona",
       "input": "行くぞな"
+    },
+    {
+      "description": "本を読んだわい - auto-generated",
+      "expected": [
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "わい",
+          "pos": "Particle",
+          "surface": "わい"
+        }
+      ],
+      "id": "wo_ndawai",
+      "input": "本を読んだわい"
+    },
+    {
+      "description": "困ったわい - auto-generated",
+      "expected": [
+        {
+          "lemma": "困る",
+          "pos": "Verb",
+          "surface": "困っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "わい",
+          "pos": "Particle",
+          "surface": "わい"
+        }
+      ],
+      "id": "tttawai",
+      "input": "困ったわい"
+    },
+    {
+      "description": "食べるわい - auto-generated",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べる"
+        },
+        {
+          "lemma": "わい",
+          "pos": "Particle",
+          "surface": "わい"
+        }
+      ],
+      "id": "beruwai",
+      "input": "食べるわい"
+    },
+    {
+      "description": "僕が笑ったわい - auto-generated",
+      "expected": [
+        {
+          "lemma": "僕",
+          "pos": "Pronoun",
+          "surface": "僕"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "笑う",
+          "pos": "Verb",
+          "surface": "笑っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "わい",
+          "pos": "Particle",
+          "surface": "わい"
+        }
+      ],
+      "id": "ga_tttawai",
+      "input": "僕が笑ったわい"
     }
   ],
   "description": "particle_final tests",

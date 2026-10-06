@@ -103,6 +103,7 @@ EntrySpecRange getParticleEntries() {
       particle("よ", EPOS::ParticleFinal),
       particle("さ", EPOS::ParticleFinal),
       particle("わ", EPOS::ParticleFinal),
+      particle("わい", EPOS::ParticleFinal),  // emphatic わ (笑ったわい, 食べるわい)
       particle("ぞ", EPOS::ParticleFinal),
       // ぞ is also the classical binding particle, like こそ and なむ above: it
       // licenses a nominal in the inverted kakari-musubi order (散りたる+ぞ+花).
