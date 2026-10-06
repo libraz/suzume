@@ -921,6 +921,43 @@
       ],
       "id": "e_sounano",
       "input": "え、そうなの。"
+    },
+    {
+      "description": "犬やねこも家族だ - auto-generated",
+      "expected": [
+        {
+          "lemma": "犬",
+          "pos": "Noun",
+          "surface": "犬"
+        },
+        {
+          "lemma": "や",
+          "pos": "Particle",
+          "surface": "や"
+        },
+        {
+          "lemma": "ねこ",
+          "pos": "Noun",
+          "surface": "ねこ"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "家族",
+          "pos": "Noun",
+          "surface": "家族"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "yanekomo_da",
+      "input": "犬やねこも家族だ"
     }
   ],
   "description": "Modality auxiliaries (たい、そう、らしい) (part 2/2)",

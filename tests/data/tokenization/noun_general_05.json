@@ -251,6 +251,43 @@
       ],
       "id": "ha_nai_da",
       "input": "今回はピンチない状況だ"
+    },
+    {
+      "description": "犬がねこは好きだ - auto-generated",
+      "expected": [
+        {
+          "lemma": "犬",
+          "pos": "Noun",
+          "surface": "犬"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ねこ",
+          "pos": "Noun",
+          "surface": "ねこ"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "好き",
+          "pos": "Adjective",
+          "surface": "好き"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "ganekoha_kida",
+      "input": "犬がねこは好きだ"
     }
   ],
   "description": "General nouns (part 5/5)",

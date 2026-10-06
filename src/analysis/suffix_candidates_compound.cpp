@@ -218,7 +218,10 @@ bool hasInternalNominalParticleBoundary(const std::vector<char32_t>& codepoints,
       constexpr PartOfSpeechMask kNominalMask = partOfSpeechMask(core::PartOfSpeech::Noun) |
                                                 partOfSpeechMask(core::PartOfSpeech::Pronoun) |
                                                 partOfSpeechMask(core::PartOfSpeech::Suffix);
-      if (!hasExactPartOfSpeech(*dict_manager, remainder, kNominalMask)) {
+      // Only the genitive joins constituents into a lexicalized nominal; the
+      // subject, object and topic markers never do (音+が+ねこ).
+      if (!hasExactPartOfSpeech(*dict_manager, remainder, kNominalMask) ||
+          match.entry->extended_pos != core::ExtendedPOS::ParticleNo) {
         return true;
       }
     }
