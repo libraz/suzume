@@ -615,6 +615,10 @@ constexpr float kQuotedPassiveSuruBonus = -0.3F;
 constexpr float kSahenPassiveSuruBonus = kContractedOnbinBonus;
 // Weak penalty for uncertain verb patterns (passive, causative, zu-form)
 constexpr float kWeakPenalty = 0.1F;
+// A katakana run that cannot end an ichidan stem, plus only a negative, is read
+// as a noun with the adjective ない (ペン+ない, カフェ+ない); the denominal verb
+// reading is discouraged rather than removed.
+constexpr float kKatakanaIchidanNegativePenalty = bigram_cost::kSevere;
 // Minor penalty for a tense candidate with less evidence than a contracted
 // auxiliary boundary.
 constexpr float kMinorPenalty = 0.2F;

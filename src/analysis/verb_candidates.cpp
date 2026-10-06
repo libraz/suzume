@@ -309,6 +309,18 @@ void generateKatakanaVerbCandidates(const std::vector<char32_t>& codepoints, siz
       // Cost: 0.4-0.55 based on confidence (lower = better)
       float cost = candidate::confidenceScaledCost(verb_opts.base_cost_standard, best.confidence,
                                                    verb_opts.confidence_cost_scale);
+      // An ichidan stem ends on a full-size e-row or i-row mora, so a run closing
+      // on anything else (ペン, カフェ, コーヒー) has no ichidan reading at all.
+      const char32_t stem_final = codepoints[kata_end - 1];
+      const bool small_vowel = utf8::equalsAny(normalize::encodeUtf8(stem_final), {"ァ", "ィ", "ゥ", "ェ", "ォ"});
+      const char32_t stem_final_hiragana =
+          stem_final >= U'ァ' && stem_final <= U'ヶ' ? stem_final - (U'ァ' - U'ぁ') : 0;
+      const bool ichidan_stem_final =
+          !small_vowel && (kana::isERowCodepoint(stem_final_hiragana) || kana::isIRowCodepoint(stem_final_hiragana));
+      if (best.verb_type == grammar::VerbType::Ichidan && !ichidan_stem_final &&
+          vh::naiNegativeFormLengthAt(codepoints, kata_end) == end_pos - kata_end) {
+        cost += candidate::verb_cost::kKatakanaIchidanNegativePenalty;
+      }
       candidates.push_back(makeVerbCandidate(
           surface, start_pos, end_pos, cost, best.base_form, grammar::verbTypeToConjType(best.verb_type), false,
           CandidateOrigin::VerbKatakana, best.confidence, grammar::verbTypeToString(best.verb_type).data()));

@@ -1141,6 +1141,38 @@
       ],
       "id": "ttte_ha_shii_2",
       "input": "従って結論は正しい"
+    },
+    {
+      "description": "この辺にカフェない？ - auto-generated",
+      "expected": [
+        {
+          "lemma": "この",
+          "pos": "Determiner",
+          "surface": "この"
+        },
+        {
+          "lemma": "辺",
+          "pos": "Noun",
+          "surface": "辺"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "カフェ",
+          "pos": "Noun",
+          "surface": "カフェ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
+      "id": "kono_ni_nai",
+      "input": "この辺にカフェない？"
     }
   ],
   "description": "Basic tokenization tests",

@@ -2330,6 +2330,40 @@
       ],
       "id": "kono_wo_de_suru",
       "input": "この問題を最優先で対応する"
+    },
+    {
+      "description": "カフェない - auto-generated",
+      "expected": [
+        {
+          "lemma": "カフェ",
+          "pos": "Noun",
+          "surface": "カフェ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
+      "id": "nai_3",
+      "input": "カフェない"
+    },
+    {
+      "description": "ペンない - auto-generated",
+      "expected": [
+        {
+          "lemma": "ペン",
+          "pos": "Noun",
+          "surface": "ペン"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
+      "id": "nai_4",
+      "input": "ペンない"
     }
   ],
   "description": "General nouns (part 4/4)",
