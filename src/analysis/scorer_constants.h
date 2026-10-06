@@ -470,6 +470,9 @@ constexpr float kEosTeEndingAdverbPenalty = scale::kNever;
 // A fabricated continuative after a one-character noun closing the utterance.
 constexpr float kEosNounContinuativePenalty = scale::kStrong;
 
+// A formal noun does not follow the bare-kanji terminal of a classical verb (候+はず).
+constexpr float kPenaltyBareClassicalTerminalBeforeFormalNoun = scale::kStrong;
+
 // The recollective け after a bare common noun is the tail of a nominalized verb.
 constexpr float kPenaltyBareNounRecollectiveKe = scale::kStrong;
 

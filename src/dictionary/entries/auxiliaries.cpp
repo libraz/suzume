@@ -378,6 +378,7 @@ EntrySpecRange getAuxiliaryEntries() {
       // okurigana-spelled cells come from the classical ハ行四段 generator.
       verb("候", "候ふ", EPOS::VerbShuushikei),
       verb("候", "候ふ", EPOS::VerbRenyokei),
+      verb("候は", "候ふ", EPOS::VerbMizenkei),
       // Irregular i-adjective よい/いい (形容詞・アウオ段)
       // MeCab: よければ → よけれ(仮定形) + ば, よかった → よかっ(連用タ接続) + た
       // いい is colloquial form of よい, shares conjugated forms (よかった, よければ, etc.)

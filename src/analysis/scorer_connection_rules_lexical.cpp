@@ -424,6 +424,20 @@ float computeBareNounRecollectiveKePenalty(const core::LatticeEdge& prev, const 
   return bare_noun_host && recollective_ke ? sc::kPenaltyBareNounRecollectiveKe : sc::scale::kNeutral;
 }
 
+/// The epistolary 候 is a bare-kanji cell of the classical ハ行 verb 候ふ: it
+/// stands only as the clause-closing terminal, while a formal noun selects the
+/// attributive 候ふ. So 候+はず is not the formal noun; 候は+ず is the negative.
+/// The kanji connectives of the epistolary clause (候間, 候処) are the exception.
+float computeBareClassicalTerminalFormalNounPenalty(const core::LatticeEdge& prev, const core::LatticeEdge& next) {
+  const bool bare_classical_terminal = prev.pos == core::PartOfSpeech::Verb &&
+                                       prev.extended_pos == core::ExtendedPOS::VerbShuushikei &&
+                                       utf8::endsWith(prev.lemma, "ふ") && !utf8::endsWith(prev.surface, "ふ");
+  return bare_classical_terminal && next.extended_pos == core::ExtendedPOS::NounFormal &&
+                 !grammar::containsKanji(next.surface)
+             ? sc::kPenaltyBareClassicalTerminalBeforeFormalNoun
+             : sc::scale::kNeutral;
+}
+
 float computeCopulaConditionalBonus(const core::LatticeEdge& prev, const core::LatticeEdge& next) {
   // The literary concessive/conditional construction であれ(ば) is the
   // continuative copula followed by the hypothetical form of ある. Favor this

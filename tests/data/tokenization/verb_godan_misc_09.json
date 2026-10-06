@@ -1404,6 +1404,50 @@
       ],
       "id": "ha_wo_kimasu",
       "input": "彼は毎日を生きます。"
+    },
+    {
+      "description": "存じ候はば - auto-generated",
+      "expected": [
+        {
+          "lemma": "存じる",
+          "pos": "Verb",
+          "surface": "存じ"
+        },
+        {
+          "lemma": "候ふ",
+          "pos": "Verb",
+          "surface": "候は"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "ji_haba",
+      "input": "存じ候はば"
+    },
+    {
+      "description": "存じ候はず - auto-generated",
+      "expected": [
+        {
+          "lemma": "存じる",
+          "pos": "Verb",
+          "surface": "存じ"
+        },
+        {
+          "lemma": "候ふ",
+          "pos": "Verb",
+          "surface": "候は"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ず"
+        }
+      ],
+      "id": "ji_hazu",
+      "input": "存じ候はず"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",
