@@ -1533,6 +1533,119 @@
       ],
       "id": "betaishisa",
       "input": "食べたいしさ。"
+    },
+    {
+      "description": "星のように光りたいな - auto-generated",
+      "expected": [
+        {
+          "lemma": "星",
+          "pos": "Noun",
+          "surface": "星"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "よう",
+          "pos": "Noun",
+          "surface": "よう"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "光る",
+          "pos": "Verb",
+          "surface": "光り"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たい"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        }
+      ],
+      "id": "noyouni_ritaina",
+      "input": "星のように光りたいな"
+    },
+    {
+      "description": "やれやれ、参ったな。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "やれやれ",
+          "pos": "Adverb",
+          "surface": "やれやれ"
+        },
+        {
+          "lemma": "参る",
+          "pos": "Verb",
+          "surface": "参っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        }
+      ],
+      "id": "yareyare_tttana",
+      "input": "やれやれ、参ったな。"
+    },
+    {
+      "description": "困ったな - auto-generated",
+      "expected": [
+        {
+          "lemma": "困る",
+          "pos": "Verb",
+          "surface": "困っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        }
+      ],
+      "id": "tttana",
+      "input": "困ったな"
+    },
+    {
+      "description": "食べたいな - auto-generated",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たい"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        }
+      ],
+      "id": "betaina",
+      "input": "食べたいな"
     }
   ],
   "description": "particle_final tests",

@@ -343,8 +343,28 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
         const char32_t predicate_tail = codepoints[predicate_end - 1];
         // The terminal る contracts to ん before the prohibitive な (忘れん+な);
         // only a bare kanji keeps ん as a stem ending (盛んな).
+        // A predicate also closes on a conjugating auxiliary of its own — the
+        // past た and the desiderative たい (参っ+た+な, 光り+たい+な). The
+        // auxiliary has to follow a kana of the verb cell; right after the
+        // kanji the same た is a stem ending (新た+な).
+        bool closes_on_predicate_auxiliary = false;
+        if (dict_manager != nullptr) {
+          for (size_t aux_start = kanji_end + 1; aux_start < predicate_end && !closes_on_predicate_auxiliary;
+               ++aux_start) {
+            for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, aux_start, predicate_end)) {
+              if (match.entry != nullptr && aux_start + match.length == predicate_end &&
+                  match.entry->pos == core::PartOfSpeech::Auxiliary &&
+                  (match.entry->extended_pos == core::ExtendedPOS::AuxTenseTa ||
+                   match.entry->extended_pos == core::ExtendedPOS::AuxDesireTai)) {
+                closes_on_predicate_auxiliary = true;
+                break;
+              }
+            }
+          }
+        }
         const bool closes_on_verbal_ru =
             predicate_tail == U'る' || (predicate_tail == U'ん' && predicate_end - 1 > kanji_end) ||
+            closes_on_predicate_auxiliary ||
             (after_final_particle &&
              (kana::isURowCodepoint(predicate_tail) || predicate_tail == U'た' || predicate_tail == U'だ'));
         if (is_bare_attributive && !has_internal_particle && !contains_closed_suffix && !starts_closed_tail &&
