@@ -156,7 +156,12 @@ float computeTaFormVolitionalBonus(const core::LatticeEdge& prev, const core::La
       grammar::isSingleHiragana(next.surface, core::hiragana::kU) &&
       prev.extended_pos == core::ExtendedPOS::VerbMizenkei && grammar::endsWithORow(prev.surface) &&
       prev.lemma != "いく" &&
+      // A dictionary edge leaves a る-final lemma's row unset, but an o-row
+      // irrealis cell other than よ exists only in the godan paradigm (くださろ,
+      // なさろ); よ is the ichidan and カ変 volitional stem (こよ).
       (grammar::isGodanVerbType(grammar::conjTypeToVerbType(prev.conj_type)) ||
+       (prev.fromDictionary() && prev.conj_type == dictionary::ConjugationType::None &&
+        !utf8::endsWith(prev.surface, "よ")) ||
        prev.conj_type == dictionary::ConjugationType::Suru || prev.lemma == "する" ||
        (prev.conj_type == dictionary::ConjugationType::Ichidan && utf8::endsWith(prev.surface, "よ")));
 

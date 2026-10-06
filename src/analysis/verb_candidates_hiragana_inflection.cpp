@@ -576,8 +576,12 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
         // forms, so generate the 未然形 stem here to complete the split path
         // (しまおう → しまお + う).
         const auto* godan_row = grammar::Conjugation::getGodanRow(best.verb_type);
-        if (!is_dictionary_verb && godan_row != nullptr && godan_row->o_row == codepoints[end_pos - 2] &&
-            pre_filter_len >= 3) {
+        // Nor may the stem open inside a dictionary verb cell that ends where it
+        // does: the run began one mora late (て+く|ださろ is て+くださろ).
+        const bool opens_inside_dictionary_verb =
+            start_pos > 0 && vh::isVerbInDictionary(dict_manager, codepoints, start_pos - 1, end_pos - 1);
+        if (!is_dictionary_verb && !opens_inside_dictionary_verb && godan_row != nullptr &&
+            godan_row->o_row == codepoints[end_pos - 2] && pre_filter_len >= 3) {
           std::string stem_surface = extractSubstring(codepoints, start_pos, end_pos - 1);
           SUZUME_DEBUG_LOG_VERBOSE("[VERB_CAND] " << stem_surface
                                                   << " hiragana_volitional_mizenkei lemma=" << best.base_form << "\n");
