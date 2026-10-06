@@ -2668,6 +2668,38 @@
       ],
       "id": "ka_i_reta",
       "input": "何か買い忘れた"
+    },
+    {
+      "description": "verb continuative and final particle do not take a bare conjunction",
+      "expected": [
+        {
+          "lemma": "夜明け",
+          "pos": "Noun",
+          "surface": "夜明け"
+        },
+        {
+          "lemma": "ゆえ",
+          "pos": "Suffix",
+          "surface": "ゆえ"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "遅れる",
+          "pos": "Verb",
+          "surface": "遅れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "keyueni_reta",
+      "input": "夜明けゆえに遅れた"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",

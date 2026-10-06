@@ -150,6 +150,11 @@ void setVerbAndAdjectiveCosts(BigramMatrix& table) {
       // The onbin stem takes only て/た/たら/たり, so a conjunction spelled from
       // て after it is the connective plus what follows (寄っ+て+か+ない).
       {EPOS::VerbOnbinkei, EPOS::Conjunction, cost::kAlmostNever},
+      // A continuative stem and a sentence-final particle both leave the clause
+      // open or closed without a boundary mark, so a conjunction cannot follow
+      // them directly (夜明け+ゆえに is a noun plus ゆえに, not 夜+明け+ゆえに).
+      {EPOS::VerbRenyokei, EPOS::Conjunction, cost::kVeryRare},
+      {EPOS::ParticleFinal, EPOS::Conjunction, cost::kVeryRare},
 
       // An irrealis stem cannot take a sentence-final particle. The
       // prohibitive な attaches to the terminal form (読む+な), while negative
