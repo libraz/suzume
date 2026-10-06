@@ -2317,6 +2317,38 @@
       ],
       "id": "buttta_wotoru",
       "input": "偉ぶった態度をとる"
+    },
+    {
+      "description": "ほのかな香りが漂う - auto-generated",
+      "expected": [
+        {
+          "lemma": "ほのか",
+          "pos": "Adjective",
+          "surface": "ほのか"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "香り",
+          "pos": "Noun",
+          "surface": "香り"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "漂う",
+          "pos": "Verb",
+          "surface": "漂う"
+        }
+      ],
+      "id": "honokana_riga_u",
+      "input": "ほのかな香りが漂う"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 3/3)",

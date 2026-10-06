@@ -378,6 +378,31 @@ def postprocess_na_adj_noun(tokens: list[dict]) -> bool:
     return changed
 
 
+def postprocess_kana_na_adjective_stem(tokens: list[dict]) -> bool:
+    """Read a kana noun the reference lists as a plain noun as a na-adjective stem before attributive な.
+
+    Only a na-adjective stem takes the attributive な and then a noun (ほのかな香り),
+    so a kana noun in that frame is the stem. The copula な before の or ん is the
+    predicative copula after a real noun and stays as it is.
+    """
+    changed = False
+    for idx in range(len(tokens) - 2):
+        token, copula, head = tokens[idx : idx + 3]
+        if (
+            token.get("pos") == "Noun"
+            and regex.fullmatch(r"\p{Hiragana}{2,}", token.get("surface", ""))
+            and copula.get("surface") == "な"
+            and copula.get("pos") == "Auxiliary"
+            and copula.get("lemma") == "だ"
+            and head.get("pos") == "Noun"
+            and head.get("surface") not in ("の", "ん")
+        ):
+            token["pos"] = "Adjective"
+            token["lemma"] = token.get("surface", "")
+            changed = True
+    return changed
+
+
 def postprocess_hiragana_yaka_adverbial(tokens: list[dict]) -> bool:
     """Repair a split hiragana na-adjective in the productive 〜やかに form."""
     for idx in range(len(tokens) - 1):

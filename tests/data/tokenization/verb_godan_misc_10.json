@@ -2582,6 +2582,53 @@
       ],
       "id": "ni_u_3",
       "input": "彼常に笑う"
+    },
+    {
+      "description": "子供なのに大人びた話し方をする - auto-generated",
+      "expected": [
+        {
+          "lemma": "子供",
+          "pos": "Noun",
+          "surface": "子供"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "のに",
+          "pos": "Particle",
+          "surface": "のに"
+        },
+        {
+          "lemma": "大人びる",
+          "pos": "Verb",
+          "surface": "大人び"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "話し方",
+          "pos": "Noun",
+          "surface": "話し方"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "nanoni_bita_shi_wosuru",
+      "input": "子供なのに大人びた話し方をする"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",

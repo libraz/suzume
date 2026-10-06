@@ -150,6 +150,7 @@ postprocess_bare_sa_row_imperative = postprocessor_predicates.postprocess_bare_s
 postprocess_katakana_ichidan_continuative = postprocessor_predicates.postprocess_katakana_ichidan_continuative
 postprocess_katakana_godan_te_form = postprocessor_predicates.postprocess_katakana_godan_te_form
 postprocess_na_adj_noun = postprocessor_predicates.postprocess_na_adj_noun
+postprocess_kana_na_adjective_stem = postprocessor_predicates.postprocess_kana_na_adjective_stem
 postprocess_onaji_predicate = postprocessor_predicates.postprocess_onaji_predicate
 postprocess_short_hiragana_onbin = postprocessor_predicates.postprocess_short_hiragana_onbin
 postprocess_sou = postprocessor_predicates.postprocess_sou
@@ -278,6 +279,7 @@ POSTPROCESSORS: tuple[tuple[str, Callable[[list[dict]], bool]], ...] = (
     ("ka-suru-noun", postprocess_ka_suru_noun),
     ("taihen-context", postprocess_taihen),
     ("na-adjective-noun-use", postprocess_na_adj_noun),
+    ("kana-na-adjective-stem", postprocess_kana_na_adjective_stem),
     ("deverbal-noun-context", postprocess_deverbal_noun_context),
     ("attributive-mamonaku", postprocess_attributive_mamonaku),
     ("adverb-nominal-context", postprocess_adverb_nominal_context),
