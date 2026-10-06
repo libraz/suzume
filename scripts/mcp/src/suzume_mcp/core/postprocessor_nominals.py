@@ -11,6 +11,7 @@ from .constants import (
 from .core_lexicon import core_headwords
 from .mecab import mecab_analyze
 from .merge_postprocessors import NIDAN_TERMINAL_KANA
+from .pos_mapping import map_mecab_pos
 from .postprocessor_common import reports_mutation
 
 
@@ -449,6 +450,39 @@ def postprocess_formal_noun_lemma(tokens: list[dict]) -> bool:
         if token.get("lemma") != lemma:
             token["lemma"] = lemma
             changed = True
+    return changed
+
+
+def postprocess_indefinite_pronoun_ka(tokens: list[dict]) -> bool:
+    """Split the か of an indefinite pronoun off a verb the reference fused it into.
+
+    何か and 誰か close on the adverbial か, so what follows begins its own word
+    (何+か+し忘れた). The reference dictionary can read か+し忘れ as one verb; the
+    mora is handed back as the particle and the rest is analyzed again.
+    """
+    changed = False
+    idx = 1
+    while idx < len(tokens):
+        token = tokens[idx]
+        surface = token.get("surface", "")
+        if (
+            token.get("pos") == "Verb"
+            and len(surface) > 1
+            and surface.startswith("か")
+            and tokens[idx - 1].get("pos") == "Pronoun"
+            and tokens[idx - 1].get("surface") in {"何", "誰"}
+        ):
+            # Analyze the whole tail so the verb keeps the context that reads it as one.
+            tail = surface[1:] + "".join(following.get("surface", "") for following in tokens[idx + 1 :])
+            rest = [
+                {"surface": item["surface"], "pos": map_mecab_pos(item), "lemma": item.get("lemma", item["surface"])}
+                for item in mecab_analyze(tail)
+            ]
+            tokens[idx:] = [{"surface": "か", "pos": "Particle", "lemma": "か"}, *rest]
+            changed = True
+            idx += 1 + len(rest)
+            continue
+        idx += 1
     return changed
 
 

@@ -1557,3 +1557,22 @@ class TestClassicalPerfectTe:
             {"surface": "た", "pos": "Auxiliary", "lemma": "た"},
         ]
         assert not postprocessors.postprocess_classical_perfect_te(tokens)
+
+
+class TestIndefinitePronounKa:
+    def test_ka_fused_into_a_verb_after_an_indefinite_pronoun_is_split(self):
+        tokens = [
+            {"surface": "何", "pos": "Pronoun", "lemma": "何"},
+            {"surface": "かし忘れ", "pos": "Verb", "lemma": "かし忘れる"},
+            {"surface": "た", "pos": "Auxiliary", "lemma": "た"},
+        ]
+        assert postprocessors.postprocess_indefinite_pronoun_ka(tokens)
+        assert [t["surface"] for t in tokens][:2] == ["何", "か"]
+        assert tokens[1]["pos"] == "Particle"
+
+    def test_a_verb_after_a_non_pronoun_is_left_alone(self):
+        tokens = [
+            {"surface": "本", "pos": "Noun", "lemma": "本"},
+            {"surface": "かし忘れ", "pos": "Verb", "lemma": "かし忘れる"},
+        ]
+        assert not postprocessors.postprocess_indefinite_pronoun_ka(tokens)

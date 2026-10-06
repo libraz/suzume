@@ -269,10 +269,16 @@ float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::
   // nominative is the one exponent the bonus has to skip. Without this it buys a
   // fabricated focus particle out of the first mora of the very predicate the
   // case marks (太陽+が+も+たらす for 太陽+が+もたらす).
+  // The listing し follows a finite predicate, which a particle is not: after an
+  // adverbial particle the mora is the light verb's continuative (何か+し+忘れた).
+  const bool unlicensed_listing_shi = prev.extended_pos == core::ExtendedPOS::ParticleAdverbial &&
+                                      next.extended_pos == core::ExtendedPOS::ParticleConj &&
+                                      utf8::equalsAny(next.surface, {"し"});
   const bool unlicensed_nominative_stacking = prev.extended_pos == core::ExtendedPOS::ParticleCase &&
                                               utf8::equalsAny(prev.surface, {"が"}) &&
                                               next.extended_pos == core::ExtendedPOS::ParticleTopic;
-  if (quantifier_host || unlicensed_tomo || unlicensed_hypothetical || unlicensed_nominative_stacking) {
+  if (quantifier_host || unlicensed_tomo || unlicensed_hypothetical || unlicensed_nominative_stacking ||
+      unlicensed_listing_shi) {
     SUZUME_CONNECTION_ADD(bonus, quantifier_host ? cost::kExtremeBonus : cost::kAlmostNever);
   }
 

@@ -286,9 +286,12 @@ float computeProgressiveHonorificBonus(const core::LatticeEdge& prev, const core
   // stem, and a one-kanji renyokei (だけ+寝) keeps its self-standing stem, so
   // gating on a single hiragana character leaves those untouched while
   // countering the ParticleAdverbial→VerbRenyokei bonus that the false path
-  // would otherwise receive.
+  // would otherwise receive. The light verb's continuative し is the real
+  // predicate after an adverbial particle (何か+し+忘れた), not a fabricated
+  // ichidan stem.
   if (prev.extended_pos == core::ExtendedPOS::ParticleAdverbial &&
       next.extended_pos == core::ExtendedPOS::VerbRenyokei && next.surface.size() == core::kJapaneseCharBytes &&
+      !grammar::isSuruRenyokeiSurface(next.surface) &&
       normalize::classifyChar(utf8::decodeFirstChar(next.surface)) == normalize::CharType::Hiragana) {
     SUZUME_CONNECTION_ADD(bonus, cost::kStrong);
   }

@@ -103,6 +103,14 @@ CompoundV1Verification verifyCompoundVerbV1(const CompoundV1VerificationRequest&
     return result;
   }
 
+  // An indefinite pronoun closes on its か (何か, 誰か): that か is the adverbial
+  // particle, so the compound verb begins after it (何+か+し忘れる), and the
+  // pronoun plus か and the continuative that follows cannot be one V1.
+  if (!dict_compound_v1 && kanji_end < v2_start && codepoints[kanji_end] == core::hiragana::kKa &&
+      lookupEntryInRange(dict_manager, codepoints, start_pos, kanji_end, core::PartOfSpeech::Pronoun) != nullptr) {
+    return {};
+  }
+
   // Build the V1 base form for verification.
   const size_t v1_end_byte = is_ichidan ? v2_start_byte : byteOffsetAt(byte_offsets, kanji_end);
   v1_verified = dict_compound_v1;

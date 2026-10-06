@@ -105,6 +105,7 @@ split_transparent_suru_te_adverb = postprocessor_mecab.split_transparent_suru_te
 
 # Exports from postprocessor_nominals.
 postprocess_adjective_nominalizer = postprocessor_nominals.postprocess_adjective_nominalizer
+postprocess_indefinite_pronoun_ka = postprocessor_nominals.postprocess_indefinite_pronoun_ka
 postprocess_adverb_nominal_context = postprocessor_nominals.postprocess_adverb_nominal_context
 postprocess_adverbial_temporal_prefix = postprocessor_nominals.postprocess_adverbial_temporal_prefix
 postprocess_attributive_mamonaku = postprocessor_nominals.postprocess_attributive_mamonaku
@@ -212,6 +213,7 @@ POSTPROCESSORS: tuple[tuple[str, Callable[[list[dict]], bool]], ...] = (
     ("monono-conjunction", postprocess_monono_conjunction),
     ("formal-noun-lemma", postprocess_formal_noun_lemma),
     ("adjective-nominalizer", postprocess_adjective_nominalizer),
+    ("indefinite-pronoun-ka", postprocess_indefinite_pronoun_ka),
     ("verbal-nominalizer-mi", postprocess_verbal_nominalizer_mi),
     ("mu-verb-desiderative", postprocess_mu_verb_desiderative),
     ("shortened-causative-passive", postprocess_shortened_causative_passive),
