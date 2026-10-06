@@ -1750,6 +1750,119 @@
       ],
       "id": "oishiinda",
       "input": "おいしいんだ"
+    },
+    {
+      "description": "面白さもある - auto-generated",
+      "expected": [
+        {
+          "lemma": "面白い",
+          "pos": "Adjective",
+          "surface": "面白"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Suffix",
+          "surface": "さ"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        }
+      ],
+      "id": "samoaru",
+      "input": "面白さもある"
+    },
+    {
+      "description": "高さもある - auto-generated",
+      "expected": [
+        {
+          "lemma": "高い",
+          "pos": "Adjective",
+          "surface": "高"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Suffix",
+          "surface": "さ"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        }
+      ],
+      "id": "samoaru_2",
+      "input": "高さもある"
+    },
+    {
+      "description": "強さもある - auto-generated",
+      "expected": [
+        {
+          "lemma": "強い",
+          "pos": "Adjective",
+          "surface": "強"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Suffix",
+          "surface": "さ"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        }
+      ],
+      "id": "samoaru_3",
+      "input": "強さもある"
+    },
+    {
+      "description": "重さもあった - auto-generated",
+      "expected": [
+        {
+          "lemma": "重い",
+          "pos": "Adjective",
+          "surface": "重"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Suffix",
+          "surface": "さ"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "samoattta",
+      "input": "重さもあった"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 3/3)",

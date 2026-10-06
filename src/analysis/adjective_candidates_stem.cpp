@@ -363,7 +363,14 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
       // For 1-char patterns (み, さ), skip if the hiragana portion starts with
       // a known dictionary word of 2+ chars. This prevents splitting known words.
       // E.g., 像+みんな → みんな is PRON, so み is not nominalization suffix
-      if (pattern.size() <= 3 && hiragana_part.size() > pattern.size() && dict_manager) {
+      // A registered particle opening right after the pattern keeps it, though:
+      // there the pattern closes a word and the longer entry only spells
+      // across that boundary (高さ+も, not さも).
+      const bool particle_follows_pattern =
+          dict_manager != nullptr && hiragana_part.size() > pattern.size() &&
+          lookupEntryInRange(*dict_manager, codepoints, kanji_end + normalize::utf8Length(pattern),
+                             kanji_end + normalize::utf8Length(pattern) + 1, core::PartOfSpeech::Particle) != nullptr;
+      if (pattern.size() <= 3 && hiragana_part.size() > pattern.size() && dict_manager && !particle_follows_pattern) {
         auto hira_results = dict_manager->lookup(hiragana_part, 0);
         bool has_longer_dict_word = false;
         for (const auto& result : hira_results) {
