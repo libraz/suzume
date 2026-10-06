@@ -1578,6 +1578,72 @@
       ],
       "id": "ni_ttte_u_2",
       "input": "規則に従って行う"
+    },
+    {
+      "description": "走り出せよ - auto-generated",
+      "expected": [
+        {
+          "lemma": "走り出す",
+          "pos": "Verb",
+          "surface": "走り出せ"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "ri_seyo",
+      "input": "走り出せよ"
+    },
+    {
+      "description": "飛び出せよ - auto-generated",
+      "expected": [
+        {
+          "lemma": "飛び出す",
+          "pos": "Verb",
+          "surface": "飛び出せ"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "bi_seyo",
+      "input": "飛び出せよ"
+    },
+    {
+      "description": "書き直せと言われた - auto-generated",
+      "expected": [
+        {
+          "lemma": "書き直す",
+          "pos": "Verb",
+          "surface": "書き直せ"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言わ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ki_seto_wareta",
+      "input": "書き直せと言われた"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",

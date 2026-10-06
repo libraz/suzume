@@ -519,9 +519,17 @@ CompoundVerbMatch findCompoundVerbMatch(
         // the next word starting on kanji (走り出せ今). The competing readings
         // all need kana right after: ば for the conditional, the auxiliary for
         // the potential's stem.
+        // A sentence-final or quotative particle also closes it (走り出せ+よ,
+        // 書き直せ+と+言う); ば and the auxiliaries of the potential do not.
         const size_t imperative_end = v2_start + normalize::utf8Length(imperative);
+        const bool closed_by_particle =
+            verb_helpers::oneMoraParticleEndsAt(&dict_manager, codepoints, imperative_end + 1,
+                                                core::ExtendedPOS::ParticleFinal) ||
+            verb_helpers::oneMoraParticleEndsAt(&dict_manager, codepoints, imperative_end + 1,
+                                                core::ExtendedPOS::ParticleQuote) ||
+            (imperative_end < codepoints.size() && codepoints[imperative_end] == core::hiragana::kTo);
         if (imperative_end < char_types.size() && char_types[imperative_end] != CharType::Symbol &&
-            char_types[imperative_end] != CharType::Kanji) {
+            char_types[imperative_end] != CharType::Kanji && !closed_by_particle) {
           return;
         }
         matched_imperative = true;
@@ -777,6 +785,11 @@ CompoundVerbMatch findCompoundVerbMatch(
       // A lexical V2 base form (続ける) takes precedence over an overlapping
       // potential form generated from a different Godan V2 (続く→続ける).
       should_update = true;
+    } else if (matched_imperative && best_match.is_imperative) {
+      // Two imperatives can overlap when a particle closes the shorter one: the
+      // Godan 続け before よ and the Ichidan 続けよ. The longer spells more of
+      // the text, and the particle reading is the fallback.
+      should_update = matched_len > best_match.matched_len;
     } else if ((matched_kanji || matched_reading || matched_renyokei) && best_match.is_imperative) {
       // Any lexical V2 match outranks an imperative generated off a different
       // Godan V2 that happens to spell the same characters: つけ is the
