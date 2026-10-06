@@ -106,6 +106,99 @@
       ],
       "id": "niwatari_suru",
       "input": "三日間にわたり確認する"
+    },
+    {
+      "description": "新規参入事業者は5社とみられている。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "新規参入事業者",
+          "pos": "Noun",
+          "surface": "新規参入事業者"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "5社",
+          "pos": "Noun",
+          "surface": "5社"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "みる",
+          "pos": "Verb",
+          "surface": "み"
+        },
+        {
+          "lemma": "られる",
+          "pos": "Auxiliary",
+          "surface": "られ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "ha5_tomirareteiru",
+      "input": "新規参入事業者は5社とみられている。"
+    },
+    {
+      "description": "5社と提携 - auto-generated",
+      "expected": [
+        {
+          "lemma": "5社",
+          "pos": "Noun",
+          "surface": "5社"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "提携",
+          "pos": "Noun",
+          "surface": "提携"
+        }
+      ],
+      "id": "5_to",
+      "input": "5社と提携"
+    },
+    {
+      "description": "3校 - auto-generated",
+      "expected": [
+        {
+          "lemma": "3校",
+          "pos": "Noun",
+          "surface": "3校"
+        }
+      ],
+      "id": "3_2",
+      "input": "3校"
+    },
+    {
+      "description": "5社目 - auto-generated",
+      "expected": [
+        {
+          "lemma": "5社目",
+          "pos": "Noun",
+          "surface": "5社目"
+        }
+      ],
+      "id": "5",
+      "input": "5社目"
     }
   ],
   "description": "counter tests",

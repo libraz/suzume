@@ -676,7 +676,7 @@ TEST(CharTypeTest, QuantityCharacterPropertiesMatchClosedClasses) {
 
   expect_membership(isCounterKanji,
                     U"円銭万億兆分秒時日月年週期世個本人台枚杯回歳才階号番匹冊件丁通発点票頭羽着足軒組曲巻版畳割部面問"
-                    U"章条棟戸席食泊口束両機基隻度倍段級位種色名話連敗勝戦間紀次行");
+                    U"章条棟戸席食泊口束両機基隻度倍段級位種色名話連敗勝戦間紀次行社校局");
   expect_membership(isDurationSuffixKanji, U"間分秒中");
   expect_membership(isTemporalRelationSuffixKanji, U"後前");
   expect_membership(isTemporalCounterKanji, U"日月年週時分秒間");
