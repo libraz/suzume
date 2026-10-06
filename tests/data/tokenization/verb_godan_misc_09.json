@@ -2518,6 +2518,33 @@
       ],
       "id": "kitekeri_3",
       "input": "鳥鳴きてけり"
+    },
+    {
+      "description": "風になびきて - auto-generated",
+      "expected": [
+        {
+          "lemma": "風",
+          "pos": "Noun",
+          "surface": "風"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "なびく",
+          "pos": "Verb",
+          "surface": "なびき"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "ninabikite",
+      "input": "風になびきて"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",
