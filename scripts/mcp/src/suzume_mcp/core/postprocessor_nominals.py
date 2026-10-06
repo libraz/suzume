@@ -30,6 +30,25 @@ def postprocess_ikaga(tokens: list[dict]) -> bool:
             t["pos"] = "Adverb"
 
 
+# Prefixes that productively take a verb continuative as a nominal base (お待ち,
+# ご案内); any other prefix directly before a verb is a word the reference
+# misread as one (奴の名+覚えて, where 名 is the noun).
+_HONORIFIC_PREFIXES = frozenset({"お", "ご", "御"})
+
+
+@reports_mutation
+def postprocess_prefix_before_verb(tokens: list[dict]) -> bool:
+    """Read a non-honorific prefix standing right before a verb as a noun."""
+    for idx in range(len(tokens) - 1):
+        token = tokens[idx]
+        if (
+            token.get("pos") == "Prefix"
+            and token.get("surface") not in _HONORIFIC_PREFIXES
+            and tokens[idx + 1].get("pos") == "Verb"
+        ):
+            token["pos"] = "Noun"
+
+
 @reports_mutation
 def postprocess_tada(tokens: list[dict]) -> bool:
     """Context-dependent ただ normalization.

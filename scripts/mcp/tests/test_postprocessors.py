@@ -1478,6 +1478,25 @@ class TestQuotativeDeterminerHead:
         assert not postprocessors.postprocess_quotative_determiner_head(before_no)
 
 
+class TestPrefixBeforeVerb:
+    def test_non_honorific_prefix_before_verb_is_a_noun(self):
+        tokens = [_tok("の", "Particle"), _tok("名", "Prefix"), _tok("覚え", "Verb")]
+
+        assert postprocessors.postprocess_prefix_before_verb(tokens)
+        assert tokens[1]["pos"] == "Noun"
+
+    def test_honorific_prefix_keeps_its_class(self):
+        tokens = [_tok("お", "Prefix"), _tok("待ち", "Verb")]
+
+        assert not postprocessors.postprocess_prefix_before_verb(tokens)
+        assert tokens[0]["pos"] == "Prefix"
+
+    def test_prefix_before_a_noun_is_untouched(self):
+        tokens = [_tok("名", "Prefix"), _tok("前", "Noun")]
+
+        assert not postprocessors.postprocess_prefix_before_verb(tokens)
+
+
 class TestCopularFormalNounDe:
     def test_de_after_copular_formal_noun_is_the_copula(self):
         tokens = [

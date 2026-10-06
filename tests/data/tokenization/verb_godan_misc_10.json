@@ -998,6 +998,43 @@
       ],
       "id": "ringotomikanwo_u",
       "input": "りんごとみかんを買う"
+    },
+    {
+      "description": "奴の名覚えてろよ。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "奴",
+          "pos": "Pronoun",
+          "surface": "奴"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "名",
+          "pos": "Noun",
+          "surface": "名"
+        },
+        {
+          "lemma": "覚える",
+          "pos": "Verb",
+          "surface": "覚え"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てろ"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "no_eteroyo",
+      "input": "奴の名覚えてろよ。"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",
