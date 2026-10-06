@@ -66,6 +66,9 @@ postprocess_distributive_goto = postprocessor_function_words.postprocess_distrib
 postprocess_indefinite_ka = postprocessor_function_words.postprocess_indefinite_ka
 postprocess_interjection_after_te = postprocessor_function_words.postprocess_interjection_after_te
 postprocess_interjection_before_copula = postprocessor_function_words.postprocess_interjection_before_copula
+postprocess_interjection_before_argument_particle = (
+    postprocessor_function_words.postprocess_interjection_before_argument_particle
+)
 postprocess_kiri_limited_particle = postprocessor_function_words.postprocess_kiri_limited_particle
 postprocess_monono_conjunction = postprocessor_function_words.postprocess_monono_conjunction
 postprocess_nan_copula_nominalizer = postprocessor_function_words.postprocess_nan_copula_nominalizer
@@ -285,6 +288,7 @@ POSTPROCESSORS: tuple[tuple[str, Callable[[list[dict]], bool]], ...] = (
     ("adverb-nominal-context", postprocess_adverb_nominal_context),
     ("nominal-conjunction-homograph", postprocess_nominal_conjunction_homograph),
     ("interjection-before-copula", postprocess_interjection_before_copula),
+    ("interjection-before-argument-particle", postprocess_interjection_before_argument_particle),
     ("interjection-after-te", postprocess_interjection_after_te),
     ("negative-conjunctive-de", postprocess_negative_conjunctive_de),
     ("temporal-nao-adverb", postprocess_temporal_nao),

@@ -463,6 +463,26 @@ def postprocess_interjection_before_copula(tokens: list[dict]) -> bool:
     return changed
 
 
+def postprocess_interjection_before_argument_particle(tokens: list[dict]) -> bool:
+    """Read an interjection homograph nominally when a case or topic particle follows.
+
+    An interjection is a complete utterance and takes no particle, so そら+は and
+    そら+を are the noun (空), not the exclamation.
+    """
+    changed = False
+    for idx in range(len(tokens) - 1):
+        token = tokens[idx]
+        following = tokens[idx + 1]
+        if token.get("pos") != "Interjection" or following.get("pos") != "Particle":
+            continue
+        if following.get("surface") not in ("は", "が", "を", "の", "も"):
+            continue
+        token["pos"] = "Noun"
+        token["lemma"] = token.get("surface", "")
+        changed = True
+    return changed
+
+
 def postprocess_negative_conjunctive_de(tokens: list[dict]) -> bool:
     """Tag で after a negative auxiliary as the conjunctive particle.
 

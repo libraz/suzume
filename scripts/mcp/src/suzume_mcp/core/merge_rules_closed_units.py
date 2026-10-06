@@ -211,8 +211,8 @@ def _merge_closed_function_units(state: MergeState) -> bool:
         # list, so its spelling falls apart into readable pieces (かの+じょ).
         # The archaic personal pronouns (それがし, わらわ, 拙僧) share their kana
         # with ordinary words (それ+が+し, 笑わ), so they are taken only where a
-        # nominal phrase can stand: opening a phrase and closed by a particle, the
-        # copula, punctuation or the end of the input.
+        # nominal phrase can stand: opening a phrase and closed by a particle, a
+        # pronoun, the copula, punctuation or the end of the input.
         if not merged:
             for pronoun in (*KANA_PERSONAL_PRONOUNS, *ARCHAIC_PERSONAL_PRONOUNS):
                 if not remaining.startswith(pronoun):
@@ -223,6 +223,7 @@ def _merge_closed_function_units(state: MergeState) -> bool:
                     and (
                         j == len(tokens)
                         or tokens[j].get("pos") in ("助詞", "記号")
+                        or tokens[j].get("pos_sub1") == "代名詞"
                         or (tokens[j].get("pos") == "助動詞" and tokens[j].get("lemma") in ("だ", "です"))
                     )
                 ):

@@ -338,6 +338,43 @@
       ],
       "id": "ga_ta_2",
       "input": "ワタシが来た"
+    },
+    {
+      "description": "わてここに来ました - auto-generated",
+      "expected": [
+        {
+          "lemma": "わて",
+          "pos": "Pronoun",
+          "surface": "わて"
+        },
+        {
+          "lemma": "ここ",
+          "pos": "Pronoun",
+          "surface": "ここ"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "まし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "watekokoni_mashita",
+      "input": "わてここに来ました"
     }
   ],
   "description": "Irregular verbs (する、くる) (part 2/2)",

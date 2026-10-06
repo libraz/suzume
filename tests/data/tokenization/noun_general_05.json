@@ -320,6 +320,33 @@
       ],
       "id": "tomo_da_3",
       "input": "心身とも健康だ"
+    },
+    {
+      "description": "そらはいつも青い - auto-generated",
+      "expected": [
+        {
+          "lemma": "そら",
+          "pos": "Noun",
+          "surface": "そら"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "いつも",
+          "pos": "Adverb",
+          "surface": "いつも"
+        },
+        {
+          "lemma": "青い",
+          "pos": "Adjective",
+          "surface": "青い"
+        }
+      ],
+      "id": "sorahaitsumo_i",
+      "input": "そらはいつも青い"
     }
   ],
   "description": "General nouns (part 5/5)",

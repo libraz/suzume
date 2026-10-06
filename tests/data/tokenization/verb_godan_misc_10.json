@@ -2728,6 +2728,28 @@
       ],
       "id": "ha_wo_ndekunda",
       "input": "明日は本を読んでくんだ"
+    },
+    {
+      "description": "そらを見上げる - auto-generated",
+      "expected": [
+        {
+          "lemma": "そら",
+          "pos": "Noun",
+          "surface": "そら"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "見上げる",
+          "pos": "Verb",
+          "surface": "見上げる"
+        }
+      ],
+      "id": "sorawo_geru",
+      "input": "そらを見上げる"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",
