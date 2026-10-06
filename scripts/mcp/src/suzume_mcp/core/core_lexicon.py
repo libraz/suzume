@@ -74,3 +74,23 @@ def kana_i_adjective_lemmas() -> tuple[str, ...]:
         and all("ぁ" <= char <= "ゖ" for char in entry[0])
     )
     return tuple(sorted(lemmas, key=len, reverse=True))
+
+
+_O_ROW = frozenset("おこごそぞとどのほぼぽもよろ")
+
+
+def clipped_greetings() -> dict[str, str]:
+    """Map the clipped spelling of a listed kana greeting to its headword (ありがと → ありがとう).
+
+    Casual speech drops the long vowel う after the greeting's closing o-row mora.
+    """
+    return {
+        entry[0][:-1]: entry[0]
+        for entry in core_entries("expressions.tsv")
+        if len(entry) >= 2
+        and entry[1] == "INTERJECTION"
+        and len(entry[0]) >= 3
+        and entry[0].endswith("う")
+        and entry[0][-2] in _O_ROW
+        and all("ぁ" <= char <= "ゖ" for char in entry[0])
+    }

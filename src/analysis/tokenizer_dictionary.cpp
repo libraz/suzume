@@ -1180,6 +1180,50 @@ void addTruncatedAdverbCandidates(core::Lattice& lattice, const dictionary::Dict
   }
 }
 
+// Casual speech clips the long vowel off a greeting (ありがと, おはよ) or spells
+// it with the prolonged mark (ありがとー). The listed interjection ends on its
+// o-row mora plus う, so a kana run closing on that mora is looked up with the
+// う put back; the clipped span keeps the entry's own lemma. It must close the
+// run, as the full greeting would, or hand off to a final particle.
+void addClippedInterjectionCandidates(core::Lattice& lattice, const dictionary::DictionaryManager& dict_manager,
+                                      const std::vector<char32_t>& codepoints, size_t start_pos) {
+  const size_t window_end = std::min(codepoints.size(), start_pos + kElidedLookupWindow);
+  for (size_t end_pos = start_pos + 2; end_pos <= window_end; ++end_pos) {
+    if (normalize::classifyChar(codepoints[end_pos - 1]) != normalize::CharType::Hiragana) {
+      return;
+    }
+    if (!kana::isORowCodepoint(codepoints[end_pos - 1])) {
+      continue;
+    }
+    size_t span_end = end_pos;
+    while (span_end < codepoints.size() && normalize::isProlongedSoundMark(codepoints[span_end])) {
+      ++span_end;
+    }
+    bool closes_run =
+        span_end >= codepoints.size() || normalize::classifyChar(codepoints[span_end]) != normalize::CharType::Hiragana;
+    if (!closes_run && span_end == end_pos) {
+      const auto* particle =
+          lookupEntryInRange(dict_manager, codepoints, span_end, span_end + 1, core::PartOfSpeech::Particle);
+      closes_run = particle != nullptr && particle->extended_pos == core::ExtendedPOS::ParticleFinal;
+    }
+    if (!closes_run) {
+      continue;
+    }
+    const auto* interjection = dict_manager.lookupExact(extractSubstring(codepoints, start_pos, end_pos) + "う",
+                                                        core::PartOfSpeech::Interjection);
+    if (interjection == nullptr) {
+      continue;
+    }
+    lattice.addEdge(
+        extractSubstring(codepoints, start_pos, span_end), static_cast<uint32_t>(start_pos),
+        static_cast<uint32_t>(span_end), interjection->pos, getCategoryCost(interjection->extended_pos),
+        core::LatticeEdge::kFromDictionary,
+        interjection->lemma.empty() ? std::string_view(interjection->surface) : std::string_view(interjection->lemma),
+        dictionary::ConjugationType::None, core::CandidateOrigin::Dictionary, candidate::kDictionaryOriginConfidence,
+        {}, interjection->extended_pos, "dict_clipped_interjection");
+  }
+}
+
 }  // namespace
 
 void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view text,
@@ -2816,6 +2860,7 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
   tokenizer_dictionary_detail::appendSpecialGrammarCandidates(lattice, text, codepoints, start_pos, byte_pos);
   addElidedProlongedDictionaryCandidates(lattice, dict_manager_, codepoints, start_pos);
   addTruncatedAdverbCandidates(lattice, dict_manager_, codepoints, start_pos);
+  addClippedInterjectionCandidates(lattice, dict_manager_, codepoints, start_pos);
 }
 
 }  // namespace suzume::analysis

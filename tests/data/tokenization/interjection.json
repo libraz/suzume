@@ -563,6 +563,64 @@
       ],
       "id": "ahaha",
       "input": "あはは"
+    },
+    {
+      "description": "clipped greeting keeps its long-vowel lemma",
+      "expected": [
+        {
+          "lemma": "あざす",
+          "pos": "Interjection",
+          "surface": "あざす"
+        },
+        {
+          "lemma": "ありがとう",
+          "pos": "Interjection",
+          "surface": "ありがと"
+        }
+      ],
+      "id": "azasuarigato",
+      "input": "あざすありがと！"
+    },
+    {
+      "description": "clipped greeting with prolonged mark",
+      "expected": [
+        {
+          "lemma": "ありがとう",
+          "pos": "Interjection",
+          "surface": "ありがとー"
+        }
+      ],
+      "id": "arigato",
+      "input": "ありがとー"
+    },
+    {
+      "description": "clipped greeting",
+      "expected": [
+        {
+          "lemma": "おはよう",
+          "pos": "Interjection",
+          "surface": "おはよ"
+        }
+      ],
+      "id": "ohayo",
+      "input": "おはよ！"
+    },
+    {
+      "description": "clipped greeting before a final particle",
+      "expected": [
+        {
+          "lemma": "ありがとう",
+          "pos": "Interjection",
+          "surface": "ありがと"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        }
+      ],
+      "id": "arigatone",
+      "input": "ありがとね"
     }
   ],
   "description": "Interjections and greetings (感動詞・挨拶)",

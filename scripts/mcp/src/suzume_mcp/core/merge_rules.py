@@ -33,7 +33,7 @@ from .constants import (
     TEMPORAL_COMPOUND_UNITS,
     TEMPORAL_PREFIX_KANJI,
 )
-from .core_lexicon import core_headwords, core_headwords_by_length, kana_i_adjective_lemmas
+from .core_lexicon import clipped_greetings, core_headwords, core_headwords_by_length, kana_i_adjective_lemmas
 from .mecab import is_single_token_of_pos, mecab_analyze, reads_as_counter
 from .merge_postprocessor_common import _continuative_verb_tokens
 from .merge_postprocessors import (
@@ -1023,6 +1023,24 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
                     merged = True
                     if applied_rule is None:
                         applied_rule = "greeting-interjection"
+
+        # A listed greeting clipped of its long vowel (おはよ, ありがと) is still
+        # that greeting when it closes the run or hands off to a final particle.
+        if not merged:
+            clipped = clipped_greetings()
+            clip = next((word for word in sorted(clipped, key=len, reverse=True) if remaining.startswith(word)), "")
+            span = clip + regex.match(r"[ー〜～]*", remaining[len(clip) :]).group() if clip else ""
+            after = remaining[len(span) : len(span) + 1]
+            if clip and (
+                after == "" or after in _UTTERANCE_FINAL_PARTICLE_HEADS or regex.match(r"\p{Hiragana}", after) is None
+            ):
+                consumed, j = _consume_span(tokens, i, len(span))
+                if consumed == span:
+                    result.append({"surface": span, "pos": "感動詞", "lemma": clipped[clip]})
+                    i = j
+                    merged = True
+                    if applied_rule is None:
+                        applied_rule = "clipped-greeting"
 
         # An L2 noun is lexical evidence that an otherwise ambiguous sequence
         # is one search unit. Recover only whole adjacent MeCab tokens: a

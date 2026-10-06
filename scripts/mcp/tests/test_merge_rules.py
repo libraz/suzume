@@ -1380,6 +1380,25 @@ class TestGreetingInterjection:
         assert [token["surface"] for token in result] == ["あざ", "すぎる"]
 
 
+class TestClippedGreeting:
+    def test_rejoins_clipped_greeting_with_full_lemma(self):
+        tokens = [_tok("お", pos="接頭詞"), _tok("は"), _tok("よ", pos="助詞"), _tok("！", pos="記号")]
+        result, rule = apply_suzume_merge(tokens, "おはよ！")
+        assert result[0] == {"surface": "おはよ", "pos": "感動詞", "lemma": "おはよう"}
+        assert rule == "clipped-greeting"
+
+    def test_keeps_prolonged_mark_inside_the_greeting(self):
+        tokens = [_tok("ありがとー", pos="感動詞")]
+        result, _ = apply_suzume_merge(tokens, "ありがとー")
+        assert result[0] == {"surface": "ありがとー", "pos": "感動詞", "lemma": "ありがとう"}
+
+    def test_leaves_the_full_greeting_to_the_dictionary_reading(self):
+        tokens = [_tok("おはよう", pos="感動詞")]
+        result, rule = apply_suzume_merge(tokens, "おはよう")
+        assert result[0]["surface"] == "おはよう"
+        assert rule != "clipped-greeting"
+
+
 class TestGamashiiCells:
     def test_rebuilds_the_continuative_cell_from_suffix_pieces(self):
         tokens = [
