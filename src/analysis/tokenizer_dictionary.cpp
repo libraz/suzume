@@ -54,6 +54,24 @@ bool endsDictionaryVerbSpanningBack(const dictionary::DictionaryManager& dict_ma
   return false;
 }
 
+// Whether a listed word opening before @p start_pos reaches @p end_pos or
+// further, so the span is inside that word rather than a word of its own.
+bool hasDictionaryEntrySpanningBack(const dictionary::DictionaryManager& dict_manager,
+                                    const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos) {
+  constexpr size_t kMaxHostChars = 4;
+  constexpr size_t kMaxTailChars = 4;
+  const size_t scan_start = lookbehindStart(start_pos, kMaxHostChars);
+  const size_t probe_end = std::min(codepoints.size(), end_pos + kMaxTailChars);
+  for (size_t host_start = scan_start; host_start < start_pos; ++host_start) {
+    for (const auto& match : lookupResultsInRange(dict_manager, codepoints, host_start, probe_end)) {
+      if (match.entry != nullptr && host_start + match.length >= end_pos) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 // Whether a listed noun ending at @p start_pos opens a listed verb that ends at
 // @p end_pos, so the span is the verb's tail rather than a word of its own.
 bool splitsListedVerbAtNoun(const dictionary::DictionaryManager& dict_manager, const std::vector<char32_t>& codepoints,
@@ -2574,6 +2592,30 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
                       dictionary::ConjugationType::Ichidan, core::CandidateOrigin::Dictionary,
                       candidate::kDictionaryOriginConfidence, {}, core::ExtendedPOS::VerbRenyokei,
                       "dictionary_potential_renyokei_before_past");
+    }
+    // A listed verb's continuative right after a noun and before a nominal
+    // particle is the deverbal head of an object-verb compound (水+やり+を),
+    // the same re-reading an unlisted continuative gets in the unknown-word
+    // path (草+むしり+を), under the same gates: a bound suffix verb stays bound
+    // to its host (手+がかり), and a listed non-verb reading of the span keeps it
+    // (走り+まくり). A one-mora cell is the tail of too many other words
+    // (美しい, 夜深し), and a listed word reaching over the host already owns
+    // the span (気持ち). The noun itself is not listed, so it is not priced as
+    // a dictionary noun.
+    if (result.entry->pos == core::PartOfSpeech::Verb &&
+        result.entry->extended_pos == core::ExtendedPOS::VerbRenyokei && end_pos >= start_pos + 2 &&
+        end_pos < codepoints.size() && hasNominalForcingParticleContinuation(codepoints, end_pos, &dict_manager_) &&
+        hasPrecedingNominal(lattice, start_pos) &&
+        !hasDictionaryEntrySpanningBack(dict_manager_, codepoints, start_pos, end_pos) &&
+        !verb_helpers::isBoundSuffixAfterNominalHost(&dict_manager_, codepoints, start_pos, result.entry->surface) &&
+        std::none_of(lookup_results.begin(), lookup_results.end(), [&](const dictionary::LookupResult& other) {
+          return other.entry != nullptr && other.length == result.length &&
+                 other.entry->pos != core::PartOfSpeech::Verb;
+        })) {
+      lattice.addEdge(result.entry->surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(end_pos),
+                      core::PartOfSpeech::Noun, cost, 0, result.entry->surface, dictionary::ConjugationType::None,
+                      core::CandidateOrigin::NominalizedNoun, candidate::kNoOriginConfidence, {},
+                      core::ExtendedPOS::NounVerbal, "dictionary_renyokei_nominalized_after_noun");
     }
     // An auxiliary cell spelled with a final sokuon is an onbin form, and what
     // it can connect to follows from the paradigm it belongs to. The past た is

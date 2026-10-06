@@ -1052,6 +1052,55 @@
       ],
       "id": "ha_inanoda",
       "input": "今日は手伝いなのだ"
+    },
+    {
+      "description": "水やりをする - auto-generated",
+      "expected": [
+        {
+          "lemma": "水",
+          "pos": "Noun",
+          "surface": "水"
+        },
+        {
+          "lemma": "やり",
+          "pos": "Noun",
+          "surface": "やり"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "yariwosuru",
+      "input": "水やりをする"
+    },
+    {
+      "description": "水やりが - auto-generated",
+      "expected": [
+        {
+          "lemma": "水",
+          "pos": "Noun",
+          "surface": "水"
+        },
+        {
+          "lemma": "やり",
+          "pos": "Noun",
+          "surface": "やり"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        }
+      ],
+      "id": "yariga",
+      "input": "水やりが"
     }
   ],
   "description": "noun_deverbal tests",
