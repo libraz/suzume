@@ -473,6 +473,9 @@ constexpr float kEosNounContinuativePenalty = scale::kStrong;
 // The recollective け after a bare common noun is the tail of a nominalized verb.
 constexpr float kPenaltyBareNounRecollectiveKe = scale::kStrong;
 
+// The case particle に after the universal quantifier とも belongs to the adverb ともに.
+constexpr float kPenaltyQuantifierTomoCase = scale::kAlmostNever;
+
 // An attributive compound particle (による) closing its modifier at a particle,
 // symbol, auxiliary or the end of the utterance has no noun to modify.
 constexpr float kPenaltyAttributiveCompoundParticleClose = scale::kProhibitive;

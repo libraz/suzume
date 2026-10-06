@@ -1099,6 +1099,33 @@
       ],
       "id": "itashimasu_3",
       "input": "前略失礼いたします。"
+    },
+    {
+      "description": "二人とも休んだ。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "二人",
+          "pos": "Noun",
+          "surface": "二人"
+        },
+        {
+          "lemma": "とも",
+          "pos": "Particle",
+          "surface": "とも"
+        },
+        {
+          "lemma": "休む",
+          "pos": "Verb",
+          "surface": "休ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "tomo_nda",
+      "input": "二人とも休んだ。"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",

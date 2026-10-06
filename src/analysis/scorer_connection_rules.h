@@ -51,6 +51,9 @@ bool isAttributiveCompoundParticle(const core::LatticeEdge& edge);
 /** @brief Bars an attributive compound particle from closing its modifier (before a particle, symbol or auxiliary). */
 float computeAttributiveCompoundParticlePenalty(const core::LatticeEdge& prev, const core::LatticeEdge& next);
 
+/** @brief Penalizes the case particle に after the universal quantifier とも, which opens ともに. */
+float computeQuantifierTomoCasePenalty(const core::LatticeEdge& prev, const core::LatticeEdge& next);
+
 /** @brief Bars a multi-mora conjunctive particle ending in で from governing the copular ある. */
 float computeConjunctiveParticleCopulaPenalty(const core::LatticeEdge& prev, const core::LatticeEdge& next);
 

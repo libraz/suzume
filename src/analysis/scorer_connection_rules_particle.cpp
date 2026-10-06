@@ -309,6 +309,16 @@ float computeAttributiveCompoundParticlePenalty(const core::LatticeEdge& prev, c
                                                                 : sc::scale::kNeutral;
 }
 
+// The universal quantifier とも (二人とも) is complete: a case particle does not
+// follow it, so に after a counted quantity opens the adverb ともに (二人ともに
+// 参加した) rather than marking とも as an argument.
+float computeQuantifierTomoCasePenalty(const core::LatticeEdge& prev, const core::LatticeEdge& next) {
+  const bool quantifier_tomo = prev.extended_pos == core::ExtendedPOS::ParticleAdverbial &&
+                               utf8::equalsAny(prev.surface, {"とも"}) && prev.fromDictionary();
+  const bool case_ni = next.extended_pos == core::ExtendedPOS::ParticleCase && utf8::equalsAny(next.surface, {"に"});
+  return quantifier_tomo && case_ni ? sc::kPenaltyQuantifierTomoCase : sc::scale::kNeutral;
+}
+
 // The copula である is the auxiliary で plus ある, so a conjunctive particle that
 // merely ends in で cannot govern ある: its で would have to be the particle's
 // own tail and the copula at once. The reading that fits is the formal noun

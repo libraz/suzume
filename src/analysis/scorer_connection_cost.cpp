@@ -422,7 +422,8 @@ float Scorer::connectionCost(const core::LatticeEdge& prev, const core::LatticeE
   SUZUME_CONNECTION_ADD(surface_bonus, connection_rules::computeCompoundParticlePoliteBonus(prev, next) +
                                            connection_rules::computeConjunctiveParticleCopulaPenalty(prev, next) +
                                            connection_rules::computeAdverbialNiAfterPredicatePenalty(prev, next) +
-                                           connection_rules::computeAttributiveCompoundParticlePenalty(prev, next));
+                                           connection_rules::computeAttributiveCompoundParticlePenalty(prev, next) +
+                                           connection_rules::computeQuantifierTomoCasePenalty(prev, next));
 
   // Note: Removed penalty for Pronoun + でも patterns
   // MeCab behavior is context-dependent:

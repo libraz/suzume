@@ -575,6 +575,38 @@
       ],
       "id": "ha_da_4",
       "input": "無視は危険だ"
+    },
+    {
+      "description": "二人ともに参加した。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "二人",
+          "pos": "Noun",
+          "surface": "二人"
+        },
+        {
+          "lemma": "ともに",
+          "pos": "Adverb",
+          "surface": "ともに"
+        },
+        {
+          "lemma": "参加",
+          "pos": "Noun",
+          "surface": "参加"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "tomoni_shita_2",
+      "input": "二人ともに参加した。"
     }
   ],
   "description": "Suru-verb patterns with subsidiary verbs - MeCab互換分割 (part 2/2)",
