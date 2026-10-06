@@ -88,9 +88,10 @@ BigramTable::EncodedTable BigramTable::initTable() {
   }
   // The choice か stands where the final か does, and differs only in what it
   // hands on: it joins a following item, so a nominal head may follow it where
-  // the final か prohibits one. After a nominal the final か already serves
-  // (雨か雪), and a split-off か there would outbid a longer particle ending in
-  // か (どころか), so only a predicate may precede the choice か.
+  // the final か prohibits one. After a nominal the listing か (雨か雪) is the
+  // choice か, but at a cost: a split-off か there must not outbid a longer
+  // particle ending in か (どころか), yet it still has to beat an unclassified
+  // fragment between two kana nouns (りんご+か+みかん).
   {
     bigram_rules::inheritRuleProfile(table, core::ExtendedPOS::ParticleFinal, core::ExtendedPOS::ParticleChoice);
     const size_t choice = static_cast<size_t>(core::ExtendedPOS::ParticleChoice);
@@ -99,7 +100,7 @@ BigramTable::EncodedTable BigramTable::initTable() {
       if (core::isNounType(other) || other == core::ExtendedPOS::Pronoun ||
           other == core::ExtendedPOS::PronounInterrogative) {
         table[choice][idx] = bigram_rules::encodeCost(bigram_cost::kNeutral);
-        table[idx][choice] = bigram_rules::encodeCost(bigram_cost::kNever);
+        table[idx][choice] = bigram_rules::encodeCost(bigram_cost::kRare);
       }
     }
   }

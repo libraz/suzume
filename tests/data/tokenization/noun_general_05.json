@@ -148,6 +148,33 @@
       ],
       "id": "unnamed_50",
       "input": "御中"
+    },
+    {
+      "description": "りんごかみかんか - auto-generated",
+      "expected": [
+        {
+          "lemma": "りんご",
+          "pos": "Noun",
+          "surface": "りんご"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "みかん",
+          "pos": "Noun",
+          "surface": "みかん"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "ringokamikanka",
+      "input": "りんごかみかんか"
     }
   ],
   "description": "General nouns (part 5/5)",
