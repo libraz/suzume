@@ -10,6 +10,7 @@
 
 #include "core/kana_constants.h"
 #include "core/utf8_constants.h"
+#include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
 #include "grammar/honorific_verbs.h"
 #include "normalize/utf8.h"
@@ -85,7 +86,8 @@ std::vector<dictionary::DictionaryEntry> expandIAdjective(const dictionary::Dict
   return result;
 }
 
-std::vector<dictionary::DictionaryEntry> expandVerb(const dictionary::DictionaryEntry& base_entry, VerbType verb_type) {
+std::vector<dictionary::DictionaryEntry> expandVerb(const dictionary::DictionaryEntry& base_entry, VerbType verb_type,
+                                                    const std::unordered_set<std::string>* verb_surfaces) {
   std::vector<dictionary::DictionaryEntry> result;
   if (verb_type == VerbType::Kuru) {
     const std::string_view source_ending = utf8::endsWith(base_entry.surface, "来る") ? "来る" : "くる";
@@ -130,12 +132,20 @@ std::vector<dictionary::DictionaryEntry> expandVerb(const dictionary::Dictionary
   // unambiguous enough to materialize (がかっ, がかり).
   const bool bound_suffix_verb = isBoundDerivationalSuffixVerbLemma(base_entry.lemma);
   // An a-row stem before す (終わらす, 済ます, 減らす) is also the irrealis of
-  // the verb it is built on, and that verb's causative spells the same え-row
-  // cells (終わら+せる, 済ま+せる, 減ら+せる). The two readings are told apart
-  // only by what follows, which analysis sees and a materialized entry cannot,
-  // so those cells are left to the productive causative and to reverse analysis.
-  const bool stem_is_a_row_irrealis = verb_type == VerbType::GodanSa && !stem.empty() &&
-                                      kana::isARowCodepoint(utf8::decodeFirstChar(utf8::lastChar(stem)));
+  // the listed verb it is built on (終わる, 済む, 減る), and that verb's
+  // productive causative spells the same え-row cells (終わら+せる, 済ま+せる,
+  // 減ら+せる). The two readings are told apart only by what follows, which
+  // analysis sees and a materialized entry cannot, so those cells are left to
+  // the causative and to reverse analysis. Without a listed base (転がす) the
+  // cells are the verb's own.
+  bool stem_is_a_row_irrealis = false;
+  if (verb_type == VerbType::GodanSa && verb_surfaces != nullptr && !stem.empty()) {
+    const std::string_view irrealis = utf8::lastChar(stem);
+    const std::string_view base_ending = godanBaseSuffixFromARow(utf8::decodeFirstChar(irrealis));
+    stem_is_a_row_irrealis =
+        !base_ending.empty() &&
+        verb_surfaces->count(normalize::concat(stem.substr(0, stem.size() - irrealis.size()), base_ending)) > 0;
+  }
   result.reserve(suffixes.size());
   for (const auto& suffix : suffixes) {
     if (stem_is_a_row_irrealis && (suffix.extended_pos == core::ExtendedPOS::VerbKateikei ||
@@ -153,7 +163,8 @@ std::vector<dictionary::DictionaryEntry> expandVerb(const dictionary::Dictionary
 }
 
 std::vector<dictionary::DictionaryEntry> expandSourceEntry(const dictionary::SourceEntry& source_entry,
-                                                           bool has_yoi_variant) {
+                                                           bool has_yoi_variant,
+                                                           const std::unordered_set<std::string>* verb_surfaces) {
   auto base_entry = makeBaseEntry(source_entry);
   if (!needsExpansion(source_entry)) {
     return {std::move(base_entry)};
@@ -165,7 +176,7 @@ std::vector<dictionary::DictionaryEntry> expandSourceEntry(const dictionary::Sou
   }
 
   base_entry.extended_pos = core::ExtendedPOS::VerbShuushikei;
-  return expandVerb(base_entry, conjTypeToVerbType(source_entry.conj_type));
+  return expandVerb(base_entry, conjTypeToVerbType(source_entry.conj_type), verb_surfaces);
 }
 
 }  // namespace
@@ -211,7 +222,7 @@ std::string dictionaryConjugationTypeIssue(const dictionary::SourceEntry& source
 }
 
 std::vector<dictionary::DictionaryEntry> expandDictionarySourceEntry(const dictionary::SourceEntry& source_entry) {
-  return expandSourceEntry(source_entry, /*has_yoi_variant=*/false);
+  return expandSourceEntry(source_entry, /*has_yoi_variant=*/false, /*verb_surfaces=*/nullptr);
 }
 
 DictionaryExpansionResult expandDictionarySourceEntries(const std::vector<dictionary::SourceEntry>& source_entries,
@@ -235,7 +246,11 @@ DictionaryExpansionResult expandDictionarySourceEntries(const std::vector<dictio
   };
   std::unordered_set<std::string> seen_entries;
   std::unordered_set<std::string> suppletive_yoi_variants;
+  std::unordered_set<std::string> verb_surfaces;
   for (const auto& source_entry : source_entries) {
+    if (source_entry.pos == core::PartOfSpeech::Verb) {
+      verb_surfaces.insert(source_entry.surface);
+    }
     if (source_entry.pos == core::PartOfSpeech::Adjective &&
         source_entry.conj_type == dictionary::ConjugationType::IAdjective) {
       suppletive_yoi_variants.insert(source_entry.surface);
@@ -261,7 +276,8 @@ DictionaryExpansionResult expandDictionarySourceEntries(const std::vector<dictio
   auto append_source = [&](const dictionary::SourceEntry& source_entry) {
     const bool has_yoi_variant = source_entry.pos == core::PartOfSpeech::Adjective &&
                                  suppletive_yoi_variants.count(yoiVariantOf(source_entry.surface)) > 0;
-    std::vector<dictionary::DictionaryEntry> expanded_entries = expandSourceEntry(source_entry, has_yoi_variant);
+    std::vector<dictionary::DictionaryEntry> expanded_entries =
+        expandSourceEntry(source_entry, has_yoi_variant, &verb_surfaces);
     const bool is_expanded = expanded_entries.size() > 1;
     for (auto& entry : expanded_entries) {
       const bool is_explicit_surface = entry.surface.compare(source_entry.surface) == 0;

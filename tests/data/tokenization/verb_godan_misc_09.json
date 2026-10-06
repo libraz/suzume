@@ -2052,6 +2052,121 @@
       ],
       "id": "shi_nageni_wo_geru",
       "input": "申し訳なげに頭を下げる"
+    },
+    {
+      "description": "焦がした - auto-generated",
+      "expected": [
+        {
+          "lemma": "焦がす",
+          "pos": "Verb",
+          "surface": "焦がし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "gashita",
+      "input": "焦がした"
+    },
+    {
+      "description": "転がした - auto-generated",
+      "expected": [
+        {
+          "lemma": "転がす",
+          "pos": "Verb",
+          "surface": "転がし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "gashita_2",
+      "input": "転がした"
+    },
+    {
+      "description": "逃がした - auto-generated",
+      "expected": [
+        {
+          "lemma": "逃がす",
+          "pos": "Verb",
+          "surface": "逃がし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "gashita_3",
+      "input": "逃がした"
+    },
+    {
+      "description": "魚を焦がしてしまった - auto-generated",
+      "expected": [
+        {
+          "lemma": "魚",
+          "pos": "Noun",
+          "surface": "魚"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "焦がす",
+          "pos": "Verb",
+          "surface": "焦がし"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "しまう",
+          "pos": "Auxiliary",
+          "surface": "しまっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wo_gashiteshimattta",
+      "input": "魚を焦がしてしまった"
+    },
+    {
+      "description": "鳥を逃がした - auto-generated",
+      "expected": [
+        {
+          "lemma": "鳥",
+          "pos": "Noun",
+          "surface": "鳥"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "逃がす",
+          "pos": "Verb",
+          "surface": "逃がし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wo_gashita",
+      "input": "鳥を逃がした"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 9/9)",
