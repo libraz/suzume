@@ -162,6 +162,9 @@ void setVerbAndAdjectiveCosts(BigramMatrix& table) {
       // Mizenkei never directly connects to sentence-ending particles
       // Prevents 勉強+せ(mizenkei)+よ(final) over 勉強+せよ(imperative dict entry)
       {EPOS::VerbMizenkei, EPOS::ParticleFinal, cost::kAlmostNever},
+      // Nor can it close a clause before a mark: 任せ、 is the continuative of the
+      // ichidan 任せる, not 任+せ(する irrealis).
+      {EPOS::VerbMizenkei, EPOS::Symbol, cost::kStrong},
 
       // Suffix → Conjunction: rare (without punctuation, suffix+conj is unusual)
       // Prevents さ(suffix)+まして(CONJ) over さまし(verb renyokei)+て

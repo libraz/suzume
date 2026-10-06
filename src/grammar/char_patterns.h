@@ -117,6 +117,8 @@ bool isAttributiveCompoundParticleSurface(std::string_view surface);
  * @return True for し
  */
 bool isSuruRenyokeiSurface(std::string_view surface);
+/** @brief Whether a surface is the classical irrealis stem せ of the irregular verb する */
+bool isSuruMizenkeiSurface(std::string_view surface);
 /** @brief Whether a surface is the base form of the irregular verb する */
 bool isSuruBaseForm(std::string_view surface);
 /** @brief Whether a surface is the modern volitional stem しよ of する */

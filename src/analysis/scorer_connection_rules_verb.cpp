@@ -194,8 +194,15 @@ float computeTaFormVolitionalBonus(const core::LatticeEdge& prev, const core::La
   const bool suru_continuative_before_classical_negative =
       next.extended_pos == core::ExtendedPOS::AuxNegativeNu && grammar::isSuruRenyokeiSurface(prev.surface) &&
       (prev.conj_type == dictionary::ConjugationType::Suru || prev.lemma == "する");
+  // The せ of する only hosts the classical negative and せ+られる; the modern
+  // ない and ます take し (しない・します), so せ+ない is an ichidan stem 任せ+ない.
+  const bool suru_irrealis_before_modern_aux =
+      (next.extended_pos == core::ExtendedPOS::AuxNegativeNai ||
+       next.extended_pos == core::ExtendedPOS::AuxTenseMasu) &&
+      prev.extended_pos == core::ExtendedPOS::VerbMizenkei && grammar::isSuruMizenkeiSurface(prev.surface) &&
+      (prev.conj_type == dictionary::ConjugationType::Suru || prev.lemma == "する");
   if (bare_volitional_after_non_o_row || negative_after_godan_non_irrealis ||
-      suru_continuative_before_classical_negative)
+      suru_continuative_before_classical_negative || suru_irrealis_before_modern_aux)
     SUZUME_CONNECTION_ADD(bonus, cost::kSevere);
   if (modern_volitional)
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryStrongBonus + cost::kStrongBonus);

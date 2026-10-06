@@ -994,6 +994,53 @@
       ],
       "id": "domoha_shimasu",
       "input": "私どもは参加します"
+    },
+    {
+      "description": "失敗を認識せざるを得ない - auto-generated",
+      "expected": [
+        {
+          "lemma": "失敗",
+          "pos": "Noun",
+          "surface": "失敗"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "認識",
+          "pos": "Noun",
+          "surface": "認識"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "せ"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ざる"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "得る",
+          "pos": "Verb",
+          "surface": "得"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "wo_sezaruwo_nai",
+      "input": "失敗を認識せざるを得ない"
     }
   ],
   "description": "Suru-verb patterns with subsidiary verbs - MeCab互換分割 (part 2/2)",

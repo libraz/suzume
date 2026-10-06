@@ -195,6 +195,10 @@ bool isSuruRenyokeiSurface(std::string_view surface) {
   return surface == "し";
 }
 
+bool isSuruMizenkeiSurface(std::string_view surface) {
+  return surface == "せ";
+}
+
 bool isSuruBaseForm(std::string_view surface) {
   return surface == "する";
 }

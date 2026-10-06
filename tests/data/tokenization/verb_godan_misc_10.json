@@ -1756,6 +1756,80 @@
       ],
       "id": "chi_tttosa_iteyo",
       "input": "ちょっとさ、聞いてよ"
+    },
+    {
+      "description": "彼は全部任せました - auto-generated",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "全部",
+          "pos": "Noun",
+          "surface": "全部"
+        },
+        {
+          "lemma": "任せる",
+          "pos": "Verb",
+          "surface": "任せ"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "まし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ha_semashita",
+      "input": "彼は全部任せました"
+    },
+    {
+      "description": "この仕事は全部任せない - auto-generated",
+      "expected": [
+        {
+          "lemma": "この",
+          "pos": "Determiner",
+          "surface": "この"
+        },
+        {
+          "lemma": "仕事",
+          "pos": "Noun",
+          "surface": "仕事"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "全部",
+          "pos": "Noun",
+          "surface": "全部"
+        },
+        {
+          "lemma": "任せる",
+          "pos": "Verb",
+          "surface": "任せ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "kono_ha_senai",
+      "input": "この仕事は全部任せない"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",
