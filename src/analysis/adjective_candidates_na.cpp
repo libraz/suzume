@@ -298,6 +298,16 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
                                                dict_manager, extractSubstring(codepoints, start_pos, aux_end) + "い"));
           }
         }
+        // A registered pronoun that takes in the な is a word of its own (結局+みな),
+        // not a stem plus the copula.
+        bool spans_registered_pronoun = false;
+        if (dict_manager != nullptr && stem_end > kanji_end) {
+          for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, kanji_end, stem_end + 1)) {
+            spans_registered_pronoun = spans_registered_pronoun ||
+                                       (match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Pronoun &&
+                                        match.length == stem_end + 1 - kanji_end);
+          }
+        }
         const std::string stem = extractSubstring(codepoints, start_pos, stem_end);
         // A te-form chain is not a nominal stem (食べ+て+み+な): the な after
         // it is the imperative particle.
@@ -371,8 +381,8 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
             (after_final_particle &&
              (kana::isURowCodepoint(predicate_tail) || predicate_tail == U'た' || predicate_tail == U'だ'));
         if (is_bare_attributive && !has_internal_particle && !contains_closed_suffix && !starts_closed_tail &&
-            !is_exact_verb_stem && !crosses_te_form && !contains_passive_boundary && !starts_naru_after_ku &&
-            !closes_on_verbal_ru) {
+            !is_exact_verb_stem && !spans_registered_pronoun && !crosses_te_form && !contains_passive_boundary &&
+            !starts_naru_after_ku && !closes_on_verbal_ru) {
           if (!normalize::isFormalNounSurface(normalize::encodeUtf8(codepoints[start_pos]))) {
             candidates.push_back(makeNaAdjCandidate(stem, start_pos, stem_end, candidate::kNaAdjStemCost, true,
                                                     CandidateOrigin::AdjectiveNa, candidate::kNaAdjPredicateConfidence,

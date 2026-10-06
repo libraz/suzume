@@ -1600,6 +1600,232 @@
       ],
       "id": "pronoun_before_noun_suffix",
       "input": "彼仕事中"
+    },
+    {
+      "description": "畢竟みな同じ目標を目指すべき - auto-generated",
+      "expected": [
+        {
+          "lemma": "畢竟",
+          "pos": "Adverb",
+          "surface": "畢竟"
+        },
+        {
+          "lemma": "みな",
+          "pos": "Pronoun",
+          "surface": "みな"
+        },
+        {
+          "lemma": "同じ",
+          "pos": "Determiner",
+          "surface": "同じ"
+        },
+        {
+          "lemma": "目標",
+          "pos": "Noun",
+          "surface": "目標"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "目指す",
+          "pos": "Verb",
+          "surface": "目指す"
+        },
+        {
+          "lemma": "べし",
+          "pos": "Auxiliary",
+          "surface": "べき"
+        }
+      ],
+      "id": "mina_ji_wo_subeki",
+      "input": "畢竟みな同じ目標を目指すべき"
+    },
+    {
+      "description": "結局みな同じ - auto-generated",
+      "expected": [
+        {
+          "lemma": "結局",
+          "pos": "Noun",
+          "surface": "結局"
+        },
+        {
+          "lemma": "みな",
+          "pos": "Pronoun",
+          "surface": "みな"
+        },
+        {
+          "lemma": "同じ",
+          "pos": "Adjective",
+          "surface": "同じ"
+        }
+      ],
+      "id": "mina_ji",
+      "input": "結局みな同じ"
+    },
+    {
+      "description": "そなたが来るのか - auto-generated",
+      "expected": [
+        {
+          "lemma": "そなた",
+          "pos": "Pronoun",
+          "surface": "そなた"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来る"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "sonataga_runoka",
+      "input": "そなたが来るのか"
+    },
+    {
+      "description": "おぬしは書かぬ - auto-generated",
+      "expected": [
+        {
+          "lemma": "おぬし",
+          "pos": "Pronoun",
+          "surface": "おぬし"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "書く",
+          "pos": "Verb",
+          "surface": "書か"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬ"
+        }
+      ],
+      "id": "onushiha_kanu",
+      "input": "おぬしは書かぬ"
+    },
+    {
+      "description": "拙僧が参る - auto-generated",
+      "expected": [
+        {
+          "lemma": "拙僧",
+          "pos": "Pronoun",
+          "surface": "拙僧"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "参る",
+          "pos": "Verb",
+          "surface": "参る"
+        }
+      ],
+      "id": "ga_ru_4",
+      "input": "拙僧が参る"
+    },
+    {
+      "description": "それがしが参る - auto-generated",
+      "expected": [
+        {
+          "lemma": "それがし",
+          "pos": "Pronoun",
+          "surface": "それがし"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "参る",
+          "pos": "Verb",
+          "surface": "参る"
+        }
+      ],
+      "id": "soregashiga_ru",
+      "input": "それがしが参る"
+    },
+    {
+      "description": "それがしたい - auto-generated",
+      "expected": [
+        {
+          "lemma": "それ",
+          "pos": "Pronoun",
+          "surface": "それ"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たい"
+        }
+      ],
+      "id": "soregashitai",
+      "input": "それがしたい"
+    },
+    {
+      "description": "家族はみな来た - auto-generated",
+      "expected": [
+        {
+          "lemma": "家族",
+          "pos": "Noun",
+          "surface": "家族"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "みな",
+          "pos": "Pronoun",
+          "surface": "みな"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "hamina_ta",
+      "input": "家族はみな来た"
     }
   ],
   "description": "Pronouns",

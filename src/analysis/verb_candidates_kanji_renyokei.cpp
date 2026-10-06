@@ -308,6 +308,17 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
             }
           }
         }
+        // Nor may an unverified proposal take only the first mora of a registered
+        // pronoun (結局+みな, never 結局み+な).
+        bool okurigana_opens_pronoun = false;
+        if (!ichidan_base_is_dict && dict_manager != nullptr) {
+          const size_t max_pronoun_end = std::min(codepoints.size(), kanji_end + static_cast<size_t>(4));
+          for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, kanji_end, max_pronoun_end)) {
+            okurigana_opens_pronoun =
+                okurigana_opens_pronoun ||
+                (match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Pronoun && match.length >= 2);
+          }
+        }
         // A surface that is also a dictionary i-adjective (強い) is verbal
         // only in conjugation contexts: renyokei + た/て or mizenkei + られ/させ.
         // Elsewhere (predicate/attributive use: 力が強い, 強い風) the adjective
@@ -346,7 +357,7 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
         if (!prefer_suru && !prefer_godan && ichidan_cand.confidence > conf_threshold && !surface_is_dict_noun &&
             !single_kanji_te_form && !suffix_is_dict_verb && !trailing_span_is_dict_suffix &&
             !suffix_is_godan_before_auxiliary && !adj_homograph_blocked && !okurigana_opens_auxiliary &&
-            !okurigana_opens_bound_suffix && !unverified_multi_kanji_suru_mizen &&
+            !okurigana_opens_bound_suffix && !okurigana_opens_pronoun && !unverified_multi_kanji_suru_mizen &&
             !unverified_before_temporal_nominal && !shifted_row_ichidan_stem && !stranded_potential_stem &&
             !okurigana_is_nominal_final_particle) {
           // Negative cost to strongly favor split over combined analysis

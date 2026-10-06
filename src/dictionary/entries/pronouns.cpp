@@ -52,6 +52,15 @@ EntrySpecRange getPronounEntries() {
       pronoun("己", ""),
       pronoun("おのれ", ""),
       pronoun("拙者", ""),
+      // Archaic and dialectal personal pronouns, a closed set the reference
+      // lexicon splits or misreads (そなた, おぬし, 拙僧).
+      pronoun("そなた", ""),
+      pronoun("おぬし", ""),
+      pronoun("わて", ""),
+      pronoun("それがし", ""),
+      pronoun("わらわ", ""),
+      pronoun("拙僧", ""),
+      pronoun("そち", ""),
       pronoun("貴殿", ""),
       pronoun("某", ""),
       pronoun("我輩", ""),
@@ -61,6 +70,7 @@ EntrySpecRange getPronounEntries() {
       // Keep the collective pronoun and honorific suffix as separate search units.
       pronoun("皆", ""),
       pronoun("みんな", ""),
+      pronoun("みな", ""),
 
       // Distributive pronoun (分配代名詞)
       pronoun("各々", ""),

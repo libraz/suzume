@@ -507,6 +507,22 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
     }
   }
 
+  // A registered pronoun opening at the okurigana is a word of its own, not the
+  // continuative's tail plus a particle (結局+みな, never 結局み+な).
+  if (!skip_single_char && dict_manager != nullptr) {
+    const size_t probe_end = std::min(codepoints.size(), kanji_end + static_cast<size_t>(4));
+    for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, kanji_end, probe_end)) {
+      skip_single_char = skip_single_char || (match.entry != nullptr &&
+                                              match.entry->pos == core::PartOfSpeech::Pronoun && match.length >= 2);
+    }
+    // A registered noun or an attested verb continuative on the same span
+    // (試み+な) keeps its own reading.
+    skip_single_char =
+        skip_single_char &&
+        lookupEntryInRange(*dict_manager, codepoints, start_pos, kanji_end + 1, core::PartOfSpeech::Noun) == nullptr &&
+        !verb_helpers::namesDictionaryVerbContinuative(dict_manager, codepoints, kanji_end);
+  }
+
   if (!skip_single_char) {
     const std::string surface = extractSubstring(codepoints, start_pos, kanji_end + 1);
     // Scale cost higher for long kanji sequences to prevent absorbing

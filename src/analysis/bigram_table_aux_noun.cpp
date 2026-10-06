@@ -154,6 +154,10 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       // Ensures 見られたい → 見+られ+たい over 見+られ+た+い
       {EPOS::AuxPassive, EPOS::AuxDesireTai, cost::kStrongBonus},
 
+      // A pronoun cannot take the desiderative: たい attaches to a continuative,
+      // so それがし+たい is それ+が+し+たい (the pronoun それがし does not stand there).
+      {EPOS::Pronoun, EPOS::AuxDesireTai, cost::kAlmostNever},
+
       // AuxPassive → AuxVolitional (れる+べき in passive obligation) - strong bonus
       // Ensures 書かれるべき → 書か+れる+べき(dict) over char_speech べき(AUX_過去) path
       {EPOS::AuxPassive, EPOS::AuxVolitional, cost::kStrongBonus},
