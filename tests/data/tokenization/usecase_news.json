@@ -1840,6 +1840,102 @@
       ],
       "id": "300_ga_reru",
       "input": "月間約300人が訪れる"
+    },
+    {
+      "description": "売上は前期比85%を下回る。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "売上",
+          "pos": "Noun",
+          "surface": "売上"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "前期比",
+          "pos": "Noun",
+          "surface": "前期比"
+        },
+        {
+          "lemma": "85%",
+          "pos": "Noun",
+          "surface": "85%"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "下回る",
+          "pos": "Verb",
+          "surface": "下回る"
+        }
+      ],
+      "id": "ha_85%wo_ru",
+      "input": "売上は前期比85%を下回る。"
+    },
+    {
+      "description": "平均を下回った - auto-generated",
+      "expected": [
+        {
+          "lemma": "平均",
+          "pos": "Noun",
+          "surface": "平均"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "下回る",
+          "pos": "Verb",
+          "surface": "下回っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wo_ttta_11",
+      "input": "平均を下回った"
+    },
+    {
+      "description": "前年度を上回っている - auto-generated",
+      "expected": [
+        {
+          "lemma": "前年度",
+          "pos": "Noun",
+          "surface": "前年度"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "上回る",
+          "pos": "Verb",
+          "surface": "上回っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "wo_ttteiru_5",
+      "input": "前年度を上回っている"
     }
   ],
   "version": "1.0"
