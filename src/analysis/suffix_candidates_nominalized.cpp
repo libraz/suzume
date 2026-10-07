@@ -437,6 +437,15 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
                           grammar::isContinuativeSelectingConjunctiveParticle(match.entry->surface));
     }
   }
+  // The inchoative 始める takes only a verb continuative as its host (飼い+始め),
+  // so a continuation opening it rules the noun out as well.
+  if (dict_manager != nullptr && kanji_end + 1 < codepoints.size()) {
+    const size_t probe_end = std::min(codepoints.size(), kanji_end + 1 + static_cast<size_t>(4));
+    for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, kanji_end + 1, probe_end)) {
+      skip_single_char = skip_single_char ||
+                         (match.entry != nullptr && match.entry->extended_pos == core::ExtendedPOS::AuxAspectHajimeru);
+    }
+  }
   // Skip kanji+い when kanji ends with 的 (teki na-adjective suffix)
   // 理性的い, 経済的い don't make sense — 的 forms na-adjectives, not i-adjectives
   if (first_hiragana == U'い' && codepoints[kanji_end - 1] == U'的') {

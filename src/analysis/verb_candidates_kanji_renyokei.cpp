@@ -277,6 +277,20 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
             }
           }
         }
+        // A kanji run of three or more cannot be one unverified Ichidan stem when
+        // its last kanji plus the okurigana already reads as one: the run then
+        // holds a nominal of two or more kanji in front of a one-kanji verb
+        // (全部+任せ, 仕事+辞め). Lexical multi-kanji verbs stop at two kanji
+        // (片付け, 目覚め).
+        bool nominal_head_before_one_kanji_stem = false;
+        if (!ichidan_base_is_dict && kanji_end >= start_pos + 3) {
+          for (const auto& tail_candidate : analysesInRange(inflection, codepoints, kanji_end - 1, renyokei_end)) {
+            if (tail_candidate.verb_type == grammar::VerbType::Ichidan && tail_candidate.confidence > conf_threshold) {
+              nominal_head_before_one_kanji_stem = true;
+              break;
+            }
+          }
+        }
         // The okurigana of an unverified Ichidan proposal must not be the head of
         // a dictionary auxiliary that starts at the same position: 見けむ is the
         // continuative of 見る plus けむ, not a fabricated 見ける. The shorter
@@ -383,10 +397,10 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
             !comma_clause_chaining && !vh::followsCaseParticle(dict_manager, codepoints, start_pos);
         if (!prefer_suru && !prefer_godan && ichidan_cand.confidence > conf_threshold && !surface_is_dict_noun &&
             !single_kanji_te_form && !suffix_is_dict_verb && !trailing_span_is_dict_suffix &&
-            !suffix_is_godan_before_auxiliary && !adj_homograph_blocked && !okurigana_opens_auxiliary &&
-            !okurigana_opens_bound_suffix && !okurigana_opens_pronoun && !unverified_multi_kanji_suru_mizen &&
-            !unverified_before_temporal_nominal && !shifted_row_ichidan_stem && !stranded_potential_stem &&
-            !okurigana_is_nominal_final_particle) {
+            !suffix_is_godan_before_auxiliary && !nominal_head_before_one_kanji_stem && !adj_homograph_blocked &&
+            !okurigana_opens_auxiliary && !okurigana_opens_bound_suffix && !okurigana_opens_pronoun &&
+            !unverified_multi_kanji_suru_mizen && !unverified_before_temporal_nominal && !shifted_row_ichidan_stem &&
+            !stranded_potential_stem && !okurigana_is_nominal_final_particle) {
           // Negative cost to strongly favor split over combined analysis
           // Combined forms get optimal_length bonus (-0.5), so we need to be lower
           // A bound verb prefix is the one multi-kanji stem that cannot be read

@@ -1737,6 +1737,92 @@
       ],
       "id": "niite_2",
       "input": "側にいて"
+    },
+    {
+      "description": "彼女に全部任せ、帰った - auto-generated",
+      "expected": [
+        {
+          "lemma": "彼女",
+          "pos": "Pronoun",
+          "surface": "彼女"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "全部",
+          "pos": "Noun",
+          "surface": "全部"
+        },
+        {
+          "lemma": "任せる",
+          "pos": "Verb",
+          "surface": "任せ"
+        },
+        {
+          "lemma": "帰る",
+          "pos": "Verb",
+          "surface": "帰っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ni_se_ttta",
+      "input": "彼女に全部任せ、帰った"
+    },
+    {
+      "description": "仕事辞めたい - auto-generated",
+      "expected": [
+        {
+          "lemma": "仕事",
+          "pos": "Noun",
+          "surface": "仕事"
+        },
+        {
+          "lemma": "辞める",
+          "pos": "Verb",
+          "surface": "辞め"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たい"
+        }
+      ],
+      "id": "metai",
+      "input": "仕事辞めたい"
+    },
+    {
+      "description": "猫飼い始めた - auto-generated",
+      "expected": [
+        {
+          "lemma": "猫",
+          "pos": "Noun",
+          "surface": "猫"
+        },
+        {
+          "lemma": "飼う",
+          "pos": "Verb",
+          "surface": "飼い"
+        },
+        {
+          "lemma": "始める",
+          "pos": "Verb",
+          "surface": "始め"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "i_meta",
+      "input": "猫飼い始めた"
     }
   ],
   "description": "Ichidan verbs (一段動詞) (part 2/2)",
