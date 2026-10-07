@@ -1936,6 +1936,55 @@
       ],
       "id": "rane_ttte",
       "input": "知らねーって"
+    },
+    {
+      "description": "Vowel-fused negative after contracted copula ja",
+      "expected": [
+        {
+          "lemma": "そう",
+          "pos": "Adverb",
+          "surface": "そう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "じゃ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ねえ"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        }
+      ],
+      "id": "souji_neettte",
+      "input": "そうじゃねえって"
+    },
+    {
+      "description": "Vowel-fused negative after contracted copula ja, clause final",
+      "expected": [
+        {
+          "lemma": "そう",
+          "pos": "Adverb",
+          "surface": "そう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "じゃ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ねえ"
+        }
+      ],
+      "id": "souji_nee",
+      "input": "そうじゃねえ"
     }
   ],
   "description": "colloquial_contracted tests",

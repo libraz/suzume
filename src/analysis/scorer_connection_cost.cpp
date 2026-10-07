@@ -218,6 +218,12 @@ void addImpossibleAttachmentRules(const core::LatticeEdge& prev, const core::Lat
   // off it (行こう+け+ど is 行こう+けど).
   const bool conjunctive_after_final_particle =
       prev.extended_pos == core::ExtendedPOS::ParticleFinal && next.extended_pos == core::ExtendedPOS::ParticleConj;
+  // Contracted じゃ (では, or ては after a voiced onbin) selects a predicate,
+  // and the ai→ee negative ねえ is spelled like the lengthened final particle
+  // (そうじゃ+ねえ).
+  const bool final_nee_after_contracted_copula = utf8::equalsAny(prev.surface, {"じゃ"}) &&
+                                                 next.extended_pos == core::ExtendedPOS::ParticleFinal &&
+                                                 utf8::equalsAny(next.surface, {"ねえ", "ねー", "ねぇ"});
   if (invalid_aspect_iru_attachment || invalid_aspect_iku_attachment || incomplete_potential_before_symbol ||
       terminal_verb_before_ga || nonterminal_predicate_before_assertive_copula || emphatic_adverb_before_past ||
       volitional_after_stray_kanji || terminal_adjective_before_te || clipped_desu_off_nominalizer ||
@@ -226,7 +232,8 @@ void addImpossibleAttachmentRules(const core::LatticeEdge& prev, const core::Lat
       contracted_nominalizer_before_continuative || contracted_nominalizer_after_adverb ||
       unpaired_assimilated_copula || terminal_spelled_final_particle_in_kana_run ||
       contracted_volitional_off_predicate || conjunctive_after_final_particle || contracted_te_wa_off_adverb ||
-      dubitative_kamo_after_continuative || geminate_past_adverb_before_auxiliary || mimetic_cut_at_geminate) {
+      dubitative_kamo_after_continuative || geminate_past_adverb_before_auxiliary || mimetic_cut_at_geminate ||
+      final_nee_after_contracted_copula) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
   if ((prev.extended_pos == core::ExtendedPOS::VerbRenyokei || prev.extended_pos == core::ExtendedPOS::VerbOnbinkei) &&
