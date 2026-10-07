@@ -712,26 +712,20 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       // (e.g., 壁にかかる絵 should be VERB, not DET).
       {EPOS::ParticleCase, EPOS::Determiner, cost::kStrong},
 
-      // AuxTenseTa → Determiner (past tense should not be followed by determiner)
-      // Prevents over-greedy match of L1 DET like かの in `た+か+の` (e.g., 覚めたかのような).
-      // The correct parse is た(past) + か(question particle) + の(particle).
-      // Needs kSevere to outweigh the DET→NounFormal bonus (-2.5 for かの→よう).
-      {EPOS::AuxTenseTa, EPOS::Determiner, cost::kSevere},
+      // A finished predicate takes a following determiner only as a relative
+      // clause skipping over it (買った+この+本), which is rare but grammatical.
+      // The かの over-match these rows once had to price out (た+か+の+よう) is
+      // rejected at the candidate (isOutOfPlaceForWordClass), so a minor
+      // penalty is enough.
+      {EPOS::AuxTenseTa, EPOS::Determiner, cost::kMinor},
+      {EPOS::VerbShuushikei, EPOS::Determiner, cost::kMinor},
 
-      // A finite verb cannot directly take a determiner. This preserves the
-      // particle sequence in clause-final similatives such as ある+か+の+よう
-      // instead of selecting the unrelated determiner かの.
-      {EPOS::VerbShuushikei, EPOS::Determiner, cost::kSevere},
-
-      // A continuative cannot take one either: suspending a clause on it needs
-      // punctuation, which is its own boundary. Same かの over-match as the two
-      // rows above, one paradigm cell over (なにが+し+かの for なに+が+しか+の).
+      // A continuative cannot take one: suspending a clause on it needs
+      // punctuation, which is its own boundary (なにが+し+かの for
+      // なに+が+しか+の).
       {EPOS::VerbRenyokei, EPOS::Determiner, cost::kSevere},
 
-      // The formal copula である also cannot directly take a determiner.
-      // In であるかのよう, retain the intervening final and nominalizing
-      // particles rather than joining them as かの.
-      {EPOS::AuxCopulaDa, EPOS::Determiner, cost::kSevere},
+      {EPOS::AuxCopulaDa, EPOS::Determiner, cost::kMinor},
 
       // Pronoun → Determiner (pronoun does not directly take a determiner)
       // Prevents over-greedy match of L1 DET like かの in `いくつ+か+の` (e.g., いくつかの限界).

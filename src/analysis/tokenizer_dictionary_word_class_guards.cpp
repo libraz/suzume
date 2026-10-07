@@ -430,6 +430,22 @@ bool isOutOfPlaceForWordClass(const DictionaryCandidateContext& ctx, const core:
     return true;
   }
 
+  // A determiner never follows a finished predicate directly when its surface
+  // also reads as a final particle plus a particle: after a predicate that
+  // reading is the one the clause takes (見ている+か+の+ような, not かの).
+  if (result.entry->pos == core::PartOfSpeech::Determiner && start_pos > 0 &&
+      hasPrecedingPartOfSpeech(lattice, start_pos, kPredicateHostMask)) {
+    for (size_t split = 1; split < result.length; ++split) {
+      const auto* head =
+          lookupEntryInRange(dict_manager, codepoints, start_pos, start_pos + split, core::PartOfSpeech::Particle);
+      if (head != nullptr && head->extended_pos == core::ExtendedPOS::ParticleFinal &&
+          lookupEntryInRange(dict_manager, codepoints, start_pos + split, end_pos, core::PartOfSpeech::Particle) !=
+              nullptr) {
+        return true;
+      }
+    }
+  }
+
   if (result.entry->pos == core::PartOfSpeech::Conjunction && start_pos > 0) {
     if (crossesAttributiveNaHonorificNominal(lattice, codepoints, start_pos, end_pos)) {
       return true;

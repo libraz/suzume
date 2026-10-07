@@ -2165,6 +2165,105 @@
       ],
       "id": "kukana",
       "input": "行くかなー"
+    },
+    {
+      "description": "夢でも見ているかのような心地 - auto-generated",
+      "expected": [
+        {
+          "lemma": "夢",
+          "pos": "Noun",
+          "surface": "夢"
+        },
+        {
+          "lemma": "でも",
+          "pos": "Particle",
+          "surface": "でも"
+        },
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "よう",
+          "pos": "Noun",
+          "surface": "よう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "心地",
+          "pos": "Noun",
+          "surface": "心地"
+        }
+      ],
+      "id": "demo_teirukanoyouna",
+      "input": "夢でも見ているかのような心地"
+    },
+    {
+      "description": "泣いているかのように - auto-generated",
+      "expected": [
+        {
+          "lemma": "泣く",
+          "pos": "Verb",
+          "surface": "泣い"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "よう",
+          "pos": "Noun",
+          "surface": "よう"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        }
+      ],
+      "id": "iteirukanoyouni",
+      "input": "泣いているかのように"
     }
   ],
   "description": "particle_final tests",

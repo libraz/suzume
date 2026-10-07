@@ -497,6 +497,38 @@
       ],
       "id": "sonoheya",
       "input": "そのへや"
+    },
+    {
+      "description": "昨日買ったこの本 - auto-generated",
+      "expected": [
+        {
+          "lemma": "昨日",
+          "pos": "Noun",
+          "surface": "昨日"
+        },
+        {
+          "lemma": "買う",
+          "pos": "Verb",
+          "surface": "買っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "この",
+          "pos": "Determiner",
+          "surface": "この"
+        },
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        }
+      ],
+      "id": "tttakono",
+      "input": "昨日買ったこの本"
     }
   ],
   "description": "determiner tests",
