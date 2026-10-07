@@ -78,9 +78,7 @@ bool immediatelyFollowsParticleHost(const std::vector<char32_t>& codepoints, siz
     return false;
   }
   constexpr size_t kMaxHostChars = 12;
-  constexpr PartOfSpeechMask kHostMask =
-      partOfSpeechMask(core::PartOfSpeech::Noun) | partOfSpeechMask(core::PartOfSpeech::Pronoun) |
-      partOfSpeechMask(core::PartOfSpeech::Verb) | partOfSpeechMask(core::PartOfSpeech::Adjective);
+  constexpr PartOfSpeechMask kHostMask = kNounPronounMask | kVerbAdjectiveMask;
   const size_t min_host_start = lookbehindStart(start_pos, kMaxHostChars);
   return hasDictionaryEntryEndingAt(*dict_manager, codepoints, min_host_start, start_pos, kHostMask);
 }
@@ -327,10 +325,8 @@ bool followsKanjiOrNominalHostBeforeCaseParticle(const std::vector<char32_t>& co
     return true;
   }
   constexpr size_t kMaxHostChars = 12;
-  constexpr PartOfSpeechMask kNominalHostMask =
-      partOfSpeechMask(core::PartOfSpeech::Noun) | partOfSpeechMask(core::PartOfSpeech::Pronoun);
   const size_t min_host_start = lookbehindStart(particle_start, kMaxHostChars);
-  return hasDictionaryEntryEndingAt(*dict_manager, codepoints, min_host_start, particle_start, kNominalHostMask);
+  return hasDictionaryEntryEndingAt(*dict_manager, codepoints, min_host_start, particle_start, kNounPronounMask);
 }
 
 bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,

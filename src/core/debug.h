@@ -107,4 +107,17 @@ inline NullStream& nullStream() {
 
 #endif  // defined(SUZUME_DEBUG) && !defined(__EMSCRIPTEN__)
 
+// Candidate debug metadata (SUZUME_DEBUG_INFO builds only); arguments are not evaluated otherwise.
+#ifdef SUZUME_DEBUG_INFO
+#define SUZUME_DEBUG_CANDIDATE(cand, conf, pat) \
+  do {                                          \
+    (cand).confidence = (conf);                 \
+    (cand).pattern = (pat);                     \
+  } while (0)
+#define SUZUME_DEBUG_CANDIDATE_PATTERN(cand, pat) ((cand).pattern = (pat))
+#else
+#define SUZUME_DEBUG_CANDIDATE(cand, conf, pat) ((void)0)
+#define SUZUME_DEBUG_CANDIDATE_PATTERN(cand, pat) ((void)0)
+#endif
+
 #endif  // SUZUME_CORE_DEBUG_H_

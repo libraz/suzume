@@ -59,9 +59,7 @@ bool hasSuruContinuation(const std::vector<char32_t>& codepoints, size_t suffix_
   }
 
   char32_t next_char = codepoints[suffix_start + 1];
-  return normalize::isKanjiCodepoint(next_char) || next_char == U'ち' || next_char == U'て' || next_char == U'た' ||
-         next_char == U'な' || next_char == U'ま' || next_char == U'よ' || next_char == U'ろ' || next_char == U'そ' ||
-         next_char == U'と' || next_char == U'か' || next_char == U'つ';
+  return normalize::isKanjiCodepoint(next_char) || verb_helpers::isSuruAuxiliaryStarter(next_char);
 }
 
 bool suffixHeadedRunAbsorbsVerifiedGodanStem(const std::vector<char32_t>& codepoints, size_t start_pos,

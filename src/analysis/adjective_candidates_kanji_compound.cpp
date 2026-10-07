@@ -24,6 +24,15 @@ namespace suzume::analysis {
 
 namespace {
 
+void appendLexicalCompoundIAdj(std::vector<UnknownCandidate>& candidates, const std::string& surface, size_t start_pos,
+                               size_t end_pos, const std::string& lemma, float confidence, const char* pattern) {
+  auto adjective =
+      adj_detail::makeIAdjCandidate(surface, start_pos, end_pos, lemma, adj_detail::lexicalCompoundIAdjCost(confidence),
+                                    CandidateOrigin::AdjectiveI, confidence, pattern);
+  adjective.has_suffix = true;
+  candidates.push_back(std::move(adjective));
+}
+
 // A duration/formal-noun kanji may begin a compound adjective only when its
 // tail is independently an i-adjective, never merely a Godan continuative.
 bool hasValidDurationCompoundTail(const std::vector<char32_t>& codepoints, size_t start_pos, size_t kanji_end,
@@ -117,14 +126,8 @@ void appendRenyokeiHostCompound(const std::vector<char32_t>& codepoints, size_t 
           !verb_helpers::isAdjectiveInDictionary(dict_manager, lemma)) {
         continue;
       }
-      const float cost = candidate::confidenceScaledCost(candidate::kCompoundAdjBaseCost, analysis.confidence,
-                                                         candidate::kKanjiAdjConfScale) +
-                         candidate::kCompoundIAdjectiveLexicalBonus;
-      auto adjective =
-          adj_detail::makeIAdjCandidate(surface, start_pos, end_pos, lemma, cost, CandidateOrigin::AdjectiveI,
-                                        analysis.confidence, "renyokei_host_compound");
-      adjective.has_suffix = true;
-      candidates.push_back(std::move(adjective));
+      appendLexicalCompoundIAdj(candidates, surface, start_pos, end_pos, lemma, analysis.confidence,
+                                "renyokei_host_compound");
       return;
     }
   }
@@ -291,14 +294,8 @@ void appendKanjiStemCompoundIAdjCandidates(const std::vector<char32_t>& codepoin
     }
     if (!productive_tail_base.empty()) {
       const std::string lemma = extractSubstring(codepoints, start_pos, kanji_end - 1) + productive_tail_base;
-      const float cost = candidate::confidenceScaledCost(candidate::kCompoundAdjBaseCost, productive_tail_confidence,
-                                                         candidate::kKanjiAdjConfScale) +
-                         candidate::kCompoundIAdjectiveLexicalBonus;
-      auto adjective =
-          adj_detail::makeIAdjCandidate(surface, start_pos, end_pos, lemma, cost, CandidateOrigin::AdjectiveI,
-                                        productive_tail_confidence, "productive_second_element_compound");
-      adjective.has_suffix = true;
-      candidates.push_back(std::move(adjective));
+      appendLexicalCompoundIAdj(candidates, surface, start_pos, end_pos, lemma, productive_tail_confidence,
+                                "productive_second_element_compound");
       return;
     }
   }

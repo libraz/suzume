@@ -190,10 +190,7 @@ void appendBasicNumeralCounterCandidates(const std::vector<char32_t>& codepoints
   if (codepoints[numeral_end] == U'つ') {
     auto cand = makeCandidate(codepoints, start_pos, numeral_end + 1, core::PartOfSpeech::Noun,
                               candidate::kNativeTsuCounterBonus, false, CandidateOrigin::Counter);
-#ifdef SUZUME_DEBUG_INFO
-    cand.confidence = 0.95F;
-    cand.pattern = "counter_tsu";
-#endif
+    SUZUME_DEBUG_CANDIDATE(cand, 0.95F, "counter_tsu");
     candidates.push_back(cand);
   }
 

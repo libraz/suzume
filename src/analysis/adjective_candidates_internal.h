@@ -83,6 +83,23 @@ bool hasDictionaryVerbAnalysis(const std::vector<grammar::InflectionCandidate>& 
                                const dictionary::DictionaryManager* dict_manager);
 
 /**
+ * @brief Cost of a morphologically complete kanji i-adjective read as a lexical compound.
+ */
+float lexicalCompoundIAdjCost(float confidence);
+
+/**
+ * @brief Whether an auxiliary cell closes the span before its final い.
+ *
+ * True when @p surface ends in い, @p base_form is not a dictionary adjective, and the
+ * span after the okurigana starting at @p okurigana_start ends in an auxiliary that
+ * does not itself inflect like an adjective (勉強し+とき+い), so the stem is a predicate
+ * chain rather than an adjective.
+ */
+bool isPredicateChainClosedByAuxiliary(const dictionary::DictionaryManager* dict_manager,
+                                       const std::vector<char32_t>& codepoints, size_t okurigana_start, size_t end_pos,
+                                       const std::string& surface, const std::string& base_form);
+
+/**
  * @brief Whether the character after い makes it a Godan onbin surface.
  */
 bool isVerbOnbinContextAfterI(const std::vector<char32_t>& codepoints, size_t pos);

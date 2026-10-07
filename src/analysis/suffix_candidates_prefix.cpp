@@ -143,10 +143,8 @@ void generatePrefixCompoundCandidates(const std::vector<char32_t>& codepoints, s
   // colloquial aux the inflection analyzer cannot peel.
   if (!followed_by_kanji && start_pos + 2 < char_types.size() &&
       char_types[start_pos + 2] == normalize::CharType::Hiragana) {
-    size_t hira_end = start_pos + 2;
-    while (hira_end < char_types.size() && char_types[hira_end] == normalize::CharType::Hiragana) {
-      ++hira_end;
-    }
+    const size_t hira_end =
+        findCharRegionEnd(char_types, start_pos + 2, char_types.size(), normalize::CharType::Hiragana);
     for (size_t probe_end = start_pos + 3; probe_end <= hira_end; ++probe_end) {
       std::string verb_probe = extractSubstring(codepoints, start_pos + 1, probe_end);
       grammar::InflectionCandidate best = inflection.getBest(verb_probe);
@@ -162,10 +160,7 @@ void generatePrefixCompoundCandidates(const std::vector<char32_t>& codepoints, s
     // And compete with dictionary entries
     auto cand = makeCandidate(codepoints, start_pos, start_pos + 2, core::PartOfSpeech::Noun, -1.0F, false,
                               CandidateOrigin::PrefixCompound);
-#ifdef SUZUME_DEBUG_INFO
-    cand.confidence = 0.9F;
-    cand.pattern = "prefix_single_kanji";
-#endif
+    SUZUME_DEBUG_CANDIDATE(cand, 0.9F, "prefix_single_kanji");
     candidates.push_back(cand);
   }
 }
@@ -177,10 +172,7 @@ void generateTemporalNounBoundaryCandidates(const std::vector<char32_t>& codepoi
   // (終了|間もなく).  Preserve the noun boundary before it.  Requiring two
   // kanji before 間 excludes ordinary one-kanji compounds followed by
   // も+なく (時間|も|なく), where 間 belongs to the noun on the left.
-  size_t kanji_end = start_pos;
-  while (kanji_end < char_types.size() && char_types[kanji_end] == normalize::CharType::Kanji) {
-    ++kanji_end;
-  }
+  const size_t kanji_end = findCharRegionEnd(char_types, start_pos, char_types.size(), normalize::CharType::Kanji);
   if (kanji_end >= start_pos + 3 && codepoints[kanji_end - 1] == U'間' && kanji_end + 2 < codepoints.size() &&
       extractSubstring(codepoints, kanji_end - 1, kanji_end + 3) == "間もなく") {
     const size_t noun_end = kanji_end - 1;
@@ -188,10 +180,7 @@ void generateTemporalNounBoundaryCandidates(const std::vector<char32_t>& codepoi
     auto boundary = makeCandidate(noun, start_pos, noun_end, core::PartOfSpeech::Noun,
                                   candidate::kTemporalNounBoundarySplitBonus, false, CandidateOrigin::PrefixCompound);
     boundary.lemma = noun;
-#ifdef SUZUME_DEBUG_INFO
-    boundary.confidence = candidate::kHighOriginConfidence;
-    boundary.pattern = "before_ma_mo_naku";
-#endif
+    SUZUME_DEBUG_CANDIDATE(boundary, candidate::kHighOriginConfidence, "before_ma_mo_naku");
     candidates.push_back(std::move(boundary));
     return;
   }
@@ -206,10 +195,7 @@ void generateTemporalNounBoundaryCandidates(const std::vector<char32_t>& codepoi
     auto temporal = makeCandidate("今", start_pos, start_pos + 1, core::PartOfSpeech::Noun,
                                   candidate::kTemporalNounBoundarySplitBonus, false, CandidateOrigin::PrefixCompound);
     temporal.lemma = "今";
-#ifdef SUZUME_DEBUG_INFO
-    temporal.confidence = candidate::kHighOriginConfidence;
-    temporal.pattern = "temporal_before_number_counter";
-#endif
+    SUZUME_DEBUG_CANDIDATE(temporal, candidate::kHighOriginConfidence, "temporal_before_number_counter");
     candidates.push_back(std::move(temporal));
     return;
   }
@@ -247,10 +233,7 @@ void generateTemporalNounBoundaryCandidates(const std::vector<char32_t>& codepoi
       has_temporal_reference_suffix ? start_pos + 4 : (binds_fiscal_year ? start_pos + 3 : start_pos + 2);
   auto cand = makeCandidate(codepoints, start_pos, candidate_end, core::PartOfSpeech::Noun,
                             candidate::kTemporalNounBoundarySplitBonus, false, CandidateOrigin::PrefixCompound);
-#ifdef SUZUME_DEBUG_INFO
-  cand.confidence = candidate::kHighOriginConfidence;
-  cand.pattern = "temporal_noun_boundary";
-#endif
+  SUZUME_DEBUG_CANDIDATE(cand, candidate::kHighOriginConfidence, "temporal_noun_boundary");
   candidates.push_back(cand);
 }
 

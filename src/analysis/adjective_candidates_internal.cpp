@@ -11,6 +11,7 @@
 #include "analysis/candidate_constants.h"
 #include "analysis/dictionary_probe.h"
 #include "analysis/scorer_constants.h"
+#include "core/debug.h"
 #include "core/utf8_constants.h"
 #include "normalize/utf8.h"
 #include "tokenizer_utils.h"
@@ -209,6 +210,25 @@ bool hasDictionaryVerbAnalysis(const std::vector<grammar::InflectionCandidate>& 
   return false;
 }
 
+float lexicalCompoundIAdjCost(float confidence) {
+  return candidate::confidenceScaledCost(candidate::kCompoundAdjBaseCost, confidence, candidate::kKanjiAdjConfScale) +
+         candidate::kCompoundIAdjectiveLexicalBonus;
+}
+
+bool isPredicateChainClosedByAuxiliary(const dictionary::DictionaryManager* dict_manager,
+                                       const std::vector<char32_t>& codepoints, size_t okurigana_start, size_t end_pos,
+                                       const std::string& surface, const std::string& base_form) {
+  const auto* closing_auxiliary =
+      verb_helpers::auxiliaryClosingAfterOkurigana(dict_manager, codepoints, okurigana_start, end_pos);
+  const bool closes_on_predicate_cell =
+      closing_auxiliary != nullptr &&
+      !utf8::endsWith(closing_auxiliary->lemma.empty() ? closing_auxiliary->surface : closing_auxiliary->lemma, "い");
+  return utf8::endsWith(surface, "い") && !verb_helpers::isAdjectiveInDictionary(dict_manager, base_form) &&
+         (closes_on_predicate_cell ||
+          (closing_auxiliary == nullptr &&
+           verb_helpers::endsWithAuxiliaryAfterOkurigana(dict_manager, codepoints, okurigana_start, end_pos - 1)));
+}
+
 bool isVerbOnbinContextAfterI(const std::vector<char32_t>& codepoints, size_t pos) {
   if (pos >= codepoints.size()) {
     return false;
@@ -229,10 +249,7 @@ UnknownCandidate makeIAdjCandidate(const std::string& surface, size_t start, siz
   auto candidate =
       makeCandidate(surface, start, end, core::PartOfSpeech::Adjective, cost, false, origin, detectIAdjEpos(surface));
   candidate.lemma = lemma;
-#ifdef SUZUME_DEBUG_INFO
-  candidate.confidence = confidence;
-  candidate.pattern = pattern;
-#endif
+  SUZUME_DEBUG_CANDIDATE(candidate, confidence, pattern);
   return candidate;
 }
 
@@ -241,10 +258,7 @@ UnknownCandidate makeNaAdjCandidate(const std::string& surface, size_t start, si
                                     [[maybe_unused]] const char* pattern) {
   auto candidate = makeCandidate(surface, start, end, core::PartOfSpeech::Adjective, cost, has_suffix, origin,
                                  core::ExtendedPOS::AdjNaAdj);
-#ifdef SUZUME_DEBUG_INFO
-  candidate.confidence = confidence;
-  candidate.pattern = pattern;
-#endif
+  SUZUME_DEBUG_CANDIDATE(candidate, confidence, pattern);
   return candidate;
 }
 
@@ -259,10 +273,7 @@ UnknownCandidate makeIAdjCellCandidate(const std::string& surface, size_t start,
                                        [[maybe_unused]] float confidence, [[maybe_unused]] const char* pattern) {
   auto candidate = makeCandidate(surface, start, end, core::PartOfSpeech::Adjective, cost, true, origin, extended_pos);
   candidate.lemma = lemma;
-#ifdef SUZUME_DEBUG_INFO
-  candidate.confidence = confidence;
-  candidate.pattern = pattern;
-#endif
+  SUZUME_DEBUG_CANDIDATE(candidate, confidence, pattern);
   return candidate;
 }
 
@@ -293,10 +304,7 @@ UnknownCandidate makeTrimmedAdjVariant(const UnknownCandidate& candidate, size_t
   variant.has_suffix = true;
   variant.extended_pos = epos;
   variant.origin = candidate.origin;
-#ifdef SUZUME_DEBUG_INFO
-  variant.confidence = candidate.confidence;
-  variant.pattern = pattern;
-#endif
+  SUZUME_DEBUG_CANDIDATE(variant, candidate.confidence, pattern);
   return variant;
 }
 

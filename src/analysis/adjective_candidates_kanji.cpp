@@ -704,16 +704,8 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
         // that auxiliary's own ending (珍し+らし+い is らしい).
         // An auxiliary closing the whole span is that ending only when it
         // inflects like an adjective; んさい (of んさる) is a predicate cell.
-        const auto* closing_auxiliary =
-            verb_helpers::auxiliaryClosingAfterOkurigana(dict_manager, codepoints, kanji_end, end_pos);
-        const bool closes_on_predicate_cell =
-            closing_auxiliary != nullptr &&
-            !utf8::endsWith(closing_auxiliary->lemma.empty() ? closing_auxiliary->surface : closing_auxiliary->lemma,
-                            "い");
-        if (utf8::endsWith(surface, "い") && !isAdjectiveInDictionary(dict_manager, cand.base_form) &&
-            (closes_on_predicate_cell ||
-             (closing_auxiliary == nullptr &&
-              verb_helpers::endsWithAuxiliaryAfterOkurigana(dict_manager, codepoints, kanji_end, end_pos - 1)))) {
+        if (adj_detail::isPredicateChainClosedByAuxiliary(dict_manager, codepoints, kanji_end, end_pos, surface,
+                                                          cand.base_form)) {
           continue;
         }
         // The hypothetical けれ after a verb continuative is けり's (咲き+けれ+ば);

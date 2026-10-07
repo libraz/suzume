@@ -43,10 +43,7 @@ bool hasInternalPredicateBoundary(const std::vector<char32_t>& codepoints, size_
   }
   for (size_t boundary = start_pos + 1; boundary < onbin_pos; ++boundary) {
     const std::string tail = extractSubstring(codepoints, boundary, onbin_pos + 1);
-    constexpr PartOfSpeechMask kPredicateMask = partOfSpeechMask(core::PartOfSpeech::Verb) |
-                                                partOfSpeechMask(core::PartOfSpeech::Adjective) |
-                                                partOfSpeechMask(core::PartOfSpeech::Auxiliary);
-    if (hasExactPartOfSpeech(*dict_manager, tail, kPredicateMask)) {
+    if (hasExactPartOfSpeech(*dict_manager, tail, kPredicateHostMask)) {
       return true;
     }
   }
@@ -406,10 +403,7 @@ void appendHiraganaRenyokeiBeforeAspect(const std::vector<char32_t>& codepoints,
   if (dict_manager == nullptr) {
     return;
   }
-  size_t stem_end = start_pos;
-  while (stem_end < char_types.size() && char_types[stem_end] == normalize::CharType::Hiragana) {
-    ++stem_end;
-  }
+  const size_t stem_end = findCharRegionEnd(char_types, start_pos, char_types.size(), normalize::CharType::Hiragana);
   if (stem_end < start_pos + 2 || stem_end >= codepoints.size()) {
     return;
   }

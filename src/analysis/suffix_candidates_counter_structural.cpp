@@ -6,6 +6,7 @@
 #include <algorithm>
 
 #include "candidate_constants.h"
+#include "core/debug.h"
 #include "dictionary_probe.h"
 #include "normalize/char_type.h"
 #include "normalize/exceptions.h"
@@ -134,9 +135,7 @@ void appendStructuralCounterCandidates(const std::vector<char32_t>& codepoints, 
                                   candidate::kKanaNumeralCounterMergeBonus, true, CandidateOrigin::Counter,
                                   core::ExtendedPOS::NounNumber);
         cand.lemma = surface;
-#ifdef SUZUME_DEBUG_INFO
-        cand.pattern = "kana_numeral_counter";
-#endif
+        SUZUME_DEBUG_CANDIDATE_PATTERN(cand, "kana_numeral_counter");
         candidates.push_back(cand);
       }
     }
@@ -223,10 +222,7 @@ void appendStructuralCounterCandidates(const std::vector<char32_t>& codepoints, 
       normalize::isNumeralCodepoint(codepoints[start_pos + 1])) {
     const size_t ordinal_end = scanQuantityHead(codepoints, start_pos + 1, false);
     if (ordinal_end < char_types.size() && char_types[ordinal_end] == normalize::CharType::Kanji) {
-      size_t tail_end = ordinal_end;
-      while (tail_end < char_types.size() && char_types[tail_end] == normalize::CharType::Kanji) {
-        ++tail_end;
-      }
+      const size_t tail_end = findCharRegionEnd(char_types, ordinal_end, char_types.size(), normalize::CharType::Kanji);
       size_t tail_len = tail_end - ordinal_end;
       if (tail_len == 1 && normalize::isCounterKanji(codepoints[ordinal_end])) {
         appendCounterCandidate(codepoints, start_pos, ordinal_end, core::PartOfSpeech::Noun,

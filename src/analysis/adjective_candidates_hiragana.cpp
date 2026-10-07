@@ -347,9 +347,7 @@ void appendHiraganaPrefixedKanjiIAdjCandidates(std::vector<UnknownCandidate>& ca
           inflection_candidate.confidence < candidate::kCompoundAdjConfMin) {
         continue;
       }
-      float cost = candidate::confidenceScaledCost(candidate::kCompoundAdjBaseCost, inflection_candidate.confidence,
-                                                   candidate::kKanjiAdjConfScale) +
-                   candidate::kCompoundIAdjectiveLexicalBonus;
+      float cost = adj_detail::lexicalCompoundIAdjCost(inflection_candidate.confidence);
       if (follows_particle) {
         cost += candidate::kPrefixedIAdjectiveAfterParticleBonus;
       }
@@ -416,10 +414,7 @@ void appendVowelFusedAdjectiveCandidates(const std::vector<char32_t>& codepoints
                                  core::ExtendedPOS::AdjBasic);
       fused.lemma = base_form;
       fused.lemma_verified = true;
-#ifdef SUZUME_DEBUG_INFO
-      fused.confidence = candidate::kDictionaryOriginConfidence;
-      fused.pattern = "adj_vowel_fused_e";
-#endif
+      SUZUME_DEBUG_CANDIDATE(fused, candidate::kDictionaryOriginConfidence, "adj_vowel_fused_e");
       candidates.push_back(std::move(fused));
       return;
     }

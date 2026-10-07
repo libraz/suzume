@@ -205,10 +205,7 @@ bool hasInternalNominalParticleBoundary(const std::vector<char32_t>& codepoints,
         return true;
       }
       const std::string remainder = extractSubstring(codepoints, particle_end, end_pos);
-      constexpr PartOfSpeechMask kPredicateMask = partOfSpeechMask(core::PartOfSpeech::Verb) |
-                                                  partOfSpeechMask(core::PartOfSpeech::Adjective) |
-                                                  partOfSpeechMask(core::PartOfSpeech::Auxiliary);
-      if (hasExactPartOfSpeech(*dict_manager, remainder, kPredicateMask)) {
+      if (hasExactPartOfSpeech(*dict_manager, remainder, kPredicateHostMask)) {
         return true;
       }
       // The particle joins two complete constituents, so a head may only span
@@ -700,9 +697,8 @@ void generateSelectedNominalHeadCandidates(const std::vector<char32_t>& codepoin
     auto noun_candidate = makeCandidate(head_surface, start_pos, head_end, core::PartOfSpeech::Noun, noun_cost,
                                         /*has_suffix=*/true, CandidateOrigin::SelectedNominalHead);
     noun_candidate.extended_pos = has_exact_renyokei ? core::ExtendedPOS::NounVerbal : core::ExtendedPOS::Noun;
-#ifdef SUZUME_DEBUG_INFO
-    noun_candidate.pattern = has_genitive_selector ? "genitive_selected_noun" : "attributive_selected_noun";
-#endif
+    SUZUME_DEBUG_CANDIDATE_PATTERN(noun_candidate,
+                                   has_genitive_selector ? "genitive_selected_noun" : "attributive_selected_noun");
     candidates.push_back(std::move(noun_candidate));
   }
 }
@@ -727,10 +723,7 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
   // forms one search unit (必要以上, 期待以下). Numeral+counter phrases retain
   // their compositional boundary (三名|以上, 百倍|以下), which is owned by the
   // counter generator. A following nominal selector proves the right edge.
-  size_t kanji_run_end = start_pos;
-  while (kanji_run_end < char_types.size() && char_types[kanji_run_end] == normalize::CharType::Kanji) {
-    ++kanji_run_end;
-  }
+  const size_t kanji_run_end = findCharRegionEnd(char_types, start_pos, char_types.size(), normalize::CharType::Kanji);
   if (kanji_run_end >= start_pos + 4 && codepoints[kanji_run_end - 2] == U'以' &&
       (codepoints[kanji_run_end - 1] == U'上' || codepoints[kanji_run_end - 1] == U'下') &&
       !normalize::isNumeralCodepoint(codepoints[kanji_run_end - 3]) &&
@@ -740,10 +733,7 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
     auto comparison = makeCandidate(surface, start_pos, kanji_run_end, core::PartOfSpeech::Noun,
                                     candidate::kComparisonCompoundNounCost, false, CandidateOrigin::SuffixPattern);
     comparison.lemma = surface;
-#ifdef SUZUME_DEBUG_INFO
-    comparison.confidence = candidate::kDictionaryOriginConfidence;
-    comparison.pattern = "comparison_bound_compound";
-#endif
+    SUZUME_DEBUG_CANDIDATE(comparison, candidate::kDictionaryOriginConfidence, "comparison_bound_compound");
     candidates.push_back(std::move(comparison));
     return;
   }
@@ -796,9 +786,7 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
                                   candidate::kCounterExtentSuffixCost, true, CandidateOrigin::SuffixPattern,
                                   core::ExtendedPOS::Suffix);
         gake.lemma = std::string(kGake);
-#ifdef SUZUME_DEBUG_INFO
-        gake.pattern = "nominal_gake_suffix";
-#endif
+        SUZUME_DEBUG_CANDIDATE_PATTERN(gake, "nominal_gake_suffix");
         candidates.push_back(std::move(gake));
         return;
       }
@@ -809,10 +797,7 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
       auto candidate = makeCandidate(surface, start_pos, suffix_end, core::PartOfSpeech::Noun,
                                      candidate::kDerivedSuffixCompoundNounCost, false, CandidateOrigin::SuffixPattern);
       candidate.lemma = surface;
-#ifdef SUZUME_DEBUG_INFO
-      candidate.confidence = candidate::kDictionaryOriginConfidence;
-      candidate.pattern = "nominal_gakari_gake";
-#endif
+      SUZUME_DEBUG_CANDIDATE(candidate, candidate::kDictionaryOriginConfidence, "nominal_gakari_gake");
       candidates.push_back(std::move(candidate));
       return;
     }
@@ -851,10 +836,7 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
         for (size_t end_pos = sokuon_pos + 2; end_pos <= kanji2_end; ++end_pos) {
           auto cand = makeCandidate(codepoints, start_pos, end_pos, core::PartOfSpeech::Noun,
                                     candidate::kInfixCompoundNounCost, false, CandidateOrigin::KanjiHiraganaCompound);
-#ifdef SUZUME_DEBUG_INFO
-          cand.confidence = 0.9F;
-          cand.pattern = "kanji_sokuon_kanji";
-#endif
+          SUZUME_DEBUG_CANDIDATE(cand, 0.9F, "kanji_sokuon_kanji");
           candidates.push_back(cand);
         }
 
@@ -875,10 +857,7 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
             cand.lemma = normalize::concat(full_kanji, hatsuonbin_match.base_suffix);
             cand.conj_type = grammar::verbTypeToConjType(hatsuonbin_match.verb_type);
             cand.extended_pos = core::ExtendedPOS::VerbOnbinkei;
-#ifdef SUZUME_DEBUG_INFO
-            cand.confidence = 0.9F;
-            cand.pattern = "sokuon_kanji_hatsuonbin";
-#endif
+            SUZUME_DEBUG_CANDIDATE(cand, 0.9F, "sokuon_kanji_hatsuonbin");
             SUZUME_DEBUG_LOG("[SUFFIX_CAND] " << onbin_surface << " sokuon_kanji_hatsuonbin lemma=" << cand.lemma
                                               << " cost=" << kHatsuonbinCost << "\n");
             candidates.push_back(cand);
@@ -966,10 +945,7 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
 
           auto cand = makeCandidate(codepoints, start_pos, hira2_end, core::PartOfSpeech::Noun, 1.0F, false,
                                     CandidateOrigin::KanjiHiraganaCompound);
-#ifdef SUZUME_DEBUG_INFO
-          cand.confidence = 0.7F;
-          cand.pattern = "kanji_sokuon_hira";
-#endif
+          SUZUME_DEBUG_CANDIDATE(cand, 0.7F, "kanji_sokuon_hira");
           candidates.push_back(cand);
         }
       }
@@ -998,10 +974,7 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
       if (has_attributive_copula) {
         cand.extended_pos = core::ExtendedPOS::AdjNaAdj;
       }
-#ifdef SUZUME_DEBUG_INFO
-      cand.confidence = 0.9F;
-      cand.pattern = "kanji_hatsuon_kanji";
-#endif
+      SUZUME_DEBUG_CANDIDATE(cand, 0.9F, "kanji_hatsuon_kanji");
       candidates.push_back(cand);
     }
     return;
@@ -1018,10 +991,7 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
       hasNominalPhraseSelectorAt(dict_manager, codepoints, hiragana_end)) {
     auto cand = makeCandidate(codepoints, start_pos, hiragana_end, core::PartOfSpeech::Noun,
                               candidate::kInfixCompoundNounCost, false, CandidateOrigin::KanjiHiraganaNominalCompound);
-#ifdef SUZUME_DEBUG_INFO
-    cand.confidence = candidate::kHighOriginConfidence;
-    cand.pattern = "kanji_nominalizer_sa_compound";
-#endif
+    SUZUME_DEBUG_CANDIDATE(cand, candidate::kHighOriginConfidence, "kanji_nominalizer_sa_compound");
     candidates.push_back(cand);
     return;
   }
@@ -1126,10 +1096,7 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
   // For ichidan verbs: べ,め,け,せ,て,ね,れ,え (e-row) - these are verb stems
   const bool is_renyokei = (first_hira == U'し' || first_hira == U'み' || first_hira == U'き' || first_hira == U'ぎ' ||
                             first_hira == U'ち' || first_hira == U'り' || first_hira == U'い' || first_hira == U'び');
-  const bool is_ichidan_stem =
-      (first_hira == U'べ' || first_hira == U'め' || first_hira == U'け' || first_hira == U'せ' ||
-       first_hira == U'て' || first_hira == U'ね' || first_hira == U'れ' || first_hira == U'え' ||
-       first_hira == U'げ' || first_hira == U'ぜ' || first_hira == U'で' || first_hira == U'へ' || first_hira == U'ぺ');
+  const bool is_ichidan_stem = kana::isERowCodepoint(first_hira);
   if ((is_renyokei || is_ichidan_stem) && (second_hira == U'そ' || second_hira == U'た' || second_hira == U'ま')) {
     looks_like_aux = true;
   }
@@ -1312,10 +1279,8 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
   auto cand = makeCandidate(
       codepoints, start_pos, hiragana_end, core::PartOfSpeech::Noun, cost, false,
       nominal_context ? CandidateOrigin::KanjiHiraganaNominalCompound : CandidateOrigin::KanjiHiraganaCompound);
-#ifdef SUZUME_DEBUG_INFO
-  cand.confidence = looks_like_aux ? 0.3F : 0.8F;
-  cand.pattern = looks_like_aux ? "aux_like" : (nominal_context ? "nominal_compound" : "compound");
-#endif
+  SUZUME_DEBUG_CANDIDATE(cand, looks_like_aux ? 0.3F : 0.8F,
+                         looks_like_aux ? "aux_like" : (nominal_context ? "nominal_compound" : "compound"));
   candidates.push_back(cand);
 }
 

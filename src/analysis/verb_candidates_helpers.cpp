@@ -175,9 +175,7 @@ bool crossesCaseParticleBeforePredicate(const dictionary::DictionaryManager* dic
     if (particle == nullptr || particle->extended_pos != core::ExtendedPOS::ParticleCase) {
       continue;
     }
-    if (hasExactPartOfSpeech(
-            *dict_manager, codepoints, pos + 1, end_pos,
-            partOfSpeechMask(core::PartOfSpeech::Verb) | partOfSpeechMask(core::PartOfSpeech::Adjective))) {
+    if (hasExactPartOfSpeech(*dict_manager, codepoints, pos + 1, end_pos, kVerbAdjectiveMask)) {
       return true;
     }
   }

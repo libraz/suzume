@@ -39,6 +39,17 @@ bool analyzesAsVerbType(const grammar::Inflection& inflection, const std::string
   });
 }
 
+// Whether the observed span [start_pos, end_pos) analyzes as the given verb
+// type and base form with constructed-verb confidence.
+bool observedFormConfirms(const grammar::Inflection& inflection, const std::vector<char32_t>& codepoints,
+                          size_t start_pos, size_t end_pos, grammar::VerbType verb_type, const std::string& base_form) {
+  const auto& results = analysesInRange(inflection, codepoints, start_pos, end_pos);
+  return std::any_of(results.begin(), results.end(), [&](const grammar::InflectionCandidate& result) {
+    return result.verb_type == verb_type && result.base_form == base_form &&
+           result.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence;
+  });
+}
+
 // Godan mizenkei stem candidates for auxiliary separation: kanji + one a-row
 // okurigana mora before a passive, causative, negative or classical auxiliary
 // (書か, 読ま, 話さ). Those auxiliaries connect to the stem as their own tokens.
@@ -203,13 +214,7 @@ void appendSingleOkuriganaMizenkeiCandidates(const std::vector<char32_t>& codepo
   // rejecting the productive mizenkei candidate; this remains type- and
   // lemma-checked rather than accepting an arbitrary kanji+さ.
   if (!is_valid_verb && is_passive_pattern && first_hira == U'さ') {
-    for (const auto& inflection_candidate : analysesInRange(inflection, codepoints, start_pos, hiragana_end)) {
-      if (inflection_candidate.verb_type == verb_type && inflection_candidate.base_form == base_form &&
-          inflection_candidate.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence) {
-        is_valid_verb = true;
-        break;
-      }
-    }
+    is_valid_verb = observedFormConfirms(inflection, codepoints, start_pos, hiragana_end, verb_type, base_form);
   }
   if (!is_valid_verb) {
     return;
@@ -667,13 +672,7 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
           ++observed_end;  // Preserve the existing れまし validation span.
         }
         observed_end = std::min(observed_end, hiragana_end);
-        for (const auto& inflection_candidate : analysesInRange(inflection, codepoints, start_pos, observed_end)) {
-          if (inflection_candidate.verb_type == verb_type && inflection_candidate.base_form == base_form &&
-              inflection_candidate.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence) {
-            is_valid_verb = true;
-            break;
-          }
-        }
+        is_valid_verb = observedFormConfirms(inflection, codepoints, start_pos, observed_end, verb_type, base_form);
       }
 
       const std::string competing_ichidan = surface + "れる";
@@ -809,13 +808,8 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
                 dict_manager, inflection, base_form, candidate::verb_cost::kConstructedVerbMinConfidence, true);
             bool is_valid_verb = verified_base;
             if (!is_valid_verb) {
-              for (const auto& inflected : analysesInRange(inflection, codepoints, start_pos, hiragana_end)) {
-                if (inflected.verb_type == verb_type && inflected.base_form == base_form &&
-                    inflected.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence) {
-                  is_valid_verb = true;
-                  break;
-                }
-              }
+              is_valid_verb =
+                  observedFormConfirms(inflection, codepoints, start_pos, hiragana_end, verb_type, base_form);
             }
             // Reject a fabricated mizenkei that merely absorbs a trailing
             // binding particle (係助詞): 水すらない is noun + すら + ない, never

@@ -190,10 +190,7 @@ inline UnknownCandidate makeSuffixCandidate(const std::string& surface, size_t s
   auto cand = makeCandidate(surface, start, end, pos, cost, true, CandidateOrigin::SuffixPattern);
   cand.lemma = lemma;
   cand.conj_type = conj_type;
-#ifdef SUZUME_DEBUG_INFO
-  cand.confidence = confidence;
-  cand.pattern = pattern;
-#endif
+  SUZUME_DEBUG_CANDIDATE(cand, confidence, pattern);
   return cand;
 }
 
@@ -403,10 +400,7 @@ void generateProductiveSuffixVerbCandidates(const std::vector<char32_t>& codepoi
     return;
   }
 
-  size_t base_end = start_pos;
-  while (base_end < char_types.size() && char_types[base_end] == normalize::CharType::Kanji) {
-    ++base_end;
-  }
+  const size_t base_end = findCharRegionEnd(char_types, start_pos, char_types.size(), normalize::CharType::Kanji);
 
   // A productive suffix verb may attach after a repeated quantity unit, but
   // it cannot begin inside that already-complete unit and cross its right
@@ -597,11 +591,7 @@ void generateWithSuffix(const std::vector<char32_t>& codepoints, size_t start_po
   generateAdminBoundaryCandidates(codepoints, start_pos, char_types, candidates);
 
   // Find kanji sequence
-  size_t end_pos = start_pos;
-  while (end_pos < char_types.size() && end_pos - start_pos < options.max_kanji_length &&
-         char_types[end_pos] == normalize::CharType::Kanji) {
-    ++end_pos;
-  }
+  const size_t end_pos = findCharRegionEnd(char_types, start_pos, options.max_kanji_length, normalize::CharType::Kanji);
 
   if (end_pos <= start_pos + 1) {
     return;
@@ -645,10 +635,7 @@ void generateWithSuffix(const std::vector<char32_t>& codepoints, size_t start_po
         stem.cost = 1.0F + options.suffix_separation_bonus;
         stem.has_suffix = false;
         stem.origin = CandidateOrigin::SuffixPattern;
-#ifdef SUZUME_DEBUG_INFO
-        stem.confidence = 1.0F;
-        stem.pattern = normalize::concat("stem_before_", suffix);
-#endif
+        SUZUME_DEBUG_CANDIDATE(stem, 1.0F, normalize::concat("stem_before_", suffix));
         candidates.push_back(stem);
 
         // Add whole word candidate too
@@ -661,10 +648,7 @@ void generateWithSuffix(const std::vector<char32_t>& codepoints, size_t start_po
             forms_derived_compound ? candidate::kDerivedSuffixCompoundNounCost : candidate::kSuffixWholeCandidateCost;
         whole.has_suffix = true;
         whole.origin = CandidateOrigin::SuffixPattern;
-#ifdef SUZUME_DEBUG_INFO
-        whole.confidence = 1.0F;
-        whole.pattern = normalize::concat("with_suffix_", suffix);
-#endif
+        SUZUME_DEBUG_CANDIDATE(whole, 1.0F, normalize::concat("with_suffix_", suffix));
         candidates.push_back(whole);
 
         break;  // Use longest matching suffix

@@ -411,10 +411,7 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
         }
         auto cand = makeCandidate(surface, start_pos, hiragana_end + 1, core::PartOfSpeech::Noun, nom2_cost,
                                   has_particle_continuation || selects_nominal_host, CandidateOrigin::NominalizedNoun);
-#ifdef SUZUME_DEBUG_INFO
-        cand.confidence = 0.8F;
-        cand.pattern = "nominalized_2hira";
-#endif
+        SUZUME_DEBUG_CANDIDATE(cand, 0.8F, "nominalized_2hira");
         candidates.push_back(cand);
       }
     }
@@ -665,10 +662,7 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
                                 has_particle_continuation || has_final_particle_continuation || nominal_compound ||
                                     has_hiragana_noun_continuation || is_property_nominal,
                                 CandidateOrigin::NominalizedNoun);
-#ifdef SUZUME_DEBUG_INFO
-      cand.confidence = kNominalizedNounReportedConfidence;
-      cand.pattern = "nominalized_1hira";
-#endif
+      SUZUME_DEBUG_CANDIDATE(cand, kNominalizedNounReportedConfidence, "nominalized_1hira");
       candidates.push_back(cand);
     }
   }
@@ -781,10 +775,7 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
           is_verb_continuative ? candidate::kDeverbalCompoundNounCost : candidate::kUnverifiedDeverbalCompoundNounCost;
       auto cand = makeCandidate(codepoints, start_pos, kanji_end + 2, core::PartOfSpeech::Noun, compound_cost, true,
                                 CandidateOrigin::NominalizedNoun);
-#ifdef SUZUME_DEBUG_INFO
-      cand.confidence = kNominalizedNounReportedConfidence;
-      cand.pattern = "deverbal_compound_noun";
-#endif
+      SUZUME_DEBUG_CANDIDATE(cand, kNominalizedNounReportedConfidence, "deverbal_compound_noun");
       candidates.push_back(cand);
     }
   }
@@ -819,9 +810,7 @@ void generateReciprocalActionNounCandidates(const std::vector<char32_t>& codepoi
     auto cand = makeCandidate(surface, start_pos, end_pos, core::PartOfSpeech::Noun,
                               candidate::kReciprocalActionNounCost, false, CandidateOrigin::NominalizedNoun);
     cand.lemma = surface;
-#ifdef SUZUME_DEBUG_INFO
-    cand.pattern = "reciprocal_action_kko";
-#endif
+    SUZUME_DEBUG_CANDIDATE_PATTERN(cand, "reciprocal_action_kko");
     candidates.push_back(cand);
   }
 }
@@ -903,9 +892,7 @@ void generateHumbleNominalCandidates(const std::vector<char32_t>& codepoints, si
       // The prefix and the する frame prove both boundaries of the head.
       auto cand = makeCandidate(stem, start_pos, end_pos, core::PartOfSpeech::Noun,
                                 candidate::kHumbleNominalCandidateBonus, true, CandidateOrigin::SelectedNominalHead);
-#ifdef SUZUME_DEBUG_INFO
-      cand.pattern = "humble_kana_verbal_noun";
-#endif
+      SUZUME_DEBUG_CANDIDATE_PATTERN(cand, "humble_kana_verbal_noun");
       candidates.push_back(cand);
       continue;
     }
@@ -944,9 +931,7 @@ void generateHumbleNominalCandidates(const std::vector<char32_t>& codepoints, si
     }
     auto cand = makeCandidate(stem, start_pos, end_pos, core::PartOfSpeech::Noun,
                               candidate::kHumbleNominalCandidateBonus, true, CandidateOrigin::NominalizedNoun);
-#ifdef SUZUME_DEBUG_INFO
-    cand.pattern = "humble_nominal";
-#endif
+    SUZUME_DEBUG_CANDIDATE_PATTERN(cand, "humble_nominal");
     candidates.push_back(cand);
   }
 }

@@ -7,6 +7,7 @@
 
 #include "analysis/dictionary_probe.h"
 #include "candidate_constants.h"
+#include "core/debug.h"
 #include "dictionary/dictionary.h"
 #include "grammar/char_patterns.h"
 #include "normalize/char_type.h"
@@ -223,9 +224,7 @@ void appendTemporalCounterCandidates(const std::vector<char32_t>& codepoints, si
                                     candidate::kCounterExtentSuffixCost, true, CandidateOrigin::SuffixPattern,
                                     core::ExtendedPOS::Suffix);
         suffix.lemma = suffix_surface;
-#ifdef SUZUME_DEBUG_INFO
-        suffix.pattern = "temporal_quantity_extent_suffix";
-#endif
+        SUZUME_DEBUG_CANDIDATE_PATTERN(suffix, "temporal_quantity_extent_suffix");
         candidates.push_back(std::move(suffix));
       }
     }

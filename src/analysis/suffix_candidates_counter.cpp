@@ -35,9 +35,7 @@ void appendCounterCandidate(const std::vector<char32_t>& codepoints, size_t star
   }
   auto cand = makeCandidate(surface, start, end, pos, cost, false, CandidateOrigin::Counter, extended_pos);
   cand.lemma = std::move(surface);
-#ifdef SUZUME_DEBUG_INFO
-  cand.pattern = pattern;
-#endif
+  SUZUME_DEBUG_CANDIDATE_PATTERN(cand, pattern);
   candidates.push_back(std::move(cand));
 }
 
@@ -176,10 +174,7 @@ void generateCounterCandidates(const std::vector<char32_t>& codepoints, size_t s
                                        : -0.5F - (static_cast<float>(unit_len) * 0.05F);
   auto cand =
       makeCandidate(codepoints, start_pos, unit_end, core::PartOfSpeech::Noun, cost, false, CandidateOrigin::Counter);
-#ifdef SUZUME_DEBUG_INFO
-  cand.confidence = starts_with_zero_prefix ? 0.3F : 0.9F;
-  cand.pattern = "numeric_unit_katakana";
-#endif
+  SUZUME_DEBUG_CANDIDATE(cand, starts_with_zero_prefix ? 0.3F : 0.9F, "numeric_unit_katakana");
   candidates.push_back(cand);
 }
 
