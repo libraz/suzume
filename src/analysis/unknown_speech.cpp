@@ -469,8 +469,13 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
   // productive mimetic shape (ちくたくと).  The particle gate prevents a
   // generic four-hiragana run from becoming an adverb without syntactic
   // evidence, while the earlier AA/ABAB branches retain their stronger costs.
+  // An opening が may begin the mimetic where nothing could host the particle
+  // (電車が+がたごと+と): が starts no native noun, so unlike は/と/に (ともだち)
+  // no nominal reading competes for the run.
   if (has_trailing_quotative && seq_end < codepoints.size() && mimetic_len == 4 &&
-      start_type == normalize::CharType::Hiragana && !normalize::isParticleCodepoint(codepoints[start_pos])) {
+      start_type == normalize::CharType::Hiragana &&
+      (!normalize::isParticleCodepoint(codepoints[start_pos]) ||
+       (codepoints[start_pos] == U'が' && particleMoraLacksHost(codepoints, start_pos)))) {
     bool heterogeneous_has_small_kana = false;
     for (size_t offset = 0; offset < mimetic_len; ++offset) {
       heterogeneous_has_small_kana = heterogeneous_has_small_kana || isSmallKanaAt(start_pos + offset);

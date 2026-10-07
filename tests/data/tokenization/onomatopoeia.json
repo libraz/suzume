@@ -2052,6 +2052,38 @@
       ],
       "id": "derederetoshita_de",
       "input": "でれでれとした顔で"
+    },
+    {
+      "description": "A が-initial heterogeneous four-mora mimetic after a closing particle",
+      "expected": [
+        {
+          "lemma": "電車",
+          "pos": "Noun",
+          "surface": "電車"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "がたごと",
+          "pos": "Adverb",
+          "surface": "がたごと"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "揺れる",
+          "pos": "Verb",
+          "surface": "揺れる"
+        }
+      ],
+      "id": "gagatagototo_reru",
+      "input": "電車ががたごとと揺れる"
     }
   ],
   "description": "Onomatopoeia and mimetic words",

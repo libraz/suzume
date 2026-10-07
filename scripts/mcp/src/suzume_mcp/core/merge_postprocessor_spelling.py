@@ -509,6 +509,30 @@ def _is_laughter(surface: str) -> bool:
 _IMPACT_MIMETIC = regex.compile(r"[がぎぐげござじずぜぞだぢづでどばびぶべぼ][うー]ん")
 
 
+# The consonant row of each plain hiragana mora, for ablaut mimetics (がた+ごと).
+_MORA_CONSONANT = {
+    kana: row
+    for row, kanas in (
+        ("", "あいうえお"),
+        ("k", "かきくけこ"),
+        ("g", "がぎぐげご"),
+        ("s", "さしすせそ"),
+        ("z", "ざじずぜぞ"),
+        ("t", "たちつてと"),
+        ("d", "だぢづでど"),
+        ("n", "なにぬねの"),
+        ("h", "はひふへほ"),
+        ("b", "ばびぶべぼ"),
+        ("p", "ぱぴぷぺぽ"),
+        ("m", "まみむめも"),
+        ("y", "やゆよ"),
+        ("r", "らりるれろ"),
+        ("w", "わを"),
+    )
+    for kana in kanas
+}
+
+
 def _mimetic_pos(surface: str) -> str:
     """A laugh is an interjection like the listed うふふ; other mimetics are adverbs."""
     if _IMPACT_MIMETIC.fullmatch(surface):
@@ -538,8 +562,19 @@ def _is_productive_mimetic_stem(surface: str) -> bool:
     if len(set(surface)) == 1:
         return True
     # Alternating two-mora mimetics such as ちくたく share their closing
-    # mora even when the two halves are not identical.
-    return length == 4 and surface[1] == surface[3]
+    # mora even when the two halves are not identical, and ablaut pairs such
+    # as がたごと keep both consonants while the vowel alternates.
+    if length != 4:
+        return False
+    if surface[1] == surface[3]:
+        return True
+    consonants = [_MORA_CONSONANT.get(kana) for kana in surface]
+    return (
+        None not in consonants
+        and consonants[0] == consonants[2]
+        and consonants[1] == consonants[3]
+        and _MORA_VOWEL.get(surface[0]) != _MORA_VOWEL.get(surface[2])
+    )
 
 
 def _is_abri_mimetic_stem(tokens: list[dict], stem: str) -> bool:
