@@ -356,7 +356,7 @@ bool isAttributiveCopulaNa(std::string_view surface) {
 }
 
 bool startsPredicativeCopula(std::string_view surface) {
-  return surface.rfind("だ", 0) == 0 || surface.rfind("です", 0) == 0 || surface.rfind("である", 0) == 0;
+  return utf8::startsWith(surface, "だ") || utf8::startsWith(surface, "です") || utf8::startsWith(surface, "である");
 }
 
 char32_t copulaFusedConjunctionParticle(std::string_view surface) {

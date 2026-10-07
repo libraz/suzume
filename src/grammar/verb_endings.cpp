@@ -9,7 +9,6 @@
 #include "verb_endings.h"
 
 #include <array>
-#include <iterator>
 #include <utility>
 #include <vector>
 
@@ -34,15 +33,13 @@ constexpr VerbType kGodanTypeOrder[] = {
     VerbType::GodanNa, VerbType::GodanRa, VerbType::GodanTa, VerbType::GodanWa,
 };
 
-struct TaggedVerbEnding {
-  VerbEnding ending;
-  uint16_t provides_conn;
-};
-
-// Generate all Godan verb endings from Conjugation::getGodanRow()
-std::vector<TaggedVerbEnding> generateGodanEndings() {
-  std::vector<TaggedVerbEnding> endings;
-  endings.reserve(80);  // Approx 9 types * 9 forms
+// Append the Godan endings providing `provides_conn`, generated from Conjugation::getGodanRow()
+void appendGodanEndings(uint16_t provides_conn, std::vector<VerbEnding>& endings) {
+  const auto emit = [&](uint16_t conn, VerbEnding ending) {
+    if (conn == provides_conn) {
+      endings.push_back(std::move(ending));
+    }
+  };
 
   for (VerbType type : kGodanTypeOrder) {
     const auto* row_ptr = Conjugation::getGodanRow(type);
@@ -53,45 +50,43 @@ std::vector<TaggedVerbEnding> generateGodanEndings() {
     const auto [base, a_row, i_row, e_row, o_row] = encodeGodanVowels(row);
 
     // Onbinkei (音便形): explicit onbin (い/っ/ん) or, for サ行, the い段 form.
-    endings.push_back({{onbinFormOf(row), base, type, true}, conn::kVerbOnbinkei});
+    emit(conn::kVerbOnbinkei, {onbinFormOf(row), base, type, true});
 
     // Special case: GodanKa also has っ-onbin for いく (irregular).
     // Derive the surface through the shared lexical-irregularity helper.
     if (type == VerbType::GodanKa) {
-      endings.push_back({{godanOnbinForm(type, "い"), base, type, true}, conn::kVerbOnbinkei});
+      emit(conn::kVerbOnbinkei, {godanOnbinForm(type, "い"), base, type, true});
     }
     // A closed GodanWa subclass uses う音便 (問うた) instead of the row's
     // regular 促音便.  Include the surface in reverse lookup; dictionary
     // verification at the consumer selects only attested base forms.
     if (type == VerbType::GodanWa) {
-      endings.push_back({{"う", base, type, true}, conn::kVerbOnbinkei});
+      emit(conn::kVerbOnbinkei, {"う", base, type, true});
     }
 
     // Renyokei (連用形)
-    endings.push_back({{i_row, base, type, false}, conn::kVerbRenyokei});
+    emit(conn::kVerbRenyokei, {i_row, base, type, false});
 
     // Mizenkei (未然形)
-    endings.push_back({{a_row, base, type, false}, conn::kVerbMizenkei});
+    emit(conn::kVerbMizenkei, {a_row, base, type, false});
 
     // Potential (可能形) - skip for GodanRa (conflicts with Ichidan stems)
     if (type != VerbType::GodanRa) {
-      endings.push_back({{e_row, base, type, false}, conn::kVerbPotential});
+      emit(conn::kVerbPotential, {e_row, base, type, false});
     }
 
     // Kateikei (仮定形)
-    endings.push_back({{e_row, base, type, false}, conn::kVerbKatei});
+    emit(conn::kVerbKatei, {e_row, base, type, false});
 
     // Meireikei (命令形)
-    endings.push_back({{e_row, base, type, false}, conn::kVerbMeireikei});
+    emit(conn::kVerbMeireikei, {e_row, base, type, false});
 
     // Volitional (意志形)
-    endings.push_back({{o_row, base, type, false}, conn::kVerbVolitional});
+    emit(conn::kVerbVolitional, {o_row, base, type, false});
 
     // Base/dictionary form (終止形)
-    endings.push_back({{base, base, type, false}, conn::kVerbBase});
+    emit(conn::kVerbBase, {base, base, type, false});
   }
-
-  return endings;
 }
 
 // Manually defined irregular verb patterns
@@ -147,32 +142,28 @@ struct VerbEndingTable {
 };
 
 VerbEndingTable buildVerbEndingTable() {
-  std::vector<TaggedVerbEnding> tagged = generateGodanEndings();
-  tagged.reserve(tagged.size() + std::size(kIrregularEndings) + std::size(kKuruConnectionCells));
-  for (const auto& spec : kIrregularEndings) {
-    tagged.push_back({{spec.suffix, spec.base_suffix, spec.verb_type, spec.is_onbin}, spec.provides_conn});
-  }
-
   // カ変 is derived from the same kana stem record used by generation and
   // dictionary expansion. Keeping it out of kIrregularEndings avoids a fourth
   // independent list of こ/き/くれ/こよ/こい spellings.
   const KuruStemForms kuru = getKuruStemForms("くる");
-  for (const auto& cell : kKuruConnectionCells) {
-    tagged.push_back(
-        {{kuru.*cell.form, kuru.base, VerbType::Kuru, cell.provides_conn == conn::kVerbOnbinkei}, cell.provides_conn});
-  }
 
   VerbEndingTable table;
-  table.endings.reserve(tagged.size());
-  // There are only nine connection groups. Scanning the small initialization
-  // table once per group is cheaper in code size than instantiating stable_sort,
-  // and preserves the original order within every group.
+  // There are only nine connection groups. Generating the small initialization
+  // set once per group is cheaper in code size than tagging and sorting it,
+  // and preserves the generation order within every group.
   for (size_t group_index = 0; group_index < kEndingGroupCount; ++group_index) {
     const uint16_t provides_conn = static_cast<uint16_t>(conn::kVerbBase + group_index);
     const size_t offset = table.endings.size();
-    for (auto& item : tagged) {
-      if (item.provides_conn == provides_conn) {
-        table.endings.push_back(std::move(item.ending));
+    appendGodanEndings(provides_conn, table.endings);
+    for (const auto& spec : kIrregularEndings) {
+      if (spec.provides_conn == provides_conn) {
+        table.endings.push_back({spec.suffix, spec.base_suffix, spec.verb_type, spec.is_onbin});
+      }
+    }
+    for (const auto& cell : kKuruConnectionCells) {
+      if (cell.provides_conn == provides_conn) {
+        table.endings.push_back(
+            {kuru.*cell.form, kuru.base, VerbType::Kuru, cell.provides_conn == conn::kVerbOnbinkei});
       }
     }
     table.groups[group_index] = {offset, table.endings.size() - offset};

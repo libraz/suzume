@@ -81,11 +81,15 @@ void resolveSemanticRolesPreservingSymbols(std::vector<core::Morpheme>& result,
   }
 }
 
+using PairAccepts = bool (*)(const std::vector<core::Morpheme>& merged_so_far, const core::Morpheme& head,
+                             const core::Morpheme& tail);
+using PairRetag = void (*)(core::Morpheme& merged, const core::Morpheme& head, const core::Morpheme& tail);
+
 // Merges each adjacent pair that `accepts` into its head, then lets `retag`
 // set the merged category from the merged token and the original pair.
 // `accepts` also sees the output built so far.
-template <typename Accepts, typename Retag>
-std::vector<core::Morpheme> mergeAdjacentPairs(std::vector<core::Morpheme> morphemes, Accepts accepts, Retag retag) {
+std::vector<core::Morpheme> mergeAdjacentPairs(std::vector<core::Morpheme> morphemes, PairAccepts accepts,
+                                               PairRetag retag) {
   if (morphemes.size() < 2) {
     return morphemes;
   }
