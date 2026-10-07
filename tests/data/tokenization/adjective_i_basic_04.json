@@ -329,6 +329,28 @@
       ],
       "id": "hageshii_ga_ttta",
       "input": "はげしい雨が降った"
+    },
+    {
+      "description": "ごはんおいしいよ - auto-generated",
+      "expected": [
+        {
+          "lemma": "ごはん",
+          "pos": "Noun",
+          "surface": "ごはん"
+        },
+        {
+          "lemma": "おいしい",
+          "pos": "Adjective",
+          "surface": "おいしい"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "gohanoishiiyo",
+      "input": "ごはんおいしいよ"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 4/4)",

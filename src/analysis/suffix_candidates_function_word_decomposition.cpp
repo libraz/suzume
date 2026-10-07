@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 
+#include "analysis/bigram_table.h"
 #include "analysis/dictionary_probe.h"
 #include "dictionary/dictionary.h"
 #include "grammar/char_patterns.h"
@@ -63,8 +64,17 @@ bool hasAuxiliaryChainDecomposition(const std::vector<char32_t>& codepoints, siz
   if (dict_manager == nullptr || end_pos < start_pos + 3) {
     return false;
   }
-  constexpr PartOfSpeechMask kAuxiliaryMask = partOfSpeechMask(core::PartOfSpeech::Auxiliary);
-  return hasDictionarySplit(*dict_manager, codepoints, start_pos, end_pos, kAuxiliaryMask, kAuxiliaryMask);
+  // The two auxiliaries must also chain: the attributive copula な does not
+  // host the aspect でる (ゆっくり+なでる is no な+でる).
+  for (size_t split = start_pos + 1; split < end_pos; ++split) {
+    const auto* head = lookupEntryInRange(*dict_manager, codepoints, start_pos, split, core::PartOfSpeech::Auxiliary);
+    const auto* tail = lookupEntryInRange(*dict_manager, codepoints, split, end_pos, core::PartOfSpeech::Auxiliary);
+    if (head != nullptr && tail != nullptr &&
+        BigramTable::getCost(head->extended_pos, tail->extended_pos) < bigram_cost::kSevere) {
+      return true;
+    }
+  }
+  return false;
 }
 
 bool hasFunctionWordChainDecomposition(const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos,

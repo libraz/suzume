@@ -605,6 +605,23 @@
       ],
       "id": "motsureta",
       "input": "もつれた糸"
+    },
+    {
+      "description": "ゆっくりなでる - auto-generated",
+      "expected": [
+        {
+          "lemma": "ゆっくり",
+          "pos": "Adverb",
+          "surface": "ゆっくり"
+        },
+        {
+          "lemma": "なでる",
+          "pos": "Verb",
+          "surface": "なでる"
+        }
+      ],
+      "id": "yuttkurinaderu",
+      "input": "ゆっくりなでる"
     }
   ],
   "description": "verb_ichidan_hiragana tests",

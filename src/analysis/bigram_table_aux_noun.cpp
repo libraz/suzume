@@ -705,6 +705,8 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       {EPOS::ParticleCase, EPOS::AuxAspectOku, cost::kProhibitive},
       {EPOS::ParticleAdverbial, EPOS::AuxAspectOku, cost::kProhibitive},
       {EPOS::ParticleConjFinite, EPOS::AuxAspectOku, cost::kProhibitive},
+      // A bare nominal is no verb either (ごはん+おい+しい is ごはん+おいしい).
+      {EPOS::Noun, EPOS::AuxAspectOku, cost::kProhibitive},
 
       // ParticleCase → Determiner (rare; 連体詞 rarely follows case particles)
       // Determiners introduce a new modifier clause and don't follow が/を/に/と/から/etc.
@@ -898,6 +900,12 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       // overcomes the DET→NOUN bonus on prefix compounds like 先生.
       {EPOS::Noun, EPOS::AuxAspectIru, cost::kSevere},
       {EPOS::Noun, EPOS::AuxAspectKuru, cost::kProhibitive},
+      // A pronoun, a case or binding particle and the copula host no te-form
+      // either (彼が+とっ+さ is 彼が+とっさ, ゆっくり+な+でる is ゆっくり+なでる).
+      {EPOS::Pronoun, EPOS::AuxAspectIru, cost::kSevere},
+      {EPOS::ParticleCase, EPOS::AuxAspectIru, cost::kSevere},
+      {EPOS::ParticleBinding, EPOS::AuxAspectIru, cost::kSevere},
+      {EPOS::AuxCopulaDa, EPOS::AuxAspectIru, cost::kSevere},
       // The progressive auxiliary い also requires a preceding te-form. An
       // unclassified span, including retained content symbols, cannot license
       // it as a predicate continuation.

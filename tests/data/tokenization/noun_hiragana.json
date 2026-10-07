@@ -964,6 +964,33 @@
       ],
       "id": "garantoshita",
       "input": "がらんとした部屋"
+    },
+    {
+      "description": "彼がとっさに - auto-generated",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "とっさ",
+          "pos": "Noun",
+          "surface": "とっさ"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        }
+      ],
+      "id": "gatottsani",
+      "input": "彼がとっさに"
     }
   ],
   "description": "noun_hiragana tests",

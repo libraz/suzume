@@ -735,6 +735,9 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
       // An irrealis stem selects a closed set of auxiliaries; an unknown run
       // after it has swallowed one of them (言わ+んや for 言わ+ん+や).
       {EPOS::VerbMizenkei, EPOS::Other, cost::kAlmostNever},
+      // An onbin cell exists only before た/て/たり, so an unknown run after it
+      // is the tail of a word cut at a geminate (とっ+さ for とっさ).
+      {EPOS::VerbOnbinkei, EPOS::Other, cost::kSevere},
 
       // Note: Particle → AdjStem is allowed for patterns like やる気がなさそう (が+な+さ+そう)
   };
