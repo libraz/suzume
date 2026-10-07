@@ -315,6 +315,53 @@
       ],
       "id": "rattte_2",
       "input": "僕らって"
+    },
+    {
+      "description": "お前らって休日何してんの - auto-generated",
+      "expected": [
+        {
+          "lemma": "お前",
+          "pos": "Pronoun",
+          "surface": "お前"
+        },
+        {
+          "lemma": "ら",
+          "pos": "Suffix",
+          "surface": "ら"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "休日",
+          "pos": "Noun",
+          "surface": "休日"
+        },
+        {
+          "lemma": "何",
+          "pos": "Pronoun",
+          "surface": "何"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てん"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        }
+      ],
+      "id": "o_rattte_shitenno",
+      "input": "お前らって休日何してんの"
     }
   ],
   "description": "particle_quotative tests",

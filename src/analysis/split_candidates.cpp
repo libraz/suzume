@@ -430,8 +430,11 @@ void addNounVerbSplitCandidates(core::Lattice& lattice, std::string_view text, c
   const size_t following_verb_start =
       longestNominalVerbContinuativeStart(codepoints, char_types, start_pos, kanji_end, inflection, &dict_manager);
   const std::string final_kanji = normalize::encodeUtf8(codepoints[kanji_end - 1]);
+  // A final derivational suffix closes the run as a nominal, and a final
+  // pronoun is a word of its own that する takes as its object (休日+何+して).
   const bool ends_with_derivational_suffix =
-      dict_manager.lookupExact(final_kanji, core::PartOfSpeech::Suffix) != nullptr;
+      dict_manager.lookupExact(final_kanji, core::PartOfSpeech::Suffix) != nullptr ||
+      dict_manager.lookupExact(final_kanji, core::PartOfSpeech::Pronoun) != nullptr;
   // The last kanji of the run can itself open a closed humble subsidiary verb
   // (確認 + 致し + ます). Its continuative ends in し, so the run is shaped exactly
   // like an ordinary sahen verbal noun, and reading it as one absorbs the

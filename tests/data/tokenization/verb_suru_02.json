@@ -1265,6 +1265,107 @@
       ],
       "id": "gasareta",
       "input": "話がされた"
+    },
+    {
+      "description": "何しに来たんだ - auto-generated",
+      "expected": [
+        {
+          "lemma": "何",
+          "pos": "Pronoun",
+          "surface": "何"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "shini_tanda",
+      "input": "何しに来たんだ"
+    },
+    {
+      "description": "何しに行く - auto-generated",
+      "expected": [
+        {
+          "lemma": "何",
+          "pos": "Pronoun",
+          "surface": "何"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行く"
+        }
+      ],
+      "id": "shini_ku_2",
+      "input": "何しに行く"
+    },
+    {
+      "description": "休日何してんの - auto-generated",
+      "expected": [
+        {
+          "lemma": "休日",
+          "pos": "Noun",
+          "surface": "休日"
+        },
+        {
+          "lemma": "何",
+          "pos": "Pronoun",
+          "surface": "何"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てん"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        }
+      ],
+      "id": "shitenno",
+      "input": "休日何してんの"
     }
   ],
   "description": "Suru-verb patterns with subsidiary verbs - MeCab互換分割 (part 2/2)",

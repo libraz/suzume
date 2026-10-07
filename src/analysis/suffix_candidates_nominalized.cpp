@@ -316,6 +316,12 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
       codepoints[kanji_end + 1] == U'し') {
     return;
   }
+  // A pronoun does not inflect, so a run ending on one has no continuative to
+  // nominalize: the kana after it is する or a particle (何+し+に, 休日+何+して).
+  if (dict_manager != nullptr &&
+      lookupEntryInRange(*dict_manager, codepoints, kanji_end - 1, kanji_end, core::PartOfSpeech::Pronoun) != nullptr) {
+    return;
+  }
   // When a multi-kanji nominal prefix precedes a longer verified verb
   // continuative, this start position owns only the prefix. Do not emit a
   // nominalized candidate spanning the right-hand verb (総合|見直し,
