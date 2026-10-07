@@ -693,8 +693,16 @@ void appendStemBeforeNominalizerSa(const HiraganaAdjectiveRun& run, std::vector<
       }
     }
     // A terminal auxiliary closed by a conjunctive particle is a predicate
-    // chain (やり+たい+し+さ), not a stem.
-    if (!is_dict_adjective &&
+    // chain (やり+たい+し+さ), not a stem. The interjectory さ closing such a
+    // chain takes no case particle or copula, so with one after it the さ is
+    // the nominalizer and the stem stands (くるし+さ+に).
+    const auto* case_after_sa =
+        dict_manager != nullptr && after_sa < codepoints.size()
+            ? lookupEntryInRange(*dict_manager, codepoints, after_sa, after_sa + 1, core::PartOfSpeech::Particle)
+            : nullptr;
+    const bool nominal_frame_after_sa =
+        copula_boundary || (case_after_sa != nullptr && case_after_sa->extended_pos == core::ExtendedPOS::ParticleCase);
+    if (!is_dict_adjective && !nominal_frame_after_sa &&
         (verb_helpers::closesOnTerminalAuxiliaryAndConjunctive(dict_manager, codepoints, stem_end) ||
          verb_helpers::closesOnTerminalVerbAndConjunctive(dict_manager, codepoints, start_pos, stem_end))) {
       continue;

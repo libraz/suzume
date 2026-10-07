@@ -18,6 +18,7 @@
 #include "tokenizer_utils.h"
 #include "unknown.h"
 #include "verb_candidates.h"
+#include "verb_candidates_verb_stems.h"
 
 namespace suzume::analysis {
 
@@ -203,8 +204,25 @@ bool hasAttributiveNominalSelector(const std::vector<char32_t>& codepoints,
     // single AdjBasic edge ending at the head, so inspect this closed two-edge
     // selector separately.  Requiring both AdjNaAdj and AuxCopulaDa leaves
     // ordinary i-adjective attribution (美しい+人) on its existing path.
+    // A た/て right after a verb continuative is that verb's past or te-form
+    // (帯び+た+まなざし), so no na-adjective stem opens on it or runs across it.
+    const bool crosses_selected_ta = [&] {
+      constexpr size_t kMaxContinuative = 4;
+      for (size_t ta_pos = selector_start; ta_pos + 1 < start_pos; ++ta_pos) {
+        if (ta_pos == 0 || !utf8::equalsAny(normalize::encodeUtf8(codepoints[ta_pos]), {"た", "て", "だ", "で"})) {
+          continue;
+        }
+        for (size_t verb_start = ta_pos > kMaxContinuative ? ta_pos - kMaxContinuative : 0; verb_start < ta_pos;
+             ++verb_start) {
+          if (verb_helpers::isVerbContinuativeSpan(dict_manager, codepoints, verb_start, ta_pos)) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }();
     if (attributive_copula != nullptr && attributive_copula->extended_pos == core::ExtendedPOS::AuxCopulaDa &&
-        selector_start + 1 < start_pos) {
+        selector_start + 1 < start_pos && !crosses_selected_ta) {
       const auto* na_adjective =
           lookupEntryInRange(*dict_manager, codepoints, selector_start, start_pos - 1, core::PartOfSpeech::Adjective);
       if (na_adjective != nullptr && na_adjective->extended_pos == core::ExtendedPOS::AdjNaAdj) {
@@ -265,7 +283,7 @@ bool isSelectedNominalHeadShape(const std::vector<normalize::CharType>& char_typ
                      [](normalize::CharType type) { return type == normalize::CharType::Hiragana; });
 }
 
-// True when a registered suffix, particle or auxiliary starts in
+// True when a registered suffix, particle, auxiliary or numeral starts in
 // [first_start, end_pos) and ends after end_pos.
 bool closedClassEntryCrossesEnd(const dictionary::DictionaryManager& dict_manager,
                                 const std::vector<char32_t>& codepoints, size_t first_start, size_t end_pos) {
@@ -276,8 +294,9 @@ bool closedClassEntryCrossesEnd(const dictionary::DictionaryManager& dict_manage
         continue;
       }
       const auto pos = match.entry->pos;
+      // A listed numeral is closed class too (身+ひとつ, not 身ひ+とつ).
       if (pos == core::PartOfSpeech::Suffix || pos == core::PartOfSpeech::Particle ||
-          pos == core::PartOfSpeech::Auxiliary) {
+          pos == core::PartOfSpeech::Auxiliary || match.entry->extended_pos == core::ExtendedPOS::NounNumber) {
         return true;
       }
     }

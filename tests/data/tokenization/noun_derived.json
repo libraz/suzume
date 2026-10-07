@@ -181,6 +181,97 @@
       ],
       "id": "yasashisaga",
       "input": "、やさしさが"
+    },
+    {
+      "description": "我が身ひとつの - auto-generated",
+      "expected": [
+        {
+          "lemma": "我が",
+          "pos": "Determiner",
+          "surface": "我が"
+        },
+        {
+          "lemma": "身",
+          "pos": "Noun",
+          "surface": "身"
+        },
+        {
+          "lemma": "ひとつ",
+          "pos": "Noun",
+          "surface": "ひとつ"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        }
+      ],
+      "id": "ga_hitotsuno",
+      "input": "我が身ひとつの"
+    },
+    {
+      "description": "憂いを帯びたまなざし - auto-generated",
+      "expected": [
+        {
+          "lemma": "憂い",
+          "pos": "Noun",
+          "surface": "憂い"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "帯びる",
+          "pos": "Verb",
+          "surface": "帯び"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "まなざし",
+          "pos": "Noun",
+          "surface": "まなざし"
+        }
+      ],
+      "id": "iwo_bitamanazashi",
+      "input": "憂いを帯びたまなざし"
+    },
+    {
+      "description": "くるしさに耐えた - auto-generated",
+      "expected": [
+        {
+          "lemma": "くるしい",
+          "pos": "Adjective",
+          "surface": "くるし"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Suffix",
+          "surface": "さ"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "耐える",
+          "pos": "Verb",
+          "surface": "耐え"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "kurushisani_eta",
+      "input": "くるしさに耐えた"
     }
   ],
   "description": "noun_derived tests",
