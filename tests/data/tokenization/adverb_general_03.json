@@ -629,6 +629,100 @@
       ],
       "id": "nomarudenai",
       "input": "力のまるでない人"
+    },
+    {
+      "description": "改革は道半ばと言わざるを得ない - auto-generated",
+      "expected": [
+        {
+          "lemma": "改革",
+          "pos": "Noun",
+          "surface": "改革"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "道",
+          "pos": "Noun",
+          "surface": "道"
+        },
+        {
+          "lemma": "半ば",
+          "pos": "Adverb",
+          "surface": "半ば"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言わ"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ざる"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "得る",
+          "pos": "Verb",
+          "surface": "得"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "ha_bato_wazaruwo_nai",
+      "input": "改革は道半ばと言わざるを得ない"
+    },
+    {
+      "description": "計画はまだ道半ばだ - auto-generated",
+      "expected": [
+        {
+          "lemma": "計画",
+          "pos": "Noun",
+          "surface": "計画"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "まだ",
+          "pos": "Adverb",
+          "surface": "まだ"
+        },
+        {
+          "lemma": "道",
+          "pos": "Noun",
+          "surface": "道"
+        },
+        {
+          "lemma": "半ば",
+          "pos": "Adverb",
+          "surface": "半ば"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "hamada_bada",
+      "input": "計画はまだ道半ばだ"
     }
   ],
   "description": "General adverbs (part 3/3)",
