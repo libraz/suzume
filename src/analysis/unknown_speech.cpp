@@ -496,7 +496,20 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
           }
         }
       }
-      if (!surface.empty() && !decomposes_as_predicate_particle) {
+      // The mirror image: a dictionary predicate that starts inside the run
+      // and closes it is the clause's own predicate before the quotative, with
+      // the mora in front belonging to the word before (なら|いける+と).
+      constexpr size_t kMinClosingPredicateLength = 2;
+      bool ends_on_predicate = false;
+      if (dict_manager_ != nullptr) {
+        for (size_t split = start_pos + 1; split + kMinClosingPredicateLength <= mimetic_end; ++split) {
+          if (hasExactPartOfSpeech(*dict_manager_, codepoints, split, mimetic_end, kVerbAdjectiveMask)) {
+            ends_on_predicate = true;
+            break;
+          }
+        }
+      }
+      if (!surface.empty() && !decomposes_as_predicate_particle && !ends_on_predicate) {
         auto cand = makeCandidate(surface, start_pos, mimetic_end, core::PartOfSpeech::Adverb,
                                   candidate::kMimeticHeterogeneousAdverbCost, true, CandidateOrigin::Onomatopoeia);
 #ifdef SUZUME_DEBUG_INFO

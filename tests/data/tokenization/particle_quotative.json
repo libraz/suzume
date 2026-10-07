@@ -362,6 +362,75 @@
       ],
       "id": "o_rattte_shitenno",
       "input": "お前らって休日何してんの"
+    },
+    {
+      "description": "彼女ならいけると思う - auto-generated",
+      "expected": [
+        {
+          "lemma": "彼女",
+          "pos": "Pronoun",
+          "surface": "彼女"
+        },
+        {
+          "lemma": "なら",
+          "pos": "Particle",
+          "surface": "なら"
+        },
+        {
+          "lemma": "いける",
+          "pos": "Verb",
+          "surface": "いける"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "思う",
+          "pos": "Verb",
+          "surface": "思う"
+        }
+      ],
+      "id": "naraikeruto_u",
+      "input": "彼女ならいけると思う"
+    },
+    {
+      "description": "駅までならいけると思う - auto-generated",
+      "expected": [
+        {
+          "lemma": "駅",
+          "pos": "Noun",
+          "surface": "駅"
+        },
+        {
+          "lemma": "まで",
+          "pos": "Particle",
+          "surface": "まで"
+        },
+        {
+          "lemma": "なら",
+          "pos": "Particle",
+          "surface": "なら"
+        },
+        {
+          "lemma": "いける",
+          "pos": "Verb",
+          "surface": "いける"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "思う",
+          "pos": "Verb",
+          "surface": "思う"
+        }
+      ],
+      "id": "madenaraikeruto_u",
+      "input": "駅までならいけると思う"
     }
   ],
   "description": "particle_quotative tests",
