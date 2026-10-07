@@ -886,6 +886,77 @@
       ],
       "id": "yagare",
       "input": "来やがれ"
+    },
+    {
+      "description": "Colloquial polite copula with separate question particle",
+      "expected": [
+        {
+          "lemma": "それ",
+          "pos": "Pronoun",
+          "surface": "それ"
+        },
+        {
+          "lemma": "マジ",
+          "pos": "Noun",
+          "surface": "マジ"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "っす"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "sore_ttsuka",
+      "input": "それマジっすか"
+    },
+    {
+      "description": "Colloquial polite copula after an adjective, question particle separate",
+      "expected": [
+        {
+          "lemma": "いい",
+          "pos": "Adjective",
+          "surface": "いい"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "っす"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "iittsuka",
+      "input": "いいっすか"
+    },
+    {
+      "description": "Continuative cell of the colloquial polite copula before past ta",
+      "expected": [
+        {
+          "lemma": "お疲れ様",
+          "pos": "Interjection",
+          "surface": "お疲れ様"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "っし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "o_re_ttshita",
+      "input": "お疲れ様っした"
     }
   ],
   "description": "auxiliary_colloquial tests",

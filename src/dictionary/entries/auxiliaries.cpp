@@ -1035,8 +1035,9 @@ EntrySpecRange getAuxiliaryEntries() {
       // intended stem + っす split (きつい+っす).
       aux("っす", "です", EPOS::AuxCopulaDesu),
       aux("っしょ", "です", EPOS::AuxCopulaDesu),  // でしょう contracted (行けるっしょ), lemma as でしょ
-      aux("っした", "でした", EPOS::AuxCopulaDesu),
-      aux("っすか", "ですか", EPOS::AuxCopulaDesu),
+      // The continuative cell before た, as でし (お疲れ様+っし+た); the question
+      // particle stays separate as after です (マジ+っす+か).
+      aux("っし", "です", EPOS::AuxCopulaDesu),
       aux("っス", "です", EPOS::AuxCopulaDesu),
       // After the nominalizer ん the same contraction drops its っ (そうなん+す+か).
       aux("す", "です", EPOS::AuxCopulaDesu),

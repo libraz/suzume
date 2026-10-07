@@ -515,8 +515,9 @@ def correct_mecab_pos(tokens: list[dict]) -> None:
             t["lemma"] = "だ"
 
         # Fix っす: colloquial contraction of です; canonical base form is です.
-        # っしょ is the same word's volitional cell (でしょ+う contracted).
-        if surface in ("っす", "っした", "っすか", "っしょ"):
+        # っしょ is the same word's volitional cell (でしょ+う contracted), and
+        # っし its continuative before た (でし+た).
+        if surface in ("っす", "っし", "っした", "っすか", "っしょ"):
             t["pos"] = "助動詞"
             t["lemma"] = "です"
 
