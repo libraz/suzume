@@ -526,6 +526,11 @@ constexpr float kEosPassiveStemPenalty = scale::kAlmostNever;
 // end of the text it is the tail of a lengthened final particle (かも+ねえ).
 constexpr float kEosPotentialStemPenalty = scale::kAlmostNever;
 
+// An unregistered mimetic directly after a case particle stands where the
+// particle's predicate does, and its shape often spells a verb cell
+// (が+あっ+たら read as あったら); it keeps a smaller share of the bonus there.
+constexpr float kCaseMarkedMimeticBonus = scale::kDoubleVeryStrongBonus + scale::kRare;
+
 // A quotative determiner with no head after it takes back the predicate→
 // determiner bonus on its left as well as being prohibited (行く+って+いう+か).
 constexpr float kHeadlessQuotativeDeterminerPenalty = scale::kProhibitive - scale::kDoubleVeryStrongBonus;

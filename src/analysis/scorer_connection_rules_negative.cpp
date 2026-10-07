@@ -85,7 +85,8 @@ float computeNegativeAndNounVerbBonus(const core::LatticeEdge& prev, const core:
   if (contracted_negative_before_copula)
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   if (marked_nominal_before_mimetic)
-    SUZUME_CONNECTION_ADD(bonus, cost::kDoubleVeryStrongBonus);
+    SUZUME_CONNECTION_ADD(bonus, prev.extended_pos == core::ExtendedPOS::ParticleCase ? scorer::kCaseMarkedMimeticBonus
+                                                                                      : cost::kDoubleVeryStrongBonus);
   if (long_chuu_nominal)
     SUZUME_CONNECTION_ADD(bonus, cost::kStrongBonus + cost::kModerateBonus);
   if (exclusive_binding_negative)

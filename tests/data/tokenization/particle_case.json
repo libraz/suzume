@@ -1284,6 +1284,75 @@
       ],
       "id": "sotttonaderu",
       "input": "そっとなでる"
+    },
+    {
+      "description": "Case particle ga after a pronoun followed by a dictionary adverb",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "もし",
+          "pos": "Adverb",
+          "surface": "もし"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "たら"
+        }
+      ],
+      "id": "gamoshi_tara",
+      "input": "彼がもし来たら"
+    },
+    {
+      "description": "Case particle ga after a noun followed by a degree adverb",
+      "expected": [
+        {
+          "lemma": "雨",
+          "pos": "Noun",
+          "surface": "雨"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "だいぶ",
+          "pos": "Adverb",
+          "surface": "だいぶ"
+        },
+        {
+          "lemma": "弱い",
+          "pos": "Adjective",
+          "surface": "弱く"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "gadaibu_kunattta_2",
+      "input": "雨がだいぶ弱くなった"
     }
   ],
   "description": "Case particles (が、を、に、で)",

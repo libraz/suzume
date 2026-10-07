@@ -85,10 +85,6 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
       // adjective continuation.
       {EPOS::ParticleTopic, EPOS::AuxNegativeNai, cost::kMinorBonus},
 
-      // ParticleCase → Adverb (か+もし) - moderate penalty
-      // This discourages splitting かもしれない as か+もし+れない
-      {EPOS::ParticleCase, EPOS::Adverb, cost::kRare},
-
       // A case-marked phrase requires a predicate; a discourse conjunction
       // cannot directly consume that slot. This keeps a dictionary predicate
       // whose prefix is a conjunction homograph intact (を+さておく).
@@ -110,6 +106,8 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
       // nonfinite cell rejects it. The rows matter because が also spells the
       // first mora of the ガル auxiliary and of several onbin cells: without
       // them the particle cuts 寒+がっ+て and 見+たがっ+て apart at that mora.
+      // A nominal is not a predicate either: the adversative needs a copula
+      // after it (学生だ+が), and a bare nominal+が is the case particle.
       {EPOS::AdjStem, EPOS::ParticleConjFinite, cost::kAlmostNever},
       {EPOS::AdjRenyokei, EPOS::ParticleConjFinite, cost::kAlmostNever},
       {EPOS::AdjKatt, EPOS::ParticleConjFinite, cost::kAlmostNever},
@@ -118,6 +116,16 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
       {EPOS::VerbRenyokei, EPOS::ParticleConjFinite, cost::kAlmostNever},
       {EPOS::VerbOnbinkei, EPOS::ParticleConjFinite, cost::kAlmostNever},
       {EPOS::VerbTeForm, EPOS::ParticleConjFinite, cost::kAlmostNever},
+      {EPOS::Noun, EPOS::ParticleConjFinite, cost::kAlmostNever},
+      {EPOS::NounFormal, EPOS::ParticleConjFinite, cost::kAlmostNever},
+      {EPOS::NounVerbal, EPOS::ParticleConjFinite, cost::kAlmostNever},
+      {EPOS::NounProper, EPOS::ParticleConjFinite, cost::kAlmostNever},
+      {EPOS::NounProperFamily, EPOS::ParticleConjFinite, cost::kAlmostNever},
+      {EPOS::NounProperGiven, EPOS::ParticleConjFinite, cost::kAlmostNever},
+      {EPOS::NounNumber, EPOS::ParticleConjFinite, cost::kAlmostNever},
+      {EPOS::NounForeign, EPOS::ParticleConjFinite, cost::kAlmostNever},
+      {EPOS::Pronoun, EPOS::ParticleConjFinite, cost::kAlmostNever},
+      {EPOS::PronounInterrogative, EPOS::ParticleConjFinite, cost::kAlmostNever},
 
       // An irrealis verb form selects auxiliaries, not a particle. The stem is
       // unfinished, so nothing that attaches to a completed phrase can follow
