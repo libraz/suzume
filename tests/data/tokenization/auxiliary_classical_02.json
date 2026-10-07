@@ -309,6 +309,87 @@
       ],
       "id": "taru_3",
       "input": "学生たる者"
+    },
+    {
+      "description": "容赦はせぬ - auto-generated",
+      "expected": [
+        {
+          "lemma": "容赦",
+          "pos": "Noun",
+          "surface": "容赦"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "せ"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬ"
+        }
+      ],
+      "id": "hasenu",
+      "input": "容赦はせぬ"
+    },
+    {
+      "description": "勉強はせぬ - auto-generated",
+      "expected": [
+        {
+          "lemma": "勉強",
+          "pos": "Noun",
+          "surface": "勉強"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "せ"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬ"
+        }
+      ],
+      "id": "hasenu_2",
+      "input": "勉強はせぬ"
+    },
+    {
+      "description": "行きはせぬ - auto-generated",
+      "expected": [
+        {
+          "lemma": "行き",
+          "pos": "Noun",
+          "surface": "行き"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "せ"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ぬ"
+        }
+      ],
+      "id": "kihasenu",
+      "input": "行きはせぬ"
     }
   ],
   "description": "auxiliary_classical tests (part 2/2)",

@@ -112,12 +112,14 @@ float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::
   // Only applies to は — other topic particles (も, こそ) naturally precede し
   // (何もしない, 誰もしない are common patterns)
   // Exception: い (renyokei of いる) - valid in ずにはいられない pattern
-  // Exception: し (renyokei of する) - valid in emphatic negation ありはしない pattern
+  // Exception: し (renyokei of する) - valid in emphatic negation ありはしない pattern,
+  // and its irrealis せ in the literary one (容赦はせぬ)
   if (prev.extended_pos == core::ExtendedPOS::ParticleTopic && prev.surface == "は" &&
       next.pos == core::PartOfSpeech::Verb && grammar::isPureHiragana(next.surface) &&
-      next.surface.size() <= 3 &&                       // 1 char only (3 bytes in UTF-8)
-      next.surface != "い" &&                           // い+られ is valid (いる potential)
-      !grammar::isSuruRenyokeiSurface(next.surface)) {  // し+ない is valid (emphatic negation)
+      next.surface.size() <= 3 &&  // 1 char only (3 bytes in UTF-8)
+      next.surface != "い" &&      // い+られ is valid (いる potential)
+      !grammar::isSuruRenyokeiSurface(next.surface) &&
+      !(grammar::isSuruMizenkeiSurface(next.surface) && next.extended_pos == core::ExtendedPOS::VerbMizenkei)) {
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryRare);
   }
 
