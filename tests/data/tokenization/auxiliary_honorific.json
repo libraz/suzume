@@ -858,6 +858,67 @@
       ],
       "id": "warigozaimasen",
       "input": "変わりございません"
+    },
+    {
+      "description": "Informal request choudai after an adverb",
+      "expected": [
+        {
+          "lemma": "もっと",
+          "pos": "Adverb",
+          "surface": "もっと"
+        },
+        {
+          "lemma": "ちょうだい",
+          "pos": "Noun",
+          "surface": "ちょうだい"
+        }
+      ],
+      "id": "motttochi_udai",
+      "input": "もっとちょうだい"
+    },
+    {
+      "description": "Informal request choudai after a noun",
+      "expected": [
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "茶",
+          "pos": "Noun",
+          "surface": "茶"
+        },
+        {
+          "lemma": "ちょうだい",
+          "pos": "Noun",
+          "surface": "ちょうだい"
+        }
+      ],
+      "id": "o_chi_udai",
+      "input": "お茶ちょうだい"
+    },
+    {
+      "description": "Informal request choudai after a te-form",
+      "expected": [
+        {
+          "lemma": "見せる",
+          "pos": "Verb",
+          "surface": "見せ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "ちょうだい",
+          "pos": "Noun",
+          "surface": "ちょうだい"
+        }
+      ],
+      "id": "setechi_udai",
+      "input": "見せてちょうだい"
     }
   ],
   "description": "auxiliary_honorific tests",

@@ -752,6 +752,9 @@ EntrySpecRange getAuxiliaryEntries() {
       // Uses VerbRenyokei to allow connection to ます (くださいました)
       verb("ください", "くださる", EPOS::AuxBenefactive),
       verb("下さい", "下さる", EPOS::AuxBenefactive),
+      // The informal request ちょうだい (見せて+ちょうだい, お茶+ちょうだい) is the
+      // kana verbal noun 頂戴 standing alone, a noun in MeCab as well.
+      noun("ちょうだい", ""),
 
       // Special ra-row godan verbs (五段ラ行特殊) with い-form renyokei
       // These honorific/humble verbs use い instead of り for renyokei:
