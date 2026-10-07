@@ -284,6 +284,23 @@ void appendHiraganaIAdjSurfaceCandidates(const std::vector<char32_t>& codepoints
                                          const dictionary::DictionaryManager* dict_manager,
                                          std::vector<UnknownCandidate>& candidates);
 
+/**
+ * @brief Append kanji i-adjective candidates opened by a lexical hiragana prefix (うす+暗い).
+ */
+void appendHiraganaPrefixedKanjiIAdjCandidates(std::vector<UnknownCandidate>& candidates,
+                                               const std::vector<char32_t>& codepoints, size_t start_pos,
+                                               const std::vector<normalize::CharType>& char_types,
+                                               const grammar::Inflection& inflection,
+                                               const dictionary::DictionaryManager* dict_manager);
+
+/**
+ * @brief Drop coined adjective candidates from @p candidate_start on that the
+ * dictionary already spells as another adjective or as closed-class words.
+ */
+void dropCoinedAdjectivesOverDictionaryAdjective(const dictionary::DictionaryManager* dict_manager,
+                                                 const std::vector<char32_t>& codepoints,
+                                                 std::vector<UnknownCandidate>& candidates, size_t candidate_start);
+
 }  // namespace suzume::analysis::adj_detail
 
 #endif  // SUZUME_ANALYSIS_ADJECTIVE_CANDIDATES_INTERNAL_H_

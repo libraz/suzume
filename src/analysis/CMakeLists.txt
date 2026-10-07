@@ -2,6 +2,8 @@
 
 add_library(suzume_analysis OBJECT
   adjective_candidates_hiragana.cpp
+  adjective_candidates_hiragana_prefixed.cpp
+  adjective_candidates_coined_filter.cpp
   adjective_candidates_internal.cpp
   adjective_candidates_kanji.cpp
   adjective_candidates_kanji_compound.cpp
@@ -10,6 +12,7 @@ add_library(suzume_analysis OBJECT
   adjective_candidates_hiragana_scan.cpp
   adjective_candidates_na.cpp
   adjective_candidates_stem.cpp
+  adjective_candidates_paradigm_cells.cpp
   analyzer.cpp
   bigram_table.cpp
   bigram_table_aux_noun.cpp
@@ -42,6 +45,8 @@ add_library(suzume_analysis OBJECT
   scorer_word_cost.cpp
   split_candidates.cpp
   suffix_candidates_compound.cpp
+  suffix_candidates_function_word_decomposition.cpp
+  suffix_candidates_nominal_head.cpp
   suffix_candidates_nominalized.cpp
   suffix_candidates_counter.cpp
   suffix_candidates_counter_numeral.cpp
@@ -51,6 +56,8 @@ add_library(suzume_analysis OBJECT
   suffix_candidates_suffix.cpp
   tokenizer.cpp
   tokenizer_dictionary.cpp
+  tokenizer_dictionary_contextual.cpp
+  tokenizer_dictionary_variants.cpp
   tokenizer_dictionary_special.cpp
   tokenizer_unknown.cpp
   dictionary_probe.cpp
@@ -62,6 +69,7 @@ add_library(suzume_analysis OBJECT
   verb_candidates_contracted_conditional.cpp
   verb_candidates_helpers.cpp
   verb_candidates_helpers_dictionary.cpp
+  verb_candidates_helpers_absorption.cpp
   verb_candidates_helpers_emphatic.cpp
   verb_candidates_hiragana.cpp
   verb_candidates_hiragana_derived.cpp
