@@ -1917,6 +1917,114 @@
       ],
       "id": "arekara_tatttadarou",
       "input": "あれから何年たっただろう"
+    },
+    {
+      "description": "Colloquial second-person pronoun after an adverb",
+      "expected": [
+        {
+          "lemma": "むしろ",
+          "pos": "Adverb",
+          "surface": "むしろ"
+        },
+        {
+          "lemma": "あんた",
+          "pos": "Pronoun",
+          "surface": "あんた"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "悪い",
+          "pos": "Adjective",
+          "surface": "悪い"
+        }
+      ],
+      "id": "mushiroantaga_i",
+      "input": "むしろあんたが悪い"
+    },
+    {
+      "description": "Inverted pronoun after final no",
+      "expected": [
+        {
+          "lemma": "何",
+          "pos": "Pronoun",
+          "surface": "何"
+        },
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言っ"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てん"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "あんた",
+          "pos": "Pronoun",
+          "surface": "あんた"
+        }
+      ],
+      "id": "tttennoanta",
+      "input": "何言ってんのあんた"
+    },
+    {
+      "description": "Vowel-fused second-person pronoun",
+      "expected": [
+        {
+          "lemma": "おまえ",
+          "pos": "Pronoun",
+          "surface": "おめえ"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行け"
+        }
+      ],
+      "id": "omeega_ke",
+      "input": "おめえが行け"
+    },
+    {
+      "description": "Vowel-fused second-person pronoun before a comma",
+      "expected": [
+        {
+          "lemma": "てめえ",
+          "pos": "Pronoun",
+          "surface": "てめえ"
+        },
+        {
+          "lemma": "ふざける",
+          "pos": "Verb",
+          "surface": "ふざけん"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "temee_fuzakennayo",
+      "input": "てめえ、ふざけんなよ"
     }
   ],
   "description": "Pronouns",

@@ -42,6 +42,11 @@ EntrySpecRange getPronounEntries() {
       // PREFIX→NOUN path has cost ~-1.2, so お前 needs cost < -1.2 to win
       pronoun("お前", ""),
       pronoun("おまえ", ""),
+      // Colloquial second person: the clipped あんた and the fused-vowel
+      // おめえ/てめえ of おまえ/てまえ.
+      pronoun("あんた", ""),
+      pronoun("おめえ", "おまえ"),
+      pronoun("てめえ", ""),
 
       // Second person plural removed - use pronoun + たち suffix
 
