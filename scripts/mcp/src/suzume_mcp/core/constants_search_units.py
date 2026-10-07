@@ -136,6 +136,8 @@ FIXED_FUNCTION_SEARCH_UNITS: dict[str, str] = {
     "おそれ": "名詞",
     "おかげ": "名詞",
     "おのれ": "代名詞",
+    # Literary interrogative pronoun; the analyzer has no entry and reads い+ず+こ.
+    "いずこ": "代名詞",
     "だけ": "助詞",
     "だに": "助詞",
     # 即時の接続助詞. The analyzer reads its middle mora as the noun 否, which
