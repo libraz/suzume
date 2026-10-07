@@ -218,6 +218,15 @@ bool lacksLicensingEnvironment(const DictionaryCandidateContext& ctx, const core
     return true;
   }
 
+  // The level suffix 並み is productive after a word (小学生+並み, 例年+並み,
+  // プロ+並み); after a lone kanji it is the second half of a lexical compound
+  // (町並み, 人並み, 足並み), which the kanji-plus-okurigana noun covers.
+  if (result.entry->pos == core::PartOfSpeech::Suffix && utf8::equalsAny(result.entry->surface, {"並み"}) &&
+      start_pos > 0 && normalize::isKanjiCodepoint(codepoints[start_pos - 1]) &&
+      (start_pos == 1 || !normalize::isKanjiCodepoint(codepoints[start_pos - 2]))) {
+    return true;
+  }
+
   // The irrealis たら of the classical perfect たり exists only before the
   // conjectural む/ん that selects it (咲き+たら+む); anywhere else the same
   // kana is the conditional of the past.

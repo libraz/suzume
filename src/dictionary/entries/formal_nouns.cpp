@@ -44,6 +44,8 @@ EntrySpecRange getFormalNounEntries() {
       // State suffix after a nominal stem (作業中、確認中). The standalone
       // formal-noun reading remains available through the preceding entry.
       suffix("中", ""),
+      // Comparative-level suffix after a nominal (小学生並み、例年並み).
+      suffix("並み", ""),
       // Agentive suffix after a deverbal stem (引き受け手、書き手).
       suffix("手", ""),
       // Destination suffix after a deverbal nominal (問い合わせ先、送り先).

@@ -935,6 +935,82 @@
       ],
       "id": "sanno_3",
       "input": "次女さんの家"
+    },
+    {
+      "description": "Level suffix nami after a multi-kanji noun",
+      "expected": [
+        {
+          "lemma": "小学生",
+          "pos": "Noun",
+          "surface": "小学生"
+        },
+        {
+          "lemma": "並み",
+          "pos": "Suffix",
+          "surface": "並み"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        }
+      ],
+      "id": "mino",
+      "input": "小学生並みの"
+    },
+    {
+      "description": "Level suffix nami after a katakana noun",
+      "expected": [
+        {
+          "lemma": "プロ",
+          "pos": "Noun",
+          "surface": "プロ"
+        },
+        {
+          "lemma": "並み",
+          "pos": "Suffix",
+          "surface": "並み"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "腕前",
+          "pos": "Noun",
+          "surface": "腕前"
+        }
+      ],
+      "id": "mino_2",
+      "input": "プロ並みの腕前"
+    },
+    {
+      "description": "Lexical compound with a one-kanji host stays whole",
+      "expected": [
+        {
+          "lemma": "古い",
+          "pos": "Adjective",
+          "surface": "古い"
+        },
+        {
+          "lemma": "町並み",
+          "pos": "Noun",
+          "surface": "町並み"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "残る",
+          "pos": "Verb",
+          "surface": "残る"
+        }
+      ],
+      "id": "i_miga_ru",
+      "input": "古い町並みが残る"
     }
   ],
   "description": "suffix_general tests",
