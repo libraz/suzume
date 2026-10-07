@@ -474,6 +474,60 @@
       ],
       "id": "nattteiru",
       "input": "重なっている"
+    },
+    {
+      "description": "Kana godan-ra past whose tail spells a registered verb cell after a non-word head",
+      "expected": [
+        {
+          "lemma": "声",
+          "pos": "Noun",
+          "surface": "声"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "くぐもる",
+          "pos": "Verb",
+          "surface": "くぐもっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "gakugumottta",
+      "input": "声がくぐもった"
+    },
+    {
+      "description": "Kana godan-ra past whose tail spells a registered verb cell after a non-word head",
+      "expected": [
+        {
+          "lemma": "約束",
+          "pos": "Noun",
+          "surface": "約束"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "まもる",
+          "pos": "Verb",
+          "surface": "まもっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "womamottta",
+      "input": "約束をまもった"
     }
   ],
   "description": "Godan Ra-row verbs (五段ラ行動詞) - verbs ending in る (part 2/2)",

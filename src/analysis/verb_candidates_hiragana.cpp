@@ -45,9 +45,16 @@ bool hasInternalPredicateBoundary(const std::vector<char32_t>& codepoints, size_
   if (dict_manager == nullptr) {
     return false;
   }
+  // The internal predicate only splits the run when what stands before it is
+  // itself a word (それ+もっ); くぐ+もっ leaves a non-word head. Behind the
+  // honorific prefix the head is a verb cell the dictionary need not list
+  // (お+かけ+いたし), so there the internal predicate alone keeps the boundary.
+  const bool opens_on_prefix =
+      lookupEntryInRange(*dict_manager, codepoints, start_pos, start_pos + 1, core::PartOfSpeech::Prefix) != nullptr;
   for (size_t boundary = start_pos + 1; boundary < onbin_pos; ++boundary) {
     const std::string tail = extractSubstring(codepoints, boundary, onbin_pos + 1);
-    if (hasExactPartOfSpeech(*dict_manager, tail, kPredicateHostMask)) {
+    if (hasExactPartOfSpeech(*dict_manager, tail, kPredicateHostMask) &&
+        (opens_on_prefix || lookupEntryInRange(*dict_manager, codepoints, start_pos, boundary) != nullptr)) {
       return true;
     }
   }
