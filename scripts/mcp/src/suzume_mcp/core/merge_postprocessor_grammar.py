@@ -72,6 +72,27 @@ def _postprocess_totomoni(result: list[dict], applied_rule: str | None) -> tuple
 #: The progressive subsidiary in both its spellings (食べている, 食べてる).
 _PROGRESSIVE_LEMMAS = frozenset({"いる", "てる"})
 
+#: Marks that hold the vowel of に at the clause end.
+_HELD_I_MARKS = frozenset("ぃいー")
+
+
+def _held_noni_tail(result: list[dict], j: int) -> tuple[str, int] | None:
+    """Held-vowel tail of a clause-closing の+に at j, and how many tokens after の it spans."""
+    if j < 1 or result[j].get("surface") != "の" or j + 1 >= len(result):
+        return None
+    second = result[j + 1].get("surface", "")
+    third = result[j + 2].get("surface", "") if j + 2 < len(result) else ""
+    if second.startswith("に") and len(second) > 1 and set(second[1:]) <= _HELD_I_MARKS:
+        tail, consumed = second[1:], 1
+    elif second == "に" and third and set(third) <= _HELD_I_MARKS:
+        tail, consumed = third, 2
+    else:
+        return None
+    end = j + 1 + consumed
+    if end < len(result) and result[end].get("pos") != "記号":
+        return None
+    return tail, consumed
+
 
 def _postprocess_noni(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
     """Merge の+に -> のに after a host that admits only the concessive reading.
@@ -96,7 +117,11 @@ def _postprocess_noni(result: list[dict], applied_rule: str | None) -> tuple[lis
     """
     merged = []
     skip_next = False
+    skip_extra = 0
     for j, curr in enumerate(result):
+        if skip_extra:
+            skip_extra -= 1
+            continue
         if skip_next:
             skip_next = False
             continue
@@ -122,6 +147,16 @@ def _postprocess_noni(result: list[dict], applied_rule: str | None) -> tuple[lis
             )
             or (host.get("pos") == "形容詞" and host.get("surface", "").endswith("い"))
         )
+        # A vowel held on the second mora closes the clause, which only the
+        # concessive does, whatever the host (行くのにぃ, 行くのにー).
+        held = _held_noni_tail(result, j)
+        if held is not None:
+            tail, consumed = held
+            merged.append({"surface": "のに" + tail, "pos": "助詞", "lemma": "のに"})
+            skip_extra = consumed
+            if applied_rule is None:
+                applied_rule = "noni-merge"
+            continue
         if (
             j >= 1
             and j < len(result) - 1

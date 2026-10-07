@@ -2264,6 +2264,23 @@
       ],
       "id": "iteirukanoyouni",
       "input": "泣いているかのように"
+    },
+    {
+      "description": "A held vowel on のに closes the clause, so it is the concessive particle after any host",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行く"
+        },
+        {
+          "lemma": "のに",
+          "pos": "Particle",
+          "surface": "のにぃ"
+        }
+      ],
+      "id": "kunoni",
+      "input": "行くのにぃ"
     }
   ],
   "description": "particle_final tests",
