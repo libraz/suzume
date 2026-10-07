@@ -345,6 +345,50 @@
       ],
       "id": "hizo_karamu",
       "input": "思ひぞ深からむ"
+    },
+    {
+      "description": "いと美しき人 - auto-generated",
+      "expected": [
+        {
+          "lemma": "いと",
+          "pos": "Adverb",
+          "surface": "いと"
+        },
+        {
+          "lemma": "美しい",
+          "pos": "Adjective",
+          "surface": "美しき"
+        },
+        {
+          "lemma": "人",
+          "pos": "Noun",
+          "surface": "人"
+        }
+      ],
+      "id": "ito_shiki",
+      "input": "いと美しき人"
+    },
+    {
+      "description": "いと悲しき物語 - auto-generated",
+      "expected": [
+        {
+          "lemma": "いと",
+          "pos": "Adverb",
+          "surface": "いと"
+        },
+        {
+          "lemma": "悲しい",
+          "pos": "Adjective",
+          "surface": "悲しき"
+        },
+        {
+          "lemma": "物語",
+          "pos": "Noun",
+          "surface": "物語"
+        }
+      ],
+      "id": "ito_shiki_2",
+      "input": "いと悲しき物語"
     }
   ],
   "description": "adjective_classical tests",

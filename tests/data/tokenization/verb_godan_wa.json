@@ -2710,6 +2710,55 @@
       ],
       "id": "wo_ke_ttta",
       "input": "仕事を請け負った"
+    },
+    {
+      "description": "母は嫌う - auto-generated",
+      "expected": [
+        {
+          "lemma": "母",
+          "pos": "Noun",
+          "surface": "母"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "嫌う",
+          "pos": "Verb",
+          "surface": "嫌う"
+        }
+      ],
+      "id": "ha_u",
+      "input": "母は嫌う"
+    },
+    {
+      "description": "誰もが嫌う - auto-generated",
+      "expected": [
+        {
+          "lemma": "誰",
+          "pos": "Pronoun",
+          "surface": "誰"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "嫌う",
+          "pos": "Verb",
+          "surface": "嫌う"
+        }
+      ],
+      "id": "moga_u",
+      "input": "誰もが嫌う"
     }
   ],
   "description": "Godan Wa-row verbs (五段ワ行動詞) - verbs ending in う",

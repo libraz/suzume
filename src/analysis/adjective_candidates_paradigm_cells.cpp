@@ -24,6 +24,7 @@
 namespace suzume::analysis {
 
 using verb_helpers::isAdjectiveInDictionary;
+using verb_helpers::isIAdjectiveInDictionary;
 
 using adj_detail::makeIAdjCellCandidate;
 
@@ -39,7 +40,7 @@ void pushIAdjCell(std::vector<UnknownCandidate>& candidates, const std::string& 
 
 bool isModernIAdjective(const std::string& lemma, const grammar::Inflection& inflection,
                         const dictionary::DictionaryManager* dict_manager) {
-  if (isAdjectiveInDictionary(dict_manager, lemma)) {
+  if (isIAdjectiveInDictionary(dict_manager, lemma)) {
     return true;
   }
   const float minimum_confidence =
@@ -174,7 +175,7 @@ void appendIAdjOnbinRenyokeiCandidates(const std::vector<char32_t>& codepoints, 
     // it the shape is just a kanji stem plus う, which every wa-row Godan
     // terminal also spells (思う, 使う), so that side needs the dictionary.
     if (glide_shape ? !isModernIAdjective(lemma, inflection, dict_manager)
-                    : !isAdjectiveInDictionary(dict_manager, lemma)) {
+                    : !isIAdjectiveInDictionary(dict_manager, lemma)) {
       continue;
     }
     pushIAdjCell(candidates, extractSubstring(codepoints, start_pos, u_pos + 1), start_pos, u_pos + 1, lemma,

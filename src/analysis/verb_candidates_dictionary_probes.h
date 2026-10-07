@@ -76,6 +76,14 @@ bool isStrandedPotentialStem(const dictionary::DictionaryManager* dict_manager, 
 bool isAdjectiveInDictionary(const dictionary::DictionaryManager* dict_manager, std::string_view base_form);
 
 /**
+ * @brief Check if a base form exists in dictionary as an i-adjective
+ *
+ * A na-adjective whose stem happens to end in い (嫌い) is an adjective entry
+ * too, but it has no く/かっ/う paradigm, so i-adjective cells must not take it.
+ */
+bool isIAdjectiveInDictionary(const dictionary::DictionaryManager* dict_manager, std::string_view base_form);
+
+/**
  * @brief The span forms of the two lookups above
  *
  * They own the conversion from the codepoint range to the surface, which

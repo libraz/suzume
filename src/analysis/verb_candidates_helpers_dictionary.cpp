@@ -55,6 +55,14 @@ bool isAdjectiveInDictionary(const dictionary::DictionaryManager* dict_manager, 
   return hasDictionaryEntry(dict_manager, base_form, core::PartOfSpeech::Adjective);
 }
 
+bool isIAdjectiveInDictionary(const dictionary::DictionaryManager* dict_manager, std::string_view base_form) {
+  if (dict_manager == nullptr || base_form.empty()) {
+    return false;
+  }
+  const auto* entry = dict_manager->lookupExact(base_form, core::PartOfSpeech::Adjective);
+  return entry != nullptr && entry->extended_pos != core::ExtendedPOS::AdjNaAdj;
+}
+
 bool isVerbInDictionary(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
                         size_t start, size_t end) {
   return hasDictionaryEntry(dict_manager, extractSubstring(codepoints, start, end), core::PartOfSpeech::Verb);

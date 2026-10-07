@@ -648,6 +648,12 @@ void appendGodanSaRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
         }
       }
 
+      // An unattested su-row stem that spells a registered i-adjective's
+      // shiku stem (美し of 美しい) is that adjective's classical stem.
+      if (!base_in_dict && vh::isIAdjectiveInDictionary(dict_manager, normalize::concat(surface, "い"))) {
+        continue;
+      }
+
       if (isInterrogativeKanji(codepoints[start_pos])) {
         continue;
       }
