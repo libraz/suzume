@@ -156,9 +156,10 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
       // personal pronouns (それ+らしい, 彼+らしい).
       {EPOS::Pronoun, EPOS::AuxConjectureRashii, cost::kExtremeBonus},
 
-      // A terminal volitional auxiliary cannot directly precede the past
-      // auxiliary.
+      // A terminal volitional auxiliary cannot directly precede the past or
+      // the passive auxiliary (う+れ+しー is not a reading of うれしー).
       {EPOS::AuxVolitional, EPOS::AuxTenseTa, cost::kAlmostNever},
+      {EPOS::AuxVolitional, EPOS::AuxPassive, cost::kAlmostNever},
 
       // The contracted negative followed by the copula is the productive
       // んで construction (読まんで). The bonus stays below the attributive-copula

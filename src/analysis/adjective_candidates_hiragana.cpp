@@ -190,8 +190,8 @@ constexpr std::array<FusedESource, 13> kFusedESources = {{
     {U'れ', U'ら', U'ろ'},
 }};
 
-// A registered i-adjective whose ending has fused into a long e (すげえ for
-// すごい, やべえ for やばい) is that adjective, with its standard lemma.
+// A registered i-adjective whose ending has fused into a long e (すげえ・すげー
+// for すごい, やべぇ for やばい) is that adjective, with its standard lemma.
 void appendVowelFusedAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                          size_t max_hiragana_end, const dictionary::DictionaryManager* dict_manager,
                                          std::vector<UnknownCandidate>& candidates) {
@@ -201,7 +201,8 @@ void appendVowelFusedAdjectiveCandidates(const std::vector<char32_t>& codepoints
   }
   for (size_t fused_at = start_pos + 1; fused_at + 1 < max_hiragana_end && fused_at - start_pos <= kMaxStemMorae;
        ++fused_at) {
-    if (codepoints[fused_at + 1] != U'え') {
+    const char32_t long_e = codepoints[fused_at + 1];
+    if (long_e != U'え' && long_e != U'ぇ' && !normalize::isProlongedSoundMark(long_e)) {
       continue;
     }
     const auto source = std::find_if(kFusedESources.begin(), kFusedESources.end(),

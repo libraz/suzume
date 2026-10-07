@@ -376,6 +376,81 @@
       ],
       "id": "tt",
       "input": "寒っ"
+    },
+    {
+      "description": "i-adjective ending fused into a long e written with ー",
+      "expected": [
+        {
+          "lemma": "すごい",
+          "pos": "Adjective",
+          "surface": "すげー"
+        },
+        {
+          "lemma": "マジ",
+          "pos": "Noun",
+          "surface": "マジ"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "suge_kayo",
+      "input": "すげー、マジかよ"
+    },
+    {
+      "description": "i-adjective ending fused into a long e written with ー",
+      "expected": [
+        {
+          "lemma": "やばい",
+          "pos": "Adjective",
+          "surface": "やべー"
+        }
+      ],
+      "id": "yabe",
+      "input": "やべー"
+    },
+    {
+      "description": "i-adjective ending fused into a long e written with ー",
+      "expected": [
+        {
+          "lemma": "でかい",
+          "pos": "Adjective",
+          "surface": "でけー"
+        }
+      ],
+      "id": "deke",
+      "input": "でけー"
+    },
+    {
+      "description": "kana i-adjective final i drawn out as ー, not volitional + passive",
+      "expected": [
+        {
+          "lemma": "うれしい",
+          "pos": "Adjective",
+          "surface": "うれしー"
+        }
+      ],
+      "id": "ureshi",
+      "input": "うれしー"
+    },
+    {
+      "description": "kanji i-adjective final i drawn out as ー",
+      "expected": [
+        {
+          "lemma": "嬉しい",
+          "pos": "Adjective",
+          "surface": "嬉しー"
+        }
+      ],
+      "id": "shi_10",
+      "input": "嬉しー"
     }
   ],
   "description": "Taru-adjectives and irregular adjectives",

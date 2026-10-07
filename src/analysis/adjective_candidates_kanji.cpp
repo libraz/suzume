@@ -335,6 +335,30 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
     }
     break;
   }
+  // A final い drawn out as ー (嬉しー, 楽しーね) is the same dictionary
+  // adjective; the kana path reads this through its ー normalization.
+  {
+    size_t okurigana_end = kanji_end;
+    while (okurigana_end < char_types.size() && char_types[okurigana_end] == normalize::CharType::Hiragana) {
+      ++okurigana_end;
+    }
+    size_t prolonged_end = okurigana_end;
+    while (prolonged_end < codepoints.size() && normalize::isProlongedSoundMark(codepoints[prolonged_end])) {
+      ++prolonged_end;
+    }
+    if (okurigana_end > kanji_end && prolonged_end > okurigana_end &&
+        grammar::getVowelForChar(codepoints[okurigana_end - 1]) == U'い') {
+      const std::string base_form = extractSubstring(codepoints, start_pos, okurigana_end) + "い";
+      if (verb_helpers::isIAdjectiveInDictionary(dict_manager, base_form)) {
+        auto prolonged = adj_detail::makeIAdjCellCandidate(
+            extractSubstring(codepoints, start_pos, prolonged_end), start_pos, prolonged_end, base_form,
+            core::ExtendedPOS::AdjBasic, candidate::kAdjStemDictionaryCost, CandidateOrigin::AdjectiveI,
+            candidate::kDictionaryOriginConfidence, "adj_kanji_prolonged_final_i");
+        prolonged.lemma_verified = true;
+        candidates.push_back(std::move(prolonged));
+      }
+    }
+  }
   const size_t extended_kanji_end =
       findCharRegionEnd(char_types, start_pos, kMaxKanjiAdjectiveStemLength, normalize::CharType::Kanji);
   if (extended_kanji_end > kanji_end && extended_kanji_end < char_types.size() &&
