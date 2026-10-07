@@ -831,6 +831,43 @@
       ],
       "id": "iwo_bitamanazashini",
       "input": "憂いを帯びたまなざしに"
+    },
+    {
+      "description": "Aspect auxiliary とっ cannot open a run after topic は, so とっさ stays one noun",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "とっさ",
+          "pos": "Noun",
+          "surface": "とっさ"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "逃げる",
+          "pos": "Verb",
+          "surface": "逃げ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "hatottsani_geta",
+      "input": "彼はとっさに逃げた"
     }
   ],
   "description": "noun_hiragana tests",

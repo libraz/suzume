@@ -956,6 +956,12 @@ void UnknownWordGenerator::appendSameTypePrefixCandidates(const std::vector<char
                                 shape.precedes_closed_native_number || shape.closes_genitive_negative_noun)
                                    ? core::PartOfSpeech::Noun
                                    : getPosForType(start_type);
+      // A noun never ends on the small っ: it geminates onto the next mora,
+      // so the run stops inside a word (は+とっさ, not はとっ).
+      if (pos == core::PartOfSpeech::Noun && start_type == normalize::CharType::Hiragana &&
+          codepoints[candidate_end - 1] == core::hiragana::kSmallTsu) {
+        continue;
+      }
       float cost = getCostForType(start_type, len);
       if (shape.selects_past_tari_collision_noun) {
         cost = candidate::kSelectedNominalShortHeadCost;

@@ -814,7 +814,7 @@ bool admitsPromotedRun(const BracketedNounContext& ctx, const BracketedScan& bra
   const bool spells_auxiliary_chain =
       dict_manager != nullptr && promoted.len >= 3 &&
       maximalSegmentCount(*dict_manager, codepoints, start_pos, scan, core::PartOfSpeech::Auxiliary,
-                          core::ExtendedPOS::AuxClassicalPerfect, hasLeftHost(codepoints, start_pos)) >= 2;
+                          core::ExtendedPOS::AuxClassicalPerfect, !particleMoraLacksHost(codepoints, start_pos)) >= 2;
   // ご before kana is the Sino-Japanese honorific on a kana verbal noun
   // (ご+あんない+します); a rescue would swallow the prefix into the noun.
   // Nor may it open on the te-form connective that a continuative right in

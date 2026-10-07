@@ -27,8 +27,9 @@ bool hasAuxiliaryParticleDecomposition(const std::vector<char32_t>& codepoints, 
     return false;
   }
   // The aspect auxiliaries attach only to a verb stem, so with no word in front
-  // of the run none of them opens it (どうん is not どう+ん).
-  const bool lacks_left_host = !hasLeftHost(codepoints, start_pos);
+  // of the run, or behind a closing は/が/を/も, none of them opens it
+  // (どうん is not どう+ん, 彼は+とっさ is not とっ+さ).
+  const bool lacks_left_host = particleMoraLacksHost(codepoints, start_pos);
   // Behind the auxiliary stands one particle, or a final particle plus the
   // modal tail that licenses a stack (だ+よ+ね, but not う+わ+べ).
   const auto final_particle_at = [&](size_t from, size_t to) {
@@ -86,7 +87,8 @@ bool hasFunctionWordChainDecomposition(const std::vector<char32_t>& codepoints, 
     // what an ordinary hiragana run spells: the one-mora continuative alone
     // would decompose にんじん as に+ん+じ+ん.
     if (maximalSegmentCount(*dict_manager, codepoints, start_pos, particle_start, core::PartOfSpeech::Auxiliary,
-                            core::ExtendedPOS::AuxClassicalPerfect, hasLeftHost(codepoints, start_pos)) >= 1) {
+                            core::ExtendedPOS::AuxClassicalPerfect,
+                            !particleMoraLacksHost(codepoints, start_pos)) >= 1) {
       return true;
     }
   }
