@@ -348,6 +348,21 @@ def postprocess_final_particle_quotative_tte(tokens: list[dict]) -> None:
             tokens[idx - 1 : idx + 1] = [final_ka, final_na, quotative]
 
 
+def _is_contracted_iku_te_after_te_form(tokens: list[dict], te_idx: int) -> bool:
+    """Return whether ``tokens[te_idx]`` is て in te-form + っ(いく) + て."""
+    if te_idx < 2:
+        return False
+    te, sokuon, host_te = tokens[te_idx], tokens[te_idx - 1], tokens[te_idx - 2]
+    return (
+        te.get("surface") == "て"
+        and te.get("pos") == "Particle"
+        and sokuon.get("surface") == "っ"
+        and sokuon.get("lemma") == "いく"
+        and host_te.get("surface") in ("て", "で")
+        and host_te.get("pos") == "Particle"
+    )
+
+
 @reports_mutation
 def postprocess_tteba_emphatic_particle(tokens: list[dict]) -> None:
     """Keep the emphatic final particle ってば whole and off the predicate.
@@ -358,7 +373,9 @@ def postprocess_tteba_emphatic_particle(tokens: list[dict]) -> None:
     particle だって -- which strands the host as a bare noun and loses the
     copula.  Restore the copula and merge the particle in both readings.
     """
-    for idx in range(len(tokens) - 1, 0, -1):
+    idx = len(tokens)
+    while idx > 1:
+        idx -= 1
         token = tokens[idx]
         # MeCab tags a clause-final ば as a noun when nothing follows it.
         if token.get("surface") != "ば" or token.get("pos") not in ("Particle", "Noun"):
@@ -372,6 +389,12 @@ def postprocess_tteba_emphatic_particle(tokens: list[dict]) -> None:
             continue
         previous = tokens[idx - 1]
         head = previous.get("surface", "")
+        # After a te-form MeCab reads っ+て as contracted いく; a conditional
+        # ば never follows a te-form, so the run is the emphatic particle.
+        if _is_contracted_iku_te_after_te_form(tokens, idx - 1):
+            tokens[idx - 2 : idx + 1] = [{"surface": "ってば", "pos": "Particle", "lemma": "ってば"}]
+            idx -= 2
+            continue
         if previous.get("pos") != "Particle" or head not in ("って", "だって"):
             continue
         emphatic = {"surface": "ってば", "pos": "Particle", "lemma": "ってば"}

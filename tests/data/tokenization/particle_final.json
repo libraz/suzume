@@ -1974,6 +1974,82 @@
       ],
       "id": "ga_tttawai",
       "input": "僕が笑ったわい"
+    },
+    {
+      "description": "ちょっと待ってってば - auto-generated",
+      "expected": [
+        {
+          "lemma": "ちょっと",
+          "pos": "Adverb",
+          "surface": "ちょっと"
+        },
+        {
+          "lemma": "待つ",
+          "pos": "Verb",
+          "surface": "待っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "ってば",
+          "pos": "Particle",
+          "surface": "ってば"
+        }
+      ],
+      "id": "chi_ttto_tttettteba",
+      "input": "ちょっと待ってってば"
+    },
+    {
+      "description": "早くしてってば - auto-generated",
+      "expected": [
+        {
+          "lemma": "早い",
+          "pos": "Adjective",
+          "surface": "早く"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "ってば",
+          "pos": "Particle",
+          "surface": "ってば"
+        }
+      ],
+      "id": "kushitettteba",
+      "input": "早くしてってば"
+    },
+    {
+      "description": "見てってば - auto-generated",
+      "expected": [
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "ってば",
+          "pos": "Particle",
+          "surface": "ってば"
+        }
+      ],
+      "id": "tettteba",
+      "input": "見てってば"
     }
   ],
   "description": "particle_final tests",
