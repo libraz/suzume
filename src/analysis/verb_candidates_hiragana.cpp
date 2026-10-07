@@ -830,14 +830,14 @@ size_t scanPredicateRunEnd(const HiraganaVerbScan& scan, const PredicateRunTails
         // follows て (ても), and と follows っ (やっとく = やって + おく) or opens a
         // long godan-wa negative.
         const char32_t prev = codepoints[hiragana_end - 1];
-        // で followed by た/て or ながら/つつ closes an ichidan stem (なで+た):
-        // the copula で takes none of them.
+        // で followed by た/て/る or ながら/つつ closes an ichidan stem (なで+た,
+        // なでる): neither the copula nor the particle で takes them.
         const auto closes_ichidan_de_stem = [&]() {
           const size_t next = hiragana_end + 1;
           if (next >= codepoints.size()) {
             return false;
           }
-          if (codepoints[next] == U'た' || codepoints[next] == U'て') {
+          if (codepoints[next] == U'た' || codepoints[next] == U'て' || codepoints[next] == U'る') {
             return true;
           }
           return vh::continuativeConjunctiveFollowsAt(codepoints, next);

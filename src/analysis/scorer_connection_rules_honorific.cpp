@@ -205,10 +205,16 @@ float computeProgressiveHonorificBonus(const core::LatticeEdge& prev, const core
 
   // The attributive copula な cannot introduce the progressive/aspectual いる.
   // This rules out the fabricated な+い+ん+だ chain and leaves the independent
-  // adjective plus nominalizer in ないんだ.
+  // adjective plus nominalizer in ないんだ. Nor can it take the past auxiliary,
+  // which a character-speech ending is scored as, unless a nominalizer leads
+  // it (雨+な+のだ, but not と+な+ぞる for なぞる).
   if (prev.extended_pos == core::ExtendedPOS::AuxCopulaDa && grammar::isAttributiveCopulaNa(prev.surface)) {
+    const bool past_without_nominalizer = next.extended_pos == core::ExtendedPOS::AuxTenseTa &&
+                                          !utf8::startsWith(next.surface, "の") &&
+                                          !utf8::startsWith(next.surface, "ん");
     if (next.extended_pos == core::ExtendedPOS::AuxAspectIru || next.extended_pos == core::ExtendedPOS::AuxNegativeNu ||
-        next.extended_pos == core::ExtendedPOS::AuxVolitional || next.pos == core::PartOfSpeech::Verb) {
+        next.extended_pos == core::ExtendedPOS::AuxVolitional || next.pos == core::PartOfSpeech::Verb ||
+        past_without_nominalizer) {
       SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
     }
   }

@@ -374,7 +374,13 @@ bool coinedVerbOpensOnArgumentParticle(const dictionary::DictionaryManager* dict
   // a kanji host and the remainder's own confidence.
   const bool topic_after_case_particle = opener->extended_pos == core::ExtendedPOS::ParticleTopic &&
                                          followsCaseParticle(dict_manager, codepoints, start_pos);
-  const bool kanji_host_run = end_pos >= start_pos + kMinSpan && normalize::isKanjiCodepoint(codepoints[start_pos - 1]);
+  // A registered adverb hosts the quotative-adverbial と the same way
+  // (ゆっくり+と+なぞる, not ゆっくり+となぞる).
+  const bool kanji_host_run =
+      end_pos >= start_pos + kMinSpan &&
+      (normalize::isKanjiCodepoint(codepoints[start_pos - 1]) ||
+       hasDictionaryEntryEndingAt(*dict_manager, codepoints, dictionaryLookbehindStart(start_pos), start_pos,
+                                  partOfSpeechMask(core::PartOfSpeech::Adverb)));
   if (!topic_after_case_particle && !kanji_host_run) {
     return false;
   }

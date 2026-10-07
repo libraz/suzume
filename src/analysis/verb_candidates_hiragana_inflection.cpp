@@ -252,8 +252,8 @@ bool admitsUnattestedSpan(const InflectedScanContext& ctx, InflectedSpan& span) 
     SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << surface << "\" opens on a closed-class word tail\n");
     return false;
   }
-  // Behind a kanji host a one-mora particle marks that argument.
-  if (!is_dictionary_verb && ctx.follows_kanji) {
+  // Behind a kanji or adverb host a one-mora particle marks that argument.
+  if (!is_dictionary_verb) {
     float own_confidence{};
     for (const auto& analysis : span.all_candidates) {
       own_confidence = std::max(own_confidence, analysis.confidence);

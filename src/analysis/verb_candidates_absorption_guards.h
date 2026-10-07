@@ -324,11 +324,13 @@ bool opensOnClosedClassWordTail(const dictionary::DictionaryManager* dict_manage
                                 const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos);
 
 /**
- * @brief Whether a coined verb opens on the one-mora particle marking a kanji host.
+ * @brief Whether a coined verb opens on the one-mora particle marking a kanji
+ *        or adverb host.
  *
- * Behind a kanji host a one-mora particle marks that argument, so a coined
- * verb opening on it loses to the same verb read after it whenever the
- * remainder reconstructs at least as well (駅+で+しらべる, not でしらべる).
+ * Behind a kanji host or a registered adverb a one-mora particle marks that
+ * argument, so a coined verb opening on it loses to the same verb read after
+ * it whenever the remainder reconstructs at least as well (駅+で+しらべる, not
+ * でしらべる; ゆっくり+と+なぞる).
  *
  * @param own_confidence Best inflection confidence of the candidate span
  */

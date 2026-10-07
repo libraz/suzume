@@ -1225,6 +1225,65 @@
       ],
       "id": "he_2",
       "input": "経済成長へ"
+    },
+    {
+      "description": "A registered adverb hosts と; the coined verb opening on と loses to と + verb",
+      "expected": [
+        {
+          "lemma": "指",
+          "pos": "Noun",
+          "surface": "指"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "文字",
+          "pos": "Noun",
+          "surface": "文字"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "ゆっくり",
+          "pos": "Adverb",
+          "surface": "ゆっくり"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "なぞる",
+          "pos": "Verb",
+          "surface": "なぞる"
+        }
+      ],
+      "id": "de_woyuttkuritonazoru",
+      "input": "指で文字をゆっくりとなぞる"
+    },
+    {
+      "description": "Kana ichidan verb whose stem ends in で, terminal form after a kana adverb",
+      "expected": [
+        {
+          "lemma": "そっと",
+          "pos": "Adverb",
+          "surface": "そっと"
+        },
+        {
+          "lemma": "なでる",
+          "pos": "Verb",
+          "surface": "なでる"
+        }
+      ],
+      "id": "sotttonaderu",
+      "input": "そっとなでる"
     }
   ],
   "description": "Case particles (が、を、に、で)",
