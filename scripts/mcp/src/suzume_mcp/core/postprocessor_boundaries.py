@@ -73,6 +73,26 @@ def postprocess_exclusion_suffix(tokens: list[dict]) -> bool:
     return changed
 
 
+def postprocess_admixture_suffix(tokens: list[dict]) -> bool:
+    """Classify nominal X+まじり as the admixture suffix (冗談+まじり, 雪+まじり).
+
+    The reference reads the kana as the continuative of まじる; after a noun
+    and before a nominal frame it is the dependent suffix, not a predicate.
+    """
+    changed = False
+    for idx, token in enumerate(tokens[1:], start=1):
+        if token.get("surface") != "まじり" or tokens[idx - 1].get("pos") != "Noun":
+            continue
+        following = tokens[idx + 1] if idx + 1 < len(tokens) else None
+        if following is not None and following.get("pos") not in ("Particle", "Symbol"):
+            continue
+        if token.get("pos") != "Suffix" or token.get("lemma") != "まじり":
+            token["pos"] = "Suffix"
+            token["lemma"] = "まじり"
+            changed = True
+    return changed
+
+
 def postprocess_state_suffix(tokens: list[dict]) -> bool:
     """Classify nominal X+中 as a state suffix in nominal predicate positions."""
     changed = False

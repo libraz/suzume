@@ -374,10 +374,11 @@ def _postprocess_small_kana_head_merge(result: list[dict], applied_rule: str | N
     return merged, applied_rule
 
 
-# The vowel each hiragana mora carries, used to tell an emphatic lengthening
-# from a morpheme that merely starts with the same kana.
+# The vowel each kana mora carries, used to tell an emphatic lengthening
+# from a morpheme that merely starts with the same kana. A katakana word
+# draws out its last mora with the same small hiragana vowel (ダメぇ).
 _MORA_VOWEL = {
-    kana: vowel
+    spelling: vowel
     for vowel, row in (
         ("あ", "あかさたなはまやらわがざだばぱゃゎぁ"),
         ("い", "いきしちにひみりゐぎじぢびぴぃ"),
@@ -386,6 +387,7 @@ _MORA_VOWEL = {
         ("お", "おこそとのほもよろをごぞどぼぽょぉ"),
     )
     for kana in row
+    for spelling in (kana, chr(ord(kana) + 0x60))
 }
 
 

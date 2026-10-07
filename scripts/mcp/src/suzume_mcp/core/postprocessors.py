@@ -19,6 +19,7 @@ from . import (
 
 # Exports from postprocessor_boundaries.
 postprocess_exclusion_suffix = postprocessor_boundaries.postprocess_exclusion_suffix
+postprocess_admixture_suffix = postprocessor_boundaries.postprocess_admixture_suffix
 postprocess_productive_search_unit_boundaries = postprocessor_boundaries.postprocess_productive_search_unit_boundaries
 postprocess_productive_verb_suffix_stem = postprocessor_boundaries.postprocess_productive_verb_suffix_stem
 postprocess_negative_appearance_suffix = postprocessor_boundaries.postprocess_negative_appearance_suffix
@@ -243,6 +244,7 @@ POSTPROCESSORS: tuple[tuple[str, Callable[[list[dict]], bool]], ...] = (
     ("koto-suru-te", postprocess_koto_suru_te),
     ("quantity-bound-suffix", postprocess_quantity_bound_suffix),
     ("exclusion-suffix", postprocess_exclusion_suffix),
+    ("admixture-suffix", postprocess_admixture_suffix),
     ("state-suffix", postprocess_state_suffix),
     ("productive-verb-suffix-stem", postprocess_productive_verb_suffix_stem),
     ("teki-na-adjective", postprocess_teki_na_adjective),
