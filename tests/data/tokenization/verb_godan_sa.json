@@ -921,6 +921,87 @@
       ],
       "id": "wo_shita_3",
       "input": "優勝を目指した"
+    },
+    {
+      "description": "息を切らしながら - auto-generated",
+      "expected": [
+        {
+          "lemma": "息",
+          "pos": "Noun",
+          "surface": "息"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "切らす",
+          "pos": "Verb",
+          "surface": "切らし"
+        },
+        {
+          "lemma": "ながら",
+          "pos": "Particle",
+          "surface": "ながら"
+        }
+      ],
+      "id": "wo_rashinagara",
+      "input": "息を切らしながら"
+    },
+    {
+      "description": "鐘を鳴らしつつ - auto-generated",
+      "expected": [
+        {
+          "lemma": "鐘",
+          "pos": "Noun",
+          "surface": "鐘"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "鳴らす",
+          "pos": "Verb",
+          "surface": "鳴らし"
+        },
+        {
+          "lemma": "つつ",
+          "pos": "Particle",
+          "surface": "つつ"
+        }
+      ],
+      "id": "wo_rashitsutsu",
+      "input": "鐘を鳴らしつつ"
+    },
+    {
+      "description": "床を濡らしながら - auto-generated",
+      "expected": [
+        {
+          "lemma": "床",
+          "pos": "Noun",
+          "surface": "床"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "濡らす",
+          "pos": "Verb",
+          "surface": "濡らし"
+        },
+        {
+          "lemma": "ながら",
+          "pos": "Particle",
+          "surface": "ながら"
+        }
+      ],
+      "id": "wo_rashinagara_2",
+      "input": "床を濡らしながら"
     }
   ],
   "description": "Godan Sa-row verbs (五段サ行動詞) - verbs ending in す",

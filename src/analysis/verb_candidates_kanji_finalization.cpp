@@ -170,12 +170,7 @@ bool rejectsStemShape(const KanjiVerbSelection& sel) {
   // A literary auxiliary standing on the み supplies the missing evidence by
   // itself: みたい is one auxiliary, so it can never be followed by a second
   // one that selects a continuative (花を摘み+ぬ, 花を摘み+けり).
-  bool continuative_conjunctive_follows = false;
-  for (size_t particle_end = end_pos + 2; particle_end <= std::min(end_pos + 3, codepoints.size()); ++particle_end) {
-    continuative_conjunctive_follows =
-        continuative_conjunctive_follows ||
-        grammar::isContinuativeSelectingConjunctiveParticle(extractSubstring(codepoints, end_pos, particle_end));
-  }
+  const bool continuative_conjunctive_follows = vh::continuativeConjunctiveFollowsAt(codepoints, end_pos);
   // A conjunctive particle that selects the continuative (霞み+ながら,
   // 霞み+つつ) or a clause chained through 、 is that evidence as well.
   if (best.verb_type == grammar::VerbType::GodanMa && hiragana_part == "み" && kanji_end - start_pos <= 3 &&

@@ -840,14 +840,7 @@ size_t scanPredicateRunEnd(const HiraganaVerbScan& scan, const PredicateRunTails
           if (codepoints[next] == U'た' || codepoints[next] == U'て') {
             return true;
           }
-          constexpr size_t kConjunctiveMaxChars = 3;
-          for (size_t particle_end = next + 2; particle_end <= std::min(codepoints.size(), next + kConjunctiveMaxChars);
-               ++particle_end) {
-            if (grammar::isContinuativeSelectingConjunctiveParticle(extractSubstring(codepoints, next, particle_end))) {
-              return true;
-            }
-          }
-          return false;
+          return vh::continuativeConjunctiveFollowsAt(codepoints, next);
         };
         if ((curr == U'か' && kaContinuesConjugation(codepoints, hiragana_end)) ||
             (curr == U'で' && (prev == U'ん' || prev == U'き' || closes_ichidan_de_stem())) ||

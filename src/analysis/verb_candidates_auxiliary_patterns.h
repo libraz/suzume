@@ -145,6 +145,14 @@ bool containsPassiveCausativeAuxPattern(std::string_view surface);
  */
 bool masuAuxFollowsAt(const std::vector<char32_t>& codepoints, size_t pos);
 
+/**
+ * @brief Whether a conjunctive particle selecting the continuative (ながら, つつ) starts at @p pos.
+ *
+ * Its host is a verb continuative, never a finite form or a closed auxiliary
+ * such as the conjectural らし, so it licenses the verb-cell reading before it.
+ */
+bool continuativeConjunctiveFollowsAt(const std::vector<char32_t>& codepoints, size_t pos);
+
 // Returns the length of a complete finite ます inflection beginning at pos,
 // or zero when the following characters do not form one.  The caller decides
 // whether the form is at a clause boundary.

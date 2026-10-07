@@ -69,6 +69,17 @@ bool masuAuxFollowsAt(const std::vector<char32_t>& codepoints, size_t pos) {
   return next == U'す' || next == U'し' || next == U'せ';
 }
 
+bool continuativeConjunctiveFollowsAt(const std::vector<char32_t>& codepoints, size_t pos) {
+  constexpr size_t kConjunctiveMaxChars = 3;
+  for (size_t particle_end = pos + 2; particle_end <= std::min(codepoints.size(), pos + kConjunctiveMaxChars);
+       ++particle_end) {
+    if (grammar::isContinuativeSelectingConjunctiveParticle(extractSubstring(codepoints, pos, particle_end))) {
+      return true;
+    }
+  }
+  return false;
+}
+
 size_t finiteMasuFormLengthAt(const std::vector<char32_t>& codepoints, size_t pos) {
   if (pos + 1 >= codepoints.size() || codepoints[pos] != U'ま') {
     return 0;
