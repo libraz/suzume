@@ -209,6 +209,20 @@ def postprocess_deverbal_noun_context(tokens: list[dict]) -> bool:
             motion_lemmas = {"行く", "来る", "いく", "くる", "ゆく"}
             nominal_particle = after_particle is None or after_particle.get("lemma") not in motion_lemmas
         nominal_follower = following.get("surface") in {"方", "ひとつ"}
+        # A continuative never takes する directly: whatever する verbalizes is
+        # a nominal (身じろぎ+した, 夜更かし+して). The する must carry its own
+        # auxiliary or て: a bare し there is the classical past (摘みし人), and
+        # a topic-contracted continuative (出しゃ+しない) stays a verb.
+        after_suru = tokens[idx + 2] if idx + 2 < len(tokens) else {}
+        suru_object = (
+            following.get("pos") == "Verb"
+            and following.get("lemma") == "する"
+            and not surface.endswith("ゃ")
+            and (
+                after_suru.get("pos") == "Auxiliary"
+                or (after_suru.get("pos") == "Particle" and after_suru.get("surface") in {"て", "で"})
+            )
+        )
         # An onbin stem before だ is the voiced past (読ん+だ, 泳い+だ).
         onbin_stem = surface.endswith(("ん", "っ")) or (surface.endswith("い") and lemma.endswith(("く", "ぐ")))
         predicative_copula = following.get("pos") == "Auxiliary" and (
@@ -237,6 +251,7 @@ def postprocess_deverbal_noun_context(tokens: list[dict]) -> bool:
         if (
             not nominal_particle
             and not nominal_follower
+            and not suru_object
             and not predicative_copula
             and not nominal_negative
             and not genitive_phrase_head

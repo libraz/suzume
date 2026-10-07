@@ -1123,6 +1123,144 @@
       ],
       "id": "keyueni",
       "input": "夜明けゆえに"
+    },
+    {
+      "description": "言い訳してきた - auto-generated",
+      "expected": [
+        {
+          "lemma": "言い訳",
+          "pos": "Noun",
+          "surface": "言い訳"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くる",
+          "pos": "Auxiliary",
+          "surface": "き"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "i_shitekita",
+      "input": "言い訳してきた"
+    },
+    {
+      "description": "犬に甘噛みされた - auto-generated",
+      "expected": [
+        {
+          "lemma": "犬",
+          "pos": "Noun",
+          "surface": "犬"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "甘噛み",
+          "pos": "Noun",
+          "surface": "甘噛み"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "さ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ni_misareta",
+      "input": "犬に甘噛みされた"
+    },
+    {
+      "description": "子供が身じろぎした - auto-generated",
+      "expected": [
+        {
+          "lemma": "子供",
+          "pos": "Noun",
+          "surface": "子供"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "身じろぎ",
+          "pos": "Noun",
+          "surface": "身じろぎ"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ga_jirogishita",
+      "input": "子供が身じろぎした"
+    },
+    {
+      "description": "夜更かししてしまった - auto-generated",
+      "expected": [
+        {
+          "lemma": "夜",
+          "pos": "Noun",
+          "surface": "夜"
+        },
+        {
+          "lemma": "更かし",
+          "pos": "Noun",
+          "surface": "更かし"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "しまう",
+          "pos": "Auxiliary",
+          "surface": "しまっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "kashishiteshimattta",
+      "input": "夜更かししてしまった"
     }
   ],
   "description": "noun_deverbal tests",

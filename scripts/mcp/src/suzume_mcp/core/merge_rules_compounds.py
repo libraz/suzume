@@ -177,6 +177,32 @@ def _merge_verb_derived_nouns(state: MergeState) -> bool:
                     if applied_rule is None:
                         applied_rule = "verb-renyokei+kata"
 
+        # 5a-adj. A bare i-adjective stem is not a free word, so before a kanji
+        # continuative it is the head of a deverbal compound noun (甘噛み), the
+        # same shape the reference lists whole (長生き, 早起き). The frame after
+        # it has to select a nominal: する or a case particle, never a
+        # continuative's own auxiliaries (高+すぎ+た stays a verb chain).
+        if (
+            not merged
+            and t.get("pos") == "形容詞"
+            and t.get("conj_form") == "ガル接続"
+            and i + 2 < len(tokens)
+            and tokens[i + 1].get("pos") == "動詞"
+            and tokens[i + 1].get("pos_sub1") == "自立"
+            and tokens[i + 1].get("conj_form") == "連用形"
+            and regex.match(r"\p{Han}", tokens[i + 1].get("surface", ""))
+            and (
+                (tokens[i + 2].get("pos") == "動詞" and tokens[i + 2].get("lemma") == "する")
+                or (tokens[i + 2].get("pos") == "助詞" and tokens[i + 2].get("surface") in {"を", "が", "の"})
+            )
+        ):
+            compound = t.get("surface", "") + tokens[i + 1].get("surface", "")
+            result.append({"surface": compound, "pos": "名詞", "pos_sub1": "サ変接続", "lemma": compound})
+            i += 2
+            merged = True
+            if applied_rule is None:
+                applied_rule = "adjective-stem+continuative-noun"
+
         # 5a''. Noun + adjective-forming めかしい (艶めかしい, 古めかしい). The
         # reference holds a few as single adjectives and reads the rest as the
         # verb めかす plus a stray いる; like がましい, the host plus the suffix

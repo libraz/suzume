@@ -13,6 +13,7 @@
 #include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
 #include "grammar/inflection.h"
+#include "join_compound_verb_internal.h"
 #include "normalize/char_type.h"
 #include "normalize/exceptions.h"
 #include "normalize/utf8.h"
@@ -155,6 +156,19 @@ bool startsLightVerb(const std::vector<char32_t>& codepoints, size_t pos) {
   return grammar::isSuruBaseForm(extractSubstring(codepoints, pos, pos + 2));
 }
 
+// The kanji at kanji_pos plus す spells a listed verb or a compound-verb V2, so
+// a continuative before it heads a compound verb (言い渡す, 聞き流す).
+bool namesSuRowCompoundHead(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
+                            size_t kanji_pos) {
+  const std::string verb = normalize::concat(normalize::encodeUtf8(codepoints[kanji_pos]), "す");
+  if (verb_helpers::isVerbInDictionary(dict_manager, verb)) {
+    return true;
+  }
+  const auto subsidiaries = compound_verb_detail::subsidiaryVerbs();
+  return std::any_of(subsidiaries.begin(), subsidiaries.end(),
+                     [&](const auto& subsidiary) { return verb == subsidiary.surface; });
+}
+
 // A deverbal noun and the continuative of the verb it is built on are spelled
 // alike, so what stands to the right decides which one the span is. The two
 // sets of selectors are disjoint closed classes: a case particle, the copula
@@ -277,8 +291,28 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
   const bool ends_on_dictionary_continuative =
       kanji_end - start_pos >= 2 && verb_helpers::namesDictionaryVerbContinuative(dict_manager, codepoints, kanji_end);
 
+  // A continuative never takes する directly, so a two-mora continuative before
+  // the light verb is its deverbal noun even when it opens on a particle-like
+  // mora (夜更かし+した). The okurigana has to end on a continuative vowel, and
+  // a case particle or a closed suffix at its head keeps its own boundary
+  // (電気+を+け, 声+がけ+する).
+  const bool continuative_before_light_verb =
+      dict_manager != nullptr && kanji_end + 2 < codepoints.size() &&
+      char_types[kanji_end + 1] == normalize::CharType::Hiragana &&
+      (kana::isIRowCodepoint(codepoints[kanji_end + 1]) || kana::isERowCodepoint(codepoints[kanji_end + 1])) &&
+      startsLightVerb(codepoints, kanji_end + 2) &&
+      [&] {
+        const auto* particle =
+            lookupEntryInRange(*dict_manager, codepoints, kanji_end, kanji_end + 1, core::PartOfSpeech::Particle);
+        return particle == nullptr || particle->extended_pos != core::ExtendedPOS::ParticleCase;
+      }() &&
+      !hasExactPartOfSpeech(*dict_manager, codepoints, kanji_end, kanji_end + 2,
+                            partOfSpeechMask(core::PartOfSpeech::Suffix)) &&
+      hasInferredVerbContinuative(inflection, extractSubstring(codepoints, start_pos, kanji_end + 2));
+
   // Skip particles that never form nominalizations
-  if (normalize::isParticleCodepoint(first_hiragana) && !ends_on_dictionary_continuative) {
+  if (normalize::isParticleCodepoint(first_hiragana) && !ends_on_dictionary_continuative &&
+      !continuative_before_light_verb) {
     return;
   }
 
@@ -289,7 +323,7 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
        first_hiragana == U'ぎ' || first_hiragana == U'し' || first_hiragana == U'ま' || first_hiragana == U'み' ||
        first_hiragana == U'び' || first_hiragana == U'え' || first_hiragana == U'れ' || first_hiragana == U'め');
 
-  if (!is_nominalization_ending && !ends_on_dictionary_continuative) {
+  if (!is_nominalization_ending && !ends_on_dictionary_continuative && !continuative_before_light_verb) {
     return;
   }
 
@@ -770,7 +804,13 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
             return false;
         }
       }();
-      nominal_context = normalize::isParticleCodepoint(after) || after == U'だ' || heads_existential_negative;
+      // The light verb takes a nominal too (言い訳+した), unless the second
+      // kanji plus す is itself a verb the continuative compounds with
+      // (言い渡+した is 言い渡す).
+      const bool heads_light_verb = startsLightVerb(codepoints, kanji_end + 2) &&
+                                    !namesSuRowCompoundHead(dict_manager, codepoints, kanji_end + 1);
+      nominal_context =
+          normalize::isParticleCodepoint(after) || after == U'だ' || heads_existential_negative || heads_light_verb;
     }
     // A lexical entry reaching past the compound owns the span: the second kanji
     // is then the head of a compound verb, not a noun (取り逃がす, not 取り逃+が+す).
