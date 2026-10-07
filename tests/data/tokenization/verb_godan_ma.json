@@ -782,6 +782,242 @@
       ],
       "id": "ano_ga_yamareta",
       "input": "あの日が悔やまれた"
+    },
+    {
+      "description": "口をつぐむ - auto-generated",
+      "expected": [
+        {
+          "lemma": "口",
+          "pos": "Noun",
+          "surface": "口"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "つぐむ",
+          "pos": "Verb",
+          "surface": "つぐむ"
+        }
+      ],
+      "id": "wotsugumu",
+      "input": "口をつぐむ"
+    },
+    {
+      "description": "口をつぐんで黙った - auto-generated",
+      "expected": [
+        {
+          "lemma": "口",
+          "pos": "Noun",
+          "surface": "口"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "つぐむ",
+          "pos": "Verb",
+          "surface": "つぐん"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "黙る",
+          "pos": "Verb",
+          "surface": "黙っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wotsugunde_ttta",
+      "input": "口をつぐんで黙った"
+    },
+    {
+      "description": "うるんだ瞳で見つめた - auto-generated",
+      "expected": [
+        {
+          "lemma": "うるむ",
+          "pos": "Verb",
+          "surface": "うるん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "瞳",
+          "pos": "Noun",
+          "surface": "瞳"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "見つめる",
+          "pos": "Verb",
+          "surface": "見つめ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "urunda_de_tsumeta",
+      "input": "うるんだ瞳で見つめた"
+    },
+    {
+      "description": "光がにじんで見えた - auto-generated",
+      "expected": [
+        {
+          "lemma": "光",
+          "pos": "Noun",
+          "surface": "光"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "にじむ",
+          "pos": "Verb",
+          "surface": "にじん"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "見える",
+          "pos": "Verb",
+          "surface": "見え"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ganijinde_eta",
+      "input": "光がにじんで見えた"
+    },
+    {
+      "description": "涙がにじむ - auto-generated",
+      "expected": [
+        {
+          "lemma": "涙",
+          "pos": "Noun",
+          "surface": "涙"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "にじむ",
+          "pos": "Verb",
+          "surface": "にじむ"
+        }
+      ],
+      "id": "ganijimu",
+      "input": "涙がにじむ"
+    },
+    {
+      "description": "糸がゆるんで見えた - auto-generated",
+      "expected": [
+        {
+          "lemma": "糸",
+          "pos": "Noun",
+          "surface": "糸"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ゆるむ",
+          "pos": "Verb",
+          "surface": "ゆるん"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "見える",
+          "pos": "Verb",
+          "surface": "見え"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "gayurunde_eta",
+      "input": "糸がゆるんで見えた"
+    },
+    {
+      "description": "心がすさむ - auto-generated",
+      "expected": [
+        {
+          "lemma": "心",
+          "pos": "Noun",
+          "surface": "心"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "すさむ",
+          "pos": "Verb",
+          "surface": "すさむ"
+        }
+      ],
+      "id": "gasusamu",
+      "input": "心がすさむ"
+    },
+    {
+      "description": "昔を懐かしむ - auto-generated",
+      "expected": [
+        {
+          "lemma": "昔",
+          "pos": "Noun",
+          "surface": "昔"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "懐かしむ",
+          "pos": "Verb",
+          "surface": "懐かしむ"
+        }
+      ],
+      "id": "wo_kashimu_2",
+      "input": "昔を懐かしむ"
     }
   ],
   "description": "Godan Ma-row verbs (五段マ行動詞) - verbs ending in む",

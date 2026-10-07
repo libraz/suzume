@@ -89,6 +89,28 @@
         "ta_form",
         "mecab_compat"
       ]
+    },
+    {
+      "description": "一瞬たじろいだ - auto-generated",
+      "expected": [
+        {
+          "lemma": "一瞬",
+          "pos": "Noun",
+          "surface": "一瞬"
+        },
+        {
+          "lemma": "たじろぐ",
+          "pos": "Verb",
+          "surface": "たじろい"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "tajiroida",
+      "input": "一瞬たじろいだ"
     }
   ],
   "description": "Godan Ga-row verbs (五段ガ行動詞) - verbs ending in ぐ",

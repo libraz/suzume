@@ -53,6 +53,48 @@
         "mixed",
         "english"
       ]
+    },
+    {
+      "description": "彼女は、むせぶように泣いた - auto-generated",
+      "expected": [
+        {
+          "lemma": "彼女",
+          "pos": "Pronoun",
+          "surface": "彼女"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "むせぶ",
+          "pos": "Verb",
+          "surface": "むせぶ"
+        },
+        {
+          "lemma": "よう",
+          "pos": "Noun",
+          "surface": "よう"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "泣く",
+          "pos": "Verb",
+          "surface": "泣い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ha_musebuyouni_ita",
+      "input": "彼女は、むせぶように泣いた"
     }
   ],
   "description": "Godan Ba-row verbs (五段バ行動詞) - verbs ending in ぶ",

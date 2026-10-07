@@ -848,6 +848,28 @@
       ],
       "id": "okakeitashimasen",
       "input": "おかけいたしません"
+    },
+    {
+      "description": "油断めさるな - auto-generated",
+      "expected": [
+        {
+          "lemma": "油断",
+          "pos": "Noun",
+          "surface": "油断"
+        },
+        {
+          "lemma": "めさる",
+          "pos": "Verb",
+          "surface": "めさる"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        }
+      ],
+      "id": "mesaruna",
+      "input": "油断めさるな"
     }
   ],
   "description": "Honorific verbs (敬語動詞)",

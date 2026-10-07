@@ -1,0 +1,97 @@
+{
+  "cases": [
+    {
+      "description": "道にまよっていた - auto-generated",
+      "expected": [
+        {
+          "lemma": "道",
+          "pos": "Noun",
+          "surface": "道"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "まよう",
+          "pos": "Verb",
+          "surface": "まよっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "nimayottteita",
+      "input": "道にまよっていた"
+    },
+    {
+      "description": "煙がただよう - auto-generated",
+      "expected": [
+        {
+          "lemma": "煙",
+          "pos": "Noun",
+          "surface": "煙"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ただよう",
+          "pos": "Verb",
+          "surface": "ただよう"
+        }
+      ],
+      "id": "gatadayou",
+      "input": "煙がただよう"
+    },
+    {
+      "description": "恥じらうように笑った - auto-generated",
+      "expected": [
+        {
+          "lemma": "恥じらう",
+          "pos": "Verb",
+          "surface": "恥じらう"
+        },
+        {
+          "lemma": "よう",
+          "pos": "Noun",
+          "surface": "よう"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "笑う",
+          "pos": "Verb",
+          "surface": "笑っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "jirauyouni_ttta",
+      "input": "恥じらうように笑った"
+    }
+  ],
+  "description": "Godan Wa-row verbs (五段ワ行動詞) - verbs ending in う (part 2/2)",
+  "version": "1.0"
+}

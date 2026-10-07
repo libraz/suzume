@@ -1858,6 +1858,70 @@
       ],
       "id": "ki_gita_2",
       "input": "行き過ぎた"
+    },
+    {
+      "description": "床にへたりこむ - auto-generated",
+      "expected": [
+        {
+          "lemma": "床",
+          "pos": "Noun",
+          "surface": "床"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "へたりこむ",
+          "pos": "Verb",
+          "surface": "へたりこむ"
+        }
+      ],
+      "id": "nihetarikomu",
+      "input": "床にへたりこむ"
+    },
+    {
+      "description": "ふいに抱きすくめられ、息をのんだ - auto-generated",
+      "expected": [
+        {
+          "lemma": "ふいに",
+          "pos": "Adverb",
+          "surface": "ふいに"
+        },
+        {
+          "lemma": "抱きすくめる",
+          "pos": "Verb",
+          "surface": "抱きすくめ"
+        },
+        {
+          "lemma": "られる",
+          "pos": "Auxiliary",
+          "surface": "られ"
+        },
+        {
+          "lemma": "息",
+          "pos": "Noun",
+          "surface": "息"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "のむ",
+          "pos": "Verb",
+          "surface": "のん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "fuini_kisukumerare_wononda",
+      "input": "ふいに抱きすくめられ、息をのんだ"
     }
   ],
   "description": "Compound verbs (part 5/5)",

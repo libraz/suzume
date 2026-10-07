@@ -2759,8 +2759,67 @@
       ],
       "id": "moga_u",
       "input": "誰もが嫌う"
+    },
+    {
+      "description": "一瞬ためらった - auto-generated",
+      "expected": [
+        {
+          "lemma": "一瞬",
+          "pos": "Noun",
+          "surface": "一瞬"
+        },
+        {
+          "lemma": "ためらう",
+          "pos": "Verb",
+          "surface": "ためらっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "tamerattta",
+      "input": "一瞬ためらった"
+    },
+    {
+      "description": "部屋にただよっていた - auto-generated",
+      "expected": [
+        {
+          "lemma": "部屋",
+          "pos": "Noun",
+          "surface": "部屋"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "ただよう",
+          "pos": "Verb",
+          "surface": "ただよっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "nitadayottteita",
+      "input": "部屋にただよっていた"
     }
   ],
-  "description": "Godan Wa-row verbs (五段ワ行動詞) - verbs ending in う",
+  "description": "Godan Wa-row verbs (五段ワ行動詞) - verbs ending in う (part 1/2)",
   "version": "1.0"
 }

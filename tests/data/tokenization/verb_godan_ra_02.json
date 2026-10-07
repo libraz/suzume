@@ -602,6 +602,33 @@
       ],
       "id": "gaunettteita",
       "input": "道がうねっていた"
+    },
+    {
+      "description": "相手にへりくだった - auto-generated",
+      "expected": [
+        {
+          "lemma": "相手",
+          "pos": "Noun",
+          "surface": "相手"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "へりくだる",
+          "pos": "Verb",
+          "surface": "へりくだっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "niherikudattta",
+      "input": "相手にへりくだった"
     }
   ],
   "description": "Godan Ra-row verbs (五段ラ行動詞) - verbs ending in る (part 2/2)",

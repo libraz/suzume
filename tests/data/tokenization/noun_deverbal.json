@@ -1372,6 +1372,50 @@
       ],
       "id": "kuniha_gakakaru",
       "input": "書くには時間がかかる"
+    },
+    {
+      "description": "静かな暮らし - auto-generated",
+      "expected": [
+        {
+          "lemma": "静か",
+          "pos": "Adjective",
+          "surface": "静か"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "暮らし",
+          "pos": "Noun",
+          "surface": "暮らし"
+        }
+      ],
+      "id": "kana_rashi",
+      "input": "静かな暮らし"
+    },
+    {
+      "description": "日々の暮らし - auto-generated",
+      "expected": [
+        {
+          "lemma": "日々",
+          "pos": "Noun",
+          "surface": "日々"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "暮らし",
+          "pos": "Noun",
+          "surface": "暮らし"
+        }
+      ],
+      "id": "no_rashi",
+      "input": "日々の暮らし"
     }
   ],
   "description": "noun_deverbal tests",

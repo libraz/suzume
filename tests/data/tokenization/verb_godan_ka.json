@@ -1138,6 +1138,55 @@
       ],
       "id": "todokundesu",
       "input": "とどくんです"
+    },
+    {
+      "description": "恐怖におののく - auto-generated",
+      "expected": [
+        {
+          "lemma": "恐怖",
+          "pos": "Noun",
+          "surface": "恐怖"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "おののく",
+          "pos": "Verb",
+          "surface": "おののく"
+        }
+      ],
+      "id": "niononoku",
+      "input": "恐怖におののく"
+    },
+    {
+      "description": "恐怖でよろめいた - auto-generated",
+      "expected": [
+        {
+          "lemma": "恐怖",
+          "pos": "Noun",
+          "surface": "恐怖"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "よろめく",
+          "pos": "Verb",
+          "surface": "よろめい"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "deyoromeita",
+      "input": "恐怖でよろめいた"
     }
   ],
   "description": "Godan Ka-row verbs (五段カ行動詞) - verbs ending in く",

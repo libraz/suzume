@@ -1002,6 +1002,205 @@
       ],
       "id": "wo_rashinagara_2",
       "input": "床を濡らしながら"
+    },
+    {
+      "description": "チャンスを逃した - auto-generated",
+      "expected": [
+        {
+          "lemma": "チャンス",
+          "pos": "Noun",
+          "surface": "チャンス"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "逃す",
+          "pos": "Verb",
+          "surface": "逃し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wo_shita_5",
+      "input": "チャンスを逃した"
+    },
+    {
+      "description": "聞き逃した - auto-generated",
+      "expected": [
+        {
+          "lemma": "聞く",
+          "pos": "Verb",
+          "surface": "聞き"
+        },
+        {
+          "lemma": "逃す",
+          "pos": "Verb",
+          "surface": "逃し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ki_shita",
+      "input": "聞き逃した"
+    },
+    {
+      "description": "子供を甘やかした - auto-generated",
+      "expected": [
+        {
+          "lemma": "子供",
+          "pos": "Noun",
+          "surface": "子供"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "甘やかす",
+          "pos": "Verb",
+          "surface": "甘やかし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wo_yakashita",
+      "input": "子供を甘やかした"
+    },
+    {
+      "description": "冷やかしそうな顔 - auto-generated",
+      "expected": [
+        {
+          "lemma": "冷やかす",
+          "pos": "Verb",
+          "surface": "冷やかし"
+        },
+        {
+          "lemma": "そう",
+          "pos": "Auxiliary",
+          "surface": "そう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "顔",
+          "pos": "Noun",
+          "surface": "顔"
+        }
+      ],
+      "id": "yakashisouna",
+      "input": "冷やかしそうな顔"
+    },
+    {
+      "description": "子供を家に帰した - auto-generated",
+      "expected": [
+        {
+          "lemma": "子供",
+          "pos": "Noun",
+          "surface": "子供"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "家",
+          "pos": "Noun",
+          "surface": "家"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "帰す",
+          "pos": "Verb",
+          "surface": "帰し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wo_ni_shita",
+      "input": "子供を家に帰した"
+    },
+    {
+      "description": "顔を人前に晒した - auto-generated",
+      "expected": [
+        {
+          "lemma": "顔",
+          "pos": "Noun",
+          "surface": "顔"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "人前",
+          "pos": "Noun",
+          "surface": "人前"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "晒す",
+          "pos": "Verb",
+          "surface": "晒し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wo_ni_shita_2",
+      "input": "顔を人前に晒した"
+    },
+    {
+      "description": "話をはぐらかす - auto-generated",
+      "expected": [
+        {
+          "lemma": "話",
+          "pos": "Noun",
+          "surface": "話"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "はぐらかす",
+          "pos": "Verb",
+          "surface": "はぐらかす"
+        }
+      ],
+      "id": "wohagurakasu",
+      "input": "話をはぐらかす"
     }
   ],
   "description": "Godan Sa-row verbs (五段サ行動詞) - verbs ending in す",

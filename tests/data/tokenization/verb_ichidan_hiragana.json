@@ -622,6 +622,134 @@
       ],
       "id": "yuttkurinaderu",
       "input": "ゆっくりなでる"
+    },
+    {
+      "description": "肩にもたれて目を閉じた - auto-generated",
+      "expected": [
+        {
+          "lemma": "肩",
+          "pos": "Noun",
+          "surface": "肩"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "もたれる",
+          "pos": "Verb",
+          "surface": "もたれ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "目",
+          "pos": "Noun",
+          "surface": "目"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "閉じる",
+          "pos": "Verb",
+          "surface": "閉じ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "nimotarete_wo_jita",
+      "input": "肩にもたれて目を閉じた"
+    },
+    {
+      "description": "壁にもたれた - auto-generated",
+      "expected": [
+        {
+          "lemma": "壁",
+          "pos": "Noun",
+          "surface": "壁"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "もたれる",
+          "pos": "Verb",
+          "surface": "もたれ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "nimotareta",
+      "input": "壁にもたれた"
+    },
+    {
+      "description": "水をぶっかけられた - auto-generated",
+      "expected": [
+        {
+          "lemma": "水",
+          "pos": "Noun",
+          "surface": "水"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "ぶっかける",
+          "pos": "Verb",
+          "surface": "ぶっかけ"
+        },
+        {
+          "lemma": "られる",
+          "pos": "Auxiliary",
+          "surface": "られ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wobuttkakerareta",
+      "input": "水をぶっかけられた"
+    },
+    {
+      "description": "裾をたくしあげる - auto-generated",
+      "expected": [
+        {
+          "lemma": "裾",
+          "pos": "Noun",
+          "surface": "裾"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "たくしあげる",
+          "pos": "Verb",
+          "surface": "たくしあげる"
+        }
+      ],
+      "id": "wotakushiageru",
+      "input": "裾をたくしあげる"
     }
   ],
   "description": "verb_ichidan_hiragana tests",
