@@ -238,6 +238,23 @@ bool isPredicateChainClosedByAuxiliary(const dictionary::DictionaryManager* dict
          (closes_on_predicate_cell || chain_takes_i);
 }
 
+std::string clippedExclamativeBase(const dictionary::DictionaryManager* dict_manager,
+                                   const std::vector<char32_t>& codepoints,
+                                   const std::vector<normalize::CharType>& char_types, size_t start,
+                                   size_t sokuon_pos) {
+  if (sokuon_pos <= start || sokuon_pos >= codepoints.size() || codepoints[sokuon_pos] != core::hiragana::kSmallTsu) {
+    return {};
+  }
+  const size_t after = sokuon_pos + 1;
+  const bool closes_utterance =
+      after >= codepoints.size() || (after < char_types.size() && char_types[after] == normalize::CharType::Symbol);
+  if (!closes_utterance) {
+    return {};
+  }
+  std::string base_form = extractSubstring(codepoints, start, sokuon_pos) + "い";
+  return verb_helpers::isIAdjectiveInDictionary(dict_manager, base_form) ? base_form : std::string{};
+}
+
 bool isVerbOnbinContextAfterI(const std::vector<char32_t>& codepoints, size_t pos) {
   if (pos >= codepoints.size()) {
     return false;

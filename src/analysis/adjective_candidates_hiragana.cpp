@@ -764,16 +764,21 @@ void appendClippedExclamative(const HiraganaAdjectiveRun& run, std::vector<Unkno
     const bool clipped_before_ka = codepoints[stem_end - 1] == U'い' && after_sokuon < codepoints.size() &&
                                    codepoints[after_sokuon] == U'か' && closes_utterance(after_sokuon + 1) &&
                                    !follows_case_particle;
-    if (!clipped_before_ka && (stem_end < start_pos + 2 || !closes_utterance(after_sokuon))) {
-      break;
-    }
     // Reconstructing the base form is not enough on its own here: the sokuon
     // carries no information about the word in front of it, so any two morae
     // plus い pass an inflection check and the run turns into a coined
     // adjective (たぞっ as たぞい). The nominalizer above can afford that check
     // because さ is itself the evidence; this cell needs the entry.
-    const std::string base_form = extractSubstring(codepoints, start_pos, stem_end) + "い";
-    if (!isAdjectiveInDictionary(dict_manager, base_form)) {
+    std::string base_form;
+    if (clipped_before_ka) {
+      base_form = extractSubstring(codepoints, start_pos, stem_end) + "い";
+      if (!isAdjectiveInDictionary(dict_manager, base_form)) {
+        break;
+      }
+    } else if (stem_end >= start_pos + 2) {
+      base_form = adj_detail::clippedExclamativeBase(dict_manager, codepoints, run.char_types, start_pos, stem_end);
+    }
+    if (base_form.empty()) {
       break;
     }
     auto exclamative = makeIAdjCellCandidate(

@@ -325,6 +325,57 @@
       ],
       "id": "omoshiro",
       "input": "おもしろ。"
+    },
+    {
+      "description": "冷たっ！ - auto-generated",
+      "expected": [
+        {
+          "lemma": "冷たい",
+          "pos": "Adjective",
+          "surface": "冷たっ"
+        }
+      ],
+      "id": "tatt_2",
+      "input": "冷たっ！"
+    },
+    {
+      "description": "痛っ、と叫んだ - auto-generated",
+      "expected": [
+        {
+          "lemma": "痛い",
+          "pos": "Adjective",
+          "surface": "痛っ"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "叫ぶ",
+          "pos": "Verb",
+          "surface": "叫ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "tt_to_nda",
+      "input": "痛っ、と叫んだ"
+    },
+    {
+      "description": "寒っ - auto-generated",
+      "expected": [
+        {
+          "lemma": "寒い",
+          "pos": "Adjective",
+          "surface": "寒っ"
+        }
+      ],
+      "id": "tt",
+      "input": "寒っ"
     }
   ],
   "description": "Taru-adjectives and irregular adjectives",

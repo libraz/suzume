@@ -316,6 +316,25 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
   // out of the whole-span adjective path.
   constexpr size_t kMaxKanjiAdjectiveStemLength = 6;
   size_t kanji_end = findCharRegionEnd(char_types, start_pos, 2, normalize::CharType::Kanji);
+  // The clipped exclamative on a kanji stem (冷た+っ！, 痛+っ、), with the same
+  // dictionary gate and utterance end as the kana path.
+  for (size_t sokuon_pos = kanji_end;
+       sokuon_pos < char_types.size() && char_types[sokuon_pos] == normalize::CharType::Hiragana; ++sokuon_pos) {
+    if (codepoints[sokuon_pos] != core::hiragana::kSmallTsu) {
+      continue;
+    }
+    const std::string base_form =
+        adj_detail::clippedExclamativeBase(dict_manager, codepoints, char_types, start_pos, sokuon_pos);
+    if (!base_form.empty()) {
+      auto exclamative = adj_detail::makeIAdjCellCandidate(
+          extractSubstring(codepoints, start_pos, sokuon_pos + 1), start_pos, sokuon_pos + 1, base_form,
+          core::ExtendedPOS::AdjBasic, candidate::kAdjStemDictionaryCost, CandidateOrigin::AdjectiveI,
+          candidate::kDictionaryOriginConfidence, "adj_stem_kanji_exclamative_sokuon");
+      exclamative.lemma_verified = true;
+      candidates.push_back(std::move(exclamative));
+    }
+    break;
+  }
   const size_t extended_kanji_end =
       findCharRegionEnd(char_types, start_pos, kMaxKanjiAdjectiveStemLength, normalize::CharType::Kanji);
   if (extended_kanji_end > kanji_end && extended_kanji_end < char_types.size() &&

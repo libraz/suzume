@@ -277,6 +277,17 @@ bool predicateFollowsContinuative(const std::vector<char32_t>& codepoints, size_
 bool spansPastAdjectiveEnding(const std::string& surface, const std::string& base_form);
 
 /**
+ * @brief Base form of the clipped exclamative over [start, sokuon_pos], or empty
+ *
+ * An i-adjective closes on its bare stem with an emphatic sokuon that ends the
+ * utterance (すごっ, 冷たっ, 痛っ、). The sokuon carries no evidence of the word
+ * in front of it, so the stem plus い has to be a listed i-adjective.
+ */
+std::string clippedExclamativeBase(const dictionary::DictionaryManager* dict_manager,
+                                   const std::vector<char32_t>& codepoints,
+                                   const std::vector<normalize::CharType>& char_types, size_t start, size_t sokuon_pos);
+
+/**
  * @brief Whether [start, end) is a verified i-adjective stem plus the suffix げ
  *
  * The stem is two or more characters and passes the productive i-adjective
