@@ -154,20 +154,18 @@ bool isProductiveShiiAdjectiveTerminal(std::string_view surface, const grammar::
   if (!utf8::endsWith(surface, "しい") || normalize::utf8Length(surface) < 3) {
     return false;
   }
-  const auto& analyses = inflection.analyze(surface);
-  return std::any_of(analyses.begin(), analyses.end(), [&](const auto& analysis) {
-    return analysis.verb_type == grammar::VerbType::IAdjective && analysis.base_form == surface &&
-           analysis.confidence >= candidate::kCompoundAdjConfMin;
-  });
+  return readsAsBaseForm(inflection, surface, surface, grammar::VerbType::IAdjective, candidate::kCompoundAdjConfMin);
 }
 
 bool readsAsIAdjectiveTerminal(std::string_view surface, const grammar::Inflection& inflection) {
-  if (!utf8::endsWith(surface, "い")) {
-    return false;
-  }
+  return utf8::endsWith(surface, "い") && readsAsBaseForm(inflection, surface, surface, grammar::VerbType::IAdjective);
+}
+
+bool readsAsBaseForm(const grammar::Inflection& inflection, std::string_view surface, std::string_view base_form,
+                     grammar::VerbType verb_type, float min_confidence) {
   const auto& analyses = inflection.analyze(surface);
-  return std::any_of(analyses.begin(), analyses.end(), [&](const auto& analysis) {
-    return analysis.verb_type == grammar::VerbType::IAdjective && analysis.base_form == surface;
+  return std::any_of(analyses.begin(), analyses.end(), [&](const grammar::InflectionCandidate& analysis) {
+    return analysis.verb_type == verb_type && analysis.base_form == base_form && analysis.confidence >= min_confidence;
   });
 }
 

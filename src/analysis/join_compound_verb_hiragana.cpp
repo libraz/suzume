@@ -47,15 +47,8 @@ size_t findParticleInitialClosedOnbinSplit(std::string_view text, const std::vec
       continue;
     }
     const std::string v1_base = normalize::concat(v1_surface, "る");
-    bool has_exact_ichidan = false;
-    for (const auto& analysis : inflection.analyze(v1_surface)) {
-      if (analysis.verb_type == grammar::VerbType::Ichidan && analysis.base_form == v1_base &&
-          analysis.confidence >= candidate::verb_cost::kClosedOnbinCompoundV1MinConfidence) {
-        has_exact_ichidan = true;
-        break;
-      }
-    }
-    if (!has_exact_ichidan) {
+    if (!verb_helpers::readsAsBaseForm(inflection, v1_surface, v1_base, grammar::VerbType::Ichidan,
+                                       candidate::verb_cost::kClosedOnbinCompoundV1MinConfidence)) {
       continue;
     }
 

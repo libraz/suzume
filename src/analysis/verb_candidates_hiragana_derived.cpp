@@ -61,20 +61,6 @@ bool startsWithRenyokeiAuxiliary(std::string_view following_surface) {
 
 }  // namespace
 
-// A dictionary hit alone is insufficient for an euphonic Godan candidate:
-// the reconstructed base must also have the Godan class that licenses the
-// observed onbin. This excludes non-Godan homographs such as する from a
-// fabricated すっ+て path.
-bool hasMatchingGodanInflection(const grammar::Inflection& inflection, std::string_view base_form,
-                                grammar::VerbType expected_type) {
-  for (const auto& analysis : inflection.analyze(base_form)) {
-    if (analysis.base_form == base_form && analysis.verb_type == expected_type) {
-      return true;
-    }
-  }
-  return false;
-}
-
 void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, size_t start_pos, size_t hiragana_end,
                                      const std::vector<normalize::CharType>& char_types,
                                      const grammar::Inflection& inflection,
@@ -502,9 +488,10 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
       const std::string stem = extractSubstring(codepoints, start_pos, onbin_end - 1);
       const std::string_view onbin = is_sokuonbin ? "っ" : "ん";
       auto onbin_match = vh::firstGodanOnbinDictBase(dict_manager, stem, onbin);
+      // The base must also inflect as the Godan row the onbin implies (no する from すっ+て).
       if (is_sokuonbin && onbin_match.matched &&
           (grammar::isSuruBaseForm(onbin_match.base_form) ||
-           !hasMatchingGodanInflection(inflection, onbin_match.base_form, onbin_match.verb_type))) {
+           !vh::readsAsBaseForm(inflection, onbin_match.base_form, onbin_match.base_form, onbin_match.verb_type))) {
         onbin_match.matched = false;
       }
       // 来い|って: the っ belongs to the quotative after a finished predicate.

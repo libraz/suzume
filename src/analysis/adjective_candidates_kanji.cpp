@@ -402,13 +402,8 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
     // unpenalized cost. Suppress the fused candidate so the noun and
     // negative-adjective path wins. Dictionary-confirmed multi-kanji
     // nai-adjectives (味気ない etc.) keep their fused form, in any cell.
-    bool is_bare_nai_form = false;
-    for (const auto& nai_cand : inflection.analyze(hiragana_part)) {
-      if (nai_cand.verb_type == grammar::VerbType::IAdjective && nai_cand.base_form == kNegativeAdjectiveBase) {
-        is_bare_nai_form = true;
-        break;
-      }
-    }
+    const bool is_bare_nai_form =
+        verb_helpers::readsAsBaseForm(inflection, hiragana_part, kNegativeAdjectiveBase, grammar::VerbType::IAdjective);
     if (is_bare_nai_form && (kanji_end - start_pos) >= 2 && !isAdjectiveInDictionary(dict_manager, surface) &&
         !isAdjectiveInDictionary(dict_manager,
                                  extractSubstring(codepoints, start_pos, kanji_end) + kNegativeAdjectiveBase)) {

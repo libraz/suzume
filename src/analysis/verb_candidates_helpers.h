@@ -12,6 +12,7 @@
 
 #include <array>
 #include <initializer_list>
+#include <limits>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -212,6 +213,15 @@ bool isProductiveShiiAdjectiveTerminal(std::string_view surface, const grammar::
  * terminal reading needs no lexical support there.
  */
 bool readsAsIAdjectiveTerminal(std::string_view surface, const grammar::Inflection& inflection);
+
+/**
+ * @brief Whether some analysis of @p surface yields @p base_form with @p verb_type
+ *
+ * @param min_confidence Lowest accepted confidence; the default accepts any,
+ *        since penalties can push a confidence below zero
+ */
+bool readsAsBaseForm(const grammar::Inflection& inflection, std::string_view surface, std::string_view base_form,
+                     grammar::VerbType verb_type, float min_confidence = std::numeric_limits<float>::lowest());
 
 /**
  * @brief Check if a surface exists in dictionary as a noun (exact match)

@@ -43,11 +43,8 @@ bool analyzesAsVerbType(const grammar::Inflection& inflection, const std::string
 // type and base form with constructed-verb confidence.
 bool observedFormConfirms(const grammar::Inflection& inflection, const std::vector<char32_t>& codepoints,
                           size_t start_pos, size_t end_pos, grammar::VerbType verb_type, const std::string& base_form) {
-  const auto& results = analysesInRange(inflection, codepoints, start_pos, end_pos);
-  return std::any_of(results.begin(), results.end(), [&](const grammar::InflectionCandidate& result) {
-    return result.verb_type == verb_type && result.base_form == base_form &&
-           result.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence;
-  });
+  return vh::readsAsBaseForm(inflection, extractSubstring(codepoints, start_pos, end_pos), base_form, verb_type,
+                             candidate::verb_cost::kConstructedVerbMinConfidence);
 }
 
 // Godan mizenkei stem candidates for auxiliary separation: kanji + one a-row
@@ -477,14 +474,7 @@ void appendGodanMizenkeiZuCandidates(const std::vector<char32_t>& codepoints, si
     // Analyze mizenkei+ない form (standard negative) for better confidence
     // Base form alone may not be recognized. Multi-kanji stems require
     // dictionary evidence so a preceding noun cannot be absorbed.
-    std::string neg_form = surface + "ない";
-    const auto& infl_results = inflection.analyze(neg_form);
-    for (const auto& cand : infl_results) {
-      if (cand.base_form == base_form && cand.verb_type == verb_type && cand.confidence >= 0.3F) {
-        is_valid = true;
-        break;
-      }
-    }
+    is_valid = vh::readsAsBaseForm(inflection, surface + "ない", base_form, verb_type, 0.3F);
   }
 
   // An irrealis whose own last mora is a registered case particle is

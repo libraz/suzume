@@ -142,16 +142,9 @@ bool spellsClosedSequenceBeforeSokuon(const std::string& hiragana_part) {
 // without turning arbitrary long auxiliary chains into one predicate.
 bool sokuonbinInflVerified(const grammar::Inflection& inflection, const std::string& onbin_surface,
                            const std::string& potential_base, size_t hiragana_before_onbin) {
-  if (hiragana_before_onbin == 0) {
-    return false;
-  }
-  for (const auto& result : inflection.analyze(onbin_surface + "た")) {
-    if (result.verb_type == grammar::VerbType::GodanRa && result.base_form == potential_base &&
-        result.confidence >= candidate::verb_cost::kKanjiSokuonbinMinConfidence) {
-      return true;
-    }
-  }
-  return false;
+  return hiragana_before_onbin != 0 &&
+         vh::readsAsBaseForm(inflection, onbin_surface + "た", potential_base, grammar::VerbType::GodanRa,
+                             candidate::verb_cost::kKanjiSokuonbinMinConfidence);
 }
 void appendExtendedSokuonbinCandidates(const std::vector<char32_t>& codepoints, size_t start_pos, size_t kanji_end,
                                        size_t hiragana_end, const grammar::Inflection& inflection,

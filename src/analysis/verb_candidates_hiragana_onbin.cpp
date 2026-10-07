@@ -163,7 +163,7 @@ void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, s
       // Check if base form exists in dictionary as this verb type
       bool is_valid_verb = !grammar::isSuruBaseForm(base_form) && godan_paradigm_attested &&
                            vh::isVerbInDictionary(dict_manager, base_form) &&
-                           hasMatchingGodanInflection(inflection, base_form, verb_type);
+                           vh::readsAsBaseForm(inflection, base_form, base_form, verb_type);
       // Capture dictionary attestation before the inflection fallback below may
       // set is_valid_verb on a non-dictionary base.
       const bool lemma_dict_verified = is_valid_verb;

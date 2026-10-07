@@ -26,8 +26,6 @@ bool endsWithParticleAfterVerb(const dictionary::DictionaryManager* dict_manager
 bool opensPredicateSlot(const std::vector<char32_t>& codepoints, size_t start_pos);
 bool pronounEndsAt(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
                    size_t pos);
-bool hasMatchingGodanInflection(const grammar::Inflection& inflection, std::string_view base_form,
-                                grammar::VerbType expected_type);
 // True when start_pos follows a case particle whose host is a kanji or a
 // dictionary noun/pronoun, which fixes start_pos as a predicate slot.
 bool followsKanjiOrNominalHostBeforeCaseParticle(const std::vector<char32_t>& codepoints, size_t start_pos,

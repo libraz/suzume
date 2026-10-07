@@ -267,11 +267,7 @@ void appendIchidanRareruCandidates(const std::vector<char32_t>& codepoints, size
     }
 
     const auto analyzes_as_ichidan = [&](float min_confidence) {
-      const auto& analyses = inflection.analyze(base_form);
-      return std::any_of(analyses.begin(), analyses.end(), [&](const auto& inflected) {
-        return inflected.verb_type == grammar::VerbType::Ichidan && inflected.base_form == base_form &&
-               inflected.confidence >= min_confidence;
-      });
+      return vh::readsAsBaseForm(inflection, base_form, base_form, grammar::VerbType::Ichidan, min_confidence);
     };
     const bool opens_predicate_slot = start_pos == 0 || vh::followsCaseParticle(dict_manager, codepoints, start_pos);
     // Common hiragana ichidan verbs (いる, おきる, みる) may be missing from L2.

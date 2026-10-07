@@ -418,14 +418,10 @@ void appendNOnbinNaiCandidates(const std::vector<char32_t>& codepoints, size_t s
     // Construct base form: stem + る (godan-ra)
     std::string base_form = stem + "る";
 
-    // Validate: check if the standard form (stem + らない) is a valid verb
-    std::string standard_form = stem + "らない";
-    // (or that the base form is in the dictionary)
-    const auto& analyses = inflection.analyze(standard_form);
+    // Validate: the base form is in the dictionary, or the standard form
+    // (stem + らない) reads as that GodanRa verb.
     const bool is_in_dict = vh::isVerbInDictionary(dict_manager, base_form);
-    if (!is_in_dict && std::none_of(analyses.begin(), analyses.end(), [&](const auto& cand) {
-          return cand.verb_type == grammar::VerbType::GodanRa && cand.base_form == base_form;
-        })) {
+    if (!is_in_dict && !vh::readsAsBaseForm(inflection, stem + "らない", base_form, grammar::VerbType::GodanRa)) {
       continue;
     }
 
