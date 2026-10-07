@@ -1956,6 +1956,65 @@
       ],
       "id": "haniyarito_ttta",
       "input": "彼はにやりと笑った"
+    },
+    {
+      "description": "reduplication with a sequentially voiced second half",
+      "expected": [
+        {
+          "lemma": "はるばる",
+          "pos": "Adverb",
+          "surface": "はるばる"
+        },
+        {
+          "lemma": "やる",
+          "pos": "Verb",
+          "surface": "やっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "harubaruyattte_ta",
+      "input": "はるばるやって来た"
+    },
+    {
+      "description": "reduplication with a sequentially voiced second half",
+      "expected": [
+        {
+          "lemma": "ほのぼの",
+          "pos": "Adverb",
+          "surface": "ほのぼの"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "honobonotoshita",
+      "input": "ほのぼのとした"
     }
   ],
   "description": "Onomatopoeia and mimetic words",

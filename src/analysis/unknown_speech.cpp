@@ -442,10 +442,13 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
   }
   for (size_t half = mimetic_len / 2; half >= kMinReduplicationHalf && uniform_prefix < mimetic_end; --half) {
     const size_t doubled_end = start_pos + (2 * half);
-    // The doubling repeats the opening codepoint at the second half, so one
-    // comparison rejects most widths before the halves are walked.
-    if (codepoints[start_pos + half] != codepoints[start_pos] || isSmallKanaAt(start_pos) ||
-        isSmallKanaAt(doubled_end) || uniform_prefix - start_pos >= half) {
+    // The doubling repeats the opening codepoint at the second half, possibly
+    // sequentially voiced (はる+ばる, ほの+ぼの), so one comparison rejects most
+    // widths before the halves are walked.
+    const char32_t second_onset = codepoints[start_pos + half];
+    if ((second_onset != codepoints[start_pos] &&
+         !kana::isSequentialVoicingPair(codepoints[start_pos], second_onset)) ||
+        isSmallKanaAt(start_pos) || isSmallKanaAt(doubled_end) || uniform_prefix - start_pos >= half) {
       continue;
     }
     bool halves_match = true;
