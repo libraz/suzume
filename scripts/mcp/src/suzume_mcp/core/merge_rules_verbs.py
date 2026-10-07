@@ -289,6 +289,24 @@ def _merge_lexicalized_words(state: MergeState) -> bool:
                     applied_rule = "kana-ichidan-lexicon"
                 break
 
+        # 10c. A kanji-led verb cell spelled twice in a row is one reduplicated
+        # adverb (代わる代わる, 見る見る); the reference lists only some of them
+        # as headwords and splits the rest into two predicates.
+        if (
+            not merged
+            and t.get("pos") == "動詞"
+            and i + 1 < len(tokens)
+            and tokens[i + 1].get("surface") == t.get("surface")
+            and tokens[i + 1].get("pos") == "動詞"
+            and regex.match(r"^\p{Han}+\p{Hiragana}+$", t.get("surface", ""))
+        ):
+            doubled = t["surface"] * 2
+            result.append({"surface": doubled, "pos": "副詞", "lemma": doubled})
+            i += 2
+            merged = True
+            if applied_rule is None:
+                applied_rule = "reduplicated-verb-adverb"
+
         # 11. Colloquial intensifier めちゃ
         if not merged and t.get("surface") == "め" and t.get("pos") == "名詞":
             if i + 1 < len(tokens) and tokens[i + 1].get("surface") == "ちゃ":
