@@ -700,17 +700,19 @@ bool admitsPromotedRun(const BracketedNounContext& ctx, const BracketedScan& bra
   // no predicate reading, so it stands down here whatever brackets the run.
   const bool spells_contracted_hypothetical =
       spellsContractedHypothetical(codepoints, start_pos, scan, ctx.inflection, dict_manager);
-  // The rescue may not stop part-way through a registered predicate that
-  // begins inside the run. ゆえあ|って cuts the onbin stem あっ in half, and
-  // what is left of the te-form then looks like the quotative particle that
-  // brackets it (ゆえ|あっ|て).
+  // The rescue may not stop part-way through a registered predicate or
+  // determiner that begins inside the run. ゆえあ|って cuts the onbin stem あっ
+  // in half, and what is left of the te-form then looks like the quotative
+  // particle that brackets it (ゆえ|あっ|て); なくこ|の cuts この the same way.
+  constexpr PartOfSpeechMask kOverhangWordMask = partOfSpeechMask(core::PartOfSpeech::Verb) |
+                                                 partOfSpeechMask(core::PartOfSpeech::Adjective) |
+                                                 partOfSpeechMask(core::PartOfSpeech::Determiner);
   bool cuts_into_predicate = false;
   for (size_t probe = start_pos + 1; probe < scan && !cuts_into_predicate && dict_manager != nullptr; ++probe) {
     constexpr size_t kOverhangProbe = 2;
     const size_t probe_limit = std::min(codepoints.size(), scan + kOverhangProbe);
     for (size_t probe_end = scan + 1; probe_end <= probe_limit; ++probe_end) {
-      if (hasExactPartOfSpeech(*dict_manager, codepoints, probe, probe_end,
-                               partOfSpeechMask(core::PartOfSpeech::Verb))) {
+      if (hasExactPartOfSpeech(*dict_manager, codepoints, probe, probe_end, kOverhangWordMask)) {
         cuts_into_predicate = true;
         break;
       }

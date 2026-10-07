@@ -389,6 +389,127 @@
       ],
       "id": "ito_shiki_2",
       "input": "いと悲しき物語"
+    },
+    {
+      "description": "kana noun rescue does not stop inside a determiner overhanging the bracket",
+      "expected": [
+        {
+          "lemma": "幾度",
+          "pos": "Noun",
+          "surface": "幾度"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "なく"
+        },
+        {
+          "lemma": "この",
+          "pos": "Determiner",
+          "surface": "この"
+        },
+        {
+          "lemma": "街",
+          "pos": "Noun",
+          "surface": "街"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "訪れる",
+          "pos": "Verb",
+          "surface": "訪れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "tonakukono_wo_reta",
+      "input": "幾度となくこの街を訪れた"
+    },
+    {
+      "description": "kana noun rescue does not stop inside a determiner overhanging the bracket",
+      "expected": [
+        {
+          "lemma": "意味",
+          "pos": "Noun",
+          "surface": "意味"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "なく"
+        },
+        {
+          "lemma": "この",
+          "pos": "Determiner",
+          "surface": "この"
+        },
+        {
+          "lemma": "道",
+          "pos": "Noun",
+          "surface": "道"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        }
+      ],
+      "id": "monakukono_wo",
+      "input": "意味もなくこの道を"
+    },
+    {
+      "description": "classical attributive なき between alternative particles, not a rescued kana noun",
+      "expected": [
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "なき"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "風",
+          "pos": "Noun",
+          "surface": "風"
+        }
+      ],
+      "id": "arukanakikano",
+      "input": "あるかなきかの風"
     }
   ],
   "description": "adjective_classical tests",
