@@ -137,9 +137,10 @@ bool isFollowedByNominalParticle(const std::vector<char32_t>& codepoints, size_t
 // boundary (この時妙なもの, その事不思議な結末). The whole kanji run determines
 // this boundary so that shorter fabricated prefixes such as 時不 do not evade it.
 bool hasFormalNounNaAdjectiveBoundary(const std::vector<char32_t>& codepoints, size_t start_pos, size_t kanji_end,
-                                      normalize::CharType start_type) {
+                                      normalize::CharType start_type,
+                                      const dictionary::DictionaryManager* dict_manager) {
   if (start_type != normalize::CharType::Kanji || kanji_end <= start_pos + 1 || kanji_end >= codepoints.size() ||
-      codepoints[kanji_end] != U'な') {
+      codepoints[kanji_end] != U'な' || verb_helpers::opensNonCopularParticleAt(dict_manager, codepoints, kanji_end)) {
     return false;
   }
   if (kanji_end + 1 < codepoints.size() && codepoints[kanji_end + 1] == U'ら') {
@@ -911,7 +912,7 @@ void UnknownWordGenerator::appendSameTypePrefixCandidates(const std::vector<char
 
   // Generate candidates for different lengths
   const bool has_formal_noun_na_adjective_boundary =
-      hasFormalNounNaAdjectiveBoundary(codepoints, start_pos, end_pos, start_type);
+      hasFormalNounNaAdjectiveBoundary(codepoints, start_pos, end_pos, start_type, dict_manager_);
   const size_t first_candidate_length = starts_non_word_run ? end_pos - start_pos : 1;
   const bool starts_at_dictionary_verb_continuative =
       start_type == normalize::CharType::Hiragana &&

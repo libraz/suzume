@@ -1790,6 +1790,72 @@
       ],
       "id": "monono_after_onbin_past",
       "input": "行ったものの会えなかった"
+    },
+    {
+      "description": "短い時間ながら - auto-generated",
+      "expected": [
+        {
+          "lemma": "短い",
+          "pos": "Adjective",
+          "surface": "短い"
+        },
+        {
+          "lemma": "時間",
+          "pos": "Noun",
+          "surface": "時間"
+        },
+        {
+          "lemma": "ながら",
+          "pos": "Particle",
+          "surface": "ながら"
+        }
+      ],
+      "id": "i_nagara",
+      "input": "短い時間ながら"
+    },
+    {
+      "description": "短い期間ながら - auto-generated",
+      "expected": [
+        {
+          "lemma": "短い",
+          "pos": "Adjective",
+          "surface": "短い"
+        },
+        {
+          "lemma": "期間",
+          "pos": "Noun",
+          "surface": "期間"
+        },
+        {
+          "lemma": "ながら",
+          "pos": "Particle",
+          "surface": "ながら"
+        }
+      ],
+      "id": "i_nagara_2",
+      "input": "短い期間ながら"
+    },
+    {
+      "description": "狭い部屋ながら - auto-generated",
+      "expected": [
+        {
+          "lemma": "狭い",
+          "pos": "Adjective",
+          "surface": "狭い"
+        },
+        {
+          "lemma": "部屋",
+          "pos": "Noun",
+          "surface": "部屋"
+        },
+        {
+          "lemma": "ながら",
+          "pos": "Particle",
+          "surface": "ながら"
+        }
+      ],
+      "id": "i_nagara_3",
+      "input": "狭い部屋ながら"
     }
   ],
   "description": "particle_conjunctive tests",

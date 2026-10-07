@@ -65,9 +65,10 @@ bool closesOnNegationPrefixedAdjective(const std::vector<char32_t>& codepoints, 
 // is not a stem this rule invented an adjective for.
 //
 // The two callers ask for different classes, and the difference is
-// grammatical rather than incidental. An auxiliary or a particle attaches to a
-// stem, so 壮大+なる and 遺憾+ながら still have a na-adjective stem in front of
-// them; only a mixed run needs protecting there, because its own boundary is
+// grammatical rather than incidental. An auxiliary attaches to a stem, so
+// 壮大+なる still has a na-adjective stem in front of it; a particle such as
+// ながら takes a plain noun as readily, so the kanji rule reads no stem from it
+// (opensNonCopularParticleAt). Only a mixed run needs protecting here, because its own boundary is
 // what is in question. A closed-class *predicate* forms its own phrase
 // instead, so it leaves an ordinary nominal to its left (勝利+なし), and so
 // does a final particle, which closes the sentence on it (東京+なう).
@@ -501,6 +502,7 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
   const bool followed_by_na =
       kanji_end < codepoints.size() && codepoints[kanji_end] == U'な' &&
       !startsLongerClosedForm(codepoints, kanji_end, dict_manager, kClosedFormAfterKanjiStem, true) &&
+      !verb_helpers::opensNonCopularParticleAt(dict_manager, codepoints, kanji_end) &&
       (kanji_end + 1 >= codepoints.size() ||
        (codepoints[kanji_end + 1] != U'ら' && codepoints[kanji_end + 1] != U'の' &&
         codepoints[kanji_end + 1] != U'り'));

@@ -76,6 +76,17 @@ bool isStrandedPotentialStem(const dictionary::DictionaryManager* dict_manager, 
 bool isAdjectiveInDictionary(const dictionary::DictionaryManager* dict_manager, std::string_view base_form);
 
 /**
+ * @brief Whether a multi-mora particle that is not also a copula cell opens at @p pos
+ *
+ * A な there begins that particle (時間+ながら, 子供+など), not the attributive
+ * copula, so it is no evidence of a na-adjective stem in front of it. Final
+ * particles and spellings the copula paradigm shares (なら, なり) are not
+ * counted.
+ */
+bool opensNonCopularParticleAt(const dictionary::DictionaryManager* dict_manager,
+                               const std::vector<char32_t>& codepoints, size_t pos);
+
+/**
  * @brief Check if a base form exists in dictionary as an i-adjective
  *
  * A na-adjective whose stem happens to end in い (嫌い) is an adjective entry

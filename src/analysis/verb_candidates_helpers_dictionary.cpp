@@ -55,6 +55,24 @@ bool isAdjectiveInDictionary(const dictionary::DictionaryManager* dict_manager, 
   return hasDictionaryEntry(dict_manager, base_form, core::PartOfSpeech::Adjective);
 }
 
+bool opensNonCopularParticleAt(const dictionary::DictionaryManager* dict_manager,
+                               const std::vector<char32_t>& codepoints, size_t pos) {
+  if (dict_manager == nullptr || pos >= codepoints.size()) {
+    return false;
+  }
+  constexpr size_t kMaxParticleLength = 3;
+  const size_t probe_end = std::min(codepoints.size(), pos + kMaxParticleLength);
+  for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, pos, probe_end)) {
+    if (match.entry != nullptr && match.length > 1 && match.entry->pos == core::PartOfSpeech::Particle &&
+        match.entry->extended_pos != core::ExtendedPOS::ParticleFinal &&
+        lookupEntryInRange(*dict_manager, codepoints, pos, pos + match.length, core::PartOfSpeech::Auxiliary) ==
+            nullptr) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool isIAdjectiveInDictionary(const dictionary::DictionaryManager* dict_manager, std::string_view base_form) {
   if (dict_manager == nullptr || base_form.empty()) {
     return false;

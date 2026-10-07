@@ -335,9 +335,12 @@ void addKanjiCompoundBoundaryRules(const core::LatticeEdge& prev, const core::La
   // A one-kanji noun followed by a one-kanji formal noun is usually a lexical
   // compound (人物, 結末), not a productive formal-noun boundary.  Longer
   // nominal stems remain available for bound temporal/spatial forms such as
-  // 年度+末 and 期間+内.
-  if (prev.pos == core::PartOfSpeech::Noun && next.extended_pos == core::ExtendedPOS::NounFormal &&
-      grammar::isSingleKanjiSurface(prev.surface) && grammar::isSingleKanjiSurface(next.surface)) {
+  // 年度+末 and 期間+内.  The mirror order holds for an unlisted one-kanji
+  // fragment after the formal noun (時+間 of 時間).
+  if (prev.pos == core::PartOfSpeech::Noun && next.pos == core::PartOfSpeech::Noun &&
+      grammar::isSingleKanjiSurface(prev.surface) && grammar::isSingleKanjiSurface(next.surface) &&
+      (next.extended_pos == core::ExtendedPOS::NounFormal ||
+       (prev.extended_pos == core::ExtendedPOS::NounFormal && !next.fromDictionary()))) {
     SUZUME_CONNECTION_ADD(bonus, cost::kStrong);
   }
 
