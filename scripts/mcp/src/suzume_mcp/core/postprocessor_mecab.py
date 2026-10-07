@@ -305,14 +305,14 @@ _FUSED_E_SOURCES: dict[str, tuple[str, ...]] = {
 
 
 def _vowel_fused_adjectives(text: str) -> dict[int, tuple[str, str]]:
-    """Spans spelling an i-adjective with its ending fused into a long e.
+    """Spans spelling an i-adjective (or a pronoun) with its ending fused into a long e.
 
-    Keyed by start; the value is the written span and the standard form. The
+    The length mark is written え or ー (すげえ, すげー). Keyed by start; the value is the written span and the standard form. The
     stem is the longest kana run before the e-row kana for which the standard
     form is one adjective.
     """
     spans: dict[int, tuple[str, str]] = {}
-    for m in regex.finditer(r"(?<=\p{Hiragana})[えけげせぜてでねへべぺめれ](?=え)", text):
+    for m in regex.finditer(r"(?<=\p{Hiragana})[えけげせぜてでねへべぺめれ](?=[えー])", text):
         fused_at = m.start()
         run_start = fused_at
         while run_start > 0 and fused_at - run_start < 4 and regex.fullmatch(r"\p{Hiragana}", text[run_start - 1]):
@@ -327,10 +327,20 @@ def _vowel_fused_adjectives(text: str) -> dict[int, tuple[str, str]]:
                 ),
                 "",
             )
-            if standard:
-                spans[start] = (text[start : fused_at + 2], standard)
+            # The same fusion contracts a pronoun's a+e (おまえ → おめえ); that
+            # reading wins over a homographic adjective (おもい).
+            pronoun = _fused_pronoun(stem, text[fused_at])
+            if pronoun or standard:
+                spans[start] = (text[start : fused_at + 2], pronoun or standard)
                 break
     return spans
+
+
+def _fused_pronoun(stem: str, fused: str) -> str:
+    """The pronoun whose a+e the long e contracts, or an empty string."""
+    source = stem + _FUSED_E_SOURCES[fused][0] + "え"
+    tokens = mecab_analyze(source)
+    return source if len(tokens) == 1 and tokens[0].get("pos_sub1") == "代名詞" else ""
 
 
 def _non_overlapping_replacements(candidates: dict[tuple[int, str], dict]) -> dict[tuple[int, str], dict]:
