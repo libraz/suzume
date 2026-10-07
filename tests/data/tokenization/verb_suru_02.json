@@ -1169,6 +1169,102 @@
       ],
       "id": "no_wosasuru",
       "input": "祖母の肩をさする"
+    },
+    {
+      "description": "頬ずりされた - auto-generated",
+      "expected": [
+        {
+          "lemma": "頬ずり",
+          "pos": "Noun",
+          "surface": "頬ずり"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "さ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "zurisareta",
+      "input": "頬ずりされた"
+    },
+    {
+      "description": "嫌な顔された - auto-generated",
+      "expected": [
+        {
+          "lemma": "嫌",
+          "pos": "Adjective",
+          "surface": "嫌"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "顔",
+          "pos": "Noun",
+          "surface": "顔"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "さ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "na_sareta",
+      "input": "嫌な顔された"
+    },
+    {
+      "description": "話がされた - auto-generated",
+      "expected": [
+        {
+          "lemma": "話",
+          "pos": "Noun",
+          "surface": "話"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "さ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "gasareta",
+      "input": "話がされた"
     }
   ],
   "description": "Suru-verb patterns with subsidiary verbs - MeCab互換分割 (part 2/2)",

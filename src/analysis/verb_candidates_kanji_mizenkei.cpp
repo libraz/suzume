@@ -667,6 +667,20 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
       const std::string stem = extractSubstring(codepoints, start_pos, mizenkei_end - 1);
       const std::string base_form = normalize::concat(stem, base_suffix);
       bool is_valid_verb = vh::isVerbInDictionary(dict_manager, base_form);
+      // Before an unattested さ+れ, a continuative vowel (噛み+さ, 頬ずり+さ)
+      // or a case/topic particle right after the kanji (話が+さ) closes a
+      // nominal that takes the passive of する; no su-row stem ends there.
+      if (!is_valid_verb && mizenkei_ending == U'さ') {
+        const char32_t before_sa = codepoints[mizenkei_end - 2];
+        const bool argument_before_sa =
+            mizenkei_end - 2 == kanji_end &&
+            (vh::oneMoraParticleEndsAt(dict_manager, codepoints, kanji_end + 1, core::ExtendedPOS::ParticleCase) ||
+             vh::oneMoraParticleEndsAt(dict_manager, codepoints, kanji_end + 1, core::ExtendedPOS::ParticleTopic));
+        if (kana::isIRowCodepoint(before_sa) || kana::isERowCodepoint(before_sa) || argument_before_sa) {
+          SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" nominal + される, not a su-row stem\n");
+          break;
+        }
+      }
       if (!is_valid_verb) {
         // Validate exactly one closed auxiliary inflection after れ.  Cutting
         // れなかった at れなか loses its base-form evidence, while consuming

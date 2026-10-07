@@ -138,7 +138,11 @@ void appendPassiveMizenkeiCandidates(const std::vector<char32_t>& codepoints, si
     // Fallback for GodanSa: use inflection analysis for causative verb patterns
     // E.g., やらされた = やらさ (mizenkei of やらす) + れ + た
     // やらす is the causative form of やる but not in dictionary
-    if (!is_valid_verb && verb_type == grammar::VerbType::GodanSa) {
+    // A continuative vowel before さ (頬ずり+さ+れ) closes a deverbal noun that
+    // takes the passive of する; no su-row stem ends there.
+    if (!is_valid_verb && verb_type == grammar::VerbType::GodanSa &&
+        !(mizenkei_end >= start_pos + 2 && (kana::isIRowCodepoint(codepoints[mizenkei_end - 2]) ||
+                                            kana::isERowCodepoint(codepoints[mizenkei_end - 2])))) {
       is_valid_verb = vh::isVerifiedVerbBase(dict_manager, inflection, base_form,
                                              candidate::verb_cost::kConstructedVerbMinConfidence, true);
     }

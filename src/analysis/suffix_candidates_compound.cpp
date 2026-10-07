@@ -64,6 +64,21 @@ size_t scanCompoundHiraganaEnd(const std::vector<char32_t>& codepoints,
   return end;
 }
 
+// Position in [from, to) where a cell of する opens: し before a する auxiliary
+// (し+た, し+て), さ before the passive/causative (さ+れ, さ+せ), or す+る/れ.
+// to when none.
+size_t findSuruCellStart(const std::vector<char32_t>& codepoints, size_t from, size_t to) {
+  for (size_t pos = from; pos < to; ++pos) {
+    const char32_t next = pos + 1 < codepoints.size() ? codepoints[pos + 1] : U'\0';
+    if ((codepoints[pos] == U'し' && verb_helpers::isSuruAuxiliaryStarter(next)) ||
+        (codepoints[pos] == U'さ' && (next == U'れ' || next == U'せ')) ||
+        (codepoints[pos] == U'す' && (next == U'る' || next == U'れ'))) {
+      return pos;
+    }
+  }
+  return to;
+}
+
 bool hasNominalPhraseSelectorAt(const dictionary::DictionaryManager* dict_manager,
                                 const std::vector<char32_t>& codepoints, size_t pos) {
   if (dict_manager == nullptr || pos >= codepoints.size()) {
@@ -710,7 +725,20 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
   if (kanji_end >= char_types.size() || char_types[kanji_end] != normalize::CharType::Hiragana) {
     return;
   }
-  const size_t hiragana_end = scanCompoundHiraganaEnd(codepoints, char_types, kanji_end, dict_manager);
+  size_t hiragana_end = scanCompoundHiraganaEnd(codepoints, char_types, kanji_end, dict_manager);
+  // A cell of する inside the run closes the nominal it takes: after a
+  // continuative vowel the noun ends there (頬ずり+される, 身じろぎ+した), and
+  // right after the kanji the passive belongs to the kanji noun (顔+される).
+  const size_t suru_cell = findSuruCellStart(codepoints, kanji_end, hiragana_end);
+  if (suru_cell < hiragana_end) {
+    if (suru_cell == kanji_end && codepoints[suru_cell] == U'さ') {
+      return;
+    }
+    if (suru_cell > kanji_end &&
+        (kana::isIRowCodepoint(codepoints[suru_cell - 1]) || kana::isERowCodepoint(codepoints[suru_cell - 1]))) {
+      hiragana_end = suru_cell;
+    }
+  }
   const size_t hiragana_len = hiragana_end - kanji_end;
   const char32_t first_hira = codepoints[kanji_end];
 
