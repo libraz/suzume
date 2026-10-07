@@ -2050,6 +2050,77 @@
       ],
       "id": "tettteba",
       "input": "見てってば"
+    },
+    {
+      "description": "two-mora clause-closing particle holding its vowel with a small vowel",
+      "expected": [
+        {
+          "lemma": "困る",
+          "pos": "Verb",
+          "surface": "困る"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        },
+        {
+          "lemma": "けど",
+          "pos": "Particle",
+          "surface": "けどぉ"
+        }
+      ],
+      "id": "rundesukedo",
+      "input": "困るんですけどぉ"
+    },
+    {
+      "description": "two-mora clause-closing particle holding its vowel with a small vowel",
+      "expected": [
+        {
+          "lemma": "いい",
+          "pos": "Adjective",
+          "surface": "いい"
+        },
+        {
+          "lemma": "けど",
+          "pos": "Particle",
+          "surface": "けどぉ"
+        }
+      ],
+      "id": "iikedo",
+      "input": "いいけどぉ"
+    },
+    {
+      "description": "two-mora clause-closing particle holding its vowel with a long mark",
+      "expected": [
+        {
+          "lemma": "困る",
+          "pos": "Verb",
+          "surface": "困る"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        },
+        {
+          "lemma": "けど",
+          "pos": "Particle",
+          "surface": "けどー"
+        }
+      ],
+      "id": "rundesukedo_2",
+      "input": "困るんですけどー"
     }
   ],
   "description": "particle_final tests",

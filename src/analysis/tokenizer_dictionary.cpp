@@ -290,9 +290,17 @@ void addEmphaticDictionaryEdge(core::Lattice& lattice,
              normalize::classifyChar(codepoints[emphatic.end]) == normalize::CharType::Symbol ||
              (next_final != nullptr && next_final->extended_pos == core::ExtendedPOS::ParticleFinal);
     };
+    // A conjunctive particle of two morae or more left closing the clause
+    // holds its vowel the same way (けど+ぉ, から+ー). Final particles stay
+    // limited to one mora: a longer one (わい) is as often the tail of a word
+    // whose own vowel is drawn out (か+わい+ー for かわいー).
     auto holds_final_particle_vowel = [&]() {
-      if (result.entry->extended_pos != core::ExtendedPOS::ParticleFinal || emphatic.end != end_pos + 1 ||
-          normalize::utf8Length(result.entry->surface) != 1 || !closes_clause_after_emphatic()) {
+      const bool clause_closing_conjunctive = result.entry->extended_pos == core::ExtendedPOS::ParticleConj &&
+                                              normalize::utf8Length(result.entry->surface) >= 2;
+      const bool one_mora_final = result.entry->extended_pos == core::ExtendedPOS::ParticleFinal &&
+                                  normalize::utf8Length(result.entry->surface) == 1;
+      if ((!one_mora_final && !clause_closing_conjunctive) || emphatic.end != end_pos + 1 ||
+          !closes_clause_after_emphatic()) {
         return false;
       }
       const char32_t held = codepoints[end_pos];
