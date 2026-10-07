@@ -384,6 +384,11 @@ bool rejectsFabricatedAbsorption(const KanjiVerbSelection& sel, bool in_dict) {
       return true;
     }
   }
+  if (!in_dict &&
+      vh::absorbsRegisteredClosedCell(dict_manager, sel.inflection, codepoints, start_pos, sel.kanji_end, end_pos)) {
+    SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" fabricated verb absorbing a closed cell\n");
+    return true;
+  }
   if (!in_dict && vh::hasAuxiliaryNegativeBoundary(dict_manager, codepoints, start_pos, end_pos)) {
     SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" fabricated verb absorbing auxiliary negative\n");
     return true;

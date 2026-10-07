@@ -46,6 +46,33 @@ def postprocess_classical_copula_nari(tokens: list[dict]) -> bool:
     return changed
 
 
+def postprocess_classical_copula_taru(tokens: list[dict]) -> bool:
+    """Classify kana たる between two nominals as the classical copula.
+
+    The reference analyzer reads たる before a kanji noun as the noun 樽
+    (学生+たる+者) and the noun after it as a suffix, while the same たる before
+    もの is already the copula. A noun cannot stand between a nominal and the
+    noun it modifies without a particle, so the token is the attributive
+    copula, and what follows it is an ordinary noun rather than a suffix.
+    """
+    changed = False
+    for idx in range(1, len(tokens) - 1):
+        token = tokens[idx]
+        following = tokens[idx + 1]
+        if (
+            token.get("surface") == "たる"
+            and token.get("pos") == "Noun"
+            and tokens[idx - 1].get("pos") in ("Noun", "Pronoun")
+            and following.get("pos") in ("Noun", "Suffix")
+        ):
+            token["pos"] = "Auxiliary"
+            token["lemma"] = "たり"
+            if following.get("pos") == "Suffix":
+                following["pos"] = "Noun"
+            changed = True
+    return changed
+
+
 def _verb_continuative_reading(surface: str) -> dict | None:
     """The verb reading of a surface that spells a continuative, else None.
 

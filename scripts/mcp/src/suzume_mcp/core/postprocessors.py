@@ -29,6 +29,7 @@ postprocess_state_suffix = postprocessor_boundaries.postprocess_state_suffix
 postprocess_classical_b_row_moteiku = postprocessor_classical.postprocess_classical_b_row_moteiku
 postprocess_classical_conjecture_aux = postprocessor_classical.postprocess_classical_conjecture_aux
 postprocess_classical_copula_nari = postprocessor_classical.postprocess_classical_copula_nari
+postprocess_classical_copula_taru = postprocessor_classical.postprocess_classical_copula_taru
 postprocess_classical_desiderative_aux = postprocessor_classical.postprocess_classical_desiderative_aux
 postprocess_classical_focus_namu = postprocessor_classical.postprocess_classical_focus_namu
 postprocess_classical_ha_row_past = postprocessor_classical.postprocess_classical_ha_row_past
@@ -214,6 +215,7 @@ POSTPROCESSORS: tuple[tuple[str, Callable[[list[dict]], bool]], ...] = (
     ("closed-subsidiary-aux", postprocess_closed_subsidiary_aux),
     ("classical-focus-namu", postprocess_classical_focus_namu),
     ("classical-copula-nari", postprocess_classical_copula_nari),
+    ("classical-copula-taru", postprocess_classical_copula_taru),
     ("classical-past-shika-fused-host", postprocess_classical_past_shika_fused_host),
     ("classical-past-izenkei-shika", postprocess_classical_past_izenkei_shika),
     ("honorific-i-adjective", postprocess_honorific_i_adjective),

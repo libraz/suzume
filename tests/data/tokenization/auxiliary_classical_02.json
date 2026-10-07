@@ -265,6 +265,50 @@
       ],
       "id": "mashikaba",
       "input": "見ましかば"
+    },
+    {
+      "description": "君たる者 - auto-generated",
+      "expected": [
+        {
+          "lemma": "君",
+          "pos": "Pronoun",
+          "surface": "君"
+        },
+        {
+          "lemma": "たり",
+          "pos": "Auxiliary",
+          "surface": "たる"
+        },
+        {
+          "lemma": "者",
+          "pos": "Noun",
+          "surface": "者"
+        }
+      ],
+      "id": "taru_2",
+      "input": "君たる者"
+    },
+    {
+      "description": "学生たる者 - auto-generated",
+      "expected": [
+        {
+          "lemma": "学生",
+          "pos": "Noun",
+          "surface": "学生"
+        },
+        {
+          "lemma": "たり",
+          "pos": "Auxiliary",
+          "surface": "たる"
+        },
+        {
+          "lemma": "者",
+          "pos": "Noun",
+          "surface": "者"
+        }
+      ],
+      "id": "taru_3",
+      "input": "学生たる者"
     }
   ],
   "description": "auxiliary_classical tests (part 2/2)",

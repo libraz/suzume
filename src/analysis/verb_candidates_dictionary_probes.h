@@ -118,6 +118,20 @@ bool hasDictionaryGodanBaseFromIRow(const dictionary::DictionaryManager* dict_ma
 bool namesDictionaryVerbContinuative(const dictionary::DictionaryManager* dict_manager,
                                      const std::vector<char32_t>& codepoints, size_t stem_start, size_t okurigana_pos);
 
+/**
+ * @brief Whether the okurigana of [start_pos, end) ends on a registered closed
+ * cell standing on a host of its own
+ *
+ * The cell is the past conditional たら, the classical copulas たる/なら (and
+ * their other cells). Its host is a verified godan continuative (咲き+たら), a
+ * dictionary pronoun (君+たる) or a kanji run of two or more (一方+なら); a
+ * verb proposal over that span has absorbed the auxiliary. Callers apply it to
+ * unverified proposals only.
+ */
+bool absorbsRegisteredClosedCell(const dictionary::DictionaryManager* dict_manager,
+                                 const grammar::Inflection& inflection, const std::vector<char32_t>& codepoints,
+                                 size_t start_pos, size_t kanji_end, size_t end);
+
 /** @brief namesDictionaryVerbContinuative over the one kanji before @p okurigana_pos */
 inline bool namesDictionaryVerbContinuative(const dictionary::DictionaryManager* dict_manager,
                                             const std::vector<char32_t>& codepoints, size_t okurigana_pos) {

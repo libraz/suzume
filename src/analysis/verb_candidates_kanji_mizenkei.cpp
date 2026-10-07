@@ -473,7 +473,10 @@ void appendGodanMizenkeiZuCandidates(const std::vector<char32_t>& codepoints, si
                 entry.extended_pos == core::ExtendedPOS::AuxNegativeMai) &&
                entry.lemma != "じ";
       });
-  const bool inferred_stem_licensed = non_ji_auxiliary_follows || mizenkei_ending != U'さ';
+  // The na-row is the closed class of 死ぬ/往ぬ, so it is never inferred
+  // (暮れ+な+ず is not a coined 暮れぬ).
+  const bool inferred_stem_licensed =
+      (non_ji_auxiliary_follows || mizenkei_ending != U'さ') && verb_type != grammar::VerbType::GodanNa;
   if (!contains_internal_particle && !is_valid && is_single_kanji_stem && inferred_stem_licensed) {
     // Analyze mizenkei+ない form (standard negative) for better confidence
     // Base form alone may not be recognized. Multi-kanji stems require
@@ -825,6 +828,13 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
                       nullptr) {
                 continue;
               }
+            }
+            // Nor may an unregistered verb take a closed cell standing on its own
+            // host (咲き+たら+ん, 一方+なら+ぬ).
+            if (!vh::isVerbInDictionary(dict_manager, base_form) &&
+                vh::absorbsRegisteredClosedCell(dict_manager, inflection, codepoints, start_pos, kanji_end,
+                                                multi_miz_end)) {
+              continue;
             }
             // Verify this is a valid verb
             const bool verified_base = vh::isVerifiedVerbBase(

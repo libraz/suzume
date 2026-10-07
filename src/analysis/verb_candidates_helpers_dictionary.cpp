@@ -94,6 +94,42 @@ bool namesDictionaryVerbContinuative(const dictionary::DictionaryManager* dict_m
                             stem + normalize::encodeUtf8(okurigana) + normalize::encodeUtf8(core::hiragana::kRu));
 }
 
+bool absorbsRegisteredClosedCell(const dictionary::DictionaryManager* dict_manager,
+                                 const grammar::Inflection& inflection, const std::vector<char32_t>& codepoints,
+                                 size_t start_pos, size_t kanji_end, size_t end) {
+  if (dict_manager == nullptr || start_pos >= kanji_end || end > codepoints.size()) {
+    return false;
+  }
+  for (size_t tail = kanji_end; tail + 2 <= end; ++tail) {
+    bool closed_cell = false;
+    for (const auto& result : lookupResultsInRange(*dict_manager, codepoints, tail, end)) {
+      closed_cell = closed_cell || (result.entry != nullptr && tail + result.length == end &&
+                                    result.entry->pos == core::PartOfSpeech::Auxiliary &&
+                                    (result.entry->extended_pos == core::ExtendedPOS::AuxTenseTa ||
+                                     result.entry->extended_pos == core::ExtendedPOS::AuxClassicalTari ||
+                                     result.entry->extended_pos == core::ExtendedPOS::AuxClassicalNari));
+    }
+    if (!closed_cell) {
+      continue;
+    }
+    const bool nominal_host = tail == kanji_end && (kanji_end - start_pos >= 2 ||
+                                                    lookupEntryInRange(*dict_manager, codepoints, start_pos, kanji_end,
+                                                                       core::PartOfSpeech::Pronoun) != nullptr);
+    const std::string_view godan_ending = grammar::godanBaseSuffixFromIRow(codepoints[kanji_end]);
+    const bool continuative_host =
+        tail == kanji_end + 1 &&
+        (namesDictionaryVerbContinuative(dict_manager, codepoints, start_pos, kanji_end) ||
+         (!godan_ending.empty() &&
+          isVerifiedVerbBase(dict_manager, inflection,
+                             normalize::concat(extractSubstring(codepoints, start_pos, kanji_end), godan_ending),
+                             candidate::verb_cost::kConstructedVerbMinConfidence, true)));
+    if (nominal_host || continuative_host) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool isQuantityClosingSuffixAt(const dictionary::DictionaryManager* dict_manager,
                                const std::vector<char32_t>& codepoints, size_t pos) {
   if (dict_manager == nullptr || pos >= codepoints.size() || !normalize::isKanjiCodepoint(codepoints[pos]) ||
