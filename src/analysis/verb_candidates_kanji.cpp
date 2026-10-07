@@ -512,6 +512,14 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
     std::string boundary_pair =
         normalize::encodeUtf8(codepoints[start_pos - 1]) + normalize::encodeUtf8(codepoints[start_pos]);
     if (dict_manager->lookupExact(boundary_pair) != nullptr) {
+      // A one-kanji stem whose okurigana opens on う can only be a wa-row
+      // terminal; unlisted, it has no evidence to outweigh the dictionary word
+      // it cuts (画+像う).
+      if (kanji_end == start_pos + 1 && codepoints[kanji_end] == U'う' &&
+          !vh::isVerbInDictionary(dict_manager, codepoints, start_pos, kanji_end + 1)) {
+        SUZUME_DEBUG_LOG("[VERB_SKIP] unlisted one-kanji wa-row stem cuts \"" << boundary_pair << "\"\n");
+        return;
+      }
       mid_compound_penalty = bigram_cost::kMinor;
       SUZUME_DEBUG_LOG("[COST_ADJ] verb candidates at pos " << start_pos << " +" << mid_compound_penalty
                                                             << " (boundary pair \"" << boundary_pair
