@@ -237,19 +237,25 @@ void adj_detail::appendHiraganaIAdjSurfaceCandidates(const std::vector<char32_t>
     }
 
     // A run opening on a case, topic or binding particle is that particle plus
-    // what follows when the remainder is a word of its own: a dictionary entry
-    // (で+いい, と+おい), or an i-adjective with a stem of two or more morae that
-    // reads better than the whole run does (が+にぶい, が+おいしかった). A
-    // final-particle mora opens words too often to count (よろしい, わびしい).
+    // what follows when the remainder is a dictionary entry (で+いい, と+おい,
+    // も+よろしい). After a case particle, an i-adjective remainder with a stem of
+    // two or more morae that reads better than the whole run counts as well
+    // (が+にぶい, が+おいしかった); a topic or binding particle mora opens too many
+    // adjectives of its own for that comparison (もどかしい, はかない). A
+    // final-particle mora is not checked at all (よろしい, わびしい), and a run
+    // the dictionary lists whole stays whole.
     const auto* opening_particle =
         starts_with_particle && dict_manager != nullptr
             ? lookupEntryInRange(*dict_manager, codepoints, start_pos, start_pos + 1, core::PartOfSpeech::Particle)
             : nullptr;
+    const bool opens_on_case_particle =
+        opening_particle != nullptr && opening_particle->extended_pos == core::ExtendedPOS::ParticleCase;
     const bool opens_on_argument_particle =
-        opening_particle != nullptr && (opening_particle->extended_pos == core::ExtendedPOS::ParticleCase ||
-                                        opening_particle->extended_pos == core::ExtendedPOS::ParticleTopic ||
-                                        opening_particle->extended_pos == core::ExtendedPOS::ParticleBinding);
-    if (opens_on_argument_particle && end_pos - start_pos >= 3) {
+        opens_on_case_particle ||
+        (opening_particle != nullptr && (opening_particle->extended_pos == core::ExtendedPOS::ParticleTopic ||
+                                         opening_particle->extended_pos == core::ExtendedPOS::ParticleBinding));
+    if (opens_on_argument_particle && end_pos - start_pos >= 3 &&
+        !isAdjectiveInDictionary(dict_manager, utf8::endsWith(analysis_surface, "い") ? analysis_surface : "")) {
       if (lookupEntryInRange(*dict_manager, codepoints, start_pos + 1, end_pos) != nullptr) {
         continue;
       }
@@ -265,7 +271,9 @@ void adj_detail::appendHiraganaIAdjSurfaceCandidates(const std::vector<char32_t>
       };
       constexpr size_t kMinRemainderStem = 2;
       const std::string_view remainder = std::string_view(analysis_surface).substr(core::kJapaneseCharBytes);
-      const float remainder_confidence = best_adjective_confidence(remainder, kMinRemainderStem);
+      const float remainder_confidence = opens_on_case_particle
+                                             ? best_adjective_confidence(remainder, kMinRemainderStem)
+                                             : candidate::kNoOriginConfidence;
       if (remainder_confidence != candidate::kNoOriginConfidence &&
           remainder_confidence > best_adjective_confidence(analysis_surface, 0)) {
         continue;

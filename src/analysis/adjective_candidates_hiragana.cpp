@@ -528,9 +528,14 @@ size_t boundedAdjectiveRunEnd(const HiraganaAdjectiveRun& run, const std::string
         // かっ must still break — the rare ない-family adjective (少なかった) is left to the
         // pre-existing split rather than mis-scored as one token.
         bool is_katt_past = adj_detail::opensAdjectivePastConnective(codepoints, hiragana_end);
+        // か before the shiku し is likewise the stem's own mora (なまめか+しい,
+        // もどか+しい), not the question particle.
+        const bool opens_shiku_ending =
+            curr_char == U'か' && hiragana_end + 1 < max_hiragana_end && codepoints[hiragana_end + 1] == U'し';
         // The contracted nominalizer ん closes the terminal the way の does
         // (つらい+ん+だ, つらい+の).
-        if (!is_katt_past && (normalize::isExtendedParticle(curr_char) || curr_char == U'や' || curr_char == U'ん')) {
+        if (!is_katt_past && !opens_shiku_ending &&
+            (normalize::isExtendedParticle(curr_char) || curr_char == U'や' || curr_char == U'ん')) {
           break;  // Stop before the particle
         }
       }

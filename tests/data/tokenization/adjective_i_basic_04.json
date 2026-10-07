@@ -246,6 +246,57 @@
       ],
       "id": "tttai",
       "input": "野暮ったい"
+    },
+    {
+      "description": "なまめかしい仕草 - auto-generated",
+      "expected": [
+        {
+          "lemma": "なまめかしい",
+          "pos": "Adjective",
+          "surface": "なまめかしい"
+        },
+        {
+          "lemma": "仕草",
+          "pos": "Noun",
+          "surface": "仕草"
+        }
+      ],
+      "id": "namamekashii",
+      "input": "なまめかしい仕草"
+    },
+    {
+      "description": "ふるめかしい建物 - auto-generated",
+      "expected": [
+        {
+          "lemma": "ふるめかしい",
+          "pos": "Adjective",
+          "surface": "ふるめかしい"
+        },
+        {
+          "lemma": "建物",
+          "pos": "Noun",
+          "surface": "建物"
+        }
+      ],
+      "id": "furumekashii",
+      "input": "ふるめかしい建物"
+    },
+    {
+      "description": "もどかしい思い - auto-generated",
+      "expected": [
+        {
+          "lemma": "もどかしい",
+          "pos": "Adjective",
+          "surface": "もどかしい"
+        },
+        {
+          "lemma": "思い",
+          "pos": "Noun",
+          "surface": "思い"
+        }
+      ],
+      "id": "modokashii_i",
+      "input": "もどかしい思い"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 4/4)",
