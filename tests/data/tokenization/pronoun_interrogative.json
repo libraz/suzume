@@ -515,6 +515,75 @@
       ],
       "id": "kunoka_nazeda",
       "input": "行くのか、なぜだ"
+    },
+    {
+      "description": "Literary locative interrogative",
+      "expected": [
+        {
+          "lemma": "いずこ",
+          "pos": "Pronoun",
+          "surface": "いずこ"
+        },
+        {
+          "lemma": "へ",
+          "pos": "Particle",
+          "surface": "へ"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "なく"
+        },
+        {
+          "lemma": "去る",
+          "pos": "Verb",
+          "surface": "去っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "izukohetomonaku_ttta",
+      "input": "いずこへともなく去った"
+    },
+    {
+      "description": "Literary locative interrogative before he",
+      "expected": [
+        {
+          "lemma": "いずこ",
+          "pos": "Pronoun",
+          "surface": "いずこ"
+        },
+        {
+          "lemma": "へ",
+          "pos": "Particle",
+          "surface": "へ"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "izukohe_ttta",
+      "input": "いずこへ行った"
     }
   ],
   "description": "pronoun_interrogative tests",

@@ -132,6 +132,8 @@ EntrySpecRange getPronounEntries() {
       pronoun_interrogative("どれ", ""),
       pronoun_interrogative("どこ", ""),
       pronoun_interrogative("どちら", ""),
+      // Literary locative interrogative (どこ).
+      pronoun_interrogative("いずこ", ""),
       // Contracted indefinite どこか: one pronoun, not the dialectal aspect
       // auxiliary どっ (どる) plus か.
       pronoun("どっか", ""),
