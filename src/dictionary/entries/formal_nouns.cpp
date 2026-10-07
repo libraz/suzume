@@ -46,6 +46,8 @@ EntrySpecRange getFormalNounEntries() {
       suffix("中", ""),
       // Comparative-level suffix after a nominal (小学生並み、例年並み).
       suffix("並み", ""),
+      // Admixture suffix after a nominal (冗談まじり、ため息まじり).
+      suffix("まじり", ""),
       // Agentive suffix after a deverbal stem (引き受け手、書き手).
       suffix("手", ""),
       // Destination suffix after a deverbal nominal (問い合わせ先、送り先).
