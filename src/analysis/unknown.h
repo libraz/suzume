@@ -205,6 +205,44 @@ class UnknownWordGenerator {
                           const std::vector<normalize::CharType>& char_types,
                           std::vector<UnknownCandidate>& candidates) const;
 
+  /// Run shared by the generateBySameType phases (unknown_same_type_internal.h).
+  struct SameTypeRun;
+
+  /**
+   * @brief Classify the run opening at @p start_pos into @p run
+   * @return false when no same-type run starts here; a particle-homographic
+   *         onset may still have emitted its closed reading
+   */
+  bool openSameTypeRun(const std::vector<char32_t>& codepoints, size_t start_pos,
+                       const std::vector<normalize::CharType>& char_types, SameTypeRun& run,
+                       std::vector<UnknownCandidate>& candidates) const;
+
+  /**
+   * @brief Extend @p run to the end of its same-type sequence
+   */
+  void findSameTypeRunEnd(const std::vector<char32_t>& codepoints, const std::vector<normalize::CharType>& char_types,
+                          SameTypeRun& run) const;
+
+  /**
+   * @brief Emit a candidate for each prefix length of @p run that no proven boundary cuts
+   */
+  void appendSameTypePrefixCandidates(const std::vector<char32_t>& codepoints,
+                                      const std::vector<normalize::CharType>& char_types, const SameTypeRun& run,
+                                      std::vector<UnknownCandidate>& candidates) const;
+
+  /**
+   * @brief Emit the nominal before an adjective-continuative なく (よどみ+なく)
+   */
+  void appendHiraganaNominalNakuCandidate(const std::vector<char32_t>& codepoints, const SameTypeRun& run,
+                                          std::vector<UnknownCandidate>& candidates) const;
+
+  /**
+   * @brief Emit noun candidates for hiragana runs bracketed as content nouns
+   */
+  void appendBracketedHiraganaNounCandidates(const std::vector<char32_t>& codepoints,
+                                             const std::vector<normalize::CharType>& char_types, const SameTypeRun& run,
+                                             std::vector<UnknownCandidate>& candidates) const;
+
   /**
    * @brief Generate alphanumeric sequence candidates
    */

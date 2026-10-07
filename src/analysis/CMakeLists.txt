@@ -64,6 +64,8 @@ add_library(suzume_analysis OBJECT
   tokenizer_utils.cpp
   unknown.cpp
   unknown_same_type.cpp
+  unknown_same_type_prefixes.cpp
+  unknown_bracketed_noun.cpp
   unknown_speech.cpp
   verb_candidates.cpp
   verb_candidates_contracted_conditional.cpp

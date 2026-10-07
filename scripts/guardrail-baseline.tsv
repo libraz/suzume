@@ -86,7 +86,10 @@ src/analysis/tokenizer_utils.cpp	0	0	0
 src/analysis/tokenizer_utils.h	0	0	0
 src/analysis/unknown.cpp	0	29	0
 src/analysis/unknown.h	0	6	0
-src/analysis/unknown_same_type.cpp	0	14	0
+src/analysis/unknown_bracketed_noun.cpp	0	0	0
+src/analysis/unknown_same_type.cpp	0	0	0
+src/analysis/unknown_same_type_internal.h	0	0	0
+src/analysis/unknown_same_type_prefixes.cpp	0	14	0
 src/analysis/unknown_speech.cpp	0	13	0
 src/analysis/verb_candidates.cpp	0	8	0
 src/analysis/verb_candidates.h	0	0	0
