@@ -466,6 +466,22 @@ bool yieldsToListedReading(const CompoundMatchContext& ctx, const CompoundVerbMa
     }
   }
 
+  // Nor may an unverified kanji V1 lend its okurigana to the compound when a
+  // dictionary verb starts on that kana and ends with the V2: the listed verb
+  // proves the kana belong together (油断+めさる, not 断め+さる).
+  if (!ctx.hiragana_v1 && !best_match.v1_dict_verified && best_match.matched_len > 0) {
+    const size_t compound_end_pos =
+        ctx.v2_start + normalize::utf8Length(text.substr(v2_start_byte, best_match.matched_len));
+    for (size_t pos = ctx.kanji_end; pos < ctx.v2_start; ++pos) {
+      for (const auto& result : ctx.dict_manager.lookup(text, byteOffsetAt(ctx.byte_offsets, pos))) {
+        if (result.entry != nullptr && result.entry->pos == core::PartOfSpeech::Verb &&
+            pos + result.length == compound_end_pos) {
+          return true;
+        }
+      }
+    }
+  }
+
   // Nor may it override a listed particle covering the identical span. A
   // subsidiary verb spelled in kana where its own lemma carries kanji is the
   // marked orthography, so it cannot outrank the unmarked closed-class reading
