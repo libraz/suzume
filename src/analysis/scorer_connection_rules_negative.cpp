@@ -49,13 +49,18 @@ float computeNegativeAndNounVerbBonus(const core::LatticeEdge& prev, const core:
   //     irrealis たろ (疲れ+たろ+う): never よう, which selects the ichidan and
   //     sa-hen stems (すね+た+よう+に), and never on its conditional たら, where
   //     the classical perfect's irrealis is the host (咲き+たら+む).
+  //   - the two-mora よう, which selects the ichidan, sa-hen and ka-hen
+  //     irrealis (食べ+よう, し+よう, こ+よう). A host ending on the a- or
+  //     u-row has no such cell, so the terminal copula cannot carry it
+  //     (煙が+ただよう, not がた+だ+よう).
+  const char32_t volitional_host_vowel = grammar::getVowelForChar(utf8::decodeLastChar(prev.surface));
   const bool volitional_host_row_mismatch =
       next.extended_pos == core::ExtendedPOS::AuxVolitional &&
       ((prev.extended_pos == core::ExtendedPOS::AuxTenseMasu && grammar::endsWithERow(prev.surface) &&
         grammar::isSingleHiragana(next.surface, core::hiragana::kN)) ||
-       (grammar::isSingleHiragana(next.surface, U'う') &&
-        grammar::getVowelForChar(utf8::decodeLastChar(prev.surface)) != U'お') ||
-       (prev.extended_pos == core::ExtendedPOS::AuxTenseTa && !utf8::equalsAny(prev.surface, {"たろ"})));
+       (grammar::isSingleHiragana(next.surface, U'う') && volitional_host_vowel != U'お') ||
+       (prev.extended_pos == core::ExtendedPOS::AuxTenseTa && !utf8::equalsAny(prev.surface, {"たろ"})) ||
+       (utf8::equalsAny(next.surface, {"よう"}) && (volitional_host_vowel == U'あ' || volitional_host_vowel == U'う')));
   // The classical/contracted negative ん cannot be followed by the plain
   // copula だ. In an apparent …んだ sequence after a ma/ba/na-row verb, ん is
   // the verb's hatsuonbin and だ is the past auxiliary (膨らん+だ).

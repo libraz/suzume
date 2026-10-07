@@ -619,9 +619,6 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
       // VerbShuushikei → AuxConjectureMitai (食べる+みたい) - strong bonus
       {EPOS::VerbShuushikei, EPOS::AuxConjectureMitai, cost::kStrongBonus},
 
-      // VerbShuushikei → AuxVolitional (食べる+べき) - strong bonus for obligation
-      {EPOS::VerbShuushikei, EPOS::AuxVolitional, cost::kStrongBonus},
-
       // AdjBasic → AuxConjectureMitai (美しい+みたい) - moderate bonus
       {EPOS::AdjBasic, EPOS::AuxConjectureMitai, cost::kModerateBonus},
 
