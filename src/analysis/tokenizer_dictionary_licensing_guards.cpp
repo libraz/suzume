@@ -210,6 +210,14 @@ bool lacksLicensingEnvironment(const DictionaryCandidateContext& ctx, const core
     }
   }
 
+  // Standalone 中 heads an attributive clause (忙しい+中, そうした+中, 雨の+中),
+  // which never ends on a bare kanji; after one the kanji is the state suffix
+  // or part of a compound (作業+中, 一時+中断).
+  if (result.entry->extended_pos == core::ExtendedPOS::NounFormal && utf8::equalsAny(result.entry->surface, {"中"}) &&
+      start_pos > 0 && normalize::isKanjiCodepoint(codepoints[start_pos - 1])) {
+    return true;
+  }
+
   // The irrealis たら of the classical perfect たり exists only before the
   // conjectural む/ん that selects it (咲き+たら+む); anywhere else the same
   // kana is the conditional of the past.

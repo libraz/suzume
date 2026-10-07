@@ -74,14 +74,22 @@ bool suffixHeadedRunAbsorbsVerifiedGodanStem(const std::vector<char32_t>& codepo
 }
 
 bool hasDictionaryLexicalPrefix(const std::vector<dictionary::LookupResult>& results, size_t full_length) {
+  // A one-kanji suffix homograph is not evidence that a lexical search unit
+  // begins here (中 in 中断, for example), and neither is the standalone formal
+  // noun the same suffix spells (中, 内). Multi-kanji closed entries such as
+  // 以後, content entries such as 各自, and a formal noun with no suffix reading
+  // (時 in 時間) still establish a real boundary.
+  const bool has_single_kanji_suffix = std::any_of(results.begin(), results.end(), [](const auto& result) {
+    return result.entry != nullptr && result.length == 1 && result.entry->pos == core::PartOfSpeech::Suffix;
+  });
   for (const auto& result : results) {
     if (result.entry == nullptr || result.length >= full_length) {
       continue;
     }
-    // A one-kanji suffix homograph is not evidence that a lexical search unit
-    // begins here (中 in 中断, for example). Multi-kanji closed entries such as
-    // 以後 and content entries such as 各自 still establish a real boundary.
-    const bool is_single_kanji_suffix = result.length == 1 && result.entry->pos == core::PartOfSpeech::Suffix;
+    const bool is_single_kanji_suffix =
+        result.length == 1 &&
+        (result.entry->pos == core::PartOfSpeech::Suffix ||
+         (has_single_kanji_suffix && result.entry->extended_pos == core::ExtendedPOS::NounFormal));
     if (!is_single_kanji_suffix) {
       return true;
     }
@@ -349,13 +357,16 @@ void addCompoundSplitCandidates(core::Lattice& lattice, std::string_view text, c
       }
     }
 
-    // Check if the second part matches a dictionary entry (NOUN or ADJ)
+    // Check if the second part matches a dictionary entry (NOUN or ADJ). A
+    // one-kanji formal noun is a bound right-hand element like the suffix it
+    // usually doubles as (仕事+中), not a second compound member.
     auto second_results = dict_manager.lookup(text, first_end_byte);
     bool second_in_dict = false;
 
     for (const auto& result : second_results) {
       if (result.entry != nullptr && result.length == kanji_len - split_point &&
-          (result.entry->pos == core::PartOfSpeech::Noun || result.entry->pos == core::PartOfSpeech::Adjective)) {
+          (result.entry->pos == core::PartOfSpeech::Noun || result.entry->pos == core::PartOfSpeech::Adjective) &&
+          !(result.length == 1 && result.entry->extended_pos == core::ExtendedPOS::NounFormal)) {
         second_in_dict = true;
         break;
       }

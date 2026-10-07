@@ -376,6 +376,82 @@
       ],
       "id": "itakotoni",
       "input": "驚いたことに"
+    },
+    {
+      "description": "Standalone formal noun naka after a determiner",
+      "expected": [
+        {
+          "lemma": "そうした",
+          "pos": "Determiner",
+          "surface": "そうした"
+        },
+        {
+          "lemma": "中",
+          "pos": "Noun",
+          "surface": "中"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "soushita_niattte",
+      "input": "そうした中にあって"
+    },
+    {
+      "description": "Standalone formal noun naka after an adjective",
+      "expected": [
+        {
+          "lemma": "忙しい",
+          "pos": "Adjective",
+          "surface": "忙しい"
+        },
+        {
+          "lemma": "中",
+          "pos": "Noun",
+          "surface": "中"
+        },
+        {
+          "lemma": "ありがとう",
+          "pos": "Interjection",
+          "surface": "ありがとう"
+        }
+      ],
+      "id": "shii_arigatou",
+      "input": "忙しい中、ありがとう"
+    },
+    {
+      "description": "Standalone formal noun naka before de",
+      "expected": [
+        {
+          "lemma": "こうした",
+          "pos": "Determiner",
+          "surface": "こうした"
+        },
+        {
+          "lemma": "中",
+          "pos": "Noun",
+          "surface": "中"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        }
+      ],
+      "id": "koushita_de",
+      "input": "こうした中で"
     }
   ],
   "description": "Formal nouns (こと、もの、ところ) (part 2/2)",

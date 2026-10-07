@@ -38,6 +38,9 @@ EntrySpecRange getFormalNounEntries() {
       // Bound temporal/spatial suffix after a nominal stem (期間内、期限内).
       // Keep the formal-noun entry above for standalone uses as well.
       suffix("内", ""),
+      // Standalone 中 heads an attributive clause the way 内 does (そうした+中+に,
+      // 忙しい+中).
+      formal_noun("中", ""),
       // State suffix after a nominal stem (作業中、確認中). The standalone
       // formal-noun reading remains available through the preceding entry.
       suffix("中", ""),
