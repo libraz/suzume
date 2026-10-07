@@ -554,10 +554,11 @@ bool isFinalParticleStackTail(std::string_view surface) {
   }
   while (byte_pos < surface.size()) {
     const char32_t lengthening = normalize::decodeUtf8(surface, byte_pos);
-    // The vowel that lengthens a mora is the one its own row carries.
-    const bool matches_row = (kana::isARowCodepoint(head) && lengthening == U'あ') ||
-                             (kana::isERowCodepoint(head) && lengthening == U'え') ||
-                             (kana::isORowCodepoint(head) && lengthening == U'お');
+    // The vowel that lengthens a mora is the one its own row carries,
+    // written full-size or small (かなあ, かなぁ).
+    const bool matches_row = (kana::isARowCodepoint(head) && (lengthening == U'あ' || lengthening == U'ぁ')) ||
+                             (kana::isERowCodepoint(head) && (lengthening == U'え' || lengthening == U'ぇ')) ||
+                             (kana::isORowCodepoint(head) && (lengthening == U'お' || lengthening == U'ぉ'));
     // So does the emphatic sokuon that closes the utterance (よ+ねっ).
     const bool emphatic_close = lengthening == U'っ' && byte_pos == surface.size();
     if (lengthening != U'ー' && !matches_row && !emphatic_close) {

@@ -2121,6 +2121,50 @@
       ],
       "id": "rundesukedo_2",
       "input": "困るんですけどー"
+    },
+    {
+      "description": "final-particle stack whose tail is lengthened with a small vowel",
+      "expected": [
+        {
+          "lemma": "雨",
+          "pos": "Noun",
+          "surface": "雨"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "なあ",
+          "pos": "Particle",
+          "surface": "なぁ"
+        }
+      ],
+      "id": "kana_4",
+      "input": "雨かなぁ"
+    },
+    {
+      "description": "final-particle stack whose tail is lengthened with a long mark",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行く"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "なあ",
+          "pos": "Particle",
+          "surface": "なー"
+        }
+      ],
+      "id": "kukana",
+      "input": "行くかなー"
     }
   ],
   "description": "particle_final tests",
