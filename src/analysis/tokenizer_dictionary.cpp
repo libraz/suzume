@@ -543,13 +543,12 @@ bool hasCoveringVerifiedVerbRenyokei(const core::Lattice& lattice, size_t interi
 // candidate ending at start_pos mistakes homographic word endings for an
 // independent auxiliary and suppresses the following particle.
 bool hasPrecedingVerbVolitionalChain(const core::Lattice& lattice, size_t start_pos) {
-  for (const uint32_t edge_id : lattice.edgeIdsEndingAt(start_pos)) {
-    const auto& edge = lattice.getEdge(edge_id);
+  return core::anyEdgeEndingAt(lattice, start_pos, [&lattice](const core::LatticeEdge& edge) {
     if (edge.extended_pos != core::ExtendedPOS::AuxVolitional &&
         edge.extended_pos != core::ExtendedPOS::AuxNegativeMai) {
-      continue;
+      return false;
     }
-    const bool licensed = core::anyEdgeEndingAt(lattice, edge.start, [&edge](const core::LatticeEdge& verb) {
+    return core::anyEdgeEndingAt(lattice, edge.start, [&edge](const core::LatticeEdge& verb) {
       // The a-row mizenkei of する (さ) only hosts the passive/causative, never ん
       // (田中さ+ん+と+し+て is 田中+さん+として).
       const bool is_suru_passive_stem =
@@ -560,17 +559,11 @@ bool hasPrecedingVerbVolitionalChain(const core::Lattice& lattice, size_t start_
                                             verb.extended_pos == core::ExtendedPOS::VerbShuushikei;
       return licenses_volitional || licenses_negative_intent;
     });
-    if (licensed) {
-      return true;
-    }
-  }
-  return false;
+  });
 }
 
 bool hasPrecedingNominal(const core::Lattice& lattice, size_t start_pos) {
-  constexpr PartOfSpeechMask kNominalMask =
-      partOfSpeechMask(core::PartOfSpeech::Noun) | partOfSpeechMask(core::PartOfSpeech::Pronoun);
-  return hasPrecedingPartOfSpeech(lattice, start_pos, kNominalMask);
+  return hasPrecedingPartOfSpeech(lattice, start_pos, kNounPronounMask);
 }
 
 // An L2 noun can begin with another L2 noun by accident (は+にわ inside
@@ -633,9 +626,7 @@ bool hasPrecedingTemporalCompoundBoundary(const core::Lattice& lattice, size_t s
 bool startsFormalNounParticleAfterPredicate(const core::Lattice& lattice,
                                             const dictionary::DictionaryManager& dict_manager,
                                             const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos) {
-  constexpr PartOfSpeechMask kPredicateMask =
-      partOfSpeechMask(core::PartOfSpeech::Verb) | partOfSpeechMask(core::PartOfSpeech::Adjective);
-  if (!hasPrecedingPartOfSpeech(lattice, start_pos, kPredicateMask)) {
+  if (!hasPrecedingPartOfSpeech(lattice, start_pos, kVerbAdjectiveMask)) {
     return false;
   }
   for (size_t split = start_pos + 1; split < end_pos; ++split) {
@@ -681,21 +672,15 @@ bool startsParticleBeforeReduplicatedMimetic(const std::vector<char32_t>& codepo
 // verb continuative, or a benefactive request form. This keeps 読み+やすかっ
 // as an adjective while preserving お+見+やす and 読んで+おくれ+やす.
 bool followsKyotoHonorificYasuHost(const core::Lattice& lattice, size_t start_pos) {
-  for (const uint32_t edge_id : lattice.edgeIdsEndingAt(start_pos)) {
-    const auto& edge = lattice.getEdge(edge_id);
+  return core::anyEdgeEndingAt(lattice, start_pos, [&lattice](const core::LatticeEdge& edge) {
     if (edge.extended_pos == core::ExtendedPOS::AuxBenefactive) {
       return true;
     }
-    if (edge.extended_pos != core::ExtendedPOS::VerbRenyokei) {
-      continue;
-    }
-    if (core::anyEdgeEndingAt(lattice, edge.start, [](const core::LatticeEdge& prefix) {
-          return prefix.extended_pos == core::ExtendedPOS::Prefix && grammar::isHonorificPrefix(prefix.surface);
-        })) {
-      return true;
-    }
-  }
-  return false;
+    return edge.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+           core::anyEdgeEndingAt(lattice, edge.start, [](const core::LatticeEdge& prefix) {
+             return prefix.extended_pos == core::ExtendedPOS::Prefix && grammar::isHonorificPrefix(prefix.surface);
+           });
+  });
 }
 
 bool hasPrecedingQuantityEdge(const core::Lattice& lattice, size_t end_pos) {
@@ -874,22 +859,18 @@ ContextualDictionaryCandidateState addContextualDictionaryCandidates(
   ContextualDictionaryCandidateState state;
 
   if (startsLiteraryNitsukeAt(lattice, codepoints, start_pos)) {
-    lattice.addEdge("につけ", static_cast<uint32_t>(start_pos), static_cast<uint32_t>(start_pos + 3),
-                    core::PartOfSpeech::Particle, getCategoryCost(core::ExtendedPOS::ParticleConj),
-                    core::LatticeEdge::kFromDictionary, "につけ", dictionary::ConjugationType::None,
-                    core::CandidateOrigin::Dictionary, candidate::kDictionaryOriginConfidence, {},
-                    core::ExtendedPOS::ParticleConj, "literary_nitsuke");
+    tokenizer_dictionary_detail::addClosedClassEdge(lattice, "につけ", start_pos, start_pos + 3,
+                                                    core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleConj,
+                                                    "literary_nitsuke");
   }
 
   const bool starts_kyoto_honorific_yasu = start_pos + 1 < codepoints.size() && codepoints[start_pos] == U'や' &&
                                            codepoints[start_pos + 1] == U'す' &&
                                            followsKyotoHonorificYasuHost(lattice, start_pos);
   if (starts_kyoto_honorific_yasu) {
-    lattice.addEdge("やす", static_cast<uint32_t>(start_pos), static_cast<uint32_t>(start_pos + 2),
-                    core::PartOfSpeech::Auxiliary, getCategoryCost(core::ExtendedPOS::AuxHonorific),
-                    core::LatticeEdge::kFromDictionary, "やす", dictionary::ConjugationType::None,
-                    core::CandidateOrigin::Dictionary, candidate::kDictionaryOriginConfidence, {},
-                    core::ExtendedPOS::AuxHonorific, "kyoto_honorific_yasu");
+    tokenizer_dictionary_detail::addClosedClassEdge(lattice, "やす", start_pos, start_pos + 2,
+                                                    core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxHonorific,
+                                                    "kyoto_honorific_yasu");
   }
 
   // The regional causal き is indistinguishable from an ordinary
@@ -897,11 +878,9 @@ ContextualDictionaryCandidateState addContextualDictionaryCandidates(
   // auxiliary supplies the only unambiguous host (飲ん+だ+き), allowing this
   // context-licensed particle edge without cutting き out of lexical verbs.
   if (codepoints[start_pos] == U'き' && hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::AuxTenseTa)) {
-    constexpr auto causal_epos = core::ExtendedPOS::ParticleConj;
-    lattice.addEdge("き", static_cast<uint32_t>(start_pos), static_cast<uint32_t>(start_pos + 1),
-                    core::PartOfSpeech::Particle, getCategoryCost(causal_epos), core::LatticeEdge::kFromDictionary,
-                    "き", dictionary::ConjugationType::None, core::CandidateOrigin::Dictionary,
-                    candidate::kDictionaryOriginConfidence, {}, causal_epos, "regional_causal_ki");
+    tokenizer_dictionary_detail::addClosedClassEdge(lattice, "き", start_pos, start_pos + 1,
+                                                    core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleConj,
+                                                    "regional_causal_ki");
   }
 
   if (grammar::isBoundDeverbalSuffixAt(codepoints, start_pos) && hasPrecedingDeverbalNoun(lattice, start_pos)) {
@@ -916,21 +895,16 @@ ContextualDictionaryCandidateState addContextualDictionaryCandidates(
   state.has_attributive_temporal_ma =
       codepoints[start_pos] == U'間' && hasPrecedingAttributivePredicate(lattice, start_pos);
   if (state.has_attributive_temporal_ma) {
-    constexpr auto temporal_epos = core::ExtendedPOS::NounFormal;
-    lattice.addEdge("間", static_cast<uint32_t>(start_pos), static_cast<uint32_t>(start_pos + 1),
-                    core::PartOfSpeech::Noun, getCategoryCost(temporal_epos),
-                    core::LatticeEdge::kFromDictionary | core::LatticeEdge::kIsFormalNoun, "間",
-                    dictionary::ConjugationType::None, core::CandidateOrigin::Dictionary,
-                    candidate::kDictionaryOriginConfidence, {}, temporal_epos, "attributive_temporal_ma");
+    tokenizer_dictionary_detail::addClosedClassEdge(
+        lattice, "間", start_pos, start_pos + 1, core::PartOfSpeech::Noun, core::ExtendedPOS::NounFormal,
+        "attributive_temporal_ma", core::LatticeEdge::kFromDictionary | core::LatticeEdge::kIsFormalNoun);
   }
 
   if (codepoints[start_pos] == U'か' && (hasInterrogativeEndingAt(dict_manager, text, byte_offsets, start_pos) ||
                                          hasInterrogativeNominalPhraseEndingAt(lattice, start_pos))) {
-    lattice.addEdge("か", static_cast<uint32_t>(start_pos), static_cast<uint32_t>(start_pos + 1),
-                    core::PartOfSpeech::Particle, getCategoryCost(core::ExtendedPOS::ParticleAdverbial),
-                    core::LatticeEdge::kFromDictionary, "か", dictionary::ConjugationType::None,
-                    core::CandidateOrigin::Dictionary, candidate::kDictionaryOriginConfidence, {},
-                    core::ExtendedPOS::ParticleAdverbial, "indefinite_particle_ka");
+    tokenizer_dictionary_detail::addClosedClassEdge(lattice, "か", start_pos, start_pos + 1,
+                                                    core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleAdverbial,
+                                                    "indefinite_particle_ka");
   }
 
   // Keep the first/last か of a closed interrogative frame available when it
@@ -944,11 +918,9 @@ ContextualDictionaryCandidateState addContextualDictionaryCandidates(
       codepoints[start_pos - 2] == U'ど' && codepoints[start_pos - 1] == U'う' &&
       hasPrecedingExtendedPOS(lattice, start_pos - 3, core::ExtendedPOS::VerbShuushikei);
   if (opens_interrogative_frame || closes_interrogative_frame) {
-    constexpr auto frame_epos = core::ExtendedPOS::ParticleAdverbial;
-    lattice.addEdge("か", static_cast<uint32_t>(start_pos), static_cast<uint32_t>(start_pos + 1),
-                    core::PartOfSpeech::Particle, getCategoryCost(frame_epos), core::LatticeEdge::kFromDictionary, "か",
-                    dictionary::ConjugationType::None, core::CandidateOrigin::Dictionary,
-                    candidate::kDictionaryOriginConfidence, {}, frame_epos, "interrogative_frame_ka");
+    tokenizer_dictionary_detail::addClosedClassEdge(lattice, "か", start_pos, start_pos + 1,
+                                                    core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleAdverbial,
+                                                    "interrogative_frame_ka");
   }
 
   // In shortened causative-passive, さ retains the lexical verb's mizenkei
@@ -1068,14 +1040,9 @@ bool namesSimplexDeverbalNoun(const dictionary::DictionaryManager& dict_manager,
 // scan below runs at every position, so the window is bounded rather than open.
 constexpr size_t kElidedLookupWindow = 6;
 
-// The word classes that close a predicate. One in front hosts a final particle;
-// one reaching across a held particle's span is the word the mark draws out
-// (やばーい), and owns the mark instead.
-constexpr PartOfSpeechMask kPredicateHostMask = partOfSpeechMask(core::PartOfSpeech::Verb) |
-                                                partOfSpeechMask(core::PartOfSpeech::Adjective) |
-                                                partOfSpeechMask(core::PartOfSpeech::Auxiliary);
-constexpr PartOfSpeechMask kHeldFinalParticleHostMask =
-    kPredicateHostMask | partOfSpeechMask(core::PartOfSpeech::Noun) | partOfSpeechMask(core::PartOfSpeech::Pronoun);
+// A predicate host in front hosts a final particle; one reaching across a held
+// particle's span is the word the mark draws out (やばーい), and owns the mark instead.
+constexpr PartOfSpeechMask kHeldFinalParticleHostMask = kPredicateHostMask | kNounPronounMask;
 
 // Colloquial emphasis may hold a mora in the middle of a function word rather
 // than at its end (飲みたーい, ませーん, でーす). The mark carries no segment of
@@ -1512,9 +1479,8 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
       continue;
     }
     if (result.entry->pos == core::PartOfSpeech::Determiner && ends_at_sentence_boundary) {
-      constexpr PartOfSpeechMask kPredicateMask =
-          partOfSpeechMask(core::PartOfSpeech::Verb) | partOfSpeechMask(core::PartOfSpeech::Adjective);
-      const bool has_same_span_predicate = lookupResultsHavePartOfSpeech(lookup_results, kPredicateMask, result.length);
+      const bool has_same_span_predicate =
+          lookupResultsHavePartOfSpeech(lookup_results, kVerbAdjectiveMask, result.length);
       if (has_same_span_predicate) {
         continue;
       }
@@ -1871,9 +1837,7 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
       // A conjunction introduces what follows, so one closed off by punctuation
       // or the sentence end right after a content word has nothing to join
       // (時間+ない+し、 not 時間+ないし、) — the EOS AfterContent gate, mirrored.
-      constexpr PartOfSpeechMask kContentMask =
-          partOfSpeechMask(core::PartOfSpeech::Noun) | partOfSpeechMask(core::PartOfSpeech::Pronoun) |
-          partOfSpeechMask(core::PartOfSpeech::Verb) | partOfSpeechMask(core::PartOfSpeech::Adjective);
+      constexpr PartOfSpeechMask kContentMask = kNounPronounMask | kVerbAdjectiveMask;
       if (verb_helpers::clauseEndsAt(codepoints, end_pos) &&
           hasPrecedingPartOfSpeech(lattice, start_pos, kContentMask)) {
         continue;

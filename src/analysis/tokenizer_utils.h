@@ -55,6 +55,18 @@ inline constexpr PartOfSpeechMask kOpenClassPartOfSpeechMask =
     partOfSpeechMask(core::PartOfSpeech::Noun) | partOfSpeechMask(core::PartOfSpeech::Verb) |
     partOfSpeechMask(core::PartOfSpeech::Adjective) | partOfSpeechMask(core::PartOfSpeech::Adverb);
 
+/** Nominal host classes. */
+inline constexpr PartOfSpeechMask kNounPronounMask =
+    partOfSpeechMask(core::PartOfSpeech::Noun) | partOfSpeechMask(core::PartOfSpeech::Pronoun);
+
+/** Inflecting content predicates. */
+inline constexpr PartOfSpeechMask kVerbAdjectiveMask =
+    partOfSpeechMask(core::PartOfSpeech::Verb) | partOfSpeechMask(core::PartOfSpeech::Adjective);
+
+/** The word classes that close a predicate. */
+inline constexpr PartOfSpeechMask kPredicateHostMask =
+    kVerbAdjectiveMask | partOfSpeechMask(core::PartOfSpeech::Auxiliary);
+
 /**
  * Whether @p surface is a registered adjective that is not a na-adjective stem.
  * Only the i-adjective can stand in front of the nominalizer ん as it is; a

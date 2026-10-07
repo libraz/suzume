@@ -149,8 +149,7 @@ void addHiraganaCompoundVerbJoinCandidates(core::Lattice& lattice, std::string_v
 
     const bool closed_onbin_context = has_left_predicate_boundary && v2_start == particle_initial_onbin_split;
     const char32_t first_char = codepoints[start_pos];
-    if ((first_char == U'を' || first_char == U'が' || first_char == U'は' || first_char == U'に' ||
-         first_char == U'で' || first_char == U'へ' || first_char == U'の' || first_char == U'も') &&
+    if ((normalize::isCommonParticle(first_char) || first_char == U'で' || first_char == U'も') &&
         !closed_onbin_context) {
       continue;
     }

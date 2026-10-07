@@ -161,12 +161,10 @@ bool startsWithParticleBeforeRegisteredPredicate(const UnknownCandidate& candida
     const auto* slot_particle = dict_manager->lookupExact(extractSubstring(codepoints, host_boundary, candidate.start),
                                                           core::PartOfSpeech::Particle);
     constexpr size_t kHostLookback = 12;
-    constexpr PartOfSpeechMask kNominalHostMask =
-        partOfSpeechMask(core::PartOfSpeech::Noun) | partOfSpeechMask(core::PartOfSpeech::Pronoun);
     const size_t min_host_start = lookbehindStart(host_boundary, kHostLookback);
     if (slot_particle != nullptr && slot_particle->extended_pos == core::ExtendedPOS::ParticleCase &&
         (normalize::isKanjiCodepoint(codepoints[host_boundary - 1]) ||
-         hasDictionaryEntryEndingAt(*dict_manager, codepoints, min_host_start, host_boundary, kNominalHostMask))) {
+         hasDictionaryEntryEndingAt(*dict_manager, codepoints, min_host_start, host_boundary, kNounPronounMask))) {
       return false;
     }
   }
@@ -211,9 +209,7 @@ bool startsWithParticleBeforeRegisteredPredicate(const UnknownCandidate& candida
       continue;
     }
     const std::string tail = extractSubstring(codepoints, split, candidate.end);
-    constexpr PartOfSpeechMask kPredicateMask =
-        partOfSpeechMask(core::PartOfSpeech::Verb) | partOfSpeechMask(core::PartOfSpeech::Adjective);
-    if (hasExactPartOfSpeech(*dict_manager, tail, kPredicateMask)) {
+    if (hasExactPartOfSpeech(*dict_manager, tail, kVerbAdjectiveMask)) {
       return true;
     }
     const auto best = inflection.getBest(tail);
@@ -242,9 +238,7 @@ bool isGeneratedPredicate(const std::vector<char32_t>& codepoints, size_t start,
     return false;
   }
   const std::string surface = extractSubstring(codepoints, start, end);
-  constexpr PartOfSpeechMask kPredicateMask =
-      partOfSpeechMask(core::PartOfSpeech::Verb) | partOfSpeechMask(core::PartOfSpeech::Adjective);
-  if (hasExactPartOfSpeech(*dict_manager, surface, kPredicateMask)) {
+  if (hasExactPartOfSpeech(*dict_manager, surface, kVerbAdjectiveMask)) {
     return true;
   }
   const auto best = inflection.getBest(surface);
@@ -383,10 +377,7 @@ bool fusesPastAuxiliary(const UnknownCandidate& candidate, const std::vector<cha
   if (single_mora_verb != nullptr && single_mora_verb->extended_pos == core::ExtendedPOS::VerbShuushikei) {
     return false;
   }
-  constexpr PartOfSpeechMask kPredicateMask = partOfSpeechMask(core::PartOfSpeech::Verb) |
-                                              partOfSpeechMask(core::PartOfSpeech::Adjective) |
-                                              partOfSpeechMask(core::PartOfSpeech::Auxiliary);
-  return hasExactPartOfSpeech(*dict_manager, prefix, kPredicateMask);
+  return hasExactPartOfSpeech(*dict_manager, prefix, kPredicateHostMask);
 }
 
 bool fusesPassivePastAsNoun(const UnknownCandidate& candidate) {

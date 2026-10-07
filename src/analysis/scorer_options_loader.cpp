@@ -367,6 +367,7 @@ class ConfigReader {
   bool readString(std::string& out);
   bool readNumber(float& out);
   bool skipValue();
+  void skipDigits();
   void skipWhitespace();
   char peek() const;
   bool match(char expected);
@@ -439,28 +440,28 @@ bool ConfigReader::readString(std::string& out) {
   return true;
 }
 
+void ConfigReader::skipDigits() {
+  while (pos_ < json_.size() && json_[pos_] >= '0' && json_[pos_] <= '9') {
+    ++pos_;
+  }
+}
+
 bool ConfigReader::readNumber(float& out) {
   const size_t start = pos_;
   if (peek() == '-') {
     ++pos_;
   }
-  while (pos_ < json_.size() && json_[pos_] >= '0' && json_[pos_] <= '9') {
-    ++pos_;
-  }
+  skipDigits();
   if (pos_ < json_.size() && json_[pos_] == '.') {
     ++pos_;
-    while (pos_ < json_.size() && json_[pos_] >= '0' && json_[pos_] <= '9') {
-      ++pos_;
-    }
+    skipDigits();
   }
   if (pos_ < json_.size() && (json_[pos_] == 'e' || json_[pos_] == 'E')) {
     ++pos_;
     if (pos_ < json_.size() && (json_[pos_] == '+' || json_[pos_] == '-')) {
       ++pos_;
     }
-    while (pos_ < json_.size() && json_[pos_] >= '0' && json_[pos_] <= '9') {
-      ++pos_;
-    }
+    skipDigits();
   }
   if (pos_ == start || !convertDecimalToFloat(json_.substr(start, pos_ - start), out)) {
     return failParse("Invalid number in JSON");
@@ -471,39 +472,7 @@ bool ConfigReader::readNumber(float& out) {
 bool ConfigReader::skipValue() {
   const char lead = peek();
   if (lead == '{') {
-    ++pos_;
-    skipWhitespace();
-    if (match('}')) {
-      return true;
-    }
-    while (true) {
-      if (peek() == '\0') {
-        return failParse("Unterminated object");
-      }
-      if (peek() != '"') {
-        return failParse("Expected string key in object");
-      }
-      std::string ignored;
-      if (!readString(ignored)) {
-        return false;
-      }
-      skipWhitespace();
-      if (!match(':')) {
-        return failParse("Expected ':' in object");
-      }
-      skipWhitespace();
-      if (!skipValue()) {
-        return false;
-      }
-      skipWhitespace();
-      if (match('}')) {
-        return true;
-      }
-      if (!match(',')) {
-        return failParse("Expected ',' or '}' in object");
-      }
-      skipWhitespace();
-    }
+    return forEachObjectMember([this](const std::string&) { return skipValue(); });
   }
   if (lead == '[') {
     ++pos_;
@@ -626,13 +595,7 @@ bool ConfigReader::readBigramSection() {
     return false;
   }
   return forEachObjectMember([&](const std::string& name) {
-    const BigramOverrideSpec* override_spec = nullptr;
-    for (const BigramOverrideSpec& spec : kBigramOverrideSpecs) {
-      if (name == spec.name) {
-        override_spec = &spec;
-        break;
-      }
-    }
+    const BigramOverrideSpec* override_spec = findBigramSpec(name);
     if (override_spec == nullptr) {
       return fail("Unknown scorer option: bigram." + name);
     }
@@ -778,27 +741,37 @@ int applySpecs(const char* section, ScorerOptions& options, size_t base, const O
   return applied;
 }
 
+// Environment sections in application order; a null spec is the bigram section.
+struct EnvSection {
+  const char* name;
+  const SectionSpec* spec;
+};
+
+constexpr std::array<EnvSection, 6> kEnvSections{{
+    {"JOIN", &kCandidateSections[0]},
+    {"SPLIT", &kCandidateSections[1]},
+    {"UNARY", &kRootOptionSections[0]},
+    {"BIGRAM", nullptr},
+    {"VERB", &kRootOptionSections[1]},
+    {"INFL", &kRootOptionSections[2]},
+}};
+
 int applyAllEnvOverrides(ScorerOptions& options, bool report_warnings,
                          std::vector<std::string>* collected_warnings = nullptr) {
   int count = 0;
-  count += applySpecs("JOIN", options, kJoinBase, kJoinOptionSpecs.data(), kJoinOptionSpecs.size(), report_warnings,
-                      collected_warnings);
-  count += applySpecs("SPLIT", options, kSplitBase, kSplitOptionSpecs.data(), kSplitOptionSpecs.size(), report_warnings,
-                      collected_warnings);
-  count += applySpecs("UNARY", options, kUnaryBase, kUnaryOptionSpecs.data(), kUnaryOptionSpecs.size(), report_warnings,
-                      collected_warnings);
-
-  for (const BigramOverrideSpec& spec : kBigramOverrideSpecs) {
-    const std::string variable_name = std::string("SUZUME_SCORER_BIGRAM_") + spec.name;
-    if (tryGetEnvFloat(variable_name.c_str(), options.bigram.*(spec.value), report_warnings, collected_warnings)) {
-      ++count;
+  for (const EnvSection& section : kEnvSections) {
+    if (section.spec != nullptr) {
+      count += applySpecs(section.name, options, section.spec->base, section.spec->options, section.spec->option_count,
+                          report_warnings, collected_warnings);
+      continue;
+    }
+    for (const BigramOverrideSpec& spec : kBigramOverrideSpecs) {
+      const std::string variable_name = std::string("SUZUME_SCORER_BIGRAM_") + spec.name;
+      if (tryGetEnvFloat(variable_name.c_str(), options.bigram.*(spec.value), report_warnings, collected_warnings)) {
+        ++count;
+      }
     }
   }
-
-  count += applySpecs("VERB", options, kVerbBase, kVerbOptionSpecs.data(), kVerbOptionSpecs.size(), report_warnings,
-                      collected_warnings);
-  count += applySpecs("INFL", options, kInflectionBase, kInflectionOptionSpecs.data(), kInflectionOptionSpecs.size(),
-                      report_warnings, collected_warnings);
   return count;
 }
 
@@ -806,23 +779,19 @@ bool isKnownScorerEnvironmentVariable(std::string_view name) {
   if (name == "SUZUME_SCORER_CONFIG") {
     return true;
   }
-  const auto matches_specs = [name](std::string_view section, const OptionSpec* specs, size_t count) {
-    for (size_t index = 0; index < count; ++index) {
-      if (name == "SUZUME_SCORER_" + std::string(section) + "_" + std::string(specs[index].name)) {
+  for (const EnvSection& section : kEnvSections) {
+    const std::string prefix = std::string("SUZUME_SCORER_") + section.name + "_";
+    if (name.substr(0, prefix.size()) != prefix) {
+      continue;
+    }
+    const std::string_view option = name.substr(prefix.size());
+    if (section.spec == nullptr) {
+      if (findBigramSpec(option) != nullptr) {
         return true;
       }
+      continue;
     }
-    return false;
-  };
-  if (matches_specs("JOIN", kJoinOptionSpecs.data(), kJoinOptionSpecs.size()) ||
-      matches_specs("SPLIT", kSplitOptionSpecs.data(), kSplitOptionSpecs.size()) ||
-      matches_specs("UNARY", kUnaryOptionSpecs.data(), kUnaryOptionSpecs.size()) ||
-      matches_specs("VERB", kVerbOptionSpecs.data(), kVerbOptionSpecs.size()) ||
-      matches_specs("INFL", kInflectionOptionSpecs.data(), kInflectionOptionSpecs.size())) {
-    return true;
-  }
-  for (const BigramOverrideSpec& spec : kBigramOverrideSpecs) {
-    if (name == "SUZUME_SCORER_BIGRAM_" + std::string(spec.name)) {
+    if (findOption(*section.spec, option) != nullptr) {
       return true;
     }
   }

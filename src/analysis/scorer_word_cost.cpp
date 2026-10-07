@@ -183,8 +183,7 @@ float computeSpuriousVerbPenalty(const core::LatticeEdge& edge) {
   // E.g., "につけ" as renyokei of "につける" is spurious
   // Should be に|つけ (particle + verb), not につけ (verb)
   // Valid verbs like "につける" don't exist; this is a mis-analysis
-  if (!edge.fromDictionary() && edge.pos == core::PartOfSpeech::Verb &&
-      edge.extended_pos == core::ExtendedPOS::VerbRenyokei && grammar::isPureHiragana(edge.surface) &&
+  if (isUnregisteredPureHiraganaVerb(edge) && edge.extended_pos == core::ExtendedPOS::VerbRenyokei &&
       utf8::startsWith(edge.surface, "に") && edge.surface.size() >= core::kTwoJapaneseCharBytes &&
       edge.surface.size() <= core::kFourJapaneseCharBytes) {  // 2-4 chars
     penalty += sc::kPenaltyNiPrefixVerb;
@@ -203,8 +202,7 @@ float computeSpuriousVerbPenalty(const core::LatticeEdge& edge) {
   // E.g., "つるつるし" as godan-sa renyokei — should be つるつる(ADV) + し(する)
   // Only renyokei: base forms like "づけられる" (from づける) are legitimate.
   // The -asu derivation lengthens the stem by one mora (あまやか+し).
-  if (!edge.fromDictionary() && edge.pos == core::PartOfSpeech::Verb &&
-      edge.extended_pos == core::ExtendedPOS::VerbRenyokei && grammar::isPureHiragana(edge.surface) &&
+  if (isUnregisteredPureHiraganaVerb(edge) && edge.extended_pos == core::ExtendedPOS::VerbRenyokei &&
       edge.surface.size() >= core::kFiveJapaneseCharBytes &&  // 5+ hiragana chars (5*3=15 bytes)
       !isTransitiveAsuContinuative(edge.surface)) {
     penalty += sc::kPenaltyVeryLongHiraganaVerb;
@@ -245,8 +243,7 @@ float computeVerbEndingPenalty(const core::LatticeEdge& edge) {
   // E.g., "ねて" should be ね + て, not ねて (verb te-form)
   // MeCab splits pure-hiragana verb te-forms into verb + て particle
   // Exception: keep short forms (2 chars like して, きて) as they're common L1 entries
-  if (!edge.fromDictionary() && edge.pos == core::PartOfSpeech::Verb &&
-      edge.extended_pos == core::ExtendedPOS::VerbTeForm && grammar::isPureHiragana(edge.surface) &&
+  if (isUnregisteredPureHiraganaVerb(edge) && edge.extended_pos == core::ExtendedPOS::VerbTeForm &&
       edge.surface.size() >= core::kThreeJapaneseCharBytes) {  // keeps して, きて
     penalty += cost::kVeryRare;
   }

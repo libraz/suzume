@@ -7,7 +7,9 @@
  */
 
 #include <algorithm>
+#include <array>
 #include <cstdint>
+#include <string_view>
 
 #include "adjective_candidates.h"
 #include "analysis/dictionary_probe.h"
@@ -115,20 +117,7 @@ bool spellsAuxiliaryChain(const dictionary::DictionaryManager& dict_manager, con
 // Particle that can immediately PRECEDE a content noun (私は…, 本を…, 犬が…). Used as
 // the left bracket of a post-particle noun promotion.
 bool isLeftBoundaryParticle(char32_t code_point) {
-  switch (code_point) {
-    case U'は':
-    case U'が':
-    case U'を':
-    case U'に':
-    case U'で':
-    case U'へ':
-    case U'と':
-    case U'も':
-    case U'の':
-      return true;
-    default:
-      return false;
-  }
+  return normalize::isCommonParticle(code_point) || code_point == U'で' || code_point == U'と' || code_point == U'も';
 }
 
 // Particle that can immediately FOLLOW a content noun (…を, …が, …は). Used as the
@@ -174,21 +163,12 @@ bool isInternalParticleChar(char32_t code_point) {
 }
 
 bool startsClosedNativeNumber(const std::vector<char32_t>& codepoints, size_t pos) {
-  if (pos + 2 >= codepoints.size()) {
-    return false;
-  }
-  const char32_t first = codepoints[pos];
-  const char32_t second = codepoints[pos + 1];
-  const char32_t third = codepoints[pos + 2];
-  if ((first == U'ひ' && second == U'と' && third == U'つ') || (first == U'ふ' && second == U'た' && third == U'つ') ||
-      (first == U'み' && second == U'っ' && third == U'つ') || (first == U'よ' && second == U'っ' && third == U'つ') ||
-      (first == U'い' && second == U'つ' && third == U'つ') || (first == U'む' && second == U'っ' && third == U'つ') ||
-      (first == U'な' && second == U'な' && third == U'つ') || (first == U'や' && second == U'っ' && third == U'つ')) {
-    return true;
-  }
-  return pos + 3 < codepoints.size() &&
-         ((first == U'こ' && second == U'こ' && third == U'の' && codepoints[pos + 3] == U'つ') ||
-          (first == U'と' && second == U'お' && third == U'の' && codepoints[pos + 3] == U'つ'));
+  constexpr std::array<std::u32string_view, 10> kClosedNativeNumbers{{U"ひとつ", U"ふたつ", U"みっつ", U"よっつ",
+                                                                      U"いつつ", U"むっつ", U"ななつ", U"やっつ",
+                                                                      U"ここのつ", U"とおのつ"}};
+  return std::any_of(kClosedNativeNumbers.begin(), kClosedNativeNumbers.end(), [&](std::u32string_view word) {
+    return pos + word.size() <= codepoints.size() && std::equal(word.begin(), word.end(), codepoints.begin() + pos);
+  });
 }
 
 // Length of a dictionary auxiliary starting at @p pos that is itself bound on
@@ -1714,13 +1694,10 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
       const bool absorbs_copula_before_sokuon_final =
           right_sokuon_final_particle && absorbed_auxiliary != nullptr &&
           absorbed_auxiliary->extended_pos == core::ExtendedPOS::AuxCopulaDa;
-      constexpr PartOfSpeechMask kPredicateMask = partOfSpeechMask(core::PartOfSpeech::Verb) |
-                                                  partOfSpeechMask(core::PartOfSpeech::Adjective) |
-                                                  partOfSpeechMask(core::PartOfSpeech::Auxiliary);
       const bool has_exact_noun =
           dict_manager_ != nullptr && dict_manager_->lookupExact(promoted_surface, core::PartOfSpeech::Noun) != nullptr;
       const bool has_competing_exact_predicate =
-          dict_manager_ != nullptr && hasExactPartOfSpeech(*dict_manager_, promoted_surface, kPredicateMask);
+          dict_manager_ != nullptr && hasExactPartOfSpeech(*dict_manager_, promoted_surface, kPredicateHostMask);
       const auto* exact_verb =
           dict_manager_ != nullptr ? dict_manager_->lookupExact(promoted_surface, core::PartOfSpeech::Verb) : nullptr;
       const bool has_exact_conditional_verb =
@@ -2099,9 +2076,8 @@ void UnknownWordGenerator::generateBySameType(const std::vector<char32_t>& codep
                                             promoted_dictionary_reading == nullptr &&
                                             !kana::isIRowCodepoint(last_mora) && !kana::isERowCodepoint(last_mora);
         if (opens_on_native_prefix) {
-          auto host_cand =
-              makeCandidate(extractSubstring(codepoints, start_pos + 1, scan), start_pos + 1, scan,
-                            core::PartOfSpeech::Noun, noun_cost, /*has_suffix=*/true, CandidateOrigin::BracketedNoun);
+          auto host_cand = makeCandidate(codepoints, start_pos + 1, scan, core::PartOfSpeech::Noun, noun_cost,
+                                         /*has_suffix=*/true, CandidateOrigin::BracketedNoun);
 #ifdef SUZUME_DEBUG_INFO
           host_cand.pattern = "prefixed_hira_noun";
 #endif

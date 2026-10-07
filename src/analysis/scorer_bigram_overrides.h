@@ -2,6 +2,7 @@
 #define SUZUME_ANALYSIS_SCORER_BIGRAM_OVERRIDES_H_
 
 #include <array>
+#include <string_view>
 
 #include "scorer.h"
 
@@ -35,6 +36,16 @@ inline constexpr std::array<BigramOverrideSpec, 14> kBigramOverrideSpecs = {{
     {"aux_to_part", POS::Auxiliary, POS::Particle, &BigramOverrides::aux_to_part},
     {"aux_to_aux", POS::Auxiliary, POS::Auxiliary, &BigramOverrides::aux_to_aux},
 }};
+
+/** The override spec whose public option name is @p name, or nullptr. */
+inline const BigramOverrideSpec* findBigramSpec(std::string_view name) {
+  for (const BigramOverrideSpec& spec : kBigramOverrideSpecs) {
+    if (name == spec.name) {
+      return &spec;
+    }
+  }
+  return nullptr;
+}
 
 }  // namespace suzume::analysis
 

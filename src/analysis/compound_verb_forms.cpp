@@ -25,31 +25,6 @@ const grammar::Conjugation::GodanEntry* findGodanRowByEnding(std::string_view ba
   return findGodanRowByBaseVowel(utf8::decodeFirstChar(base_ending));
 }
 
-dictionary::ConjugationType toDictionaryConjugationType(grammar::VerbType verb_type) {
-  switch (verb_type) {
-    case grammar::VerbType::GodanKa:
-      return dictionary::ConjugationType::GodanKa;
-    case grammar::VerbType::GodanGa:
-      return dictionary::ConjugationType::GodanGa;
-    case grammar::VerbType::GodanSa:
-      return dictionary::ConjugationType::GodanSa;
-    case grammar::VerbType::GodanTa:
-      return dictionary::ConjugationType::GodanTa;
-    case grammar::VerbType::GodanNa:
-      return dictionary::ConjugationType::GodanNa;
-    case grammar::VerbType::GodanBa:
-      return dictionary::ConjugationType::GodanBa;
-    case grammar::VerbType::GodanMa:
-      return dictionary::ConjugationType::GodanMa;
-    case grammar::VerbType::GodanRa:
-      return dictionary::ConjugationType::GodanRa;
-    case grammar::VerbType::GodanWa:
-      return dictionary::ConjugationType::GodanWa;
-    default:
-      return dictionary::ConjugationType::None;
-  }
-}
-
 std::string replaceGodanEnding(std::string_view base, bool use_o_row) {
   if (base.size() < core::kJapaneseCharBytes) {
     return "";
@@ -71,7 +46,7 @@ dictionary::ConjugationType compoundConjugationType(V2VerbType verb_type, std::s
     return dictionary::ConjugationType::Ichidan;
   }
   const auto* godan_entry = findGodanRowByEnding(base_ending);
-  return godan_entry == nullptr ? dictionary::ConjugationType::None : toDictionaryConjugationType(godan_entry->first);
+  return godan_entry == nullptr ? dictionary::ConjugationType::None : grammar::verbTypeToConjType(godan_entry->first);
 }
 
 namespace {

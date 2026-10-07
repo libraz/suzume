@@ -2,6 +2,7 @@
 #include "analysis/category_cost.h"
 #include "analysis/scorer.h"
 #include "analysis/scorer_connection_rules.h"
+#include "analysis/scorer_connection_rules_internal.h"
 #include "analysis/scorer_constants.h"
 #include "analysis/verb_candidates_helpers.h"
 #include "core/debug.h"
@@ -713,6 +714,10 @@ float Scorer::connectionCost(const core::LatticeEdge& prev, const core::LatticeE
                                                                      : attributive_continuation_weight);
   }
 
+  const bool next_is_shi =
+      (next.extended_pos == core::ExtendedPOS::VerbRenyokei && grammar::isSuruRenyokeiSurface(next.surface)) ||
+      (next.extended_pos == core::ExtendedPOS::ParticleConj && grammar::isConjunctiveParticleShi(next.surface));
+
   // Penalty for AuxCopulaDa(で) → し pattern (VerbRenyokei or ParticleConj)
   // 本でした should be 本+でし+た, not 本+で+し+た
   // で as copula te-form followed by し is grammatically unusual
@@ -721,10 +726,7 @@ float Scorer::connectionCost(const core::LatticeEdge& prev, const core::LatticeE
   // This ensures でし (AuxCopulaDesu renyokei) wins over で+し split
   if (prev.extended_pos == core::ExtendedPOS::AuxCopulaDa && prev.surface == "で" &&
       (next.extended_pos == core::ExtendedPOS::VerbRenyokei || next.extended_pos == core::ExtendedPOS::ParticleConj)) {
-    const bool is_suru_or_conjunctive_shi =
-        (next.extended_pos == core::ExtendedPOS::VerbRenyokei && grammar::isSuruRenyokeiSurface(next.surface)) ||
-        (next.extended_pos == core::ExtendedPOS::ParticleConj && grammar::isConjunctiveParticleShi(next.surface));
-    if (is_suru_or_conjunctive_shi) {
+    if (next_is_shi) {
       SUZUME_CONNECTION_ADD(surface_bonus, cost::kAlmostNever);
     }
   }
@@ -746,9 +748,6 @@ float Scorer::connectionCost(const core::LatticeEdge& prev, const core::LatticeE
   // Short verb renyokei (2-3 chars) followed by し or き often indicates
   // over-segmentation of a noun or longer verb
   // Exclude ば (valid conditional: よれ+ば), て (te-form), etc.
-  const bool next_is_shi =
-      (next.extended_pos == core::ExtendedPOS::VerbRenyokei && grammar::isSuruRenyokeiSurface(next.surface)) ||
-      (next.extended_pos == core::ExtendedPOS::ParticleConj && grammar::isConjunctiveParticleShi(next.surface));
   if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei && prev.surface.size() >= 6 && prev.surface.size() <= 9 &&
       (next_is_shi || next.surface == "き")) {  // 2-3 hiragana
     // Check prev is all hiragana
@@ -871,12 +870,9 @@ float Scorer::connectionCost(const core::LatticeEdge& prev, const core::LatticeE
   // Single hiragana verb renyokei (し, き, み, etc.) rarely takes を directly
   // Nominalized verb renyokei like 読み, 書き take を (読みを深める) but those
   // are multi-char and should be recognized as NOUN, not single-char VERB_連用
-  if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei && normalize::utf8Length(prev.surface) == 1 &&
-      next.extended_pos == core::ExtendedPOS::ParticleCase && next.surface == "を") {
-    // Check if single char is hiragana
-    if (kana::isHiraganaCodepoint(utf8::decodeFirstChar(prev.surface))) {
-      SUZUME_CONNECTION_ADD(surface_bonus, cost::kStrong);
-    }
+  if (connection_rules::isSingleHiraganaVerbRenyokei(prev) && next.extended_pos == core::ExtendedPOS::ParticleCase &&
+      next.surface == "を") {
+    SUZUME_CONNECTION_ADD(surface_bonus, cost::kStrong);
   }
 
   // Penalty for で(VerbRenyokei of 出る) → Particle (except て)

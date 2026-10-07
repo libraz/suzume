@@ -379,6 +379,12 @@ void emitCompoundVerbCandidates(core::Lattice& lattice, std::string_view text, c
   }
 
   const float verbal_noun_cost = scorer.posPrior(core::PartOfSpeech::Noun) + candidate::kCompoundVerbSuffixNounBonus;
+  const auto add_verbal_noun = [&](std::string_view pattern) {
+    lattice.addEdge(compound_surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(compound_end_pos),
+                    core::PartOfSpeech::Noun, verbal_noun_cost, flags, compound_surface,
+                    dictionary::ConjugationType::None, core::CandidateOrigin::VerbCompound,
+                    candidate::kNoOriginConfidence, pattern, core::ExtendedPOS::NounVerbal, pattern);
+  };
 
   // A verified compound continuative directly marked by a case, topic, or
   // nominalizer particle, or by the copula, heads a nominal phrase.  Emit its deverbal-noun
@@ -401,22 +407,14 @@ void emitCompoundVerbCandidates(core::Lattice& lattice, std::string_view text, c
        // The copula predicates over it the same way (押し付けだ, 押し付けではなく).
        grammar::startsPredicativeCopula(extractSubstring(codepoints, compound_end_pos, codepoints.size())) ||
        grammar::isCopulaFusedConjunction(extractSubstring(codepoints, compound_end_pos, compound_end_pos + 2)))) {
-    lattice.addEdge(compound_surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(compound_end_pos),
-                    core::PartOfSpeech::Noun, verbal_noun_cost, flags, compound_surface,
-                    dictionary::ConjugationType::None, core::CandidateOrigin::VerbCompound,
-                    candidate::kNoOriginConfidence, "compound_renyokei_nominal", core::ExtendedPOS::NounVerbal,
-                    "compound_renyokei_nominal");
+    add_verbal_noun("compound_renyokei_nominal");
   }
 
   // A deverbal suffix after a compound continuative keeps its own boundary
   // while the compound is nominalized (組み合わせ+方, 取り扱い+所, 引き受け+手);
   // only a simple continuative fuses with it (書き方).
   if (best_match.renyokei_form && grammar::isBoundDeverbalSuffixAt(codepoints, compound_end_pos)) {
-    lattice.addEdge(compound_surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(compound_end_pos),
-                    core::PartOfSpeech::Noun, verbal_noun_cost, flags, compound_surface,
-                    dictionary::ConjugationType::None, core::CandidateOrigin::VerbCompound,
-                    candidate::kNoOriginConfidence, "compound_renyokei_before_suffix", core::ExtendedPOS::NounVerbal,
-                    "compound_renyokei_before_suffix");
+    add_verbal_noun("compound_renyokei_before_suffix");
   }
 
   // An ichidan V2 forms its conditional from the compound renyokei plus

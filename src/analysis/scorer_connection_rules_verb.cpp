@@ -148,6 +148,8 @@ float computeTaFormVolitionalBonus(const core::LatticeEdge& prev, const core::La
                                                prev.pos == core::PartOfSpeech::Verb &&
                                                !grammar::endsWithORow(prev.surface);
 
+  const bool prev_is_suru = prev.conj_type == dictionary::ConjugationType::Suru || prev.lemma == "する";
+
   // An o-row irrealis form followed by bare う is the productive modern
   // volitional (書こ+う, 泳ご+う, しよ+う). Prefer it over a homographic
   // continuative-form plus formal-noun path.
@@ -162,8 +164,7 @@ float computeTaFormVolitionalBonus(const core::LatticeEdge& prev, const core::La
       (grammar::isGodanVerbType(grammar::conjTypeToVerbType(prev.conj_type)) ||
        (prev.fromDictionary() && prev.conj_type == dictionary::ConjugationType::None &&
         !utf8::endsWith(prev.surface, "よ")) ||
-       prev.conj_type == dictionary::ConjugationType::Suru || prev.lemma == "する" ||
-       (prev.conj_type == dictionary::ConjugationType::Ichidan && utf8::endsWith(prev.surface, "よ")));
+       prev_is_suru || (prev.conj_type == dictionary::ConjugationType::Ichidan && utf8::endsWith(prev.surface, "よ")));
 
   // The directional subsidiary retains the same volitional boundary after a
   // connective form (読んで+いこ+う), rather than yielding to the
@@ -191,16 +192,14 @@ float computeTaFormVolitionalBonus(const core::LatticeEdge& prev, const core::La
       grammar::isGodanVerbType(grammar::conjTypeToVerbType(prev.conj_type));
   // する negates its classical negative through せ (せ+ん); し+ん is the
   // dialect contraction, which yields to a registered onbin (楽しん+で).
-  const bool suru_continuative_before_classical_negative =
-      next.extended_pos == core::ExtendedPOS::AuxNegativeNu && grammar::isSuruRenyokeiSurface(prev.surface) &&
-      (prev.conj_type == dictionary::ConjugationType::Suru || prev.lemma == "する");
+  const bool suru_continuative_before_classical_negative = next.extended_pos == core::ExtendedPOS::AuxNegativeNu &&
+                                                           grammar::isSuruRenyokeiSurface(prev.surface) && prev_is_suru;
   // The せ of する only hosts the classical negative and せ+られる; the modern
   // ない and ます take し (しない・します), so せ+ない is an ichidan stem 任せ+ない.
-  const bool suru_irrealis_before_modern_aux =
-      (next.extended_pos == core::ExtendedPOS::AuxNegativeNai ||
-       next.extended_pos == core::ExtendedPOS::AuxTenseMasu) &&
-      prev.extended_pos == core::ExtendedPOS::VerbMizenkei && grammar::isSuruMizenkeiSurface(prev.surface) &&
-      (prev.conj_type == dictionary::ConjugationType::Suru || prev.lemma == "する");
+  const bool suru_irrealis_before_modern_aux = (next.extended_pos == core::ExtendedPOS::AuxNegativeNai ||
+                                                next.extended_pos == core::ExtendedPOS::AuxTenseMasu) &&
+                                               prev.extended_pos == core::ExtendedPOS::VerbMizenkei &&
+                                               grammar::isSuruMizenkeiSurface(prev.surface) && prev_is_suru;
   // The attributive ける of the classical past is bound to a classical clause
   // and needs the nominal it modifies; after a modern continuative it is the
   // potential or a verb tail (彼女なら+いける, not 習い+ける), which outweighs

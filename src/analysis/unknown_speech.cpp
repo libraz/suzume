@@ -6,6 +6,7 @@
  * and UnknownWordGenerator::generateOnomatopoeiaCandidates.
  */
 
+#include <array>
 #include <cstdint>
 #include <utility>
 
@@ -122,14 +123,10 @@ void UnknownWordGenerator::generateCharacterSpeechCandidates(std::string_view /*
   // Only kana that can begin a sentence-ending speech pattern (ぞ, じゃ, のう)
   // or a colloquial auxiliary (ちゃ) start character speech. Grammar kana handled
   // by the dictionary (た, さ, ら, く) and sound-symbolic rows are excluded.
-  const bool valid_starter = first_char == U'ぞ' || first_char == U'じ' || first_char == U'の' || first_char == U'な' ||
-                             first_char == U'ね' || first_char == U'よ' || first_char == U'わ' || first_char == U'で' ||
-                             first_char == U'だ' || first_char == U'ま' || first_char == U'や' || first_char == U'か' ||
-                             first_char == U'が' || first_char == U'べ' || first_char == U'ち' || first_char == U'に' ||
-                             first_char == U'せ' || first_char == U'ず' || first_char == U'ど' || first_char == U'て' ||
-                             first_char == U'も' || first_char == U'み' || first_char == U'ん' || first_char == U'そ' ||
-                             first_char == U'と' || first_char == U'お' || first_char == U'は' || first_char == U'へ';
-  if (!valid_starter) {
+  constexpr std::array<char32_t, 28> kSpeechStarters{
+      {U'ぞ', U'じ', U'の', U'な', U'ね', U'よ', U'わ', U'で', U'だ', U'ま', U'や', U'か', U'が', U'べ',
+       U'ち', U'に', U'せ', U'ず', U'ど', U'て', U'も', U'み', U'ん', U'そ', U'と', U'お', U'は', U'へ'}};
+  if (!kana::isCodepointIn(kSpeechStarters, first_char)) {
     return;
   }
 
@@ -308,9 +305,8 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
   if (isBareVowelMora(codepoints[start_pos]) &&
       (after_vowel >= codepoints.size() || char_types[after_vowel] == normalize::CharType::Symbol) &&
       (start_pos == 0 || char_types[start_pos - 1] == normalize::CharType::Symbol)) {
-    auto interjection = makeCandidate(extractSubstring(codepoints, start_pos, after_vowel), start_pos, after_vowel,
-                                      core::PartOfSpeech::Interjection, candidate::kLaughterInterjectionCost, true,
-                                      CandidateOrigin::Onomatopoeia);
+    auto interjection = makeCandidate(codepoints, start_pos, after_vowel, core::PartOfSpeech::Interjection,
+                                      candidate::kLaughterInterjectionCost, true, CandidateOrigin::Onomatopoeia);
 #ifdef SUZUME_DEBUG_INFO
     interjection.pattern = "bare_vowel_interjection";
 #endif
@@ -332,8 +328,7 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
   // A laugh is an interjection of its own, not the honorific お on 頬 or a
   // noun followed by particle へ (おほほ, えへへ).
   if (const size_t laugh_len = laughterLengthAt(codepoints, start_pos); laugh_len > 0) {
-    auto laugh = makeCandidate(extractSubstring(codepoints, start_pos, start_pos + laugh_len), start_pos,
-                               start_pos + laugh_len, core::PartOfSpeech::Interjection,
+    auto laugh = makeCandidate(codepoints, start_pos, start_pos + laugh_len, core::PartOfSpeech::Interjection,
                                candidate::kLaughterInterjectionCost, true, CandidateOrigin::Onomatopoeia);
 #ifdef SUZUME_DEBUG_INFO
     laugh.confidence = candidate::kHighOriginConfidence;
@@ -486,10 +481,7 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
         // particle belongs to the next word (だっ|た+と+なる|と reads the past
         // auxiliary, the quotative and なる as one fabricated adverb たとなる).
         for (size_t split = start_pos + 1; split < mimetic_end && !decomposes_as_predicate_particle; ++split) {
-          constexpr PartOfSpeechMask kPredicateMask = partOfSpeechMask(core::PartOfSpeech::Verb) |
-                                                      partOfSpeechMask(core::PartOfSpeech::Adjective) |
-                                                      partOfSpeechMask(core::PartOfSpeech::Auxiliary);
-          if (!hasExactPartOfSpeech(*dict_manager_, codepoints, start_pos, split, kPredicateMask)) {
+          if (!hasExactPartOfSpeech(*dict_manager_, codepoints, start_pos, split, kPredicateHostMask)) {
             continue;
           }
           for (size_t particle_end = split + 1; particle_end <= mimetic_end; ++particle_end) {

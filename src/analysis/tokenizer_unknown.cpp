@@ -519,15 +519,10 @@ bool hasCompleteInternalConstituentBoundary(const core::Lattice& lattice,
       return licenses_adjective || licenses_auxiliary || licenses_formal_noun || licenses_connective_particle ||
              licenses_nominal_particle || licenses_suffix;
     };
-    bool complete_left = false;
-    for (const uint32_t edge_id : lattice.edgeIdsEndingAt(split)) {
-      const auto& edge = lattice.getEdge(edge_id);
-      if (edge.start <= candidate.start && left_licenses_right(edge.pos, edge.extended_pos, edge.lemmaVerified(),
-                                                               edge.start < candidate.start, edge.surface)) {
-        complete_left = true;
-        break;
-      }
-    }
+    bool complete_left = core::anyEdgeEndingAt(lattice, split, [&](const core::LatticeEdge& edge) {
+      return edge.start <= candidate.start && left_licenses_right(edge.pos, edge.extended_pos, edge.lemmaVerified(),
+                                                                  edge.start < candidate.start, edge.surface);
+    });
     if (!complete_left) {
       complete_left = std::any_of(batch_candidates.begin(), batch_candidates.end(), [&](const auto& alternative) {
         return alternative.start == candidate.start && alternative.end == split &&
@@ -941,13 +936,10 @@ void Tokenizer::addUnknownCandidates(core::Lattice& lattice, std::string_view te
     }
 
     if (candidate.pos == core::PartOfSpeech::Adjective && utf8::endsWith(candidate.lemma, "がましい")) {
-      const bool has_longer_host =
-          std::any_of(lattice.edgeIdsEndingAt(candidate.end).begin(), lattice.edgeIdsEndingAt(candidate.end).end(),
-                      [&](const uint32_t edge_id) {
-                        const auto& edge = lattice.getEdge(edge_id);
-                        return edge.start < candidate.start && edge.pos == core::PartOfSpeech::Adjective &&
-                               utf8::endsWith(edge.lemma, "がましい");
-                      });
+      const bool has_longer_host = core::anyEdgeEndingAt(lattice, candidate.end, [&](const core::LatticeEdge& edge) {
+        return edge.start < candidate.start && edge.pos == core::PartOfSpeech::Adjective &&
+               utf8::endsWith(edge.lemma, "がましい");
+      });
       if (has_longer_host) {
         continue;
       }
