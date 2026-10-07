@@ -216,6 +216,16 @@ def _splits_closing_particle(text: str, raw: tuple[int, dict[int, dict]], positi
     return start < host and start + len(token.get("surface", "")) == position and token.get("pos") == "助詞"
 
 
+def _joins_word_across_sokuon(text: str, raw: tuple[int, dict[int, dict]], position: int) -> bool:
+    """Whether a medial っ the dictionary cut out alone hides one word around it."""
+    bare = raw[1].get(position)
+    if bare is None or bare.get("surface") != "っ" or bare.get("lemma") == "っ":
+        return False
+    probe = _raw_analysis(text[:position] + text[position + 1 :])[1]
+    host = probe.get(position - 1)
+    return host is not None and len(host.get("surface", "")) > 1 and host.get("pos") in ("名詞", "動詞", "形容詞")
+
+
 def _stranded_adjective_stems(raw: tuple[int, dict[int, dict]]) -> dict[int, str]:
     """Two-mora kana fragments that head an adjective the dictionary lacks.
 
@@ -523,6 +533,20 @@ def preprocess_for_mecab(text: str) -> tuple[str, dict[tuple[int, str], dict], t
             replacements[(emphatic_sokuon - 1, "emphatic_sokuon")] = {
                 "original": text[emphatic_sokuon - 1 : emphatic_sokuon + 1],
                 "replacement": text[emphatic_sokuon - 1],
+                "length": 2,
+            }
+
+    # An emphatic sokuon inside a word (大っ嫌い) has no entry either: the
+    # dictionary cuts it out as a bare っ with an invented lemma. Taken only
+    # when the text without it reads the kanji and what follows as one word,
+    # so a lexicalized form (取っ手, 吹っ飛ぶ) never reaches this.
+    for m in regex.finditer(r"(?<=\p{Han})っ(?=[\p{Han}\p{Hiragana}])", text):
+        if raw is None:
+            raw = _raw_analysis(text)
+        if _joins_word_across_sokuon(text, raw, m.start()):
+            replacements[(m.start() - 1, "emphatic_sokuon")] = {
+                "original": text[m.start() - 1 : m.end()],
+                "replacement": text[m.start() - 1],
                 "length": 2,
             }
 
