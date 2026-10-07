@@ -110,13 +110,21 @@ bool startsInsideVerifiedPredicate(const core::Lattice& lattice, const std::vect
 // mora is itself a registered particle. Both halves of the competing reading
 // are then lexically attested, which the adverb's own span is not.
 // This uses lattice structure rather than enumerating open-class words.
+// A conjunctive particle selects a predicate, so it cannot follow the content
+// word and does not attest that reading (道半+ば is no noun plus ば).
 bool opensOnContentWordTailBeforeParticle(const core::Lattice& lattice,
                                           const dictionary::DictionaryManager& dict_manager,
                                           const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos) {
   if (start_pos == 0 || end_pos <= start_pos + 1 || end_pos > codepoints.size()) {
     return false;
   }
-  if (lookupEntryInRange(dict_manager, codepoints, start_pos + 1, end_pos, core::PartOfSpeech::Particle) == nullptr) {
+  const auto remainder = lookupResultsInRange(dict_manager, codepoints, start_pos + 1, end_pos);
+  const bool remainder_follows_nominal = std::any_of(remainder.begin(), remainder.end(), [&](const auto& other) {
+    return other.entry != nullptr && start_pos + 1 + other.length == end_pos &&
+           other.entry->pos == core::PartOfSpeech::Particle &&
+           other.entry->extended_pos != core::ExtendedPOS::ParticleConj;
+  });
+  if (!remainder_follows_nominal) {
     return false;
   }
   const size_t content_end = start_pos + 1;
