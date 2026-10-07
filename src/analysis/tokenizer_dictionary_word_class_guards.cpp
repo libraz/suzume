@@ -75,20 +75,26 @@ bool startsInsideVerifiedPredicate(const core::Lattice& lattice, const std::vect
   for (size_t edge_start = scan_start; edge_start < start_pos; ++edge_start) {
     // A predicate opening inside a dictionary function word that ends exactly
     // at start_pos (な|んか|もう → かも) is that word's fragment, not a witness.
-    const bool opens_inside_function_word =
-        core::anyEdgeEndingAt(lattice, start_pos, [edge_start](const core::LatticeEdge& word) {
-          return word.start < edge_start && word.fromDictionary() &&
-                 (word.pos == core::PartOfSpeech::Particle || word.pos == core::PartOfSpeech::Auxiliary);
-        });
-    if (opens_inside_function_word) {
+    const auto ends_function_word_here = [&](bool same_start) {
+      return core::anyEdgeEndingAt(lattice, start_pos, [edge_start, same_start](const core::LatticeEdge& word) {
+        return (same_start ? word.start == edge_start : word.start < edge_start) && word.fromDictionary() &&
+               (word.pos == core::PartOfSpeech::Particle || word.pos == core::PartOfSpeech::Auxiliary);
+      });
+    };
+    if (ends_function_word_here(false)) {
       continue;
     }
-    if (core::anyEdgeStartingAt(lattice, edge_start, [&codepoints, start_pos](const core::LatticeEdge& edge) {
-          return edge.end > start_pos && edge.lemmaVerified() &&
-                 (edge.pos == core::PartOfSpeech::Verb || edge.pos == core::PartOfSpeech::Adjective ||
-                  edge.pos == core::PartOfSpeech::Auxiliary) &&
-                 (edge.end >= codepoints.size() || !kana::isSmallKanaCodepoint(codepoints[edge.end]));
-        })) {
+    // So is a verb or adjective opening on one (の|まるで → のまる). An
+    // auxiliary may open on such kana in its own right (し+とこう).
+    const bool opens_on_function_word = ends_function_word_here(true);
+    if (core::anyEdgeStartingAt(
+            lattice, edge_start, [&codepoints, start_pos, opens_on_function_word](const core::LatticeEdge& edge) {
+              return edge.end > start_pos && edge.lemmaVerified() &&
+                     (edge.pos == core::PartOfSpeech::Auxiliary ||
+                      (!opens_on_function_word &&
+                       (edge.pos == core::PartOfSpeech::Verb || edge.pos == core::PartOfSpeech::Adjective))) &&
+                     (edge.end >= codepoints.size() || !kana::isSmallKanaCodepoint(codepoints[edge.end]));
+            })) {
       return true;
     }
   }

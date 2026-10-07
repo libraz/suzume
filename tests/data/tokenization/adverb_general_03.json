@@ -555,6 +555,80 @@
       ],
       "id": "ha_wo_rashi_kani_wo_teita",
       "input": "彼は時折頭を揺らし、静かに夢を見ていた。"
+    },
+    {
+      "description": "人の気配のまるでない村 - auto-generated",
+      "expected": [
+        {
+          "lemma": "人",
+          "pos": "Noun",
+          "surface": "人"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "気配",
+          "pos": "Noun",
+          "surface": "気配"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "まるで",
+          "pos": "Adverb",
+          "surface": "まるで"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        },
+        {
+          "lemma": "村",
+          "pos": "Noun",
+          "surface": "村"
+        }
+      ],
+      "id": "no_nomarudenai",
+      "input": "人の気配のまるでない村"
+    },
+    {
+      "description": "力のまるでない人 - auto-generated",
+      "expected": [
+        {
+          "lemma": "力",
+          "pos": "Noun",
+          "surface": "力"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "まるで",
+          "pos": "Adverb",
+          "surface": "まるで"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        },
+        {
+          "lemma": "人",
+          "pos": "Noun",
+          "surface": "人"
+        }
+      ],
+      "id": "nomarudenai",
+      "input": "力のまるでない人"
     }
   ],
   "description": "General adverbs (part 3/3)",
