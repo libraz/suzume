@@ -414,6 +414,191 @@
       ],
       "id": "tosarereba",
       "input": "安全とされれば"
+    },
+    {
+      "description": "Kana ichidan passive continuative closing a clause before a comma",
+      "expected": [
+        {
+          "lemma": "先生",
+          "pos": "Noun",
+          "surface": "先生"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "ほめる",
+          "pos": "Verb",
+          "surface": "ほめ"
+        },
+        {
+          "lemma": "られる",
+          "pos": "Auxiliary",
+          "surface": "られ"
+        },
+        {
+          "lemma": "うれしい",
+          "pos": "Adjective",
+          "surface": "うれしかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "nihomerare_ureshikattta",
+      "input": "先生にほめられ、うれしかった"
+    },
+    {
+      "description": "Kana ichidan passive continuative closing a clause before a comma",
+      "expected": [
+        {
+          "lemma": "犬",
+          "pos": "Noun",
+          "surface": "犬"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "ほえる",
+          "pos": "Verb",
+          "surface": "ほえ"
+        },
+        {
+          "lemma": "られる",
+          "pos": "Auxiliary",
+          "surface": "られ"
+        },
+        {
+          "lemma": "驚く",
+          "pos": "Verb",
+          "surface": "驚い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "nihoerare_ita",
+      "input": "犬にほえられ、驚いた"
+    },
+    {
+      "description": "Kana ichidan passive continuative at the end of the input",
+      "expected": [
+        {
+          "lemma": "先生",
+          "pos": "Noun",
+          "surface": "先生"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "ほめる",
+          "pos": "Verb",
+          "surface": "ほめ"
+        },
+        {
+          "lemma": "られる",
+          "pos": "Auxiliary",
+          "surface": "られ"
+        }
+      ],
+      "id": "nihomerare",
+      "input": "先生にほめられ"
+    },
+    {
+      "description": "Long unregistered kana ichidan stem with clause-final passive continuative",
+      "expected": [
+        {
+          "lemma": "雨水",
+          "pos": "Noun",
+          "surface": "雨水"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "たくわえる",
+          "pos": "Verb",
+          "surface": "たくわえ"
+        },
+        {
+          "lemma": "られる",
+          "pos": "Auxiliary",
+          "surface": "られ"
+        },
+        {
+          "lemma": "畑",
+          "pos": "Noun",
+          "surface": "畑"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "潤う",
+          "pos": "Verb",
+          "surface": "潤っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "gatakuwaerare_ga_ttta",
+      "input": "雨水がたくわえられ、畑が潤った"
+    },
+    {
+      "description": "Kana ichidan passive continuative closing a clause before a comma",
+      "expected": [
+        {
+          "lemma": "人",
+          "pos": "Noun",
+          "surface": "人"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "たすける",
+          "pos": "Verb",
+          "surface": "たすけ"
+        },
+        {
+          "lemma": "られる",
+          "pos": "Auxiliary",
+          "surface": "られ"
+        },
+        {
+          "lemma": "助かる",
+          "pos": "Verb",
+          "surface": "助かっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "nitasukerare_kattta",
+      "input": "人にたすけられ、助かった"
     }
   ],
   "description": "auxiliary_passive tests",

@@ -113,9 +113,11 @@ void appendPassiveMizenkeiCandidates(const std::vector<char32_t>& codepoints, si
     // A passive れ (れる, れた, れて, ...) follows the A-row mizenkei, which the
     // shared reconstruction below validates. Loose ま-branch: bare ま (れます,
     // れました, れません, れませんでした) qualifies.
+    // The passive continuative also closes a clause on its own (しから+れ、).
     const size_t mizenkei_end = end_pos - 1;
     if (codepoints[mizenkei_end] != U'れ' ||
-        !vh::isPassiveAuxContinuation(codepoints, mizenkei_end + 1, /*strict_masu=*/false)) {
+        !(vh::isPassiveAuxContinuation(codepoints, mizenkei_end + 1, /*strict_masu=*/false) ||
+          vh::clauseEndsAt(codepoints, mizenkei_end + 1))) {
       continue;
     }
 
@@ -202,15 +204,17 @@ void appendIchidanRareruCandidates(const std::vector<char32_t>& codepoints, size
                                    std::vector<UnknownCandidate>& candidates) {
   // Pattern: ichidan stem (E-row ending or い/え) + られ + る/た/て
   // Search for られ starting at positions from start_pos+1 to hiragana_end-2
-  for (size_t ra_pos = start_pos + 1; ra_pos + 2 < hiragana_end; ++ra_pos) {
+  for (size_t ra_pos = start_pos + 1; ra_pos + 2 <= hiragana_end; ++ra_pos) {
     // Check for られ pattern at this position
     if (codepoints[ra_pos] != U'ら' || codepoints[ra_pos + 1] != U'れ') {
       continue;
     }
 
     // られる, られた, られて, られな, られま: れ sits at ra_pos+1, so the
-    // continuation index is ra_pos+2 (loose ま-branch).
-    if (!vh::isPassiveAuxContinuation(codepoints, ra_pos + 2, /*strict_masu=*/false)) {
+    // continuation index is ra_pos+2 (loose ま-branch). The continuative
+    // られ also closes a clause on its own (ほめ+られ、).
+    if (!vh::isPassiveAuxContinuation(codepoints, ra_pos + 2, /*strict_masu=*/false) &&
+        !vh::clauseEndsAt(codepoints, ra_pos + 2)) {
       continue;
     }
 
@@ -257,8 +261,14 @@ void appendIchidanRareruCandidates(const std::vector<char32_t>& codepoints, size
     // reading by itself (たくわえる), while stem+られる still traces back to
     // that exact stem and lemma. Project that observed analysis instead of
     // selecting only the highest-scoring homographic Godan interpretation.
+    // A clause-final られ is the continuative cell of られる, which the analyzer
+    // reads only through its terminal, so that cell stands in for it.
+    const bool clause_final_rare = vh::clauseEndsAt(codepoints, ra_pos + 2);
     if (!is_valid_ichidan && normalize::utf8Length(stem) >= 3) {
-      for (const auto& observed : analysesInRange(inflection, codepoints, start_pos, hiragana_end)) {
+      const auto observed_analyses =
+          clause_final_rare ? inflection.analyze(extractSubstring(codepoints, start_pos, ra_pos + 2) + "る")
+                            : analysesInRange(inflection, codepoints, start_pos, hiragana_end);
+      for (const auto& observed : observed_analyses) {
         if (observed.verb_type == grammar::VerbType::Ichidan && observed.base_form == base_form &&
             observed.stem == stem && utf8::startsWith(observed.suffix, "られ")) {
           is_valid_ichidan = true;
