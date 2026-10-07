@@ -505,14 +505,15 @@ def postprocess_copula_negative_nee(tokens: list[dict]) -> bool:
     """Tag ねえ after the copula's じゃ as the negative auxiliary (じゃねえか).
 
     The reference reads it as the final particle there, while 知らねえ gets the
-    negative; じゃ+ない is the same chain in its plain spelling.
+    negative; じゃ+ない is the same chain in its plain spelling, and ねぇ/ねー
+    are spellings of the same ねえ.
     """
     changed = False
     for idx in range(1, len(tokens)):
         token = tokens[idx]
         previous = tokens[idx - 1]
         if (
-            token.get("surface") == "ねえ"
+            token.get("surface") in ("ねえ", "ねぇ", "ねー")
             and token.get("pos") == "Particle"
             and previous.get("surface") == "じゃ"
             and previous.get("lemma") == "だ"

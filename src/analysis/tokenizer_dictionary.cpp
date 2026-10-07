@@ -234,6 +234,27 @@ void addEmphaticDictionaryEdge(core::Lattice& lattice,
                         ? verb_helpers::EmphaticSuffixMatch{}
                         : verb_helpers::matchEmphaticSuffix(codepoints, end_pos, result.entry->pos,
                                                             verb_helpers::SokuonOnsetPolicy::DictionaryEntry);
+    // A sokuon that opens a registered particle (って, っけ, ったら) is that
+    // particle's first mora, so the emphasis stops in front of it
+    // (ねー+って, not ねーっ+て).
+    constexpr size_t kSokuonParticleProbe = 4;
+    for (size_t sokuon_pos = end_pos; sokuon_pos < emphatic.end; ++sokuon_pos) {
+      if (codepoints[sokuon_pos] != core::hiragana::kSmallTsu) {
+        continue;
+      }
+      const auto opened = lookupResultsInRange(dict_manager, codepoints, sokuon_pos,
+                                               std::min(codepoints.size(), sokuon_pos + kSokuonParticleProbe));
+      if (std::none_of(opened.begin(), opened.end(), [](const dictionary::LookupResult& match) {
+            return match.entry != nullptr && match.length >= 2 && match.entry->pos == core::PartOfSpeech::Particle;
+          })) {
+        continue;
+      }
+      emphatic.suffix = extractSubstring(codepoints, end_pos, sokuon_pos);
+      emphatic.end = sokuon_pos;
+      emphatic.standard_char_count = sokuon_pos - end_pos;
+      emphatic.repeated_vowel_count = 0;
+      break;
+    }
     // One repeated vowel is below the generic emphasis floor, but a final
     // particle drawn out by its own full-size vowel (けど+さあ) is that hold,
     // and so is a continuative closing the clause as the regional imperative

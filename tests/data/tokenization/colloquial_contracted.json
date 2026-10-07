@@ -1865,6 +1865,77 @@
       ],
       "id": "yamennayo",
       "input": "やめんなよ"
+    },
+    {
+      "description": "emphasis stops before the sokuon that opens quotative って",
+      "expected": [
+        {
+          "lemma": "そう",
+          "pos": "Adverb",
+          "surface": "そう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "じゃ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ねー"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        }
+      ],
+      "id": "souji_ne_ttte",
+      "input": "そうじゃねーって"
+    },
+    {
+      "description": "emphasis stops before the sokuon that opens quotative って",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行か"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ねー"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        }
+      ],
+      "id": "kane_ttte",
+      "input": "行かねーって"
+    },
+    {
+      "description": "emphasis stops before the sokuon that opens quotative って",
+      "expected": [
+        {
+          "lemma": "知る",
+          "pos": "Verb",
+          "surface": "知ら"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ねー"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        }
+      ],
+      "id": "rane_ttte",
+      "input": "知らねーって"
     }
   ],
   "description": "colloquial_contracted tests",
