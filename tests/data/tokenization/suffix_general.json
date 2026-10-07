@@ -854,6 +854,87 @@
       ],
       "id": "ttkega_rinai",
       "input": "塩っけが足りない"
+    },
+    {
+      "description": "巫女さんの衣装 - auto-generated",
+      "expected": [
+        {
+          "lemma": "巫女",
+          "pos": "Noun",
+          "surface": "巫女"
+        },
+        {
+          "lemma": "さん",
+          "pos": "Suffix",
+          "surface": "さん"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "衣装",
+          "pos": "Noun",
+          "surface": "衣装"
+        }
+      ],
+      "id": "sanno",
+      "input": "巫女さんの衣装"
+    },
+    {
+      "description": "長女さんの話 - auto-generated",
+      "expected": [
+        {
+          "lemma": "長女",
+          "pos": "Noun",
+          "surface": "長女"
+        },
+        {
+          "lemma": "さん",
+          "pos": "Suffix",
+          "surface": "さん"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "話",
+          "pos": "Noun",
+          "surface": "話"
+        }
+      ],
+      "id": "sanno_2",
+      "input": "長女さんの話"
+    },
+    {
+      "description": "次女さんの家 - auto-generated",
+      "expected": [
+        {
+          "lemma": "次女",
+          "pos": "Noun",
+          "surface": "次女"
+        },
+        {
+          "lemma": "さん",
+          "pos": "Suffix",
+          "surface": "さん"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "家",
+          "pos": "Noun",
+          "surface": "家"
+        }
+      ],
+      "id": "sanno_3",
+      "input": "次女さんの家"
     }
   ],
   "description": "suffix_general tests",

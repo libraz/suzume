@@ -544,6 +544,21 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
     if (codepoints[n_pos] != U'ん' || (!negative_follows && !terminal_follows && !nominalizer_follows)) {
       continue;
     }
+    // A registered suffix reaching over the ん is that suffix: 姉+さん+の is
+    // not the contracted terminal of a coined 姉さる. A kana noun there is
+    // not evidence (曲が+ん+ない is not 曲+がん).
+    if (dict_manager != nullptr) {
+      bool covered = false;
+      for (size_t begin = start_pos; begin < n_pos && !covered; ++begin) {
+        for (const auto& result : lookupResultsInRange(*dict_manager, codepoints, begin, n_pos + 1)) {
+          covered = covered || (result.entry != nullptr && begin + result.length > n_pos &&
+                                result.entry->pos == core::PartOfSpeech::Suffix);
+        }
+      }
+      if (covered) {
+        continue;
+      }
+    }
     const std::string stem = extractSubstring(codepoints, start_pos, n_pos);
     // A stem closed by the te-form is the contracted aspect (見て+ん+の), and
     // one that passes through it is a subsidiary verb's contraction
