@@ -459,7 +459,11 @@ def postprocess_listing_tari(tokens: list[dict]) -> bool:
 
 
 def postprocess_classical_perfect_aux(tokens: list[dict]) -> bool:
-    """Normalize たり's terminal/adnominal cells and 已然形+り."""
+    """Normalize たり's terminal/adnominal/irrealis cells and 已然形+り.
+
+    The irrealis たら before the conjectural む/ん is たり's cell, not the
+    conditional of the past, which takes no auxiliary after it.
+    """
     changed = False
     for idx, token in enumerate(tokens):
         if idx == 0:
@@ -472,7 +476,13 @@ def postprocess_classical_perfect_aux(tokens: list[dict]) -> bool:
             and not _is_listing_tari(tokens, idx)
         )
         is_adnominal_perfect = surface == "たる" and token.get("pos") == "Auxiliary"
-        if is_terminal_perfect or is_adnominal_perfect:
+        is_irrealis_perfect = (
+            surface == "たら"
+            and idx + 1 < len(tokens)
+            and tokens[idx + 1].get("surface") in ("む", "ん")
+            and tokens[idx + 1].get("pos") == "Auxiliary"
+        )
+        if is_terminal_perfect or is_adnominal_perfect or is_irrealis_perfect:
             if previous.get("pos") == "Noun":
                 lemma = base_from_renyokei(previous.get("surface", ""))
                 if lemma is not None:

@@ -297,8 +297,8 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
         // derivative, one kanji plus one a-row mora (伸ば+そ, 動か+そ): more
         // kana or a kanji compound in front is a predicate chain that closes on
         // a closed-class word (遠い+だろ+う, 教師+だ+そう, 読み+た+そう).
-        const bool derivative_shape =
-            kanji_end == start_pos + 1 && vol_pos == kanji_end + 1 && kana::isARowCodepoint(codepoints[kanji_end]);
+        const bool derivative_shape = kanji_end == start_pos + 1 && vol_pos == kanji_end + 1 &&
+                                      kana::isARowCodepoint(codepoints[kanji_end]) && codepoints[vol_pos] == U'そ';
         if (listed_adjective_cell || (vol_pos > kanji_end && !derivative_shape)) {
           break;
         }

@@ -91,6 +91,10 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       // AuxCopulaDa → AuxVolitional (だろ+う) - very strong bonus for the volitional boundary
       // The copular conjecture must beat a fabricated pure-hiragana verb.
       {EPOS::AuxCopulaDa, EPOS::AuxVolitional, cost::kVeryStrongBonus},
+      // The past has the same conjectural cell (疲れ+たろ+う, 寒かっ+たろ+う), and so
+      // does the classical perfect (咲き+たら+む).
+      {EPOS::AuxTenseTa, EPOS::AuxVolitional, cost::kVeryStrongBonus},
+      {EPOS::AuxClassicalPerfect, EPOS::AuxVolitional, cost::kVeryStrongBonus},
 
       // AuxCausative → AuxPassive (せ+られ in causative-passive) - strong bonus
       // Ensures 聞かせられた → 聞か+せ+られ+た over 聞か+せられた

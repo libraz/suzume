@@ -34,8 +34,8 @@ namespace suzume::analysis::connection_rules {
 float computeTaFormVolitionalBonus(const core::LatticeEdge& prev, const core::LatticeEdge& next) {
   float bonus{};  // value-init to 0
 
-  // Surface-based bonus for VerbRenyokei → た/たら (ichidan/irregular
-  // past and conditional-past forms). E.g., 食べ+た, 見+たら.
+  // Surface-based bonus for VerbRenyokei → た/たら/たろ (ichidan/irregular
+  // past, conditional-past and conjectural-past forms). E.g., 食べ+た, 見+たら.
   // Guard: require kanji or dictionary-attested lexical evidence.  A generated
   // pure-hiragana Ichidan stem is also usable: the following た validates its
   // inflectional shape wherever it starts. Withholding it at the sentence start
@@ -43,7 +43,7 @@ float computeTaFormVolitionalBonus(const core::LatticeEdge& prev, const core::La
   // (は+だけ+た). The sa row takes it too: its continuative し takes the past
   // directly, with no onbin to mistake.
   const bool lexical_renyokei_past = prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
-                                     utf8::equalsAny(next.surface, {"た", "たら"}) &&
+                                     utf8::equalsAny(next.surface, {"た", "たら", "たろ"}) &&
                                      next.extended_pos == core::ExtendedPOS::AuxTenseTa &&
                                      (grammar::containsKanji(prev.surface) || prev.lemmaVerified() ||
                                       grammar::conjTypeToVerbType(prev.conj_type) == grammar::VerbType::GodanSa ||

@@ -111,6 +111,9 @@ EntrySpecRange getAuxiliaryEntries() {
       // the dictionary edge is admitted only there.  See
       // grammar::spellsHypotheticalAuxiliaryCell.
       aux("たれ", "たり", EPOS::AuxClassicalPerfect),
+      // 未然形 たら before the conjectural (咲き+たら+む); licensed only there,
+      // since elsewhere it is the conditional of the past.
+      aux("たら", "たり", EPOS::AuxClassicalPerfect),
       // 完了の助動詞つ, 終止形 (見つ, 書きつ). One mora, and the tail of a great
       // many words, so the tokenizer admits it only between a continuative and
       // a clause end.
@@ -142,6 +145,7 @@ EntrySpecRange getAuxiliaryEntries() {
       // Past/Completion - た (過去・完了)
       aux("た", "た", EPOS::AuxTenseTa),
       aux("たら", "た", EPOS::AuxTenseTa),  // 仮定形
+      aux("たろ", "た", EPOS::AuxTenseTa),  // 未然形, connects to う (疲れ+たろ+う)
       aux("だ", "だ", EPOS::AuxTenseTa),    // 連濁形 (泳いだ, 死んだ, 飛んだ, 読んだ)
       aux("だら", "だ", EPOS::AuxTenseTa),
 

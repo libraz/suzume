@@ -53,6 +53,109 @@
       ],
       "id": "deshi_unine",
       "input": "でしょうにね"
+    },
+    {
+      "description": "Conjectural cell of the past before u",
+      "expected": [
+        {
+          "lemma": "幾年",
+          "pos": "Noun",
+          "surface": "幾年"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "過ぎる",
+          "pos": "Verb",
+          "surface": "過ぎ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "たろ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "ga_gitarouka",
+      "input": "幾年が過ぎたろうか"
+    },
+    {
+      "description": "Conjectural past after an ichidan continuative",
+      "expected": [
+        {
+          "lemma": "疲れる",
+          "pos": "Verb",
+          "surface": "疲れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "たろ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "retarou",
+      "input": "疲れたろう"
+    },
+    {
+      "description": "Conjectural past after an adjective",
+      "expected": [
+        {
+          "lemma": "寒い",
+          "pos": "Adjective",
+          "surface": "寒かっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "たろ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "katttarou",
+      "input": "寒かったろう"
+    },
+    {
+      "description": "Conjectural past after a one-kanji ichidan stem, not a coined ra-row verb",
+      "expected": [
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "たろ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "tarou",
+      "input": "見たろう"
     }
   ],
   "description": "auxiliary_volitional tests",

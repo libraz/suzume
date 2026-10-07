@@ -141,7 +141,7 @@
           "surface": "来"
         },
         {
-          "lemma": "た",
+          "lemma": "たり",
           "pos": "Auxiliary",
           "surface": "たら"
         },
@@ -163,7 +163,7 @@
           "surface": "見"
         },
         {
-          "lemma": "た",
+          "lemma": "たり",
           "pos": "Auxiliary",
           "surface": "たら"
         },
@@ -390,6 +390,28 @@
       ],
       "id": "kihasenu",
       "input": "行きはせぬ"
+    },
+    {
+      "description": "Irrealis of the classical perfect before the nasal conjectural",
+      "expected": [
+        {
+          "lemma": "咲く",
+          "pos": "Verb",
+          "surface": "咲き"
+        },
+        {
+          "lemma": "たり",
+          "pos": "Auxiliary",
+          "surface": "たら"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        }
+      ],
+      "id": "kitaran",
+      "input": "咲きたらん"
     }
   ],
   "description": "auxiliary_classical tests (part 2/2)",

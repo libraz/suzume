@@ -210,6 +210,15 @@ bool lacksLicensingEnvironment(const DictionaryCandidateContext& ctx, const core
     }
   }
 
+  // The irrealis たら of the classical perfect たり exists only before the
+  // conjectural む/ん that selects it (咲き+たら+む); anywhere else the same
+  // kana is the conditional of the past.
+  if (result.entry->extended_pos == core::ExtendedPOS::AuxClassicalPerfect &&
+      utf8::equalsAny(result.entry->surface, {"たら"}) &&
+      (end_pos >= codepoints.size() || (codepoints[end_pos] != U'む' && codepoints[end_pos] != U'ん'))) {
+    return true;
+  }
+
   // The classical past keeps only its 連体形 し and 已然形 しか, so each has
   // exactly one environment: し modifies a following nominal or closes the
   // clause (読みし人, 読まざりし。) and しか takes the conditional particle

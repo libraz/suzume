@@ -45,14 +45,17 @@ float computeNegativeAndNounVerbBonus(const core::LatticeEdge& prev, const core:
   //     host ending elsewhere has had the う cut out of the word behind it
   //     (読ん+だ+う+え for 読ん+だ+うえ). The terminal copula shares its
   //     ExtendedPOS with its own irrealis, which is how the だろ+う bonus
-  //     reached だ+う. The two-mora よう selects the ichidan and sa-hen stems
-  //     and is not gated here.
+  //     reached だ+う. The past hosts the conjecture only through its
+  //     irrealis たろ (疲れ+たろ+う): never よう, which selects the ichidan and
+  //     sa-hen stems (すね+た+よう+に), and never on its conditional たら, where
+  //     the classical perfect's irrealis is the host (咲き+たら+む).
   const bool volitional_host_row_mismatch =
       next.extended_pos == core::ExtendedPOS::AuxVolitional &&
       ((prev.extended_pos == core::ExtendedPOS::AuxTenseMasu && grammar::endsWithERow(prev.surface) &&
         grammar::isSingleHiragana(next.surface, core::hiragana::kN)) ||
        (grammar::isSingleHiragana(next.surface, U'う') &&
-        grammar::getVowelForChar(utf8::decodeLastChar(prev.surface)) != U'お'));
+        grammar::getVowelForChar(utf8::decodeLastChar(prev.surface)) != U'お') ||
+       (prev.extended_pos == core::ExtendedPOS::AuxTenseTa && !utf8::equalsAny(prev.surface, {"たろ"})));
   // The classical/contracted negative ん cannot be followed by the plain
   // copula だ. In an apparent …んだ sequence after a ma/ba/na-row verb, ん is
   // the verb's hatsuonbin and だ is the past auxiliary (膨らん+だ).
