@@ -257,6 +257,25 @@ def split_demonstrative_dake(tokens: list[dict]) -> None:
         idx += 1
 
 
+def split_predicate_tokoro_ga(tokens: list[dict]) -> None:
+    """Split the conjunction ところが after a predicate into ところ + が.
+
+    Clause-initially ところが is a conjunction, but after a predicate it is
+    the formal noun ところ marked by が, the same pair the reference returns
+    when no comma follows (したところが問題だ).
+    """
+    for idx in range(len(tokens) - 1, 0, -1):
+        token = tokens[idx]
+        if token.get("surface") != "ところが" or token.get("pos") != "接続詞":
+            continue
+        if tokens[idx - 1].get("pos") not in ("動詞", "助動詞", "形容詞"):
+            continue
+        tokens[idx : idx + 1] = [
+            {"surface": "ところ", "pos": "名詞", "pos_sub1": "非自立", "lemma": "ところ"},
+            {"surface": "が", "pos": "助詞", "pos_sub1": "格助詞", "lemma": "が"},
+        ]
+
+
 def repair_mimetic_n_to_suru(tokens: list[dict]) -> None:
     """Rebuild a two-mora kana noun in ん + と + する as the mimetic adverb.
 

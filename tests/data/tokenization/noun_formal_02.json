@@ -196,6 +196,100 @@
       ],
       "id": "nakiraigaaru_shidearu",
       "input": "楽観的なきらいがある見通しである"
+    },
+    {
+      "description": "叩かれたところが、まだ痛む - auto-generated",
+      "expected": [
+        {
+          "lemma": "叩く",
+          "pos": "Verb",
+          "surface": "叩か"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "ところ",
+          "pos": "Noun",
+          "surface": "ところ"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "まだ",
+          "pos": "Adverb",
+          "surface": "まだ"
+        },
+        {
+          "lemma": "痛む",
+          "pos": "Verb",
+          "surface": "痛む"
+        }
+      ],
+      "id": "karetatokoroga_mada_mu",
+      "input": "叩かれたところが、まだ痛む"
+    },
+    {
+      "description": "確認したところが、問題はなかった - auto-generated",
+      "expected": [
+        {
+          "lemma": "確認",
+          "pos": "Noun",
+          "surface": "確認"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "ところ",
+          "pos": "Noun",
+          "surface": "ところ"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "問題",
+          "pos": "Noun",
+          "surface": "問題"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "なかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "shitatokoroga_hanakattta",
+      "input": "確認したところが、問題はなかった"
     }
   ],
   "description": "Formal nouns (こと、もの、ところ) (part 2/2)",
