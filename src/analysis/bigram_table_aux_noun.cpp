@@ -281,6 +281,8 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       // ParticleNo → Noun (の+学生, の+画像) - strong bonus
       // Genitive の + noun is fundamental Japanese grammar
       {EPOS::ParticleNo, EPOS::Noun, cost::kStrongBonus},
+      // A deverbal noun heads the genitive phrase like any noun (日々の+暮らし).
+      {EPOS::ParticleNo, EPOS::NounVerbal, cost::kStrongBonus},
 
       // ParticleNo → NounNumber (の+3分の1, の+二人) - same strong bonus
       // A quantity nominal heads a genitive phrase exactly as a plain noun

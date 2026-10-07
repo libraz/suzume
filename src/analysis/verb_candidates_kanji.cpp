@@ -153,6 +153,16 @@ bool hasNonTeNominalForcingParticleAt(const std::vector<char32_t>& codepoints, s
   return hasNominalForcingParticleContinuation(codepoints, end_pos, dict_manager);
 }
 
+// A continuative cannot close a clause after an adnominal の/な, so a span
+// there that ends the text or meets punctuation is the deverbal noun
+// (静かな+暮らし, 日々の+暮らし。).
+bool closesAfterAdnominal(const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos) {
+  if (start_pos == 0 || (codepoints[start_pos - 1] != U'の' && codepoints[start_pos - 1] != core::hiragana::kNa)) {
+    return false;
+  }
+  return end_pos >= codepoints.size() || normalize::classifyChar(codepoints[end_pos]) == normalize::CharType::Symbol;
+}
+
 bool hasDictionaryAdjectiveTail(const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos,
                                 const dictionary::DictionaryManager* dict_manager) {
   if (dict_manager == nullptr) {
@@ -732,7 +742,8 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
         (!cand.lemma_verified && cand.conj_type != dictionary::ConjugationType::GodanSa) || starts_inside_kanji_run ||
         hasDictionaryAdjectiveTail(codepoints, cand.start, cand.end, dict_manager) ||
         vh::isBoundSuffixAfterNominalHost(dict_manager, codepoints, cand.start, cand.surface) ||
-        !hasNonTeNominalForcingParticleAt(codepoints, cand.end, dict_manager)) {
+        (!hasNonTeNominalForcingParticleAt(codepoints, cand.end, dict_manager) &&
+         !closesAfterAdnominal(codepoints, cand.start, cand.end))) {
       continue;
     }
     nominalized_candidates.push_back(makeNounCandidate(
