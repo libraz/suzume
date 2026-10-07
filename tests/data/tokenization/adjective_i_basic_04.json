@@ -190,6 +190,62 @@
       ],
       "id": "gohangaoishikattta",
       "input": "ごはんがおいしかった"
+    },
+    {
+      "description": "足の裏がくすぐったい - auto-generated",
+      "expected": [
+        {
+          "lemma": "足",
+          "pos": "Noun",
+          "surface": "足"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "裏",
+          "pos": "Noun",
+          "surface": "裏"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "くすぐったい",
+          "pos": "Adjective",
+          "surface": "くすぐったい"
+        }
+      ],
+      "id": "no_gakusugutttai",
+      "input": "足の裏がくすぐったい"
+    },
+    {
+      "description": "じれったい - auto-generated",
+      "expected": [
+        {
+          "lemma": "じれったい",
+          "pos": "Adjective",
+          "surface": "じれったい"
+        }
+      ],
+      "id": "jiretttai",
+      "input": "じれったい"
+    },
+    {
+      "description": "野暮ったい - auto-generated",
+      "expected": [
+        {
+          "lemma": "野暮ったい",
+          "pos": "Adjective",
+          "surface": "野暮ったい"
+        }
+      ],
+      "id": "tttai",
+      "input": "野暮ったい"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 4/4)",

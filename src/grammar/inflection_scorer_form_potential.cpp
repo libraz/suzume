@@ -170,8 +170,11 @@ float scoreAdjectiveAndForm(float base, const InflectionScoreContext& context) {
         // A/i/e-row kana cover Godan mizenkei/renyokei and Ichidan stems.
         // Use the canonical vowel predicates so や and へ cannot drift out of
         // a hand-maintained surface list. 促音 is the independent onbin marker.
+        // The one sokuon + a-row pair that is no irrealis is っ+た, the
+        // adjective-forming ending -ったい (くすぐった+い, じれった+い).
+        const bool sokuon_ta_ending = previous == U'っ' && last == "た";
         if (kana::isARowCodepoint(previous) || kana::isIRowCodepoint(previous) || kana::isERowCodepoint(previous) ||
-            previous == U'っ') {
+            (previous == U'っ' && !sokuon_ta_ending)) {
           applyPenalty(base, inflection::kPenaltyIAdjMizenkeiPattern, "i_adj_mizenkei_pattern");
         }
       }

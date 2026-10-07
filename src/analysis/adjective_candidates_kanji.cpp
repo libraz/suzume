@@ -158,6 +158,9 @@ bool readsAsVerbForm(const grammar::Inflection& inflection, const dictionary::Di
 // Pattern Skip Helpers for I-Adjective Candidate Generation
 // =============================================================================
 
+// Godan rows whose continuative takes the sokuonbin っ before た/て.
+constexpr std::string_view kSokuonbinGodanEndings[] = {"う", "つ", "る"};
+
 /**
  * @brief Check if a pattern should be skipped based on simple pattern matching
  *
@@ -176,10 +179,12 @@ bool readsAsVerbForm(const grammar::Inflection& inflection, const dictionary::Di
  * @param start_pos Start position in codepoints
  * @param kanji_end End of kanji portion
  * @param end_pos Current end position being checked
+ * @param dict_manager Dictionary that attests a verb behind a sokuonbin
  * @return true if the pattern should be skipped
  */
 bool shouldSkipSimplePatterns(const std::string& hiragana_part, const std::vector<char32_t>& codepoints,
-                              size_t start_pos, size_t kanji_end, size_t end_pos) {
+                              size_t start_pos, size_t kanji_end, size_t end_pos,
+                              const dictionary::DictionaryManager* dict_manager) {
   // A terminal ない preceded by an a-row mora is a productive verb
   // mizenkei + negative auxiliary (止ま+ない), not one i-adjective. Likewise,
   // a closed case-particle mora inside the pre-negative tail proves that the
@@ -212,9 +217,20 @@ bool shouldSkipSimplePatterns(const std::string& hiragana_part, const std::vecto
     return true;
   }
 
-  // Patterns starting with っ (te-form contractions like 待ってく = 待っていく)
+  // Patterns starting with っ (te-form contractions like 待ってく = 待っていく),
+  // except the adjective-forming -ったい in its terminal and past cells
+  // (野暮ったい, 野暮ったかっ+た). Its continuative ったく is left out, and so is
+  // a kanji run whose っ is the sokuonbin of a listed verb (う/つ/る rows): that
+  // is the past plus a kana word (洗った+いす, 洗った+くつ).
   if (utf8::startsWith(hiragana_part, "っ")) {
-    return true;
+    const std::string kanji_run = extractSubstring(codepoints, start_pos, kanji_end);
+    const bool sokuonbin_of_listed_verb =
+        std::any_of(std::begin(kSokuonbinGodanEndings), std::end(kSokuonbinGodanEndings), [&](std::string_view ending) {
+          return isVerbInDictionary(dict_manager, normalize::concat(kanji_run, ending));
+        });
+    if (sokuonbin_of_listed_verb || !utf8::startsWithAny(hiragana_part, {"ったい", "ったかっ"})) {
+      return true;
+    }
   }
 
   // Patterns ending with んでい or でい (te-form + auxiliary like 学んでいく)
@@ -373,7 +389,7 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
     const std::string hiragana_part = extractSubstring(codepoints, kanji_end, end_pos);
 
     // Skip patterns that are clearly not i-adjectives
-    if (shouldSkipSimplePatterns(hiragana_part, codepoints, start_pos, kanji_end, end_pos)) {
+    if (shouldSkipSimplePatterns(hiragana_part, codepoints, start_pos, kanji_end, end_pos, dict_manager)) {
       continue;
     }
 
@@ -530,7 +546,9 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
           if (!before_tai.empty()) {
             auto last_cp = utf8::decodeFirstChar(utf8::lastChar(before_tai));
             const auto before_codepoints = normalize::toCodepoints(before_tai);
-            if ((last_cp != 0 && kana::isHiraganaCodepoint(last_cp)) ||
+            // No continuative ends in っ, so たい after one is the adjective
+            // suffix -ったい, not the desiderative.
+            if ((last_cp != 0 && kana::isHiraganaCodepoint(last_cp) && last_cp != core::hiragana::kSmallTsu) ||
                 verb_helpers::isVerbContinuativeSpan(dict_manager, before_codepoints, 0, before_codepoints.size())) {
               continue;  // Verb renyokei + たい (見+たい), not a real adjective
             }

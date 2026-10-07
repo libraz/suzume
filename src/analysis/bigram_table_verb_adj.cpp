@@ -23,6 +23,9 @@ void setVerbAndAdjectiveCosts(BigramMatrix& table) {
 
       // VerbRenyokei → AuxDesireTai (食べ+たい) - strong bonus
       {EPOS::VerbRenyokei, EPOS::AuxDesireTai, cost::kStrongBonus},
+      // An onbin cell takes only た/て, never the desiderative (くすぐっ+たい is
+      // the adjective くすぐったい).
+      {EPOS::VerbOnbinkei, EPOS::AuxDesireTai, cost::kNever},
 
       // VerbRenyokei → AuxHonorific (書き+なさい, お読み+なさる) - the
       // subsidiary reading must outrank a homographic lexical honorific verb.

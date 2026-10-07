@@ -27,8 +27,9 @@ namespace {
 // or a verb continuative to derive a new adjective rather than predicating over
 // a separate preceding word.
 // Derivational suffixes: any host takes them (読みにくい, 子供っぽい).
-constexpr std::array<std::string_view, 12> kDerivationalSuffixAdjectives = {
-    "臭い", "くさい", "難い", "にくい", "易い", "やすい", "づらい", "がたい", "ぽい", "っぽい", "っこい", "らしい"};
+constexpr std::array<std::string_view, 13> kDerivationalSuffixAdjectives = {
+    "臭い",   "くさい", "難い",   "にくい", "易い",   "やすい", "づらい",
+    "がたい", "ぽい",   "っぽい", "っこい", "ったい", "らしい"};
 // Lexical heads: they also form compounds (用心深い, 我慢強い), but each compound
 // is its own word, so whether a host takes one is lexical (奥行き+深い stays a
 // noun plus a predicate).

@@ -383,7 +383,9 @@ void adj_detail::appendHiraganaIAdjSurfaceCandidates(const std::vector<char32_t>
         //       みたい context-dependent: auxiliary (見たい/似たい) vs mimetic (みたいな)
         //       したい should be し + たい, not i-adjective
         // Note: 痛い (itai) has kanji, so not affected
-        if (utf8::endsWith(surface, "たい") && surface != "たい") {
+        // No continuative ends in っ, so たい after one is the adjective suffix
+        // -ったい itself (くすぐったい, じれったい).
+        if (utf8::endsWith(surface, "たい") && surface != "たい" && !utf8::endsWith(surface, "ったい")) {
           continue;  // Skip - should be split as verb renyokei + たい
         }
         // Skip pure hiragana patterns ending with さ - these are almost always part of
