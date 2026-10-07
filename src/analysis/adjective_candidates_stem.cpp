@@ -279,7 +279,11 @@ float productiveIAdjectiveStemConfidence(const std::string& stem, const std::str
 
 // A stem whose okurigana ends inside a multi-mora auxiliary cell, one that
 // begins after at least one host mora and runs past the stem, has swallowed the
-// head of that auxiliary (食べや+がっ is 食べ+やがっ, not a stem 食べや).
+// head of that auxiliary (食べや+がっ is 食べ+やがっ, not a stem 食べや). The
+// final し after other okurigana is the shiku ending of the stem itself, so a
+// cell opening there (する+そう's しそう) is not inside it (恐ろし+そう). After an
+// a-row mora the same し spells a sa-row derived verb (驚か+す), which keeps
+// the guard.
 bool opensAuxiliaryInsideStem(const dictionary::DictionaryManager* dict_manager,
                               const std::vector<char32_t>& codepoints, size_t start_pos, size_t stem_end) {
   if (dict_manager == nullptr) {
@@ -288,6 +292,10 @@ bool opensAuxiliaryInsideStem(const dictionary::DictionaryManager* dict_manager,
   constexpr size_t kLongestAuxiliaryCell = 4;
   for (size_t cell_start = start_pos + 1; cell_start < stem_end; ++cell_start) {
     if (!kana::isHiraganaCodepoint(codepoints[cell_start])) {
+      continue;
+    }
+    if (cell_start + 1 == stem_end && codepoints[cell_start] == U'し' &&
+        kana::isHiraganaCodepoint(codepoints[cell_start - 1]) && !kana::isARowCodepoint(codepoints[cell_start - 1])) {
       continue;
     }
     const size_t last_end = std::min(codepoints.size(), cell_start + kLongestAuxiliaryCell);

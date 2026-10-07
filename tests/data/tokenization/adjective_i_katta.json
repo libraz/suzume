@@ -379,6 +379,94 @@
       ],
       "id": "shikatttanomettchi_i",
       "input": "楽しかったのめっちゃ良い"
+    },
+    {
+      "description": "子犬が愛おしかった - auto-generated",
+      "expected": [
+        {
+          "lemma": "子犬",
+          "pos": "Noun",
+          "surface": "子犬"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "愛おしい",
+          "pos": "Adjective",
+          "surface": "愛おしかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ga_oshikattta",
+      "input": "子犬が愛おしかった"
+    },
+    {
+      "description": "恐ろしかった - auto-generated",
+      "expected": [
+        {
+          "lemma": "恐ろしい",
+          "pos": "Adjective",
+          "surface": "恐ろしかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "roshikattta",
+      "input": "恐ろしかった"
+    },
+    {
+      "description": "狂おしかった - auto-generated",
+      "expected": [
+        {
+          "lemma": "狂おしい",
+          "pos": "Adjective",
+          "surface": "狂おしかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "oshikattta",
+      "input": "狂おしかった"
+    },
+    {
+      "description": "恐ろしそうな顔 - auto-generated",
+      "expected": [
+        {
+          "lemma": "恐ろしい",
+          "pos": "Adjective",
+          "surface": "恐ろし"
+        },
+        {
+          "lemma": "そう",
+          "pos": "Auxiliary",
+          "surface": "そう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "顔",
+          "pos": "Noun",
+          "surface": "顔"
+        }
+      ],
+      "id": "roshisouna",
+      "input": "恐ろしそうな顔"
     }
   ],
   "description": "I-adjectives past forms (過去形) - katta forms, past negative, past with desu",

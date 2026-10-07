@@ -97,9 +97,11 @@ bool endsWithMultiMoraFinalParticle(const std::vector<char32_t>& codepoints, siz
 // An unverified adjective cannot span an independently dictionary-backed verb
 // within its putative stem (複数|見つかっ|た, not 複|数見つかった).  Check every
 // internal span because the verb may be followed by its own auxiliary inside
-// the adjective-shaped surface.
-bool containsDictionaryVerbBoundary(const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos,
-                                    const dictionary::DictionaryManager* dict_manager) {
+// the adjective-shaped surface. A verb opening at or after stem_end starts
+// inside the analysis's own inflection ending (愛おし+かっ+た is not か+う), so
+// only verbs opening inside the stem count.
+bool containsDictionaryVerbBoundary(const std::vector<char32_t>& codepoints, size_t start_pos, size_t stem_end,
+                                    size_t end_pos, const dictionary::DictionaryManager* dict_manager) {
   if (dict_manager == nullptr || end_pos <= start_pos + 2) {
     return false;
   }
@@ -109,13 +111,26 @@ bool containsDictionaryVerbBoundary(const std::vector<char32_t>& codepoints, siz
   const auto independent_verb = [](const dictionary::DictionaryEntry& entry) {
     return !grammar::isBoundDerivationalSuffixVerbLemma(entry.lemma);
   };
-  for (size_t verb_start = start_pos + 1; verb_start + 1 < end_pos; ++verb_start) {
+  for (size_t verb_start = start_pos + 1; verb_start + 1 < end_pos && verb_start < stem_end; ++verb_start) {
     if (hasDictionaryEntryFrom(dict_manager, codepoints, verb_start, kMinimumVerbLength, end_pos - 1 - verb_start,
                                core::PartOfSpeech::Verb, independent_verb)) {
       return true;
     }
   }
   return false;
+}
+
+// Whether [okurigana_start, stem_end) is a registered auxiliary of two or more
+// morae whose own paradigm ends in い (らし of らしい).
+bool closesOnAdjectivalAuxiliaryStem(const std::vector<char32_t>& codepoints, size_t okurigana_start, size_t stem_end,
+                                     const dictionary::DictionaryManager* dict_manager) {
+  constexpr size_t kMinAuxiliaryMorae = 2;
+  if (dict_manager == nullptr || stem_end < okurigana_start + kMinAuxiliaryMorae) {
+    return false;
+  }
+  const auto* auxiliary =
+      lookupEntryInRange(*dict_manager, codepoints, okurigana_start, stem_end, core::PartOfSpeech::Auxiliary);
+  return auxiliary != nullptr && utf8::endsWith(auxiliary->lemma, "い");
 }
 
 // Whether @p prefix reads as a verb form ahead of a following auxiliary: a
@@ -451,7 +466,15 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
       // of a compound (山 / 高し). Only an unverified hypothesis that crosses
       // an independently attested verb boundary is suppressed.
       if (!isAdjectiveInDictionary(dict_manager, cand.base_form) &&
-          containsDictionaryVerbBoundary(codepoints, start_pos, end_pos, dict_manager)) {
+          containsDictionaryVerbBoundary(codepoints, start_pos, start_pos + normalize::utf8Length(cand.stem), end_pos,
+                                         dict_manager)) {
+        continue;
+      }
+      // A multi-mora auxiliary stem closing the okurigana (春+らし) carries the
+      // adjective paradigm itself; the kanji before it is its host, not a stem.
+      if (!isAdjectiveInDictionary(dict_manager, cand.base_form) &&
+          closesOnAdjectivalAuxiliaryStem(codepoints, kanji_end, start_pos + normalize::utf8Length(cand.stem),
+                                          dict_manager)) {
         continue;
       }
       // A long unregistered i-adjective in its uninflected form is recognizable

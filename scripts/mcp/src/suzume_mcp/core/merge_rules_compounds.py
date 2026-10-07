@@ -203,6 +203,30 @@ def _merge_verb_derived_nouns(state: MergeState) -> bool:
             if applied_rule is None:
                 applied_rule = "adjective-stem+continuative-noun"
 
+        # 5a-adj2. A noun the reference cuts off a listed adjective leaves a
+        # kana adjective of its own behind (愛 + おしい for 愛おしい). The joined
+        # spelling is the listed word, inflected as the kana half is.
+        if (
+            not merged
+            and t.get("pos") == "名詞"
+            and i + 1 < len(tokens)
+            and tokens[i + 1].get("pos") == "形容詞"
+            and regex.fullmatch(r"\p{Hiragana}+", tokens[i + 1].get("surface", ""))
+            and t.get("surface", "") + tokens[i + 1].get("lemma", "") in core_headwords("adjectives.tsv")
+        ):
+            adjective = tokens[i + 1]
+            result.append(
+                {
+                    **adjective,
+                    "surface": t.get("surface", "") + adjective.get("surface", ""),
+                    "lemma": t.get("surface", "") + adjective.get("lemma", ""),
+                }
+            )
+            i += 2
+            merged = True
+            if applied_rule is None:
+                applied_rule = "noun+kana-adjective-listed"
+
         # 5a''. Noun + adjective-forming めかしい (艶めかしい, 古めかしい). The
         # reference holds a few as single adjectives and reads the rest as the
         # verb めかす plus a stray いる; like がましい, the host plus the suffix
