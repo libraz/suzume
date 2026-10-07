@@ -15,6 +15,7 @@
 #include <utility>
 
 #include "adjective_candidates.h"
+#include "analysis/dictionary_probe.h"
 #include "analysis/scorer_constants.h"
 #include "candidate_constants.h"
 #include "core/kana_constants.h"
@@ -33,6 +34,56 @@
 namespace suzume::analysis {
 
 namespace {
+
+// A kanji-led verb cell spelled twice in a row is one reduplicated adverb
+// (恐る恐る, 泣き泣き, 重ね重ね, 絶え絶え), not two predicates. The cell is a
+// kanji run plus kana that the inflection analysis reads as a verb form.
+void appendReduplicatedVerbAdverb(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                  const std::vector<normalize::CharType>& char_types,
+                                  const grammar::Inflection& inflection,
+                                  const dictionary::DictionaryManager& dict_manager,
+                                  std::vector<UnknownCandidate>& candidates) {
+  constexpr size_t kMinCellLength = 2;
+  constexpr size_t kMaxCellLength = 4;
+  for (size_t cell_len = kMinCellLength; cell_len <= kMaxCellLength; ++cell_len) {
+    const size_t end_pos = start_pos + 2 * cell_len;
+    if (end_pos > codepoints.size()) {
+      return;
+    }
+    if (!std::equal(codepoints.begin() + static_cast<std::ptrdiff_t>(start_pos),
+                    codepoints.begin() + static_cast<std::ptrdiff_t>(start_pos + cell_len),
+                    codepoints.begin() + static_cast<std::ptrdiff_t>(start_pos + cell_len))) {
+      continue;
+    }
+    size_t kana_start = start_pos;
+    while (kana_start < start_pos + cell_len && char_types[kana_start] == normalize::CharType::Kanji) {
+      ++kana_start;
+    }
+    bool kana_tail = kana_start > start_pos && kana_start < start_pos + cell_len;
+    for (size_t pos = kana_start; kana_tail && pos < start_pos + cell_len; ++pos) {
+      kana_tail = char_types[pos] == normalize::CharType::Hiragana;
+    }
+    // A kana tail that is a case particle closes a noun (方へ+方へ), not a verb.
+    const auto* tail_particle = kana_tail ? lookupEntryInRange(dict_manager, codepoints, kana_start,
+                                                               start_pos + cell_len, core::PartOfSpeech::Particle)
+                                          : nullptr;
+    if (!kana_tail || (tail_particle != nullptr && tail_particle->extended_pos == core::ExtendedPOS::ParticleCase)) {
+      continue;
+    }
+    const std::string cell = extractSubstring(codepoints, start_pos, start_pos + cell_len);
+    const auto& analyses = inflection.analyze(cell);
+    const bool verb_cell = std::any_of(analyses.begin(), analyses.end(), [&](const auto& analysis) {
+      return analysis.verb_type != grammar::VerbType::IAdjective &&
+             analysis.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence;
+    });
+    if (!verb_cell) {
+      continue;
+    }
+    candidates.push_back(makeCandidate(codepoints, start_pos, end_pos, core::PartOfSpeech::Adverb,
+                                       candidate::kReduplicatedVerbAdverbCost, false, CandidateOrigin::Onomatopoeia,
+                                       core::ExtendedPOS::Adverb, "reduplicated_verb_adverb"));
+  }
+}
 
 void appendCandidates(std::vector<UnknownCandidate>& destination, std::vector<UnknownCandidate>&& source) {
   destination.reserve(destination.size() + source.size());
@@ -637,6 +688,8 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generate(std::string_view te
     // This preserves the adjective stem and appearance-auxiliary boundary.
     analysis::generateAdjectiveStemCandidates(codepoints, start_pos, char_types, inflection_, dict_manager_,
                                               candidates);
+
+    appendReduplicatedVerbAdverb(codepoints, start_pos, char_types, inflection_, *dict_manager_, candidates);
 
     // Generate productive nominal-base suffix verbs (春めく、謎めく).
     generateProductiveSuffixVerbCandidates(codepoints, start_pos, char_types, candidates);

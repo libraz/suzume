@@ -426,6 +426,10 @@ constexpr float kLaughterInterjectionCost = -1.5F;
 // Four-mora mimetic adverbs followed by the quotative particle (ちくたくと).
 constexpr float kMimeticHeterogeneousAdverbCost = -0.5F;
 
+// A kanji-led verb cell repeated as one adverb (恐る恐る, 泣き泣き) is priced
+// like a heterogeneous four-mora mimetic: it must outbid two verb cells.
+constexpr float kReduplicatedVerbAdverbCost = kMimeticHeterogeneousAdverbCost;
+
 // ABんCDん+と has two fixed nasal closures and an explicit quotative boundary,
 // making it substantially stronger than an arbitrary heterogeneous kana run.
 constexpr float kMimeticAlternatingNasalAdverbCost = -5.8F;

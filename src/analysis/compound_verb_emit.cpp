@@ -2,6 +2,8 @@
  * @file compound_verb_emit.cpp
  * @brief Post-match validation, scoring, and edge emission for compound verbs
  */
+#include <algorithm>
+
 #include "analysis/dictionary_probe.h"
 #include "grammar/char_patterns.h"
 #include "grammar/honorific_verbs.h"
@@ -121,6 +123,15 @@ void emitCompoundVerbCandidates(core::Lattice& lattice, std::string_view text, c
   }
   if (start_pos > 0 && normalize::isKanjiCodepoint(codepoints[start_pos - 1]) &&
       startsInsideRegisteredNoun(dict_manager, text, byte_offsets, start_pos)) {
+    return;
+  }
+  // A V1 spelled again as the V2 is a reduplicated adverb (重ね重ね, 泣き泣き),
+  // which the unknown-word generator owns, not a compound verb.
+  const size_t v1_length = v2_start - start_pos;
+  if (v2_start + v1_length <= codepoints.size() &&
+      std::equal(codepoints.begin() + static_cast<std::ptrdiff_t>(start_pos),
+                 codepoints.begin() + static_cast<std::ptrdiff_t>(v2_start),
+                 codepoints.begin() + static_cast<std::ptrdiff_t>(v2_start))) {
     return;
   }
   const SubsidiaryVerb& matched_v2 = *best_match.v2_verb;
