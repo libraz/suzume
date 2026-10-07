@@ -297,6 +297,38 @@
       ],
       "id": "modokashii_i",
       "input": "もどかしい思い"
+    },
+    {
+      "description": "はげしい雨が降った - auto-generated",
+      "expected": [
+        {
+          "lemma": "はげしい",
+          "pos": "Adjective",
+          "surface": "はげしい"
+        },
+        {
+          "lemma": "雨",
+          "pos": "Noun",
+          "surface": "雨"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "降る",
+          "pos": "Verb",
+          "surface": "降っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "hageshii_ga_ttta",
+      "input": "はげしい雨が降った"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 4/4)",

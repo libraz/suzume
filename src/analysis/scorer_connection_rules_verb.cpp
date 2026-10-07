@@ -37,17 +37,17 @@ float computeTaFormVolitionalBonus(const core::LatticeEdge& prev, const core::La
   // Surface-based bonus for VerbRenyokei → た/たら (ichidan/irregular
   // past and conditional-past forms). E.g., 食べ+た, 見+たら.
   // Guard: require kanji or dictionary-attested lexical evidence.  A generated
-  // pure-hiragana Ichidan stem is also usable when it starts after an observed
-  // token boundary: the following て/た validates its inflectional shape while
-  // the left context keeps a sentence-initial compound from being split into a
-  // fabricated lemma plus the past auxiliary. The sa row needs no such context:
-  // its continuative し takes the past directly, with no onbin to mistake.
-  const bool lexical_renyokei_past =
-      prev.extended_pos == core::ExtendedPOS::VerbRenyokei && utf8::equalsAny(next.surface, {"た", "たら"}) &&
-      next.extended_pos == core::ExtendedPOS::AuxTenseTa &&
-      (grammar::containsKanji(prev.surface) || prev.lemmaVerified() ||
-       grammar::conjTypeToVerbType(prev.conj_type) == grammar::VerbType::GodanSa ||
-       (prev.start > 0 && prev.origin == core::CandidateOrigin::VerbHiraganaInflectedRenyokei));
+  // pure-hiragana Ichidan stem is also usable: the following た validates its
+  // inflectional shape wherever it starts. Withholding it at the sentence start
+  // only handed the bonus to a stem cut after a host-less particle mora
+  // (は+だけ+た). The sa row takes it too: its continuative し takes the past
+  // directly, with no onbin to mistake.
+  const bool lexical_renyokei_past = prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+                                     utf8::equalsAny(next.surface, {"た", "たら"}) &&
+                                     next.extended_pos == core::ExtendedPOS::AuxTenseTa &&
+                                     (grammar::containsKanji(prev.surface) || prev.lemmaVerified() ||
+                                      grammar::conjTypeToVerbType(prev.conj_type) == grammar::VerbType::GodanSa ||
+                                      prev.origin == core::CandidateOrigin::VerbHiraganaInflectedRenyokei);
   const bool hiragana_onbin_past =
       prev.extended_pos == core::ExtendedPOS::VerbOnbinkei && prev.origin == core::CandidateOrigin::VerbHiragana &&
       utf8::endsWith(prev.surface, "い") && next.extended_pos == core::ExtendedPOS::AuxTenseTa;

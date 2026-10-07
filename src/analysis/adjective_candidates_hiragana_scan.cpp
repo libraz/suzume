@@ -161,6 +161,12 @@ void adj_detail::appendHiraganaIAdjSurfaceCandidates(const std::vector<char32_t>
                                                      const grammar::Inflection& inflection,
                                                      const dictionary::DictionaryManager* dict_manager,
                                                      std::vector<UnknownCandidate>& candidates) {
+  // A particle mora with no host in front of it is the first mora of a word,
+  // so no adjective opens right after it (は+げしい is はげしい).
+  if (start_pos >= 1 && normalize::isParticleCodepoint(codepoints[start_pos - 1]) &&
+      particleMoraLacksHost(codepoints, start_pos - 1)) {
+    return;
+  }
   // Try different lengths, starting from longest
   for (size_t end_pos = hiragana_end; end_pos > start_pos + 2; --end_pos) {
     const std::string surface = extractSubstring(codepoints, start_pos, end_pos);

@@ -502,6 +502,65 @@
       ],
       "id": "wonadenagara",
       "input": "髪をなでながら"
+    },
+    {
+      "description": "はだけた襟元を直した - auto-generated",
+      "expected": [
+        {
+          "lemma": "はだける",
+          "pos": "Verb",
+          "surface": "はだけ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "襟元",
+          "pos": "Noun",
+          "surface": "襟元"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "直す",
+          "pos": "Verb",
+          "surface": "直し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "hadaketa_wo_shita",
+      "input": "はだけた襟元を直した"
+    },
+    {
+      "description": "はにかんだ顔 - auto-generated",
+      "expected": [
+        {
+          "lemma": "はにかむ",
+          "pos": "Verb",
+          "surface": "はにかん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "顔",
+          "pos": "Noun",
+          "surface": "顔"
+        }
+      ],
+      "id": "hanikanda",
+      "input": "はにかんだ顔"
     }
   ],
   "description": "verb_ichidan_hiragana tests",

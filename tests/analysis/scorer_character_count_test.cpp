@@ -157,7 +157,7 @@ TEST(ScorerConnectionDedupTest, CopulaHypotheticalLegacyDomainsKeepTheirEffectiv
   EXPECT_FLOAT_EQ(connection_rules::computeCopulaConditionalBonus(prev, next), bigram_cost::kStrong);
 }
 
-TEST(ScorerConnectionDedupTest, BosUnverifiedHiraganaRenyokeiDoesNotReceivePastBonus) {
+TEST(ScorerConnectionDedupTest, UnverifiedHiraganaRenyokeiReceivesPastBonusAtAnyStart) {
   core::LatticeEdge stem;
   stem.surface = "つめ";
   stem.pos = core::PartOfSpeech::Verb;
@@ -169,7 +169,7 @@ TEST(ScorerConnectionDedupTest, BosUnverifiedHiraganaRenyokeiDoesNotReceivePastB
   past.pos = core::PartOfSpeech::Auxiliary;
   past.extended_pos = core::ExtendedPOS::AuxTenseTa;
 
-  EXPECT_FLOAT_EQ(connection_rules::computeTaFormVolitionalBonus(stem, past), bigram_cost::kNeutral);
+  EXPECT_FLOAT_EQ(connection_rules::computeTaFormVolitionalBonus(stem, past), bigram_cost::kVeryStrongBonus);
 
   stem.start = 1;
   EXPECT_FLOAT_EQ(connection_rules::computeTaFormVolitionalBonus(stem, past), bigram_cost::kVeryStrongBonus);

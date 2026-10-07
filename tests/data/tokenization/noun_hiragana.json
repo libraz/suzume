@@ -868,6 +868,102 @@
       ],
       "id": "hatottsani_geta",
       "input": "彼はとっさに逃げた"
+    },
+    {
+      "description": "すねたように見えた - auto-generated",
+      "expected": [
+        {
+          "lemma": "すねる",
+          "pos": "Verb",
+          "surface": "すね"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "よう",
+          "pos": "Noun",
+          "surface": "よう"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "見える",
+          "pos": "Verb",
+          "surface": "見え"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "sunetayouni_eta",
+      "input": "すねたように見えた"
+    },
+    {
+      "description": "うなじに日が当たる - auto-generated",
+      "expected": [
+        {
+          "lemma": "うなじ",
+          "pos": "Noun",
+          "surface": "うなじ"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "日",
+          "pos": "Noun",
+          "surface": "日"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "当たる",
+          "pos": "Verb",
+          "surface": "当たる"
+        }
+      ],
+      "id": "unajini_ga_taru",
+      "input": "うなじに日が当たる"
+    },
+    {
+      "description": "がらんとした部屋 - auto-generated",
+      "expected": [
+        {
+          "lemma": "がらんと",
+          "pos": "Adverb",
+          "surface": "がらんと"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "部屋",
+          "pos": "Noun",
+          "surface": "部屋"
+        }
+      ],
+      "id": "garantoshita",
+      "input": "がらんとした部屋"
     }
   ],
   "description": "noun_hiragana tests",

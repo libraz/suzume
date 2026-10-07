@@ -441,6 +441,10 @@ constexpr float kBosClassicalNegativePenalty = kBosTensePenalty;
 // fragment may genuinely open on the copula's own continuative, its nominal
 // supplied by the preceding context (ではあるまいか).
 constexpr float kBosCopulaPenalty = scale::kRare;
+// The volitional, causative and がる auxiliaries inflect off a stem in front of
+// them, as the past and the classical auxiliaries do, so they share that tier
+// (すねた read as す + ね + た, うなじ as う + な + じ).
+constexpr float kBosStemBoundAuxPenalty = kBosTensePenalty;
 
 // EOS (end-of-sentence) adjustments share the table below with BOS. The two
 // columns are intentionally asymmetric: a final particle can naturally close a
@@ -570,6 +574,9 @@ constexpr std::array<BoundaryCost, static_cast<size_t>(core::ExtendedPOS::Count_
   table[static_cast<size_t>(core::ExtendedPOS::AuxClassicalPerfect)].bos = kBosClassicalPerfectPenalty;
   table[static_cast<size_t>(core::ExtendedPOS::AuxNegativeNu)].bos = kBosClassicalNegativePenalty;
   table[static_cast<size_t>(core::ExtendedPOS::AuxCopulaDa)].bos = kBosCopulaPenalty;
+  table[static_cast<size_t>(core::ExtendedPOS::AuxVolitional)].bos = kBosStemBoundAuxPenalty;
+  table[static_cast<size_t>(core::ExtendedPOS::AuxCausative)].bos = kBosStemBoundAuxPenalty;
+  table[static_cast<size_t>(core::ExtendedPOS::AuxGaru)].bos = kBosStemBoundAuxPenalty;
 
   table[static_cast<size_t>(core::ExtendedPOS::ParticleFinal)].bos = kBosFinalParticlePenalty;
   table[static_cast<size_t>(core::ExtendedPOS::ParticleTopic)].bos = kBosTopicParticlePenalty;
@@ -577,6 +584,11 @@ constexpr std::array<BoundaryCost, static_cast<size_t>(core::ExtendedPOS::Count_
   table[static_cast<size_t>(core::ExtendedPOS::ParticleBinding)].bos = kBosBindingParticlePenalty;
   table[static_cast<size_t>(core::ExtendedPOS::ParticleCase)].bos = kBosCaseParticlePenalty;
   table[static_cast<size_t>(core::ExtendedPOS::ParticleNo)].bos = kBosNominalizerParticlePenalty;
+  // The choice か inherits the final particle's profile and the finite-only
+  // conjunctive particles are conjunctive particles. An adverbial particle has
+  // no row: it opens an elliptical reply (かもね, だけど).
+  table[static_cast<size_t>(core::ExtendedPOS::ParticleChoice)].bos = kBosFinalParticlePenalty;
+  table[static_cast<size_t>(core::ExtendedPOS::ParticleConjFinite)].bos = kBosConjunctiveParticlePenalty;
 
   table[static_cast<size_t>(core::ExtendedPOS::AuxAspectKuru)].eos = kEosAspectKuruPenalty;
   table[static_cast<size_t>(core::ExtendedPOS::AuxAspectKuru)].eos_gate = EosBoundaryGate::SingleCodepoint;

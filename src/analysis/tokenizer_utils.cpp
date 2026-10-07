@@ -53,6 +53,14 @@ bool kanjiRunEndsWithSuru(const std::vector<char32_t>& codepoints, size_t start_
          codepoints[predicate_end] == U'す' && codepoints[predicate_end + 1] == U'る';
 }
 
+// The aspect いる and the volitional stand only on an inflected verb cell, so
+// neither opens a span with nothing in front of it. Other auxiliaries are left
+// out: their one-mora cells also spell the continuative of する or the copula,
+// which do open a clause (し+たい, with し the literary past き).
+bool selectsInflectedStem(core::ExtendedPOS epos) {
+  return epos == core::ExtendedPOS::AuxAspectIru || epos == core::ExtendedPOS::AuxVolitional;
+}
+
 }  // namespace
 
 bool hasKanjiSuruPredicateAt(const std::vector<char32_t>& codepoints,
@@ -435,7 +443,7 @@ int maximalSegmentCount(const dictionary::DictionaryManager& dict_manager, const
       const auto* entry =
           lookupEntryInRange(dict_manager, codepoints, start_pos + relative_start, start_pos + relative_end, pos);
       if (entry != nullptr && entry->extended_pos != excluded &&
-          (host_in_front || relative_start > 0 || entry->extended_pos != core::ExtendedPOS::AuxAspectIru)) {
+          (host_in_front || relative_start > 0 || !selectsInflectedStem(entry->extended_pos))) {
         part_count[relative_end] = std::max(part_count[relative_end], part_count[relative_start] + 1);
       }
     }

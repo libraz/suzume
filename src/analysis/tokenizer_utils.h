@@ -122,8 +122,9 @@ bool particleMoraLacksHost(const std::vector<char32_t>& codepoints, size_t start
  * @p excluded drops one category from the segmentation. Callers use it for the
  * cells the tokenizer itself admits only inside a named chain: a registered
  * surface the analyzer would never place here is not evidence about what the
- * span spells. Without a @p host_in_front, the aspect auxiliaries, which attach
- * only to a verb stem, cannot open the segmentation; callers pass
+ * span spells. Without a @p host_in_front, the aspect いる and the volitional,
+ * which stand only on an inflected verb cell, cannot open the segmentation;
+ * callers pass
  * !particleMoraLacksHost(), since a closing は/が/を/も hosts no verb stem either.
  */
 int maximalSegmentCount(const dictionary::DictionaryManager& dict_manager, const std::vector<char32_t>& codepoints,
