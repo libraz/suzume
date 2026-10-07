@@ -11,6 +11,7 @@
 #include "analysis/tokenizer_utils.h"
 #include "candidate_constants.h"
 #include "core/kana_constants.h"
+#include "core/utf8_constants.h"
 #include "normalize/char_type.h"
 #include "normalize/utf8.h"
 #include "tokenizer_dictionary_internal.h"
@@ -157,11 +158,11 @@ void addTruncatedAdverbCandidates(core::Lattice& lattice, const dictionary::Dict
   }
 }
 
-// Casual speech clips the long vowel off a greeting (ありがと, おはよ) or spells
-// it with the prolonged mark (ありがとー). The listed interjection ends on its
+// Casual speech clips the long vowel off a greeting (ありがと, おはよ), spells
+// it with the prolonged mark (ありがとー) or closes it on a sokuon (おはよっ). The listed interjection ends on its
 // o-row mora plus う, so a kana run closing on that mora is looked up with the
 // う put back; the clipped span keeps the entry's own lemma. It must close the
-// run, as the full greeting would, or hand off to a final particle.
+// run, as the full greeting would, or hand off to a final or quotative particle.
 void addClippedInterjectionCandidates(core::Lattice& lattice, const dictionary::DictionaryManager& dict_manager,
                                       const std::vector<char32_t>& codepoints, size_t start_pos) {
   const size_t window_end = std::min(codepoints.size(), start_pos + kElidedLookupWindow);
@@ -176,12 +177,26 @@ void addClippedInterjectionCandidates(core::Lattice& lattice, const dictionary::
     while (span_end < codepoints.size() && normalize::isProlongedSoundMark(codepoints[span_end])) {
       ++span_end;
     }
+    // A glottal stop closing the clipped greeting (おはよっ！) clips it the
+    // same way.
+    if (span_end == end_pos && span_end < codepoints.size() && codepoints[span_end] == core::hiragana::kSmallTsu &&
+        (span_end + 1 >= codepoints.size() ||
+         normalize::classifyChar(codepoints[span_end + 1]) != normalize::CharType::Hiragana)) {
+      ++span_end;
+    }
     bool closes_run =
         span_end >= codepoints.size() || normalize::classifyChar(codepoints[span_end]) != normalize::CharType::Hiragana;
+    // A final particle or the quotative that cites the greeting takes over
+    // the clause (ありがと+ね, ありがと+って).
     if (!closes_run && span_end == end_pos) {
-      const auto* particle =
-          lookupEntryInRange(dict_manager, codepoints, span_end, span_end + 1, core::PartOfSpeech::Particle);
-      closes_run = particle != nullptr && particle->extended_pos == core::ExtendedPOS::ParticleFinal;
+      constexpr size_t kHandoffParticleProbe = 2;
+      for (const auto& match : lookupResultsInRange(dict_manager, codepoints, span_end,
+                                                    std::min(codepoints.size(), span_end + kHandoffParticleProbe))) {
+        closes_run = closes_run || (match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Particle &&
+                                    (match.entry->extended_pos == core::ExtendedPOS::ParticleFinal ||
+                                     (match.entry->extended_pos == core::ExtendedPOS::ParticleQuote &&
+                                      match.length == kHandoffParticleProbe)));
+      }
     }
     if (!closes_run) {
       continue;

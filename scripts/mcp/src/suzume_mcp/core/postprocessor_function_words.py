@@ -3,6 +3,7 @@
 from .constants import (
     INTERROGATIVES,
 )
+from .core_lexicon import listed_interjections
 from .postprocessor_common import _raw_analysis, reports_mutation
 
 
@@ -847,6 +848,22 @@ def postprocess_kamo_before_final_particle(tokens: list[dict]) -> bool:
             and following.get("surface", "")[:1] in _HELD_FINAL_PARTICLES | {"ね", "な"}
         ):
             token.update(pos="Particle", lemma="かも")
+            changed = True
+    return changed
+
+
+def postprocess_listed_interjection(tokens: list[dict]) -> bool:
+    """Tag a listed greeting as the interjection wherever it stands.
+
+    The reference reads おめでとう as the adverbial cell of めでたい before
+    ございます or after a noun; the core lists the greeting as one interjection
+    (誕生日+おめでとう, おめでとう+ござい+ます), as ありがとう already is.
+    """
+    changed = False
+    listed = listed_interjections()
+    for token in tokens:
+        if token.get("surface") in listed and token.get("pos") in ("Adverb", "Adjective"):
+            token.update(pos="Interjection", lemma=token["surface"])
             changed = True
     return changed
 

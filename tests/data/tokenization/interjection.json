@@ -733,6 +733,106 @@
       ],
       "id": "otsukare",
       "input": "おつかれ！"
+    },
+    {
+      "description": "clipped greeting closed by a sokuon is one interjection",
+      "expected": [
+        {
+          "lemma": "おはよう",
+          "pos": "Interjection",
+          "surface": "おはよっ"
+        },
+        {
+          "lemma": "今日",
+          "pos": "Noun",
+          "surface": "今日"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "いい",
+          "pos": "Adjective",
+          "surface": "いい"
+        },
+        {
+          "lemma": "天気",
+          "pos": "Noun",
+          "surface": "天気"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        }
+      ],
+      "id": "ohayott_moii_dane",
+      "input": "おはよっ！今日もいい天気だね"
+    },
+    {
+      "description": "clipped greeting closed by a sokuon is one interjection",
+      "expected": [
+        {
+          "lemma": "ありがとう",
+          "pos": "Interjection",
+          "surface": "ありがとっ"
+        }
+      ],
+      "id": "arigatott",
+      "input": "ありがとっ"
+    },
+    {
+      "description": "clipped greeting closed by a sokuon is one interjection",
+      "expected": [
+        {
+          "lemma": "おめでとう",
+          "pos": "Interjection",
+          "surface": "おめでとっ"
+        }
+      ],
+      "id": "omedetott",
+      "input": "おめでとっ！"
+    },
+    {
+      "description": "kanji noun before a listed greeting keeps its whole run",
+      "expected": [
+        {
+          "lemma": "誕生日",
+          "pos": "Noun",
+          "surface": "誕生日"
+        },
+        {
+          "lemma": "おめでとう",
+          "pos": "Interjection",
+          "surface": "おめでとう"
+        }
+      ],
+      "id": "omedetou",
+      "input": "誕生日おめでとう"
+    },
+    {
+      "description": "kanji noun before a listed greeting keeps its whole run",
+      "expected": [
+        {
+          "lemma": "合格",
+          "pos": "Noun",
+          "surface": "合格"
+        },
+        {
+          "lemma": "おめでとう",
+          "pos": "Interjection",
+          "surface": "おめでとう"
+        }
+      ],
+      "id": "omedetou_2",
+      "input": "合格おめでとう！"
     }
   ],
   "description": "Interjections and greetings (感動詞・挨拶)",

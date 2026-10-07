@@ -76,6 +76,13 @@ def kana_i_adjective_lemmas() -> tuple[str, ...]:
     return tuple(sorted(lemmas, key=len, reverse=True))
 
 
+def listed_interjections() -> frozenset[str]:
+    """Return the L2 interjection headwords (おはよう, おめでとう)."""
+    return frozenset(
+        entry[0] for entry in core_entries("expressions.tsv") if len(entry) >= 2 and entry[1] == "INTERJECTION"
+    )
+
+
 _O_ROW = frozenset("おこごそぞとどのほぼぽもよろ")
 
 

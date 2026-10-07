@@ -201,15 +201,22 @@ bool kanjiHeadsPredicateAt(const std::vector<char32_t>& codepoints, const std::v
   const auto opening_entry = [&](size_t length, core::PartOfSpeech pos) {
     return lookupEntryInRange(dict_manager, codepoints, kana_start, kana_start + length, pos);
   };
-  // A registered content word of three kana or more opening on the kana
-  // leaves the kanji to the run (助言|いただく, 質問|うざい, 学生|いかに).
+  // A registered content word or interjection of three kana or more opening
+  // on the kana leaves the kanji to the run (助言|いただく, 質問|うざい,
+  // 学生|いかに, 合格|おめでとう). The word may run past the predicate probe.
   // Two-kana verbs are weighed after the direct proofs below, because they
   // are also spelled by the okurigana of a predicate (遠+いけ+ど, 鳴+かむ).
   constexpr size_t kOpeningContentWordMinLength = 3;
-  for (size_t length = kOpeningContentWordMinLength; kana_start + length <= kana_end; ++length) {
-    if (opening_entry(length, core::PartOfSpeech::Verb) != nullptr ||
-        opening_entry(length, core::PartOfSpeech::Adjective) != nullptr ||
-        opening_entry(length, core::PartOfSpeech::Adverb) != nullptr) {
+  constexpr size_t kOpeningContentWordProbe = 8;
+  size_t word_probe_end = kana_start;
+  while (word_probe_end < codepoints.size() && word_probe_end < kana_start + kOpeningContentWordProbe &&
+         char_types[word_probe_end] == normalize::CharType::Hiragana) {
+    ++word_probe_end;
+  }
+  for (const auto& match : lookupResultsInRange(dict_manager, codepoints, kana_start, word_probe_end)) {
+    if (match.entry != nullptr && match.length >= kOpeningContentWordMinLength &&
+        (match.entry->pos == core::PartOfSpeech::Verb || match.entry->pos == core::PartOfSpeech::Adjective ||
+         match.entry->pos == core::PartOfSpeech::Adverb || match.entry->pos == core::PartOfSpeech::Interjection)) {
       return false;
     }
   }

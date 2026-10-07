@@ -62,6 +62,7 @@ postprocess_demo = postprocessor_function_words.postprocess_demo
 postprocess_dewa_aru_boundary = postprocessor_function_words.postprocess_dewa_aru_boundary
 postprocess_final_particle_quotative_tte = postprocessor_function_words.postprocess_final_particle_quotative_tte
 postprocess_held_final_particle = postprocessor_function_words.postprocess_held_final_particle
+postprocess_listed_interjection = postprocessor_function_words.postprocess_listed_interjection
 postprocess_kamo_before_final_particle = postprocessor_function_words.postprocess_kamo_before_final_particle
 postprocess_distributive_goto = postprocessor_function_words.postprocess_distributive_goto
 postprocess_indefinite_ka = postprocessor_function_words.postprocess_indefinite_ka
@@ -273,6 +274,7 @@ POSTPROCESSORS: tuple[tuple[str, Callable[[list[dict]], bool]], ...] = (
     ("dai-final-particle", postprocess_dai_final_particle),
     ("tteba-emphatic-particle", postprocess_tteba_emphatic_particle),
     ("held-final-particle", postprocess_held_final_particle),
+    ("listed-interjection", postprocess_listed_interjection),
     ("kamo-final-particle", postprocess_kamo_before_final_particle),
     ("distributive-goto", postprocess_distributive_goto),
     ("nano-quotative", postprocess_nano_quotative),
