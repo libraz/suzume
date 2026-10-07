@@ -412,6 +412,16 @@ bool hasLeftHost(const std::vector<char32_t>& codepoints, size_t start_pos) {
   return start_pos > 0 && normalize::classifyChar(codepoints[start_pos - 1]) != normalize::CharType::Symbol;
 }
 
+bool spellsRiMimeticShape(const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos) {
+  constexpr size_t kShortLength = 3;
+  constexpr size_t kGeminateLength = 4;
+  if (end_pos > codepoints.size() || end_pos <= start_pos || codepoints[end_pos - 1] != U'り') {
+    return false;
+  }
+  const size_t length = end_pos - start_pos;
+  return length == kShortLength || (length == kGeminateLength && kana::isSmallKanaCodepoint(codepoints[start_pos + 1]));
+}
+
 bool particleMoraLacksHost(const std::vector<char32_t>& codepoints, size_t start_pos) {
   if (!hasLeftHost(codepoints, start_pos)) {
     return true;

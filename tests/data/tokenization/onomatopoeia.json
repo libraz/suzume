@@ -2084,6 +2084,141 @@
       ],
       "id": "gagatagototo_reru",
       "input": "電車ががたごとと揺れる"
+    },
+    {
+      "description": "しっとりとした生地 - auto-generated",
+      "expected": [
+        {
+          "lemma": "しっとり",
+          "pos": "Adverb",
+          "surface": "しっとり"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "生地",
+          "pos": "Noun",
+          "surface": "生地"
+        }
+      ],
+      "id": "shitttoritoshita",
+      "input": "しっとりとした生地"
+    },
+    {
+      "description": "うっとりと眺めた - auto-generated",
+      "expected": [
+        {
+          "lemma": "うっとり",
+          "pos": "Adverb",
+          "surface": "うっとり"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "眺める",
+          "pos": "Verb",
+          "surface": "眺め"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "utttorito_meta",
+      "input": "うっとりと眺めた"
+    },
+    {
+      "description": "じっとりと汗ばむ - auto-generated",
+      "expected": [
+        {
+          "lemma": "じっとり",
+          "pos": "Adverb",
+          "surface": "じっとり"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "汗ばむ",
+          "pos": "Verb",
+          "surface": "汗ばむ"
+        }
+      ],
+      "id": "jitttorito_bamu",
+      "input": "じっとりと汗ばむ"
+    },
+    {
+      "description": "すっきりと晴れた - auto-generated",
+      "expected": [
+        {
+          "lemma": "すっきり",
+          "pos": "Adverb",
+          "surface": "すっきり"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "晴れる",
+          "pos": "Verb",
+          "surface": "晴れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "suttkirito_reta",
+      "input": "すっきりと晴れた"
+    },
+    {
+      "description": "どきりとした - auto-generated",
+      "expected": [
+        {
+          "lemma": "どきり",
+          "pos": "Adverb",
+          "surface": "どきり"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "dokiritoshita",
+      "input": "どきりとした"
     }
   ],
   "description": "Onomatopoeia and mimetic words",

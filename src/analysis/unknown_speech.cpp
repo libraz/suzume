@@ -597,7 +597,8 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
   // four-character form can precede a hiragana predicate), so recognize the
   // structural prefix rather than requiring り to end the whole run.
   if (seq_len >= 3 && start_type == normalize::CharType::Hiragana) {
-    if (codepoints[start_pos + 2] == U'り' && (seq_len == 3 || (seq_len > 3 && codepoints[start_pos + 3] == U'と'))) {
+    if (spellsRiMimeticShape(codepoints, start_pos, start_pos + 3) &&
+        (seq_len == 3 || (seq_len > 3 && codepoints[start_pos + 3] == U'と'))) {
       // Three-character patterns are extended past the run boundary only when
       // followed by the adverbial marker と, which limits prefix false positives.
       // Skip if first char is a common particle (の, は, が, を, に, で, も, と, へ, か)
@@ -625,7 +626,7 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
     }
 
     // Four-character patterns like ぐったり and じっくり.
-    if (seq_len >= 4 && isSmallKanaAt(start_pos + 1) && codepoints[start_pos + 3] == U'り') {
+    if (seq_len >= 4 && spellsRiMimeticShape(codepoints, start_pos, start_pos + 4)) {
       const auto* tail_particle = dict_manager_ != nullptr
                                       ? lookupEntryInRange(*dict_manager_, codepoints, start_pos + 2, start_pos + 4,
                                                            core::PartOfSpeech::Particle)

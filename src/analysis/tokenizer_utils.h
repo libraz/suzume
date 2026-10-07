@@ -114,6 +114,12 @@ bool hasLeftHost(const std::vector<char32_t>& codepoints, size_t start_pos);
 bool particleMoraLacksHost(const std::vector<char32_t>& codepoints, size_t start_pos);
 
 /**
+ * Whether [start_pos, end_pos) has the shape of an AB+り or Aっ+B+り manner
+ * mimetic (どさり, うっとり). Shape only: callers add their own lexical guards.
+ */
+bool spellsRiMimeticShape(const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos);
+
+/**
  * Largest number of registered words of one part of speech a span can be
  * segmented into, or -1 when no segmentation covers it entirely. Multi-mora
  * entries stay whole, so a span that is one such word counts as one part

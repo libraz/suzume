@@ -1000,8 +1000,14 @@ void appendPromotedRunCandidates(const BracketedNounContext& ctx, const Brackete
   if (promoted.right_copula && !exact_reading_owns_context && !selected_nominal) {
     noun_cost += scorer::scale::kMinorBonus;
   }
-  auto noun_cand = makeCandidate(promoted.promoted_surface, start_pos, scan, core::PartOfSpeech::Noun, noun_cost,
-                                 /*has_suffix=*/true, CandidateOrigin::BracketedNoun);
+  // A manner mimetic before the quotative と is bracketed the same way but is
+  // the adverb, not a noun (うっとり+と, どきり+と).
+  const bool spells_mimetic_before_quotative = scan < codepoints.size() && codepoints[scan] == core::hiragana::kTo &&
+                                               spellsRiMimeticShape(codepoints, start_pos, scan);
+  auto noun_cand =
+      makeCandidate(promoted.promoted_surface, start_pos, scan,
+                    spells_mimetic_before_quotative ? core::PartOfSpeech::Adverb : core::PartOfSpeech::Noun, noun_cost,
+                    /*has_suffix=*/true, CandidateOrigin::BracketedNoun);
   noun_cand.bracketed_noun_rescue = !promoted.copula_selected_predicate_homograph;
   // A particle-shaped last mora of a determiner (その, この) is no particle,
   // so a run the determiner opens and the clause end or a case or topic

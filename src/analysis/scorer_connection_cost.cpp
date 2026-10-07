@@ -193,6 +193,15 @@ void addImpossibleAttachmentRules(const core::LatticeEdge& prev, const core::Lat
   const bool dubitative_kamo_after_continuative = prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
                                                   next.extended_pos == core::ExtendedPOS::ParticleAdverbial &&
                                                   utf8::equalsAny(next.surface, {"かも"});
+  // A kana geminate onbin before an adverbial particle, which follows the past
+  // (行っ+た+きり), or an unverified one before the continuative cell of the
+  // contraction, is an AっBり mimetic cut apart (すっ+きり, うっ+とり).
+  const bool kana_geminate_onbin = prev.extended_pos == core::ExtendedPOS::VerbOnbinkei &&
+                                   grammar::isPureHiragana(prev.surface) && utf8::endsWith(prev.surface, "っ");
+  const bool mimetic_cut_at_geminate =
+      kana_geminate_onbin && (next.extended_pos == core::ExtendedPOS::ParticleAdverbial ||
+                              (next.extended_pos == core::ExtendedPOS::AuxAspectIru && is_dialectal_oru_contraction &&
+                               !prev.fromDictionary() && !prev.lemmaVerified() && grammar::endsWithIRow(next.surface)));
   // A final particle closes the utterance, so no conjunctive particle hangs
   // off it (行こう+け+ど is 行こう+けど).
   const bool conjunctive_after_final_particle =
@@ -205,11 +214,12 @@ void addImpossibleAttachmentRules(const core::LatticeEdge& prev, const core::Lat
       contracted_nominalizer_before_continuative || contracted_nominalizer_after_adverb ||
       unpaired_assimilated_copula || terminal_spelled_final_particle_in_kana_run ||
       contracted_volitional_off_predicate || conjunctive_after_final_particle || contracted_te_wa_off_adverb ||
-      dubitative_kamo_after_continuative || geminate_past_adverb_before_auxiliary) {
+      dubitative_kamo_after_continuative || geminate_past_adverb_before_auxiliary || mimetic_cut_at_geminate) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
   if ((prev.extended_pos == core::ExtendedPOS::VerbRenyokei || prev.extended_pos == core::ExtendedPOS::VerbOnbinkei) &&
-      next.extended_pos == core::ExtendedPOS::AuxAspectIru && is_dialectal_oru_contraction) {
+      next.extended_pos == core::ExtendedPOS::AuxAspectIru && is_dialectal_oru_contraction &&
+      !mimetic_cut_at_geminate) {
     SUZUME_CONNECTION_ADD(bonus, cost::kExtremeBonus);
   }
 }
