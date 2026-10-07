@@ -2015,6 +2015,43 @@
       ],
       "id": "honobonotoshita",
       "input": "ほのぼのとした"
+    },
+    {
+      "description": "kana noun rescue does not select the first half of a reduplication",
+      "expected": [
+        {
+          "lemma": "でれでれ",
+          "pos": "Adverb",
+          "surface": "でれでれ"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "顔",
+          "pos": "Noun",
+          "surface": "顔"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        }
+      ],
+      "id": "derederetoshita_de",
+      "input": "でれでれとした顔で"
     }
   ],
   "description": "Onomatopoeia and mimetic words",

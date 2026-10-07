@@ -840,8 +840,56 @@ bool admitsPromotedRun(const BracketedNounContext& ctx, const BracketedScan& bra
           promoted.has_deverbal_noun_shape_before_genitive || promoted.copula_selected_predicate_homograph);
 }
 
+// A reading from the same start that runs past the bracket contains the
+// bracket's kana (ひと|しきり is ひとしきり, おい|しかっ is おいしかっ, まなざ|し
+// is the rescue run まなざし|に), so the bracket does not select the shorter run:
+// a reduplication, a registered content word, a verified i-adjective cell, or a
+// longer rescue run that a boundary particle closes.
+bool longerReadingSpansBracket(const BracketedNounContext& ctx, size_t run_end, size_t longer_rescue_end) {
+  if (longer_rescue_end > run_end) {
+    return true;
+  }
+  const auto& codepoints = ctx.codepoints;
+  const size_t start_pos = ctx.start_pos;
+  constexpr size_t kLongerReadingProbe = 8;
+  size_t kana_end = run_end;
+  while (kana_end < codepoints.size() && ctx.char_types[kana_end] == normalize::CharType::Hiragana &&
+         kana_end - start_pos < kLongerReadingProbe) {
+    ++kana_end;
+  }
+  // The run repeated right after itself (でれ|でれ, はる|ばる) is a reduplicated
+  // mimetic whose second half the bracket opens.
+  const size_t run_len = run_end - start_pos;
+  if (run_len >= 2 && run_end + run_len <= kana_end &&
+      (codepoints[run_end] == codepoints[start_pos] ||
+       kana::isSequentialVoicingPair(codepoints[start_pos], codepoints[run_end])) &&
+      std::equal(codepoints.begin() + static_cast<std::ptrdiff_t>(start_pos + 1),
+                 codepoints.begin() + static_cast<std::ptrdiff_t>(run_end),
+                 codepoints.begin() + static_cast<std::ptrdiff_t>(run_end + 1))) {
+    return true;
+  }
+  if (ctx.dict_manager != nullptr) {
+    for (const auto& match : lookupResultsInRange(*ctx.dict_manager, codepoints, start_pos, kana_end)) {
+      if (match.entry != nullptr && start_pos + match.length > run_end &&
+          match.entry->pos != core::PartOfSpeech::Particle && match.entry->pos != core::PartOfSpeech::Auxiliary &&
+          match.entry->pos != core::PartOfSpeech::Prefix) {
+        return true;
+      }
+    }
+  }
+  for (size_t reading_end = run_end + 1; reading_end <= kana_end; ++reading_end) {
+    for (const auto& reading : ctx.inflection.analyze(extractSubstring(codepoints, start_pos, reading_end))) {
+      if (reading.verb_type == grammar::VerbType::IAdjective && !reading.suffix.empty() &&
+          reading.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 void appendPromotedRunCandidates(const BracketedNounContext& ctx, const BracketedScan& bracketed,
-                                 const PromotedRun& promoted, float noun_cost,
+                                 const PromotedRun& promoted, float noun_cost, size_t longer_rescue_end,
                                  std::vector<UnknownCandidate>& candidates) {
   const auto& codepoints = ctx.codepoints;
   const size_t start_pos = ctx.start_pos;
@@ -905,7 +953,7 @@ void appendPromotedRunCandidates(const BracketedNounContext& ctx, const Brackete
        !(promoted.has_exact_noun && promoted.has_competing_exact_predicate) &&
        !(promoted.right_particle && exact_dictionary_reading->pos == core::PartOfSpeech::Auxiliary) &&
        !promoted.copula_selected_predicate_homograph);
-  if (selected_nominal && !exact_reading_owns_context) {
+  if (selected_nominal && !exact_reading_owns_context && !longerReadingSpansBracket(ctx, scan, longer_rescue_end)) {
     noun_cost += scorer::kBonusDoubleVeryStrong;
   }
   // A substantive hiragana run at a clause boundary, immediately before
@@ -1025,19 +1073,26 @@ void UnknownWordGenerator::appendBracketedHiraganaNounCandidates(const std::vect
     // A te-form on the left closes its clause, so the run after it needs neither
     // a nominal nor an attributive in front of the connective (嬉しく+て+うれぴ).
     bracketed.left_te_bracket = start_pos > 0 && closesTeFormAt(ctx, start_pos - 1);
+    // End of the maximal run when a boundary particle closes it; the shorter
+    // runs offered below lie inside it.
+    size_t longer_rescue_end = 0;
     auto emit_promoted_run = [&](size_t run_end) {
       if (endsOnPredicateTail(ctx, run_end)) {
-        return;
+        return false;
       }
       PromotedRun promoted = classifyRightBrackets(ctx, bracketed, run_end);
       readPromotedSurface(ctx, bracketed, promoted);
-      if (admitsPromotedRun(ctx, bracketed, promoted)) {
-        float noun_cost = getCostForType(start_type, promoted.len) + candidate::kPostParticleNounPenalty;
-        appendPromotedRunCandidates(ctx, bracketed, promoted, noun_cost, candidates);
+      if (!admitsPromotedRun(ctx, bracketed, promoted)) {
+        return false;
       }
+      float noun_cost = getCostForType(start_type, promoted.len) + candidate::kPostParticleNounPenalty;
+      appendPromotedRunCandidates(ctx, bracketed, promoted, noun_cost, longer_rescue_end, candidates);
+      return true;
     };
     const size_t scan = bracketed.scan;
-    emit_promoted_run(scan);
+    if (emit_promoted_run(scan) && scan < codepoints.size() && isRightBoundaryParticle(codepoints[scan])) {
+      longer_rescue_end = scan;
+    }
     // At the clause start a case particle or the topic は inside the scanned
     // run may equally close a short noun (そら|は|いつも, ねこ|が), so the run
     // that stops there is offered beside the maximal one and scoring weighs
@@ -1081,10 +1136,15 @@ void UnknownWordGenerator::appendBracketedHiraganaNounCandidates(const std::vect
     // auxiliary can also sit word-internally in front of the real break (みか|ん|
     // だ|と against みかん|だ|と), and stopping there would hide the run the
     // copula actually brackets.
+    // A non-copula auxiliary whose only continuation is the particle that
+    // closes the maximal run is that run's last mora (まなざ|し|に is
+    // まなざし|に): it selects a predicate cell, not the particle.
     for (size_t trimmed = start_pos + 1; trimmed < scan; ++trimmed) {
-      if (boundAuxiliaryAt(codepoints, trimmed, dict_manager_,
-                           bracketed.left_particle_bracket || bracketed.left_clause_bracket)
-                  .length > 0 ||
+      const BoundAuxiliary bound = boundAuxiliaryAt(codepoints, trimmed, dict_manager_,
+                                                    bracketed.left_particle_bracket || bracketed.left_clause_bracket);
+      const bool auxiliary_is_last_mora =
+          bound.length > 0 && !bound.is_copula && trimmed + bound.length == longer_rescue_end;
+      if ((bound.length > 0 && !auxiliary_is_last_mora) ||
           (trimmed >= start_pos + 2 && (suffixLengthAt(ctx, trimmed) > 0 || pronounLengthAt(ctx, trimmed) > 0))) {
         emit_promoted_run(trimmed);
       }

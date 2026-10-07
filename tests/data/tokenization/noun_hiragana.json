@@ -733,6 +733,104 @@
       ],
       "id": "futonde_ru",
       "input": "ふとんで寝る"
+    },
+    {
+      "description": "kana noun rescue does not select a run whose bracket lies inside a verified adjective cell",
+      "expected": [
+        {
+          "lemma": "おいしい",
+          "pos": "Adjective",
+          "surface": "おいしかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "oishikatttadesu",
+      "input": "おいしかったです"
+    },
+    {
+      "description": "kana noun rescue does not select a run whose bracket lies inside a registered word",
+      "expected": [
+        {
+          "lemma": "ひとしきり",
+          "pos": "Adverb",
+          "surface": "ひとしきり"
+        },
+        {
+          "lemma": "泣く",
+          "pos": "Verb",
+          "surface": "泣い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "hitoshikiri_ita",
+      "input": "ひとしきり泣いた"
+    },
+    {
+      "description": "shorter rescue run inside the run a case particle closes",
+      "expected": [
+        {
+          "lemma": "まなざし",
+          "pos": "Noun",
+          "surface": "まなざし"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        }
+      ],
+      "id": "manazashini",
+      "input": "まなざしに"
+    },
+    {
+      "description": "non-copula auxiliary before the closing particle is the rescue run's last mora",
+      "expected": [
+        {
+          "lemma": "憂い",
+          "pos": "Noun",
+          "surface": "憂い"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "帯びる",
+          "pos": "Verb",
+          "surface": "帯び"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "まなざし",
+          "pos": "Noun",
+          "surface": "まなざし"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        }
+      ],
+      "id": "iwo_bitamanazashini",
+      "input": "憂いを帯びたまなざしに"
     }
   ],
   "description": "noun_hiragana tests",
