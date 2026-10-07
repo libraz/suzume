@@ -106,6 +106,14 @@ bool lookupResultsHaveExtendedPOS(const std::vector<dictionary::LookupResult>& r
 bool hasLeftHost(const std::vector<char32_t>& codepoints, size_t start_pos);
 
 /**
+ * Whether a particle mora opening at @p start_pos has no word to attach to:
+ * hasLeftHost() fails, or the previous mora is が・を・は・も closing a
+ * non-hiragana host. Those four take no particle after them, so a particle
+ * homograph there opens a word (彼は+はしった) instead of marking an argument.
+ */
+bool particleMoraLacksHost(const std::vector<char32_t>& codepoints, size_t start_pos);
+
+/**
  * Largest number of registered words of one part of speech a span can be
  * segmented into, or -1 when no segmentation covers it entirely. Multi-mora
  * entries stay whole, so a span that is one such word counts as one part

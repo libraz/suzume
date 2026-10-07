@@ -595,7 +595,9 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
           dict_manager_ != nullptr && grammar::isTeDeSurface(extractSubstring(codepoints, start_pos, start_pos + 1)) &&
           lookupEntryInRange(*dict_manager_, codepoints, start_pos + 1, start_pos + 3, core::PartOfSpeech::Auxiliary) !=
               nullptr;
-      if (!normalize::isParticleCodepoint(first) && !isBareVowelMora(first) && !kana::isRaColumnCodepoint(first) &&
+      const bool particle_mora_opens_word =
+          !normalize::isParticleCodepoint(first) || particleMoraLacksHost(codepoints, start_pos);
+      if (particle_mora_opens_word && !isBareVowelMora(first) && !kana::isRaColumnCodepoint(first) &&
           !is_godan_ra_continuative && !opens_te_auxiliary_chain) {
         appendMimeticAdverb(codepoints, start_pos, start_pos + 3, 0.7F, 0.7F, "ab_ri_pattern", candidates);
       }
@@ -633,10 +635,12 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
 
   // Try XXんと pattern for manner adverbs (きちんと, ちゃんと). A two-or-more
   // mora stem followed by んと is a productive mimetic shape. Require the
-  // complete four-character prefix and a non-particle start so that the rule
-  // does not absorb ordinary one-mora words or particle sequences.
+  // complete four-character prefix and a start that is not a hosted particle
+  // so that the rule does not absorb ordinary one-mora words or particle
+  // sequences.
   if (seq_len >= 4 && start_type == normalize::CharType::Hiragana && codepoints[start_pos + 2] == U'ん' &&
-      codepoints[start_pos + 3] == U'と' && !normalize::isParticleCodepoint(codepoints[start_pos])) {
+      codepoints[start_pos + 3] == U'と' &&
+      (!normalize::isParticleCodepoint(codepoints[start_pos]) || particleMoraLacksHost(codepoints, start_pos))) {
     appendMimeticAdverb(codepoints, start_pos, start_pos + 4, candidate::kMimeticNtoAdverbBonus,
                         candidate::kHighOriginConfidence, "xx_nto_pattern", candidates);
   }

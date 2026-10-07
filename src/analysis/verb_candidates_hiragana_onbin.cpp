@@ -124,7 +124,8 @@ void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, s
     const bool starts_with_short_particle_stem =
         stem_char_count == 2 &&
         (first_char == U'と' || first_char == U'を' || first_char == U'に' || first_char == U'で' ||
-         first_char == U'が' || first_char == U'は' || first_char == U'へ');
+         first_char == U'が' || first_char == U'は' || first_char == U'へ') &&
+        !particleMoraLacksHost(codepoints, start_pos);
 
     const bool has_left_predicate_boundary = opensPredicateSlot(codepoints, start_pos);
     // A kanji on the left closes a nominal subject whose particle was dropped

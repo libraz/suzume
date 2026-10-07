@@ -249,6 +249,151 @@
       ],
       "id": "deshirabeta",
       "input": "図書館でしらべた"
+    },
+    {
+      "description": "Particle-homograph first mora at sentence start opens a kana verb",
+      "expected": [
+        {
+          "lemma": "はしる",
+          "pos": "Verb",
+          "surface": "はしっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "hashittta",
+      "input": "はしった"
+    },
+    {
+      "description": "Particle-homograph first mora after a comma opens a kana verb",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "はしる",
+          "pos": "Verb",
+          "surface": "はしっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ha_hashittta",
+      "input": "彼は、はしった"
+    },
+    {
+      "description": "Particle-homograph first mora right after topic は opens a kana verb",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "はしる",
+          "pos": "Verb",
+          "surface": "はしっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "hahashittta",
+      "input": "彼ははしった"
+    },
+    {
+      "description": "Kana ichidan verb whose tail spells だけ, after a comma",
+      "expected": [
+        {
+          "lemma": "胸元",
+          "pos": "Noun",
+          "surface": "胸元"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "はだける",
+          "pos": "Verb",
+          "surface": "はだけ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ha_hadaketa",
+      "input": "胸元は、はだけた"
+    },
+    {
+      "description": "Kana hatsuonbin verb opening on a particle homograph after が",
+      "expected": [
+        {
+          "lemma": "彼女",
+          "pos": "Pronoun",
+          "surface": "彼女"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "はにかむ",
+          "pos": "Verb",
+          "surface": "はにかん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "顔",
+          "pos": "Noun",
+          "surface": "顔"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "笑う",
+          "pos": "Verb",
+          "surface": "笑っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "gahanikanda_de_ttta",
+      "input": "彼女がはにかんだ顔で笑った"
     }
   ],
   "description": "verb_ichidan_hiragana tests",

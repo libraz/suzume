@@ -9,7 +9,7 @@ from .constants import (
     KANJI_SUFFIXES_KEPT_SEPARATE,
     LETTER_FORMULAS,
 )
-from .mecab import mecab_analyze
+from .mecab import is_single_token_of_pos, mecab_analyze
 from .merge_postprocessor_grammar import _CONTINUATIVE_CELL
 from .pos_mapping import map_mecab_pos
 
@@ -697,6 +697,27 @@ def _doubled_nasal_mimetic_end(tokens: list[dict], start: int) -> int | None:
     return None
 
 
+def _is_fused_nasal_mimetic(tokens: list[dict], start: int) -> bool:
+    """Whether tokens at ``start`` spell an XXんと manner mimetic cut before と.
+
+    A hatsuonbin verb cell takes only た/だ/て/で, so XXん read as one before と
+    (からん+と) is no verb; and a run the reference lists whole as an adverb
+    when read alone (がらんと) is that adverb.  A noun before comitative と
+    (みかん+と) meets neither test.
+    """
+    if start + 1 >= len(tokens):
+        return False
+    head, particle = tokens[start], tokens[start + 1]
+    surface = head.get("surface", "")
+    if not regex.fullmatch(r"\p{Hiragana}{2}ん", surface) or particle.get("surface") != "と":
+        return False
+    if particle.get("pos") != "助詞":
+        return False
+    if head.get("pos") == "動詞" and head.get("conj_form") == "連用タ接続":
+        return True
+    return head.get("pos") == "名詞" and is_single_token_of_pos(surface + "と", "副詞")
+
+
 def _postprocess_productive_mimetics(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
     """Rebuild productive mimetic search units from arbitrary MeCab splits.
 
@@ -743,6 +764,14 @@ def _postprocess_productive_mimetics(result: list[dict], applied_rule: str | Non
             idx += 1
             if applied_rule is None:
                 applied_rule = "productive-mimetic-suru"
+            continue
+
+        if _is_fused_nasal_mimetic(result, idx):
+            combined = surface + "と"
+            normalized.append({"surface": combined, "pos": "副詞", "lemma": combined})
+            idx += 2
+            if applied_rule is None:
+                applied_rule = "productive-mimetic"
             continue
 
         # A doubled Xん (ごろん+ごろん, ぽろん+ぽろん) is one mimetic whatever the

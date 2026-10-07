@@ -16,6 +16,7 @@
 #include "grammar/conjugation.h"
 #include "grammar/inflection.h"
 #include "normalize/char_type.h"
+#include "normalize/exceptions.h"
 #include "normalize/utf8.h"
 #include "verb_candidates_absorption_guards.h"
 #include "verb_candidates_dictionary_probes.h"
@@ -49,8 +50,15 @@ bool endsWithParticleTailOfPos(const dictionary::DictionaryManager* dict_manager
   } else if (total_len >= 1 && codepoints[tail_end - 1] == U'だ') {
     --tail_end;
   }
-  // Probe particle suffixes of 2+ codepoints, keeping a non-empty prefix.
+  // Probe particle suffixes of 2+ codepoints, keeping a non-empty prefix. A
+  // prefix that is one particle mora with no host on its left is no word for
+  // the particle to follow (、+はだけ+た).
+  const bool bare_particle_mora_prefix =
+      normalize::isParticleCodepoint(codepoints[start_pos]) && particleMoraLacksHost(codepoints, start_pos);
   for (size_t particle_len = 2; start_pos + particle_len < tail_end; ++particle_len) {
+    if (bare_particle_mora_prefix && tail_end - particle_len == start_pos + 1) {
+      continue;
+    }
     const dictionary::DictionaryEntry* suffix_entry =
         lookupEntryInRange(*dict_manager, codepoints, tail_end - particle_len, tail_end);
     if (suffix_entry != nullptr && suffix_entry->extended_pos == particle_pos) {

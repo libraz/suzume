@@ -404,6 +404,20 @@ bool hasLeftHost(const std::vector<char32_t>& codepoints, size_t start_pos) {
   return start_pos > 0 && normalize::classifyChar(codepoints[start_pos - 1]) != normalize::CharType::Symbol;
 }
 
+bool particleMoraLacksHost(const std::vector<char32_t>& codepoints, size_t start_pos) {
+  if (!hasLeftHost(codepoints, start_pos)) {
+    return true;
+  }
+  if (start_pos < 2) {
+    return false;
+  }
+  const char32_t previous = codepoints[start_pos - 1];
+  const bool closes_without_stacking = previous == U'が' || previous == U'を' || previous == U'は' || previous == U'も';
+  const auto host_type = normalize::classifyChar(codepoints[start_pos - 2]);
+  return closes_without_stacking && host_type != normalize::CharType::Hiragana &&
+         host_type != normalize::CharType::Symbol;
+}
+
 int maximalSegmentCount(const dictionary::DictionaryManager& dict_manager, const std::vector<char32_t>& codepoints,
                         size_t start_pos, size_t end_pos, core::PartOfSpeech pos, core::ExtendedPOS excluded,
                         bool host_in_front) {

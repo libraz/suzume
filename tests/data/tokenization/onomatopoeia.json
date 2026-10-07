@@ -1850,6 +1850,112 @@
       ],
       "id": "gapotorito_reta",
       "input": "水がぽとりと垂れた"
+    },
+    {
+      "description": "XXんと mimetic opening on a particle homograph at sentence start",
+      "expected": [
+        {
+          "lemma": "からんと",
+          "pos": "Adverb",
+          "surface": "からんと"
+        },
+        {
+          "lemma": "音",
+          "pos": "Noun",
+          "surface": "音"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "karanto_gashita",
+      "input": "からんと音がした"
+    },
+    {
+      "description": "ABり mimetic opening on a particle homograph after が",
+      "expected": [
+        {
+          "lemma": "葉",
+          "pos": "Noun",
+          "surface": "葉"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "はらり",
+          "pos": "Adverb",
+          "surface": "はらり"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "落ちる",
+          "pos": "Verb",
+          "surface": "落ち"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "gahararito_chita",
+      "input": "葉がはらりと落ちた"
+    },
+    {
+      "description": "ABり mimetic opening on a particle homograph after topic は",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "にやり",
+          "pos": "Adverb",
+          "surface": "にやり"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "笑う",
+          "pos": "Verb",
+          "surface": "笑っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "haniyarito_ttta",
+      "input": "彼はにやりと笑った"
     }
   ],
   "description": "Onomatopoeia and mimetic words",
