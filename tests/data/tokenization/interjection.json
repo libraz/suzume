@@ -833,6 +833,23 @@
       ],
       "id": "omedetou_2",
       "input": "合格おめでとう！"
+    },
+    {
+      "description": "Clipped greeting after a kanji noun keeps the kanji run whole",
+      "expected": [
+        {
+          "lemma": "合格",
+          "pos": "Noun",
+          "surface": "合格"
+        },
+        {
+          "lemma": "おめでとう",
+          "pos": "Interjection",
+          "surface": "おめでと"
+        }
+      ],
+      "id": "omedeto",
+      "input": "合格おめでと"
     }
   ],
   "description": "Interjections and greetings (感動詞・挨拶)",

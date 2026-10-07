@@ -8,6 +8,7 @@
 #include <algorithm>
 
 #include "analysis/tokenizer_utils.h"
+#include "core/kana_constants.h"
 
 namespace suzume::analysis {
 
@@ -15,6 +16,15 @@ const dictionary::DictionaryEntry* lookupEntryInRange(const dictionary::Dictiona
                                                       const std::vector<char32_t>& codepoints, size_t start, size_t end,
                                                       core::PartOfSpeech pos) {
   return dict_manager.lookupExact(extractSubstring(codepoints, start, end), pos);
+}
+
+const dictionary::DictionaryEntry* lookupClippedInterjection(const dictionary::DictionaryManager& dict_manager,
+                                                             const std::vector<char32_t>& codepoints, size_t start,
+                                                             size_t end) {
+  if (end <= start || end > codepoints.size() || !kana::isORowCodepoint(codepoints[end - 1])) {
+    return nullptr;
+  }
+  return dict_manager.lookupExact(extractSubstring(codepoints, start, end) + "う", core::PartOfSpeech::Interjection);
 }
 
 std::vector<dictionary::LookupResult> lookupResultsInRange(const dictionary::DictionaryManager& dict_manager,

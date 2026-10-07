@@ -55,6 +55,19 @@ const dictionary::DictionaryEntry* lookupEntryInRange(const dictionary::Dictiona
                                                       core::PartOfSpeech pos = core::PartOfSpeech::Unknown);
 
 /**
+ * @brief The interjection that codepoints[start, end) spells with its final う
+ *        clipped (ありがと, おはよ, おめでと)
+ *
+ * The listed greeting ends on an o-row mora plus う, so a span closing on that
+ * mora is looked up with the う put back.
+ *
+ * @return the interjection entry, or nullptr if the span clips none
+ */
+const dictionary::DictionaryEntry* lookupClippedInterjection(const dictionary::DictionaryManager& dict_manager,
+                                                             const std::vector<char32_t>& codepoints, size_t start,
+                                                             size_t end);
+
+/**
  * @brief Every dictionary entry whose surface opens codepoints[start, end)
  *
  * The prefix-lookup counterpart of lookupEntryInRange, for the callers that walk

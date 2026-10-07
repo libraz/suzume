@@ -220,6 +220,12 @@ bool kanjiHeadsPredicateAt(const std::vector<char32_t>& codepoints, const std::v
       return false;
     }
   }
+  // The clipped spelling of such a greeting leaves it there too (合格|おめでと).
+  for (size_t clip_end = kana_start + kOpeningContentWordMinLength; clip_end <= word_probe_end; ++clip_end) {
+    if (lookupClippedInterjection(dict_manager, codepoints, kana_start, clip_end) != nullptr) {
+      return false;
+    }
+  }
   const char32_t okurigana = codepoints[kana_start];
   const std::string head = normalize::encodeUtf8(codepoints[kana_start - 1]);
   if (verb_helpers::hasDictionaryGodanBaseFromIRow(&dict_manager, head, okurigana) ||

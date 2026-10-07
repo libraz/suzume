@@ -201,8 +201,7 @@ void addClippedInterjectionCandidates(core::Lattice& lattice, const dictionary::
     if (!closes_run) {
       continue;
     }
-    const auto* interjection = dict_manager.lookupExact(extractSubstring(codepoints, start_pos, end_pos) + "う",
-                                                        core::PartOfSpeech::Interjection);
+    const auto* interjection = lookupClippedInterjection(dict_manager, codepoints, start_pos, end_pos);
     if (interjection == nullptr) {
       continue;
     }
