@@ -145,6 +145,62 @@
       ],
       "id": "tazott_yatttaze",
       "input": "来たぞっ！やったぜ"
+    },
+    {
+      "description": "emphatic sokuon inside a dictionary adjective keeps the adjective whole",
+      "expected": [
+        {
+          "lemma": "ピーマン",
+          "pos": "Noun",
+          "surface": "ピーマン"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "大嫌い",
+          "pos": "Adjective",
+          "surface": "大っ嫌い"
+        }
+      ],
+      "id": "ga_tt_i",
+      "input": "ピーマンが大っ嫌い"
+    },
+    {
+      "description": "emphatic sokuon inside a dictionary adjective keeps the adjective whole",
+      "expected": [
+        {
+          "lemma": "大好き",
+          "pos": "Adjective",
+          "surface": "大っ好き"
+        }
+      ],
+      "id": "tt_ki",
+      "input": "大っ好き"
+    },
+    {
+      "description": "emphatic sokuon inside a dictionary adjective keeps the adjective whole",
+      "expected": [
+        {
+          "lemma": "大好き",
+          "pos": "Adjective",
+          "surface": "大っ好き"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "人",
+          "pos": "Noun",
+          "surface": "人"
+        }
+      ],
+      "id": "tt_kina",
+      "input": "大っ好きな人"
     }
   ],
   "description": "Tests for sokuon (促音) patterns: 漢字+っ+漢字/平仮名",

@@ -283,8 +283,35 @@ void appendSokuonKanjiCompounds(const KanjiHiraganaSpan& span, std::vector<Unkno
   const size_t sokuon_pos = span.kanji_end;
   size_t kanji2_end = findCharRegionEnd(span.char_types, sokuon_pos + 1, 3, normalize::CharType::Kanji);
 
+  // An emphatic sokuon inside a dictionary adjective or verb (大っ嫌い for
+  // 大嫌い) is that word: with the っ taken out, the kanji and the kana after
+  // them spell its entry, whose class and lemma the span keeps. No noun may
+  // then end inside it (大っ嫌|い).
+  size_t emphasized_word_end = 0;
+  if (span.dict_manager != nullptr) {
+    constexpr size_t kEmphasizedWordProbe = 6;
+    const size_t probe_end = std::min(codepoints.size(), kanji2_end + kEmphasizedWordProbe);
+    const std::string joined =
+        extractSubstring(codepoints, start_pos, sokuon_pos) + extractSubstring(codepoints, sokuon_pos + 1, probe_end);
+    for (const auto& match : span.dict_manager->lookup(joined, 0)) {
+      const size_t word_end = start_pos + match.length + 1;
+      if (match.entry == nullptr || word_end <= kanji2_end ||
+          (match.entry->pos != core::PartOfSpeech::Adjective && match.entry->pos != core::PartOfSpeech::Verb) ||
+          word_end <= emphasized_word_end) {
+        continue;
+      }
+      auto word = makeCandidate(codepoints, start_pos, word_end, match.entry->pos, candidate::kInfixCompoundNounCost,
+                                false, CandidateOrigin::KanjiHiraganaCompound, match.entry->extended_pos);
+      word.lemma = match.entry->lemma.empty() ? match.entry->surface : match.entry->lemma;
+      word.lemma_verified = true;
+      SUZUME_DEBUG_CANDIDATE(word, candidate::kDictionaryOriginConfidence, "kanji_emphatic_sokuon_word");
+      candidates.push_back(std::move(word));
+      emphasized_word_end = word_end;
+    }
+  }
+
   // Generate candidates for each length
-  for (size_t end_pos = sokuon_pos + 2; end_pos <= kanji2_end; ++end_pos) {
+  for (size_t end_pos = sokuon_pos + 2; end_pos <= kanji2_end && emphasized_word_end == 0; ++end_pos) {
     auto cand = makeCandidate(codepoints, start_pos, end_pos, core::PartOfSpeech::Noun,
                               candidate::kInfixCompoundNounCost, false, CandidateOrigin::KanjiHiraganaCompound);
     SUZUME_DEBUG_CANDIDATE(cand, 0.9F, "kanji_sokuon_kanji");
