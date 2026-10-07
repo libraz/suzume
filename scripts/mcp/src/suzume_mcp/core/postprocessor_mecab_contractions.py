@@ -461,3 +461,49 @@ def repair_kamo_quotative(tokens: list[dict]) -> None:
                 {"surface": "かも", "pos": "助詞", "pos_sub1": "副助詞", "lemma": "かも"},
                 {"surface": "って", "pos": "助詞", "pos_sub1": "格助詞", "pos_sub2": "連語", "lemma": "って"},
             ]
+
+
+_GODAN_E_ROW_TO_BASE = {
+    "え": "う",
+    "け": "く",
+    "げ": "ぐ",
+    "せ": "す",
+    "て": "つ",
+    "ね": "ぬ",
+    "べ": "ぶ",
+    "め": "む",
+    "れ": "る",
+}
+
+
+def repair_sentence_final_godan_imperative(tokens: list[dict]) -> None:
+    """Read a sentence-final potential continuative as the godan imperative.
+
+    The reference lemmatizes a bare e-row verb as the continuative of the
+    potential (君が行け → 行ける), but a continuative cannot end a sentence,
+    so there it is the imperative of the godan verb (行く).  A comma keeps the
+    suspended continuative (道が分かれ、進む), and a true ichidan stem with no
+    godan base (見せ) is left alone.
+    """
+    for idx, token in enumerate(tokens):
+        surface = token.get("surface", "")
+        base_suffix = _GODAN_E_ROW_TO_BASE.get(surface[-1:])
+        if (
+            base_suffix is None
+            or token.get("pos") != "動詞"
+            or token.get("conj_type") != "一段"
+            or token.get("conj_form") != "連用形"
+            or token.get("lemma") != surface + "る"
+        ):
+            continue
+        following = tokens[idx + 1] if idx + 1 < len(tokens) else None
+        # A final particle is no evidence: よ also closes the ichidan
+        # imperative (求め+よ), whose base the reference reads as classical 求む.
+        if following is not None and not (following.get("pos") == "記号" and following.get("pos_sub1") != "読点"):
+            continue
+        base = mecab_analyze(surface[:-1] + base_suffix)
+        if len(base) != 1 or base[0].get("pos") != "動詞" or not base[0].get("conj_type", "").startswith("五段"):
+            continue
+        token["lemma"] = base[0]["surface"]
+        token["conj_type"] = base[0]["conj_type"]
+        token["conj_form"] = "命令ｅ"

@@ -312,6 +312,50 @@
       ],
       "id": "ki_re_no_yo",
       "input": "咲き誇れ心の花よ"
+    },
+    {
+      "description": "おまえが行け - auto-generated",
+      "expected": [
+        {
+          "lemma": "おまえ",
+          "pos": "Pronoun",
+          "surface": "おまえ"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行け"
+        }
+      ],
+      "id": "omaega_ke",
+      "input": "おまえが行け"
+    },
+    {
+      "description": "君が書け。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "君",
+          "pos": "Pronoun",
+          "surface": "君"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "書く",
+          "pos": "Verb",
+          "surface": "書け"
+        }
+      ],
+      "id": "ga_ke",
+      "input": "君が書け。"
     }
   ],
   "description": "verb_imperative tests",

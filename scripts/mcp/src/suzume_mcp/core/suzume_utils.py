@@ -30,6 +30,7 @@ from .postprocessors import (
     repair_mimetic_n_to_suru,
     repair_productive_causative,
     repair_regional_imperative,
+    repair_sentence_final_godan_imperative,
     split_demonstrative_dake,
     split_predicate_tokoro_ga,
     split_reason_nde,
@@ -243,6 +244,7 @@ def get_expected_tokens(text: str, suzume_tokens: list[dict] | None = None) -> t
     repair_contracted_volitional(raw_tokens)
     repair_contracted_quotative(raw_tokens)
     repair_regional_imperative(raw_tokens)
+    repair_sentence_final_godan_imperative(raw_tokens)
     repair_productive_causative(raw_tokens)
     repair_euphonic_adjective_adverb(raw_tokens)
     repair_continuative_before_manner_suffix(raw_tokens)
