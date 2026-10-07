@@ -24,6 +24,7 @@ from .postprocessors import (
     repair_euphonic_adjective_adverb,
     repair_interrogative_nande,
     repair_kamo_quotative,
+    repair_kana_compound_verb_at_tari,
     repair_kanji_prefix_before_kana_noun,
     repair_kko_nominalizer,
     repair_lengthened_negative,
@@ -253,6 +254,7 @@ def get_expected_tokens(text: str, suzume_tokens: list[dict] | None = None) -> t
     split_reason_nde(raw_tokens)
     repair_contracted_rareru(raw_tokens)
     repair_contracted_iika(raw_tokens)
+    repair_kana_compound_verb_at_tari(raw_tokens)
     repair_lengthened_negative(raw_tokens)
     repair_kamo_quotative(raw_tokens)
     repair_adjective_yo_quotative(raw_tokens)

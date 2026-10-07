@@ -152,8 +152,21 @@ HaRowLicense haRowCellLicense(core::ExtendedPOS cell, const std::vector<char32_t
       // 思へ+ば). The same form ends an imperative clause (書き給へ。), which is
       // the only other environment the row kana reaches without a following
       // closed-class word.
-      license.closed_class_tail = dictionaryTailFollowsAt(
-          codepoints, end_pos, dict_manager, core::PartOfSpeech::Particle, {core::ExtendedPOS::ParticleConj});
+      // Only the conjunctions that select the 已然形 name it (思へ+ど, 思へ+ば);
+      // たり or て after へ say nothing about the cell.
+      const auto selects_hypothetical = [&]() {
+        for (size_t length = 1; length <= 2 && end_pos + length <= codepoints.size(); ++length) {
+          if (grammar::isHypotheticalSelectingConjunctiveParticle(
+                  extractSubstring(codepoints, end_pos, end_pos + length))) {
+            return true;
+          }
+        }
+        return false;
+      };
+      license.closed_class_tail =
+          dictionaryTailFollowsAt(codepoints, end_pos, dict_manager, core::PartOfSpeech::Particle,
+                                  {core::ExtendedPOS::ParticleConj}) &&
+          selects_hypothetical();
       // Without a closed-class word behind it the cell rests on position alone,
       // and the position it needs — a clause end after a finished predicate — is
       // also where the direction particle sits (食べて+大阪+へ). The 未然形 branch
@@ -352,6 +365,15 @@ void appendClassicalHaRowCandidates(const std::vector<char32_t>& codepoints, siz
     // reading, so the 未然形 cell takes no okurigana in front of it.
     if (cell == core::ExtendedPOS::VerbMizenkei && tail_pos != kanji_end) {
       continue;
+    }
+    // A case particle in the okurigana closes the kanji run as an argument
+    // (場+に+へたり), so no cell of the run lies past it.
+    if (tail_pos > kanji_end && dict_manager != nullptr) {
+      const auto* particle =
+          lookupEntryInRange(*dict_manager, codepoints, tail_pos - 1, tail_pos, core::PartOfSpeech::Particle);
+      if (particle != nullptr && particle->extended_pos == core::ExtendedPOS::ParticleCase) {
+        break;
+      }
     }
     const size_t end_pos = tail_pos + 1;
     const HaRowLicense license = haRowCellLicense(cell, codepoints, start_pos, end_pos, dict_manager);

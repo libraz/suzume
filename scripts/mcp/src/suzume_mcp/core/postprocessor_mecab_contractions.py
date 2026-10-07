@@ -1,5 +1,7 @@
 """Repairs for contracted, regional, and lengthened forms that MeCab splits at the wrong boundary."""
 
+import regex
+
 from .mecab import mecab_analyze
 
 
@@ -370,6 +372,36 @@ def repair_contracted_rareru(tokens: list[dict]) -> None:
                 "conj_form": "基本形",
                 "lemma": "ない",
             }
+
+
+def repair_kana_compound_verb_at_tari(tokens: list[dict]) -> None:
+    """Rejoin a kana compound verb the reference cut at a parallel たり.
+
+    A parallel たり lists actions and the list closes on another たり/だり or
+    on する (見たり聞いたりした, 食べたりする); a lexical verb directly after a
+    lone たり is not a list.  For an unknown kana compound (へたりこむ) the
+    reference reads one-mora 経 + たり + 込む, so a short kana verb, たり and a
+    kana verb with no list-closing たり/だり behind it are one compound verb.
+    """
+    idx = 0
+    while idx + 2 < len(tokens):
+        head, tari, verb = tokens[idx], tokens[idx + 1], tokens[idx + 2]
+        following = tokens[idx + 3] if idx + 3 < len(tokens) else None
+        if (
+            head.get("pos") == "動詞"
+            and regex.fullmatch(r"\p{Hiragana}{1,2}", head.get("surface", ""))
+            and tari.get("surface") == "たり"
+            and tari.get("pos_sub1") == "並立助詞"
+            and verb.get("pos") == "動詞"
+            and verb.get("lemma") != "する"
+            and regex.fullmatch(r"\p{Hiragana}+", verb.get("surface", ""))
+            and not (following and following.get("surface") in ("たり", "だり"))
+        ):
+            prefix = head.get("surface", "") + "たり"
+            tokens[idx : idx + 3] = [
+                {**verb, "surface": prefix + verb.get("surface", ""), "lemma": prefix + verb.get("lemma", "")}
+            ]
+        idx += 1
 
 
 def _evaluates_iika(previous: dict) -> bool:

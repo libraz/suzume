@@ -1686,6 +1686,65 @@
       ],
       "id": "comma_separates_compound_verb",
       "input": "書き、直して"
+    },
+    {
+      "description": "Kana compound verb after a case particle; okurigana scan of the kanji run stops at the particle",
+      "expected": [
+        {
+          "lemma": "その",
+          "pos": "Determiner",
+          "surface": "その"
+        },
+        {
+          "lemma": "場",
+          "pos": "Noun",
+          "surface": "場"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "へたりこむ",
+          "pos": "Verb",
+          "surface": "へたりこん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "sono_nihetarikonda",
+      "input": "その場にへたりこんだ"
+    },
+    {
+      "description": "Kana compound verb after a case particle",
+      "expected": [
+        {
+          "lemma": "地面",
+          "pos": "Noun",
+          "surface": "地面"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "へたりこむ",
+          "pos": "Verb",
+          "surface": "へたりこん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "nihetarikonda",
+      "input": "地面にへたりこんだ"
     }
   ],
   "description": "Compound verbs (part 5/5)",
