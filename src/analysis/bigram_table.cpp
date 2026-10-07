@@ -100,6 +100,12 @@ BigramTable::EncodedTable BigramTable::initTable() {
         bigram_rules::setCost(table, other, core::ExtendedPOS::ParticleChoice, bigram_cost::kRare);
       }
     }
+    // An embedded question closes on the choice か and is the argument of the
+    // predicate after it (起きるか+分から+ない, 高いか+安いか), so the final
+    // か's bar on a following irrealis or adjective does not carry over.
+    bigram_rules::setCost(table, core::ExtendedPOS::ParticleChoice, core::ExtendedPOS::VerbMizenkei,
+                          bigram_cost::kNeutral);
+    bigram_rules::setCost(table, core::ExtendedPOS::ParticleChoice, core::ExtendedPOS::AdjBasic, bigram_cost::kNeutral);
   }
   // A nominal in Latin letters or digits is a noun in every respect the general
   // category covers, so it inherits that profile whole rather than restating

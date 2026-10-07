@@ -2281,6 +2281,117 @@
       ],
       "id": "kunoni",
       "input": "行くのにぃ"
+    },
+    {
+      "description": "何が起きるか分からないものだ - auto-generated",
+      "expected": [
+        {
+          "lemma": "何",
+          "pos": "Pronoun",
+          "surface": "何"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "起きる",
+          "pos": "Verb",
+          "surface": "起きる"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "分かる",
+          "pos": "Verb",
+          "surface": "分から"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        },
+        {
+          "lemma": "もの",
+          "pos": "Noun",
+          "surface": "もの"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "ga_kiruka_karanaimonoda",
+      "input": "何が起きるか分からないものだ"
+    },
+    {
+      "description": "どうなるか分からないもの - auto-generated",
+      "expected": [
+        {
+          "lemma": "どう",
+          "pos": "Adverb",
+          "surface": "どう"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なる"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "分かる",
+          "pos": "Verb",
+          "surface": "分から"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        },
+        {
+          "lemma": "もの",
+          "pos": "Noun",
+          "surface": "もの"
+        }
+      ],
+      "id": "dounaruka_karanaimono",
+      "input": "どうなるか分からないもの"
+    },
+    {
+      "description": "高いか安いか - auto-generated",
+      "expected": [
+        {
+          "lemma": "高い",
+          "pos": "Adjective",
+          "surface": "高い"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "安い",
+          "pos": "Adjective",
+          "surface": "安い"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "ika_ika",
+      "input": "高いか安いか"
     }
   ],
   "description": "particle_final tests",
