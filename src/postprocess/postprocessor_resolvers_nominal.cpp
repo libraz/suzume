@@ -131,9 +131,7 @@ bool isCompoundRenyokeiShape(const std::string& surface) {
   // mora; a base form (終止形) ends in a う-row godan terminal (呼び出す, 受け継ぐ) or ichidan
   // る. Reject base-form endings so a compound 終止形 the lattice still tags VerbRenyokei
   // (呼び出す, 着付け直す) is not wrongly nominalized — only true renyokei nominalize.
-  const char32_t last_cp = codepoints.back();
-  if (last_cp == U'う' || last_cp == U'く' || last_cp == U'ぐ' || last_cp == U'す' || last_cp == U'つ' ||
-      last_cp == U'ぬ' || last_cp == U'ぶ' || last_cp == U'む' || last_cp == U'る') {
+  if (grammar::isModernGodanTerminalKana(codepoints.back())) {
     return false;
   }
   size_t kanji_runs = 0;
@@ -340,13 +338,13 @@ void resolveComparisonNoun(std::vector<core::Morpheme>& result) {
     // predicate/adjective contexts keep the ordinary adjective 近い
     // (駅の近く, 近くない). The numeric ExtendedPOS supplies the local gate.
     if (morpheme.surface == "近く" && idx > 0 && result[idx - 1].extended_pos == core::ExtendedPOS::NounNumber) {
-      retagUninflected(morpheme, core::PartOfSpeech::Noun, core::ExtendedPOS::Noun, "近く");
+      retagNounSurface(morpheme);
       continue;
     }
     if (morpheme.surface != "以上") {
       continue;
     }
-    retagUninflected(morpheme, core::PartOfSpeech::Noun, core::ExtendedPOS::Noun, "以上");
+    retagNounSurface(morpheme);
   }
 }
 

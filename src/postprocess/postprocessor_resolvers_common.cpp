@@ -1,5 +1,6 @@
 #include <iterator>
 #include <string_view>
+#include <utility>
 
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
@@ -9,6 +10,26 @@
 #include "postprocess/postprocessor_resolvers_internal.h"
 
 namespace suzume::postprocess::resolver {
+
+namespace {
+
+bool isMotionVerbLemma(std::string_view lemma) {
+  return utf8::equalsAny(lemma, {"行く", "来る", "いく", "くる", "ゆく"});
+}
+
+// Expanded demonstrative of a contracted こん/そん/あん/どん (before だけ), or empty.
+std::string_view expandContractedDemonstrative(std::string_view surface) {
+  static constexpr std::pair<std::string_view, std::string_view> kContracted[] = {
+      {"こん", "これ"}, {"そん", "それ"}, {"あん", "あれ"}, {"どん", "どれ"}};
+  for (const auto& [contracted, expanded] : kContracted) {
+    if (utf8::equalsAny(surface, {contracted})) {
+      return expanded;
+    }
+  }
+  return {};
+}
+
+}  // namespace
 
 void retag(core::Morpheme& morpheme, core::PartOfSpeech pos, core::ExtendedPOS extended_pos, std::string_view lemma,
            dictionary::ConjugationType conj_type, grammar::ConjForm conj_form) {
@@ -309,9 +330,9 @@ void resolveExcessiveDeverbalNoun(std::vector<core::Morpheme>& result) {
     const auto* after = morphemeAfter(result, idx, 2);
     const bool case_particle =
         following.pos == core::PartOfSpeech::Particle && utf8::equalsAny(following.surface, {"を", "が", "の"});
-    const bool non_motion_ni =
-        following.pos == core::PartOfSpeech::Particle && utf8::equalsAny(following.surface, {"に"}) &&
-        (after == nullptr || !utf8::equalsAny(after->getLemma(), {"行く", "来る", "いく", "くる", "ゆく"}));
+    const bool non_motion_ni = following.pos == core::PartOfSpeech::Particle &&
+                               utf8::equalsAny(following.surface, {"に"}) &&
+                               (after == nullptr || !isMotionVerbLemma(after->getLemma()));
     const bool copula =
         following.pos == core::PartOfSpeech::Auxiliary && utf8::equalsAny(following.getLemma(), {"だ", "です"});
     if (case_particle || non_motion_ni || copula) {
@@ -372,8 +393,8 @@ void resolvePredicateCellLemmas(std::vector<core::Morpheme>& result) {
             dictionary::ConjugationType::IAdjective, grammar::ConjForm::Base);
     } else if (utf8::equalsAny(cell.surface, {"じゃろ"})) {
       cell.lemma = "だ";
-    } else if (cell.pos == core::PartOfSpeech::Verb && normalize::utf8Length(cell.surface) == 1 &&
-               grammar::isAllKanji(cell.surface) && following != nullptr && following->getLemma() == "する" &&
+    } else if (cell.pos == core::PartOfSpeech::Verb && grammar::isSingleKanjiSurface(cell.surface) &&
+               following != nullptr && following->getLemma() == "する" &&
                (previous == nullptr || previous->pos != core::PartOfSpeech::Prefix)) {
       retagNounSurface(cell);
     } else if (utf8::equalsAny(cell.surface, {"とれ"}) && after_verb && cell.pos == core::PartOfSpeech::Verb) {
@@ -410,6 +431,7 @@ void resolveFrameRepairs(std::vector<core::Morpheme>& result) {
     const core::Morpheme* previous = morphemeBefore(result, idx);
     const core::Morpheme* following = morphemeAfter(result, idx, 1);
     const core::Morpheme* after = morphemeAfter(result, idx, 2);
+    const std::string_view expanded_demonstrative = expandContractedDemonstrative(token.surface);
     if (utf8::equalsAny(token.surface, {"で"}) && following != nullptr &&
         utf8::equalsAny(following->surface, {"しか"}) && after != nullptr && after->pos == core::PartOfSpeech::Verb) {
       retagUninflected(token, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleCase, "で");
@@ -434,15 +456,9 @@ void resolveFrameRepairs(std::vector<core::Morpheme>& result) {
                previous != nullptr && previous->pos == core::PartOfSpeech::Pronoun) {
       retagNounSurface(token);
     } else if (following != nullptr && utf8::equalsAny(following->surface, {"だけ"}) &&
-               utf8::equalsAny(token.surface, {"こん", "そん", "あん", "どん"})) {
+               !expanded_demonstrative.empty()) {
       // The contracted demonstratives これ/それ/あれ/どれ before だけ.
-      static constexpr std::string_view kExpanded[] = {"これ", "それ", "あれ", "どれ"};
-      static constexpr std::string_view kContracted[] = {"こん", "そん", "あん", "どん"};
-      for (size_t form = 0; form < std::size(kContracted); ++form) {
-        if (utf8::equalsAny(token.surface, {kContracted[form]})) {
-          retagUninflected(token, core::PartOfSpeech::Pronoun, core::ExtendedPOS::Pronoun, kExpanded[form]);
-        }
-      }
+      retagUninflected(token, core::PartOfSpeech::Pronoun, core::ExtendedPOS::Pronoun, expanded_demonstrative);
     } else if (utf8::equalsAny(token.surface, {"ん"}) && previous != nullptr &&
                previous->pos == core::PartOfSpeech::Verb && following != nullptr &&
                utf8::equalsAny(following->surface, {"す", "し"}) && following->getLemma() == "する") {
@@ -473,6 +489,13 @@ void resolveFrameRepairs(std::vector<core::Morpheme>& result) {
       retagCopulaDa(result[idx + 1]);
     }
   }
+}
+
+void retagIchidanContinuative(core::Morpheme& stem) {
+  stem.pos = core::PartOfSpeech::Verb;
+  stem.extended_pos = core::ExtendedPOS::VerbRenyokei;
+  stem.conj_type = dictionary::ConjugationType::Ichidan;
+  stem.lemma = stem.surface + "る";
 }
 
 bool retagContinuativeAsVerb(core::Morpheme& stem) {
@@ -543,7 +566,7 @@ void resolveVerbFrameRepairs(std::vector<core::Morpheme>& result) {
       insertAfter(result, idx, volitional);
     } else if (token.pos == core::PartOfSpeech::Noun && following != nullptr &&
                utf8::equalsAny(following->surface, {"に"}) && after != nullptr &&
-               utf8::equalsAny(after->getLemma(), {"行く", "来る", "いく", "くる", "ゆく"}) &&
+               isMotionVerbLemma(after->getLemma()) &&
                (token.extended_pos == core::ExtendedPOS::NounVerbal || grammar::isPureHiragana(token.surface)) &&
                kana::isIRowCodepoint(utf8::decodeLastChar(token.surface))) {
       retagContinuativeAsVerb(token);

@@ -328,8 +328,7 @@ std::string yaRowBigradeTerminalLemma(std::string_view base_form) {
 }
 
 bool isModernGodanTerminalKana(char32_t code) {
-  constexpr std::array<char32_t, 9> kGodanTerminals = {U'う', U'く', U'ぐ', U'す', U'つ', U'ぬ', U'ぶ', U'む', U'る'};
-  return kana::isCodepointIn(kGodanTerminals, code);
+  return kana::isGodanTerminalCodepoint(code);
 }
 
 bool isUnproductiveGodanTerminalKana(char32_t code) {
@@ -714,6 +713,10 @@ bool endsWithURow(std::string_view stem) {
 
 bool isSingleHiragana(std::string_view text, char32_t codepoint) {
   return text.size() == core::kJapaneseCharBytes && utf8::decode3ByteUtf8At(text, 0) == codepoint;
+}
+
+bool isSingleKanjiSurface(std::string_view text) {
+  return normalize::utf8Length(text) == 1 && isAllKanji(text);
 }
 
 char32_t getVowelForChar(char32_t ch) {

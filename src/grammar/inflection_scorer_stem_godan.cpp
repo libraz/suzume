@@ -106,18 +106,20 @@ float scoreStemAndIchidan(float base, const InflectionScoreContext& context) {
       //   - え (wa-row): Many Ichidan verbs end in え (考える, 答える, 見える)
       //   - げ (ga-row): 泳ぐ, 急ぐ, etc. - moderately common
       //   - Others: て, ね, へ - less common as potential forms
+      // Each use below keeps its own stem length guard.
+      const std::string_view last_char = utf8::lastChar(stem);
+      const std::string_view stem_head =
+          stem.substr(0, stem_len >= core::kJapaneseCharBytes ? stem_len - core::kJapaneseCharBytes : 0);
       bool is_common_potential_ending = false;
       bool is_copula_de_pattern = false;
       if (stem_len >= core::kJapaneseCharBytes) {
-        std::string_view last_char = utf8::lastChar(stem);
         is_common_potential_ending = utf8::equalsAny(last_char, {"け", "め", "せ", "れ", "げ"});
         // All-kanji + で patterns are usually copula, not verb stems
         // e.g., 嫌でない = 嫌 + で + ない, 公園でる is not a real verb
         // Valid Ichidan verbs ending in で are rare: 茹でる, 出でる (archaic)
         // These have single-kanji stems (茹, 出), not multi-kanji stems
         if (last_char == "で" && stem_len >= core::kTwoJapaneseCharBytes) {
-          std::string_view stem_before_de = stem.substr(0, stem_len - core::kJapaneseCharBytes);
-          if (isAllKanji(stem_before_de)) {
+          if (isAllKanji(stem_head)) {
             // Kanji+ + で pattern: likely copula (だ/です) not Ichidan verb
             // 公園で, 速攻で, etc. are NOUN + copula patterns
             is_copula_de_pattern = true;
@@ -142,11 +144,9 @@ float scoreStemAndIchidan(float base, const InflectionScoreContext& context) {
       // Apply penalty when aux_count == 0 (analyzing as base/dictionary form)
       bool is_te_stem_in_base_context = false;
       if (stem_len >= core::kTwoJapaneseCharBytes && aux_count == 0) {
-        std::string_view last_char = utf8::lastChar(stem);
         if (last_char == "て") {
           // Check if this is a known exception (捨て, 棄て)
-          std::string_view stem_before_te = stem.substr(0, stem_len - core::kJapaneseCharBytes);
-          if (!equalsAny(stem_before_te, inflection::kTeEndingStemExceptionKanji)) {
+          if (!equalsAny(stem_head, inflection::kTeEndingStemExceptionKanji)) {
             is_te_stem_in_base_context = true;
           }
         }
@@ -159,11 +159,9 @@ float scoreStemAndIchidan(float base, const InflectionScoreContext& context) {
       // Single kanji + せ (話せ, 見せ) is more likely Godan potential form
       bool is_suru_imperative_pattern = false;
       if (stem_len >= core::kTwoJapaneseCharBytes) {
-        std::string_view last_char = utf8::lastChar(stem);
         if (last_char == "せ") {
-          std::string_view stem_before_se = stem.substr(0, stem_len - core::kJapaneseCharBytes);
           // Only apply to 2+ kanji stems (勉強, 検討, etc.), not single kanji (話, 見)
-          if (isAllKanji(stem_before_se) && stem_before_se.size() >= core::kTwoJapaneseCharBytes) {
+          if (isAllKanji(stem_head) && stem_head.size() >= core::kTwoJapaneseCharBytes) {
             // Multi-kanji + せ: likely suru-verb imperative, not Ichidan
             is_suru_imperative_pattern = true;
           }

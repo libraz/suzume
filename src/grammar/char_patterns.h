@@ -765,6 +765,11 @@ bool endsWithURow(std::string_view stem);
 bool isSingleHiragana(std::string_view text, char32_t codepoint);
 
 /**
+ * @brief Check whether text is exactly one kanji character
+ */
+bool isSingleKanjiSurface(std::string_view text);
+
+/**
  * @brief Get the vowel row character for any hiragana character
  * @param ch Unicode codepoint to check
  * @return The vowel (あ/い/う/え/お) for the character's row, or ch if not hiragana

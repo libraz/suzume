@@ -635,7 +635,7 @@ void resolveCompoundAdjectiveRenyokei(std::vector<core::Morpheme>& result) {
       continue;
     }
 
-    retagUninflected(suffix, core::PartOfSpeech::Noun, core::ExtendedPOS::Noun, "にく");
+    retagNounSurface(suffix);
     if (idx + 3 < result.size() && result[idx + 3].surface == "な") {
       retagAppearanceSou(sou);
       auto& na = result[idx + 3];
@@ -766,10 +766,7 @@ void Postprocessor::convertPrefixVerbToNoun(std::vector<core::Morpheme>& morphem
       if (kana::isIRowCodepoint(morpheme_last)) {
         resolver::retagGodanRenyokeiFromIRow(morpheme, false);
       } else if (kana::isERowCodepoint(morpheme_last)) {
-        morpheme.lemma = morpheme.surface + "る";
-        morpheme.conj_type = dictionary::ConjugationType::Ichidan;
-        morpheme.pos = core::PartOfSpeech::Verb;
-        morpheme.extended_pos = core::ExtendedPOS::VerbRenyokei;
+        resolver::retagIchidanContinuative(morpheme);
       }
     }
     // ご prefixes a Sino-Japanese verbal noun (ご+あんない+し), which is

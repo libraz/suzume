@@ -566,7 +566,7 @@ void resolveNegativeAppearanceSuffix(std::vector<core::Morpheme>& result) {
     // Verbal ない takes an irrealis, so a continuative before な+げ is the
     // deverbal noun (頼り), not a verb.
     if (idx > 0 && result[idx - 1].pos == core::PartOfSpeech::Verb) {
-      retagUninflected(result[idx - 1], core::PartOfSpeech::Noun, core::ExtendedPOS::Noun, result[idx - 1].surface);
+      retagNounSurface(result[idx - 1]);
     }
     retag(na, core::PartOfSpeech::Adjective, core::ExtendedPOS::AdjStem, "ない",
           dictionary::ConjugationType::IAdjective, grammar::ConjForm::Renyokei);

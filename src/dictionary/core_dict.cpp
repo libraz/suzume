@@ -1,5 +1,6 @@
 #include "dictionary/core_dict.h"
 
+#include <algorithm>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -30,30 +31,10 @@ namespace {
 
 #ifndef __EMSCRIPTEN__
 void stableSortEntrySpecs(std::vector<entries::EntrySpec>& entry_specs) {
-  std::vector<entries::EntrySpec> buffer(entry_specs.size());
-  for (size_t width = 1; width < entry_specs.size(); width *= 2) {
-    for (size_t left = 0; left < entry_specs.size(); left += width * 2) {
-      const size_t middle = left + width < entry_specs.size() ? left + width : entry_specs.size();
-      const size_t right = middle + width < entry_specs.size() ? middle + width : entry_specs.size();
-      size_t lhs = left;
-      size_t rhs = middle;
-      size_t output = left;
-      while (lhs < middle && rhs < right) {
-        if (std::string_view(entry_specs[rhs].surface) < std::string_view(entry_specs[lhs].surface)) {
-          buffer[output++] = entry_specs[rhs++];
-        } else {
-          buffer[output++] = entry_specs[lhs++];
-        }
-      }
-      while (lhs < middle) {
-        buffer[output++] = entry_specs[lhs++];
-      }
-      while (rhs < right) {
-        buffer[output++] = entry_specs[rhs++];
-      }
-    }
-    entry_specs.swap(buffer);
-  }
+  std::stable_sort(entry_specs.begin(), entry_specs.end(),
+                   [](const entries::EntrySpec& lhs, const entries::EntrySpec& rhs) {
+                     return std::string_view(lhs.surface) < std::string_view(rhs.surface);
+                   });
 }
 #endif
 

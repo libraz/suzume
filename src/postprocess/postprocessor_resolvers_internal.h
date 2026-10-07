@@ -104,6 +104,8 @@ void retagBasicNegativeAdjective(core::Morpheme& morpheme);
 void retagNegativeAdjectiveCell(core::Morpheme& morpheme);
 void retagCopulaDa(core::Morpheme& morpheme);
 bool retagGodanRenyokeiFromIRow(core::Morpheme& stem, bool set_conj_form);
+/// Retag an e-row stem as an Ichidan continuative verb (+る lemma); the conjugation form is left untouched.
+void retagIchidanContinuative(core::Morpheme& stem);
 /// Retag a continuative-shaped token as its verb (読み → 読む, かけ → かける).
 bool retagContinuativeAsVerb(core::Morpheme& stem);
 void retagNaAdjectivalSou(core::Morpheme& morpheme);

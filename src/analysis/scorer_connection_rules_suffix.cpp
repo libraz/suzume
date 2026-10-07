@@ -24,10 +24,6 @@ namespace suzume::analysis::connection_rules {
 
 namespace {
 
-bool isSingleKanjiSurface(std::string_view surface) {
-  return normalize::utf8Length(surface) == 1 && grammar::isAllKanji(surface);
-}
-
 bool startsWithCaseParticleMora(std::string_view surface) {
   switch (utf8::decodeFirstChar(surface)) {
     case U'が':
@@ -89,7 +85,7 @@ float computeSuffixShortVerbBonus(const core::LatticeEdge& prev, const core::Lat
   // at the same boundary (しかも+間違えた). Do not let the generic conjunction
   // bonus split that predicate; registered one-kanji nouns remain available.
   if (prev.extended_pos == core::ExtendedPOS::Conjunction && next.pos == core::PartOfSpeech::Noun &&
-      !next.fromDictionary() && isSingleKanjiSurface(next.surface)) {
+      !next.fromDictionary() && grammar::isSingleKanjiSurface(next.surface)) {
     SUZUME_CONNECTION_ADD(bonus, sc::kPenaltyConjunctionInternalNoun);
   }
 
@@ -425,7 +421,7 @@ float computeSuffixShortVerbBonus(const core::LatticeEdge& prev, const core::Lat
   // nominal stems remain available for bound temporal/spatial forms such as
   // 年度+末 and 期間+内.
   if (prev.pos == core::PartOfSpeech::Noun && next.extended_pos == core::ExtendedPOS::NounFormal &&
-      isSingleKanjiSurface(prev.surface) && isSingleKanjiSurface(next.surface)) {
+      grammar::isSingleKanjiSurface(prev.surface) && grammar::isSingleKanjiSurface(next.surface)) {
     SUZUME_CONNECTION_ADD(bonus, cost::kStrong);
   }
 
@@ -433,7 +429,7 @@ float computeSuffixShortVerbBonus(const core::LatticeEdge& prev, const core::Lat
   // one compound search unit (不祥事, 出来事). Temporal endpoint suffixes retain
   // their productive boundary (年度+末, 学期+末).
   if (next.extended_pos == core::ExtendedPOS::NounFormal && normalize::utf8Length(prev.surface) >= 2 &&
-      grammar::isAllKanji(prev.surface) && isSingleKanjiSurface(next.surface) &&
+      grammar::isAllKanji(prev.surface) && grammar::isSingleKanjiSurface(next.surface) &&
       !normalize::isTemporalSpanSuffixKanji(utf8::decodeFirstChar(next.surface))) {
     SUZUME_CONNECTION_ADD(bonus, cost::kStrong);
   }
@@ -569,7 +565,7 @@ float computeSuffixShortVerbBonus(const core::LatticeEdge& prev, const core::Lat
   // a lexical compound (時間, 期間), not a productive formal-noun boundary.
   // Leave kana suffixes and multi-character forms unaffected.
   if (prev.extended_pos == core::ExtendedPOS::NounFormal && next.pos == core::PartOfSpeech::Suffix &&
-      isSingleKanjiSurface(prev.surface) && isSingleKanjiSurface(next.surface)) {
+      grammar::isSingleKanjiSurface(prev.surface) && grammar::isSingleKanjiSurface(next.surface)) {
     SUZUME_CONNECTION_ADD(bonus, cost::kStrong);
   }
 
@@ -659,7 +655,7 @@ float computeSuffixShortVerbBonus(const core::LatticeEdge& prev, const core::Lat
   // bonus (-0.8) makes 今年|度 cheaper than the whole 今年度.
   if (prev.pos == core::PartOfSpeech::Noun && next.pos == core::PartOfSpeech::Suffix &&
       normalize::utf8Length(prev.surface) >= 2 && grammar::isAllKanji(prev.surface) &&
-      isSingleKanjiSurface(next.surface)) {
+      grammar::isSingleKanjiSurface(next.surface)) {
     if (normalize::isFiscalYearBindingPair(utf8::decodeLastChar(prev.surface), utf8::decodeFirstChar(next.surface))) {
       SUZUME_CONNECTION_ADD(bonus, cost::kRare);  // +1.0 to neutralize -0.8 bigram bonus
     }

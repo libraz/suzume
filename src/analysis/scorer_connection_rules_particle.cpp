@@ -212,7 +212,7 @@ float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::
   // causing splits like こんな+伸+びる instead of こんな+伸びる
   // Valid DET+NOUN patterns (こんな+事, あんな+人) use dict nouns or multi-char nouns
   if (prev.pos == core::PartOfSpeech::Determiner && next.pos == core::PartOfSpeech::Noun && !next.fromDictionary() &&
-      grammar::containsKanji(next.surface) && suzume::normalize::utf8Length(next.surface) == 1) {
+      grammar::isSingleKanjiSurface(next.surface)) {
     SUZUME_CONNECTION_ADD(bonus, cost::kStrong);
   }
 

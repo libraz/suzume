@@ -140,6 +140,18 @@ inline bool isCodepointIn(const std::array<char32_t, Size>& set, char32_t cp) {
   return std::find(set.begin(), set.end(), cp) != set.end();
 }
 
+/// Whether a kana ends a Godan dictionary form (the nine u-row kana, る included for Ichidan).
+inline bool isGodanTerminalCodepoint(char32_t cp) {
+  constexpr std::array<char32_t, 9> kGodanTerminals = {U'う', U'く', U'ぐ', U'す', U'つ', U'ぬ', U'ぶ', U'む', U'る'};
+  return isCodepointIn(kGodanTerminals, cp);
+}
+
+/// Whether a kana is an e-row ending of a Godan 仮定形/命令形/potential stem (え, け, げ, せ, て, ね, べ, め, れ).
+inline bool isGodanERowCodepoint(char32_t cp) {
+  constexpr std::array<char32_t, 9> kGodanERow = {U'え', U'け', U'げ', U'せ', U'て', U'ね', U'べ', U'め', U'れ'};
+  return isCodepointIn(kGodanERow, cp);
+}
+
 }  // namespace suzume::kana
 
 #endif  // SUZUME_CORE_KANA_CONSTANTS_H_

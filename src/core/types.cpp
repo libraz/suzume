@@ -2,6 +2,7 @@
 
 #include <iterator>
 
+#include "core/kana_constants.h"
 #include "core/utf8_constants.h"
 #include "normalize/char_type.h"
 #include "normalize/utf8.h"
@@ -513,6 +514,31 @@ ExtendedPOS posToExtendedPos(PartOfSpeech pos) {
 // Verb Form Detection Helpers
 // =============================================================================
 
+namespace {
+
+struct SuffixForm {
+  std::string_view suffix;
+  ExtendedPOS form;
+};
+
+// Verb suffix-chain endings, ordered: たら/だら before た/だ so the longer ending wins.
+constexpr SuffixForm kVerbSuffixForms[] = {
+    {"たら", ExtendedPOS::VerbTaraForm}, {"だら", ExtendedPOS::VerbTaraForm}, {"た", ExtendedPOS::VerbTaForm},
+    {"だ", ExtendedPOS::VerbTaForm},     {"て", ExtendedPOS::VerbTeForm},     {"で", ExtendedPOS::VerbTeForm},
+    {"ば", ExtendedPOS::VerbKateikei},   {"ます", ExtendedPOS::VerbRenyokei}, {"まし", ExtendedPOS::VerbRenyokei},
+    {"ませ", ExtendedPOS::VerbRenyokei}, {"ない", ExtendedPOS::VerbMizenkei}, {"なかっ", ExtendedPOS::VerbMizenkei},
+    {"れる", ExtendedPOS::VerbMizenkei}, {"られ", ExtendedPOS::VerbMizenkei}, {"せる", ExtendedPOS::VerbMizenkei},
+    {"させ", ExtendedPOS::VerbMizenkei},
+};
+
+// i-adjective endings, ordered: かっ/けれ/かろ before the bare く/い.
+constexpr SuffixForm kAdjSuffixForms[] = {
+    {"かっ", ExtendedPOS::AdjKatt},     {"けれ", ExtendedPOS::AdjKeForm}, {"きゃ", ExtendedPOS::AdjKeForm},
+    {"かろ", ExtendedPOS::AdjMizenkei}, {"く", ExtendedPOS::AdjRenyokei}, {"い", ExtendedPOS::AdjBasic},
+};
+
+}  // namespace
+
 // This detector assigns ExtendedPOS while candidates are built. Postprocessing
 // treats that selected ExtendedPOS as authoritative when exposing ConjForm;
 // its surface heuristics are only a fallback for legacy morphemes without one.
@@ -523,35 +549,12 @@ ExtendedPOS detectVerbForm(std::string_view surface, std::string_view suffix, bo
     return ExtendedPOS::VerbShuushikei;
   }
 
-  // Check suffix chain first for more accurate form detection
+  // Suffix chain first, for more accurate form detection (first match wins).
   if (!suffix.empty()) {
-    // たら/だら forms (conditional past)
-    if (utf8::endsWithAny(suffix, {"たら", "だら"})) {
-      return ExtendedPOS::VerbTaraForm;
-    }
-    // た/だ forms (past), including onbin variants (書いた, 読んだ)
-    if (utf8::endsWithAny(suffix, {"た", "だ"})) {
-      return ExtendedPOS::VerbTaForm;
-    }
-    // て/で forms
-    if (utf8::endsWithAny(suffix, {"て", "で"})) {
-      return ExtendedPOS::VerbTeForm;
-    }
-    // ば forms (conditional)
-    if (utf8::endsWith(suffix, "ば")) {
-      return ExtendedPOS::VerbKateikei;
-    }
-    // ます forms indicate renyokei connection
-    if (utf8::endsWithAny(suffix, {"ます", "まし", "ませ"})) {
-      return ExtendedPOS::VerbRenyokei;
-    }
-    // ない/なかっ forms indicate mizenkei connection (for godan) or renyokei (ichidan)
-    if (utf8::endsWithAny(suffix, {"ない", "なかっ"})) {
-      return ExtendedPOS::VerbMizenkei;
-    }
-    // れる/られる forms indicate mizenkei connection
-    if (utf8::endsWithAny(suffix, {"れる", "られ", "せる", "させ"})) {
-      return ExtendedPOS::VerbMizenkei;
+    for (const auto& rule : kVerbSuffixForms) {
+      if (utf8::endsWith(suffix, rule.suffix)) {
+        return rule.form;
+      }
     }
   }
 
@@ -576,7 +579,7 @@ ExtendedPOS detectVerbForm(std::string_view surface, std::string_view suffix, bo
   // an Ichidan continuative (食べ). Candidate generators that know the
   // conjugation type provide the Godan hint; keep unknown forms conservative.
   if (godan_imperative_hint && normalize::utf8Length(surface) > 1 &&
-      utf8::endsWithAny(surface, {"え", "け", "げ", "せ", "て", "ね", "べ", "め", "れ"})) {
+      kana::isGodanERowCodepoint(utf8::decodeLastChar(surface))) {
     return ExtendedPOS::VerbMeireikei;
   }
 
@@ -608,7 +611,7 @@ ExtendedPOS detectVerbForm(std::string_view surface, std::string_view suffix, bo
 
   // Godan dictionary forms end in one of these nine u-row kana.  This also
   // covers the shared る ending used by Ichidan dictionary forms.
-  if (utf8::endsWithAny(surface, {"う", "く", "ぐ", "す", "つ", "ぬ", "ぶ", "む", "る"})) {
+  if (kana::isGodanTerminalCodepoint(utf8::decodeLastChar(surface))) {
     return ExtendedPOS::VerbShuushikei;
   }
 
@@ -628,31 +631,10 @@ ExtendedPOS detectAdjForm(std::string_view surface, bool is_na_adj) {
     return ExtendedPOS::AdjBasic;
   }
 
-  // Check for specific i-adjective endings
-
-  // かっ form (past stem): 美しかっ, 高かっ
-  if (utf8::endsWith(surface, "かっ")) {
-    return ExtendedPOS::AdjKatt;
-  }
-
-  // けれ form (conditional stem): 美しけれ, 高けれ
-  if (utf8::endsWithAny(surface, {"けれ", "きゃ"})) {
-    return ExtendedPOS::AdjKeForm;
-  }
-
-  // かろ form (irrealis stem for 推量): 美しかろ, 高かろ
-  if (utf8::endsWith(surface, "かろ")) {
-    return ExtendedPOS::AdjMizenkei;
-  }
-
-  // く form (adverbial/renyokei): 美しく, 高く
-  if (utf8::endsWith(surface, "く")) {
-    return ExtendedPOS::AdjRenyokei;
-  }
-
-  // い form (basic/shuushi): 美しい, 高い
-  if (utf8::endsWith(surface, "い")) {
-    return ExtendedPOS::AdjBasic;
+  for (const auto& rule : kAdjSuffixForms) {
+    if (utf8::endsWith(surface, rule.suffix)) {
+      return rule.form;
+    }
   }
 
   // Stem forms (for ガル接続): 美し, 高

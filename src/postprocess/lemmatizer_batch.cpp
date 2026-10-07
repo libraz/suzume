@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <utility>
 
+#include "core/kana_constants.h"
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
@@ -20,16 +21,13 @@ namespace {
 // Retag a non-verbal host as a verb continuative: an Ichidan stem takes +る,
 // otherwise the Godan base is recovered from the final i-row kana.
 void retagAsContinuative(core::Morpheme& morpheme, bool ichidan_stem) {
-  if (!ichidan_stem) {
-    // The conjugation type travels with the lemma, so the classical-suru repair
-    // that follows leaves a rebuilt godan-sa base (見逃す) alone.
-    resolver::retagGodanRenyokeiFromIRow(morpheme, false);
+  if (ichidan_stem) {
+    resolver::retagIchidanContinuative(morpheme);
     return;
   }
-  morpheme.pos = core::PartOfSpeech::Verb;
-  morpheme.extended_pos = core::ExtendedPOS::VerbRenyokei;
-  morpheme.conj_type = grammar::verbTypeToConjType(grammar::VerbType::Ichidan);
-  morpheme.lemma = morpheme.surface + "る";
+  // The conjugation type travels with the lemma, so the classical-suru repair
+  // that follows leaves a rebuilt godan-sa base (見逃す) alone.
+  resolver::retagGodanRenyokeiFromIRow(morpheme, false);
 }
 
 }  // namespace
@@ -162,47 +160,20 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes, bool updat
     }
     if (!needs_lemmatization && morpheme.lemma == morpheme.surface) {
       if (morpheme.pos == core::PartOfSpeech::Verb) {
-        // Check if surface looks like a dictionary form verb
-        // Dictionary form verbs end with: る, う, く, ぐ, す, つ, ぬ, ぶ, む
-        bool is_dict_form = utf8::endsWithAny(morpheme.surface, {"る", "う", "く", "ぐ", "す", "つ", "ぬ", "ぶ", "む"});
-        // If it's a dictionary form, lemma == surface is correct
-        // If it's a conjugated form (て, た, ない, etc.), recalculate
-        if (!is_dict_form) {
-          needs_lemmatization = true;
-        }
-        // NOTE: Passive verbs ending in 〜れる (e.g., いわれる → いう, かかれる → かく)
-        // are usually SPLIT by the tokenizer (読ま+れる), not kept as single tokens.
-        // Single token 〜れる verbs are typically potential verbs (可能動詞) like:
-        // 書ける, 泊まれる, 読める - these should keep lemma = surface.
-        // So we DON'T mark 〜れる verbs for re-lemmatization here.
-        // The earlier fix already sets lemma = surface for these patterns.
-        // Causative forms need lemmatization
-        // E.g., 勉強させる → 勉強する, 書かせる → 書く
-        if (is_dict_form && utf8::endsWithAny(morpheme.surface, {"させる", "わせる", "かせる", "がせる", "たせる",
-                                                                 "なせる", "ばせる", "ませる", "らせる"})) {
-          needs_lemmatization = true;
-        }
-        // Suru-verb te-form + subsidiary verb patterns need lemmatization
-        // E.g., 説明してもらう → 説明する, 勉強してくる → 勉強する
-        if (is_dict_form && utf8::endsWithAny(morpheme.surface, {"してもらう", "してあげる", "してみる", "してくれる",
-                                                                 "していく", "してくる", "しておく", "してしまう"})) {
-          needs_lemmatization = true;
-        }
-        // Colloquial とく/どく contractions need lemmatization
-        // E.g., 見とく → 見る, 読んどく → 読む, 書いとく → 書く
-        if (is_dict_form && utf8::endsWithAny(morpheme.surface, {"とく", "んどく"})) {
-          needs_lemmatization = true;
-        }
-        // Colloquial てる/でる contractions need lemmatization
-        // E.g., 見てる → 見る, 読んでる → 読む, 買ってる → 買う
-        if (is_dict_form && utf8::endsWithAny(morpheme.surface, {"てる", "でる", "ってる"})) {
-          needs_lemmatization = true;
-        }
-        // Volitional form needs lemmatization
-        // E.g., 始めよう → 始める, 食べよう → 食べる
-        if (utf8::endsWith(morpheme.surface, "よう")) {
-          needs_lemmatization = true;
-        }
+        // A conjugated form (て, た, ない, etc.) is recalculated; a dictionary-form ending keeps
+        // lemma == surface unless it is a derived form whose lemma differs:
+        // causative (勉強させる → 勉強する), suru te-form + subsidiary verb (説明してもらう → 説明する),
+        // colloquial とく/どく and てる/でる contractions (見とく → 見る, 読んでる → 読む),
+        // and volitional (始めよう → 始める).
+        // 〜れる verbs are not listed: a single-token one is a potential (書ける, 読める) that keeps
+        // lemma = surface.
+        needs_lemmatization =
+            !kana::isGodanTerminalCodepoint(utf8::decodeLastChar(morpheme.surface)) ||
+            utf8::endsWithAny(
+                morpheme.surface,
+                {"させる",     "わせる",     "かせる",     "がせる",   "たせる",     "なせる",   "ばせる",   "ませる",
+                 "らせる",     "してもらう", "してあげる", "してみる", "してくれる", "していく", "してくる", "しておく",
+                 "してしまう", "とく",       "んどく",     "てる",     "でる",       "ってる",   "よう"});
       } else if (morpheme.pos == core::PartOfSpeech::Adjective) {
         // Check if surface looks like a dictionary form adjective (ends with い)
         bool is_dict_form = utf8::endsWith(morpheme.surface, "い");
@@ -227,8 +198,7 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes, bool updat
     // conditional. The potential remains one verb token (書けます, なれます),
     // so recover its ichidan dictionary form from the visible stem.
     if (morpheme.pos == core::PartOfSpeech::Verb && morpheme.extended_pos == core::ExtendedPOS::VerbKateikei &&
-        next_surface == "ます" &&
-        utf8::endsWithAny(morpheme.surface, {"え", "け", "げ", "せ", "て", "ね", "べ", "め", "れ"})) {
+        next_surface == "ます" && kana::isGodanERowCodepoint(utf8::decodeLastChar(morpheme.surface))) {
       morpheme.lemma = morpheme.surface + "る";
     }
     // A one-kanji サ変 verb uses せ before the classical negative auxiliary:
@@ -364,7 +334,7 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes, bool updat
       // Special case: なけれ+ば → lemma=ない
       if (morpheme.surface == "なけれ") {
         morpheme.lemma = "ない";
-      } else if (utf8::endsWithAny(morpheme.surface, {"え", "け", "げ", "せ", "て", "ね", "べ", "め", "れ"})) {
+      } else if (kana::isGodanERowCodepoint(utf8::decodeLastChar(morpheme.surface))) {
         // Check if lemma looks like ichidan potential (ends with e-row + る)
         if (utf8::endsWithAny(morpheme.lemma,
                               {"える", "ける", "げる", "せる", "てる", "ねる", "べる", "める", "れる"})) {
