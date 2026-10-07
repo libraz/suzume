@@ -1322,6 +1322,70 @@
       ],
       "id": "nada",
       "input": "頑なだ"
+    },
+    {
+      "description": "週末暇な人 - auto-generated",
+      "expected": [
+        {
+          "lemma": "週末",
+          "pos": "Noun",
+          "surface": "週末"
+        },
+        {
+          "lemma": "暇",
+          "pos": "Adjective",
+          "surface": "暇"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "人",
+          "pos": "Noun",
+          "surface": "人"
+        }
+      ],
+      "id": "na_14",
+      "input": "週末暇な人"
+    },
+    {
+      "description": "今週暇な日はある - auto-generated",
+      "expected": [
+        {
+          "lemma": "今週",
+          "pos": "Noun",
+          "surface": "今週"
+        },
+        {
+          "lemma": "暇",
+          "pos": "Adjective",
+          "surface": "暇"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "日",
+          "pos": "Noun",
+          "surface": "日"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        }
+      ],
+      "id": "na_haaru",
+      "input": "今週暇な日はある"
     }
   ],
   "description": "Na-adjectives (ナ形容詞) (part 2/2)",

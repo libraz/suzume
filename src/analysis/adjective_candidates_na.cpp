@@ -36,6 +36,14 @@ bool hasIndependentAdjectiveHost(const std::vector<char32_t>& codepoints, size_t
   if (lookupEntryInRange(*dict_manager, codepoints, start_pos + 1, end_pos, core::PartOfSpeech::Adjective) != nullptr) {
     return true;
   }
+  // A registered noun of two or more kanji opening the run is a word of its
+  // own, so the stem starts after it (週末+暇な, 今日+暇なら).
+  constexpr size_t kMinNounPrefix = 2;
+  for (size_t noun_end = start_pos + kMinNounPrefix; noun_end < end_pos; ++noun_end) {
+    if (lookupEntryInRange(*dict_manager, codepoints, start_pos, noun_end, core::PartOfSpeech::Noun) != nullptr) {
+      return true;
+    }
+  }
   const bool opens_quantity_phrase =
       normalize::isNumeralCodepoint(codepoints[start_pos]) || normalize::isQuantityPrefixKanji(codepoints[start_pos]);
   return opens_quantity_phrase && hasDictionaryEntryEndingAt(*dict_manager, codepoints, start_pos + 1, end_pos,
@@ -453,10 +461,23 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
     // A na-adjective-forming suffix (なし崩し+的) attaches rather than heads.
     const std::string one_kanji = extractSubstring(codepoints, start_pos, kanji_end);
     const auto& na_suffixes = getNaAdjSuffixes();
-    const bool opens_kanji_run = (start_pos == 0 || char_types[start_pos - 1] != normalize::CharType::Kanji) &&
-                                 std::none_of(na_suffixes.begin(), na_suffixes.end(), [&](const auto& suffix) {
-                                   return std::string_view(suffix) == one_kanji;
-                                 });
+    // A registered noun closing right before it leaves the kanji its own word,
+    // as the multi-kanji host rule reads it (週末+暇な).
+    const bool follows_registered_noun = [&] {
+      constexpr size_t kMinNoun = 2;
+      constexpr size_t kMaxNoun = 4;
+      for (size_t length = kMinNoun; dict_manager != nullptr && length <= kMaxNoun && length <= start_pos; ++length) {
+        if (lookupEntryInRange(*dict_manager, codepoints, start_pos - length, start_pos, core::PartOfSpeech::Noun) !=
+            nullptr) {
+          return true;
+        }
+      }
+      return false;
+    }();
+    const bool opens_kanji_run =
+        (start_pos == 0 || char_types[start_pos - 1] != normalize::CharType::Kanji || follows_registered_noun) &&
+        std::none_of(na_suffixes.begin(), na_suffixes.end(),
+                     [&](const auto& suffix) { return std::string_view(suffix) == one_kanji; });
     const bool attributive_before_nominal =
         dict_manager != nullptr && opens_kanji_run && head < codepoints.size() && codepoints[kanji_end] == U'な' &&
         !startsLongerClosedForm(codepoints, kanji_end, dict_manager, kClosedFormAfterMixedStem, true) &&
