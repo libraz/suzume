@@ -9,6 +9,7 @@ from .constants import (
     COMPOUND_VERB_V2_SURU_ONLY,
     HIRAGANA_COMPOUNDS,
 )
+from .core_lexicon import kana_ichidan_verbs
 from .mecab import mecab_analyze
 from .merge_rules_helpers import _FIXED_INFLECTED_FUNCTION_UNITS
 from .merge_rules_state import MergeState
@@ -245,6 +246,48 @@ def _merge_lexicalized_words(state: MergeState) -> bool:
                         if applied_rule is None:
                             applied_rule = "hiragana-compound"
                         break
+
+        # 10b. Kana ichidan verbs of the core lexicon. The reference dictionary
+        # lacks them and spells their stem as other morphemes (もた+れる as the
+        # passive of もつ, も+たれ as a particle and 垂れる), so a run of two or
+        # more tokens that spells exactly the stem, or the stem plus its terminal
+        # る, is the listed verb. A particle right after a predicate is a real
+        # conjunctive particle (読ん+で+き), so the run cannot start on it.
+        after_predicate_particle = (
+            t.get("pos") == "助詞" and bool(result) and result[-1].get("pos") in ("動詞", "形容詞", "助動詞")
+        )
+        if (
+            not merged
+            and not after_predicate_particle
+            and t.get("surface", "")[:1]
+            and "ぁ" <= t.get("surface", "")[0] <= "ゖ"
+        ):
+            for lemma in kana_ichidan_verbs():
+                stem = lemma[:-1]
+                if not remaining.startswith(stem):
+                    continue
+                consumed = ""
+                j = i
+                while j < len(tokens) and len(consumed) < len(stem):
+                    consumed += tokens[j].get("surface", "")
+                    j += 1
+                if j - i < 2 or consumed not in (stem, lemma):
+                    continue
+                result.append(
+                    {
+                        "surface": consumed,
+                        "pos": "動詞",
+                        "pos_sub1": "自立",
+                        "conj_type": "一段",
+                        "conj_form": "基本形" if consumed == lemma else "連用形",
+                        "lemma": lemma,
+                    }
+                )
+                i = j
+                merged = True
+                if applied_rule is None:
+                    applied_rule = "kana-ichidan-lexicon"
+                break
 
         # 11. Colloquial intensifier めちゃ
         if not merged and t.get("surface") == "め" and t.get("pos") == "名詞":

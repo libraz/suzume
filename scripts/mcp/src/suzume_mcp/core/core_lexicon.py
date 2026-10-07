@@ -76,6 +76,20 @@ def kana_i_adjective_lemmas() -> tuple[str, ...]:
     return tuple(sorted(lemmas, key=len, reverse=True))
 
 
+def kana_ichidan_verbs() -> tuple[str, ...]:
+    """Return the L2 ichidan verbs spelled wholly in hiragana, longest first."""
+    lemmas = (
+        entry[0]
+        for entry in core_entries("verbs.tsv")
+        if len(entry) >= 3
+        and entry[1] == "VERB"
+        and entry[2] == "ICHIDAN"
+        and entry[0].endswith("る")
+        and all("ぁ" <= char <= "ゖ" for char in entry[0])
+    )
+    return tuple(sorted(lemmas, key=len, reverse=True))
+
+
 def listed_interjections() -> frozenset[str]:
     """Return the L2 interjection headwords (おはよう, おめでとう)."""
     return frozenset(
