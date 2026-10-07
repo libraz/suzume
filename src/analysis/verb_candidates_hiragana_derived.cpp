@@ -130,11 +130,6 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
       continue;
     }
 
-    // Exclude て and で which are more commonly particles
-    if (stem_end_char == U'て' || stem_end_char == U'で') {
-      continue;
-    }
-
     // Check if followed by te/ta particle, polite ます auxiliary, or conditional れば
     if (end_pos >= codepoints.size()) {
       continue;
@@ -146,6 +141,12 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
         (next_char == U'な' && end_pos + 2 < codepoints.size() && codepoints[end_pos + 1] == U'が' &&
          codepoints[end_pos + 2] == U'ら') ||
         (next_char == U'つ' && end_pos + 1 < codepoints.size() && codepoints[end_pos + 1] == U'つ');
+
+    // て and で are more commonly particles. A stem closing on で stays open
+    // only before た/て or ながら/つつ, which the copula で never takes (なで+た).
+    if (stem_end_char == U'て' || (stem_end_char == U'で' && !is_followed_by_te_ta && !is_followed_by_renyokei_conj)) {
+      continue;
+    }
     // For Godan-ta, any auxiliary whose declared required connection is
     // VerbRenyokei licenses the continuative reading (もち+たい, たち+ます).
     // Derive this from the grammar table instead of enumerating ます/たい/etc.
@@ -201,8 +202,10 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
     }
 
     // Skip if not recognized as ichidan stem by inflection analysis
-    // Threshold 0.3 catches most valid cases while filtering noise
-    if (!found_ichidan || ichidan_confidence < 0.3F) {
+    // Threshold 0.3 catches most valid cases while filtering noise. A で-final
+    // stem reached this far is already licensed by its follower, so the
+    // analyzer's te-form penalty on that shape says nothing here.
+    if (!found_ichidan || (ichidan_confidence < 0.3F && stem_end_char != U'で')) {
       continue;
     }
 
@@ -414,7 +417,8 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
     const core::CandidateOrigin origin =
         is_lexical_negative_continuation
             ? CandidateOrigin::VerbHiraganaNegativeRenyokei
-            : ((is_followed_by_te_ta || is_followed_by_masu) && !has_kanji_immediately_before
+            : ((is_followed_by_te_ta || is_followed_by_masu || is_followed_by_renyokei_conj) &&
+                       !has_kanji_immediately_before
                    ? CandidateOrigin::VerbHiraganaInflectedRenyokei
                    : CandidateOrigin::VerbHiragana);
     // Ichidan stems share their surface in renyokei and mizenkei. A following

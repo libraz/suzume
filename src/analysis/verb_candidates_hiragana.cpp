@@ -830,9 +830,28 @@ size_t scanPredicateRunEnd(const HiraganaVerbScan& scan, const PredicateRunTails
         // follows て (ても), and と follows っ (やっとく = やって + おく) or opens a
         // long godan-wa negative.
         const char32_t prev = codepoints[hiragana_end - 1];
+        // で followed by た/て or ながら/つつ closes an ichidan stem (なで+た):
+        // the copula で takes none of them.
+        const auto closes_ichidan_de_stem = [&]() {
+          const size_t next = hiragana_end + 1;
+          if (next >= codepoints.size()) {
+            return false;
+          }
+          if (codepoints[next] == U'た' || codepoints[next] == U'て') {
+            return true;
+          }
+          constexpr size_t kConjunctiveMaxChars = 3;
+          for (size_t particle_end = next + 2; particle_end <= std::min(codepoints.size(), next + kConjunctiveMaxChars);
+               ++particle_end) {
+            if (grammar::isContinuativeSelectingConjunctiveParticle(extractSubstring(codepoints, next, particle_end))) {
+              return true;
+            }
+          }
+          return false;
+        };
         if ((curr == U'か' && kaContinuesConjugation(codepoints, hiragana_end)) ||
-            (curr == U'で' && (prev == U'ん' || prev == U'き')) || (curr == U'も' && prev == U'て') ||
-            (curr == U'と' && (prev == U'っ' || has_godan_wa_negative))) {
+            (curr == U'で' && (prev == U'ん' || prev == U'き' || closes_ichidan_de_stem())) ||
+            (curr == U'も' && prev == U'て') || (curr == U'と' && (prev == U'っ' || has_godan_wa_negative))) {
           ++hiragana_end;
           continue;
         }

@@ -394,6 +394,114 @@
       ],
       "id": "gahanikanda_de_ttta",
       "input": "彼女がはにかんだ顔で笑った"
+    },
+    {
+      "description": "Kana ichidan stem ending in で before past た",
+      "expected": [
+        {
+          "lemma": "犬",
+          "pos": "Noun",
+          "surface": "犬"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "なでる",
+          "pos": "Verb",
+          "surface": "なで"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wonadeta",
+      "input": "犬をなでた"
+    },
+    {
+      "description": "Kana ichidan stem ending in で before past た",
+      "expected": [
+        {
+          "lemma": "卵",
+          "pos": "Noun",
+          "surface": "卵"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "ゆでる",
+          "pos": "Verb",
+          "surface": "ゆで"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "woyudeta",
+      "input": "卵をゆでた"
+    },
+    {
+      "description": "Kana ichidan stem ending in で before past た",
+      "expected": [
+        {
+          "lemma": "曲",
+          "pos": "Noun",
+          "surface": "曲"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "かなでる",
+          "pos": "Verb",
+          "surface": "かなで"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wokanadeta",
+      "input": "曲をかなでた"
+    },
+    {
+      "description": "Kana ichidan stem ending in で before ながら",
+      "expected": [
+        {
+          "lemma": "髪",
+          "pos": "Noun",
+          "surface": "髪"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "なでる",
+          "pos": "Verb",
+          "surface": "なで"
+        },
+        {
+          "lemma": "ながら",
+          "pos": "Particle",
+          "surface": "ながら"
+        }
+      ],
+      "id": "wonadenagara",
+      "input": "髪をなでながら"
     }
   ],
   "description": "verb_ichidan_hiragana tests",
