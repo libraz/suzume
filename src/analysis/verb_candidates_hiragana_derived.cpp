@@ -93,6 +93,7 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
   // Generate Godan-ra ん音便 stem candidates for colloquial ん+ない pattern
   // E.g., たまんない → たまん (ん音便 of たまる) + ない (negative auxiliary)
   appendNOnbinNaiCandidates(codepoints, start_pos, hiragana_end, inflection, dict_manager, candidates);
+  appendNContractedTerminalCandidates(codepoints, start_pos, hiragana_end, inflection, dict_manager, candidates);
 
   // Generate Godan onbin stem candidates for contraction auxiliary patterns
   // E.g., やっとく → やっ (onbin of やる) + とく (ておく contraction), 読んでる → 読ん + でる

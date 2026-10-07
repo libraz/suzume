@@ -1799,6 +1799,72 @@
       ],
       "id": "rannai_2",
       "input": "来らんない"
+    },
+    {
+      "description": "Kana ichidan terminal contracted る→ん before prohibitive な",
+      "expected": [
+        {
+          "lemma": "ふざける",
+          "pos": "Verb",
+          "surface": "ふざけん"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "fuzakennayo",
+      "input": "ふざけんなよ"
+    },
+    {
+      "description": "Kanji ichidan terminal contracted る→ん before prohibitive な",
+      "expected": [
+        {
+          "lemma": "逃げる",
+          "pos": "Verb",
+          "surface": "逃げん"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "gennayo",
+      "input": "逃げんなよ"
+    },
+    {
+      "description": "Registered kana stem contracted る→ん before prohibitive な",
+      "expected": [
+        {
+          "lemma": "やめる",
+          "pos": "Verb",
+          "surface": "やめん"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "yamennayo",
+      "input": "やめんなよ"
     }
   ],
   "description": "colloquial_contracted tests",

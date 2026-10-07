@@ -476,4 +476,63 @@ void appendNOnbinNaiCandidates(const std::vector<char32_t>& codepoints, size_t s
   }
 }
 
+// The terminal る contracts to ん before the prohibitive な (ふざけん+な+よ ←
+// ふざけるなよ), and する to すん (すん+な); the kanji generator reads the
+// same contraction behind a kanji stem. The な must close the phrase (end,
+// final particle or quotative って), so a word spelled with ん+な (みんな,
+// そんな) is left to the dictionary.
+void appendNContractedTerminalCandidates(const std::vector<char32_t>& codepoints, size_t start_pos, size_t hiragana_end,
+                                         const grammar::Inflection& inflection,
+                                         const dictionary::DictionaryManager* dict_manager,
+                                         std::vector<UnknownCandidate>& candidates) {
+  if (dict_manager == nullptr) {
+    return;
+  }
+  for (size_t n_pos = start_pos + 1; n_pos + 1 < hiragana_end; ++n_pos) {
+    if (codepoints[n_pos] != U'ん' || codepoints[n_pos + 1] != U'な') {
+      continue;
+    }
+    const size_t after = n_pos + 2;
+    const auto* following_particle =
+        lookupEntryInRange(*dict_manager, codepoints, after, after + 1, core::PartOfSpeech::Particle);
+    const bool closes_phrase =
+        vh::clauseEndsAt(codepoints, after) ||
+        (following_particle != nullptr && following_particle->extended_pos == core::ExtendedPOS::ParticleFinal) ||
+        (after + 1 < codepoints.size() && codepoints[after] == U'っ' && codepoints[after + 1] == U'て');
+    if (!closes_phrase) {
+      return;
+    }
+    // A registered word reaching over the ん is that word (みんな, ごはん).
+    for (const auto& result : lookupResultsInRange(*dict_manager, codepoints, start_pos, after)) {
+      if (result.entry != nullptr && start_pos + result.length > n_pos &&
+          result.entry->pos != core::PartOfSpeech::Verb) {
+        return;
+      }
+    }
+    const size_t stem_length = n_pos - start_pos;
+    const bool is_suru = stem_length == 1 && codepoints[start_pos] == U'す';
+    if (!is_suru && stem_length < 2) {
+      return;
+    }
+    const std::string stem = extractSubstring(codepoints, start_pos, n_pos);
+    const char32_t stem_last = codepoints[n_pos - 1];
+    const bool ichidan = kana::isERowCodepoint(stem_last) || kana::isIRowCodepoint(stem_last);
+    const std::string base_form = is_suru ? std::string("する") : stem + "る";
+    const grammar::VerbType verb_type =
+        is_suru ? grammar::VerbType::Suru : (ichidan ? grammar::VerbType::Ichidan : grammar::VerbType::GodanRa);
+    if (!is_suru && !vh::isVerbInDictionary(dict_manager, base_form) &&
+        !vh::readsAsBaseForm(inflection, base_form, base_form, verb_type)) {
+      return;
+    }
+    SUZUME_DEBUG_VERBOSE_BLOCK {
+      SUZUME_DEBUG_STREAM << "[VERB_CAND] " << stem << "ん hiragana_n_contracted_terminal lemma=" << base_form << "\n";
+    }
+    candidates.push_back(makeVerbCandidate(codepoints, start_pos, n_pos + 1, candidate::verb_cost::kStandardBonus,
+                                           base_form, grammar::verbTypeToConjType(verb_type), true,
+                                           CandidateOrigin::VerbHiragana, candidate::kVerifiedConfidence,
+                                           "hiragana_n_contracted_terminal", core::ExtendedPOS::VerbShuushikei));
+    return;
+  }
+}
+
 }  // namespace suzume::analysis::hiragana_verb_detail

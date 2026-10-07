@@ -73,6 +73,10 @@ void appendMizenkeiNakyaCandidates(const std::vector<char32_t>& codepoints, size
 void appendNOnbinNaiCandidates(const std::vector<char32_t>& codepoints, size_t start_pos, size_t hiragana_end,
                                const grammar::Inflection& inflection, const dictionary::DictionaryManager* dict_manager,
                                std::vector<UnknownCandidate>& candidates);
+void appendNContractedTerminalCandidates(const std::vector<char32_t>& codepoints, size_t start_pos, size_t hiragana_end,
+                                         const grammar::Inflection& inflection,
+                                         const dictionary::DictionaryManager* dict_manager,
+                                         std::vector<UnknownCandidate>& candidates);
 void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, size_t start_pos, size_t hiragana_end,
                                       const grammar::Inflection& inflection,
                                       const dictionary::DictionaryManager* dict_manager,
