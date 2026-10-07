@@ -30,12 +30,13 @@ namespace suzume::analysis::connection_rules {
 // every contribution is additive, the order among these helpers does not affect the
 // total; call sites are kept at their original positions for readability.
 
-// VerbRenyokei attachment to adjectives, auxiliaries, and subsidiary verbs:
-// すぎ/AdjBasic, し-conjunction, causative さ, compound-particle→topic, て→い,
-// し→てる, and ゆく/いく subsidiary verbs.
-float computeVerbRenyokeiEarlyBonus(const core::LatticeEdge& prev, const core::LatticeEdge& next) {
-  float bonus{};  // value-init to 0
+namespace {
 
+// Rule groups add into the caller's accumulator in sequence, so the floating-point
+// summation order is the order of the calls below.
+
+// Compound, binding-hypothetical, long-onbin and Godan continuatives before their closed continuation.
+void addContinuativeContinuationRules(const core::LatticeEdge& prev, const core::LatticeEdge& next, float& bonus) {
   // A generated compound predicate retains its lexical unit through its
   // connective continuation (思い出し+て). This prevents a dictionary
   // nominalization plus a short homographic verb from winning solely through
@@ -105,7 +106,10 @@ float computeVerbRenyokeiEarlyBonus(const core::LatticeEdge& prev, const core::L
     SUZUME_CONNECTION_ADD(bonus, cost::kModerateBonus);
   if (literary_perfect)
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryStrongBonus);
+}
 
+// A continuative heading a compound predicate with する or a verified V2.
+void addCompoundPredicateRules(const core::LatticeEdge& prev, const core::LatticeEdge& next, float& bonus) {
   // A continuative can form a productive compound predicate with the
   // irregular suru predicate. Keep this connection available beside the
   // homographic verbal-noun analysis rather than forcing every such phrase
@@ -136,7 +140,10 @@ float computeVerbRenyokeiEarlyBonus(const core::LatticeEdge& prev, const core::L
     SUZUME_CONNECTION_ADD(bonus, cost::kStrongBonus);
   if (nested_finite_compound)
     SUZUME_CONNECTION_ADD(bonus, cost::kMinor);
+}
 
+// Adverbs, conjunctions and adverbial particles directly modifying a predicate.
+void addModifierPredicateRules(const core::LatticeEdge& prev, const core::LatticeEdge& next, float& bonus) {
   // Demonstrative manner adverbs form closed compound adverbs with して
   // (こうして, そうして, どうして). Prefer the dictionary compound over a
   // fabricated adverb plus suru-verb sequence.
@@ -207,7 +214,10 @@ float computeVerbRenyokeiEarlyBonus(const core::LatticeEdge& prev, const core::L
       (next.lemma != "ない" || utf8::equalsAny(prev.surface, {"でも"}))) {
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryStrongBonus + cost::kMinorBonus);
   }
+}
 
+// Copular で and verb te-form boundaries before negation and subsidiary honorifics.
+void addConnectiveBoundaryRules(const core::LatticeEdge& prev, const core::LatticeEdge& next, float& bonus) {
   // A nominal or na-adjectival copula can be followed by the continuative
   // negative adjective in the change-of-state construction (本で+なく+なっ
   // +た, 静かで+なく+なる). This preserves the copular reading of で.
@@ -258,7 +268,10 @@ float computeVerbRenyokeiEarlyBonus(const core::LatticeEdge& prev, const core::L
   if (prev.extended_pos == core::ExtendedPOS::ParticleConj && next.extended_pos == core::ExtendedPOS::AuxHonorific) {
     SUZUME_CONNECTION_ADD(bonus, cost::kDoubleVeryStrongBonus);
   }
+}
 
+// Conditional ければ, なら and ならば, and adjacent connective particles.
+void addConditionalParticleRules(const core::LatticeEdge& prev, const core::LatticeEdge& next, float& bonus) {
   // The directional auxiliary いく retains its auxiliary analysis in the
   // conditional -けれ+ば form. The inflected surface gate keeps bare く+て
   // available for its ordinary lexical and auxiliary interpretations.
@@ -305,7 +318,10 @@ float computeVerbRenyokeiEarlyBonus(const core::LatticeEdge& prev, const core::L
       grammar::isTeDeSurface(prev.surface) && grammar::isTeDeSurface(next.surface)) {
     SUZUME_CONNECTION_ADD(bonus, sc::kPenaltyInvalidConjunctiveSequence);
   }
+}
 
+// Classical auxiliaries and particles selecting a continuative, realis or hypothetical cell.
+void addCellSelectingAuxiliaryRules(const core::LatticeEdge& prev, const core::LatticeEdge& next, float& bonus) {
   // Classical past conjecture attaches to a continuative verb form
   // (行き+けむ). It shares AuxVolitional with modern う/よう, which select the
   // irrealis instead, so the bigram cell for that pair is a penalty; this
@@ -388,7 +404,10 @@ float computeVerbRenyokeiEarlyBonus(const core::LatticeEdge& prev, const core::L
       next.extended_pos == core::ExtendedPOS::AuxClassicalKeri) {
     SUZUME_CONNECTION_ADD(bonus, cost::kStrongBonus);
   }
+}
 
+// Particles after a finite predicate: なり, ので, とともに, を.
+void addFinitePredicateParticleRules(const core::LatticeEdge& prev, const core::LatticeEdge& next, float& bonus) {
   // A finite predicate followed by なり is the closed conjunctive-particle
   // construction expressing immediate succession (鳴る+なり), not the
   // renyokei of lexical なる.
@@ -434,7 +453,10 @@ float computeVerbRenyokeiEarlyBonus(const core::LatticeEdge& prev, const core::L
       grammar::isAccusativeParticleWoSurface(next.surface)) {
     SUZUME_CONNECTION_ADD(bonus, prev.fromDictionary() ? cost::kRare : cost::kStrong);
   }
+}
 
+// Generated negative continuatives and the contracted negative past.
+void addNegativeChainRules(const core::LatticeEdge& prev, const core::LatticeEdge& next, float& bonus) {
   // A predicate-final に can introduce a continuative form only when that
   // form was generated with a following negative auxiliary (読むに+たえ+ない).
   if (prev.extended_pos == core::ExtendedPOS::ParticleCase && utf8::equalsAny(prev.surface, {"に"}) &&
@@ -454,7 +476,10 @@ float computeVerbRenyokeiEarlyBonus(const core::LatticeEdge& prev, const core::L
       utf8::equalsAny(next.surface, {"んかっ"})) {
     SUZUME_CONNECTION_ADD(bonus, cost::kModerateBonus);
   }
+}
 
+// Quotative と with 言う, and the purposive continuative before に.
+void addParticleGovernedVerbRules(const core::LatticeEdge& prev, const core::LatticeEdge& next, float& bonus) {
   // The quotative particle followed by 言う's hypothetical form is the
   // productive concessive/conditional construction と+いえ(ども/ば). Preserve
   // this boundary over a generated verb that absorbs the noun and quotation.
@@ -489,7 +514,10 @@ float computeVerbRenyokeiEarlyBonus(const core::LatticeEdge& prev, const core::L
       utf8::equalsAny(next.surface, {"に"})) {
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryStrongBonus);
   }
+}
 
+// Bound adjective suffixes and unsupported continuative attachments.
+void addContinuativeAttachmentRules(const core::LatticeEdge& prev, const core::LatticeEdge& next, float& bonus) {
   // Unsupported continuative attachments lose to their grammatical
   // homographs. A bare continuative verb cannot directly modify an arbitrary
   // adjective, except for the closed derivational suffix class
@@ -534,7 +562,10 @@ float computeVerbRenyokeiEarlyBonus(const core::LatticeEdge& prev, const core::L
       next.extended_pos == core::ExtendedPOS::AuxTenseTa) {
     SUZUME_CONNECTION_ADD(bonus, cost::kModerateBonus);
   }
+}
 
+// Subsidiary and auxiliary verbs after a connective particle or ある.
+void addSubsidiaryVerbRules(const core::LatticeEdge& prev, const core::LatticeEdge& next, float& bonus) {
   // The uncontracted preparation subsidiary is written after an explicit
   // connective particle (食べ+て+おく). Its lexical homograph おく must not win
   // merely because both candidates share the same surface. Contracted とく/どく
@@ -583,7 +614,10 @@ float computeVerbRenyokeiEarlyBonus(const core::LatticeEdge& prev, const core::L
       next.fromDictionary() && next.lemma == "いく") {
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryStrongBonus);
   }
+}
 
+// Continuatives falsely split before し and causative さ.
+void addRenyokeiFalseSplitRules(const core::LatticeEdge& prev, const core::LatticeEdge& next, float& bonus) {
   // Penalty for VerbRenyokei + し(conjunction) with kanji verb
   // In modern Japanese, conjunction し follows shuushikei (行く+し), not renyoukei (行き+し).
   // VerbRenyokei + し is usually a false split of godan-sa renyoukei (尽く+し → 尽くし).
@@ -600,7 +634,10 @@ float computeVerbRenyokeiEarlyBonus(const core::LatticeEdge& prev, const core::L
       next.surface == "さ" && grammar::endsWithARow(prev.surface)) {
     SUZUME_CONNECTION_ADD(bonus, sc::kBonusVerbCausativePattern);
   }
+}
 
+// Compound case particles before a topic, a noun or a numeral.
+void addCompoundParticleContinuationRules(const core::LatticeEdge& prev, const core::LatticeEdge& next, float& bonus) {
   // Compound particle (≥2 chars) → topic/binding particle (は, も, が)
   // E.g., まで+も, より+も, にとって+も, について+は
   // Excludes one-char particles to avoid boosting て+も, し+は, で+も, and the
@@ -627,7 +664,10 @@ float computeVerbRenyokeiEarlyBonus(const core::LatticeEdge& prev, const core::L
       normalize::isNumeralCodepoint(utf8::decodeFirstChar(next.surface))) {
     SUZUME_CONNECTION_ADD(bonus, cost::kModerateBonus);
   }
+}
 
+// What may follow a volitional auxiliary.
+void addVolitionalContinuationRules(const core::LatticeEdge& prev, const core::LatticeEdge& next, float& bonus) {
   // A multi-mora case-particle candidate after an explicit volitional auxiliary
   // would swallow the quotative と and following verb (書こ+う+として). Keep the
   // one-mora と connection licensed, but reject compound-particle attachment so
@@ -679,7 +719,10 @@ float computeVerbRenyokeiEarlyBonus(const core::LatticeEdge& prev, const core::L
                                                            : cost::kNeutral) +
                    (literary_volitional_outside_quotative ? cost::kSevere : cost::kNeutral));
   }
+}
 
+// Conjunctive-particle homographs and aspect auxiliaries after て/し.
+void addConjunctiveHomographRules(const core::LatticeEdge& prev, const core::LatticeEdge& next, float& bonus) {
   // The conjunctive-particle homograph なり cannot follow an i-adjective's
   // adverbial form. 高くなり is 高く+なり(なる), whereas 鳴るなり uses the
   // particle after a finite verb.
@@ -726,7 +769,10 @@ float computeVerbRenyokeiEarlyBonus(const core::LatticeEdge& prev, const core::L
       (next.surface == "ゆく" || next.surface == "いく")) {
     SUZUME_CONNECTION_ADD(bonus, cost::kStrongBonus);
   }
+}
 
+// Verified Godan-wa and single-kanji する continuatives heading a compound predicate.
+void addVerifiedCompoundPredicateRules(const core::LatticeEdge& prev, const core::LatticeEdge& next, float& bonus) {
   // A kanji godan-wa renyokei may head a productive compound predicate
   // (沿い+進む, 担い+進む). Its conjugation type distinguishes it from
   // other i-ending renyokei forms and from the competing unknown i-adjective.
@@ -754,6 +800,32 @@ float computeVerbRenyokeiEarlyBonus(const core::LatticeEdge& prev, const core::L
       normalize::utf8Length(prev.surface) == 2 && grammar::containsKanji(prev.surface)) {
     SUZUME_CONNECTION_ADD(bonus, cost::kStrongBonus + cost::kModerateBonus);
   }
+}
+
+}  // namespace
+
+// VerbRenyokei attachment to adjectives, auxiliaries, and subsidiary verbs:
+// すぎ/AdjBasic, し-conjunction, causative さ, compound-particle→topic, て→い,
+// し→てる, and ゆく/いく subsidiary verbs.
+float computeVerbRenyokeiEarlyBonus(const core::LatticeEdge& prev, const core::LatticeEdge& next) {
+  float bonus{};  // value-init to 0
+
+  addContinuativeContinuationRules(prev, next, bonus);
+  addCompoundPredicateRules(prev, next, bonus);
+  addModifierPredicateRules(prev, next, bonus);
+  addConnectiveBoundaryRules(prev, next, bonus);
+  addConditionalParticleRules(prev, next, bonus);
+  addCellSelectingAuxiliaryRules(prev, next, bonus);
+  addFinitePredicateParticleRules(prev, next, bonus);
+  addNegativeChainRules(prev, next, bonus);
+  addParticleGovernedVerbRules(prev, next, bonus);
+  addContinuativeAttachmentRules(prev, next, bonus);
+  addSubsidiaryVerbRules(prev, next, bonus);
+  addRenyokeiFalseSplitRules(prev, next, bonus);
+  addCompoundParticleContinuationRules(prev, next, bonus);
+  addVolitionalContinuationRules(prev, next, bonus);
+  addConjunctiveHomographRules(prev, next, bonus);
+  addVerifiedCompoundPredicateRules(prev, next, bonus);
 
   return bonus;
 }
