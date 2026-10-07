@@ -1833,6 +1833,85 @@
       ],
       "id": "doukana",
       "input": "どうかな"
+    },
+    {
+      "description": "ほどなくして到着した - auto-generated",
+      "expected": [
+        {
+          "lemma": "ほどなく",
+          "pos": "Adverb",
+          "surface": "ほどなく"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "到着",
+          "pos": "Noun",
+          "surface": "到着"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "hodonakushite_shita",
+      "input": "ほどなくして到着した"
+    },
+    {
+      "description": "ほどなくして雨が止んだ - auto-generated",
+      "expected": [
+        {
+          "lemma": "ほどなく",
+          "pos": "Adverb",
+          "surface": "ほどなく"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "雨",
+          "pos": "Noun",
+          "surface": "雨"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "止む",
+          "pos": "Verb",
+          "surface": "止ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "hodonakushite_ga_nda",
+      "input": "ほどなくして雨が止んだ"
     }
   ],
   "description": "adverb_fixed tests",

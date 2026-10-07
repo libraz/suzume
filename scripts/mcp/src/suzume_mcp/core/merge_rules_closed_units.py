@@ -551,6 +551,24 @@ def _merge_closed_function_units(state: MergeState) -> bool:
     return False
 
 
+def _predicate_overflow(consumed: str, fixed_word: str, token_count: int) -> list[dict]:
+    """Re-read the tail of a token that a fixed unit ends inside of.
+
+    The reference dictionary can fuse a fixed unit's last kana into the next
+    predicate (ほど+なくし for ほどなく+し).  The unit still stands when the
+    leftover re-reads as predicate tokens alone; anything else means the
+    span was never the fixed unit.
+    """
+    if token_count < 2 or not consumed.startswith(fixed_word) or len(consumed) == len(fixed_word):
+        return []
+    rest = mecab_analyze(consumed[len(fixed_word) :])
+    if "".join(token.get("surface", "") for token in rest) != consumed[len(fixed_word) :]:
+        return []
+    if not rest or rest[0].get("pos") != "動詞" or any(token.get("pos") not in ("動詞", "助動詞") for token in rest):
+        return []
+    return rest
+
+
 def _merge_fixed_search_units(state: MergeState) -> bool:
     """Pretokenized quantities, fixed function words, L2 nouns, and kana quantities."""
     tokens = state.tokens
@@ -643,7 +661,8 @@ def _merge_fixed_search_units(state: MergeState) -> bool:
             fixed_word = next((word for word in _FIXED_FUNCTION_SEARCH_UNITS if remaining.startswith(word)), "")
             if fixed_word:
                 consumed, j = _consume_span(tokens, i, len(fixed_word))
-                if consumed == fixed_word:
+                overflow = _predicate_overflow(consumed, fixed_word, j - i)
+                if consumed == fixed_word or overflow:
                     result.append(
                         {
                             "surface": fixed_word,
@@ -651,6 +670,7 @@ def _merge_fixed_search_units(state: MergeState) -> bool:
                             "lemma": FIXED_FUNCTION_LEMMAS.get(fixed_word, fixed_word),
                         }
                     )
+                    result.extend(overflow)
                     i = j
                     merged = True
                     if applied_rule is None:
