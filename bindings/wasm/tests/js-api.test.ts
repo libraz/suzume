@@ -14,11 +14,11 @@ import { ErrorCode, Suzume, SuzumeError, version } from '../dist/index.js';
 import { C_LAYOUTS } from '../js/abi_layout.js';
 import {
   allocString,
+  allocTagOptions,
   EXTENDED_OPTIONS_LAYOUT,
   getModule,
   parseMorphemes,
   parseTags,
-  TAG_OPTIONS_LAYOUT,
   TAGS_LAYOUT,
   type WasmModule,
 } from './helpers';
@@ -372,19 +372,7 @@ describe('JS API: struct layout compatibility', () => {
     const tagsFree = module.cwrap('suzume_tags_free', null, ['number']) as (t: number) => void;
 
     const textPtr = allocString(module, '東京タワー');
-    const optionsPtr = module._malloc(TAG_OPTIONS_LAYOUT.size);
-
-    const heapU8 = new Uint8Array(module.HEAPU32.buffer);
-    heapU8[optionsPtr + TAG_OPTIONS_LAYOUT.posFilter] = 0;
-    heapU8[optionsPtr + TAG_OPTIONS_LAYOUT.excludeBasic] = 0;
-    heapU8[optionsPtr + TAG_OPTIONS_LAYOUT.useLemma] = 1;
-    module.HEAPU32[(optionsPtr + TAG_OPTIONS_LAYOUT.minLength) >> 2] = 1;
-    module.HEAPU32[(optionsPtr + TAG_OPTIONS_LAYOUT.maxTags) >> 2] = 0;
-    heapU8[optionsPtr + TAG_OPTIONS_LAYOUT.excludeParticles] = 1;
-    heapU8[optionsPtr + TAG_OPTIONS_LAYOUT.excludeAuxiliaries] = 1;
-    heapU8[optionsPtr + TAG_OPTIONS_LAYOUT.excludeFormalNouns] = 1;
-    heapU8[optionsPtr + TAG_OPTIONS_LAYOUT.excludeLowInfo] = 1;
-    heapU8[optionsPtr + TAG_OPTIONS_LAYOUT.removeDuplicates] = 1;
+    const optionsPtr = allocTagOptions(module, { minLength: 1 });
 
     const tagsPtr = generateTagsWithOptions(handle, textPtr, optionsPtr);
     module._free(textPtr);

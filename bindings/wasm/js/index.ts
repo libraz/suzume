@@ -104,11 +104,12 @@ const ANALYSIS_MODE_CODES: Readonly<Record<AnalysisMode, number>> = {
   split: 2,
 };
 
-const ANALYSIS_MODE_NAMES: Readonly<Record<number, AnalysisMode>> = {
-  0: 'normal',
-  1: 'search',
-  2: 'split',
-};
+const ANALYSIS_MODE_NAMES: Readonly<Record<number, AnalysisMode>> = Object.fromEntries(
+  (Object.keys(ANALYSIS_MODE_CODES) as AnalysisMode[]).map((name) => [
+    ANALYSIS_MODE_CODES[name],
+    name,
+  ]),
+);
 
 // Keep the binding's public defaults explicit so CI can compare them with the
 // C ABI initializer. Values are consumed below rather than duplicated there.
@@ -126,6 +127,18 @@ const EXTENDED_OPTION_DEFAULTS = {
   scorerOptions: null,
   dataDirectory: null,
 } as const;
+
+const EXTENDED_BOOL_FIELDS = [
+  'preserveVu',
+  'preserveCase',
+  'preserveSymbols',
+  'lemmatize',
+  'mergeCompounds',
+  'skipUserDictionary',
+  'skipCoreDictionary',
+  'skipEnvConfig',
+  'reportScorerConfig',
+] as const;
 
 /**
  * Morpheme - A single token produced by analysis
@@ -234,6 +247,16 @@ const TAG_OPTION_DEFAULTS = {
   removeDuplicates: true,
 } as const;
 
+const TAG_BOOL_FIELDS = [
+  'excludeBasic',
+  'useLemma',
+  'excludeParticles',
+  'excludeAuxiliaries',
+  'excludeFormalNouns',
+  'excludeLowInfo',
+  'removeDuplicates',
+] as const;
+
 const TAG_POS_FILTER_BITS: Readonly<Record<string, number>> = {
   noun: 1,
   verb: 2,
@@ -286,35 +309,10 @@ export class Suzume {
   private module: EmscriptenModule;
   private handle: number;
   private cleanupRef: CleanupRef;
-  private _analyzeN: (handle: number, textPtr: number, size: number) => number;
-  private _setMode: (handle: number, mode: number) => number;
-  private _mode: (handle: number) => number;
-  private _resultFree: (resultPtr: number) => void;
-  private _generateTagsN: (handle: number, textPtr: number, size: number) => number;
-  private _generateTagsWithOptionsN: (
-    handle: number,
-    textPtr: number,
-    size: number,
-    optionsPtr: number,
-  ) => number;
-  private _tagsFree: (tagsPtr: number) => void;
-  private _loadUserDictCount: (handle: number, dataPtr: number, size: number) => number;
-  private _loadBinaryDict: (handle: number, dataPtr: number, size: number) => number;
-  private _clearUserDictionaries: (handle: number) => number;
-  private _hasCoreDictionary: (handle: number) => number;
-  private _version: () => number;
-  private _lastError: () => number;
-  private _lastErrorCode: () => number;
-  private _conjugationTypeLabel: (code: number) => number;
-  private _extendedPosLabel: (code: number) => number;
-  private _conjugationFormLabel: (code: number) => number;
-  private _posLabel: (code: number) => number;
   private readonly _posLabels = new Map<number, string>();
   private readonly _conjugationTypeLabels = new Map<number, string | null>();
   private readonly _conjugationFormLabels = new Map<number, string | null>();
   private readonly _extendedPosLabels = new Map<number, string>();
-  private _dictionaryWarningCount: (handle: number) => number;
-  private _dictionaryWarning: (handle: number, index: number) => number;
   private layouts = C_LAYOUTS;
   private unregisterToken = {};
 
@@ -323,27 +321,6 @@ export class Suzume {
     this.handle = handle;
     this.cleanupRef = { module, handle };
     registry.register(this, this.cleanupRef, this.unregisterToken);
-
-    this._analyzeN = module._suzume_analyze_n;
-    this._setMode = module._suzume_set_mode;
-    this._mode = module._suzume_mode;
-    this._resultFree = module._suzume_result_free;
-    this._generateTagsN = module._suzume_generate_tags_n;
-    this._generateTagsWithOptionsN = module._suzume_generate_tags_with_options_n;
-    this._tagsFree = module._suzume_tags_free;
-    this._loadUserDictCount = module._suzume_load_user_dict_count;
-    this._loadBinaryDict = module._suzume_load_binary_dict;
-    this._clearUserDictionaries = module._suzume_clear_user_dictionaries;
-    this._hasCoreDictionary = module._suzume_has_core_dictionary;
-    this._version = module._suzume_version;
-    this._lastError = module._suzume_last_error;
-    this._lastErrorCode = module._suzume_last_error_code;
-    this._conjugationTypeLabel = module._suzume_conjugation_type_label;
-    this._extendedPosLabel = module._suzume_extended_pos_label;
-    this._conjugationFormLabel = module._suzume_conjugation_form_label;
-    this._posLabel = module._suzume_pos_label;
-    this._dictionaryWarningCount = module._suzume_dictionary_warning_count;
-    this._dictionaryWarning = module._suzume_dictionary_warning;
   }
 
   /**
@@ -360,16 +337,8 @@ export class Suzume {
 
     if (
       options &&
-      (options.preserveVu !== undefined ||
-        options.preserveCase !== undefined ||
-        options.preserveSymbols !== undefined ||
+      (EXTENDED_BOOL_FIELDS.some((field) => options[field] !== undefined) ||
         options.mode !== undefined ||
-        options.lemmatize !== undefined ||
-        options.mergeCompounds !== undefined ||
-        options.skipUserDictionary !== undefined ||
-        options.skipCoreDictionary !== undefined ||
-        options.skipEnvConfig !== undefined ||
-        options.reportScorerConfig !== undefined ||
         options.scorerOptions !== undefined)
     ) {
       // Create with options
@@ -390,25 +359,11 @@ export class Suzume {
         if (modeValue === undefined) {
           throw new Error(`Invalid Suzume mode: ${String(options.mode)}`);
         }
-        heap[optionsPtr + layout.preserveVu] =
-          (options.preserveVu ?? EXTENDED_OPTION_DEFAULTS.preserveVu) ? 1 : 0;
-        heap[optionsPtr + layout.preserveCase] =
-          (options.preserveCase ?? EXTENDED_OPTION_DEFAULTS.preserveCase) ? 1 : 0;
-        heap[optionsPtr + layout.preserveSymbols] =
-          (options.preserveSymbols ?? EXTENDED_OPTION_DEFAULTS.preserveSymbols) ? 1 : 0;
         heap[optionsPtr + layout.mode] = modeValue;
-        heap[optionsPtr + layout.lemmatize] =
-          (options.lemmatize ?? EXTENDED_OPTION_DEFAULTS.lemmatize) ? 1 : 0;
-        heap[optionsPtr + layout.mergeCompounds] =
-          (options.mergeCompounds ?? EXTENDED_OPTION_DEFAULTS.mergeCompounds) ? 1 : 0;
-        heap[optionsPtr + layout.skipUserDictionary] =
-          (options.skipUserDictionary ?? EXTENDED_OPTION_DEFAULTS.skipUserDictionary) ? 1 : 0;
-        heap[optionsPtr + layout.skipCoreDictionary] =
-          (options.skipCoreDictionary ?? EXTENDED_OPTION_DEFAULTS.skipCoreDictionary) ? 1 : 0;
-        heap[optionsPtr + layout.skipEnvConfig] =
-          (options.skipEnvConfig ?? EXTENDED_OPTION_DEFAULTS.skipEnvConfig) ? 1 : 0;
-        heap[optionsPtr + layout.reportScorerConfig] =
-          (options.reportScorerConfig ?? EXTENDED_OPTION_DEFAULTS.reportScorerConfig) ? 1 : 0;
+        for (const field of EXTENDED_BOOL_FIELDS) {
+          heap[optionsPtr + layout[field]] =
+            (options[field] ?? EXTENDED_OPTION_DEFAULTS[field]) ? 1 : 0;
+        }
         if (options.scorerOptions !== undefined) {
           const scorerJson =
             typeof options.scorerOptions === 'string'
@@ -458,12 +413,9 @@ export class Suzume {
   /** Current analysis mode for this instance. */
   get mode(): AnalysisMode {
     this.ensureAlive();
-    const mode = ANALYSIS_MODE_NAMES[this._mode(this.handle)];
+    const mode = ANALYSIS_MODE_NAMES[this.module._suzume_mode(this.handle)];
     if (mode === undefined) {
-      throw new SuzumeError(
-        `Suzume mode query failed: ${this.lastError || 'unknown error'}`,
-        this.lastErrorCode,
-      );
+      throw this.nativeError('mode query failed');
     }
     return mode;
   }
@@ -475,11 +427,8 @@ export class Suzume {
     if (mode === undefined) {
       throw new Error(`Invalid Suzume mode: ${String(value)}`);
     }
-    if (this._setMode(this.handle, mode) !== 1) {
-      throw new SuzumeError(
-        `Suzume mode change failed: ${this.lastError || 'unknown error'}`,
-        this.lastErrorCode,
-      );
+    if (this.module._suzume_set_mode(this.handle, mode) !== 1) {
+      throw this.nativeError('mode change failed');
     }
   }
 
@@ -490,19 +439,16 @@ export class Suzume {
     this.ensureAlive();
 
     return this.withUtf8String(text, (textPtr, textBytes) => {
-      const resultPtr = this._analyzeN(this.handle, textPtr, textBytes - 1);
+      const resultPtr = this.module._suzume_analyze_n(this.handle, textPtr, textBytes - 1);
 
       if (resultPtr === 0) {
-        throw new SuzumeError(
-          `Suzume analyze failed: ${this.lastError || 'unknown error'}`,
-          this.lastErrorCode,
-        );
+        throw this.nativeError('analyze failed');
       }
 
       try {
         return this.parseResult(resultPtr);
       } finally {
-        this._resultFree(resultPtr);
+        this.module._suzume_result_free(resultPtr);
       }
     });
   }
@@ -533,33 +479,30 @@ export class Suzume {
           const layout = this.layouts.tagOptions;
 
           heapU8[optionsPtr + layout.posFilter] = posFilter & 0xff;
-          heapU8[optionsPtr + layout.excludeBasic] =
-            (options.excludeBasic ?? TAG_OPTION_DEFAULTS.excludeBasic) ? 1 : 0;
-          heapU8[optionsPtr + layout.useLemma] =
-            (options.useLemma ?? TAG_OPTION_DEFAULTS.useLemma) ? 1 : 0;
           heapU32[(optionsPtr + layout.minLength) >> 2] =
             options.minLength ?? TAG_OPTION_DEFAULTS.minLength;
           heapU32[(optionsPtr + layout.maxTags) >> 2] =
             options.maxTags ?? TAG_OPTION_DEFAULTS.maxTags;
-          heapU8[optionsPtr + layout.excludeParticles] =
-            (options.excludeParticles ?? TAG_OPTION_DEFAULTS.excludeParticles) ? 1 : 0;
-          heapU8[optionsPtr + layout.excludeAuxiliaries] =
-            (options.excludeAuxiliaries ?? TAG_OPTION_DEFAULTS.excludeAuxiliaries) ? 1 : 0;
-          heapU8[optionsPtr + layout.excludeFormalNouns] =
-            (options.excludeFormalNouns ?? TAG_OPTION_DEFAULTS.excludeFormalNouns) ? 1 : 0;
-          heapU8[optionsPtr + layout.excludeLowInfo] =
-            (options.excludeLowInfo ?? TAG_OPTION_DEFAULTS.excludeLowInfo) ? 1 : 0;
-          heapU8[optionsPtr + layout.removeDuplicates] =
-            (options.removeDuplicates ?? TAG_OPTION_DEFAULTS.removeDuplicates) ? 1 : 0;
+          for (const field of TAG_BOOL_FIELDS) {
+            heapU8[optionsPtr + layout[field]] =
+              (options[field] ?? TAG_OPTION_DEFAULTS[field]) ? 1 : 0;
+          }
           return this.consumeTags(
-            this._generateTagsWithOptionsN(this.handle, textPtr, textBytes - 1, optionsPtr),
+            this.module._suzume_generate_tags_with_options_n(
+              this.handle,
+              textPtr,
+              textBytes - 1,
+              optionsPtr,
+            ),
           );
         } finally {
           this.module._free(optionsPtr);
         }
       }
 
-      return this.consumeTags(this._generateTagsN(this.handle, textPtr, textBytes - 1));
+      return this.consumeTags(
+        this.module._suzume_generate_tags_n(this.handle, textPtr, textBytes - 1),
+      );
     });
   }
 
@@ -580,7 +523,7 @@ export class Suzume {
     this.ensureAlive();
 
     return this.withUtf8String(data, (dataPtr, dataBytes) =>
-      this._loadUserDictCount(this.handle, dataPtr, dataBytes - 1),
+      this.module._suzume_load_user_dict_count(this.handle, dataPtr, dataBytes - 1),
     );
   }
 
@@ -591,10 +534,7 @@ export class Suzume {
    */
   loadUserDictionaryOrThrow(data: string): void {
     if (!this.loadUserDictionary(data)) {
-      throw new SuzumeError(
-        `Suzume user dictionary load failed: ${this.lastError || 'unknown error'}`,
-        this.lastErrorCode,
-      );
+      throw this.nativeError('user dictionary load failed');
     }
   }
 
@@ -613,7 +553,7 @@ export class Suzume {
       const heapU32 = this.module.HEAPU32;
       const heapU8 = new Uint8Array(heapU32.buffer);
       heapU8.set(data, dataPtr);
-      return this._loadBinaryDict(this.handle, dataPtr, data.byteLength) === 1;
+      return this.module._suzume_load_binary_dict(this.handle, dataPtr, data.byteLength) === 1;
     } finally {
       this.module._free(dataPtr);
     }
@@ -626,10 +566,7 @@ export class Suzume {
    */
   loadBinaryDictionaryOrThrow(data: Uint8Array): void {
     if (!this.loadBinaryDictionary(data)) {
-      throw new SuzumeError(
-        `Suzume binary dictionary load failed: ${this.lastError || 'unknown error'}`,
-        this.lastErrorCode,
-      );
+      throw this.nativeError('binary dictionary load failed');
     }
   }
 
@@ -638,11 +575,8 @@ export class Suzume {
    */
   clearUserDictionaries(): void {
     this.ensureAlive();
-    if (this._clearUserDictionaries(this.handle) !== 1) {
-      throw new SuzumeError(
-        `Suzume dictionary clear failed: ${this.lastError || 'unknown error'}`,
-        this.lastErrorCode,
-      );
+    if (this.module._suzume_clear_user_dictionaries(this.handle) !== 1) {
+      throw this.nativeError('dictionary clear failed');
     }
   }
 
@@ -650,7 +584,7 @@ export class Suzume {
    * Get Suzume version string
    */
   get version(): string {
-    const versionPtr = this._version();
+    const versionPtr = this.module._suzume_version();
     return this.module.UTF8ToString(versionPtr);
   }
 
@@ -658,12 +592,12 @@ export class Suzume {
    * Last C API error for this thread, or empty string if the last C API call succeeded.
    */
   get lastError(): string {
-    return this.module.UTF8ToString(this._lastError());
+    return this.module.UTF8ToString(this.module._suzume_last_error());
   }
 
   /** Stable native error category for the last failed C ABI call. */
   get lastErrorCode(): ErrorCode {
-    return this._lastErrorCode() as ErrorCode;
+    return this.module._suzume_last_error_code() as ErrorCode;
   }
 
   /** Current WebAssembly linear-memory size in bytes. */
@@ -675,10 +609,10 @@ export class Suzume {
   /** Dictionary-loading, parsing, and scorer-configuration diagnostics. */
   get dictionaryWarnings(): string[] {
     this.ensureAlive();
-    const count = this._dictionaryWarningCount(this.handle);
+    const count = this.module._suzume_dictionary_warning_count(this.handle);
     const warnings: string[] = [];
     for (let idx = 0; idx < count; idx++) {
-      const warningPtr = this._dictionaryWarning(this.handle, idx);
+      const warningPtr = this.module._suzume_dictionary_warning(this.handle, idx);
       if (warningPtr !== 0) {
         warnings.push(this.module.UTF8ToString(warningPtr));
       }
@@ -689,7 +623,7 @@ export class Suzume {
   /** Whether the bundled L2 core dictionary is loaded. */
   get hasCoreDictionary(): boolean {
     this.ensureAlive();
-    return this._hasCoreDictionary(this.handle) === 1;
+    return this.module._suzume_has_core_dictionary(this.handle) === 1;
   }
 
   /**
@@ -742,26 +676,13 @@ export class Suzume {
 
   private consumeTags(tagsPtr: number): Tag[] {
     if (tagsPtr === 0) {
-      throw new SuzumeError(
-        `Suzume tag generation failed: ${this.lastError || 'unknown error'}`,
-        this.lastErrorCode,
-      );
+      throw this.nativeError('tag generation failed');
     }
     try {
       return this.parseTags(tagsPtr);
     } finally {
-      this._tagsFree(tagsPtr);
+      this.module._suzume_tags_free(tagsPtr);
     }
-  }
-
-  private conjugationTypeLabel(code: number): string | null {
-    if (this._conjugationTypeLabels.has(code)) {
-      return this._conjugationTypeLabels.get(code) ?? null;
-    }
-    const labelPtr = this._conjugationTypeLabel(code);
-    const label = labelPtr === 0 ? null : this.module.UTF8ToString(labelPtr);
-    this._conjugationTypeLabels.set(code, label);
-    return label;
   }
 
   // Parse suzume_result_t structure from WASM memory
@@ -782,35 +703,57 @@ export class Suzume {
   }
 
   private posLabel(code: number): string {
-    const cached = this._posLabels.get(code);
-    if (cached !== undefined) {
-      return cached;
-    }
-    const labelPtr = this._posLabel(code);
-    const label = labelPtr === 0 ? 'OTHER' : this.module.UTF8ToString(labelPtr);
-    this._posLabels.set(code, label);
-    return label;
+    return this.cachedLabel(this._posLabels, this.module._suzume_pos_label, code, 'OTHER');
+  }
+
+  private conjugationTypeLabel(code: number): string | null {
+    return this.cachedLabel(
+      this._conjugationTypeLabels,
+      this.module._suzume_conjugation_type_label,
+      code,
+      null,
+    );
   }
 
   private conjugationFormLabel(code: number): string | null {
-    if (this._conjugationFormLabels.has(code)) {
-      return this._conjugationFormLabels.get(code) ?? null;
-    }
-    const labelPtr = this._conjugationFormLabel(code);
-    const label = labelPtr === 0 ? null : this.module.UTF8ToString(labelPtr);
-    this._conjugationFormLabels.set(code, label);
-    return label;
+    return this.cachedLabel(
+      this._conjugationFormLabels,
+      this.module._suzume_conjugation_form_label,
+      code,
+      null,
+    );
   }
 
   private extendedPosLabel(code: number): string {
-    const cached = this._extendedPosLabels.get(code);
+    return this.cachedLabel(
+      this._extendedPosLabels,
+      this.module._suzume_extended_pos_label,
+      code,
+      'UNKNOWN',
+    );
+  }
+
+  private cachedLabel<T extends string | null>(
+    cache: Map<number, string | T>,
+    nativeLabel: (code: number) => number,
+    code: number,
+    fallback: T,
+  ): string | T {
+    const cached = cache.get(code);
     if (cached !== undefined) {
       return cached;
     }
-    const labelPtr = this._extendedPosLabel(code);
-    const label = labelPtr === 0 ? 'UNKNOWN' : this.module.UTF8ToString(labelPtr);
-    this._extendedPosLabels.set(code, label);
+    const labelPtr = nativeLabel(code);
+    const label = labelPtr === 0 ? fallback : this.module.UTF8ToString(labelPtr);
+    cache.set(code, label);
     return label;
+  }
+
+  private nativeError(action: string): SuzumeError {
+    return new SuzumeError(
+      `Suzume ${action}: ${this.lastError || 'unknown error'}`,
+      this.lastErrorCode,
+    );
   }
 }
 

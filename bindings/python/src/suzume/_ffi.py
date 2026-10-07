@@ -13,6 +13,7 @@ import ctypes.util
 import os
 import platform
 from pathlib import Path
+from typing import Any
 
 # --- ABI revision --------------------------------------------------------------
 #
@@ -150,124 +151,65 @@ def _find_library() -> str:
     )
 
 
+_HANDLE = ctypes.c_void_p
+_TEXT = ctypes.c_char_p
+_SIZE = ctypes.c_size_t
+_CODE = ctypes.c_uint8
+_RESULT_PTR = ctypes.POINTER(SuzumeResult)
+_TAGS_PTR = ctypes.POINTER(SuzumeTags)
+_EXTENDED_OPTIONS_PTR = ctypes.POINTER(SuzumeExtendedOptions)
+_TAG_OPTIONS_PTR = ctypes.POINTER(SuzumeTagOptions)
+
+# name -> (restype, argtypes)
+_SIGNATURES: dict[str, tuple[Any, list[Any]]] = {
+    "suzume_create": (_HANDLE, []),
+    "suzume_init_extended_options": (None, [_EXTENDED_OPTIONS_PTR]),
+    "suzume_create_with_extended_options": (_HANDLE, [_EXTENDED_OPTIONS_PTR]),
+    "suzume_destroy": (None, [_HANDLE]),
+    "suzume_set_mode": (ctypes.c_int, [_HANDLE, _CODE]),
+    "suzume_mode": (_CODE, [_HANDLE]),
+    "suzume_analyze": (_RESULT_PTR, [_HANDLE, _TEXT]),
+    "suzume_analyze_n": (_RESULT_PTR, [_HANDLE, _TEXT, _SIZE]),
+    "suzume_result_free": (None, [_RESULT_PTR]),
+    "suzume_generate_tags": (_TAGS_PTR, [_HANDLE, _TEXT]),
+    "suzume_generate_tags_n": (_TAGS_PTR, [_HANDLE, _TEXT, _SIZE]),
+    "suzume_init_tag_options": (None, [_TAG_OPTIONS_PTR]),
+    "suzume_generate_tags_with_options": (_TAGS_PTR, [_HANDLE, _TEXT, _TAG_OPTIONS_PTR]),
+    "suzume_generate_tags_with_options_n": (
+        _TAGS_PTR,
+        [_HANDLE, _TEXT, _SIZE, _TAG_OPTIONS_PTR],
+    ),
+    "suzume_tags_free": (None, [_TAGS_PTR]),
+    "suzume_load_user_dict": (ctypes.c_int, [_HANDLE, _TEXT, _SIZE]),
+    "suzume_load_user_dict_count": (_SIZE, [_HANDLE, _TEXT, _SIZE]),
+    "suzume_load_binary_dict": (ctypes.c_int, [_HANDLE, ctypes.POINTER(ctypes.c_uint8), _SIZE]),
+    "suzume_clear_user_dictionaries": (ctypes.c_int, [_HANDLE]),
+    "suzume_has_core_dictionary": (ctypes.c_int, [_HANDLE]),
+    "suzume_version": (_TEXT, []),
+    "suzume_abi_version": (ctypes.c_uint32, []),
+    "suzume_last_error": (_TEXT, []),
+    "suzume_last_error_code": (_CODE, []),
+    "suzume_conjugation_type_label": (_TEXT, [_CODE]),
+    "suzume_extended_pos_label": (_TEXT, [_CODE]),
+    "suzume_conjugation_form_label": (_TEXT, [_CODE]),
+    "suzume_pos_label": (_TEXT, [_CODE]),
+    "suzume_dictionary_warning_count": (_SIZE, [_HANDLE]),
+    "suzume_dictionary_warning": (_TEXT, [_HANDLE, _SIZE]),
+    # ABI layout oracles (used by the layout-guard test).
+    "suzume_sizeof_result": (_SIZE, []),
+    "suzume_sizeof_morpheme": (_SIZE, []),
+    "suzume_sizeof_tags": (_SIZE, []),
+    "suzume_sizeof_tag_options": (_SIZE, []),
+    "suzume_sizeof_extended_options": (_SIZE, []),
+}
+
+
 def _configure_signatures(lib: ctypes.CDLL) -> None:
     """Attach argtypes/restype to every function the binding calls."""
-    handle = ctypes.c_void_p
-
-    lib.suzume_create.restype = handle
-    lib.suzume_create.argtypes = []
-
-    lib.suzume_init_extended_options.restype = None
-    lib.suzume_init_extended_options.argtypes = [ctypes.POINTER(SuzumeExtendedOptions)]
-
-    lib.suzume_create_with_extended_options.restype = handle
-    lib.suzume_create_with_extended_options.argtypes = [ctypes.POINTER(SuzumeExtendedOptions)]
-
-    lib.suzume_destroy.restype = None
-    lib.suzume_destroy.argtypes = [handle]
-
-    lib.suzume_set_mode.restype = ctypes.c_int
-    lib.suzume_set_mode.argtypes = [handle, ctypes.c_uint8]
-
-    lib.suzume_mode.restype = ctypes.c_uint8
-    lib.suzume_mode.argtypes = [handle]
-
-    lib.suzume_analyze.restype = ctypes.POINTER(SuzumeResult)
-    lib.suzume_analyze.argtypes = [handle, ctypes.c_char_p]
-
-    lib.suzume_analyze_n.restype = ctypes.POINTER(SuzumeResult)
-    lib.suzume_analyze_n.argtypes = [handle, ctypes.c_char_p, ctypes.c_size_t]
-
-    lib.suzume_result_free.restype = None
-    lib.suzume_result_free.argtypes = [ctypes.POINTER(SuzumeResult)]
-
-    lib.suzume_generate_tags.restype = ctypes.POINTER(SuzumeTags)
-    lib.suzume_generate_tags.argtypes = [handle, ctypes.c_char_p]
-
-    lib.suzume_generate_tags_n.restype = ctypes.POINTER(SuzumeTags)
-    lib.suzume_generate_tags_n.argtypes = [handle, ctypes.c_char_p, ctypes.c_size_t]
-
-    lib.suzume_init_tag_options.restype = None
-    lib.suzume_init_tag_options.argtypes = [ctypes.POINTER(SuzumeTagOptions)]
-
-    lib.suzume_generate_tags_with_options.restype = ctypes.POINTER(SuzumeTags)
-    lib.suzume_generate_tags_with_options.argtypes = [
-        handle,
-        ctypes.c_char_p,
-        ctypes.POINTER(SuzumeTagOptions),
-    ]
-
-    lib.suzume_generate_tags_with_options_n.restype = ctypes.POINTER(SuzumeTags)
-    lib.suzume_generate_tags_with_options_n.argtypes = [
-        handle,
-        ctypes.c_char_p,
-        ctypes.c_size_t,
-        ctypes.POINTER(SuzumeTagOptions),
-    ]
-
-    lib.suzume_tags_free.restype = None
-    lib.suzume_tags_free.argtypes = [ctypes.POINTER(SuzumeTags)]
-
-    lib.suzume_load_user_dict.restype = ctypes.c_int
-    lib.suzume_load_user_dict.argtypes = [handle, ctypes.c_char_p, ctypes.c_size_t]
-
-    lib.suzume_load_user_dict_count.restype = ctypes.c_size_t
-    lib.suzume_load_user_dict_count.argtypes = [handle, ctypes.c_char_p, ctypes.c_size_t]
-
-    lib.suzume_load_binary_dict.restype = ctypes.c_int
-    lib.suzume_load_binary_dict.argtypes = [
-        handle,
-        ctypes.POINTER(ctypes.c_uint8),
-        ctypes.c_size_t,
-    ]
-
-    lib.suzume_clear_user_dictionaries.restype = ctypes.c_int
-    lib.suzume_clear_user_dictionaries.argtypes = [handle]
-
-    lib.suzume_has_core_dictionary.restype = ctypes.c_int
-    lib.suzume_has_core_dictionary.argtypes = [handle]
-
-    lib.suzume_version.restype = ctypes.c_char_p
-    lib.suzume_version.argtypes = []
-
-    lib.suzume_abi_version.restype = ctypes.c_uint32
-    lib.suzume_abi_version.argtypes = []
-
-    lib.suzume_last_error.restype = ctypes.c_char_p
-    lib.suzume_last_error.argtypes = []
-
-    lib.suzume_last_error_code.restype = ctypes.c_uint8
-    lib.suzume_last_error_code.argtypes = []
-
-    lib.suzume_conjugation_type_label.restype = ctypes.c_char_p
-    lib.suzume_conjugation_type_label.argtypes = [ctypes.c_uint8]
-
-    lib.suzume_extended_pos_label.restype = ctypes.c_char_p
-    lib.suzume_extended_pos_label.argtypes = [ctypes.c_uint8]
-
-    lib.suzume_conjugation_form_label.restype = ctypes.c_char_p
-    lib.suzume_conjugation_form_label.argtypes = [ctypes.c_uint8]
-
-    lib.suzume_pos_label.restype = ctypes.c_char_p
-    lib.suzume_pos_label.argtypes = [ctypes.c_uint8]
-
-    lib.suzume_dictionary_warning_count.restype = ctypes.c_size_t
-    lib.suzume_dictionary_warning_count.argtypes = [handle]
-
-    lib.suzume_dictionary_warning.restype = ctypes.c_char_p
-    lib.suzume_dictionary_warning.argtypes = [handle, ctypes.c_size_t]
-
-    # ABI layout oracles (used by the layout-guard test).
-    for name in (
-        "suzume_sizeof_result",
-        "suzume_sizeof_morpheme",
-        "suzume_sizeof_tags",
-        "suzume_sizeof_tag_options",
-        "suzume_sizeof_extended_options",
-    ):
+    for name, (restype, argtypes) in _SIGNATURES.items():
         fn = getattr(lib, name)
-        fn.restype = ctypes.c_size_t
-        fn.argtypes = []
+        fn.restype = restype
+        fn.argtypes = argtypes
     for name in (
         "suzume_offsetof_result",
         "suzume_offsetof_morpheme",

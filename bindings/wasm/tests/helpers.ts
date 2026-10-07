@@ -52,6 +52,36 @@ export function allocString(module: WasmModule, text: string): number {
   return ptr;
 }
 
+export interface TagOptionValues {
+  posFilter?: number;
+  excludeBasic?: boolean;
+  useLemma?: boolean;
+  minLength?: number;
+  maxTags?: number;
+  excludeParticles?: boolean;
+  excludeAuxiliaries?: boolean;
+  excludeFormalNouns?: boolean;
+  excludeLowInfo?: boolean;
+  removeDuplicates?: boolean;
+}
+
+/** Allocate a suzume_tag_options_t with every field written (defaults match the C initializer). */
+export function allocTagOptions(module: WasmModule, opts: TagOptionValues = {}): number {
+  const ptr = module._malloc(TAG_OPTIONS_LAYOUT.size);
+  const heapU8 = new Uint8Array(module.HEAPU32.buffer);
+  heapU8[ptr + TAG_OPTIONS_LAYOUT.posFilter] = (opts.posFilter ?? 0) & 0xff;
+  heapU8[ptr + TAG_OPTIONS_LAYOUT.excludeBasic] = opts.excludeBasic ? 1 : 0;
+  heapU8[ptr + TAG_OPTIONS_LAYOUT.useLemma] = opts.useLemma !== false ? 1 : 0;
+  module.HEAPU32[(ptr + TAG_OPTIONS_LAYOUT.minLength) >> 2] = opts.minLength ?? 2;
+  module.HEAPU32[(ptr + TAG_OPTIONS_LAYOUT.maxTags) >> 2] = opts.maxTags ?? 0;
+  heapU8[ptr + TAG_OPTIONS_LAYOUT.excludeParticles] = opts.excludeParticles !== false ? 1 : 0;
+  heapU8[ptr + TAG_OPTIONS_LAYOUT.excludeAuxiliaries] = opts.excludeAuxiliaries !== false ? 1 : 0;
+  heapU8[ptr + TAG_OPTIONS_LAYOUT.excludeFormalNouns] = opts.excludeFormalNouns !== false ? 1 : 0;
+  heapU8[ptr + TAG_OPTIONS_LAYOUT.excludeLowInfo] = opts.excludeLowInfo !== false ? 1 : 0;
+  heapU8[ptr + TAG_OPTIONS_LAYOUT.removeDuplicates] = opts.removeDuplicates !== false ? 1 : 0;
+  return ptr;
+}
+
 export function parseMorphemes(module: WasmModule, resultPtr: number): ParsedMorpheme[] {
   const label = (name: string, code: number): string | null => {
     const ptr = module.cwrap(name, 'number', ['number'])(code) as number;

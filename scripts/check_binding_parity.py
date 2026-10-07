@@ -6,6 +6,8 @@ from __future__ import annotations
 import ctypes
 import json
 import subprocess
+from collections.abc import Iterator
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, TypedDict, cast
 
@@ -89,6 +91,15 @@ TAG_CASES: list[TagCase] = [
 
 _POS_FILTER_BITS = {"noun": 1, "verb": 2, "adjective": 4, "adverb": 8}
 _MODE_CODES = {"normal": 0, "search": 1, "split": 2}
+# Bit positions in the native morpheme flags word, in record order.
+_FLAG_BITS = {
+    "user_dict": 0,
+    "formal_noun": 1,
+    "low_info": 2,
+    "unknown": 3,
+    "from_dictionary": 4,
+    "conjugatable": 5,
+}
 _lib = load_library()
 
 
@@ -97,14 +108,29 @@ def _decode(value: bytes | None) -> str:
 
 
 def _flags(value: int) -> dict[str, bool]:
-    return {
-        "user_dict": bool(value & (1 << 0)),
-        "formal_noun": bool(value & (1 << 1)),
-        "low_info": bool(value & (1 << 2)),
-        "unknown": bool(value & (1 << 3)),
-        "from_dictionary": bool(value & (1 << 4)),
-        "conjugatable": bool(value & (1 << 5)),
-    }
+    return {name: bool(value & (1 << bit)) for name, bit in _FLAG_BITS.items()}
+
+
+@contextmanager
+def _native_handle(handle: Any) -> Iterator[Any]:
+    """Own a freshly created native handle, destroying it on exit."""
+    if not handle:
+        raise RuntimeError(_decode(_lib.suzume_last_error()))
+    try:
+        yield handle
+    finally:
+        _lib.suzume_destroy(handle)
+
+
+@contextmanager
+def _native_result(result: Any, free: Any) -> Iterator[Any]:
+    """Own a native result pointer, yielding its contents and freeing it on exit."""
+    if not result:
+        raise RuntimeError(_decode(_lib.suzume_last_error()))
+    try:
+        yield result.contents
+    finally:
+        free(result)
 
 
 def _morpheme_record(
@@ -172,16 +198,11 @@ def _native_analysis_records() -> list[AnalysisRecord]:
     records: list[AnalysisRecord] = []
     for case in ANALYSIS_CASES:
         options = _native_options(case["options"])
-        handle = _lib.suzume_create_with_extended_options(ctypes.byref(options))
-        if not handle:
-            raise RuntimeError(_decode(_lib.suzume_last_error()))
         payload = case["text"].encode("utf-8")
-        result = _lib.suzume_analyze_n(handle, payload, len(payload))
-        if not result:
-            _lib.suzume_destroy(handle)
-            raise RuntimeError(_decode(_lib.suzume_last_error()))
-        try:
-            raw = result.contents
+        with (
+            _native_handle(_lib.suzume_create_with_extended_options(ctypes.byref(options))) as handle,
+            _native_result(_lib.suzume_analyze_n(handle, payload, len(payload)), _lib.suzume_result_free) as raw,
+        ):
             morphemes: list[MorphemeRecord] = []
             for index in range(raw.count):
                 morpheme = raw.morphemes[index]
@@ -210,9 +231,6 @@ def _native_analysis_records() -> list[AnalysisRecord]:
                     "morphemes": morphemes,
                 }
             )
-        finally:
-            _lib.suzume_result_free(result)
-            _lib.suzume_destroy(handle)
     return records
 
 
@@ -226,16 +244,14 @@ def _native_tag_records() -> list[list[TagRecord]]:
                 options.pos_filter = sum(_POS_FILTER_BITS[name] for name in value)
             else:
                 setattr(options, field, int(value))
-        handle = _lib.suzume_create()
-        if not handle:
-            raise RuntimeError(_decode(_lib.suzume_last_error()))
         payload = case["text"].encode("utf-8")
-        result = _lib.suzume_generate_tags_with_options_n(handle, payload, len(payload), ctypes.byref(options))
-        if not result:
-            _lib.suzume_destroy(handle)
-            raise RuntimeError(_decode(_lib.suzume_last_error()))
-        try:
-            raw = result.contents
+        with (
+            _native_handle(_lib.suzume_create()) as handle,
+            _native_result(
+                _lib.suzume_generate_tags_with_options_n(handle, payload, len(payload), ctypes.byref(options)),
+                _lib.suzume_tags_free,
+            ) as raw,
+        ):
             records.append(
                 [
                     {
@@ -245,10 +261,13 @@ def _native_tag_records() -> list[list[TagRecord]]:
                     for index in range(raw.count)
                 ]
             )
-        finally:
-            _lib.suzume_tags_free(result)
-            _lib.suzume_destroy(handle)
     return records
+
+
+def _python_flags(item: Any) -> dict[str, bool]:
+    flags = {name: bool(getattr(item, f"is_{name}")) for name in _FLAG_BITS if name != "conjugatable"}
+    flags["conjugatable"] = item.conj_form is not None
+    return flags
 
 
 def _python_analysis_records() -> list[AnalysisRecord]:
@@ -269,14 +288,7 @@ def _python_analysis_records() -> list[AnalysisRecord]:
                         item.extended_pos,
                         item.start,
                         item.end,
-                        {
-                            "user_dict": item.is_user_dict,
-                            "formal_noun": item.is_formal_noun,
-                            "low_info": item.is_low_info,
-                            "unknown": item.is_unknown,
-                            "from_dictionary": item.is_from_dictionary,
-                            "conjugatable": item.conj_form is not None,
-                        },
+                        _python_flags(item),
                         item.score,
                     )
                     for item in result.morphemes

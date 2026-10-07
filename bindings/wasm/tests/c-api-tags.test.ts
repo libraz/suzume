@@ -1,10 +1,13 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import type { Tag as ParsedTag } from '../js/index.js';
 import {
   allocString,
+  allocTagOptions,
   getModule,
   getTagCount,
   parseTags,
   TAG_OPTIONS_LAYOUT,
+  type TagOptionValues,
   type WasmModule,
 } from './helpers';
 
@@ -85,153 +88,74 @@ describe('C API: generate_tags', () => {
   });
 
   describe('with options', () => {
-    function allocOptions(
-      module: WasmModule,
-      opts: {
-        posFilter?: number;
-        excludeBasic?: boolean;
-        useLemma?: boolean;
-        minLength?: number;
-        maxTags?: number;
-        excludeParticles?: boolean;
-        excludeAuxiliaries?: boolean;
-        excludeFormalNouns?: boolean;
-        excludeLowInfo?: boolean;
-        removeDuplicates?: boolean;
-      },
-    ): number {
-      const ptr = module._malloc(TAG_OPTIONS_LAYOUT.size);
-      const heapU8 = new Uint8Array(module.HEAPU32.buffer);
-      heapU8[ptr + TAG_OPTIONS_LAYOUT.posFilter] = (opts.posFilter ?? 0) & 0xff;
-      heapU8[ptr + TAG_OPTIONS_LAYOUT.excludeBasic] = opts.excludeBasic ? 1 : 0;
-      heapU8[ptr + TAG_OPTIONS_LAYOUT.useLemma] = opts.useLemma !== false ? 1 : 0;
-      module.HEAPU32[(ptr + TAG_OPTIONS_LAYOUT.minLength) >> 2] = opts.minLength ?? 2;
-      module.HEAPU32[(ptr + TAG_OPTIONS_LAYOUT.maxTags) >> 2] = opts.maxTags ?? 0;
-      heapU8[ptr + TAG_OPTIONS_LAYOUT.excludeParticles] = opts.excludeParticles !== false ? 1 : 0;
-      heapU8[ptr + TAG_OPTIONS_LAYOUT.excludeAuxiliaries] =
-        opts.excludeAuxiliaries !== false ? 1 : 0;
-      heapU8[ptr + TAG_OPTIONS_LAYOUT.excludeFormalNouns] =
-        opts.excludeFormalNouns !== false ? 1 : 0;
-      heapU8[ptr + TAG_OPTIONS_LAYOUT.excludeLowInfo] = opts.excludeLowInfo !== false ? 1 : 0;
-      heapU8[ptr + TAG_OPTIONS_LAYOUT.removeDuplicates] = opts.removeDuplicates !== false ? 1 : 0;
-      return ptr;
-    }
-
-    it('should filter by POS (noun + adjective only)', () => {
-      const textPtr = allocString(module, '東京タワーは美しい観光地です');
-      const optionsPtr = allocOptions(module, { posFilter: 1 | 4 }); // noun + adjective
-
+    function tagsWith(text: string, opts: TagOptionValues): ParsedTag[] {
+      const textPtr = allocString(module, text);
+      const optionsPtr = allocTagOptions(module, opts);
       const tagsPtr = generateTagsWithOptions(handle, textPtr, optionsPtr);
       module._free(textPtr);
       module._free(optionsPtr);
+      try {
+        return parseTags(module, tagsPtr);
+      } finally {
+        tagsFree(tagsPtr);
+      }
+    }
 
-      const tags = parseTags(module, tagsPtr);
+    it('should filter by POS (noun + adjective only)', () => {
+      const tags = tagsWith('東京タワーは美しい観光地です', { posFilter: 1 | 4 });
       expect(tags.length).toBeGreaterThan(0);
 
       // All tags should be NOUN or ADJ
       for (const t of tags) {
         expect(['NOUN', 'ADJ']).toContain(t.pos);
       }
-
-      tagsFree(tagsPtr);
     });
 
     it('should filter by POS (verb only)', () => {
-      const textPtr = allocString(module, '東京に行って食べた');
-      const optionsPtr = allocOptions(module, { posFilter: 2 }); // verb only
-
-      const tagsPtr = generateTagsWithOptions(handle, textPtr, optionsPtr);
-      module._free(textPtr);
-      module._free(optionsPtr);
-
-      const tags = parseTags(module, tagsPtr);
+      const tags = tagsWith('東京に行って食べた', { posFilter: 2 });
       for (const t of tags) {
         expect(t.pos).toBe('VERB');
       }
-
-      tagsFree(tagsPtr);
     });
 
     it('should respect max_tags limit', () => {
-      const textPtr = allocString(module, '東京タワーは美しい観光地です');
-      const optionsPtr = allocOptions(module, { maxTags: 2 });
-
-      const tagsPtr = generateTagsWithOptions(handle, textPtr, optionsPtr);
-      module._free(textPtr);
-      module._free(optionsPtr);
-
-      const count = getTagCount(module, tagsPtr);
-      expect(count).toBeLessThanOrEqual(2);
-
-      tagsFree(tagsPtr);
+      const tags = tagsWith('東京タワーは美しい観光地です', { maxTags: 2 });
+      expect(tags.length).toBeLessThanOrEqual(2);
     });
 
     it('should respect min_length filter', () => {
-      const textPtr = allocString(module, '東京タワーは美しい観光地です');
-      const optionsPtr = allocOptions(module, { minLength: 3 });
-
-      const tagsPtr = generateTagsWithOptions(handle, textPtr, optionsPtr);
-      module._free(textPtr);
-      module._free(optionsPtr);
-
-      const tags = parseTags(module, tagsPtr);
+      const tags = tagsWith('東京タワーは美しい観光地です', { minLength: 3 });
       for (const t of tags) {
         // Count characters (not bytes)
         const charCount = [...t.tag].length;
         expect(charCount).toBeGreaterThanOrEqual(3);
       }
-
-      tagsFree(tagsPtr);
     });
 
     it('should exclude basic words when excludeBasic is set', () => {
-      const textPtr = allocString(module, 'ある日東京に行った');
-      const optionsPtr = allocOptions(module, { excludeBasic: true });
-
-      const tagsPtr = generateTagsWithOptions(handle, textPtr, optionsPtr);
-      module._free(textPtr);
-      module._free(optionsPtr);
-
-      const tags = parseTags(module, tagsPtr);
+      const tags = tagsWith('ある日東京に行った', { excludeBasic: true });
       // "ある" (hiragana-only verb) should be excluded
       const tagTexts = tags.map((t) => t.tag);
       expect(tagTexts).not.toContain('ある');
-
-      tagsFree(tagsPtr);
     });
 
     it('should allow particles when excludeParticles is false', () => {
-      const textPtr = allocString(module, '猫が走る');
-      const optionsPtr = allocOptions(module, { minLength: 1, excludeParticles: false });
-
-      const tagsPtr = generateTagsWithOptions(handle, textPtr, optionsPtr);
-      module._free(textPtr);
-      module._free(optionsPtr);
-
-      const tags = parseTags(module, tagsPtr);
+      const tags = tagsWith('猫が走る', { minLength: 1, excludeParticles: false });
       const tagTexts = tags.map((t) => t.tag);
       expect(tagTexts).toContain('が');
-
-      tagsFree(tagsPtr);
     });
 
     it('should select particles and auxiliaries with explicit POS bits', () => {
-      const textPtr = allocString(module, 'りんごが歩きます');
-      const optionsPtr = allocOptions(module, {
+      const tags = tagsWith('りんごが歩きます', {
         minLength: 1,
         posFilter: 16 | 32,
         excludeParticles: false,
         excludeAuxiliaries: false,
       });
-      const tagsPtr = generateTagsWithOptions(handle, textPtr, optionsPtr);
-      module._free(textPtr);
-      module._free(optionsPtr);
-
-      expect(parseTags(module, tagsPtr)).toEqual([
+      expect(tags).toEqual([
         { tag: 'が', pos: 'PARTICLE' },
         { tag: 'ます', pos: 'AUX' },
       ]);
-      tagsFree(tagsPtr);
     });
   });
 

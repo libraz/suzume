@@ -183,6 +183,37 @@ def _cached_native_label(
     return cache[code]
 
 
+def _pos_label(code: int) -> str:
+    return _cached_native_label(_POS_LABELS, _lib.suzume_pos_label, code, "OTHER") or "OTHER"
+
+
+def _extended_pos_label(code: int) -> str:
+    return (
+        _cached_native_label(_EXTENDED_POS_LABELS, _lib.suzume_extended_pos_label, code, "UNKNOWN")
+        or "UNKNOWN"
+    )
+
+
+def _conjugation_type_label(code: int) -> str | None:
+    return _cached_native_label(
+        _CONJUGATION_TYPE_LABELS, _lib.suzume_conjugation_type_label, code, None
+    )
+
+
+def _conjugation_form_label(code: int) -> str | None:
+    return _cached_native_label(
+        _CONJUGATION_FORM_LABELS, _lib.suzume_conjugation_form_label, code, None
+    )
+
+
+def _encode_text(text: str) -> bytes:
+    """Encode ``text`` as UTF-8, mapping lone surrogates to a SuzumeError."""
+    try:
+        return text.encode("utf-8")
+    except UnicodeEncodeError as error:
+        raise SuzumeError(str(error), ErrorCode.INVALID_UTF8) from error
+
+
 def version() -> str:
     """Return the native library version string."""
     return _decode(_lib.suzume_version())
@@ -332,10 +363,7 @@ class Suzume:
         the length-aware native API.
         """
         handle = self._require_handle()
-        try:
-            payload = text.encode("utf-8")
-        except UnicodeEncodeError as error:
-            raise SuzumeError(str(error), ErrorCode.INVALID_UTF8) from error
+        payload = _encode_text(text)
         result = _lib.suzume_analyze_n(handle, payload, len(payload))
         if not result:
             raise _native_error("analysis failed")
@@ -348,37 +376,16 @@ class Suzume:
                 out.append(
                     Morpheme(
                         surface=_decode_sized(m.surface, m.surface_size),
-                        pos=_cached_native_label(_POS_LABELS, _lib.suzume_pos_label, m.pos, "OTHER")
-                        or "OTHER",
+                        pos=_pos_label(m.pos),
                         base_form=_decode_sized(m.base_form, m.base_form_size),
                         pos_ja=pos_japanese(m.pos),
-                        conj_type=(
-                            _cached_native_label(
-                                _CONJUGATION_TYPE_LABELS,
-                                _lib.suzume_conjugation_type_label,
-                                m.conjugation_type,
-                                None,
-                            )
-                            if conjugates
-                            else None
-                        ),
-                        conj_form=(
-                            _cached_native_label(
-                                _CONJUGATION_FORM_LABELS,
-                                _lib.suzume_conjugation_form_label,
-                                m.conjugation_form,
-                                None,
-                            )
-                            if conjugates
-                            else None
-                        ),
-                        extended_pos=_cached_native_label(
-                            _EXTENDED_POS_LABELS,
-                            _lib.suzume_extended_pos_label,
-                            m.extended_pos,
-                            "UNKNOWN",
-                        )
-                        or "UNKNOWN",
+                        conj_type=_conjugation_type_label(m.conjugation_type)
+                        if conjugates
+                        else None,
+                        conj_form=_conjugation_form_label(m.conjugation_form)
+                        if conjugates
+                        else None,
+                        extended_pos=_extended_pos_label(m.extended_pos),
                         start=int(m.start),
                         end=int(m.end),
                         is_user_dict=bool(m.flags & FLAG_USER_DICT),
@@ -423,10 +430,7 @@ class Suzume:
         together. All other flags map directly to the native tag options.
         """
         handle = self._require_handle()
-        try:
-            payload = text.encode("utf-8")
-        except UnicodeEncodeError as error:
-            raise SuzumeError(str(error), ErrorCode.INVALID_UTF8) from error
+        payload = _encode_text(text)
         opts = SuzumeTagOptions()
         _lib.suzume_init_tag_options(ctypes.byref(opts))
         opts.pos_filter = _resolve_pos_filter(pos_filter)
@@ -451,7 +455,7 @@ class Suzume:
                 out.append(
                     Tag(
                         tag=_decode(data.tags[idx]),
-                        pos=_decode(_lib.suzume_pos_label(data.pos[idx])) or "OTHER",
+                        pos=_pos_label(data.pos[idx]),
                     )
                 )
             return out

@@ -24,16 +24,9 @@ _OPTIONS_WITH_VALUES = {
     "--tag-min-length",
     "--tag-max-tags",
 }
-_OPTIONS_WITH_ATTACHED_VALUES = (
-    "-d",
-    "-m",
-    "-f",
-    "--dict=",
-    "--mode=",
-    "--format=",
-    "--tag-pos=",
-    "--tag-min-length=",
-    "--tag-max-tags=",
+# Short options accept an attached value (``-dFILE``); long ones only ``--opt=value``.
+_OPTIONS_WITH_ATTACHED_VALUES = tuple(
+    option if not option.startswith("--") else f"{option}=" for option in _OPTIONS_WITH_VALUES
 )
 _FLAG_OPTIONS = {
     "--normalize-vu",

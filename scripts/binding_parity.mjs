@@ -11,31 +11,36 @@ if (!cases || !Array.isArray(cases.analysis) || !Array.isArray(cases.tags)) {
   throw new TypeError('expected { analysis: [...], tags: [...] }');
 }
 
-function extendedOptions(options) {
-  return {
-    ...(options.mode === undefined ? {} : { mode: options.mode }),
-    ...(options.preserve_vu === undefined ? {} : { preserveVu: options.preserve_vu }),
-    ...(options.preserve_case === undefined ? {} : { preserveCase: options.preserve_case }),
-    ...(options.preserve_symbols === undefined ? {} : { preserveSymbols: options.preserve_symbols }),
-    ...(options.lemmatize === undefined ? {} : { lemmatize: options.lemmatize }),
-    ...(options.merge_compounds === undefined ? {} : { mergeCompounds: options.merge_compounds }),
-  };
+function renameDefined(options, pairs) {
+  return Object.fromEntries(
+    pairs.filter(([snake]) => options[snake] !== undefined).map(([snake, camel]) => [camel, options[snake]]),
+  );
 }
 
-function tagOptions(options) {
-  return {
-    ...(options.pos_filter === undefined ? {} : { posFilter: options.pos_filter }),
-    ...(options.exclude_basic === undefined ? {} : { excludeBasic: options.exclude_basic }),
-    ...(options.use_lemma === undefined ? {} : { useLemma: options.use_lemma }),
-    ...(options.min_length === undefined ? {} : { minLength: options.min_length }),
-    ...(options.max_tags === undefined ? {} : { maxTags: options.max_tags }),
-    ...(options.exclude_particles === undefined ? {} : { excludeParticles: options.exclude_particles }),
-    ...(options.exclude_auxiliaries === undefined ? {} : { excludeAuxiliaries: options.exclude_auxiliaries }),
-    ...(options.exclude_formal_nouns === undefined ? {} : { excludeFormalNouns: options.exclude_formal_nouns }),
-    ...(options.exclude_low_info === undefined ? {} : { excludeLowInfo: options.exclude_low_info }),
-    ...(options.remove_duplicates === undefined ? {} : { removeDuplicates: options.remove_duplicates }),
-  };
-}
+const EXTENDED_OPTION_PAIRS = [
+  ['mode', 'mode'],
+  ['preserve_vu', 'preserveVu'],
+  ['preserve_case', 'preserveCase'],
+  ['preserve_symbols', 'preserveSymbols'],
+  ['lemmatize', 'lemmatize'],
+  ['merge_compounds', 'mergeCompounds'],
+];
+
+const TAG_OPTION_PAIRS = [
+  ['pos_filter', 'posFilter'],
+  ['exclude_basic', 'excludeBasic'],
+  ['use_lemma', 'useLemma'],
+  ['min_length', 'minLength'],
+  ['max_tags', 'maxTags'],
+  ['exclude_particles', 'excludeParticles'],
+  ['exclude_auxiliaries', 'excludeAuxiliaries'],
+  ['exclude_formal_nouns', 'excludeFormalNouns'],
+  ['exclude_low_info', 'excludeLowInfo'],
+  ['remove_duplicates', 'removeDuplicates'],
+];
+
+const extendedOptions = (options) => renameDefined(options, EXTENDED_OPTION_PAIRS);
+const tagOptions = (options) => renameDefined(options, TAG_OPTION_PAIRS);
 
 function morphemeRecord(morpheme) {
   return {
