@@ -279,8 +279,15 @@ bool kanjiHeadsPredicateAt(const std::vector<char32_t>& codepoints, const std::v
   // A sa-hen reading makes the kanji a verbal noun, and one whose stem the
   // dictionary conjugates in another row (味わ+く against 味わう) is refuted by
   // that entry.
+  // A reading that leaves the run to resume on the ら column proves nothing:
+  // no native word starts there (瞬+ため leaves らった), as the opaque-fragment
+  // rule in overlapsRegisteredWord holds.
   bool proven = false;
   for (size_t reading_end = kana_start + 1; reading_end <= kana_end; ++reading_end) {
+    if (reading_end < codepoints.size() && char_types[reading_end] == normalize::CharType::Hiragana &&
+        kana::isRaColumnCodepoint(codepoints[reading_end])) {
+      continue;
+    }
     for (const auto& analysis : inflection.analyze(normalize::encodeRange(codepoints, kana_start - 1, reading_end))) {
       if (!utf8::startsWith(analysis.stem, head) || analysis.verb_type == grammar::VerbType::Unknown ||
           analysis.confidence < candidate::verb_cost::kConstructedVerbMinConfidence) {

@@ -114,6 +114,28 @@
       ],
       "id": "unnamed_44",
       "input": "便利機能"
+    },
+    {
+      "description": "Kanji compound keeps its last kanji when the kana after it opens with a mora followed by the ら column",
+      "expected": [
+        {
+          "lemma": "一瞬",
+          "pos": "Noun",
+          "surface": "一瞬"
+        },
+        {
+          "lemma": "ぐらつく",
+          "pos": "Verb",
+          "surface": "ぐらつい"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "guratsuita",
+      "input": "一瞬ぐらついた"
     }
   ],
   "description": "noun_kanji_compound tests",
