@@ -76,8 +76,10 @@ bool sharesEndWithDictionaryAdjective(const dictionary::DictionaryManager* dict_
     if (span_morae + (is_stem ? 1 : 0) < kMinInnerAdjectiveMorae) {
       continue;
     }
-    if (dict_manager->lookupExact(span, core::PartOfSpeech::Adjective) != nullptr ||
-        (is_stem && isAdjectiveInDictionary(dict_manager, span + "い"))) {
+    // A stem is compared through its い form only: a na-adjective spelled like
+    // the inner span (まし of うらやまし+げ) is no i-adjective stem.
+    if ((!is_stem && dict_manager->lookupExact(span, core::PartOfSpeech::Adjective) != nullptr) ||
+        (is_stem && verb_helpers::isIAdjectiveInDictionary(dict_manager, span + "い"))) {
       return true;
     }
   }

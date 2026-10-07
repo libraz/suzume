@@ -26,6 +26,10 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       {EPOS::ParticleConj, EPOS::AuxTenseMasu, cost::kSevere},
       {EPOS::ParticleConjFinite, EPOS::AuxTenseMasu, cost::kSevere},
 
+      // The polite まし is never followed by the continuative い of いる (ます has
+      // no い cell), so まし+い is the ending of a kana -ましい adjective (つつましい).
+      {EPOS::AuxTenseMasu, EPOS::AuxAspectIru, cost::kNever},
+
       // AuxTenseMasu → AuxNegativeNu (ませ+ん for polite negative) - strong bonus
       // Ensures ません → ませ+ん (aux) over ませ+ん (particle の)
       {EPOS::AuxTenseMasu, EPOS::AuxNegativeNu, cost::kStrongBonus},

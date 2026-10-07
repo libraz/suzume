@@ -63,6 +63,84 @@
       ],
       "id": "sugirukiraigaaru",
       "input": "慎重すぎるきらいがある"
+    },
+    {
+      "description": "つつましい生活 - auto-generated",
+      "expected": [
+        {
+          "lemma": "つつましい",
+          "pos": "Adjective",
+          "surface": "つつましい"
+        },
+        {
+          "lemma": "生活",
+          "pos": "Noun",
+          "surface": "生活"
+        }
+      ],
+      "id": "tsutsumashii",
+      "input": "つつましい生活"
+    },
+    {
+      "description": "いさましい姿 - auto-generated",
+      "expected": [
+        {
+          "lemma": "いさましい",
+          "pos": "Adjective",
+          "surface": "いさましい"
+        },
+        {
+          "lemma": "姿",
+          "pos": "Noun",
+          "surface": "姿"
+        }
+      ],
+      "id": "isamashii",
+      "input": "いさましい姿"
+    },
+    {
+      "description": "なやましい問題 - auto-generated",
+      "expected": [
+        {
+          "lemma": "なやましい",
+          "pos": "Adjective",
+          "surface": "なやましい"
+        },
+        {
+          "lemma": "問題",
+          "pos": "Noun",
+          "surface": "問題"
+        }
+      ],
+      "id": "nayamashii",
+      "input": "なやましい問題"
+    },
+    {
+      "description": "うらやましげに見る - auto-generated",
+      "expected": [
+        {
+          "lemma": "うらやましい",
+          "pos": "Adjective",
+          "surface": "うらやまし"
+        },
+        {
+          "lemma": "げ",
+          "pos": "Suffix",
+          "surface": "げ"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見る"
+        }
+      ],
+      "id": "urayamashigeni_ru",
+      "input": "うらやましげに見る"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 4/4)",

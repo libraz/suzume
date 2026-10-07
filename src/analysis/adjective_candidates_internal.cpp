@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <utility>
 
+#include "analysis/bigram_table.h"
 #include "analysis/candidate_constants.h"
 #include "analysis/dictionary_probe.h"
 #include "analysis/scorer_constants.h"
@@ -224,10 +225,16 @@ bool isPredicateChainClosedByAuxiliary(const dictionary::DictionaryManager* dict
   const bool closes_on_predicate_cell =
       closing_auxiliary != nullptr &&
       !utf8::endsWith(closing_auxiliary->lemma.empty() ? closing_auxiliary->surface : closing_auxiliary->lemma, "い");
+  // A cell before the final い closes a chain only when that い can follow it
+  // as the continuative of いる; まし+い cannot, so it is an adjective ending.
+  const auto* cell_before_i = closing_auxiliary == nullptr ? verb_helpers::auxiliaryClosingAfterOkurigana(
+                                                                 dict_manager, codepoints, okurigana_start, end_pos - 1)
+                                                           : nullptr;
+  const bool chain_takes_i =
+      cell_before_i != nullptr &&
+      BigramTable::getCost(cell_before_i->extended_pos, core::ExtendedPOS::AuxAspectIru) < bigram_cost::kNever;
   return utf8::endsWith(surface, "い") && !verb_helpers::isAdjectiveInDictionary(dict_manager, base_form) &&
-         (closes_on_predicate_cell ||
-          (closing_auxiliary == nullptr &&
-           verb_helpers::endsWithAuxiliaryAfterOkurigana(dict_manager, codepoints, okurigana_start, end_pos - 1)));
+         (closes_on_predicate_cell || chain_takes_i);
 }
 
 bool isVerbOnbinContextAfterI(const std::vector<char32_t>& codepoints, size_t pos) {

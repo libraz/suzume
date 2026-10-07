@@ -5,6 +5,7 @@
 
 #include <algorithm>
 
+#include "analysis/bigram_table.h"
 #include "analysis/category_cost.h"
 #include "analysis/dictionary_probe.h"
 #include "analysis/tokenizer.h"
@@ -341,13 +342,19 @@ void addEmphaticDictionaryEdge(core::Lattice& lattice,
         }
       }
     }
-    // A vowel drawn out after a verb continuative can instead complete an
-    // i-adjective spelled in kana (おい+し+い is おいしい, not おい+しい), so
-    // the span from a hiragana run in front of it reads as an adjective.
+    // A vowel drawn out after a verb continuative, or after an auxiliary cell
+    // that has no い to take, can instead complete an i-adjective spelled in
+    // kana (おい+し+い is おいしい, つつ+まし+い is つつましい), so the span from a
+    // hiragana run in front of it reads as an adjective.
     auto lengthening_completes_adjective = [&]() {
       constexpr size_t kMaxAdjectiveLookback = 6;
-      if (result.entry->pos != core::PartOfSpeech::Verb || emphatic.standard_char_count != 0 ||
-          emphatic.repeated_vowel_count != 1 || start_pos == 0) {
+      // An auxiliary cell that takes the continuative い of いる (し+とき+い) is
+      // a chain there, not the opening of an adjective.
+      const bool auxiliary_without_i_cell =
+          result.entry->pos == core::PartOfSpeech::Auxiliary &&
+          BigramTable::getCost(result.entry->extended_pos, core::ExtendedPOS::AuxAspectIru) >= bigram_cost::kNever;
+      if ((result.entry->pos != core::PartOfSpeech::Verb && !auxiliary_without_i_cell) ||
+          emphatic.standard_char_count != 0 || emphatic.repeated_vowel_count != 1 || start_pos == 0) {
         return false;
       }
       size_t run_start = start_pos;
