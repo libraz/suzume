@@ -589,6 +589,50 @@
       ],
       "id": "buttchi_kete_su",
       "input": "ぶっちゃけて話す"
+    },
+    {
+      "description": "final particle drawn out with a small vowel after a kana noun and copula",
+      "expected": [
+        {
+          "lemma": "りんご",
+          "pos": "Noun",
+          "surface": "りんご"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "なあ",
+          "pos": "Particle",
+          "surface": "なぁ"
+        }
+      ],
+      "id": "ringodana",
+      "input": "りんごだなぁ"
+    },
+    {
+      "description": "final particle drawn out with a small vowel after a kana noun and copula",
+      "expected": [
+        {
+          "lemma": "こども",
+          "pos": "Noun",
+          "surface": "こども"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "ねえ",
+          "pos": "Particle",
+          "surface": "ねぇ"
+        }
+      ],
+      "id": "kodomodane",
+      "input": "こどもだねぇ"
     }
   ],
   "description": "colloquial tests",

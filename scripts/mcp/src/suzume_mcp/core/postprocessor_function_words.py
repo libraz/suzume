@@ -812,6 +812,7 @@ def postprocess_now_final_particle(tokens: list[dict]) -> bool:
 
 _HELD_FINAL_PARTICLES = frozenset("さよぞわ")
 _HELD_VOWELS = {"さ": "あぁー", "わ": "あぁー", "よ": "おぉー", "ぞ": "おぉー"}
+_HELD_PARTICLE_SPELLINGS = {"ねぇ": "ねえ", "ねー": "ねえ", "なぁ": "なあ", "なー": "なあ"}
 
 
 def postprocess_distributive_goto(tokens: list[dict]) -> bool:
@@ -873,8 +874,11 @@ def postprocess_held_final_particle(tokens: list[dict]) -> bool:
         ):
             token.update(pos="Particle", lemma=surface[0])
             changed = True
-        # ねぇ and ねー are spellings of the registered final particle ねえ.
-        elif surface in ("ねぇ", "ねー") and token.get("pos") == "Particle" and token.get("lemma") != "ねえ":
-            token["lemma"] = "ねえ"
-            changed = True
+        # ねぇ/ねー and なぁ/なー are spellings of the registered final
+        # particles ねえ and なあ.
+        elif surface in _HELD_PARTICLE_SPELLINGS and token.get("pos") == "Particle":
+            lemma = _HELD_PARTICLE_SPELLINGS[surface]
+            if token.get("lemma") != lemma:
+                token["lemma"] = lemma
+                changed = True
     return changed

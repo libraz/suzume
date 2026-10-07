@@ -9,6 +9,7 @@
  */
 
 #include <algorithm>
+#include <array>
 #include <cstdint>
 #include <string>
 
@@ -449,6 +450,13 @@ bool endsOnPredicateTail(const BracketedNounContext& ctx, size_t run_end) {
   // No noun ends on a sokuon: a run closing on one carries the emphatic っ
   // of a final particle or a predicate (だよ+ねっ, つらい+もんねっ).
   if (run_end > start_pos && codepoints[run_end - 1] == U'っ') {
+    return true;
+  }
+  // Nor on a small vowel drawing out the vowel of the mora in front of it:
+  // that lengthening is a final particle's or a predicate's (や+だ+なぁ).
+  constexpr std::array<char32_t, 5> kSmallVowels = {U'ぁ', U'ぃ', U'ぅ', U'ぇ', U'ぉ'};
+  if (run_end > start_pos + 1 && kana::isCodepointIn(kSmallVowels, codepoints[run_end - 1]) &&
+      grammar::getVowelForChar(codepoints[run_end - 2]) == codepoints[run_end - 1] + 1) {
     return true;
   }
   // A modal chain closing on the presumptive is a predicate, not an
