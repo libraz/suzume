@@ -97,6 +97,186 @@
       ],
       "id": "botchan_opening",
       "input": "元気な子供は外で遊んでいる"
+    },
+    {
+      "description": "雨が止み、手が冷えた - auto-generated",
+      "expected": [
+        {
+          "lemma": "雨",
+          "pos": "Noun",
+          "surface": "雨"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "止む",
+          "pos": "Verb",
+          "surface": "止み"
+        },
+        {
+          "lemma": "手",
+          "pos": "Noun",
+          "surface": "手"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "冷える",
+          "pos": "Verb",
+          "surface": "冷え"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ga_mi_ga_eta",
+      "input": "雨が止み、手が冷えた"
+    },
+    {
+      "description": "彼は微睡み、手を振った - auto-generated",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "微睡む",
+          "pos": "Verb",
+          "surface": "微睡み"
+        },
+        {
+          "lemma": "手",
+          "pos": "Noun",
+          "surface": "手"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "振る",
+          "pos": "Verb",
+          "surface": "振っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ha_mi_wo_ttta",
+      "input": "彼は微睡み、手を振った"
+    },
+    {
+      "description": "高い、しかも遠い - auto-generated",
+      "expected": [
+        {
+          "lemma": "高い",
+          "pos": "Adjective",
+          "surface": "高い"
+        },
+        {
+          "lemma": "しかも",
+          "pos": "Conjunction",
+          "surface": "しかも"
+        },
+        {
+          "lemma": "遠い",
+          "pos": "Adjective",
+          "surface": "遠い"
+        }
+      ],
+      "id": "i_shikamo_i",
+      "input": "高い、しかも遠い"
+    },
+    {
+      "description": "安くて、しかもうまい - auto-generated",
+      "expected": [
+        {
+          "lemma": "安い",
+          "pos": "Adjective",
+          "surface": "安く"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "しかも",
+          "pos": "Conjunction",
+          "surface": "しかも"
+        },
+        {
+          "lemma": "うまい",
+          "pos": "Adjective",
+          "surface": "うまい"
+        }
+      ],
+      "id": "kute_shikamoumai",
+      "input": "安くて、しかもうまい"
+    },
+    {
+      "description": "彼は、とっさに嘘をついた - auto-generated",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "とっさ",
+          "pos": "Noun",
+          "surface": "とっさ"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "嘘",
+          "pos": "Noun",
+          "surface": "嘘"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "つく",
+          "pos": "Verb",
+          "surface": "つい"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ha_tottsani_wotsuita",
+      "input": "彼は、とっさに嘘をついた"
     }
   ],
   "version": "1.0"

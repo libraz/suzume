@@ -183,6 +183,11 @@ void addImpossibleAttachmentRules(const core::LatticeEdge& prev, const core::Lat
   const bool contracted_te_wa_off_adverb = prev.pos == core::PartOfSpeech::Adverb &&
                                            next.extended_pos == core::ExtendedPOS::ParticleConj &&
                                            grammar::isContractedTeWaParticle(next.surface);
+  // The dubitative かも closes a terminal or a nominal; a bare continuative in
+  // front of it is the conjunction cut apart (し+かも is しかも).
+  const bool dubitative_kamo_after_continuative = prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+                                                  next.extended_pos == core::ExtendedPOS::ParticleAdverbial &&
+                                                  utf8::equalsAny(next.surface, {"かも"});
   // A final particle closes the utterance, so no conjunctive particle hangs
   // off it (行こう+け+ど is 行こう+けど).
   const bool conjunctive_after_final_particle =
@@ -194,7 +199,8 @@ void addImpossibleAttachmentRules(const core::LatticeEdge& prev, const core::Lat
       attributive_na_after_final_particle || polite_copula_continuative_stranded || copula_spelled_adverb_on_nominal ||
       contracted_nominalizer_before_continuative || contracted_nominalizer_after_adverb ||
       unpaired_assimilated_copula || terminal_spelled_final_particle_in_kana_run ||
-      contracted_volitional_off_predicate || conjunctive_after_final_particle || contracted_te_wa_off_adverb) {
+      contracted_volitional_off_predicate || conjunctive_after_final_particle || contracted_te_wa_off_adverb ||
+      dubitative_kamo_after_continuative) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
   if ((prev.extended_pos == core::ExtendedPOS::VerbRenyokei || prev.extended_pos == core::ExtendedPOS::VerbOnbinkei) &&
@@ -982,6 +988,9 @@ float Scorer::connectionCost(const core::LatticeEdge& prev, const core::LatticeE
   SUZUME_CONNECTION_ADD(surface_bonus, connection_rules::computeParticleDeterminerBonus(prev, next));
 
   SUZUME_CONNECTION_ADD(surface_bonus, connection_rules::computePrefixSymbolBonus(prev, next));
+  if (connection_rules::opensClauseAfterComma(prev, next)) {
+    SUZUME_CONNECTION_ADD(surface_bonus, bosCost(next));
+  }
   // What a multi-mora particle may govern: both rules key on the predicate
   // form the particle was lexicalized from, and their contributions are
   // additive, so they share one accumulation.

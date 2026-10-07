@@ -42,6 +42,9 @@ float computeNegativeAndNounVerbBonus(const core::LatticeEdge& prev, const core:
 float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::LatticeEdge& next);
 float computePrefixSymbolBonus(const core::LatticeEdge& prev, const core::LatticeEdge& next);
 
+/** @brief Whether `next` opens a clause after a clause-chaining comma, so it takes the sentence-start cost. */
+bool opensClauseAfterComma(const core::LatticeEdge& prev, const core::LatticeEdge& next);
+
 /** @brief Waives the particle→polite-auxiliary bar for a continuative-based compound particle. */
 float computeCompoundParticlePoliteBonus(const core::LatticeEdge& prev, const core::LatticeEdge& next);
 

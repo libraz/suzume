@@ -13,6 +13,7 @@
 #include "grammar/char_patterns.h"
 #include "grammar/honorific_verbs.h"
 #include "normalize/char_type.h"
+#include "normalize/exceptions.h"
 #include "normalize/utf8.h"
 
 namespace cost = suzume::analysis::bigram_cost;
@@ -384,6 +385,15 @@ float computeAdverbialNiAfterPredicatePenalty(const core::LatticeEdge& prev, con
     return cost::kNeutral;
   }
   return cost::kProhibitive;
+}
+
+// A comma closes the clause before it, so the next word opens a clause as it
+// would at the sentence start. A case particle (the quotative と) and an
+// adverbial particle (the listing など) still attach across the comma.
+bool opensClauseAfterComma(const core::LatticeEdge& prev, const core::LatticeEdge& next) {
+  return prev.pos == core::PartOfSpeech::Symbol && normalize::isClauseChainingComma(firstCodepoint(prev.surface)) &&
+         next.extended_pos != core::ExtendedPOS::ParticleCase &&
+         next.extended_pos != core::ExtendedPOS::ParticleAdverbial;
 }
 
 // Prefix/adverb→short-verb, symbol→particle/aux/furigana, and で+も copula rules.
