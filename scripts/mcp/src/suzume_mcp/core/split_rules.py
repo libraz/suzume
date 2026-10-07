@@ -470,8 +470,9 @@ def apply_suzume_split(tokens: list[dict]) -> tuple[list[dict], str | None]:
             continue
 
         # 0a. Split a kanji nominal head from adverbial に regardless of the
-        # reference dictionary's POS coverage (次に, 滅多に).
-        if surface not in FIXED_FUNCTION_SEARCH_UNITS:
+        # reference dictionary's POS coverage (次に, 滅多に). A verb's
+        # continuative (死に) has no particle inside it.
+        if surface not in FIXED_FUNCTION_SEARCH_UNITS and t.get("pos") != "動詞":
             m = regex.match(r"^([\p{Han}]+)(に)$", surface)
             if m:
                 base = m.group(1)

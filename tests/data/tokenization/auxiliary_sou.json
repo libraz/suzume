@@ -355,6 +355,60 @@
       ],
       "id": "kawaisouna",
       "input": "かわいそうな猫"
+    },
+    {
+      "description": "疲れて死にそう - auto-generated",
+      "expected": [
+        {
+          "lemma": "疲れる",
+          "pos": "Verb",
+          "surface": "疲れ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "死ぬ",
+          "pos": "Verb",
+          "surface": "死に"
+        },
+        {
+          "lemma": "そう",
+          "pos": "Auxiliary",
+          "surface": "そう"
+        }
+      ],
+      "id": "rete_nisou",
+      "input": "疲れて死にそう"
+    },
+    {
+      "description": "死にたいほど眠い - auto-generated",
+      "expected": [
+        {
+          "lemma": "死ぬ",
+          "pos": "Verb",
+          "surface": "死に"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たい"
+        },
+        {
+          "lemma": "ほど",
+          "pos": "Particle",
+          "surface": "ほど"
+        },
+        {
+          "lemma": "眠い",
+          "pos": "Adjective",
+          "surface": "眠い"
+        }
+      ],
+      "id": "nitaihodo_i",
+      "input": "死にたいほど眠い"
     }
   ],
   "description": "auxiliary_sou tests",
