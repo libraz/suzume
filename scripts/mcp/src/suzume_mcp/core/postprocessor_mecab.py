@@ -197,6 +197,25 @@ def _invents_a_word_for(raw: tuple[int, dict[int, dict]], position: int) -> bool
     return lemma != token.get("surface")
 
 
+def _splits_closing_particle(text: str, raw: tuple[int, dict[int, dict]], position: int) -> bool:
+    """Whether a held small vowel tears its host mora off a clause-closing particle.
+
+    The dictionary reads the host mora plus the vowel as a word of its own
+    (け + どぉ), so nothing is invented at the mark itself. Without the mark the
+    host mora closes a particle that starts earlier (けど, から, のに).
+    """
+    host = position - 1
+    if raw[1].get(host) is None:
+        return False
+    probe = _raw_analysis(text[:position] + text[position + 1 :])[1]
+    starts = [start for start in probe if start <= host]
+    if not starts:
+        return False
+    start = max(starts)
+    token = probe[start]
+    return start < host and start + len(token.get("surface", "")) == position and token.get("pos") == "助詞"
+
+
 def _stranded_adjective_stems(raw: tuple[int, dict[int, dict]]) -> dict[int, str]:
     """Two-mora kana fragments that head an adjective the dictionary lacks.
 
@@ -491,10 +510,16 @@ def preprocess_for_mecab(text: str) -> tuple[str, dict[tuple[int, str], dict], t
     # mark is dropped before the analysis and put back into the surface
     # afterwards. A final sokuon the dictionary already reads as a word in its
     # own right (あっ, えっ) has itself for a lemma and is left alone.
-    for emphatic_sokuon in [*_emphatic_sokuons(text), *_emphatic_small_vowels(text)]:
+    # A held vowel (small vowel or ー) can also tear its host mora off a
+    # closing particle (け + どぉ) without inventing a word at the mark.
+    sokuons = _emphatic_sokuons(text)
+    held_marks = [m.start() for m in regex.finditer(r"(?<=\p{Hiragana})ー(?=[\p{P}\p{S}\p{Z}]|$)", text)]
+    for emphatic_sokuon in [*sokuons, *_emphatic_small_vowels(text), *held_marks]:
         if raw is None:
             raw = _raw_analysis(text)
-        if _invents_a_word_for(raw, emphatic_sokuon):
+        if (emphatic_sokuon not in held_marks and _invents_a_word_for(raw, emphatic_sokuon)) or (
+            emphatic_sokuon not in sokuons and _splits_closing_particle(text, raw, emphatic_sokuon)
+        ):
             replacements[(emphatic_sokuon - 1, "emphatic_sokuon")] = {
                 "original": text[emphatic_sokuon - 1 : emphatic_sokuon + 1],
                 "replacement": text[emphatic_sokuon - 1],
