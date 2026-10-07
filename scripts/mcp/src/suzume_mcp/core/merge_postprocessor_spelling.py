@@ -542,6 +542,21 @@ def _is_productive_mimetic_stem(surface: str) -> bool:
     return length == 4 and surface[1] == surface[3]
 
 
+def _is_abri_mimetic_stem(tokens: list[dict], stem: str) -> bool:
+    """Whether ``stem`` is an ABり manner mimetic (びくり, はらり) before と.
+
+    The reference reads the shape three ways (びく+り, はらりと, ぴくり), so
+    only the shape decides.  A stem the reference holds as one noun or
+    particle (ひとり, ばかり) is a word of its own, not a mimetic.
+    """
+    if not regex.fullmatch(r"\p{Hiragana}{2}り", stem):
+        return False
+    covering = [token for token in tokens if token.get("surface") != "と"]
+    return not (
+        len(covering) == 1 and covering[0].get("surface") == stem and covering[0].get("pos") in ("名詞", "助詞")
+    )
+
+
 def _is_split_reduplication(tokens: list[dict]) -> bool:
     """Whether adjacent tokens are one reduplicated mimetic MeCab tore apart.
 
@@ -767,7 +782,9 @@ def _postprocess_productive_mimetics(result: list[dict], applied_rule: str | Non
             elif (
                 result[idx].get("pos") != "助詞"
                 and combined.endswith("と")
-                and _is_productive_mimetic_stem(combined[:-1])
+                and (
+                    _is_productive_mimetic_stem(combined[:-1]) or _is_abri_mimetic_stem(result[idx:end], combined[:-1])
+                )
             ):
                 stem = combined[:-1]
                 normalized.append({"surface": stem, "pos": _mimetic_pos(stem), "lemma": stem})

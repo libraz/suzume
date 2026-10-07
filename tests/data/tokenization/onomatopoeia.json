@@ -1776,6 +1776,80 @@
       ],
       "id": "guun_to_ga_gattta",
       "input": "ぐうん、とスピードが上がった。"
+    },
+    {
+      "description": "猫がびくりと跳ねた - auto-generated",
+      "expected": [
+        {
+          "lemma": "猫",
+          "pos": "Noun",
+          "surface": "猫"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "びくり",
+          "pos": "Adverb",
+          "surface": "びくり"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "跳ねる",
+          "pos": "Verb",
+          "surface": "跳ね"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "gabikurito_neta",
+      "input": "猫がびくりと跳ねた"
+    },
+    {
+      "description": "水がぽとりと垂れた - auto-generated",
+      "expected": [
+        {
+          "lemma": "水",
+          "pos": "Noun",
+          "surface": "水"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ぽとり",
+          "pos": "Adverb",
+          "surface": "ぽとり"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "垂れる",
+          "pos": "Verb",
+          "surface": "垂れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "gapotorito_reta",
+      "input": "水がぽとりと垂れた"
     }
   ],
   "description": "Onomatopoeia and mimetic words",
