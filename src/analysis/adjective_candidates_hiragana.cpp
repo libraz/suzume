@@ -921,6 +921,11 @@ void appendHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints, 
   }};
   adj_detail::appendTrimmedAdjVariants(candidates, kHiraganaTrimRules.data(), kHiraganaTrimRules.size(),
                                        candidate_start);
+  // The past た is always a separate auxiliary, as on the kanji path: every
+  // span ending in かった produced its trimmed かっ variant above.
+  candidates.erase(std::remove_if(candidates.begin() + candidate_start, candidates.end(),
+                                  [](const UnknownCandidate& cand) { return utf8::endsWith(cand.surface, "かった"); }),
+                   candidates.end());
 
   appendStemBeforeAuxiliaryPattern(run, full_hiragana_surface, candidates);
   appendStemBeforeNominalizerSa(run, candidates);

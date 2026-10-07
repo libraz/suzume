@@ -220,15 +220,6 @@ void adj_detail::appendHiraganaIAdjSurfaceCandidates(const std::vector<char32_t>
       continue;  // Skip - likely negative auxiliary, not adjective
     }
 
-    // Skip short patterns starting with common case particles (で, に, を, と)
-    // These are likely particle + adjective splits (でやばい = で + やばい)
-    // Longer sequences (5+ chars) are less likely to be splits
-    const char32_t first_char = codepoints[start_pos];
-    if (starts_with_particle && end_pos - start_pos <= 4 &&
-        (first_char == U'で' || first_char == U'に' || first_char == U'を' || first_char == U'と')) {
-      continue;  // Skip - likely particle + adjective split
-    }
-
     // Normalize prolonged sound marks before analysis
     // e.g., すごーい → すごおい, やばーい → やばあい
     std::string analysis_surface = surface;
@@ -243,6 +234,42 @@ void adj_detail::appendHiraganaIAdjSurfaceCandidates(const std::vector<char32_t>
     // and therefore receives AdjRenyokei from detectIAdjEpos().
     if (utf8::endsWith(analysis_surface, "く")) {
       analysis_surface = normalize::replaceFinalChar(analysis_surface, "い");
+    }
+
+    // A run opening on a case, topic or binding particle is that particle plus
+    // what follows when the remainder is a word of its own: a dictionary entry
+    // (で+いい, と+おい), or an i-adjective with a stem of two or more morae that
+    // reads better than the whole run does (が+にぶい, が+おいしかった). A
+    // final-particle mora opens words too often to count (よろしい, わびしい).
+    const auto* opening_particle =
+        starts_with_particle && dict_manager != nullptr
+            ? lookupEntryInRange(*dict_manager, codepoints, start_pos, start_pos + 1, core::PartOfSpeech::Particle)
+            : nullptr;
+    const bool opens_on_argument_particle =
+        opening_particle != nullptr && (opening_particle->extended_pos == core::ExtendedPOS::ParticleCase ||
+                                        opening_particle->extended_pos == core::ExtendedPOS::ParticleTopic ||
+                                        opening_particle->extended_pos == core::ExtendedPOS::ParticleBinding);
+    if (opens_on_argument_particle && end_pos - start_pos >= 3) {
+      if (lookupEntryInRange(*dict_manager, codepoints, start_pos + 1, end_pos) != nullptr) {
+        continue;
+      }
+      const auto best_adjective_confidence = [&](std::string_view text, size_t min_stem) {
+        float best = candidate::kNoOriginConfidence;
+        for (const auto& analysis : inflection.analyze(text)) {
+          if (analysis.verb_type == grammar::VerbType::IAdjective && normalize::utf8Length(analysis.stem) >= min_stem &&
+              analysis.confidence > best) {
+            best = analysis.confidence;
+          }
+        }
+        return best;
+      };
+      constexpr size_t kMinRemainderStem = 2;
+      const std::string_view remainder = std::string_view(analysis_surface).substr(core::kJapaneseCharBytes);
+      const float remainder_confidence = best_adjective_confidence(remainder, kMinRemainderStem);
+      if (remainder_confidence != candidate::kNoOriginConfidence &&
+          remainder_confidence > best_adjective_confidence(analysis_surface, 0)) {
+        continue;
+      }
     }
 
     // Check all candidates for IAdjective, not just the best one

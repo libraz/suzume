@@ -697,11 +697,14 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       // hosts nothing at all, so the same bar applies there.
       {EPOS::Determiner, EPOS::AuxAspectOku, cost::kProhibitive},
       {EPOS::Interjection, EPOS::AuxAspectOku, cost::kProhibitive},
-      // The same holds behind a topic or binding particle, which ends a nominal:
-      // the subsidiary verb needs the verb it follows, so ごはんは+おい+しかった is
-      // ごはんは+おいしかった.
+      // The same holds behind any particle but the te that the auxiliary
+      // actually takes: the subsidiary verb needs the verb it follows, so
+      // ごはんは+おい+しかった is ごはんは+おいしかった, and so is the が form.
       {EPOS::ParticleTopic, EPOS::AuxAspectOku, cost::kProhibitive},
       {EPOS::ParticleBinding, EPOS::AuxAspectOku, cost::kProhibitive},
+      {EPOS::ParticleCase, EPOS::AuxAspectOku, cost::kProhibitive},
+      {EPOS::ParticleAdverbial, EPOS::AuxAspectOku, cost::kProhibitive},
+      {EPOS::ParticleConjFinite, EPOS::AuxAspectOku, cost::kProhibitive},
 
       // ParticleCase → Determiner (rare; 連体詞 rarely follows case particles)
       // Determiners introduce a new modifier clause and don't follow が/を/に/と/から/etc.
