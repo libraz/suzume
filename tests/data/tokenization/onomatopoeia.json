@@ -2219,6 +2219,183 @@
       ],
       "id": "dokiritoshita",
       "input": "どきりとした"
+    },
+    {
+      "description": "恐る恐る近づいた - auto-generated",
+      "expected": [
+        {
+          "lemma": "恐る恐る",
+          "pos": "Adverb",
+          "surface": "恐る恐る"
+        },
+        {
+          "lemma": "近づく",
+          "pos": "Verb",
+          "surface": "近づい"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ru_ru_duita",
+      "input": "恐る恐る近づいた"
+    },
+    {
+      "description": "泣き泣き帰った - auto-generated",
+      "expected": [
+        {
+          "lemma": "泣き泣き",
+          "pos": "Adverb",
+          "surface": "泣き泣き"
+        },
+        {
+          "lemma": "帰る",
+          "pos": "Verb",
+          "surface": "帰っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ki_ki_ttta",
+      "input": "泣き泣き帰った"
+    },
+    {
+      "description": "代わる代わる見た - auto-generated",
+      "expected": [
+        {
+          "lemma": "代わる代わる",
+          "pos": "Adverb",
+          "surface": "代わる代わる"
+        },
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "waru_waru_ta",
+      "input": "代わる代わる見た"
+    },
+    {
+      "description": "重ね重ねお詫びします - auto-generated",
+      "expected": [
+        {
+          "lemma": "重ね重ね",
+          "pos": "Adverb",
+          "surface": "重ね重ね"
+        },
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "詫ぶ",
+          "pos": "Verb",
+          "surface": "詫び"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "ne_neo_bishimasu",
+      "input": "重ね重ねお詫びします"
+    },
+    {
+      "description": "返す返すも残念だ - auto-generated",
+      "expected": [
+        {
+          "lemma": "返す返す",
+          "pos": "Adverb",
+          "surface": "返す返す"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "残念",
+          "pos": "Adjective",
+          "surface": "残念"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "su_sumo_da",
+      "input": "返す返すも残念だ"
+    },
+    {
+      "description": "明るい方へ方へと歩いて行く - auto-generated",
+      "expected": [
+        {
+          "lemma": "明るい",
+          "pos": "Adjective",
+          "surface": "明るい"
+        },
+        {
+          "lemma": "方",
+          "pos": "Noun",
+          "surface": "方"
+        },
+        {
+          "lemma": "へ",
+          "pos": "Particle",
+          "surface": "へ"
+        },
+        {
+          "lemma": "方",
+          "pos": "Noun",
+          "surface": "方"
+        },
+        {
+          "lemma": "へ",
+          "pos": "Particle",
+          "surface": "へ"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "歩く",
+          "pos": "Verb",
+          "surface": "歩い"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Auxiliary",
+          "surface": "行く"
+        }
+      ],
+      "id": "rui_he_heto_ite_ku",
+      "input": "明るい方へ方へと歩いて行く"
     }
   ],
   "description": "Onomatopoeia and mimetic words",

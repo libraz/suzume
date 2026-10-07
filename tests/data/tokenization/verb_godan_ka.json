@@ -1187,6 +1187,70 @@
       ],
       "id": "deyoromeita",
       "input": "恐怖でよろめいた"
+    },
+    {
+      "description": "彼女はしがみついてきた - auto-generated",
+      "expected": [
+        {
+          "lemma": "彼女",
+          "pos": "Pronoun",
+          "surface": "彼女"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "しがみつく",
+          "pos": "Verb",
+          "surface": "しがみつい"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くる",
+          "pos": "Auxiliary",
+          "surface": "き"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "hashigamitsuitekita",
+      "input": "彼女はしがみついてきた"
+    },
+    {
+      "description": "子供はしがみついた - auto-generated",
+      "expected": [
+        {
+          "lemma": "子供",
+          "pos": "Noun",
+          "surface": "子供"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "しがみつく",
+          "pos": "Verb",
+          "surface": "しがみつい"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "hashigamitsuita",
+      "input": "子供はしがみついた"
     }
   ],
   "description": "Godan Ka-row verbs (五段カ行動詞) - verbs ending in く",
