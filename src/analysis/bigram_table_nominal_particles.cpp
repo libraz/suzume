@@ -150,7 +150,7 @@ void setNominalParticleCosts(BigramMatrix& table) {
       // auxiliary chain (…ん+と+いけ+ん), rather than reopening い as an
       // independent continuative followed by the dialectal particle けん.
   };
-  applyRules(table, kRules, sizeof(kRules) / sizeof(kRules[0]));
+  applyRules(table, kRules);
 }
 
 }  // namespace suzume::analysis::bigram_rules

@@ -146,20 +146,7 @@ bool isRightBoundaryParticle(char32_t code_point) {
 // hard stop; が/の may occur inside native words (つながり, かけがえ) and are
 // admitted only under the same one-internal-particle cap.
 bool isInternalParticleChar(char32_t code_point) {
-  switch (code_point) {
-    case U'は':
-    case U'に':
-    case U'へ':
-    case U'で':
-    case U'と':
-    case U'も':
-    case U'か':
-    case U'が':
-    case U'の':
-      return true;
-    default:
-      return false;
-  }
+  return normalize::isParticleCodepoint(code_point) && code_point != U'を' && code_point != U'や';
 }
 
 bool startsClosedNativeNumber(const std::vector<char32_t>& codepoints, size_t pos) {
@@ -291,14 +278,9 @@ bool isFollowedByNominalParticle(const std::vector<char32_t>& codepoints, size_t
                                  const dictionary::DictionaryManager* dict_manager) {
   // Longest nominal-selecting particle in the closed class is three codepoints.
   constexpr size_t kParticleProbe = 3;
-  return hasDictionaryEntryFrom(dict_manager, codepoints, end_pos, 1, kParticleProbe, core::PartOfSpeech::Particle,
-                                [](const dictionary::DictionaryEntry& entry) {
-                                  return entry.extended_pos == core::ExtendedPOS::ParticleCase ||
-                                         entry.extended_pos == core::ExtendedPOS::ParticleTopic ||
-                                         entry.extended_pos == core::ExtendedPOS::ParticleAdverbial ||
-                                         entry.extended_pos == core::ExtendedPOS::ParticleBinding ||
-                                         entry.extended_pos == core::ExtendedPOS::ParticleNo;
-                                });
+  return hasDictionaryEntryFrom(
+      dict_manager, codepoints, end_pos, 1, kParticleProbe, core::PartOfSpeech::Particle,
+      [](const dictionary::DictionaryEntry& entry) { return isNominalForcingParticle(entry.extended_pos); });
 }
 
 // Phonologically impossible hiragana word starts: small kana (拗音・促音), the

@@ -873,9 +873,7 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
         // (total around -0.5). Need extra strong bonus for these cases.
         // EXCEPTION: If the 1-char stem is a known verb (e.g., でる, ねる in dictionary),
         // we want to prefer split path (で+て, ね+て), so use weaker bonus
-        bool starts_with_common_particle =
-            (first_char == U'で' || first_char == U'に' || first_char == U'が' || first_char == U'を' ||
-             first_char == U'は' || first_char == U'の' || first_char == U'へ');
+        bool starts_with_common_particle = normalize::isCommonParticle(first_char) || first_char == U'で';
         // Check if 1-char stem + る is a known verb (e.g., でる, ねる)
         if (vh::isVerbInDictionary(dict_manager, extractSubstring(codepoints, start_pos, start_pos + 1) + "る")) {
           // Prefer split path (で+て) over combined (でて) when verb is in dictionary

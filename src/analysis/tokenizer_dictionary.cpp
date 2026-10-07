@@ -270,14 +270,8 @@ bool hasProductiveContinuativeCrossingDeterminer(const core::Lattice& lattice, c
 
   size_t host_start = dictionaryLookbehindStart(determiner_start);
   for (size_t boundary = determiner_start; boundary > host_start; --boundary) {
-    const bool follows_predicate_introducing_particle =
-        core::anyEdgeEndingAt(lattice, boundary, [](const core::LatticeEdge& edge) {
-          return edge.extended_pos == core::ExtendedPOS::ParticleCase ||
-                 edge.extended_pos == core::ExtendedPOS::ParticleNo ||
-                 edge.extended_pos == core::ExtendedPOS::ParticleTopic ||
-                 edge.extended_pos == core::ExtendedPOS::ParticleBinding ||
-                 edge.extended_pos == core::ExtendedPOS::ParticleAdverbial;
-        });
+    const bool follows_predicate_introducing_particle = core::anyEdgeEndingAt(
+        lattice, boundary, [](const core::LatticeEdge& edge) { return isNominalForcingParticle(edge.extended_pos); });
     if (follows_predicate_introducing_particle) {
       host_start = boundary;
       break;
@@ -576,9 +570,7 @@ bool startsInsideSentenceInitialDictionaryNoun(const dictionary::DictionaryManag
     return false;
   }
   const auto sentence_initial = dict_manager.lookup(text, 0);
-  return std::any_of(sentence_initial.begin(), sentence_initial.end(), [start_pos](const auto& result) {
-    return result.entry != nullptr && result.entry->pos == core::PartOfSpeech::Noun && result.length > start_pos;
-  });
+  return lookupResultsHaveLongerPartOfSpeech(sentence_initial, partOfSpeechMask(core::PartOfSpeech::Noun), start_pos);
 }
 
 // A two-mora conjunction candidate can straddle the productive boundary in
@@ -959,12 +951,11 @@ ContextualDictionaryCandidateState addContextualDictionaryCandidates(
       hasPrecedingSahenNominal(lattice, start_pos) &&
       verb_helpers::isPassiveAuxContinuation(codepoints, start_pos + 2, /*strict_masu=*/true);
   if (starts_sahen_passive) {
-    lattice.addEdge("さ", static_cast<uint32_t>(start_pos), static_cast<uint32_t>(start_pos + 1),
-                    core::PartOfSpeech::Verb,
-                    getCategoryCost(core::ExtendedPOS::VerbMizenkei) + candidate::verb_cost::kSahenPassiveSuruBonus,
-                    core::LatticeEdge::kFromDictionary | core::LatticeEdge::kHasCustomCost, "する",
-                    dictionary::ConjugationType::Suru, core::CandidateOrigin::Dictionary,
-                    candidate::kDictionaryOriginConfidence, {}, core::ExtendedPOS::VerbMizenkei, "sahen_passive_suru");
+    tokenizer_dictionary_detail::addDictionaryOriginEdge(
+        lattice, "さ", start_pos, start_pos + 1, core::PartOfSpeech::Verb,
+        getCategoryCost(core::ExtendedPOS::VerbMizenkei) + candidate::verb_cost::kSahenPassiveSuruBonus,
+        core::LatticeEdge::kFromDictionary | core::LatticeEdge::kHasCustomCost, "する",
+        dictionary::ConjugationType::Suru, core::ExtendedPOS::VerbMizenkei, "sahen_passive_suru");
   }
   state.starts_shortened_causative_passive =
       start_pos > 0 && codepoints[start_pos] == core::hiragana::kSa && start_pos + 1 < codepoints.size() &&
@@ -1127,10 +1118,10 @@ void addElidedProlongedDictionaryCandidates(core::Lattice& lattice, const dictio
     // whole run unmarked.
     const float cost = getCategoryCost(result.entry->extended_pos) +
                        (candidate::kEmphaticCharacterPenalty * static_cast<float>(elided_marks));
-    lattice.addEdge(surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(end_pos), result.entry->pos, cost,
-                    core::LatticeEdge::kFromDictionary | core::LatticeEdge::kHasCustomCost, lemma,
-                    dictionary::ConjugationType::None, core::CandidateOrigin::Dictionary,
-                    candidate::kDictionaryOriginConfidence, {}, result.entry->extended_pos, "dict_elided_prolonged");
+    tokenizer_dictionary_detail::addDictionaryOriginEdge(
+        lattice, surface, start_pos, end_pos, result.entry->pos, cost,
+        core::LatticeEdge::kFromDictionary | core::LatticeEdge::kHasCustomCost, lemma,
+        dictionary::ConjugationType::None, result.entry->extended_pos, "dict_elided_prolonged");
   }
 }
 
@@ -1163,11 +1154,11 @@ void addTruncatedAdverbCandidates(core::Lattice& lattice, const dictionary::Dict
     if (adverb == nullptr) {
       return;
     }
-    lattice.addEdge(surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(end_pos), adverb->pos,
-                    getCategoryCost(adverb->extended_pos), core::LatticeEdge::kFromDictionary,
-                    adverb->lemma.empty() ? std::string_view(adverb->surface) : std::string_view(adverb->lemma),
-                    dictionary::ConjugationType::None, core::CandidateOrigin::Dictionary,
-                    candidate::kDictionaryOriginConfidence, {}, adverb->extended_pos, "dict_truncated_adverb");
+    tokenizer_dictionary_detail::addDictionaryOriginEdge(
+        lattice, surface, start_pos, end_pos, adverb->pos, getCategoryCost(adverb->extended_pos),
+        core::LatticeEdge::kFromDictionary,
+        adverb->lemma.empty() ? std::string_view(adverb->surface) : std::string_view(adverb->lemma),
+        dictionary::ConjugationType::None, adverb->extended_pos, "dict_truncated_adverb");
     return;
   }
 }
@@ -1206,13 +1197,11 @@ void addClippedInterjectionCandidates(core::Lattice& lattice, const dictionary::
     if (interjection == nullptr) {
       continue;
     }
-    lattice.addEdge(
-        extractSubstring(codepoints, start_pos, span_end), static_cast<uint32_t>(start_pos),
-        static_cast<uint32_t>(span_end), interjection->pos, getCategoryCost(interjection->extended_pos),
-        core::LatticeEdge::kFromDictionary,
+    tokenizer_dictionary_detail::addDictionaryOriginEdge(
+        lattice, extractSubstring(codepoints, start_pos, span_end), start_pos, span_end, interjection->pos,
+        getCategoryCost(interjection->extended_pos), core::LatticeEdge::kFromDictionary,
         interjection->lemma.empty() ? std::string_view(interjection->surface) : std::string_view(interjection->lemma),
-        dictionary::ConjugationType::None, core::CandidateOrigin::Dictionary, candidate::kDictionaryOriginConfidence,
-        {}, interjection->extended_pos, "dict_clipped_interjection");
+        dictionary::ConjugationType::None, interjection->extended_pos, "dict_clipped_interjection");
   }
 }
 
@@ -1499,10 +1488,7 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
       // A longer nominal headword starting there is what the determiner
       // modifies (そういう+ところ, こういう+とこ), not the particle.
       const bool followed_by_longer_nominal =
-          std::any_of(following_results.begin(), following_results.end(), [](const auto& following) {
-            return following.entry != nullptr && following.length > 1 &&
-                   following.entry->pos == core::PartOfSpeech::Noun;
-          });
+          lookupResultsHaveLongerPartOfSpeech(following_results, partOfSpeechMask(core::PartOfSpeech::Noun), 1);
       // So is an unregistered kana noun the rescue path offers there: a run
       // with no reading of its own, closed by the clause end or a particle
       // (この+へや+、, この+へや+で). Its first mora only spells the particle.
@@ -1608,11 +1594,7 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
                 return false;
               }
               const auto extended_pos = following.entry->extended_pos;
-              return extended_pos == core::ExtendedPOS::ParticleNo ||
-                     extended_pos == core::ExtendedPOS::ParticleTopic ||
-                     extended_pos == core::ExtendedPOS::ParticleCase ||
-                     extended_pos == core::ExtendedPOS::ParticleBinding ||
-                     extended_pos == core::ExtendedPOS::ParticleAdverbial ||
+              return isNominalForcingParticle(extended_pos) ||
                      (extended_pos == core::ExtendedPOS::AuxCopulaDa &&
                       !grammar::isSingleHiragana(following.entry->surface, core::hiragana::kNa)) ||
                      extended_pos == core::ExtendedPOS::AuxCopulaDesu;
@@ -2045,11 +2027,10 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     if (result.entry->pos == core::PartOfSpeech::Verb && utf8::endsWith(result.entry->surface, "ぬ") &&
         result.entry->lemma != result.entry->surface) {
       const std::string stem_surface = std::string(utf8::dropLastChar(result.entry->surface));
-      lattice.addEdge(stem_surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(end_pos - 1),
-                      core::PartOfSpeech::Verb, getCategoryCost(core::ExtendedPOS::VerbMizenkei),
-                      core::LatticeEdge::kFromDictionary, result.entry->lemma, dictionary::ConjugationType::None,
-                      core::CandidateOrigin::Dictionary, candidate::kDictionaryOriginConfidence, {},
-                      core::ExtendedPOS::VerbMizenkei, "dictionary_classical_negative_stem");
+      tokenizer_dictionary_detail::addDictionaryOriginEdge(
+          lattice, stem_surface, start_pos, end_pos - 1, core::PartOfSpeech::Verb,
+          getCategoryCost(core::ExtendedPOS::VerbMizenkei), core::LatticeEdge::kFromDictionary, result.entry->lemma,
+          dictionary::ConjugationType::None, core::ExtendedPOS::VerbMizenkei, "dictionary_classical_negative_stem");
       continue;
     }
 
@@ -2065,13 +2046,12 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
       const std::string verb_base = normalize::concat(utf8::dropLastChar(result.entry->surface), "す");
       const auto* verb = dict_manager_.lookupExact(verb_base, core::PartOfSpeech::Verb);
       if (verb != nullptr) {
-        lattice.addEdge(result.entry->surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(end_pos),
-                        core::PartOfSpeech::Verb,
-                        getCategoryCost(core::ExtendedPOS::VerbRenyokei) + candidate::kVerifiedTailCompoundVerbBonus +
-                            candidate::kVerifiedVerbBonus,
-                        core::LatticeEdge::kFromDictionary, verb_base, dictionary::ConjugationType::GodanSa,
-                        core::CandidateOrigin::Dictionary, candidate::kDictionaryOriginConfidence, {},
-                        core::ExtendedPOS::VerbRenyokei, "dictionary_godan_sa_renyokei");
+        tokenizer_dictionary_detail::addDictionaryOriginEdge(
+            lattice, result.entry->surface, start_pos, end_pos, core::PartOfSpeech::Verb,
+            getCategoryCost(core::ExtendedPOS::VerbRenyokei) + candidate::kVerifiedTailCompoundVerbBonus +
+                candidate::kVerifiedVerbBonus,
+            core::LatticeEdge::kFromDictionary, verb_base, dictionary::ConjugationType::GodanSa,
+            core::ExtendedPOS::VerbRenyokei, "dictionary_godan_sa_renyokei");
       }
     }
 
@@ -2084,11 +2064,10 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
         if (verb != nullptr) {
           const auto conj_type = grammar::verbTypeToConjType(
               grammar::verbTypeFromBaseCodepoint(utf8::decodeFirstChar(utf8::lastChar(verb_base))));
-          lattice.addEdge(result.entry->surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(end_pos),
-                          core::PartOfSpeech::Verb, getCategoryCost(core::ExtendedPOS::VerbRenyokei),
-                          core::LatticeEdge::kFromDictionary, verb_base, conj_type, core::CandidateOrigin::Dictionary,
-                          candidate::kDictionaryOriginConfidence, {}, core::ExtendedPOS::VerbRenyokei,
-                          "dictionary_godan_renyokei_before_predicate");
+          tokenizer_dictionary_detail::addDictionaryOriginEdge(
+              lattice, result.entry->surface, start_pos, end_pos, core::PartOfSpeech::Verb,
+              getCategoryCost(core::ExtendedPOS::VerbRenyokei), core::LatticeEdge::kFromDictionary, verb_base,
+              conj_type, core::ExtendedPOS::VerbRenyokei, "dictionary_godan_renyokei_before_predicate");
         }
       }
     }
@@ -2096,11 +2075,9 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     // かねる takes a continuative, which a voice auxiliary also supplies
     // (損なわ+れ+かね, 行か+せ+かね).
     if (result.entry->extended_pos == core::ExtendedPOS::AuxInability &&
-        !core::anyEdgeEndingAt(lattice, start_pos, [](const core::LatticeEdge& edge) {
-          return edge.extended_pos == core::ExtendedPOS::VerbRenyokei ||
-                 edge.extended_pos == core::ExtendedPOS::AuxPassive ||
-                 edge.extended_pos == core::ExtendedPOS::AuxCausative;
-        })) {
+        !hasPrecedingExtendedPOS(
+            lattice, start_pos,
+            {core::ExtendedPOS::VerbRenyokei, core::ExtendedPOS::AuxPassive, core::ExtendedPOS::AuxCausative})) {
       continue;
     }
 
@@ -2447,11 +2424,8 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     // boundary; letting its prefix reach a following particle manufactures a
     // predicate with no host.
     if (start_pos == 0 && result.entry->extended_pos == core::ExtendedPOS::VerbRenyokei && result.length == 1) {
-      const bool has_longer_conjunction =
-          std::any_of(lookup_results.begin(), lookup_results.end(), [&](const auto& candidate) {
-            return candidate.entry != nullptr && candidate.entry->pos == core::PartOfSpeech::Conjunction &&
-                   candidate.length > result.length;
-          });
+      const bool has_longer_conjunction = lookupResultsHaveLongerPartOfSpeech(
+          lookup_results, partOfSpeechMask(core::PartOfSpeech::Conjunction), result.length);
       if (has_longer_conjunction) {
         continue;
       }
@@ -2463,11 +2437,8 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     if ((result.entry->pos == core::PartOfSpeech::Noun || result.entry->pos == core::PartOfSpeech::Suffix) &&
         result.length == 1 &&
         hasPrecedingPartOfSpeech(lattice, start_pos, partOfSpeechMask(core::PartOfSpeech::Conjunction))) {
-      const bool has_longer_verb =
-          std::any_of(lookup_results.begin(), lookup_results.end(), [&](const auto& candidate) {
-            return candidate.entry != nullptr && candidate.entry->pos == core::PartOfSpeech::Verb &&
-                   candidate.length > result.length;
-          });
+      const bool has_longer_verb = lookupResultsHaveLongerPartOfSpeech(
+          lookup_results, partOfSpeechMask(core::PartOfSpeech::Verb), result.length);
       if (has_longer_verb) {
         continue;
       }
@@ -2664,12 +2635,11 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     if (result.entry->pos == core::PartOfSpeech::Verb &&
         result.entry->extended_pos == core::ExtendedPOS::VerbKateikei && end_pos < codepoints.size() &&
         codepoints[end_pos] == U'た' && grammar::endsWithERow(result.entry->surface)) {
-      lattice.addEdge(result.entry->surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(end_pos),
-                      core::PartOfSpeech::Verb, getCategoryCost(core::ExtendedPOS::VerbRenyokei),
-                      core::LatticeEdge::kFromDictionary, normalize::concat(result.entry->surface, "る"),
-                      dictionary::ConjugationType::Ichidan, core::CandidateOrigin::Dictionary,
-                      candidate::kDictionaryOriginConfidence, {}, core::ExtendedPOS::VerbRenyokei,
-                      "dictionary_potential_renyokei_before_past");
+      tokenizer_dictionary_detail::addDictionaryOriginEdge(
+          lattice, result.entry->surface, start_pos, end_pos, core::PartOfSpeech::Verb,
+          getCategoryCost(core::ExtendedPOS::VerbRenyokei), core::LatticeEdge::kFromDictionary,
+          normalize::concat(result.entry->surface, "る"), dictionary::ConjugationType::Ichidan,
+          core::ExtendedPOS::VerbRenyokei, "dictionary_potential_renyokei_before_past");
     }
     // A listed verb's continuative right after a noun and before a nominal
     // particle is the deverbal head of an object-verb compound (水+やり+を),
@@ -2840,12 +2810,11 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
             respells_word = true;
             // Each host reading at this position reaches here; one of them adds the word.
             if (result.entry->pos == core::PartOfSpeech::Particle) {
-              lattice.addEdge(extractSubstring(codepoints, start_pos, emphatic.end), static_cast<uint32_t>(start_pos),
-                              static_cast<uint32_t>(emphatic.end), word.entry->pos,
-                              getCategoryCost(word.entry->extended_pos), core::LatticeEdge::kFromDictionary,
-                              word.entry->lemma.empty() ? respelled : word.entry->lemma,
-                              dictionary::ConjugationType::None, core::CandidateOrigin::Dictionary,
-                              candidate::kDictionaryOriginConfidence, {}, word.entry->extended_pos, "dict_respelled");
+              tokenizer_dictionary_detail::addDictionaryOriginEdge(
+                  lattice, extractSubstring(codepoints, start_pos, emphatic.end), start_pos, emphatic.end,
+                  word.entry->pos, getCategoryCost(word.entry->extended_pos), core::LatticeEdge::kFromDictionary,
+                  word.entry->lemma.empty() ? respelled : word.entry->lemma, dictionary::ConjugationType::None,
+                  word.entry->extended_pos, "dict_respelled");
             }
           }
           if (respells_word) {

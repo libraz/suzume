@@ -4,6 +4,7 @@
  */
 
 #include <algorithm>
+#include <array>
 
 #include "adjective_candidates.h"
 #include "adjective_candidates_internal.h"
@@ -160,11 +161,7 @@ bool isNominalClosingParticle(const dictionary::DictionaryEntry& entry) {
 }
 
 bool isNominalBoundaryParticle(const dictionary::DictionaryEntry& entry) {
-  return entry.pos == core::PartOfSpeech::Particle && (entry.extended_pos == core::ExtendedPOS::ParticleCase ||
-                                                       entry.extended_pos == core::ExtendedPOS::ParticleTopic ||
-                                                       entry.extended_pos == core::ExtendedPOS::ParticleAdverbial ||
-                                                       entry.extended_pos == core::ExtendedPOS::ParticleNo ||
-                                                       entry.extended_pos == core::ExtendedPOS::ParticleBinding);
+  return entry.pos == core::PartOfSpeech::Particle && isNominalForcingParticle(entry.extended_pos);
 }
 
 // A selected nominal-head rescue supplies an otherwise unavailable open-class
@@ -1042,20 +1039,18 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
   if (second_hira == U'て' || second_hira == U'た' || second_hira == U'で' || second_hira == U'だ') {
     looks_like_aux = true;
   }
-  // ます, ない
-  if ((first_hira == U'ま' && second_hira == U'す') || (first_hira == U'な' && second_hira == U'い')) {
-    looks_like_aux = true;
-  }
-  // れる, られる, せる, させる
-  if ((first_hira == U'れ' && second_hira == U'る') || (first_hira == U'せ' && second_hira == U'る')) {
-    looks_like_aux = true;
-  }
-  // だった, だろう
-  if (first_hira == U'だ' && (second_hira == U'っ' || second_hira == U'ろ')) {
-    looks_like_aux = true;
-  }
-  // なら, なかった
-  if (first_hira == U'な' && (second_hira == U'ら' || second_hira == U'か')) {
+  // ます, ない, れる, せる, だった, だろう, なら, なかった
+  constexpr std::array<std::array<char32_t, 2>, 8> kAuxKanaPairs{{{U'ま', U'す'},
+                                                                  {U'な', U'い'},
+                                                                  {U'れ', U'る'},
+                                                                  {U'せ', U'る'},
+                                                                  {U'だ', U'っ'},
+                                                                  {U'だ', U'ろ'},
+                                                                  {U'な', U'ら'},
+                                                                  {U'な', U'か'}}};
+  if (std::any_of(kAuxKanaPairs.begin(), kAuxKanaPairs.end(), [&](const std::array<char32_t, 2>& pair) {
+        return first_hira == pair[0] && second_hira == pair[1];
+      })) {
     looks_like_aux = true;
   }
   // An o-row irrealis followed by the volitional う (走ろ+う, 食べよ+う) is a
@@ -1068,9 +1063,7 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
   // If first hiragana is a godan verb ending, kanji+first hiragana likely forms
   // a complete verb, and the rest starts a new word
   // 休むこと → 休む(VERB) + こと(NOUN), not 休むこ(NOUN) + と(PARTICLE)
-  const bool is_godan_shuushikei =
-      (first_hira == U'む' || first_hira == U'う' || first_hira == U'く' || first_hira == U'ぐ' ||
-       first_hira == U'す' || first_hira == U'つ' || first_hira == U'ぬ' || first_hira == U'ぶ' || first_hira == U'る');
+  const bool is_godan_shuushikei = grammar::isModernGodanTerminalKana(first_hira);
   if (is_godan_shuushikei) {
     // The 終止形 split hypothesis (kanji+first_hira is a complete verb, the rest starts
     // a new word) is only sound when the stranded remainder is lexically realizable.

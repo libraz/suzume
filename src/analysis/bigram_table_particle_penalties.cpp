@@ -161,7 +161,7 @@ void setParticleAndLexicalPenaltyCosts(BigramMatrix& table) {
       {EPOS::ParticleQuote, EPOS::Interjection, cost::kAlmostNever},
       {EPOS::ParticleFinal, EPOS::Interjection, cost::kAlmostNever},
   };
-  applyRules(table, kRules, sizeof(kRules) / sizeof(kRules[0]));
+  applyRules(table, kRules);
 }
 
 }  // namespace suzume::analysis::bigram_rules

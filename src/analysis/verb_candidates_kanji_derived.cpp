@@ -390,16 +390,9 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
     std::string surface = extractSubstring(codepoints, start_pos, kateikei_end);
     std::string causative_stem = extractSubstring(codepoints, start_pos, kanji_end + 2);
     std::string base_form = causative_stem + "る";
-    float confidence =
-        getIchidanConfidence(inflection.analyze(surface), candidate::verb_cost::kIchidanKateikeiMinConfidence);
-    if (confidence >= candidate::verb_cost::kIchidanKateikeiMinConfidence &&
-        vh::isVerbInDictionary(dict_manager, base_form)) {
-      auto candidate =
-          makeVerbCandidate(surface, start_pos, kateikei_end, candidate::verb_cost::kStrongBonus, base_form,
-                            dictionary::ConjugationType::Ichidan, true, CandidateOrigin::VerbKanji, confidence,
-                            "causative_kateikei", core::ExtendedPOS::VerbKateikei);
-      candidate.lemma_verified = true;
-      candidates.push_back(std::move(candidate));
+    if (vh::isVerbInDictionary(dict_manager, base_form)) {
+      appendIchidanKateikeiCandidate(candidates, inflection.analyze(surface), surface, start_pos, kateikei_end,
+                                     base_form, "causative_kateikei", /*lemma_verified=*/true);
     }
   }
 
@@ -450,20 +443,9 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
         }
 
         // Verify using inflection analysis on the kateikei form
-        const auto& all_candidates = inflection.analyze(surface);
-        const float ichidan_confidence =
-            getIchidanConfidence(all_candidates, candidate::verb_cost::kIchidanKateikeiMinConfidence);
-
-        if (!is_iadj_kateikei && ichidan_confidence != candidate::kNoConfidence) {
-          // Negative cost to beat the split path 語幹+れ(受身)+ば
-          constexpr float kKateikeiCost = candidate::verb_cost::kStrongBonus;
-          SUZUME_DEBUG_VERBOSE_BLOCK {
-            SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface << " ichidan_kateikei lemma=" << base_form
-                                << " conf=" << ichidan_confidence << " cost=" << kKateikeiCost << "\n";
-          }
-          candidates.push_back(makeVerbCandidate(
-              surface, start_pos, kateikei_end, kKateikeiCost, base_form, dictionary::ConjugationType::Ichidan, true,
-              CandidateOrigin::VerbKanji, ichidan_confidence, "ichidan_kateikei", core::ExtendedPOS::VerbKateikei));
+        if (!is_iadj_kateikei) {
+          appendIchidanKateikeiCandidate(candidates, inflection.analyze(surface), surface, start_pos, kateikei_end,
+                                         base_form, "ichidan_kateikei");
         }
       }
 

@@ -49,6 +49,28 @@ float getIchidanConfidence(const std::vector<grammar::InflectionCandidate>& cand
   return best;
 }
 
+bool appendIchidanKateikeiCandidate(std::vector<UnknownCandidate>& candidates,
+                                    const std::vector<grammar::InflectionCandidate>& analyses,
+                                    const std::string& surface, size_t start_pos, size_t end_pos,
+                                    const std::string& lemma, const char* pattern, bool lemma_verified) {
+  const float confidence = getIchidanConfidence(analyses, candidate::verb_cost::kIchidanKateikeiMinConfidence);
+  if (confidence == candidate::kNoConfidence) {
+    return false;
+  }
+  // Negative cost to beat the split path 語幹+れ(受身)+ば
+  constexpr float kKateikeiCost = candidate::verb_cost::kStrongBonus;
+  SUZUME_DEBUG_VERBOSE_BLOCK {
+    SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface << " " << pattern << " lemma=" << lemma << " conf=" << confidence
+                        << " cost=" << kKateikeiCost << "\n";
+  }
+  auto kateikei_candidate =
+      makeVerbCandidate(surface, start_pos, end_pos, kKateikeiCost, lemma, dictionary::ConjugationType::Ichidan, true,
+                        CandidateOrigin::VerbKanji, confidence, pattern, core::ExtendedPOS::VerbKateikei);
+  kateikei_candidate.lemma_verified = lemma_verified;
+  candidates.push_back(std::move(kateikei_candidate));
+  return true;
+}
+
 void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, size_t start_pos, size_t kanji_end,
                                      size_t hiragana_end, const grammar::Inflection& inflection,
                                      const dictionary::DictionaryManager* dict_manager,
@@ -540,14 +562,8 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
             if (codepoints[renyokei_end] == U'れ' && renyokei_end + 1 < codepoints.size() &&
                 codepoints[renyokei_end + 1] == U'ば') {
               std::string kateikei_surface = extractSubstring(codepoints, start_pos, renyokei_end + 1);
-              float kateikei_confidence = getIchidanConfidence(inflection.analyze(kateikei_surface),
-                                                               candidate::verb_cost::kIchidanKateikeiMinConfidence);
-              if (kateikei_confidence >= candidate::verb_cost::kIchidanKateikeiMinConfidence) {
-                candidates.push_back(makeVerbCandidate(
-                    kateikei_surface, start_pos, renyokei_end + 1, candidate::verb_cost::kStrongBonus, surface + "る",
-                    dictionary::ConjugationType::Ichidan, true, CandidateOrigin::VerbKanji, kateikei_confidence,
-                    "ichidan_kateikei_multi", core::ExtendedPOS::VerbKateikei));
-              }
+              appendIchidanKateikeiCandidate(candidates, inflection.analyze(kateikei_surface), kateikei_surface,
+                                             start_pos, renyokei_end + 1, surface + "る", "ichidan_kateikei_multi");
             }
 
             if (codepoints[renyokei_end] == U'る') {

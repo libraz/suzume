@@ -4,7 +4,9 @@
  */
 
 #include <algorithm>
+#include <array>
 #include <cmath>
+#include <string_view>
 
 #include "analysis/bigram_table.h"
 #include "analysis/candidate_constants.h"
@@ -710,31 +712,27 @@ void appendSelectedKanjiVerbCandidate(const std::vector<char32_t>& codepoints, s
       SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" is an irrealis before the contracted negative\n");
       return;
     }
-    // Skip fake verb candidates homographic with the i-adjective 未然形.
-    // Xかろ(+う) can be a verb volitional stem (分かる → 分かろ+う) or the
-    // i-adjective 未然形 (高い → 高かろ+う); inflection alone yields a
-    // plausible fake base (ichidan 高かる). The lexical signal decides:
-    // when the base form is not a known verb and stem + い is a known
-    // dictionary adjective, prefer the ADJ 未然形 candidate.
-    if (!in_dict && dict_manager != nullptr && utf8::endsWith(surface, "かろ")) {
-      std::string iadj_base = surface.substr(0, surface.size() - 2 * core::kJapaneseCharBytes) + "い";
-      if (vh::isAdjectiveInDictionary(dict_manager, iadj_base)) {
-        SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" ends かろ and " << iadj_base
-                                          << " is i-adjective (prefer ADJ 未然形)\n");
-        return;
-      }
-    }
-    // Skip fake verb candidates homographic with the classical i-adjective
-    // 連体形 (文語). Xき is usually a godan-ka 連用形 (書き ← 書く), but when
-    // the hypothesized base verb is not in the dictionary and stem + い is a
-    // known dictionary adjective (美しき → 美しい), the surface is the
-    // classical attributive form — prefer the ADJ 連体形 candidate.
-    if (!in_dict && dict_manager != nullptr && utf8::endsWith(surface, "き")) {
-      std::string iadj_base = surface.substr(0, surface.size() - core::kJapaneseCharBytes) + "い";
-      if (vh::isAdjectiveInDictionary(dict_manager, iadj_base)) {
-        SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" ends き and " << iadj_base
-                                          << " is i-adjective (prefer ADJ 連体形)\n");
-        return;
+    // Skip fake verb candidates homographic with an i-adjective form. Xかろ(+う)
+    // can be a verb volitional stem (分かる → 分かろ+う) or the i-adjective 未然形
+    // (高い → 高かろ+う); Xき is usually a godan-ka 連用形 (書き ← 書く) but can be
+    // the classical 連体形 (美しき). When the hypothesized base verb is not a known
+    // verb and stem + い is a known dictionary adjective, prefer the adjective form.
+    struct IAdjectiveHomograph {
+      std::string_view suffix;
+      std::string_view label;
+    };
+    constexpr std::array<IAdjectiveHomograph, 2> kIAdjectiveHomographs{{{"かろ", "ADJ 未然形"}, {"き", "ADJ 連体形"}}};
+    if (!in_dict && dict_manager != nullptr) {
+      for (const auto& homograph : kIAdjectiveHomographs) {
+        if (!utf8::endsWith(surface, homograph.suffix)) {
+          continue;
+        }
+        std::string iadj_base = surface.substr(0, surface.size() - homograph.suffix.size()) + "い";
+        if (vh::isAdjectiveInDictionary(dict_manager, iadj_base)) {
+          SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" ends " << homograph.suffix << " and " << iadj_base
+                                            << " is i-adjective (prefer " << homograph.label << ")\n");
+          return;
+        }
       }
     }
     // A one-kanji Ichidan stem spells its continuative bare, and the classical

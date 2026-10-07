@@ -37,11 +37,18 @@ bool startsEvaluativeKotoni(const std::vector<char32_t>& codepoints, size_t star
 
 }  // namespace
 
+void addDictionaryOriginEdge(core::Lattice& lattice, std::string_view surface, size_t start_pos, size_t end_pos,
+                             core::PartOfSpeech pos, float cost, uint8_t flags, std::string_view lemma,
+                             dictionary::ConjugationType conj_type, core::ExtendedPOS epos, std::string_view pattern) {
+  lattice.addEdge(surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(end_pos), pos, cost, flags, lemma,
+                  conj_type, core::CandidateOrigin::Dictionary, candidate::kDictionaryOriginConfidence, {}, epos,
+                  pattern);
+}
+
 void addClosedClassEdge(core::Lattice& lattice, std::string_view surface, size_t start_pos, size_t end_pos,
                         core::PartOfSpeech pos, core::ExtendedPOS epos, std::string_view pattern, uint8_t flags) {
-  lattice.addEdge(surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(end_pos), pos,
-                  analysis::getCategoryCost(epos), flags, surface, dictionary::ConjugationType::None,
-                  core::CandidateOrigin::Dictionary, candidate::kDictionaryOriginConfidence, {}, epos, pattern);
+  addDictionaryOriginEdge(lattice, surface, start_pos, end_pos, pos, analysis::getCategoryCost(epos), flags, surface,
+                          dictionary::ConjugationType::None, epos, pattern);
 }
 
 void addGrammarEdge(core::Lattice& lattice, std::string_view surface, size_t start_pos, size_t end_pos,

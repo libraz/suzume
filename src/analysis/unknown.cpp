@@ -402,32 +402,24 @@ UnknownCandidate makeVerbCandidate(const std::string& surface, size_t start, siz
                                    CandidateOrigin origin, [[maybe_unused]] float confidence,
                                    [[maybe_unused]] const char* pattern, core::ExtendedPOS extended_pos,
                                    [[maybe_unused]] const char* epos_source) {
-  UnknownCandidate candidate;
-  candidate.surface = surface;
-  candidate.start = start;
-  candidate.end = end;
-  candidate.pos = core::PartOfSpeech::Verb;
   const bool godan_i_onbin_hint =
       conj_type == dictionary::ConjugationType::GodanKa || conj_type == dictionary::ConjugationType::GodanGa;
-  candidate.extended_pos = extended_pos != core::ExtendedPOS::Unknown
-                               ? extended_pos
-                               : core::detectVerbForm(surface, {}, false, godan_i_onbin_hint);
-  candidate.cost = cost;
+  const core::ExtendedPOS resolved_epos = extended_pos != core::ExtendedPOS::Unknown
+                                              ? extended_pos
+                                              : core::detectVerbForm(surface, {}, false, godan_i_onbin_hint);
+#ifdef SUZUME_DEBUG_INFO
+  if (epos_source == nullptr) {
+    epos_source = extended_pos != core::ExtendedPOS::Unknown ? "verb_cand_explicit" : "verb_cand_auto";
+  }
+#endif
+  UnknownCandidate candidate = makeCandidate(surface, start, end, core::PartOfSpeech::Verb, cost, has_suffix, origin,
+                                             resolved_epos, epos_source);
   candidate.lemma = lemma;
   candidate.conj_type = conj_type;
-  candidate.has_suffix = has_suffix;
-  candidate.origin = origin;
 #ifdef SUZUME_DEBUG_INFO
   candidate.confidence = confidence;
   if (pattern != nullptr) {
     candidate.pattern = pattern;
-  }
-  if (epos_source != nullptr) {
-    candidate.epos_source = epos_source;
-  } else if (extended_pos != core::ExtendedPOS::Unknown) {
-    candidate.epos_source = "verb_cand_explicit";
-  } else {
-    candidate.epos_source = "verb_cand_auto";
   }
 #endif
   return candidate;

@@ -382,6 +382,14 @@ bool lookupResultsHavePartOfSpeech(const std::vector<dictionary::LookupResult>& 
   });
 }
 
+bool lookupResultsHaveLongerPartOfSpeech(const std::vector<dictionary::LookupResult>& results,
+                                         PartOfSpeechMask pos_mask, size_t min_length_exclusive) {
+  return std::any_of(results.begin(), results.end(), [=](const auto& result) {
+    return result.entry != nullptr && result.length > min_length_exclusive &&
+           (pos_mask & partOfSpeechMask(result.entry->pos)) != 0;
+  });
+}
+
 bool lookupResultsHaveExtendedPOS(const std::vector<dictionary::LookupResult>& results, core::ExtendedPOS extended_pos,
                                   size_t length) {
   return std::any_of(results.begin(), results.end(), [=](const auto& result) {

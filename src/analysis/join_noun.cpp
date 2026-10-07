@@ -128,21 +128,7 @@ bool isAttestedAdjectiveBeforeHead(const dictionary::DictionaryManager& dict_man
 }
 
 bool isCaseParticleCodepoint(char32_t codepoint) {
-  switch (codepoint) {
-    case U'に':
-    case U'で':
-    case U'と':
-    case U'を':
-    case U'が':
-    case U'は':
-    case U'へ':
-    case U'も':
-    case U'か':
-    case U'や':
-      return true;
-    default:
-      return false;
-  }
+  return normalize::isParticleCodepoint(codepoint) && codepoint != U'の';
 }
 
 void addHonorificSamaNounJoinCandidate(core::Lattice& lattice, std::string_view text,

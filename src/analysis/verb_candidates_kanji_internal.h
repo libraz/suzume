@@ -7,6 +7,13 @@ namespace suzume::analysis::kanji_verb_detail {
 
 float getIchidanConfidence(const std::vector<grammar::InflectionCandidate>& candidates, float min_threshold);
 
+// Append an Ichidan 仮定形 candidate when @p analyses confirm an Ichidan reading.
+// Returns whether a candidate was appended.
+bool appendIchidanKateikeiCandidate(std::vector<UnknownCandidate>& candidates,
+                                    const std::vector<grammar::InflectionCandidate>& analyses,
+                                    const std::string& surface, size_t start_pos, size_t end_pos,
+                                    const std::string& lemma, const char* pattern, bool lemma_verified = false);
+
 // Acceptance threshold for a mixed-script godan-ka stem (羽ばた+く): its complete
 // い-onbin past/te cell clears the past/te bar, every other cell the low bar.
 float mixedGodanKaStemThreshold(const grammar::InflectionCandidate& candidate, const VerbCandidateOptions& verb_opts);

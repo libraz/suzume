@@ -68,6 +68,16 @@ static_assert(sizeof(BigramRule) == 3);
 // process during static table construction. Rule tables are verified by unit
 // tests and their constexpr encoded costs are constrained by kCostPalette.
 bool applyRules(BigramMatrix& table, const BigramRule* rules, size_t rule_count);
+
+template <size_t Size>
+bool applyRules(BigramMatrix& table, const BigramRule (&rules)[Size]) {
+  return applyRules(table, rules, Size);
+}
+
+// Overwrites one cell, whatever it held.
+inline void setCost(BigramMatrix& table, core::ExtendedPOS prev, core::ExtendedPOS next, float cost) {
+  table[static_cast<size_t>(prev)][static_cast<size_t>(next)] = encodeCost(cost);
+}
 void inheritRuleProfile(BigramMatrix& table, core::ExtendedPOS source, core::ExtendedPOS target);
 
 void setVerbAndAdjectiveCosts(BigramMatrix& table);

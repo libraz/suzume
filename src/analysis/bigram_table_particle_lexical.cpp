@@ -740,7 +740,7 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
 
       // Note: Particle → AdjStem is allowed for patterns like やる気がなさそう (が+な+さ+そう)
   };
-  applyRules(table, kRules, sizeof(kRules) / sizeof(kRules[0]));
+  applyRules(table, kRules);
 
   setParticleAndLexicalPenaltyCosts(table);
 
@@ -953,7 +953,7 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
       // their connective (なされ+ば), ahead of the homographic lexical verb.
       {EPOS::AuxHonorific, EPOS::ParticleConj, cost::kDoubleVeryStrongBonus},
   };
-  applyRules(table, kClassicalRules, sizeof(kClassicalRules) / sizeof(kClassicalRules[0]));
+  applyRules(table, kClassicalRules);
 }
 
 }  // namespace suzume::analysis::bigram_rules

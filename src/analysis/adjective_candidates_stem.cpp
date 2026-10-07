@@ -297,6 +297,14 @@ bool opensAuxiliaryInsideStem(const dictionary::DictionaryManager* dict_manager,
   return false;
 }
 
+// Append a strongly-preferred i-adjective paradigm cell with the shared origin and confidence.
+void pushIAdjCell(std::vector<UnknownCandidate>& candidates, const std::string& surface, size_t start, size_t end,
+                  const std::string& lemma, core::ExtendedPOS extended_pos, const char* pattern) {
+  candidates.push_back(makeIAdjCellCandidate(surface, start, end, lemma, extended_pos,
+                                             candidate::verb_cost::kStrongBonus, CandidateOrigin::AdjectiveI,
+                                             candidate::kIAdjKaroConfidence, pattern));
+}
+
 }  // namespace
 
 void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
@@ -522,6 +530,7 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
           const std::string ext_okurigana = hiragana_part.substr(0, byte_pos);
           const std::string stem = kanji_part + ext_okurigana;
           const std::string base_form = stem + "い";
+          const bool base_is_dict_adjective = isAdjectiveInDictionary(dict_manager, base_form);
 
           // A productive kanji suffix followed by the independent Sahen
           // continuative has a complete nominal analysis (簡素+化+し+すぎ).
@@ -548,7 +557,7 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
           // (美味し+すぎる).
           const bool sahen_sized_stem = normalize::utf8Length(kanji_part) >= 2 ||
                                         (start_pos > 0 && normalize::isKanjiCodepoint(codepoints[start_pos - 1]));
-          if (ext_okurigana == "し" && sahen_sized_stem && !isAdjectiveInDictionary(dict_manager, base_form)) {
+          if (ext_okurigana == "し" && sahen_sized_stem && !base_is_dict_adjective) {
             has_nominal_sahen_suffix_boundary = true;
           }
           if (has_nominal_sahen_suffix_boundary) {
@@ -561,13 +570,13 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
           if (ext_okurigana.size() >= core::kTwoJapaneseCharBytes && normalize::utf8Length(kanji_part) >= 2 &&
               dict_manager != nullptr &&
               dict_manager->lookupExact(ext_okurigana, core::PartOfSpeech::Auxiliary) != nullptr &&
-              !isAdjectiveInDictionary(dict_manager, base_form)) {
+              !base_is_dict_adjective) {
             continue;
           }
 
           // A verb continuative plus a closed continuation is a predicate chain,
           // not a stem of an unlisted adjective (来+やがる, 食べ+やがる).
-          if (!isAdjectiveInDictionary(dict_manager, base_form) &&
+          if (!base_is_dict_adjective &&
               verb_helpers::startsWithVerbContinuative(dict_manager, normalize::toCodepoints(stem), 0,
                                                        normalize::utf8Length(stem))) {
             continue;
@@ -576,7 +585,7 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
           // A pattern opening on し whose stem plus しい is a listed adjective
           // has taken the し from the adjective's own ending (恥ずか+しそう is
           // 恥ずかし+そう, the stem of 恥ずかしい).
-          if (utf8::startsWith(pattern, "し") && !isAdjectiveInDictionary(dict_manager, base_form) &&
+          if (utf8::startsWith(pattern, "し") && !base_is_dict_adjective &&
               isAdjectiveInDictionary(dict_manager, normalize::concat(stem, "しい"))) {
             continue;
           }
@@ -584,8 +593,7 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
           // A single mora other than the shiku し that sits between a kanji and
           // what follows is a particle of the phrase, not okurigana of an
           // unattested adjective (花+や+さくら, not the stem of 花やい).
-          if (ext_okurigana.size() == core::kJapaneseCharBytes && ext_okurigana != "し" &&
-              !isAdjectiveInDictionary(dict_manager, base_form)) {
+          if (ext_okurigana.size() == core::kJapaneseCharBytes && ext_okurigana != "し" && !base_is_dict_adjective) {
             continue;
           }
 
@@ -620,14 +628,13 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
                 adjective != nullptr && adjective->extended_pos == core::ExtendedPOS::AdjNaAdj;
             // A stem closed by る is a verb terminal before hearsay そう (食べる+そう)
             // unless the adjective it builds is attested (明る+そう).
-            const bool verb_terminal_shape =
-                utf8::endsWith(stem, "る") && !isAdjectiveInDictionary(dict_manager, base_form);
+            const bool verb_terminal_shape = utf8::endsWith(stem, "る") && !base_is_dict_adjective;
             // そ+う is also the volitional of a sa-row derivative, one kanji plus
             // an a-row irrealis (伸ば+そ+う), so an unlisted adjective of that
             // shape needs its own evidence there.
             const auto& sou_analyses = inflection.analyze(normalize::concat(stem, pattern));
             const bool reads_as_sa_row_volitional =
-                !isAdjectiveInDictionary(dict_manager, base_form) && normalize::utf8Length(stem) == 2 &&
+                !base_is_dict_adjective && normalize::utf8Length(stem) == 2 &&
                 normalize::isKanjiCodepoint(utf8::decodeFirstChar(stem)) &&
                 kana::isARowCodepoint(utf8::decodeLastChar(stem)) &&
                 std::any_of(sou_analyses.begin(), sou_analyses.end(), [&](const auto& analysis) {
@@ -651,7 +658,7 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
 
             // Nor may it end on a terminal auxiliary and a conjunctive particle
             // (食べ+たい+し+さ): that is a predicate chain.
-            if (!isAdjectiveInDictionary(dict_manager, base_form) &&
+            if (!base_is_dict_adjective &&
                 verb_helpers::closesOnTerminalAuxiliaryAndConjunctive(dict_manager, codepoints, stem_end)) {
               continue;
             }
@@ -662,8 +669,7 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
                                                  /*include_genitive_and_wa=*/true)) {
               continue;
             }
-            if (!isAdjectiveInDictionary(dict_manager, base_form) &&
-                opensAuxiliaryInsideStem(dict_manager, codepoints, start_pos, stem_end)) {
+            if (!base_is_dict_adjective && opensAuxiliaryInsideStem(dict_manager, codepoints, start_pos, stem_end)) {
               continue;
             }
 
@@ -931,9 +937,8 @@ void appendIAdjClassicalTerminalCandidates(const std::vector<char32_t>& codepoin
         }
       }
     }
-    candidates.push_back(makeIAdjCellCandidate(surface, start_pos, shi_pos + 1, lemma, core::ExtendedPOS::AdjBasic,
-                                               candidate::verb_cost::kStrongBonus, CandidateOrigin::AdjectiveI,
-                                               candidate::kIAdjKaroConfidence, "i_adjective_classical_shi"));
+    pushIAdjCell(candidates, surface, start_pos, shi_pos + 1, lemma, core::ExtendedPOS::AdjBasic,
+                 "i_adjective_classical_shi");
   }
 }
 
@@ -976,10 +981,8 @@ void appendIAdjOnbinRenyokeiCandidates(const std::vector<char32_t>& codepoints, 
                     : !isAdjectiveInDictionary(dict_manager, lemma)) {
       continue;
     }
-    candidates.push_back(makeIAdjCellCandidate(extractSubstring(codepoints, start_pos, u_pos + 1), start_pos, u_pos + 1,
-                                               lemma, core::ExtendedPOS::AdjRenyokei,
-                                               candidate::verb_cost::kStrongBonus, CandidateOrigin::AdjectiveI,
-                                               candidate::kIAdjKaroConfidence, "i_adjective_onbin_renyokei"));
+    pushIAdjCell(candidates, extractSubstring(codepoints, start_pos, u_pos + 1), start_pos, u_pos + 1, lemma,
+                 core::ExtendedPOS::AdjRenyokei, "i_adjective_onbin_renyokei");
   }
 }
 
@@ -1025,10 +1028,8 @@ void appendIAdjKaroCandidates(const std::vector<char32_t>& codepoints, size_t st
     // Verified adjective: make the 未然形 win over fake verb interpretations
     // (ichidan Xかる etc.), mirroring the ke-form handling. AdjMizenkei feeds the
     // AdjMizenkei→AuxVolitional bigram.
-    candidates.push_back(makeIAdjCellCandidate(extractSubstring(codepoints, start_pos, karo_pos + 2), start_pos,
-                                               karo_pos + 2, lemma, core::ExtendedPOS::AdjMizenkei,
-                                               candidate::verb_cost::kStrongBonus, CandidateOrigin::AdjectiveI,
-                                               candidate::kIAdjKaroConfidence, "i_adjective_karo"));
+    pushIAdjCell(candidates, extractSubstring(codepoints, start_pos, karo_pos + 2), start_pos, karo_pos + 2, lemma,
+                 core::ExtendedPOS::AdjMizenkei, "i_adjective_karo");
   }
 }
 
@@ -1239,9 +1240,7 @@ void appendIAdjKaraZuCandidates(const std::vector<char32_t>& codepoints, size_t 
     if (dict_manager != nullptr && dict_manager->lookupExact(surface, core::PartOfSpeech::Auxiliary) != nullptr) {
       continue;
     }
-    candidates.push_back(makeIAdjCellCandidate(surface, start_pos, kara_pos + 2, lemma, cell,
-                                               candidate::verb_cost::kStrongBonus, CandidateOrigin::AdjectiveI,
-                                               candidate::kIAdjKaroConfidence, "i_adjective_kari"));
+    pushIAdjCell(candidates, surface, start_pos, kara_pos + 2, lemma, cell, "i_adjective_kari");
   }
 }
 

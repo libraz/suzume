@@ -91,6 +91,10 @@ bool hasExactPartOfSpeech(const dictionary::DictionaryManager& dict_manager, con
 bool lookupResultsHavePartOfSpeech(const std::vector<dictionary::LookupResult>& results, PartOfSpeechMask pos_mask,
                                    size_t length = 0);
 
+/** Whether dictionary lookup results contain a requested POS strictly longer than @p min_length_exclusive. */
+bool lookupResultsHaveLongerPartOfSpeech(const std::vector<dictionary::LookupResult>& results,
+                                         PartOfSpeechMask pos_mask, size_t min_length_exclusive);
+
 /** Whether dictionary lookup results contain a requested ExtendedPOS, optionally at an exact character length. */
 bool lookupResultsHaveExtendedPOS(const std::vector<dictionary::LookupResult>& results, core::ExtendedPOS extended_pos,
                                   size_t length = 0);
@@ -262,7 +266,10 @@ const std::vector<grammar::InflectionCandidate>& analysesInRange(const grammar::
 /** Whether a position begins a case/topic/nominalizer particle sequence. */
 bool startsNominalForcingParticle(const std::vector<char32_t>& codepoints, size_t pos);
 
-/** Whether a particle category can turn a preceding continuative into a nominal head. */
+/**
+ * Whether a particle category (case, topic, adverbial, no, binding) can turn a preceding
+ * continuative into a nominal head, or marks the boundary after a nominal phrase.
+ */
 bool isNominalForcingParticle(core::ExtendedPOS extended_pos);
 
 /** Whether dictionary evidence at a position starts a nominal-forcing particle. */

@@ -56,25 +56,23 @@ BigramTable::EncodedTable BigramTable::initTable() {
   // carry the connection of a neutral head instead of the manner-adverb penalty.
   {
     bigram_rules::inheritRuleProfile(table, core::ExtendedPOS::Adverb, core::ExtendedPOS::AdverbInterrogative);
-    const size_t interrogative = static_cast<size_t>(core::ExtendedPOS::AdverbInterrogative);
     for (const auto copula : {core::ExtendedPOS::AuxCopulaDa, core::ExtendedPOS::AuxCopulaDesu}) {
-      table[interrogative][static_cast<size_t>(copula)] = bigram_rules::encodeCost(bigram_cost::kMinorBonus);
+      bigram_rules::setCost(table, core::ExtendedPOS::AdverbInterrogative, copula, bigram_cost::kMinorBonus);
     }
   }
   // The pejorative subsidiary やがる continues like the progressive auxiliary but
   // stands directly on a continuative instead of a て form.
   {
     bigram_rules::inheritRuleProfile(table, core::ExtendedPOS::AuxAspectIru, core::ExtendedPOS::AuxPejorativeYagaru);
-    table[static_cast<size_t>(core::ExtendedPOS::VerbRenyokei)]
-         [static_cast<size_t>(core::ExtendedPOS::AuxPejorativeYagaru)] =
-             bigram_rules::encodeCost(bigram_cost::kStrongBonus);
+    bigram_rules::setCost(table, core::ExtendedPOS::VerbRenyokei, core::ExtendedPOS::AuxPejorativeYagaru,
+                          bigram_cost::kStrongBonus);
   }
   // The trace suffix っけ continues like any suffix, and stands on a continuative
   // firmly enough to outrank the homographic final particle (飾り+っけ).
   {
     bigram_rules::inheritRuleProfile(table, core::ExtendedPOS::Suffix, core::ExtendedPOS::SuffixTrace);
-    table[static_cast<size_t>(core::ExtendedPOS::VerbRenyokei)][static_cast<size_t>(core::ExtendedPOS::SuffixTrace)] =
-        bigram_rules::encodeCost(bigram_cost::kDoubleVeryStrongBonus);
+    bigram_rules::setCost(table, core::ExtendedPOS::VerbRenyokei, core::ExtendedPOS::SuffixTrace,
+                          bigram_cost::kDoubleVeryStrongBonus);
   }
   // The colloquial contraction of the hypothetical is a single word that closes
   // a conditional clause. What may follow it is therefore what may follow the
@@ -94,13 +92,12 @@ BigramTable::EncodedTable BigramTable::initTable() {
   // fragment between two kana nouns (りんご+か+みかん).
   {
     bigram_rules::inheritRuleProfile(table, core::ExtendedPOS::ParticleFinal, core::ExtendedPOS::ParticleChoice);
-    const size_t choice = static_cast<size_t>(core::ExtendedPOS::ParticleChoice);
     for (size_t idx = 0; idx < BigramTable::kSize; ++idx) {
       const auto other = static_cast<core::ExtendedPOS>(idx);
       if (core::isNounType(other) || other == core::ExtendedPOS::Pronoun ||
           other == core::ExtendedPOS::PronounInterrogative) {
-        table[choice][idx] = bigram_rules::encodeCost(bigram_cost::kNeutral);
-        table[idx][choice] = bigram_rules::encodeCost(bigram_cost::kRare);
+        bigram_rules::setCost(table, core::ExtendedPOS::ParticleChoice, other, bigram_cost::kNeutral);
+        bigram_rules::setCost(table, other, core::ExtendedPOS::ParticleChoice, bigram_cost::kRare);
       }
     }
   }
@@ -114,15 +111,13 @@ BigramTable::EncodedTable BigramTable::initTable() {
   // heading a nominal is about exactly that modification (the final な against
   // the copular attributive な), and it has no purchase here — while a final
   // particle before a Latin run is the ordinary way a colloquial clause ends.
-  table[static_cast<size_t>(core::ExtendedPOS::ParticleFinal)][static_cast<size_t>(core::ExtendedPOS::NounForeign)] =
-      bigram_rules::encodeCost(bigram_cost::kNeutral);
+  bigram_rules::setCost(table, core::ExtendedPOS::ParticleFinal, core::ExtendedPOS::NounForeign, bigram_cost::kNeutral);
   // A greeting is an interjection that stands as its utterance's predicate, so
   // it takes the complements an exclamation cannot: a case-marked one
   // (みんな+に+ありがとう) and a connective clause (来て+くれ+て+ありがとう).
   bigram_rules::inheritRuleProfile(table, core::ExtendedPOS::Interjection, core::ExtendedPOS::InterjectionGreeting);
   for (const auto complement : {core::ExtendedPOS::ParticleCase, core::ExtendedPOS::ParticleConj}) {
-    table[static_cast<size_t>(complement)][static_cast<size_t>(core::ExtendedPOS::InterjectionGreeting)] =
-        bigram_rules::encodeCost(bigram_cost::kNeutral);
+    bigram_rules::setCost(table, complement, core::ExtendedPOS::InterjectionGreeting, bigram_cost::kNeutral);
   }
 
   // The bare stem of らしい is what the auxiliary's hosts precede, but it only
@@ -146,19 +141,18 @@ BigramTable::EncodedTable BigramTable::initTable() {
   {
     bigram_rules::inheritRuleProfile(table, core::ExtendedPOS::AuxVolitional,
                                      core::ExtendedPOS::AuxClassicalConjectureTerminal);
-    const size_t ramu = static_cast<size_t>(core::ExtendedPOS::AuxClassicalConjectureTerminal);
     for (const auto irrealis :
          {core::ExtendedPOS::VerbMizenkei, core::ExtendedPOS::AdjMizenkei, core::ExtendedPOS::AuxTenseTa}) {
-      table[static_cast<size_t>(irrealis)][ramu] = bigram_rules::encodeCost(bigram_cost::kAlmostNever);
+      bigram_rules::setCost(table, irrealis, core::ExtendedPOS::AuxClassicalConjectureTerminal,
+                            bigram_cost::kAlmostNever);
     }
-    table[static_cast<size_t>(core::ExtendedPOS::VerbShuushikei)][ramu] =
-        bigram_rules::encodeCost(bigram_cost::kStrongBonus);
+    bigram_rules::setCost(table, core::ExtendedPOS::VerbShuushikei, core::ExtendedPOS::AuxClassicalConjectureTerminal,
+                          bigram_cost::kStrongBonus);
   }
 
   // A quotative demonstrative cannot directly complete an adjective stem.
   // Keep appearance そう on its auxiliary path (高+そう, キモ+そう).
-  table[static_cast<size_t>(core::ExtendedPOS::AdjStem)][static_cast<size_t>(core::ExtendedPOS::AdverbQuotative)] =
-      bigram_rules::encodeCost(bigram_cost::kRare);
+  bigram_rules::setCost(table, core::ExtendedPOS::AdjStem, core::ExtendedPOS::AdverbQuotative, bigram_cost::kRare);
   for (auto& row : table) {
     for (uint8_t& encoded_cost : row) {
       if (encoded_cost == bigram_rules::kUnsetCost) {

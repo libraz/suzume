@@ -476,7 +476,7 @@ void setVerbAndAdjectiveCosts(BigramMatrix& table) {
       // Suffixes naturally precede nouns (e.g., honorifics before noun phrases)
       {EPOS::Suffix, EPOS::Noun, cost::kModerateBonus},
   };
-  applyRules(table, kRules, sizeof(kRules) / sizeof(kRules[0]));
+  applyRules(table, kRules);
 }
 
 }  // namespace suzume::analysis::bigram_rules

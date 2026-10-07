@@ -589,7 +589,7 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       {EPOS::AuxNegativeNai, EPOS::ParticleFinal, cost::kModerateBonus},
 
   };
-  applyRules(table, kRules, sizeof(kRules) / sizeof(kRules[0]));
+  applyRules(table, kRules);
 
   setNominalParticleCosts(table);
 
@@ -1012,7 +1012,7 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       // Nominal completion-state suffix (確認+済み, 承認+済み).
       {EPOS::Noun, EPOS::SuffixRecentCompletion, cost::kStrongBonus},
   };
-  applyRules(table, kLexicalNominalRules, sizeof(kLexicalNominalRules) / sizeof(kLexicalNominalRules[0]));
+  applyRules(table, kLexicalNominalRules);
 
   // The causative and passive auxiliaries select a verb's irrealis form and
   // nothing else, so no particle of any role can host one. Stating that over
