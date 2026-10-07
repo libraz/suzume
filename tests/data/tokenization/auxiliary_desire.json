@@ -286,6 +286,82 @@
       ],
       "id": "betaikedo",
       "input": "食べたいけど"
+    },
+    {
+      "description": "Colloquial vowel-fused desiderative",
+      "expected": [
+        {
+          "lemma": "高校時代",
+          "pos": "Noun",
+          "surface": "高校時代"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "戻る",
+          "pos": "Verb",
+          "surface": "戻り"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "てえ"
+        }
+      ],
+      "id": "ni_ritee",
+      "input": "高校時代に戻りてえ"
+    },
+    {
+      "description": "Colloquial vowel-fused desiderative with small vowel",
+      "expected": [
+        {
+          "lemma": "帰る",
+          "pos": "Verb",
+          "surface": "帰り"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "てぇ"
+        }
+      ],
+      "id": "rite",
+      "input": "帰りてぇ"
+    },
+    {
+      "description": "Colloquial desiderative before the nominalizer",
+      "expected": [
+        {
+          "lemma": "食う",
+          "pos": "Verb",
+          "surface": "食い"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "てえ"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        }
+      ],
+      "id": "iteendaga",
+      "input": "食いてえんだが"
     }
   ],
   "description": "auxiliary_desire tests",
