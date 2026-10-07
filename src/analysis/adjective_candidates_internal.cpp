@@ -238,14 +238,28 @@ bool isPredicateChainClosedByAuxiliary(const dictionary::DictionaryManager* dict
          (closes_on_predicate_cell || chain_takes_i);
 }
 
+size_t clippedExclamativeMarkEnd(const std::vector<char32_t>& codepoints, size_t mark_pos) {
+  if (mark_pos >= codepoints.size()) {
+    return 0;
+  }
+  if (codepoints[mark_pos] == core::hiragana::kSmallTsu) {
+    return mark_pos + 1;
+  }
+  size_t end = mark_pos;
+  while (end < codepoints.size() && normalize::isProlongedSoundMark(codepoints[end])) {
+    ++end;
+  }
+  return end > mark_pos ? end : 0;
+}
+
 std::string clippedExclamativeBase(const dictionary::DictionaryManager* dict_manager,
                                    const std::vector<char32_t>& codepoints,
                                    const std::vector<normalize::CharType>& char_types, size_t start,
                                    size_t sokuon_pos) {
-  if (sokuon_pos <= start || sokuon_pos >= codepoints.size() || codepoints[sokuon_pos] != core::hiragana::kSmallTsu) {
+  const size_t after = clippedExclamativeMarkEnd(codepoints, sokuon_pos);
+  if (sokuon_pos <= start || after == 0) {
     return {};
   }
-  const size_t after = sokuon_pos + 1;
   const bool closes_utterance =
       after >= codepoints.size() || (after < char_types.size() && char_types[after] == normalize::CharType::Symbol);
   if (!closes_utterance) {

@@ -316,18 +316,26 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
   // out of the whole-span adjective path.
   constexpr size_t kMaxKanjiAdjectiveStemLength = 6;
   size_t kanji_end = findCharRegionEnd(char_types, start_pos, 2, normalize::CharType::Kanji);
-  // The clipped exclamative on a kanji stem (冷た+っ！, 痛+っ、), with the same
-  // dictionary gate and utterance end as the kana path.
-  for (size_t sokuon_pos = kanji_end;
-       sokuon_pos < char_types.size() && char_types[sokuon_pos] == normalize::CharType::Hiragana; ++sokuon_pos) {
-    if (codepoints[sokuon_pos] != core::hiragana::kSmallTsu) {
+  // The clipped exclamative on a kanji stem (冷た+っ！, 痛+っ、, 少な+ー), with
+  // the same dictionary gate and utterance end as the kana path. A ー after
+  // an i-row mora draws out the final い itself and is read below (嬉しー).
+  for (size_t sokuon_pos = kanji_end; sokuon_pos < char_types.size(); ++sokuon_pos) {
+    const size_t mark_end = adj_detail::clippedExclamativeMarkEnd(codepoints, sokuon_pos);
+    if (mark_end == 0) {
+      if (char_types[sokuon_pos] != normalize::CharType::Hiragana) {
+        break;
+      }
       continue;
+    }
+    if (codepoints[sokuon_pos] != core::hiragana::kSmallTsu && sokuon_pos > kanji_end &&
+        grammar::getVowelForChar(codepoints[sokuon_pos - 1]) == U'い') {
+      break;
     }
     const std::string base_form =
         adj_detail::clippedExclamativeBase(dict_manager, codepoints, char_types, start_pos, sokuon_pos);
     if (!base_form.empty()) {
       auto exclamative = adj_detail::makeIAdjCellCandidate(
-          extractSubstring(codepoints, start_pos, sokuon_pos + 1), start_pos, sokuon_pos + 1, base_form,
+          extractSubstring(codepoints, start_pos, mark_end), start_pos, mark_end, base_form,
           core::ExtendedPOS::AdjBasic, candidate::kAdjStemDictionaryCost, CandidateOrigin::AdjectiveI,
           candidate::kDictionaryOriginConfidence, "adj_stem_kanji_exclamative_sokuon");
       exclamative.lemma_verified = true;
@@ -356,6 +364,18 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
             candidate::kDictionaryOriginConfidence, "adj_kanji_prolonged_final_i");
         prolonged.lemma_verified = true;
         candidates.push_back(std::move(prolonged));
+      }
+    }
+    // The stem vowel drawn out in front of the terminal い (高ーい, 長ーい, 少なーい).
+    if (prolonged_end > okurigana_end && prolonged_end < codepoints.size() && codepoints[prolonged_end] == U'い') {
+      const std::string base_form = extractSubstring(codepoints, start_pos, okurigana_end) + "い";
+      if (verb_helpers::isIAdjectiveInDictionary(dict_manager, base_form)) {
+        auto drawn_out = adj_detail::makeIAdjCellCandidate(
+            extractSubstring(codepoints, start_pos, prolonged_end + 1), start_pos, prolonged_end + 1, base_form,
+            core::ExtendedPOS::AdjBasic, candidate::kAdjStemDictionaryCost, CandidateOrigin::AdjectiveI,
+            candidate::kDictionaryOriginConfidence, "adj_kanji_prolonged_stem");
+        drawn_out.lemma_verified = true;
+        candidates.push_back(std::move(drawn_out));
       }
     }
   }

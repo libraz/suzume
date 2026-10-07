@@ -451,6 +451,45 @@
       ],
       "id": "shi_10",
       "input": "嬉しー"
+    },
+    {
+      "description": "Kanji adjective stem closed by a drawn-out vowel is the clipped exclamative",
+      "expected": [
+        {
+          "lemma": "量",
+          "pos": "Noun",
+          "surface": "量"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "少ない",
+          "pos": "Adjective",
+          "surface": "少なー"
+        }
+      ],
+      "id": "ga_na",
+      "input": "量が少なー"
+    },
+    {
+      "description": "Stem vowel drawn out before the terminal い of a kanji adjective",
+      "expected": [
+        {
+          "lemma": "長い",
+          "pos": "Adjective",
+          "surface": "長ーい"
+        },
+        {
+          "lemma": "話",
+          "pos": "Noun",
+          "surface": "話"
+        }
+      ],
+      "id": "i_12",
+      "input": "長ーい話"
     }
   ],
   "description": "Taru-adjectives and irregular adjectives",

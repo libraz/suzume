@@ -199,11 +199,12 @@ def _invents_a_word_for(raw: tuple[int, dict[int, dict]], position: int) -> bool
 
 
 def _splits_closing_particle(text: str, raw: tuple[int, dict[int, dict]], position: int) -> bool:
-    """Whether a held small vowel tears its host mora off a clause-closing particle.
+    """Whether a held vowel tears its host mora off a clause-closing particle or adjective stem.
 
     The dictionary reads the host mora plus the vowel as a word of its own
-    (け + どぉ), so nothing is invented at the mark itself. Without the mark the
-    host mora closes a particle that starts earlier (けど, から, のに).
+    (け + どぉ, 少 + なー), so nothing is invented at the mark itself. Without the
+    mark the host mora closes a particle or the exclamative adjective stem that
+    starts earlier (けど, から, のに, 少な).
     """
     host = position - 1
     if raw[1].get(host) is None:
@@ -214,7 +215,17 @@ def _splits_closing_particle(text: str, raw: tuple[int, dict[int, dict]], positi
         return False
     start = max(starts)
     token = probe[start]
-    return start < host and start + len(token.get("surface", "")) == position and token.get("pos") == "助詞"
+    return start < host and start + len(token.get("surface", "")) == position and token.get("pos") in ("助詞", "形容詞")
+
+
+def _draws_out_adjective_stem(text: str, position: int) -> bool:
+    """Whether a ー inside a kanji adjective is its stem vowel drawn out before い (高ーい, 長ーい)."""
+    probe = _raw_analysis(text[:position] + text[position + 1 :])[1]
+    starts = [start for start in probe if start < position]
+    if not starts:
+        return False
+    token = probe[max(starts)]
+    return token.get("pos") == "形容詞" and max(starts) + len(token.get("surface", "")) == position + 1
 
 
 def _joins_word_across_sokuon(text: str, raw: tuple[int, dict[int, dict]], position: int) -> bool:
@@ -534,6 +545,14 @@ def preprocess_for_mecab(text: str) -> tuple[str, dict[tuple[int, str], dict], t
             replacements[(emphatic_sokuon - 1, "emphatic_sokuon")] = {
                 "original": text[emphatic_sokuon - 1 : emphatic_sokuon + 1],
                 "replacement": text[emphatic_sokuon - 1],
+                "length": 2,
+            }
+
+    for m in regex.finditer(r"(?<=\p{Han}\p{Hiragana}?)ー(?=い)", text):
+        if _draws_out_adjective_stem(text, m.start()):
+            replacements[(m.start() - 1, "emphatic_sokuon")] = {
+                "original": text[m.start() - 1 : m.end()],
+                "replacement": text[m.start() - 1],
                 "length": 2,
             }
 
