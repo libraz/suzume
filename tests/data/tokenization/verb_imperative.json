@@ -356,6 +356,80 @@
       ],
       "id": "ga_ke",
       "input": "君が書け。"
+    },
+    {
+      "description": "字が書け、絵も描ける - auto-generated",
+      "expected": [
+        {
+          "lemma": "字",
+          "pos": "Noun",
+          "surface": "字"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "書ける",
+          "pos": "Verb",
+          "surface": "書け"
+        },
+        {
+          "lemma": "絵",
+          "pos": "Noun",
+          "surface": "絵"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "描ける",
+          "pos": "Verb",
+          "surface": "描ける"
+        }
+      ],
+      "id": "ga_ke_mo_keru",
+      "input": "字が書け、絵も描ける"
+    },
+    {
+      "description": "手紙を書け、と言った - auto-generated",
+      "expected": [
+        {
+          "lemma": "手紙",
+          "pos": "Noun",
+          "surface": "手紙"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "書く",
+          "pos": "Verb",
+          "surface": "書け"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wo_ke_to_ttta",
+      "input": "手紙を書け、と言った"
     }
   ],
   "description": "verb_imperative tests",

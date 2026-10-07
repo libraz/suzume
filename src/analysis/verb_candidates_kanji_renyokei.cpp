@@ -158,9 +158,17 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
                                      follows_topic_particle || follows_quotative_determiner);
         bool prefer_suru = !causative_follows && !passive_follows && !negative_predicate_context &&
                            !ichidan_base_is_dict && (suru_cand.confidence > ichidan_cand.confidence);
+        // Before a chaining comma an e-row okurigana is no godan continuative:
+        // the godan reads it only as an imperative or hypothetical, neither of
+        // which suspends a clause, so the potential continuative stays offered
+        // even when the godan base is listed (字が+書け、). A comma in front of
+        // the quotative と closes a quoted sentence instead (書け、と言った).
+        const bool comma_suspends_clause = comma_clause_chaining && renyokei_end + 1 < codepoints.size() &&
+                                           codepoints[renyokei_end + 1] != core::hiragana::kTo;
+        const bool comma_chained_e_row = comma_suspends_clause && kana::isERowCodepoint(first_hira);
         bool prefer_godan = !causative_follows && !passive_follows && !negative_predicate_context &&
                             !ichidan_base_is_dict && (!comma_clause_chaining || godan_base_is_dict) &&
-                            (godan_cand.confidence > ichidan_cand.confidence);
+                            !comma_chained_e_row && (godan_cand.confidence > ichidan_cand.confidence);
         // Use different thresholds for e-row vs i-row patterns:
         // - I-row (じ, み, etc.): lower threshold (0.28) - these are distinctively verb stems
         //   and get penalized by ichidan_kanji_i_row_stem, so need lower threshold
@@ -383,6 +391,7 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
         // A bare potential stem with nothing to carry is the listed verb's own
         // e-row cell (書け+今), not the potential (書け+ない).
         const bool stranded_potential_stem =
+            !comma_suspends_clause &&
             vh::isStrandedPotentialStem(dict_manager, ichidan_cand.base_form, codepoints, renyokei_end);
         // An unattested stem whose okurigana is a final particle that attaches to
         // a bare nominal (水+ね, 花+ね) is that particle wherever the particle can

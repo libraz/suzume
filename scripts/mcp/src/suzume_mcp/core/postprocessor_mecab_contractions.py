@@ -592,8 +592,9 @@ def repair_sentence_final_godan_imperative(tokens: list[dict]) -> None:
     The reference lemmatizes a bare e-row verb as the continuative of the
     potential (君が行け → 行ける), but a continuative cannot end a sentence,
     so there it is the imperative of the godan verb (行く).  A comma keeps the
-    suspended continuative (道が分かれ、進む), and a true ichidan stem with no
-    godan base (見せ) is left alone.
+    suspended continuative (道が分かれ、進む) unless the quotative と follows it,
+    which closes a quoted sentence (書け、と言った).  A true ichidan stem with
+    no godan base (見せ) is left alone.
     """
     for idx, token in enumerate(tokens):
         surface = token.get("surface", "")
@@ -607,9 +608,15 @@ def repair_sentence_final_godan_imperative(tokens: list[dict]) -> None:
         ):
             continue
         following = tokens[idx + 1] if idx + 1 < len(tokens) else None
+        after_comma = tokens[idx + 2] if idx + 2 < len(tokens) else None
+        quoted_after_comma = (
+            after_comma is not None and after_comma.get("surface") == "と" and after_comma.get("pos_sub2") == "引用"
+        )
         # A final particle is no evidence: よ also closes the ichidan
         # imperative (求め+よ), whose base the reference reads as classical 求む.
-        if following is not None and not (following.get("pos") == "記号" and following.get("pos_sub1") != "読点"):
+        if following is not None and not (
+            following.get("pos") == "記号" and (following.get("pos_sub1") != "読点" or quoted_after_comma)
+        ):
             continue
         base = mecab_analyze(surface[:-1] + base_suffix)
         if len(base) != 1 or base[0].get("pos") != "動詞" or not base[0].get("conj_type", "").startswith("五段"):
