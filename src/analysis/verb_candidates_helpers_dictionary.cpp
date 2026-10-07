@@ -130,6 +130,34 @@ bool absorbsRegisteredClosedCell(const dictionary::DictionaryManager* dict_manag
   return false;
 }
 
+NominalBeforeSokuon nominalEndsBeforeSokuon(const dictionary::DictionaryManager* dict_manager,
+                                            const std::vector<char32_t>& codepoints, size_t stem_start,
+                                            size_t sokuon_pos) {
+  if (dict_manager == nullptr || stem_start >= sokuon_pos || sokuon_pos > codepoints.size()) {
+    return NominalBeforeSokuon::None;
+  }
+  constexpr size_t kMaxNominalChars = 4;
+  NominalBeforeSokuon found = NominalBeforeSokuon::None;
+  for (size_t nominal_end = stem_start + 1; nominal_end <= sokuon_pos; ++nominal_end) {
+    const bool suffix_closes =
+        nominal_end == sokuon_pos ||
+        lookupEntryInRange(*dict_manager, codepoints, nominal_end, sokuon_pos, core::PartOfSpeech::Suffix) != nullptr;
+    if (!suffix_closes) {
+      continue;
+    }
+    const size_t earliest = nominal_end > kMaxNominalChars ? nominal_end - kMaxNominalChars : 0;
+    for (size_t begin = earliest; begin <= stem_start; ++begin) {
+      if (lookupEntryInRange(*dict_manager, codepoints, begin, nominal_end, core::PartOfSpeech::Pronoun) != nullptr) {
+        return NominalBeforeSokuon::Pronoun;
+      }
+      if (lookupEntryInRange(*dict_manager, codepoints, begin, nominal_end, core::PartOfSpeech::Noun) != nullptr) {
+        found = NominalBeforeSokuon::Noun;
+      }
+    }
+  }
+  return found;
+}
+
 bool isQuantityClosingSuffixAt(const dictionary::DictionaryManager* dict_manager,
                                const std::vector<char32_t>& codepoints, size_t pos) {
   if (dict_manager == nullptr || pos >= codepoints.size() || !normalize::isKanjiCodepoint(codepoints[pos]) ||

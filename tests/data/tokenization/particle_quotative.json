@@ -244,6 +244,77 @@
       ],
       "id": "dattteta",
       "input": "雨だってた"
+    },
+    {
+      "description": "彼らって - auto-generated",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "ら",
+          "pos": "Suffix",
+          "surface": "ら"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        }
+      ],
+      "id": "rattte",
+      "input": "彼らって"
+    },
+    {
+      "description": "君らってさ - auto-generated",
+      "expected": [
+        {
+          "lemma": "君",
+          "pos": "Pronoun",
+          "surface": "君"
+        },
+        {
+          "lemma": "ら",
+          "pos": "Suffix",
+          "surface": "ら"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Particle",
+          "surface": "さ"
+        }
+      ],
+      "id": "ratttesa",
+      "input": "君らってさ"
+    },
+    {
+      "description": "僕らって - auto-generated",
+      "expected": [
+        {
+          "lemma": "僕",
+          "pos": "Pronoun",
+          "surface": "僕"
+        },
+        {
+          "lemma": "ら",
+          "pos": "Suffix",
+          "surface": "ら"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        }
+      ],
+      "id": "rattte_2",
+      "input": "僕らって"
     }
   ],
   "description": "particle_quotative tests",

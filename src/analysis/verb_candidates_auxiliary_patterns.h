@@ -213,7 +213,8 @@ bool colloquialNegativeFollowsAt(const std::vector<char32_t>& codepoints, size_t
  *
  * てる, てた, ちゃう and てない have no quotative reading: the quotative って is
  * never followed by る, た, ち or な, so a sokuonbin before them is a verb's
- * te-form (沼っ+てる, ディスっ+てる), not a nominal plus って.
+ * te-form (沼っ+てる, ディスっ+てる), not a nominal plus って. Only the ない
+ * paradigm counts for な (沼っ+て+ない, not 猫+って+なんで).
  */
 bool contractedTeContinuationFollowsAt(const std::vector<char32_t>& codepoints, size_t pos);
 

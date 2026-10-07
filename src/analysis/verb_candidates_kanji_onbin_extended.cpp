@@ -245,7 +245,16 @@ void appendExtendedSokuonbinCandidates(const std::vector<char32_t>& codepoints, 
       const bool onbin_spells_bound_suffix =
           !in_dict && (grammar::spellsBoundDerivationalSuffixCell(extractSubstring(codepoints, kanji_end, onbin_end)) ||
                        opensOnCaseParticleThenDictVerb(dict_manager, codepoints, kanji_end, onbin_end - 1));
-      if (!is_adj_katt_form && !onbin_spells_bound_suffix && (in_dict || infl_verified)) {
+      // An inferred stem that ends on a dictionary nominal (彼+ら, 子供+ら) puts
+      // the particle って after it. Only a contracted te-continuation makes a
+      // noun a denominal verb (沼っ+てる); a pronoun never inflects.
+      const vh::NominalBeforeSokuon nominal_before_sokuon =
+          in_dict ? vh::NominalBeforeSokuon::None
+                  : vh::nominalEndsBeforeSokuon(dict_manager, codepoints, start_pos, onbin_end - 1);
+      const bool sokuon_follows_nominal = nominal_before_sokuon == vh::NominalBeforeSokuon::Pronoun ||
+                                          (nominal_before_sokuon == vh::NominalBeforeSokuon::Noun &&
+                                           !vh::contractedTeContinuationFollowsAt(codepoints, hiragana_end));
+      if (!is_adj_katt_form && !onbin_spells_bound_suffix && !sokuon_follows_nominal && (in_dict || infl_verified)) {
         // Verified - generate candidate
         float cost = candidate::verb_cost::kModerateBonus;
         if (crosses_completed_past) {
@@ -342,6 +351,15 @@ void appendExtendedSokuonbinCandidates(const std::vector<char32_t>& codepoints, 
 
     if (!in_dict_check && opensOnCaseParticleThenDictVerb(dict_manager, codepoints, kanji_end, pos)) {
       continue;
+    }
+    // As on the trailing-っ path: a stem ending on a dictionary nominal (君+ら)
+    // takes the particle って, unless a te-continuation makes a noun denominal.
+    if (!in_dict_check) {
+      const vh::NominalBeforeSokuon nominal = vh::nominalEndsBeforeSokuon(dict_manager, codepoints, start_pos, pos);
+      if (nominal == vh::NominalBeforeSokuon::Pronoun ||
+          (nominal == vh::NominalBeforeSokuon::Noun && !vh::contractedTeContinuationFollowsAt(codepoints, pos + 2))) {
+        continue;
+      }
     }
     bool infl_verified =
         !in_dict_check && sokuonbinInflVerified(inflection, onbin_surface, potential_base, hiragana_before_onbin);

@@ -151,8 +151,8 @@ bool colloquialNegativeFollowsAt(const std::vector<char32_t>& codepoints, size_t
 }
 
 bool contractedTeContinuationFollowsAt(const std::vector<char32_t>& codepoints, size_t pos) {
-  return pos < codepoints.size() &&
-         (codepoints[pos] == U'る' || codepoints[pos] == U'た' || codepoints[pos] == U'ち' || codepoints[pos] == U'な');
+  return pos < codepoints.size() && (codepoints[pos] == U'る' || codepoints[pos] == U'た' || codepoints[pos] == U'ち' ||
+                                     (codepoints[pos] == U'な' && naiNegativeFollowsAt(codepoints, pos)));
 }
 
 bool particleClosesClauseBeforeSokuon(const std::vector<char32_t>& codepoints, size_t sokuon_pos) {

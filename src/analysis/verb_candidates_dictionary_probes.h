@@ -132,6 +132,21 @@ bool absorbsRegisteredClosedCell(const dictionary::DictionaryManager* dict_manag
                                  const grammar::Inflection& inflection, const std::vector<char32_t>& codepoints,
                                  size_t start_pos, size_t kanji_end, size_t end);
 
+/** @brief What a dictionary nominal ending right before a sokuon is */
+enum class NominalBeforeSokuon : uint8_t { None, Noun, Pronoun };
+
+/**
+ * @brief Whether a dictionary noun or pronoun, optionally plus a dictionary
+ * suffix (彼+ら, 子供+ら), ends exactly at @p sokuon_pos
+ *
+ * The nominal may start anywhere before the proposal's stem (お前+ら, 子供+ら),
+ * but must reach into it at @p stem_start. A sokuon right after such a nominal
+ * opens the particle って on it rather than an onbin of a verb built on it.
+ */
+NominalBeforeSokuon nominalEndsBeforeSokuon(const dictionary::DictionaryManager* dict_manager,
+                                            const std::vector<char32_t>& codepoints, size_t stem_start,
+                                            size_t sokuon_pos);
+
 /** @brief namesDictionaryVerbContinuative over the one kanji before @p okurigana_pos */
 inline bool namesDictionaryVerbContinuative(const dictionary::DictionaryManager* dict_manager,
                                             const std::vector<char32_t>& codepoints, size_t okurigana_pos) {

@@ -381,7 +381,12 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
       }
     }
 
-    if (matched_verb_type != grammar::VerbType::Unknown && !sokuon_heads_dictionary_particle) {
+    // A pronoun never inflects, so a te-continuation does not make it a verb
+    // the way it does a noun (沼っ+てる).
+    const bool stem_ends_on_pronoun =
+        !matched_via_dict &&
+        vh::nominalEndsBeforeSokuon(dict_manager, codepoints, start_pos, kanji_end) == vh::NominalBeforeSokuon::Pronoun;
+    if (matched_verb_type != grammar::VerbType::Unknown && !sokuon_heads_dictionary_particle && !stem_ends_on_pronoun) {
       // Found valid verb - generate sokuonbin stem candidate
       // Dict-matched verbs get bonus (-0.5) to beat unsplit forms
       // Inflection-only matches get neutral cost (0) to avoid false positives
