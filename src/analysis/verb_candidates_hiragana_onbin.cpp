@@ -109,8 +109,15 @@ void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, s
 
     // Get the stem (part before onbin character)
     std::string stem = extractSubstring(codepoints, start_pos, onbin_pos);
-    // っ+て after a clause-closing particle is the quotative (いいか+って).
-    if (is_sokuonbin && next_char == U'て' && onbin_pos >= start_pos + 2 &&
+    // っ+て after a clause-closing particle is the quotative (いいか+って),
+    // unless an aspect auxiliary follows, which only a te-form hosts
+    // (ただよっ+て+いた).
+    const bool aspect_follows_te =
+        next_char == U'て' &&
+        vh::auxiliaryFollowsAt(dict_manager, codepoints, onbin_pos + 2, [](const dictionary::DictionaryEntry& entry) {
+          return core::isAspectAuxiliaryType(entry.extended_pos);
+        });
+    if (is_sokuonbin && next_char == U'て' && onbin_pos >= start_pos + 2 && !aspect_follows_te &&
         vh::particleClosesClauseBeforeSokuon(codepoints, onbin_pos)) {
       continue;
     }

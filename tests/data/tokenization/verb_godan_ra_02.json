@@ -528,6 +528,80 @@
       ],
       "id": "womamottta",
       "input": "約束をまもった"
+    },
+    {
+      "description": "Kana godan sokuonbin te-form before aspect いる whose stem ends in a final-particle mora",
+      "expected": [
+        {
+          "lemma": "腕",
+          "pos": "Noun",
+          "surface": "腕"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "つねる",
+          "pos": "Verb",
+          "surface": "つねっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wotsunettteita",
+      "input": "腕をつねっていた"
+    },
+    {
+      "description": "Kana godan sokuonbin te-form before aspect いる whose stem ends in a final-particle mora",
+      "expected": [
+        {
+          "lemma": "道",
+          "pos": "Noun",
+          "surface": "道"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "うねる",
+          "pos": "Verb",
+          "surface": "うねっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "gaunettteita",
+      "input": "道がうねっていた"
     }
   ],
   "description": "Godan Ra-row verbs (五段ラ行動詞) - verbs ending in る (part 2/2)",

@@ -77,6 +77,17 @@ bool spansConjunctionStart(const UnknownCandidate& candidate, const std::vector<
         // (変更+に, not 変+更に).  Keep that noun candidate so the lattice can
         // evaluate the grammatical case boundary.  Topic-final conjunctions
         // such as 又は remain protected by the ordinary hard boundary below.
+        // A conjunction takes no auxiliary, so one ending in て with an aspect
+        // auxiliary behind it is a te-form (ただよっ+て+いた, not よって).
+        const bool aspect_follows_te =
+            grammar::isTeDeSurface(extractSubstring(codepoints, conjunction_end - 1, conjunction_end)) &&
+            verb_helpers::auxiliaryFollowsAt(dict_manager, codepoints, conjunction_end,
+                                             [](const dictionary::DictionaryEntry& entry) {
+                                               return core::isAspectAuxiliaryType(entry.extended_pos);
+                                             });
+        if (aspect_follows_te) {
+          continue;
+        }
         const bool conjunction_leaves_one_case_particle =
             boundary + 1 == candidate.end && conjunction_end == candidate.end + 1;
         if (conjunction_leaves_one_case_particle) {
