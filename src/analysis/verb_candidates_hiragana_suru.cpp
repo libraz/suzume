@@ -7,7 +7,7 @@
 #include "analysis/candidate_constants.h"
 #include "analysis/join_compound_verb_internal.h"
 #include "analysis/tokenizer_utils.h"
-#include "analysis/verb_candidates_helpers.h"
+#include "analysis/verb_candidates_dictionary_probes.h"
 #include "analysis/verb_candidates_hiragana_internal.h"
 #include "normalize/char_type.h"
 #include "normalize/exceptions.h"

@@ -3,7 +3,6 @@
  * @brief V1 verification and V2 matching for compound verbs
  */
 #include "analysis/dictionary_probe.h"
-#include "analysis/verb_candidates_helpers.h"
 #include "compound_verb_v2_cells_internal.h"
 #include "grammar/char_patterns.h"
 #include "join_compound_verb_internal.h"
@@ -62,7 +61,7 @@ bool rejectsHiraganaV1(const CompoundMatchContext& ctx, bool& hiragana_v1_in_dic
   // predicate (き+た of 流れてきた, れ+た of 落とされた), and joining it would
   // build a lexical verb on top of a finished clause. The V2 side of this
   // boundary is guarded by the past-auxiliary test further down.
-  // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+  // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
   if (v2_start > start_pos && kana::isARowCodepoint(codepoints[v2_start - 1])) {
     SUZUME_DEBUG_LOG_VERBOSE("[COMPOUND] rejected a-row tail on hiragana V1: " << v1_surface << "\n");
     return true;

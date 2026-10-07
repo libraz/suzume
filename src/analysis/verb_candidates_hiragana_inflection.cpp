@@ -10,7 +10,10 @@
 #include "analysis/candidate_constants.h"
 #include "analysis/dictionary_probe.h"
 #include "analysis/scorer_constants.h"
-#include "analysis/verb_candidates_helpers.h"
+#include "analysis/verb_candidates_absorption_guards.h"
+#include "analysis/verb_candidates_auxiliary_patterns.h"
+#include "analysis/verb_candidates_classical.h"
+#include "analysis/verb_candidates_dictionary_probes.h"
 #include "analysis/verb_candidates_hiragana_internal.h"
 #include "core/debug.h"
 #include "core/kana_constants.h"
@@ -184,7 +187,7 @@ bool admitsUnattestedSpan(const InflectedScanContext& ctx, InflectedSpan& span) 
   // (とうきょう, でしょう); that row keeps its own scanner-verified gate below.
   // A run closing on the polite copula after its okurigana is a nominal plus
   // です (ごはん+です), which no verb's own terminal spells.
-  // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+  // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
   if (!is_dictionary_verb && vh::closesOnPoliteCopula(dict_manager, codepoints, start_pos, end_pos)) {
     SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << surface << "\" closes on the polite copula\n");
     return false;
@@ -231,7 +234,7 @@ bool admitsUnattestedSpan(const InflectedScanContext& ctx, InflectedSpan& span) 
   // perfect's continuative plus けり, not a form of にける. The agreement is
   // what licenses the split — と+ける decomposes exactly like に+ける, and
   // 雪がとける keeps the verb because nothing there is demanding a cell.
-  // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+  // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
   if (!is_dictionary_verb && end_pos == codepoints.size() &&
       vh::governingKakariMusubi(dict_manager, codepoints, start_pos) == vh::KakariMusubi::Rentaikei &&
       vh::endsWithClassicalAuxiliary(dict_manager, codepoints, start_pos, end_pos)) {
@@ -244,7 +247,7 @@ bool admitsUnattestedSpan(const InflectedScanContext& ctx, InflectedSpan& span) 
   // plus the volitional う, and the tables read that as the dictionary form of
   // the non-word しょう. The chain test above cannot see it, because the
   // auxiliary boundary lies outside the fabricated span.
-  // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+  // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
   if (!is_dictionary_verb && vh::opensOnClosedClassWordTail(dict_manager, codepoints, start_pos, end_pos)) {
     SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << surface << "\" opens on a closed-class word tail\n");
     return false;
@@ -880,7 +883,7 @@ bool appendStemBeforeConnective(const InflectedScanContext& ctx, const Inflected
     // the host verb (…ぎ+たれ+ば, …ら+ざれ+ば). Promoting the whole span
     // then fabricates a lemma out of the auxiliary, so leave the boundary
     // to the ordinary candidate path unless the base form is attested.
-    // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+    // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
     if (vh::endsWithAuxiliaryAfterOkurigana(dict_manager, codepoints, start_pos, stem_end) &&
         !vh::isVerbInDictionary(dict_manager, best.base_form)) {
       return true;

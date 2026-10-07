@@ -11,8 +11,13 @@
 #include "analysis/candidate_constants.h"
 #include "analysis/dictionary_probe.h"
 #include "analysis/scorer_constants.h"
-#include "analysis/verb_candidates_helpers.h"
+#include "analysis/tokenizer_utils.h"
+#include "analysis/verb_candidates_absorption_guards.h"
+#include "analysis/verb_candidates_auxiliary_patterns.h"
+#include "analysis/verb_candidates_classical.h"
+#include "analysis/verb_candidates_dictionary_probes.h"
 #include "analysis/verb_candidates_kanji_internal.h"
+#include "analysis/verb_candidates_verb_stems.h"
 #include "core/debug.h"
 #include "core/kana_constants.h"
 #include "core/utf8_constants.h"
@@ -154,7 +159,7 @@ bool appendGodanIzenkeiCandidate(const std::vector<char32_t>& codepoints, size_t
   // Resolve the tail from the auxiliary inventory instead of naming one cell,
   // so the whole closed class is covered at once. A dictionary-attested
   // lexical verb such as ござる retains its genuine ござれ+ば paradigm.
-  // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+  // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
   if ((vh::endsWithAuxiliaryAfterOkurigana(dict_manager, codepoints, kanji_end, cell_end) ||
        oneMoraAuxiliaryClosesAttestedIrrealis(codepoints, start_pos, kanji_end, cell_end, dict_manager)) &&
       !vh::isVerbInDictionary(dict_manager, best.base_form)) {
@@ -178,7 +183,7 @@ bool appendGodanIzenkeiCandidate(const std::vector<char32_t>& codepoints, size_t
     return false;
   }
   // 書い+とけ+ば: the ておく contraction leaves no て for the te-form guards.
-  // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+  // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
   if (vh::embedsAuxiliaryOnOnbinStem(codepoints, kanji_end, cell_end, dict_manager)) {
     return false;
   }

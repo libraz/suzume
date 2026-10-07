@@ -7,6 +7,7 @@
 
 #include "grammar/honorific_verbs.h"
 #include "join_compound_verb_internal.h"
+#include "verb_candidates_verb_stems.h"
 
 namespace suzume::analysis {
 

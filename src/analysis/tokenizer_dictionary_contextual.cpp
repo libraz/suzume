@@ -15,7 +15,7 @@
 #include "normalize/char_type.h"
 #include "normalize/utf8.h"
 #include "tokenizer_dictionary_internal.h"
-#include "verb_candidates_helpers.h"
+#include "verb_candidates_auxiliary_patterns.h"
 
 namespace suzume::analysis::tokenizer_dictionary_detail {
 

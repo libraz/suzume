@@ -7,7 +7,9 @@
 
 #include "analysis/candidate_constants.h"
 #include "analysis/dictionary_probe.h"
-#include "analysis/verb_candidates_helpers.h"
+#include "analysis/verb_candidates_absorption_guards.h"
+#include "analysis/verb_candidates_auxiliary_patterns.h"
+#include "analysis/verb_candidates_dictionary_probes.h"
 #include "core/debug.h"
 #include "core/kana_constants.h"
 #include "core/utf8_constants.h"
@@ -75,7 +77,7 @@ const grammar::InflectionCandidate* readContractedHypothetical(const std::vector
   // one (本が読めりゃ is 本 + が + 読めりゃ). The fused mora itself is exempt: the
   // i-row kana it starts with spells the case particle に for the な row
   // (死にゃ), and there the mora belongs to the inflection.
-  // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+  // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
   if (vh::embedsCaseParticle(dict_manager, codepoints, start_pos, contracted_end - 1)) {
     return nullptr;
   }
@@ -93,7 +95,7 @@ const grammar::InflectionCandidate* readContractedHypothetical(const std::vector
   // The negative auxiliary contracts the same way and is registered as its own
   // paradigm cell, so a run ending in one is [verb] + auxiliary and the verb
   // keeps its own boundary (書か + なきゃ, never a form of the non-word 書かなく).
-  // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+  // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
   for (size_t tail_start = start_pos + 1; dict_manager != nullptr && tail_start < contracted_end; ++tail_start) {
     if (lookupEntryInRange(*dict_manager, codepoints, tail_start, contracted_end, core::PartOfSpeech::Auxiliary) !=
         nullptr) {

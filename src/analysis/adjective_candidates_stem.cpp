@@ -23,8 +23,13 @@
 #include "normalize/exceptions.h"
 #include "normalize/utf8.h"
 #include "suffix_candidates.h"
+#include "tokenizer_utils.h"
 #include "unknown.h"
-#include "verb_candidates_helpers.h"
+#include "verb_candidates_absorption_guards.h"
+#include "verb_candidates_auxiliary_patterns.h"
+#include "verb_candidates_dictionary_probes.h"
+#include "verb_candidates_emphatic.h"
+#include "verb_candidates_verb_stems.h"
 
 namespace suzume::analysis {
 
@@ -605,7 +610,7 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
             }
             // The さ must be the nominalizer, not the first mora of a longer
             // closed class beginning with it (飲む+さかい).
-            // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+            // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
             if (dict_manager != nullptr && hiragana_part.size() > byte_pos + pattern.size()) {
               const std::string_view closed_tail = std::string_view(hiragana_part).substr(byte_pos);
               if (dict_manager->lookupExact(closed_tail, core::PartOfSpeech::Particle) != nullptr) {
@@ -655,7 +660,7 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
             }
             // The okurigana scan runs past a case particle and reaches the next
             // word's kana (水 + を + くみ read as the stem of the non-word 水をくい).
-            // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+            // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
             if (verb_helpers::embedsCaseParticle(dict_manager, codepoints, start_pos, stem_end,
                                                  /*include_genitive_and_wa=*/true)) {
               continue;

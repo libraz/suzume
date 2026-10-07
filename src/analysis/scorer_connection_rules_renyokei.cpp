@@ -5,7 +5,6 @@
 #include "analysis/scorer.h"
 #include "analysis/scorer_connection_rules.h"
 #include "analysis/scorer_constants.h"
-#include "analysis/verb_candidates_helpers.h"
 #include "core/debug.h"
 #include "core/kana_constants.h"
 #include "core/types.h"

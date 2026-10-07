@@ -13,7 +13,7 @@
 #include "normalize/char_type.h"
 #include "normalize/utf8.h"
 #include "unknown.h"
-#include "verb_candidates_helpers.h"
+#include "verb_candidates_dictionary_probes.h"
 
 namespace suzume::analysis {
 

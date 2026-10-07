@@ -17,7 +17,10 @@
 #include "grammar/inflection.h"
 #include "normalize/char_type.h"
 #include "normalize/utf8.h"
-#include "verb_candidates_helpers.h"
+#include "verb_candidates_absorption_guards.h"
+#include "verb_candidates_classical.h"
+#include "verb_candidates_dictionary_probes.h"
+#include "verb_candidates_verb_stems.h"
 
 namespace suzume::analysis::verb_helpers {
 

@@ -4,6 +4,7 @@
  */
 #include "analysis/dictionary_probe.h"
 #include "join_compound_verb_internal.h"
+#include "verb_candidates_dictionary_probes.h"
 
 namespace suzume::analysis {
 

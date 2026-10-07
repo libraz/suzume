@@ -11,7 +11,7 @@
 #include "analysis/bigram_table.h"
 #include "analysis/candidate_constants.h"
 #include "analysis/tokenizer_utils.h"
-#include "analysis/verb_candidates_helpers.h"
+#include "analysis/verb_candidates_auxiliary_patterns.h"
 #include "analysis/verb_candidates_hiragana_internal.h"
 #include "core/utf8_constants.h"
 #include "normalize/exceptions.h"

@@ -13,7 +13,7 @@
 #include "analysis/bigram_table.h"
 #include "analysis/candidate_constants.h"
 #include "analysis/dictionary_probe.h"
-#include "analysis/verb_candidates_helpers.h"
+#include "analysis/verb_candidates_dictionary_probes.h"
 #include "analysis/verb_candidates_hiragana_internal.h"
 #include "core/debug.h"
 #include "grammar/conjugation.h"

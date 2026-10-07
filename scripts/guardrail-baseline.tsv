@@ -101,9 +101,13 @@ src/analysis/unknown_same_type_prefixes.cpp	0	14	0
 src/analysis/unknown_speech.cpp	0	13	0
 src/analysis/verb_candidates.cpp	0	8	0
 src/analysis/verb_candidates.h	0	0	0
+src/analysis/verb_candidates_absorption_guards.h	0	0	0
+src/analysis/verb_candidates_auxiliary_patterns.h	0	0	0
+src/analysis/verb_candidates_classical.h	0	0	0
 src/analysis/verb_candidates_contracted_conditional.cpp	0	0	0
+src/analysis/verb_candidates_dictionary_probes.h	0	0	0
+src/analysis/verb_candidates_emphatic.h	0	0	0
 src/analysis/verb_candidates_helpers.cpp	0	0	0
-src/analysis/verb_candidates_helpers.h	0	1	0
 src/analysis/verb_candidates_helpers_absorption.cpp	0	0	0
 src/analysis/verb_candidates_helpers_dictionary.cpp	1	0	0
 src/analysis/verb_candidates_helpers_emphatic.cpp	0	0	0
@@ -128,6 +132,7 @@ src/analysis/verb_candidates_kanji_mizenkei.cpp	0	7	0
 src/analysis/verb_candidates_kanji_onbin.cpp	0	6	0
 src/analysis/verb_candidates_kanji_onbin_extended.cpp	0	0	0
 src/analysis/verb_candidates_kanji_renyokei.cpp	0	13	0
+src/analysis/verb_candidates_verb_stems.h	0	1	0
 src/core/debug.h	0	0	0
 src/core/edge_flags.h	0	0	0
 src/core/error.h	0	0	0

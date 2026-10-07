@@ -14,8 +14,11 @@
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "normalize/utf8.h"
+#include "tokenizer_utils.h"
 #include "unknown.h"
-#include "verb_candidates_helpers.h"
+#include "verb_candidates_auxiliary_patterns.h"
+#include "verb_candidates_dictionary_probes.h"
+#include "verb_candidates_emphatic.h"
 
 namespace suzume::analysis {
 

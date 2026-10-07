@@ -8,7 +8,7 @@
 #include "grammar/char_patterns.h"
 #include "normalize/char_type.h"
 #include "normalize/utf8.h"
-#include "verb_candidates_helpers.h"
+#include "verb_candidates_emphatic.h"
 
 namespace suzume::analysis::verb_helpers {
 

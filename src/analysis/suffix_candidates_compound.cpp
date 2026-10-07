@@ -26,7 +26,10 @@
 #include "tokenizer_utils.h"
 #include "unknown.h"
 #include "verb_candidates.h"
-#include "verb_candidates_helpers.h"
+#include "verb_candidates_absorption_guards.h"
+#include "verb_candidates_auxiliary_patterns.h"
+#include "verb_candidates_dictionary_probes.h"
+#include "verb_candidates_verb_stems.h"
 
 namespace suzume::analysis {
 
@@ -127,7 +130,7 @@ bool boundarySplitsClosedClassWord(const dictionary::DictionaryManager* dict_man
  * 読ん+じゃ+だめ). This is the head-side counterpart of the て/で tail check
  * below; single-mora members are left out because their kana are also ordinary
  * word-internal morae (手しごと, 雨やどり).
- * @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+ * @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
  */
 bool startsWithConjunctiveParticle(const dictionary::DictionaryManager* dict_manager,
                                    const std::vector<char32_t>& codepoints, size_t kanji_end, size_t end_pos) {
@@ -660,7 +663,7 @@ bool crossesFunctionWordBoundary(const KanjiHiraganaSpan& span, const HiraganaTa
   // never a single compound noun. A hiragana portion that IS exactly a
   // particle (先ほど, 中ほど) was already skipped by the exact-dictionary-word
   // check above, so this only rejects particle + negative absorption blobs.
-  // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+  // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
   if (verb_helpers::endsWithFocusParticleTail(dict_manager, codepoints, span.start_pos, hiragana_end)) {
     return true;  // Skip - noun + focus particle split should win
   }

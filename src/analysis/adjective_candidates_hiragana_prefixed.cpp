@@ -17,7 +17,7 @@
 #include "normalize/utf8.h"
 #include "tokenizer_utils.h"
 #include "unknown.h"
-#include "verb_candidates_helpers.h"
+#include "verb_candidates_absorption_guards.h"
 
 namespace suzume::analysis {
 
@@ -137,7 +137,7 @@ void adj_detail::appendHiraganaPrefixedKanjiIAdjCandidates(std::vector<UnknownCa
     // inside its paradigm. That is what separates these from the lexical
     // intensifiers, whose final mora is a word in its own right (the の of ほの,
     // the す of うす, the ら of そら).
-    // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+    // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
     for (size_t cell_start = start_pos; cell_start < prefix_end; ++cell_start) {
       const auto* cell =
           lookupEntryInRange(*dict_manager, codepoints, cell_start, prefix_end, core::PartOfSpeech::Auxiliary);
@@ -168,7 +168,7 @@ void adj_detail::appendHiraganaPrefixedKanjiIAdjCandidates(std::vector<UnknownCa
     // A case particle inside the run marks an argument boundary, so the kana
     // prefix is a preceding phrase rather than part of one compound adjective
     // (さきに + 食べとく, not the non-word さきに食べとい).
-    // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+    // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
     if (embedsCaseParticle(dict_manager, codepoints, start_pos, end_pos)) {
       continue;
     }

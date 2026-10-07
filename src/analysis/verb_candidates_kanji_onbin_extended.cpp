@@ -6,8 +6,12 @@
 #include "analysis/bigram_table.h"
 #include "analysis/candidate_constants.h"
 #include "analysis/dictionary_probe.h"
-#include "analysis/verb_candidates_helpers.h"
+#include "analysis/tokenizer_utils.h"
+#include "analysis/verb_candidates_absorption_guards.h"
+#include "analysis/verb_candidates_auxiliary_patterns.h"
+#include "analysis/verb_candidates_dictionary_probes.h"
 #include "analysis/verb_candidates_kanji_internal.h"
+#include "analysis/verb_candidates_verb_stems.h"
 #include "core/debug.h"
 #include "core/kana_constants.h"
 #include "core/utf8_constants.h"
@@ -79,7 +83,7 @@ bool hasClosedAuxiliaryTail(const dictionary::DictionaryManager* dict_manager, c
  * past form, so the っ scanned here belongs to the particle rather than to a
  * second onbin of one long verb. A genuine stem that merely ends in た before its
  * own onbin (隔たっ) has no verified predicate in front of that kana.
- * @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+ * @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
  */
 bool pastAuxiliaryClosesPredicateBefore(const grammar::Inflection& inflection,
                                         const dictionary::DictionaryManager* dict_manager,
@@ -237,7 +241,7 @@ void appendExtendedSokuonbinCandidates(const std::vector<char32_t>& codepoints, 
       // host and not the stem of a verb (嘘 + ばっ + た). A dictionary base
       // is the exemption, since a lexicalized compound spelled the same
       // way is a word of its own.
-      // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+      // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
       const bool onbin_spells_bound_suffix =
           !in_dict && (grammar::spellsBoundDerivationalSuffixCell(extractSubstring(codepoints, kanji_end, onbin_end)) ||
                        opensOnCaseParticleThenDictVerb(dict_manager, codepoints, kanji_end, onbin_end - 1));
@@ -295,7 +299,7 @@ void appendExtendedSokuonbinCandidates(const std::vector<char32_t>& codepoints, 
     // 書い+た+って: the っ scanned here belongs to the concessive particle, not
     // to an onbin stem, whenever a complete auxiliary already sits on the
     // stem's own onbin kana.
-    // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+    // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
     if (hasClosedAuxiliaryTail(dict_manager, codepoints, kanji_end, onbin_end) ||
         vh::embedsAuxiliaryOnOnbinStem(codepoints, kanji_end, pos, dict_manager) ||
         pastAuxiliaryClosesPredicateBefore(inflection, dict_manager, codepoints, start_pos, pos) ||

@@ -4,6 +4,8 @@
  */
 #include "analysis/dictionary_probe.h"
 #include "join_compound_verb_internal.h"
+#include "verb_candidates_dictionary_probes.h"
+#include "verb_candidates_verb_stems.h"
 
 namespace suzume::analysis::compound_verb_detail {
 

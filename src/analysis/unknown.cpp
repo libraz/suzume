@@ -26,7 +26,9 @@
 #include "suffix_candidates.h"
 #include "tokenizer_utils.h"
 #include "verb_candidates.h"
-#include "verb_candidates_helpers.h"
+#include "verb_candidates_auxiliary_patterns.h"
+#include "verb_candidates_dictionary_probes.h"
+#include "verb_candidates_emphatic.h"
 
 namespace suzume::analysis {
 
@@ -303,7 +305,7 @@ bool spansCaseParticleBeforeVerifiedPredicate(const UnknownCandidate& candidate,
     // A bound derivational suffix owns its own opening mora, so the kana there
     // is not a particle at all (押しつけ+がまし+さ). Without this the guard
     // reads the suffix as 押しつけ+が+まし and refuses the derived adjective.
-    // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+    // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
     if (verb_helpers::startsInsideGaMashiiSuffix(codepoints, boundary)) {
       continue;
     }

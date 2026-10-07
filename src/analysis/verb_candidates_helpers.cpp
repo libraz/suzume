@@ -3,8 +3,6 @@
  * @brief Implementation of internal helpers for verb candidate generation
  */
 
-#include "verb_candidates_helpers.h"
-
 #include <algorithm>
 #include <utility>
 
@@ -19,6 +17,13 @@
 #include "grammar/conjugation.h"
 #include "normalize/char_type.h"
 #include "normalize/utf8.h"
+#include "tokenizer_utils.h"
+#include "verb_candidates_absorption_guards.h"
+#include "verb_candidates_auxiliary_patterns.h"
+#include "verb_candidates_classical.h"
+#include "verb_candidates_dictionary_probes.h"
+#include "verb_candidates_emphatic.h"
+#include "verb_candidates_verb_stems.h"
 
 namespace suzume::analysis::verb_helpers {
 

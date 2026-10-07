@@ -25,7 +25,6 @@
 #include "split_candidates.h"
 #include "suffix_candidates.h"
 #include "tokenizer_utils.h"
-#include "verb_candidates_helpers.h"
 
 namespace suzume::analysis {
 

@@ -6,6 +6,8 @@
 #include "grammar/char_patterns.h"
 #include "grammar/honorific_verbs.h"
 #include "join_compound_verb_internal.h"
+#include "verb_candidates_auxiliary_patterns.h"
+#include "verb_candidates_verb_stems.h"
 
 namespace suzume::analysis::compound_verb_detail {
 

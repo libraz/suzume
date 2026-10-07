@@ -20,7 +20,7 @@
 #include "suffix_candidates_counter_internal.h"
 #include "tokenizer_utils.h"
 #include "unknown.h"
-#include "verb_candidates_helpers.h"
+#include "verb_candidates_dictionary_probes.h"
 
 namespace suzume::analysis {
 

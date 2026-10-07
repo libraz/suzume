@@ -11,8 +11,13 @@
 #include "analysis/bigram_table.h"
 #include "analysis/candidate_constants.h"
 #include "analysis/scorer_constants.h"
-#include "analysis/verb_candidates_helpers.h"
+#include "analysis/tokenizer_utils.h"
+#include "analysis/verb_candidates_absorption_guards.h"
+#include "analysis/verb_candidates_auxiliary_patterns.h"
+#include "analysis/verb_candidates_classical.h"
+#include "analysis/verb_candidates_dictionary_probes.h"
 #include "analysis/verb_candidates_kanji_internal.h"
+#include "analysis/verb_candidates_verb_stems.h"
 #include "core/debug.h"
 #include "core/kana_constants.h"
 #include "core/utf8_constants.h"
@@ -96,7 +101,7 @@ bool rejectsBeforeConfidenceGate(const KanjiVerbSelection& sel) {
   }
   // A coined verb whose span is a verb cell plus classical auxiliaries has
   // swallowed the chain into its ending (来+べし, 月見+ぬれ+ば, 咲き+たら+む).
-  // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+  // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
   if (!sel.is_dict_verified &&
       vh::guardIsWired(vh::GuardMember::ClassicalAuxiliaryTail, vh::GuardOrigin::KanjiFinalization) &&
       vh::spellsVerbCellWithClassicalAuxiliaries(dict_manager, sel.codepoints, sel.start_pos, sel.end_pos)) {
@@ -221,7 +226,7 @@ bool rejectsAuxiliarySplit(const KanjiVerbSelection& sel) {
   // Skip te-form + subsidiary/aspect verb patterns (てもらう, てくれ, てあげ,
   // ていく, ている, てお, ...): these split as verb te-form + auxiliary
   // (助けてもらう → 助け+て+もらう, 食べていく → 食べ+て+いく).
-  // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+  // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
   if (vh::guardIsWired(vh::GuardMember::EmbedTeAuxiliary, vh::GuardOrigin::KanjiFinalization) &&
       vh::embedsTeFormAuxiliary(surface)) {
     return true;  // Skip - let the split (verb te-form + subsidiary verb) win
@@ -353,7 +358,7 @@ bool rejectsFabricatedAbsorption(const KanjiVerbSelection& sel, bool in_dict) {
   // godan-wa verb 金さう. Real verbs whose surface embeds a particle
   // string (押さえ from 押さえる, 起こそ from 起こす) are protected by
   // their dictionary base form (in_dict).
-  // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+  // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
   if (!in_dict && vh::endsWithFocusParticleTail(dict_manager, codepoints, start_pos, end_pos)) {
     SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" fabricated verb absorbing focus particle\n");
     return true;
@@ -366,7 +371,7 @@ bool rejectsFabricatedAbsorption(const KanjiVerbSelection& sel, bool in_dict) {
   // so a coined 嘘じむ has absorbed the suffix rather than named a verb. The
   // dictionary base form is the exemption, since a lexicalized compound
   // spelled the same way is a word of its own.
-  // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+  // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
   if (!in_dict && grammar::spellsBoundDerivationalSuffixCell(sel.hiragana_part)) {
     SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" fabricated verb absorbing bound derivational suffix\n");
     return true;
@@ -394,7 +399,7 @@ bool rejectsFabricatedAbsorption(const KanjiVerbSelection& sel, bool in_dict) {
   // spelled like one of the closed class (来ぬ is 来 + ぬ, never a form of
   // 来る). The dictionary base form is no defence here — 来る is registered
   // and still cannot spell that cell — so this runs before the in_dict gate.
-  // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+  // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
   if ((best.verb_type == grammar::VerbType::Ichidan || best.verb_type == grammar::VerbType::Kuru) &&
       vh::spellsClassicalAuxiliaryEnding(dict_manager, surface, best.stem)) {
     SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" fabricated cell spelling a classical auxiliary\n");
@@ -416,7 +421,7 @@ bool rejectsFabricatedAbsorption(const KanjiVerbSelection& sel, bool in_dict) {
   // Reject a fabricated conjugation that spans a te-form + the subsidiary
   // verb みる: an internal て/で followed by み is always [verb te-form] +
   // みる (食べてみれば = 食べ + て + みれ + ば), never one conjugated verb.
-  // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+  // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
   if (!in_dict && vh::guardIsWired(vh::GuardMember::EmbedTeMiruAuxiliary, vh::GuardOrigin::KanjiFinalization) &&
       vh::embedsTeFormMiruAuxiliary(codepoints, start_pos, end_pos)) {
     SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" fabricated verb spanning te-form + みる\n");

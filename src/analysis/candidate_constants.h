@@ -658,7 +658,7 @@ constexpr float kImperativeFinalBonus = -0.8F;
 // (isVerifiedVerbBase) or a prefix probed by a tail guard. Below this bar the run
 // is treated as a non-word and the candidate/guard rejects it. Shared so the
 // acceptance threshold stays uniform across the fabricated closed-class
-// absorption guard family (see the guard-family note in verb_candidates_helpers.h).
+// absorption guard family (see the guard-family note in verb_candidates_absorption_guards.h).
 constexpr float kConstructedVerbMinConfidence = 0.5F;
 // Compound V1 context resolves the usual Ichidan/Godan ambiguity.
 constexpr float kCompoundVerbIchidanMinConfidence = 0.25F;

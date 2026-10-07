@@ -18,7 +18,9 @@
 #include "normalize/utf8.h"
 #include "tokenizer_utils.h"
 #include "unknown.h"
-#include "verb_candidates_helpers.h"
+#include "verb_candidates_absorption_guards.h"
+#include "verb_candidates_auxiliary_patterns.h"
+#include "verb_candidates_dictionary_probes.h"
 
 namespace suzume::analysis {
 
@@ -210,14 +212,14 @@ void appendKanjiStemCompoundIAdjCandidates(const std::vector<char32_t>& codepoin
     // onbin stem alone is unrecoverable (置い analyzes as the continuative
     // of the non-word 置う, so the guard only fires for the verbs L2
     // happens to carry).
-    // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+    // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
     if (codepoints[end_pos - 1] == U'い' && adj_detail::isVerbOnbinContextAfterI(codepoints, end_pos)) {
       SUZUME_DEBUG_LOG_VERBOSE("[ADJ_SKIP] \"" << surface << "\" い is a verb onbin stem here\n");
       continue;
     }
     // A focus particle is not an adjective conjugation: noun + しか(…ない)
     // shares its kana with the しい-adjective paradigm.
-    // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+    // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
     if (!verb_helpers::isAdjectiveInDictionary(dict_manager, surface) &&
         verb_helpers::guardIsWired(verb_helpers::GuardMember::FocusParticleHead,
                                    verb_helpers::GuardOrigin::KanjiCompoundAdjective) &&
@@ -231,7 +233,7 @@ void appendKanjiStemCompoundIAdjCandidates(const std::vector<char32_t>& codepoin
     // omitted (紙書く → 紙 + 書く), not a fabricated i-adjective.
     // A genuine compound adjective's tail is adjectival (力強く,
     // 薄暗く), so this leaves it alone.
-    // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+    // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
     // The whole span spelling a dictionary verb cell (手伝い ← 手伝う) is that
     // verb as well.
     const std::string tail_surface = extractSubstring(codepoints, kanji_end - 1, end_pos);
@@ -247,7 +249,7 @@ void appendKanjiStemCompoundIAdjCandidates(const std::vector<char32_t>& codepoin
     // 紙 薄い) — the default reading, which needs no compound invented
     // for it. A lexicalized compound (力強い, 薄暗い) is a lexical fact
     // rather than a derivable one, so the dictionary carries it.
-    // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+    // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
     std::string productive_tail_base;
     float productive_tail_confidence = candidate::kNoOriginConfidence;
     bool tail_is_independent_adjective = false;

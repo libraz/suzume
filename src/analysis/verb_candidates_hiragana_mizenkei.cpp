@@ -10,7 +10,8 @@
 #include "analysis/candidate_constants.h"
 #include "analysis/dictionary_probe.h"
 #include "analysis/scorer_constants.h"
-#include "analysis/verb_candidates_helpers.h"
+#include "analysis/verb_candidates_auxiliary_patterns.h"
+#include "analysis/verb_candidates_dictionary_probes.h"
 #include "analysis/verb_candidates_hiragana_internal.h"
 #include "core/debug.h"
 #include "core/kana_constants.h"
@@ -28,7 +29,7 @@
 namespace suzume::analysis::hiragana_verb_detail {
 namespace vh = verb_helpers;
 
-// @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+// @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
 bool endsWithParticleAfterVerb(const dictionary::DictionaryManager* dict_manager, const grammar::Inflection& inflection,
                                const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos) {
   // Needs a 1+ char prefix and a 2+ char particle suffix

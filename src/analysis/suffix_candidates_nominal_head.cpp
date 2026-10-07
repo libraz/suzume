@@ -377,7 +377,7 @@ void generateSelectedNominalHeadCandidates(const std::vector<char32_t>& codepoin
     // noun rescue deliberately does not take this guard — it has no selector
     // asserting a phrase head, so for it a run that merely decomposes into
     // one-mora classical fragments (くるま as くる + ま) is still a noun.
-    // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+    // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
     if (has_exact_noun || has_blocking_exact_reading || absorbs_copula ||
         hasFunctionWordChainDecomposition(codepoints, start_pos, head_end, dict_manager) ||
         hasAuxiliaryChainDecomposition(codepoints, start_pos, head_end, dict_manager) ||

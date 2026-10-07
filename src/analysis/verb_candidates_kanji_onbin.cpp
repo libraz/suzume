@@ -10,8 +10,11 @@
 #include "analysis/candidate_constants.h"
 #include "analysis/dictionary_probe.h"
 #include "analysis/scorer_constants.h"
-#include "analysis/verb_candidates_helpers.h"
+#include "analysis/tokenizer_utils.h"
+#include "analysis/verb_candidates_auxiliary_patterns.h"
+#include "analysis/verb_candidates_dictionary_probes.h"
 #include "analysis/verb_candidates_kanji_internal.h"
+#include "analysis/verb_candidates_verb_stems.h"
 #include "core/debug.h"
 #include "core/kana_constants.h"
 #include "core/utf8_constants.h"
@@ -352,7 +355,7 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
     // って), so the fabricated predicate splits the nominal and steals the
     // particle's first mora in one move (資 + 料っ + て). A dictionary-backed
     // base keeps its ordinary te-form reading (見 + 合って).
-    // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+    // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
     // A stem that is itself a dictionary nominal (猫, 君) is the host the
     // particle marks (猫+って+かわいい) unless a te-continuation follows
     // the て, which is what a denominal verb looks like (沼っ+てる).

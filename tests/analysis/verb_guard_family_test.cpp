@@ -1,7 +1,7 @@
 /**
  * @file verb_guard_family_test.cpp
  * @brief Characterization tests for the fabricated closed-class absorption guard
- *        family (see verb_candidates_helpers.h).
+ *        family (see verb_candidates_absorption_guards.h).
  *
  * These pin the decision boundaries of the guards that stop verb/adjective
  * candidate generators from fabricating a non-dictionary conjugation that
@@ -20,7 +20,8 @@
 #include <vector>
 
 #include "analysis/join_compound_verb_internal.h"
-#include "analysis/verb_candidates_helpers.h"
+#include "analysis/verb_candidates_absorption_guards.h"
+#include "analysis/verb_candidates_auxiliary_patterns.h"
 #include "analysis/verb_candidates_hiragana_internal.h"
 #include "core/types.h"
 #include "dictionary/dictionary.h"

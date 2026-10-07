@@ -8,7 +8,8 @@
  * text at v2_start. Choosing between V2 entries is findCompoundVerbMatch's job.
  */
 #include "analysis/dictionary_probe.h"
-#include "analysis/verb_candidates_helpers.h"
+#include "analysis/verb_candidates_classical.h"
+#include "analysis/verb_candidates_dictionary_probes.h"
 #include "compound_verb_v2_cells_internal.h"
 #include "grammar/char_patterns.h"
 

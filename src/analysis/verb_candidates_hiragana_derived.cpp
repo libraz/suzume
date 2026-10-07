@@ -10,8 +10,12 @@
 #include "analysis/candidate_constants.h"
 #include "analysis/dictionary_probe.h"
 #include "analysis/scorer_constants.h"
-#include "analysis/verb_candidates_helpers.h"
+#include "analysis/tokenizer_utils.h"
+#include "analysis/verb_candidates_absorption_guards.h"
+#include "analysis/verb_candidates_auxiliary_patterns.h"
+#include "analysis/verb_candidates_dictionary_probes.h"
 #include "analysis/verb_candidates_hiragana_internal.h"
+#include "analysis/verb_candidates_verb_stems.h"
 #include "core/debug.h"
 #include "core/kana_constants.h"
 #include "core/utf8_constants.h"
@@ -338,7 +342,7 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
     // always [verb te-form] + みる (やってみ = やっ + て + み, われてみ =
     // われ + て + み), never a single ichidan verb やってみる. This also
     // suppresses the kateikei variant below (やってみれ from やってみれば).
-    // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+    // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
     if (!is_dict_verb && vh::guardIsWired(vh::GuardMember::EmbedTeMiruAuxiliary, vh::GuardOrigin::HiraganaDerived) &&
         vh::embedsTeFormMiruAuxiliary(codepoints, start_pos, end_pos)) {
       continue;

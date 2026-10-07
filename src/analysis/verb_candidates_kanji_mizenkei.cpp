@@ -10,8 +10,12 @@
 #include "analysis/candidate_constants.h"
 #include "analysis/dictionary_probe.h"
 #include "analysis/scorer_constants.h"
-#include "analysis/verb_candidates_helpers.h"
+#include "analysis/tokenizer_utils.h"
+#include "analysis/verb_candidates_absorption_guards.h"
+#include "analysis/verb_candidates_auxiliary_patterns.h"
+#include "analysis/verb_candidates_dictionary_probes.h"
 #include "analysis/verb_candidates_kanji_internal.h"
+#include "analysis/verb_candidates_verb_stems.h"
 #include "core/debug.h"
 #include "core/kana_constants.h"
 #include "core/utf8_constants.h"
@@ -745,7 +749,7 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
             // An internal te-form followed by a subsidiary/aspect verb is a
             // grammatical boundary, not the irrealis of one lexical verb
             // (描いていかない → 描い + て + いか + ない).
-            // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+            // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
             if (vh::guardIsWired(vh::GuardMember::EmbedTeAuxiliary, vh::GuardOrigin::KanjiMizenkei) &&
                 vh::embedsTeFormAuxiliary(surface)) {
               continue;
@@ -758,7 +762,7 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
             // that merely spells a case particle stays exempt, because the
             // irrealis mora closes the span immediately after it and the guard
             // requires kana on both sides of the particle (落と+さ+ない).
-            // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+            // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
             if (vh::embedsCaseParticle(dict_manager, codepoints, start_pos, multi_miz_end)) {
               continue;
             }
@@ -766,7 +770,7 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
             // an auxiliary heads nothing: 如く is a cell of the comparative 如し
             // and the あら behind it opens the next predicate, not okurigana of
             // the non-word 如くある.
-            // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+            // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
             if (vh::opensOnCompleteAuxiliary(dict_manager, codepoints, start_pos, multi_miz_end)) {
               continue;
             }
@@ -783,7 +787,7 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
             // A formal noun written in kanji is a word of its own, so kana after
             // it that open a dictionary verb cell belong to that verb (他+なら+ない),
             // not to an unregistered verb built on the noun.
-            // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+            // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
             if (dict_manager != nullptr && !vh::isVerbInDictionary(dict_manager, base_form)) {
               const auto* host =
                   lookupEntryInRange(*dict_manager, codepoints, start_pos, kanji_end, core::PartOfSpeech::Noun);
@@ -806,7 +810,7 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
             // the mizenkei of a non-word godan-ra verb 水する. Only すら ends in
             // an a-row mora among binding particles, and no genuine godan verb
             // ends in 〜する, so this cannot suppress a real conjugation.
-            // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+            // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
             if (is_valid_verb && !vh::isVerbInDictionary(dict_manager, base_form) &&
                 vh::endsWithParticleTailOfPos(dict_manager, codepoints, start_pos, multi_miz_end,
                                               core::ExtendedPOS::ParticleBinding)) {
@@ -819,7 +823,7 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
             // never the irrealis of the non-word 変わりぐ. The case particle sits
             // at the end of the span, so the embedded-particle guard above has no
             // suffix to see.
-            // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+            // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
             if (is_valid_verb && !vh::isVerbInDictionary(dict_manager, base_form) &&
                 vh::endsWithCaseParticleAfterContinuative(dict_manager, inflection, codepoints, start_pos,
                                                           multi_miz_end)) {

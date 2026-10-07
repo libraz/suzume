@@ -13,7 +13,11 @@
 #include "analysis/candidate_constants.h"
 #include "analysis/dictionary_probe.h"
 #include "analysis/scorer_constants.h"
-#include "analysis/verb_candidates_helpers.h"
+#include "analysis/verb_candidates_absorption_guards.h"
+#include "analysis/verb_candidates_auxiliary_patterns.h"
+#include "analysis/verb_candidates_classical.h"
+#include "analysis/verb_candidates_dictionary_probes.h"
+#include "analysis/verb_candidates_emphatic.h"
 #include "analysis/verb_candidates_hiragana_internal.h"
 #include "core/debug.h"
 #include "core/kana_constants.h"
@@ -983,7 +987,7 @@ void appendClosedOnbinTenseStem(const HiraganaVerbScan& scan, size_t closed_onbi
     // built on top of one: なかった+ん is the negative's past cell plus the
     // nominalizer, not a form of the non-word なかったむ, even though the
     // analysis places the stem boundary exactly where the ん sits.
-    // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+    // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
     if (vh::opensOnCompleteAuxiliary(scan.dict_manager, codepoints, start_pos, onbin_pos + 1)) {
       continue;
     }

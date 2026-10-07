@@ -23,7 +23,11 @@
 #include "suffix_candidates.h"
 #include "tokenizer_utils.h"
 #include "unknown.h"
-#include "verb_candidates_helpers.h"
+#include "verb_candidates_absorption_guards.h"
+#include "verb_candidates_auxiliary_patterns.h"
+#include "verb_candidates_dictionary_probes.h"
+#include "verb_candidates_emphatic.h"
+#include "verb_candidates_verb_stems.h"
 
 namespace suzume::analysis {
 
@@ -361,7 +365,7 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
     // A focus particle opening the okurigana is not adjective morphology: the
     // run is [noun] + particle, and the い that looks like an adjective ending
     // starts the next word (水とか + いう read as the non-word 水とかい).
-    // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+    // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
     if (!isAdjectiveInDictionary(dict_manager, surface) &&
         verb_helpers::guardIsWired(verb_helpers::GuardMember::FocusParticleHead,
                                    verb_helpers::GuardOrigin::KanjiAdjective) &&
@@ -636,7 +640,7 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
         // adjective as a search unit; the material before it is its own word.
         // Lexicalized compounds are dictionary entries themselves (力強い, 心細い)
         // and are exempt, as is the case where the adjective spans everything.
-        // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+        // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
         if (!isAdjectiveInDictionary(dict_manager, cand.base_form)) {
           bool prefixes_dictionary_adjective = false;
           for (size_t tail_start = start_pos + 1; tail_start < end_pos && !prefixes_dictionary_adjective;

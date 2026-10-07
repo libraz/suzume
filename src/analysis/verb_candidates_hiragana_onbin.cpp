@@ -10,8 +10,12 @@
 #include "analysis/candidate_constants.h"
 #include "analysis/dictionary_probe.h"
 #include "analysis/scorer_constants.h"
-#include "analysis/verb_candidates_helpers.h"
+#include "analysis/tokenizer_utils.h"
+#include "analysis/verb_candidates_absorption_guards.h"
+#include "analysis/verb_candidates_auxiliary_patterns.h"
+#include "analysis/verb_candidates_dictionary_probes.h"
 #include "analysis/verb_candidates_hiragana_internal.h"
+#include "analysis/verb_candidates_verb_stems.h"
 #include "core/debug.h"
 #include "core/kana_constants.h"
 #include "core/utf8_constants.h"
@@ -223,7 +227,7 @@ void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, s
       // cell of the non-word してく. The phonological rescue below grants an
       // unattested lemma on the follower alone, which is exactly where that
       // reading needs blocking.
-      // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+      // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
       const bool stem_ends_on_conjunctive =
           onbin_pos > start_pos && (codepoints[onbin_pos - 1] == U'て' || codepoints[onbin_pos - 1] == U'で');
       if (!is_valid_verb && is_resolved_i_onbin && i_onbin_has_predicate_boundary && !stem_ends_on_conjunctive) {
@@ -299,7 +303,7 @@ void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, s
       // The guards of the inflected-hiragana path apply to onbin spans too: a
       // span may not open on the tail of a closed-class word (でし|ょっ), nor
       // one mora inside a registered verb cell ending where it does (も|らっ).
-      // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+      // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
       if (!lemma_dict_verified &&
           (vh::opensOnClosedClassWordTail(dict_manager, codepoints, start_pos, onbin_pos + 1) ||
            (start_pos > 0 && vh::isVerbInDictionary(dict_manager, codepoints, start_pos - 1, onbin_pos + 1)))) {
@@ -309,7 +313,7 @@ void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, s
       // A registered imperative or terminal ending right at the っ (食べろ|って,
       // 来い|って) is a finished predicate, and the っ opens the quotative
       // particle; a span reaching into that predicate is a fragment of it.
-      // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+      // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
       // The same holds inside the span where the quotative contracts to っ+つ
       // (やる|っ|つっ+たら): a registered predicate fills the span up to it.
       bool closes_before_contracted_quotative = false;
@@ -335,7 +339,7 @@ void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, s
       // complete, so nothing lexical is built on top of it. A span opening on
       // one has read the auxiliary's own cells as the okurigana of a base that
       // is not a word (なかった+ん as a form of the non-word なかったむ).
-      // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+      // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
       if (!lemma_dict_verified && vh::opensOnCompleteAuxiliary(dict_manager, codepoints, start_pos, onbin_pos + 1)) {
         SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << onbin_surface << "\" opens on a complete auxiliary\n");
         continue;

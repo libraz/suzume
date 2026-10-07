@@ -19,7 +19,8 @@
 #include "normalize/char_type.h"
 #include "normalize/utf8.h"
 #include "tokenizer_utils.h"
-#include "verb_candidates_helpers.h"
+#include "verb_candidates_auxiliary_patterns.h"
+#include "verb_candidates_dictionary_probes.h"
 
 namespace suzume::analysis {
 

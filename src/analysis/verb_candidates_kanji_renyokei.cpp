@@ -10,8 +10,13 @@
 #include "analysis/candidate_constants.h"
 #include "analysis/dictionary_probe.h"
 #include "analysis/scorer_constants.h"
-#include "analysis/verb_candidates_helpers.h"
+#include "analysis/tokenizer_utils.h"
+#include "analysis/verb_candidates_absorption_guards.h"
+#include "analysis/verb_candidates_auxiliary_patterns.h"
+#include "analysis/verb_candidates_classical.h"
+#include "analysis/verb_candidates_dictionary_probes.h"
 #include "analysis/verb_candidates_kanji_internal.h"
+#include "analysis/verb_candidates_verb_stems.h"
 #include "core/debug.h"
 #include "core/kana_constants.h"
 #include "core/utf8_constants.h"
@@ -279,7 +284,7 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
         // attested verb on its own — either a dictionary base or a member of the
         // closed single-kanji Ichidan class, whose bases are recovered by rule
         // rather than registered (見る, 出る, 寝る).
-        // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+        // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
         const bool ichidan_stem_is_attested =
             vh::isVerbInDictionary(dict_manager, extractSubstring(codepoints, start_pos, kanji_end) + "る") ||
             (is_single_kanji && vh::isSingleKanjiIchidan(codepoints[start_pos]));
@@ -316,7 +321,7 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
         // (嘘じみた is 嘘 + じみ + た, never 嘘じ + みた). A dictionary base keeps
         // its candidate, because a lexical verb spelled the same way owns the
         // kana (感じ before みたい).
-        // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+        // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
         bool okurigana_opens_bound_suffix = false;
         if (!ichidan_base_is_dict) {
           constexpr size_t kBoundSuffixProbe = 4;
@@ -541,7 +546,7 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
           // focus particle: 本+さえ and 水+すら are nominal phrases, not
           // renyokei of fabricated verbs. Dictionary-verified verbs remain
           // available for genuine lexical surfaces that happen to end alike.
-          // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+          // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
           bool absorbs_focus_particle =
               !base_is_dict_verb && vh::endsWithFocusParticleTail(dict_manager, codepoints, start_pos, renyokei_end);
           if ((!surface_is_dict_entry || base_is_dict_verb) && !absorbs_focus_particle) {
@@ -726,7 +731,7 @@ void appendGodanSaRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
       // The conjectural らし is a closed auxiliary, while an attested base
       // such as 荒らす keeps its dictionary path. An unverified candidate must
       // not absorb that auxiliary into a fabricated godan-sa stem.
-      // @see fabricated closed-class absorption guards (verb_candidates_helpers.h)
+      // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
       if (dict_manager != nullptr && renyokei_end >= kanji_end + 2 && !base_in_dict) {
         const auto* tail_entry =
             lookupEntryInRange(*dict_manager, codepoints, kanji_end, renyokei_end, core::PartOfSpeech::Auxiliary);

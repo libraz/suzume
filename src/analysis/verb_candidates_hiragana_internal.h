@@ -18,7 +18,7 @@ inline constexpr size_t kPredicateRunMax = 12;
 // (しか/さえ/すら), so the run is verb + particle rather than a single fabricated
 // 未然形 (やるしか → や|る|しか, never a form of the non-word 〜しく). Declared
 // here so the guard can be exercised directly by characterization tests; see the
-// guard-family note in verb_candidates_helpers.h.
+// guard-family note in verb_candidates_absorption_guards.h.
 bool endsWithParticleAfterVerb(const dictionary::DictionaryManager* dict_manager, const grammar::Inflection& inflection,
                                const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos);
 

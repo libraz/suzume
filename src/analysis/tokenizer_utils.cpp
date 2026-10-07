@@ -16,7 +16,9 @@
 #include "grammar/inflection.h"
 #include "normalize/exceptions.h"
 #include "normalize/utf8.h"
-#include "verb_candidates_helpers.h"
+#include "verb_candidates_auxiliary_patterns.h"
+#include "verb_candidates_dictionary_probes.h"
+#include "verb_candidates_verb_stems.h"
 
 namespace suzume::analysis {
 
