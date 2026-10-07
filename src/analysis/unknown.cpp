@@ -674,6 +674,8 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generate(std::string_view te
 
   // Generate reciprocal-action deverbal nouns (にらめっこ, かけっこ)
   analysis::generateReciprocalActionNounCandidates(codepoints, start_pos, char_types, dict_manager_, candidates);
+  analysis::generateHiraganaDeverbalCompoundNounCandidates(codepoints, start_pos, char_types, dict_manager_,
+                                                           candidates);
 
   // Generate hiragana verb candidates (pure hiragana verbs like いく, くる)
   if (char_types[start_pos] == normalize::CharType::Hiragana) {

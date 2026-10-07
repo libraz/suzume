@@ -63,6 +63,37 @@ bool isParticleSequenceWithoutLexicalReading(const std::vector<char32_t>& codepo
   return maximalSegmentCount(*dict_manager, codepoints, start_pos, end_pos, core::PartOfSpeech::Particle) > 0;
 }
 
+// A particle-spelled mora that closes a longer non-particle word belongs to
+// that word, so it is no particle boundary in front of the prefix (the し of
+// わたくし).
+bool endsLongerContentWord(const std::vector<char32_t>& codepoints, size_t start_pos,
+                           const dictionary::DictionaryManager* dict_manager) {
+  constexpr size_t kMaxWordChars = 6;
+  for (size_t word_start = lookbehindStart(start_pos, kMaxWordChars); word_start + 1 < start_pos; ++word_start) {
+    const auto* entry = lookupEntryInRange(*dict_manager, codepoints, word_start, start_pos);
+    if (entry != nullptr && entry->pos != core::PartOfSpeech::Particle) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// A case or genitive particle opening the kana after the kanji marks an
+// argument boundary: the kanji is a noun and the kana a phrase (やり場|の|ない).
+bool tailOpensOnCaseParticle(const std::vector<char32_t>& codepoints, size_t kanji_end, size_t end_pos,
+                             const dictionary::DictionaryManager* dict_manager) {
+  if (dict_manager == nullptr || kanji_end + 1 >= end_pos) {
+    return false;
+  }
+  constexpr size_t kMaxParticleChars = 3;
+  return hasDictionaryEntryFrom(dict_manager, codepoints, kanji_end, 1,
+                                std::min(kMaxParticleChars, end_pos - kanji_end - 1), core::PartOfSpeech::Particle,
+                                [](const dictionary::DictionaryEntry& entry) {
+                                  return entry.extended_pos == core::ExtendedPOS::ParticleCase ||
+                                         entry.extended_pos == core::ExtendedPOS::ParticleNo;
+                                });
+}
+
 }  // namespace
 
 void adj_detail::appendHiraganaPrefixedKanjiIAdjCandidates(std::vector<UnknownCandidate>& candidates,
@@ -74,9 +105,10 @@ void adj_detail::appendHiraganaPrefixedKanjiIAdjCandidates(std::vector<UnknownCa
   // an attached particle within a sentence (いまだ+に続く).  Restrict this
   // recovery path to a lexical word boundary; ordinary kanji adjective and
   // particle candidates retain responsibility inside a clause.
-  const bool follows_particle =
-      start_pos > 0 && dict_manager != nullptr &&
-      lookupEntryInRange(*dict_manager, codepoints, start_pos - 1, start_pos, core::PartOfSpeech::Particle) != nullptr;
+  const bool follows_particle = start_pos > 0 && dict_manager != nullptr &&
+                                lookupEntryInRange(*dict_manager, codepoints, start_pos - 1, start_pos,
+                                                   core::PartOfSpeech::Particle) != nullptr &&
+                                !endsLongerContentWord(codepoints, start_pos, dict_manager);
   if (start_pos > 0 && char_types[start_pos - 1] != normalize::CharType::Symbol && !follows_particle) {
     return;
   }
@@ -111,8 +143,13 @@ void adj_detail::appendHiraganaPrefixedKanjiIAdjCandidates(std::vector<UnknownCa
     // into a fabricated whole i-adjective spanning the following verb and the
     // beginning of its dependent auxiliary (お+答え+ください).  Lexical kana
     // adjective prefixes remain handled by the evidence checks below.
-    if (dict_manager->lookupExact(prefix_surface, core::PartOfSpeech::Prefix) != nullptr) {
-      return;
+    // The same holds when the prefix only closes on one (に+お+任せ): the
+    // honorific attaches to the following verb, not to the kana before it.
+    for (size_t cell_start = start_pos; cell_start < prefix_end; ++cell_start) {
+      if (lookupEntryInRange(*dict_manager, codepoints, cell_start, prefix_end, core::PartOfSpeech::Prefix) !=
+          nullptr) {
+        return;
+      }
     }
     // A determiner joins the mask for the same reason: it modifies a noun
     // phrase from outside and never binds as an adjectival prefix, so a span
@@ -169,7 +206,8 @@ void adj_detail::appendHiraganaPrefixedKanjiIAdjCandidates(std::vector<UnknownCa
     // prefix is a preceding phrase rather than part of one compound adjective
     // (さきに + 食べとく, not the non-word さきに食べとい).
     // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
-    if (embedsCaseParticle(dict_manager, codepoints, start_pos, end_pos)) {
+    if (embedsCaseParticle(dict_manager, codepoints, start_pos, end_pos) ||
+        tailOpensOnCaseParticle(codepoints, kanji_end, end_pos, dict_manager)) {
       continue;
     }
     const std::string surface = extractSubstring(codepoints, start_pos, end_pos);

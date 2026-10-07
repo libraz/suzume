@@ -876,6 +876,72 @@ void generateReciprocalActionNounCandidates(const std::vector<char32_t>& codepoi
   }
 }
 
+void generateHiraganaDeverbalCompoundNounCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                                    const std::vector<normalize::CharType>& char_types,
+                                                    const dictionary::DictionaryManager* dict_manager,
+                                                    std::vector<UnknownCandidate>& candidates) {
+  if (dict_manager == nullptr || start_pos >= char_types.size() ||
+      char_types[start_pos] != normalize::CharType::Hiragana) {
+    return;
+  }
+  // Two or three kana: one mora is the opening of anything, and a longer run
+  // is no longer a bare continuative.
+  constexpr size_t kMinStemLength = 2;
+  constexpr size_t kMaxStemLength = 3;
+  const size_t stem_end = findCharRegionEnd(char_types, start_pos, kMaxStemLength + 1, normalize::CharType::Hiragana);
+  if (stem_end - start_pos < kMinStemLength || stem_end - start_pos > kMaxStemLength ||
+      stem_end + 1 > char_types.size() || char_types[stem_end] != normalize::CharType::Kanji) {
+    return;
+  }
+  const size_t end_pos = stem_end + 1;
+  // One kanji only, so a longer kanji compound keeps its own left boundary.
+  if (end_pos < char_types.size() && char_types[end_pos] == normalize::CharType::Kanji) {
+    return;
+  }
+  // The kana must open a word: inside a longer lexical word (しか|し, つい|に)
+  // its tail is no continuative.
+  constexpr size_t kLexicalLookbehind = 4;
+  for (size_t word_start = start_pos > kLexicalLookbehind ? start_pos - kLexicalLookbehind : 0; word_start < start_pos;
+       ++word_start) {
+    for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, word_start, stem_end)) {
+      if (match.entry != nullptr && word_start + normalize::utf8Length(match.entry->surface) > start_pos) {
+        return;
+      }
+    }
+  }
+  const std::string stem = extractSubstring(codepoints, start_pos, stem_end);
+  // A stem already lexicalized outside the verb and noun classes keeps that
+  // reading (いい, これ, より).
+  for (const auto& match : dict_manager->lookup(stem, 0)) {
+    if (match.entry != nullptr && match.entry->surface.size() == stem.size() &&
+        match.entry->pos != core::PartOfSpeech::Verb && match.entry->pos != core::PartOfSpeech::Noun) {
+      return;
+    }
+  }
+  // Unlike the kanji-led compound there is no okurigana to carry the shape, so
+  // only a listed verb behind the continuative licenses it. い is excluded on
+  // the same ground as there: it also spells the adjective terminal.
+  const char32_t last = codepoints[stem_end - 1];
+  const std::string_view base_ending = grammar::godanBaseSuffixFromIRow(last);
+  const std::string head = extractSubstring(codepoints, start_pos, stem_end - 1);
+  const bool is_verb_continuative =
+      (last != U'い' && !base_ending.empty() &&
+       verb_helpers::isVerbInDictionary(dict_manager, normalize::concat(head, base_ending))) ||
+      (kana::isERowCodepoint(last) && verb_helpers::isVerbBaseFormInDictionary(dict_manager, stem + "る"));
+  if (!is_verb_continuative || hasClosedSuffixBoundary(codepoints, start_pos, end_pos, dict_manager)) {
+    return;
+  }
+  // The compound closes in a nominal frame, as the kanji-led one does.
+  if (end_pos < codepoints.size() && char_types[end_pos] == normalize::CharType::Hiragana &&
+      !normalize::isParticleCodepoint(codepoints[end_pos]) && codepoints[end_pos] != U'だ') {
+    return;
+  }
+  auto cand = makeCandidate(codepoints, start_pos, end_pos, core::PartOfSpeech::Noun,
+                            candidate::kDeverbalCompoundNounCost, true, CandidateOrigin::NominalizedNoun);
+  SUZUME_DEBUG_CANDIDATE(cand, kNominalizedNounReportedConfidence, "hiragana_deverbal_compound_noun");
+  candidates.push_back(cand);
+}
+
 void generateHumbleNominalCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                      const grammar::Inflection& inflection,
                                      const dictionary::DictionaryManager* dict_manager,

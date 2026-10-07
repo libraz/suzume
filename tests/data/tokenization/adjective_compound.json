@@ -1033,6 +1033,134 @@
       ],
       "id": "i_gamashiku_su",
       "input": "言い訳がましく話す"
+    },
+    {
+      "description": "わたくしにお任せくださいですわ - auto-generated",
+      "expected": [
+        {
+          "lemma": "わたくし",
+          "pos": "Pronoun",
+          "surface": "わたくし"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "任せる",
+          "pos": "Verb",
+          "surface": "任せ"
+        },
+        {
+          "lemma": "くださる",
+          "pos": "Verb",
+          "surface": "ください"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        },
+        {
+          "lemma": "わ",
+          "pos": "Particle",
+          "surface": "わ"
+        }
+      ],
+      "id": "watakushinio_sekudasaidesuwa",
+      "input": "わたくしにお任せくださいですわ"
+    },
+    {
+      "description": "彼女にお任せください - auto-generated",
+      "expected": [
+        {
+          "lemma": "彼女",
+          "pos": "Pronoun",
+          "surface": "彼女"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "任せる",
+          "pos": "Verb",
+          "surface": "任せ"
+        },
+        {
+          "lemma": "くださる",
+          "pos": "Verb",
+          "surface": "ください"
+        }
+      ],
+      "id": "nio_sekudasai",
+      "input": "彼女にお任せください"
+    },
+    {
+      "description": "やり場のない怒り - auto-generated",
+      "expected": [
+        {
+          "lemma": "やり場",
+          "pos": "Noun",
+          "surface": "やり場"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        },
+        {
+          "lemma": "怒り",
+          "pos": "Noun",
+          "surface": "怒り"
+        }
+      ],
+      "id": "yari_nonai_ri",
+      "input": "やり場のない怒り"
+    },
+    {
+      "description": "逃げ場のない部屋 - auto-generated",
+      "expected": [
+        {
+          "lemma": "逃げ場",
+          "pos": "Noun",
+          "surface": "逃げ場"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        },
+        {
+          "lemma": "部屋",
+          "pos": "Noun",
+          "surface": "部屋"
+        }
+      ],
+      "id": "ge_nonai",
+      "input": "逃げ場のない部屋"
     }
   ],
   "description": "Compound adjectives (〜やすい、〜にくい、〜すぎる)",

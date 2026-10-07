@@ -132,6 +132,18 @@ void generateReciprocalActionNounCandidates(const std::vector<char32_t>& codepoi
                                             std::vector<UnknownCandidate>& candidates);
 
 /**
+ * @brief Generate hiragana continuative + one-kanji compound nouns (やり場)
+ *
+ * The kana-written counterpart of the deverbal compound noun: a two- or
+ * three-kana continuative of a listed verb followed by a single kanji noun in a
+ * nominal frame is one search unit.
+ */
+void generateHiraganaDeverbalCompoundNounCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                                    const std::vector<normalize::CharType>& char_types,
+                                                    const dictionary::DictionaryManager* dict_manager,
+                                                    std::vector<UnknownCandidate>& candidates);
+
+/**
  * @brief Generate the deverbal nominal of the humble 敬語接頭辞 + V連用形 + する frame
  *
  * The honorific prefix and following する form delimit a closed frame in which

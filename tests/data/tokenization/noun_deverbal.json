@@ -1261,6 +1261,38 @@
       ],
       "id": "kashishiteshimattta",
       "input": "夜更かししてしまった"
+    },
+    {
+      "description": "怒りのやり場がない - auto-generated",
+      "expected": [
+        {
+          "lemma": "怒り",
+          "pos": "Noun",
+          "surface": "怒り"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "やり場",
+          "pos": "Noun",
+          "surface": "やり場"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
+      "id": "rinoyari_ganai",
+      "input": "怒りのやり場がない"
     }
   ],
   "description": "noun_deverbal tests",

@@ -179,6 +179,10 @@ def postprocess_deverbal_noun_context(tokens: list[dict]) -> bool:
         # (っ+つう+の for っていうの).
         if surface[-1:] in (lemma[-1:], "ー"):
             continue
+        # The い imperative of an honorific ラ行 verb is finite as well
+        # (くださ+い+です, なさい), never a continuative.
+        if lemma.endswith("る") and surface == lemma[:-1] + "い":
+            continue
         # So is the colloquial る→ん contraction of that terminal (分かん+の).
         if surface.endswith("ん") and lemma.endswith("る") and surface[:-1] == lemma[:-1]:
             continue
