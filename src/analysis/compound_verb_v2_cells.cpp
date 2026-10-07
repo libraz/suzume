@@ -412,6 +412,13 @@ void matchV2Imperative(const CompoundMatchContext& ctx, V2FormMatch& form) {
       // A sentence-final or quotative particle also closes it (走り出せ+よ,
       // 書き直せ+と+言う); ば and the auxiliaries of the potential do not.
       const size_t imperative_end = ctx.v2_start + normalize::utf8Length(imperative);
+      // Spelled in kana, the imperative され of 去る is also the する irrealis
+      // plus the passive continuative closing its clause (甘噛み+さ+れ、), and
+      // the voice chain is the productive reading of those kana.
+      if (via_reading && imperative_end == ctx.v2_start + 2 && codepoints[ctx.v2_start] == U'さ' &&
+          codepoints[ctx.v2_start + 1] == U'れ') {
+        return;
+      }
       const bool closed_by_particle =
           verb_helpers::oneMoraParticleEndsAt(&ctx.dict_manager, codepoints, imperative_end + 1,
                                               core::ExtendedPOS::ParticleFinal) ||

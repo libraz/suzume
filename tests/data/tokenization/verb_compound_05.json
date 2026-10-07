@@ -1745,6 +1745,75 @@
       ],
       "id": "nihetarikonda",
       "input": "地面にへたりこんだ"
+    },
+    {
+      "description": "Kana され closing a clause is する irrealis + passive, not the imperative of V2 去る",
+      "expected": [
+        {
+          "lemma": "子犬",
+          "pos": "Noun",
+          "surface": "子犬"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "指",
+          "pos": "Noun",
+          "surface": "指"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "甘噛み",
+          "pos": "Noun",
+          "surface": "甘噛み"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "さ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "驚く",
+          "pos": "Verb",
+          "surface": "驚い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ni_wo_misare_ita",
+      "input": "子犬に指を甘噛みされ、驚いた"
+    },
+    {
+      "description": "Completive subsidiary 尽くす stays a separate unit after V1",
+      "expected": [
+        {
+          "lemma": "立つ",
+          "pos": "Verb",
+          "surface": "立ち"
+        },
+        {
+          "lemma": "尽くす",
+          "pos": "Auxiliary",
+          "surface": "尽くす"
+        }
+      ],
+      "id": "chi_kusu",
+      "input": "立ち尽くす"
     }
   ],
   "description": "Compound verbs (part 5/5)",
