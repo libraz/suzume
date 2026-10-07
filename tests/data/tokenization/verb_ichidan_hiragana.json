@@ -561,6 +561,50 @@
       ],
       "id": "hanikanda",
       "input": "はにかんだ顔"
+    },
+    {
+      "description": "糸がもつれる - auto-generated",
+      "expected": [
+        {
+          "lemma": "糸",
+          "pos": "Noun",
+          "surface": "糸"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "もつれる",
+          "pos": "Verb",
+          "surface": "もつれる"
+        }
+      ],
+      "id": "gamotsureru",
+      "input": "糸がもつれる"
+    },
+    {
+      "description": "もつれた糸 - auto-generated",
+      "expected": [
+        {
+          "lemma": "もつれる",
+          "pos": "Verb",
+          "surface": "もつれ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "糸",
+          "pos": "Noun",
+          "surface": "糸"
+        }
+      ],
+      "id": "motsureta",
+      "input": "もつれた糸"
     }
   ],
   "description": "verb_ichidan_hiragana tests",

@@ -116,6 +116,9 @@ void setVerbAndAdjectiveCosts(BigramMatrix& table) {
       // before it means the stem was invented to fit the auxiliary (かぶ+せる
       // for かぶせる), so the pair is barred rather than merely unrewarded.
       {EPOS::VerbShuushikei, EPOS::AuxCausative, cost::kAlmostNever},
+      // The passive has the same single host, so a terminal before it is a
+      // stem cut to fit the auxiliary as well (もつ+れる for もつれる).
+      {EPOS::VerbShuushikei, EPOS::AuxPassive, cost::kAlmostNever},
 
       // VerbMizenkei → VerbMizenkei (読ま+さ, やら+さ causative pattern)
       // Godan mizenkei + causative さ (する mizenkei) - moderate bonus

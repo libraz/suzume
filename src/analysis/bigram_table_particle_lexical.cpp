@@ -897,6 +897,14 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
       // (出+で+に+ける for 出で+に+ける). The copula is deliberately not barred
       // here: the modern parallel たり shares this class (歩いたり+だっ+たり).
       {EPOS::ParticleConj, EPOS::AuxClassicalPerfect, cost::kNever},
+      // The finite-attaching conjunctive, topic and binding particles close a
+      // phrase the same way (髪+が+ぬれ is the kana verb ぬれる).
+      {EPOS::ParticleConjFinite, EPOS::AuxClassicalPerfect, cost::kNever},
+      {EPOS::ParticleTopic, EPOS::AuxClassicalPerfect, cost::kNever},
+      {EPOS::ParticleBinding, EPOS::AuxClassicalPerfect, cost::kNever},
+      // The passive selects an irrealis cell, which the negative ぬ is not
+      // (読ま+ぬ+れ is no chain).
+      {EPOS::AuxNegativeNu, EPOS::AuxPassive, cost::kAlmostNever},
 
       // 連体形 なる (壮大なる計画): a na-adjective stem + なる is the classical adnominal 断定, not
       // the verb 成る. Only the left context (AdjNaAdj→なる) is rewarded: a right-context なる→Noun
