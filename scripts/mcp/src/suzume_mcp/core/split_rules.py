@@ -924,14 +924,16 @@ def apply_suzume_split(tokens: list[dict]) -> tuple[list[dict], str | None]:
             continue
 
         # 13. An excessive auxiliary remains a separate search unit. MeCab can
-        # lexicalize a kanji V1 plus 過ぎ into one verb token (行き過ぎ), while
-        # Suzume consistently exposes the productive V1 + 過ぎ boundary.
-        if t.get("pos") == "動詞" and surface.endswith("過ぎ") and t.get("lemma", "").endswith("過ぎる"):
-            verb_part = surface[: -len("過ぎ")]
+        # lexicalize a kanji V1 plus 過ぎる into one verb token in any cell
+        # (行き過ぎ, 通り過ぎる, 通り過ぎれ), while Suzume consistently exposes the
+        # productive V1 + 過ぎる boundary.
+        excessive_at = surface.rfind("過ぎ")
+        if t.get("pos") == "動詞" and excessive_at > 0 and t.get("lemma", "").endswith("過ぎる"):
+            verb_part = surface[:excessive_at]
             verb_lemma = base_from_renyokei(verb_part)
             if verb_lemma is not None:
                 result.append({"surface": verb_part, "pos": "動詞", "lemma": verb_lemma})
-                result.append({"surface": "過ぎ", "pos": "動詞", "lemma": "過ぎる"})
+                result.append({"surface": surface[excessive_at:], "pos": "動詞", "lemma": "過ぎる"})
                 if applied_rule is None:
                     applied_rule = "excessive-auxiliary-split"
                 continue

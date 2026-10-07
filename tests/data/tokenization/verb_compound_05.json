@@ -732,9 +732,14 @@
           "surface": "を"
         },
         {
-          "lemma": "通り過ぎる",
+          "lemma": "通る",
           "pos": "Verb",
-          "surface": "通り過ぎる"
+          "surface": "通り"
+        },
+        {
+          "lemma": "過ぎる",
+          "pos": "Verb",
+          "surface": "過ぎる"
         }
       ],
       "id": "wo_ri_giru",
@@ -1814,6 +1819,45 @@
       ],
       "id": "chi_kusu",
       "input": "立ち尽くす"
+    },
+    {
+      "description": "通り過ぎる - auto-generated",
+      "expected": [
+        {
+          "lemma": "通る",
+          "pos": "Verb",
+          "surface": "通り"
+        },
+        {
+          "lemma": "過ぎる",
+          "pos": "Verb",
+          "surface": "過ぎる"
+        }
+      ],
+      "id": "ri_giru_2",
+      "input": "通り過ぎる"
+    },
+    {
+      "description": "行き過ぎた - auto-generated",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行き"
+        },
+        {
+          "lemma": "過ぎる",
+          "pos": "Verb",
+          "surface": "過ぎ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ki_gita_2",
+      "input": "行き過ぎた"
     }
   ],
   "description": "Compound verbs (part 5/5)",
