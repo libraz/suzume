@@ -692,10 +692,11 @@ def _merge_fixed_search_units(state: MergeState) -> bool:
 
         # A listed greeting clipped of its long vowel (おはよ, ありがと) is still
         # that greeting when it closes the run or hands off to a final particle.
+        # A closing emphatic っ belongs to it as well (おはよっ).
         if not merged:
             clipped = clipped_greetings()
             clip = next((word for word in sorted(clipped, key=len, reverse=True) if remaining.startswith(word)), "")
-            span = clip + regex.match(r"[ー〜～]*", remaining[len(clip) :]).group() if clip else ""
+            span = clip + regex.match(r"[ー〜～]*っ?", remaining[len(clip) :]).group() if clip else ""
             after = remaining[len(span) : len(span) + 1]
             if clip and (
                 after == "" or after in _UTTERANCE_FINAL_PARTICLE_HEADS or regex.match(r"\p{Hiragana}", after) is None
