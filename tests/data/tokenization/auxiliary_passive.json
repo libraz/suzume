@@ -599,6 +599,80 @@
       ],
       "id": "nitasukerare_kattta",
       "input": "人にたすけられ、助かった"
+    },
+    {
+      "description": "Registered kana godan irrealis plus passive れ, not a coined ichidan stem",
+      "expected": [
+        {
+          "lemma": "箱",
+          "pos": "Noun",
+          "surface": "箱"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "しまう",
+          "pos": "Verb",
+          "surface": "しまわ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "nishimawareta",
+      "input": "箱にしまわれた"
+    },
+    {
+      "description": "Registered kana godan irrealis plus passive れ before ている",
+      "expected": [
+        {
+          "lemma": "棚",
+          "pos": "Noun",
+          "surface": "棚"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "しまう",
+          "pos": "Verb",
+          "surface": "しまわ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "nishimawareteita",
+      "input": "棚にしまわれていた"
     }
   ],
   "description": "auxiliary_passive tests",

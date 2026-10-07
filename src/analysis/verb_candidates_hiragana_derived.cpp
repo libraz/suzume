@@ -289,6 +289,17 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
       continue;
     }
 
+    // A registered godan irrealis plus passive れ / causative せ is that verb
+    // and its auxiliary (しまわ+れ+た), not the stem of a coined ichidan verb.
+    if (!is_dict_verb && dict_manager != nullptr && end_pos - start_pos >= 3 &&
+        (stem_end_char == U'れ' || stem_end_char == U'せ')) {
+      const auto* irrealis =
+          lookupEntryInRange(*dict_manager, codepoints, start_pos, end_pos - 1, core::PartOfSpeech::Verb);
+      if (irrealis != nullptr && irrealis->extended_pos == core::ExtendedPOS::VerbMizenkei) {
+        continue;
+      }
+    }
+
     // Skip causative+passive auxiliary chain patterns
     // E.g., "せられ" should be split as せ(causative) + られ(passive), not single verb
     // Preserve the causative, passive, and tense morpheme boundaries.
