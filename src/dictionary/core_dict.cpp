@@ -122,21 +122,9 @@ void CoreDictionary::buildTrie() {
     return;
   }
 
-  // Build unique keys with first occurrence index. Entries are already sorted,
-  // so a comparison with the previous item is sufficient.
-  std::vector<std::string> keys;
-  std::vector<uint32_t> values;
-  keys.reserve(entries_.size());
-  values.reserve(entries_.size());
-  for (size_t idx = 0; idx < entries_.size(); ++idx) {
-    if (idx == 0 || entries_[idx].surface != entries_[idx - 1].surface) {
-      keys.push_back(entries_[idx].surface);
-      values.push_back(static_cast<uint32_t>(idx));
-    }
-  }
-
-  // Build the Double-Array trie
-  trie_.build(keys, values);
+  // Entries are already sorted, so duplicates are adjacent.
+  buildFirstOccurrenceTrie(trie_, entries_.size(),
+                           [this](size_t idx) -> const std::string& { return entries_[idx].surface; });
 }
 
 std::vector<LookupResult> CoreDictionary::lookup(std::string_view text, size_t start_pos) const {

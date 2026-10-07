@@ -10,42 +10,16 @@ namespace {
 
 // Full-width ASCII to half-width (with case preservation option)
 char32_t fullwidthToHalfwidth(char32_t codepoint, bool preserve_case) {
-  // The full-width ASCII compatibility block maps one-to-one onto ASCII.
-  // Keep width folding here, before pre-tokenization, so all matchers share
-  // the same punctuation contract as letters and digits.
-  if (codepoint >= 0xFF01 && codepoint <= 0xFF0F) {
-    return codepoint - 0xFF01 + '!';
+  // The full-width ASCII compatibility block (！-～) maps one-to-one onto
+  // ASCII. Keep width folding here, before pre-tokenization, so all matchers
+  // share the same punctuation contract as letters and digits.
+  constexpr char32_t kFullwidthOffset = 0xFEE0;
+  if (codepoint >= 0xFF01 && codepoint <= 0xFF5E) {
+    codepoint -= kFullwidthOffset;
   }
-  // Full-width digits (０-９) -> half-width (0-9)
-  if (codepoint >= 0xFF10 && codepoint <= 0xFF19) {
-    return codepoint - 0xFF10 + '0';
-  }
-  if (codepoint >= 0xFF1A && codepoint <= 0xFF20) {
-    return codepoint - 0xFF1A + ':';
-  }
-  // Full-width uppercase (Ａ-Ｚ)
-  if (codepoint >= 0xFF21 && codepoint <= 0xFF3A) {
-    if (preserve_case) {
-      return codepoint - 0xFF21 + 'A';  // Keep uppercase
-    }
-    return codepoint - 0xFF21 + 'a';  // Convert to lowercase
-  }
-  if (codepoint >= 0xFF3B && codepoint <= 0xFF40) {
-    return codepoint - 0xFF3B + '[';
-  }
-  // Full-width lowercase (ａ-ｚ) -> half-width lowercase (a-z)
-  if (codepoint >= 0xFF41 && codepoint <= 0xFF5A) {
-    return codepoint - 0xFF41 + 'a';
-  }
-  if (codepoint >= 0xFF5B && codepoint <= 0xFF5E) {
-    return codepoint - 0xFF5B + '{';
-  }
-  // Half-width uppercase (A-Z)
-  if (codepoint >= 'A' && codepoint <= 'Z') {
-    if (preserve_case) {
-      return codepoint;  // Keep uppercase
-    }
-    return codepoint - 'A' + 'a';  // Convert to lowercase
+  // Uppercase (full-width already folded above) -> lowercase unless preserved
+  if (!preserve_case && codepoint >= 'A' && codepoint <= 'Z') {
+    return codepoint - 'A' + 'a';
   }
   return codepoint;
 }
@@ -91,32 +65,12 @@ char32_t normalizeWidthAndKana(char32_t codepoint, bool preserve_case) {
 
 // Vu-series (ヴ) normalization
 // ヴァ→バ, ヴィ→ビ, ヴ→ブ, ヴェ→ベ, ヴォ→ボ
-constexpr char32_t kKatakanaVu = 0x30F4;      // ヴ
-constexpr char32_t kKatakanaSmallA = 0x30A1;  // ァ
-constexpr char32_t kKatakanaSmallI = 0x30A3;  // ィ
-constexpr char32_t kKatakanaSmallU = 0x30A5;  // ゥ
-constexpr char32_t kKatakanaSmallE = 0x30A7;  // ェ
-constexpr char32_t kKatakanaSmallO = 0x30A9;  // ォ
-
-constexpr char32_t kKatakanaBa = 0x30D0;  // バ
-constexpr char32_t kKatakanaBi = 0x30D3;  // ビ
+constexpr char32_t kKatakanaVu = 0x30F4;  // ヴ
 constexpr char32_t kKatakanaBu = 0x30D6;  // ブ
-constexpr char32_t kKatakanaBe = 0x30D9;  // ベ
-constexpr char32_t kKatakanaBo = 0x30DC;  // ボ
 
 // Hiragana vu (rare but exists)
-constexpr char32_t kHiraganaVu = 0x3094;      // ゔ
-constexpr char32_t kHiraganaSmallA = 0x3041;  // ぁ
-constexpr char32_t kHiraganaSmallI = 0x3043;  // ぃ
-constexpr char32_t kHiraganaSmallU = 0x3045;  // ぅ
-constexpr char32_t kHiraganaSmallE = 0x3047;  // ぇ
-constexpr char32_t kHiraganaSmallO = 0x3049;  // ぉ
-
-constexpr char32_t kHiraganaBa = 0x3070;  // ば
-constexpr char32_t kHiraganaBi = 0x3073;  // び
+constexpr char32_t kHiraganaVu = 0x3094;  // ゔ
 constexpr char32_t kHiraganaBu = 0x3076;  // ぶ
-constexpr char32_t kHiraganaBe = 0x3079;  // べ
-constexpr char32_t kHiraganaBo = 0x307C;  // ぼ
 
 // Half-width dakuten and handakuten
 constexpr char32_t kHalfwidthDakuten = 0xFF9E;     // ﾞ
@@ -175,39 +129,17 @@ bool isHandakutenMark(char32_t codepoint) {
 
 // Returns normalized character for ヴ + small vowel, or 0 if not applicable
 char32_t normalizeVuSequence(char32_t vu_char, char32_t next_char) {
-  if (vu_char == kKatakanaVu) {
-    switch (next_char) {
-      case kKatakanaSmallA:
-        return kKatakanaBa;
-      case kKatakanaSmallI:
-        return kKatakanaBi;
-      case kKatakanaSmallU:
-        return kKatakanaBu;
-      case kKatakanaSmallE:
-        return kKatakanaBe;
-      case kKatakanaSmallO:
-        return kKatakanaBo;
-      default:
-        return 0;
-    }
+  // Small vowels ァィゥェォ (every other code point) map to バビブベボ (every third).
+  const bool is_katakana = vu_char == kKatakanaVu;
+  if (!is_katakana && vu_char != kHiraganaVu) {
+    return 0;
   }
-  if (vu_char == kHiraganaVu) {
-    switch (next_char) {
-      case kHiraganaSmallA:
-        return kHiraganaBa;
-      case kHiraganaSmallI:
-        return kHiraganaBi;
-      case kHiraganaSmallU:
-        return kHiraganaBu;
-      case kHiraganaSmallE:
-        return kHiraganaBe;
-      case kHiraganaSmallO:
-        return kHiraganaBo;
-      default:
-        return 0;
-    }
+  const char32_t plane_shift = is_katakana ? 0 : kKatakanaPlaneOffset;
+  const char32_t small_a = 0x30A1 - plane_shift;
+  if (next_char < small_a || next_char > small_a + 8 || (next_char - small_a) % 2 != 0) {
+    return 0;
   }
-  return 0;
+  return 0x30D0 - plane_shift + (next_char - small_a) / 2 * 3;
 }
 
 }  // namespace

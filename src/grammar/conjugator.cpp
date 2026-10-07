@@ -113,13 +113,9 @@ std::vector<StemForm> Conjugator::generateKuruStems(const std::string& base_form
   VerbType type = VerbType::Kuru;
   const KuruStemForms kuru = getKuruStemForms(base_form);
 
-  forms.push_back({kuru.base, type, base_form, conn::kVerbBase});
-  forms.push_back({kuru.renyokei, type, base_form, conn::kVerbRenyokei});
-  forms.push_back({kuru.onbinkei, type, base_form, conn::kVerbOnbinkei});
-  forms.push_back({kuru.mizenkei, type, base_form, conn::kVerbMizenkei});
-  forms.push_back({kuru.kateikei, type, base_form, conn::kVerbKatei});
-  forms.push_back({kuru.ishikei, type, base_form, conn::kVerbVolitional});
-  forms.push_back({kuru.meireikei, type, base_form, conn::kVerbMeireikei});
+  for (const auto& cell : kKuruConnectionCells) {
+    forms.push_back({kuru.*cell.form, type, base_form, cell.provides_conn});
+  }
 
   return forms;
 }

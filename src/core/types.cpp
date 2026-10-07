@@ -1,10 +1,66 @@
 #include "types.h"
 
+#include <iterator>
+
 #include "core/utf8_constants.h"
 #include "normalize/char_type.h"
 #include "normalize/utf8.h"
 
 namespace suzume::core {
+
+namespace {
+
+struct PosAlias {
+  std::string_view name;
+  PartOfSpeech pos;
+};
+
+// Canonical short forms, long aliases, and Japanese names. PROPN maps to Noun
+// (no dedicated proper-noun POS); OTHER/PHRASE map to Other.
+constexpr PosAlias kPosAliases[] = {
+    {"NOUN", PartOfSpeech::Noun},
+    {"名詞", PartOfSpeech::Noun},
+    {"PROPN", PartOfSpeech::Noun},
+    {"PROPER_NOUN", PartOfSpeech::Noun},
+    {"VERB", PartOfSpeech::Verb},
+    {"動詞", PartOfSpeech::Verb},
+    {"ADJ", PartOfSpeech::Adjective},
+    {"ADJECTIVE", PartOfSpeech::Adjective},
+    {"形容詞", PartOfSpeech::Adjective},
+    {"ADV", PartOfSpeech::Adverb},
+    {"ADVERB", PartOfSpeech::Adverb},
+    {"副詞", PartOfSpeech::Adverb},
+    {"PARTICLE", PartOfSpeech::Particle},
+    {"助詞", PartOfSpeech::Particle},
+    {"AUX", PartOfSpeech::Auxiliary},
+    {"AUXILIARY", PartOfSpeech::Auxiliary},
+    {"助動詞", PartOfSpeech::Auxiliary},
+    {"CONJ", PartOfSpeech::Conjunction},
+    {"CONJUNCTION", PartOfSpeech::Conjunction},
+    {"接続詞", PartOfSpeech::Conjunction},
+    {"DET", PartOfSpeech::Determiner},
+    {"DETERMINER", PartOfSpeech::Determiner},
+    {"ADNOMINAL", PartOfSpeech::Determiner},
+    {"連体詞", PartOfSpeech::Determiner},
+    {"PRON", PartOfSpeech::Pronoun},
+    {"PRONOUN", PartOfSpeech::Pronoun},
+    {"代名詞", PartOfSpeech::Pronoun},
+    {"PREFIX", PartOfSpeech::Prefix},
+    {"接頭辞", PartOfSpeech::Prefix},
+    {"SUFFIX", PartOfSpeech::Suffix},
+    {"接尾辞", PartOfSpeech::Suffix},
+    {"INTJ", PartOfSpeech::Interjection},
+    {"INTERJECTION", PartOfSpeech::Interjection},
+    {"感動詞", PartOfSpeech::Interjection},
+    {"SYMBOL", PartOfSpeech::Symbol},
+    {"SYM", PartOfSpeech::Symbol},
+    {"記号", PartOfSpeech::Symbol},
+    {"OTHER", PartOfSpeech::Other},
+    {"PHRASE", PartOfSpeech::Other},
+    {"その他", PartOfSpeech::Other},
+};
+
+}  // namespace
 
 std::string_view posToString(PartOfSpeech pos) {
   switch (pos) {
@@ -79,49 +135,10 @@ std::string_view posToJapanese(PartOfSpeech pos) {
 }
 
 std::optional<PartOfSpeech> stringToPosStrict(std::string_view str) {
-  // Canonical short forms, their long aliases, and Japanese names. PROPN maps
-  // to Noun (no dedicated proper-noun POS); OTHER/PHRASE map to Other.
-  if (str == "NOUN" || str == "名詞" || str == "PROPN" || str == "PROPER_NOUN") {
-    return PartOfSpeech::Noun;
-  }
-  if (str == "VERB" || str == "動詞") {
-    return PartOfSpeech::Verb;
-  }
-  if (str == "ADJ" || str == "ADJECTIVE" || str == "形容詞") {
-    return PartOfSpeech::Adjective;
-  }
-  if (str == "ADV" || str == "ADVERB" || str == "副詞") {
-    return PartOfSpeech::Adverb;
-  }
-  if (str == "PARTICLE" || str == "助詞") {
-    return PartOfSpeech::Particle;
-  }
-  if (str == "AUX" || str == "AUXILIARY" || str == "助動詞") {
-    return PartOfSpeech::Auxiliary;
-  }
-  if (str == "CONJ" || str == "CONJUNCTION" || str == "接続詞") {
-    return PartOfSpeech::Conjunction;
-  }
-  if (str == "DET" || str == "DETERMINER" || str == "ADNOMINAL" || str == "連体詞") {
-    return PartOfSpeech::Determiner;
-  }
-  if (str == "PRON" || str == "PRONOUN" || str == "代名詞") {
-    return PartOfSpeech::Pronoun;
-  }
-  if (str == "PREFIX" || str == "接頭辞") {
-    return PartOfSpeech::Prefix;
-  }
-  if (str == "SUFFIX" || str == "接尾辞") {
-    return PartOfSpeech::Suffix;
-  }
-  if (str == "INTJ" || str == "INTERJECTION" || str == "感動詞") {
-    return PartOfSpeech::Interjection;
-  }
-  if (str == "SYMBOL" || str == "SYM" || str == "記号") {
-    return PartOfSpeech::Symbol;
-  }
-  if (str == "OTHER" || str == "PHRASE" || str == "その他") {
-    return PartOfSpeech::Other;
+  for (const auto& alias : kPosAliases) {
+    if (str == alias.name) {
+      return alias.pos;
+    }
   }
   return std::nullopt;
 }
@@ -152,61 +169,38 @@ bool isFunctionWord(PartOfSpeech pos) {
 }
 
 const char* originToString(CandidateOrigin origin) {
-  switch (origin) {
-    case CandidateOrigin::Dictionary:
-      return "dict";
-    case CandidateOrigin::VerbKanji:
-      return "verb_kanji";
-    case CandidateOrigin::VerbHiragana:
-      return "verb_hira";
-    case CandidateOrigin::VerbHiraganaPassiveRenyokei:
-      return "verb_hira_passive_renyo";
-    case CandidateOrigin::VerbHiraganaNegativeRenyokei:
-      return "verb_hira_negative_renyo";
-    case CandidateOrigin::VerbHiraganaInflectedRenyokei:
-      return "verb_hira_inflected_renyo";
-    case CandidateOrigin::VerbKatakana:
-      return "verb_kata";
-    case CandidateOrigin::VerbCompound:
-      return "verb_compound";
-    case CandidateOrigin::AdjectiveI:
-      return "adj_i";
-    case CandidateOrigin::AdjectiveIHiragana:
-      return "adj_i_hira";
-    case CandidateOrigin::AdjectiveNa:
-      return "adj_na";
-    case CandidateOrigin::NominalizedNoun:
-      return "noun_nominalized";
-    case CandidateOrigin::SuffixPattern:
-      return "suffix";
-    case CandidateOrigin::SameType:
-      return "same_type";
-    case CandidateOrigin::Alphanumeric:
-      return "alphanum";
-    case CandidateOrigin::Onomatopoeia:
-      return "onomatopoeia";
-    case CandidateOrigin::CharacterSpeech:
-      return "char_speech";
-    case CandidateOrigin::Split:
-      return "split";
-    case CandidateOrigin::Join:
-      return "join";
-    case CandidateOrigin::KanjiHiraganaCompound:
-      return "kanji_hira_compound";
-    case CandidateOrigin::KanjiHiraganaNominalCompound:
-      return "kanji_hira_nominal_compound";
-    case CandidateOrigin::SelectedNominalHead:
-      return "selected_nominal_head";
-    case CandidateOrigin::BracketedNoun:
-      return "bracketed_noun";
-    case CandidateOrigin::Counter:
-      return "counter";
-    case CandidateOrigin::PrefixCompound:
-      return "prefix_compound";
-    case CandidateOrigin::Unknown:
-    default:
-      return "unknown";
-  }
+  static constexpr const char* kNames[] = {
+      "unknown",
+      "dict",
+      "verb_kanji",
+      "verb_hira",
+      "verb_hira_passive_renyo",
+      "verb_hira_negative_renyo",
+      "verb_hira_inflected_renyo",
+      "verb_kata",
+      "verb_compound",
+      "adj_i",
+      "adj_i_hira",
+      "adj_na",
+      "noun_nominalized",
+      "suffix",
+      "same_type",
+      "alphanum",
+      "onomatopoeia",
+      "char_speech",
+      "split",
+      "join",
+      "kanji_hira_compound",
+      "kanji_hira_nominal_compound",
+      "selected_nominal_head",
+      "bracketed_noun",
+      "counter",
+      "prefix_compound",
+  };
+  static_assert(std::size(kNames) == static_cast<size_t>(CandidateOrigin::PrefixCompound) + 1,
+                "kNames must cover every CandidateOrigin value");
+  const auto idx = static_cast<size_t>(origin);
+  return idx < std::size(kNames) ? kNames[idx] : "unknown";
 }
 
 // =============================================================================
@@ -491,39 +485,28 @@ PartOfSpeech extendedPosToPos(ExtendedPOS epos) {
 }
 
 ExtendedPOS posToExtendedPos(PartOfSpeech pos) {
-  switch (pos) {
-    case PartOfSpeech::Verb:
-      return ExtendedPOS::VerbShuushikei;  // Default: dictionary form
-    case PartOfSpeech::Adjective:
-      return ExtendedPOS::AdjBasic;  // Default: basic form
-    case PartOfSpeech::Auxiliary:
-      return ExtendedPOS::AuxTenseTa;  // Default: た (most common)
-    case PartOfSpeech::Particle:
-      return ExtendedPOS::ParticleCase;  // Default: case particle
-    case PartOfSpeech::Noun:
-      return ExtendedPOS::Noun;
-    case PartOfSpeech::Pronoun:
-      return ExtendedPOS::Pronoun;
-    case PartOfSpeech::Adverb:
-      return ExtendedPOS::Adverb;
-    case PartOfSpeech::Conjunction:
-      return ExtendedPOS::Conjunction;
-    case PartOfSpeech::Determiner:
-      return ExtendedPOS::Determiner;
-    case PartOfSpeech::Prefix:
-      return ExtendedPOS::Prefix;
-    case PartOfSpeech::Suffix:
-      return ExtendedPOS::Suffix;
-    case PartOfSpeech::Interjection:
-      return ExtendedPOS::Interjection;
-    case PartOfSpeech::Symbol:
-      return ExtendedPOS::Symbol;
-    case PartOfSpeech::Count_:
-    case PartOfSpeech::Other:
-    case PartOfSpeech::Unknown:
-    default:
-      return ExtendedPOS::Other;
-  }
+  // Indexed by PartOfSpeech; defaults pick the most common form per POS.
+  static constexpr ExtendedPOS kDefaults[] = {
+      ExtendedPOS::Other,           // Unknown
+      ExtendedPOS::Noun,            // Noun
+      ExtendedPOS::VerbShuushikei,  // Verb: dictionary form
+      ExtendedPOS::AdjBasic,        // Adjective: basic form
+      ExtendedPOS::Adverb,          // Adverb
+      ExtendedPOS::ParticleCase,    // Particle: case particle
+      ExtendedPOS::AuxTenseTa,      // Auxiliary: た (most common)
+      ExtendedPOS::Conjunction,     // Conjunction
+      ExtendedPOS::Determiner,      // Determiner
+      ExtendedPOS::Pronoun,         // Pronoun
+      ExtendedPOS::Prefix,          // Prefix
+      ExtendedPOS::Suffix,          // Suffix
+      ExtendedPOS::Interjection,    // Interjection
+      ExtendedPOS::Symbol,          // Symbol
+      ExtendedPOS::Other,           // Other
+  };
+  static_assert(std::size(kDefaults) == static_cast<size_t>(PartOfSpeech::Count_),
+                "kDefaults must cover every PartOfSpeech value");
+  const auto idx = static_cast<size_t>(pos);
+  return idx < std::size(kDefaults) ? kDefaults[idx] : ExtendedPOS::Other;
 }
 
 // =============================================================================

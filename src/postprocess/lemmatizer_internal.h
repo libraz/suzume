@@ -10,6 +10,9 @@
 namespace suzume::postprocess::lemmatizer_detail {
 
 bool hasExactVerbEntry(const dictionary::DictionaryManager* dict_manager, std::string_view surface);
+/// First godan base (in onbin-table order) of stem that is a dictionary verb, or empty.
+std::string firstAttestedGodanBase(const dictionary::DictionaryManager* dict_manager, std::string_view stem,
+                                   std::string_view onbin);
 std::string fixSuruClassical(std::string_view lemma, dictionary::ConjugationType conj_type);
 std::string fixShiru(std::string_view lemma, std::string_view surface);
 std::string fixSpecialRaRowLemma(std::string_view lemma, const dictionary::DictionaryManager* dict_manager);

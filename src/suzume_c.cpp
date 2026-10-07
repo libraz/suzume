@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <exception>
+#include <iterator>
 #include <new>
 #include <optional>
 #include <string>
@@ -698,120 +699,74 @@ SUZUME_EXPORT size_t suzume_sizeof_extended_options(void) {
 }
 
 SUZUME_EXPORT size_t suzume_offsetof_result(uint32_t field) {
-  switch (field) {
-    case 0:
-      return offsetof(suzume_result_t, morphemes);
-    case 1:
-      return offsetof(suzume_result_t, count);
-    case 2:
-      return offsetof(suzume_result_t, normalized_text);
-    case 3:
-      return offsetof(suzume_result_t, normalized_text_size);
-    default:
-      return static_cast<size_t>(-1);
-  }
+  static constexpr size_t kOffsets[] = {
+      offsetof(suzume_result_t, morphemes),
+      offsetof(suzume_result_t, count),
+      offsetof(suzume_result_t, normalized_text),
+      offsetof(suzume_result_t, normalized_text_size),
+  };
+  return field < std::size(kOffsets) ? kOffsets[field] : static_cast<size_t>(-1);
 }
 
 SUZUME_EXPORT size_t suzume_offsetof_morpheme(uint32_t field) {
-  switch (field) {
-    case 0:
-      return offsetof(suzume_morpheme_t, surface);
-    case 1:
-      return offsetof(suzume_morpheme_t, base_form);
-    case 2:
-      return offsetof(suzume_morpheme_t, start);
-    case 3:
-      return offsetof(suzume_morpheme_t, end);
-    case 4:
-      return offsetof(suzume_morpheme_t, score);
-    case 5:
-      return offsetof(suzume_morpheme_t, pos);
-    case 6:
-      return offsetof(suzume_morpheme_t, extended_pos);
-    case 7:
-      return offsetof(suzume_morpheme_t, conjugation_type);
-    case 8:
-      return offsetof(suzume_morpheme_t, conjugation_form);
-    case 9:
-      return offsetof(suzume_morpheme_t, flags);
-    case 10:
-      return offsetof(suzume_morpheme_t, surface_size);
-    case 11:
-      return offsetof(suzume_morpheme_t, base_form_size);
-    default:
-      return static_cast<size_t>(-1);
-  }
+  static constexpr size_t kOffsets[] = {
+      offsetof(suzume_morpheme_t, surface),
+      offsetof(suzume_morpheme_t, base_form),
+      offsetof(suzume_morpheme_t, start),
+      offsetof(suzume_morpheme_t, end),
+      offsetof(suzume_morpheme_t, score),
+      offsetof(suzume_morpheme_t, pos),
+      offsetof(suzume_morpheme_t, extended_pos),
+      offsetof(suzume_morpheme_t, conjugation_type),
+      offsetof(suzume_morpheme_t, conjugation_form),
+      offsetof(suzume_morpheme_t, flags),
+      offsetof(suzume_morpheme_t, surface_size),
+      offsetof(suzume_morpheme_t, base_form_size),
+  };
+  return field < std::size(kOffsets) ? kOffsets[field] : static_cast<size_t>(-1);
 }
 
 SUZUME_EXPORT size_t suzume_offsetof_tags(uint32_t field) {
-  switch (field) {
-    case 0:
-      return offsetof(suzume_tags_t, tags);
-    case 1:
-      return offsetof(suzume_tags_t, pos);
-    case 2:
-      return offsetof(suzume_tags_t, count);
-    default:
-      return static_cast<size_t>(-1);
-  }
+  static constexpr size_t kOffsets[] = {
+      offsetof(suzume_tags_t, tags),
+      offsetof(suzume_tags_t, pos),
+      offsetof(suzume_tags_t, count),
+  };
+  return field < std::size(kOffsets) ? kOffsets[field] : static_cast<size_t>(-1);
 }
 
 SUZUME_EXPORT size_t suzume_offsetof_tag_options(uint32_t field) {
-  switch (field) {
-    case 0:
-      return offsetof(suzume_tag_options_t, pos_filter);
-    case 1:
-      return offsetof(suzume_tag_options_t, exclude_basic);
-    case 2:
-      return offsetof(suzume_tag_options_t, use_lemma);
-    case 3:
-      return offsetof(suzume_tag_options_t, min_length);
-    case 4:
-      return offsetof(suzume_tag_options_t, max_tags);
-    case 5:
-      return offsetof(suzume_tag_options_t, exclude_particles);
-    case 6:
-      return offsetof(suzume_tag_options_t, exclude_auxiliaries);
-    case 7:
-      return offsetof(suzume_tag_options_t, exclude_formal_nouns);
-    case 8:
-      return offsetof(suzume_tag_options_t, exclude_low_info);
-    case 9:
-      return offsetof(suzume_tag_options_t, remove_duplicates);
-    default:
-      return static_cast<size_t>(-1);
-  }
+  static constexpr size_t kOffsets[] = {
+      offsetof(suzume_tag_options_t, pos_filter),
+      offsetof(suzume_tag_options_t, exclude_basic),
+      offsetof(suzume_tag_options_t, use_lemma),
+      offsetof(suzume_tag_options_t, min_length),
+      offsetof(suzume_tag_options_t, max_tags),
+      offsetof(suzume_tag_options_t, exclude_particles),
+      offsetof(suzume_tag_options_t, exclude_auxiliaries),
+      offsetof(suzume_tag_options_t, exclude_formal_nouns),
+      offsetof(suzume_tag_options_t, exclude_low_info),
+      offsetof(suzume_tag_options_t, remove_duplicates),
+  };
+  return field < std::size(kOffsets) ? kOffsets[field] : static_cast<size_t>(-1);
 }
 
 SUZUME_EXPORT size_t suzume_offsetof_extended_options(uint32_t field) {
-  switch (field) {
-    case 0:
-      return offsetof(suzume_extended_options_t, preserve_vu);
-    case 1:
-      return offsetof(suzume_extended_options_t, preserve_case);
-    case 2:
-      return offsetof(suzume_extended_options_t, preserve_symbols);
-    case 3:
-      return offsetof(suzume_extended_options_t, mode);
-    case 4:
-      return offsetof(suzume_extended_options_t, lemmatize);
-    case 5:
-      return offsetof(suzume_extended_options_t, merge_compounds);
-    case 6:
-      return offsetof(suzume_extended_options_t, skip_user_dictionary);
-    case 7:
-      return offsetof(suzume_extended_options_t, skip_core_dictionary);
-    case 8:
-      return offsetof(suzume_extended_options_t, report_scorer_config);
-    case 9:
-      return offsetof(suzume_extended_options_t, skip_env_config);
-    case 10:
-      return offsetof(suzume_extended_options_t, scorer_options_json);
-    case 11:
-      return offsetof(suzume_extended_options_t, data_directory);
-    default:
-      return static_cast<size_t>(-1);
-  }
+  static constexpr size_t kOffsets[] = {
+      offsetof(suzume_extended_options_t, preserve_vu),
+      offsetof(suzume_extended_options_t, preserve_case),
+      offsetof(suzume_extended_options_t, preserve_symbols),
+      offsetof(suzume_extended_options_t, mode),
+      offsetof(suzume_extended_options_t, lemmatize),
+      offsetof(suzume_extended_options_t, merge_compounds),
+      offsetof(suzume_extended_options_t, skip_user_dictionary),
+      offsetof(suzume_extended_options_t, skip_core_dictionary),
+      offsetof(suzume_extended_options_t, report_scorer_config),
+      offsetof(suzume_extended_options_t, skip_env_config),
+      offsetof(suzume_extended_options_t, scorer_options_json),
+      offsetof(suzume_extended_options_t, data_directory),
+  };
+  return field < std::size(kOffsets) ? kOffsets[field] : static_cast<size_t>(-1);
 }
 
 #ifdef __EMSCRIPTEN__

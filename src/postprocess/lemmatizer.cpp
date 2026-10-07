@@ -2,7 +2,6 @@
 
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
-#include "grammar/conjugation.h"
 #include "grammar/inflection_scorer_constants.h"
 #include "normalize/char_type.h"
 #include "normalize/utf8.h"
@@ -269,12 +268,8 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
         // matching candidate generation's order so this fallback and the analysis
         // layer agree on ties (a stem in the dictionary as both, e.g. つく/つぐ).
         const std::string_view stem = utf8::dropLastChar(grammar_result);
-        for (const auto& [verb_type, base_suffix] : grammar::Conjugation::getGodanTypesByOnbin("い")) {
-          (void)verb_type;
-          std::string base_form = normalize::concat(stem, base_suffix);
-          if (hasExactVerbEntry(dict_manager_, base_form)) {
-            return base_form;
-          }
+        if (std::string base_form = firstAttestedGodanBase(dict_manager_, stem, "い"); !base_form.empty()) {
+          return base_form;
         }
         // No dictionary verification available - return grammar_result as-is
         // The lemmatizeAll() will fix onbin patterns using next morpheme context

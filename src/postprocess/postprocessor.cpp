@@ -278,19 +278,13 @@ std::vector<core::Morpheme> Postprocessor::mergeNounCompounds(std::vector<core::
 }
 
 std::vector<core::Morpheme> Postprocessor::filterMorphemes(std::vector<core::Morpheme> morphemes) const {
-  std::vector<core::Morpheme> result;
-  result.reserve(morphemes.size());
-
-  for (auto& morpheme : morphemes) {
-    // Skip symbols if option is set
-    if (options_.remove_symbols && morpheme.pos == core::PartOfSpeech::Symbol) {
-      continue;
-    }
-
-    result.push_back(std::move(morpheme));
+  if (options_.remove_symbols) {
+    morphemes.erase(
+        std::remove_if(morphemes.begin(), morphemes.end(),
+                       [](const core::Morpheme& morpheme) { return morpheme.pos == core::PartOfSpeech::Symbol; }),
+        morphemes.end());
   }
-
-  return result;
+  return morphemes;
 }
 
 std::vector<core::Morpheme> Postprocessor::mergeVerbRenyokeiMono(std::vector<core::Morpheme> morphemes) {

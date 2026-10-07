@@ -572,17 +572,16 @@ const auto& auxiliaryBases() {
 
 void appendAuxiliaryBase(const AuxiliaryBase& base, std::vector<AuxiliaryEntry>& result) {
   switch (base.conj_type) {
-    case VerbType::Ichidan:
+    case VerbType::Ichidan: {
+      size_t form_count = std::size(kIchidanFull);
       if (base.form_family == AuxiliaryFormFamily::TeAttachment) {
-        appendWithStem(base, kIchidanFull, kIchidanTeAttachCount, result);
-        return;
+        form_count = kIchidanTeAttachCount;
+      } else if (base.form_family == AuxiliaryFormFamily::Progressive) {
+        form_count = kIchidanProgressiveCount;
       }
-      if (base.form_family == AuxiliaryFormFamily::Progressive) {
-        appendWithStem(base, kIchidanFull, kIchidanProgressiveCount, result);
-        return;
-      }
-      appendWithStem(base, kIchidanFull, std::size(kIchidanFull), result);
+      appendWithStem(base, kIchidanFull, form_count, result);
       return;
+    }
     case VerbType::GodanWa:
     case VerbType::GodanKa:
     case VerbType::GodanSa:

@@ -21,6 +21,7 @@
 
 #include "core/types.h"
 #include "dictionary/dictionary.h"
+#include "grammar/connection.h"
 
 namespace suzume::grammar {
 
@@ -212,6 +213,24 @@ struct KuruStemForms {
   std::string ishikei;
   std::string meireikei;
 };
+
+/**
+ * @brief Connection id each KuruStemForms cell provides, in generation order.
+ */
+struct KuruConnectionCell {
+  std::string KuruStemForms::*form;
+  uint16_t provides_conn;
+};
+
+inline constexpr std::array<KuruConnectionCell, 7> kKuruConnectionCells = {{
+    {&KuruStemForms::base, conn::kVerbBase},
+    {&KuruStemForms::renyokei, conn::kVerbRenyokei},
+    {&KuruStemForms::onbinkei, conn::kVerbOnbinkei},
+    {&KuruStemForms::mizenkei, conn::kVerbMizenkei},
+    {&KuruStemForms::kateikei, conn::kVerbKatei},
+    {&KuruStemForms::ishikei, conn::kVerbVolitional},
+    {&KuruStemForms::meireikei, conn::kVerbMeireikei},
+}};
 
 /**
  * @brief Return the canonical カ変 stem surfaces for a base form.

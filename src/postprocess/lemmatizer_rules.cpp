@@ -301,6 +301,18 @@ bool hasExactVerbEntry(const dictionary::DictionaryManager* dict_manager, std::s
   return dict_manager->lookupExact(surface, core::PartOfSpeech::Verb) != nullptr;
 }
 
+std::string firstAttestedGodanBase(const dictionary::DictionaryManager* dict_manager, std::string_view stem,
+                                   std::string_view onbin) {
+  for (const auto& [verb_type, base_suffix] : grammar::Conjugation::getGodanTypesByOnbin(onbin)) {
+    (void)verb_type;
+    std::string base_form = normalize::concat(stem, base_suffix);
+    if (hasExactVerbEntry(dict_manager, base_form)) {
+      return base_form;
+    }
+  }
+  return "";
+}
+
 // =============================================================================
 // Shared lemma-correction helpers
 //
@@ -621,12 +633,8 @@ std::string lemmatizeContractedVerbWithDictionary(std::string_view surface,
 
     const std::string_view stem = surface.substr(0, surface.size() - ending.suffix.size());
     const std::string_view onbin = kOnbinSurfaces[static_cast<size_t>(ending.onbin)];
-    for (const auto& [verb_type, base_suffix] : grammar::Conjugation::getGodanTypesByOnbin(onbin)) {
-      (void)verb_type;
-      std::string base_form = normalize::concat(stem, base_suffix);
-      if (hasExactVerbEntry(dict_manager, base_form)) {
-        return base_form;
-      }
+    if (std::string base_form = firstAttestedGodanBase(dict_manager, stem, onbin); !base_form.empty()) {
+      return base_form;
     }
   }
 

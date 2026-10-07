@@ -840,25 +840,7 @@ VerbType verbTypeFromBaseCodepoint(char32_t base_cp) {
 }
 
 bool isMixedHiraganaKanji(std::string_view stem) {
-  bool has_hiragana = false;
-  bool has_kanji = false;
-  size_t pos = 0;
-  while (pos + core::kJapaneseCharBytes <= stem.size()) {
-    if (utf8::is3ByteUtf8At(stem, pos)) {
-      char32_t cp = utf8::decode3ByteUtf8At(stem, pos);
-      if (kana::isHiraganaCodepoint(cp)) {
-        has_hiragana = true;
-      } else if (kana::isKanjiCodepoint(cp)) {
-        has_kanji = true;
-      }
-      if (has_hiragana && has_kanji)
-        return true;
-      pos += core::kJapaneseCharBytes;
-    } else {
-      pos += 1;
-    }
-  }
-  return false;
+  return anyCharMatches(stem, kana::isHiraganaCodepoint) && anyCharMatches(stem, kana::isKanjiCodepoint);
 }
 
 bool isRenyokeiNominalizingSuffix(std::string_view suffix) {

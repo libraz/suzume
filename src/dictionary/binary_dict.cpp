@@ -19,6 +19,10 @@ namespace suzume::dictionary {
 
 namespace {
 
+core::Unexpected<core::Error> invalid(std::string message) {
+  return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, std::move(message)));
+}
+
 constexpr size_t kInlineFrontLength = 15;
 constexpr size_t kMaxSerializedSurfaceLength = std::numeric_limits<uint8_t>::max();
 constexpr uint16_t kPackedLemmaMask = 0x07FFU;
@@ -214,8 +218,7 @@ BinaryDictionary::~BinaryDictionary() = default;
 core::Expected<size_t, core::Error> BinaryDictionary::loadFromFile(const std::string& path) {
 #ifdef __EMSCRIPTEN__
   (void)path;
-  return core::makeUnexpected(
-      core::Error(core::ErrorCode::InvalidInput, "File dictionary loading is unavailable in WASM"));
+  return invalid("File dictionary loading is unavailable in WASM");
 #else
   std::ifstream file(path, std::ios::binary | std::ios::ate);
   if (!file) {
@@ -239,7 +242,7 @@ core::Expected<size_t, core::Error> BinaryDictionary::loadFromFile(const std::st
 
 core::Expected<size_t, core::Error> BinaryDictionary::loadFromMemory(const uint8_t* data, size_t size) {
   if (data == nullptr || size == 0) {
-    return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Empty dictionary data"));
+    return invalid("Empty dictionary data");
   }
 
   DoubleArray loaded_trie;
@@ -258,23 +261,23 @@ core::Expected<size_t, core::Error> BinaryDictionary::loadFromMemory(const uint8
 core::Expected<size_t, core::Error> BinaryDictionary::parseData(const uint8_t* data, size_t size, DoubleArray& trie,
                                                                 std::vector<DictionaryEntry>& entries) {
   if (size < sizeof(BinaryDictHeader)) {
-    return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Dictionary file too small"));
+    return invalid("Dictionary file too small");
   }
 
   const auto header = readPod<BinaryDictHeader>(data, 0);
 
   // Validate magic
   if (header.magic != BinaryDictHeader::kMagic) {
-    return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Invalid dictionary magic number"));
+    return invalid("Invalid dictionary magic number");
   }
 
   if (header.version != BinaryDictHeader::kVersion) {
-    return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Unsupported dictionary version"));
+    return invalid("Unsupported dictionary version");
   }
 
   const size_t entry_count = header.entry_count;
   if (entry_count > static_cast<size_t>(std::numeric_limits<int32_t>::max())) {
-    return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Dictionary has too many entries"));
+    return invalid("Dictionary has too many entries");
   }
   const size_t surface_offset = sizeof(BinaryDictHeader);
   const size_t surface_size = header.surface_size;
@@ -285,26 +288,25 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData(const uint8_t* d
       (uses_relative_lemmas && entry_encoding != BinaryDictHeader::kPackedEntries &&
        entry_encoding != BinaryDictHeader::kRecordPaletteEntries) ||
       header.reserved != 0) {
-    return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Invalid dictionary header"));
+    return invalid("Invalid dictionary header");
   }
   size_t entry_table_offset = surface_offset + surface_size;
   size_t entry_record_size = 0;
   std::vector<GrammarPair> grammar_palette;
   if (entry_table_offset >= size) {
-    return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Missing dictionary grammar palette"));
+    return invalid("Missing dictionary grammar palette");
   }
   const size_t palette_count = data[entry_table_offset++];
   const size_t palette_bytes = palette_count * sizeof(GrammarPair);
   if (palette_count == 0 || palette_bytes > size - entry_table_offset) {
-    return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Invalid dictionary grammar palette"));
+    return invalid("Invalid dictionary grammar palette");
   }
   grammar_palette.reserve(palette_count);
   for (size_t idx = 0; idx < palette_count; ++idx) {
     const size_t pair_offset = entry_table_offset + idx * sizeof(GrammarPair);
     GrammarPair pair{data[pair_offset], data[pair_offset + 1]};
     if (!isValidPos(pair.pos) || !isValidExtendedPos(pair.extended_pos)) {
-      return core::makeUnexpected(
-          core::Error(core::ErrorCode::InvalidInput, "Invalid dictionary grammar palette value"));
+      return invalid("Invalid dictionary grammar palette value");
     }
     grammar_palette.push_back(pair);
   }
@@ -314,12 +316,12 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData(const uint8_t* d
   switch (entry_encoding) {
     case BinaryDictHeader::kRecordPaletteEntries: {
       if (entry_table_offset >= size) {
-        return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Missing dictionary record palette"));
+        return invalid("Missing dictionary record palette");
       }
       const size_t record_count = data[entry_table_offset++];
       const size_t record_bytes = record_count * sizeof(uint16_t);
       if (record_count == 0 || record_bytes > size - entry_table_offset) {
-        return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Invalid dictionary record palette"));
+        return invalid("Invalid dictionary record palette");
       }
       record_palette = data + entry_table_offset;
       record_palette_size = record_count;
@@ -337,34 +339,24 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData(const uint8_t* d
       entry_record_size = kWideCompactEntrySize;
       break;
     default:
-      return core::makeUnexpected(
-          core::Error(core::ErrorCode::InvalidInput, "Invalid compact dictionary entry encoding"));
+      return invalid("Invalid compact dictionary entry encoding");
   }
   if (entry_count > (std::numeric_limits<size_t>::max() / entry_record_size)) {
-    return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Dictionary entry table too large"));
+    return invalid("Dictionary entry table too large");
   }
   const size_t entry_table_size = entry_count * entry_record_size;
   if (entry_table_size > size - entry_table_offset) {
-    return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Invalid dictionary entry table"));
+    return invalid("Invalid dictionary entry table");
   }
   const size_t string_offset = entry_table_offset + entry_table_size;
 
   std::vector<std::string> trie_surfaces;
   if (!decodeFrontCodedSurfaces(data + surface_offset, surface_size, entry_count, trie_surfaces)) {
-    return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Invalid dictionary surface table"));
+    return invalid("Invalid dictionary surface table");
   }
-  std::vector<std::string> trie_keys;
-  std::vector<uint32_t> trie_values;
-  trie_keys.reserve(trie_surfaces.size());
-  trie_values.reserve(trie_surfaces.size());
-  for (size_t idx = 0; idx < trie_surfaces.size(); ++idx) {
-    if (idx == 0 || trie_surfaces[idx] != trie_surfaces[idx - 1]) {
-      trie_keys.push_back(trie_surfaces[idx]);
-      trie_values.push_back(static_cast<uint32_t>(idx));
-    }
-  }
-  if (!trie.build(trie_keys, trie_values)) {
-    return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Failed to build dictionary trie"));
+  if (!buildFirstOccurrenceTrie(trie, trie_surfaces.size(),
+                                [&](size_t idx) -> const std::string& { return trie_surfaces[idx]; })) {
+    return invalid("Failed to build dictionary trie");
   }
 
   // Relative references consume the entire tail; other encodings use it as a
@@ -372,24 +364,23 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData(const uint8_t* d
   std::vector<std::string_view> compact_lemmas;
   if (uses_relative_lemmas) {
     if (string_offset != size) {
-      return core::makeUnexpected(
-          core::Error(core::ErrorCode::InvalidInput, "Relative lemma dictionary has trailing data"));
+      return invalid("Relative lemma dictionary has trailing data");
     }
   } else {
     size_t lemma_offset = string_offset;
     while (lemma_offset < size) {
       const size_t lemma_length = data[lemma_offset++];
       if (lemma_length == 0 || lemma_length > size - lemma_offset) {
-        return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Invalid compact lemma table"));
+        return invalid("Invalid compact lemma table");
       }
       const std::string_view lemma(reinterpret_cast<const char*>(data + lemma_offset), lemma_length);
       if (!normalize::isValidUtf8(lemma)) {
-        return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Dictionary lemma is not valid UTF-8"));
+        return invalid("Dictionary lemma is not valid UTF-8");
       }
       compact_lemmas.push_back(lemma);
       lemma_offset += lemma_length;
       if (compact_lemmas.size() > std::numeric_limits<uint16_t>::max()) {
-        return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Compact lemma table is too large"));
+        return invalid("Compact lemma table is too large");
       }
     }
   }
@@ -404,7 +395,7 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData(const uint8_t* d
       case BinaryDictHeader::kRecordPaletteEntries: {
         const uint8_t record_idx = data[entry_pos];
         if (record_idx >= record_palette_size) {
-          return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Invalid record palette index"));
+          return invalid("Invalid record palette index");
         }
         record = unpackEntry(readPod<uint16_t>(record_palette, record_idx * sizeof(uint16_t)));
         break;
@@ -424,8 +415,7 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData(const uint8_t* d
     const uint16_t lemma_reference = record.lemma_reference;
     const uint8_t grammar_idx = record.grammar_index;
     if (grammar_idx >= grammar_palette.size()) {
-      return core::makeUnexpected(
-          core::Error(core::ErrorCode::InvalidInput, "Invalid dictionary grammar palette index"));
+      return invalid("Invalid dictionary grammar palette index");
     }
     const uint8_t pos = grammar_palette[grammar_idx].pos;
     const uint8_t extended_pos = grammar_palette[grammar_idx].extended_pos;
@@ -436,12 +426,12 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData(const uint8_t* d
     if (uses_relative_lemmas) {
       const int64_t lemma_target = static_cast<int64_t>(idx) + decodeRelativeLemmaReference(lemma_reference);
       if (lemma_target < 0 || lemma_target >= static_cast<int64_t>(entry_count)) {
-        return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Invalid relative lemma reference"));
+        return invalid("Invalid relative lemma reference");
       }
       entry.lemma = trie_surfaces[static_cast<size_t>(lemma_target)];
     } else if (lemma_reference > 0) {
       if (lemma_reference > compact_lemmas.size()) {
-        return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Invalid compact lemma index"));
+        return invalid("Invalid compact lemma index");
       }
       entry.lemma = compact_lemmas[lemma_reference - 1];
     } else {
@@ -489,10 +479,10 @@ void BinaryDictWriter::addEntry(const DictionaryEntry& entry) {
 
 core::Expected<std::vector<uint8_t>, core::Error> BinaryDictWriter::build() {
   if (entries_.empty()) {
-    return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "No entries to write"));
+    return invalid("No entries to write");
   }
   if (entries_.size() > static_cast<size_t>(std::numeric_limits<int32_t>::max())) {
-    return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Dictionary has too many entries"));
+    return invalid("Dictionary has too many entries");
   }
 
   // Keep grammatical homographs consecutive and deterministic. The trie points
@@ -514,28 +504,25 @@ core::Expected<std::vector<uint8_t>, core::Error> BinaryDictWriter::build() {
 
   for (const auto& ent : entries_) {
     if (ent.surface.empty()) {
-      return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Dictionary surface must not be empty"));
+      return invalid("Dictionary surface must not be empty");
     }
     if (ent.surface.find('\0') != std::string::npos) {
-      return core::makeUnexpected(
-          core::Error(core::ErrorCode::InvalidInput, "Dictionary surface contains an embedded NUL byte"));
+      return invalid("Dictionary surface contains an embedded NUL byte");
     }
     if (!normalize::isValidUtf8(ent.surface) || (!ent.lemma.empty() && !normalize::isValidUtf8(ent.lemma))) {
-      return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Dictionary entry is not valid UTF-8"));
+      return invalid("Dictionary entry is not valid UTF-8");
     }
 
     if (ent.surface.size() > std::numeric_limits<uint8_t>::max()) {
-      return core::makeUnexpected(
-          core::Error(core::ErrorCode::InvalidInput, "Dictionary surface exceeds 255 bytes: " + ent.surface));
+      return invalid("Dictionary surface exceeds 255 bytes: " + ent.surface);
     }
 
     if (!ent.lemma.empty() && ent.lemma.size() > std::numeric_limits<uint8_t>::max()) {
-      return core::makeUnexpected(
-          core::Error(core::ErrorCode::InvalidInput, "Dictionary lemma exceeds 255 bytes: " + ent.lemma));
+      return invalid("Dictionary lemma exceeds 255 bytes: " + ent.lemma);
     }
 
     if (!isValidPos(posToUint8(ent.pos))) {
-      return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Dictionary entry has invalid POS"));
+      return invalid("Dictionary entry has invalid POS");
     }
 
     core::ExtendedPOS extended_pos_value = ent.extended_pos;
@@ -543,8 +530,7 @@ core::Expected<std::vector<uint8_t>, core::Error> BinaryDictWriter::build() {
       extended_pos_value = core::posToExtendedPos(ent.pos);
     }
     if (!isValidExtendedPos(extendedPosToUint8(extended_pos_value))) {
-      return core::makeUnexpected(
-          core::Error(core::ErrorCode::InvalidInput, "Dictionary entry has invalid extended POS"));
+      return invalid("Dictionary entry has invalid extended POS");
     }
 
     uint16_t lemma_reference = 0;
@@ -553,8 +539,7 @@ core::Expected<std::vector<uint8_t>, core::Error> BinaryDictWriter::build() {
       if (lemma_iter != lemma_indices.end()) {
         lemma_reference = lemma_iter->second;
       } else if (lemma_indices.size() >= std::numeric_limits<uint16_t>::max()) {
-        return core::makeUnexpected(
-            core::Error(core::ErrorCode::InvalidInput, "Dictionary has too many distinct lemma strings"));
+        return invalid("Dictionary has too many distinct lemma strings");
       } else {
         lemma_reference = static_cast<uint16_t>(lemma_indices.size() + 1);
         lemma_indices.emplace(ent.lemma, lemma_reference);
@@ -571,8 +556,7 @@ core::Expected<std::vector<uint8_t>, core::Error> BinaryDictWriter::build() {
     if (grammar_iter != grammar_indices.end()) {
       grammar_index = grammar_iter->second;
     } else if (grammar_palette.size() >= std::numeric_limits<uint8_t>::max()) {
-      return core::makeUnexpected(
-          core::Error(core::ErrorCode::InvalidInput, "Dictionary has too many grammar categories"));
+      return invalid("Dictionary has too many grammar categories");
     } else {
       grammar_index = static_cast<uint8_t>(grammar_palette.size());
       grammar_indices.emplace(grammar_key, grammar_index);
@@ -587,8 +571,7 @@ core::Expected<std::vector<uint8_t>, core::Error> BinaryDictWriter::build() {
     const auto& entry = entries_[idx];
     if (std::tie(previous.surface, previous.pos, previous.extended_pos, previous.lemma) ==
         std::tie(entry.surface, entry.pos, entry.extended_pos, entry.lemma)) {
-      return core::makeUnexpected(
-          core::Error(core::ErrorCode::InvalidInput, "Duplicate dictionary entry: " + entry.surface));
+      return invalid("Duplicate dictionary entry: " + entry.surface);
     }
   }
   std::vector<std::string> trie_surfaces;
@@ -600,9 +583,7 @@ core::Expected<std::vector<uint8_t>, core::Error> BinaryDictWriter::build() {
   }
   DoubleArray trie_validation;
   if (!trie_validation.build(trie_surfaces)) {
-    return core::makeUnexpected(
-        core::Error(core::ErrorCode::InvalidInput,
-                    "Dictionary surfaces cannot be represented by the runtime trie (duplicate or capacity limit)"));
+    return invalid("Dictionary surfaces cannot be represented by the runtime trie (duplicate or capacity limit)");
   }
 
   // If every differing lemma is also a nearby surface, encode its signed
@@ -730,7 +711,7 @@ core::Expected<std::vector<uint8_t>, core::Error> BinaryDictWriter::build() {
   const size_t total_size = string_offset + string_pool.size();
 
   if (total_size > std::numeric_limits<uint32_t>::max()) {
-    return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Dictionary binary is too large"));
+    return invalid("Dictionary binary is too large");
   }
 
   // Build output
@@ -759,8 +740,7 @@ core::Expected<std::vector<uint8_t>, core::Error> BinaryDictWriter::build() {
 core::Expected<size_t, core::Error> BinaryDictWriter::writeToFile(const std::string& path) {
 #ifdef __EMSCRIPTEN__
   (void)path;
-  return core::makeUnexpected(
-      core::Error(core::ErrorCode::InvalidInput, "File dictionary writing is unavailable in WASM"));
+  return invalid("File dictionary writing is unavailable in WASM");
 #else
   auto result = build();
   if (!result) {

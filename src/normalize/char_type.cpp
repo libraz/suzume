@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <array>
+#include <iterator>
 
 #include "core/kana_constants.h"
 #include "utf8.h"
@@ -299,16 +300,8 @@ CharType classifyChar(char32_t codepoint) {
 
   // Emoji ranges (comprehensive, Unicode 15.0+). Unknown-word generation
   // retains these as OTHER tokens rather than filtering them as punctuation.
-  if ((codepoint >= 0x1F600 && codepoint <= 0x1F64F) ||  // Emoticons
-      (codepoint >= 0x1F300 && codepoint <= 0x1F5FF) ||  // Misc Symbols and Pictographs
-      (codepoint >= 0x1F680 && codepoint <= 0x1F6FF) ||  // Transport and Map
-      (codepoint >= 0x1F700 && codepoint <= 0x1F77F) ||  // Alchemical Symbols
-      (codepoint >= 0x1F780 && codepoint <= 0x1F7FF) ||  // Geometric Shapes Extended
-      (codepoint >= 0x1F800 && codepoint <= 0x1F8FF) ||  // Supplemental Arrows-C
-      (codepoint >= 0x1F900 && codepoint <= 0x1F9FF) ||  // Supplemental Symbols and Pictographs
-      (codepoint >= 0x1FA00 && codepoint <= 0x1FA6F) ||  // Chess Symbols
-      (codepoint >= 0x1FA70 && codepoint <= 0x1FAFF) ||  // Symbols and Pictographs Extended-A
-      (codepoint >= 0x1FB00 && codepoint <= 0x1FBFF) ||  // Symbols for Legacy Computing
+  if ((codepoint >= 0x1F300 && codepoint <= 0x1F64F) ||  // Pictographs, Emoticons
+      (codepoint >= 0x1F680 && codepoint <= 0x1FBFF) ||  // Transport through Legacy Computing
       isEmojiModifier(codepoint) || isRegionalIndicator(codepoint)) {
     return CharType::Emoji;
   }
@@ -321,25 +314,13 @@ CharType classifyChar(char32_t codepoint) {
 }
 
 std::string_view charTypeToString(CharType type) {
-  switch (type) {
-    case CharType::Kanji:
-      return "KANJI";
-    case CharType::Hiragana:
-      return "HIRAGANA";
-    case CharType::Katakana:
-      return "KATAKANA";
-    case CharType::Alphabet:
-      return "ALPHABET";
-    case CharType::Digit:
-      return "DIGIT";
-    case CharType::Symbol:
-      return "SYMBOL";
-    case CharType::Emoji:
-      return "EMOJI";
-    case CharType::Unknown:
-    default:
-      return "UNKNOWN";
-  }
+  static constexpr std::string_view kNames[] = {
+      "KANJI", "HIRAGANA", "KATAKANA", "ALPHABET", "DIGIT", "SYMBOL", "EMOJI", "UNKNOWN",
+  };
+  static_assert(std::size(kNames) == static_cast<size_t>(CharType::Unknown) + 1,
+                "kNames must cover every CharType value");
+  const auto idx = static_cast<size_t>(type);
+  return idx < std::size(kNames) ? kNames[idx] : "UNKNOWN";
 }
 
 bool canCombine(CharType first_type, CharType second_type) {

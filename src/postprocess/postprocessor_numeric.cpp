@@ -59,19 +59,10 @@ bool looksLikeUnit(const std::string& surface) {
   if (surface.empty())
     return false;
 
-  // Only the first codepoint drives the kanji-unit branch; kanji/katakana are
-  // 3-byte, so decoding just the leading char avoids allocating a codepoint
-  // vector. Non-3-byte leads decode to 0 and fall through to the katakana check.
-  char32_t first = utf8::decodeFirstChar(surface);
-
-  // Kanji units: first char must be a counter kanji
-  // CJK Unified Ideographs: U+4E00-U+9FFF
-  if (first >= 0x4E00 && first <= 0x9FFF) {
-    return isCounterKanji(first);
-  }
-
-  // Katakana nouns: any all-katakana surface merges with a preceding numeral
-  return isAllKatakana(surface);
+  // Only the leading char drives the kanji-unit check, so decode just that
+  // instead of allocating a codepoint vector. Katakana nouns: any all-katakana
+  // surface merges with a preceding numeral.
+  return isCounterKanji(utf8::decodeFirstChar(surface)) || isAllKatakana(surface);
 }
 
 // Check if surface ends with a numeric unit that can be followed by more numbers

@@ -148,7 +148,7 @@ struct VerbEndingTable {
 
 VerbEndingTable buildVerbEndingTable() {
   std::vector<TaggedVerbEnding> tagged = generateGodanEndings();
-  tagged.reserve(tagged.size() + std::size(kIrregularEndings) + 7);
+  tagged.reserve(tagged.size() + std::size(kIrregularEndings) + std::size(kKuruConnectionCells));
   for (const auto& spec : kIrregularEndings) {
     tagged.push_back({{spec.suffix, spec.base_suffix, spec.verb_type, spec.is_onbin}, spec.provides_conn});
   }
@@ -157,13 +157,10 @@ VerbEndingTable buildVerbEndingTable() {
   // dictionary expansion. Keeping it out of kIrregularEndings avoids a fourth
   // independent list of こ/き/くれ/こよ/こい spellings.
   const KuruStemForms kuru = getKuruStemForms("くる");
-  tagged.push_back({{kuru.onbinkei, kuru.base, VerbType::Kuru, true}, conn::kVerbOnbinkei});
-  tagged.push_back({{kuru.renyokei, kuru.base, VerbType::Kuru, false}, conn::kVerbRenyokei});
-  tagged.push_back({{kuru.mizenkei, kuru.base, VerbType::Kuru, false}, conn::kVerbMizenkei});
-  tagged.push_back({{kuru.kateikei, kuru.base, VerbType::Kuru, false}, conn::kVerbKatei});
-  tagged.push_back({{kuru.meireikei, kuru.base, VerbType::Kuru, false}, conn::kVerbMeireikei});
-  tagged.push_back({{kuru.ishikei, kuru.base, VerbType::Kuru, false}, conn::kVerbVolitional});
-  tagged.push_back({{kuru.base, kuru.base, VerbType::Kuru, false}, conn::kVerbBase});
+  for (const auto& cell : kKuruConnectionCells) {
+    tagged.push_back(
+        {{kuru.*cell.form, kuru.base, VerbType::Kuru, cell.provides_conn == conn::kVerbOnbinkei}, cell.provides_conn});
+  }
 
   VerbEndingTable table;
   table.endings.reserve(tagged.size());
