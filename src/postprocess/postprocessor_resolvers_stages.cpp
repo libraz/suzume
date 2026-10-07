@@ -186,19 +186,15 @@ void resolvePostPrefixMorphemeRoles(std::vector<core::Morpheme>& result) {
   }
 }
 
-// These repairs run only after merges and filtering have finalized the local
-// token context.  Moving them earlier would change the grammatical evidence
-// each resolver observes.
-void resolveFinalMorphemeRoles(std::vector<core::Morpheme>& result, const dictionary::DictionaryManager* dict_manager) {
-  resolver::resolveDurationPredicateKakaru(result);
-  resolver::resolveDeverbalNominalSuffix(result);
-  resolver::resolveClosedInflectionalChains(result);
+namespace {
 
-  // A dictionary-confirmed na-adjective keeps its adjectival role before a
-  // predicative copula or the productive excessive auxiliary. The lattice can
-  // otherwise prefer a homographic unknown noun/verb when ん+だ resembles an
-  // explanatory chain, or when material after すぎる changes its path
-  // (盛ん+だ, 複雑+すぎる+の+です).
+// A dictionary-confirmed na-adjective keeps its adjectival role before a
+// predicative copula or the productive excessive auxiliary. The lattice can
+// otherwise prefer a homographic unknown noun/verb when ん+だ resembles an
+// explanatory chain, or when material after すぎる changes its path
+// (盛ん+だ, 複雑+すぎる+の+です).
+void resolveDictionaryNaAdjectiveStems(std::vector<core::Morpheme>& result,
+                                       const dictionary::DictionaryManager* dict_manager) {
   for (size_t idx = 0; idx + 1 < result.size(); ++idx) {
     auto& stem = result[idx];
     auto& follower = result[idx + 1];
@@ -228,11 +224,13 @@ void resolveFinalMorphemeRoles(std::vector<core::Morpheme>& result, const dictio
     follower.extended_pos = core::ExtendedPOS::AuxExcessive;
     follower.lemma = "すぎる";
   }
+}
 
-  // A pure-hiragana n-onbin V2 can carry inflection evidence that contradicts
-  // an overlapping closed V2 reading (折り+たたん, not the fabricated
-  // 折りたつ). Direct adjacency to V1 licenses the compound search unit
-  // without registering that open-class V2 in the closed table.
+// A pure-hiragana n-onbin V2 can carry inflection evidence that contradicts
+// an overlapping closed V2 reading (折り+たたん, not the fabricated
+// 折りたつ). Direct adjacency to V1 licenses the compound search unit
+// without registering that open-class V2 in the closed table.
+void mergeHiraganaOnbinCompoundVerbs(std::vector<core::Morpheme>& result) {
   for (size_t idx = 0; idx + 1 < result.size();) {
     auto& v1 = result[idx];
     const auto& v2 = result[idx + 1];
@@ -252,11 +250,13 @@ void resolveFinalMorphemeRoles(std::vector<core::Morpheme>& result, const dictio
     v1.conj_form = v2.conj_form;
     resolver::eraseAfter(result, idx);
   }
+}
 
-  // A continuative between a period-end noun and the closed following-period
-  // modifier is a deverbal schedule noun (月末+締め+翌月).  Both anchors are
-  // grammatical/temporal classes, so arbitrary open-class continuatives are
-  // handled without registering individual payment terms.
+// A continuative between a period-end noun and the closed following-period
+// modifier is a deverbal schedule noun (月末+締め+翌月).  Both anchors are
+// grammatical/temporal classes, so arbitrary open-class continuatives are
+// handled without registering individual payment terms.
+void resolveScheduleDeverbalNoun(std::vector<core::Morpheme>& result) {
   for (size_t idx = 1; idx + 1 < result.size(); ++idx) {
     auto& current = result[idx];
     if (result[idx - 1].pos == core::PartOfSpeech::Noun && utf8::endsWith(result[idx - 1].surface, "末") &&
@@ -265,7 +265,9 @@ void resolveFinalMorphemeRoles(std::vector<core::Morpheme>& result, const dictio
       resolver::retagNounSurface(current);
     }
   }
+}
 
+void resolvePredicateFollowerAuxiliaries(std::vector<core::Morpheme>& result) {
   // After the connective て/で, an aspect verb is the productive subsidiary
   // (進んで+いく, 読んで+いれば, 読んで+おいた), not an independent predicate.
   // The lattice intentionally keeps its verbal inflection shape; the closed
@@ -312,10 +314,12 @@ void resolveFinalMorphemeRoles(std::vector<core::Morpheme>& result, const dictio
       current.lemma = current.surface == "だら" ? "だ" : "た";
     }
   }
+}
 
-  // Resolve productive homographs from their closed grammatical follower.
-  // These are inflectional patterns, not word lists: 形容詞語幹+げ/すぎる,
-  // 形容詞仮定形+ば, and nominal+的+な are locally unambiguous.
+// Resolve productive homographs from their closed grammatical follower.
+// These are inflectional patterns, not word lists: 形容詞語幹+げ/すぎる,
+// 形容詞仮定形+ば, and nominal+的+な are locally unambiguous.
+void resolveHomographsFromClosedFollower(std::vector<core::Morpheme>& result) {
   for (size_t idx = 0; idx + 1 < result.size(); ++idx) {
     auto& current = result[idx];
     auto& next = result[idx + 1];
@@ -380,10 +384,12 @@ void resolveFinalMorphemeRoles(std::vector<core::Morpheme>& result, const dictio
       resolver::retagUninflected(current, core::PartOfSpeech::Adverb, core::ExtendedPOS::Adverb, current.surface);
     }
   }
+}
 
-  // A focused continuative in V-連用形+は+する remains verbal (減りはしない),
-  // unlike a deverbal noun independently marked by は.  Reconstruct the Godan
-  // base from the i-row ending instead of registering open-class verbs.
+// A focused continuative in V-連用形+は+する remains verbal (減りはしない),
+// unlike a deverbal noun independently marked by は.  Reconstruct the Godan
+// base from the i-row ending instead of registering open-class verbs.
+void resolveFocusedContinuativeBeforeSuru(std::vector<core::Morpheme>& result) {
   for (size_t idx = 1; idx + 2 < result.size(); ++idx) {
     auto& stem = result[idx];
     const auto& focus = result[idx + 1];
@@ -395,7 +401,9 @@ void resolveFinalMorphemeRoles(std::vector<core::Morpheme>& result, const dictio
       resolver::retagGodanRenyokeiFromIRow(stem, true);
     }
   }
+}
 
+void resolveClosedPrenominalWords(std::vector<core::Morpheme>& result) {
   // 本 is the closed demonstrative prefix before a katakana product/service
   // head.  The rule depends on the following script class, not on product
   // names, so arbitrary open-class heads remain supported.
@@ -428,7 +436,9 @@ void resolveFinalMorphemeRoles(std::vector<core::Morpheme>& result, const dictio
     resolver::retagUninflected(result[0], core::PartOfSpeech::Determiner, core::ExtendedPOS::Determiner,
                                result[0].surface);
   }
+}
 
+void resolveFunctionWordsFromLeftContext(std::vector<core::Morpheme>& result) {
   for (size_t idx = 0; idx < result.size(); ++idx) {
     auto& current = result[idx];
     const bool has_auxiliary_host =
@@ -488,7 +498,9 @@ void resolveFinalMorphemeRoles(std::vector<core::Morpheme>& result, const dictio
   if (!result.empty() && result[0].surface == "何ら") {
     resolver::retagUninflected(result[0], core::PartOfSpeech::Adverb, core::ExtendedPOS::Adverb, "何ら");
   }
+}
 
+void resolveNegativeChainRoles(std::vector<core::Morpheme>& result) {
   // An i-adjective renyokei keeps its lexical lemma before the independent
   // negative auxiliary (明るく+なかっ), rather than acquiring a synthetic
   // compound lemma 明るくない.
@@ -524,11 +536,13 @@ void resolveFinalMorphemeRoles(std::vector<core::Morpheme>& result, const dictio
                       dictionary::ConjugationType::IAdjective, grammar::ConjForm::Renyokei);
     }
   }
+}
 
-  // The regional causal き is homographic with the classical past auxiliary,
-  // which attaches to a continuative (あり+き). After a finite predicate — a
-  // terminal form or the past auxiliary — no classical reading is available,
-  // so the residual unknown token is the conjunctive particle (書く+き).
+// The regional causal き is homographic with the classical past auxiliary,
+// which attaches to a continuative (あり+き). After a finite predicate — a
+// terminal form or the past auxiliary — no classical reading is available,
+// so the residual unknown token is the conjunctive particle (書く+き).
+void resolveRegionalCausalKi(std::vector<core::Morpheme>& result) {
   for (size_t idx = 1; idx < result.size(); ++idx) {
     auto& causal = result[idx];
     const auto& host = result[idx - 1];
@@ -539,11 +553,13 @@ void resolveFinalMorphemeRoles(std::vector<core::Morpheme>& result, const dictio
       resolver::retagUninflected(causal, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleConj, "き");
     }
   }
+}
 
-  // Sentence-final ね is the final particle after a completed predicate or
-  // after any particle, not the homographic verb/negative auxiliary.  No
-  // particle licenses a following predicate stem, so a trailing ね behind one
-  // is clause-final regardless of the particle's own class (本だがね, 東京にね).
+// Sentence-final ね is the final particle after a completed predicate or
+// after any particle, not the homographic verb/negative auxiliary.  No
+// particle licenses a following predicate stem, so a trailing ね behind one
+// is clause-final regardless of the particle's own class (本だがね, 東京にね).
+void resolveSentenceFinalNe(std::vector<core::Morpheme>& result) {
   if (result.size() >= 2 && result.back().surface == "ね") {
     auto& previous = result[result.size() - 2];
     auto& final_ne = result.back();
@@ -565,7 +581,10 @@ void resolveFinalMorphemeRoles(std::vector<core::Morpheme>& result, const dictio
       resolver::retagUninflected(final_ne, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleFinal, "ね");
     }
   }
+}
 
+void resolveClauseFinalPredicate(std::vector<core::Morpheme>& result,
+                                 const dictionary::DictionaryManager* dict_manager) {
   // A demonstrative identification with an omitted copula ends in a noun:
   // これが答え。  The lattice can select the homographic Ichidan continuative
   // 答え, so resolve the closed demonstrative + case-particle frame before the
@@ -620,7 +639,9 @@ void resolveFinalMorphemeRoles(std::vector<core::Morpheme>& result, const dictio
       }
     }
   }
+}
 
+void resolveDouAndAppearanceSou(std::vector<core::Morpheme>& result) {
   // The interrogative どう is the adverb of the こう/そう/ああ/どう series
   // whichever predicate follows (どう+なった, どう+する, どう+だ), like そう.
   for (auto& morpheme : result) {
@@ -641,7 +662,9 @@ void resolveFinalMorphemeRoles(std::vector<core::Morpheme>& result, const dictio
     resolver::retagCopulaDa(na);
     resolver::retagNounSurface(noun);
   }
+}
 
+void restoreVerbReadingsFromFollower(std::vector<core::Morpheme>& result) {
   // A one-kanji Ichidan stem has the same visible form before the negative
   // auxiliary. Resolve its lemma from the final token sequence, after all
   // ambiguity-specific retagging has completed.
@@ -673,11 +696,13 @@ void resolveFinalMorphemeRoles(std::vector<core::Morpheme>& result, const dictio
                       dictionary::ConjugationType::GodanTa, grammar::ConjForm::Onbinkei);
     }
   }
+}
 
-  // An otherwise unresolved lexical item directly quantified by a complete
-  // native number phrase is the nominal head of that phrase (まばたき+
-  // ひとつ).  Resolve only Other here; established adverbs, predicates, and
-  // pronouns keep their own readings, and verbal まばたき+する is untouched.
+// An otherwise unresolved lexical item directly quantified by a complete
+// native number phrase is the nominal head of that phrase (まばたき+
+// ひとつ).  Resolve only Other here; established adverbs, predicates, and
+// pronouns keep their own readings, and verbal まばたき+する is untouched.
+void resolveQuantifiedOtherHead(std::vector<core::Morpheme>& result) {
   for (size_t idx = 0; idx + 1 < result.size(); ++idx) {
     auto& head = result[idx];
     const auto& quantity = result[idx + 1];
@@ -685,11 +710,13 @@ void resolveFinalMorphemeRoles(std::vector<core::Morpheme>& result, const dictio
       resolver::retagNounSurface(head);
     }
   }
+}
 
-  // A kanji-plus-て continuative before the past auxiliary or connective
-  // particle is an Ichidan stem (立て+て, 棄て+た). The lattice also has a
-  // homographic analysis that drops the e-row mora from the lemma; restore
-  // the productive Ichidan dictionary form after contextual disambiguation.
+// A kanji-plus-て continuative before the past auxiliary or connective
+// particle is an Ichidan stem (立て+て, 棄て+た). The lattice also has a
+// homographic analysis that drops the e-row mora from the lemma; restore
+// the productive Ichidan dictionary form after contextual disambiguation.
+void restoreKanjiTeIchidanStem(std::vector<core::Morpheme>& result) {
   for (size_t idx = 0; idx + 1 < result.size(); ++idx) {
     auto& stem = result[idx];
     const auto& next = result[idx + 1];
@@ -708,10 +735,12 @@ void resolveFinalMorphemeRoles(std::vector<core::Morpheme>& result, const dictio
       stem.conj_form = grammar::ConjForm::Renyokei;
     }
   }
+}
 
-  // A suffix between the genitive particle and a case particle heads its own
-  // nominal phrase (穴の中から, 月の末に). Retag it as a noun; a true bound
-  // suffix instead remains directly attached to its nominal stem.
+// A suffix between the genitive particle and a case particle heads its own
+// nominal phrase (穴の中から, 月の末に). Retag it as a noun; a true bound
+// suffix instead remains directly attached to its nominal stem.
+void resolveGenitiveFramedSuffixNoun(std::vector<core::Morpheme>& result) {
   for (size_t idx = 1; idx + 1 < result.size(); ++idx) {
     auto& candidate = result[idx];
     const auto& previous = result[idx - 1];
@@ -726,6 +755,35 @@ void resolveFinalMorphemeRoles(std::vector<core::Morpheme>& result, const dictio
       candidate.conj_form = grammar::ConjForm::Base;
     }
   }
+}
+
+}  // namespace
+
+// These repairs run only after merges and filtering have finalized the local
+// token context.  Moving them earlier would change the grammatical evidence
+// each resolver observes.
+void resolveFinalMorphemeRoles(std::vector<core::Morpheme>& result, const dictionary::DictionaryManager* dict_manager) {
+  resolver::resolveDurationPredicateKakaru(result);
+  resolver::resolveDeverbalNominalSuffix(result);
+  resolver::resolveClosedInflectionalChains(result);
+
+  resolveDictionaryNaAdjectiveStems(result, dict_manager);
+  mergeHiraganaOnbinCompoundVerbs(result);
+  resolveScheduleDeverbalNoun(result);
+  resolvePredicateFollowerAuxiliaries(result);
+  resolveHomographsFromClosedFollower(result);
+  resolveFocusedContinuativeBeforeSuru(result);
+  resolveClosedPrenominalWords(result);
+  resolveFunctionWordsFromLeftContext(result);
+  resolveNegativeChainRoles(result);
+  resolveRegionalCausalKi(result);
+  resolveSentenceFinalNe(result);
+  resolveClauseFinalPredicate(result, dict_manager);
+  resolveDouAndAppearanceSou(result);
+  restoreVerbReadingsFromFollower(result);
+  resolveQuantifiedOtherHead(result);
+  restoreKanjiTeIchidanStem(result);
+  resolveGenitiveFramedSuffixNoun(result);
 }
 
 }  // namespace suzume::postprocess

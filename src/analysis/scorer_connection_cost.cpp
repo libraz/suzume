@@ -24,9 +24,11 @@ namespace suzume::analysis {
 
 namespace {
 
-float computeLateLexicalBoundaryBonus(const core::LatticeEdge& prev, const core::LatticeEdge& next) {
-  float bonus{};
+// The late lexical boundary groups share one accumulator, added in call order.
 
+// Function words placed on a host they cannot attach to, and the regional
+// ておる/でおる contraction that attaches without one.
+void addImpossibleAttachmentRules(const core::LatticeEdge& prev, const core::LatticeEdge& next, float& bonus) {
   // AuxAspectIru requires a te-form; regional ておる / でおる contractions
   // are the productive direct-attachment exception.
   // The uninflected とう/どう share their spelling with the desiderative's onbin
@@ -199,13 +201,11 @@ float computeLateLexicalBoundaryBonus(const core::LatticeEdge& prev, const core:
       next.extended_pos == core::ExtendedPOS::AuxAspectIru && is_dialectal_oru_contraction) {
     SUZUME_CONNECTION_ADD(bonus, cost::kExtremeBonus);
   }
+}
 
-  // Dictionary-backed i-adjectives form a reliable nominal predicate boundary.
-  if (prev.pos == core::PartOfSpeech::Noun && next.extended_pos == core::ExtendedPOS::AdjBasic &&
-      next.fromDictionary()) {
-    SUZUME_CONNECTION_ADD(bonus, cost::kModerateBonus);
-  }
-
+// Conjunctions, focus particles and kana-lemma formal nouns on a host that
+// supplies no clause or phrase boundary in front of them.
+void addBarredHostRules(const core::LatticeEdge& prev, const core::LatticeEdge& next, float& bonus) {
   // Conjunctions cannot usually start from a bare token or an unknown
   // hiragana noun; after a conjunction, hiragana で is not 出る's renyokei.
   if (next.pos == core::PartOfSpeech::Conjunction && prev.pos != core::PartOfSpeech::Symbol &&
@@ -299,7 +299,9 @@ float computeLateLexicalBoundaryBonus(const core::LatticeEdge& prev, const core:
   if (conjunction_before_hiragana_de || conjunction_shite_before_iru || closed_te_form_before_directional_aux) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
+}
 
+void addLexicalBoundaryRetentionRules(const core::LatticeEdge& prev, const core::LatticeEdge& next, float& bonus) {
   // Dictionary compound adverbs and formal-noun constructions retain their
   // lexical boundary, unlike the corresponding accidental short-token splits.
   if (prev.extended_pos == core::ExtendedPOS::ParticleCase && next.pos == core::PartOfSpeech::Adverb &&
@@ -325,7 +327,10 @@ float computeLateLexicalBoundaryBonus(const core::LatticeEdge& prev, const core:
   if (te_de_before_binding || formal_noun_before_mizenkei) {
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryStrongBonus);
   }
+}
 
+// Particles after a clause already closed by a final particle or a finite predicate.
+void addClosedClauseParticleRules(const core::LatticeEdge& prev, const core::LatticeEdge& next, float& bonus) {
   // Only quotative と can follow a sentence-final particle as a case phrase.
   const bool case_after_final_particle = prev.extended_pos == core::ExtendedPOS::ParticleFinal &&
                                          next.extended_pos == core::ExtendedPOS::ParticleCase &&
@@ -346,9 +351,11 @@ float computeLateLexicalBoundaryBonus(const core::LatticeEdge& prev, const core:
   if (case_after_final_particle || binding_after_finite) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
+}
 
-  // Keep the colloquial sa-row contract, duration-counter predicate, and
-  // generated past-marked noun guards separate from ordinary lexical edges.
+// Keep the colloquial sa-row contract, duration-counter predicate, and
+// generated past-marked noun guards separate from ordinary lexical edges.
+void addGeneratedEdgeGuardRules(const core::LatticeEdge& prev, const core::LatticeEdge& next, float& bonus) {
   const bool colloquial_sa_row_boundary = prev.extended_pos == core::ExtendedPOS::VerbMizenkei &&
                                           utf8::endsWith(prev.surface, "しゃ") &&
                                           next.extended_pos == core::ExtendedPOS::VerbRenyokei && next.lemma == "する";
@@ -374,6 +381,22 @@ float computeLateLexicalBoundaryBonus(const core::LatticeEdge& prev, const core:
       grammar::isPastMarkerTaDaSurface(utf8::lastChar(prev.surface))) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
+}
+
+float computeLateLexicalBoundaryBonus(const core::LatticeEdge& prev, const core::LatticeEdge& next) {
+  float bonus{};
+  addImpossibleAttachmentRules(prev, next, bonus);
+
+  // Dictionary-backed i-adjectives form a reliable nominal predicate boundary.
+  if (prev.pos == core::PartOfSpeech::Noun && next.extended_pos == core::ExtendedPOS::AdjBasic &&
+      next.fromDictionary()) {
+    SUZUME_CONNECTION_ADD(bonus, cost::kModerateBonus);
+  }
+
+  addBarredHostRules(prev, next, bonus);
+  addLexicalBoundaryRetentionRules(prev, next, bonus);
+  addClosedClauseParticleRules(prev, next, bonus);
+  addGeneratedEdgeGuardRules(prev, next, bonus);
   return bonus;
 }
 
