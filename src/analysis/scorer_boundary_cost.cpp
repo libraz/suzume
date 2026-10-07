@@ -39,8 +39,8 @@ float Scorer::eosCost(const core::LatticeEdge& edge, core::ExtendedPOS prev_exte
   // Only after content: a lone adverb (the whole input or a fragment after a
   // punctuation mark) is the clause opener itself.
   if (edge.pos == core::PartOfSpeech::Adverb && edge.fromDictionary() &&
-      (utf8::endsWith(edge.surface, "て") || utf8::endsWith(edge.surface, "で")) &&
-      prev_extended_pos != core::ExtendedPOS::Unknown && prev_extended_pos != core::ExtendedPOS::Symbol) {
+      connection_rules::adverbSpellsPredicateCell(edge.surface) && prev_extended_pos != core::ExtendedPOS::Unknown &&
+      prev_extended_pos != core::ExtendedPOS::Symbol) {
     return sc::kEosTeEndingAdverbPenalty;
   }
 

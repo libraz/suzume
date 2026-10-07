@@ -183,6 +183,11 @@ void addImpossibleAttachmentRules(const core::LatticeEdge& prev, const core::Lat
   const bool contracted_te_wa_off_adverb = prev.pos == core::PartOfSpeech::Adverb &&
                                            next.extended_pos == core::ExtendedPOS::ParticleConj &&
                                            grammar::isContractedTeWaParticle(next.surface);
+  // An adverb spelling a geminate past (たった) modifies a quantity after it;
+  // in front of an auxiliary it is the verb's past instead (たっ+た+だろ+う).
+  const bool geminate_past_adverb_before_auxiliary = prev.pos == core::PartOfSpeech::Adverb && prev.fromDictionary() &&
+                                                     utf8::endsWith(prev.surface, "った") &&
+                                                     next.pos == core::PartOfSpeech::Auxiliary;
   // The dubitative かも closes a terminal or a nominal; a bare continuative in
   // front of it is the conjunction cut apart (し+かも is しかも).
   const bool dubitative_kamo_after_continuative = prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
@@ -200,7 +205,7 @@ void addImpossibleAttachmentRules(const core::LatticeEdge& prev, const core::Lat
       contracted_nominalizer_before_continuative || contracted_nominalizer_after_adverb ||
       unpaired_assimilated_copula || terminal_spelled_final_particle_in_kana_run ||
       contracted_volitional_off_predicate || conjunctive_after_final_particle || contracted_te_wa_off_adverb ||
-      dubitative_kamo_after_continuative) {
+      dubitative_kamo_after_continuative || geminate_past_adverb_before_auxiliary) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
   if ((prev.extended_pos == core::ExtendedPOS::VerbRenyokei || prev.extended_pos == core::ExtendedPOS::VerbOnbinkei) &&

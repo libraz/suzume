@@ -539,6 +539,53 @@ _GODAN_E_ROW_TO_BASE = {
 }
 
 
+def repair_clause_final_geminate_past_adverb(tokens: list[dict]) -> None:
+    """Read a clause-final adverb spelling a geminate past as the verb's past.
+
+    An adverb such as たった modifies a quantity after it (たった三人), so
+    closing a clause after content it has nothing to modify and is the
+    geminate onbin plus た (時間が+たっ+た).  The verb is the reading the
+    reference gives the same onbin before たら.
+    """
+    idx = 1
+    while idx < len(tokens):
+        token = tokens[idx]
+        surface = token.get("surface", "")
+        following = tokens[idx + 1] if idx + 1 < len(tokens) else None
+        if (
+            token.get("pos") != "副詞"
+            or len(surface) < 3
+            or not surface.endswith("った")
+            or (following is not None and following.get("pos") != "記号")
+            or tokens[idx - 1].get("pos") == "記号"
+        ):
+            idx += 1
+            continue
+        onbin = surface[:-1]
+        analyzed = mecab_analyze(onbin + "たら")
+        if (
+            len(analyzed) != 2
+            or analyzed[0].get("surface") != onbin
+            or analyzed[0].get("pos") != "動詞"
+            or analyzed[0].get("conj_form") != "連用タ接続"
+        ):
+            idx += 1
+            continue
+        past = {
+            "surface": "た",
+            "pos": "助動詞",
+            "pos_sub1": "*",
+            "pos_sub2": "*",
+            "pos_sub3": "*",
+            "conj_type": "特殊・タ",
+            "conj_form": "基本形",
+            "lemma": "た",
+            "reading": "タ",
+        }
+        tokens[idx : idx + 1] = [analyzed[0], past]
+        idx += 2
+
+
 def repair_sentence_final_godan_imperative(tokens: list[dict]) -> None:
     """Read a sentence-final potential continuative as the godan imperative.
 

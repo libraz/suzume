@@ -1826,6 +1826,97 @@
       ],
       "id": "hamina_ta",
       "input": "家族はみな来た"
+    },
+    {
+      "description": "あれから何日も - auto-generated",
+      "expected": [
+        {
+          "lemma": "あれ",
+          "pos": "Pronoun",
+          "surface": "あれ"
+        },
+        {
+          "lemma": "から",
+          "pos": "Particle",
+          "surface": "から"
+        },
+        {
+          "lemma": "何日",
+          "pos": "Noun",
+          "surface": "何日"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        }
+      ],
+      "id": "arekara_mo",
+      "input": "あれから何日も"
+    },
+    {
+      "description": "あれから毎日 - auto-generated",
+      "expected": [
+        {
+          "lemma": "あれ",
+          "pos": "Pronoun",
+          "surface": "あれ"
+        },
+        {
+          "lemma": "から",
+          "pos": "Particle",
+          "surface": "から"
+        },
+        {
+          "lemma": "毎日",
+          "pos": "Noun",
+          "surface": "毎日"
+        }
+      ],
+      "id": "arekara",
+      "input": "あれから毎日"
+    },
+    {
+      "description": "あれから何年たっただろう - auto-generated",
+      "expected": [
+        {
+          "lemma": "あれ",
+          "pos": "Pronoun",
+          "surface": "あれ"
+        },
+        {
+          "lemma": "から",
+          "pos": "Particle",
+          "surface": "から"
+        },
+        {
+          "lemma": "何年",
+          "pos": "Noun",
+          "surface": "何年"
+        },
+        {
+          "lemma": "たつ",
+          "pos": "Verb",
+          "surface": "たっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だろ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "arekara_tatttadarou",
+      "input": "あれから何年たっただろう"
     }
   ],
   "description": "Pronouns",

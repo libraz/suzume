@@ -42,6 +42,9 @@ float computeNegativeAndNounVerbBonus(const core::LatticeEdge& prev, const core:
 float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::LatticeEdge& next);
 float computePrefixSymbolBonus(const core::LatticeEdge& prev, const core::LatticeEdge& next);
 
+/** @brief Whether an adverb's surface also spells a verb's te-form or geminate past (改めて, たった). */
+bool adverbSpellsPredicateCell(std::string_view surface);
+
 /** @brief Whether `next` opens a clause after a clause-chaining comma, so it takes the sentence-start cost. */
 bool opensClauseAfterComma(const core::LatticeEdge& prev, const core::LatticeEdge& next);
 

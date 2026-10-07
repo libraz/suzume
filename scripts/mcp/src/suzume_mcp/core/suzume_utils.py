@@ -16,6 +16,7 @@ from .postprocessors import (
     repair_adjective_stem_before_suffix,
     repair_adjective_yo_quotative,
     repair_assimilated_koto_copula,
+    repair_clause_final_geminate_past_adverb,
     repair_continuative_before_manner_suffix,
     repair_contracted_iika,
     repair_contracted_quotative,
@@ -246,6 +247,7 @@ def get_expected_tokens(text: str, suzume_tokens: list[dict] | None = None) -> t
     repair_contracted_quotative(raw_tokens)
     repair_regional_imperative(raw_tokens)
     repair_sentence_final_godan_imperative(raw_tokens)
+    repair_clause_final_geminate_past_adverb(raw_tokens)
     repair_productive_causative(raw_tokens)
     repair_euphonic_adjective_adverb(raw_tokens)
     repair_continuative_before_manner_suffix(raw_tokens)

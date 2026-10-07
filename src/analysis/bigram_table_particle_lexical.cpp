@@ -181,9 +181,6 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
       // remains deliberately unscored for quotative constructions.
       {EPOS::ParticleCase, EPOS::VerbOnbinkei, cost::kVeryStrongBonus},
 
-      // Conditional predicates introduce concessive clauses (しかれ+ども,
-      // 読め+ども) and must outrank a homographic particle-plus-auxiliary path.
-      {EPOS::VerbKateikei, EPOS::ParticleConj, cost::kStrongBonus},
       // A hypothetical/imperative e-row cell closes on ば or the clause; it
       // never hosts the genitive or nominalizer の (おれ+の is the pronoun).
       {EPOS::VerbKateikei, EPOS::ParticleNo, cost::kAlmostNever},

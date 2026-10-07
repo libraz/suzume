@@ -387,6 +387,10 @@ float computeAdverbialNiAfterPredicatePenalty(const core::LatticeEdge& prev, con
   return cost::kProhibitive;
 }
 
+bool adverbSpellsPredicateCell(std::string_view surface) {
+  return utf8::endsWith(surface, "て") || utf8::endsWith(surface, "で") || utf8::endsWith(surface, "った");
+}
+
 // A comma closes the clause before it, so the next word opens a clause as it
 // would at the sentence start. A case particle (the quotative と) and an
 // adverbial particle (the listing など) still attach across the comma.

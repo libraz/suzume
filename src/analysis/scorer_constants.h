@@ -474,8 +474,9 @@ constexpr float kEosRenyokeiFormalNounPenalty = scale::kAlmostNever;
 // A sokuon onbin cell exists only before た/て/たり (言っ+た); at the end of an
 // utterance the っ is the emphatic one on a final particle (だから+ねっ).
 constexpr float kEosSokuonOnbinPenalty = scale::kAlmostNever;
-// A registered adverb ending in the connective て/で is a clause opener
-// (続いて, 改めて); closing the utterance on one means the verb's te-form.
+// A registered adverb spelling a te-form or a geminate past is a clause opener
+// (続いて, 改めて) or a quantity modifier (たった); closing the utterance on one
+// means the verb's te-form or past (時間が+たっ+た).
 constexpr float kEosTeEndingAdverbPenalty = scale::kNever;
 // A fabricated continuative after a one-character noun closing the utterance.
 constexpr float kEosNounContinuativePenalty = scale::kStrong;

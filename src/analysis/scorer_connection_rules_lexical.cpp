@@ -462,11 +462,19 @@ float computeCopulaConditionalBonus(const core::LatticeEdge& prev, const core::L
   if (copula_before_hypothetical) {
     return cost::kStrong;
   }
-  // In であれ, the hypothetical ある can coordinate another nominal
-  // predicate (本であれ水であれ) or introduce the following predicate
+  // The hypothetical cell closes on ば and the concessive ど/ども only
+  // (あれ+ば, しかれ+ども); a finite-attaching particle such as から takes the
+  // terminal, so behind an e-row cell it is the pronoun's case particle
+  // (あれ+から). In であれ, the hypothetical ある can also coordinate another
+  // nominal predicate (本であれ水であれ) or introduce the following predicate
   // (本であれ読む). These continuations distinguish it from the pronoun あれ.
-  if (prev.extended_pos == core::ExtendedPOS::VerbKateikei && prev.lemma == "ある" &&
-      (next.pos == core::PartOfSpeech::Noun || next.extended_pos == core::ExtendedPOS::VerbShuushikei)) {
+  const bool hypothetical_closing_particle =
+      next.extended_pos == core::ExtendedPOS::ParticleConj && utf8::equalsAny(next.surface, {"ば", "ど", "ども"});
+  const bool aru_hypothetical_continuation =
+      prev.lemma == "ある" &&
+      (next.pos == core::PartOfSpeech::Noun || next.extended_pos == core::ExtendedPOS::VerbShuushikei);
+  if (prev.extended_pos == core::ExtendedPOS::VerbKateikei &&
+      (hypothetical_closing_particle || aru_hypothetical_continuation)) {
     return cost::kStrongBonus;
   }
   return {};

@@ -1912,6 +1912,33 @@
       ],
       "id": "hodonakushite_ga_nda",
       "input": "ほどなくして雨が止んだ"
+    },
+    {
+      "description": "時間がたった - auto-generated",
+      "expected": [
+        {
+          "lemma": "時間",
+          "pos": "Noun",
+          "surface": "時間"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "たつ",
+          "pos": "Verb",
+          "surface": "たっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "gatattta",
+      "input": "時間がたった"
     }
   ],
   "description": "adverb_fixed tests",
