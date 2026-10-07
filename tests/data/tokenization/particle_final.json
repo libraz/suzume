@@ -2392,6 +2392,18 @@
       ],
       "id": "ika_ika",
       "input": "高いか安いか"
+    },
+    {
+      "description": "ダメぇ - auto-generated",
+      "expected": [
+        {
+          "lemma": "ダメ",
+          "pos": "Adjective",
+          "surface": "ダメぇ"
+        }
+      ],
+      "id": "unnamed_52",
+      "input": "ダメぇ"
     }
   ],
   "description": "particle_final tests",

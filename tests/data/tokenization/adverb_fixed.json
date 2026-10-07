@@ -1939,6 +1939,339 @@
       ],
       "id": "gatattta",
       "input": "時間がたった"
+    },
+    {
+      "description": "今更どの面下げて来たんだ - auto-generated",
+      "expected": [
+        {
+          "lemma": "今更",
+          "pos": "Adverb",
+          "surface": "今更"
+        },
+        {
+          "lemma": "どの",
+          "pos": "Determiner",
+          "surface": "どの"
+        },
+        {
+          "lemma": "面",
+          "pos": "Noun",
+          "surface": "面"
+        },
+        {
+          "lemma": "下げる",
+          "pos": "Verb",
+          "surface": "下げ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "dono_gete_tanda",
+      "input": "今更どの面下げて来たんだ"
+    },
+    {
+      "description": "なまじ知っていたばかりに、苦しんだ - auto-generated",
+      "expected": [
+        {
+          "lemma": "なまじ",
+          "pos": "Adverb",
+          "surface": "なまじ"
+        },
+        {
+          "lemma": "知る",
+          "pos": "Verb",
+          "surface": "知っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "ばかり",
+          "pos": "Particle",
+          "surface": "ばかり"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "苦しむ",
+          "pos": "Verb",
+          "surface": "苦しん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "namaji_ttteitabakarini_shinda",
+      "input": "なまじ知っていたばかりに、苦しんだ"
+    },
+    {
+      "description": "いつしか空は暗くなった - auto-generated",
+      "expected": [
+        {
+          "lemma": "いつしか",
+          "pos": "Adverb",
+          "surface": "いつしか"
+        },
+        {
+          "lemma": "空",
+          "pos": "Noun",
+          "surface": "空"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "暗い",
+          "pos": "Adjective",
+          "surface": "暗く"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "itsushika_ha_kunattta",
+      "input": "いつしか空は暗くなった"
+    },
+    {
+      "description": "たかが一杯のコーヒー - auto-generated",
+      "expected": [
+        {
+          "lemma": "たかが",
+          "pos": "Adverb",
+          "surface": "たかが"
+        },
+        {
+          "lemma": "一杯",
+          "pos": "Noun",
+          "surface": "一杯"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "コーヒー",
+          "pos": "Noun",
+          "surface": "コーヒー"
+        }
+      ],
+      "id": "takaga_no",
+      "input": "たかが一杯のコーヒー"
+    },
+    {
+      "description": "故郷を離れて、はや十年になる - auto-generated",
+      "expected": [
+        {
+          "lemma": "故郷",
+          "pos": "Noun",
+          "surface": "故郷"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "離れる",
+          "pos": "Verb",
+          "surface": "離れ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "はや",
+          "pos": "Adverb",
+          "surface": "はや"
+        },
+        {
+          "lemma": "十年",
+          "pos": "Noun",
+          "surface": "十年"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なる"
+        }
+      ],
+      "id": "wo_rete_haya_ninaru",
+      "input": "故郷を離れて、はや十年になる"
+    },
+    {
+      "description": "よしんば失敗しても - auto-generated",
+      "expected": [
+        {
+          "lemma": "よしんば",
+          "pos": "Adverb",
+          "surface": "よしんば"
+        },
+        {
+          "lemma": "失敗",
+          "pos": "Noun",
+          "surface": "失敗"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        }
+      ],
+      "id": "yoshinba_shitemo",
+      "input": "よしんば失敗しても"
+    },
+    {
+      "description": "にわかに空がかき曇った - auto-generated",
+      "expected": [
+        {
+          "lemma": "にわかに",
+          "pos": "Adverb",
+          "surface": "にわかに"
+        },
+        {
+          "lemma": "空",
+          "pos": "Noun",
+          "surface": "空"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "かき曇る",
+          "pos": "Verb",
+          "surface": "かき曇っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "niwakani_gakaki_ttta",
+      "input": "にわかに空がかき曇った"
+    },
+    {
+      "description": "はからずも再会した - auto-generated",
+      "expected": [
+        {
+          "lemma": "はからずも",
+          "pos": "Adverb",
+          "surface": "はからずも"
+        },
+        {
+          "lemma": "再会",
+          "pos": "Noun",
+          "surface": "再会"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "hakarazumo_shita",
+      "input": "はからずも再会した"
+    },
+    {
+      "description": "ともすれば忘れがちだ - auto-generated",
+      "expected": [
+        {
+          "lemma": "ともすれば",
+          "pos": "Adverb",
+          "surface": "ともすれば"
+        },
+        {
+          "lemma": "忘れる",
+          "pos": "Verb",
+          "surface": "忘れ"
+        },
+        {
+          "lemma": "がち",
+          "pos": "Suffix",
+          "surface": "がち"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "tomosureba_regachida",
+      "input": "ともすれば忘れがちだ"
     }
   ],
   "description": "adverb_fixed tests",

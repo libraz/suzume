@@ -903,6 +903,192 @@
       ],
       "id": "yori_reru_2",
       "input": "予定より乱れる"
+    },
+    {
+      "description": "時間を持て余した - auto-generated",
+      "expected": [
+        {
+          "lemma": "時間",
+          "pos": "Noun",
+          "surface": "時間"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "持て余す",
+          "pos": "Verb",
+          "surface": "持て余し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wo_te_shita",
+      "input": "時間を持て余した"
+    },
+    {
+      "description": "鐘が鳴り響く - auto-generated",
+      "expected": [
+        {
+          "lemma": "鐘",
+          "pos": "Noun",
+          "surface": "鐘"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "鳴り響く",
+          "pos": "Verb",
+          "surface": "鳴り響く"
+        }
+      ],
+      "id": "ga_ri_ku",
+      "input": "鐘が鳴り響く"
+    },
+    {
+      "description": "街が寝静まっていた - auto-generated",
+      "expected": [
+        {
+          "lemma": "街",
+          "pos": "Noun",
+          "surface": "街"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "寝静まる",
+          "pos": "Verb",
+          "surface": "寝静まっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ga_mattteita",
+      "input": "街が寝静まっていた"
+    },
+    {
+      "description": "言い淀んだ - auto-generated",
+      "expected": [
+        {
+          "lemma": "言い淀む",
+          "pos": "Verb",
+          "surface": "言い淀ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "i_nda",
+      "input": "言い淀んだ"
+    },
+    {
+      "description": "胸が高鳴る - auto-generated",
+      "expected": [
+        {
+          "lemma": "胸",
+          "pos": "Noun",
+          "surface": "胸"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "高鳴る",
+          "pos": "Verb",
+          "surface": "高鳴る"
+        }
+      ],
+      "id": "ga_ru_5",
+      "input": "胸が高鳴る"
+    },
+    {
+      "description": "身構えた - auto-generated",
+      "expected": [
+        {
+          "lemma": "身構える",
+          "pos": "Verb",
+          "surface": "身構え"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "eta",
+      "input": "身構えた"
+    },
+    {
+      "description": "肌が粟立った - auto-generated",
+      "expected": [
+        {
+          "lemma": "肌",
+          "pos": "Noun",
+          "surface": "肌"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "粟立つ",
+          "pos": "Verb",
+          "surface": "粟立っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ga_ttta_3",
+      "input": "肌が粟立った"
+    },
+    {
+      "description": "にじり寄った - auto-generated",
+      "expected": [
+        {
+          "lemma": "にじり寄る",
+          "pos": "Verb",
+          "surface": "にじり寄っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "nijiri_ttta",
+      "input": "にじり寄った"
     }
   ],
   "description": "compound_verb tests",

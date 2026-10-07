@@ -1922,6 +1922,28 @@
       ],
       "id": "fuini_kisukumerare_wononda",
       "input": "ふいに抱きすくめられ、息をのんだ"
+    },
+    {
+      "description": "砂がまじり込む - auto-generated",
+      "expected": [
+        {
+          "lemma": "砂",
+          "pos": "Noun",
+          "surface": "砂"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "まじり込む",
+          "pos": "Verb",
+          "surface": "まじり込む"
+        }
+      ],
+      "id": "gamajiri_mu",
+      "input": "砂がまじり込む"
     }
   ],
   "description": "Compound verbs (part 5/5)",

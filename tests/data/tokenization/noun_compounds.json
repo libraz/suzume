@@ -1578,6 +1578,139 @@
       ],
       "id": "gakeni_ga_ttta",
       "input": "出がけに雨が降った"
+    },
+    {
+      "description": "にわか雨が降った - auto-generated",
+      "expected": [
+        {
+          "lemma": "にわか雨",
+          "pos": "Noun",
+          "surface": "にわか雨"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "降る",
+          "pos": "Verb",
+          "surface": "降っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "niwaka_ga_ttta",
+      "input": "にわか雨が降った"
+    },
+    {
+      "description": "ため息まじりに、彼女は鏡を見つめた - auto-generated",
+      "expected": [
+        {
+          "lemma": "ため息",
+          "pos": "Noun",
+          "surface": "ため息"
+        },
+        {
+          "lemma": "まじり",
+          "pos": "Suffix",
+          "surface": "まじり"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "彼女",
+          "pos": "Pronoun",
+          "surface": "彼女"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "鏡",
+          "pos": "Noun",
+          "surface": "鏡"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "見つめる",
+          "pos": "Verb",
+          "surface": "見つめ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "tame_majirini_ha_wo_tsumeta",
+      "input": "ため息まじりに、彼女は鏡を見つめた"
+    },
+    {
+      "description": "冗談まじりに言った - auto-generated",
+      "expected": [
+        {
+          "lemma": "冗談",
+          "pos": "Noun",
+          "surface": "冗談"
+        },
+        {
+          "lemma": "まじり",
+          "pos": "Suffix",
+          "surface": "まじり"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "majirini_ttta",
+      "input": "冗談まじりに言った"
+    },
+    {
+      "description": "つま先が冷たい - auto-generated",
+      "expected": [
+        {
+          "lemma": "つま先",
+          "pos": "Noun",
+          "surface": "つま先"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "冷たい",
+          "pos": "Adjective",
+          "surface": "冷たい"
+        }
+      ],
+      "id": "tsuma_ga_tai",
+      "input": "つま先が冷たい"
     }
   ],
   "description": "noun_compounds tests",

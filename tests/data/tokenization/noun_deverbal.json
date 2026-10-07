@@ -1416,6 +1416,60 @@
       ],
       "id": "no_rashi",
       "input": "日々の暮らし"
+    },
+    {
+      "description": "言い伝えによれば - auto-generated",
+      "expected": [
+        {
+          "lemma": "言い伝え",
+          "pos": "Noun",
+          "surface": "言い伝え"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "よる",
+          "pos": "Verb",
+          "surface": "よれ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "i_eniyoreba",
+      "input": "言い伝えによれば"
+    },
+    {
+      "description": "返り咲きを果たした - auto-generated",
+      "expected": [
+        {
+          "lemma": "返り咲き",
+          "pos": "Noun",
+          "surface": "返り咲き"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "果たす",
+          "pos": "Verb",
+          "surface": "果たし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ri_kiwo_tashita",
+      "input": "返り咲きを果たした"
     }
   ],
   "description": "noun_deverbal tests",

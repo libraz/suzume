@@ -351,6 +351,45 @@
       ],
       "id": "gohanoishiiyo",
       "input": "ごはんおいしいよ"
+    },
+    {
+      "description": "可笑しそうに笑う - auto-generated",
+      "expected": [
+        {
+          "lemma": "可笑しい",
+          "pos": "Adjective",
+          "surface": "可笑し"
+        },
+        {
+          "lemma": "そう",
+          "pos": "Auxiliary",
+          "surface": "そう"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "笑う",
+          "pos": "Verb",
+          "surface": "笑う"
+        }
+      ],
+      "id": "shisouni_u",
+      "input": "可笑しそうに笑う"
+    },
+    {
+      "description": "いとわしい - auto-generated",
+      "expected": [
+        {
+          "lemma": "いとわしい",
+          "pos": "Adjective",
+          "surface": "いとわしい"
+        }
+      ],
+      "id": "itowashii",
+      "input": "いとわしい"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 4/4)",

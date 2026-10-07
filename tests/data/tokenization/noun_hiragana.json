@@ -1149,6 +1149,72 @@
       ],
       "id": "gakotatsuni_ttta",
       "input": "彼がこたつに入った"
+    },
+    {
+      "description": "とこしえに続く - auto-generated",
+      "expected": [
+        {
+          "lemma": "とこしえ",
+          "pos": "Noun",
+          "surface": "とこしえ"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "続く",
+          "pos": "Verb",
+          "surface": "続く"
+        }
+      ],
+      "id": "tokoshieni_ku",
+      "input": "とこしえに続く"
+    },
+    {
+      "description": "こめかみが痛む - auto-generated",
+      "expected": [
+        {
+          "lemma": "こめかみ",
+          "pos": "Noun",
+          "surface": "こめかみ"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "痛む",
+          "pos": "Verb",
+          "surface": "痛む"
+        }
+      ],
+      "id": "komekamiga_mu",
+      "input": "こめかみが痛む"
+    },
+    {
+      "description": "古びたろうそく - auto-generated",
+      "expected": [
+        {
+          "lemma": "古びる",
+          "pos": "Verb",
+          "surface": "古び"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "ろうそく",
+          "pos": "Noun",
+          "surface": "ろうそく"
+        }
+      ],
+      "id": "bitarousoku",
+      "input": "古びたろうそく"
     }
   ],
   "description": "noun_hiragana tests",

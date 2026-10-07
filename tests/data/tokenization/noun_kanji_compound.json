@@ -136,6 +136,33 @@
       ],
       "id": "guratsuita",
       "input": "一瞬ぐらついた"
+    },
+    {
+      "description": "一大事が起きた - auto-generated",
+      "expected": [
+        {
+          "lemma": "一大事",
+          "pos": "Noun",
+          "surface": "一大事"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "起きる",
+          "pos": "Verb",
+          "surface": "起き"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ga_kita",
+      "input": "一大事が起きた"
     }
   ],
   "description": "noun_kanji_compound tests",

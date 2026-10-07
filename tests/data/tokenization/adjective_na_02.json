@@ -1386,6 +1386,50 @@
       ],
       "id": "na_haaru",
       "input": "今週暇な日はある"
+    },
+    {
+      "description": "がむしゃらに働く - auto-generated",
+      "expected": [
+        {
+          "lemma": "がむしゃら",
+          "pos": "Adjective",
+          "surface": "がむしゃら"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "働く",
+          "pos": "Verb",
+          "surface": "働く"
+        }
+      ],
+      "id": "gamushi_rani_ku",
+      "input": "がむしゃらに働く"
+    },
+    {
+      "description": "ダメだよ - auto-generated",
+      "expected": [
+        {
+          "lemma": "ダメ",
+          "pos": "Adjective",
+          "surface": "ダメ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "dayo",
+      "input": "ダメだよ"
     }
   ],
   "description": "Na-adjectives (ナ形容詞) (part 2/2)",

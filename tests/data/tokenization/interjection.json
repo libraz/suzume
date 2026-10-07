@@ -850,6 +850,28 @@
       ],
       "id": "omedeto",
       "input": "合格おめでと"
+    },
+    {
+      "description": "いやはや驚いた - auto-generated",
+      "expected": [
+        {
+          "lemma": "いやはや",
+          "pos": "Interjection",
+          "surface": "いやはや"
+        },
+        {
+          "lemma": "驚く",
+          "pos": "Verb",
+          "surface": "驚い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "iyahaya_ita",
+      "input": "いやはや驚いた"
     }
   ],
   "description": "Interjections and greetings (感動詞・挨拶)",
