@@ -76,6 +76,9 @@ EntrySpecRange getDeterminerEntries() {
       // Note: shares hiragana surface with godan-ra verb 掛かる/懸かる (L2: かかる).
       // L1 Determiner competes with VERB in determiner+NOUN contexts (かかる事態).
       det("かかる", ""),
+      // The same literary demonstrative heads the na-adjective stem 斯様
+      // (かような+N, かように), the counterpart of さよう.
+      na_adj("かよう", "かよう"),
 
       // Classical/literary determiner (彼の = that, the aforementioned)
       // Without L1, over-splits to か(unknown)+の(particle).

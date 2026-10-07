@@ -256,16 +256,24 @@ def _merge_closed_function_units(state: MergeState) -> bool:
                 applied_rule = "kana-sayou-stem"
             return True
         # Where the reference does list さよう, it tags the adverb; the word is the
-        # same na-adjective stem before its copula or adverbial に.
+        # same na-adjective stem before its copula or adverbial に. Its literary
+        # sibling かよう (斯様) is read as the verb 通う in the same frame.
         if (
             not merged
-            and t.get("surface") == "さよう"
-            and t.get("pos") == "副詞"
+            and (
+                (t.get("surface") == "さよう" and t.get("pos") == "副詞")
+                or (t.get("surface") == "かよう" and t.get("pos") == "動詞")
+            )
             and i + 1 < len(tokens)
             and tokens[i + 1].get("surface") in ("な", "に", "で", "だ", "です")
         ):
-            result.append({"surface": "さよう", "pos": "名詞", "pos_sub1": "形容動詞語幹", "lemma": "さよう"})
+            result.append({"surface": t["surface"], "pos": "名詞", "pos_sub1": "形容動詞語幹", "lemma": t["surface"]})
             i += 1
+            # Behind the misread verb the attributive な was taken for the
+            # prohibitive final particle; after the stem it is the copula.
+            if tokens[i].get("surface") == "な" and tokens[i].get("pos") == "助詞":
+                result.append({"surface": "な", "pos": "助動詞", "lemma": "だ"})
+                i += 1
             merged = True
             if applied_rule is None:
                 applied_rule = "kana-sayou-stem"

@@ -238,6 +238,55 @@
       ],
       "id": "kakunogotoki",
       "input": "かくのごとき"
+    },
+    {
+      "description": "Literary demonstrative na-adjective stem before attributive na",
+      "expected": [
+        {
+          "lemma": "かよう",
+          "pos": "Adjective",
+          "surface": "かよう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "仕打ち",
+          "pos": "Noun",
+          "surface": "仕打ち"
+        }
+      ],
+      "id": "kayouna_chi",
+      "input": "かような仕打ち"
+    },
+    {
+      "description": "Literary demonstrative na-adjective stem before adverbial ni",
+      "expected": [
+        {
+          "lemma": "かよう",
+          "pos": "Adjective",
+          "surface": "かよう"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "申す",
+          "pos": "Verb",
+          "surface": "申し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "kayouni_shita",
+      "input": "かように申した"
     }
   ],
   "description": "literary tests",
