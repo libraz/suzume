@@ -211,7 +211,7 @@ bool hasAttributiveNominalSelector(const std::vector<char32_t>& codepoints,
         return true;
       }
       std::vector<UnknownCandidate> na_adjective_candidates;
-      generateNaAdjectiveCandidates(codepoints, selector_start, char_types, UnknownOptions{}, dict_manager,
+      generateNaAdjectiveCandidates(codepoints, selector_start, char_types, UnknownOptions{}, inflection, dict_manager,
                                     na_adjective_candidates);
       if (std::any_of(
               na_adjective_candidates.begin(), na_adjective_candidates.end(), [start_pos](const auto& adjective) {

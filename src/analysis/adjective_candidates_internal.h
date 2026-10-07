@@ -277,6 +277,17 @@ bool predicateFollowsContinuative(const std::vector<char32_t>& codepoints, size_
 bool spansPastAdjectiveEnding(const std::string& surface, const std::string& base_form);
 
 /**
+ * @brief Whether [start, end) is a verified i-adjective stem plus the suffix げ
+ *
+ * The stem is two or more characters and passes the productive i-adjective
+ * stem check (寂し+げ, 悲し+げ). A ない-family after げ is the lexical ...げない
+ * form instead (危なげない), so it does not count.
+ */
+bool spellsAdjectiveStemBeforeGe(const std::vector<char32_t>& codepoints, size_t start, size_t end,
+                                 const grammar::Inflection& inflection,
+                                 const dictionary::DictionaryManager* dict_manager);
+
+/**
  * @brief Append surface-qualified pure-hiragana i-adjective candidates.
  */
 void appendHiraganaIAdjSurfaceCandidates(const std::vector<char32_t>& codepoints, size_t start_pos, size_t hiragana_end,

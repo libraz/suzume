@@ -699,6 +699,7 @@ bool crossesFunctionWordBoundary(const KanjiHiraganaSpan& span, const HiraganaTa
 
 void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                              const std::vector<normalize::CharType>& char_types,
+                                             const grammar::Inflection& inflection,
                                              const dictionary::DictionaryManager* dict_manager,
                                              std::vector<UnknownCandidate>& candidates) {
   if (start_pos >= char_types.size() || char_types[start_pos] != normalize::CharType::Kanji) {
@@ -826,6 +827,10 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
   // This is a grammatical pattern: hiragana ending with ん after single kanji
   // is typically an honorific suffix, not a compound noun
   if (codepoints[hiragana_end - 1] == U'ん') {
+    return;
+  }
+  // A verified adjective stem keeps its boundary before the closed げ (寂し+げ).
+  if (adj_detail::spellsAdjectiveStemBeforeGe(codepoints, start_pos, hiragana_end, inflection, dict_manager)) {
     return;
   }
 

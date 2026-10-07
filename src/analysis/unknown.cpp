@@ -642,7 +642,8 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generate(std::string_view te
     generateProductiveSuffixVerbCandidates(codepoints, start_pos, char_types, candidates);
 
     // Generate na-adjective candidates (〜的 patterns)
-    analysis::generateNaAdjectiveCandidates(codepoints, start_pos, char_types, options_, dict_manager_, candidates);
+    analysis::generateNaAdjectiveCandidates(codepoints, start_pos, char_types, options_, inflection_, dict_manager_,
+                                            candidates);
 
     // Generate nominalized noun candidates (kanji + short hiragana)
     // e.g., 手助け, 片付け, 引き上げ
@@ -652,7 +653,7 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generate(std::string_view te
     // Generate kanji + hiragana compound noun candidates
     // e.g., 玉ねぎ, 水たまり
     // Pass dict_manager to skip compounds when hiragana portion is a known word
-    generateKanjiHiraganaCompoundCandidates(codepoints, start_pos, char_types, dict_manager_, candidates);
+    generateKanjiHiraganaCompoundCandidates(codepoints, start_pos, char_types, inflection_, dict_manager_, candidates);
 
     // Generate counter candidates for numeral + つ patterns
     // e.g., 一つ, 二つ, ..., 九つ (closed class)
@@ -679,7 +680,8 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generate(std::string_view te
     appendCandidates(candidates,
                      analysis::generateHiraganaVerbCandidates(codepoints, start_pos, char_types, inflection_,
                                                               dict_manager_, options_.verb_candidate_options));
-    analysis::generateNaAdjectiveCandidates(codepoints, start_pos, char_types, options_, dict_manager_, candidates);
+    analysis::generateNaAdjectiveCandidates(codepoints, start_pos, char_types, options_, inflection_, dict_manager_,
+                                            candidates);
 
     // Generate hiragana i-adjective candidates (まずい, おいしい, etc.)
     analysis::generateHiraganaAdjectiveCandidates(codepoints, start_pos, char_types, inflection_, dict_manager_,

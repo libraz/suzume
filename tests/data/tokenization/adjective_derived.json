@@ -53,6 +53,70 @@
       ],
       "id": "rashige",
       "input": "大人らしげ"
+    },
+    {
+      "description": "いかにも寂しげな風情 - auto-generated",
+      "expected": [
+        {
+          "lemma": "いかにも",
+          "pos": "Adverb",
+          "surface": "いかにも"
+        },
+        {
+          "lemma": "寂しい",
+          "pos": "Adjective",
+          "surface": "寂し"
+        },
+        {
+          "lemma": "げ",
+          "pos": "Suffix",
+          "surface": "げ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "風情",
+          "pos": "Noun",
+          "surface": "風情"
+        }
+      ],
+      "id": "ikanimo_shigena",
+      "input": "いかにも寂しげな風情"
+    },
+    {
+      "description": "とても悲しげな顔 - auto-generated",
+      "expected": [
+        {
+          "lemma": "とても",
+          "pos": "Adverb",
+          "surface": "とても"
+        },
+        {
+          "lemma": "悲しい",
+          "pos": "Adjective",
+          "surface": "悲し"
+        },
+        {
+          "lemma": "げ",
+          "pos": "Suffix",
+          "surface": "げ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "顔",
+          "pos": "Noun",
+          "surface": "顔"
+        }
+      ],
+      "id": "totemo_shigena",
+      "input": "とても悲しげな顔"
     }
   ],
   "description": "adjective_derived tests",

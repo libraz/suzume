@@ -218,7 +218,8 @@ void generateHiraganaAttributiveNaStemCandidates(const std::vector<char32_t>& co
 
 void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                    const std::vector<normalize::CharType>& char_types,
-                                   const UnknownOptions& /*options*/, const dictionary::DictionaryManager* dict_manager,
+                                   const UnknownOptions& /*options*/, const grammar::Inflection& inflection,
+                                   const dictionary::DictionaryManager* dict_manager,
                                    std::vector<UnknownCandidate>& candidates) {
   if (start_pos >= char_types.size()) {
     return;
@@ -413,7 +414,8 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
              (kana::isURowCodepoint(predicate_tail) || predicate_tail == U'た' || predicate_tail == U'だ'));
         if (is_bare_attributive && !has_internal_particle && !contains_closed_suffix && !starts_closed_tail &&
             !is_exact_verb_stem && !spans_registered_pronoun && !crosses_te_form && !contains_passive_boundary &&
-            !starts_naru_after_ku && !closes_on_verbal_ru) {
+            !starts_naru_after_ku && !closes_on_verbal_ru &&
+            !adj_detail::spellsAdjectiveStemBeforeGe(codepoints, start_pos, stem_end, inflection, dict_manager)) {
           if (!normalize::isFormalNounSurface(normalize::encodeUtf8(codepoints[start_pos]))) {
             candidates.push_back(makeNaAdjCandidate(stem, start_pos, stem_end, candidate::kNaAdjStemCost, true,
                                                     CandidateOrigin::AdjectiveNa, candidate::kNaAdjPredicateConfidence,

@@ -303,6 +303,23 @@ bool opensAuxiliaryInsideStem(const dictionary::DictionaryManager* dict_manager,
 
 }  // namespace
 
+namespace adj_detail {
+
+bool spellsAdjectiveStemBeforeGe(const std::vector<char32_t>& codepoints, size_t start, size_t end,
+                                 const grammar::Inflection& inflection,
+                                 const dictionary::DictionaryManager* dict_manager) {
+  constexpr size_t kMinStemLength = 2;
+  if (end > codepoints.size() || end < start + kMinStemLength + 1 || codepoints[end - 1] != U'げ' ||
+      verb_helpers::naiNegativeFollowsAt(codepoints, end)) {
+    return false;
+  }
+  const std::string stem = extractSubstring(codepoints, start, end - 1);
+  return productiveIAdjectiveStemConfidence(stem, normalize::concat(stem, "い"), inflection, dict_manager) !=
+         candidate::kNoOriginConfidence;
+}
+
+}  // namespace adj_detail
+
 void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                      const std::vector<normalize::CharType>& char_types,
                                      const grammar::Inflection& inflection,

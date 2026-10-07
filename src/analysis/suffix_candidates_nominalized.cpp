@@ -4,6 +4,7 @@
  */
 #include <algorithm>
 
+#include "adjective_candidates_internal.h"
 #include "analysis/dictionary_probe.h"
 #include "candidate_constants.h"
 #include "core/debug.h"
@@ -444,7 +445,11 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
       const bool crosses_closed_suffix =
           hasClosedSuffixBoundary(codepoints, start_pos, hiragana_end + 1, dict_manager) &&
           !(kanji_count == 1 && has_inferred_verb_continuative && has_explicit_nominal_selector);
-      if (!trailing_shi_is_suru && !second_starts_classical_conjectural_auxiliary && !crosses_closed_suffix) {
+      // A verified adjective stem keeps its boundary before the closed げ (寂し+げ).
+      const bool adjective_stem_before_ge =
+          adj_detail::spellsAdjectiveStemBeforeGe(codepoints, start_pos, hiragana_end + 1, inflection, dict_manager);
+      if (!trailing_shi_is_suru && !second_starts_classical_conjectural_auxiliary && !crosses_closed_suffix &&
+          !adjective_stem_before_ge) {
         float nom2_cost = 0.8F;
         if (has_particle_continuation || selects_nominal_host ||
             isGenitiveClauseFinalNominal(codepoints, char_types, start_pos, hiragana_end + 1, dict_manager)) {
