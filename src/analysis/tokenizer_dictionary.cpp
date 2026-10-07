@@ -25,33 +25,19 @@
 
 namespace suzume::analysis {
 
+using tokenizer_dictionary_detail::addClippedInterjectionCandidates;
+using tokenizer_dictionary_detail::addContextualDictionaryCandidates;
+using tokenizer_dictionary_detail::addElidedProlongedDictionaryCandidates;
+using tokenizer_dictionary_detail::addTruncatedAdverbCandidates;
+using tokenizer_dictionary_detail::adverbAbsorbsQuotedQuestion;
+using tokenizer_dictionary_detail::ContextualDictionaryCandidateState;
+using tokenizer_dictionary_detail::crossesEstablishedBoundary;
+using tokenizer_dictionary_detail::hasPrecedingNominal;
+using tokenizer_dictionary_detail::isOutOfPlaceForWordClass;
+using tokenizer_dictionary_detail::lacksLicensingEnvironment;
+using tokenizer_dictionary_detail::losesHomographReading;
+
 namespace {
-
-// A kanji run ending in な is an attributive na-adjective candidate.  A
-// preceding one-kanji formal noun remains a separate grammatical unit in this
-// environment (時 + 不思議 + な), unlike an ordinary lexical kanji compound.
-bool isKanjiRunFollowedByAttributiveNa(const std::vector<char32_t>& codepoints, size_t start_pos) {
-  size_t pos = start_pos;
-  while (pos < codepoints.size() && normalize::isKanjiCodepoint(codepoints[pos])) {
-    ++pos;
-  }
-  return pos > start_pos && pos < codepoints.size() && codepoints[pos] == U'な';
-}
-
-// Whether a dictionary verb ends exactly at @p end_pos while starting before
-// @p start_pos, i.e. the span in question is the tail of a longer headword.
-bool endsDictionaryVerbSpanningBack(const dictionary::DictionaryManager& dict_manager,
-                                    const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos) {
-  // A headword reaching back further than this is not a contraction host.
-  constexpr size_t kMaxHostChars = 4;
-  const size_t scan_start = lookbehindStart(start_pos, kMaxHostChars);
-  for (size_t host_start = scan_start; host_start < start_pos; ++host_start) {
-    if (lookupEntryInRange(dict_manager, codepoints, host_start, end_pos, core::PartOfSpeech::Verb) != nullptr) {
-      return true;
-    }
-  }
-  return false;
-}
 
 // Whether a listed word opening before @p start_pos reaches @p end_pos or
 // further, so the span is inside that word rather than a word of its own.
@@ -66,21 +52,6 @@ bool hasDictionaryEntrySpanningBack(const dictionary::DictionaryManager& dict_ma
       if (match.entry != nullptr && host_start + match.length >= end_pos) {
         return true;
       }
-    }
-  }
-  return false;
-}
-
-// Whether a listed noun ending at @p start_pos opens a listed verb that ends at
-// @p end_pos, so the span is the verb's tail rather than a word of its own.
-bool splitsListedVerbAtNoun(const dictionary::DictionaryManager& dict_manager, const std::vector<char32_t>& codepoints,
-                            size_t start_pos, size_t end_pos) {
-  constexpr size_t kMaxNounChars = 4;
-  const size_t scan_start = lookbehindStart(start_pos, kMaxNounChars);
-  for (size_t host_start = scan_start; host_start < start_pos; ++host_start) {
-    if (lookupEntryInRange(dict_manager, codepoints, host_start, start_pos, core::PartOfSpeech::Noun) != nullptr &&
-        lookupEntryInRange(dict_manager, codepoints, host_start, end_pos, core::PartOfSpeech::Verb) != nullptr) {
-      return true;
     }
   }
   return false;
@@ -117,601 +88,7 @@ bool startsHonorificPrefixedNounWithVerbTail(const dictionary::DictionaryManager
   return false;
 }
 
-// A pure-hiragana na-adjective can share its surface with the interior of a
-// kanji-led inflected verb. If a previously generated verb edge already
-// crosses this position, the adjective cannot begin here without cutting the
-// verb stem (読まれ, 生まれて, 止まれ). Scan only the immediately preceding
-// kanji run; this keeps the check bounded and leaves genuine clause-initial or
-// post-particle adjective uses available.
-bool startsInsideKanjiLedVerb(const core::Lattice& lattice, const std::vector<char32_t>& codepoints, size_t start_pos) {
-  if (start_pos == 0 || !normalize::isKanjiCodepoint(codepoints[start_pos - 1])) {
-    return false;
-  }
-
-  size_t kanji_start = start_pos;
-  while (kanji_start > 0 && normalize::isKanjiCodepoint(codepoints[kanji_start - 1])) {
-    --kanji_start;
-  }
-  for (size_t pos = kanji_start; pos < start_pos; ++pos) {
-    if (core::anyEdgeStartingAt(lattice, pos, [start_pos](const core::LatticeEdge& edge) {
-          return edge.pos == core::PartOfSpeech::Verb && edge.end > start_pos && edge.lemmaVerified();
-        })) {
-      return true;
-    }
-  }
-  return false;
-}
-
-// A dictionary adverb cannot begin inside an already verified inflected
-// predicate.  Short literary adverbs can be homographic with the tail of an
-// adjective or auxiliary followed by a particle (ない+と, らしい+と).  Keep
-// the adverb available at a real boundary while protecting the longer
-// grammatical edge that crosses this position.
-//
-// A predicate only counts when its own right edge could be a word boundary.
-// Small kana cannot open a word, so an edge that ends just before one has not
-// finished the word it belongs to and is in no position to claim the span:
-// のめ (the potential stem of 飲む) ends before the っ of のめっちゃ, and
-// letting it suppress the adverb hands those morae to a fragment instead.
-bool startsInsideVerifiedPredicate(const core::Lattice& lattice, const std::vector<char32_t>& codepoints,
-                                   size_t start_pos) {
-  const size_t scan_start = dictionaryLookbehindStart(start_pos);
-  for (size_t edge_start = scan_start; edge_start < start_pos; ++edge_start) {
-    // A predicate opening inside a dictionary function word that ends exactly
-    // at start_pos (な|んか|もう → かも) is that word's fragment, not a witness.
-    const bool opens_inside_function_word =
-        core::anyEdgeEndingAt(lattice, start_pos, [edge_start](const core::LatticeEdge& word) {
-          return word.start < edge_start && word.fromDictionary() &&
-                 (word.pos == core::PartOfSpeech::Particle || word.pos == core::PartOfSpeech::Auxiliary);
-        });
-    if (opens_inside_function_word) {
-      continue;
-    }
-    if (core::anyEdgeStartingAt(lattice, edge_start, [&codepoints, start_pos](const core::LatticeEdge& edge) {
-          return edge.end > start_pos && edge.lemmaVerified() &&
-                 (edge.pos == core::PartOfSpeech::Verb || edge.pos == core::PartOfSpeech::Adjective ||
-                  edge.pos == core::PartOfSpeech::Auxiliary) &&
-                 (edge.end >= codepoints.size() || !kana::isSmallKanaCodepoint(codepoints[edge.end]));
-        })) {
-      return true;
-    }
-  }
-  return false;
-}
-
-// A kana determiner can begin at the final mora of a productive verb
-// continuative (たなびき+たる, not たなび+きたる).  Probe the predicate run
-// following the nearest particle that can introduce a predicate, and permit a
-// suffix probe because the confidence scorer deliberately discounts long
-// all-hiragana stems while still recognizing their productive tail.  An
-// immediately preceding particle means the determiner starts at a real
-// boundary and must remain available (そして+きたる).
-bool hasProductiveContinuativeCrossingDeterminer(const core::Lattice& lattice, const grammar::Inflection& inflection,
-                                                 const dictionary::DictionaryManager& dict_manager,
-                                                 const std::vector<char32_t>& codepoints, size_t determiner_start) {
-  if (determiner_start == 0 || !kana::isIRowCodepoint(codepoints[determiner_start])) {
-    return false;
-  }
-
-  size_t host_start = dictionaryLookbehindStart(determiner_start);
-  for (size_t boundary = determiner_start; boundary > host_start; --boundary) {
-    const bool follows_predicate_introducing_particle = core::anyEdgeEndingAt(
-        lattice, boundary, [](const core::LatticeEdge& edge) { return isNominalForcingParticle(edge.extended_pos); });
-    if (follows_predicate_introducing_particle) {
-      host_start = boundary;
-      break;
-    }
-  }
-  if (host_start == determiner_start) {
-    return false;
-  }
-
-  for (size_t probe_start = host_start; probe_start < determiner_start; ++probe_start) {
-    const std::string continuative = extractSubstring(codepoints, probe_start, determiner_start + 1);
-    if (dict_manager.lookupExact(continuative, core::PartOfSpeech::Verb) != nullptr) {
-      return true;
-    }
-    const auto inflection_candidates = inflection.analyze(continuative);
-    if (std::any_of(inflection_candidates.begin(), inflection_candidates.end(),
-                    [](const grammar::InflectionCandidate& inflection_candidate) {
-                      return inflection_candidate.verb_type != grammar::VerbType::IAdjective &&
-                             !inflection_candidate.suffix.empty() &&
-                             inflection_candidate.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence;
-                    })) {
-      return true;
-    }
-  }
-  return false;
-}
-
-bool canSegmentAsParticles(const dictionary::DictionaryManager& dict_manager, const std::vector<char32_t>& codepoints,
-                           size_t start_pos, size_t end_pos) {
-  return maximalSegmentCount(dict_manager, codepoints, start_pos, end_pos, core::PartOfSpeech::Particle) > 0;
-}
-
-// A dictionary adverb may begin at the terminal い of an already complete
-// i-adjective and consume the following particle sequence (惜し+いとも).  The
-// overlap is not a morpheme boundary: keep the adjective and the independently
-// searchable particles.  Requiring an adjective edge that crosses the start
-// and a fully particle-decomposable remainder leaves clause-initial uses of
-// the same adverb untouched.
-// "Complete" is decided by the mora in front of the terminal い. An i-adjective
-// written with okurigana has one (惜し+い), and its stem is spelled out whether
-// or not the adverb is taken. A kanji or katakana run running straight into い
-// has none: that い is the adverb's own first mora (人々+い, 学生+い, テスト+い),
-// so the adjective it completes exists only because the adverb was not taken,
-// and it would retire the adverb wherever a nominal precedes it.
-bool overlapsCompleteIAdjectiveBeforeParticles(const core::Lattice& lattice,
-                                               const dictionary::DictionaryManager& dict_manager,
-                                               const std::vector<char32_t>& codepoints, size_t start_pos,
-                                               size_t end_pos) {
-  if (start_pos == 0 || start_pos + 1 >= end_pos || codepoints[start_pos] != U'い' ||
-      !kana::isHiraganaCodepoint(codepoints[start_pos - 1]) ||
-      !canSegmentAsParticles(dict_manager, codepoints, start_pos + 1, end_pos)) {
-    return false;
-  }
-  return core::anyEdgeEndingAt(lattice, start_pos + 1, [start_pos](const core::LatticeEdge& edge) {
-    return edge.start < start_pos && edge.pos == core::PartOfSpeech::Adjective &&
-           edge.extended_pos == core::ExtendedPOS::AdjBasic && edge.origin == core::CandidateOrigin::AdjectiveI;
-  });
-}
-
-// A dictionary adverb may open on the last mora of a longer content word and
-// carry an independent particle along with it (事実+に read as 事+実に, 勢い+と
-// as 勢+いと, 勢い+とも as 勢+いとも). The same adverb stays available at a real
-// boundary (実に+難しい, いとも+簡単に), so the guard is not about the entry but
-// about the offset: reject it only when the mora it opens on completes a
-// content edge that starts earlier, and what remains of the adverb after that
-// mora is itself a registered particle. Both halves of the competing reading
-// are then lexically attested, which the adverb's own span is not.
-// This uses lattice structure rather than enumerating open-class words.
-bool opensOnContentWordTailBeforeParticle(const core::Lattice& lattice,
-                                          const dictionary::DictionaryManager& dict_manager,
-                                          const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos) {
-  if (start_pos == 0 || end_pos <= start_pos + 1 || end_pos > codepoints.size()) {
-    return false;
-  }
-  if (lookupEntryInRange(dict_manager, codepoints, start_pos + 1, end_pos, core::PartOfSpeech::Particle) == nullptr) {
-    return false;
-  }
-  const size_t content_end = start_pos + 1;
-  // An unverified content edge is evidence only when no dictionary word ends
-  // inside it: 事実 is one opaque run, while 私+少 and 明日+少 are fabricated
-  // across a registered word's boundary (私+少し, 明日+少し).
-  const auto crosses_dictionary_boundary = [&lattice](const core::LatticeEdge& edge) {
-    for (size_t interior = edge.start + 1; interior < edge.end; ++interior) {
-      if (core::anyEdgeEndingAt(lattice, interior,
-                                [](const core::LatticeEdge& inner) { return inner.fromDictionary(); })) {
-        return true;
-      }
-    }
-    return false;
-  };
-  for (size_t content_start = 0; content_start < start_pos; ++content_start) {
-    if (core::anyEdgeStartingAt(lattice, content_start, [&](const core::LatticeEdge& edge) {
-          return edge.end == content_end &&
-                 (edge.pos == core::PartOfSpeech::Noun || edge.pos == core::PartOfSpeech::Adjective) &&
-                 (edge.lemmaVerified() || !crosses_dictionary_boundary(edge));
-        })) {
-      return true;
-    }
-  }
-  return false;
-}
-
-// A verified compound candidate can span a productive completive auxiliary
-// boundary (食べ+ちゃい+ます). Keep that boundary only when its left and
-// right contexts independently license the closed auxiliary paradigm.
-bool startsClosedCompletiveContinuation(const dictionary::DictionaryManager& dict_manager, std::string_view text,
-                                        const ByteOffsets& byte_offsets, size_t start_pos) {
-  if (start_pos + 1 >= byte_offsets.size()) {
-    return false;
-  }
-  for (const auto& result : dict_manager.lookup(text, byteOffsetAt(byte_offsets, start_pos))) {
-    if (result.entry == nullptr) {
-      continue;
-    }
-    switch (result.entry->extended_pos) {
-      case core::ExtendedPOS::AuxTenseTa:
-      case core::ExtendedPOS::AuxNegativeNai:
-      case core::ExtendedPOS::AuxTenseMasu:
-      case core::ExtendedPOS::AuxDesireTai:
-      case core::ExtendedPOS::AuxVolitional:
-      case core::ExtendedPOS::AuxAppearanceSou:
-      case core::ExtendedPOS::ParticleConj:
-        return true;
-      default:
-        break;
-    }
-  }
-  return false;
-}
-
-bool isLicensedCompletiveAuxiliaryBoundary(const core::Lattice& lattice,
-                                           const dictionary::DictionaryManager& dict_manager, std::string_view text,
-                                           const ByteOffsets& byte_offsets, size_t candidate_start,
-                                           size_t candidate_end, core::ExtendedPOS candidate_epos) {
-  if (candidate_epos != core::ExtendedPOS::AuxAspectShimau) {
-    return false;
-  }
-  const bool follows_verb_host = hasPrecedingExtendedPOS(
-      lattice, candidate_start, {core::ExtendedPOS::VerbRenyokei, core::ExtendedPOS::VerbOnbinkei});
-  return follows_verb_host && startsClosedCompletiveContinuation(dict_manager, text, byte_offsets, candidate_end);
-}
-
-// A dictionary-verified lexical compound owns every boundary inside its
-// active inflectional span. Short dictionary verbs and closed function words
-// may be accidental homographs of that interior (思い出+し, 見落+として).
-// Require the explicit LemmaVerified flag: compound join candidates also carry
-// FromDictionary for their generation evidence, which alone does not attest
-// the complete compound lemma.
-bool conflictsWithVerifiedCompoundBoundary(const core::Lattice& lattice,
-                                           const dictionary::DictionaryManager& dict_manager, std::string_view text,
-                                           const ByteOffsets& byte_offsets, const std::vector<char32_t>& codepoints,
-                                           size_t candidate_start, size_t candidate_end,
-                                           core::PartOfSpeech candidate_pos, core::ExtendedPOS candidate_epos) {
-  const bool is_grammatical_candidate =
-      candidate_pos == core::PartOfSpeech::Verb || candidate_pos == core::PartOfSpeech::Particle ||
-      candidate_pos == core::PartOfSpeech::Auxiliary || candidate_pos == core::PartOfSpeech::Suffix;
-  if (!is_grammatical_candidate) {
-    return false;
-  }
-  // A verified compound's inflected whole-span candidate must not hide a
-  // productive verb-to-auxiliary boundary.  In particular, the irrealis is
-  // the required host for negative, causative, and passive auxiliaries; the
-  // auxiliary remains grammatical even when a longer compound candidate also
-  // crosses the same position.
-  if (candidate_pos == core::PartOfSpeech::Auxiliary &&
-      hasPrecedingExtendedPOS(
-          lattice, candidate_start,
-          {core::ExtendedPOS::VerbMizenkei, core::ExtendedPOS::VerbRenyokei, core::ExtendedPOS::VerbOnbinkei})) {
-    return false;
-  }
-  const size_t compound_end = verifiedCompoundEndCovering(lattice, candidate_start);
-  if (compound_end != 0 && candidate_end <= compound_end &&
-      !isLicensedCompletiveAuxiliaryBoundary(lattice, dict_manager, text, byte_offsets, candidate_start, candidate_end,
-                                             candidate_epos)) {
-    return true;
-  }
-  const size_t onbinkei_end = dictionarySokuonbinEndCovering(lattice, candidate_start);
-  if (onbinkei_end != 0 && candidate_end <= onbinkei_end && onbinkei_end < codepoints.size() &&
-      (codepoints[onbinkei_end] == U'た' || codepoints[onbinkei_end] == U'て')) {
-    return true;
-  }
-  if (candidate_pos != core::PartOfSpeech::Particle) {
-    return false;
-  }
-  // A structurally valid compound does not need lexical registration to
-  // protect its connective boundary from a larger particle that begins in
-  // its interior. Requiring the outside remainder itself to be a particle
-  // keeps ordinary compound-particle uses available at real boundaries.
-  const size_t structural_compound_end = compoundVerbEndCovering(lattice, candidate_start);
-  if (structural_compound_end == 0 || candidate_end <= structural_compound_end) {
-    return false;
-  }
-  return lookupEntryInRange(dict_manager, codepoints, structural_compound_end, candidate_end,
-                            core::PartOfSpeech::Particle) != nullptr;
-}
-
-// The temporal adverb いま overlaps the full polite forms of いる
-// (います/いました/いません/…).  At a clause boundary the closed inflectional
-// chain is more specific than the accidental いま+verb path.  Do not apply
-// this inside a longer lexical continuation: いますぐ remains いま+すぐ.
-bool startsIruPoliteFormAt(const std::vector<char32_t>& codepoints, size_t start_pos) {
-  if (start_pos >= codepoints.size() || codepoints[start_pos] != U'い') {
-    return false;
-  }
-  const size_t masu_length = verb_helpers::finiteMasuFormLengthAt(codepoints, start_pos + 1);
-  if (masu_length == 0) {
-    return false;
-  }
-  const size_t end_pos = start_pos + 1 + masu_length;
-  if (end_pos >= codepoints.size()) {
-    return true;
-  }
-  const char32_t following = codepoints[end_pos];
-  return normalize::isExtendedParticle(following) || following == U'。' || following == U'、' || following == U'」' ||
-         following == U'）';
-}
-
-// A polite-auxiliary homograph is not a real boundary when it begins inside a
-// longer, dictionary-verified verb renyokei ending at the same position
-// (醒まし/て, さまし/て).  Requiring both the shared end and verified lemma
-// keeps ordinary polite chains such as 食べ/まし/て and 読み/まし/て intact.
-bool hasCoveringVerifiedVerbRenyokei(const core::Lattice& lattice, size_t interior_start, size_t shared_end) {
-  return core::anyEdgeEndingAt(lattice, shared_end, [interior_start](const core::LatticeEdge& edge) {
-    return edge.start < interior_start && edge.extended_pos == core::ExtendedPOS::VerbRenyokei && edge.lemmaVerified();
-  });
-}
-
-// An intentional auxiliary is structurally meaningful here only when it
-// closes the verb form selected by that auxiliary. Looking merely for any
-// candidate ending at start_pos mistakes homographic word endings for an
-// independent auxiliary and suppresses the following particle.
-bool hasPrecedingVerbVolitionalChain(const core::Lattice& lattice, size_t start_pos) {
-  return core::anyEdgeEndingAt(lattice, start_pos, [&lattice](const core::LatticeEdge& edge) {
-    if (edge.extended_pos != core::ExtendedPOS::AuxVolitional &&
-        edge.extended_pos != core::ExtendedPOS::AuxNegativeMai) {
-      return false;
-    }
-    return core::anyEdgeEndingAt(lattice, edge.start, [&edge](const core::LatticeEdge& verb) {
-      // The a-row mizenkei of する (さ) only hosts the passive/causative, never ん
-      // (田中さ+ん+と+し+て is 田中+さん+として).
-      const bool is_suru_passive_stem =
-          grammar::isSuruBaseForm(verb.lemma) && kana::isARowCodepoint(utf8::decodeFirstChar(verb.surface));
-      const bool licenses_volitional = edge.extended_pos == core::ExtendedPOS::AuxVolitional &&
-                                       verb.extended_pos == core::ExtendedPOS::VerbMizenkei && !is_suru_passive_stem;
-      const bool licenses_negative_intent = edge.extended_pos == core::ExtendedPOS::AuxNegativeMai &&
-                                            verb.extended_pos == core::ExtendedPOS::VerbShuushikei;
-      return licenses_volitional || licenses_negative_intent;
-    });
-  });
-}
-
-bool hasPrecedingNominal(const core::Lattice& lattice, size_t start_pos) {
-  return hasPrecedingPartOfSpeech(lattice, start_pos, kNounPronounMask);
-}
-
-// An L2 noun can begin with another L2 noun by accident (は+にわ inside
-// はにわ).  At sentence start the longer registered noun owns the span; after
-// a completed nominal, the same first mora can instead be a productive topic
-// particle and the suffix noun remains available.
-bool startsInsideSentenceInitialDictionaryNoun(const dictionary::DictionaryManager& dict_manager, std::string_view text,
-                                               size_t start_pos) {
-  if (start_pos == 0) {
-    return false;
-  }
-  const auto sentence_initial = dict_manager.lookup(text, 0);
-  return lookupResultsHaveLongerPartOfSpeech(sentence_initial, partOfSpeechMask(core::PartOfSpeech::Noun), start_pos);
-}
-
-// A two-mora conjunction candidate can straddle the productive boundary in
-// AdjNaAdj + な + お/ご + nominal (重要+な+お+知らせ). A preceding
-// dictionary-verified na-adjective and a kanji/katakana head on the right make
-// that structure explicit, including open-class heads absent from the
-// dictionary, so the discourse-conjunction homograph is unavailable. Requiring
-// dictionary evidence keeps incidental unknown adjective candidates from
-// suppressing a real conjunction after a completed clause.
-bool crossesAttributiveNaHonorificNominal(const core::Lattice& lattice, const std::vector<char32_t>& codepoints,
-                                          size_t start_pos, size_t end_pos) {
-  if (end_pos != start_pos + 2 || end_pos >= codepoints.size() || codepoints[start_pos] != U'な' ||
-      !grammar::isHonorificPrefix(extractSubstring(codepoints, start_pos + 1, end_pos)) ||
-      (!normalize::isKanjiCodepoint(codepoints[end_pos]) &&
-       normalize::classifyChar(codepoints[end_pos]) != normalize::CharType::Katakana)) {
-    return false;
-  }
-
-  return core::anyEdgeEndingAt(lattice, start_pos, [](const core::LatticeEdge& edge) {
-    return edge.extended_pos == core::ExtendedPOS::AdjNaAdj && edge.fromDictionary();
-  });
-}
-
-// generateTemporalNounBoundaryCandidates() marks the left side of a
-// lexicalized all-kanji + 間もなく sequence as a PrefixCompound noun.  Use
-// that structural edge to distinguish 終了|間もなく from a candidate that
-// would reopen the interior of 時間 (時|間もなく).
-bool hasPrecedingTemporalCompoundBoundary(const core::Lattice& lattice, size_t start_pos) {
-  return core::anyEdgeEndingAt(lattice, start_pos, [](const core::LatticeEdge& edge) {
-    return edge.pos == core::PartOfSpeech::Noun && edge.origin == core::CandidateOrigin::PrefixCompound;
-  });
-}
-
-bool startsFormalNounParticleAfterPredicate(const core::Lattice& lattice,
-                                            const dictionary::DictionaryManager& dict_manager,
-                                            const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos) {
-  if (!hasPrecedingPartOfSpeech(lattice, start_pos, kVerbAdjectiveMask)) {
-    return false;
-  }
-  for (size_t split = start_pos + 1; split < end_pos; ++split) {
-    const auto* noun = lookupEntryInRange(dict_manager, codepoints, start_pos, split, core::PartOfSpeech::Noun);
-    if (noun == nullptr || noun->extended_pos != core::ExtendedPOS::NounFormal) {
-      continue;
-    }
-    if (lookupEntryInRange(dict_manager, codepoints, split, end_pos, core::PartOfSpeech::Particle) != nullptr) {
-      return true;
-    }
-  }
-  return false;
-}
-
-// A dictionary noun opening on the counter of a numeral+counter cuts the
-// quantity in two when what follows the counter is a formal noun (三日+付け,
-// not 三+日付け), the same boundary the counter generator binds.
-bool cutsNumeralCounterBeforeFormalNoun(const dictionary::DictionaryManager& dict_manager,
-                                        const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos) {
-  if (start_pos == 0 || end_pos <= start_pos + 1 || !normalize::isNumeralCodepoint(codepoints[start_pos - 1]) ||
-      !(normalize::isCounterKanji(codepoints[start_pos]) || normalize::isTemporalCounterKanji(codepoints[start_pos]))) {
-    return false;
-  }
-  const auto* formal = lookupEntryInRange(dict_manager, codepoints, start_pos + 1, end_pos, core::PartOfSpeech::Noun);
-  return formal != nullptr && formal->extended_pos == core::ExtendedPOS::NounFormal;
-}
-
-// A case particle immediately before an ABAB mimetic is a stronger boundary
-// than a homographic multi-mora dictionary entry beginning at that particle
-// (鈴+が+りんりんと, not がり+んりんと).
-bool startsParticleBeforeReduplicatedMimetic(const std::vector<char32_t>& codepoints, size_t start_pos) {
-  if (start_pos + 5 >= codepoints.size() || !normalize::isParticleCodepoint(codepoints[start_pos])) {
-    return false;
-  }
-  const size_t rest = start_pos + 1;
-  return codepoints[rest] == codepoints[rest + 2] && codepoints[rest + 1] == codepoints[rest + 3] &&
-         codepoints[rest + 4] == U'と';
-}
-
-bool hasPrecedingQuantityEdge(const core::Lattice& lattice, size_t end_pos) {
-  return core::anyEdgeEndingAt(lattice, end_pos, [](const core::LatticeEdge& edge) {
-    return edge.extended_pos == core::ExtendedPOS::NounNumber || edge.origin == core::CandidateOrigin::Counter;
-  });
-}
-
-// Whether a verb continuative built on a kanji stem reaches past this position.
-// Its okurigana starts on the same i-row mora two of the kana numerals do
-// (思い|つつ against 思|いつつ, 読み|つつ against 読|みっつ), so a numeral opening
-// there would be opening inside a word.  A stem is at most one mora shorter than
-// the run it heads, so probing back that far reaches every such continuative.
-bool insideKanjiVerbOkurigana(const core::Lattice& lattice, size_t start_pos) {
-  constexpr size_t kStemProbeChars = 4;
-  const size_t probe_start = lookbehindStart(start_pos, kStemProbeChars);
-  for (size_t stem_start = probe_start; stem_start < start_pos; ++stem_start) {
-    const bool spans = core::anyEdgeStartingAt(lattice, stem_start, [start_pos](const core::LatticeEdge& edge) {
-      return edge.pos == core::PartOfSpeech::Verb && edge.extended_pos == core::ExtendedPOS::VerbRenyokei &&
-             edge.end > start_pos;
-    });
-    if (spans) {
-      return true;
-    }
-  }
-  return false;
-}
-
-// Whether an edge ending at pos satisfies edge_pred while an edge ending at
-// that edge's start satisfies host_pred.
-template <typename EdgePred, typename HostPred>
-bool followsHostedEdge(const core::Lattice& lattice, size_t pos, EdgePred edge_pred, HostPred host_pred) {
-  return core::anyEdgeEndingAt(lattice, pos, [&](const core::LatticeEdge& edge) {
-    return edge_pred(edge) && core::anyEdgeEndingAt(lattice, edge.start, host_pred);
-  });
-}
-
-// A formal noun after the negative-quote frame (…ん+と) must not hide a
-// dictionary verb irrealis plus the following negative auxiliary.  This is a
-// structural ambiguity: the formal-noun edge has no predicate host there,
-// while the split supplies one.  Keep ordinary formal-noun uses (結果いかんで)
-// and unrelated quotative phrases available.
-bool followsNegativeQuote(const core::Lattice& lattice, size_t start_pos) {
-  return followsHostedEdge(
-      lattice, start_pos,
-      [](const core::LatticeEdge& quote) {
-        // と is lexically ambiguous between a quotation and a case particle.
-        // In this frame the preceding negative predicate supplies the quoted
-        // clause, so either dictionary label represents the same boundary.
-        return quote.extended_pos == core::ExtendedPOS::ParticleQuote ||
-               (quote.extended_pos == core::ExtendedPOS::ParticleCase &&
-                grammar::isSingleHiragana(quote.surface, core::hiragana::kTo));
-      },
-      [](const core::LatticeEdge& negative) { return negative.extended_pos == core::ExtendedPOS::AuxNegativeNu; });
-}
-
-// A nasal onbin happens to contain a competing one-mora ん entry (読ん+どく).
-// It is a negative only when it has an actual irrealis host, as in
-// 確認せ+ん+と.  Checking the immediate lattice predecessor keeps this guard
-// structural instead of suppressing every accidental ん edge.
-bool followsNegativeAuxiliary(const core::Lattice& lattice, size_t start_pos) {
-  return followsHostedEdge(
-      lattice, start_pos,
-      [](const core::LatticeEdge& negative) { return negative.extended_pos == core::ExtendedPOS::AuxNegativeNu; },
-      [](const core::LatticeEdge& host) { return host.extended_pos == core::ExtendedPOS::VerbMizenkei; });
-}
-
-// The contracted explanatory nominalizer in …てん/…でん follows a
-// conjunctive te-form.  Classical negative ん instead requires a verb
-// irrealis host, so retaining that homograph here can only fabricate an
-// impossible analysis (読ん+で+ん+の).  Checking the preceding lattice edge
-// makes this a grammatical boundary guard rather than a surface exception.
-// The boundary is explanatory only when the conjunctive particle itself
-// follows a predicate.  A kana inside an Ichidan host (慌て+ずに) also has a
-// competing one-mora て particle edge, but its left neighbor is a noun
-// fragment rather than the te-form's predicate.
-bool followsConjunctiveTeDe(const core::Lattice& lattice, size_t start_pos) {
-  return followsHostedEdge(
-      lattice, start_pos,
-      [](const core::LatticeEdge& edge) {
-        return edge.extended_pos == core::ExtendedPOS::ParticleConj && grammar::isTeDeSurface(edge.surface);
-      },
-      [](const core::LatticeEdge& host) { return host.pos == core::PartOfSpeech::Verb; });
-}
-
-// A candidate span whose last character is the contracted negative ん competes
-// with a dictionary irrealis one character shorter.  Both the formal-noun and
-// the irrealis reading of the span are decided by the same evidence, so they
-// ask this one question rather than each carrying its own scan.
-bool hasShorterMizenkeiBeforeNegative(const std::vector<dictionary::LookupResult>& alternatives,
-                                      const std::vector<char32_t>& codepoints, size_t start_pos,
-                                      size_t candidate_length) {
-  if (candidate_length < 2 || start_pos + candidate_length > codepoints.size() ||
-      codepoints[start_pos + candidate_length - 1] != U'ん') {
-    return false;
-  }
-  for (const auto& alternative : alternatives) {
-    if (alternative.entry != nullptr && alternative.entry->extended_pos == core::ExtendedPOS::VerbMizenkei &&
-        alternative.length + 1 == candidate_length) {
-      return true;
-    }
-  }
-  return false;
-}
-
-// In a negative-quote frame, a one-mora verbal edge can be the prefix of a
-// longer dictionary verb that is immediately followed by the negative
-// auxiliary. The longer predicate supplies the only complete grammatical
-// chain, while the shorter edge would leave its remaining kana to a particle.
-// Compare dictionary spans rather than surfaces so the rule applies to every
-// homographic verb pair with this structure.
-bool hasLongerVerbBeforeNegative(const std::vector<dictionary::LookupResult>& alternatives,
-                                 const std::vector<char32_t>& codepoints, size_t start_pos, size_t candidate_length) {
-  for (const auto& alternative : alternatives) {
-    if (alternative.entry == nullptr || alternative.entry->pos != core::PartOfSpeech::Verb ||
-        alternative.length <= candidate_length || start_pos + alternative.length >= codepoints.size()) {
-      continue;
-    }
-    if (codepoints[start_pos + alternative.length] == U'ん') {
-      return true;
-    }
-  }
-  return false;
-}
-
-// A closed determiner may happen to share a whole surface with a dictionary
-// Godan onbin + past form.  At a sentence boundary the finite predicate owns
-// that construction: the determiner requires a following nominal, whereas
-// the attested verb stem and its matching past allomorph form a complete
-// clause.  Resolve this from the conjugation table and lexical base evidence,
-// never from a particular homographic surface.
-// Both the past and the connective suffix select their voiced allomorph from
-// the same Godan row, so the two forms differ only in which kana pair closes
-// the sequence.
-bool isDictionaryOnbinBefore(const dictionary::DictionaryManager& dict_manager, std::string_view surface,
-                             std::string_view unvoiced, std::string_view voiced) {
-  const std::string_view suffix = utf8::lastChar(surface);
-  if (suffix != unvoiced && suffix != voiced) {
-    return false;
-  }
-  const std::string_view onbin_stem = utf8::dropLastChar(surface);
-  const std::string_view onbin = utf8::lastChar(onbin_stem);
-  const std::string_view lexical_stem = utf8::dropLastChar(onbin_stem);
-  if (lexical_stem.empty()) {
-    return false;
-  }
-  const auto match = verb_helpers::firstGodanOnbinDictBase(&dict_manager, lexical_stem, onbin);
-  if (!match.matched) {
-    return false;
-  }
-  const auto* row = grammar::Conjugation::getGodanRow(match.verb_type);
-  return row != nullptr && (row->voiced_ta ? suffix == voiced : suffix == unvoiced);
-}
-
-bool isDictionaryOnbinPast(const dictionary::DictionaryManager& dict_manager, std::string_view surface) {
-  return isDictionaryOnbinBefore(dict_manager, surface, "た", "だ");
-}
-
-bool isDictionaryOnbinTeForm(const dictionary::DictionaryManager& dict_manager, std::string_view surface) {
-  return isDictionaryOnbinBefore(dict_manager, surface, "て", "で");
-}
-
-bool startsKuruConditional(const std::vector<char32_t>& codepoints, size_t start_pos) {
-  return start_pos + 2 < codepoints.size() && codepoints[start_pos] == U'く' && codepoints[start_pos + 1] == U'れ' &&
-         codepoints[start_pos + 2] == U'ば';
-}
-
 // Whether a surface spells the continuative of a registered verb.
-// A multi-mora adverb ending in か before という has absorbed the question
-// particle of a quoted question (なぜか+という against なぜ+か+という).
-bool adverbAbsorbsQuotedQuestion(const std::vector<char32_t>& codepoints, size_t length, size_t end_pos) {
-  return length > 1 && codepoints[end_pos - 1] == U'か' && end_pos + 2 < codepoints.size() &&
-         codepoints[end_pos] == U'と' && codepoints[end_pos + 1] == U'い' && codepoints[end_pos + 2] == U'う';
-}
-
 bool namesVerbContinuative(const dictionary::DictionaryManager& dict_manager, std::string_view surface) {
   const char32_t tail = utf8::decodeLastChar(surface);
   const std::string_view stem = utf8::dropLastChar(surface);
@@ -756,15 +133,473 @@ bool namesSimplexDeverbalNoun(const dictionary::DictionaryManager& dict_manager,
   return true;
 }
 
-}  // namespace
+// Add the verb-stem edges a dictionary entry implies. Returns false when the
+// entry itself is not a candidate, either because its stem edge replaces it or
+// because its span is not a word.
+bool addDictionaryVerbStemEdges(core::Lattice& lattice,
+                                const tokenizer_dictionary_detail::DictionaryCandidateContext& ctx,
+                                const dictionary::LookupResult& result, size_t end_pos) {
+  const auto& dict_manager = ctx.dict_manager;
+  const auto& codepoints = ctx.codepoints;
+  const size_t start_pos = ctx.start_pos;
+  if (result.entry->pos == core::PartOfSpeech::Verb && utf8::endsWith(result.entry->surface, "ぬ") &&
+      result.entry->lemma != result.entry->surface) {
+    const std::string stem_surface = std::string(utf8::dropLastChar(result.entry->surface));
+    tokenizer_dictionary_detail::addDictionaryOriginEdge(
+        lattice, stem_surface, start_pos, end_pos - 1, core::PartOfSpeech::Verb,
+        getCategoryCost(core::ExtendedPOS::VerbMizenkei), core::LatticeEdge::kFromDictionary, result.entry->lemma,
+        dictionary::ConjugationType::None, core::ExtendedPOS::VerbMizenkei, "dictionary_classical_negative_stem");
+    return false;
+  }
 
-using tokenizer_dictionary_detail::addClippedInterjectionCandidates;
-using tokenizer_dictionary_detail::addContextualDictionaryCandidates;
-using tokenizer_dictionary_detail::addElidedProlongedDictionaryCandidates;
-using tokenizer_dictionary_detail::addTruncatedAdverbCandidates;
-using tokenizer_dictionary_detail::ContextualDictionaryCandidateState;
-using tokenizer_dictionary_detail::hasInterrogativeEndingAt;
-using tokenizer_dictionary_detail::hasPrecedingAttributivePredicate;
+  if ((result.entry->pos == core::PartOfSpeech::Verb || result.entry->pos == core::PartOfSpeech::Adjective ||
+       result.entry->pos == core::PartOfSpeech::Noun) &&
+      result.length > 1 && codepoints[start_pos] == U'は' && codepoints[end_pos - 1] == U'な' &&
+      end_pos + 1 < codepoints.size() && codepoints[end_pos] == U'か' && codepoints[end_pos + 1] == U'っ') {
+    return false;
+  }
+
+  if (result.entry->pos == core::PartOfSpeech::Noun && end_pos < codepoints.size() &&
+      codepoints[end_pos - 1] == U'し' && codepoints[end_pos] == U'て') {
+    const std::string verb_base = normalize::concat(utf8::dropLastChar(result.entry->surface), "す");
+    const auto* verb = dict_manager.lookupExact(verb_base, core::PartOfSpeech::Verb);
+    if (verb != nullptr) {
+      tokenizer_dictionary_detail::addDictionaryOriginEdge(
+          lattice, result.entry->surface, start_pos, end_pos, core::PartOfSpeech::Verb,
+          getCategoryCost(core::ExtendedPOS::VerbRenyokei) + candidate::kVerifiedTailCompoundVerbBonus +
+              candidate::kVerifiedVerbBonus,
+          core::LatticeEdge::kFromDictionary, verb_base, dictionary::ConjugationType::GodanSa,
+          core::ExtendedPOS::VerbRenyokei, "dictionary_godan_sa_renyokei");
+    }
+  }
+
+  if (result.entry->pos == core::PartOfSpeech::Noun && end_pos < codepoints.size() &&
+      normalize::isKanjiCodepoint(codepoints[end_pos]) && kana::isIRowCodepoint(codepoints[end_pos - 1])) {
+    const std::string_view base_suffix = grammar::godanBaseSuffixFromIRow(codepoints[end_pos - 1]);
+    if (!base_suffix.empty()) {
+      const std::string verb_base = normalize::concat(utf8::dropLastChar(result.entry->surface), base_suffix);
+      const auto* verb = dict_manager.lookupExact(verb_base, core::PartOfSpeech::Verb);
+      if (verb != nullptr) {
+        const auto conj_type = grammar::verbTypeToConjType(
+            grammar::verbTypeFromBaseCodepoint(utf8::decodeFirstChar(utf8::lastChar(verb_base))));
+        tokenizer_dictionary_detail::addDictionaryOriginEdge(
+            lattice, result.entry->surface, start_pos, end_pos, core::PartOfSpeech::Verb,
+            getCategoryCost(core::ExtendedPOS::VerbRenyokei), core::LatticeEdge::kFromDictionary, verb_base, conj_type,
+            core::ExtendedPOS::VerbRenyokei, "dictionary_godan_renyokei_before_predicate");
+      }
+    }
+  }
+  return true;
+}
+
+// Add the entry extended with colloquial emphasis at the cost and flags of its
+// own edge.
+void addEmphaticDictionaryEdge(core::Lattice& lattice,
+                               const tokenizer_dictionary_detail::DictionaryCandidateContext& ctx,
+                               const dictionary::LookupResult& result, size_t end_pos, float cost, uint8_t flags) {
+  const auto& dict_manager = ctx.dict_manager;
+  const auto& inflection = ctx.inflection;
+  const std::string_view text = ctx.text;
+  const auto& codepoints = ctx.codepoints;
+  const auto& byte_offsets = ctx.byte_offsets;
+  const size_t start_pos = ctx.start_pos;
+  // Extend predicates, adverbs and particles with colloquial emphasis
+  // (ですっ, 行くーー, きたあああ, 行くよっ). Unknown candidates use the same
+  // matcher. A particle takes the mark for the same reason a predicate does —
+  // it closes the utterance — and the bare-sokuon guard below is what keeps
+  // the mark from being taken out of the next word (よっぽど, ねっとり).
+  if (end_pos < codepoints.size() &&
+      (result.entry->pos == core::PartOfSpeech::Verb || result.entry->pos == core::PartOfSpeech::Auxiliary ||
+       result.entry->pos == core::PartOfSpeech::Adjective || result.entry->pos == core::PartOfSpeech::Adverb ||
+       result.entry->pos == core::PartOfSpeech::Particle)) {
+    // A dictionary irrealis stem cannot absorb っ before て/た as emphasis:
+    // 染まっ+て belongs to the GodanRa verb 染まる, not 染ま(染む)+っ+て.
+    // The hypothetical stem is barred for the same reason, and it is where
+    // the productive potential forms are registered: かえ is the ichidan stem
+    // of かえる (the potential of 買う), which has no sokuonbin at all, so
+    // かえっ+て can only belong to the godan かえる and must keep that lemma.
+    // An auxiliary cannot either: っ+て after one is the concessive particle
+    // って (書い+た+って), and every genuine auxiliary onbin cell (だっ, たかっ,
+    // じゃっ) is a dictionary entry in its own right.
+    const bool sokuon_before_te_or_ta =
+        end_pos + 1 < codepoints.size() && codepoints[end_pos] == core::hiragana::kSmallTsu &&
+        (codepoints[end_pos + 1] == core::hiragana::kTe || codepoints[end_pos + 1] == core::hiragana::kTa) &&
+        (result.entry->extended_pos == core::ExtendedPOS::VerbMizenkei ||
+         result.entry->extended_pos == core::ExtendedPOS::VerbKateikei ||
+         result.entry->pos == core::PartOfSpeech::Auxiliary);
+    auto emphatic = sokuon_before_te_or_ta
+                        ? verb_helpers::EmphaticSuffixMatch{}
+                        : verb_helpers::matchEmphaticSuffix(codepoints, end_pos, result.entry->pos,
+                                                            verb_helpers::SokuonOnsetPolicy::DictionaryEntry);
+    // One repeated vowel is below the generic emphasis floor, but a final
+    // particle drawn out by its own full-size vowel (けど+さあ) is that hold,
+    // and so is a continuative closing the clause as the regional imperative
+    // (見+ときい, し+ときい): an inflected i-row cell, then nothing.
+    const bool closes_after_held_vowel =
+        end_pos + 1 >= codepoints.size() ||
+        normalize::classifyChar(codepoints[end_pos + 1]) == normalize::CharType::Symbol;
+    const bool imperative_continuative =
+        (result.entry->pos == core::PartOfSpeech::Verb || result.entry->pos == core::PartOfSpeech::Auxiliary) &&
+        !result.entry->lemma.empty() && result.entry->lemma != result.entry->surface &&
+        kana::isIRowCodepoint(codepoints[end_pos - 1]) && closes_after_held_vowel;
+    if (emphatic.empty() &&
+        (result.entry->extended_pos == core::ExtendedPOS::ParticleFinal || imperative_continuative) &&
+        end_pos < codepoints.size() && codepoints[end_pos] == grammar::getVowelForChar(codepoints[end_pos - 1])) {
+      emphatic.suffix = extractSubstring(codepoints, end_pos, end_pos + 1);
+      emphatic.end = end_pos + 1;
+      emphatic.repeated_vowel_count = 1;
+    }
+    // A bare sokuon after a predicate is one of two things: the genuine 促音便,
+    // which needs て/た/で/だ behind it (と+いっ+て), or colloquial emphasis, which
+    // closes the clause (行くっ！). Before any other kana it is neither, and taking
+    // it eats the opening mora of the following word (にらめっ+こ for にらめっこ).
+    const bool bare_sokuon = emphatic.suffix == "っ";
+    // Only a verb's own 音便形 owns the sokuon in front of the connective. The
+    // continuative does not: the 促音便 replaces that form's last mora rather
+    // than following it (買う has 買っ, built on the stem, while 買い is the
+    // continuative and 買いっ is no cell at all), and the genuine cell reaches
+    // the lattice as an entry of its own. An i-adjective closes its terminal
+    // on い and builds its own onbin elsewhere (忙し|かっ|た), and a na-adjective
+    // stem has no inflection at all, so a っ after either is the emphatic —
+    // which needs a clause end, not a following word (忙しい|っていう, not
+    // 忙しいっ|ていう).
+    const bool host_owns_sokuonbin_cell =
+        result.entry->pos == core::PartOfSpeech::Verb && result.entry->extended_pos == core::ExtendedPOS::VerbOnbinkei;
+    const bool unlicensed_bare_sokuon =
+        bare_sokuon && emphatic.end < codepoints.size() &&
+        normalize::classifyChar(codepoints[emphatic.end]) == normalize::CharType::Hiragana &&
+        !(host_owns_sokuonbin_cell &&
+          utf8::equalsAny(extractSubstring(codepoints, emphatic.end, emphatic.end + 1), {"て", "た", "で", "だ"}));
+    // A particle takes the glottal stop, which closes the utterance, but not
+    // the prolonged mark: after a one-mora particle that spelling is also the
+    // tail of a lengthened word, and taking it there cuts the word in two
+    // (おいしーー as おい + しーー).
+    // A sentence-final particle may hold its own vowel at a clause end
+    // (さ+あ, よ+お, さ+ー): one mora, the particle's vowel, then nothing.
+    // The clause ends after the emphatic, or a final particle closes it
+    // (行くけえ+ね).
+    auto closes_clause_after_emphatic = [&]() {
+      const auto* next_final = emphatic.end < codepoints.size()
+                                   ? lookupEntryInRange(dict_manager, codepoints, emphatic.end, emphatic.end + 1,
+                                                        core::PartOfSpeech::Particle)
+                                   : nullptr;
+      return emphatic.end >= codepoints.size() ||
+             normalize::classifyChar(codepoints[emphatic.end]) == normalize::CharType::Symbol ||
+             (next_final != nullptr && next_final->extended_pos == core::ExtendedPOS::ParticleFinal);
+    };
+    auto holds_final_particle_vowel = [&]() {
+      if (result.entry->extended_pos != core::ExtendedPOS::ParticleFinal || emphatic.end != end_pos + 1 ||
+          normalize::utf8Length(result.entry->surface) != 1 || !closes_clause_after_emphatic()) {
+        return false;
+      }
+      const char32_t held = codepoints[end_pos];
+      const char32_t vowel = grammar::getVowelForChar(codepoints[end_pos - 1]);
+      // Small vowels sit one codepoint below their full-size form (ぁ, あ).
+      return held == U'ー' || held == vowel || (kana::isSmallKanaCodepoint(held) && held + 1 == vowel);
+    };
+    // Exactly two repeated vowels that themselves spell a dictionary word
+    // starting there (で+ええ, そう+ああ) are that word, not emphasis.
+    auto lengthening_spells_word_at = [&]() {
+      // A content word draws its own vowel out (やばいいい); only a function
+      // word's "lengthening" can be a following word instead.
+      const bool function_word_host =
+          result.entry->pos == core::PartOfSpeech::Particle || result.entry->pos == core::PartOfSpeech::Auxiliary;
+      if (!function_word_host || emphatic.repeated_vowel_count != 2 || emphatic.standard_char_count != 0) {
+        return false;
+      }
+      const auto following_results = dict_manager.lookup(text, byteOffsetAt(byte_offsets, end_pos));
+      return std::any_of(following_results.begin(), following_results.end(),
+                         [](const auto& following) { return following.entry != nullptr && following.length == 2; });
+    };
+    // A one-mora host whose vowel is held with ー or a small vowel can respell
+    // a registered two-mora word (ね+ー, ね+ぇ for ねえ): the span is that
+    // word, with its own class and lemma, and not the host drawn out.
+    if (normalize::utf8Length(result.entry->surface) == 1 && emphatic.end == end_pos + 1) {
+      const char32_t held = codepoints[end_pos];
+      const char32_t vowel = grammar::getVowelForChar(codepoints[end_pos - 1]);
+      if (held == U'ー' || (kana::isSmallKanaCodepoint(held) && held + 1 == vowel)) {
+        const std::string respelled = result.entry->surface + normalize::encodeUtf8(vowel);
+        bool respells_word = false;
+        for (const auto& word : dict_manager.lookup(respelled, 0)) {
+          if (word.entry == nullptr || word.length != normalize::utf8Length(respelled)) {
+            continue;
+          }
+          respells_word = true;
+          // Each host reading at this position reaches here; one of them adds the word.
+          if (result.entry->pos == core::PartOfSpeech::Particle) {
+            tokenizer_dictionary_detail::addDictionaryOriginEdge(
+                lattice, extractSubstring(codepoints, start_pos, emphatic.end), start_pos, emphatic.end,
+                word.entry->pos, getCategoryCost(word.entry->extended_pos), core::LatticeEdge::kFromDictionary,
+                word.entry->lemma.empty() ? respelled : word.entry->lemma, dictionary::ConjugationType::None,
+                word.entry->extended_pos, "dict_respelled");
+          }
+        }
+        if (respells_word) {
+          return;
+        }
+      }
+    }
+    // A vowel drawn out after a verb continuative can instead complete an
+    // i-adjective spelled in kana (おい+し+い is おいしい, not おい+しい), so
+    // the span from a hiragana run in front of it reads as an adjective.
+    auto lengthening_completes_adjective = [&]() {
+      constexpr size_t kMaxAdjectiveLookback = 6;
+      if (result.entry->pos != core::PartOfSpeech::Verb || emphatic.standard_char_count != 0 ||
+          emphatic.repeated_vowel_count != 1 || start_pos == 0) {
+        return false;
+      }
+      size_t run_start = start_pos;
+      while (run_start > 0 && start_pos - run_start < kMaxAdjectiveLookback &&
+             normalize::classifyChar(codepoints[run_start - 1]) == normalize::CharType::Hiragana) {
+        --run_start;
+      }
+      for (size_t from = run_start; from < start_pos; ++from) {
+        const auto& spans = analysesInRange(inflection, codepoints, from, emphatic.end);
+        if (std::any_of(spans.begin(), spans.end(), [](const grammar::InflectionCandidate& inflection_candidate) {
+              return inflection_candidate.verb_type == grammar::VerbType::IAdjective &&
+                     inflection_candidate.confidence >= candidate::kIAdjConfMin;
+            })) {
+          return true;
+        }
+      }
+      return false;
+    };
+    const bool lengthening_spells_word = lengthening_spells_word_at() || lengthening_completes_adjective();
+    const bool unlicensed_particle_lengthening =
+        result.entry->pos == core::PartOfSpeech::Particle && !bare_sokuon && !holds_final_particle_vowel();
+    // A conjugated word drawn out with the prolonged mark closes the
+    // utterance; a following word means the mark belongs to that word instead
+    // (しー+ん is the mimetic しーん, not する continuative plus ん).
+    const bool unlicensed_open_prolongation =
+        (result.entry->pos == core::PartOfSpeech::Verb || result.entry->pos == core::PartOfSpeech::Auxiliary) &&
+        utf8::endsWith(emphatic.suffix, "ー") && !closes_clause_after_emphatic();
+    if (!emphatic.empty() && !unlicensed_bare_sokuon && !unlicensed_particle_lengthening &&
+        !unlicensed_open_prolongation && !lengthening_spells_word) {
+      // Determine extended_pos for emphatic form
+      // A sokuon on a continuative reads as its onbin cell (い → いっ for
+      // と+いっ+て); on a finished form (待て+っ) it is only emphasis, and the
+      // form keeps its own cell.
+      core::ExtendedPOS emphatic_epos = result.entry->extended_pos;
+      if (result.entry->pos == core::PartOfSpeech::Verb && emphatic.suffix == "っ" &&
+          result.entry->extended_pos == core::ExtendedPOS::VerbRenyokei) {
+        // E.g., い(連用形) + っ → いっ(音便形) for と+いっ+て pattern
+        emphatic_epos = core::ExtendedPOS::VerbOnbinkei;
+      }
+
+      const std::string emphatic_surface = result.entry->surface + emphatic.suffix;
+      // Emphasis adds nothing to the word, so the entry's own base form is the
+      // lemma whatever the host (ですっ → です, すごいいいい → すごい).
+      const std::string_view emphatic_lemma =
+          result.entry->lemma.empty() ? std::string_view(result.entry->surface) : std::string_view(result.entry->lemma);
+      lattice.addEdge(emphatic_surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(emphatic.end),
+                      result.entry->pos, cost + verb_helpers::emphaticCostAdjustment(emphatic), flags, emphatic_lemma,
+                      dictionary::ConjugationType::None, core::CandidateOrigin::Dictionary, 1.0F, {}, emphatic_epos,
+                      "dict_emphatic");
+    }
+  }
+}
+
+// Add the entry's own edge together with the context-licensed readings that
+// share its cost.
+void addDictionaryEntryEdges(core::Lattice& lattice, const tokenizer_dictionary_detail::DictionaryCandidateContext& ctx,
+                             const dictionary::LookupResult& result, size_t end_pos, std::string_view following_text) {
+  const auto& dict_manager = ctx.dict_manager;
+  const auto& codepoints = ctx.codepoints;
+  const size_t start_pos = ctx.start_pos;
+  const auto& lookup_results = ctx.lookup_results;
+  const size_t longest_interjection = ctx.longest_interjection;
+  uint8_t flags = core::LatticeEdge::kFromDictionary;
+  if (result.from_user_dict) {
+    flags |= core::LatticeEdge::kFromUserDict;
+  }
+  if (result.entry->extended_pos == core::ExtendedPOS::NounFormal) {
+    flags |= core::LatticeEdge::kIsFormalNoun;
+  }
+
+  float cost = analysis::getCategoryCost(result.entry->extended_pos);
+  // A tuned cost is flagged so the scorer honours it even when it lands on
+  // exactly 0.0, which would otherwise read as unset.
+  const auto add_custom_cost = [&cost, &flags](float adjustment) {
+    cost += adjustment;
+    flags |= core::LatticeEdge::kHasCustomCost;
+  };
+
+  if (result.entry->pos == core::PartOfSpeech::Noun && result.length >= 2 &&
+      grammar::isAllKanji(result.entry->surface)) {
+    add_custom_cost(candidate::kVerifiedMultiCharacterNounBonus);
+  }
+
+  if (result.entry->extended_pos == core::ExtendedPOS::PronounInterrogative && result.length >= longest_interjection) {
+    add_custom_cost(candidate::kInterrogativePronounBonus);
+  }
+
+  if (result.entry->pos == core::PartOfSpeech::Verb &&
+      result.entry->extended_pos == core::ExtendedPOS::VerbShuushikei &&
+      utf8::endsWith(result.entry->surface, "せる")) {
+    add_custom_cost(candidate::kLexicalSeruBaseBonus);
+  }
+
+  if (result.entry->extended_pos == core::ExtendedPOS::NounFormal && end_pos + 1 < codepoints.size() &&
+      codepoints[end_pos] == U'で' && (codepoints[end_pos + 1] == U'は' || codepoints[end_pos + 1] == U'も')) {
+    add_custom_cost(candidate::kFormalNounCopularTopicBonus);
+  }
+
+  if (result.entry->pos == core::PartOfSpeech::Adverb && end_pos + 1 < codepoints.size() &&
+      codepoints[end_pos] == U'な' && codepoints[end_pos + 1] == U'の') {
+    add_custom_cost(candidate::kAdverbExplanatoryCopulaBonus);
+  }
+
+  // In the explanatory interrogative opener, an adverb ends before the
+  // sentence-final question particle and quotative predicate (なぜ+かというと).
+  // Keep this productive boundary available instead of preferring an
+  // accidental lexicalized adverb that absorbs か.
+  if (result.entry->pos == core::PartOfSpeech::Adverb &&
+      grammar::startsInterrogativeQuoteIntroduction(following_text)) {
+    add_custom_cost(candidate::kInterrogativeQuoteIntroductionBonus);
+  }
+
+  // A dictionary-backed mixed-script noun can be a lexicalized compound
+  // containing an inflected verbal segment. Prefer that registered search
+  // unit over a coincidental inflection path.
+  if (result.entry->pos == core::PartOfSpeech::Noun && result.length >= 3) {
+    bool has_kanji = false;
+    bool has_hiragana = false;
+    for (size_t idx = start_pos; idx < end_pos; ++idx) {
+      has_kanji = has_kanji || normalize::isKanjiCodepoint(codepoints[idx]);
+      has_hiragana = has_hiragana || kana::isHiraganaCodepoint(codepoints[idx]);
+    }
+    const bool ichidan_predicate_continuation =
+        has_kanji && has_hiragana && end_pos < codepoints.size() &&
+        dict_manager.lookupExact(result.entry->surface + "る", core::PartOfSpeech::Verb) != nullptr &&
+        (codepoints[end_pos] == U'て' ||
+         (end_pos + 1 < codepoints.size() && codepoints[end_pos] == U'ら' && codepoints[end_pos + 1] == U'れ'));
+    if (has_kanji && has_hiragana && !ichidan_predicate_continuation) {
+      add_custom_cost(candidate::kLexicalizedMixedScriptNounBonus);
+    }
+  }
+
+  const bool is_fused_demo = result.length == 2 && end_pos >= 2 && codepoints[end_pos - 2] == U'で' &&
+                             codepoints[end_pos - 1] == U'も' &&
+                             result.entry->extended_pos == core::ExtendedPOS::ParticleAdverbial;
+  if (is_fused_demo && verb_helpers::naiNegativeFollowsAt(codepoints, end_pos) &&
+      hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::AdjNaAdj)) {
+    return;
+  }
+
+  // A bare え-row dict-verb imperative closing a clause (書け, 止まれ) is the 命令形 of the
+  // base verb, not the potential-verb renyokei; without this the spurious 未然+受身れ split
+  // (止ま+れ, lemma 止む) wins. Gated so any auxiliary/ば continuation (走れます/走れば/止まれる)
+  // leaves the connection scores byte-identical.
+  if (result.entry->pos == core::PartOfSpeech::Verb &&
+      (result.entry->extended_pos == core::ExtendedPOS::VerbKateikei ||
+       result.entry->extended_pos == core::ExtendedPOS::VerbMeireikei) &&
+      grammar::containsKanji(result.entry->surface)) {
+    const bool continues = end_pos < codepoints.size() &&
+                           (codepoints[end_pos] == U'ば' ||
+                            verb_helpers::isPassiveAuxContinuation(codepoints, end_pos, /*strict_masu=*/true));
+    if (!continues) {
+      add_custom_cost(candidate::verb_cost::kImperativeFinalBonus);
+    }
+  }
+
+  // A single-token godan potential (読める) is analyzed as an independent ichidan verb, so its
+  // lemma is its surface. The boost lets that dict form beat an unrelated ichidan reading. Excluded: independent
+  // ichidan verbs (割れる==割れる have lemma == surface, and 自他 pairs like 切れる are registered
+  // as ICHIDAN so no potential form is generated); られる passive/potential (来られる); and
+  // irregular L1 forms whose lemma differs for other reasons (す→する) that do not end え-row + る.
+  const bool is_godan_potential =
+      result.entry->pos == core::PartOfSpeech::Verb &&
+      result.entry->extended_pos == core::ExtendedPOS::VerbShuushikei &&
+      std::string_view(result.entry->lemma) != std::string_view(result.entry->surface) &&
+      utf8::endsWith(result.entry->surface, "る") && !utf8::endsWith(result.entry->surface, "られる") &&
+      grammar::endsWithERow(
+          std::string_view(result.entry->surface).substr(0, result.entry->surface.size() - core::kJapaneseCharBytes));
+  if (is_godan_potential) {
+    add_custom_cost(candidate::verb_cost::kImperativeFinalBonus);
+  }
+
+  const std::string_view lemma =
+      is_godan_potential ? std::string_view(result.entry->surface) : std::string_view(result.entry->lemma);
+  dictionary::ConjugationType conj_type = dictionary::ConjugationType::None;
+  // Dictionary entries deliberately omit conjugation metadata. For a verb
+  // whose dictionary-form ending uniquely identifies a Godan row, preserve
+  // that information on the lattice edge so a low-cost dictionary match does
+  // not discard the type carried by an equivalent generated candidate.
+  if (result.entry->pos == core::PartOfSpeech::Verb && !lemma.empty()) {
+    const char32_t final_cp = utf8::decodeFirstChar(utf8::lastChar(lemma));
+    conj_type = grammar::verbTypeToConjType(grammar::verbTypeFromBaseCodepoint(final_cp));
+    // The る-final row is unknown from the lemma, but stem+よ is a cell only
+    // the ichidan paradigm has (あきらめ+よ), never a godan-ra one.
+    const std::string_view surface = result.entry->surface;
+    if (conj_type == dictionary::ConjugationType::None && utf8::endsWith(lemma, "る") &&
+        utf8::endsWith(surface, "よ") &&
+        surface.substr(0, surface.size() - core::kJapaneseCharBytes) ==
+            lemma.substr(0, lemma.size() - core::kJapaneseCharBytes)) {
+      conj_type = dictionary::ConjugationType::Ichidan;
+    }
+  }
+
+  // A godan e-row form followed by past た cannot be a conditional or an
+  // imperative; it is the continuative stem of the derived potential verb
+  // (書け+た, 見渡せ+た). Keep the dictionary's conditional edge for ば,
+  // and add this context-licensed potential edge without registering every
+  // productive potential form as a separate verb.
+  if (result.entry->pos == core::PartOfSpeech::Verb && result.entry->extended_pos == core::ExtendedPOS::VerbKateikei &&
+      end_pos < codepoints.size() && codepoints[end_pos] == U'た' && grammar::endsWithERow(result.entry->surface)) {
+    tokenizer_dictionary_detail::addDictionaryOriginEdge(
+        lattice, result.entry->surface, start_pos, end_pos, core::PartOfSpeech::Verb,
+        getCategoryCost(core::ExtendedPOS::VerbRenyokei), core::LatticeEdge::kFromDictionary,
+        normalize::concat(result.entry->surface, "る"), dictionary::ConjugationType::Ichidan,
+        core::ExtendedPOS::VerbRenyokei, "dictionary_potential_renyokei_before_past");
+  }
+  // A listed verb's continuative right after a noun and before a nominal
+  // particle is the deverbal head of an object-verb compound (水+やり+を),
+  // the same re-reading an unlisted continuative gets in the unknown-word
+  // path (草+むしり+を), under the same gates: a bound suffix verb stays bound
+  // to its host (手+がかり), and a listed non-verb reading of the span keeps it
+  // (走り+まくり). A one-mora cell is the tail of too many other words
+  // (美しい, 夜深し), and a listed word reaching over the host already owns
+  // the span (気持ち). The noun itself is not listed, so it is not priced as
+  // a dictionary noun.
+  if (result.entry->pos == core::PartOfSpeech::Verb && result.entry->extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      end_pos >= start_pos + 2 && end_pos < codepoints.size() &&
+      hasNominalForcingParticleContinuation(codepoints, end_pos, &dict_manager) &&
+      hasPrecedingNominal(lattice, start_pos) &&
+      !hasDictionaryEntrySpanningBack(dict_manager, codepoints, start_pos, end_pos) &&
+      !verb_helpers::isBoundSuffixAfterNominalHost(&dict_manager, codepoints, start_pos, result.entry->surface) &&
+      std::none_of(lookup_results.begin(), lookup_results.end(), [&](const dictionary::LookupResult& other) {
+        return other.entry != nullptr && other.length == result.length && other.entry->pos != core::PartOfSpeech::Verb;
+      })) {
+    lattice.addEdge(result.entry->surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(end_pos),
+                    core::PartOfSpeech::Noun, cost, 0, result.entry->surface, dictionary::ConjugationType::None,
+                    core::CandidateOrigin::NominalizedNoun, candidate::kNoOriginConfidence, {},
+                    core::ExtendedPOS::NounVerbal, "dictionary_renyokei_nominalized_after_noun");
+  }
+  // An auxiliary cell spelled with a final sokuon is an onbin form, and what
+  // it can connect to follows from the paradigm it belongs to. The past た is
+  // always available. The connective て needs a paradigm that has a te-form at
+  // all: an auxiliary inflected as a Godan verb does (たがっ+て), while the
+  // copula's continuative is で and it has no such cell, so its onbin before て
+  // is really the plain form plus the quotative (無理|だ|って, not 無理|だっ|て).
+  const bool auxiliary_inflects_as_godan =
+      grammar::isModernGodanTerminalKana(utf8::decodeLastChar(result.entry->lemma));
+  const bool unlicensed_auxiliary_onbin = result.entry->pos == core::PartOfSpeech::Auxiliary &&
+                                          utf8::endsWith(result.entry->surface, "っ") && end_pos < codepoints.size() &&
+                                          !auxiliary_inflects_as_godan &&
+                                          !utf8::equalsAny(extractSubstring(codepoints, end_pos, end_pos + 1), {"た"});
+  if (!unlicensed_auxiliary_onbin) {
+    const core::ExtendedPOS entry_epos = namesSimplexDeverbalNoun(dict_manager, *result.entry)
+                                             ? core::ExtendedPOS::NounVerbal
+                                             : result.entry->extended_pos;
+    lattice.addEdge(result.entry->surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(end_pos),
+                    result.entry->pos, cost, flags, lemma, conj_type, core::CandidateOrigin::Dictionary, 1.0F, {},
+                    entry_epos, "dict");
+  }
+
+  addEmphaticDictionaryEdge(lattice, ctx, result, end_pos, cost, flags);
+}
+
+}  // namespace
 
 void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view text,
                                         const std::vector<char32_t>& codepoints, const ByteOffsets& byte_offsets,
@@ -818,25 +653,26 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     }
   }
 
+  const tokenizer_dictionary_detail::DictionaryCandidateContext ctx{dict_manager_,
+                                                                    inflection_,
+                                                                    text,
+                                                                    codepoints,
+                                                                    byte_offsets,
+                                                                    start_pos,
+                                                                    byte_pos,
+                                                                    lookup_results,
+                                                                    has_attributive_temporal_ma,
+                                                                    starts_shortened_causative_passive,
+                                                                    suppress_prefixed_noun_interior,
+                                                                    longest_conjunction,
+                                                                    longest_fixed_conjunction,
+                                                                    longest_interjection,
+                                                                    longest_adverb,
+                                                                    longest_noun,
+                                                                    longest_potential_benefactive};
+
   for (const auto& result : lookup_results) {
     if (result.entry == nullptr) {
-      continue;
-    }
-
-    // A closed kana numeral cannot open immediately after a completed
-    // quantity. Repeated/distributive quantities are owned by the dedicated
-    // counter candidate, while this position otherwise begins a particle or
-    // predicate (一つ+と+おもう, not 一つ+とお+も+う).
-    if (result.entry->extended_pos == core::ExtendedPOS::NounNumber &&
-        (hasPrecedingQuantityEdge(lattice, start_pos) || insideKanjiVerbOkurigana(lattice, start_pos))) {
-      continue;
-    }
-
-    // A finite predicate immediately before 間 establishes the productive
-    // attributive formal-noun construction.  In that context an otherwise
-    // valid lexical adverb beginning at the same position must not swallow
-    // the grammatical 間 boundary.
-    if (has_attributive_temporal_ma && result.entry->pos == core::PartOfSpeech::Adverb) {
       continue;
     }
 
@@ -845,1600 +681,18 @@ void Tokenizer::addDictionaryCandidates(core::Lattice& lattice, std::string_view
     const size_t end_pos = start_pos + result.length;
     const std::string_view following_text = text.substr(byteOffsetAt(byte_offsets, end_pos));
 
-    if ((result.entry->extended_pos == core::ExtendedPOS::NounFormal ||
-         result.entry->extended_pos == core::ExtendedPOS::VerbMizenkei) &&
-        followsNegativeQuote(lattice, start_pos) &&
-        hasShorterMizenkeiBeforeNegative(lookup_results, codepoints, start_pos, result.length)) {
+    if (crossesEstablishedBoundary(ctx, lattice, result, end_pos) ||
+        losesHomographReading(ctx, lattice, result, end_pos, following_text) ||
+        isOutOfPlaceForWordClass(ctx, lattice, result, end_pos)) {
       continue;
     }
-    if (result.entry->pos == core::PartOfSpeech::Verb && followsNegativeQuote(lattice, start_pos) &&
-        hasLongerVerbBeforeNegative(lookup_results, codepoints, start_pos, result.length)) {
+    if (!addDictionaryVerbStemEdges(lattice, ctx, result, end_pos)) {
       continue;
     }
-    // An aspect auxiliary attaches to a te-form, never directly after the
-    // contracted negative.  Keep the intervening quotative particle in
-    // dialectal obligation frames (…せん+と+いけ+ん).
-    if (result.entry->extended_pos == core::ExtendedPOS::AuxAspectOku && followsNegativeAuxiliary(lattice, start_pos)) {
+    if (lacksLicensingEnvironment(ctx, lattice, result, end_pos, following_text)) {
       continue;
     }
-    if (result.entry->extended_pos == core::ExtendedPOS::AuxNegativeNu && followsConjunctiveTeDe(lattice, start_pos)) {
-      continue;
-    }
-
-    // A one-mora verb or auxiliary homograph at the tail of the polite copula
-    // is not a morpheme boundary. Keeping it would
-    // split the polite copula in ですって as で+すっ+て.  Ask the dictionary
-    // directly rather than relying on lattice insertion order.
-    if ((result.entry->pos == core::PartOfSpeech::Verb || result.entry->pos == core::PartOfSpeech::Auxiliary) &&
-        verb_helpers::startsInsideDictionaryAuxiliary(codepoints, start_pos, &dict_manager_)) {
-      continue;
-    }
-
-    // A regional aspect contraction does not span a word the dictionary
-    // carries. 〜とる after an onbin is the ておる contraction (知っ+とる), but
-    // the same two morae also close ordinary lexical verbs (のっとる, もどる),
-    // and there the contraction is a coincidence of spelling that the
-    // productive chain would otherwise win on connection bonuses alone.
-    // A final particle that ends on a u-row mora is spelled like a verb
-    // terminal in the same way (考えた+なう against 損なう, 行なう).
-    if (((result.entry->extended_pos == core::ExtendedPOS::AuxAspectIru &&
-          grammar::isDialectalOruContractionLemma(result.entry->lemma)) ||
-         (result.entry->extended_pos == core::ExtendedPOS::ParticleFinal &&
-          kana::isURowCodepoint(codepoints[end_pos - 1]))) &&
-        endsDictionaryVerbSpanningBack(dict_manager_, codepoints, start_pos, end_pos)) {
-      continue;
-    }
-    // Nor does the one-mora サ変 terminal す split a listed verb into the
-    // listed noun it opens with plus す (思い出す, not 思い出+す; 提出+す stays).
-    if (result.length == 1 && result.entry->extended_pos == core::ExtendedPOS::VerbShuushikei &&
-        result.entry->lemma == "する" && splitsListedVerbAtNoun(dict_manager_, codepoints, start_pos, end_pos)) {
-      continue;
-    }
-
-    // なら is the irrealis of the classical copula なり only before the
-    // classical negative (静か+なら+ず). In every other context this surface
-    // is the modern conditional particle, so do not let the homograph replace
-    // its stable POS/lemma analysis.
-    if (result.entry->extended_pos == core::ExtendedPOS::AuxClassicalNari &&
-        utf8::equalsAny(result.entry->surface, {"なら"}) &&
-        (end_pos >= codepoints.size() || codepoints[end_pos] != U'ず')) {
-      continue;
-    }
-
-    // A one-kanji formal-noun homograph cannot claim the tail of an ongoing
-    // kanji compound immediately before an adverbial particle
-    // (行為+やら, 当時+やら, 室内+やら). The particle identifies the complete
-    // nominal boundary, while genuine productive formal-noun uses such as
-    // 年度+末 and 期間+内 remain available in their ordinary contexts.
-    if (result.entry->extended_pos == core::ExtendedPOS::NounFormal && result.length == 1 && start_pos > 0 &&
-        normalize::isKanjiCodepoint(codepoints[start_pos - 1]) && end_pos < codepoints.size() &&
-        lookupResultsHaveExtendedPOS(dict_manager_.lookup(text, byteOffsetAt(byte_offsets, end_pos)),
-                                     core::ExtendedPOS::ParticleAdverbial)) {
-      continue;
-    }
-
-    // A registered word is no more entitled to the material in front of the
-    // nominalizer っこ than a constructed one is (で+きっ+こない for できっこない).
-    if (verb_helpers::startsInsideGaMashiiSuffix(codepoints, start_pos)) {
-      continue;
-    }
-    if (verb_helpers::crossesKkoNominalizer(codepoints, start_pos, end_pos)) {
-      continue;
-    }
-
-    if (result.entry->pos == core::PartOfSpeech::Adverb &&
-        overlapsCompleteIAdjectiveBeforeParticles(lattice, dict_manager_, codepoints, start_pos, end_pos)) {
-      continue;
-    }
-
-    // Once the surrounding lattice proves the shortened causative-passive,
-    // the homographic suru mizenkei is not grammatical at this boundary.
-    // Removing it also prevents a list-particle reading of やら from reaching
-    // the passive through the otherwise cheap する+れる connection.
-    if (starts_shortened_causative_passive && result.length == 1 &&
-        result.entry->extended_pos == core::ExtendedPOS::VerbMizenkei && grammar::isSuruBaseForm(result.entry->lemma)) {
-      continue;
-    }
-
-    // A context-licensed particle must not absorb the beginning of a complete
-    // following adverb (裏+で+しばらく, 時+は+すでに). Restricting the guard to
-    // an observed left content/predicate edge avoids kana homographs inside
-    // open words such as adjectives.
-    if (result.entry->pos != core::PartOfSpeech::Particle &&
-        !isLicensedCompletiveAuxiliaryBoundary(lattice, dict_manager_, text, byte_offsets, start_pos, end_pos,
-                                               result.entry->extended_pos) &&
-        joinsParticleToDictionaryAdverb(lattice, dict_manager_, text, byte_offsets, start_pos, end_pos,
-                                        result.entry->extended_pos)) {
-      continue;
-    }
-
-    // A dictionary terminal verb must yield to a longer, structurally valid
-    // i-onbin stem immediately selected by て/で. This recovers open Godan-ka/
-    // Godan-ga forms such as あるい+て without registering the lexical verb.
-    if (result.entry->pos == core::PartOfSpeech::Verb && end_pos + 1 < codepoints.size() &&
-        codepoints[end_pos] == U'い' && (codepoints[end_pos + 1] == U'て' || codepoints[end_pos + 1] == U'で')) {
-      const auto& longer_analyses = analysesInRange(inflection_, codepoints, start_pos, end_pos + 1);
-      const bool has_longer_ionbin = std::any_of(
-          longer_analyses.begin(), longer_analyses.end(), [&](const grammar::InflectionCandidate& candidate) {
-            return (candidate.verb_type == grammar::VerbType::GodanKa ||
-                    candidate.verb_type == grammar::VerbType::GodanGa) &&
-                   candidate.base_form != result.entry->lemma &&
-                   candidate.confidence >= candidate::kParticleVerbBoundaryMinConfidence;
-          });
-      if (has_longer_ionbin) {
-        continue;
-      }
-    }
-
-    // Exact dictionary nouns are tokenizer search units.  If multiple noun
-    // entries share a start, keep the longest one instead of letting the
-    // negative lexical costs of two shorter noun edges defeat it.  Competing
-    // grammatical categories remain available, so this changes only the
-    // ownership relation among exact Noun homographs.
-    // An all-kana formal noun is exempt. It is a closed-class grammatical
-    // element, and a kana homograph starting at the same place carries no
-    // orthographic boundary of its own, so length alone cannot say which
-    // morpheme is present — the connection has to (ことば vs こと+ばかり).
-    // A formal noun spelled with kanji is not exempt: the script change marks
-    // the boundary, and the longer registered entry is a real search unit
-    // (当たり障り, not 当たり+障り).
-    const bool kana_formal_noun =
-        result.entry->extended_pos == core::ExtendedPOS::NounFormal && grammar::isPureHiragana(result.entry->surface);
-    if (result.entry->pos == core::PartOfSpeech::Noun && result.length < longest_noun && !kana_formal_noun) {
-      continue;
-    }
-    if (result.entry->pos == core::PartOfSpeech::Noun &&
-        startsInsideSentenceInitialDictionaryNoun(dict_manager_, text, start_pos)) {
-      continue;
-    }
-    // A registered noun beginning with a topic-particle homograph can absorb
-    // that productive boundary after another nominal (そこ+は+にわ).  Require
-    // both closed-class evidence for the first mora and L2 noun evidence for
-    // the suffix, so a standalone lexical noun (はにわ) remains whole.
-    if (result.entry->pos == core::PartOfSpeech::Noun && result.length > 1 && hasPrecedingNominal(lattice, start_pos) &&
-        lookupResultsHaveExtendedPOS(lookup_results, core::ExtendedPOS::ParticleTopic, 1) &&
-        lookupEntryInRange(dict_manager_, codepoints, start_pos + 1, end_pos, core::PartOfSpeech::Noun) != nullptr) {
-      continue;
-    }
-
-    // A one-kanji na-adjective entry cannot begin inside a contiguous kanji
-    // run. In that position it is the tail of the surrounding lexical noun
-    // (音楽, 喜怒哀楽), not an independent predicate. At a real adjective
-    // boundary the same entry begins the run (楽だ, 楽な仕事).
-    if (result.entry->extended_pos == core::ExtendedPOS::AdjNaAdj && result.length == 1 && start_pos > 0 &&
-        normalize::isKanjiCodepoint(codepoints[start_pos - 1])) {
-      continue;
-    }
-
-    if (conflictsWithVerifiedCompoundBoundary(lattice, dict_manager_, text, byte_offsets, codepoints, start_pos,
-                                              end_pos, result.entry->pos, result.entry->extended_pos)) {
-      continue;
-    }
-
-    // A determiner must introduce a nominal constituent.  If a closed case
-    // particle starts exactly where this candidate ends, the homographic
-    // surface belongs to a compositional predicate instead (と+いう+より),
-    // so do not admit the fused determiner path at all.  This is a category
-    // constraint, independent of the individual determiner or particle.
-    const bool ends_at_sentence_boundary =
-        end_pos >= codepoints.size() || normalize::classifyChar(codepoints[end_pos]) == normalize::CharType::Symbol;
-    if (result.entry->pos == core::PartOfSpeech::Determiner && ends_at_sentence_boundary &&
-        isDictionaryOnbinPast(dict_manager_, result.entry->surface)) {
-      continue;
-    }
-    if (result.entry->pos == core::PartOfSpeech::Determiner && ends_at_sentence_boundary) {
-      const bool has_same_span_predicate =
-          lookupResultsHavePartOfSpeech(lookup_results, kVerbAdjectiveMask, result.length);
-      if (has_same_span_predicate) {
-        continue;
-      }
-    }
-    if (result.entry->pos == core::PartOfSpeech::Determiner && ends_at_sentence_boundary &&
-        hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::AuxCopulaDa) && start_pos >= 2 &&
-        codepoints[start_pos - 2] == U'の' &&
-        hasPrecedingExtendedPOS(lattice, start_pos - 1, core::ExtendedPOS::ParticleNo)) {
-      continue;
-    }
-    if (result.entry->pos == core::PartOfSpeech::Determiner && end_pos < codepoints.size()) {
-      const size_t following_byte_pos = byteOffsetAt(byte_offsets, end_pos);
-      const auto following_results = dict_manager_.lookup(text, following_byte_pos);
-      const bool followed_by_case_particle =
-          lookupResultsHaveExtendedPOS(following_results, core::ExtendedPOS::ParticleCase);
-      // A longer nominal headword starting there is what the determiner
-      // modifies (そういう+ところ, こういう+とこ), not the particle.
-      const bool followed_by_longer_nominal =
-          lookupResultsHaveLongerPartOfSpeech(following_results, partOfSpeechMask(core::PartOfSpeech::Noun), 1);
-      // So is an unregistered kana noun the rescue path offers there: a run
-      // with no reading of its own, closed by the clause end or a particle
-      // (この+へや+、, この+へや+で). Its first mora only spells the particle.
-      const auto opens_unread_kana_noun = [&]() {
-        constexpr size_t kMaxUnreadNounLength = 4;
-        size_t run_end = end_pos;
-        while (run_end < codepoints.size() && run_end - end_pos < kMaxUnreadNounLength &&
-               normalize::classifyChar(codepoints[run_end]) == normalize::CharType::Hiragana) {
-          ++run_end;
-        }
-        for (size_t noun_end = end_pos + 2; noun_end <= run_end; ++noun_end) {
-          const bool closed = noun_end >= codepoints.size() ||
-                              normalize::classifyChar(codepoints[noun_end]) != normalize::CharType::Hiragana ||
-                              lookupEntryInRange(dict_manager_, codepoints, noun_end, noun_end + 1,
-                                                 core::PartOfSpeech::Particle) != nullptr;
-          if (!closed || lookupEntryInRange(dict_manager_, codepoints, end_pos, noun_end) != nullptr) {
-            continue;
-          }
-          const auto& readings = inflection_.analyze(extractSubstring(codepoints, end_pos, noun_end));
-          if (std::none_of(readings.begin(), readings.end(), [](const grammar::InflectionCandidate& reading) {
-                return reading.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence;
-              })) {
-            return true;
-          }
-        }
-        return false;
-      };
-      if (followed_by_case_particle && !followed_by_longer_nominal && !opens_unread_kana_noun()) {
-        continue;
-      }
-    }
-
-    // When the same dictionary span has both noun and adverb readings, a
-    // following nominal particle selects the noun use (一切+の/は/を).  Keep
-    // the adverb when it directly modifies a predicate (一切+確認しない).
-    if (result.entry->pos == core::PartOfSpeech::Adverb && end_pos < codepoints.size()) {
-      const bool has_same_span_noun =
-          lookupResultsHavePartOfSpeech(lookup_results, partOfSpeechMask(core::PartOfSpeech::Noun), result.length);
-      const auto following_results = dict_manager_.lookup(text, byteOffsetAt(byte_offsets, end_pos));
-      const bool followed_by_nominal_particle =
-          std::any_of(following_results.begin(), following_results.end(), [](const auto& following) {
-            if (following.entry == nullptr) {
-              return false;
-            }
-            const auto extended_pos = following.entry->extended_pos;
-            return extended_pos == core::ExtendedPOS::ParticleNo || extended_pos == core::ExtendedPOS::ParticleTopic ||
-                   extended_pos == core::ExtendedPOS::ParticleCase;
-          });
-      const bool follows_genitive = hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::ParticleNo);
-      if (has_same_span_noun && (followed_by_nominal_particle || follows_genitive)) {
-        continue;
-      }
-
-      // An interrogative pronoun followed by a closed adverbial particle is
-      // compositional before the genitive/nominalizer の (どれ+ほど+の...).
-      // The same full-span adverb remains valid when it directly modifies a
-      // predicate, so require both internal dictionary categories and the
-      // right-hand nominal particle instead of naming any lexical surface.
-      const bool followed_by_no = lookupResultsHaveExtendedPOS(following_results, core::ExtendedPOS::ParticleNo);
-      if (followed_by_no) {
-        bool has_interrogative_particle_split = false;
-        for (const auto& prefix : lookup_results) {
-          if (prefix.entry == nullptr || prefix.length >= result.length ||
-              prefix.entry->extended_pos != core::ExtendedPOS::PronounInterrogative) {
-            continue;
-          }
-          const size_t suffix_pos = start_pos + prefix.length;
-          const auto suffix_results = dict_manager_.lookup(text, byteOffsetAt(byte_offsets, suffix_pos));
-          has_interrogative_particle_split = lookupResultsHaveExtendedPOS(
-              suffix_results, core::ExtendedPOS::ParticleAdverbial, result.length - prefix.length);
-          if (has_interrogative_particle_split) {
-            break;
-          }
-        }
-        if (has_interrogative_particle_split) {
-          continue;
-        }
-      }
-    }
-
-    // A formal-noun/adverb homograph directly before a predicate is the
-    // adverbial reading unless an attributive predicate on the left licenses
-    // the formal noun (考えすぎた+あまり+眠れない).  Retain the nominal
-    // reading before case/topic/genitive particles and copulas so independent
-    // noun uses remain available.  This resolves the grammatical category by
-    // its two constructional environments rather than by lexical surface.
-    if (result.entry->extended_pos == core::ExtendedPOS::NounFormal && end_pos < codepoints.size()) {
-      const bool has_same_span_adverb =
-          lookupResultsHavePartOfSpeech(lookup_results, partOfSpeechMask(core::PartOfSpeech::Adverb), result.length);
-      const bool follows_genitive = hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::ParticleNo);
-      const bool follows_non_genitive_nominal_particle =
-          hasPrecedingExtendedPOS(lattice, start_pos,
-                                  {core::ExtendedPOS::ParticleCase, core::ExtendedPOS::ParticleTopic,
-                                   core::ExtendedPOS::ParticleBinding, core::ExtendedPOS::ParticleAdverbial});
-      const bool has_formal_noun_left_context =
-          follows_genitive ||
-          (hasPrecedingAttributivePredicate(lattice, start_pos) && !follows_non_genitive_nominal_particle);
-      if (has_same_span_adverb && !has_formal_noun_left_context) {
-        const auto following_results = dict_manager_.lookup(text, byteOffsetAt(byte_offsets, end_pos));
-        const bool followed_by_nominal_marker =
-            std::any_of(following_results.begin(), following_results.end(), [](const auto& following) {
-              if (following.entry == nullptr) {
-                return false;
-              }
-              const auto extended_pos = following.entry->extended_pos;
-              return isNominalForcingParticle(extended_pos) ||
-                     (extended_pos == core::ExtendedPOS::AuxCopulaDa &&
-                      !grammar::isSingleHiragana(following.entry->surface, core::hiragana::kNa)) ||
-                     extended_pos == core::ExtendedPOS::AuxCopulaDesu;
-            });
-        if (!followed_by_nominal_marker) {
-          continue;
-        }
-      }
-    }
-
-    if (result.entry->extended_pos == core::ExtendedPOS::AuxTenseMasu &&
-        utf8::equalsAny(result.entry->surface, {"まし"}) && end_pos < codepoints.size() &&
-        codepoints[end_pos] == U'て' && hasCoveringVerifiedVerbRenyokei(lattice, start_pos, end_pos)) {
-      continue;
-    }
-
-    // A closed interval suffix can be homographic with a verb continuative
-    // (1時間+おき).  After a verified number expression, select the suffix
-    // only in a nominal environment; an auxiliary continuation such as
-    // 1時間+おき+ます keeps the verb candidate.
-    if (result.entry->pos == core::PartOfSpeech::Verb &&
-        hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::NounNumber)) {
-      const bool has_same_span_suffix =
-          lookupResultsHavePartOfSpeech(lookup_results, partOfSpeechMask(core::PartOfSpeech::Suffix), result.length);
-      bool has_nominal_right_context = end_pos >= codepoints.size();
-      if (!has_nominal_right_context && normalize::classifyChar(codepoints[end_pos]) == normalize::CharType::Symbol) {
-        has_nominal_right_context = true;
-      }
-      if (!has_nominal_right_context) {
-        const auto following_results = dict_manager_.lookup(text, byteOffsetAt(byte_offsets, end_pos));
-        has_nominal_right_context =
-            lookupResultsHavePartOfSpeech(following_results, partOfSpeechMask(core::PartOfSpeech::Particle));
-      }
-      if (has_same_span_suffix && has_nominal_right_context) {
-        continue;
-      }
-    }
-
-    // Nominalizing/final-particle homographs of さ cannot occur between a verb
-    // mizenkei and a passive auxiliary.  In a causative-passive chain
-    // (読ま+さ+れ, 考え込ま+さ+れ), keeping either homograph creates a
-    // spurious adjective path which can defeat the generated verb candidate.
-    if (result.entry->extended_pos != core::ExtendedPOS::VerbMizenkei && result.length == 1 &&
-        codepoints[start_pos] == core::hiragana::kSa && result.entry->pos != core::PartOfSpeech::Verb &&
-        hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbMizenkei) && end_pos < codepoints.size()) {
-      const size_t following_byte_pos = byteOffsetAt(byte_offsets, end_pos);
-      const auto following_results = dict_manager_.lookup(text, following_byte_pos);
-      const bool followed_by_passive = lookupResultsHaveExtendedPOS(following_results, core::ExtendedPOS::AuxPassive);
-      if (followed_by_passive) {
-        continue;
-      }
-    }
-
-    // Resolve dictionary homographs from a closed na-adjective continuation.
-    // When the same full surface has an AdjNaAdj entry, attributive な,
-    // adverbial に, and appearance そう select that entry rather than the noun
-    // homograph. Noun-only words remain untouched.
-    if (result.entry->pos == core::PartOfSpeech::Noun && end_pos < codepoints.size()) {
-      const bool has_same_surface_na_adjective =
-          lookupResultsHaveExtendedPOS(lookup_results, core::ExtendedPOS::AdjNaAdj, result.length);
-      const bool na_adjective_continuation =
-          codepoints[end_pos] == U'に' ||
-          (codepoints[end_pos] == U'な' && (end_pos + 1 >= codepoints.size() || codepoints[end_pos + 1] != U'ら')) ||
-          (end_pos + 1 < codepoints.size() && codepoints[end_pos] == U'そ' && codepoints[end_pos + 1] == U'う');
-      if (has_same_surface_na_adjective && na_adjective_continuation) {
-        continue;
-      }
-    }
-    // The reverse side of the same lexical homograph contract: when a surface
-    // is explicitly registered as both a noun and a na-adjective, a predicative
-    // copula selects its nominal reading. Adjective-only entries remain
-    // adjectives before the same copula.
-    if (result.entry->extended_pos == core::ExtendedPOS::AdjNaAdj && end_pos < codepoints.size()) {
-      const bool has_same_surface_noun =
-          lookupResultsHavePartOfSpeech(lookup_results, partOfSpeechMask(core::PartOfSpeech::Noun), result.length);
-      if (has_same_surface_noun && grammar::startsPredicativeCopula(following_text)) {
-        continue;
-      }
-    }
-
-    // A shorter adverb prefix cannot split a longer dictionary na-adjective
-    // immediately before attributive な (めちゃくちゃな, もっともな).
-    if (result.entry->pos == core::PartOfSpeech::Adverb) {
-      const bool longer_attributive_na_adjective =
-          std::any_of(lookup_results.begin(), lookup_results.end(), [&](const auto& other) {
-            const size_t other_end = start_pos + other.length;
-            return other.entry != nullptr && other.length > result.length &&
-                   other.entry->extended_pos == core::ExtendedPOS::AdjNaAdj && other_end < codepoints.size() &&
-                   codepoints[other_end] == U'な';
-          });
-      if (longer_attributive_na_adjective) {
-        continue;
-      }
-    }
-
-    // A word that selects a te-form: the progressive いる, the benefactive verbs, the
-    // humble honorific ください, and the conjunctive から (てから).
-    const auto starts_te_selecting_word = [&](size_t pos) {
-      if (pos >= codepoints.size()) {
-        return false;
-      }
-      const auto following = dict_manager_.lookup(text, byteOffsetAt(byte_offsets, pos));
-      return std::any_of(following.begin(), following.end(), [](const auto& candidate) {
-        const auto* entry = candidate.entry;
-        return entry != nullptr &&
-               (entry->lemma == "いる" || grammar::isBenefactiveLemma(entry->lemma) ||
-                grammar::isHumbleHonorificLemma(entry->lemma) ||
-                (entry->extended_pos == core::ExtendedPOS::ParticleConj && utf8::equalsAny(entry->surface, {"から"})));
-      });
-    };
-
-    // Prefer the longest member only within the same particle class. This
-    // keeps closed concessives such as ども/けれども intact without
-    // suppressing productive boundaries whose shorter member has another
-    // grammatical role (で+も, と+も).
-    if (result.entry->pos == core::PartOfSpeech::Particle) {
-      // A compound case particle ends an adpositional phrase and cannot host
-      // a word that selects a te-form (the aspectual いる, ください, てから).
-      // When that continuation is present, keep the shorter internal
-      // case-particle boundary so the adjoining verb te-form can carry it
-      // (目を+通し+て+いる, 席に+つい+て+ください).
-      const bool compound_particle_before_aspect = result.entry->extended_pos == core::ExtendedPOS::ParticleCase &&
-                                                   result.length > 1 && utf8::endsWith(result.entry->surface, "て") &&
-                                                   starts_te_selecting_word(end_pos);
-      if (compound_particle_before_aspect) {
-        continue;
-      }
-      const bool follows_volitional = hasPrecedingVerbVolitionalChain(lattice, start_pos);
-      // After an explicit volitional auxiliary, a multi-mora case particle
-      // would hide the productive quotative + suru sequence
-      // (書こ+う+と+し+て). Keep the one-mora quotative candidate even when a
-      // longer case-particle entry shares its prefix. Only an entry opening on
-      // that same quotative mora can hide it; a compound particle beginning
-      // anywhere else shares nothing with the sequence and stays available
-      // (いかん+によって, where the ん also reads as the literary volitional).
-      if (follows_volitional && result.entry->extended_pos == core::ExtendedPOS::ParticleCase && result.length > 1 &&
-          utf8::decodeFirstChar(result.entry->surface) == core::hiragana::kTo) {
-        continue;
-      }
-      const bool has_longer_same_class =
-          std::any_of(lookup_results.begin(), lookup_results.end(), [&](const auto& other) {
-            const size_t other_end = start_pos + other.length;
-            return other.entry != nullptr && other.entry->pos == core::PartOfSpeech::Particle &&
-                   other.entry->extended_pos == result.entry->extended_pos && other.length > result.length &&
-                   !grammar::isAttributiveCompoundParticleSurface(other.entry->surface) &&
-                   !(other.entry->extended_pos == core::ExtendedPOS::ParticleCase && other.length > 1 &&
-                     utf8::endsWith(other.entry->surface, "て") && starts_te_selecting_word(other_end));
-          });
-      const bool keep_interrogative_quotative =
-          result.entry->extended_pos == core::ExtendedPOS::ParticleCase && result.length == 1 &&
-          grammar::isSingleHiragana(result.entry->surface, core::hiragana::kTo) &&
-          std::any_of(lookup_results.begin(), lookup_results.end(),
-                      [&](const auto& other) {
-                        const size_t other_end = start_pos + other.length;
-                        return other.entry != nullptr && other.entry->extended_pos == core::ExtendedPOS::ParticleCase &&
-                               grammar::isQuotativeSuruTeCompoundParticle(other.entry->surface) &&
-                               other_end < codepoints.size() && codepoints[other_end] == U'も';
-                      }) &&
-          hasInterrogativeEndingAt(dict_manager_, text, byte_offsets, start_pos);
-      const bool keep_volitional_quotative =
-          follows_volitional && result.entry->extended_pos == core::ExtendedPOS::ParticleCase && result.length == 1;
-      if (has_longer_same_class && !keep_volitional_quotative && !keep_interrogative_quotative) {
-        continue;
-      }
-    }
-
-    if (result.entry->pos == core::PartOfSpeech::Adverb &&
-        adverbAbsorbsQuotedQuestion(codepoints, result.length, end_pos)) {
-      continue;
-    }
-
-    // A lexical adverb homographic with a dictionary-verified verb te-form
-    // cannot govern the progressive auxiliary いる. Preserve the verb stem +
-    // connective boundary in that environment while leaving ordinary adverb
-    // uses untouched.
-    if (result.entry->pos == core::PartOfSpeech::Adverb && end_pos + 1 < codepoints.size() &&
-        codepoints[end_pos] == U'い' && codepoints[end_pos + 1] == U'る' &&
-        utf8::endsWithAny(result.entry->surface, {"て", "で"})) {
-      bool is_verified_verb_te_form = false;
-      for (const auto& inflection_candidate : inflection_.analyze(result.entry->surface)) {
-        if (inflection_candidate.verb_type != grammar::VerbType::IAdjective &&
-            (verb_helpers::isVerbInDictionary(&dict_manager_, inflection_candidate.base_form) ||
-             inflection_candidate.confidence >= candidate::kAdverbVerbTeHomographMinConfidence)) {
-          is_verified_verb_te_form = true;
-          break;
-        }
-      }
-      if (is_verified_verb_te_form) {
-        continue;
-      }
-    }
-
-    // A conjunction that is also a productive verb+particle sequence is
-    // lexical only at a clause boundary. Inside a phrase, keep the ordinary
-    // predicate boundary (もしか+する+と).
-    // A final particle spelled with a leading sokuon (っちゃ, っぴ) geminates
-    // onto a finished predicate; with none in front, the sokuon belongs to the
-    // word before it (行っ+ちゃ+だめ, not 行+っちゃ).
-    if (result.entry->extended_pos == core::ExtendedPOS::ParticleFinal &&
-        codepoints[start_pos] == core::hiragana::kSmallTsu &&
-        !hasPrecedingPartOfSpeech(lattice, start_pos, kPredicateHostMask)) {
-      continue;
-    }
-
-    if (result.entry->pos == core::PartOfSpeech::Conjunction && start_pos > 0) {
-      if (crossesAttributiveNaHonorificNominal(lattice, codepoints, start_pos, end_pos)) {
-        continue;
-      }
-      // A conjunction opens a clause, so it cannot start inside a registered
-      // particle that began one mora earlier (か|も of かも+って).
-      bool opens_inside_particle = false;
-      for (size_t split = 1; split < result.length; ++split) {
-        if (lookupEntryInRange(dict_manager_, codepoints, start_pos - 1, start_pos + split,
-                               core::PartOfSpeech::Particle) != nullptr) {
-          opens_inside_particle = true;
-          break;
-        }
-      }
-      if (opens_inside_particle) {
-        continue;
-      }
-      // A conjunction introduces what follows, so one closed off by punctuation
-      // or the sentence end right after a content word has nothing to join
-      // (時間+ない+し、 not 時間+ないし、) — the EOS AfterContent gate, mirrored.
-      constexpr PartOfSpeechMask kContentMask = kNounPronounMask | kVerbAdjectiveMask;
-      if (verb_helpers::clauseEndsAt(codepoints, end_pos) &&
-          hasPrecedingPartOfSpeech(lattice, start_pos, kContentMask)) {
-        continue;
-      }
-      bool decomposes_as_verb_particle = false;
-      for (size_t split = 1; split < result.length; ++split) {
-        if (lookupEntryInRange(dict_manager_, codepoints, start_pos, start_pos + split, core::PartOfSpeech::Verb) !=
-                nullptr &&
-            lookupEntryInRange(dict_manager_, codepoints, start_pos + split, end_pos, core::PartOfSpeech::Particle) !=
-                nullptr) {
-          decomposes_as_verb_particle = true;
-          break;
-        }
-      }
-      const bool coordinates_nominals = hasPrecedingNominal(lattice, start_pos) && end_pos < codepoints.size() &&
-                                        (normalize::isKanjiCodepoint(codepoints[end_pos]) ||
-                                         normalize::classifyChar(codepoints[end_pos]) == normalize::CharType::Katakana);
-      const bool follows_completed_clause = hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::AuxTenseTa);
-      if (decomposes_as_verb_particle && !coordinates_nominals && !follows_completed_clause &&
-          normalize::classifyChar(codepoints[start_pos - 1]) != normalize::CharType::Symbol) {
-        continue;
-      }
-    }
-
-    // A conjunction must not absorb a dictionary-verified te-form immediately
-    // before the conditional directional 来る. The latter is a productive
-    // predicate chain (持っ+て+くれ+ば), while the conjunction cannot govern
-    // that auxiliary inflection.
-    if (result.entry->pos == core::PartOfSpeech::Conjunction &&
-        isDictionaryOnbinTeForm(dict_manager_, result.entry->surface) && startsKuruConditional(codepoints, end_pos)) {
-      continue;
-    }
-
-    if (result.length > 1 && startsParticleBeforeReduplicatedMimetic(codepoints, start_pos) &&
-        end_pos > start_pos + 1) {
-      continue;
-    }
-
-    if (result.entry->pos == core::PartOfSpeech::Noun &&
-        cutsNumeralCounterBeforeFormalNoun(dict_manager_, codepoints, start_pos, end_pos)) {
-      continue;
-    }
-
-    if (result.entry->pos == core::PartOfSpeech::Adverb && result.length == 2 &&
-        startsIruPoliteFormAt(codepoints, start_pos)) {
-      continue;
-    }
-
-    if (result.entry->pos == core::PartOfSpeech::Adverb &&
-        startsInsideVerifiedPredicate(lattice, codepoints, start_pos)) {
-      continue;
-    }
-
-    // The lexical temporal adverb can follow a verified compound boundary,
-    // but must not reopen the final 間 of a shorter duration noun.
-    if (result.entry->pos == core::PartOfSpeech::Adverb && codepoints[start_pos] == U'間' && start_pos > 0 &&
-        normalize::isKanjiCodepoint(codepoints[start_pos - 1]) &&
-        !hasPrecedingTemporalCompoundBoundary(lattice, start_pos)) {
-      continue;
-    }
-
-    if (result.entry->pos == core::PartOfSpeech::Adverb &&
-        opensOnContentWordTailBeforeParticle(lattice, dict_manager_, codepoints, start_pos, end_pos)) {
-      continue;
-    }
-
-    // Do not reopen the interior of a kanji-led verb as a pure-hiragana
-    // dictionary na-adjective. The same adjective remains available at a real
-    // boundary (sentence start or after a particle).
-    if (result.entry->extended_pos == core::ExtendedPOS::AdjNaAdj && grammar::isPureHiragana(result.entry->surface) &&
-        startsInsideKanjiLedVerb(lattice, codepoints, start_pos)) {
-      continue;
-    }
-
-    // A period suffix cannot head an interval compound.  In a numeral-led
-    // expression such as 10分間隔, the counter generator already supplies
-    // 10分 and the following lexical noun must remain 間隔, not 間+隔.
-    if (result.entry->extended_pos == core::ExtendedPOS::Suffix && result.length == 1 &&
-        start_pos + 1 < codepoints.size() && codepoints[start_pos] == U'間' &&
-        normalize::isIntervalCompoundSecondKanji(codepoints[start_pos + 1])) {
-      continue;
-    }
-
-    // 時間接尾辞「後」は終了+後・三日+後のように内容語へ直接接合
-    // する。ひらがな活用や助詞の後では独立時間名詞なので、suffix
-    // edgeを出さず既存のnoun候補へ任せる（食べた+後、ので+後）。
-    if (result.entry->extended_pos == core::ExtendedPOS::Suffix &&
-        grammar::isDirectAttachmentTemporalSuffix(result.entry->surface)) {
-      if (start_pos == 0) {
-        continue;
-      }
-      const auto preceding_type = normalize::classifyChar(codepoints[start_pos - 1]);
-      const bool directly_attached_to_nominal =
-          preceding_type == normalize::CharType::Kanji || preceding_type == normalize::CharType::Katakana ||
-          preceding_type == normalize::CharType::Alphabet || preceding_type == normalize::CharType::Digit;
-      if (!directly_attached_to_nominal) {
-        continue;
-      }
-    }
-
-    // A one-kanji formal noun cannot head an adjacent kanji compound.  The
-    // formal reading remains available at a word boundary (ない+事), while a
-    // lexical compound such as 事情 or 事実 keeps its complete search unit.
-    // After a registered noun and before a kanji compound it closes the left
-    // noun instead (先月+末+決算).
-    if (result.entry->extended_pos == core::ExtendedPOS::NounFormal && result.length == 1 &&
-        end_pos < codepoints.size() && normalize::isKanjiCodepoint(codepoints[end_pos]) &&
-        !isKanjiRunFollowedByAttributiveNa(codepoints, end_pos)) {
-      const bool closes_preceding_noun = start_pos >= 2 && end_pos + 2 <= codepoints.size() &&
-                                         lookupEntryInRange(dict_manager_, codepoints, start_pos - 2, start_pos,
-                                                            core::PartOfSpeech::Noun) != nullptr &&
-                                         normalize::isKanjiCodepoint(codepoints[end_pos + 1]);
-      if (!closes_preceding_noun) {
-        continue;
-      }
-    }
-
-    // わりに is an adverb at clause start, but after an attributive の or a
-    // finite predicate it is the formal noun わり followed by the case
-    // particle に (本の+わりに, 読む+わりに). Before an adjective it instead
-    // forms the fixed comparative adverb (年齢の+わりに+若い).
-    if (result.entry->pos == core::PartOfSpeech::Adverb && result.entry->lemma == "わりに" && start_pos > 0) {
-      if (startsInsideKanjiLedVerb(lattice, codepoints, start_pos)) {
-        continue;
-      }
-      const char32_t preceding = codepoints[start_pos - 1];
-      const bool followed_by_adjective =
-          end_pos < codepoints.size() &&
-          lookupResultsHavePartOfSpeech(dict_manager_.lookup(text, byteOffsetAt(byte_offsets, end_pos)),
-                                        partOfSpeechMask(core::PartOfSpeech::Adjective));
-      if (!followed_by_adjective &&
-          (preceding == U'の' || preceding == U'る' || preceding == U'く' || preceding == U'む' || preceding == U'ぶ' ||
-           preceding == U'ぬ' || preceding == U'す' || preceding == U'つ' || preceding == U'ぐ')) {
-        continue;
-      }
-    }
-
-    if (result.entry->pos == core::PartOfSpeech::Adverb &&
-        startsFormalNounParticleAfterPredicate(lattice, dict_manager_, codepoints, start_pos, end_pos)) {
-      continue;
-    }
-
-    const bool fused_demo_after_te_form = result.length == 2 && codepoints[start_pos] == U'で' &&
-                                          codepoints[start_pos + 1] == U'も' &&
-                                          hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbOnbinkei);
-    if (fused_demo_after_te_form) {
-      continue;
-    }
-
-    if (suppress_prefixed_noun_interior) {
-      continue;
-    }
-
-    // Prefer the maximal closed-class conjunction at this position: 又は,
-    // not 又+は. Shorter prefixes remain available when no longer conjunction
-    // matches the input.
-    if (result.entry->pos == core::PartOfSpeech::Conjunction && result.length < longest_conjunction) {
-      continue;
-    }
-
-    // Members of the closed adverb lexicon use maximal matching within their
-    // own class (必ずしも, どうしても). Shorter dictionary adverbs remain
-    // available whenever no longer adverb actually covers the input.
-    if (result.entry->pos == core::PartOfSpeech::Adverb && result.length < longest_adverb) {
-      continue;
-    }
-
-    // A complete member of the closed potential-benefactive paradigm is
-    // authoritative over shorter homographs starting at the same position.
-    // This keeps いただけ(る/ない/ます) from reopening as い+た+だけ while
-    // leaving every position without that exact closed-class match untouched.
-    if (result.length < longest_potential_benefactive) {
-      continue;
-    }
-
-    // At sentence start, a longer closed-class conjunction takes precedence
-    // over a homographic auxiliary prefix.  After a topic/focus particle,
-    // suppress only the polite auxiliary prefix: ます requires a verb
-    // renyokei, so に+も+まし+て cannot be a polite chain.  Other auxiliaries
-    // remain available (本+も+だ+けど).
-    const bool sentence_initial_auxiliary = start_pos == 0 && result.entry->pos == core::PartOfSpeech::Auxiliary;
-    const bool unlicensed_polite_after_topic =
-        result.entry->extended_pos == core::ExtendedPOS::AuxTenseMasu &&
-        hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::ParticleTopic);
-    if ((sentence_initial_auxiliary || unlicensed_polite_after_topic) && result.length < longest_fixed_conjunction) {
-      continue;
-    }
-
-    // A bound derivational suffix verb has no independent use, so without a
-    // nominal host in front the entry is not a candidate at all.
-    if (result.entry->pos == core::PartOfSpeech::Verb &&
-        grammar::isBoundDerivationalSuffixVerbLemma(result.entry->lemma) &&
-        !verb_helpers::hasNominalHostBefore(codepoints, start_pos)) {
-      continue;
-    }
-
-    // Past た/だ is an auxiliary boundary, not part of a dictionary verb
-    // token.  Inflected dictionary entries still provide the stem/onbin edge;
-    // discard only the fused full-past alternative.
-    if (result.entry->extended_pos == core::ExtendedPOS::VerbTaForm &&
-        utf8::endsWithAny(result.entry->surface, {"た", "だ"})) {
-      continue;
-    }
-
-    if (result.entry->pos == core::PartOfSpeech::Verb && utf8::endsWith(result.entry->surface, "ぬ") &&
-        result.entry->lemma != result.entry->surface) {
-      const std::string stem_surface = std::string(utf8::dropLastChar(result.entry->surface));
-      tokenizer_dictionary_detail::addDictionaryOriginEdge(
-          lattice, stem_surface, start_pos, end_pos - 1, core::PartOfSpeech::Verb,
-          getCategoryCost(core::ExtendedPOS::VerbMizenkei), core::LatticeEdge::kFromDictionary, result.entry->lemma,
-          dictionary::ConjugationType::None, core::ExtendedPOS::VerbMizenkei, "dictionary_classical_negative_stem");
-      continue;
-    }
-
-    if ((result.entry->pos == core::PartOfSpeech::Verb || result.entry->pos == core::PartOfSpeech::Adjective ||
-         result.entry->pos == core::PartOfSpeech::Noun) &&
-        result.length > 1 && codepoints[start_pos] == U'は' && codepoints[end_pos - 1] == U'な' &&
-        end_pos + 1 < codepoints.size() && codepoints[end_pos] == U'か' && codepoints[end_pos + 1] == U'っ') {
-      continue;
-    }
-
-    if (result.entry->pos == core::PartOfSpeech::Noun && end_pos < codepoints.size() &&
-        codepoints[end_pos - 1] == U'し' && codepoints[end_pos] == U'て') {
-      const std::string verb_base = normalize::concat(utf8::dropLastChar(result.entry->surface), "す");
-      const auto* verb = dict_manager_.lookupExact(verb_base, core::PartOfSpeech::Verb);
-      if (verb != nullptr) {
-        tokenizer_dictionary_detail::addDictionaryOriginEdge(
-            lattice, result.entry->surface, start_pos, end_pos, core::PartOfSpeech::Verb,
-            getCategoryCost(core::ExtendedPOS::VerbRenyokei) + candidate::kVerifiedTailCompoundVerbBonus +
-                candidate::kVerifiedVerbBonus,
-            core::LatticeEdge::kFromDictionary, verb_base, dictionary::ConjugationType::GodanSa,
-            core::ExtendedPOS::VerbRenyokei, "dictionary_godan_sa_renyokei");
-      }
-    }
-
-    if (result.entry->pos == core::PartOfSpeech::Noun && end_pos < codepoints.size() &&
-        normalize::isKanjiCodepoint(codepoints[end_pos]) && kana::isIRowCodepoint(codepoints[end_pos - 1])) {
-      const std::string_view base_suffix = grammar::godanBaseSuffixFromIRow(codepoints[end_pos - 1]);
-      if (!base_suffix.empty()) {
-        const std::string verb_base = normalize::concat(utf8::dropLastChar(result.entry->surface), base_suffix);
-        const auto* verb = dict_manager_.lookupExact(verb_base, core::PartOfSpeech::Verb);
-        if (verb != nullptr) {
-          const auto conj_type = grammar::verbTypeToConjType(
-              grammar::verbTypeFromBaseCodepoint(utf8::decodeFirstChar(utf8::lastChar(verb_base))));
-          tokenizer_dictionary_detail::addDictionaryOriginEdge(
-              lattice, result.entry->surface, start_pos, end_pos, core::PartOfSpeech::Verb,
-              getCategoryCost(core::ExtendedPOS::VerbRenyokei), core::LatticeEdge::kFromDictionary, verb_base,
-              conj_type, core::ExtendedPOS::VerbRenyokei, "dictionary_godan_renyokei_before_predicate");
-        }
-      }
-    }
-
-    // かねる takes a continuative, which a voice auxiliary also supplies
-    // (損なわ+れ+かね, 行か+せ+かね).
-    if (result.entry->extended_pos == core::ExtendedPOS::AuxInability &&
-        !hasPrecedingExtendedPOS(
-            lattice, start_pos,
-            {core::ExtendedPOS::VerbRenyokei, core::ExtendedPOS::AuxPassive, core::ExtendedPOS::AuxCausative})) {
-      continue;
-    }
-
-    // The uninflected progressive contraction とう/どう exists only on an
-    // onbin host (終わっ+とう, 読ん+どう); elsewhere it is ordinary kana.
-    if (result.entry->extended_pos == core::ExtendedPOS::AuxAspectIru &&
-        grammar::isDialectalOruContractionLemma(result.entry->lemma) && utf8::endsWith(result.entry->lemma, "う") &&
-        !hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbOnbinkei)) {
-      continue;
-    }
-
-    // The contracted ておく (とく/どく) fuses the て of a predicate, so it stands
-    // only on a continuative, an onbin or a voice auxiliary (書い+とく,
-    // 読ん+どく, 見+とく, させ+とく); after a particle it is kana (と+どく).
-    if (result.entry->extended_pos == core::ExtendedPOS::AuxAspectOku &&
-        utf8::equalsAny(result.entry->lemma, {"とく", "どく"}) &&
-        !hasPrecedingExtendedPOS(lattice, start_pos,
-                                 {core::ExtendedPOS::VerbRenyokei, core::ExtendedPOS::VerbOnbinkei,
-                                  core::ExtendedPOS::AuxCausative, core::ExtendedPOS::AuxPassive})) {
-      continue;
-    }
-
-    // An adverb spelled like a te-form (至って, 決して) is that te-form when an
-    // auxiliary selecting the te-form follows it (至っ+て+おら+ず, 至っ+て+ませ+ん).
-    if (result.entry->pos == core::PartOfSpeech::Adverb && result.length >= 2 &&
-        (codepoints[end_pos - 1] == U'て' || codepoints[end_pos - 1] == U'で')) {
-      bool te_selecting_auxiliary_follows = false;
-      for (size_t aux_end = end_pos + 1; aux_end <= std::min(codepoints.size(), end_pos + 2); ++aux_end) {
-        const auto* aux =
-            lookupEntryInRange(dict_manager_, codepoints, end_pos, aux_end, core::PartOfSpeech::Auxiliary);
-        te_selecting_auxiliary_follows = te_selecting_auxiliary_follows ||
-                                         (aux != nullptr && (aux->extended_pos == core::ExtendedPOS::AuxAspectIru ||
-                                                             aux->extended_pos == core::ExtendedPOS::AuxTenseMasu));
-      }
-      // The mora may instead open a following word (かえって+いい).
-      bool content_word_follows = false;
-      for (size_t word_end = end_pos + 2; word_end <= std::min(codepoints.size(), end_pos + 3); ++word_end) {
-        content_word_follows = content_word_follows || lookupEntryInRange(dict_manager_, codepoints, end_pos, word_end,
-                                                                          core::PartOfSpeech::Adjective) != nullptr;
-      }
-      if (te_selecting_auxiliary_follows && !content_word_follows) {
-        continue;
-      }
-    }
-
-    // The u-onbin とう of the desiderative stands on a continuative before the
-    // negative or the humble predicates it heads (食べ+とう+ない, 行き+とう+ござる).
-    if (result.entry->extended_pos == core::ExtendedPOS::AuxDesireTai && result.entry->lemma != result.entry->surface &&
-        utf8::endsWith(result.entry->surface, "う") &&
-        !(hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbRenyokei) &&
-          (verb_helpers::naiNegativeFollowsAt(codepoints, end_pos) ||
-           utf8::startsWithAny(following_text, {"ござ", "存じ"})))) {
-      continue;
-    }
-
-    // An interrogative adverb fused with か (どうか) is one adverb only when a
-    // predicate follows it (どうか+してる, どうか+助けて); in かどうか and
-    // before a particle (どうか+な) it stays the adverb plus the particle か.
-    const auto* interrogative_head =
-        result.entry->pos == core::PartOfSpeech::Adverb && result.length >= 2 && codepoints[end_pos - 1] == U'か'
-            ? lookupEntryInRange(dict_manager_, codepoints, start_pos, end_pos - 1, core::PartOfSpeech::Adverb)
-            : nullptr;
-    if (interrogative_head != nullptr && interrogative_head->extended_pos == core::ExtendedPOS::AdverbQuotative) {
-      const bool after_ka = start_pos > 0 && codepoints[start_pos - 1] == U'か';
-      const bool predicate_follows =
-          end_pos < codepoints.size() &&
-          (normalize::isKanjiCodepoint(codepoints[end_pos]) ||
-           grammar::isSuruRenyokeiSurface(extractSubstring(codepoints, end_pos, end_pos + 1)));
-      if (after_ka || !predicate_follows) {
-        continue;
-      }
-    }
-
-    // The aspect おる's irrealis おら stands only behind the connective て/で
-    // (書いて+おら+ず); elsewhere おら is the pronoun of おらが村 or a verb.
-    if (result.entry->extended_pos == core::ExtendedPOS::AuxAspectIru && result.entry->lemma == "おる" &&
-        grammar::endsWithARow(result.entry->surface) &&
-        !(start_pos > 0 && (codepoints[start_pos - 1] == U'て' || codepoints[start_pos - 1] == U'で') &&
-          hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::ParticleConj))) {
-      continue;
-    }
-
-    // The pejorative ったらしい opens on the geminate that the past た also
-    // takes after an onbin stem or the copula (言っ+た+らしい, だっ+た+らしい);
-    // a registered predicate cell ending at that っ claims it.
-    // Without the geminate, its host is a nominal written outside the kana run:
-    // after kana it is the tail of a word (あ+たらしい for あたらしい) or of a
-    // stem closing on っ.
-    if (result.entry->pos == core::PartOfSpeech::Adjective && utf8::endsWith(result.entry->lemma, "たらしい") &&
-        ((codepoints[start_pos] == U'っ' &&
-          (endsDictionaryVerbSpanningBack(dict_manager_, codepoints, start_pos, start_pos + 1) ||
-           (start_pos > 0 && lookupEntryInRange(dict_manager_, codepoints, start_pos - 1, start_pos + 1,
-                                                core::PartOfSpeech::Auxiliary) != nullptr))) ||
-         (codepoints[start_pos] != U'っ' && start_pos > 0 && kana::isHiraganaCodepoint(codepoints[start_pos - 1])))) {
-      continue;
-    }
-
-    // The one-mora contracted polite copula す stands only on the nominalizer
-    // ん (行くん+す+か); everywhere else す is a verb.
-    if (result.entry->extended_pos == core::ExtendedPOS::AuxCopulaDesu && end_pos == start_pos + 1 &&
-        !(start_pos > 0 && codepoints[start_pos - 1] == U'ん' &&
-          hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::ParticleNo))) {
-      continue;
-    }
-
-    // The one-mora classical desiderative auxiliary ま is valid only as the
-    // first component of まほしき.  Keeping it context-gated prevents a
-    // common temporal adverb such as いま from being split as い+ま.
-    if (result.entry->extended_pos == core::ExtendedPOS::AuxDesireTai &&
-        grammar::isClassicalDesiderativeMarker(result.entry->surface) &&
-        !grammar::startsClassicalDesiderativeSequence(text.substr(byte_pos))) {
-      continue;
-    }
-
-    // The classical honorific たまふ is represented as た+ま+ふ.  Its
-    // one-mora pieces are admitted only inside that exact auxiliary chain.
-    if (result.entry->extended_pos == core::ExtendedPOS::AuxHonorific &&
-        grammar::isClassicalHonorificComponent(result.entry->surface)) {
-      const bool is_marker = grammar::isClassicalDesiderativeMarker(result.entry->surface);
-      const bool has_honorific_start = grammar::startsClassicalHonorificSequence(text.substr(byte_pos));
-      const bool follows_honorific_marker = start_pos > 0 && grammar::isClassicalDesiderativeMarker(extractSubstring(
-                                                                 codepoints, start_pos - 1, start_pos));
-      if ((is_marker && !has_honorific_start) || (!is_marker && !follows_honorific_marker)) {
-        continue;
-      }
-    }
-
-    // The classical past keeps only its 連体形 し and 已然形 しか, so each has
-    // exactly one environment: し modifies a following nominal or closes the
-    // clause (読みし人, 読まざりし。) and しか takes the conditional particle
-    // (見しかば).  Anywhere else the same kana is the サ変 continuative
-    // (消し+ます, 落ち+し+て).
-    // The classical perfect たり contributes its own 已然形 たれ, which needs the
-    // same conjunctive particle (記録したれ+ども).
-    const bool classical_perfect_izenkei = result.entry->extended_pos == core::ExtendedPOS::AuxClassicalPerfect &&
-                                           grammar::spellsHypotheticalAuxiliaryCell(result.entry->surface);
-    const bool is_classical_izenkei = classical_perfect_izenkei || end_pos - start_pos > 1;
-    // The irrealis せ of that same paradigm is licensed by neither test below:
-    // its cell never closes a clause and never heads a nominal, because the
-    // counterfactual is the only construction that selects it. What identifies
-    // it is the pair of hosts around it — the continuative it attaches to, and
-    // the conditional particle the construction ends in (高かり+せ+ば). The two
-    // far commoner readings of the mora take neither: the サ変 irrealis follows
-    // the nominal it turns into a predicate (勉強+せ+ば), and the causative
-    // follows an irrealis rather than a continuative.
-    const bool classical_past_irrealis = result.entry->extended_pos == core::ExtendedPOS::AuxClassicalKi &&
-                                         grammar::spellsClassicalPastIrrealis(result.entry->surface);
-    if (classical_past_irrealis) {
-      const bool follows_renyokei = hasPrecedingExtendedPOS(
-          lattice, start_pos, {core::ExtendedPOS::VerbRenyokei, core::ExtendedPOS::AdjRenyokei});
-      if (!follows_renyokei || !verb_helpers::hypotheticalParticleFollowsAt(dict_manager_, codepoints, end_pos)) {
-        continue;
-      }
-    } else if (result.entry->extended_pos == core::ExtendedPOS::AuxClassicalKi || classical_perfect_izenkei) {
-      // 係り結び leaves the 已然形 as the clause's own predicate, so the cell also
-      // stands with no particle after it at all (雨こそ降りたれ, 月を見しか). What
-      // marks it there is the continuative it attaches to, not the follower: a
-      // case particle in that slot leaves the same kana as the ordinary noun it
-      // introduces (料理に+たれ, 背も+たれ), and requiring the binding particle
-      // itself would reject the same cell wherever the clause carries no 係助詞,
-      // which is the reading the oracle takes (彼が知り+たれ). The continuative may
-      // belong to an auxiliary rather than the verb, because a voice auxiliary
-      // hosts the perfect from the same cell (開か+れ+たれ).
-      const bool follows_continuative =
-          hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbRenyokei) ||
-          hasPrecedingPartOfSpeech(lattice, start_pos, partOfSpeechMask(core::PartOfSpeech::Auxiliary));
-      const bool izenkei_closes_clause =
-          is_classical_izenkei && verb_helpers::clauseEndsAt(codepoints, end_pos) && follows_continuative;
-      // The 連体形 also nominalizes, and the nominal it forms takes a particle of
-      // its own (告げぬべかりし+に, 読みし+を). The host separates that from the サ変
-      // continuative the same kana spells: the classical past attaches to a
-      // continuative, while the サ変 verb takes the nominal it turns into a
-      // predicate, or the particle that introduces one (話を+し+に行く).
-      const bool rentaikei_nominalizes = !is_classical_izenkei && follows_continuative &&
-                                         verb_helpers::caseParticleFollowsAt(dict_manager_, codepoints, end_pos);
-      if (!izenkei_closes_clause && !rentaikei_nominalizes &&
-          !verb_helpers::classicalPastEnvironmentFollows(dict_manager_, codepoints, end_pos, is_classical_izenkei)) {
-        continue;
-      }
-    }
-
-    // A one-mora classical perfect is the tail of far more words than it is an
-    // auxiliary (待つ, 一つ, いつの間にか), so it is admitted only where the
-    // paradigm cell it attaches to actually precedes it. The realis is evidence
-    // enough on its own, because り is the only auxiliary that takes it
-    // (行け+り). A continuative precedes half the lattice, so the terminal つ
-    // additionally needs the clause end its form implies (書き+つ).
-    // The continuative cell is licensed by a different follower: it hands the
-    // predicate to the literary past instead of closing the clause its own form
-    // would end (来+に+けり).
-    // The terminal also hands its clause to a further literary auxiliary
-    // (散り+ぬ+べし, 確認し+ぬ+らむ), which is as decisive as the clause end.
-    const bool continuative_environment =
-        (grammar::spellsClassicalPerfectContinuative(result.entry->surface) &&
-         verb_helpers::literaryPastAuxiliaryFollowsAt(dict_manager_, codepoints, end_pos)) ||
-        (!grammar::spellsClassicalPerfectContinuative(result.entry->surface) &&
-         verb_helpers::classicalAuxiliaryFollowsAt(&dict_manager_, codepoints, end_pos));
-    if (result.entry->extended_pos == core::ExtendedPOS::AuxClassicalPerfect && end_pos == start_pos + 1 &&
-        !hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbKateikei) &&
-        !(hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbRenyokei) &&
-          (verb_helpers::classicalPastEnvironmentFollows(dict_manager_, codepoints, end_pos, false) ||
-           continuative_environment))) {
-      continue;
-    }
-
-    // An interjection is an utterance of its own, closed by punctuation or by a
-    // change of script rather than continued by more kana. Where its surface is
-    // also the irrealis of a dictionary verb, that verb owns the paradigm behind
-    // it (あら、素敵ね keeps the interjection; あらう, あらば, あらゆる stay with
-    // ある). Interjections with no such reading are unaffected.
-    if (result.entry->pos == core::PartOfSpeech::Interjection && end_pos < codepoints.size() &&
-        end_pos > start_pos + 1 && normalize::classifyChar(codepoints[end_pos]) == normalize::CharType::Hiragana) {
-      const std::string_view base_suffix = grammar::godanBaseSuffixFromARow(codepoints[end_pos - 1]);
-      if (!base_suffix.empty() &&
-          dict_manager_.lookupExact(
-              normalize::concat(extractSubstring(codepoints, start_pos, end_pos - 1), base_suffix),
-              core::PartOfSpeech::Verb) != nullptr) {
-        continue;
-      }
-    }
-
-    // A 終助詞 closes its clause, so the nominalizer cannot follow it. The な in
-    // そう+な+ん+です is the copula's attributive form instead; the indefinite
-    // stack the bigram favors (いくつ+か+の) uses the の spelling and is untouched.
-    if (result.entry->extended_pos == core::ExtendedPOS::ParticleFinal && end_pos < codepoints.size() &&
-        codepoints[end_pos] == U'ん') {
-      continue;
-    }
-
-    // The contracted directional く is the いく renyokei with its い elided, so
-    // it exists only directly after a te-form (読ん+で+く).  Anywhere else the
-    // same single kana is an adjective continuative or a stem fragment, and
-    // admitting the auxiliary there splits the negative continuative (な+く for
-    // 書か+なく+ない).
-    if (result.entry->extended_pos == core::ExtendedPOS::AuxAspectIku && end_pos - start_pos == 1 &&
-        (start_pos == 0 || (codepoints[start_pos - 1] != U'て' && codepoints[start_pos - 1] != U'で'))) {
-      continue;
-    }
-
-    // A 副助詞 attaches to a 体言 and a 接続詞 opens a clause; neither follows a
-    // verb onbin stem.  Where one that begins with だ appears to (読ん+だって,
-    // 脱い+だって), the だ is the voiced past auxiliary and the rest is its own
-    // word (読ん+だ+って).  The stem is a kanji verb whose dictionary base takes
-    // the voiced allomorph, or the hatsuonbin shape kanji + ん; an ordinary
-    // noun (みかん+だって) and every other left context stay untouched.
-    if ((result.entry->extended_pos == core::ExtendedPOS::ParticleAdverbial ||
-         result.entry->pos == core::PartOfSpeech::Conjunction) &&
-        start_pos >= 2 && codepoints[start_pos] == U'だ' &&
-        ((codepoints[start_pos - 1] == U'ん' && normalize::isKanjiCodepoint(codepoints[start_pos - 2])) ||
-         (normalize::isKanjiCodepoint(codepoints[start_pos - 2]) &&
-          isDictionaryOnbinPast(dict_manager_, extractSubstring(codepoints, start_pos - 2, start_pos + 1))))) {
-      continue;
-    }
-
-    // An adverb takes no object, so a te-ending adverb behind the object
-    // marker is the continuative of a verb plus the conjunctive て whenever the
-    // stem names a dictionary verb (約束を+果たし+て, never 果たして).
-    if (result.entry->pos == core::PartOfSpeech::Adverb && end_pos - start_pos >= 3 && start_pos > 0 &&
-        codepoints[start_pos - 1] == U'を' && codepoints[end_pos - 1] == U'て' &&
-        verb_helpers::namesDictionaryVerbContinuative(&dict_manager_, codepoints, start_pos, end_pos - 2)) {
-      continue;
-    }
-
-    // A pure-hiragana adnominal begins with a kana that is also an inflectional
-    // ending, so it cannot start where a productive verb continuative already
-    // straddles the boundary (書き+たる, たなびき+たる).  A real boundary
-    // immediately before the determiner and unrelated kana contexts remain
-    // untouched.
-    if (result.entry->pos == core::PartOfSpeech::Determiner &&
-        hasProductiveContinuativeCrossingDeterminer(lattice, inflection_, dict_manager_, codepoints, start_pos)) {
-      continue;
-    }
-
-    // The historical terminal component ふ is meaningful only after a kanji
-    // stem.  The positional gate retains separations such as 候+ふ and 思+ふ
-    // without admitting a free one-mora verb in ordinary hiragana text.
-    if (result.entry->pos == core::PartOfSpeech::Verb &&
-        result.entry->extended_pos == core::ExtendedPOS::VerbShuushikei &&
-        grammar::isClassicalFuruTerminal(result.entry->surface) &&
-        (start_pos == 0 || !normalize::isKanjiCodepoint(codepoints[start_pos - 1]))) {
-      continue;
-    }
-
-    // A classical honorific written as its bare kanji (候) is the predicate of
-    // a clause, so it follows a continuative, a particle or a clause boundary.
-    // After another kanji it is the second element of a compound noun
-    // (天候, 兆候), and after the genitive or an adnominal it is the noun a
-    // modifier heads (新緑の候). A registered multi-kanji noun that ends here
-    // (御座) is a complete host instead, and the honorific is its predicate.
-    if (result.entry->pos == core::PartOfSpeech::Verb && grammar::isHumbleHonorificLemma(result.entry->lemma) &&
-        result.length == 1 && normalize::isKanjiCodepoint(codepoints[start_pos]) && start_pos > 0 &&
-        ((normalize::isKanjiCodepoint(codepoints[start_pos - 1]) &&
-          !core::anyEdgeEndingAt(lattice, start_pos,
-                                 [](const core::LatticeEdge& edge) {
-                                   return edge.pos == core::PartOfSpeech::Noun && edge.fromDictionary() &&
-                                          edge.end - edge.start >= 2;
-                                 })) ||
-         core::anyEdgeEndingAt(lattice, start_pos, [](const core::LatticeEdge& edge) {
-           return edge.extended_pos == core::ExtendedPOS::ParticleNo || edge.pos == core::PartOfSpeech::Determiner;
-         }))) {
-      continue;
-    }
-
-    // A dictionary noun homographic with a verb renyokei (知らせ) cannot
-    // precede the closed classical honorific auxiliary chain たまふ.  Keep the
-    // verb boundary available in that grammatical environment.
-    if (result.entry->pos == core::PartOfSpeech::Noun &&
-        grammar::startsClassicalHonorificAuxiliaryChain(following_text)) {
-      continue;
-    }
-
-    // In an interrogative emphatic sequence, として is not the viewpoint
-    // compound particle: it is と+し+て before the focus particle も.
-    if (result.entry->extended_pos == core::ExtendedPOS::ParticleCase &&
-        grammar::isQuotativeSuruTeCompoundParticle(result.entry->surface) && end_pos < codepoints.size() &&
-        codepoints[end_pos] == U'も' && hasInterrogativeEndingAt(dict_manager_, text, byte_offsets, start_pos)) {
-      continue;
-    }
-
-    // The contracted preparative auxiliary has a genuine mizenkei+volitional
-    // cell (とこ+う / どこ+う), but those spellings are also ordinary lexical
-    // words. Emit them only in their complete verb-onbin auxiliary context.
-    // Other AuxAspectOku forms before う are the invalid とい+う path.
-    if (result.entry->extended_pos == core::ExtendedPOS::AuxAspectOku) {
-      const bool follows_volitional = verb_helpers::volitionalEndingFollowsAt(codepoints, end_pos);
-      // The contraction is て + おく, so its host is whichever cell that て
-      // selects: the onbin form of a Godan verb (書い+とこう) but the plain
-      // continuative of an Ichidan or サ変 one (見+とこう, 作成し+とこう).
-      // Admitting only the onbin cell left the other two conjugations to fall
-      // back on the case particle plus the homographic adverb.
-      const bool contracted_volitional =
-          utf8::equalsAny(result.entry->surface, {"とこ", "どこ"}) && follows_volitional &&
-          hasPrecedingExtendedPOS(lattice, start_pos,
-                                  {core::ExtendedPOS::VerbOnbinkei, core::ExtendedPOS::VerbRenyokei});
-      if ((utf8::equalsAny(result.entry->surface, {"とこ", "どこ"}) && !contracted_volitional) ||
-          (follows_volitional && !contracted_volitional)) {
-        continue;
-      }
-    }
-
-    // At the beginning of a clause, a one-mora continuative cannot steal the
-    // first mora of a longer dictionary conjunction (しかも, しかし). The
-    // conjunction is already a complete closed-class candidate at this
-    // boundary; letting its prefix reach a following particle manufactures a
-    // predicate with no host.
-    if (start_pos == 0 && result.entry->extended_pos == core::ExtendedPOS::VerbRenyokei && result.length == 1) {
-      const bool has_longer_conjunction = lookupResultsHaveLongerPartOfSpeech(
-          lookup_results, partOfSpeechMask(core::PartOfSpeech::Conjunction), result.length);
-      if (has_longer_conjunction) {
-        continue;
-      }
-    }
-
-    // A conjunction introduces a new predicate. Do not start that predicate
-    // with a one-character nominal/suffix homograph when a longer dictionary
-    // verb begins at the same boundary (しかも+間違えた, not しかも+間+違えた).
-    if ((result.entry->pos == core::PartOfSpeech::Noun || result.entry->pos == core::PartOfSpeech::Suffix) &&
-        result.length == 1 &&
-        hasPrecedingPartOfSpeech(lattice, start_pos, partOfSpeechMask(core::PartOfSpeech::Conjunction))) {
-      const bool has_longer_verb = lookupResultsHaveLongerPartOfSpeech(
-          lookup_results, partOfSpeechMask(core::PartOfSpeech::Verb), result.length);
-      if (has_longer_verb) {
-        continue;
-      }
-    }
-
-    // A one-kanji suffix closing the kanji run right after a numeral+counter is
-    // part of the quantity phrase (三割+強, 二時間+弱), which keeps no lone
-    // kanji of its own; relational 前/後 stand alone (三日|後).
-    if (result.entry->pos == core::PartOfSpeech::Suffix && result.length == 1 &&
-        verb_helpers::isQuantityClosingSuffixAt(&dict_manager_, codepoints, start_pos)) {
-      size_t counter_start = start_pos;
-      while (counter_start > 0 && normalize::isCounterKanji(codepoints[counter_start - 1])) {
-        --counter_start;
-      }
-      if (counter_start < start_pos && counter_start > 0 &&
-          normalize::isNumeralCodepoint(codepoints[counter_start - 1])) {
-        continue;
-      }
-    }
-
-    // A deverbal suffix after a kana continuative binds to it only when it
-    // closes the kanji run; otherwise it opens the next noun, whether listed
-    // alone or as the tail of a lexical noun (申し込み+手続き, 置き+場所).
-    if (result.entry->pos == core::PartOfSpeech::Suffix || result.entry->pos == core::PartOfSpeech::Noun) {
-      const size_t suffix_pos = start_pos + result.length - 1;
-      if (suffix_pos > 0 && kana::isHiraganaCodepoint(codepoints[suffix_pos - 1]) &&
-          grammar::isDeverbalSuffixKanji(codepoints[suffix_pos]) &&
-          !grammar::isBoundDeverbalSuffixAt(codepoints, suffix_pos)) {
-        continue;
-      }
-    }
-
-    if (result.entry->pos == core::PartOfSpeech::Particle && utf8::equalsAny(result.entry->surface, {"だの"}) &&
-        end_pos < codepoints.size() && codepoints[end_pos] == U'は' &&
-        hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbOnbinkei)) {
-      continue;
-    }
-
-    // The contrastive nominal construction のでは keeps the nominalizer,
-    // copular connective, and topic particle independently searchable.  The
-    // causal compound particle ので cannot consume its initial two morae.
-    if (result.entry->extended_pos == core::ExtendedPOS::ParticleConj &&
-        grammar::isCausalParticleBeforeTopic(result.entry->surface, following_text)) {
-      continue;
-    }
-
-    // Skip a dictionary adjective ending in double い when its final い is the
-    // leading い of the receptive auxiliary いただく: the adjective reading
-    // would fuse a wa-row renyokei's い with the auxiliary's onset
-    // (お使いいただく → 使い+いただく, not 使+いい+ただく). Plain いい in
-    // predicate/attributive position is untouched (no ただ+inflection follows).
-    if (result.entry->pos == core::PartOfSpeech::Adjective && result.length >= 2 && codepoints[end_pos - 1] == U'い' &&
-        codepoints[end_pos - 2] == U'い' && verb_helpers::itadakuParadigmStartsAt(codepoints, end_pos - 1)) {
-      continue;
-    }
-
-    uint8_t flags = core::LatticeEdge::kFromDictionary;
-    if (result.from_user_dict) {
-      flags |= core::LatticeEdge::kFromUserDict;
-    }
-    if (result.entry->extended_pos == core::ExtendedPOS::NounFormal) {
-      flags |= core::LatticeEdge::kIsFormalNoun;
-    }
-
-    float cost = analysis::getCategoryCost(result.entry->extended_pos);
-    // A tuned cost is flagged so the scorer honours it even when it lands on
-    // exactly 0.0, which would otherwise read as unset.
-    const auto add_custom_cost = [&cost, &flags](float adjustment) {
-      cost += adjustment;
-      flags |= core::LatticeEdge::kHasCustomCost;
-    };
-
-    if (result.entry->pos == core::PartOfSpeech::Noun && result.length >= 2 &&
-        grammar::isAllKanji(result.entry->surface)) {
-      add_custom_cost(candidate::kVerifiedMultiCharacterNounBonus);
-    }
-
-    if (result.entry->extended_pos == core::ExtendedPOS::PronounInterrogative &&
-        result.length >= longest_interjection) {
-      add_custom_cost(candidate::kInterrogativePronounBonus);
-    }
-
-    if (result.entry->pos == core::PartOfSpeech::Verb &&
-        result.entry->extended_pos == core::ExtendedPOS::VerbShuushikei &&
-        utf8::endsWith(result.entry->surface, "せる")) {
-      add_custom_cost(candidate::kLexicalSeruBaseBonus);
-    }
-
-    if (result.entry->extended_pos == core::ExtendedPOS::NounFormal && end_pos + 1 < codepoints.size() &&
-        codepoints[end_pos] == U'で' && (codepoints[end_pos + 1] == U'は' || codepoints[end_pos + 1] == U'も')) {
-      add_custom_cost(candidate::kFormalNounCopularTopicBonus);
-    }
-
-    if (result.entry->pos == core::PartOfSpeech::Adverb && end_pos + 1 < codepoints.size() &&
-        codepoints[end_pos] == U'な' && codepoints[end_pos + 1] == U'の') {
-      add_custom_cost(candidate::kAdverbExplanatoryCopulaBonus);
-    }
-
-    // In the explanatory interrogative opener, an adverb ends before the
-    // sentence-final question particle and quotative predicate (なぜ+かというと).
-    // Keep this productive boundary available instead of preferring an
-    // accidental lexicalized adverb that absorbs か.
-    if (result.entry->pos == core::PartOfSpeech::Adverb &&
-        grammar::startsInterrogativeQuoteIntroduction(following_text)) {
-      add_custom_cost(candidate::kInterrogativeQuoteIntroductionBonus);
-    }
-
-    // A dictionary-backed mixed-script noun can be a lexicalized compound
-    // containing an inflected verbal segment. Prefer that registered search
-    // unit over a coincidental inflection path.
-    if (result.entry->pos == core::PartOfSpeech::Noun && result.length >= 3) {
-      bool has_kanji = false;
-      bool has_hiragana = false;
-      for (size_t idx = start_pos; idx < end_pos; ++idx) {
-        has_kanji = has_kanji || normalize::isKanjiCodepoint(codepoints[idx]);
-        has_hiragana = has_hiragana || kana::isHiraganaCodepoint(codepoints[idx]);
-      }
-      const bool ichidan_predicate_continuation =
-          has_kanji && has_hiragana && end_pos < codepoints.size() &&
-          dict_manager_.lookupExact(result.entry->surface + "る", core::PartOfSpeech::Verb) != nullptr &&
-          (codepoints[end_pos] == U'て' ||
-           (end_pos + 1 < codepoints.size() && codepoints[end_pos] == U'ら' && codepoints[end_pos + 1] == U'れ'));
-      if (has_kanji && has_hiragana && !ichidan_predicate_continuation) {
-        add_custom_cost(candidate::kLexicalizedMixedScriptNounBonus);
-      }
-    }
-
-    const bool is_fused_demo = result.length == 2 && end_pos >= 2 && codepoints[end_pos - 2] == U'で' &&
-                               codepoints[end_pos - 1] == U'も' &&
-                               result.entry->extended_pos == core::ExtendedPOS::ParticleAdverbial;
-    if (is_fused_demo && verb_helpers::naiNegativeFollowsAt(codepoints, end_pos) &&
-        hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::AdjNaAdj)) {
-      continue;
-    }
-
-    // A bare え-row dict-verb imperative closing a clause (書け, 止まれ) is the 命令形 of the
-    // base verb, not the potential-verb renyokei; without this the spurious 未然+受身れ split
-    // (止ま+れ, lemma 止む) wins. Gated so any auxiliary/ば continuation (走れます/走れば/止まれる)
-    // leaves the connection scores byte-identical.
-    if (result.entry->pos == core::PartOfSpeech::Verb &&
-        (result.entry->extended_pos == core::ExtendedPOS::VerbKateikei ||
-         result.entry->extended_pos == core::ExtendedPOS::VerbMeireikei) &&
-        grammar::containsKanji(result.entry->surface)) {
-      const bool continues = end_pos < codepoints.size() &&
-                             (codepoints[end_pos] == U'ば' ||
-                              verb_helpers::isPassiveAuxContinuation(codepoints, end_pos, /*strict_masu=*/true));
-      if (!continues) {
-        add_custom_cost(candidate::verb_cost::kImperativeFinalBonus);
-      }
-    }
-
-    // A single-token godan potential (読める) is analyzed as an independent ichidan verb, so its
-    // lemma is its surface. The boost lets that dict form beat an unrelated ichidan reading. Excluded: independent
-    // ichidan verbs (割れる==割れる have lemma == surface, and 自他 pairs like 切れる are registered
-    // as ICHIDAN so no potential form is generated); られる passive/potential (来られる); and
-    // irregular L1 forms whose lemma differs for other reasons (す→する) that do not end え-row + る.
-    const bool is_godan_potential =
-        result.entry->pos == core::PartOfSpeech::Verb &&
-        result.entry->extended_pos == core::ExtendedPOS::VerbShuushikei &&
-        std::string_view(result.entry->lemma) != std::string_view(result.entry->surface) &&
-        utf8::endsWith(result.entry->surface, "る") && !utf8::endsWith(result.entry->surface, "られる") &&
-        grammar::endsWithERow(
-            std::string_view(result.entry->surface).substr(0, result.entry->surface.size() - core::kJapaneseCharBytes));
-    if (is_godan_potential) {
-      add_custom_cost(candidate::verb_cost::kImperativeFinalBonus);
-    }
-
-    const std::string_view lemma =
-        is_godan_potential ? std::string_view(result.entry->surface) : std::string_view(result.entry->lemma);
-    dictionary::ConjugationType conj_type = dictionary::ConjugationType::None;
-    // Dictionary entries deliberately omit conjugation metadata. For a verb
-    // whose dictionary-form ending uniquely identifies a Godan row, preserve
-    // that information on the lattice edge so a low-cost dictionary match does
-    // not discard the type carried by an equivalent generated candidate.
-    if (result.entry->pos == core::PartOfSpeech::Verb && !lemma.empty()) {
-      const char32_t final_cp = utf8::decodeFirstChar(utf8::lastChar(lemma));
-      conj_type = grammar::verbTypeToConjType(grammar::verbTypeFromBaseCodepoint(final_cp));
-      // The る-final row is unknown from the lemma, but stem+よ is a cell only
-      // the ichidan paradigm has (あきらめ+よ), never a godan-ra one.
-      const std::string_view surface = result.entry->surface;
-      if (conj_type == dictionary::ConjugationType::None && utf8::endsWith(lemma, "る") &&
-          utf8::endsWith(surface, "よ") &&
-          surface.substr(0, surface.size() - core::kJapaneseCharBytes) ==
-              lemma.substr(0, lemma.size() - core::kJapaneseCharBytes)) {
-        conj_type = dictionary::ConjugationType::Ichidan;
-      }
-    }
-
-    // A godan e-row form followed by past た cannot be a conditional or an
-    // imperative; it is the continuative stem of the derived potential verb
-    // (書け+た, 見渡せ+た). Keep the dictionary's conditional edge for ば,
-    // and add this context-licensed potential edge without registering every
-    // productive potential form as a separate verb.
-    if (result.entry->pos == core::PartOfSpeech::Verb &&
-        result.entry->extended_pos == core::ExtendedPOS::VerbKateikei && end_pos < codepoints.size() &&
-        codepoints[end_pos] == U'た' && grammar::endsWithERow(result.entry->surface)) {
-      tokenizer_dictionary_detail::addDictionaryOriginEdge(
-          lattice, result.entry->surface, start_pos, end_pos, core::PartOfSpeech::Verb,
-          getCategoryCost(core::ExtendedPOS::VerbRenyokei), core::LatticeEdge::kFromDictionary,
-          normalize::concat(result.entry->surface, "る"), dictionary::ConjugationType::Ichidan,
-          core::ExtendedPOS::VerbRenyokei, "dictionary_potential_renyokei_before_past");
-    }
-    // A listed verb's continuative right after a noun and before a nominal
-    // particle is the deverbal head of an object-verb compound (水+やり+を),
-    // the same re-reading an unlisted continuative gets in the unknown-word
-    // path (草+むしり+を), under the same gates: a bound suffix verb stays bound
-    // to its host (手+がかり), and a listed non-verb reading of the span keeps it
-    // (走り+まくり). A one-mora cell is the tail of too many other words
-    // (美しい, 夜深し), and a listed word reaching over the host already owns
-    // the span (気持ち). The noun itself is not listed, so it is not priced as
-    // a dictionary noun.
-    if (result.entry->pos == core::PartOfSpeech::Verb &&
-        result.entry->extended_pos == core::ExtendedPOS::VerbRenyokei && end_pos >= start_pos + 2 &&
-        end_pos < codepoints.size() && hasNominalForcingParticleContinuation(codepoints, end_pos, &dict_manager_) &&
-        hasPrecedingNominal(lattice, start_pos) &&
-        !hasDictionaryEntrySpanningBack(dict_manager_, codepoints, start_pos, end_pos) &&
-        !verb_helpers::isBoundSuffixAfterNominalHost(&dict_manager_, codepoints, start_pos, result.entry->surface) &&
-        std::none_of(lookup_results.begin(), lookup_results.end(), [&](const dictionary::LookupResult& other) {
-          return other.entry != nullptr && other.length == result.length &&
-                 other.entry->pos != core::PartOfSpeech::Verb;
-        })) {
-      lattice.addEdge(result.entry->surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(end_pos),
-                      core::PartOfSpeech::Noun, cost, 0, result.entry->surface, dictionary::ConjugationType::None,
-                      core::CandidateOrigin::NominalizedNoun, candidate::kNoOriginConfidence, {},
-                      core::ExtendedPOS::NounVerbal, "dictionary_renyokei_nominalized_after_noun");
-    }
-    // An auxiliary cell spelled with a final sokuon is an onbin form, and what
-    // it can connect to follows from the paradigm it belongs to. The past た is
-    // always available. The connective て needs a paradigm that has a te-form at
-    // all: an auxiliary inflected as a Godan verb does (たがっ+て), while the
-    // copula's continuative is で and it has no such cell, so its onbin before て
-    // is really the plain form plus the quotative (無理|だ|って, not 無理|だっ|て).
-    const bool auxiliary_inflects_as_godan =
-        grammar::isModernGodanTerminalKana(utf8::decodeLastChar(result.entry->lemma));
-    const bool unlicensed_auxiliary_onbin =
-        result.entry->pos == core::PartOfSpeech::Auxiliary && utf8::endsWith(result.entry->surface, "っ") &&
-        end_pos < codepoints.size() && !auxiliary_inflects_as_godan &&
-        !utf8::equalsAny(extractSubstring(codepoints, end_pos, end_pos + 1), {"た"});
-    if (!unlicensed_auxiliary_onbin) {
-      const core::ExtendedPOS entry_epos = namesSimplexDeverbalNoun(dict_manager_, *result.entry)
-                                               ? core::ExtendedPOS::NounVerbal
-                                               : result.entry->extended_pos;
-      lattice.addEdge(result.entry->surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(end_pos),
-                      result.entry->pos, cost, flags, lemma, conj_type, core::CandidateOrigin::Dictionary, 1.0F, {},
-                      entry_epos, "dict");
-    }
-
-    // Extend predicates, adverbs and particles with colloquial emphasis
-    // (ですっ, 行くーー, きたあああ, 行くよっ). Unknown candidates use the same
-    // matcher. A particle takes the mark for the same reason a predicate does —
-    // it closes the utterance — and the bare-sokuon guard below is what keeps
-    // the mark from being taken out of the next word (よっぽど, ねっとり).
-    if (end_pos < codepoints.size() &&
-        (result.entry->pos == core::PartOfSpeech::Verb || result.entry->pos == core::PartOfSpeech::Auxiliary ||
-         result.entry->pos == core::PartOfSpeech::Adjective || result.entry->pos == core::PartOfSpeech::Adverb ||
-         result.entry->pos == core::PartOfSpeech::Particle)) {
-      // A dictionary irrealis stem cannot absorb っ before て/た as emphasis:
-      // 染まっ+て belongs to the GodanRa verb 染まる, not 染ま(染む)+っ+て.
-      // The hypothetical stem is barred for the same reason, and it is where
-      // the productive potential forms are registered: かえ is the ichidan stem
-      // of かえる (the potential of 買う), which has no sokuonbin at all, so
-      // かえっ+て can only belong to the godan かえる and must keep that lemma.
-      // An auxiliary cannot either: っ+て after one is the concessive particle
-      // って (書い+た+って), and every genuine auxiliary onbin cell (だっ, たかっ,
-      // じゃっ) is a dictionary entry in its own right.
-      const bool sokuon_before_te_or_ta =
-          end_pos + 1 < codepoints.size() && codepoints[end_pos] == core::hiragana::kSmallTsu &&
-          (codepoints[end_pos + 1] == core::hiragana::kTe || codepoints[end_pos + 1] == core::hiragana::kTa) &&
-          (result.entry->extended_pos == core::ExtendedPOS::VerbMizenkei ||
-           result.entry->extended_pos == core::ExtendedPOS::VerbKateikei ||
-           result.entry->pos == core::PartOfSpeech::Auxiliary);
-      auto emphatic = sokuon_before_te_or_ta
-                          ? verb_helpers::EmphaticSuffixMatch{}
-                          : verb_helpers::matchEmphaticSuffix(codepoints, end_pos, result.entry->pos,
-                                                              verb_helpers::SokuonOnsetPolicy::DictionaryEntry);
-      // One repeated vowel is below the generic emphasis floor, but a final
-      // particle drawn out by its own full-size vowel (けど+さあ) is that hold,
-      // and so is a continuative closing the clause as the regional imperative
-      // (見+ときい, し+ときい): an inflected i-row cell, then nothing.
-      const bool closes_after_held_vowel =
-          end_pos + 1 >= codepoints.size() ||
-          normalize::classifyChar(codepoints[end_pos + 1]) == normalize::CharType::Symbol;
-      const bool imperative_continuative =
-          (result.entry->pos == core::PartOfSpeech::Verb || result.entry->pos == core::PartOfSpeech::Auxiliary) &&
-          !result.entry->lemma.empty() && result.entry->lemma != result.entry->surface &&
-          kana::isIRowCodepoint(codepoints[end_pos - 1]) && closes_after_held_vowel;
-      if (emphatic.empty() &&
-          (result.entry->extended_pos == core::ExtendedPOS::ParticleFinal || imperative_continuative) &&
-          end_pos < codepoints.size() && codepoints[end_pos] == grammar::getVowelForChar(codepoints[end_pos - 1])) {
-        emphatic.suffix = extractSubstring(codepoints, end_pos, end_pos + 1);
-        emphatic.end = end_pos + 1;
-        emphatic.repeated_vowel_count = 1;
-      }
-      // A bare sokuon after a predicate is one of two things: the genuine 促音便,
-      // which needs て/た/で/だ behind it (と+いっ+て), or colloquial emphasis, which
-      // closes the clause (行くっ！). Before any other kana it is neither, and taking
-      // it eats the opening mora of the following word (にらめっ+こ for にらめっこ).
-      const bool bare_sokuon = emphatic.suffix == "っ";
-      // Only a verb's own 音便形 owns the sokuon in front of the connective. The
-      // continuative does not: the 促音便 replaces that form's last mora rather
-      // than following it (買う has 買っ, built on the stem, while 買い is the
-      // continuative and 買いっ is no cell at all), and the genuine cell reaches
-      // the lattice as an entry of its own. An i-adjective closes its terminal
-      // on い and builds its own onbin elsewhere (忙し|かっ|た), and a na-adjective
-      // stem has no inflection at all, so a っ after either is the emphatic —
-      // which needs a clause end, not a following word (忙しい|っていう, not
-      // 忙しいっ|ていう).
-      const bool host_owns_sokuonbin_cell = result.entry->pos == core::PartOfSpeech::Verb &&
-                                            result.entry->extended_pos == core::ExtendedPOS::VerbOnbinkei;
-      const bool unlicensed_bare_sokuon =
-          bare_sokuon && emphatic.end < codepoints.size() &&
-          normalize::classifyChar(codepoints[emphatic.end]) == normalize::CharType::Hiragana &&
-          !(host_owns_sokuonbin_cell &&
-            utf8::equalsAny(extractSubstring(codepoints, emphatic.end, emphatic.end + 1), {"て", "た", "で", "だ"}));
-      // A particle takes the glottal stop, which closes the utterance, but not
-      // the prolonged mark: after a one-mora particle that spelling is also the
-      // tail of a lengthened word, and taking it there cuts the word in two
-      // (おいしーー as おい + しーー).
-      // A sentence-final particle may hold its own vowel at a clause end
-      // (さ+あ, よ+お, さ+ー): one mora, the particle's vowel, then nothing.
-      // The clause ends after the emphatic, or a final particle closes it
-      // (行くけえ+ね).
-      auto closes_clause_after_emphatic = [&]() {
-        const auto* next_final = emphatic.end < codepoints.size()
-                                     ? lookupEntryInRange(dict_manager_, codepoints, emphatic.end, emphatic.end + 1,
-                                                          core::PartOfSpeech::Particle)
-                                     : nullptr;
-        return emphatic.end >= codepoints.size() ||
-               normalize::classifyChar(codepoints[emphatic.end]) == normalize::CharType::Symbol ||
-               (next_final != nullptr && next_final->extended_pos == core::ExtendedPOS::ParticleFinal);
-      };
-      auto holds_final_particle_vowel = [&]() {
-        if (result.entry->extended_pos != core::ExtendedPOS::ParticleFinal || emphatic.end != end_pos + 1 ||
-            normalize::utf8Length(result.entry->surface) != 1 || !closes_clause_after_emphatic()) {
-          return false;
-        }
-        const char32_t held = codepoints[end_pos];
-        const char32_t vowel = grammar::getVowelForChar(codepoints[end_pos - 1]);
-        // Small vowels sit one codepoint below their full-size form (ぁ, あ).
-        return held == U'ー' || held == vowel || (kana::isSmallKanaCodepoint(held) && held + 1 == vowel);
-      };
-      // Exactly two repeated vowels that themselves spell a dictionary word
-      // starting there (で+ええ, そう+ああ) are that word, not emphasis.
-      auto lengthening_spells_word_at = [&]() {
-        // A content word draws its own vowel out (やばいいい); only a function
-        // word's "lengthening" can be a following word instead.
-        const bool function_word_host =
-            result.entry->pos == core::PartOfSpeech::Particle || result.entry->pos == core::PartOfSpeech::Auxiliary;
-        if (!function_word_host || emphatic.repeated_vowel_count != 2 || emphatic.standard_char_count != 0) {
-          return false;
-        }
-        const auto following_results = dict_manager_.lookup(text, byteOffsetAt(byte_offsets, end_pos));
-        return std::any_of(following_results.begin(), following_results.end(),
-                           [](const auto& following) { return following.entry != nullptr && following.length == 2; });
-      };
-      // A one-mora host whose vowel is held with ー or a small vowel can respell
-      // a registered two-mora word (ね+ー, ね+ぇ for ねえ): the span is that
-      // word, with its own class and lemma, and not the host drawn out.
-      if (normalize::utf8Length(result.entry->surface) == 1 && emphatic.end == end_pos + 1) {
-        const char32_t held = codepoints[end_pos];
-        const char32_t vowel = grammar::getVowelForChar(codepoints[end_pos - 1]);
-        if (held == U'ー' || (kana::isSmallKanaCodepoint(held) && held + 1 == vowel)) {
-          const std::string respelled = result.entry->surface + normalize::encodeUtf8(vowel);
-          bool respells_word = false;
-          for (const auto& word : dict_manager_.lookup(respelled, 0)) {
-            if (word.entry == nullptr || word.length != normalize::utf8Length(respelled)) {
-              continue;
-            }
-            respells_word = true;
-            // Each host reading at this position reaches here; one of them adds the word.
-            if (result.entry->pos == core::PartOfSpeech::Particle) {
-              tokenizer_dictionary_detail::addDictionaryOriginEdge(
-                  lattice, extractSubstring(codepoints, start_pos, emphatic.end), start_pos, emphatic.end,
-                  word.entry->pos, getCategoryCost(word.entry->extended_pos), core::LatticeEdge::kFromDictionary,
-                  word.entry->lemma.empty() ? respelled : word.entry->lemma, dictionary::ConjugationType::None,
-                  word.entry->extended_pos, "dict_respelled");
-            }
-          }
-          if (respells_word) {
-            continue;
-          }
-        }
-      }
-      // A vowel drawn out after a verb continuative can instead complete an
-      // i-adjective spelled in kana (おい+し+い is おいしい, not おい+しい), so
-      // the span from a hiragana run in front of it reads as an adjective.
-      auto lengthening_completes_adjective = [&]() {
-        constexpr size_t kMaxAdjectiveLookback = 6;
-        if (result.entry->pos != core::PartOfSpeech::Verb || emphatic.standard_char_count != 0 ||
-            emphatic.repeated_vowel_count != 1 || start_pos == 0) {
-          return false;
-        }
-        size_t run_start = start_pos;
-        while (run_start > 0 && start_pos - run_start < kMaxAdjectiveLookback &&
-               normalize::classifyChar(codepoints[run_start - 1]) == normalize::CharType::Hiragana) {
-          --run_start;
-        }
-        for (size_t from = run_start; from < start_pos; ++from) {
-          const auto& spans = analysesInRange(inflection_, codepoints, from, emphatic.end);
-          if (std::any_of(spans.begin(), spans.end(), [](const grammar::InflectionCandidate& inflection_candidate) {
-                return inflection_candidate.verb_type == grammar::VerbType::IAdjective &&
-                       inflection_candidate.confidence >= candidate::kIAdjConfMin;
-              })) {
-            return true;
-          }
-        }
-        return false;
-      };
-      const bool lengthening_spells_word = lengthening_spells_word_at() || lengthening_completes_adjective();
-      const bool unlicensed_particle_lengthening =
-          result.entry->pos == core::PartOfSpeech::Particle && !bare_sokuon && !holds_final_particle_vowel();
-      // A conjugated word drawn out with the prolonged mark closes the
-      // utterance; a following word means the mark belongs to that word instead
-      // (しー+ん is the mimetic しーん, not する continuative plus ん).
-      const bool unlicensed_open_prolongation =
-          (result.entry->pos == core::PartOfSpeech::Verb || result.entry->pos == core::PartOfSpeech::Auxiliary) &&
-          utf8::endsWith(emphatic.suffix, "ー") && !closes_clause_after_emphatic();
-      if (!emphatic.empty() && !unlicensed_bare_sokuon && !unlicensed_particle_lengthening &&
-          !unlicensed_open_prolongation && !lengthening_spells_word) {
-        // Determine extended_pos for emphatic form
-        // A sokuon on a continuative reads as its onbin cell (い → いっ for
-        // と+いっ+て); on a finished form (待て+っ) it is only emphasis, and the
-        // form keeps its own cell.
-        core::ExtendedPOS emphatic_epos = result.entry->extended_pos;
-        if (result.entry->pos == core::PartOfSpeech::Verb && emphatic.suffix == "っ" &&
-            result.entry->extended_pos == core::ExtendedPOS::VerbRenyokei) {
-          // E.g., い(連用形) + っ → いっ(音便形) for と+いっ+て pattern
-          emphatic_epos = core::ExtendedPOS::VerbOnbinkei;
-        }
-
-        const std::string emphatic_surface = result.entry->surface + emphatic.suffix;
-        // Emphasis adds nothing to the word, so the entry's own base form is the
-        // lemma whatever the host (ですっ → です, すごいいいい → すごい).
-        const std::string_view emphatic_lemma = result.entry->lemma.empty() ? std::string_view(result.entry->surface)
-                                                                            : std::string_view(result.entry->lemma);
-        lattice.addEdge(emphatic_surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(emphatic.end),
-                        result.entry->pos, cost + verb_helpers::emphaticCostAdjustment(emphatic), flags, emphatic_lemma,
-                        dictionary::ConjugationType::None, core::CandidateOrigin::Dictionary, 1.0F, {}, emphatic_epos,
-                        "dict_emphatic");
-      }
-    }
+    addDictionaryEntryEdges(lattice, ctx, result, end_pos, following_text);
   }
 
   tokenizer_dictionary_detail::appendSpecialGrammarCandidates(lattice, text, codepoints, start_pos, byte_pos);

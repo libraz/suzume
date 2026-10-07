@@ -7,6 +7,8 @@
 
 #include "analysis/tokenizer_utils.h"
 #include "core/lattice.h"
+#include "dictionary/dictionary.h"
+#include "grammar/inflection.h"
 
 namespace suzume::analysis::tokenizer_dictionary_detail {
 
@@ -84,6 +86,87 @@ void addTruncatedAdverbCandidates(core::Lattice& lattice, const dictionary::Dict
  */
 void addClippedInterjectionCandidates(core::Lattice& lattice, const dictionary::DictionaryManager& dict_manager,
                                       const std::vector<char32_t>& codepoints, size_t start_pos);
+
+/**
+ * @brief Inputs shared by every dictionary result at one start position
+ *
+ * The longest_* fields hold the longest lookup result of each class at the
+ * position, which the guards use to let a longer member own the span.
+ */
+struct DictionaryCandidateContext {
+  const dictionary::DictionaryManager& dict_manager;
+  const grammar::Inflection& inflection;
+  std::string_view text;
+  const std::vector<char32_t>& codepoints;
+  const ByteOffsets& byte_offsets;
+  size_t start_pos;
+  size_t byte_pos;
+  const std::vector<dictionary::LookupResult>& lookup_results;
+  bool has_attributive_temporal_ma;
+  bool starts_shortened_causative_passive;
+  bool suppress_prefixed_noun_interior;
+  size_t longest_conjunction;
+  size_t longest_fixed_conjunction;
+  size_t longest_interjection;
+  size_t longest_adverb;
+  size_t longest_noun;
+  size_t longest_potential_benefactive;
+};
+
+/**
+ * @brief Whether a dictionary reading cuts into a word or chain its context already establishes
+ */
+bool crossesEstablishedBoundary(const DictionaryCandidateContext& ctx, const core::Lattice& lattice,
+                                const dictionary::LookupResult& result, size_t end_pos);
+
+/**
+ * @brief Whether a dictionary reading loses to a homograph the neighbouring category selects
+ */
+bool losesHomographReading(const DictionaryCandidateContext& ctx, const core::Lattice& lattice,
+                           const dictionary::LookupResult& result, size_t end_pos, std::string_view following_text);
+
+/**
+ * @brief Whether a reading's word class cannot stand in its environment, or a
+ *        longer member of the class owns the span
+ */
+bool isOutOfPlaceForWordClass(const DictionaryCandidateContext& ctx, const core::Lattice& lattice,
+                              const dictionary::LookupResult& result, size_t end_pos);
+
+/**
+ * @brief Whether a function word or paradigm cell lacks the host or follower that licenses it
+ *
+ * Runs after the entry's derived verb-stem edges are added, so it suppresses
+ * only the entry's own edge.
+ */
+bool lacksLicensingEnvironment(const DictionaryCandidateContext& ctx, const core::Lattice& lattice,
+                               const dictionary::LookupResult& result, size_t end_pos, std::string_view following_text);
+
+/**
+ * @brief Whether a dictionary verb ends at @p end_pos while starting before @p start_pos
+ */
+bool endsDictionaryVerbSpanningBack(const dictionary::DictionaryManager& dict_manager,
+                                    const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos);
+
+/**
+ * @brief Whether @p surface is a dictionary Godan onbin stem plus its matching past allomorph
+ */
+bool isDictionaryOnbinPast(const dictionary::DictionaryManager& dict_manager, std::string_view surface);
+
+/**
+ * @brief Whether a noun or pronoun edge ends at @p start_pos
+ */
+inline bool hasPrecedingNominal(const core::Lattice& lattice, size_t start_pos) {
+  return hasPrecedingPartOfSpeech(lattice, start_pos, kNounPronounMask);
+}
+
+/**
+ * @brief Whether a multi-mora adverb ending in か before という has absorbed the
+ *        question particle of a quoted question (なぜか+という against なぜ+か+という)
+ */
+inline bool adverbAbsorbsQuotedQuestion(const std::vector<char32_t>& codepoints, size_t length, size_t end_pos) {
+  return length > 1 && codepoints[end_pos - 1] == U'か' && end_pos + 2 < codepoints.size() &&
+         codepoints[end_pos] == U'と' && codepoints[end_pos + 1] == U'い' && codepoints[end_pos + 2] == U'う';
+}
 
 }  // namespace suzume::analysis::tokenizer_dictionary_detail
 

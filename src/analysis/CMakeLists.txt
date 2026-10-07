@@ -56,10 +56,15 @@ add_library(suzume_analysis OBJECT
   suffix_candidates_suffix.cpp
   tokenizer.cpp
   tokenizer_dictionary.cpp
+  tokenizer_dictionary_boundary_guards.cpp
+  tokenizer_dictionary_homograph_guards.cpp
+  tokenizer_dictionary_word_class_guards.cpp
+  tokenizer_dictionary_licensing_guards.cpp
   tokenizer_dictionary_contextual.cpp
   tokenizer_dictionary_variants.cpp
   tokenizer_dictionary_special.cpp
   tokenizer_unknown.cpp
+  tokenizer_unknown_guards.cpp
   dictionary_probe.cpp
   tokenizer_utils.cpp
   unknown.cpp

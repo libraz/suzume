@@ -77,11 +77,17 @@ src/analysis/suffix_candidates_suffix.cpp	0	10	0
 src/analysis/tokenizer.cpp	0	0	0
 src/analysis/tokenizer.h	0	0	0
 src/analysis/tokenizer_dictionary.cpp	0	3	0
+src/analysis/tokenizer_dictionary_boundary_guards.cpp	0	0	0
 src/analysis/tokenizer_dictionary_contextual.cpp	0	0	0
+src/analysis/tokenizer_dictionary_homograph_guards.cpp	0	0	0
 src/analysis/tokenizer_dictionary_internal.h	0	0	0
+src/analysis/tokenizer_dictionary_licensing_guards.cpp	0	0	0
 src/analysis/tokenizer_dictionary_special.cpp	0	0	0
 src/analysis/tokenizer_dictionary_variants.cpp	0	0	0
+src/analysis/tokenizer_dictionary_word_class_guards.cpp	0	0	0
 src/analysis/tokenizer_unknown.cpp	0	7	0
+src/analysis/tokenizer_unknown_guards.cpp	0	0	0
+src/analysis/tokenizer_unknown_internal.h	0	0	0
 src/analysis/tokenizer_utils.cpp	0	0	0
 src/analysis/tokenizer_utils.h	0	0	0
 src/analysis/unknown.cpp	0	29	0
