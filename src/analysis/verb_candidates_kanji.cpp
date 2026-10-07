@@ -178,8 +178,16 @@ bool hasCompleteParticleInitialVerbEvidence(const std::vector<char32_t>& codepoi
 
   const std::string surface = extractSubstring(codepoints, start_pos, hiragana_end);
   const std::string expected_stem = extractSubstring(codepoints, start_pos, kanji_end + 1);
+  // を is never okurigana: a kanji run before it is always its object.
+  if (normalize::isNeverOkuriganaKana(codepoints[kanji_end])) {
+    return false;
+  }
   const bool has_conjunctive_initial =
       vh::oneMoraParticleEndsAt(dict_manager, codepoints, kanji_end + 1, core::ExtendedPOS::ParticleConj);
+  const bool argument_marker_initial =
+      vh::oneMoraParticleEndsAt(dict_manager, codepoints, kanji_end + 1, core::ExtendedPOS::ParticleCase) ||
+      vh::oneMoraParticleEndsAt(dict_manager, codepoints, kanji_end + 1, core::ExtendedPOS::ParticleTopic) ||
+      vh::oneMoraParticleEndsAt(dict_manager, codepoints, kanji_end + 1, core::ExtendedPOS::ParticleNo);
   for (const auto& candidate : inflection.analyze(surface)) {
     const bool has_mixed_godan_ka_stem = has_conjunctive_initial && candidate.verb_type == grammar::VerbType::GodanKa &&
                                          utf8::startsWith(candidate.stem, expected_stem) &&
@@ -230,6 +238,15 @@ bool hasCompleteParticleInitialVerbEvidence(const std::vector<char32_t>& codepoi
         break;
       default:
         break;
+    }
+    // The passive is complete on any godan row once its a-row mizenkei
+    // carries れ (悔やま+れる). A case or topic mora is excluded: there the
+    // passive belongs to a separate predicate taking the argument (話が+される).
+    if (!argument_marker_initial && grammar::isGodanVerbType(candidate.verb_type) &&
+        candidate.suffix.size() > core::kJapaneseCharBytes &&
+        grammar::verbTypeFromARowCodepoint(utf8::decodeFirstChar(candidate.suffix)) == candidate.verb_type &&
+        utf8::startsWith(std::string_view(candidate.suffix).substr(core::kJapaneseCharBytes), "れ")) {
+      complete_inflection = true;
     }
     if (complete_terminal || complete_inflection) {
       return true;

@@ -349,6 +349,10 @@ bool isNeverVerbStemAfterKanji(char32_t ch) {
   return isCommonParticle(ch) || ch == U'も' || ch == U'や';
 }
 
+bool isNeverOkuriganaKana(char32_t ch) {
+  return ch == U'を';
+}
+
 bool isNeverVerbStemAtStart(char32_t ch) {
   // Particles that never start verbs + よ (sentence-final particle)
   // Note: も, や are excluded - can start verbs (もらう, やる)

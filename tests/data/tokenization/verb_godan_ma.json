@@ -718,6 +718,70 @@
       ],
       "id": "minagara",
       "input": "病みながら"
+    },
+    {
+      "description": "今でも悔やまれる - auto-generated",
+      "expected": [
+        {
+          "lemma": "今",
+          "pos": "Noun",
+          "surface": "今"
+        },
+        {
+          "lemma": "でも",
+          "pos": "Particle",
+          "surface": "でも"
+        },
+        {
+          "lemma": "悔やむ",
+          "pos": "Verb",
+          "surface": "悔やま"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れる"
+        }
+      ],
+      "id": "demo_yamareru",
+      "input": "今でも悔やまれる"
+    },
+    {
+      "description": "あの日が悔やまれた - auto-generated",
+      "expected": [
+        {
+          "lemma": "あの",
+          "pos": "Determiner",
+          "surface": "あの"
+        },
+        {
+          "lemma": "日",
+          "pos": "Noun",
+          "surface": "日"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "悔やむ",
+          "pos": "Verb",
+          "surface": "悔やま"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ano_ga_yamareta",
+      "input": "あの日が悔やまれた"
     }
   ],
   "description": "Godan Ma-row verbs (五段マ行動詞) - verbs ending in む",

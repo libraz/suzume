@@ -64,6 +64,14 @@ bool isCommonParticle(char32_t ch);
 bool isNeverVerbStemAfterKanji(char32_t ch);
 
 /**
+ * @brief Whether a kana is never written as okurigana (を)
+ *
+ * Modern spelling keeps を for the object particle alone, so a kanji run
+ * before it never continues into a verb stem.
+ */
+bool isNeverOkuriganaKana(char32_t ch);
+
+/**
  * @brief Check if character cannot be verb stem at start of hiragana word
  *
  * These characters cannot begin hiragana verb stems.
