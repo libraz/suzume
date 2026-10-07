@@ -310,8 +310,39 @@ def repair_contracted_rareru(tokens: list[dict]) -> None:
 
     The reference has only the noun らん (蘭), so 見てらんない and 信じらんない
     come back as a noun plus an independent ない. After a continuative or て
-    and before a negative it is られ with its row nasalized.
+    and before a negative it is られ with its row nasalized.  On the カ変
+    来 the reference reads 来ら as a ra-row godan irrealis plus the negative ん
+    (来らんない); a negative cannot follow the negative ん, so it is 来 plus
+    the same contracted られ.
     """
+    for idx in range(len(tokens) - 2):
+        head, nasal, negative = tokens[idx], tokens[idx + 1], tokens[idx + 2]
+        if (
+            head.get("surface") == "来ら"
+            and head.get("pos") == "動詞"
+            and (head.get("conj_type") or "").startswith("五段")
+            and nasal.get("surface") == "ん"
+            and nasal.get("pos") == "助動詞"
+            and negative.get("surface") in _CONTRACTED_NEGATIVES
+        ):
+            tokens[idx : idx + 3] = [
+                {"surface": "来", "pos": "動詞", "conj_type": "カ変・来ル", "conj_form": "未然形", "lemma": "来る"},
+                {
+                    "surface": "らん",
+                    "pos": "動詞",
+                    "pos_sub1": "接尾",
+                    "conj_type": "一段",
+                    "conj_form": "未然形",
+                    "lemma": "られる",
+                },
+                {
+                    "surface": negative.get("surface", ""),
+                    "pos": "助動詞",
+                    "conj_type": "特殊・ナイ",
+                    "conj_form": "基本形",
+                    "lemma": "ない",
+                },
+            ]
     for idx in range(1, len(tokens) - 1):
         host, token, negative = tokens[idx - 1], tokens[idx], tokens[idx + 1]
         if (

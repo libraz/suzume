@@ -15,6 +15,7 @@
 #include "analysis/verb_candidates_auxiliary_patterns.h"
 #include "analysis/verb_candidates_dictionary_probes.h"
 #include "analysis/verb_candidates_hiragana_internal.h"
+#include "analysis/verb_candidates_verb_stems.h"
 #include "core/debug.h"
 #include "core/kana_constants.h"
 #include "core/utf8_constants.h"
@@ -384,11 +385,14 @@ void appendNOnbinNaiCandidates(const std::vector<char32_t>& codepoints, size_t s
   // becomes V+て+らん+ない (or the colloquial ねえ).  The reduced らん is the
   // potential られ with its row nasalized, so it is emitted as that auxiliary
   // once the te+らん+negative frame proves the contraction.
+  // The ら-less potential contracts the same way on an ichidan or カ変
+  // irrealis (食べ+らん+ない, 寝+らん+ない, 来+らん+ない).
   const size_t negative_pos = start_pos + 2;
   const bool colloquial_negative_follows = vh::colloquialNegativeFollowsAt(codepoints, negative_pos);
   if (start_pos > 0 && negative_pos < codepoints.size() &&
-      (codepoints[start_pos - 1] == U'て' || codepoints[start_pos - 1] == U'で') && codepoints[start_pos] == U'ら' &&
-      codepoints[start_pos + 1] == U'ん' &&
+      (codepoints[start_pos - 1] == U'て' || codepoints[start_pos - 1] == U'で' ||
+       vh::closesIchidanIrrealis(inflection, codepoints, start_pos)) &&
+      codepoints[start_pos] == U'ら' && codepoints[start_pos + 1] == U'ん' &&
       (vh::naiNegativeFollowsAt(codepoints, negative_pos) || colloquial_negative_follows)) {
     auto contracted = makeCandidate(codepoints, start_pos, start_pos + 2, core::PartOfSpeech::Auxiliary,
                                     candidate::verb_cost::kStrongBonus, false, CandidateOrigin::VerbHiragana,
@@ -399,6 +403,13 @@ void appendNOnbinNaiCandidates(const std::vector<char32_t>& codepoints, size_t s
     // below would read the same span as a godan-ra irrealis whose base is the
     // classical passive らる rather than a verb of the modern paradigm it
     // reconstructs.
+    return;
+  }
+
+  // The okurigana of a registered ichidan verb opens no godan-ra stem of its
+  // own (食+べらん is 食べ+らん).
+  if (start_pos > 0 && normalize::isKanjiCodepoint(codepoints[start_pos - 1]) &&
+      vh::closesIchidanIrrealis(inflection, codepoints, start_pos + 1)) {
     return;
   }
 

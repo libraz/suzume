@@ -407,6 +407,13 @@ void appendSingleKanjiIchidanCandidates(const std::vector<char32_t>& codepoints,
         emit_bare_stem("single_kanji_ichidan_sobireru", core::ExtendedPOS::Unknown);
       }
 
+      // The ら-less potential contracted before the negative (寝+らん+ない).
+      if (h1 == kRa && h2 == U'ん' &&
+          (vh::naiNegativeFollowsAt(codepoints, kanji_end + 2) ||
+           vh::colloquialNegativeFollowsAt(codepoints, kanji_end + 2))) {
+        emit_bare_stem("single_kanji_ichidan_ranuki_negative", core::ExtendedPOS::VerbMizenkei);
+      }
+
       // The ichidan passive/potential is られる, not れる (見+られる, 寝+られる).
       if (h1 == kRa && h2 == kRe) {
         emit_bare_stem("single_kanji_ichidan_rareru", core::ExtendedPOS::Unknown);

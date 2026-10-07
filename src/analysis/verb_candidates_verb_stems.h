@@ -33,6 +33,14 @@ namespace suzume::analysis::verb_helpers {
  */
 bool isSingleKanjiIchidan(char32_t c);
 
+/**
+ * @brief Whether an ichidan or カ変 irrealis ends right before @p pos
+ *
+ * A kanji with e/i-row okurigana that reads as an ichidan verb (食べ, 信じ),
+ * or a one-kanji ichidan or カ変 stem (寝, 見, 来).
+ */
+bool closesIchidanIrrealis(const grammar::Inflection& inflection, const std::vector<char32_t>& codepoints, size_t pos);
+
 /** Return true for a one-kanji stem that takes the polite auxiliary directly. */
 bool isSingleKanjiPoliteStem(char32_t c);
 

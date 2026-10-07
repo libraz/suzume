@@ -429,6 +429,22 @@ bool isSingleKanjiIchidan(char32_t c) {
   return false;
 }
 
+bool closesIchidanIrrealis(const grammar::Inflection& inflection, const std::vector<char32_t>& codepoints, size_t pos) {
+  if (pos == 0) {
+    return false;
+  }
+  const char32_t last = codepoints[pos - 1];
+  if (normalize::isKanjiCodepoint(last)) {
+    return isSingleKanjiPoliteStem(last);
+  }
+  if ((!kana::isERowCodepoint(last) && !kana::isIRowCodepoint(last)) || pos < 2 ||
+      !normalize::isKanjiCodepoint(codepoints[pos - 2])) {
+    return false;
+  }
+  const std::string base_form = extractSubstring(codepoints, pos - 2, pos) + "る";
+  return readsAsBaseForm(inflection, base_form, base_form, grammar::VerbType::Ichidan);
+}
+
 bool isSingleKanjiPoliteStem(char32_t c) {
   return isSingleKanjiIchidan(c) || grammar::isKuruKanjiStem(c);
 }

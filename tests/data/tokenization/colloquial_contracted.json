@@ -1711,6 +1711,94 @@
       ],
       "id": "sottka_wakattta",
       "input": "そっか、わかった。"
+    },
+    {
+      "description": "ら-less potential らん after a kanji ichidan irrealis",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "られる",
+          "pos": "Auxiliary",
+          "surface": "らん"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "berannai",
+      "input": "食べらんない"
+    },
+    {
+      "description": "ら-less potential らん after an i-row ichidan irrealis",
+      "expected": [
+        {
+          "lemma": "信じる",
+          "pos": "Verb",
+          "surface": "信じ"
+        },
+        {
+          "lemma": "られる",
+          "pos": "Auxiliary",
+          "surface": "らん"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "jirannai",
+      "input": "信じらんない"
+    },
+    {
+      "description": "ら-less potential らん after a one-kanji ichidan stem",
+      "expected": [
+        {
+          "lemma": "寝る",
+          "pos": "Verb",
+          "surface": "寝"
+        },
+        {
+          "lemma": "られる",
+          "pos": "Auxiliary",
+          "surface": "らん"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "rannai",
+      "input": "寝らんない"
+    },
+    {
+      "description": "ら-less potential らん after the カ変 stem",
+      "expected": [
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "られる",
+          "pos": "Auxiliary",
+          "surface": "らん"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "rannai_2",
+      "input": "来らんない"
     }
   ],
   "description": "colloquial_contracted tests",
