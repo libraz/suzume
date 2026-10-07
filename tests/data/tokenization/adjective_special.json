@@ -490,6 +490,52 @@
       ],
       "id": "i_12",
       "input": "長ーい話"
+    },
+    {
+      "description": "それはすごー - auto-generated",
+      "expected": [
+        {
+          "lemma": "それ",
+          "pos": "Pronoun",
+          "surface": "それ"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "すごい",
+          "pos": "Adjective",
+          "surface": "すごー"
+        }
+      ],
+      "id": "sorehasugo",
+      "input": "それはすごー"
+    },
+    {
+      "description": "うまー - auto-generated",
+      "expected": [
+        {
+          "lemma": "うまい",
+          "pos": "Adjective",
+          "surface": "うまー"
+        }
+      ],
+      "id": "uma",
+      "input": "うまー"
+    },
+    {
+      "description": "でかー - auto-generated",
+      "expected": [
+        {
+          "lemma": "でかい",
+          "pos": "Adjective",
+          "surface": "でかー"
+        }
+      ],
+      "id": "deka",
+      "input": "でかー"
     }
   ],
   "description": "Taru-adjectives and irregular adjectives",

@@ -757,12 +757,20 @@ void appendClippedExclamative(const HiraganaAdjectiveRun& run, std::vector<Unkno
           : nullptr;
   const bool follows_case_particle =
       preceding_particle != nullptr && preceding_particle->extended_pos == core::ExtendedPOS::ParticleCase;
-  for (size_t stem_end = start_pos + 1; stem_end < max_hiragana_end; ++stem_end) {
-    if (codepoints[stem_end] != core::hiragana::kSmallTsu) {
+  // The mark is the sokuon or a run of ー (すご+ー), read by the same helper as
+  // the kanji path. A ー after an i-row mora draws out the final い instead
+  // (かわいー), which the ー normalization reads.
+  for (size_t stem_end = start_pos + 1; stem_end <= max_hiragana_end && stem_end < codepoints.size(); ++stem_end) {
+    const size_t mark_end = adj_detail::clippedExclamativeMarkEnd(codepoints, stem_end);
+    if (mark_end == 0) {
       continue;
     }
-    const size_t after_sokuon = stem_end + 1;
-    const bool clipped_before_ka = codepoints[stem_end - 1] == U'い' && after_sokuon < codepoints.size() &&
+    const bool is_sokuon = codepoints[stem_end] == core::hiragana::kSmallTsu;
+    if (!is_sokuon && grammar::getVowelForChar(codepoints[stem_end - 1]) == U'い') {
+      break;
+    }
+    const size_t after_sokuon = mark_end;
+    const bool clipped_before_ka = is_sokuon && codepoints[stem_end - 1] == U'い' && after_sokuon < codepoints.size() &&
                                    codepoints[after_sokuon] == U'か' && closes_utterance(after_sokuon + 1) &&
                                    !follows_case_particle;
     // Reconstructing the base form is not enough on its own here: the sokuon
