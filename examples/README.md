@@ -6,15 +6,15 @@ These programs are compiled or type-checked by the repository build.
 |------|-----|---------|
 | [`hello.c`](hello.c) | C ABI | Minimal native consumer |
 | [`hello.cpp`](hello.cpp) | C++ wrapper | Minimal native consumer |
-| [`cpp/basic.cpp`](cpp/basic.cpp) | C++ public wrapper | Morphological analysis |
+| [`cpp/basic.cpp`](cpp/basic.cpp) | C++ public wrapper | Tokenization with POS and lemmas |
 | [`cpp/search_indexer.cpp`](cpp/search_indexer.cpp) | C++ public wrapper | Inverted search index |
 | [`cpp/tags.cpp`](cpp/tags.cpp) | C++ public wrapper | Search-tag generation |
 | [`cpp/user_dictionary.cpp`](cpp/user_dictionary.cpp) | C++ public wrapper | Runtime user dictionary |
-| [`ts/basic.ts`](ts/basic.ts) | WASM/TypeScript | Morphological analysis |
+| [`ts/basic.ts`](ts/basic.ts) | WASM/TypeScript | Tokenization with POS and lemmas |
 | [`ts/search_indexer.ts`](ts/search_indexer.ts) | WASM/TypeScript | Inverted search index |
 | [`ts/tags.ts`](ts/tags.ts) | WASM/TypeScript | Search-tag generation |
 | [`ts/user_dictionary.ts`](ts/user_dictionary.ts) | WASM/TypeScript | Runtime user dictionary |
-| [`python/basic.py`](python/basic.py) | Python package | Morphological analysis and normalized offsets |
+| [`python/basic.py`](python/basic.py) | Python package | Tokenization with POS, lemmas and normalized offsets |
 
 ## Build and check in-tree
 
