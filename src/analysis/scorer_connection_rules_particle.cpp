@@ -382,7 +382,15 @@ float computeAdverbialNiAfterPredicatePenalty(const core::LatticeEdge& prev, con
       prev.extended_pos == core::ExtendedPOS::VerbShuushikei || prev.extended_pos == core::ExtendedPOS::AuxTenseTa ||
       prev.extended_pos == core::ExtendedPOS::AdjBasic ||
       (prev.pos == core::PartOfSpeech::Auxiliary && grammar::endsInTerminalCellKana(prev.surface));
-  if (!finished_predicate || next.pos != core::PartOfSpeech::Adverb || !next.fromDictionary() ||
+  // A determiner, the genitive の and the attributive な modify a nominal, and
+  // may skip over an adverb to reach it (私の+特に+好きな). An adverb spelled
+  // as a substantive formal noun plus に is that noun's case frame there
+  // instead (あまりの+こと+に).
+  const bool nominal_modifier =
+      prev.extended_pos == core::ExtendedPOS::Determiner || prev.extended_pos == core::ExtendedPOS::ParticleNo ||
+      (prev.extended_pos == core::ExtendedPOS::AuxCopulaDa && grammar::isAttributiveCopulaNa(prev.surface));
+  const bool formal_noun_frame = nominal_modifier && grammar::isSubstantiveFormalNoun(utf8::dropLastChar(next.surface));
+  if ((!finished_predicate && !formal_noun_frame) || next.pos != core::PartOfSpeech::Adverb || !next.fromDictionary() ||
       !utf8::endsWith(next.surface, "に")) {
     return cost::kNeutral;
   }

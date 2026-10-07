@@ -290,6 +290,92 @@
       ],
       "id": "shitatokoroga_hanakattta",
       "input": "確認したところが、問題はなかった"
+    },
+    {
+      "description": "異例のことに - auto-generated",
+      "expected": [
+        {
+          "lemma": "異例",
+          "pos": "Noun",
+          "surface": "異例"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "こと"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        }
+      ],
+      "id": "nokotoni",
+      "input": "異例のことに"
+    },
+    {
+      "description": "その日のことに - auto-generated",
+      "expected": [
+        {
+          "lemma": "その",
+          "pos": "Determiner",
+          "surface": "その"
+        },
+        {
+          "lemma": "日",
+          "pos": "Noun",
+          "surface": "日"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "こと"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        }
+      ],
+      "id": "sono_nokotoni",
+      "input": "その日のことに"
+    },
+    {
+      "description": "驚いたことに - auto-generated",
+      "expected": [
+        {
+          "lemma": "驚く",
+          "pos": "Verb",
+          "surface": "驚い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "こと"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        }
+      ],
+      "id": "itakotoni",
+      "input": "驚いたことに"
     }
   ],
   "description": "Formal nouns (こと、もの、ところ) (part 2/2)",

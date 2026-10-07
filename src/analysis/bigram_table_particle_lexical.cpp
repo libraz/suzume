@@ -738,6 +738,10 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
       // An onbin cell exists only before た/て/たり, so an unknown run after it
       // is the tail of a word cut at a geminate (とっ+さ for とっさ).
       {EPOS::VerbOnbinkei, EPOS::Other, cost::kSevere},
+      // A continuative selects an auxiliary, a particle or a verb, so an unknown
+      // run after it has swallowed one of them too (驚い+た+ことに with た read
+      // as an unknown run).
+      {EPOS::VerbRenyokei, EPOS::Other, cost::kSevere},
 
       // Note: Particle → AdjStem is allowed for patterns like やる気がなさそう (が+な+さ+そう)
   };
