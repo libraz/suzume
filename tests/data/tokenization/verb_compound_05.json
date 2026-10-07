@@ -1944,6 +1944,70 @@
       ],
       "id": "gamajiri_mu",
       "input": "砂がまじり込む"
+    },
+    {
+      "description": "涙が頬にこぼれ落ちた - auto-generated",
+      "expected": [
+        {
+          "lemma": "涙",
+          "pos": "Noun",
+          "surface": "涙"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "頬",
+          "pos": "Noun",
+          "surface": "頬"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "こぼれ落ちる",
+          "pos": "Verb",
+          "surface": "こぼれ落ち"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ga_nikobore_chita",
+      "input": "涙が頬にこぼれ落ちた"
+    },
+    {
+      "description": "肩にこぼれた - auto-generated",
+      "expected": [
+        {
+          "lemma": "肩",
+          "pos": "Noun",
+          "surface": "肩"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "こぼれる",
+          "pos": "Verb",
+          "surface": "こぼれ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "nikoboreta",
+      "input": "肩にこぼれた"
     }
   ],
   "description": "Compound verbs (part 5/5)",
