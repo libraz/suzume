@@ -28,7 +28,9 @@ src/analysis/candidate_options.h	0	35	0
 src/analysis/category_cost.h	0	105	0
 src/analysis/compound_verb_emit.cpp	0	7	0
 src/analysis/compound_verb_forms.cpp	0	0	0
-src/analysis/compound_verb_match.cpp	0	4	0
+src/analysis/compound_verb_match.cpp	0	1	0
+src/analysis/compound_verb_v2_cells.cpp	0	3	0
+src/analysis/compound_verb_v2_cells_internal.h	0	0	0
 src/analysis/compound_verb_verify.cpp	0	0	0
 src/analysis/compound_verb_voice.cpp	0	0	0
 src/analysis/dictionary_probe.cpp	0	0	0
@@ -112,6 +114,7 @@ src/analysis/verb_candidates_hiragana_internal.h	0	0	0
 src/analysis/verb_candidates_hiragana_mizenkei.cpp	0	1	0
 src/analysis/verb_candidates_hiragana_mizenkei_negative.cpp	0	4	0
 src/analysis/verb_candidates_hiragana_onbin.cpp	0	3	0
+src/analysis/verb_candidates_hiragana_particle_boundary.cpp	0	0	0
 src/analysis/verb_candidates_hiragana_subsidiary.cpp	0	0	0
 src/analysis/verb_candidates_hiragana_suru.cpp	0	0	0
 src/analysis/verb_candidates_kanji.cpp	1	3	0

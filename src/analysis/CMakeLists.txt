@@ -23,6 +23,7 @@ add_library(suzume_analysis OBJECT
   compound_verb_forms.cpp
   compound_verb_emit.cpp
   compound_verb_match.cpp
+  compound_verb_v2_cells.cpp
   compound_verb_verify.cpp
   join_compound_verb.cpp
   join_compound_verb_hiragana.cpp
@@ -81,6 +82,7 @@ add_library(suzume_analysis OBJECT
   verb_candidates_hiragana.cpp
   verb_candidates_hiragana_derived.cpp
   verb_candidates_hiragana_inflection.cpp
+  verb_candidates_hiragana_particle_boundary.cpp
   verb_candidates_hiragana_mizenkei.cpp
   verb_candidates_hiragana_mizenkei_negative.cpp
   verb_candidates_hiragana_onbin.cpp

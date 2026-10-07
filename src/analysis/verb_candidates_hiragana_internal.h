@@ -30,6 +30,14 @@ bool pronounEndsAt(const dictionary::DictionaryManager* dict_manager, const std:
 // dictionary noun/pronoun, which fixes start_pos as a predicate slot.
 bool followsKanjiOrNominalHostBeforeCaseParticle(const std::vector<char32_t>& codepoints, size_t start_pos,
                                                  const dictionary::DictionaryManager* dict_manager);
+// True when the run opens on a closed-class particle followed by a
+// dictionary-verified verb inflection, so the run is a particle plus that verb
+// rather than the stem of an unknown hiragana verb (て+さえ+いれ+ば).
+bool startsWithParticleThenVerifiedVerb(const std::vector<char32_t>& codepoints, size_t start_pos, size_t hiragana_end,
+                                        const std::vector<normalize::CharType>& char_types,
+                                        const grammar::Inflection& inflection,
+                                        const dictionary::DictionaryManager* dict_manager,
+                                        bool allow_single_char_particle_after_kanji);
 
 struct GodanMizenkeiForms {
   char32_t a_row_char;
