@@ -728,6 +728,8 @@ bool admitsPromotedRun(const BracketedNounContext& ctx, const BracketedScan& bra
   }
   // Nor may it open inside a registered predicate that the word in front of
   // the kana run hosts (参加+す|る+もふ cuts the light verb する in half).
+  // A volitional stem is a cell only before its う, so elsewhere it is no
+  // predicate to cut (私+も|とっさ is not もつ's もと).
   bool opens_inside_hosted_predicate = false;
   constexpr size_t kPredicateLookbehind = 3;
   for (size_t probe = start_pos > kPredicateLookbehind ? start_pos - kPredicateLookbehind : 0;
@@ -737,8 +739,12 @@ bool admitsPromotedRun(const BracketedNounContext& ctx, const BracketedScan& bra
       continue;
     }
     for (size_t probe_end = start_pos + 1; probe_end <= scan; ++probe_end) {
-      if (hasExactPartOfSpeech(*dict_manager, codepoints, probe, probe_end,
-                               partOfSpeechMask(core::PartOfSpeech::Verb))) {
+      const auto* hosted = lookupEntryInRange(*dict_manager, codepoints, probe, probe_end, core::PartOfSpeech::Verb);
+      const bool stranded_volitional_stem = hosted != nullptr &&
+                                            hosted->extended_pos == core::ExtendedPOS::VerbMizenkei &&
+                                            kana::isORowCodepoint(codepoints[probe_end - 1]) &&
+                                            (probe_end >= codepoints.size() || codepoints[probe_end] != U'う');
+      if (hosted != nullptr && !stranded_volitional_stem) {
         opens_inside_hosted_predicate = true;
         break;
       }

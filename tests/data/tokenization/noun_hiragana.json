@@ -991,6 +991,164 @@
       ],
       "id": "gatottsani",
       "input": "彼がとっさに"
+    },
+    {
+      "description": "Kana noun after binding mo whose first mora spells a volitional stem",
+      "expected": [
+        {
+          "lemma": "私",
+          "pos": "Pronoun",
+          "surface": "私"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "とっさ",
+          "pos": "Noun",
+          "surface": "とっさ"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "手",
+          "pos": "Noun",
+          "surface": "手"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "出す",
+          "pos": "Verb",
+          "surface": "出し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "motottsani_wo_shita",
+      "input": "私もとっさに手を出した"
+    },
+    {
+      "description": "Kana noun after binding mo",
+      "expected": [
+        {
+          "lemma": "君",
+          "pos": "Pronoun",
+          "surface": "君"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "とっさ",
+          "pos": "Noun",
+          "surface": "とっさ"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "逃げる",
+          "pos": "Verb",
+          "surface": "逃げ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "motottsani_geta",
+      "input": "君もとっさに逃げた"
+    },
+    {
+      "description": "Kana noun before ni, not an unregistered terminal verb",
+      "expected": [
+        {
+          "lemma": "私",
+          "pos": "Pronoun",
+          "surface": "私"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "こたつ",
+          "pos": "Noun",
+          "surface": "こたつ"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "入る",
+          "pos": "Verb",
+          "surface": "入っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "hakotatsuni_ttta",
+      "input": "私はこたつに入った"
+    },
+    {
+      "description": "Kana noun before ni after case ga",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "こたつ",
+          "pos": "Noun",
+          "surface": "こたつ"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "入る",
+          "pos": "Verb",
+          "surface": "入っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "gakotatsuni_ttta",
+      "input": "彼がこたつに入った"
     }
   ],
   "description": "noun_hiragana tests",

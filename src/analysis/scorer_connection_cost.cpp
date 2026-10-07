@@ -65,7 +65,9 @@ void addImpossibleAttachmentRules(const core::LatticeEdge& prev, const core::Lat
   // ゆう+が+ただ).  A registered predicate keeps the connective reading free.
   // The same nominal requirement bars the case particle after the other finite
   // cells — an adjective, the past, the negative and the copulas (寒い+が,
-  // 学生だ+が, 行った+が) — where が can only be the adversative.
+  // 学生だ+が, 行った+が) — where が can only be the adversative. A terminal
+  // whose lemma is attested nowhere is no nominalized clause before に/を
+  // either: it is a kana noun cut at a terminal-looking mora (こたつ+に).
   const bool finite_predicate_cell =
       prev.extended_pos == core::ExtendedPOS::AdjBasic || prev.extended_pos == core::ExtendedPOS::AuxTenseTa ||
       prev.extended_pos == core::ExtendedPOS::AuxNegativeNai || prev.extended_pos == core::ExtendedPOS::AuxCopulaDa ||
@@ -74,7 +76,9 @@ void addImpossibleAttachmentRules(const core::LatticeEdge& prev, const core::Lat
       ((prev.extended_pos == core::ExtendedPOS::VerbShuushikei || finite_predicate_cell) &&
        next.extended_pos == core::ExtendedPOS::ParticleCase && grammar::isSingleHiragana(next.surface, U'が')) ||
       (prev.extended_pos == core::ExtendedPOS::VerbShuushikei &&
-       next.extended_pos == core::ExtendedPOS::ParticleConjFinite && !prev.fromDictionary());
+       ((next.extended_pos == core::ExtendedPOS::ParticleConjFinite && !prev.fromDictionary()) ||
+        (next.extended_pos == core::ExtendedPOS::ParticleCase && !prev.lemmaVerified() &&
+         utf8::equalsAny(next.surface, {"に", "を"}))));
   // The assertive copula predicates over a nominal.  A conditional verb form or
   // a potential auxiliary directly before it is therefore an accidental
   // homograph chain.  Restrict this to the two nonterminal readings that can

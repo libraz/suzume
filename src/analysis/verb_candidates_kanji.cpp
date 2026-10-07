@@ -273,10 +273,12 @@ void appendNiSugiPredicateCandidates(const std::vector<char32_t>& codepoints, si
           !isVerifiedFiniteVerb(dict_manager, inflection, inflected)) {
         continue;
       }
-      candidates.push_back(makeVerbCandidate(surface, start_pos, tail_pos, candidate::verb_cost::kStrongBonus,
-                                             inflected.base_form, grammar::verbTypeToConjType(inflected.verb_type),
-                                             true, CandidateOrigin::VerbKanji, inflected.confidence, "finite_ni_sugi",
-                                             core::ExtendedPOS::VerbShuushikei));
+      auto finite =
+          makeVerbCandidate(surface, start_pos, tail_pos, candidate::verb_cost::kStrongBonus, inflected.base_form,
+                            grammar::verbTypeToConjType(inflected.verb_type), true, CandidateOrigin::VerbKanji,
+                            inflected.confidence, "finite_ni_sugi", core::ExtendedPOS::VerbShuushikei);
+      finite.lemma_verified = true;
+      candidates.push_back(std::move(finite));
       return;
     }
   }
