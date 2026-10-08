@@ -423,6 +423,114 @@
       ],
       "id": "ringogasuki",
       "input": "りんごがすき"
+    },
+    {
+      "description": "short kana noun after a determiner, closed by a case particle inside the scanned run",
+      "expected": [
+        {
+          "lemma": "この",
+          "pos": "Determiner",
+          "surface": "この"
+        },
+        {
+          "lemma": "つめ",
+          "pos": "Noun",
+          "surface": "つめ"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        }
+      ],
+      "id": "konotsumegaaru",
+      "input": "このつめがある"
+    },
+    {
+      "description": "このざるがある - auto-generated",
+      "expected": [
+        {
+          "lemma": "この",
+          "pos": "Determiner",
+          "surface": "この"
+        },
+        {
+          "lemma": "ざる",
+          "pos": "Noun",
+          "surface": "ざる"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        }
+      ],
+      "id": "konozarugaaru",
+      "input": "このざるがある"
+    },
+    {
+      "description": "このわなはある - auto-generated",
+      "expected": [
+        {
+          "lemma": "この",
+          "pos": "Determiner",
+          "surface": "この"
+        },
+        {
+          "lemma": "わな",
+          "pos": "Noun",
+          "surface": "わな"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        }
+      ],
+      "id": "konowanahaaru",
+      "input": "このわなはある"
+    },
+    {
+      "description": "このくつはある - auto-generated",
+      "expected": [
+        {
+          "lemma": "この",
+          "pos": "Determiner",
+          "surface": "この"
+        },
+        {
+          "lemma": "くつ",
+          "pos": "Noun",
+          "surface": "くつ"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "ある"
+        }
+      ],
+      "id": "konokutsuhaaru",
+      "input": "このくつはある"
     }
   ],
   "description": "General nouns (part 5/5)",

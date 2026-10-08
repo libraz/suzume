@@ -1174,12 +1174,13 @@ void UnknownWordGenerator::appendBracketedHiraganaNounCandidates(const std::vect
     if (emit_promoted_run(scan) && scan < codepoints.size() && isRightBoundaryParticle(codepoints[scan])) {
       longer_rescue_end = scan;
     }
-    // At the clause start a case particle or the topic は inside the scanned
-    // run may equally close a short noun (そら|は|いつも, ねこ|が), so the run
-    // that stops there is offered beside the maximal one and scoring weighs
-    // them. Word-final は is read as the particle alone; も, か and the other
+    // At the clause start or after a determiner a case particle or the topic は
+    // inside the scanned run may equally close a short noun (そら|は|いつも,
+    // ねこ|が, この+つめ|が), so the run that stops there is offered beside the
+    // maximal one and scoring weighs them. Word-final は is read as the particle alone; も, か and the other
     // focus particles end native nouns as often as not (こども, くも).
-    for (size_t particle_pos = start_pos + 2; bracketed.left_clause_bracket && particle_pos < scan; ++particle_pos) {
+    for (size_t particle_pos = start_pos + 2;
+         (bracketed.left_clause_bracket || bracketed.left_determiner_bracket) && particle_pos < scan; ++particle_pos) {
       if (closesShortNounAt(dict_manager_, codepoints, particle_pos)) {
         emit_promoted_run(particle_pos);
       }
