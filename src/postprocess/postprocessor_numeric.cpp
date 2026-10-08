@@ -40,12 +40,16 @@ bool endsWithDigit(const std::string& surface) {
   if (surface.empty())
     return false;
 
-  size_t pos = 0;
-  char32_t last_ch = 0;
-  while (pos < surface.size()) {
-    last_ch = normalize::decodeUtf8(surface, pos);
+  const auto tail = static_cast<unsigned char>(surface.back());
+  if (tail < 0x80) {
+    return isDigitChar(static_cast<char32_t>(tail));
   }
-  return isDigitChar(last_ch);
+  if (surface.size() < core::kJapaneseCharBytes) {
+    return false;
+  }
+  size_t pos = surface.size() - core::kJapaneseCharBytes;
+  const char32_t last_ch = normalize::decodeUtf8(surface, pos);
+  return pos == surface.size() && isDigitChar(last_ch);
 }
 
 using normalize::isAllKatakana;
