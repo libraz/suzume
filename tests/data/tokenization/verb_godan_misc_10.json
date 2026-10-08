@@ -2871,6 +2871,202 @@
       ],
       "id": "ninareba_kitaramu",
       "input": "春になれば花咲きたらむ"
+    },
+    {
+      "description": "歩いてゆく - regression test",
+      "expected": [
+        {
+          "lemma": "歩く",
+          "pos": "Verb",
+          "surface": "歩い"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "ゆく",
+          "pos": "Auxiliary",
+          "surface": "ゆく"
+        }
+      ],
+      "id": "iteyuku",
+      "input": "歩いてゆく"
+    },
+    {
+      "description": "生きてゆこう - regression test",
+      "expected": [
+        {
+          "lemma": "生きる",
+          "pos": "Verb",
+          "surface": "生き"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "ゆく",
+          "pos": "Auxiliary",
+          "surface": "ゆこ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "kiteyukou",
+      "input": "生きてゆこう"
+    },
+    {
+      "description": "よぎってゆく - regression test",
+      "expected": [
+        {
+          "lemma": "よぎる",
+          "pos": "Verb",
+          "surface": "よぎっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "ゆく",
+          "pos": "Auxiliary",
+          "surface": "ゆく"
+        }
+      ],
+      "id": "yogittteyuku",
+      "input": "よぎってゆく"
+    },
+    {
+      "description": "あるいてゆく - regression test",
+      "expected": [
+        {
+          "lemma": "あるく",
+          "pos": "Verb",
+          "surface": "あるい"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "ゆく",
+          "pos": "Auxiliary",
+          "surface": "ゆく"
+        }
+      ],
+      "id": "aruiteyuku",
+      "input": "あるいてゆく"
+    },
+    {
+      "description": "消えてゆかない - regression test",
+      "expected": [
+        {
+          "lemma": "消える",
+          "pos": "Verb",
+          "surface": "消え"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "ゆく",
+          "pos": "Auxiliary",
+          "surface": "ゆか"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "eteyukanai",
+      "input": "消えてゆかない"
+    },
+    {
+      "description": "生きてゆけない - regression test",
+      "expected": [
+        {
+          "lemma": "生きる",
+          "pos": "Verb",
+          "surface": "生き"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "ゆける",
+          "pos": "Auxiliary",
+          "surface": "ゆけ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "kiteyukenai",
+      "input": "生きてゆけない"
+    },
+    {
+      "description": "生きてゆければ - regression test",
+      "expected": [
+        {
+          "lemma": "生きる",
+          "pos": "Verb",
+          "surface": "生き"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "ゆける",
+          "pos": "Auxiliary",
+          "surface": "ゆけれ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "kiteyukereba",
+      "input": "生きてゆければ"
+    },
+    {
+      "description": "あるいていく - regression test",
+      "expected": [
+        {
+          "lemma": "あるく",
+          "pos": "Verb",
+          "surface": "あるい"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いく",
+          "pos": "Auxiliary",
+          "surface": "いく"
+        }
+      ],
+      "id": "aruiteiku",
+      "input": "あるいていく"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",

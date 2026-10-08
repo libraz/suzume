@@ -116,7 +116,7 @@ void appendContextualIchidanSubsidiaryForms(const std::vector<char32_t>& codepoi
 
 }  // namespace
 
-// The directional subsidiary いく shares its いけ/いけれ spelling with the
+// The directional subsidiary いく/ゆく shares its いけ/いけれ spelling with the
 // independent potential verb いける. After a clear te-form, however, negative
 // conditional, and volitional continuations identify the subsidiary paradigm
 // (読んでいけない, 読んでいければ, 読んでいこう). Keep the short forms
@@ -143,24 +143,28 @@ void appendIkuAuxiliaryCandidates(const std::vector<char32_t>& codepoints, size_
     emit(start_pos + 1, "いく", "hiragana_iku_contracted_irrealis");
     return;
   }
-  if (start_pos + 1 >= codepoints.size() || codepoints[start_pos] != core::hiragana::kI ||
+  // The full-mora cells are shared with the literary ゆく (生きてゆこう, 生きてゆけない).
+  const bool literary = codepoints[start_pos] == U'ゆ';
+  if (start_pos + 1 >= codepoints.size() || (codepoints[start_pos] != core::hiragana::kI && !literary) ||
       (codepoints[start_pos + 1] != U'け' && codepoints[start_pos + 1] != U'こ') ||
       !isClearTeFormBeforeSubsidiary(codepoints, start_pos, false)) {
     return;
   }
+  const std::string_view base_lemma = literary ? "ゆく" : "いく";
+  const std::string_view potential_lemma = literary ? "ゆける" : "いける";
 
   if (start_pos + 3 < codepoints.size() && codepoints[start_pos + 2] == U'れ' && codepoints[start_pos + 3] == U'ば') {
-    emit(start_pos + 3, "いける", "hiragana_iku_auxiliary");
+    emit(start_pos + 3, potential_lemma, "hiragana_iku_auxiliary");
     return;
   }
 
   if (start_pos + 2 < codepoints.size() && codepoints[start_pos + 1] == U'こ' && codepoints[start_pos + 2] == U'う') {
-    emit(start_pos + 2, "いく", "hiragana_iku_auxiliary");
+    emit(start_pos + 2, base_lemma, "hiragana_iku_auxiliary");
     return;
   }
 
   if (vh::naiNegativeFollowsAt(codepoints, start_pos + 2)) {
-    emit(start_pos + 2, "いける", "hiragana_iku_auxiliary");
+    emit(start_pos + 2, potential_lemma, "hiragana_iku_auxiliary");
   }
 }
 

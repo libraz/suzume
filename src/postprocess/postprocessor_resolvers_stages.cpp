@@ -279,9 +279,8 @@ void resolvePredicateFollowerAuxiliaries(std::vector<core::Morpheme>& result) {
     core::ExtendedPOS extended_pos;
   };
   static const TeFormSubsidiary kTeFormSubsidiaries[] = {
-      {"いく", core::ExtendedPOS::AuxAspectIku},
-      {"行く", core::ExtendedPOS::AuxAspectIku},
-      {"いる", core::ExtendedPOS::AuxAspectIru},
+      {"いく", core::ExtendedPOS::AuxAspectIku}, {"行く", core::ExtendedPOS::AuxAspectIku},
+      {"ゆく", core::ExtendedPOS::AuxAspectIku}, {"いる", core::ExtendedPOS::AuxAspectIru},
       {"おく", core::ExtendedPOS::AuxAspectOku},
   };
   for (size_t idx = 1; idx < result.size(); ++idx) {

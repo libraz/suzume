@@ -602,11 +602,11 @@ void addSubsidiaryVerbRules(const core::LatticeEdge& prev, const core::LatticeEd
     SUZUME_CONNECTION_ADD(bonus, cost::kDoubleVeryStrongBonus);
   }
 
-  // The directional subsidiary いく retains a verbal dictionary category, but
-  // after the connective particle it forms the productive aspectual sequence
-  // て+いく rather than an unrelated coordinate predicate.
+  // The directional subsidiary いく/ゆく retains a verbal dictionary category,
+  // but after the connective particle it forms the productive aspectual
+  // sequence て+いく rather than an unrelated coordinate predicate.
   if (prev.extended_pos == core::ExtendedPOS::ParticleConj && next.extended_pos == core::ExtendedPOS::VerbShuushikei &&
-      next.fromDictionary() && next.lemma == "いく") {
+      next.fromDictionary() && utf8::equalsAny(next.lemma, {"いく", "ゆく"})) {
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryStrongBonus);
   }
 }
