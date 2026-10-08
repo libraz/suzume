@@ -3148,6 +3148,33 @@
       ],
       "id": "niikou",
       "input": "一緒にいこう"
+    },
+    {
+      "description": "ゆく年くる年 - regression test",
+      "expected": [
+        {
+          "lemma": "ゆく",
+          "pos": "Verb",
+          "surface": "ゆく"
+        },
+        {
+          "lemma": "年",
+          "pos": "Noun",
+          "surface": "年"
+        },
+        {
+          "lemma": "くる",
+          "pos": "Verb",
+          "surface": "くる"
+        },
+        {
+          "lemma": "年",
+          "pos": "Noun",
+          "surface": "年"
+        }
+      ],
+      "id": "yuku_kuru",
+      "input": "ゆく年くる年"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",

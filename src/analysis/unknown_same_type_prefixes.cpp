@@ -869,6 +869,12 @@ bool overlapsRegisteredWord(const PrefixScanContext& ctx, size_t len, size_t can
        hasAuxiliaryParticleDecomposition(codepoints, start_pos, candidate_end, dict_manager))) {
     return true;
   }
+  // A kana run spelling a registered verb exactly has that entry; an opaque
+  // duplicate only bypasses the connections the verb has to satisfy (ゆく+年).
+  if (start_type == normalize::CharType::Hiragana && pos == core::PartOfSpeech::Other && len > 1 &&
+      dict_manager != nullptr && dict_manager->lookupExact(surface, core::PartOfSpeech::Verb) != nullptr) {
+    return true;
+  }
   // An opaque kana fragment does not open on the ら column inside a kana
   // run: no native word starts there, so the run began inside a word
   // (あつく+るしい); the one-mora fallback still covers the span.
