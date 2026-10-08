@@ -2008,6 +2008,55 @@
       ],
       "id": "nikoboreta",
       "input": "肩にこぼれた"
+    },
+    {
+      "description": "Sentence-initial continuative + hypothetical cell of the excessive subsidiary",
+      "expected": [
+        {
+          "lemma": "通る",
+          "pos": "Verb",
+          "surface": "通り"
+        },
+        {
+          "lemma": "過ぎる",
+          "pos": "Verb",
+          "surface": "過ぎれ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "ri_gireba",
+      "input": "通り過ぎれば"
+    },
+    {
+      "description": "Continuative + hypothetical cell of the excessive subsidiary before a main clause",
+      "expected": [
+        {
+          "lemma": "飲む",
+          "pos": "Verb",
+          "surface": "飲み"
+        },
+        {
+          "lemma": "過ぎる",
+          "pos": "Verb",
+          "surface": "過ぎれ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        },
+        {
+          "lemma": "治る",
+          "pos": "Verb",
+          "surface": "治る"
+        }
+      ],
+      "id": "mi_gireba_ru",
+      "input": "飲み過ぎれば治る"
     }
   ],
   "description": "Compound verbs (part 5/5)",

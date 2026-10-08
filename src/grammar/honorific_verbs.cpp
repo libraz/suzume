@@ -36,6 +36,9 @@ constexpr std::string_view kModalSubsidiaryRenyokei[] = {"かね"};
 // search unit, so it belongs to the lexical V2 lexicon rather than to this class.
 constexpr std::string_view kAspectualSubsidiaryLemmas[] = {"始める", "はじめる", "終わる", "おわる",
                                                            "終える", "おえる",   "過ぎる", "すぎる"};
+// The excessive subsidiary, whose finite and continuative cells the auxiliary
+// dictionary spells while its other cells are generated as ordinary verb cells.
+constexpr std::string_view kExcessiveSubsidiaryLemmas[] = {"過ぎる", "すぎる"};
 // Verbs that exist only as a derivational suffix on a nominal host (形式ばる,
 // 芝居がかる). Their conjugation lives in the dictionary; the host requirement
 // cannot, so callers gate the entry on it.
@@ -84,6 +87,10 @@ bool startsHonorificSubsidiaryVerb(std::string_view surface) {
 
 bool isAspectualSubsidiaryLemma(std::string_view lemma) {
   return equalsAny(lemma, kAspectualSubsidiaryLemmas);
+}
+
+bool isExcessiveSubsidiaryLemma(std::string_view lemma) {
+  return equalsAny(lemma, kExcessiveSubsidiaryLemmas);
 }
 
 bool isPrefixBoundHonorificVerbLemma(std::string_view lemma) {

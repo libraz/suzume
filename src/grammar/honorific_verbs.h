@@ -60,6 +60,13 @@ bool isModalSubsidiaryRenyokei(std::string_view surface);
 bool isAspectualSubsidiaryLemma(std::string_view lemma);
 
 /**
+ * @brief Check whether a lemma is the excessive subsidiary verb (過ぎる・すぎる)
+ * @param lemma Dictionary form of the candidate (UTF-8, kanji or reading)
+ * @return true if the lemma is the excessive subsidiary
+ */
+bool isExcessiveSubsidiaryLemma(std::string_view lemma);
+
+/**
  * @brief Check whether a text begins with an honorific/humble subsidiary verb
  * @param surface Text following a candidate continuative stem (UTF-8)
  * @return true if くださる, いただく, or いたす opens the text

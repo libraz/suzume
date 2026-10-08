@@ -992,8 +992,15 @@ float Scorer::connectionCost(const core::LatticeEdge& prev, const core::LatticeE
 
   // This pair adds to its existing static BigramTable bonus, so it cannot be
   // represented as a replacement table entry without changing the total.
+  // The auxiliary dictionary spells the excessive's lemma and bare stem (過ぎる,
+  // 過ぎ); its other cells (過ぎれ, 過ぎろ) are generated verb cells that keep
+  // their inflection EPOS, so they are recognized by lemma instead.
+  const bool excessive_generated_cell = next.pos == core::PartOfSpeech::Verb &&
+                                        grammar::isExcessiveSubsidiaryLemma(next.lemma) &&
+                                        !utf8::startsWith(next.lemma, next.surface);
   const bool renyokei_before_excessive =
-      prev.extended_pos == core::ExtendedPOS::VerbRenyokei && next.extended_pos == core::ExtendedPOS::AuxExcessive;
+      prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      (next.extended_pos == core::ExtendedPOS::AuxExcessive || excessive_generated_cell);
   const bool na_adjective_before_adverbial_ni = prev.extended_pos == core::ExtendedPOS::AdjNaAdj &&
                                                 next.extended_pos == core::ExtendedPOS::ParticleCase &&
                                                 grammar::isSingleHiragana(next.surface, U'に');
