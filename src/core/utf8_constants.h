@@ -68,10 +68,7 @@ constexpr char32_t kSu = U'す';  // す (0x3059)
 // Negative auxiliary ない and its conjugations (なく、なかっ、なけれ)
 constexpr char32_t kNa = U'な';  // な (0x306A)
 constexpr char32_t kI = U'い';   // い (0x3044)
-constexpr char32_t kKu = U'く';  // く (0x304F) - for なく (adverbial)
 constexpr char32_t kKa = U'か';  // か (0x304B) - for なかっ (ta-connection)
-constexpr char32_t kKe = U'け';  // け (0x3051) - for なけれ (conditional)
-constexpr char32_t kKi = U'き';  // き (0x304D) - for なきゃ (colloquial conditional contraction)
 
 // Passive/potential られる
 constexpr char32_t kRa = U'ら';  // ら (0x3089)
@@ -88,7 +85,6 @@ constexpr char32_t kChi = U'ち';  // ち (0x3061)
 constexpr char32_t kSmallTsu = U'っ';  // っ (0x3063)
 
 // Common particles
-constexpr char32_t kO = U'お';   // お (0x304A) - prefix marker
 constexpr char32_t kHa = U'は';  // は (0x306F) - topic marker
 
 // Volitional auxiliary よう/う
@@ -99,10 +95,6 @@ constexpr char32_t kN = U'ん';   // ん (0x3093)
 // Causative auxiliary させる
 constexpr char32_t kSa = U'さ';  // さ (0x3055)
 constexpr char32_t kSe = U'せ';  // せ (0x305B)
-
-// Classical negative auxiliary ず/ざる/ざれ (attaches to mizenkei)
-constexpr char32_t kZu = U'ず';  // ず (0x305A) - 終止形 / ずに
-constexpr char32_t kZa = U'ざ';  // ざ (0x3056) - ざる (連体) / ざれ (已然)
 
 }  // namespace hiragana
 

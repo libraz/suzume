@@ -377,7 +377,7 @@ std::string fixShiru(std::string_view lemma, std::string_view surface) {
 // Returns the corrected lemma, or empty when the pattern does not apply. The
 // POS (Verb) guard stays at the call site.
 std::string fixSpecialRaRowLemma(std::string_view lemma, const dictionary::DictionaryManager* dict) {
-  if (!utf8::endsWith(lemma, "いる") || lemma.size() < core::kThreeJapaneseCharBytes || dict == nullptr) {
+  if (!utf8::endsWith(lemma, "いる") || lemma.size() < core::kThreeJapaneseCharBytes) {
     return "";
   }
   std::string ru_form = normalize::concat(utf8::dropLast2Chars(lemma), "る");
@@ -495,14 +495,8 @@ std::string fixHatsuonbin(std::string_view stem, const dictionary::DictionaryMan
   if (stem.empty()) {
     return "";
   }
-  if (dict_manager != nullptr) {
-    for (const auto& [verb_type, ending] : grammar::Conjugation::getGodanTypesByOnbin("ん")) {
-      (void)verb_type;
-      std::string base = normalize::concat(stem, ending);
-      if (hasExactVerbEntry(dict_manager, base)) {
-        return base;
-      }
-    }
+  if (std::string base = firstAttestedGodanBase(dict_manager, stem, "ん"); !base.empty()) {
+    return base;
   }
   // Kanji-fallback guard: assume む for kanji stems when no dictionary match is found.
   if (grammar::isAllKanji(stem)) {

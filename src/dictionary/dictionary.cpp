@@ -117,7 +117,7 @@ void DictionaryManager::lookupInto(std::string_view text, size_t start_pos, std:
   appendLookupResults(out, core_dict_->lookup(text, start_pos));
 
   // Lookup in core binary dictionary (Layer 2: core.dic)
-  if (core_binary_dict_ && core_binary_dict_->isLoaded()) {
+  if (hasCoreBinaryDictionary()) {
     appendLookupResults(out, core_binary_dict_->lookup(text, start_pos));
   }
 
@@ -145,7 +145,7 @@ const DictionaryEntry* DictionaryManager::lookupExact(std::string_view surface, 
   if (const auto* entry = core_dict_->lookupExact(surface, pos)) {
     return entry;
   }
-  if (core_binary_dict_ && core_binary_dict_->isLoaded()) {
+  if (hasCoreBinaryDictionary()) {
     if (const auto* entry = core_binary_dict_->lookupExact(surface, pos)) {
       return entry;
     }

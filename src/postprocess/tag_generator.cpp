@@ -34,18 +34,9 @@ bool TagGenerator::shouldInclude(const core::Morpheme& morpheme) const {
     return false;
   }
 
-  // Exclude conjunctions (typically not useful as tags)
-  if (morpheme.pos == core::PartOfSpeech::Conjunction) {
-    return false;
-  }
-
-  // Exclude symbols
-  if (morpheme.pos == core::PartOfSpeech::Symbol) {
-    return false;
-  }
-
-  // POS filter (whitelist). Zero means every filterable content-word category,
-  // plus particles/auxiliaries only when their explicit include flags allow it.
+  // POS filter (whitelist); categories without a bit (conjunctions, symbols, ...) are excluded.
+  // Zero means every filterable content-word category, plus particles/auxiliaries only when their explicit include
+  // flags allow it.
   uint8_t pos_bit = 0;
   switch (morpheme.pos) {
     case core::PartOfSpeech::Noun:

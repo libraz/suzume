@@ -305,9 +305,7 @@ void resolveListingTari(std::vector<core::Morpheme>& result) {
     if (!utf8::equalsAny(tari.surface, {"たり", "だり"})) {
       continue;
     }
-    const bool onbin_host =
-        idx > 0 && (utf8::endsWith(result[idx - 1].surface, "っ") || utf8::endsWith(result[idx - 1].surface, "ん") ||
-                    utf8::endsWith(result[idx - 1].surface, "い"));
+    const bool onbin_host = idx > 0 && grammar::endsWithOnbin(result[idx - 1].surface);
     if ((onbin_host || listing_opened) && tari.pos != core::PartOfSpeech::Particle) {
       retagUninflected(tari, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleConj, tari.surface);
     }
@@ -539,8 +537,7 @@ void resolveVerbFrameRepairs(std::vector<core::Morpheme>& result) {
     const size_t length = normalize::utf8Length(token.surface);
     if (token.pos == core::PartOfSpeech::Adverb && utf8::endsWith(token.surface, "ず") && following != nullptr &&
         utf8::equalsAny(following->surface, {"に"}) && length >= 2) {
-      const std::string stem(utf8::dropLastChar(token.surface));
-      const std::string base = godanBaseFromIrrealis(stem);
+      const std::string base = godanBaseFromIrrealis(utf8::dropLastChar(token.surface));
       if (!base.empty()) {
         core::Morpheme negative = splitTail(token, length - 1);
         retag(token, core::PartOfSpeech::Verb, core::ExtendedPOS::VerbMizenkei, base, dictionary::ConjugationType::None,
@@ -548,7 +545,7 @@ void resolveVerbFrameRepairs(std::vector<core::Morpheme>& result) {
         retagUninflected(negative, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxNegativeNu, "ぬ");
         insertAfter(result, idx, negative);
       }
-    } else if (token.pos == core::PartOfSpeech::Verb && length >= 3 &&
+    } else if (token.pos == core::PartOfSpeech::Verb &&
                (utf8::startsWith(token.surface, "しそこな") || utf8::startsWith(token.surface, "しそこね") ||
                 utf8::startsWith(token.surface, "しそびれ"))) {
       const std::string lemma = token.lemma;

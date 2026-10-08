@@ -601,8 +601,7 @@ void appendAuxiliaryBase(const AuxiliaryBase& base, std::vector<AuxiliaryEntry>&
         appendSuffixedForms(base, {}, kMasu, std::size(kMasu), result);
         return;
       }
-      appendNoConjForm(base, result);
-      return;
+      [[fallthrough]];
     default:
       appendNoConjForm(base, result);
       return;

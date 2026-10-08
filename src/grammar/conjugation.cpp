@@ -131,11 +131,8 @@ KuruStemForms getKuruStemForms(const std::string& base_form) {
   // follow from dropping る. Only the membership of the set is lexical: the
   // old spelling 來る is the same verb, and the reference analyzer keeps it
   // under its own lemma rather than folding it onto the modern one.
-  for (const std::string_view kanji_base : kKuruKanjiBaseForms) {
-    if (base_form != kanji_base) {
-      continue;
-    }
-    const std::string stem(normalize::utf8Substr(base_form, 0, normalize::utf8Length(base_form) - 1));
+  if (isKuruKanjiBaseForm(base_form)) {
+    const std::string stem(utf8::dropLastChar(base_form));
     return {base_form,
             stem,
             stem,
@@ -249,31 +246,13 @@ bool isGodanVerbType(VerbType type) {
 }
 
 std::string Conjugation::getStem(const std::string& base_form, VerbType type) {
-  if (base_form.empty()) {
-    return "";
-  }
-
-  size_t len = base_form.size();
-  if (len < core::kJapaneseCharBytes) {
+  if (base_form.size() < core::kJapaneseCharBytes) {
     return base_form;
   }
 
   // Suru is the only type whose stem is not "base minus its final kana":
   // Xする drops する (two chars) and bare する has an empty stem.
-  if (type == VerbType::Suru) {
-    if (base_form == "する") {
-      return "";
-    }
-    // Xする → X (remove する = 6 bytes)
-    if (len >= core::kTwoJapaneseCharBytes) {
-      return base_form.substr(0, len - core::kTwoJapaneseCharBytes);
-    }
-    return "";
-  }
-
-  // Every other type (Ichidan, all Godan rows, IAdjective, Kuru) drops its
-  // final kana (3 bytes in UTF-8).
-  return base_form.substr(0, len - core::kJapaneseCharBytes);
+  return std::string(type == VerbType::Suru ? utf8::dropLast2Chars(base_form) : utf8::dropLastChar(base_form));
 }
 
 VerbType Conjugation::detectType(const std::string& base_form) {
@@ -284,9 +263,6 @@ VerbType Conjugation::detectType(const std::string& base_form) {
   const std::string_view last = utf8::lastChar(base_form);
 
   // Special verbs
-  if (base_form == "する") {
-    return VerbType::Suru;
-  }
   if (utf8::equalsAny(base_form, {"来る", "くる"})) {
     return VerbType::Kuru;
   }
@@ -345,7 +321,7 @@ std::vector<Conjugation::DictionarySuffix> Conjugation::getDictionarySuffixes(Ve
     // 音便形 (サ行以外) - standalone stem before a tense/conjunctive auxiliary
     // E.g., 書いた → 書い + た, 飲んだ → 飲ん + だ
     // The onbin form needs to be a separate candidate to enable the split
-    const std::string lexical_stem = base_form.empty() ? "" : getStem(std::string(base_form), type);
+    const std::string lexical_stem = getStem(std::string(base_form), type);
     const std::string onbin = godanOnbinForm(type, lexical_stem);
     if (!onbin.empty()) {
       suffixes.push_back({onbin, false, core::ExtendedPOS::VerbOnbinkei});  // Onbin: 書い, 飲ん, 行っ, etc.

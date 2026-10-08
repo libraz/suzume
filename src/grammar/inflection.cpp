@@ -150,13 +150,8 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(std::string_view rema
       const Conjugation::GodanRow* row = Conjugation::getGodanRow(ending.verb_type);
       if (row != nullptr) {
         const std::string& first_aux = aux_chain.back();  // First matched aux
-        bool is_voiced_aux = isVoicedAux(first_aux);
-        bool is_unvoiced_aux = isUnvoicedAux(first_aux);
-        if (row->voiced_ta && is_unvoiced_aux) {
-          continue;  // Voiced onbin verb requires voiced aux (で/だ), skip unvoiced
-        }
-        if (!row->voiced_ta && is_voiced_aux) {
-          continue;  // Unvoiced onbin verb requires unvoiced aux (て/た), skip voiced
+        if (row->voiced_ta ? isUnvoicedAux(first_aux) : isVoicedAux(first_aux)) {
+          continue;
         }
       }
     }
@@ -166,11 +161,8 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(std::string_view rema
     // で/だ te-form only occurs with Godan verbs after onbin (読んで, 泳いだ)
     // Pattern: 付けで → should be 付け(NOUN)+で(PARTICLE), not 付ける+で
     // Pattern: 食べだ is INVALID, 食べた is correct
-    if (ending.verb_type == VerbType::Ichidan && !aux_chain.empty()) {
-      const std::string& first_aux = aux_chain.back();  // First matched aux
-      if (isVoicedAux(first_aux)) {
-        continue;  // Ichidan requires unvoiced aux (て/た), skip voiced で/だ
-      }
+    if (ending.verb_type == VerbType::Ichidan && !aux_chain.empty() && isVoicedAux(aux_chain.back())) {
+      continue;  // Ichidan requires unvoiced aux (て/た), skip voiced で/だ
     }
 
     // Validate Ichidan: reject stems that would create irregular verb base forms
@@ -264,14 +256,6 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(std::string_view rema
     candidate.verb_type = actual_verb_type;  // Use remapped type for 来→Kuru
     candidate.confidence = calculateConfidence(actual_verb_type, stem, aux_total_len, aux_chain.size(), required_conn,
                                                suffix_str.size(), first_aux, &scorer_options_);
-
-    // Ichidan verbs use て/た for te/ta-form, NOT で/だ
-    // で/だ are only used for 撥音便 Godan verbs (読む→読んで/読んだ, 遊ぶ→遊んで/遊んだ)
-    // Penalize Ichidan + で/だ combinations heavily
-    if (actual_verb_type == VerbType::Ichidan && isVoicedAux(suffix_str)) {
-      candidate.confidence -= 0.6F;  // Strong penalty
-      SUZUME_DEBUG_LOG_VERBOSE("  ichidan_voiced_te_ta_invalid: -0.6\n");
-    }
 
     // Contracted progressive past: 見てた, 食べてた should split as 見+て+た, 食べ+て+た
     // MeCab splits these, so penalize single-token analysis with suffix starting with てた/でた

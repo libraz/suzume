@@ -130,7 +130,7 @@ bool PreTokenizer::tryMatchDate(std::string_view text, size_t pos, PreToken& tok
   }
 
   // A bare year leaves an odd kanji run to the analyzer (3年生, 3年計画書).
-  if (idx > pos && !(idx == year_end && leavesOddKanjiRun(text, idx))) {
+  if (!(idx == year_end && leavesOddKanjiRun(text, idx))) {
     setTokenFromRange(token, text, pos, idx, PreTokenType::Date, core::PartOfSpeech::Noun);
     return true;
   }
@@ -385,16 +385,12 @@ bool PreTokenizer::tryMatchTime(std::string_view text, size_t pos, PreToken& tok
   // 24時間営業 stays 24時間|営業 while 5時間隔 splits as 5時|間隔.
   consumePeriodKan(text, idx);
 
-  if (idx > pos) {
-    // An hour or duration leaves an odd kanji run to the analyzer (3時限, 2時間弱).
-    if (hasIntervalSuffix(text, idx) || leavesOddKanjiRun(text, idx)) {
-      return false;
-    }
-    setTokenFromRange(token, text, pos, idx, PreTokenType::Time, core::PartOfSpeech::Noun);
-    return true;
+  // An hour or duration leaves an odd kanji run to the analyzer (3時限, 2時間弱).
+  if (hasIntervalSuffix(text, idx) || leavesOddKanjiRun(text, idx)) {
+    return false;
   }
-
-  return false;
+  setTokenFromRange(token, text, pos, idx, PreTokenType::Time, core::PartOfSpeech::Noun);
+  return true;
 }
 
 }  // namespace suzume::pretokenizer

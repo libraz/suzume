@@ -29,33 +29,6 @@ constexpr uint16_t kPackedLemmaMask = 0x07FFU;
 constexpr int64_t kMinPackedLemmaDelta = -1024;
 constexpr int64_t kMaxPackedLemmaDelta = 1023;
 
-uint8_t posToUint8(core::PartOfSpeech pos) {
-  return static_cast<uint8_t>(pos);
-}
-
-core::PartOfSpeech uint8ToPos(uint8_t val) {
-  return static_cast<core::PartOfSpeech>(val);
-}
-
-bool isValidPos(uint8_t val) {
-  return core::isValidPartOfSpeech(static_cast<core::PartOfSpeech>(val));
-}
-
-uint8_t extendedPosToUint8(core::ExtendedPOS epos) {
-  return static_cast<uint8_t>(epos);
-}
-
-core::ExtendedPOS uint8ToExtendedPos(uint8_t val) {
-  if (val >= static_cast<uint8_t>(core::ExtendedPOS::Count_)) {
-    return core::ExtendedPOS::Unknown;
-  }
-  return static_cast<core::ExtendedPOS>(val);
-}
-
-bool isValidExtendedPos(uint8_t val) {
-  return core::isValidExtendedPos(static_cast<core::ExtendedPOS>(val));
-}
-
 bool encodeRelativeLemmaReference(size_t entry_index, size_t lemma_index, uint16_t& reference) {
   const int64_t delta = static_cast<int64_t>(lemma_index) - static_cast<int64_t>(entry_index);
   if (delta < kMinPackedLemmaDelta || delta > kMaxPackedLemmaDelta) {
@@ -305,7 +278,8 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData(const uint8_t* d
   for (size_t idx = 0; idx < palette_count; ++idx) {
     const size_t pair_offset = entry_table_offset + idx * sizeof(GrammarPair);
     GrammarPair pair{data[pair_offset], data[pair_offset + 1]};
-    if (!isValidPos(pair.pos) || !isValidExtendedPos(pair.extended_pos)) {
+    if (!core::isValidPartOfSpeech(static_cast<core::PartOfSpeech>(pair.pos)) ||
+        !core::isValidExtendedPos(static_cast<core::ExtendedPOS>(pair.extended_pos))) {
       return invalid("Invalid dictionary grammar palette value");
     }
     grammar_palette.push_back(pair);
@@ -421,7 +395,7 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData(const uint8_t* d
     const uint8_t extended_pos = grammar_palette[grammar_idx].extended_pos;
 
     DictionaryEntry entry;
-    entry.pos = uint8ToPos(pos);
+    entry.pos = static_cast<core::PartOfSpeech>(pos);
 
     if (uses_relative_lemmas) {
       const int64_t lemma_target = static_cast<int64_t>(idx) + decodeRelativeLemmaReference(lemma_reference);
@@ -438,7 +412,7 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData(const uint8_t* d
       entry.lemma = trie_surfaces[idx];
     }
 
-    entry.extended_pos = uint8ToExtendedPos(extended_pos);
+    entry.extended_pos = static_cast<core::ExtendedPOS>(extended_pos);
 
     entries.push_back(std::move(entry));
   }
@@ -521,7 +495,7 @@ core::Expected<std::vector<uint8_t>, core::Error> BinaryDictWriter::build() {
       return invalid("Dictionary lemma exceeds 255 bytes: " + ent.lemma);
     }
 
-    if (!isValidPos(posToUint8(ent.pos))) {
+    if (!core::isValidPartOfSpeech(ent.pos)) {
       return invalid("Dictionary entry has invalid POS");
     }
 
@@ -529,7 +503,7 @@ core::Expected<std::vector<uint8_t>, core::Error> BinaryDictWriter::build() {
     if (extended_pos_value == core::ExtendedPOS::Unknown && ent.pos != core::PartOfSpeech::Unknown) {
       extended_pos_value = core::posToExtendedPos(ent.pos);
     }
-    if (!isValidExtendedPos(extendedPosToUint8(extended_pos_value))) {
+    if (!core::isValidExtendedPos(extended_pos_value)) {
       return invalid("Dictionary entry has invalid extended POS");
     }
 
@@ -548,8 +522,8 @@ core::Expected<std::vector<uint8_t>, core::Error> BinaryDictWriter::build() {
       }
     }
 
-    const uint8_t pos = posToUint8(ent.pos);
-    const uint8_t extended_pos = extendedPosToUint8(extended_pos_value);
+    const auto pos = static_cast<uint8_t>(ent.pos);
+    const auto extended_pos = static_cast<uint8_t>(extended_pos_value);
     const uint16_t grammar_key = static_cast<uint16_t>(pos) << 8U | extended_pos;
     uint8_t grammar_index = 0;
     auto grammar_iter = grammar_indices.find(grammar_key);

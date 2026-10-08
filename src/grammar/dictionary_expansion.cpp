@@ -352,8 +352,6 @@ DictionaryExpansionResult expandDictionarySourceEntries(const std::vector<dictio
           ++result.duplicates_skipped;
           continue;
         }
-        seen_surfaces.emplace(entry.surface,
-                              SeenSurface{result.entries.size(), entry.lemma.size(), entry.pos, is_explicit_surface});
       }
       result.entries.push_back(std::move(entry));
       seen_surfaces.try_emplace(result.entries.back().surface,
