@@ -193,11 +193,11 @@ bool hasAttributiveNominalSelector(const std::vector<char32_t>& codepoints,
   constexpr size_t kClosedClassProbeChars = 3;
   const auto head_matches = lookupResultsInRange(*dict_manager, codepoints, start_pos,
                                                  std::min(codepoints.size(), start_pos + kClosedClassProbeChars));
-  const bool startsClosedClassWord = std::any_of(head_matches.begin(), head_matches.end(), [](const auto& match) {
-    return match.entry != nullptr && match.length >= 2 &&
-           (match.entry->pos == core::PartOfSpeech::Particle || match.entry->pos == core::PartOfSpeech::Auxiliary ||
-            match.entry->pos == core::PartOfSpeech::Suffix);
-  });
+  const bool startsClosedClassWord = lookupResultsHaveLongerPartOfSpeech(
+      head_matches,
+      partOfSpeechMask(core::PartOfSpeech::Particle) | partOfSpeechMask(core::PartOfSpeech::Auxiliary) |
+          partOfSpeechMask(core::PartOfSpeech::Suffix),
+      1);
   for (size_t selector_start = first_selector; selector_start < start_pos; ++selector_start) {
     // A na-adjective selects a nominal head through its explicit attributive
     // copula (AdjNa+な+X).  The existing adjective probe only recognizes a

@@ -335,13 +335,10 @@ void adj_detail::appendHostFusedSuffixAdjective(const std::vector<char32_t>& cod
        pos < codepoints.size() && pos - start_pos <= kMaxHostLength && normalize::isKanjiCodepoint(codepoints[pos - 1]);
        ++pos) {
     const std::string host = extractSubstring(codepoints, start_pos, pos);
-    bool listed_non_noun = false;
-    if (dict_manager != nullptr) {
-      for (const auto& match : dict_manager->lookup(host, 0)) {
-        listed_non_noun = listed_non_noun || (match.entry != nullptr && match.length == pos - start_pos &&
-                                              match.entry->pos != core::PartOfSpeech::Noun);
-      }
-    }
+    const bool listed_non_noun =
+        dict_manager != nullptr &&
+        lookupResultsHavePartOfSpeech(dict_manager->lookup(host, 0), ~partOfSpeechMask(core::PartOfSpeech::Noun),
+                                      pos - start_pos);
     if (!listed_non_noun) {
       host_ends.push_back(pos);
     }

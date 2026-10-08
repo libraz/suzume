@@ -493,11 +493,9 @@ PromotedRun classifyRightBrackets(const BracketedNounContext& ctx, const Bracket
                             promoted.right_genitive_after_substantive_run;
   if (dict_manager != nullptr && scan < codepoints.size() && codepoints[scan] == U'っ') {
     const size_t particle_end = std::min(codepoints.size(), scan + static_cast<size_t>(4));
-    for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, scan, particle_end)) {
-      if (match.entry != nullptr && match.entry->extended_pos == core::ExtendedPOS::ParticleFinal) {
-        promoted.right_sokuon_final_particle = true;
-        break;
-      }
+    if (lookupResultsHaveExtendedPOS(lookupResultsInRange(*dict_manager, codepoints, scan, particle_end),
+                                     core::ExtendedPOS::ParticleFinal)) {
+      promoted.right_sokuon_final_particle = true;
     }
   }
   // An emoji closes the clause the way punctuation does (いたずら😂).

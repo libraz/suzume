@@ -167,12 +167,8 @@ bool appendProductiveSuffixVerbCells(const std::vector<char32_t>& codepoints, si
 }  // namespace
 
 bool spellsGodanMaSuffixVerbCell(std::string_view okurigana) {
-  for (size_t index = 0; index < kBamu.form_count; ++index) {
-    if (okurigana == kBamu.forms[index].inflection) {
-      return true;
-    }
-  }
-  return false;
+  return std::any_of(kGodanMaBamuForms.begin(), kGodanMaBamuForms.end(),
+                     [okurigana](const SuffixVerbForm& form) { return okurigana == form.inflection; });
 }
 
 // =============================================================================
@@ -318,13 +314,10 @@ void generateProductiveSuffixCandidates(const std::vector<char32_t>& codepoints,
     // Pattern 2: V連用形 + っぽい (resemblance suffix)
     // Examples: 子供っぽい、安っぽい、忘れっぽい
     if (surface.size() >= kPpoiLen + 3 && utf8::endsWith(surface, "っぽい")) {
-      std::string_view stem = std::string_view(surface).substr(0, surface.size() - kPpoiLen);
-      // っぽい attaches to nouns and verb stems, less strict check
-      if (stem.size() >= 3) {  // At least 1 character stem
-        candidates.push_back(makeSuffixCandidate(surface, start_pos, candidate_end, core::PartOfSpeech::Adjective, 0.4F,
-                                                 surface, 0.85F, "stem_ppoi", dictionary::ConjugationType::IAdjective));
-        return;  // Found valid っぽい candidate
-      }
+      // っぽい attaches to nouns and verb stems; the length guard leaves at least a 1-character stem
+      candidates.push_back(makeSuffixCandidate(surface, start_pos, candidate_end, core::PartOfSpeech::Adjective, 0.4F,
+                                               surface, 0.85F, "stem_ppoi", dictionary::ConjugationType::IAdjective));
+      return;  // Found valid っぽい candidate
     }
 
     // Pattern 3: Short hiragana nickname + ちゃん/くん, plus an honorific
@@ -334,60 +327,56 @@ void generateProductiveSuffixCandidates(const std::vector<char32_t>& codepoints,
     // boundary and short ordinary hiragana words must not be reclassified as
     // nicknames merely because they precede it. Lexicalized family terms are
     // supplied by the dictionary.
-    if (surface.size() >= 9) {  // at least 1-char stem (3 bytes) + 2+ char honorific
-      for (const std::string_view honorific : {"ちゃん", "くん", "さん"}) {
-        if (!utf8::endsWith(surface, honorific)) {
-          continue;
-        }
-        std::string_view stem = std::string_view(surface).substr(0, surface.size() - honorific.size());
-        size_t stem_chars = stem.size() / 3;  // Each hiragana = 3 bytes in UTF-8
-        if (stem_chars >= 2 && stem_chars <= 3) {
-          // Only an honorific-style stem can lexicalize with さん. Ordinary
-          // さん terms remain dictionary-backed or split above.
-          bool starts_with_honorific_prefix =
-              stem.size() >= 3 && (stem.compare(0, 3, "お") == 0 || stem.compare(0, 3, "ご") == 0);
-          if (honorific == "さん" && !starts_with_honorific_prefix) {
-            break;
-          }
-          // A listed verb closing on the く makes the run that verb plus the
-          // nominalizer ん (とどくんです, は|たらくん of はたらくんだ), not a
-          // nickname, whether the verb opens at the stem or earlier in the run.
-          if (honorific == "くん" &&
-              closesListedVerbBeforeN(dict_manager, codepoints, char_types, start_pos, candidate_end - 1)) {
-            break;
-          }
-          // A stem right after a kanji is that kanji's okurigana (歩+いて+くん
-          // is 歩い+て+くん), never the opening of a nickname.
-          if (start_pos > 0 && char_types[start_pos - 1] == normalize::CharType::Kanji) {
-            break;
-          }
-          // Before the negative ない/なかっ, くん is the contracted くれ of a
-          // benefactive (見てて+くん+ない), not an honorific.
-          const bool before_negative =
-              candidate_end + 1 < codepoints.size() && codepoints[candidate_end] == U'な' &&
-              (codepoints[candidate_end + 1] == U'い' || codepoints[candidate_end + 1] == U'か');
-          if (honorific == "くん" && before_negative) {
-            break;
-          }
-          // A pronoun, determiner, adverb or conjunction stands on its own and
-          // never opens a nickname stem (みんな+ちゃんと, これ+は+くんれん).
-          if (opensWithListedClosedClassWord(dict_manager, codepoints, start_pos, start_pos + stem_chars)) {
-            break;
-          }
-          // One unit, priced to beat both a listed stem + suffix split, which
-          // also collects the SUFFIX→particle bonus (もも+ちゃん+が), and a guessed
-          // godan-ka verb + nominalizer ん, whose く+ん spells くん. A prefixed
-          // family term outranks the nickname nested inside it (お+ばあちゃん).
-          float cost = bigram_cost::kVeryStrongBonus + bigram_cost::kModerateBonus;
-          if (starts_with_honorific_prefix) {
-            cost += bigram_cost::kStrongBonus;
-          }
-          candidates.push_back(makeSuffixCandidate(surface, start_pos, candidate_end, core::PartOfSpeech::Noun, cost,
-                                                   surface, 0.9F, "hira_nickname"));
-          return;
-        }
-        break;
+    for (const std::string_view honorific : {"ちゃん", "くん", "さん"}) {
+      if (!utf8::endsWith(surface, honorific)) {
+        continue;
       }
+      std::string_view stem = std::string_view(surface).substr(0, surface.size() - honorific.size());
+      size_t stem_chars = stem.size() / 3;  // Each hiragana = 3 bytes in UTF-8
+      if (stem_chars >= 2 && stem_chars <= 3) {
+        // Only an honorific-style stem can lexicalize with さん. Ordinary
+        // さん terms remain dictionary-backed or split above.
+        bool starts_with_honorific_prefix = stem.compare(0, 3, "お") == 0 || stem.compare(0, 3, "ご") == 0;
+        if (honorific == "さん" && !starts_with_honorific_prefix) {
+          break;
+        }
+        // A listed verb closing on the く makes the run that verb plus the
+        // nominalizer ん (とどくんです, は|たらくん of はたらくんだ), not a
+        // nickname, whether the verb opens at the stem or earlier in the run.
+        if (honorific == "くん" &&
+            closesListedVerbBeforeN(dict_manager, codepoints, char_types, start_pos, candidate_end - 1)) {
+          break;
+        }
+        // A stem right after a kanji is that kanji's okurigana (歩+いて+くん
+        // is 歩い+て+くん), never the opening of a nickname.
+        if (start_pos > 0 && char_types[start_pos - 1] == normalize::CharType::Kanji) {
+          break;
+        }
+        // Before the negative ない/なかっ, くん is the contracted くれ of a
+        // benefactive (見てて+くん+ない), not an honorific.
+        const bool before_negative = candidate_end + 1 < codepoints.size() && codepoints[candidate_end] == U'な' &&
+                                     (codepoints[candidate_end + 1] == U'い' || codepoints[candidate_end + 1] == U'か');
+        if (honorific == "くん" && before_negative) {
+          break;
+        }
+        // A pronoun, determiner, adverb or conjunction stands on its own and
+        // never opens a nickname stem (みんな+ちゃんと, これ+は+くんれん).
+        if (opensWithListedClosedClassWord(dict_manager, codepoints, start_pos, start_pos + stem_chars)) {
+          break;
+        }
+        // One unit, priced to beat both a listed stem + suffix split, which
+        // also collects the SUFFIX→particle bonus (もも+ちゃん+が), and a guessed
+        // godan-ka verb + nominalizer ん, whose く+ん spells くん. A prefixed
+        // family term outranks the nickname nested inside it (お+ばあちゃん).
+        float cost = bigram_cost::kVeryStrongBonus + bigram_cost::kModerateBonus;
+        if (starts_with_honorific_prefix) {
+          cost += bigram_cost::kStrongBonus;
+        }
+        candidates.push_back(makeSuffixCandidate(surface, start_pos, candidate_end, core::PartOfSpeech::Noun, cost,
+                                                 surface, 0.9F, "hira_nickname"));
+        return;
+      }
+      break;
     }
   }
 }

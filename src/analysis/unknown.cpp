@@ -265,9 +265,7 @@ bool startsWithParticleBeforeRegisteredPredicate(const UnknownCandidate& candida
   // the start of an ordinary native word as a boundary.
   for (size_t split = candidate.start + 2; split < candidate.end; ++split) {
     const std::string content = extractSubstring(codepoints, candidate.start + 1, split);
-    constexpr PartOfSpeechMask kContentMask = partOfSpeechMask(core::PartOfSpeech::Noun) |
-                                              partOfSpeechMask(core::PartOfSpeech::Pronoun) |
-                                              partOfSpeechMask(core::PartOfSpeech::Adverb);
+    constexpr PartOfSpeechMask kContentMask = kNounPronounMask | partOfSpeechMask(core::PartOfSpeech::Adverb);
     const bool content_verified = hasExactPartOfSpeech(*dict_manager, content, kContentMask);
     if (!content_verified) {
       continue;

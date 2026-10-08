@@ -228,10 +228,6 @@ void appendVowelFusedAdjectiveCandidates(const std::vector<char32_t>& codepoints
   }
 }
 
-}  // namespace
-
-namespace {
-
 // The maximal hiragana run an adjective scan reads, with the inputs every
 // phase of the scan shares.
 struct HiraganaAdjectiveRun {
@@ -263,59 +259,60 @@ void appendStemBeforeExcessiveOrAppearance(const HiraganaAdjectiveRun& run, std:
   // the kanji-adjective boundary.
   const bool follows_kanji_continuative =
       start_pos > 0 && normalize::isKanjiCodepoint(codepoints[start_pos - 1]) && first_char == U'く';
+  if (follows_kanji_continuative) {
+    return;
+  }
   // すぎ opens every cell of the auxiliary (すぎて, すぎない), so it is found
   // anywhere in the run, and the appearance そう takes the same bare stem of a
   // derived adjective (けちくさ+そう).  A stem opening on a particle mora (や, し)
   // is left to the inflection check of stem+い rather than rejected outright.
-  if (!follows_kanji_continuative) {
-    for (size_t stem_end = start_pos + 2; stem_end + 1 < run.max_hiragana_end; ++stem_end) {
-      const bool excessive_follows = codepoints[stem_end] == U'す' && codepoints[stem_end + 1] == U'ぎ';
-      const bool appearance_follows = codepoints[stem_end] == U'そ' && codepoints[stem_end + 1] == U'う';
-      if (!excessive_follows && !appearance_follows) {
-        continue;
-      }
-      // A ない-adjective inserts さ before the appearance そう (つまらな+さ+そう),
-      // so the stem ends one mora earlier than the run before そう.
-      const bool inserted_sa = appearance_follows && stem_end >= start_pos + 3 && codepoints[stem_end - 1] == U'さ' &&
-                               codepoints[stem_end - 2] == U'な';
-      const size_t own_stem_end = inserted_sa ? stem_end - 1 : stem_end;
-      const std::string stem = extractSubstring(codepoints, start_pos, own_stem_end);
-      // A verb continuative takes すぎる too (なり+すぎ); it is not a stem.
-      if (utf8::contains(stem, "て") || utf8::contains(stem, "で") ||
-          (dict_manager != nullptr && dict_manager->lookupExact(stem, core::PartOfSpeech::Verb) != nullptr)) {
-        continue;
-      }
-      const std::string base_form = stem + "い";
-      // そう also follows verb continuatives and phrases (ふり+そう, それは+そう),
-      // so before it the stem has to carry its own derivation (けちくさ+そう)
-      // or be a registered adjective (うざ+そう).
-      const bool registered_adjective =
-          dict_manager != nullptr && dict_manager->lookupExact(base_form, core::PartOfSpeech::Adjective) != nullptr;
-      if (inserted_sa && !registered_adjective) {
-        continue;
-      }
-      // A word registered over the whole run owns it: かわいそう is the
-      // adjective 可哀想, not かわいい plus the appearance そう.
-      if (appearance_follows && dict_manager != nullptr &&
-          lookupEntryInRange(*dict_manager, codepoints, start_pos, stem_end + 2) != nullptr) {
-        continue;
-      }
-      if (!excessive_follows && !registered_adjective &&
-          !adj_detail::derivesFromCompoundFormingAdjective(codepoints, start_pos, base_form, dict_manager)) {
-        continue;
-      }
-      const float confidence = adj_detail::firstConfidenceAtLeast(
-          run.inflection.analyze(base_form), grammar::VerbType::IAdjective, candidate::kCompoundAdjConfMin);
-      if (confidence == candidate::kNoOriginConfidence) {
-        continue;
-      }
-      const float cost =
-          candidate::confidenceScaledCost(candidate::kAdjStemExtCost, confidence, candidate::kAdjStemConfScale);
-      candidates.push_back(makeIAdjStemCandidate(stem, start_pos, own_stem_end, base_form, cost,
-                                                 CandidateOrigin::AdjectiveIHiragana, confidence,
-                                                 "adj_stem_hira_excessive"));
-      break;
+  for (size_t stem_end = start_pos + 2; stem_end + 1 < run.max_hiragana_end; ++stem_end) {
+    const bool excessive_follows = codepoints[stem_end] == U'す' && codepoints[stem_end + 1] == U'ぎ';
+    const bool appearance_follows = codepoints[stem_end] == U'そ' && codepoints[stem_end + 1] == U'う';
+    if (!excessive_follows && !appearance_follows) {
+      continue;
     }
+    // A ない-adjective inserts さ before the appearance そう (つまらな+さ+そう),
+    // so the stem ends one mora earlier than the run before そう.
+    const bool inserted_sa = appearance_follows && stem_end >= start_pos + 3 && codepoints[stem_end - 1] == U'さ' &&
+                             codepoints[stem_end - 2] == U'な';
+    const size_t own_stem_end = inserted_sa ? stem_end - 1 : stem_end;
+    const std::string stem = extractSubstring(codepoints, start_pos, own_stem_end);
+    // A verb continuative takes すぎる too (なり+すぎ); it is not a stem.
+    if (utf8::contains(stem, "て") || utf8::contains(stem, "で") ||
+        (dict_manager != nullptr && dict_manager->lookupExact(stem, core::PartOfSpeech::Verb) != nullptr)) {
+      continue;
+    }
+    const std::string base_form = stem + "い";
+    // そう also follows verb continuatives and phrases (ふり+そう, それは+そう),
+    // so before it the stem has to carry its own derivation (けちくさ+そう)
+    // or be a registered adjective (うざ+そう).
+    const bool registered_adjective =
+        dict_manager != nullptr && dict_manager->lookupExact(base_form, core::PartOfSpeech::Adjective) != nullptr;
+    if (inserted_sa && !registered_adjective) {
+      continue;
+    }
+    // A word registered over the whole run owns it: かわいそう is the
+    // adjective 可哀想, not かわいい plus the appearance そう.
+    if (appearance_follows && dict_manager != nullptr &&
+        lookupEntryInRange(*dict_manager, codepoints, start_pos, stem_end + 2) != nullptr) {
+      continue;
+    }
+    if (!excessive_follows && !registered_adjective &&
+        !adj_detail::derivesFromCompoundFormingAdjective(codepoints, start_pos, base_form, dict_manager)) {
+      continue;
+    }
+    const float confidence = adj_detail::firstConfidenceAtLeast(
+        run.inflection.analyze(base_form), grammar::VerbType::IAdjective, candidate::kCompoundAdjConfMin);
+    if (confidence == candidate::kNoOriginConfidence) {
+      continue;
+    }
+    const float cost =
+        candidate::confidenceScaledCost(candidate::kAdjStemExtCost, confidence, candidate::kAdjStemConfScale);
+    candidates.push_back(makeIAdjStemCandidate(stem, start_pos, own_stem_end, base_form, cost,
+                                               CandidateOrigin::AdjectiveIHiragana, confidence,
+                                               "adj_stem_hira_excessive"));
+    break;
   }
 }
 
@@ -331,40 +328,41 @@ bool opensOnParticleBeforeAuxiliary(const HiraganaAdjectiveRun& run) {
   // inflection is a grammatical boundary, not an i-adjective stem. This keeps
   // など+いない (and the same particle+auxiliary shape) from becoming a
   // fabricated adjective candidate.
-  if (dict_manager != nullptr) {
-    constexpr size_t kMaxParticleChars = 4;
-    size_t max_particle_end = std::min(max_hiragana_end, start_pos + kMaxParticleChars);
-    for (size_t particle_end = start_pos + 1; particle_end <= max_particle_end; ++particle_end) {
-      if (lookupEntryInRange(*dict_manager, codepoints, start_pos, particle_end, core::PartOfSpeech::Particle) ==
-          nullptr) {
+  if (dict_manager == nullptr) {
+    return false;
+  }
+  constexpr size_t kMaxParticleChars = 4;
+  size_t max_particle_end = std::min(max_hiragana_end, start_pos + kMaxParticleChars);
+  for (size_t particle_end = start_pos + 1; particle_end <= max_particle_end; ++particle_end) {
+    if (lookupEntryInRange(*dict_manager, codepoints, start_pos, particle_end, core::PartOfSpeech::Particle) ==
+        nullptr) {
+      continue;
+    }
+    for (size_t aux_end = max_hiragana_end; aux_end > particle_end; --aux_end) {
+      // A one-mora dictionary auxiliary such as い is too ambiguous to
+      // establish a closed-class boundary by itself: it is also the final
+      // mora of ordinary i-adjectives (かまびすしい).  The protected
+      // particle+auxiliary patterns have a multi-mora inflection (が+いない,
+      // など+いない), so require that grammatical evidence here.
+      if (aux_end - particle_end < 2) {
         continue;
       }
-      for (size_t aux_end = max_hiragana_end; aux_end > particle_end; --aux_end) {
-        // A one-mora dictionary auxiliary such as い is too ambiguous to
-        // establish a closed-class boundary by itself: it is also the final
-        // mora of ordinary i-adjectives (かまびすしい).  The protected
-        // particle+auxiliary patterns have a multi-mora inflection (が+いない,
-        // など+いない), so require that grammatical evidence here.
-        if (aux_end - particle_end < 2) {
-          continue;
+      if (lookupEntryInRange(*dict_manager, codepoints, particle_end, aux_end, core::PartOfSpeech::Auxiliary) !=
+          nullptr) {
+        std::string full_surface = extractSubstring(codepoints, start_pos, max_hiragana_end);
+        if (utf8::endsWith(full_surface, "く")) {
+          full_surface = normalize::replaceFinalChar(full_surface, "い");
         }
-        if (lookupEntryInRange(*dict_manager, codepoints, particle_end, aux_end, core::PartOfSpeech::Auxiliary) !=
-            nullptr) {
-          std::string full_surface = extractSubstring(codepoints, start_pos, max_hiragana_end);
-          if (utf8::endsWith(full_surface, "く")) {
-            full_surface = normalize::replaceFinalChar(full_surface, "い");
-          }
-          const auto& full_candidates = run.inflection.analyze(full_surface);
-          const bool has_full_i_adjective =
-              std::any_of(full_candidates.begin(), full_candidates.end(),
-                          [](const grammar::InflectionCandidate& inflection_candidate) {
-                            return inflection_candidate.verb_type == grammar::VerbType::IAdjective &&
-                                   inflection_candidate.confidence >= candidate::kHiraAdjConfParticle &&
-                                   normalize::utf8Length(inflection_candidate.stem) >= 2;
-                          });
-          if (!has_full_i_adjective) {
-            return true;
-          }
+        const auto& full_candidates = run.inflection.analyze(full_surface);
+        const bool has_full_i_adjective =
+            std::any_of(full_candidates.begin(), full_candidates.end(),
+                        [](const grammar::InflectionCandidate& inflection_candidate) {
+                          return inflection_candidate.verb_type == grammar::VerbType::IAdjective &&
+                                 inflection_candidate.confidence >= candidate::kHiraAdjConfParticle &&
+                                 normalize::utf8Length(inflection_candidate.stem) >= 2;
+                        });
+        if (!has_full_i_adjective) {
+          return true;
         }
       }
     }

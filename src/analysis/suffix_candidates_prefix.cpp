@@ -42,9 +42,13 @@ bool isInterrogativeKanji(char32_t cp) {
   return cp == U'何' || cp == U'誰' || cp == U'幾';
 }
 
+namespace {
+
 bool isNominalUsePrefix(char32_t cp) {
   return cp == U'再' || cp == U'未' || cp == U'不';
 }
+
+}  // namespace
 
 void generatePrefixCompoundCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                       const std::vector<normalize::CharType>& char_types,

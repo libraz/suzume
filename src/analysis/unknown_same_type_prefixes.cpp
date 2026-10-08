@@ -213,12 +213,11 @@ bool kanjiHeadsPredicateAt(const std::vector<char32_t>& codepoints, const std::v
          char_types[word_probe_end] == normalize::CharType::Hiragana) {
     ++word_probe_end;
   }
-  for (const auto& match : lookupResultsInRange(dict_manager, codepoints, kana_start, word_probe_end)) {
-    if (match.entry != nullptr && match.length >= kOpeningContentWordMinLength &&
-        (match.entry->pos == core::PartOfSpeech::Verb || match.entry->pos == core::PartOfSpeech::Adjective ||
-         match.entry->pos == core::PartOfSpeech::Adverb || match.entry->pos == core::PartOfSpeech::Interjection)) {
-      return false;
-    }
+  if (lookupResultsHaveLongerPartOfSpeech(lookupResultsInRange(dict_manager, codepoints, kana_start, word_probe_end),
+                                          kVerbAdjectiveMask | partOfSpeechMask(core::PartOfSpeech::Adverb) |
+                                              partOfSpeechMask(core::PartOfSpeech::Interjection),
+                                          kOpeningContentWordMinLength - 1)) {
+    return false;
   }
   // The clipped spelling of such a greeting leaves it there too (合格|おめでと).
   for (size_t clip_end = kana_start + kOpeningContentWordMinLength; clip_end <= word_probe_end; ++clip_end) {

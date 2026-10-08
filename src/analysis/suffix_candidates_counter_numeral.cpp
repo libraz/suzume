@@ -113,9 +113,7 @@ void appendBasicNumeralCounterCandidates(const std::vector<char32_t>& codepoints
     const auto following = lookupResultsInRange(*dict_manager, codepoints, counter_end, codepoints.size());
     const bool suffix_follows =
         lookupResultsHavePartOfSpeech(following, partOfSpeechMask(core::PartOfSpeech::Suffix)) ||
-        std::any_of(following.begin(), following.end(), [](const auto& match) {
-          return match.entry != nullptr && match.entry->extended_pos == core::ExtendedPOS::NounFormal;
-        });
+        lookupResultsHaveExtendedPOS(following, core::ExtendedPOS::NounFormal);
     if (closes_duration_span) {
       appendCounterCandidate(codepoints, start_pos, counter_end + 1, core::PartOfSpeech::Noun,
                              candidate::kNumeralCounterMergeBonus, core::ExtendedPOS::NounNumber,

@@ -343,11 +343,9 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
         // not a stem plus the copula.
         bool spans_registered_pronoun = false;
         if (dict_manager != nullptr && stem_end > kanji_end) {
-          for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, kanji_end, stem_end + 1)) {
-            spans_registered_pronoun = spans_registered_pronoun ||
-                                       (match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Pronoun &&
-                                        match.length == stem_end + 1 - kanji_end);
-          }
+          spans_registered_pronoun =
+              lookupResultsHavePartOfSpeech(lookupResultsInRange(*dict_manager, codepoints, kanji_end, stem_end + 1),
+                                            partOfSpeechMask(core::PartOfSpeech::Pronoun), stem_end + 1 - kanji_end);
         }
         const std::string stem = extractSubstring(codepoints, start_pos, stem_end);
         // A te-form chain is not a nominal stem (食べ+て+み+な): the な after

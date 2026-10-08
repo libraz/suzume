@@ -20,6 +20,10 @@ namespace {
 
 using suzume::analysis::verb_helpers::isProductiveShiiAdjectiveTerminal;
 
+bool isMultiKanjiSurface(std::string_view surface) {
+  return normalize::utf8Length(surface) >= 2 && grammar::isAllKanji(surface);
+}
+
 bool crossesPeriodEndNominalBoundary(const std::vector<char32_t>& codepoints,
                                      const std::vector<normalize::CharType>& char_types,
                                      const UnknownCandidate& candidate) {
@@ -256,7 +260,7 @@ bool startsInsideVerifiedNounAndAbsorbsSuru(const core::Lattice& lattice,
     }
     if (core::anyEdgeEndingAt(lattice, suru_start, [&candidate](const core::LatticeEdge& noun) {
           return noun.start < candidate.start && noun.pos == core::PartOfSpeech::Noun &&
-                 normalize::utf8Length(noun.surface) >= 2 && grammar::isAllKanji(noun.surface);
+                 isMultiKanjiSurface(noun.surface);
         })) {
       return true;
     }
@@ -286,7 +290,7 @@ bool consumesInitialSuruConditional(const dictionary::DictionaryManager& dict_ma
   }
   return std::any_of(batch_candidates.begin(), batch_candidates.end(), [&](const UnknownCandidate& noun) {
     return noun.pos == core::PartOfSpeech::Noun && noun.start == candidate.start && noun.end + 1 == candidate.end &&
-           normalize::utf8Length(noun.surface) >= 2 && grammar::isAllKanji(noun.surface);
+           isMultiKanjiSurface(noun.surface);
   });
 }
 

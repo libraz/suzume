@@ -244,9 +244,7 @@ void addEmphaticDictionaryEdge(core::Lattice& lattice,
       }
       const auto opened = lookupResultsInRange(dict_manager, codepoints, sokuon_pos,
                                                std::min(codepoints.size(), sokuon_pos + kSokuonParticleProbe));
-      if (std::none_of(opened.begin(), opened.end(), [](const dictionary::LookupResult& match) {
-            return match.entry != nullptr && match.length >= 2 && match.entry->pos == core::PartOfSpeech::Particle;
-          })) {
+      if (!lookupResultsHaveLongerPartOfSpeech(opened, partOfSpeechMask(core::PartOfSpeech::Particle), 1)) {
         continue;
       }
       emphatic.suffix = extractSubstring(codepoints, end_pos, sokuon_pos);

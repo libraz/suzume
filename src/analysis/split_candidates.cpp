@@ -432,7 +432,6 @@ void addNounVerbSplitCandidates(core::Lattice& lattice, std::string_view text, c
   // Use inflection analysis to check if verb part looks conjugated
 
   const size_t start_byte = byteOffsetAt(byte_offsets, start_pos);
-  const auto& noun_results = dict_results;
 
   // A kanji verbal noun before an inflected する is a separate search unit.
   // Preserve an earlier lexical noun or adjective boundary so compounds such
@@ -467,7 +466,7 @@ void addNounVerbSplitCandidates(core::Lattice& lattice, std::string_view text, c
        lookupEntryInRange(dict_manager, codepoints, start_pos, kanji_end, core::PartOfSpeech::Noun) == nullptr) ||
       verb_helpers::isListedGodanSaContinuativeRun(&dict_manager, codepoints, start_pos, kanji_end);
   if (hasSuruContinuation(codepoints, kanji_end) && following_verb_start == kanji_end && !ends_at_humble_subsidiary &&
-      !spells_listed_godan_sa_continuative && !hasDictionaryLexicalPrefix(noun_results, kanji_length) &&
+      !spells_listed_godan_sa_continuative && !hasDictionaryLexicalPrefix(dict_results, kanji_length) &&
       !crossesModifierBoundaryForSuruNoun(text, byte_offsets, start_pos, kanji_end, dict_manager) &&
       !(start_pos > 0 && normalize::isIterationMark(codepoints[start_pos - 1])) &&
       !containsIterationMark(codepoints, start_pos, kanji_end) && !ends_with_derivational_suffix &&
@@ -511,7 +510,7 @@ void addNounVerbSplitCandidates(core::Lattice& lattice, std::string_view text, c
     bool noun_surface_is_non_noun_dict = false;
     float noun_cost = 1.0F;
 
-    for (const auto& result : noun_results) {
+    for (const auto& result : dict_results) {
       if (result.entry != nullptr && result.length == noun_len) {
         if (result.entry->pos == core::PartOfSpeech::Noun) {
           noun_in_dict = true;

@@ -174,10 +174,9 @@ bool UnknownWordGenerator::openSameTypeRun(const std::vector<char32_t>& codepoin
     // a particle-homographic unknown noun across that boundary (不変+の+もの).
     if (first_char == U'の' && dict_manager_ != nullptr && start_pos + 1 < codepoints.size()) {
       const size_t probe_end = std::min(codepoints.size(), start_pos + static_cast<size_t>(5));
-      for (const auto& match : lookupResultsInRange(*dict_manager_, codepoints, start_pos + 1, probe_end)) {
-        if (match.entry != nullptr && match.entry->extended_pos == core::ExtendedPOS::NounFormal) {
-          return false;
-        }
+      if (lookupResultsHaveExtendedPOS(lookupResultsInRange(*dict_manager_, codepoints, start_pos + 1, probe_end),
+                                       core::ExtendedPOS::NounFormal)) {
+        return false;
       }
     }
     // Only は, に, へ, の can start hiragana nouns

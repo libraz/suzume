@@ -223,8 +223,8 @@ bool hasClosedSuffixBoundary(const std::vector<char32_t>& codepoints, size_t sta
       end_pos > start_pos + 1 && verb_helpers::namesDictionaryVerbContinuative(dict_manager, codepoints, end_pos - 1);
   for (size_t split = start_pos + 1; split < end_pos; ++split) {
     const std::string suffix = extractSubstring(codepoints, split, end_pos);
+    const bool overlaps_final_verb_continuative = ends_in_verb_continuative && split + 2 >= end_pos;
     if (dict_manager->lookupExact(suffix, core::PartOfSpeech::Suffix) != nullptr) {
-      const bool overlaps_final_verb_continuative = ends_in_verb_continuative && split + 2 >= end_pos;
       if (overlaps_final_verb_continuative) {
         continue;
       }
@@ -235,7 +235,6 @@ bool hasClosedSuffixBoundary(const std::vector<char32_t>& codepoints, size_t sta
     // narrower condition because it is also the continuative ending in
     // productive nouns such as 山+暮らし+を.
     const auto* auxiliary = dict_manager->lookupExact(suffix, core::PartOfSpeech::Auxiliary);
-    const bool overlaps_final_verb_continuative = ends_in_verb_continuative && split + 2 >= end_pos;
     if (auxiliary != nullptr && core::isClassicalAuxiliaryType(auxiliary->extended_pos) &&
         !overlaps_final_verb_continuative) {
       return true;
@@ -265,6 +264,22 @@ bool hasPeriodEndNominalBoundary(const std::vector<char32_t>& codepoints, size_t
   }
   return dict_manager == nullptr ||
          lookupEntryInRange(*dict_manager, codepoints, start_pos, candidate_end, core::PartOfSpeech::Noun) == nullptr;
+}
+
+// A suru auxiliary or a kanji opening at pos (pos must be inside codepoints).
+bool opensSuruAuxiliaryOrKanji(const std::vector<char32_t>& codepoints,
+                               const std::vector<normalize::CharType>& char_types, size_t pos) {
+  return verb_helpers::isSuruAuxiliaryStarter(codepoints[pos]) ||
+         (pos < char_types.size() && char_types[pos] == normalize::CharType::Kanji);
+}
+
+// Whether the stem is lexicalized outside the verb and noun classes at its exact length.
+bool isListedOutsideVerbAndNoun(const dictionary::DictionaryManager& dict_manager, const std::string& stem) {
+  const auto matches = dict_manager.lookup(stem, 0);
+  return std::any_of(matches.begin(), matches.end(), [&stem](const auto& match) {
+    return match.entry != nullptr && match.entry->surface.size() == stem.size() &&
+           match.entry->pos != core::PartOfSpeech::Verb && match.entry->pos != core::PartOfSpeech::Noun;
+  });
 }
 
 }  // namespace
@@ -382,8 +397,7 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
   // A suru-auxiliary after し is a suru-verb pattern, and a kanji after it is
   // the suru renyokei before a kanji verb/noun (解決+し+得+ない, not 解決し+得ない).
   if (first_hiragana == U'し' && kanji_count >= 2 && next_pos < codepoints.size() &&
-      (verb_helpers::isSuruAuxiliaryStarter(codepoints[next_pos]) ||
-       (next_pos < char_types.size() && char_types[next_pos] == normalize::CharType::Kanji))) {
+      opensSuruAuxiliaryOrKanji(codepoints, char_types, next_pos)) {
     return;
   }
   // A kanji+し token that is NOT a genuine deverbal noun (last kanji + す ∉ dict)
@@ -428,10 +442,9 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
       // nominal-forcing particle actually listed at that position is the
       // stronger evidence and settles the position as nominal (暮らし+まで).
       const size_t after_shi_pos = hiragana_end + 1;
-      const bool trailing_shi_is_suru =
-          second_hiragana == U'し' && !has_particle_continuation && after_shi_pos < codepoints.size() &&
-          (verb_helpers::isSuruAuxiliaryStarter(codepoints[after_shi_pos]) ||
-           (after_shi_pos < char_types.size() && char_types[after_shi_pos] == normalize::CharType::Kanji));
+      const bool trailing_shi_is_suru = second_hiragana == U'し' && !has_particle_continuation &&
+                                        after_shi_pos < codepoints.size() &&
+                                        opensSuruAuxiliaryOrKanji(codepoints, char_types, after_shi_pos);
       const bool selects_nominal_host = selectsNominalHost(dict_manager, codepoints, char_types, hiragana_end + 1);
       const bool has_explicit_nominal_selector =
           has_particle_continuation ||
@@ -486,10 +499,9 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
   // so a continuation opening it rules the noun out as well.
   if (dict_manager != nullptr && kanji_end + 1 < codepoints.size()) {
     const size_t probe_end = std::min(codepoints.size(), kanji_end + 1 + static_cast<size_t>(4));
-    for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, kanji_end + 1, probe_end)) {
-      skip_single_char = skip_single_char ||
-                         (match.entry != nullptr && match.entry->extended_pos == core::ExtendedPOS::AuxAspectHajimeru);
-    }
+    skip_single_char = skip_single_char || lookupResultsHaveExtendedPOS(lookupResultsInRange(*dict_manager, codepoints,
+                                                                                             kanji_end + 1, probe_end),
+                                                                        core::ExtendedPOS::AuxAspectHajimeru);
   }
   // Skip kanji+い when kanji ends with 的 (teki na-adjective suffix)
   // 理性的い, 経済的い don't make sense — 的 forms na-adjectives, not i-adjectives
@@ -571,10 +583,9 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
   // continuative's tail plus a particle (結局+みな, never 結局み+な).
   if (!skip_single_char && dict_manager != nullptr) {
     const size_t probe_end = std::min(codepoints.size(), kanji_end + static_cast<size_t>(4));
-    for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, kanji_end, probe_end)) {
-      skip_single_char = skip_single_char || (match.entry != nullptr &&
-                                              match.entry->pos == core::PartOfSpeech::Pronoun && match.length >= 2);
-    }
+    skip_single_char = skip_single_char || lookupResultsHaveLongerPartOfSpeech(
+                                               lookupResultsInRange(*dict_manager, codepoints, kanji_end, probe_end),
+                                               partOfSpeechMask(core::PartOfSpeech::Pronoun), 1);
     // A registered noun or an attested verb continuative on the same span
     // (試み+な) keeps its own reading.
     skip_single_char =
@@ -782,14 +793,7 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
     const bool crosses_suffix = hasClosedSuffixBoundary(codepoints, start_pos, kanji_end + 2, dict_manager);
     // A span that is already lexicalized as a closed-class word keeps that
     // reading even when its shape also parses as a continuative (及び, 従って).
-    bool stem_is_closed_class = false;
-    for (const auto& match : dict_manager->lookup(stem, 0)) {
-      if (match.entry != nullptr && match.entry->surface.size() == stem.size() &&
-          match.entry->pos != core::PartOfSpeech::Verb && match.entry->pos != core::PartOfSpeech::Noun) {
-        stem_is_closed_class = true;
-        break;
-      }
-    }
+    const bool stem_is_closed_class = isListedOutsideVerbAndNoun(*dict_manager, stem);
     bool nominal_context = true;
     if (kanji_end + 2 < char_types.size() && char_types[kanji_end + 2] == normalize::CharType::Hiragana) {
       const char32_t after = codepoints[kanji_end + 2];
@@ -913,11 +917,8 @@ void generateHiraganaDeverbalCompoundNounCandidates(const std::vector<char32_t>&
   const std::string stem = extractSubstring(codepoints, start_pos, stem_end);
   // A stem already lexicalized outside the verb and noun classes keeps that
   // reading (いい, これ, より).
-  for (const auto& match : dict_manager->lookup(stem, 0)) {
-    if (match.entry != nullptr && match.entry->surface.size() == stem.size() &&
-        match.entry->pos != core::PartOfSpeech::Verb && match.entry->pos != core::PartOfSpeech::Noun) {
-      return;
-    }
+  if (isListedOutsideVerbAndNoun(*dict_manager, stem)) {
+    return;
   }
   // Unlike the kanji-led compound there is no okurigana to carry the shape, so
   // only a listed verb behind the continuative licenses it. い is excluded on
@@ -988,14 +989,11 @@ void generateHumbleNominalCandidates(const std::vector<char32_t>& codepoints, si
     // ます), which carries no continuative shape to check.
     if (grammar::isSinoHonorificPrefix(extractSubstring(codepoints, start_pos - 1, start_pos))) {
       // A registered word opening on the ご mora owns it (ござい+ます, ごろごろ).
-      bool prefix_is_word_head = false;
-      if (dict_manager != nullptr) {
-        for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, start_pos - 1, end_pos + 1)) {
-          prefix_is_word_head = prefix_is_word_head || (match.entry != nullptr && match.length >= 2 &&
-                                                        match.entry->pos != core::PartOfSpeech::Prefix &&
-                                                        match.entry->pos != core::PartOfSpeech::Suffix);
-        }
-      }
+      const bool prefix_is_word_head =
+          dict_manager != nullptr &&
+          lookupResultsHaveLongerPartOfSpeech(
+              lookupResultsInRange(*dict_manager, codepoints, start_pos - 1, end_pos + 1),
+              ~(partOfSpeechMask(core::PartOfSpeech::Prefix) | partOfSpeechMask(core::PartOfSpeech::Suffix)), 1);
       // So does a godan-sa verb whose continuative is the frame's し (ごまかし+ます).
       bool spans_godan_sa_continuative = false;
       if (suru_head == U'し') {
