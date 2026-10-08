@@ -5,7 +5,7 @@ namespace suzume::analysis::bigram_rules {
 using EPOS = core::ExtendedPOS;
 namespace cost = bigram_cost;
 
-void setParticleAndLexicalPenaltyCosts(BigramMatrix& table) {
+bool setParticleAndLexicalPenaltyCosts(BigramMatrix& table) {
   static constexpr BigramRule kRules[] = {
       // =========================================================================
       // Particle → Particle penalties (unnatural adjacent particle chains)
@@ -161,7 +161,7 @@ void setParticleAndLexicalPenaltyCosts(BigramMatrix& table) {
       {EPOS::ParticleQuote, EPOS::Interjection, cost::kAlmostNever},
       {EPOS::ParticleFinal, EPOS::Interjection, cost::kAlmostNever},
   };
-  applyRules(table, kRules);
+  return applyRules(table, kRules);
 }
 
 }  // namespace suzume::analysis::bigram_rules

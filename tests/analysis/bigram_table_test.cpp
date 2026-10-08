@@ -213,6 +213,35 @@ TEST(BigramTableTest, DuplicateRuleAssignmentIsRejectedWithoutTerminatingTheProc
   EXPECT_FALSE(bigram_rules::applyRules(table, &rule, 1));
 }
 
+TEST(BigramTableTest, SkippedRuleDoesNotDropTheRulesAfterIt) {
+  using EPOS = core::ExtendedPOS;
+  bigram_rules::BigramMatrix table{};
+  for (auto& row : table) {
+    row.fill(bigram_rules::kUnsetCost);
+  }
+  const bigram_rules::BigramRule rules[] = {
+      {EPOS::ParticleFinal, EPOS::Noun, bigram_cost::kProhibitive},
+      {EPOS::ParticleFinal, EPOS::Noun, bigram_cost::kMinor},
+      {EPOS::ParticleFinal, EPOS::Pronoun, bigram_cost::kRare},
+  };
+  EXPECT_FALSE(bigram_rules::applyRules(table, rules));
+
+  EXPECT_FLOAT_EQ(
+      bigram_rules::decodeCost(table[static_cast<size_t>(EPOS::ParticleFinal)][static_cast<size_t>(EPOS::Noun)]),
+      bigram_cost::kProhibitive);
+  EXPECT_FLOAT_EQ(
+      bigram_rules::decodeCost(table[static_cast<size_t>(EPOS::ParticleFinal)][static_cast<size_t>(EPOS::Pronoun)]),
+      bigram_cost::kRare);
+}
+
+TEST(BigramTableTest, ProductionRuleTablesApplyWithoutSkippedRules) {
+  bigram_rules::BigramMatrix table{};
+  for (auto& row : table) {
+    row.fill(bigram_rules::kUnsetCost);
+  }
+  EXPECT_TRUE(bigram_rules::applyRuleTables(table));
+}
+
 TEST(BigramTableTest, SokuonbinCopulaSelectsPastAuxiliaryNotConjunctiveParticle) {
   const Scorer scorer;
   core::LatticeEdge copula = makeEdge(core::PartOfSpeech::Auxiliary);

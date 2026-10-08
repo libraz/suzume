@@ -5,7 +5,7 @@ namespace suzume::analysis::bigram_rules {
 using EPOS = core::ExtendedPOS;
 namespace cost = bigram_cost;
 
-void setParticleAndLexicalCosts(BigramMatrix& table) {
+bool setParticleAndLexicalCosts(BigramMatrix& table) {
   static constexpr BigramRule kRules[] = {
       // =========================================================================
       // Particle → Various (Particles can connect to many things)
@@ -750,9 +750,9 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
 
       // Note: Particle → AdjStem is allowed for patterns like やる気がなさそう (が+な+さ+そう)
   };
-  applyRules(table, kRules);
+  bool all_applied = applyRules(table, kRules);
 
-  setParticleAndLexicalPenaltyCosts(table);
+  all_applied = setParticleAndLexicalPenaltyCosts(table) && all_applied;
 
   static constexpr BigramRule kClassicalRules[] = {
       // =========================================================================
@@ -971,7 +971,7 @@ void setParticleAndLexicalCosts(BigramMatrix& table) {
       // their connective (なされ+ば), ahead of the homographic lexical verb.
       {EPOS::AuxHonorific, EPOS::ParticleConj, cost::kDoubleVeryStrongBonus},
   };
-  applyRules(table, kClassicalRules);
+  return applyRules(table, kClassicalRules) && all_applied;
 }
 
 }  // namespace suzume::analysis::bigram_rules

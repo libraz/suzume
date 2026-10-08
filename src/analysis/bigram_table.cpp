@@ -5,14 +5,24 @@ namespace suzume::analysis {
 namespace bigram_rules {
 
 bool applyRules(BigramMatrix& table, const BigramRule* rules, size_t rule_count) {
+  bool all_applied = true;
   for (size_t rule_index = 0; rule_index < rule_count; ++rule_index) {
     const BigramRule& rule = rules[rule_index];
     if (rule.cost == kUnsetCost || table[rule.prev][rule.next] != kUnsetCost) {
-      return false;
+      all_applied = false;
+      continue;
     }
     table[rule.prev][rule.next] = rule.cost;
   }
-  return true;
+  return all_applied;
+}
+
+bool applyRuleTables(BigramMatrix& table) {
+  // Evaluate every table even after a failure, so one bad rule cannot hide the rest.
+  const bool verb_rules = setVerbAndAdjectiveCosts(table);
+  const bool noun_rules = setAuxiliaryAndNounCosts(table);
+  const bool particle_rules = setParticleAndLexicalCosts(table);
+  return verb_rules && noun_rules && particle_rules;
 }
 
 void inheritRuleProfile(BigramMatrix& table, core::ExtendedPOS source, core::ExtendedPOS target) {
@@ -44,9 +54,9 @@ BigramTable::EncodedTable BigramTable::initTable() {
     row.fill(bigram_rules::kUnsetCost);
   }
 
-  bigram_rules::setVerbAndAdjectiveCosts(table);
-  bigram_rules::setAuxiliaryAndNounCosts(table);
-  bigram_rules::setParticleAndLexicalCosts(table);
+  // A skipped rule leaves its cell to the later neutral fill; the unit test
+  // over applyRuleTables() keeps the shipped tables free of skips.
+  static_cast<void>(bigram_rules::applyRuleTables(table));
   // Quotative demonstrative adverbs are a semantic subtype. Their category
   // cost remains distinct, while their syntactic continuations stay complete
   // as the general adverb profile evolves.

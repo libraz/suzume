@@ -5,7 +5,7 @@ namespace suzume::analysis::bigram_rules {
 using EPOS = core::ExtendedPOS;
 namespace cost = bigram_cost;
 
-void setVerbAndAdjectiveCosts(BigramMatrix& table) {
+bool setVerbAndAdjectiveCosts(BigramMatrix& table) {
   static constexpr BigramRule kRules[] = {
       // =========================================================================
       // Verb Forms → Auxiliaries (Core Grammar)
@@ -482,7 +482,7 @@ void setVerbAndAdjectiveCosts(BigramMatrix& table) {
       // Suffixes naturally precede nouns (e.g., honorifics before noun phrases)
       {EPOS::Suffix, EPOS::Noun, cost::kModerateBonus},
   };
-  applyRules(table, kRules);
+  return applyRules(table, kRules);
 }
 
 }  // namespace suzume::analysis::bigram_rules

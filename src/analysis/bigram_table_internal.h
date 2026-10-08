@@ -64,13 +64,14 @@ struct BigramRule {
 };
 static_assert(sizeof(BigramRule) == 3);
 
-// Returns false for an invalid rule set rather than terminating the embedding
-// process during static table construction. Rule tables are verified by unit
-// tests and their constexpr encoded costs are constrained by kCostPalette.
-bool applyRules(BigramMatrix& table, const BigramRule* rules, size_t rule_count);
+// Skips a rule with an off-palette cost or an already-assigned cell and returns
+// false, rather than terminating the embedding process during static table
+// construction; the remaining rules still apply. applyRuleTables() is checked
+// by a unit test so that no production rule is skipped.
+[[nodiscard]] bool applyRules(BigramMatrix& table, const BigramRule* rules, size_t rule_count);
 
 template <size_t Size>
-bool applyRules(BigramMatrix& table, const BigramRule (&rules)[Size]) {
+[[nodiscard]] bool applyRules(BigramMatrix& table, const BigramRule (&rules)[Size]) {
   return applyRules(table, rules, Size);
 }
 
@@ -80,11 +81,15 @@ inline void setCost(BigramMatrix& table, core::ExtendedPOS prev, core::ExtendedP
 }
 void inheritRuleProfile(BigramMatrix& table, core::ExtendedPOS source, core::ExtendedPOS target);
 
-void setVerbAndAdjectiveCosts(BigramMatrix& table);
-void setAuxiliaryAndNounCosts(BigramMatrix& table);
-void setNominalParticleCosts(BigramMatrix& table);
-void setParticleAndLexicalCosts(BigramMatrix& table);
-void setParticleAndLexicalPenaltyCosts(BigramMatrix& table);
+// Each returns false when any of its rules was skipped by applyRules().
+[[nodiscard]] bool setVerbAndAdjectiveCosts(BigramMatrix& table);
+[[nodiscard]] bool setAuxiliaryAndNounCosts(BigramMatrix& table);
+[[nodiscard]] bool setNominalParticleCosts(BigramMatrix& table);
+[[nodiscard]] bool setParticleAndLexicalCosts(BigramMatrix& table);
+[[nodiscard]] bool setParticleAndLexicalPenaltyCosts(BigramMatrix& table);
+
+// Applies every rule table to an unset matrix; false when any rule was skipped.
+[[nodiscard]] bool applyRuleTables(BigramMatrix& table);
 
 }  // namespace suzume::analysis::bigram_rules
 

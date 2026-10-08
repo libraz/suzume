@@ -49,12 +49,13 @@ static_assert(isNominalHead(EPOS::Noun));
 static_assert(!isNominalHead(EPOS::NounFormal));
 static_assert(nominalHeadProfile(EPOS::Pronoun).accepts_final_particle);
 
-void applyRule(BigramMatrix& table, EPOS head, EPOS next, float rule_cost) {
+bool applyRule(BigramMatrix& table, EPOS head, EPOS next, float rule_cost) {
   const BigramRule rule{head, next, rule_cost};
-  applyRules(table, &rule, 1);
+  return applyRules(table, &rule, 1);
 }
 
-void applyNominalHeadRules(BigramMatrix& table) {
+bool applyNominalHeadRules(BigramMatrix& table) {
+  bool all_applied = true;
   for (size_t idx = 0; idx < static_cast<size_t>(EPOS::Count_); ++idx) {
     const EPOS head = static_cast<EPOS>(idx);
     if (!isNominalHead(head)) {
@@ -63,24 +64,25 @@ void applyNominalHeadRules(BigramMatrix& table) {
     const NominalHeadProfile profile = nominalHeadProfile(head);
     for (const NominalContinuation& continuation : kCommonNominalContinuations) {
       const float rule_cost = continuation.next == EPOS::ParticleCase ? profile.case_cost : continuation.cost;
-      applyRule(table, head, continuation.next, rule_cost);
+      all_applied = applyRule(table, head, continuation.next, rule_cost) && all_applied;
     }
-    applyRule(table, head, EPOS::ParticleAdverbial, profile.adverbial_cost);
+    all_applied = applyRule(table, head, EPOS::ParticleAdverbial, profile.adverbial_cost) && all_applied;
     if (profile.accepts_final_particle) {
       // Ordinary/deverbal nouns and personal pronouns can form a
       // sentence-final nominal predicate. Number phrases and interrogative
       // pronouns need a following predicate;
       // rewarding their homographic final-particle path breaks 一昼夜+かけて
       // and the fixed indefinite pronoun 何かしら.
-      applyRule(table, head, EPOS::ParticleFinal, cost::kModerateBonus);
+      all_applied = applyRule(table, head, EPOS::ParticleFinal, cost::kModerateBonus) && all_applied;
     }
   }
+  return all_applied;
 }
 
 }  // namespace
 
-void setNominalParticleCosts(BigramMatrix& table) {
-  applyNominalHeadRules(table);
+bool setNominalParticleCosts(BigramMatrix& table) {
+  const bool head_rules = applyNominalHeadRules(table);
 
   static constexpr BigramRule kRules[] = {
       // Nominal particle attachment and formal-noun continuation.
@@ -147,7 +149,7 @@ void setNominalParticleCosts(BigramMatrix& table) {
       {EPOS::AuxAspectHajimeru, EPOS::NounFormal, cost::kVeryStrongBonus},
       {EPOS::ParticleQuote, EPOS::NounFormal, cost::kVeryStrongBonus},
   };
-  applyRules(table, kRules);
+  return applyRules(table, kRules) && head_rules;
 }
 
 }  // namespace suzume::analysis::bigram_rules

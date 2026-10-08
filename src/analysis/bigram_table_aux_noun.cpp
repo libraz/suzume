@@ -6,7 +6,7 @@ using EPOS = core::ExtendedPOS;
 namespace cost = bigram_cost;
 constexpr float kDeterminerNounBonus = -2.5F;
 
-void setAuxiliaryAndNounCosts(BigramMatrix& table) {
+bool setAuxiliaryAndNounCosts(BigramMatrix& table) {
   static constexpr BigramRule kRules[] = {
       // =========================================================================
       // Auxiliary → Auxiliary Chains
@@ -599,9 +599,9 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       {EPOS::AuxNegativeNai, EPOS::ParticleFinal, cost::kModerateBonus},
 
   };
-  applyRules(table, kRules);
+  bool all_applied = applyRules(table, kRules);
 
-  setNominalParticleCosts(table);
+  all_applied = setNominalParticleCosts(table) && all_applied;
 
   static constexpr BigramRule kLexicalNominalRules[] = {
       // =========================================================================
@@ -1027,7 +1027,7 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
       // Nominal completion-state suffix (確認+済み, 承認+済み).
       {EPOS::Noun, EPOS::SuffixRecentCompletion, cost::kStrongBonus},
   };
-  applyRules(table, kLexicalNominalRules);
+  all_applied = applyRules(table, kLexicalNominalRules) && all_applied;
 
   // The causative and passive auxiliaries select a verb's irrealis form and
   // nothing else, so no particle of any role can host one. Stating that over
@@ -1039,6 +1039,7 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
     table[epos][static_cast<size_t>(EPOS::AuxCausative)] = kNoParticleHost;
     table[epos][static_cast<size_t>(EPOS::AuxPassive)] = kNoParticleHost;
   }
+  return all_applied;
 }
 
 }  // namespace suzume::analysis::bigram_rules
