@@ -31,6 +31,43 @@ struct UnknownWordGenerator::SameTypeRun {
 
 namespace same_type_detail {
 
+// Inputs shared by every prefix length of one same-type run.
+struct PrefixScanContext {
+  const std::vector<char32_t>& codepoints;
+  const std::vector<normalize::CharType>& char_types;
+  size_t start_pos;
+  normalize::CharType start_type;
+  bool started_with_particle;
+  size_t crossed_particle_pos;
+  const dictionary::DictionaryManager* dict_manager;
+  const grammar::Inflection& inflection;
+  bool starts_at_dictionary_verb_continuative;
+  bool starts_after_dictionary_adjective;
+};
+
+// The nominal readings that select a prefix before it is priced.
+struct PrefixShape {
+  bool closes_particle_bracketed_hiragana_noun{false};
+  bool brackets_medial_particle_crossing{false};
+  bool selects_past_tari_collision_noun{false};
+  bool precedes_closed_native_number{false};
+  bool closes_genitive_negative_noun{false};
+};
+
+PrefixShape classifyPrefixShape(const PrefixScanContext& ctx, size_t len, size_t candidate_end,
+                                const std::string& surface);
+
+bool priceKanjiRun(const PrefixScanContext& ctx, size_t len, size_t candidate_end, float& cost);
+
+bool priceHiraganaRun(const PrefixScanContext& ctx, size_t len, size_t candidate_end, const PrefixShape& shape,
+                      float& cost);
+
+void appendInterjectionNominalCandidate(const PrefixScanContext& ctx, size_t len, size_t candidate_end,
+                                        const std::string& surface, std::vector<UnknownCandidate>& candidates);
+
+bool priceParticleStartedRun(const PrefixScanContext& ctx, size_t len, size_t candidate_end, float& cost,
+                             bool& has_suffix);
+
 // Whether a one-mora particle opens [start, end) and a registered pronoun fills
 // the rest (は+いつ): the pronoun is the noun the particle stands in front of,
 // so no opaque run spans the two.

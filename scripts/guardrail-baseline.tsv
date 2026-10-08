@@ -95,9 +95,13 @@ src/analysis/tokenizer_utils.h	0	0	0
 src/analysis/unknown.cpp	0	29	0
 src/analysis/unknown.h	0	6	0
 src/analysis/unknown_bracketed_noun.cpp	0	0	0
+src/analysis/unknown_bracketed_noun_admission.cpp	0	0	0
+src/analysis/unknown_bracketed_noun_internal.h	0	0	0
+src/analysis/unknown_bracketed_noun_scan.cpp	0	0	0
 src/analysis/unknown_same_type.cpp	0	0	0
 src/analysis/unknown_same_type_internal.h	0	0	0
-src/analysis/unknown_same_type_prefixes.cpp	0	14	0
+src/analysis/unknown_same_type_prefix_cost.cpp	0	10	0
+src/analysis/unknown_same_type_prefixes.cpp	0	4	0
 src/analysis/unknown_speech.cpp	0	13	0
 src/analysis/verb_candidates.cpp	0	8	0
 src/analysis/verb_candidates.h	0	0	0
@@ -148,8 +152,9 @@ src/grammar/auxiliaries.cpp	0	0	0
 src/grammar/auxiliaries.h	0	0	0
 src/grammar/auxiliary_generator.cpp	0	0	0
 src/grammar/auxiliary_generator.h	0	0	0
-src/grammar/char_patterns.cpp	37	0	0
+src/grammar/char_patterns.cpp	0	0	0
 src/grammar/char_patterns.h	0	0	0
+src/grammar/char_patterns_lexical.cpp	37	0	0
 src/grammar/conjugation.cpp	0	0	0
 src/grammar/conjugation.h	0	0	0
 src/grammar/conjugator.cpp	0	0	0

@@ -71,7 +71,10 @@ add_library(suzume_analysis OBJECT
   unknown.cpp
   unknown_same_type.cpp
   unknown_same_type_prefixes.cpp
+  unknown_same_type_prefix_cost.cpp
   unknown_bracketed_noun.cpp
+  unknown_bracketed_noun_scan.cpp
+  unknown_bracketed_noun_admission.cpp
   unknown_speech.cpp
   verb_candidates.cpp
   verb_candidates_contracted_conditional.cpp
