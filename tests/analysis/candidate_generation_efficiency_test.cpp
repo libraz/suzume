@@ -20,15 +20,6 @@
 namespace suzume::analysis {
 namespace {
 
-std::vector<normalize::CharType> classify(const std::vector<char32_t>& codepoints) {
-  std::vector<normalize::CharType> char_types;
-  char_types.reserve(codepoints.size());
-  for (const char32_t codepoint : codepoints) {
-    char_types.push_back(normalize::classifyChar(codepoint));
-  }
-  return char_types;
-}
-
 TEST(CandidateGenerationEfficiencyTest, BoundsClosedClassProbeToFiveCodepoints) {
   const auto codepoints = normalize::toCodepoints("あいうえおかき");
 
@@ -41,7 +32,7 @@ TEST(CandidateGenerationEfficiencyTest, EmitsOneAdjectiveStemEdgeBeforeSaNominal
   ASSERT_TRUE(dictionary_manager.loadCoreDictionary("data/core.dic"));
   const std::string text = "美しさ";
   const auto codepoints = normalize::toCodepoints(text);
-  const auto char_types = classify(codepoints);
+  const auto char_types = normalize::classifyCodepoints(codepoints);
   const UnknownWordGenerator generator({}, &dictionary_manager);
 
   const auto candidates = generator.generate(text, codepoints, 0, char_types);
@@ -65,7 +56,7 @@ TEST(CandidateGenerationEfficiencyTest, EmitsOneDictionaryBackedCompoundSplitEdg
 
   const std::string text = "人工知能";
   const auto codepoints = normalize::toCodepoints(text);
-  const auto char_types = classify(codepoints);
+  const auto char_types = normalize::classifyCodepoints(codepoints);
   const auto byte_offsets = buildByteOffsets(codepoints);
   const Scorer scorer;
   core::Lattice lattice(codepoints.size());
@@ -87,7 +78,7 @@ TEST(CandidateGenerationEfficiencyTest, BoundsSameTypeCandidatesForLongRun) {
   const UnknownWordGenerator generator(options, &dictionary_manager);
   const std::string text = "研究研究研究研究";
   const auto codepoints = normalize::toCodepoints(text);
-  const auto char_types = classify(codepoints);
+  const auto char_types = normalize::classifyCodepoints(codepoints);
 
   const auto candidates = generator.generate(text, codepoints, 0, char_types);
   auto has_same_type_end = [&candidates](size_t end) {
@@ -141,7 +132,7 @@ TEST(CandidateGenerationEfficiencyTest, KeepsAsciiKeycapEmojiInOneSameTypeCandid
   const UnknownWordGenerator generator({}, &dictionary_manager);
   const std::string text = "1️⃣です";
   const auto codepoints = normalize::toCodepoints(text);
-  const auto char_types = classify(codepoints);
+  const auto char_types = normalize::classifyCodepoints(codepoints);
 
   const auto candidates = generator.generate(text, codepoints, 0, char_types);
   const bool has_keycap = std::any_of(candidates.begin(), candidates.end(), [](const UnknownCandidate& candidate) {

@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <string_view>
+#include <vector>
 
 namespace suzume::normalize {
 
@@ -26,6 +27,13 @@ enum class CharType : uint8_t {
  * @return Character type
  */
 CharType classifyChar(char32_t codepoint);
+
+/**
+ * @brief Classify a sequence of Unicode codepoints
+ * @param codepoints Codepoints to classify
+ * @return One character type for each input codepoint
+ */
+std::vector<CharType> classifyCodepoints(const std::vector<char32_t>& codepoints);
 
 /**
  * @brief Convert character type to string

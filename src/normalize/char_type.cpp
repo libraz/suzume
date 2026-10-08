@@ -313,6 +313,15 @@ CharType classifyChar(char32_t codepoint) {
   return CharType::Unknown;
 }
 
+std::vector<CharType> classifyCodepoints(const std::vector<char32_t>& codepoints) {
+  std::vector<CharType> char_types;
+  char_types.reserve(codepoints.size());
+  for (const char32_t codepoint : codepoints) {
+    char_types.push_back(classifyChar(codepoint));
+  }
+  return char_types;
+}
+
 std::string_view charTypeToString(CharType type) {
   static constexpr std::string_view kNames[] = {
       "KANJI", "HIRAGANA", "KATAKANA", "ALPHABET", "DIGIT", "SYMBOL", "EMOJI", "UNKNOWN",

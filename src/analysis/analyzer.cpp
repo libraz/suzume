@@ -36,15 +36,6 @@ inline size_t countChars(std::string_view text, size_t from, size_t to) {
   return count;
 }
 
-std::vector<normalize::CharType> classifyCodepoints(const std::vector<char32_t>& codepoints) {
-  std::vector<normalize::CharType> char_types;
-  char_types.reserve(codepoints.size());
-  for (const char32_t codepoint : codepoints) {
-    char_types.push_back(normalize::classifyChar(codepoint));
-  }
-  return char_types;
-}
-
 // Split long text into sentence-level chunks and analyze each one.
 //
 // Scans forward up to kMaxChunkBytes looking for the last sentence boundary; if
@@ -272,7 +263,7 @@ std::vector<core::Morpheme> Analyzer::analyzeChunk(std::string_view text, size_t
   }
 
   // Build lattice
-  core::Lattice lattice = tokenizer_->buildLattice(text, codepoints, classifyCodepoints(codepoints));
+  core::Lattice lattice = tokenizer_->buildLattice(text, codepoints, normalize::classifyCodepoints(codepoints));
 
   // Run Viterbi
   core::ViterbiResult vresult = viterbi_.solve(lattice, scorer_);
@@ -342,7 +333,7 @@ std::vector<core::Morpheme> Analyzer::analyzeDebug(std::string_view text, core::
       }
       if (!debug_span.empty()) {
         const std::vector<char32_t> codepoints = normalize::toCodepoints(debug_span);
-        *out_lattice = tokenizer_->buildLattice(debug_span, codepoints, classifyCodepoints(codepoints));
+        *out_lattice = tokenizer_->buildLattice(debug_span, codepoints, normalize::classifyCodepoints(codepoints));
       }
     }
   }
