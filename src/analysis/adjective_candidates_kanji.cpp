@@ -83,7 +83,8 @@ bool endsWithMultiMoraFinalParticle(const std::vector<char32_t>& codepoints, siz
     return false;
   }
   constexpr size_t kMaxFinalParticleChars = 4;
-  const size_t earliest = end_pos > kMaxFinalParticleChars ? end_pos - kMaxFinalParticleChars : start_pos + 1;
+  // The particle opens inside the candidate, behind at least one stem character.
+  const size_t earliest = std::max(start_pos + 1, lookbehindStart(end_pos, kMaxFinalParticleChars));
   for (size_t particle_start = earliest; particle_start < end_pos - 1; ++particle_start) {
     const auto* particle =
         lookupEntryInRange(*dict_manager, codepoints, particle_start, end_pos, core::PartOfSpeech::Particle);
