@@ -3,6 +3,8 @@
 add_executable(suzume-cli
   main.cpp
   cli_common.cpp
+  cli_args.cpp
+  cli_help.cpp
   cmd_analyze.cpp
   cmd_dict.cpp
   cmd_test.cpp

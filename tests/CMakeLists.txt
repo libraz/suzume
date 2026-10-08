@@ -29,6 +29,8 @@ set(CLI_SOURCES_FOR_TESTS
   ${CMAKE_SOURCE_DIR}/tools/cli/dict_compiler.cpp
   ${CMAKE_SOURCE_DIR}/tools/cli/tsv_parser.cpp
   ${CMAKE_SOURCE_DIR}/tools/cli/cli_common.cpp
+  ${CMAKE_SOURCE_DIR}/tools/cli/cli_args.cpp
+  ${CMAKE_SOURCE_DIR}/tools/cli/cli_help.cpp
   ${CMAKE_SOURCE_DIR}/tools/cli/interactive_utils.cpp
 )
 
