@@ -11,6 +11,7 @@
 #include "core/debug.h"
 #include "core/kana_constants.h"
 #include "dictionary/dictionary.h"
+#include "grammar/char_patterns.h"
 #include "grammar/inflection.h"
 #include "normalize/char_type.h"
 #include "suffix_candidates.h"
@@ -241,7 +242,20 @@ bool hasAttributiveNominalSelector(const std::vector<char32_t>& codepoints,
       }
     }
     const std::string selector_surface = extractSubstring(codepoints, selector_start, start_pos);
-    if (dict_manager->lookupExact(selector_surface, core::PartOfSpeech::Determiner) != nullptr) {
+    // A kana selector that a kana predicate runs through is that predicate's
+    // stem, not a selector (ある+く of あるく+ひと).
+    const auto runs_into_kana_predicate = [&]() {
+      if (!grammar::isPureHiragana(selector_surface)) {
+        return false;
+      }
+      const auto predicates =
+          generateHiraganaVerbCandidates(codepoints, selector_start, char_types, inflection, dict_manager);
+      return std::any_of(predicates.begin(), predicates.end(), [start_pos](const UnknownCandidate& predicate) {
+        return predicate.end > start_pos && predicate.extended_pos == core::ExtendedPOS::VerbShuushikei;
+      });
+    };
+    if (dict_manager->lookupExact(selector_surface, core::PartOfSpeech::Determiner) != nullptr &&
+        !runs_into_kana_predicate()) {
       return true;
     }
     const auto* exact_adjective = dict_manager->lookupExact(selector_surface, core::PartOfSpeech::Adjective);
@@ -253,7 +267,8 @@ bool hasAttributiveNominalSelector(const std::vector<char32_t>& codepoints,
     // open on a registered closed-class word of two morae or more, though: that
     // word is the next morpheme of the clause (やる+べき+こと, 急ぐ+より+ほか).
     const auto* exact_verb = dict_manager->lookupExact(selector_surface, core::PartOfSpeech::Verb);
-    if (exact_verb != nullptr && selector_surface == exact_verb->lemma && !startsClosedClassWord) {
+    if (exact_verb != nullptr && selector_surface == exact_verb->lemma && !startsClosedClassWord &&
+        !runs_into_kana_predicate()) {
       return true;
     }
   }

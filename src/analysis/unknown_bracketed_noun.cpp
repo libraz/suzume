@@ -645,8 +645,17 @@ void readPromotedSurface(const BracketedNounContext& ctx, const BracketedScan& b
   const bool short_bos_case_particle_bracket = left_clause_bracket && promoted.promoted_dictionary_reading == nullptr &&
                                                closesShortNounAt(dict_manager, codepoints, scan) &&
                                                (codepoints[scan] != U'は' || unread_short_run);
+  // An attributive predicate opens it the same way (はしる|ひと|。); the
+  // candidate is then admitted only behind an attributive lattice edge. A run
+  // opening on a function word is the clause's next morpheme (おおきい+の+が).
+  const bool left_attributive_only = bracketed.left_attributive_bracket && !bracketed.left_particle_bracket &&
+                                     !bracketed.left_determiner_bracket && !left_clause_bracket &&
+                                     !bracketed.left_te_bracket && dict_manager != nullptr &&
+                                     !hasExactPartOfSpeech(*dict_manager, codepoints, start_pos, start_pos + 1,
+                                                           partOfSpeechMask(core::PartOfSpeech::Particle) |
+                                                               partOfSpeechMask(core::PartOfSpeech::Auxiliary));
   promoted.unread_short_run_bracketed =
-      unread_short_run && (((left_clause_bracket || bracketed.left_determiner_bracket) &&
+      unread_short_run && (((left_clause_bracket || bracketed.left_determiner_bracket || left_attributive_only) &&
                             (promoted.right_clause || promoted.right_adjective_word)) ||
                            promoted.right_short_genitive);
   const bool short_run_bracketed =

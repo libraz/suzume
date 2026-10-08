@@ -3175,6 +3175,23 @@
       ],
       "id": "yuku_kuru",
       "input": "ゆく年くる年"
+    },
+    {
+      "description": "はしるひと - regression test",
+      "expected": [
+        {
+          "lemma": "はしる",
+          "pos": "Verb",
+          "surface": "はしる"
+        },
+        {
+          "lemma": "ひと",
+          "pos": "Noun",
+          "surface": "ひと"
+        }
+      ],
+      "id": "hashiruhito",
+      "input": "はしるひと"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",
