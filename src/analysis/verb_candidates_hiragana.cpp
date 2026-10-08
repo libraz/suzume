@@ -1053,17 +1053,20 @@ void favorClosedOnbinTenseStems(const HiraganaVerbScan& scan, std::vector<Unknow
 
 void dropUnattestedMisreadings(const std::vector<char32_t>& codepoints, std::vector<UnknownCandidate>& candidates) {
   // An unattested verb covering only the first half of a reduplication cuts a
-  // mimetic in two (ぞく+ぞく+する, not ぞくぞく+する).
-  candidates.erase(std::remove_if(candidates.begin(), candidates.end(),
-                                  [&codepoints](const UnknownCandidate& verb_candidate) {
-                                    const size_t half = verb_candidate.end - verb_candidate.start;
-                                    return !verb_candidate.lemma_verified && half >= 2 &&
-                                           verb_candidate.end + half <= codepoints.size() &&
-                                           std::equal(codepoints.begin() + verb_candidate.start,
-                                                      codepoints.begin() + verb_candidate.end,
-                                                      codepoints.begin() + verb_candidate.end);
-                                  }),
-                   candidates.end());
+  // mimetic in two (ぞく+ぞく+する, not ぞくぞく+する), and one spelling the whole
+  // reduplication is the mimetic itself (みるみる+うち).
+  candidates.erase(
+      std::remove_if(candidates.begin(), candidates.end(),
+                     [&codepoints](const UnknownCandidate& verb_candidate) {
+                       const size_t span = verb_candidate.end - verb_candidate.start;
+                       const auto first = codepoints.begin() + verb_candidate.start;
+                       const bool halves_reduplication = span >= 2 && verb_candidate.end + span <= codepoints.size() &&
+                                                         std::equal(first, first + span, first + span);
+                       const bool spells_reduplication =
+                           span >= 4 && span % 2 == 0 && std::equal(first, first + span / 2, first + span / 2);
+                       return !verb_candidate.lemma_verified && (halves_reduplication || spells_reduplication);
+                     }),
+      candidates.end());
 
   // A terminal verb reaches the copula only through だろ (降る+だろ+う), so an
   // unattested one before a bare だ is a nominal misread (ふつう+だ).

@@ -1383,6 +1383,28 @@
       ],
       "id": "kono_haoishii",
       "input": "このパンはおいしい"
+    },
+    {
+      "description": "みるみるうちに - regression test",
+      "expected": [
+        {
+          "lemma": "みるみる",
+          "pos": "Adverb",
+          "surface": "みるみる"
+        },
+        {
+          "lemma": "うち",
+          "pos": "Noun",
+          "surface": "うち"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        }
+      ],
+      "id": "mirumiruuchini",
+      "input": "みるみるうちに"
     }
   ],
   "description": "Basic tokenization tests",
