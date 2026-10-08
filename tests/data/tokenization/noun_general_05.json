@@ -531,6 +531,33 @@
       ],
       "id": "konokutsuhaaru",
       "input": "このくつはある"
+    },
+    {
+      "description": "Kana Sino noun with a moraic nasal between the topic particle and the copula",
+      "expected": [
+        {
+          "lemma": "それ",
+          "pos": "Pronoun",
+          "surface": "それ"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "さんぽ",
+          "pos": "Noun",
+          "surface": "さんぽ"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "sorehasanpodesu",
+      "input": "それはさんぽです"
     }
   ],
   "description": "General nouns (part 5/5)",

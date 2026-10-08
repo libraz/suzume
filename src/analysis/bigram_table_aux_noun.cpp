@@ -122,6 +122,8 @@ bool setAuxiliaryAndNounCosts(BigramMatrix& table) {
       // such as し+だった must instead be licensed as a lexical noun before
       // the copula; a causative predicate needs a finite ending first.
       {EPOS::AuxCausative, EPOS::AuxCopulaDa, cost::kAlmostNever},
+      // Nor to the aspect いる, which needs the te-form in between (読ま+せ+て+いる).
+      {EPOS::AuxCausative, EPOS::AuxAspectIru, cost::kAlmostNever},
 
       // Honorific subsidiary negative: いただけ+ない, なさら+ない. Keep
       // the dependent auxiliary reading ahead of a homographic lexical verb.

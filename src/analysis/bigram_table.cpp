@@ -71,11 +71,14 @@ BigramTable::EncodedTable BigramTable::initTable() {
     }
   }
   // The pejorative subsidiary やがる continues like the progressive auxiliary but
-  // stands directly on a continuative instead of a て form.
+  // stands directly on a continuative instead of a て form, the causative's
+  // continuative among them (待た+せ+やがっ+て).
   {
     bigram_rules::inheritRuleProfile(table, core::ExtendedPOS::AuxAspectIru, core::ExtendedPOS::AuxPejorativeYagaru);
     bigram_rules::setCost(table, core::ExtendedPOS::VerbRenyokei, core::ExtendedPOS::AuxPejorativeYagaru,
                           bigram_cost::kStrongBonus);
+    bigram_rules::setCost(table, core::ExtendedPOS::AuxCausative, core::ExtendedPOS::AuxPejorativeYagaru,
+                          bigram_cost::kNeutral);
   }
   // The trace suffix っけ continues like any suffix, and stands on a continuative
   // firmly enough to outrank the homographic final particle (飾り+っけ).

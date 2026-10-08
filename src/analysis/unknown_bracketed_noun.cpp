@@ -439,6 +439,27 @@ bool readsAsVerbTerminal(const grammar::Inflection& inflection, const std::strin
   });
 }
 
+// Whether codepoints[start, end) is a chain of registered auxiliaries each of
+// which the word before it licenses, starting from @p previous. Count_ opens
+// the chain with no word in front of it.
+bool continuesAuxiliaryChain(const dictionary::DictionaryManager& dict_manager, const std::vector<char32_t>& codepoints,
+                             core::ExtendedPOS previous, size_t start, size_t end) {
+  if (start == end) {
+    return true;
+  }
+  for (size_t next_end = start + 1; next_end <= end; ++next_end) {
+    const auto* auxiliary =
+        lookupEntryInRange(dict_manager, codepoints, start, next_end, core::PartOfSpeech::Auxiliary);
+    if (auxiliary != nullptr &&
+        (previous == core::ExtendedPOS::Count_ ||
+         BigramTable::getCost(previous, auxiliary->extended_pos) < scorer::scale::kStrong) &&
+        continuesAuxiliaryChain(dict_manager, codepoints, auxiliary->extended_pos, next_end, end)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool endsOnPredicateTail(const BracketedNounContext& ctx, size_t run_end) {
   const auto& codepoints = ctx.codepoints;
   const size_t start_pos = ctx.start_pos;
@@ -520,10 +541,15 @@ PromotedRun classifyRightBrackets(const BracketedNounContext& ctx, const Bracket
       (scan == codepoints.size()) || (scan < codepoints.size() && isNonWordType(ctx.char_types[scan]));
   // An auxiliary is bound leftward, so it brackets the run in front of it just
   // as a particle does. It does not select the run the way a case particle
-  // does, so it only makes the candidate available.
+  // does, so it only makes the candidate available. One a noun cannot host
+  // brackets no noun (せんしゅ+う of the volitional).
+  const auto* right_auxiliary_entry =
+      dict_manager != nullptr && scan < codepoints.size()
+          ? lookupEntryInRange(*dict_manager, codepoints, scan, scan + 1, core::PartOfSpeech::Auxiliary)
+          : nullptr;
   promoted.right_auxiliary =
-      dict_manager != nullptr && scan < codepoints.size() &&
-      lookupEntryInRange(*dict_manager, codepoints, scan, scan + 1, core::PartOfSpeech::Auxiliary) != nullptr;
+      right_auxiliary_entry != nullptr &&
+      BigramTable::getCost(core::ExtendedPOS::Noun, right_auxiliary_entry->extended_pos) < scorer::scale::kStrong;
   // A kanji run behind the kana starts a word of its own — okurigana attaches
   // to the right of its kanji and never to the left — so the script change
   // brackets what precedes it, and the run it closes is the modifier of that
@@ -808,17 +834,20 @@ bool admitsPromotedRun(const BracketedNounContext& ctx, const BracketedScan& bra
     }
   }
   // Nor may it absorb a registered irrealis and the auxiliary that selects
-  // it (あら+ん+や): that is a finished predicate, not a noun.
+  // it (あら+ん+や): that is a finished predicate, not a noun, when only
+  // particles follow it (せ+ん+せい is the noun せんせい).
   bool opens_on_irrealis_chain = false;
   for (size_t stem_end = start_pos + 1; stem_end < scan && !opens_on_irrealis_chain && dict_manager != nullptr;
        ++stem_end) {
     const auto* irrealis = lookupEntryInRange(*dict_manager, codepoints, start_pos, stem_end, core::PartOfSpeech::Verb);
     const auto* auxiliary =
         lookupEntryInRange(*dict_manager, codepoints, stem_end, stem_end + 1, core::PartOfSpeech::Auxiliary);
-    opens_on_irrealis_chain = irrealis != nullptr && auxiliary != nullptr &&
-                              irrealis->extended_pos == core::ExtendedPOS::VerbMizenkei &&
-                              (auxiliary->extended_pos == core::ExtendedPOS::AuxNegativeNu ||
-                               auxiliary->extended_pos == core::ExtendedPOS::AuxVolitional);
+    opens_on_irrealis_chain =
+        irrealis != nullptr && auxiliary != nullptr && irrealis->extended_pos == core::ExtendedPOS::VerbMizenkei &&
+        (auxiliary->extended_pos == core::ExtendedPOS::AuxNegativeNu ||
+         auxiliary->extended_pos == core::ExtendedPOS::AuxVolitional) &&
+        (stem_end + 1 == scan ||
+         maximalSegmentCount(*dict_manager, codepoints, stem_end + 1, scan, core::PartOfSpeech::Particle) > 0);
   }
   // A case particle can complete a formal noun whose first mora was
   // accidentally absorbed by this rescue candidate (くる+こと, おく+こと).
@@ -855,8 +884,7 @@ bool admitsPromotedRun(const BracketedNounContext& ctx, const BracketedScan& bra
           (auxiliary->extended_pos == core::ExtendedPOS::AuxCopulaDa ||
            auxiliary->extended_pos == core::ExtendedPOS::AuxCopulaDesu ||
            BigramTable::getCost(word->extended_pos, auxiliary->extended_pos) < bigram_cost::kNeutral) &&
-          (aux_end == scan ||
-           maximalSegmentCount(*dict_manager, codepoints, aux_end, scan, core::PartOfSpeech::Auxiliary) > 0);
+          continuesAuxiliaryChain(*dict_manager, codepoints, auxiliary->extended_pos, aux_end, scan);
     }
   }
   // Nor may it finish an auxiliary that opens on the particle-shaped kana in
@@ -870,14 +898,15 @@ bool admitsPromotedRun(const BracketedNounContext& ctx, const BracketedScan& bra
                                (aux_end == scan || maximalSegmentCount(*dict_manager, codepoints, aux_end, scan,
                                                                        core::PartOfSpeech::Particle) > 0);
   }
-  // A run spelled wholly by two or more auxiliaries (い+です) is a predicate
-  // tail. The classical perfect is left out, as in the function-word chain
+  // A run spelled wholly by two or more auxiliaries, each licensing the next
+  // (い+です), is a predicate tail. The classical perfect is left out, as in the function-word chain
   // check: its one-mora cells are admitted only inside their own chain and
   // would otherwise decompose ordinary nouns (に+おい).
   const bool spells_auxiliary_chain =
       dict_manager != nullptr && promoted.len >= 3 &&
       maximalSegmentCount(*dict_manager, codepoints, start_pos, scan, core::PartOfSpeech::Auxiliary,
-                          core::ExtendedPOS::AuxClassicalPerfect, !particleMoraLacksHost(codepoints, start_pos)) >= 2;
+                          core::ExtendedPOS::AuxClassicalPerfect, !particleMoraLacksHost(codepoints, start_pos)) >= 2 &&
+      continuesAuxiliaryChain(*dict_manager, codepoints, core::ExtendedPOS::Count_, start_pos, scan);
   // ご before kana is the Sino-Japanese honorific on a kana verbal noun
   // (ご+あんない+します); a rescue would swallow the prefix into the noun.
   // Nor may it open on the te-form connective that a continuative right in
