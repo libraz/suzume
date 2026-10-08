@@ -163,6 +163,7 @@ postprocess_na_adj_noun = postprocessor_predicates.postprocess_na_adj_noun
 postprocess_kana_na_adjective_stem = postprocessor_predicates.postprocess_kana_na_adjective_stem
 postprocess_onaji_predicate = postprocessor_predicates.postprocess_onaji_predicate
 postprocess_short_hiragana_onbin = postprocessor_predicates.postprocess_short_hiragana_onbin
+postprocess_determiner_onbin_verb = postprocessor_predicates.postprocess_determiner_onbin_verb
 postprocess_sou = postprocessor_predicates.postprocess_sou
 postprocess_teki_na_adjective = postprocessor_predicates.postprocess_teki_na_adjective
 postprocess_verb_ease_adjective = postprocessor_predicates.postprocess_verb_ease_adjective
@@ -260,6 +261,7 @@ POSTPROCESSORS: tuple[tuple[str, Callable[[list[dict]], bool]], ...] = (
     ("excessive-after-verb", postprocess_excessive_after_verb),
     ("fuu-formal-noun", postprocess_fuu_formal_noun),
     ("indefinite-ka", postprocess_indefinite_ka),
+    ("determiner-onbin-verb", postprocess_determiner_onbin_verb),
     ("subsidiary-yuku", postprocess_subsidiary_yuku),
     ("contracted-iku-tte-na", postprocess_contracted_iku_tte_na),
     ("contracted-iku-lemma", postprocess_contracted_iku_lemma),

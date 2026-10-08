@@ -291,6 +291,33 @@ def postprocess_short_hiragana_onbin(tokens: list[dict]) -> bool:
     return changed
 
 
+def postprocess_determiner_onbin_verb(tokens: list[dict]) -> bool:
+    """Rejoin a kana イ音便 verb split into a determiner plus いる before て/で.
+
+    A determiner modifies a noun, so ある+い+て cannot stand: the kana run is
+    the イ音便 of a godan verb (あるい+て). Voicing on the connective selects
+    the row, as it does for every イ音便 (書い+て, 泳い+で).
+    """
+    changed = False
+    idx = 0
+    while idx + 2 < len(tokens):
+        determiner, verb, connective = tokens[idx], tokens[idx + 1], tokens[idx + 2]
+        if (
+            determiner.get("pos") == "Determiner"
+            and regex.fullmatch(r"\p{Hiragana}+", determiner.get("surface", ""))
+            and verb.get("pos") == "Verb"
+            and verb.get("surface") == "い"
+            and connective.get("pos") == "Particle"
+            and connective.get("surface") in ("て", "で")
+        ):
+            stem = determiner["surface"]
+            row_ending = "く" if connective["surface"] == "て" else "ぐ"
+            tokens[idx : idx + 2] = [{"surface": stem + "い", "pos": "Verb", "lemma": stem + row_ending}]
+            changed = True
+        idx += 1
+    return changed
+
+
 def postprocess_hiragana_godan_wa_terminal(tokens: list[dict]) -> bool:
     """Merge a pure-hiragana Godan-wa base split from final auxiliary う."""
     if len(tokens) != 2 or tokens[0].get("pos") != "Verb" or tokens[1].get("surface") != "う":

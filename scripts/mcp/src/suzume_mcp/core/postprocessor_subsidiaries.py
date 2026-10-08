@@ -285,12 +285,16 @@ def postprocess_tagaru_aux(tokens: list[dict]) -> bool:
 
 
 def postprocess_subsidiary_yuku(tokens: list[dict]) -> bool:
-    """Treat literary 連用形 + ゆく/いく as a subsidiary verb."""
+    """Treat literary 連用形 + ゆく/いく as a subsidiary verb.
+
+    The potential いける/ゆける keeps the same role after て/で (生きていけない,
+    生きてゆけない); the reference lists only the former as non-independent.
+    """
     changed = False
     for idx in range(1, len(tokens)):
         previous = tokens[idx - 1]
         token = tokens[idx]
-        if token.get("lemma") not in ("行く", "いく", "ゆく") and token.get("surface") not in (
+        if token.get("lemma") not in ("行く", "いく", "ゆく", "いける", "ゆける") and token.get("surface") not in (
             "いこ",
             "ゆこ",
             "いく",
