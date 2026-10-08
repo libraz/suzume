@@ -27,7 +27,14 @@ def core_entries(filename: str) -> tuple[tuple[str, ...], ...]:
 
 def core_headwords(filename: str) -> frozenset[str]:
     """Return the surfaces registered in one source L2 lexicon."""
-    return frozenset(entry[0] for entry in core_entries(filename) if entry)
+    path = PROJECT_ROOT / "data" / "core" / filename
+    return _read_headwords(str(path), path.stat().st_mtime_ns)
+
+
+@lru_cache(maxsize=16)
+def _read_headwords(path_text: str, modified_ns: int) -> frozenset[str]:
+    """Return cached headwords for one lexicon revision."""
+    return frozenset(entry[0] for entry in _read_entries(path_text, modified_ns) if entry)
 
 
 @lru_cache(maxsize=16)

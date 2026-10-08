@@ -93,6 +93,10 @@ _VOLITIONAL_AUXILIARIES = frozenset({"う", "よう", "まい", "む", "ん"})
 _GE_NAI_ADJECTIVE = regex.compile(r"(.+げ)(な(?:い|く|かっ|けれ|さ|き))")
 
 
+_VERB_INFLECTION_FOLLOWERS = frozenset({"て", "た", "たり", "ない", "なかっ", "ぬ", "ます", "まし"})
+_FIXED_LEADING_SEARCH_UNITS_BY_LENGTH = tuple(sorted(FIXED_LEADING_SEARCH_UNITS, key=len, reverse=True))
+
+
 def apply_suzume_split(tokens: list[dict]) -> tuple[list[dict], str | None]:
     """Apply Suzume split rules to MeCab tokens.
 
@@ -397,11 +401,10 @@ def apply_suzume_split(tokens: list[dict]) -> tuple[list[dict], str | None]:
         # noun or as a compound verb.  Recover the same grammatical boundary
         # for any derivable continuative stem instead of listing host verbs.
         following_surface = tokens[token_index + 1].get("surface", "") if token_index + 1 < len(tokens) else ""
-        verb_inflection_followers = frozenset({"て", "た", "たり", "ない", "なかっ", "ぬ", "ます", "まし"})
         if (
             surface.endswith("たて")
             and len(surface) > len("たて")
-            and following_surface not in verb_inflection_followers
+            and following_surface not in _VERB_INFLECTION_FOLLOWERS
         ):
             stem = surface[: -len("たて")]
             lemma = base_from_renyokei(stem)
@@ -452,7 +455,7 @@ def apply_suzume_split(tokens: list[dict]) -> tuple[list[dict], str | None]:
         # noun in the reference dictionary. Restore the grammatical search
         # boundary without enumerating the open-class noun on the right.
         leading_unit = next(
-            (unit for unit in sorted(FIXED_LEADING_SEARCH_UNITS, key=len, reverse=True) if surface.startswith(unit)),
+            (unit for unit in _FIXED_LEADING_SEARCH_UNITS_BY_LENGTH if surface.startswith(unit)),
             "",
         )
         if leading_unit and len(surface) > len(leading_unit):
