@@ -272,6 +272,87 @@
       ],
       "id": "kurushisani_eta",
       "input": "くるしさに耐えた"
+    },
+    {
+      "description": "the de of the polite copula is no particle bracket",
+      "expected": [
+        {
+          "lemma": "あした",
+          "pos": "Noun",
+          "surface": "あした"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "たのしみ",
+          "pos": "Noun",
+          "surface": "たのしみ"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "ashitagatanoshimidesu",
+      "input": "あしたがたのしみです"
+    },
+    {
+      "description": "kana mi-nominalization after a kanji noun and ga",
+      "expected": [
+        {
+          "lemma": "旅行",
+          "pos": "Noun",
+          "surface": "旅行"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "たのしみ",
+          "pos": "Noun",
+          "surface": "たのしみ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "gatanoshimida",
+      "input": "旅行がたのしみだ"
+    },
+    {
+      "description": "kana mi-nominalization between a case particle and the copula",
+      "expected": [
+        {
+          "lemma": "ねこ",
+          "pos": "Noun",
+          "surface": "ねこ"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "たのしみ",
+          "pos": "Noun",
+          "surface": "たのしみ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "nekogatanoshimida",
+      "input": "ねこがたのしみだ"
     }
   ],
   "description": "noun_derived tests",

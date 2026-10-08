@@ -70,7 +70,10 @@ BoundAuxiliary boundAuxiliaryAt(const std::vector<char32_t>& codepoints, size_t 
       }
       continue;
     }
-    if (isRightBoundaryParticle(codepoints[after]) || !auxiliaries_at(after).empty()) {
+    // The attributive copula な selects a nominal, never another auxiliary
+    // (とも+な+く is とも+なく).
+    const bool attributive_copula = is_copula && length == 1 && codepoints[pos] == U'な';
+    if (isRightBoundaryParticle(codepoints[after]) || (!attributive_copula && !auxiliaries_at(after).empty())) {
       return {length, is_copula};
     }
   }

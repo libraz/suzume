@@ -153,6 +153,7 @@ struct PromotedRun {
   bool right_kanji_word{false};
   bool right_suffix{false};
   bool right_copula{false};
+  bool right_particle_opens_copula{false};
   std::string promoted_surface;
   const dictionary::DictionaryEntry* promoted_dictionary_reading{nullptr};
   const dictionary::DictionaryEntry* short_right_particle{nullptr};
@@ -572,6 +573,19 @@ PromotedRun classifyRightBrackets(const BracketedNounContext& ctx, const Bracket
   // available, because its own kana could equally be the run's last mora.
   const BoundAuxiliary right_bound = boundAuxiliaryAt(codepoints, scan, dict_manager, bracketed.left_particle_bracket);
   promoted.right_copula = right_bound.length > 0 && right_bound.is_copula;
+  // The particle-shaped first mora of a longer copula is the copula's (で of です).
+  if (dict_manager != nullptr && scan < codepoints.size() && isRightBoundaryParticle(codepoints[scan])) {
+    constexpr size_t kCopulaWindow = 4;
+    for (const auto& match :
+         lookupResultsInRange(*dict_manager, codepoints, scan, std::min(codepoints.size(), scan + kCopulaWindow))) {
+      if (match.entry != nullptr && match.length > 1 &&
+          (match.entry->extended_pos == core::ExtendedPOS::AuxCopulaDa ||
+           match.entry->extended_pos == core::ExtendedPOS::AuxCopulaDesu)) {
+        promoted.right_particle_opens_copula = true;
+        break;
+      }
+    }
+  }
   promoted.scan = scan;
   return promoted;
 }
@@ -979,13 +993,13 @@ void appendPromotedRunCandidates(const BracketedNounContext& ctx, const Brackete
   const bool right_predicate_quote = promoted.right_particle && scan < codepoints.size() &&
                                      codepoints[scan] == core::hiragana::kTo && has_terminal_i_adjective_reading;
   // The enumerating や asks for a nominal item whatever follows it.
-  const bool selected_nominal =
-      (((promoted.right_particle || auxiliary_bracket_before_particle || promoted.right_suffix) &&
-        !promoted.right_genitive_after_substantive_run && !right_predicate_quote &&
-        (bracketed.left_determiner_bracket || bracketed.left_clause_bracket ||
-         (start_pos > 0 && codepoints[start_pos - 1] == U'の'))) ||
-       (bracketed.left_enumerating_bracket &&
-        (promoted.right_particle || promoted.right_clause || promoted.right_copula)));
+  const bool selected_nominal = ((((promoted.right_particle && !promoted.right_particle_opens_copula) ||
+                                   auxiliary_bracket_before_particle || promoted.right_suffix) &&
+                                  !promoted.right_genitive_after_substantive_run && !right_predicate_quote &&
+                                  (bracketed.left_determiner_bracket || bracketed.left_clause_bracket ||
+                                   (start_pos > 0 && codepoints[start_pos - 1] == U'の'))) ||
+                                 (bracketed.left_enumerating_bracket &&
+                                  (promoted.right_particle || promoted.right_clause || promoted.right_copula)));
   // This is an unknown-noun rescue path.  Keep the homographic noun
   // candidate when an exact lexical reading exists, but do not give it
   // the rescue bonus that would erase the dictionary POS (きれい, しかれ,
@@ -995,16 +1009,16 @@ void appendPromotedRunCandidates(const BracketedNounContext& ctx, const Brackete
                                      exact_dictionary_reading->extended_pos == core::ExtendedPOS::ParticleFinal &&
                                      scan < codepoints.size() &&
                                      grammar::isSingleHiragana(extractSubstring(codepoints, scan, scan + 1), U'と');
-  // A run spelled as an i-adjective stem and the nominalizer さ/み
-  // (やさし+さ) has a derivation that owns the span the way a lexical
-  // reading does, so the rescue offers the noun but does not select it.
-  const bool spells_adjective_nominalization =
-      std::any_of(promoted.promoted_inflections->begin(), promoted.promoted_inflections->end(),
-                  [](const grammar::InflectionCandidate& inflection_candidate) {
-                    return inflection_candidate.verb_type == grammar::VerbType::IAdjective &&
-                           (inflection_candidate.suffix == "さ" || inflection_candidate.suffix == "み") &&
-                           inflection_candidate.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence;
-                  });
+  // A run spelled as an i-adjective stem and the nominalizer さ (やさし+さ)
+  // has a derivation that owns the span the way a lexical reading does, so
+  // the rescue offers the noun but does not select it. The nominalizer み
+  // derives a whole noun (たのしみ, かなしみ), which is the rescued run itself.
+  const bool spells_adjective_nominalization = std::any_of(
+      promoted.promoted_inflections->begin(), promoted.promoted_inflections->end(),
+      [](const grammar::InflectionCandidate& inflection_candidate) {
+        return inflection_candidate.verb_type == grammar::VerbType::IAdjective && inflection_candidate.suffix == "さ" &&
+               inflection_candidate.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence;
+      });
   const bool exact_reading_owns_context =
       spells_adjective_nominalization ||
       (exact_dictionary_reading != nullptr &&
@@ -1043,11 +1057,13 @@ void appendPromotedRunCandidates(const BracketedNounContext& ctx, const Brackete
   // A bound copula selects a nominal, so it is evidence for the run being
   // a noun and not only a bracket that makes the candidate available. It
   // is weaker evidence than the selecting case particle above, which comes
-  // with a left bracket of its own, so the preference is correspondingly
-  // small — enough to settle a run the fabricated-verb reading also covers
-  // (くつ|だっ|た, where くつ is equally a godan dictionary form).
+  // with a left bracket of its own, so on its own the preference is small —
+  // enough to settle a run the fabricated-verb reading also covers (くつ|だっ|た,
+  // where くつ is equally a godan dictionary form). A non-genitive particle on
+  // the left closes the frame from both sides and weighs more (ねこ+が+たのしみ+だ).
   if (promoted.right_copula && !exact_reading_owns_context && !selected_nominal) {
-    noun_cost += scorer::scale::kMinorBonus;
+    noun_cost += bracketed.left_particle_bracket && !bracketed.left_genitive_bracket ? scorer::scale::kStrongBonus
+                                                                                     : scorer::scale::kMinorBonus;
   }
   // A manner mimetic before the quotative と is bracketed the same way but is
   // the adverb, not a noun (うっとり+と, どきり+と).
