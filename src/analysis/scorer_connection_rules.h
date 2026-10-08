@@ -84,6 +84,9 @@ float computeBareNounRecollectiveKePenalty(const core::LatticeEdge& prev, const 
 
 /** @brief Penalizes a formal noun after the bare-kanji terminal of a classical ハ行 verb (候はず). */
 float computeBareClassicalTerminalFormalNounPenalty(const core::LatticeEdge& prev, const core::LatticeEdge& next);
+
+/** @brief Penalizes a kana nominal or unknown run after a literary adjective terminal (か+なし+みだ). */
+float computeLiteraryAdjectiveTerminalNominalPenalty(const core::LatticeEdge& prev, const core::LatticeEdge& next);
 float computeAdjectiveTePredicatePenalty(const core::LatticeEdge& prev, const core::LatticeEdge& next);
 float computeClassicalNegativeBoundaryPenalty(const core::LatticeEdge& prev, const core::LatticeEdge& next);
 float computeAdjectiveDerivationHostPenalty(const core::LatticeEdge& prev, const core::LatticeEdge& next);

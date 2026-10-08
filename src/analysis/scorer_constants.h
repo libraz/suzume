@@ -488,6 +488,11 @@ constexpr float kEosBareERowRenyokeiPenalty = scale::kStrong;
 // A formal noun does not follow the bare-kanji terminal of a classical verb (候+はず).
 constexpr float kPenaltyBareClassicalTerminalBeforeFormalNoun = scale::kStrong;
 
+// A literary adjective terminal (なし) does not modify the kana run after it;
+// its attributive is a form of its own (なき). Must outweigh the attributive
+// adjective→noun bonus and the fragment path's margin (かな+しみ).
+constexpr float kPenaltyLiteraryAdjectiveTerminalBeforeKana = scale::kStrong;
+
 // The recollective け after a bare common noun is the tail of a nominalized verb.
 constexpr float kPenaltyBareNounRecollectiveKe = scale::kStrong;
 

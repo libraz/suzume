@@ -353,6 +353,60 @@
       ],
       "id": "nekogatanoshimida",
       "input": "ねこがたのしみだ"
+    },
+    {
+      "description": "Kana mi-nominal containing the literary adjective terminal nashi, framed by a case particle and the copula",
+      "expected": [
+        {
+          "lemma": "ねこ",
+          "pos": "Noun",
+          "surface": "ねこ"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "かなしみ",
+          "pos": "Noun",
+          "surface": "かなしみ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "nekogakanashimida",
+      "input": "ねこがかなしみだ"
+    },
+    {
+      "description": "Kana mi-nominal containing the literary adjective terminal nashi after the topic particle",
+      "expected": [
+        {
+          "lemma": "これ",
+          "pos": "Pronoun",
+          "surface": "これ"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "かなしみ",
+          "pos": "Noun",
+          "surface": "かなしみ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "korehakanashimida",
+      "input": "これはかなしみだ"
     }
   ],
   "description": "noun_derived tests",

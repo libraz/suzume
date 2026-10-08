@@ -433,6 +433,19 @@ float computeBareClassicalTerminalFormalNounPenalty(const core::LatticeEdge& pre
              : sc::scale::kNeutral;
 }
 
+/// A literary adjective terminal is spelled apart from its modern headword
+/// (なし of ない). It closes its clause and modifies nothing, as the classical
+/// attributive has a form of its own (なき), so a kana nominal or unknown run
+/// after it is the tail of a word it was cut out of (かな+しみ). A kanji or
+/// katakana head after it is the modern bound use (砂糖なし+コーヒー).
+float computeLiteraryAdjectiveTerminalNominalPenalty(const core::LatticeEdge& prev, const core::LatticeEdge& next) {
+  const bool literary_terminal = prev.pos == core::PartOfSpeech::Adjective &&
+                                 prev.extended_pos == core::ExtendedPOS::AdjBasic && prev.lemma != prev.surface;
+  const bool kana_nominal = (next.pos == core::PartOfSpeech::Noun || next.pos == core::PartOfSpeech::Other) &&
+                            grammar::isPureHiragana(next.surface);
+  return literary_terminal && kana_nominal ? sc::kPenaltyLiteraryAdjectiveTerminalBeforeKana : sc::scale::kNeutral;
+}
+
 float computeCopulaConditionalBonus(const core::LatticeEdge& prev, const core::LatticeEdge& next) {
   // The literary concessive/conditional construction であれ(ば) is the
   // continuative copula followed by the hypothetical form of ある. Favor this
