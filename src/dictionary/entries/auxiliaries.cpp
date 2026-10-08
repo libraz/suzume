@@ -984,6 +984,7 @@ EntrySpecRange getAuxiliaryEntries() {
       verb("ゆく", "ゆく", EPOS::VerbShuushikei),
       verb("ゆき", "ゆく", EPOS::VerbRenyokei),
       verb("ゆか", "ゆく", EPOS::VerbMizenkei),
+      verb("ゆこ", "ゆく", EPOS::VerbMizenkei),
       verb("ゆけ", "ゆく", EPOS::VerbMeireikei),
       // Classical honorific おはす.  The independent verbal component keeps
       // the productive prefix boundary お + はす.

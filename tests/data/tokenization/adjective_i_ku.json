@@ -1701,6 +1701,28 @@
       ],
       "id": "ku_ittteyo",
       "input": "早く来いってよ"
+    },
+    {
+      "description": "早くいこう - regression test",
+      "expected": [
+        {
+          "lemma": "早い",
+          "pos": "Adjective",
+          "surface": "早く"
+        },
+        {
+          "lemma": "いく",
+          "pos": "Verb",
+          "surface": "いこ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "kuikou",
+      "input": "早くいこう"
     }
   ],
   "description": "I-adjectives ku-forms (連用形) - adverbial, negative, te-form, ku-naru patterns",

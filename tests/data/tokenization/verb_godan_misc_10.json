@@ -3067,6 +3067,87 @@
       ],
       "id": "aruiteiku",
       "input": "あるいていく"
+    },
+    {
+      "description": "東京へいこう - regression test",
+      "expected": [
+        {
+          "lemma": "東京",
+          "pos": "Noun",
+          "surface": "東京"
+        },
+        {
+          "lemma": "へ",
+          "pos": "Particle",
+          "surface": "へ"
+        },
+        {
+          "lemma": "いく",
+          "pos": "Verb",
+          "surface": "いこ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "heikou",
+      "input": "東京へいこう"
+    },
+    {
+      "description": "東京へゆこう - regression test",
+      "expected": [
+        {
+          "lemma": "東京",
+          "pos": "Noun",
+          "surface": "東京"
+        },
+        {
+          "lemma": "へ",
+          "pos": "Particle",
+          "surface": "へ"
+        },
+        {
+          "lemma": "ゆく",
+          "pos": "Verb",
+          "surface": "ゆこ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "heyukou",
+      "input": "東京へゆこう"
+    },
+    {
+      "description": "一緒にいこう - regression test",
+      "expected": [
+        {
+          "lemma": "一緒",
+          "pos": "Noun",
+          "surface": "一緒"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "いく",
+          "pos": "Verb",
+          "surface": "いこ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "niikou",
+      "input": "一緒にいこう"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 10/10)",
