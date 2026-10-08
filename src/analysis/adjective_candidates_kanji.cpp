@@ -475,7 +475,7 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
     // 叩ければ → 叩く (verb exists) → skip adjective (叩い is not a real adjective)
     // 寒ければ → 寒い (adjective) - handled separately as hiragana_part starts with け
     if (kanji_end == start_pos + 1 && hiragana_part == "ければ" &&
-        isVerbInDictionary(dict_manager, extractSubstring(codepoints, start_pos, kanji_end) + "く")) {
+        isVerbInDictionary(dict_manager, codepoints, start_pos, kanji_end, "く")) {
       continue;  // Verb exists, this is verb potential-conditional (叩ける + ば)
     }
 
@@ -504,8 +504,7 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
     const bool is_bare_nai_form =
         verb_helpers::readsAsBaseForm(inflection, hiragana_part, kNegativeAdjectiveBase, grammar::VerbType::IAdjective);
     if (is_bare_nai_form && (kanji_end - start_pos) >= 2 && !isAdjectiveInDictionary(dict_manager, surface) &&
-        !isAdjectiveInDictionary(dict_manager,
-                                 extractSubstring(codepoints, start_pos, kanji_end) + kNegativeAdjectiveBase)) {
+        !isAdjectiveInDictionary(dict_manager, codepoints, start_pos, kanji_end, kNegativeAdjectiveBase)) {
       continue;
     }
 

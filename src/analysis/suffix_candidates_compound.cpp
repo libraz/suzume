@@ -638,7 +638,7 @@ void addNominalSuffixChainEvidence(const KanjiHiraganaSpan& span, const Hiragana
     looks_like_aux =
         lookupEntryInRange(*dict_manager, codepoints, kanji_end, aux_end, core::PartOfSpeech::Auxiliary) != nullptr &&
         lookupEntryInRange(*dict_manager, codepoints, aux_end, hiragana_end, core::PartOfSpeech::Suffix) != nullptr &&
-        !verb_helpers::isAdjectiveInDictionary(dict_manager, extractSubstring(codepoints, start_pos, aux_end) + "い");
+        !verb_helpers::isAdjectiveInDictionary(dict_manager, codepoints, start_pos, aux_end, "い");
   }
 
   // The same chain behind a host that carries one okurigana mora of its own
@@ -651,11 +651,10 @@ void addNominalSuffixChainEvidence(const KanjiHiraganaSpan& span, const Hiragana
                                                core::PartOfSpeech::Adjective) != nullptr;
     // The stem may carry the nominalizer さ before the suffix (頼り+な+さ+げ).
     const size_t suffix_start = codepoints[stem_end] == U'さ' ? stem_end + 1 : stem_end;
-    looks_like_aux =
-        names_stem && suffix_start < hiragana_end &&
-        lookupEntryInRange(*dict_manager, codepoints, suffix_start, hiragana_end, core::PartOfSpeech::Suffix) !=
-            nullptr &&
-        !verb_helpers::isAdjectiveInDictionary(dict_manager, extractSubstring(codepoints, start_pos, stem_end) + "い");
+    looks_like_aux = names_stem && suffix_start < hiragana_end &&
+                     lookupEntryInRange(*dict_manager, codepoints, suffix_start, hiragana_end,
+                                        core::PartOfSpeech::Suffix) != nullptr &&
+                     !verb_helpers::isAdjectiveInDictionary(dict_manager, codepoints, start_pos, stem_end, "い");
   }
 }
 

@@ -166,12 +166,11 @@ size_t longestNominalVerbContinuativeStart(const std::vector<char32_t>& codepoin
     // suffix resembles a constructed Ichidan stem (家庭|向け, not 家|庭向け).
     size_t closed_suffix_start = kanji_end;
     const bool ends_in_dictionary_verb_continuative =
-        (!godan_ending.empty() && verb_helpers::isVerbInDictionary(
-                                      dict_manager, extractSubstring(codepoints, kanji_end - 1, continuative_end - 1) +
-                                                        std::string(godan_ending))) ||
+        (!godan_ending.empty() && verb_helpers::isVerbInDictionary(dict_manager, codepoints, kanji_end - 1,
+                                                                   continuative_end - 1, godan_ending)) ||
         (kana::isERowCodepoint(ending) &&
-         verb_helpers::isVerbInDictionary(dict_manager, extractSubstring(codepoints, kanji_end - 1, continuative_end) +
-                                                            normalize::encodeUtf8(core::hiragana::kRu)));
+         verb_helpers::isVerbInDictionary(dict_manager, codepoints, kanji_end - 1, continuative_end,
+                                          normalize::encodeUtf8(core::hiragana::kRu)));
     for (size_t suffix_start = kanji_start + 1; suffix_start < kanji_end; ++suffix_start) {
       if (lookupEntryInRange(*dict_manager, codepoints, suffix_start, continuative_end, core::PartOfSpeech::Suffix) !=
           nullptr) {
@@ -211,14 +210,12 @@ size_t longestNominalVerbContinuativeStart(const std::vector<char32_t>& codepoin
         const bool left_ichidan = verb_helpers::isSingleKanjiIchidan(codepoints[verb_start]);
         bool right_verb = false;
         if (!godan_ending.empty()) {
-          right_verb = verb_helpers::isVerbInDictionary(
-              dict_manager,
-              normalize::concat(extractSubstring(codepoints, verb_start + 1, continuative_end - 1), godan_ending));
+          right_verb = verb_helpers::isVerbInDictionary(dict_manager, codepoints, verb_start + 1, continuative_end - 1,
+                                                        godan_ending);
         }
         if (!right_verb && kana::isERowCodepoint(ending)) {
-          right_verb = verb_helpers::isVerbInDictionary(dict_manager,
-                                                        extractSubstring(codepoints, verb_start + 1, continuative_end) +
-                                                            normalize::encodeUtf8(core::hiragana::kRu));
+          right_verb = verb_helpers::isVerbInDictionary(dict_manager, codepoints, verb_start + 1, continuative_end,
+                                                        normalize::encodeUtf8(core::hiragana::kRu));
         }
         names_verb = left_ichidan && right_verb;
       }

@@ -305,7 +305,7 @@ const dictionary::DictionaryEntry* auxiliaryClosingAfterOkurigana(const dictiona
         auxiliary != nullptr && auxiliary->extended_pos == core::ExtendedPOS::AuxClassicalKeri &&
         kana::isIRowCodepoint(codepoints[aux_start - 1]) && codepoints[aux_start - 1] != U'し' &&
         codepoints[aux_start - 1] != U'じ' &&
-        !isAdjectiveInDictionary(dict_manager, extractSubstring(codepoints, stem_start, aux_start) + "い");
+        !isAdjectiveInDictionary(dict_manager, codepoints, stem_start, aux_start, "い");
     if (auxiliary != nullptr &&
         (auxiliary->extended_pos != core::ExtendedPOS::AuxClassicalKeri || keri_after_continuative) &&
         !voiced_oku_off_nasal) {

@@ -113,8 +113,7 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
       // the Ichidan path claim the cell whenever the potential base is registered,
       // so the reading rests on the dictionary rather than on the kana alone.
       const bool ranuki_potential_base =
-          is_single_kanji &&
-          vh::isVerbInDictionary(dict_manager, extractSubstring(codepoints, start_pos, kanji_end + 1) + "る") &&
+          is_single_kanji && vh::isVerbInDictionary(dict_manager, codepoints, start_pos, kanji_end + 1, "る") &&
           first_hira == U'れ';
       bool is_kuru_verb = is_single_kanji && grammar::isKuruKanjiStem(codepoints[start_pos]) && !ranuki_potential_base;
       // Otherwise almost certainly noun + particle, i-adjective, or kuru verb
@@ -306,7 +305,7 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
         // rather than registered (見る, 出る, 寝る).
         // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
         const bool ichidan_stem_is_attested =
-            vh::isVerbInDictionary(dict_manager, extractSubstring(codepoints, start_pos, kanji_end) + "る") ||
+            vh::isVerbInDictionary(dict_manager, codepoints, start_pos, kanji_end, "る") ||
             (is_single_kanji && vh::isSingleKanjiIchidan(codepoints[start_pos]));
         bool okurigana_opens_auxiliary = false;
         if (!ichidan_base_is_dict && dict_manager != nullptr && renyokei_end < codepoints.size() &&
@@ -546,8 +545,7 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
         const bool is_nai_adjective_okurigana =
             utf8::startsWithAny(okurigana, {"ない", "なく", "なかっ", "なけれ", "なかろ"}) ||
             (codepoints[renyokei_end - 1] == U'げ' &&
-             vh::isAdjectiveInDictionary(dict_manager,
-                                         extractSubstring(codepoints, start_pos, renyokei_end - 1) + "い"));
+             vh::isAdjectiveInDictionary(dict_manager, codepoints, start_pos, renyokei_end - 1, "い"));
         // A-row + せ/れ before an auxiliary continuation is a Godan voice
         // stem (読ま+せる, 読ま+れる). Keep a genuinely lexicalized Ichidan
         // verb such as 泳がせる, but do not generate an unverified long

@@ -848,10 +848,10 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
       continue;
     }
     const std::string stem = extractSubstring(codepoints, start_pos, ge_pos);
-    const bool kanji_compound_host = ge_pos == kanji_end && kanji_end >= start_pos + 2 &&
-                                     !verb_helpers::isVerbInDictionary(dict_manager, stem + "げる") &&
-                                     !verb_helpers::isVerbInDictionary(
-                                         dict_manager, extractSubstring(codepoints, kanji_end - 1, kanji_end) + "げる");
+    const bool kanji_compound_host =
+        ge_pos == kanji_end && kanji_end >= start_pos + 2 &&
+        !verb_helpers::isVerbInDictionary(dict_manager, stem + "げる") &&
+        !verb_helpers::isVerbInDictionary(dict_manager, codepoints, kanji_end - 1, kanji_end, "げる");
     if (kanji_compound_host || isAdjectiveInDictionary(dict_manager, stem + "い")) {
       candidates.push_back(makeNounCandidate(stem + "げ", start_pos, ge_pos + 1, candidate::kAdjStemExtCost, false,
                                              CandidateOrigin::AdjectiveI, core::ExtendedPOS::Noun));

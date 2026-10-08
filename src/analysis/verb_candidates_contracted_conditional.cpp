@@ -60,8 +60,7 @@ bool namesAttestedPredicate(const dictionary::DictionaryManager* dict_manager, c
   if (godan_ending.empty()) {
     return false;
   }
-  return vh::isVerbInDictionary(
-      dict_manager, normalize::concat(extractSubstring(base_points, 0, base_points.size() - 2), godan_ending));
+  return vh::isVerbInDictionary(dict_manager, base_points, 0, base_points.size() - 2, godan_ending);
 }
 
 // Pick the reading the reconstruction names, or nullptr when the span is not a

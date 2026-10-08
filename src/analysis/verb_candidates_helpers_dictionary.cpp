@@ -28,6 +28,20 @@ namespace suzume::analysis::verb_helpers {
 // Dictionary Lookup Helpers
 // =============================================================================
 
+namespace {
+
+bool isDictionaryEntryWithSuffix(const dictionary::DictionaryManager* dict_manager,
+                                 const std::vector<char32_t>& codepoints, size_t start, size_t end,
+                                 std::string_view suffix, core::PartOfSpeech pos) {
+  std::string surface = extractSubstring(codepoints, start, end);
+  if (!suffix.empty()) {
+    surface.append(suffix.data(), suffix.size());
+  }
+  return hasDictionaryEntry(dict_manager, surface, pos);
+}
+
+}  // namespace
+
 bool isVerbInDictionary(const dictionary::DictionaryManager* dict_manager, std::string_view base_form) {
   return hasDictionaryEntry(dict_manager, base_form, core::PartOfSpeech::Verb);
 }
@@ -95,6 +109,16 @@ bool hasDictionaryGodanBaseFromIRow(const dictionary::DictionaryManager* dict_ma
 bool isAdjectiveInDictionary(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
                              size_t start, size_t end) {
   return hasDictionaryEntry(dict_manager, extractSubstring(codepoints, start, end), core::PartOfSpeech::Adjective);
+}
+
+bool isVerbInDictionary(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
+                        size_t start, size_t end, std::string_view suffix) {
+  return isDictionaryEntryWithSuffix(dict_manager, codepoints, start, end, suffix, core::PartOfSpeech::Verb);
+}
+
+bool isAdjectiveInDictionary(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
+                             size_t start, size_t end, std::string_view suffix) {
+  return isDictionaryEntryWithSuffix(dict_manager, codepoints, start, end, suffix, core::PartOfSpeech::Adjective);
 }
 
 bool namesDictionaryVerbContinuative(const dictionary::DictionaryManager* dict_manager,

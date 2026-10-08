@@ -135,7 +135,7 @@ void appendSingleOkuriganaMizenkeiCandidates(const std::vector<char32_t>& codepo
     // that the whole form is one search unit; otherwise the ordinary
     // Godan mizenkei + causative auxiliary boundary is productive.
     const bool has_lexical_causative =
-        vh::isVerbInDictionary(dict_manager, extractSubstring(codepoints, start_pos, mizenkei_end) + "せる");
+        vh::isVerbInDictionary(dict_manager, codepoints, start_pos, mizenkei_end, "せる");
     const char32_t after_se = codepoints[mizenkei_end + 1];
     if (after_se == U'ら') {
       // Causative-passive chains: せられる. A bare せる/せた/せて remains the
@@ -225,8 +225,7 @@ void appendSingleOkuriganaMizenkeiCandidates(const std::vector<char32_t>& codepo
   // Skip godan mizenkei passive when the surface + れる is a known ichidan
   // verb in the dictionary. E.g., 囚われる is ichidan, not passive of 囚う.
   // The dictionary entry provides the correct candidate with proper lemma.
-  if (is_passive_pattern &&
-      vh::isVerbInDictionary(dict_manager, extractSubstring(codepoints, start_pos, mizenkei_end) + "れる")) {
+  if (is_passive_pattern && vh::isVerbInDictionary(dict_manager, codepoints, start_pos, mizenkei_end, "れる")) {
     return;
   }
   // The classical conjectural attaches to an irrealis, so the
@@ -318,8 +317,7 @@ void appendGodanMizenkeiPassiveCausativeCandidates(const std::vector<char32_t>& 
   // the imperative of a registered godan-sa verb (転がせ ← 転がす, not 転が+せ).
   const bool closes_word = kanji_end + 2 >= codepoints.size() || !kana::isHiraganaCodepoint(codepoints[kanji_end + 2]);
   if (after_a == U'せ' && closes_word &&
-      vh::isVerbInDictionary(dict_manager,
-                             normalize::concat(extractSubstring(codepoints, start_pos, kanji_end + 1), "す"))) {
+      vh::isVerbInDictionary(dict_manager, codepoints, start_pos, kanji_end + 1, "す")) {
     return;
   }
 

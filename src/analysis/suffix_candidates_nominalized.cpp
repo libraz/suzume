@@ -664,7 +664,7 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
     // lexical unit instead of reanalyzing its final し as a suru stem.
     const bool is_classical_iadjective_terminal =
         kanji_count == 1 && first_hiragana == U'し' && kanji_end + 1 == codepoints.size() &&
-        verb_helpers::isAdjectiveInDictionary(dict_manager, extractSubstring(codepoints, start_pos, kanji_end) + "い");
+        verb_helpers::isAdjectiveInDictionary(dict_manager, codepoints, start_pos, kanji_end, "い");
     if (is_classical_iadjective_terminal) {
       nom1_cost += candidate::kClassicalIAdjectiveTerminalNounBonus;
     }
@@ -779,8 +779,7 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
       constexpr size_t kVerbHeadProbe = 4;
       const size_t probe_start = start_pos > kVerbHeadProbe ? start_pos - kVerbHeadProbe : 0;
       for (size_t verb_start = start_pos + 1; verb_start-- > probe_start;) {
-        if (verb_helpers::isVerbInDictionary(
-                dict_manager, normalize::concat(extractSubstring(codepoints, verb_start, kanji_end), u_row))) {
+        if (verb_helpers::isVerbInDictionary(dict_manager, codepoints, verb_start, kanji_end, u_row)) {
           return true;
         }
       }

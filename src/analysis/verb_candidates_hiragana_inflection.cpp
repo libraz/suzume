@@ -708,7 +708,7 @@ float hiraganaVerbBaseCost(const InflectedScanContext& ctx, const InflectedSpan&
     // we want to prefer split path (で+て, ね+て), so use weaker bonus
     bool starts_with_common_particle = normalize::isCommonParticle(first_char) || first_char == U'で';
     // Check if 1-char stem + る is a known verb (e.g., でる, ねる)
-    if (vh::isVerbInDictionary(ctx.dict_manager, extractSubstring(ctx.codepoints, start_pos, start_pos + 1) + "る")) {
+    if (vh::isVerbInDictionary(ctx.dict_manager, ctx.codepoints, start_pos, start_pos + 1, "る")) {
       // Prefer split path (で+て) over combined (でて) when verb is in dictionary
       // Use moderate cost that can be beaten by 1-char renyokei candidate
       base_cost = candidate::confidenceScaledCost(verb_opts.base_cost_low, best.confidence,

@@ -489,12 +489,11 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
     const char32_t next_char = kanji_end + 1 < codepoints.size() ? codepoints[kanji_end + 1] : 0;
     const bool is_verb_pattern =
         kana::isARowCodepoint(first_hiragana) &&
-        (next_char == U'れ' ||
-         (first_hiragana == U'が' &&
-          (next_char == U'る' || next_char == U'ら' || next_char == U'り' || next_char == U'っ' || next_char == U'せ' ||
-           next_char == U'さ' || next_char == U'ず' ||
-           (next_char == U'な' && dict_manager != nullptr &&
-            vh::isVerbInDictionary(dict_manager, extractSubstring(codepoints, start_pos, kanji_end) + "ぐ")))));
+        (next_char == U'れ' || (first_hiragana == U'が' &&
+                                (next_char == U'る' || next_char == U'ら' || next_char == U'り' || next_char == U'っ' ||
+                                 next_char == U'せ' || next_char == U'さ' || next_char == U'ず' ||
+                                 (next_char == U'な' && dict_manager != nullptr &&
+                                  vh::isVerbInDictionary(dict_manager, codepoints, start_pos, kanji_end, "ぐ")))));
     if (!is_verb_pattern) {
       return;  // Not a verb - these particles follow nouns
     }

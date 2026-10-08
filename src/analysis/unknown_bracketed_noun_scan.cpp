@@ -214,7 +214,7 @@ bool closesTeFormAt(const BracketedNounContext& ctx, size_t pos) {
     if (isNonWordType(ctx.char_types[host_start])) {
       break;
     }
-    for (const auto& reading : ctx.inflection.analyze(extractSubstring(codepoints, host_start, pos + 1))) {
+    for (const auto& reading : analysesInRange(ctx.inflection, codepoints, host_start, pos + 1)) {
       if (reading.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence &&
           utf8::endsWith(reading.suffix, connective)) {
         return true;
@@ -244,8 +244,7 @@ bool registeredAdjectiveOpensAt(const BracketedNounContext& ctx, size_t pos) {
     const bool stem_selected =
         adj_end + 1 < codepoints.size() && ((codepoints[adj_end] == U'す' && codepoints[adj_end + 1] == U'ぎ') ||
                                             (codepoints[adj_end] == U'そ' && codepoints[adj_end + 1] == U'う'));
-    if (stem_selected &&
-        verb_helpers::isAdjectiveInDictionary(dict_manager, extractSubstring(codepoints, pos, adj_end) + "い")) {
+    if (stem_selected && verb_helpers::isAdjectiveInDictionary(dict_manager, codepoints, pos, adj_end, "い")) {
       return true;
     }
   }
@@ -611,7 +610,7 @@ void readPromotedSurface(const BracketedNounContext& ctx, const BracketedScan& b
       if (!closes_kana) {
         continue;
       }
-      for (const auto& reading : ctx.inflection.analyze(extractSubstring(codepoints, start_pos, reading_end))) {
+      for (const auto& reading : analysesInRange(ctx.inflection, codepoints, start_pos, reading_end)) {
         if (reading.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence &&
             normalize::utf8Length(reading.stem) == len + 1) {
           return true;

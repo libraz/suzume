@@ -331,12 +331,12 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
           // holds, unless the adjective it spells is listed (誇らし+げ).
           for (size_t aux_end = kanji_end + 2; aux_end < stem_end; ++aux_end) {
             contains_closed_suffix =
-                contains_closed_suffix || (lookupEntryInRange(*dict_manager, codepoints, kanji_end, aux_end,
-                                                              core::PartOfSpeech::Auxiliary) != nullptr &&
-                                           lookupEntryInRange(*dict_manager, codepoints, aux_end, stem_end,
-                                                              core::PartOfSpeech::Suffix) != nullptr &&
-                                           !verb_helpers::isAdjectiveInDictionary(
-                                               dict_manager, extractSubstring(codepoints, start_pos, aux_end) + "い"));
+                contains_closed_suffix ||
+                (lookupEntryInRange(*dict_manager, codepoints, kanji_end, aux_end, core::PartOfSpeech::Auxiliary) !=
+                     nullptr &&
+                 lookupEntryInRange(*dict_manager, codepoints, aux_end, stem_end, core::PartOfSpeech::Suffix) !=
+                     nullptr &&
+                 !verb_helpers::isAdjectiveInDictionary(dict_manager, codepoints, start_pos, aux_end, "い"));
           }
         }
         // A registered pronoun that takes in the な is a word of its own (結局+みな),

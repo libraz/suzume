@@ -88,7 +88,7 @@ bool losesHomographReading(const DictionaryCandidateContext& ctx, const core::La
         if (!closed || lookupEntryInRange(dict_manager, codepoints, end_pos, noun_end) != nullptr) {
           continue;
         }
-        const auto& readings = inflection.analyze(extractSubstring(codepoints, end_pos, noun_end));
+        const auto& readings = analysesInRange(inflection, codepoints, end_pos, noun_end);
         if (std::none_of(readings.begin(), readings.end(), [](const grammar::InflectionCandidate& reading) {
               return reading.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence;
             })) {

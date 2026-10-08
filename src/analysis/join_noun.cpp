@@ -607,8 +607,8 @@ void addVerbSuffixNounJoinCandidates(core::Lattice& lattice, std::string_view te
       char_types[start_pos - 1] == CharType::Hiragana && char_types[start_pos - 2] == CharType::Kanji &&
       (kana::isIRowCodepoint(left_kana) || kana::isERowCodepoint(left_kana)) && !isCaseParticleCodepoint(left_kana) &&
       left_kana != U'て' &&
-      !(left_kana == U'き' && verb_helpers::isAdjectiveInDictionary(
-                                  &dict_manager, extractSubstring(codepoints, start_pos - 2, start_pos - 1) + "い")) &&
+      !(left_kana == U'き' &&
+        verb_helpers::isAdjectiveInDictionary(&dict_manager, codepoints, start_pos - 2, start_pos - 1, "い")) &&
       (verb_helpers::namesDictionaryVerbContinuative(&dict_manager, codepoints, start_pos - 1) ||
        verb_helpers::namesDictionaryVerbContinuative(&dict_manager, codepoints, kanji_end))) {
     return;

@@ -248,7 +248,7 @@ bool longerReadingSpansBracket(const BracketedNounContext& ctx, size_t run_end, 
     }
   }
   for (size_t reading_end = run_end + 1; reading_end <= kana_end; ++reading_end) {
-    for (const auto& reading : ctx.inflection.analyze(extractSubstring(codepoints, start_pos, reading_end))) {
+    for (const auto& reading : analysesInRange(ctx.inflection, codepoints, start_pos, reading_end)) {
       if (reading.verb_type == grammar::VerbType::IAdjective && !reading.suffix.empty() &&
           reading.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence) {
         return true;

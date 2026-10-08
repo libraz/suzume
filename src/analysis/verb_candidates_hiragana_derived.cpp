@@ -176,7 +176,7 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
     const bool godan_before_appearance_sou =
         kana::isIRowCodepoint(stem_end_char) && stem_end_char != U'し' && next_char == U'そ' &&
         end_pos + 1 < codepoints.size() && codepoints[end_pos + 1] == core::hiragana::kU &&
-        !vh::isAdjectiveInDictionary(dict_manager, extractSubstring(codepoints, start_pos, end_pos) + "い");
+        !vh::isAdjectiveInDictionary(dict_manager, codepoints, start_pos, end_pos, "い");
     if (!is_followed_by_te_ta && !is_followed_by_masu && !godan_ta_before_declared_renyokei_aux &&
         !is_followed_by_renyokei_conj && !is_followed_by_classical_adnominal_tari && !is_followed_by_reba &&
         !is_followed_by_nai && !is_followed_by_volitional && !godan_before_appearance_sou) {

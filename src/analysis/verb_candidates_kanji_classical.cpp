@@ -112,7 +112,7 @@ HaRowLicense haRowCellLicense(core::ExtendedPOS cell, const std::vector<char32_t
       // historical-kana spelling of the modern ワ行五段 one, and that headword
       // is the form the dictionary carries.
       license.closed_class_tail =
-          vh::isVerbInDictionary(dict_manager, extractSubstring(codepoints, start_pos, end_pos - 1) + "う") &&
+          vh::isVerbInDictionary(dict_manager, codepoints, start_pos, end_pos - 1, "う") &&
           (dictionaryTailFollowsAt(codepoints, end_pos, dict_manager, core::PartOfSpeech::Auxiliary,
                                    {core::ExtendedPOS::AuxNegativeNu, core::ExtendedPOS::AuxVolitional,
                                     core::ExtendedPOS::AuxCausative, core::ExtendedPOS::AuxPassive}) ||
@@ -132,7 +132,7 @@ HaRowLicense haRowCellLicense(core::ExtendedPOS cell, const std::vector<char32_t
       if (!license.closed_class_tail &&
           dictionaryTailFollowsAt(codepoints, end_pos, dict_manager, core::PartOfSpeech::Particle,
                                   {core::ExtendedPOS::ParticleBinding}) &&
-          vh::isVerbInDictionary(dict_manager, extractSubstring(codepoints, start_pos, end_pos - 1) + "う")) {
+          vh::isVerbInDictionary(dict_manager, codepoints, start_pos, end_pos - 1, "う")) {
         license.closed_class_tail = true;
       }
       break;
@@ -290,8 +290,8 @@ void appendClassicalNidanCandidates(const std::vector<char32_t>& codepoints, siz
     }
     if (terminal_pos > kanji_end) {
       const char32_t e_row = grammar::bigradeIrrealisKana(terminal);
-      if (e_row == 0 || !vh::isVerbInDictionary(dict_manager, extractSubstring(codepoints, stem_start, terminal_pos) +
-                                                                  normalize::encodeUtf8(e_row) + "る")) {
+      if (e_row == 0 || !vh::isVerbInDictionary(dict_manager, codepoints, stem_start, terminal_pos,
+                                                normalize::concat(normalize::encodeUtf8(e_row), "る"))) {
         continue;
       }
     }
@@ -334,7 +334,7 @@ void appendClassicalNidanCandidates(const std::vector<char32_t>& codepoints, siz
     // The tail of an adjective stem that spells a bound suffix verb is that
     // derivation (偉+ぶる), not a bigrade verb on the stem.
     if (grammar::spellsBoundDerivationalSuffixCell(extractSubstring(codepoints, kanji_end, end_pos)) &&
-        vh::isAdjectiveInDictionary(dict_manager, extractSubstring(codepoints, start_pos, kanji_end) + "い")) {
+        vh::isAdjectiveInDictionary(dict_manager, codepoints, start_pos, kanji_end, "い")) {
       continue;
     }
     const std::string lemma = extractSubstring(codepoints, stem_start, terminal_pos + 1);

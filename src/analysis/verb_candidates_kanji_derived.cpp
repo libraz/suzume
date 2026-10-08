@@ -139,7 +139,7 @@ bool appendGodanIzenkeiCandidate(const std::vector<char32_t>& codepoints, size_t
   // on the kanji (待て+ば, 育て+ば).
   if (cell_end >= kanji_end + 2 && grammar::isTeDeSurface(extractSubstring(codepoints, cell_end - 1, cell_end)) &&
       (kana::isIRowCodepoint(codepoints[cell_end - 2]) || kana::isERowCodepoint(codepoints[cell_end - 2])) &&
-      !vh::isVerbInDictionary(dict_manager, extractSubstring(codepoints, start_pos, cell_end - 1) + "つ")) {
+      !vh::isVerbInDictionary(dict_manager, codepoints, start_pos, cell_end - 1, "つ")) {
     return false;
   }
   const std::string cell_surface = extractSubstring(codepoints, start_pos, cell_end);
@@ -462,8 +462,7 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
         const std::string_view godan_base_suffix = grammar::godanBaseSuffixFromERow(codepoints[renyokei_end - 1]);
         const bool has_verified_godan_imperative =
             !godan_base_suffix.empty() && dict_manager != nullptr &&
-            vh::isVerbInDictionary(dict_manager, extractSubstring(codepoints, start_pos, renyokei_end - 1) +
-                                                     std::string(godan_base_suffix));
+            vh::isVerbInDictionary(dict_manager, codepoints, start_pos, renyokei_end - 1, godan_base_suffix);
         const bool is_volitional = vh::volitionalEndingFollowsAt(codepoints, renyokei_end + 1);
         const size_t you_end = renyokei_end + 2;
         bool has_formal_method_continuation = false;

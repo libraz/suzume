@@ -100,12 +100,17 @@ bool isIAdjectiveInDictionary(const dictionary::DictionaryManager* dict_manager,
  * They own the conversion from the codepoint range to the surface, which
  * otherwise inlines the UTF-8 encode loop and the temporary's teardown into
  * every caller. Callers that already hold the base form keep using the view
- * forms.
+ * forms. The suffix forms append the supplied ending to the encoded range
+ * before looking it up.
  */
 bool isVerbInDictionary(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
                         size_t start, size_t end);
 bool isAdjectiveInDictionary(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
                              size_t start, size_t end);
+bool isVerbInDictionary(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
+                        size_t start, size_t end, std::string_view suffix);
+bool isAdjectiveInDictionary(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
+                             size_t start, size_t end, std::string_view suffix);
 
 /**
  * @brief Whether @p stem plus the godan terminal of @p i_row_kana is a dictionary verb
