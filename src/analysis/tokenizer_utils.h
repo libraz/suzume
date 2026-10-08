@@ -67,13 +67,6 @@ inline constexpr PartOfSpeechMask kVerbAdjectiveMask =
 inline constexpr PartOfSpeechMask kPredicateHostMask =
     kVerbAdjectiveMask | partOfSpeechMask(core::PartOfSpeech::Auxiliary);
 
-/**
- * Whether @p surface is a registered adjective that is not a na-adjective stem.
- * Only the i-adjective can stand in front of the nominalizer ん as it is; a
- * na-adjective stem takes な first.
- */
-bool hasExactAdjectiveOtherThanNaStem(const dictionary::DictionaryManager& dict_manager, std::string_view surface);
-
 /** Whether an exact dictionary surface has any of the requested parts of speech. */
 bool hasExactPartOfSpeech(const dictionary::DictionaryManager& dict_manager, std::string_view surface,
                           PartOfSpeechMask pos_mask);

@@ -443,7 +443,7 @@ bool endsOnPredicateTail(const BracketedNounContext& ctx, size_t run_end) {
   if (dict_manager != nullptr && run_end > start_pos + 1 && codepoints[run_end - 1] == U'ん' &&
       (hasExactPartOfSpeech(*dict_manager, codepoints, start_pos, run_end - 1,
                             partOfSpeechMask(core::PartOfSpeech::Verb)) ||
-       hasExactAdjectiveOtherThanNaStem(*dict_manager, extractSubstring(codepoints, start_pos, run_end - 1)) ||
+       verb_helpers::isIAdjectiveInDictionary(dict_manager, extractSubstring(codepoints, start_pos, run_end - 1)) ||
        verb_helpers::readsAsIAdjectiveTerminal(extractSubstring(codepoints, start_pos, run_end - 1), ctx.inflection))) {
     return true;
   }

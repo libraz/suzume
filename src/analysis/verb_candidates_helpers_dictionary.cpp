@@ -224,14 +224,14 @@ bool kanjiRunMayContinueAt(const dictionary::DictionaryManager* dict_manager, co
   constexpr size_t kProbeLength = 6;
   const size_t probe_end = std::min(codepoints.size(), run_end + kProbeLength);
   bool particle_starts = false;
-  for (const auto& match : dict_manager->lookup(extractSubstring(codepoints, run_end, probe_end), 0)) {
+  for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, run_end, probe_end)) {
     particle_starts = particle_starts ||
                       (match.entry != nullptr && match.length >= 2 && match.entry->pos == core::PartOfSpeech::Particle);
   }
   if (!particle_starts) {
     return true;
   }
-  for (const auto& match : dict_manager->lookup(extractSubstring(codepoints, run_end - 1, probe_end), 0)) {
+  for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, run_end - 1, probe_end)) {
     if (match.entry != nullptr && match.length >= 2 &&
         (match.entry->pos == core::PartOfSpeech::Verb || match.entry->pos == core::PartOfSpeech::Adjective)) {
       return true;
@@ -362,7 +362,7 @@ bool hasNonVerbDictionaryEntry(const dictionary::DictionaryManager* dict_manager
 }
 
 bool hasParticleDictionaryEntry(const dictionary::DictionaryManager* dict_manager, std::string_view surface) {
-  return dict_manager != nullptr && dict_manager->lookupExact(surface, core::PartOfSpeech::Particle) != nullptr;
+  return hasDictionaryEntry(dict_manager, surface, core::PartOfSpeech::Particle);
 }
 
 bool hasCaseParticleDictionaryEntry(const dictionary::DictionaryManager* dict_manager, std::string_view surface) {

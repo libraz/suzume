@@ -202,7 +202,7 @@ void appendTemporalCounterCandidates(const std::vector<char32_t>& codepoints, si
     bool na_adjective_before_copula = false;
     if (has_quantity && scan > unit_start && followed_by_hiragana) {
       const auto* na_adjective =
-          dict_manager->lookupExact(extractSubstring(codepoints, start_pos, scan), core::PartOfSpeech::Adjective);
+          lookupEntryInRange(*dict_manager, codepoints, start_pos, scan, core::PartOfSpeech::Adjective);
       for (size_t copula_end = scan + 1;
            na_adjective != nullptr && na_adjective->extended_pos == core::ExtendedPOS::AdjNaAdj &&
            copula_end <= std::min(codepoints.size(), scan + kMaxQuantityParticleLength) && !na_adjective_before_copula;

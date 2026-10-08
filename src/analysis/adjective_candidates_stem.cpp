@@ -300,8 +300,8 @@ bool opensAuxiliaryInsideStem(const dictionary::DictionaryManager* dict_manager,
     }
     const size_t last_end = std::min(codepoints.size(), cell_start + kLongestAuxiliaryCell);
     for (size_t cell_end = std::max(stem_end + 1, cell_start + 2); cell_end <= last_end; ++cell_end) {
-      if (dict_manager->lookupExact(extractSubstring(codepoints, cell_start, cell_end),
-                                    core::PartOfSpeech::Auxiliary) != nullptr) {
+      if (lookupEntryInRange(*dict_manager, codepoints, cell_start, cell_end, core::PartOfSpeech::Auxiliary) !=
+          nullptr) {
         return true;
       }
     }

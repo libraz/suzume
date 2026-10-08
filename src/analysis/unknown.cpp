@@ -222,8 +222,8 @@ bool startsWithParticleBeforeRegisteredPredicate(const UnknownCandidate& candida
   if (candidate.pos == core::PartOfSpeech::Verb && !candidate.lemma.empty() && candidate.lemma == candidate.surface &&
       candidate.start >= 2) {
     const size_t host_boundary = candidate.start - 1;
-    const auto* slot_particle = dict_manager->lookupExact(extractSubstring(codepoints, host_boundary, candidate.start),
-                                                          core::PartOfSpeech::Particle);
+    const auto* slot_particle =
+        lookupEntryInRange(*dict_manager, codepoints, host_boundary, candidate.start, core::PartOfSpeech::Particle);
     constexpr size_t kHostLookback = 12;
     const size_t min_host_start = lookbehindStart(host_boundary, kHostLookback);
     if (slot_particle != nullptr && slot_particle->extended_pos == core::ExtendedPOS::ParticleCase &&

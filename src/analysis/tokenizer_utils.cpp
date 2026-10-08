@@ -374,11 +374,6 @@ bool hasExactPartOfSpeech(const dictionary::DictionaryManager& dict_manager, std
   return false;
 }
 
-bool hasExactAdjectiveOtherThanNaStem(const dictionary::DictionaryManager& dict_manager, std::string_view surface) {
-  const auto* entry = dict_manager.lookupExact(surface, core::PartOfSpeech::Adjective);
-  return entry != nullptr && entry->extended_pos != core::ExtendedPOS::AdjNaAdj;
-}
-
 bool hasExactPartOfSpeech(const dictionary::DictionaryManager& dict_manager, const std::vector<char32_t>& codepoints,
                           size_t start, size_t end, PartOfSpeechMask pos_mask) {
   return hasExactPartOfSpeech(dict_manager, extractSubstring(codepoints, start, end), pos_mask);
