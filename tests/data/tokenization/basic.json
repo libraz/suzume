@@ -1405,6 +1405,23 @@
       ],
       "id": "mirumiruuchini",
       "input": "みるみるうちに"
+    },
+    {
+      "description": "Kana na-adjective すき at clause end is one word, not the classical す+き",
+      "expected": [
+        {
+          "lemma": "これ",
+          "pos": "Pronoun",
+          "surface": "これ"
+        },
+        {
+          "lemma": "すき",
+          "pos": "Adjective",
+          "surface": "すき"
+        }
+      ],
+      "id": "koresuki",
+      "input": "これすき"
     }
   ],
   "description": "Basic tokenization tests",

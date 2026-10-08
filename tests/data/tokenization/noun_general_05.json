@@ -401,6 +401,28 @@
       ],
       "id": "nogohanhaoishiidesu",
       "input": "昨日のごはんはおいしいです"
+    },
+    {
+      "description": "Kana na-adjective すき after a case particle at clause end",
+      "expected": [
+        {
+          "lemma": "りんご",
+          "pos": "Noun",
+          "surface": "りんご"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "すき",
+          "pos": "Adjective",
+          "surface": "すき"
+        }
+      ],
+      "id": "ringogasuki",
+      "input": "りんごがすき"
     }
   ],
   "description": "General nouns (part 5/5)",

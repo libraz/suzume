@@ -122,6 +122,38 @@
       ],
       "id": "arukunohatanoshii",
       "input": "あるくのはたのしい"
+    },
+    {
+      "description": "Kana na-adjective すき after the nominalizer の and a case particle",
+      "expected": [
+        {
+          "lemma": "あるく",
+          "pos": "Verb",
+          "surface": "あるく"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "すき",
+          "pos": "Adjective",
+          "surface": "すき"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "arukunogasukida",
+      "input": "あるくのがすきだ"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 11/11)",
