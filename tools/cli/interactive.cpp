@@ -220,19 +220,7 @@ bool InteractiveSession::rebuildAnalyzer() {
   auto analyzer = std::make_unique<::suzume::Suzume>();
   if (!entries_.empty()) {
     std::ostringstream source;
-    for (const auto& entry : entries_) {
-      source << entry.surface << "\t" << core::posToString(entry.pos);
-      if (entry.conj_type != dictionary::ConjugationType::None || !entry.lemma.empty()) {
-        source << "\t";
-        if (entry.conj_type != dictionary::ConjugationType::Interjection) {
-          source << dictionary::conjTypeToCanonicalString(entry.conj_type);
-        }
-      }
-      if (!entry.lemma.empty()) {
-        source << "\t" << entry.lemma;
-      }
-      source << "\n";
-    }
+    writeTsvEntries(source, entries_);
     const std::string data = source.str();
     auto loaded = analyzer->loadUserDictionaryFromMemoryResult(data.data(), data.size());
     if (!loaded.hasValue()) {

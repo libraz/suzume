@@ -1,6 +1,7 @@
 #ifndef SUZUME_CLI_TSV_PARSER_H_
 #define SUZUME_CLI_TSV_PARSER_H_
 
+#include <iosfwd>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -89,6 +90,13 @@ core::Expected<size_t, core::Error> writeTsvFile(const std::string& path, const 
  * @brief Return why a surface or lemma cannot be represented by the plain TSV writer.
  */
 std::string tsvWriteFieldIssue(std::string_view value, std::string_view field_name);
+
+/**
+ * @brief Write TSV entry rows to an output stream.
+ * @param output Output stream
+ * @param entries Entries to write
+ */
+void writeTsvEntries(std::ostream& output, const std::vector<TsvEntry>& entries);
 
 }  // namespace suzume::cli
 

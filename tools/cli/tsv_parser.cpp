@@ -126,6 +126,26 @@ size_t TsvParser::validate(const std::vector<TsvEntry>& entries, std::vector<std
   return issue_count;
 }
 
+void writeTsvEntries(std::ostream& output, const std::vector<TsvEntry>& entries) {
+  for (const auto& entry : entries) {
+    output << entry.surface << "\t" << core::posToString(entry.pos);
+
+    if (entry.conj_type != dictionary::ConjugationType::None || !entry.lemma.empty()) {
+      output << "\t";
+      // Interjection is represented canonically by its POS field. Every other
+      // marker, including FAMILY/GIVEN, belongs in the conjugation column.
+      if (entry.conj_type != dictionary::ConjugationType::Interjection) {
+        output << dictionary::conjTypeToCanonicalString(entry.conj_type);
+      }
+    }
+    if (!entry.lemma.empty()) {
+      output << "\t" << entry.lemma;
+    }
+
+    output << "\n";
+  }
+}
+
 core::Expected<size_t, core::Error> writeTsvFile(const std::string& path, const std::vector<TsvEntry>& entries) {
   for (const auto& entry : entries) {
     if (const std::string issue = tsvWriteFieldIssue(entry.surface, "Surface"); !issue.empty()) {
@@ -149,23 +169,7 @@ core::Expected<size_t, core::Error> writeTsvFile(const std::string& path, const 
   file << "# Format: surface<TAB>pos<TAB>conj_type<TAB>lemma\n";
   file << "\n";
 
-  for (const auto& entry : entries) {
-    file << entry.surface << "\t" << core::posToString(entry.pos);
-
-    if (entry.conj_type != dictionary::ConjugationType::None || !entry.lemma.empty()) {
-      file << "\t";
-      // Interjection is represented canonically by its POS field. Every other
-      // marker, including FAMILY/GIVEN, belongs in the conjugation column.
-      if (entry.conj_type != dictionary::ConjugationType::Interjection) {
-        file << dictionary::conjTypeToCanonicalString(entry.conj_type);
-      }
-    }
-    if (!entry.lemma.empty()) {
-      file << "\t" << entry.lemma;
-    }
-
-    file << "\n";
-  }
+  writeTsvEntries(file, entries);
 
   file.close();
   if (!file) {
