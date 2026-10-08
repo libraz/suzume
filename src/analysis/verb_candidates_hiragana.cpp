@@ -974,10 +974,8 @@ void appendClosedOnbinTenseStem(const HiraganaVerbScan& scan, size_t closed_onbi
   const char32_t onbin = codepoints[onbin_pos];
   // When one of the homophonous rows names a dictionary verb, that row is the
   // reading (まよっ+て is まよう, not まよる); otherwise keep the analysis order.
-  auto analyses = analysesInRange(scan.inflection, codepoints, start_pos, closed_onbin_tense_end);
-  std::stable_partition(analyses.begin(), analyses.end(), [&](const auto& analysis) {
-    return vh::isVerbInDictionary(scan.dict_manager, analysis.base_form);
-  });
+  const auto analyses = analysesInRange(scan.inflection, codepoints, start_pos, closed_onbin_tense_end);
+  const grammar::InflectionCandidate* chosen = nullptr;
   for (const auto& inflection_candidate : analyses) {
     const bool matching_sokuon = onbin == U'っ' && (inflection_candidate.verb_type == grammar::VerbType::GodanWa ||
                                                     inflection_candidate.verb_type == grammar::VerbType::GodanRa ||
@@ -1006,13 +1004,22 @@ void appendClosedOnbinTenseStem(const HiraganaVerbScan& scan, size_t closed_onbi
     if (vh::opensOnCompleteAuxiliary(scan.dict_manager, codepoints, start_pos, onbin_pos + 1)) {
       continue;
     }
-    const std::string onbin_surface = extractSubstring(codepoints, start_pos, onbin_pos + 1);
-    candidates.push_back(makeVerbCandidate(
-        onbin_surface, start_pos, onbin_pos + 1, candidate::verb_cost::kStandardBonus, inflection_candidate.base_form,
-        grammar::verbTypeToConjType(inflection_candidate.verb_type), true, CandidateOrigin::VerbHiragana,
-        inflection_candidate.confidence, "hiragana_closed_onbin_tense", core::ExtendedPOS::VerbOnbinkei));
-    break;
+    if (vh::isVerbInDictionary(scan.dict_manager, inflection_candidate.base_form)) {
+      chosen = &inflection_candidate;
+      break;
+    }
+    if (chosen == nullptr) {
+      chosen = &inflection_candidate;
+    }
   }
+  if (chosen == nullptr) {
+    return;
+  }
+  const std::string onbin_surface = extractSubstring(codepoints, start_pos, onbin_pos + 1);
+  candidates.push_back(makeVerbCandidate(onbin_surface, start_pos, onbin_pos + 1, candidate::verb_cost::kStandardBonus,
+                                         chosen->base_form, grammar::verbTypeToConjType(chosen->verb_type), true,
+                                         CandidateOrigin::VerbHiragana, chosen->confidence,
+                                         "hiragana_closed_onbin_tense", core::ExtendedPOS::VerbOnbinkei));
 }
 
 void favorClosedOnbinTenseStems(const HiraganaVerbScan& scan, std::vector<UnknownCandidate>& candidates) {
