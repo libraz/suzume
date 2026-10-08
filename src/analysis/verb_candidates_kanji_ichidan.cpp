@@ -4,12 +4,9 @@
  */
 
 #include <algorithm>
-#include <cmath>
 
-#include "analysis/bigram_table.h"
 #include "analysis/candidate_constants.h"
 #include "analysis/dictionary_probe.h"
-#include "analysis/scorer_constants.h"
 #include "analysis/tokenizer_utils.h"
 #include "analysis/verb_candidates_auxiliary_patterns.h"
 #include "analysis/verb_candidates_classical.h"
@@ -22,7 +19,6 @@
 #include "grammar/auxiliary_generator.h"
 #include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
-#include "grammar/inflection_scorer_constants.h"
 #include "normalize/char_type.h"
 #include "normalize/exceptions.h"
 #include "normalize/utf8.h"
@@ -167,19 +163,13 @@ void appendSingleKanjiIchidanCandidates(const std::vector<char32_t>& codepoints,
     // stem below and the ichidan stem further down are that cell. Resolve it
     // from the auxiliary inventory instead of naming one kana, so the whole
     // paradigm is covered at once (来+ず, 来+ぬ, 来+ざる, 来+ね).
-    bool classical_negative_follows = false;
-    {
-      constexpr size_t kNegativeAuxProbe = 3;
-      const size_t max_aux_end = std::min(codepoints.size(), kanji_end + kNegativeAuxProbe);
-      for (size_t aux_end = kanji_end + 1; aux_end <= max_aux_end; ++aux_end) {
-        const auto* negative_entry =
-            lookupEntryInRange(*dict_manager, codepoints, kanji_end, aux_end, core::PartOfSpeech::Auxiliary);
-        if (negative_entry != nullptr && negative_entry->extended_pos == core::ExtendedPOS::AuxNegativeNu) {
-          classical_negative_follows = true;
-          break;
-        }
-      }
-    }
+    const bool classical_negative_follows =
+        vh::auxiliaryFollowsAt(dict_manager, codepoints, kanji_end, [](const dictionary::DictionaryEntry& entry) {
+          return entry.extended_pos == core::ExtendedPOS::AuxNegativeNu;
+        });
+
+    const char32_t h1 = codepoints[kanji_end];
+    const char32_t h2 = (kanji_end + 1 < codepoints.size()) ? codepoints[kanji_end + 1] : U'\0';
 
     if (grammar::isKuruKanjiStem(kanji_char)) {
       // 来る is irregular rather than ichidan, but its irrealis is written as
@@ -193,18 +183,15 @@ void appendSingleKanjiIchidanCandidates(const std::vector<char32_t>& codepoints,
                                                true, CandidateOrigin::VerbKanji, candidate::kHighOriginConfidence,
                                                origin, core::ExtendedPOS::VerbMizenkei));
       };
-      const char32_t next_kana = codepoints[kanji_end];
-      const char32_t after_next = (kanji_end + 1 < codepoints.size()) ? codepoints[kanji_end + 1] : U'\0';
-
       // The literary volitional ん is a euphonic form of む, but it is also how
       // the negative contracts, so it is admitted only where the quotative と
       // resolves that (来んとする).
-      if (next_kana == U'ん' && after_next == U'と') {
+      if (h1 == U'ん' && h2 == U'と') {
         emit_kuru_irrealis(kanji_end, candidate::verb_cost::kStandardBonus, "kuru_literary_volitional_n");
       }
       // The classical volitional itself has no such competitor and needs no
       // gate beyond its own mora (来む, 人来むや).
-      if (next_kana == U'む') {
+      if (h1 == U'む') {
         emit_kuru_irrealis(kanji_end, candidate::verb_cost::kStandardBonus, "kuru_classical_volitional_mu");
       }
       if (classical_negative_follows) {
@@ -217,7 +204,7 @@ void appendSingleKanjiIchidanCandidates(const std::vector<char32_t>& codepoints,
       }
       // The modern volitional is the one member that writes part of the stem in
       // kana, so its span reaches past よ to leave う as the auxiliary (来よ+う).
-      if (next_kana == U'よ' && after_next == U'う') {
+      if (h1 == U'よ' && h2 == U'う') {
         emit_kuru_irrealis(kanji_end + 1, candidate::verb_cost::kStrongBonus, "kuru_modern_volitional");
       }
     }
@@ -230,8 +217,6 @@ void appendSingleKanjiIchidanCandidates(const std::vector<char32_t>& codepoints,
       // renyokei inserts し before the auxiliary (出しました), so the kanji is
       // never immediately followed by ま in that reading.
       using namespace suzume::core::hiragana;
-      char32_t h1 = codepoints[kanji_end];
-      char32_t h2 = (kanji_end + 1 < codepoints.size()) ? codepoints[kanji_end + 1] : 0;
       bool is_polite_aux = vh::masuAuxFollowsAt(codepoints, kanji_end);
       // Modern ichidan volitional keeps the y-row stem and the auxiliary
       // boundary (見よ+う, 来よ+う).  The bare kanji is the renyokei/mizenkei
@@ -242,12 +227,8 @@ void appendSingleKanjiIchidanCandidates(const std::vector<char32_t>& codepoints,
       // ない (終止/連体), なく (連用), なかっ (た接続), なけれ (仮定), なきゃ (口語縮約仮定)
       bool is_negative_aux = vh::naiNegativeFollowsAt(codepoints, kanji_end);
       bool is_negative_conditional = vh::naiConditionalFollowsAt(codepoints, kanji_end);
-      // The classical negative auxiliary attaches to the ichidan mizenkei
-      // (= bare stem): 見ぬ人, 見ざるを得ない → 見 + ざる, 見ずに → 見 + ずに.
-      // Resolve the cell from the auxiliary inventory, exactly as the 来 branch
-      // above does, so the whole paradigm is covered at once instead of a
-      // hand-listed subset — the izenkei ね before ば (見+ね+ば) was missing.
-      bool is_classical_negative_aux = classical_negative_follows;
+      // The classical negative auxiliary (classical_negative_follows) attaches
+      // to the ichidan mizenkei, the bare stem: 見ぬ人, 見ざるを得ない, 見ずに.
       // The literary volitional ん is distinct from the contracted negative
       // when the quotative particle follows (見んとする, 寝んとする).
       bool is_literary_volitional_n = (h1 == U'ん' && h2 == kTo);
@@ -330,7 +311,7 @@ void appendSingleKanjiIchidanCandidates(const std::vector<char32_t>& codepoints,
       // licenses the bare stem the same way.
       const bool is_renyokei_adjective = renyokeiAdjectiveFollowsAt(dict_manager, codepoints, kanji_end);
 
-      if (is_polite_aux || is_negative_aux || is_classical_negative_aux || is_literary_volitional_n ||
+      if (is_polite_aux || is_negative_aux || classical_negative_follows || is_literary_volitional_n ||
           is_classical_volitional_mu || is_classical_desiderative || is_classical_negative_mai ||
           is_conjunctive_particle || is_classical_past_aux || is_classical_conjectural || is_honorific_aux ||
           is_renyokei_adjective) {

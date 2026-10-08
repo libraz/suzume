@@ -6,11 +6,9 @@
 #include "verb_candidates.h"
 
 #include <algorithm>
-#include <cmath>
 
 #include "analysis/bigram_table.h"
 #include "analysis/candidate_constants.h"
-#include "analysis/scorer_constants.h"
 #include "analysis/tokenizer_utils.h"
 #include "analysis/verb_candidates_auxiliary_patterns.h"
 #include "analysis/verb_candidates_dictionary_probes.h"
@@ -195,13 +193,13 @@ void generateKatakanaVerbCandidates(const std::vector<char32_t>& codepoints, siz
   const bool has_long_vowel_mark = std::find(codepoints.begin() + static_cast<std::ptrdiff_t>(start_pos),
                                              codepoints.begin() + static_cast<std::ptrdiff_t>(kata_end),
                                              U'ー') != codepoints.begin() + static_cast<std::ptrdiff_t>(kata_end);
+  constexpr char32_t kKatakanaFirst = U'ァ';
+  constexpr char32_t kKatakanaLast = U'ヶ';
+  constexpr char32_t kKatakanaToHiragana = U'ァ' - U'ぁ';
+  const char32_t stem_final = codepoints[kata_end - 1];
+  const char32_t stem_final_hiragana =
+      stem_final >= kKatakanaFirst && stem_final <= kKatakanaLast ? stem_final - kKatakanaToHiragana : 0;
   if (dict_manager != nullptr && opens_katakana_run && !has_long_vowel_mark) {
-    constexpr char32_t kKatakanaFirst = U'ァ';
-    constexpr char32_t kKatakanaLast = U'ヶ';
-    constexpr char32_t kKatakanaToHiragana = U'ァ' - U'ぁ';
-    const char32_t stem_final = codepoints[kata_end - 1];
-    const char32_t stem_final_hiragana =
-        stem_final >= kKatakanaFirst && stem_final <= kKatakanaLast ? stem_final - kKatakanaToHiragana : 0;
     // A content word reaching past the selecting auxiliary is the reading the
     // kana belongs to (ケーキ+たべた, ケーキ+たのしみ), not the auxiliary.
     size_t selecting_end = 0;
@@ -324,10 +322,7 @@ void generateKatakanaVerbCandidates(const std::vector<char32_t>& codepoints, siz
                                                    verb_opts.confidence_cost_scale);
       // An ichidan stem ends on a full-size e-row or i-row mora, so a run closing
       // on anything else (ペン, カフェ, コーヒー) has no ichidan reading at all.
-      const char32_t stem_final = codepoints[kata_end - 1];
       const bool small_vowel = utf8::equalsAny(normalize::encodeUtf8(stem_final), {"ァ", "ィ", "ゥ", "ェ", "ォ"});
-      const char32_t stem_final_hiragana =
-          stem_final >= U'ァ' && stem_final <= U'ヶ' ? stem_final - (U'ァ' - U'ぁ') : 0;
       const bool ichidan_stem_final =
           !small_vowel && (kana::isERowCodepoint(stem_final_hiragana) || kana::isIRowCodepoint(stem_final_hiragana));
       const bool whole_negative_form = best.verb_type == grammar::VerbType::Ichidan &&

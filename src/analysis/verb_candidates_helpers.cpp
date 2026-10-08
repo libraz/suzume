@@ -9,7 +9,6 @@
 #include "analysis/candidate_constants.h"
 #include "analysis/dictionary_probe.h"
 #include "analysis/scorer_constants.h"
-#include "core/debug.h"
 #include "core/kana_constants.h"
 #include "core/stable_insertion_sort.h"
 #include "core/utf8_constants.h"
@@ -152,7 +151,7 @@ bool colloquialNegativeFollowsAt(const std::vector<char32_t>& codepoints, size_t
 
 bool contractedTeContinuationFollowsAt(const std::vector<char32_t>& codepoints, size_t pos) {
   return pos < codepoints.size() && (codepoints[pos] == U'る' || codepoints[pos] == U'た' || codepoints[pos] == U'ち' ||
-                                     (codepoints[pos] == U'な' && naiNegativeFollowsAt(codepoints, pos)));
+                                     naiNegativeFollowsAt(codepoints, pos));
 }
 
 bool particleClosesClauseBeforeSokuon(const std::vector<char32_t>& codepoints, size_t sokuon_pos) {
@@ -554,13 +553,9 @@ bool isReduplicatedShiiAdjectiveHead(const std::vector<char32_t>& codepoints, si
   return onset == U'い' || onset == U'く' || onset == U'か' || onset == U'け';
 }
 
-grammar::GodanOnbinRange getGodanTypesByOnbin(std::string_view onbin) {
-  return grammar::Conjugation::getGodanTypesByOnbin(onbin);
-}
-
 GodanOnbinDictMatch firstGodanOnbinDictBase(const dictionary::DictionaryManager* dict_manager, std::string_view stem,
                                             std::string_view onbin) {
-  for (const auto& [verb_type, base_suffix] : getGodanTypesByOnbin(onbin)) {
+  for (const auto& [verb_type, base_suffix] : grammar::Conjugation::getGodanTypesByOnbin(onbin)) {
     std::string base_form = normalize::concat(stem, base_suffix);
     if (onbin == "っ" && !grammar::admitsSokuonbin(verb_type, base_form)) {
       continue;

@@ -4,12 +4,10 @@
  */
 
 #include <algorithm>
-#include <cmath>
 
 #include "analysis/bigram_table.h"
 #include "analysis/candidate_constants.h"
 #include "analysis/dictionary_probe.h"
-#include "analysis/scorer_constants.h"
 #include "analysis/tokenizer_utils.h"
 #include "analysis/verb_candidates_absorption_guards.h"
 #include "analysis/verb_candidates_auxiliary_patterns.h"
@@ -314,15 +312,11 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
         if (!ichidan_base_is_dict && dict_manager != nullptr && renyokei_end < codepoints.size() &&
             ichidan_stem_is_attested) {
           constexpr size_t kAuxiliaryProbe = 4;
-          const size_t max_aux_end = std::min(codepoints.size(), kanji_end + kAuxiliaryProbe);
-          for (size_t aux_end = renyokei_end + 1; aux_end <= max_aux_end; ++aux_end) {
-            if (lookupEntryInRange(*dict_manager, codepoints, kanji_end, aux_end, core::PartOfSpeech::Auxiliary) !=
-                nullptr) {
-              okurigana_opens_auxiliary = true;
-              SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" okurigana opens an auxiliary, "
-                                                << "skipping ichidan_renyokei\n");
-              break;
-            }
+          okurigana_opens_auxiliary = hasDictionaryEntryFrom(dict_manager, codepoints, kanji_end, 2, kAuxiliaryProbe,
+                                                             core::PartOfSpeech::Auxiliary, nullptr);
+          if (okurigana_opens_auxiliary) {
+            SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" okurigana opens an auxiliary, "
+                                              << "skipping ichidan_renyokei\n");
           }
           // The okurigana can also be the whole auxiliary rather than its head,
           // but only the classical negative may claim that cell: its ぬ paradigm

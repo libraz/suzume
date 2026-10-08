@@ -7,12 +7,10 @@
  */
 
 #include <algorithm>
-#include <cmath>
 
 #include "analysis/bigram_table.h"
 #include "analysis/candidate_constants.h"
 #include "analysis/dictionary_probe.h"
-#include "analysis/scorer_constants.h"
 #include "analysis/verb_candidates_absorption_guards.h"
 #include "analysis/verb_candidates_auxiliary_patterns.h"
 #include "analysis/verb_candidates_classical.h"
@@ -587,40 +585,36 @@ bool hasVerifiedInitialInflection(const HiraganaVerbScan& scan) {
   // A high-confidence inflection analysis is stronger evidence than the
   // conservative initial-particle blacklist. This admits kana-written verbs
   // such as のぞいて and つまずいて without opening bare particle sequences.
-  bool has_verified_initial_inflection = false;
-  if (first_char == U'の') {
-    size_t probe_end = start_pos;
-    while (probe_end < scan.char_types.size() && probe_end - start_pos < kPredicateRunMax &&
-           scan.char_types[probe_end] == normalize::CharType::Hiragana) {
-      ++probe_end;
-      if (probe_end <= start_pos + 1) {
+  if (first_char != U'の') {
+    return false;
+  }
+  size_t probe_end = start_pos;
+  while (probe_end < scan.char_types.size() && probe_end - start_pos < kPredicateRunMax &&
+         scan.char_types[probe_end] == normalize::CharType::Hiragana) {
+    ++probe_end;
+    if (probe_end <= start_pos + 1) {
+      continue;
+    }
+    const std::string probe = extractSubstring(scan.codepoints, start_pos, probe_end);
+    for (const auto& candidate : scan.inflection.analyze(probe)) {
+      if (candidate.verb_type == grammar::VerbType::Unknown || candidate.verb_type == grammar::VerbType::IAdjective ||
+          candidate.suffix.empty()) {
         continue;
       }
-      const std::string probe = extractSubstring(scan.codepoints, start_pos, probe_end);
-      for (const auto& candidate : scan.inflection.analyze(probe)) {
-        if (candidate.verb_type == grammar::VerbType::Unknown || candidate.verb_type == grammar::VerbType::IAdjective ||
-            candidate.suffix.empty()) {
-          continue;
-        }
-        // A span spelled like its own base form is the one cell the paradigm
-        // cannot distinguish from an arbitrary run: every hiragana sequence
-        // ending in a う-row kana reconstructs some dictionary form. It is
-        // therefore held to the standard acceptance confidence rather than the
-        // low bar the inflected cells get, which is the difference between a
-        // full stem (のぼる, のこる) and a single leading mora (のる).
-        const float threshold =
-            candidate.base_form == probe ? scan.verb_opts.confidence_standard : scan.verb_opts.confidence_ichidan_dict;
-        if (candidate.confidence >= threshold) {
-          has_verified_initial_inflection = true;
-          break;
-        }
-      }
-      if (has_verified_initial_inflection) {
-        break;
+      // A span spelled like its own base form is the one cell the paradigm
+      // cannot distinguish from an arbitrary run: every hiragana sequence
+      // ending in a う-row kana reconstructs some dictionary form. It is
+      // therefore held to the standard acceptance confidence rather than the
+      // low bar the inflected cells get, which is the difference between a
+      // full stem (のぼる, のこる) and a single leading mora (のる).
+      const float threshold =
+          candidate.base_form == probe ? scan.verb_opts.confidence_standard : scan.verb_opts.confidence_ichidan_dict;
+      if (candidate.confidence >= threshold) {
+        return true;
       }
     }
   }
-  return has_verified_initial_inflection;
+  return false;
 }
 
 // A ra-row irrealis contracted to ん before the colloquial negative.
@@ -646,12 +640,9 @@ ContractedIrrealis findContractedIrrealis(const HiraganaVerbScan& scan) {
     }
     const std::string stem = extractSubstring(codepoints, scan.start_pos, pos);
     const std::string base_form = stem + "る";
-    const auto& analyses = scan.inflection.analyze(stem + "らない");
     contracted_before_colloquial_negative =
         vh::isVerbInDictionary(scan.dict_manager, base_form) ||
-        std::any_of(analyses.begin(), analyses.end(), [&](const auto& cand) {
-          return cand.verb_type == grammar::VerbType::GodanRa && cand.base_form == base_form;
-        });
+        vh::readsAsBaseForm(scan.inflection, stem + "らない", base_form, grammar::VerbType::GodanRa);
     contracted_irrealis_end = contracted_before_colloquial_negative ? pos + 1 : 0;
   }
   return {contracted_before_colloquial_negative, contracted_irrealis_end};

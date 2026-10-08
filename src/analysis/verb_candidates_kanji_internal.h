@@ -18,8 +18,6 @@ bool appendIchidanKateikeiCandidate(std::vector<UnknownCandidate>& candidates,
 // い-onbin past/te cell clears the past/te bar, every other cell the low bar.
 float mixedGodanKaStemThreshold(const grammar::InflectionCandidate& candidate, const VerbCandidateOptions& verb_opts);
 
-// A multi-kanji godan-wa continuative ending in い before a kanji continuation
-// (背負い+進む), which the inflection scorer underrates as an i-adjective shape.
 // Whether an adjective that attaches to a verb continuative (にくい, やすい)
 // starts at @p pos.
 bool renyokeiAdjectiveFollowsAt(const dictionary::DictionaryManager* dict_manager,
@@ -30,6 +28,8 @@ bool renyokeiAdjectiveFollowsAt(const dictionary::DictionaryManager* dict_manage
 bool pejorativeAuxiliaryFollowsAt(const dictionary::DictionaryManager* dict_manager,
                                   const std::vector<char32_t>& codepoints, size_t pos);
 
+// A multi-kanji godan-wa continuative ending in い before a kanji continuation
+// (背負い+進む), which the inflection scorer underrates as an i-adjective shape.
 bool isMultiKanjiGodanWaRenyokei(const grammar::InflectionCandidate& candidate, std::string_view surface,
                                  const std::vector<char32_t>& codepoints, size_t end_pos);
 

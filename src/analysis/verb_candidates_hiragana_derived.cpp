@@ -4,12 +4,10 @@
  */
 
 #include <algorithm>
-#include <cmath>
 
 #include "analysis/bigram_table.h"
 #include "analysis/candidate_constants.h"
 #include "analysis/dictionary_probe.h"
-#include "analysis/scorer_constants.h"
 #include "analysis/tokenizer_utils.h"
 #include "analysis/verb_candidates_absorption_guards.h"
 #include "analysis/verb_candidates_auxiliary_patterns.h"
@@ -223,19 +221,17 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
     const bool stem_is_closed_auxiliary =
         vh::hasDictionaryEntry(dict_manager, stem_surface, core::PartOfSpeech::Auxiliary);
     const grammar::VerbType godan_type = grammar::verbTypeFromIRowCodepoint(stem_end_char);
-    if (!stem_is_closed_auxiliary &&
+    if (!stem_is_closed_auxiliary && godan_type != grammar::VerbType::Unknown &&
         (is_followed_by_masu || is_followed_by_renyokei_conj || is_followed_by_classical_adnominal_tari ||
          godan_sa_before_te_ta || godan_ta_before_declared_renyokei_aux || godan_before_appearance_sou)) {
-      if (godan_type != grammar::VerbType::Unknown) {
-        std::string godan_base = extractSubstring(codepoints, start_pos, end_pos - 1) +
-                                 std::string(grammar::godanBaseSuffixFromIRow(stem_end_char));
-        for (const auto& cand : stem_analysis) {
-          if (cand.verb_type == godan_type && cand.base_form == godan_base && cand.confidence >= chosen_confidence) {
-            chosen_base = godan_base;
-            chosen_conj = grammar::verbTypeToConjType(godan_type);
-            chosen_confidence = cand.confidence;
-            break;
-          }
+      std::string godan_base = extractSubstring(codepoints, start_pos, end_pos - 1) +
+                               std::string(grammar::godanBaseSuffixFromIRow(stem_end_char));
+      for (const auto& cand : stem_analysis) {
+        if (cand.verb_type == godan_type && cand.base_form == godan_base && cand.confidence >= chosen_confidence) {
+          chosen_base = godan_base;
+          chosen_conj = grammar::verbTypeToConjType(godan_type);
+          chosen_confidence = cand.confidence;
+          break;
         }
       }
     }

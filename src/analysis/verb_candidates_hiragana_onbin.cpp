@@ -4,12 +4,9 @@
  */
 
 #include <algorithm>
-#include <cmath>
 
-#include "analysis/bigram_table.h"
 #include "analysis/candidate_constants.h"
 #include "analysis/dictionary_probe.h"
-#include "analysis/scorer_constants.h"
 #include "analysis/tokenizer_utils.h"
 #include "analysis/verb_candidates_absorption_guards.h"
 #include "analysis/verb_candidates_auxiliary_patterns.h"
@@ -145,7 +142,8 @@ void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, s
                                         codepoints[start_pos] != U'づ' && codepoints[start_pos] != U'ぢ');
 
     // Try different verb types based on onbin type
-    const auto& candidates_to_try = vh::getGodanTypesByOnbin(is_sokuonbin ? "っ" : (is_hatsuonbin ? "ん" : "い"));
+    const auto& candidates_to_try =
+        grammar::Conjugation::getGodanTypesByOnbin(is_sokuonbin ? "っ" : (is_hatsuonbin ? "ん" : "い"));
 
     // Try each verb type and check dictionary or inflection analysis
     for (const auto& [verb_type, base_suffix] : candidates_to_try) {
@@ -207,16 +205,10 @@ void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, s
                                   : (next_char == U'た' || next_char == U'だ') ? "た"
                                                                                : "て";
         std::string full_form = normalize::concat(stem, "っ", suffix);
-        const auto& analysis = inflection.analyze(full_form);
-        for (const auto& cand : analysis) {
-          // Lower threshold (0.25) for short stems like かっ, やっ
-          // since godan_single_hiragana_stem penalty reduces confidence
-          if (cand.verb_type == verb_type && cand.base_form == base_form &&
-              cand.confidence >= candidate::verb_cost::kShortHiraganaSokuonbinMinConfidence) {
-            is_valid_verb = true;
-            break;
-          }
-        }
+        // Lower threshold (0.25) for short stems like かっ, やっ
+        // since godan_single_hiragana_stem penalty reduces confidence
+        is_valid_verb = vh::readsAsBaseForm(inflection, full_form, base_form, verb_type,
+                                            candidate::verb_cost::kShortHiraganaSokuonbinMinConfidence);
       }
 
       // An i-onbin followed by a tense marker is a productive Ka/Ga-row
@@ -555,8 +547,8 @@ bool followsListedAdverb(const std::vector<char32_t>& codepoints, size_t start_p
   if (dict_manager == nullptr) {
     return false;
   }
-  return hasDictionaryEntryEndingAt(*dict_manager, codepoints, start_pos - std::min(start_pos, kMaxAdverbMorae),
-                                    start_pos, partOfSpeechMask(core::PartOfSpeech::Adverb));
+  return hasDictionaryEntryEndingAt(*dict_manager, codepoints, lookbehindStart(start_pos, kMaxAdverbMorae), start_pos,
+                                    partOfSpeechMask(core::PartOfSpeech::Adverb));
 }
 
 void appendKuruRenyokeiCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,

@@ -9,7 +9,6 @@
 #include "analysis/candidate_constants.h"
 #include "analysis/dictionary_probe.h"
 #include "analysis/tokenizer_utils.h"
-#include "core/debug.h"
 #include "core/kana_constants.h"
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
@@ -338,7 +337,7 @@ bool closedPredicateEndsAt(const dictionary::DictionaryManager* dict_manager, co
     return false;
   }
   constexpr size_t kMaxPredicateLen = 5;
-  const size_t first = end_pos - std::min(end_pos, kMaxPredicateLen);
+  const size_t first = lookbehindStart(end_pos, kMaxPredicateLen);
   const size_t last = span_lemma_attested ? start_pos : start_pos + 1;
   for (size_t cell_start = first; cell_start < last && cell_start < end_pos; ++cell_start) {
     const auto* entry = lookupEntryInRange(*dict_manager, codepoints, cell_start, end_pos, core::PartOfSpeech::Verb);
@@ -402,11 +401,11 @@ bool opensOnClosedClassWordTail(const dictionary::DictionaryManager* dict_manage
   // The closed class holds nothing longer than a handful of morae, so the scan
   // back is bounded rather than running to the start of the sentence.
   constexpr size_t kMaxClosedClassLen = 5;
-  const size_t scan_start = start_pos - std::min(start_pos, kMaxClosedClassLen - 1);
+  const size_t scan_start = lookbehindStart(start_pos, kMaxClosedClassLen - 1);
   // A match opening inside a dictionary word that ends exactly at start_pos
   // (ちゃわ inside めっちゃ|わかる) is no tail: that word closes the left context.
   auto opens_inside_closed_word = [&](size_t word_start) {
-    for (size_t left = start_pos - std::min(start_pos, kMaxClosedClassLen); left < word_start; ++left) {
+    for (size_t left = lookbehindStart(start_pos, kMaxClosedClassLen); left < word_start; ++left) {
       if (lookupEntryInRange(*dict_manager, codepoints, left, start_pos) != nullptr) {
         return true;
       }

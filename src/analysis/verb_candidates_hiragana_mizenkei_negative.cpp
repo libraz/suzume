@@ -4,12 +4,10 @@
  */
 
 #include <algorithm>
-#include <cmath>
 
 #include "analysis/bigram_table.h"
 #include "analysis/candidate_constants.h"
 #include "analysis/dictionary_probe.h"
-#include "analysis/scorer_constants.h"
 #include "analysis/tokenizer_utils.h"
 #include "analysis/verb_candidates_absorption_guards.h"
 #include "analysis/verb_candidates_auxiliary_patterns.h"
@@ -81,13 +79,9 @@ MizenkeiEvidence judgeMizenkeiForms(const dictionary::DictionaryManager* dict_ma
                                     const GodanMizenkeiForms& forms, const std::vector<char32_t>& codepoints,
                                     size_t start_pos, size_t mizenkei_end) {
   MizenkeiEvidence evidence{};
-  const auto& analyses = inflection.analyze(full_form);
   evidence.is_in_dict = vh::isVerbInDictionary(dict_manager, forms.base_form);
-  evidence.is_valid_verb = std::any_of(analyses.begin(), analyses.end(),
-                                       [&](const auto& cand) {
-                                         return cand.verb_type == forms.verb_type && cand.base_form == forms.base_form;
-                                       }) ||
-                           evidence.is_in_dict;
+  evidence.is_valid_verb =
+      vh::readsAsBaseForm(inflection, full_form, forms.base_form, forms.verb_type) || evidence.is_in_dict;
   const bool formal_noun_stem_homograph = hasFormalNounStemHomograph(dict_manager, codepoints, start_pos, mizenkei_end);
   evidence.unattested_sa_irrealis = forms.verb_type == grammar::VerbType::GodanSa && !evidence.is_in_dict &&
                                     grammar::isPureHiragana(forms.stem) && !formal_noun_stem_homograph;
@@ -123,6 +117,25 @@ bool isNaRowGodanIrrealis(const std::vector<char32_t>& codepoints, size_t start_
   return mizenkei_end - start_pos == 2 && (codepoints[start_pos] == U'し' || codepoints[start_pos] == U'い');
 }
 
+namespace {
+
+// Emits the mizenkei candidate for @p forms with the dictionary lemma when one
+// is registered, else the reconstructed base form.
+void pushMizenkeiCandidate(std::vector<UnknownCandidate>& candidates, const dictionary::DictionaryManager* dict_manager,
+                           const GodanMizenkeiForms& forms, size_t start_pos, size_t mizenkei_end, float cost,
+                           const char* pattern) {
+  std::string lemma = vh::lookupVerbLemma(dict_manager, forms.mizenkei_surface, forms.base_form);
+  SUZUME_DEBUG_VERBOSE_BLOCK {
+    SUZUME_DEBUG_STREAM << "[VERB_CAND] " << forms.mizenkei_surface << " " << pattern << " lemma=" << lemma
+                        << " cost=" << cost << "\n";
+  }
+  candidates.push_back(makeVerbCandidate(
+      forms.mizenkei_surface, start_pos, mizenkei_end, cost, lemma, grammar::verbTypeToConjType(forms.verb_type), true,
+      CandidateOrigin::VerbHiragana, candidate::kHighOriginConfidence, pattern, core::ExtendedPOS::VerbMizenkei));
+}
+
+}  // namespace
+
 void appendMizenkeiNCandidates(const std::vector<char32_t>& codepoints, size_t start_pos, size_t hiragana_end,
                                const dictionary::DictionaryManager* dict_manager,
                                std::vector<UnknownCandidate>& candidates) {
@@ -145,15 +158,12 @@ void appendMizenkeiNCandidates(const std::vector<char32_t>& codepoints, size_t s
     if (forms.a_row_char == U'さ') {
       continue;
     }
-    grammar::VerbType verb_type = forms.verb_type;
-    const std::string& mizenkei_surface = forms.mizenkei_surface;
-    const std::string& base_form = forms.base_form;
 
     // Validate: check if base form exists in dictionary
     // The inflection analysis is too permissive and will match almost any input,
     // so we require dictionary confirmation to avoid false positives
     // like おねえさん → おねえさ + ん (おねえす is not a real verb)
-    bool is_valid_verb = vh::isVerbInDictionary(dict_manager, base_form);
+    bool is_valid_verb = vh::isVerbInDictionary(dict_manager, forms.base_form);
     // The na-row Godan class is closed (しぬ, いぬ), so any other な+ん is the
     // attributive copula plus ん (おなじ+な+ん+よ), never a new verb.
     if (!is_valid_verb && forms.a_row_char == U'な' && !isNaRowGodanIrrealis(codepoints, start_pos, mizenkei_end)) {
@@ -162,12 +172,9 @@ void appendMizenkeiNCandidates(const std::vector<char32_t>& codepoints, size_t s
 
     // Minimum stem length check: need at least 2 chars in mizenkei to be meaningful
     // This prevents false positives like "かん" → "か" + "ん"
-    if (!is_valid_verb && mizenkei_surface.size() < 6) {  // 2 chars = 6 bytes in UTF-8
+    if (!is_valid_verb && forms.mizenkei_surface.size() < 6) {  // 2 chars = 6 bytes in UTF-8
       continue;
     }
-
-    // Get lemma from dictionary entry if available
-    std::string lemma = vh::lookupVerbLemma(dict_manager, mizenkei_surface, base_form);
 
     // Generate mizenkei candidate with explicit VerbMizenkei EPOS for bigram connection
     // Use negative cost for valid verbs (to beat unsplit form)
@@ -179,14 +186,7 @@ void appendMizenkeiNCandidates(const std::vector<char32_t>& codepoints, size_t s
     if (!is_valid_verb && hasFormalNounPrefixBoundary(dict_manager, codepoints, start_pos, mizenkei_end)) {
       cost += bigram_cost::kStrong;
     }
-    SUZUME_DEBUG_VERBOSE_BLOCK {
-      SUZUME_DEBUG_STREAM << "[VERB_CAND] " << mizenkei_surface << " hiragana_mizenkei_n lemma=" << lemma
-                          << " cost=" << cost << "\n";
-    }
-    candidates.push_back(makeVerbCandidate(mizenkei_surface, start_pos, mizenkei_end, cost, lemma,
-                                           grammar::verbTypeToConjType(verb_type), true, CandidateOrigin::VerbHiragana,
-                                           candidate::kHighOriginConfidence, "hiragana_mizenkei_n",
-                                           core::ExtendedPOS::VerbMizenkei));
+    pushMizenkeiCandidate(candidates, dict_manager, forms, start_pos, mizenkei_end, cost, "hiragana_mizenkei_n");
     break;  // Only generate one candidate per position
   }
 }
@@ -214,17 +214,12 @@ void appendMizenkeiNegativeCandidates(const std::vector<char32_t>& codepoints, s
     if (!deriveGodanMizenkeiForms(codepoints, start_pos, mizenkei_end, forms)) {
       continue;
     }
-    grammar::VerbType verb_type = forms.verb_type;
-    const std::string& mizenkei_surface = forms.mizenkei_surface;
-    const std::string& base_form = forms.base_form;
 
     // Validate: analyze the full form (including the auxiliary) to check if it's a valid verb
-    const std::string full_form = mizenkei_surface + extractSubstring(codepoints, end_pos, end_pos + aux_len);
+    const std::string full_form = forms.mizenkei_surface + extractSubstring(codepoints, end_pos, end_pos + aux_len);
     const MizenkeiEvidence evidence =
         judgeMizenkeiForms(dict_manager, inflection, full_form, forms, codepoints, start_pos, mizenkei_end);
-    const bool is_valid_verb = evidence.is_valid_verb;
     const bool is_in_dict = evidence.is_in_dict;
-    const bool unattested_sa_irrealis = evidence.unattested_sa_irrealis;
     // Reject a fabricated mizenkei that merely absorbs a trailing adverbial
     // particle (みるしか / やるしか = verb + しか, never the 未然形 of a non-word).
     if (!is_in_dict && endsWithParticleAfterVerb(dict_manager, inflection, codepoints, start_pos, mizenkei_end)) {
@@ -240,18 +235,15 @@ void appendMizenkeiNegativeCandidates(const std::vector<char32_t>& codepoints, s
 
     // Minimum stem length check: need at least 2 chars in mizenkei to be meaningful
     // This prevents false positives like "かない" → "か" + "ない"
-    if (!is_valid_verb && mizenkei_surface.size() < 6) {  // 2 chars = 6 bytes in UTF-8
+    if (!evidence.is_valid_verb && forms.mizenkei_surface.size() < 6) {  // 2 chars = 6 bytes in UTF-8
       continue;
     }
-
-    // Get lemma from dictionary entry if available
-    std::string lemma = vh::lookupVerbLemma(dict_manager, mizenkei_surface, base_form);
 
     // Dict-verified verbs get standard bonus; unverified get weaker cost
     // to prevent false hiragana verb candidates (e.g., はいか from はいく)
     // from beating particle+verb splits (は+いか)
     float cost_negative = candidate::verb_cost::kStandardBonus;  // -0.5
-    if (!is_in_dict && mizenkei_surface.size() >= 6) {           // 2+ char stems
+    if (!is_in_dict && forms.mizenkei_surface.size() >= 6) {     // 2+ char stems
       cost_negative = 0.5F;                                      // Positive cost for unverified candidates
     }
     // Both charges describe the same thing — the reading rests on a mora that
@@ -259,7 +251,7 @@ void appendMizenkeiNegativeCandidates(const std::vector<char32_t>& codepoints, s
     // price rather than the two compounding into a near-prohibition and taking
     // the sa-row irrealis before the classical negative with it (手を+かさ+ず).
     const float sa_row_ambiguity =
-        unattested_sa_irrealis ? candidate::verb_cost::kPureHiraganaSaIrrealisPenalty : bigram_cost::kNeutral;
+        evidence.unattested_sa_irrealis ? candidate::verb_cost::kPureHiraganaSaIrrealisPenalty : bigram_cost::kNeutral;
     const float auxiliary_ambiguity =
         aux_len == 1 && !is_in_dict ? candidate::verb_cost::kMonomoraNegativeIrrealisPenalty : bigram_cost::kNeutral;
     cost_negative += std::max(sa_row_ambiguity, auxiliary_ambiguity);
@@ -298,14 +290,8 @@ void appendMizenkeiNegativeCandidates(const std::vector<char32_t>& codepoints, s
         (codepoints[start_pos - 1] == U'て' || codepoints[start_pos - 1] == U'で')) {
       continue;
     }
-    SUZUME_DEBUG_VERBOSE_BLOCK {
-      SUZUME_DEBUG_STREAM << "[VERB_CAND] " << mizenkei_surface << " hiragana_mizenkei_negative lemma=" << lemma
-                          << " cost=" << cost_negative << "\n";
-    }
-    candidates.push_back(makeVerbCandidate(mizenkei_surface, start_pos, mizenkei_end, cost_negative, lemma,
-                                           grammar::verbTypeToConjType(verb_type), true, CandidateOrigin::VerbHiragana,
-                                           candidate::kHighOriginConfidence, "hiragana_mizenkei_negative",
-                                           core::ExtendedPOS::VerbMizenkei));
+    pushMizenkeiCandidate(candidates, dict_manager, forms, start_pos, mizenkei_end, cost_negative,
+                          "hiragana_mizenkei_negative");
     break;  // Only generate one candidate per position
   }
 }
@@ -334,29 +320,21 @@ void appendMizenkeiNakyaCandidates(const std::vector<char32_t>& codepoints, size
     if (!deriveGodanMizenkeiForms(codepoints, start_pos, mizenkei_end, forms)) {
       continue;
     }
-    grammar::VerbType verb_type = forms.verb_type;
-    const std::string& mizenkei_surface = forms.mizenkei_surface;
-    const std::string& base_form = forms.base_form;
 
     // Validate: analyze the equivalent ない form to confirm it is a valid verb.
     // E.g., for やら validate やらない → やる (godan-ra). Dictionary is a fallback.
-    const std::string full_form = mizenkei_surface + "ない";
+    const std::string full_form = forms.mizenkei_surface + "ない";
     const MizenkeiEvidence evidence =
         judgeMizenkeiForms(dict_manager, inflection, full_form, forms, codepoints, start_pos, mizenkei_end);
-    const bool is_valid_verb = evidence.is_valid_verb;
     const bool is_in_dict = evidence.is_in_dict;
-    const bool unattested_sa_irrealis = evidence.unattested_sa_irrealis;
-    if (!is_valid_verb) {
+    if (!evidence.is_valid_verb) {
       continue;
     }
-
-    // Get lemma from dictionary entry if the mizenkei surface is registered
-    std::string lemma = vh::lookupVerbLemma(dict_manager, mizenkei_surface, base_form);
 
     // The なきゃ/なければ contraction is an unambiguous mizenkei signal, so give a
     // bonus (verified verbs stronger) to beat the particle split や + らなきゃ.
     float cost = is_in_dict ? candidate::verb_cost::kStrongBonus : candidate::verb_cost::kStandardBonus;
-    if (unattested_sa_irrealis) {
+    if (evidence.unattested_sa_irrealis) {
       cost += candidate::verb_cost::kPureHiraganaSaIrrealisPenalty;
     }
     // Unverified stems starting with a formal noun are noun + verb sequences
@@ -364,14 +342,7 @@ void appendMizenkeiNakyaCandidates(const std::vector<char32_t>& codepoints, size
     if (!is_in_dict && hasFormalNounPrefixBoundary(dict_manager, codepoints, start_pos, mizenkei_end)) {
       cost += bigram_cost::kStrong;
     }
-    SUZUME_DEBUG_VERBOSE_BLOCK {
-      SUZUME_DEBUG_STREAM << "[VERB_CAND] " << mizenkei_surface << " hiragana_mizenkei_nakya lemma=" << lemma
-                          << " cost=" << cost << "\n";
-    }
-    candidates.push_back(makeVerbCandidate(mizenkei_surface, start_pos, mizenkei_end, cost, lemma,
-                                           grammar::verbTypeToConjType(verb_type), true, CandidateOrigin::VerbHiragana,
-                                           candidate::kHighOriginConfidence, "hiragana_mizenkei_nakya",
-                                           core::ExtendedPOS::VerbMizenkei));
+    pushMizenkeiCandidate(candidates, dict_manager, forms, start_pos, mizenkei_end, cost, "hiragana_mizenkei_nakya");
     break;  // Only generate one candidate per position
   }
 }

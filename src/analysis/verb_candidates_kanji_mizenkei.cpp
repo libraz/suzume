@@ -4,12 +4,9 @@
  */
 
 #include <algorithm>
-#include <cmath>
 
-#include "analysis/bigram_table.h"
 #include "analysis/candidate_constants.h"
 #include "analysis/dictionary_probe.h"
-#include "analysis/scorer_constants.h"
 #include "analysis/tokenizer_utils.h"
 #include "analysis/verb_candidates_absorption_guards.h"
 #include "analysis/verb_candidates_auxiliary_patterns.h"
@@ -21,7 +18,6 @@
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
-#include "grammar/inflection_scorer_constants.h"
 #include "normalize/char_type.h"
 #include "normalize/exceptions.h"
 #include "normalize/utf8.h"
@@ -184,9 +180,6 @@ void appendSingleOkuriganaMizenkeiCandidates(const std::vector<char32_t>& codepo
   }
   // Base suffix, e.g. か → く for GodanKa
   const std::string_view base_suffix = grammar::godanBaseSuffixFromARow(first_hira);
-  if (base_suffix.empty()) {
-    return;
-  }
   const std::string base_form = normalize::concat(kanji_stem, base_suffix);
 
   // Verify the base form is a valid verb
@@ -300,7 +293,7 @@ void appendGodanMizenkeiPassiveCausativeCandidates(const std::vector<char32_t>& 
   }
   const grammar::VerbType verb_type = grammar::verbTypeFromARowCodepoint(a_row);
   const std::string_view base_suffix = grammar::godanBaseSuffixFromARow(a_row);
-  if (verb_type == grammar::VerbType::Unknown || base_suffix.empty()) {
+  if (verb_type == grammar::VerbType::Unknown) {
     return;
   }
   const std::string base_form = normalize::concat(extractSubstring(codepoints, start_pos, kanji_end), base_suffix);
@@ -433,7 +426,7 @@ void appendGodanMizenkeiZuCandidates(const std::vector<char32_t>& codepoints, si
   }
   const grammar::VerbType verb_type = grammar::verbTypeFromARowCodepoint(mizenkei_ending);
   const std::string_view base_suffix = grammar::godanBaseSuffixFromARow(mizenkei_ending);
-  if (verb_type == grammar::VerbType::Unknown || base_suffix.empty()) {
+  if (verb_type == grammar::VerbType::Unknown) {
     return;
   }
   const std::string surface = extractSubstring(codepoints, start_pos, negative_pos);
@@ -444,15 +437,10 @@ void appendGodanMizenkeiZuCandidates(const std::vector<char32_t>& codepoints, si
   // unknown Godan mizenkei candidate.  Inspect the finite particle
   // lexicon rather than enumerating particle surfaces.
   const auto has_internal_particle = [&]() {
-    if (dict_manager == nullptr) {
-      return false;
-    }
     for (size_t particle_start = start_pos + 1; particle_start + 1 < negative_pos; ++particle_start) {
-      for (size_t particle_end = particle_start + 2; particle_end < negative_pos; ++particle_end) {
-        if (lookupEntryInRange(*dict_manager, codepoints, particle_start, particle_end, core::PartOfSpeech::Particle) !=
-            nullptr) {
-          return true;
-        }
+      if (hasDictionaryEntryFrom(dict_manager, codepoints, particle_start, 2, negative_pos - 1 - particle_start,
+                                 core::PartOfSpeech::Particle, nullptr)) {
+        return true;
       }
     }
     return false;
@@ -633,7 +621,7 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
       }
       const grammar::VerbType verb_type = grammar::verbTypeFromARowCodepoint(mizenkei_ending);
       const std::string_view base_suffix = grammar::godanBaseSuffixFromARow(mizenkei_ending);
-      if (verb_type == grammar::VerbType::Unknown || base_suffix.empty()) {
+      if (verb_type == grammar::VerbType::Unknown) {
         continue;
       }
 
@@ -774,125 +762,122 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
           // Construct the base form
           // E.g., 分から → 分かる (replace A-row ending with U-row)
           std::string_view base_suffix = grammar::godanBaseSuffixFromARow(cur_char);
-          if (!base_suffix.empty()) {
-            std::string stem = extractSubstring(codepoints, start_pos, scan_pos);
-            std::string base_form = normalize::concat(stem, base_suffix);
-            std::string surface = extractSubstring(codepoints, start_pos, multi_miz_end);
-            // An internal te-form followed by a subsidiary/aspect verb is a
-            // grammatical boundary, not the irrealis of one lexical verb
-            // (描いていかない → 描い + て + いか + ない).
-            // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
-            if (vh::guardIsWired(vh::GuardMember::EmbedTeAuxiliary, vh::GuardOrigin::KanjiMizenkei) &&
-                vh::embedsTeFormAuxiliary(surface)) {
+          std::string stem = extractSubstring(codepoints, start_pos, scan_pos);
+          std::string base_form = normalize::concat(stem, base_suffix);
+          std::string surface = extractSubstring(codepoints, start_pos, multi_miz_end);
+          // An internal te-form followed by a subsidiary/aspect verb is a
+          // grammatical boundary, not the irrealis of one lexical verb
+          // (描いていかない → 描い + て + いか + ない).
+          // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
+          if (vh::guardIsWired(vh::GuardMember::EmbedTeAuxiliary, vh::GuardOrigin::KanjiMizenkei) &&
+              vh::embedsTeFormAuxiliary(surface)) {
+            continue;
+          }
+          // The scan for the irrealis mora starts inside the okurigana and
+          // runs to the end of the kana region, so it reaches past the word
+          // and into the next phrase. A case particle in between marks an
+          // argument boundary, which no single predicate spans: 資料 + を +
+          // しら is read as the irrealis of the non-word 料をしる. Okurigana
+          // that merely spells a case particle stays exempt, because the
+          // irrealis mora closes the span immediately after it and the guard
+          // requires kana on both sides of the particle (落と+さ+ない).
+          // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
+          if (vh::embedsCaseParticle(dict_manager, codepoints, start_pos, multi_miz_end)) {
+            continue;
+          }
+          // The scan also reaches past an auxiliary written with a kanji, and
+          // an auxiliary heads nothing: 如く is a cell of the comparative 如し
+          // and the あら behind it opens the next predicate, not okurigana of
+          // the non-word 如くある.
+          // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
+          if (vh::opensOnCompleteAuxiliary(dict_manager, codepoints, start_pos, multi_miz_end)) {
+            continue;
+          }
+          // A span that is already a complete terminal form (遊ぶ, 行く) closes
+          // its verb there; the a-row mora after it opens the next word
+          // (遊ぶ+わん), not the irrealis of a verb spelled 遊ぶう.
+          // The same holds for a complete i-adjective: the a-row mora after
+          // it opens the next word (楽しい+わん), not a verb spelled 楽しいう.
+          if (is_n_pattern && (vh::isVerifiedVerbBase(dict_manager, inflection, stem,
+                                                      candidate::verb_cost::kConstructedVerbMinConfidence, true) ||
+                               vh::isAdjectiveInDictionary(dict_manager, stem))) {
+            continue;
+          }
+          const bool base_is_dict_verb = vh::isVerbInDictionary(dict_manager, base_form);
+          // A formal noun written in kanji is a word of its own, so kana after
+          // it that open a dictionary verb cell belong to that verb (他+なら+ない),
+          // not to an unregistered verb built on the noun.
+          // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
+          if (dict_manager != nullptr && !base_is_dict_verb) {
+            const auto* host =
+                lookupEntryInRange(*dict_manager, codepoints, start_pos, kanji_end, core::PartOfSpeech::Noun);
+            if (host != nullptr && host->extended_pos == core::ExtendedPOS::NounFormal &&
+                lookupEntryInRange(*dict_manager, codepoints, kanji_end, multi_miz_end, core::PartOfSpeech::Verb) !=
+                    nullptr) {
               continue;
             }
-            // The scan for the irrealis mora starts inside the okurigana and
-            // runs to the end of the kana region, so it reaches past the word
-            // and into the next phrase. A case particle in between marks an
-            // argument boundary, which no single predicate spans: 資料 + を +
-            // しら is read as the irrealis of the non-word 料をしる. Okurigana
-            // that merely spells a case particle stays exempt, because the
-            // irrealis mora closes the span immediately after it and the guard
-            // requires kana on both sides of the particle (落と+さ+ない).
-            // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
-            if (vh::embedsCaseParticle(dict_manager, codepoints, start_pos, multi_miz_end)) {
-              continue;
+          }
+          // Nor may an unregistered verb take a closed cell standing on its own
+          // host (咲き+たら+ん, 一方+なら+ぬ).
+          if (!base_is_dict_verb && vh::absorbsRegisteredClosedCell(dict_manager, inflection, codepoints, start_pos,
+                                                                    kanji_end, multi_miz_end)) {
+            continue;
+          }
+          // Verify this is a valid verb
+          const bool verified_base = vh::isVerifiedVerbBase(dict_manager, inflection, base_form,
+                                                            candidate::verb_cost::kConstructedVerbMinConfidence, true);
+          bool is_valid_verb = verified_base;
+          if (!is_valid_verb) {
+            is_valid_verb = observedFormConfirms(inflection, codepoints, start_pos, hiragana_end, verb_type, base_form);
+          }
+          // Reject a fabricated mizenkei that merely absorbs a trailing
+          // binding particle (係助詞): 水すらない is noun + すら + ない, never
+          // the mizenkei of a non-word godan-ra verb 水する. Only すら ends in
+          // an a-row mora among binding particles, and no genuine godan verb
+          // ends in 〜する, so this cannot suppress a real conjugation.
+          // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
+          if (is_valid_verb && !base_is_dict_verb &&
+              vh::endsWithParticleTailOfPos(dict_manager, codepoints, start_pos, multi_miz_end,
+                                            core::ExtendedPOS::ParticleBinding)) {
+            SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << extractSubstring(codepoints, start_pos, multi_miz_end)
+                                              << "\" fabricated mizenkei absorbing binding particle\n");
+            is_valid_verb = false;
+          }
+          // The same fabrication reaches one mora further out when the
+          // absorbed particle marks a case: 変わりがない is 変わり + が + ない,
+          // never the irrealis of the non-word 変わりぐ. The case particle sits
+          // at the end of the span, so the embedded-particle guard above has no
+          // suffix to see.
+          // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
+          if (is_valid_verb && !base_is_dict_verb &&
+              vh::endsWithCaseParticleAfterContinuative(dict_manager, inflection, codepoints, start_pos,
+                                                        multi_miz_end)) {
+            SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << extractSubstring(codepoints, start_pos, multi_miz_end)
+                                              << "\" fabricated mizenkei absorbing case particle\n");
+            is_valid_verb = false;
+          }
+          // As in the single-okurigana irrealis: one ending on a registered
+          // case particle needs a verified base (泳が+ない, 和らが+ない), not
+          // just a whole-span reading, or it is the nominative phrase it is
+          // spelled like (塩っけ+が+ない).
+          if (is_valid_verb && !verified_base &&
+              vh::oneMoraParticleEndsAt(dict_manager, codepoints, multi_miz_end, core::ExtendedPOS::ParticleCase)) {
+            is_valid_verb = false;
+          }
+          if (is_valid_verb) {
+            constexpr float kCost = candidate::verb_cost::kStandardBonus;  // Same as other negative patterns
+            const char* pattern = is_nakatt_pattern ? "multi_mizenkei_nakatt"
+                                  : is_n_pattern    ? "multi_mizenkei_n"
+                                  : is_nu_pattern   ? "multi_mizenkei_nu"
+                                                    : "multi_mizenkei_nai";
+            SUZUME_DEBUG_VERBOSE_BLOCK {
+              SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface << " " << pattern << " lemma=" << base_form
+                                  << " cost=" << kCost << "\n";
             }
-            // The scan also reaches past an auxiliary written with a kanji, and
-            // an auxiliary heads nothing: 如く is a cell of the comparative 如し
-            // and the あら behind it opens the next predicate, not okurigana of
-            // the non-word 如くある.
-            // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
-            if (vh::opensOnCompleteAuxiliary(dict_manager, codepoints, start_pos, multi_miz_end)) {
-              continue;
-            }
-            // A span that is already a complete terminal form (遊ぶ, 行く) closes
-            // its verb there; the a-row mora after it opens the next word
-            // (遊ぶ+わん), not the irrealis of a verb spelled 遊ぶう.
-            // The same holds for a complete i-adjective: the a-row mora after
-            // it opens the next word (楽しい+わん), not a verb spelled 楽しいう.
-            if (is_n_pattern && (vh::isVerifiedVerbBase(dict_manager, inflection, stem,
-                                                        candidate::verb_cost::kConstructedVerbMinConfidence, true) ||
-                                 vh::isAdjectiveInDictionary(dict_manager, stem))) {
-              continue;
-            }
-            // A formal noun written in kanji is a word of its own, so kana after
-            // it that open a dictionary verb cell belong to that verb (他+なら+ない),
-            // not to an unregistered verb built on the noun.
-            // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
-            if (dict_manager != nullptr && !vh::isVerbInDictionary(dict_manager, base_form)) {
-              const auto* host =
-                  lookupEntryInRange(*dict_manager, codepoints, start_pos, kanji_end, core::PartOfSpeech::Noun);
-              if (host != nullptr && host->extended_pos == core::ExtendedPOS::NounFormal &&
-                  lookupEntryInRange(*dict_manager, codepoints, kanji_end, multi_miz_end, core::PartOfSpeech::Verb) !=
-                      nullptr) {
-                continue;
-              }
-            }
-            // Nor may an unregistered verb take a closed cell standing on its own
-            // host (咲き+たら+ん, 一方+なら+ぬ).
-            if (!vh::isVerbInDictionary(dict_manager, base_form) &&
-                vh::absorbsRegisteredClosedCell(dict_manager, inflection, codepoints, start_pos, kanji_end,
-                                                multi_miz_end)) {
-              continue;
-            }
-            // Verify this is a valid verb
-            const bool verified_base = vh::isVerifiedVerbBase(
-                dict_manager, inflection, base_form, candidate::verb_cost::kConstructedVerbMinConfidence, true);
-            bool is_valid_verb = verified_base;
-            if (!is_valid_verb) {
-              is_valid_verb =
-                  observedFormConfirms(inflection, codepoints, start_pos, hiragana_end, verb_type, base_form);
-            }
-            // Reject a fabricated mizenkei that merely absorbs a trailing
-            // binding particle (係助詞): 水すらない is noun + すら + ない, never
-            // the mizenkei of a non-word godan-ra verb 水する. Only すら ends in
-            // an a-row mora among binding particles, and no genuine godan verb
-            // ends in 〜する, so this cannot suppress a real conjugation.
-            // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
-            if (is_valid_verb && !vh::isVerbInDictionary(dict_manager, base_form) &&
-                vh::endsWithParticleTailOfPos(dict_manager, codepoints, start_pos, multi_miz_end,
-                                              core::ExtendedPOS::ParticleBinding)) {
-              SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << extractSubstring(codepoints, start_pos, multi_miz_end)
-                                                << "\" fabricated mizenkei absorbing binding particle\n");
-              is_valid_verb = false;
-            }
-            // The same fabrication reaches one mora further out when the
-            // absorbed particle marks a case: 変わりがない is 変わり + が + ない,
-            // never the irrealis of the non-word 変わりぐ. The case particle sits
-            // at the end of the span, so the embedded-particle guard above has no
-            // suffix to see.
-            // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
-            if (is_valid_verb && !vh::isVerbInDictionary(dict_manager, base_form) &&
-                vh::endsWithCaseParticleAfterContinuative(dict_manager, inflection, codepoints, start_pos,
-                                                          multi_miz_end)) {
-              SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << extractSubstring(codepoints, start_pos, multi_miz_end)
-                                                << "\" fabricated mizenkei absorbing case particle\n");
-              is_valid_verb = false;
-            }
-            // As in the single-okurigana irrealis: one ending on a registered
-            // case particle needs a verified base (泳が+ない, 和らが+ない), not
-            // just a whole-span reading, or it is the nominative phrase it is
-            // spelled like (塩っけ+が+ない).
-            if (is_valid_verb && !verified_base &&
-                vh::oneMoraParticleEndsAt(dict_manager, codepoints, multi_miz_end, core::ExtendedPOS::ParticleCase)) {
-              is_valid_verb = false;
-            }
-            if (is_valid_verb) {
-              constexpr float kCost = candidate::verb_cost::kStandardBonus;  // Same as other negative patterns
-              const char* pattern = is_nakatt_pattern ? "multi_mizenkei_nakatt"
-                                    : is_n_pattern    ? "multi_mizenkei_n"
-                                    : is_nu_pattern   ? "multi_mizenkei_nu"
-                                                      : "multi_mizenkei_nai";
-              SUZUME_DEBUG_VERBOSE_BLOCK {
-                SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface << " " << pattern << " lemma=" << base_form
-                                    << " cost=" << kCost << "\n";
-              }
-              candidates.push_back(makeVerbCandidate(surface, start_pos, multi_miz_end, kCost, base_form,
-                                                     grammar::verbTypeToConjType(verb_type), true,
-                                                     CandidateOrigin::VerbKanji, candidate::kHighOriginConfidence,
-                                                     pattern, core::ExtendedPOS::VerbMizenkei));
-            }
+            candidates.push_back(makeVerbCandidate(surface, start_pos, multi_miz_end, kCost, base_form,
+                                                   grammar::verbTypeToConjType(verb_type), true,
+                                                   CandidateOrigin::VerbKanji, candidate::kHighOriginConfidence,
+                                                   pattern, core::ExtendedPOS::VerbMizenkei));
           }
         }
         break;  // Only generate one candidate per position

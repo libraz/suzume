@@ -3,14 +3,11 @@
  * @brief Final validation and emission for selected kanji verb candidates
  */
 
-#include <algorithm>
 #include <array>
-#include <cmath>
 #include <string_view>
 
 #include "analysis/bigram_table.h"
 #include "analysis/candidate_constants.h"
-#include "analysis/scorer_constants.h"
 #include "analysis/tokenizer_utils.h"
 #include "analysis/verb_candidates_absorption_guards.h"
 #include "analysis/verb_candidates_auxiliary_patterns.h"
@@ -476,7 +473,6 @@ bool rejectsInteriorCaseParticle(const KanjiVerbSelection& sel, bool in_dict) {
   // word-internal rather than inventing a phrase boundary mid-stem. A lone
   // ending after it opens no word, so the mora is a particle only when it or
   // the ending starts a dictionary verb form there (金+とる, 傍に+い, but 転がる).
-  bool spans_interior_case_particle = false;
   if (!in_dict && dict_manager != nullptr && end_pos > sel.start_pos + 2) {
     for (size_t particle_pos = sel.start_pos + 1; particle_pos + 1 < end_pos; ++particle_pos) {
       if (!normalize::isKanjiCodepoint(codepoints[particle_pos - 1])) {
@@ -497,13 +493,9 @@ bool rejectsInteriorCaseParticle(const KanjiVerbSelection& sel, bool in_dict) {
           continue;
         }
       }
-      spans_interior_case_particle = true;
-      break;
+      SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << sel.surface << "\" interior_case_particle\n");
+      return true;
     }
-  }
-  if (spans_interior_case_particle) {
-    SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << sel.surface << "\" interior_case_particle\n");
-    return true;
   }
   return false;
 }

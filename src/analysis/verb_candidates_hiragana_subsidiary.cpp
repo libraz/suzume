@@ -90,27 +90,27 @@ void appendContextualIchidanSubsidiaryForms(const std::vector<char32_t>& codepoi
     return;
   }
 
+  const auto emit = [&](size_t end_pos) {
+    appendContextualSubsidiaryCandidate(codepoints, start_pos, end_pos, lemma, dictionary::ConjugationType::Ichidan,
+                                        core::ExtendedPOS::AuxAspectMiru, pattern, bigram_cost::kMinor, candidates);
+  };
+
   // The Ichidan volitional is stem + よう, never the bare renyokei stem + よう.
   const bool is_volitional_stem = codepoints[stem_end] == core::hiragana::kYo;
   if (!is_volitional_stem && grammaticalStemFollowerStartsAt(codepoints, stem_end, dict_manager)) {
-    appendContextualSubsidiaryCandidate(codepoints, start_pos, stem_end, lemma, dictionary::ConjugationType::Ichidan,
-                                        core::ExtendedPOS::AuxAspectMiru, pattern, bigram_cost::kMinor, candidates);
+    emit(stem_end);
   }
 
   const char32_t ending = codepoints[stem_end];
   if (ending == core::hiragana::kRu || ending == core::hiragana::kRe || ending == U'ろ' ||
       ending == core::hiragana::kYo) {
-    appendContextualSubsidiaryCandidate(codepoints, start_pos, stem_end + 1, lemma,
-                                        dictionary::ConjugationType::Ichidan, core::ExtendedPOS::AuxAspectMiru, pattern,
-                                        bigram_cost::kMinor, candidates);
+    emit(stem_end + 1);
   }
 
   // Colloquial conditional: the Ichidan れば contracts to りゃ (みれば → みりゃ),
   // so the cell keeps the same paradigm and loses only the particle.
   if (ending == U'り' && stem_end + 1 < codepoints.size() && codepoints[stem_end + 1] == U'ゃ') {
-    appendContextualSubsidiaryCandidate(codepoints, start_pos, stem_end + 2, lemma,
-                                        dictionary::ConjugationType::Ichidan, core::ExtendedPOS::AuxAspectMiru, pattern,
-                                        bigram_cost::kMinor, candidates);
+    emit(stem_end + 2);
   }
 }
 
@@ -123,25 +123,24 @@ void appendContextualIchidanSubsidiaryForms(const std::vector<char32_t>& codepoi
 // contextual so standalone lexical uses retain their verb analysis.
 void appendIkuAuxiliaryCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                   std::vector<UnknownCandidate>& candidates) {
+  const auto emit = [&](size_t end_pos, std::string_view lemma, const char* pattern) {
+    appendContextualSubsidiaryCandidate(codepoints, start_pos, end_pos, lemma, dictionary::ConjugationType::GodanKa,
+                                        core::ExtendedPOS::AuxAspectIku, pattern, candidate::verb_cost::kStrongBonus,
+                                        candidates);
+  };
   // The contracted onbin cell: 持って+っ+た, 忘れて+っ+ちゃう (いっ with い elided).
   if (start_pos + 1 < codepoints.size() && codepoints[start_pos] == U'っ' &&
       isClearTeFormBeforeSubsidiary(codepoints, start_pos, false) &&
       (codepoints[start_pos + 1] == U'た' || codepoints[start_pos + 1] == core::hiragana::kTe ||
        codepoints[start_pos + 1] == U'ち')) {
-    appendContextualSubsidiaryCandidate(codepoints, start_pos, start_pos + 1, "いく",
-                                        dictionary::ConjugationType::GodanKa, core::ExtendedPOS::AuxAspectIku,
-                                        "hiragana_iku_contracted_onbin", candidate::verb_cost::kStrongBonus,
-                                        candidates);
+    emit(start_pos + 1, "いく", "hiragana_iku_contracted_onbin");
     return;
   }
   // The contracted irrealis cell before a negative: 見て+か+ない, 持って+か+ず.
   if (start_pos + 1 < codepoints.size() && codepoints[start_pos] == U'か' &&
       isClearTeFormBeforeSubsidiary(codepoints, start_pos, false) &&
       (vh::naiNegativeFollowsAt(codepoints, start_pos + 1) || codepoints[start_pos + 1] == U'ず')) {
-    appendContextualSubsidiaryCandidate(codepoints, start_pos, start_pos + 1, "いく",
-                                        dictionary::ConjugationType::GodanKa, core::ExtendedPOS::AuxAspectIku,
-                                        "hiragana_iku_contracted_irrealis", candidate::verb_cost::kStrongBonus,
-                                        candidates);
+    emit(start_pos + 1, "いく", "hiragana_iku_contracted_irrealis");
     return;
   }
   if (start_pos + 1 >= codepoints.size() || codepoints[start_pos] != core::hiragana::kI ||
@@ -151,23 +150,17 @@ void appendIkuAuxiliaryCandidates(const std::vector<char32_t>& codepoints, size_
   }
 
   if (start_pos + 3 < codepoints.size() && codepoints[start_pos + 2] == U'れ' && codepoints[start_pos + 3] == U'ば') {
-    appendContextualSubsidiaryCandidate(codepoints, start_pos, start_pos + 3, "いける",
-                                        dictionary::ConjugationType::GodanKa, core::ExtendedPOS::AuxAspectIku,
-                                        "hiragana_iku_auxiliary", candidate::verb_cost::kStrongBonus, candidates);
+    emit(start_pos + 3, "いける", "hiragana_iku_auxiliary");
     return;
   }
 
   if (start_pos + 2 < codepoints.size() && codepoints[start_pos + 1] == U'こ' && codepoints[start_pos + 2] == U'う') {
-    appendContextualSubsidiaryCandidate(codepoints, start_pos, start_pos + 2, "いく",
-                                        dictionary::ConjugationType::GodanKa, core::ExtendedPOS::AuxAspectIku,
-                                        "hiragana_iku_auxiliary", candidate::verb_cost::kStrongBonus, candidates);
+    emit(start_pos + 2, "いく", "hiragana_iku_auxiliary");
     return;
   }
 
   if (vh::naiNegativeFollowsAt(codepoints, start_pos + 2)) {
-    appendContextualSubsidiaryCandidate(codepoints, start_pos, start_pos + 2, "いける",
-                                        dictionary::ConjugationType::GodanKa, core::ExtendedPOS::AuxAspectIku,
-                                        "hiragana_iku_auxiliary", candidate::verb_cost::kStrongBonus, candidates);
+    emit(start_pos + 2, "いける", "hiragana_iku_auxiliary");
   }
 }
 

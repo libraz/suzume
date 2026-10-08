@@ -3,7 +3,6 @@
  * @brief Extended kanji sokuonbin candidate patterns
  */
 
-#include "analysis/bigram_table.h"
 #include "analysis/candidate_constants.h"
 #include "analysis/dictionary_probe.h"
 #include "analysis/tokenizer_utils.h"
@@ -18,7 +17,6 @@
 #include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
 #include "grammar/honorific_verbs.h"
-#include "grammar/inflection_scorer_constants.h"
 #include "normalize/utf8.h"
 #include "unknown.h"
 #include "verb_candidates.h"
@@ -40,16 +38,6 @@ SokuonbinBase resolveSokuonbinBase(const dictionary::DictionaryManager* dict_man
     return {godan_wa_base, grammar::VerbType::GodanWa};
   }
   return {stem + "る", grammar::VerbType::GodanRa};
-}
-
-bool isGodanTerminalEnding(char32_t codepoint) {
-  for (const auto& [verb_type, row] : grammar::Conjugation::getGodanRows()) {
-    static_cast<void>(verb_type);
-    if (row.base_vowel == codepoint) {
-      return true;
-    }
-  }
-  return false;
 }
 
 /**
@@ -191,8 +179,7 @@ void appendExtendedSokuonbinCandidates(const std::vector<char32_t>& codepoints, 
     // An imperative (行け, 食べろ, 来い) closes the predicate just as a
     // terminal does; no godan-ra okurigana ends in e-row, ろ or い.
     const auto closes_predicate = [](char32_t cp) {
-      return cp == U'く' || cp == U'す' || cp == U'つ' || cp == U'う' || cp == U'ぐ' || cp == U'ぶ' || cp == U'む' ||
-             cp == U'ぬ' || cp == U'る' || kana::isERowCodepoint(cp) || cp == U'ろ' || cp == U'い';
+      return grammar::isModernGodanTerminalKana(cp) || kana::isERowCodepoint(cp) || cp == U'ろ' || cp == U'い';
     };
     // A final or nominalizing particle may close the clause first
     // (行くよ+って, 来るの+って).
@@ -319,7 +306,7 @@ void appendExtendedSokuonbinCandidates(const std::vector<char32_t>& codepoints, 
 
     // A terminal predicate followed by って is a colloquial quotation
     // (読む+っていう), rather than a te-form that continues into an auxiliary.
-    if (after_sokuon == U'て' && isGodanTerminalEnding(codepoints[pos - 1])) {
+    if (after_sokuon == U'て' && grammar::isModernGodanTerminalKana(codepoints[pos - 1])) {
       continue;
     }
 

@@ -246,13 +246,6 @@ bool closesOnPoliteCopula(const dictionary::DictionaryManager* dict_manager, con
                           size_t okurigana_start, size_t end_pos);
 
 /**
- * @brief Whether the span is a registered verb continuative plus the polite ます
- *
- * A coined hiragana verb spelled that way (し+ます as one godan-sa verb) is the
- * registered verb and its auxiliary, not a word of its own.
- * @see fabricated closed-class absorption guards (top of this header)
- */
-/**
  * @brief Whether codepoints ending at @p stem_end close on a registered
  * auxiliary in its terminal form plus a one-mora conjunctive particle
  *
@@ -275,6 +268,13 @@ bool closesOnTerminalAuxiliaryAndConjunctive(const dictionary::DictionaryManager
 bool closesOnTerminalVerbAndConjunctive(const dictionary::DictionaryManager* dict_manager,
                                         const std::vector<char32_t>& codepoints, size_t start_pos, size_t stem_end);
 
+/**
+ * @brief Whether the span is a registered verb continuative plus the polite ます
+ *
+ * A coined hiragana verb spelled that way (し+ます as one godan-sa verb) is the
+ * registered verb and its auxiliary, not a word of its own.
+ * @see fabricated closed-class absorption guards (top of this header)
+ */
 bool spellsContinuativeBeforePolite(const dictionary::DictionaryManager* dict_manager,
                                     const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos);
 
@@ -299,6 +299,16 @@ size_t negativeAuxiliaryLengthAt(const dictionary::DictionaryManager* dict_manag
                                  const std::vector<char32_t>& codepoints, size_t pos);
 
 /**
+ * @brief Whether a registered imperative/terminal verb cell ends at `end_pos`
+ * and covers `start_pos`.
+ *
+ * The cell must start before `start_pos` (the span opens inside it), or, when
+ * the span's own base is unattested, may start at `start_pos` itself.
+ */
+bool closedPredicateEndsAt(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
+                           size_t start_pos, size_t end_pos, bool span_lemma_attested);
+
+/**
  * @brief Check if a candidate span opens on the tail of an earlier closed-class word
  *
  * True when a dictionary auxiliary or particle begins before @p start_pos and
@@ -310,16 +320,6 @@ size_t negativeAuxiliaryLengthAt(const dictionary::DictionaryManager* dict_manag
  * is — which is why it cannot be found by scanning the candidate's own span.
  * @see fabricated closed-class absorption guards (top of this header)
  */
-/**
- * @brief Whether a registered imperative/terminal verb cell ends at `end_pos`
- * and covers `start_pos`.
- *
- * The cell must start before `start_pos` (the span opens inside it), or, when
- * the span's own base is unattested, may start at `start_pos` itself.
- */
-bool closedPredicateEndsAt(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
-                           size_t start_pos, size_t end_pos, bool span_lemma_attested);
-
 bool opensOnClosedClassWordTail(const dictionary::DictionaryManager* dict_manager,
                                 const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos);
 

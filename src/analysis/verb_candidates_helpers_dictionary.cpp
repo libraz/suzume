@@ -163,7 +163,7 @@ NominalBeforeSokuon nominalEndsBeforeSokuon(const dictionary::DictionaryManager*
     if (!suffix_closes) {
       continue;
     }
-    const size_t earliest = nominal_end > kMaxNominalChars ? nominal_end - kMaxNominalChars : 0;
+    const size_t earliest = lookbehindStart(nominal_end, kMaxNominalChars);
     for (size_t begin = earliest; begin <= stem_start; ++begin) {
       if (lookupEntryInRange(*dict_manager, codepoints, begin, nominal_end, core::PartOfSpeech::Pronoun) != nullptr) {
         return NominalBeforeSokuon::Pronoun;

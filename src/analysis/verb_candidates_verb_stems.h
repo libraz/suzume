@@ -89,25 +89,11 @@ std::string baseFormSuffix(grammar::VerbType verb_type);
 bool isValidIRowIchidanStem(std::string_view stem);
 
 /**
- * @brief Get Godan VerbTypes that use a specific onbin pattern
- *
- * Onbin patterns:
- * - "い" (ikuon) → GodanKa, GodanGa
- * - "っ" (sokuon) → GodanKa (行く irregular), GodanRa, GodanTa, GodanWa
- * - "ん" (hatsuonbin) → GodanNa, GodanBa, GodanMa
- * - "" (none) → GodanSa
- *
- * @param onbin Onbin pattern to match ("い", "っ", "ん", or "")
- * @return Reference to a shared immutable table of (VerbType, base_suffix) pairs
- */
-grammar::GodanOnbinRange getGodanTypesByOnbin(std::string_view onbin);
-
-/**
  * @brief Result of matching an onbin stem against the dictionary's godan verbs.
  *
- * @c base_suffix points into the immutable getGodanTypesByOnbin() table and is
- * valid for the program's lifetime. When @c matched is false, @c verb_type is
- * Unknown, @c base_form is empty, and @c base_suffix is empty.
+ * @c base_suffix points into the immutable Conjugation::getGodanTypesByOnbin()
+ * table and is valid for the program's lifetime. When @c matched is false,
+ * @c verb_type is Unknown, @c base_form is empty, and @c base_suffix is empty.
  */
 struct GodanOnbinDictMatch {
   grammar::VerbType verb_type = grammar::VerbType::Unknown;
@@ -118,7 +104,7 @@ struct GodanOnbinDictMatch {
 
 /**
  * @brief First (verb_type, stem+base_suffix) pair for @p onbin whose base form
- *        is a dictionary verb, in getGodanTypesByOnbin() table order.
+ *        is a dictionary verb, in Conjugation::getGodanTypesByOnbin() order.
  *
  * Reproduces the phase-1 "check every godan candidate, keep the first dictionary
  * hit" scan shared by the onbin candidate generators.

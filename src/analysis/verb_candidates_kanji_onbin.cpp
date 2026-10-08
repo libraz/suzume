@@ -4,12 +4,10 @@
  */
 
 #include <algorithm>
-#include <cmath>
 
 #include "analysis/bigram_table.h"
 #include "analysis/candidate_constants.h"
 #include "analysis/dictionary_probe.h"
-#include "analysis/scorer_constants.h"
 #include "analysis/tokenizer_utils.h"
 #include "analysis/verb_candidates_auxiliary_patterns.h"
 #include "analysis/verb_candidates_dictionary_probes.h"
@@ -20,7 +18,6 @@
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
-#include "grammar/inflection_scorer_constants.h"
 #include "normalize/char_type.h"
 #include "normalize/exceptions.h"
 #include "normalize/utf8.h"
@@ -211,7 +208,7 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
         // Determine candidate verb types based on onbin type
         // Uses centralized GodanRow data instead of manual enumeration
         std::string_view onbin_str = is_hatsuonbin ? "ん" : (is_ikuon ? "い" : "う");
-        const auto& candidates_to_try = vh::getGodanTypesByOnbin(onbin_str);
+        const auto& candidates_to_try = grammar::Conjugation::getGodanTypesByOnbin(onbin_str);
         // First, check dictionary for ALL verb types before falling back to inflection
         // This ensures dictionary-verified verbs take precedence
         // Phase 1: Dictionary check
@@ -244,7 +241,7 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
   if (kanji_end + 1 < hiragana_end && codepoints[kanji_end] == U'っ' &&
       (codepoints[kanji_end + 1] == U'て' || codepoints[kanji_end + 1] == U'た' || codepoints[kanji_end + 1] == U'ち' ||
        codepoints[kanji_end + 1] == U'と')) {
-    const auto& sokuonbin_types = vh::getGodanTypesByOnbin("っ");
+    const auto& sokuonbin_types = grammar::Conjugation::getGodanTypesByOnbin("っ");
     // A dictionary base for the stem in any sokuonbin row (行く is the only
     // GodanKa one, so 書く cannot license 書っ)
     auto dict_match = vh::firstGodanOnbinDictBase(dict_manager, kanji_stem, "っ");
@@ -370,14 +367,10 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
         (kanji_on_left || (stem_is_dictionary_nominal && !te_continuation_follows)) &&
         kanji_end + 1 < codepoints.size()) {
       constexpr size_t kParticleProbe = 3;
-      const size_t max_particle_end = std::min(codepoints.size(), kanji_end + kParticleProbe);
-      for (size_t particle_end = kanji_end + 2; particle_end <= max_particle_end; ++particle_end) {
-        if (lookupEntryInRange(*dict_manager, codepoints, kanji_end, particle_end, core::PartOfSpeech::Particle) !=
-            nullptr) {
-          sokuon_heads_dictionary_particle = true;
-          SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << kanji_stem << "\" sokuon heads a dictionary particle\n");
-          break;
-        }
+      sokuon_heads_dictionary_particle = hasDictionaryEntryFrom(dict_manager, codepoints, kanji_end, 2, kParticleProbe,
+                                                                core::PartOfSpeech::Particle, nullptr);
+      if (sokuon_heads_dictionary_particle) {
+        SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << kanji_stem << "\" sokuon heads a dictionary particle\n");
       }
     }
 
@@ -391,8 +384,6 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
       // Dict-matched verbs get bonus (-0.5) to beat unsplit forms
       // Inflection-only matches get neutral cost (0) to avoid false positives
       // like 像っ (from 像る which is not a real verb)
-      // Dict-matched verbs get bonus (-0.5) to beat unsplit forms
-      // Inflection-only matches (2-kanji stems only) get neutral cost
       const float sokuonbin_cost = matched_via_dict ? candidate::verb_cost::kStandardBonus : bigram_cost::kNeutral;
       // The non-dictionary fallback reaches here only for a one-kanji
       // stem whose complete sokuonbin form was validated by inflection.
@@ -416,7 +407,7 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
   // - kanji + ん + で/だ: GodanMa/GodanBa/GodanNa verbs
   if (kanji_end + 1 < hiragana_end && codepoints[kanji_end] == U'ん' &&
       (codepoints[kanji_end + 1] == U'で' || codepoints[kanji_end + 1] == U'だ')) {
-    const auto& hatsuonbin_types = vh::getGodanTypesByOnbin("ん");
+    const auto& hatsuonbin_types = grammar::Conjugation::getGodanTypesByOnbin("ん");
     // First, check dictionary for ALL verb types
     auto hatsuonbin_match = vh::firstGodanOnbinDictBase(dict_manager, kanji_stem, "ん");
     grammar::VerbType matched_verb_type = hatsuonbin_match.verb_type;
@@ -518,7 +509,7 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
     }
     if (matched_type == grammar::VerbType::Unknown && followed_by_de_da) {
       applyOnbinInflectionFallback(codepoints, start_pos, n_pos + 2, inflection, lexical_stem,
-                                   vh::getGodanTypesByOnbin("ん"), matched_type, matched_base);
+                                   grammar::Conjugation::getGodanTypesByOnbin("ん"), matched_type, matched_base);
     }
     if (matched_type != grammar::VerbType::Unknown) {
       emitOnbinStemCandidate(codepoints, start_pos, n_pos + 1, candidate::verb_cost::kStandardBonus, matched_base,

@@ -3,13 +3,9 @@
  * @brief Internal pure-hiragana verb candidate patterns
  */
 
-#include <algorithm>
-#include <cmath>
-
 #include "analysis/bigram_table.h"
 #include "analysis/candidate_constants.h"
 #include "analysis/dictionary_probe.h"
-#include "analysis/scorer_constants.h"
 #include "analysis/verb_candidates_auxiliary_patterns.h"
 #include "analysis/verb_candidates_dictionary_probes.h"
 #include "analysis/verb_candidates_hiragana_internal.h"
@@ -93,7 +89,7 @@ bool deriveGodanMizenkeiForms(const std::vector<char32_t>& codepoints, size_t st
   }
   out.verb_type = grammar::verbTypeFromARowCodepoint(out.a_row_char);
   out.base_suffix = grammar::godanBaseSuffixFromARow(out.a_row_char);
-  if (out.verb_type == grammar::VerbType::Unknown || out.base_suffix.empty()) {
+  if (out.verb_type == grammar::VerbType::Unknown) {
     return false;
   }
   out.mizenkei_surface = extractSubstring(codepoints, start_pos, mizenkei_end);
@@ -258,7 +254,8 @@ void appendIchidanRareruCandidates(const std::vector<char32_t>& codepoints, size
 
     // Validate: check if base form is a known ichidan verb
     // For pure hiragana like いる, check the dictionary
-    bool is_valid_ichidan = vh::isVerbInDictionary(dict_manager, base_form);
+    const bool base_is_dict_verb = vh::isVerbInDictionary(dict_manager, base_form);
+    bool is_valid_ichidan = base_is_dict_verb;
 
     // The complete passive form is stronger evidence than the ambiguous bare
     // base. A long unknown hiragana stem may have a low-confidence Ichidan
@@ -300,9 +297,7 @@ void appendIchidanRareruCandidates(const std::vector<char32_t>& codepoints, size
     // otherwise ambiguous stem cell.  For example, the historical やむ
     // conditional and the Ichidan やめる share やめ, but only the complete
     // latter lemma licenses the passive construction here.
-    std::string lemma = vh::isVerbInDictionary(dict_manager, base_form)
-                            ? base_form
-                            : vh::lookupVerbLemma(dict_manager, stem, base_form);
+    std::string lemma = base_is_dict_verb ? base_form : vh::lookupVerbLemma(dict_manager, stem, base_form);
 
     // A stem can be a homograph of a different inflection.  In particular,
     // the classical する form せ must not be reinterpreted as the continuative

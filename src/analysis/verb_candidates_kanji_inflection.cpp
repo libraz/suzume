@@ -3,21 +3,14 @@
  * @brief General inflection-analyzed kanji verb candidates
  */
 
-#include <algorithm>
-#include <cmath>
-
-#include "analysis/bigram_table.h"
 #include "analysis/candidate_constants.h"
-#include "analysis/scorer_constants.h"
 #include "analysis/tokenizer_utils.h"
 #include "analysis/verb_candidates_dictionary_probes.h"
 #include "analysis/verb_candidates_kanji_internal.h"
 #include "analysis/verb_candidates_verb_stems.h"
-#include "core/debug.h"
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
-#include "grammar/inflection_scorer_constants.h"
 #include "normalize/char_type.h"
 #include "normalize/exceptions.h"
 #include "normalize/utf8.h"

@@ -17,13 +17,13 @@ src/analysis/analyzer.cpp	0	0	0
 src/analysis/analyzer.h	0	0	0
 src/analysis/bigram_table.cpp	0	1	0
 src/analysis/bigram_table.h	0	18	0
-src/analysis/bigram_table_aux_noun.cpp	0	6	0
+src/analysis/bigram_table_aux_noun.cpp	0	5	0
 src/analysis/bigram_table_internal.h	0	3	0
 src/analysis/bigram_table_nominal_particles.cpp	0	0	0
 src/analysis/bigram_table_particle_lexical.cpp	0	7	0
 src/analysis/bigram_table_particle_penalties.cpp	0	0	0
 src/analysis/bigram_table_verb_adj.cpp	0	5	0
-src/analysis/candidate_constants.h	0	173	0
+src/analysis/candidate_constants.h	0	167	0
 src/analysis/candidate_options.h	0	35	0
 src/analysis/category_cost.h	0	105	0
 src/analysis/compound_verb_emit.cpp	0	7	0
@@ -46,7 +46,7 @@ src/analysis/scorer.cpp	0	174	0
 src/analysis/scorer.h	0	23	0
 src/analysis/scorer_bigram_overrides.h	0	0	0
 src/analysis/scorer_boundary_cost.cpp	0	0	0
-src/analysis/scorer_connection_cost.cpp	35	22	52
+src/analysis/scorer_connection_cost.cpp	33	22	52
 src/analysis/scorer_connection_rules.h	0	0	0
 src/analysis/scorer_connection_rules_honorific.cpp	13	2	35
 src/analysis/scorer_connection_rules_internal.h	0	0	0
@@ -129,7 +129,7 @@ src/analysis/verb_candidates_kanji_ichidan.cpp	0	2	0
 src/analysis/verb_candidates_kanji_inflection.cpp	1	1	0
 src/analysis/verb_candidates_kanji_internal.h	0	0	0
 src/analysis/verb_candidates_kanji_mizenkei.cpp	0	7	0
-src/analysis/verb_candidates_kanji_onbin.cpp	0	6	0
+src/analysis/verb_candidates_kanji_onbin.cpp	0	5	0
 src/analysis/verb_candidates_kanji_onbin_extended.cpp	0	0	0
 src/analysis/verb_candidates_kanji_renyokei.cpp	0	13	0
 src/analysis/verb_candidates_verb_stems.h	0	1	0
@@ -159,7 +159,7 @@ src/grammar/dictionary_expansion.cpp	0	0	0
 src/grammar/dictionary_expansion.h	0	0	0
 src/grammar/honorific_verbs.cpp	0	0	0
 src/grammar/honorific_verbs.h	0	0	0
-src/grammar/inflection.cpp	0	7	0
+src/grammar/inflection.cpp	0	5	0
 src/grammar/inflection.h	0	3	0
 src/grammar/inflection_scorer.cpp	0	0	0
 src/grammar/inflection_scorer.h	0	2	0
