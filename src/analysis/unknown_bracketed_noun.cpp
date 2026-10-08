@@ -429,6 +429,15 @@ void scanBracketedRun(const BracketedNounContext& ctx, size_t bracketed_noun_lim
   bracketed.crossed_verified_predicate = crossed_verified_predicate;
 }
 
+// Whether the analyzer reads a whole kana span as a verb's terminal form.
+bool readsAsVerbTerminal(const grammar::Inflection& inflection, const std::string& surface) {
+  const auto& analyses = inflection.analyze(surface);
+  return std::any_of(analyses.begin(), analyses.end(), [&](const grammar::InflectionCandidate& analysis) {
+    return analysis.verb_type != grammar::VerbType::Unknown && analysis.verb_type != grammar::VerbType::IAdjective &&
+           analysis.base_form == surface && analysis.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence;
+  });
+}
+
 bool endsOnPredicateTail(const BracketedNounContext& ctx, size_t run_end) {
   const auto& codepoints = ctx.codepoints;
   const size_t start_pos = ctx.start_pos;
@@ -442,24 +451,15 @@ bool endsOnPredicateTail(const BracketedNounContext& ctx, size_t run_end) {
   // たなばた). A na-adjective stem is no such predicate, because it takes な
   // before ん (どうん is no どう+ん). Before の a verb terminal of two morae or
   // more is evidence as well; ん is left out, as it also ends mimetics (ぐうん).
-  const auto reads_as_verb_terminal = [&](const std::string& surface) {
-    if (run_end < start_pos + 3 || codepoints[run_end - 1] != U'の') {
-      return false;
-    }
-    const auto& analyses = ctx.inflection.analyze(surface);
-    return std::any_of(analyses.begin(), analyses.end(), [&](const grammar::InflectionCandidate& analysis) {
-      return analysis.verb_type != grammar::VerbType::Unknown && analysis.verb_type != grammar::VerbType::IAdjective &&
-             analysis.base_form == surface &&
-             analysis.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence;
-    });
-  };
   if (dict_manager != nullptr && run_end > start_pos + 1 &&
       (codepoints[run_end - 1] == U'ん' || codepoints[run_end - 1] == U'の')) {
     const std::string predicate = extractSubstring(codepoints, start_pos, run_end - 1);
     if (hasExactPartOfSpeech(*dict_manager, codepoints, start_pos, run_end - 1,
                              partOfSpeechMask(core::PartOfSpeech::Verb)) ||
         verb_helpers::isIAdjectiveInDictionary(dict_manager, predicate) ||
-        verb_helpers::readsAsIAdjectiveTerminal(predicate, ctx.inflection) || reads_as_verb_terminal(predicate)) {
+        verb_helpers::readsAsIAdjectiveTerminal(predicate, ctx.inflection) ||
+        (run_end >= start_pos + 3 && codepoints[run_end - 1] == U'の' &&
+         readsAsVerbTerminal(ctx.inflection, predicate))) {
       return true;
     }
   }
@@ -773,6 +773,26 @@ bool admitsPromotedRun(const BracketedNounContext& ctx, const BracketedScan& bra
       }
     }
   }
+  // Nor may it carry the tail of a kana verb terminal that opens in front of
+  // it on into the nominalizer (ある|く+の+が is あるく+の+が). The kana in front
+  // must spell a registered verb, as a particle opens none (りんご+が+つの).
+  bool carries_left_terminal_into_nominalizer = false;
+  for (size_t opening = start_pos; opening > 0 && start_pos - opening < kPredicateLookbehind &&
+                                   ctx.char_types[opening - 1] == normalize::CharType::Hiragana &&
+                                   !carries_left_terminal_into_nominalizer && dict_manager != nullptr;
+       --opening) {
+    if (!hasExactPartOfSpeech(*dict_manager, codepoints, opening - 1, start_pos,
+                              partOfSpeechMask(core::PartOfSpeech::Verb))) {
+      continue;
+    }
+    for (size_t nominalizer = start_pos + 1; nominalizer < scan; ++nominalizer) {
+      if (codepoints[nominalizer] == U'の' &&
+          readsAsVerbTerminal(ctx.inflection, extractSubstring(codepoints, opening - 1, nominalizer))) {
+        carries_left_terminal_into_nominalizer = true;
+        break;
+      }
+    }
+  }
   // Nor may it absorb a registered irrealis and the auxiliary that selects
   // it (あら+ん+や): that is a finished predicate, not a noun.
   bool opens_on_irrealis_chain = false;
@@ -869,10 +889,10 @@ bool admitsPromotedRun(const BracketedNounContext& ctx, const BracketedScan& bra
          (promoted.right_particle || promoted.right_clause || promoted.right_auxiliary || promoted.right_kanji_word ||
           promoted.right_suffix || (promoted.right_short_genitive && promoted.unread_short_run_bracketed)) &&
          !bracketed.crossed_verified_predicate && !cuts_into_predicate && !opens_inside_hosted_predicate &&
-         !opens_on_irrealis_chain && !promoted.has_inflected_predicate_reading && !opens_on_sino_prefix &&
-         !absorbs_trailing_suffix && !opens_on_te_connective && !spans_laugh && !closes_registered_word_predicate &&
-         !finishes_auxiliary_chain && !spells_contracted_hypothetical && !steals_formal_noun_head &&
-         !promoted.absorbs_copula_before_sokuon_final &&
+         !carries_left_terminal_into_nominalizer && !opens_on_irrealis_chain &&
+         !promoted.has_inflected_predicate_reading && !opens_on_sino_prefix && !absorbs_trailing_suffix &&
+         !opens_on_te_connective && !spans_laugh && !closes_registered_word_predicate && !finishes_auxiliary_chain &&
+         !spells_contracted_hypothetical && !steals_formal_noun_head && !promoted.absorbs_copula_before_sokuon_final &&
          ((!hasAuxiliaryParticleDecomposition(codepoints, start_pos, scan, dict_manager) && !spells_auxiliary_chain) ||
           promoted.has_deverbal_noun_shape_before_genitive || promoted.copula_selected_predicate_homograph) &&
          (!hasFunctionWordChainDecomposition(codepoints, start_pos, scan, dict_manager) ||
