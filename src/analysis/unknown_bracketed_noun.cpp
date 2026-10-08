@@ -433,19 +433,35 @@ bool endsOnPredicateTail(const BracketedNounContext& ctx, size_t run_end) {
   const auto& codepoints = ctx.codepoints;
   const size_t start_pos = ctx.start_pos;
   const auto* dict_manager = ctx.dict_manager;
-  // The nominalizer ん closes an attributive predicate, so a run ending on
-  // it is that predicate plus the particle, never one unregistered noun
-  // (できる+ん+じゃ+ない). A registered predicate in front of it is the
-  // evidence, and so is an i-adjective terminal, which no noun is before ん
-  // (つらい+ん+だ); runs whose kana merely happen to spell a particle keep
-  // their whole-run candidate (りんご, たなばた). A na-adjective stem is no
-  // such predicate, because it takes な before ん (どうん is no どう+ん).
-  if (dict_manager != nullptr && run_end > start_pos + 1 && codepoints[run_end - 1] == U'ん' &&
-      (hasExactPartOfSpeech(*dict_manager, codepoints, start_pos, run_end - 1,
-                            partOfSpeechMask(core::PartOfSpeech::Verb)) ||
-       verb_helpers::isIAdjectiveInDictionary(dict_manager, extractSubstring(codepoints, start_pos, run_end - 1)) ||
-       verb_helpers::readsAsIAdjectiveTerminal(extractSubstring(codepoints, start_pos, run_end - 1), ctx.inflection))) {
-    return true;
+  // The nominalizer ん, or the の it contracts, closes an attributive
+  // predicate, so a run ending on it is that predicate plus the particle,
+  // never one unregistered noun (できる+ん+じゃ+ない, みる+の+が). A registered
+  // predicate in front of it is the evidence, and so is an i-adjective
+  // terminal, which no noun is before ん (つらい+ん+だ); runs whose kana merely
+  // happen to spell a particle keep their whole-run candidate (りんご,
+  // たなばた). A na-adjective stem is no such predicate, because it takes な
+  // before ん (どうん is no どう+ん). Before の a verb terminal of two morae or
+  // more is evidence as well; ん is left out, as it also ends mimetics (ぐうん).
+  const auto reads_as_verb_terminal = [&](const std::string& surface) {
+    if (run_end < start_pos + 3 || codepoints[run_end - 1] != U'の') {
+      return false;
+    }
+    const auto& analyses = ctx.inflection.analyze(surface);
+    return std::any_of(analyses.begin(), analyses.end(), [&](const grammar::InflectionCandidate& analysis) {
+      return analysis.verb_type != grammar::VerbType::Unknown && analysis.verb_type != grammar::VerbType::IAdjective &&
+             analysis.base_form == surface &&
+             analysis.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence;
+    });
+  };
+  if (dict_manager != nullptr && run_end > start_pos + 1 &&
+      (codepoints[run_end - 1] == U'ん' || codepoints[run_end - 1] == U'の')) {
+    const std::string predicate = extractSubstring(codepoints, start_pos, run_end - 1);
+    if (hasExactPartOfSpeech(*dict_manager, codepoints, start_pos, run_end - 1,
+                             partOfSpeechMask(core::PartOfSpeech::Verb)) ||
+        verb_helpers::isIAdjectiveInDictionary(dict_manager, predicate) ||
+        verb_helpers::readsAsIAdjectiveTerminal(predicate, ctx.inflection) || reads_as_verb_terminal(predicate)) {
+      return true;
+    }
   }
   // No noun ends on a sokuon: a run closing on one carries the emphatic っ
   // of a final particle or a predicate (だよ+ねっ, つらい+もんねっ).

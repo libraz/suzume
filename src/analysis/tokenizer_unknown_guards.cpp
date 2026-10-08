@@ -62,10 +62,12 @@ bool startsAtBindingParticleAfterTerminalVerb(const core::Lattice& lattice,
 // words: a pronoun heads a phrase exactly as a noun does (これ|は|りんご), and it
 // is outside isContentWord only because tagging does not emit a pronoun tag.
 // Widening isContentWord itself would change tagging, so the nominal-head
-// notion stays local to this bracket test.
+// notion stays local to this bracket test. The nominalizer の closes a noun
+// phrase the same way (あるく+の|が|すき).
 bool hasNominalHeadEdgeEndingAt(const core::Lattice& lattice, size_t boundary) {
   return core::anyEdgeEndingAt(lattice, boundary, [](const core::LatticeEdge& edge) {
-    return core::isContentWord(edge.pos) || edge.pos == core::PartOfSpeech::Pronoun;
+    return core::isContentWord(edge.pos) || edge.pos == core::PartOfSpeech::Pronoun ||
+           edge.extended_pos == core::ExtendedPOS::ParticleNo;
   });
 }
 

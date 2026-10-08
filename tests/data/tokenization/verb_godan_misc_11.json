@@ -1,0 +1,70 @@
+{
+  "cases": [
+    {
+      "description": "Nominalizer の closes the noun phrase a case particle marks, so the kana noun after の+が is bracketed",
+      "expected": [
+        {
+          "lemma": "あるく",
+          "pos": "Verb",
+          "surface": "あるく"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ほこり",
+          "pos": "Noun",
+          "surface": "ほこり"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "arukunogahokorida",
+      "input": "あるくのがほこりだ"
+    },
+    {
+      "description": "Kana verb terminal before nominalizer の is a predicate, not part of a kana noun",
+      "expected": [
+        {
+          "lemma": "みる",
+          "pos": "Verb",
+          "surface": "みる"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ほこり",
+          "pos": "Noun",
+          "surface": "ほこり"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "mirunogahokorida",
+      "input": "みるのがほこりだ"
+    }
+  ],
+  "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 11/11)",
+  "version": "1.0"
+}
