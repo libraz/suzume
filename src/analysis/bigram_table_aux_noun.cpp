@@ -1039,6 +1039,6 @@ void setAuxiliaryAndNounCosts(BigramMatrix& table) {
     table[epos][static_cast<size_t>(EPOS::AuxCausative)] = kNoParticleHost;
     table[epos][static_cast<size_t>(EPOS::AuxPassive)] = kNoParticleHost;
   }
-}  // namespace suzume::analysis::bigram_rules
+}
 
 }  // namespace suzume::analysis::bigram_rules

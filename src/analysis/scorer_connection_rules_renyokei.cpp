@@ -1,11 +1,7 @@
-#include <cmath>
-
 #include "analysis/bigram_table.h"
-#include "analysis/category_cost.h"
 #include "analysis/scorer.h"
 #include "analysis/scorer_connection_rules.h"
 #include "analysis/scorer_constants.h"
-#include "core/debug.h"
 #include "core/kana_constants.h"
 #include "core/types.h"
 #include "core/utf8_constants.h"

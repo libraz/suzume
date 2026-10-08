@@ -1,12 +1,8 @@
-#include <cmath>
-
 #include "analysis/bigram_table.h"
-#include "analysis/category_cost.h"
 #include "analysis/scorer.h"
 #include "analysis/scorer_connection_rules.h"
 #include "analysis/scorer_connection_rules_internal.h"
 #include "analysis/scorer_constants.h"
-#include "core/debug.h"
 #include "core/kana_constants.h"
 #include "core/types.h"
 #include "core/utf8_constants.h"
@@ -209,21 +205,20 @@ float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::
                           is_quotative_determiner ? sc::kHeadlessQuotativeDeterminerPenalty : cost::kAlmostNever);
   }
 
-  // Penalty for DET → non-dict single-kanji NOUN
-  // The DET→NOUN bigram bonus (-2.5) is too strong for unknown single-kanji tokens,
-  // causing splits like こんな+伸+びる instead of こんな+伸びる
-  // Valid DET+NOUN patterns (こんな+事, あんな+人) use dict nouns or multi-char nouns
-  if (prev.pos == core::PartOfSpeech::Determiner && next.pos == core::PartOfSpeech::Noun && !next.fromDictionary() &&
-      grammar::isSingleKanjiSurface(next.surface)) {
-    SUZUME_CONNECTION_ADD(bonus, cost::kStrong);
-  }
-
-  // Penalty for DET → non-dict kanji+hiragana NOUN (nominalized verb pattern)
-  // The DET→NOUN bonus (-2.5) makes heuristic candidates like "先生き" (NOUN)
-  // too attractive, preventing correct splits like 先+生きのこる
-  // Valid DET+NOUN uses dict nouns or pure-kanji nouns; nominalized forms
-  // (kanji + 1 trailing hiragana, e.g., 先生き, 出来事み) are rare after DET
   if (prev.pos == core::PartOfSpeech::Determiner && next.pos == core::PartOfSpeech::Noun && !next.fromDictionary()) {
+    // Penalty for DET → non-dict single-kanji NOUN
+    // The DET→NOUN bigram bonus (-2.5) is too strong for unknown single-kanji tokens,
+    // causing splits like こんな+伸+びる instead of こんな+伸びる
+    // Valid DET+NOUN patterns (こんな+事, あんな+人) use dict nouns or multi-char nouns
+    if (grammar::isSingleKanjiSurface(next.surface)) {
+      SUZUME_CONNECTION_ADD(bonus, cost::kStrong);
+    }
+
+    // Penalty for DET → non-dict kanji+hiragana NOUN (nominalized verb pattern)
+    // The DET→NOUN bonus (-2.5) makes heuristic candidates like "先生き" (NOUN)
+    // too attractive, preventing correct splits like 先+生きのこる
+    // Valid DET+NOUN uses dict nouns or pure-kanji nouns; nominalized forms
+    // (kanji + 1 trailing hiragana, e.g., 先生き, 出来事み) are rare after DET
     size_t char_len = suzume::normalize::utf8Length(next.surface);
     if (char_len >= 3 && grammar::containsKanji(next.surface) && !grammar::isAllKanji(next.surface)) {
       // Check whether the final two characters are kanji + hiragana.
@@ -398,7 +393,7 @@ float computeAdverbialNiAfterPredicatePenalty(const core::LatticeEdge& prev, con
 }
 
 bool adverbSpellsPredicateCell(std::string_view surface) {
-  return utf8::endsWith(surface, "て") || utf8::endsWith(surface, "で") || utf8::endsWith(surface, "った");
+  return utf8::endsWithAny(surface, {"て", "で", "った"});
 }
 
 // A comma closes the clause before it, so the next word opens a clause as it
@@ -471,8 +466,9 @@ float computePrefixSymbolBonus(const core::LatticeEdge& prev, const core::Lattic
   // E.g., 東京（とうきょう） should not split と+う+きょう. Punctuation
   // and closing brackets are clause boundaries and may legitimately be
   // followed by a particle, so they must not receive this penalty.
-  if (prev.pos == core::PartOfSpeech::Symbol && next.pos == core::PartOfSpeech::Particle &&
-      normalize::isOpeningBracket(firstCodepoint(prev.surface))) {
+  const bool prev_is_opening_bracket =
+      prev.pos == core::PartOfSpeech::Symbol && normalize::isOpeningBracket(firstCodepoint(prev.surface));
+  if (prev_is_opening_bracket && next.pos == core::PartOfSpeech::Particle) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
 
@@ -480,8 +476,7 @@ float computePrefixSymbolBonus(const core::LatticeEdge& prev, const core::Lattic
   // E.g., 東京（とうきょう） - the hiragana in parentheses is reading/furigana.
   // Like the two furigana rules around it, it is gated to an opening bracket:
   // after punctuation the kana opens an ordinary clause (、+て+いう+か).
-  if (prev.pos == core::PartOfSpeech::Symbol && next.pos == core::PartOfSpeech::Other &&
-      normalize::isOpeningBracket(firstCodepoint(prev.surface)) && grammar::isPureHiragana(next.surface) &&
+  if (prev_is_opening_bracket && next.pos == core::PartOfSpeech::Other && grammar::isPureHiragana(next.surface) &&
       next.surface.size() >= core::kFourJapaneseCharBytes) {
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryStrongBonus);
   }
@@ -490,8 +485,7 @@ float computePrefixSymbolBonus(const core::LatticeEdge& prev, const core::Lattic
   // opening bracket only. Emoji, closing brackets, and other symbols are a soft
   // boundary that still license a following copula: 天気😀です, 犬🐕でした,
   // 本(重要)です, 評価◎です must keep です/でした whole rather than splitting で|す.
-  if (prev.pos == core::PartOfSpeech::Symbol && next.pos == core::PartOfSpeech::Auxiliary &&
-      normalize::isOpeningBracket(firstCodepoint(prev.surface))) {
+  if (prev_is_opening_bracket && next.pos == core::PartOfSpeech::Auxiliary) {
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryRare);
   }
 

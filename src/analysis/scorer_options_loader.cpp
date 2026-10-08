@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cfloat>
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>

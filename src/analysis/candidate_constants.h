@@ -129,10 +129,6 @@ constexpr float kEmphaticCharacterPenalty = 0.3F;
 // ない-family negative).
 constexpr float kHighOriginConfidence = 0.9F;
 
-// Compound verb bonus (連用形 + 補助動詞)
-// E.g., 読み+終わる, 書き+始める
-constexpr float kCompoundVerbBonus = -0.8F;
-
 // A verified V1 continuative plus a complete closed-class V2 is one
 // productive search unit.  This small category-level preference prevents the
 // independently valid V1+V2 path from winning on dictionary word priors alone.
@@ -159,10 +155,6 @@ constexpr float kParticlePrefixedVerbRemainderMinConfidenceShort = 0.3F;
 // Verified Ichidan verb bonus
 // Applied when join creates a valid ichidan verb pattern
 constexpr float kVerifiedV1Bonus = -0.3F;
-
-// Verified noun in compound bonus
-// Applied when noun component is verified in dictionary
-constexpr float kVerifiedNounBonus = -0.3F;
 
 // A geminate or moraic nasal infixed between two kanji belongs to one lexical
 // compound (真っ赤, 真ん前, 赤ん坊) rather than to either neighbour.
@@ -214,22 +206,6 @@ constexpr float kPredicativeNegationPrefixAdjectiveBonus = -1.2F;
 // =============================================================================
 // Split Candidate Constants (split_candidates.cpp)
 // =============================================================================
-
-// Alpha + Kanji split bonus
-// E.g., Web開発, AI研究
-constexpr float kAlphaKanjiBonus = -0.3F;
-
-// Alpha + Katakana split bonus
-// E.g., APIリクエスト
-constexpr float kAlphaKatakanaBonus = -0.3F;
-
-// Dictionary word split bonus
-// Applied when split creates a dictionary-verified word
-constexpr float kDictSplitBonus = -0.5F;
-
-// Base cost for split candidates
-// Added to all split candidates as baseline cost
-constexpr float kSplitBaseCost = 1.0F;
 
 // Quantified-time + relational-suffix split bonus (三日|後, 十年|前, 数日|後, 半年|後)
 // A temporal counter (日/年/分…) followed by 後/前 is always compositional; the

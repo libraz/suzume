@@ -1,5 +1,4 @@
 #include "analysis/bigram_table.h"
-#include "analysis/category_cost.h"
 #include "analysis/scorer.h"
 #include "analysis/scorer_connection_rules.h"
 #include "analysis/scorer_connection_rules_internal.h"
@@ -594,10 +593,9 @@ void addSingleKanjiNounHostRules(const core::LatticeEdge& prev, const core::Latt
        next.extended_pos == core::ExtendedPOS::AuxPotential || next.extended_pos == core::ExtendedPOS::AuxCausative ||
        next.extended_pos == core::ExtendedPOS::AuxClassicalBeshi)) {
     // Check if this is single-kanji ichidan + causative させ (should be allowed)
-    bool is_ichidan_causative = false;
-    if (next.extended_pos == core::ExtendedPOS::AuxCausative && utf8::startsWith(next.surface, "させ")) {
-      is_ichidan_causative = verb_helpers::isSingleKanjiIchidanSurface(prev.surface);
-    }
+    const bool is_ichidan_causative = next.extended_pos == core::ExtendedPOS::AuxCausative &&
+                                      utf8::startsWith(next.surface, "させ") &&
+                                      verb_helpers::isSingleKanjiIchidanSurface(prev.surface);
     if (!is_ichidan_causative) {
       SUZUME_CONNECTION_ADD(surface_bonus, cost::kSevere);
     }
@@ -729,11 +727,8 @@ void addCopulaAndShiHomographRules(const core::LatticeEdge& prev, const core::La
   // し can be recognized as VerbRenyokei (suru) or PARTICLE_接続 (parallel particle)
   // Neither is correct in this context - the でし is the renyokei of です copula
   // This ensures でし (AuxCopulaDesu renyokei) wins over で+し split
-  if (prev.extended_pos == core::ExtendedPOS::AuxCopulaDa && prev.surface == "で" &&
-      (next.extended_pos == core::ExtendedPOS::VerbRenyokei || next.extended_pos == core::ExtendedPOS::ParticleConj)) {
-    if (next_is_shi) {
-      SUZUME_CONNECTION_ADD(surface_bonus, cost::kAlmostNever);
-    }
+  if (prev.extended_pos == core::ExtendedPOS::AuxCopulaDa && prev.surface == "で" && next_is_shi) {
+    SUZUME_CONNECTION_ADD(surface_bonus, cost::kAlmostNever);
   }
 
   // Penalty for PART_接続(し) → て pattern (PART_接続 or AUX_継続)
@@ -754,12 +749,9 @@ void addCopulaAndShiHomographRules(const core::LatticeEdge& prev, const core::La
   // over-segmentation of a noun or longer verb
   // Exclude ば (valid conditional: よれ+ば), て (te-form), etc.
   if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei && prev.surface.size() >= 6 && prev.surface.size() <= 9 &&
-      (next_is_shi || next.surface == "き")) {  // 2-3 hiragana
-    // Check prev is all hiragana
-    if (grammar::isPureHiragana(prev.surface) && (next.extended_pos == core::ExtendedPOS::VerbRenyokei ||
-                                                  next.extended_pos == core::ExtendedPOS::ParticleConj)) {
-      SUZUME_CONNECTION_ADD(surface_bonus, cost::kStrong);
-    }
+      (next_is_shi || next.surface == "き") && grammar::isPureHiragana(prev.surface) &&  // 2-3 hiragana, all hiragana
+      (next.extended_pos == core::ExtendedPOS::VerbRenyokei || next.extended_pos == core::ExtendedPOS::ParticleConj)) {
+    SUZUME_CONNECTION_ADD(surface_bonus, cost::kStrong);
   }
 }
 
@@ -778,12 +770,13 @@ void addNegationPrefixRules(const core::LatticeEdge& prev, const core::LatticeEd
 
 // Copular で before symbols, after nouns, and before ある and は.
 void addCopulaDeRules(const core::LatticeEdge& prev, const core::LatticeEdge& next, float& surface_bonus) {
+  const bool prev_is_copula_de = prev.extended_pos == core::ExtendedPOS::AuxCopulaDa && prev.surface == "で";
+
   // Penalty for AuxCopulaDa(で) → Symbol/EOS pattern
   // E.g., あとで。 should be NOUN+PART_格+。, not NOUN+AUX_断定+。
   // Copula 「で」 at sentence end is unusual; 格助詞「で」 is more natural
   // Note: 「だ」+Symbol is valid (学生だ。), so only penalize 「で」
-  if (prev.extended_pos == core::ExtendedPOS::AuxCopulaDa && prev.surface == "で" &&
-      next.extended_pos == core::ExtendedPOS::Symbol) {
+  if (prev_is_copula_de && next.extended_pos == core::ExtendedPOS::Symbol) {
     SUZUME_CONNECTION_ADD(surface_bonus, cost::kStrong);
   }
 
@@ -801,8 +794,8 @@ void addCopulaDeRules(const core::LatticeEdge& prev, const core::LatticeEdge& ne
   // のである, ではある, であった are standard literary/formal expressions
   // AuxCopulaDa→VerbShuushikei has kMinor (0.5) bigram + kVeryRare (1.8) の→で surface
   // Total penalty to overcome: ~2.3
-  if (prev.extended_pos == core::ExtendedPOS::AuxCopulaDa && prev.surface == "で" &&
-      next.pos == core::PartOfSpeech::Verb && utf8::equalsAny(next.surface, {"ある", "あっ", "あろ", "あり"})) {
+  if (prev_is_copula_de && next.pos == core::PartOfSpeech::Verb &&
+      utf8::equalsAny(next.surface, {"ある", "あっ", "あろ", "あり"})) {
     SUZUME_CONNECTION_ADD(surface_bonus, sc::kBonusDoubleVeryStrong);  // -3.2 to overcome ~2.3 total penalty
   }
 
@@ -810,8 +803,7 @@ void addCopulaDeRules(const core::LatticeEdge& prev, const core::LatticeEdge& ne
   // Helps のではない/のではなく pattern split の+で+は despite の→で penalty (1.8)
   // Only fires when で is split from の (not when ので stays as single token)
   // Safe: で(AuxCopulaDa)+は is always correct when it occurs (ではない, ではなく)
-  if (prev.extended_pos == core::ExtendedPOS::AuxCopulaDa && prev.surface == "で" &&
-      next.extended_pos == core::ExtendedPOS::ParticleTopic && next.surface == "は") {
+  if (prev_is_copula_de && next.extended_pos == core::ExtendedPOS::ParticleTopic && next.surface == "は") {
     SUZUME_CONNECTION_ADD(surface_bonus, cost::kVeryStrongBonus);  // -1.6
   }
 }

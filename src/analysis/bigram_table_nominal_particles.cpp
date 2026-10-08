@@ -146,9 +146,6 @@ void setNominalParticleCosts(BigramMatrix& table) {
       {EPOS::AuxAspectKuru, EPOS::NounFormal, cost::kVeryStrongBonus},
       {EPOS::AuxAspectHajimeru, EPOS::NounFormal, cost::kVeryStrongBonus},
       {EPOS::ParticleQuote, EPOS::NounFormal, cost::kVeryStrongBonus},
-      // The obligation predicate after a quotation particle remains an
-      // auxiliary chain (…ん+と+いけ+ん), rather than reopening い as an
-      // independent continuative followed by the dialectal particle けん.
   };
   applyRules(table, kRules);
 }

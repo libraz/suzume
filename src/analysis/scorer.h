@@ -2,7 +2,6 @@
 #define SUZUME_ANALYSIS_SCORER_H_
 
 #include <array>
-#include <cmath>
 #include <limits>
 
 #include "analysis/candidate_options.h"
