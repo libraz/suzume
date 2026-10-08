@@ -14,6 +14,7 @@ from ..core.test_file_utils import (
     load_json,
     normalize_test_file_name,
     save_json,
+    serialize_test_data,
 )
 from ..server import PROJECT_ROOT, mcp
 from ._test_tools_common import _json_error, _json_result, _load_test_cases
@@ -25,8 +26,7 @@ _PART_DESCRIPTION_RE = re.compile(r" \(part [0-9]+/[0-9]+\)$")
 
 
 def _serialized_size(data: dict) -> int:
-    content = json.dumps(data, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
-    return len(content.encode("utf-8"))
+    return len(serialize_test_data(data).encode("utf-8"))
 
 
 def _case_digest(cases: list[dict]) -> str:

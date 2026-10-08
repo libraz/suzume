@@ -55,10 +55,14 @@ def load_json(path: Path) -> dict:
     return json.loads(path.read_bytes())
 
 
+def serialize_test_data(data: dict) -> str:
+    """Serialize test data using the canonical on-disk JSON format."""
+    return json.dumps(data, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
+
+
 def save_json(path: Path, data: dict) -> None:
     """Save data as JSON with consistent formatting."""
-    content = json.dumps(data, ensure_ascii=False, indent=2, sort_keys=True)
-    atomic_write_text(path, content + "\n")
+    atomic_write_text(path, serialize_test_data(data))
 
 
 def _load_cases(path: Path) -> tuple[dict, list[dict]]:
