@@ -85,6 +85,15 @@ const Conjugation::GodanRow* Conjugation::getGodanRow(VerbType type) {
   return nullptr;
 }
 
+const Conjugation::GodanEntry* Conjugation::findGodanRowByBaseVowel(char32_t base_vowel) {
+  for (const auto& entry : getGodanRows()) {
+    if (entry.second.base_vowel == base_vowel) {
+      return &entry;
+    }
+  }
+  return nullptr;
+}
+
 GodanOnbinRange Conjugation::getGodanTypesByOnbin(std::string_view onbin) {
   static constexpr std::array<GodanOnbinEntry, 2> kIOnbin = {{{VerbType::GodanKa, "く"}, {VerbType::GodanGa, "ぐ"}}};
   // 行く has irregular 促音便 (行っ), while normal GodanKa uses イ音便.
@@ -290,16 +299,10 @@ VerbType Conjugation::detectType(const std::string& base_form) {
 
   // 五段: the final u-row kana (く/ぐ/す/つ/ぬ/ぶ/む/う) identifies the Godan row
   // by its base_vowel. る is resolved above (Ichidan vs GodanRa) and never reaches
-  // here; deriving from getGodanRows() keeps this in sync with the single
+  // here; deriving from findGodanRowByBaseVowel() keeps this in sync with the single
   // Godan-row source of truth instead of a parallel hand-written branch chain.
-  const char32_t last_cp = utf8::decodeLastChar(base_form);
-  for (const auto& [type, row] : getGodanRows()) {
-    if (row.base_vowel == last_cp) {
-      return type;
-    }
-  }
-
-  return VerbType::Unknown;
+  const auto* godan_entry = findGodanRowByBaseVowel(utf8::decodeLastChar(base_form));
+  return godan_entry != nullptr ? godan_entry->first : VerbType::Unknown;
 }
 
 std::vector<Conjugation::DictionarySuffix> Conjugation::getDictionarySuffixes(VerbType type,

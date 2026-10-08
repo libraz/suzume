@@ -9,20 +9,11 @@ namespace suzume::analysis::compound_verb_detail {
 
 namespace {
 
-const grammar::Conjugation::GodanEntry* findGodanRowByBaseVowel(char32_t base_vowel) {
-  for (const auto& entry : grammar::Conjugation::getGodanRows()) {
-    if (entry.second.base_vowel == base_vowel) {
-      return &entry;
-    }
-  }
-  return nullptr;
-}
-
 const grammar::Conjugation::GodanEntry* findGodanRowByEnding(std::string_view base_ending) {
   if (base_ending.size() != core::kJapaneseCharBytes) {
     return nullptr;
   }
-  return findGodanRowByBaseVowel(utf8::decodeFirstChar(base_ending));
+  return grammar::Conjugation::findGodanRowByBaseVowel(utf8::decodeFirstChar(base_ending));
 }
 
 std::string replaceGodanEnding(std::string_view base, bool use_o_row) {
@@ -30,7 +21,7 @@ std::string replaceGodanEnding(std::string_view base, bool use_o_row) {
     return "";
   }
 
-  const auto* godan_entry = findGodanRowByBaseVowel(utf8::decodeLastChar(base));
+  const auto* godan_entry = grammar::Conjugation::findGodanRowByBaseVowel(utf8::decodeLastChar(base));
   if (godan_entry == nullptr) {
     return "";
   }

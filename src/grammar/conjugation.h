@@ -128,6 +128,12 @@ class Conjugation {
   static const GodanRow* getGodanRow(VerbType type);
 
   /**
+   * @brief Find the Godan row whose 終止形 kana is @p base_vowel
+   * @return Pointer to the row's entry, or nullptr if no Godan row ends on it
+   */
+  static const GodanEntry* findGodanRowByBaseVowel(char32_t base_vowel);
+
+  /**
    * @brief Get all Godan rows in deterministic verb-type order
    * @return Const reference to the fixed VerbType/GodanRow table
    */
