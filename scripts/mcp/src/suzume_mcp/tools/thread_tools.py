@@ -11,6 +11,7 @@ from pathlib import Path
 
 from ..core import bug_store
 from ..core.diff_utils import classify_surface_diff
+from ..core.file_utils import atomic_write_text
 from ..core.json_utils import json_error as _json_error
 from ..core.json_utils import json_result as _json_result
 from ..core.suzume_cli import get_expected_tokens_subprocess, get_suzume_surfaces
@@ -78,11 +79,11 @@ def _load_progress(input_file: str) -> dict:
 
 def _save_progress(progress: dict) -> None:
     """Save progress to file."""
-    PROGRESS_FILE.write_text(
+    atomic_write_text(
+        PROGRESS_FILE,
         f"file={progress['file']}\n"
         f"last_checked={progress['last_checked']}\n"
         f"problems_found={progress['problems_found']}\n",
-        encoding="utf-8",
     )
 
 
