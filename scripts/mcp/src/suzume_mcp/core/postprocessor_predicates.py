@@ -2,6 +2,7 @@
 
 import regex
 
+from .conjugation_rows import GODAN_E_ROW_TO_BASE as _GODAN_ERO_TO_BASE
 from .constants import (
     ADVERBIAL_NA_ADJECTIVES,
     COPULA_SURFACES,
@@ -10,18 +11,6 @@ from .core_lexicon import adjective_garu_stems, core_headwords
 from .mecab import mecab_analyze
 from .pos_mapping import _is_katakana_onomatopoeia
 from .postprocessor_common import reports_mutation
-
-_GODAN_ERO_TO_BASE = {
-    "え": "う",
-    "け": "く",
-    "げ": "ぐ",
-    "せ": "す",
-    "て": "つ",
-    "ね": "ぬ",
-    "べ": "ぶ",
-    "め": "む",
-    "れ": "る",
-}
 
 
 @reports_mutation

@@ -2,6 +2,7 @@
 
 import regex
 
+from .conjugation_rows import GODAN_A_ROW_TO_BASE as _GODAN_MIZENKEI_TO_BASE
 from .constants import COPULAR_PREDICATE_HEADS, FIXED_FUNCTION_SEARCH_UNITS, katakana_to_hiragana
 from .mecab import mecab_analyze
 
@@ -15,19 +16,6 @@ _GODAN_RENYOKEI_TO_BASE: dict[str, str] = {
     "び": "ぶ",
     "み": "む",
     "り": "る",
-}
-
-
-_GODAN_MIZENKEI_TO_BASE: dict[str, str] = {
-    "わ": "う",
-    "か": "く",
-    "が": "ぐ",
-    "さ": "す",
-    "た": "つ",
-    "な": "ぬ",
-    "ば": "ぶ",
-    "ま": "む",
-    "ら": "る",
 }
 
 

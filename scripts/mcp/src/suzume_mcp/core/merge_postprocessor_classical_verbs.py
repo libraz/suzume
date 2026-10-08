@@ -4,6 +4,7 @@ from functools import cache
 
 import regex
 
+from .conjugation_rows import GODAN_E_ROW_TO_BASE as _E_ROW_TO_U_ROW
 from .constants import (
     HISTORICAL_KANA_RESPELLING,
     KYUJITAI_TO_SHINJITAI,
@@ -179,17 +180,6 @@ def _postprocess_classical_mu(result: list[dict], applied_rule: str | None) -> t
     return merged, applied_rule
 
 
-_E_ROW_TO_U_ROW = {
-    "え": "う",
-    "け": "く",
-    "げ": "ぐ",
-    "せ": "す",
-    "て": "つ",
-    "ね": "ぬ",
-    "べ": "ぶ",
-    "め": "む",
-    "れ": "る",
-}
 _CONCESSIVE_PARTICLES = ("ど", "ども")
 
 

@@ -1,18 +1,9 @@
 """Shared probes and conjugation helpers for merge post-processing."""
 
+from .conjugation_rows import GODAN_A_ROW_TO_BASE
 from .mecab import mecab_analyze
 
-_A_ROW_TO_U_ROW = {
-    "か": "く",
-    "が": "ぐ",
-    "さ": "す",
-    "た": "つ",
-    "な": "ぬ",
-    "ば": "ぶ",
-    "ま": "む",
-    "ら": "る",
-    "わ": "う",
-}
+_A_ROW_TO_U_ROW = GODAN_A_ROW_TO_BASE
 
 
 _CONTINUATIVE_PROBE_AUXILIARY = "ます"

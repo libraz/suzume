@@ -3,11 +3,10 @@
 import regex
 
 from .constants import (
-    COMPOUND_VERB_V2_GODAN,
-    COMPOUND_VERB_V2_ICHIDAN,
     COMPOUND_VERB_V2_NOT_AFTER_SURU,
     COMPOUND_VERB_V2_SURU_ONLY,
     HIRAGANA_COMPOUNDS,
+    PRODUCTIVE_COMPOUND_V2,
 )
 from .core_lexicon import kana_ichidan_verbs
 from .mecab import mecab_analyze
@@ -41,9 +40,6 @@ def _fixed_te_search_unit(surface: str) -> dict | None:
         "conj_form": token.get("conj_form"),
         "lemma": token.get("lemma") or surface,
     }
-
-
-_PRODUCTIVE_COMPOUND_V2 = frozenset(COMPOUND_VERB_V2_GODAN + COMPOUND_VERB_V2_ICHIDAN)
 
 
 _NOMINALIZING_PARTICLES = frozenset({"を", "は", "が", "の", "に", "で", "へ", "と", "も"})
@@ -131,13 +127,13 @@ def _merge_compound_verbs(state: MergeState) -> bool:
                 # relative clause. Membership of the closed second-member class
                 # below is the evidence; the tag it arrived with is not.
                 v2_is_adnominal_homograph = nxt.get("pos") == "連体詞" and (
-                    nxt.get("surface", "") in _PRODUCTIVE_COMPOUND_V2
+                    nxt.get("surface", "") in PRODUCTIVE_COMPOUND_V2
                 )
                 if (nxt.get("pos") == "動詞" or v2_is_adnominal_homograph) and (
                     nxt.get("lemma") or nxt.get("surface", "")
                 ) != "でる":
                     next_lemma = nxt.get("lemma") or nxt.get("surface", "")
-                    v2_base = next_lemma if next_lemma in _PRODUCTIVE_COMPOUND_V2 else ""
+                    v2_base = next_lemma if next_lemma in PRODUCTIVE_COMPOUND_V2 else ""
                     v1_is_suru = (t.get("lemma") or v1_surface) == "する"
                     restricted = COMPOUND_VERB_V2_NOT_AFTER_SURU if v1_is_suru else COMPOUND_VERB_V2_SURU_ONLY
                     if v2_base in restricted:
@@ -165,7 +161,7 @@ def _merge_compound_verbs(state: MergeState) -> bool:
                 nxt = tokens[i + 1]
                 follower = tokens[i + 2]
                 v2_readings = bases_from_renyokei(nxt.get("surface", ""))
-                v2_base = next((base for base in v2_readings if base in _PRODUCTIVE_COMPOUND_V2), None)
+                v2_base = next((base for base in v2_readings if base in PRODUCTIVE_COMPOUND_V2), None)
                 nominalizing_particle = (
                     follower.get("pos") == "助詞" and follower.get("surface") in _NOMINALIZING_PARTICLES
                 )

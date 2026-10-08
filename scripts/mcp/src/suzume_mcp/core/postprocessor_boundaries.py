@@ -3,26 +3,26 @@
 import regex
 
 from .constants import (
-    COMPOUND_VERB_V2_GODAN,
-    COMPOUND_VERB_V2_ICHIDAN,
     COPULA_SURFACES,
     COUNTER_UNITS,
+    PRODUCTIVE_COMPOUND_V2,
     QUANTITY_BOUND_SUFFIXES,
 )
 from .split_rules import base_from_mizenkei, base_from_renyokei
 
-_PRODUCTIVE_COMPOUND_V2 = frozenset(COMPOUND_VERB_V2_GODAN + COMPOUND_VERB_V2_ICHIDAN)
+_PRODUCTIVE_COMPOUND_V2 = PRODUCTIVE_COMPOUND_V2
+_QUANTITY_DIGITS = "0-9０-９〇零一二三四五六七八九十百千万億兆"
+_QUANTITY_COUNTER_PATTERN = "|".join(regex.escape(unit) for unit in sorted(COUNTER_UNITS, key=len, reverse=True))
+_QUANTITY_SUFFIX_PATTERN = "|".join(regex.escape(suffix) for suffix in QUANTITY_BOUND_SUFFIXES)
+_QUANTITY_ONLY_PATTERN = regex.compile(rf"^[{_QUANTITY_DIGITS}]+(?:{_QUANTITY_COUNTER_PATTERN})$")
+_QUANTITY_BOUND_PATTERN = regex.compile(
+    rf"^(?P<quantity>[{_QUANTITY_DIGITS}]+(?:{_QUANTITY_COUNTER_PATTERN}))"
+    rf"(?P<suffix>{_QUANTITY_SUFFIX_PATTERN})$"
+)
 
 
 def postprocess_quantity_bound_suffix(tokens: list[dict]) -> bool:
     """Split a numeral+counter phrase from its closed-class bound suffix."""
-    counter_pattern = "|".join(regex.escape(unit) for unit in sorted(COUNTER_UNITS, key=len, reverse=True))
-    suffix_pattern = "|".join(regex.escape(suffix) for suffix in QUANTITY_BOUND_SUFFIXES)
-    quantity_only_pattern = regex.compile(rf"^[0-9０-９〇零一二三四五六七八九十百千万億兆]+(?:{counter_pattern})$")
-    quantity_pattern = regex.compile(
-        rf"^(?P<quantity>[0-9０-９〇零一二三四五六七八九十百千万億兆]+(?:{counter_pattern}))"
-        rf"(?P<suffix>{suffix_pattern})$"
-    )
     changed = False
     index = 0
     while index < len(tokens):
@@ -33,14 +33,14 @@ def postprocess_quantity_bound_suffix(tokens: list[dict]) -> bool:
         if (
             index > 0
             and token.get("surface") in QUANTITY_BOUND_SUFFIXES
-            and quantity_only_pattern.fullmatch(tokens[index - 1].get("surface", ""))
+            and _QUANTITY_ONLY_PATTERN.fullmatch(tokens[index - 1].get("surface", ""))
         ):
             token["pos"] = "Suffix"
             token["lemma"] = token["surface"]
             changed = True
             index += 1
             continue
-        match = quantity_pattern.fullmatch(token.get("surface", ""))
+        match = _QUANTITY_BOUND_PATTERN.fullmatch(token.get("surface", ""))
         if match is None:
             index += 1
             continue

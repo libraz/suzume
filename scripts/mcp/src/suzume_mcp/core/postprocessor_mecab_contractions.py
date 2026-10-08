@@ -2,6 +2,7 @@
 
 import regex
 
+from .conjugation_rows import GODAN_E_ROW_TO_BASE as _GODAN_E_ROW_TO_BASE
 from .mecab import mecab_analyze
 
 
@@ -524,19 +525,6 @@ def repair_kamo_quotative(tokens: list[dict]) -> None:
                 {"surface": "かも", "pos": "助詞", "pos_sub1": "副助詞", "lemma": "かも"},
                 {"surface": "って", "pos": "助詞", "pos_sub1": "格助詞", "pos_sub2": "連語", "lemma": "って"},
             ]
-
-
-_GODAN_E_ROW_TO_BASE = {
-    "え": "う",
-    "け": "く",
-    "げ": "ぐ",
-    "せ": "す",
-    "て": "つ",
-    "ね": "ぬ",
-    "べ": "ぶ",
-    "め": "む",
-    "れ": "る",
-}
 
 
 def repair_clause_final_geminate_past_adverb(tokens: list[dict]) -> None:

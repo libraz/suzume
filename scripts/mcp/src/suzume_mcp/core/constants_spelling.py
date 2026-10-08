@@ -403,6 +403,9 @@ COMPOUND_VERB_V2_ICHIDAN: list[str] = [
 ]
 
 
+PRODUCTIVE_COMPOUND_V2: frozenset[str] = frozenset(COMPOUND_VERB_V2_GODAN + COMPOUND_VERB_V2_ICHIDAN)
+
+
 # A Sahen continuative し joins most of the V2s above (確認し続ける) but not these,
 # and そこなう joins that continuative only (確認しそこなう, not 読みそこなう). Both
 # restrictions carry the same values as the core lexicon's own joining flags.
