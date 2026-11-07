@@ -120,12 +120,9 @@ void appendSingleOkuriganaMizenkeiCandidates(const std::vector<char32_t>& codepo
   // Standard negative ない (行か+ない), the past-negative stem なかっ
   // (書か+なかっ+た), and the negative adverbial なく (行か+なく+て), so that
   // なく is not absorbed into a spurious verb form.
-  const bool is_nai_pattern =
-      next_char == U'な' && mizenkei_end + 1 < codepoints.size() && codepoints[mizenkei_end + 1] == U'い';
-  const bool is_nakatt_pattern = next_char == U'な' && mizenkei_end + 3 < codepoints.size() &&
-                                 codepoints[mizenkei_end + 1] == U'か' && codepoints[mizenkei_end + 2] == U'っ';
-  const bool is_naku_pattern =
-      next_char == U'な' && mizenkei_end + 1 < codepoints.size() && codepoints[mizenkei_end + 1] == U'く';
+  const bool is_nai_pattern = textMatchesAt(codepoints, mizenkei_end, "ない");
+  const bool is_nakatt_pattern = textMatchesAt(codepoints, mizenkei_end, "なかっ");
+  const bool is_naku_pattern = textMatchesAt(codepoints, mizenkei_end, "なく");
   // The causative auxiliary せ (聞か+せ+られ+た, 書か+せる).
   bool is_causative_pattern = false;
   bool is_shortened_causative_passive = false;
@@ -749,9 +746,8 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
       if (!kana::isARowCodepoint(cur_char)) {
         continue;
       }
-      bool is_nai_pattern = next_char == U'な' && scan_pos + 2 < codepoints.size() && codepoints[scan_pos + 2] == U'い';
-      bool is_nakatt_pattern = next_char == U'な' && scan_pos + 3 < codepoints.size() &&
-                               codepoints[scan_pos + 2] == U'か' && codepoints[scan_pos + 3] == U'っ';
+      bool is_nai_pattern = textMatchesAt(codepoints, scan_pos + 1, "ない");
+      bool is_nakatt_pattern = textMatchesAt(codepoints, scan_pos + 1, "なかっ");
       // Check for contracted negative ん pattern (分からん, 始まらん)
       // ん must be at the end of the string (hiragana_end == scan_pos + 2)
       bool is_n_pattern = next_char == U'ん' && scan_pos + 2 == hiragana_end;

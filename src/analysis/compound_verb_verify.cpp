@@ -188,13 +188,6 @@ CompoundV1Verification verifyCompoundVerbV1(const CompoundV1VerificationRequest&
     // A single-kanji sokuonbin V1 plus a verified V2 is sufficient evidence.
     if (is_sokuonbin && kanji_count == 1) {
       v1_verified = true;
-      for (char32_t ending : kSokuonbinEndings) {
-        std::string candidate = v1_base + normalize::encodeUtf8(ending);
-        if (dict_manager.lookupExact(candidate) != nullptr) {
-          v1_base = candidate;
-          break;
-        }
-      }
     }
 
     // For multi-kanji ichidan V1 stems, accept when stripping the leading
