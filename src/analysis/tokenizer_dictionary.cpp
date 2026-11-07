@@ -588,9 +588,10 @@ void addDictionaryEntryEdges(core::Lattice& lattice, const tokenizer_dictionary_
         normalize::concat(result.entry->surface, "る"), dictionary::ConjugationType::Ichidan,
         core::ExtendedPOS::VerbRenyokei, "dictionary_potential_renyokei_before_past");
   }
-  // A listed verb's continuative right after a noun and before a nominal
-  // particle is the deverbal head of an object-verb compound (水+やり+を),
-  // the same re-reading an unlisted continuative gets in the unknown-word
+  // A listed verb's continuative before a nominal particle is a deverbal noun:
+  // after a noun the head of an object-verb compound (水+やり+を), after a
+  // particle a noun phrase of its own (人で+にぎわい+を).
+  // This is the re-reading an unlisted continuative gets in the unknown-word
   // path (草+むしり+を), under the same gates: a bound suffix verb stays bound
   // to its host (手+がかり), and a listed non-verb reading of the span keeps it
   // (走り+まくり). A one-mora cell is the tail of too many other words
@@ -600,7 +601,8 @@ void addDictionaryEntryEdges(core::Lattice& lattice, const tokenizer_dictionary_
   if (result.entry->pos == core::PartOfSpeech::Verb && result.entry->extended_pos == core::ExtendedPOS::VerbRenyokei &&
       end_pos >= start_pos + 2 && end_pos < codepoints.size() &&
       hasNominalForcingParticleContinuation(codepoints, end_pos, &dict_manager) &&
-      hasPrecedingNominal(lattice, start_pos) &&
+      (hasPrecedingNominal(lattice, start_pos) ||
+       hasPrecedingPartOfSpeech(lattice, start_pos, partOfSpeechMask(core::PartOfSpeech::Particle))) &&
       !hasDictionaryEntrySpanningBack(dict_manager, codepoints, start_pos, end_pos) &&
       !verb_helpers::isBoundSuffixAfterNominalHost(&dict_manager, codepoints, start_pos, result.entry->surface) &&
       std::none_of(lookup_results.begin(), lookup_results.end(), [&](const dictionary::LookupResult& other) {

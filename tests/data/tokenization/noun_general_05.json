@@ -592,6 +592,38 @@
       ],
       "id": "2026_12",
       "input": "2026年12月"
+    },
+    {
+      "description": "listed continuative after a locative particle is a deverbal noun",
+      "expected": [
+        {
+          "lemma": "公園",
+          "pos": "Noun",
+          "surface": "公園"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "遊び",
+          "pos": "Noun",
+          "surface": "遊び"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "楽しむ",
+          "pos": "Verb",
+          "surface": "楽しむ"
+        }
+      ],
+      "id": "de_biwo_shimu",
+      "input": "公園で遊びを楽しむ"
     }
   ],
   "description": "General nouns (part 5/5)",
