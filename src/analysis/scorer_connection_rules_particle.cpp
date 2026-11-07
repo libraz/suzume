@@ -250,10 +250,13 @@ float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::
       tomo_particle &&
       (prev.origin == core::CandidateOrigin::Counter ||
        (prev.pos == core::PartOfSpeech::Noun && grammar::startsWithCollectiveQuantifier(prev.surface)));
-  const bool unlicensed_tomo = tomo_particle && prev.extended_pos != core::ExtendedPOS::AuxNegativeNu &&
-                               prev.extended_pos != core::ExtendedPOS::AuxNegativeNai &&
-                               prev.extended_pos != core::ExtendedPOS::AuxVolitional &&
-                               prev.extended_pos != core::ExtendedPOS::AdjRenyokei;
+  // Those predicate hosts take the concessive, conjunctive とも (少なく+とも,
+  // 行か+ず+とも); the adverbial cell is the quantifier's (二人+とも).
+  const bool unlicensed_tomo = tomo_particle && ((prev.extended_pos != core::ExtendedPOS::AuxNegativeNu &&
+                                                  prev.extended_pos != core::ExtendedPOS::AuxNegativeNai &&
+                                                  prev.extended_pos != core::ExtendedPOS::AuxVolitional &&
+                                                  prev.extended_pos != core::ExtendedPOS::AdjRenyokei) ||
+                                                 next.extended_pos == core::ExtendedPOS::ParticleAdverbial);
   // A particle offers no inflected stem, and the passive fills the conditional
   // ば slot with its own cell れれ/られれ.  The concessive ど/ども, however,
   // attaches to the passive continuative itself (書か+れ+ども), just like

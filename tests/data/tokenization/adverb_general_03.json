@@ -723,6 +723,162 @@
       ],
       "id": "hamada_bada",
       "input": "計画はまだ道半ばだ"
+    },
+    {
+      "description": "Listed adverb 少なくとも after case particle で; adjective host takes only the concessive とも",
+      "expected": [
+        {
+          "lemma": "同様",
+          "pos": "Noun",
+          "surface": "同様"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "被害",
+          "pos": "Noun",
+          "surface": "被害"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "県内",
+          "pos": "Noun",
+          "surface": "県内"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "少なくとも",
+          "pos": "Adverb",
+          "surface": "少なくとも"
+        },
+        {
+          "lemma": "3件",
+          "pos": "Noun",
+          "surface": "3件"
+        },
+        {
+          "lemma": "確認",
+          "pos": "Noun",
+          "surface": "確認"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "さ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "no_ha_de_nakutomo_sareteiru",
+      "input": "同様の被害は県内で少なくとも３件確認されている。"
+    },
+    {
+      "description": "Listed adverb 少なくとも after で before a quantity",
+      "expected": [
+        {
+          "lemma": "全国",
+          "pos": "Noun",
+          "surface": "全国"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "少なくとも",
+          "pos": "Adverb",
+          "surface": "少なくとも"
+        },
+        {
+          "lemma": "百人",
+          "pos": "Noun",
+          "surface": "百人"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "参加",
+          "pos": "Noun",
+          "surface": "参加"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "de_nakutomo_ga_shita",
+      "input": "全国で少なくとも百人が参加した"
+    },
+    {
+      "description": "Concessive とも after ず stays one particle",
+      "expected": [
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読ま"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ず"
+        },
+        {
+          "lemma": "とも",
+          "pos": "Particle",
+          "surface": "とも"
+        },
+        {
+          "lemma": "分かる",
+          "pos": "Verb",
+          "surface": "分かる"
+        }
+      ],
+      "id": "wo_mazutomo_karu",
+      "input": "本を読まずとも分かる"
     }
   ],
   "description": "General adverbs (part 3/3)",

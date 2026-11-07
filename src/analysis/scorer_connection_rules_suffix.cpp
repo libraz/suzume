@@ -267,15 +267,16 @@ void addConjunctiveParticleHostRules(const core::LatticeEdge& prev, const core::
   // The concessive particle とも attaches to an adjective renyokei, the
   // classical negative ず, or a verb's own terminal form (言う+とも, 行く+とも),
   // then introduces a finite predicate. Keep this closed particle whole instead
-  // of splitting it into quotative と plus も. Behind a terminal that competing
-  // reading is among the most productive sequences in the language, so there
-  // the preference has to be stronger than the ordinary one.
-  const bool concessive_host_is_terminal = prev.extended_pos == core::ExtendedPOS::VerbShuushikei;
-  if ((prev.extended_pos == core::ExtendedPOS::AdjRenyokei || prev.extended_pos == core::ExtendedPOS::AuxNegativeNu ||
-       concessive_host_is_terminal) &&
+  // of splitting it into quotative と plus も, which is among the most
+  // productive sequences in the language behind a terminal or ず. Behind an
+  // adjective the preference stays ordinary, so the listed adverbs built on
+  // とも (少なくとも) still outbid the adjective plus particle.
+  const bool concessive_host_is_adjective = prev.extended_pos == core::ExtendedPOS::AdjRenyokei;
+  if ((concessive_host_is_adjective || prev.extended_pos == core::ExtendedPOS::AuxNegativeNu ||
+       prev.extended_pos == core::ExtendedPOS::VerbShuushikei) &&
       next.extended_pos == core::ExtendedPOS::ParticleConj && grammar::isConcessiveParticleTomoSurface(next.surface)) {
     SUZUME_CONNECTION_ADD(bonus,
-                          concessive_host_is_terminal ? sc::kBonusConcessiveTomoAfterTerminal : cost::kStrongBonus);
+                          concessive_host_is_adjective ? cost::kStrongBonus : sc::kBonusConcessiveTomoAfterTerminal);
   }
   if (prev.extended_pos == core::ExtendedPOS::ParticleConj && grammar::isConcessiveParticleTomoSurface(prev.surface) &&
       (next.extended_pos == core::ExtendedPOS::VerbShuushikei || next.extended_pos == core::ExtendedPOS::AdjBasic)) {
