@@ -810,6 +810,12 @@ void appendGodanSaRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
         SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" verb cell + classical auxiliary chain\n");
         continue;
       }
+      // A godan-sa verb negates on its irrealis さ (話さ+ない), so its し cell
+      // never carries ない: there し is the irrealis of する (音+し+ない).
+      if (vh::naiNegativeFollowsAt(codepoints, renyokei_end)) {
+        SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" godan_sa continuative before ない\n");
+        continue;
+      }
 
       float base_cost = candidate::confidenceScaledCost(verb_opts.bonus_ichidan, best_sa.confidence,
                                                         verb_opts.confidence_cost_scale_small) +

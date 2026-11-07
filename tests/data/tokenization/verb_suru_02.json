@@ -1534,6 +1534,80 @@
       ],
       "id": "wo_shi_sono",
       "input": "方針を発表し、その後"
+    },
+    {
+      "description": "particle-dropped noun + negative of suru",
+      "expected": [
+        {
+          "lemma": "なんか",
+          "pos": "Particle",
+          "surface": "なんか"
+        },
+        {
+          "lemma": "変",
+          "pos": "Adjective",
+          "surface": "変"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "音",
+          "pos": "Noun",
+          "surface": "音"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "nanka_na_shinai",
+      "input": "なんか変な音しない？"
+    },
+    {
+      "description": "no sa-row upper monograde stem: noun + shi + nai",
+      "expected": [
+        {
+          "lemma": "この",
+          "pos": "Determiner",
+          "surface": "この"
+        },
+        {
+          "lemma": "スープ",
+          "pos": "Noun",
+          "surface": "スープ"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "味",
+          "pos": "Noun",
+          "surface": "味"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "kono_ha_shinai",
+      "input": "このスープは味しない"
     }
   ],
   "description": "Suru-verb patterns with subsidiary verbs - MeCab互換分割 (part 2/2)",

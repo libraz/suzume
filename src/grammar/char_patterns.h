@@ -252,8 +252,11 @@ bool isUnproductiveGodanTerminalKana(char32_t code);
  * ハ行 is the one row the monograde paradigm lost: its intervocalic morae
  * shifted to ワ行, leaving no modern verb whose stem ends in okurigana ひ or へ.
  * A candidate built on that shape is historical kana for a ワ行五段 continuative
- * (思ひ) or simply the head of the following word (肩+ひじ). Every other i-row
- * and e-row kana still ends a monograde stem (起き, 過ぎ, 感じ, 落ち, 浴び, 求め).
+ * (思ひ) or simply the head of the following word (肩+ひじ). The upper
+ * monograde has no サ行 member either (its sibilant stems are ザ行: 信じ, 感じ),
+ * so an i-row し is a godan-sa continuative or the irrealis of する (味+し+ない).
+ * Every other i-row and e-row kana still ends a monograde stem (起き, 過ぎ,
+ * 感じ, 落ち, 浴び, 見せ, 求め).
  */
 bool isMonogradeStemFinalKana(char32_t code);
 

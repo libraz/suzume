@@ -755,10 +755,14 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
   size_t hiragana_end = scanCompoundHiraganaEnd(codepoints, char_types, kanji_end, dict_manager);
   // A cell of する inside the run closes the nominal it takes: after a
   // continuative vowel the noun ends there (頬ずり+される, 身じろぎ+した), and
-  // right after the kanji the passive belongs to the kanji noun (顔+される).
+  // right after the kanji the passive belongs to the kanji noun (顔+される),
+  // as does し before ない, which a godan-sa continuative cannot carry
+  // (音+しない; 押し+つけ stays open).
   const size_t suru_cell = findSuruCellStart(codepoints, kanji_end, hiragana_end);
   if (suru_cell < hiragana_end) {
-    if (suru_cell == kanji_end && codepoints[suru_cell] == U'さ') {
+    if (suru_cell == kanji_end &&
+        (codepoints[suru_cell] == U'さ' ||
+         (codepoints[suru_cell] == U'し' && verb_helpers::naiNegativeFollowsAt(codepoints, suru_cell + 1)))) {
       return;
     }
     if (suru_cell > kanji_end &&
