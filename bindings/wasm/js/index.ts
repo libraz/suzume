@@ -456,8 +456,8 @@ export class Suzume {
   analyzeWithNormalizedText(text: string): AnalysisResult {
     this.ensureAlive();
 
-    return this.withUtf8String(text, (textPtr, textBytes) => {
-      const resultPtr = this.module._suzume_analyze_n(this.handle, textPtr, textBytes - 1);
+    return this.withUtf8String(text, (textPtr, textByteLength) => {
+      const resultPtr = this.module._suzume_analyze_n(this.handle, textPtr, textByteLength);
 
       if (resultPtr === 0) {
         throw this.nativeError('analyze failed');
@@ -481,7 +481,7 @@ export class Suzume {
   generateTags(text: string, options?: TagOptions): Tag[] {
     this.ensureAlive();
 
-    return this.withUtf8String(text, (textPtr, textBytes) => {
+    return this.withUtf8String(text, (textPtr, textByteLength) => {
       if (options) {
         const posFilter = resolveTagPosFilter(options);
 
@@ -509,7 +509,7 @@ export class Suzume {
             this.module._suzume_generate_tags_with_options_n(
               this.handle,
               textPtr,
-              textBytes - 1,
+              textByteLength,
               optionsPtr,
             ),
           );
@@ -519,7 +519,7 @@ export class Suzume {
       }
 
       return this.consumeTags(
-        this.module._suzume_generate_tags_n(this.handle, textPtr, textBytes - 1),
+        this.module._suzume_generate_tags_n(this.handle, textPtr, textByteLength),
       );
     });
   }
@@ -540,8 +540,8 @@ export class Suzume {
   loadUserDictionaryCount(data: string): number {
     this.ensureAlive();
 
-    return this.withUtf8String(data, (dataPtr, dataBytes) =>
-      this.module._suzume_load_user_dict_count(this.handle, dataPtr, dataBytes - 1),
+    return this.withUtf8String(data, (dataPtr, dataByteLength) =>
+      this.module._suzume_load_user_dict_count(this.handle, dataPtr, dataByteLength),
     );
   }
 
@@ -681,7 +681,7 @@ export class Suzume {
     }
     const { pointer, byteLength } = allocUtf8(this.module, value);
     try {
-      return operation(pointer, byteLength);
+      return operation(pointer, byteLength - 1);
     } finally {
       this.module._free(pointer);
     }

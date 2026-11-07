@@ -124,7 +124,11 @@ class Mode(str, Enum):
 
     @property
     def _code(self) -> int:
-        return {Mode.NORMAL: 0, Mode.SEARCH: 1, Mode.SPLIT: 2}[self]
+        return _MODE_CODES[self]
+
+
+_MODE_CODES = {Mode.NORMAL: 0, Mode.SEARCH: 1, Mode.SPLIT: 2}
+_MODES_BY_CODE = {code: mode for mode, code in _MODE_CODES.items()}
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -334,8 +338,8 @@ class Suzume:
         """Current analysis mode for this handle."""
         code = int(_lib.suzume_mode(self._require_handle()))
         try:
-            return Mode(("normal", "search", "split")[code])
-        except IndexError as error:  # pragma: no cover - native ABI invariant
+            return _MODES_BY_CODE[code]
+        except KeyError as error:  # pragma: no cover - native ABI invariant
             raise _native_error("failed to read analysis mode") from error
 
     @mode.setter
