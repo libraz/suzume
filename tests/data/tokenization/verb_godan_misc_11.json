@@ -1904,6 +1904,227 @@
       ],
       "id": "kanakatt_to_ttta",
       "input": "「書かなかっ」と言った"
+    },
+    {
+      "description": "準体助詞を伴う主語と形容動詞の境界",
+      "expected": [
+        {
+          "lemma": "泳ぐ",
+          "pos": "Verb",
+          "surface": "泳ぐ"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "にがて",
+          "pos": "Adjective",
+          "surface": "にがて"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "もの",
+          "pos": "Noun",
+          "surface": "もの"
+        }
+      ],
+      "id": "gunoganigatenamono",
+      "input": "泳ぐのがにがてなもの"
+    },
+    {
+      "description": "数量句の後の存在動詞と過去助動詞",
+      "expected": [
+        {
+          "lemma": "三人",
+          "pos": "Noun",
+          "surface": "三人"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ita_5",
+      "input": "三人いた"
+    },
+    {
+      "description": "数量句の後の存在動詞と丁寧助動詞",
+      "expected": [
+        {
+          "lemma": "二人",
+          "pos": "Noun",
+          "surface": "二人"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "い"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "imasuka",
+      "input": "二人いますか"
+    },
+    {
+      "description": "疑問数量句の後の存在動詞と丁寧助動詞",
+      "expected": [
+        {
+          "lemma": "何人",
+          "pos": "Noun",
+          "surface": "何人"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "い"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "imasuka_2",
+      "input": "何人いますか"
+    },
+    {
+      "description": "疑問数量句の後の存在動詞と丁寧過去",
+      "expected": [
+        {
+          "lemma": "幾人",
+          "pos": "Noun",
+          "surface": "幾人"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "い"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "まし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "imashitaka",
+      "input": "幾人いましたか"
+    },
+    {
+      "description": "疑問数量句の後の存在動詞と過去助動詞",
+      "expected": [
+        {
+          "lemma": "何人",
+          "pos": "Noun",
+          "surface": "何人"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ita_6",
+      "input": "何人いた"
+    },
+    {
+      "description": "After an onbin cell the clause-final たかっ is past た plus the held final particle か",
+      "expected": [
+        {
+          "lemma": "やる",
+          "pos": "Verb",
+          "surface": "やっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "かっ"
+        }
+      ],
+      "id": "yatttakatt",
+      "input": "やったかっ！"
+    },
+    {
+      "description": "I-onbin host: た plus held か, never the desiderative",
+      "expected": [
+        {
+          "lemma": "本当",
+          "pos": "Noun",
+          "surface": "本当"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "書く",
+          "pos": "Verb",
+          "surface": "書い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "かっ"
+        }
+      ],
+      "id": "ni_itakatt",
+      "input": "本当に書いたかっ"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 11/11)",

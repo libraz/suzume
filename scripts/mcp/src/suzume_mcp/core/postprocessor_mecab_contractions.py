@@ -1,5 +1,7 @@
 """Repairs for contracted, regional, and lengthened forms that MeCab splits at the wrong boundary."""
 
+import unicodedata
+
 import regex
 
 from .conjugation_rows import GODAN_E_ROW_TO_BASE as _GODAN_E_ROW_TO_BASE
@@ -111,6 +113,66 @@ def repair_regional_imperative(tokens: list[dict]) -> None:
             ]
             continue
         idx += 1
+
+
+def _closes_clause(token: dict | None) -> bool:
+    """Whether nothing follows or the next token is punctuation.
+
+    Normalized text carries half-width marks (!), which the reference tags as
+    nouns rather than 記号, so the characters themselves are checked too.
+    """
+    if token is None or token.get("pos") == "記号":
+        return True
+    surface = token.get("surface", "")
+    return bool(surface) and all(unicodedata.category(char)[0] in "PS" for char in surface)
+
+
+def repair_desiderative_after_onbin(tokens: list[dict]) -> None:
+    """Split たかっ after a euphonic verb cell into the past た and an emphatic か.
+
+    The desiderative たい attaches to the continuative (やり+たかっ), never to a
+    euphonic cell, so after やっ, 書い or 読ん the span can only be the past た
+    followed by the final particle か held on a sokuon (やっ+た+かっ, read as やったか).
+    The reference dictionary reads it as たかっ regardless of the host. The held
+    particle closes the clause, so only a clause-final span is rebuilt.
+    """
+    idx = 1
+    while idx < len(tokens):
+        token, previous = tokens[idx], tokens[idx - 1]
+        following = tokens[idx + 1] if idx + 1 < len(tokens) else None
+        if (
+            token.get("surface") != "たかっ"
+            or token.get("pos") != "助動詞"
+            or previous.get("pos") != "動詞"
+            or previous.get("conj_form") != "連用タ接続"
+            or not _closes_clause(following)
+        ):
+            idx += 1
+            continue
+        past = {
+            "surface": "た",
+            "pos": "助動詞",
+            "pos_sub1": "*",
+            "pos_sub2": "*",
+            "pos_sub3": "*",
+            "conj_type": "特殊・タ",
+            "conj_form": "基本形",
+            "lemma": "た",
+            "reading": "タ",
+        }
+        particle = {
+            "surface": "かっ",
+            "pos": "助詞",
+            "pos_sub1": "副助詞／並立助詞／終助詞",
+            "pos_sub2": "*",
+            "pos_sub3": "*",
+            "conj_type": "*",
+            "conj_form": "*",
+            "lemma": "か",
+            "reading": "カッ",
+        }
+        tokens[idx : idx + 1] = [past, particle]
+        idx += 2
 
 
 def repair_contracted_quotative(tokens: list[dict]) -> None:

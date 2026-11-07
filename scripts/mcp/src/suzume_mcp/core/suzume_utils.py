@@ -23,6 +23,7 @@ from .postprocessors import (
     repair_contracted_quotative,
     repair_contracted_rareru,
     repair_contracted_volitional,
+    repair_desiderative_after_onbin,
     repair_euphonic_adjective_adverb,
     repair_interrogative_nande,
     repair_kamo_quotative,
@@ -303,6 +304,7 @@ def get_expected_tokens(text: str, suzume_tokens: list[dict] | None = None) -> t
     repair_koto_suru_te(raw_tokens)
     repair_assimilated_koto_copula(raw_tokens)
     repair_contracted_volitional(raw_tokens)
+    repair_desiderative_after_onbin(raw_tokens)
     repair_contracted_quotative(raw_tokens)
     repair_regional_imperative(raw_tokens)
     repair_sentence_final_godan_imperative(raw_tokens)

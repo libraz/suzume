@@ -1792,3 +1792,40 @@ class TestKusaiStemBeforeSuffix:
             {"surface": "せる", "pos": "Auxiliary", "lemma": "せる"},
         ]
         assert not postprocessors.postprocess_kusai_garu(tokens)
+
+
+class TestRepairDesiderativeAfterOnbin:
+    @staticmethod
+    def _raw(surface, pos, conj_form="*"):
+        return {"surface": surface, "pos": pos, "conj_form": conj_form, "lemma": surface}
+
+    def test_clause_final_takatt_after_onbin_is_past_and_held_ka(self):
+        tokens = [self._raw("やっ", "動詞", "連用タ接続"), self._raw("たかっ", "助動詞", "連用タ接続")]
+        postprocessors.repair_desiderative_after_onbin(tokens)
+        assert [(t["surface"], t["pos"], t["lemma"]) for t in tokens[1:]] == [
+            ("た", "助動詞", "た"),
+            ("かっ", "助詞", "か"),
+        ]
+
+    def test_half_width_mark_closes_the_clause(self):
+        tokens = [
+            self._raw("書い", "動詞", "連用タ接続"),
+            self._raw("たかっ", "助動詞", "連用タ接続"),
+            self._raw("!", "名詞"),
+        ]
+        postprocessors.repair_desiderative_after_onbin(tokens)
+        assert [t["surface"] for t in tokens] == ["書い", "た", "かっ", "!"]
+
+    def test_continuative_host_keeps_desiderative(self):
+        tokens = [self._raw("やり", "動詞", "連用形"), self._raw("たかっ", "助動詞", "連用タ接続")]
+        postprocessors.repair_desiderative_after_onbin(tokens)
+        assert [t["surface"] for t in tokens] == ["やり", "たかっ"]
+
+    def test_span_continuing_into_a_word_is_left_alone(self):
+        tokens = [
+            self._raw("やっ", "動詞", "連用タ接続"),
+            self._raw("たかっ", "助動詞", "連用タ接続"),
+            self._raw("た", "助動詞", "基本形"),
+        ]
+        postprocessors.repair_desiderative_after_onbin(tokens)
+        assert [t["surface"] for t in tokens] == ["やっ", "たかっ", "た"]
