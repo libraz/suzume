@@ -2025,6 +2025,50 @@
       ],
       "id": "temee_fuzakennayo",
       "input": "てめえ、ふざけんなよ"
+    },
+    {
+      "description": "a registered three-kana pronoun after a kanji run leaves the run whole",
+      "expected": [
+        {
+          "lemma": "前回",
+          "pos": "Noun",
+          "surface": "前回"
+        },
+        {
+          "lemma": "みんな",
+          "pos": "Pronoun",
+          "surface": "みんな"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        }
+      ],
+      "id": "minnade",
+      "input": "前回みんなで"
+    },
+    {
+      "description": "先週あなたが - auto-generated",
+      "expected": [
+        {
+          "lemma": "先週",
+          "pos": "Noun",
+          "surface": "先週"
+        },
+        {
+          "lemma": "あなた",
+          "pos": "Pronoun",
+          "surface": "あなた"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        }
+      ],
+      "id": "anataga",
+      "input": "先週あなたが"
     }
   ],
   "description": "Pronouns",
