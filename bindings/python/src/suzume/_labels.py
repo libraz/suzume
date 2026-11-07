@@ -49,9 +49,5 @@ def _lookup(values: tuple[str, ...], code: int, fallback: str) -> str:
     return values[code] if 0 <= code < len(values) else fallback
 
 
-def pos_english(code: int) -> str:
-    return _lookup(POS_ENGLISH, code, "OTHER")
-
-
 def pos_japanese(code: int) -> str:
     return _lookup(POS_JAPANESE, code, "その他")

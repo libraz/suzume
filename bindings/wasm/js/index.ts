@@ -12,7 +12,7 @@
  */
 
 import { C_LAYOUTS } from './abi_layout.js';
-import { decodeAnalysisResult, decodeTags } from './decode.js';
+import { decodeAnalysisResult, decodeTags, heapBytes } from './decode.js';
 import type { EmscriptenModule } from './suzume.js';
 
 export enum ErrorCode {
@@ -296,11 +296,6 @@ const registry = new FinalizationRegistry((ref: CleanupRef) => {
     ref.handle = 0;
   }
 });
-
-/** Byte view over the module heap, derived from HEAPU32 (HEAPU8 may not be exported). */
-function heapBytes(module: EmscriptenModule): Uint8Array {
-  return new Uint8Array(module.HEAPU32.buffer);
-}
 
 /** Throws InvalidUtf8 for an unpaired surrogate, which has no UTF-8 encoding. */
 function assertWellFormedUtf16(value: string): void {
