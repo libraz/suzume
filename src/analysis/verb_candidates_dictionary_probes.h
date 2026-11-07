@@ -343,11 +343,6 @@ bool hasNominalHostBefore(const std::vector<char32_t>& codepoints, size_t start_
  */
 bool hasParticleDictionaryEntry(const dictionary::DictionaryManager* dict_manager, std::string_view surface);
 
-// Exact one-token case-particle lookup.  Conjunctive particles such as ば are
-// valid syllables inside inflected lexical stems and must not trigger the
-// noun+case-particle+する guard.
-bool hasCaseParticleDictionaryEntry(const dictionary::DictionaryManager* dict_manager, std::string_view surface);
-
 // True when the mora ending at @p pos is a one-mora particle of @p particle_pos.
 bool oneMoraParticleEndsAt(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
                            size_t pos, core::ExtendedPOS particle_pos);

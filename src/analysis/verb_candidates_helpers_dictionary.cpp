@@ -428,14 +428,6 @@ bool hasParticleDictionaryEntry(const dictionary::DictionaryManager* dict_manage
   return hasDictionaryEntry(dict_manager, surface, core::PartOfSpeech::Particle);
 }
 
-bool hasCaseParticleDictionaryEntry(const dictionary::DictionaryManager* dict_manager, std::string_view surface) {
-  if (dict_manager == nullptr) {
-    return false;
-  }
-  const auto* entry = dict_manager->lookupExact(surface, core::PartOfSpeech::Particle);
-  return entry != nullptr && entry->extended_pos == core::ExtendedPOS::ParticleCase;
-}
-
 core::ExtendedPOS oneMoraParticlePosEndingAt(const dictionary::DictionaryManager* dict_manager,
                                              const std::vector<char32_t>& codepoints, size_t pos) {
   if (dict_manager == nullptr || pos == 0) {
@@ -449,6 +441,21 @@ bool oneMoraParticleEndsAt(const dictionary::DictionaryManager* dict_manager, co
                            size_t pos, core::ExtendedPOS particle_pos) {
   return oneMoraParticlePosEndingAt(dict_manager, codepoints, pos) == particle_pos;
 }
+
+namespace {
+
+// Exact one-token case-particle lookup.  Conjunctive particles such as ば are
+// valid syllables inside inflected lexical stems and must not trigger the
+// noun+case-particle+する guard.
+bool hasCaseParticleDictionaryEntry(const dictionary::DictionaryManager* dict_manager, std::string_view surface) {
+  if (dict_manager == nullptr) {
+    return false;
+  }
+  const auto* entry = dict_manager->lookupExact(surface, core::PartOfSpeech::Particle);
+  return entry != nullptr && entry->extended_pos == core::ExtendedPOS::ParticleCase;
+}
+
+}  // namespace
 
 bool followsCaseParticle(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
                          size_t pos) {

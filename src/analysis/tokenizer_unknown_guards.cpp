@@ -805,14 +805,10 @@ bool isRejectedUnknownCandidate(const UnknownCandidateContext& ctx, const core::
     }
   }
 
-  bool is_conjunction_prefix = false;
-  for (const auto& result : dict_results) {
-    if (result.entry != nullptr && result.entry->pos == core::PartOfSpeech::Conjunction &&
-        candidate.end - candidate.start <= result.length) {
-      is_conjunction_prefix = true;
-      break;
-    }
-  }
+  const bool is_conjunction_prefix = std::any_of(dict_results.begin(), dict_results.end(), [&](const auto& result) {
+    return result.entry != nullptr && result.entry->pos == core::PartOfSpeech::Conjunction &&
+           candidate.end - candidate.start <= result.length;
+  });
   if (is_conjunction_prefix) {
     return true;
   }

@@ -4,6 +4,8 @@
  */
 
 #include <algorithm>
+#include <optional>
+#include <vector>
 
 #include "analysis/dictionary_probe.h"
 #include "candidate_constants.h"
@@ -37,6 +39,14 @@ bool losesHomographReading(const DictionaryCandidateContext& ctx, const core::La
   const auto& byte_offsets = ctx.byte_offsets;
   const size_t start_pos = ctx.start_pos;
   const auto& lookup_results = ctx.lookup_results;
+  // Lookup at the candidate end, computed on first use.
+  std::optional<std::vector<dictionary::LookupResult>> following_cache;
+  const auto followingAtEnd = [&]() -> const std::vector<dictionary::LookupResult>& {
+    if (!following_cache) {
+      following_cache = dict_manager.lookup(text, byteOffsetAt(byte_offsets, end_pos));
+    }
+    return *following_cache;
+  };
   // A determiner must introduce a nominal constituent.  If a closed case
   // particle starts exactly where this candidate ends, the homographic
   // surface belongs to a compositional predicate instead (と+いう+より),
@@ -61,8 +71,7 @@ bool losesHomographReading(const DictionaryCandidateContext& ctx, const core::La
       return true;
     }
     if (end_pos < codepoints.size()) {
-      const size_t following_byte_pos = byteOffsetAt(byte_offsets, end_pos);
-      const auto following_results = dict_manager.lookup(text, following_byte_pos);
+      const auto& following_results = followingAtEnd();
       const bool followed_by_case_particle =
           lookupResultsHaveExtendedPOS(following_results, core::ExtendedPOS::ParticleCase);
       // A longer nominal headword starting there is what the determiner
@@ -108,7 +117,7 @@ bool losesHomographReading(const DictionaryCandidateContext& ctx, const core::La
   if (result.entry->pos == core::PartOfSpeech::Adverb && end_pos < codepoints.size()) {
     const bool has_same_span_noun =
         lookupResultsHavePartOfSpeech(lookup_results, partOfSpeechMask(core::PartOfSpeech::Noun), result.length);
-    const auto following_results = dict_manager.lookup(text, byteOffsetAt(byte_offsets, end_pos));
+    const auto& following_results = followingAtEnd();
     const bool followed_by_nominal_particle =
         std::any_of(following_results.begin(), following_results.end(), [](const auto& following) {
           if (following.entry == nullptr) {
@@ -168,7 +177,7 @@ bool losesHomographReading(const DictionaryCandidateContext& ctx, const core::La
         follows_genitive ||
         (hasPrecedingAttributivePredicate(lattice, start_pos) && !follows_non_genitive_nominal_particle);
     if (has_same_span_adverb && !has_formal_noun_left_context) {
-      const auto following_results = dict_manager.lookup(text, byteOffsetAt(byte_offsets, end_pos));
+      const auto& following_results = followingAtEnd();
       const bool followed_by_nominal_marker =
           std::any_of(following_results.begin(), following_results.end(), [](const auto& following) {
             if (following.entry == nullptr) {
@@ -205,7 +214,7 @@ bool losesHomographReading(const DictionaryCandidateContext& ctx, const core::La
       has_nominal_right_context = true;
     }
     if (!has_nominal_right_context) {
-      const auto following_results = dict_manager.lookup(text, byteOffsetAt(byte_offsets, end_pos));
+      const auto& following_results = followingAtEnd();
       has_nominal_right_context =
           lookupResultsHavePartOfSpeech(following_results, partOfSpeechMask(core::PartOfSpeech::Particle));
     }
@@ -221,8 +230,7 @@ bool losesHomographReading(const DictionaryCandidateContext& ctx, const core::La
   if (result.entry->extended_pos != core::ExtendedPOS::VerbMizenkei && result.length == 1 &&
       codepoints[start_pos] == core::hiragana::kSa && result.entry->pos != core::PartOfSpeech::Verb &&
       hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbMizenkei) && end_pos < codepoints.size()) {
-    const size_t following_byte_pos = byteOffsetAt(byte_offsets, end_pos);
-    const auto following_results = dict_manager.lookup(text, following_byte_pos);
+    const auto& following_results = followingAtEnd();
     const bool followed_by_passive = lookupResultsHaveExtendedPOS(following_results, core::ExtendedPOS::AuxPassive);
     if (followed_by_passive) {
       return true;

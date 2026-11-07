@@ -103,8 +103,9 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
       // not an ichidan verb renyoukei. The closed set of kami-ichidan
       // renyokei stems ending in い (率い, 用い, ...) is exempted.
       bool is_common_particle = (first_hira == U'で' || first_hira == U'に' || first_hira == U'へ');
-      bool is_i_adjective_suffix = (first_hira == U'い') && !grammar::inflection::isValidKanjiIStemException(
-                                                                extractSubstring(codepoints, start_pos, kanji_end + 1));
+      const size_t renyokei_end = kanji_end + 1;
+      const std::string surface = extractSubstring(codepoints, start_pos, renyokei_end);
+      bool is_i_adjective_suffix = (first_hira == U'い') && !grammar::inflection::isValidKanjiIStemException(surface);
       bool is_single_kanji = (kanji_end == start_pos + 1);
       // Skip kuru irregular verb: 来 + て/た should not be treated as ichidan
       // 来る is kuru irregular, not ichidan (来て should have lemma 来る, not 来てる)
@@ -119,8 +120,6 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
       // Otherwise almost certainly noun + particle, i-adjective, or kuru verb
       if (!((is_common_particle && is_single_kanji) || is_i_adjective_suffix || is_kuru_verb)) {
         // Surface is kanji + first e/i-row hiragana only (e.g., 食べ from 食べます, 感じ from 感じる)
-        size_t renyokei_end = kanji_end + 1;
-        std::string surface = extractSubstring(codepoints, start_pos, renyokei_end);
         // Rank every inflection reading, not just the best: 入れ is both godan 入る
         // imperative and ichidan 入れる continuative.
         const auto [ichidan_cand, suru_cand, godan_cand] = vh::bestByVerbClass(inflection.analyze(surface));

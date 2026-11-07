@@ -294,10 +294,7 @@ void appendHiraganaRenyokeiBeforeFormalNoun(const std::vector<char32_t>& codepoi
   // productive verb-continuative nominal construction (たて+もの). The
   // closed noun supplies the right boundary, so this does not turn arbitrary
   // kana runs into verbs.
-  for (size_t stem_end = start_pos + 2; stem_end < run_end; ++stem_end) {
-    if (stem_end + 2 > run_end) {
-      continue;
-    }
+  for (size_t stem_end = start_pos + 2; stem_end + 2 <= run_end; ++stem_end) {
     if (codepoints[stem_end] != U'も' || codepoints[stem_end + 1] != U'の') {
       continue;
     }
