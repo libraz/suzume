@@ -1632,6 +1632,60 @@
       ],
       "id": "wo_ttteiku",
       "input": "本を持っていく"
+    },
+    {
+      "description": "遅刻してやがる - auto-generated",
+      "expected": [
+        {
+          "lemma": "遅刻",
+          "pos": "Noun",
+          "surface": "遅刻"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "やがる",
+          "pos": "Auxiliary",
+          "surface": "やがる"
+        }
+      ],
+      "id": "shiteyagaru",
+      "input": "遅刻してやがる"
+    },
+    {
+      "description": "読んでやがった - auto-generated",
+      "expected": [
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読ん"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "やがる",
+          "pos": "Auxiliary",
+          "surface": "やがっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ndeyagattta",
+      "input": "読んでやがった"
     }
   ],
   "description": "Te-form and ta-form patterns",

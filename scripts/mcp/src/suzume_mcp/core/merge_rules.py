@@ -13,6 +13,7 @@ from .merge_rules_compounds import (
     _merge_name_and_script_compounds,
     _merge_tari_adverbs,
     _merge_verb_derived_nouns,
+    _separate_yagaru_hosts,
 )
 from .merge_rules_elongation import (
     _merge_adjective_forms,
@@ -165,7 +166,7 @@ def apply_suzume_merge(tokens: list[dict], text: str) -> tuple[list[dict], str |
     Returns:
         Tuple of (merged tokens, applied rule name or None).
     """
-    tokens = _retag_classical_sourou(_separate_counter_case_particles(tokens))
+    tokens = _separate_yagaru_hosts(_retag_classical_sourou(_separate_counter_case_particles(tokens)))
     state = MergeState(tokens=tokens, text=text)
 
     while state.i < len(tokens):

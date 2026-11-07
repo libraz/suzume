@@ -16,8 +16,10 @@ from .merge_rules_helpers import _covered_length, _kanji_noun_run
 from .merge_rules_state import MergeState
 from .split_rules import base_from_renyokei
 
-# The cells of がる after the や of やがる (やがら, やがり, やがる, やがれ, やがろ, やがっ).
-_YAGARU_TAIL = regex.compile(r"が[らりるれろっ]")
+# The cells of がる after the や of やがる (やがら, やがり, やがる, やがれ, やがろ, やがっ, やがん).
+_YAGARU_TAIL = regex.compile(r"が[らりるれろっん]")
+_YAGARU_VERB_LEMMA = "いやがる"
+_TE_FORM_PARTICLES = frozenset({"て", "で"})
 
 
 # Characters a hashtag body may contain. A tag ends at whitespace, punctuation or any
@@ -528,6 +530,7 @@ def _merge_colloquial_forms(state: MergeState) -> bool:
             and (
                 (t.get("pos") == "動詞" and "連用" in (t.get("conj_form") or ""))
                 or (t.get("pos") == "名詞" and reads_as_continuative(t.get("surface", "")))
+                or (t.get("pos") == "助詞" and t.get("surface") in _TE_FORM_PARTICLES)
             )
             and i + 2 < len(tokens)
             and tokens[i + 1].get("surface") == "や"
@@ -552,7 +555,7 @@ def _merge_colloquial_forms(state: MergeState) -> bool:
         if (
             not merged
             and t.get("pos") == "動詞"
-            and len(t.get("surface", "")) == 2
+            and len(t.get("surface", "")) >= 2
             and t["surface"].endswith("や")
             and (t.get("lemma") or "").endswith("やる")
             and i + 1 < len(tokens)
@@ -571,3 +574,38 @@ def _merge_colloquial_forms(state: MergeState) -> bool:
         state.merged = merged
         state.applied_rule = applied_rule
     return False
+
+
+def _separate_yagaru_hosts(tokens: list[dict]) -> list[dict]:
+    """Give the pejorative auxiliary back the continuative it was read into.
+
+    After a kanji verbal stem the reference dictionary reads 言いやがった as the
+    noun 言 plus the verb いやがる (嫌がる), so the い of the continuative sits in
+    the wrong word. When the noun plus い spells a continuative, the い goes back
+    to the host and や/がっ are left for the pejorative-auxiliary merge.
+    """
+    separated: list[dict] = []
+    for token in tokens:
+        previous = separated[-1] if separated else None
+        surface = token.get("surface", "")
+        if (
+            previous is not None
+            and token.get("pos") == "動詞"
+            and token.get("lemma") == _YAGARU_VERB_LEMMA
+            and surface.startswith("いやが")
+            and previous.get("pos") == "名詞"
+            and reads_as_continuative(previous.get("surface", "") + "い")
+        ):
+            host = previous["surface"] + "い"
+            separated[-1] = {
+                "surface": host,
+                "pos": "動詞",
+                "pos_sub1": "自立",
+                "conj_form": "連用形",
+                "lemma": base_from_renyokei(host) or host,
+            }
+            separated.append({"surface": "や", "pos": "助詞", "lemma": "や"})
+            separated.append({"surface": surface[2:], "pos": "動詞", "pos_sub1": "接尾", "lemma": "がる"})
+            continue
+        separated.append(token)
+    return separated

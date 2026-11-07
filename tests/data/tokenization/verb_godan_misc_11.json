@@ -198,6 +198,33 @@
       ],
       "id": "seyo",
       "input": "元気出せよ。"
+    },
+    {
+      "description": "うるさく言いやがった - auto-generated",
+      "expected": [
+        {
+          "lemma": "うるさい",
+          "pos": "Adjective",
+          "surface": "うるさく"
+        },
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言い"
+        },
+        {
+          "lemma": "やがる",
+          "pos": "Auxiliary",
+          "surface": "やがっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "urusaku_iyagattta",
+      "input": "うるさく言いやがった"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 11/11)",

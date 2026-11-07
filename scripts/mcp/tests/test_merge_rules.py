@@ -1724,6 +1724,35 @@ class TestPlaceNameKanjiMerge:
 
 
 class TestPejorativeYagaru:
+    def test_joins_after_a_te_form_particle(self):
+        tokens = [
+            _tok("読ん", pos="動詞", pos_sub1="自立", conj_form="連用タ接続", lemma="読む"),
+            _tok("で", pos="助詞", pos_sub1="接続助詞", lemma="で"),
+            _tok("や", pos="助詞", pos_sub1="係助詞", lemma="や"),
+            _tok("がっ", pos="動詞", pos_sub1="接尾", conj_form="連用タ接続", lemma="がる"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "読んでやがっ")
+        assert [token["surface"] for token in result] == ["読ん", "で", "やがっ"]
+        assert rule == "pejorative-yagaru"
+
+    def test_gives_the_continuative_i_back_from_iyagaru(self):
+        tokens = [
+            _tok("言", pos="名詞", pos_sub1="一般", lemma="言"),
+            _tok("いやがっ", pos="動詞", pos_sub1="自立", conj_form="連用タ接続", lemma="いやがる"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "言いやがっ")
+        assert [token["surface"] for token in result] == ["言い", "やがっ"]
+        assert result[0]["lemma"] == "言う"
+        assert rule == "pejorative-yagaru"
+
+    def test_keeps_the_verb_iyagaru_after_a_particle(self):
+        tokens = [
+            _tok("が", pos="助詞", pos_sub1="格助詞", lemma="が"),
+            _tok("いやがっ", pos="動詞", pos_sub1="自立", conj_form="連用タ接続", lemma="いやがる"),
+        ]
+        result, _ = apply_suzume_merge(tokens, "がいやがっ")
+        assert [token["surface"] for token in result] == ["が", "いやがっ"]
+
     def test_moves_the_ya_of_miya_back_to_the_auxiliary(self):
         tokens = [
             _tok("見や", pos="動詞", pos_sub1="自立", conj_form="連用形", lemma="見やる"),
