@@ -17,6 +17,7 @@
 #include "normalize/utf8.h"
 #include "tokenizer_utils.h"
 #include "verb_candidates_absorption_guards.h"
+#include "verb_candidates_auxiliary_patterns.h"
 #include "verb_candidates_dictionary_probes.h"
 
 namespace suzume::analysis::adj_detail {
@@ -391,6 +392,43 @@ void appendTrimmedAdjVariants(std::vector<UnknownCandidate>& candidates, const T
       }
     }
     group_begin = group_end;
+  }
+}
+
+// Emit a whole-word i-adjective candidate for a spelled-out reduplicated 〜しい
+// adjective (バカバカしい, ばかばかしくない). The doubled stem is otherwise pre-empted
+// by an onomatopoeia ADV candidate (aa_doubled / abab_pattern) plus a split-off しい
+// tail, so this bypasses the particle-boundary and ending gates the regular scanners
+// apply and lets inflection analyze the full surface directly. The caller's existing
+// ku/katt/ke trim loops spin the conjugation splits (…しく, …しかっ) out of the emitted
+// base. Shared by the hiragana and katakana generators (the kanji path handles its own
+// stem-length case), so the reduplication rule lives in one place for all three scripts.
+void addReduplicatedShiiAdjective(std::vector<UnknownCandidate>& candidates, const std::vector<char32_t>& codepoints,
+                                  size_t start_pos, const std::vector<normalize::CharType>& char_types,
+                                  const grammar::Inflection& inflection, CandidateOrigin origin) {
+  if (!verb_helpers::isReduplicatedShiiAdjectiveHead(codepoints, start_pos)) {
+    return;
+  }
+  // し and every inflection ending after it are hiragana; scan that run.
+  size_t shi_pos = start_pos + 4;
+  size_t hira_end = findCharRegionEnd(char_types, shi_pos, 8, normalize::CharType::Hiragana);
+  // Longest-first so the full conjugated surface (…しくない) is chosen; the caller's
+  // trim loops then derive …しく. Minimum end covers し + い (base form しい).
+  for (size_t end_pos = hira_end; end_pos >= shi_pos + 2; --end_pos) {
+    std::string surface = extractSubstring(codepoints, start_pos, end_pos);
+    for (const auto& cand : inflection.analyze(surface)) {
+      if (cand.verb_type != grammar::VerbType::IAdjective || cand.confidence < candidate::kIAdjConfMin) {
+        continue;
+      }
+      float cost = candidate::confidenceScaledCost(candidate::kKanjiAdjBaseCost, cand.confidence,
+                                                   candidate::kKanjiAdjConfScale) +
+                   candidate::kReduplicatedShiiAdjBonus;
+      auto adj = makeIAdjCandidate(surface, start_pos, end_pos, cand.base_form, cost, origin, cand.confidence,
+                                   "i_adjective_reduplicated");
+      adj.has_suffix = true;  // Morphologically recognized; skip exceeds_dict_length penalty
+      candidates.push_back(std::move(adj));
+      return;
+    }
   }
 }
 

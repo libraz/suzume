@@ -332,6 +332,40 @@ void dropCoinedAdjectivesOverDictionaryAdjective(const dictionary::DictionaryMan
                                                  const std::vector<char32_t>& codepoints,
                                                  std::vector<UnknownCandidate>& candidates, size_t candidate_start);
 
+// The maximal hiragana run an adjective scan reads, with the inputs every
+// phase of the scan shares.
+struct HiraganaAdjectiveRun {
+  const std::vector<char32_t>& codepoints;
+  size_t start_pos;
+  size_t max_hiragana_end;
+  const std::vector<normalize::CharType>& char_types;
+  const grammar::Inflection& inflection;
+  const dictionary::DictionaryManager* dict_manager;
+};
+
+// Emit a whole-word i-adjective candidate for a spelled-out reduplicated 〜しい
+// adjective (バカバカしい, ばかばかしくない). The doubled stem is otherwise pre-empted
+// by an onomatopoeia ADV candidate (aa_doubled / abab_pattern) plus a split-off しい
+// tail, so this bypasses the particle-boundary and ending gates the regular scanners
+// apply and lets inflection analyze the full surface directly. The caller's existing
+// ku/katt/ke trim loops spin the conjugation splits (…しく, …しかっ) out of the emitted
+// base. Shared by the hiragana and katakana generators (the kanji path handles its own
+// stem-length case), so the reduplication rule lives in one place for all three scripts.
+void addReduplicatedShiiAdjective(std::vector<UnknownCandidate>& candidates, const std::vector<char32_t>& codepoints,
+                                  size_t start_pos, const std::vector<normalize::CharType>& char_types,
+                                  const grammar::Inflection& inflection, CandidateOrigin origin);
+
+void appendStemBeforeExcessiveOrAppearance(const HiraganaAdjectiveRun& run, std::vector<UnknownCandidate>& candidates);
+
+void appendStemBeforeGe(const HiraganaAdjectiveRun& run, const std::string& full_hiragana_surface,
+                        std::vector<UnknownCandidate>& candidates);
+
+void appendStemBeforeAuxiliaryPattern(const HiraganaAdjectiveRun& run, const std::string& full_hiragana_surface,
+                                      std::vector<UnknownCandidate>& candidates);
+
+void appendStemBeforeNominalizerSa(const HiraganaAdjectiveRun& run, std::vector<UnknownCandidate>& candidates);
+
+void appendClippedExclamative(const HiraganaAdjectiveRun& run, std::vector<UnknownCandidate>& candidates);
 }  // namespace suzume::analysis::adj_detail
 
 #endif  // SUZUME_ANALYSIS_ADJECTIVE_CANDIDATES_INTERNAL_H_

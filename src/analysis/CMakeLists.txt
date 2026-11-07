@@ -9,7 +9,9 @@ add_library(suzume_analysis OBJECT
   adjective_candidates_kanji_compound.cpp
   adjective_candidates_kanji_special.cpp
   adjective_candidates_kanji_variants.cpp
+  adjective_candidates_katakana.cpp
   adjective_candidates_hiragana_scan.cpp
+  adjective_candidates_hiragana_stem.cpp
   adjective_candidates_na.cpp
   adjective_candidates_stem.cpp
   adjective_candidates_paradigm_cells.cpp
@@ -37,6 +39,7 @@ add_library(suzume_analysis OBJECT
   scorer_connection_rules_renyokei.cpp
   scorer_connection_rules_voice.cpp
   scorer_connection_rules_lexical.cpp
+  scorer_connection_rules_lexical_boundary.cpp
   scorer_connection_rules_honorific.cpp
   scorer_connection_rules_negative.cpp
   scorer_connection_rules_particle.cpp
@@ -47,6 +50,7 @@ add_library(suzume_analysis OBJECT
   split_candidates.cpp
   suffix_candidates_compound.cpp
   suffix_candidates_function_word_decomposition.cpp
+  suffix_candidates_humble_nominal.cpp
   suffix_candidates_nominal_head.cpp
   suffix_candidates_nominalized.cpp
   suffix_candidates_counter.cpp
@@ -86,6 +90,7 @@ add_library(suzume_analysis OBJECT
   verb_candidates_hiragana_derived.cpp
   verb_candidates_hiragana_inflection.cpp
   verb_candidates_hiragana_particle_boundary.cpp
+  verb_candidates_hiragana_predicate_run.cpp
   verb_candidates_hiragana_mizenkei.cpp
   verb_candidates_hiragana_mizenkei_negative.cpp
   verb_candidates_hiragana_onbin.cpp

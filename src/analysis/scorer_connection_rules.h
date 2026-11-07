@@ -88,6 +88,9 @@ float computeAdjectiveTePredicatePenalty(const core::LatticeEdge& prev, const co
 float computeClassicalNegativeBoundaryPenalty(const core::LatticeEdge& prev, const core::LatticeEdge& next);
 float computeAdjectiveDerivationHostPenalty(const core::LatticeEdge& prev, const core::LatticeEdge& next);
 
+/** @brief Late lexical boundary adjustments, summed in their fixed rule-group order. */
+float computeLateLexicalBoundaryBonus(const core::LatticeEdge& prev, const core::LatticeEdge& next);
+
 }  // namespace suzume::analysis::connection_rules
 
 #endif  // SUZUME_ANALYSIS_SCORER_CONNECTION_RULES_H_

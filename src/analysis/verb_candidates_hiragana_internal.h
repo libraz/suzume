@@ -140,6 +140,33 @@ bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoin
                                            bool has_complete_case_particle_terminal,
                                            std::vector<UnknownCandidate>& candidates);
 
+// Inputs every phase of the hiragana verb scan reads.
+struct HiraganaVerbScan {
+  const std::vector<char32_t>& codepoints;
+  size_t start_pos;
+  const std::vector<normalize::CharType>& char_types;
+  const grammar::Inflection& inflection;
+  const dictionary::DictionaryManager* dict_manager;
+  const VerbCandidateOptions& verb_opts;
+};
+
+// Closed tails that carry the run scan across particle-homographic morae; 0
+// when absent.
+struct PredicateRunTails {
+  size_t closed_onbin_tense_end;
+  size_t complete_godan_wa_terminal_end;
+  size_t complete_case_particle_terminal_end;
+  size_t comma_clause_end;
+  size_t contracted_irrealis_end;
+};
+
+// Find the end of the hiragana run a verb may span, breaking at particle
+// boundaries the closed tails do not cross. Sets @p crossed_particle_guard when
+// a closed onbin tail crossed a particle mora, and @p
+// godan_ra_continuation_stem_end when a Godan-ra continuation crosses one.
+size_t scanPredicateRunEnd(const HiraganaVerbScan& scan, const PredicateRunTails& tails, bool& crossed_particle_guard,
+                           size_t& godan_ra_continuation_stem_end);
+
 }  // namespace suzume::analysis::hiragana_verb_detail
 
 #endif  // SUZUME_ANALYSIS_VERB_CANDIDATES_HIRAGANA_INTERNAL_H_
