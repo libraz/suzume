@@ -434,6 +434,19 @@ bool auxiliaryFollowsAt(const dictionary::DictionaryManager* dict_manager, const
 bool predicateAuxiliaryFollowsAt(const dictionary::DictionaryManager* dict_manager,
                                  const std::vector<char32_t>& codepoints, size_t pos);
 
+/**
+ * @brief Whether codepoints[cell_start, cell_end) is the kana spelling of a
+ *        dictionary verb cell with the negative auxiliary after it
+ *
+ * Neither the i-adjective terminal nor a godan continuative hosts ない, so a
+ * kanji run ending right before such a cell is a bare noun in front of the
+ * kana predicate (人+い+ない, 傘+いら+ない) unless the kanji plus the cell is
+ * itself a listed verb (用い+ない). The polite ます is left out: a godan
+ * continuative hosts it, and an unlisted one (構い+ます) has the same shape.
+ */
+bool kanaVerbCellBeforeNegative(const dictionary::DictionaryManager* dict_manager,
+                                const std::vector<char32_t>& codepoints, size_t cell_start, size_t cell_end);
+
 }  // namespace suzume::analysis::verb_helpers
 
 #endif  // SUZUME_ANALYSIS_VERB_CANDIDATES_DICTIONARY_PROBES_H_

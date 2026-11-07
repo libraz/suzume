@@ -645,6 +645,36 @@ bool predicateAuxiliaryFollowsAt(const dictionary::DictionaryManager* dict_manag
                                 });
 }
 
+bool kanaVerbCellBeforeNegative(const dictionary::DictionaryManager* dict_manager,
+                                const std::vector<char32_t>& codepoints, size_t cell_start, size_t cell_end) {
+  if (dict_manager == nullptr || cell_start >= cell_end || cell_end > codepoints.size() ||
+      !std::all_of(codepoints.begin() + static_cast<std::ptrdiff_t>(cell_start),
+                   codepoints.begin() + static_cast<std::ptrdiff_t>(cell_end),
+                   [](char32_t codepoint) { return kana::isHiraganaCodepoint(codepoint); }) ||
+      lookupEntryInRange(*dict_manager, codepoints, cell_start, cell_end, core::PartOfSpeech::Verb) == nullptr) {
+    return false;
+  }
+  // The cell must be one the negative selects. A cell of する after a kanji
+  // run is the verbal noun's own predicate, which the verbal-noun analysis
+  // weighs (確認致+し against 確認+致し).
+  bool selects_auxiliary = false;
+  for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, cell_start, cell_end)) {
+    if (match.length != cell_end - cell_start || match.entry == nullptr ||
+        match.entry->pos != core::PartOfSpeech::Verb) {
+      continue;
+    }
+    if (match.entry->lemma == "する") {
+      return false;
+    }
+    selects_auxiliary = selects_auxiliary || match.entry->extended_pos == core::ExtendedPOS::VerbRenyokei ||
+                        match.entry->extended_pos == core::ExtendedPOS::VerbMizenkei;
+  }
+  return selects_auxiliary &&
+         auxiliaryFollowsAt(dict_manager, codepoints, cell_end, [](const dictionary::DictionaryEntry& entry) {
+           return entry.extended_pos == core::ExtendedPOS::AuxNegativeNai;
+         });
+}
+
 KakariMusubi governingKakariMusubi(const dictionary::DictionaryManager* dict_manager,
                                    const std::vector<char32_t>& codepoints, size_t clause_pos) {
   struct KakariParticle {

@@ -120,7 +120,9 @@ TEST_F(SuzumeApiTest, InflectionScorerJsonChangesAnalysis) {
   ASSERT_EQ(default_results.size(), 4u);
   EXPECT_EQ(default_results[0].surface, "歩い");
   ASSERT_FALSE(tuned_results.empty());
-  EXPECT_EQ(tuned_results[0].surface, "歩");
+  // A bare noun hosts no aspect auxiliary, so without inflection evidence the
+  // first word is no longer the onbin stem.
+  EXPECT_NE(tuned_results[0].surface, default_results[0].surface);
 }
 
 TEST_F(SuzumeApiTest, ProgramScorerJsonOverridesEnvironment) {

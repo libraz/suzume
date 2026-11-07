@@ -297,9 +297,13 @@ bool kanjiHeadsPredicateAt(const std::vector<char32_t>& codepoints, const std::v
   // particle-dropped noun (会社|いく, 部屋|いる), and a registered kana noun
   // there is the tail of a compound noun (粗大|ごみ); either outweighs a
   // reading the inflection analyzer only infers below.
-  for (size_t length = 2; kana_start + length <= kana_end; ++length) {
+  // A shorter kana verb cell does the same when the negative follows it,
+  // since no unlisted predicate on the kanji hosts ない there (先生|い+ない,
+  // 傘|いら+ない).
+  for (size_t length = 1; kana_start + length <= kana_end; ++length) {
     if ((length == 2 && opening_entry(length, core::PartOfSpeech::Verb) != nullptr) ||
-        opening_entry(length, core::PartOfSpeech::Noun) != nullptr) {
+        verb_helpers::kanaVerbCellBeforeNegative(&dict_manager, codepoints, kana_start, kana_start + length) ||
+        (length >= 2 && opening_entry(length, core::PartOfSpeech::Noun) != nullptr)) {
       return false;
     }
   }

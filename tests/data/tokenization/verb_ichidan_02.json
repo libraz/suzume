@@ -1823,6 +1823,38 @@
       ],
       "id": "i_meta",
       "input": "猫飼い始めた"
+    },
+    {
+      "description": "listed i-stem ichidan keeps its continuative before the negative",
+      "expected": [
+        {
+          "lemma": "年",
+          "pos": "Noun",
+          "surface": "年"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "とっても",
+          "pos": "Adverb",
+          "surface": "とっても"
+        },
+        {
+          "lemma": "老いる",
+          "pos": "Verb",
+          "surface": "老い"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "wototttemo_inai",
+      "input": "年をとっても老いない"
     }
   ],
   "description": "Ichidan verbs (一段動詞) (part 2/2)",

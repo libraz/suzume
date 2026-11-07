@@ -899,8 +899,10 @@ bool setAuxiliaryAndNounCosts(BigramMatrix& table) {
 
       // Noun → aspect auxiliary いる/くる (驚+い, 先生+き): aspect attaches only to a
       // te-form, never a bare noun (食べて+いた, 走って+きた). Prevents 間続+い+た and
-      // overcomes the DET→NOUN bonus on prefix compounds like 先生.
-      {EPOS::Noun, EPOS::AuxAspectIru, cost::kSevere},
+      // overcomes the DET→NOUN bonus on prefix compounds like 先生. Both rows are
+      // prohibitive, so a kana い after a bare noun is the main verb いる
+      // (人+い+ない), never the aspect auxiliary.
+      {EPOS::Noun, EPOS::AuxAspectIru, cost::kProhibitive},
       {EPOS::Noun, EPOS::AuxAspectKuru, cost::kProhibitive},
       // A pronoun, a case or binding particle and the copula host no te-form
       // either (彼が+とっ+さ is 彼が+とっさ, ゆっくり+な+でる is ゆっくり+なでる).

@@ -406,6 +406,35 @@ bool startsInsideKanjiRunBeforeClosedNai(const UnknownCandidate& candidate, cons
          extractSubstring(codepoints, boundary, candidate.end) == "ない";
 }
 
+// A coined kanji-stem candidate cannot absorb a kana verb cell that the
+// negative follows (人+い+ない, not 人い+ない); an attested continuative keeps
+// its span (用い+ない, 迷い+ない).
+bool absorbsKanaVerbCellBeforeNegative(const UnknownCandidate& candidate, const std::vector<char32_t>& codepoints,
+                                       const dictionary::DictionaryManager* dict_manager) {
+  if (candidate.lemma_verified || normalize::classifyChar(codepoints[candidate.start]) != normalize::CharType::Kanji ||
+      (candidate.pos == core::PartOfSpeech::Verb && verb_helpers::isVerbInDictionary(dict_manager, candidate.lemma))) {
+    return false;
+  }
+  size_t boundary = candidate.start;
+  while (boundary < candidate.end && normalize::classifyChar(codepoints[boundary]) == normalize::CharType::Kanji) {
+    ++boundary;
+  }
+  // The cell may close the candidate (人い+ない) or sit inside it with the
+  // negative (人いない coined as one verb).
+  for (size_t cell_end = boundary + 1; cell_end <= candidate.end; ++cell_end) {
+    if (!verb_helpers::kanaVerbCellBeforeNegative(dict_manager, codepoints, boundary, cell_end)) {
+      continue;
+    }
+    // The verb may open anywhere in the run (資料+用い+ない).
+    bool attested = false;
+    for (size_t stem_start = candidate.start; stem_start < boundary && !attested; ++stem_start) {
+      attested = verb_helpers::namesDictionaryVerbContinuative(dict_manager, codepoints, stem_start, cell_end - 1);
+    }
+    return !attested;
+  }
+  return false;
+}
+
 // The first mora of the closed negative-past auxiliary belongs to なかっ,
 // never to the preceding speculative predicate (逃さ|なかっ, 強く|は|なかっ).
 bool endsInsideNegativePast(const UnknownCandidate& candidate, const std::vector<char32_t>& codepoints) {
@@ -814,6 +843,7 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generate(std::string_view te
                     startsWithParticleBeforeRegisteredPredicate(candidate, codepoints, inflection_, dict_manager_)) ||
                    spansCaseParticleBeforeVerifiedPredicate(candidate, codepoints, inflection_, dict_manager_) ||
                    startsInsideKanjiRunBeforeClosedNai(candidate, codepoints) ||
+                   absorbsKanaVerbCellBeforeNegative(candidate, codepoints, dict_manager_) ||
                    endsInsideVerifiedCompoundVerb(candidate, codepoints, char_types, dict_manager_);
           }),
       candidates.end());

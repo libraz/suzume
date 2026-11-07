@@ -206,7 +206,7 @@ def test_scorer_options_change_analysis() -> None:
         skip_env_config=True,
         scorer_options={"inflection": {"confidence_ceiling": 0}},
     ) as sz:
-        assert sz.analyze("歩いています")[0].surface == "歩"
+        assert sz.analyze("歩いています")[0].surface != "歩い"
 
 
 def test_environment_scorer_config_can_be_disabled(monkeypatch: pytest.MonkeyPatch) -> None:

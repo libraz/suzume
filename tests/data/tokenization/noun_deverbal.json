@@ -2001,6 +2001,33 @@
       ],
       "id": "nigiwaiga_ttta",
       "input": "にぎわいが戻った"
+    },
+    {
+      "description": "listed godan-wa nominalization keeps its span before the negative adjective",
+      "expected": [
+        {
+          "lemma": "計算",
+          "pos": "Noun",
+          "surface": "計算"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "狂い",
+          "pos": "Noun",
+          "surface": "狂い"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
+      "id": "ni_inai",
+      "input": "計算に狂いない"
     }
   ],
   "description": "noun_deverbal tests",

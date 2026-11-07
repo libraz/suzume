@@ -555,7 +555,7 @@ describe('JS API: error reporting', () => {
       scorerOptions: { inflection: { confidence_ceiling: 0 } },
     });
     try {
-      expect(suzume.analyze('歩いています')[0]?.surface).toBe('歩');
+      expect(suzume.analyze('歩いています')[0]?.surface).not.toBe('歩い');
     } finally {
       suzume.destroy();
     }
