@@ -1643,6 +1643,87 @@
       ],
       "id": "i_ga_kareta",
       "input": "笑い声大会が開かれた。"
+    },
+    {
+      "description": "目覚まし鳴らなかった - auto-generated",
+      "expected": [
+        {
+          "lemma": "目覚まし",
+          "pos": "Noun",
+          "surface": "目覚まし"
+        },
+        {
+          "lemma": "鳴る",
+          "pos": "Verb",
+          "surface": "鳴ら"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "mashi_ranakattta",
+      "input": "目覚まし鳴らなかった"
+    },
+    {
+      "description": "目覚まし時計を買った。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "目覚まし",
+          "pos": "Noun",
+          "surface": "目覚まし"
+        },
+        {
+          "lemma": "時計",
+          "pos": "Noun",
+          "surface": "時計"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "買う",
+          "pos": "Verb",
+          "surface": "買っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "mashi_wo_ttta",
+      "input": "目覚まし時計を買った。"
+    },
+    {
+      "description": "目覚ましが鳴る。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "目覚まし",
+          "pos": "Noun",
+          "surface": "目覚まし"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "鳴る",
+          "pos": "Verb",
+          "surface": "鳴る"
+        }
+      ],
+      "id": "mashiga_ru",
+      "input": "目覚ましが鳴る。"
     }
   ],
   "description": "noun_deverbal tests",

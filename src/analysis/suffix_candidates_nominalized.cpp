@@ -219,11 +219,20 @@ bool hasClosedSuffixBoundary(const std::vector<char32_t>& codepoints, size_t sta
   if (lookupEntryInRange(*dict_manager, codepoints, start_pos, end_pos, core::PartOfSpeech::Noun) != nullptr) {
     return false;
   }
+  // The final continuative is its last kanji plus the whole kana tail
+  // (越+し, 覚+まし), so a suffix opening anywhere inside it overlaps it.
+  size_t kana_tail_start = end_pos - 1;
+  while (kana_tail_start > start_pos && kana::isHiraganaCodepoint(codepoints[kana_tail_start - 1])) {
+    --kana_tail_start;
+  }
+  const size_t continuative_start = kana_tail_start - 1;
   const bool ends_in_verb_continuative =
-      end_pos > start_pos + 1 && verb_helpers::namesDictionaryVerbContinuative(dict_manager, codepoints, end_pos - 1);
+      kana_tail_start > start_pos + 1 && kana::isHiraganaCodepoint(codepoints[end_pos - 1]) &&
+      normalize::isKanjiCodepoint(codepoints[continuative_start]) &&
+      verb_helpers::namesDictionaryVerbContinuative(dict_manager, codepoints, continuative_start, end_pos - 1);
   for (size_t split = start_pos + 1; split < end_pos; ++split) {
     const std::string suffix = extractSubstring(codepoints, split, end_pos);
-    const bool overlaps_final_verb_continuative = ends_in_verb_continuative && split + 2 >= end_pos;
+    const bool overlaps_final_verb_continuative = ends_in_verb_continuative && split >= continuative_start;
     if (dict_manager->lookupExact(suffix, core::PartOfSpeech::Suffix) != nullptr) {
       if (overlaps_final_verb_continuative) {
         continue;
@@ -442,8 +451,12 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
       // nominal-forcing particle actually listed at that position is the
       // stronger evidence and settles the position as nominal (暮らし+まで).
       const size_t after_shi_pos = hiragana_end + 1;
+      // A し that closes a dictionary godan continuative is its okurigana,
+      // not する (目覚+まし: 覚ます).
+      const bool shi_closes_dictionary_continuative =
+          verb_helpers::namesDictionaryVerbContinuative(dict_manager, codepoints, kanji_end - 1, hiragana_end);
       const bool trailing_shi_is_suru = second_hiragana == U'し' && !has_particle_continuation &&
-                                        after_shi_pos < codepoints.size() &&
+                                        !shi_closes_dictionary_continuative && after_shi_pos < codepoints.size() &&
                                         opensSuruAuxiliaryOrKanji(codepoints, char_types, after_shi_pos);
       const bool selects_nominal_host = selectsNominalHost(dict_manager, codepoints, char_types, hiragana_end + 1);
       const bool has_explicit_nominal_selector =
