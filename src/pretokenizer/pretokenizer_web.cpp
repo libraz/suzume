@@ -20,6 +20,8 @@ namespace {
 // CI/CD, example.com), so splitting on them would break the search unit into
 // fragments that no query matches.
 constexpr std::string_view kAsciiWordJoiners = ".-'&/";
+constexpr std::string_view kHttpsScheme = "https://";
+constexpr std::string_view kHttpScheme = "http://";
 
 size_t trailingUnmatchedClosingParentheses(std::string_view text, size_t start, size_t end) {
   size_t open_count = 0;
@@ -60,15 +62,15 @@ void trimTrailingStopsAndCommas(std::string_view text, size_t start, size_t& end
 
 bool PreTokenizer::tryMatchUrl(std::string_view text, size_t pos, PreToken& token) const {
   // Check for http:// or https://
-  bool is_https = startsWithCI(text, pos, "https://");
-  bool is_http = !is_https && startsWithCI(text, pos, "http://");
+  bool is_https = startsWithCI(text, pos, kHttpsScheme);
+  bool is_http = !is_https && startsWithCI(text, pos, kHttpScheme);
 
   if (!is_https && !is_http) {
     return false;
   }
 
   size_t start = pos;
-  const size_t body_start = pos + (is_https ? 8 : 7);  // Skip protocol
+  const size_t body_start = pos + (is_https ? kHttpsScheme.size() : kHttpScheme.size());  // Skip protocol
   // Match URL-safe characters until whitespace or end
   size_t idx = scanAsciiRun(text, body_start, "-._~:/?#[]@!$&'()*+,;=%");
   const auto apostrophe_count = std::count(text.begin() + body_start, text.begin() + idx, '\'');

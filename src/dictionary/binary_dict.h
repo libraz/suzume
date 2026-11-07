@@ -2,7 +2,6 @@
 #define SUZUME_DICTIONARY_BINARY_DICT_H_
 
 #include <cstdint>
-#include <memory>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -13,8 +12,6 @@
 #include "dictionary/double_array.h"
 
 namespace suzume::dictionary {
-
-// ConjugationType is now defined in dictionary.h
 
 /**
  * @brief Binary dictionary header
@@ -132,7 +129,6 @@ class BinaryDictWriter {
 
   /**
    * @brief Add an entry
-   * v0.8: conj_type parameter removed
    */
   void addEntry(const DictionaryEntry& entry);
 

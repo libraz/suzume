@@ -56,6 +56,10 @@ bool isAsciiHorizontalWhitespace(char chr) {
   return chr == ' ' || chr == '\t' || chr == '\r';
 }
 
+bool isAsciiWhitespace(char chr) {
+  return isAsciiHorizontalWhitespace(chr) || chr == '\n';
+}
+
 bool isNumericField(std::string_view field) {
   if (field.empty()) {
     return false;
@@ -113,7 +117,7 @@ char detectDelimiter(std::string_view record) {
       field_has_non_space = false;
       continue;
     }
-    if (!in_quotes && chr != ' ' && chr != '\r' && chr != '\n') {
+    if (!in_quotes && !isAsciiWhitespace(chr)) {
       field_has_non_space = true;
     }
   }
@@ -168,7 +172,7 @@ ParsedRecord parseDelimitedRecord(std::string_view record, char delimiter) {
       return result;
     }
 
-    if (chr != ' ' && chr != '\t' && chr != '\r' && chr != '\n') {
+    if (!isAsciiWhitespace(chr)) {
       field_has_non_space = true;
     }
     field.push_back(chr);
@@ -311,7 +315,7 @@ core::Expected<SourceParseResult, core::Error> parseDictionarySource(std::string
       }
     } else if (!at_end && !in_quotes && (chr == '\t' || chr == ',')) {
       field_has_non_space = false;
-    } else if (!at_end && !in_quotes && chr != ' ' && chr != '\r' && chr != '\n') {
+    } else if (!at_end && !in_quotes && !isAsciiWhitespace(chr)) {
       field_has_non_space = true;
     }
 

@@ -83,6 +83,8 @@ core::Expected<LoadedSourceDictionary, core::Error> loadSourceDictionaryFromMemo
 #ifndef SUZUME_USE_EMBEDDED_DICT
 namespace fs = std::filesystem;
 
+constexpr const char* kDataDirEnvVar = "SUZUME_DATA_DIR";
+
 /**
  * @brief Get dictionary search paths in priority order
  */
@@ -96,7 +98,7 @@ std::vector<fs::path> getDictSearchPaths(const std::string& data_directory) {
   }
 
   // 2. Environment variable $SUZUME_DATA_DIR
-  if (const char* env_path = std::getenv("SUZUME_DATA_DIR")) {
+  if (const char* env_path = std::getenv(kDataDirEnvVar)) {
     paths.emplace_back(env_path);
   }
 
@@ -258,8 +260,6 @@ struct Suzume::Impl {
                                std::make_move_iterator(warnings.end()));
   }
 
-  const std::vector<std::string>& dictionaryWarnings() const { return dictionary_warnings; }
-
   explicit Impl(const SuzumeOptions& opts) : Impl(opts, loadAnalyzerConfig(opts)) {}
 
   Impl(const SuzumeOptions& opts, LoadedAnalyzerConfig loaded_config)
@@ -286,7 +286,7 @@ struct Suzume::Impl {
     }
 #ifndef SUZUME_USE_EMBEDDED_DICT
     if (opts.data_directory.empty()) {
-      if (const char* env_path = std::getenv("SUZUME_DATA_DIR")) {
+      if (const char* env_path = std::getenv(kDataDirEnvVar)) {
         dictionary_warnings.push_back("Using external dictionary directory from SUZUME_DATA_DIR: " +
                                       std::string(env_path));
       }
@@ -383,7 +383,7 @@ void Suzume::clearUserDictionaries() {
 }
 
 const std::vector<std::string>& Suzume::dictionaryWarnings() const {
-  return impl_->dictionaryWarnings();
+  return impl_->dictionary_warnings;
 }
 
 bool Suzume::hasCoreDictionary() const {
