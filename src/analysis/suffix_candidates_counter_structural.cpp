@@ -144,9 +144,19 @@ void appendStructuralCounterCandidates(const std::vector<char32_t>& codepoints, 
   // Indefinite approximate duration: 数+か+temporal counter (数か月,
   // 数か年).  数 supplies the quantity and か is the counter linker, so the
   // three-character quantity remains one search unit even before a following
-  // kanji noun such as 後.
-  if (start_pos + 2 < codepoints.size() && codepoints[start_pos] == U'数' && codepoints[start_pos + 1] == U'か' &&
-      normalize::isTemporalCounterKanji(codepoints[start_pos + 2])) {
+  // kanji noun such as 後. The interrogative quantity heads take any linked
+  // counter the same way (何か月, 幾か国), but only where the counter closes
+  // the kanji run: 何か is also the indefinite pronoun (何か+月曜日).
+  const char32_t quantity_head = codepoints[start_pos];
+  const bool interrogative_head = quantity_head == U'何' || quantity_head == U'幾';
+  const bool interrogative_linked_counter =
+      interrogative_head && start_pos + 2 < codepoints.size() &&
+      normalize::isCounterLinker(codepoints[start_pos + 1]) &&
+      normalize::isLinkedCounterKanji(codepoints[start_pos + 2]) &&
+      (start_pos + 3 >= codepoints.size() || !normalize::isKanjiCodepoint(codepoints[start_pos + 3]));
+  if (interrogative_linked_counter ||
+      (start_pos + 2 < codepoints.size() && quantity_head == U'数' && codepoints[start_pos + 1] == U'か' &&
+       normalize::isTemporalCounterKanji(codepoints[start_pos + 2]))) {
     appendCounterCandidate(codepoints, start_pos, start_pos + 3, core::PartOfSpeech::Noun,
                            candidate::kNumeralCounterMergeBonus, core::ExtendedPOS::NounNumber,
                            "indefinite_approximate_duration", candidates);
