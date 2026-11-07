@@ -28,7 +28,7 @@ from .constants import (
     VERB_NOT_AUX_LEMMAS,
     is_all_kanji,
 )
-from .mecab import is_na_adjective_stem, is_single_token_of_pos
+from .mecab import is_na_adjective_stem, is_single_token_of_pos, mecab_analyze
 
 # The word classes a terminal predicate belongs to, in the two tag vocabularies a
 # token may still be carrying at this point in the pipeline.
@@ -489,6 +489,34 @@ def correct_mecab_pos(tokens: list[dict]) -> None:
             t.update({"surface": base, "pos": "名詞", "pos_sub1": sub1, "lemma": base})
             tokens.insert(idx + 1, {"surface": "に", "pos": "助詞", "pos_sub1": "格助詞", "lemma": "に"})
             continue
+
+        # A deverbal 〜方 noun before a one-kanji suffix that 方 heads a noun with
+        # is the verb continuative plus that noun (読み方+法 is 読み+方法).
+        next_token = tokens[idx + 1] if idx + 1 < len(tokens) else {}
+        next_surface = next_token.get("surface", "")
+        if (
+            pos == "名詞"
+            and len(surface) >= 3
+            and surface.endswith("方")
+            and next_token.get("pos") == "名詞"
+            and next_token.get("pos_sub1") == "接尾"
+            and len(next_surface) == 1
+            and is_single_token_of_pos("方" + next_surface, "名詞")
+        ):
+            # ます selects the continuative alone, so it reads the stem as the verb.
+            stem_tokens = mecab_analyze(surface[:-1] + "ます")[:-1]
+            if (
+                len(stem_tokens) == 1
+                and stem_tokens[0].get("surface") == surface[:-1]
+                and stem_tokens[0].get("pos") == "動詞"
+                and stem_tokens[0].get("conj_form") == "連用形"
+            ):
+                head = "方" + next_surface
+                tokens[idx : idx + 2] = [
+                    stem_tokens[0],
+                    {"surface": head, "pos": "名詞", "pos_sub1": "一般", "lemma": head},
+                ]
+                continue
 
         # The causal formal noun ゆえ/故 is in the reference dictionary, but a
         # predicate behind it makes the analyzer prefer a reading that fits the

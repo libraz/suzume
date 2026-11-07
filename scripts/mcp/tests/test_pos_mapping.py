@@ -249,3 +249,21 @@ def test_contracted_sou_before_ka_is_the_demonstrative_adverb():
     ]
     correct_mecab_pos(tokens)
     assert (tokens[0]["pos"], tokens[0]["lemma"]) == ("副詞", "そう")
+
+
+def test_deverbal_kata_noun_before_hou_suffix_is_continuative_plus_houhou():
+    tokens = [
+        {"surface": "読み方", "pos": "名詞", "pos_sub1": "一般", "lemma": "読み方"},
+        {"surface": "法", "pos": "名詞", "pos_sub1": "接尾", "lemma": "法"},
+    ]
+    correct_mecab_pos(tokens)
+    assert [(token["surface"], token["pos"]) for token in tokens] == [("読み", "動詞"), ("方法", "名詞")]
+
+
+def test_deverbal_kata_noun_before_other_suffix_stays_whole():
+    tokens = [
+        {"surface": "読み方", "pos": "名詞", "pos_sub1": "一般", "lemma": "読み方"},
+        {"surface": "等", "pos": "名詞", "pos_sub1": "接尾", "lemma": "等"},
+    ]
+    correct_mecab_pos(tokens)
+    assert [token["surface"] for token in tokens] == ["読み方", "等"]
