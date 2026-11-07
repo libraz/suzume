@@ -1581,6 +1581,147 @@
       ],
       "id": "ga_ri_wareta",
       "input": "式典が執り行われた"
+    },
+    {
+      "description": "listed kana verb continuative after a case particle is a deverbal noun",
+      "expected": [
+        {
+          "lemma": "商店街",
+          "pos": "Noun",
+          "surface": "商店街"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "年末",
+          "pos": "Noun",
+          "surface": "年末"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "買い物",
+          "pos": "Noun",
+          "surface": "買い物"
+        },
+        {
+          "lemma": "客",
+          "pos": "Noun",
+          "surface": "客"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "にぎわい",
+          "pos": "Noun",
+          "surface": "にぎわい"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "見せる",
+          "pos": "Verb",
+          "surface": "見せ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "い"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "deha_no_i_denigiwaiwo_seteimasu",
+      "input": "商店街では、年末の買い物客でにぎわいを見せています。"
+    },
+    {
+      "description": "kana godan-wa verb opening on a particle mora keeps its wa-row lemma",
+      "expected": [
+        {
+          "lemma": "会場",
+          "pos": "Noun",
+          "surface": "会場"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "大勢",
+          "pos": "Noun",
+          "surface": "大勢"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "人",
+          "pos": "Noun",
+          "surface": "人"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "にぎわう",
+          "pos": "Verb",
+          "surface": "にぎわっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ha_no_denigiwattta",
+      "input": "会場は大勢の人でにぎわった"
+    },
+    {
+      "description": "にぎわう街 - auto-generated",
+      "expected": [
+        {
+          "lemma": "にぎわう",
+          "pos": "Verb",
+          "surface": "にぎわう"
+        },
+        {
+          "lemma": "街",
+          "pos": "Noun",
+          "surface": "街"
+        }
+      ],
+      "id": "nigiwau",
+      "input": "にぎわう街"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 11/11)",
