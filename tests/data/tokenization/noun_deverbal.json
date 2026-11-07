@@ -1825,6 +1825,84 @@
       ],
       "id": "toshi_naika_shita",
       "input": "落とし物ないか探した"
+    },
+    {
+      "description": "方 opens 方法 when an odd kanji run follows the continuative",
+      "expected": [
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読み"
+        },
+        {
+          "lemma": "方法",
+          "pos": "Noun",
+          "surface": "方法"
+        }
+      ],
+      "id": "mi_3",
+      "input": "読み方法"
+    },
+    {
+      "description": "作り方法を学ぶ - auto-generated",
+      "expected": [
+        {
+          "lemma": "作る",
+          "pos": "Verb",
+          "surface": "作り"
+        },
+        {
+          "lemma": "方法",
+          "pos": "Noun",
+          "surface": "方法"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "学ぶ",
+          "pos": "Verb",
+          "surface": "学ぶ"
+        }
+      ],
+      "id": "ri_wo_bu",
+      "input": "作り方法を学ぶ"
+    },
+    {
+      "description": "kana continuative + 方 obeys the same kanji-run parity",
+      "expected": [
+        {
+          "lemma": "やる",
+          "pos": "Verb",
+          "surface": "やり"
+        },
+        {
+          "lemma": "方法",
+          "pos": "Noun",
+          "surface": "方法"
+        }
+      ],
+      "id": "yari_2",
+      "input": "やり方法"
+    },
+    {
+      "description": "やり方改革 - auto-generated",
+      "expected": [
+        {
+          "lemma": "やり方",
+          "pos": "Noun",
+          "surface": "やり方"
+        },
+        {
+          "lemma": "改革",
+          "pos": "Noun",
+          "surface": "改革"
+        }
+      ],
+      "id": "yari_3",
+      "input": "やり方改革"
     }
   ],
   "description": "noun_deverbal tests",

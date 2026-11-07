@@ -512,6 +512,10 @@ void addVerbSuffixNounJoinCandidates(core::Lattice& lattice, std::string_view te
     if (!verb_helpers::isVerbInDictionary(&dict_manager, continuative_base)) {
       return;
     }
+    // 方 closes its compound here as after a kanji stem (やり|方法, やり方|改革).
+    if (!grammar::kanjiRunSplitsIntoWordPairsAt(codepoints, start_pos + 3)) {
+      return;
+    }
     add_join_noun_edge(start_pos + 3);
     return;
   }
