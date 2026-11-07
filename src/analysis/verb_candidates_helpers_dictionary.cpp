@@ -167,7 +167,7 @@ bool absorbsRegisteredClosedCell(const dictionary::DictionaryManager* dict_manag
   if (dict_manager == nullptr || start_pos >= kanji_end || end > codepoints.size()) {
     return false;
   }
-  for (size_t tail = kanji_end; tail + 2 <= end; ++tail) {
+  for (size_t tail = kanji_end; tail <= kanji_end + 1 && tail + 2 <= end; ++tail) {
     bool closed_cell = false;
     for (const auto& result : lookupResultsInRange(*dict_manager, codepoints, tail, end)) {
       closed_cell = closed_cell || (result.entry != nullptr && tail + result.length == end &&
@@ -499,7 +499,8 @@ bool isCommaClauseChainingRenyokei(const std::vector<char32_t>& codepoints, size
   const std::string particle_surface = extractSubstring(codepoints, start_pos - 1, start_pos);
   const auto* particle = dict_manager->lookupExact(particle_surface, core::PartOfSpeech::Particle);
   // A topic marker closes its argument just as a case particle does (彼は+微睡み、).
-  const bool follows_argument = particle != nullptr && particle_surface != "と" && particle_surface != "で" &&
+  const bool follows_argument = particle != nullptr && codepoints[start_pos - 1] != U'と' &&
+                                codepoints[start_pos - 1] != U'で' &&
                                 (particle->extended_pos == core::ExtendedPOS::ParticleCase ||
                                  particle->extended_pos == core::ExtendedPOS::ParticleTopic);
   if (follows_argument) {
@@ -609,7 +610,7 @@ bool embedsAuxiliaryOnOnbinStem(const std::vector<char32_t>& codepoints, size_t 
   }
   for (size_t aux_start = start_pos + 1; aux_start < end_pos; ++aux_start) {
     const char32_t onbin = codepoints[aux_start - 1];
-    if (onbin != U'い' && onbin != U'ん' && onbin != U'っ') {
+    if (!kana::isOnbinCodepoint(onbin)) {
       continue;
     }
     if (hasDictionaryEntryFrom(dict_manager, codepoints, aux_start, 1, end_pos - aux_start,
@@ -789,8 +790,7 @@ bool spellsVerbCellWithClassicalAuxiliaries(const dictionary::DictionaryManager*
       continue;
     }
     const char32_t head_last = codepoints[aux_start - 1];
-    const bool kanji_stem = normalize::isKanjiCodepoint(head_last) &&
-                            (isSingleKanjiIchidan(head_last) || grammar::isKuruKanjiStem(head_last));
+    const bool kanji_stem = isSingleKanjiPoliteStem(head_last);
     // A kanji stem with one i/e-row okurigana is a continuative cell (咲き, 起き).
     const bool continuative_shape = aux_start >= start_pos + 2 &&
                                     normalize::isKanjiCodepoint(codepoints[aux_start - 2]) &&

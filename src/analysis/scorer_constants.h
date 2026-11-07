@@ -14,10 +14,9 @@
 // Scorer Constants
 // =============================================================================
 // Named constants for surface-based word-cost adjustments and pattern tables used by
-// scorer.cpp. Category costs live in category_cost.h; POS-pair connection costs in
-// bigram_table.cpp. Prefer a named constant here over a raw literal in the .cpp
-// (the CI ratchet blocks new raw score literals).
-// Rationale and tuning notes are documented alongside each constant.
+// scorer_word_cost.cpp and scorer_connection_*.cpp. Category costs live in category_cost.h; POS-pair connection costs
+// in bigram_table.cpp. Prefer a named constant here over a raw literal in the .cpp (the CI ratchet blocks new raw score
+// literals). Rationale and tuning notes are documented alongside each constant.
 //
 // Naming convention:
 //   kPenalty* - increases cost (discourages pattern)
@@ -56,7 +55,7 @@ namespace suzume::analysis::scorer {
 namespace scale = bigram_cost;
 
 // =============================================================================
-// Surface-Based Cost Adjustments (scorer.cpp)
+// Surface-Based Cost Adjustments (scorer_word_cost.cpp, scorer_connection_*.cpp)
 // =============================================================================
 // These constants are used for word-cost adjustments based on surface properties.
 

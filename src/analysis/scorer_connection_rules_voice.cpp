@@ -193,8 +193,7 @@ float computePassiveCausativeBonus(const core::LatticeEdge& prev, const core::La
   // (致し) is the verb the subsidiary attaches to, not a host of its own.
   const bool can_precede_humble_subsidiary =
       (prev.pos == core::PartOfSpeech::Particle && grammar::isTeDeSurface(prev.surface)) ||
-      prev.extended_pos == core::ExtendedPOS::VerbRenyokei || prev.extended_pos == core::ExtendedPOS::VerbOnbinkei ||
-      prev.extended_pos == core::ExtendedPOS::AuxCausative ||
+      core::isVerbContinuativeForm(prev.extended_pos) || prev.extended_pos == core::ExtendedPOS::AuxCausative ||
       (prev.pos == core::PartOfSpeech::Noun && prev.origin != core::CandidateOrigin::NominalizedNoun);
   if (can_precede_humble_subsidiary && next.pos == core::PartOfSpeech::Verb &&
       grammar::isHumbleHonorificLemma(next.lemma)) {

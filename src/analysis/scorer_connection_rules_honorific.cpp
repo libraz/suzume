@@ -274,8 +274,8 @@ float computeProgressiveHonorificBonus(const core::LatticeEdge& prev, const core
   // Valid forms are: 書い, 泳い, etc. (single い after kanji)
   // Invalid: 願いい (連用形い + さらにい) - this suggests wrong verb base
   // Include VerbRenyokei since 願いい is sometimes assigned as renyokei of 願いう
-  if ((prev.extended_pos == core::ExtendedPOS::VerbOnbinkei || prev.extended_pos == core::ExtendedPOS::VerbRenyokei) &&
-      next.extended_pos == core::ExtendedPOS::AuxTenseTa && utf8::endsWith(prev.surface, "いい")) {
+  if (core::isVerbContinuativeForm(prev.extended_pos) && next.extended_pos == core::ExtendedPOS::AuxTenseTa &&
+      utf8::endsWith(prev.surface, "いい")) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
 
@@ -302,8 +302,7 @@ float computeProgressiveHonorificBonus(const core::LatticeEdge& prev, const core
   // E.g., 願い+いたし (お願いいたします), 報告+いたし (ご報告いたします),
   //       し+かね (賛成しかねます), 沿い+かね (ご期待に沿いかねます)
   // Include VerbOnbinkei since 願い is often recognized as onbin form of 願う
-  if ((prev.extended_pos == core::ExtendedPOS::VerbRenyokei || prev.extended_pos == core::ExtendedPOS::VerbOnbinkei) &&
-      next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+  if (core::isVerbContinuativeForm(prev.extended_pos) && next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
       (grammar::isSubsidiaryHonorificRenyokei(next.surface) || grammar::isModalSubsidiaryRenyokei(next.surface))) {
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryStrongBonus);
   }

@@ -54,10 +54,8 @@ class SuffixEntryRange {
  */
 SuffixEntryRange getSuffixEntries();
 
-/**
- * @brief Get list of na-adjective forming suffixes (的, etc.)
- */
-const std::array<std::string_view, 1>& getNaAdjSuffixes();
+/// Na-adjective forming suffix (理性的, 論理的, etc.)
+inline constexpr std::string_view kNaAdjSuffixTeki = "的";
 
 /**
  * Return the end of an identical repeated numeral+one-kanji unit, or zero.

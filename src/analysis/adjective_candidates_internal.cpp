@@ -285,8 +285,8 @@ bool isVerbOnbinContextAfterI(const std::vector<char32_t>& codepoints, size_t po
 }
 
 UnknownCandidate makeIAdjCandidate(const std::string& surface, size_t start, size_t end, const std::string& lemma,
-                                   float cost, [[maybe_unused]] CandidateOrigin origin,
-                                   [[maybe_unused]] float confidence, [[maybe_unused]] const char* pattern) {
+                                   float cost, CandidateOrigin origin, [[maybe_unused]] float confidence,
+                                   [[maybe_unused]] const char* pattern) {
   auto candidate =
       makeCandidate(surface, start, end, core::PartOfSpeech::Adjective, cost, false, origin, detectIAdjEpos(surface));
   candidate.lemma = lemma;
@@ -295,7 +295,7 @@ UnknownCandidate makeIAdjCandidate(const std::string& surface, size_t start, siz
 }
 
 UnknownCandidate makeNaAdjCandidate(const std::string& surface, size_t start, size_t end, float cost, bool has_suffix,
-                                    [[maybe_unused]] CandidateOrigin origin, [[maybe_unused]] float confidence,
+                                    CandidateOrigin origin, [[maybe_unused]] float confidence,
                                     [[maybe_unused]] const char* pattern) {
   auto candidate = makeCandidate(surface, start, end, core::PartOfSpeech::Adjective, cost, has_suffix, origin,
                                  core::ExtendedPOS::AdjNaAdj);

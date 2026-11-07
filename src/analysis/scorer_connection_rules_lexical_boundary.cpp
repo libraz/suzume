@@ -241,9 +241,8 @@ void addImpossibleAttachmentRules(const core::LatticeEdge& prev, const core::Lat
       final_nee_after_contracted_copula) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
-  if ((prev.extended_pos == core::ExtendedPOS::VerbRenyokei || prev.extended_pos == core::ExtendedPOS::VerbOnbinkei) &&
-      next.extended_pos == core::ExtendedPOS::AuxAspectIru && is_dialectal_oru_contraction &&
-      !mimetic_cut_at_geminate) {
+  if (core::isVerbContinuativeForm(prev.extended_pos) && next.extended_pos == core::ExtendedPOS::AuxAspectIru &&
+      is_dialectal_oru_contraction && !mimetic_cut_at_geminate) {
     SUZUME_CONNECTION_ADD(bonus, cost::kExtremeBonus);
   }
 }

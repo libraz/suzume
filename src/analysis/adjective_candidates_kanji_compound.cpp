@@ -136,7 +136,7 @@ void appendRenyokeiHostCompound(const std::vector<char32_t>& codepoints, size_t 
 }
 
 // Compound adjective: set has_suffix on existing kanji-stem ADJ candidates
-// to skip exceeds_dict_length penalty in tokenizer (薄暗い, 物悲しく, etc.)
+// to skip exceeds_dict_length penalty in tokenizer_unknown.cpp (薄暗い, 物悲しく, etc.)
 // Guards prevent false positives on suru-verb patterns (遅刻しそう, 確認して):
 //  1. First hiragana must be valid i-adj inflection char (い,く,け,か,し)
 //  2. Hiragana portion must be short (≤5 chars)

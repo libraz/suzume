@@ -225,13 +225,6 @@ SuffixEntryRange getSuffixEntries() {
   return {kSuffixes, std::size(kSuffixes)};
 }
 
-const std::array<std::string_view, 1>& getNaAdjSuffixes() {
-  static constexpr std::array<std::string_view, 1> kNaAdjSuffixes = {
-      "的",  // 理性的, 論理的, etc.
-  };
-  return kNaAdjSuffixes;
-}
-
 // =============================================================================
 // Productive Hiragana Suffix Patterns (生産的接尾辞)
 // =============================================================================

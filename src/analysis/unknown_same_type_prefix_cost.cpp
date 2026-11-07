@@ -148,7 +148,7 @@ bool priceKanjiRun(const PrefixScanContext& ctx, size_t len, size_t candidate_en
   // (御 + 尽力, 御 + 挨拶, 御 + 協力). The +2.0 penalty makes the PREFIX path
   // win over any 2+ char kanji_seq starting with 御. Lexicalized 御-X nouns
   // (御者, 御所, 御曹司) come from the dictionary and get a separate bonus
-  // in scorer.cpp to beat the prefix path.
+  // in scorer_word_cost.cpp to beat the prefix path.
   if (start_type == normalize::CharType::Kanji && len >= 2 && codepoints[start_pos] == U'御') {
     cost += 2.0F;
   }
@@ -332,7 +332,7 @@ bool priceParticleStartedRun(const PrefixScanContext& ctx, size_t len, size_t ca
       // but still generated so words like にゃんこ have a chance
       cost += 1.0F + static_cast<float>(len - 3) * 0.5F;
     }
-    // Mark as has_suffix to skip exceeds_dict_length penalty in tokenizer
+    // Mark as has_suffix to skip exceeds_dict_length penalty in tokenizer_unknown.cpp
     has_suffix = true;
   }
   if (ctx.started_with_particle && !isFollowedByNominalParticle(codepoints, candidate_end, ctx.dict_manager) &&

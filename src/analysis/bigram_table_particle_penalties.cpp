@@ -48,8 +48,8 @@ bool setParticleAndLexicalPenaltyCosts(BigramMatrix& table) {
 
       // Note: PART_接続 → PART_係 bonus is NOT set here because short particles
       // like て, し also have PART_接続 and would incorrectly bond with は, も.
-      // Instead, compound particle (≥3 chars) + topic particle bonus is handled
-      // in scorer.cpp with surface length check.
+      // Instead, compound particle (≥2 chars) + topic particle bonus is handled
+      // in scorer_connection_rules_renyokei.cpp with surface length check.
 
       // =========================================================================
       // Particle → Other penalties (prevents over-segmentation of hiragana words)

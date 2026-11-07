@@ -682,7 +682,7 @@ void addAuxiliaryChainPenalties(const KanjiVerbSelection& sel, float& base_cost)
 bool hasRecognizedVerbStem(const KanjiVerbSelection& sel, bool in_dict, bool productive_denominal_ru) {
   const auto& best = sel.best;
 
-  // Set has_suffix to skip exceeds_dict_length penalty in tokenizer.cpp
+  // Set has_suffix to skip exceeds_dict_length penalty in tokenizer_unknown.cpp
   // This applies when:
   // 1. Base form exists in dictionary as verb (in_dict)
   // 2. OR: Ichidan verb with valid i-row stem (感じる, not 人いる)

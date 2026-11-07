@@ -483,10 +483,9 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
     // Inside a longer kanji run (直接的, 再利用可能) the kanji is a suffix, not a stem.
     // A na-adjective-forming suffix (なし崩し+的) attaches rather than heads.
     const std::string one_kanji = extractSubstring(codepoints, start_pos, kanji_end);
-    const auto& na_suffixes = getNaAdjSuffixes();
     // A registered noun closing right before it leaves the kanji its own word,
     // as the multi-kanji host rule reads it (週末+暇な).
-    const bool follows_registered_noun = [&] {
+    const auto follows_registered_noun = [&] {
       constexpr size_t kMinNoun = 2;
       constexpr size_t kMaxNoun = 4;
       for (size_t length = kMinNoun; dict_manager != nullptr && length <= kMaxNoun && length <= start_pos; ++length) {
@@ -496,11 +495,10 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
         }
       }
       return false;
-    }();
+    };
     const bool opens_kanji_run =
-        (start_pos == 0 || char_types[start_pos - 1] != normalize::CharType::Kanji || follows_registered_noun) &&
-        std::none_of(na_suffixes.begin(), na_suffixes.end(),
-                     [&](const auto& suffix) { return std::string_view(suffix) == one_kanji; });
+        (start_pos == 0 || char_types[start_pos - 1] != normalize::CharType::Kanji || follows_registered_noun()) &&
+        one_kanji != kNaAdjSuffixTeki;
     const bool attributive_before_nominal =
         dict_manager != nullptr && opens_kanji_run && head < codepoints.size() && codepoints[kanji_end] == U'な' &&
         !startsLongerClosedForm(codepoints, kanji_end, dict_manager, kClosedFormAfterMixedStem, true) &&
@@ -520,12 +518,9 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
   // Keep X+的 as one tokenizer search unit while preserving its na-adjective
   // class.  A bare noun path remains available for contexts that do not
   // license the derived adjective.
-  for (const auto& suffix : getNaAdjSuffixes()) {
-    if (utf8::endsWith(kanji_seq, suffix)) {
-      candidates.push_back(makeNaAdjCandidate(kanji_seq, start_pos, kanji_end, candidate::kNaAdjTekiCost, true,
-                                              CandidateOrigin::AdjectiveNa, 1.0F, "na_adjective_teki"));
-      break;
-    }
+  if (utf8::endsWith(kanji_seq, kNaAdjSuffixTeki)) {
+    candidates.push_back(makeNaAdjCandidate(kanji_seq, start_pos, kanji_end, candidate::kNaAdjTekiCost, true,
+                                            CandidateOrigin::AdjectiveNa, 1.0F, "na_adjective_teki"));
   }
 
   // Pattern 2: Check for kanji compound + na-adjective continuation (e.g., 獰猛な, 変だ).

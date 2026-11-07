@@ -178,7 +178,7 @@ bool setVerbAndAdjectiveCosts(BigramMatrix& table) {
 
       // Note: VerbRenyokei → AuxTenseTa is NOT set here because it would incorrectly
       // favor て as AUX over Particle. Ichidan た-form split (食べ+た) needs surface-based
-      // handling in scorer.cpp to distinguish た from て.
+      // handling to distinguish た from て.
 
       // VerbOnbinkei → AuxTenseTa (書い+た, 泳い+だ) - strong bonus
       {EPOS::VerbOnbinkei, EPOS::AuxTenseTa, cost::kStrongBonus},

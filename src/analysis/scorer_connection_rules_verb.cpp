@@ -89,8 +89,8 @@ float computeTaFormVolitionalBonus(const core::LatticeEdge& prev, const core::La
   // Without this, た(AuxTenseTa) wins over たり(ParticleConj) due to strong た bonus
   // Accept dictionary-backed hiragana forms too (なっ+たり), while excluding
   // unknown pure-hiragana sound-symbolic forms (まっ+たり).
-  if ((prev.extended_pos == core::ExtendedPOS::VerbRenyokei || prev.extended_pos == core::ExtendedPOS::VerbOnbinkei) &&
-      (next.surface == "たり" || next.surface == "だり") && next.extended_pos == core::ExtendedPOS::ParticleConj &&
+  if (core::isVerbContinuativeForm(prev.extended_pos) && (next.surface == "たり" || next.surface == "だり") &&
+      next.extended_pos == core::ExtendedPOS::ParticleConj &&
       (grammar::containsKanji(prev.surface) || prev.fromDictionary())) {
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryStrongBonus);
   }

@@ -531,9 +531,8 @@ bool hasCompleteInternalConstituentBoundary(const core::Lattice& lattice,
           right_is_formal_noun &&
           (left_pos == core::PartOfSpeech::Auxiliary ||
            (left_verified && (left_pos == core::PartOfSpeech::Verb || left_pos == core::PartOfSpeech::Adjective)));
-      const bool licenses_connective_particle =
-          right_is_connective_particle && left_pos == core::PartOfSpeech::Verb &&
-          (left_epos == core::ExtendedPOS::VerbRenyokei || left_epos == core::ExtendedPOS::VerbOnbinkei);
+      const bool licenses_connective_particle = right_is_connective_particle && left_pos == core::PartOfSpeech::Verb &&
+                                                core::isVerbContinuativeForm(left_epos);
       const bool licenses_nominal_particle =
           right_is_nominal_particle && left_verified &&
           (left_pos == core::PartOfSpeech::Noun || left_pos == core::PartOfSpeech::Pronoun);

@@ -145,8 +145,7 @@ void addSingleKanjiNounHostRules(const core::LatticeEdge& prev, const core::Latt
   //            so the shape this penalty describes is the correct one for it
   if (prev.pos == core::PartOfSpeech::Noun && prev.extended_pos != core::ExtendedPOS::NounNumber &&
       normalize::utf8Length(prev.surface) == 1 &&  // Single char
-      next.pos == core::PartOfSpeech::Verb &&
-      (next.extended_pos == core::ExtendedPOS::VerbRenyokei || next.extended_pos == core::ExtendedPOS::VerbOnbinkei) &&
+      next.pos == core::PartOfSpeech::Verb && core::isVerbContinuativeForm(next.extended_pos) &&
       !(grammar::isSuruRenyokeiSurface(next.surface) && prev.fromDictionary()) &&   // サ変動詞パターン
       !grammar::isBoundDerivationalSuffixVerbLemma(next.lemma) &&                   // 束縛派生接尾辞
       !kana::isKatakanaCodepoint(utf8::decodeFirstChar(next.surface)) &&            // Exclude katakana verbs

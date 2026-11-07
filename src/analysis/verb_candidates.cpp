@@ -199,13 +199,15 @@ void generateKatakanaVerbCandidates(const std::vector<char32_t>& codepoints, siz
   const char32_t stem_final = codepoints[kata_end - 1];
   const char32_t stem_final_hiragana =
       stem_final >= kKatakanaFirst && stem_final <= kKatakanaLast ? stem_final - kKatakanaToHiragana : 0;
+  // Full-size e/i-row mora only: a run closing on ペン, カフェ, コーヒー has no ichidan reading.
+  const bool ichidan_stem_final = kana::isIOrERowCodepoint(stem_final_hiragana);
   if (dict_manager != nullptr && opens_katakana_run && !has_long_vowel_mark) {
     // A content word reaching past the selecting auxiliary is the reading the
     // kana belongs to (ケーキ+たべた, ケーキ+たのしみ), not the auxiliary.
     size_t selecting_end = 0;
     size_t content_end = 0;
     bool selects_irrealis = false;
-    if (kana::isIOrERowCodepoint(stem_final_hiragana)) {
+    if (ichidan_stem_final) {
       for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, kata_end, hira_end)) {
         if (match.entry == nullptr) {
           continue;
@@ -320,10 +322,6 @@ void generateKatakanaVerbCandidates(const std::vector<char32_t>& codepoints, siz
       // Cost: 0.4-0.55 based on confidence (lower = better)
       float cost = candidate::confidenceScaledCost(verb_opts.base_cost_standard, best.confidence,
                                                    verb_opts.confidence_cost_scale);
-      // An ichidan stem ends on a full-size e-row or i-row mora, so a run closing
-      // on anything else (ペン, カフェ, コーヒー) has no ichidan reading at all.
-      const bool small_vowel = utf8::equalsAny(normalize::encodeUtf8(stem_final), {"ァ", "ィ", "ゥ", "ェ", "ォ"});
-      const bool ichidan_stem_final = !small_vowel && kana::isIOrERowCodepoint(stem_final_hiragana);
       const bool whole_negative_form = best.verb_type == grammar::VerbType::Ichidan &&
                                        vh::naiNegativeFormLengthAt(codepoints, kata_end) == end_pos - kata_end;
       if (whole_negative_form && splits_negative_stem) {

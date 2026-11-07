@@ -687,7 +687,6 @@ bool setParticleAndLexicalCosts(BigramMatrix& table) {
       // Verb renyokei directly followed by another verb in onbin form only occurs
       // in compound verbs (突き刺さる, 走り出す). When the compound is in the
       // dictionary, the merged token should be preferred over the split path.
-      // Surface-based bonus in scorer.cpp adds extra penalty for kanji verbs.
       {EPOS::VerbRenyokei, EPOS::VerbOnbinkei, cost::kNegligible},
 
       // AdjBasic → VerbMizenkei (盛りだく+さ) - strong penalty

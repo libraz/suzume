@@ -67,7 +67,7 @@ bool startsPastAuxiliaryBeforeQuote(const std::vector<char32_t>& codepoints, siz
     return false;
   }
   const char32_t preceding = codepoints[start_pos - 1];
-  const bool follows_onbin = preceding == U'い' || preceding == U'ん' || preceding == core::hiragana::kSmallTsu;
+  const bool follows_onbin = kana::isOnbinCodepoint(preceding);
   return follows_onbin && lookupEntryInRange(*dict_manager, codepoints, start_pos, start_pos + 1,
                                              core::PartOfSpeech::Auxiliary) != nullptr;
 }
@@ -332,7 +332,7 @@ void appendHiraganaRenyokeiBeforeFormalNoun(const std::vector<char32_t>& codepoi
       return;
     }
     SUZUME_DEBUG_LOG_VERBOSE("[VERB_CAND] " << stem << " hiragana_renyokei_before_formal_noun\n");
-    candidates.push_back(makeVerbCandidate(stem, start_pos, stem_end, candidate::verb_cost::kStrongBonus, stem + "る",
+    candidates.push_back(makeVerbCandidate(stem, start_pos, stem_end, candidate::verb_cost::kStrongBonus, terminal,
                                            dictionary::ConjugationType::Ichidan, true, CandidateOrigin::VerbHiragana,
                                            candidate::kHighOriginConfidence, "hiragana_renyokei_before_formal_noun",
                                            core::ExtendedPOS::VerbRenyokei));
