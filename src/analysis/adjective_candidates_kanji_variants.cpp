@@ -167,7 +167,7 @@ void appendIAdjClassicalAttributiveCandidates(const std::vector<char32_t>& codep
     // Attributive form connects like the basic form (ADJ + 体言).
     candidates.push_back(adj_detail::makeIAdjCellCandidate(
         ki_surface, start_pos, ki_pos + 1, ki_lemma, core::ExtendedPOS::AdjBasic, candidate::verb_cost::kStrongBonus,
-        CandidateOrigin::AdjectiveI, 0.8F, "i_adjective_classical_ki"));
+        CandidateOrigin::AdjectiveI, candidate::kStandardOriginConfidence, "i_adjective_classical_ki"));
   }
 }
 

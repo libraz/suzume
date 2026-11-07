@@ -347,8 +347,9 @@ void appendGodanMizenkeiPassiveCausativeCandidates(const std::vector<char32_t>& 
   SUZUME_DEBUG_LOG("[VERB_CAND] " << surface << " godan_mizenkei_passive lemma=" << base_form << " cost=" << kCost
                                   << "\n");
   candidates.push_back(makeVerbCandidate(surface, start_pos, kanji_end + 1, kCost, base_form,
-                                         grammar::verbTypeToConjType(verb_type), true, CandidateOrigin::VerbKanji, 0.8F,
-                                         "godan_mizenkei_passive", core::ExtendedPOS::VerbMizenkei));
+                                         grammar::verbTypeToConjType(verb_type), true, CandidateOrigin::VerbKanji,
+                                         candidate::kStandardOriginConfidence, "godan_mizenkei_passive",
+                                         core::ExtendedPOS::VerbMizenkei));
 }
 
 // Contracted sa-row mizenkei: kanji + しゃ + れ/せ/し
@@ -379,9 +380,10 @@ void appendSaRowContractedMizenkeiCandidates(const std::vector<char32_t>& codepo
   constexpr float kCost = candidate::verb_cost::kWeakPenalty;
   SUZUME_DEBUG_LOG("[VERB_CAND] " << surface << " godan_sa_contracted_mizenkei lemma=" << base_form << " cost=" << kCost
                                   << "\n");
-  candidates.push_back(makeVerbCandidate(
-      surface, start_pos, kanji_end + 2, kCost, base_form, grammar::verbTypeToConjType(grammar::VerbType::GodanSa),
-      false, CandidateOrigin::VerbKanji, 0.8F, "godan_sa_contracted_mizenkei", core::ExtendedPOS::VerbMizenkei));
+  candidates.push_back(makeVerbCandidate(surface, start_pos, kanji_end + 2, kCost, base_form,
+                                         grammar::verbTypeToConjType(grammar::VerbType::GodanSa), false,
+                                         CandidateOrigin::VerbKanji, candidate::kStandardOriginConfidence,
+                                         "godan_sa_contracted_mizenkei", core::ExtendedPOS::VerbMizenkei));
 }
 
 // Godan mizenkei pattern: kanji + mizenkei ending + a classical negative
@@ -493,9 +495,10 @@ void appendGodanMizenkeiZuCandidates(const std::vector<char32_t>& codepoints, si
       constexpr float kCost = candidate::verb_cost::kWeakPenalty;
       SUZUME_DEBUG_LOG("[VERB_CAND] " << surface << " godan_mizenkei_zu lemma=" << base_form << " cost=" << kCost
                                       << "\n");
-      auto candidate = makeVerbCandidate(surface, start_pos, negative_pos, kCost, base_form,
-                                         grammar::verbTypeToConjType(verb_type), true, CandidateOrigin::VerbKanji, 0.8F,
-                                         "godan_mizenkei_zu", core::ExtendedPOS::VerbMizenkei);
+      auto candidate =
+          makeVerbCandidate(surface, start_pos, negative_pos, kCost, base_form, grammar::verbTypeToConjType(verb_type),
+                            true, CandidateOrigin::VerbKanji, candidate::kStandardOriginConfidence, "godan_mizenkei_zu",
+                            core::ExtendedPOS::VerbMizenkei);
       candidate.lemma_verified = dictionary_verified;
       candidates.push_back(std::move(candidate));
     }

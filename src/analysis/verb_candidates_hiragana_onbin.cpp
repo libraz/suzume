@@ -693,8 +693,8 @@ void appendIchidanRenyokei1CharCandidates(const std::vector<char32_t>& codepoint
   // Explicit VerbRenyokei for て/た connection
   candidates.push_back(makeVerbCandidate(
       stem_surface, start_pos, start_pos + 1, kCost, base_form, dictionary::ConjugationType::Ichidan, true,
-      predicate_slot_ichidan ? CandidateOrigin::VerbHiraganaInflectedRenyokei : CandidateOrigin::VerbHiragana, 0.8F,
-      "hiragana_ichidan_renyokei_1char", core::ExtendedPOS::VerbRenyokei));
+      predicate_slot_ichidan ? CandidateOrigin::VerbHiraganaInflectedRenyokei : CandidateOrigin::VerbHiragana,
+      candidate::kStandardOriginConfidence, "hiragana_ichidan_renyokei_1char", core::ExtendedPOS::VerbRenyokei));
 }
 
 void appendSubjectGenitiveIchidanBeforeFormalNoun(const std::vector<char32_t>& codepoints, size_t start_pos,

@@ -129,6 +129,9 @@ constexpr float kEmphaticCharacterPenalty = 0.3F;
 // ない-family negative).
 constexpr float kHighOriginConfidence = 0.9F;
 
+// Origin-confidence for a rule-derived candidate whose shape is checked but whose context is not.
+constexpr float kStandardOriginConfidence = 0.8F;
+
 // A verified V1 continuative plus a complete closed-class V2 is one
 // productive search unit.  This small category-level preference prevents the
 // independently valid V1+V2 path from winning on dictionary word priors alone.
