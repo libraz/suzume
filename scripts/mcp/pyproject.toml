@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "MCP server for Suzume Japanese morphological analysis tools"
 requires-python = ">=3.11"
 dependencies = [
-    "mcp>=1.0,<2",
+    "mcp>=2.0,<3",
     "regex",
 ]
 

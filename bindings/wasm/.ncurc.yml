@@ -11,6 +11,11 @@
 # and node-version in .github/workflows/publish.yml);
 # a bump there is what unblocks such packages.
 #
-# Empty today: Node 22.23.2 satisfies the current devDependency floors
-# (e.g. lint-staged 17.x requires Node >=22.22.1).
-reject: []
+# A reject only stops ncu from rewriting the range; the held package is also
+# pinned exactly in package.json.
+reject:
+  # @biomejs/biome: 2.6.6 panics ("path is expected to be under the root" in the
+  # ignore crate) on `biome check --config-path ../../examples/ts/biome.json`,
+  # which `yarn lint` runs; 2.5.10 passes. Release the hold once a newer biome
+  # fixes that invocation.
+  - "@biomejs/biome"
