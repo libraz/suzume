@@ -268,7 +268,7 @@ VerbType Conjugation::detectType(std::string_view base_form) {
   const std::string_view last = utf8::lastChar(base_form);
 
   // Special verbs
-  if (utf8::equalsAny(base_form, {"来る", "くる"})) {
+  if (isKuruKanjiBaseForm(base_form) || utf8::equalsAny(base_form, {"くる"})) {
     return VerbType::Kuru;
   }
 

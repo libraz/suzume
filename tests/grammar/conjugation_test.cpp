@@ -82,6 +82,8 @@ TEST_F(ConjugationTest, DetectTypeSuru) {
 TEST_F(ConjugationTest, DetectTypeKuru) {
   EXPECT_EQ(conjugator_.detectType("来る"), VerbType::Kuru);
   EXPECT_EQ(conjugator_.detectType("くる"), VerbType::Kuru);
+  // The old spelling is the same verb (isKuruKanjiBaseForm), not a godan ra-row verb.
+  EXPECT_EQ(conjugator_.detectType("來る"), VerbType::Kuru);
 }
 
 TEST_F(ConjugationTest, DetectTypeIAdjective) {
