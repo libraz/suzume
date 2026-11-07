@@ -11,6 +11,7 @@
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "grammar/honorific_verbs.h"
+#include "normalize/char_type.h"
 #include "normalize/utf8.h"
 #include "tokenizer_dictionary_internal.h"
 #include "verb_candidates_auxiliary_patterns.h"
@@ -85,6 +86,18 @@ bool lacksLicensingEnvironment(const DictionaryCandidateContext& ctx, const core
       !hasPrecedingExtendedPOS(
           lattice, start_pos,
           {core::ExtendedPOS::VerbRenyokei, core::ExtendedPOS::AuxPassive, core::ExtendedPOS::AuxCausative})) {
+    return true;
+  }
+
+  // The contracted nominalizer ん closes a predicate's clause and is followed
+  // by the copula or a particle (行く+ん+だ, ない+ん+です); a kanji, katakana or
+  // numeral word right after it is no continuation it can take, so the mora
+  // belongs to the word in front (フォロワー+さん+1000人).
+  if (result.entry->extended_pos == core::ExtendedPOS::ParticleNo && result.length == 1 &&
+      codepoints[start_pos] == core::hiragana::kN && end_pos < codepoints.size() &&
+      (normalize::classifyChar(codepoints[end_pos]) == normalize::CharType::Kanji ||
+       normalize::classifyChar(codepoints[end_pos]) == normalize::CharType::Katakana ||
+       normalize::isNumeralCodepoint(codepoints[end_pos]))) {
     return true;
   }
 

@@ -924,6 +924,90 @@
       ],
       "id": "o_isasetekudasai",
       "input": "お手伝いさせてください"
+    },
+    {
+      "description": "Honorific さん before a numeral; contracted ん cannot precede a numeral word",
+      "expected": [
+        {
+          "lemma": "フォロワー",
+          "pos": "Noun",
+          "surface": "フォロワー"
+        },
+        {
+          "lemma": "さん",
+          "pos": "Suffix",
+          "surface": "さん"
+        },
+        {
+          "lemma": "1000人",
+          "pos": "Noun",
+          "surface": "1000人"
+        },
+        {
+          "lemma": "ありがとう",
+          "pos": "Interjection",
+          "surface": "ありがとう"
+        },
+        {
+          "lemma": "ござる",
+          "pos": "Auxiliary",
+          "surface": "ござい"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        },
+        {
+          "lemma": "🙏",
+          "pos": "Other",
+          "surface": "🙏"
+        }
+      ],
+      "id": "san1000_arigatougozaimasu",
+      "input": "フォロワーさん1000人ありがとうございます🙏"
+    },
+    {
+      "description": "Honorific さん before a full-width numeral",
+      "expected": [
+        {
+          "lemma": "店員",
+          "pos": "Noun",
+          "surface": "店員"
+        },
+        {
+          "lemma": "さん",
+          "pos": "Suffix",
+          "surface": "さん"
+        },
+        {
+          "lemma": "10人",
+          "pos": "Noun",
+          "surface": "10人"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "働く",
+          "pos": "Verb",
+          "surface": "働い"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "san_ga_iteiru",
+      "input": "店員さん１０人が働いている"
     }
   ],
   "description": "honorific tests",
