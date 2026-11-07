@@ -31,6 +31,11 @@ struct LatticeEdge {
   // in release and WASM builds so their tokenization matches debug builds.
   CandidateOrigin origin{CandidateOrigin::Unknown};
 
+  // Internal proof that this counted noun has a finite existential continuation.
+  // This survives candidate insertion so connection rules can distinguish
+  // quantity + いる + finite auxiliary from unrelated short verb fragments.
+  bool has_finite_existential_continuation{false};
+
 #ifdef SUZUME_DEBUG_INFO
   float origin_confidence{0.0F};   // Inflection confidence (for debug)
   std::string_view origin_detail;  // Pattern detail (e.g., "ichidan_te_form")
@@ -91,13 +96,14 @@ class Lattice {
    * @param origin_detail Origin detail pattern for debug (optional)
    * @param extended_pos Extended POS for bigram (optional, defaults from pos)
    * @param epos_source Where ExtendedPOS was determined (optional, for debug)
+   * @param has_finite_existential_continuation Internal finite-いる context proof
    * @return Edge ID
    */
   size_t addEdge(std::string_view surface, uint32_t start, uint32_t end, PartOfSpeech pos, float cost, uint8_t flags,
                  std::string_view lemma = {}, dictionary::ConjugationType conj_type = dictionary::ConjugationType::None,
                  CandidateOrigin origin = CandidateOrigin::Unknown, float origin_confidence = 0.0F,
                  std::string_view origin_detail = {}, ExtendedPOS extended_pos = ExtendedPOS::Unknown,
-                 std::string_view epos_source = {});
+                 std::string_view epos_source = {}, bool has_finite_existential_continuation = false);
 
   /**
    * @brief Get all edges starting at a position

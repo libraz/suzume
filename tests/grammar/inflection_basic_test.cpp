@@ -20,6 +20,15 @@ class InflectionBasicTest : public ::testing::Test {
 
 // ===== Basic verb conjugations =====
 
+TEST_F(InflectionBasicTest, AuxiliaryOutputRequiresCompleteSurface) {
+  EXPECT_TRUE(inflection_.auxiliaryProvidesConnection("た", conn::kAuxOutTa));
+  EXPECT_TRUE(inflection_.auxiliaryProvidesConnection("ます", conn::kAuxOutMasu));
+  EXPECT_FALSE(inflection_.auxiliaryProvidesConnection("まし", conn::kAuxOutMasu));
+  EXPECT_TRUE(inflection_.auxiliaryProvidesConnection("いた", conn::kAuxOutTa));
+  EXPECT_FALSE(inflection_.auxiliaryProvidesConnection("xた", conn::kAuxOutTa));
+  EXPECT_FALSE(inflection_.auxiliaryProvidesConnection("", conn::kAuxOutTa));
+}
+
 TEST_F(InflectionBasicTest, GodanVerbTeForm) {
   auto result = inflection_.getBest("書いて");
   EXPECT_EQ(result.base_form, "書く");

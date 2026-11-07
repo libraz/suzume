@@ -24,7 +24,7 @@ size_t Lattice::addEdge(std::string_view surface, uint32_t start, uint32_t end, 
                         uint8_t flags, std::string_view lemma, dictionary::ConjugationType conj_type,
                         CandidateOrigin origin, [[maybe_unused]] float origin_confidence,
                         [[maybe_unused]] std::string_view origin_detail, ExtendedPOS extended_pos,
-                        [[maybe_unused]] std::string_view epos_source) {
+                        [[maybe_unused]] std::string_view epos_source, bool has_finite_existential_continuation) {
   if (start >= end || end > text_length_ || !isValidPartOfSpeech(pos) || !isValidExtendedPos(extended_pos) ||
       all_edges_.size() >= kMaxEdges) {
     return static_cast<size_t>(-1);
@@ -75,6 +75,7 @@ size_t Lattice::addEdge(std::string_view surface, uint32_t start, uint32_t end, 
   edge.lemma = stored_lemma;
   edge.conj_type = conj_type;
   edge.origin = origin;
+  edge.has_finite_existential_continuation = has_finite_existential_continuation;
 #ifdef SUZUME_DEBUG_INFO
   edge.origin_confidence = origin_confidence;
   edge.origin_detail = stored_origin_detail;

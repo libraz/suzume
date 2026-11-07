@@ -82,6 +82,9 @@ class Inflection {
    */
   InflectionCandidate getBest(std::string_view surface) const;
 
+  /// Whether a complete auxiliary surface provides the given connection.
+  bool auxiliaryProvidesConnection(std::string_view surface, uint16_t right_id) const;
+
  private:
   static constexpr size_t kMaxCacheEntries = 4096;
 

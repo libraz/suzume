@@ -54,6 +54,13 @@ std::vector<std::pair<const AuxiliaryEntry*, size_t>> Inflection::matchAuxiliari
   return matches;
 }
 
+bool Inflection::auxiliaryProvidesConnection(std::string_view surface, uint16_t right_id) const {
+  const auto matches = matchAuxiliaries(surface);
+  return std::any_of(matches.begin(), matches.end(), [&](const auto& match) {
+    return match.second == surface.size() && match.first->right_id == right_id;
+  });
+}
+
 std::vector<InflectionCandidate> Inflection::matchVerbStem(std::string_view remaining,
                                                            const std::vector<std::string>& aux_chain,
                                                            uint16_t required_conn) const {

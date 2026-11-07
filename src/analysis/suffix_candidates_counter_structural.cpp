@@ -14,6 +14,7 @@
 #include "suffix_candidates_counter_internal.h"
 #include "tokenizer_utils.h"
 #include "unknown.h"
+#include "verb_candidates_dictionary_probes.h"
 
 namespace suzume::analysis::counter_detail {
 namespace {
@@ -160,6 +161,23 @@ void appendStructuralCounterCandidates(const std::vector<char32_t>& codepoints, 
     appendCounterCandidate(codepoints, start_pos, start_pos + 3, core::PartOfSpeech::Noun,
                            candidate::kNumeralCounterMergeBonus, core::ExtendedPOS::NounNumber,
                            "indefinite_approximate_duration", candidates);
+  }
+
+  // An interrogative head directly followed by a counter forms one nominal
+  // quantity (何人, 幾人). Keep the same kanji-run boundary as numeral+counter
+  // candidates so a following kanji noun is not absorbed (何人家族), and leave
+  // the linked 何か月/幾か国 path above with its existing NounNumber metadata.
+  const size_t interrogative_counter_start = start_pos + 1;
+  if (interrogative_head && interrogative_counter_start < codepoints.size()) {
+    const size_t counter_run_end =
+        verb_helpers::counterKanjiRunEnd(dict_manager, codepoints, interrogative_counter_start, codepoints.size());
+    if (counter_run_end > interrogative_counter_start &&
+        normalize::isCounterKanji(codepoints[interrogative_counter_start]) &&
+        (counter_run_end >= char_types.size() || char_types[counter_run_end] != normalize::CharType::Kanji)) {
+      appendCounterCandidate(codepoints, start_pos, counter_run_end, core::PartOfSpeech::Noun,
+                             candidate::kNumeralCounterMergeBonus, core::ExtendedPOS::Unknown,
+                             "interrogative_kanji_counter", candidates);
+    }
   }
 
   // Repeated numeral-counter units are distributive quantity expressions
