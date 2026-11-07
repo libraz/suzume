@@ -186,6 +186,27 @@ bool lacksLicensingEnvironment(const DictionaryCandidateContext& ctx, const core
     }
   }
 
+  // An adverb spelled like a geminate past (たった) modifies a quantity or the
+  // predicate (たった三人, 彼が+たった今+来た). After a case-marked argument and
+  // before a non-quantity nominal that takes a particle it is that past heading
+  // a relative clause (時間が+たっ+た+今+も).
+  if (result.entry->pos == core::PartOfSpeech::Adverb && result.length >= 3 && end_pos < codepoints.size() &&
+      codepoints[end_pos - 2] == core::hiragana::kSmallTsu && codepoints[end_pos - 1] == U'た' &&
+      normalize::classifyChar(codepoints[end_pos]) == normalize::CharType::Kanji &&
+      !normalize::isNumeralCodepoint(codepoints[end_pos]) &&
+      lookupEntryInRange(dict_manager, codepoints, start_pos, end_pos - 1, core::PartOfSpeech::Verb) != nullptr &&
+      verb_helpers::oneMoraParticleEndsAt(&dict_manager, codepoints, start_pos, core::ExtendedPOS::ParticleCase)) {
+    size_t nominal_end = end_pos;
+    while (nominal_end < codepoints.size() &&
+           normalize::classifyChar(codepoints[nominal_end]) == normalize::CharType::Kanji) {
+      ++nominal_end;
+    }
+    if (lookupEntryInRange(dict_manager, codepoints, nominal_end, nominal_end + 1, core::PartOfSpeech::Particle) !=
+        nullptr) {
+      return true;
+    }
+  }
+
   // The u-onbin とう of the desiderative stands on a continuative before the
   // negative or the humble predicates it heads (食べ+とう+ない, 行き+とう+ござる).
   if (result.entry->extended_pos == core::ExtendedPOS::AuxDesireTai && result.entry->lemma != result.entry->surface &&

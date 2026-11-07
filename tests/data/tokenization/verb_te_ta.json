@@ -2076,6 +2076,187 @@
       ],
       "id": "tatttane",
       "input": "当たったね"
+    },
+    {
+      "description": "geminate past after a case-marked argument heads a relative clause on 今",
+      "expected": [
+        {
+          "lemma": "発生",
+          "pos": "Noun",
+          "surface": "発生"
+        },
+        {
+          "lemma": "から",
+          "pos": "Particle",
+          "surface": "から"
+        },
+        {
+          "lemma": "1週間",
+          "pos": "Noun",
+          "surface": "1週間"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "たつ",
+          "pos": "Verb",
+          "surface": "たっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "今",
+          "pos": "Noun",
+          "surface": "今"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "復旧",
+          "pos": "Noun",
+          "surface": "復旧"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "めど",
+          "pos": "Noun",
+          "surface": "めど"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "立つ",
+          "pos": "Verb",
+          "surface": "立っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "い"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "kara1_gatattta_mo_nomedoha_ttteinai",
+      "input": "発生から1週間がたった今も、復旧のめどは立っていない。"
+    },
+    {
+      "description": "たっ+た+今 after が before a particle",
+      "expected": [
+        {
+          "lemma": "時間",
+          "pos": "Noun",
+          "surface": "時間"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "たつ",
+          "pos": "Verb",
+          "surface": "たっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "今",
+          "pos": "Noun",
+          "surface": "今"
+        },
+        {
+          "lemma": "でも",
+          "pos": "Particle",
+          "surface": "でも"
+        },
+        {
+          "lemma": "覚える",
+          "pos": "Verb",
+          "surface": "覚え"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "gatattta_demo_eteiru",
+      "input": "時間がたった今でも覚えている"
+    },
+    {
+      "description": "control: the adverb たった before a quantity after が",
+      "expected": [
+        {
+          "lemma": "残り",
+          "pos": "Noun",
+          "surface": "残り"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "たった",
+          "pos": "Adverb",
+          "surface": "たった"
+        },
+        {
+          "lemma": "三人",
+          "pos": "Noun",
+          "surface": "三人"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "rigatattta_ninattta",
+      "input": "残りがたった三人になった"
     }
   ],
   "description": "Te-form and ta-form patterns",
