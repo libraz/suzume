@@ -197,6 +197,19 @@ void generateSelectedNominalHeadCandidates(const std::vector<char32_t>& codepoin
                                            std::vector<UnknownCandidate>& candidates);
 
 /**
+ * @brief Return true when a kana span opens on an attributive predicate that
+ *        runs into, or up to, a registered formal noun (いう+こと, し+た+こと).
+ *
+ * Such a span is a relative clause and its formal noun, so no nominal rescue
+ * may read it as one unknown noun; a の in front of it marks the clause's
+ * subject rather than selecting the span as a genitive head.
+ */
+bool spansPredicateBeforeFormalNoun(const std::vector<char32_t>& codepoints,
+                                    const std::vector<normalize::CharType>& char_types, size_t start_pos,
+                                    size_t head_end, const grammar::Inflection& inflection,
+                                    const dictionary::DictionaryManager& dict_manager);
+
+/**
  * @brief Return true when a span is exactly two registered auxiliaries (ぬ+べし)
  *
  * A chain of closed-class forms spells no open-class word, so a predicate

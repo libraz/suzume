@@ -319,7 +319,61 @@ bool closedClassEntryCrossesEnd(const dictionary::DictionaryManager& dict_manage
   return false;
 }
 
+// Whether codepoints[start, end) is an attributive predicate: a verb terminal,
+// or a verb form closed by one registered auxiliary (し+た, つくっ+た). The
+// verb is a dictionary entry or one of the generated kana verbs.
+bool spellsAttributivePredicate(const dictionary::DictionaryManager& dict_manager,
+                                const std::vector<char32_t>& codepoints, size_t start, size_t end,
+                                const std::vector<UnknownCandidate>& generated_verbs) {
+  const auto closes_with_auxiliary = [&](size_t verb_end) {
+    return verb_end < end &&
+           lookupEntryInRange(dict_manager, codepoints, verb_end, end, core::PartOfSpeech::Auxiliary) != nullptr;
+  };
+  for (const auto& match : lookupResultsInRange(dict_manager, codepoints, start, end)) {
+    if (match.entry == nullptr || match.entry->pos != core::PartOfSpeech::Verb) {
+      continue;
+    }
+    if ((start + match.length == end && match.entry->extended_pos == core::ExtendedPOS::VerbShuushikei) ||
+        closes_with_auxiliary(start + match.length)) {
+      return true;
+    }
+  }
+  return std::any_of(generated_verbs.begin(), generated_verbs.end(), [&](const UnknownCandidate& verb) {
+    return verb.pos == core::PartOfSpeech::Verb &&
+           ((verb.end == end && verb.extended_pos == core::ExtendedPOS::VerbShuushikei) ||
+            closes_with_auxiliary(verb.end));
+  });
+}
+
 }  // namespace
+
+bool spansPredicateBeforeFormalNoun(const std::vector<char32_t>& codepoints,
+                                    const std::vector<normalize::CharType>& char_types, size_t start_pos,
+                                    size_t head_end, const grammar::Inflection& inflection,
+                                    const dictionary::DictionaryManager& dict_manager) {
+  constexpr size_t kFormalNounProbe = 4;
+  std::vector<UnknownCandidate> generated_verbs;
+  bool generated = false;
+  for (size_t split = start_pos + 1; split <= head_end; ++split) {
+    const auto matches =
+        lookupResultsInRange(dict_manager, codepoints, split, std::min(codepoints.size(), split + kFormalNounProbe));
+    const bool opens_formal_noun = std::any_of(matches.begin(), matches.end(), [](const auto& match) {
+      return match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Noun &&
+             match.entry->extended_pos == core::ExtendedPOS::NounFormal;
+    });
+    if (!opens_formal_noun) {
+      continue;
+    }
+    if (!generated && char_types[start_pos] == normalize::CharType::Hiragana) {
+      generated_verbs = generateHiraganaVerbCandidates(codepoints, start_pos, char_types, inflection, &dict_manager);
+      generated = true;
+    }
+    if (spellsAttributivePredicate(dict_manager, codepoints, start_pos, split, generated_verbs)) {
+      return true;
+    }
+  }
+  return false;
+}
 
 void generateSelectedNominalHeadCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                            const std::vector<normalize::CharType>& char_types,
@@ -476,7 +530,8 @@ void generateSelectedNominalHeadCandidates(const std::vector<char32_t>& codepoin
         std::any_of(predicate_candidates.begin(), predicate_candidates.end(), [head_end](const auto& predicate) {
           return predicate.end == head_end && predicate.extended_pos == core::ExtendedPOS::VerbTeForm;
         });
-    if (has_complete_te_predicate) {
+    if (has_complete_te_predicate ||
+        spansPredicateBeforeFormalNoun(codepoints, char_types, start_pos, head_end, inflection, *dict_manager)) {
       continue;
     }
 

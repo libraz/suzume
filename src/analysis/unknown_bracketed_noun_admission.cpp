@@ -216,7 +216,9 @@ bool admitsPromotedRun(const BracketedNounContext& ctx, const BracketedScan& bra
           genitive_selects_nominal_head) &&
          (!hasFunctionWordChainDecomposition(codepoints, start_pos, scan, dict_manager) ||
           promoted.has_deverbal_noun_shape_before_genitive || promoted.copula_selected_predicate_homograph ||
-          genitive_selects_nominal_head);
+          genitive_selects_nominal_head) &&
+         (dict_manager == nullptr ||
+          !spansPredicateBeforeFormalNoun(codepoints, ctx.char_types, start_pos, scan, ctx.inflection, *dict_manager));
 }
 
 // A reading from the same start that runs past the bracket contains the
