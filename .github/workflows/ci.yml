@@ -134,7 +134,7 @@ jobs:
       # version means re-recording scripts/wasm-size-baseline.txt in the same commit.
       - uses: mymindstorm/setup-emsdk@v16
         with:
-          version: 6.0.3
+          version: 6.0.13
       - run: corepack enable
       - uses: actions/setup-node@v7
         with:
