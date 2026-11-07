@@ -921,6 +921,112 @@
       ],
       "id": "rakuo_taseshimashita",
       "input": "長らくお待たせしました"
+    },
+    {
+      "description": "sentence adverb 結局 does not join a following kanji noun",
+      "expected": [
+        {
+          "lemma": "結局",
+          "pos": "Adverb",
+          "surface": "結局"
+        },
+        {
+          "lemma": "中止",
+          "pos": "Noun",
+          "surface": "中止"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "dattta",
+      "input": "結局中止だった。"
+    },
+    {
+      "description": "結局 before の is nominal, before は adverbial",
+      "expected": [
+        {
+          "lemma": "結局",
+          "pos": "Noun",
+          "surface": "結局"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "ところ",
+          "pos": "Noun",
+          "surface": "ところ"
+        },
+        {
+          "lemma": "結局",
+          "pos": "Adverb",
+          "surface": "結局"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "失敗",
+          "pos": "Noun",
+          "surface": "失敗"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "notokoro_ha_dattta",
+      "input": "結局のところ、結局は失敗だった"
+    },
+    {
+      "description": "結局 before a clause-final kanji noun",
+      "expected": [
+        {
+          "lemma": "急ぐ",
+          "pos": "Verb",
+          "surface": "急い"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "けど",
+          "pos": "Particle",
+          "surface": "けど"
+        },
+        {
+          "lemma": "結局",
+          "pos": "Adverb",
+          "surface": "結局"
+        },
+        {
+          "lemma": "遅刻",
+          "pos": "Noun",
+          "surface": "遅刻"
+        }
+      ],
+      "id": "idakedo",
+      "input": "急いだけど結局遅刻"
     }
   ],
   "description": "General adverbs (part 3/3)",
