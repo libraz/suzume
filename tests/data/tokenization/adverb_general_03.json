@@ -1131,6 +1131,70 @@
       ],
       "id": "habetsuni_ttteinai",
       "input": "彼はべつに怒っていない"
+    },
+    {
+      "description": "adverb たった modifies the noun 今",
+      "expected": [
+        {
+          "lemma": "たった",
+          "pos": "Adverb",
+          "surface": "たった"
+        },
+        {
+          "lemma": "今",
+          "pos": "Noun",
+          "surface": "今"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "tattta_ta",
+      "input": "たった今来た"
+    },
+    {
+      "description": "sentence-initial たった + 今 before a verb",
+      "expected": [
+        {
+          "lemma": "たった",
+          "pos": "Adverb",
+          "surface": "たった"
+        },
+        {
+          "lemma": "今",
+          "pos": "Noun",
+          "surface": "今"
+        },
+        {
+          "lemma": "終わる",
+          "pos": "Verb",
+          "surface": "終わっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "ところ",
+          "pos": "Noun",
+          "surface": "ところ"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "tattta_watttatokorodesu",
+      "input": "たった今終わったところです"
     }
   ],
   "description": "General adverbs (part 3/3)",

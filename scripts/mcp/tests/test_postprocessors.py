@@ -1760,8 +1760,18 @@ class TestElapsedPastBeforeNow:
     def test_subject_marker_and_particle_make_it_the_past_plus_now(self):
         assert self._surfaces("時間がたった今も") == ["時間", "が", "たっ", "た", "今", "も"]
 
-    def test_adverb_before_a_verb_is_kept(self):
-        assert self._surfaces("彼がたった今来た") == ["彼", "が", "たった今", "来", "た"]
+    def test_adverb_before_a_verb_is_the_adverb_plus_now(self):
+        assert self._surfaces("彼がたった今来た") == ["彼", "が", "たった", "今", "来", "た"]
+
+    def test_sentence_initial_adverb_is_the_adverb_plus_now(self):
+        from suzume_mcp.core.mecab import mecab_analyze
+
+        tokens = mecab_analyze("たった今終わった")
+        postprocessors.repair_clause_final_geminate_past_adverb(tokens)
+        assert [(token["surface"], token["pos"]) for token in tokens[:2]] == [("たった", "副詞"), ("今", "名詞")]
+
+    def test_now_after_a_non_adverb_prefix_is_kept(self):
+        assert self._surfaces("ただ今戻りました") == ["ただ今", "戻り", "まし", "た"]
 
 
 class TestKusaiStemBeforeSuffix:

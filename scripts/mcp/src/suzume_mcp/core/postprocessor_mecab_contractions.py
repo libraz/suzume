@@ -562,6 +562,22 @@ def repair_kamo_quotative(tokens: list[dict]) -> None:
             ]
 
 
+def _split_adverb_before_now(tokens: list[dict], idx: int) -> bool:
+    """Split an adverb lexicalized with 今 into the adverb and the noun 今.
+
+    The reference lists たった今 as one adverb but analyzes つい+いま as two
+    words; the prefix is an adverb of its own that modifies the noun 今.
+    """
+    surface = tokens[idx].get("surface", "")
+    if len(surface) < 2 or not surface.endswith("今"):
+        return False
+    prefix = mecab_analyze(surface[:-1])
+    if len(prefix) != 1 or prefix[0].get("pos") != "副詞":
+        return False
+    tokens[idx : idx + 1] = [prefix[0], *mecab_analyze("今")]
+    return True
+
+
 def repair_clause_final_geminate_past_adverb(tokens: list[dict]) -> None:
     """Read a clause-final adverb spelling a geminate past as the verb's past.
 
@@ -571,27 +587,33 @@ def repair_clause_final_geminate_past_adverb(tokens: list[dict]) -> None:
     reference gives the same onbin before たら.
 
     The compound たった今 is the same geminate past plus the noun 今 when a
-    subject marker leads in and a particle follows (時間がたった今も); before a
-    verb it stays the adverb "just now" (彼がたった今来た).
+    subject marker leads in and a particle follows (時間がたった今も).  Elsewhere
+    it is the adverb たった modifying the noun 今 (彼がたった今来た), the same
+    boundary the reference already gives つい+いま.
     """
-    idx = 1
+    idx = 0
     while idx < len(tokens):
         token = tokens[idx]
         surface = token.get("surface", "")
         following = tokens[idx + 1] if idx + 1 < len(tokens) else None
-        previous = tokens[idx - 1]
+        previous = tokens[idx - 1] if idx > 0 else None
         elapsed_now = (
-            surface.endswith("った今")
+            previous is not None
+            and surface.endswith("った今")
             and previous.get("surface") == "が"
             and previous.get("pos_sub1") == "格助詞"
             and following is not None
             and following.get("pos") == "助詞"
         )
         clause_final = (
-            surface.endswith("った")
+            previous is not None
+            and surface.endswith("った")
             and (following is None or following.get("pos") == "記号")
             and previous.get("pos") != "記号"
         )
+        if token.get("pos") == "副詞" and not elapsed_now and _split_adverb_before_now(tokens, idx):
+            idx += 2
+            continue
         if token.get("pos") != "副詞" or len(surface) < 3 or not (elapsed_now or clause_final):
             idx += 1
             continue
