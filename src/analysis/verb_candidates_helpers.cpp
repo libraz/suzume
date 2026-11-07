@@ -333,6 +333,17 @@ GodanSaHeadReading readKanjiRunBeforeGodanSaHead(const dictionary::DictionaryMan
       return GodanSaHeadReading::kVerb;
     }
   }
+  // A numeral+counter phrase closing right before the head is a word of its own
+  // whatever its kanji count (2回|出し, 三十回|話し).
+  size_t counter_start = head_pos;
+  while (counter_start > 0 && normalize::isKanjiCodepoint(codepoints[counter_start - 1]) &&
+         !normalize::isNumeralCodepoint(codepoints[counter_start - 1])) {
+    --counter_start;
+  }
+  if (counter_start < head_pos && counter_start > 0 && normalize::isNumeralCodepoint(codepoints[counter_start - 1]) &&
+      counterKanjiRunEnd(dict_manager, codepoints, counter_start, head_pos) == head_pos) {
+    return GodanSaHeadReading::kVerb;
+  }
   // Otherwise the residue is counted in two-kanji words past a productive
   // prefix: an even count closes before the head (本気|出し), an odd one
   // pairs its last kanji with the head (書類提出+し), and a single kanji is

@@ -200,7 +200,8 @@ void appendBasicNumeralCounterCandidates(const std::vector<char32_t>& codepoints
   // pull a multi-digit numeral apart (三十|度); a discounted merged candidate keeps the
   // unit whole. The counter may be a run of counter kanji (2万3千+円台), but it
   // must reach a non-kanji so a following kanji noun (五度見た) keeps its boundary.
-  const size_t counter_run_end = verb_helpers::counterKanjiRunEnd(codepoints, numeral_end, codepoints.size());
+  const size_t counter_run_end =
+      verb_helpers::counterKanjiRunEnd(dict_manager, codepoints, numeral_end, codepoints.size());
   if (counter_run_end > numeral_end &&
       (counter_run_end >= char_types.size() || char_types[counter_run_end] != normalize::CharType::Kanji)) {
     appendCounterCandidate(codepoints, start_pos, counter_run_end, core::PartOfSpeech::Noun,

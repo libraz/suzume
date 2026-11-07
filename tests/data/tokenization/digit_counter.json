@@ -768,6 +768,97 @@
       ],
       "id": "comma_ten_thousand_yen",
       "input": "10,000円だ。"
+    },
+    {
+      "description": "numeral+counter closes before a listed godan-sa continuative",
+      "expected": [
+        {
+          "lemma": "2回",
+          "pos": "Noun",
+          "surface": "2回"
+        },
+        {
+          "lemma": "出す",
+          "pos": "Verb",
+          "surface": "出し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "2_shita_2",
+      "input": "2回出した"
+    },
+    {
+      "description": "counter kanji heading a godan-sa continuative is the verb, not part of the counter",
+      "expected": [
+        {
+          "lemma": "1回",
+          "pos": "Noun",
+          "surface": "1回"
+        },
+        {
+          "lemma": "話す",
+          "pos": "Verb",
+          "surface": "話し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "けど",
+          "pos": "Particle",
+          "surface": "けど"
+        },
+        {
+          "lemma": "伝わる",
+          "pos": "Verb",
+          "surface": "伝わら"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "1_shitakedo_waranakattta",
+      "input": "1回話したけど伝わらなかった"
+    },
+    {
+      "description": "kanji numeral+counter of odd length before a godan-sa continuative",
+      "expected": [
+        {
+          "lemma": "三十回",
+          "pos": "Noun",
+          "surface": "三十回"
+        },
+        {
+          "lemma": "話す",
+          "pos": "Verb",
+          "surface": "話し"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "まし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "shimashita_5",
+      "input": "三十回話しました"
     }
   ],
   "description": "digit_counter tests",

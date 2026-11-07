@@ -247,10 +247,18 @@ bool opensWordAfterQuantity(const dictionary::DictionaryManager* dict_manager, c
            lookupEntryInRange(*dict_manager, codepoints, pos, pos + 1, core::PartOfSpeech::Pronoun) != nullptr));
 }
 
-size_t counterKanjiRunEnd(const std::vector<char32_t>& codepoints, size_t pos, size_t limit) {
+bool headsListedGodanSaContinuativeAt(const dictionary::DictionaryManager* dict_manager,
+                                      const std::vector<char32_t>& codepoints, size_t pos) {
+  return pos + 1 < codepoints.size() && codepoints[pos + 1] == U'し' && normalize::isKanjiCodepoint(codepoints[pos]) &&
+         hasDictionaryGodanBaseFromIRow(dict_manager, normalize::encodeUtf8(codepoints[pos]), U'し');
+}
+
+size_t counterKanjiRunEnd(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
+                          size_t pos, size_t limit) {
   size_t end = pos;
   while (end < limit && normalize::isCounterKanji(codepoints[end]) &&
-         (end == pos || !normalize::isQuantityOpeningCounterKanji(codepoints[end]))) {
+         (end == pos || (!normalize::isQuantityOpeningCounterKanji(codepoints[end]) &&
+                         !headsListedGodanSaContinuativeAt(dict_manager, codepoints, end)))) {
     ++end;
   }
   return end;

@@ -207,13 +207,21 @@ bool opensWordAfterQuantity(const dictionary::DictionaryManager* dict_manager, c
                             size_t pos);
 
 /**
+ * @brief Whether the kanji at @p pos heads a listed godan-sa verb's continuative し (話+し, 出+し)
+ */
+bool headsListedGodanSaContinuativeAt(const dictionary::DictionaryManager* dict_manager,
+                                      const std::vector<char32_t>& codepoints, size_t pos);
+
+/**
  * @brief End of the counter kanji run that starts at @p pos and stops before @p limit
  *
  * Every leading counter kanji belongs to the counter (時間, 段階) except one
  * that counts only straight after the numeral, which opens the next word
- * (5日|連続, but 3連勝).
+ * (5日|連続, but 3連勝), and one past the first that heads a listed godan-sa
+ * continuative, which is the predicate (1回|話し).
  */
-size_t counterKanjiRunEnd(const std::vector<char32_t>& codepoints, size_t pos, size_t limit);
+size_t counterKanjiRunEnd(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
+                          size_t pos, size_t limit);
 
 /**
  * @brief Whether the word on the kanji run before @p run_end may continue past it
