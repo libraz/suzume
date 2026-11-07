@@ -494,6 +494,14 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
       // Check for false positives: single-kanji stems that are also verb renyokei
       // E.g., 落ちすぎ could be 落ち(verb renyokei) + すぎ(verb)
       // We should prefer the verb renyokei interpretation if kanji+ちる/きる/etc. is a verb
+      // A kanji right after a run-opening 最 is the head of that prefix's
+      // nominal (最高+すぎる), not an adjective stem of its own.
+      const bool opens_after_superlative =
+          start_pos > 0 && grammar::isSuperlativePrefix(normalize::encodeUtf8(codepoints[start_pos - 1])) &&
+          (start_pos == 1 || !normalize::isKanjiCodepoint(codepoints[start_pos - 2]));
+      if (single_kanji_stem && opens_after_superlative) {
+        continue;
+      }
       if (single_kanji_stem) {
         // Check if stem + る, stem + す, etc. forms a verb
         bool is_likely_verb_stem = false;

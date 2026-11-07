@@ -545,9 +545,12 @@ bool overlapsRegisteredWord(const PrefixScanContext& ctx, size_t len, size_t can
   // kanji keeps its candidate, which is what supplies 外 here, and a
   // one-kanji run is exempt because there is no fabrication to reject
   // (夢|みたい).
+  // The superlative prefix binds to the nominal after it, so a kanji preceded
+  // by nothing but 最 heads no predicate (最近+よく, 最高+すぎた).
+  const bool superlative_pair = len == 2 && grammar::startsWithSuperlativePrefix(surface);
   if (start_type == normalize::CharType::Kanji && len > 1 && dict_manager != nullptr &&
       candidate_end < codepoints.size() && ctx.char_types[candidate_end] == normalize::CharType::Hiragana &&
-      dict_manager->lookupExact(surface) == nullptr &&
+      dict_manager->lookupExact(surface) == nullptr && !superlative_pair &&
       kanjiHeadsPredicateAt(codepoints, ctx.char_types, candidate_end, ctx.inflection, *dict_manager)) {
     return true;
   }

@@ -780,6 +780,149 @@
       ],
       "id": "hiita",
       "input": "風邪ひいた"
+    },
+    {
+      "description": "Superlative prefix compound before a kana adjective form stays whole",
+      "expected": [
+        {
+          "lemma": "うち",
+          "pos": "Noun",
+          "surface": "うち"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "犬",
+          "pos": "Noun",
+          "surface": "犬"
+        },
+        {
+          "lemma": "最近",
+          "pos": "Noun",
+          "surface": "最近"
+        },
+        {
+          "lemma": "よい",
+          "pos": "Adjective",
+          "surface": "よく"
+        },
+        {
+          "lemma": "寝る",
+          "pos": "Verb",
+          "surface": "寝"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てる"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        }
+      ],
+      "id": "uchino_yoku_terundayone",
+      "input": "うちの犬、最近よく寝てるんだよね"
+    },
+    {
+      "description": "Superlative prefix compound before sugiru stays whole",
+      "expected": [
+        {
+          "lemma": "今日",
+          "pos": "Noun",
+          "surface": "今日"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "ランチ",
+          "pos": "Noun",
+          "surface": "ランチ"
+        },
+        {
+          "lemma": "最高",
+          "pos": "Noun",
+          "surface": "最高"
+        },
+        {
+          "lemma": "すぎる",
+          "pos": "Verb",
+          "surface": "すぎ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "no_sugita",
+      "input": "今日のランチ最高すぎた"
+    },
+    {
+      "description": "Superlative prefix compound before sugiru stays whole",
+      "expected": [
+        {
+          "lemma": "最低",
+          "pos": "Noun",
+          "surface": "最低"
+        },
+        {
+          "lemma": "すぎる",
+          "pos": "Verb",
+          "surface": "すぎ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "sugita",
+      "input": "最低すぎた"
+    },
+    {
+      "description": "Superlative prefix compound before a kana adjective form stays whole",
+      "expected": [
+        {
+          "lemma": "最近",
+          "pos": "Noun",
+          "surface": "最近"
+        },
+        {
+          "lemma": "よい",
+          "pos": "Adjective",
+          "surface": "よく"
+        },
+        {
+          "lemma": "寝る",
+          "pos": "Verb",
+          "surface": "寝る"
+        }
+      ],
+      "id": "yoku_ru",
+      "input": "最近よく寝る"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 11/11)",
