@@ -209,7 +209,7 @@ bool kanjiHeadsPredicateAt(const std::vector<char32_t>& codepoints, const std::v
       verb_helpers::readKanjiRunBeforeGodanSaHead(&dict_manager, codepoints, kana_start - 1) !=
           verb_helpers::GodanSaHeadReading::kVerbalNoun;
   if (proves_godan_head ||
-      (kana::isERowCodepoint(okurigana) &&
+      (grammar::isMonogradeStemFinalKana(okurigana) &&
        verb_helpers::isVerbInDictionary(&dict_manager,
                                         normalize::concat(head, normalize::encodeUtf8(okurigana), "る"))) ||
       (okurigana == U'い' && verb_helpers::isAdjectiveInDictionary(&dict_manager, normalize::concat(head, "い")))) {
