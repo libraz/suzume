@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import ctypes.util
 from concurrent.futures import ThreadPoolExecutor
 
 import pytest
@@ -47,7 +48,7 @@ def test_shallow_package_layout_falls_through_without_index_error(
 ) -> None:
     monkeypatch.setattr(ffi, "__file__", "/app/suzume/_ffi.py")
     monkeypatch.delenv("SUZUME_LIB_PATH", raising=False)
-    monkeypatch.setattr(ffi.ctypes.util, "find_library", lambda _name: None)
+    monkeypatch.setattr(ctypes.util, "find_library", lambda _name: None)
     with pytest.raises(OSError, match="shared library"):
         ffi._find_library()
 
