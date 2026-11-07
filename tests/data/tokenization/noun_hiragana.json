@@ -1326,6 +1326,166 @@
       ],
       "id": "nomeiga_ta",
       "input": "友達のめいが来た"
+    },
+    {
+      "description": "genitive after a nominal selects a kana noun head containing a function-word homograph",
+      "expected": [
+        {
+          "lemma": "日本",
+          "pos": "Noun",
+          "surface": "日本"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "しきたり",
+          "pos": "Noun",
+          "surface": "しきたり"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "守る",
+          "pos": "Verb",
+          "surface": "守る"
+        }
+      ],
+      "id": "noshikitariwo_ru",
+      "input": "日本のしきたりを守る"
+    },
+    {
+      "description": "no coined predicate opens on the genitive",
+      "expected": [
+        {
+          "lemma": "日本",
+          "pos": "Noun",
+          "surface": "日本"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "しきたり",
+          "pos": "Noun",
+          "surface": "しきたり"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "大切",
+          "pos": "Adjective",
+          "surface": "大切"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "noshikitariha_da",
+      "input": "日本のしきたりは大切だ"
+    },
+    {
+      "description": "genitive-selected kana noun before the copula",
+      "expected": [
+        {
+          "lemma": "村",
+          "pos": "Noun",
+          "surface": "村"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "しきたり",
+          "pos": "Noun",
+          "surface": "しきたり"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "noshikitarida",
+      "input": "村のしきたりだ"
+    },
+    {
+      "description": "genitive is not the first mora of a coined verb",
+      "expected": [
+        {
+          "lemma": "東京",
+          "pos": "Noun",
+          "surface": "東京"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "たてもの",
+          "pos": "Noun",
+          "surface": "たてもの"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "高い",
+          "pos": "Adjective",
+          "surface": "高い"
+        }
+      ],
+      "id": "notatemonoga_i",
+      "input": "東京のたてものが高い"
+    },
+    {
+      "description": "kana noun opening on の after a genitive",
+      "expected": [
+        {
+          "lemma": "日本",
+          "pos": "Noun",
+          "surface": "日本"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "のみもの",
+          "pos": "Noun",
+          "surface": "のみもの"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "甘い",
+          "pos": "Adjective",
+          "surface": "甘い"
+        }
+      ],
+      "id": "nonomimonoha_i",
+      "input": "日本ののみものは甘い"
     }
   ],
   "description": "noun_hiragana tests",

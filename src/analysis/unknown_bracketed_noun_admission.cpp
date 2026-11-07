@@ -197,6 +197,12 @@ bool admitsPromotedRun(const BracketedNounContext& ctx, const BracketedScan& bra
   }
   absorbs_trailing_suffix =
       absorbs_trailing_suffix || opensOnParticleBeforePronoun(dict_manager, codepoints, start_pos, scan);
+  // A genitive after a nominal selects a nominal head, so a run closed by a
+  // particle or the copula that opens on no word a nominal can take is no
+  // function-word chain (本+の+ねだん+が, not ね+だ+ん).
+  const bool genitive_selects_nominal_head = bracketed.left_nominal_genitive_bracket &&
+                                             (promoted.right_particle || promoted.right_copula) &&
+                                             !opensNominalFollowerAt(ctx, start_pos, scan);
   return (promoted.len >= promoted.min_len || promoted.short_bos_preparatory_homograph) &&
          (promoted.right_particle || promoted.right_clause || promoted.right_auxiliary || promoted.right_kanji_word ||
           promoted.right_suffix || (promoted.right_short_genitive && promoted.unread_short_run_bracketed)) &&
@@ -206,9 +212,11 @@ bool admitsPromotedRun(const BracketedNounContext& ctx, const BracketedScan& bra
          !opens_on_te_connective && !spans_laugh && !closes_registered_word_predicate && !finishes_auxiliary_chain &&
          !spells_contracted_hypothetical && !steals_formal_noun_head && !promoted.absorbs_copula_before_sokuon_final &&
          ((!hasAuxiliaryParticleDecomposition(codepoints, start_pos, scan, dict_manager) && !spells_auxiliary_chain) ||
-          promoted.has_deverbal_noun_shape_before_genitive || promoted.copula_selected_predicate_homograph) &&
+          promoted.has_deverbal_noun_shape_before_genitive || promoted.copula_selected_predicate_homograph ||
+          genitive_selects_nominal_head) &&
          (!hasFunctionWordChainDecomposition(codepoints, start_pos, scan, dict_manager) ||
-          promoted.has_deverbal_noun_shape_before_genitive || promoted.copula_selected_predicate_homograph);
+          promoted.has_deverbal_noun_shape_before_genitive || promoted.copula_selected_predicate_homograph ||
+          genitive_selects_nominal_head);
 }
 
 // A reading from the same start that runs past the bracket contains the

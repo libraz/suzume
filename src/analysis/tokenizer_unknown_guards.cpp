@@ -647,6 +647,15 @@ bool isRejectedUnknownCandidate(const UnknownCandidateContext& ctx, const core::
   if (consumesInitialSuruConditional(dict_manager, text, codepoints, byte_offsets, candidates, candidate)) {
     return true;
   }
+  // A genitive after a nominal selects a nominal head, so an unattested
+  // predicate opening on it has swallowed the particle (日本+の+しきたり, not
+  // のしき+たり).
+  if (is_unattested_predicate(candidate) && candidate.start > 0 && codepoints[candidate.start] == U'の' &&
+      char_types[candidate.start - 1] != normalize::CharType::Hiragana &&
+      char_types[candidate.start - 1] != normalize::CharType::Symbol &&
+      char_types[candidate.start - 1] != normalize::CharType::Emoji) {
+    return true;
+  }
   // No native predicate opens on the ら column, so an unattested one starting
   // there inside a kana run has begun inside a word (あつく+るしい).
   if (is_unattested_predicate(candidate) && candidate.start > 0 &&

@@ -181,6 +181,32 @@ bool liesInsideFormalNounNegativePredicate(const BracketedNounContext& ctx, size
 // @p pos, or 0. A suffix is bound leftward to a nominal host.
 }  // namespace
 
+bool opensNominalFollowerAt(const BracketedNounContext& ctx, size_t pos, size_t run_end) {
+  const auto& codepoints = ctx.codepoints;
+  if (ctx.dict_manager == nullptr || pos >= codepoints.size()) {
+    return false;
+  }
+  constexpr size_t kFunctionWordProbe = 4;
+  const size_t win_end = std::min(codepoints.size(), pos + kFunctionWordProbe);
+  for (const auto& res : lookupResultsInRange(*ctx.dict_manager, codepoints, pos, win_end)) {
+    if (res.entry == nullptr) {
+      continue;
+    }
+    const core::ExtendedPOS epos = res.entry->extended_pos;
+    if (res.entry->pos == core::PartOfSpeech::Particle && epos != core::ExtendedPOS::ParticleConj &&
+        epos != core::ExtendedPOS::ParticleFinal) {
+      return true;
+    }
+    if (res.entry->pos == core::PartOfSpeech::Auxiliary &&
+        (epos == core::ExtendedPOS::AuxCopulaDa || epos == core::ExtendedPOS::AuxCopulaDesu) &&
+        (pos + res.length > run_end ||
+         continuesAuxiliaryChain(*ctx.dict_manager, codepoints, epos, pos + res.length, run_end))) {
+      return true;
+    }
+  }
+  return false;
+}
+
 size_t suffixLengthAt(const BracketedNounContext& ctx, size_t pos) {
   constexpr size_t kSuffixProbe = 3;
   return longestDictionaryEntryLengthFrom(ctx.dict_manager, ctx.codepoints, pos, 2, kSuffixProbe,
@@ -331,7 +357,10 @@ void scanBracketedRun(const BracketedNounContext& ctx, size_t bracketed_noun_lim
     // A multi-character particle immediately after the first mora can be
     // part of a native hiragana noun (こども).  Require a substantive
     // preceding run before treating it as an internal word boundary.
-    if (scan - start_pos >= 2 && multiCharFunctionWordAt(ctx, scan)) {
+    // After a genitive that follows a nominal, a function word that cannot
+    // stand after a nominal (たり, まい) is no boundary of the head (しき+たり).
+    if (scan - start_pos >= 2 && multiCharFunctionWordAt(ctx, scan) &&
+        (!bracketed.left_nominal_genitive_bracket || opensNominalFollowerAt(ctx, scan, codepoints.size() + 1))) {
       if (liesInsideFormalNounNegativePredicate(ctx, scan)) {
         crossed_verified_predicate = true;
       } else {

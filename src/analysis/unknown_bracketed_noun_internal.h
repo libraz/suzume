@@ -77,6 +77,10 @@ bool closesShortNounAt(const dictionary::DictionaryManager* dict_manager, const 
 size_t suffixLengthAt(const BracketedNounContext& ctx, size_t pos);
 size_t pronounLengthAt(const BracketedNounContext& ctx, size_t pos);
 bool closesTeFormAt(const BracketedNounContext& ctx, size_t pos);
+// Whether a function word that may stand after a nominal opens at @p pos: a
+// case, adverbial or binding particle, or a copula whose auxiliary chain
+// reaches @p run_end (a run_end past the text accepts any copula).
+bool opensNominalFollowerAt(const BracketedNounContext& ctx, size_t pos, size_t run_end);
 bool registeredAdjectiveOpensAt(const BracketedNounContext& ctx, size_t pos);
 BracketedScan classifyLeftBrackets(const BracketedNounContext& ctx);
 void scanBracketedRun(const BracketedNounContext& ctx, size_t bracketed_noun_limit, BracketedScan& bracketed);
