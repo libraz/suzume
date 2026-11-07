@@ -427,6 +427,17 @@ bool crossesEstablishedBoundary(const DictionaryCandidateContext& ctx, const cor
     return true;
   }
 
+  // An irrealis exists only for the auxiliary or particle it selects, so one
+  // followed by neither is no irrealis (私+の+まちがい, not のま+ちがい). The
+  // volitional う it selects may be contracted to a geminate (行こ+っ+か).
+  if (result.entry->extended_pos == core::ExtendedPOS::VerbMizenkei && end_pos < codepoints.size() &&
+      codepoints[end_pos] != core::hiragana::kSmallTsu &&
+      !lookupResultsHavePartOfSpeech(
+          dict_manager.lookup(text, byteOffsetAt(byte_offsets, end_pos)),
+          partOfSpeechMask(core::PartOfSpeech::Auxiliary) | partOfSpeechMask(core::PartOfSpeech::Particle))) {
+    return true;
+  }
+
   // Once the surrounding lattice proves the shortened causative-passive,
   // the homographic suru mizenkei is not grammatical at this boundary.
   // Removing it also prevents a list-particle reading of やら from reaching

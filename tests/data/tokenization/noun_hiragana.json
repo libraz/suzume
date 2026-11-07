@@ -1486,6 +1486,65 @@
       ],
       "id": "nonomimonoha_i",
       "input": "日本ののみものは甘い"
+    },
+    {
+      "description": "kana deverbal noun after a genitive keeps the particle and its listed-irrealis homograph out",
+      "expected": [
+        {
+          "lemma": "私",
+          "pos": "Pronoun",
+          "surface": "私"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "まちがい",
+          "pos": "Noun",
+          "surface": "まちがい"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "nomachigaida",
+      "input": "私のまちがいだ"
+    },
+    {
+      "description": "kana deverbal noun after a genitive before the accusative",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "まちがい",
+          "pos": "Noun",
+          "surface": "まちがい"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "直す",
+          "pos": "Verb",
+          "surface": "直す"
+        }
+      ],
+      "id": "nomachigaiwo_su",
+      "input": "彼のまちがいを直す"
     }
   ],
   "description": "noun_hiragana tests",

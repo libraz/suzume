@@ -151,6 +151,10 @@ bool setParticleAndLexicalPenaltyCosts(BigramMatrix& table) {
       // A determiner opens its phrase the same way, so it cannot start inside
       // an unreadable run either (ご|あんな|… inside ごあんない).
       {EPOS::Other, EPOS::Determiner, cost::kRare},
+      // A formal noun needs an attributive or a genitive on its left, which an
+      // unreadable run never is: the formal noun has then started inside a
+      // word (ま|ちがい inside まちがい).
+      {EPOS::Other, EPOS::NounFormal, cost::kStrong},
 
       // Particles do not introduce interjections within a running phrase.
       {EPOS::ParticleCase, EPOS::Interjection, cost::kAlmostNever},
