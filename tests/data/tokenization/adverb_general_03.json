@@ -879,6 +879,48 @@
       ],
       "id": "wo_mazutomo_karu",
       "input": "本を読まずとも分かる"
+    },
+    {
+      "description": "adverb 長らく is not an adjective 長らい",
+      "expected": [
+        {
+          "lemma": "長らく",
+          "pos": "Adverb",
+          "surface": "長らく"
+        },
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "待つ",
+          "pos": "Verb",
+          "surface": "待た"
+        },
+        {
+          "lemma": "せる",
+          "pos": "Auxiliary",
+          "surface": "せ"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "まし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "rakuo_taseshimashita",
+      "input": "長らくお待たせしました"
     }
   ],
   "description": "General adverbs (part 3/3)",

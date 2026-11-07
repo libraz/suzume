@@ -1500,6 +1500,87 @@
       ],
       "id": "iteno",
       "input": "続いての話題"
+    },
+    {
+      "description": "lexicalized compound verb 長引く stays one verb",
+      "expected": [
+        {
+          "lemma": "交渉",
+          "pos": "Noun",
+          "surface": "交渉"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "長引く",
+          "pos": "Verb",
+          "surface": "長引い"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "ga_iteiru",
+      "input": "交渉が長引いている。"
+    },
+    {
+      "description": "attributive 長引く before a noun",
+      "expected": [
+        {
+          "lemma": "長引く",
+          "pos": "Verb",
+          "surface": "長引く"
+        },
+        {
+          "lemma": "物価高",
+          "pos": "Noun",
+          "surface": "物価高"
+        }
+      ],
+      "id": "ku_5",
+      "input": "長引く物価高"
+    },
+    {
+      "description": "compound verb 執り行う passive",
+      "expected": [
+        {
+          "lemma": "式典",
+          "pos": "Noun",
+          "surface": "式典"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "執り行う",
+          "pos": "Verb",
+          "surface": "執り行わ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ga_ri_wareta",
+      "input": "式典が執り行われた"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 11/11)",
