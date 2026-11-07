@@ -218,12 +218,18 @@ def get_mecab_tokens(text: str) -> list[dict]:
             {
                 "surface": t["surface"],
                 "pos": map_mecab_pos(t),
-                "lemma": t["lemma"] if t.get("lemma") and t["lemma"] != "*" else t["surface"],
+                "lemma": _lemma_or_surface(t, t["surface"]),
             }
         )
 
     postprocess_mecab_tokens(tokens, normalized_text, replacements)
     return tokens
+
+
+def _lemma_or_surface(token: dict, surface: str) -> str:
+    """Return the token's lemma, or ``surface`` when the lemma is absent or ``*``."""
+    lemma = token.get("lemma")
+    return lemma if lemma and lemma != "*" else surface
 
 
 def _reject_lossy_symbol_drop(surface: str, text: str) -> None:
@@ -353,7 +359,7 @@ def get_expected_tokens(text: str, suzume_tokens: list[dict] | None = None) -> t
         pos = normalize_pos(map_mecab_pos(t))
         surface = t.get("surface", "")
         if pos == "Symbol" or _is_deliberately_removed_symbol(surface):
-            _reject_lossy_symbol_drop(t.get("surface", ""), text)
+            _reject_lossy_symbol_drop(surface, text)
             removed_symbol = True
             if runs[-1]:
                 runs.append([])
@@ -365,7 +371,7 @@ def get_expected_tokens(text: str, suzume_tokens: list[dict] | None = None) -> t
                 "pos": pos,
                 "pos_sub1": t.get("pos_sub1"),
                 "pos_sub2": t.get("pos_sub2"),
-                "lemma": t["lemma"] if t.get("lemma") and t["lemma"] != "*" else t.get("surface", ""),
+                "lemma": _lemma_or_surface(t, surface),
             }
         )
     if removed_symbol and applied_rule is None:

@@ -20,6 +20,7 @@ from .constants import (
 )
 from .core_lexicon import core_headwords
 from .mecab import is_single_token_of_pos, mecab_analyze
+from .merge_postprocessor_common import _probe_continuative
 from .split_boundaries import (
     _emit_split,
     _reads_as_one_noun,
@@ -99,13 +100,7 @@ _FIXED_LEADING_SEARCH_UNITS_BY_LENGTH = tuple(sorted(FIXED_LEADING_SEARCH_UNITS,
 
 def _spells_verb_continuative_before_masu(head: str) -> bool:
     """Whether ``head`` re-reads as case particle(s) plus a verb continuative before ます."""
-    polite = mecab_analyze(head + "ます")
-    return (
-        len(polite) > 1
-        and polite[-1].get("surface") == "ます"
-        and polite[-2].get("pos") == "動詞"
-        and "".join(part.get("surface", "") for part in polite) == head + "ます"
-    )
+    return _probe_continuative(head) is not None
 
 
 def _polite_compound_particle_tokens(head: str) -> list[dict]:

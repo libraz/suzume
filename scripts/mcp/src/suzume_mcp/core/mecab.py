@@ -5,7 +5,16 @@ import subprocess
 
 
 def mecab_analyze(text: str) -> list[dict]:
-    """Run MeCab on text and return parsed tokens (synchronous)."""
+    """Run MeCab on text and return parsed tokens (synchronous).
+
+    Results are memoized per text; each call returns fresh token dicts so
+    callers may mutate or splice them.
+    """
+    return [dict(token) for token in _mecab_tokens(text)]
+
+
+@functools.lru_cache(maxsize=16384)
+def _mecab_tokens(text: str) -> tuple[dict, ...]:
     result = subprocess.run(
         ["mecab"],
         input=text + "\n",
@@ -16,7 +25,7 @@ def mecab_analyze(text: str) -> list[dict]:
         raise RuntimeError(f"MeCab failed: {result.stderr.strip() or 'non-zero exit'}")
     if "EOS" not in result.stdout.splitlines():
         raise RuntimeError("MeCab failed: missing EOS marker")
-    return _parse_mecab_output(result.stdout)
+    return tuple(_parse_mecab_output(result.stdout))
 
 
 def is_single_token_of_pos(surface: str, pos: str) -> bool:
@@ -31,7 +40,6 @@ def is_single_token_of_pos(surface: str, pos: str) -> bool:
     return len(tokens) == 1 and tokens[0].get("pos") == pos and tokens[0].get("surface") == surface
 
 
-@functools.lru_cache(maxsize=4096)
 def is_na_adjective_stem(surface: str) -> bool:
     """Whether the reference dictionary reads a surface as a na-adjective stem.
 
@@ -43,7 +51,6 @@ def is_na_adjective_stem(surface: str) -> bool:
     return bool(probe) and probe[0].get("surface") == surface and probe[0].get("pos_sub1") == "形容動詞語幹"
 
 
-@functools.lru_cache(maxsize=4096)
 def reads_as_counter(kanji: str, suffix_only: bool = False) -> bool:
     """Whether the reference dictionary reads a kanji as a counter after a numeral.
 

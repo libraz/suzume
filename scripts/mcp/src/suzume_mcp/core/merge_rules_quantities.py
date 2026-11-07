@@ -1,7 +1,5 @@
 """Merge steps for dates, URLs, reduplications, counters, and numbered nouns."""
 
-import functools
-
 import regex
 
 from .constants import FAMILY_TERMS, TEMPORAL_COMPOUND_UNITS, TEMPORAL_PREFIX_KANJI
@@ -14,7 +12,6 @@ from .merge_rules_state import MergeState
 _COMPOUND_CASE_PARTICLE_VERBS = frozenset(("つく", "あたる", "当たる", "対する"))
 
 
-@functools.lru_cache(maxsize=4096)
 def _reads_as_compound_case_particle(host: str, span: str) -> bool:
     """Whether the reference reads ``span`` as one particle after ``host`` in a noun frame.
 

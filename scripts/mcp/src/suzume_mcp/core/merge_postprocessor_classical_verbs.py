@@ -723,7 +723,6 @@ def _nidan_cell_match(token: dict, following: dict, beyond: str = "") -> tuple[r
     return None
 
 
-@cache
 def _is_common_noun(surface: str) -> bool:
     """Whether the dictionary reads a surface as one noun that is not a proper name."""
     tokens = mecab_analyze(surface)
@@ -873,7 +872,6 @@ def _postprocess_verb_terminal_ru(result: list[dict], applied_rule: str | None) 
 _KAKARI_PARTICLES = ("ぞ", "こそ", "なむ", "や")
 
 
-@cache
 def _reads_as_pronoun(surface: str) -> bool:
     """Whether the reference dictionary reads a surface as exactly one pronoun."""
     tokens = mecab_analyze(surface)

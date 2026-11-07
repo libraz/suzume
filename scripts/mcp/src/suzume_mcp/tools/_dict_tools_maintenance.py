@@ -233,7 +233,7 @@ async def dict_sort(
             continue
 
         # Sort by reading
-        group_entries.sort(key=lambda ent: reading_cache.get(ent["surface"], ent["surface"]))
+        group_entries.sort(key=lambda ent: reading_cache[ent["surface"]])
 
         if group_key:
             labels = _CONJ_LABELS if group_key == "conj_type" else _POS_LABELS
@@ -411,8 +411,8 @@ async def dict_cleanup(
             total += 1
 
             # Determine if entry is needed
-            reason = ""
             keep = True
+            char_types = get_char_types(surface)
 
             if len(surface) <= 2:
                 keep = False
@@ -422,9 +422,9 @@ async def dict_cleanup(
                 reason = "handled_by_suzume"
             elif is_fixed_expression(surface):
                 reason = "fixed_expression"
-            elif len(get_char_types(surface)) > 1:
+            elif len(char_types) > 1:
                 reason = "mixed_chartype_compound"
-            elif get_char_types(surface) and get_char_types(surface)[0] == "kanji" and len(surface) >= 4:
+            elif char_types and char_types[0] == "kanji" and len(surface) >= 4:
                 reason = "kanji_compound"
             else:
                 reason = "split_other"
