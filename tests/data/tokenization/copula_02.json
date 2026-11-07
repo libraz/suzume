@@ -166,6 +166,75 @@
       ],
       "id": "ha_ni_kida",
       "input": "私は特に好きだ"
+    },
+    {
+      "description": "Copula continuative で is never case-marked; で before に-initial kana word is the case particle",
+      "expected": [
+        {
+          "lemma": "駅前",
+          "pos": "Noun",
+          "surface": "駅前"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "人",
+          "pos": "Noun",
+          "surface": "人"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "にぎやか",
+          "pos": "Adjective",
+          "surface": "にぎやか"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "ha_denigiyakada",
+      "input": "駅前は人でにぎやかだ"
+    },
+    {
+      "description": "Copula で before a kana na-adjective opening on に",
+      "expected": [
+        {
+          "lemma": "静か",
+          "pos": "Adjective",
+          "surface": "静か"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "lemma": "にぎやか",
+          "pos": "Adjective",
+          "surface": "にぎやか"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "町",
+          "pos": "Noun",
+          "surface": "町"
+        }
+      ],
+      "id": "kadenigiyakana",
+      "input": "静かでにぎやかな町"
     }
   ],
   "description": "Copula patterns (だ、です、である) (part 2/2)",

@@ -88,6 +88,14 @@ bool lacksLicensingEnvironment(const DictionaryCandidateContext& ctx, const core
     return true;
   }
 
+  // The copula's continuative (で) chains a clause and is never case-marked;
+  // only its terminal quotes or takes a particle (学生だ+と). Before a case
+  // particle the mora is the case particle itself (人+で+にぎわう).
+  if (result.entry->extended_pos == core::ExtendedPOS::AuxCopulaDa && grammar::endsWithERow(result.entry->surface) &&
+      verb_helpers::caseParticleFollowsAt(dict_manager, codepoints, end_pos)) {
+    return true;
+  }
+
   // A bare causative stem (せ, させ) cannot be case-marked; before a case
   // particle the span is a lexical noun (知らせ+を). The terminal (待たせる+と)
   // is a finished predicate and stays free, and so does a stem before an

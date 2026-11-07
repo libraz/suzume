@@ -155,6 +155,15 @@ void generateHiraganaNariNaAdjectiveCandidates(const std::vector<char32_t>& code
     if (!has_na_adjective_stem_shape) {
       continue;
     }
+    // A run opening on a particle mora right after a kanji host whose remainder
+    // is a full stem of the same shape is that particle plus the adjective
+    // (人+で+にぎやか); a shorter remainder leaves the mora to the stem
+    // (町+にぎやか, not 町+に+ぎやか).
+    constexpr size_t kMinRemainderStemLength = 4;
+    if (start_pos > 0 && char_types[start_pos - 1] == normalize::CharType::Kanji &&
+        normalize::isParticleCodepoint(codepoints[start_pos]) && stem_end - start_pos - 1 >= kMinRemainderStemLength) {
+      return;
+    }
     candidates.push_back(makeNaAdjCandidate(stem, start_pos, stem_end, candidate::kNaAdjYakaCost, true,
                                             CandidateOrigin::AdjectiveNa, candidate::kHiraganaNaAdjNariConfidence,
                                             "hira_na_adj_yaka_raka_nari"));
