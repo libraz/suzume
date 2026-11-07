@@ -551,6 +551,27 @@ bool followsListedAdverb(const std::vector<char32_t>& codepoints, size_t start_p
                                     partOfSpeechMask(core::PartOfSpeech::Adverb));
 }
 
+// A listed noun, or a katakana run, closes right before the き, and no listed
+// verb reads that き as its own okurigana (生+き+る, 書+き from 書く).
+bool nominalClosesBeforeKuru(const std::vector<char32_t>& codepoints, size_t start_pos,
+                             const dictionary::DictionaryManager* dict_manager) {
+  constexpr size_t kMaxNounMorae = 4;
+  constexpr size_t kMaxVerbStemKanji = 2;
+  if (start_pos == 0 || dict_manager == nullptr) {
+    return false;
+  }
+  for (size_t stem = 1; stem <= kMaxVerbStemKanji && stem <= start_pos; ++stem) {
+    const size_t from = start_pos - stem;
+    if (vh::isVerbInDictionary(dict_manager, codepoints, from, start_pos + 1, "る") ||
+        vh::isVerbInDictionary(dict_manager, codepoints, from, start_pos, "く")) {
+      return false;
+    }
+  }
+  return normalize::classifyChar(codepoints[start_pos - 1]) == normalize::CharType::Katakana ||
+         hasDictionaryEntryEndingAt(*dict_manager, codepoints, lookbehindStart(start_pos, kMaxNounMorae), start_pos,
+                                    partOfSpeechMask(core::PartOfSpeech::Noun));
+}
+
 void appendKuruRenyokeiCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                   const dictionary::DictionaryManager* dict_manager,
                                   std::vector<UnknownCandidate>& candidates) {
@@ -583,7 +604,8 @@ void appendKuruRenyokeiCandidates(const std::vector<char32_t>& codepoints, size_
                              normalize::classifyChar(codepoints[start_pos - 1]) == normalize::CharType::Symbol ||
                              (normalize::isExtendedParticle(codepoints[start_pos - 1]) &&
                               codepoints[start_pos - 1] != U'て' && codepoints[start_pos - 1] != U'で') ||
-                             followsListedAdverb(codepoints, start_pos, dict_manager);
+                             followsListedAdverb(codepoints, start_pos, dict_manager) ||
+                             nominalClosesBeforeKuru(codepoints, start_pos, dict_manager);
   if (!left_boundary) {
     return;
   }

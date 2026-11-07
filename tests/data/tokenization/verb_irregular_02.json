@@ -375,6 +375,82 @@
       ],
       "id": "watekokoni_mashita",
       "input": "わてここに来ました"
+    },
+    {
+      "description": "kana kuru continuative after a listed noun, elongated ta",
+      "expected": [
+        {
+          "lemma": "やっと",
+          "pos": "Adverb",
+          "surface": "やっと"
+        },
+        {
+          "lemma": "週末",
+          "pos": "Noun",
+          "surface": "週末"
+        },
+        {
+          "lemma": "くる",
+          "pos": "Verb",
+          "surface": "き"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "たー"
+        }
+      ],
+      "id": "yattto_kita",
+      "input": "やっと週末きたー！！"
+    },
+    {
+      "description": "kana kuru continuative after a listed noun, doubly elongated ta",
+      "expected": [
+        {
+          "lemma": "やっと",
+          "pos": "Adverb",
+          "surface": "やっと"
+        },
+        {
+          "lemma": "週末",
+          "pos": "Noun",
+          "surface": "週末"
+        },
+        {
+          "lemma": "くる",
+          "pos": "Verb",
+          "surface": "き"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "たーー"
+        }
+      ],
+      "id": "yattto_kita_2",
+      "input": "やっと週末きたーー"
+    },
+    {
+      "description": "kana kuru continuative after a katakana noun",
+      "expected": [
+        {
+          "lemma": "バス",
+          "pos": "Noun",
+          "surface": "バス"
+        },
+        {
+          "lemma": "くる",
+          "pos": "Verb",
+          "surface": "き"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "kita_2",
+      "input": "バスきた"
     }
   ],
   "description": "Irregular verbs (する、くる) (part 2/2)",
