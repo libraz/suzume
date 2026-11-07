@@ -1368,6 +1368,48 @@
       ],
       "id": "zukashisou",
       "input": "恥ずかしそう"
+    },
+    {
+      "description": "registered adjective stem before そう beats a shorter registered adjective's continuative",
+      "expected": [
+        {
+          "lemma": "めんどくさい",
+          "pos": "Adjective",
+          "surface": "めんどくさ"
+        },
+        {
+          "lemma": "そう",
+          "pos": "Auxiliary",
+          "surface": "そう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "顔",
+          "pos": "Noun",
+          "surface": "顔"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "mendokusasouna_woshita",
+      "input": "めんどくさそうな顔をした"
     }
   ],
   "description": "I-adjectives compound/derived forms (複合・派生) - sou patterns, nominalization, contracted forms",

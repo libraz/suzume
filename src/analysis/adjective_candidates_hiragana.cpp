@@ -302,11 +302,13 @@ void appendStemBeforeExcessiveOrAppearance(const HiraganaAdjectiveRun& run, std:
         !adj_detail::derivesFromCompoundFormingAdjective(codepoints, start_pos, base_form, dict_manager)) {
       continue;
     }
-    const float confidence = adj_detail::firstConfidenceAtLeast(
+    const float analyzed_confidence = adj_detail::firstConfidenceAtLeast(
         run.inflection.analyze(base_form), grammar::VerbType::IAdjective, candidate::kCompoundAdjConfMin);
-    if (confidence == candidate::kNoOriginConfidence) {
+    if (analyzed_confidence == candidate::kNoOriginConfidence) {
       continue;
     }
+    // A registered base is attested, not guessed from the kana shape.
+    const float confidence = registered_adjective ? candidate::kDictionaryOriginConfidence : analyzed_confidence;
     const float cost =
         candidate::confidenceScaledCost(candidate::kAdjStemExtCost, confidence, candidate::kAdjStemConfScale);
     candidates.push_back(makeIAdjStemCandidate(stem, start_pos, own_stem_end, base_form, cost,
