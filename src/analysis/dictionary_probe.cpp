@@ -53,4 +53,20 @@ size_t acceptedDictionaryEntryLength(const dictionary::DictionaryManager* dict_m
   return 0;
 }
 
+bool opensStandardCopulaCell(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
+                             size_t pos) {
+  constexpr size_t kMaxCopulaCellLength = 3;
+  if (dict_manager == nullptr || pos >= codepoints.size() || (codepoints[pos] != U'だ' && codepoints[pos] != U'で')) {
+    return false;
+  }
+  const size_t probe_end = std::min(codepoints.size(), pos + kMaxCopulaCellLength);
+  for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, pos, probe_end)) {
+    if (match.entry != nullptr && (match.entry->extended_pos == core::ExtendedPOS::AuxCopulaDa ||
+                                   match.entry->extended_pos == core::ExtendedPOS::AuxCopulaDesu)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 }  // namespace suzume::analysis

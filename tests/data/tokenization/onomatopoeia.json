@@ -2396,6 +2396,237 @@
       ],
       "id": "rui_he_heto_ite_ku",
       "input": "明るい方へ方へと歩いて行く"
+    },
+    {
+      "description": "doubled mimetic before the copula is the adjectival complement; kanji okurigana does not cut it",
+      "expected": [
+        {
+          "lemma": "ご",
+          "pos": "Prefix",
+          "surface": "ご"
+        },
+        {
+          "lemma": "飯",
+          "pos": "Noun",
+          "surface": "飯"
+        },
+        {
+          "lemma": "うまうま",
+          "pos": "Adjective",
+          "surface": "うまうま"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "go_umaumadattta",
+      "input": "ご飯うまうまだった"
+    },
+    {
+      "description": "kanji noun and a doubled mimetic do not form one compound",
+      "expected": [
+        {
+          "lemma": "犬",
+          "pos": "Noun",
+          "surface": "犬"
+        },
+        {
+          "lemma": "ふわふわ",
+          "pos": "Adjective",
+          "surface": "ふわふわ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "fuwafuwada",
+      "input": "犬ふわふわだ"
+    },
+    {
+      "description": "肉ふわふわだった - auto-generated",
+      "expected": [
+        {
+          "lemma": "肉",
+          "pos": "Noun",
+          "surface": "肉"
+        },
+        {
+          "lemma": "ふわふわ",
+          "pos": "Adjective",
+          "surface": "ふわふわ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "fuwafuwadattta",
+      "input": "肉ふわふわだった"
+    },
+    {
+      "description": "お腹がぺこぺこだ - auto-generated",
+      "expected": [
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "腹",
+          "pos": "Noun",
+          "surface": "腹"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ぺこぺこ",
+          "pos": "Adjective",
+          "surface": "ぺこぺこ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "o_gapekopekoda",
+      "input": "お腹がぺこぺこだ"
+    },
+    {
+      "description": "靴がぴかぴかです - auto-generated",
+      "expected": [
+        {
+          "lemma": "靴",
+          "pos": "Noun",
+          "surface": "靴"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ぴかぴか",
+          "pos": "Adjective",
+          "surface": "ぴかぴか"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "gapikapikadesu",
+      "input": "靴がぴかぴかです"
+    },
+    {
+      "description": "copula continuative and polite past after a doubled mimetic",
+      "expected": [
+        {
+          "lemma": "ふわふわ",
+          "pos": "Adjective",
+          "surface": "ふわふわ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "lemma": "気持ちいい",
+          "pos": "Adjective",
+          "surface": "気持ちいい"
+        },
+        {
+          "lemma": "もう",
+          "pos": "Adverb",
+          "surface": "もう"
+        },
+        {
+          "lemma": "くたくた",
+          "pos": "Adjective",
+          "surface": "くたくた"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "でし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "fuwafuwade_chiii_moukutakutadeshita",
+      "input": "ふわふわで気持ちいい。もうくたくたでした。"
+    },
+    {
+      "description": "doubled mimetic modifying a verb stays an adverb",
+      "expected": [
+        {
+          "lemma": "飯",
+          "pos": "Noun",
+          "surface": "飯"
+        },
+        {
+          "lemma": "うまうま",
+          "pos": "Adverb",
+          "surface": "うまうま"
+        },
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "umauma_beta",
+      "input": "飯うまうま食べた"
+    },
+    {
+      "description": "doubled mimetic before the genitive is nominal",
+      "expected": [
+        {
+          "lemma": "ふわふわ",
+          "pos": "Noun",
+          "surface": "ふわふわ"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "毛",
+          "pos": "Noun",
+          "surface": "毛"
+        }
+      ],
+      "id": "fuwafuwano",
+      "input": "ふわふわの毛"
     }
   ],
   "description": "Onomatopoeia and mimetic words",

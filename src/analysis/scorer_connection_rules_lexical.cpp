@@ -164,13 +164,15 @@ float computeSugiFinalParticleBonus(const core::LatticeEdge& prev, const core::L
   // boundaries in this position begin with a content kanji or an attested
   // lexical form, rather than this unverified tail.  A kana adverb glued to an
   // unattested lone kanji takes the same okurigana (当+たった for 当たっ+た),
-  // stretched or not (当+たったーー).
+  // stretched or not (当+たったーー). A doubled mimetic spells no ending
+  // (飯+うまうま), so it is not such a tail.
   const bool lone_kanji_noun = prev.pos == core::PartOfSpeech::Noun && normalize::utf8Length(prev.surface) == 1;
   const bool generated_te_tail = next.origin == core::CandidateOrigin::VerbHiragana && !next.fromDictionary() &&
                                  next.extended_pos == core::ExtendedPOS::VerbTeForm &&
                                  next.surface.size() >= core::kTwoJapaneseCharBytes;
   const bool kana_adverb_tail = !prev.fromDictionary() && grammar::isAllKanji(prev.surface) &&
-                                next.pos == core::PartOfSpeech::Adverb && grammar::isElongatedHiragana(next.surface);
+                                next.pos == core::PartOfSpeech::Adverb && grammar::isElongatedHiragana(next.surface) &&
+                                next.origin != core::CandidateOrigin::Onomatopoeia;
   if (lone_kanji_noun && (generated_te_tail || kana_adverb_tail)) {
     return cost::kAlmostNever;
   }

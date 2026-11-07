@@ -368,10 +368,24 @@ void appendPromotedRunCandidates(const BracketedNounContext& ctx, const Brackete
   // the adverb, not a noun (うっとり+と, どきり+と).
   const bool spells_mimetic_before_quotative = scan < codepoints.size() && codepoints[scan] == core::hiragana::kTo &&
                                                spellsRiMimeticShape(codepoints, start_pos, scan);
-  auto noun_cand =
-      makeCandidate(promoted.promoted_surface, start_pos, scan,
-                    spells_mimetic_before_quotative ? core::PartOfSpeech::Adverb : core::PartOfSpeech::Noun, noun_cost,
-                    /*has_suffix=*/true, CandidateOrigin::BracketedNoun);
+  // A doubled mimetic before a copula cell is its adjectival-noun complement
+  // (ふわふわ+で), the reading the mimetic generator gives the same span.
+  const size_t run_len = scan - start_pos;
+  const bool spells_doubled_mimetic_before_copula =
+      opensStandardCopulaCell(ctx.dict_manager, codepoints, scan) && run_len >= 4 && run_len % 2 == 0 &&
+      std::equal(codepoints.begin() + static_cast<std::ptrdiff_t>(start_pos),
+                 codepoints.begin() + static_cast<std::ptrdiff_t>(start_pos + (run_len / 2)),
+                 codepoints.begin() + static_cast<std::ptrdiff_t>(start_pos + (run_len / 2)));
+  core::PartOfSpeech bracketed_pos = core::PartOfSpeech::Noun;
+  core::ExtendedPOS bracketed_epos = core::ExtendedPOS::Unknown;
+  if (spells_mimetic_before_quotative) {
+    bracketed_pos = core::PartOfSpeech::Adverb;
+  } else if (spells_doubled_mimetic_before_copula) {
+    bracketed_pos = core::PartOfSpeech::Adjective;
+    bracketed_epos = core::ExtendedPOS::AdjNaAdj;
+  }
+  auto noun_cand = makeCandidate(promoted.promoted_surface, start_pos, scan, bracketed_pos, noun_cost,
+                                 /*has_suffix=*/true, CandidateOrigin::BracketedNoun, bracketed_epos);
   noun_cand.bracketed_noun_rescue = !promoted.copula_selected_predicate_homograph;
   // A particle-shaped last mora of a determiner (その, この) is no particle,
   // so a run the determiner opens and the clause end or a case or topic

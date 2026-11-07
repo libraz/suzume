@@ -80,6 +80,24 @@ void appendMimeticAdverb(const std::vector<char32_t>& codepoints, size_t start, 
   candidates.push_back(std::move(cand));
 }
 
+// The doubled mimetic's word class: the copula's complement is the adjectival
+// noun (ふわふわ+だ, ぺこぺこ+でした), which an adverb cannot be, and the manner
+// adverb everywhere else.
+void appendDoubledMimetic(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
+                          size_t start, size_t end, float cost, [[maybe_unused]] const char* pattern,
+                          std::vector<UnknownCandidate>& candidates) {
+  const bool copula_complement = opensStandardCopulaCell(dict_manager, codepoints, end);
+  auto cand = makeCandidate(codepoints, start, end,
+                            copula_complement ? core::PartOfSpeech::Adjective : core::PartOfSpeech::Adverb, cost, true,
+                            CandidateOrigin::Onomatopoeia,
+                            copula_complement ? core::ExtendedPOS::AdjNaAdj : core::ExtendedPOS::Unknown);
+#ifdef SUZUME_DEBUG_INFO
+  cand.confidence = 1.0F;
+  cand.pattern = pattern;
+#endif
+  candidates.push_back(std::move(cand));
+}
+
 }  // namespace
 
 size_t laughterLengthAt(const std::vector<char32_t>& codepoints, size_t start_pos) {
@@ -403,14 +421,8 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
         // mimetic adverb invented over the same span would outbid it on shape
         // alone (めちゃめちゃ is the na-adjective the dictionary lists).
         if (!surface.empty() && (dict_manager_ == nullptr || dict_manager_->lookupExact(surface) == nullptr)) {
-          auto cand =
-              makeCandidate(surface, start_pos, mimetic_end, core::PartOfSpeech::Adverb,
-                            candidate::kMimeticExactReduplicationAdverbCost, true, CandidateOrigin::Onomatopoeia);
-#ifdef SUZUME_DEBUG_INFO
-          cand.confidence = 1.0F;
-          cand.pattern = "aa_doubled";
-#endif
-          candidates.push_back(cand);
+          appendDoubledMimetic(dict_manager_, codepoints, start_pos, mimetic_end,
+                               candidate::kMimeticExactReduplicationAdverbCost, "aa_doubled", candidates);
           return;  // Found a match, return early
         }
       }
@@ -461,7 +473,7 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
     if (!halves_match) {
       continue;
     }
-    appendMimeticAdverb(codepoints, start_pos, doubled_end, 0.1F, 1.0F, "reduplicated_prefix", candidates);
+    appendDoubledMimetic(dict_manager_, codepoints, start_pos, doubled_end, 0.1F, "reduplicated_prefix", candidates);
     break;
   }
 

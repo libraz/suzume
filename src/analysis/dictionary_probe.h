@@ -100,6 +100,16 @@ inline size_t longestDictionaryEntryLengthFrom(const dictionary::DictionaryManag
   return acceptedDictionaryEntryLength(dict_manager, codepoints, start, min_len, max_len, pos, accept, true);
 }
 
+/**
+ * @brief Whether a cell of the standard copula opens at @p pos
+ *
+ * Every cell of the standard copula (だ, だっ, だろ, で, です, でし, でしょ)
+ * opens on だ or で; regional and clipped copulas (や, す) also open other
+ * words (やる, する), so they are not admitted.
+ */
+bool opensStandardCopulaCell(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
+                             size_t pos);
+
 }  // namespace suzume::analysis
 
 #endif  // SUZUME_ANALYSIS_DICTIONARY_PROBE_H_

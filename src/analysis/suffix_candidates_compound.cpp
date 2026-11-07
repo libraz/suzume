@@ -721,6 +721,25 @@ bool crossesFunctionWordBoundary(const KanjiHiraganaSpan& span, const HiraganaTa
   return false;
 }
 
+// Whether the hiragana run at @p pos opens on a stem of two or three morae
+// spelled twice.
+bool opensKanaDoubling(const std::vector<char32_t>& codepoints, const std::vector<normalize::CharType>& char_types,
+                       size_t pos) {
+  constexpr size_t kMinHalf = 2;
+  constexpr size_t kMaxHalf = 3;
+  for (size_t half = kMinHalf; half <= kMaxHalf && pos + (2 * half) <= codepoints.size(); ++half) {
+    bool doubled = true;
+    for (size_t offset = 0; offset < half && doubled; ++offset) {
+      doubled = char_types[pos + offset] == normalize::CharType::Hiragana &&
+                codepoints[pos + offset] == codepoints[pos + half + offset];
+    }
+    if (doubled) {
+      return true;
+    }
+  }
+  return false;
+}
+
 }  // namespace
 
 void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
@@ -750,6 +769,11 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
 
   // Find hiragana portion (2-4 characters)
   if (kanji_end >= char_types.size() || char_types[kanji_end] != normalize::CharType::Hiragana) {
+    return;
+  }
+  // A kana run that opens on a doubling (ふわ+ふわ, うま+うま) is a mimetic
+  // word of its own, never the tail of a one-kanji compound (犬+ふわふわ).
+  if (opensKanaDoubling(codepoints, char_types, kanji_end)) {
     return;
   }
   size_t hiragana_end = scanCompoundHiraganaEnd(codepoints, char_types, kanji_end, dict_manager);
