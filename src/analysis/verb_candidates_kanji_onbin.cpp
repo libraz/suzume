@@ -147,18 +147,33 @@ void emitOnbinStemCandidate(const std::vector<char32_t>& codepoints, size_t star
   candidates.push_back(std::move(candidate));
 }
 
-void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t start_pos, size_t kanji_end,
-                                size_t hiragana_end, const grammar::Inflection& inflection,
-                                const dictionary::DictionaryManager* dict_manager, bool sokuonbin_stem_verified,
-                                const std::string& sokuonbin_lemma, grammar::VerbType sokuonbin_verb_type,
-                                std::vector<UnknownCandidate>& candidates) {
-  const std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
-  // Generate Godan onbin stem candidates for contraction auxiliary patterns
-  // E.g., 読んでる → 読ん (onbin of 読む) + でる (ている contraction)
-  //       書いとく → 書い (onbin of 書く) + とく (ておく contraction)
-  // Key patterns:
-  // - kanji + ん + (ど/じ/で): GodanMa/GodanBa/GodanNa verbs (読んでる, 飛んどく)
-  // - kanji + い + (と/ち): GodanKa/GodanGa verbs (書いとく, 泳いちゃう)
+namespace {
+
+/// Shared inputs of the kanji onbin steps.
+struct OnbinContext {
+  const std::vector<char32_t>& codepoints;
+  size_t start_pos;
+  size_t kanji_end;
+  size_t hiragana_end;
+  const grammar::Inflection& inflection;
+  const dictionary::DictionaryManager* dict_manager;
+  const std::string& kanji_stem;
+};
+
+// Generate Godan onbin stem candidates for contraction auxiliary patterns
+// E.g., 読んでる → 読ん (onbin of 読む) + でる (ている contraction)
+//       書いとく → 書い (onbin of 書く) + とく (ておく contraction)
+// Key patterns:
+// - kanji + ん + (ど/じ/で): GodanMa/GodanBa/GodanNa verbs (読んでる, 飛んどく)
+// - kanji + い + (と/ち): GodanKa/GodanGa verbs (書いとく, 泳いちゃう)
+void appendContractionOnbinStem(const OnbinContext& ctx, std::vector<UnknownCandidate>& candidates) {
+  const auto& codepoints = ctx.codepoints;
+  const size_t start_pos = ctx.start_pos;
+  const size_t kanji_end = ctx.kanji_end;
+  const size_t hiragana_end = ctx.hiragana_end;
+  const auto& inflection = ctx.inflection;
+  const dictionary::DictionaryManager* dict_manager = ctx.dict_manager;
+  const std::string& kanji_stem = ctx.kanji_stem;
   if (kanji_end < hiragana_end) {
     char32_t first_hira = codepoints[kanji_end];
     // Check for hatsuonbin (ん), ikuon (い), or the lexical GodanWa
@@ -229,15 +244,25 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
       }
     }
   }
+}
 
-  // Generate Godan sokuonbin (っ) candidates for basic te/ta-form splitting
-  // E.g., 言って → 言っ (onbin of 言う) + て (particle)
-  //       言った → 言っ (onbin of 言う) + た (auxiliary)
-  //       待って → 待っ (onbin of 待つ) + て (particle)
-  //       買って → 買っ (onbin of 買う) + て (particle)
-  // Key patterns:
-  // - kanji + っ + て/た/たら/たり: GodanRa/GodanTa/GodanWa verbs
-  // - the ちゃう (ち) and とく (と) contractions take the same stem
+// Generate Godan sokuonbin (っ) candidates for basic te/ta-form splitting
+// E.g., 言って → 言っ (onbin of 言う) + て (particle)
+//       言った → 言っ (onbin of 言う) + た (auxiliary)
+//       待って → 待っ (onbin of 待つ) + て (particle)
+//       買って → 買っ (onbin of 買う) + て (particle)
+// Key patterns:
+// - kanji + っ + て/た/たら/たり: GodanRa/GodanTa/GodanWa verbs
+// - the ちゃう (ち) and とく (と) contractions take the same stem
+void appendSokuonbinStem(const OnbinContext& ctx, bool sokuonbin_stem_verified, const std::string& sokuonbin_lemma,
+                         grammar::VerbType sokuonbin_verb_type, std::vector<UnknownCandidate>& candidates) {
+  const auto& codepoints = ctx.codepoints;
+  const size_t start_pos = ctx.start_pos;
+  const size_t kanji_end = ctx.kanji_end;
+  const size_t hiragana_end = ctx.hiragana_end;
+  const auto& inflection = ctx.inflection;
+  const dictionary::DictionaryManager* dict_manager = ctx.dict_manager;
+  const std::string& kanji_stem = ctx.kanji_stem;
   if (kanji_end + 1 < hiragana_end && codepoints[kanji_end] == U'っ' &&
       (codepoints[kanji_end + 1] == U'て' || codepoints[kanji_end + 1] == U'た' || codepoints[kanji_end + 1] == U'ち' ||
        codepoints[kanji_end + 1] == U'と')) {
@@ -394,17 +419,23 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
                              matched_via_dict ? " (dict)" : " (infl)", candidates);
     }
   }
+}
 
-  appendExtendedSokuonbinCandidates(codepoints, start_pos, kanji_end, hiragana_end, inflection, dict_manager,
-                                    candidates);
-
-  // Generate Godan hatsuonbin (ん) candidates for basic te/ta-form splitting
-  // E.g., 読んだ → 読ん (onbin of 読む) + だ (auxiliary)
-  //       読んで → 読ん (onbin of 読む) + で (particle)
-  //       飛んだ → 飛ん (onbin of 飛ぶ) + だ (auxiliary)
-  //       死んだ → 死ん (onbin of 死ぬ) + だ (auxiliary)
-  // Key patterns:
-  // - kanji + ん + で/だ: GodanMa/GodanBa/GodanNa verbs
+// Generate Godan hatsuonbin (ん) candidates for basic te/ta-form splitting
+// E.g., 読んだ → 読ん (onbin of 読む) + だ (auxiliary)
+//       読んで → 読ん (onbin of 読む) + で (particle)
+//       飛んだ → 飛ん (onbin of 飛ぶ) + だ (auxiliary)
+//       死んだ → 死ん (onbin of 死ぬ) + だ (auxiliary)
+// Key patterns:
+// - kanji + ん + で/だ: GodanMa/GodanBa/GodanNa verbs
+void appendHatsuonbinDeDaStem(const OnbinContext& ctx, std::vector<UnknownCandidate>& candidates) {
+  const auto& codepoints = ctx.codepoints;
+  const size_t start_pos = ctx.start_pos;
+  const size_t kanji_end = ctx.kanji_end;
+  const size_t hiragana_end = ctx.hiragana_end;
+  const auto& inflection = ctx.inflection;
+  const dictionary::DictionaryManager* dict_manager = ctx.dict_manager;
+  const std::string& kanji_stem = ctx.kanji_stem;
   if (kanji_end + 1 < hiragana_end && codepoints[kanji_end] == U'ん' &&
       (codepoints[kanji_end + 1] == U'で' || codepoints[kanji_end + 1] == U'だ')) {
     const auto& hatsuonbin_types = grammar::Conjugation::getGodanTypesByOnbin("ん");
@@ -436,11 +467,20 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
                              candidates);
     }
   }
+}
 
-  // Generate hatsuonbin candidates for multi-hiragana okurigana and standalone ん
-  // Covers cases NOT handled by the de/da handler above:
-  // - Multi-hira okurigana: 汗ばんだ → 汗ばん (onbin of 汗ばむ) + だ
-  // - Standalone single ん: 死ん (end of token, no following で/だ)
+// Generate hatsuonbin candidates for multi-hiragana okurigana and standalone ん
+// Covers cases NOT handled by the de/da handler above:
+// - Multi-hira okurigana: 汗ばんだ → 汗ばん (onbin of 汗ばむ) + だ
+// - Standalone single ん: 死ん (end of token, no following で/だ)
+void appendHatsuonbinOkuriganaStem(const OnbinContext& ctx, std::vector<UnknownCandidate>& candidates) {
+  const auto& codepoints = ctx.codepoints;
+  const size_t start_pos = ctx.start_pos;
+  const size_t kanji_end = ctx.kanji_end;
+  const size_t hiragana_end = ctx.hiragana_end;
+  const auto& inflection = ctx.inflection;
+  const dictionary::DictionaryManager* dict_manager = ctx.dict_manager;
+  const std::string& kanji_stem = ctx.kanji_stem;
   for (size_t n_pos = kanji_end; n_pos < hiragana_end; ++n_pos) {
     if (codepoints[n_pos] != U'ん')
       continue;
@@ -518,6 +558,23 @@ void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t 
     }
     break;  // Only process first ん in the region
   }
+}
+
+}  // namespace
+
+void appendKanjiOnbinCandidates(const std::vector<char32_t>& codepoints, size_t start_pos, size_t kanji_end,
+                                size_t hiragana_end, const grammar::Inflection& inflection,
+                                const dictionary::DictionaryManager* dict_manager, bool sokuonbin_stem_verified,
+                                const std::string& sokuonbin_lemma, grammar::VerbType sokuonbin_verb_type,
+                                std::vector<UnknownCandidate>& candidates) {
+  const std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
+  const OnbinContext ctx{codepoints, start_pos, kanji_end, hiragana_end, inflection, dict_manager, kanji_stem};
+  appendContractionOnbinStem(ctx, candidates);
+  appendSokuonbinStem(ctx, sokuonbin_stem_verified, sokuonbin_lemma, sokuonbin_verb_type, candidates);
+  appendExtendedSokuonbinCandidates(codepoints, start_pos, kanji_end, hiragana_end, inflection, dict_manager,
+                                    candidates);
+  appendHatsuonbinDeDaStem(ctx, candidates);
+  appendHatsuonbinOkuriganaStem(ctx, candidates);
 }
 
 }  // namespace suzume::analysis::kanji_verb_detail
