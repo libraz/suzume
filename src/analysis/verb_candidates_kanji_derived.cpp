@@ -217,8 +217,7 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
   // Literary ～んずる verbs (軽んずる, 重んずる) use a productive zuru
   // terminal that is not the ordinary noun+する paradigm.  Preserve the
   // complete finite form instead of reopening ん as a nominalizer particle.
-  if (kanji_end + 3 <= codepoints.size() && codepoints[kanji_end] == U'ん' && codepoints[kanji_end + 1] == U'ず' &&
-      codepoints[kanji_end + 2] == U'る') {
+  if (textMatchesAt(codepoints, kanji_end, "んずる")) {
     const size_t zuru_end = kanji_end + 3;
     const std::string zuru_surface = extractSubstring(codepoints, start_pos, zuru_end);
     auto zuru_candidate =
@@ -369,8 +368,7 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
   // Dictionary-backed single-kanji する verbs form 仮定形 with すれ+ば
   // (反する→反すれ+ば).  The generic analyzer can otherwise detach the
   // lexical kanji and select the standalone する paradigm.
-  if (kanji_end == start_pos + 1 && kanji_end + 2 < codepoints.size() && codepoints[kanji_end] == U'す' &&
-      codepoints[kanji_end + 1] == U'れ' && codepoints[kanji_end + 2] == U'ば') {
+  if (kanji_end == start_pos + 1 && textMatchesAt(codepoints, kanji_end, "すれば")) {
     const std::string suru_base = extractSubstring(codepoints, start_pos, kanji_end) + "する";
     if (vh::isVerbInDictionary(dict_manager, suru_base)) {
       const size_t kateikei_end = kanji_end + 2;
@@ -387,7 +385,7 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
   // surface is stem + a-row + せれ + ば (遊ばせれば), so preserve the full
   // conditional stem instead of splitting the causative auxiliary midway.
   if (kanji_end + 3 < codepoints.size() && kana::isARowCodepoint(codepoints[kanji_end]) &&
-      codepoints[kanji_end + 1] == U'せ' && codepoints[kanji_end + 2] == U'れ' && codepoints[kanji_end + 3] == U'ば') {
+      textMatchesAt(codepoints, kanji_end + 1, "せれば")) {
     size_t kateikei_end = kanji_end + 3;
     std::string surface = extractSubstring(codepoints, start_pos, kateikei_end);
     std::string causative_stem = extractSubstring(codepoints, start_pos, kanji_end + 2);
@@ -402,7 +400,7 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
   // Unlike 食べよう, there is no e-row renyokei kana before よ, so emit the
   // mizenkei stem separately after inflection confirms the full form.
   if (kanji_end == start_pos + 1 && !grammar::isKuruKanjiStem(codepoints[start_pos]) &&
-      kanji_end + 1 < codepoints.size() && codepoints[kanji_end] == U'よ' && codepoints[kanji_end + 1] == U'う') {
+      textMatchesAt(codepoints, kanji_end, "よう")) {
     float confidence = getIchidanConfidence(analysesInRange(inflection, codepoints, start_pos, kanji_end + 2),
                                             candidate::verb_cost::kIchidanKateikeiMinConfidence);
     if (confidence >= candidate::verb_cost::kIchidanKateikeiMinConfidence) {

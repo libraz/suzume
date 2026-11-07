@@ -58,8 +58,8 @@ RenyokeiBase renyokeiBaseFromEnding(const std::string& surface, char32_t ending)
 }
 
 bool hasNiSugiNegativeTail(const std::vector<char32_t>& codepoints, size_t pos) {
-  return pos + 3 < codepoints.size() && codepoints[pos] == U'に' && codepoints[pos + 1] == U'す' &&
-         codepoints[pos + 2] == U'ぎ' && vh::naiNegativeFollowsAt(codepoints, pos + 3);
+  return pos + 3 < codepoints.size() && textMatchesAt(codepoints, pos, "にすぎ") &&
+         vh::naiNegativeFollowsAt(codepoints, pos + 3);
 }
 
 bool isVerifiedFiniteVerb(const dictionary::DictionaryManager* dict_manager, const grammar::Inflection& inflection,
@@ -429,7 +429,7 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
   const size_t hiragana_end = findCharRegionEnd(char_types, kanji_end, 12, normalize::CharType::Hiragana);
   bool has_excessive_renyokei_tail = false;
   for (size_t pos = kanji_end + 1; pos + 1 < hiragana_end; ++pos) {
-    if (codepoints[pos] == U'す' && codepoints[pos + 1] == U'ぎ' && kana::isIOrERowCodepoint(codepoints[pos - 1])) {
+    if (textMatchesAt(codepoints, pos, "すぎ") && kana::isIOrERowCodepoint(codepoints[pos - 1])) {
       has_excessive_renyokei_tail = true;
       break;
     }
@@ -565,7 +565,7 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
   // Pattern: kanji + (き/ぎ/し/ち/に/び/み/り/い) + すぎ...
   size_t sugi_pos = hiragana_end;
   for (size_t pos = kanji_end; pos + 1 < hiragana_end; ++pos) {
-    if (codepoints[pos] == U'す' && codepoints[pos + 1] == U'ぎ') {
+    if (textMatchesAt(codepoints, pos, "すぎ")) {
       sugi_pos = pos;
       break;
     }

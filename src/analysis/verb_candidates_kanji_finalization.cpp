@@ -972,7 +972,7 @@ void appendSelectedKanjiVerbCandidate(const std::vector<char32_t>& codepoints, s
     // Valid single-kanji verbs: 入る, 走る, 居る (いる), 見る, etc.
     // These should be in dictionary, so dictionary bonus will override
     if (end_pos - start_pos == 3 && normalize::isKanjiCodepoint(codepoints[start_pos]) &&
-        codepoints[start_pos + 1] == U'い' && codepoints[start_pos + 2] == U'る') {
+        textMatchesAt(codepoints, start_pos + 1, "いる")) {
       base_cost += candidate::kSingleKanjiIruVerbSplitPenalty;
       SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +2.5 (single_kanji_iru_penalty)\n");
     }

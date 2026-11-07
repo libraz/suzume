@@ -153,12 +153,12 @@ void appendIkuAuxiliaryCandidates(const std::vector<char32_t>& codepoints, size_
   const std::string_view base_lemma = literary ? "ゆく" : "いく";
   const std::string_view potential_lemma = literary ? "ゆける" : "いける";
 
-  if (start_pos + 3 < codepoints.size() && codepoints[start_pos + 2] == U'れ' && codepoints[start_pos + 3] == U'ば') {
+  if (textMatchesAt(codepoints, start_pos + 2, "れば")) {
     emit(start_pos + 3, potential_lemma, "hiragana_iku_auxiliary");
     return;
   }
 
-  if (start_pos + 2 < codepoints.size() && codepoints[start_pos + 1] == U'こ' && codepoints[start_pos + 2] == U'う') {
+  if (textMatchesAt(codepoints, start_pos + 1, "こう")) {
     emit(start_pos + 2, base_lemma, "hiragana_iku_auxiliary");
     return;
   }

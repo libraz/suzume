@@ -64,8 +64,7 @@ void appendSingleOkuriganaMizenkeiCandidates(const std::vector<char32_t>& codepo
   // 1. Classical べき patterns: 書かれべき, 読まれべき
   // 2. Passive patterns: 書か+れる, 言わ+れ+た. Strict ま-branch: bare ま
   //    requires a following す/せ (れます/れません).
-  const bool is_beki_pattern = next_char == U'れ' && mizenkei_end + 2 < codepoints.size() &&
-                               codepoints[mizenkei_end + 1] == U'べ' && codepoints[mizenkei_end + 2] == U'き';
+  const bool is_beki_pattern = next_char == U'れ' && textMatchesAt(codepoints, mizenkei_end + 1, "べき");
   const bool is_passive_pattern = next_char == U'れ' && !is_beki_pattern &&
                                   vh::isPassiveAuxContinuation(codepoints, mizenkei_end + 1, /*strict_masu=*/true);
   // Classical negation ぬ: 揃わぬ → 揃わ (mizenkei) + ぬ (AUX)
@@ -707,7 +706,7 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
   // 読む/書く. Validate the underlying godan verb so ordinary Ichidan stems
   // such as 食べなく do not acquire a fabricated potential reading.
   if (kanji_end - start_pos == 1 && kanji_end + 2 < hiragana_end && kana::isERowCodepoint(codepoints[kanji_end]) &&
-      codepoints[kanji_end + 1] == U'な' && codepoints[kanji_end + 2] == U'く') {
+      textMatchesAt(codepoints, kanji_end + 1, "なく")) {
     const std::string_view base_suffix = grammar::godanBaseSuffixFromERow(codepoints[kanji_end]);
     if (!base_suffix.empty()) {
       const std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);

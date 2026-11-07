@@ -309,8 +309,8 @@ void appendMizenkeiNakyaCandidates(const std::vector<char32_t>& codepoints, size
     if (end_pos + 3 > codepoints.size() || codepoints[end_pos] != U'な') {
       continue;
     }
-    bool is_nakya = (codepoints[end_pos + 1] == U'き' && codepoints[end_pos + 2] == U'ゃ');
-    bool is_nakere = (codepoints[end_pos + 1] == U'け' && codepoints[end_pos + 2] == U'れ');
+    bool is_nakya = textMatchesAt(codepoints, end_pos + 1, "きゃ");
+    bool is_nakere = textMatchesAt(codepoints, end_pos + 1, "けれ");
     if (!is_nakya && !is_nakere) {
       continue;
     }
@@ -363,7 +363,7 @@ void appendNOnbinNaiCandidates(const std::vector<char32_t>& codepoints, size_t s
   if (start_pos > 0 && negative_pos < codepoints.size() &&
       (codepoints[start_pos - 1] == U'て' || codepoints[start_pos - 1] == U'で' ||
        vh::closesIchidanIrrealis(inflection, codepoints, start_pos)) &&
-      codepoints[start_pos] == U'ら' && codepoints[start_pos + 1] == U'ん' &&
+      textMatchesAt(codepoints, start_pos, "らん") &&
       (vh::naiNegativeFollowsAt(codepoints, negative_pos) || colloquial_negative_follows)) {
     auto contracted = makeCandidate(codepoints, start_pos, start_pos + 2, core::PartOfSpeech::Auxiliary,
                                     candidate::verb_cost::kStrongBonus, false, CandidateOrigin::VerbHiragana,
@@ -467,7 +467,7 @@ void appendNContractedTerminalCandidates(const std::vector<char32_t>& codepoints
     const bool closes_phrase =
         vh::clauseEndsAt(codepoints, after) ||
         vh::oneMoraParticleEndsAt(dict_manager, codepoints, after + 1, core::ExtendedPOS::ParticleFinal) ||
-        (after + 1 < codepoints.size() && codepoints[after] == U'っ' && codepoints[after + 1] == U'て');
+        textMatchesAt(codepoints, after, "って");
     if (!closes_phrase) {
       return;
     }

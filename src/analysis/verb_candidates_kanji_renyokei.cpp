@@ -36,7 +36,7 @@ namespace {
 
 // The ichidan passive/potential られ followed by a complete auxiliary cell.
 bool rarePassiveFollowsAt(const std::vector<char32_t>& codepoints, size_t pos) {
-  return pos + 1 < codepoints.size() && codepoints[pos] == U'ら' && codepoints[pos + 1] == U'れ' &&
+  return textMatchesAt(codepoints, pos, "られ") &&
          vh::isPassiveAuxContinuation(codepoints, pos + 2, /*strict_masu=*/true);
 }
 
@@ -512,8 +512,7 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
         ++following_kanji_end;
       }
       bool follows_kanji_sahen_predicate =
-          following_kanji_end > renyokei_end && following_kanji_end + 1 < codepoints.size() &&
-          codepoints[following_kanji_end] == U'す' && codepoints[following_kanji_end + 1] == U'る';
+          following_kanji_end > renyokei_end && textMatchesAt(codepoints, following_kanji_end, "する");
       // The object marker in front of the stem is what makes it the head of its
       // own clause rather than the first half of a compound verb.
       const bool preceded_by_case_particle =

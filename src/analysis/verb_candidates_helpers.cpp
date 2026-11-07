@@ -84,7 +84,7 @@ size_t finiteMasuFormLengthAt(const std::vector<char32_t>& codepoints, size_t po
     return 0;
   }
   if (codepoints[pos + 1] == U'す') {
-    if (pos + 3 < codepoints.size() && codepoints[pos + 2] == U'れ' && codepoints[pos + 3] == U'ば') {
+    if (textMatchesAt(codepoints, pos + 2, "れば")) {
       return 4;  // ますれば
     }
     return 2;  // ます
@@ -93,18 +93,18 @@ size_t finiteMasuFormLengthAt(const std::vector<char32_t>& codepoints, size_t po
     if (pos + 2 < codepoints.size() && (codepoints[pos + 2] == U'た' || codepoints[pos + 2] == U'て')) {
       return 3;  // ました / まして
     }
-    if (pos + 3 < codepoints.size() && codepoints[pos + 2] == U'ょ' && codepoints[pos + 3] == U'う') {
+    if (textMatchesAt(codepoints, pos + 2, "ょう")) {
       return 4;  // ましょう
     }
   }
-  if (pos + 2 < codepoints.size() && codepoints[pos + 1] == U'せ' && codepoints[pos + 2] == U'ん') {
+  if (textMatchesAt(codepoints, pos + 1, "せん")) {
     return 3;  // ません
   }
   return 0;
 }
 
 bool causativeSaseFollowsAt(const std::vector<char32_t>& codepoints, size_t pos) {
-  return pos + 1 < codepoints.size() && codepoints[pos] == U'さ' && codepoints[pos + 1] == U'せ';
+  return textMatchesAt(codepoints, pos, "させ");
 }
 
 bool isSuruAuxiliaryStarter(char32_t next_char) {
@@ -168,9 +168,7 @@ bool particleClosesClauseBeforeSokuon(const std::vector<char32_t>& codepoints, s
 }
 
 bool volitionalEndingFollowsAt(const std::vector<char32_t>& codepoints, size_t pos) {
-  return pos < codepoints.size() &&
-         (codepoints[pos] == U'う' ||
-          (codepoints[pos] == U'っ' && pos + 1 < codepoints.size() && codepoints[pos + 1] == U'か'));
+  return pos < codepoints.size() && (codepoints[pos] == U'う' || textMatchesAt(codepoints, pos, "っか"));
 }
 
 bool startsInsideKanjiRun(const std::vector<char32_t>& codepoints, size_t pos) {
@@ -225,8 +223,7 @@ bool crossesKkoNominalizer(const std::vector<char32_t>& codepoints, size_t start
     return false;
   }
   for (size_t pos = start_pos + 1; pos < end_pos; ++pos) {
-    if (codepoints[pos] == U'っ' && pos + 1 < codepoints.size() && codepoints[pos + 1] == U'こ' &&
-        naiNegativeFollowsAt(codepoints, pos + 2)) {
+    if (textMatchesAt(codepoints, pos, "っこ") && naiNegativeFollowsAt(codepoints, pos + 2)) {
       return true;
     }
   }
@@ -405,8 +402,7 @@ bool literaryPastAuxiliaryFollowsAt(const dictionary::DictionaryManager& dict_ma
 }
 
 bool naiConditionalFollowsAt(const std::vector<char32_t>& codepoints, size_t pos) {
-  return pos + 2 < codepoints.size() && codepoints[pos] == U'な' && codepoints[pos + 1] == U'け' &&
-         codepoints[pos + 2] == U'れ';
+  return textMatchesAt(codepoints, pos, "なけれ");
 }
 
 bool itadakuParadigmStartsAt(const std::vector<char32_t>& codepoints, size_t pos) {

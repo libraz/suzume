@@ -327,7 +327,7 @@ void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, s
       bool closes_before_contracted_quotative = false;
       for (size_t quote_pos = start_pos + 1; is_sokuonbin && dict_manager != nullptr && quote_pos + 1 < onbin_pos;
            ++quote_pos) {
-        if (codepoints[quote_pos] == U'っ' && codepoints[quote_pos + 1] == U'つ') {
+        if (textMatchesAt(codepoints, quote_pos, "っつ")) {
           const auto* host =
               lookupEntryInRange(*dict_manager, codepoints, start_pos, quote_pos, core::PartOfSpeech::Verb);
           closes_before_contracted_quotative =
@@ -446,8 +446,7 @@ void appendEruObligationCandidates(const std::vector<char32_t>& codepoints, size
   const bool negative_follows =
       start_pos + 1 < codepoints.size() &&
       (vh::naiNegativeFollowsAt(codepoints, start_pos + 1) || codepoints[start_pos + 1] == U'ず');
-  const bool polite_negative_follows =
-      start_pos + 2 < codepoints.size() && codepoints[start_pos + 1] == U'ま' && codepoints[start_pos + 2] == U'せ';
+  const bool polite_negative_follows = textMatchesAt(codepoints, start_pos + 1, "ませ");
   if (start_pos < 3 || codepoints[start_pos] != U'え' || codepoints[start_pos - 1] != U'を' ||
       codepoints[start_pos - 2] != U'る' || codepoints[start_pos - 3] != U'ざ' ||
       (!negative_follows && !polite_negative_follows)) {
@@ -481,8 +480,7 @@ void appendKuruMizenkeiCandidates(const std::vector<char32_t>& codepoints, size_
   // is followed immediately by ば after a clear te-form (読んでくれ+ば).
   // The benefactive conditional is くれれ+ば, so this context uniquely marks
   // the directional auxiliary 来る.
-  if (start_pos + 2 < codepoints.size() && codepoints[start_pos] == U'く' && codepoints[start_pos + 1] == U'れ' &&
-      codepoints[start_pos + 2] == U'ば' && isClearTeFormBeforeSubsidiary(codepoints, start_pos, false)) {
+  if (textMatchesAt(codepoints, start_pos, "くれば") && isClearTeFormBeforeSubsidiary(codepoints, start_pos, false)) {
     appendContextualSubsidiaryCandidate(codepoints, start_pos, start_pos + 2, "くる", dictionary::ConjugationType::Kuru,
                                         core::ExtendedPOS::AuxAspectKuru, "hiragana_kuru_conditional",
                                         candidate::verb_cost::kStrongBonus, candidates);
@@ -492,14 +490,11 @@ void appendKuruMizenkeiCandidates(const std::vector<char32_t>& codepoints, size_
     return;
   }
   const bool negative_follows = vh::naiNegativeFollowsAt(codepoints, start_pos + 1);
-  const bool passive_follows = start_pos + 3 < codepoints.size() && codepoints[start_pos + 1] == U'ら' &&
-                               codepoints[start_pos + 2] == U'れ' &&
+  const bool passive_follows = start_pos + 3 < codepoints.size() && textMatchesAt(codepoints, start_pos + 1, "られ") &&
                                vh::isPassiveAuxContinuation(codepoints, start_pos + 3, /*strict_masu=*/false);
   const bool causative_follows = vh::causativeSaseFollowsAt(codepoints, start_pos + 1);
-  const bool ra_nuki_potential_follows =
-      start_pos + 2 < codepoints.size() && codepoints[start_pos + 1] == U'れ' && codepoints[start_pos + 2] == U'る';
-  const bool volitional_follows =
-      start_pos + 2 < codepoints.size() && codepoints[start_pos + 1] == U'よ' && codepoints[start_pos + 2] == U'う';
+  const bool ra_nuki_potential_follows = textMatchesAt(codepoints, start_pos + 1, "れる");
+  const bool volitional_follows = textMatchesAt(codepoints, start_pos + 1, "よう");
   if (!negative_follows && !passive_follows && !causative_follows && !ra_nuki_potential_follows &&
       !volitional_follows) {
     return;

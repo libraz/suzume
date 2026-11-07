@@ -45,8 +45,7 @@ bool hasLongGodanWaNegativeEvidence(const std::vector<char32_t>& codepoints, siz
     if (char_types[negative_pos] != normalize::CharType::Hiragana) {
       break;
     }
-    if (negative_pos >= start_pos + 3 && codepoints[negative_pos] == U'わ' && codepoints[negative_pos + 1] == U'な' &&
-        codepoints[negative_pos + 2] == U'い') {
+    if (negative_pos >= start_pos + 3 && textMatchesAt(codepoints, negative_pos, "わない")) {
       return true;
     }
   }
