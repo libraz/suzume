@@ -580,9 +580,17 @@ bool continuesTemporalNounCompound(char32_t prefix, char32_t next) {
   return kana::isCodepointIn(kTemporalCompoundUnits, next);
 }
 
+bool isArabicDigitCodepoint(char32_t code_point) {
+  return (code_point >= U'0' && code_point <= U'9') || (code_point >= U'０' && code_point <= U'９');
+}
+
+bool isMagnitudeKanji(char32_t code_point) {
+  static constexpr std::array<char32_t, 6> kMagnitudes = {U'十', U'百', U'千', U'万', U'億', U'兆'};
+  return kana::isCodepointIn(kMagnitudes, code_point);
+}
+
 bool isNumeralCodepoint(char32_t code_point) {
-  // Arabic numerals (half-width and full-width)
-  if ((code_point >= U'0' && code_point <= U'9') || (code_point >= U'０' && code_point <= U'９')) {
+  if (isArabicDigitCodepoint(code_point)) {
     return true;
   }
   // Kanji numerals

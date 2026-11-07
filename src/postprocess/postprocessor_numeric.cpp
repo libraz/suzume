@@ -11,10 +11,7 @@ namespace suzume::postprocess {
 
 namespace {
 
-// Check if a character is a digit (ASCII or fullwidth)
-bool isDigitChar(char32_t ch) {
-  return (ch >= U'0' && ch <= U'9') || (ch >= U'０' && ch <= U'９');
-}
+using normalize::isArabicDigitCodepoint;
 
 // Check if surface is a numeric expression (starts with digit or contains units)
 bool isNumericExpression(const std::string& surface) {
@@ -23,7 +20,7 @@ bool isNumericExpression(const std::string& surface) {
 
   size_t pos = 0;
   char32_t first_ch = normalize::decodeUtf8(surface, pos);
-  return isDigitChar(first_ch);
+  return isArabicDigitCodepoint(first_ch);
 }
 
 // Check if a one-character surface closes a number+counter phrase (3時+間, 3人+目)
@@ -42,14 +39,14 @@ bool endsWithDigit(const std::string& surface) {
 
   const auto tail = static_cast<unsigned char>(surface.back());
   if (tail < 0x80) {
-    return isDigitChar(static_cast<char32_t>(tail));
+    return isArabicDigitCodepoint(static_cast<char32_t>(tail));
   }
   if (surface.size() < core::kJapaneseCharBytes) {
     return false;
   }
   size_t pos = surface.size() - core::kJapaneseCharBytes;
   const char32_t last_ch = normalize::decodeUtf8(surface, pos);
-  return pos == surface.size() && isDigitChar(last_ch);
+  return pos == surface.size() && isArabicDigitCodepoint(last_ch);
 }
 
 using normalize::isAllKatakana;
@@ -71,10 +68,8 @@ bool looksLikeUnit(const std::string& surface) {
 
 // Check if surface ends with a numeric unit that can be followed by more numbers
 bool endsWithContinuableUnit(const std::string& surface) {
-  // Targets 兆/億/万/千/百 are all 3-byte kanji; decode only the trailing char.
-  char32_t last_ch = utf8::decodeLastChar(surface);
-  // Units that can be followed by more numbers (兆, 億, 万, 千, 百)
-  return last_ch == U'兆' || last_ch == U'億' || last_ch == U'万' || last_ch == U'千' || last_ch == U'百';
+  // A magnitude multiplies the digits before it and may be followed by more (2万+3千).
+  return normalize::isMagnitudeKanji(utf8::decodeLastChar(surface));
 }
 
 }  // namespace

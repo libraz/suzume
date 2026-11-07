@@ -26,6 +26,14 @@ void appendCounterCandidate(const std::vector<char32_t>& codepoints, size_t star
  */
 size_t scanQuantityHead(const std::vector<char32_t>& codepoints, size_t start, bool allow_prefix);
 
+/**
+ * @brief Whether [start, end) is a digit-written number scaled by magnitude kanji (3千, 2万3千, 50億)
+ *
+ * Digit-led, made only of Arabic digits and magnitude kanji, with at least one
+ * magnitude. Such a head behaves like a digit numeral, not a kanji one.
+ */
+bool isDigitMagnitudeHead(const std::vector<char32_t>& codepoints, size_t start, size_t end);
+
 void appendTemporalCounterCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                      const std::vector<normalize::CharType>& char_types,
                                      const dictionary::DictionaryManager* dict_manager,

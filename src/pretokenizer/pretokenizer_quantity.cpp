@@ -163,17 +163,18 @@ bool PreTokenizer::tryMatchCounter(std::string_view text, size_t pos, PreToken& 
 }
 
 bool PreTokenizer::tryMatchCurrency(std::string_view text, size_t pos, PreToken& token) const {
-  // Match patterns: 数字+[万億兆]?円
+  // Match patterns: 数字+magnitude?+円
   size_t idx = scanDigits(text, pos);
 
   if (idx == pos) {
     return false;
   }
 
-  // Optional: 万, 億, 兆
-  for (const char32_t multiplier : {U'万', U'億', U'兆'}) {
-    if (consumeCodepoint(text, idx, multiplier)) {
-      break;
+  // Optional magnitude kanji (3万円, 5千円)
+  if (idx < text.size()) {
+    size_t next = idx;
+    if (normalize::isMagnitudeKanji(normalize::decodeUtf8(text, next))) {
+      idx = next;
     }
   }
 

@@ -16,6 +16,7 @@
 #include "suffix_candidates_counter_internal.h"
 #include "tokenizer_utils.h"
 #include "unknown.h"
+#include "verb_candidates_dictionary_probes.h"
 
 namespace suzume::analysis::counter_detail {
 
@@ -192,15 +193,16 @@ void appendBasicNumeralCounterCandidates(const std::vector<char32_t>& codepoints
     candidates.push_back(cand);
   }
 
-  // Numeral(s) + a single kanji counter at a kanji→non-kanji boundary (三十度, 九十度,
+  // Numeral(s) + kanji counter at a kanji→non-kanji boundary (三十度, 九十度,
   // 三十分, 十本) is a number+counter search unit. 度 also reads as a generic nominal
   // suffix (態度, 難易度), so its dictionary Suffix reading plus the suffix-stem split
   // pull a multi-digit numeral apart (三十|度); a discounted merged candidate keeps the
-  // unit whole. Gated to a lone counter kanji followed by a non-kanji so a following
-  // kanji noun/suffix (五度目, 五度見た, 三年間) keeps its own boundary.
-  if (numeral_end < char_types.size() && normalize::isCounterKanji(codepoints[numeral_end]) &&
-      (numeral_end + 1 >= char_types.size() || char_types[numeral_end + 1] != normalize::CharType::Kanji)) {
-    appendCounterCandidate(codepoints, start_pos, numeral_end + 1, core::PartOfSpeech::Noun,
+  // unit whole. The counter may be a run of counter kanji (2万3千+円台), but it
+  // must reach a non-kanji so a following kanji noun (五度見た) keeps its boundary.
+  const size_t counter_run_end = verb_helpers::counterKanjiRunEnd(codepoints, numeral_end, codepoints.size());
+  if (counter_run_end > numeral_end &&
+      (counter_run_end >= char_types.size() || char_types[counter_run_end] != normalize::CharType::Kanji)) {
+    appendCounterCandidate(codepoints, start_pos, counter_run_end, core::PartOfSpeech::Noun,
                            candidate::kNumeralCounterMergeBonus, core::ExtendedPOS::Unknown, "numeral_kanji_counter",
                            candidates);
   }

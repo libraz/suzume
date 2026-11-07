@@ -388,6 +388,23 @@ bool continuesTemporalNounCompound(char32_t prefix, char32_t next);
 bool isNumeralCodepoint(char32_t code_point);
 
 /**
+ * @brief Check if a codepoint is an Arabic digit (half-width or full-width)
+ */
+bool isArabicDigitCodepoint(char32_t code_point);
+
+/**
+ * @brief Check if a codepoint is a magnitude kanji ({十, 百, 千, 万, 億, 兆})
+ *
+ * A magnitude multiplies the digit group before it, so after a numeral it
+ * continues the number (2万3千, 1兆2千億) rather than opening a counter.
+ * 億/兆 are not numerals on their own (兆し), only after one.
+ *
+ * @param code_point Unicode codepoint
+ * @return true if codepoint is a magnitude kanji
+ */
+bool isMagnitudeKanji(char32_t code_point);
+
+/**
  * @brief Check if a codepoint is a temporal counter kanji ({日, 月, 年, 週, 時, 分, 秒, 間})
  *
  * The subset of counter kanji that measure a span of time. Distinct from the

@@ -139,6 +139,154 @@
       ],
       "id": "kakattta",
       "input": "数百万円かかった"
+    },
+    {
+      "description": "価格は２万３千円台で推移している。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "価格",
+          "pos": "Noun",
+          "surface": "価格"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "2万3千円台",
+          "pos": "Noun",
+          "surface": "2万3千円台"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "推移",
+          "pos": "Noun",
+          "surface": "推移"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "ha_de_shiteiru",
+      "input": "価格は２万３千円台で推移している。"
+    },
+    {
+      "description": "売上高は１兆２千億円だった。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "売上高",
+          "pos": "Noun",
+          "surface": "売上高"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "1兆2千億円",
+          "pos": "Noun",
+          "surface": "1兆2千億円"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ha_dattta",
+      "input": "売上高は１兆２千億円だった。"
+    },
+    {
+      "description": "ランチは3千円台が多い。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "ランチ",
+          "pos": "Noun",
+          "surface": "ランチ"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "3千円台",
+          "pos": "Noun",
+          "surface": "3千円台"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "多い",
+          "pos": "Adjective",
+          "surface": "多い"
+        }
+      ],
+      "id": "ha3_ga_i",
+      "input": "ランチは3千円台が多い。"
+    },
+    {
+      "description": "会員は1万2千を超えた。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "会員",
+          "pos": "Noun",
+          "surface": "会員"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "1万2千",
+          "pos": "Noun",
+          "surface": "1万2千"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "超える",
+          "pos": "Verb",
+          "surface": "超え"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ha1_2_wo_eta",
+      "input": "会員は1万2千を超えた。"
     }
   ],
   "description": "noun_number tests",

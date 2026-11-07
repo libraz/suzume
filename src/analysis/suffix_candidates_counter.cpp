@@ -44,10 +44,28 @@ size_t scanQuantityHead(const std::vector<char32_t>& codepoints, size_t start, b
   if (allow_prefix && scan < codepoints.size() && normalize::isQuantityPrefixKanji(codepoints[scan])) {
     ++scan;
   }
-  while (scan < codepoints.size() && normalize::isNumeralCodepoint(codepoints[scan])) {
+  const size_t head_start = scan;
+  // 億/兆 are no numerals alone (兆し), but after one they continue it (1兆2千億).
+  while (scan < codepoints.size() && (normalize::isNumeralCodepoint(codepoints[scan]) ||
+                                      (scan > head_start && normalize::isMagnitudeKanji(codepoints[scan])))) {
     ++scan;
   }
   return scan;
+}
+
+bool isDigitMagnitudeHead(const std::vector<char32_t>& codepoints, size_t start, size_t end) {
+  if (start >= end || end > codepoints.size() || !normalize::isArabicDigitCodepoint(codepoints[start])) {
+    return false;
+  }
+  bool has_magnitude = false;
+  for (size_t idx = start; idx < end; ++idx) {
+    const bool magnitude = normalize::isMagnitudeKanji(codepoints[idx]);
+    if (!magnitude && !normalize::isArabicDigitCodepoint(codepoints[idx])) {
+      return false;
+    }
+    has_magnitude = has_magnitude || magnitude;
+  }
+  return has_magnitude;
 }
 
 bool leavesUnevenNominalRun(const std::vector<char32_t>& codepoints, size_t counter_end) {
@@ -116,6 +134,16 @@ void generateCounterCandidates(const std::vector<char32_t>& codepoints, size_t s
 
   // Find the end of the numeral sequence
   const size_t numeral_end = counter_detail::scanQuantityHead(codepoints, start_pos, false);
+
+  // A digit number scaled by magnitudes is a search unit before a non-kanji
+  // (1万2千+を); a kanji or katakana after it is a counter, handled below.
+  if (counter_detail::isDigitMagnitudeHead(codepoints, start_pos, numeral_end) &&
+      (numeral_end >= codepoints.size() || (char_types[numeral_end] != normalize::CharType::Kanji &&
+                                            char_types[numeral_end] != normalize::CharType::Katakana))) {
+    counter_detail::appendCounterCandidate(codepoints, start_pos, numeral_end, core::PartOfSpeech::Noun,
+                                           candidate::kNumeralCounterMergeBonus, core::ExtendedPOS::NounNumber,
+                                           "digit_magnitude_number", candidates);
+  }
 
   // Must have at least one character after numerals
   if (numeral_end >= codepoints.size()) {
