@@ -101,6 +101,19 @@ bool lacksLicensingEnvironment(const DictionaryCandidateContext& ctx, const core
     return true;
   }
 
+  // An adverbial particle spelled like a listed verb's irrealis (やら) is that
+  // verb when the negative follows and no nominal hosts the particle
+  // (宿題を+やら+なきゃ, どうしても+やら+なければ); a hosted particle keeps
+  // its reading (金+さえ+ない).
+  if (result.entry->extended_pos == core::ExtendedPOS::ParticleAdverbial && result.length >= 2 &&
+      verb_helpers::naiNegativeFollowsAt(codepoints, end_pos) && !hasPrecedingNominal(lattice, start_pos) &&
+      std::any_of(lookup_results.begin(), lookup_results.end(), [&](const dictionary::LookupResult& other) {
+        return other.entry != nullptr && other.length == result.length &&
+               other.entry->extended_pos == core::ExtendedPOS::VerbMizenkei;
+      })) {
+    return true;
+  }
+
   // The copula's continuative (で) chains a clause and is never case-marked;
   // only its terminal quotes or takes a particle (学生だ+と). Before a case
   // particle the mora is the case particle itself (人+で+にぎわう).

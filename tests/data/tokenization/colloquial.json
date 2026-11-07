@@ -721,6 +721,134 @@
       ],
       "id": "tsukareta_greek_letter_kaomoji",
       "input": "今日は疲れた(´・ω・｀)"
+    },
+    {
+      "description": "kana やる irrealis before the negative, not the particle やら",
+      "expected": [
+        {
+          "lemma": "どうしても",
+          "pos": "Adverb",
+          "surface": "どうしても"
+        },
+        {
+          "lemma": "やる",
+          "pos": "Verb",
+          "surface": "やら"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なきゃ"
+        },
+        {
+          "lemma": "ダメ",
+          "pos": "Adjective",
+          "surface": "ダメ"
+        }
+      ],
+      "id": "doushitemoyaranaki",
+      "input": "どうしてもやらなきゃダメ"
+    },
+    {
+      "description": "どうしてもやらなければ - auto-generated",
+      "expected": [
+        {
+          "lemma": "どうしても",
+          "pos": "Adverb",
+          "surface": "どうしても"
+        },
+        {
+          "lemma": "やる",
+          "pos": "Verb",
+          "surface": "やら"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なけれ"
+        },
+        {
+          "lemma": "ば",
+          "pos": "Particle",
+          "surface": "ば"
+        }
+      ],
+      "id": "doushitemoyaranakereba",
+      "input": "どうしてもやらなければ"
+    },
+    {
+      "description": "宿題をやらなきゃ - auto-generated",
+      "expected": [
+        {
+          "lemma": "宿題",
+          "pos": "Noun",
+          "surface": "宿題"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "やる",
+          "pos": "Verb",
+          "surface": "やら"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なきゃ"
+        }
+      ],
+      "id": "woyaranaki",
+      "input": "宿題をやらなきゃ"
+    },
+    {
+      "description": "control: hosted listing particle やら",
+      "expected": [
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        },
+        {
+          "lemma": "やら",
+          "pos": "Particle",
+          "surface": "やら"
+        },
+        {
+          "lemma": "ノート",
+          "pos": "Noun",
+          "surface": "ノート"
+        },
+        {
+          "lemma": "やら",
+          "pos": "Particle",
+          "surface": "やら"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "散らかる",
+          "pos": "Verb",
+          "surface": "散らかっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "yara_yaraga_rakattteiru",
+      "input": "本やらノートやらが散らかっている"
     }
   ],
   "description": "colloquial tests",
