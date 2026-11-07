@@ -1903,6 +1903,50 @@
       ],
       "id": "yari_3",
       "input": "やり方改革"
+    },
+    {
+      "description": "e-row continuative べ nominalizes like the other e-row endings",
+      "expected": [
+        {
+          "lemma": "これ",
+          "pos": "Pronoun",
+          "surface": "これ"
+        },
+        {
+          "lemma": "に関する",
+          "pos": "Particle",
+          "surface": "に関する"
+        },
+        {
+          "lemma": "調べ",
+          "pos": "Noun",
+          "surface": "調べ"
+        }
+      ],
+      "id": "koreni_suru_be",
+      "input": "これに関する調べ"
+    },
+    {
+      "description": "警察の調べ - auto-generated",
+      "expected": [
+        {
+          "lemma": "警察",
+          "pos": "Noun",
+          "surface": "警察"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "調べ",
+          "pos": "Noun",
+          "surface": "調べ"
+        }
+      ],
+      "id": "no_be",
+      "input": "警察の調べ"
     }
   ],
   "description": "noun_deverbal tests",

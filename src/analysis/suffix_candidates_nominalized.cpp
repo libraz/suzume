@@ -3,6 +3,7 @@
  * @brief Nominalized noun candidate generation
  */
 #include <algorithm>
+#include <array>
 
 #include "adjective_candidates_internal.h"
 #include "analysis/dictionary_probe.h"
@@ -293,6 +294,21 @@ bool isListedOutsideVerbAndNoun(const dictionary::DictionaryManager& dict_manage
 
 }  // namespace
 
+namespace {
+
+// The clause ends or a case/topic particle follows (調べ。, 調べが). The
+// べ continuative of a common verb (食べ) otherwise yields its verb readings.
+bool closesNominalFrameAt(const std::vector<char32_t>& codepoints, const std::vector<normalize::CharType>& char_types,
+                          size_t pos) {
+  if (pos >= codepoints.size() || char_types[pos] == normalize::CharType::Symbol) {
+    return true;
+  }
+  static constexpr std::array<char32_t, 5> kNominalParticles = {U'が', U'を', U'は', U'の', U'も'};
+  return kana::isCodepointIn(kNominalParticles, codepoints[pos]);
+}
+
+}  // namespace
+
 void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                        const std::vector<normalize::CharType>& char_types,
                                        const grammar::Inflection& inflection,
@@ -346,7 +362,8 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
       (first_hiragana == U'け' || first_hiragana == U'げ' || first_hiragana == U'せ' || first_hiragana == U'い' ||
        first_hiragana == U'り' || first_hiragana == U'ら' || first_hiragana == U'ち' || first_hiragana == U'き' ||
        first_hiragana == U'ぎ' || first_hiragana == U'し' || first_hiragana == U'ま' || first_hiragana == U'み' ||
-       first_hiragana == U'び' || first_hiragana == U'え' || first_hiragana == U'れ' || first_hiragana == U'め');
+       first_hiragana == U'び' || first_hiragana == U'え' || first_hiragana == U'れ' || first_hiragana == U'め' ||
+       (first_hiragana == U'べ' && closesNominalFrameAt(codepoints, char_types, kanji_end + 1)));
 
   if (!is_nominalization_ending && !ends_on_dictionary_continuative && !continuative_before_light_verb) {
     return;
