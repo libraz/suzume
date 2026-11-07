@@ -149,12 +149,13 @@ bool PreTokenizer::tryMatchCounter(std::string_view text, size_t pos, PreToken& 
     return false;
   }
   const char32_t prefix = normalize::decodeUtf8(text, idx);
-  if (!isMonthPlaceCounterPrefix(prefix) || idx >= text.size()) {
+  if (!normalize::isCounterLinker(prefix) || idx >= text.size()) {
     return false;
   }
 
   const char32_t unit = normalize::decodeUtf8(text, idx);
-  if (unit != U'月' && unit != U'所') {
+  // An odd kanji run after the counter is left to the analyzer (5カ国+語).
+  if (!normalize::isLinkedCounterKanji(unit) || leavesOddKanjiRun(text, idx)) {
     return false;
   }
 

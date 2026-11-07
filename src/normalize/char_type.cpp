@@ -589,6 +589,16 @@ bool isMagnitudeKanji(char32_t code_point) {
   return kana::isCodepointIn(kMagnitudes, code_point);
 }
 
+bool isCounterLinker(char32_t code_point) {
+  static constexpr std::array<char32_t, 6> kLinkers = {U'か', U'カ', U'ヶ', U'ヵ', U'ケ', U'箇'};
+  return kana::isCodepointIn(kLinkers, code_point);
+}
+
+bool isLinkedCounterKanji(char32_t code_point) {
+  static constexpr std::array<char32_t, 5> kLinkedCounters = {U'月', U'所', U'国', U'年', U'条'};
+  return kana::isCodepointIn(kLinkedCounters, code_point);
+}
+
 bool isNumeralCodepoint(char32_t code_point) {
   if (isArabicDigitCodepoint(code_point)) {
     return true;

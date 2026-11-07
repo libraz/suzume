@@ -34,6 +34,20 @@ size_t scanQuantityHead(const std::vector<char32_t>& codepoints, size_t start, b
  */
 bool isDigitMagnitudeHead(const std::vector<char32_t>& codepoints, size_t start, size_t end);
 
+/**
+ * @brief End of a linker + counter kanji pair at pos (3+か月, 7+カ国), or pos when there is none
+ *
+ * @param counter Which counter kanji the linker may take
+ */
+size_t linkedCounterEnd(const std::vector<char32_t>& codepoints, size_t pos, bool (*counter)(char32_t));
+
+/**
+ * @brief Numeral + linker + counter kanji (7か国, 三ヶ所), with the parity rule for a kanji run after it
+ */
+void appendLinkedCounterCandidate(const std::vector<char32_t>& codepoints, size_t start_pos, size_t numeral_end,
+                                  const dictionary::DictionaryManager* dict_manager,
+                                  std::vector<UnknownCandidate>& candidates);
+
 void appendTemporalCounterCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                      const std::vector<normalize::CharType>& char_types,
                                      const dictionary::DictionaryManager* dict_manager,

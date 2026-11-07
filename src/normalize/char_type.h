@@ -405,6 +405,21 @@ bool isArabicDigitCodepoint(char32_t code_point);
 bool isMagnitudeKanji(char32_t code_point);
 
 /**
+ * @brief Check if a codepoint links a numeral to a counter kanji ({か, カ, ヶ, ヵ, ケ, 箇})
+ *
+ * The spelling variants of the counter 箇 written between a numeral and the
+ * counted kanji (3か月, ７カ国, 三ヶ所, 3箇所).
+ */
+bool isCounterLinker(char32_t code_point);
+
+/**
+ * @brief Check if a codepoint is a counter kanji taken through a linker ({月, 所, 国, 年, 条})
+ *
+ * The closed set counted with か/ヶ/箇 (3か月, 7か国, 3か年, 三か条).
+ */
+bool isLinkedCounterKanji(char32_t code_point);
+
+/**
  * @brief Check if a codepoint is a temporal counter kanji ({日, 月, 年, 週, 時, 分, 秒, 間})
  *
  * The subset of counter kanji that measure a span of time. Distinct from the

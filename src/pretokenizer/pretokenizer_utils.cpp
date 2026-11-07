@@ -115,13 +115,6 @@ IntegerScan scanInteger(std::string_view text, size_t pos) {
   return {idx, digit_count, value};
 }
 
-// Month and place counters have five conventional prefix spellings. Treating
-// the spelling variation as one orthographic class keeps the numeric counter
-// atomic without adding entries for individual surface forms.
-bool isMonthPlaceCounterPrefix(char32_t codepoint) {
-  return codepoint == U'か' || codepoint == U'ヶ' || codepoint == U'ヵ' || codepoint == U'ケ' || codepoint == U'箇';
-}
-
 bool hasAsciiRunLeftNeighbor(std::string_view text, size_t pos, std::string_view punctuation) {
   if (pos == 0) {
     return false;

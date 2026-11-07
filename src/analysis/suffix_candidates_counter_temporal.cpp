@@ -26,20 +26,12 @@ bool isChainCounterKanji(char32_t codepoint) {
   return normalize::isTemporalCounterKanji(codepoint) || codepoint == U'泊' || codepoint == U'割';
 }
 
-// End of the temporal counter run at pos. ヶ/ケ heads a counter only with a
-// following kanji (ヶ月), so it joins the run only before a temporal counter (三ヶ月|後).
+// End of the temporal counter run at pos. A counter linker (か/ヶ) opens the
+// run only right after the numeral and before a temporal counter (三ヶ月|後).
 size_t scanTemporalCounterRun(const std::vector<char32_t>& codepoints, size_t pos) {
-  while (pos < codepoints.size()) {
-    if (normalize::isTemporalCounterKanji(codepoints[pos])) {
-      ++pos;
-      continue;
-    }
-    if ((codepoints[pos] == U'ヶ' || codepoints[pos] == U'ケ') && pos + 1 < codepoints.size() &&
-        normalize::isTemporalCounterKanji(codepoints[pos + 1])) {
-      pos += 2;
-      continue;
-    }
-    break;
+  pos = linkedCounterEnd(codepoints, pos, normalize::isTemporalCounterKanji);
+  while (pos < codepoints.size() && normalize::isTemporalCounterKanji(codepoints[pos])) {
+    ++pos;
   }
   return pos;
 }
@@ -113,8 +105,7 @@ void appendTemporalCounterCandidates(const std::vector<char32_t>& codepoints, si
       appendDurationCandidates(codepoints, start_pos, numeral_end + 2, U'目', candidates,
                                "numeral_jikan_duration_merge", "temporal_counter_ordinal_merge");
     }
-    if (numeral_end + 1 < codepoints.size() &&
-        (codepoints[numeral_end] == U'か' || codepoints[numeral_end] == U'ヶ' || codepoints[numeral_end] == U'ケ') &&
+    if (linkedCounterEnd(codepoints, numeral_end, normalize::isLinkedCounterKanji) == numeral_end + 2 &&
         codepoints[numeral_end + 1] == U'月') {
       appendDurationCandidates(codepoints, start_pos, numeral_end + 2, U'間', candidates, "numeral_kana_month_merge",
                                "temporal_counter_span_merge");

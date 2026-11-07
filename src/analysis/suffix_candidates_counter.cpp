@@ -68,6 +68,37 @@ bool isDigitMagnitudeHead(const std::vector<char32_t>& codepoints, size_t start,
   return has_magnitude;
 }
 
+size_t linkedCounterEnd(const std::vector<char32_t>& codepoints, size_t pos, bool (*counter)(char32_t)) {
+  if (pos + 1 < codepoints.size() && normalize::isCounterLinker(codepoints[pos]) && counter(codepoints[pos + 1])) {
+    return pos + 2;
+  }
+  return pos;
+}
+
+// A linked counter followed by an odd kanji run lands inside a two-kanji word
+// unless the run is taken whole (5カ国+語), as for any other counter; an even
+// run is a sequence of words after it (7か国|首脳会議).
+void appendLinkedCounterCandidate(const std::vector<char32_t>& codepoints, size_t start_pos, size_t numeral_end,
+                                  const dictionary::DictionaryManager* dict_manager,
+                                  std::vector<UnknownCandidate>& candidates) {
+  const size_t counter_end = linkedCounterEnd(codepoints, numeral_end, normalize::isLinkedCounterKanji);
+  if (counter_end == numeral_end) {
+    return;
+  }
+  const size_t run_end = grammar::nominalKanjiRunEnd(codepoints, counter_end);
+  if (run_end > counter_end && !verb_helpers::opensWordAfterQuantity(dict_manager, codepoints, counter_end) &&
+      !verb_helpers::kanjiRunMayContinueAt(dict_manager, codepoints, run_end) &&
+      grammar::countKanjiRunWords(codepoints, counter_end, run_end) % 2 == 1) {
+    appendCounterCandidate(codepoints, start_pos, run_end, core::PartOfSpeech::Noun,
+                           candidate::kCounterRelationSplitBonus, core::ExtendedPOS::NounNumber,
+                           "numeral_linked_counter_uneven_run", candidates);
+    return;
+  }
+  appendCounterCandidate(codepoints, start_pos, counter_end, core::PartOfSpeech::Noun,
+                         candidate::kCounterRelationSplitBonus, core::ExtendedPOS::NounNumber, "numeral_linked_counter",
+                         candidates);
+}
+
 bool leavesUnevenNominalRun(const std::vector<char32_t>& codepoints, size_t counter_end) {
   const size_t run_end = grammar::nominalKanjiRunEnd(codepoints, counter_end);
   return !grammar::mayBeOkuriganaAt(codepoints, run_end) &&
@@ -152,6 +183,7 @@ void generateCounterCandidates(const std::vector<char32_t>& codepoints, size_t s
 
   counter_detail::appendBasicNumeralCounterCandidates(codepoints, start_pos, numeral_end, char_types, dict_manager,
                                                       candidates);
+  counter_detail::appendLinkedCounterCandidate(codepoints, start_pos, numeral_end, dict_manager, candidates);
 
   // A number + katakana unit merges only when the numeral is written in (half- or
   // full-width) digits: 3キロ, 100ドル, ５センチ are one quantity token. A kanji
@@ -179,19 +211,17 @@ void generateCounterCandidates(const std::vector<char32_t>& codepoints, size_t s
     return;
   }
   // Find end of katakana sequence (max 8 chars for reasonable unit length)
-  size_t unit_end = findCharRegionEnd(char_types, numeral_end, 8, normalize::CharType::Katakana);
-  bool is_ke_kanji_counter = false;
-  // ヶ/ケ alone is not a counter — extend to include following kanji
-  // (ヶ月, ヶ所, ヶ国, ヶ年 etc.)
-  if (unit_end == numeral_end + 1 && (codepoints[numeral_end] == U'ヶ' || codepoints[numeral_end] == U'ケ') &&
-      unit_end < codepoints.size() && char_types[unit_end] == normalize::CharType::Kanji) {
-    ++unit_end;
-    is_ke_kanji_counter = true;
+  const size_t unit_end = findCharRegionEnd(char_types, numeral_end, 8, normalize::CharType::Katakana);
+  // A linker before a kanji counter (ヶ月, カ国) is not a unit of its own; the
+  // linked-counter candidate above owns it.
+  if (unit_end == numeral_end + 1 && unit_end < codepoints.size() &&
+      normalize::isCounterLinker(codepoints[numeral_end]) && char_types[unit_end] == normalize::CharType::Kanji) {
+    return;
   }
   // Any all-katakana run merges with the preceding numeral (3キロ, 100メダル);
   // MeCab treats number + katakana as one quantity token, so there is no
-  // curated unit list. (ヶ/ケ + kanji surfaces are mixed-script and fall through.)
-  if (!is_ke_kanji_counter && !normalize::isAllKatakana(extractSubstring(codepoints, numeral_end, unit_end))) {
+  // curated unit list.
+  if (!normalize::isAllKatakana(extractSubstring(codepoints, numeral_end, unit_end))) {
     return;
   }
   // Penalize numbers starting with 0 (e.g., "00ポイント" is unnatural)

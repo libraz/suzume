@@ -20,7 +20,6 @@ struct IntegerScan {
 bool isAsciiDigit(char chr);
 bool isAsciiAlpha(char chr);
 bool isAsciiAlnum(char chr);
-bool isMonthPlaceCounterPrefix(char32_t codepoint);
 IntegerScan scanInteger(std::string_view text, size_t pos);
 size_t scanDigits(std::string_view text, size_t pos);
 bool hasAsciiRunLeftNeighbor(std::string_view text, size_t pos, std::string_view punctuation);

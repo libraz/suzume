@@ -264,6 +264,280 @@
       ],
       "id": "tsukattta_2",
       "input": "三件見つかった。"
+    },
+    {
+      "description": "七か国が参加した。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "七か国",
+          "pos": "Noun",
+          "surface": "七か国"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "参加",
+          "pos": "Noun",
+          "surface": "参加"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ka_ga_shita",
+      "input": "七か国が参加した。"
+    },
+    {
+      "description": "５カ国語を話せる。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "5カ国語",
+          "pos": "Noun",
+          "surface": "5カ国語"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "話せる",
+          "pos": "Verb",
+          "surface": "話せる"
+        }
+      ],
+      "id": "wo_seru",
+      "input": "５カ国語を話せる。"
+    },
+    {
+      "description": "3か年計画を立てた。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "3か年",
+          "pos": "Noun",
+          "surface": "3か年"
+        },
+        {
+          "lemma": "計画",
+          "pos": "Noun",
+          "surface": "計画"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "立てる",
+          "pos": "Verb",
+          "surface": "立て"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "3ka_wo_teta",
+      "input": "3か年計画を立てた。"
+    },
+    {
+      "description": "先進７か国首脳会議が閉幕した。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "先進",
+          "pos": "Noun",
+          "surface": "先進"
+        },
+        {
+          "lemma": "7か国",
+          "pos": "Noun",
+          "surface": "7か国"
+        },
+        {
+          "lemma": "首脳会議",
+          "pos": "Noun",
+          "surface": "首脳会議"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "閉幕",
+          "pos": "Noun",
+          "surface": "閉幕"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ka_ga_shita_2",
+      "input": "先進７か国首脳会議が閉幕した。"
+    },
+    {
+      "description": "２０か国の財務相が集まった。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "20か国",
+          "pos": "Noun",
+          "surface": "20か国"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "財務相",
+          "pos": "Noun",
+          "surface": "財務相"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "集まる",
+          "pos": "Verb",
+          "surface": "集まっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ka_no_ga_mattta",
+      "input": "２０か国の財務相が集まった。"
+    },
+    {
+      "description": "主要７か国首脳会議は、首脳宣言を採択して閉幕した。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "主要",
+          "pos": "Adjective",
+          "surface": "主要"
+        },
+        {
+          "lemma": "7か国",
+          "pos": "Noun",
+          "surface": "7か国"
+        },
+        {
+          "lemma": "首脳会議",
+          "pos": "Noun",
+          "surface": "首脳会議"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "首脳宣言",
+          "pos": "Noun",
+          "surface": "首脳宣言"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "採択",
+          "pos": "Noun",
+          "surface": "採択"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "閉幕",
+          "pos": "Noun",
+          "surface": "閉幕"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ka_ha_wo_shite_shita",
+      "input": "主要７か国首脳会議は、首脳宣言を採択して閉幕した。"
+    },
+    {
+      "description": "主要２０か国の財務相が集まった。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "主要",
+          "pos": "Adjective",
+          "surface": "主要"
+        },
+        {
+          "lemma": "20か国",
+          "pos": "Noun",
+          "surface": "20か国"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "財務相",
+          "pos": "Noun",
+          "surface": "財務相"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "集まる",
+          "pos": "Verb",
+          "surface": "集まっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ka_no_ga_mattta_2",
+      "input": "主要２０か国の財務相が集まった。"
     }
   ],
   "description": "noun_counter tests",
