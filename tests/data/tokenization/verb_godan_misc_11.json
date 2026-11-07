@@ -967,6 +967,114 @@
       ],
       "id": "kirenai_2",
       "input": "朝起きれない"
+    },
+    {
+      "description": "ra-nuki potential of an unlisted e-row ichidan verb",
+      "expected": [
+        {
+          "lemma": "今日",
+          "pos": "Noun",
+          "surface": "今日"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "早い",
+          "pos": "Adjective",
+          "surface": "早く"
+        },
+        {
+          "lemma": "食べれる",
+          "pos": "Verb",
+          "surface": "食べれ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "ha_ku_berenai",
+      "input": "今日は早く食べれない"
+    },
+    {
+      "description": "ra-nuki potential overrides the godan reading of an i-row stem",
+      "expected": [
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "借りれる",
+          "pos": "Verb",
+          "surface": "借りれ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "wo_rirenai",
+      "input": "本を借りれない"
+    },
+    {
+      "description": "ra-nuki potential before the negative past",
+      "expected": [
+        {
+          "lemma": "決めれる",
+          "pos": "Verb",
+          "surface": "決めれ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "merenakattta",
+      "input": "決めれなかった"
+    },
+    {
+      "description": "ra-nuki potential of a ji-row ichidan verb",
+      "expected": [
+        {
+          "lemma": "信じれる",
+          "pos": "Verb",
+          "surface": "信じれ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        },
+        {
+          "lemma": "話",
+          "pos": "Noun",
+          "surface": "話"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "jirenai_da",
+      "input": "信じれない話だ"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 11/11)",

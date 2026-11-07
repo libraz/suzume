@@ -130,6 +130,12 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
         const bool causative_follows =
             vh::causativeSaseFollowsAt(codepoints, renyokei_end) && !kana::isARowCodepoint(first_hira);
         const bool passive_follows = rarePassiveFollowsAt(codepoints, renyokei_end);
+        // The suffix れる never follows an Ichidan stem as a passive (that is
+        // られる), nor a godan continuative, so stem + れ carrying the れる
+        // paradigm is the ra-nuki potential (食べ+れ+ない, 借り+れ+ない).
+        const bool ra_nuki_potential_follows =
+            renyokei_end + 1 < codepoints.size() && codepoints[renyokei_end] == U'れ' &&
+            vh::isPassiveAuxContinuation(codepoints, renyokei_end + 1, /*strict_masu=*/true);
         // Skip if there's a suru-verb or godan-verb candidate with higher confidence
         // e.g., 勉強し has suru conf=0.82 vs ichidan conf=0.3 - prefer suru
         // e.g., 走り has godan conf=0.61 vs ichidan conf=0.3 - prefer godan
@@ -153,8 +159,9 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
         const bool negative_predicate_context =
             negative_aux_follows && (vh::followsCaseParticle(dict_manager, codepoints, start_pos) ||
                                      follows_topic_particle || follows_quotative_determiner);
-        bool prefer_suru = !causative_follows && !passive_follows && !negative_predicate_context &&
-                           !ichidan_base_is_dict && (suru_cand.confidence > ichidan_cand.confidence);
+        bool prefer_suru = !causative_follows && !passive_follows && !ra_nuki_potential_follows &&
+                           !negative_predicate_context && !ichidan_base_is_dict &&
+                           (suru_cand.confidence > ichidan_cand.confidence);
         // Before a chaining comma an e-row okurigana is no godan continuative:
         // the godan reads it only as an imperative or hypothetical, neither of
         // which suspends a clause, so the potential continuative stays offered
@@ -163,9 +170,10 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
         const bool comma_suspends_clause = comma_clause_chaining && renyokei_end + 1 < codepoints.size() &&
                                            codepoints[renyokei_end + 1] != core::hiragana::kTo;
         const bool comma_chained_e_row = comma_suspends_clause && kana::isERowCodepoint(first_hira);
-        bool prefer_godan = !causative_follows && !passive_follows && !negative_predicate_context &&
-                            !ichidan_base_is_dict && (!comma_clause_chaining || godan_base_is_dict) &&
-                            !comma_chained_e_row && (godan_cand.confidence > ichidan_cand.confidence);
+        bool prefer_godan = !causative_follows && !passive_follows && !ra_nuki_potential_follows &&
+                            !negative_predicate_context && !ichidan_base_is_dict &&
+                            (!comma_clause_chaining || godan_base_is_dict) && !comma_chained_e_row &&
+                            (godan_cand.confidence > ichidan_cand.confidence);
         // Use different thresholds for e-row vs i-row patterns:
         // - I-row (じ, み, etc.): lower threshold (0.28) - these are distinctively verb stems
         //   and get penalized by ichidan_kanji_i_row_stem, so need lower threshold
@@ -442,6 +450,26 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
           candidates.push_back(std::move(renyokei_candidate));
           SUZUME_DEBUG_LOG_VERBOSE("[VERB_CAND] " << surface << " ichidan_renyokei lemma=" << lemma
                                                   << " cost=" << base_cost << "\n");
+          // The ra-nuki potential takes the whole stem + れ cell (食べれ+ない,
+          // 食べれる, 食べれれ+ば).
+          if (ra_nuki_potential_follows) {
+            const size_t after_re = renyokei_end + 1;
+            const bool cell_takes_next_kana = codepoints[after_re] == U'る' || codepoints[after_re] == U'れ';
+            const size_t potential_end = cell_takes_next_kana ? after_re + 1 : after_re;
+            const bool irrealis = vh::naiNegativeFollowsAt(codepoints, after_re) || codepoints[after_re] == U'ず' ||
+                                  codepoints[after_re] == U'ぬ';
+            const core::ExtendedPOS potential_epos = codepoints[after_re] == U'る'   ? core::ExtendedPOS::VerbShuushikei
+                                                     : codepoints[after_re] == U'れ' ? core::ExtendedPOS::VerbKateikei
+                                                     : irrealis                      ? core::ExtendedPOS::VerbMizenkei
+                                                                                     : core::ExtendedPOS::VerbRenyokei;
+            const std::string potential_lemma = surface + "れる";
+            candidates.push_back(makeVerbCandidate(
+                codepoints, start_pos, potential_end, candidate::verb_cost::kStrongBonus, potential_lemma,
+                dictionary::ConjugationType::Ichidan, true, CandidateOrigin::VerbKanji, ichidan_cand.confidence,
+                "ichidan_ra_nuki_potential", potential_epos));
+            SUZUME_DEBUG_LOG_VERBOSE("[VERB_CAND] " << extractSubstring(codepoints, start_pos, potential_end)
+                                                    << " ichidan_ra_nuki_potential lemma=" << potential_lemma << "\n");
+          }
           // Also generate shuushikei (dictionary form) if followed by る
           // E.g., 捨てるわけ → 捨てる (VERB shuushikei) + わけ (NOUN)
           // Without this, compound noun 捨てるわけ wins over split path
