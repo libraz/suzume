@@ -1310,6 +1310,80 @@
       ],
       "id": "ha_ga_wo_meteirukadoukawo_rakanishiteinai",
       "input": "同署は男が容疑を認めているかどうかを明らかにしていない。"
+    },
+    {
+      "description": "prefix compound before a kana pronoun is not prefix + verb stem",
+      "expected": [
+        {
+          "lemma": "今度",
+          "pos": "Noun",
+          "surface": "今度"
+        },
+        {
+          "lemma": "みんな",
+          "pos": "Pronoun",
+          "surface": "みんな"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "飲む",
+          "pos": "Verb",
+          "surface": "飲み"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行か"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "minnade_mini_kanai",
+      "input": "今度みんなで飲みに行かない？"
+    },
+    {
+      "description": "prefix compound kon-kai before a kana pronoun",
+      "expected": [
+        {
+          "lemma": "今回",
+          "pos": "Noun",
+          "surface": "今回"
+        },
+        {
+          "lemma": "みんな",
+          "pos": "Pronoun",
+          "surface": "みんな"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "決める",
+          "pos": "Verb",
+          "surface": "決め"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "minnade_meta",
+      "input": "今回みんなで決めた"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 11/11)",

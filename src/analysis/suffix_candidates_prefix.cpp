@@ -144,7 +144,13 @@ void generatePrefixCompoundCandidates(const std::vector<char32_t>& codepoints, s
   // 今|食べ|てる, not 今食|べてる. Probe the second kanji plus a growing hiragana
   // window (食べ → 食べる ichidan) since the full run (食べてる) may include a
   // colloquial aux the inflection analyzer cannot peel.
-  if (!followed_by_kanji && start_pos + 2 < char_types.size() &&
+  // A listed pronoun opening on that hiragana is a word of its own, not the
+  // okurigana of the second kanji (今度+みんな, not 度+み).
+  constexpr size_t kPronounProbe = 4;
+  const bool hiragana_opens_pronoun =
+      !followed_by_kanji && hasDictionaryEntryFrom(dict_manager, codepoints, start_pos + 2, 2, kPronounProbe,
+                                                   core::PartOfSpeech::Pronoun, nullptr);
+  if (!followed_by_kanji && !hiragana_opens_pronoun && start_pos + 2 < char_types.size() &&
       char_types[start_pos + 2] == normalize::CharType::Hiragana) {
     const size_t hira_end =
         findCharRegionEnd(char_types, start_pos + 2, char_types.size(), normalize::CharType::Hiragana);
