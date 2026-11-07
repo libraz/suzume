@@ -14,7 +14,7 @@ namespace {
 using normalize::isArabicDigitCodepoint;
 
 // Check if surface is a numeric expression (starts with digit or contains units)
-bool isNumericExpression(const std::string& surface) {
+bool isNumericExpression(std::string_view surface) {
   if (surface.empty())
     return false;
 
@@ -24,7 +24,7 @@ bool isNumericExpression(const std::string& surface) {
 }
 
 // Check if a one-character surface closes a number+counter phrase (3時+間, 3人+目)
-bool isQuantityPhraseSuffixSurface(const std::string& surface) {
+bool isQuantityPhraseSuffixSurface(std::string_view surface) {
   if (surface.size() != core::kJapaneseCharBytes) {
     return false;
   }
@@ -33,7 +33,7 @@ bool isQuantityPhraseSuffixSurface(const std::string& surface) {
 }
 
 // Check if surface ends with a digit
-bool endsWithDigit(const std::string& surface) {
+bool endsWithDigit(std::string_view surface) {
   if (surface.empty())
     return false;
 
@@ -56,7 +56,7 @@ using normalize::isCounterKanji;
 // For kanji: must start with a counter kanji (円, 分, 時間, etc.)
 // For katakana: any katakana noun merges (MeCab treats number + katakana as one
 // quantity token, e.g. 3キロ, 100メダル), so no curated unit list is needed.
-bool looksLikeUnit(const std::string& surface) {
+bool looksLikeUnit(std::string_view surface) {
   if (surface.empty())
     return false;
 
@@ -67,13 +67,13 @@ bool looksLikeUnit(const std::string& surface) {
 }
 
 // Check if surface ends with a numeric unit that can be followed by more numbers
-bool endsWithContinuableUnit(const std::string& surface) {
+bool endsWithContinuableUnit(std::string_view surface) {
   // A magnitude multiplies the digits before it and may be followed by more (2万+3千).
   return normalize::isMagnitudeKanji(utf8::decodeLastChar(surface));
 }
 
 // Check if surface is spelled entirely with kanji numerals (二千, 百)
-bool isKanjiNumeral(const std::string& surface) {
+bool isKanjiNumeral(std::string_view surface) {
   size_t pos = 0;
   while (pos < surface.size()) {
     const char32_t code_point = normalize::decodeUtf8(surface, pos);
@@ -82,6 +82,12 @@ bool isKanjiNumeral(const std::string& surface) {
     }
   }
   return !surface.empty();
+}
+
+// Append @p tail to @p head; the merged numeric phrase is its own lemma.
+void mergeNumeric(core::Morpheme& head, const core::Morpheme& tail) {
+  resolver::mergeInto(head, tail);
+  head.lemma = head.surface;
 }
 
 }  // namespace
@@ -106,14 +112,12 @@ std::vector<core::Morpheme> Postprocessor::mergeNumericExpressions(std::vector<c
       const auto& next = morphemes[idx + 1];
       if (next.pos == core::PartOfSpeech::Noun && isNumericExpression(next.surface)) {
         core::Morpheme merged = current;
-        resolver::mergeInto(merged, next);
-        merged.lemma = merged.surface;
+        mergeNumeric(merged, next);
         size_t merge_end = idx + 2;
 
         if (merge_end < morphemes.size() && morphemes[merge_end].pos == core::PartOfSpeech::Noun &&
             utf8::equalsAny(morphemes[merge_end].surface, {"目"})) {
-          resolver::mergeInto(merged, morphemes[merge_end]);
-          merged.lemma = merged.surface;
+          mergeNumeric(merged, morphemes[merge_end]);
           ++merge_end;
         }
 
@@ -137,8 +141,7 @@ std::vector<core::Morpheme> Postprocessor::mergeNumericExpressions(std::vector<c
       while (merge_end < morphemes.size()) {
         const auto& next = morphemes[merge_end];
         if (next.pos == core::PartOfSpeech::Noun && isNumericExpression(next.surface)) {
-          resolver::mergeInto(merged, next);
-          merged.lemma = merged.surface;
+          mergeNumeric(merged, next);
           ++merge_end;
 
           // Continue if this also ends with a continuable unit
@@ -192,8 +195,7 @@ std::vector<core::Morpheme> Postprocessor::mergeNumericExpressions(std::vector<c
       const bool is_quantity_suffix = isQuantityPhraseSuffixSurface(next.surface);
       if (next.pos == core::PartOfSpeech::Noun && (is_number_unit || is_quantity_suffix)) {
         core::Morpheme merged = current;
-        resolver::mergeInto(merged, next);
-        merged.lemma = merged.surface;
+        mergeNumeric(merged, next);
 
         SUZUME_DEBUG_LOG_VERBOSE("[POSTPROC] Merged " << (is_number_unit ? "number+unit" : "numeric+suffix") << ": \""
                                                       << current.surface << "\" + \"" << next.surface << "\" → \""
@@ -213,9 +215,8 @@ std::vector<core::Morpheme> Postprocessor::mergeNumericExpressions(std::vector<c
       if (next.pos == core::PartOfSpeech::Suffix) {
         core::Morpheme merged = current;
         merged.pos = core::PartOfSpeech::Noun;  // Merged result is always NOUN
-        resolver::mergeInto(merged, next);
+        mergeNumeric(merged, next);
         merged.extended_pos = core::ExtendedPOS::NounNumber;
-        merged.lemma = merged.surface;
 
         SUZUME_DEBUG_LOG_VERBOSE("[POSTPROC] Merged indefinite+suffix: \""
                                  << current.surface << "\" + \"" << next.surface << "\" → \"" << merged.surface

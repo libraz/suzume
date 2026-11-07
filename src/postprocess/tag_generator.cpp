@@ -71,10 +71,7 @@ bool TagGenerator::shouldInclude(const core::Morpheme& morpheme) const {
 }
 
 std::string TagGenerator::getTagString(const core::Morpheme& morpheme) const {
-  if (options_.use_lemma && !morpheme.lemma.empty()) {
-    return morpheme.lemma;
-  }
-  return morpheme.surface;
+  return options_.use_lemma ? std::string(morpheme.getLemma()) : morpheme.surface;
 }
 
 std::vector<TagEntry> TagGenerator::generate(const std::vector<core::Morpheme>& morphemes) const {

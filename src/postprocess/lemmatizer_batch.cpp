@@ -176,12 +176,13 @@ bool needsRelemmatization(const core::Morpheme& morpheme) {
 }
 
 // Lemma repairs driven by the following morpheme's POS (potential before ます, 屈せ+ず).
-void fixLemmaBeforeAuxiliary(core::Morpheme& morpheme, const core::Morpheme* next, std::string_view next_surface) {
+void fixLemmaBeforeAuxiliary(core::Morpheme& morpheme, const core::Morpheme* next) {
   // An e-row form before polite ます is a potential verb, not a godan
   // conditional. The potential remains one verb token (書けます, なれます),
   // so recover its ichidan dictionary form from the visible stem.
   if (morpheme.pos == core::PartOfSpeech::Verb && morpheme.extended_pos == core::ExtendedPOS::VerbKateikei &&
-      next_surface == "ます" && kana::isGodanERowCodepoint(utf8::decodeLastChar(morpheme.surface))) {
+      next != nullptr && utf8::equalsAny(next->surface, {"ます"}) &&
+      kana::isGodanERowCodepoint(utf8::decodeLastChar(morpheme.surface))) {
     morpheme.lemma = morpheme.surface + "る";
   }
   // A one-kanji サ変 verb uses せ before the classical negative auxiliary:
@@ -416,7 +417,7 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes, bool updat
       next_lemma = next->lemma;
       next_extended_pos = next->extended_pos;
     }
-    fixLemmaBeforeAuxiliary(morpheme, next, next_surface);
+    fixLemmaBeforeAuxiliary(morpheme, next);
     fixOnbinLemma(morpheme, next_surface, next_extended_pos, dict_manager_);
     fixRenyokeiBeforeTe(morpheme, next2, next_surface, dict_manager_);
     fixIrregularIku(morpheme, morphemes, idx, next_surface);
