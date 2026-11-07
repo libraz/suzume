@@ -14,6 +14,11 @@ bool isAsciiDigit(char chr) {
   return chr >= '0' && chr <= '9';
 }
 
+// Decode the codepoint at `pos` without advancing; `pos` must be inside `text`.
+char32_t peekCodepoint(std::string_view text, size_t pos) {
+  return normalize::decodeUtf8(text, pos);
+}
+
 // Decide whether a period suffix 間 immediately following a time/duration
 // counter (N時/N年) should be absorbed into the atomic counter token.
 //
@@ -40,7 +45,7 @@ bool absorbsPeriodKan(std::string_view text, size_t pos_after_kan) {
   if (normalize::isTemporalRelationSuffixKanji(next_cp)) {
     return true;  // 間 + 後/前 → duration + relational suffix (2時間|後, 5年間|前)
   }
-  if (idx < text.size() && normalize::isKanjiCodepoint(normalize::decodeUtf8(text, idx))) {
+  if (idx < text.size() && normalize::isKanjiCodepoint(peekCodepoint(text, idx))) {
     return true;  // 2+ kanji → duration (時間営業, 年間活動)
   }
   // 間 + single kanji at the end or before a non-kanji: interval only when the kanji

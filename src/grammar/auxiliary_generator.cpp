@@ -46,8 +46,6 @@ struct ConjSuffix {
 
 // Full forms with negative (9 suffixes)
 // Pattern: base, ta, tara, te, masu, mashita, nai, nakatta, nakute
-// Note: Te-form entries are kept for inflection analysis but skipped during generation
-// (te-form boundary: VERB renyokei/onbinkei + て(PARTICLE))
 constexpr ConjSuffix kIchidanFull[] = {
     {"る", conn::kAuxOutBase},   {"た", conn::kAuxOutTa},       {"たら", conn::kAuxOutBase},
     {"て", conn::kAuxOutTe},     {"ます", conn::kAuxOutMasu},   {"ました", conn::kAuxOutTa},
@@ -112,12 +110,13 @@ void appendWithStem(const AuxiliaryBase& base, const ConjSuffix* suffixes, size_
 
 // Append a godan base's suffixes in the fixed order the handwritten tables
 // used: base, ta, tara, te, [masu, mashita, nai, nakatta, nakute].
-// @param te_attach_only  Benefactive bases stop after te (no masu/negative), the
-//                        old kGodanWaTeAttach subset.
-// @param force_sokuonbin いく-type 促音便 irregular: onbin becomes っ (った/って);
-//                        ます系 and 未然形 still follow the regular row.
-void appendGodanWithStem(const AuxiliaryBase& base, bool te_attach_only, bool force_sokuonbin, bool include_negative,
-                         std::vector<AuxiliaryEntry>& result) {
+// The base's form family selects the subset: TeAttachment stops after te (no
+// masu/negative); Sokuonbin is the いく-type irregular whose onbin becomes っ
+// (ます系 and 未然形 still follow the regular row); Positive omits the negative.
+void appendGodanWithStem(const AuxiliaryBase& base, std::vector<AuxiliaryEntry>& result) {
+  const bool te_attach_only = base.form_family == AuxiliaryFormFamily::TeAttachment;
+  const bool force_sokuonbin = base.form_family == AuxiliaryFormFamily::Sokuonbin;
+  const bool include_negative = base.form_family != AuxiliaryFormFamily::Positive;
   const Conjugation::GodanRow* row_ptr = Conjugation::getGodanRow(base.conj_type);
   if (row_ptr == nullptr) {
     return;
@@ -586,9 +585,7 @@ void appendAuxiliaryBase(const AuxiliaryBase& base, std::vector<AuxiliaryEntry>&
     case VerbType::GodanKa:
     case VerbType::GodanSa:
     case VerbType::GodanRa:
-      appendGodanWithStem(base, base.form_family == AuxiliaryFormFamily::TeAttachment,
-                          base.form_family == AuxiliaryFormFamily::Sokuonbin,
-                          base.form_family != AuxiliaryFormFamily::Positive, result);
+      appendGodanWithStem(base, result);
       return;
     case VerbType::Kuru:
       appendSuffixedForms(base, {}, kKuruFull, std::size(kKuruFull), result);

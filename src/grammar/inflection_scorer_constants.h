@@ -57,8 +57,6 @@ constexpr float kVeryRare = 0.25F;
 
 // Bonus scale (positive values)
 constexpr float kMinorBonus = 0.05F;
-constexpr float kModerateBonus = 0.12F;
-constexpr float kStrongBonus = 0.20F;
 
 }  // namespace scale
 

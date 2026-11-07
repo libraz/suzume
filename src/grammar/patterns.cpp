@@ -28,8 +28,7 @@ bool endsWithVerbNegative(std::string_view surface) {
   // Only e-row endings are matched; i-row Ichidan negatives (見ない → みない)
   // are not covered here. These patterns can appear when a kanji is followed
   // by hiragana.
-  if (utf8::equalsAny(last9, {"えない", "けない", "げない", "せない", "ぜない", "てない", "でない", "ねない", "へない",
-                              "べない", "ぺない", "めない", "れない"})) {
+  if (last9.substr(core::kJapaneseCharBytes) == "ない" && kana::isERowCodepoint(utf8::decodeFirstChar(last9))) {
     return true;
   }
 

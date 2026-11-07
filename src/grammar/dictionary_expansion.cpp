@@ -154,7 +154,7 @@ std::vector<dictionary::DictionaryEntry> expandVerb(const dictionary::Dictionary
     }
     std::string surface = stem + suffix.suffix;
     if (bound_suffix_verb && suffix.extended_pos != core::ExtendedPOS::VerbShuushikei &&
-        surface.size() <= 2 * core::kJapaneseCharBytes) {
+        surface.size() <= core::kTwoJapaneseCharBytes) {
       continue;
     }
     result.push_back({std::move(surface), core::PartOfSpeech::Verb, suffix.extended_pos, base_entry.lemma});
@@ -203,7 +203,7 @@ std::string dictionaryConjugationTypeIssue(const dictionary::SourceEntry& source
   }
 
   if (const auto* godan_row = Conjugation::getGodanRow(verb_type); godan_row != nullptr) {
-    return utf8::lastChar(source_entry.surface) == normalize::encodeUtf8(godan_row->base_vowel)
+    return utf8::decodeLastChar(source_entry.surface) == godan_row->base_vowel
                ? ""
                : "conjugation type requires its matching godan terminal kana";
   }

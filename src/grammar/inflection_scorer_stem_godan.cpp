@@ -227,7 +227,7 @@ float scoreStemAndIchidan(float base, const InflectionScoreContext& context) {
       // (E-row stems are handled in the branch above; only i-row remains as a valid ending.)
       if (stem_len >= core::kJapaneseCharBytes) {
         char32_t last_cp = utf8::decodeLastChar(stem);
-        if (kana::isHiraganaCodepoint(last_cp) && !kana::isIRowCodepoint(last_cp) && !kana::isERowCodepoint(last_cp)) {
+        if (kana::isHiraganaCodepoint(last_cp) && !kana::isIOrERowCodepoint(last_cp)) {
           // Strong penalty - this pattern is grammatically impossible for Ichidan
           applyPenalty(base, inflection::kPenaltyIchidanInvalidRowStem, "ichidan_invalid_row_stem");
         }
@@ -336,9 +336,8 @@ float scoreStemAndIchidan(float base, const InflectionScoreContext& context) {
   //   - Used after i-adjective stem: 高すぎる (too expensive)
   //   - Must be recognized as legitimate Ichidan verb
   // Also でき (from できる - to be able)
-  bool is_valid_hiragana_stem = equalsAny(stem, inflection::kValidHiraganaStemExceptions);
   if (type == VerbType::Ichidan && stem_len >= core::kTwoJapaneseCharBytes && isPureHiragana(stem) &&
-      !is_valid_hiragana_stem) {
+      !equalsAny(stem, inflection::kValidHiraganaStemExceptions)) {
     applyPenalty(base, GET_OPT(penalty_pure_hiragana_stem, inflection::kPenaltyPureHiraganaStem),
                  "ichidan_pure_hiragana_stem");
   }
@@ -581,8 +580,6 @@ float scoreGodan(float base, const InflectionScoreContext& context) {
     }
   }
 
-  // I-adjective validation: single-kanji stems are very rare
-  // Most I-adjectives have multi-character stems (美しい, 高い, 長い)
   return base;
 }
 

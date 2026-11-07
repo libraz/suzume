@@ -39,11 +39,11 @@ constexpr std::string_view kAspectualSubsidiaryLemmas[] = {"始める", "はじ�
 // The excessive subsidiary, whose finite and continuative cells the auxiliary
 // dictionary spells while its other cells are generated as ordinary verb cells.
 constexpr std::string_view kExcessiveSubsidiaryLemmas[] = {"過ぎる", "すぎる"};
+// Verbs that exist only behind the honorific prefix お (おはす, おはします).
+constexpr std::string_view kPrefixBoundHonorificVerbLemmas[] = {"はす"};
 // Verbs that exist only as a derivational suffix on a nominal host (形式ばる,
 // 芝居がかる). Their conjugation lives in the dictionary; the host requirement
 // cannot, so callers gate the entry on it.
-// Verbs that exist only behind the honorific prefix お (おはす, おはします).
-constexpr std::string_view kPrefixBoundHonorificVerbLemmas[] = {"はす"};
 constexpr std::string_view kBoundDerivationalSuffixVerbLemmas[] = {"ばる", "がかる", "じみる",
                                                                    "ぶる", "めく",   "めかす"};
 // The subset whose cells can stand for the okurigana of a fabricated verb. めく
@@ -110,10 +110,9 @@ bool spellsBoundDerivationalSuffixCell(std::string_view okurigana) {
   static const std::vector<std::string> kCells = [] {
     std::vector<std::string> cells;
     for (const std::string_view lemma : kBoundSuffixCellLemmas) {
-      const std::string base(lemma);
-      cells.push_back(base);
-      const VerbType type = Conjugation::detectType(base);
-      const std::string stem = Conjugation::getStem(base, type);
+      cells.emplace_back(lemma);
+      const VerbType type = Conjugation::detectType(lemma);
+      const std::string stem = Conjugation::getStem(lemma, type);
       for (const ConjForm form : kAllVerbConjForms) {
         for (const auto& ending : getVerbEndingsByForm(form)) {
           if (ending.verb_type == type) {

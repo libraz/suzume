@@ -179,12 +179,12 @@ class Conjugation {
   /**
    * @brief Get verb stem from base form
    */
-  static std::string getStem(const std::string& base_form, VerbType type);
+  static std::string getStem(std::string_view base_form, VerbType type);
 
   /**
    * @brief Detect verb type from base form (heuristic)
    */
-  static VerbType detectType(const std::string& base_form);
+  static VerbType detectType(std::string_view base_form);
 };
 
 /**
@@ -241,7 +241,7 @@ inline constexpr std::array<KuruConnectionCell, 7> kKuruConnectionCells = {{
 /**
  * @brief Return the canonical カ変 stem surfaces for a base form.
  */
-KuruStemForms getKuruStemForms(const std::string& base_form);
+KuruStemForms getKuruStemForms(std::string_view base_form);
 
 /**
  * @brief Dictionary form surfaces for both spellings of カ変.

@@ -6,23 +6,9 @@ namespace suzume::normalize {
 
 namespace {
 
-// Particles that should not be treated as verb endings when generating
-// verb candidates from kanji + hiragana patterns.
+// Multi-kana particles that should not be treated as verb endings when
+// generating verb candidates; single-kana ones live in isParticleCodepoint().
 constexpr std::string_view kParticleStrings[] = {
-    // Case particles (格助詞)
-    "が",
-    "を",
-    "に",
-    "で",
-    "と",
-    "へ",
-    "の",
-    // Binding particles (係助詞)
-    "は",
-    "も",
-    // Other particles (副助詞・接続助詞)
-    "や",
-    "か",
     // Compound particles (複合助詞)
     "から",
     "まで",
@@ -44,15 +30,12 @@ constexpr std::string_view kCopulaStrings[] = {
     "である",
 };
 
-// Formal nouns (形式名詞) with abstract grammatical functions. These remain
-// recognizable even when a dictionary lookup did not flag the candidate.
-constexpr std::string_view kFormalNounStrings[] = {
-    "所", "物", "事", "時", "方", "為",
-};
-
 }  // namespace
 
 bool isParticle(std::string_view surface) {
+  if (surface.size() == core::kJapaneseCharBytes && isParticleCodepoint(utf8::decodeFirstChar(surface))) {
+    return true;
+  }
   return utf8::equalsAny(surface, kParticleStrings);
 }
 
@@ -65,7 +48,21 @@ bool isParticleOrCopula(std::string_view surface) {
 }
 
 bool isFormalNounSurface(std::string_view surface) {
-  return utf8::equalsAny(surface, kFormalNounStrings);
+  return surface.size() == core::kJapaneseCharBytes && isFormalNounCodepoint(utf8::decodeFirstChar(surface));
+}
+
+bool isFormalNounCodepoint(char32_t ch) {
+  switch (ch) {
+    case U'所':
+    case U'物':
+    case U'事':
+    case U'時':
+    case U'方':
+    case U'為':
+      return true;
+    default:
+      return false;
+  }
 }
 
 bool isParticleCodepoint(char32_t ch) {

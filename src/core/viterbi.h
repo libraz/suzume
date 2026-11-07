@@ -18,8 +18,6 @@
 
 namespace suzume::core {
 
-inline constexpr size_t kNumExtendedPosTypes = static_cast<size_t>(ExtendedPOS::Count_);
-
 // Sentence-boundary costs are linguistic, so they belong to the scorer: a
 // Scorer supplies bosCost(edge) for an edge that opens the sentence and
 // eosCost(edge, prev) for one that closes it. Keeping them out of core also
@@ -186,10 +184,6 @@ class Viterbi {
 
       for (uint32_t edge_id : lattice.edgeIdsAt(pos)) {
         const auto& edge = lattice.getEdge(edge_id);
-        // Bounds check - skip edges that go beyond text length
-        if (edge.end > text_len) {
-          continue;
-        }
         const float word_cost = scorer.wordCost(edge);
 
         const bool closes_sentence = edge.end == text_len;
@@ -253,10 +247,7 @@ class Viterbi {
           continue;
         }
 
-        size_t next_epos_idx = static_cast<size_t>(edge.extended_pos);
-        if (next_epos_idx >= kNumExtendedPosTypes) {
-          next_epos_idx = static_cast<size_t>(ExtendedPOS::Unknown);
-        }
+        const size_t next_epos_idx = static_cast<size_t>(edge.extended_pos);
         states_by_pos[edge.end]
             .getOrCreate(static_cast<uint16_t>(next_epos_idx))
             .insert(lattice, best_total, edge.id, best_prev_epos, best_prev_slot);

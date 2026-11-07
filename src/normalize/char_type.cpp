@@ -229,13 +229,12 @@ bool isRetainedTextSymbol(char32_t codepoint) {
 
 CharType classifyChar(char32_t codepoint) {
   // Hiragana: U+3040-U+309F
-  if (codepoint >= 0x3040 && codepoint <= 0x309F) {
+  if (kana::isHiraganaCodepoint(codepoint)) {
     return CharType::Hiragana;
   }
 
   // Katakana: U+30A0-U+30FF, U+31F0-U+31FF (small), U+FF66-U+FF9F (half-width)
-  if ((codepoint >= 0x30A0 && codepoint <= 0x30FF) || (codepoint >= 0x31F0 && codepoint <= 0x31FF) ||
-      (codepoint >= 0xFF66 && codepoint <= 0xFF9F)) {
+  if (kana::isKatakanaCodepoint(codepoint) || (codepoint >= 0xFF66 && codepoint <= 0xFF9F)) {
     return CharType::Katakana;
   }
 
@@ -265,13 +264,8 @@ CharType classifyChar(char32_t codepoint) {
     return CharType::Alphabet;
   }
 
-  // ASCII digits
-  if (codepoint >= '0' && codepoint <= '9') {
-    return CharType::Digit;
-  }
-
-  // Full-width digits
-  if (codepoint >= 0xFF10 && codepoint <= 0xFF19) {
+  // ASCII and full-width digits
+  if (isArabicDigitCodepoint(codepoint)) {
     return CharType::Digit;
   }
 

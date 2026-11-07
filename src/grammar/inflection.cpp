@@ -330,6 +330,12 @@ std::vector<InflectionCandidate> Inflection::analyzeWithAuxiliaries(std::string_
 }
 
 const std::vector<InflectionCandidate>& Inflection::analyze(std::string_view surface) const {
+  // A conjugated verb needs at least stem + ending (2 Japanese characters)
+  if (surface.size() < core::kTwoJapaneseCharBytes) {
+    static const std::vector<InflectionCandidate> kNoCandidates;
+    return kNoCandidates;
+  }
+
   // Check cache first
   std::string key(surface);
   auto cache_iter = cache_.find(key);
@@ -348,14 +354,6 @@ const std::vector<InflectionCandidate>& Inflection::analyze(std::string_view sur
   SUZUME_DEBUG_LOG_VERBOSE("[INFLECTION] Analyzing \"" << surface << "\"\n");
 
   std::vector<InflectionCandidate> candidates;
-
-  // Early return for very short strings (less than 2 Japanese characters)
-  // A conjugated verb needs at least stem + ending
-  if (surface.size() < core::kTwoJapaneseCharBytes) {  // 2 Japanese chars = 6 bytes in UTF-8
-    rollCacheIfFull();
-    auto [iter, inserted] = cache_.emplace(std::move(key), std::move(candidates));
-    return iter->second;
-  }
 
   // First, try to match auxiliaries from the end
   auto matches = matchAuxiliaries(surface);

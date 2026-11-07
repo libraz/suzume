@@ -42,6 +42,9 @@ bool isParticleOrCopula(std::string_view surface);
 // Check if surface is a formal noun
 bool isFormalNounSurface(std::string_view surface);
 
+// Check if a codepoint is a single-kanji formal noun
+bool isFormalNounCodepoint(char32_t ch);
+
 // =============================================================================
 // Particle Codepoints (for character-level filtering)
 // =============================================================================

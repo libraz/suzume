@@ -286,7 +286,7 @@ bool isUnproductiveGodanTerminalKana(char32_t code) {
 
 bool isMonogradeStemFinalKana(char32_t code) {
   constexpr std::array<char32_t, 3> kNoMonogradeStem = {U'ひ', U'へ', U'し'};
-  return (kana::isIRowCodepoint(code) || kana::isERowCodepoint(code)) && !kana::isCodepointIn(kNoMonogradeStem, code);
+  return kana::isIOrERowCodepoint(code) && !kana::isCodepointIn(kNoMonogradeStem, code);
 }
 
 bool isClassicalAuxiliaryHomographKana(char32_t code) {

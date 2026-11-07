@@ -18,6 +18,7 @@ struct IntegerScan {
 };
 
 bool isAsciiDigit(char chr);
+char32_t peekCodepoint(std::string_view text, size_t pos);
 bool isAsciiAlpha(char chr);
 bool isAsciiAlnum(char chr);
 IntegerScan scanInteger(std::string_view text, size_t pos);

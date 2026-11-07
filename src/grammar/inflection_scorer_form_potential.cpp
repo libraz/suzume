@@ -249,17 +249,6 @@ float scoreAdjectiveAndForm(float base, const InflectionScoreContext& context) {
     applyPenalty(base, inflection::kPenaltyOnbinkeiERowNonIchidan, "onbinkei_e_row_non_ichidan");
   }
 
-  // Single-kanji Godan stems in onbinkei context need careful handling
-  // GodanKa/GodanGa have い音便: 書く→書いて (aux=いて), 泳ぐ→泳いで (aux=いで)
-  // Ichidan have no 音便: 用いる→用いて (aux=て)
-  // When stem is single kanji and aux is just て/た (3 bytes), it's likely
-  // the input is actually an Ichidan verb like 用いる (stem=用い, aux=て)
-  // When aux is いて/いた/いで/いだ (6 bytes), it's legitimate GodanKa/GodanGa
-  // This prevents "用いて" (stem=用, aux=いて) from being parsed as GodanKa "用く"
-  // But allows "書いて" (stem=書, aux=いて) to be correctly parsed as GodanKa "書く"
-  // Note: aux_total_len includes all auxiliary suffixes, not just the first one
-  // For simple te-form: aux_total_len is 6 for いて, 3 for て
-
   // Multi-kanji stems (2+ kanji only) are almost always サ変名詞
   // Such stems should only be parsed as Suru verbs, not Godan or Ichidan
   // This prevents "検討いた" from being parsed as GodanKa "検討く"
@@ -270,7 +259,7 @@ float scoreAdjectiveAndForm(float base, const InflectionScoreContext& context) {
   //   - But 検討 + いて could be サ変 (検討している) or GodanKa (検討く - wrong)
   // Exception: GodanSa verbs with 2-kanji stems exist (目指す, 見逃す, etc.)
   //   - These are NOT サ変名詞, they are true Godan verbs ending in す
-  // Skip IAdjective - it has separate handling at line 246-254
+  // Skip IAdjective - it has separate handling above
   if (stem_len >= core::kTwoJapaneseCharBytes && isAllKanji(stem) && type != VerbType::Suru &&
       type != VerbType::IAdjective) {
     // Skip penalty for っ-onbin verbs (GodanWa/Ra/Ta) in onbinkei context
@@ -413,8 +402,9 @@ float scorePotentialAndSuru(float base, const InflectionScoreContext& context) {
     // aux_len == 6 (ない) or 12 (なかった) with empty verb suffix is invalid
     // aux_len >= 9 with empty suffix is likely valid (された=9, させた=9, etc.)
     bool has_empty_verb_suffix = (suffix_len == aux_total_len);
-    bool is_direct_nai_pattern =
-        has_empty_verb_suffix && (aux_total_len == 6 || aux_total_len == 12);  // ない or なかった
+    // ない or なかった
+    bool is_direct_nai_pattern = has_empty_verb_suffix && (aux_total_len == core::kTwoJapaneseCharBytes ||
+                                                           aux_total_len == core::kFourJapaneseCharBytes);
     if (is_direct_nai_pattern) {
       applyPenalty(base, inflection::kPenaltySuruDirectNai, "suru_direct_nai");
     }

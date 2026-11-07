@@ -118,10 +118,9 @@ bool PreTokenizer::tryMatchDate(std::string_view text, size_t pos, PreToken& tok
   // is exempt since it opens the second term of a ratio.
   byte_pos = idx;
   if (consumeCodepoint(text, byte_pos, U'中')) {
-    size_t after_extent = byte_pos;
     bool closes_phrase = true;
-    if (after_extent < text.size()) {
-      const char32_t following = normalize::decodeUtf8(text, after_extent);
+    if (byte_pos < text.size()) {
+      const char32_t following = peekCodepoint(text, byte_pos);
       closes_phrase = !normalize::isKanjiCodepoint(following) || normalize::isNumeralCodepoint(following);
     }
     if (closes_phrase) {
@@ -185,11 +184,8 @@ bool PreTokenizer::tryMatchCurrency(std::string_view text, size_t pos, PreToken&
   }
   // A kanji after 円 may continue the quantity phrase (10万円超, 1万円札), which
   // the lattice's counter scan decides by its kanji-run rule, as after 人.
-  if (idx < text.size()) {
-    size_t next = idx;
-    if (normalize::isKanjiCodepoint(normalize::decodeUtf8(text, next))) {
-      return false;
-    }
+  if (idx < text.size() && normalize::isKanjiCodepoint(peekCodepoint(text, idx))) {
+    return false;
   }
 
   setTokenFromRange(token, text, pos, idx, PreTokenType::Currency, core::PartOfSpeech::Noun);
