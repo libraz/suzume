@@ -614,6 +614,16 @@ class TestNumberUnit:
         assert result[0]["lemma"] == "ミスる"
         assert rule == "denominal-ru-verb"
 
+    def test_keeps_a_katakana_verb_behind_a_kanji_host(self):
+        tokens = [
+            _tok("授業", pos="名詞", pos_sub1="サ変接続"),
+            _tok("サボっ", pos="動詞", conj_type="五段・ラ行", lemma="サボる"),
+            _tok("た", pos="助動詞"),
+        ]
+        result, rule = apply_suzume_merge(tokens, "授業サボった")
+        assert [token["surface"] for token in result] == ["授業", "サボっ", "た"]
+        assert rule != "denominal-ru-verb"
+
     def test_kana_counter_from_arbitrary_mecab_split(self):
         tokens = [_tok("い", pos="動詞"), _tok("ちまい", pos="動詞")]
         result, rule = apply_suzume_merge(tokens, "いちまい")

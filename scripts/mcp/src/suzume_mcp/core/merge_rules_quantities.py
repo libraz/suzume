@@ -181,8 +181,12 @@ def _denominal_ru_form(tokens: list[dict], index: int) -> str | None:
         )
     ):
         return surface
+    # A katakana-only verb is a verb in its own right behind a kanji or kana
+    # host (最近+ハマっ); it is a broken tail only where the host is katakana
+    # too (ミ+スっ).
     if (
         regex.fullmatch(r"[\p{Katakana}ー]+っ", surface)
+        and regex.fullmatch(r"[\p{Katakana}ー]+", tokens[index - 1].get("surface", ""))
         and tail.get("pos") == "動詞"
         and tail.get("conj_type") == "五段・ラ行"
         and tail.get("lemma", "").endswith("る")

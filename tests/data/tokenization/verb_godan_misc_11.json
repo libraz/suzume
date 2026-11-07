@@ -225,6 +225,50 @@
       ],
       "id": "urusaku_iyagattta",
       "input": "うるさく言いやがった"
+    },
+    {
+      "description": "最近ハマってる - auto-generated",
+      "expected": [
+        {
+          "lemma": "最近",
+          "pos": "Noun",
+          "surface": "最近"
+        },
+        {
+          "lemma": "ハマる",
+          "pos": "Verb",
+          "surface": "ハマっ"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てる"
+        }
+      ],
+      "id": "ttteru_7",
+      "input": "最近ハマってる"
+    },
+    {
+      "description": "授業サボった - auto-generated",
+      "expected": [
+        {
+          "lemma": "授業",
+          "pos": "Noun",
+          "surface": "授業"
+        },
+        {
+          "lemma": "サボる",
+          "pos": "Verb",
+          "surface": "サボっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ttta_9",
+      "input": "授業サボった"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 11/11)",
