@@ -16,7 +16,8 @@ EntrySpecRange getConjunctionEntries() {
 
       // Adversative (逆接)
       conj("しかし", ""), conj("然し", ""), conj("しかしながら", ""), conj("だが", ""), conj("けれども", ""),
-      conj("だけど", ""),  // colloquial variant
+      conj("けれど", ""), conj("けど", ""),  // clause-initial readings of the conjunctive particles
+      conj("だけど", ""),                    // colloquial variant
       conj("ところが", ""), conj("それでも", ""), conj("それなのに", ""), conj("でも", ""),
       conj("だって", ""),                    // にもかかわらず removed for MeCab compat
       conj("てか", ""), conj("ってか", ""),  // colloquial clause-initial correction (てか、それ…)

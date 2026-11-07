@@ -2053,6 +2053,79 @@
       ],
       "id": "ttte_no_ga_dearu",
       "input": "翻って個人の努力が必要である。"
+    },
+    {
+      "description": "clause-initial けど is the conjunction",
+      "expected": [
+        {
+          "lemma": "けど",
+          "pos": "Conjunction",
+          "surface": "けど"
+        },
+        {
+          "lemma": "やる",
+          "pos": "Verb",
+          "surface": "やる"
+        }
+      ],
+      "id": "kedoyaru",
+      "input": "けどやる"
+    },
+    {
+      "description": "けど、行く - auto-generated",
+      "expected": [
+        {
+          "lemma": "けど",
+          "pos": "Conjunction",
+          "surface": "けど"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行く"
+        }
+      ],
+      "id": "kedo_ku",
+      "input": "けど、行く"
+    },
+    {
+      "description": "after a predicate けど stays the conjunctive particle",
+      "expected": [
+        {
+          "lemma": "寒い",
+          "pos": "Adjective",
+          "surface": "寒い"
+        },
+        {
+          "lemma": "けど",
+          "pos": "Particle",
+          "surface": "けど"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行く"
+        }
+      ],
+      "id": "ikedo_ku",
+      "input": "寒いけど行く"
+    },
+    {
+      "description": "けれどやる - auto-generated",
+      "expected": [
+        {
+          "lemma": "けれど",
+          "pos": "Conjunction",
+          "surface": "けれど"
+        },
+        {
+          "lemma": "やる",
+          "pos": "Verb",
+          "surface": "やる"
+        }
+      ],
+      "id": "keredoyaru",
+      "input": "けれどやる"
     }
   ],
   "description": "conjunction tests",

@@ -471,6 +471,14 @@ bool isOutOfPlaceForWordClass(const DictionaryCandidateContext& ctx, const core:
     if (opens_inside_particle) {
       return true;
     }
+    // A conjunction spelled like a conjunctive particle (けど, けれど) is that
+    // particle anywhere but the clause start (寒い+けど, not 寒い+けど(CONJ)).
+    const auto* conjunctive_particle =
+        lookupEntryInRange(dict_manager, codepoints, start_pos, end_pos, core::PartOfSpeech::Particle);
+    if (conjunctive_particle != nullptr && conjunctive_particle->extended_pos == core::ExtendedPOS::ParticleConj &&
+        normalize::classifyChar(codepoints[start_pos - 1]) != normalize::CharType::Symbol) {
+      return true;
+    }
     // A conjunction introduces what follows, so one closed off by punctuation
     // or the sentence end right after a content word has nothing to join
     // (時間+ない+し、 not 時間+ないし、) — the EOS AfterContent gate, mirrored.
