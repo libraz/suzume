@@ -1430,6 +1430,137 @@
       ],
       "id": "dayo",
       "input": "ダメだよ"
+    },
+    {
+      "description": "Negation-prefix compound opening on a shorter listed adjective stays one na-adjective",
+      "expected": [
+        {
+          "lemma": "不安定",
+          "pos": "Adjective",
+          "surface": "不安定"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "情勢",
+          "pos": "Noun",
+          "surface": "情勢"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "続く",
+          "pos": "Verb",
+          "surface": "続く"
+        }
+      ],
+      "id": "na_ga_ku",
+      "input": "不安定な情勢が続く。"
+    },
+    {
+      "description": "Negation-prefix na-adjective after の",
+      "expected": [
+        {
+          "lemma": "西日本",
+          "pos": "Noun",
+          "surface": "西日本"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "中心",
+          "pos": "Noun",
+          "surface": "中心"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "大気",
+          "pos": "Noun",
+          "surface": "大気"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "不安定",
+          "pos": "Adjective",
+          "surface": "不安定"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "状態",
+          "pos": "Noun",
+          "surface": "状態"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "続く",
+          "pos": "Verb",
+          "surface": "続く"
+        },
+        {
+          "lemma": "見込み",
+          "pos": "Noun",
+          "surface": "見込み"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "wo_ni_no_na_ga_ku_mida",
+      "input": "西日本を中心に、大気の不安定な状態が続く見込みだ。"
+    },
+    {
+      "description": "Negation-prefix na-adjective before a noun",
+      "expected": [
+        {
+          "lemma": "不安定",
+          "pos": "Adjective",
+          "surface": "不安定"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "天気",
+          "pos": "Noun",
+          "surface": "天気"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "na_da",
+      "input": "不安定な天気だ"
     }
   ],
   "description": "Na-adjectives (ナ形容詞) (part 2/2)",

@@ -67,6 +67,22 @@ bool closesOnNegationPrefixedAdjective(const std::vector<char32_t>& codepoints, 
   return false;
 }
 
+// The mirror: a negation compound that opens on a shorter listed adjective
+// (不安|定 inside 不+安定). That listed word carries the same lexical bonus,
+// which the productive compound has to match.
+bool opensOnNegationPrefixedAdjective(const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos,
+                                      const dictionary::DictionaryManager* dict_manager) {
+  if (dict_manager == nullptr) {
+    return false;
+  }
+  for (size_t head_end = start_pos + 2; head_end < end_pos; ++head_end) {
+    if (dict_manager->lookupExact(extractSubstring(codepoints, start_pos, head_end), core::PartOfSpeech::Adjective)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 // The な that would be the attributive copula may instead be the first mora of
 // a longer closed-class word (なら, ない, など, なし). When the dictionary can
 // name one starting there, that word is the reading and the material before it
@@ -587,7 +603,9 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
     // Found kanji compound + な - potential na-adjective stem
     // Cost similar to dictionary na-adjectives but with small penalty for unknown
     float cost = has_dictionary_head ? candidate::kNaAdjHeadedCompoundCost : candidate::kNaAdjStemCost;
-    if (has_dictionary_head && closesOnNegationPrefixedAdjective(codepoints, start_pos, kanji_end, dict_manager)) {
+    if ((has_dictionary_head && closesOnNegationPrefixedAdjective(codepoints, start_pos, kanji_end, dict_manager)) ||
+        (is_productive_negation_compound &&
+         opensOnNegationPrefixedAdjective(codepoints, start_pos, kanji_end, dict_manager))) {
       cost += scorer::kBonusNegationPrefixBase;
     }
     candidates.push_back(makeNaAdjCandidate(kanji_seq, start_pos, kanji_end, cost, true, CandidateOrigin::AdjectiveNa,
