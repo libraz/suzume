@@ -157,8 +157,8 @@ FIXED_FUNCTION_SEARCH_UNITS: dict[str, str] = {
     "だっちゃ": "助動詞",
     # Lexicalized compound particles the reference analyzer keeps whole after a
     # noun but takes apart after a verb attributive (確認に際して vs
-    # 確認するに際して). The unit does not change with what precedes it, and the
-    # continuative member is the one that carries the polite form (に際し+まし+て).
+    # 確認するに際して). The unit does not change with what precedes it; before
+    # ます its continuative is a verb again (に+際し+まし+て, に+つき+まし+て).
     "に際して": "助詞",
     "に際し": "助詞",
     "につき": "助詞",

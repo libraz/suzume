@@ -33,6 +33,20 @@ class TestFixedFunctionSearchUnits:
             assert merged == [{"surface": text, "pos": pos, "lemma": text}]
             assert rule == "fixed-function-search-unit"
 
+    def test_compound_particle_before_polite_keeps_its_continuative(self):
+        tokens = [
+            _token("に", "助詞"),
+            {"surface": "つき", "pos": "動詞", "lemma": "つく"},
+            {"surface": "まし", "pos": "助動詞", "lemma": "ます"},
+            _token("て", "助詞"),
+        ]
+        merged, _ = apply_suzume_merge(tokens, "につきまして")
+        assert [token["surface"] for token in merged] == ["に", "つき", "まし", "て"]
+
+        merged, rule = apply_suzume_merge([_token("に", "助詞"), _token("つき", "動詞")], "につき")
+        assert [token["surface"] for token in merged] == ["につき"]
+        assert rule == "fixed-function-search-unit"
+
     def test_does_not_absorb_a_longer_token(self):
         tokens = [_token("おそれる", "動詞")]
         merged, rule = apply_suzume_merge(tokens, "おそれる")

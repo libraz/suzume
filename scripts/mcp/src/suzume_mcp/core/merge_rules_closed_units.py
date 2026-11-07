@@ -670,7 +670,12 @@ def _merge_fixed_search_units(state: MergeState) -> bool:
             if fixed_word:
                 consumed, j = _consume_span(tokens, i, len(fixed_word))
                 overflow = _predicate_overflow(consumed, fixed_word, j - i)
-                if consumed == fixed_word or overflow:
+                # ます selects a verb continuative, so before it a compound
+                # particle ending in one is the case particle plus that verb
+                # (に+つき+まし+て), as the polite split reads the whole family.
+                following = tokens[j].get("lemma", "") if j < len(tokens) else ""
+                polite_continuative = FIXED_FUNCTION_SEARCH_UNITS[fixed_word] == "助詞" and following == "ます"
+                if (consumed == fixed_word or overflow) and not polite_continuative:
                     result.append(
                         {
                             "surface": fixed_word,
