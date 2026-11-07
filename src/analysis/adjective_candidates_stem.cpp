@@ -211,9 +211,7 @@ float productiveIAdjectiveStemConfidence(const std::string& stem, const std::str
   // the genuine i-adjective stem in 暖か+さ and must remain available.
   if (dict_manager != nullptr) {
     const auto* particle = dict_manager->lookupExact(utf8::lastChar(stem), core::PartOfSpeech::Particle);
-    if (particle != nullptr && (particle->extended_pos == core::ExtendedPOS::ParticleCase ||
-                                particle->extended_pos == core::ExtendedPOS::ParticleTopic ||
-                                particle->extended_pos == core::ExtendedPOS::ParticleNo)) {
+    if (particle != nullptr && isTopicCaseOrNoParticle(particle->extended_pos)) {
       return candidate::kNoOriginConfidence;
     }
   }

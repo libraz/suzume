@@ -180,8 +180,8 @@ void generateTemporalNounBoundaryCandidates(const std::vector<char32_t>& codepoi
   // kanji before 間 excludes ordinary one-kanji compounds followed by
   // も+なく (時間|も|なく), where 間 belongs to the noun on the left.
   const size_t kanji_end = findCharRegionEnd(char_types, start_pos, char_types.size(), normalize::CharType::Kanji);
-  if (kanji_end >= start_pos + 3 && codepoints[kanji_end - 1] == U'間' && kanji_end + 2 < codepoints.size() &&
-      extractSubstring(codepoints, kanji_end - 1, kanji_end + 3) == "間もなく") {
+  if (kanji_end >= start_pos + 3 && codepoints[kanji_end - 1] == U'間' &&
+      textMatchesAt(codepoints, kanji_end - 1, "間もなく")) {
     const size_t noun_end = kanji_end - 1;
     const std::string noun = extractSubstring(codepoints, start_pos, noun_end);
     auto boundary = makeCandidate(noun, start_pos, noun_end, core::PartOfSpeech::Noun,

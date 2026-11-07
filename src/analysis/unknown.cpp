@@ -201,12 +201,6 @@ bool spansAdverbAdjectiveBoundary(const UnknownCandidate& candidate, const std::
                             partOfSpeechMask(core::PartOfSpeech::Adjective));
 }
 
-// Whether a particle entry is a topic, case or genitive marker.
-bool isTopicCaseOrNoParticle(const dictionary::DictionaryEntry& entry) {
-  return entry.extended_pos == core::ExtendedPOS::ParticleTopic ||
-         entry.extended_pos == core::ExtendedPOS::ParticleCase || entry.extended_pos == core::ExtendedPOS::ParticleNo;
-}
-
 // End of the kanji run that opens at @p from, clamped to @p limit.
 size_t skipKanjiRun(const std::vector<char32_t>& codepoints, size_t from, size_t limit) {
   while (from < limit && normalize::classifyChar(codepoints[from]) == normalize::CharType::Kanji) {
@@ -249,7 +243,7 @@ bool startsWithParticleBeforeRegisteredPredicate(const UnknownCandidate& candida
 
   const auto* particle_entry =
       lookupEntryInRange(*dict_manager, codepoints, candidate.start, candidate.start + 1, core::PartOfSpeech::Particle);
-  if (particle_entry == nullptr || !isTopicCaseOrNoParticle(*particle_entry)) {
+  if (particle_entry == nullptr || !isTopicCaseOrNoParticle(particle_entry->extended_pos)) {
     return false;
   }
   const size_t predicate_length = candidate.end - candidate.start - 1;
@@ -381,7 +375,7 @@ bool spansCaseParticleBeforeVerifiedPredicate(const UnknownCandidate& candidate,
     }
     const auto* entry =
         lookupEntryInRange(*dict_manager, codepoints, boundary, boundary + 1, core::PartOfSpeech::Particle);
-    if (entry == nullptr || !isTopicCaseOrNoParticle(*entry)) {
+    if (entry == nullptr || !isTopicCaseOrNoParticle(entry->extended_pos)) {
       continue;
     }
     const bool left_content =
@@ -407,8 +401,8 @@ bool startsInsideKanjiRunBeforeClosedNai(const UnknownCandidate& candidate, cons
     return false;
   }
   const size_t boundary = skipKanjiRun(codepoints, candidate.start, candidate.end);
-  return boundary > candidate.start && boundary < candidate.end &&
-         extractSubstring(codepoints, boundary, candidate.end) == "ない";
+  return boundary > candidate.start && boundary < candidate.end && candidate.end - boundary == 2 &&
+         textMatchesAt(codepoints, boundary, "ない");
 }
 
 // A coined kanji-stem candidate cannot absorb a kana verb cell that the

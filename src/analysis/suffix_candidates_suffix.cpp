@@ -126,8 +126,7 @@ bool appendProductiveSuffixVerbCells(const std::vector<char32_t>& codepoints, si
   for (size_t index = 0; index < spec.form_count; ++index) {
     const SuffixVerbForm& form = spec.forms[index];
     const size_t candidate_end = attach_pos + normalize::utf8Length(form.inflection);
-    if (candidate_end > codepoints.size() ||
-        extractSubstring(codepoints, attach_pos, candidate_end) != form.inflection) {
+    if (!textMatchesAt(codepoints, attach_pos, form.inflection)) {
       continue;
     }
     bool gated_out = false;

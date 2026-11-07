@@ -428,9 +428,7 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
     // i-adjective (未練がましい, 言い訳がましく, 恩着せがましさ). Its が is part of
     // the suffix, never the case particle, and the suffix is closed — so require
     // the whole stem of it, not just its opening mora.
-    const bool ga_mashii_derivation =
-        first_hiragana == U'が' && kanji_end + kGaMashiiStemLength <= codepoints.size() &&
-        extractSubstring(codepoints, kanji_end, kanji_end + kGaMashiiStemLength) == kGaMashiiStem;
+    const bool ga_mashii_derivation = first_hiragana == U'が' && textMatchesAt(codepoints, kanji_end, kGaMashiiStem);
     if (!medial_mo_adjective && !ga_mashii_derivation) {
       return;  // These particles follow nouns/verbs, not adjective stems
     }
@@ -851,8 +849,7 @@ void generateGaMashiiHostAdjectiveCandidates(const std::vector<char32_t>& codepo
   for (size_t candidate_idx = 0; candidate_idx < noun_candidate_count; ++candidate_idx) {
     const auto& host = candidates[candidate_idx];
     if (host.start != start_pos || host.pos != core::PartOfSpeech::Noun ||
-        host.end + kGaMashiiStemLength >= codepoints.size() ||
-        extractSubstring(codepoints, host.end, host.end + kGaMashiiStemLength) != kGaMashiiStem) {
+        host.end + kGaMashiiStemLength >= codepoints.size() || !textMatchesAt(codepoints, host.end, kGaMashiiStem)) {
       continue;
     }
 

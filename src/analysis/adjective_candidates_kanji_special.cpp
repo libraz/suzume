@@ -126,8 +126,7 @@ bool appendKanjiIAdjSpecialCandidates(const std::vector<char32_t>& codepoints, s
 
   // The past cell かっ+た of the same one-kanji stem (違かった). A ka-row
   // verb owns the spelling when the dictionary attests it (分かった, 助かった).
-  if (kanji_end == start_pos + 1 && kanji_end + 2 < codepoints.size() &&
-      extractSubstring(codepoints, kanji_end, kanji_end + 3) == "かった") {
+  if (kanji_end == start_pos + 1 && textMatchesAt(codepoints, kanji_end, "かった")) {
     const std::string kanji = extractSubstring(codepoints, start_pos, kanji_end);
     if (!verb_helpers::hasDictionaryEntry(dict_manager, kanji + "かる", core::PartOfSpeech::Verb) &&
         !verb_helpers::hasDictionaryEntry(dict_manager, kanji + "く", core::PartOfSpeech::Verb)) {

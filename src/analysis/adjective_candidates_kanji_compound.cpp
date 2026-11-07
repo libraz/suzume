@@ -385,8 +385,7 @@ void adj_detail::appendHostFusedSuffixAdjective(const std::vector<char32_t>& cod
       source.conj_type = dictionary::ConjugationType::IAdjective;
       for (const auto& cell : grammar::expandDictionarySourceEntry(source)) {
         const size_t cell_length = normalize::utf8Length(cell.surface);
-        if (host_end + cell_length <= codepoints.size() &&
-            extractSubstring(codepoints, host_end, host_end + cell_length) == cell.surface) {
+        if (textMatchesAt(codepoints, host_end, cell.surface)) {
           emit(host_end, host_end + cell_length, std::string(suffix), cell.extended_pos);
         }
       }

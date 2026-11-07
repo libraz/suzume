@@ -50,8 +50,7 @@ void appendSuruSubsidiaryCandidates(const std::vector<char32_t>& codepoints, siz
   }
 
   const auto matchesAt = [&](size_t pos, std::string_view form) {
-    return !form.empty() && pos + normalize::utf8Length(form) <= codepoints.size() &&
-           extractSubstring(codepoints, pos, pos + normalize::utf8Length(form)) == form;
+    return !form.empty() && textMatchesAt(codepoints, pos, form);
   };
   for (const auto& subsidiary : compound_verb_detail::subsidiaryVerbs()) {
     if (!subsidiary.joins_suru) {

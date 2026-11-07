@@ -40,13 +40,6 @@ constexpr std::array<std::string_view, 4> kLexicalCompoundHeadAdjectives = {"苦
 // analyzer folded into the reconstructed base, so a derivation needs two.
 constexpr size_t kMinDerivedAdjectiveHostLength = 2;
 
-// Particle classes that bind a nominal phrase and therefore close it. A
-// 接続助詞 or 終助詞 attaches to a predicate instead, so it cannot mark the end
-// of a host (めんど ends in the concessive ど without being a phrase).
-constexpr std::array<core::ExtendedPOS, 5> kNominalPhraseParticles = {
-    core::ExtendedPOS::ParticleCase, core::ExtendedPOS::ParticleTopic, core::ExtendedPOS::ParticleAdverbial,
-    core::ExtendedPOS::ParticleNo, core::ExtendedPOS::ParticleBinding};
-
 core::ExtendedPOS detectIAdjEpos(const std::string& surface) {
   if (utf8::endsWith(surface, "かっ")) {
     return core::ExtendedPOS::AdjKatt;
@@ -166,11 +159,13 @@ bool derivesFromCompoundFormingAdjective(const std::vector<char32_t>& codepoints
   if (hasExactPartOfSpeech(*dict_manager, codepoints, start_pos, host_end, kFunctionWordMask)) {
     return false;
   }
+  // Particle classes that bind a nominal phrase close it. A 接続助詞 or 終助詞
+  // attaches to a predicate instead, so it cannot mark the end of a host
+  // (めんど ends in the concessive ど without being a phrase).
   for (size_t particle_start = start_pos + 1; particle_start < host_end; ++particle_start) {
     const auto* particle =
         lookupEntryInRange(*dict_manager, codepoints, particle_start, host_end, core::PartOfSpeech::Particle);
-    if (particle != nullptr && std::find(kNominalPhraseParticles.begin(), kNominalPhraseParticles.end(),
-                                         particle->extended_pos) != kNominalPhraseParticles.end()) {
+    if (particle != nullptr && isNominalForcingParticle(particle->extended_pos)) {
       return false;
     }
   }

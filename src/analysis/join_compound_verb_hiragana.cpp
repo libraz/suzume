@@ -112,8 +112,7 @@ void addHiraganaCompoundVerbJoinCandidates(core::Lattice& lattice, std::string_v
   // Do not reinterpret a closed particle plus an independently attested verb
   // as a hiragana V1+V2 compound (結果+と+ひきかえる). A whole dictionary verb
   // at the same position still wins this ambiguity (できる, not で+きる).
-  const size_t hiragana_end =
-      findCharRegionEnd(char_types, start_pos, char_types.size() - start_pos, CharType::Hiragana);
+  const size_t hiragana_end = findCharRegionEnd(char_types, start_pos, char_types.size(), CharType::Hiragana);
   if (start_pos + 2 < hiragana_end) {
     const auto* particle =
         lookupEntryInRange(dict_manager, codepoints, start_pos, start_pos + 1, core::PartOfSpeech::Particle);

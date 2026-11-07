@@ -85,9 +85,7 @@ bool hasNominalPhraseSelectorAt(const dictionary::DictionaryManager* dict_manage
     return false;
   }
   const auto* particle = lookupEntryInRange(*dict_manager, codepoints, pos, pos + 1, core::PartOfSpeech::Particle);
-  if (particle != nullptr && (particle->extended_pos == core::ExtendedPOS::ParticleCase ||
-                              particle->extended_pos == core::ExtendedPOS::ParticleTopic ||
-                              particle->extended_pos == core::ExtendedPOS::ParticleNo)) {
+  if (particle != nullptr && isTopicCaseOrNoParticle(particle->extended_pos)) {
     return true;
   }
   const auto* auxiliary = lookupEntryInRange(*dict_manager, codepoints, pos, pos + 1, core::PartOfSpeech::Auxiliary);
@@ -359,7 +357,7 @@ bool appendSokuonSuffixCandidates(const KanjiHiraganaSpan& span, size_t hira2_en
     // The suffix's inflected cells may run past the compound scan,
     // which stops before an auxiliary-like tail (油っこ+かった).
     const size_t hiragana_run_end =
-        findCharRegionEnd(span.char_types, sokuon_pos, codepoints.size() - sokuon_pos, normalize::CharType::Hiragana);
+        findCharRegionEnd(span.char_types, sokuon_pos, codepoints.size(), normalize::CharType::Hiragana);
     for (const auto& entry : lookupResultsInRange(*dict_manager, codepoints, sokuon_pos, hiragana_run_end)) {
       // A registered derivational suffix opening at the sokuon (色+っけ)
       // keeps its own boundary, as the adjectival suffixes below do.

@@ -43,8 +43,7 @@ size_t findCharRegionEndBeforeHiragana(const std::vector<normalize::CharType>& c
 namespace {
 
 size_t kanjiPredicateEnd(const std::vector<normalize::CharType>& char_types, size_t start_pos) {
-  return findCharRegionEnd(char_types, start_pos, char_types.size() - std::min(start_pos, char_types.size()),
-                           normalize::CharType::Kanji);
+  return findCharRegionEnd(char_types, start_pos, char_types.size(), normalize::CharType::Kanji);
 }
 
 bool kanjiRunEndsWithSuru(const std::vector<char32_t>& codepoints, size_t start_pos, size_t predicate_end,
@@ -274,6 +273,16 @@ std::string extractSubstring(const std::vector<char32_t>& codepoints, size_t sta
   return normalize::encodeRange(codepoints, start, end);
 }
 
+bool textMatchesAt(const std::vector<char32_t>& codepoints, size_t pos, std::string_view text) {
+  size_t byte_pos = 0;
+  for (size_t idx = pos; byte_pos < text.size(); ++idx) {
+    if (idx >= codepoints.size() || normalize::decodeUtf8(text, byte_pos) != codepoints[idx]) {
+      return false;
+    }
+  }
+  return true;
+}
+
 std::string extractClosedClassProbe(const std::vector<char32_t>& codepoints, size_t start) {
   return extractSubstring(codepoints, start, lookaheadEnd(codepoints.size(), start, kClosedClassProbeChars));
 }
@@ -318,6 +327,11 @@ static bool isParticleHomograph(const dictionary::DictionaryManager& dict_manage
                                 const dictionary::DictionaryEntry& entry) {
   return entry.pos != core::PartOfSpeech::Particle &&
          dict_manager.lookupExact(entry.surface, core::PartOfSpeech::Particle) != nullptr;
+}
+
+bool isTopicCaseOrNoParticle(core::ExtendedPOS extended_pos) {
+  return extended_pos == core::ExtendedPOS::ParticleTopic || extended_pos == core::ExtendedPOS::ParticleCase ||
+         extended_pos == core::ExtendedPOS::ParticleNo;
 }
 
 bool isNominalForcingParticle(core::ExtendedPOS extended_pos) {

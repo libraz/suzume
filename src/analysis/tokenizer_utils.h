@@ -266,6 +266,9 @@ size_t advanceCharsToBytePos(const std::vector<char32_t>& codepoints, size_t sta
  */
 std::string extractSubstring(const std::vector<char32_t>& codepoints, size_t start, size_t end);
 
+/** Whether codepoints from @p pos spell @p text; false when the input ends first. */
+bool textMatchesAt(const std::vector<char32_t>& codepoints, size_t pos, std::string_view text);
+
 /** Encode only the bounded closed-class lookahead starting at @p start. */
 std::string extractClosedClassProbe(const std::vector<char32_t>& codepoints, size_t start);
 
@@ -290,6 +293,9 @@ bool startsNominalForcingParticle(const std::vector<char32_t>& codepoints, size_
  * continuative into a nominal head, or marks the boundary after a nominal phrase.
  */
 bool isNominalForcingParticle(core::ExtendedPOS extended_pos);
+
+/** Whether a particle category is a topic, case or genitive marker. */
+bool isTopicCaseOrNoParticle(core::ExtendedPOS extended_pos);
 
 /** Whether dictionary evidence at a position starts a nominal-forcing particle. */
 bool hasNominalForcingParticleContinuation(const std::vector<char32_t>& codepoints, size_t pos,

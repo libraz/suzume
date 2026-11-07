@@ -34,8 +34,7 @@ void addTaruAdjectiveJoinCandidates(core::Lattice& lattice, std::string_view tex
   }
 
   // Find the kanji portion (including 然)
-  const size_t kanji_end =
-      findCharRegionEnd(char_types, start_pos + 1, char_types.size() - (start_pos + 1), CharType::Kanji);
+  const size_t kanji_end = findCharRegionEnd(char_types, start_pos + 1, char_types.size(), CharType::Kanji);
 
   // Need at least 2 kanji, and the last one must mark the nominal as taru-style
   if (kanji_end - start_pos < 2) {

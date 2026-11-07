@@ -27,6 +27,17 @@ TEST(CandidateGenerationEfficiencyTest, BoundsClosedClassProbeToFiveCodepoints) 
   EXPECT_EQ(extractClosedClassProbe(codepoints, 4), "おかき");
 }
 
+TEST(CandidateGenerationEfficiencyTest, MatchesTextAtACodepointPosition) {
+  const auto codepoints = normalize::toCodepoints("分かった");
+
+  EXPECT_TRUE(textMatchesAt(codepoints, 1, "かった"));
+  EXPECT_TRUE(textMatchesAt(codepoints, 1, "か"));
+  EXPECT_TRUE(textMatchesAt(codepoints, 4, ""));
+  EXPECT_FALSE(textMatchesAt(codepoints, 1, "かったら"));
+  EXPECT_FALSE(textMatchesAt(codepoints, 2, "かった"));
+  EXPECT_FALSE(textMatchesAt(codepoints, 5, "た"));
+}
+
 TEST(CandidateGenerationEfficiencyTest, EmitsOneAdjectiveStemEdgeBeforeSaNominalizer) {
   dictionary::DictionaryManager dictionary_manager;
   ASSERT_TRUE(dictionary_manager.loadCoreDictionaryResult("data/core.dic").hasValue());

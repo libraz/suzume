@@ -110,8 +110,7 @@ void addHonorificSamaNounJoinCandidate(core::Lattice& lattice, std::string_view 
     return;
   }
 
-  const size_t end_pos =
-      findCharRegionEnd(char_types, start_pos + 1, char_types.size() - (start_pos + 1), CharType::Kanji);
+  const size_t end_pos = findCharRegionEnd(char_types, start_pos + 1, char_types.size(), CharType::Kanji);
 
   // A productive honorific noun needs a lexical kanji base before the closed
   // honorific suffix. This preserves the ordinary prefix analysis for お様.
@@ -523,7 +522,7 @@ void addVerbSuffixNounJoinCandidates(core::Lattice& lattice, std::string_view te
 
   // Look for patterns: Kanji + Hiragana + Suffix(物/方/所)
   // Examples: 食べ物, 飲み物, 読み方, 居場所
-  const size_t kanji_end = findCharRegionEnd(char_types, start_pos, char_types.size() - start_pos, CharType::Kanji);
+  const size_t kanji_end = findCharRegionEnd(char_types, start_pos, char_types.size(), CharType::Kanji);
 
   // Look for 1-2 optional hiragana (verb renyokei suffix like べ, み, き)
   const size_t hiragana_end = findCharRegionEnd(char_types, kanji_end, 2, CharType::Hiragana);

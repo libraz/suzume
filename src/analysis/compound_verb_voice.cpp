@@ -66,9 +66,7 @@ bool subsidiaryVerbContinuativeAt(const std::vector<char32_t>& codepoints, size_
       continue;
     }
     const std::string continuative = compound_verb_detail::generateRenyokei(subsidiary.reading, subsidiary.verb_type);
-    const size_t length = normalize::utf8Length(continuative);
-    if (!continuative.empty() && pos + length <= codepoints.size() &&
-        extractSubstring(codepoints, pos, pos + length) == continuative) {
+    if (!continuative.empty() && textMatchesAt(codepoints, pos, continuative)) {
       return true;
     }
   }
