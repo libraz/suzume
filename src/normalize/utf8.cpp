@@ -102,7 +102,13 @@ void encodeUtf8(char32_t codepoint, std::string& out) {
 }
 
 size_t utf8Length(std::string_view str) {
-  return byteToCharOffset(str, str.size());
+  size_t count = 0;
+  size_t pos = 0;
+  while (pos < str.size()) {
+    decodeUtf8(str, pos);
+    ++count;
+  }
+  return count;
 }
 
 size_t charToByteOffset(std::string_view str, size_t char_index) {
@@ -111,16 +117,6 @@ size_t charToByteOffset(std::string_view str, size_t char_index) {
     decodeUtf8(str, pos);
   }
   return pos;
-}
-
-size_t byteToCharOffset(std::string_view str, size_t byte_offset) {
-  size_t count = 0;
-  size_t pos = 0;
-  while (pos < byte_offset && pos < str.size()) {
-    decodeUtf8(str, pos);
-    ++count;
-  }
-  return count;
 }
 
 std::string_view utf8Substr(std::string_view str, size_t start, size_t length) {
@@ -180,15 +176,6 @@ std::vector<char32_t> toCodepoints(std::string_view str) {
   size_t pos = 0;
   while (pos < str.size()) {
     result.push_back(decodeUtf8(str, pos));
-  }
-  return result;
-}
-
-std::string fromCodepoints(const std::vector<char32_t>& codepoints) {
-  std::string result;
-  result.reserve(codepoints.size() * 3);  // Estimate for Japanese
-  for (char32_t codepoint : codepoints) {
-    encodeUtf8(codepoint, result);
   }
   return result;
 }

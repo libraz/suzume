@@ -151,9 +151,6 @@ std::vector<core::Morpheme> Postprocessor::process(std::vector<core::Morpheme> r
   // Merge consecutive numeric expressions (always applied)
   runMergePass(result, mergeNumericExpressions, "mergeNumericExpressions");
 
-  // Keep a na-adjective stem and the attributive copula な as separate
-  // grammatical search units.
-
   // Conjugation-form detection and contextual POS repairs are annotations, not
   // optional lemma output. Always run the batch pass; the option controls only
   // whether its corrected lemmas are retained.

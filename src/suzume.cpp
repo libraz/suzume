@@ -154,8 +154,7 @@ struct Suzume::Impl {
   analysis::Analyzer analyzer;
   postprocess::Postprocessor postprocessor;
   std::vector<std::string> dictionary_warnings;
-  std::vector<std::string> runtime_dictionary_warnings;
-  mutable std::vector<std::string> dictionary_warning_view;
+  size_t startup_warning_count = 0;  // dictionary_warnings[0, count) are startup; the rest come from runtime loads
 
   struct LoadedAnalyzerConfig {
     analysis::AnalyzerOptions analyzer_options;
@@ -255,16 +254,11 @@ struct Suzume::Impl {
 #endif
 
   void appendDictionaryWarnings(std::vector<std::string> warnings) {
-    runtime_dictionary_warnings.insert(runtime_dictionary_warnings.end(), std::make_move_iterator(warnings.begin()),
-                                       std::make_move_iterator(warnings.end()));
+    dictionary_warnings.insert(dictionary_warnings.end(), std::make_move_iterator(warnings.begin()),
+                               std::make_move_iterator(warnings.end()));
   }
 
-  const std::vector<std::string>& dictionaryWarnings() const {
-    dictionary_warning_view = dictionary_warnings;
-    dictionary_warning_view.insert(dictionary_warning_view.end(), runtime_dictionary_warnings.begin(),
-                                   runtime_dictionary_warnings.end());
-    return dictionary_warning_view;
-  }
+  const std::vector<std::string>& dictionaryWarnings() const { return dictionary_warnings; }
 
   explicit Impl(const SuzumeOptions& opts) : Impl(opts, loadAnalyzerConfig(opts)) {}
 
@@ -298,6 +292,7 @@ struct Suzume::Impl {
       }
     }
 #endif
+    startup_warning_count = dictionary_warnings.size();
   }
 
   void setMode(core::AnalysisMode mode) {
@@ -384,7 +379,7 @@ core::Expected<size_t, core::Error> Suzume::loadBinaryDictionaryResult(const uin
 
 void Suzume::clearUserDictionaries() {
   impl_->analyzer.dictionaryManager().clearUserDictionaries();
-  impl_->runtime_dictionary_warnings.clear();
+  impl_->dictionary_warnings.resize(impl_->startup_warning_count);
 }
 
 const std::vector<std::string>& Suzume::dictionaryWarnings() const {

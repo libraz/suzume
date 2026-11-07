@@ -55,14 +55,6 @@ size_t utf8Length(std::string_view str);
 size_t charToByteOffset(std::string_view str, size_t char_index);
 
 /**
- * @brief Get character index for byte offset
- * @param str UTF-8 string
- * @param byte_offset Byte offset
- * @return Character index
- */
-size_t byteToCharOffset(std::string_view str, size_t byte_offset);
-
-/**
  * @brief Extract substring by character indices
  * @param str UTF-8 string
  * @param start Start character index
@@ -121,13 +113,6 @@ bool isValidUtf8(std::string_view str);
  * @return Vector of codepoints
  */
 std::vector<char32_t> toCodepoints(std::string_view str);
-
-/**
- * @brief Convert vector of codepoints to UTF-8 string
- * @param codepoints Vector of codepoints
- * @return UTF-8 string
- */
-std::string fromCodepoints(const std::vector<char32_t>& codepoints);
 
 /**
  * @brief Encode a range of codepoints to UTF-8 string (no intermediate vector)

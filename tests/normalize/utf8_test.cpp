@@ -71,14 +71,6 @@ TEST(Utf8Test, CharToByteOffset) {
   EXPECT_EQ(charToByteOffset(text, 3), 9);
 }
 
-TEST(Utf8Test, ByteToCharOffset) {
-  std::string_view text = "日本語";  // 9 bytes, 3 characters
-  EXPECT_EQ(byteToCharOffset(text, 0), 0);
-  EXPECT_EQ(byteToCharOffset(text, 3), 1);
-  EXPECT_EQ(byteToCharOffset(text, 6), 2);
-  EXPECT_EQ(byteToCharOffset(text, 9), 3);
-}
-
 TEST(Utf8Test, ToCodepoints) {
   auto cps = toCodepoints("あいう");
   ASSERT_EQ(cps.size(), 3);
@@ -87,9 +79,10 @@ TEST(Utf8Test, ToCodepoints) {
   EXPECT_EQ(cps[2], U'う');
 }
 
-TEST(Utf8Test, FromCodepoints) {
+TEST(Utf8Test, EncodeRange) {
   std::vector<char32_t> cps = {U'あ', U'い', U'う'};
-  EXPECT_EQ(fromCodepoints(cps), "あいう");
+  EXPECT_EQ(encodeRange(cps, 0, cps.size()), "あいう");
+  EXPECT_EQ(encodeRange(cps, 1, 2), "い");
 }
 
 TEST(Utf8Test, IsValidUtf8) {
@@ -505,7 +498,7 @@ TEST(Utf8Test, EdgeCase_NullCharacter) {
   EXPECT_EQ(codepoints[1], U'\0');
   EXPECT_EQ(codepoints[2], U'b');
   EXPECT_EQ(utf8Length(with_null), 3U);
-  EXPECT_EQ(fromCodepoints(codepoints), with_null);
+  EXPECT_EQ(encodeRange(codepoints, 0, codepoints.size()), with_null);
 }
 
 TEST(Utf8Test, EdgeCase_VeryLongString) {
@@ -539,21 +532,21 @@ TEST(Utf8Test, EdgeCase_AllByteSequenceLengths) {
 TEST(Utf8Test, Roundtrip_Japanese) {
   std::string original = "日本語テスト";
   auto cps = toCodepoints(original);
-  std::string encoded = fromCodepoints(cps);
+  std::string encoded = encodeRange(cps, 0, cps.size());
   EXPECT_EQ(encoded, original);
 }
 
 TEST(Utf8Test, Roundtrip_Emoji) {
   std::string original = "😀🎉🌟";
   auto cps = toCodepoints(original);
-  std::string encoded = fromCodepoints(cps);
+  std::string encoded = encodeRange(cps, 0, cps.size());
   EXPECT_EQ(encoded, original);
 }
 
 TEST(Utf8Test, Roundtrip_Mixed) {
   std::string original = "Hello日本語😀World";
   auto cps = toCodepoints(original);
-  std::string encoded = fromCodepoints(cps);
+  std::string encoded = encodeRange(cps, 0, cps.size());
   EXPECT_EQ(encoded, original);
 }
 
@@ -569,7 +562,7 @@ TEST(Utf8Test, Roundtrip_FullRange) {
       U'\U00020000',  // CJK Extension B
   };
 
-  std::string encoded = fromCodepoints(test_cps);
+  std::string encoded = encodeRange(test_cps, 0, test_cps.size());
   auto decoded = toCodepoints(encoded);
 
   ASSERT_EQ(decoded.size(), test_cps.size());
