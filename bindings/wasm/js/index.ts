@@ -302,24 +302,26 @@ function heapBytes(module: EmscriptenModule): Uint8Array {
   return new Uint8Array(module.HEAPU32.buffer);
 }
 
-/** Copy a string into freshly malloc'd NUL-terminated UTF-8; the caller frees `pointer`. */
 /** Throws InvalidUtf8 for an unpaired surrogate, which has no UTF-8 encoding. */
 function assertWellFormedUtf16(value: string): void {
   for (let idx = 0; idx < value.length; idx++) {
     const codeUnit = value.charCodeAt(idx);
-    if (codeUnit >= 0xd800 && codeUnit <= 0xdbff) {
+    if (codeUnit < 0xd800 || codeUnit > 0xdfff) {
+      continue;
+    }
+    if (codeUnit <= 0xdbff) {
       // charCodeAt past the end is NaN, which no range test admits.
       const next = value.charCodeAt(idx + 1);
-      if (!(next >= 0xdc00 && next <= 0xdfff)) {
-        throw new SuzumeError('Input contains an unpaired UTF-16 surrogate', ErrorCode.InvalidUtf8);
+      if (next >= 0xdc00 && next <= 0xdfff) {
+        idx++;
+        continue;
       }
-      idx++;
-    } else if (codeUnit >= 0xdc00 && codeUnit <= 0xdfff) {
-      throw new SuzumeError('Input contains an unpaired UTF-16 surrogate', ErrorCode.InvalidUtf8);
     }
+    throw new SuzumeError('Input contains an unpaired UTF-16 surrogate', ErrorCode.InvalidUtf8);
   }
 }
 
+/** Copy a string into freshly malloc'd NUL-terminated UTF-8; the caller frees `pointer`. */
 function allocUtf8(
   module: EmscriptenModule,
   value: string,
