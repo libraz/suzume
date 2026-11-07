@@ -43,6 +43,60 @@
       ],
       "id": "ga_tsu",
       "input": "音が立つ"
+    },
+    {
+      "description": "bare one-kanji ichidan V1 inside a kanji run heads the compound after a dropped particle",
+      "expected": [
+        {
+          "lemma": "服",
+          "pos": "Noun",
+          "surface": "服"
+        },
+        {
+          "lemma": "着替える",
+          "pos": "Verb",
+          "surface": "着替え"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "eta_2",
+      "input": "服着替えた"
+    },
+    {
+      "description": "服着替えて出かけた - auto-generated",
+      "expected": [
+        {
+          "lemma": "服",
+          "pos": "Noun",
+          "surface": "服"
+        },
+        {
+          "lemma": "着替える",
+          "pos": "Verb",
+          "surface": "着替え"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "出かける",
+          "pos": "Verb",
+          "surface": "出かけ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ete_kaketa",
+      "input": "服着替えて出かけた"
     }
   ],
   "description": "verb_kanji_compound tests",

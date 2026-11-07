@@ -3,6 +3,8 @@
  * @brief V1 verification and V2 matching for compound verbs
  */
 #include "analysis/dictionary_probe.h"
+#include "analysis/verb_candidates_auxiliary_patterns.h"
+#include "analysis/verb_candidates_verb_stems.h"
 #include "compound_verb_v2_cells_internal.h"
 #include "grammar/char_patterns.h"
 #include "join_compound_verb_internal.h"
@@ -183,7 +185,22 @@ bool rejectsCompoundSpan(const CompoundMatchContext& ctx, const V2FormMatch& for
   // answers it.
   const bool v1_carries_okurigana =
       kanji_end == start_pos + 1 && kanji_end < v2_start && normalize::isKanjiCodepoint(codepoints[start_pos]);
-  if (starts_inside_kanji_run && !follows_counter && !v1_carries_okurigana && !v1.dict_verified && !dict_compound_v1) {
+  // A bare one-kanji V1 from the closed single-kanji Ichidan set before a
+  // kanji-spelled V2 heads a verb when a predicate auxiliary or て closes the
+  // compound (服|着替え+た); before する or a copula the run stays a
+  // lexical noun (人見知り+する).
+  const size_t compound_end =
+      advanceCharsToBytePos(codepoints, v2_start, ctx.v2_start_byte, ctx.v2_start_byte + form.matched_len);
+  const bool closed_by_predicate_auxiliary =
+      compound_end < codepoints.size() &&
+      (codepoints[compound_end] == core::hiragana::kTe || codepoints[compound_end] == core::hiragana::kTa ||
+       verb_helpers::masuAuxFollowsAt(codepoints, compound_end) ||
+       verb_helpers::naiNegativeFollowsAt(codepoints, compound_end));
+  const bool v1_closed_single_kanji_ichidan = ctx.has_kanji_v2_after_bare_ichidan && v2_start == start_pos + 1 &&
+                                              closed_by_predicate_auxiliary &&
+                                              verb_helpers::isSingleKanjiIchidan(codepoints[start_pos]);
+  if (starts_inside_kanji_run && !follows_counter && !v1_carries_okurigana && !v1_closed_single_kanji_ichidan &&
+      !v1.dict_verified && !dict_compound_v1) {
     return true;
   }
 
