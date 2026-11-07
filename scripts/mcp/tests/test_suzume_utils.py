@@ -116,6 +116,21 @@ class TestGetExpectedTokens:
         assert [token["surface"] for token in tokens] == ["そう", "です", "って"]
         assert rule != "word-exception"
 
+    @pytest.mark.parametrize(
+        "text,expected",
+        [
+            ("起きれない", [("起きれ", "Verb", "起きれる"), ("ない", "Auxiliary", "ない")]),
+            ("食べれた", [("食べれ", "Verb", "食べれる"), ("た", "Auxiliary", "た")]),
+            ("寝れる", [("寝れる", "Verb", "寝れる")]),
+            ("来れない", [("来れ", "Verb", "来れる"), ("ない", "Auxiliary", "ない")]),
+            ("見られない", [("見", "Verb", "見る"), ("られ", "Auxiliary", "られる"), ("ない", "Auxiliary", "ない")]),
+            ("書かれない", [("書か", "Verb", "書く"), ("れ", "Auxiliary", "れる"), ("ない", "Auxiliary", "ない")]),
+        ],
+    )
+    def test_ra_nuki_potential_is_one_verb(self, text, expected):
+        tokens, _, _ = get_expected_tokens(text)
+        assert [(t["surface"], t["pos"], t["lemma"]) for t in tokens] == expected
+
     def test_whitespace_does_not_shift_merge_rule_anchor(self):
         tokens, _, rule = get_expected_tokens("彼は そんなら行く")
         assert [token["surface"] for token in tokens] == ["彼", "は", "そんなら", "行く"]

@@ -923,6 +923,50 @@
       ],
       "id": "yoku_ru",
       "input": "最近よく寝る"
+    },
+    {
+      "description": "ra-nuki potential of an ichidan verb is one potential verb",
+      "expected": [
+        {
+          "lemma": "明日",
+          "pos": "Noun",
+          "surface": "明日"
+        },
+        {
+          "lemma": "起きれる",
+          "pos": "Verb",
+          "surface": "起きれ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "kirenai",
+      "input": "明日起きれない"
+    },
+    {
+      "description": "ra-nuki potential after a time noun",
+      "expected": [
+        {
+          "lemma": "朝",
+          "pos": "Noun",
+          "surface": "朝"
+        },
+        {
+          "lemma": "起きれる",
+          "pos": "Verb",
+          "surface": "起きれ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "kirenai_2",
+      "input": "朝起きれない"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 11/11)",

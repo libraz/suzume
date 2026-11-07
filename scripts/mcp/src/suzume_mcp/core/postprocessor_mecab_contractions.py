@@ -375,6 +375,39 @@ def repair_contracted_rareru(tokens: list[dict]) -> None:
             }
 
 
+def merge_ra_nuki_potential(tokens: list[dict]) -> None:
+    """Read an ichidan irrealis plus the suffix れる as one ra-nuki potential verb.
+
+    The reference lists 見れる and 来れる as verbs of their own but splits every
+    other ra-nuki potential (起き+れ, 食べ+れ). The suffix れる never attaches to
+    an ichidan stem otherwise (the passive there is られる), so the pair is one
+    potential verb whatever the stem.
+    """
+    idx = 1
+    while idx < len(tokens):
+        host, suffix = tokens[idx - 1], tokens[idx]
+        host_lemma = host.get("lemma") or ""
+        if (
+            host.get("pos") == "動詞"
+            and host.get("pos_sub1") == "自立"
+            and host.get("conj_type") == "一段"
+            and host_lemma.endswith("る")
+            and suffix.get("pos") == "動詞"
+            and suffix.get("pos_sub1") == "接尾"
+            and suffix.get("lemma") == "れる"
+        ):
+            tokens[idx - 1 : idx + 1] = [
+                {
+                    **suffix,
+                    "surface": host.get("surface", "") + suffix.get("surface", ""),
+                    "pos_sub1": "自立",
+                    "lemma": host_lemma[:-1] + "れる",
+                    "reading": (host.get("reading") or "") + (suffix.get("reading") or ""),
+                }
+            ]
+        idx += 1
+
+
 def repair_kana_compound_verb_at_tari(tokens: list[dict]) -> None:
     """Rejoin a kana compound verb the reference cut at a parallel たり.
 

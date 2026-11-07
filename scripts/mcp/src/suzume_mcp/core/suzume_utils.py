@@ -11,6 +11,7 @@ from .postprocessors import (
     analyze_preprocessed,
     merge_conjunction_with_rashii,
     merge_honorific_kana_verbal_noun,
+    merge_ra_nuki_potential,
     postprocess_mecab_tokens,
     postprocessor_rules,
     repair_adjective_stem_before_suffix,
@@ -259,6 +260,7 @@ def get_expected_tokens(text: str, suzume_tokens: list[dict] | None = None) -> t
     repair_interrogative_nande(raw_tokens)
     split_reason_nde(raw_tokens)
     repair_contracted_rareru(raw_tokens)
+    merge_ra_nuki_potential(raw_tokens)
     repair_contracted_iika(raw_tokens)
     repair_kana_compound_verb_at_tari(raw_tokens)
     repair_lengthened_negative(raw_tokens)
