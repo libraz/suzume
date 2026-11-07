@@ -1110,6 +1110,7 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(const std::vector<c
   // This construction is licensed by its formal-noun follower, even when the
   // stem starts with a mora that is also a closed auxiliary (たてもの).
   appendHiraganaRenyokeiBeforeFormalNoun(codepoints, start_pos, char_types, inflection, dict_manager, candidates);
+  appendSubjectGenitiveIchidanBeforeFormalNoun(codepoints, start_pos, inflection, dict_manager, candidates);
 
   const size_t closed_onbin_tense_end =
       closedOnbinTenseEnd(codepoints, start_pos, char_types, inflection, dict_manager);

@@ -623,6 +623,39 @@ void appendKuruRenyokeiCandidates(const std::vector<char32_t>& codepoints, size_
                                          core::ExtendedPOS::VerbRenyokei));
 }
 
+bool followsSubjectGenitiveRelativeClauseSlot(const dictionary::DictionaryManager* dict_manager,
+                                              const std::vector<char32_t>& codepoints, size_t start_pos) {
+  if (dict_manager == nullptr || start_pos < 2 || start_pos + 2 >= codepoints.size() ||
+      !vh::oneMoraParticleEndsAt(dict_manager, codepoints, start_pos, core::ExtendedPOS::ParticleNo)) {
+    return false;
+  }
+
+  // Subject-marking の after a visible nominal licenses an adnominal clause.
+  // Hiragana-only and symbol boundaries do not prove a nominal host.
+  const normalize::CharType host_type = normalize::classifyChar(codepoints[start_pos - 2]);
+  if (host_type != normalize::CharType::Kanji && host_type != normalize::CharType::Katakana &&
+      host_type != normalize::CharType::Digit) {
+    return false;
+  }
+
+  const auto* past =
+      lookupEntryInRange(*dict_manager, codepoints, start_pos + 1, start_pos + 2, core::PartOfSpeech::Auxiliary);
+  if (past == nullptr || past->extended_pos != core::ExtendedPOS::AuxTenseTa) {
+    return false;
+  }
+
+  // Only the closed formal-noun class supplies the right edge for this short
+  // attributive predicate; arbitrary kana after の remains unlicensed.
+  constexpr size_t kFormalNounProbeLength = 4;
+  const size_t formal_noun_start = start_pos + 2;
+  const size_t probe_end = std::min(codepoints.size(), formal_noun_start + kFormalNounProbeLength);
+  const auto matches = lookupResultsInRange(*dict_manager, codepoints, formal_noun_start, probe_end);
+  return std::any_of(matches.begin(), matches.end(), [](const auto& match) {
+    return match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Noun &&
+           match.entry->extended_pos == core::ExtendedPOS::NounFormal;
+  });
+}
+
 // 1-char ichidan renyokei before て/た (ねて → ね + て). Requires the base form
 // (stem + る) in the dictionary, or — as for the passive stem before られる — an
 // Ichidan reading of the base in the predicate slot right after a case
@@ -643,8 +676,9 @@ void appendIchidanRenyokei1CharCandidates(const std::vector<char32_t>& codepoint
   const std::string stem_surface = extractSubstring(codepoints, start_pos, start_pos + 1);
   const std::string base_form = stem_surface + "る";
   const bool base_is_dict_verb = vh::isVerbInDictionary(dict_manager, base_form);
-  const bool predicate_slot_ichidan = !base_is_dict_verb &&
-                                      vh::followsCaseParticle(dict_manager, codepoints, start_pos) &&
+  const bool follows_predicate_slot = vh::followsCaseParticle(dict_manager, codepoints, start_pos) ||
+                                      followsSubjectGenitiveRelativeClauseSlot(dict_manager, codepoints, start_pos);
+  const bool predicate_slot_ichidan = !base_is_dict_verb && follows_predicate_slot &&
                                       vh::readsAsBaseForm(inflection, base_form, base_form, grammar::VerbType::Ichidan,
                                                           candidate::kV1PrefixMinConfidence) &&
                                       vh::lookupVerbLemma(dict_manager, stem_surface, base_form) == base_form;
@@ -663,6 +697,20 @@ void appendIchidanRenyokei1CharCandidates(const std::vector<char32_t>& codepoint
       stem_surface, start_pos, start_pos + 1, kCost, base_form, dictionary::ConjugationType::Ichidan, true,
       predicate_slot_ichidan ? CandidateOrigin::VerbHiraganaInflectedRenyokei : CandidateOrigin::VerbHiragana, 0.8F,
       "hiragana_ichidan_renyokei_1char", core::ExtendedPOS::VerbRenyokei));
+}
+
+void appendSubjectGenitiveIchidanBeforeFormalNoun(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                                  const grammar::Inflection& inflection,
+                                                  const dictionary::DictionaryManager* dict_manager,
+                                                  std::vector<UnknownCandidate>& candidates) {
+  // Pre-emit only when a registered particle blocks a verb opening inside its
+  // spelling (genitive の + み). The broad closed-class guard remains in force
+  // below, so this candidate cannot be duplicated by normal derived scanning.
+  if (!vh::startsInsideDictionaryParticle(codepoints, start_pos, dict_manager) ||
+      !followsSubjectGenitiveRelativeClauseSlot(dict_manager, codepoints, start_pos)) {
+    return;
+  }
+  appendIchidanRenyokei1CharCandidates(codepoints, start_pos, inflection, dict_manager, candidates);
 }
 
 }  // namespace suzume::analysis::hiragana_verb_detail

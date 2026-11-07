@@ -3243,6 +3243,80 @@
       ],
       "id": "notsukutttamonoga_kida",
       "input": "母のつくったものが好きだ"
+    },
+    {
+      "description": "Short Ichidan relative predicate after subject-marking genitive",
+      "expected": [
+        {
+          "lemma": "私",
+          "pos": "Pronoun",
+          "surface": "私"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "みる",
+          "pos": "Verb",
+          "surface": "み"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "もの",
+          "pos": "Noun",
+          "surface": "もの"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        }
+      ],
+      "id": "nomitamonowo",
+      "input": "私のみたものを"
+    },
+    {
+      "description": "Short Ichidan relative predicate after subject-marking genitive",
+      "expected": [
+        {
+          "lemma": "私",
+          "pos": "Pronoun",
+          "surface": "私"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "にる",
+          "pos": "Verb",
+          "surface": "に"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "もの",
+          "pos": "Noun",
+          "surface": "もの"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        }
+      ],
+      "id": "nonitamonowo",
+      "input": "私のにたものを"
     }
   ],
   "description": "formal_noun tests",
