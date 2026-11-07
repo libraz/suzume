@@ -603,6 +603,12 @@ void addUnknownCandidateEdges(core::Lattice& lattice, const tokenizer_unknown_de
         }
       }
     }
+    // A span opening inside a kanji run cuts that run, which only a real verb
+    // justifies (総合+見直し); a fabricated lemma there is a misread compound
+    // tail (粗+大ごみ from the non-word 大ごむ).
+    const bool cuts_kanji_run_without_verb = candidate.start > 0 &&
+                                             normalize::isKanjiCodepoint(codepoints[candidate.start - 1]) &&
+                                             !verb_helpers::isVerbInDictionary(&dict_manager, candidate.lemma);
     const auto& span_analyses = inflection.analyze(surface_str);
     const bool carries_auxiliary_chain = std::any_of(
         span_analyses.begin(), span_analyses.end(),
@@ -610,7 +616,7 @@ void addUnknownCandidateEdges(core::Lattice& lattice, const tokenizer_unknown_de
     if (nominal_particle && !longer_dependent_follows && !has_lexical_nonverb_reading && !is_complete_shii_adjective &&
         !same_span_adjective_analysis && !crosses_complete_internal_boundary && !crosses_noun_nagara_ni_boundary &&
         !verb_reading_rejected && !bound_suffix_after_host && !candidate.has_suffix && !starts_with_closed_particle &&
-        !carries_auxiliary_chain && !auxiliary_tail_before_quote) {
+        !carries_auxiliary_chain && !auxiliary_tail_before_quote && !cuts_kanji_run_without_verb) {
       lattice.addEdge(surface_str, static_cast<uint32_t>(candidate.start), static_cast<uint32_t>(candidate.end),
                       core::PartOfSpeech::Noun,
                       getCategoryCost(core::ExtendedPOS::NounVerbal) + candidate::kNominalizedNounParticleBonus, flags,

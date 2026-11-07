@@ -1711,6 +1711,102 @@
       ],
       "id": "tsuma_ga_tai",
       "input": "つま先が冷たい"
+    },
+    {
+      "description": "家庭ごみを出す。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "家庭",
+          "pos": "Noun",
+          "surface": "家庭"
+        },
+        {
+          "lemma": "ごみ",
+          "pos": "Noun",
+          "surface": "ごみ"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "出す",
+          "pos": "Verb",
+          "surface": "出す"
+        }
+      ],
+      "id": "gomiwo_su",
+      "input": "家庭ごみを出す。"
+    },
+    {
+      "description": "明日は可燃ごみの日だ。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "明日",
+          "pos": "Noun",
+          "surface": "明日"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "可燃",
+          "pos": "Noun",
+          "surface": "可燃"
+        },
+        {
+          "lemma": "ごみ",
+          "pos": "Noun",
+          "surface": "ごみ"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "日",
+          "pos": "Noun",
+          "surface": "日"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "ha_gomino_da",
+      "input": "明日は可燃ごみの日だ。"
+    },
+    {
+      "description": "燃えるごみを出す。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "燃える",
+          "pos": "Verb",
+          "surface": "燃える"
+        },
+        {
+          "lemma": "ごみ",
+          "pos": "Noun",
+          "surface": "ごみ"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "出す",
+          "pos": "Verb",
+          "surface": "出す"
+        }
+      ],
+      "id": "erugomiwo_su",
+      "input": "燃えるごみを出す。"
     }
   ],
   "description": "noun_compounds tests",

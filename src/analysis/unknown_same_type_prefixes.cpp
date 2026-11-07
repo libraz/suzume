@@ -293,9 +293,14 @@ bool kanjiHeadsPredicateAt(const std::vector<char32_t>& codepoints, const std::v
     }
   }
   // A registered two-kana verb opening on the kana is the predicate of a
-  // particle-dropped noun (会社|いく, 部屋|いる).
-  if (kana_start + 2 <= kana_end && opening_entry(2, core::PartOfSpeech::Verb) != nullptr) {
-    return false;
+  // particle-dropped noun (会社|いく, 部屋|いる), and a registered kana noun
+  // there is the tail of a compound noun (粗大|ごみ); either outweighs a
+  // reading the inflection analyzer only infers below.
+  for (size_t length = 2; kana_start + length <= kana_end; ++length) {
+    if ((length == 2 && opening_entry(length, core::PartOfSpeech::Verb) != nullptr) ||
+        opening_entry(length, core::PartOfSpeech::Noun) != nullptr) {
+      return false;
+    }
   }
   // Of the inferred readings of the kanji plus each prefix of the kana, any
   // that is a bound derivational suffix verb on the kanji (肉+めく) makes the
