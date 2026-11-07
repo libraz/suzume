@@ -178,7 +178,11 @@ _FIXED_FUNCTION_SEARCH_UNITS = tuple(sorted(FIXED_FUNCTION_SEARCH_UNITS, key=len
 _KEYCAP_EMOJI = regex.compile(r"[0-9#*]\uFE0F?\u20E3")
 
 
-_PRETOKENIZED_QUANTITY = regex.compile(r"(?:\d{1,3}(?:,\d{3})+|\d+)円")
+# Native pre-tokenization keeps a grouped numeral with its currency, percent or
+# storage unit (1,000円, 1,000%, 1,024MB); a bit-rate unit (Mbps) is not storage.
+_PRETOKENIZED_QUANTITY = regex.compile(
+    r"(?:\d{1,3}(?:,\d{3})+|\d+)円|\d{1,3}(?:,\d{3})+(?:[%％]|[KMGTkmgt]?[Bb](?![A-Za-z]))"
+)
 
 
 _PRETOKENIZED_COMMA_NUMBER = regex.compile(r"\d{1,3}(?:,\d{3})+")

@@ -145,6 +145,97 @@
       ],
       "id": "100_no",
       "input": "100円均一の店"
+    },
+    {
+      "description": "Comma-grouped numeral keeps its percent unit",
+      "expected": [
+        {
+          "lemma": "売上",
+          "pos": "Noun",
+          "surface": "売上"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "1,000%",
+          "pos": "Noun",
+          "surface": "1,000%"
+        },
+        {
+          "lemma": "増える",
+          "pos": "Verb",
+          "surface": "増え"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "grouped_number_percent",
+      "input": "売上が1,000%増えた"
+    },
+    {
+      "description": "Comma-grouped numeral keeps its storage unit",
+      "expected": [
+        {
+          "lemma": "容量",
+          "pos": "Noun",
+          "surface": "容量"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "1,024MB",
+          "pos": "Noun",
+          "surface": "1,024MB"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "grouped_number_storage",
+      "input": "容量は1,024MBです"
+    },
+    {
+      "description": "A bit-rate unit after a comma-grouped numeral is not storage",
+      "expected": [
+        {
+          "lemma": "回線",
+          "pos": "Noun",
+          "surface": "回線"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "1,000",
+          "pos": "Noun",
+          "surface": "1,000"
+        },
+        {
+          "lemma": "Mbps",
+          "pos": "Noun",
+          "surface": "Mbps"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "grouped_number_bitrate",
+      "input": "回線は1,000Mbpsです"
     }
   ],
   "description": "pretokenizer tests",
