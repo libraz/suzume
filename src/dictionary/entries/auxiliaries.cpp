@@ -27,9 +27,8 @@ EntrySpecRange getAuxiliaryEntries() {
       verb("あっ", "ある", EPOS::VerbOnbinkei),
       verb("あれ", "ある", EPOS::VerbKateikei),
 
-      // 文語尊敬「あらせる」。存在を表す「ある」の一般的な使役ではなく、
-      // 尊敬表現としてのみ用いる閉じた文法語彙であり、受身・尊敬形
-      // あらせ+られるの語幹を保持する。
+      // Literary honorific あらせる: not the ordinary causative of existential
+      // ある but a closed honorific word, kept so the stem of あらせ+られる stays whole.
       verb("あらせる", "あらせる", EPOS::VerbShuushikei),
       verb("あらせ", "あらせる", EPOS::VerbMizenkei),
 

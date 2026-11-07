@@ -50,7 +50,7 @@ bool setParticleAndLexicalCosts(BigramMatrix& table) {
       // - strong bonus. Favors かも+しれ+ない over か+もし+れない and keeps a real
       //   verb renyokei after a subsidiary particle. A single-mora renyokei after
       //   this particle is a false over-split (し+かね misread as しか+ね←寝る) and
-      //   is penalized by surface length in scorer_connection_cost.cpp.
+      //   is penalized by surface length in scorer_connection_rules_honorific.cpp.
       {EPOS::ParticleAdverbial, EPOS::VerbRenyokei, cost::kStrongBonus},
 
       // An adverb can be followed by a focus particle (そう+かも, もっとも+でも).
