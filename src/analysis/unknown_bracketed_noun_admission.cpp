@@ -176,6 +176,13 @@ bool admitsPromotedRun(const BracketedNounContext& ctx, const BracketedScan& bra
       maximalSegmentCount(*dict_manager, codepoints, start_pos, scan, core::PartOfSpeech::Auxiliary,
                           core::ExtendedPOS::AuxClassicalPerfect, !particleMoraLacksHost(codepoints, start_pos)) >= 2 &&
       continuesAuxiliaryChain(*dict_manager, codepoints, core::ExtendedPOS::Count_, start_pos, scan);
+  // A run that is one copula form is that predicate (私+の+です+が): the
+  // longer copula chains are caught as auxiliary chains below.
+  const bool spells_copula = dict_manager != nullptr && [&] {
+    const auto* copula = lookupEntryInRange(*dict_manager, codepoints, start_pos, scan, core::PartOfSpeech::Auxiliary);
+    return copula != nullptr && (copula->extended_pos == core::ExtendedPOS::AuxCopulaDa ||
+                                 copula->extended_pos == core::ExtendedPOS::AuxCopulaDesu);
+  }();
   // ご before kana is the Sino-Japanese honorific on a kana verbal noun
   // (ご+あんない+します); a rescue would swallow the prefix into the noun.
   // Nor may it open on the te-form connective that a continuative right in
@@ -210,7 +217,8 @@ bool admitsPromotedRun(const BracketedNounContext& ctx, const BracketedScan& bra
          !carries_left_terminal_into_nominalizer && !opens_on_irrealis_chain &&
          !promoted.has_inflected_predicate_reading && !opens_on_sino_prefix && !absorbs_trailing_suffix &&
          !opens_on_te_connective && !spans_laugh && !closes_registered_word_predicate && !finishes_auxiliary_chain &&
-         !spells_contracted_hypothetical && !steals_formal_noun_head && !promoted.absorbs_copula_before_sokuon_final &&
+         !spells_copula && !spells_contracted_hypothetical && !steals_formal_noun_head &&
+         !promoted.absorbs_copula_before_sokuon_final &&
          ((!hasAuxiliaryParticleDecomposition(codepoints, start_pos, scan, dict_manager) && !spells_auxiliary_chain) ||
           promoted.has_deverbal_noun_shape_before_genitive || promoted.copula_selected_predicate_homograph ||
           genitive_selects_nominal_head) &&
