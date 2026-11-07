@@ -1384,6 +1384,122 @@
       ],
       "id": "minnade_meta",
       "input": "今回みんなで決めた"
+    },
+    {
+      "description": "に続いて keeps the verb te-form boundary",
+      "expected": [
+        {
+          "lemma": "大会初日",
+          "pos": "Noun",
+          "surface": "大会初日"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "開会式",
+          "pos": "Noun",
+          "surface": "開会式"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "続く",
+          "pos": "Verb",
+          "surface": "続い"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "予選",
+          "pos": "Noun",
+          "surface": "予選"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "行う",
+          "pos": "Verb",
+          "surface": "行わ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ha_ni_ite_ga_wareta",
+      "input": "大会初日は、開会式に続いて予選が行われた。"
+    },
+    {
+      "description": "clause-initial 続いて is the te-form of 続く",
+      "expected": [
+        {
+          "lemma": "続く",
+          "pos": "Verb",
+          "surface": "続い"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "天気予報",
+          "pos": "Noun",
+          "surface": "天気予報"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "ite_desu",
+      "input": "続いて、天気予報です。"
+    },
+    {
+      "description": "続いて before の stays verb + te",
+      "expected": [
+        {
+          "lemma": "続く",
+          "pos": "Verb",
+          "surface": "続い"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "話題",
+          "pos": "Noun",
+          "surface": "話題"
+        }
+      ],
+      "id": "iteno",
+      "input": "続いての話題"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 11/11)",
