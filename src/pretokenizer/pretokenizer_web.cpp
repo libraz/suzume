@@ -292,4 +292,39 @@ bool PreTokenizer::tryMatchAsciiWithJoiners(std::string_view text, size_t pos, P
   return true;
 }
 
+bool PreTokenizer::tryMatchKaomoji(std::string_view text, size_t pos, PreToken& token) const {
+  constexpr size_t kMaxBodyCodepoints = 16;
+  size_t idx = pos;
+  const char32_t open = normalize::decodeUtf8(text, idx);
+  if (open != U'(' && open != U'（') {
+    return false;
+  }
+  bool has_symbol = false;
+  for (size_t body = 0; body <= kMaxBodyCodepoints && idx < text.size(); ++body) {
+    const char32_t codepoint = normalize::decodeUtf8(text, idx);
+    if (codepoint == U')' || codepoint == U'）') {
+      if (!has_symbol) {
+        return false;
+      }
+      setTokenFromRange(token, text, pos, idx, PreTokenType::Kaomoji, core::PartOfSpeech::Symbol);
+      return true;
+    }
+    if (codepoint == U'(' || codepoint == U'（' || codepoint <= U' ' || codepoint == U'　') {
+      return false;
+    }
+    // Greek and Cyrillic letters draw faces (ω, Д), as do the kana marks
+    // ・ and ゜; kana letters, kanji, digits and ASCII letters spell words
+    // (full-width ASCII is folded before this runs).
+    const normalize::CharType type = normalize::classifyChar(codepoint);
+    const bool kana_letter = (codepoint >= U'ぁ' && codepoint <= U'ゖ') || (codepoint >= U'ァ' && codepoint <= U'ヺ');
+    if (kana_letter || type == normalize::CharType::Kanji || type == normalize::CharType::Digit ||
+        (codepoint < 0x80 && isAsciiAlpha(static_cast<char>(codepoint)))) {
+      return false;
+    }
+    // A body of letters alone is a label such as (α), not a face.
+    has_symbol = has_symbol || type != normalize::CharType::Alphabet;
+  }
+  return false;
+}
+
 }  // namespace suzume::pretokenizer

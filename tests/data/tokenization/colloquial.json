@@ -633,6 +633,94 @@
       ],
       "id": "kodomodane",
       "input": "こどもだねぇ"
+    },
+    {
+      "description": "すごい(^^)楽しい - auto-generated",
+      "expected": [
+        {
+          "lemma": "すごい",
+          "pos": "Adjective",
+          "surface": "すごい"
+        },
+        {
+          "lemma": "楽しい",
+          "pos": "Adjective",
+          "surface": "楽しい"
+        }
+      ],
+      "id": "sugoi(^^)_shii",
+      "input": "すごい(^^)楽しい"
+    },
+    {
+      "description": "Negative control: a bracketed word is not a face",
+      "expected": [
+        {
+          "lemma": "それ",
+          "pos": "Pronoun",
+          "surface": "それ"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "笑",
+          "pos": "Noun",
+          "surface": "笑"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        }
+      ],
+      "id": "soreha(_)desune",
+      "input": "それは(笑)ですね"
+    },
+    {
+      "description": "A bracketed face is one symbol, removed by default",
+      "expected": [
+        {
+          "lemma": "ありがとう",
+          "pos": "Interjection",
+          "surface": "ありがと"
+        }
+      ],
+      "id": "arigato_wave_dash_kaomoji",
+      "input": "ありがと〜(*´∇｀*)"
+    },
+    {
+      "description": "A face drawn with Greek letters and kana marks is still one symbol",
+      "expected": [
+        {
+          "lemma": "今日",
+          "pos": "Noun",
+          "surface": "今日"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "疲れる",
+          "pos": "Verb",
+          "surface": "疲れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "tsukareta_greek_letter_kaomoji",
+      "input": "今日は疲れた(´・ω・｀)"
     }
   ],
   "description": "colloquial tests",

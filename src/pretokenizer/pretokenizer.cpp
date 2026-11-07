@@ -41,8 +41,8 @@ PreTokenResult PreTokenizer::process(std::string_view text) const {
     // Note: Date must come before Time (日付 includes 日 which looks like time suffix)
     if (!inside_numeric_run &&
         (tryMatchUrl(text, pos, token) || tryMatchEmail(text, pos, token) || tryMatchHashtag(text, pos, token) ||
-         tryMatchMention(text, pos, token) || tryMatchDate(text, pos, token) || tryMatchCounter(text, pos, token) ||
-         tryMatchTime(text, pos, token) || tryMatchCurrency(text, pos, token) ||
+         tryMatchMention(text, pos, token) || tryMatchKaomoji(text, pos, token) || tryMatchDate(text, pos, token) ||
+         tryMatchCounter(text, pos, token) || tryMatchTime(text, pos, token) || tryMatchCurrency(text, pos, token) ||
          tryMatchGroupedNumber(text, pos, token) || tryMatchStorage(text, pos, token) ||
          tryMatchPercentage(text, pos, token) || tryMatchAddressNumber(text, pos, token) ||
          tryMatchVersion(text, pos, token) || tryMatchAsciiWithJoiners(text, pos, token))) {

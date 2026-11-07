@@ -27,6 +27,7 @@ enum class PreTokenType : uint8_t {
   Counter,     // Number with a counter (3か月, 12箇所)
   AsciiSeq,    // ASCII sequence with word-internal joiners (example.com, Coca-Cola)
   Boundary,    // Sentence boundary (。！？)
+  Kaomoji,     // Bracketed emoticon ((^^), (´・ω・｀))
 };
 
 /**
@@ -206,6 +207,16 @@ class PreTokenizer {
    * @return true if matched
    */
   bool tryMatchAsciiWithJoiners(std::string_view text, size_t pos, PreToken& token) const;
+
+  /**
+   * @brief Match a bracketed emoticon as one symbol ((^^), (*´∇｀*))
+   *
+   * The bracketed body holds no word character (kana, kanji, digit, Latin
+   * letter) and at least one symbol, so it spells a face rather than an aside
+   * such as (笑) or (2024).
+   * @return true if matched
+   */
+  bool tryMatchKaomoji(std::string_view text, size_t pos, PreToken& token) const;
 };
 
 }  // namespace suzume::pretokenizer
