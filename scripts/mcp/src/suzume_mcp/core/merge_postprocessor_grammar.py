@@ -8,7 +8,7 @@ from .constants import (
     HONORIFIC_SUFFIXES,
     PREFIX_EXCEPTIONS,
 )
-from .mecab import mecab_analyze
+from .mecab import is_single_token_of_pos, mecab_analyze
 from .merge_postprocessor_common import _continuative_verb_tokens
 
 
@@ -691,6 +691,33 @@ def _postprocess_decomposable_adverb(result: list[dict], applied_rule: str | Non
         if applied_rule is None:
             applied_rule = "decomposable-adverb"
     return expanded, applied_rule
+
+
+def _postprocess_adverb_mo(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
+    """Join the focus particle も to the adverb it lexicalizes with.
+
+    The reference holds some adverb-plus-も pairs as one headword (どうしても)
+    and leaves the rest in pieces (そうも, 少しも) depending on its entries
+    alone. The pair is one adverb exactly when the dictionary reads the joined
+    surface as a single adverb, which settles it without a word list.
+    """
+    merged: list[dict] = []
+    for token in result:
+        host = merged[-1] if merged else None
+        if (
+            host is not None
+            and token.get("surface") == "も"
+            and token.get("pos") == "助詞"
+            and host.get("pos") == "副詞"
+            and is_single_token_of_pos(host.get("surface", "") + "も", "副詞")
+        ):
+            joined = host["surface"] + "も"
+            merged[-1] = {"surface": joined, "pos": "副詞", "lemma": joined}
+            if applied_rule is None:
+                applied_rule = "adverb-mo"
+            continue
+        merged.append(token)
+    return merged, applied_rule
 
 
 # A derivational suffix that builds a nominal from a predicate, with the base it

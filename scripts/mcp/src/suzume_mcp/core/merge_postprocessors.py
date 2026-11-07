@@ -51,6 +51,7 @@ reads_as_continuative = merge_postprocessor_common.reads_as_continuative
 
 # Exports from merge_postprocessor_grammar.
 _postprocess_atode = merge_postprocessor_grammar._postprocess_atode
+_postprocess_adverb_mo = merge_postprocessor_grammar._postprocess_adverb_mo
 _postprocess_decomposable_adverb = merge_postprocessor_grammar._postprocess_decomposable_adverb
 _postprocess_demo_copula = merge_postprocessor_grammar._postprocess_demo_copula
 _postprocess_derivational_nominal_suffix = merge_postprocessor_grammar._postprocess_derivational_nominal_suffix
@@ -117,6 +118,7 @@ def apply_merge_postprocessors(result: list[dict], applied_rule: str | None) -> 
     result, applied_rule = _postprocess_ichidan_imperative_yo(result, applied_rule)
     result, applied_rule = _postprocess_stranded_okurigana(result, applied_rule)
     result, applied_rule = _postprocess_decomposable_adverb(result, applied_rule)
+    result, applied_rule = _postprocess_adverb_mo(result, applied_rule)
     result, applied_rule = _postprocess_bound_prefix_adjective(result, applied_rule)
     result, applied_rule = _postprocess_word_internal_honorific_prefix(result, applied_rule)
     result, applied_rule = _postprocess_variation_selector_merge(result, applied_rule)

@@ -2267,3 +2267,17 @@ class TestCalendarMonthAfterYear:
         ]
         result, _ = apply_suzume_merge(tokens, "2026年8月")
         assert [token["surface"] for token in result] == ["2026年8月"]
+
+
+class TestAdverbMoJoin:
+    @staticmethod
+    def _merge(surface, text):
+        tokens = [_tok(surface, pos="副詞"), _tok("も", pos="助詞", pos_sub1="係助詞"), _tok("やら", pos="動詞")]
+        result, _ = apply_suzume_merge(tokens, text + "やら")
+        return [token["surface"] for token in result]
+
+    def test_joins_a_pair_the_reference_reads_as_one_adverb(self):
+        assert self._merge("どうして", "どうしてもやら")[:2] == ["どうしても", "やら"]
+
+    def test_keeps_a_pair_the_reference_reads_apart(self):
+        assert self._merge("少し", "少しもやら")[:2] == ["少し", "も"]
