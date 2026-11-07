@@ -131,6 +131,18 @@ class TestGetExpectedTokens:
         tokens, _, _ = get_expected_tokens(text)
         assert [(t["surface"], t["pos"], t["lemma"]) for t in tokens] == expected
 
+    @pytest.mark.parametrize(
+        "text,expected",
+        [
+            ("値段高すぎて", [("値段", "Noun"), ("高", "Adjective"), ("すぎ", "Verb"), ("て", "Particle")]),
+            ("人多すぎ", [("人", "Noun"), ("多", "Adjective"), ("すぎ", "Verb")]),
+            ("時間すぎて", [("時間", "Noun"), ("すぎ", "Verb"), ("て", "Particle")]),
+        ],
+    )
+    def test_adjective_stem_before_excessive_after_bare_noun(self, text, expected):
+        tokens, _, _ = get_expected_tokens(text)
+        assert [(t["surface"], t["pos"]) for t in tokens] == expected
+
     def test_whitespace_does_not_shift_merge_rule_anchor(self):
         tokens, _, rule = get_expected_tokens("彼は そんなら行く")
         assert [token["surface"] for token in tokens] == ["彼", "は", "そんなら", "行く"]

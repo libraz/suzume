@@ -215,15 +215,17 @@ def repair_adjective_stem_before_suffix(tokens: list[dict]) -> None:
 
     Utterance-final 高すぎ comes back as noun+suffix although 高すぎた is the
     adjective stem plus the continuative of すぎる; the host is re-analyzed
-    before すぎた and adopted, with its すぎ, when it reads as that stem.
+    before すぎた and adopted, with its すぎ, when it reads as that stem. After
+    a bare noun the stem may come back as a nominal suffix instead (値段+高 as
+    the ダカ of 円高); the re-analysis decides that host the same way.
     """
     for idx in range(len(tokens) - 1):
         token, suffix = tokens[idx], tokens[idx + 1]
         if (
             token.get("pos") != "名詞"
-            or token.get("pos_sub1") != "一般"
+            or token.get("pos_sub1") not in ("一般", "接尾")
             or suffix.get("surface") not in ("すぎ", "そう")
-            or suffix.get("pos_sub1") != "接尾"
+            or (suffix.get("pos_sub1") != "接尾" and suffix.get("lemma") != "すぎる")
         ):
             continue
         surface = token.get("surface", "")
