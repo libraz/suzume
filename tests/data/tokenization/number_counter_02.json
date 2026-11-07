@@ -392,6 +392,97 @@
       ],
       "id": "5_3",
       "input": "二千5百円"
+    },
+    {
+      "description": "a one-kanji continuative used as a verbal noun extends the quantity run",
+      "expected": [
+        {
+          "lemma": "二度寝",
+          "pos": "Noun",
+          "surface": "二度寝"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "結局",
+          "pos": "Adverb",
+          "surface": "結局"
+        },
+        {
+          "lemma": "遅刻",
+          "pos": "Noun",
+          "surface": "遅刻"
+        }
+      ],
+      "id": "shite_2",
+      "input": "二度寝して結局遅刻"
+    },
+    {
+      "description": "二度寝が気持ちいい - auto-generated",
+      "expected": [
+        {
+          "lemma": "二度寝",
+          "pos": "Noun",
+          "surface": "二度寝"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "気持ちいい",
+          "pos": "Adjective",
+          "surface": "気持ちいい"
+        }
+      ],
+      "id": "ga_chiii",
+      "input": "二度寝が気持ちいい"
+    },
+    {
+      "description": "before te the one-kanji continuative stays the verb",
+      "expected": [
+        {
+          "lemma": "三度",
+          "pos": "Noun",
+          "surface": "三度"
+        },
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "確認",
+          "pos": "Noun",
+          "surface": "確認"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "te_shita",
+      "input": "三度見て確認した"
     }
   ],
   "description": "number_counter tests (part 2/2)",

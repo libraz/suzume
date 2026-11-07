@@ -590,6 +590,27 @@ class TestNumberUnit:
         result, _ = apply_suzume_merge(tokens, "百数人")
         assert [token["surface"] for token in result] == ["百", "数人"]
 
+    def test_one_kanji_continuative_before_suru_extends_the_quantity(self):
+        tokens = [
+            _tok("二", pos="名詞", pos_sub1="数"),
+            _tok("度", pos="名詞", pos_sub1="接尾", pos_sub2="助数詞"),
+            {"surface": "寝", "pos": "動詞", "pos_sub1": "自立", "lemma": "寝る", "conj_form": "連用形"},
+            {"surface": "し", "pos": "動詞", "pos_sub1": "自立", "lemma": "する", "conj_form": "連用形"},
+            _tok("た", pos="助動詞"),
+        ]
+        result, _ = apply_suzume_merge(tokens, "二度寝した")
+        assert result[0]["surface"] == "二度寝"
+
+    def test_one_kanji_continuative_before_te_stays_a_verb(self):
+        tokens = [
+            _tok("三", pos="名詞", pos_sub1="数"),
+            _tok("度", pos="名詞", pos_sub1="接尾", pos_sub2="助数詞"),
+            {"surface": "見", "pos": "動詞", "pos_sub1": "自立", "lemma": "見る", "conj_form": "連用形"},
+            _tok("て", pos="助詞", pos_sub1="接続助詞"),
+        ]
+        result, _ = apply_suzume_merge(tokens, "三度見て")
+        assert [token["surface"] for token in result][:2] == ["三度", "見"]
+
     def test_comma_separated_number(self):
         tokens = [_tok("1", pos="名詞", pos_sub1="数"), _tok(",", pos="記号"), _tok("200", pos="名詞", pos_sub1="数")]
         result, rule = apply_suzume_merge(tokens, "1,200")

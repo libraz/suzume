@@ -85,6 +85,9 @@ def _continues_counter_dimension(tail: str, tokens: list[dict], number_index: in
 # Relative-time nouns after a duration keep their own boundary (3年+後, 5分+前).
 _TEMPORAL_RELATION_SUFFIXES = frozenset({"前", "後"})
 
+# Particles that attach to a verb continuative (見+て, 見+つつ, 見+ながら).
+_CONTINUATIVE_PARTICLES = frozenset({"て", "つつ", "ながら"})
+
 
 # Kanji closing a quantity phrase after the noun it measures (2段階+目, 3時限+目).
 _QUANTITY_PHRASE_SUFFIXES = frozenset({"半", "目", "間"})
@@ -96,6 +99,27 @@ def _is_plain_kanji_noun(token: dict) -> bool:
         token.get("pos") == "名詞"
         and token.get("pos_sub1") not in ("数", "代名詞", "固有名詞", "非自立")
         and regex.fullmatch(r"\p{Han}+", token.get("surface", "")) is not None
+    )
+
+
+def _is_nominal_one_kanji_continuative(tokens: list[dict], index: int) -> bool:
+    """Whether a one-kanji verb continuative is used as a noun (二度+寝+する).
+
+    Nothing verbal follows it: the text ends, a particle other than one that
+    selects the continuative follows, or する takes it as its verbal noun.
+    """
+    token = tokens[index]
+    if not (
+        token.get("pos") == "動詞"
+        and token.get("conj_form") == "連用形"
+        and regex.fullmatch(r"\p{Han}", token.get("surface", "")) is not None
+    ):
+        return False
+    if index + 1 == len(tokens):
+        return True
+    following = tokens[index + 1]
+    return (following.get("pos") == "助詞" and following.get("surface") not in _CONTINUATIVE_PARTICLES) or (
+        following.get("pos") == "動詞" and following.get("lemma") == "する"
     )
 
 
@@ -115,7 +139,7 @@ def _absorb_unevenly_cut_kanji_run(
     """
     absorbed_counter = j > i + 1 and last_was_counter
     k = j
-    while k < len(tokens) and _is_plain_kanji_noun(tokens[k]):
+    while k < len(tokens) and (_is_plain_kanji_noun(tokens[k]) or _is_nominal_one_kanji_continuative(tokens, k)):
         k += 1
     run = "".join(tok["surface"] for tok in tokens[j:k])
     if not run or run[0] in _TEMPORAL_RELATION_SUFFIXES:
