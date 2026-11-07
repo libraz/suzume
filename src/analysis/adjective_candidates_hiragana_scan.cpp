@@ -402,6 +402,15 @@ void adj_detail::appendHiraganaIAdjSurfaceCandidates(const std::vector<char32_t>
         if (utf8::endsWith(surface, "たい") && surface != "たい" && !utf8::endsWith(surface, "ったい")) {
           continue;  // Skip - should be split as verb renyokei + たい
         }
+        // The same holds for an inflected cell whose reconstructed base ends in
+        // たい after a listed verb continuative (し+たく, ね+たく); an unlisted
+        // stem such as ねむ keeps the adjective (ねむたく).
+        if (utf8::endsWith(cand.base_form, "たい") && !utf8::endsWith(cand.base_form, "ったい") &&
+            !isAdjectiveInDictionary(dict_manager, cand.base_form) &&
+            verb_helpers::hasDictionaryEntry(dict_manager, utf8::dropLastChar(utf8::dropLastChar(cand.base_form)),
+                                             core::PartOfSpeech::Verb)) {
+          continue;
+        }
         // Skip pure hiragana patterns ending with さ - these are almost always part of
         // honorific suffix さん/さま, not i-adjective forms
         // e.g., おじさ, おばさ, おねえさ should not be recognized as i-adjectives
