@@ -1410,6 +1410,23 @@
       ],
       "id": "mendokusasouna_woshita",
       "input": "めんどくさそうな顔をした"
+    },
+    {
+      "description": "registered kana adjective stem before the emotive がる",
+      "expected": [
+        {
+          "lemma": "めんどうくさい",
+          "pos": "Adjective",
+          "surface": "めんどうくさ"
+        },
+        {
+          "lemma": "がる",
+          "pos": "Verb",
+          "surface": "がり"
+        }
+      ],
+      "id": "mendoukusagari",
+      "input": "めんどうくさがり"
     }
   ],
   "description": "I-adjectives compound/derived forms (複合・派生) - sou patterns, nominalization, contracted forms",

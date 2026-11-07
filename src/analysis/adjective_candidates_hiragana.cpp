@@ -269,7 +269,10 @@ void appendStemBeforeExcessiveOrAppearance(const HiraganaAdjectiveRun& run, std:
   for (size_t stem_end = start_pos + 2; stem_end + 1 < run.max_hiragana_end; ++stem_end) {
     const bool excessive_follows = codepoints[stem_end] == U'す' && codepoints[stem_end + 1] == U'ぎ';
     const bool appearance_follows = codepoints[stem_end] == U'そ' && codepoints[stem_end + 1] == U'う';
-    if (!excessive_follows && !appearance_follows) {
+    // The emotive がる takes the same bare stem (めんどくさ+がる, 寒+がる).
+    const bool garu_follows = codepoints[stem_end] == U'が' && (kana::isRaColumnCodepoint(codepoints[stem_end + 1]) ||
+                                                                codepoints[stem_end + 1] == U'っ');
+    if (!excessive_follows && !appearance_follows && !garu_follows) {
       continue;
     }
     // A ない-adjective inserts さ before the appearance そう (つまらな+さ+そう),
@@ -289,7 +292,7 @@ void appendStemBeforeExcessiveOrAppearance(const HiraganaAdjectiveRun& run, std:
     // or be a registered adjective (うざ+そう).
     const bool registered_adjective =
         dict_manager != nullptr && dict_manager->lookupExact(base_form, core::PartOfSpeech::Adjective) != nullptr;
-    if (inserted_sa && !registered_adjective) {
+    if ((inserted_sa || garu_follows) && !registered_adjective) {
       continue;
     }
     // A word registered over the whole run owns it: かわいそう is the
