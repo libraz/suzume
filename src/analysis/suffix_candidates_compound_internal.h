@@ -8,6 +8,7 @@
 #include "dictionary/dictionary.h"
 #include "normalize/utf8.h"
 #include "tokenizer_utils.h"
+#include "verb_candidates_dictionary_probes.h"
 
 namespace suzume::analysis {
 
@@ -21,8 +22,8 @@ inline bool isAdjectiveNominalizationSa(const dictionary::DictionaryManager* dic
   if (normalize::utf8Length(stem) >= 2 && utf8::endsWith(stem, "し")) {
     return true;
   }
-  return dict_manager->lookupExact(stem, core::PartOfSpeech::Adjective) != nullptr ||
-         dict_manager->lookupExact(stem + "い", core::PartOfSpeech::Adjective) != nullptr;
+  return verb_helpers::isAdjectiveInDictionary(dict_manager, stem) ||
+         verb_helpers::isAdjectiveInDictionary(dict_manager, stem + "い");
 }
 
 }  // namespace suzume::analysis

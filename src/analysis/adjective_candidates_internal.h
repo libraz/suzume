@@ -67,10 +67,12 @@ struct TrimmedAdjVariantRule {
 };
 
 /**
- * @brief First confidence at or above a threshold for one inflection type.
+ * @brief First i-adjective confidence at or above a threshold.
  */
-float firstConfidenceAtLeast(const std::vector<grammar::InflectionCandidate>& candidates, grammar::VerbType type,
-                             float minimum);
+float iAdjectiveConfidenceAtLeast(const std::vector<grammar::InflectionCandidate>& candidates, float minimum);
+
+/** Whether @p pos is at the end of the text or on a symbol. */
+bool closesAtTextEndOrSymbol(const std::vector<normalize::CharType>& char_types, size_t pos);
 
 /**
  * @brief Highest confidence among a small set of inflection types.

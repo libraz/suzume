@@ -230,8 +230,8 @@ void adj_detail::appendHiraganaPrefixedKanjiIAdjCandidates(std::vector<UnknownCa
     const std::string tail_surface =
         is_renyokei ? normalize::replaceFinalChar(tail_observed_surface, "い") : std::string(tail_observed_surface);
     const auto& tail_candidates = inflection.analyze(tail_surface);
-    const bool tail_has_i_adjective = adj_detail::firstConfidenceAtLeast(tail_candidates, grammar::VerbType::IAdjective,
-                                                                         candidate::kCompoundAdjConfMin) != float{};
+    const bool tail_has_i_adjective =
+        adj_detail::iAdjectiveConfidenceAtLeast(tail_candidates, candidate::kCompoundAdjConfMin) != float{};
     const bool tail_has_verified_verb = adj_detail::hasDictionaryVerbAnalysis(tail_candidates, dict_manager);
     const auto& observed_tail_candidates = inflection.analyze(tail_observed_surface);
     const bool observed_tail_has_verified_verb =

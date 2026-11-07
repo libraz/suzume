@@ -42,7 +42,7 @@ bool opensWordAt(const dictionary::DictionaryManager* dict_manager, const std::v
 // adjectives ない・いい・よい stay usable as productive tails.
 bool sharesEndWithDictionaryAdjective(const dictionary::DictionaryManager* dict_manager,
                                       const std::vector<char32_t>& codepoints, const UnknownCandidate& cand) {
-  if (dict_manager == nullptr || cand.lemma_verified || cand.pos != core::PartOfSpeech::Adjective) {
+  if (cand.lemma_verified || cand.pos != core::PartOfSpeech::Adjective) {
     return false;
   }
   constexpr size_t kMinInnerAdjectiveMorae = 3;
@@ -78,7 +78,7 @@ bool sharesEndWithDictionaryAdjective(const dictionary::DictionaryManager* dict_
     }
     // A stem is compared through its い form only: a na-adjective spelled like
     // the inner span (まし of うらやまし+げ) is no i-adjective stem.
-    if ((!is_stem && dict_manager->lookupExact(span, core::PartOfSpeech::Adjective) != nullptr) ||
+    if ((!is_stem && verb_helpers::isAdjectiveInDictionary(dict_manager, span)) ||
         (is_stem && verb_helpers::isIAdjectiveInDictionary(dict_manager, span + "い"))) {
       return true;
     }
@@ -91,8 +91,7 @@ bool sharesEndWithDictionaryAdjective(const dictionary::DictionaryManager* dict_
 // those words, not an adjective.
 bool spansClosedHeadAndClosedWord(const dictionary::DictionaryManager* dict_manager,
                                   const std::vector<char32_t>& codepoints, const UnknownCandidate& cand) {
-  if (dict_manager == nullptr || cand.lemma_verified || cand.pos != core::PartOfSpeech::Adjective ||
-      cand.end < cand.start + 2) {
+  if (cand.lemma_verified || cand.pos != core::PartOfSpeech::Adjective || cand.end < cand.start + 2) {
     return false;
   }
   // Nor is a span the dictionary already carries as a function word of
@@ -119,7 +118,7 @@ bool spansClosedHeadAndClosedWord(const dictionary::DictionaryManager* dict_mana
 // lemma (らしかっ of らしい) is the auxiliary itself, read with the wrong class.
 bool respellsAuxiliaryCell(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
                            const UnknownCandidate& cand) {
-  if (dict_manager == nullptr || cand.pos != core::PartOfSpeech::Adjective || cand.lemma.empty()) {
+  if (cand.pos != core::PartOfSpeech::Adjective || cand.lemma.empty()) {
     return false;
   }
   const auto* auxiliary =
@@ -133,6 +132,9 @@ void adj_detail::dropCoinedAdjectivesOverDictionaryAdjective(const dictionary::D
                                                              const std::vector<char32_t>& codepoints,
                                                              std::vector<UnknownCandidate>& candidates,
                                                              size_t candidate_start) {
+  if (dict_manager == nullptr) {
+    return;
+  }
   candidates.erase(std::remove_if(candidates.begin() + static_cast<std::ptrdiff_t>(candidate_start), candidates.end(),
                                   [&](const UnknownCandidate& cand) {
                                     return sharesEndWithDictionaryAdjective(dict_manager, codepoints, cand) ||

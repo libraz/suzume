@@ -181,14 +181,17 @@ const std::array<std::string_view, 14> kIAdjStemAuxPatterns = {
     "きそう", "きそうだ", "きそうな", "きそうに", "きすぎ", "きすぎる", "きすぎた",
 };
 
-float firstConfidenceAtLeast(const std::vector<grammar::InflectionCandidate>& candidates, grammar::VerbType type,
-                             float minimum) {
+float iAdjectiveConfidenceAtLeast(const std::vector<grammar::InflectionCandidate>& candidates, float minimum) {
   for (const auto& candidate : candidates) {
-    if (candidate.verb_type == type && candidate.confidence >= minimum) {
+    if (candidate.verb_type == grammar::VerbType::IAdjective && candidate.confidence >= minimum) {
       return candidate.confidence;
     }
   }
   return float{};
+}
+
+bool closesAtTextEndOrSymbol(const std::vector<normalize::CharType>& char_types, size_t pos) {
+  return pos >= char_types.size() || char_types[pos] == normalize::CharType::Symbol;
 }
 
 float maxConfidenceFor(const std::vector<grammar::InflectionCandidate>& candidates,
@@ -260,9 +263,7 @@ std::string clippedExclamativeBase(const dictionary::DictionaryManager* dict_man
   if (sokuon_pos <= start || after == 0) {
     return {};
   }
-  const bool closes_utterance =
-      after >= codepoints.size() || (after < char_types.size() && char_types[after] == normalize::CharType::Symbol);
-  if (!closes_utterance) {
+  if (!closesAtTextEndOrSymbol(char_types, after)) {
     return {};
   }
   std::string base_form = extractSubstring(codepoints, start, sokuon_pos) + "い";

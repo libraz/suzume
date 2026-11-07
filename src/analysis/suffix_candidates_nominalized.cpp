@@ -86,8 +86,7 @@ bool hasClauseFinalParticleContinuation(const std::vector<char32_t>& codepoints,
       continue;
     }
     const size_t after_particle = end_pos + match.length;
-    if (after_particle == codepoints.size() ||
-        (after_particle < char_types.size() && char_types[after_particle] == normalize::CharType::Symbol)) {
+    if (adj_detail::closesAtTextEndOrSymbol(char_types, after_particle)) {
       return true;
     }
   }
@@ -121,8 +120,7 @@ bool hasParticleFinalHiraganaNounContinuation(const std::vector<char32_t>& codep
 bool isGenitiveClauseFinalNominal(const std::vector<char32_t>& codepoints,
                                   const std::vector<normalize::CharType>& char_types, size_t start_pos, size_t end_pos,
                                   const dictionary::DictionaryManager* dict_manager) {
-  const bool closes_clause = end_pos == codepoints.size() ||
-                             (end_pos < char_types.size() && char_types[end_pos] == normalize::CharType::Symbol);
+  const bool closes_clause = adj_detail::closesAtTextEndOrSymbol(char_types, end_pos);
   if (start_pos == 0 || !closes_clause) {
     return false;
   }
@@ -300,7 +298,7 @@ namespace {
 // べ continuative of a common verb (食べ) otherwise yields its verb readings.
 bool closesNominalFrameAt(const std::vector<char32_t>& codepoints, const std::vector<normalize::CharType>& char_types,
                           size_t pos) {
-  if (pos >= codepoints.size() || char_types[pos] == normalize::CharType::Symbol) {
+  if (adj_detail::closesAtTextEndOrSymbol(char_types, pos)) {
     return true;
   }
   static constexpr std::array<char32_t, 5> kNominalParticles = {U'が', U'を', U'は', U'の', U'も'};
@@ -340,8 +338,7 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
   const bool continuative_before_light_verb =
       dict_manager != nullptr && kanji_end + 2 < codepoints.size() &&
       char_types[kanji_end + 1] == normalize::CharType::Hiragana &&
-      (kana::isIRowCodepoint(codepoints[kanji_end + 1]) || kana::isERowCodepoint(codepoints[kanji_end + 1])) &&
-      startsLightVerb(codepoints, kanji_end + 2) &&
+      kana::isIOrERowCodepoint(codepoints[kanji_end + 1]) && startsLightVerb(codepoints, kanji_end + 2) &&
       [&] {
         const auto* particle =
             lookupEntryInRange(*dict_manager, codepoints, kanji_end, kanji_end + 1, core::PartOfSpeech::Particle);
@@ -371,9 +368,11 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
 
   // Do not turn the first mora of a dictionary particle into a nominalized
   // noun. The particle candidate owns the whole span (最後|まで, not 最後ま|で).
+  std::vector<dictionary::LookupResult> okurigana_matches;
   if (dict_manager != nullptr) {
     const size_t probe_end = std::min(codepoints.size(), kanji_end + static_cast<size_t>(4));
-    for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, kanji_end, probe_end)) {
+    okurigana_matches = lookupResultsInRange(*dict_manager, codepoints, kanji_end, probe_end);
+    for (const auto& match : okurigana_matches) {
       if (match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Particle &&
           normalize::utf8Length(match.entry->surface) > 1) {
         return;
@@ -512,9 +511,13 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
   // A continuation that selects the verb cell (片付け+ない, 片付け+ながら,
   // 片付け+なさい) rules the noun out; the copula and particles opening on な
   // take a nominal host as well (片付け+な+の+だ, 手伝い+なら).
-  if (dict_manager != nullptr && kanji_end + 1 < char_types.size() && codepoints[kanji_end + 1] == U'な') {
+  std::vector<dictionary::LookupResult> following_matches;
+  if (dict_manager != nullptr && kanji_end + 1 < codepoints.size()) {
     const size_t probe_end = std::min(codepoints.size(), kanji_end + 1 + static_cast<size_t>(4));
-    for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, kanji_end + 1, probe_end)) {
+    following_matches = lookupResultsInRange(*dict_manager, codepoints, kanji_end + 1, probe_end);
+  }
+  if (dict_manager != nullptr && kanji_end + 1 < char_types.size() && codepoints[kanji_end + 1] == U'な') {
+    for (const auto& match : following_matches) {
       if (match.entry == nullptr) {
         continue;
       }
@@ -528,10 +531,8 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
   // The inchoative 始める takes only a verb continuative as its host (飼い+始め),
   // so a continuation opening it rules the noun out as well.
   if (dict_manager != nullptr && kanji_end + 1 < codepoints.size()) {
-    const size_t probe_end = std::min(codepoints.size(), kanji_end + 1 + static_cast<size_t>(4));
-    skip_single_char = skip_single_char || lookupResultsHaveExtendedPOS(lookupResultsInRange(*dict_manager, codepoints,
-                                                                                             kanji_end + 1, probe_end),
-                                                                        core::ExtendedPOS::AuxAspectHajimeru);
+    skip_single_char =
+        skip_single_char || lookupResultsHaveExtendedPOS(following_matches, core::ExtendedPOS::AuxAspectHajimeru);
   }
   // Skip kanji+い when kanji ends with 的 (teki na-adjective suffix)
   // 理性的い, 経済的い don't make sense — 的 forms na-adjectives, not i-adjectives
@@ -612,10 +613,8 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
   // A registered pronoun opening at the okurigana is a word of its own, not the
   // continuative's tail plus a particle (結局+みな, never 結局み+な).
   if (!skip_single_char && dict_manager != nullptr) {
-    const size_t probe_end = std::min(codepoints.size(), kanji_end + static_cast<size_t>(4));
     skip_single_char = skip_single_char || lookupResultsHaveLongerPartOfSpeech(
-                                               lookupResultsInRange(*dict_manager, codepoints, kanji_end, probe_end),
-                                               partOfSpeechMask(core::PartOfSpeech::Pronoun), 1);
+                                               okurigana_matches, partOfSpeechMask(core::PartOfSpeech::Pronoun), 1);
     // A registered noun or an attested verb continuative on the same span
     // (試み+な) keeps its own reading.
     skip_single_char =
@@ -1068,7 +1067,7 @@ void generateHumbleNominalCandidates(const std::vector<char32_t>& codepoints, si
     // stem, because the inflection analyzer reconstructs a nominal ichidan
     // paradigm for any kana run at its floor confidence.
     const char32_t stem_end = codepoints[end_pos - 1];
-    if (!kana::isERowCodepoint(stem_end) && !kana::isIRowCodepoint(stem_end)) {
+    if (!kana::isIOrERowCodepoint(stem_end)) {
       continue;
     }
     const auto& stem_analysis = inflection.analyze(stem);

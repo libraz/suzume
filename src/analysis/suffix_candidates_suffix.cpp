@@ -175,19 +175,23 @@ bool spellsGodanMaSuffixVerbCell(std::string_view okurigana) {
 // Suffix Candidate Factory Helpers
 // =============================================================================
 
+namespace {
+
 /**
  * @brief Create a suffix pattern candidate
  */
-inline UnknownCandidate makeSuffixCandidate(const std::string& surface, size_t start, size_t end,
-                                            core::PartOfSpeech pos, float cost, const std::string& lemma,
-                                            [[maybe_unused]] float confidence, [[maybe_unused]] const char* pattern,
-                                            dictionary::ConjugationType conj_type = dictionary::ConjugationType::None) {
+UnknownCandidate makeSuffixCandidate(const std::string& surface, size_t start, size_t end, core::PartOfSpeech pos,
+                                     float cost, const std::string& lemma, [[maybe_unused]] float confidence,
+                                     [[maybe_unused]] const char* pattern,
+                                     dictionary::ConjugationType conj_type = dictionary::ConjugationType::None) {
   auto cand = makeCandidate(surface, start, end, pos, cost, true, CandidateOrigin::SuffixPattern);
   cand.lemma = lemma;
   cand.conj_type = conj_type;
   SUZUME_DEBUG_CANDIDATE(cand, confidence, pattern);
   return cand;
 }
+
+}  // namespace
 
 SuffixEntryRange getSuffixEntries() {
   static constexpr SuffixEntry kSuffixes[] = {
@@ -197,15 +201,6 @@ SuffixEntryRange getSuffixEntries() {
       {"化", true},   // 国際化, 自動化
       {"視", false},  // 重要視, 問題視
       {"性", true},
-      // {"率", core::PartOfSpeech::Suffix},  // Removed: causes over-segmentation (降水確率→降水確+率)
-      // {"法", core::PartOfSpeech::Suffix},  // Merge via kanji-merge (解決法, 民法)
-      // {"論", core::PartOfSpeech::Suffix},  // Merge via kanji-merge (進化論, 理論)
-      // {"者", core::PartOfSpeech::Suffix},  // Removed: causes over-segmentation (代表者→代表+者)
-      // {"家", core::PartOfSpeech::Suffix},  // Removed: causes over-segmentation (大家/思想家/政治家/etc.)
-      // {"員", core::PartOfSpeech::Suffix},  // Merge via kanji-merge (会社員, 公務員)
-      // {"式", core::PartOfSpeech::Suffix},  // Merge via kanji-merge (計算式, 結婚式)
-      // {"感", core::PartOfSpeech::Suffix},  // Merge via kanji-merge (達成感, 違和感)
-      // {"力", core::PartOfSpeech::Suffix},  // Merge via kanji-merge (説得力, 影響力)
       {"度", true},
       {"方", false},  // 歩き方, やり方 (V連用形+方)
       {"中", false},  // 一日中, 今日中 (N+中) - MeCab treats as suffix
@@ -295,7 +290,6 @@ void generateProductiveSuffixCandidates(const std::vector<char32_t>& codepoints,
     return;
   }
 
-  constexpr size_t kPpoiLen = 9;  // "っぽい" = 3 chars * 3 bytes
   constexpr size_t kMaxHiraganaLen = 8;
   const size_t hiragana_end = findCharRegionEnd(char_types, start_pos, kMaxHiraganaLen, normalize::CharType::Hiragana);
 
@@ -313,7 +307,8 @@ void generateProductiveSuffixCandidates(const std::vector<char32_t>& codepoints,
 
     // Pattern 2: V連用形 + っぽい (resemblance suffix)
     // Examples: 子供っぽい、安っぽい、忘れっぽい
-    if (surface.size() >= kPpoiLen + 3 && utf8::endsWith(surface, "っぽい")) {
+    if (surface.size() >= core::kThreeJapaneseCharBytes + core::kJapaneseCharBytes &&
+        utf8::endsWith(surface, "っぽい")) {
       // っぽい attaches to nouns and verb stems; the length guard leaves at least a 1-character stem
       candidates.push_back(makeSuffixCandidate(surface, start_pos, candidate_end, core::PartOfSpeech::Adjective, 0.4F,
                                                surface, 0.85F, "stem_ppoi", dictionary::ConjugationType::IAdjective));
@@ -332,11 +327,12 @@ void generateProductiveSuffixCandidates(const std::vector<char32_t>& codepoints,
         continue;
       }
       std::string_view stem = std::string_view(surface).substr(0, surface.size() - honorific.size());
-      size_t stem_chars = stem.size() / 3;  // Each hiragana = 3 bytes in UTF-8
+      size_t stem_chars = stem.size() / core::kJapaneseCharBytes;
       if (stem_chars >= 2 && stem_chars <= 3) {
         // Only an honorific-style stem can lexicalize with さん. Ordinary
         // さん terms remain dictionary-backed or split above.
-        bool starts_with_honorific_prefix = stem.compare(0, 3, "お") == 0 || stem.compare(0, 3, "ご") == 0;
+        bool starts_with_honorific_prefix = stem.compare(0, core::kJapaneseCharBytes, "お") == 0 ||
+                                            stem.compare(0, core::kJapaneseCharBytes, "ご") == 0;
         if (honorific == "さん" && !starts_with_honorific_prefix) {
           break;
         }
@@ -539,11 +535,15 @@ void generateProductiveSuffixVerbCandidates(const std::vector<char32_t>& codepoi
   appendProductiveSuffixVerbCells(codepoints, start_pos, base_end, kZuku, candidates);
 }
 
+namespace {
+
 // Administrative suffix codepoints for intermediate boundary detection
 const std::array<char32_t, 8>& getAdminSuffixCodepoints() {
   static constexpr std::array<char32_t, 8> kAdminSuffixes = {U'県', U'都', U'府', U'道', U'市', U'区', U'町', U'村'};
   return kAdminSuffixes;
 }
+
+}  // namespace
 
 void generateAdminBoundaryCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                      const std::vector<normalize::CharType>& char_types,

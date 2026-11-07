@@ -45,8 +45,8 @@ bool isModernIAdjective(const std::string& lemma, const grammar::Inflection& inf
   }
   const float minimum_confidence =
       grammar::containsKanji(lemma) ? candidate::kCompoundAdjConfMin : candidate::kHiraAdjConfMin;
-  return adj_detail::firstConfidenceAtLeast(inflection.analyze(lemma), grammar::VerbType::IAdjective,
-                                            minimum_confidence) != candidate::kNoOriginConfidence;
+  return adj_detail::iAdjectiveConfidenceAtLeast(inflection.analyze(lemma), minimum_confidence) !=
+         candidate::kNoOriginConfidence;
 }
 
 // A listed verb can follow in an inflected cell instead of its dictionary
@@ -493,7 +493,7 @@ void appendIAdjKaraZuCandidates(const std::vector<char32_t>& codepoints, size_t 
       continue;
     }
     const std::string surface = extractSubstring(codepoints, start_pos, kara_pos + 2);
-    if (dict_manager != nullptr && dict_manager->lookupExact(surface, core::PartOfSpeech::Auxiliary) != nullptr) {
+    if (verb_helpers::hasDictionaryEntry(dict_manager, surface, core::PartOfSpeech::Auxiliary)) {
       continue;
     }
     pushIAdjCell(candidates, surface, start_pos, kara_pos + 2, lemma, cell, "i_adjective_kari");

@@ -25,6 +25,11 @@ using adj_detail::makeNaAdjCandidate;
 
 namespace {
 
+// Hiragana that continues a na-adjective stem: に, な, だ, で, さ.
+bool isNaAdjectiveContinuation(char32_t ch) {
+  return ch == U'に' || ch == U'な' || ch == U'だ' || ch == U'で' || ch == U'さ';
+}
+
 // Whether a dictionary adjective closing the run stands apart from what is in
 // front of it: one bound kanji (超|重要, 最|簡単) or a quantity phrase, which
 // its counter closes (何部|必要). A full noun compounds with it (交通安全).
@@ -60,7 +65,7 @@ bool closesOnNegationPrefixedAdjective(const std::vector<char32_t>& codepoints, 
   }
   for (size_t head_pos = start_pos + 2; head_pos + 2 <= end_pos; ++head_pos) {
     const std::string head = extractSubstring(codepoints, head_pos, end_pos);
-    if (scorer::startsWithNegationPrefix(head) && dict_manager->lookupExact(head, core::PartOfSpeech::Adjective)) {
+    if (scorer::startsWithNegationPrefix(head) && verb_helpers::isAdjectiveInDictionary(dict_manager, head)) {
       return true;
     }
   }
@@ -76,7 +81,7 @@ bool opensOnNegationPrefixedAdjective(const std::vector<char32_t>& codepoints, s
     return false;
   }
   for (size_t head_end = start_pos + 2; head_end < end_pos; ++head_end) {
-    if (dict_manager->lookupExact(extractSubstring(codepoints, start_pos, head_end), core::PartOfSpeech::Adjective)) {
+    if (verb_helpers::isAdjectiveInDictionary(dict_manager, extractSubstring(codepoints, start_pos, head_end))) {
       return true;
     }
   }
@@ -154,9 +159,7 @@ void generateHiraganaNariNaAdjectiveCandidates(const std::vector<char32_t>& code
     }
     const bool has_classical_attributive =
         stem_end + 2 <= codepoints.size() && extractSubstring(codepoints, stem_end, stem_end + 2) == "なる";
-    const bool has_na_adjective_continuation = codepoints[stem_end] == U'に' || codepoints[stem_end] == U'な' ||
-                                               codepoints[stem_end] == U'だ' || codepoints[stem_end] == U'で' ||
-                                               codepoints[stem_end] == U'さ';
+    const bool has_na_adjective_continuation = isNaAdjectiveContinuation(codepoints[stem_end]);
     if (!has_classical_attributive && !has_na_adjective_continuation) {
       continue;
     }
@@ -167,7 +170,7 @@ void generateHiraganaNariNaAdjectiveCandidates(const std::vector<char32_t>& code
     // modern continuations it is not, because 〜かな/〜かに also occur inside
     // ordinary verb inflection, so those keep the narrow -やか/-らか test.
     const bool has_na_adjective_stem_shape =
-        utf8::endsWithAny(stem, {"やか", "らか"}) || (has_classical_attributive && utf8::endsWithAny(stem, {"か"}));
+        utf8::endsWithAny(stem, {"やか", "らか"}) || (has_classical_attributive && utf8::endsWith(stem, "か"));
     if (!has_na_adjective_stem_shape) {
       continue;
     }
@@ -283,9 +286,7 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
     if (stem_end < codepoints.size()) {
       std::string stem_suffix = extractSubstring(codepoints, kanji_end, stem_end);
       bool is_yaka_pattern = utf8::equalsAny(stem_suffix, {"やか", "らか"});
-      bool has_na_adj_continuation = codepoints[stem_end] == U'な' || codepoints[stem_end] == U'に' ||
-                                     codepoints[stem_end] == U'だ' || codepoints[stem_end] == U'で' ||
-                                     codepoints[stem_end] == U'さ';
+      bool has_na_adj_continuation = isNaAdjectiveContinuation(codepoints[stem_end]);
       if (is_yaka_pattern && has_na_adj_continuation) {
         std::string stem = extractSubstring(codepoints, start_pos, stem_end);
         candidates.push_back(makeNaAdjCandidate(stem, start_pos, stem_end, candidate::kNaAdjYakaCost, true,
@@ -379,8 +380,7 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
         for (size_t tail = kanji_end; tail < stem_end; ++tail) {
           crosses_te_form = crosses_te_form || codepoints[tail] == U'て' || codepoints[tail] == U'で';
         }
-        const bool is_exact_verb_stem =
-            dict_manager != nullptr && dict_manager->lookupExact(stem, core::PartOfSpeech::Verb) != nullptr;
+        const bool is_exact_verb_stem = verb_helpers::isVerbInDictionary(dict_manager, stem);
         bool contains_passive_boundary = false;
         if (dict_manager != nullptr) {
           for (size_t auxiliary_start = kanji_end + 1; auxiliary_start < stem_end; ++auxiliary_start) {
@@ -448,7 +448,7 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
             !is_exact_verb_stem && !spans_registered_pronoun && !crosses_te_form && !contains_passive_boundary &&
             !starts_naru_after_ku && !closes_on_verbal_ru &&
             !adj_detail::spellsAdjectiveStemBeforeGe(codepoints, start_pos, stem_end, inflection, dict_manager)) {
-          if (!normalize::isFormalNounSurface(normalize::encodeUtf8(codepoints[start_pos]))) {
+          if (!normalize::isFormalNounCodepoint(codepoints[start_pos])) {
             candidates.push_back(makeNaAdjCandidate(stem, start_pos, stem_end, candidate::kNaAdjStemCost, true,
                                                     CandidateOrigin::AdjectiveNa, candidate::kNaAdjPredicateConfidence,
                                                     "mixed_na_adjective_stem"));
@@ -575,7 +575,7 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
     // Skip if first character is a formal noun (形式名詞)
     // e.g., 時妙な should be 時+妙な, not 時妙(ADJ)+な
     // Formal nouns (時, 事, 所, etc.) are standalone grammatical words
-    if (normalize::isFormalNounSurface(normalize::encodeUtf8(codepoints[start_pos]))) {
+    if (normalize::isFormalNounCodepoint(codepoints[start_pos])) {
       return;
     }
 

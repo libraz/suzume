@@ -141,7 +141,7 @@ bool isPossibleUnknownIAdjectiveStem(const std::string& stem, const std::string&
   // Native i-adjectives do not form an unknown base by appending い to an
   // e-row okurigana (静け+い).  This is a conjugational shape constraint, not
   // a lexical whitelist; kanji-final stems and the a/i/u/o rows remain open.
-  const char32_t stem_last = utf8::decodeFirstChar(utf8::lastChar(stem));
+  const char32_t stem_last = utf8::decodeLastChar(stem);
   if (kana::isERowCodepoint(stem_last)) {
     return false;
   }
@@ -218,8 +218,8 @@ float productiveIAdjectiveStemConfidence(const std::string& stem, const std::str
     }
   }
 
-  const float confidence = adj_detail::firstConfidenceAtLeast(
-      inflection.analyze(base_form), grammar::VerbType::IAdjective, candidate::kCompoundAdjConfMin);
+  const float confidence =
+      adj_detail::iAdjectiveConfidenceAtLeast(inflection.analyze(base_form), candidate::kCompoundAdjConfMin);
   if (confidence == candidate::kNoOriginConfidence) {
     return candidate::kNoOriginConfidence;
   }
@@ -227,7 +227,7 @@ float productiveIAdjectiveStemConfidence(const std::string& stem, const std::str
   // An i-row ending can instead be a productive godan continuative.  Lexical
   // evidence for that verb wins (書き/話し/積もり), while stems without a
   // competing predicate retain the adjective analysis.
-  const char32_t final_codepoint = utf8::decodeFirstChar(utf8::lastChar(stem));
+  const char32_t final_codepoint = utf8::decodeLastChar(stem);
   const std::string_view godan_suffix = grammar::godanBaseSuffixFromIRow(final_codepoint);
   if (!godan_suffix.empty()) {
     const std::string verb_base = normalize::concat(utf8::dropLastChar(stem), godan_suffix);
@@ -393,8 +393,8 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
 
       // Check for サ変 passive/causative pattern: さ + れ/せ
       // E.g., 処理される, 勉強させる - these are NOT adjective nominalization
-      if (pattern == "さ" && hiragana_part.size() > 3) {
-        const std::string_view after_sa = std::string_view(hiragana_part).substr(3);  // Skip さ (3 bytes)
+      if (pattern == "さ" && hiragana_part.size() > core::kJapaneseCharBytes) {
+        const std::string_view after_sa = std::string_view(hiragana_part).substr(core::kJapaneseCharBytes);  // Skip さ
         if (utf8::startsWithAny(after_sa, {"れ", "せ"})) {
           SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   skip: サ変 passive/causative (さ+" << after_sa.substr(0, 3) << ")\n");
           continue;  // Skip - this is likely サ変 passive/causative, not adjective
@@ -441,11 +441,12 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
           dict_manager != nullptr && hiragana_part.size() > pattern.size() &&
           lookupEntryInRange(*dict_manager, codepoints, kanji_end + normalize::utf8Length(pattern),
                              kanji_end + normalize::utf8Length(pattern) + 1, core::PartOfSpeech::Particle) != nullptr;
-      if (pattern.size() <= 3 && hiragana_part.size() > pattern.size() && dict_manager && !particle_follows_pattern) {
+      if (pattern.size() <= core::kJapaneseCharBytes && hiragana_part.size() > pattern.size() && dict_manager &&
+          !particle_follows_pattern) {
         auto hira_results = dict_manager->lookup(hiragana_part, 0);
         bool has_longer_dict_word = false;
         for (const auto& result : hira_results) {
-          if (result.entry && result.entry->surface.size() > 3) {
+          if (result.entry && result.entry->surface.size() > core::kJapaneseCharBytes) {
             has_longer_dict_word = true;
             break;
           }
@@ -475,8 +476,7 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
       float adj_confidence =
           (single_kanji_stem && !in_dictionary)
               ? candidate::kNoOriginConfidence
-              : adj_detail::firstConfidenceAtLeast(inflection.analyze(base_form), grammar::VerbType::IAdjective,
-                                                   candidate::kGaruAdjConfMin);
+              : adj_detail::iAdjectiveConfidenceAtLeast(inflection.analyze(base_form), candidate::kGaruAdjConfMin);
 
       SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   base=\"" << base_form << "\" conf=" << adj_confidence << "\n");
 
@@ -734,8 +734,7 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
 
       // Validate that this looks like a real adjective
       const auto& adj_results = inflection.analyze(base_form);
-      const float adj_confidence =
-          adj_detail::firstConfidenceAtLeast(adj_results, grammar::VerbType::IAdjective, candidate::kIAdjConfMin);
+      const float adj_confidence = adj_detail::iAdjectiveConfidenceAtLeast(adj_results, candidate::kIAdjConfMin);
       const bool is_valid_adjective = adj_confidence != 0.0F;
 
       SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   base=\"" << base_form << "\" is_valid=" << is_valid_adjective

@@ -236,13 +236,15 @@ bool appendNominalGakariGake(const KanjiHiraganaSpan& span, std::vector<UnknownC
   // An ichidan stem written as the bare kanji (出 of 出る) is a continuative
   // host, and a host that heads a lexical がける verb (心がける) is that
   // verb's deverbal noun.
-  const std::string gake_host = extractSubstring(codepoints, start_pos, kanji_run_end);
-  const bool nominal_host =
-      dict_manager != nullptr &&
-      lookupEntryInRange(*dict_manager, codepoints, start_pos, kanji_run_end, core::PartOfSpeech::Verb) == nullptr &&
-      !(kanji_run_end == start_pos + 1 && verb_helpers::isSingleKanjiIchidan(codepoints[start_pos])) &&
-      !verb_helpers::isVerbInDictionary(dict_manager, gake_host + "る") &&
-      !verb_helpers::isVerbInDictionary(dict_manager, gake_host + "がける");
+  const auto nominal_host = [&]() {
+    const std::string gake_host = extractSubstring(codepoints, start_pos, kanji_run_end);
+    return dict_manager != nullptr &&
+           lookupEntryInRange(*dict_manager, codepoints, start_pos, kanji_run_end, core::PartOfSpeech::Verb) ==
+               nullptr &&
+           !(kanji_run_end == start_pos + 1 && verb_helpers::isSingleKanjiIchidan(codepoints[start_pos])) &&
+           !verb_helpers::isVerbInDictionary(dict_manager, gake_host + "る") &&
+           !verb_helpers::isVerbInDictionary(dict_manager, gake_host + "がける");
+  };
   for (size_t suffix_start = kanji_run_end;
        suffix_start < codepoints.size() && span.char_types[suffix_start] == normalize::CharType::Hiragana;
        ++suffix_start) {
@@ -251,7 +253,7 @@ bool appendNominalGakariGake(const KanjiHiraganaSpan& span, std::vector<UnknownC
       if (suffix_end > codepoints.size() || extractSubstring(codepoints, suffix_start, suffix_end) != suffix) {
         continue;
       }
-      if (suffix == kGake && suffix_start == kanji_run_end && nominal_host &&
+      if (suffix == kGake && suffix_start == kanji_run_end && nominal_host() &&
           (hasNominalPhraseSelectorAt(dict_manager, codepoints, suffix_end) || verbal_noun_predicate_at(suffix_end))) {
         auto gake = makeCandidate(std::string(kGake), suffix_start, suffix_end, core::PartOfSpeech::Suffix,
                                   candidate::kCounterExtentSuffixCost, true, CandidateOrigin::SuffixPattern,
@@ -402,7 +404,7 @@ bool appendSokuonSuffixCandidates(const KanjiHiraganaSpan& span, size_t hira2_en
         // not on individual derived words.
         if (sokuon_suffix && suffix_stem_end <= codepoints.size() &&
             extractSubstring(codepoints, sokuon_pos, suffix_stem_end) + "い" == suffix_lemma) {
-          if (dict_manager->lookupExact(base + "い", core::PartOfSpeech::Adjective) != nullptr) {
+          if (verb_helpers::isAdjectiveInDictionary(dict_manager, base + "い")) {
             auto stem = makeCandidate(codepoints, start_pos, suffix_stem_end, core::PartOfSpeech::Adjective,
                                       candidate::kCompoundAdjBaseCost, true, CandidateOrigin::KanjiHiraganaCompound,
                                       core::ExtendedPOS::AdjStem);
@@ -695,7 +697,7 @@ bool crossesFunctionWordBoundary(const KanjiHiraganaSpan& span, const HiraganaTa
 
   // Skip compound generation if the full surface is a known verb in dictionary
   // E.g., 下さい is dict verb (くださる), not compound noun
-  if (verb_helpers::isVerbInDictionary(dict_manager, extractSubstring(codepoints, span.start_pos, hiragana_end))) {
+  if (verb_helpers::isVerbInDictionary(dict_manager, codepoints, span.start_pos, hiragana_end)) {
     return true;
   }
 
@@ -789,8 +791,7 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
          (codepoints[suru_cell] == U'し' && verb_helpers::naiNegativeFollowsAt(codepoints, suru_cell + 1)))) {
       return;
     }
-    if (suru_cell > kanji_end &&
-        (kana::isIRowCodepoint(codepoints[suru_cell - 1]) || kana::isERowCodepoint(codepoints[suru_cell - 1]))) {
+    if (suru_cell > kanji_end && kana::isIOrERowCodepoint(codepoints[suru_cell - 1])) {
       hiragana_end = suru_cell;
     }
   }
@@ -856,8 +857,7 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
   // This is morphology, not a per-word lexicon: i-row marks Godan
   // continuative stems and e-row marks Ichidan continuative stems.
   const std::string hiragana_candidate = extractSubstring(codepoints, kanji_end, hiragana_end);
-  if (utf8::endsWith(hiragana_candidate, "っぽい") &&
-      (kana::isIRowCodepoint(first_hira) || kana::isERowCodepoint(first_hira))) {
+  if (utf8::endsWith(hiragana_candidate, "っぽい") && kana::isIOrERowCodepoint(first_hira)) {
     const std::string derived = extractSubstring(codepoints, start_pos, hiragana_end);
     auto adjective = makeCandidate(derived, start_pos, hiragana_end, core::PartOfSpeech::Adjective,
                                    candidate::kProductivePpoiAdjCost, false, CandidateOrigin::KanjiHiraganaCompound,
@@ -911,7 +911,7 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
   // occupies the position is a nominal (草むら。 alongside 草むらに). Without
   // this the identical compound would be priced as an unverified run purely
   // because the sentence stopped.
-  const bool ends_clause = hiragana_end >= char_types.size() || char_types[hiragana_end] == normalize::CharType::Symbol;
+  const bool ends_clause = adj_detail::closesAtTextEndOrSymbol(char_types, hiragana_end);
   const bool nominal_context =
       !looks_like_aux && (ends_clause || hasNominalPhraseSelectorAt(dict_manager, codepoints, hiragana_end));
   auto cand = makeCandidate(

@@ -282,16 +282,14 @@ void appendStemBeforeExcessiveOrAppearance(const HiraganaAdjectiveRun& run, std:
     const size_t own_stem_end = inserted_sa ? stem_end - 1 : stem_end;
     const std::string stem = extractSubstring(codepoints, start_pos, own_stem_end);
     // A verb continuative takes すぎる too (なり+すぎ); it is not a stem.
-    if (utf8::contains(stem, "て") || utf8::contains(stem, "で") ||
-        (dict_manager != nullptr && dict_manager->lookupExact(stem, core::PartOfSpeech::Verb) != nullptr)) {
+    if (utf8::contains(stem, "て") || utf8::contains(stem, "で") || isVerbInDictionary(dict_manager, stem)) {
       continue;
     }
     const std::string base_form = stem + "い";
     // そう also follows verb continuatives and phrases (ふり+そう, それは+そう),
     // so before it the stem has to carry its own derivation (けちくさ+そう)
     // or be a registered adjective (うざ+そう).
-    const bool registered_adjective =
-        dict_manager != nullptr && dict_manager->lookupExact(base_form, core::PartOfSpeech::Adjective) != nullptr;
+    const bool registered_adjective = isAdjectiveInDictionary(dict_manager, base_form);
     if ((inserted_sa || garu_follows) && !registered_adjective) {
       continue;
     }
@@ -305,8 +303,8 @@ void appendStemBeforeExcessiveOrAppearance(const HiraganaAdjectiveRun& run, std:
         !adj_detail::derivesFromCompoundFormingAdjective(codepoints, start_pos, base_form, dict_manager)) {
       continue;
     }
-    const float analyzed_confidence = adj_detail::firstConfidenceAtLeast(
-        run.inflection.analyze(base_form), grammar::VerbType::IAdjective, candidate::kCompoundAdjConfMin);
+    const float analyzed_confidence =
+        adj_detail::iAdjectiveConfidenceAtLeast(run.inflection.analyze(base_form), candidate::kCompoundAdjConfMin);
     if (analyzed_confidence == candidate::kNoOriginConfidence) {
       continue;
     }
@@ -402,8 +400,8 @@ void appendStemBeforeGe(const HiraganaAdjectiveRun& run, const std::string& full
     const std::string stem = full_hiragana_surface.substr(0, ge_pos);
     const std::string base_form = stem + "い";
     const auto& base_candidates = run.inflection.analyze(base_form);
-    const float adjective_confidence = adj_detail::firstConfidenceAtLeast(
-        base_candidates, grammar::VerbType::IAdjective, candidate::kDerivedSuffixAdjectiveConfidence);
+    const float adjective_confidence =
+        adj_detail::iAdjectiveConfidenceAtLeast(base_candidates, candidate::kDerivedSuffixAdjectiveConfidence);
     const bool has_verified_verb_reading = adj_detail::hasDictionaryVerbAnalysis(base_candidates, dict_manager);
     // A registered auxiliary cell (らし of らしい) keeps its own reading before
     // げ (子供+らし+げ+な); it is no coined adjective stem.
@@ -511,8 +509,8 @@ size_t boundedAdjectiveRunEnd(const HiraganaAdjectiveRun& run, const std::string
                                                    : std::string(full_hiragana_surface);
   const auto& bounded_candidates = run.inflection.analyze(bounded_analysis_surface);
   const bool has_bounded_i_adjective =
-      bounded_long_ku_form && adj_detail::firstConfidenceAtLeast(bounded_candidates, grammar::VerbType::IAdjective,
-                                                                 candidate::kHiraAdjConfParticle) != float{};
+      bounded_long_ku_form &&
+      adj_detail::iAdjectiveConfidenceAtLeast(bounded_candidates, candidate::kHiraAdjConfParticle) != float{};
   size_t hiragana_end = has_bounded_i_adjective ? max_hiragana_end : start_pos;
   while (!has_bounded_i_adjective && hiragana_end < max_hiragana_end) {
     char32_t curr_char = codepoints[hiragana_end];
@@ -567,8 +565,9 @@ void appendStemBeforeAuxiliaryPattern(const HiraganaAdjectiveRun& run, const std
       }
 
       // The stem is everything before the auxiliary pattern, including the し
-      const std::string stem = full_hiragana_surface.substr(0, pattern_pos + 3);  // +3 for し
-      const std::string base_form = stem + "い";                                  // e.g., おいし → おいしい
+      const std::string stem =
+          full_hiragana_surface.substr(0, pattern_pos + core::kJapaneseCharBytes);  // +1 char for し
+      const std::string base_form = stem + "い";                                    // e.g., おいし → おいしい
 
       // A te-form connective cannot be part of an i-adjective stem. Keep its
       // boundary in desiderative-looking chains (読ん+で+ほし+そう,
@@ -579,8 +578,7 @@ void appendStemBeforeAuxiliaryPattern(const HiraganaAdjectiveRun& run, const std
 
       // Validate that this forms a valid i-adjective
       const auto& adj_results = run.inflection.analyze(base_form);
-      const float adj_confidence =
-          adj_detail::firstConfidenceAtLeast(adj_results, grammar::VerbType::IAdjective, candidate::kIAdjConfMin);
+      const float adj_confidence = adj_detail::iAdjectiveConfidenceAtLeast(adj_results, candidate::kIAdjConfMin);
 
       if (adj_confidence == 0.0F) {
         continue;
@@ -590,7 +588,8 @@ void appendStemBeforeAuxiliaryPattern(const HiraganaAdjectiveRun& run, const std
       // For pure hiragana, check if stem + す would be a valid verb
       // We compare adjective vs verb confidence - if adjective is significantly higher, prefer it
       // e.g., おい + す = おいす (not real)
-      const std::string verb_form = normalize::concat(std::string_view(stem).substr(0, stem.size() - 3), "す");
+      const std::string verb_form =
+          normalize::concat(std::string_view(stem).substr(0, stem.size() - core::kJapaneseCharBytes), "す");
 
       // Check verb confidence from inflection analyzer
       const auto& verb_results = run.inflection.analyze(verb_form);
@@ -651,10 +650,9 @@ void appendStemBeforeNominalizerSa(const HiraganaAdjectiveRun& run, std::vector<
     // fragments into single morae.
     const bool copula_boundary = after_sa < codepoints.size() && grammar::startsPredicativeCopula(extractSubstring(
                                                                      codepoints, after_sa, codepoints.size()));
-    const bool bounded_nominalizer =
-        !adj_detail::opensAdjectivePastConnective(codepoints, after_sa) &&
-        (after_sa >= codepoints.size() || normalize::isExtendedParticle(codepoints[after_sa]) || copula_boundary ||
-         (after_sa < run.char_types.size() && run.char_types[after_sa] == normalize::CharType::Symbol));
+    const bool bounded_nominalizer = !adj_detail::opensAdjectivePastConnective(codepoints, after_sa) &&
+                                     (adj_detail::closesAtTextEndOrSymbol(run.char_types, after_sa) ||
+                                      normalize::isExtendedParticle(codepoints[after_sa]) || copula_boundary);
     if (!bounded_nominalizer) {
       continue;
     }
@@ -691,8 +689,8 @@ void appendStemBeforeNominalizerSa(const HiraganaAdjectiveRun& run, std::vector<
         opening_particle->extended_pos == core::ExtendedPOS::ParticleTopic) {
       const std::string remainder_base = extractSubstring(codepoints, start_pos + 1, stem_end) + "い";
       if (isAdjectiveInDictionary(dict_manager, remainder_base) ||
-          adj_detail::firstConfidenceAtLeast(run.inflection.analyze(remainder_base), grammar::VerbType::IAdjective,
-                                             candidate::kIAdjConfMin) != candidate::kNoOriginConfidence) {
+          adj_detail::iAdjectiveConfidenceAtLeast(run.inflection.analyze(remainder_base), candidate::kIAdjConfMin) !=
+              candidate::kNoOriginConfidence) {
         continue;
       }
     }
@@ -712,9 +710,9 @@ void appendStemBeforeNominalizerSa(const HiraganaAdjectiveRun& run, std::vector<
       continue;
     }
     const float adjective_confidence =
-        is_dict_adjective ? candidate::kDictionaryOriginConfidence
-                          : adj_detail::firstConfidenceAtLeast(run.inflection.analyze(base_form),
-                                                               grammar::VerbType::IAdjective, candidate::kIAdjConfMin);
+        is_dict_adjective
+            ? candidate::kDictionaryOriginConfidence
+            : adj_detail::iAdjectiveConfidenceAtLeast(run.inflection.analyze(base_form), candidate::kIAdjConfMin);
     if (adjective_confidence == candidate::kNoOriginConfidence) {
       continue;
     }
@@ -748,10 +746,7 @@ void appendClippedExclamative(const HiraganaAdjectiveRun& run, std::vector<Unkno
   // An adjective in いい also clips before the question particle, its second
   // い assimilated into the sokuon (まあいっか, これでいっか); the stem then
   // ends in い, which is what keeps a numeral such as よっか out.
-  const auto closes_utterance = [&](size_t pos) {
-    return pos >= codepoints.size() ||
-           (pos < run.char_types.size() && run.char_types[pos] == normalize::CharType::Symbol);
-  };
+  const auto closes_utterance = [&](size_t pos) { return adj_detail::closesAtTextEndOrSymbol(run.char_types, pos); };
   // After a case particle the run is a verb's onbin instead (東京に+いっ+か);
   // で is the evaluative frame itself (これで+いっ+か) and stays out.
   const auto* preceding_particle =

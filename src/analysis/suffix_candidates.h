@@ -152,7 +152,7 @@ void generateHiraganaDeverbalCompoundNounCandidates(const std::vector<char32_t>&
  * @param codepoints Text as codepoints
  * @param start_pos Start position (character index)
  * @param inflection Inflection analyzer used to verify the continuative
- * @param dict_manager Reserved dictionary context (currently unused; may be null)
+ * @param dict_manager Dictionary used to verify the frame (may be null)
  * @param candidates Output candidates, appended in generation order
  */
 void generateHumbleNominalCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
@@ -248,11 +248,12 @@ bool hasFunctionWordChainDecomposition(const std::vector<char32_t>& codepoints, 
 /**
  * @brief Generate productive suffix candidates for hiragana sequences
  *
- * Detects productive suffix patterns attached to verb stems:
- *   - V連用形 + がち (tendency): ありがち、なりがち
- *   - V連用形 + っぽい (resemblance): 忘れっぽい、怒りっぽい
+ * Detects productive suffix patterns written in hiragana:
+ *   - N/V連用形 + っぽい (resemblance): 子供っぽい、忘れっぽい
+ *   - Short nickname + ちゃん/くん, honorific stem + さん: たっちゃん、おじさん
  *
- * These patterns allow recognition without explicit dictionary entries.
+ * V連用形 + がち is left split (あり|がち). These patterns allow recognition
+ * without explicit dictionary entries.
  *
  * @param codepoints Text as codepoints
  * @param start_pos Start position (character index)
@@ -268,8 +269,9 @@ void generateProductiveSuffixCandidates(const std::vector<char32_t>& codepoints,
 /**
  * @brief Generate productive suffix-verb candidates from nominal bases.
  *
- * Detects the Godan-ka suffix verb めく and its inflections:
- *   - 春めく、謎めいた、色めいて
+ * Detects the suffix verbs 付ける/付く, づける, びる, ばむ and づく on kanji bases and
+ * their inflections:
+ *   - 大人びる、黄ばむ、色づく
  */
 void generateProductiveSuffixVerbCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                             const std::vector<normalize::CharType>& char_types,

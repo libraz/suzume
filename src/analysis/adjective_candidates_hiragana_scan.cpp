@@ -427,7 +427,7 @@ void adj_detail::appendHiraganaIAdjSurfaceCandidates(const std::vector<char32_t>
         // No genuine i-adjective has て or で in its stem
         // e.g., さましてほしい should be さまし+て+ほしい, not a single i-adj
         const std::string_view stem_part =
-            std::string_view(surface).substr(0, surface.size() - 3);  // Remove trailing い (3 bytes)
+            std::string_view(surface).substr(0, surface.size() - core::kJapaneseCharBytes);  // Remove trailing い
         if (utf8::contains(stem_part, "て") || utf8::contains(stem_part, "で")) {
           continue;
         }

@@ -237,8 +237,8 @@ void appendKanjiStemCompoundIAdjCandidates(const std::vector<char32_t>& codepoin
     // The whole span spelling a dictionary verb cell (手伝い ← 手伝う) is that
     // verb as well.
     const std::string tail_surface = extractSubstring(codepoints, kanji_end - 1, end_pos);
-    if ((dict_manager != nullptr && (dict_manager->lookupExact(tail_surface, core::PartOfSpeech::Verb) != nullptr ||
-                                     dict_manager->lookupExact(surface, core::PartOfSpeech::Verb) != nullptr)) ||
+    if (verb_helpers::isVerbInDictionary(dict_manager, tail_surface) ||
+        verb_helpers::isVerbInDictionary(dict_manager, surface) ||
         isIndependentPredicateTail(tail_surface, inflection, dict_manager)) {
       SUZUME_DEBUG_LOG_VERBOSE("[ADJ_SKIP] \"" << surface << "\" tail \"" << tail_surface << "\" is a verb\n");
       continue;

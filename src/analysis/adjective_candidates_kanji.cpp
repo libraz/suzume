@@ -193,7 +193,7 @@ bool shouldSkipSimplePatterns(const std::string& hiragana_part, const std::vecto
   if (utf8::endsWith(hiragana_part, "ない") && hiragana_part.size() > core::kTwoJapaneseCharBytes) {
     const std::string_view pre_negative =
         std::string_view(hiragana_part).substr(0, hiragana_part.size() - core::kTwoJapaneseCharBytes);
-    const char32_t pre_negative_tail = utf8::decodeFirstChar(utf8::lastChar(pre_negative));
+    const char32_t pre_negative_tail = utf8::decodeLastChar(pre_negative);
     if (kana::isARowCodepoint(pre_negative_tail) || utf8::containsAny(pre_negative, {"に", "を", "が", "の", "へ"})) {
       return true;
     }
@@ -607,7 +607,7 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
             before_tai = base_sv.substr(0, base_sv.size() - 2 * core::kJapaneseCharBytes);
           }
           if (!before_tai.empty()) {
-            auto last_cp = utf8::decodeFirstChar(utf8::lastChar(before_tai));
+            auto last_cp = utf8::decodeLastChar(before_tai);
             const auto before_codepoints = normalize::toCodepoints(before_tai);
             // No continuative ends in っ, so たい after one is the adjective
             // suffix -ったい, not the desiderative.
@@ -637,8 +637,8 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
           const std::string adjective_base = stem + "い";
           meka_shii_derivation =
               isAdjectiveInDictionary(dict_manager, adjective_base) ||
-              adj_detail::firstConfidenceAtLeast(inflection.analyze(adjective_base), grammar::VerbType::IAdjective,
-                                                 candidate::kIAdjConfMin) != candidate::kNoOriginConfidence;
+              adj_detail::iAdjectiveConfidenceAtLeast(inflection.analyze(adjective_base), candidate::kIAdjConfMin) !=
+                  candidate::kNoOriginConfidence;
         }
         if (ga_mashii_derivation || meka_shii_derivation) {
           cost = std::min(cost, candidate::kDerivedSuffixAdjectiveCost);
@@ -715,7 +715,7 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
           std::string_view base_sv(cand.base_form);
           if (base_sv.size() > core::kJapaneseCharBytes && utf8::endsWith(base_sv, "い")) {
             std::string_view stem = base_sv.substr(0, base_sv.size() - core::kJapaneseCharBytes);
-            char32_t stem_last = utf8::decodeFirstChar(utf8::lastChar(stem));
+            char32_t stem_last = utf8::decodeLastChar(stem);
             if (stem_last != 0 && kana::isHiraganaCodepoint(stem_last) &&
                 adj_detail::hasDictionaryVerbAnalysis(inflection.analyze(hiragana_part), dict_manager)) {
               SUZUME_DEBUG_LOG_VERBOSE("[ADJ_SKIP] \"" << surface << "\" tail is dict verb, skipping fake adjective\n");
