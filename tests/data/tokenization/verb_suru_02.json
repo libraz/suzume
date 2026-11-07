@@ -1366,6 +1366,75 @@
       ],
       "id": "shitenno",
       "input": "休日何してんの"
+    },
+    {
+      "description": "そんなことしてんの - auto-generated",
+      "expected": [
+        {
+          "lemma": "そんな",
+          "pos": "Determiner",
+          "surface": "そんな"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "こと"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てん"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        }
+      ],
+      "id": "sonnakotoshitenno",
+      "input": "そんなことしてんの"
+    },
+    {
+      "description": "そんなことしてんだ - auto-generated",
+      "expected": [
+        {
+          "lemma": "そんな",
+          "pos": "Determiner",
+          "surface": "そんな"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "こと"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "ん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "sonnakotoshitenda",
+      "input": "そんなことしてんだ"
     }
   ],
   "description": "Suru-verb patterns with subsidiary verbs - MeCab互換分割 (part 2/2)",

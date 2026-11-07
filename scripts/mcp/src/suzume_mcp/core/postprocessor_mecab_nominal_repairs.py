@@ -197,6 +197,41 @@ def repair_assimilated_koto_copula(tokens: list[dict]) -> None:
         idx += 2
 
 
+def repair_koto_suru_te(tokens: list[dict]) -> None:
+    """Rebuild こと+し+て where the year noun ことし swallowed a te-form.
+
+    Before a て-initial tail the reference dictionary prefers the year noun
+    ことし and reads the rest as a noun (てん) or a particle plus ん, but the
+    year noun takes no such tail: it is the formal noun こと and the verb する
+    (そんなことしてんの). The tail is re-analyzed from し up to the next
+    punctuation so the verb and its contraction come back in one context.
+    """
+    idx = 0
+    while idx + 1 < len(tokens):
+        token = tokens[idx]
+        if token.get("surface") != "ことし" or not tokens[idx + 1].get("surface", "").startswith("て"):
+            idx += 1
+            continue
+        end = idx + 1
+        while end < len(tokens) and tokens[end].get("pos") != "記号":
+            end += 1
+        analyzed = mecab_analyze("し" + "".join(t.get("surface", "") for t in tokens[idx + 1 : end]))
+        if (
+            len(analyzed) < 2
+            or analyzed[0].get("surface") != "し"
+            or analyzed[0].get("lemma") != "する"
+            or not analyzed[1].get("surface", "").startswith("て")
+        ):
+            idx += 1
+            continue
+        koto = mecab_analyze("こと")
+        if len(koto) != 1:
+            idx += 1
+            continue
+        tokens[idx:end] = [koto[0], *analyzed]
+        idx += 1 + len(analyzed)
+
+
 def merge_honorific_kana_verbal_noun(tokens: list[dict]) -> None:
     """Rebuild ご + a fragmented kana verbal noun + する as one noun + する.
 

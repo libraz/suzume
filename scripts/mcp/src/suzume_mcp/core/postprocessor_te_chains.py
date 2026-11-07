@@ -98,11 +98,11 @@ _TE_CONTINUATION_HEADS = ("ら", "る", "た", "ない", "い", "ちゃ", "お")
 
 
 def postprocess_koto_suru_te(tokens: list[dict]) -> bool:
-    """Restore こと+し+て where the reference reads a kana こ or ことし.
+    """Restore こと+し+て where the reference reads a kana こ.
 
-    Before a te-continuation (らんない, る, た, ない) the kana こ+として and
-    ことし+てる are the formal noun こと, the verb する and its te-form; the
-    year noun ことし and the particle として cannot take those tails.
+    Before a te-continuation (らんない, る, た, ない) the kana こ+として is the
+    formal noun こと, the verb する and its te-form; the particle として cannot
+    take those tails.
     """
     changed = False
     idx = 0
@@ -121,18 +121,6 @@ def postprocess_koto_suru_te(tokens: list[dict]) -> bool:
             tokens[idx : idx + 2] = [koto, shi, {"surface": "て", "pos": "Particle", "lemma": "て"}]
             changed = True
             idx += 3
-            continue
-        if (
-            token.get("surface") == "ことし"
-            and token.get("pos") == "Noun"
-            and following.get("surface", "").startswith("て")
-            and following.get("pos") in ("Verb", "Auxiliary", "Particle")
-        ):
-            tokens[idx : idx + 1] = [koto, shi]
-            if following.get("surface") in ("てる", "てた"):
-                following.update(pos="Auxiliary", lemma="てる")
-            changed = True
-            idx += 2
             continue
         idx += 1
     return changed

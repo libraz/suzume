@@ -1697,3 +1697,19 @@ class TestGodanImperativeBeforeEmphaticYo:
     def test_accusative_object_keeps_the_written_ichidan_imperative(self):
         verb = self._repaired("平和を求めよ")[2]
         assert verb["lemma"] == "求める"
+
+
+class TestKotoSuruTeRepair:
+    @staticmethod
+    def _surfaces(text):
+        from suzume_mcp.core.mecab import mecab_analyze
+
+        tokens = mecab_analyze(text)
+        postprocessors.repair_koto_suru_te(tokens)
+        return [token["surface"] for token in tokens]
+
+    def test_year_noun_before_te_tail_becomes_koto_and_suru(self):
+        assert self._surfaces("そんなことしてんの") == ["そんな", "こと", "し", "てん", "の"]
+
+    def test_year_noun_is_kept_without_a_te_tail(self):
+        assert self._surfaces("ことしの夏") == ["ことし", "の", "夏"]

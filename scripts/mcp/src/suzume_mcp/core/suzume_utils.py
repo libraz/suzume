@@ -28,6 +28,7 @@ from .postprocessors import (
     repair_kana_compound_verb_at_tari,
     repair_kanji_prefix_before_kana_noun,
     repair_kko_nominalizer,
+    repair_koto_suru_te,
     repair_lengthened_negative,
     repair_mimetic_n_to_suru,
     repair_productive_causative,
@@ -242,6 +243,7 @@ def get_expected_tokens(text: str, suzume_tokens: list[dict] | None = None) -> t
     repair_adjective_stem_before_suffix(raw_tokens)
     postprocess_mecab_tokens(raw_tokens, normalized_text, replacements)
     repair_kko_nominalizer(raw_tokens)
+    repair_koto_suru_te(raw_tokens)
     repair_assimilated_koto_copula(raw_tokens)
     repair_contracted_volitional(raw_tokens)
     repair_contracted_quotative(raw_tokens)
