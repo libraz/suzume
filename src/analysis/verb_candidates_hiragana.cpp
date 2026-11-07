@@ -902,6 +902,18 @@ size_t admittedGodanRaContinuationEnd(const HiraganaVerbScan& scan, size_t godan
   if (vh::crossesCaseParticleBeforePredicate(dict_manager, codepoints, start_pos, godan_ra_continuation_stem_end)) {
     godan_ra_continuation_stem_end = 0;
   }
+  // After a te-form the span opens a subsidiary verb: a one-mora continuative
+  // the dictionary lists (as a verb or a subsidiary), then a listed auxiliary cell (て+き+やがっ, て+い+やがっ),
+  // not one verb spelled across both.
+  if (godan_ra_continuation_stem_end > start_pos + 2 && dict_manager != nullptr &&
+      isClearTeFormBeforeSubsidiary(codepoints, start_pos, false) &&
+      (lookupEntryInRange(*dict_manager, codepoints, start_pos, start_pos + 1, core::PartOfSpeech::Verb) != nullptr ||
+       lookupEntryInRange(*dict_manager, codepoints, start_pos, start_pos + 1, core::PartOfSpeech::Auxiliary) !=
+           nullptr) &&
+      lookupEntryInRange(*dict_manager, codepoints, start_pos + 1, godan_ra_continuation_stem_end,
+                         core::PartOfSpeech::Auxiliary) != nullptr) {
+    godan_ra_continuation_stem_end = 0;
+  }
   // Crossing the particle must not also swallow the 結び a binding particle is
   // waiting for. ぞ and なむ demand an attributive at the end of their clause,
   // and a classical auxiliary spells that cell with a bare verbal mora the
