@@ -51,7 +51,7 @@ class TestFixedFunctionSearchUnit:
 class TestDegreeSuffixGe:
     def test_splits_lexicalized_i_adjective_derivative(self, monkeypatch):
         monkeypatch.setattr(
-            "suzume_mcp.core.split_rules.mecab_analyze",
+            "suzume_mcp.core.split_boundaries.mecab_analyze",
             lambda text: [_tok(text, pos="形容詞", lemma=text)],
         )
 
@@ -65,7 +65,7 @@ class TestDegreeSuffixGe:
 
     def test_keeps_unverified_noun_ending(self, monkeypatch):
         monkeypatch.setattr(
-            "suzume_mcp.core.split_rules.mecab_analyze",
+            "suzume_mcp.core.split_boundaries.mecab_analyze",
             lambda text: [_tok(text, pos="名詞")],
         )
 
