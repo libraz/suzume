@@ -18,14 +18,6 @@ bool isTwoDigitFieldInRange(const IntegerScan& field, int min_value, int max_val
   return !field.empty() && field.digit_count <= 2 && field.value >= min_value && field.value <= max_value;
 }
 
-bool isValidCalendarMonth(const IntegerScan& month) {
-  return isTwoDigitFieldInRange(month, 1, 12);
-}
-
-bool isValidCalendarDay(const IntegerScan& day) {
-  return isTwoDigitFieldInRange(day, 1, 31);
-}
-
 // Advances pos past the next codepoint when it is expected; leaves pos unchanged otherwise.
 bool consumeCodepoint(std::string_view text, size_t& pos, char32_t expected) {
   size_t next = pos;
@@ -34,6 +26,28 @@ bool consumeCodepoint(std::string_view text, size_t& pos, char32_t expected) {
   }
   pos = next;
   return true;
+}
+
+// Whether the codepoint before pos is an ASCII digit, i.e. pos is mid-number.
+bool followsAsciiDigit(std::string_view text, size_t pos) {
+  return pos > 0 && isAsciiDigit(text[pos - 1]);
+}
+
+// For an already scanned field in range, consumes the unit codepoint right after it and
+// stores the position past the unit in end_pos; end_pos is left unchanged on failure.
+bool consumeScannedField(std::string_view text, const IntegerScan& field, int min_value, int max_value, char32_t unit,
+                         size_t& end_pos) {
+  size_t next = field.end;
+  if (!isTwoDigitFieldInRange(field, min_value, max_value) || !consumeCodepoint(text, next, unit)) {
+    return false;
+  }
+  end_pos = next;
+  return true;
+}
+
+// Scans a field at pos and consumes it with its unit codepoint; pos is unchanged on failure.
+bool consumeUnitField(std::string_view text, size_t& pos, int min_value, int max_value, char32_t unit) {
+  return consumeScannedField(text, scanInteger(text, pos), min_value, max_value, unit, pos);
 }
 
 // Advances pos past a duration suffix 間 when absorbsPeriodKan keeps it in the counter.
@@ -50,7 +64,7 @@ bool consumePeriodKan(std::string_view text, size_t& pos) {
 
 bool PreTokenizer::tryMatchDate(std::string_view text, size_t pos, PreToken& token) const {
   // Match patterns: MM月DD日, YYYY年MM月DD日, YYYY年MM月, YYYY年, YYYY年度 (fiscal year)
-  if (pos > 0 && isAsciiDigit(text[pos - 1])) {
+  if (followsAsciiDigit(text, pos)) {
     return false;
   }
 
@@ -64,13 +78,9 @@ bool PreTokenizer::tryMatchDate(std::string_view text, size_t pos, PreToken& tok
   // A month and day without a year is still an atomic calendar date. Check it
   // before requiring 年 so 7月18日 does not become two adjacent date tokens.
   size_t byte_pos = idx;
-  if (isValidCalendarMonth(year) && consumeCodepoint(text, byte_pos, U'月')) {
-    const IntegerScan day = scanInteger(text, byte_pos);
-    byte_pos = day.end;
-    if (isValidCalendarDay(day) && consumeCodepoint(text, byte_pos, U'日')) {
-      setTokenFromRange(token, text, pos, byte_pos, PreTokenType::Date, core::PartOfSpeech::Noun);
-      return true;
-    }
+  if (consumeScannedField(text, year, 1, 12, U'月', byte_pos) && consumeUnitField(text, byte_pos, 1, 31, U'日')) {
+    setTokenFromRange(token, text, pos, byte_pos, PreTokenType::Date, core::PartOfSpeech::Noun);
+    return true;
   }
 
   if (year.digit_count > 4) {
@@ -84,17 +94,12 @@ bool PreTokenizer::tryMatchDate(std::string_view text, size_t pos, PreToken& tok
   const size_t year_end = idx;  // Position right after "年", before any month match
 
   // Try to match month, then day
-  const IntegerScan month = scanInteger(text, idx);
-  byte_pos = month.end;
+  byte_pos = idx;
   bool matched_month = false;
-  if (isValidCalendarMonth(month) && consumeCodepoint(text, byte_pos, U'月')) {
+  if (consumeUnitField(text, byte_pos, 1, 12, U'月')) {
     idx = byte_pos;
     matched_month = true;
-    const IntegerScan day = scanInteger(text, idx);
-    byte_pos = day.end;
-    if (isValidCalendarDay(day) && consumeCodepoint(text, byte_pos, U'日')) {
-      idx = byte_pos;
-    }
+    consumeUnitField(text, idx, 1, 31, U'日');
   }
 
   // Fiscal year suffix: N年度 (令和6年度, 2024年度予算). Only applies when no
@@ -345,19 +350,13 @@ bool PreTokenizer::tryMatchAddressNumber(std::string_view text, size_t pos, PreT
 bool PreTokenizer::tryMatchTime(std::string_view text, size_t pos, PreToken& token) const {
   // Match patterns: HH時, HH時MM分, HH時MM分SS秒
   // Check that we're not starting in the middle of a number
-  if (pos > 0 && isAsciiDigit(text[pos - 1])) {
+  if (followsAsciiDigit(text, pos)) {
     return false;
   }
 
-  // Validate hour (0-23 or 1-24)
-  const IntegerScan hour = scanInteger(text, pos);
-  size_t idx = hour.end;
-  if (!isTwoDigitFieldInRange(hour, 0, 24)) {
-    return false;
-  }
-
-  // Check for 時
-  if (!consumeCodepoint(text, idx, U'時')) {
+  // Hour (0-23 or 1-24) followed by 時
+  size_t idx = pos;
+  if (!consumeUnitField(text, idx, 0, 24, U'時')) {
     return false;
   }
 
@@ -367,15 +366,8 @@ bool PreTokenizer::tryMatchTime(std::string_view text, size_t pos, PreToken& tok
   consumePeriodKan(text, idx);
 
   // Try to match minutes, then seconds
-  const IntegerScan minute = scanInteger(text, idx);
-  size_t byte_pos = minute.end;
-  if (isTwoDigitFieldInRange(minute, 0, 59) && consumeCodepoint(text, byte_pos, U'分')) {
-    idx = byte_pos;
-    const IntegerScan second = scanInteger(text, idx);
-    byte_pos = second.end;
-    if (isTwoDigitFieldInRange(second, 0, 59) && consumeCodepoint(text, byte_pos, U'秒')) {
-      idx = byte_pos;
-    }
+  if (consumeUnitField(text, idx, 0, 59, U'分')) {
+    consumeUnitField(text, idx, 0, 59, U'秒');
   }
 
   // Duration suffix 間 (期間接尾): HH時 + 間 = HH時間. Absorbed only when it is
