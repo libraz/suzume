@@ -570,6 +570,26 @@ class TestNumberUnit:
         assert len(result) == 1
         assert result[0]["surface"] == "100万円"
 
+    def test_digit_after_thousand_continues_the_numeral(self):
+        tokens = [
+            _tok("3", pos="名詞", pos_sub1="数"),
+            _tok("千", pos="名詞", pos_sub1="数"),
+            _tok("5", pos="名詞", pos_sub1="数"),
+            _tok("百", pos="名詞", pos_sub1="数"),
+            _tok("円", pos="名詞", pos_sub1="接尾", pos_sub2="助数詞"),
+        ]
+        result, _ = apply_suzume_merge(tokens, "3千5百円")
+        assert [token["surface"] for token in result] == ["3千5百円"]
+
+    def test_indefinite_numeral_after_hundred_stays_apart(self):
+        tokens = [
+            _tok("百", pos="名詞", pos_sub1="数"),
+            _tok("数", pos="名詞", pos_sub1="数"),
+            _tok("人", pos="名詞", pos_sub1="接尾", pos_sub2="助数詞"),
+        ]
+        result, _ = apply_suzume_merge(tokens, "百数人")
+        assert [token["surface"] for token in result] == ["百", "数人"]
+
     def test_comma_separated_number(self):
         tokens = [_tok("1", pos="名詞", pos_sub1="数"), _tok(",", pos="記号"), _tok("200", pos="名詞", pos_sub1="数")]
         result, rule = apply_suzume_merge(tokens, "1,200")

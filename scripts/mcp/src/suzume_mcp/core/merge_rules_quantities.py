@@ -480,7 +480,19 @@ def _merge_counter_expressions(state: MergeState) -> bool:
                 is_chuu_suffix = ns == "中" and np == "名詞" and ns1 == "接尾"
                 is_me_suffix = ns == "目" and np == "名詞" and ns1 == "接尾"
                 is_large_unit = np == "名詞" and ns1 == "数" and ns in ("万", "億", "兆")
-                is_number_after_large = combined.endswith(("万", "億", "兆")) and np == "名詞" and ns1 == "数"
+                # 千, 百 and 十 are place units too: a digit after them continues the
+                # same numeral (3千+5百円, like 2万+3千円); 百+数人 stays apart.
+                is_number_after_large = (
+                    np == "名詞"
+                    and ns1 == "数"
+                    and (
+                        combined.endswith(("万", "億", "兆"))
+                        or (
+                            combined.endswith(("千", "百", "十"))
+                            and regex.fullmatch(r"[0-9０-９一二三四五六七八九]+", ns)
+                        )
+                    )
+                )
                 # A quantity chains on only within one dimension (1時間30分,
                 # 1泊2日); where the dimension changes the second quantity is a
                 # rate over the first (1泊+5000円, 1日+3回).
