@@ -106,6 +106,24 @@ bool hasDictionaryGodanBaseFromIRow(const dictionary::DictionaryManager* dict_ma
   return !godan_ending.empty() && isVerbInDictionary(dict_manager, normalize::concat(stem, godan_ending));
 }
 
+bool endsInsideListedPredicate(const dictionary::DictionaryManager* dict_manager,
+                               const std::vector<char32_t>& codepoints, size_t start, size_t end) {
+  constexpr size_t kPredicateProbe = 8;
+  if (end >= codepoints.size() || !normalize::isKanjiCodepoint(codepoints[end])) {
+    return false;
+  }
+  for (size_t split = start + 1; split < end; ++split) {
+    const size_t min_len = end - split + 1;
+    if (hasDictionaryEntryFrom(dict_manager, codepoints, split, min_len, kPredicateProbe, core::PartOfSpeech::Verb,
+                               nullptr) ||
+        hasDictionaryEntryFrom(dict_manager, codepoints, split, min_len, kPredicateProbe, core::PartOfSpeech::Adjective,
+                               nullptr)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool hasListedTransitivePartner(const dictionary::DictionaryManager* dict_manager, std::string_view stem,
                                 char32_t a_row_kana) {
   const std::string_view e_row_kana = grammar::godanERowSuffixFromARow(a_row_kana);

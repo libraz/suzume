@@ -551,6 +551,11 @@ bool overlapsRegisteredWord(const PrefixScanContext& ctx, size_t len, size_t can
       kanjiHeadsPredicateAt(codepoints, ctx.char_types, candidate_end, ctx.inflection, *dict_manager)) {
     return true;
   }
+  if (start_type == normalize::CharType::Kanji && len > 1 && dict_manager != nullptr &&
+      dict_manager->lookupExact(surface) == nullptr &&
+      verb_helpers::endsInsideListedPredicate(dict_manager, codepoints, start_pos, candidate_end)) {
+    return true;
+  }
   if (start_type == normalize::CharType::Hiragana &&
       opensOnParticleBeforePronoun(dict_manager, codepoints, start_pos, candidate_end)) {
     return true;

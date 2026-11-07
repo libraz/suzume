@@ -537,6 +537,12 @@ void addNounVerbSplitCandidates(core::Lattice& lattice, std::string_view text, c
       }
     }
 
+    // The noun may not end inside a listed predicate that opens within it
+    // (自炊|頑張り, not 自炊頑+張り).
+    if (!noun_in_dict && verb_helpers::endsInsideListedPredicate(&dict_manager, codepoints, start_pos, verb_start)) {
+      continue;
+    }
+
     // Skip N+V split if noun is a formal/bound noun (e.g., 中, 上, 下)
     // These typically attach to preceding nouns, not verbs
     if (is_formal_noun) {

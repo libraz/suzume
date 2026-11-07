@@ -122,6 +122,16 @@ bool hasDictionaryGodanBaseFromIRow(const dictionary::DictionaryManager* dict_ma
                                     char32_t i_row_kana);
 
 /**
+ * @brief Whether codepoints[start, end) cuts the kanji stem of a listed verb or adjective that opens within it
+ *
+ * A listed predicate owns its kanji stem, so a nominal that stops between two
+ * of its kanji has crossed a word boundary (自炊|頑張り, not 自炊頑+張り). A
+ * nominal ending on the stem's okurigana is untouched (質問+うざい against 問う).
+ */
+bool endsInsideListedPredicate(const dictionary::DictionaryManager* dict_manager,
+                               const std::vector<char32_t>& codepoints, size_t start, size_t end);
+
+/**
  * @brief Whether @p stem plus the e-row partner of @p a_row_kana plus る is a listed verb base
  *
  * An intransitive godan-ra stem pairs with a transitive ichidan one on the same

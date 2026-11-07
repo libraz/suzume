@@ -640,6 +640,55 @@
       ],
       "id": "tattta_3",
       "input": "予想当たった"
+    },
+    {
+      "description": "Noun does not end between the kanji of a listed verb stem",
+      "expected": [
+        {
+          "lemma": "自炊",
+          "pos": "Noun",
+          "surface": "自炊"
+        },
+        {
+          "lemma": "頑張る",
+          "pos": "Verb",
+          "surface": "頑張り"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "まし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "rimashita_2",
+      "input": "自炊頑張りました！"
+    },
+    {
+      "description": "Noun does not end between the kanji of a listed verb stem",
+      "expected": [
+        {
+          "lemma": "練習",
+          "pos": "Noun",
+          "surface": "練習"
+        },
+        {
+          "lemma": "頑張る",
+          "pos": "Verb",
+          "surface": "頑張り"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "rimasu_3",
+      "input": "練習頑張ります"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 11/11)",
