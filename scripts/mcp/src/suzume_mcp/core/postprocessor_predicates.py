@@ -578,6 +578,17 @@ def postprocess_bound_derived_adjective(tokens: list[dict]) -> bool:
     return changed
 
 
+def _is_reduplicated_mimetic(surface: str) -> bool:
+    """Whether ``surface`` is a kana stem spelled twice (ふわふわ, ぺこぺこ)."""
+    half = len(surface) // 2
+    return (
+        len(surface) >= 4
+        and len(surface) % 2 == 0
+        and surface[:half] == surface[half:]
+        and regex.fullmatch(r"[\p{Hiragana}\p{Katakana}ー]+", surface) is not None
+    )
+
+
 def postprocess_adverbial_na_adjective(tokens: list[dict]) -> bool:
     """Tag a degree word as an adjective in the cells its copula supplies.
 
@@ -589,16 +600,21 @@ def postprocess_adverbial_na_adjective(tokens: list[dict]) -> bool:
     keeps the adverb (大変おいしい). The conjunction tag is admitted for the
     same reason as the adverb one: neither class can be the subject of a
     copula, so a word from the set carrying it in that cell is the adjectival
-    reading (もっとも+です).
+    reading (もっとも+です). A reduplicated mimetic is the same case by shape:
+    the reference tags some as adjectival nouns (ぺこぺこ+だ) and others as
+    adverbs (ふわふわ+だ) in the identical frame.
     """
     changed = False
     for idx, token in enumerate(tokens[:-1]):
         follower = tokens[idx + 1]
         if (
-            token.get("surface") not in ADVERBIAL_NA_ADJECTIVES
+            (
+                token.get("surface") not in ADVERBIAL_NA_ADJECTIVES
+                and not _is_reduplicated_mimetic(token.get("surface", ""))
+            )
             or token.get("pos") not in ("Adverb", "Conjunction")
             or follower.get("pos") != "Auxiliary"
-            or follower.get("surface") not in ("だ", "です", "な", "でし", "だっ", "なら")
+            or follower.get("surface") not in ("だ", "です", "な", "で", "でし", "だっ", "だろ", "でしょ", "なら")
         ):
             continue
         token["pos"] = "Adjective"

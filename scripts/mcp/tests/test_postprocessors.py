@@ -268,6 +268,23 @@ class TestPostprocessSou:
         assert tokens[0]["lemma"] == "キモい"
 
 
+class TestPostprocessReduplicatedMimeticCopula:
+    def test_mimetic_before_copula_is_adjectival(self):
+        for copula in ("だ", "だっ", "です", "で"):
+            tokens = [_tok("ふわふわ", "Adverb"), _tok(copula, "Auxiliary")]
+            assert postprocessors.postprocess_adverbial_na_adjective(tokens)
+            assert tokens[0]["pos"] == "Adjective"
+
+    def test_mimetic_modifying_a_verb_stays_adverb(self):
+        tokens = [_tok("うまうま", "Adverb"), _tok("食べる", "Verb")]
+        assert not postprocessors.postprocess_adverbial_na_adjective(tokens)
+        assert tokens[0]["pos"] == "Adverb"
+
+    def test_two_mora_doubling_is_not_a_mimetic(self):
+        tokens = [_tok("まあ", "Adverb"), _tok("だ", "Auxiliary")]
+        assert not postprocessors.postprocess_adverbial_na_adjective(tokens)
+
+
 class TestPostprocessSouHost:
     def test_demonstrative_before_copula_is_adverb(self):
         tokens = [_tok("そう", "Adjective"), _tok("だ", "Auxiliary")]
