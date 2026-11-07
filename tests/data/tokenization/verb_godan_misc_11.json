@@ -689,6 +689,97 @@
       ],
       "id": "rimasu_3",
       "input": "練習頑張ります"
+    },
+    {
+      "description": "Kana ichidan kakeru after a particle-dropped sahen noun",
+      "expected": [
+        {
+          "lemma": "心配",
+          "pos": "Noun",
+          "surface": "心配"
+        },
+        {
+          "lemma": "かける",
+          "pos": "Verb",
+          "surface": "かけ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "ごめん",
+          "pos": "Interjection",
+          "surface": "ごめん"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        }
+      ],
+      "id": "kaketegomenne",
+      "input": "心配かけてごめんね"
+    },
+    {
+      "description": "Kana godan-ka hiku i-onbin after a particle-dropped noun",
+      "expected": [
+        {
+          "lemma": "風邪",
+          "pos": "Noun",
+          "surface": "風邪"
+        },
+        {
+          "lemma": "ひく",
+          "pos": "Verb",
+          "surface": "ひい"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "っぽい",
+          "pos": "Adjective",
+          "surface": "っぽい"
+        },
+        {
+          "lemma": "喉",
+          "pos": "Noun",
+          "surface": "喉"
+        },
+        {
+          "lemma": "痛い",
+          "pos": "Adjective",
+          "surface": "痛い"
+        }
+      ],
+      "id": "hiitattpoi_i",
+      "input": "風邪ひいたっぽい…喉痛い"
+    },
+    {
+      "description": "Kana godan-ka hiku i-onbin after a particle-dropped noun",
+      "expected": [
+        {
+          "lemma": "風邪",
+          "pos": "Noun",
+          "surface": "風邪"
+        },
+        {
+          "lemma": "ひく",
+          "pos": "Verb",
+          "surface": "ひい"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "hiita",
+      "input": "風邪ひいた"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 11/11)",
