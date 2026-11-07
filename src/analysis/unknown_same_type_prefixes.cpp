@@ -8,6 +8,7 @@
  */
 
 #include <algorithm>
+#include <array>
 #include <string_view>
 
 #include "analysis/dictionary_probe.h"
@@ -237,7 +238,17 @@ bool kanjiHeadsPredicateAt(const std::vector<char32_t>& codepoints, const std::v
       core::isClassicalAuxiliaryType(terminal_tail_auxiliary->extended_pos)) {
     return true;
   }
-  for (size_t length = 1; kana_start + length <= kana_end; ++length) {
+  // って before a contracted te-continuation is the te-form of a listed godan
+  // verb on the kanji, not the quotative particle a noun takes (電話+鳴っ+てる,
+  // not 電話鳴+って+る).
+  constexpr std::array<std::string_view, 3> kSokuonbinBaseEndings = {"る", "う", "つ"};
+  const bool opens_contracted_te_form =
+      okurigana == U'っ' && kana_start + 1 < codepoints.size() && codepoints[kana_start + 1] == U'て' &&
+      verb_helpers::contractedTeContinuationFollowsAt(codepoints, kana_start + 2) &&
+      std::any_of(kSokuonbinBaseEndings.begin(), kSokuonbinBaseEndings.end(), [&](std::string_view ending) {
+        return verb_helpers::isVerbInDictionary(&dict_manager, normalize::concat(head, ending));
+      });
+  for (size_t length = 1; kana_start + length <= kana_end && !opens_contracted_te_form; ++length) {
     const auto* particle = opening_entry(length, core::PartOfSpeech::Particle);
     const auto* auxiliary = opening_entry(length, core::PartOfSpeech::Auxiliary);
     const auto* adjective = opening_entry(length, core::PartOfSpeech::Adjective);

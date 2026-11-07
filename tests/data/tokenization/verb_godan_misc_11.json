@@ -527,6 +527,75 @@
       ],
       "id": "keruka",
       "input": "仕事続けるか"
+    },
+    {
+      "description": "Sokuonbin te-form before a contracted continuation after a particle-dropped kanji noun",
+      "expected": [
+        {
+          "lemma": "さっき",
+          "pos": "Noun",
+          "surface": "さっき"
+        },
+        {
+          "lemma": "から",
+          "pos": "Particle",
+          "surface": "から"
+        },
+        {
+          "lemma": "ずっと",
+          "pos": "Adverb",
+          "surface": "ずっと"
+        },
+        {
+          "lemma": "電話",
+          "pos": "Noun",
+          "surface": "電話"
+        },
+        {
+          "lemma": "鳴る",
+          "pos": "Verb",
+          "surface": "鳴っ"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "てる"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "sattkikarazuttto_ttteruyo",
+      "input": "さっきからずっと電話鳴ってるよ"
+    },
+    {
+      "description": "Sokuonbin te-form before a contracted continuation after a particle-dropped kanji noun",
+      "expected": [
+        {
+          "lemma": "携帯",
+          "pos": "Noun",
+          "surface": "携帯"
+        },
+        {
+          "lemma": "鳴る",
+          "pos": "Verb",
+          "surface": "鳴っ"
+        },
+        {
+          "lemma": "てる",
+          "pos": "Auxiliary",
+          "surface": "て"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ttteta_4",
+      "input": "携帯鳴ってた"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 11/11)",
