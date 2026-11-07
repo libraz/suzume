@@ -422,6 +422,70 @@
       ],
       "id": "shiteikou",
       "input": "元気出していこう〜"
+    },
+    {
+      "description": "conjunctive keredo + predicate is not a selected nominal head",
+      "expected": [
+        {
+          "lemma": "だるい",
+          "pos": "Adjective",
+          "surface": "だるい"
+        },
+        {
+          "lemma": "けど",
+          "pos": "Particle",
+          "surface": "けど"
+        },
+        {
+          "lemma": "やる",
+          "pos": "Verb",
+          "surface": "やる"
+        },
+        {
+          "lemma": "しか",
+          "pos": "Particle",
+          "surface": "しか"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
+      "id": "daruikedoyarushikanai",
+      "input": "だるいけどやるしかない"
+    },
+    {
+      "description": "adjective + kedo + kana verb",
+      "expected": [
+        {
+          "lemma": "きつい",
+          "pos": "Adjective",
+          "surface": "きつい"
+        },
+        {
+          "lemma": "けど",
+          "pos": "Particle",
+          "surface": "けど"
+        },
+        {
+          "lemma": "やる",
+          "pos": "Verb",
+          "surface": "やる"
+        },
+        {
+          "lemma": "しか",
+          "pos": "Particle",
+          "surface": "しか"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
+      "id": "kitsuikedoyarushikanai",
+      "input": "きついけどやるしかない"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 4/4)",

@@ -438,6 +438,25 @@ void generateSelectedNominalHeadCandidates(const std::vector<char32_t>& codepoin
     if (contains_predicate_auxiliary_boundary) {
       continue;
     }
+    // Nor can it open on a conjunctive particle that closes the clause to its
+    // left and then take the next clause's predicate (けど+やる, から+行く).
+    bool opens_on_conjunctive_before_predicate = false;
+    for (size_t split = start_pos + 1; split < head_end; ++split) {
+      const auto* particle =
+          lookupEntryInRange(*dict_manager, codepoints, start_pos, split, core::PartOfSpeech::Particle);
+      if (particle == nullptr || (particle->extended_pos != core::ExtendedPOS::ParticleConj &&
+                                  particle->extended_pos != core::ExtendedPOS::ParticleConjFinite)) {
+        continue;
+      }
+      if (lookupEntryInRange(*dict_manager, codepoints, split, head_end, core::PartOfSpeech::Verb) != nullptr ||
+          lookupEntryInRange(*dict_manager, codepoints, split, head_end, core::PartOfSpeech::Adjective) != nullptr) {
+        opens_on_conjunctive_before_predicate = true;
+        break;
+      }
+    }
+    if (opens_on_conjunctive_before_predicate) {
+      continue;
+    }
 
     // A registered function word that opens inside the head and runs past its
     // end owns that right edge, so the head would cut it in two (店+ならでは).
