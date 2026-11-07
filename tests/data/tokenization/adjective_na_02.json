@@ -1650,6 +1650,33 @@
       ],
       "id": "nishiro_ga_u_na_da",
       "input": "勝手にしろ。勝手が違う。身勝手な行動だ。"
+    },
+    {
+      "description": "kana spelling of a na-adjective is lexical evidence",
+      "expected": [
+        {
+          "lemma": "めんどう",
+          "pos": "Adjective",
+          "surface": "めんどう"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "けど",
+          "pos": "Particle",
+          "surface": "けど"
+        },
+        {
+          "lemma": "やる",
+          "pos": "Verb",
+          "surface": "やる"
+        }
+      ],
+      "id": "mendoudakedoyaru",
+      "input": "めんどうだけどやる"
     }
   ],
   "description": "Na-adjectives (ナ形容詞) (part 2/2)",

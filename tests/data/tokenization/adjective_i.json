@@ -384,6 +384,33 @@
       ],
       "id": "gamendokusakattta",
       "input": "掃除がめんどくさかった"
+    },
+    {
+      "description": "掃除がめんどうくさかった - auto-generated",
+      "expected": [
+        {
+          "lemma": "掃除",
+          "pos": "Noun",
+          "surface": "掃除"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "めんどうくさい",
+          "pos": "Adjective",
+          "surface": "めんどうくさかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "gamendoukusakattta",
+      "input": "掃除がめんどうくさかった"
     }
   ],
   "description": "adjective_i tests",
