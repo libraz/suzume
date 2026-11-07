@@ -95,7 +95,7 @@ bool overlapsPredicativeNegativeConjecture(const core::Lattice& lattice,
                                            const std::vector<char32_t>& codepoints, const ByteOffsets& byte_offsets,
                                            size_t candidate_start, size_t candidate_end) {
   for (size_t aux_start = candidate_start; aux_start < candidate_end; ++aux_start) {
-    const size_t probe_end = std::min(codepoints.size(), aux_start + static_cast<size_t>(3));
+    const size_t probe_end = lookaheadEnd(codepoints.size(), aux_start, 3);
     const std::string_view probe = textRange(text, byte_offsets, aux_start, probe_end);
     for (const auto& match : dict_manager.lookup(probe, 0)) {
       if (match.entry == nullptr || match.entry->extended_pos != core::ExtendedPOS::AuxNegativeMai) {
@@ -171,12 +171,11 @@ bool absorbsPassiveBeforeNegative(const core::Lattice& lattice, const dictionary
                                   std::string_view text, const std::vector<char32_t>& codepoints,
                                   const ByteOffsets& byte_offsets, const UnknownCandidate& candidate) {
   if (candidate.pos != core::PartOfSpeech::Verb || candidate.extended_pos != core::ExtendedPOS::VerbMizenkei ||
-      candidate.end >= codepoints.size() ||
-      dict_manager.lookupExact(candidate.surface, core::PartOfSpeech::Verb) != nullptr) {
+      candidate.end >= codepoints.size() || verb_helpers::isVerbInDictionary(&dict_manager, candidate.surface)) {
     return false;
   }
 
-  const size_t probe_end = std::min(codepoints.size(), candidate.end + static_cast<size_t>(3));
+  const size_t probe_end = lookaheadEnd(codepoints.size(), candidate.end, 3);
   const std::string_view following = textRange(text, byte_offsets, candidate.end, probe_end);
   const bool followed_by_negative =
       lookupResultsHaveExtendedPOS(dict_manager.lookup(following, 0), core::ExtendedPOS::AuxNegativeNai);
@@ -316,15 +315,14 @@ bool reopensNoncontinuativeNominalCopula(const core::Lattice& lattice,
                                          const ByteOffsets& byte_offsets, const UnknownCandidate& candidate) {
   if (candidate.pos != core::PartOfSpeech::Verb || candidate.lemma_verified ||
       verb_helpers::isVerbInDictionary(&dict_manager, candidate.lemma) ||
-      dict_manager.lookupExact(candidate.surface, core::PartOfSpeech::Verb) != nullptr) {
+      verb_helpers::isVerbInDictionary(&dict_manager, candidate.surface)) {
     return false;
   }
   for (size_t split = candidate.start + 1; split < candidate.end; ++split) {
     const auto* copula =
         dict_manager.lookupExact(textRange(text, byte_offsets, split, candidate.end), core::PartOfSpeech::Auxiliary);
     if (copula == nullptr || utf8::decodeFirstChar(copula->surface) == U'な' ||
-        (copula->extended_pos != core::ExtendedPOS::AuxCopulaDa &&
-         copula->extended_pos != core::ExtendedPOS::AuxCopulaDesu)) {
+        !core::isCopulaType(copula->extended_pos)) {
       continue;
     }
     if (core::anyEdgeEndingAt(lattice, split, [&](const core::LatticeEdge& edge) {

@@ -25,7 +25,7 @@ src/analysis/bigram_table_nominal_particles.cpp	0	0	0
 src/analysis/bigram_table_particle_lexical.cpp	0	7	0
 src/analysis/bigram_table_particle_penalties.cpp	0	0	0
 src/analysis/bigram_table_verb_adj.cpp	0	5	0
-src/analysis/candidate_constants.h	0	168	0
+src/analysis/candidate_constants.h	0	183	0
 src/analysis/candidate_options.h	0	35	0
 src/analysis/category_cost.h	0	105	0
 src/analysis/compound_verb_emit.cpp	0	4	0
@@ -96,7 +96,7 @@ src/analysis/tokenizer_unknown_guards.cpp	0	0	0
 src/analysis/tokenizer_unknown_internal.h	0	0	0
 src/analysis/tokenizer_utils.cpp	0	0	0
 src/analysis/tokenizer_utils.h	0	0	0
-src/analysis/unknown.cpp	0	29	0
+src/analysis/unknown.cpp	0	13	0
 src/analysis/unknown.h	0	6	0
 src/analysis/unknown_bracketed_noun.cpp	0	0	0
 src/analysis/unknown_bracketed_noun_admission.cpp	0	0	0
@@ -106,7 +106,7 @@ src/analysis/unknown_same_type.cpp	0	0	0
 src/analysis/unknown_same_type_internal.h	0	0	0
 src/analysis/unknown_same_type_prefix_cost.cpp	0	10	0
 src/analysis/unknown_same_type_prefixes.cpp	0	4	0
-src/analysis/unknown_speech.cpp	0	12	0
+src/analysis/unknown_speech.cpp	0	11	0
 src/analysis/verb_candidates.cpp	0	8	0
 src/analysis/verb_candidates.h	0	0	0
 src/analysis/verb_candidates_absorption_guards.h	0	0	0

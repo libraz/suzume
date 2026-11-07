@@ -207,6 +207,26 @@ constexpr float kUnverifiedVerbExceedsTerminalPenalty = 3.0F;
 constexpr float kPredicativeNegationPrefixAdjectiveBonus = -1.2F;
 
 // =============================================================================
+// Unknown Word Category Costs (unknown.cpp getCostForType)
+// =============================================================================
+
+constexpr float kUnknownBaseCost = 1.0F;
+constexpr float kUnknownKanjiSingleCharPenalty = 0.4F;
+constexpr float kUnknownKatakanaSingleCharPenalty = 1.5F;
+constexpr float kUnknownKatakanaDoubleCharPenalty = 1.0F;
+constexpr float kUnknownKatakanaLightPenalty = 0.3F;  // 3 chars, and 11+ chars
+constexpr float kUnknownAlphabetBasePenalty = 0.2F;
+constexpr float kUnknownAlphabetLongBonus = -0.3F;  // 8+ chars
+constexpr float kUnknownAlphabetOutOfRangePenalty = 0.5F;
+constexpr float kUnknownDigitBonus = -0.2F;
+constexpr float kUnknownHiraganaSingleCharPenalty = 1.0F;
+constexpr float kUnknownHiraganaShortPenalty = 0.4F;  // 2-3 chars
+constexpr float kUnknownHiraganaLongBasePenalty = 0.5F;
+constexpr float kUnknownHiraganaLongFreeLength = 3.0F;
+constexpr float kUnknownHiraganaLongStep = 0.5F;
+constexpr float kUnknownOtherCharPenalty = 1.5F;
+
+// =============================================================================
 // Split Candidate Constants (split_candidates.cpp)
 // =============================================================================
 

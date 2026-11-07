@@ -7,12 +7,18 @@
 #define SUZUME_ANALYSIS_DICTIONARY_PROBE_H_
 
 #include <cstddef>
+#include <string_view>
 #include <vector>
 
 #include "core/types.h"
 #include "dictionary/dictionary.h"
 
 namespace suzume::analysis {
+
+/** The entry's lemma, or its surface when the lemma is empty. */
+inline std::string_view lemmaOrSurface(const dictionary::DictionaryEntry& entry) {
+  return entry.lemma.empty() ? std::string_view(entry.surface) : std::string_view(entry.lemma);
+}
 
 /**
  * @brief Selects which dictionary entry a probe takes; nullptr takes any entry

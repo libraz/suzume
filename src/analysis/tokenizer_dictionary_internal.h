@@ -19,13 +19,6 @@ void appendSpecialGrammarCandidates(core::Lattice& lattice, std::string_view tex
 inline constexpr size_t kMaxHostChars = 4;
 
 /**
- * @brief The entry's lemma, or its surface when the lemma is empty
- */
-inline std::string_view lemmaOrSurface(const dictionary::DictionaryEntry& entry) {
-  return entry.lemma.empty() ? std::string_view(entry.surface) : std::string_view(entry.lemma);
-}
-
-/**
  * @brief Add an edge with Dictionary origin and the standard dictionary origin confidence
  * @param lemma Lemma of the edge
  * @param pattern Debug label recorded as the ExtendedPOS source

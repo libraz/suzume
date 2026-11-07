@@ -431,6 +431,20 @@ constexpr bool isConjectureRashiiType(ExtendedPOS epos) {
 }
 
 /**
+ * @brief Whether ExtendedPOS is the plain or polite copula (だ, です)
+ */
+constexpr bool isCopulaType(ExtendedPOS epos) {
+  return epos == ExtendedPOS::AuxCopulaDa || epos == ExtendedPOS::AuxCopulaDesu;
+}
+
+/**
+ * @brief Whether ExtendedPOS is the negative auxiliary ぬ/ん or ない
+ */
+constexpr bool isNegativeNuNaiType(ExtendedPOS epos) {
+  return epos == ExtendedPOS::AuxNegativeNu || epos == ExtendedPOS::AuxNegativeNai;
+}
+
+/**
  * @brief Check if ExtendedPOS is a literary (文語) auxiliary
  *
  * These auxiliaries stand on an inflected verb cell as free morphemes with their

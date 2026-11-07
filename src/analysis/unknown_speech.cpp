@@ -724,7 +724,7 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
                                   CandidateOrigin::Onomatopoeia);
         cand.rejects_preceding_content_edge = particle_start && stem_len == 2;
 #ifdef SUZUME_DEBUG_INFO
-        cand.confidence = 0.9F;
+        cand.confidence = candidate::kHighOriginConfidence;
         cand.pattern = "x_tto_pattern";
 #endif
         candidates.push_back(std::move(cand));

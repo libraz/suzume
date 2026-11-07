@@ -39,7 +39,6 @@ using tokenizer_dictionary_detail::hasPrecedingNominal;
 using tokenizer_dictionary_detail::isOutOfPlaceForWordClass;
 using tokenizer_dictionary_detail::kMaxHostChars;
 using tokenizer_dictionary_detail::lacksLicensingEnvironment;
-using tokenizer_dictionary_detail::lemmaOrSurface;
 using tokenizer_dictionary_detail::losesHomographReading;
 
 namespace {
@@ -50,7 +49,7 @@ bool hasDictionaryEntrySpanningBack(const dictionary::DictionaryManager& dict_ma
                                     const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos) {
   constexpr size_t kMaxTailChars = 4;
   const size_t scan_start = lookbehindStart(start_pos, kMaxHostChars);
-  const size_t probe_end = std::min(codepoints.size(), end_pos + kMaxTailChars);
+  const size_t probe_end = lookaheadEnd(codepoints.size(), end_pos, kMaxTailChars);
   for (size_t host_start = scan_start; host_start < start_pos; ++host_start) {
     for (const auto& match : lookupResultsInRange(dict_manager, codepoints, host_start, probe_end)) {
       if (match.entry != nullptr && host_start + match.length >= end_pos) {
@@ -244,7 +243,7 @@ void addEmphaticDictionaryEdge(core::Lattice& lattice,
         continue;
       }
       const auto opened = lookupResultsInRange(dict_manager, codepoints, sokuon_pos,
-                                               std::min(codepoints.size(), sokuon_pos + kSokuonParticleProbe));
+                                               lookaheadEnd(codepoints.size(), sokuon_pos, kSokuonParticleProbe));
       if (!lookupResultsHaveLongerPartOfSpeech(opened, partOfSpeechMask(core::PartOfSpeech::Particle), 1)) {
         continue;
       }

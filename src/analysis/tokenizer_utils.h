@@ -46,6 +46,16 @@ constexpr size_t dictionaryLookbehindStart(size_t pos) {
   return lookbehindStart(pos, kDictionaryLookbehindChars);
 }
 
+/** End of a window of at most @p chars characters that opens at @p pos, clamped to @p size. */
+constexpr size_t lookaheadEnd(size_t size, size_t pos, size_t chars) {
+  return pos + chars < size ? pos + chars : size;
+}
+
+/** Whether position @p pos exists and has character type @p type. */
+inline bool isCharTypeAt(const std::vector<normalize::CharType>& char_types, size_t pos, normalize::CharType type) {
+  return pos < char_types.size() && char_types[pos] == type;
+}
+
 constexpr PartOfSpeechMask partOfSpeechMask(core::PartOfSpeech pos) {
   return 1U << static_cast<uint8_t>(pos);
 }

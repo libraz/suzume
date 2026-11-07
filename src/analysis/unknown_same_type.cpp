@@ -42,12 +42,11 @@ BoundAuxiliary boundAuxiliaryAt(const std::vector<char32_t>& codepoints, size_t 
   // onbin cell is found under its own length rather than its headword's.
   constexpr size_t kAuxiliaryWindow = 4;
   auto auxiliaries_at = [&](size_t at) {
-    const size_t window_end = std::min(codepoints.size(), at + kAuxiliaryWindow);
+    const size_t window_end = lookaheadEnd(codepoints.size(), at, kAuxiliaryWindow);
     std::vector<std::pair<size_t, bool>> found;
     for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, at, window_end)) {
       if (match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Auxiliary) {
-        const bool is_copula = match.entry->extended_pos == core::ExtendedPOS::AuxCopulaDa ||
-                               match.entry->extended_pos == core::ExtendedPOS::AuxCopulaDesu;
+        const bool is_copula = core::isCopulaType(match.entry->extended_pos);
         found.emplace_back(match.length, is_copula);
       }
     }
@@ -177,7 +176,7 @@ bool UnknownWordGenerator::openSameTypeRun(const std::vector<char32_t>& codepoin
     // A genitive の closes before a dictionary formal noun. Do not manufacture
     // a particle-homographic unknown noun across that boundary (不変+の+もの).
     if (first_char == U'の' && dict_manager_ != nullptr && start_pos + 1 < codepoints.size()) {
-      const size_t probe_end = std::min(codepoints.size(), start_pos + static_cast<size_t>(5));
+      const size_t probe_end = lookaheadEnd(codepoints.size(), start_pos, 5);
       if (lookupResultsHaveExtendedPOS(lookupResultsInRange(*dict_manager_, codepoints, start_pos + 1, probe_end),
                                        core::ExtendedPOS::NounFormal)) {
         return false;

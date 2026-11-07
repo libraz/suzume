@@ -340,9 +340,8 @@ void addDestinationSuffixNounJoinCandidates(core::Lattice& lattice, std::string_
         continue;
       }
       const auto extended_pos = result.entry->extended_pos;
-      if (result.entry->pos == core::PartOfSpeech::Particle || extended_pos == core::ExtendedPOS::AuxCopulaDa ||
-          extended_pos == core::ExtendedPOS::AuxCopulaDesu || core::isConjectureRashiiType(extended_pos) ||
-          extended_pos == core::ExtendedPOS::AuxConjectureMitai) {
+      if (result.entry->pos == core::PartOfSpeech::Particle || core::isCopulaType(extended_pos) ||
+          core::isConjectureRashiiType(extended_pos) || extended_pos == core::ExtendedPOS::AuxConjectureMitai) {
         nominal_right_context = true;
         break;
       }
@@ -490,7 +489,7 @@ void addVerbSuffixNounJoinCandidates(core::Lattice& lattice, std::string_view te
     // attributive predicate, not a pure-hiragana verb continuative
     // (ない+方法, not ない方+法).
     const std::string stem = extractSubstring(codepoints, start_pos, start_pos + 2);
-    if (dict_manager.lookupExact(stem, core::PartOfSpeech::Adjective) != nullptr) {
+    if (verb_helpers::isAdjectiveInDictionary(&dict_manager, stem)) {
       return;
     }
     // Allow godan-ra renyokei (り: やる→やり, ある→あり) and godan-wa renyokei
@@ -634,7 +633,7 @@ void addVerbSuffixNounJoinCandidates(core::Lattice& lattice, std::string_view te
       return;
     }
     const std::string renyokei = extractSubstring(codepoints, start_pos, hiragana_end);
-    const bool has_verb_reading = dict_manager.lookupExact(renyokei, core::PartOfSpeech::Verb) != nullptr;
+    const bool has_verb_reading = verb_helpers::isVerbInDictionary(&dict_manager, renyokei);
     constexpr PartOfSpeechMask kModifierMask =
         partOfSpeechMask(core::PartOfSpeech::Determiner) | partOfSpeechMask(core::PartOfSpeech::Adjective);
     const bool is_closed_modifier = hasExactPartOfSpeech(dict_manager, renyokei, kModifierMask);
@@ -646,7 +645,7 @@ void addVerbSuffixNounJoinCandidates(core::Lattice& lattice, std::string_view te
     const std::string_view godan_ending = grammar::godanBaseSuffixFromIRow(codepoints[hiragana_end - 1]);
     if (!godan_ending.empty()) {
       const std::string base_form = normalize::concat(renyokei_stem, godan_ending);
-      if (dict_manager.lookupExact(base_form, core::PartOfSpeech::Verb) == nullptr) {
+      if (!verb_helpers::isVerbInDictionary(&dict_manager, base_form)) {
         return;
       }
     } else {

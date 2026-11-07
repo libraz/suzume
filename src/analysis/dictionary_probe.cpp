@@ -59,10 +59,9 @@ bool opensStandardCopulaCell(const dictionary::DictionaryManager* dict_manager, 
   if (dict_manager == nullptr || pos >= codepoints.size() || (codepoints[pos] != U'だ' && codepoints[pos] != U'で')) {
     return false;
   }
-  const size_t probe_end = std::min(codepoints.size(), pos + kMaxCopulaCellLength);
+  const size_t probe_end = lookaheadEnd(codepoints.size(), pos, kMaxCopulaCellLength);
   for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, pos, probe_end)) {
-    if (match.entry != nullptr && (match.entry->extended_pos == core::ExtendedPOS::AuxCopulaDa ||
-                                   match.entry->extended_pos == core::ExtendedPOS::AuxCopulaDesu)) {
+    if (match.entry != nullptr && core::isCopulaType(match.entry->extended_pos)) {
       return true;
     }
   }

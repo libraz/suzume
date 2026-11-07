@@ -436,13 +436,18 @@ bool hasCaseParticleDictionaryEntry(const dictionary::DictionaryManager* dict_ma
   return entry != nullptr && entry->extended_pos == core::ExtendedPOS::ParticleCase;
 }
 
-bool oneMoraParticleEndsAt(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
-                           size_t pos, core::ExtendedPOS particle_pos) {
+core::ExtendedPOS oneMoraParticlePosEndingAt(const dictionary::DictionaryManager* dict_manager,
+                                             const std::vector<char32_t>& codepoints, size_t pos) {
   if (dict_manager == nullptr || pos == 0) {
-    return false;
+    return core::ExtendedPOS::Unknown;
   }
   const auto* particle = lookupEntryInRange(*dict_manager, codepoints, pos - 1, pos, core::PartOfSpeech::Particle);
-  return particle != nullptr && particle->extended_pos == particle_pos;
+  return particle != nullptr ? particle->extended_pos : core::ExtendedPOS::Unknown;
+}
+
+bool oneMoraParticleEndsAt(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
+                           size_t pos, core::ExtendedPOS particle_pos) {
+  return oneMoraParticlePosEndingAt(dict_manager, codepoints, pos) == particle_pos;
 }
 
 bool followsCaseParticle(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,

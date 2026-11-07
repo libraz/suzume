@@ -48,7 +48,7 @@ bool admitsPromotedRun(const BracketedNounContext& ctx, const BracketedScan& bra
   bool cuts_into_predicate = false;
   for (size_t probe = start_pos + 1; probe < scan && !cuts_into_predicate && dict_manager != nullptr; ++probe) {
     constexpr size_t kOverhangProbe = 2;
-    const size_t probe_limit = std::min(codepoints.size(), scan + kOverhangProbe);
+    const size_t probe_limit = lookaheadEnd(codepoints.size(), scan, kOverhangProbe);
     for (size_t probe_end = scan + 1; probe_end <= probe_limit; ++probe_end) {
       if (hasExactPartOfSpeech(*dict_manager, codepoints, probe, probe_end, kOverhangWordMask)) {
         cuts_into_predicate = true;
@@ -126,7 +126,7 @@ bool admitsPromotedRun(const BracketedNounContext& ctx, const BracketedScan& bra
   bool steals_formal_noun_head = false;
   if (dict_manager != nullptr && promoted.right_particle && scan > start_pos) {
     const size_t formal_start = scan - 1;
-    const size_t formal_probe_end = std::min(codepoints.size(), scan + static_cast<size_t>(3));
+    const size_t formal_probe_end = lookaheadEnd(codepoints.size(), scan, 3);
     for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, formal_start, formal_probe_end)) {
       if (match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Noun &&
           match.entry->extended_pos == core::ExtendedPOS::NounFormal && match.length > 1) {
@@ -151,8 +151,7 @@ bool admitsPromotedRun(const BracketedNounContext& ctx, const BracketedScan& bra
           lookupEntryInRange(*dict_manager, codepoints, word_end, aux_end, core::PartOfSpeech::Auxiliary);
       closes_registered_word_predicate =
           auxiliary != nullptr &&
-          (auxiliary->extended_pos == core::ExtendedPOS::AuxCopulaDa ||
-           auxiliary->extended_pos == core::ExtendedPOS::AuxCopulaDesu ||
+          (core::isCopulaType(auxiliary->extended_pos) ||
            BigramTable::getCost(word->extended_pos, auxiliary->extended_pos) < bigram_cost::kNeutral) &&
           continuesAuxiliaryChain(*dict_manager, codepoints, auxiliary->extended_pos, aux_end, scan);
     }
@@ -181,8 +180,7 @@ bool admitsPromotedRun(const BracketedNounContext& ctx, const BracketedScan& bra
   // longer copula chains are caught as auxiliary chains below.
   const bool spells_copula = dict_manager != nullptr && [&] {
     const auto* copula = lookupEntryInRange(*dict_manager, codepoints, start_pos, scan, core::PartOfSpeech::Auxiliary);
-    return copula != nullptr && (copula->extended_pos == core::ExtendedPOS::AuxCopulaDa ||
-                                 copula->extended_pos == core::ExtendedPOS::AuxCopulaDesu);
+    return copula != nullptr && core::isCopulaType(copula->extended_pos);
   }();
   // ご before kana is the Sino-Japanese honorific on a kana verbal noun
   // (ご+あんない+します); a rescue would swallow the prefix into the noun.

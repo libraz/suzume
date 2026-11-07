@@ -6,6 +6,7 @@
 
 #include "analysis/dictionary_probe.h"
 #include "analysis/verb_candidates_auxiliary_patterns.h"
+#include "analysis/verb_candidates_dictionary_probes.h"
 #include "analysis/verb_candidates_verb_stems.h"
 #include "compound_verb_v2_cells_internal.h"
 #include "grammar/char_patterns.h"
@@ -39,11 +40,11 @@ bool isCompoundVerbOrNominalizationAttested(const dictionary::DictionaryManager&
   if (base.empty()) {
     return false;
   }
-  if (dict_manager.lookupExact(base, core::PartOfSpeech::Verb) != nullptr) {
+  if (verb_helpers::isVerbInDictionary(&dict_manager, base)) {
     return true;
   }
   const std::string nominalized = generateRenyokei(base, verb_type);
-  return !nominalized.empty() && dict_manager.lookupExact(nominalized, core::PartOfSpeech::Noun) != nullptr;
+  return !nominalized.empty() && verb_helpers::isNounInDictionary(&dict_manager, nominalized);
 }
 
 // The hiragana V1 opening checks. Sets @p hiragana_v1_in_dictionary and returns
@@ -69,13 +70,13 @@ bool rejectsHiraganaV1(const CompoundMatchContext& ctx, bool& hiragana_v1_in_dic
     return true;
   }
   const std::string v1_base = hiraganaV1Base(v1_surface, ctx.is_ichidan, ctx.base_ending);
-  hiragana_v1_in_dictionary = dict_manager.lookupExact(v1_base, core::PartOfSpeech::Verb) != nullptr;
+  hiragana_v1_in_dictionary = verb_helpers::isVerbInDictionary(&dict_manager, v1_base);
   // A V1 that also reads as a finished adjective (いい) followed by a final
   // particle mora has closed its clause (いい+か+って, いい+よ+って).
   const auto* v2_head_particle =
       lookupEntryInRange(dict_manager, codepoints, v2_start, v2_start + 1, core::PartOfSpeech::Particle);
   if (v2_head_particle != nullptr && v2_head_particle->extended_pos == core::ExtendedPOS::ParticleFinal &&
-      dict_manager.lookupExact(v1_surface, core::PartOfSpeech::Adjective) != nullptr) {
+      verb_helpers::isAdjectiveInDictionary(&dict_manager, v1_surface)) {
     SUZUME_DEBUG_LOG_VERBOSE("[COMPOUND] rejected final particle after adjective-like V1: " << v1_surface << "\n");
     return true;
   }

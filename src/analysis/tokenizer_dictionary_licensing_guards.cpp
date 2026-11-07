@@ -169,7 +169,7 @@ bool lacksLicensingEnvironment(const DictionaryCandidateContext& ctx, const core
   if (result.entry->pos == core::PartOfSpeech::Adverb && result.length >= 2 &&
       (codepoints[end_pos - 1] == U'て' || codepoints[end_pos - 1] == U'で')) {
     bool te_selecting_auxiliary_follows = false;
-    for (size_t aux_end = end_pos + 1; aux_end <= std::min(codepoints.size(), end_pos + 2); ++aux_end) {
+    for (size_t aux_end = end_pos + 1; aux_end <= lookaheadEnd(codepoints.size(), end_pos, 2); ++aux_end) {
       const auto* aux = lookupEntryInRange(dict_manager, codepoints, end_pos, aux_end, core::PartOfSpeech::Auxiliary);
       te_selecting_auxiliary_follows =
           te_selecting_auxiliary_follows || (aux != nullptr && (aux->extended_pos == core::ExtendedPOS::AuxAspectIru ||
@@ -177,7 +177,7 @@ bool lacksLicensingEnvironment(const DictionaryCandidateContext& ctx, const core
     }
     // The mora may instead open a following word (かえって+いい).
     bool content_word_follows = false;
-    for (size_t word_end = end_pos + 2; word_end <= std::min(codepoints.size(), end_pos + 3); ++word_end) {
+    for (size_t word_end = end_pos + 2; word_end <= lookaheadEnd(codepoints.size(), end_pos, 3); ++word_end) {
       content_word_follows = content_word_follows || lookupEntryInRange(dict_manager, codepoints, end_pos, word_end,
                                                                         core::PartOfSpeech::Adjective) != nullptr;
     }

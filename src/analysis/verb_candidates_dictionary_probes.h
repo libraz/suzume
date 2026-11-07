@@ -352,6 +352,10 @@ bool hasCaseParticleDictionaryEntry(const dictionary::DictionaryManager* dict_ma
 bool oneMoraParticleEndsAt(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
                            size_t pos, core::ExtendedPOS particle_pos);
 
+// ExtendedPOS of the one-mora particle ending at @p pos, or Unknown when none is listed.
+core::ExtendedPOS oneMoraParticlePosEndingAt(const dictionary::DictionaryManager* dict_manager,
+                                             const std::vector<char32_t>& codepoints, size_t pos);
+
 // True when a complete case-particle entry ends exactly at @p pos.
 bool followsCaseParticle(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
                          size_t pos);

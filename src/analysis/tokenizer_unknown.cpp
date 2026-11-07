@@ -514,7 +514,7 @@ void addUnknownCandidateEdges(core::Lattice& lattice, const tokenizer_unknown_de
     // Longest closed-class evidence takes priority over the nominalized
     // renyokei alternative; a standalone が/を still licenses it.
     bool longer_dependent_follows = false;
-    const size_t probe_end = std::min(codepoints.size(), candidate.end + static_cast<size_t>(4));
+    const size_t probe_end = lookaheadEnd(codepoints.size(), candidate.end, 4);
     const std::string_view following_probe = textRange(text, byte_offsets, candidate.end, probe_end);
     for (const auto& result : dict_manager.lookup(following_probe, 0)) {
       if (result.entry != nullptr && result.length > 1 &&

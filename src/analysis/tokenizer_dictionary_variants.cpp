@@ -44,7 +44,7 @@ constexpr PartOfSpeechMask kHeldFinalParticleHostMask = kPredicateHostMask | kNo
 // through the mark (the dialectal ばい inside やばーい).
 void addElidedProlongedDictionaryCandidates(core::Lattice& lattice, const dictionary::DictionaryManager& dict_manager,
                                             const std::vector<char32_t>& codepoints, size_t start_pos) {
-  const size_t window_end = std::min(codepoints.size(), start_pos + kElidedLookupWindow);
+  const size_t window_end = lookaheadEnd(codepoints.size(), start_pos, kElidedLookupWindow);
   // The mark holds the mora in front of it, so it can neither open the window
   // nor be the only thing in it. Scanning for one before building anything keeps
   // the ordinary position — which has no mark — free of allocation.
@@ -106,7 +106,7 @@ void addElidedProlongedDictionaryCandidates(core::Lattice& lattice, const dictio
       continue;
     }
     const std::string surface = extractSubstring(codepoints, start_pos, end_pos);
-    const std::string_view lemma = tokenizer_dictionary_detail::lemmaOrSurface(*result.entry);
+    const std::string_view lemma = lemmaOrSurface(*result.entry);
     // Charged the same per mark as emphasis at a word's end: the drawn-out
     // spelling is the marked one and must not undercut a word that owns the
     // whole run unmarked.
@@ -126,7 +126,7 @@ void addElidedProlongedDictionaryCandidates(core::Lattice& lattice, const dictio
 // the cut surface with its own lemma.
 void addTruncatedAdverbCandidates(core::Lattice& lattice, const dictionary::DictionaryManager& dict_manager,
                                   const std::vector<char32_t>& codepoints, size_t start_pos) {
-  const size_t window_end = std::min(codepoints.size(), start_pos + kElidedLookupWindow);
+  const size_t window_end = lookaheadEnd(codepoints.size(), start_pos, kElidedLookupWindow);
   for (size_t pos = start_pos + 1; pos < window_end; ++pos) {
     if (normalize::classifyChar(codepoints[pos]) != normalize::CharType::Hiragana) {
       return;
@@ -150,8 +150,8 @@ void addTruncatedAdverbCandidates(core::Lattice& lattice, const dictionary::Dict
     }
     tokenizer_dictionary_detail::addDictionaryOriginEdge(
         lattice, surface, start_pos, end_pos, adverb->pos, getCategoryCost(adverb->extended_pos),
-        core::LatticeEdge::kFromDictionary, tokenizer_dictionary_detail::lemmaOrSurface(*adverb),
-        dictionary::ConjugationType::None, adverb->extended_pos, "dict_truncated_adverb");
+        core::LatticeEdge::kFromDictionary, lemmaOrSurface(*adverb), dictionary::ConjugationType::None,
+        adverb->extended_pos, "dict_truncated_adverb");
     return;
   }
 }
@@ -163,7 +163,7 @@ void addTruncatedAdverbCandidates(core::Lattice& lattice, const dictionary::Dict
 // run, as the full greeting would, or hand off to a final or quotative particle.
 void addClippedInterjectionCandidates(core::Lattice& lattice, const dictionary::DictionaryManager& dict_manager,
                                       const std::vector<char32_t>& codepoints, size_t start_pos) {
-  const size_t window_end = std::min(codepoints.size(), start_pos + kElidedLookupWindow);
+  const size_t window_end = lookaheadEnd(codepoints.size(), start_pos, kElidedLookupWindow);
   for (size_t end_pos = start_pos + 2; end_pos <= window_end; ++end_pos) {
     if (normalize::classifyChar(codepoints[end_pos - 1]) != normalize::CharType::Hiragana) {
       return;
@@ -189,7 +189,7 @@ void addClippedInterjectionCandidates(core::Lattice& lattice, const dictionary::
     if (!closes_run && span_end == end_pos) {
       constexpr size_t kHandoffParticleProbe = 2;
       for (const auto& match : lookupResultsInRange(dict_manager, codepoints, span_end,
-                                                    std::min(codepoints.size(), span_end + kHandoffParticleProbe))) {
+                                                    lookaheadEnd(codepoints.size(), span_end, kHandoffParticleProbe))) {
         closes_run = closes_run || (match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Particle &&
                                     (match.entry->extended_pos == core::ExtendedPOS::ParticleFinal ||
                                      (match.entry->extended_pos == core::ExtendedPOS::ParticleQuote &&
@@ -205,9 +205,8 @@ void addClippedInterjectionCandidates(core::Lattice& lattice, const dictionary::
     }
     tokenizer_dictionary_detail::addDictionaryOriginEdge(
         lattice, extractSubstring(codepoints, start_pos, span_end), start_pos, span_end, interjection->pos,
-        getCategoryCost(interjection->extended_pos), core::LatticeEdge::kFromDictionary,
-        tokenizer_dictionary_detail::lemmaOrSurface(*interjection), dictionary::ConjugationType::None,
-        interjection->extended_pos, "dict_clipped_interjection");
+        getCategoryCost(interjection->extended_pos), core::LatticeEdge::kFromDictionary, lemmaOrSurface(*interjection),
+        dictionary::ConjugationType::None, interjection->extended_pos, "dict_clipped_interjection");
   }
 }
 

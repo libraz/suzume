@@ -75,7 +75,7 @@ bool matchV2BaseForm(const CompoundMatchContext& ctx, V2FormMatch& form) {
   if (!matched_kanji && ctx.char_types[ctx.v2_start] == CharType::Hiragana &&
       (v2_reading == "とる" || v2_reading == "どる")) {
     const std::string full_compound = normalize::concat(ctx.v1_surface, v2_reading);
-    if (ctx.dict_manager.lookupExact(full_compound, core::PartOfSpeech::Verb) == nullptr) {
+    if (!verb_helpers::isVerbInDictionary(&ctx.dict_manager, full_compound)) {
       return false;
     }
   }

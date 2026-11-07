@@ -7,6 +7,7 @@
 
 #include "grammar/honorific_verbs.h"
 #include "join_compound_verb_internal.h"
+#include "verb_candidates_dictionary_probes.h"
 #include "verb_candidates_verb_stems.h"
 
 namespace suzume::analysis {
@@ -67,7 +68,7 @@ void addDictionaryVerifiedIchidanCompoundNominalCandidate(core::Lattice& lattice
 
   const std::string surface = extractSubstring(codepoints, start_pos, end_pos);
   const std::string lemma = surface + "る";
-  if (dict_manager.lookupExact(lemma, core::PartOfSpeech::Verb) == nullptr) {
+  if (!verb_helpers::isVerbInDictionary(&dict_manager, lemma)) {
     return;
   }
 
@@ -91,7 +92,7 @@ void addDictionaryVerifiedGodanCompoundNominalCandidate(core::Lattice& lattice, 
     return;
   }
   const std::string v1_base = normalize::concat(extractSubstring(codepoints, start_pos, v1_kanji_end), v1_base_ending);
-  if (dict_manager.lookupExact(v1_base, core::PartOfSpeech::Verb) == nullptr) {
+  if (!verb_helpers::isVerbInDictionary(&dict_manager, v1_base)) {
     return;
   }
 
@@ -123,7 +124,7 @@ void addDictionaryVerifiedGodanCompoundNominalCandidate(core::Lattice& lattice, 
   // subsidiary verbs are handled by the ordinary compound matcher; this
   // fallback is only for an otherwise unregistered Godan V2 such as 畳む.
   const std::string v2_surface = extractSubstring(codepoints, v2_start, end_pos);
-  if (dict_manager.lookupExact(v2_surface + "る", core::PartOfSpeech::Verb) != nullptr) {
+  if (verb_helpers::isVerbInDictionary(&dict_manager, v2_surface + "る")) {
     return;
   }
 
@@ -315,7 +316,7 @@ void addCompoundVerbJoinCandidates(core::Lattice& lattice, std::string_view text
       kanji_end + 1 < codepoints.size() && char_types[kanji_end + 1] == CharType::Kanji &&
       kana::isIOrERowCodepoint(renyokei_char)) {
     const std::string multi_kanji_ichidan_base = extractSubstring(codepoints, start_pos, kanji_end + 1) + "る";
-    if (dict_manager.lookupExact(multi_kanji_ichidan_base, core::PartOfSpeech::Verb) != nullptr) {
+    if (verb_helpers::isVerbInDictionary(&dict_manager, multi_kanji_ichidan_base)) {
       adopt_dictionary_v1(kanji_end + 1);
       dict_compound_v1_lemma = multi_kanji_ichidan_base;
     }
@@ -340,7 +341,7 @@ void addCompoundVerbJoinCandidates(core::Lattice& lattice, std::string_view text
         if (base2 != 0) {
           std::string embedded2(textRange(text, byte_offsets, k2_start, k2_end));
           embedded2 += normalize::encodeUtf8(base2);
-          if (dict_manager.lookupExact(embedded2, core::PartOfSpeech::Verb) != nullptr) {
+          if (verb_helpers::isVerbInDictionary(&dict_manager, embedded2)) {
             adopt_dictionary_v1(k2_end + 1);
             dict_compound_v1_lemma = embedded2;  // best-effort; unused once verified
           }

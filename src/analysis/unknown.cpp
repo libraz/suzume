@@ -109,7 +109,7 @@ bool spansConjunctionStart(const UnknownCandidate& candidate, const std::vector<
 
   constexpr size_t kConjunctionWindowChars = 8;
   for (size_t boundary = candidate.start; boundary < candidate.end; ++boundary) {
-    size_t window_end = std::min(codepoints.size(), boundary + kConjunctionWindowChars);
+    size_t window_end = lookaheadEnd(codepoints.size(), boundary, kConjunctionWindowChars);
     for (size_t conjunction_end = boundary + 1; conjunction_end <= window_end; ++conjunction_end) {
       const auto* conjunction_entry =
           lookupEntryInRange(*dict_manager, codepoints, boundary, conjunction_end, core::PartOfSpeech::Conjunction);
@@ -617,7 +617,7 @@ core::PartOfSpeech UnknownWordGenerator::getPosForType(normalize::CharType ctype
 }
 
 float UnknownWordGenerator::getCostForType(normalize::CharType ctype, size_t length) {
-  float base_cost = 1.0F;
+  const float base_cost = candidate::kUnknownBaseCost;
 
   switch (ctype) {
     case normalize::CharType::Kanji:
@@ -627,7 +627,7 @@ float UnknownWordGenerator::getCostForType(normalize::CharType ctype, size_t len
       // E.g., 自然言語処理 should stay as one token (no evidence to split)
       // But 今夏最高 splits because 今 is marked as PREFIX
       if (length == 1) {
-        return base_cost + 0.4F;  // 1.4: prefer over suffix entries (1.5)
+        return base_cost + candidate::kUnknownKanjiSingleCharPenalty;  // 1.4: prefer over suffix entries (1.5)
       }
       // 2+ chars: all valid compound lengths, no penalty
       // Long compounds like 独立行政法人情報処理推進機構 should stay as one token
@@ -637,18 +637,18 @@ float UnknownWordGenerator::getCostForType(normalize::CharType ctype, size_t len
       // Katakana: prefer 4+ characters for loanwords (マスカラ, デスクトップ)
       // Penalize short sequences to prevent splits like マ+スカラ
       if (length == 1) {
-        return base_cost + 1.5F;  // Strong penalty for 1-char
+        return base_cost + candidate::kUnknownKatakanaSingleCharPenalty;  // Strong penalty for 1-char
       }
       if (length == 2) {
-        return base_cost + 1.0F;  // Moderate penalty for 2-char
+        return base_cost + candidate::kUnknownKatakanaDoubleCharPenalty;  // Moderate penalty for 2-char
       }
       if (length == 3) {
-        return base_cost + 0.3F;  // Light penalty for 3-char
+        return base_cost + candidate::kUnknownKatakanaLightPenalty;  // Light penalty for 3-char
       }
       if (length >= 4 && length <= 10) {
         return base_cost;  // Optimal: 4-10 chars
       }
-      return base_cost + 0.3F;  // 11+ chars: light penalty
+      return base_cost + candidate::kUnknownKatakanaLightPenalty;  // 11+ chars: light penalty
 
     case normalize::CharType::Alphabet:
       // Alphabet: prefer longer sequences for identifiers/words
@@ -656,14 +656,14 @@ float UnknownWordGenerator::getCostForType(normalize::CharType ctype, size_t len
       if (length >= 2 && length <= 20) {
         // Give bonus to longer sequences to prefer them over splits
         // This helps keep "getUserData" together vs "getUser" + "Data"
-        float length_bonus = (length >= 8) ? -0.3F : 0.0F;
-        return base_cost + 0.2F + length_bonus;
+        float length_bonus = (length >= 8) ? candidate::kUnknownAlphabetLongBonus : 0.0F;
+        return base_cost + candidate::kUnknownAlphabetBasePenalty + length_bonus;
       }
-      return base_cost + 0.5F;
+      return base_cost + candidate::kUnknownAlphabetOutOfRangePenalty;
 
     case normalize::CharType::Digit:
       // Digits: always reasonable
-      return base_cost - 0.2F;
+      return base_cost + candidate::kUnknownDigitBonus;
 
     case normalize::CharType::Hiragana:
       // Hiragana only: usually function words
@@ -673,15 +673,17 @@ float UnknownWordGenerator::getCostForType(normalize::CharType ctype, size_t len
       //   but closer, and bigram penalties on bad connections can tip it
       // 4+: increasing penalty to force segmentation
       if (length == 1) {
-        return base_cost + 1.0F;  // 2.0: original cost
+        return base_cost + candidate::kUnknownHiraganaSingleCharPenalty;  // 2.0: original cost
       }
       if (length <= 3) {
-        return base_cost + 0.4F;  // 1.4: compete with particle chains
+        return base_cost + candidate::kUnknownHiraganaShortPenalty;  // 1.4: compete with particle chains
       }
-      return base_cost + 0.5F + (static_cast<float>(length) - 3.0F) * 0.5F;
+      return base_cost + candidate::kUnknownHiraganaLongBasePenalty +
+             (static_cast<float>(length) - candidate::kUnknownHiraganaLongFreeLength) *
+                 candidate::kUnknownHiraganaLongStep;
 
     default:
-      return base_cost + 1.5F;
+      return base_cost + candidate::kUnknownOtherCharPenalty;
   }
 }
 

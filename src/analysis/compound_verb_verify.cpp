@@ -133,14 +133,14 @@ CompoundV1Verification verifyCompoundVerbV1(const CompoundV1VerificationRequest&
       // Try all sokuonbin-compatible godan endings.
       for (char32_t ending : kSokuonbinEndings) {
         std::string candidate = v1_base + normalize::encodeUtf8(ending);
-        if (dict_manager.lookupExact(candidate, core::PartOfSpeech::Verb) != nullptr) {
+        if (verb_helpers::isVerbInDictionary(&dict_manager, candidate)) {
           v1_verified = true;
           v1_dict_verified = true;
           v1_base = candidate;
           break;
         }
       }
-    } else if (dict_manager.lookupExact(v1_base, core::PartOfSpeech::Verb) != nullptr) {
+    } else if (verb_helpers::isVerbInDictionary(&dict_manager, v1_base)) {
       v1_verified = true;
       v1_dict_verified = true;
     }
@@ -203,7 +203,7 @@ CompoundV1Verification verifyCompoundVerbV1(const CompoundV1VerificationRequest&
       const size_t v1_second_char_byte = byteOffsetAt(byte_offsets, start_pos + 1);
       std::string embedded_base(text.substr(v1_second_char_byte, v1_end_byte - v1_second_char_byte));
       embedded_base += "る";
-      if (dict_manager.lookupExact(embedded_base, core::PartOfSpeech::Verb) != nullptr) {
+      if (verb_helpers::isVerbInDictionary(&dict_manager, embedded_base)) {
         v1_verified = true;
         v1_embedded_verified = true;
         SUZUME_DEBUG_LOG_VERBOSE("[COMPOUND] V1 verified via embedded dict verb \"" << embedded_base << "\"\n");
@@ -232,8 +232,7 @@ CompoundV1Verification verifyCompoundVerbV1(const CompoundV1VerificationRequest&
     if (use_inflection_fallback) {
       if (verb_helpers::hasNonVerbDictionaryEntry(&dict_manager, v1_renyokei)) {
         const auto inflection_candidate = inflection.getBest(v1_renyokei);
-        const bool is_complete_dictionary_adjective =
-            dict_manager.lookupExact(v1_renyokei, core::PartOfSpeech::Adjective) != nullptr;
+        const bool is_complete_dictionary_adjective = verb_helpers::isAdjectiveInDictionary(&dict_manager, v1_renyokei);
         const bool productive_godan_compound =
             !is_complete_dictionary_adjective && !is_ichidan && kanji_count == 1 &&
             inflection_candidate.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence &&
@@ -274,7 +273,7 @@ CompoundV1Verification verifyCompoundVerbV1(const CompoundV1VerificationRequest&
     if (use_inflection_fallback && v2_start < codepoints.size() && codepoints[v2_start] == U'い') {
       std::string adjective_terminal(text.substr(start_byte, v2_start_byte - start_byte));
       adjective_terminal += "い";
-      if (dict_manager.lookupExact(adjective_terminal, core::PartOfSpeech::Adjective) != nullptr) {
+      if (verb_helpers::isAdjectiveInDictionary(&dict_manager, adjective_terminal)) {
         use_inflection_fallback = false;
       }
     }

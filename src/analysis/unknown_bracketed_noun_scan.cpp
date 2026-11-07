@@ -147,19 +147,17 @@ bool liesInsideFormalNounNegativePredicate(const BracketedNounContext& ctx, size
           predicate.end >= codepoints.size()) {
         continue;
       }
-      const size_t probe_end = std::min(codepoints.size(), predicate.end + static_cast<size_t>(2));
+      const size_t probe_end = lookaheadEnd(codepoints.size(), predicate.end, 2);
       for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, predicate.end, probe_end)) {
-        if (match.entry != nullptr && (match.entry->extended_pos == core::ExtendedPOS::AuxNegativeNu ||
-                                       match.entry->extended_pos == core::ExtendedPOS::AuxNegativeNai)) {
+        if (match.entry != nullptr && core::isNegativeNuNaiType(match.entry->extended_pos)) {
           return true;
         }
       }
     }
-    const size_t auxiliary_limit = std::min(codepoints.size(), pos + static_cast<size_t>(5));
+    const size_t auxiliary_limit = lookaheadEnd(codepoints.size(), pos, 5);
     for (size_t auxiliary_start = pos + 1; auxiliary_start < auxiliary_limit; ++auxiliary_start) {
       for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, auxiliary_start, auxiliary_limit)) {
-        if (match.entry == nullptr || (match.entry->extended_pos != core::ExtendedPOS::AuxNegativeNu &&
-                                       match.entry->extended_pos != core::ExtendedPOS::AuxNegativeNai)) {
+        if (match.entry == nullptr || !core::isNegativeNuNaiType(match.entry->extended_pos)) {
           continue;
         }
         const std::string full_predicate =
@@ -177,8 +175,6 @@ bool liesInsideFormalNounNegativePredicate(const BracketedNounContext& ctx, size
   return false;
 }
 
-// Length of the longest registered suffix of two or more kana that opens at
-// @p pos, or 0. A suffix is bound leftward to a nominal host.
 }  // namespace
 
 bool opensNominalFollowerAt(const BracketedNounContext& ctx, size_t pos, size_t run_end) {
@@ -187,7 +183,7 @@ bool opensNominalFollowerAt(const BracketedNounContext& ctx, size_t pos, size_t 
     return false;
   }
   constexpr size_t kFunctionWordProbe = 4;
-  const size_t win_end = std::min(codepoints.size(), pos + kFunctionWordProbe);
+  const size_t win_end = lookaheadEnd(codepoints.size(), pos, kFunctionWordProbe);
   for (const auto& res : lookupResultsInRange(*ctx.dict_manager, codepoints, pos, win_end)) {
     if (res.entry == nullptr) {
       continue;
@@ -197,8 +193,7 @@ bool opensNominalFollowerAt(const BracketedNounContext& ctx, size_t pos, size_t 
         epos != core::ExtendedPOS::ParticleFinal) {
       return true;
     }
-    if (res.entry->pos == core::PartOfSpeech::Auxiliary &&
-        (epos == core::ExtendedPOS::AuxCopulaDa || epos == core::ExtendedPOS::AuxCopulaDesu) &&
+    if (res.entry->pos == core::PartOfSpeech::Auxiliary && core::isCopulaType(epos) &&
         (pos + res.length > run_end ||
          continuesAuxiliaryChain(*ctx.dict_manager, codepoints, epos, pos + res.length, run_end))) {
       return true;
@@ -207,6 +202,8 @@ bool opensNominalFollowerAt(const BracketedNounContext& ctx, size_t pos, size_t 
   return false;
 }
 
+// Length of the longest registered suffix of two or more kana that opens at
+// @p pos, or 0. A suffix is bound leftward to a nominal host.
 size_t suffixLengthAt(const BracketedNounContext& ctx, size_t pos) {
   constexpr size_t kSuffixProbe = 3;
   return longestDictionaryEntryLengthFrom(ctx.dict_manager, ctx.codepoints, pos, 2, kSuffixProbe,
@@ -493,7 +490,7 @@ PromotedRun classifyRightBrackets(const BracketedNounContext& ctx, const Bracket
                             multiCharFunctionWordAt(ctx, scan) || promoted.right_genitive_after_internal_particle ||
                             promoted.right_genitive_after_substantive_run;
   if (dict_manager != nullptr && scan < codepoints.size() && codepoints[scan] == U'っ') {
-    const size_t particle_end = std::min(codepoints.size(), scan + static_cast<size_t>(4));
+    const size_t particle_end = lookaheadEnd(codepoints.size(), scan, 4);
     if (lookupResultsHaveExtendedPOS(lookupResultsInRange(*dict_manager, codepoints, scan, particle_end),
                                      core::ExtendedPOS::ParticleFinal)) {
       promoted.right_sokuon_final_particle = true;
@@ -532,7 +529,7 @@ PromotedRun classifyRightBrackets(const BracketedNounContext& ctx, const Bracket
   bool predicate_closes_on_suffix = false;
   for (size_t pred_start = start_pos; pred_start < scan && right_suffix_len > 0 && !predicate_closes_on_suffix;
        ++pred_start) {
-    const size_t probe_end = std::min(codepoints.size(), scan + right_suffix_len);
+    const size_t probe_end = lookaheadEnd(codepoints.size(), scan, right_suffix_len);
     for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, pred_start, probe_end)) {
       if (match.entry != nullptr && match.length >= 2 &&
           (match.entry->pos == core::PartOfSpeech::Verb || match.entry->pos == core::PartOfSpeech::Adjective) &&
@@ -576,10 +573,8 @@ PromotedRun classifyRightBrackets(const BracketedNounContext& ctx, const Bracket
   if (dict_manager != nullptr && scan < codepoints.size() && isRightBoundaryParticle(codepoints[scan])) {
     constexpr size_t kCopulaWindow = 4;
     for (const auto& match :
-         lookupResultsInRange(*dict_manager, codepoints, scan, std::min(codepoints.size(), scan + kCopulaWindow))) {
-      if (match.entry != nullptr && match.length > 1 &&
-          (match.entry->extended_pos == core::ExtendedPOS::AuxCopulaDa ||
-           match.entry->extended_pos == core::ExtendedPOS::AuxCopulaDesu)) {
+         lookupResultsInRange(*dict_manager, codepoints, scan, lookaheadEnd(codepoints.size(), scan, kCopulaWindow))) {
+      if (match.entry != nullptr && match.length > 1 && core::isCopulaType(match.entry->extended_pos)) {
         promoted.right_particle_opens_copula = true;
         break;
       }

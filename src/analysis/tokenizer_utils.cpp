@@ -69,8 +69,7 @@ bool isDictionaryVerbContinuative(const dictionary::DictionaryManager* dict_mana
   return (!godan_ending.empty() &&
           verb_helpers::isVerbInDictionary(dict_manager, codepoints, head_start, continuative_end - 1, godan_ending)) ||
          (kana::isERowCodepoint(ending) &&
-          verb_helpers::isVerbInDictionary(dict_manager, codepoints, head_start, continuative_end,
-                                           normalize::encodeUtf8(core::hiragana::kRu)));
+          verb_helpers::isVerbInDictionary(dict_manager, codepoints, head_start, continuative_end, "る"));
 }
 
 }  // namespace
@@ -144,7 +143,7 @@ size_t longestNominalVerbContinuativeStart(const std::vector<char32_t>& codepoin
       continue;
     }
     const std::string continuation =
-        extractSubstring(codepoints, continuative_end, std::min(codepoints.size(), continuative_end + 3));
+        extractSubstring(codepoints, continuative_end, lookaheadEnd(codepoints.size(), continuative_end, 3));
     if (okurigana_length == 2) {
       const std::string okurigana = extractSubstring(codepoints, kanji_end, continuative_end);
       const bool is_auxiliary = dict_manager->lookupExact(okurigana, core::PartOfSpeech::Auxiliary) != nullptr;
@@ -276,7 +275,7 @@ std::string extractSubstring(const std::vector<char32_t>& codepoints, size_t sta
 }
 
 std::string extractClosedClassProbe(const std::vector<char32_t>& codepoints, size_t start) {
-  return extractSubstring(codepoints, start, std::min(codepoints.size(), start + kClosedClassProbeChars));
+  return extractSubstring(codepoints, start, lookaheadEnd(codepoints.size(), start, kClosedClassProbeChars));
 }
 
 const std::vector<grammar::InflectionCandidate>& analysesInRange(const grammar::Inflection& inflection,
@@ -340,7 +339,7 @@ bool hasNominalForcingParticleContinuation(const std::vector<char32_t>& codepoin
     return false;
   }
 
-  const size_t probe_end = std::min(codepoints.size(), pos + static_cast<size_t>(4));
+  const size_t probe_end = lookaheadEnd(codepoints.size(), pos, 4);
   bool has_particle = false;
   for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, pos, probe_end)) {
     if (match.entry == nullptr) {
@@ -360,7 +359,7 @@ bool startsLongerNonParticleEntry(const std::vector<char32_t>& codepoints, size_
   if (dict_manager == nullptr || start_pos >= codepoints.size()) {
     return false;
   }
-  const size_t probe_end = std::min(codepoints.size(), start_pos + static_cast<size_t>(4));
+  const size_t probe_end = lookaheadEnd(codepoints.size(), start_pos, 4);
   for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, start_pos, probe_end)) {
     if (match.entry != nullptr && match.entry->pos != core::PartOfSpeech::Particle &&
         normalize::utf8Length(match.entry->surface) > 1 && !isParticleHomograph(*dict_manager, *match.entry)) {

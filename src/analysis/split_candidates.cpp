@@ -574,7 +574,7 @@ void addNounVerbSplitCandidates(core::Lattice& lattice, std::string_view text, c
           looks_like_verb = true;
         }
         if (!base_in_dict && !(cand.confidence < 0.5F) &&
-            dict_manager.lookupExact(cand.base_form, core::PartOfSpeech::Verb) != nullptr) {
+            verb_helpers::isVerbInDictionary(&dict_manager, cand.base_form)) {
           base_in_dict = true;
         }
         if (looks_like_verb && base_in_dict) {

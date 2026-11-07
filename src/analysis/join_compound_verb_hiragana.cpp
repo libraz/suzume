@@ -55,7 +55,7 @@ size_t findParticleInitialClosedOnbinSplit(std::string_view text, const std::vec
 
     for (const auto& v2_verb : subsidiaryVerbs()) {
       if (!v2_verb.joins_general || v2_verb.reading == nullptr || v2_verb.verb_type != V2VerbType::Godan ||
-          dict_manager.lookupExact(v2_verb.reading, core::PartOfSpeech::Verb) == nullptr) {
+          !verb_helpers::isVerbInDictionary(&dict_manager, v2_verb.reading)) {
         continue;
       }
       const auto [te_stem, uses_de] = generateTeFormStem(v2_verb.reading, v2_verb.verb_type, v2_verb.base_ending);
@@ -185,7 +185,7 @@ void addHiraganaCompoundVerbJoinCandidates(core::Lattice& lattice, std::string_v
       if (!godan_suffix.empty()) {
         const std::string godan_base =
             normalize::concat(v1_surface.substr(0, v1_surface.size() - core::kJapaneseCharBytes), godan_suffix);
-        if (dict_manager.lookupExact(godan_base, core::PartOfSpeech::Verb) != nullptr) {
+        if (verb_helpers::isVerbInDictionary(&dict_manager, godan_base)) {
           continue;
         }
       }
