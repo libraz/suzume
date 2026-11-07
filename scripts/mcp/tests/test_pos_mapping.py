@@ -11,6 +11,27 @@ def test_particle_correction_accepts_raw_japanese_noun_tag():
     assert tokens[0]["pos"] == "Particle"
 
 
+def test_contracted_progressive_te_before_negative_is_the_particle():
+    tokens = [
+        {"surface": "聞い", "pos": "動詞", "pos_sub1": "自立", "lemma": "聞く"},
+        {"surface": "て", "pos": "動詞", "pos_sub1": "非自立", "lemma": "てる"},
+        {"surface": "ない", "pos": "助動詞", "pos_sub1": "*", "lemma": "ない"},
+    ]
+    correct_mecab_pos(tokens)
+    assert tokens[1]["pos"] == "助詞"
+    assert tokens[1]["lemma"] == "て"
+
+
+def test_contracted_progressive_te_before_past_stays_teru():
+    tokens = [
+        {"surface": "聞い", "pos": "動詞", "pos_sub1": "自立", "lemma": "聞く"},
+        {"surface": "て", "pos": "動詞", "pos_sub1": "非自立", "lemma": "てる"},
+        {"surface": "た", "pos": "助動詞", "pos_sub1": "*", "lemma": "た"},
+    ]
+    correct_mecab_pos(tokens)
+    assert tokens[1]["lemma"] == "てる"
+
+
 def test_copula_de_before_adverbial_adjective_and_verb_is_case_particle():
     tokens = [
         {"surface": "公園", "pos": "名詞", "pos_sub1": "一般", "lemma": "公園"},

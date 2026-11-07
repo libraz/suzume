@@ -341,6 +341,22 @@ def correct_mecab_pos(tokens: list[dict]) -> None:
             t["pos"] = "名詞"
             t["pos_sub1"] = "形容動詞語幹"
 
+        # Before the negative, the reference reads the te of a dropped-い
+        # progressive as the contracted てる in some cells (聞い+て+ない) and as
+        # the conjunctive particle in others (読ん+で+ない, 食べ+て+なく+て). The
+        # negative attaches to the dropped いる, so the te is the particle.
+        if (
+            surface in ("て", "で")
+            and pos == "動詞"
+            and t.get("pos_sub1") == "非自立"
+            and t.get("lemma") in ("てる", "でる")
+            and idx + 1 < len(tokens)
+            and tokens[idx + 1].get("lemma") == "ない"
+            and tokens[idx + 1].get("pos") in ("助動詞", "形容詞")
+        ):
+            t.update(pos="助詞", pos_sub1="接続助詞", conj_type="*", conj_form="*", lemma=surface)
+            continue
+
         # The copula continuative で makes the following adjective the predicate
         # of its noun (晴天+で+よい). An adjective in the continuative that
         # modifies a following verb is no such predicate, so after a plain noun
