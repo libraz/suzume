@@ -71,6 +71,7 @@ ADVERB_OVERRIDES: set[str] = {
     "めちゃ",
     "ともすれば",
     "半ば",
+    "結局",
 }
 
 

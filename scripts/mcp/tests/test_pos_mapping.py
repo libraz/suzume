@@ -47,6 +47,10 @@ class TestMapMecabPos:
         token = {"surface": "いずれ", "pos": "名詞", "pos_sub1": "副詞可能", "pos_sub2": ""}
         assert map_mecab_pos(token) == "Adverb"
 
+    def test_adverb_override_sentence_adverb_kekkyoku(self):
+        token = {"surface": "結局", "pos": "名詞", "pos_sub1": "副詞可能", "pos_sub2": ""}
+        assert map_mecab_pos(token) == "Adverb"
+
     def test_lexical_mamonaku_stays_adverb(self):
         token = {"surface": "間もなく", "pos": "副詞", "lemma": "間もなく"}
         correct_mecab_pos([token])
