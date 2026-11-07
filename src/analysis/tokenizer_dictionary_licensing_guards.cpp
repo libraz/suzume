@@ -491,11 +491,15 @@ bool lacksLicensingEnvironment(const DictionaryCandidateContext& ctx, const core
   // A deverbal suffix after a kana continuative binds to it only when it
   // closes the kanji run; otherwise it opens the next noun, whether listed
   // alone or as the tail of a lexical noun (申し込み+手続き, 置き+場所).
+  // Its host is a continuative, which ends on kana, so after a kanji the
+  // suffix spelling is the tail of the kanji-run word (運転手, like 運転者).
   if (result.entry->pos == core::PartOfSpeech::Suffix || result.entry->pos == core::PartOfSpeech::Noun) {
     const size_t suffix_pos = start_pos + result.length - 1;
-    if (suffix_pos > 0 && kana::isHiraganaCodepoint(codepoints[suffix_pos - 1]) &&
-        grammar::isDeverbalSuffixKanji(codepoints[suffix_pos]) &&
-        !grammar::isBoundDeverbalSuffixAt(codepoints, suffix_pos)) {
+    if (suffix_pos > 0 && grammar::isDeverbalSuffixKanji(codepoints[suffix_pos]) &&
+        ((kana::isHiraganaCodepoint(codepoints[suffix_pos - 1]) &&
+          !grammar::isBoundDeverbalSuffixAt(codepoints, suffix_pos)) ||
+         (result.entry->pos == core::PartOfSpeech::Suffix && result.length == 1 &&
+          normalize::isKanjiCodepoint(codepoints[suffix_pos - 1])))) {
       return true;
     }
   }

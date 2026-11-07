@@ -1807,6 +1807,122 @@
       ],
       "id": "erugomiwo_su",
       "input": "燃えるごみを出す。"
+    },
+    {
+      "description": "Agentive suffix 手 after a kanji is the tail of the kanji-run word",
+      "expected": [
+        {
+          "lemma": "運転手",
+          "pos": "Noun",
+          "surface": "運転手"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "募集",
+          "pos": "Noun",
+          "surface": "募集"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "wo_shiteiru",
+      "input": "運転手を募集している。"
+    },
+    {
+      "description": "Kanji-run word ending in 手 before の",
+      "expected": [
+        {
+          "lemma": "物流業界",
+          "pos": "Noun",
+          "surface": "物流業界"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "運転手",
+          "pos": "Noun",
+          "surface": "運転手"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "残業規制",
+          "pos": "Noun",
+          "surface": "残業規制"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "始まる",
+          "pos": "Verb",
+          "surface": "始まっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "deha_no_ga_mattta",
+      "input": "物流業界では運転手の残業規制が始まった。"
+    },
+    {
+      "description": "Kanji-run word ending in 手 before が",
+      "expected": [
+        {
+          "lemma": "運転手",
+          "pos": "Noun",
+          "surface": "運転手"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ga_ta_3",
+      "input": "運転手が来た"
     }
   ],
   "description": "noun_compounds tests",
