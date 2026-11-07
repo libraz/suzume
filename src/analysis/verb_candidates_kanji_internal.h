@@ -83,7 +83,8 @@ void appendSelectedKanjiVerbCandidate(const std::vector<char32_t>& codepoints, s
                                       const grammar::Inflection& inflection,
                                       const dictionary::DictionaryManager* dict_manager,
                                       const VerbCandidateOptions& verb_opts, bool sokuonbin_stem_verified,
-                                      const std::string& sokuonbin_lemma, std::vector<UnknownCandidate>& candidates);
+                                      const std::string& sokuonbin_lemma, bool has_conjunctive_initial,
+                                      std::vector<UnknownCandidate>& candidates);
 void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, size_t start_pos, size_t kanji_end,
                                        size_t hiragana_end, const grammar::Inflection& inflection,
                                        const dictionary::DictionaryManager* dict_manager,

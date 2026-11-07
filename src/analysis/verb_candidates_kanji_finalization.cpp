@@ -58,7 +58,6 @@ struct KanjiVerbSelection {
   const std::string& sokuonbin_lemma;
   bool proceed_is_i_row_ichidan;
   bool is_multi_kanji_godan_wa_renyokei;
-  bool has_mixed_godan_ka_stem;
   size_t kanji_count;
 };
 
@@ -478,9 +477,7 @@ bool rejectsInteriorCaseParticle(const KanjiVerbSelection& sel, bool in_dict) {
       if (!normalize::isKanjiCodepoint(codepoints[particle_pos - 1])) {
         continue;
       }
-      const auto* particle =
-          lookupEntryInRange(*dict_manager, codepoints, particle_pos, particle_pos + 1, core::PartOfSpeech::Particle);
-      if (particle == nullptr || particle->extended_pos != core::ExtendedPOS::ParticleCase) {
+      if (!vh::oneMoraParticleEndsAt(dict_manager, codepoints, particle_pos + 1, core::ExtendedPOS::ParticleCase)) {
         continue;
       }
       if (particle_pos + 2 == end_pos) {
@@ -916,7 +913,8 @@ void appendSelectedKanjiVerbCandidate(const std::vector<char32_t>& codepoints, s
                                       const grammar::Inflection& inflection,
                                       const dictionary::DictionaryManager* dict_manager,
                                       const VerbCandidateOptions& verb_opts, bool sokuonbin_stem_verified,
-                                      const std::string& sokuonbin_lemma, std::vector<UnknownCandidate>& candidates) {
+                                      const std::string& sokuonbin_lemma, bool has_conjunctive_initial,
+                                      std::vector<UnknownCandidate>& candidates) {
   // Only proceed if we found a matching candidate
   // Use lower threshold for valid i-row ichidan stems (感じ, 信じ, etc.)
   // but not single-kanji + い patterns (人い → 人 + いる)
@@ -929,8 +927,7 @@ void appendSelectedKanjiVerbCandidate(const std::vector<char32_t>& codepoints, s
   // before a verified verb.
   const bool is_multi_kanji_godan_wa_renyokei = isMultiKanjiGodanWaRenyokei(best, surface, codepoints, end_pos);
   const bool has_mixed_godan_ka_stem =
-      best.verb_type == grammar::VerbType::GodanKa && stem_end > kanji_end + 1 &&
-      vh::oneMoraParticleEndsAt(dict_manager, codepoints, kanji_end + 1, core::ExtendedPOS::ParticleConj);
+      best.verb_type == grammar::VerbType::GodanKa && stem_end > kanji_end + 1 && has_conjunctive_initial;
   const KanjiVerbSelection sel{codepoints,
                                start_pos,
                                kanji_end,
@@ -948,7 +945,6 @@ void appendSelectedKanjiVerbCandidate(const std::vector<char32_t>& codepoints, s
                                sokuonbin_lemma,
                                proceed_is_i_row_ichidan,
                                is_multi_kanji_godan_wa_renyokei,
-                               has_mixed_godan_ka_stem,
                                kanji_end - start_pos};
   if (rejectsBeforeConfidenceGate(sel)) {
     return;

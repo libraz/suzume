@@ -304,7 +304,8 @@ void appendAnalyzedKanjiVerbCandidates(const std::vector<char32_t>& codepoints, 
 
       appendSelectedKanjiVerbCandidate(codepoints, start_pos, kanji_end, stem_end, end_pos, surface, hiragana_part,
                                        best, is_dict_verified, follows_reduplicated_noun, inflection, dict_manager,
-                                       verb_opts, sokuonbin_stem_verified, sokuonbin_lemma, candidates);
+                                       verb_opts, sokuonbin_stem_verified, sokuonbin_lemma, has_conjunctive_initial,
+                                       candidates);
     }
   }
 }

@@ -138,7 +138,7 @@ bool appendGodanIzenkeiCandidate(const std::vector<char32_t>& codepoints, size_t
   // continuative (考え+て+ばかり), not a ta-row izenkei; a real one sits right
   // on the kanji (待て+ば, 育て+ば).
   if (cell_end >= kanji_end + 2 && grammar::isTeDeSurface(extractSubstring(codepoints, cell_end - 1, cell_end)) &&
-      (kana::isIRowCodepoint(codepoints[cell_end - 2]) || kana::isERowCodepoint(codepoints[cell_end - 2])) &&
+      kana::isIOrERowCodepoint(codepoints[cell_end - 2]) &&
       !vh::isVerbInDictionary(dict_manager, codepoints, start_pos, cell_end - 1, "つ")) {
     return false;
   }
@@ -417,7 +417,7 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
   if (kanji_end < hiragana_end) {
     char32_t first_hira = codepoints[kanji_end];
     // Check if first hiragana is e-row or i-row (ichidan renyokei ending)
-    if (kana::isERowCodepoint(first_hira) || kana::isIRowCodepoint(first_hira)) {
+    if (kana::isIOrERowCodepoint(first_hira)) {
       size_t renyokei_end = kanji_end + 1;  // kanji + e/i-row
       const std::string renyokei_surface = extractSubstring(codepoints, start_pos, renyokei_end);
       const std::string base_form = renyokei_surface + "る";  // 食べ + る = 食べる

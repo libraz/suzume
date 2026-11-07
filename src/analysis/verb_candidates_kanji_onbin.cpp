@@ -98,7 +98,7 @@ struct OnbinInflMatch {
 OnbinInflMatch bestOnbinInflMatch(const grammar::Inflection& inflection, const std::string& full_surface,
                                   const std::string& kanji_stem, grammar::GodanOnbinRange onbin_types) {
   OnbinInflMatch match;
-  float best_conf = 0.0F;
+  float best_conf = candidate::kNoConfidence;
   for (const auto& result : inflection.analyze(full_surface)) {
     if (result.confidence >= 0.5F && result.confidence > best_conf) {
       for (const auto& [verb_type, base_suffix] : onbin_types) {

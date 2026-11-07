@@ -336,17 +336,14 @@ void appendExtendedSokuonbinCandidates(const std::vector<char32_t>& codepoints, 
     // (行ける, 立てる, 起きる), and ろ is its imperative ending (食べろ). An
     // ichidan verb has no onbin: 行け+って.
     const char32_t stem_last = utf8::decodeLastChar(stem);
-    if (hiragana_before_onbin >= 1 &&
-        (kana::isERowCodepoint(stem_last) || kana::isIRowCodepoint(stem_last) || stem_last == U'ろ') &&
+    if (hiragana_before_onbin >= 1 && (kana::isIOrERowCodepoint(stem_last) || stem_last == U'ろ') &&
         potential_base == stem + "る") {
       continue;
     }
     if (!in_dict_check && dict_manager != nullptr) {
       const auto* stem_entry = dict_manager->lookupExact(stem);
-      const std::string_view continuative_base_suffix = grammar::godanBaseSuffixFromIRow(utf8::decodeLastChar(stem));
       const bool stem_is_registered_continuative =
-          !continuative_base_suffix.empty() &&
-          vh::isVerbInDictionary(dict_manager, normalize::concat(utf8::dropLastChar(stem), continuative_base_suffix));
+          vh::hasDictionaryGodanBaseFromIRow(dict_manager, utf8::dropLastChar(stem), utf8::decodeLastChar(stem));
       if ((stem_entry != nullptr && stem_entry->pos != core::PartOfSpeech::Verb) || stem_is_registered_continuative) {
         continue;
       }

@@ -95,7 +95,7 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
     char32_t first_hira = codepoints[kanji_end];
     // E-row hiragana: え, け, せ, て, ね, へ, め, れ, げ, ぜ, で, べ, ぺ
     // I-row hiragana: い, き, し, ち, に, ひ, み, り, ぎ, じ, ぢ, び, ぴ
-    if (kana::isERowCodepoint(first_hira) || kana::isIRowCodepoint(first_hira)) {
+    if (kana::isIOrERowCodepoint(first_hira)) {
       // Skip hiragana commonly used as particles after single kanji
       // で (te-form/particle), に (particle), へ (particle) are rarely Ichidan stem endings
       // These almost always represent kanji + particle (雨で→雨+で, 本に→本+に)
@@ -507,7 +507,7 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
       char32_t first_hira = codepoints[kanji_end];
       char32_t second_hira = codepoints[kanji_end + 1];
       size_t renyokei_end = kanji_end + 2;
-      bool first_is_single_stem_ending = kana::isERowCodepoint(first_hira) || kana::isIRowCodepoint(first_hira);
+      bool first_is_single_stem_ending = kana::isIOrERowCodepoint(first_hira);
       size_t following_kanji_end = renyokei_end;
       while (following_kanji_end < codepoints.size() && normalize::isKanjiCodepoint(codepoints[following_kanji_end])) {
         ++following_kanji_end;
@@ -563,8 +563,7 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
            grammar::startsHonorificSubsidiaryVerb(extractClosedClassProbe(codepoints, renyokei_end)) ||
            follows_kanji_sahen_predicate || follows_kanji_predicate || causative_follows || passive_follows ||
            follows_symbol_after_case_particle);
-      if (!first_is_single_stem_ending && has_ichidan_continuation &&
-          (kana::isERowCodepoint(second_hira) || kana::isIRowCodepoint(second_hira))) {
+      if (!first_is_single_stem_ending && has_ichidan_continuation && kana::isIOrERowCodepoint(second_hira)) {
         std::string surface = extractSubstring(codepoints, start_pos, renyokei_end);
         const auto [ichidan_cand, suru_cand, godan_cand] = vh::bestByVerbClass(inflection.analyze(surface));
         bool prefer_suru = !causative_follows && !passive_follows && (suru_cand.confidence > ichidan_cand.confidence);
@@ -679,7 +678,7 @@ void appendGodanSaRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
 
       // Find best godan-sa candidate
       grammar::InflectionCandidate best_sa;
-      best_sa.confidence = 0.0F;
+      best_sa.confidence = candidate::kNoConfidence;
       for (const auto& cand : all_cands) {
         if (cand.has_explanatory_suffix)
           continue;
@@ -771,8 +770,8 @@ void appendGodanSaRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
             // e-row (ichidan) renyokei vowel before し means the godan-sa base
             // (待ちす/伝えす) is fabricated and would glue the humble form.
             char32_t before_shi = codepoints[renyokei_end - 2];
-            if ((kana::isIRowCodepoint(before_shi) || kana::isERowCodepoint(before_shi)) &&
-                renyokei_end < codepoints.size() && vh::isSuruAuxiliaryStarter(codepoints[renyokei_end])) {
+            if (kana::isIOrERowCodepoint(before_shi) && renyokei_end < codepoints.size() &&
+                vh::isSuruAuxiliaryStarter(codepoints[renyokei_end])) {
               SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" godan_sa verb-renyokei+し+する-aux pattern\n");
               continue;
             }

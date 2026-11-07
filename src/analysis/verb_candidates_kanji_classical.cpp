@@ -368,12 +368,9 @@ void appendClassicalHaRowCandidates(const std::vector<char32_t>& codepoints, siz
     }
     // A case particle in the okurigana closes the kanji run as an argument
     // (場+に+へたり), so no cell of the run lies past it.
-    if (tail_pos > kanji_end && dict_manager != nullptr) {
-      const auto* particle =
-          lookupEntryInRange(*dict_manager, codepoints, tail_pos - 1, tail_pos, core::PartOfSpeech::Particle);
-      if (particle != nullptr && particle->extended_pos == core::ExtendedPOS::ParticleCase) {
-        break;
-      }
+    if (tail_pos > kanji_end &&
+        vh::oneMoraParticleEndsAt(dict_manager, codepoints, tail_pos, core::ExtendedPOS::ParticleCase)) {
+      break;
     }
     const size_t end_pos = tail_pos + 1;
     const HaRowLicense license = haRowCellLicense(cell, codepoints, start_pos, end_pos, dict_manager);

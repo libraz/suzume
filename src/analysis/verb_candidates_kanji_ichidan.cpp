@@ -61,7 +61,7 @@ void appendIchidanStemRareCandidates(const std::vector<char32_t>& codepoints, si
       continue;
     }
     const char32_t stem_last = codepoints[suffix_start - 1];
-    if (kana::isERowCodepoint(stem_last) || kana::isIRowCodepoint(stem_last)) {
+    if (kana::isIOrERowCodepoint(stem_last)) {
       stem_end = suffix_start;
       break;
     }

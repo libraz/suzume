@@ -37,6 +37,26 @@ using namespace kanji_verb_detail;
 
 namespace {
 
+struct RenyokeiBase {
+  grammar::VerbType verb_type;
+  std::string base_form;
+};
+
+// Base form of a continuative span from its final mora: i-row is godan, e-row ichidan.
+RenyokeiBase renyokeiBaseFromEnding(const std::string& surface, char32_t ending) {
+  if (kana::isIRowCodepoint(ending)) {
+    const std::string_view base_suffix = grammar::godanBaseSuffixFromIRow(ending);
+    if (base_suffix.empty()) {
+      return {grammar::VerbType::Unknown, {}};
+    }
+    return {grammar::verbTypeFromIRowCodepoint(ending), normalize::concat(utf8::dropLastChar(surface), base_suffix)};
+  }
+  if (kana::isERowCodepoint(ending)) {
+    return {grammar::VerbType::Ichidan, surface + "る"};
+  }
+  return {grammar::VerbType::Unknown, {}};
+}
+
 bool hasNiSugiNegativeTail(const std::vector<char32_t>& codepoints, size_t pos) {
   return pos + 3 < codepoints.size() && codepoints[pos] == U'に' && codepoints[pos + 1] == U'す' &&
          codepoints[pos + 2] == U'ぎ' && vh::naiNegativeFollowsAt(codepoints, pos + 3);
@@ -411,8 +431,7 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
   const size_t hiragana_end = findCharRegionEnd(char_types, kanji_end, 12, normalize::CharType::Hiragana);
   bool has_excessive_renyokei_tail = false;
   for (size_t pos = kanji_end + 1; pos + 1 < hiragana_end; ++pos) {
-    if (codepoints[pos] == U'す' && codepoints[pos + 1] == U'ぎ' &&
-        (kana::isIRowCodepoint(codepoints[pos - 1]) || kana::isERowCodepoint(codepoints[pos - 1]))) {
+    if (codepoints[pos] == U'す' && codepoints[pos + 1] == U'ぎ' && kana::isIOrERowCodepoint(codepoints[pos - 1])) {
       has_excessive_renyokei_tail = true;
       break;
     }
@@ -420,7 +439,7 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
   bool has_following_renyokei_auxiliary = false;
   if (dict_manager != nullptr && hiragana_end < char_types.size() &&
       char_types[hiragana_end] == normalize::CharType::Kanji && hiragana_end > kanji_end + 1 &&
-      (kana::isIRowCodepoint(codepoints[hiragana_end - 1]) || kana::isERowCodepoint(codepoints[hiragana_end - 1]))) {
+      kana::isIOrERowCodepoint(codepoints[hiragana_end - 1])) {
     size_t predicate_end = hiragana_end;
     while (predicate_end < char_types.size() && predicate_end - hiragana_end < 6 &&
            (char_types[predicate_end] == normalize::CharType::Kanji ||
@@ -576,18 +595,14 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
       !hasFinitePredicateCaseParticleTail(codepoints, start_pos, hiragana_end, inflection, dict_manager)) {
     const char32_t ending = codepoints[hiragana_end - 1];
     const std::string surface = extractSubstring(codepoints, start_pos, hiragana_end);
-    if (kana::isIRowCodepoint(ending)) {
-      const std::string_view base_suffix = grammar::godanBaseSuffixFromIRow(ending);
-      if (!base_suffix.empty()) {
-        const std::string base_form = normalize::concat(utf8::dropLastChar(surface), base_suffix);
-        const grammar::VerbType verb_type = grammar::verbTypeFromIRowCodepoint(ending);
-        candidates.push_back(makeVerbCandidate(surface, start_pos, hiragana_end, candidate::verb_cost::kStrongBonus,
-                                               base_form, grammar::verbTypeToConjType(verb_type), true,
-                                               CandidateOrigin::VerbKanji,
-                                               candidate::verb_cost::kConstructedVerbMinConfidence,
-                                               "extended_okurigana_renyokei", core::ExtendedPOS::VerbRenyokei));
-      }
-    } else if (kana::isERowCodepoint(ending)) {
+    const RenyokeiBase span_base = renyokeiBaseFromEnding(surface, ending);
+    if (span_base.verb_type != grammar::VerbType::Unknown && span_base.verb_type != grammar::VerbType::Ichidan) {
+      candidates.push_back(makeVerbCandidate(surface, start_pos, hiragana_end, candidate::verb_cost::kStrongBonus,
+                                             span_base.base_form, grammar::verbTypeToConjType(span_base.verb_type),
+                                             true, CandidateOrigin::VerbKanji,
+                                             candidate::verb_cost::kConstructedVerbMinConfidence,
+                                             "extended_okurigana_renyokei", core::ExtendedPOS::VerbRenyokei));
+    } else if (span_base.verb_type == grammar::VerbType::Ichidan) {
       // A span whose okurigana closes on the voice auxiliary (a-row + れ) is a
       // verb plus its passive, not a longer lexical V1: 使わ+れ+始める, never
       // 使われ+始める. A dictionary headword spelled the same way (生まれる)
@@ -613,15 +628,9 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
   if (is_sugi_pattern && kanji_end < sugi_pos) {
     const char32_t renyokei_ending = codepoints[sugi_pos - 1];
     const bool is_godan = kana::isIRowCodepoint(renyokei_ending);
-    const grammar::VerbType verb_type = is_godan ? grammar::verbTypeFromIRowCodepoint(renyokei_ending)
-                                        : kana::isERowCodepoint(renyokei_ending) ? grammar::VerbType::Ichidan
-                                                                                 : grammar::VerbType::Unknown;
-    const std::string_view godan_suffix = is_godan ? grammar::godanBaseSuffixFromIRow(renyokei_ending) : "";
-    if (verb_type != grammar::VerbType::Unknown && (!is_godan || !godan_suffix.empty())) {
-      const std::string surface = extractSubstring(codepoints, start_pos, sugi_pos);
-      const std::string base_form =
-          is_godan ? normalize::concat(utf8::dropLastChar(surface), godan_suffix) : surface + "る";
-
+    const std::string surface = extractSubstring(codepoints, start_pos, sugi_pos);
+    const auto& [verb_type, base_form] = renyokeiBaseFromEnding(surface, renyokei_ending);
+    if (verb_type != grammar::VerbType::Unknown) {
       // The closed excessive follower is itself inflectional evidence.
       // Multi-mora okurigana cannot be validated reliably by the single-stem
       // inflection probe (積もる is seen only as もる), so the final mora shape

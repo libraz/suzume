@@ -246,7 +246,9 @@ void appendSingleOkuriganaMizenkeiCandidates(const std::vector<char32_t>& codepo
   const std::string surface = extractSubstring(codepoints, start_pos, mizenkei_end);
   // Negative and passive splits need a negative cost to beat the combined
   // verb form (揃わぬ, 行かん, 行かない, 言われる); べき takes a moderate cost.
-  const float cost = (is_nu_pattern || is_n_pattern || is_nai_pattern || is_passive_pattern) ? -0.5F : 0.2F;
+  const float cost = (is_nu_pattern || is_n_pattern || is_nai_pattern || is_passive_pattern)
+                         ? candidate::verb_cost::kStandardBonus
+                         : 0.2F;
   const char* debug_pattern = is_nu_pattern                     ? "nu"
                               : is_n_pattern                    ? "n"
                               : is_nai_pattern                  ? "nai"
@@ -665,7 +667,7 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
             mizenkei_end - 2 == kanji_end &&
             (vh::oneMoraParticleEndsAt(dict_manager, codepoints, kanji_end + 1, core::ExtendedPOS::ParticleCase) ||
              vh::oneMoraParticleEndsAt(dict_manager, codepoints, kanji_end + 1, core::ExtendedPOS::ParticleTopic));
-        if (kana::isIRowCodepoint(before_sa) || kana::isERowCodepoint(before_sa) || argument_before_sa) {
+        if (kana::isIOrERowCodepoint(before_sa) || argument_before_sa) {
           SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" nominal + される, not a su-row stem\n");
           break;
         }
