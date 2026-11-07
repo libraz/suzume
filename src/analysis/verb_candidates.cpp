@@ -205,7 +205,7 @@ void generateKatakanaVerbCandidates(const std::vector<char32_t>& codepoints, siz
     size_t selecting_end = 0;
     size_t content_end = 0;
     bool selects_irrealis = false;
-    if (kana::isERowCodepoint(stem_final_hiragana) || kana::isIRowCodepoint(stem_final_hiragana)) {
+    if (kana::isIOrERowCodepoint(stem_final_hiragana)) {
       for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, kata_end, hira_end)) {
         if (match.entry == nullptr) {
           continue;
@@ -323,8 +323,7 @@ void generateKatakanaVerbCandidates(const std::vector<char32_t>& codepoints, siz
       // An ichidan stem ends on a full-size e-row or i-row mora, so a run closing
       // on anything else (ペン, カフェ, コーヒー) has no ichidan reading at all.
       const bool small_vowel = utf8::equalsAny(normalize::encodeUtf8(stem_final), {"ァ", "ィ", "ゥ", "ェ", "ォ"});
-      const bool ichidan_stem_final =
-          !small_vowel && (kana::isERowCodepoint(stem_final_hiragana) || kana::isIRowCodepoint(stem_final_hiragana));
+      const bool ichidan_stem_final = !small_vowel && kana::isIOrERowCodepoint(stem_final_hiragana);
       const bool whole_negative_form = best.verb_type == grammar::VerbType::Ichidan &&
                                        vh::naiNegativeFormLengthAt(codepoints, kata_end) == end_pos - kata_end;
       if (whole_negative_form && splits_negative_stem) {

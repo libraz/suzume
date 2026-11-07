@@ -18,6 +18,7 @@
 #include "normalize/char_type.h"
 #include "normalize/utf8.h"
 #include "verb_candidates_absorption_guards.h"
+#include "verb_candidates_auxiliary_patterns.h"
 #include "verb_candidates_classical.h"
 #include "verb_candidates_dictionary_probes.h"
 #include "verb_candidates_verb_stems.h"
@@ -97,7 +98,7 @@ bool isIAdjectiveInDictionary(const dictionary::DictionaryManager* dict_manager,
 
 bool isVerbInDictionary(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
                         size_t start, size_t end) {
-  return hasDictionaryEntry(dict_manager, extractSubstring(codepoints, start, end), core::PartOfSpeech::Verb);
+  return isDictionaryEntryWithSuffix(dict_manager, codepoints, start, end, "", core::PartOfSpeech::Verb);
 }
 
 bool hasDictionaryGodanBaseFromIRow(const dictionary::DictionaryManager* dict_manager, std::string_view stem,
@@ -132,7 +133,7 @@ bool hasListedTransitivePartner(const dictionary::DictionaryManager* dict_manage
 
 bool isAdjectiveInDictionary(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
                              size_t start, size_t end) {
-  return hasDictionaryEntry(dict_manager, extractSubstring(codepoints, start, end), core::PartOfSpeech::Adjective);
+  return isDictionaryEntryWithSuffix(dict_manager, codepoints, start, end, "", core::PartOfSpeech::Adjective);
 }
 
 bool isVerbInDictionary(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
@@ -264,9 +265,6 @@ size_t counterKanjiRunEnd(const dictionary::DictionaryManager* dict_manager, con
   return end;
 }
 
-// Lengths of the conjunctive particles that select a continuative (つつ, ながら).
-constexpr std::array<size_t, 2> kContinuativeParticleLengths = {2, 3};
-
 bool kanjiRunMayContinueAt(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
                            size_t run_end) {
   if (grammar::kanjiRunCutByNumeralAt(codepoints, run_end)) {
@@ -275,11 +273,7 @@ bool kanjiRunMayContinueAt(const dictionary::DictionaryManager* dict_manager, co
   // A closed single-kanji Ichidan stem is its own continuative, so a particle
   // that selects one ends the run on that verb (三度+見+ながら).
   if (run_end > 0 && run_end < codepoints.size() && isSingleKanjiIchidan(codepoints[run_end - 1]) &&
-      std::any_of(kContinuativeParticleLengths.begin(), kContinuativeParticleLengths.end(), [&](size_t length) {
-        return run_end + length <= codepoints.size() &&
-               grammar::isContinuativeSelectingConjunctiveParticle(
-                   normalize::encodeRange(codepoints, run_end, run_end + length));
-      })) {
+      continuativeConjunctiveFollowsAt(codepoints, run_end)) {
     return true;
   }
   if (!grammar::mayBeOkuriganaAt(codepoints, run_end)) {
@@ -795,7 +789,7 @@ bool spellsVerbCellWithClassicalAuxiliaries(const dictionary::DictionaryManager*
     // A kanji stem with one i/e-row okurigana is a continuative cell (咲き, 起き).
     const bool continuative_shape = aux_start >= start_pos + 2 &&
                                     normalize::isKanjiCodepoint(codepoints[aux_start - 2]) &&
-                                    (kana::isIRowCodepoint(head_last) || kana::isERowCodepoint(head_last));
+                                    kana::isIOrERowCodepoint(head_last);
     if (kanji_stem || continuative_shape ||
         (!normalize::isKanjiCodepoint(head_last) &&
          lookupEntryInRange(*dict_manager, codepoints, start_pos, aux_start, core::PartOfSpeech::Verb) != nullptr)) {

@@ -129,6 +129,8 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
                                      const grammar::Inflection& inflection,
                                      const dictionary::DictionaryManager* dict_manager,
                                      std::vector<UnknownCandidate>& candidates);
+// True when @p candidate analyses @p surface as the base form of a Godan verb with no suffix morphemes.
+bool isCompleteGodanTerminal(const grammar::InflectionCandidate& candidate, std::string_view surface);
 bool appendInflectedHiraganaVerbCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                            size_t hiragana_end, char32_t first_char,
                                            const std::vector<normalize::CharType>& char_types,

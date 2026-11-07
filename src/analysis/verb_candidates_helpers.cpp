@@ -186,8 +186,7 @@ bool crossesCaseParticleBeforePredicate(const dictionary::DictionaryManager* dic
   // A one-mora predicate behind the particle is no evidence: every godan-sa
   // stem ends in one (ながす, さがす), and the classical す is a dictionary verb.
   for (size_t pos = start_pos + 1; pos + 3 <= end_pos; ++pos) {
-    const auto* particle = lookupEntryInRange(*dict_manager, codepoints, pos, pos + 1, core::PartOfSpeech::Particle);
-    if (particle == nullptr || particle->extended_pos != core::ExtendedPOS::ParticleCase) {
+    if (!oneMoraParticleEndsAt(dict_manager, codepoints, pos + 1, core::ExtendedPOS::ParticleCase)) {
       continue;
     }
     if (hasExactPartOfSpeech(*dict_manager, codepoints, pos + 1, end_pos, kVerbAdjectiveMask)) {
@@ -500,8 +499,7 @@ bool closesIchidanIrrealis(const grammar::Inflection& inflection, const std::vec
   if (normalize::isKanjiCodepoint(last)) {
     return isSingleKanjiPoliteStem(last);
   }
-  if ((!kana::isERowCodepoint(last) && !kana::isIRowCodepoint(last)) || pos < 2 ||
-      !normalize::isKanjiCodepoint(codepoints[pos - 2])) {
+  if (!kana::isIOrERowCodepoint(last) || pos < 2 || !normalize::isKanjiCodepoint(codepoints[pos - 2])) {
     return false;
   }
   const std::string base_form = extractSubstring(codepoints, pos - 2, pos) + "る";

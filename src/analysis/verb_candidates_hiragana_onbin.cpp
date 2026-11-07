@@ -608,12 +608,11 @@ void appendKuruRenyokeiCandidates(const std::vector<char32_t>& codepoints, size_
   if (!right_continuation) {
     return;
   }
-  const bool left_boundary = start_pos == 0 ||
-                             normalize::classifyChar(codepoints[start_pos - 1]) == normalize::CharType::Symbol ||
-                             (normalize::isExtendedParticle(codepoints[start_pos - 1]) &&
-                              codepoints[start_pos - 1] != U'て' && codepoints[start_pos - 1] != U'で') ||
-                             followsListedAdverb(codepoints, start_pos, dict_manager) ||
-                             nominalClosesBeforeKuru(codepoints, start_pos, dict_manager);
+  const bool left_boundary =
+      start_pos == 0 || normalize::classifyChar(codepoints[start_pos - 1]) == normalize::CharType::Symbol ||
+      (normalize::isExtendedParticle(codepoints[start_pos - 1]) && codepoints[start_pos - 1] != U'で') ||
+      followsListedAdverb(codepoints, start_pos, dict_manager) ||
+      nominalClosesBeforeKuru(codepoints, start_pos, dict_manager);
   if (!left_boundary) {
     return;
   }
@@ -668,8 +667,7 @@ void appendIchidanRenyokei1CharCandidates(const std::vector<char32_t>& codepoint
   // Pattern: e-row or i-row hiragana followed by て or た
   // Without dictionary evidence the stem needs the predicate slot, to avoid
   // false positives like めて → め + て inside a word.
-  if (start_pos + 1 >= codepoints.size() ||
-      (!kana::isERowCodepoint(codepoints[start_pos]) && !kana::isIRowCodepoint(codepoints[start_pos])) ||
+  if (start_pos + 1 >= codepoints.size() || !kana::isIOrERowCodepoint(codepoints[start_pos]) ||
       (codepoints[start_pos + 1] != U'て' && codepoints[start_pos + 1] != U'た')) {
     return;
   }

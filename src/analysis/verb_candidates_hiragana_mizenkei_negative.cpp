@@ -464,11 +464,9 @@ void appendNContractedTerminalCandidates(const std::vector<char32_t>& codepoints
       continue;
     }
     const size_t after = n_pos + 2;
-    const auto* following_particle =
-        lookupEntryInRange(*dict_manager, codepoints, after, after + 1, core::PartOfSpeech::Particle);
     const bool closes_phrase =
         vh::clauseEndsAt(codepoints, after) ||
-        (following_particle != nullptr && following_particle->extended_pos == core::ExtendedPOS::ParticleFinal) ||
+        vh::oneMoraParticleEndsAt(dict_manager, codepoints, after + 1, core::ExtendedPOS::ParticleFinal) ||
         (after + 1 < codepoints.size() && codepoints[after] == U'っ' && codepoints[after + 1] == U'て');
     if (!closes_phrase) {
       return;
@@ -487,7 +485,7 @@ void appendNContractedTerminalCandidates(const std::vector<char32_t>& codepoints
     }
     const std::string stem = extractSubstring(codepoints, start_pos, n_pos);
     const char32_t stem_last = codepoints[n_pos - 1];
-    const bool ichidan = kana::isERowCodepoint(stem_last) || kana::isIRowCodepoint(stem_last);
+    const bool ichidan = kana::isIOrERowCodepoint(stem_last);
     const std::string base_form = is_suru ? std::string("する") : stem + "る";
     const grammar::VerbType verb_type =
         is_suru ? grammar::VerbType::Suru : (ichidan ? grammar::VerbType::Ichidan : grammar::VerbType::GodanRa);

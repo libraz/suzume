@@ -125,7 +125,7 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
     // E-row: 食べる, 見える → 食べ, 見え
     // I-row: 感じる, 過ぎる → 感じ, すぎ
     char32_t stem_end_char = codepoints[end_pos - 1];
-    if (!kana::isERowCodepoint(stem_end_char) && !kana::isIRowCodepoint(stem_end_char)) {
+    if (!kana::isIOrERowCodepoint(stem_end_char)) {
       continue;
     }
 
@@ -395,7 +395,7 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
     // Non-dictionary verbs get moderate positive cost to avoid spurious candidates
     // competing with dictionary compound particles like について
     // But not too high to break valid patterns like してほしい
-    float cost = is_dict_verb ? -0.8F : 0.5F;
+    float cost = is_dict_verb ? candidate::verb_cost::kStrongBonus : 0.5F;
     const std::string following = extractSubstring(codepoints, end_pos, std::min(end_pos + 2, codepoints.size()));
     // An e-row stem before し+ます is an ichidan continuative plus する's し
     // (お+つたえ+し+ます), not the godan-sa continuative of a coined verb.

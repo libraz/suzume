@@ -137,8 +137,7 @@ void appendPassiveMizenkeiCandidates(const std::vector<char32_t>& codepoints, si
     // A continuative vowel before さ (頬ずり+さ+れ) closes a deverbal noun that
     // takes the passive of する; no su-row stem ends there.
     if (!is_valid_verb && verb_type == grammar::VerbType::GodanSa &&
-        !(mizenkei_end >= start_pos + 2 && (kana::isIRowCodepoint(codepoints[mizenkei_end - 2]) ||
-                                            kana::isERowCodepoint(codepoints[mizenkei_end - 2])))) {
+        !(mizenkei_end >= start_pos + 2 && kana::isIOrERowCodepoint(codepoints[mizenkei_end - 2]))) {
       is_valid_verb = vh::isVerifiedVerbBase(dict_manager, inflection, base_form,
                                              candidate::verb_cost::kConstructedVerbMinConfidence, true);
     }
@@ -226,7 +225,7 @@ void appendIchidanRareruCandidates(const std::vector<char32_t>& codepoints, size
     // membership alone is insufficient because Godan-ra verbs such as おる
     // would otherwise fabricate an Ichidan stem before られ.
     const char32_t stem_last = codepoints[stem_end - 1];
-    if (!kana::isERowCodepoint(stem_last) && !kana::isIRowCodepoint(stem_last)) {
+    if (!kana::isIOrERowCodepoint(stem_last)) {
       continue;
     }
 

@@ -163,9 +163,7 @@ bool endsWithCaseParticleAfterContinuative(const dictionary::DictionaryManager* 
     return false;
   }
   const size_t particle_pos = end_pos - 1;
-  const auto* particle =
-      lookupEntryInRange(*dict_manager, codepoints, particle_pos, end_pos, core::PartOfSpeech::Particle);
-  if (particle == nullptr || particle->extended_pos != core::ExtendedPOS::ParticleCase) {
+  if (!oneMoraParticleEndsAt(dict_manager, codepoints, end_pos, core::ExtendedPOS::ParticleCase)) {
     return false;
   }
   // The host must look like a continuative: an i-row mora is what nominalizes a
@@ -211,9 +209,7 @@ bool closesOnTerminalAuxiliaryAndConjunctive(const dictionary::DictionaryManager
   if (dict_manager == nullptr || stem_end == 0 || stem_end > codepoints.size()) {
     return false;
   }
-  const auto* particle =
-      lookupEntryInRange(*dict_manager, codepoints, stem_end - 1, stem_end, core::PartOfSpeech::Particle);
-  if (particle == nullptr || particle->extended_pos != core::ExtendedPOS::ParticleConj) {
+  if (!oneMoraParticleEndsAt(dict_manager, codepoints, stem_end, core::ExtendedPOS::ParticleConj)) {
     return false;
   }
   const size_t aux_end = stem_end - 1;
@@ -236,17 +232,13 @@ bool closesOnTerminalVerbAndConjunctive(const dictionary::DictionaryManager* dic
   }
   // The run may open on the case particle itself (大人+になるし), which hands
   // the verb to the position after it.
-  const auto* opening_case =
-      lookupEntryInRange(*dict_manager, codepoints, start_pos, start_pos + 1, core::PartOfSpeech::Particle);
-  if (opening_case != nullptr && opening_case->extended_pos == core::ExtendedPOS::ParticleCase) {
+  if (oneMoraParticleEndsAt(dict_manager, codepoints, start_pos + 1, core::ExtendedPOS::ParticleCase)) {
     return closesOnTerminalVerbAndConjunctive(dict_manager, codepoints, start_pos + 1, stem_end);
   }
   if (!followsCaseParticle(dict_manager, codepoints, start_pos)) {
     return false;
   }
-  const auto* particle =
-      lookupEntryInRange(*dict_manager, codepoints, stem_end - 1, stem_end, core::PartOfSpeech::Particle);
-  if (particle == nullptr || particle->extended_pos != core::ExtendedPOS::ParticleConj) {
+  if (!oneMoraParticleEndsAt(dict_manager, codepoints, stem_end, core::ExtendedPOS::ParticleConj)) {
     return false;
   }
   // The verb must be the whole of what stands between the argument and the particle.

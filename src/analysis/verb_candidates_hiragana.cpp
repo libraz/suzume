@@ -195,8 +195,7 @@ size_t completeGodanTerminalAfterCaseParticle(const std::vector<char32_t>& codep
     return 0;
   }
   for (const auto& candidate : inflection.analyze(surface)) {
-    if (grammar::isGodanVerbType(candidate.verb_type) && candidate.base_form == surface &&
-        candidate.morphemes.empty() && candidate.confidence >= verb_opts.confidence_standard) {
+    if (isCompleteGodanTerminal(candidate, surface) && candidate.confidence >= verb_opts.confidence_standard) {
       return end_pos;
     }
   }
@@ -468,9 +467,11 @@ void appendHiraganaRenyokeiBeforeFormalNoun(const std::vector<char32_t>& codepoi
     if (stem_end + 2 > run_end) {
       continue;
     }
+    if (codepoints[stem_end] != U'も' || codepoints[stem_end + 1] != U'の') {
+      continue;
+    }
     const std::string following = extractSubstring(codepoints, stem_end, stem_end + 2);
-    if (following != "もの" ||
-        !lookupResultsHaveExtendedPOS(dict_manager->lookup(following, 0), core::ExtendedPOS::NounFormal) ||
+    if (!lookupResultsHaveExtendedPOS(dict_manager->lookup(following, 0), core::ExtendedPOS::NounFormal) ||
         !kana::isERowCodepoint(codepoints[stem_end - 1])) {
       continue;
     }
@@ -1067,30 +1068,28 @@ void dropUnattestedMisreadings(const std::vector<char32_t>& codepoints, std::vec
   // An unattested verb covering only the first half of a reduplication cuts a
   // mimetic in two (ぞく+ぞく+する, not ぞくぞく+する), and one spelling the whole
   // reduplication is the mimetic itself (みるみる+うち).
+  // A terminal verb reaches the copula only through だろ (降る+だろ+う), so an
+  // unattested one before a bare だ is a nominal misread (ふつう+だ).
   candidates.erase(
       std::remove_if(candidates.begin(), candidates.end(),
                      [&codepoints](const UnknownCandidate& verb_candidate) {
+                       if (verb_candidate.lemma_verified) {
+                         return false;
+                       }
                        const size_t span = verb_candidate.end - verb_candidate.start;
                        const auto first = codepoints.begin() + verb_candidate.start;
                        const bool halves_reduplication = span >= 2 && verb_candidate.end + span <= codepoints.size() &&
                                                          std::equal(first, first + span, first + span);
                        const bool spells_reduplication =
                            span >= 4 && span % 2 == 0 && std::equal(first, first + span / 2, first + span / 2);
-                       return !verb_candidate.lemma_verified && (halves_reduplication || spells_reduplication);
+                       const size_t next = verb_candidate.end;
+                       const bool bare_da_after_terminal =
+                           verb_candidate.extended_pos == core::ExtendedPOS::VerbShuushikei &&
+                           next < codepoints.size() && codepoints[next] == U'だ' &&
+                           (next + 1 >= codepoints.size() || codepoints[next + 1] != U'ろ');
+                       return halves_reduplication || spells_reduplication || bare_da_after_terminal;
                      }),
       candidates.end());
-
-  // A terminal verb reaches the copula only through だろ (降る+だろ+う), so an
-  // unattested one before a bare だ is a nominal misread (ふつう+だ).
-  candidates.erase(std::remove_if(candidates.begin(), candidates.end(),
-                                  [&codepoints](const UnknownCandidate& verb_candidate) {
-                                    const size_t next = verb_candidate.end;
-                                    return !verb_candidate.lemma_verified &&
-                                           verb_candidate.extended_pos == core::ExtendedPOS::VerbShuushikei &&
-                                           next < codepoints.size() && codepoints[next] == U'だ' &&
-                                           (next + 1 >= codepoints.size() || codepoints[next + 1] != U'ろ');
-                                  }),
-                   candidates.end());
 }
 
 }  // namespace
@@ -1112,16 +1111,16 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(const std::vector<c
   appendHiraganaRenyokeiBeforeFormalNoun(codepoints, start_pos, char_types, inflection, dict_manager, candidates);
   appendSubjectGenitiveIchidanBeforeFormalNoun(codepoints, start_pos, inflection, dict_manager, candidates);
 
+  if (opensInsideClosedClassWord(scan)) {
+    return candidates;
+  }
+
   const size_t closed_onbin_tense_end =
       closedOnbinTenseEnd(codepoints, start_pos, char_types, inflection, dict_manager);
   const size_t complete_godan_wa_terminal_end =
       completeIndependentGodanWaTerminalEnd(codepoints, start_pos, char_types, inflection, verb_opts);
   const size_t complete_case_particle_terminal_end =
       completeGodanTerminalAfterCaseParticle(codepoints, start_pos, char_types, inflection, dict_manager, verb_opts);
-
-  if (opensInsideClosedClassWord(scan)) {
-    return candidates;
-  }
 
   appendContextGatedAuxiliaryCandidates(scan, candidates);
 
@@ -1135,8 +1134,6 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(const std::vector<c
     return candidates;
   }
 
-  const bool has_verified_initial_inflection = hasVerifiedInitialInflection(scan);
-
   // Skip if starting character is a particle that is NEVER a verb stem
   // Note: Characters that CAN be verb stems are NOT skipped:
   //   - な→なる/なくす, て→できる, や→やる, か→かける/かえる
@@ -1146,7 +1143,7 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(const std::vector<c
   const auto [contracted_before_colloquial_negative, contracted_irrealis_end] = findContractedIrrealis(scan);
   bool crossed_particle_guard = normalize::isNeverVerbStemAtStart(first_char);
   if (crossed_particle_guard && closed_onbin_tense_end == 0 && complete_godan_wa_terminal_end == 0 &&
-      !has_verified_initial_inflection && !contracted_before_colloquial_negative) {
+      !hasVerifiedInitialInflection(scan) && !contracted_before_colloquial_negative) {
     SUZUME_DEBUG_LOG_VERBOSE("[VERB_BLACKLIST] pos=" << start_pos << " char=U+" << std::hex
                                                      << static_cast<uint32_t>(first_char) << std::dec
                                                      << " blocked (isNeverVerbStemAtStart)\n");

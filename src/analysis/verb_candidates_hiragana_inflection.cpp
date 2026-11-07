@@ -90,6 +90,10 @@ bool prefersOverInflection(const grammar::InflectionCandidate& cand, const gramm
 
 namespace hiragana_verb_detail {
 
+bool isCompleteGodanTerminal(const grammar::InflectionCandidate& candidate, std::string_view surface) {
+  return grammar::isGodanVerbType(candidate.verb_type) && candidate.base_form == surface && candidate.morphemes.empty();
+}
+
 namespace {
 
 // Inputs shared by every span length the inflected scan tries.
@@ -465,12 +469,12 @@ bool adoptIchidanDictionaryReading(const InflectedScanContext& ctx, InflectedSpa
   bool looks_like_ichidan_dict_form = false;
   if (pre_check_len >= 3 && span.surface.size() >= core::kTwoJapaneseCharBytes) {
     std::string_view last_char = utf8::lastChar(span.surface);
-    if (last_char == "る" && end_pos >= 2) {
+    if (last_char == "る") {
       // Check if second-to-last char is e-row or i-row hiragana (ichidan stem ending)
       // E-row: 食べる, 見える, 調べる
       // I-row: 感じる, 信じる (kanji + i-row + る pattern)
       char32_t stem_end = ctx.codepoints[end_pos - 2];
-      if (kana::isERowCodepoint(stem_end) || kana::isIRowCodepoint(stem_end)) {
+      if (kana::isIOrERowCodepoint(stem_end)) {
         // Exclude てる pattern (ている contraction) - this should be suru/godan + ている
         // not ichidan dictionary form
         bool is_te_iru_contraction = (stem_end == U'て' || stem_end == U'で');
@@ -524,8 +528,8 @@ void retainCaseParticleTerminal(const InflectedScanContext& ctx, InflectedSpan& 
   // complete terminal reading here.
   if (ctx.has_complete_case_particle_terminal && span.end_pos == ctx.hiragana_end) {
     for (const auto& candidate : span.all_candidates) {
-      if (grammar::isGodanVerbType(candidate.verb_type) && candidate.base_form == span.surface &&
-          candidate.morphemes.empty() && candidate.confidence >= ctx.verb_opts.confidence_standard) {
+      if (isCompleteGodanTerminal(candidate, span.surface) &&
+          candidate.confidence >= ctx.verb_opts.confidence_standard) {
         span.best = candidate;
         looks_like_ichidan_dict_form = false;
         break;
@@ -660,8 +664,8 @@ float hiraganaVerbBaseCost(const InflectedScanContext& ctx, const InflectedSpan&
   // evidence, not lexical evidence: it permits kana verbs whose stem
   // contains a particle homograph (犬とはしる, 家にもどる) to compete with
   // the otherwise cheap particle chain.
-  if (ctx.has_complete_case_particle_terminal && span.end_pos == ctx.hiragana_end && best.base_form == surface &&
-      best.morphemes.empty() && grammar::isGodanVerbType(best.verb_type)) {
+  if (ctx.has_complete_case_particle_terminal && span.end_pos == ctx.hiragana_end &&
+      isCompleteGodanTerminal(best, surface)) {
     base_cost += bigram_cost::kVeryStrongBonus;
   }
 
