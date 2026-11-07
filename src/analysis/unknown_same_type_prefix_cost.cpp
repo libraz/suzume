@@ -85,14 +85,14 @@ PrefixShape classifyPrefixShape(const PrefixScanContext& ctx, size_t len, size_t
   const bool has_verb_tail_after_ri = closes_past_tari_collision_noun && ctx.dict_manager != nullptr &&
                                       lookupEntryInRange(*ctx.dict_manager, codepoints, start_pos + 1, candidate_end,
                                                          core::PartOfSpeech::Verb) != nullptr;
-  const bool has_inflected_verb_reading =
-      closes_past_tari_collision_noun && std::any_of(ctx.inflection.analyze(surface).begin(),
-                                                     ctx.inflection.analyze(surface).end(), [](const auto& analysis) {
-                                                       return analysis.verb_type != grammar::VerbType::Unknown &&
-                                                              analysis.verb_type != grammar::VerbType::IAdjective &&
-                                                              !analysis.morphemes.empty() &&
-                                                              analysis.confidence > candidate::kNoOriginConfidence;
-                                                     });
+  bool has_inflected_verb_reading = false;
+  if (closes_past_tari_collision_noun) {
+    const auto& analyses = ctx.inflection.analyze(surface);
+    has_inflected_verb_reading = std::any_of(analyses.begin(), analyses.end(), [](const auto& analysis) {
+      return analysis.verb_type != grammar::VerbType::Unknown && analysis.verb_type != grammar::VerbType::IAdjective &&
+             !analysis.morphemes.empty() && analysis.confidence > candidate::kNoOriginConfidence;
+    });
+  }
   const bool has_contracted_progressive_tail =
       closes_past_tari_collision_noun && len >= 2 &&
       grammar::isContractedProgressiveSurface(extractSubstring(codepoints, candidate_end - 2, candidate_end));

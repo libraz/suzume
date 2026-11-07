@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <array>
 #include <string_view>
+#include <utility>
 
 #include "analysis/dictionary_probe.h"
 #include "analysis/scorer_constants.h"
@@ -369,6 +370,10 @@ bool crossesVerbOkuriganaBoundary(const PrefixScanContext& ctx, size_t len, size
   return false;
 }
 
+bool isFormalNounEntry(const dictionary::DictionaryEntry& entry) {
+  return entry.extended_pos == core::ExtendedPOS::NounFormal;
+}
+
 bool crossesKanjiWordBoundary(const PrefixScanContext& ctx, size_t len, size_t candidate_end,
                               const std::string& surface) {
   const auto& codepoints = ctx.codepoints;
@@ -381,15 +386,8 @@ bool crossesKanjiWordBoundary(const PrefixScanContext& ctx, size_t len, size_t c
   if (start_type == normalize::CharType::Kanji && dict_manager != nullptr && candidate_end < codepoints.size() &&
       ctx.char_types[candidate_end] == normalize::CharType::Hiragana) {
     constexpr size_t kSuffixProbe = 3;
-    const size_t probe_end = std::min(codepoints.size(), candidate_end + kSuffixProbe);
-    bool heads_bound_suffix = false;
-    for (size_t suffix_end = candidate_end + 1; suffix_end <= probe_end; ++suffix_end) {
-      if (lookupEntryInRange(*dict_manager, codepoints, candidate_end - 1, suffix_end, core::PartOfSpeech::Suffix) !=
-          nullptr) {
-        heads_bound_suffix = true;
-        break;
-      }
-    }
+    const bool heads_bound_suffix = hasDictionaryEntryFrom(dict_manager, codepoints, candidate_end - 1, 2,
+                                                           kSuffixProbe + 1, core::PartOfSpeech::Suffix, nullptr);
     if (heads_bound_suffix && len > 1) {
       return true;
     }
@@ -403,11 +401,8 @@ bool crossesKanjiWordBoundary(const PrefixScanContext& ctx, size_t len, size_t c
       candidate_end < codepoints.size() && ctx.char_types[candidate_end] == normalize::CharType::Hiragana &&
       (codepoints[candidate_end] == U'す' || codepoints[candidate_end] == U'し' ||
        codepoints[candidate_end] == U'さ')) {
-    bool listed_modifier_head = false;
-    for (size_t split = start_pos + 1; split < candidate_end && !listed_modifier_head; ++split) {
-      listed_modifier_head =
-          lookupEntryInRange(*dict_manager, codepoints, start_pos, split, core::PartOfSpeech::Noun) != nullptr;
-    }
+    const bool listed_modifier_head =
+        hasDictionaryEntryFrom(dict_manager, codepoints, start_pos, 1, len - 1, core::PartOfSpeech::Noun, nullptr);
     if (listed_modifier_head) {
       return true;
     }
@@ -436,15 +431,14 @@ bool crossesKanjiWordBoundary(const PrefixScanContext& ctx, size_t len, size_t c
       return true;
     }
   }
-  if (start_type == normalize::CharType::Kanji && len > 2 && dict_manager != nullptr &&
-      dict_manager->lookupExact(surface) == nullptr &&
-      spansInterjectionBoundary(*dict_manager, codepoints, start_pos, candidate_end)) {
-    return true;
-  }
   if (start_type == normalize::CharType::Kanji && len > 1 && dict_manager != nullptr &&
-      dict_manager->lookupExact(surface) == nullptr &&
-      closesOnPronounAfterRegisteredNoun(*dict_manager, codepoints, start_pos, candidate_end)) {
-    return true;
+      dict_manager->lookupExact(surface) == nullptr) {
+    if (len > 2 && spansInterjectionBoundary(*dict_manager, codepoints, start_pos, candidate_end)) {
+      return true;
+    }
+    if (closesOnPronounAfterRegisteredNoun(*dict_manager, codepoints, start_pos, candidate_end)) {
+      return true;
+    }
   }
   // The mirror boundary: a kanji run must not open with a registered
   // multi-kanji formal noun (以来|問題, 途中|経過). A formal noun is a bound
@@ -452,14 +446,8 @@ bool crossesKanjiWordBoundary(const PrefixScanContext& ctx, size_t len, size_t c
   // than continuing one compound. One-kanji formal nouns are excluded — 内,
   // 中, 手, 先 head ordinary kango (内容, 中止, 手法, 先方).
   if (start_type == normalize::CharType::Kanji && dict_manager != nullptr && len > 2) {
-    bool opens_with_formal_noun = false;
-    for (size_t head_end = start_pos + 2; head_end < candidate_end; ++head_end) {
-      const auto* entry = lookupEntryInRange(*dict_manager, codepoints, start_pos, head_end, core::PartOfSpeech::Noun);
-      if (entry != nullptr && entry->extended_pos == core::ExtendedPOS::NounFormal) {
-        opens_with_formal_noun = true;
-        break;
-      }
-    }
+    const bool opens_with_formal_noun = hasDictionaryEntryFrom(dict_manager, codepoints, start_pos, 2, len - 1,
+                                                               core::PartOfSpeech::Noun, isFormalNounEntry);
     if (opens_with_formal_noun) {
       return true;
     }
@@ -636,7 +624,7 @@ void appendPluralHonorificSuffix(const PrefixScanContext& ctx, size_t len, size_
     suffix_cand.confidence = 1.0F;
     suffix_cand.pattern = "tail_suffix_方";
 #endif
-    candidates.push_back(suffix_cand);
+    candidates.push_back(std::move(suffix_cand));
   }
 }
 
@@ -757,7 +745,7 @@ void UnknownWordGenerator::appendSameTypePrefixCandidates(const std::vector<char
           break;
       }
 #endif
-      candidates.push_back(cand);
+      candidates.push_back(std::move(cand));
 
       appendPluralHonorificSuffix(ctx, len, candidate_end, surface, candidates);
     }

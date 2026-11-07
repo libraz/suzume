@@ -11,7 +11,6 @@
 #include "analysis/unknown.h"
 
 #include <algorithm>
-#include <cstdint>
 #include <utility>
 
 #include "adjective_candidates.h"
@@ -112,8 +111,8 @@ bool spansConjunctionStart(const UnknownCandidate& candidate, const std::vector<
   for (size_t boundary = candidate.start; boundary < candidate.end; ++boundary) {
     size_t window_end = std::min(codepoints.size(), boundary + kConjunctionWindowChars);
     for (size_t conjunction_end = boundary + 1; conjunction_end <= window_end; ++conjunction_end) {
-      std::string conjunction = extractSubstring(codepoints, boundary, conjunction_end);
-      const auto* conjunction_entry = dict_manager->lookupExact(conjunction, core::PartOfSpeech::Conjunction);
+      const auto* conjunction_entry =
+          lookupEntryInRange(*dict_manager, codepoints, boundary, conjunction_end, core::PartOfSpeech::Conjunction);
       if (conjunction_entry != nullptr && (boundary > candidate.start || conjunction_end > candidate.end)) {
         // A complete generated i-adjective may contain a kana-homographic
         // conjunction (慌ただしい contains ただし).  That is ordinary native
@@ -143,8 +142,8 @@ bool spansConjunctionStart(const UnknownCandidate& candidate, const std::vector<
         const bool conjunction_leaves_one_case_particle =
             boundary + 1 == candidate.end && conjunction_end == candidate.end + 1;
         if (conjunction_leaves_one_case_particle) {
-          const std::string trailing = extractSubstring(codepoints, candidate.end, conjunction_end);
-          const auto* particle = dict_manager->lookupExact(trailing, core::PartOfSpeech::Particle);
+          const auto* particle = lookupEntryInRange(*dict_manager, codepoints, candidate.end, conjunction_end,
+                                                    core::PartOfSpeech::Particle);
           if (particle != nullptr && particle->extended_pos == core::ExtendedPOS::ParticleCase) {
             continue;
           }
@@ -202,6 +201,20 @@ bool spansAdverbAdjectiveBoundary(const UnknownCandidate& candidate, const std::
                             partOfSpeechMask(core::PartOfSpeech::Adjective));
 }
 
+// Whether a particle entry is a topic, case or genitive marker.
+bool isTopicCaseOrNoParticle(const dictionary::DictionaryEntry& entry) {
+  return entry.extended_pos == core::ExtendedPOS::ParticleTopic ||
+         entry.extended_pos == core::ExtendedPOS::ParticleCase || entry.extended_pos == core::ExtendedPOS::ParticleNo;
+}
+
+// End of the kanji run that opens at @p from, clamped to @p limit.
+size_t skipKanjiRun(const std::vector<char32_t>& codepoints, size_t from, size_t limit) {
+  while (from < limit && normalize::classifyChar(codepoints[from]) == normalize::CharType::Kanji) {
+    ++from;
+  }
+  return from;
+}
+
 // A leading particle followed by a registered predicate remains compositional
 // (も+よろしい). This is gated by the complete following dictionary predicate,
 // so ordinary lexical words beginning with the same mora remain untouched.
@@ -234,16 +247,13 @@ bool startsWithParticleBeforeRegisteredPredicate(const UnknownCandidate& candida
     }
   }
 
-  const std::string particle = extractSubstring(codepoints, candidate.start, candidate.start + 1);
-  const auto* particle_entry = dict_manager->lookupExact(particle, core::PartOfSpeech::Particle);
-  if (particle_entry == nullptr || (particle_entry->extended_pos != core::ExtendedPOS::ParticleTopic &&
-                                    particle_entry->extended_pos != core::ExtendedPOS::ParticleCase &&
-                                    particle_entry->extended_pos != core::ExtendedPOS::ParticleNo)) {
+  const auto* particle_entry =
+      lookupEntryInRange(*dict_manager, codepoints, candidate.start, candidate.start + 1, core::PartOfSpeech::Particle);
+  if (particle_entry == nullptr || !isTopicCaseOrNoParticle(*particle_entry)) {
     return false;
   }
-  const std::string predicate = extractSubstring(codepoints, candidate.start + 1, candidate.end);
   const size_t predicate_length = candidate.end - candidate.start - 1;
-  for (const auto& result : dict_manager->lookup(predicate, 0)) {
+  for (const auto& result : lookupResultsInRange(*dict_manager, codepoints, candidate.start + 1, candidate.end)) {
     if (result.entry == nullptr || result.length != predicate_length ||
         (result.entry->pos != core::PartOfSpeech::Verb && result.entry->pos != core::PartOfSpeech::Adjective)) {
       continue;
@@ -323,8 +333,7 @@ bool hasClosedFollowerForGeneratedVerb(const UnknownCandidate& candidate, const 
   if (candidate.pos != core::PartOfSpeech::Verb || candidate.end >= codepoints.size()) {
     return false;
   }
-  const std::string remaining = extractSubstring(codepoints, candidate.end, codepoints.size());
-  for (const auto& result : dict_manager->lookup(remaining, 0)) {
+  for (const auto& result : lookupResultsInRange(*dict_manager, codepoints, candidate.end, codepoints.size())) {
     if (result.entry == nullptr) {
       continue;
     }
@@ -370,11 +379,9 @@ bool spansCaseParticleBeforeVerifiedPredicate(const UnknownCandidate& candidate,
     if (verb_helpers::startsInsideGaMashiiSuffix(codepoints, boundary)) {
       continue;
     }
-    const std::string particle = extractSubstring(codepoints, boundary, boundary + 1);
-    const auto* entry = dict_manager->lookupExact(particle, core::PartOfSpeech::Particle);
-    if (entry == nullptr || (entry->extended_pos != core::ExtendedPOS::ParticleCase &&
-                             entry->extended_pos != core::ExtendedPOS::ParticleTopic &&
-                             entry->extended_pos != core::ExtendedPOS::ParticleNo)) {
+    const auto* entry =
+        lookupEntryInRange(*dict_manager, codepoints, boundary, boundary + 1, core::PartOfSpeech::Particle);
+    if (entry == nullptr || !isTopicCaseOrNoParticle(*entry)) {
       continue;
     }
     const bool left_content =
@@ -399,10 +406,7 @@ bool startsInsideKanjiRunBeforeClosedNai(const UnknownCandidate& candidate, cons
       normalize::classifyChar(codepoints[candidate.start]) != normalize::CharType::Kanji) {
     return false;
   }
-  size_t boundary = candidate.start;
-  while (boundary < candidate.end && normalize::classifyChar(codepoints[boundary]) == normalize::CharType::Kanji) {
-    ++boundary;
-  }
+  const size_t boundary = skipKanjiRun(codepoints, candidate.start, candidate.end);
   return boundary > candidate.start && boundary < candidate.end &&
          extractSubstring(codepoints, boundary, candidate.end) == "ない";
 }
@@ -416,10 +420,7 @@ bool absorbsKanaVerbCellBeforeNegative(const UnknownCandidate& candidate, const 
       (candidate.pos == core::PartOfSpeech::Verb && verb_helpers::isVerbInDictionary(dict_manager, candidate.lemma))) {
     return false;
   }
-  size_t boundary = candidate.start;
-  while (boundary < candidate.end && normalize::classifyChar(codepoints[boundary]) == normalize::CharType::Kanji) {
-    ++boundary;
-  }
+  const size_t boundary = skipKanjiRun(codepoints, candidate.start, candidate.end);
   // The cell may close the candidate (人い+ない) or sit inside it with the
   // negative (人いない coined as one verb).
   for (size_t cell_end = boundary + 1; cell_end <= candidate.end; ++cell_end) {
@@ -486,7 +487,7 @@ bool endsInsideIchidanPassive(const UnknownCandidate& candidate, const std::vect
     return false;
   }
   const char32_t preceding = codepoints[candidate.end - 2];
-  return kana::isIRowCodepoint(preceding) || kana::isERowCodepoint(preceding);
+  return kana::isIOrERowCodepoint(preceding);
 }
 
 }  // namespace
@@ -684,7 +685,7 @@ float UnknownWordGenerator::getCostForType(normalize::CharType ctype, size_t len
   }
 }
 
-std::vector<UnknownCandidate> UnknownWordGenerator::generate(std::string_view text,
+std::vector<UnknownCandidate> UnknownWordGenerator::generate(std::string_view /*text*/,
                                                              const std::vector<char32_t>& codepoints, size_t start_pos,
                                                              const std::vector<normalize::CharType>& char_types) const {
   std::vector<UnknownCandidate> candidates;
@@ -805,7 +806,7 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generate(std::string_view te
   generateSelectedNominalHeadCandidates(codepoints, start_pos, char_types, inflection_, dict_manager_, candidates);
 
   // Generate alphanumeric sequences
-  generateAlphanumeric(text, codepoints, start_pos, char_types, candidates);
+  generateAlphanumeric(codepoints, start_pos, char_types, candidates);
 
   // Generate with suffix separation for kanji
   if (options_.separate_suffix && char_types[start_pos] == normalize::CharType::Kanji) {
@@ -814,7 +815,7 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generate(std::string_view te
 
   // Generate character speech candidates (キャラ語尾)
   if (options_.enable_character_speech) {
-    generateCharacterSpeechCandidates(text, codepoints, start_pos, char_types, candidates);
+    generateCharacterSpeechCandidates(codepoints, start_pos, char_types, candidates);
   }
 
   // Generate the colloquial contraction of the hypothetical (行きゃ, 食べりゃ).
@@ -856,8 +857,8 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generate(std::string_view te
   return candidates;
 }
 
-void UnknownWordGenerator::generateAlphanumeric(std::string_view /*text*/, const std::vector<char32_t>& codepoints,
-                                                size_t start_pos, const std::vector<normalize::CharType>& char_types,
+void UnknownWordGenerator::generateAlphanumeric(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                                const std::vector<normalize::CharType>& char_types,
                                                 std::vector<UnknownCandidate>& candidates) const {
   if (start_pos >= char_types.size()) {
     return;
@@ -909,17 +910,15 @@ void UnknownWordGenerator::generateAlphanumeric(std::string_view /*text*/, const
   bool is_identifier = has_underscore && (has_alpha || has_digit);
   if ((is_mixed || is_identifier) && end_pos > start_pos + 1) {
     std::string surface = extractSubstring(codepoints, start_pos, end_pos);
-    if (!surface.empty()) {
-      // Give identifiers with underscores a bonus to prefer them over splits
-      float cost = is_identifier ? 0.5F : 0.8F;
-      auto cand = makeCandidate(surface, start_pos, end_pos, core::PartOfSpeech::Noun, cost, false,
-                                CandidateOrigin::Alphanumeric);
+    // Give identifiers with underscores a bonus to prefer them over splits
+    float cost = is_identifier ? 0.5F : 0.8F;
+    auto cand = makeCandidate(surface, start_pos, end_pos, core::PartOfSpeech::Noun, cost, false,
+                              CandidateOrigin::Alphanumeric);
 #ifdef SUZUME_DEBUG_INFO
-      cand.confidence = 1.0F;
-      cand.pattern = is_identifier ? "identifier" : "alphanum_mixed";
+    cand.confidence = 1.0F;
+    cand.pattern = is_identifier ? "identifier" : "alphanum_mixed";
 #endif
-      candidates.push_back(cand);
-    }
+    candidates.push_back(std::move(cand));
   }
 }
 

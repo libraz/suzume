@@ -102,9 +102,6 @@ struct CandidateOptions {
   JoinOptions join;
   SplitOptions split;
   VerbCandidateOptions verb;
-
-  /// Create default options matching candidate_constants.h
-  static CandidateOptions defaults() { return CandidateOptions{}; }
 };
 
 }  // namespace suzume::analysis

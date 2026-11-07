@@ -7,10 +7,8 @@
  */
 
 #include <array>
-#include <cstdint>
 #include <utility>
 
-#include "adjective_candidates.h"
 #include "analysis/dictionary_probe.h"
 #include "analysis/scorer_constants.h"
 #include "analysis/unknown.h"
@@ -21,9 +19,7 @@
 #include "normalize/char_type.h"
 #include "normalize/exceptions.h"
 #include "normalize/utf8.h"
-#include "suffix_candidates.h"
 #include "tokenizer_utils.h"
-#include "verb_candidates.h"
 
 namespace suzume::analysis {
 
@@ -116,8 +112,7 @@ size_t laughterLengthAt(const std::vector<char32_t>& codepoints, size_t start_po
   return end - start_pos - 1 >= kMinRepeats ? end - start_pos : 0;
 }
 
-void UnknownWordGenerator::generateCharacterSpeechCandidates(std::string_view /*text*/,
-                                                             const std::vector<char32_t>& codepoints, size_t start_pos,
+void UnknownWordGenerator::generateCharacterSpeechCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                                              const std::vector<normalize::CharType>& char_types,
                                                              std::vector<UnknownCandidate>& candidates) const {
   if (start_pos >= char_types.size()) {
@@ -307,7 +302,7 @@ void UnknownWordGenerator::generateCharacterSpeechCandidates(std::string_view /*
       cand.confidence = 0.5F;
       cand.pattern = "char_speech_hira";
 #endif
-      candidates.push_back(cand);
+      candidates.push_back(std::move(cand));
     }
   }
 }
@@ -420,7 +415,7 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
         // dictionary already carries has a lexical reading of its own, and a
         // mimetic adverb invented over the same span would outbid it on shape
         // alone (めちゃめちゃ is the na-adjective the dictionary lists).
-        if (!surface.empty() && (dict_manager_ == nullptr || dict_manager_->lookupExact(surface) == nullptr)) {
+        if (dict_manager_ == nullptr || dict_manager_->lookupExact(surface) == nullptr) {
           appendDoubledMimetic(dict_manager_, codepoints, start_pos, mimetic_end,
                                candidate::kMimeticExactReduplicationAdverbCost, "aa_doubled", candidates);
           return;  // Found a match, return early
@@ -526,14 +521,14 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
           }
         }
       }
-      if (!surface.empty() && !decomposes_as_predicate_particle && !ends_on_predicate) {
+      if (!decomposes_as_predicate_particle && !ends_on_predicate) {
         auto cand = makeCandidate(surface, start_pos, mimetic_end, core::PartOfSpeech::Adverb,
                                   candidate::kMimeticHeterogeneousAdverbCost, true, CandidateOrigin::Onomatopoeia);
 #ifdef SUZUME_DEBUG_INFO
         cand.confidence = candidate::kHighOriginConfidence;
         cand.pattern = "heterogeneous_four_mora_quotative";
 #endif
-        candidates.push_back(cand);
+        candidates.push_back(std::move(cand));
       }
     }
   }
@@ -732,7 +727,7 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
         cand.confidence = 0.9F;
         cand.pattern = "x_tto_pattern";
 #endif
-        candidates.push_back(cand);
+        candidates.push_back(std::move(cand));
       }
       break;
     }

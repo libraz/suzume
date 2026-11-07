@@ -82,10 +82,10 @@ bool spansPresumptiveAuxiliary(const std::vector<char32_t>& codepoints, size_t s
   return false;
 }
 
-// Phonologically impossible hiragana word starts: small kana (拗音・促音), the
-// moraic nasal ん, and the case particles を/が which never begin a native word.
 }  // namespace
 
+// Phonologically impossible hiragana word starts: small kana (拗音・促音), the
+// moraic nasal ん, and the case particles を/が which never begin a native word.
 bool isImpossibleHiraganaStart(char32_t code_point) {
   // Small kana (拗音・促音) share the single kana:: source of truth; ん and the case
   // particles を/が never begin a native hiragana word. Callers gate on hiragana,

@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <utility>
 
 #include "analysis/dictionary_probe.h"
 #include "analysis/scorer_constants.h"
@@ -365,7 +366,7 @@ void UnknownWordGenerator::appendHiraganaNominalNakuCandidate(const std::vector<
 #ifdef SUZUME_DEBUG_INFO
     noun_cand.pattern = "hiragana_nominal_naku";
 #endif
-    candidates.push_back(noun_cand);
+    candidates.push_back(std::move(noun_cand));
   }
 }
 

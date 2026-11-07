@@ -107,6 +107,8 @@ class Analyzer {
   std::unique_ptr<Tokenizer> tokenizer_;
   core::Viterbi viterbi_;
 
+  void rebuildTokenizer();
+
   /**
    * @brief Analyze a chunk with pretokenization (URL/date/etc. extraction)
    */

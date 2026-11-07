@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <utility>
 
 #include "analysis/dictionary_probe.h"
 #include "analysis/scorer_constants.h"
@@ -236,6 +237,11 @@ bool admitsPromotedRun(const BracketedNounContext& ctx, const BracketedScan& bra
 // longer rescue run that a boundary particle closes.
 
 namespace {
+bool isTerminalIAdjectiveReading(const grammar::InflectionCandidate& reading) {
+  return reading.verb_type == grammar::VerbType::IAdjective && !reading.suffix.empty() &&
+         reading.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence;
+}
+
 bool longerReadingSpansBracket(const BracketedNounContext& ctx, size_t run_end, size_t longer_rescue_end) {
   if (longer_rescue_end > run_end) {
     return true;
@@ -270,8 +276,7 @@ bool longerReadingSpansBracket(const BracketedNounContext& ctx, size_t run_end, 
   }
   for (size_t reading_end = run_end + 1; reading_end <= kana_end; ++reading_end) {
     for (const auto& reading : analysesInRange(ctx.inflection, codepoints, start_pos, reading_end)) {
-      if (reading.verb_type == grammar::VerbType::IAdjective && !reading.suffix.empty() &&
-          reading.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence) {
+      if (isTerminalIAdjectiveReading(reading)) {
         return true;
       }
     }
@@ -298,13 +303,8 @@ void appendPromotedRunCandidates(const BracketedNounContext& ctx, const Brackete
   // from word-final kana (ありがち+だ against あり+がち+だ).
   const bool auxiliary_bracket_before_particle =
       promoted.right_auxiliary && scan + 1 < codepoints.size() && isRightBoundaryParticle(codepoints[scan + 1]);
-  const bool has_terminal_i_adjective_reading =
-      std::any_of(promoted.promoted_inflections->begin(), promoted.promoted_inflections->end(),
-                  [](const grammar::InflectionCandidate& inflection_candidate) {
-                    return inflection_candidate.verb_type == grammar::VerbType::IAdjective &&
-                           !inflection_candidate.suffix.empty() &&
-                           inflection_candidate.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence;
-                  });
+  const bool has_terminal_i_adjective_reading = std::any_of(
+      promoted.promoted_inflections->begin(), promoted.promoted_inflections->end(), isTerminalIAdjectiveReading);
   // と can close a nominal phrase, but it is also the unique one-mora
   // case-particle homograph that quotes a finished predicate. When the
   // run has a credible terminal i-adjective analysis, it may make the noun
@@ -348,7 +348,7 @@ void appendPromotedRunCandidates(const BracketedNounContext& ctx, const Brackete
        !(promoted.right_particle && exact_dictionary_reading->pos == core::PartOfSpeech::Auxiliary) &&
        !promoted.copula_selected_predicate_homograph);
   if (selected_nominal && !exact_reading_owns_context && !longerReadingSpansBracket(ctx, scan, longer_rescue_end)) {
-    noun_cost += scorer::kBonusDoubleVeryStrong;
+    noun_cost += scorer::scale::kDoubleVeryStrongBonus;
   }
   // A substantive hiragana run at a clause boundary, immediately before
   // genitive の, or in front of a kanji head is a complete nominal head when
@@ -432,7 +432,7 @@ void appendPromotedRunCandidates(const BracketedNounContext& ctx, const Brackete
 #ifdef SUZUME_DEBUG_INFO
   noun_cand.pattern = "bracketed_hira_noun";
 #endif
-  candidates.push_back(noun_cand);
+  candidates.push_back(std::move(noun_cand));
   // The beautifying お is productive on native nouns (お+ふろ, お+さんぽ),
   // so the noun behind it is offered with the same evidence. A
   // lexicalized お-word whose remainder means nothing alone (おなか,
@@ -443,14 +443,14 @@ void appendPromotedRunCandidates(const BracketedNounContext& ctx, const Brackete
   const char32_t last_mora = codepoints[scan - 1];
   const bool opens_on_native_prefix = codepoints[start_pos] == U'お' && promoted.len >= 3 &&
                                       promoted.promoted_dictionary_reading == nullptr &&
-                                      !kana::isIRowCodepoint(last_mora) && !kana::isERowCodepoint(last_mora);
+                                      !kana::isIOrERowCodepoint(last_mora);
   if (opens_on_native_prefix) {
     auto host_cand = makeCandidate(codepoints, start_pos + 1, scan, core::PartOfSpeech::Noun, noun_cost,
                                    /*has_suffix=*/true, CandidateOrigin::BracketedNoun);
 #ifdef SUZUME_DEBUG_INFO
     host_cand.pattern = "prefixed_hira_noun";
 #endif
-    candidates.push_back(host_cand);
+    candidates.push_back(std::move(host_cand));
   }
 }
 

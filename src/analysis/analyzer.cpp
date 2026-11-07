@@ -105,15 +105,14 @@ Analyzer::Analyzer(const AnalyzerOptions& options)
       scorer_(options.scorer_options),
       unknown_gen_(options.unknown_options, &dict_manager_),
       tokenizer_(nullptr) {
-  tokenizer_ = std::make_unique<Tokenizer>(dict_manager_, scorer_, unknown_gen_, options_.mode);
+  rebuildTokenizer();
 }
 
 Analyzer::~Analyzer() = default;
 
 void Analyzer::addUserDictionary(std::shared_ptr<dictionary::UserDictionary> dict) {
   dict_manager_.addUserDictionary(std::move(dict));
-  // Rebuild tokenizer with new dictionary
-  tokenizer_ = std::make_unique<Tokenizer>(dict_manager_, scorer_, unknown_gen_, options_.mode);
+  rebuildTokenizer();
 }
 
 bool Analyzer::hasCoreBinaryDictionary() const {
@@ -125,6 +124,10 @@ void Analyzer::setMode(core::AnalysisMode mode) {
     return;
   }
   options_.mode = mode;
+  rebuildTokenizer();
+}
+
+void Analyzer::rebuildTokenizer() {
   tokenizer_ = std::make_unique<Tokenizer>(dict_manager_, scorer_, unknown_gen_, options_.mode);
 }
 

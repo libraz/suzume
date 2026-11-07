@@ -247,7 +247,7 @@ class UnknownWordGenerator {
   /**
    * @brief Generate alphanumeric sequence candidates
    */
-  void generateAlphanumeric(std::string_view text, const std::vector<char32_t>& codepoints, size_t start_pos,
+  void generateAlphanumeric(const std::vector<char32_t>& codepoints, size_t start_pos,
                             const std::vector<normalize::CharType>& char_types,
                             std::vector<UnknownCandidate>& candidates) const;
 
@@ -260,8 +260,8 @@ class UnknownWordGenerator {
    *
    * Examples: ナリ, ござる, だわ, etc.
    */
-  void generateCharacterSpeechCandidates(std::string_view text, const std::vector<char32_t>& codepoints,
-                                         size_t start_pos, const std::vector<normalize::CharType>& char_types,
+  void generateCharacterSpeechCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                         const std::vector<normalize::CharType>& char_types,
                                          std::vector<UnknownCandidate>& candidates) const;
 
   /**

@@ -32,7 +32,7 @@ using core::ExtendedPOS;
 
 namespace detail {
 
-constexpr std::array<float, static_cast<size_t>(ExtendedPOS::Count_)> kCategoryCostTable = []() constexpr {
+inline constexpr std::array<float, static_cast<size_t>(ExtendedPOS::Count_)> kCategoryCostTable = []() constexpr {
   std::array<float, static_cast<size_t>(ExtendedPOS::Count_)> table{};
 
   // Initialize all to moderate cost

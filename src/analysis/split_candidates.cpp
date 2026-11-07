@@ -13,7 +13,6 @@
 #include "candidate_constants.h"
 #include "core/debug.h"
 #include "grammar/char_patterns.h"
-#include "grammar/conjugation.h"
 #include "grammar/honorific_verbs.h"
 #include "grammar/inflection.h"
 #include "normalize/char_type.h"
@@ -567,24 +566,18 @@ void addNounVerbSplitCandidates(core::Lattice& lattice, std::string_view text, c
       // Extract the potential verb part
       const std::string_view verb_part = text.substr(verb_start_byte, verb_end_byte - verb_start_byte);
 
-      // Check if the verb part looks like a conjugated verb
+      // The verb part looks conjugated, and/or a candidate's base form is in the dictionary
       bool looks_like_verb = false;
-      const auto& candidates = inflection.analyze(verb_part);
-      for (const auto& cand : candidates) {
+      bool base_in_dict = false;
+      for (const auto& cand : inflection.analyze(verb_part)) {
         if (cand.confidence > 0.5F) {
           looks_like_verb = true;
-          break;
         }
-      }
-
-      // Check if any candidate's base form is in dictionary
-      bool base_in_dict = false;
-      for (const auto& cand : candidates) {
-        if (cand.confidence < 0.5F) {
-          continue;
-        }
-        if (dict_manager.lookupExact(cand.base_form, core::PartOfSpeech::Verb) != nullptr) {
+        if (!base_in_dict && !(cand.confidence < 0.5F) &&
+            dict_manager.lookupExact(cand.base_form, core::PartOfSpeech::Verb) != nullptr) {
           base_in_dict = true;
+        }
+        if (looks_like_verb && base_in_dict) {
           break;
         }
       }
