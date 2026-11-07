@@ -21,6 +21,7 @@
 #include "core/kana_constants.h"
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
+#include "grammar/inflection_scorer_constants.h"
 #include "normalize/char_type.h"
 #include "normalize/exceptions.h"
 #include "normalize/utf8.h"
@@ -425,10 +426,12 @@ bool absorbsKanaVerbCellBeforeNegative(const UnknownCandidate& candidate, const 
     if (!verb_helpers::kanaVerbCellBeforeNegative(dict_manager, codepoints, boundary, cell_end)) {
       continue;
     }
-    // The verb may open anywhere in the run (資料+用い+ない).
+    // The verb may open anywhere in the run (資料+用い+ない); the closed set of
+    // kami-ichidan い stems attests itself (老い+ない).
     bool attested = false;
     for (size_t stem_start = candidate.start; stem_start < boundary && !attested; ++stem_start) {
-      attested = verb_helpers::namesDictionaryVerbContinuative(dict_manager, codepoints, stem_start, cell_end - 1);
+      attested = verb_helpers::namesDictionaryVerbContinuative(dict_manager, codepoints, stem_start, cell_end - 1) ||
+                 grammar::inflection::isValidKanjiIStemException(extractSubstring(codepoints, stem_start, cell_end));
     }
     return !attested;
   }

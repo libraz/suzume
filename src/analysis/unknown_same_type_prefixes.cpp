@@ -20,6 +20,7 @@
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "grammar/honorific_verbs.h"
+#include "grammar/inflection_scorer_constants.h"
 #include "normalize/char_type.h"
 #include "normalize/exceptions.h"
 #include "normalize/utf8.h"
@@ -223,7 +224,9 @@ bool kanjiHeadsPredicateAt(const std::vector<char32_t>& codepoints, const std::v
       (grammar::isMonogradeStemFinalKana(okurigana) &&
        verb_helpers::isVerbInDictionary(&dict_manager,
                                         normalize::concat(head, normalize::encodeUtf8(okurigana), "る"))) ||
-      (okurigana == U'い' && verb_helpers::isAdjectiveInDictionary(&dict_manager, normalize::concat(head, "い")))) {
+      // The closed kami-ichidan い stems (老い, 率い) are verbs without a listing.
+      (okurigana == U'い' && (verb_helpers::isAdjectiveInDictionary(&dict_manager, normalize::concat(head, "い")) ||
+                              grammar::inflection::isValidKanjiIStemException(normalize::concat(head, "い"))))) {
     return true;
   }
   // A word a noun takes opening on the kana makes the run plus that word a
