@@ -658,10 +658,11 @@ def postprocess_verb_ease_adjective(tokens: list[dict]) -> bool:
 
 
 def postprocess_kusai_garu(tokens: list[dict]) -> bool:
-    """Restore the -くさい adjective stem before がる (面倒くさ+がら+ず).
+    """Restore the -くさい adjective stem before がる or a suffix (面倒くさ+がら+ず).
 
-    The reference cuts the stem after く and reads the rest as さがる or as
-    さ+がる; the stem is the adjective's, exactly as in 恥ずかし+がら.
+    The reference cuts the stem after く and reads the rest as さがる, as
+    さ+がる, or as the nominalizer さ before a suffix (面倒く+さ+すぎ); the stem
+    is the adjective's, exactly as in 恥ずかし+がら.
     """
     from .split_rules import _is_single_i_adjective
 
@@ -674,16 +675,22 @@ def postprocess_kusai_garu(tokens: list[dict]) -> bool:
         if token.get("pos") != "Adjective" or not surface.endswith("く"):
             continue
         stem = surface + "さ"
+        garu = None
         if following.get("pos") == "Verb" and following.get("lemma") == "さがる":
             garu = {"surface": following["surface"][1:], "pos": "Verb", "lemma": "がる"}
             span = 2
         elif following.get("surface") == "さ" and idx + 2 < len(tokens) and tokens[idx + 2].get("lemma") == "がる":
             garu = {"surface": tokens[idx + 2]["surface"], "pos": "Verb", "lemma": "がる"}
             span = 3
+        elif following.get("surface") == "さ" and following.get("pos") == "Suffix":
+            span = 2
         else:
             continue
         if not _is_single_i_adjective(stem + "い"):
             continue
-        tokens[idx : idx + span] = [{"surface": stem, "pos": "Adjective", "lemma": stem + "い"}, garu]
+        tokens[idx : idx + span] = [
+            {"surface": stem, "pos": "Adjective", "lemma": stem + "い"},
+            *([garu] if garu else []),
+        ]
         changed = True
     return changed

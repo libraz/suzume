@@ -1745,3 +1745,23 @@ class TestElapsedPastBeforeNow:
 
     def test_adverb_before_a_verb_is_kept(self):
         assert self._surfaces("彼がたった今来た") == ["彼", "が", "たった今", "来", "た"]
+
+
+class TestKusaiStemBeforeSuffix:
+    def test_nominalizer_before_excess_suffix_is_folded_into_the_stem(self):
+        tokens = [
+            {"surface": "面倒く", "pos": "Adjective", "lemma": "面倒い"},
+            {"surface": "さ", "pos": "Suffix", "lemma": "さ"},
+            {"surface": "すぎ", "pos": "Suffix", "lemma": "すぎ"},
+        ]
+        assert postprocessors.postprocess_kusai_garu(tokens)
+        assert [token["surface"] for token in tokens] == ["面倒くさ", "すぎ"]
+        assert tokens[0]["lemma"] == "面倒くさい"
+
+    def test_causative_sa_after_a_ku_form_is_kept(self):
+        tokens = [
+            {"surface": "高く", "pos": "Adjective", "lemma": "高い"},
+            {"surface": "さ", "pos": "Verb", "lemma": "する"},
+            {"surface": "せる", "pos": "Auxiliary", "lemma": "せる"},
+        ]
+        assert not postprocessors.postprocess_kusai_garu(tokens)

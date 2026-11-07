@@ -224,7 +224,7 @@ def postprocess_teru_te_order(tokens: list[dict]) -> bool:
 
 
 def postprocess_excessive_after_verb(tokens: list[dict]) -> bool:
-    """Tag すぎ after a verb continuative as the verb すぎる (食べ+すぎ).
+    """Tag すぎ after a verb continuative or adjective stem as the verb すぎる (食べ+すぎ).
 
     The reference calls the same cell a nominal suffix when its host was an
     unknown stem it had to repair, so one construction carried two tags.
@@ -240,7 +240,7 @@ def postprocess_excessive_after_verb(tokens: list[dict]) -> bool:
             if base is None:
                 continue
             previous.update(pos="Verb", lemma=base)
-        if previous.get("pos") == "Verb":
+        if previous.get("pos") in ("Verb", "Adjective"):
             token.update(pos="Verb", lemma="すぎる")
             changed = True
     return changed

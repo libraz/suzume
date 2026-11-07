@@ -1723,6 +1723,45 @@
       ],
       "id": "kuikou",
       "input": "早くいこう"
+    },
+    {
+      "description": "設定めんどくさすぎ - auto-generated",
+      "expected": [
+        {
+          "lemma": "設定",
+          "pos": "Noun",
+          "surface": "設定"
+        },
+        {
+          "lemma": "めんどくさい",
+          "pos": "Adjective",
+          "surface": "めんどくさ"
+        },
+        {
+          "lemma": "すぎる",
+          "pos": "Verb",
+          "surface": "すぎ"
+        }
+      ],
+      "id": "mendokusasugi",
+      "input": "設定めんどくさすぎ"
+    },
+    {
+      "description": "面倒くさすぎ - auto-generated",
+      "expected": [
+        {
+          "lemma": "面倒くさい",
+          "pos": "Adjective",
+          "surface": "面倒くさ"
+        },
+        {
+          "lemma": "すぎる",
+          "pos": "Verb",
+          "surface": "すぎ"
+        }
+      ],
+      "id": "kusasugi",
+      "input": "面倒くさすぎ"
     }
   ],
   "description": "I-adjectives ku-forms (連用形) - adverbial, negative, te-form, ku-naru patterns",
