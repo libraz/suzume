@@ -473,7 +473,9 @@ def _merge_counter_expressions(state: MergeState) -> bool:
                 is_span_kan = (
                     ns == "間" and np == "名詞" and ns1 == "接尾" and _DURATION_BEFORE_SPAN_KAN.search(combined)
                 )
-                is_calendar_month = ns == "月" and regex.match(r"^(?:1[0-2]|[1-9])$", combined)
+                # The month numeral is tested alone, after a calendar year when one
+                # precedes it (2026年+8+月); a short span (3年2) is not a year.
+                is_calendar_month = ns == "月" and regex.match(r"^(?:\d{3,4}年)?(?:1[0-2]|[1-9])$", combined)
                 is_katakana_noun = np == "名詞" and regex.match(r"^[\u30A0-\u30FF]+$", ns)
                 is_chuu_suffix = ns == "中" and np == "名詞" and ns1 == "接尾"
                 is_me_suffix = ns == "目" and np == "名詞" and ns1 == "接尾"

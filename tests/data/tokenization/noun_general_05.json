@@ -558,6 +558,40 @@
       ],
       "id": "sorehasanpodesu",
       "input": "それはさんぽです"
+    },
+    {
+      "description": "２０２６年８月に開催 - auto-generated",
+      "expected": [
+        {
+          "lemma": "2026年8月",
+          "pos": "Noun",
+          "surface": "2026年8月"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "開催",
+          "pos": "Noun",
+          "surface": "開催"
+        }
+      ],
+      "id": "ni_7",
+      "input": "２０２６年８月に開催"
+    },
+    {
+      "description": "2026年12月 - auto-generated",
+      "expected": [
+        {
+          "lemma": "2026年12月",
+          "pos": "Noun",
+          "surface": "2026年12月"
+        }
+      ],
+      "id": "2026_12",
+      "input": "2026年12月"
     }
   ],
   "description": "General nouns (part 5/5)",

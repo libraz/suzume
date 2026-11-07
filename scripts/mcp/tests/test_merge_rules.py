@@ -2255,3 +2255,15 @@ class TestIchidanProhibitiveContraction:
     def test_keeps_negative_n_before_other_particles(self):
         assert self._merge("寝んなあ")[:2] == ["寝", "ん"]
         assert self._merge("寝んぞ")[:2] == ["寝", "ん"]
+
+
+class TestCalendarMonthAfterYear:
+    def test_joins_the_month_to_a_calendar_year(self):
+        tokens = [
+            _tok("2026", pos="名詞", pos_sub1="数"),
+            _tok("年", pos="名詞", pos_sub1="接尾", pos_sub2="助数詞"),
+            _tok("8", pos="名詞", pos_sub1="数"),
+            _tok("月", pos="名詞", pos_sub1="接尾", pos_sub2="助数詞"),
+        ]
+        result, _ = apply_suzume_merge(tokens, "2026年8月")
+        assert [token["surface"] for token in result] == ["2026年8月"]
