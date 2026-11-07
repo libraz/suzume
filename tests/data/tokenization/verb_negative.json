@@ -877,6 +877,114 @@
       ],
       "id": "raganai",
       "input": "和らがない"
+    },
+    {
+      "description": "listed ichidan verb whose irrealis is also a listed noun keeps the verb before ない",
+      "expected": [
+        {
+          "lemma": "痛み",
+          "pos": "Noun",
+          "surface": "痛み"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "感じる",
+          "pos": "Verb",
+          "surface": "感じ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "miwo_jinai",
+      "input": "痛みを感じない"
+    },
+    {
+      "description": "何も感じなかった - auto-generated",
+      "expected": [
+        {
+          "lemma": "何",
+          "pos": "Pronoun",
+          "surface": "何"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "感じる",
+          "pos": "Verb",
+          "surface": "感じ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "mo_jinakattta",
+      "input": "何も感じなかった"
+    },
+    {
+      "description": "寒さを感じず - auto-generated",
+      "expected": [
+        {
+          "lemma": "寒い",
+          "pos": "Adjective",
+          "surface": "寒"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Suffix",
+          "surface": "さ"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "感じる",
+          "pos": "Verb",
+          "surface": "感じ"
+        },
+        {
+          "lemma": "ぬ",
+          "pos": "Auxiliary",
+          "surface": "ず"
+        }
+      ],
+      "id": "sawo_jizu",
+      "input": "寒さを感じず"
+    },
+    {
+      "description": "感じない - auto-generated",
+      "expected": [
+        {
+          "lemma": "感じる",
+          "pos": "Verb",
+          "surface": "感じ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "jinai",
+      "input": "感じない"
     }
   ],
   "description": "verb_negative tests",

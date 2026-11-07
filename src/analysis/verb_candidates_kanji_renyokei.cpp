@@ -233,6 +233,11 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
         // 見せる remain eligible.
         const bool unverified_multi_kanji_suru_mizen =
             !ichidan_base_is_dict && kanji_end - start_pos >= 2 && first_hira == U'せ' && continuation == U'ん';
+        // The negative paradigm selects an irrealis too. ず/ぬ/ざる never follow a
+        // noun; ない does (頼り+ない), so there a listed Ichidan base is required
+        // (感じ+ない, 感じ+ず, not 感じ(NOUN) + ない).
+        verb_aux_follows = verb_aux_follows || classical_negative_aux_follows ||
+                           (ichidan_base_is_dict && vh::naiNegativeFollowsAt(codepoints, renyokei_end));
         bool surface_is_dict_noun = !verb_aux_follows && vh::isNounInDictionary(dict_manager, surface);
         if (surface_is_dict_noun) {
           SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" is dict NOUN, skipping ichidan_renyokei\n");
