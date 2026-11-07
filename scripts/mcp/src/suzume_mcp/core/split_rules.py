@@ -97,6 +97,36 @@ _VERB_INFLECTION_FOLLOWERS = frozenset({"て", "た", "たり", "ない", "な�
 _FIXED_LEADING_SEARCH_UNITS_BY_LENGTH = tuple(sorted(FIXED_LEADING_SEARCH_UNITS, key=len, reverse=True))
 
 
+def _spells_verb_continuative_before_masu(head: str) -> bool:
+    """Whether ``head`` re-reads as case particle(s) plus a verb continuative before ます."""
+    polite = mecab_analyze(head + "ます")
+    return (
+        len(polite) > 1
+        and polite[-1].get("surface") == "ます"
+        and polite[-2].get("pos") == "動詞"
+        and "".join(part.get("surface", "") for part in polite) == head + "ます"
+    )
+
+
+def _polite_compound_particle_tokens(head: str) -> list[dict]:
+    """Split a compound particle's polite form into its head, まし and て."""
+    head_tokens = [{"surface": head, "pos": "助詞", "lemma": head}]
+    # ます selects a continuative, so even a head the dictionary lists as
+    # one particle (に関し) is the case particle plus the verb here.
+    polite = mecab_analyze(head + "ます")
+    if (
+        len(polite) > 1
+        and polite[-1].get("surface") == "ます"
+        and "".join(part.get("surface", "") for part in polite) == head + "ます"
+    ):
+        head_tokens = [dict(part) for part in polite[:-1]]
+    return [
+        *head_tokens,
+        {"surface": "まし", "pos": "助動詞", "lemma": "ます"},
+        {"surface": "て", "pos": "助詞", "lemma": "て"},
+    ]
+
+
 def apply_suzume_split(tokens: list[dict]) -> tuple[list[dict], str | None]:
     """Apply Suzume split rules to MeCab tokens.
 
@@ -183,24 +213,23 @@ def apply_suzume_split(tokens: list[dict]) -> tuple[list[dict], str | None]:
         # the verb continuative plus ます; re-reading the head with ます restored
         # recovers that continuative (に+関し+まし+て).
         if t.get("pos") == "助詞" and surface.endswith("まして") and len(surface) > 3:
-            head = surface[:-3]
-            head_tokens = [{"surface": head, "pos": "助詞", "lemma": head}]
-            # ます selects a continuative, so even a head the dictionary lists as
-            # one particle (に関し) is the case particle plus the verb here.
-            polite = mecab_analyze(head + "ます")
-            if (
-                len(polite) > 1
-                and polite[-1].get("surface") == "ます"
-                and "".join(part.get("surface", "") for part in polite) == head + "ます"
-            ):
-                head_tokens = [dict(part) for part in polite[:-1]]
-            result.extend(
-                [
-                    *head_tokens,
-                    {"surface": "まし", "pos": "助動詞", "lemma": "ます"},
-                    {"surface": "て", "pos": "助詞", "lemma": "て"},
-                ]
-            )
+            result.extend(_polite_compound_particle_tokens(surface[:-3]))
+            if applied_rule is None:
+                applied_rule = "polite-compound-particle-boundary"
+            continue
+        # The reference can also cut the same span after the particle and read
+        # まして as the adverb (につれ+まして). The adverb never follows a compound
+        # particle whose head re-reads as a verb continuative before ます.
+        if (
+            surface == "まして"
+            and t.get("pos") in ("副詞", "接続詞")
+            and result
+            and result[-1].get("pos") == "助詞"
+            and len(result[-1].get("surface", "")) > 1
+            and _spells_verb_continuative_before_masu(result[-1].get("surface", ""))
+        ):
+            head = result.pop().get("surface", "")
+            result.extend(_polite_compound_particle_tokens(head))
             if applied_rule is None:
                 applied_rule = "polite-compound-particle-boundary"
             continue

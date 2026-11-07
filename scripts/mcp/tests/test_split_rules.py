@@ -422,3 +422,17 @@ class TestLexicalizedTeCompoundVerb:
         result, rule = apply_suzume_split([token])
         assert [part["surface"] for part in result] == ["捨て"]
         assert rule is None
+
+
+class TestPoliteCompoundParticleAdverbCut:
+    def test_adverb_mashite_after_continuative_particle_is_polite(self):
+        tokens = [_tok("につれ", "助詞"), _tok("まして", "副詞"), _tok("体力")]
+        result, rule = apply_suzume_split(tokens)
+        assert [t["surface"] for t in result] == ["に", "つれ", "まし", "て", "体力"]
+        assert result[2]["lemma"] == "ます"
+        assert rule == "polite-compound-particle-boundary"
+
+    def test_mashite_after_plain_particle_is_untouched(self):
+        tokens = [_tok("に", "助詞"), _tok("も", "助詞"), _tok("まして", "副詞")]
+        result, _ = apply_suzume_split(tokens)
+        assert [t["surface"] for t in result] == ["に", "も", "まして"]

@@ -1294,6 +1294,157 @@
       ],
       "id": "ni_imashite_shimasu",
       "input": "規則に従いまして処理します"
+    },
+    {
+      "description": "polite form of a continuative-final compound particle splits like に関しまして",
+      "expected": [
+        {
+          "lemma": "年",
+          "pos": "Noun",
+          "surface": "年"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "とる",
+          "pos": "Verb",
+          "surface": "とる"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "つれる",
+          "pos": "Verb",
+          "surface": "つれ"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "まし"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "体力",
+          "pos": "Noun",
+          "surface": "体力"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "落ちる",
+          "pos": "Verb",
+          "surface": "落ちる"
+        }
+      ],
+      "id": "wotorunitsuremashite_ga_chiru",
+      "input": "年をとるにつれまして体力が落ちる"
+    },
+    {
+      "description": "時間がたつにつれまして寒くなる - auto-generated",
+      "expected": [
+        {
+          "lemma": "時間",
+          "pos": "Noun",
+          "surface": "時間"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "たつ",
+          "pos": "Verb",
+          "surface": "たつ"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "つれる",
+          "pos": "Verb",
+          "surface": "つれ"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "まし"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "寒い",
+          "pos": "Adjective",
+          "surface": "寒く"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なる"
+        }
+      ],
+      "id": "gatatsunitsuremashite_kunaru",
+      "input": "時間がたつにつれまして寒くなる"
+    },
+    {
+      "description": "control: にもまして keeps the verb 増す",
+      "expected": [
+        {
+          "lemma": "前",
+          "pos": "Noun",
+          "surface": "前"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "増す",
+          "pos": "Verb",
+          "surface": "まし"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "元気",
+          "pos": "Adjective",
+          "surface": "元気"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "nimomashite_da_3",
+      "input": "前にもまして元気だ"
     }
   ],
   "description": "particle_compound tests",
