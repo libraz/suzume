@@ -569,6 +569,65 @@
       ],
       "id": "ka_niaru",
       "input": "何か月曜日にある"
+    },
+    {
+      "description": "a closed one-kanji ichidan stem before ながら ends the quantity run as a verb",
+      "expected": [
+        {
+          "lemma": "三度",
+          "pos": "Noun",
+          "surface": "三度"
+        },
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "ながら",
+          "pos": "Particle",
+          "surface": "ながら"
+        },
+        {
+          "lemma": "確かめる",
+          "pos": "Verb",
+          "surface": "確かめ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "nagara_kameta",
+      "input": "三度見ながら確かめた"
+    },
+    {
+      "description": "二度見しながら歩く - auto-generated",
+      "expected": [
+        {
+          "lemma": "二度見",
+          "pos": "Noun",
+          "surface": "二度見"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "ながら",
+          "pos": "Particle",
+          "surface": "ながら"
+        },
+        {
+          "lemma": "歩く",
+          "pos": "Verb",
+          "surface": "歩く"
+        }
+      ],
+      "id": "shinagara_ku",
+      "input": "二度見しながら歩く"
     }
   ],
   "description": "number_counter tests (part 2/2)",
