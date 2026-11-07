@@ -529,6 +529,192 @@
       ],
       "id": "tttakono",
       "input": "昨日買ったこの本"
+    },
+    {
+      "description": "Determiner after a case particle keeps its span; quotative と + み + て",
+      "expected": [
+        {
+          "lemma": "警察",
+          "pos": "Noun",
+          "surface": "警察"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "男",
+          "pos": "Noun",
+          "surface": "男"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "何らかの",
+          "pos": "Determiner",
+          "surface": "何らかの"
+        },
+        {
+          "lemma": "事情",
+          "pos": "Noun",
+          "surface": "事情"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "知る",
+          "pos": "Verb",
+          "surface": "知っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "みる",
+          "pos": "Verb",
+          "surface": "み"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "話",
+          "pos": "Noun",
+          "surface": "話"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "聴く",
+          "pos": "Verb",
+          "surface": "聴い"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "ha_ga_rakano_wo_ttteirutomite_wo_iteiru",
+      "input": "警察は男が何らかの事情を知っているとみて、話を聴いている。"
+    },
+    {
+      "description": "Determiner 何らかの after が",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "何らかの",
+          "pos": "Determiner",
+          "surface": "何らかの"
+        },
+        {
+          "lemma": "理由",
+          "pos": "Noun",
+          "surface": "理由"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "欠席",
+          "pos": "Noun",
+          "surface": "欠席"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ga_rakano_de_shita",
+      "input": "彼が何らかの理由で欠席した"
+    },
+    {
+      "description": "Verb-homograph determiner after a case particle is the verb",
+      "expected": [
+        {
+          "lemma": "壁",
+          "pos": "Noun",
+          "surface": "壁"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "かかる",
+          "pos": "Verb",
+          "surface": "かかる"
+        },
+        {
+          "lemma": "絵",
+          "pos": "Noun",
+          "surface": "絵"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "見る",
+          "pos": "Verb",
+          "surface": "見"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "nikakaru_wo_ta",
+      "input": "壁にかかる絵を見た"
     }
   ],
   "description": "determiner tests",

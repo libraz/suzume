@@ -88,6 +88,19 @@ bool lacksLicensingEnvironment(const DictionaryCandidateContext& ctx, const core
     return true;
   }
 
+  // A determiner spelled exactly like a verb's attributive (ある, かかる) is
+  // that verb when a one-mora case particle has just supplied its argument
+  // (お金が+ある人, 壁に+かかる絵); a determiner proper modifies its noun from
+  // outside the argument frame (男が+その本を, 男が+何らかの事情を). A mora
+  // closing a listed adverb is that adverb's tail, not a particle (わざと+ある).
+  if (result.entry->pos == core::PartOfSpeech::Determiner &&
+      verb_helpers::hasDictionaryEntry(&dict_manager, result.entry->surface, core::PartOfSpeech::Verb) &&
+      verb_helpers::oneMoraParticleEndsAt(&dict_manager, codepoints, start_pos, core::ExtendedPOS::ParticleCase) &&
+      !hasDictionaryEntryEndingAt(dict_manager, codepoints, dictionaryLookbehindStart(start_pos), start_pos,
+                                  partOfSpeechMask(core::PartOfSpeech::Adverb))) {
+    return true;
+  }
+
   // The uninflected progressive contraction とう/どう exists only on an
   // onbin host (終わっ+とう, 読ん+どう); elsewhere it is ordinary kana.
   if (result.entry->extended_pos == core::ExtendedPOS::AuxAspectIru &&

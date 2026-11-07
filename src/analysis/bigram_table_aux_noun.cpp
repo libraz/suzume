@@ -716,12 +716,6 @@ bool setAuxiliaryAndNounCosts(BigramMatrix& table) {
       // A bare nominal is no verb either (ごはん+おい+しい is ごはん+おいしい).
       {EPOS::Noun, EPOS::AuxAspectOku, cost::kProhibitive},
 
-      // ParticleCase → Determiner (rare; 連体詞 rarely follows case particles)
-      // Determiners introduce a new modifier clause and don't follow が/を/に/と/から/etc.
-      // Counteracts overly strong DET→NOUN bonus for verb-ambiguous hiragana DET like かかる
-      // (e.g., 壁にかかる絵 should be VERB, not DET).
-      {EPOS::ParticleCase, EPOS::Determiner, cost::kStrong},
-
       // A finished predicate takes a following determiner only as a relative
       // clause skipping over it (買った+この+本), which is rare but grammatical.
       // The かの over-match these rows once had to price out (た+か+の+よう) is
