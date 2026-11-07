@@ -30,6 +30,9 @@ using kana::kRenyokeiEndings;
  */
 bool endsWithERow(std::string_view stem);
 
+/// Pure kana ending in A/O-row + て cannot be a modern connective te-form.
+bool hasNoncontinuativeTeEnding(std::string_view surface);
+
 /**
  * @brief Check if stem ends with any of the specified characters
  * @param stem The stem to check

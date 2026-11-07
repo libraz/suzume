@@ -698,15 +698,27 @@ void Tokenizer::addUnknownCandidates(core::Lattice& lattice, std::string_view te
       dict_manager_, inflection_,  unknown_gen_, text,      codepoints,           byte_offsets,   start_pos,
       char_types,    dict_results, candidates,   kanji_end, following_verb_start, max_dict_length};
 
-  for (const auto& candidate : candidates) {
+  const auto emit_candidate = [&](const UnknownCandidate& candidate) {
     if (tokenizer_unknown_detail::isRejectedUnknownCandidate(ctx, lattice, candidate)) {
-      continue;
+      return;
     }
     const std::optional<float> adjusted_cost = unknownCandidateCost(ctx, candidate);
     if (!adjusted_cost) {
-      continue;
+      return;
     }
     addUnknownCandidateEdges(lattice, ctx, candidate, *adjusted_cost);
+  };
+  // Only admitted nominal edges may establish the copula boundary consumed by
+  // the unknown-verb guards below. Both passes use the same insertion checks.
+  for (const auto& candidate : candidates) {
+    if (candidate.copula_selected_noncontinuative_te) {
+      emit_candidate(candidate);
+    }
+  }
+  for (const auto& candidate : candidates) {
+    if (!candidate.copula_selected_noncontinuative_te) {
+      emit_candidate(candidate);
+    }
   }
 }
 

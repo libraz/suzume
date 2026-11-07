@@ -221,10 +221,10 @@ bool admitsPromotedRun(const BracketedNounContext& ctx, const BracketedScan& bra
          !promoted.absorbs_copula_before_sokuon_final &&
          ((!hasAuxiliaryParticleDecomposition(codepoints, start_pos, scan, dict_manager) && !spells_auxiliary_chain) ||
           promoted.has_deverbal_noun_shape_before_genitive || promoted.copula_selected_predicate_homograph ||
-          genitive_selects_nominal_head) &&
+          genitive_selects_nominal_head || promoted.copula_selected_noncontinuative_te) &&
          (!hasFunctionWordChainDecomposition(codepoints, start_pos, scan, dict_manager) ||
           promoted.has_deverbal_noun_shape_before_genitive || promoted.copula_selected_predicate_homograph ||
-          genitive_selects_nominal_head) &&
+          genitive_selects_nominal_head || promoted.copula_selected_noncontinuative_te) &&
          (dict_manager == nullptr ||
           !spansPredicateBeforeFormalNoun(codepoints, ctx.char_types, start_pos, scan, ctx.inflection, *dict_manager));
 }
@@ -313,7 +313,8 @@ void appendPromotedRunCandidates(const BracketedNounContext& ctx, const Brackete
   const bool right_predicate_quote = promoted.right_particle && scan < codepoints.size() &&
                                      codepoints[scan] == core::hiragana::kTo && has_terminal_i_adjective_reading;
   // The enumerating や asks for a nominal item whatever follows it.
-  const bool selected_nominal = ((((promoted.right_particle && !promoted.right_particle_opens_copula) ||
+  const bool selected_nominal = promoted.copula_selected_noncontinuative_te ||
+                                ((((promoted.right_particle && !promoted.right_particle_opens_copula) ||
                                    auxiliary_bracket_before_particle || promoted.right_suffix) &&
                                   !promoted.right_genitive_after_substantive_run && !right_predicate_quote &&
                                   (bracketed.left_determiner_bracket || bracketed.left_clause_bracket ||
@@ -407,7 +408,13 @@ void appendPromotedRunCandidates(const BracketedNounContext& ctx, const Brackete
   }
   auto noun_cand = makeCandidate(promoted.promoted_surface, start_pos, scan, bracketed_pos, noun_cost,
                                  /*has_suffix=*/true, CandidateOrigin::BracketedNoun, bracketed_epos);
-  noun_cand.bracketed_noun_rescue = !promoted.copula_selected_predicate_homograph;
+  noun_cand.bracketed_noun_rescue =
+      !promoted.copula_selected_predicate_homograph && !promoted.copula_selected_noncontinuative_te;
+  noun_cand.copula_selected_noncontinuative_te = promoted.copula_selected_noncontinuative_te;
+  if (promoted.copula_selected_noncontinuative_te) {
+    noun_cand.lemma = promoted.promoted_surface;
+    noun_cand.extended_pos = core::ExtendedPOS::Noun;
+  }
   // A particle-shaped last mora of a determiner (その, この) is no particle,
   // so a run the determiner opens and the clause end or a case or topic
   // particle closes needs no content word in front of it (その+へや,

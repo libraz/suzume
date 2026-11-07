@@ -1801,6 +1801,38 @@
       ],
       "id": "kaatttara_ete",
       "input": "何かあったら教えて"
+    },
+    {
+      "description": "Copula-selected kana nominal with a noncontinuative te ending",
+      "expected": [
+        {
+          "lemma": "泳ぐ",
+          "pos": "Verb",
+          "surface": "泳ぐ"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "にがて",
+          "pos": "Noun",
+          "surface": "にがて"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "gunoganigateda",
+      "input": "泳ぐのがにがてだ"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 11/11)",

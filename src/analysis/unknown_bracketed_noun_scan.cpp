@@ -562,6 +562,16 @@ PromotedRun classifyRightBrackets(const BracketedNounContext& ctx, const Bracket
   // available, because its own kana could equally be the run's last mora.
   const BoundAuxiliary right_bound = boundAuxiliaryAt(codepoints, scan, dict_manager, bracketed.left_particle_bracket);
   promoted.right_copula = right_bound.length > 0 && right_bound.is_copula;
+  // A/O-row + て is not a productive te-form. A finite copula can select
+  // that complete nominal even when internal particle kana truncated the scan.
+  if (promoted.len >= 3 && promoted.len <= 4 && scan < codepoints.size() && codepoints[scan] != U'な' &&
+      (bracketed.left_clause_bracket || bracketed.left_particle_bracket || bracketed.left_determiner_bracket) &&
+      grammar::hasNoncontinuativeTeEnding(extractSubstring(codepoints, start_pos, scan))) {
+    const BoundAuxiliary nominal_copula = boundAuxiliaryAt(codepoints, scan, dict_manager, true);
+    promoted.copula_selected_noncontinuative_te = nominal_copula.length > 0 && nominal_copula.is_copula;
+    promoted.right_copula = promoted.right_copula || promoted.copula_selected_noncontinuative_te;
+    promoted.right_auxiliary = promoted.right_auxiliary || promoted.copula_selected_noncontinuative_te;
+  }
   // The particle-shaped first mora of a longer copula is the copula's (で of です).
   if (dict_manager != nullptr && scan < codepoints.size() && isRightBoundaryParticle(codepoints[scan])) {
     constexpr size_t kCopulaWindow = 4;

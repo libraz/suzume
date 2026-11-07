@@ -123,6 +123,7 @@ repair_te_negative_causal_shi = postprocessor_mecab.repair_te_negative_causal_sh
 split_transparent_suru_te_adverb = postprocessor_mecab.split_transparent_suru_te_adverb
 
 # Exports from postprocessor_nominals.
+postprocess_noncontinuative_te_nominal = postprocessor_nominals.postprocess_noncontinuative_te_nominal
 postprocess_adjective_nominalizer = postprocessor_nominals.postprocess_adjective_nominalizer
 postprocess_prefix_before_verb = postprocessor_nominals.postprocess_prefix_before_verb
 postprocess_indefinite_pronoun_ka = postprocessor_nominals.postprocess_indefinite_pronoun_ka
@@ -276,6 +277,7 @@ POSTPROCESSORS: tuple[tuple[str, Callable[[list[dict]], bool]], ...] = (
     ("humble-o-itasu", postprocess_humble_o_itasu),
     # Ordered before the copular readings below, which name the environments
     # that genuinely select the copula and must have the last word.
+    ("noncontinuative-te-nominal", postprocess_noncontinuative_te_nominal),
     ("de-after-nominal", postprocess_de_after_nominal),
     ("de-particle", postprocess_de_particle),
     ("te-form-contraction-particle", postprocess_te_form_contraction),

@@ -63,6 +63,7 @@ struct PromotedRun {
   bool has_exact_noun{false};
   bool has_competing_exact_predicate{false};
   bool copula_selected_predicate_homograph{false};
+  bool copula_selected_noncontinuative_te{false};
   bool right_short_genitive{false};
   bool unread_short_run_bracketed{false};
   size_t min_len{0};

@@ -54,8 +54,9 @@ struct UnknownCandidate {
   core::ExtendedPOS extended_pos{core::ExtendedPOS::Unknown};  // Fine-grained POS for bigram
   float cost{0.0F};
   bool has_suffix{false};
-  bool lemma_verified{false};  // Lemma (base form) attested as a dictionary verb at generation time
+  bool lemma_verified{false};  // Base form attested in the dictionary at generation time
   bool bracketed_noun_rescue{false};
+  bool copula_selected_noncontinuative_te{false};
   bool requires_left_content_edge{false};
   bool requires_left_attributive_edge{false};
   bool rejects_preceding_content_edge{false};

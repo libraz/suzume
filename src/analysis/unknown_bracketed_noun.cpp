@@ -89,6 +89,13 @@ void UnknownWordGenerator::appendBracketedHiraganaNounCandidates(const std::vect
       if (endsOnPredicateTail(ctx, run_end)) {
         return false;
       }
+      if (std::any_of(candidates.begin(), candidates.end(), [&](const UnknownCandidate& candidate) {
+            return candidate.copula_selected_noncontinuative_te && candidate.origin == CandidateOrigin::BracketedNoun &&
+                   candidate.start == start_pos && candidate.end == run_end &&
+                   candidate.pos == core::PartOfSpeech::Noun;
+          })) {
+        return true;
+      }
       PromotedRun promoted = classifyRightBrackets(ctx, bracketed, run_end);
       readPromotedSurface(ctx, bracketed, promoted);
       if (!admitsPromotedRun(ctx, bracketed, promoted)) {
@@ -98,6 +105,12 @@ void UnknownWordGenerator::appendBracketedHiraganaNounCandidates(const std::vect
       appendPromotedRunCandidates(ctx, bracketed, promoted, noun_cost, longer_rescue_end, candidates);
       return true;
     };
+    for (size_t nominal_end = start_pos + 3;
+         nominal_end <= start_pos + kDefaultBracketedNounLength && nominal_end < codepoints.size(); ++nominal_end) {
+      if (classifyRightBrackets(ctx, bracketed, nominal_end).copula_selected_noncontinuative_te) {
+        emit_promoted_run(nominal_end);
+      }
+    }
     const size_t scan = bracketed.scan;
     if (emit_promoted_run(scan) && scan < codepoints.size() && isRightBoundaryParticle(codepoints[scan])) {
       longer_rescue_end = scan;

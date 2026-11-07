@@ -16,6 +16,38 @@ from .postprocessor_common import reports_mutation
 
 
 @reports_mutation
+def postprocess_noncontinuative_te_nominal(tokens: list[dict]) -> bool:
+    """Restore a kana nominal whose A/O-row ending cannot select connective て."""
+    idx = 0
+    while idx + 2 < len(tokens):
+        host, connective, copula = tokens[idx : idx + 3]
+        stem = host.get("surface", "")
+        if (
+            host.get("pos") not in ("Verb", "Adjective")
+            or not regex.fullmatch(
+                r"\p{Hiragana}{1,2}[あかがさざただなはばぱまやらわおこごそぞとどのほぼぽもよろを]", stem
+            )
+            or connective.get("surface") != "て"
+            or connective.get("pos") not in ("Particle", "Auxiliary")
+            or copula.get("pos") != "Auxiliary"
+            or copula.get("lemma") not in ("だ", "です")
+        ):
+            idx += 1
+            continue
+        if copula.get("surface", "").startswith("な") and (
+            copula.get("surface") != "な"
+            or idx + 3 >= len(tokens)
+            or tokens[idx + 3].get("pos") != "Noun"
+            or tokens[idx + 3].get("surface") in ("の", "ん")
+        ):
+            idx += 1
+            continue
+        surface = stem + "て"
+        tokens[idx : idx + 2] = [{"surface": surface, "pos": "Noun", "lemma": surface}]
+        idx += 1
+
+
+@reports_mutation
 def postprocess_ikaga(tokens: list[dict]) -> bool:
     """Context-dependent いかが normalization."""
     for i, t in enumerate(tokens):

@@ -309,6 +309,35 @@ bool verbFormLicensesAuxiliary(core::ExtendedPOS verb_epos, core::ExtendedPOS au
           verb_epos == core::ExtendedPOS::VerbShuushikei);
 }
 
+// An admitted nominal before a finite copula owns that boundary. An
+// unverified verb must not reopen it from the same start or inside the noun.
+bool reopensNoncontinuativeNominalCopula(const core::Lattice& lattice,
+                                         const dictionary::DictionaryManager& dict_manager, std::string_view text,
+                                         const ByteOffsets& byte_offsets, const UnknownCandidate& candidate) {
+  if (candidate.pos != core::PartOfSpeech::Verb || candidate.lemma_verified ||
+      verb_helpers::isVerbInDictionary(&dict_manager, candidate.lemma) ||
+      dict_manager.lookupExact(candidate.surface, core::PartOfSpeech::Verb) != nullptr) {
+    return false;
+  }
+  for (size_t split = candidate.start + 1; split < candidate.end; ++split) {
+    const auto* copula =
+        dict_manager.lookupExact(textRange(text, byte_offsets, split, candidate.end), core::PartOfSpeech::Auxiliary);
+    if (copula == nullptr || utf8::decodeFirstChar(copula->surface) == U'な' ||
+        (copula->extended_pos != core::ExtendedPOS::AuxCopulaDa &&
+         copula->extended_pos != core::ExtendedPOS::AuxCopulaDesu)) {
+      continue;
+    }
+    if (core::anyEdgeEndingAt(lattice, split, [&](const core::LatticeEdge& edge) {
+          return edge.pos == core::PartOfSpeech::Noun && edge.origin == CandidateOrigin::BracketedNoun &&
+                 edge.start <= candidate.start && candidate.start < edge.end && edge.end - edge.start >= 3 &&
+                 edge.end - edge.start <= 4 && grammar::hasNoncontinuativeTeEnding(edge.surface);
+        })) {
+      return true;
+    }
+  }
+  return false;
+}
+
 // An open verb candidate cannot restart inside a complete verb form and then
 // absorb the closed auxiliary selected by that form (確かめ+たい, しかる+べく).
 // Both the overlapping left edge and its EPOS-to-auxiliary connection are
@@ -661,6 +690,9 @@ bool isRejectedUnknownCandidate(const UnknownCandidateContext& ctx, const core::
   if (is_unattested_predicate(candidate) && candidate.start > 0 &&
       char_types[candidate.start - 1] == normalize::CharType::Hiragana &&
       kana::isRaColumnCodepoint(codepoints[candidate.start])) {
+    return true;
+  }
+  if (reopensNoncontinuativeNominalCopula(lattice, dict_manager, text, byte_offsets, candidate)) {
     return true;
   }
   if (reopensObservedVerbAuxiliaryBoundary(lattice, dict_manager, text, byte_offsets, candidate)) {

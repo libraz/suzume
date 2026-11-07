@@ -1032,6 +1032,158 @@
       ],
       "id": "tomo_da_2",
       "input": "両者とも賛成だ"
+    },
+    {
+      "description": "Copula-selected kana nominal with a noncontinuative te ending",
+      "expected": [
+        {
+          "lemma": "ねこ",
+          "pos": "Noun",
+          "surface": "ねこ"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "にがて",
+          "pos": "Noun",
+          "surface": "にがて"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "nekoganigateda",
+      "input": "ねこがにがてだ"
+    },
+    {
+      "description": "Copula-selected kana nominal with a noncontinuative te ending",
+      "expected": [
+        {
+          "lemma": "りんご",
+          "pos": "Noun",
+          "surface": "りんご"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "にがて",
+          "pos": "Noun",
+          "surface": "にがて"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ringohanigatedattta",
+      "input": "りんごはにがてだった"
+    },
+    {
+      "description": "Copula-selected kana nominal with a noncontinuative te ending",
+      "expected": [
+        {
+          "lemma": "これ",
+          "pos": "Pronoun",
+          "surface": "これ"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "にがて",
+          "pos": "Noun",
+          "surface": "にがて"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "korehanigatedesu",
+      "input": "これはにがてです"
+    },
+    {
+      "description": "Copula-selected kana nominal with a noncontinuative te ending",
+      "expected": [
+        {
+          "lemma": "これ",
+          "pos": "Pronoun",
+          "surface": "これ"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "にがて",
+          "pos": "Noun",
+          "surface": "にがて"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "でし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "korehanigatedeshita",
+      "input": "これはにがてでした"
+    },
+    {
+      "description": "Copula-selected kana nominal with a noncontinuative te ending",
+      "expected": [
+        {
+          "lemma": "かたて",
+          "pos": "Noun",
+          "surface": "かたて"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "katateda",
+      "input": "かたてだ"
+    },
+    {
+      "description": "Copula-selected kana nominal with a noncontinuative te ending",
+      "expected": [
+        {
+          "lemma": "あらて",
+          "pos": "Noun",
+          "surface": "あらて"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "arateda",
+      "input": "あらてだ"
     }
   ],
   "description": "Modality auxiliaries (たい、そう、らしい) (part 2/2)",

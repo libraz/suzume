@@ -194,6 +194,20 @@ bool containsKanji(std::string_view stem) {
   return anyCharMatches(stem, kana::isKanjiCodepoint);
 }
 
+bool hasNoncontinuativeTeEnding(std::string_view surface) {
+  size_t byte_pos = 0;
+  char32_t previous = 0;
+  char32_t current = 0;
+  while (byte_pos < surface.size()) {
+    previous = current;
+    current = normalize::decodeUtf8(surface, byte_pos);
+    if (!kana::isHiraganaCodepoint(current)) {
+      return false;
+    }
+  }
+  return current == U'て' && (kana::isARowCodepoint(previous) || kana::isORowCodepoint(previous));
+}
+
 bool isPureHiragana(std::string_view stem) {
   return allCharsMatch(stem, kana::isHiraganaCodepoint);
 }

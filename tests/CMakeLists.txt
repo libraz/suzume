@@ -93,6 +93,9 @@ set(TEST_SOURCES
   analysis/destination_suffix_test.cpp
   analysis/deverbal_noun_naku_test.cpp
   analysis/hiragana_godan_terminal_test.cpp
+  analysis/kana_u_onbin_adjective_test.cpp
+  analysis/unknown_bracketed_noun_test.cpp
+  analysis/short_ichidan_relative_clause_test.cpp
   analysis/noun_nagara_ni_test.cpp
   analysis/scorer_character_count_test.cpp
   analysis/scorer_word_cost_test.cpp
@@ -102,6 +105,8 @@ set(TEST_SOURCES
   output/japanese_format_test.cpp
   postprocess/tag_generator_test.cpp
   postprocess/postprocessor_test.cpp
+  postprocess/copular_quote_test.cpp
+  postprocess/renyokei_suru_nominalization_test.cpp
   integration/suzume_api_test.cpp
   integration/suzume_abi_contract_test.cpp
   integration/suzume_c_api_test.cpp
