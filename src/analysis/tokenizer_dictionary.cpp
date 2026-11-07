@@ -618,10 +618,13 @@ void addDictionaryEntryEdges(core::Lattice& lattice, const tokenizer_dictionary_
   // all: an auxiliary inflected as a Godan verb does (たがっ+て), while the
   // copula's continuative is で and it has no such cell, so its onbin before て
   // is really the plain form plus the quotative (無理|だ|って, not 無理|だっ|て).
+  // Punctuation after the cell cuts the utterance off as the end of input does
+  // (行かなかっ…, 書かなかっ、), so only a following word is checked.
   const bool auxiliary_inflects_as_godan =
       grammar::isModernGodanTerminalKana(utf8::decodeLastChar(result.entry->lemma));
   const bool unlicensed_auxiliary_onbin = result.entry->pos == core::PartOfSpeech::Auxiliary &&
                                           utf8::endsWith(result.entry->surface, "っ") && end_pos < codepoints.size() &&
+                                          normalize::classifyChar(codepoints[end_pos]) != normalize::CharType::Symbol &&
                                           !auxiliary_inflects_as_godan && codepoints[end_pos] != U'た';
   if (!unlicensed_auxiliary_onbin) {
     const core::ExtendedPOS entry_epos = namesSimplexDeverbalNoun(dict_manager, *result.entry)

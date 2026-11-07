@@ -1833,6 +1833,77 @@
       ],
       "id": "gunoganigateda",
       "input": "泳ぐのがにがてだ"
+    },
+    {
+      "description": "Negative onbin auxiliary cut off by an ellipsis keeps its cell",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行か"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
+        }
+      ],
+      "id": "kanakatt",
+      "input": "行かなかっ…"
+    },
+    {
+      "description": "Desiderative onbin auxiliary before a comma keeps its cell",
+      "expected": [
+        {
+          "lemma": "会う",
+          "pos": "Verb",
+          "surface": "会い"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たかっ"
+        },
+        {
+          "lemma": "でも",
+          "pos": "Conjunction",
+          "surface": "でも"
+        }
+      ],
+      "id": "itakatt_demo",
+      "input": "会いたかっ、でも"
+    },
+    {
+      "description": "Negative onbin auxiliary before a closing bracket keeps its cell",
+      "expected": [
+        {
+          "lemma": "書く",
+          "pos": "Verb",
+          "surface": "書か"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "なかっ"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "kanakatt_to_ttta",
+      "input": "「書かなかっ」と言った"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 11/11)",
