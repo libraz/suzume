@@ -430,6 +430,142 @@
       ],
       "id": "ha3_dattta",
       "input": "費用は3千ドルだった。"
+    },
+    {
+      "description": "地震の影響で、一時約５万戸が停電した。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "地震",
+          "pos": "Noun",
+          "surface": "地震"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "影響",
+          "pos": "Noun",
+          "surface": "影響"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "一時",
+          "pos": "Noun",
+          "surface": "一時"
+        },
+        {
+          "lemma": "約",
+          "pos": "Prefix",
+          "surface": "約"
+        },
+        {
+          "lemma": "5万戸",
+          "pos": "Noun",
+          "surface": "5万戸"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "停電",
+          "pos": "Noun",
+          "surface": "停電"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "no_de_ga_shita",
+      "input": "地震の影響で、一時約５万戸が停電した。"
+    },
+    {
+      "description": "一日約３万人が訪れる。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "一日",
+          "pos": "Noun",
+          "surface": "一日"
+        },
+        {
+          "lemma": "約",
+          "pos": "Prefix",
+          "surface": "約"
+        },
+        {
+          "lemma": "3万人",
+          "pos": "Noun",
+          "surface": "3万人"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "訪れる",
+          "pos": "Verb",
+          "surface": "訪れる"
+        }
+      ],
+      "id": "ga_reru_2",
+      "input": "一日約３万人が訪れる。"
+    },
+    {
+      "description": "一時約３万人が避難した。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "一時",
+          "pos": "Noun",
+          "surface": "一時"
+        },
+        {
+          "lemma": "約",
+          "pos": "Prefix",
+          "surface": "約"
+        },
+        {
+          "lemma": "3万人",
+          "pos": "Noun",
+          "surface": "3万人"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "避難",
+          "pos": "Noun",
+          "surface": "避難"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ga_shita_3",
+      "input": "一時約３万人が避難した。"
     }
   ],
   "description": "noun_number tests",

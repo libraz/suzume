@@ -101,7 +101,7 @@ void appendLinkedCounterCandidate(const std::vector<char32_t>& codepoints, size_
 
 bool leavesUnevenNominalRun(const std::vector<char32_t>& codepoints, size_t counter_end) {
   const size_t run_end = grammar::nominalKanjiRunEnd(codepoints, counter_end);
-  return !grammar::mayBeOkuriganaAt(codepoints, run_end) &&
+  return !grammar::mayBeOkuriganaAt(codepoints, run_end) && !grammar::kanjiRunCutByNumeralAt(codepoints, run_end) &&
          grammar::countKanjiRunWords(codepoints, counter_end, run_end) % 2 == 1;
 }
 
@@ -128,6 +128,14 @@ void appendUnevenKanjiRunCandidate(const std::vector<char32_t>& codepoints, size
     appendCounterCandidate(codepoints, start_pos, counter_end + 1, core::PartOfSpeech::Noun,
                            candidate::kCounterRelationSplitBonus, core::ExtendedPOS::NounNumber,
                            "numeral_closing_suffix", candidates);
+    return;
+  }
+  // A run cut by the next numeral has no parity to read (一日|約+３万人); the
+  // counter keeps its own boundary.
+  if (grammar::kanjiRunCutByNumeralAt(codepoints, run_end)) {
+    appendCounterCandidate(codepoints, start_pos, counter_end, core::PartOfSpeech::Noun,
+                           candidate::kCounterNounSplitBonus, core::ExtendedPOS::NounNumber,
+                           "numeral_counter_before_numeral_run", candidates);
     return;
   }
   if (verb_helpers::kanjiRunMayContinueAt(dict_manager, codepoints, run_end)) {

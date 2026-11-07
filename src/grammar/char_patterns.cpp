@@ -120,6 +120,10 @@ size_t nominalKanjiRunEnd(const std::vector<char32_t>& codepoints, size_t pos) {
   return run_end;
 }
 
+bool kanjiRunCutByNumeralAt(const std::vector<char32_t>& codepoints, size_t run_end) {
+  return run_end < codepoints.size() && normalize::isNumeralCodepoint(codepoints[run_end]);
+}
+
 size_t countKanjiRunWords(const std::vector<char32_t>& codepoints, size_t pos, size_t run_end) {
   size_t counted = run_end - pos;
   if (counted > 1 && normalize::isQuantityPhraseSuffixKanji(codepoints[run_end - 1])) {

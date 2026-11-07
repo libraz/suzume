@@ -218,7 +218,7 @@ size_t counterKanjiRunEnd(const std::vector<char32_t>& codepoints, size_t pos, s
 /**
  * @brief Whether the word on the kanji run before @p run_end may continue past it
  *
- * A numeral kanji there may still belong to the word (100円+均一). Otherwise
+ * A numeral there may still belong to the word (100円+均一, 一時約+５万). Otherwise
  * grammar::mayBeOkuriganaAt() answers from the kana alone, and a registered
  * particle of two or more morae starting there settles it unless the last
  * kanji opens a registered predicate through it (1万人超+まで). A one-mora

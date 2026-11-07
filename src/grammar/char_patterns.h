@@ -703,6 +703,12 @@ bool isBoundDeverbalSuffixAt(const std::vector<char32_t>& codepoints, size_t pos
 size_t nominalKanjiRunEnd(const std::vector<char32_t>& codepoints, size_t pos);
 
 /**
+ * @brief Whether the kanji run ending at @p run_end is cut short by a numeral
+ * (一時約+５万戸, 100円+均一): its parity is then unmeasured
+ */
+bool kanjiRunCutByNumeralAt(const std::vector<char32_t>& codepoints, size_t run_end);
+
+/**
  * @brief Length of codepoints[pos, run_end) as two-kanji words count it: a
  * closing quantity-phrase suffix (目, 半, 間) binds to the whole phrase and is
  * left out

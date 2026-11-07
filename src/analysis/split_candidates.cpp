@@ -204,10 +204,9 @@ void addMixedScriptCandidates(core::Lattice& lattice, std::string_view text, con
     // Counting it would invert the parity and push the cut one kanji early.
     const size_t full_run_end = grammar::nominalKanjiRunEnd(codepoints, first_end);
     const size_t kanji_run_end = first_end + grammar::countKanjiRunWords(codepoints, first_end, full_run_end);
-    // A run cut short by a numeral kanji has not been measured (100円+均一), so
-    // its parity says nothing about the cut.
-    const bool run_continues_into_numeral =
-        full_run_end < codepoints.size() && normalize::isKanjiCodepoint(codepoints[full_run_end]);
+    // A run cut short by a numeral has not been measured (100円+均一), so its
+    // parity says nothing about the cut.
+    const bool run_continues_into_numeral = grammar::kanjiRunCutByNumeralAt(codepoints, full_run_end);
     // For digit+kanji, generate multiple candidates with length-based costs
     // This allows Viterbi to choose the best segmentation
     for (size_t kanji_len = 1; kanji_len <= max_end - first_end; ++kanji_len) {
