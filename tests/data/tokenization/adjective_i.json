@@ -288,6 +288,102 @@
       ],
       "id": "kitanai",
       "input": "きたない部屋"
+    },
+    {
+      "description": "colloquial contracted i-adjective めんどい",
+      "expected": [
+        {
+          "lemma": "めんどい",
+          "pos": "Adjective",
+          "surface": "めんどい"
+        },
+        {
+          "lemma": "けど",
+          "pos": "Particle",
+          "surface": "けど"
+        },
+        {
+          "lemma": "やる",
+          "pos": "Verb",
+          "surface": "やる"
+        }
+      ],
+      "id": "mendoikedoyaru",
+      "input": "めんどいけどやる"
+    },
+    {
+      "description": "宿題がめんどくて後回しにした - auto-generated",
+      "expected": [
+        {
+          "lemma": "宿題",
+          "pos": "Noun",
+          "surface": "宿題"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "めんどい",
+          "pos": "Adjective",
+          "surface": "めんどく"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "後回し",
+          "pos": "Noun",
+          "surface": "後回し"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "gamendokute_shinishita",
+      "input": "宿題がめんどくて後回しにした"
+    },
+    {
+      "description": "full form めんどくさい stays one adjective beside the contracted one",
+      "expected": [
+        {
+          "lemma": "掃除",
+          "pos": "Noun",
+          "surface": "掃除"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "めんどくさい",
+          "pos": "Adjective",
+          "surface": "めんどくさかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "gamendokusakattta",
+      "input": "掃除がめんどくさかった"
     }
   ],
   "description": "adjective_i tests",
