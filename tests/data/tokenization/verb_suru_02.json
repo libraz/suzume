@@ -1655,6 +1655,85 @@
       ],
       "id": "wo_kanishiteinai",
       "input": "部屋を静かにしていない"
+    },
+    {
+      "description": "adverb ending in tto before shite-oite is not a contracted toku",
+      "expected": [
+        {
+          "lemma": "とりあえず",
+          "pos": "Adverb",
+          "surface": "とりあえず"
+        },
+        {
+          "lemma": "そっと",
+          "pos": "Adverb",
+          "surface": "そっと"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "おく",
+          "pos": "Auxiliary",
+          "surface": "おい"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "ほしい",
+          "pos": "Adjective",
+          "surface": "ほしい"
+        }
+      ],
+      "id": "toriaezusotttoshiteoitehoshii",
+      "input": "とりあえずそっとしておいてほしい"
+    },
+    {
+      "description": "mimetic adverb jitto before shite-oite",
+      "expected": [
+        {
+          "lemma": "しばらく",
+          "pos": "Adverb",
+          "surface": "しばらく"
+        },
+        {
+          "lemma": "じっと",
+          "pos": "Adverb",
+          "surface": "じっと"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "おく",
+          "pos": "Auxiliary",
+          "surface": "おい"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "shibarakujitttoshiteoite",
+      "input": "しばらくじっとしておいて"
     }
   ],
   "description": "Suru-verb patterns with subsidiary verbs - MeCab互換分割 (part 2/2)",

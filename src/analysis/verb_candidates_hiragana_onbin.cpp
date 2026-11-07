@@ -103,6 +103,14 @@ void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, s
         contractionCutsRegisteredVerb(dict_manager, codepoints, start_pos, onbin_pos + 1, hiragana_end)) {
       continue;
     }
+    // The contraction is a listed contracted subsidiary (とく, ちゃう, どく,
+    // じゃう) opening right after the onbin; a bare と is the quotative or the
+    // adverb's own mora (そっと+して).
+    if (is_contraction_pattern && !is_tense_pattern &&
+        !vh::auxiliaryFollowsAt(dict_manager, codepoints, onbin_pos + 1,
+                                [](const dictionary::DictionaryEntry&) { return true; })) {
+      continue;
+    }
 
     // Get the stem (part before onbin character)
     std::string stem = extractSubstring(codepoints, start_pos, onbin_pos);
