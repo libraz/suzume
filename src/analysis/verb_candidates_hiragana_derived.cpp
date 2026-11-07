@@ -426,8 +426,11 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
     // otherwise valid Ichidan reconstruction cannot turn 〜てやらない into a
     // lexical predicate.  Outside that boundary, the negative confirms that
     // the ambiguous Ichidan stem is mizenkei (さけ+ない, かけ+ない).
-    const bool is_lexical_negative_continuation =
-        is_negative_continuation && !isClearTeFormBeforeSubsidiary(codepoints, start_pos, true);
+    // A stem closing on て/で+い is itself a te-form plus the aspect いる
+    // (して+い+ない), which the negative cannot turn into one Ichidan irrealis.
+    const bool closes_on_te_aspect_iru = utf8::endsWithAny(stem_surface, {"てい", "でい"});
+    const bool is_lexical_negative_continuation = is_negative_continuation && !closes_on_te_aspect_iru &&
+                                                  !isClearTeFormBeforeSubsidiary(codepoints, start_pos, true);
     // A following て/た/ます validates the inflectional shape, but it does not prove
     // a word boundary when the candidate begins immediately after kanji. In
     // that position the hiragana can instead be the okurigana tail of a

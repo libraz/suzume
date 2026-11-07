@@ -1208,6 +1208,108 @@
       ],
       "id": "sugite_enai",
       "input": "値段高すぎて買えない"
+    },
+    {
+      "description": "te-form + aspect iru negative after na-adjective + ni",
+      "expected": [
+        {
+          "lemma": "同署",
+          "pos": "Noun",
+          "surface": "同署"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "男",
+          "pos": "Noun",
+          "surface": "男"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "容疑",
+          "pos": "Noun",
+          "surface": "容疑"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "認める",
+          "pos": "Verb",
+          "surface": "認め"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "どう",
+          "pos": "Adverb",
+          "surface": "どう"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "明らか",
+          "pos": "Adjective",
+          "surface": "明らか"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "い"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "ha_ga_wo_meteirukadoukawo_rakanishiteinai",
+      "input": "同署は男が容疑を認めているかどうかを明らかにしていない。"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 11/11)",
