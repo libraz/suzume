@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 
+#include <algorithm>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include "analysis/suffix_candidates.h"
@@ -88,6 +90,52 @@ TEST(SuffixCandidatesCounterTest, ExtendsKeCounterThroughFollowingKanji) {
     EXPECT_EQ(results.front().surface, text);
     EXPECT_EQ(results.front().pos, core::PartOfSpeech::Noun);
   }
+}
+
+TEST(SuffixCandidatesCounterTest, MarksKatakanaQuantityOrdinalAsSuffix) {
+  SuzumeOptions options;
+  options.skip_user_dictionary = true;
+  Suzume analyzer(options);
+
+  for (const std::string_view text : {"三ページ目を読む", "五セット目"}) {
+    const auto results = analyzer.analyze(text);
+    ASSERT_FALSE(results.empty()) << text;
+    const auto ordinal =
+        std::find_if(results.begin(), results.end(), [](const auto& result) { return result.surface == "目"; });
+    ASSERT_NE(ordinal, results.end()) << text;
+    EXPECT_EQ(ordinal->pos, core::PartOfSpeech::Suffix) << text;
+  }
+}
+
+TEST(SuffixCandidatesCounterTest, KeepsKatakanaQuantityAndLexicalKanjiTailBoundaries) {
+  SuzumeOptions options;
+  options.skip_user_dictionary = true;
+  Suzume analyzer(options);
+
+  const auto bare_unit = analyzer.analyze("ページ目");
+  ASSERT_EQ(bare_unit.size(), 2u);
+  EXPECT_EQ(bare_unit[0].surface, "ページ");
+  EXPECT_EQ(bare_unit[1].surface, "目");
+  EXPECT_EQ(bare_unit[1].pos, core::PartOfSpeech::Noun);
+
+  for (const auto& [text, lexical_tail] :
+       {std::pair<std::string_view, std::string_view>{"三ページ目標", "目標"}, {"三ページ目次", "目次"}}) {
+    const auto results = analyzer.analyze(text);
+    ASSERT_EQ(results.size(), 3u) << text;
+    EXPECT_EQ(results[0].surface, "三") << text;
+    EXPECT_EQ(results[1].surface, "ページ") << text;
+    EXPECT_EQ(results[2].surface, lexical_tail) << text;
+    EXPECT_EQ(results[2].pos, core::PartOfSpeech::Noun) << text;
+  }
+
+  const auto kanji_quantity = analyzer.analyze("三ページ");
+  ASSERT_EQ(kanji_quantity.size(), 2u);
+  EXPECT_EQ(kanji_quantity[0].surface, "三");
+  EXPECT_EQ(kanji_quantity[1].surface, "ページ");
+
+  const auto digit_quantity = analyzer.analyze("3ページ目");
+  ASSERT_EQ(digit_quantity.size(), 1u);
+  EXPECT_EQ(digit_quantity[0].surface, "3ページ目");
 }
 
 }  // namespace

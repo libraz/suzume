@@ -215,7 +215,7 @@ void generateCounterCandidates(const std::vector<char32_t>& codepoints, size_t s
   // Digits scaled by magnitude kanji are still digit-written (50億ドル, 3千ドル).
   const bool digit_written =
       numeral_is_digits || counter_detail::isDigitMagnitudeHead(codepoints, start_pos, numeral_end);
-  if (!digit_written || follows_letter || char_types[numeral_end] != normalize::CharType::Katakana) {
+  if (follows_letter || char_types[numeral_end] != normalize::CharType::Katakana) {
     return;
   }
   // Find end of katakana sequence (max 8 chars for reasonable unit length)
@@ -232,6 +232,22 @@ void generateCounterCandidates(const std::vector<char32_t>& codepoints, size_t s
   if (!normalize::isAllKatakana(extractSubstring(codepoints, numeral_end, unit_end))) {
     return;
   }
+
+  // A kanji numeral before a katakana unit stays split, but an ordinal 目
+  // closing that quantity is a suffix rather than a lexical noun. Require 目
+  // to end before a non-kanji boundary so compounds such as 目標 and 目次 keep
+  // their ordinary noun candidate. Digit-written quantities already have a
+  // complete merged candidate below, so they do not need this competing edge.
+  if (!digit_written) {
+    if (unit_end < codepoints.size() && codepoints[unit_end] == U'目' &&
+        (unit_end + 1 == codepoints.size() || char_types[unit_end + 1] != normalize::CharType::Kanji)) {
+      counter_detail::appendCounterCandidate(codepoints, unit_end, unit_end + 1, core::PartOfSpeech::Suffix,
+                                             candidate::kOrdinalDigitCounterSplitBonus, core::ExtendedPOS::Unknown,
+                                             "kanji_numeral_katakana_ordinal_suffix", candidates);
+    }
+    return;
+  }
+
   // Penalize numbers starting with 0 (e.g., "00ポイント" is unnatural)
   // "0ドル" is fine, but "00ドル", "000キロ" are not typical Japanese patterns
   const bool starts_with_zero_prefix = numeral_end - start_pos >= 2 && codepoints[start_pos] == U'0';

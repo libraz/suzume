@@ -688,6 +688,50 @@
       ],
       "id": "sorehabetsutoshite",
       "input": "それはべつとして"
+    },
+    {
+      "description": "Ordinal suffix after a kanji numeral and katakana quantity unit",
+      "expected": [
+        {
+          "lemma": "三",
+          "pos": "Noun",
+          "surface": "三"
+        },
+        {
+          "lemma": "ページ",
+          "pos": "Noun",
+          "surface": "ページ"
+        },
+        {
+          "lemma": "目",
+          "pos": "Suffix",
+          "surface": "目"
+        }
+      ],
+      "id": "unnamed_53",
+      "input": "三ページ目"
+    },
+    {
+      "description": "Ordinal suffix after a kanji numeral and katakana quantity unit",
+      "expected": [
+        {
+          "lemma": "五",
+          "pos": "Noun",
+          "surface": "五"
+        },
+        {
+          "lemma": "セット",
+          "pos": "Noun",
+          "surface": "セット"
+        },
+        {
+          "lemma": "目",
+          "pos": "Suffix",
+          "surface": "目"
+        }
+      ],
+      "id": "unnamed_54",
+      "input": "五セット目"
     }
   ],
   "description": "General nouns (part 5/5)",
