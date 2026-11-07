@@ -1353,6 +1353,11 @@ class TestHonorificPrefixKanji:
         result, _ = apply_suzume_merge([_tok("御殿", pos="名詞")], "御殿")
         assert [token["surface"] for token in result] == ["御殿"]
 
+    def test_keeps_a_compound_whose_remainder_opens_on_kana(self):
+        result, rule = _postprocess_prefix_split([_tok("ごみ箱", pos="名詞")], None)
+        assert [token["surface"] for token in result] == ["ごみ箱"]
+        assert rule is None
+
     def test_merges_prefix_before_pronoun_into_one_noun(self):
         tokens = [_tok("お", pos="接頭詞"), _tok("やつ", pos="名詞", pos_sub1="代名詞")]
         result, rule = _postprocess_prefix_split(tokens, None)

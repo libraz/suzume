@@ -276,10 +276,10 @@ def _postprocess_honorific_split(result: list[dict], applied_rule: str | None) -
 def _postprocess_prefix_split(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
     """Split お/ご+noun patterns.
 
-    The prefix is separable when the remainder carries a kanji, which is what
-    an honorific written over a free noun looks like (お仕事, ご意見). An
-    all-hiragana remainder is part of the lexeme far more often than not
-    (おなか, おだやか, おごそか, おかず) and its leading mora is not a prefix at
+    The prefix is separable when the remainder opens on a kanji, which is what
+    an honorific written over a free noun looks like (お仕事, ご意見). A
+    remainder opening on hiragana is part of the lexeme far more often than not
+    (おなか, おだやか, おかず, ごみ箱) and its leading mora is not a prefix at
     all, so it only separates inside the humble/honorific frame that requires a
     verb stem after the prefix (ご迷惑をおかけする). 御 is the kanji spelling of
     the same prefix and follows the same criterion.
@@ -309,7 +309,7 @@ def _postprocess_prefix_split(result: list[dict], applied_rule: str | None) -> t
         if pos == "名詞" and pos_sub1 != "接尾" and surface not in PREFIX_EXCEPTIONS:
             m = regex.match(r"^(お|ご|御)([\p{Han}\p{Hiragana}]+)$", surface)
             following = result[index + 1].get("surface", "") if index + 1 < len(result) else ""
-            separable = regex.search(r"\p{Han}", m.group(2)) is not None if m else False
+            separable = regex.match(r"\p{Han}", m.group(2)) is not None if m else False
             if m and (separable or following in HONORIFIC_FRAME_TAILS):
                 prefix, noun = m.group(1), m.group(2)
                 new_result.append({"surface": prefix, "pos": "接頭詞", "lemma": prefix})
