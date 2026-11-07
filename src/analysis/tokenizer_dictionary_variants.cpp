@@ -106,8 +106,7 @@ void addElidedProlongedDictionaryCandidates(core::Lattice& lattice, const dictio
       continue;
     }
     const std::string surface = extractSubstring(codepoints, start_pos, end_pos);
-    const std::string_view lemma =
-        result.entry->lemma.empty() ? std::string_view(result.entry->surface) : std::string_view(result.entry->lemma);
+    const std::string_view lemma = tokenizer_dictionary_detail::lemmaOrSurface(*result.entry);
     // Charged the same per mark as emphasis at a word's end: the drawn-out
     // spelling is the marked one and must not undercut a word that owns the
     // whole run unmarked.
@@ -151,8 +150,7 @@ void addTruncatedAdverbCandidates(core::Lattice& lattice, const dictionary::Dict
     }
     tokenizer_dictionary_detail::addDictionaryOriginEdge(
         lattice, surface, start_pos, end_pos, adverb->pos, getCategoryCost(adverb->extended_pos),
-        core::LatticeEdge::kFromDictionary,
-        adverb->lemma.empty() ? std::string_view(adverb->surface) : std::string_view(adverb->lemma),
+        core::LatticeEdge::kFromDictionary, tokenizer_dictionary_detail::lemmaOrSurface(*adverb),
         dictionary::ConjugationType::None, adverb->extended_pos, "dict_truncated_adverb");
     return;
   }
@@ -208,8 +206,8 @@ void addClippedInterjectionCandidates(core::Lattice& lattice, const dictionary::
     tokenizer_dictionary_detail::addDictionaryOriginEdge(
         lattice, extractSubstring(codepoints, start_pos, span_end), start_pos, span_end, interjection->pos,
         getCategoryCost(interjection->extended_pos), core::LatticeEdge::kFromDictionary,
-        interjection->lemma.empty() ? std::string_view(interjection->surface) : std::string_view(interjection->lemma),
-        dictionary::ConjugationType::None, interjection->extended_pos, "dict_clipped_interjection");
+        tokenizer_dictionary_detail::lemmaOrSurface(*interjection), dictionary::ConjugationType::None,
+        interjection->extended_pos, "dict_clipped_interjection");
   }
 }
 

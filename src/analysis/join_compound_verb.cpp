@@ -199,11 +199,12 @@ void addCompoundVerbJoinCandidates(core::Lattice& lattice, std::string_view text
   // interior of a two-kanji kango (提+出す for 提出する). The same closed set
   // already gates the retry below, which spells this construction the other
   // way round.
-  const bool has_bound_verb_prefix = grammar::isBoundVerbPrefix(extractSubstring(codepoints, start_pos, start_pos + 1));
-  const bool has_kanji_v2_after_bare_ichidan =
-      kanji_end >= start_pos + 2 && char_types[start_pos + 1] == CharType::Kanji &&
-      godanRenyokeiBaseCp(renyokei_char) == 0 &&
-      (verb_helpers::isSingleKanjiIchidan(codepoints[start_pos]) || has_bound_verb_prefix);
+  const bool is_bare_ichidan_stem_kanji =
+      verb_helpers::isSingleKanjiIchidan(codepoints[start_pos]) ||
+      grammar::isBoundVerbPrefix(extractSubstring(codepoints, start_pos, start_pos + 1));
+  const bool has_kanji_v2_after_bare_ichidan = kanji_end >= start_pos + 2 &&
+                                               char_types[start_pos + 1] == CharType::Kanji &&
+                                               godanRenyokeiBaseCp(renyokei_char) == 0 && is_bare_ichidan_stem_kanji;
 
   if (addPassiveContinuativeTailCandidates(lattice, codepoints, kanji_end)) {
     return;
@@ -239,7 +240,7 @@ void addCompoundVerbJoinCandidates(core::Lattice& lattice, std::string_view text
     // The i-row Godan continuatives (き, し, ...) already set base_ending above,
     // so an e/i-row kana here is a single-kana ichidan stem: 食べ+込む, 落ち+着く.
     const char32_t hira = codepoints[kanji_end];
-    if (kana::isERowCodepoint(hira) || kana::isIRowCodepoint(hira)) {
+    if (kana::isIOrERowCodepoint(hira)) {
       v2_start = kanji_end + 1;
     } else {
       // A multi-kana ichidan stem ends on the next e/i-row kana (生まれ+変わる);
@@ -248,7 +249,7 @@ void addCompoundVerbJoinCandidates(core::Lattice& lattice, std::string_view text
       const size_t scan_limit = std::min(kanji_end + 3, codepoints.size());
       for (size_t scan_pos = kanji_end + 1; scan_pos < scan_limit && char_types[scan_pos] == CharType::Hiragana;
            ++scan_pos) {
-        if (kana::isERowCodepoint(codepoints[scan_pos]) || kana::isIRowCodepoint(codepoints[scan_pos])) {
+        if (kana::isIOrERowCodepoint(codepoints[scan_pos])) {
           v2_start = scan_pos + 1;
           break;
         }
@@ -312,7 +313,7 @@ void addCompoundVerbJoinCandidates(core::Lattice& lattice, std::string_view text
   // retain its entire stem and begin matching the subsidiary V2 after it.
   if (!dict_compound_v1 && has_kanji_v2_after_bare_ichidan && kanji_end > start_pos + 1 &&
       kanji_end + 1 < codepoints.size() && char_types[kanji_end + 1] == CharType::Kanji &&
-      (kana::isERowCodepoint(renyokei_char) || kana::isIRowCodepoint(renyokei_char))) {
+      kana::isIOrERowCodepoint(renyokei_char)) {
     const std::string multi_kanji_ichidan_base = extractSubstring(codepoints, start_pos, kanji_end + 1) + "る";
     if (dict_manager.lookupExact(multi_kanji_ichidan_base, core::PartOfSpeech::Verb) != nullptr) {
       adopt_dictionary_v1(kanji_end + 1);
@@ -358,8 +359,7 @@ void addCompoundVerbJoinCandidates(core::Lattice& lattice, std::string_view text
   // that boundary only after the ordinary analysis has no V2 match and only
   // for the closed set of known single-kanji ichidan verbs.
   if (best_match.v2_verb == nullptr && !dict_compound_v1 && kanji_end >= start_pos + 2 &&
-      char_types[start_pos + 1] == CharType::Kanji &&
-      (verb_helpers::isSingleKanjiIchidan(codepoints[start_pos]) || has_bound_verb_prefix)) {
+      char_types[start_pos + 1] == CharType::Kanji && is_bare_ichidan_stem_kanji) {
     CompoundVerbMatch bare_ichidan_match =
         findCompoundVerbMatch(text, codepoints, byte_offsets, start_pos, char_types, kanji_end, start_pos + 1, 0, false,
                               true, true, false, "", dict_manager, inflection);

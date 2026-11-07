@@ -140,9 +140,7 @@ bool conflictsWithVerifiedCompoundBoundary(const core::Lattice& lattice,
                                              candidate_epos)) {
     return true;
   }
-  const size_t onbinkei_end = dictionarySokuonbinEndCovering(lattice, candidate_start);
-  if (onbinkei_end != 0 && candidate_end <= onbinkei_end && onbinkei_end < codepoints.size() &&
-      (codepoints[onbinkei_end] == U'た' || codepoints[onbinkei_end] == U'て')) {
+  if (isClosedByDictionarySokuonbin(lattice, codepoints, candidate_start, candidate_end)) {
     return true;
   }
   if (candidate_pos != core::PartOfSpeech::Particle) {
@@ -302,8 +300,7 @@ bool hasLongerVerbBeforeNegative(const std::vector<dictionary::LookupResult>& al
 // @p start_pos, i.e. the span in question is the tail of a longer headword.
 bool endsDictionaryVerbSpanningBack(const dictionary::DictionaryManager& dict_manager,
                                     const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos) {
-  // A headword reaching back further than this is not a contraction host.
-  constexpr size_t kMaxHostChars = 4;
+  // A headword reaching back further than kMaxHostChars is not a contraction host.
   const size_t scan_start = lookbehindStart(start_pos, kMaxHostChars);
   for (size_t host_start = scan_start; host_start < start_pos; ++host_start) {
     if (lookupEntryInRange(dict_manager, codepoints, host_start, end_pos, core::PartOfSpeech::Verb) != nullptr) {
@@ -341,15 +338,17 @@ bool crossesEstablishedBoundary(const DictionaryCandidateContext& ctx, const cor
   if (has_attributive_temporal_ma && result.entry->pos == core::PartOfSpeech::Adverb) {
     return true;
   }
-  if ((result.entry->extended_pos == core::ExtendedPOS::NounFormal ||
-       result.entry->extended_pos == core::ExtendedPOS::VerbMizenkei) &&
-      followsNegativeQuote(lattice, start_pos) &&
-      hasShorterMizenkeiBeforeNegative(lookup_results, codepoints, start_pos, result.length)) {
-    return true;
-  }
-  if (result.entry->pos == core::PartOfSpeech::Verb && followsNegativeQuote(lattice, start_pos) &&
-      hasLongerVerbBeforeNegative(lookup_results, codepoints, start_pos, result.length)) {
-    return true;
+  const bool is_formal_or_mizenkei = result.entry->extended_pos == core::ExtendedPOS::NounFormal ||
+                                     result.entry->extended_pos == core::ExtendedPOS::VerbMizenkei;
+  const bool is_verb = result.entry->pos == core::PartOfSpeech::Verb;
+  if ((is_formal_or_mizenkei || is_verb) && followsNegativeQuote(lattice, start_pos)) {
+    if (is_formal_or_mizenkei &&
+        hasShorterMizenkeiBeforeNegative(lookup_results, codepoints, start_pos, result.length)) {
+      return true;
+    }
+    if (is_verb && hasLongerVerbBeforeNegative(lookup_results, codepoints, start_pos, result.length)) {
+      return true;
+    }
   }
   // An aspect auxiliary attaches to a te-form, never directly after the
   // contracted negative.  Keep the intervening quotative particle in
@@ -415,10 +414,7 @@ bool crossesEstablishedBoundary(const DictionaryCandidateContext& ctx, const cor
 
   // A registered word is no more entitled to the material in front of the
   // nominalizer っこ than a constructed one is (で+きっ+こない for できっこない).
-  if (verb_helpers::startsInsideGaMashiiSuffix(codepoints, start_pos)) {
-    return true;
-  }
-  if (verb_helpers::crossesKkoNominalizer(codepoints, start_pos, end_pos)) {
+  if (splitsLexicalSuffix(codepoints, start_pos, end_pos)) {
     return true;
   }
 

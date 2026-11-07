@@ -12,16 +12,11 @@
 #include "analysis/tokenizer.h"
 
 #include <algorithm>
-#include <utility>
 
 #include "analysis/category_cost.h"
 #include "candidate_constants.h"
 #include "core/debug.h"
-#include "core/kana_constants.h"
-#include "core/utf8_constants.h"
-#include "grammar/char_patterns.h"
 #include "join_candidates.h"
-#include "normalize/utf8.h"
 #include "split_candidates.h"
 #include "suffix_candidates.h"
 #include "tokenizer_utils.h"
@@ -117,7 +112,7 @@ core::Lattice Tokenizer::buildLattice(std::string_view text, const std::vector<c
         addTaruAdjectiveJoinCandidates(lattice, text, codepoints, byte_offsets, pos, char_types, dict_manager_,
                                        scorer_);
         addVerbSuffixNounJoinCandidates(lattice, text, codepoints, byte_offsets, pos, char_types, dict_manager_,
-                                        scorer_, inflection_);
+                                        scorer_);
       }
     } else if (ct == normalize::CharType::Hiragana) {
       if (mode_ != core::AnalysisMode::Split) {
@@ -126,7 +121,7 @@ core::Lattice Tokenizer::buildLattice(std::string_view text, const std::vector<c
         addHiraganaCompoundVerbJoinCandidates(lattice, text, codepoints, byte_offsets, pos, char_types, dict_manager_,
                                               scorer_, inflection_);
         addVerbSuffixNounJoinCandidates(lattice, text, codepoints, byte_offsets, pos, char_types, dict_manager_,
-                                        scorer_, inflection_);
+                                        scorer_);
       }
     }
 

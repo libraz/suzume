@@ -37,7 +37,9 @@ using tokenizer_dictionary_detail::ContextualDictionaryCandidateState;
 using tokenizer_dictionary_detail::crossesEstablishedBoundary;
 using tokenizer_dictionary_detail::hasPrecedingNominal;
 using tokenizer_dictionary_detail::isOutOfPlaceForWordClass;
+using tokenizer_dictionary_detail::kMaxHostChars;
 using tokenizer_dictionary_detail::lacksLicensingEnvironment;
+using tokenizer_dictionary_detail::lemmaOrSurface;
 using tokenizer_dictionary_detail::losesHomographReading;
 
 namespace {
@@ -46,7 +48,6 @@ namespace {
 // further, so the span is inside that word rather than a word of its own.
 bool hasDictionaryEntrySpanningBack(const dictionary::DictionaryManager& dict_manager,
                                     const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos) {
-  constexpr size_t kMaxHostChars = 4;
   constexpr size_t kMaxTailChars = 4;
   const size_t scan_start = lookbehindStart(start_pos, kMaxHostChars);
   const size_t probe_end = std::min(codepoints.size(), end_pos + kMaxTailChars);
@@ -290,8 +291,8 @@ void addEmphaticDictionaryEdge(core::Lattice& lattice,
     const bool unlicensed_bare_sokuon =
         bare_sokuon && emphatic.end < codepoints.size() &&
         normalize::classifyChar(codepoints[emphatic.end]) == normalize::CharType::Hiragana &&
-        !(host_owns_sokuonbin_cell &&
-          utf8::equalsAny(extractSubstring(codepoints, emphatic.end, emphatic.end + 1), {"て", "た", "で", "だ"}));
+        !(host_owns_sokuonbin_cell && (codepoints[emphatic.end] == U'て' || codepoints[emphatic.end] == U'た' ||
+                                       codepoints[emphatic.end] == U'で' || codepoints[emphatic.end] == U'だ'));
     // A particle takes the glottal stop, which closes the utterance, but not
     // the prolonged mark: after a one-mora particle that spelling is also the
     // tail of a lengthened word, and taking it there cuts the word in two
@@ -425,12 +426,11 @@ void addEmphaticDictionaryEdge(core::Lattice& lattice,
       const std::string emphatic_surface = result.entry->surface + emphatic.suffix;
       // Emphasis adds nothing to the word, so the entry's own base form is the
       // lemma whatever the host (ですっ → です, すごいいいい → すごい).
-      const std::string_view emphatic_lemma =
-          result.entry->lemma.empty() ? std::string_view(result.entry->surface) : std::string_view(result.entry->lemma);
+      const std::string_view emphatic_lemma = lemmaOrSurface(*result.entry);
       lattice.addEdge(emphatic_surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(emphatic.end),
                       result.entry->pos, cost + verb_helpers::emphaticCostAdjustment(emphatic), flags, emphatic_lemma,
-                      dictionary::ConjugationType::None, core::CandidateOrigin::Dictionary, 1.0F, {}, emphatic_epos,
-                      "dict_emphatic");
+                      dictionary::ConjugationType::None, core::CandidateOrigin::Dictionary,
+                      candidate::kDictionaryOriginConfidence, {}, emphatic_epos, "dict_emphatic");
     }
   }
 }
@@ -452,7 +452,7 @@ void addDictionaryEntryEdges(core::Lattice& lattice, const tokenizer_dictionary_
     flags |= core::LatticeEdge::kIsFormalNoun;
   }
 
-  float cost = analysis::getCategoryCost(result.entry->extended_pos);
+  float cost = getCategoryCost(result.entry->extended_pos);
   // A tuned cost is flagged so the scorer honours it even when it lands on
   // exactly 0.0, which would otherwise read as unset.
   const auto add_custom_cost = [&cost, &flags](float adjustment) {
@@ -623,15 +623,14 @@ void addDictionaryEntryEdges(core::Lattice& lattice, const tokenizer_dictionary_
       grammar::isModernGodanTerminalKana(utf8::decodeLastChar(result.entry->lemma));
   const bool unlicensed_auxiliary_onbin = result.entry->pos == core::PartOfSpeech::Auxiliary &&
                                           utf8::endsWith(result.entry->surface, "っ") && end_pos < codepoints.size() &&
-                                          !auxiliary_inflects_as_godan &&
-                                          !utf8::equalsAny(extractSubstring(codepoints, end_pos, end_pos + 1), {"た"});
+                                          !auxiliary_inflects_as_godan && codepoints[end_pos] != U'た';
   if (!unlicensed_auxiliary_onbin) {
     const core::ExtendedPOS entry_epos = namesSimplexDeverbalNoun(dict_manager, *result.entry)
                                              ? core::ExtendedPOS::NounVerbal
                                              : result.entry->extended_pos;
     lattice.addEdge(result.entry->surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(end_pos),
-                    result.entry->pos, cost, flags, lemma, conj_type, core::CandidateOrigin::Dictionary, 1.0F, {},
-                    entry_epos, "dict");
+                    result.entry->pos, cost, flags, lemma, conj_type, core::CandidateOrigin::Dictionary,
+                    candidate::kDictionaryOriginConfidence, {}, entry_epos, "dict");
   }
 
   addEmphaticDictionaryEdge(lattice, ctx, result, end_pos, cost, flags);

@@ -261,7 +261,7 @@ TEST(CompoundVerbForms, GodanRowsDriveConjugationAndTeForms) {
               test_case.conjugation_type);
     EXPECT_EQ(compound_verb_detail::getTeFormType(test_case.ending), test_case.te_form_type);
     const auto [stem, uses_de] =
-        compound_verb_detail::generateTeFormStem(test_case.base, "", V2VerbType::Godan, test_case.ending);
+        compound_verb_detail::generateTeFormStem(test_case.base, V2VerbType::Godan, test_case.ending);
     EXPECT_EQ(stem, test_case.te_stem);
     EXPECT_EQ(uses_de, test_case.uses_de);
   }

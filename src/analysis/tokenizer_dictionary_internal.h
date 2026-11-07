@@ -15,6 +15,16 @@ namespace suzume::analysis::tokenizer_dictionary_detail {
 void appendSpecialGrammarCandidates(core::Lattice& lattice, std::string_view text,
                                     const std::vector<char32_t>& codepoints, size_t start_pos, size_t byte_pos);
 
+/** Widest headword, in characters, that may reach back over a span as its host. */
+inline constexpr size_t kMaxHostChars = 4;
+
+/**
+ * @brief The entry's lemma, or its surface when the lemma is empty
+ */
+inline std::string_view lemmaOrSurface(const dictionary::DictionaryEntry& entry) {
+  return entry.lemma.empty() ? std::string_view(entry.surface) : std::string_view(entry.lemma);
+}
+
 /**
  * @brief Add an edge with Dictionary origin and the standard dictionary origin confidence
  * @param lemma Lemma of the edge

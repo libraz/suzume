@@ -164,18 +164,16 @@ ContextualDictionaryCandidateState addContextualDictionaryCandidates(
   ContextualDictionaryCandidateState state;
 
   if (startsLiteraryNitsukeAt(lattice, codepoints, start_pos)) {
-    tokenizer_dictionary_detail::addClosedClassEdge(lattice, "につけ", start_pos, start_pos + 3,
-                                                    core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleConj,
-                                                    "literary_nitsuke");
+    addClosedClassEdge(lattice, "につけ", start_pos, start_pos + 3, core::PartOfSpeech::Particle,
+                       core::ExtendedPOS::ParticleConj, "literary_nitsuke");
   }
 
   const bool starts_kyoto_honorific_yasu = start_pos + 1 < codepoints.size() && codepoints[start_pos] == U'や' &&
                                            codepoints[start_pos + 1] == U'す' &&
                                            followsKyotoHonorificYasuHost(lattice, start_pos);
   if (starts_kyoto_honorific_yasu) {
-    tokenizer_dictionary_detail::addClosedClassEdge(lattice, "やす", start_pos, start_pos + 2,
-                                                    core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxHonorific,
-                                                    "kyoto_honorific_yasu");
+    addClosedClassEdge(lattice, "やす", start_pos, start_pos + 2, core::PartOfSpeech::Auxiliary,
+                       core::ExtendedPOS::AuxHonorific, "kyoto_honorific_yasu");
   }
 
   // The regional causal き is indistinguishable from an ordinary
@@ -183,9 +181,8 @@ ContextualDictionaryCandidateState addContextualDictionaryCandidates(
   // auxiliary supplies the only unambiguous host (飲ん+だ+き), allowing this
   // context-licensed particle edge without cutting き out of lexical verbs.
   if (codepoints[start_pos] == U'き' && hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::AuxTenseTa)) {
-    tokenizer_dictionary_detail::addClosedClassEdge(lattice, "き", start_pos, start_pos + 1,
-                                                    core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleConj,
-                                                    "regional_causal_ki");
+    addClosedClassEdge(lattice, "き", start_pos, start_pos + 1, core::PartOfSpeech::Particle,
+                       core::ExtendedPOS::ParticleConj, "regional_causal_ki");
   }
 
   if (grammar::isBoundDeverbalSuffixAt(codepoints, start_pos) && hasPrecedingDeverbalNoun(lattice, start_pos)) {
@@ -200,16 +197,15 @@ ContextualDictionaryCandidateState addContextualDictionaryCandidates(
   state.has_attributive_temporal_ma =
       codepoints[start_pos] == U'間' && hasPrecedingAttributivePredicate(lattice, start_pos);
   if (state.has_attributive_temporal_ma) {
-    tokenizer_dictionary_detail::addClosedClassEdge(
-        lattice, "間", start_pos, start_pos + 1, core::PartOfSpeech::Noun, core::ExtendedPOS::NounFormal,
-        "attributive_temporal_ma", core::LatticeEdge::kFromDictionary | core::LatticeEdge::kIsFormalNoun);
+    addClosedClassEdge(lattice, "間", start_pos, start_pos + 1, core::PartOfSpeech::Noun, core::ExtendedPOS::NounFormal,
+                       "attributive_temporal_ma",
+                       core::LatticeEdge::kFromDictionary | core::LatticeEdge::kIsFormalNoun);
   }
 
   if (codepoints[start_pos] == U'か' && (hasInterrogativeEndingAt(dict_manager, text, byte_offsets, start_pos) ||
                                          hasInterrogativeNominalPhraseEndingAt(lattice, start_pos))) {
-    tokenizer_dictionary_detail::addClosedClassEdge(lattice, "か", start_pos, start_pos + 1,
-                                                    core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleAdverbial,
-                                                    "indefinite_particle_ka");
+    addClosedClassEdge(lattice, "か", start_pos, start_pos + 1, core::PartOfSpeech::Particle,
+                       core::ExtendedPOS::ParticleAdverbial, "indefinite_particle_ka");
   }
 
   // Keep the first/last か of a closed interrogative frame available when it
@@ -223,9 +219,8 @@ ContextualDictionaryCandidateState addContextualDictionaryCandidates(
       codepoints[start_pos - 2] == U'ど' && codepoints[start_pos - 1] == U'う' &&
       hasPrecedingExtendedPOS(lattice, start_pos - 3, core::ExtendedPOS::VerbShuushikei);
   if (opens_interrogative_frame || closes_interrogative_frame) {
-    tokenizer_dictionary_detail::addClosedClassEdge(lattice, "か", start_pos, start_pos + 1,
-                                                    core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleAdverbial,
-                                                    "interrogative_frame_ka");
+    addClosedClassEdge(lattice, "か", start_pos, start_pos + 1, core::PartOfSpeech::Particle,
+                       core::ExtendedPOS::ParticleAdverbial, "interrogative_frame_ka");
   }
 
   // In shortened causative-passive, さ retains the lexical verb's mizenkei
@@ -234,20 +229,22 @@ ContextualDictionaryCandidateState addContextualDictionaryCandidates(
   // passive auxiliary (…と + さ + れる), never the shortened causative
   // auxiliary.  Do not use the preceding character alone here: an irrealis
   // such as 書か is itself commonly also a particle character.
-  const bool starts_quoted_passive =
-      start_pos > 0 && codepoints[start_pos] == core::hiragana::kSa && start_pos + 1 < codepoints.size() &&
-      codepoints[start_pos + 1] == U'れ' &&
-      // The closed entry for と is POS-tagged as a case particle; its
-      // quotative role is determined by this passive continuation.
-      hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::ParticleCase) &&
-      // A Godan irrealis ending here outranks the particle reading of its own
-      // okurigana: 急が+さ+れ+た is the shortened causative-passive of 急ぐ, and
-      // reading the が as a case particle turns the auxiliary into する. Only an
-      // a-row kana can be that okurigana, which keeps a genuine quotative と in
-      // the same position (確認したと+さ+れ+て).
-      !(kana::isARowCodepoint(codepoints[start_pos - 1]) &&
-        hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbMizenkei)) &&
-      verb_helpers::isPassiveAuxContinuation(codepoints, start_pos + 2, /*strict_masu=*/true);
+  const bool starts_sa_re = start_pos > 0 && codepoints[start_pos] == core::hiragana::kSa &&
+                            start_pos + 1 < codepoints.size() && codepoints[start_pos + 1] == U'れ';
+  const bool sa_re_passive_aux =
+      starts_sa_re && verb_helpers::isPassiveAuxContinuation(codepoints, start_pos + 2, /*strict_masu=*/true);
+  const bool starts_quoted_passive = starts_sa_re &&
+                                     // The closed entry for と is POS-tagged as a case particle; its
+                                     // quotative role is determined by this passive continuation.
+                                     hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::ParticleCase) &&
+                                     // A Godan irrealis ending here outranks the particle reading of its own
+                                     // okurigana: 急が+さ+れ+た is the shortened causative-passive of 急ぐ, and
+                                     // reading the が as a case particle turns the auxiliary into する. Only an
+                                     // a-row kana can be that okurigana, which keeps a genuine quotative と in
+                                     // the same position (確認したと+さ+れ+て).
+                                     !(kana::isARowCodepoint(codepoints[start_pos - 1]) &&
+                                       hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbMizenkei)) &&
+                                     sa_re_passive_aux;
   if (starts_quoted_passive) {
     lattice.addEdge(
         "さ", static_cast<uint32_t>(start_pos), static_cast<uint32_t>(start_pos + 1), core::PartOfSpeech::Verb,
@@ -259,23 +256,18 @@ ContextualDictionaryCandidateState addContextualDictionaryCandidates(
   // A sahen nominal immediately before される supplies する's irrealis;
   // preserve its independent passive boundary (反映+さ+れ+ます).
   const bool starts_sahen_passive =
-      !starts_quoted_passive && start_pos > 0 && codepoints[start_pos] == core::hiragana::kSa &&
-      start_pos + 1 < codepoints.size() && codepoints[start_pos + 1] == U'れ' &&
-      hasPrecedingSahenNominal(lattice, start_pos) &&
-      verb_helpers::isPassiveAuxContinuation(codepoints, start_pos + 2, /*strict_masu=*/true);
+      !starts_quoted_passive && starts_sa_re && hasPrecedingSahenNominal(lattice, start_pos) && sa_re_passive_aux;
   if (starts_sahen_passive) {
-    tokenizer_dictionary_detail::addDictionaryOriginEdge(
+    addDictionaryOriginEdge(
         lattice, "さ", start_pos, start_pos + 1, core::PartOfSpeech::Verb,
         getCategoryCost(core::ExtendedPOS::VerbMizenkei) + candidate::verb_cost::kSahenPassiveSuruBonus,
         core::LatticeEdge::kFromDictionary | core::LatticeEdge::kHasCustomCost, "する",
         dictionary::ConjugationType::Suru, core::ExtendedPOS::VerbMizenkei, "sahen_passive_suru");
   }
   state.starts_shortened_causative_passive =
-      start_pos > 0 && codepoints[start_pos] == core::hiragana::kSa && start_pos + 1 < codepoints.size() &&
-      !starts_quoted_passive && codepoints[start_pos + 1] == U'れ' &&
+      starts_sa_re && !starts_quoted_passive &&
       hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbMizenkei) &&
-      (verb_helpers::isPassiveAuxContinuation(codepoints, start_pos + 2, /*strict_masu=*/true) ||
-       subsidiaryVerbContinuativeAt(codepoints, start_pos + 2));
+      (sa_re_passive_aux || subsidiaryVerbContinuativeAt(codepoints, start_pos + 2));
   if (state.starts_shortened_causative_passive) {
     lattice.addEdge(
         "さ", static_cast<uint32_t>(start_pos), static_cast<uint32_t>(start_pos + 1), core::PartOfSpeech::Auxiliary,

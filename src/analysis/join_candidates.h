@@ -171,8 +171,7 @@ void addTaruAdjectiveJoinCandidates(core::Lattice& lattice, std::string_view tex
 void addVerbSuffixNounJoinCandidates(core::Lattice& lattice, std::string_view text,
                                      const std::vector<char32_t>& codepoints, const ByteOffsets& byte_offsets,
                                      size_t start_pos, const std::vector<normalize::CharType>& char_types,
-                                     const dictionary::DictionaryManager& dict_manager, const Scorer& scorer,
-                                     const grammar::Inflection& inflection);
+                                     const dictionary::DictionaryManager& dict_manager, const Scorer& scorer);
 
 /**
  * @brief Whether a listed subsidiary verb's continuative starts at @p pos

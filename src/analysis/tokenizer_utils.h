@@ -320,6 +320,13 @@ size_t verifiedCompoundEndCovering(const core::Lattice& lattice, size_t pos);
 /** Find a dictionary-derived verb onbin form spanning an interior boundary. */
 size_t dictionarySokuonbinEndCovering(const core::Lattice& lattice, size_t pos);
 
+/** Whether a dictionary onbin form covering @p start ends at or past @p end and is closed by た/て. */
+bool isClosedByDictionarySokuonbin(const core::Lattice& lattice, const std::vector<char32_t>& codepoints, size_t start,
+                                   size_t end);
+
+/** Whether [start, end) begins inside the がましい suffix or crosses the nominalizer っこ. */
+bool splitsLexicalSuffix(const std::vector<char32_t>& codepoints, size_t start, size_t end);
+
 /**
  * @brief Find the end of any structurally generated compound verb covering pos.
  */

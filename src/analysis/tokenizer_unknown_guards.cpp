@@ -751,10 +751,7 @@ bool isRejectedUnknownCandidate(const UnknownCandidateContext& ctx, const core::
   // past/connective morpheme follows immediately.  This protects lexical
   // compounds such as 言い損なっ+た without owning unrelated 〜んと or
   // conditional boundaries.
-  const size_t dictionary_onbinkei_end = dictionarySokuonbinEndCovering(lattice, candidate.start);
-  if (dictionary_onbinkei_end != 0 && candidate.end <= dictionary_onbinkei_end &&
-      dictionary_onbinkei_end < codepoints.size() &&
-      (codepoints[dictionary_onbinkei_end] == U'た' || codepoints[dictionary_onbinkei_end] == U'て')) {
+  if (isClosedByDictionarySokuonbin(lattice, codepoints, candidate.start, candidate.end)) {
     return true;
   }
 
@@ -833,13 +830,7 @@ bool isRejectedUnknownCandidate(const UnknownCandidateContext& ctx, const core::
     }
   }
 
-  if (verb_helpers::startsInsideGaMashiiSuffix(codepoints, candidate.start)) {
-    return true;
-  }
-  if (verb_helpers::crossesKkoNominalizer(codepoints, candidate.start, candidate.end)) {
-    return true;
-  }
-  return false;
+  return splitsLexicalSuffix(codepoints, candidate.start, candidate.end);
 }
 
 }  // namespace suzume::analysis::tokenizer_unknown_detail

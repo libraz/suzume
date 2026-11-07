@@ -2,6 +2,8 @@
  * @file compound_verb_match.cpp
  * @brief V1 verification and V2 matching for compound verbs
  */
+#include <optional>
+
 #include "analysis/dictionary_probe.h"
 #include "analysis/verb_candidates_auxiliary_patterns.h"
 #include "analysis/verb_candidates_verb_stems.h"
@@ -13,9 +15,7 @@ namespace suzume::analysis::compound_verb_detail {
 
 namespace {
 
-// A compound-verb candidate needs inflectional evidence, not a bare
-// continuative ending. Politeness is intentionally excluded: ます remains a
-// separate auxiliary token.
+// Whether the non-empty span [start_pos, end_pos) is made of numeral codepoints only.
 bool isNumeralOnlySpan(const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos) {
   if (start_pos >= end_pos || end_pos > codepoints.size()) {
     return false;
@@ -42,7 +42,7 @@ bool isCompoundVerbOrNominalizationAttested(const dictionary::DictionaryManager&
   if (dict_manager.lookupExact(base, core::PartOfSpeech::Verb) != nullptr) {
     return true;
   }
-  const std::string nominalized = generateRenyokei(base, "", verb_type);
+  const std::string nominalized = generateRenyokei(base, verb_type);
   return !nominalized.empty() && dict_manager.lookupExact(nominalized, core::PartOfSpeech::Noun) != nullptr;
 }
 
@@ -245,8 +245,8 @@ bool rejectsCompoundSpan(const CompoundMatchContext& ctx, const V2FormMatch& for
 
     // Check if full surface could be an i-adjective
     auto full_infl = ctx.inflection.getBest(full_surface);
-    if (full_infl.confidence >= 0.5F && full_infl.verb_type == grammar::VerbType::IAdjective && !v1.dict_verified &&
-        !dict_compound_v1) {
+    if (full_infl.confidence >= candidate::kIAdjConfMin && full_infl.verb_type == grammar::VerbType::IAdjective &&
+        !v1.dict_verified && !dict_compound_v1) {
       // With no independently verified V1, the whole adjective analysis is
       // stronger evidence (美しかった). A dictionary-backed continuative V1
       // followed by an allowed V2 remains a productive compound even when
@@ -278,7 +278,7 @@ CompoundBases buildCompoundBases(const CompoundMatchContext& ctx, const V2FormMa
   const std::string compound_base =
       form.matched_classical ? normalize::concat(v1_renyokei, form.classical_terminal)
       : form.matched_potential
-          ? normalize::concat(v1_renyokei, generateGodanPotential(v2_spelling, "", form.v2_verb.verb_type))
+          ? normalize::concat(v1_renyokei, generateGodanPotential(v2_spelling, form.v2_verb.verb_type))
           : compound_source_base;
   return {compound_source_base, compound_base};
 }
@@ -567,6 +567,8 @@ CompoundVerbMatch findCompoundVerbMatch(
   // This allows renyokei matches (すぎ) to take precedence over inflection
   // matches (すぎた) when the inflection match includes an auxiliary suffix.
   CompoundVerbMatch best_match;
+  // V1 verification does not depend on the V2 form, so it runs once on the first match.
+  std::optional<CompoundV1Verification> v1_cache;
 
   for (const auto& v2_verb : subsidiaryVerbs()) {
     if (!v2_verb.joins_general) {
@@ -579,26 +581,29 @@ CompoundVerbMatch findCompoundVerbMatch(
       continue;
     }
 
-    const CompoundV1Verification v1 = verifyCompoundVerbV1({
-        text,
-        codepoints,
-        byte_offsets,
-        start_pos,
-        kanji_end,
-        v2_start,
-        start_byte,
-        v2_start_byte,
-        base_ending,
-        is_sokuonbin,
-        is_ichidan,
-        has_kanji_v2_after_bare_ichidan,
-        dict_compound_v1,
-        hiragana_v1,
-        allow_closed_onbin_v1,
-        dict_compound_v1_lemma,
-        dict_manager,
-        inflection,
-    });
+    if (!v1_cache.has_value()) {
+      v1_cache = verifyCompoundVerbV1({
+          text,
+          codepoints,
+          byte_offsets,
+          start_pos,
+          kanji_end,
+          v2_start,
+          start_byte,
+          v2_start_byte,
+          base_ending,
+          is_sokuonbin,
+          is_ichidan,
+          has_kanji_v2_after_bare_ichidan,
+          dict_compound_v1,
+          hiragana_v1,
+          allow_closed_onbin_v1,
+          dict_compound_v1_lemma,
+          dict_manager,
+          inflection,
+      });
+    }
+    const CompoundV1Verification& v1 = *v1_cache;
 
     // Only generate compound verb candidates when V1 is a verified verb
     // This prevents false positives like 試験に落ちる (試験 is not a verb)

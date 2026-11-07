@@ -107,7 +107,7 @@ bool matchV2Renyokei(const CompoundMatchContext& ctx, V2FormMatch& form) {
     // Generate V2 renyokei
     std::string kanji_renyokei =
         v2_verb.joins_surface ? generateKanjiRenyokei(form.v2_surface, form.v2_reading, v2_verb.verb_type) : "";
-    std::string hira_renyokei = generateRenyokei(form.v2_reading, "", v2_verb.verb_type);
+    std::string hira_renyokei = generateRenyokei(form.v2_reading, v2_verb.verb_type);
 
     // Try kanji renyokei match
     if (spellsAt(ctx.text, ctx.v2_start_byte, kanji_renyokei)) {
@@ -144,8 +144,8 @@ void matchV2Potential(const CompoundMatchContext& ctx, V2FormMatch& form) {
   // V2 rather than adding per-verb potential entries.
   if (!form.matched_kanji && !form.matched_reading && !form.matched_renyokei) {
     std::string kanji_potential =
-        v2_verb.joins_surface ? generateGodanPotential(form.v2_surface, "", v2_verb.verb_type) : "";
-    std::string hira_potential = generateGodanPotential(form.v2_reading, "", v2_verb.verb_type);
+        v2_verb.joins_surface ? generateGodanPotential(form.v2_surface, v2_verb.verb_type) : "";
+    std::string hira_potential = generateGodanPotential(form.v2_reading, v2_verb.verb_type);
     if (spellsAt(text, v2_start_byte, kanji_potential)) {
       matched_potential = true;
       matched_len = kanji_potential.size();
@@ -191,9 +191,8 @@ void matchV2Kateikei(const CompoundMatchContext& ctx, V2FormMatch& form) {
   if (!form.matched_kanji && !form.matched_reading && !form.matched_renyokei && !form.matched_potential &&
       v2_verb.verb_type == V2VerbType::Godan) {
     const std::string kanji_kateikei =
-        v2_verb.joins_surface ? generateKateikei(form.v2_surface, "", v2_verb.verb_type) : "";
-    const std::string hira_kateikei =
-        !form.v2_reading.empty() ? generateKateikei(form.v2_reading, "", v2_verb.verb_type) : "";
+        v2_verb.joins_surface ? generateKateikei(form.v2_surface, v2_verb.verb_type) : "";
+    const std::string hira_kateikei = generateKateikei(form.v2_reading, v2_verb.verb_type);
     auto tryKateikei = [&](const std::string& kateikei, bool via_reading) {
       if (form.matched_kateikei || kateikei.empty() ||
           v2_start_byte + kateikei.size() + core::kJapaneseCharBytes > text.size()) {
@@ -226,9 +225,8 @@ void matchV2Volitional(const CompoundMatchContext& ctx, V2FormMatch& form) {
   // because the following auxiliary supplies decisive inflectional evidence.
   {
     const std::string kanji_volitional =
-        v2_verb.joins_surface ? generateVolitionalStem(form.v2_surface, "", v2_verb.verb_type) : "";
-    const std::string hira_volitional =
-        !form.v2_reading.empty() ? generateVolitionalStem(form.v2_reading, "", v2_verb.verb_type) : "";
+        v2_verb.joins_surface ? generateVolitionalStem(form.v2_surface, v2_verb.verb_type) : "";
+    const std::string hira_volitional = generateVolitionalStem(form.v2_reading, v2_verb.verb_type);
     auto tryVolitional = [&](const std::string& stem, bool via_reading) {
       if (matched_volitional || stem.empty() || v2_start_byte + stem.size() + core::kJapaneseCharBytes > text.size()) {
         return;
@@ -352,8 +350,8 @@ void matchV2AuxiliaryForms(const CompoundMatchContext& ctx, V2FormMatch& form) {
   // Keep a Godan mizenkei before its auxiliary separate.  Otherwise an
   // inflection match over the longer span (しきらない) would hide the
   // grammatical boundary that the mizenkei candidate below represents.
-  const std::string kanji_mizen = v2_verb.joins_surface ? generateMizenkei(form.v2_surface, "", v2_verb.verb_type) : "";
-  const std::string hira_mizen = !v2_reading.empty() ? generateMizenkei(v2_reading, "", v2_verb.verb_type) : "";
+  const std::string kanji_mizen = v2_verb.joins_surface ? generateMizenkei(form.v2_surface, v2_verb.verb_type) : "";
+  const std::string hira_mizen = generateMizenkei(v2_reading, v2_verb.verb_type);
   const bool mizenkei_before_aux = beginsMizenkeiAuxiliary(text, v2_start_byte, kanji_mizen) ||
                                    beginsMizenkeiAuxiliary(text, v2_start_byte, hira_mizen);
 
@@ -434,12 +432,11 @@ void matchV2Imperative(const CompoundMatchContext& ctx, V2FormMatch& form) {
       form.matched_renyokei_via_reading = via_reading;
     };
     if (v2_verb.verb_type == V2VerbType::Godan) {
-      tryImperative(v2_verb.joins_surface ? generateKateikei(form.v2_surface, "", v2_verb.verb_type) : "", false);
-      tryImperative(!v2_reading.empty() ? generateKateikei(v2_reading, "", v2_verb.verb_type) : "", true);
+      tryImperative(v2_verb.joins_surface ? generateKateikei(form.v2_surface, v2_verb.verb_type) : "", false);
+      tryImperative(generateKateikei(v2_reading, v2_verb.verb_type), true);
     } else {
-      const std::string kanji_stem =
-          v2_verb.joins_surface ? generateRenyokei(form.v2_surface, "", v2_verb.verb_type) : "";
-      const std::string hira_stem = !v2_reading.empty() ? generateRenyokei(v2_reading, "", v2_verb.verb_type) : "";
+      const std::string kanji_stem = v2_verb.joins_surface ? generateRenyokei(form.v2_surface, v2_verb.verb_type) : "";
+      const std::string hira_stem = generateRenyokei(v2_reading, v2_verb.verb_type);
       for (const auto* ending : kIchidanImperativeEndings) {
         tryImperative(kanji_stem.empty() ? "" : normalize::concat(kanji_stem, ending), false);
         tryImperative(hira_stem.empty() ? "" : normalize::concat(hira_stem, ending), true);
@@ -488,8 +485,8 @@ void matchV2ClassicalTerminal(const CompoundMatchContext& ctx, V2FormMatch& form
       form.classical_terminal = terminal;
       form.matched_len = terminal.size() + (attributive ? core::kJapaneseCharBytes : 0);
     };
-    tryClassical(v2_verb.joins_surface ? generateRenyokei(form.v2_surface, "", v2_verb.verb_type) : "");
-    tryClassical(!form.v2_reading.empty() ? generateRenyokei(form.v2_reading, "", v2_verb.verb_type) : "");
+    tryClassical(v2_verb.joins_surface ? generateRenyokei(form.v2_surface, v2_verb.verb_type) : "");
+    tryClassical(generateRenyokei(form.v2_reading, v2_verb.verb_type));
   }
 }
 

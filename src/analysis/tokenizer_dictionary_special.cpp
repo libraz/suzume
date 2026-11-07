@@ -5,7 +5,6 @@
 
 #include "analysis/candidate_constants.h"
 #include "analysis/category_cost.h"
-#include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "normalize/char_type.h"
 #include "normalize/utf8.h"

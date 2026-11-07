@@ -303,7 +303,7 @@ void emitCompoundVerbCandidates(core::Lattice& lattice, std::string_view text, c
   const bool compound_honorific_verified = grammar::isHumbleHonorificLemma(best_match.compound_base);
   const bool compound_lemma_verified =
       compound_lemma_in_dictionary || compound_source_in_dictionary || compound_honorific_verified;
-  const std::string nominalized_compound = generateRenyokei(best_match.compound_base, "", matched_v2.verb_type);
+  const std::string nominalized_compound = generateRenyokei(best_match.compound_base, matched_v2.verb_type);
   const bool compound_nominalization_verified =
       !nominalized_compound.empty() &&
       dict_manager.lookupExact(nominalized_compound, core::PartOfSpeech::Noun) != nullptr;
@@ -364,7 +364,8 @@ void emitCompoundVerbCandidates(core::Lattice& lattice, std::string_view text, c
     const char* pattern = best_match.is_volitional ? "compound_volitional_mizenkei" : "compound_mizenkei";
     lattice.addEdge(compound_surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(compound_end_pos),
                     core::PartOfSpeech::Verb, final_cost, flags, compound_lemma, compound_conj_type,
-                    core::CandidateOrigin::VerbCompound, 0.0F, pattern, core::ExtendedPOS::VerbMizenkei, pattern);
+                    core::CandidateOrigin::VerbCompound, candidate::kNoOriginConfidence, pattern,
+                    core::ExtendedPOS::VerbMizenkei, pattern);
     return;
   }
 
@@ -418,7 +419,7 @@ void emitCompoundVerbCandidates(core::Lattice& lattice, std::string_view text, c
       compound_epos == core::ExtendedPOS::VerbRenyokei &&
       (beginsNominalForcingParticle(codepoints, compound_end_pos, dict_manager) || modifies_marked_kanji_head ||
        // The copula predicates over it the same way (押し付けだ, 押し付けではなく).
-       grammar::startsPredicativeCopula(extractSubstring(codepoints, compound_end_pos, codepoints.size())) ||
+       grammar::startsPredicativeCopula(text.substr(byteOffsetAt(byte_offsets, compound_end_pos))) ||
        grammar::isCopulaFusedConjunction(extractSubstring(codepoints, compound_end_pos, compound_end_pos + 2)))) {
     add_verbal_noun("compound_renyokei_nominal");
   }
@@ -447,8 +448,7 @@ void emitCompoundVerbCandidates(core::Lattice& lattice, std::string_view text, c
   // Generate a te-form euphonic stem candidate so the conjunctive particle
   // remains separate: 話し合って → 話し合っ|て.
   // Without this, the compound verb te-form (話し合って) would be a single token.
-  auto [te_stem, uses_de] =
-      generateTeFormStem(best_match.compound_base, "", matched_v2.verb_type, matched_v2.base_ending);
+  auto [te_stem, uses_de] = generateTeFormStem(best_match.compound_base, matched_v2.verb_type, matched_v2.base_ending);
 
   // The te-form stem (e.g., 受け取っ before た) is itself the desired split
   // candidate, so it must not carry the includes_aux merge penalty. That
@@ -475,7 +475,8 @@ void emitCompoundVerbCandidates(core::Lattice& lattice, std::string_view text, c
 
     lattice.addEdge(stem, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(stem_end_pos),
                     core::PartOfSpeech::Verb, te_stem_cost, flags, stem_lemma, compound_conj_type,
-                    core::CandidateOrigin::VerbCompound, 0.0F, "compound_te_stem", epos, "compound_te_stem");
+                    core::CandidateOrigin::VerbCompound, candidate::kNoOriginConfidence, "compound_te_stem", epos,
+                    "compound_te_stem");
     return true;
   };
 
@@ -500,7 +501,7 @@ void emitCompoundVerbCandidates(core::Lattice& lattice, std::string_view text, c
   // also try a hiragana te-stem. This handles cases like:
   // 演じきった (input uses hiragana き, not kanji 切)
   if (!added_te_stem && !hira_compound_base.empty()) {
-    addTeStemEdge(generateTeFormStem(hira_compound_base, "", matched_v2.verb_type, matched_v2.base_ending).first);
+    addTeStemEdge(generateTeFormStem(hira_compound_base, matched_v2.verb_type, matched_v2.base_ending).first);
   }
 
   // Generate a mizenkei candidate for a following passive/causative auxiliary:
@@ -531,15 +532,15 @@ void emitCompoundVerbCandidates(core::Lattice& lattice, std::string_view text, c
     }
     lattice.addEdge(stem, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(stem_end_pos),
                     core::PartOfSpeech::Verb, mizenkei_cost, flags, compound_lemma, compound_conj_type,
-                    core::CandidateOrigin::Unknown, 0.0F, "compound_mizenkei", core::ExtendedPOS::VerbMizenkei,
-                    "compound_mizenkei");
+                    core::CandidateOrigin::Unknown, candidate::kNoOriginConfidence, "compound_mizenkei",
+                    core::ExtendedPOS::VerbMizenkei, "compound_mizenkei");
     return true;
   };
 
   // A V2 matched via its hiragana reading also tries the hiragana spelling.
-  if (!addMizenkeiEdge(generateMizenkei(best_match.compound_base, "", matched_v2.verb_type)) &&
+  if (!addMizenkeiEdge(generateMizenkei(best_match.compound_base, matched_v2.verb_type)) &&
       !hira_compound_base.empty()) {
-    addMizenkeiEdge(generateMizenkei(hira_compound_base, "", matched_v2.verb_type));
+    addMizenkeiEdge(generateMizenkei(hira_compound_base, matched_v2.verb_type));
   }
 }
 

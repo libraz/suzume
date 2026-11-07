@@ -204,25 +204,25 @@ inline constexpr char32_t kSokuonbinEndings[] = {U'く', U'つ', U'う', U'る'}
 // Generate renyokei surface from base form
 // Godan: replace ending with i-row (込む→込み, 返す→返し)
 // Ichidan: drop る (続ける→続け)
-std::string generateRenyokei(std::string_view surface, std::string_view reading, V2VerbType verb_type);
+std::string generateRenyokei(std::string_view surface, V2VerbType verb_type);
 
 // Generate mizenkei surface from base form
 // Godan: replace ending with a-row (込む→込ま, 返す→返さ)
 // Ichidan: drop る (続ける→続け, same as renyokei for ichidan)
-std::string generateMizenkei(std::string_view surface, std::string_view reading, V2VerbType verb_type);
+std::string generateMizenkei(std::string_view surface, V2VerbType verb_type);
 
 // Generate the Godan o-row stem selected by the volitional auxiliary う.
-std::string generateVolitionalStem(std::string_view surface, std::string_view reading, V2VerbType verb_type);
+std::string generateVolitionalStem(std::string_view surface, V2VerbType verb_type);
 
 // Generate kateikei surface from base form
 // Godan: replace ending with e-row (返す→返せ)
 // Ichidan: replace る with れ (続ける→続けれ)
-std::string generateKateikei(std::string_view surface, std::string_view reading, V2VerbType verb_type);
+std::string generateKateikei(std::string_view surface, V2VerbType verb_type);
 
 // Generate a Godan potential form (戻す→戻せる) from the dictionary form.
 // The V2 allowlist controls which lexical verbs participate; this merely shares
 // their ordinary Godan conjugation across all of those entries.
-std::string generateGodanPotential(std::string_view surface, std::string_view reading, V2VerbType verb_type);
+std::string generateGodanPotential(std::string_view surface, V2VerbType verb_type);
 
 // Te-form euphonic form type for Godan verbs
 enum class TeFormType : uint8_t {
@@ -238,8 +238,8 @@ TeFormType getTeFormType(std::string_view base_ending);
 
 // Generate te-form euphonic stem (before て/で)
 // Returns: stem and whether it uses で (vs て)
-std::pair<std::string, bool> generateTeFormStem(std::string_view surface, std::string_view reading,
-                                                V2VerbType verb_type, std::string_view base_ending);
+std::pair<std::string, bool> generateTeFormStem(std::string_view surface, V2VerbType verb_type,
+                                                std::string_view base_ending);
 
 // Generate kanji renyokei from kanji surface
 std::string generateKanjiRenyokei(std::string_view kanji_surface, std::string_view reading, V2VerbType verb_type);

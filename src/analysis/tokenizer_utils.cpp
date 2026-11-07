@@ -61,6 +61,18 @@ bool selectsInflectedStem(core::ExtendedPOS epos) {
   return epos == core::ExtendedPOS::AuxAspectIru || epos == core::ExtendedPOS::AuxVolitional;
 }
 
+// Whether [head_start, continuative_end) spells a dictionary verb ending in the
+// godan i-row continuative or an e-row continuative of an Ichidan verb.
+bool isDictionaryVerbContinuative(const dictionary::DictionaryManager* dict_manager,
+                                  const std::vector<char32_t>& codepoints, size_t head_start, size_t continuative_end,
+                                  char32_t ending, std::string_view godan_ending) {
+  return (!godan_ending.empty() &&
+          verb_helpers::isVerbInDictionary(dict_manager, codepoints, head_start, continuative_end - 1, godan_ending)) ||
+         (kana::isERowCodepoint(ending) &&
+          verb_helpers::isVerbInDictionary(dict_manager, codepoints, head_start, continuative_end,
+                                           normalize::encodeUtf8(core::hiragana::kRu)));
+}
+
 }  // namespace
 
 bool hasKanjiSuruPredicateAt(const std::vector<char32_t>& codepoints,
@@ -166,11 +178,7 @@ size_t longestNominalVerbContinuativeStart(const std::vector<char32_t>& codepoin
     // suffix resembles a constructed Ichidan stem (家庭|向け, not 家|庭向け).
     size_t closed_suffix_start = kanji_end;
     const bool ends_in_dictionary_verb_continuative =
-        (!godan_ending.empty() && verb_helpers::isVerbInDictionary(dict_manager, codepoints, kanji_end - 1,
-                                                                   continuative_end - 1, godan_ending)) ||
-        (kana::isERowCodepoint(ending) &&
-         verb_helpers::isVerbInDictionary(dict_manager, codepoints, kanji_end - 1, continuative_end,
-                                          normalize::encodeUtf8(core::hiragana::kRu)));
+        isDictionaryVerbContinuative(dict_manager, codepoints, kanji_end - 1, continuative_end, ending, godan_ending);
     for (size_t suffix_start = kanji_start + 1; suffix_start < kanji_end; ++suffix_start) {
       if (lookupEntryInRange(*dict_manager, codepoints, suffix_start, continuative_end, core::PartOfSpeech::Suffix) !=
           nullptr) {
@@ -208,16 +216,8 @@ size_t longestNominalVerbContinuativeStart(const std::vector<char32_t>& codepoin
       // compound-verb joiner, plus the dictionary-backed visible V2.
       if (!names_verb && kanji_end - verb_start == 2) {
         const bool left_ichidan = verb_helpers::isSingleKanjiIchidan(codepoints[verb_start]);
-        bool right_verb = false;
-        if (!godan_ending.empty()) {
-          right_verb = verb_helpers::isVerbInDictionary(dict_manager, codepoints, verb_start + 1, continuative_end - 1,
-                                                        godan_ending);
-        }
-        if (!right_verb && kana::isERowCodepoint(ending)) {
-          right_verb = verb_helpers::isVerbInDictionary(dict_manager, codepoints, verb_start + 1, continuative_end,
-                                                        normalize::encodeUtf8(core::hiragana::kRu));
-        }
-        names_verb = left_ichidan && right_verb;
+        names_verb = left_ichidan && isDictionaryVerbContinuative(dict_manager, codepoints, verb_start + 1,
+                                                                  continuative_end, ending, godan_ending);
       }
       // A one-kanji Godan-sa head inside a longer run is no verb where the run
       // reads as a verbal noun, or where an argument on the left chains the
@@ -581,6 +581,18 @@ size_t dictionarySokuonbinEndCovering(const core::Lattice& lattice, size_t pos) 
     return edge.origin == core::CandidateOrigin::Dictionary && edge.pos == core::PartOfSpeech::Verb &&
            edge.extended_pos == core::ExtendedPOS::VerbOnbinkei && utf8::endsWith(edge.surface, "っ");
   });
+}
+
+bool isClosedByDictionarySokuonbin(const core::Lattice& lattice, const std::vector<char32_t>& codepoints, size_t start,
+                                   size_t end) {
+  const size_t onbinkei_end = dictionarySokuonbinEndCovering(lattice, start);
+  return onbinkei_end != 0 && end <= onbinkei_end && onbinkei_end < codepoints.size() &&
+         (codepoints[onbinkei_end] == U'た' || codepoints[onbinkei_end] == U'て');
+}
+
+bool splitsLexicalSuffix(const std::vector<char32_t>& codepoints, size_t start, size_t end) {
+  return verb_helpers::startsInsideGaMashiiSuffix(codepoints, start) ||
+         verb_helpers::crossesKkoNominalizer(codepoints, start, end);
 }
 
 size_t compoundVerbEndCovering(const core::Lattice& lattice, size_t pos) {

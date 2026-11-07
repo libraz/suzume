@@ -107,15 +107,15 @@ void appendSuruSubsidiaryCandidates(const std::vector<char32_t>& codepoints, siz
     };
     tryConjugatedForm(compound_verb_detail::generateKanjiRenyokei(subsidiary.surface, reading, subsidiary.verb_type),
                       subsidiary.surface, core::ExtendedPOS::VerbRenyokei, "suru_subsidiary_renyokei");
-    tryConjugatedForm(compound_verb_detail::generateRenyokei(reading, "", subsidiary.verb_type), reading,
+    tryConjugatedForm(compound_verb_detail::generateRenyokei(reading, subsidiary.verb_type), reading,
                       core::ExtendedPOS::VerbRenyokei, "suru_subsidiary_renyokei");
-    tryConjugatedForm(compound_verb_detail::generateMizenkei(subsidiary.surface, "", subsidiary.verb_type),
+    tryConjugatedForm(compound_verb_detail::generateMizenkei(subsidiary.surface, subsidiary.verb_type),
                       subsidiary.surface, core::ExtendedPOS::VerbMizenkei, "suru_subsidiary_mizenkei");
-    tryConjugatedForm(compound_verb_detail::generateMizenkei(reading, "", subsidiary.verb_type), reading,
+    tryConjugatedForm(compound_verb_detail::generateMizenkei(reading, subsidiary.verb_type), reading,
                       core::ExtendedPOS::VerbMizenkei, "suru_subsidiary_mizenkei");
-    tryConjugatedForm(compound_verb_detail::generateKateikei(subsidiary.surface, "", subsidiary.verb_type),
+    tryConjugatedForm(compound_verb_detail::generateKateikei(subsidiary.surface, subsidiary.verb_type),
                       subsidiary.surface, core::ExtendedPOS::VerbKateikei, "suru_subsidiary_kateikei");
-    tryConjugatedForm(compound_verb_detail::generateKateikei(reading, "", subsidiary.verb_type), reading,
+    tryConjugatedForm(compound_verb_detail::generateKateikei(reading, subsidiary.verb_type), reading,
                       core::ExtendedPOS::VerbKateikei, "suru_subsidiary_kateikei");
 
     if (subsidiary.verb_type == compound_verb_detail::V2VerbType::Godan) {
@@ -133,10 +133,10 @@ void appendSuruSubsidiaryCandidates(const std::vector<char32_t>& codepoints, siz
           }
         }
       };
-      tryTeStem(compound_verb_detail::generateTeFormStem(subsidiary.surface, "", subsidiary.verb_type,
-                                                         subsidiary.base_ending),
-                subsidiary.surface);
-      tryTeStem(compound_verb_detail::generateTeFormStem(reading, "", subsidiary.verb_type, subsidiary.base_ending),
+      tryTeStem(
+          compound_verb_detail::generateTeFormStem(subsidiary.surface, subsidiary.verb_type, subsidiary.base_ending),
+          subsidiary.surface);
+      tryTeStem(compound_verb_detail::generateTeFormStem(reading, subsidiary.verb_type, subsidiary.base_ending),
                 reading);
     }
   }

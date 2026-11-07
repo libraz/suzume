@@ -58,7 +58,7 @@ size_t findParticleInitialClosedOnbinSplit(std::string_view text, const std::vec
           dict_manager.lookupExact(v2_verb.reading, core::PartOfSpeech::Verb) == nullptr) {
         continue;
       }
-      const auto [te_stem, uses_de] = generateTeFormStem(v2_verb.reading, "", v2_verb.verb_type, v2_verb.base_ending);
+      const auto [te_stem, uses_de] = generateTeFormStem(v2_verb.reading, v2_verb.verb_type, v2_verb.base_ending);
       if (te_stem.size() <= core::kJapaneseCharBytes ||
           v2_start_byte + te_stem.size() + core::kJapaneseCharBytes > text.size() ||
           text.substr(v2_start_byte, te_stem.size()) != te_stem) {
@@ -112,10 +112,8 @@ void addHiraganaCompoundVerbJoinCandidates(core::Lattice& lattice, std::string_v
   // Do not reinterpret a closed particle plus an independently attested verb
   // as a hiragana V1+V2 compound (結果+と+ひきかえる). A whole dictionary verb
   // at the same position still wins this ambiguity (できる, not で+きる).
-  size_t hiragana_end = start_pos;
-  while (hiragana_end < char_types.size() && char_types[hiragana_end] == CharType::Hiragana) {
-    ++hiragana_end;
-  }
+  const size_t hiragana_end =
+      findCharRegionEnd(char_types, start_pos, char_types.size() - start_pos, CharType::Hiragana);
   if (start_pos + 2 < hiragana_end) {
     const auto* particle =
         lookupEntryInRange(dict_manager, codepoints, start_pos, start_pos + 1, core::PartOfSpeech::Particle);
@@ -128,7 +126,10 @@ void addHiraganaCompoundVerbJoinCandidates(core::Lattice& lattice, std::string_v
   }
 
   const size_t start_byte = byteOffsetAt(byte_offsets, start_pos);
-  const size_t min_v1_len = codepoints[start_pos] == U'し' ? 1 : 2;
+  const char32_t first_char = codepoints[start_pos];
+  const bool starts_with_particle_kana =
+      normalize::isCommonParticle(first_char) || first_char == U'で' || first_char == U'も';
+  const size_t min_v1_len = first_char == U'し' ? 1 : 2;
   for (size_t v1_len = min_v1_len; v1_len <= 4; ++v1_len) {
     const size_t v2_start = start_pos + v1_len;
     if (v2_start >= codepoints.size() || v2_start > hiragana_end) {
@@ -142,9 +143,7 @@ void addHiraganaCompoundVerbJoinCandidates(core::Lattice& lattice, std::string_v
     const bool is_ichidan = base_ending == 0;
 
     const bool closed_onbin_context = has_left_predicate_boundary && v2_start == particle_initial_onbin_split;
-    const char32_t first_char = codepoints[start_pos];
-    if ((normalize::isCommonParticle(first_char) || first_char == U'で' || first_char == U'も') &&
-        !closed_onbin_context) {
+    if (starts_with_particle_kana && !closed_onbin_context) {
       continue;
     }
 
@@ -165,7 +164,7 @@ void addHiraganaCompoundVerbJoinCandidates(core::Lattice& lattice, std::string_v
     bool v1_embeds_conjunctive_particle = false;
     for (size_t particle_start = start_pos + 1; particle_start + 1 < v2_start; ++particle_start) {
       const char32_t host_tail = codepoints[particle_start - 1];
-      if (!kana::isIRowCodepoint(host_tail) && !kana::isERowCodepoint(host_tail)) {
+      if (!kana::isIOrERowCodepoint(host_tail)) {
         continue;
       }
       const auto* particle =

@@ -44,61 +44,61 @@ bool losesHomographReading(const DictionaryCandidateContext& ctx, const core::La
   // constraint, independent of the individual determiner or particle.
   const bool ends_at_sentence_boundary =
       end_pos >= codepoints.size() || normalize::classifyChar(codepoints[end_pos]) == normalize::CharType::Symbol;
-  if (result.entry->pos == core::PartOfSpeech::Determiner && ends_at_sentence_boundary &&
-      isDictionaryOnbinPast(dict_manager, result.entry->surface)) {
-    return true;
-  }
-  if (result.entry->pos == core::PartOfSpeech::Determiner && ends_at_sentence_boundary) {
-    const bool has_same_span_predicate =
-        lookupResultsHavePartOfSpeech(lookup_results, kVerbAdjectiveMask, result.length);
-    if (has_same_span_predicate) {
+  if (result.entry->pos == core::PartOfSpeech::Determiner) {
+    if (ends_at_sentence_boundary && isDictionaryOnbinPast(dict_manager, result.entry->surface)) {
       return true;
     }
-  }
-  if (result.entry->pos == core::PartOfSpeech::Determiner && ends_at_sentence_boundary &&
-      hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::AuxCopulaDa) && start_pos >= 2 &&
-      codepoints[start_pos - 2] == U'の' &&
-      hasPrecedingExtendedPOS(lattice, start_pos - 1, core::ExtendedPOS::ParticleNo)) {
-    return true;
-  }
-  if (result.entry->pos == core::PartOfSpeech::Determiner && end_pos < codepoints.size()) {
-    const size_t following_byte_pos = byteOffsetAt(byte_offsets, end_pos);
-    const auto following_results = dict_manager.lookup(text, following_byte_pos);
-    const bool followed_by_case_particle =
-        lookupResultsHaveExtendedPOS(following_results, core::ExtendedPOS::ParticleCase);
-    // A longer nominal headword starting there is what the determiner
-    // modifies (そういう+ところ, こういう+とこ), not the particle.
-    const bool followed_by_longer_nominal =
-        lookupResultsHaveLongerPartOfSpeech(following_results, partOfSpeechMask(core::PartOfSpeech::Noun), 1);
-    // So is an unregistered kana noun the rescue path offers there: a run
-    // with no reading of its own, closed by the clause end or a particle
-    // (この+へや+、, この+へや+で). Its first mora only spells the particle.
-    const auto opens_unread_kana_noun = [&]() {
-      constexpr size_t kMaxUnreadNounLength = 4;
-      size_t run_end = end_pos;
-      while (run_end < codepoints.size() && run_end - end_pos < kMaxUnreadNounLength &&
-             normalize::classifyChar(codepoints[run_end]) == normalize::CharType::Hiragana) {
-        ++run_end;
+    if (ends_at_sentence_boundary) {
+      const bool has_same_span_predicate =
+          lookupResultsHavePartOfSpeech(lookup_results, kVerbAdjectiveMask, result.length);
+      if (has_same_span_predicate) {
+        return true;
       }
-      for (size_t noun_end = end_pos + 2; noun_end <= run_end; ++noun_end) {
-        const bool closed = noun_end >= codepoints.size() ||
-                            normalize::classifyChar(codepoints[noun_end]) != normalize::CharType::Hiragana ||
-                            lookupEntryInRange(dict_manager, codepoints, noun_end, noun_end + 1,
-                                               core::PartOfSpeech::Particle) != nullptr;
-        if (!closed || lookupEntryInRange(dict_manager, codepoints, end_pos, noun_end) != nullptr) {
-          continue;
-        }
-        const auto& readings = analysesInRange(inflection, codepoints, end_pos, noun_end);
-        if (std::none_of(readings.begin(), readings.end(), [](const grammar::InflectionCandidate& reading) {
-              return reading.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence;
-            })) {
-          return true;
-        }
-      }
-      return false;
-    };
-    if (followed_by_case_particle && !followed_by_longer_nominal && !opens_unread_kana_noun()) {
+    }
+    if (ends_at_sentence_boundary && hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::AuxCopulaDa) &&
+        start_pos >= 2 && codepoints[start_pos - 2] == U'の' &&
+        hasPrecedingExtendedPOS(lattice, start_pos - 1, core::ExtendedPOS::ParticleNo)) {
       return true;
+    }
+    if (end_pos < codepoints.size()) {
+      const size_t following_byte_pos = byteOffsetAt(byte_offsets, end_pos);
+      const auto following_results = dict_manager.lookup(text, following_byte_pos);
+      const bool followed_by_case_particle =
+          lookupResultsHaveExtendedPOS(following_results, core::ExtendedPOS::ParticleCase);
+      // A longer nominal headword starting there is what the determiner
+      // modifies (そういう+ところ, こういう+とこ), not the particle.
+      const bool followed_by_longer_nominal =
+          lookupResultsHaveLongerPartOfSpeech(following_results, partOfSpeechMask(core::PartOfSpeech::Noun), 1);
+      // So is an unregistered kana noun the rescue path offers there: a run
+      // with no reading of its own, closed by the clause end or a particle
+      // (この+へや+、, この+へや+で). Its first mora only spells the particle.
+      const auto opens_unread_kana_noun = [&]() {
+        constexpr size_t kMaxUnreadNounLength = 4;
+        size_t run_end = end_pos;
+        while (run_end < codepoints.size() && run_end - end_pos < kMaxUnreadNounLength &&
+               normalize::classifyChar(codepoints[run_end]) == normalize::CharType::Hiragana) {
+          ++run_end;
+        }
+        for (size_t noun_end = end_pos + 2; noun_end <= run_end; ++noun_end) {
+          const bool closed = noun_end >= codepoints.size() ||
+                              normalize::classifyChar(codepoints[noun_end]) != normalize::CharType::Hiragana ||
+                              lookupEntryInRange(dict_manager, codepoints, noun_end, noun_end + 1,
+                                                 core::PartOfSpeech::Particle) != nullptr;
+          if (!closed || lookupEntryInRange(dict_manager, codepoints, end_pos, noun_end) != nullptr) {
+            continue;
+          }
+          const auto& readings = analysesInRange(inflection, codepoints, end_pos, noun_end);
+          if (std::none_of(readings.begin(), readings.end(), [](const grammar::InflectionCandidate& reading) {
+                return reading.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence;
+              })) {
+            return true;
+          }
+        }
+        return false;
+      };
+      if (followed_by_case_particle && !followed_by_longer_nominal && !opens_unread_kana_noun()) {
+        return true;
+      }
     }
   }
 

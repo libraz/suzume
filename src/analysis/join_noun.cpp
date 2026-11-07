@@ -110,10 +110,8 @@ void addHonorificSamaNounJoinCandidate(core::Lattice& lattice, std::string_view 
     return;
   }
 
-  size_t end_pos = start_pos + 1;
-  while (end_pos < codepoints.size() && char_types[end_pos] == CharType::Kanji) {
-    ++end_pos;
-  }
+  const size_t end_pos =
+      findCharRegionEnd(char_types, start_pos + 1, char_types.size() - (start_pos + 1), CharType::Kanji);
 
   // A productive honorific noun needs a lexical kanji base before the closed
   // honorific suffix. This preserves the ordinary prefix analysis for お様.
@@ -121,7 +119,7 @@ void addHonorificSamaNounJoinCandidate(core::Lattice& lattice, std::string_view 
     return;
   }
 
-  std::string surface(textRange(text, byte_offsets, start_pos, end_pos));
+  const std::string_view surface = textRange(text, byte_offsets, start_pos, end_pos);
   const float cost = scorer.posPrior(core::PartOfSpeech::Noun) + candidate::kHonorificSamaNounBonus;
   lattice.addEdge(surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(end_pos), core::PartOfSpeech::Noun,
                   cost, core::LatticeEdge::kIsUnknown);
@@ -145,7 +143,7 @@ void addStandaloneHonorificPrefixInterjectionCandidate(core::Lattice& lattice, s
     return;
   }
 
-  std::string surface(textRange(text, byte_offsets, start_pos, start_pos + 1));
+  const std::string_view surface = textRange(text, byte_offsets, start_pos, start_pos + 1);
   const float cost =
       scorer.posPrior(core::PartOfSpeech::Interjection) + candidate::kStandaloneHonorificPrefixInterjectionBonus;
   lattice.addEdge(surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(start_pos + 1),
@@ -464,13 +462,12 @@ void addDeverbalNounBeforeIndependentNakuCandidates(core::Lattice& lattice, std:
 void addVerbSuffixNounJoinCandidates(core::Lattice& lattice, std::string_view text,
                                      const std::vector<char32_t>& codepoints, const ByteOffsets& byte_offsets,
                                      size_t start_pos, const std::vector<normalize::CharType>& char_types,
-                                     const dictionary::DictionaryManager& dict_manager, const Scorer& scorer,
-                                     [[maybe_unused]] const grammar::Inflection& inflection) {
+                                     const dictionary::DictionaryManager& dict_manager, const Scorer& scorer) {
   if (start_pos >= codepoints.size()) {
     return;
   }
   const auto add_join_noun_edge = [&](size_t end_pos) {
-    std::string surface(textRange(text, byte_offsets, start_pos, end_pos));
+    const std::string_view surface = textRange(text, byte_offsets, start_pos, end_pos);
     lattice.addEdge(surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(end_pos), core::PartOfSpeech::Noun,
                     scorer.posPrior(core::PartOfSpeech::Noun) + candidate::kVerbSuffixNounJoinBonus,
                     core::LatticeEdge::kFromDictionary, surface);  // lemma = surface for compound nouns
@@ -527,10 +524,7 @@ void addVerbSuffixNounJoinCandidates(core::Lattice& lattice, std::string_view te
 
   // Look for patterns: Kanji + Hiragana + Suffix(物/方/所)
   // Examples: 食べ物, 飲み物, 読み方, 居場所
-  size_t kanji_end = start_pos;
-  while (kanji_end < codepoints.size() && char_types[kanji_end] == CharType::Kanji) {
-    ++kanji_end;
-  }
+  const size_t kanji_end = findCharRegionEnd(char_types, start_pos, char_types.size() - start_pos, CharType::Kanji);
 
   // Look for 1-2 optional hiragana (verb renyokei suffix like べ, み, き)
   const size_t hiragana_end = findCharRegionEnd(char_types, kanji_end, 2, CharType::Hiragana);
@@ -561,8 +555,7 @@ void addVerbSuffixNounJoinCandidates(core::Lattice& lattice, std::string_view te
   // A continuative ends on the i-row or e-row. Any other final kana is an
   // attributive, past, genitive or terminal form instead (効率的な方, 書いた方,
   // 今後の方針, 見渡せる所), not a verb continuative heading the compound.
-  if (hiragana_end > kanji_end && !kana::isIRowCodepoint(codepoints[hiragana_end - 1]) &&
-      !kana::isERowCodepoint(codepoints[hiragana_end - 1])) {
+  if (hiragana_end > kanji_end && !kana::isIOrERowCodepoint(codepoints[hiragana_end - 1])) {
     return;
   }
 
@@ -573,8 +566,7 @@ void addVerbSuffixNounJoinCandidates(core::Lattice& lattice, std::string_view te
   const char32_t left_kana = start_pos >= 2 ? codepoints[start_pos - 1] : U'\0';
   if (start_pos >= 2 && hiragana_end == kanji_end + 1 && kanji_end == start_pos + 1 &&
       char_types[start_pos - 1] == CharType::Hiragana && char_types[start_pos - 2] == CharType::Kanji &&
-      (kana::isIRowCodepoint(left_kana) || kana::isERowCodepoint(left_kana)) && !isCaseParticleCodepoint(left_kana) &&
-      left_kana != U'て' &&
+      kana::isIOrERowCodepoint(left_kana) && !isCaseParticleCodepoint(left_kana) && left_kana != U'て' &&
       !(left_kana == U'き' &&
         verb_helpers::isAdjectiveInDictionary(&dict_manager, codepoints, start_pos - 2, start_pos - 1, "い")) &&
       (verb_helpers::namesDictionaryVerbContinuative(&dict_manager, codepoints, start_pos - 1) ||

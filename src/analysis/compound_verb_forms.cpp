@@ -30,24 +30,10 @@ std::string replaceGodanEnding(std::string_view base, bool use_o_row) {
                            normalize::encodeUtf8(use_o_row ? row.o_row : row.e_row));
 }
 
-}  // namespace
-
-dictionary::ConjugationType compoundConjugationType(V2VerbType verb_type, std::string_view base_ending) {
-  if (verb_type == V2VerbType::Ichidan) {
-    return dictionary::ConjugationType::Ichidan;
-  }
-  const auto* godan_entry = findGodanRowByEnding(base_ending);
-  return godan_entry == nullptr ? dictionary::ConjugationType::None : grammar::verbTypeToConjType(godan_entry->first);
-}
-
-namespace {
-
 // Renyokei and mizenkei are the same operation on the V2 base: an Ichidan verb
 // drops its final mora, and a Godan verb moves that mora to another row of the
 // same column. Only the target row differs between the two forms.
-std::string generateGodanRowStem(std::string_view surface, std::string_view reading, V2VerbType verb_type,
-                                 bool use_a_row) {
-  const std::string_view base = reading.empty() ? surface : reading;
+std::string generateGodanRowStem(std::string_view base, V2VerbType verb_type, bool use_a_row) {
   if (base.size() < core::kJapaneseCharBytes) {
     return "";
   }
@@ -67,16 +53,23 @@ std::string generateGodanRowStem(std::string_view surface, std::string_view read
 
 }  // namespace
 
-std::string generateRenyokei(std::string_view surface, std::string_view reading, V2VerbType verb_type) {
-  return generateGodanRowStem(surface, reading, verb_type, false);
+dictionary::ConjugationType compoundConjugationType(V2VerbType verb_type, std::string_view base_ending) {
+  if (verb_type == V2VerbType::Ichidan) {
+    return dictionary::ConjugationType::Ichidan;
+  }
+  const auto* godan_entry = findGodanRowByEnding(base_ending);
+  return godan_entry == nullptr ? dictionary::ConjugationType::None : grammar::verbTypeToConjType(godan_entry->first);
 }
 
-std::string generateMizenkei(std::string_view surface, std::string_view reading, V2VerbType verb_type) {
-  return generateGodanRowStem(surface, reading, verb_type, true);
+std::string generateRenyokei(std::string_view surface, V2VerbType verb_type) {
+  return generateGodanRowStem(surface, verb_type, false);
 }
 
-std::string generateVolitionalStem(std::string_view surface, std::string_view reading, V2VerbType verb_type) {
-  const std::string_view base = reading.empty() ? surface : reading;
+std::string generateMizenkei(std::string_view surface, V2VerbType verb_type) {
+  return generateGodanRowStem(surface, verb_type, true);
+}
+
+std::string generateVolitionalStem(std::string_view base, V2VerbType verb_type) {
   // An Ichidan verb forms its volitional from the bare stem plus よ, where a
   // Godan verb uses its o-row (続けよ+う against 出そ+う).
   if (verb_type == V2VerbType::Ichidan) {
@@ -88,8 +81,7 @@ std::string generateVolitionalStem(std::string_view surface, std::string_view re
   return replaceGodanEnding(base, true);
 }
 
-std::string generateKateikei(std::string_view surface, std::string_view reading, V2VerbType verb_type) {
-  const std::string_view base = reading.empty() ? surface : reading;
+std::string generateKateikei(std::string_view base, V2VerbType verb_type) {
   if (base.size() < core::kJapaneseCharBytes) {
     return "";
   }
@@ -101,12 +93,12 @@ std::string generateKateikei(std::string_view surface, std::string_view reading,
   return replaceGodanEnding(base, false);
 }
 
-std::string generateGodanPotential(std::string_view surface, std::string_view reading, V2VerbType verb_type) {
+std::string generateGodanPotential(std::string_view surface, V2VerbType verb_type) {
   if (verb_type != V2VerbType::Godan) {
     return "";
   }
 
-  std::string result = replaceGodanEnding(reading.empty() ? surface : reading, false);
+  std::string result = replaceGodanEnding(surface, false);
   if (!result.empty()) {
     result += "る";
   }
@@ -128,9 +120,8 @@ TeFormType getTeFormType(std::string_view base_ending) {
   return TeFormType::Renyokei;
 }
 
-std::pair<std::string, bool> generateTeFormStem(std::string_view surface, std::string_view reading,
-                                                V2VerbType verb_type, std::string_view base_ending) {
-  const std::string_view base = reading.empty() ? surface : reading;
+std::pair<std::string, bool> generateTeFormStem(std::string_view base, V2VerbType verb_type,
+                                                std::string_view base_ending) {
   if (base.size() < core::kJapaneseCharBytes)
     return {"", false};
 
@@ -159,9 +150,9 @@ std::pair<std::string, bool> generateTeFormStem(std::string_view surface, std::s
 
 std::string generateKanjiRenyokei(std::string_view kanji_surface, std::string_view reading, V2VerbType verb_type) {
   if (reading.empty()) {
-    return generateRenyokei(kanji_surface, "", verb_type);
+    return generateRenyokei(kanji_surface, verb_type);
   }
-  const std::string hiragana_renyokei = generateRenyokei(reading, "", verb_type);
+  const std::string hiragana_renyokei = generateRenyokei(reading, verb_type);
   if (hiragana_renyokei.empty())
     return "";
 

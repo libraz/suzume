@@ -222,13 +222,13 @@ std::optional<float> unknownCandidateCost(const tokenizer_unknown_detail::Unknow
 
   // Case 3: Colloquial verb contraction (ておく→っとく)
   // っとく is a valid compound verb ending that shouldn't be penalized for length
-  // Note: っちゃう/っじゃう are handled by Case 6 (revoke skip for ちゃう endings)
+  // Note: っちゃう/っじゃう are handled by Case 5 (revoke skip for ちゃう endings)
   if (!skip_penalty && candidate.pos == core::PartOfSpeech::Verb && utf8::endsWith(candidate.surface, "っとく")) {
     skip_penalty = true;
     skip_reason = "colloquial_contraction";
   }
 
-  // Case 5: Short hiragana verb candidates ending with te/de-form
+  // Case 4: Short hiragana verb candidates ending with te/de-form
   // Handles cases like ねて (寝る), でて (出る), みて (見る) where
   // dictionary only has kanji form but surface is pure hiragana.
   // These 2-char patterns don't meet Case 2's ≥3 char threshold.
@@ -241,7 +241,7 @@ std::optional<float> unknownCandidateCost(const tokenizer_unknown_detail::Unknow
     skip_reason = "short_te_form";
   }
 
-  // Case 6: Revoke skip for long hiragana verbs ending with ちゃう/ちゃっ/ちゃい
+  // Case 5: Revoke skip for long hiragana verbs ending with ちゃう/ちゃっ/ちゃい
   // These are auxiliary chains (e.g., されちゃう = さ+れ+ちゃう,
   // なっちゃう = なっ+ちゃう, やっちゃう = やっ+ちゃう) that should split.
   if (skip_penalty && candidate.pos == core::PartOfSpeech::Verb && candidate.end - candidate.start >= 4) {
@@ -253,7 +253,7 @@ std::optional<float> unknownCandidateCost(const tokenizer_unknown_detail::Unknow
     }
   }
 
-  // Case 4: Pure hiragana OTHER (likely readings/furigana)
+  // Case 6: Pure hiragana OTHER (likely readings/furigana)
   // Reduce penalty for long varied hiragana sequences
   // Also allow prolonged sound mark (ー) as part of hiragana sequence
   bool reduced_penalty = false;
@@ -643,7 +643,7 @@ void addUnknownCandidateEdges(core::Lattice& lattice, const tokenizer_unknown_de
 #ifdef SUZUME_DEBUG_INFO
                   candidate.confidence, candidate.pattern, candidate.extended_pos, candidate.epos_source);
 #else
-                  0.0F, {}, candidate.extended_pos);
+                  candidate::kNoOriginConfidence, {}, candidate.extended_pos);
 #endif
 }
 
