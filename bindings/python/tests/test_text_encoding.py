@@ -13,7 +13,7 @@ def test_user_dictionary_rejects_unpaired_surrogate() -> None:
     assert caught.value.code is ErrorCode.INVALID_UTF8
 
 
-@pytest.mark.parametrize("scorer_options", ["\ud800", {"verb": "\ud800"}])
+@pytest.mark.parametrize("scorer_options", ["\ud800", {"verb": {"name": "\ud800"}}, {"\udc00": 1}])
 def test_scorer_options_reject_unpaired_surrogate(scorer_options: str | dict[str, object]) -> None:
     with pytest.raises(SuzumeError) as caught:
         Suzume(scorer_options=scorer_options)

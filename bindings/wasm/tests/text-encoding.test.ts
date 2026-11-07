@@ -23,9 +23,12 @@ describe('unpaired surrogates', () => {
     }
   });
 
-  // An object goes through JSON.stringify, which escapes a lone surrogate as ASCII.
-  it('are rejected in scorer options given as a string', async () => {
-    await expectInvalidUtf8(() => Suzume.create({ scorerOptions: '\ud800' }));
+  it.each([
+    ['a string', '\ud800'],
+    ['an object value', { verb: { name: '\ud800' } }],
+    ['an object key', { '\udc00': 1 }],
+  ])('are rejected in scorer options given as %s', async (_label, scorerOptions) => {
+    await expectInvalidUtf8(() => Suzume.create({ scorerOptions }));
   });
 
   it('are rejected at the end of analyzed text', async () => {

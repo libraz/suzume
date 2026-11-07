@@ -406,7 +406,14 @@ export class Suzume {
           const scorerJson =
             typeof options.scorerOptions === 'string'
               ? options.scorerOptions
-              : JSON.stringify(options.scorerOptions);
+              : // JSON.stringify escapes a lone surrogate as ASCII, so check each key and string first.
+                JSON.stringify(options.scorerOptions, (key, value: unknown) => {
+                  assertWellFormedUtf16(key);
+                  if (typeof value === 'string') {
+                    assertWellFormedUtf16(value);
+                  }
+                  return value;
+                });
           scorerOptionsPtr = allocUtf8(module, scorerJson).pointer;
           module.HEAPU32[(optionsPtr + layout.scorerOptionsJson) >> 2] = scorerOptionsPtr;
         }
