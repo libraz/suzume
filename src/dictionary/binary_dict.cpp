@@ -24,7 +24,10 @@ core::Unexpected<core::Error> invalid(std::string message) {
 }
 
 constexpr size_t kInlineFrontLength = 15;
-constexpr uint16_t kPackedLemmaMask = 0x07FFU;
+constexpr size_t kByteEntrySize = 1;    // grammar-only and record-palette entries
+constexpr size_t kPackedEntrySize = 2;  // lemma reference and grammar index in one uint16
+constexpr uint32_t kPackedGrammarShift = 11U;
+constexpr uint16_t kPackedLemmaMask = static_cast<uint16_t>((1U << kPackedGrammarShift) - 1U);
 constexpr size_t kMaxPackedGrammarPaletteSize = 32;
 constexpr int64_t kMinPackedLemmaDelta = -1024;
 constexpr int64_t kMaxPackedLemmaDelta = 1023;
@@ -53,11 +56,11 @@ struct CompactEntry {
 };
 
 uint16_t packEntry(const CompactEntry& entry) {
-  return entry.lemma_reference | static_cast<uint16_t>(entry.grammar_index << 11U);
+  return entry.lemma_reference | static_cast<uint16_t>(entry.grammar_index << kPackedGrammarShift);
 }
 
 CompactEntry unpackEntry(uint16_t packed) {
-  return {static_cast<uint16_t>(packed & kPackedLemmaMask), static_cast<uint8_t>(packed >> 11U)};
+  return {static_cast<uint16_t>(packed & kPackedLemmaMask), static_cast<uint8_t>(packed >> kPackedGrammarShift)};
 }
 
 uint16_t readLe16(const uint8_t* data) {
@@ -300,14 +303,14 @@ core::Expected<size_t, core::Error> BinaryDictionary::parseData(const uint8_t* d
       record_palette = data + entry_table_offset;
       record_palette_size = record_count;
       entry_table_offset += record_bytes;
-      entry_record_size = 1;
+      entry_record_size = kByteEntrySize;
       break;
     }
     case BinaryDictHeader::kGrammarOnlyEntries:
-      entry_record_size = 1;
+      entry_record_size = kByteEntrySize;
       break;
     case BinaryDictHeader::kPackedEntries:
-      entry_record_size = 2;
+      entry_record_size = kPackedEntrySize;
       break;
     case BinaryDictHeader::kWideEntries:
       entry_record_size = kWideCompactEntrySize;
@@ -604,13 +607,13 @@ core::Expected<std::vector<uint8_t>, core::Error> BinaryDictWriter::build() {
   // misleading selection criterion here.
   if (lemma_indices.empty()) {
     output_flags = BinaryDictHeader::kGrammarOnlyEntries;
-    compact_entry_size = 1;
+    compact_entry_size = kByteEntrySize;
   } else if (uses_relative_lemmas) {
     output_flags = BinaryDictHeader::kPackedEntries | BinaryDictHeader::kRelativeLemmaRefs;
-    compact_entry_size = 2;
+    compact_entry_size = kPackedEntrySize;
   } else if (lemma_indices.size() <= kPackedLemmaMask && grammar_palette.size() <= kMaxPackedGrammarPaletteSize) {
     output_flags = BinaryDictHeader::kPackedEntries;
-    compact_entry_size = 2;
+    compact_entry_size = kPackedEntrySize;
   }
 
   std::vector<uint16_t> record_palette;
@@ -636,7 +639,7 @@ core::Expected<std::vector<uint8_t>, core::Error> BinaryDictWriter::build() {
                                        compact_entries.size() * sizeof(uint16_t)) {
       output_flags = static_cast<uint8_t>((output_flags & ~BinaryDictHeader::kEntryEncodingMask) |
                                           BinaryDictHeader::kRecordPaletteEntries);
-      compact_entry_size = 1;
+      compact_entry_size = kByteEntrySize;
     } else {
       record_palette.clear();
     }

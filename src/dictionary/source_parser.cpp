@@ -93,32 +93,45 @@ bool usesLegacyTsvLayout(const std::vector<std::string>& fields) {
   return fields.size() >= 4 && isNumericField(fields[3]);
 }
 
-char detectDelimiter(std::string_view record) {
+// Quote tracking shared by delimiter detection and record splitting.
+struct QuoteScan {
   bool in_quotes = false;
   bool field_has_non_space = false;
+
+  // Handles the '"' at text[idx]; a doubled quote inside quotes advances idx past the pair.
+  void onQuote(std::string_view text, size_t& idx) {
+    if (in_quotes && idx + 1 < text.size() && text[idx + 1] == '"') {
+      ++idx;
+    } else if (in_quotes) {
+      in_quotes = false;
+    } else if (!field_has_non_space) {
+      in_quotes = true;
+    }
+  }
+
+  // Handles a character seen outside quotes: ',' and tab start a new field.
+  void onUnquoted(char chr) {
+    if (chr == '\t' || chr == ',') {
+      field_has_non_space = false;
+    } else if (!isAsciiWhitespace(chr)) {
+      field_has_non_space = true;
+    }
+  }
+};
+
+char detectDelimiter(std::string_view record) {
+  QuoteScan scan;
   for (size_t idx = 0; idx < record.size(); ++idx) {
     const char chr = record[idx];
     if (chr == '"') {
-      if (in_quotes && idx + 1 < record.size() && record[idx + 1] == '"') {
-        ++idx;
-        continue;
-      }
-      if (in_quotes) {
-        in_quotes = false;
-      } else if (!field_has_non_space) {
-        in_quotes = true;
-      }
+      scan.onQuote(record, idx);
       continue;
     }
-    if (!in_quotes && chr == '\t') {
-      return '\t';
-    }
-    if (!in_quotes && chr == ',') {
-      field_has_non_space = false;
-      continue;
-    }
-    if (!in_quotes && !isAsciiWhitespace(chr)) {
-      field_has_non_space = true;
+    if (!scan.in_quotes) {
+      if (chr == '\t') {
+        return '\t';
+      }
+      scan.onUnquoted(chr);
     }
   }
   return ',';
@@ -294,8 +307,7 @@ core::Expected<SourceParseResult, core::Error> parseDictionarySource(std::string
   size_t record_start = 0;
   size_t record_line = 1;
   size_t current_line = 1;
-  bool in_quotes = false;
-  bool field_has_non_space = false;
+  QuoteScan scan;
 
   for (size_t idx = 0; idx <= content.size(); ++idx) {
     const bool at_end = idx == content.size();
@@ -304,25 +316,15 @@ core::Expected<SourceParseResult, core::Error> parseDictionarySource(std::string
     }
     const char chr = at_end ? '\0' : content[idx];
     if (!at_end && chr == '"') {
-      if (in_quotes && idx + 1 < content.size() && content[idx + 1] == '"') {
-        ++idx;
-        continue;
-      }
-      if (in_quotes) {
-        in_quotes = false;
-      } else if (!field_has_non_space) {
-        in_quotes = true;
-      }
-    } else if (!at_end && !in_quotes && (chr == '\t' || chr == ',')) {
-      field_has_non_space = false;
-    } else if (!at_end && !in_quotes && !isAsciiWhitespace(chr)) {
-      field_has_non_space = true;
+      scan.onQuote(content, idx);
+    } else if (!at_end && !scan.in_quotes) {
+      scan.onUnquoted(chr);
     }
 
     if (!at_end && chr == '\n') {
       ++current_line;
     }
-    if (!at_end && (chr != '\n' || in_quotes)) {
+    if (!at_end && (chr != '\n' || scan.in_quotes)) {
       continue;
     }
 
@@ -370,10 +372,10 @@ core::Expected<SourceParseResult, core::Error> parseDictionarySource(std::string
     }
     record_start = idx + 1;
     record_line = current_line;
-    field_has_non_space = false;
+    scan.field_has_non_space = false;
   }
 
-  if (in_quotes) {
+  if (scan.in_quotes) {
     return core::makeUnexpected(quotingError(record_line, "unterminated quoted field"));
   }
   return result;

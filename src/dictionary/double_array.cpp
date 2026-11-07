@@ -187,9 +187,6 @@ void DoubleArray::buildRecursive(BuildState& state, const std::vector<std::strin
   // First pass: mark all children as used (before recursion!)
   for (uint8_t chr : children) {
     size_t child_pos = base_val ^ chr;
-    if (child_pos >= state.units.size()) {
-      state.resize(child_pos + kBlockSize);
-    }
     state.units[child_pos].setLabel(chr);
     state.used[child_pos] = true;
   }
