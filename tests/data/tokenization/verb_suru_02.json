@@ -1435,6 +1435,105 @@
       ],
       "id": "sonnakotoshitenda",
       "input": "そんなことしてんだ"
+    },
+    {
+      "description": "Sino verbal noun before a comma after an object marker stays whole",
+      "expected": [
+        {
+          "lemma": "輸出規制",
+          "pos": "Noun",
+          "surface": "輸出規制"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "強化",
+          "pos": "Noun",
+          "surface": "強化"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "発表",
+          "pos": "Noun",
+          "surface": "発表"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "国際社会",
+          "pos": "Noun",
+          "surface": "国際社会"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "反発",
+          "pos": "Noun",
+          "surface": "反発"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "招く",
+          "pos": "Verb",
+          "surface": "招い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "no_wo_shi_no_wo_ita",
+      "input": "輸出規制の強化を発表し、国際社会の反発を招いた。"
+    },
+    {
+      "description": "Sino verbal noun before a comma after an object marker stays whole",
+      "expected": [
+        {
+          "lemma": "方針",
+          "pos": "Noun",
+          "surface": "方針"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "発表",
+          "pos": "Noun",
+          "surface": "発表"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "その後",
+          "pos": "Adverb",
+          "surface": "その後"
+        }
+      ],
+      "id": "wo_shi_sono",
+      "input": "方針を発表し、その後"
     }
   ],
   "description": "Suru-verb patterns with subsidiary verbs - MeCab互換分割 (part 2/2)",

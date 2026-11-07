@@ -310,6 +310,48 @@ bool isListedGodanSaContinuativeRun(const dictionary::DictionaryManager* dict_ma
                                    core::PartOfSpeech::Verb) != nullptr;
 }
 
+GodanSaHeadReading readKanjiRunBeforeGodanSaHead(const dictionary::DictionaryManager* dict_manager,
+                                                 const std::vector<char32_t>& codepoints, size_t head_pos) {
+  if (dict_manager == nullptr || head_pos == 0 || head_pos + 1 >= codepoints.size() ||
+      codepoints[head_pos + 1] != U'し' || !normalize::isKanjiCodepoint(codepoints[head_pos]) ||
+      !normalize::isKanjiCodepoint(codepoints[head_pos - 1])) {
+    return GodanSaHeadReading::kNotApplicable;
+  }
+  const std::string head = normalize::encodeUtf8(codepoints[head_pos]);
+  if (dict_manager->lookupExact(head, core::PartOfSpeech::Suffix) != nullptr ||
+      !hasDictionaryGodanBaseFromIRow(dict_manager, head, U'し')) {
+    return GodanSaHeadReading::kNotApplicable;
+  }
+  // A listed content word closing right before the head (元気|出し, お金|貸し).
+  constexpr size_t kMinContentWordChars = 2;
+  constexpr size_t kContentWordLookback = 4;
+  constexpr PartOfSpeechMask kContentWordMask =
+      partOfSpeechMask(core::PartOfSpeech::Noun) | partOfSpeechMask(core::PartOfSpeech::Adjective) |
+      partOfSpeechMask(core::PartOfSpeech::Adverb) | partOfSpeechMask(core::PartOfSpeech::Pronoun);
+  for (size_t back = kMinContentWordChars; back <= std::min(head_pos, kContentWordLookback); ++back) {
+    if (hasExactPartOfSpeech(*dict_manager, codepoints, head_pos - back, head_pos, kContentWordMask)) {
+      return GodanSaHeadReading::kVerb;
+    }
+  }
+  // Otherwise the residue is counted in two-kanji words past a productive
+  // prefix: an even count closes before the head (本気|出し), an odd one
+  // pairs its last kanji with the head (書類提出+し), and a single kanji is
+  // either (発表+し against 口出し).
+  size_t residue_start = head_pos;
+  while (residue_start > 0 && normalize::isKanjiCodepoint(codepoints[residue_start - 1])) {
+    --residue_start;
+  }
+  if (head_pos - residue_start > 1 && grammar::isProductiveSinoPrefixKanji(codepoints[residue_start])) {
+    ++residue_start;
+  }
+  constexpr size_t kKanjiWordChars = 2;
+  const size_t residue_length = head_pos - residue_start;
+  if (residue_length < kKanjiWordChars) {
+    return GodanSaHeadReading::kUndecided;
+  }
+  return residue_length % kKanjiWordChars == 0 ? GodanSaHeadReading::kVerb : GodanSaHeadReading::kVerbalNoun;
+}
+
 bool caseParticleFollowsAt(const dictionary::DictionaryManager& dict_manager, const std::vector<char32_t>& codepoints,
                            size_t pos) {
   return hasDictionaryEntryFrom(

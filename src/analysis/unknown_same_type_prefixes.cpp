@@ -203,7 +203,12 @@ bool kanjiHeadsPredicateAt(const std::vector<char32_t>& codepoints, const std::v
   }
   const char32_t okurigana = codepoints[kana_start];
   const std::string head = normalize::encodeUtf8(codepoints[kana_start - 1]);
-  if (verb_helpers::hasDictionaryGodanBaseFromIRow(&dict_manager, head, okurigana) ||
+  // し is also a cell of する after a verbal noun (書類提出+し), which proves no head.
+  const bool proves_godan_head =
+      verb_helpers::hasDictionaryGodanBaseFromIRow(&dict_manager, head, okurigana) &&
+      verb_helpers::readKanjiRunBeforeGodanSaHead(&dict_manager, codepoints, kana_start - 1) !=
+          verb_helpers::GodanSaHeadReading::kVerbalNoun;
+  if (proves_godan_head ||
       (kana::isERowCodepoint(okurigana) &&
        verb_helpers::isVerbInDictionary(&dict_manager,
                                         normalize::concat(head, normalize::encodeUtf8(okurigana), "る"))) ||

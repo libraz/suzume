@@ -108,6 +108,17 @@ bool isLeftBranchingPrefixKanji(char32_t code) {
   return kana::isCodepointIn(kLeftBranchingPrefixes, code);
 }
 
+bool isProductiveSinoPrefixKanji(char32_t code) {
+  // Negation (不 未 非 無), degree and quantity (超 再 準 副 総 各 両 最 全 半).
+  constexpr std::array<char32_t, 14> kProductiveSinoPrefixes = {U'不', U'未', U'非', U'無', U'超', U'再', U'準',
+                                                                U'副', U'総', U'各', U'両', U'最', U'全', U'半'};
+  return kana::isCodepointIn(kProductiveSinoPrefixes, code);
+}
+
+bool isIntensifierPrefixKanji(char32_t code) {
+  return code == U'超';
+}
+
 bool isKanjiHonorificTitle(std::string_view surface) {
   return surface == "様" || surface == "氏";
 }

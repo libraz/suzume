@@ -269,6 +269,188 @@
       ],
       "id": "ttta_9",
       "input": "授業サボった"
+    },
+    {
+      "description": "Two-kanji noun before a listed godan-sa verb with the object particle dropped",
+      "expected": [
+        {
+          "lemma": "本気",
+          "pos": "Noun",
+          "surface": "本気"
+        },
+        {
+          "lemma": "出す",
+          "pos": "Verb",
+          "surface": "出し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "掃除",
+          "pos": "Noun",
+          "surface": "掃除"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "shite_shita",
+      "input": "本気出して掃除した"
+    },
+    {
+      "description": "Two-kanji noun before a listed godan-sa verb with the object particle dropped",
+      "expected": [
+        {
+          "lemma": "電気",
+          "pos": "Noun",
+          "surface": "電気"
+        },
+        {
+          "lemma": "消す",
+          "pos": "Verb",
+          "surface": "消し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "寝る",
+          "pos": "Verb",
+          "surface": "寝"
+        },
+        {
+          "lemma": "なさる",
+          "pos": "Auxiliary",
+          "surface": "なさい"
+        }
+      ],
+      "id": "shite_nasai",
+      "input": "電気消して寝なさい"
+    },
+    {
+      "description": "Two-kanji noun before godan-sa kuzusu continuative",
+      "expected": [
+        {
+          "lemma": "気温差",
+          "pos": "Noun",
+          "surface": "気温差"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "体調",
+          "pos": "Noun",
+          "surface": "体調"
+        },
+        {
+          "lemma": "崩す",
+          "pos": "Verb",
+          "surface": "崩し"
+        },
+        {
+          "lemma": "そう",
+          "pos": "Auxiliary",
+          "surface": "そう"
+        }
+      ],
+      "id": "de_shisou",
+      "input": "気温差で体調崩しそう"
+    },
+    {
+      "description": "Adverbial two-kanji noun before a listed godan-sa verb",
+      "expected": [
+        {
+          "lemma": "リプ",
+          "pos": "Noun",
+          "surface": "リプ"
+        },
+        {
+          "lemma": "絶対",
+          "pos": "Noun",
+          "surface": "絶対"
+        },
+        {
+          "lemma": "返す",
+          "pos": "Verb",
+          "surface": "返し"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "shimasu_3",
+      "input": "リプ絶対返します！"
+    },
+    {
+      "description": "Prefixed listed noun closes before the godan-sa head",
+      "expected": [
+        {
+          "lemma": "お金",
+          "pos": "Noun",
+          "surface": "お金"
+        },
+        {
+          "lemma": "貸す",
+          "pos": "Verb",
+          "surface": "貸し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くれる",
+          "pos": "Auxiliary",
+          "surface": "くれ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "o_shitekurenai",
+      "input": "お金貸してくれない？"
+    },
+    {
+      "description": "Two-kanji noun before a listed godan-sa verb with the object particle dropped",
+      "expected": [
+        {
+          "lemma": "広告",
+          "pos": "Noun",
+          "surface": "広告"
+        },
+        {
+          "lemma": "出す",
+          "pos": "Verb",
+          "surface": "出し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "shita_11",
+      "input": "広告出した"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 11/11)",

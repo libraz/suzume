@@ -834,8 +834,19 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
         }
       }
     }
+    // A listed noun closing on the continuative from further left owns it, so
+    // the compound cannot open inside that noun (なし崩し|的, not なし|崩し的).
+    bool continuative_closes_listed_noun = false;
+    {
+      constexpr size_t kLexicalLookback = 4;
+      const size_t probe_start = start_pos > kLexicalLookback ? start_pos - kLexicalLookback : 0;
+      for (size_t noun_start = probe_start; noun_start < start_pos && !continuative_closes_listed_noun; ++noun_start) {
+        continuative_closes_listed_noun = lookupEntryInRange(*dict_manager, codepoints, noun_start, kanji_end + 1,
+                                                             core::PartOfSpeech::Noun) != nullptr;
+      }
+    }
     if (has_continuative_shape && nominal_context && !crosses_suffix && !stem_is_closed_class &&
-        !longer_entry_starts_here) {
+        !longer_entry_starts_here && !continuative_closes_listed_noun) {
       const float compound_cost =
           is_verb_continuative ? candidate::kDeverbalCompoundNounCost : candidate::kUnverifiedDeverbalCompoundNounCost;
       auto cand = makeCandidate(codepoints, start_pos, kanji_end + 2, core::PartOfSpeech::Noun, compound_cost, true,

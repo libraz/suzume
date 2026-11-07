@@ -365,6 +365,26 @@ bool dictionaryTailFollowsAt(const std::vector<char32_t>& codepoints, size_t pos
 bool isListedGodanSaContinuativeRun(const dictionary::DictionaryManager* dict_manager,
                                     const std::vector<char32_t>& codepoints, size_t start, size_t end);
 
+/** How a kanji run before し reads when its last kanji heads a listed Godan-sa verb. */
+enum class GodanSaHeadReading {
+  kNotApplicable,  ///< No listed Godan-sa head, or the head is a listed suffix (一本化)
+  kVerb,           ///< The run is cut before the head (本気|出し, 元気|出し, お金|貸し)
+  kVerbalNoun,     ///< The whole run is a verbal noun (書類提出+し)
+  kUndecided,      ///< One kanji before the head: 発表+し and 口出し share the shape
+};
+
+/**
+ * @brief Read the kanji run ending at @p head_pos before a following し
+ *
+ * The last kanji plus し is the continuative of a listed Godan-sa verb (出し,
+ * 消し), but the same string also spells a sahen verbal noun (提出+し). The
+ * verb reading holds when a listed content word closes right before the head,
+ * or when the kanji before the head, past a productive prefix, count out in
+ * two-kanji words.
+ */
+GodanSaHeadReading readKanjiRunBeforeGodanSaHead(const dictionary::DictionaryManager* dict_manager,
+                                                 const std::vector<char32_t>& codepoints, size_t head_pos);
+
 /**
  * @brief Whether a case particle begins at @p pos.
  *

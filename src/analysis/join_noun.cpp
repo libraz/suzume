@@ -56,37 +56,6 @@ const DeverbalHeadNoun kDeverbalHeadNouns[] = {
 // Longest head in the table, in codepoints.
 constexpr size_t kMaxDeverbalHeadLength = 2;
 
-// Productive prefixes for prefix+noun joining
-struct ProductivePrefix {
-  char32_t codepoint;
-  float bonus;
-  bool needs_kanji;
-};
-
-const ProductivePrefix kProductivePrefixes[] = {
-    // Note: Honorific prefixes お, ご, 御 are NOT included here.
-    // They should be tokenized separately as PREFIX + NOUN.
-    // E.g., お水 → お(PREFIX) + 水(NOUN), not お水(NOUN)
-
-    // Negation prefixes
-    {U'不', candidate::kProductivePrefixJoinBonus, true},  // 不安, 不要, 不便
-    {U'未', candidate::kProductivePrefixJoinBonus, true},  // 未経験, 未確認
-    {U'非', candidate::kProductivePrefixJoinBonus, true},  // 非常, 非公開
-    {U'無', candidate::kProductivePrefixJoinBonus, true},  // 無理, 無料
-
-    // Degree/quantity prefixes
-    {U'超', candidate::kIntensifierPrefixJoinBonus, true},  // 超人, 超高速
-    {U'再', candidate::kProductivePrefixJoinBonus, true},   // 再開, 再確認
-    {U'準', candidate::kProductivePrefixJoinBonus, true},   // 準備, 準決勝
-    {U'副', candidate::kProductivePrefixJoinBonus, true},   // 副社長, 副作用
-    {U'総', candidate::kProductivePrefixJoinBonus, true},   // 総合, 総数
-    {U'各', candidate::kProductivePrefixJoinBonus, true},   // 各地, 各種
-    {U'両', candidate::kProductivePrefixJoinBonus, true},   // 両方, 両手
-    {U'最', candidate::kProductivePrefixJoinBonus, true},   // 最高, 最新
-    {U'全', candidate::kProductivePrefixJoinBonus, true},   // 全部, 全員
-    {U'半', candidate::kProductivePrefixJoinBonus, true},   // 半分, 半額
-};
-
 // Maximum noun length for prefix joining
 constexpr size_t kMaxNounLenForPrefix = 6;
 
@@ -197,17 +166,13 @@ void addPrefixNounJoinCandidates(core::Lattice& lattice, std::string_view text, 
   addStandaloneHonorificPrefixInterjectionCandidate(lattice, text, codepoints, byte_offsets, start_pos, char_types,
                                                     scorer);
 
-  const ProductivePrefix* matched_prefix = nullptr;
-  for (const auto& prefix : kProductivePrefixes) {
-    if (prefix.codepoint == codepoints[start_pos]) {
-      matched_prefix = &prefix;
-      break;
-    }
-  }
-
-  if (matched_prefix == nullptr) {
+  // Honorific お/ご/御 are not productive prefixes here: they stay PREFIX + NOUN.
+  if (!grammar::isProductiveSinoPrefixKanji(codepoints[start_pos])) {
     return;
   }
+  const float prefix_bonus = grammar::isIntensifierPrefixKanji(codepoints[start_pos])
+                                 ? candidate::kIntensifierPrefixJoinBonus
+                                 : candidate::kProductivePrefixJoinBonus;
 
   // Check if there's a noun part following
   size_t noun_start = start_pos + 1;
@@ -215,19 +180,17 @@ void addPrefixNounJoinCandidates(core::Lattice& lattice, std::string_view text, 
     return;
   }
 
-  // For most prefixes, the noun part should start with kanji
+  // The noun part starts with kanji
   const CharType noun_type = char_types[noun_start];
-  if (noun_type != CharType::Kanji && (matched_prefix->needs_kanji || noun_type != CharType::Katakana)) {
+  if (noun_type != CharType::Kanji) {
     return;
   }
 
   size_t noun_end = findCharRegionEnd(char_types, noun_start, kMaxNounLenForPrefix, noun_type);
-  if (noun_type == CharType::Kanji) {
-    const size_t following_verb_start =
-        longestNominalVerbContinuativeStart(codepoints, char_types, start_pos, noun_end, inflection, &dict_manager);
-    if (following_verb_start > start_pos + 1 && following_verb_start < noun_end) {
-      noun_end = following_verb_start;
-    }
+  const size_t following_verb_start =
+      longestNominalVerbContinuativeStart(codepoints, char_types, start_pos, noun_end, inflection, &dict_manager);
+  if (following_verb_start > start_pos + 1 && following_verb_start < noun_end) {
+    noun_end = following_verb_start;
   }
 
   if (noun_end <= noun_start) {
@@ -283,7 +246,7 @@ void addPrefixNounJoinCandidates(core::Lattice& lattice, std::string_view text, 
 
   // Generate joined candidate
   float base_cost = scorer.posPrior(core::PartOfSpeech::Noun);
-  float final_cost = base_cost + matched_prefix->bonus;
+  float final_cost = base_cost + prefix_bonus;
 
   // Apply length penalty to prevent over-concatenation
   // Prefix + noun should be 2-3 chars total for most verified cases
@@ -336,7 +299,7 @@ void addPrefixNounJoinCandidates(core::Lattice& lattice, std::string_view text, 
   // unit is absent from the compact dictionary. Keep the nominal path too so
   // non-adjectival contexts can still select it.
   if (!is_nominal_capability_compound && is_predicative_negation_compound) {
-    const float adjective_cost = scorer.posPrior(core::PartOfSpeech::Adjective) + matched_prefix->bonus +
+    const float adjective_cost = scorer.posPrior(core::PartOfSpeech::Adjective) + prefix_bonus +
                                  candidate::kPredicativeNegationPrefixAdjectiveBonus;
     lattice.addEdge(surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(noun_end),
                     core::PartOfSpeech::Adjective, adjective_cost, flags, surface, dictionary::ConjugationType::None,

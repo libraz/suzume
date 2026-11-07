@@ -219,6 +219,16 @@ size_t longestNominalVerbContinuativeStart(const std::vector<char32_t>& codepoin
         }
         names_verb = left_ichidan && right_verb;
       }
+      // A one-kanji Godan-sa head inside a longer run is no verb where the run
+      // reads as a verbal noun, or where an argument on the left chains the
+      // clause through し before a comma (強化を+発表+し、).
+      if (names_verb && okurigana_length == 1 && verb_start + 1 == kanji_end && verb_start > kanji_start) {
+        const auto reading = verb_helpers::readKanjiRunBeforeGodanSaHead(dict_manager, codepoints, verb_start);
+        names_verb =
+            reading != verb_helpers::GodanSaHeadReading::kVerbalNoun &&
+            !(reading == verb_helpers::GodanSaHeadReading::kUndecided &&
+              verb_helpers::isCommaClauseChainingRenyokei(codepoints, kanji_start, continuative_end, dict_manager));
+      }
       if (names_verb) {
         longest_start = std::min(longest_start, verb_start);
         break;

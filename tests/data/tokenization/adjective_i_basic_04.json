@@ -390,6 +390,38 @@
       ],
       "id": "itowashii",
       "input": "いとわしい"
+    },
+    {
+      "description": "Listed content word closes before the godan-sa head",
+      "expected": [
+        {
+          "lemma": "元気",
+          "pos": "Adjective",
+          "surface": "元気"
+        },
+        {
+          "lemma": "出す",
+          "pos": "Verb",
+          "surface": "出し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いく",
+          "pos": "Auxiliary",
+          "surface": "いこ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "shiteikou",
+      "input": "元気出していこう〜"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 4/4)",

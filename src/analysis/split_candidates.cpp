@@ -456,7 +456,8 @@ void addNounVerbSplitCandidates(core::Lattice& lattice, std::string_view text, c
           : kanji_end;
   const bool ends_at_humble_subsidiary = humble_subsidiary_start < kanji_end;
   // A run whose continuative し is a listed godan-sa verb cell (目指し, 見逃し)
-  // is that verb's stem, not a verbal noun, unless the run is a listed noun.
+  // is that verb's stem, not a verbal noun, unless the run is a listed noun;
+  // so is a run cut before a Godan-sa head (本気|出し).
   const auto* run_continuative =
       kanji_end < codepoints.size() && codepoints[kanji_end] == U'し'
           ? lookupEntryInRange(dict_manager, codepoints, start_pos, kanji_end + 1, core::PartOfSpeech::Verb)
@@ -464,9 +465,17 @@ void addNounVerbSplitCandidates(core::Lattice& lattice, std::string_view text, c
   const bool spells_listed_godan_sa_continuative =
       (run_continuative != nullptr && run_continuative->extended_pos == core::ExtendedPOS::VerbRenyokei &&
        lookupEntryInRange(dict_manager, codepoints, start_pos, kanji_end, core::PartOfSpeech::Noun) == nullptr) ||
-      verb_helpers::isListedGodanSaContinuativeRun(&dict_manager, codepoints, start_pos, kanji_end);
-  if (hasSuruContinuation(codepoints, kanji_end) && following_verb_start == kanji_end && !ends_at_humble_subsidiary &&
-      !spells_listed_godan_sa_continuative && !hasDictionaryLexicalPrefix(dict_results, kanji_length) &&
+      verb_helpers::isListedGodanSaContinuativeRun(&dict_manager, codepoints, start_pos, kanji_end) ||
+      verb_helpers::readKanjiRunBeforeGodanSaHead(&dict_manager, codepoints, kanji_end - 1) ==
+          verb_helpers::GodanSaHeadReading::kVerb;
+  // Before a comma, し chains the clause of an argument marked on the left
+  // (強化を+発表+し、), so the run is the verbal noun of that predicate.
+  const bool chains_clause_with_shi =
+      kanji_end < codepoints.size() && codepoints[kanji_end] == U'し' &&
+      verb_helpers::isCommaClauseChainingRenyokei(codepoints, start_pos, kanji_end + 1, &dict_manager);
+  if ((hasSuruContinuation(codepoints, kanji_end) || chains_clause_with_shi) && following_verb_start == kanji_end &&
+      !ends_at_humble_subsidiary && !spells_listed_godan_sa_continuative &&
+      !hasDictionaryLexicalPrefix(dict_results, kanji_length) &&
       !crossesModifierBoundaryForSuruNoun(text, byte_offsets, start_pos, kanji_end, dict_manager) &&
       !(start_pos > 0 && normalize::isIterationMark(codepoints[start_pos - 1])) &&
       !containsIterationMark(codepoints, start_pos, kanji_end) && !ends_with_derivational_suffix &&

@@ -179,6 +179,17 @@ bool isBoundVerbPrefix(std::string_view surface);
 bool isLeftBranchingPrefixKanji(char32_t code);
 
 /**
+ * @brief Whether a kanji is a productive Sino-Japanese prefix (再, 未, 全, ...)
+ *
+ * The prefix binds to the nominal after it (再確認, 未経験), so it is not one of
+ * the two-kanji words a kanji run is counted in.
+ */
+bool isProductiveSinoPrefixKanji(char32_t code);
+
+/** @brief Whether a productive Sino-Japanese prefix is the intensifier 超 */
+bool isIntensifierPrefixKanji(char32_t code);
+
+/**
  * @brief Whether a kana ends the 終止形 of a classical bigrade verb
  *
  * The bigrade paradigm closes on the U-row kana of its own row (受く, 過ぐ,
