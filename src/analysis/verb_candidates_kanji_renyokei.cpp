@@ -356,7 +356,7 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
         bool okurigana_opens_bound_suffix = false;
         if (!ichidan_base_is_dict) {
           constexpr size_t kBoundSuffixProbe = 4;
-          const size_t max_suffix_end = std::min(codepoints.size(), kanji_end + kBoundSuffixProbe);
+          const size_t max_suffix_end = lookaheadEnd(codepoints.size(), kanji_end, kBoundSuffixProbe);
           for (size_t suffix_end = kanji_end + 1; suffix_end <= max_suffix_end; ++suffix_end) {
             if (grammar::spellsBoundDerivationalSuffixCell(extractSubstring(codepoints, kanji_end, suffix_end))) {
               okurigana_opens_bound_suffix = true;
@@ -370,7 +370,7 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
         // pronoun (結局+みな, never 結局み+な).
         bool okurigana_opens_pronoun = false;
         if (!ichidan_base_is_dict && dict_manager != nullptr) {
-          const size_t max_pronoun_end = std::min(codepoints.size(), kanji_end + static_cast<size_t>(4));
+          const size_t max_pronoun_end = lookaheadEnd(codepoints.size(), kanji_end, 4);
           for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, kanji_end, max_pronoun_end)) {
             okurigana_opens_pronoun =
                 okurigana_opens_pronoun ||
@@ -529,7 +529,7 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
       bool follows_kanji_predicate = false;
       if (preceded_by_case_particle && following_kanji_end > renyokei_end && dict_manager != nullptr) {
         constexpr size_t kPredicateOkuriganaProbe = 3;
-        const size_t probe_limit = std::min(codepoints.size(), following_kanji_end + kPredicateOkuriganaProbe);
+        const size_t probe_limit = lookaheadEnd(codepoints.size(), following_kanji_end, kPredicateOkuriganaProbe);
         for (size_t probe_end = following_kanji_end + 1; probe_end <= probe_limit && !follows_kanji_predicate;
              ++probe_end) {
           const std::string follower = extractSubstring(codepoints, renyokei_end, probe_end);

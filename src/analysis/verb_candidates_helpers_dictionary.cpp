@@ -76,7 +76,7 @@ bool opensNonCopularParticleAt(const dictionary::DictionaryManager* dict_manager
     return false;
   }
   constexpr size_t kMaxParticleLength = 3;
-  const size_t probe_end = std::min(codepoints.size(), pos + kMaxParticleLength);
+  const size_t probe_end = lookaheadEnd(codepoints.size(), pos, kMaxParticleLength);
   for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, pos, probe_end)) {
     if (match.entry != nullptr && match.length > 1 && match.entry->pos == core::PartOfSpeech::Particle &&
         match.entry->extended_pos != core::ExtendedPOS::ParticleFinal &&
@@ -285,7 +285,7 @@ bool kanjiRunMayContinueAt(const dictionary::DictionaryManager* dict_manager, co
     return true;
   }
   constexpr size_t kProbeLength = 6;
-  const size_t probe_end = std::min(codepoints.size(), run_end + kProbeLength);
+  const size_t probe_end = lookaheadEnd(codepoints.size(), run_end, kProbeLength);
   bool particle_starts = false;
   for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, run_end, probe_end)) {
     particle_starts = particle_starts ||
@@ -523,7 +523,7 @@ bool startsInsideDictionaryEntry(const std::vector<char32_t>& codepoints, size_t
     return false;
   }
   const size_t first_start = lookbehindStart(start_pos, lookback);
-  const size_t probe_end = std::min(codepoints.size(), start_pos + probe);
+  const size_t probe_end = lookaheadEnd(codepoints.size(), start_pos, probe);
   for (size_t entry_start = first_start; entry_start < start_pos; ++entry_start) {
     for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, entry_start, probe_end)) {
       if (match.entry != nullptr && match.entry->pos == pos && (accept == nullptr || accept(*match.entry)) &&
@@ -576,7 +576,7 @@ bool startsInsideDictionaryIAdjectiveStemBeforeGaru(const std::vector<char32_t>&
   if (dict_manager == nullptr || start_pos == 0) {
     return false;
   }
-  const size_t probe_end = std::min(codepoints.size(), start_pos + kStemProbe);
+  const size_t probe_end = lookaheadEnd(codepoints.size(), start_pos, kStemProbe);
   for (size_t stem_start = lookbehindStart(start_pos, kStemLookback); stem_start < start_pos; ++stem_start) {
     for (size_t stem_end = start_pos + 1; stem_end <= probe_end; ++stem_end) {
       // The がる cells are listed as verbs carrying the auxiliary class.
@@ -647,7 +647,7 @@ bool classicalAuxiliaryFollowsAt(const dictionary::DictionaryManager* dict_manag
     return false;
   }
   constexpr size_t kAuxiliaryProbe = 3;
-  const size_t max_end = std::min(codepoints.size(), pos + kAuxiliaryProbe);
+  const size_t max_end = lookaheadEnd(codepoints.size(), pos, kAuxiliaryProbe);
   for (size_t aux_end = pos + 1; aux_end <= max_end; ++aux_end) {
     const auto* entry = lookupEntryInRange(*dict_manager, codepoints, pos, aux_end, core::PartOfSpeech::Auxiliary);
     if (entry == nullptr || !core::isClassicalAuxiliaryType(entry->extended_pos)) {

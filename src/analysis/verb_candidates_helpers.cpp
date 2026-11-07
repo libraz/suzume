@@ -70,7 +70,7 @@ bool masuAuxFollowsAt(const std::vector<char32_t>& codepoints, size_t pos) {
 
 bool continuativeConjunctiveFollowsAt(const std::vector<char32_t>& codepoints, size_t pos) {
   constexpr size_t kConjunctiveMaxChars = 3;
-  for (size_t particle_end = pos + 2; particle_end <= std::min(codepoints.size(), pos + kConjunctiveMaxChars);
+  for (size_t particle_end = pos + 2; particle_end <= lookaheadEnd(codepoints.size(), pos, kConjunctiveMaxChars);
        ++particle_end) {
     if (grammar::isContinuativeSelectingConjunctiveParticle(extractSubstring(codepoints, pos, particle_end))) {
       return true;
@@ -276,7 +276,7 @@ bool dictionaryTailFollowsAt(const std::vector<char32_t>& codepoints, size_t pos
   if (dict_manager == nullptr || pos >= codepoints.size()) {
     return false;
   }
-  const size_t probe_end = std::min(codepoints.size(), pos + kFollowerProbeChars);
+  const size_t probe_end = lookaheadEnd(codepoints.size(), pos, kFollowerProbeChars);
   for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, pos, probe_end)) {
     if (match.entry == nullptr || match.entry->pos != pos_class) {
       continue;

@@ -281,7 +281,7 @@ void generateProductiveSuffixCandidates(const std::vector<char32_t>& codepoints,
                                         const dictionary::DictionaryManager* dict_manager,
                                         std::vector<UnknownCandidate>& candidates) {
   // Only for hiragana sequences
-  if (start_pos >= char_types.size() || char_types[start_pos] != normalize::CharType::Hiragana) {
+  if (!isCharTypeAt(char_types, start_pos, normalize::CharType::Hiragana)) {
     return;
   }
   // No word starts with a small kana; a stem here would cut a digraph or a
@@ -380,7 +380,7 @@ void generateProductiveSuffixCandidates(const std::vector<char32_t>& codepoints,
 void generateProductiveSuffixVerbCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                             const std::vector<normalize::CharType>& char_types,
                                             std::vector<UnknownCandidate>& candidates) {
-  if (start_pos >= char_types.size() || char_types[start_pos] != normalize::CharType::Kanji) {
+  if (!isCharTypeAt(char_types, start_pos, normalize::CharType::Kanji)) {
     return;
   }
 
@@ -548,7 +548,7 @@ const std::array<char32_t, 8>& getAdminSuffixCodepoints() {
 void generateAdminBoundaryCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                      const std::vector<normalize::CharType>& char_types,
                                      std::vector<UnknownCandidate>& candidates) {
-  if (start_pos >= char_types.size() || char_types[start_pos] != normalize::CharType::Kanji) {
+  if (!isCharTypeAt(char_types, start_pos, normalize::CharType::Kanji)) {
     return;
   }
 
@@ -571,7 +571,7 @@ void generateAdminBoundaryCandidates(const std::vector<char32_t>& codepoints, si
 void generateWithSuffix(const std::vector<char32_t>& codepoints, size_t start_pos,
                         const std::vector<normalize::CharType>& char_types, const UnknownOptions& options,
                         std::vector<UnknownCandidate>& candidates) {
-  if (start_pos >= char_types.size() || char_types[start_pos] != normalize::CharType::Kanji) {
+  if (!isCharTypeAt(char_types, start_pos, normalize::CharType::Kanji)) {
     return;
   }
 

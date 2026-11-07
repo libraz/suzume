@@ -50,7 +50,7 @@ void generateKatakanaAdjectiveCandidates(const std::vector<char32_t>& codepoints
   const size_t candidate_start = candidates.size();
 
   // Only process katakana-starting positions
-  if (start_pos >= char_types.size() || char_types[start_pos] != normalize::CharType::Katakana) {
+  if (!isCharTypeAt(char_types, start_pos, normalize::CharType::Katakana)) {
     return;
   }
 
@@ -72,7 +72,7 @@ void generateKatakanaAdjectiveCandidates(const std::vector<char32_t>& codepoints
   // The main loop only runs for a katakana stem followed by a valid i-adjective ending
   // start. When it does not apply (e.g. the reduplicated しい handled above), fall through
   // to the shared emphatic/trim/sort tail so the emitted candidate still gets its splits.
-  if (kata_end < char_types.size() && char_types[kata_end] == normalize::CharType::Hiragana) {
+  if (isCharTypeAt(char_types, kata_end, normalize::CharType::Hiragana)) {
     // I-adjective endings: い, か(った), く(ない/て), け(れば), さ(そう), そ(う) etc.
     char32_t first_hira = codepoints[kata_end];
     size_t kata_len = kata_end - start_pos;

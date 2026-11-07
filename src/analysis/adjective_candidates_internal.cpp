@@ -228,8 +228,7 @@ bool isPredicateChainClosedByAuxiliary(const dictionary::DictionaryManager* dict
   const auto* closing_auxiliary =
       verb_helpers::auxiliaryClosingAfterOkurigana(dict_manager, codepoints, okurigana_start, end_pos);
   const bool closes_on_predicate_cell =
-      closing_auxiliary != nullptr &&
-      !utf8::endsWith(closing_auxiliary->lemma.empty() ? closing_auxiliary->surface : closing_auxiliary->lemma, "い");
+      closing_auxiliary != nullptr && !utf8::endsWith(lemmaOrSurface(*closing_auxiliary), "い");
   // A cell before the final い closes a chain only when that い can follow it
   // as the continuative of いる; まし+い cannot, so it is an adjective ending.
   const auto* cell_before_i = closing_auxiliary == nullptr ? verb_helpers::auxiliaryClosingAfterOkurigana(

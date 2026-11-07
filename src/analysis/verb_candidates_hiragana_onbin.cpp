@@ -647,7 +647,7 @@ bool followsSubjectGenitiveRelativeClauseSlot(const dictionary::DictionaryManage
   // attributive predicate; arbitrary kana after の remains unlicensed.
   constexpr size_t kFormalNounProbeLength = 4;
   const size_t formal_noun_start = start_pos + 2;
-  const size_t probe_end = std::min(codepoints.size(), formal_noun_start + kFormalNounProbeLength);
+  const size_t probe_end = lookaheadEnd(codepoints.size(), formal_noun_start, kFormalNounProbeLength);
   const auto matches = lookupResultsInRange(*dict_manager, codepoints, formal_noun_start, probe_end);
   return std::any_of(matches.begin(), matches.end(), [](const auto& match) {
     return match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Noun &&

@@ -108,7 +108,7 @@ bool startsLongerClosedForm(const std::vector<char32_t>& codepoints, size_t na_p
     return false;
   }
   constexpr size_t kMaxClosedFormLength = 3;
-  const size_t probe_end = std::min(codepoints.size(), na_pos + kMaxClosedFormLength);
+  const size_t probe_end = lookaheadEnd(codepoints.size(), na_pos, kMaxClosedFormLength);
   for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, na_pos, probe_end)) {
     // A word cannot be followed by a ら-column mora, which opens no native
     // word, so the form is the start of a longer word instead (な+きらい, not なき+らい).
@@ -133,7 +133,7 @@ constexpr PartOfSpeechMask kClosedFormAfterKanjiStem = partOfSpeechMask(core::Pa
 void generateHiraganaNariNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                                const std::vector<normalize::CharType>& char_types,
                                                std::vector<UnknownCandidate>& candidates) {
-  if (start_pos >= char_types.size() || char_types[start_pos] != normalize::CharType::Hiragana) {
+  if (!isCharTypeAt(char_types, start_pos, normalize::CharType::Hiragana)) {
     return;
   }
 
@@ -281,7 +281,7 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
   // Pattern 0: Kanji(1) + やか/らか + na-adjective inflection. These productive
   // derivatives can be followed by attributive な, adverbial に, or a copula
   // form (e.g., 華やかな, 明らかになる, 安らかだった).
-  if (kanji_len == 1 && kanji_end < char_types.size() && char_types[kanji_end] == normalize::CharType::Hiragana) {
+  if (kanji_len == 1 && isCharTypeAt(char_types, kanji_end, normalize::CharType::Hiragana)) {
     size_t stem_end = kanji_end + 2;
     if (stem_end < codepoints.size()) {
       std::string stem_suffix = extractSubstring(codepoints, kanji_end, stem_end);
@@ -302,7 +302,7 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
   // stem (気まぐれ+な, 気まま+な), while rejecting an internal particle such
   // as 山+の+よう+な.  Bare copula だ is deliberately excluded because it
   // cannot distinguish an ordinary nominal predicate from a na-adjective.
-  if (kanji_end < char_types.size() && char_types[kanji_end] == normalize::CharType::Hiragana) {
+  if (isCharTypeAt(char_types, kanji_end, normalize::CharType::Hiragana)) {
     // The productive plural suffix ら and the na-adjective stem ending ら are
     // homographic before the copula (彼らだ / 平らだ).  A pronoun host licenses
     // the suffix reading; otherwise the explicit copula supplies the missing

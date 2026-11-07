@@ -666,10 +666,11 @@ void appendKanjiMizenkeiStemCandidates(const std::vector<char32_t>& codepoints, 
       // nominal that takes the passive of する; no su-row stem ends there.
       if (!is_valid_verb && mizenkei_ending == U'さ') {
         const char32_t before_sa = codepoints[mizenkei_end - 2];
-        const bool argument_before_sa =
-            mizenkei_end - 2 == kanji_end &&
-            (vh::oneMoraParticleEndsAt(dict_manager, codepoints, kanji_end + 1, core::ExtendedPOS::ParticleCase) ||
-             vh::oneMoraParticleEndsAt(dict_manager, codepoints, kanji_end + 1, core::ExtendedPOS::ParticleTopic));
+        const core::ExtendedPOS particle_before_sa =
+            mizenkei_end - 2 == kanji_end ? vh::oneMoraParticlePosEndingAt(dict_manager, codepoints, kanji_end + 1)
+                                          : core::ExtendedPOS::Unknown;
+        const bool argument_before_sa = particle_before_sa == core::ExtendedPOS::ParticleCase ||
+                                        particle_before_sa == core::ExtendedPOS::ParticleTopic;
         if (kana::isIOrERowCodepoint(before_sa) || argument_before_sa) {
           SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" nominal + される, not a su-row stem\n");
           break;

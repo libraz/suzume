@@ -360,14 +360,16 @@ void adj_detail::appendHostFusedSuffixAdjective(const std::vector<char32_t>& cod
     candidates.push_back(std::move(adjective));
   };
   for (const size_t host_end : host_ends) {
-    const size_t tail_limit = std::min(codepoints.size(), host_end + kMaxTailLength);
+    const size_t tail_limit = lookaheadEnd(codepoints.size(), host_end, kMaxTailLength);
     if (dict_manager != nullptr) {
       for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, host_end, tail_limit)) {
         const auto* entry = match.entry;
-        if (entry != nullptr && entry->pos == core::PartOfSpeech::Adjective &&
-            adj_detail::isHostFusedSuffixAdjective(entry->lemma.empty() ? entry->surface : entry->lemma)) {
-          emit(host_end, host_end + match.length, entry->lemma.empty() ? entry->surface : entry->lemma,
-               entry->extended_pos);
+        if (entry == nullptr || entry->pos != core::PartOfSpeech::Adjective) {
+          continue;
+        }
+        const std::string suffix_lemma(lemmaOrSurface(*entry));
+        if (adj_detail::isHostFusedSuffixAdjective(suffix_lemma)) {
+          emit(host_end, host_end + match.length, suffix_lemma, entry->extended_pos);
         }
       }
     }

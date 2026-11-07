@@ -67,7 +67,7 @@ bool predicateFollowsOnbin(const std::vector<char32_t>& codepoints, size_t start
   }
   const bool kanji_head = normalize::isKanjiCodepoint(codepoints[end_pos]);
   bool has_okurigana = false;
-  const size_t limit = std::min(codepoints.size(), end_pos + candidate::kMaxHiraganaOnbinProbeChars);
+  const size_t limit = lookaheadEnd(codepoints.size(), end_pos, candidate::kMaxHiraganaOnbinProbeChars);
   for (size_t probe_end = end_pos + 1; probe_end <= limit; ++probe_end) {
     const char32_t codepoint = codepoints[probe_end - 1];
     if (!normalize::isKanjiCodepoint(codepoint) && !kana::isHiraganaCodepoint(codepoint)) {
@@ -132,7 +132,7 @@ void appendIAdjClassicalTerminalCandidates(const std::vector<char32_t>& codepoin
       }
       constexpr size_t kQuoteProbe = 4;
       if (dict_manager != nullptr) {
-        const size_t probe_end = std::min(codepoints.size(), pos + kQuoteProbe);
+        const size_t probe_end = lookaheadEnd(codepoints.size(), pos, kQuoteProbe);
         for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, pos, probe_end)) {
           if (match.entry != nullptr && (match.entry->extended_pos == core::ExtendedPOS::ParticleQuote ||
                                          match.entry->extended_pos == core::ExtendedPOS::DeterminerQuotative)) {
@@ -343,7 +343,7 @@ bool pairedImperativeCellAdjacent(const std::vector<char32_t>& codepoints, size_
   if (start_pos >= 2 && codepoints[start_pos - 2] == U'か' && codepoints[start_pos - 1] == U'れ') {
     return true;
   }
-  const size_t probe_end = std::min(codepoints.size(), cell_end + kPairedStemProbeChars);
+  const size_t probe_end = lookaheadEnd(codepoints.size(), cell_end, kPairedStemProbeChars);
   for (size_t pos = cell_end; pos + 1 < probe_end; ++pos) {
     if (codepoints[pos] == U'か' && codepoints[pos + 1] == U'れ') {
       return true;

@@ -43,7 +43,7 @@ void generateHumbleNominalCandidates(const std::vector<char32_t>& codepoints, si
   // Long enough for a compound continuative (問い合わせ) without scanning past
   // the frame.
   constexpr size_t kMaxStemLength = 5;
-  const size_t max_end = std::min(codepoints.size(), start_pos + kMaxStemLength);
+  const size_t max_end = lookaheadEnd(codepoints.size(), start_pos, kMaxStemLength);
   for (size_t end_pos = start_pos + kMinStemLength; end_pos <= max_end; ++end_pos) {
     if (end_pos >= codepoints.size()) {
       break;

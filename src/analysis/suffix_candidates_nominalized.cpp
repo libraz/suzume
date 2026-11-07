@@ -80,7 +80,7 @@ bool hasClauseFinalParticleContinuation(const std::vector<char32_t>& codepoints,
     return false;
   }
   constexpr size_t kParticleProbe = 3;
-  const size_t probe_end = std::min(codepoints.size(), end_pos + kParticleProbe);
+  const size_t probe_end = lookaheadEnd(codepoints.size(), end_pos, kParticleProbe);
   for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, end_pos, probe_end)) {
     if (match.entry == nullptr || match.entry->extended_pos != core::ExtendedPOS::ParticleFinal) {
       continue;
@@ -183,7 +183,7 @@ bool selectsNominalHost(const dictionary::DictionaryManager* dict_manager, const
   if (pos < codepoints.size() && normalize::isClauseChainingComma(codepoints[pos])) {
     return false;
   }
-  if (pos >= char_types.size() || char_types[pos] != normalize::CharType::Hiragana) {
+  if (!isCharTypeAt(char_types, pos, normalize::CharType::Hiragana)) {
     return true;
   }
   if (normalize::isParticleCodepoint(codepoints[pos])) {
@@ -193,7 +193,7 @@ bool selectsNominalHost(const dictionary::DictionaryManager* dict_manager, const
     return false;
   }
   // Read the copula's cells out of its own paradigm instead of listing them.
-  const size_t probe_end = std::min(codepoints.size(), pos + 3);
+  const size_t probe_end = lookaheadEnd(codepoints.size(), pos, 3);
   for (const auto& result : lookupResultsInRange(*dict_manager, codepoints, pos, probe_end)) {
     if (result.entry != nullptr && (result.entry->extended_pos == core::ExtendedPOS::AuxCopulaDa ||
                                     result.entry->extended_pos == core::ExtendedPOS::AuxCopulaDesu)) {
@@ -278,7 +278,7 @@ bool hasPeriodEndNominalBoundary(const std::vector<char32_t>& codepoints, size_t
 bool opensSuruAuxiliaryOrKanji(const std::vector<char32_t>& codepoints,
                                const std::vector<normalize::CharType>& char_types, size_t pos) {
   return verb_helpers::isSuruAuxiliaryStarter(codepoints[pos]) ||
-         (pos < char_types.size() && char_types[pos] == normalize::CharType::Kanji);
+         (isCharTypeAt(char_types, pos, normalize::CharType::Kanji));
 }
 
 // Whether the stem is lexicalized outside the verb and noun classes at its exact length.
@@ -312,7 +312,7 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
                                        const grammar::Inflection& inflection,
                                        const dictionary::DictionaryManager* dict_manager,
                                        std::vector<UnknownCandidate>& candidates) {
-  if (start_pos >= char_types.size() || char_types[start_pos] != normalize::CharType::Kanji) {
+  if (!isCharTypeAt(char_types, start_pos, normalize::CharType::Kanji)) {
     return;
   }
 
@@ -370,7 +370,7 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
   // noun. The particle candidate owns the whole span (最後|まで, not 最後ま|で).
   std::vector<dictionary::LookupResult> okurigana_matches;
   if (dict_manager != nullptr) {
-    const size_t probe_end = std::min(codepoints.size(), kanji_end + static_cast<size_t>(4));
+    const size_t probe_end = lookaheadEnd(codepoints.size(), kanji_end, 4);
     okurigana_matches = lookupResultsInRange(*dict_manager, codepoints, kanji_end, probe_end);
     for (const auto& match : okurigana_matches) {
       if (match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Particle &&
@@ -445,7 +445,7 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
   size_t hiragana_end = kanji_end + 1;
 
   // Check for 2-hiragana patterns if second char is also valid
-  if (hiragana_end < char_types.size() && char_types[hiragana_end] == normalize::CharType::Hiragana) {
+  if (isCharTypeAt(char_types, hiragana_end, normalize::CharType::Hiragana)) {
     char32_t second_hiragana = codepoints[hiragana_end];
     const bool second_starts_classical_conjectural_auxiliary =
         grammar::startsClassicalConjecturalAuxiliary(extractSubstring(codepoints, hiragana_end, codepoints.size()));
@@ -477,8 +477,7 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
       const bool selects_nominal_host = selectsNominalHost(dict_manager, codepoints, char_types, hiragana_end + 1);
       const bool has_explicit_nominal_selector =
           has_particle_continuation ||
-          (hiragana_end + 1 < char_types.size() && char_types[hiragana_end + 1] == normalize::CharType::Hiragana &&
-           selects_nominal_host);
+          (isCharTypeAt(char_types, hiragana_end + 1, normalize::CharType::Hiragana) && selects_nominal_host);
       const bool has_inferred_verb_continuative = hasInferredVerbContinuative(inflection, surface);
       // A single-kanji stem followed by two hiragana can be a productive
       // deverbal noun when a particle, copula, or light verb explicitly
@@ -513,7 +512,7 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
   // take a nominal host as well (片付け+な+の+だ, 手伝い+なら).
   std::vector<dictionary::LookupResult> following_matches;
   if (dict_manager != nullptr && kanji_end + 1 < codepoints.size()) {
-    const size_t probe_end = std::min(codepoints.size(), kanji_end + 1 + static_cast<size_t>(4));
+    const size_t probe_end = lookaheadEnd(codepoints.size(), kanji_end + 1, 4);
     following_matches = lookupResultsInRange(*dict_manager, codepoints, kanji_end + 1, probe_end);
   }
   if (dict_manager != nullptr && kanji_end + 1 < char_types.size() && codepoints[kanji_end + 1] == U'な') {
@@ -824,7 +823,7 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
     // reading even when its shape also parses as a continuative (及び, 従って).
     const bool stem_is_closed_class = isListedOutsideVerbAndNoun(*dict_manager, stem);
     bool nominal_context = true;
-    if (kanji_end + 2 < char_types.size() && char_types[kanji_end + 2] == normalize::CharType::Hiragana) {
+    if (isCharTypeAt(char_types, kanji_end + 2, normalize::CharType::Hiragana)) {
       const char32_t after = codepoints[kanji_end + 2];
       // The existential negative ない takes a nominal subject, so it closes the
       // compound exactly as a particle does (申し分ない, 差し支えない). Its own
@@ -856,7 +855,7 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
     bool longer_entry_starts_here = false;
     {
       constexpr size_t kLexicalProbe = 6;
-      const size_t probe_end = std::min(codepoints.size(), start_pos + kLexicalProbe);
+      const size_t probe_end = lookaheadEnd(codepoints.size(), start_pos, kLexicalProbe);
       for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, start_pos, probe_end)) {
         if (match.entry != nullptr && normalize::utf8Length(match.entry->surface) > kanji_end + 2 - start_pos) {
           longer_entry_starts_here = true;
@@ -901,7 +900,7 @@ void generateReciprocalActionNounCandidates(const std::vector<char32_t>& codepoi
   // Long enough for a compound continuative (追いかけっこ) without running past
   // the construction.
   constexpr size_t kMaxStemLength = 4;
-  const size_t max_stem_end = std::min(codepoints.size(), start_pos + kMaxStemLength);
+  const size_t max_stem_end = lookaheadEnd(codepoints.size(), start_pos, kMaxStemLength);
   for (size_t stem_end = start_pos + kMinStemLength; stem_end <= max_stem_end; ++stem_end) {
     const size_t end_pos = stem_end + 2;
     if (end_pos > codepoints.size() || codepoints[stem_end] != core::hiragana::kSmallTsu ||
@@ -940,7 +939,7 @@ void generateHiraganaDeverbalCompoundNounCandidates(const std::vector<char32_t>&
   }
   const size_t end_pos = stem_end + 1;
   // One kanji only, so a longer kanji compound keeps its own left boundary.
-  if (end_pos < char_types.size() && char_types[end_pos] == normalize::CharType::Kanji) {
+  if (isCharTypeAt(char_types, end_pos, normalize::CharType::Kanji)) {
     return;
   }
   // The kana must open a word: inside a longer lexical word (しか|し, つい|に)

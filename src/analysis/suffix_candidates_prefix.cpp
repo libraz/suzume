@@ -61,7 +61,7 @@ void generatePrefixCompoundCandidates(const std::vector<char32_t>& codepoints, s
   }
 
   // First character must be kanji
-  if (start_pos >= char_types.size() || char_types[start_pos] != normalize::CharType::Kanji) {
+  if (!isCharTypeAt(char_types, start_pos, normalize::CharType::Kanji)) {
     return;
   }
 
@@ -74,7 +74,7 @@ void generatePrefixCompoundCandidates(const std::vector<char32_t>& codepoints, s
   // longer compound such as 不安要素.
   if (isNominalUsePrefix(first_char) && start_pos + 2 < codepoints.size() && start_pos + 2 < char_types.size() &&
       char_types[start_pos + 1] == normalize::CharType::Kanji && codepoints[start_pos + 2] == U'用' &&
-      (start_pos + 3 >= char_types.size() || char_types[start_pos + 3] != normalize::CharType::Kanji)) {
+      !isCharTypeAt(char_types, start_pos + 3, normalize::CharType::Kanji)) {
     candidates.push_back(makeCandidate(codepoints, start_pos, start_pos + 3, core::PartOfSpeech::Noun,
                                        candidate::kPrefixNominalUseBonus, false, CandidateOrigin::PrefixCompound));
     return;
@@ -96,7 +96,7 @@ void generatePrefixCompoundCandidates(const std::vector<char32_t>& codepoints, s
   }
 
   // Second character must also be kanji
-  if (start_pos + 1 >= char_types.size() || char_types[start_pos + 1] != normalize::CharType::Kanji) {
+  if (!isCharTypeAt(char_types, start_pos + 1, normalize::CharType::Kanji)) {
     return;
   }
 
@@ -115,9 +115,8 @@ void generatePrefixCompoundCandidates(const std::vector<char32_t>& codepoints, s
   // marking the boundary before it (佐藤|先生).
   // The style suffix 風 closes such a compound (今風) unless a longer kanji word
   // takes it (今|風邪).
-  const bool closes_style_compound =
-      normalize::isStyleSuffixKanji(second_char) &&
-      (start_pos + 2 >= char_types.size() || char_types[start_pos + 2] != normalize::CharType::Kanji);
+  const bool closes_style_compound = normalize::isStyleSuffixKanji(second_char) &&
+                                     !isCharTypeAt(char_types, start_pos + 2, normalize::CharType::Kanji);
   if (dict_manager != nullptr && !closes_style_compound &&
       !normalize::continuesTemporalNounCompound(first_char, second_char)) {
     const auto* head =
@@ -133,8 +132,7 @@ void generatePrefixCompoundCandidates(const std::vector<char32_t>& codepoints, s
   //   prefix-formed temporal noun (今月|中, 今月|末) rather than extending the
   //   kanji compound.
   // This prevents invalid splits like 翌営|業日 (should be 翌営業日)
-  bool followed_by_kanji =
-      (start_pos + 2 < char_types.size() && char_types[start_pos + 2] == normalize::CharType::Kanji);
+  bool followed_by_kanji = (isCharTypeAt(char_types, start_pos + 2, normalize::CharType::Kanji));
   bool followed_by_span_suffix = (followed_by_kanji && start_pos + 2 < codepoints.size() &&
                                   normalize::isTemporalSpanSuffixKanji(codepoints[start_pos + 2]));
 

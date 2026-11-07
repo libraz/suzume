@@ -40,7 +40,7 @@ void generateCompoundVerbCandidates(const std::vector<char32_t>& codepoints, siz
 
   // Pattern: Kanji+ Hiragana(1-3) Kanji+ Hiragana+
   // e.g., 恐(K)れ(H)入(K)ります(H), 差(K)し(H)上(K)げます(H)
-  if (start_pos >= char_types.size() || char_types[start_pos] != normalize::CharType::Kanji) {
+  if (!isCharTypeAt(char_types, start_pos, normalize::CharType::Kanji)) {
     return;
   }
 
@@ -54,7 +54,7 @@ void generateCompoundVerbCandidates(const std::vector<char32_t>& codepoints, siz
   size_t hira1_end = findCharRegionEnd(char_types, kanji1_end, 4, normalize::CharType::Hiragana);
 
   // Find second kanji portion (must exist for compound verb)
-  if (hira1_end >= char_types.size() || char_types[hira1_end] != normalize::CharType::Kanji) {
+  if (!isCharTypeAt(char_types, hira1_end, normalize::CharType::Kanji)) {
     return;
   }
 
@@ -72,7 +72,7 @@ void generateCompoundVerbCandidates(const std::vector<char32_t>& codepoints, siz
   }
 
   // Find second hiragana portion (conjugation ending)
-  if (kanji2_end >= char_types.size() || char_types[kanji2_end] != normalize::CharType::Hiragana) {
+  if (!isCharTypeAt(char_types, kanji2_end, normalize::CharType::Hiragana)) {
     return;
   }
 
@@ -155,7 +155,7 @@ void generateKatakanaVerbCandidates(const std::vector<char32_t>& codepoints, siz
   const size_t candidate_start = candidates.size();
 
   // Only process katakana-starting positions
-  if (start_pos >= char_types.size() || char_types[start_pos] != normalize::CharType::Katakana) {
+  if (!isCharTypeAt(char_types, start_pos, normalize::CharType::Katakana)) {
     return;
   }
 

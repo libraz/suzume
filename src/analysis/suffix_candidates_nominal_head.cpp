@@ -63,7 +63,7 @@ bool hasInternalNominalParticleBoundary(const std::vector<char32_t>& codepoints,
     return false;
   }
   for (size_t particle_start = start_pos + 1; particle_start < end_pos; ++particle_start) {
-    const size_t probe_end = std::min(codepoints.size(), particle_start + static_cast<size_t>(4));
+    const size_t probe_end = lookaheadEnd(codepoints.size(), particle_start, 4);
     for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, particle_start, probe_end)) {
       if (match.entry == nullptr || !isNominalBoundaryParticle(*match.entry)) {
         continue;
@@ -99,7 +99,7 @@ bool hasNominalClosingParticleAt(const std::vector<char32_t>& codepoints, size_t
   if (dict_manager == nullptr || start_pos >= codepoints.size()) {
     return false;
   }
-  const size_t probe_end = std::min(codepoints.size(), start_pos + static_cast<size_t>(4));
+  const size_t probe_end = lookaheadEnd(codepoints.size(), start_pos, 4);
   for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, start_pos, probe_end)) {
     if (match.entry != nullptr && isNominalClosingParticle(*match.entry)) {
       return true;
@@ -191,9 +191,9 @@ bool hasAttributiveNominalSelector(const std::vector<char32_t>& codepoints,
   const size_t first_selector = lookbehindStart(start_pos, kMaximumSelectorLength);
   const auto* attributive_copula =
       codepoints[start_pos - 1] == U'な' ? dict_manager->lookupExact("な", core::PartOfSpeech::Auxiliary) : nullptr;
-  constexpr size_t kClosedClassProbeChars = 3;
+  constexpr size_t kClosedClassHeadWindow = 3;
   const auto head_matches = lookupResultsInRange(*dict_manager, codepoints, start_pos,
-                                                 std::min(codepoints.size(), start_pos + kClosedClassProbeChars));
+                                                 lookaheadEnd(codepoints.size(), start_pos, kClosedClassHeadWindow));
   const bool startsClosedClassWord = lookupResultsHaveLongerPartOfSpeech(
       head_matches,
       partOfSpeechMask(core::PartOfSpeech::Particle) | partOfSpeechMask(core::PartOfSpeech::Auxiliary) |
@@ -356,7 +356,7 @@ bool spansPredicateBeforeFormalNoun(const std::vector<char32_t>& codepoints,
   bool generated = false;
   for (size_t split = start_pos + 1; split <= head_end; ++split) {
     const auto matches =
-        lookupResultsInRange(dict_manager, codepoints, split, std::min(codepoints.size(), split + kFormalNounProbe));
+        lookupResultsInRange(dict_manager, codepoints, split, lookaheadEnd(codepoints.size(), split, kFormalNounProbe));
     const bool opens_formal_noun = std::any_of(matches.begin(), matches.end(), [](const auto& match) {
       return match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Noun &&
              match.entry->extended_pos == core::ExtendedPOS::NounFormal;

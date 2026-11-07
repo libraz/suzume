@@ -454,8 +454,7 @@ ContractedIrrealis findContractedIrrealis(const HiraganaVerbScan& scan) {
   bool contracted_before_colloquial_negative = false;
   size_t contracted_irrealis_end = 0;
   for (size_t pos = scan.start_pos + 1;
-       pos < scan.char_types.size() && scan.char_types[pos] == normalize::CharType::Hiragana &&
-       !contracted_before_colloquial_negative;
+       isCharTypeAt(scan.char_types, pos, normalize::CharType::Hiragana) && !contracted_before_colloquial_negative;
        ++pos) {
     if (codepoints[pos] != U'ん' || !vh::colloquialNegativeFollowsAt(codepoints, pos + 1)) {
       continue;
@@ -775,7 +774,7 @@ std::vector<UnknownCandidate> generateHiraganaVerbCandidates(const std::vector<c
                                                              const VerbCandidateOptions& verb_opts) {
   std::vector<UnknownCandidate> candidates;
 
-  if (start_pos >= char_types.size() || char_types[start_pos] != normalize::CharType::Hiragana) {
+  if (!isCharTypeAt(char_types, start_pos, normalize::CharType::Hiragana)) {
     return candidates;
   }
   const HiraganaVerbScan scan{codepoints, start_pos, char_types, inflection, dict_manager, verb_opts};

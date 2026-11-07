@@ -383,7 +383,7 @@ void appendHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints, 
                                        std::vector<UnknownCandidate>& candidates) {
   const size_t candidate_start = candidates.size();
 
-  if (start_pos >= char_types.size() || char_types[start_pos] != normalize::CharType::Hiragana) {
+  if (!isCharTypeAt(char_types, start_pos, normalize::CharType::Hiragana)) {
     return;
   }
 

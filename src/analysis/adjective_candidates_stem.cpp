@@ -298,7 +298,7 @@ bool opensAuxiliaryInsideStem(const dictionary::DictionaryManager* dict_manager,
         kana::isHiraganaCodepoint(codepoints[cell_start - 1]) && !kana::isARowCodepoint(codepoints[cell_start - 1])) {
       continue;
     }
-    const size_t last_end = std::min(codepoints.size(), cell_start + kLongestAuxiliaryCell);
+    const size_t last_end = lookaheadEnd(codepoints.size(), cell_start, kLongestAuxiliaryCell);
     for (size_t cell_end = std::max(stem_end + 1, cell_start + 2); cell_end <= last_end; ++cell_end) {
       if (lookupEntryInRange(*dict_manager, codepoints, cell_start, cell_end, core::PartOfSpeech::Auxiliary) !=
           nullptr) {
@@ -334,7 +334,7 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
                                      const dictionary::DictionaryManager* dict_manager,
                                      std::vector<UnknownCandidate>& candidates) {
   // Must start with kanji
-  if (start_pos >= char_types.size() || char_types[start_pos] != normalize::CharType::Kanji) {
+  if (!isCharTypeAt(char_types, start_pos, normalize::CharType::Kanji)) {
     return;
   }
 

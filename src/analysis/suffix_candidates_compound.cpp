@@ -127,7 +127,7 @@ bool boundarySplitsClosedClassWord(const dictionary::DictionaryManager* dict_man
     return false;
   }
   const size_t scan_start = (end_pos > kanji_end + 1) ? end_pos - 2 : kanji_end;
-  const size_t probe_end = std::min(codepoints.size(), end_pos + 2);
+  const size_t probe_end = lookaheadEnd(codepoints.size(), end_pos, 2);
   for (size_t start = scan_start; start < end_pos; ++start) {
     if (hasDictionaryEntryFrom(dict_manager, codepoints, start, end_pos + 1 - start, probe_end - start,
                                core::PartOfSpeech::Unknown, &isUninflectedClosedClass)) {
@@ -292,7 +292,7 @@ void appendSokuonKanjiCompounds(const KanjiHiraganaSpan& span, std::vector<Unkno
   size_t emphasized_word_end = 0;
   if (span.dict_manager != nullptr) {
     constexpr size_t kEmphasizedWordProbe = 6;
-    const size_t probe_end = std::min(codepoints.size(), kanji2_end + kEmphasizedWordProbe);
+    const size_t probe_end = lookaheadEnd(codepoints.size(), kanji2_end, kEmphasizedWordProbe);
     const std::string joined =
         extractSubstring(codepoints, start_pos, sokuon_pos) + extractSubstring(codepoints, sokuon_pos + 1, probe_end);
     for (const auto& match : span.dict_manager->lookup(joined, 0)) {
@@ -304,7 +304,7 @@ void appendSokuonKanjiCompounds(const KanjiHiraganaSpan& span, std::vector<Unkno
       }
       auto word = makeCandidate(codepoints, start_pos, word_end, match.entry->pos, candidate::kInfixCompoundNounCost,
                                 false, CandidateOrigin::KanjiHiraganaCompound, match.entry->extended_pos);
-      word.lemma = match.entry->lemma.empty() ? match.entry->surface : match.entry->lemma;
+      word.lemma = std::string(lemmaOrSurface(*match.entry));
       word.lemma_verified = true;
       SUZUME_DEBUG_CANDIDATE(word, candidate::kDictionaryOriginConfidence, "kanji_emphatic_sokuon_word");
       candidates.push_back(std::move(word));
@@ -451,8 +451,7 @@ void appendSokuonHiraganaCompounds(const KanjiHiraganaSpan& span, std::vector<Un
 // nouns their own dictionary edges keep the split cheaper.
 void appendNasalInfixCompound(const KanjiHiraganaSpan& span, std::vector<UnknownCandidate>& candidates) {
   const size_t end_pos = span.kanji_end + 2;
-  const bool second_kanji_is_single =
-      end_pos >= span.char_types.size() || span.char_types[end_pos] != normalize::CharType::Kanji;
+  const bool second_kanji_is_single = !isCharTypeAt(span.char_types, end_pos, normalize::CharType::Kanji);
   if (second_kanji_is_single) {
     // An attributive copula right after the compound identifies it as a
     // na-adjective stem rather than a plain noun (真ん丸+な+月).
@@ -749,7 +748,7 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
                                              const grammar::Inflection& inflection,
                                              const dictionary::DictionaryManager* dict_manager,
                                              std::vector<UnknownCandidate>& candidates) {
-  if (start_pos >= char_types.size() || char_types[start_pos] != normalize::CharType::Kanji) {
+  if (!isCharTypeAt(char_types, start_pos, normalize::CharType::Kanji)) {
     return;
   }
 
@@ -770,7 +769,7 @@ void generateKanjiHiraganaCompoundCandidates(const std::vector<char32_t>& codepo
   }
 
   // Find hiragana portion (2-4 characters)
-  if (kanji_end >= char_types.size() || char_types[kanji_end] != normalize::CharType::Hiragana) {
+  if (!isCharTypeAt(char_types, kanji_end, normalize::CharType::Hiragana)) {
     return;
   }
   // A kana run that opens on a doubling (ふわ+ふわ, うま+うま) is a mimetic

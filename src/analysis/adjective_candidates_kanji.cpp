@@ -298,7 +298,7 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
     candidates.push_back(std::move(candidate));
   }
 
-  if (start_pos >= char_types.size() || char_types[start_pos] != normalize::CharType::Kanji) {
+  if (!isCharTypeAt(char_types, start_pos, normalize::CharType::Kanji)) {
     return;
   }
 
@@ -348,7 +348,7 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
   // adjective; the kana path reads this through its ー normalization.
   {
     size_t okurigana_end = kanji_end;
-    while (okurigana_end < char_types.size() && char_types[okurigana_end] == normalize::CharType::Hiragana) {
+    while (isCharTypeAt(char_types, okurigana_end, normalize::CharType::Hiragana)) {
       ++okurigana_end;
     }
     size_t prolonged_end = okurigana_end;
@@ -408,7 +408,7 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
   // Look for hiragana after kanji (adjective endings like い, かった, くない)
   // Note: Some adjectives have hiragana in the stem (美しい, 楽しい, 涼しい, etc.)
   // so we allow any hiragana and let the inflection module decide
-  if (kanji_end >= char_types.size() || char_types[kanji_end] != normalize::CharType::Hiragana) {
+  if (!isCharTypeAt(char_types, kanji_end, normalize::CharType::Hiragana)) {
     return;
   }
 

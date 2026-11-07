@@ -137,7 +137,7 @@ void appendSingleKanjiIchidanCandidates(const std::vector<char32_t>& codepoints,
   if (single_kanji_end < codepoints.size() && vh::isSingleKanjiIchidan(codepoints[start_pos]) &&
       normalize::isKanjiCodepoint(codepoints[single_kanji_end])) {
     constexpr size_t kMaxKanjiLeadingAuxLength = 4;
-    const size_t max_end = std::min(codepoints.size(), single_kanji_end + kMaxKanjiLeadingAuxLength);
+    const size_t max_end = lookaheadEnd(codepoints.size(), single_kanji_end, kMaxKanjiLeadingAuxLength);
     for (size_t aux_end = single_kanji_end + 1; aux_end <= max_end; ++aux_end) {
       const auto* auxiliary_entry = lookupEntryInRange(*dict_manager, codepoints, single_kanji_end, aux_end);
       const bool is_closed_auxiliary =
@@ -263,7 +263,7 @@ void appendSingleKanjiIchidanCandidates(const std::vector<char32_t>& codepoints,
           dict_manager->lookupExact(extractSubstring(codepoints, start_pos, kanji_end) + "く",
                                     core::PartOfSpeech::Verb) != nullptr;
       constexpr size_t kMaxConjunctiveParticleLength = 4;
-      const size_t max_particle_end = std::min(codepoints.size(), kanji_end + kMaxConjunctiveParticleLength);
+      const size_t max_particle_end = lookaheadEnd(codepoints.size(), kanji_end, kMaxConjunctiveParticleLength);
       for (size_t particle_end = kanji_end + 1; particle_end <= max_particle_end; ++particle_end) {
         const std::string particle_surface = extractSubstring(codepoints, kanji_end, particle_end);
         const auto* particle = dict_manager->lookupExact(particle_surface, core::PartOfSpeech::Particle);

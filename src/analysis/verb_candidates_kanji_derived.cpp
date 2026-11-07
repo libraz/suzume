@@ -476,7 +476,7 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
           bool nominal_case_continuation = false;
           if (formal_you != nullptr && formal_you->extended_pos == core::ExtendedPOS::NounFormal &&
               you_end < codepoints.size() && codepoints[you_end] == U'に') {
-            const size_t probe_end = std::min(codepoints.size(), you_end + static_cast<size_t>(5));
+            const size_t probe_end = lookaheadEnd(codepoints.size(), you_end, 5);
             for (const auto& following : lookupResultsInRange(*dict_manager, codepoints, you_end, probe_end)) {
               if (following.entry != nullptr && following.length > 1 &&
                   following.entry->extended_pos == core::ExtendedPOS::ParticleCase) {
@@ -636,7 +636,7 @@ void appendGodanPassiveRenyokeiCandidates(const std::vector<char32_t>& codepoint
   // (奪わ+れ+かね+ない, 奪わ+れ+がち, 奪わ+れ+そう).
   bool is_passive_auxiliary_chain = false;
   for (size_t aux_end = renyokei_end + 1;
-       dict_manager != nullptr && aux_end <= std::min(codepoints.size(), renyokei_end + 3) &&
+       dict_manager != nullptr && aux_end <= lookaheadEnd(codepoints.size(), renyokei_end, 3) &&
        !is_passive_auxiliary_chain;
        ++aux_end) {
     is_passive_auxiliary_chain = hasExactPartOfSpeech(

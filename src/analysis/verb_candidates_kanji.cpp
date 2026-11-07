@@ -209,12 +209,11 @@ bool hasCompleteParticleInitialVerbEvidence(const std::vector<char32_t>& codepoi
   if (normalize::isNeverOkuriganaKana(codepoints[kanji_end])) {
     return false;
   }
-  const bool has_conjunctive_initial =
-      vh::oneMoraParticleEndsAt(dict_manager, codepoints, kanji_end + 1, core::ExtendedPOS::ParticleConj);
-  const bool argument_marker_initial =
-      vh::oneMoraParticleEndsAt(dict_manager, codepoints, kanji_end + 1, core::ExtendedPOS::ParticleCase) ||
-      vh::oneMoraParticleEndsAt(dict_manager, codepoints, kanji_end + 1, core::ExtendedPOS::ParticleTopic) ||
-      vh::oneMoraParticleEndsAt(dict_manager, codepoints, kanji_end + 1, core::ExtendedPOS::ParticleNo);
+  const core::ExtendedPOS initial_particle = vh::oneMoraParticlePosEndingAt(dict_manager, codepoints, kanji_end + 1);
+  const bool has_conjunctive_initial = initial_particle == core::ExtendedPOS::ParticleConj;
+  const bool argument_marker_initial = initial_particle == core::ExtendedPOS::ParticleCase ||
+                                       initial_particle == core::ExtendedPOS::ParticleTopic ||
+                                       initial_particle == core::ExtendedPOS::ParticleNo;
   for (const auto& candidate : inflection.analyze(surface)) {
     const bool has_mixed_godan_ka_stem = has_conjunctive_initial && candidate.verb_type == grammar::VerbType::GodanKa &&
                                          utf8::startsWith(candidate.stem, expected_stem) &&
@@ -359,7 +358,7 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
   // whole-buffer step below must stay inside the range this generator appended.
   const size_t candidate_start = candidates.size();
 
-  if (start_pos >= char_types.size() || char_types[start_pos] != normalize::CharType::Kanji) {
+  if (!isCharTypeAt(char_types, start_pos, normalize::CharType::Kanji)) {
     return;
   }
 
@@ -389,14 +388,13 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
   std::string sokuonbin_lemma;
   grammar::VerbType sokuonbin_verb_type = grammar::VerbType::Unknown;
   if (dict_manager != nullptr && kanji_end == start_pos + 1 && codepoints[kanji_end] == core::hiragana::kSmallTsu &&
-      kanji_end + 1 < char_types.size() && char_types[kanji_end + 1] == normalize::CharType::Kanji) {
+      isCharTypeAt(char_types, kanji_end + 1, normalize::CharType::Kanji)) {
     size_t kanji2_end = findCharRegionEnd(char_types, kanji_end + 1, 3, normalize::CharType::Kanji);
     // Skip hatsuonbin (ん) continuations: 吹っ飛んだ's ん is onbin-ambiguous (ぶ/む/ぬ)
     // and 漢っ漢+ん compounds are already resolved by the dedicated
     // sokuon_kanji_hatsuonbin suffix candidate with the correct base. The verbs this
     // probe is needed for (走る っ-onbin, 掻く い-onbin) never use ん-onbin.
-    if (kanji2_end < char_types.size() && char_types[kanji2_end] == normalize::CharType::Hiragana &&
-        codepoints[kanji2_end] != U'ん') {
+    if (isCharTypeAt(char_types, kanji2_end, normalize::CharType::Hiragana) && codepoints[kanji2_end] != U'ん') {
       size_t probe_end = findCharRegionEnd(char_types, kanji2_end, 12, normalize::CharType::Hiragana);
       std::string embedded = extractSubstring(codepoints, kanji_end + 1, probe_end);
       for (const auto& res : inflection.analyze(embedded)) {
@@ -732,8 +730,7 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
     // A deverbal noun is the bare continuative, which ends in an i/e-row kana
     // or the kanji stem; a span closing on an auxiliary (行か+ず) is not one.
     const char32_t final_char = codepoints[cand.end - 1];
-    const bool ends_in_continuative = normalize::isKanjiCodepoint(final_char) || kana::isIRowCodepoint(final_char) ||
-                                      kana::isERowCodepoint(final_char);
+    const bool ends_in_continuative = normalize::isKanjiCodepoint(final_char) || kana::isIOrERowCodepoint(final_char);
     // The noun is the continuative itself: at most the row mora follows the
     // stem, never an inflectional suffix (読み+たい is no deverbal noun).
     const auto& analyses = inflection.analyze(cand.surface);
