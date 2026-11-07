@@ -168,10 +168,6 @@ const DictionaryEntry* DictionaryManager::lookupExact(std::string_view surface, 
   return nullptr;
 }
 
-bool DictionaryManager::loadCoreDictionary(const std::string& path) {
-  return loadCoreDictionaryResult(path).hasValue();
-}
-
 BinaryDictionary& DictionaryManager::ensureCoreBinaryDict() {
   if (!core_binary_dict_) {
     core_binary_dict_ = std::make_unique<BinaryDictionary>();
@@ -216,10 +212,6 @@ core::Expected<size_t, core::Error> DictionaryManager::loadUserBinaryDictionaryR
                                 [&path](BinaryDictionary& dictionary) { return dictionary.loadFromFile(path); });
 }
 
-bool DictionaryManager::loadUserBinaryDictionaryFromMemory(const uint8_t* data, size_t size) {
-  return loadUserBinaryDictionaryFromMemoryResult(data, size).hasValue();
-}
-
 core::Expected<size_t, core::Error> DictionaryManager::loadUserBinaryDictionaryFromMemoryResult(const uint8_t* data,
                                                                                                 size_t size) {
   return loadUserBinaryDictionaryFromMemoryResultInto(data, size, user_binary_dicts_);
@@ -238,10 +230,6 @@ core::Expected<size_t, core::Error> DictionaryManager::loadBundledUserBinaryDict
 core::Expected<size_t, core::Error> DictionaryManager::loadBundledUserBinaryDictionaryFromMemoryResult(
     const uint8_t* data, size_t size) {
   return loadUserBinaryDictionaryFromMemoryResultInto(data, size, bundled_user_binary_dicts_);
-}
-
-bool DictionaryManager::hasUserBinaryDictionary() const {
-  return !bundled_user_binary_dicts_.empty() || !user_binary_dicts_.empty();
 }
 
 }  // namespace suzume::dictionary

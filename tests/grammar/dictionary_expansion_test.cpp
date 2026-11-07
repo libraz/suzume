@@ -181,14 +181,6 @@ TEST(DictionaryExpansionTest, PreservesDifferentPosAtTheSameExpandedSurface) {
   EXPECT_EQ(collisions, 2);
   EXPECT_EQ(expanded.duplicates_skipped, 0);
 
-  DictionaryExpansionOptions binary_options;
-  binary_options.preserve_surface_homographs = false;
-  auto binary_expanded = expandDictionarySourceEntries({verb, noun}, binary_options);
-  const auto binary_collisions = std::count_if(binary_expanded.entries.begin(), binary_expanded.entries.end(),
-                                               [](const auto& entry) { return entry.surface == "テストすれば"; });
-  EXPECT_EQ(binary_collisions, 1);
-  EXPECT_GT(binary_expanded.duplicates_skipped, 0);
-
   DictionaryExpansionOptions distinct_pos_options;
   distinct_pos_options.preserve_same_pos_homographs = false;
   auto distinct_pos_expanded = expandDictionarySourceEntries({verb, noun}, distinct_pos_options);

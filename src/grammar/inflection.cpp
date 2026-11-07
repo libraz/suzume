@@ -468,10 +468,6 @@ void Inflection::rollCacheIfFull() const {
   }
 }
 
-bool Inflection::looksConjugated(std::string_view surface) const {
-  return !analyze(surface).empty();
-}
-
 InflectionCandidate Inflection::getBest(std::string_view surface) const {
   const auto& candidates = analyze(surface);
   if (candidates.empty()) {

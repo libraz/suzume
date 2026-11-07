@@ -29,7 +29,7 @@ TEST(CandidateGenerationEfficiencyTest, BoundsClosedClassProbeToFiveCodepoints) 
 
 TEST(CandidateGenerationEfficiencyTest, EmitsOneAdjectiveStemEdgeBeforeSaNominalizer) {
   dictionary::DictionaryManager dictionary_manager;
-  ASSERT_TRUE(dictionary_manager.loadCoreDictionary("data/core.dic"));
+  ASSERT_TRUE(dictionary_manager.loadCoreDictionaryResult("data/core.dic").hasValue());
   const std::string text = "美しさ";
   const auto codepoints = normalize::toCodepoints(text);
   const auto char_types = normalize::classifyCodepoints(codepoints);

@@ -143,6 +143,101 @@ TEST(SourceParserTest, ConvertsMarkerToRuntimeExtendedPos) {
   EXPECT_EQ(sourceToDictionaryEntry(parsed.value().entries[3]).extended_pos, core::ExtendedPOS::InterjectionGreeting);
 }
 
+TEST(SourceParserTest, SkipsCommentsBlankLinesAndHandlesCrLfWithoutFinalNewline) {
+  const std::string source =
+      "  # indented comment\n"
+      "\t# tab-indented comment\n"
+      "\n"
+      "東京,NOUN,0.5\r\n"
+      "テスト,NOUN,0.5";
+
+  auto result = parseDictionarySource(source);
+
+  ASSERT_TRUE(result.hasValue()) << result.error().message;
+  ASSERT_EQ(result.value().entries.size(), 2u);
+  EXPECT_EQ(result.value().entries[0].surface, "東京");
+  EXPECT_EQ(result.value().entries[1].surface, "テスト");
+}
+
+TEST(SourceParserTest, AcceptsPosAliases) {
+  const std::string source =
+      "東京,PROPN,0.5\n"
+      "静か,ADJECTIVE,0.5\n"
+      "すぐ,ADVERB,0.5\n"
+      "です,AUXILIARY,0.5\n"
+      "ね,INTERJECTION,0.5\n"
+      "記号,SYM,0.5\n";
+
+  auto result = parseDictionarySource(source);
+
+  ASSERT_TRUE(result.hasValue()) << result.error().message;
+  const auto& entries = result.value().entries;
+  ASSERT_EQ(entries.size(), 6u);
+  EXPECT_EQ(entries[0].pos, core::PartOfSpeech::Noun);
+  EXPECT_EQ(entries[1].pos, core::PartOfSpeech::Adjective);
+  EXPECT_EQ(entries[2].pos, core::PartOfSpeech::Adverb);
+  EXPECT_EQ(entries[3].pos, core::PartOfSpeech::Auxiliary);
+  EXPECT_EQ(entries[4].pos, core::PartOfSpeech::Interjection);
+  EXPECT_EQ(entries[5].pos, core::PartOfSpeech::Symbol);
+}
+
+TEST(SourceParserTest, RejectsInvalidPosAndEmptyFields) {
+  auto invalid_pos = parseDictionarySource("東京,BADPOS,0.5\n");
+  ASSERT_FALSE(invalid_pos.hasValue());
+  EXPECT_NE(invalid_pos.error().message.find("Invalid POS at line 1: BADPOS"), std::string::npos);
+
+  auto empty_surface = parseDictionarySource(",NOUN,0.5\n");
+  ASSERT_FALSE(empty_surface.hasValue());
+  EXPECT_NE(empty_surface.error().message.find("Empty surface at line 1"), std::string::npos);
+
+  auto quoted_empty_surface = parseDictionarySource("\"\",NOUN,0.5\n");
+  ASSERT_FALSE(quoted_empty_surface.hasValue());
+  EXPECT_NE(quoted_empty_surface.error().message.find("Empty surface at line 1"), std::string::npos);
+
+  auto empty_pos = parseDictionarySource("東京,,0.5\n");
+  ASSERT_FALSE(empty_pos.hasValue());
+  EXPECT_NE(empty_pos.error().message.find("Empty POS at line 1"), std::string::npos);
+}
+
+TEST(SourceParserTest, RejectsTextAfterClosingQuoteAndKeepsQuotedFields) {
+  auto trailing = parseDictionarySource("\"東京\"bad,NOUN,0.5\n");
+  ASSERT_FALSE(trailing.hasValue());
+  EXPECT_NE(trailing.error().message.find("unexpected character after closing quote"), std::string::npos);
+
+  auto quoted = parseDictionarySource("\"東京,大阪\",NOUN,0.5,\"東\"\"阪\"\n");
+  ASSERT_TRUE(quoted.hasValue()) << quoted.error().message;
+  ASSERT_EQ(quoted.value().entries.size(), 1u);
+  EXPECT_EQ(quoted.value().entries[0].surface, "東京,大阪");
+  EXPECT_EQ(quoted.value().entries[0].lemma, "東\"阪");
+}
+
+TEST(SourceParserTest, SkipsSingleFieldRecordsWhenRequested) {
+  const std::string source =
+      "東京\n"
+      "大阪,NOUN,0.5\n";
+
+  SourceParseOptions skip;
+  skip.skip_single_field_records = true;
+  auto skipped = parseDictionarySource(source, skip);
+  ASSERT_TRUE(skipped.hasValue()) << skipped.error().message;
+  ASSERT_EQ(skipped.value().entries.size(), 1u);
+  EXPECT_EQ(skipped.value().entries[0].surface, "大阪");
+}
+
+TEST(SourceParserTest, ReadsLemmaFromCsvAndTsvButNotCompilerConjugationMarker) {
+  auto csv = parseDictionarySource("食べた,VERB,0.5,食べる\n");
+  ASSERT_TRUE(csv.hasValue()) << csv.error().message;
+  EXPECT_EQ(csv.value().entries[0].lemma, "食べる");
+
+  auto tsv = parseDictionarySource("食べた\tVERB\t食べる\n");
+  ASSERT_TRUE(tsv.hasValue()) << tsv.error().message;
+  EXPECT_EQ(tsv.value().entries[0].lemma, "食べる");
+
+  auto marker = parseDictionarySource("食べる\tVERB\tIchidan\n");
+  ASSERT_TRUE(marker.hasValue()) << marker.error().message;
+  EXPECT_TRUE(marker.value().entries[0].lemma.empty());
+}
+
 }  // namespace
 }  // namespace dictionary
 }  // namespace suzume

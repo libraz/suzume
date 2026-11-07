@@ -160,13 +160,6 @@ class DictionaryManager {
 
   /**
    * @brief Load core binary dictionary from file
-   * @param path File path
-   * @return true if loaded successfully
-   */
-  bool loadCoreDictionary(const std::string& path);
-
-  /**
-   * @brief Load core binary dictionary from file with error details
    */
   core::Expected<size_t, core::Error> loadCoreDictionaryResult(const std::string& path);
 
@@ -184,12 +177,6 @@ class DictionaryManager {
    * @brief Load user binary dictionary from memory
    * @param data Binary dictionary data (.dic format)
    * @param size Data size in bytes
-   * @return true if loaded successfully
-   */
-  bool loadUserBinaryDictionaryFromMemory(const uint8_t* data, size_t size);
-
-  /**
-   * @brief Load user binary dictionary from memory with error details
    */
   core::Expected<size_t, core::Error> loadUserBinaryDictionaryFromMemoryResult(const uint8_t* data, size_t size);
 
@@ -208,11 +195,6 @@ class DictionaryManager {
    * dictionaries explicitly added by the caller.
    */
   core::Expected<size_t, core::Error> loadBundledUserBinaryDictionaryFromMemoryResult(const uint8_t* data, size_t size);
-
-  /**
-   * @brief Check if user binary dictionary is loaded
-   */
-  bool hasUserBinaryDictionary() const;
 
  private:
   BinaryDictionary& ensureCoreBinaryDict();

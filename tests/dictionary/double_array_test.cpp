@@ -22,7 +22,8 @@ TEST_F(DoubleArrayTest, BuildEmpty) {
   std::vector<uint32_t> values;
 
   EXPECT_TRUE(trie_.build(keys, values));
-  EXPECT_TRUE(trie_.empty());
+  EXPECT_EQ(trie_.exactMatch("a"), -1);
+  EXPECT_TRUE(trie_.commonPrefixSearch("a").empty());
 }
 
 TEST_F(DoubleArrayTest, BuildSingleKey) {
@@ -30,7 +31,6 @@ TEST_F(DoubleArrayTest, BuildSingleKey) {
   std::vector<uint32_t> values = {42};
 
   EXPECT_TRUE(trie_.build(keys, values));
-  EXPECT_FALSE(trie_.empty());
 
   EXPECT_EQ(trie_.exactMatch("hello"), 42);
   EXPECT_EQ(trie_.exactMatch("world"), -1);
@@ -79,7 +79,7 @@ TEST_F(DoubleArrayTest, BuildRejectsValueOutsideSignedResultRange) {
   std::vector<uint32_t> values = {static_cast<uint32_t>(INT32_MAX) + 1u};
 
   EXPECT_FALSE(trie_.build(keys, values));
-  EXPECT_TRUE(trie_.empty());
+  EXPECT_EQ(trie_.exactMatch("a"), -1);
 }
 
 TEST_F(DoubleArrayTest, PackedValueBoundary) {
@@ -131,19 +131,6 @@ TEST_F(DoubleArrayTest, CommonPrefixSearchWithStart) {
   EXPECT_EQ(results[0].length, 1u);
   EXPECT_EQ(results[1].value, 4);  // "bc"
   EXPECT_EQ(results[1].length, 2u);
-}
-
-TEST_F(DoubleArrayTest, CommonPrefixSearchMaxResults) {
-  std::vector<std::string> keys = {"a", "ab", "abc", "abcd"};
-  std::vector<uint32_t> values = {1, 2, 3, 4};
-
-  EXPECT_TRUE(trie_.build(keys, values));
-
-  auto results = trie_.commonPrefixSearch("abcde", 0, 2);
-
-  EXPECT_EQ(results.size(), 2u);
-  EXPECT_EQ(results[0].value, 1);
-  EXPECT_EQ(results[1].value, 2);
 }
 
 TEST_F(DoubleArrayTest, CommonPrefixSearchNoMatch) {
@@ -242,18 +229,6 @@ TEST_F(DoubleArrayTest, MissingDeepTransitionDoesNotMatchAnotherParent) {
   for (size_t idx = 0; idx < keys.size(); ++idx) {
     EXPECT_EQ(trie_.exactMatch(keys[idx]), static_cast<int32_t>(idx));
   }
-}
-
-TEST_F(DoubleArrayTest, Clear) {
-  std::vector<std::string> keys = {"a", "b"};
-  std::vector<uint32_t> values = {1, 2};
-
-  EXPECT_TRUE(trie_.build(keys, values));
-  EXPECT_FALSE(trie_.empty());
-
-  trie_.clear();
-  EXPECT_TRUE(trie_.empty());
-  EXPECT_EQ(trie_.exactMatch("a"), -1);
 }
 
 }  // namespace

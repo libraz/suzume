@@ -283,8 +283,7 @@ int32_t DoubleArray::exactMatch(std::string_view key) const {
   return value;
 }
 
-std::vector<DoubleArray::Result> DoubleArray::commonPrefixSearch(std::string_view text, size_t start,
-                                                                 size_t max_results) const {
+std::vector<DoubleArray::Result> DoubleArray::commonPrefixSearch(std::string_view text, size_t start) const {
   std::vector<Result> results;
 
   if (units_.empty() || start >= text.size()) {
@@ -301,10 +300,6 @@ std::vector<DoubleArray::Result> DoubleArray::commonPrefixSearch(std::string_vie
       res.value = value;
       res.length = idx - start;
       results.push_back(res);
-
-      if (max_results > 0 && results.size() >= max_results) {
-        return results;
-      }
     }
 
     // End of text

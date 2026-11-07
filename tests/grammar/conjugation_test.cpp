@@ -204,42 +204,6 @@ TEST(VerbTypeStringTest, AllTypes) {
 }
 
 // ============================================================================
-// verbTypeToJapanese tests
-// ============================================================================
-
-TEST(VerbTypeJapaneseTest, AllTypes) {
-  EXPECT_EQ(verbTypeToJapanese(VerbType::Ichidan), "一段");
-  EXPECT_EQ(verbTypeToJapanese(VerbType::GodanKa), "五段・カ行");
-  EXPECT_EQ(verbTypeToJapanese(VerbType::GodanGa), "五段・ガ行");
-  EXPECT_EQ(verbTypeToJapanese(VerbType::GodanSa), "五段・サ行");
-  EXPECT_EQ(verbTypeToJapanese(VerbType::GodanTa), "五段・タ行");
-  EXPECT_EQ(verbTypeToJapanese(VerbType::GodanNa), "五段・ナ行");
-  EXPECT_EQ(verbTypeToJapanese(VerbType::GodanBa), "五段・バ行");
-  EXPECT_EQ(verbTypeToJapanese(VerbType::GodanMa), "五段・マ行");
-  EXPECT_EQ(verbTypeToJapanese(VerbType::GodanRa), "五段・ラ行");
-  EXPECT_EQ(verbTypeToJapanese(VerbType::GodanWa), "五段・ワ行");
-  EXPECT_EQ(verbTypeToJapanese(VerbType::Suru), "サ変");
-  EXPECT_EQ(verbTypeToJapanese(VerbType::Kuru), "カ変");
-  EXPECT_EQ(verbTypeToJapanese(VerbType::IAdjective), "形容詞");
-  EXPECT_EQ(verbTypeToJapanese(VerbType::Unknown), "");
-}
-
-// ============================================================================
-// conjFormToString tests
-// ============================================================================
-
-TEST(ConjFormStringTest, AllForms) {
-  EXPECT_EQ(conjFormToString(ConjForm::Base), "base");
-  EXPECT_EQ(conjFormToString(ConjForm::Mizenkei), "mizenkei");
-  EXPECT_EQ(conjFormToString(ConjForm::Renyokei), "renyokei");
-  EXPECT_EQ(conjFormToString(ConjForm::Onbinkei), "onbinkei");
-  EXPECT_EQ(conjFormToString(ConjForm::Kateikei), "kateikei");
-  EXPECT_EQ(conjFormToString(ConjForm::Meireikei), "meireikei");
-  EXPECT_EQ(conjFormToString(ConjForm::Ishikei), "ishikei");
-  EXPECT_EQ(conjFormToString(ConjForm::Count_), "");
-}
-
-// ============================================================================
 // conjFormToJapanese tests
 // ============================================================================
 

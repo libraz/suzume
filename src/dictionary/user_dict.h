@@ -1,11 +1,9 @@
 #ifndef SUZUME_DICTIONARY_USER_DICT_H_
 #define SUZUME_DICTIONARY_USER_DICT_H_
 
-#include <memory>
-#include <string>
+#include <string_view>
 #include <vector>
 
-#include "core/error.h"
 #include "dictionary/dictionary.h"
 #include "dictionary/trie.h"
 
@@ -14,8 +12,7 @@ namespace suzume::dictionary {
 /**
  * @brief User dictionary loaded at runtime
  *
- * Supports loading from file (native) or memory (WASM).
- * Accepts current source TSV and legacy surface,pos,cost,lemma CSV.
+ * Entries are installed one at a time through addEntry().
  */
 class UserDictionary {
  public:
@@ -27,21 +24,6 @@ class UserDictionary {
   UserDictionary& operator=(const UserDictionary&) = delete;
   UserDictionary(UserDictionary&&) = delete;
   UserDictionary& operator=(UserDictionary&&) = delete;
-
-  /**
-   * @brief Load dictionary from file (native)
-   * @param path File path
-   * @return Number of entries on success, error on failure
-   */
-  core::Expected<size_t, core::Error> loadFromFile(const std::string& path);
-
-  /**
-   * @brief Load dictionary from memory (WASM)
-   * @param data Pointer to dictionary source data
-   * @param size Data size
-   * @return Number of entries on success, error on failure
-   */
-  core::Expected<size_t, core::Error> loadFromMemory(const char* data, size_t size);
 
   /**
    * @brief Add a single entry
@@ -64,28 +46,9 @@ class UserDictionary {
   const DictionaryEntry* lookupExact(std::string_view surface,
                                      core::PartOfSpeech pos = core::PartOfSpeech::Unknown) const;
 
-  /**
-   * @brief Get entry by ID
-   * @param idx Entry ID
-   * @return Entry pointer, or nullptr if not found
-   */
-  const DictionaryEntry* getEntry(uint32_t idx) const;
-
-  /**
-   * @brief Get number of entries
-   */
-  size_t size() const { return entries_.size(); }
-
-  /**
-   * @brief Clear all entries
-   */
-  void clear();
-
  private:
   std::vector<DictionaryEntry> entries_;
   Trie trie_;
-
-  core::Expected<size_t, core::Error> parseSource(std::string_view source_data);
 };
 
 }  // namespace suzume::dictionary

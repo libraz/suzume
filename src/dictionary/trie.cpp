@@ -42,7 +42,6 @@ void Trie::insert(std::string_view key, uint32_t entry_id) {
   }
 
   node->entry_ids.push_back(entry_id);
-  ++entry_count_;
 }
 
 const std::vector<uint32_t>* Trie::lookupView(std::string_view key) const {
@@ -81,11 +80,6 @@ std::vector<std::pair<size_t, const std::vector<uint32_t>*>> Trie::prefixMatch(s
   }
 
   return results;
-}
-
-void Trie::clear() {
-  root_ = std::make_unique<TrieNode>();
-  entry_count_ = 0;
 }
 
 }  // namespace suzume::dictionary

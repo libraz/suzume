@@ -162,8 +162,6 @@ src/grammar/char_patterns.h	0	0	0
 src/grammar/char_patterns_lexical.cpp	37	0	0
 src/grammar/conjugation.cpp	0	0	0
 src/grammar/conjugation.h	0	0	0
-src/grammar/conjugator.cpp	0	0	0
-src/grammar/conjugator.h	0	0	0
 src/grammar/connection.h	0	0	0
 src/grammar/dictionary_expansion.cpp	0	0	0
 src/grammar/dictionary_expansion.h	0	0	0

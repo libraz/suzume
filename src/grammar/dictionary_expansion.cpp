@@ -281,77 +281,65 @@ DictionaryExpansionResult expandDictionarySourceEntries(const std::vector<dictio
     const bool is_expanded = expanded_entries.size() > 1;
     for (auto& entry : expanded_entries) {
       const bool is_explicit_surface = entry.surface.compare(source_entry.surface) == 0;
-      if (options.preserve_surface_homographs) {
-        if (!options.preserve_generated_surface_homographs) {
-          auto found = seen_surfaces.find(entry.surface);
-          if (found != seen_surfaces.end()) {
-            if (!is_explicit_surface) {
-              if (!found->second.explicit_surface && entry.pos == found->second.pos &&
-                  entry.lemma.size() > found->second.lemma_length) {
-                const auto& previous = result.entries[found->second.index];
-                seen_entries.erase(
-                    entry_identity_key(previous.surface, previous.pos, previous.extended_pos, previous.lemma));
-                result.entries[found->second.index] = std::move(entry);
-                const auto& replacement = result.entries[found->second.index];
-                found->second.lemma_length = replacement.lemma.size();
-                seen_entries.insert(entry_identity_key(replacement.surface, replacement.pos, replacement.extended_pos,
-                                                       replacement.lemma));
-                if (!options.preserve_same_pos_homographs) {
-                  seen_surface_pos.at(surface_pos_key(replacement.surface, replacement.pos)) = found->second;
-                }
-              }
-              ++result.duplicates_skipped;
-              continue;
-            }
-            if (!found->second.explicit_surface) {
+      if (!options.preserve_generated_surface_homographs) {
+        auto found = seen_surfaces.find(entry.surface);
+        if (found != seen_surfaces.end()) {
+          if (!is_explicit_surface) {
+            if (!found->second.explicit_surface && entry.pos == found->second.pos &&
+                entry.lemma.size() > found->second.lemma_length) {
               const auto& previous = result.entries[found->second.index];
               seen_entries.erase(
                   entry_identity_key(previous.surface, previous.pos, previous.extended_pos, previous.lemma));
-              if (!options.preserve_same_pos_homographs) {
-                seen_surface_pos.erase(surface_pos_key(previous.surface, previous.pos));
-              }
               result.entries[found->second.index] = std::move(entry);
               const auto& replacement = result.entries[found->second.index];
-              found->second = {found->second.index, replacement.lemma.size(), replacement.pos, true};
+              found->second.lemma_length = replacement.lemma.size();
               seen_entries.insert(entry_identity_key(replacement.surface, replacement.pos, replacement.extended_pos,
                                                      replacement.lemma));
               if (!options.preserve_same_pos_homographs) {
-                seen_surface_pos.emplace(surface_pos_key(replacement.surface, replacement.pos), found->second);
+                seen_surface_pos.at(surface_pos_key(replacement.surface, replacement.pos)) = found->second;
               }
-              ++result.duplicates_skipped;
-              continue;
-            }
-          }
-        }
-        auto identity = entry_identity_key(entry.surface, entry.pos, entry.extended_pos, entry.lemma);
-        if (!seen_entries.insert(std::move(identity)).second) {
-          ++result.duplicates_skipped;
-          continue;
-        }
-        if (!options.preserve_same_pos_homographs) {
-          const auto key = surface_pos_key(entry.surface, entry.pos);
-          auto found = seen_surface_pos.find(key);
-          if (found != seen_surface_pos.end()) {
-            if (entry.lemma.size() > found->second.lemma_length) {
-              found->second.lemma_length = entry.lemma.size();
-              result.entries[found->second.index] = std::move(entry);
             }
             ++result.duplicates_skipped;
             continue;
           }
-          seen_surface_pos.emplace(
-              key, SeenSurface{result.entries.size(), entry.lemma.size(), entry.pos, is_explicit_surface});
+          if (!found->second.explicit_surface) {
+            const auto& previous = result.entries[found->second.index];
+            seen_entries.erase(
+                entry_identity_key(previous.surface, previous.pos, previous.extended_pos, previous.lemma));
+            if (!options.preserve_same_pos_homographs) {
+              seen_surface_pos.erase(surface_pos_key(previous.surface, previous.pos));
+            }
+            result.entries[found->second.index] = std::move(entry);
+            const auto& replacement = result.entries[found->second.index];
+            found->second = {found->second.index, replacement.lemma.size(), replacement.pos, true};
+            seen_entries.insert(
+                entry_identity_key(replacement.surface, replacement.pos, replacement.extended_pos, replacement.lemma));
+            if (!options.preserve_same_pos_homographs) {
+              seen_surface_pos.emplace(surface_pos_key(replacement.surface, replacement.pos), found->second);
+            }
+            ++result.duplicates_skipped;
+            continue;
+          }
         }
-      } else {
-        auto found = seen_surfaces.find(entry.surface);
-        if (found != seen_surfaces.end()) {
-          if (entry.pos == found->second.pos && entry.lemma.size() > found->second.lemma_length) {
+      }
+      auto identity = entry_identity_key(entry.surface, entry.pos, entry.extended_pos, entry.lemma);
+      if (!seen_entries.insert(std::move(identity)).second) {
+        ++result.duplicates_skipped;
+        continue;
+      }
+      if (!options.preserve_same_pos_homographs) {
+        const auto key = surface_pos_key(entry.surface, entry.pos);
+        auto found = seen_surface_pos.find(key);
+        if (found != seen_surface_pos.end()) {
+          if (entry.lemma.size() > found->second.lemma_length) {
             found->second.lemma_length = entry.lemma.size();
             result.entries[found->second.index] = std::move(entry);
           }
           ++result.duplicates_skipped;
           continue;
         }
+        seen_surface_pos.emplace(
+            key, SeenSurface{result.entries.size(), entry.lemma.size(), entry.pos, is_explicit_surface});
       }
       result.entries.push_back(std::move(entry));
       seen_surfaces.try_emplace(result.entries.back().surface,

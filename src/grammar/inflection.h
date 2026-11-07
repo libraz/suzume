@@ -3,7 +3,7 @@
  * @brief Reverse inflection analysis using connection rules
  *
  * Design: Connection-based analysis replaces pattern enumeration.
- * - Use conjugator to generate candidate stems
+ * - Use the conjugation tables to generate candidate stems
  * - Use auxiliary dictionary to match suffixes
  * - Validate with connection rules
  */
@@ -44,7 +44,7 @@ struct InflectionCandidate {
  * 1. Try to match auxiliary suffixes from the end of the string
  * 2. For each match, find what it connects to
  * 3. Build a chain of auxiliaries back to the verb stem
- * 4. Use conjugator to find possible base forms
+ * 4. Use the conjugation tables to find possible base forms
  */
 class Inflection {
  public:
@@ -76,11 +76,6 @@ class Inflection {
 
   /// Number of entries retained from the immediately preceding generation.
   size_t previousCacheSize() const { return previous_.size(); }
-
-  /**
-   * @brief Check if surface looks like a conjugated form
-   */
-  bool looksConjugated(std::string_view surface) const;
 
   /**
    * @brief Get the best candidate (highest confidence)

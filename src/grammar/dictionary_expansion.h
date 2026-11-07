@@ -17,8 +17,6 @@ struct DictionaryExpansionResult {
 };
 
 struct DictionaryExpansionOptions {
-  // Runtime source dictionaries can retain every grammatical homograph.
-  bool preserve_surface_homographs{true};
   // Binary dictionaries retain distinct POS readings for one surface, while
   // collapsing competing expanded forms inside one broad POS deterministically.
   bool preserve_same_pos_homographs{true};

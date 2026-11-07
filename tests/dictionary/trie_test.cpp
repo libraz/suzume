@@ -47,21 +47,12 @@ TEST(TrieTest, PrefixMatchFromPosition) {
   EXPECT_EQ(results[1].first, 2);  // length 2: 本語
 }
 
-TEST(TrieTest, Clear) {
-  Trie trie;
-  trie.insert("test", 1);
-  EXPECT_EQ(trie.size(), 1);
-
-  trie.clear();
-  EXPECT_EQ(trie.size(), 0);
-  EXPECT_EQ(trie.lookupView("test"), nullptr);
-}
-
 TEST(TrieTest, DestroysADepthFirstChainWithoutUsingTheCallStack) {
   {
     Trie trie;
-    trie.insert(std::string(30000, 'a'), 1);
-    EXPECT_EQ(trie.size(), 1u);
+    const std::string key(30000, 'a');
+    trie.insert(key, 1);
+    EXPECT_NE(trie.lookupView(key), nullptr);
   }
   SUCCEED();
 }

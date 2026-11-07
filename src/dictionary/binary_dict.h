@@ -150,11 +150,6 @@ class BinaryDictWriter {
    */
   core::Expected<std::vector<uint8_t>, core::Error> build();
 
-  /**
-   * @brief Get number of entries
-   */
-  size_t size() const { return entries_.size(); }
-
  private:
   std::vector<DictionaryEntry> entries_;
 };

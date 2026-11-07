@@ -9,11 +9,11 @@
 #include <utility>
 
 #include "cli_common.h"
+#include "conjugator.h"
 #include "dict_compiler.h"
 #include "dictionary/binary_dict.h"
 #include "dictionary/core_dict.h"
 #include "grammar/conjugation.h"
-#include "grammar/conjugator.h"
 #include "grammar/connection.h"
 #include "interactive.h"
 #include "interactive_utils.h"

@@ -189,19 +189,6 @@ TEST_F(InflectionBasicTest, AnalyzeSortsByConfidence) {
   }
 }
 
-// ===== LooksConjugated =====
-
-TEST_F(InflectionBasicTest, LooksConjugatedTrue) {
-  EXPECT_TRUE(inflection_.looksConjugated("食べた"));
-  EXPECT_TRUE(inflection_.looksConjugated("書いている"));
-  EXPECT_TRUE(inflection_.looksConjugated("読めなかった"));
-}
-
-TEST_F(InflectionBasicTest, LooksConjugatedFalse) {
-  EXPECT_FALSE(inflection_.looksConjugated("あ"));
-  EXPECT_FALSE(inflection_.looksConjugated(""));
-}
-
 // ===== Honorific verb forms =====
 
 TEST_F(InflectionBasicTest, HonorificIrasshattaForm) {

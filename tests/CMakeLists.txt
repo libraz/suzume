@@ -32,6 +32,7 @@ set(CLI_SOURCES_FOR_TESTS
   ${CMAKE_SOURCE_DIR}/tools/cli/cli_args.cpp
   ${CMAKE_SOURCE_DIR}/tools/cli/cli_help.cpp
   ${CMAKE_SOURCE_DIR}/tools/cli/interactive_utils.cpp
+  ${CMAKE_SOURCE_DIR}/tools/cli/conjugator.cpp
 )
 
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
@@ -51,6 +52,7 @@ set(TEST_SOURCES
   ${TEST_COMMON_SOURCES}
   ${CLI_SOURCES_FOR_TESTS}
   cli/cli_common_test.cpp
+  cli/conjugator_test.cpp
   cli/dict_compiler_test.cpp
   cli/interactive_utils_test.cpp
   cli/tsv_parser_test.cpp
@@ -71,7 +73,6 @@ set(TEST_SOURCES
   dictionary/source_parser_test.cpp
   dictionary/user_dict_test.cpp
   dictionary/conj_type_test.cpp
-  grammar/conjugator_test.cpp
   grammar/conjugation_test.cpp
   grammar/dictionary_expansion_test.cpp
   grammar/inflection_basic_test.cpp

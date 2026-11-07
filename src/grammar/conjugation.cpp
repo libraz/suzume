@@ -412,40 +412,18 @@ constexpr std::string_view kVerbTypeNames[] = {
 static_assert(std::size(kVerbTypeNames) == static_cast<size_t>(VerbType::IAdjective) + 1,
               "kVerbTypeNames must cover every VerbType value");
 
-// Indexed by VerbType (Unknown is empty).
-constexpr std::string_view kVerbTypeJapanese[] = {
-    "",           "一段",       "五段・カ行", "五段・ガ行", "五段・サ行", "五段・タ行", "五段・ナ行",
-    "五段・バ行", "五段・マ行", "五段・ラ行", "五段・ワ行", "サ変",       "カ変",       "形容詞",
-};
-static_assert(std::size(kVerbTypeJapanese) == std::size(kVerbTypeNames),
-              "VerbType label tables must have the same length");
-
 // Indexed by ConjForm; Onbinkei shares the renyokei label.
-constexpr std::string_view kConjFormNames[] = {
-    "base", "mizenkei", "renyokei", "onbinkei", "kateikei", "meireikei", "ishikei",
-};
 constexpr std::string_view kConjFormJapanese[] = {
     "終止形", "未然形", "連用形", "連用形", "仮定形", "命令形", "意志形",
 };
-static_assert(std::size(kConjFormNames) == static_cast<size_t>(ConjForm::Count_) &&
-                  std::size(kConjFormJapanese) == static_cast<size_t>(ConjForm::Count_),
-              "ConjForm label tables must cover every ConjForm value");
+static_assert(std::size(kConjFormJapanese) == static_cast<size_t>(ConjForm::Count_),
+              "ConjForm label table must cover every ConjForm value");
 
 }  // namespace
 
 std::string_view verbTypeToString(VerbType type) {
   const auto idx = static_cast<size_t>(type);
   return idx < std::size(kVerbTypeNames) ? kVerbTypeNames[idx] : "";
-}
-
-std::string_view verbTypeToJapanese(VerbType type) {
-  const auto idx = static_cast<size_t>(type);
-  return idx < std::size(kVerbTypeJapanese) ? kVerbTypeJapanese[idx] : "";
-}
-
-std::string_view conjFormToString(ConjForm form) {
-  const auto idx = static_cast<size_t>(form);
-  return idx < std::size(kConjFormNames) ? kConjFormNames[idx] : "";
 }
 
 std::string_view conjFormToJapanese(ConjForm form) {

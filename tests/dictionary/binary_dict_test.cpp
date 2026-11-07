@@ -935,11 +935,9 @@ TEST_F(BinaryDictTest, DictionaryManagerLoadUserBinaryDictionaryFromMemory) {
   auto dict_data = buildTestDict("りんご", core::PartOfSpeech::Noun);
 
   DictionaryManager manager;
-  EXPECT_FALSE(manager.hasUserBinaryDictionary());
 
-  bool loaded = manager.loadUserBinaryDictionaryFromMemory(dict_data.data(), dict_data.size());
+  bool loaded = manager.loadUserBinaryDictionaryFromMemoryResult(dict_data.data(), dict_data.size()).hasValue();
   EXPECT_TRUE(loaded);
-  EXPECT_TRUE(manager.hasUserBinaryDictionary());
 
   // Verify lookup works through manager
   auto results = manager.lookup("りんご", 0);
@@ -960,7 +958,7 @@ TEST_F(BinaryDictTest, DictionaryManagerPreservesBinaryDictionaryProvenance) {
 
   DictionaryManager manager;
   ASSERT_TRUE(manager.loadCoreDictionaryFromMemoryResult(core_data.data(), core_data.size()).hasValue());
-  ASSERT_TRUE(manager.loadUserBinaryDictionaryFromMemory(user_data.data(), user_data.size()));
+  ASSERT_TRUE(manager.loadUserBinaryDictionaryFromMemoryResult(user_data.data(), user_data.size()).hasValue());
 
   const auto core_results = manager.lookup("coretestentry", 0);
   const auto core_result = std::find_if(core_results.begin(), core_results.end(), [](const LookupResult& result) {
@@ -980,7 +978,7 @@ TEST_F(BinaryDictTest, DictionaryManagerPreservesBinaryDictionaryProvenance) {
 TEST_F(BinaryDictTest, DictionaryManagerLookupExactChecksSurfaceAndPos) {
   auto dict_data = buildTestDict("りんご", core::PartOfSpeech::Noun);
   DictionaryManager manager;
-  ASSERT_TRUE(manager.loadUserBinaryDictionaryFromMemory(dict_data.data(), dict_data.size()));
+  ASSERT_TRUE(manager.loadUserBinaryDictionaryFromMemoryResult(dict_data.data(), dict_data.size()).hasValue());
 
   const auto* exact = manager.lookupExact("りんご", core::PartOfSpeech::Noun);
   ASSERT_NE(exact, nullptr);
@@ -994,8 +992,7 @@ TEST_F(BinaryDictTest, DictionaryManagerLoadFromMemoryInvalidData) {
   std::vector<uint8_t> bad_data(10, 0);
 
   DictionaryManager manager;
-  EXPECT_FALSE(manager.loadUserBinaryDictionaryFromMemory(bad_data.data(), bad_data.size()));
-  EXPECT_FALSE(manager.hasUserBinaryDictionary());
+  EXPECT_FALSE(manager.loadUserBinaryDictionaryFromMemoryResult(bad_data.data(), bad_data.size()).hasValue());
 }
 
 TEST_F(BinaryDictTest, DictionaryManagerBinaryDictionariesAreAdditiveAndFailedLoadsPreserveThem) {
@@ -1004,13 +1001,12 @@ TEST_F(BinaryDictTest, DictionaryManagerBinaryDictionariesAreAdditiveAndFailedLo
   const std::vector<uint8_t> invalid_data(10, 0);
 
   DictionaryManager manager;
-  ASSERT_TRUE(manager.loadUserBinaryDictionaryFromMemory(first_data.data(), first_data.size()));
-  ASSERT_TRUE(manager.loadUserBinaryDictionaryFromMemory(second_data.data(), second_data.size()));
-  EXPECT_FALSE(manager.loadUserBinaryDictionaryFromMemory(invalid_data.data(), invalid_data.size()));
+  ASSERT_TRUE(manager.loadUserBinaryDictionaryFromMemoryResult(first_data.data(), first_data.size()).hasValue());
+  ASSERT_TRUE(manager.loadUserBinaryDictionaryFromMemoryResult(second_data.data(), second_data.size()).hasValue());
+  EXPECT_FALSE(manager.loadUserBinaryDictionaryFromMemoryResult(invalid_data.data(), invalid_data.size()).hasValue());
 
   EXPECT_NE(manager.lookupExact("東京テスト"), nullptr);
   EXPECT_NE(manager.lookupExact("りんごテスト"), nullptr);
-  EXPECT_TRUE(manager.hasUserBinaryDictionary());
 }
 
 TEST_F(BinaryDictTest, DictionaryManagerClearRemovesEveryUserDictionaryButKeepsCoreDictionary) {
@@ -1021,14 +1017,13 @@ TEST_F(BinaryDictTest, DictionaryManagerClearRemovesEveryUserDictionaryButKeepsC
 
   DictionaryManager manager;
   ASSERT_TRUE(manager.loadCoreDictionaryFromMemoryResult(core_data.data(), core_data.size()).hasValue());
-  ASSERT_TRUE(manager.loadUserBinaryDictionaryFromMemory(binary_data.data(), binary_data.size()));
+  ASSERT_TRUE(manager.loadUserBinaryDictionaryFromMemoryResult(binary_data.data(), binary_data.size()).hasValue());
   manager.addUserDictionary(source_dictionary);
   ASSERT_NE(manager.lookupExact("りんごテスト"), nullptr);
   ASSERT_NE(manager.lookupExact("テスト公園"), nullptr);
 
   manager.clearUserDictionaries();
 
-  EXPECT_FALSE(manager.hasUserBinaryDictionary());
   EXPECT_EQ(manager.lookupExact("りんごテスト"), nullptr);
   EXPECT_EQ(manager.lookupExact("テスト公園"), nullptr);
   EXPECT_NE(manager.lookupExact("東京テスト"), nullptr);

@@ -66,25 +66,9 @@ class DoubleArray {
    * @brief Common prefix search from position
    * @param text Text to search
    * @param start Start position in bytes
-   * @param max_results Maximum number of results (0 = unlimited)
    * @return Vector of matching results (value, length)
    */
-  std::vector<Result> commonPrefixSearch(std::string_view text, size_t start = 0, size_t max_results = 0) const;
-
-  /**
-   * @brief Get size of the double-array (number of units)
-   */
-  size_t size() const { return units_.size(); }
-
-  /**
-   * @brief Check if the double-array is empty
-   */
-  bool empty() const { return units_.empty(); }
-
-  /**
-   * @brief Clear the double-array
-   */
-  void clear();
+  std::vector<Result> commonPrefixSearch(std::string_view text, size_t start = 0) const;
 
  private:
   /**
@@ -111,6 +95,9 @@ class DoubleArray {
   };
 
   std::vector<Unit> units_;
+
+  /** @brief Release every unit, leaving an empty array. */
+  void clear();
 
   /**
    * @brief Read the leaf value reachable from a node via the null terminator

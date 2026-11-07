@@ -6,7 +6,7 @@
 #include <fstream>
 #include <iterator>
 
-#include "dictionary/user_dict.h"
+#include "dictionary/source_parser.h"
 
 namespace suzume {
 namespace cli {
@@ -22,18 +22,19 @@ TEST(TsvParserTest, CliAndRuntimeShareBomAndMarkerParsing) {
   auto cli_result = parser.parseString(source);
   ASSERT_TRUE(cli_result.hasValue()) << cli_result.error().message;
 
-  dictionary::UserDictionary runtime_dict;
-  auto runtime_result = runtime_dict.loadFromMemory(source.data(), source.size());
+  dictionary::SourceParseOptions runtime_options;
+  runtime_options.skip_single_field_records = true;
+  auto runtime_result = dictionary::parseDictionarySource(source, runtime_options);
   ASSERT_TRUE(runtime_result.hasValue()) << runtime_result.error().message;
+  const auto& runtime_entries = runtime_result.value().entries;
 
-  ASSERT_EQ(cli_result.value().size(), runtime_result.value());
-  ASSERT_NE(runtime_dict.getEntry(0), nullptr);
-  EXPECT_EQ(runtime_dict.getEntry(0)->surface, cli_result.value()[0].surface);
-  EXPECT_EQ(runtime_dict.getEntry(0)->extended_pos, core::ExtendedPOS::NounProperFamily);
-  ASSERT_NE(runtime_dict.getEntry(1), nullptr);
-  EXPECT_EQ(runtime_dict.getEntry(1)->extended_pos, core::ExtendedPOS::NounProperGiven);
-  ASSERT_NE(runtime_dict.getEntry(2), nullptr);
-  EXPECT_EQ(runtime_dict.getEntry(2)->extended_pos, core::ExtendedPOS::InterjectionGreeting);
+  ASSERT_EQ(cli_result.value().size(), runtime_entries.size());
+  ASSERT_EQ(runtime_entries.size(), 3u);
+  EXPECT_EQ(runtime_entries[0].surface, cli_result.value()[0].surface);
+  EXPECT_EQ(dictionary::sourceToDictionaryEntry(runtime_entries[0]).extended_pos, core::ExtendedPOS::NounProperFamily);
+  EXPECT_EQ(dictionary::sourceToDictionaryEntry(runtime_entries[1]).extended_pos, core::ExtendedPOS::NounProperGiven);
+  EXPECT_EQ(dictionary::sourceToDictionaryEntry(runtime_entries[2]).extended_pos,
+            core::ExtendedPOS::InterjectionGreeting);
 }
 
 TEST(TsvParserTest, WritePreservesCanonicalMarkerAndLemma) {

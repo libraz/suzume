@@ -77,68 +77,6 @@ TEST_F(JapanesePosNameTest, Other) {
   EXPECT_EQ(core::posToJapanese(core::PartOfSpeech::Other), "その他");
 }
 
-// =============================================================================
-// Japanese Verb Type Names (verbTypeToJapanese)
-// =============================================================================
-
-class JapaneseVerbTypeTest : public ::testing::Test {};
-
-TEST_F(JapaneseVerbTypeTest, Ichidan) {
-  EXPECT_EQ(grammar::verbTypeToJapanese(grammar::VerbType::Ichidan), "一段");
-}
-
-TEST_F(JapaneseVerbTypeTest, GodanKa) {
-  EXPECT_EQ(grammar::verbTypeToJapanese(grammar::VerbType::GodanKa), "五段・カ行");
-}
-
-TEST_F(JapaneseVerbTypeTest, GodanGa) {
-  EXPECT_EQ(grammar::verbTypeToJapanese(grammar::VerbType::GodanGa), "五段・ガ行");
-}
-
-TEST_F(JapaneseVerbTypeTest, GodanSa) {
-  EXPECT_EQ(grammar::verbTypeToJapanese(grammar::VerbType::GodanSa), "五段・サ行");
-}
-
-TEST_F(JapaneseVerbTypeTest, GodanTa) {
-  EXPECT_EQ(grammar::verbTypeToJapanese(grammar::VerbType::GodanTa), "五段・タ行");
-}
-
-TEST_F(JapaneseVerbTypeTest, GodanNa) {
-  EXPECT_EQ(grammar::verbTypeToJapanese(grammar::VerbType::GodanNa), "五段・ナ行");
-}
-
-TEST_F(JapaneseVerbTypeTest, GodanBa) {
-  EXPECT_EQ(grammar::verbTypeToJapanese(grammar::VerbType::GodanBa), "五段・バ行");
-}
-
-TEST_F(JapaneseVerbTypeTest, GodanMa) {
-  EXPECT_EQ(grammar::verbTypeToJapanese(grammar::VerbType::GodanMa), "五段・マ行");
-}
-
-TEST_F(JapaneseVerbTypeTest, GodanRa) {
-  EXPECT_EQ(grammar::verbTypeToJapanese(grammar::VerbType::GodanRa), "五段・ラ行");
-}
-
-TEST_F(JapaneseVerbTypeTest, GodanWa) {
-  EXPECT_EQ(grammar::verbTypeToJapanese(grammar::VerbType::GodanWa), "五段・ワ行");
-}
-
-TEST_F(JapaneseVerbTypeTest, Suru) {
-  EXPECT_EQ(grammar::verbTypeToJapanese(grammar::VerbType::Suru), "サ変");
-}
-
-TEST_F(JapaneseVerbTypeTest, Kuru) {
-  EXPECT_EQ(grammar::verbTypeToJapanese(grammar::VerbType::Kuru), "カ変");
-}
-
-TEST_F(JapaneseVerbTypeTest, IAdjective) {
-  EXPECT_EQ(grammar::verbTypeToJapanese(grammar::VerbType::IAdjective), "形容詞");
-}
-
-TEST_F(JapaneseVerbTypeTest, Unknown) {
-  EXPECT_EQ(grammar::verbTypeToJapanese(grammar::VerbType::Unknown), "");
-}
-
 TEST(LemmatizerTest, ContractedGodanSokuonFormsUseDictionaryVerifiedRows) {
   dictionary::DictionaryManager dict_manager;
   auto user_dict = std::make_shared<dictionary::UserDictionary>();

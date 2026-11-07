@@ -7,6 +7,7 @@ add_executable(suzume-cli
   cli_help.cpp
   cmd_analyze.cpp
   cmd_dict.cpp
+  conjugator.cpp
   cmd_test.cpp
   tsv_parser.cpp
   dict_compiler.cpp
