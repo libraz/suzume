@@ -1,0 +1,55 @@
+{
+  "cases": [
+    {
+      "description": "Nominalized continuative selected by bare suru",
+      "expected": [
+        {
+          "lemma": "一人",
+          "pos": "Noun",
+          "surface": "一人"
+        },
+        {
+          "lemma": "歩き",
+          "pos": "Noun",
+          "surface": "歩き"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "kisuru",
+      "input": "一人歩きする"
+    },
+    {
+      "description": "Nominalized continuative selected by inflected bare suru",
+      "expected": [
+        {
+          "lemma": "一人",
+          "pos": "Noun",
+          "surface": "一人"
+        },
+        {
+          "lemma": "歩き",
+          "pos": "Noun",
+          "surface": "歩き"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "kishita_2",
+      "input": "一人歩きした"
+    }
+  ],
+  "description": "compound_noun tests",
+  "version": "1.0"
+}

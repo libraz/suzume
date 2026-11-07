@@ -438,10 +438,10 @@ void resolveIndefiniteCaseDe(std::vector<core::Morpheme>& result) {
 }
 
 // A continuative form is used as a nominal predicate before a copula, a
-// nominalizing suffix, or the copular change construction 〜に+なる. The
-// lattice keeps a verb candidate for the same surface, but these contexts
+// nominalizing suffix, bare する, or the copular change construction 〜に+なる.
+// The lattice keeps a verb candidate for the same surface, but these contexts
 // require a nominal reading (疲れ気味だ、丸出しだ、丸出しになる). Honorific
-// お/ご+連用形+に+なる remains verbal.
+// お/ご+連用形+する and お/ご+連用形+に+なる remain verbal.
 void resolveNominalizedRenyokeiPredicate(std::vector<core::Morpheme>& result) {
   for (size_t idx = 0; idx < result.size(); ++idx) {
     auto& stem = result[idx];
@@ -478,6 +478,10 @@ void resolveNominalizedRenyokeiPredicate(std::vector<core::Morpheme>& result) {
     const bool before_naru = next.extended_pos == core::ExtendedPOS::ParticleCase && next.surface == "に" &&
                              idx + 2 < result.size() && result[idx + 2].pos == core::PartOfSpeech::Verb &&
                              result[idx + 2].lemma == "なる";
+    // Bare する selects a nominalized action; a compound verb's suru
+    // conjugation alone does not establish that construction.
+    const bool before_suru =
+        stem.end == next.start && next.pos == core::PartOfSpeech::Verb && grammar::isSuruBaseForm(next.lemma);
     // A wa-row continuative directly after に cannot take the negative
     // auxiliary as a finite predicate. It is the nominal stem in the
     // certainty construction (N に + V連用形 + ない), so retain the noun
@@ -488,8 +492,12 @@ void resolveNominalizedRenyokeiPredicate(std::vector<core::Morpheme>& result) {
         stem.conj_type == dictionary::ConjugationType::GodanWa;
     const bool honorific_naru = before_naru && idx > 0 && result[idx - 1].pos == core::PartOfSpeech::Prefix &&
                                 grammar::isHonorificPrefix(result[idx - 1].surface);
-    if ((!before_copula && !before_nominalizing_suffix && !before_naru && !nominal_negative_after_case) ||
-        honorific_naru) {
+    const bool honorific_suru = before_suru && idx > 0 && result[idx - 1].end == stem.start &&
+                                result[idx - 1].pos == core::PartOfSpeech::Prefix &&
+                                grammar::isHonorificPrefix(result[idx - 1].surface);
+    if ((!before_copula && !before_nominalizing_suffix && !before_naru && !before_suru &&
+         !nominal_negative_after_case) ||
+        honorific_naru || honorific_suru) {
       continue;
     }
 
@@ -554,6 +562,56 @@ void splitFormalNounCopularDemo(std::vector<core::Morpheme>& result) {
         aru.getLemma() == "ある" && aru.conj_form == grammar::ConjForm::Base && !followed_by_auxiliary) {
       retag(aru, core::PartOfSpeech::Verb, core::ExtendedPOS::VerbShuushikei, "ある",
             dictionary::ConjugationType::GodanRa, grammar::ConjForm::Base);
+    }
+  }
+}
+
+// An adjectival stem is a predicate, not a referential argument of a focus
+// particle. Recover its copula and quotation boundary only when both pieces
+// are proven by the closed grammatical dictionary categories.
+void splitCopularQuoteAfterAdjectivalStem(std::vector<core::Morpheme>& result,
+                                          const dictionary::DictionaryManager* dict_manager) {
+  if (dict_manager == nullptr) {
+    return;
+  }
+  for (size_t idx = 1; idx < result.size(); ++idx) {
+    const auto& host = result[idx - 1];
+    auto& fused = result[idx];
+    if (host.extended_pos != core::ExtendedPOS::AdjNaAdj || host.end != fused.start ||
+        fused.extended_pos != core::ExtendedPOS::ParticleAdverbial) {
+      continue;
+    }
+    for (const auto& prefix : dict_manager->lookup(fused.surface, 0)) {
+      const auto& copula_entry = *prefix.entry;
+      if ((copula_entry.extended_pos != core::ExtendedPOS::AuxCopulaDa &&
+           copula_entry.extended_pos != core::ExtendedPOS::AuxCopulaDesu) ||
+          copula_entry.surface.size() >= fused.surface.size()) {
+        continue;
+      }
+      const std::string_view remainder = std::string_view(fused.surface).substr(copula_entry.surface.size());
+      const dictionary::DictionaryEntry* quote_entry = nullptr;
+      for (const auto& suffix : dict_manager->lookup(remainder, 0)) {
+        if (suffix.entry->extended_pos == core::ExtendedPOS::ParticleQuote &&
+            suffix.entry->surface.size() == remainder.size()) {
+          quote_entry = suffix.entry;
+          break;
+        }
+      }
+      if (quote_entry == nullptr) {
+        continue;
+      }
+      core::Morpheme quote = fused;
+      quote.surface = quote_entry->surface;
+      quote.start = fused.start + prefix.length;
+      retagUninflected(quote, quote_entry->pos, quote_entry->extended_pos,
+                       quote_entry->lemma.empty() ? quote_entry->surface : quote_entry->lemma);
+      fused.surface = copula_entry.surface;
+      fused.end = quote.start;
+      retagUninflected(fused, copula_entry.pos, copula_entry.extended_pos,
+                       copula_entry.lemma.empty() ? copula_entry.surface : copula_entry.lemma);
+      insertAfter(result, idx, quote);
+      ++idx;
+      break;
     }
   }
 }

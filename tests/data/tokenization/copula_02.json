@@ -235,6 +235,70 @@
       ],
       "id": "kadenigiyakana",
       "input": "静かでにぎやかな町"
+    },
+    {
+      "description": "Copula and quotation after an adjectival predicate",
+      "expected": [
+        {
+          "lemma": "無理",
+          "pos": "Adjective",
+          "surface": "無理"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "dattte_ttta",
+      "input": "無理だって言った"
+    },
+    {
+      "description": "Copula and quotation after an adjectival predicate",
+      "expected": [
+        {
+          "lemma": "静か",
+          "pos": "Adjective",
+          "surface": "静か"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "聞く",
+          "pos": "Verb",
+          "surface": "聞い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "kadattte_ita",
+      "input": "静かだって聞いた"
     }
   ],
   "description": "Copula patterns (だ、です、である) (part 2/2)",

@@ -85,6 +85,8 @@ void resolveDependentVerbHomographs(std::vector<core::Morpheme>& result);
 void resolveClosedInflectionalChains(std::vector<core::Morpheme>& result);
 void resolveSahenRenyokei(std::vector<core::Morpheme>& result);
 void splitFormalNounCopularDemo(std::vector<core::Morpheme>& result);
+void splitCopularQuoteAfterAdjectivalStem(std::vector<core::Morpheme>& result,
+                                          const dictionary::DictionaryManager* dict_manager);
 void resolveSimilitudeYou(std::vector<core::Morpheme>& result);
 void resolveTearuAuxiliary(std::vector<core::Morpheme>& result);
 void resolveEchoedConditionalCopula(std::vector<core::Morpheme>& result);
