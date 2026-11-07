@@ -209,7 +209,14 @@ void appendExtendedSokuonbinCandidates(const std::vector<char32_t>& codepoints, 
       const bool ambiguous_katt = char_before_sokuon == U'か';
       bool infl_verified = !in_dict && !ambiguous_katt &&
                            sokuonbinInflVerified(inflection, onbin_surface, potential_base, hiragana_before_onbin);
-      const bool standalone_verb_tail = vh::isVerbInDictionary(dict_manager, codepoints, kanji_end, onbin_end);
+      // A kana tail that is itself a listed verb (たっ of たつ) marks a
+      // boundary, unless its first kana is the okurigana a listed transitive
+      // partner attests on the kanji (当た+っ beside 当てる).
+      const bool standalone_verb_tail =
+          vh::isVerbInDictionary(dict_manager, codepoints, kanji_end, onbin_end) &&
+          !(hiragana_before_onbin == 1 && kanji_end == start_pos + 1 &&
+            vh::hasListedTransitivePartner(dict_manager, extractSubstring(codepoints, start_pos, kanji_end),
+                                           codepoints[kanji_end]));
 
       // Skip if this is an i-adjective katt-form (美しかっ → 美しい, 高かっ → 高い)
       // The stem ends with か, so remove か and add い to get adjective base form

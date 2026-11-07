@@ -97,6 +97,9 @@ bool containsKanji(std::string_view stem);
  */
 bool isPureHiragana(std::string_view stem);
 
+/** @brief Whether a surface is hiragana, optionally stretched by prolonged sound marks (たったーー) */
+bool isElongatedHiragana(std::string_view surface);
+
 /**
  * @brief Whether a compound particle is the quotative + suru te-form sequence
  * @param surface Dictionary particle surface
@@ -865,6 +868,16 @@ std::string_view godanBaseSuffixFromIRow(char32_t i_row_cp);
  * (取れ→取る) or from a mis-analyzed ichidan-potential lemma (書け→書く).
  */
 std::string_view godanBaseSuffixFromERow(char32_t e_row_cp);
+
+/**
+ * @brief Get the E-row kana of the same column as an A-row kana
+ * @param a_row_cp A-row codepoint (か, た, ま, etc.)
+ * @return The e-row kana (け, て, め, etc.), or empty if invalid
+ *
+ * Pairs an intransitive godan-ra stem with its transitive ichidan partner
+ * (当た+る / 当て+る, 閉ま+る / 閉め+る).
+ */
+std::string_view godanERowSuffixFromARow(char32_t a_row_cp);
 
 /**
  * @brief Get VerbType from I-row renyokei ending

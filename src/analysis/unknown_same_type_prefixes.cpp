@@ -178,6 +178,17 @@ bool kanjiHeadsPredicateAt(const std::vector<char32_t>& codepoints, const std::v
   const auto opening_entry = [&](size_t length, core::PartOfSpeech pos) {
     return lookupEntryInRange(dict_manager, codepoints, kana_start, kana_start + length, pos);
   };
+  const char32_t okurigana = codepoints[kana_start];
+  const std::string head = normalize::encodeUtf8(codepoints[kana_start - 1]);
+  // An a-row kana opening a godan-ra cell on the kanji is the intransitive
+  // partner of a listed ichidan verb on the e-row (当た+っ beside 当てる,
+  // 閉ま+る beside 閉める). That proof outweighs any word the tail spells
+  // (抽選|当たっ+た, not 抽選当+たった).
+  if (kana::isARowCodepoint(okurigana) && kana_start + 1 < kana_end &&
+      (codepoints[kana_start + 1] == U'っ' || kana::isRaColumnCodepoint(codepoints[kana_start + 1])) &&
+      verb_helpers::hasListedTransitivePartner(&dict_manager, head, okurigana)) {
+    return true;
+  }
   // A registered content word or interjection of three kana or more opening
   // on the kana leaves the kanji to the run (助言|いただく, 質問|うざい,
   // 学生|いかに, 合格|おめでとう). The word may run past the predicate probe.
@@ -202,8 +213,6 @@ bool kanjiHeadsPredicateAt(const std::vector<char32_t>& codepoints, const std::v
       return false;
     }
   }
-  const char32_t okurigana = codepoints[kana_start];
-  const std::string head = normalize::encodeUtf8(codepoints[kana_start - 1]);
   // し is also a cell of する after a verbal noun (書類提出+し), which proves no head.
   const bool proves_godan_head =
       verb_helpers::hasDictionaryGodanBaseFromIRow(&dict_manager, head, okurigana) &&

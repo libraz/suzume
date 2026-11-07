@@ -183,6 +183,14 @@ bool isPureHiragana(std::string_view stem) {
   return allCharsMatch(stem, kana::isHiraganaCodepoint);
 }
 
+bool isElongatedHiragana(std::string_view surface) {
+  size_t byte_pos = 0;
+  return !surface.empty() && kana::isHiraganaCodepoint(normalize::decodeUtf8(surface, byte_pos)) &&
+         allCharsMatch(surface, [](char32_t code) {
+           return kana::isHiraganaCodepoint(code) || normalize::isProlongedSoundMark(code);
+         });
+}
+
 bool isBigradeTerminalKana(char32_t code) {
   // す is left out: サ行 bigrade is marginal, while する is the light verb every
   // sahen nominal takes, so the row would claim that construction instead.
@@ -404,6 +412,10 @@ std::string_view godanBaseSuffixFromIRow(char32_t i_row_cp) {
 
 std::string_view godanBaseSuffixFromERow(char32_t e_row_cp) {
   return lookupGodanSuffix(e_row_cp, GodanColumn::E, GodanColumn::Base);
+}
+
+std::string_view godanERowSuffixFromARow(char32_t a_row_cp) {
+  return lookupGodanSuffix(a_row_cp, GodanColumn::A, GodanColumn::E);
 }
 
 VerbType verbTypeFromIRowCodepoint(char32_t i_row_cp) {

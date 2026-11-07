@@ -106,6 +106,12 @@ bool hasDictionaryGodanBaseFromIRow(const dictionary::DictionaryManager* dict_ma
   return !godan_ending.empty() && isVerbInDictionary(dict_manager, normalize::concat(stem, godan_ending));
 }
 
+bool hasListedTransitivePartner(const dictionary::DictionaryManager* dict_manager, std::string_view stem,
+                                char32_t a_row_kana) {
+  const std::string_view e_row_kana = grammar::godanERowSuffixFromARow(a_row_kana);
+  return !e_row_kana.empty() && isVerbBaseFormInDictionary(dict_manager, normalize::concat(stem, e_row_kana, "る"));
+}
+
 bool isAdjectiveInDictionary(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
                              size_t start, size_t end) {
   return hasDictionaryEntry(dict_manager, extractSubstring(codepoints, start, end), core::PartOfSpeech::Adjective);

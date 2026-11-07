@@ -596,6 +596,50 @@
       ],
       "id": "ttteta_4",
       "input": "携帯鳴ってた"
+    },
+    {
+      "description": "Intransitive godan-ra attested by its listed transitive partner after a particle-dropped noun",
+      "expected": [
+        {
+          "lemma": "抽選",
+          "pos": "Noun",
+          "surface": "抽選"
+        },
+        {
+          "lemma": "当たる",
+          "pos": "Verb",
+          "surface": "当たっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "たーーー"
+        }
+      ],
+      "id": "tattta_2",
+      "input": "抽選当たったーーー！"
+    },
+    {
+      "description": "Intransitive godan-ra attested by its listed transitive partner after a particle-dropped noun",
+      "expected": [
+        {
+          "lemma": "予想",
+          "pos": "Noun",
+          "surface": "予想"
+        },
+        {
+          "lemma": "当たる",
+          "pos": "Verb",
+          "surface": "当たっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "tattta_3",
+      "input": "予想当たった"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 11/11)",

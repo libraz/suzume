@@ -122,6 +122,17 @@ bool hasDictionaryGodanBaseFromIRow(const dictionary::DictionaryManager* dict_ma
                                     char32_t i_row_kana);
 
 /**
+ * @brief Whether @p stem plus the e-row partner of @p a_row_kana plus る is a listed verb base
+ *
+ * An intransitive godan-ra stem pairs with a transitive ichidan one on the same
+ * column (当た+る / 当て+る, 閉ま+る / 閉め+る), so a listed transitive verb
+ * attests the unlisted intransitive okurigana. A potential form (映せる of
+ * 映す) is no base and does not count.
+ */
+bool hasListedTransitivePartner(const dictionary::DictionaryManager* dict_manager, std::string_view stem,
+                                char32_t a_row_kana);
+
+/**
  * @brief Whether codepoints[stem_start, okurigana_pos) plus the okurigana there
  * is the continuative of a dictionary verb
  *
