@@ -287,6 +287,149 @@
       ],
       "id": "ha1_2_wo_eta",
       "input": "会員は1万2千を超えた。"
+    },
+    {
+      "description": "総額５０億ドルを拠出した。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "総額",
+          "pos": "Noun",
+          "surface": "総額"
+        },
+        {
+          "lemma": "50億ドル",
+          "pos": "Noun",
+          "surface": "50億ドル"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "拠出",
+          "pos": "Noun",
+          "surface": "拠出"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wo_shita_6",
+      "input": "総額５０億ドルを拠出した。"
+    },
+    {
+      "description": "１０万ドルの罰金が科された。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "10万ドル",
+          "pos": "Noun",
+          "surface": "10万ドル"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "罰金",
+          "pos": "Noun",
+          "surface": "罰金"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "科す",
+          "pos": "Verb",
+          "surface": "科さ"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "no_ga_sareta",
+      "input": "１０万ドルの罰金が科された。"
+    },
+    {
+      "description": "予算は５億ユーロに上る。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "予算",
+          "pos": "Noun",
+          "surface": "予算"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "5億ユーロ",
+          "pos": "Noun",
+          "surface": "5億ユーロ"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "上る",
+          "pos": "Verb",
+          "surface": "上る"
+        }
+      ],
+      "id": "ha_ni_ru",
+      "input": "予算は５億ユーロに上る。"
+    },
+    {
+      "description": "費用は3千ドルだった。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "費用",
+          "pos": "Noun",
+          "surface": "費用"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "3千ドル",
+          "pos": "Noun",
+          "surface": "3千ドル"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ha3_dattta",
+      "input": "費用は3千ドルだった。"
     }
   ],
   "description": "noun_number tests",

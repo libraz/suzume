@@ -171,8 +171,11 @@ void generateCounterCandidates(const std::vector<char32_t>& codepoints, size_t s
   const bool follows_letter = start_pos > 0 && char_types[start_pos - 1] == normalize::CharType::Alphabet;
 
   // Check for katakana unit suffix (e.g., キロ, ドル, メートル, パーセント)
-  // Generate digit + katakana unit candidates like 3キロ, 100ドル, 80パーセント
-  if (!numeral_is_digits || follows_letter || char_types[numeral_end] != normalize::CharType::Katakana) {
+  // Generate digit + katakana unit candidates like 3キロ, 100ドル, 80パーセント.
+  // Digits scaled by magnitude kanji are still digit-written (50億ドル, 3千ドル).
+  const bool digit_written =
+      numeral_is_digits || counter_detail::isDigitMagnitudeHead(codepoints, start_pos, numeral_end);
+  if (!digit_written || follows_letter || char_types[numeral_end] != normalize::CharType::Katakana) {
     return;
   }
   // Find end of katakana sequence (max 8 chars for reasonable unit length)
