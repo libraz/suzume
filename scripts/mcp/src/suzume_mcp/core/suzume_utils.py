@@ -77,11 +77,60 @@ def _is_deliberately_removed_symbol(surface: str) -> bool:
     must stay in the expected-token stream as well.  Only punctuation is a
     removable boundary under the default options.
     """
-    return (
+    return is_kaomoji(surface) or (
         surface not in TEXT_SYMBOLS
         and bool(surface)
         and all(unicodedata.category(char).startswith("P") for char in surface)
     )
+
+
+_KAOMOJI_OPENERS = "(（"
+_KAOMOJI_CLOSERS = ")）"
+_KAOMOJI_MAX_BODY = 16
+
+
+def is_kaomoji(surface: str) -> bool:
+    """Mirror PreTokenizer::tryMatchKaomoji: a bracketed face such as (^^) or (*^_^*).
+
+    The body holds no word character (kana letter, kanji, digit, ASCII letter)
+    and is not letters alone, so asides such as (笑), (2024) or a lone Greek letter stay text.
+    """
+    if len(surface) < 3 or surface[0] not in _KAOMOJI_OPENERS or surface[-1] not in _KAOMOJI_CLOSERS:
+        return False
+    body = surface[1:-1]
+    if len(body) > _KAOMOJI_MAX_BODY:
+        return False
+    has_symbol = False
+    for char in body:
+        if char in _KAOMOJI_OPENERS or char in _KAOMOJI_CLOSERS or char.isspace():
+            return False
+        if regex.fullmatch(r"[ぁ-ゖァ-ヺ\p{Han}0-9A-Za-z]", char):
+            return False
+        has_symbol = has_symbol or not unicodedata.category(char).startswith("L")
+    return has_symbol
+
+
+def _merge_kaomoji(tokens: list[dict]) -> None:
+    """Coalesce the MeCab pieces of a bracketed face into one removable symbol."""
+    merged: list[dict] = []
+    index = 0
+    while index < len(tokens):
+        surface = tokens[index].get("surface", "")
+        end = index
+        combined = ""
+        if surface[:1] in _KAOMOJI_OPENERS:
+            while end < len(tokens) and len(combined) <= _KAOMOJI_MAX_BODY + 2:
+                combined += tokens[end].get("surface", "")
+                end += 1
+                if combined[-1:] in _KAOMOJI_CLOSERS:
+                    break
+        if combined and is_kaomoji(combined):
+            merged.append({"surface": combined, "pos": "記号", "pos_sub1": "一般", "lemma": combined})
+            index = end
+            continue
+        merged.append(tokens[index])
+        index += 1
+    tokens[:] = merged
 
 
 def _is_emoji_cluster_component(char: str) -> bool:
@@ -275,6 +324,7 @@ def get_expected_tokens(text: str, suzume_tokens: list[dict] | None = None) -> t
     # Fix MeCab POS errors (before POS mapping)
     correct_mecab_pos(raw_tokens)
     _merge_emoji_clusters(raw_tokens)
+    _merge_kaomoji(raw_tokens)
     # Restore inflection boundaries the dictionary lexicalized away.  Runs here
     # because the decision needs the reading, which the merge pass drops.
     split_transparent_suru_te_adverb(raw_tokens)

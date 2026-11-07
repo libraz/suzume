@@ -688,8 +688,9 @@ def _merge_fixed_search_units(state: MergeState) -> bool:
             greeting = next((word for word in GREETING_INTERJECTIONS if remaining.startswith(word)), "")
             if greeting:
                 # A held final vowel is part of the greeting (おつかれー), as it is
-                # for the clipped forms below.
-                span = greeting + regex.match(r"[ー〜～]*", remaining[len(greeting) :]).group()
+                # for the clipped forms below. A wave dash is punctuation, which
+                # the tokenizer drops like any other symbol (ありがと〜).
+                span = greeting + regex.match(r"ー*", remaining[len(greeting) :]).group()
                 consumed, j = _consume_span(tokens, i, len(span))
                 if consumed == span:
                     result.append({"surface": span, "pos": "感動詞", "lemma": greeting})
@@ -704,7 +705,7 @@ def _merge_fixed_search_units(state: MergeState) -> bool:
         if not merged:
             clipped = clipped_greetings()
             clip = next((word for word in sorted(clipped, key=len, reverse=True) if remaining.startswith(word)), "")
-            span = clip + regex.match(r"[ー〜～]*っ?", remaining[len(clip) :]).group() if clip else ""
+            span = clip + regex.match(r"ー*っ?", remaining[len(clip) :]).group() if clip else ""
             after = remaining[len(span) : len(span) + 1]
             if clip and (
                 after == "" or after in _UTTERANCE_FINAL_PARTICLE_HEADS or regex.match(r"\p{Hiragana}", after) is None

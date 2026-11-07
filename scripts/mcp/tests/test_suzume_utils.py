@@ -271,6 +271,17 @@ class TestSurfaceIsNeverLost:
         assert tokens[0]["pos"] == "Other"
         assert rule == ""
 
+    @pytest.mark.parametrize("text", ["ありがと〜(*´∇｀*)", "(´・ω・｀)", "すごい(^^)", "テスト(ー_ー)"])
+    def test_kaomoji_is_removed_as_one_symbol(self, text):
+        tokens, _, _ = get_expected_tokens(text)
+        assert all("(" not in token["surface"] and "´" not in token["surface"] for token in tokens)
+        assert all(token["surface"] not in ("ω", "∇", "ー") for token in tokens)
+
+    @pytest.mark.parametrize(("text", "kept"), [("(笑)", "笑"), ("(2024)", "2024"), ("(α)", "α")])
+    def test_bracketed_text_is_not_a_kaomoji(self, text, kept):
+        tokens, _, _ = get_expected_tokens(text)
+        assert [token["surface"] for token in tokens] == [kept]
+
     def test_unknown_non_punctuation_symbol_is_retained_as_other(self):
         raw_symbol = [{"surface": "↯", "pos": "記号", "pos_sub1": "一般", "lemma": "↯"}]
         with patch("suzume_mcp.core.postprocessor_mecab.mecab_analyze", return_value=raw_symbol):

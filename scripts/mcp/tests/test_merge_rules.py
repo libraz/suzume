@@ -1408,6 +1408,12 @@ class TestClippedGreeting:
         result, _ = apply_suzume_merge(tokens, "ありがとー")
         assert result[0] == {"surface": "ありがとー", "pos": "感動詞", "lemma": "ありがとう"}
 
+    def test_leaves_a_wave_dash_to_the_symbol_filter(self):
+        tokens = [_tok("ありがと", pos="感動詞"), _tok("〜", pos="記号")]
+        result, _ = apply_suzume_merge(tokens, "ありがと〜")
+        assert result[0] == {"surface": "ありがと", "pos": "感動詞", "lemma": "ありがとう"}
+        assert result[1]["surface"] == "〜"
+
     def test_leaves_the_full_greeting_to_the_dictionary_reading(self):
         tokens = [_tok("おはよう", pos="感動詞")]
         result, rule = apply_suzume_merge(tokens, "おはよう")
