@@ -442,12 +442,15 @@ void resolveClosedPrenominalWords(std::vector<core::Morpheme>& result) {
 void resolveFunctionWordsFromLeftContext(std::vector<core::Morpheme>& result) {
   for (size_t idx = 0; idx < result.size(); ++idx) {
     auto& current = result[idx];
+    if (current.surface != "らしく") {
+      continue;
+    }
     const bool has_auxiliary_host =
         idx == 0 || result[idx - 1].pos == core::PartOfSpeech::Noun ||
         result[idx - 1].pos == core::PartOfSpeech::Verb || result[idx - 1].pos == core::PartOfSpeech::Adjective ||
         result[idx - 1].pos == core::PartOfSpeech::Auxiliary || result[idx - 1].pos == core::PartOfSpeech::Adverb ||
         result[idx - 1].pos == core::PartOfSpeech::Conjunction;
-    if (current.surface == "らしく" && has_auxiliary_host) {
+    if (has_auxiliary_host) {
       resolver::retag(current, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxConjectureRashii, "らしい",
                       dictionary::ConjugationType::IAdjective, grammar::ConjForm::Renyokei);
     }

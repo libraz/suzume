@@ -34,7 +34,6 @@ float scoreAdjectiveAndForm(float base, const InflectionScoreContext& context) {
       applyPenalty(base, GET_OPT(penalty_i_adj_verb_aux_pattern, inflection::kPenaltyIAdjVerbAuxPattern),
                    "i_adj_verb_aux_pattern");
       // Note: This penalty may be clamped by the floor at return.
-      // Additional penalty is applied in scorer.cpp for lattice cost.
     }
   }
 

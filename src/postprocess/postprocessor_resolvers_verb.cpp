@@ -5,7 +5,6 @@
 #include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
 #include "grammar/honorific_verbs.h"
-#include "grammar/inflection_scorer_constants.h"
 #include "normalize/char_type.h"
 #include "normalize/utf8.h"
 #include "postprocess/postprocessor.h"
@@ -381,9 +380,8 @@ void resolveClosedInflectionalChains(std::vector<core::Morpheme>& result) {
       retagContinuativeAsVerb(stem);
     }
     const bool accepts_past =
-        stem.extended_pos == core::ExtendedPOS::VerbRenyokei || stem.extended_pos == core::ExtendedPOS::VerbOnbinkei ||
-        stem.extended_pos == core::ExtendedPOS::AdjKatt || stem.extended_pos == core::ExtendedPOS::AuxNegativeNai ||
-        (stem.pos == core::PartOfSpeech::Particle && past_ta);
+        core::isVerbContinuativeForm(stem.extended_pos) || stem.extended_pos == core::ExtendedPOS::AdjKatt ||
+        stem.extended_pos == core::ExtendedPOS::AuxNegativeNai || (stem.pos == core::PartOfSpeech::Particle && past_ta);
     if (past_surface && accepts_past && past.extended_pos != core::ExtendedPOS::AuxTenseTa) {
       retagUninflected(past, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxTenseTa, past.surface);
     }
@@ -582,9 +580,9 @@ void resolveVerbTeParticle(std::vector<core::Morpheme>& result) {
   for (size_t idx = 1; idx < result.size(); ++idx) {
     const auto& verb = result[idx - 1];
     auto& te = result[idx];
-    const bool is_connective_verb_form =
-        verb.extended_pos == core::ExtendedPOS::VerbOnbinkei || verb.extended_pos == core::ExtendedPOS::VerbRenyokei ||
-        verb.extended_pos == core::ExtendedPOS::VerbTeForm || verb.extended_pos == core::ExtendedPOS::AuxAspectOku;
+    const bool is_connective_verb_form = core::isVerbContinuativeForm(verb.extended_pos) ||
+                                         verb.extended_pos == core::ExtendedPOS::VerbTeForm ||
+                                         verb.extended_pos == core::ExtendedPOS::AuxAspectOku;
     if (!is_connective_verb_form || !grammar::isTeDeSurface(te.surface)) {
       continue;
     }
@@ -782,13 +780,14 @@ void Postprocessor::convertPrefixVerbToNoun(std::vector<core::Morpheme>& morphem
     if (!utf8::equalsAny(prefix_surface, {"お", "ご", "御"})) {
       continue;
     }
+    // Hoisted without the Noun test: the first repair below retags the morpheme.
+    const bool native_prefix_with_next = !grammar::isSinoHonorificPrefix(prefix_surface) && idx + 1 < morphemes.size();
     // Restore a nominally homographic stem when a following humble or
     // honorific subsidiary supplies decisive verbal context:
     // お+知らせ+いたす, お+使い+いただく. This mirrors the preservation
     // rule below for stems that already reached the lattice as verbs. ご
     // takes a Sino-Japanese verbal noun instead (ご+あんない+いたす).
-    if (morpheme.pos == core::PartOfSpeech::Noun && !grammar::isSinoHonorificPrefix(prefix_surface) &&
-        idx + 1 < morphemes.size() &&
+    if (morpheme.pos == core::PartOfSpeech::Noun && native_prefix_with_next &&
         (grammar::isHumbleHonorificLemma(morphemes[idx + 1].lemma) ||
          grammar::isPotentialBenefactiveLemma(morphemes[idx + 1].lemma))) {
       const char32_t morpheme_last = utf8::decodeLastChar(morpheme.surface);
@@ -800,9 +799,9 @@ void Postprocessor::convertPrefixVerbToNoun(std::vector<core::Morpheme>& morphem
     }
     // ご prefixes a Sino-Japanese verbal noun (ご+あんない+し), which is
     // not a native continuative even when it ends in i/e.
-    if (morpheme.pos == core::PartOfSpeech::Noun && !grammar::isSinoHonorificPrefix(prefix_surface) &&
-        idx + 1 < morphemes.size() && morphemes[idx + 1].extended_pos == core::ExtendedPOS::VerbRenyokei &&
-        morphemes[idx + 1].surface == "し" && morphemes[idx + 1].lemma == "する") {
+    if (morpheme.pos == core::PartOfSpeech::Noun && native_prefix_with_next &&
+        morphemes[idx + 1].extended_pos == core::ExtendedPOS::VerbRenyokei && morphemes[idx + 1].surface == "し" &&
+        morphemes[idx + 1].lemma == "する") {
       resolver::retagContinuativeAsVerb(morpheme);
     }
     // A continuative after an honorific prefix is nominalized (お+願い), unless

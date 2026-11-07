@@ -282,7 +282,7 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(std::string_view rema
     // MeCab always splits these, so penalize single-token analysis
     // E.g., 知ってる → 知っ + てる, 食べてる → 食べ + てる
     if (utf8::endsWithAny(suffix_str, {"てる", "てた", "でる", "でた"})) {
-      candidate.confidence -= 0.8F;  // Strong penalty to prefer split
+      candidate.confidence -= inflection::kPenaltyContractedProgressiveEnding;  // Strong penalty to prefer split
       SUZUME_DEBUG_LOG_VERBOSE("  contracted_progressive_ending: -0.8\n");
     }
 
@@ -377,10 +377,10 @@ const std::vector<InflectionCandidate>& Inflection::analyze(std::string_view sur
       // Recursively analyze what's left (it should be a verb in base form)
       const auto& sub = analyze(remaining);
       for (const auto& cand : sub) {
-        if (cand.confidence >= 0.5F) {
+        if (cand.confidence >= inflection::kExplanatoryStemMinConfidence) {
           auto boosted = cand;
           // Boost confidence: explanatory suffix is a strong signal
-          boosted.confidence = std::max(cand.confidence, 0.8F);
+          boosted.confidence = std::max(cand.confidence, inflection::kExplanatoryStemConfidenceFloor);
           boosted.has_explanatory_suffix = true;
           candidates.push_back(std::move(boosted));
         }

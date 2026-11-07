@@ -167,11 +167,11 @@ src/grammar/dictionary_expansion.cpp	0	0	0
 src/grammar/dictionary_expansion.h	0	0	0
 src/grammar/honorific_verbs.cpp	0	0	0
 src/grammar/honorific_verbs.h	0	0	0
-src/grammar/inflection.cpp	0	5	0
+src/grammar/inflection.cpp	0	2	0
 src/grammar/inflection.h	0	3	0
 src/grammar/inflection_scorer.cpp	0	0	0
 src/grammar/inflection_scorer.h	0	2	0
-src/grammar/inflection_scorer_constants.h	0	86	0
+src/grammar/inflection_scorer_constants.h	0	89	0
 src/grammar/inflection_scorer_form_potential.cpp	0	0	0
 src/grammar/inflection_scorer_internal.h	0	1	0
 src/grammar/inflection_scorer_stem_godan.cpp	0	1	0

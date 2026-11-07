@@ -155,7 +155,7 @@ bool retagGodanRenyokeiFromIRow(core::Morpheme& stem, bool set_conj_form) {
 // quantity prefix (数/半/何) and the last is a counter kanji. MeCab tags 後 after such
 // a quantity as 名詞,接尾 (Suffix), whereas 後 after an ordinary noun (食事の後) stays a
 // plain noun.
-bool isCounterDurationNoun(const std::string& surface) {
+bool isCounterDurationNoun(std::string_view surface) {
   if (surface.empty()) {
     return false;
   }
@@ -164,11 +164,7 @@ bool isCounterDurationNoun(const std::string& surface) {
   if (!normalize::isNumeralCodepoint(first) && !normalize::isQuantityPrefixKanji(first)) {
     return false;
   }
-  char32_t last = first;
-  while (pos < surface.size()) {
-    last = normalize::decodeUtf8(surface, pos);
-  }
-  return normalize::isCounterKanji(last);
+  return normalize::isCounterKanji(utf8::decodeLastChar(surface));
 }
 
 // The negative auxiliary ない selects a verbal irrealis: a verb, a
@@ -403,8 +399,6 @@ void resolvePredicateCellLemmas(std::vector<core::Morpheme>& result) {
   }
 }
 
-namespace {
-
 // Split a Japanese-script @p head after @p head_codepoints characters, the tail
 // becoming a new morpheme after it.
 core::Morpheme splitTail(core::Morpheme& head, size_t head_codepoints) {
@@ -416,8 +410,6 @@ core::Morpheme splitTail(core::Morpheme& head, size_t head_codepoints) {
   tail.start = head.end;
   return tail;
 }
-
-}  // namespace
 
 // Readings the surrounding frame rules out, mirroring the reference repairs:
 // で+しか before a verb is the case particle; で+は before ござる is the copula;
@@ -555,6 +547,7 @@ void resolveVerbFrameRepairs(std::vector<core::Morpheme>& result) {
     const core::Morpheme* following = morphemeAfter(result, idx, 1);
     const core::Morpheme* after = morphemeAfter(result, idx, 2);
     const size_t length = normalize::utf8Length(token.surface);
+    std::pair<std::string, dictionary::ConjugationType> particle_verb;
     if (token.pos == core::PartOfSpeech::Adverb && utf8::endsWith(token.surface, "ず") && following != nullptr &&
         utf8::equalsAny(following->surface, {"に"}) && length >= 2) {
       const std::string base = godanBaseFromIrrealis(utf8::dropLastChar(token.surface));
@@ -566,8 +559,7 @@ void resolveVerbFrameRepairs(std::vector<core::Morpheme>& result) {
         insertAfter(result, idx, negative);
       }
     } else if (token.pos == core::PartOfSpeech::Verb &&
-               (utf8::startsWith(token.surface, "しそこな") || utf8::startsWith(token.surface, "しそこね") ||
-                utf8::startsWith(token.surface, "しそびれ"))) {
+               utf8::startsWithAny(token.surface, {"しそこな", "しそこね", "しそびれ"})) {
       const std::string lemma = token.lemma;
       core::Morpheme subsidiary = splitTail(token, 1);
       retag(token, core::PartOfSpeech::Verb, core::ExtendedPOS::VerbRenyokei, "する", dictionary::ConjugationType::Suru,
@@ -600,8 +592,8 @@ void resolveVerbFrameRepairs(std::vector<core::Morpheme>& result) {
       insertAfter(result, idx, te);
     } else if (token.pos == core::PartOfSpeech::Particle && utf8::startsWith(token.surface, "に") && length >= 3 &&
                following != nullptr && following->extended_pos == core::ExtendedPOS::AuxTenseMasu &&
-               !compoundParticleVerbLemma(token.surface).first.empty()) {
-      const auto [lemma, conj_type] = compoundParticleVerbLemma(token.surface);
+               !(particle_verb = compoundParticleVerbLemma(token.surface)).first.empty()) {
+      const auto& [lemma, conj_type] = particle_verb;
       core::Morpheme verb = splitTail(token, 1);
       retagUninflected(token, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleCase, "に");
       retag(verb, core::PartOfSpeech::Verb, core::ExtendedPOS::VerbRenyokei, lemma, conj_type,

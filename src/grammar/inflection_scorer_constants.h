@@ -359,6 +359,15 @@ constexpr float kPenaltyIchidanSingleKanjiOnbinInvalid = scale::kSevere;
 // Apply penalty to prefer split path over unified verb analysis
 constexpr float kPenaltyIchidanContractedProgressivePast = scale::kSevere;  // 0.60F
 
+// Penalty for a single-token contracted progressive ending (てる/てた/でる/でた) on any verb type
+constexpr float kPenaltyContractedProgressiveEnding = 0.8F;
+
+// Explanatory-suffix (んだ/のだ/...) stem analyses below this confidence are not boosted
+constexpr float kExplanatoryStemMinConfidence = 0.5F;
+
+// Confidence floor given to a stem analysis followed by an explanatory suffix
+constexpr float kExplanatoryStemConfidenceFloor = 0.8F;
+
 // Particle + な stem pattern for GodanWa (もな, はな, etc.)
 // These are likely PARTICLE + ない misparse
 constexpr float kPenaltyGodanWaParticleNaStem = scale::kStrong;

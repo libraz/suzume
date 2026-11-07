@@ -1,8 +1,6 @@
 #include "postprocess/lemmatizer.h"
 
 #include "core/utf8_constants.h"
-#include "grammar/char_patterns.h"
-#include "grammar/inflection_scorer_constants.h"
 #include "normalize/char_type.h"
 #include "normalize/utf8.h"
 #include "postprocess/lemmatizer_internal.h"
@@ -147,19 +145,15 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
     case core::PartOfSpeech::Pronoun:
     case core::PartOfSpeech::Particle:
     case core::PartOfSpeech::Auxiliary:
-    case core::PartOfSpeech::Conjunction:
-    case core::PartOfSpeech::Adverb: {
+    case core::PartOfSpeech::Conjunction: {
       // Tari-adjective adverbs: remove trailing と from lemma (颯爽と → 颯爽, 堂々と → 堂々).
-      // For Adverb this call is a no-op — an Adverb surface was already run through
-      // fixTariAdverb at the top of lemmatize() and returned there if it matched, so
-      // by here it never matches. It is retained (not narrowed) because this case
-      // also covers Noun/Pronoun/Particle/Auxiliary/Conjunction, which do NOT hit
-      // that early path and legitimately need the correction.
       if (std::string tari_stem = fixTariAdverb(morpheme.surface); !tari_stem.empty()) {
         return tari_stem;
       }
       return morpheme.surface;
     }
+    case core::PartOfSpeech::Adverb:
+      // fixTariAdverb already ran for Adverb at the top of lemmatize().
     case core::PartOfSpeech::Suffix:
     case core::PartOfSpeech::Symbol:
     case core::PartOfSpeech::Other:

@@ -28,8 +28,10 @@ inline const core::Morpheme* morphemeAfter(const std::vector<core::Morpheme>& re
   return idx + offset < result.size() ? &result[idx + offset] : nullptr;
 }
 
+/// Split a Japanese-script @p head after @p head_codepoints characters; returns the tail as a new morpheme.
+core::Morpheme splitTail(core::Morpheme& head, size_t head_codepoints);
 bool isCompoundRenyokeiShape(const std::string& surface);
-bool isCounterDurationNoun(const std::string& surface);
+bool isCounterDurationNoun(std::string_view surface);
 bool followsTeFormConnective(const core::Morpheme& morpheme);
 bool isVerbalPredicateBeforeSou(const core::Morpheme& morpheme);
 bool isNominalForcingParticle(const core::Morpheme& next);

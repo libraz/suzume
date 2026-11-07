@@ -12,6 +12,9 @@ namespace suzume::postprocess::resolver {
 
 namespace {
 
+constexpr std::string_view kAruForms[] = {"ある", "あり", "あろ", "あれ"};
+constexpr std::string_view kGozaruForms[] = {"ござい", "ござる"};
+
 bool followsAttributiveModifier(const std::vector<core::Morpheme>& result, size_t idx) {
   if (idx == 0) {
     return false;
@@ -82,8 +85,7 @@ void resolveAttributiveDeverbalNoun(std::vector<core::Morpheme>& result,
       continue;
     }
     const bool deverbal_noun_shape =
-        head.pos == core::PartOfSpeech::Verb &&
-        (head.extended_pos == core::ExtendedPOS::VerbRenyokei || head.extended_pos == core::ExtendedPOS::VerbOnbinkei);
+        head.pos == core::PartOfSpeech::Verb && core::isVerbContinuativeForm(head.extended_pos);
     if (deverbal_noun_shape) {
       retagNounSurface(head);
       continue;
@@ -169,7 +171,7 @@ void resolveNominalCaseDe(std::vector<core::Morpheme>& result) {
     }
     core::Morpheme* successor = idx + 1 < result.size() ? &result[idx + 1] : nullptr;
     if (idx == 0) {
-      if (successor != nullptr && utf8::equalsAny(successor->surface, {"ござい", "ござる"})) {
+      if (successor != nullptr && utf8::equalsAny(successor->surface, kGozaruForms)) {
         retagCopulaDa(de);
       }
       continue;
@@ -211,7 +213,7 @@ void resolveNominalCaseDe(std::vector<core::Morpheme>& result) {
         successor != nullptr && successor->extended_pos == core::ExtendedPOS::ParticleTopic &&
         ((successor->surface == "は" && idx + 2 < result.size() &&
           (utf8::equalsAny(result[idx + 2].surface, {"ない", "なく", "なかっ", "なかろ"}) ||
-           (is_na_adjective && (utf8::equalsAny(result[idx + 2].surface, {"ござい", "ござる"}) ||
+           (is_na_adjective && (utf8::equalsAny(result[idx + 2].surface, kGozaruForms) ||
                                 result[idx + 2].extended_pos == core::ExtendedPOS::AuxGozaru)))) ||
          (successor->surface == "も" &&
           (((is_na_adjective || is_formal_noun || is_nominalized_clause) && idx + 2 < result.size() &&
@@ -219,7 +221,7 @@ void resolveNominalCaseDe(std::vector<core::Morpheme>& result) {
            is_adverbial_predicate)));
     const bool topic_starts_copular_aru =
         successor != nullptr && successor->extended_pos == core::ExtendedPOS::ParticleTopic &&
-        idx + 2 < result.size() && utf8::equalsAny(result[idx + 2].surface, {"ある", "あり", "あろ", "あれ"});
+        idx + 2 < result.size() && utf8::equalsAny(result[idx + 2].surface, kAruForms);
     const bool binding_is_copular = successor != nullptr &&
                                     successor->extended_pos == core::ExtendedPOS::ParticleBinding &&
                                     (successor->surface != "も" || is_adverbial_predicate);
@@ -229,7 +231,7 @@ void resolveNominalCaseDe(std::vector<core::Morpheme>& result) {
          topic_starts_copular_aru || binding_is_copular ||
          (successor->extended_pos == core::ExtendedPOS::AuxCopulaDa && successor->surface != "あっ") ||
          ((is_na_adjective || is_nominalized_clause) && successor->surface == "あっ") ||
-         utf8::equalsAny(successor->surface, {"ある", "あり", "あろ", "あれ", "ござい", "ござる"}));
+         utf8::equalsAny(successor->surface, kAruForms) || utf8::equalsAny(successor->surface, kGozaruForms));
     const bool na_adjective_coordination =
         is_na_adjective && successor != nullptr && successor->extended_pos == core::ExtendedPOS::AdjBasic;
     // A na-adjective cannot take the case-particle reading of で. Its
@@ -539,13 +541,8 @@ void splitFormalNounCopularDemo(std::vector<core::Morpheme>& result) {
       continue;
     }
 
-    core::Morpheme focus = copula;
-    copula.surface = "で";
-    copula.end = copula.start + 1;
+    core::Morpheme focus = splitTail(copula, 1);
     retagCopulaDa(copula);
-
-    focus.surface = "も";
-    focus.start = copula.end;
     retagUninflected(focus, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleTopic, "も");
     insertAfter(result, idx, focus);
     ++idx;
