@@ -292,18 +292,19 @@ std::vector<core::Morpheme> Postprocessor::filterMorphemes(std::vector<core::Mor
 }
 
 std::vector<core::Morpheme> Postprocessor::mergeVerbRenyokeiMono(std::vector<core::Morpheme> morphemes) {
-  // VERB + もの(formal noun) → compound NOUN
-  // e.g., 食べ+もの → 食べもの, 飲み+もの → 飲みもの, 乗り+もの → 乗りもの.
+  // VERB + もの/物 (formal noun) → compound NOUN
+  // e.g., 食べ+もの → 食べもの, 飲み+もの → 飲みもの, 忘れ+物 → 忘れ物.
   // The formal noun takes an attributive modifier, never a continuative or a
   // bare noun, so a kana continuative or kana noun in front of it is the first
-  // member of the compound as well (たて+もの, のり+もの).
+  // member of the compound as well (たて+もの, のり+もの). Both spellings share
+  // the lemma, so the kanji one is matched the same way.
   return mergeAdjacentPairs(
       std::move(morphemes),
       [](const std::vector<core::Morpheme>& /*merged_so_far*/, const core::Morpheme& verb, const core::Morpheme& mono) {
         const bool continuative = verb.pos == core::PartOfSpeech::Verb && verb.conj_form == grammar::ConjForm::Renyokei;
         const bool kana_nominal = verb.pos == core::PartOfSpeech::Noun && !verb.isFormalNoun() &&
                                   normalize::utf8Length(verb.surface) >= 2 && grammar::isPureHiragana(verb.surface);
-        return (continuative || kana_nominal) && mono.surface == "もの" && mono.isFormalNoun() &&
+        return (continuative || kana_nominal) && mono.getLemma() == "もの" && mono.isFormalNoun() &&
                verb.end == mono.start;
       },
       [](core::Morpheme& merged, [[maybe_unused]] const core::Morpheme& verb, const core::Morpheme& /*mono*/) {

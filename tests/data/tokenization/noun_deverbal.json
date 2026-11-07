@@ -1724,6 +1724,107 @@
       ],
       "id": "mashiga_ru",
       "input": "目覚ましが鳴る。"
+    },
+    {
+      "description": "Continuative + kanji formal noun 物 before bare ない stays one compound noun",
+      "expected": [
+        {
+          "lemma": "忘れ物",
+          "pos": "Noun",
+          "surface": "忘れ物"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "確認",
+          "pos": "Noun",
+          "surface": "確認"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        }
+      ],
+      "id": "re_naika_shitene",
+      "input": "忘れ物ないか確認してね"
+    },
+    {
+      "description": "Continuative + kanji 物 compound before bare ない",
+      "expected": [
+        {
+          "lemma": "食べ物",
+          "pos": "Noun",
+          "surface": "食べ物"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        }
+      ],
+      "id": "be_naikana",
+      "input": "食べ物ないかな"
+    },
+    {
+      "description": "Unlisted continuative + kanji 物 compound before bare ない",
+      "expected": [
+        {
+          "lemma": "落とし物",
+          "pos": "Noun",
+          "surface": "落とし物"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "探す",
+          "pos": "Verb",
+          "surface": "探し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "toshi_naika_shita",
+      "input": "落とし物ないか探した"
     }
   ],
   "description": "noun_deverbal tests",
