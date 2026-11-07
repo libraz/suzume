@@ -1947,6 +1947,60 @@
       ],
       "id": "no_be",
       "input": "警察の調べ"
+    },
+    {
+      "description": "a fabricated nominalization may not open inside a listed verb cell",
+      "expected": [
+        {
+          "lemma": "にぎわい",
+          "pos": "Noun",
+          "surface": "にぎわい"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "見せる",
+          "pos": "Verb",
+          "surface": "見せ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "nigiwaiwo_sete",
+      "input": "にぎわいを見せて"
+    },
+    {
+      "description": "にぎわいが戻った - auto-generated",
+      "expected": [
+        {
+          "lemma": "にぎわい",
+          "pos": "Noun",
+          "surface": "にぎわい"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "戻る",
+          "pos": "Verb",
+          "surface": "戻っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "nigiwaiga_ttta",
+      "input": "にぎわいが戻った"
     }
   ],
   "description": "noun_deverbal tests",
