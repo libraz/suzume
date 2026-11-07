@@ -123,16 +123,14 @@ void appendIchidanStemRareCandidates(const std::vector<char32_t>& codepoints, si
   }
 }
 
-// Generate single-kanji Ichidan verb candidates for auxiliary patterns
-// E.g., 寝ます → 寝(VERB) + ます(AUX), 見ます → 見(VERB) + ます(AUX)
-// Covers polite ます / negative ない, た/て, colloquial contractions,
-// られる, volitional, and causative auxiliary attachments.
-void appendSingleKanjiIchidanCandidates(const std::vector<char32_t>& codepoints, size_t start_pos, size_t kanji_end,
-                                        size_t hiragana_end, const dictionary::DictionaryManager* dict_manager,
-                                        std::vector<UnknownCandidate>& candidates) {
-  // A one-kanji Ichidan renyokei may be followed directly by a kanji-leading
-  // closed-class auxiliary (見+損なう, 見+得る). Normal hiragana logic cannot
-  // emit the stem here because the adjacent kanji extends the initial run.
+namespace {
+
+// A one-kanji Ichidan renyokei may be followed directly by a kanji-leading
+// closed-class auxiliary (見+損なう, 見+得る). Normal hiragana logic cannot
+// emit the stem here because the adjacent kanji extends the initial run.
+void appendSingleKanjiBeforeKanjiAuxiliary(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                           const dictionary::DictionaryManager* dict_manager,
+                                           std::vector<UnknownCandidate>& candidates) {
   const size_t single_kanji_end = start_pos + 1;
   if (single_kanji_end < codepoints.size() && vh::isSingleKanjiIchidan(codepoints[start_pos]) &&
       normalize::isKanjiCodepoint(codepoints[single_kanji_end])) {
@@ -155,6 +153,281 @@ void appendSingleKanjiIchidanCandidates(const std::vector<char32_t>& codepoints,
       break;
     }
   }
+}
+
+// 来る is irregular rather than ichidan, but its irrealis is written as
+// the bare kanji all the same, so every auxiliary that selects that cell
+// sits directly on it. One emitter holds the reading; the environments
+// below only say where it applies, which is what keeps a newly covered
+// auxiliary from arriving as another copy of the same candidate.
+void appendKuruKanjiIrrealisCandidates(const std::vector<char32_t>& codepoints, size_t start_pos, size_t kanji_end,
+                                       char32_t kanji_char, char32_t h1, char32_t h2, bool classical_negative_follows,
+                                       std::vector<UnknownCandidate>& candidates) {
+  const auto emit_kuru_irrealis = [&](size_t end_pos, float cost, const char* origin) {
+    candidates.push_back(makeVerbCandidate(codepoints, start_pos, end_pos, cost, grammar::kuruBaseFormOf(kanji_char),
+                                           dictionary::ConjugationType::Kuru, true, CandidateOrigin::VerbKanji,
+                                           candidate::kHighOriginConfidence, origin, core::ExtendedPOS::VerbMizenkei));
+  };
+  // The literary volitional ん is a euphonic form of む, but it is also how
+  // the negative contracts, so it is admitted only where the quotative と
+  // resolves that (来んとする).
+  if (h1 == U'ん' && h2 == U'と') {
+    emit_kuru_irrealis(kanji_end, candidate::verb_cost::kStandardBonus, "kuru_literary_volitional_n");
+  }
+  // The classical volitional itself has no such competitor and needs no
+  // gate beyond its own mora (来む, 人来むや).
+  if (h1 == U'む') {
+    emit_kuru_irrealis(kanji_end, candidate::verb_cost::kStandardBonus, "kuru_classical_volitional_mu");
+  }
+  if (classical_negative_follows) {
+    emit_kuru_irrealis(kanji_end, candidate::verb_cost::kStandardBonus, "kuru_classical_negative");
+  }
+  // The ない family selects the same cell, the conditional included
+  // (来+なけれ+ば).
+  if (vh::naiConditionalFollowsAt(codepoints, kanji_end)) {
+    emit_kuru_irrealis(kanji_end, candidate::verb_cost::kSingleKanjiNegativeConditionalBonus, "kuru_negative_nai");
+  }
+  // The modern volitional is the one member that writes part of the stem in
+  // kana, so its span reaches past よ to leave う as the auxiliary (来よ+う).
+  if (h1 == U'よ' && h2 == U'う') {
+    emit_kuru_irrealis(kanji_end + 1, candidate::verb_cost::kStrongBonus, "kuru_modern_volitional");
+  }
+}
+
+// Bare-stem readings of a one-kanji Ichidan verb in front of its auxiliaries
+// (見ました, 寝ない, 見て, 見られる, 見させる).
+void appendSingleKanjiIchidanStemCandidates(const std::vector<char32_t>& codepoints, size_t start_pos, size_t kanji_end,
+                                            size_t hiragana_end, const dictionary::DictionaryManager* dict_manager,
+                                            char32_t h1, char32_t h2, bool classical_negative_follows,
+                                            std::vector<UnknownCandidate>& candidates) {
+  // Check if followed by a polite ます-family auxiliary or negative auxiliary.
+  // The ます family (ます/まし(た)/ませ(ん)/ましょ(う)) attaches only to a verb
+  // renyokei, so the bare-kanji ichidan renyokei reading is licensed here
+  // (見ました → 見+まし+た). Godan-sa homographs are unaffected: their
+  // renyokei inserts し before the auxiliary (出しました), so the kanji is
+  // never immediately followed by ま in that reading.
+  using namespace suzume::core::hiragana;
+  bool is_polite_aux = vh::masuAuxFollowsAt(codepoints, kanji_end);
+  // Modern ichidan volitional keeps the y-row stem and the auxiliary
+  // boundary (見よ+う, 来よ+う).  The bare kanji is the renyokei/mizenkei
+  // spelling in other cells, but emitting it here would let formal noun
+  // よう absorb the stem.
+  bool is_modern_volitional = h1 == U'よ' && vh::volitionalEndingFollowsAt(codepoints, kanji_end + 1);
+  // Negative auxiliary ない and its conjugations:
+  // ない (終止/連体), なく (連用), なかっ (た接続), なけれ (仮定), なきゃ (口語縮約仮定)
+  bool is_negative_aux = vh::naiNegativeFollowsAt(codepoints, kanji_end);
+  bool is_negative_conditional = vh::naiConditionalFollowsAt(codepoints, kanji_end);
+  // The classical negative auxiliary (classical_negative_follows) attaches
+  // to the ichidan mizenkei, the bare stem: 見ぬ人, 見ざるを得ない, 見ずに.
+  // The literary volitional ん is distinct from the contracted negative
+  // when the quotative particle follows (見んとする, 寝んとする).
+  bool is_literary_volitional_n = (h1 == U'ん' && h2 == kTo);
+  // Classical む attaches to the same bare ichidan stem (見む, 寝む).
+  bool is_classical_volitional_mu = (h1 == U'む');
+  std::string following_hiragana = extractSubstring(codepoints, kanji_end, hiragana_end);
+  // Classical desiderative まほしき also follows a bare ichidan renyokei.
+  bool is_classical_desiderative = grammar::startsClassicalDesiderativeSequence(following_hiragana);
+  // The classical past-conjectural auxiliary attaches to the same bare
+  // continuative as the classical past does (見けむ, 寝けむ).
+  bool is_classical_conjectural = grammar::startsClassicalConjecturalAuxiliary(following_hiragana);
+  // The classical negative-conjectural auxiliary attaches to the bare
+  // irrealis stem in its attributive form as well (見まじき姿).
+  const auto* classical_negative_mai = dict_manager->lookupExact(following_hiragana, core::PartOfSpeech::Auxiliary);
+  bool is_classical_negative_mai =
+      classical_negative_mai != nullptr && classical_negative_mai->extended_pos == core::ExtendedPOS::AuxNegativeMai;
+
+  // A conjunctive particle licenses the bare renyokei of a one-kanji
+  // ichidan verb just as て and ます do.  Resolve this from the particle
+  // inventory rather than by surface so every closed-class conjunctive
+  // continuation shares the same grammar gate.
+  bool is_conjunctive_particle = false;
+  bool is_classical_past_aux = false;
+  bool is_honorific_aux = false;
+  // The plain classical past き selects the same bare continuative as けり
+  // (山|見|き). Unlike けり it is a single i-row mora, which after a kanji
+  // is also how a ka-row godan verb spells its own continuative. The stem
+  // is already one of the ichidan verbs this branch knows, so the only
+  // thing left to rule out is that homograph: 着き belongs to 着く and not
+  // to 着る, while 見, 寝 and the rest have no ka-row counterpart.
+  const bool has_godan_ka_competitor =
+      dict_manager->lookupExact(extractSubstring(codepoints, start_pos, kanji_end) + "く", core::PartOfSpeech::Verb) !=
+      nullptr;
+  constexpr size_t kMaxConjunctiveParticleLength = 4;
+  const size_t max_particle_end = lookaheadEnd(codepoints.size(), kanji_end, kMaxConjunctiveParticleLength);
+  for (size_t particle_end = kanji_end + 1; particle_end <= max_particle_end; ++particle_end) {
+    const std::string particle_surface = extractSubstring(codepoints, kanji_end, particle_end);
+    const auto* particle = dict_manager->lookupExact(particle_surface, core::PartOfSpeech::Particle);
+    if (particle != nullptr && particle->extended_pos == core::ExtendedPOS::ParticleConj) {
+      is_conjunctive_particle = true;
+    }
+    const auto* auxiliary = dict_manager->lookupExact(particle_surface, core::PartOfSpeech::Auxiliary);
+    // The perfect selects the same bare continuative that the past けり does
+    // (見つ, 経つ). Two conditions keep it off the stems of ordinary words:
+    // an i-row opening mora is excluded, because directly after a kanji it
+    // spells the stem's own continuative okurigana (居り, 祭り) — exactly
+    // where the izenkei-attaching perfect り would sit; and the auxiliary
+    // must be able to end the clause where it does, or 見つける would open
+    // with a perfect too.
+    const bool continuative_perfect = auxiliary != nullptr &&
+                                      auxiliary->extended_pos == core::ExtendedPOS::AuxClassicalPerfect &&
+                                      !kana::isIRowCodepoint(h1) &&
+                                      vh::classicalPastEnvironmentFollows(*dict_manager, codepoints, particle_end,
+                                                                          /*is_izenkei=*/false);
+    // The plain classical past き is terminal, so it also has to be able to close the
+    // clause where it sits — otherwise 着きます would open with one.
+    const bool continuative_past_ki =
+        auxiliary != nullptr && !has_godan_ka_competitor &&
+        auxiliary->extended_pos == core::ExtendedPOS::AuxClassicalKi &&
+        vh::classicalPastEnvironmentFollows(*dict_manager, codepoints, particle_end, /*is_izenkei=*/false);
+    if (continuative_perfect || continuative_past_ki ||
+        (auxiliary != nullptr && auxiliary->extended_pos == core::ExtendedPOS::AuxClassicalKeri)) {
+      is_classical_past_aux = true;
+    }
+    // The honorific subsidiaries sit on the same continuative (寝+なさい,
+    // 見+たまえ), and so does the pejorative やがる (見+やがって); their
+    // one-mora classical pieces (ま, ふ) do not open here.
+    if (auxiliary != nullptr &&
+        (auxiliary->extended_pos == core::ExtendedPOS::AuxHonorific ||
+         auxiliary->extended_pos == core::ExtendedPOS::AuxPejorativeYagaru) &&
+        particle_end - kanji_end >= 2) {
+      is_honorific_aux = true;
+    }
+    if (is_conjunctive_particle && is_classical_past_aux) {
+      break;
+    }
+  }
+
+  // An adjective that attaches to the continuative (見+にくい, 寝+やすい)
+  // licenses the bare stem the same way.
+  const bool is_renyokei_adjective = renyokeiAdjectiveFollowsAt(dict_manager, codepoints, kanji_end);
+
+  if (is_polite_aux || is_negative_aux || classical_negative_follows || is_literary_volitional_n ||
+      is_classical_volitional_mu || is_classical_desiderative || is_classical_negative_mai || is_conjunctive_particle ||
+      is_classical_past_aux || is_classical_conjectural || is_honorific_aux || is_renyokei_adjective) {
+    std::string surface = extractSubstring(codepoints, start_pos, kanji_end);
+    // A one-kanji stem followed by して can instead be the continuative
+    // form of a dictionary-confirmed Godan-sa verb. Keep that lexical
+    // inflection ahead of an unsupported Ichidan plus suru analysis.
+    const bool has_godan_sa_te_competitor =
+        h1 == U'し' && h2 == kTe && dict_manager->lookupExact(surface + "す", core::PartOfSpeech::Verb) != nullptr;
+    if (!has_godan_sa_te_competitor) {
+      std::string base_form = surface + "る";
+      const float candidate_cost = is_negative_conditional ? candidate::verb_cost::kSingleKanjiNegativeConditionalBonus
+                                                           : candidate::verb_cost::kStandardBonus;
+      SUZUME_DEBUG_VERBOSE_BLOCK {
+        SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface << " single_kanji_ichidan_polite lemma=" << base_form
+                            << " cost=" << candidate_cost << "\n";
+      }
+      candidates.push_back(makeVerbCandidate(
+          surface, start_pos, kanji_end, candidate_cost, base_form,
+          grammar::verbTypeToConjType(grammar::VerbType::Ichidan), true, CandidateOrigin::VerbKanji,
+          candidate::kHighOriginConfidence,
+          (is_literary_volitional_n || is_classical_volitional_mu) ? "single_kanji_ichidan_literary_volitional"
+          : is_classical_desiderative                              ? "single_kanji_ichidan_classical_desiderative"
+                                                                   : "single_kanji_ichidan_polite",
+          (is_negative_conditional || is_literary_volitional_n || is_classical_volitional_mu ||
+           is_classical_negative_mai)
+              ? core::ExtendedPOS::VerbMizenkei
+          : (is_conjunctive_particle || is_classical_past_aux || is_classical_conjectural || is_honorific_aux)
+              ? core::ExtendedPOS::VerbRenyokei
+              : core::ExtendedPOS::Unknown));
+    }
+  }
+
+  if (is_modern_volitional) {
+    const std::string base_form = extractSubstring(codepoints, start_pos, kanji_end) + "る";
+    candidates.push_back(makeVerbCandidate(codepoints, start_pos, kanji_end + 1, candidate::verb_cost::kStrongBonus,
+                                           base_form, dictionary::ConjugationType::Ichidan, true,
+                                           CandidateOrigin::VerbKanji, candidate::kHighOriginConfidence,
+                                           "single_kanji_ichidan_volitional", core::ExtendedPOS::VerbMizenkei));
+  }
+
+  // Each auxiliary below attaches directly to the bare stem, so one emitter
+  // holds the reading and the environments only say where it applies.
+  const auto emit_bare_stem = [&](const char* pattern, core::ExtendedPOS extended_pos) {
+    const std::string surface = extractSubstring(codepoints, start_pos, kanji_end);
+    const std::string base_form = surface + "る";
+    constexpr float kCost = candidate::verb_cost::kStrongBonus;
+    SUZUME_DEBUG_VERBOSE_BLOCK {
+      SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface << " " << pattern << " lemma=" << base_form << " cost=" << kCost
+                          << "\n";
+    }
+    candidates.push_back(makeVerbCandidate(surface, start_pos, kanji_end, kCost, base_form,
+                                           dictionary::ConjugationType::Ichidan, true, CandidateOrigin::VerbKanji,
+                                           candidate::kHighOriginConfidence, pattern, extended_pos));
+  };
+
+  // た and て (寝+た, 見+て); the strong bonus beats the unified dictionary entry.
+  if (h1 == kTa || h1 == kTe) {
+    emit_bare_stem("single_kanji_ichidan_ta_te", core::ExtendedPOS::Unknown);
+  }
+
+  // Colloquial contractions: と → とく/といた (見とく = 見ておく),
+  // ち → ちゃう/ちゃった (見ちゃう = 見てしまう).
+  if (h1 == kTo || h1 == kChi) {
+    emit_bare_stem("single_kanji_ichidan_colloquial", core::ExtendedPOS::Unknown);
+  }
+
+  // The failure subsidiary そびれる attaches directly to the bare
+  // renyokei of single-kanji ichidan verbs (見そびれる, 寝そびれる).
+  // License that stem only for the closed auxiliary onset, so ordinary
+  // noun-plus-hiragana sequences are unaffected.
+  if (h1 == U'そ' && h2 == U'び' && kanji_end + 2 < codepoints.size() && codepoints[kanji_end + 2] == U'れ') {
+    emit_bare_stem("single_kanji_ichidan_sobireru", core::ExtendedPOS::Unknown);
+  }
+
+  // The ら-less potential contracted before the negative (寝+らん+ない).
+  if (h1 == kRa && h2 == U'ん' &&
+      (vh::naiNegativeFollowsAt(codepoints, kanji_end + 2) ||
+       vh::colloquialNegativeFollowsAt(codepoints, kanji_end + 2))) {
+    emit_bare_stem("single_kanji_ichidan_ranuki_negative", core::ExtendedPOS::VerbMizenkei);
+  }
+
+  // The ichidan passive/potential is られる, not れる (見+られる, 寝+られる).
+  if (h1 == kRa && h2 == kRe) {
+    emit_bare_stem("single_kanji_ichidan_rareru", core::ExtendedPOS::Unknown);
+  }
+
+  // Handle both volitional and literary-imperative forms for single-kanji
+  // Ichidan verbs: 見よ+う and 見よ.
+  if (h1 == kYo) {
+    const bool is_volitional = vh::volitionalEndingFollowsAt(codepoints, kanji_end + 1);
+    std::string surface = extractSubstring(codepoints, start_pos, kanji_end + 1);
+    std::string base_form = extractSubstring(codepoints, start_pos, kanji_end) + "る";
+    constexpr float kCost = candidate::verb_cost::kStrongBonus;  // Strong bonus to beat compound interpretation
+    SUZUME_DEBUG_VERBOSE_BLOCK {
+      SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
+                          << (is_volitional ? " single_kanji_ichidan_volitional lemma="
+                                            : " single_kanji_ichidan_imperative lemma=")
+                          << base_form << " cost=" << kCost << "\n";
+    }
+    candidates.push_back(makeVerbCandidate(
+        surface, start_pos, kanji_end + 1, kCost, base_form, grammar::verbTypeToConjType(grammar::VerbType::Ichidan),
+        true, CandidateOrigin::VerbKanji, candidate::kHighOriginConfidence,
+        is_volitional ? "single_kanji_ichidan_volitional" : "single_kanji_ichidan_imperative",
+        is_volitional ? core::ExtendedPOS::VerbMizenkei : core::ExtendedPOS::VerbMeireikei));
+  }
+
+  // Causative させ (見+させる, 見+させ+られ+た), not 見さ+せる like godan-sa.
+  // A Sino-Japanese verbal noun takes the same させ through する's own
+  // irrealis (提出+さ+せる), and a kanji run with no boundary in front of it
+  // is that noun. Carving its last character out as an Ichidan verb splits
+  // the word and leaves 提 with no reading.
+  if (h1 == kSa && h2 == kSe && !vh::startsInsideKanjiRun(codepoints, start_pos)) {
+    emit_bare_stem("single_kanji_ichidan_causative", core::ExtendedPOS::VerbMizenkei);
+  }
+}
+
+}  // namespace
+
+// Generate single-kanji Ichidan verb candidates for auxiliary patterns
+// E.g., 寝ます → 寝(VERB) + ます(AUX), 見ます → 見(VERB) + ます(AUX)
+// Covers polite ます / negative ない, た/て, colloquial contractions,
+// られる, volitional, and causative auxiliary attachments.
+void appendSingleKanjiIchidanCandidates(const std::vector<char32_t>& codepoints, size_t start_pos, size_t kanji_end,
+                                        size_t hiragana_end, const dictionary::DictionaryManager* dict_manager,
+                                        std::vector<UnknownCandidate>& candidates) {
+  appendSingleKanjiBeforeKanjiAuxiliary(codepoints, start_pos, dict_manager, candidates);
 
   if (kanji_end == start_pos + 1 && hiragana_end > kanji_end) {
     char32_t kanji_char = codepoints[start_pos];
@@ -172,263 +445,13 @@ void appendSingleKanjiIchidanCandidates(const std::vector<char32_t>& codepoints,
     const char32_t h2 = (kanji_end + 1 < codepoints.size()) ? codepoints[kanji_end + 1] : U'\0';
 
     if (grammar::isKuruKanjiStem(kanji_char)) {
-      // 来る is irregular rather than ichidan, but its irrealis is written as
-      // the bare kanji all the same, so every auxiliary that selects that cell
-      // sits directly on it. One emitter holds the reading; the environments
-      // below only say where it applies, which is what keeps a newly covered
-      // auxiliary from arriving as another copy of the same candidate.
-      const auto emit_kuru_irrealis = [&](size_t end_pos, float cost, const char* origin) {
-        candidates.push_back(makeVerbCandidate(codepoints, start_pos, end_pos, cost,
-                                               grammar::kuruBaseFormOf(kanji_char), dictionary::ConjugationType::Kuru,
-                                               true, CandidateOrigin::VerbKanji, candidate::kHighOriginConfidence,
-                                               origin, core::ExtendedPOS::VerbMizenkei));
-      };
-      // The literary volitional ん is a euphonic form of む, but it is also how
-      // the negative contracts, so it is admitted only where the quotative と
-      // resolves that (来んとする).
-      if (h1 == U'ん' && h2 == U'と') {
-        emit_kuru_irrealis(kanji_end, candidate::verb_cost::kStandardBonus, "kuru_literary_volitional_n");
-      }
-      // The classical volitional itself has no such competitor and needs no
-      // gate beyond its own mora (来む, 人来むや).
-      if (h1 == U'む') {
-        emit_kuru_irrealis(kanji_end, candidate::verb_cost::kStandardBonus, "kuru_classical_volitional_mu");
-      }
-      if (classical_negative_follows) {
-        emit_kuru_irrealis(kanji_end, candidate::verb_cost::kStandardBonus, "kuru_classical_negative");
-      }
-      // The ない family selects the same cell, the conditional included
-      // (来+なけれ+ば).
-      if (vh::naiConditionalFollowsAt(codepoints, kanji_end)) {
-        emit_kuru_irrealis(kanji_end, candidate::verb_cost::kSingleKanjiNegativeConditionalBonus, "kuru_negative_nai");
-      }
-      // The modern volitional is the one member that writes part of the stem in
-      // kana, so its span reaches past よ to leave う as the auxiliary (来よ+う).
-      if (h1 == U'よ' && h2 == U'う') {
-        emit_kuru_irrealis(kanji_end + 1, candidate::verb_cost::kStrongBonus, "kuru_modern_volitional");
-      }
+      appendKuruKanjiIrrealisCandidates(codepoints, start_pos, kanji_end, kanji_char, h1, h2,
+                                        classical_negative_follows, candidates);
     }
 
     if (vh::isSingleKanjiIchidan(kanji_char)) {
-      // Check if followed by a polite ます-family auxiliary or negative auxiliary.
-      // The ます family (ます/まし(た)/ませ(ん)/ましょ(う)) attaches only to a verb
-      // renyokei, so the bare-kanji ichidan renyokei reading is licensed here
-      // (見ました → 見+まし+た). Godan-sa homographs are unaffected: their
-      // renyokei inserts し before the auxiliary (出しました), so the kanji is
-      // never immediately followed by ま in that reading.
-      using namespace suzume::core::hiragana;
-      bool is_polite_aux = vh::masuAuxFollowsAt(codepoints, kanji_end);
-      // Modern ichidan volitional keeps the y-row stem and the auxiliary
-      // boundary (見よ+う, 来よ+う).  The bare kanji is the renyokei/mizenkei
-      // spelling in other cells, but emitting it here would let formal noun
-      // よう absorb the stem.
-      bool is_modern_volitional = h1 == U'よ' && vh::volitionalEndingFollowsAt(codepoints, kanji_end + 1);
-      // Negative auxiliary ない and its conjugations:
-      // ない (終止/連体), なく (連用), なかっ (た接続), なけれ (仮定), なきゃ (口語縮約仮定)
-      bool is_negative_aux = vh::naiNegativeFollowsAt(codepoints, kanji_end);
-      bool is_negative_conditional = vh::naiConditionalFollowsAt(codepoints, kanji_end);
-      // The classical negative auxiliary (classical_negative_follows) attaches
-      // to the ichidan mizenkei, the bare stem: 見ぬ人, 見ざるを得ない, 見ずに.
-      // The literary volitional ん is distinct from the contracted negative
-      // when the quotative particle follows (見んとする, 寝んとする).
-      bool is_literary_volitional_n = (h1 == U'ん' && h2 == kTo);
-      // Classical む attaches to the same bare ichidan stem (見む, 寝む).
-      bool is_classical_volitional_mu = (h1 == U'む');
-      std::string following_hiragana = extractSubstring(codepoints, kanji_end, hiragana_end);
-      // Classical desiderative まほしき also follows a bare ichidan renyokei.
-      bool is_classical_desiderative = grammar::startsClassicalDesiderativeSequence(following_hiragana);
-      // The classical past-conjectural auxiliary attaches to the same bare
-      // continuative as the classical past does (見けむ, 寝けむ).
-      bool is_classical_conjectural = grammar::startsClassicalConjecturalAuxiliary(following_hiragana);
-      // The classical negative-conjectural auxiliary attaches to the bare
-      // irrealis stem in its attributive form as well (見まじき姿).
-      const auto* classical_negative_mai = dict_manager->lookupExact(following_hiragana, core::PartOfSpeech::Auxiliary);
-      bool is_classical_negative_mai = classical_negative_mai != nullptr &&
-                                       classical_negative_mai->extended_pos == core::ExtendedPOS::AuxNegativeMai;
-
-      // A conjunctive particle licenses the bare renyokei of a one-kanji
-      // ichidan verb just as て and ます do.  Resolve this from the particle
-      // inventory rather than by surface so every closed-class conjunctive
-      // continuation shares the same grammar gate.
-      bool is_conjunctive_particle = false;
-      bool is_classical_past_aux = false;
-      bool is_honorific_aux = false;
-      // The plain classical past き selects the same bare continuative as けり
-      // (山|見|き). Unlike けり it is a single i-row mora, which after a kanji
-      // is also how a ka-row godan verb spells its own continuative. The stem
-      // is already one of the ichidan verbs this branch knows, so the only
-      // thing left to rule out is that homograph: 着き belongs to 着く and not
-      // to 着る, while 見, 寝 and the rest have no ka-row counterpart.
-      const bool has_godan_ka_competitor =
-          dict_manager->lookupExact(extractSubstring(codepoints, start_pos, kanji_end) + "く",
-                                    core::PartOfSpeech::Verb) != nullptr;
-      constexpr size_t kMaxConjunctiveParticleLength = 4;
-      const size_t max_particle_end = lookaheadEnd(codepoints.size(), kanji_end, kMaxConjunctiveParticleLength);
-      for (size_t particle_end = kanji_end + 1; particle_end <= max_particle_end; ++particle_end) {
-        const std::string particle_surface = extractSubstring(codepoints, kanji_end, particle_end);
-        const auto* particle = dict_manager->lookupExact(particle_surface, core::PartOfSpeech::Particle);
-        if (particle != nullptr && particle->extended_pos == core::ExtendedPOS::ParticleConj) {
-          is_conjunctive_particle = true;
-        }
-        const auto* auxiliary = dict_manager->lookupExact(particle_surface, core::PartOfSpeech::Auxiliary);
-        // The perfect selects the same bare continuative that the past けり does
-        // (見つ, 経つ). Two conditions keep it off the stems of ordinary words:
-        // an i-row opening mora is excluded, because directly after a kanji it
-        // spells the stem's own continuative okurigana (居り, 祭り) — exactly
-        // where the izenkei-attaching perfect り would sit; and the auxiliary
-        // must be able to end the clause where it does, or 見つける would open
-        // with a perfect too.
-        const bool continuative_perfect = auxiliary != nullptr &&
-                                          auxiliary->extended_pos == core::ExtendedPOS::AuxClassicalPerfect &&
-                                          !kana::isIRowCodepoint(h1) &&
-                                          vh::classicalPastEnvironmentFollows(*dict_manager, codepoints, particle_end,
-                                                                              /*is_izenkei=*/false);
-        // The plain classical past き is terminal, so it also has to be able to close the
-        // clause where it sits — otherwise 着きます would open with one.
-        const bool continuative_past_ki =
-            auxiliary != nullptr && !has_godan_ka_competitor &&
-            auxiliary->extended_pos == core::ExtendedPOS::AuxClassicalKi &&
-            vh::classicalPastEnvironmentFollows(*dict_manager, codepoints, particle_end, /*is_izenkei=*/false);
-        if (continuative_perfect || continuative_past_ki ||
-            (auxiliary != nullptr && auxiliary->extended_pos == core::ExtendedPOS::AuxClassicalKeri)) {
-          is_classical_past_aux = true;
-        }
-        // The honorific subsidiaries sit on the same continuative (寝+なさい,
-        // 見+たまえ), and so does the pejorative やがる (見+やがって); their
-        // one-mora classical pieces (ま, ふ) do not open here.
-        if (auxiliary != nullptr &&
-            (auxiliary->extended_pos == core::ExtendedPOS::AuxHonorific ||
-             auxiliary->extended_pos == core::ExtendedPOS::AuxPejorativeYagaru) &&
-            particle_end - kanji_end >= 2) {
-          is_honorific_aux = true;
-        }
-        if (is_conjunctive_particle && is_classical_past_aux) {
-          break;
-        }
-      }
-
-      // An adjective that attaches to the continuative (見+にくい, 寝+やすい)
-      // licenses the bare stem the same way.
-      const bool is_renyokei_adjective = renyokeiAdjectiveFollowsAt(dict_manager, codepoints, kanji_end);
-
-      if (is_polite_aux || is_negative_aux || classical_negative_follows || is_literary_volitional_n ||
-          is_classical_volitional_mu || is_classical_desiderative || is_classical_negative_mai ||
-          is_conjunctive_particle || is_classical_past_aux || is_classical_conjectural || is_honorific_aux ||
-          is_renyokei_adjective) {
-        std::string surface = extractSubstring(codepoints, start_pos, kanji_end);
-        // A one-kanji stem followed by して can instead be the continuative
-        // form of a dictionary-confirmed Godan-sa verb. Keep that lexical
-        // inflection ahead of an unsupported Ichidan plus suru analysis.
-        const bool has_godan_sa_te_competitor =
-            h1 == U'し' && h2 == kTe && dict_manager->lookupExact(surface + "す", core::PartOfSpeech::Verb) != nullptr;
-        if (!has_godan_sa_te_competitor) {
-          std::string base_form = surface + "る";
-          const float candidate_cost = is_negative_conditional
-                                           ? candidate::verb_cost::kSingleKanjiNegativeConditionalBonus
-                                           : candidate::verb_cost::kStandardBonus;
-          SUZUME_DEBUG_VERBOSE_BLOCK {
-            SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface << " single_kanji_ichidan_polite lemma=" << base_form
-                                << " cost=" << candidate_cost << "\n";
-          }
-          candidates.push_back(makeVerbCandidate(
-              surface, start_pos, kanji_end, candidate_cost, base_form,
-              grammar::verbTypeToConjType(grammar::VerbType::Ichidan), true, CandidateOrigin::VerbKanji,
-              candidate::kHighOriginConfidence,
-              (is_literary_volitional_n || is_classical_volitional_mu) ? "single_kanji_ichidan_literary_volitional"
-              : is_classical_desiderative                              ? "single_kanji_ichidan_classical_desiderative"
-                                                                       : "single_kanji_ichidan_polite",
-              (is_negative_conditional || is_literary_volitional_n || is_classical_volitional_mu ||
-               is_classical_negative_mai)
-                  ? core::ExtendedPOS::VerbMizenkei
-              : (is_conjunctive_particle || is_classical_past_aux || is_classical_conjectural || is_honorific_aux)
-                  ? core::ExtendedPOS::VerbRenyokei
-                  : core::ExtendedPOS::Unknown));
-        }
-      }
-
-      if (is_modern_volitional) {
-        const std::string base_form = extractSubstring(codepoints, start_pos, kanji_end) + "る";
-        candidates.push_back(makeVerbCandidate(codepoints, start_pos, kanji_end + 1, candidate::verb_cost::kStrongBonus,
-                                               base_form, dictionary::ConjugationType::Ichidan, true,
-                                               CandidateOrigin::VerbKanji, candidate::kHighOriginConfidence,
-                                               "single_kanji_ichidan_volitional", core::ExtendedPOS::VerbMizenkei));
-      }
-
-      // Each auxiliary below attaches directly to the bare stem, so one emitter
-      // holds the reading and the environments only say where it applies.
-      const auto emit_bare_stem = [&](const char* pattern, core::ExtendedPOS extended_pos) {
-        const std::string surface = extractSubstring(codepoints, start_pos, kanji_end);
-        const std::string base_form = surface + "る";
-        constexpr float kCost = candidate::verb_cost::kStrongBonus;
-        SUZUME_DEBUG_VERBOSE_BLOCK {
-          SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface << " " << pattern << " lemma=" << base_form
-                              << " cost=" << kCost << "\n";
-        }
-        candidates.push_back(makeVerbCandidate(surface, start_pos, kanji_end, kCost, base_form,
-                                               dictionary::ConjugationType::Ichidan, true, CandidateOrigin::VerbKanji,
-                                               candidate::kHighOriginConfidence, pattern, extended_pos));
-      };
-
-      // た and て (寝+た, 見+て); the strong bonus beats the unified dictionary entry.
-      if (h1 == kTa || h1 == kTe) {
-        emit_bare_stem("single_kanji_ichidan_ta_te", core::ExtendedPOS::Unknown);
-      }
-
-      // Colloquial contractions: と → とく/といた (見とく = 見ておく),
-      // ち → ちゃう/ちゃった (見ちゃう = 見てしまう).
-      if (h1 == kTo || h1 == kChi) {
-        emit_bare_stem("single_kanji_ichidan_colloquial", core::ExtendedPOS::Unknown);
-      }
-
-      // The failure subsidiary そびれる attaches directly to the bare
-      // renyokei of single-kanji ichidan verbs (見そびれる, 寝そびれる).
-      // License that stem only for the closed auxiliary onset, so ordinary
-      // noun-plus-hiragana sequences are unaffected.
-      if (h1 == U'そ' && h2 == U'び' && kanji_end + 2 < codepoints.size() && codepoints[kanji_end + 2] == U'れ') {
-        emit_bare_stem("single_kanji_ichidan_sobireru", core::ExtendedPOS::Unknown);
-      }
-
-      // The ら-less potential contracted before the negative (寝+らん+ない).
-      if (h1 == kRa && h2 == U'ん' &&
-          (vh::naiNegativeFollowsAt(codepoints, kanji_end + 2) ||
-           vh::colloquialNegativeFollowsAt(codepoints, kanji_end + 2))) {
-        emit_bare_stem("single_kanji_ichidan_ranuki_negative", core::ExtendedPOS::VerbMizenkei);
-      }
-
-      // The ichidan passive/potential is られる, not れる (見+られる, 寝+られる).
-      if (h1 == kRa && h2 == kRe) {
-        emit_bare_stem("single_kanji_ichidan_rareru", core::ExtendedPOS::Unknown);
-      }
-
-      // Handle both volitional and literary-imperative forms for single-kanji
-      // Ichidan verbs: 見よ+う and 見よ.
-      if (h1 == kYo) {
-        const bool is_volitional = vh::volitionalEndingFollowsAt(codepoints, kanji_end + 1);
-        std::string surface = extractSubstring(codepoints, start_pos, kanji_end + 1);
-        std::string base_form = extractSubstring(codepoints, start_pos, kanji_end) + "る";
-        constexpr float kCost = candidate::verb_cost::kStrongBonus;  // Strong bonus to beat compound interpretation
-        SUZUME_DEBUG_VERBOSE_BLOCK {
-          SUZUME_DEBUG_STREAM << "[VERB_CAND] " << surface
-                              << (is_volitional ? " single_kanji_ichidan_volitional lemma="
-                                                : " single_kanji_ichidan_imperative lemma=")
-                              << base_form << " cost=" << kCost << "\n";
-        }
-        candidates.push_back(
-            makeVerbCandidate(surface, start_pos, kanji_end + 1, kCost, base_form,
-                              grammar::verbTypeToConjType(grammar::VerbType::Ichidan), true, CandidateOrigin::VerbKanji,
-                              candidate::kHighOriginConfidence,
-                              is_volitional ? "single_kanji_ichidan_volitional" : "single_kanji_ichidan_imperative",
-                              is_volitional ? core::ExtendedPOS::VerbMizenkei : core::ExtendedPOS::VerbMeireikei));
-      }
-
-      // Causative させ (見+させる, 見+させ+られ+た), not 見さ+せる like godan-sa.
-      // A Sino-Japanese verbal noun takes the same させ through する's own
-      // irrealis (提出+さ+せる), and a kanji run with no boundary in front of it
-      // is that noun. Carving its last character out as an Ichidan verb splits
-      // the word and leaves 提 with no reading.
-      if (h1 == kSa && h2 == kSe && !vh::startsInsideKanjiRun(codepoints, start_pos)) {
-        emit_bare_stem("single_kanji_ichidan_causative", core::ExtendedPOS::VerbMizenkei);
-      }
+      appendSingleKanjiIchidanStemCandidates(codepoints, start_pos, kanji_end, hiragana_end, dict_manager, h1, h2,
+                                             classical_negative_follows, candidates);
     }
   }
 }
