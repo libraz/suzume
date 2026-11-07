@@ -52,6 +52,11 @@ inline bool isORowCodepoint(char32_t cp) {
          cp == U'を';
 }
 
+/// I-row or e-row kana: the final mora of a godan continuative or an ichidan stem.
+inline bool isIOrERowCodepoint(char32_t cp) {
+  return isIRowCodepoint(cp) || isERowCodepoint(cp);
+}
+
 /**
  * @brief Whether a kana belongs to the ら column
  *
