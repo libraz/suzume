@@ -624,6 +624,70 @@
       ],
       "id": "de_biwo_shimu",
       "input": "公園で遊びを楽しむ"
+    },
+    {
+      "description": "kana noun べつ before the genitive, like kanji 別",
+      "expected": [
+        {
+          "lemma": "べつ",
+          "pos": "Noun",
+          "surface": "べつ"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "日",
+          "pos": "Noun",
+          "surface": "日"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "しよ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "betsuno_nishiyou",
+      "input": "べつの日にしよう"
+    },
+    {
+      "description": "それはべつとして - auto-generated",
+      "expected": [
+        {
+          "lemma": "それ",
+          "pos": "Pronoun",
+          "surface": "それ"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "べつ",
+          "pos": "Noun",
+          "surface": "べつ"
+        },
+        {
+          "lemma": "として",
+          "pos": "Particle",
+          "surface": "として"
+        }
+      ],
+      "id": "sorehabetsutoshite",
+      "input": "それはべつとして"
     }
   ],
   "description": "General nouns (part 5/5)",

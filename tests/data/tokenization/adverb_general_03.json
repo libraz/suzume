@@ -1027,6 +1027,110 @@
       ],
       "id": "idakedo",
       "input": "急いだけど結局遅刻"
+    },
+    {
+      "description": "kana adverb べつに stays one token",
+      "expected": [
+        {
+          "lemma": "べつに",
+          "pos": "Adverb",
+          "surface": "べつに"
+        },
+        {
+          "lemma": "いい",
+          "pos": "Adjective",
+          "surface": "いい"
+        },
+        {
+          "lemma": "けど",
+          "pos": "Particle",
+          "surface": "けど"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Particle",
+          "surface": "さ"
+        },
+        {
+          "lemma": "次",
+          "pos": "Noun",
+          "surface": "次"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "気",
+          "pos": "Noun",
+          "surface": "気"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "つける",
+          "pos": "Verb",
+          "surface": "つけ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "betsuniiikedosa_ha_wotsuketeyo",
+      "input": "べつにいいけどさ、次は気をつけてよ"
+    },
+    {
+      "description": "彼はべつに怒っていない - auto-generated",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "べつに",
+          "pos": "Adverb",
+          "surface": "べつに"
+        },
+        {
+          "lemma": "怒る",
+          "pos": "Verb",
+          "surface": "怒っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "い"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "habetsuni_ttteinai",
+      "input": "彼はべつに怒っていない"
     }
   ],
   "description": "General adverbs (part 3/3)",
