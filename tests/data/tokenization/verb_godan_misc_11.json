@@ -451,6 +451,82 @@
       ],
       "id": "shita_11",
       "input": "広告出した"
+    },
+    {
+      "description": "Ichidan terminal after a particle-dropped noun is not the classical past attributive",
+      "expected": [
+        {
+          "lemma": "今年",
+          "pos": "Noun",
+          "surface": "今年"
+        },
+        {
+          "lemma": "こそ",
+          "pos": "Particle",
+          "surface": "こそ"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "日記",
+          "pos": "Noun",
+          "surface": "日記"
+        },
+        {
+          "lemma": "続ける",
+          "pos": "Verb",
+          "surface": "続ける"
+        },
+        {
+          "lemma": "ぞ",
+          "pos": "Particle",
+          "surface": "ぞ"
+        }
+      ],
+      "id": "kosoha_keruzo",
+      "input": "今年こそは日記続けるぞ"
+    },
+    {
+      "description": "Ichidan terminal after a particle-dropped noun is not the classical past attributive",
+      "expected": [
+        {
+          "lemma": "勉強",
+          "pos": "Noun",
+          "surface": "勉強"
+        },
+        {
+          "lemma": "続ける",
+          "pos": "Verb",
+          "surface": "続ける"
+        }
+      ],
+      "id": "keru_2",
+      "input": "勉強続ける"
+    },
+    {
+      "description": "Ichidan terminal after a particle-dropped noun is not the classical past attributive",
+      "expected": [
+        {
+          "lemma": "仕事",
+          "pos": "Noun",
+          "surface": "仕事"
+        },
+        {
+          "lemma": "続ける",
+          "pos": "Verb",
+          "surface": "続ける"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "keruka",
+      "input": "仕事続けるか"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 11/11)",

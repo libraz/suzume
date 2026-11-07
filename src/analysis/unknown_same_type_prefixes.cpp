@@ -227,6 +227,16 @@ bool kanjiHeadsPredicateAt(const std::vector<char32_t>& codepoints, const std::v
       return false;
     }
   }
+  // An e-row kana plus る after the kanji is the ichidan terminal on it, which a
+  // classical auxiliary over the same kana does not outweigh (続+ける, not
+  // 日記続+ける); the terminal けり keeps its noun host (確認+けり).
+  constexpr size_t kIchidanTerminalTailLength = 2;
+  const auto* terminal_tail_auxiliary = opening_entry(kIchidanTerminalTailLength, core::PartOfSpeech::Auxiliary);
+  if (kana::isERowCodepoint(okurigana) && kana_start + kIchidanTerminalTailLength <= kana_end &&
+      codepoints[kana_start + 1] == core::hiragana::kRu && terminal_tail_auxiliary != nullptr &&
+      core::isClassicalAuxiliaryType(terminal_tail_auxiliary->extended_pos)) {
+    return true;
+  }
   for (size_t length = 1; kana_start + length <= kana_end; ++length) {
     const auto* particle = opening_entry(length, core::PartOfSpeech::Particle);
     const auto* auxiliary = opening_entry(length, core::PartOfSpeech::Auxiliary);
