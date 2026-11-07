@@ -1470,6 +1470,179 @@
       ],
       "id": "ri_kiwo_tashita",
       "input": "返り咲きを果たした"
+    },
+    {
+      "description": "県教育委員会は、教員の働き方改革に向けた指針をまとめた。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "県教育委員会",
+          "pos": "Noun",
+          "surface": "県教育委員会"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "教員",
+          "pos": "Noun",
+          "surface": "教員"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "働き方",
+          "pos": "Noun",
+          "surface": "働き方"
+        },
+        {
+          "lemma": "改革",
+          "pos": "Noun",
+          "surface": "改革"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "向ける",
+          "pos": "Verb",
+          "surface": "向け"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "指針",
+          "pos": "Noun",
+          "surface": "指針"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "まとめる",
+          "pos": "Verb",
+          "surface": "まとめ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ha_no_ki_ni_keta_womatometa",
+      "input": "県教育委員会は、教員の働き方改革に向けた指針をまとめた。"
+    },
+    {
+      "description": "話し方教室に通う。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "話し方",
+          "pos": "Noun",
+          "surface": "話し方"
+        },
+        {
+          "lemma": "教室",
+          "pos": "Noun",
+          "surface": "教室"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "通う",
+          "pos": "Verb",
+          "surface": "通う"
+        }
+      ],
+      "id": "shi_ni_u",
+      "input": "話し方教室に通う。"
+    },
+    {
+      "description": "結果は考え方次第で変わる。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "結果",
+          "pos": "Noun",
+          "surface": "結果"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "考え方",
+          "pos": "Noun",
+          "surface": "考え方"
+        },
+        {
+          "lemma": "次第",
+          "pos": "Noun",
+          "surface": "次第"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "変わる",
+          "pos": "Verb",
+          "surface": "変わる"
+        }
+      ],
+      "id": "ha_e_de_waru",
+      "input": "結果は考え方次第で変わる。"
+    },
+    {
+      "description": "笑い声大会が開かれた。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "笑い声",
+          "pos": "Noun",
+          "surface": "笑い声"
+        },
+        {
+          "lemma": "大会",
+          "pos": "Noun",
+          "surface": "大会"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "開く",
+          "pos": "Verb",
+          "surface": "開か"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "i_ga_kareta",
+      "input": "笑い声大会が開かれた。"
     }
   ],
   "description": "noun_deverbal tests",

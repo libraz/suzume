@@ -32,8 +32,9 @@ using CharType = normalize::CharType;
 // continuative form before the head, which keeps a coincidental kanji+hiragana run
 // from being absorbed; the looser heads predate that check and keep their behavior.
 // `closes_kanji_run` says the head is the right edge of its compound, so a kanji
-// following it starts a word of its own (走れ|目標, 使い|道具, 書き|方向,
-// 置き|場所). 物 is the exception: it is itself a productive nominalizer that
+// following it opens a word of its own when the run after it is odd (走れ|目標,
+// 使い|道具, 書き|方向, 置き|場所) and is a separate word sequence when even
+// (働き方|改革). 物 is the exception: it is itself a productive nominalizer that
 // takes a further derivational kanji (食べ物|屋, 飲み物|代, 落し物|係), so for
 // it the following kanji proves nothing.
 struct DeverbalHeadNoun {
@@ -606,11 +607,10 @@ void addVerbSuffixNounJoinCandidates(core::Lattice& lattice, std::string_view te
     return;
   }
 
-  // A head that closes its compound has to be the right edge of its own kanji
-  // run. When another kanji follows, that run is a word of its own and the head
-  // is its first character rather than a bound suffix (走れ|目標, 使い|道具).
-  if (head_noun->closes_kanji_run && hiragana_end + head_length < codepoints.size() &&
-      char_types[hiragana_end + head_length] == CharType::Kanji) {
+  // A head that closes its compound has to be the right edge of its compound.
+  // An odd kanji run after it pairs the head with the next kanji (走れ|目標,
+  // 使い|道具); an even one is a sequence of words after it (働き方|改革).
+  if (head_noun->closes_kanji_run && !grammar::kanjiRunSplitsIntoWordPairsAt(codepoints, hiragana_end + head_length)) {
     return;
   }
 

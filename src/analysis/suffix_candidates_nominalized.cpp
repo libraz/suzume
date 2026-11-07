@@ -737,13 +737,14 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
   // Deverbal compound noun: a continuative verb form written as kanji plus one
   // okurigana, followed by a single-kanji noun, is a productive nominal compound
   // (笑い声, 泣き声, 立ち姿, 聞き耳, 呼び声).  The continuative must reconstruct a
-  // dictionary verb, the noun must be a kanji run of exactly one character so a
-  // longer kanji compound keeps its own left boundary (読み文章 stays split), and
-  // the span must close in a nominal frame — a following predicate suffix means
-  // the second kanji heads a verb rather than closing a noun.
+  // dictionary verb, the noun must be one kanji closing its compound, so a
+  // two-kanji word keeps its own left boundary (読み|文章) while an even run of
+  // words may follow (笑い声|大会), and the span must close in a nominal frame —
+  // a following predicate suffix means the second kanji heads a verb rather
+  // than closing a noun.
   if (kanji_count == 1 && dict_manager != nullptr && kanji_end + 2 <= char_types.size() &&
       char_types[kanji_end + 1] == normalize::CharType::Kanji &&
-      (kanji_end + 2 == char_types.size() || char_types[kanji_end + 2] != normalize::CharType::Kanji)) {
+      grammar::kanjiRunSplitsIntoWordPairsAt(codepoints, kanji_end + 2)) {
     // The continuative shape alone is not enough: 高い山 and 及び水 have it too,
     // and only an attested verb base separates them from a real compound. The
     // reconstructed base therefore has to be a known verb, on either the godan

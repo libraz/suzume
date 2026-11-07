@@ -108,7 +108,18 @@ bool isBoundDeverbalSuffixAt(const std::vector<char32_t>& codepoints, size_t pos
   if (pos >= codepoints.size() || !isDeverbalSuffixKanji(codepoints[pos])) {
     return false;
   }
-  return codepoints[pos] == U'物' || pos + 1 >= codepoints.size() || !normalize::isKanjiCodepoint(codepoints[pos + 1]);
+  return codepoints[pos] == U'物' || kanjiRunSplitsIntoWordPairsAt(codepoints, pos + 1);
+}
+
+bool kanjiRunSplitsIntoWordPairsAt(const std::vector<char32_t>& codepoints, size_t pos) {
+  if (pos >= codepoints.size() || !normalize::isKanjiCodepoint(codepoints[pos])) {
+    return true;
+  }
+  const size_t run_end = nominalKanjiRunEnd(codepoints, pos);
+  if (run_end == pos || kanjiRunCutByNumeralAt(codepoints, run_end) || mayBeOkuriganaAt(codepoints, run_end)) {
+    return false;
+  }
+  return countKanjiRunWords(codepoints, pos, run_end) % 2 == 0;
 }
 
 size_t nominalKanjiRunEnd(const std::vector<char32_t>& codepoints, size_t pos) {

@@ -694,10 +694,19 @@ bool isDeverbalSuffixKanji(char32_t codepoint);
 
 /**
  * @brief Whether the deverbal suffix at @p pos is bound to the continuative
- * before it: it closes its kanji run (書き+方, 使い|方法, 手|続き), except 物,
- * which itself takes a further derivational kanji (食べ物+屋)
+ * before it: the kanji after it read as whole two-kanji words
+ * (書き+方, 働き+方|改革, 使い|方法, 手|続き), except 物, which itself takes a
+ * further derivational kanji (食べ物+屋)
  */
 bool isBoundDeverbalSuffixAt(const std::vector<char32_t>& codepoints, size_t pos);
+
+/**
+ * @brief Whether the kanji run at @p pos is empty or splits into whole
+ * two-kanji words, so a bound head ending just before it closes its compound
+ * (働き方|改革) rather than opening a word with the next kanji (書き|方向).
+ * A run cut by a numeral or ending before possible okurigana is not measured.
+ */
+bool kanjiRunSplitsIntoWordPairsAt(const std::vector<char32_t>& codepoints, size_t pos);
 
 /** @brief End of the kanji run at @p pos, numerals excluded */
 size_t nominalKanjiRunEnd(const std::vector<char32_t>& codepoints, size_t pos);
