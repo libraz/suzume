@@ -224,55 +224,6 @@ TEST(CharTypeTest, ClassifyUnknown) {
 }
 
 // ============================================================================
-// charTypeToString tests
-// ============================================================================
-
-TEST(CharTypeTest, TypeToString) {
-  EXPECT_EQ(charTypeToString(CharType::Kanji), "KANJI");
-  EXPECT_EQ(charTypeToString(CharType::Hiragana), "HIRAGANA");
-  EXPECT_EQ(charTypeToString(CharType::Katakana), "KATAKANA");
-  EXPECT_EQ(charTypeToString(CharType::Alphabet), "ALPHABET");
-  EXPECT_EQ(charTypeToString(CharType::Digit), "DIGIT");
-  EXPECT_EQ(charTypeToString(CharType::Symbol), "SYMBOL");
-  EXPECT_EQ(charTypeToString(CharType::Emoji), "EMOJI");
-  EXPECT_EQ(charTypeToString(CharType::Unknown), "UNKNOWN");
-}
-
-// ============================================================================
-// canCombine tests
-// ============================================================================
-
-TEST(CharTypeTest, CanCombineSameType) {
-  EXPECT_TRUE(canCombine(CharType::Kanji, CharType::Kanji));
-  EXPECT_TRUE(canCombine(CharType::Hiragana, CharType::Hiragana));
-  EXPECT_TRUE(canCombine(CharType::Katakana, CharType::Katakana));
-  EXPECT_TRUE(canCombine(CharType::Alphabet, CharType::Alphabet));
-  EXPECT_TRUE(canCombine(CharType::Digit, CharType::Digit));
-  EXPECT_TRUE(canCombine(CharType::Symbol, CharType::Symbol));
-  EXPECT_TRUE(canCombine(CharType::Emoji, CharType::Emoji));
-}
-
-TEST(CharTypeTest, CanCombineAlphabetDigit) {
-  EXPECT_TRUE(canCombine(CharType::Alphabet, CharType::Digit));
-  EXPECT_TRUE(canCombine(CharType::Digit, CharType::Alphabet));
-}
-
-TEST(CharTypeTest, CanCombineHiraganaKatakanaFalse) {
-  EXPECT_FALSE(canCombine(CharType::Hiragana, CharType::Katakana));
-  EXPECT_FALSE(canCombine(CharType::Katakana, CharType::Hiragana));
-}
-
-TEST(CharTypeTest, CanCombineCrossTypeFalse) {
-  EXPECT_FALSE(canCombine(CharType::Kanji, CharType::Hiragana));
-  EXPECT_FALSE(canCombine(CharType::Hiragana, CharType::Kanji));
-  EXPECT_FALSE(canCombine(CharType::Kanji, CharType::Alphabet));
-  EXPECT_FALSE(canCombine(CharType::Alphabet, CharType::Kanji));
-  EXPECT_FALSE(canCombine(CharType::Digit, CharType::Kanji));
-  EXPECT_FALSE(canCombine(CharType::Symbol, CharType::Hiragana));
-  EXPECT_FALSE(canCombine(CharType::Emoji, CharType::Alphabet));
-}
-
-// ============================================================================
 // isCommonParticle tests
 // ============================================================================
 

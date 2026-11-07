@@ -30,28 +30,6 @@ TEST(TypesExtendedTest, PosToJapaneseAllValues) {
 }
 
 // =============================================================================
-// posToDefaultExtendedPOS - all POS values
-// =============================================================================
-
-TEST(TypesExtendedTest, PosToDefaultExtendedPOSAllValues) {
-  EXPECT_EQ(posToDefaultExtendedPOS(PartOfSpeech::Noun), ExtendedPOS::Noun);
-  EXPECT_EQ(posToDefaultExtendedPOS(PartOfSpeech::Verb), ExtendedPOS::VerbShuushikei);
-  EXPECT_EQ(posToDefaultExtendedPOS(PartOfSpeech::Adjective), ExtendedPOS::AdjBasic);
-  EXPECT_EQ(posToDefaultExtendedPOS(PartOfSpeech::Adverb), ExtendedPOS::Adverb);
-  EXPECT_EQ(posToDefaultExtendedPOS(PartOfSpeech::Particle), ExtendedPOS::ParticleCase);
-  EXPECT_EQ(posToDefaultExtendedPOS(PartOfSpeech::Auxiliary), ExtendedPOS::AuxTenseTa);
-  EXPECT_EQ(posToDefaultExtendedPOS(PartOfSpeech::Pronoun), ExtendedPOS::Pronoun);
-  EXPECT_EQ(posToDefaultExtendedPOS(PartOfSpeech::Conjunction), ExtendedPOS::Conjunction);
-  EXPECT_EQ(posToDefaultExtendedPOS(PartOfSpeech::Determiner), ExtendedPOS::Determiner);
-  EXPECT_EQ(posToDefaultExtendedPOS(PartOfSpeech::Prefix), ExtendedPOS::Prefix);
-  EXPECT_EQ(posToDefaultExtendedPOS(PartOfSpeech::Suffix), ExtendedPOS::Suffix);
-  EXPECT_EQ(posToDefaultExtendedPOS(PartOfSpeech::Symbol), ExtendedPOS::Symbol);
-  EXPECT_EQ(posToDefaultExtendedPOS(PartOfSpeech::Interjection), ExtendedPOS::Interjection);
-  EXPECT_EQ(posToDefaultExtendedPOS(PartOfSpeech::Other), ExtendedPOS::Unknown);
-  EXPECT_EQ(posToDefaultExtendedPOS(PartOfSpeech::Unknown), ExtendedPOS::Unknown);
-}
-
-// =============================================================================
 // isTaggable - all POS values
 // =============================================================================
 
@@ -99,31 +77,6 @@ TEST(TypesExtendedTest, IsContentWordFalse) {
   EXPECT_FALSE(isContentWord(PartOfSpeech::Symbol));
   EXPECT_FALSE(isContentWord(PartOfSpeech::Other));
   EXPECT_FALSE(isContentWord(PartOfSpeech::Unknown));
-}
-
-// =============================================================================
-// isFunctionWord - all POS values
-// =============================================================================
-
-TEST(TypesExtendedTest, IsFunctionWordTrue) {
-  EXPECT_TRUE(isFunctionWord(PartOfSpeech::Particle));
-  EXPECT_TRUE(isFunctionWord(PartOfSpeech::Auxiliary));
-}
-
-TEST(TypesExtendedTest, IsFunctionWordFalse) {
-  EXPECT_FALSE(isFunctionWord(PartOfSpeech::Noun));
-  EXPECT_FALSE(isFunctionWord(PartOfSpeech::Verb));
-  EXPECT_FALSE(isFunctionWord(PartOfSpeech::Adjective));
-  EXPECT_FALSE(isFunctionWord(PartOfSpeech::Adverb));
-  EXPECT_FALSE(isFunctionWord(PartOfSpeech::Conjunction));
-  EXPECT_FALSE(isFunctionWord(PartOfSpeech::Determiner));
-  EXPECT_FALSE(isFunctionWord(PartOfSpeech::Pronoun));
-  EXPECT_FALSE(isFunctionWord(PartOfSpeech::Prefix));
-  EXPECT_FALSE(isFunctionWord(PartOfSpeech::Suffix));
-  EXPECT_FALSE(isFunctionWord(PartOfSpeech::Interjection));
-  EXPECT_FALSE(isFunctionWord(PartOfSpeech::Symbol));
-  EXPECT_FALSE(isFunctionWord(PartOfSpeech::Other));
-  EXPECT_FALSE(isFunctionWord(PartOfSpeech::Unknown));
 }
 
 TEST(TypesExtendedTest, LowInformationCategoriesAreGrammaticalAndClosed) {

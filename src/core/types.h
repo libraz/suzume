@@ -347,14 +347,6 @@ std::optional<PartOfSpeech> stringToPosStrict(std::string_view str);
 PartOfSpeech stringToPos(std::string_view str);
 
 /**
- * @brief Map PartOfSpeech to a default ExtendedPOS
- *
- * Used by user dictionary (Layer 4) entries which only specify POS,
- * not ExtendedPOS. Maps to the most common/neutral ExtendedPOS for each POS.
- */
-ExtendedPOS posToDefaultExtendedPOS(PartOfSpeech pos);
-
-/**
  * @brief Check if POS is taggable (content word)
  */
 bool isTaggable(PartOfSpeech pos);
@@ -363,11 +355,6 @@ bool isTaggable(PartOfSpeech pos);
  * @brief Check if POS is content word
  */
 bool isContentWord(PartOfSpeech pos);
-
-/**
- * @brief Check if POS is function word
- */
-bool isFunctionWord(PartOfSpeech pos);
 
 /**
  * @brief Convert extended POS to string (English)
@@ -396,6 +383,13 @@ ExtendedPOS posToExtendedPos(PartOfSpeech pos);
 constexpr bool isVerbForm(ExtendedPOS epos) {
   return (epos >= ExtendedPOS::VerbShuushikei && epos <= ExtendedPOS::VerbTaraForm) ||
          epos == ExtendedPOS::VerbContractedKateikei;
+}
+
+/**
+ * @brief Check if ExtendedPOS is a verb continuative, plain or euphonic (書き, 書い)
+ */
+constexpr bool isVerbContinuativeForm(ExtendedPOS epos) {
+  return epos == ExtendedPOS::VerbRenyokei || epos == ExtendedPOS::VerbOnbinkei;
 }
 
 /**

@@ -148,14 +148,6 @@ PartOfSpeech stringToPos(std::string_view str) {
   return stringToPosStrict(str).value_or(PartOfSpeech::Other);
 }
 
-ExtendedPOS posToDefaultExtendedPOS(PartOfSpeech pos) {
-  // Same POS→EPOS mapping as posToExtendedPos; the only difference is the
-  // fallback for unmapped POS (Unknown here vs Other there). No mapped POS
-  // yields ExtendedPOS::Other, so remapping Other→Unknown is exact.
-  ExtendedPOS epos = posToExtendedPos(pos);
-  return epos == ExtendedPOS::Other ? ExtendedPOS::Unknown : epos;
-}
-
 bool isTaggable(PartOfSpeech pos) {
   return pos == PartOfSpeech::Noun || pos == PartOfSpeech::Verb || pos == PartOfSpeech::Adjective ||
          pos == PartOfSpeech::Adverb;
@@ -163,10 +155,6 @@ bool isTaggable(PartOfSpeech pos) {
 
 bool isContentWord(PartOfSpeech pos) {
   return isTaggable(pos);
-}
-
-bool isFunctionWord(PartOfSpeech pos) {
-  return pos == PartOfSpeech::Particle || pos == PartOfSpeech::Auxiliary;
 }
 
 const char* originToString(CandidateOrigin origin) {

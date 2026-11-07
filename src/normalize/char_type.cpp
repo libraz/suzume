@@ -316,30 +316,6 @@ std::vector<CharType> classifyCodepoints(const std::vector<char32_t>& codepoints
   return char_types;
 }
 
-std::string_view charTypeToString(CharType type) {
-  static constexpr std::string_view kNames[] = {
-      "KANJI", "HIRAGANA", "KATAKANA", "ALPHABET", "DIGIT", "SYMBOL", "EMOJI", "UNKNOWN",
-  };
-  static_assert(std::size(kNames) == static_cast<size_t>(CharType::Unknown) + 1,
-                "kNames must cover every CharType value");
-  const auto idx = static_cast<size_t>(type);
-  return idx < std::size(kNames) ? kNames[idx] : "UNKNOWN";
-}
-
-bool canCombine(CharType first_type, CharType second_type) {
-  if (first_type == second_type) {
-    return true;
-  }
-
-  // Alphabet + Digit can combine (e.g., "abc123")
-  if ((first_type == CharType::Alphabet && second_type == CharType::Digit) ||
-      (first_type == CharType::Digit && second_type == CharType::Alphabet)) {
-    return true;
-  }
-
-  return false;
-}
-
 bool isCommonParticle(char32_t ch) {
   // Common particles: を, が, は, に, へ, の
   return ch == U'を' || ch == U'が' || ch == U'は' || ch == U'に' || ch == U'へ' || ch == U'の';

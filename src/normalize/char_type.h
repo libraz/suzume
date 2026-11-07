@@ -36,19 +36,6 @@ CharType classifyChar(char32_t codepoint);
 std::vector<CharType> classifyCodepoints(const std::vector<char32_t>& codepoints);
 
 /**
- * @brief Convert character type to string
- */
-std::string_view charTypeToString(CharType type);
-
-/**
- * @brief Check if character type can be combined
- * @param first_type First character type
- * @param second_type Second character type
- * @return true if can be combined as unknown word
- */
-bool canCombine(CharType first_type, CharType second_type);
-
-/**
  * @brief Check if character is a common particle (助詞)
  *
  * Common particles that never form verb stems: を, が, は, に, へ, の
