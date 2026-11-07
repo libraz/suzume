@@ -495,12 +495,18 @@ void appendIchidanKateikeiVolitionalCandidates(const std::vector<char32_t>& code
         const auto is_kanji = [](char32_t codepoint) { return normalize::isKanjiCodepoint(codepoint); };
         const bool is_suru_pattern =
             codepoints[renyokei_end - 1] == U'し' && std::any_of(stem_begin, stem_last, is_kanji);
+        // Likewise で after a multi-kanji run is the copula or case particle
+        // (平和+で+よき); Ichidan verbs spelled with で have a one-kanji stem
+        // (撫で, 茹で, 秀で).
+        const bool is_copula_pattern = codepoints[renyokei_end - 1] == U'で' && renyokei_end - 1 >= start_pos + 2 &&
+                                       std::all_of(stem_begin, stem_last, is_kanji);
 
         // The Godan reading wins for a bare e-row + よ imperative (書けよ),
         // but a following う closes the distinct Ichidan volitional pattern
         // (書けよ+う).  Do not let the imperative guard hide that productive
         // volitional candidate.
-        if ((!has_verified_godan_imperative || is_volitional) && !is_suru_pattern && !has_formal_method_continuation) {
+        if ((!has_verified_godan_imperative || is_volitional) && !is_suru_pattern && !is_copula_pattern &&
+            !has_formal_method_continuation) {
           // E.g., 食べ + よ + う → 食べよ is volitional stem;
           //       食べ + よ → 食べよ is the literary imperative.
           size_t volitional_end = renyokei_end + 1;  // renyokei + よ

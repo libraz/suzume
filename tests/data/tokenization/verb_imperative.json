@@ -430,6 +430,80 @@
       ],
       "id": "wo_ke_to_ttta",
       "input": "手紙を書け、と言った"
+    },
+    {
+      "description": "Multi-kanji run + で is the particle, not an Ichidan stem before よ",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "駅前",
+          "pos": "Noun",
+          "surface": "駅前"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "ようやく",
+          "pos": "Adverb",
+          "surface": "ようやく"
+        },
+        {
+          "lemma": "会える",
+          "pos": "Verb",
+          "surface": "会え"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "to_deyouyaku_eta",
+      "input": "彼と駅前でようやく会えた"
+    },
+    {
+      "description": "Na-adjective + copula で + classical よき",
+      "expected": [
+        {
+          "lemma": "景色",
+          "pos": "Noun",
+          "surface": "景色"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "綺麗",
+          "pos": "Adjective",
+          "surface": "綺麗"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "lemma": "よい",
+          "pos": "Adjective",
+          "surface": "よき"
+        }
+      ],
+      "id": "ga_deyoki",
+      "input": "景色が綺麗でよき"
     }
   ],
   "description": "verb_imperative tests",
