@@ -155,6 +155,15 @@ void appendExtendedSokuonbinCandidates(const std::vector<char32_t>& codepoints, 
   // Hiragana between kanji and っ should be 1-2 chars. Longer spans can
   // contain productive auxiliary or compound boundaries and are handled by
   // their dedicated generators.
+  // Measure up to the past or te mora rather than the whole kana run: a final
+  // particle may follow it (当たっ+た+よ).
+  for (size_t sokuon_pos = kanji_end + 1; sokuon_pos <= kanji_end + 2 && sokuon_pos + 1 < hiragana_end; ++sokuon_pos) {
+    if (codepoints[sokuon_pos] == U'っ' &&
+        (codepoints[sokuon_pos + 1] == U'た' || codepoints[sokuon_pos + 1] == U'て')) {
+      hiragana_end = sokuon_pos + 2;
+      break;
+    }
+  }
   const size_t hiragana_before_onbin = hiragana_end - kanji_end >= 2 ? hiragana_end - kanji_end - 2 : 0;
   const char32_t last_char = codepoints[hiragana_end - 1];
   if (hiragana_before_onbin >= 1 && hiragana_before_onbin <= 2 && codepoints[hiragana_end - 2] == U'っ' &&

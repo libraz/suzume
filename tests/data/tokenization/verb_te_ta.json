@@ -2022,6 +2022,60 @@
       ],
       "id": "sono_ha_itenakattta",
       "input": "その話は聞いてなかった"
+    },
+    {
+      "description": "extended sokuonbin is measured to the past mora, not the kana run end",
+      "expected": [
+        {
+          "lemma": "くじ",
+          "pos": "Noun",
+          "surface": "くじ"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "当たる",
+          "pos": "Verb",
+          "surface": "当たっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "kujiga_tatttayo",
+      "input": "くじが当たったよ"
+    },
+    {
+      "description": "当たったね - auto-generated",
+      "expected": [
+        {
+          "lemma": "当たる",
+          "pos": "Verb",
+          "surface": "当たっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        }
+      ],
+      "id": "tatttane",
+      "input": "当たったね"
     }
   ],
   "description": "Te-form and ta-form patterns",
