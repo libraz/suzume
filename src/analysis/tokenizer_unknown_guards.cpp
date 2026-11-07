@@ -623,6 +623,9 @@ bool isRejectedUnknownCandidate(const UnknownCandidateContext& ctx, const core::
   if (candidate.rejects_preceding_content_edge && hasContentEdgeEndingAt(lattice, candidate.start)) {
     return true;
   }
+  if (candidate.rejects_preceding_nominal_head && hasNominalHeadEdgeEndingAt(lattice, candidate.start)) {
+    return true;
+  }
   // A longer content word from any other generator supersedes the rescue, but
   // not another rescue: the generator offers both the maximal run and the run
   // that stops in front of a trailing auxiliary, and those two are meant to

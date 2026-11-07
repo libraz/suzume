@@ -1184,6 +1184,67 @@
       ],
       "id": "arateda",
       "input": "あらてだ"
+    },
+    {
+      "description": "有限繋辞が選択する仮名名詞と感動詞の誤分割修復",
+      "expected": [
+        {
+          "lemma": "あらて",
+          "pos": "Noun",
+          "surface": "あらて"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "aratedattta",
+      "input": "あらてだった"
+    },
+    {
+      "description": "有限繋辞が選択する仮名名詞と感動詞の誤分割修復",
+      "expected": [
+        {
+          "lemma": "あらて",
+          "pos": "Noun",
+          "surface": "あらて"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "aratedesu",
+      "input": "あらてです"
+    },
+    {
+      "description": "有限繋辞が選択する仮名名詞と感動詞の誤分割修復",
+      "expected": [
+        {
+          "lemma": "あらて",
+          "pos": "Noun",
+          "surface": "あらて"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "でし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "aratedeshita",
+      "input": "あらてでした"
     }
   ],
   "description": "Modality auxiliaries (たい、そう、らしい) (part 2/2)",

@@ -1818,6 +1818,53 @@
       ],
       "id": "sonnakotoshitakunai",
       "input": "そんなことしたくない"
+    },
+    {
+      "description": "形容動詞語幹の前の格助詞境界を維持",
+      "expected": [
+        {
+          "lemma": "ねこ",
+          "pos": "Noun",
+          "surface": "ねこ"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "にがて",
+          "pos": "Adjective",
+          "surface": "にがて"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "もの",
+          "pos": "Noun",
+          "surface": "もの"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "確認",
+          "pos": "Noun",
+          "surface": "確認"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "nekoganigatenamonowo_suru",
+      "input": "ねこがにがてなものを確認する"
     }
   ],
   "description": "Suru-verb patterns with subsidiary verbs - MeCab互換分割 (part 2/2)",

@@ -30,6 +30,23 @@ bool isNaAdjectiveContinuation(char32_t ch) {
   return ch == U'に' || ch == U'な' || ch == U'だ' || ch == U'で' || ch == U'さ';
 }
 
+bool followsSubstantiveFormalNoun(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                  const dictionary::DictionaryManager* dict_manager) {
+  if (dict_manager == nullptr) {
+    return false;
+  }
+  constexpr size_t kMaxFormalNounLength = 2;
+  const size_t probe_end = lookaheadEnd(codepoints.size(), start_pos, kMaxFormalNounLength);
+  for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, start_pos, probe_end)) {
+    if (match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Noun &&
+        match.entry->extended_pos == core::ExtendedPOS::NounFormal &&
+        grammar::isSubstantiveFormalNoun(match.entry->surface)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 // Whether a dictionary adjective closing the run stands apart from what is in
 // front of it: one bound kanji (超|重要, 最|簡単) or a quantity phrase, which
 // its counter closes (何部|必要). A full noun compounds with it (交通安全).
@@ -210,11 +227,14 @@ void generateHiraganaAttributiveNaStemCandidates(const std::vector<char32_t>& co
     const size_t head = stem_end + 1;
     const bool nominal_head =
         char_types[head] == normalize::CharType::Kanji || char_types[head] == normalize::CharType::Katakana;
+    const std::string stem = extractSubstring(codepoints, start_pos, stem_end);
+    const bool substantive_formal_noun = stem_end - start_pos >= 3 && grammar::hasNoncontinuativeTeEnding(stem) &&
+                                         followsSubstantiveFormalNoun(codepoints, head, dict_manager);
     const bool explanatory_head =
         (codepoints[head] == U'ん' || codepoints[head] == U'の') && head + 1 < codepoints.size() &&
         (codepoints[head + 1] == U'だ' || codepoints[head + 1] == U'で' || codepoints[head + 1] == U'じ' ||
          codepoints[head + 1] == U'よ' || codepoints[head + 1] == U'ね');
-    if (!nominal_head && !explanatory_head) {
+    if (!nominal_head && !explanatory_head && !substantive_formal_noun) {
       continue;
     }
     if (dict_manager == nullptr) {
@@ -238,7 +258,6 @@ void generateHiraganaAttributiveNaStemCandidates(const std::vector<char32_t>& co
           lookupEntryInRange(*dict_manager, codepoints, split, stem_end) != nullptr;
       splits_at_particle = word_then_particle || particle_then_word;
     }
-    const std::string stem = extractSubstring(codepoints, start_pos, stem_end);
     // A stem closing on げ is a host plus the appearance suffix (頼り+な+げ),
     // which keeps its own boundary instead of forming a nominal adjective.
     if (registered_stem || splits_at_particle || utf8::endsWith(stem, "げ")) {
@@ -247,6 +266,23 @@ void generateHiraganaAttributiveNaStemCandidates(const std::vector<char32_t>& co
     candidates.push_back(makeNaAdjCandidate(stem, start_pos, stem_end, candidate::kNaAdjYakaCost, true,
                                             CandidateOrigin::AdjectiveNa, candidate::kHiraganaNaAdjNariConfidence,
                                             "hira_na_adj_attributive"));
+    if (substantive_formal_noun && !nominal_head && !explanatory_head && stem_end - start_pos == kMaxStemLength &&
+        start_pos > 0) {
+      const auto* initial_particle =
+          lookupEntryInRange(*dict_manager, codepoints, start_pos, start_pos + 1, core::PartOfSpeech::Particle);
+      if (initial_particle != nullptr && isNominalForcingParticle(initial_particle->extended_pos)) {
+        std::vector<UnknownCandidate> shorter_stems;
+        generateHiraganaAttributiveNaStemCandidates(codepoints, start_pos + 1, char_types, dict_manager, shorter_stems);
+        // Preserve a particle after a nominal only when the remaining stem
+        // independently satisfies the same attributive admission rules.
+        candidates.back().rejects_preceding_nominal_head =
+            std::any_of(shorter_stems.begin(), shorter_stems.end(), [&](const UnknownCandidate& shorter) {
+              return shorter.start == start_pos + 1 && shorter.end == stem_end &&
+                     shorter.pos == core::PartOfSpeech::Adjective &&
+                     shorter.extended_pos == core::ExtendedPOS::AdjNaAdj;
+            });
+      }
+    }
     return;
   }
 }

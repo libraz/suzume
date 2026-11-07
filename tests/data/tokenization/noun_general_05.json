@@ -732,6 +732,38 @@
       ],
       "id": "unnamed_54",
       "input": "五セット目"
+    },
+    {
+      "description": "形容動詞語幹の前の格助詞境界を維持",
+      "expected": [
+        {
+          "lemma": "生徒",
+          "pos": "Noun",
+          "surface": "生徒"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "にがて",
+          "pos": "Adjective",
+          "surface": "にがて"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "こと",
+          "pos": "Noun",
+          "surface": "こと"
+        }
+      ],
+      "id": "ganigatenakoto",
+      "input": "生徒がにがてなこと"
     }
   ],
   "description": "General nouns (part 5/5)",

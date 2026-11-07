@@ -14,16 +14,19 @@ from .merge_postprocessors import NIDAN_TERMINAL_KANA
 from .pos_mapping import map_mecab_pos
 from .postprocessor_common import reports_mutation
 
+_INTERJECTION_HOST_FINITE_COPULAS = COPULA_SURFACES - {"で", "な", "なら"}
+
 
 @reports_mutation
 def postprocess_noncontinuative_te_nominal(tokens: list[dict]) -> bool:
-    """Restore a kana nominal whose A/O-row ending cannot select connective て."""
+    """Restore kana nominals selected by copulas after a noncontinuative て."""
     idx = 0
     while idx + 2 < len(tokens):
         host, connective, copula = tokens[idx : idx + 3]
         stem = host.get("surface", "")
+        interjection_host = host.get("pos") == "Interjection"
         if (
-            host.get("pos") not in ("Verb", "Adjective")
+            (host.get("pos") not in ("Verb", "Adjective") and not interjection_host)
             or not regex.fullmatch(
                 r"\p{Hiragana}{1,2}[あかがさざただなはばぱまやらわおこごそぞとどのほぼぽもよろを]", stem
             )
@@ -34,8 +37,12 @@ def postprocess_noncontinuative_te_nominal(tokens: list[dict]) -> bool:
         ):
             idx += 1
             continue
+        if interjection_host and copula.get("surface") not in _INTERJECTION_HOST_FINITE_COPULAS:
+            idx += 1
+            continue
         if copula.get("surface", "").startswith("な") and (
-            copula.get("surface") != "な"
+            interjection_host
+            or copula.get("surface") != "な"
             or idx + 3 >= len(tokens)
             or tokens[idx + 3].get("pos") != "Noun"
             or tokens[idx + 3].get("surface") in ("の", "ん")

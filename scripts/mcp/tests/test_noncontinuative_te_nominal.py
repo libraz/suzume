@@ -25,6 +25,54 @@ def test_finite_copula_selects_nominal(text, surface):
     assert matching[0]["lemma"] == surface
 
 
+@pytest.mark.parametrize("text", ["あらてだ", "あらてだった", "あらてです", "あらてでした"])
+def test_finite_copula_selects_interjection_plus_noncontinuative_te(text):
+    tokens, _, _ = get_expected_tokens(text)
+    matching = [token for token in tokens if token["surface"] == "あらて"]
+    assert len(matching) == 1
+    assert matching[0]["pos"] == "Noun"
+    assert matching[0]["lemma"] == "あらて"
+
+
+@pytest.mark.parametrize(
+    "tokens",
+    [
+        [{"surface": "あら", "pos": "Interjection", "lemma": "あら"}],
+        [
+            {"surface": "あら", "pos": "Interjection", "lemma": "あら"},
+            {"surface": "だ", "pos": "Auxiliary", "lemma": "だ"},
+        ],
+        [
+            {"surface": "あら", "pos": "Interjection", "lemma": "あら"},
+            {"surface": "、", "pos": "Symbol", "lemma": "、"},
+            {"surface": "て", "pos": "Particle", "lemma": "て"},
+            {"surface": "だ", "pos": "Auxiliary", "lemma": "だ"},
+        ],
+        [
+            {"surface": "あら", "pos": "Interjection", "lemma": "あら"},
+            {"surface": "って", "pos": "Particle", "lemma": "って"},
+            {"surface": "だ", "pos": "Auxiliary", "lemma": "だ"},
+        ],
+        *[
+            [
+                {"surface": "あら", "pos": "Interjection", "lemma": "あら"},
+                {"surface": "て", "pos": "Particle", "lemma": "て"},
+                {"surface": copula, "pos": "Auxiliary", "lemma": "だ"},
+            ]
+            for copula in ("で", "な", "なら", "なの")
+        ],
+    ],
+)
+def test_interjection_requires_complete_te_and_finite_copula(tokens):
+    from copy import deepcopy
+
+    from suzume_mcp.core.postprocessor_nominals import postprocess_noncontinuative_te_nominal
+
+    before = deepcopy(tokens)
+    assert not postprocess_noncontinuative_te_nominal(tokens)
+    assert tokens == before
+
+
 @pytest.mark.parametrize("text", ["苦手だ", "にがてな人"])
 def test_lexical_or_attributive_adjectival_stem_is_preserved(text):
     tokens, _, _ = get_expected_tokens(text)
