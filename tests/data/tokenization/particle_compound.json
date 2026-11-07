@@ -1024,6 +1024,276 @@
       ],
       "id": "soreha_niyoru",
       "input": "それは場合による。"
+    },
+    {
+      "description": "Compound particle continuative before ます splits into に + verb continuative",
+      "expected": [
+        {
+          "lemma": "気象庁",
+          "pos": "Noun",
+          "surface": "気象庁"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "よる",
+          "pos": "Verb",
+          "surface": "より"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "明日",
+          "pos": "Noun",
+          "surface": "明日"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "全国的",
+          "pos": "Adjective",
+          "surface": "全国的"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "晴れる",
+          "pos": "Verb",
+          "surface": "晴れる"
+        },
+        {
+          "lemma": "見込み",
+          "pos": "Noun",
+          "surface": "見込み"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "niyorimasuto_ha_ni_reru_midesu",
+      "input": "気象庁によりますと、明日は全国的に晴れる見込みです。"
+    },
+    {
+      "description": "Godan-ra compound particle continuative before polite まし",
+      "expected": [
+        {
+          "lemma": "三日",
+          "pos": "Noun",
+          "surface": "三日"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "わたる",
+          "pos": "Verb",
+          "surface": "わたり"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "まし"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "開催",
+          "pos": "Noun",
+          "surface": "開催"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "niwatarimashite_shimasu",
+      "input": "三日にわたりまして開催します"
+    },
+    {
+      "description": "Fixed compound particle continuative before polite まし splits like the family",
+      "expected": [
+        {
+          "lemma": "雨天",
+          "pos": "Noun",
+          "surface": "雨天"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "つく",
+          "pos": "Verb",
+          "surface": "つき"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "まし"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "中止",
+          "pos": "Noun",
+          "surface": "中止"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "nitsukimashite_shimasu",
+      "input": "雨天につきまして中止します"
+    },
+    {
+      "description": "Attributive による cannot close on a coined kana verb; によると + み + て",
+      "expected": [
+        {
+          "lemma": "犯行",
+          "pos": "Noun",
+          "surface": "犯行"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "内部",
+          "pos": "Noun",
+          "surface": "内部"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "者",
+          "pos": "Noun",
+          "surface": "者"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "よる",
+          "pos": "Verb",
+          "surface": "よる"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "みる",
+          "pos": "Verb",
+          "surface": "み"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "ha_no_niyorutomiteiru",
+      "input": "犯行は内部の者によるとみている"
+    },
+    {
+      "description": "Godan-wa compound particle continuative before polite まし",
+      "expected": [
+        {
+          "lemma": "規則",
+          "pos": "Noun",
+          "surface": "規則"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "従う",
+          "pos": "Verb",
+          "surface": "従い"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "まし"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "処理",
+          "pos": "Noun",
+          "surface": "処理"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "ni_imashite_shimasu",
+      "input": "規則に従いまして処理します"
     }
   ],
   "description": "particle_compound tests",

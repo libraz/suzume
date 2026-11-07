@@ -297,7 +297,7 @@ float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::
 }
 
 // A compound particle built on a predicate continuative still hosts the polite
-// auxiliary (に関し+まし+て, につき+まし+て). The POS-level bigram bars every
+// auxiliary (に関し+まし+て, につれ+まし+て). The POS-level bigram bars every
 // particle from that slot because a bare particle offers no stem for ます, and
 // the homographic readings of まし — the na-adjective and the opening of a
 // ましい-derived adjective — are what a bare particle actually selects. The
@@ -305,7 +305,7 @@ float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::
 // particle is a single mora that never carries it.
 float computeCompoundParticlePoliteBonus(const core::LatticeEdge& prev, const core::LatticeEdge& next) {
   if (next.extended_pos != core::ExtendedPOS::AuxTenseMasu || prev.extended_pos != core::ExtendedPOS::ParticleCase ||
-      normalize::utf8Length(prev.surface) < 3 || !kana::isIRowCodepoint(utf8::decodeLastChar(prev.surface))) {
+      normalize::utf8Length(prev.surface) < 3 || !grammar::endsWithRenyokeiMarker(prev.surface)) {
     return cost::kNeutral;
   }
   return -cost::kSevere;
@@ -314,7 +314,9 @@ float computeCompoundParticlePoliteBonus(const core::LatticeEdge& prev, const co
 // A compound case particle in its attributive る cell (による, に関する, に対する,
 // における) modifies a following noun. Closing the modifier on a particle,
 // symbol or auxiliary means the case particle plus the predicate, which keeps
-// its own boundaries (によると = に+よる+と).
+// its own boundaries (によると = に+よる+と). A verb cannot be the modified
+// nominal either, short of a continuative read as its deverbal noun — a kanji
+// one or an attested kana one (に関する+調べ, but によると+みて, not による+とみ+て).
 bool isAttributiveCompoundParticle(const core::LatticeEdge& edge) {
   return edge.extended_pos == core::ExtendedPOS::ParticleCase && edge.fromDictionary() &&
          grammar::isAttributiveCompoundParticleSurface(edge.surface);
@@ -329,9 +331,12 @@ bool isDependenceIdiomCompoundParticle(const core::LatticeEdge& edge) {
 }
 
 float computeAttributiveCompoundParticlePenalty(const core::LatticeEdge& prev, const core::LatticeEdge& next) {
-  const bool closes_modifier = next.pos == core::PartOfSpeech::Particle ||
-                               (next.pos == core::PartOfSpeech::Symbol && isDependenceIdiomCompoundParticle(prev)) ||
-                               next.pos == core::PartOfSpeech::Auxiliary || next.pos == core::PartOfSpeech::Other;
+  const bool closes_modifier =
+      next.pos == core::PartOfSpeech::Particle ||
+      (next.pos == core::PartOfSpeech::Symbol && isDependenceIdiomCompoundParticle(prev)) ||
+      next.pos == core::PartOfSpeech::Auxiliary || next.pos == core::PartOfSpeech::Other ||
+      (next.pos == core::PartOfSpeech::Verb && (next.extended_pos != core::ExtendedPOS::VerbRenyokei ||
+                                                (!next.lemmaVerified() && !grammar::containsKanji(next.surface))));
   return isAttributiveCompoundParticle(prev) && closes_modifier ? sc::kPenaltyAttributiveCompoundParticleClose
                                                                 : sc::scale::kNeutral;
 }

@@ -519,15 +519,35 @@ std::string godanBaseFromIrrealis(std::string_view stem) {
   return normalize::concat(utf8::dropLastChar(stem), suffix);
 }
 
+// The verb a compound particle (に+関し, に+より, に+つれ) is built on, read off
+// its continuative: the サ変 し, an Ichidan e-row stem, or a Godan i-row cell.
+// ます selects that continuative, so before it the particle is に plus the verb.
+std::pair<std::string, dictionary::ConjugationType> compoundParticleVerbLemma(std::string_view particle) {
+  const std::string_view head = particle.substr(core::kJapaneseCharBytes);
+  const char32_t last = utf8::decodeLastChar(head);
+  if (utf8::endsWith(head, "し")) {
+    return {normalize::concat(utf8::dropLastChar(head), "する"), dictionary::ConjugationType::Suru};
+  }
+  if (kana::isERowCodepoint(last)) {
+    return {normalize::concat(head, "る"), dictionary::ConjugationType::Ichidan};
+  }
+  const grammar::VerbType godan = grammar::verbTypeFromIRowCodepoint(last);
+  if (godan == grammar::VerbType::Unknown) {
+    return {};
+  }
+  return {normalize::concat(utf8::dropLastChar(head), grammar::godanBaseSuffixFromIRow(last)),
+          grammar::verbTypeToConjType(godan)};
+}
+
 }  // namespace
 
 // Verb-frame readings the surrounding frame decides, mirroring the reference:
 // 思わず before に is 思わ+ず; する+closed subsidiary splits (し+そこなう);
 // て+こう is the contracted volitional of ていく (て+こ+う); a continuative noun
 // before に and a motion verb, or after お before する, is the verb continuative;
-// にもまして is the te-form of 増す; ます after に関し makes it に+関し; the す
-// causative's hypothetical before ば is す's own cell; 来る's causative is
-// 来+させ.
+// にもまして is the te-form of 増す; ます after a compound particle makes it に plus
+// its verb continuative (に+関し, に+より); the す causative's hypothetical before
+// ば is す's own cell; 来る's causative is 来+させ.
 void resolveVerbFrameRepairs(std::vector<core::Morpheme>& result) {
   for (size_t idx = 0; idx < result.size(); ++idx) {
     auto& token = result[idx];
@@ -579,12 +599,12 @@ void resolveVerbFrameRepairs(std::vector<core::Morpheme>& result) {
       retagUninflected(te, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleConj, "て");
       insertAfter(result, idx, te);
     } else if (token.pos == core::PartOfSpeech::Particle && utf8::startsWith(token.surface, "に") && length >= 3 &&
-               utf8::endsWith(token.surface, "し") && following != nullptr &&
-               following->extended_pos == core::ExtendedPOS::AuxTenseMasu) {
+               following != nullptr && following->extended_pos == core::ExtendedPOS::AuxTenseMasu &&
+               !compoundParticleVerbLemma(token.surface).first.empty()) {
+      const auto [lemma, conj_type] = compoundParticleVerbLemma(token.surface);
       core::Morpheme verb = splitTail(token, 1);
       retagUninflected(token, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleCase, "に");
-      retag(verb, core::PartOfSpeech::Verb, core::ExtendedPOS::VerbRenyokei,
-            normalize::concat(utf8::dropLastChar(verb.surface), "する"), dictionary::ConjugationType::Suru,
+      retag(verb, core::PartOfSpeech::Verb, core::ExtendedPOS::VerbRenyokei, lemma, conj_type,
             grammar::ConjForm::Renyokei);
       insertAfter(result, idx, verb);
     } else if (utf8::equalsAny(token.surface, {"せ"}) && token.pos == core::PartOfSpeech::Auxiliary &&
