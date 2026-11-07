@@ -27,6 +27,9 @@ struct BracketedScan {
   bool left_enumerating_bracket{false};
   bool left_particle_bracket{false};
   bool left_genitive_bracket{false};
+  // The genitive follows a non-kana nominal (復旧+の), so it cannot be the
+  // nominalizer closing a predicate (届いていない+の+です).
+  bool left_nominal_genitive_bracket{false};
   bool left_determiner_bracket{false};
   bool left_clause_bracket{false};
   bool left_attributive_bracket{false};

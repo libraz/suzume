@@ -107,8 +107,10 @@ void UnknownWordGenerator::appendBracketedHiraganaNounCandidates(const std::vect
     // ねこ|が, この+つめ|が), so the run that stops there is offered beside the
     // maximal one and scoring weighs them. Word-final は is read as the particle alone; も, か and the other
     // focus particles end native nouns as often as not (こども, くも).
-    for (size_t particle_pos = start_pos + 2;
-         (bracketed.left_clause_bracket || bracketed.left_determiner_bracket) && particle_pos < scan; ++particle_pos) {
+    for (size_t particle_pos = start_pos + 2; (bracketed.left_clause_bracket || bracketed.left_determiner_bracket ||
+                                               bracketed.left_nominal_genitive_bracket) &&
+                                              particle_pos < scan;
+         ++particle_pos) {
       if (closesShortNounAt(dict_manager_, codepoints, particle_pos)) {
         emit_promoted_run(particle_pos);
       }

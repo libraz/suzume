@@ -58,13 +58,16 @@ bool admitsPromotedRun(const BracketedNounContext& ctx, const BracketedScan& bra
   // Nor may it open inside a registered predicate that the word in front of
   // the kana run hosts (参加+す|る+もふ cuts the light verb する in half).
   // A volitional stem is a cell only before its う, so elsewhere it is no
-  // predicate to cut (私+も|とっさ is not もつ's もと).
+  // predicate to cut (私+も|とっさ is not もつ's もと). The genitive that
+  // brackets the run hosts nothing: a predicate opening on it is the very
+  // reading the rescue is weighed against (復旧+の|めど, not 復旧+のめ+ど).
   bool opens_inside_hosted_predicate = false;
   constexpr size_t kPredicateLookbehind = 3;
   for (size_t probe = start_pos > kPredicateLookbehind ? start_pos - kPredicateLookbehind : 0;
        probe < start_pos && !opens_inside_hosted_predicate && dict_manager != nullptr; ++probe) {
     if (probe == 0 || ctx.char_types[probe - 1] == normalize::CharType::Hiragana ||
-        ctx.char_types[probe] != normalize::CharType::Hiragana) {
+        ctx.char_types[probe] != normalize::CharType::Hiragana ||
+        (bracketed.left_nominal_genitive_bracket && probe + 1 == start_pos)) {
       continue;
     }
     for (size_t probe_end = start_pos + 1; probe_end <= scan; ++probe_end) {

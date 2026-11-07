@@ -286,7 +286,10 @@ BracketedScan classifyLeftBrackets(const BracketedNounContext& ctx) {
   const bool left_attributive_bracket = start_pos > 0;
   // Every position has some left bracket: the clause bracket covers the start,
   // and the attributive one any later position.
-  return {left_enumerating_bracket, left_particle_bracket, left_genitive_bracket,
+  const bool left_nominal_genitive_bracket = left_genitive_bracket && start_pos >= 2 &&
+                                             char_types[start_pos - 2] != normalize::CharType::Hiragana &&
+                                             !isNonWordType(char_types[start_pos - 2]);
+  return {left_enumerating_bracket, left_particle_bracket, left_genitive_bracket,   left_nominal_genitive_bracket,
           left_determiner_bracket,  left_clause_bracket,   left_attributive_bracket};
 }
 
@@ -650,6 +653,8 @@ void readPromotedSurface(const BracketedNounContext& ctx, const BracketedScan& b
       (bracketed.left_enumerating_bracket && promoted.right_clause) || short_bos_case_particle_bracket ||
       promoted.unread_short_run_bracketed ||
       (bracketed.left_genitive_bracket && promoted.right_clause &&
+       !normalize::isExtendedParticle(codepoints[start_pos])) ||
+      (bracketed.left_nominal_genitive_bracket && promoted.right_particle &&
        !normalize::isExtendedParticle(codepoints[start_pos])) ||
       (promoted.right_copula && left_clause_bracket && promoted.promoted_dictionary_reading == nullptr) ||
       (promoted.right_suffix && promoted.promoted_dictionary_reading == nullptr) ||

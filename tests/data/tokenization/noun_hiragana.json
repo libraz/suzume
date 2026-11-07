@@ -1215,6 +1215,117 @@
       ],
       "id": "bitarousoku",
       "input": "古びたろうそく"
+    },
+    {
+      "description": "kana noun between a genitive and a particle keeps the genitive",
+      "expected": [
+        {
+          "lemma": "解決",
+          "pos": "Noun",
+          "surface": "解決"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "めど",
+          "pos": "Noun",
+          "surface": "めど"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "立つ",
+          "pos": "Verb",
+          "surface": "立っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "nomedoga_ttta",
+      "input": "解決のめどが立った"
+    },
+    {
+      "description": "two-mora kana noun after a genitive stops before the case particle",
+      "expected": [
+        {
+          "lemma": "犬",
+          "pos": "Noun",
+          "surface": "犬"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "えさ",
+          "pos": "Noun",
+          "surface": "えさ"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "足りる",
+          "pos": "Verb",
+          "surface": "足り"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "noesaga_rinai",
+      "input": "犬のえさが足りない"
+    },
+    {
+      "description": "genitive is not the opening mora of a listed verb before a kana noun",
+      "expected": [
+        {
+          "lemma": "友達",
+          "pos": "Noun",
+          "surface": "友達"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "めい",
+          "pos": "Noun",
+          "surface": "めい"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "nomeiga_ta",
+      "input": "友達のめいが来た"
     }
   ],
   "description": "noun_hiragana tests",
