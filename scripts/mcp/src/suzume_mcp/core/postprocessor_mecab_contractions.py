@@ -574,6 +574,10 @@ def repair_clause_final_geminate_past_adverb(tokens: list[dict]) -> None:
         idx += 2
 
 
+def _is_emphatic_yo(token: dict) -> bool:
+    return token.get("surface") == "よ" and token.get("pos") == "助詞" and token.get("pos_sub1") == "終助詞"
+
+
 def repair_sentence_final_godan_imperative(tokens: list[dict]) -> None:
     """Read a sentence-final potential continuative as the godan imperative.
 
@@ -581,8 +585,10 @@ def repair_sentence_final_godan_imperative(tokens: list[dict]) -> None:
     potential (君が行け → 行ける), but a continuative cannot end a sentence,
     so there it is the imperative of the godan verb (行く).  A comma keeps the
     suspended continuative (道が分かれ、進む) unless the quotative と follows it,
-    which closes a quoted sentence (書け、と言った).  A true ichidan stem with
-    no godan base (見せ) is left alone.
+    which closes a quoted sentence (書け、と言った).  The emphatic final よ
+    leaves the clause closed (早く言えよ) unless an accusative object marks the
+    transitive written imperative (平和を求めよ).  A true ichidan stem with no
+    godan base (見せ) is left alone.
     """
     for idx, token in enumerate(tokens):
         surface = token.get("surface", "")
@@ -600,11 +606,15 @@ def repair_sentence_final_godan_imperative(tokens: list[dict]) -> None:
         quoted_after_comma = (
             after_comma is not None and after_comma.get("surface") == "と" and after_comma.get("pos_sub2") == "引用"
         )
-        # A final particle is no evidence: よ also closes the ichidan
-        # imperative (求め+よ), whose base the reference reads as classical 求む.
-        if following is not None and not (
+        closes_clause = following is None or (
             following.get("pos") == "記号" and (following.get("pos_sub1") != "読点" or quoted_after_comma)
-        ):
+        )
+        if not closes_clause and not _is_emphatic_yo(following):
+            continue
+        # An accusative object marks the transitive written imperative
+        # (平和を求めよ), where the ichidan reading is the real verb; the
+        # potential, which takes が or no case, is the godan e-row (言えよ).
+        if not closes_clause and idx > 0 and tokens[idx - 1].get("surface") == "を":
             continue
         base = mecab_analyze(surface[:-1] + base_suffix)
         if len(base) != 1 or base[0].get("pos") != "動詞" or not base[0].get("conj_type", "").startswith("五段"):

@@ -1679,3 +1679,21 @@ class TestIndefinitePronounKa:
             {"surface": "かし忘れ", "pos": "Verb", "lemma": "かし忘れる"},
         ]
         assert not postprocessors.postprocess_indefinite_pronoun_ka(tokens)
+
+
+class TestGodanImperativeBeforeEmphaticYo:
+    @staticmethod
+    def _repaired(text):
+        from suzume_mcp.core.mecab import mecab_analyze
+
+        tokens = mecab_analyze(text)
+        postprocessors.repair_sentence_final_godan_imperative(tokens)
+        return tokens
+
+    def test_potential_continuative_before_yo_is_the_godan_imperative(self):
+        verb = self._repaired("早く言えよ")[1]
+        assert (verb["surface"], verb["lemma"], verb["conj_form"]) == ("言え", "言う", "命令ｅ")
+
+    def test_accusative_object_keeps_the_written_ichidan_imperative(self):
+        verb = self._repaired("平和を求めよ")[2]
+        assert verb["lemma"] == "求める"

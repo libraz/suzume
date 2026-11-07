@@ -154,6 +154,50 @@
       ],
       "id": "arukunogasukida",
       "input": "あるくのがすきだ"
+    },
+    {
+      "description": "早く言えよ - auto-generated",
+      "expected": [
+        {
+          "lemma": "早い",
+          "pos": "Adjective",
+          "surface": "早く"
+        },
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言え"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "ku_eyo",
+      "input": "早く言えよ"
+    },
+    {
+      "description": "元気出せよ。 - auto-generated",
+      "expected": [
+        {
+          "lemma": "元気",
+          "pos": "Adjective",
+          "surface": "元気"
+        },
+        {
+          "lemma": "出す",
+          "pos": "Verb",
+          "surface": "出せ"
+        },
+        {
+          "lemma": "よ",
+          "pos": "Particle",
+          "surface": "よ"
+        }
+      ],
+      "id": "seyo",
+      "input": "元気出せよ。"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 11/11)",
