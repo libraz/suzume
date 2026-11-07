@@ -253,8 +253,8 @@ def _encode_scorer_options(scorer_options: str | dict[str, object] | None) -> by
     if scorer_options is None:
         return None
     if isinstance(scorer_options, str):
-        return scorer_options.encode("utf-8")
-    return json.dumps(scorer_options, ensure_ascii=False).encode("utf-8")
+        return _encode_text(scorer_options)
+    return _encode_text(json.dumps(scorer_options, ensure_ascii=False))
 
 
 class Suzume:
@@ -471,7 +471,7 @@ class Suzume:
     def load_user_dict(self, data: str) -> int:
         """Load current TSV (or legacy CSV) and return the installed expanded-entry count."""
         handle = self._require_handle()
-        payload = data.encode("utf-8")
+        payload = _encode_text(data)
         count = int(_lib.suzume_load_user_dict_count(handle, payload, len(payload)))
         if count == 0:
             raise _native_error("failed to load user dictionary")
