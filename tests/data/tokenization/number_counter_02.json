@@ -628,6 +628,109 @@
       ],
       "id": "shinagara_ku",
       "input": "二度見しながら歩く"
+    },
+    {
+      "description": "kanji run before a numeral pretoken is read as cut by the numeral",
+      "expected": [
+        {
+          "lemma": "一日",
+          "pos": "Noun",
+          "surface": "一日"
+        },
+        {
+          "lemma": "約",
+          "pos": "Prefix",
+          "surface": "約"
+        },
+        {
+          "lemma": "3時間",
+          "pos": "Noun",
+          "surface": "3時間"
+        },
+        {
+          "lemma": "勉強",
+          "pos": "Noun",
+          "surface": "勉強"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "suru_23",
+      "input": "一日約３時間勉強する。"
+    },
+    {
+      "description": "kanji run before a currency pretoken keeps the approximation prefix",
+      "expected": [
+        {
+          "lemma": "一日",
+          "pos": "Noun",
+          "surface": "一日"
+        },
+        {
+          "lemma": "約",
+          "pos": "Prefix",
+          "surface": "約"
+        },
+        {
+          "lemma": "3千円",
+          "pos": "Noun",
+          "surface": "3千円"
+        },
+        {
+          "lemma": "かかる",
+          "pos": "Verb",
+          "surface": "かかる"
+        }
+      ],
+      "id": "kakaru_6",
+      "input": "一日約３千円かかる"
+    },
+    {
+      "description": "digit counter + one-kanji ichidan continuative before する is one noun",
+      "expected": [
+        {
+          "lemma": "2度寝",
+          "pos": "Noun",
+          "surface": "2度寝"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "2_shita",
+      "input": "2度寝した"
+    },
+    {
+      "description": "digit counter + one-kanji ichidan continuative before する",
+      "expected": [
+        {
+          "lemma": "1回見",
+          "pos": "Noun",
+          "surface": "1回見"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "1_shita",
+      "input": "1回見した"
     }
   ],
   "description": "number_counter tests (part 2/2)",

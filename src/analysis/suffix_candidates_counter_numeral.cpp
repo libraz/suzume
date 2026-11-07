@@ -17,6 +17,7 @@
 #include "tokenizer_utils.h"
 #include "unknown.h"
 #include "verb_candidates_dictionary_probes.h"
+#include "verb_candidates_verb_stems.h"
 
 namespace suzume::analysis::counter_detail {
 
@@ -214,7 +215,16 @@ void appendBasicNumeralCounterCandidates(const std::vector<char32_t>& codepoints
   // predicate distinguishes the productive quantity construction.
   if (numeral_end < char_types.size() && normalize::isCounterKanji(codepoints[numeral_end])) {
     const bool repeated_predicate_unit = isRepeatedNumeralNounPredicateUnitAt(codepoints, char_types, start_pos);
-    if (!repeated_predicate_unit && !closes_duration_span && dict_manager != nullptr &&
+    // A lone one-kanji ichidan continuative before する is no verbal noun but the
+    // deverbal tail of the quantity phrase (2度寝+する, 二度寝+する), which the
+    // uneven-run reading keeps whole; a listed godan-sa verb on the same kanji
+    // owns the し instead (2回+出し+た).
+    const bool lone_ichidan_continuative =
+        numeral_end + 2 < char_types.size() && char_types[numeral_end + 2] != normalize::CharType::Kanji &&
+        verb_helpers::isSingleKanjiIchidan(codepoints[numeral_end + 1]) &&
+        !verb_helpers::hasDictionaryGodanBaseFromIRow(
+            dict_manager, extractSubstring(codepoints, numeral_end + 1, numeral_end + 2), codepoints[numeral_end + 2]);
+    if (!repeated_predicate_unit && !closes_duration_span && !lone_ichidan_continuative && dict_manager != nullptr &&
         headsKanjiSuruPredicateAt(*dict_manager, codepoints, char_types, numeral_end + 1)) {
       appendCounterCandidate(codepoints, start_pos, numeral_end + 1, core::PartOfSpeech::Noun,
                              candidate::kCounterNounSplitBonus, core::ExtendedPOS::NounNumber,

@@ -121,6 +121,15 @@ class Analyzer {
   std::vector<core::Morpheme> analyzeSpan(std::string_view text, size_t char_offset) const;
 
   /**
+   * @brief Analyze text[span_start, span_end) with the pretoken that follows it in view
+   *
+   * @param following The pretoken starting at span_end, or nullptr
+   */
+  std::vector<core::Morpheme> analyzeSpanBeforeNumeral(std::string_view text, size_t span_start, size_t span_end,
+                                                       const pretokenizer::PreToken* following,
+                                                       size_t char_offset) const;
+
+  /**
    * @brief Analyze a single chunk (no further splitting)
    */
   std::vector<core::Morpheme> analyzeChunk(std::string_view text, size_t char_offset) const;

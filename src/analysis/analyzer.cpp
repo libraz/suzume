@@ -5,6 +5,7 @@
 
 #include "core/debug.h"
 #include "core/text_boundaries.h"
+#include "core/utf8_constants.h"
 #include "normalize/char_type.h"
 #include "normalize/utf8.h"
 
@@ -219,8 +220,11 @@ std::vector<core::Morpheme> Analyzer::analyzeWithPretokenizer(std::string_view t
     } else {
       // Analyze span
       const auto& span = pretoken_result.spans[span_idx++];
-      std::string_view span_text = text.substr(span.start, span.end - span.start);
-      auto span_morphemes = analyzeSpan(span_text, char_offset);
+      const pretokenizer::PreToken* following =
+          token_idx < pretoken_result.tokens.size() && pretoken_result.tokens[token_idx].start == span.end
+              ? &pretoken_result.tokens[token_idx]
+              : nullptr;
+      auto span_morphemes = analyzeSpanBeforeNumeral(text, span.start, span.end, following, char_offset);
       for (auto& morpheme : span_morphemes) {
         result.push_back(std::move(morpheme));
       }
@@ -228,6 +232,36 @@ std::vector<core::Morpheme> Analyzer::analyzeWithPretokenizer(std::string_view t
   }
 
   return result;
+}
+
+std::vector<core::Morpheme> Analyzer::analyzeSpanBeforeNumeral(std::string_view text, size_t span_start,
+                                                               size_t span_end, const pretokenizer::PreToken* following,
+                                                               size_t char_offset) const {
+  const std::string_view span_text = text.substr(span_start, span_end - span_start);
+  // A kanji run that a numeral pretoken cuts off is analyzed with the numeral
+  // in view, so the run reads as cut rather than as ending the text
+  // (一日|約+３時間). The pretoken keeps its own token; only the span's
+  // morphemes are taken, and only when one of them closes exactly there.
+  if (following == nullptr || span_text.empty() || following->end <= span_end) {
+    return analyzeSpan(span_text, char_offset);
+  }
+  const char32_t last_codepoint = utf8::decodeLastChar(span_text);
+  size_t following_pos = span_end;
+  const char32_t first_following = normalize::decodeUtf8(text, following_pos);
+  if (!normalize::isKanjiCodepoint(last_codepoint) || normalize::isNumeralCodepoint(last_codepoint) ||
+      !normalize::isNumeralCodepoint(first_following)) {
+    return analyzeSpan(span_text, char_offset);
+  }
+  const size_t span_chars = countChars(span_text, 0, span_text.size());
+  auto with_context = analyzeSpan(text.substr(span_start, following->end - span_start), char_offset);
+  const auto closing = std::find_if(with_context.begin(), with_context.end(), [&](const core::Morpheme& morpheme) {
+    return morpheme.end == char_offset + span_chars;
+  });
+  if (closing == with_context.end()) {
+    return analyzeSpan(span_text, char_offset);
+  }
+  with_context.erase(closing + 1, with_context.end());
+  return with_context;
 }
 
 std::vector<core::Morpheme> Analyzer::analyzeSpan(std::string_view text, size_t char_offset) const {
