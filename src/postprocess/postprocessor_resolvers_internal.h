@@ -76,6 +76,7 @@ void resolveClassicalPerfectTe(std::vector<core::Morpheme>& result);
 void resolveNominalizedRenyokeiPredicate(std::vector<core::Morpheme>& result);
 void resolveObligationNaranai(std::vector<core::Morpheme>& result);
 void resolveParticleAruOnbin(std::vector<core::Morpheme>& result);
+void resolveParticleHostedExistentialAru(std::vector<core::Morpheme>& result);
 void resolvePoliteSuruRenyokei(std::vector<core::Morpheme>& result);
 void resolvePreparatoryVolitional(std::vector<core::Morpheme>& result);
 void resolveProgressiveContractionNominalizer(std::vector<core::Morpheme>& result);

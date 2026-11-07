@@ -77,6 +77,7 @@ void resolvePrePrefixMorphemeRoles(std::vector<core::Morpheme>& result,
   }
 
   resolver::resolveParticleAruOnbin(result);
+  resolver::resolveParticleHostedExistentialAru(result);
   resolver::resolveDemonstrativeMiseru(result);
   resolver::resolveBenefactivePotential(result);
   resolver::resolveBindingParticleNegative(result);

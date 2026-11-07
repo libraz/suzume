@@ -546,6 +546,35 @@ void resolveParticleAruOnbin(std::vector<core::Morpheme>& result) {
   }
 }
 
+// The copula ある is the second half of である (で+は+ある), and after the
+// te particle it is the resultative auxiliary (して+あり+ます). After any
+// other particle its terminal and onbin cells are the existential verb
+// (友達+と+ある+店, 何+か+あっ+た).
+void resolveParticleHostedExistentialAru(std::vector<core::Morpheme>& result) {
+  for (size_t idx = 1; idx < result.size(); ++idx) {
+    auto& aru = result[idx];
+    const auto& host = result[idx - 1];
+    if (aru.extended_pos != core::ExtendedPOS::AuxCopulaDa || aru.lemma != "ある" ||
+        host.pos != core::PartOfSpeech::Particle) {
+      continue;
+    }
+    const bool binding_after_de = idx >= 2 &&
+                                  (host.extended_pos == core::ExtendedPOS::ParticleTopic ||
+                                   host.extended_pos == core::ExtendedPOS::ParticleBinding) &&
+                                  grammar::isTeDeSurface(result[idx - 2].surface);
+    if (grammar::isTeDeSurface(host.surface) || binding_after_de) {
+      continue;
+    }
+    const core::ExtendedPOS cell = core::detectVerbForm(aru.surface);
+    if (cell != core::ExtendedPOS::VerbShuushikei && cell != core::ExtendedPOS::VerbOnbinkei) {
+      continue;
+    }
+    const core::ExtendedPOS next = idx + 1 < result.size() ? result[idx + 1].extended_pos : core::ExtendedPOS::Unknown;
+    retag(aru, core::PartOfSpeech::Verb, cell, "ある", dictionary::ConjugationType::GodanRa,
+          grammar::conjFormFromExtendedPos(cell, next));
+  }
+}
+
 // A verb's continuative or onbin form followed by て/で is the connective
 // particle.  Its surface overlaps with several auxiliary entries, whose POS
 // is only disambiguated once the preceding selected verb form is available.
