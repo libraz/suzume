@@ -411,6 +411,77 @@
       ],
       "id": "gamendoukusakattta",
       "input": "掃除がめんどうくさかった"
+    },
+    {
+      "description": "Kana adjective u-onbin continuative before an inflected predicate",
+      "expected": [
+        {
+          "lemma": "よい",
+          "pos": "Adjective",
+          "surface": "よう"
+        },
+        {
+          "lemma": "できる",
+          "pos": "Verb",
+          "surface": "でき"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "まし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "youdekimashita",
+      "input": "ようできました"
+    },
+    {
+      "description": "Short kana adjective u-onbin continuative before a mixed-script predicate",
+      "expected": [
+        {
+          "lemma": "よい",
+          "pos": "Adjective",
+          "surface": "よう"
+        },
+        {
+          "lemma": "出来る",
+          "pos": "Verb",
+          "surface": "出来"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "まし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "you_mashita",
+      "input": "よう出来ました"
+    },
+    {
+      "description": "Registered adjective u-onbin before a kanji predicate",
+      "expected": [
+        {
+          "lemma": "すごい",
+          "pos": "Adjective",
+          "surface": "すごう"
+        },
+        {
+          "lemma": "見える",
+          "pos": "Verb",
+          "surface": "見える"
+        }
+      ],
+      "id": "sugou_eru",
+      "input": "すごう見える"
     }
   ],
   "description": "adjective_i tests",

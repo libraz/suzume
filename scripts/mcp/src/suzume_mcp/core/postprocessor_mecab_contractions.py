@@ -180,6 +180,28 @@ def repair_euphonic_adjective_adverb(tokens: list[dict]) -> None:
             and analyzed[0].get("conj_form", "").startswith("連用ゴザイ")
         ):
             tokens[idx] = analyzed[0]
+            continue
+
+        # A kana o-row keeps its vowel when く becomes う. General adverbs
+        # before a lexical verb can therefore be checked against the complete
+        # adjective base; demonstrative adverbs and ABAB forms keep their roles.
+        if (
+            token.get("pos_sub1") != "一般"
+            or idx + 1 >= len(tokens)
+            or tokens[idx + 1].get("pos") != "動詞"
+            or not regex.fullmatch(r"\p{Hiragana}*[おこごそぞとどのほぼぽもよろを]う", surface)
+            or (len(surface) == 4 and surface[:2] == surface[2:])
+        ):
+            continue
+        base = surface[:-1] + "い"
+        analyzed = mecab_analyze(base)
+        if len(analyzed) != 1 or analyzed[0].get("surface") != base or analyzed[0].get("pos") != "形容詞":
+            continue
+        # Keep the original spelling and pronunciation, which belong to the
+        # continuative rather than to the reconstructed terminal form.
+        for field in ("pos", "pos_sub1", "pos_sub2", "pos_sub3", "conj_type", "lemma"):
+            token[field] = analyzed[0].get(field, "*")
+        token["conj_form"] = "連用ゴザイ接続"
 
 
 def repair_continuative_before_manner_suffix(tokens: list[dict]) -> None:

@@ -49,6 +49,53 @@ bool isModernIAdjective(const std::string& lemma, const grammar::Inflection& inf
                                             minimum_confidence) != candidate::kNoOriginConfidence;
 }
 
+// A listed verb can follow in an inflected cell instead of its dictionary
+// surface. Keep the probe inside one Japanese run. An unlisted kanji verb
+// needs its complete terminal paradigm; unknown kana alone is not evidence.
+bool predicateFollowsOnbin(const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos,
+                           const grammar::Inflection& inflection, const dictionary::DictionaryManager* dict_manager) {
+  if (dict_manager == nullptr || end_pos >= codepoints.size()) {
+    return false;
+  }
+  const bool reduplicated = end_pos == start_pos + 4 && codepoints[start_pos] == codepoints[start_pos + 2] &&
+                            codepoints[start_pos + 1] == codepoints[start_pos + 3];
+  if (reduplicated) {
+    return false;
+  }
+  if (adj_detail::predicateFollowsContinuative(codepoints, start_pos, end_pos, dict_manager)) {
+    return true;
+  }
+  const bool kanji_head = normalize::isKanjiCodepoint(codepoints[end_pos]);
+  bool has_okurigana = false;
+  const size_t limit = std::min(codepoints.size(), end_pos + candidate::kMaxHiraganaOnbinProbeChars);
+  for (size_t probe_end = end_pos + 1; probe_end <= limit; ++probe_end) {
+    const char32_t codepoint = codepoints[probe_end - 1];
+    if (!normalize::isKanjiCodepoint(codepoint) && !kana::isHiraganaCodepoint(codepoint)) {
+      break;
+    }
+    has_okurigana = has_okurigana || kana::isHiraganaCodepoint(codepoint);
+    const std::string surface = extractSubstring(codepoints, end_pos, probe_end);
+    for (const auto& analysis : inflection.analyze(surface)) {
+      if (analysis.verb_type == grammar::VerbType::Unknown || analysis.verb_type == grammar::VerbType::IAdjective) {
+        continue;
+      }
+      if (verb_helpers::isVerbInDictionary(dict_manager, analysis.base_form)) {
+        return true;
+      }
+      // A kanji head supplies an orthographic boundary. Require its complete
+      // terminal paradigm, not an inferred bare stem, for an unlisted verb.
+      const bool terminal_boundary =
+          probe_end == codepoints.size() || !kana::isHiraganaCodepoint(codepoints[probe_end]);
+      if (kanji_head && has_okurigana && terminal_boundary && analysis.verb_type != grammar::VerbType::Suru &&
+          analysis.base_form == surface && !analysis.suffix.empty() &&
+          analysis.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 // The modern base of a ku-paradigm stem that ends in け, when that base is a
 // na-adjective spelling the same stem with か (静け -> 静か). Empty when no such
 // adjective is registered, which is the ordinary case for a verb stem in け.
@@ -149,15 +196,15 @@ void appendIAdjOnbinRenyokeiCandidates(const std::vector<char32_t>& codepoints, 
   // kanji stem keeps its spelling and only loses the く (高く → 高う). The cell
   // is missing from the paradigm, so the run gets cut at the glide instead.
   //
-  // Only those two shapes are admitted. A bare kana stem plus う would accept
-  // any two morae whose first plus い happens to be an adjective, which is what
-  // the formal noun よう spells.
+  // A kana o-row stem keeps its vowel (よく → よう). Since this also spells
+  // formal nouns, require a registered adjective and a following lexical verb.
   for (size_t u_pos = scan_start; u_pos < scan_end; ++u_pos) {
     if (codepoints[u_pos] != U'う' || u_pos <= start_pos) {
       continue;
     }
     size_t stem_end = u_pos;
     bool glide_shape = false;
+    bool kana_o_row_shape = false;
     if (codepoints[u_pos - 1] == U'ゅ') {
       if (u_pos < start_pos + 2 || !kana::isIRowCodepoint(codepoints[u_pos - 2])) {
         continue;
@@ -165,21 +212,33 @@ void appendIAdjOnbinRenyokeiCandidates(const std::vector<char32_t>& codepoints, 
       stem_end = u_pos - 1;
       glide_shape = true;
     } else if (!normalize::isKanjiCodepoint(codepoints[u_pos - 1])) {
-      continue;
+      if (!kana::isORowCodepoint(codepoints[u_pos - 1])) {
+        continue;
+      }
+      kana_o_row_shape = true;
     }
     if (stem_end <= start_pos) {
       continue;
     }
     const std::string lemma = extractSubstring(codepoints, start_pos, stem_end) + "い";
     // The glide is itself the evidence: nothing else produces し+ゅ+う. Without
-    // it the shape is just a kanji stem plus う, which every wa-row Godan
-    // terminal also spells (思う, 使う), so that side needs the dictionary.
+    // it the shape can also be a wa-row Godan terminal (思う, 使う) or
+    // a kana noun, so the unglided forms need the adjective dictionary.
     if (glide_shape ? !isModernIAdjective(lemma, inflection, dict_manager)
                     : !isIAdjectiveInDictionary(dict_manager, lemma)) {
       continue;
     }
+    if (kana_o_row_shape && !predicateFollowsOnbin(codepoints, start_pos, u_pos + 1, inflection, dict_manager)) {
+      continue;
+    }
     pushIAdjCell(candidates, extractSubstring(codepoints, start_pos, u_pos + 1), start_pos, u_pos + 1, lemma,
                  core::ExtendedPOS::AdjRenyokei, "i_adjective_onbin_renyokei");
+    // The unglided form was reconstructed from an actual adjective entry.
+    // A homographic function word must not make the coined-word filter erase it.
+    candidates.back().lemma_verified = !glide_shape;
+    if (kana_o_row_shape) {
+      candidates.back().conj_type = dictionary::ConjugationType::IAdjective;
+    }
   }
 }
 
