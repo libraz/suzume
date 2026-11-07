@@ -1353,6 +1353,75 @@
       ],
       "id": "gadaibu_kunattta_2",
       "input": "雨がだいぶ弱くなった"
+    },
+    {
+      "description": "locative で before an adverbial continuative adjective and a verb is the case particle",
+      "expected": [
+        {
+          "lemma": "友達",
+          "pos": "Noun",
+          "surface": "友達"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "公園",
+          "pos": "Noun",
+          "surface": "公園"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "よい",
+          "pos": "Adjective",
+          "surface": "よく"
+        },
+        {
+          "lemma": "遊ぶ",
+          "pos": "Verb",
+          "surface": "遊ぶ"
+        }
+      ],
+      "id": "ga_deyoku_bu",
+      "input": "友達が公園でよく遊ぶ"
+    },
+    {
+      "description": "家でよく寝た - auto-generated",
+      "expected": [
+        {
+          "lemma": "家",
+          "pos": "Noun",
+          "surface": "家"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "よい",
+          "pos": "Adjective",
+          "surface": "よく"
+        },
+        {
+          "lemma": "寝る",
+          "pos": "Verb",
+          "surface": "寝"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "deyoku_ta",
+      "input": "家でよく寝た"
     }
   ],
   "description": "Case particles (が、を、に、で)",

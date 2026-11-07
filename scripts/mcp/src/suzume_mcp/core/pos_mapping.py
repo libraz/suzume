@@ -341,6 +341,26 @@ def correct_mecab_pos(tokens: list[dict]) -> None:
             t["pos"] = "名詞"
             t["pos_sub1"] = "形容動詞語幹"
 
+        # The copula continuative で makes the following adjective the predicate
+        # of its noun (晴天+で+よい). An adjective in the continuative that
+        # modifies a following verb is no such predicate, so after a plain noun
+        # the で is the case particle (公園+で+よく+遊ぶ).
+        if (
+            surface == "で"
+            and pos == "助動詞"
+            and 0 < idx < len(tokens) - 2
+            and tokens[idx - 1].get("pos") == "名詞"
+            and tokens[idx - 1].get("pos_sub1") not in ("形容動詞語幹", "ナイ形容詞語幹")
+            and tokens[idx + 1].get("pos") == "形容詞"
+            and tokens[idx + 1].get("conj_form", "").startswith("連用")
+            and (
+                tokens[idx + 2].get("pos") == "動詞"
+                or (tokens[idx + 2].get("pos") == "名詞" and tokens[idx + 2].get("pos_sub1") == "サ変接続")
+            )
+        ):
+            t.update(pos="助詞", pos_sub1="格助詞", conj_type="*", conj_form="*", lemma="で")
+            continue
+
         # The contracted demonstrative adverb in そっか/こっか ("so it is") comes
         # back as a pronoun with itself as the lemma. It is そう/こう with the
         # sokuon before the final particle.

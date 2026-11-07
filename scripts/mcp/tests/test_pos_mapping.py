@@ -11,6 +11,28 @@ def test_particle_correction_accepts_raw_japanese_noun_tag():
     assert tokens[0]["pos"] == "Particle"
 
 
+def test_copula_de_before_adverbial_adjective_and_verb_is_case_particle():
+    tokens = [
+        {"surface": "公園", "pos": "名詞", "pos_sub1": "一般", "lemma": "公園"},
+        {"surface": "で", "pos": "助動詞", "pos_sub1": "*", "conj_form": "連用形", "lemma": "だ"},
+        {"surface": "よく", "pos": "形容詞", "pos_sub1": "非自立", "conj_form": "連用テ接続", "lemma": "よい"},
+        {"surface": "遊ぶ", "pos": "動詞", "pos_sub1": "自立", "lemma": "遊ぶ"},
+    ]
+    correct_mecab_pos(tokens)
+    assert tokens[1]["pos"] == "助詞"
+    assert tokens[1]["lemma"] == "で"
+
+
+def test_copula_de_before_predicative_adjective_stays_copula():
+    tokens = [
+        {"surface": "晴天", "pos": "名詞", "pos_sub1": "一般", "lemma": "晴天"},
+        {"surface": "で", "pos": "助動詞", "pos_sub1": "*", "conj_form": "連用形", "lemma": "だ"},
+        {"surface": "よい", "pos": "形容詞", "pos_sub1": "非自立", "conj_form": "基本形", "lemma": "よい"},
+    ]
+    correct_mecab_pos(tokens)
+    assert tokens[1]["pos"] == "助動詞"
+
+
 def test_particle_correction_preserves_suffix_subclassification():
     tokens = [{"surface": "さ", "pos": "名詞", "pos_sub1": "接尾", "lemma": "さ"}]
     correct_mecab_pos(tokens)
