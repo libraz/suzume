@@ -167,6 +167,12 @@ struct Suzume::Impl {
     analysis::ScorerOptions scorer_opts = opts.scorer_options;
     std::vector<std::string> diagnostics;
     std::string config_status;
+    auto appendConfigStatus = [&config_status](const std::string& item) {
+      if (!config_status.empty()) {
+        config_status += ", ";
+      }
+      config_status += item;
+    };
 
 #ifndef __EMSCRIPTEN__
     if (!opts.skip_env_config) {
@@ -177,10 +183,7 @@ struct Suzume::Impl {
         config_status = "json=" + result.config_path;
       }
       if (result.env_override_count > 0) {
-        if (!config_status.empty()) {
-          config_status += ", ";
-        }
-        config_status += "env_overrides=" + core::decimalDigits(result.env_override_count);
+        appendConfigStatus("env_overrides=" + core::decimalDigits(result.env_override_count));
       }
     }
 #endif
@@ -190,10 +193,7 @@ struct Suzume::Impl {
       if (!analysis::ScorerOptionsLoader::loadFromJsonString(opts.scorer_options_json, scorer_opts, &error_message)) {
         diagnostics.push_back("Failed to load direct scorer config: " + error_message);
       } else {
-        if (!config_status.empty()) {
-          config_status += ", ";
-        }
-        config_status += "program_json=active";
+        appendConfigStatus("program_json=active");
       }
     }
 

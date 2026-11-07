@@ -7,7 +7,7 @@ namespace suzume::dictionary {
 std::vector<LookupResult> lookupByTrie(const DoubleArray& trie, const std::vector<DictionaryEntry>& entries,
                                        std::string_view text, size_t start_pos) {
   std::vector<LookupResult> results;
-  if (entries.empty() || start_pos >= text.size()) {
+  if (entries.empty()) {
     return results;
   }
 
@@ -22,7 +22,6 @@ std::vector<LookupResult> lookupByTrie(const DoubleArray& trie, const std::vecto
     for (size_t entry_idx = first_idx; entry_idx < entries.size() && entries[entry_idx].surface == matched_surface;
          ++entry_idx) {
       LookupResult result{};
-      result.entry_id = static_cast<uint32_t>(entry_idx);
       result.length = char_length;
       result.entry = &entries[entry_idx];
       results.push_back(result);

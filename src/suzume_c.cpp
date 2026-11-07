@@ -314,28 +314,28 @@ suzume_result_t* analyzeBytes(SuzumeHandle* handle, std::string_view text) {
   result->normalized_text_size = output.normalized_text.size();
   for (size_t idx = 0; idx < morphemes.size(); ++idx) {
     const auto& morph = morphemes[idx];
-    result->morphemes[idx].surface = copyStringToArena(morph.surface, cursor);
+    auto& out = result->morphemes[idx];
+    out.surface = copyStringToArena(morph.surface, cursor);
     const std::string_view lemma = morph.getLemma();
-    result->morphemes[idx].base_form = copyStringToArena(lemma, cursor);
-    result->morphemes[idx].start = static_cast<uint32_t>(morph.start);
-    result->morphemes[idx].end = static_cast<uint32_t>(morph.end);
-    result->morphemes[idx].score = morph.score;
-    result->morphemes[idx].pos = static_cast<suzume_pos_t>(morph.pos);
-    result->morphemes[idx].extended_pos = static_cast<suzume_extended_pos_t>(morph.extended_pos);
-    result->morphemes[idx].conjugation_type = static_cast<suzume_conjugation_type_t>(morph.conj_type);
-    result->morphemes[idx].conjugation_form = static_cast<suzume_conjugation_form_t>(morph.conj_form);
+    out.base_form = copyStringToArena(lemma, cursor);
+    out.start = static_cast<uint32_t>(morph.start);
+    out.end = static_cast<uint32_t>(morph.end);
+    out.score = morph.score;
+    out.pos = static_cast<suzume_pos_t>(morph.pos);
+    out.extended_pos = static_cast<suzume_extended_pos_t>(morph.extended_pos);
+    out.conjugation_type = static_cast<suzume_conjugation_type_t>(morph.conj_type);
+    out.conjugation_form = static_cast<suzume_conjugation_form_t>(morph.conj_form);
     const bool conjugatable = morph.pos == suzume::core::PartOfSpeech::Verb ||
                               morph.pos == suzume::core::PartOfSpeech::Adjective ||
                               morph.pos == suzume::core::PartOfSpeech::Auxiliary;
-    result->morphemes[idx].flags =
-        static_cast<uint8_t>((morph.fromUserDict() ? SUZUME_MORPHEME_USER_DICT : 0U) |
-                             (morph.isFormalNoun() ? SUZUME_MORPHEME_FORMAL_NOUN : 0U) |
-                             (morph.isLowInformation() ? SUZUME_MORPHEME_LOW_INFO : 0U) |
-                             (morph.isUnknown() ? SUZUME_MORPHEME_UNKNOWN : 0U) |
-                             (morph.fromDictionary() ? SUZUME_MORPHEME_FROM_DICTIONARY : 0U) |
-                             (conjugatable ? SUZUME_MORPHEME_CONJUGATABLE : 0U));
-    result->morphemes[idx].surface_size = morph.surface.size();
-    result->morphemes[idx].base_form_size = lemma.size();
+    out.flags = static_cast<uint8_t>((morph.fromUserDict() ? SUZUME_MORPHEME_USER_DICT : 0U) |
+                                     (morph.isFormalNoun() ? SUZUME_MORPHEME_FORMAL_NOUN : 0U) |
+                                     (morph.isLowInformation() ? SUZUME_MORPHEME_LOW_INFO : 0U) |
+                                     (morph.isUnknown() ? SUZUME_MORPHEME_UNKNOWN : 0U) |
+                                     (morph.fromDictionary() ? SUZUME_MORPHEME_FROM_DICTIONARY : 0U) |
+                                     (conjugatable ? SUZUME_MORPHEME_CONJUGATABLE : 0U));
+    out.surface_size = morph.surface.size();
+    out.base_form_size = lemma.size();
   }
   return result;
 }

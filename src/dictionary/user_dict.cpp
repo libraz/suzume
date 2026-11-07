@@ -5,17 +5,11 @@
 
 namespace suzume::dictionary {
 
-namespace {
-
-constexpr size_t kMaxUserDictionarySurfaceBytes = 255;
-
-}  // namespace
-
 UserDictionary::UserDictionary() = default;
 
 bool UserDictionary::addEntry(const DictionaryEntry& entry) {
   if (entry.surface.empty() || !core::isValidPartOfSpeech(entry.pos) || !core::isValidExtendedPos(entry.extended_pos) ||
-      entry.surface.size() > kMaxUserDictionarySurfaceBytes || !normalize::isValidUtf8(entry.surface) ||
+      entry.surface.size() > kMaxSerializedSurfaceLength || !normalize::isValidUtf8(entry.surface) ||
       (!entry.lemma.empty() && !normalize::isValidUtf8(entry.lemma))) {
     return false;
   }
@@ -34,7 +28,6 @@ std::vector<LookupResult> UserDictionary::lookup(std::string_view text, size_t s
     for (uint32_t idx : *entry_ids) {
       if (idx < entries_.size()) {
         LookupResult result{};
-        result.entry_id = idx;
         result.length = length;
         result.entry = &entries_[idx];
         results.push_back(result);

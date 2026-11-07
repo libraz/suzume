@@ -22,7 +22,6 @@ TEST(UserDictTest, AddEntry) {
   EXPECT_TRUE(dict.addEntry(entry));
   const auto results = dict.lookup("東京", 0);
   ASSERT_EQ(results.size(), 1u);
-  EXPECT_EQ(results[0].entry_id, 0u);
   ASSERT_NE(results[0].entry, nullptr);
   EXPECT_EQ(results[0].entry->surface, "東京");
   EXPECT_EQ(results[0].entry->pos, core::PartOfSpeech::Noun);

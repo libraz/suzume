@@ -30,8 +30,7 @@ constexpr std::string_view kCopulaStrings[] = {
     "である",
 };
 
-}  // namespace
-
+// Case, binding and compound particles that should not be treated as verb endings.
 bool isParticle(std::string_view surface) {
   if (surface.size() == core::kJapaneseCharBytes && isParticleCodepoint(utf8::decodeFirstChar(surface))) {
     return true;
@@ -42,6 +41,8 @@ bool isParticle(std::string_view surface) {
 bool isCopula(std::string_view surface) {
   return utf8::equalsAny(surface, kCopulaStrings);
 }
+
+}  // namespace
 
 bool isParticleOrCopula(std::string_view surface) {
   return isParticle(surface) || isCopula(surface);

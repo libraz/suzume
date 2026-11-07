@@ -24,7 +24,6 @@ core::Unexpected<core::Error> invalid(std::string message) {
 }
 
 constexpr size_t kInlineFrontLength = 15;
-constexpr size_t kMaxSerializedSurfaceLength = std::numeric_limits<uint8_t>::max();
 constexpr uint16_t kPackedLemmaMask = 0x07FFU;
 constexpr size_t kMaxPackedGrammarPaletteSize = 32;
 constexpr int64_t kMinPackedLemmaDelta = -1024;

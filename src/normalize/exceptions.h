@@ -19,13 +19,6 @@ namespace suzume::normalize {
 // Particle/Copula Sets (for verb candidate filtering)
 // =============================================================================
 
-// Particle strings that should not be treated as verb endings
-// Includes case particles (格助詞), binding particles (係助詞), and compound particles
-bool isParticle(std::string_view surface);
-
-// Copula/auxiliary verb patterns that should not be treated as verb endings
-bool isCopula(std::string_view surface);
-
 // =============================================================================
 // Particle/Copula Lookup Functions
 // =============================================================================

@@ -1,7 +1,9 @@
 #ifndef SUZUME_DICTIONARY_DICTIONARY_H_
 #define SUZUME_DICTIONARY_DICTIONARY_H_
 
+#include <cstddef>
 #include <cstdint>
+#include <limits>
 #include <memory>
 #include <optional>
 #include <string>
@@ -12,6 +14,9 @@
 #include "core/types.h"
 
 namespace suzume::dictionary {
+
+/// Longest surface or lemma, in bytes, that the binary format's uint8 length field can hold.
+constexpr size_t kMaxSerializedSurfaceLength = std::numeric_limits<uint8_t>::max();
 
 /**
  * @brief Conjugation type for verbs and adjectives
@@ -89,7 +94,6 @@ struct DictionaryEntry {
  * @brief Lookup result
  */
 struct LookupResult {
-  uint32_t entry_id;
   size_t length;  // Match length in characters
   const DictionaryEntry* entry;
   bool from_user_dict = false;  // True if from a user dictionary (Layer 3 or 4)
