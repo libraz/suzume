@@ -329,6 +329,69 @@
       ],
       "id": "100_made_eta",
       "input": "100人超まで増えた"
+    },
+    {
+      "description": "digits after 千 continue the numeral",
+      "expected": [
+        {
+          "lemma": "3千5百円",
+          "pos": "Noun",
+          "surface": "3千5百円"
+        }
+      ],
+      "id": "3_5",
+      "input": "3千5百円"
+    },
+    {
+      "description": "3千5百人が集まった - auto-generated",
+      "expected": [
+        {
+          "lemma": "3千5百人",
+          "pos": "Noun",
+          "surface": "3千5百人"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "集まる",
+          "pos": "Verb",
+          "surface": "集まっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "3_5_ga_mattta",
+      "input": "3千5百人が集まった"
+    },
+    {
+      "description": "a bare kanji magnitude opens a mixed-script numeral",
+      "expected": [
+        {
+          "lemma": "千5百円",
+          "pos": "Noun",
+          "surface": "千5百円"
+        }
+      ],
+      "id": "5_2",
+      "input": "千5百円"
+    },
+    {
+      "description": "二千5百円 - auto-generated",
+      "expected": [
+        {
+          "lemma": "二千5百円",
+          "pos": "Noun",
+          "surface": "二千5百円"
+        }
+      ],
+      "id": "5_3",
+      "input": "二千5百円"
     }
   ],
   "description": "number_counter tests (part 2/2)",

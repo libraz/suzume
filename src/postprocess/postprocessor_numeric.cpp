@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <utility>
 
 #include "core/debug.h"
@@ -72,6 +73,14 @@ bool endsWithContinuableUnit(const std::string& surface) {
   return normalize::isMagnitudeKanji(utf8::decodeLastChar(surface));
 }
 
+// Check if surface is spelled entirely with kanji numerals (二千, 百)
+bool isKanjiNumeral(const std::string& surface) {
+  const auto codepoints = normalize::toCodepoints(surface);
+  return !codepoints.empty() && std::all_of(codepoints.begin(), codepoints.end(), [](char32_t code_point) {
+    return normalize::isNumeralCodepoint(code_point) && !isArabicDigitCodepoint(code_point);
+  });
+}
+
 }  // namespace
 
 std::vector<core::Morpheme> Postprocessor::mergeNumericExpressions(std::vector<core::Morpheme> morphemes) {
@@ -111,8 +120,12 @@ std::vector<core::Morpheme> Postprocessor::mergeNumericExpressions(std::vector<c
       }
     }
 
-    // Pattern 1: Merge large numbers (3億 + 5000万円)
-    if (current.pos == core::PartOfSpeech::Noun && isNumericExpression(current.surface) &&
+    // Pattern 1: Merge large numbers (3億 + 5000万円). A kanji numeral ending
+    // in a magnitude opens the numeral the same way when digits follow it
+    // (千 + 5百円, 二千 + 5百円).
+    const bool kanji_numeral_head = isKanjiNumeral(current.surface) && idx + 1 < morphemes.size() &&
+                                    isNumericExpression(morphemes[idx + 1].surface);
+    if (current.pos == core::PartOfSpeech::Noun && (kanji_numeral_head || isNumericExpression(current.surface)) &&
         endsWithContinuableUnit(current.surface)) {
       core::Morpheme merged = current;
       size_t merge_end = idx + 1;
