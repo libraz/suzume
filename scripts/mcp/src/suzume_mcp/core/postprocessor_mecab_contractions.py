@@ -534,22 +534,33 @@ def repair_clause_final_geminate_past_adverb(tokens: list[dict]) -> None:
     closing a clause after content it has nothing to modify and is the
     geminate onbin plus た (時間が+たっ+た).  The verb is the reading the
     reference gives the same onbin before たら.
+
+    The compound たった今 is the same geminate past plus the noun 今 when a
+    subject marker leads in and a particle follows (時間がたった今も); before a
+    verb it stays the adverb "just now" (彼がたった今来た).
     """
     idx = 1
     while idx < len(tokens):
         token = tokens[idx]
         surface = token.get("surface", "")
         following = tokens[idx + 1] if idx + 1 < len(tokens) else None
-        if (
-            token.get("pos") != "副詞"
-            or len(surface) < 3
-            or not surface.endswith("った")
-            or (following is not None and following.get("pos") != "記号")
-            or tokens[idx - 1].get("pos") == "記号"
-        ):
+        previous = tokens[idx - 1]
+        elapsed_now = (
+            surface.endswith("った今")
+            and previous.get("surface") == "が"
+            and previous.get("pos_sub1") == "格助詞"
+            and following is not None
+            and following.get("pos") == "助詞"
+        )
+        clause_final = (
+            surface.endswith("った")
+            and (following is None or following.get("pos") == "記号")
+            and previous.get("pos") != "記号"
+        )
+        if token.get("pos") != "副詞" or len(surface) < 3 or not (elapsed_now or clause_final):
             idx += 1
             continue
-        onbin = surface[:-1]
+        onbin = surface[: -2 if elapsed_now else -1]
         analyzed = mecab_analyze(onbin + "たら")
         if (
             len(analyzed) != 2
@@ -570,8 +581,11 @@ def repair_clause_final_geminate_past_adverb(tokens: list[dict]) -> None:
             "lemma": "た",
             "reading": "タ",
         }
-        tokens[idx : idx + 1] = [analyzed[0], past]
-        idx += 2
+        replacement = [analyzed[0], past]
+        if elapsed_now:
+            replacement.extend(mecab_analyze("今"))
+        tokens[idx : idx + 1] = replacement
+        idx += len(replacement)
 
 
 def repair_te_negative_causal_shi(tokens: list[dict]) -> None:

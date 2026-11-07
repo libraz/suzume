@@ -1729,3 +1729,19 @@ class TestTeNegativeCausalShi:
 
     def test_conjunction_between_nominals_is_kept(self):
         assert self._surfaces("東京ないし大阪") == ["東京", "ないし", "大阪"]
+
+
+class TestElapsedPastBeforeNow:
+    @staticmethod
+    def _surfaces(text):
+        from suzume_mcp.core.mecab import mecab_analyze
+
+        tokens = mecab_analyze(text)
+        postprocessors.repair_clause_final_geminate_past_adverb(tokens)
+        return [token["surface"] for token in tokens]
+
+    def test_subject_marker_and_particle_make_it_the_past_plus_now(self):
+        assert self._surfaces("時間がたった今も") == ["時間", "が", "たっ", "た", "今", "も"]
+
+    def test_adverb_before_a_verb_is_kept(self):
+        assert self._surfaces("彼がたった今来た") == ["彼", "が", "たった今", "来", "た"]
