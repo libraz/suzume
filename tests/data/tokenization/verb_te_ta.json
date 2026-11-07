@@ -1713,6 +1713,219 @@
       ],
       "id": "ndenaishi",
       "input": "読んでないし"
+    },
+    {
+      "description": "Quotative と + kana ichidan み (見る) + て keeps its boundaries",
+      "expected": [
+        {
+          "lemma": "警察",
+          "pos": "Noun",
+          "surface": "警察"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "男",
+          "pos": "Noun",
+          "surface": "男"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "金",
+          "pos": "Noun",
+          "surface": "金"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "奪う",
+          "pos": "Verb",
+          "surface": "奪っ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "逃走",
+          "pos": "Noun",
+          "surface": "逃走"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "みる",
+          "pos": "Verb",
+          "surface": "み"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "行方",
+          "pos": "Noun",
+          "surface": "行方"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "調べる",
+          "pos": "Verb",
+          "surface": "調べ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "ha_ga_wo_ttte_shitatomite_wo_beteiru",
+      "input": "警察は、男が金を奪って逃走したとみて行方を調べている。"
+    },
+    {
+      "description": "Quotative と + kana み + て",
+      "expected": [
+        {
+          "lemma": "事故",
+          "pos": "Noun",
+          "surface": "事故"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "みる",
+          "pos": "Verb",
+          "surface": "み"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "調べる",
+          "pos": "Verb",
+          "surface": "調べ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "tomite_beteiru",
+      "input": "事故とみて調べている"
+    },
+    {
+      "description": "Object を + kana ichidan み + て",
+      "expected": [
+        {
+          "lemma": "テレビ",
+          "pos": "Noun",
+          "surface": "テレビ"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "みる",
+          "pos": "Verb",
+          "surface": "み"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "から",
+          "pos": "Particle",
+          "surface": "から"
+        },
+        {
+          "lemma": "寝る",
+          "pos": "Verb",
+          "surface": "寝"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "womitekara_ta",
+      "input": "テレビをみてから寝た"
+    },
+    {
+      "description": "Object を + kana ichidan み + た",
+      "expected": [
+        {
+          "lemma": "様子",
+          "pos": "Noun",
+          "surface": "様子"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "みる",
+          "pos": "Verb",
+          "surface": "み"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "womita",
+      "input": "様子をみた"
     }
   ],
   "description": "Te-form and ta-form patterns",

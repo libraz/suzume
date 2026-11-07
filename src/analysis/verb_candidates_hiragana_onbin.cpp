@@ -624,21 +624,31 @@ void appendKuruRenyokeiCandidates(const std::vector<char32_t>& codepoints, size_
 }
 
 // 1-char ichidan renyokei before て/た (ねて → ね + て). Requires the base form
-// (stem + る) in the dictionary. Contextual subsidiary verbs are generated
+// (stem + る) in the dictionary, or — as for the passive stem before られる — an
+// Ichidan reading of the base in the predicate slot right after a case
+// particle (と+み+て, を+み+た). Contextual subsidiary verbs are generated
 // separately with their auxiliary ExtendedPOS.
 void appendIchidanRenyokei1CharCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                          const grammar::Inflection& inflection,
                                           const dictionary::DictionaryManager* dict_manager,
                                           std::vector<UnknownCandidate>& candidates) {
-  // Pattern: e-row hiragana followed by て or た
-  // IMPORTANT: Only generate if the base form (stem + る) is a known verb in dictionary
-  // to avoid false positives like めて → め + て (め is not a verb)
-  if (start_pos + 1 >= codepoints.size() || !kana::isERowCodepoint(codepoints[start_pos]) ||
+  // Pattern: e-row or i-row hiragana followed by て or た
+  // Without dictionary evidence the stem needs the predicate slot, to avoid
+  // false positives like めて → め + て inside a word.
+  if (start_pos + 1 >= codepoints.size() ||
+      (!kana::isERowCodepoint(codepoints[start_pos]) && !kana::isIRowCodepoint(codepoints[start_pos])) ||
       (codepoints[start_pos + 1] != U'て' && codepoints[start_pos + 1] != U'た')) {
     return;
   }
   const std::string stem_surface = extractSubstring(codepoints, start_pos, start_pos + 1);
   const std::string base_form = stem_surface + "る";
-  if (!vh::isVerbInDictionary(dict_manager, base_form)) {
+  const bool base_is_dict_verb = vh::isVerbInDictionary(dict_manager, base_form);
+  const bool predicate_slot_ichidan = !base_is_dict_verb &&
+                                      vh::followsCaseParticle(dict_manager, codepoints, start_pos) &&
+                                      vh::readsAsBaseForm(inflection, base_form, base_form, grammar::VerbType::Ichidan,
+                                                          candidate::kV1PrefixMinConfidence) &&
+                                      vh::lookupVerbLemma(dict_manager, stem_surface, base_form) == base_form;
+  if (!(kana::isERowCodepoint(codepoints[start_pos]) && base_is_dict_verb) && !predicate_slot_ichidan) {
     return;
   }
   // Strong negative cost to beat particle split
@@ -649,9 +659,10 @@ void appendIchidanRenyokei1CharCandidates(const std::vector<char32_t>& codepoint
                         << " cost=" << kCost << "\n";
   }
   // Explicit VerbRenyokei for て/た connection
-  candidates.push_back(makeVerbCandidate(stem_surface, start_pos, start_pos + 1, kCost, base_form,
-                                         dictionary::ConjugationType::Ichidan, true, CandidateOrigin::VerbHiragana,
-                                         0.8F, "hiragana_ichidan_renyokei_1char", core::ExtendedPOS::VerbRenyokei));
+  candidates.push_back(makeVerbCandidate(
+      stem_surface, start_pos, start_pos + 1, kCost, base_form, dictionary::ConjugationType::Ichidan, true,
+      predicate_slot_ichidan ? CandidateOrigin::VerbHiraganaInflectedRenyokei : CandidateOrigin::VerbHiragana, 0.8F,
+      "hiragana_ichidan_renyokei_1char", core::ExtendedPOS::VerbRenyokei));
 }
 
 }  // namespace suzume::analysis::hiragana_verb_detail

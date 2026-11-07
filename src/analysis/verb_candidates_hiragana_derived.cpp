@@ -99,7 +99,7 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
 
   // Generate 1-char ichidan renyokei stem candidates
   // E.g., ねて → ね (renyokei of ねる) + て (particle)
-  appendIchidanRenyokei1CharCandidates(codepoints, start_pos, dict_manager, candidates);
+  appendIchidanRenyokei1CharCandidates(codepoints, start_pos, inflection, dict_manager, candidates);
 
   // Generate 2+ char ichidan renyokei stem candidates
   // E.g., つけて → つけ (renyokei of つける) + て (particle)
