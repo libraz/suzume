@@ -112,10 +112,10 @@ bool setAuxiliaryAndNounCosts(BigramMatrix& table) {
       // bonus on the せ=する reading wins asymmetrically only when ない follows.
       {EPOS::AuxCausative, EPOS::AuxNegativeNai, cost::kModerateBonus},
 
-      // A bare causative auxiliary stem cannot be nominally case/topic marked.
-      // This rejects 知ら+せ+を/は in favour of the lexical noun 知らせ; a
-      // causative predicate needs a finite form or nominalizer before particles.
-      {EPOS::AuxCausative, EPOS::ParticleCase, cost::kAlmostNever},
+      // A causative auxiliary cannot be topic-marked: the stem needs a finite
+      // form or nominalizer first (知ら+せ+は is the noun 知らせ+は). The bare
+      // stem before a case particle is refused at the candidate, which leaves the
+      // terminal free to take と/から (待た+せる+と).
       {EPOS::AuxCausative, EPOS::ParticleTopic, cost::kAlmostNever},
 
       // A causative auxiliary cannot attach directly to a copula. A surface

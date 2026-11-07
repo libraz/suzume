@@ -88,6 +88,16 @@ bool lacksLicensingEnvironment(const DictionaryCandidateContext& ctx, const core
     return true;
   }
 
+  // A bare causative stem (せ, させ) cannot be case-marked; before a case
+  // particle the span is a lexical noun (知らせ+を). The terminal (待たせる+と)
+  // is a finished predicate and stays free, and so does a stem before an
+  // auxiliary that merely opens on a particle's kana (終わら+せ+とき).
+  if (result.entry->extended_pos == core::ExtendedPOS::AuxCausative && grammar::endsWithERow(result.entry->surface) &&
+      verb_helpers::caseParticleFollowsAt(dict_manager, codepoints, end_pos) &&
+      !verb_helpers::predicateAuxiliaryFollowsAt(&dict_manager, codepoints, end_pos)) {
+    return true;
+  }
+
   // A determiner spelled exactly like a verb's attributive (ある, かかる) is
   // that verb when a one-mora case particle has just supplied its argument
   // (お金が+ある人, 壁に+かかる絵); a determiner proper modifies its noun from

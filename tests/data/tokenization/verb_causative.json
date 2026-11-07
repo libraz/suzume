@@ -1364,6 +1364,127 @@
       ],
       "id": "wo_kasareta",
       "input": "靴を磨かされた"
+    },
+    {
+      "description": "Terminal causative せる takes the conditional と",
+      "expected": [
+        {
+          "lemma": "あんまり",
+          "pos": "Adverb",
+          "surface": "あんまり"
+        },
+        {
+          "lemma": "待つ",
+          "pos": "Verb",
+          "surface": "待た"
+        },
+        {
+          "lemma": "せる",
+          "pos": "Auxiliary",
+          "surface": "せる"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "悪い",
+          "pos": "Adjective",
+          "surface": "悪い"
+        },
+        {
+          "lemma": "し",
+          "pos": "Particle",
+          "surface": "し"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        }
+      ],
+      "id": "anmari_taseruto_ishine",
+      "input": "あんまり待たせると悪いしね"
+    },
+    {
+      "description": "Terminal causative させる takes the conditional と",
+      "expected": [
+        {
+          "lemma": "子供",
+          "pos": "Noun",
+          "surface": "子供"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "させる",
+          "pos": "Auxiliary",
+          "surface": "させる"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "喜ぶ",
+          "pos": "Verb",
+          "surface": "喜ぶ"
+        }
+      ],
+      "id": "ni_besaseruto_bu",
+      "input": "子供に食べさせると喜ぶ"
+    },
+    {
+      "description": "Terminal causative せる before と",
+      "expected": [
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読ま"
+        },
+        {
+          "lemma": "せる",
+          "pos": "Auxiliary",
+          "surface": "せる"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "眠い",
+          "pos": "Adjective",
+          "surface": "眠く"
+        },
+        {
+          "lemma": "なる",
+          "pos": "Verb",
+          "surface": "なる"
+        }
+      ],
+      "id": "wo_maseruto_kunaru",
+      "input": "本を読ませると眠くなる"
     }
   ],
   "description": "verb_causative tests",
