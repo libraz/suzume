@@ -1686,6 +1686,33 @@
       ],
       "id": "ndeyagattta",
       "input": "読んでやがった"
+    },
+    {
+      "description": "読んでないし - auto-generated",
+      "expected": [
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読ん"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        },
+        {
+          "lemma": "し",
+          "pos": "Particle",
+          "surface": "し"
+        }
+      ],
+      "id": "ndenaishi",
+      "input": "読んでないし"
     }
   ],
   "description": "Te-form and ta-form patterns",

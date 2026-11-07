@@ -1713,3 +1713,19 @@ class TestKotoSuruTeRepair:
 
     def test_year_noun_is_kept_without_a_te_tail(self):
         assert self._surfaces("ことしの夏") == ["ことし", "の", "夏"]
+
+
+class TestTeNegativeCausalShi:
+    @staticmethod
+    def _surfaces(text):
+        from suzume_mcp.core.mecab import mecab_analyze
+
+        tokens = mecab_analyze(text)
+        postprocessors.repair_te_negative_causal_shi(tokens)
+        return [token["surface"] for token in tokens]
+
+    def test_conjunction_behind_a_te_form_becomes_negative_and_shi(self):
+        assert self._surfaces("読んでないし") == ["読ん", "で", "ない", "し"]
+
+    def test_conjunction_between_nominals_is_kept(self):
+        assert self._surfaces("東京ないし大阪") == ["東京", "ないし", "大阪"]

@@ -574,6 +574,46 @@ def repair_clause_final_geminate_past_adverb(tokens: list[dict]) -> None:
         idx += 2
 
 
+def repair_te_negative_causal_shi(tokens: list[dict]) -> None:
+    """Split ない+し off the conjunction ないし behind a te-form.
+
+    ないし is the conjunction "or" between nominals (東京ないし大阪), but behind
+    the conjunctive て/で it is the negative ない plus the causal し (聞いてない
+    し). The verb and its て are re-analyzed with a final particle in place of
+    し, which gives the negative the reading the reference assigns it before any
+    other clause-final word, and し is put back after it.
+    """
+    idx = 2
+    while idx < len(tokens):
+        token, te_form, verb = tokens[idx], tokens[idx - 1], tokens[idx - 2]
+        if (
+            token.get("surface") != "ないし"
+            or token.get("pos") != "接続詞"
+            or te_form.get("surface") not in ("て", "で")
+            or te_form.get("pos_sub1") != "接続助詞"
+            or verb.get("pos") != "動詞"
+        ):
+            idx += 1
+            continue
+        probe = mecab_analyze(verb["surface"] + te_form["surface"] + "ないよ")
+        if len(probe) < 4 or probe[-1].get("surface") != "よ" or probe[-2].get("lemma") != "ない":
+            idx += 1
+            continue
+        shi = {
+            "surface": "し",
+            "pos": "助詞",
+            "pos_sub1": "接続助詞",
+            "pos_sub2": "*",
+            "pos_sub3": "*",
+            "conj_type": "*",
+            "conj_form": "*",
+            "lemma": "し",
+            "reading": "シ",
+        }
+        tokens[idx - 2 : idx + 1] = [*probe[:-1], shi]
+        idx += len(probe) - 2
+
+
 def _is_emphatic_yo(token: dict) -> bool:
     return token.get("surface") == "よ" and token.get("pos") == "助詞" and token.get("pos_sub1") == "終助詞"
 
