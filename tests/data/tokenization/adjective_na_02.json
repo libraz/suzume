@@ -1561,6 +1561,95 @@
       ],
       "id": "na_da",
       "input": "不安定な天気だ"
+    },
+    {
+      "description": "na-adjective 勝手 keeps one POS across cells",
+      "expected": [
+        {
+          "lemma": "好き",
+          "pos": "Adjective",
+          "surface": "好き"
+        },
+        {
+          "lemma": "勝手",
+          "pos": "Adjective",
+          "surface": "勝手"
+        },
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言い"
+        },
+        {
+          "lemma": "やがる",
+          "pos": "Auxiliary",
+          "surface": "やがっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "ki_iyagattte",
+      "input": "好き勝手言いやがって"
+    },
+    {
+      "description": "勝手 adverbial, nominal before が, and the compound 身勝手",
+      "expected": [
+        {
+          "lemma": "勝手",
+          "pos": "Adjective",
+          "surface": "勝手"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "しろ"
+        },
+        {
+          "lemma": "勝手",
+          "pos": "Noun",
+          "surface": "勝手"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "違う",
+          "pos": "Verb",
+          "surface": "違う"
+        },
+        {
+          "lemma": "身勝手",
+          "pos": "Adjective",
+          "surface": "身勝手"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "行動",
+          "pos": "Noun",
+          "surface": "行動"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "nishiro_ga_u_na_da",
+      "input": "勝手にしろ。勝手が違う。身勝手な行動だ。"
     }
   ],
   "description": "Na-adjectives (ナ形容詞) (part 2/2)",
