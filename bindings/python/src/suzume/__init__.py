@@ -245,6 +245,14 @@ def _locked(
     return wrapper
 
 
+def _encode_scorer_options(scorer_options: str | dict[str, object] | None) -> bytes | None:
+    if scorer_options is None:
+        return None
+    if isinstance(scorer_options, str):
+        return scorer_options.encode("utf-8")
+    return json.dumps(scorer_options, ensure_ascii=False).encode("utf-8")
+
+
 class Suzume:
     """A reusable analyzer instance.
 
@@ -283,15 +291,7 @@ class Suzume:
         opts.skip_core_dictionary = int(skip_core_dictionary)
         opts.skip_env_config = int(skip_env_config)
         opts.report_scorer_config = int(report_scorer_config)
-        scorer_json = (
-            scorer_options
-            if isinstance(scorer_options, str)
-            else json.dumps(scorer_options, ensure_ascii=False)
-            if scorer_options is not None
-            else None
-        )
-        scorer_payload = scorer_json.encode("utf-8") if scorer_json is not None else None
-        opts.scorer_options_json = scorer_payload
+        opts.scorer_options_json = _encode_scorer_options(scorer_options)
         data_directory = os.fsencode(_BUNDLED_DATA_DIR) if _BUNDLED_DATA_DIR is not None else None
         opts.data_directory = data_directory
 
@@ -348,7 +348,6 @@ class Suzume:
 
     # --- analysis ---
 
-    @_locked
     def analyze(self, text: str) -> list[Morpheme]:
         """Analyze ``text`` into a list of :class:`Morpheme`."""
         return self.analyze_with_normalized_text(text).morphemes

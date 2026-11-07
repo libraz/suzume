@@ -297,6 +297,27 @@ const registry = new FinalizationRegistry((ref: CleanupRef) => {
   }
 });
 
+/** Byte view over the module heap, derived from HEAPU32 (HEAPU8 may not be exported). */
+function heapBytes(module: EmscriptenModule): Uint8Array {
+  return new Uint8Array(module.HEAPU32.buffer);
+}
+
+/** Copy a string into freshly malloc'd NUL-terminated UTF-8; the caller frees `pointer`. */
+function allocUtf8(
+  module: EmscriptenModule,
+  value: string,
+): { pointer: number; byteLength: number } {
+  const byteLength = module.lengthBytesUTF8(value) + 1;
+  const pointer = module._malloc(byteLength);
+  try {
+    module.stringToUTF8(value, pointer, byteLength);
+  } catch (error) {
+    module._free(pointer);
+    throw error;
+  }
+  return { pointer, byteLength };
+}
+
 /**
  * Suzume instance for Japanese tokenization.
  *
@@ -313,7 +334,6 @@ export class Suzume {
   private readonly _conjugationTypeLabels = new Map<number, string | null>();
   private readonly _conjugationFormLabels = new Map<number, string | null>();
   private readonly _extendedPosLabels = new Map<number, string>();
-  private layouts = C_LAYOUTS;
   private unregisterToken = {};
 
   private constructor(module: EmscriptenModule, handle: number) {
@@ -353,7 +373,7 @@ export class Suzume {
         // but a field added to the C struct would otherwise be read as garbage.
         module._suzume_init_extended_options(optionsPtr);
 
-        const heap = new Uint8Array(module.HEAPU32.buffer);
+        const heap = heapBytes(module);
         const selectedMode = options.mode ?? EXTENDED_OPTION_DEFAULTS.mode;
         const modeValue = ANALYSIS_MODE_CODES[selectedMode];
         if (modeValue === undefined) {
@@ -369,9 +389,7 @@ export class Suzume {
             typeof options.scorerOptions === 'string'
               ? options.scorerOptions
               : JSON.stringify(options.scorerOptions);
-          const scorerBytes = module.lengthBytesUTF8(scorerJson) + 1;
-          scorerOptionsPtr = module._malloc(scorerBytes);
-          module.stringToUTF8(scorerJson, scorerOptionsPtr, scorerBytes);
+          scorerOptionsPtr = allocUtf8(module, scorerJson).pointer;
           module.HEAPU32[(optionsPtr + layout.scorerOptionsJson) >> 2] = scorerOptionsPtr;
         }
 
@@ -467,7 +485,7 @@ export class Suzume {
       if (options) {
         const posFilter = resolveTagPosFilter(options);
 
-        const optionsPtr = this.module._malloc(this.layouts.tagOptions.size);
+        const optionsPtr = this.module._malloc(C_LAYOUTS.tagOptions.size);
 
         try {
           // Same reason as create(): seed the C defaults into freshly malloc'd
@@ -475,8 +493,8 @@ export class Suzume {
           this.module._suzume_init_tag_options(optionsPtr);
 
           const heapU32 = this.module.HEAPU32;
-          const heapU8 = new Uint8Array(heapU32.buffer);
-          const layout = this.layouts.tagOptions;
+          const heapU8 = heapBytes(this.module);
+          const layout = C_LAYOUTS.tagOptions;
 
           heapU8[optionsPtr + layout.posFilter] = posFilter & 0xff;
           heapU32[(optionsPtr + layout.minLength) >> 2] =
@@ -549,10 +567,7 @@ export class Suzume {
 
     const dataPtr = this.module._malloc(data.byteLength);
     try {
-      // Derive Uint8Array view from HEAPU32's underlying buffer (HEAPU8 may not be exported)
-      const heapU32 = this.module.HEAPU32;
-      const heapU8 = new Uint8Array(heapU32.buffer);
-      heapU8.set(data, dataPtr);
+      heapBytes(this.module).set(data, dataPtr);
       return this.module._suzume_load_binary_dict(this.handle, dataPtr, data.byteLength) === 1;
     } finally {
       this.module._free(dataPtr);
@@ -664,10 +679,8 @@ export class Suzume {
         throw new SuzumeError('Input contains an unpaired UTF-16 surrogate', ErrorCode.InvalidUtf8);
       }
     }
-    const byteLength = this.module.lengthBytesUTF8(value) + 1;
-    const pointer = this.module._malloc(byteLength);
+    const { pointer, byteLength } = allocUtf8(this.module, value);
     try {
-      this.module.stringToUTF8(value, pointer, byteLength);
       return operation(pointer, byteLength);
     } finally {
       this.module._free(pointer);
