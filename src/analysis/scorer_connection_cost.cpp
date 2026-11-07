@@ -33,7 +33,7 @@ void addImpossibleAttachmentRules(const core::LatticeEdge& prev, const core::Lat
   // The uninflected とう/どう share their spelling with the desiderative's onbin
   // after a continuative (食べとうない), so only an onbin host proves them.
   const bool is_dialectal_oru_contraction =
-      grammar::isDialectalOruContractionLemma(next.lemma) &&
+      next.extended_pos == core::ExtendedPOS::AuxAspectIru && grammar::isDialectalOruContractionLemma(next.lemma) &&
       (prev.extended_pos == core::ExtendedPOS::VerbOnbinkei || !utf8::endsWith(next.lemma, "う"));
   const bool invalid_aspect_iru_attachment =
       next.extended_pos == core::ExtendedPOS::AuxAspectIru && !grammar::isContractedProgressiveSurface(next.surface) &&
@@ -252,51 +252,52 @@ void addBarredHostRules(const core::LatticeEdge& prev, const core::LatticeEdge& 
       normalize::utf8Length(prev.surface) == 1) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
-  const bool unknown_hiragana_conjunction_host = !prev.fromDictionary() &&
-                                                 prev.origin != core::CandidateOrigin::BracketedNoun &&
-                                                 grammar::isPureHiragana(prev.surface);
-  // A conjunction that spells a te-form cannot be introduced by a bare noun:
-  // with no boundary marker between them its opening mora is the continuative
-  // that the noun's own predicate needs (確認+し+たがっ+て+いる, not
-  // 確認+したがって+いる). A conjunction reached through a particle or a
-  // punctuation mark is unaffected, which is where the clause-opening reading
-  // actually occurs.
-  const bool te_form_conjunction =
-      grammar::isPureHiragana(next.surface) && utf8::endsWithAny(next.surface, {"て", "で"});
-  // A conjunction opening with だ is barred from the same slot for the mirror
-  // reason: directly after a noun that だ is the copula predicating it
-  // (確認+だ+から+こそ), and only a clause boundary in front of the conjunction
-  // makes the listed reading available.
-  const bool copula_initial_conjunction = utf8::startsWith(next.surface, "だ");
-  // Same reasoning at the other end: every listed と-final conjunction spells a
-  // predicate plus the conditional と (すると, そうすると, さもないと), so
-  // directly after a noun that と is the particle on the noun's own predicate
-  // (しばらく+する+と, not しばらく+すると). The bar is deliberately shaped on the
-  // conjunction rather than on the host being an unknown hiragana noun: a
-  // coordinating conjunction joins two nominals with no clause boundary
-  // anywhere, and barring it there shatters an all-hiragana coordination
-  // (りんご+または+みかん).
-  const bool conditional_to_conjunction = grammar::isConditionalToConjunction(next.surface);
-  // The conditional と reaches one host class further than the other two: an
-  // adverb in that slot modifies the very predicate the conjunction spells
-  // (もしか+する+と), so it is no more a clause boundary than a bare noun is.
-  const bool conjunction_host_slot =
-      prev.pos == core::PartOfSpeech::Noun || (prev.pos == core::PartOfSpeech::Adverb && conditional_to_conjunction);
-  // An auxiliary closes the predicate it sits on exactly as a noun heads the
-  // phrase it sits in, so a だ-initial conjunction directly after one is the
-  // copula predicating it and its own conjunctive particle (確認+す+べき+だ+が,
-  // not 確認+す+べき+だが). The listed conjunction reading needs the clause
-  // boundary that a punctuation mark or a particle supplies.
-  const bool barred_conjunction_host =
-      next.pos == core::PartOfSpeech::Conjunction &&
-      ((conjunction_host_slot && (te_form_conjunction || copula_initial_conjunction || conditional_to_conjunction)) ||
-       (prev.pos == core::PartOfSpeech::Auxiliary && copula_initial_conjunction));
+  bool barred_conjunction_host = false;
+  if (next.pos == core::PartOfSpeech::Conjunction) {
+    // A conjunction that spells a te-form cannot be introduced by a bare noun:
+    // with no boundary marker between them its opening mora is the continuative
+    // that the noun's own predicate needs (確認+し+たがっ+て+いる, not
+    // 確認+したがって+いる). A conjunction reached through a particle or a
+    // punctuation mark is unaffected, which is where the clause-opening reading
+    // actually occurs.
+    const bool te_form_conjunction =
+        grammar::isPureHiragana(next.surface) && utf8::endsWithAny(next.surface, {"て", "で"});
+    // A conjunction opening with だ is barred from the same slot for the mirror
+    // reason: directly after a noun that だ is the copula predicating it
+    // (確認+だ+から+こそ), and only a clause boundary in front of the conjunction
+    // makes the listed reading available.
+    const bool copula_initial_conjunction = utf8::startsWith(next.surface, "だ");
+    // Same reasoning at the other end: every listed と-final conjunction spells a
+    // predicate plus the conditional と (すると, そうすると, さもないと), so
+    // directly after a noun that と is the particle on the noun's own predicate
+    // (しばらく+する+と, not しばらく+すると). The bar is deliberately shaped on the
+    // conjunction rather than on the host being an unknown hiragana noun: a
+    // coordinating conjunction joins two nominals with no clause boundary
+    // anywhere, and barring it there shatters an all-hiragana coordination
+    // (りんご+または+みかん).
+    const bool conditional_to_conjunction = grammar::isConditionalToConjunction(next.surface);
+    // The conditional と reaches one host class further than the other two: an
+    // adverb in that slot modifies the very predicate the conjunction spells
+    // (もしか+する+と), so it is no more a clause boundary than a bare noun is.
+    const bool conjunction_host_slot =
+        prev.pos == core::PartOfSpeech::Noun || (prev.pos == core::PartOfSpeech::Adverb && conditional_to_conjunction);
+    // An auxiliary closes the predicate it sits on exactly as a noun heads the
+    // phrase it sits in, so a だ-initial conjunction directly after one is the
+    // copula predicating it and its own conjunctive particle (確認+す+べき+だ+が,
+    // not 確認+す+べき+だが). The listed conjunction reading needs the clause
+    // boundary that a punctuation mark or a particle supplies.
+    barred_conjunction_host =
+        (conjunction_host_slot && (te_form_conjunction || copula_initial_conjunction || conditional_to_conjunction)) ||
+        (prev.pos == core::PartOfSpeech::Auxiliary && copula_initial_conjunction);
+  }
   // A focus particle marks a phrase the analyzer has already identified. An
   // unknown hiragana noun is the fallback for material it could not, so the
   // pairing means the boundary landed inside a word rather than after one
   // (昔+の+まま+で, where のま+まで invents a host for まで).
   const bool barred_focus_particle_host = next.extended_pos == core::ExtendedPOS::ParticleAdverbial &&
-                                          prev.pos == core::PartOfSpeech::Noun && unknown_hiragana_conjunction_host;
+                                          prev.pos == core::PartOfSpeech::Noun && !prev.fromDictionary() &&
+                                          prev.origin != core::CandidateOrigin::BracketedNoun &&
+                                          grammar::isPureHiragana(prev.surface);
   // A formal noun whose canonical spelling is kana (こと, もの) is not one when
   // it appears as its single kanji directly after another kanji: there it is the
   // tail of that compound (果物, 仕事, 記事). The kana lemma behind the kanji
@@ -344,8 +345,7 @@ void addLexicalBoundaryRetentionRules(const core::LatticeEdge& prev, const core:
   // Dictionary compound adverbs and formal-noun constructions retain their
   // lexical boundary, unlike the corresponding accidental short-token splits.
   if (prev.extended_pos == core::ExtendedPOS::ParticleCase && next.pos == core::PartOfSpeech::Adverb &&
-      next.fromDictionary() && grammar::containsKanji(next.surface) &&
-      next.surface.find("の") != std::string_view::npos) {
+      next.fromDictionary() && grammar::containsKanji(next.surface) && utf8::contains(next.surface, "の")) {
     SUZUME_CONNECTION_ADD(bonus, cost::kModerateBonus);
   }
   if (prev.extended_pos == core::ExtendedPOS::NounFormal && prev.fromDictionary() &&
@@ -517,9 +517,8 @@ void addShortHiraganaIrrealisRules(const core::LatticeEdge& prev, const core::La
   // Neither an adverb nor a na-adjective stem takes ん directly (どう+ん of どうん;
   // a na-adjective stem takes な first).
   if (((prev.extended_pos == core::ExtendedPOS::VerbMizenkei && !prev.fromDictionary() &&
-        grammar::isPureHiragana(prev.surface) && prev.surface.size() <= 6) ||  // 2 chars or less (6 bytes in UTF-8)
-       prev.pos == core::PartOfSpeech::Adverb ||
-       prev.extended_pos == core::ExtendedPOS::AdjNaAdj) &&
+        grammar::isPureHiragana(prev.surface) && prev.surface.size() <= core::kTwoJapaneseCharBytes) ||
+       prev.pos == core::PartOfSpeech::Adverb || prev.extended_pos == core::ExtendedPOS::AdjNaAdj) &&
       next.surface == "ん") {
     SUZUME_CONNECTION_ADD(surface_bonus, cost::kAlmostNever);
   }
@@ -539,9 +538,8 @@ void addShortHiraganaIrrealisRules(const core::LatticeEdge& prev, const core::La
   // only cost 理解+でき+ず its boundary.
   if (prev.extended_pos == core::ExtendedPOS::VerbMizenkei && prev.fromDictionary() &&
       grammar::isPureHiragana(prev.surface) && kana::isARowCodepoint(utf8::decodeLastChar(prev.surface)) &&
-      prev.surface.size() <= 9 &&  // ≤3 hiragana chars (9 bytes)
-      next.extended_pos == core::ExtendedPOS::AuxNegativeNu && prev.lemma != "する" && prev.lemma != "ある" &&
-      prev.lemma != "なる" && utf8::equalsAny(next.surface, {"ず"})) {
+      prev.surface.size() <= core::kThreeJapaneseCharBytes && next.extended_pos == core::ExtendedPOS::AuxNegativeNu &&
+      prev.lemma != "する" && prev.lemma != "ある" && prev.lemma != "なる" && utf8::equalsAny(next.surface, {"ず"})) {
     SUZUME_CONNECTION_ADD(surface_bonus, cost::kAlmostNever);
   }
 }
@@ -653,7 +651,7 @@ void addSuruStemHostRules(const core::LatticeEdge& prev, const core::LatticeEdge
   // The pattern: 漢字+っ+漢字 (kanji + sokuon + kanji) as NOUN → し(する連用形)
   if (prev.pos == core::PartOfSpeech::Noun && !prev.fromDictionary() &&
       next.extended_pos == core::ExtendedPOS::VerbRenyokei && grammar::isSuruRenyokeiSurface(next.surface) &&
-      prev.surface.size() >= 9 &&  // At least 3 chars (2 kanji + っ)
+      prev.surface.size() >= core::kThreeJapaneseCharBytes &&  // At least 3 chars (2 kanji + っ)
       utf8::contains(prev.surface, "っ")) {
     // Check if it's kanji+っ+kanji pattern
     bool has_sokuon_between_kanji = false;
@@ -748,8 +746,9 @@ void addCopulaAndShiHomographRules(const core::LatticeEdge& prev, const core::La
   // Short verb renyokei (2-3 chars) followed by し or き often indicates
   // over-segmentation of a noun or longer verb
   // Exclude ば (valid conditional: よれ+ば), て (te-form), etc.
-  if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei && prev.surface.size() >= 6 && prev.surface.size() <= 9 &&
-      (next_is_shi || next.surface == "き") && grammar::isPureHiragana(prev.surface) &&  // 2-3 hiragana, all hiragana
+  if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei && prev.surface.size() >= core::kTwoJapaneseCharBytes &&
+      prev.surface.size() <= core::kThreeJapaneseCharBytes && (next_is_shi || next.surface == "き") &&
+      grammar::isPureHiragana(prev.surface) &&  // 2-3 hiragana, all hiragana
       (next.extended_pos == core::ExtendedPOS::VerbRenyokei || next.extended_pos == core::ExtendedPOS::ParticleConj)) {
     SUZUME_CONNECTION_ADD(surface_bonus, cost::kStrong);
   }
@@ -953,9 +952,9 @@ void addHiraganaPredicateFragmentRules(const core::LatticeEdge& prev, const core
   // Penalty for single-kanji NOUN → pure-hiragana VERB_未然 (non-dict)
   // E.g., 分+から should be 分から (single verb), not 分(NOUN) + から(VERB かる)
   // When a dictionary entry exists for combined form, penalize the split
-  if (prev.pos == core::PartOfSpeech::Noun && normalize::utf8Length(prev.surface) == 1 &&  // Single char
-      grammar::isAllKanji(prev.surface) && next.extended_pos == core::ExtendedPOS::VerbMizenkei &&
-      !next.fromDictionary() && grammar::isPureHiragana(next.surface)) {
+  if (prev.pos == core::PartOfSpeech::Noun && grammar::isSingleKanjiSurface(prev.surface) &&
+      next.extended_pos == core::ExtendedPOS::VerbMizenkei && !next.fromDictionary() &&
+      grammar::isPureHiragana(next.surface)) {
     SUZUME_CONNECTION_ADD(surface_bonus, cost::kVeryRare);  // Penalize split to favor combined dict verb
   }
 

@@ -107,8 +107,7 @@ BigramTable::EncodedTable BigramTable::initTable() {
     bigram_rules::inheritRuleProfile(table, core::ExtendedPOS::ParticleFinal, core::ExtendedPOS::ParticleChoice);
     for (size_t idx = 0; idx < BigramTable::kSize; ++idx) {
       const auto other = static_cast<core::ExtendedPOS>(idx);
-      if (core::isNounType(other) || other == core::ExtendedPOS::Pronoun ||
-          other == core::ExtendedPOS::PronounInterrogative) {
+      if (core::isNounType(other) || core::isPronounType(other)) {
         bigram_rules::setCost(table, core::ExtendedPOS::ParticleChoice, other, bigram_cost::kNeutral);
         bigram_rules::setCost(table, other, core::ExtendedPOS::ParticleChoice, bigram_cost::kRare);
       }

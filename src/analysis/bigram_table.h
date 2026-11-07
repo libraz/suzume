@@ -90,6 +90,7 @@ constexpr float kAppearanceAuxiliaryBonus = kExtremeBonus + kMinorBonus;
 constexpr float kCompletiveVolitionalBonus = kExtremeBonus + kMinorBonus;
 constexpr float kDoubleVeryStrongBonus = kVeryStrongBonus * 2;
 constexpr float kTripleVeryStrongBonus = kVeryStrongBonus * 3;
+constexpr float kDeterminerNounBonus = -kSevere;
 constexpr float kProhibitive = 5.0F;  // Absolute prohibition — exceeds kNever
 
 }  // namespace bigram_cost

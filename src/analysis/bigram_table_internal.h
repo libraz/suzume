@@ -14,7 +14,7 @@ inline constexpr uint8_t kUnsetCost = std::numeric_limits<uint8_t>::max();
 // Every value used by the grammatical rule tables. Keep this list compact:
 // the dense matrix stores only an index into it.
 inline constexpr std::array<float, 21> kCostPalette = {
-    -2.5F,
+    bigram_cost::kDeterminerNounBonus,
     bigram_cost::kCompletiveVolitionalBonus,
     bigram_cost::kDoubleVeryStrongBonus,
     bigram_cost::kTripleVeryStrongBonus,

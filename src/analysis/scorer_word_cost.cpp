@@ -176,7 +176,8 @@ float computeSpuriousVerbPenalty(const core::LatticeEdge& edge) {
   // Patterns: xさん, xさんで, さんで where x is short hiragana (likely name)
   // This complements the hatsuonbin penalty above for other verb forms
   // Penalize only when さん follows 0-2 hiragana chars and the form is at most 5 chars.
-  if (isUnregisteredPureHiraganaVerb(edge) && edge.surface.find("さん") <= core::kTwoJapaneseCharBytes &&
+  const bool unregistered_hiragana_verb = isUnregisteredPureHiraganaVerb(edge);
+  if (unregistered_hiragana_verb && edge.surface.find("さん") <= core::kTwoJapaneseCharBytes &&
       edge.surface.size() <= core::kFiveJapaneseCharBytes) {
     penalty += sc::kPenaltySanPatternVerb;
   }
@@ -185,7 +186,7 @@ float computeSpuriousVerbPenalty(const core::LatticeEdge& edge) {
   // E.g., "につけ" as renyokei of "につける" is spurious
   // Should be に|つけ (particle + verb), not につけ (verb)
   // Valid verbs like "につける" don't exist; this is a mis-analysis
-  if (isUnregisteredPureHiraganaVerb(edge) && edge.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+  if (unregistered_hiragana_verb && edge.extended_pos == core::ExtendedPOS::VerbRenyokei &&
       utf8::startsWith(edge.surface, "に") && edge.surface.size() >= core::kTwoJapaneseCharBytes &&
       edge.surface.size() <= core::kFourJapaneseCharBytes) {  // 2-4 chars
     penalty += sc::kPenaltyNiPrefixVerb;
@@ -195,7 +196,7 @@ float computeSpuriousVerbPenalty(const core::LatticeEdge& edge) {
   // E.g., "ございませんでし" as verb renyokei is spurious
   // Should be ござい|ませ|ん|でし (aux chain), not ございませんでし (verb)
   // Valid long verbs typically have kanji stems
-  if (isUnregisteredPureHiraganaVerb(edge) &&
+  if (unregistered_hiragana_verb &&
       edge.surface.size() >= core::kSixJapaneseCharBytes) {  // 6+ hiragana chars (6*3=18 bytes)
     penalty += sc::kPenaltyVeryLongHiraganaVerb;
   }
@@ -204,7 +205,7 @@ float computeSpuriousVerbPenalty(const core::LatticeEdge& edge) {
   // E.g., "つるつるし" as godan-sa renyokei — should be つるつる(ADV) + し(する)
   // Only renyokei: base forms like "づけられる" (from づける) are legitimate.
   // The -asu derivation lengthens the stem by one mora (あまやか+し).
-  if (isUnregisteredPureHiraganaVerb(edge) && edge.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+  if (unregistered_hiragana_verb && edge.extended_pos == core::ExtendedPOS::VerbRenyokei &&
       edge.surface.size() >= core::kFiveJapaneseCharBytes &&  // 5+ hiragana chars (5*3=15 bytes)
       !isTransitiveAsuContinuative(edge.surface)) {
     penalty += sc::kPenaltyVeryLongHiraganaVerb;
@@ -232,7 +233,8 @@ float computeVerbEndingPenalty(const core::LatticeEdge& edge) {
   // Common unregistered-hiragana endings are more plausibly an auxiliary
   // boundary than an independent verb. The table keeps their shared gate and
   // per-ending severity together.
-  if (isUnregisteredPureHiraganaVerb(edge)) {
+  const bool unregistered_hiragana_verb = isUnregisteredPureHiraganaVerb(edge);
+  if (unregistered_hiragana_verb) {
     for (const VerbEndingPenaltyRule& rule : kHiraganaVerbEndingPenalties) {
       if (edge.surface.size() >= core::kThreeJapaneseCharBytes && utf8::endsWith(edge.surface, rule.suffix)) {
         penalty += rule.penalty;
@@ -245,7 +247,7 @@ float computeVerbEndingPenalty(const core::LatticeEdge& edge) {
   // E.g., "ねて" should be ね + て, not ねて (verb te-form)
   // MeCab splits pure-hiragana verb te-forms into verb + て particle
   // Exception: keep short forms (2 chars like して, きて) as they're common L1 entries
-  if (isUnregisteredPureHiraganaVerb(edge) && edge.extended_pos == core::ExtendedPOS::VerbTeForm &&
+  if (unregistered_hiragana_verb && edge.extended_pos == core::ExtendedPOS::VerbTeForm &&
       edge.surface.size() >= core::kThreeJapaneseCharBytes) {  // keeps して, きて
     penalty += cost::kVeryRare;
   }
@@ -256,8 +258,7 @@ float computeVerbEndingPenalty(const core::LatticeEdge& edge) {
   // This penalty encourages verb_stem + て particle split
   // Apply to both dict and non-dict candidates as some come from auto-generation
   if (edge.pos == core::PartOfSpeech::Verb && edge.extended_pos == core::ExtendedPOS::VerbTeForm &&
-      grammar::containsKanji(edge.surface) &&
-      (utf8::endsWith(edge.surface, "て") || utf8::endsWith(edge.surface, "で")) &&
+      grammar::containsKanji(edge.surface) && utf8::endsWithAny(edge.surface, {"て", "で"}) &&
       edge.surface.size() <= core::kFourJapaneseCharBytes) {  // Short te-forms (1-2 kanji + て/で)
     penalty += cost::kSevere;                                 // Very strong penalty to overcome negative costs
   }
@@ -360,7 +361,7 @@ float computeMitaiAndPrefixDictBonus(const core::LatticeEdge& edge, size_t char_
   // not a separable prefix. Without this bonus, the strong PREFIX→NOUN bigram
   // bonus (-1.3) makes 御(PREFIX) + X split path cheaper than the dict entry.
   if (edge.fromDictionary() && edge.pos == core::PartOfSpeech::Noun &&
-      edge.surface.size() >= core::kTwoJapaneseCharBytes && edge.surface.compare(0, 3, "御") == 0) {
+      edge.surface.size() >= core::kTwoJapaneseCharBytes && utf8::startsWith(edge.surface, "御")) {
     bonus += lengthScaledBonus(sc::kBonusHonorificGoNounBase, char_len, 2, sc::kBonusHonorificGoNounPerChar);
   }
 

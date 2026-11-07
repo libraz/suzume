@@ -96,8 +96,7 @@ float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::
   if (prev.extended_pos == core::ExtendedPOS::ParticleCase &&
       prev.surface.size() <= core::kJapaneseCharBytes &&  // Single hiragana char (3 bytes in UTF-8)
       next.pos == core::PartOfSpeech::Verb && !next.fromDictionary() && grammar::isPureHiragana(next.surface) &&
-      next.surface.size() <= 6 &&  // 2 chars or less (6 bytes in UTF-8)
-      next.extended_pos != core::ExtendedPOS::VerbShuushikei &&
+      next.surface.size() <= core::kTwoJapaneseCharBytes && next.extended_pos != core::ExtendedPOS::VerbShuushikei &&
       next.surface != "い" &&  // Exclude い - has specific rule
       !is_validated_ichidan_inflection && !is_resolved_i_onbin) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
@@ -112,8 +111,7 @@ float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::
   // and its irrealis せ in the literary one (容赦はせぬ)
   if (prev.extended_pos == core::ExtendedPOS::ParticleTopic && prev.surface == "は" &&
       next.pos == core::PartOfSpeech::Verb && grammar::isPureHiragana(next.surface) &&
-      next.surface.size() <= 3 &&  // 1 char only (3 bytes in UTF-8)
-      next.surface != "い" &&      // い+られ is valid (いる potential)
+      next.surface.size() <= core::kJapaneseCharBytes && next.surface != "い" &&  // い+られ is valid (いる potential)
       !grammar::isSuruRenyokeiSurface(next.surface) &&
       !(grammar::isSuruMizenkeiSurface(next.surface) && next.extended_pos == core::ExtendedPOS::VerbMizenkei)) {
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryRare);
@@ -124,8 +122,8 @@ float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::
   // Pure hiragana unknown sequences split before し/き/etc. are usually wrong
   // Does not apply when prev is a known particle/aux (those have specific EPOS)
   if (prev.pos == core::PartOfSpeech::Other && grammar::isPureHiragana(prev.surface) &&
-      prev.surface.size() >= 6 &&  // 2+ hiragana chars
-      next.extended_pos == core::ExtendedPOS::VerbRenyokei && next.surface.size() <= core::kJapaneseCharBytes) {
+      prev.surface.size() >= core::kTwoJapaneseCharBytes && next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      next.surface.size() <= core::kJapaneseCharBytes) {
     SUZUME_CONNECTION_ADD(bonus, cost::kUncommon);
   }
 
@@ -150,7 +148,7 @@ float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::
   // An adverb has no such stray continuation either (なんで+す for なん+です).
   if (((prev.pos == core::PartOfSpeech::Noun && grammar::containsKanji(prev.surface)) ||
        prev.pos == core::PartOfSpeech::Adverb) &&
-      next.pos == core::PartOfSpeech::Other && next.surface.size() == 3 &&  // Single char = 3 bytes UTF-8
+      next.pos == core::PartOfSpeech::Other && next.surface.size() == core::kJapaneseCharBytes &&
       grammar::isPureHiragana(next.surface)) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
@@ -314,6 +312,8 @@ float computeCompoundParticlePoliteBonus(const core::LatticeEdge& prev, const co
   return -cost::kSevere;
 }
 
+namespace {
+
 // A compound case particle in its attributive る cell (による, に関する, に対する,
 // における) modifies a following noun. Closing the modifier on a particle,
 // symbol or auxiliary means the case particle plus the predicate, which keeps
@@ -324,6 +324,8 @@ bool isAttributiveCompoundParticle(const core::LatticeEdge& edge) {
   return edge.extended_pos == core::ExtendedPOS::ParticleCase && edge.fromDictionary() &&
          grammar::isAttributiveCompoundParticleSurface(edge.surface);
 }
+
+}  // namespace
 
 // による alone is also the idiom of dependence (場合による), so at the end of
 // the input or before a mark it is the case particle plus that predicate. The

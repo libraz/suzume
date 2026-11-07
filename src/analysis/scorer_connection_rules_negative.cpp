@@ -49,14 +49,16 @@ float computeNegativeAndNounVerbBonus(const core::LatticeEdge& prev, const core:
   //     irrealis (食べ+よう, し+よう, こ+よう). A host ending on the a- or
   //     u-row has no such cell, so the terminal copula cannot carry it
   //     (煙が+ただよう, not がた+だ+よう).
-  const char32_t volitional_host_vowel = grammar::getVowelForChar(utf8::decodeLastChar(prev.surface));
-  const bool volitional_host_row_mismatch =
-      next.extended_pos == core::ExtendedPOS::AuxVolitional &&
-      ((prev.extended_pos == core::ExtendedPOS::AuxTenseMasu && grammar::endsWithERow(prev.surface) &&
-        grammar::isSingleHiragana(next.surface, core::hiragana::kN)) ||
-       (grammar::isSingleHiragana(next.surface, U'う') && volitional_host_vowel != U'お') ||
-       (prev.extended_pos == core::ExtendedPOS::AuxTenseTa && !utf8::equalsAny(prev.surface, {"たろ"})) ||
-       (utf8::equalsAny(next.surface, {"よう"}) && (volitional_host_vowel == U'あ' || volitional_host_vowel == U'う')));
+  bool volitional_host_row_mismatch = false;
+  if (next.extended_pos == core::ExtendedPOS::AuxVolitional) {
+    const char32_t volitional_host_vowel = grammar::getVowelForChar(utf8::decodeLastChar(prev.surface));
+    volitional_host_row_mismatch =
+        (prev.extended_pos == core::ExtendedPOS::AuxTenseMasu && grammar::endsWithERow(prev.surface) &&
+         grammar::isSingleHiragana(next.surface, core::hiragana::kN)) ||
+        (grammar::isSingleHiragana(next.surface, U'う') && volitional_host_vowel != U'お') ||
+        (prev.extended_pos == core::ExtendedPOS::AuxTenseTa && !utf8::equalsAny(prev.surface, {"たろ"})) ||
+        (utf8::equalsAny(next.surface, {"よう"}) && (volitional_host_vowel == U'あ' || volitional_host_vowel == U'う'));
+  }
   // The classical/contracted negative ん cannot be followed by the plain
   // copula だ. In an apparent …んだ sequence after a ma/ba/na-row verb, ん is
   // the verb's hatsuonbin and だ is the past auxiliary (膨らん+だ).
@@ -312,8 +314,8 @@ float computeNegativeAndNounVerbBonus(const core::LatticeEdge& prev, const core:
   const bool bound_derivational_suffix = grammar::isBoundDerivationalSuffixVerbLemma(next.lemma);
   if ((prev.extended_pos == core::ExtendedPOS::Noun || prev.extended_pos == core::ExtendedPOS::Pronoun) &&
       next.extended_pos == core::ExtendedPOS::VerbRenyokei && !grammar::isSuruRenyokeiSurface(next.surface) &&
-      next.surface != "せ" && next.surface.size() <= 6 && bare_kanji_host && !renyokei_has_okurigana &&
-      !bound_derivational_suffix) {
+      next.surface != "せ" && next.surface.size() <= core::kTwoJapaneseCharBytes && bare_kanji_host &&
+      !renyokei_has_okurigana && !bound_derivational_suffix) {
     SUZUME_CONNECTION_ADD(bonus, cost::kRare);  // Cancel the bigram bonus
   }
 

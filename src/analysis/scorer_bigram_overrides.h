@@ -9,7 +9,7 @@
 namespace suzume::analysis {
 
 // The public option name, POS pair, and storage member are one definition.
-// JSON loading, environment loading, and Scorer::bigramCost all consume it.
+// JSON loading, environment loading, and the Scorer constructor's bigram table all consume it.
 struct BigramOverrideSpec {
   const char* name;
   core::PartOfSpeech prev;

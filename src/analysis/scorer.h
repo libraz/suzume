@@ -14,7 +14,7 @@ namespace suzume::analysis {
 // Public POS values collapse to the 13 scoring profiles used by the static
 // bigram matrix (Interjection, Other, and Unknown share the final profile).
 inline constexpr size_t kScoringPosClassCount = 13;
-using BigramOverrideCostTable = std::array<std::array<float, kScoringPosClassCount>, kScoringPosClassCount>;
+using BigramCostTable = std::array<std::array<float, kScoringPosClassCount>, kScoringPosClassCount>;
 
 /**
  * @brief Scoring options
@@ -149,11 +149,11 @@ class Scorer {
 
  private:
   ScorerOptions options_;
-  BigramOverrideCostTable bigram_override_costs_;
+  BigramCostTable bigram_costs_;
 
   /**
    * @brief Calculate bigram connection cost
-   * Uses BigramOverrides if set, otherwise falls back to default table
+   * Reads the default table with any BigramOverrides already applied
    */
   float bigramCost(core::PartOfSpeech prev, core::PartOfSpeech next) const;
 };

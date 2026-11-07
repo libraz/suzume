@@ -573,8 +573,8 @@ void addKangoSuffixSplitRules(const core::LatticeEdge& prev, const core::Lattice
   const bool prefixed_run_before_suffix =
       prev.pos == core::PartOfSpeech::Noun && !prev.fromDictionary() && next.pos == core::PartOfSpeech::Suffix &&
       normalize::utf8Length(prev.surface) == 2 && grammar::startsWithSuperlativePrefix(prev.surface);
-  if ((normalize::utf8Length(prev.surface) == 1 && normalize::utf8Length(next.surface) == 1 &&
-       (one_kanji_noun_before_suffix || one_kanji_suffix_before_noun)) ||
+  if (((one_kanji_noun_before_suffix || one_kanji_suffix_before_noun) && normalize::utf8Length(prev.surface) == 1 &&
+       normalize::utf8Length(next.surface) == 1) ||
       prefixed_run_before_suffix) {
     // The split collects the -0.8 bigram bonus here and the SUFFIX→PART_格
     // bonus on the next edge (最+中+に), so a penalty that only offsets the
@@ -607,15 +607,16 @@ void addKangoSuffixSplitRules(const core::LatticeEdge& prev, const core::Lattice
   // 間, so it needs the same neutralizing penalty as the 3+ char case. Keyed on
   // the period unit rather than the length: after any other two-kanji noun the
   // suffix keeps its productive "between X" reading (部署|間, 世代|間).
-  const size_t suffix_stem_len = normalize::utf8Length(prev.surface);
-  const bool duration_noun_tail = suffix_stem_len == 2 &&
-                                  normalize::isQuantityPhraseSuffixKanji(utf8::decodeFirstChar(next.surface)) &&
-                                  normalize::isDurationCompoundHeadKanji(utf8::decodeLastChar(prev.surface));
-  if (prev.pos == core::PartOfSpeech::Noun && next.pos == core::PartOfSpeech::Suffix && !prev.fromDictionary() &&
-      (suffix_stem_len >= 3 || duration_noun_tail) && normalize::utf8Length(next.surface) == 1 &&
-      grammar::isAllKanji(prev.surface) && grammar::isAllKanji(next.surface) &&
-      !normalize::isDerivationalNounSuffixKanji(utf8::decodeLastChar(prev.surface))) {
-    SUZUME_CONNECTION_ADD(bonus, cost::kRare);  // +1.0 to neutralize -0.8 bigram bonus
+  if (prev.pos == core::PartOfSpeech::Noun && next.pos == core::PartOfSpeech::Suffix && !prev.fromDictionary()) {
+    const size_t suffix_stem_len = normalize::utf8Length(prev.surface);
+    const bool duration_noun_tail = suffix_stem_len == 2 &&
+                                    normalize::isQuantityPhraseSuffixKanji(utf8::decodeFirstChar(next.surface)) &&
+                                    normalize::isDurationCompoundHeadKanji(utf8::decodeLastChar(prev.surface));
+    if ((suffix_stem_len >= 3 || duration_noun_tail) && normalize::utf8Length(next.surface) == 1 &&
+        grammar::isAllKanji(prev.surface) && grammar::isAllKanji(next.surface) &&
+        !normalize::isDerivationalNounSuffixKanji(utf8::decodeLastChar(prev.surface))) {
+      SUZUME_CONNECTION_ADD(bonus, cost::kRare);  // +1.0 to neutralize -0.8 bigram bonus
+    }
   }
 }
 
@@ -707,9 +708,9 @@ void addShortVerbFragmentRules(const core::LatticeEdge& prev, const core::Lattic
   // Exception: い+られ is valid (いる potential: いられない = cannot stay)
   if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
       (next.extended_pos == core::ExtendedPOS::AuxPassive || next.extended_pos == core::ExtendedPOS::AuxCausative) &&
-      prev.surface.size() <= 3 &&                                       // Single hiragana (3 bytes)
-      grammar::isPureHiragana(prev.surface) && prev.surface != "い") {  // い+られ is valid (いる potential)
-    SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);                   // Strongly discourage
+      prev.surface.size() <= core::kJapaneseCharBytes && grammar::isPureHiragana(prev.surface) &&
+      prev.surface != "い") {                          // い+られ is valid (いる potential)
+    SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);  // Strongly discourage
   }
 
   // Penalty for a conjunctive particle → a single-character lexical verb stem.
@@ -721,8 +722,8 @@ void addShortVerbFragmentRules(const core::LatticeEdge& prev, const core::Lattic
   // 食べたり+し+てる). Naming that continuative covers both particles at once,
   // where excepting たり/だり by surface left the same sequence banned after て.
   if (prev.extended_pos == core::ExtendedPOS::ParticleConj && next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
-      next.surface.size() <= 3 &&  // Single hiragana (3 bytes)
-      grammar::isPureHiragana(next.surface) && !grammar::isSuruRenyokeiSurface(next.surface)) {
+      next.surface.size() <= core::kJapaneseCharBytes && grammar::isPureHiragana(next.surface) &&
+      !grammar::isSuruRenyokeiSurface(next.surface)) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);  // Strongly discourage
   }
 }

@@ -1,7 +1,6 @@
 #include "analysis/scorer.h"
 
 #include <cmath>
-#include <limits>
 
 #include "analysis/scorer_bigram_overrides.h"
 
@@ -45,19 +44,6 @@ constexpr size_t posToIndex(core::PartOfSpeech pos) {
   return 12;
 }
 
-BigramOverrideCostTable makeBigramOverrideTable(const ScorerOptions& options) {
-  BigramOverrideCostTable table{};
-  for (auto& row : table) {
-    row.fill(std::numeric_limits<float>::quiet_NaN());
-  }
-  for (const BigramOverrideSpec& spec : kBigramOverrideSpecs) {
-    const size_t prev_index = posToIndex(spec.prev);
-    const size_t next_index = posToIndex(spec.next);
-    table[prev_index][next_index] = options.bigram.*(spec.value);
-  }
-  return table;
-}
-
 // Bigram cost table [prev][next]
 // Scale reference: kNegligible=0.2, kMinor=0.5, kRare=1.0, kStrong=1.5
 // Negative values = bonus (encourages connection)
@@ -84,10 +70,26 @@ constexpr float kBigramCostTable[13][13] = {
 };
 // clang-format on
 
+// Default table with the options' bigram overrides applied; NaN means unset.
+BigramCostTable makeBigramCostTable(const ScorerOptions& options) {
+  BigramCostTable table{};
+  for (size_t prev_index = 0; prev_index < kScoringPosClassCount; ++prev_index) {
+    for (size_t next_index = 0; next_index < kScoringPosClassCount; ++next_index) {
+      table[prev_index][next_index] = kBigramCostTable[prev_index][next_index];
+    }
+  }
+  for (const BigramOverrideSpec& spec : kBigramOverrideSpecs) {
+    const float value = options.bigram.*(spec.value);
+    if (!std::isnan(value)) {
+      table[posToIndex(spec.prev)][posToIndex(spec.next)] = value;
+    }
+  }
+  return table;
+}
+
 }  // namespace
 
-Scorer::Scorer(const ScorerOptions& options)
-    : options_(options), bigram_override_costs_(makeBigramOverrideTable(options)) {}
+Scorer::Scorer(const ScorerOptions& options) : options_(options), bigram_costs_(makeBigramCostTable(options)) {}
 
 float Scorer::posPrior(core::PartOfSpeech pos) const {
   switch (pos) {
@@ -111,12 +113,7 @@ float Scorer::posPrior(core::PartOfSpeech pos) const {
 }
 
 float Scorer::bigramCost(core::PartOfSpeech prev, core::PartOfSpeech next) const {
-  const float override_value = bigram_override_costs_[posToIndex(prev)][posToIndex(next)];
-  if (!std::isnan(override_value)) {
-    return override_value;
-  }
-  // Fall back to default table
-  return kBigramCostTable[posToIndex(prev)][posToIndex(next)];
+  return bigram_costs_[posToIndex(prev)][posToIndex(next)];
 }
 
 }  // namespace suzume::analysis

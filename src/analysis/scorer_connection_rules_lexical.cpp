@@ -125,20 +125,18 @@ float computeCompoundNominalizationBonus(const core::LatticeEdge& prev, const co
   // (書きかけの紙, 書きたての文). Prefer the noun reading emitted alongside
   // the compound-verb edge; otherwise a verb-only bonus would incorrectly
   // discard that grammatical category while keeping the same search unit.
-  if (prev.origin == core::CandidateOrigin::VerbCompound && prev.extended_pos == core::ExtendedPOS::NounVerbal &&
-      next.extended_pos == core::ExtendedPOS::ParticleNo && utf8::equalsAny(next.surface, {"の"})) {
-    if (isRecentCompletionCompoundNounVerbal(prev.surface)) {
-      return cost::kAlmostNever;
+  if (prev.origin == core::CandidateOrigin::VerbCompound && prev.extended_pos == core::ExtendedPOS::NounVerbal) {
+    if (next.extended_pos == core::ExtendedPOS::ParticleNo && utf8::equalsAny(next.surface, {"の"})) {
+      if (isRecentCompletionCompoundNounVerbal(prev.surface)) {
+        return cost::kAlmostNever;
+      }
+      return cost::kTripleVeryStrongBonus + cost::kModerateBonus;
     }
-    return cost::kTripleVeryStrongBonus + cost::kModerateBonus;
-  }
-
-  // A productive renyokei+suffix nominalization before the accusative marker
-  // should remain split as verb + suffix + を, rather than collapsing to a
-  // closed deverbal noun.
-  if (prev.origin == core::CandidateOrigin::VerbCompound && prev.extended_pos == core::ExtendedPOS::NounVerbal &&
-      next.extended_pos == core::ExtendedPOS::ParticleCase && utf8::equalsAny(next.surface, {"を"})) {
-    if (isRecentCompletionCompoundNounVerbal(prev.surface)) {
+    // A productive renyokei+suffix nominalization before the accusative marker
+    // should remain split as verb + suffix + を, rather than collapsing to a
+    // closed deverbal noun.
+    if (next.extended_pos == core::ExtendedPOS::ParticleCase && utf8::equalsAny(next.surface, {"を"}) &&
+        isRecentCompletionCompoundNounVerbal(prev.surface)) {
       return cost::kAlmostNever;
     }
   }
@@ -323,7 +321,7 @@ float computeSugiFinalParticleBonus(const core::LatticeEdge& prev, const core::L
   // Without this, multi-kanji nouns get split: 最高→最+高(ADJ_語幹)+すぎ
   // because ADJ_語幹→すぎ has a very strong surface bonus (-3.2)
   // Only apply to all-kanji surfaces (not katakana/verb renyokei)
-  if (prev.pos == core::PartOfSpeech::Noun && prev.surface.size() >= 6 &&  // 2+ chars (6+ bytes)
+  if (prev.pos == core::PartOfSpeech::Noun && prev.surface.size() >= core::kTwoJapaneseCharBytes &&
       grammar::isAllKanji(prev.surface) && utf8::startsWith(next.surface, "すぎ")) {
     SUZUME_CONNECTION_ADD(bonus, sc::kBonusDoubleVeryStrong);
   }
@@ -403,7 +401,7 @@ float computeSugiFinalParticleBonus(const core::LatticeEdge& prev, const core::L
 /// shuushikei える/うる legitimately ends a clause and is exempt.
 float computeBarePotentialRenyokeiPenalty(const core::LatticeEdge& prev, const core::LatticeEdge& next) {
   float penalty{};
-  if (prev.extended_pos == core::ExtendedPOS::AuxPotential && prev.surface.size() <= 3 &&  // Single character (3 bytes)
+  if (prev.extended_pos == core::ExtendedPOS::AuxPotential && prev.surface.size() <= core::kJapaneseCharBytes &&
       next.pos != core::PartOfSpeech::Auxiliary && next.pos != core::PartOfSpeech::Particle &&
       next.pos != core::PartOfSpeech::Suffix) {
     penalty += cost::kSevere;

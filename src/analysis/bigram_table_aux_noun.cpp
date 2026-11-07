@@ -4,7 +4,6 @@ namespace suzume::analysis::bigram_rules {
 
 using EPOS = core::ExtendedPOS;
 namespace cost = bigram_cost;
-constexpr float kDeterminerNounBonus = -2.5F;
 
 bool setAuxiliaryAndNounCosts(BigramMatrix& table) {
   static constexpr BigramRule kRules[] = {
@@ -641,9 +640,9 @@ bool setAuxiliaryAndNounCosts(BigramMatrix& table) {
       // Determiner → Noun (そんな+こと, こんな+話) - very strong bonus
       // Ensures そんなことない → そんな+こと+ない over そん+な+こと+ない
       // Ensures あんな+人 over あん+な+人 (NOUN→AUX_断定→NOUN chain has -2.5 total)
-      {EPOS::Determiner, EPOS::Noun, kDeterminerNounBonus},
-      {EPOS::Determiner, EPOS::NounFormal, kDeterminerNounBonus},
-      {EPOS::Determiner, EPOS::NounProper, kDeterminerNounBonus},
+      {EPOS::Determiner, EPOS::Noun, cost::kDeterminerNounBonus},
+      {EPOS::Determiner, EPOS::NounFormal, cost::kDeterminerNounBonus},
+      {EPOS::Determiner, EPOS::NounProper, cost::kDeterminerNounBonus},
 
       // A demonstrative or degree adverb attaches to the predicate it modifies,
       // so an interrogative argument between the two is the marked order. The
@@ -675,14 +674,14 @@ bool setAuxiliaryAndNounCosts(BigramMatrix& table) {
       // Determiner → ParticleNo (という+の, こんな+の)
       // 準体助詞の follows determiners naturally (same grammatical slot as nouns)
       // Use same bonus as DET→NOUN so the の+は split path can compete
-      {EPOS::Determiner, EPOS::ParticleNo, kDeterminerNounBonus},
+      {EPOS::Determiner, EPOS::ParticleNo, cost::kDeterminerNounBonus},
 
       // Quotative determiners have the same attributive distribution as
       // ordinary determiners (ということ, っていう話).
-      {EPOS::DeterminerQuotative, EPOS::Noun, kDeterminerNounBonus},
-      {EPOS::DeterminerQuotative, EPOS::NounFormal, kDeterminerNounBonus},
-      {EPOS::DeterminerQuotative, EPOS::NounProper, kDeterminerNounBonus},
-      {EPOS::DeterminerQuotative, EPOS::ParticleNo, kDeterminerNounBonus},
+      {EPOS::DeterminerQuotative, EPOS::Noun, cost::kDeterminerNounBonus},
+      {EPOS::DeterminerQuotative, EPOS::NounFormal, cost::kDeterminerNounBonus},
+      {EPOS::DeterminerQuotative, EPOS::NounProper, cost::kDeterminerNounBonus},
+      {EPOS::DeterminerQuotative, EPOS::ParticleNo, cost::kDeterminerNounBonus},
 
       // The complementary requirement — that a quotative determiner is followed
       // by a nominal head at all — is a condition on the whole right-hand
@@ -692,8 +691,8 @@ bool setAuxiliaryAndNounCosts(BigramMatrix& table) {
       // Determiner → Adjective (その+薄暗い+部屋, この+大きい+建物)
       // Determiners modify adjective+noun combinations in Japanese
       // Uses same bonus as DET→NOUN to allow adjective path to compete
-      {EPOS::Determiner, EPOS::AdjBasic, kDeterminerNounBonus},
-      {EPOS::Determiner, EPOS::AdjRenyokei, kDeterminerNounBonus},
+      {EPOS::Determiner, EPOS::AdjBasic, cost::kDeterminerNounBonus},
+      {EPOS::Determiner, EPOS::AdjRenyokei, cost::kDeterminerNounBonus},
 
       // Determiner → Determiner (そんな+大きな, こんな+小さな) - strong bonus
       // Demonstrative determiners stack with descriptive ones; without this the
