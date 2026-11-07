@@ -316,8 +316,11 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
             vh::isVerbInDictionary(dict_manager, codepoints, start_pos, kanji_end, "る") ||
             (is_single_kanji && vh::isSingleKanjiIchidan(codepoints[start_pos]));
         bool okurigana_opens_auxiliary = false;
+        // The ra-nuki potential already proves the stem (見せ+れ+ない): an
+        // auxiliary opening on its okurigana would be a causative せる on an
+        // Ichidan stem, which takes させる.
         if (!ichidan_base_is_dict && dict_manager != nullptr && renyokei_end < codepoints.size() &&
-            ichidan_stem_is_attested) {
+            ichidan_stem_is_attested && !ra_nuki_potential_follows) {
           constexpr size_t kAuxiliaryProbe = 4;
           okurigana_opens_auxiliary = hasDictionaryEntryFrom(dict_manager, codepoints, kanji_end, 2, kAuxiliaryProbe,
                                                              core::PartOfSpeech::Auxiliary, nullptr);

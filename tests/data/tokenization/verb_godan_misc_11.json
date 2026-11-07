@@ -1075,6 +1075,33 @@
       ],
       "id": "jirenai_da",
       "input": "信じれない話だ"
+    },
+    {
+      "description": "ra-nuki potential of a single-kanji ichidan stem whose okurigana spells a causative",
+      "expected": [
+        {
+          "lemma": "写真",
+          "pos": "Noun",
+          "surface": "写真"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "見せれる",
+          "pos": "Verb",
+          "surface": "見せれ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "wo_serenai",
+      "input": "写真を見せれない"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 11/11)",
