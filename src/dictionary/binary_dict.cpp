@@ -26,6 +26,7 @@ core::Unexpected<core::Error> invalid(std::string message) {
 constexpr size_t kInlineFrontLength = 15;
 constexpr size_t kMaxSerializedSurfaceLength = std::numeric_limits<uint8_t>::max();
 constexpr uint16_t kPackedLemmaMask = 0x07FFU;
+constexpr size_t kMaxPackedGrammarPaletteSize = 32;
 constexpr int64_t kMinPackedLemmaDelta = -1024;
 constexpr int64_t kMaxPackedLemmaDelta = 1023;
 
@@ -487,11 +488,11 @@ core::Expected<std::vector<uint8_t>, core::Error> BinaryDictWriter::build() {
       return invalid("Dictionary entry is not valid UTF-8");
     }
 
-    if (ent.surface.size() > std::numeric_limits<uint8_t>::max()) {
+    if (ent.surface.size() > kMaxSerializedSurfaceLength) {
       return invalid("Dictionary surface exceeds 255 bytes: " + ent.surface);
     }
 
-    if (!ent.lemma.empty() && ent.lemma.size() > std::numeric_limits<uint8_t>::max()) {
+    if (ent.lemma.size() > kMaxSerializedSurfaceLength) {
       return invalid("Dictionary lemma exceeds 255 bytes: " + ent.lemma);
     }
 
@@ -563,7 +564,7 @@ core::Expected<std::vector<uint8_t>, core::Error> BinaryDictWriter::build() {
   // If every differing lemma is also a nearby surface, encode its signed
   // surface-index delta directly in the packed entry. This removes the lemma
   // string pool and makes the small deltas substantially more compressible.
-  bool uses_relative_lemmas = !lemma_indices.empty() && grammar_palette.size() <= 32;
+  bool uses_relative_lemmas = !lemma_indices.empty() && grammar_palette.size() <= kMaxPackedGrammarPaletteSize;
   std::vector<uint16_t> relative_lemma_references;
   if (uses_relative_lemmas) {
     relative_lemma_references.resize(entries_.size());
@@ -608,28 +609,29 @@ core::Expected<std::vector<uint8_t>, core::Error> BinaryDictWriter::build() {
   } else if (uses_relative_lemmas) {
     output_flags = BinaryDictHeader::kPackedEntries | BinaryDictHeader::kRelativeLemmaRefs;
     compact_entry_size = 2;
-  } else if (lemma_indices.size() <= 0x07FFU && grammar_palette.size() <= 32) {
+  } else if (lemma_indices.size() <= kPackedLemmaMask && grammar_palette.size() <= kMaxPackedGrammarPaletteSize) {
     output_flags = BinaryDictHeader::kPackedEntries;
     compact_entry_size = 2;
   }
 
   std::vector<uint16_t> record_palette;
   std::unordered_map<uint16_t, uint8_t> record_indices;
+  std::vector<uint8_t> entry_record_indices;
   // Packed core records are mostly non-zero and repeat heavily, unlike the
   // grammar-only zero runs above. A byte-indexed palette reduced core.dic by
   // 5,148 bytes and still reduced the complete WASM after decoder cost.
   if ((output_flags & BinaryDictHeader::kEntryEncodingMask) == BinaryDictHeader::kPackedEntries) {
     for (const auto& entry : compact_entries) {
       const uint16_t packed = packEntry(entry);
-      if (record_indices.find(packed) == record_indices.end()) {
+      const auto [record_iter, inserted] = record_indices.emplace(packed, static_cast<uint8_t>(record_palette.size()));
+      if (inserted) {
         if (record_palette.size() >= std::numeric_limits<uint8_t>::max()) {
           record_palette.clear();
           break;
         }
-        const uint8_t record_idx = static_cast<uint8_t>(record_palette.size());
-        record_indices.emplace(packed, record_idx);
         record_palette.push_back(packed);
       }
+      entry_record_indices.push_back(record_iter->second);
     }
     if (!record_palette.empty() && 1 + record_palette.size() * sizeof(uint16_t) + compact_entries.size() <
                                        compact_entries.size() * sizeof(uint16_t)) {
@@ -652,9 +654,7 @@ core::Expected<std::vector<uint8_t>, core::Error> BinaryDictWriter::build() {
     for (uint16_t packed : record_palette) {
       appendLe16(entry_data, packed);
     }
-    for (const auto& entry : compact_entries) {
-      entry_data.push_back(record_indices.at(packEntry(entry)));
-    }
+    entry_data.insert(entry_data.end(), entry_record_indices.begin(), entry_record_indices.end());
   } else {
     const uint8_t entry_encoding = output_flags & BinaryDictHeader::kEntryEncodingMask;
     for (const auto& entry : compact_entries) {

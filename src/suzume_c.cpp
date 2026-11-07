@@ -7,7 +7,6 @@
 
 #include <array>
 #include <cstddef>
-#include <cstdlib>
 #include <cstring>
 #include <exception>
 #include <iterator>
@@ -249,11 +248,11 @@ char* copyStringToArena(std::string_view str, char*& cursor) {
 
 std::optional<suzume::core::AnalysisMode> parseAnalysisMode(int mode) {
   switch (mode) {
-    case 1:
+    case SUZUME_MODE_SEARCH:
       return suzume::core::AnalysisMode::Search;
-    case 2:
+    case SUZUME_MODE_SPLIT:
       return suzume::core::AnalysisMode::Split;
-    case 0:
+    case SUZUME_MODE_NORMAL:
       return suzume::core::AnalysisMode::Normal;
     default:
       return std::nullopt;

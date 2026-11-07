@@ -103,8 +103,6 @@ char detectDelimiter(std::string_view record) {
         in_quotes = false;
       } else if (!field_has_non_space) {
         in_quotes = true;
-      } else {
-        field_has_non_space = true;
       }
       continue;
     }
@@ -185,25 +183,25 @@ ParsedRecord parseDelimitedRecord(std::string_view record, char delimiter) {
   return result;
 }
 
+core::Unexpected<core::Error> parseError(std::string message) {
+  return core::makeUnexpected(core::Error(core::ErrorCode::ParseError, std::move(message)));
+}
+
 core::Expected<SourceEntry, core::Error> convertFields(const std::vector<std::string>& fields, size_t line_number,
                                                        char delimiter) {
   if (fields.size() < 2) {
-    return core::makeUnexpected(
-        core::Error(core::ErrorCode::ParseError, "Missing POS field at line " + core::decimalDigits(line_number)));
+    return parseError("Missing POS field at line " + core::decimalDigits(line_number));
   }
   if (fields[0].empty()) {
-    return core::makeUnexpected(
-        core::Error(core::ErrorCode::ParseError, "Empty surface at line " + core::decimalDigits(line_number)));
+    return parseError("Empty surface at line " + core::decimalDigits(line_number));
   }
   if (fields[1].empty()) {
-    return core::makeUnexpected(
-        core::Error(core::ErrorCode::ParseError, "Empty POS at line " + core::decimalDigits(line_number)));
+    return parseError("Empty POS at line " + core::decimalDigits(line_number));
   }
 
   auto pos = core::stringToPosStrict(fields[1]);
   if (!pos.has_value()) {
-    return core::makeUnexpected(core::Error(
-        core::ErrorCode::ParseError, "Invalid POS at line " + core::decimalDigits(line_number) + ": " + fields[1]));
+    return parseError("Invalid POS at line " + core::decimalDigits(line_number) + ": " + fields[1]);
   }
 
   SourceEntry entry;
@@ -223,9 +221,7 @@ core::Expected<SourceEntry, core::Error> convertFields(const std::vector<std::st
       if (fields.size() > 4 && !fields[4].empty()) {
         auto conj_type = parseConjugationType(fields[4]);
         if (!conj_type.has_value()) {
-          return core::makeUnexpected(
-              core::Error(core::ErrorCode::ParseError,
-                          "Line " + core::decimalDigits(line_number) + ": Invalid conjugation type: " + fields[4]));
+          return parseError("Line " + core::decimalDigits(line_number) + ": Invalid conjugation type: " + fields[4]);
         }
         entry.conj_type = *conj_type;
       }
@@ -253,9 +249,7 @@ core::Expected<SourceEntry, core::Error> convertFields(const std::vector<std::st
         entry.conj_type = *conj_type;
       } else if (!isNumericField(fields[2])) {
         if (fields.size() >= 4 && !fields[3].empty()) {
-          return core::makeUnexpected(
-              core::Error(core::ErrorCode::ParseError,
-                          "Ambiguous non-empty TSV columns 3 and 4 at line " + core::decimalDigits(line_number)));
+          return parseError("Ambiguous non-empty TSV columns 3 and 4 at line " + core::decimalDigits(line_number));
         }
         entry.lemma = fields[2];
       }
@@ -271,9 +265,7 @@ core::Expected<SourceEntry, core::Error> convertFields(const std::vector<std::st
   }
 
   if (!normalize::isValidUtf8(entry.surface) || (!entry.lemma.empty() && !normalize::isValidUtf8(entry.lemma))) {
-    return core::makeUnexpected(
-        core::Error(core::ErrorCode::ParseError,
-                    "Dictionary entry is not valid UTF-8 at line " + core::decimalDigits(line_number)));
+    return parseError("Dictionary entry is not valid UTF-8 at line " + core::decimalDigits(line_number));
   }
 
   return entry;
@@ -316,8 +308,6 @@ core::Expected<SourceParseResult, core::Error> parseDictionarySource(std::string
         in_quotes = false;
       } else if (!field_has_non_space) {
         in_quotes = true;
-      } else {
-        field_has_non_space = true;
       }
     } else if (!at_end && !in_quotes && (chr == '\t' || chr == ',')) {
       field_has_non_space = false;

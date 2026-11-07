@@ -190,7 +190,7 @@ void resolveNegativeHost(std::vector<core::Morpheme>& result) {
          (host->pos == core::PartOfSpeech::Auxiliary &&
           !utf8::equalsAny(host->lemma, {"だ", "です", "たい", "ない", "らしい", "ます", "た", "う", "よう", "まい",
                                          "ぬ", "ん", "ず", "べし", "そう", "みたい"})) ||
-         (host->pos == core::PartOfSpeech::Particle && utf8::equalsAny(host->surface, {"て", "で"})));
+         (host->pos == core::PartOfSpeech::Particle && grammar::isTeDeSurface(host->surface)));
     if (verbal_host && negative.pos == core::PartOfSpeech::Adjective) {
       retagNegativeNai(negative);
     } else if (!verbal_host && negative.pos == core::PartOfSpeech::Auxiliary) {
@@ -284,7 +284,7 @@ void mergeContractedTeruBeforeNominalizer(std::vector<core::Morpheme>& result) {
     auto& te = result[idx];
     const auto& contracted = result[idx + 1];
     const auto& nominalizer = result[idx + 2];
-    if (result[idx - 1].pos != core::PartOfSpeech::Verb || !utf8::equalsAny(te.surface, {"て", "で"}) ||
+    if (result[idx - 1].pos != core::PartOfSpeech::Verb || !grammar::isTeDeSurface(te.surface) ||
         !utf8::equalsAny(contracted.surface, {"ん"}) || nominalizer.getLemma() != "の" || te.end != contracted.start) {
       continue;
     }
@@ -576,7 +576,7 @@ void resolveVerbFrameRepairs(std::vector<core::Morpheme>& result) {
       subsidiary.lemma = lemma.substr(core::kJapaneseCharBytes);
       insertAfter(result, idx, subsidiary);
     } else if (utf8::equalsAny(token.surface, {"こう"}) && token.pos == core::PartOfSpeech::Adverb &&
-               previous != nullptr && utf8::equalsAny(previous->surface, {"て", "で"})) {
+               previous != nullptr && grammar::isTeDeSurface(previous->surface)) {
       core::Morpheme volitional = splitTail(token, 1);
       retagUninflected(token, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxAspectIku, "いく");
       retagUninflected(volitional, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxVolitional, "う");

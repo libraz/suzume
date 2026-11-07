@@ -10,10 +10,6 @@ namespace suzume::postprocess {
 
 TagGenerator::TagGenerator(const TagGeneratorOptions& options) : options_(options) {}
 
-size_t TagGenerator::countChars(std::string_view str) {
-  return normalize::utf8Length(str);
-}
-
 bool TagGenerator::shouldInclude(const core::Morpheme& morpheme) const {
   // Exclude by POS
   if (options_.exclude_particles && morpheme.pos == core::PartOfSpeech::Particle) {
@@ -92,7 +88,7 @@ std::vector<TagEntry> TagGenerator::generate(const std::vector<core::Morpheme>& 
     std::string tag = getTagString(morpheme);
 
     // Check minimum length
-    if (countChars(tag) < options_.min_tag_length) {
+    if (normalize::utf8Length(tag) < options_.min_tag_length) {
       continue;
     }
 

@@ -727,9 +727,9 @@ void restoreKanjiTeIchidanStem(std::vector<core::Morpheme>& result) {
         stem.extended_pos != core::ExtendedPOS::VerbRenyokei) {
       continue;
     }
-    const auto codepoints = normalize::toCodepoints(stem.surface);
-    const bool is_ichidan_te_stem =
-        codepoints.size() == 2 && normalize::isKanjiCodepoint(codepoints.front()) && codepoints.back() == U'て';
+    const bool is_ichidan_te_stem = normalize::utf8Length(stem.surface) == 2 &&
+                                    normalize::isKanjiCodepoint(utf8::decodeFirstChar(stem.surface)) &&
+                                    utf8::decodeLastChar(stem.surface) == U'て';
     if (is_ichidan_te_stem) {
       stem.lemma = stem.surface + "る";
       stem.conj_type = dictionary::ConjugationType::Ichidan;

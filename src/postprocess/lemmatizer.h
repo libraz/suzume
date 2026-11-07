@@ -85,11 +85,6 @@ class Lemmatizer {
   bool verifyCandidateWithDictionary(const grammar::InflectionCandidate& candidate) const;
 
   /**
-   * @brief Lemmatize verb (fallback)
-   */
-  static std::string lemmatizeVerb(std::string_view surface);
-
-  /**
    * @brief Lemmatize adjective (fallback)
    */
   static std::string lemmatizeAdjective(std::string_view surface);

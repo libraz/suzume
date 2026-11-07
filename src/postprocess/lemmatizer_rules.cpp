@@ -568,16 +568,12 @@ std::string lemmatizeVerbFallback(std::string_view surface) {
 
 using namespace lemmatizer_detail;
 
-std::string Lemmatizer::lemmatizeVerb(std::string_view surface) {
-  return lemmatizeVerbFallback(surface);
-}
-
 std::string Lemmatizer::lemmatizeAdjective(std::string_view surface) {
   // Preserve the ない lemma in the adjective + さ + そう pattern.
   // なさそう = ない + さ + そう (looks like there isn't)
   // Without this, lemmatizer would incorrectly return なさい (from そう → い rule)
   // This pattern also covers: なさそうな, なさそうに, なさそうだ, etc.
-  if (surface.find("なさそう") == 0) {
+  if (utf8::startsWith(surface, kNasaSouSurface)) {
     // Replace なさそう... with ない
     return "ない";
   }
@@ -602,15 +598,8 @@ bool Lemmatizer::verifyCandidateWithDictionary(const grammar::InflectionCandidat
   // Accept if base_form exists as a verb/adjective in the dictionary. A type
   // mismatch is acceptable: the dictionary presence validates the base form
   // itself (見せられた → 見せる with a wrong GodanRa type is still accepted).
-  for (const auto& result : dict_manager_->lookup(candidate.base_form, 0)) {
-    if (result.entry == nullptr || result.entry->surface != candidate.base_form) {
-      continue;
-    }
-    if (result.entry->pos == core::PartOfSpeech::Verb || result.entry->pos == core::PartOfSpeech::Adjective) {
-      return true;
-    }
-  }
-  return false;
+  return dict_manager_->lookupExact(candidate.base_form, core::PartOfSpeech::Verb) != nullptr ||
+         dict_manager_->lookupExact(candidate.base_form, core::PartOfSpeech::Adjective) != nullptr;
 }
 
 namespace lemmatizer_detail {

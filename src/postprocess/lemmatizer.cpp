@@ -42,10 +42,7 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
   // always splits them (見+てる) — so no whole 終止形 てる-verb is a contraction. Scoped to
   // てる (not all base verbs) so genuine re-derivations stay intact, e.g. potential
   // バズれる→バズる. A dictionary entry with its own distinct lemma is returned above.
-  if (morpheme.pos == core::PartOfSpeech::Verb &&
-      (morpheme.extended_pos == core::ExtendedPOS::VerbShuushikei ||
-       morpheme.extended_pos == core::ExtendedPOS::VerbRentaikei) &&
-      utf8::endsWith(morpheme.surface, "てる")) {
+  if (isTerminalVerb(morpheme) && utf8::endsWith(morpheme.surface, "てる")) {
     return std::string(morpheme.surface);
   }
 
@@ -56,10 +53,7 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
   // strip it (組み合わせる → 組み合う). Scoped to dictionary-backed edges: a
   // token that is genuinely mizenkei+させる never reaches here as one
   // dictionary-flagged 終止形 token (the tokenizer splits it: 話し合わ+せる).
-  if (morpheme.fromDictionary() && morpheme.pos == core::PartOfSpeech::Verb &&
-      (morpheme.extended_pos == core::ExtendedPOS::VerbShuushikei ||
-       morpheme.extended_pos == core::ExtendedPOS::VerbRentaikei) &&
-      utf8::endsWith(morpheme.surface, "せる")) {
+  if (morpheme.fromDictionary() && isTerminalVerb(morpheme) && utf8::endsWith(morpheme.surface, "せる")) {
     return std::string(morpheme.surface);
   }
 
@@ -84,7 +78,7 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
     // なさそう = ない + さ + そう (looks like there isn't)
     // The inflection analyzer incorrectly derives lemma なさい (from なさ + そう)
     // but the correct lemma is ない (from な + さそう)
-    if (morpheme.pos == core::PartOfSpeech::Adjective && morpheme.surface.find("なさそう") == 0) {
+    if (morpheme.pos == core::PartOfSpeech::Adjective && utf8::startsWith(morpheme.surface, kNasaSouSurface)) {
       return "ない";
     }
 
@@ -222,7 +216,7 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
         return potential;
       }
 
-      std::string rule_result = lemmatizeVerb(morpheme.surface);
+      std::string rule_result = lemmatizeVerbFallback(morpheme.surface);
       if (rule_result != morpheme.surface) {
         return rule_result;
       }
@@ -230,7 +224,7 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
     // Preserve the ない lemma in the adjective + さ + そう pattern.
     // Grammar incorrectly returns なさい, but correct lemma is ない
     // The surface なさそう with grammar result なさい should return ない
-    if (grammar_result == "なさい" && morpheme.surface.find("なさそう") != std::string::npos) {
+    if (grammar_result == "なさい" && utf8::contains(morpheme.surface, kNasaSouSurface)) {
       return "ない";
     }
 
@@ -283,7 +277,7 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
   // Fallback to rule-based for known POS (only if grammar failed)
   switch (morpheme.pos) {
     case core::PartOfSpeech::Verb:
-      return lemmatizeVerb(morpheme.surface);
+      return lemmatizeVerbFallback(morpheme.surface);
     case core::PartOfSpeech::Adjective:
       return lemmatizeAdjective(morpheme.surface);
     default:

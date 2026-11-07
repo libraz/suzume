@@ -71,11 +71,6 @@ class TagGenerator {
    * @brief Get tag string from morpheme
    */
   std::string getTagString(const core::Morpheme& morpheme) const;
-
-  /**
-   * @brief Count UTF-8 characters
-   */
-  static size_t countChars(std::string_view str);
 };
 
 }  // namespace suzume::postprocess

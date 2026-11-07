@@ -70,7 +70,7 @@ std::optional<ConjugationType> conjTypeFromCanonical(std::string_view str) {
     return ConjugationType::None;
   }
   for (const auto& alias : kConjTypeAliases) {
-    if (!alias.canonical.empty() && alias.canonical == str) {
+    if (alias.canonical == str) {
       return alias.type;
     }
   }

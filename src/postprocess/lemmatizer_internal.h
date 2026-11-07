@@ -9,6 +9,15 @@
 
 namespace suzume::postprocess::lemmatizer_detail {
 
+/// Constant stem of the adjective + さ + そう pattern whose lemma is ない.
+inline constexpr std::string_view kNasaSouSurface = "なさそう";
+
+/// True for a Verb in 終止形/連体形.
+inline bool isTerminalVerb(const core::Morpheme& morpheme) {
+  return morpheme.pos == core::PartOfSpeech::Verb && (morpheme.extended_pos == core::ExtendedPOS::VerbShuushikei ||
+                                                      morpheme.extended_pos == core::ExtendedPOS::VerbRentaikei);
+}
+
 bool hasExactVerbEntry(const dictionary::DictionaryManager* dict_manager, std::string_view surface);
 /// First godan base (in onbin-table order) of stem that is a dictionary verb, or empty.
 std::string firstAttestedGodanBase(const dictionary::DictionaryManager* dict_manager, std::string_view stem,

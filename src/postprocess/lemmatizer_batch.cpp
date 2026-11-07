@@ -51,8 +51,6 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes, bool updat
     const bool next_is_verbal_hajime = idx + 1 < morphemes.size() && morphemes[idx + 1].surface == "始め" &&
                                        (morphemes[idx + 1].pos == core::PartOfSpeech::Verb ||
                                         morphemes[idx + 1].extended_pos == core::ExtendedPOS::AuxAspectHajimeru);
-    const bool is_dictionary_noun =
-        dict_manager_ != nullptr && dict_manager_->lookupExact(morpheme.surface, core::PartOfSpeech::Noun) != nullptr;
     const bool hajime_has_verbal_follower =
         idx + 2 < morphemes.size() &&
         (morphemes[idx + 2].pos == core::PartOfSpeech::Auxiliary || morphemes[idx + 2].pos == core::PartOfSpeech::Verb);
@@ -69,7 +67,9 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes, bool updat
       // An auxiliary is already a member of the verbal chain, so there is no
       // homograph left to recover: rebuilding a predicate out of the passive れ
       // would undo the voice boundary (使わ+れ+始め).
-    } else if (next_is_verbal_hajime && (!is_dictionary_noun || hajime_has_verbal_follower) &&
+    } else if (next_is_verbal_hajime &&
+               (hajime_has_verbal_follower || dict_manager_ == nullptr ||
+                dict_manager_->lookupExact(morpheme.surface, core::PartOfSpeech::Noun) == nullptr) &&
                morpheme.pos != core::PartOfSpeech::Verb && morpheme.pos != core::PartOfSpeech::Auxiliary) {
       retagAsContinuative(morpheme,
                           grammar::endsWithERow(morpheme.surface) || utf8::decodeLastChar(morpheme.surface) == U'じ');
@@ -89,7 +89,7 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes, bool updat
     // Preserve the ない lemma in the adjective + さ + そう pattern.
     // The adjective candidate generator sets lemma to なさい, but correct is ない
     // なさそう = ない + さそう (looks like there isn't)
-    if (morpheme.pos == core::PartOfSpeech::Adjective && morpheme.surface.find("なさそう") != std::string::npos &&
+    if (morpheme.pos == core::PartOfSpeech::Adjective && utf8::contains(morpheme.surface, kNasaSouSurface) &&
         morpheme.lemma == "なさい") {
       morpheme.lemma = "ない";
     }
@@ -152,10 +152,8 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes, bool updat
     // it untouched (neither empty nor equal), preserving the wrong lemma. Force
     // re-lemmatization so the てる gate in lemmatize() restores the surface; a genuine
     // dictionary lemma is still protected there by the is_from_dictionary short-circuit.
-    if (!needs_lemmatization && morpheme.pos == core::PartOfSpeech::Verb && morpheme.lemma != morpheme.surface &&
-        utf8::endsWith(morpheme.surface, "てる") &&
-        (morpheme.extended_pos == core::ExtendedPOS::VerbShuushikei ||
-         morpheme.extended_pos == core::ExtendedPOS::VerbRentaikei)) {
+    if (!needs_lemmatization && isTerminalVerb(morpheme) && morpheme.lemma != morpheme.surface &&
+        utf8::endsWith(morpheme.surface, "てる")) {
       needs_lemmatization = true;
     }
     if (!needs_lemmatization && morpheme.lemma == morpheme.surface) {

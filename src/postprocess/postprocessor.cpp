@@ -90,10 +90,6 @@ using PairRetag = void (*)(core::Morpheme& merged, const core::Morpheme& head, c
 // `accepts` also sees the output built so far.
 std::vector<core::Morpheme> mergeAdjacentPairs(std::vector<core::Morpheme> morphemes, PairAccepts accepts,
                                                PairRetag retag) {
-  if (morphemes.size() < 2) {
-    return morphemes;
-  }
-
   std::vector<core::Morpheme> result;
   result.reserve(morphemes.size());
   for (size_t idx = 0; idx < morphemes.size(); ++idx) {
@@ -123,8 +119,7 @@ void runMergePass(std::vector<core::Morpheme>& result, MergePass pass, [[maybe_u
 
 }  // namespace
 
-Postprocessor::Postprocessor(const PostprocessOptions& options)
-    : options_(options), dict_manager_(nullptr), lemmatizer_() {}
+Postprocessor::Postprocessor(const PostprocessOptions& options) : options_(options), dict_manager_(nullptr) {}
 
 Postprocessor::Postprocessor(const dictionary::DictionaryManager* dict_manager, const PostprocessOptions& options)
     : options_(options), dict_manager_(dict_manager), lemmatizer_(dict_manager) {}
@@ -229,10 +224,6 @@ std::vector<core::Morpheme> Postprocessor::process(std::vector<core::Morpheme> r
 }
 
 std::vector<core::Morpheme> Postprocessor::mergeNounCompounds(std::vector<core::Morpheme> morphemes) {
-  if (morphemes.empty()) {
-    return morphemes;
-  }
-
   std::vector<core::Morpheme> result;
   result.reserve(morphemes.size());
 
@@ -362,10 +353,6 @@ std::vector<core::Morpheme> Postprocessor::mergeLexicalizedAdverbs(std::vector<c
 }
 
 std::vector<core::Morpheme> Postprocessor::mergeProlongedSoundMark(std::vector<core::Morpheme> morphemes) {
-  if (morphemes.size() < 2) {
-    return morphemes;
-  }
-
   std::vector<core::Morpheme> result;
   result.reserve(morphemes.size());
 
