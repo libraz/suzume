@@ -376,6 +376,19 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
         continue;
       }
     }
+    // A stem the dictionary already holds as the excessive auxiliary (すぎ)
+    // has its verb and auxiliary readings as dictionary edges; a bonused copy
+    // would outrank the auxiliary after an adjective stem (多+すぎ).
+    if (is_dict_verb && dict_manager != nullptr) {
+      const auto spans_excessive = [&](const dictionary::LookupResult& result) {
+        return result.entry != nullptr && result.entry->extended_pos == core::ExtendedPOS::AuxExcessive &&
+               normalize::utf8Length(result.entry->surface) == end_pos - start_pos;
+      };
+      const auto results = lookupResultsInRange(*dict_manager, codepoints, start_pos, end_pos);
+      if (std::any_of(results.begin(), results.end(), spans_excessive)) {
+        continue;
+      }
+    }
 
     // Strong negative cost to beat NOUN + て(VERB from てる) split
     // Dictionary-verified verbs get stronger bonus

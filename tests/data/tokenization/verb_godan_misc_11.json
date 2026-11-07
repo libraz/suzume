@@ -1102,6 +1102,112 @@
       ],
       "id": "wo_serenai",
       "input": "写真を見せれない"
+    },
+    {
+      "description": "particle-dropped noun + adjective stem + excessive sugi",
+      "expected": [
+        {
+          "lemma": "人",
+          "pos": "Noun",
+          "surface": "人"
+        },
+        {
+          "lemma": "多い",
+          "pos": "Adjective",
+          "surface": "多"
+        },
+        {
+          "lemma": "すぎる",
+          "pos": "Verb",
+          "surface": "すぎ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "しんどい",
+          "pos": "Adjective",
+          "surface": "しんどい"
+        }
+      ],
+      "id": "sugiteshindoi",
+      "input": "人多すぎてしんどい"
+    },
+    {
+      "description": "two-kanji noun + adjective stem + excessive sugi",
+      "expected": [
+        {
+          "lemma": "広告",
+          "pos": "Noun",
+          "surface": "広告"
+        },
+        {
+          "lemma": "多い",
+          "pos": "Adjective",
+          "surface": "多"
+        },
+        {
+          "lemma": "すぎる",
+          "pos": "Verb",
+          "surface": "すぎ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "読める",
+          "pos": "Verb",
+          "surface": "読め"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "sugite_menai",
+      "input": "広告多すぎて読めない"
+    },
+    {
+      "description": "adjective stem the reference reads as a suffix before sugi",
+      "expected": [
+        {
+          "lemma": "値段",
+          "pos": "Noun",
+          "surface": "値段"
+        },
+        {
+          "lemma": "高い",
+          "pos": "Adjective",
+          "surface": "高"
+        },
+        {
+          "lemma": "すぎる",
+          "pos": "Verb",
+          "surface": "すぎ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "買える",
+          "pos": "Verb",
+          "surface": "買え"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "sugite_enai",
+      "input": "値段高すぎて買えない"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 11/11)",
