@@ -382,6 +382,13 @@ bool startsInsideDictionaryAuxiliary(const std::vector<char32_t>& codepoints, si
 bool startsInsideDictionaryIAdjective(const std::vector<char32_t>& codepoints, size_t start_pos,
                                       const dictionary::DictionaryManager* dict_manager);
 
+// True when start_pos is strictly inside the stem of a registered i-adjective
+// that the suffix verb がる takes. The stem owns its kana up to がる, so a coined
+// verb opening inside it cannot carry がる as its own tail
+// (めんどうくさ+がっ+て, not めんどう+くさがっ+て).
+bool startsInsideDictionaryIAdjectiveStemBeforeGaru(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                                    const dictionary::DictionaryManager* dict_manager);
+
 // Detect a multi-mora particle beginning exactly at @p start_pos. Such a
 // closed-class prefix cannot be the first half of a productive compound verb.
 bool startsWithMultiMoraDictionaryParticle(const std::vector<char32_t>& codepoints, size_t start_pos,

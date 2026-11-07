@@ -1427,6 +1427,139 @@
       ],
       "id": "mendoukusagari",
       "input": "めんどうくさがり"
+    },
+    {
+      "description": "registered kana adjective stem keeps がり before the copula",
+      "expected": [
+        {
+          "lemma": "めんどうくさい",
+          "pos": "Adjective",
+          "surface": "めんどうくさ"
+        },
+        {
+          "lemma": "がる",
+          "pos": "Verb",
+          "surface": "がり"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "人",
+          "pos": "Noun",
+          "surface": "人"
+        }
+      ],
+      "id": "mendoukusagarina",
+      "input": "めんどうくさがりな人"
+    },
+    {
+      "description": "registered kana adjective stem + がっ + て",
+      "expected": [
+        {
+          "lemma": "掃除",
+          "pos": "Noun",
+          "surface": "掃除"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "めんどうくさい",
+          "pos": "Adjective",
+          "surface": "めんどうくさ"
+        },
+        {
+          "lemma": "がる",
+          "pos": "Verb",
+          "surface": "がっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "womendoukusagattte",
+      "input": "掃除をめんどうくさがって"
+    },
+    {
+      "description": "contracted kana adjective stem + がっ + て",
+      "expected": [
+        {
+          "lemma": "宿題",
+          "pos": "Noun",
+          "surface": "宿題"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "めんどくさい",
+          "pos": "Adjective",
+          "surface": "めんどくさ"
+        },
+        {
+          "lemma": "がる",
+          "pos": "Verb",
+          "surface": "がっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "womendokusagattte",
+      "input": "宿題をめんどくさがって"
+    },
+    {
+      "description": "kanji adjective stem + がっ + て",
+      "expected": [
+        {
+          "lemma": "犬",
+          "pos": "Noun",
+          "surface": "犬"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "怖い",
+          "pos": "Adjective",
+          "surface": "怖"
+        },
+        {
+          "lemma": "がる",
+          "pos": "Verb",
+          "surface": "がっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "逃げる",
+          "pos": "Verb",
+          "surface": "逃げ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wo_gattte_geta",
+      "input": "犬を怖がって逃げた"
     }
   ],
   "description": "I-adjectives compound/derived forms (複合・派生) - sou patterns, nominalization, contracted forms",

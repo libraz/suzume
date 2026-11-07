@@ -375,6 +375,9 @@ bool setAuxiliaryAndNounCosts(BigramMatrix& table) {
       // The excessive subsidiary can inflect or be nominalized. Keep its
       // auxiliary analysis ahead of the homographic nominalized-stem candidate.
       {EPOS::AuxExcessive, EPOS::ParticleConj, cost::kStrongBonus},
+      // The emotive がる inflects like a godan verb too, and its onbin takes
+      // the conjunctive て as every other inflecting auxiliary does (寒+がっ+て).
+      {EPOS::AuxGaru, EPOS::ParticleConj, cost::kStrongBonus},
       {EPOS::AuxExcessive, EPOS::ParticleCase, cost::kVeryStrongBonus},
       {EPOS::AuxExcessive, EPOS::ParticleTopic, cost::kVeryStrongBonus},
 

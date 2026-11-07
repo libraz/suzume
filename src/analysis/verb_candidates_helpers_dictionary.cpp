@@ -562,6 +562,29 @@ bool startsInsideDictionaryIAdjective(const std::vector<char32_t>& codepoints, s
       [](const dictionary::DictionaryEntry& adjective) { return utf8::endsWith(adjective.surface, "い"); });
 }
 
+bool startsInsideDictionaryIAdjectiveStemBeforeGaru(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                                    const dictionary::DictionaryManager* dict_manager) {
+  constexpr size_t kStemLookback = 6;
+  constexpr size_t kStemProbe = 3;
+  if (dict_manager == nullptr || start_pos == 0) {
+    return false;
+  }
+  const size_t probe_end = std::min(codepoints.size(), start_pos + kStemProbe);
+  for (size_t stem_start = lookbehindStart(start_pos, kStemLookback); stem_start < start_pos; ++stem_start) {
+    for (size_t stem_end = start_pos + 1; stem_end <= probe_end; ++stem_end) {
+      // The がる cells are listed as verbs carrying the auxiliary class.
+      if (isAdjectiveInDictionary(dict_manager, codepoints, stem_start, stem_end, "い") &&
+          hasDictionaryEntryFrom(dict_manager, codepoints, stem_end, 1, kStemProbe, core::PartOfSpeech::Unknown,
+                                 [](const dictionary::DictionaryEntry& entry) {
+                                   return entry.extended_pos == core::ExtendedPOS::AuxGaru;
+                                 })) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 bool startsWithMultiMoraDictionaryParticle(const std::vector<char32_t>& codepoints, size_t start_pos,
                                            const dictionary::DictionaryManager* dict_manager) {
   constexpr size_t kMinimumParticleLength = 2;

@@ -847,6 +847,8 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generate(std::string_view te
                    spansCaseParticleBeforeVerifiedPredicate(candidate, codepoints, inflection_, dict_manager_) ||
                    startsInsideKanjiRunBeforeClosedNai(candidate, codepoints) ||
                    absorbsKanaVerbCellBeforeNegative(candidate, codepoints, dict_manager_) ||
+                   (!candidate.lemma_verified && verb_helpers::startsInsideDictionaryIAdjectiveStemBeforeGaru(
+                                                     codepoints, candidate.start, dict_manager_)) ||
                    endsInsideVerifiedCompoundVerb(candidate, codepoints, char_types, dict_manager_);
           }),
       candidates.end());
