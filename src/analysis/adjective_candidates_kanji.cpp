@@ -4,7 +4,6 @@
  */
 
 #include <algorithm>
-#include <array>
 
 #include "adjective_candidates.h"
 #include "adjective_candidates_internal.h"

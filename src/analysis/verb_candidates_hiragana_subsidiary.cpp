@@ -14,7 +14,6 @@
 #include "analysis/verb_candidates_auxiliary_patterns.h"
 #include "analysis/verb_candidates_hiragana_internal.h"
 #include "core/utf8_constants.h"
-#include "normalize/exceptions.h"
 #include "unknown.h"
 
 namespace suzume::analysis::hiragana_verb_detail {

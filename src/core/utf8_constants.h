@@ -286,10 +286,6 @@ template <typename Entry, size_t Size>
 // UTF-8 Decoding Utilities for Japanese Characters
 // =============================================================================
 // These functions decode 3-byte UTF-8 sequences (Japanese characters).
-// They replace the common pattern:
-//   const unsigned char* ptr = reinterpret_cast<const unsigned char*>(s.data() + pos);
-//   if ((ptr[0] & 0xF0) != 0xE0) { return false; }
-//   char32_t cp = ((ptr[0] & 0x0F) << 12) | ((ptr[1] & 0x3F) << 6) | (ptr[2] & 0x3F);
 
 /// Check if byte at position starts a 3-byte UTF-8 sequence
 /// @param s The string to check

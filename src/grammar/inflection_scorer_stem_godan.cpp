@@ -1,5 +1,3 @@
-#include <algorithm>
-
 #include "char_patterns.h"
 #include "connection.h"
 #include "core/kana_constants.h"

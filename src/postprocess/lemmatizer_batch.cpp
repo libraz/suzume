@@ -1,4 +1,3 @@
-#include <algorithm>
 #include <utility>
 
 #include "core/kana_constants.h"
@@ -6,7 +5,6 @@
 #include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
 #include "grammar/inflection_scorer_constants.h"
-#include "normalize/char_type.h"
 #include "normalize/utf8.h"
 #include "postprocess/lemmatizer.h"
 #include "postprocess/lemmatizer_internal.h"

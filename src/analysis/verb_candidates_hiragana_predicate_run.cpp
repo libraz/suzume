@@ -8,27 +8,20 @@
 
 #include <algorithm>
 
-#include "analysis/bigram_table.h"
-#include "analysis/candidate_constants.h"
 #include "analysis/dictionary_probe.h"
 #include "analysis/verb_candidates_absorption_guards.h"
 #include "analysis/verb_candidates_auxiliary_patterns.h"
-#include "analysis/verb_candidates_classical.h"
 #include "analysis/verb_candidates_dictionary_probes.h"
-#include "analysis/verb_candidates_emphatic.h"
 #include "analysis/verb_candidates_hiragana_internal.h"
 #include "core/debug.h"
 #include "core/kana_constants.h"
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
-#include "grammar/inflection_scorer_constants.h"
 #include "normalize/char_type.h"
-#include "normalize/exceptions.h"
 #include "normalize/utf8.h"
 #include "suffix_candidates.h"
 #include "tokenizer_utils.h"
-#include "unknown.h"
 #include "verb_candidates.h"
 
 namespace suzume::analysis {

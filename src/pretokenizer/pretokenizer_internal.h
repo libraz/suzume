@@ -2,7 +2,6 @@
 #define SUZUME_PRETOKENIZER_PRETOKENIZER_INTERNAL_H_
 
 #include <cstddef>
-#include <string>
 #include <string_view>
 
 #include "pretokenizer/pretokenizer.h"

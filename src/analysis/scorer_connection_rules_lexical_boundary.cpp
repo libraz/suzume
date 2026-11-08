@@ -8,19 +8,13 @@
 #include "analysis/scorer.h"
 #include "analysis/scorer_connection_rules.h"
 #include "analysis/scorer_connection_rules_internal.h"
-#include "analysis/scorer_constants.h"
-#include "analysis/verb_candidates_verb_stems.h"
-#include "core/debug.h"
-#include "core/kana_constants.h"
 #include "core/types.h"
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
-#include "grammar/honorific_verbs.h"
 #include "normalize/char_type.h"
 #include "normalize/utf8.h"
 
 namespace cost = suzume::analysis::bigram_cost;
-namespace sc = suzume::analysis::scorer;
 
 // Surface-based adjustments use cost:: namespace directly from bigram_cost.
 // See bigram_table.h and scorer_constants.h for constant values.

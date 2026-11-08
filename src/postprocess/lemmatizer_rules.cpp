@@ -30,7 +30,7 @@ struct VerbEnding {
 };
 
 // Common verb conjugation endings (simplified)
-// NOTE: Order matters - longer patterns should come first
+// NOTE: lemmatizeVerbFallback picks the longest matching suffix, so row order does not matter
 const VerbEnding kVerbEndings[] = {
     // Polite humble forms with おります (longest first)
     {"しております", "する"},          // している polite humble

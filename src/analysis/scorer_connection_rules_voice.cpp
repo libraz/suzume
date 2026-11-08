@@ -9,7 +9,6 @@
 #include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
 #include "grammar/honorific_verbs.h"
-#include "normalize/char_type.h"
 #include "normalize/utf8.h"
 
 namespace cost = suzume::analysis::bigram_cost;

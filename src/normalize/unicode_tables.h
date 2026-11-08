@@ -1,8 +1,6 @@
 #ifndef SUZUME_NORMALIZE_UNICODE_TABLES_H_
 #define SUZUME_NORMALIZE_UNICODE_TABLES_H_
 
-#include <cstdint>
-
 namespace suzume::normalize {
 
 /**

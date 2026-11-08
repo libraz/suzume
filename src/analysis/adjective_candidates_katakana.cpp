@@ -3,7 +3,6 @@
  * @brief Katakana i-adjective candidate generation (エモい, ウザい)
  */
 
-#include <algorithm>
 #include <array>
 
 #include "adjective_candidates.h"

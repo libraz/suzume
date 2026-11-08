@@ -5,7 +5,6 @@
 
 #include <algorithm>
 #include <array>
-#include <utility>
 
 #include "adjective_candidates.h"
 #include "adjective_candidates_internal.h"

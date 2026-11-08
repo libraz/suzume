@@ -5,7 +5,6 @@
 #include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
 #include "grammar/honorific_verbs.h"
-#include "normalize/char_type.h"
 #include "normalize/utf8.h"
 #include "postprocess/postprocessor.h"
 #include "postprocess/postprocessor_resolvers_internal.h"

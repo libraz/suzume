@@ -1,8 +1,6 @@
 #include "char_type.h"
 
-#include <algorithm>
 #include <array>
-#include <iterator>
 
 #include "core/kana_constants.h"
 #include "utf8.h"
