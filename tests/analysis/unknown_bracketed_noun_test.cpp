@@ -22,10 +22,9 @@ std::vector<UnknownCandidate> generateNaCandidatesAt(std::string_view input, siz
                                                      const dictionary::DictionaryManager& dict_manager) {
   const auto codepoints = normalize::toCodepoints(input);
   const auto char_types = normalize::classifyCodepoints(codepoints);
-  UnknownOptions options;
   grammar::Inflection inflection;
   std::vector<UnknownCandidate> candidates;
-  generateNaAdjectiveCandidates(codepoints, start_pos, char_types, options, inflection, &dict_manager, candidates);
+  generateNaAdjectiveCandidates(codepoints, start_pos, char_types, inflection, &dict_manager, candidates);
   return candidates;
 }
 
@@ -181,7 +180,7 @@ TEST(NoncontinuativeTeNominal, KeepsDictionaryProvenHomographicVerb) {
   options.skip_user_dictionary = true;
   Suzume analyzer(options);
   const std::string source = "おもてだつ\tVERB\tGODAN_TA\n";
-  ASSERT_TRUE(analyzer.loadUserDictionaryFromMemory(source.data(), source.size()));
+  ASSERT_TRUE(analyzer.loadUserDictionaryFromMemoryResult(source.data(), source.size()).hasValue());
   const auto result = analyzer.analyze("おもてだった");
   ASSERT_EQ(result.size(), 2U);
   EXPECT_EQ(result[0].surface, "おもてだっ");

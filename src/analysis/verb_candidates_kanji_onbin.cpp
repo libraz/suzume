@@ -28,7 +28,7 @@
 namespace suzume::analysis::kanji_verb_detail {
 namespace vh = verb_helpers;
 
-bool followsQuantityHead(const std::vector<char32_t>& codepoints, size_t start_pos) {
+static bool followsQuantityHead(const std::vector<char32_t>& codepoints, size_t start_pos) {
   if (start_pos < 2) {
     return false;
   }

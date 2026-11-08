@@ -55,7 +55,6 @@ struct KanjiVerbSelection {
   const dictionary::DictionaryManager* dict_manager;
   const VerbCandidateOptions& verb_opts;
   bool sokuonbin_stem_verified;
-  const std::string& sokuonbin_lemma;
   bool proceed_is_i_row_ichidan;
   bool is_multi_kanji_godan_wa_renyokei;
   size_t kanji_count;
@@ -942,7 +941,6 @@ void appendSelectedKanjiVerbCandidate(const std::vector<char32_t>& codepoints, s
                                dict_manager,
                                verb_opts,
                                sokuonbin_stem_verified,
-                               sokuonbin_lemma,
                                proceed_is_i_row_ichidan,
                                is_multi_kanji_godan_wa_renyokei,
                                kanji_end - start_pos};

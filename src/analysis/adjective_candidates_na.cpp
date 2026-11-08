@@ -291,7 +291,7 @@ void generateHiraganaAttributiveNaStemCandidates(const std::vector<char32_t>& co
 
 void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                    const std::vector<normalize::CharType>& char_types,
-                                   const UnknownOptions& /*options*/, const grammar::Inflection& inflection,
+                                   const grammar::Inflection& inflection,
                                    const dictionary::DictionaryManager* dict_manager,
                                    std::vector<UnknownCandidate>& candidates) {
   if (start_pos >= char_types.size()) {

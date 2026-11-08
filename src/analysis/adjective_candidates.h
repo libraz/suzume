@@ -16,7 +16,6 @@
 namespace suzume::analysis {
 
 struct UnknownCandidate;
-struct UnknownOptions;
 
 /**
  * @brief Generate i-adjective candidates (kanji + conjugation endings)
@@ -58,11 +57,10 @@ void generateGaMashiiHostAdjectiveCandidates(const std::vector<char32_t>& codepo
  * @param codepoints Text as codepoints
  * @param start_pos Start position (character index)
  * @param char_types Character types for each position
- * @param options Unknown word generation options
  * @param inflection Inflection analyzer that verifies an i-adjective stem
  */
 void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
-                                   const std::vector<normalize::CharType>& char_types, const UnknownOptions& options,
+                                   const std::vector<normalize::CharType>& char_types,
                                    const grammar::Inflection& inflection,
                                    const dictionary::DictionaryManager* dict_manager,
                                    std::vector<UnknownCandidate>& candidates);

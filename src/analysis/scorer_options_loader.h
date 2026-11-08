@@ -57,15 +57,13 @@ class ScorerOptionsLoader {
   /// Environment variables: SUZUME_SCORER_{SECTION}_{KEY}=value
   /// @param options Options to modify
   /// @return Number of overrides applied
-  static int applyEnvOverrides(ScorerOptions& options);
-  static int applyEnvOverrides(ScorerOptions& options, bool report_warnings);
+  static int applyEnvOverrides(ScorerOptions& options, bool report_warnings = true);
 
   /// Load scorer options from environment variables
   /// Checks SUZUME_SCORER_CONFIG for JSON file path, then individual overrides
   /// @param options Options to modify
   /// @return Result containing what was loaded
-  static ScorerLoadResult loadFromEnv(ScorerOptions& options);
-  static ScorerLoadResult loadFromEnv(ScorerOptions& options, bool report_warnings);
+  static ScorerLoadResult loadFromEnv(ScorerOptions& options, bool report_warnings = true);
 #endif
 };
 

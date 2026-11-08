@@ -818,17 +818,9 @@ void collectUnknownScorerEnvironmentWarnings(std::vector<std::string>& warnings)
 
 }  // namespace env_override_internal
 
-int ScorerOptionsLoader::applyEnvOverrides(ScorerOptions& options) {
-  return applyEnvOverrides(options, true);
-}
-
 int ScorerOptionsLoader::applyEnvOverrides(ScorerOptions& options, bool report_warnings) {
   using namespace env_override_internal;
   return applyAllEnvOverrides(options, report_warnings);
-}
-
-ScorerLoadResult ScorerOptionsLoader::loadFromEnv(ScorerOptions& options) {
-  return loadFromEnv(options, true);
 }
 
 ScorerLoadResult ScorerOptionsLoader::loadFromEnv(ScorerOptions& options, bool report_warnings) {

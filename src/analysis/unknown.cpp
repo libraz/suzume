@@ -722,8 +722,7 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generate(std::string_view /*
     generateProductiveSuffixVerbCandidates(codepoints, start_pos, char_types, candidates);
 
     // Generate na-adjective candidates (〜的 patterns)
-    analysis::generateNaAdjectiveCandidates(codepoints, start_pos, char_types, options_, inflection_, dict_manager_,
-                                            candidates);
+    analysis::generateNaAdjectiveCandidates(codepoints, start_pos, char_types, inflection_, dict_manager_, candidates);
 
     // Generate nominalized noun candidates (kanji + short hiragana)
     // e.g., 手助け, 片付け, 引き上げ
@@ -762,8 +761,7 @@ std::vector<UnknownCandidate> UnknownWordGenerator::generate(std::string_view /*
     appendCandidates(candidates,
                      analysis::generateHiraganaVerbCandidates(codepoints, start_pos, char_types, inflection_,
                                                               dict_manager_, options_.verb_candidate_options));
-    analysis::generateNaAdjectiveCandidates(codepoints, start_pos, char_types, options_, inflection_, dict_manager_,
-                                            candidates);
+    analysis::generateNaAdjectiveCandidates(codepoints, start_pos, char_types, inflection_, dict_manager_, candidates);
 
     // Generate hiragana i-adjective candidates (まずい, おいしい, etc.)
     analysis::generateHiraganaAdjectiveCandidates(codepoints, start_pos, char_types, inflection_, dict_manager_,
