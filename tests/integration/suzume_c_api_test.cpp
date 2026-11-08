@@ -568,7 +568,10 @@ TEST(SuzumeCApiTest, DictionaryWarningAccessorsHandleEmptyAndInvalidIndex) {
   suzume_t handle = suzume_create();
   ASSERT_NE(handle, nullptr);
 
+  ASSERT_EQ(suzume_clear_user_dictionaries(handle), 1);
+  ASSERT_EQ(suzume_last_error_code(), SUZUME_ERROR_SUCCESS);
   EXPECT_EQ(suzume_dictionary_warning_count(nullptr), 0u);
+  EXPECT_EQ(suzume_last_error_code(), SUZUME_ERROR_INVALID_INPUT);
   EXPECT_EQ(suzume_dictionary_warning(nullptr, 0), nullptr);
   EXPECT_EQ(suzume_last_error_code(), SUZUME_ERROR_INVALID_INPUT);
   EXPECT_EQ(suzume_dictionary_warning(handle, suzume_dictionary_warning_count(handle)), nullptr);
@@ -580,7 +583,7 @@ TEST(SuzumeCApiTest, DictionaryWarningAccessorsHandleEmptyAndInvalidIndex) {
   suzume_destroy(handle);
 }
 
-TEST(SuzumeCApiTest, DictionaryReadAccessorsPreserveExistingErrorDiagnostics) {
+TEST(SuzumeCApiTest, ReadAccessorsPreserveExistingErrorDiagnostics) {
   suzume_t handle = suzume_create();
   ASSERT_NE(handle, nullptr);
   const std::string dictionary = "missing-pos\n検査語\tNOUN\n";
@@ -593,6 +596,12 @@ TEST(SuzumeCApiTest, DictionaryReadAccessorsPreserveExistingErrorDiagnostics) {
   const std::string expected_error = suzume_last_error();
 
   (void)suzume_has_core_dictionary(handle);
+  EXPECT_EQ(suzume_last_error_code(), SUZUME_ERROR_INVALID_UTF8);
+  EXPECT_EQ(suzume_last_error(), expected_error);
+  (void)suzume_dictionary_warning_count(handle);
+  EXPECT_EQ(suzume_last_error_code(), SUZUME_ERROR_INVALID_UTF8);
+  EXPECT_EQ(suzume_last_error(), expected_error);
+  EXPECT_NE(suzume_mode(handle), SUZUME_MODE_INVALID);
   EXPECT_EQ(suzume_last_error_code(), SUZUME_ERROR_INVALID_UTF8);
   EXPECT_EQ(suzume_last_error(), expected_error);
   ASSERT_NE(suzume_dictionary_warning(handle, 0), nullptr);

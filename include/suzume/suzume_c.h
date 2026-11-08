@@ -80,7 +80,9 @@ SUZUME_EXPORT uint32_t suzume_abi_version(void);
  *
  * Every entry point reports failure by return value (NULL, 0, or a false-like
  * code) and leaves a description in suzume_last_error(). Nothing propagates a
- * C++ exception across the ABI.
+ * C++ exception across the ABI. A successful read-only query (suzume_mode,
+ * suzume_has_core_dictionary, the dictionary-warning accessors) leaves an
+ * earlier diagnostic in place, so it can be read after the failed call.
  *
  * The one failure this does NOT cover is allocation failure in a build made
  * without exceptions, which is how the WebAssembly package is compiled: there
@@ -469,7 +471,7 @@ SUZUME_EXPORT const char* suzume_pos_label(suzume_pos_t code);
 /**
  * @brief Get number of dictionary warnings from auto-loading dictionaries
  * @param handle Suzume handle
- * @return Warning count, or 0 for null handle
+ * @return Warning count, or 0 for an invalid handle (see suzume_last_error)
  */
 SUZUME_EXPORT size_t suzume_dictionary_warning_count(suzume_t handle);
 

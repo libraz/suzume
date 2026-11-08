@@ -478,8 +478,6 @@ SUZUME_EXPORT uint8_t suzume_mode(suzume_t handle) {
     setLastError("suzume_mode: null handle", SUZUME_ERROR_INVALID_INPUT);
     return SUZUME_MODE_INVALID;
   }
-
-  clearLastError();
   return static_cast<uint8_t>(handle->instance.mode());
 }
 
@@ -657,6 +655,7 @@ SUZUME_EXPORT const char* suzume_pos_label(suzume_pos_t code) {
 
 SUZUME_EXPORT size_t suzume_dictionary_warning_count(suzume_t handle) {
   if (handle == nullptr) {
+    setLastError("suzume_dictionary_warning_count: null handle", SUZUME_ERROR_INVALID_INPUT);
     return 0;
   }
   return handle->instance.dictionaryWarnings().size();
