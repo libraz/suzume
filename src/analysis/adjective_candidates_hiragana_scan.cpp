@@ -468,7 +468,8 @@ void adj_detail::appendHiraganaIAdjSurfaceCandidates(const std::vector<char32_t>
                                                      candidate::kHiraganaAdjConfScale);
         if (has_prolonged) {
           cost += candidate::kProlongedSoundBonus;  // Bonus for colloquial patterns like すごーい
-          SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" -0.1 (prolonged_sound_bonus)\n");
+          SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" " << candidate::kProlongedSoundBonus
+                                                   << " (prolonged_sound_bonus)\n");
         }
         // Length-based bonus for adjectives starting with particle characters
         // Short sequences (3-4 chars like につい, でやばい) are likely splits
@@ -476,11 +477,13 @@ void adj_detail::appendHiraganaIAdjSurfaceCandidates(const std::vector<char32_t>
         // No bonus for 3-4 char sequences (につい, でやばい) - likely particle + adjective split
         if (starts_with_particle && end_pos - start_pos >= 5) {
           cost += candidate::kLongParticleAdjBonus;  // Strong bonus for long adjectives (はなはだしい)
-          SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" -0.5 (long_particle_adj_bonus)\n");
+          SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" " << candidate::kLongParticleAdjBonus
+                                                   << " (long_particle_adj_bonus)\n");
         }
         if (bounded_long_ku_form) {
           cost += candidate::kBoundedHiraganaKuAdjBonus;
-          SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" -0.5 (bounded_ku_adj_bonus)\n");
+          SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" " << candidate::kBoundedHiraganaKuAdjBonus
+                                                   << " (bounded_ku_adj_bonus)\n");
         }
         // Set lemma to base form from inflection analysis
         // For prolonged sound mark patterns, normalize the base form

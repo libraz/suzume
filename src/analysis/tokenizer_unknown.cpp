@@ -474,9 +474,10 @@ std::optional<float> unknownCandidateCost(const tokenizer_unknown_detail::Unknow
       // - Candidate has has_suffix flag (mizenkei for ぬ/れべき patterns)
       if (!is_verb_ending && !candidate.has_suffix) {
         if (dict_manager.lookupExact(hiragana_suffix, core::PartOfSpeech::Particle) != nullptr) {
-          adjusted_cost += 1.5F;
-          SUZUME_DEBUG_LOG_VERBOSE("[TOK_UNK] \"" << candidate.surface << "\": +1.5 (particle_suffix=\""
-                                                  << hiragana_suffix << "\")\n");
+          constexpr float kParticleSuffixPenalty = 1.5F;
+          adjusted_cost += kParticleSuffixPenalty;
+          SUZUME_DEBUG_LOG_VERBOSE("[TOK_UNK] \"" << candidate.surface << "\": +" << kParticleSuffixPenalty
+                                                  << " (particle_suffix=\"" << hiragana_suffix << "\")\n");
         }
       }
     }

@@ -290,7 +290,8 @@ std::vector<InflectionCandidate> Inflection::matchVerbStem(std::string_view rema
     // E.g., 知ってる → 知っ + てる, 食べてる → 食べ + てる
     if (utf8::endsWithAny(suffix_str, {"てる", "てた", "でる", "でた"})) {
       candidate.confidence -= inflection::kPenaltyContractedProgressiveEnding;  // Strong penalty to prefer split
-      SUZUME_DEBUG_LOG_VERBOSE("  contracted_progressive_ending: -0.8\n");
+      SUZUME_DEBUG_LOG_VERBOSE("  contracted_progressive_ending: -" << inflection::kPenaltyContractedProgressiveEnding
+                                                                    << "\n");
     }
 
     candidate.stem = std::move(stem);

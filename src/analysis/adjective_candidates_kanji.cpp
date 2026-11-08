@@ -655,7 +655,8 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
         // standalone やすい/にくい/がたい which are in the dictionary
         if (surface.size() >= 4 * core::kJapaneseCharBytes && verb_helpers::isCompoundAdjectivePattern(surface)) {
           cost += candidate::kAdjSplitForcePenalty;  // Force split
-          SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +2.0 (compound_adj_penalty)\n");
+          SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +" << candidate::kAdjSplitForcePenalty
+                                                   << " (compound_adj_penalty)\n");
         }
         // Penalty for く + なる patterns (i-adjective adverbial + なる verb)
         // MeCab splits these: 良くなる → 良く + なる, 高くなった → 高く + なっ + た.
@@ -664,13 +665,15 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
         // Must have at least 2 chars before くなる to avoid penalizing standalone patterns
         if (surface.size() >= 3 * core::kJapaneseCharBytes && verb_helpers::containsKuNaruPattern(surface)) {
           cost += candidate::kAdjSplitForcePenalty;  // Force adj く-form + なる split
-          SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +2.0 (ku_naru_split)\n");
+          SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +" << candidate::kAdjSplitForcePenalty
+                                                   << " (ku_naru_split)\n");
         }
         // Penalty for とい/という endings (noun + quotative patterns, not adjectives)
         // E.g., 友人という → 友人 + という (determiner), not 友人とい(adj) + う
         if (surface.size() >= 3 * core::kJapaneseCharBytes && utf8::endsWithAny(surface, {"とい", "という"})) {
           cost += candidate::kAdjSplitForcePenalty;  // Protect NOUN + という pattern
-          SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +2.0 (toiu_pattern)\n");
+          SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +" << candidate::kAdjSplitForcePenalty
+                                                   << " (toiu_pattern)\n");
         }
         // Penalty for らしい endings (adj + conjecture auxiliary patterns)
         // E.g., 美しいらしい → 美しい + らしい, not 美しいらし(adj) + い
@@ -686,14 +689,16 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
             utf8::endsWithAny(surface,
                               {"らしい", "らしく", "らしかっ", "らしくない", "らしくなかっ", "らしくなかった"})) {
           cost += candidate::kAdjModeratePenalty;  // Promote adj/noun + らしい split
-          SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +1.5 (rashii_conjecture)\n");
+          SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +" << candidate::kAdjModeratePenalty
+                                                   << " (rashii_conjecture)\n");
         }
         // Penalty for まい endings (verb + negative volitional auxiliary)
         // E.g., 知るまい → 知る + まい, 出来まい → 出来 + まい
         // まい is an auxiliary attached to verb dictionary form, not an i-adjective suffix
         if (surface.size() >= 2 * core::kJapaneseCharBytes && utf8::endsWith(surface, "まい")) {
           cost += candidate::kAdjSplitForcePenalty;  // Promote verb + まい split
-          SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +2.0 (mai_auxiliary)\n");
+          SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +" << candidate::kAdjSplitForcePenalty
+                                                   << " (mai_auxiliary)\n");
         }
         // Skip a fake i-adjective that is really [noun] + a dictionary verb whose
         // onbin tail reconstructs a non-word かい/たい-shaped base: 手間+かかった →
