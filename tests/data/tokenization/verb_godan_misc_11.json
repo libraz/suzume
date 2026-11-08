@@ -2125,6 +2125,276 @@
       ],
       "id": "ni_itakatt",
       "input": "本当に書いたかっ"
+    },
+    {
+      "description": "Known-limit regression: productive quantity and finite predicate boundaries",
+      "expected": [
+        {
+          "lemma": "猫",
+          "pos": "Noun",
+          "surface": "猫"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ita_7",
+      "input": "猫いた"
+    },
+    {
+      "description": "Known-limit regression: productive quantity and finite predicate boundaries",
+      "expected": [
+        {
+          "lemma": "猫",
+          "pos": "Noun",
+          "surface": "猫"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "い"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "imasuka_3",
+      "input": "猫いますか"
+    },
+    {
+      "description": "Known-limit regression: productive quantity and finite predicate boundaries",
+      "expected": [
+        {
+          "lemma": "猫",
+          "pos": "Noun",
+          "surface": "猫"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "い"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "まし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "imashita_2",
+      "input": "猫いました"
+    },
+    {
+      "description": "Known-limit regression: productive quantity and finite predicate boundaries",
+      "expected": [
+        {
+          "lemma": "子ども",
+          "pos": "Noun",
+          "surface": "子ども"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "domoita",
+      "input": "子どもいた"
+    },
+    {
+      "description": "Known-limit regression: productive quantity and finite predicate boundaries",
+      "expected": [
+        {
+          "lemma": "彼氏",
+          "pos": "Noun",
+          "surface": "彼氏"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "い"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "imasuka_4",
+      "input": "彼氏いますか"
+    },
+    {
+      "description": "Known-limit regression: productive quantity and finite predicate boundaries",
+      "expected": [
+        {
+          "lemma": "猫",
+          "pos": "Noun",
+          "surface": "猫"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "い"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ませ"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        }
+      ],
+      "id": "imasen",
+      "input": "猫いません"
+    },
+    {
+      "description": "Known-limit regression: productive quantity and finite predicate boundaries",
+      "expected": [
+        {
+          "lemma": "彼氏",
+          "pos": "Noun",
+          "surface": "彼氏"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "い"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ませ"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "imasenka",
+      "input": "彼氏いませんか"
+    },
+    {
+      "description": "Known-limit regression: productive quantity and finite predicate boundaries",
+      "expected": [
+        {
+          "lemma": "二人",
+          "pos": "Noun",
+          "surface": "二人"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "い"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ませ"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        }
+      ],
+      "id": "imasen_2",
+      "input": "二人いません"
+    },
+    {
+      "description": "Known-limit regression: productive quantity and finite predicate boundaries",
+      "expected": [
+        {
+          "lemma": "数人",
+          "pos": "Noun",
+          "surface": "数人"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "い"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ませ"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "imasenka_2",
+      "input": "数人いませんか"
+    },
+    {
+      "description": "Known-limit regression: productive quantity and finite predicate boundaries",
+      "expected": [
+        {
+          "lemma": "三人",
+          "pos": "Noun",
+          "surface": "三人"
+        },
+        {
+          "lemma": "いっしょ",
+          "pos": "Noun",
+          "surface": "いっしょ"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行く"
+        }
+      ],
+      "id": "ittshi_ni_ku",
+      "input": "三人いっしょに行く"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 11/11)",

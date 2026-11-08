@@ -89,21 +89,39 @@ void UnknownWordGenerator::appendBracketedHiraganaNounCandidates(const std::vect
       if (endsOnPredicateTail(ctx, run_end)) {
         return false;
       }
-      if (std::any_of(candidates.begin(), candidates.end(), [&](const UnknownCandidate& candidate) {
+      const bool has_copula_selected_noncontinuative_candidate =
+          std::any_of(candidates.begin(), candidates.end(), [&](const UnknownCandidate& candidate) {
             return candidate.copula_selected_noncontinuative_te && candidate.origin == CandidateOrigin::BracketedNoun &&
                    candidate.start == start_pos && candidate.end == run_end &&
                    candidate.pos == core::PartOfSpeech::Noun;
-          })) {
-        return true;
-      }
+          });
       PromotedRun promoted = classifyRightBrackets(ctx, bracketed, run_end);
       readPromotedSurface(ctx, bracketed, promoted);
-      if (!admitsPromotedRun(ctx, bracketed, promoted)) {
-        return false;
-      }
       float noun_cost = getCostForType(start_type, promoted.len) + candidate::kPostParticleNounPenalty;
-      appendPromotedRunCandidates(ctx, bracketed, promoted, noun_cost, longer_rescue_end, candidates);
-      return true;
+      bool admitted = has_copula_selected_noncontinuative_candidate;
+      if (!has_copula_selected_noncontinuative_candidate && admitsPromotedRun(ctx, bracketed, promoted)) {
+        appendPromotedRunCandidates(ctx, bracketed, promoted, noun_cost, longer_rescue_end, candidates);
+        admitted = true;
+      }
+      const bool has_quantity_candidate =
+          std::any_of(candidates.begin(), candidates.end(), [&](const UnknownCandidate& candidate) {
+            return candidate.requires_left_counter_edge && candidate.origin == CandidateOrigin::BracketedNoun &&
+                   candidate.start == start_pos && candidate.end == run_end &&
+                   candidate.pos == core::PartOfSpeech::Noun;
+          });
+      const bool has_explicit_mimetic_or_interjection =
+          std::any_of(candidates.begin(), candidates.end(), [&](const UnknownCandidate& candidate) {
+            return candidate.start == start_pos && candidate.end == run_end &&
+                   candidate.origin == CandidateOrigin::Onomatopoeia &&
+                   (candidate.pos == core::PartOfSpeech::Adverb || candidate.pos == core::PartOfSpeech::Interjection);
+          });
+      if (!has_quantity_candidate && !has_explicit_mimetic_or_interjection &&
+          admitsPromotedRun(ctx, bracketed, promoted, /*after_quantity=*/true)) {
+        appendPromotedRunCandidates(ctx, bracketed, promoted, noun_cost, longer_rescue_end, candidates,
+                                    /*after_quantity=*/true);
+        admitted = true;
+      }
+      return admitted;
     };
     for (size_t nominal_end = start_pos + 3;
          nominal_end <= start_pos + kDefaultBracketedNounLength && nominal_end < codepoints.size(); ++nominal_end) {

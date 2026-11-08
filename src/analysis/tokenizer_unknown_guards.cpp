@@ -5,6 +5,7 @@
 
 #include <algorithm>
 
+#include "candidate_constants.h"
 #include "core/kana_constants.h"
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
@@ -448,6 +449,92 @@ bool endsWithFinalParticleAfterNominalHead(const dictionary::DictionaryManager& 
   return false;
 }
 
+bool hasDictionaryPredicateReading(const dictionary::DictionaryManager& dict_manager,
+                                   const UnknownCandidate& candidate) {
+  return candidate.lemma_verified || dict_manager.lookupExact(candidate.surface, core::PartOfSpeech::Verb) != nullptr ||
+         dict_manager.lookupExact(candidate.surface, core::PartOfSpeech::Adjective) != nullptr ||
+         dict_manager.lookupExact(candidate.lemma, core::PartOfSpeech::Verb) != nullptr ||
+         dict_manager.lookupExact(candidate.lemma, core::PartOfSpeech::Adjective) != nullptr;
+}
+
+bool crossesAttestedNominalExistentialBoundary(const core::Lattice& lattice,
+                                               const dictionary::DictionaryManager& dict_manager,
+                                               const UnknownCandidate& candidate) {
+  if ((candidate.pos != core::PartOfSpeech::Verb && candidate.pos != core::PartOfSpeech::Adjective) ||
+      candidate.end <= candidate.start + 1 || candidate.lemma_verified) {
+    return false;
+  }
+  const bool crosses_nominal_boundary =
+      core::anyEdgeEndingAt(lattice, candidate.end - 1, [&](const core::LatticeEdge& edge) {
+        return edge.start == candidate.start && edge.pos == core::PartOfSpeech::Noun &&
+               edge.extended_pos == core::ExtendedPOS::Noun && edge.fromDictionary() &&
+               edge.has_finite_existential_continuation;
+      });
+  return crosses_nominal_boundary && !hasDictionaryPredicateReading(dict_manager, candidate);
+}
+
+bool usesQuantityAsAdjectiveStem(const UnknownCandidateContext& ctx, const core::Lattice& lattice,
+                                 const UnknownCandidate& candidate) {
+  const bool adjective = candidate.origin == CandidateOrigin::AdjectiveI;
+  const bool nominalized = candidate.origin == CandidateOrigin::NominalizedNoun;
+  if ((!adjective && !nominalized) || candidate.lemma_verified) {
+    return false;
+  }
+  const auto spelling = normalize::toCodepoints(nominalized ? candidate.surface : candidate.lemma);
+  if (spelling.size() < 2 || spelling.back() != U'い') {
+    return false;
+  }
+  const size_t stem_end = candidate.start + spelling.size() - 1;
+  if (candidate.start >= ctx.codepoints.size() || stem_end >= ctx.codepoints.size() || stem_end >= candidate.end ||
+      ctx.codepoints[stem_end] != U'い' || (nominalized && candidate.end != stem_end + 1) ||
+      !std::equal(spelling.begin(), spelling.end() - 1, ctx.codepoints.begin() + candidate.start)) {
+    return false;
+  }
+  const auto quantity_closes_stem = [&](const auto& quantity) {
+    return quantity.pos == core::PartOfSpeech::Noun && quantity.origin == CandidateOrigin::Counter &&
+           quantity.start <= candidate.start && candidate.start < quantity.end && quantity.end == stem_end;
+  };
+  // Counter candidates follow adjectives in the generation order. Earlier
+  // starting counters are already in the lattice; same-start counters are
+  // available in the completed candidate batch before either is inserted.
+  const bool quantity_prefix = std::any_of(ctx.candidates.begin(), ctx.candidates.end(), quantity_closes_stem) ||
+                               core::anyEdgeEndingAt(lattice, stem_end, quantity_closes_stem);
+  return quantity_prefix && !hasDictionaryPredicateReading(ctx.dict_manager, candidate) &&
+         ctx.dict_manager.lookupExact(candidate.surface, core::PartOfSpeech::Noun) == nullptr;
+}
+
+bool dividesKanaQuantityWithUnattestedHead(const UnknownCandidateContext& ctx, const core::Lattice& lattice,
+                                           const UnknownCandidate& candidate) {
+  const bool adjective_origin =
+      candidate.origin == CandidateOrigin::AdjectiveI || candidate.origin == CandidateOrigin::AdjectiveIHiragana;
+  const bool adjective_form =
+      candidate.extended_pos == core::ExtendedPOS::AdjRenyokei || candidate.extended_pos == core::ExtendedPOS::AdjBasic;
+  const bool adjective = adjective_origin && candidate.pos == core::PartOfSpeech::Adjective && adjective_form;
+  const bool selected_nominal =
+      candidate.origin == CandidateOrigin::SelectedNominalHead && candidate.pos == core::PartOfSpeech::Noun;
+  if ((!adjective && !selected_nominal) || candidate.lemma_verified) {
+    return false;
+  }
+  const auto contains_head = [&](const auto& quantity) {
+    return quantity.origin == CandidateOrigin::Counter && quantity.pos == core::PartOfSpeech::Noun &&
+           quantity.extended_pos == core::ExtendedPOS::NounNumber && quantity.start <= candidate.start &&
+           candidate.end < quantity.end && quantity.end - quantity.start <= candidate::kMaxKanaQuantityLength &&
+           grammar::isPureHiragana(quantity.surface);
+  };
+  bool inside_quantity = std::any_of(ctx.candidates.begin(), ctx.candidates.end(), contains_head);
+  const size_t earliest_start = lookbehindStart(candidate.start, candidate::kMaxKanaQuantityLength);
+  for (size_t quantity_start = earliest_start; !inside_quantity && quantity_start < candidate.start; ++quantity_start) {
+    for (const uint32_t edge_id : lattice.edgeIdsAt(quantity_start)) {
+      if (contains_head(lattice.getEdge(edge_id))) {
+        inside_quantity = true;
+        break;
+      }
+    }
+  }
+  return inside_quantity && !hasDictionaryPredicateReading(ctx.dict_manager, candidate) &&
+         (!selected_nominal || ctx.dict_manager.lookupExact(candidate.surface, core::PartOfSpeech::Noun) == nullptr);
+}
+
 }  // namespace
 
 // A generated continuative must not be promoted to a deverbal noun when its
@@ -582,6 +669,11 @@ bool isRejectedUnknownCandidate(const UnknownCandidateContext& ctx, const core::
   const auto& candidates = ctx.candidates;
   const size_t kanji_end = ctx.kanji_end;
   const size_t following_verb_start = ctx.following_verb_start;
+  if (crossesAttestedNominalExistentialBoundary(lattice, dict_manager, candidate) ||
+      usesQuantityAsAdjectiveStem(ctx, lattice, candidate) ||
+      dividesKanaQuantityWithUnattestedHead(ctx, lattice, candidate)) {
+    return true;
+  }
   const bool conjunction_before_short_nominal =
       candidate.pos == core::PartOfSpeech::Noun && candidate.end == candidate.start + 1 &&
       hasPrecedingPartOfSpeech(lattice, candidate.start, partOfSpeechMask(core::PartOfSpeech::Conjunction));
@@ -618,6 +710,12 @@ bool isRejectedUnknownCandidate(const UnknownCandidateContext& ctx, const core::
     return true;
   }
   if (candidate.requires_left_attributive_edge && !hasAttributiveEdgeEndingAt(lattice, candidate.start)) {
+    return true;
+  }
+  if (candidate.requires_left_counter_edge &&
+      !core::anyEdgeEndingAt(lattice, candidate.start, [](const core::LatticeEdge& edge) {
+        return edge.pos == core::PartOfSpeech::Noun && edge.origin == CandidateOrigin::Counter;
+      })) {
     return true;
   }
   if (candidate.rejects_preceding_content_edge && hasContentEdgeEndingAt(lattice, candidate.start)) {

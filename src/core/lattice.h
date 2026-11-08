@@ -31,9 +31,9 @@ struct LatticeEdge {
   // in release and WASM builds so their tokenization matches debug builds.
   CandidateOrigin origin{CandidateOrigin::Unknown};
 
-  // Internal proof that this counted noun has a finite existential continuation.
+  // Internal proof that this attested noun has a finite existential continuation.
   // This survives candidate insertion so connection rules can distinguish
-  // quantity + いる + finite auxiliary from unrelated short verb fragments.
+  // noun + いる + finite auxiliary from unrelated short verb fragments.
   bool has_finite_existential_continuation{false};
 
 #ifdef SUZUME_DEBUG_INFO

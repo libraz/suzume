@@ -161,6 +161,11 @@ bool hasDictionarySplit(const dictionary::DictionaryManager& dict_manager, const
 bool hasCompleteVerbLemma(const dictionary::DictionaryManager& dict_manager, std::string_view surface,
                           size_t char_length, std::string_view lemma);
 
+/** Whether a dictionary いる continuative opens a finite, clause-closing continuation. */
+bool hasFiniteExistentialContinuation(const dictionary::DictionaryManager& dict_manager,
+                                      const grammar::Inflection& inflection, const std::vector<char32_t>& codepoints,
+                                      size_t verb_start);
+
 /** Whether a character boundary starts inside a registered noun. */
 bool startsInsideRegisteredNoun(const dictionary::DictionaryManager& dict_manager, std::string_view text,
                                 const ByteOffsets& byte_offsets, size_t start_pos);

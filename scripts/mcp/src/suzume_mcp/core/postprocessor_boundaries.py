@@ -12,24 +12,26 @@ from .split_rules import base_from_mizenkei, base_from_renyokei
 
 _PRODUCTIVE_COMPOUND_V2 = PRODUCTIVE_COMPOUND_V2
 _QUANTITY_DIGITS = "0-9０-９〇零一二三四五六七八九十百千万億兆"
+_QUANTITY_PREFIXES = "数半何幾"
 _QUANTITY_COUNTER_PATTERN = "|".join(regex.escape(unit) for unit in sorted(COUNTER_UNITS, key=len, reverse=True))
 _QUANTITY_SUFFIX_PATTERN = "|".join(regex.escape(suffix) for suffix in QUANTITY_BOUND_SUFFIXES)
-_QUANTITY_ONLY_PATTERN = regex.compile(rf"^[{_QUANTITY_DIGITS}]+(?:{_QUANTITY_COUNTER_PATTERN})$")
+_QUANTITY_HEAD_PATTERN = rf"(?:[{_QUANTITY_DIGITS}]+|[{_QUANTITY_PREFIXES}][{_QUANTITY_DIGITS}]*)"
+_QUANTITY_ONLY_PATTERN = regex.compile(rf"^{_QUANTITY_HEAD_PATTERN}(?:{_QUANTITY_COUNTER_PATTERN})$")
 _QUANTITY_BOUND_PATTERN = regex.compile(
-    rf"^(?P<quantity>[{_QUANTITY_DIGITS}]+(?:{_QUANTITY_COUNTER_PATTERN}))"
+    rf"^(?P<quantity>{_QUANTITY_HEAD_PATTERN}(?:{_QUANTITY_COUNTER_PATTERN}))"
     rf"(?P<suffix>{_QUANTITY_SUFFIX_PATTERN})$"
 )
 
 
 def postprocess_quantity_bound_suffix(tokens: list[dict]) -> bool:
-    """Split a numeral+counter phrase from its closed-class bound suffix."""
+    """Split a numeral/quantity-prefix+counter phrase from its bound suffix."""
     changed = False
     index = 0
     while index < len(tokens):
         token = tokens[index]
-        # MeCab sometimes already supplies the quantity and suffix as separate
-        # tokens but tags the homographic suffix as a verb stem (二本|立て).
-        # The preceding quantity fixes the closed-class suffix reading.
+        # MeCab can supply the quantity and suffix as separate tokens while
+        # assigning the suffix a host-dependent POS (二本|立て can be a verb
+        # stem). The preceding quantity fixes the closed-class suffix reading.
         if (
             index > 0
             and token.get("surface") in QUANTITY_BOUND_SUFFIXES

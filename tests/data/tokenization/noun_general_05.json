@@ -764,6 +764,159 @@
       ],
       "id": "ganigatenakoto",
       "input": "生徒がにがてなこと"
+    },
+    {
+      "description": "Known-limit regression: productive quantity and finite predicate boundaries",
+      "expected": [
+        {
+          "lemma": "二人",
+          "pos": "Noun",
+          "surface": "二人"
+        },
+        {
+          "lemma": "いっしょ",
+          "pos": "Noun",
+          "surface": "いっしょ"
+        }
+      ],
+      "id": "ittshi",
+      "input": "二人いっしょ"
+    },
+    {
+      "description": "Known-limit regression: productive quantity and finite predicate boundaries",
+      "expected": [
+        {
+          "lemma": "数人",
+          "pos": "Noun",
+          "surface": "数人"
+        },
+        {
+          "lemma": "いっしょ",
+          "pos": "Noun",
+          "surface": "いっしょ"
+        }
+      ],
+      "id": "ittshi_2",
+      "input": "数人いっしょ"
+    },
+    {
+      "description": "Known-limit regression: productive quantity and finite predicate boundaries",
+      "expected": [
+        {
+          "lemma": "3人",
+          "pos": "Noun",
+          "surface": "3人"
+        },
+        {
+          "lemma": "いっしょ",
+          "pos": "Noun",
+          "surface": "いっしょ"
+        }
+      ],
+      "id": "3_ittshi",
+      "input": "3人いっしょ"
+    },
+    {
+      "description": "Known-limit regression: productive quantity and finite predicate boundaries",
+      "expected": [
+        {
+          "lemma": "三人",
+          "pos": "Noun",
+          "surface": "三人"
+        },
+        {
+          "lemma": "いっしょ",
+          "pos": "Noun",
+          "surface": "いっしょ"
+        }
+      ],
+      "id": "ittshi_3",
+      "input": "三人いっしょ"
+    },
+    {
+      "description": "Known-limit regression: productive quantity and finite predicate boundaries",
+      "expected": [
+        {
+          "lemma": "三件",
+          "pos": "Noun",
+          "surface": "三件"
+        },
+        {
+          "lemma": "とっきょ",
+          "pos": "Noun",
+          "surface": "とっきょ"
+        }
+      ],
+      "id": "tottki",
+      "input": "三件とっきょ"
+    },
+    {
+      "description": "Known-limit regression: productive quantity and finite predicate boundaries",
+      "expected": [
+        {
+          "lemma": "数件",
+          "pos": "Noun",
+          "surface": "数件"
+        },
+        {
+          "lemma": "とっきょ",
+          "pos": "Noun",
+          "surface": "とっきょ"
+        }
+      ],
+      "id": "tottki_2",
+      "input": "数件とっきょ"
+    },
+    {
+      "description": "Known-limit regression: productive quantity and finite predicate boundaries",
+      "expected": [
+        {
+          "lemma": "三人",
+          "pos": "Noun",
+          "surface": "三人"
+        },
+        {
+          "lemma": "以下",
+          "pos": "Suffix",
+          "surface": "以下"
+        }
+      ],
+      "id": "unnamed_55",
+      "input": "三人以下"
+    },
+    {
+      "description": "Known-limit regression: productive quantity and finite predicate boundaries",
+      "expected": [
+        {
+          "lemma": "3人",
+          "pos": "Noun",
+          "surface": "3人"
+        },
+        {
+          "lemma": "以下",
+          "pos": "Suffix",
+          "surface": "以下"
+        }
+      ],
+      "id": "3_3",
+      "input": "3人以下"
+    },
+    {
+      "description": "Known-limit regression: productive quantity and finite predicate boundaries",
+      "expected": [
+        {
+          "lemma": "数人",
+          "pos": "Noun",
+          "surface": "数人"
+        },
+        {
+          "lemma": "以下",
+          "pos": "Suffix",
+          "surface": "以下"
+        }
+      ],
+      "id": "unnamed_56",
+      "input": "数人以下"
     }
   ],
   "description": "General nouns (part 5/5)",

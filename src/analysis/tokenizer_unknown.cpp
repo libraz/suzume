@@ -28,78 +28,6 @@ using tokenizer_unknown_detail::hasCompleteInternalConstituentBoundary;
 
 namespace {
 
-bool hasFiniteExistentialContinuation(const tokenizer_unknown_detail::UnknownCandidateContext& ctx,
-                                      const UnknownCandidate& candidate) {
-  const auto& codepoints = ctx.codepoints;
-  const auto& dict_manager = ctx.dict_manager;
-  const size_t verb_start = candidate.end;
-  if (candidate.pos != core::PartOfSpeech::Noun || candidate.origin != core::CandidateOrigin::Counter ||
-      verb_start >= codepoints.size()) {
-    return false;
-  }
-
-  const auto* existential =
-      lookupEntryInRange(dict_manager, codepoints, verb_start, verb_start + 1, core::PartOfSpeech::Verb);
-  if (existential == nullptr || existential->extended_pos != core::ExtendedPOS::VerbRenyokei ||
-      lemmaOrSurface(*existential) != "いる") {
-    return false;
-  }
-
-  constexpr size_t kMaximumAuxiliarySurfaceLength = 6;
-  const size_t auxiliary_start = verb_start + 1;
-  const size_t auxiliary_probe_end = lookaheadEnd(codepoints.size(), auxiliary_start, kMaximumAuxiliarySurfaceLength);
-  bool has_finite_dictionary_auxiliary = false;
-  for (const auto& match : lookupResultsInRange(dict_manager, codepoints, auxiliary_start, auxiliary_probe_end)) {
-    if (match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Auxiliary &&
-        (match.entry->extended_pos == core::ExtendedPOS::AuxTenseTa ||
-         match.entry->extended_pos == core::ExtendedPOS::AuxTenseMasu)) {
-      has_finite_dictionary_auxiliary = true;
-      break;
-    }
-  }
-  if (!has_finite_dictionary_auxiliary) {
-    return false;
-  }
-
-  constexpr size_t kMaximumExistentialPrefixLength = 8;
-  constexpr size_t kMaximumFinalParticleLength = 3;
-  const size_t prefix_probe_end = lookaheadEnd(codepoints.size(), verb_start, kMaximumExistentialPrefixLength);
-  for (size_t prefix_end = verb_start + 1; prefix_end <= prefix_probe_end; ++prefix_end) {
-    if (!kana::isHiraganaCodepoint(codepoints[prefix_end - 1])) {
-      break;
-    }
-    const bool closes_clause = verb_helpers::clauseEndsAt(codepoints, prefix_end);
-    bool closes_after_final_particle = false;
-    const size_t particle_probe_end = lookaheadEnd(codepoints.size(), prefix_end, kMaximumFinalParticleLength);
-    for (const auto& match : lookupResultsInRange(dict_manager, codepoints, prefix_end, particle_probe_end)) {
-      if (match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Particle &&
-          match.entry->extended_pos == core::ExtendedPOS::ParticleFinal &&
-          match.length <= kMaximumFinalParticleLength &&
-          verb_helpers::clauseEndsAt(codepoints, prefix_end + match.length)) {
-        closes_after_final_particle = true;
-        break;
-      }
-    }
-    if (!closes_clause && !closes_after_final_particle) {
-      continue;
-    }
-
-    const std::string prefix = extractSubstring(codepoints, verb_start, prefix_end);
-    for (const auto& analysis : ctx.inflection.analyze(prefix)) {
-      if (analysis.base_form != "いる" || analysis.verb_type != grammar::VerbType::Ichidan ||
-          analysis.has_explanatory_suffix || analysis.morphemes.empty()) {
-        continue;
-      }
-      const auto& outer_auxiliary = analysis.morphemes.front();
-      if (ctx.inflection.auxiliaryProvidesConnection(outer_auxiliary, grammar::conn::kAuxOutTa) ||
-          ctx.inflection.auxiliaryProvidesConnection(outer_auxiliary, grammar::conn::kAuxOutMasu)) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
 // True if every char position in [start, end) has CharType `type`. When
 // `allow_choon` is set, the prolonged sound mark (ー) is also accepted as part
 // of the run (colloquial すごーい, katakana loanwords). Bounds-checked against
@@ -567,7 +495,9 @@ void addUnknownCandidateEdges(core::Lattice& lattice, const tokenizer_unknown_de
   const auto& byte_offsets = ctx.byte_offsets;
   const auto& candidates = ctx.candidates;
   uint8_t flags = core::LatticeEdge::kIsUnknown;
-  const bool finite_existential_continuation = hasFiniteExistentialContinuation(ctx, candidate);
+  const bool finite_existential_continuation =
+      candidate.pos == core::PartOfSpeech::Noun && candidate.origin == core::CandidateOrigin::Counter &&
+      hasFiniteExistentialContinuation(dict_manager, inflection, codepoints, candidate.end);
 
   std::string surface_str(candidate.surface);
 

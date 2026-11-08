@@ -1245,6 +1245,391 @@
       ],
       "id": "aratedeshita",
       "input": "あらてでした"
+    },
+    {
+      "description": "Known-limit regression: productive quantity and finite predicate boundaries",
+      "expected": [
+        {
+          "lemma": "二人",
+          "pos": "Noun",
+          "surface": "二人"
+        },
+        {
+          "lemma": "いっしょ",
+          "pos": "Noun",
+          "surface": "いっしょ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "ittshi_da",
+      "input": "二人いっしょだ"
+    },
+    {
+      "description": "Known-limit regression: productive quantity and finite predicate boundaries",
+      "expected": [
+        {
+          "lemma": "ねこ",
+          "pos": "Noun",
+          "surface": "ねこ"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "いちばん",
+          "pos": "Noun",
+          "surface": "いちばん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "nekogaichibanda",
+      "input": "ねこがいちばんだ"
+    },
+    {
+      "description": "Known-limit regression: productive quantity and finite predicate boundaries",
+      "expected": [
+        {
+          "lemma": "いちばん",
+          "pos": "Noun",
+          "surface": "いちばん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "ichibanda",
+      "input": "いちばんだ"
+    },
+    {
+      "description": "Known-limit regression: productive quantity and finite predicate boundaries",
+      "expected": [
+        {
+          "lemma": "にばん",
+          "pos": "Noun",
+          "surface": "にばん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "nibanda",
+      "input": "にばんだ"
+    },
+    {
+      "description": "Known-limit regression: productive quantity and finite predicate boundaries",
+      "expected": [
+        {
+          "lemma": "さんばん",
+          "pos": "Noun",
+          "surface": "さんばん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "sanbanda",
+      "input": "さんばんだ"
+    },
+    {
+      "description": "Known-limit regression: productive quantity and finite predicate boundaries",
+      "expected": [
+        {
+          "lemma": "よんばん",
+          "pos": "Noun",
+          "surface": "よんばん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "yonbanda",
+      "input": "よんばんだ"
+    },
+    {
+      "description": "Known-limit regression: productive quantity and finite predicate boundaries",
+      "expected": [
+        {
+          "lemma": "じゅうばん",
+          "pos": "Noun",
+          "surface": "じゅうばん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "ji_ubanda",
+      "input": "じゅうばんだ"
+    },
+    {
+      "description": "Known-limit regression: productive quantity and finite predicate boundaries",
+      "expected": [
+        {
+          "lemma": "じゅういちばん",
+          "pos": "Noun",
+          "surface": "じゅういちばん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ji_uichibandattta",
+      "input": "じゅういちばんだった"
+    },
+    {
+      "description": "Known-limit regression: productive quantity and finite predicate boundaries",
+      "expected": [
+        {
+          "lemma": "にじゅういちばん",
+          "pos": "Noun",
+          "surface": "にじゅういちばん"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "niji_uichibandesu",
+      "input": "にじゅういちばんです"
+    },
+    {
+      "description": "Known-limit regression: productive quantity and finite predicate boundaries",
+      "expected": [
+        {
+          "lemma": "にじゅうにばん",
+          "pos": "Noun",
+          "surface": "にじゅうにばん"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "niji_unibandesu",
+      "input": "にじゅうにばんです"
+    },
+    {
+      "description": "Known-limit regression: productive quantity and finite predicate boundaries",
+      "expected": [
+        {
+          "lemma": "しちじゅういちばん",
+          "pos": "Noun",
+          "surface": "しちじゅういちばん"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "shichiji_uichibandesu",
+      "input": "しちじゅういちばんです"
+    },
+    {
+      "description": "Known-limit regression: productive quantity and finite predicate boundaries",
+      "expected": [
+        {
+          "lemma": "きゅうじゅうきゅうばん",
+          "pos": "Noun",
+          "surface": "きゅうじゅうきゅうばん"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "でし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ki_uji_uki_ubandeshita",
+      "input": "きゅうじゅうきゅうばんでした"
+    },
+    {
+      "description": "Known-limit regression: productive quantity and finite predicate boundaries",
+      "expected": [
+        {
+          "lemma": "いちばん",
+          "pos": "Noun",
+          "surface": "いちばん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "ichibanda_2",
+      "input": "いちばんだ。"
+    },
+    {
+      "description": "Known-limit regression: productive quantity and finite predicate boundaries",
+      "expected": [
+        {
+          "lemma": "いちばん",
+          "pos": "Noun",
+          "surface": "いちばん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "ね",
+          "pos": "Particle",
+          "surface": "ね"
+        }
+      ],
+      "id": "ichibandane",
+      "input": "いちばんだね。"
+    },
+    {
+      "description": "Known-limit regression: productive quantity and finite predicate boundaries",
+      "expected": [
+        {
+          "lemma": "三人",
+          "pos": "Noun",
+          "surface": "三人"
+        },
+        {
+          "lemma": "以下",
+          "pos": "Suffix",
+          "surface": "以下"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "da_11",
+      "input": "三人以下だ"
+    },
+    {
+      "description": "Closed kana numeral composition and auxiliary boundary regression",
+      "expected": [
+        {
+          "lemma": "じゅういちばん",
+          "pos": "Noun",
+          "surface": "じゅういちばん"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "でし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ji_uichibandeshita",
+      "input": "じゅういちばんでした"
+    },
+    {
+      "description": "Closed kana numeral composition and auxiliary boundary regression",
+      "expected": [
+        {
+          "lemma": "よんじゅうばん",
+          "pos": "Noun",
+          "surface": "よんじゅうばん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "yonji_ubanda",
+      "input": "よんじゅうばんだ"
+    },
+    {
+      "description": "Closed kana numeral composition and auxiliary boundary regression",
+      "expected": [
+        {
+          "lemma": "よんじゅうきゅうばん",
+          "pos": "Noun",
+          "surface": "よんじゅうきゅうばん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "yonji_uki_ubanda",
+      "input": "よんじゅうきゅうばんだ"
+    },
+    {
+      "description": "Closed kana numeral composition and auxiliary boundary regression",
+      "expected": [
+        {
+          "lemma": "ごじゅうしちばん",
+          "pos": "Noun",
+          "surface": "ごじゅうしちばん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "goji_ushichibanda",
+      "input": "ごじゅうしちばんだ"
+    },
+    {
+      "description": "Closed kana numeral composition and auxiliary boundary regression",
+      "expected": [
+        {
+          "lemma": "ごじゅうしちばん",
+          "pos": "Noun",
+          "surface": "ごじゅうしちばん"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "でし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "goji_ushichibandeshita",
+      "input": "ごじゅうしちばんでした"
     }
   ],
   "description": "Modality auxiliaries (たい、そう、らしい) (part 2/2)",

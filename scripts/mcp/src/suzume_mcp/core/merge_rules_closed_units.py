@@ -15,6 +15,15 @@ from .constants import (
     KANA_NUMBER_STEMS,
     KANA_PERSONAL_PRONOUNS,
 )
+from .constants_search_units import (
+    KANA_ORDINAL_CLAUSE_END_PUNCTUATION,
+    KANA_ORDINAL_COUNTER_SURFACE,
+    KANA_ORDINAL_DIGIT_READINGS,
+    KANA_ORDINAL_FINAL_PARTICLES,
+    KANA_ORDINAL_FINITE_COPULAS,
+    KANA_ORDINAL_MAX_NUMBER_LENGTH,
+    KANA_ORDINAL_TEN_READING,
+)
 from .core_lexicon import clipped_greetings, core_headwords_by_length
 from .mecab import is_single_token_of_pos, mecab_analyze
 from .merge_postprocessors import KARI_MIZENKEI_CELL, classical_adjective_lemma
@@ -172,6 +181,118 @@ _KANA_NUMBER_COUNTERS = tuple(
 )
 
 
+_KANA_ORDINAL_DIGITS = tuple(sorted(KANA_ORDINAL_DIGIT_READINGS, key=lambda reading: len(reading[0]), reverse=True))
+
+
+def _kana_ordinal_digit_at(text: str, pos: int, limit: int) -> tuple[str, int] | None:
+    """Read the longest closed digit spelling that fits inside the bounded number prefix."""
+    for reading, value in _KANA_ORDINAL_DIGITS:
+        if pos + len(reading) <= limit and text.startswith(reading, pos):
+            return reading, value
+    return None
+
+
+def _kana_ordinal_surface_at(text: str) -> str:
+    """Return a complete 1-99 kana ordinal at the start of ``text``, if present."""
+    limit = min(len(text), KANA_ORDINAL_MAX_NUMBER_LENGTH)
+    if text.startswith(KANA_ORDINAL_TEN_READING) and len(KANA_ORDINAL_TEN_READING) <= limit:
+        number_end = len(KANA_ORDINAL_TEN_READING)
+        ones = _kana_ordinal_digit_at(text, number_end, limit)
+        if ones is not None:
+            number_end += len(ones[0])
+    else:
+        first = _kana_ordinal_digit_at(text, 0, limit)
+        if first is None:
+            return ""
+        number_end = len(first[0])
+        ten_end = number_end + len(KANA_ORDINAL_TEN_READING)
+        if first[1] >= 2 and ten_end <= limit and text.startswith(KANA_ORDINAL_TEN_READING, number_end):
+            number_end = ten_end
+            ones = _kana_ordinal_digit_at(text, number_end, limit)
+            if ones is not None:
+                number_end += len(ones[0])
+
+    if not text.startswith(KANA_ORDINAL_COUNTER_SURFACE, number_end):
+        return ""
+    return text[: number_end + len(KANA_ORDINAL_COUNTER_SURFACE)]
+
+
+def _kana_ordinal_finite_tail(text_after_ordinal: str) -> tuple[str, str] | None:
+    """Return a finite copula and optional one-character final particle at a clause end."""
+    for copula in KANA_ORDINAL_FINITE_COPULAS:
+        if not text_after_ordinal.startswith(copula):
+            continue
+        tail = text_after_ordinal[len(copula) :]
+        if not tail or tail[0] in KANA_ORDINAL_CLAUSE_END_PUNCTUATION:
+            return copula, ""
+        if tail[0] in KANA_ORDINAL_FINAL_PARTICLES:
+            final_particle_tail = tail[1:]
+            if not final_particle_tail or final_particle_tail[0] in KANA_ORDINAL_CLAUSE_END_PUNCTUATION:
+                return copula, tail[0]
+    return None
+
+
+def _kana_ordinal_right_boundary(text_after_ordinal: str) -> bool:
+    """Require a clause end, or a complete finite copula and clause end."""
+    return (
+        not text_after_ordinal
+        or text_after_ordinal[0] in KANA_ORDINAL_CLAUSE_END_PUNCTUATION
+        or (_kana_ordinal_finite_tail(text_after_ordinal) is not None)
+    )
+
+
+def _reparse_kana_ordinal_finite_tail(copula: str, final_particle: str) -> list[dict] | None:
+    """Tokenize a proven closed tail and keep it only when MeCab confirms its roles."""
+    tail_surface = copula + final_particle
+    parsed = mecab_analyze(tail_surface)
+    if "".join(token.get("surface", "") for token in parsed) != tail_surface:
+        return None
+
+    auxiliary_surface = ""
+    particle_tokens: list[dict] = []
+    for token in parsed:
+        surface = token.get("surface", "")
+        if len(auxiliary_surface) < len(copula):
+            if token.get("pos") != "助動詞" or not copula.startswith(auxiliary_surface + surface):
+                return None
+            auxiliary_surface += surface
+            continue
+        if (
+            not final_particle
+            or surface != final_particle
+            or len(surface) != 1
+            or token.get("pos") != "助詞"
+            or token.get("pos_sub1") != "終助詞"
+        ):
+            return None
+        particle_tokens.append(token)
+
+    expected_particle_count = 1 if final_particle else 0
+    if auxiliary_surface != copula or len(particle_tokens) != expected_particle_count:
+        return None
+    return parsed
+
+
+def _consume_fused_kana_ordinal_tail(
+    tokens: list[dict], start: int, ordinal: str, remaining: str
+) -> tuple[int, list[dict]] | None:
+    """Consume exactly an ordinal plus its proven finite tail across raw MeCab tokens."""
+    finite_tail = _kana_ordinal_finite_tail(remaining[len(ordinal) :])
+    if finite_tail is None:
+        return None
+    copula, final_particle = finite_tail
+    tail_surface = copula + final_particle
+    expected_span = ordinal + tail_surface
+    consumed, end = _consume_span(tokens, start, len(expected_span))
+    if consumed != expected_span:
+        return None
+
+    reparsed_tail = _reparse_kana_ordinal_finite_tail(copula, final_particle)
+    if reparsed_tail is None:
+        return None
+    return end, reparsed_tail
+
+
 _FIXED_FUNCTION_SEARCH_UNITS = tuple(sorted(FIXED_FUNCTION_SEARCH_UNITS, key=len, reverse=True))
 
 
@@ -211,6 +332,32 @@ def _merge_closed_function_units(state: MergeState) -> bool:
     applied_rule = state.applied_rule
     remaining = state.remaining
     try:
+        # Kana ordinals are a closed numeral grammar plus the closed counter ばん.
+        # The source boundary keeps the adverbial reading before an attributive
+        # phrase from being rewritten as a noun.
+        if not merged:
+            kana_ordinal = _kana_ordinal_surface_at(remaining)
+            if kana_ordinal and _kana_ordinal_right_boundary(remaining[len(kana_ordinal) :]):
+                consumed, j = _consume_span(tokens, i, len(kana_ordinal))
+                if consumed == kana_ordinal:
+                    result.append({"surface": kana_ordinal, "pos": "名詞", "pos_sub1": "数", "lemma": kana_ordinal})
+                    i = j
+                    merged = True
+                    if applied_rule is None:
+                        applied_rule = "kana-numeral-ordinal"
+                    return True
+                if len(consumed) > len(kana_ordinal):
+                    fused_tail = _consume_fused_kana_ordinal_tail(tokens, i, kana_ordinal, remaining)
+                    if fused_tail is not None:
+                        end, reparsed_tail = fused_tail
+                        result.append({"surface": kana_ordinal, "pos": "名詞", "pos_sub1": "数", "lemma": kana_ordinal})
+                        result.extend(reparsed_tail)
+                        i = end
+                        merged = True
+                        if applied_rule is None:
+                            applied_rule = "kana-numeral-ordinal"
+                        return True
+
         # A kana personal pronoun is a closed-class word the reference does not
         # list, so its spelling falls apart into readable pieces (かの+じょ).
         # The archaic personal pronouns (それがし, わらわ, 拙僧) share their kana

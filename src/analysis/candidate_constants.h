@@ -316,11 +316,14 @@ constexpr float kNumeralCounterMergeBonus = -0.5F;
 // set below their combined cost rather than at the plain counter-merge level.
 constexpr float kQuantityExtentMergeBonus = -1.4F;
 
-// Closed kana NounNumber + quantitative Suffix composition (いち+まい,
-// よん+にん).  Both split components receive strong dictionary/bigram bonuses,
+// Closed kana numeral + counter composition (いち+まい, よん+にん).
+// Split components can receive strong dictionary/bigram bonuses,
 // so the complete quantity search unit needs a correspondingly stronger cost.
-// The candidate generator requires exact L1 class evidence on both halves.
+// The generator requires L1 classes or a bounded numeral/counter grammar.
 constexpr float kKanaNumeralCounterMergeBonus = -2.0F;
+constexpr size_t kMaxKanaOrdinalNumberLength = 9;
+constexpr size_t kKanaOrdinalCounterLength = 2;
+constexpr size_t kMaxKanaQuantityLength = kMaxKanaOrdinalNumberLength + kKanaOrdinalCounterLength;
 
 // Native counter repeated across scripts (一つひとつ). Both halves are closed
 // quantity expressions and the kana half is an L1 entry with a full dictionary

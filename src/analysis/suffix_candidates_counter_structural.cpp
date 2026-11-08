@@ -4,6 +4,9 @@
  */
 
 #include <algorithm>
+#include <array>
+#include <string_view>
+#include <utility>
 
 #include "candidate_constants.h"
 #include "core/debug.h"
@@ -14,6 +17,7 @@
 #include "suffix_candidates_counter_internal.h"
 #include "tokenizer_utils.h"
 #include "unknown.h"
+#include "verb_candidates_auxiliary_patterns.h"
 #include "verb_candidates_dictionary_probes.h"
 
 namespace suzume::analysis::counter_detail {
@@ -47,6 +51,125 @@ bool isObjectCounterKanji(char32_t code_point) {
 // into a scan of the entire remaining input.
 constexpr size_t kMaxKanaNounNumberLength = 4;
 constexpr size_t kMaxKanaCounterSuffixLength = 6;
+
+struct KanaDigitReading {
+  std::u32string_view surface;
+  unsigned value;
+};
+
+constexpr std::array<KanaDigitReading, 10> kKanaDigitReadings = {{{U"いち", 1},
+                                                                  {U"に", 2},
+                                                                  {U"さん", 3},
+                                                                  {U"よん", 4},
+                                                                  {U"ご", 5},
+                                                                  {U"ろく", 6},
+                                                                  {U"なな", 7},
+                                                                  {U"しち", 7},
+                                                                  {U"はち", 8},
+                                                                  {U"きゅう", 9}}};
+constexpr std::u32string_view kKanaTenReading = U"じゅう";
+constexpr std::u32string_view kKanaOrdinalCounter = U"ばん";
+constexpr std::array<std::u32string_view, 4> kFiniteKanaOrdinalCopulas = {U"だった", U"でした", U"です", U"だ"};
+static_assert(kKanaOrdinalCounter.size() == candidate::kKanaOrdinalCounterLength);
+
+bool codepointsMatchAt(const std::vector<char32_t>& codepoints, size_t pos, size_t limit, std::u32string_view surface) {
+  if (pos > limit || surface.size() > limit - pos) {
+    return false;
+  }
+  return std::equal(surface.begin(), surface.end(), codepoints.begin() + pos);
+}
+
+bool kanaDigitAt(const std::vector<char32_t>& codepoints, size_t pos, size_t limit, KanaDigitReading& reading) {
+  size_t longest_length = 0;
+  for (const KanaDigitReading& candidate : kKanaDigitReadings) {
+    if (candidate.surface.size() > longest_length && codepointsMatchAt(codepoints, pos, limit, candidate.surface)) {
+      reading = candidate;
+      longest_length = candidate.surface.size();
+    }
+  }
+  return longest_length != 0;
+}
+
+size_t kanaOrdinalNumberEndAt(const std::vector<char32_t>& codepoints, size_t start_pos) {
+  if (start_pos >= codepoints.size()) {
+    return 0;
+  }
+
+  const size_t probe_end = std::min(codepoints.size(), start_pos + candidate::kMaxKanaOrdinalNumberLength);
+  if (codepointsMatchAt(codepoints, start_pos, probe_end, kKanaTenReading)) {
+    size_t number_end = start_pos + kKanaTenReading.size();
+    KanaDigitReading ones{};
+    if (kanaDigitAt(codepoints, number_end, probe_end, ones)) {
+      number_end += ones.surface.size();
+    }
+    return number_end;
+  }
+
+  KanaDigitReading tens_or_ones{};
+  if (!kanaDigitAt(codepoints, start_pos, probe_end, tens_or_ones)) {
+    return 0;
+  }
+
+  size_t number_end = start_pos + tens_or_ones.surface.size();
+  if (tens_or_ones.value < 2 || !codepointsMatchAt(codepoints, number_end, probe_end, kKanaTenReading)) {
+    return number_end;
+  }
+
+  number_end += kKanaTenReading.size();
+  KanaDigitReading ones{};
+  if (kanaDigitAt(codepoints, number_end, probe_end, ones)) {
+    number_end += ones.surface.size();
+  }
+  return number_end;
+}
+
+bool hasSingleFinalParticleAt(const std::vector<char32_t>& codepoints, size_t pos,
+                              const dictionary::DictionaryManager* dict_manager) {
+  if (dict_manager == nullptr || pos >= codepoints.size()) {
+    return false;
+  }
+  const auto matches = lookupResultsInRange(*dict_manager, codepoints, pos, pos + 1);
+  return std::any_of(matches.begin(), matches.end(), [](const auto& match) {
+    return match.length == 1 && match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Particle &&
+           match.entry->extended_pos == core::ExtendedPOS::ParticleFinal;
+  });
+}
+
+bool hasKanaOrdinalRightBoundary(const std::vector<char32_t>& codepoints, size_t ordinal_end,
+                                 const dictionary::DictionaryManager* dict_manager) {
+  if (verb_helpers::clauseEndsAt(codepoints, ordinal_end)) {
+    return true;
+  }
+
+  for (const std::u32string_view copula : kFiniteKanaOrdinalCopulas) {
+    if (!codepointsMatchAt(codepoints, ordinal_end, codepoints.size(), copula)) {
+      continue;
+    }
+    const size_t copula_end = ordinal_end + copula.size();
+    if (verb_helpers::clauseEndsAt(codepoints, copula_end) ||
+        (hasSingleFinalParticleAt(codepoints, copula_end, dict_manager) &&
+         verb_helpers::clauseEndsAt(codepoints, copula_end + 1))) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool isClosedKanaNumberCounter(const std::vector<char32_t>& codepoints, size_t number_start, size_t number_end,
+                               size_t suffix_end) {
+  static constexpr std::array<std::string_view, 3> kNumberReadings = {"いち", "ふた", "よん"};
+  static constexpr std::array<std::string_view, 2> kCounterReadings = {"まい", "にん"};
+  const std::string number = extractSubstring(codepoints, number_start, number_end);
+  const std::string counter = extractSubstring(codepoints, number_end, suffix_end);
+  return std::find(kNumberReadings.begin(), kNumberReadings.end(), number) != kNumberReadings.end() &&
+         std::find(kCounterReadings.begin(), kCounterReadings.end(), counter) != kCounterReadings.end();
+}
+
+bool isHiraganaSpan(const std::vector<normalize::CharType>& char_types, size_t start, size_t end) {
+  return start < end && end <= char_types.size() &&
+         std::all_of(char_types.begin() + start, char_types.begin() + end,
+                     [](normalize::CharType char_type) { return char_type == normalize::CharType::Hiragana; });
+}
 }  // namespace
 
 }  // namespace suzume::analysis::counter_detail
@@ -113,10 +236,9 @@ void appendStructuralCounterCandidates(const std::vector<char32_t>& codepoints, 
   }
 
   // Kana quantity readings are a finite composition of the closed NounNumber
-  // and quantitative Suffix classes (いち+まい, よん+にん).  MeCab may split
-  // these at arbitrary syllable boundaries, but Suzume already owns both
-  // grammatical components in L1; emit the complete quantity search unit
-  // without registering any open-class word.
+  // and quantitative Suffix classes (いち+まい, よん+にん). Hiragana suffixes
+  // are restricted to those readings; kanji counters such as 月 keep the
+  // mixed-script path.
   if (dict_manager != nullptr && char_types[start_pos] == normalize::CharType::Hiragana) {
     const size_t number_probe_end = std::min(codepoints.size(), start_pos + kMaxKanaNounNumberLength);
     for (const auto& number_result : lookupResultsInRange(*dict_manager, codepoints, start_pos, number_probe_end)) {
@@ -131,6 +253,10 @@ void appendStructuralCounterCandidates(const std::vector<char32_t>& codepoints, 
           continue;
         }
         const size_t suffix_end = number_end + suffix_result.length;
+        if (isHiraganaSpan(char_types, number_end, suffix_end) &&
+            !isClosedKanaNumberCounter(codepoints, start_pos, number_end, suffix_end)) {
+          continue;
+        }
         std::string surface = extractSubstring(codepoints, start_pos, suffix_end);
         auto cand = makeCandidate(surface, start_pos, suffix_end, core::PartOfSpeech::Noun,
                                   candidate::kKanaNumeralCounterMergeBonus, true, CandidateOrigin::Counter,
@@ -138,6 +264,26 @@ void appendStructuralCounterCandidates(const std::vector<char32_t>& codepoints, 
         cand.lemma = surface;
         SUZUME_DEBUG_CANDIDATE_PATTERN(cand, "kana_numeral_counter");
         candidates.push_back(cand);
+      }
+    }
+  }
+
+  // The ordinal counter ばん is a closed suffix for the productive readings
+  // of 1–99. It only opens a noun candidate when the complete ordinal is
+  // clause-final or followed by a finite copula, optionally closed by one
+  // single-character final particle.
+  if (char_types[start_pos] == normalize::CharType::Hiragana) {
+    const size_t number_end = kanaOrdinalNumberEndAt(codepoints, start_pos);
+    if (number_end > start_pos && codepointsMatchAt(codepoints, number_end, codepoints.size(), kKanaOrdinalCounter)) {
+      const size_t ordinal_end = number_end + kKanaOrdinalCounter.size();
+      if (hasKanaOrdinalRightBoundary(codepoints, ordinal_end, dict_manager)) {
+        std::string surface = extractSubstring(codepoints, start_pos, ordinal_end);
+        auto cand = makeCandidate(surface, start_pos, ordinal_end, core::PartOfSpeech::Noun,
+                                  candidate::kKanaNumeralCounterMergeBonus, true, CandidateOrigin::Counter,
+                                  core::ExtendedPOS::NounNumber);
+        cand.lemma = surface;
+        SUZUME_DEBUG_CANDIDATE_PATTERN(cand, "kana_ordinal_counter");
+        candidates.push_back(std::move(cand));
       }
     }
   }
@@ -163,12 +309,16 @@ void appendStructuralCounterCandidates(const std::vector<char32_t>& codepoints, 
                            "indefinite_approximate_duration", candidates);
   }
 
-  // An interrogative head directly followed by a counter forms one nominal
-  // quantity (何人, 幾人). Keep the same kanji-run boundary as numeral+counter
+  // An interrogative or approximate head followed by a counter forms one
+  // quantity (何人, 幾人, 数人). Keep the same kanji-run boundary as numeral+counter
   // candidates so a following kanji noun is not absorbed (何人家族), and leave
   // the linked 何か月/幾か国 path above with its existing NounNumber metadata.
   const size_t interrogative_counter_start = start_pos + 1;
-  if (interrogative_head && interrogative_counter_start < codepoints.size()) {
+  const bool approximate_head = quantity_head == U'数' &&
+                                (start_pos == 0 || char_types[start_pos - 1] != normalize::CharType::Kanji) &&
+                                interrogative_counter_start < codepoints.size() &&
+                                !normalize::isTemporalCounterKanji(codepoints[interrogative_counter_start]);
+  if ((interrogative_head || approximate_head) && interrogative_counter_start < codepoints.size()) {
     const size_t counter_run_end =
         verb_helpers::counterKanjiRunEnd(dict_manager, codepoints, interrogative_counter_start, codepoints.size());
     if (counter_run_end > interrogative_counter_start &&
@@ -176,7 +326,7 @@ void appendStructuralCounterCandidates(const std::vector<char32_t>& codepoints, 
         (counter_run_end >= char_types.size() || char_types[counter_run_end] != normalize::CharType::Kanji)) {
       appendCounterCandidate(codepoints, start_pos, counter_run_end, core::PartOfSpeech::Noun,
                              candidate::kNumeralCounterMergeBonus, core::ExtendedPOS::Unknown,
-                             "interrogative_kanji_counter", candidates);
+                             "direct_quantity_kanji_counter", candidates);
     }
   }
 

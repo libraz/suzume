@@ -63,6 +63,7 @@ from suzume_mcp.core.postprocessors import (
     postprocess_you_noun,
     preprocess_for_mecab,
 )
+from suzume_mcp.core.suzume_utils import get_expected_tokens
 
 
 def _tok(surface, pos, **kw):
@@ -641,6 +642,73 @@ class TestPostprocessQuantityBoundSuffix:
         tokens = [_tok("二本", "Noun"), _tok("立て", "Verb", lemma="立てる")]
         assert postprocess_quantity_bound_suffix(tokens)
         assert tokens[1] == _tok("立て", "Suffix")
+
+    @pytest.mark.parametrize(
+        ("surface", "quantity"),
+        [
+            ("三人以下", "三人"),
+            ("3人以下", "3人"),
+            ("数人以下", "数人"),
+            ("数十人以下", "数十人"),
+            ("半日以下", "半日"),
+            ("何人以下", "何人"),
+            ("幾人以下", "幾人"),
+        ],
+    )
+    def test_fused_quantity_comparison_is_split(self, surface, quantity):
+        tokens = [_tok(surface, "Noun")]
+        assert postprocess_quantity_bound_suffix(tokens)
+        assert [(token["surface"], token["pos"]) for token in tokens] == [
+            (quantity, "Noun"),
+            ("以下", "Suffix"),
+        ]
+
+    @pytest.mark.parametrize(
+        "quantity",
+        ["三人", "3人", "数人", "数十人", "半日", "何人", "幾人"],
+    )
+    def test_separate_quantity_head_selects_ika_suffix(self, quantity):
+        tokens = [_tok(quantity, "Noun"), _tok("以下", "Noun")]
+        assert postprocess_quantity_bound_suffix(tokens)
+        assert tokens[1] == _tok("以下", "Suffix")
+
+    @pytest.mark.parametrize(
+        "tokens",
+        [
+            [_tok("以下", "Noun"), _tok("の", "Particle"), _tok("条件", "Noun")],
+            [_tok("水準", "Noun"), _tok("以下", "Noun"), _tok("だ", "Auxiliary")],
+            [_tok("三人", "Noun"), _tok("以上", "Noun")],
+            [_tok("三人", "Noun"), _tok("未満", "Noun")],
+            [_tok("三人", "Noun"), _tok("程度", "Noun")],
+        ],
+    )
+    def test_non_quantity_followers_are_not_retyped(self, tokens):
+        original = [token.copy() for token in tokens]
+        assert not postprocess_quantity_bound_suffix(tokens)
+        assert tokens == original
+
+    @pytest.mark.parametrize(
+        ("text", "expected_pos"),
+        [
+            ("三人以下", "Suffix"),
+            ("3人以下", "Suffix"),
+            ("数人以下", "Suffix"),
+            ("三人以下だ", "Suffix"),
+            ("以下の条件", "Noun"),
+        ],
+    )
+    def test_get_expected_tokens_preserves_quantity_boundary(self, text, expected_pos):
+        tokens, _source, _rule = get_expected_tokens(text)
+        ika_tokens = [token for token in tokens if token["surface"] == "以下"]
+        assert len(ika_tokens) == 1
+        assert ika_tokens[0]["pos"] == expected_pos
+
+    def test_non_quantity_kanji_compound_remains_a_noun(self):
+        tokens, _source, _rule = get_expected_tokens("水準以下だ")
+        assert [(token["surface"], token["pos"]) for token in tokens] == [
+            ("水準以下", "Noun"),
+            ("だ", "Auxiliary"),
+        ]
 
 
 class TestPostprocessTsureteParticle:

@@ -59,6 +59,7 @@ struct UnknownCandidate {
   bool copula_selected_noncontinuative_te{false};
   bool requires_left_content_edge{false};
   bool requires_left_attributive_edge{false};
+  bool requires_left_counter_edge{false};
   bool rejects_preceding_content_edge{false};
   bool rejects_preceding_nominal_head{false};
   std::string lemma;  // Base form (for verbs/adjectives)

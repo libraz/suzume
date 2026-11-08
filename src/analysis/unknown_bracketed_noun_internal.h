@@ -91,10 +91,11 @@ bool continuesAuxiliaryChain(const dictionary::DictionaryManager& dict_manager, 
 bool endsOnPredicateTail(const BracketedNounContext& ctx, size_t run_end);
 PromotedRun classifyRightBrackets(const BracketedNounContext& ctx, const BracketedScan& bracketed, size_t run_end);
 void readPromotedSurface(const BracketedNounContext& ctx, const BracketedScan& bracketed, PromotedRun& promoted);
-bool admitsPromotedRun(const BracketedNounContext& ctx, const BracketedScan& bracketed, const PromotedRun& promoted);
+bool admitsPromotedRun(const BracketedNounContext& ctx, const BracketedScan& bracketed, const PromotedRun& promoted,
+                       bool after_quantity = false);
 void appendPromotedRunCandidates(const BracketedNounContext& ctx, const BracketedScan& bracketed,
                                  const PromotedRun& promoted, float noun_cost, size_t longer_rescue_end,
-                                 std::vector<UnknownCandidate>& candidates);
+                                 std::vector<UnknownCandidate>& candidates, bool after_quantity = false);
 
 }  // namespace bracketed_noun_detail
 }  // namespace analysis

@@ -439,6 +439,7 @@ void addEmphaticDictionaryEdge(core::Lattice& lattice,
 void addDictionaryEntryEdges(core::Lattice& lattice, const tokenizer_dictionary_detail::DictionaryCandidateContext& ctx,
                              const dictionary::LookupResult& result, size_t end_pos, std::string_view following_text) {
   const auto& dict_manager = ctx.dict_manager;
+  const auto& inflection = ctx.inflection;
   const auto& codepoints = ctx.codepoints;
   const size_t start_pos = ctx.start_pos;
   const auto& lookup_results = ctx.lookup_results;
@@ -630,9 +631,14 @@ void addDictionaryEntryEdges(core::Lattice& lattice, const tokenizer_dictionary_
     const core::ExtendedPOS entry_epos = namesSimplexDeverbalNoun(dict_manager, *result.entry)
                                              ? core::ExtendedPOS::NounVerbal
                                              : result.entry->extended_pos;
+    const bool finite_existential_continuation =
+        result.entry->pos == core::PartOfSpeech::Noun && entry_epos == core::ExtendedPOS::Noun &&
+        end_pos < codepoints.size() &&
+        !hasExactPartOfSpeech(dict_manager, codepoints, start_pos, end_pos + 1, kVerbAdjectiveMask) &&
+        hasFiniteExistentialContinuation(dict_manager, inflection, codepoints, end_pos);
     lattice.addEdge(result.entry->surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(end_pos),
                     result.entry->pos, cost, flags, lemma, conj_type, core::CandidateOrigin::Dictionary,
-                    candidate::kDictionaryOriginConfidence, {}, entry_epos, "dict");
+                    candidate::kDictionaryOriginConfidence, {}, entry_epos, "dict", finite_existential_continuation);
   }
 
   addEmphaticDictionaryEdge(lattice, ctx, result, end_pos, cost, flags);

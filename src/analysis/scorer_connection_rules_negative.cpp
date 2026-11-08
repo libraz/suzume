@@ -304,10 +304,11 @@ float computeNegativeAndNounVerbBonus(const core::LatticeEdge& prev, const core:
   // the potential of する (外出+でき) are the productive exceptions.
   const bool bare_kana_continuative_host = next.fromDictionary() && grammar::isPureHiragana(next.surface) &&
                                            !grammar::isSuruRenyokeiSurface(next.surface) && next.lemma != "できる";
-  const bool counted_subject_before_finite_iru =
+  const bool attested_noun_before_finite_iru =
       prev.has_finite_existential_continuation && prev.pos == core::PartOfSpeech::Noun &&
-      prev.origin == core::CandidateOrigin::Counter && next.fromDictionary() && next.pos == core::PartOfSpeech::Verb &&
-      next.extended_pos == core::ExtendedPOS::VerbRenyokei && next.lemma == "いる";
+      (prev.origin == core::CandidateOrigin::Counter || prev.fromDictionary()) && next.fromDictionary() &&
+      next.pos == core::PartOfSpeech::Verb && next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      next.lemma == "いる";
   const bool bare_kanji_host =
       normalize::utf8Length(prev.surface) == 1 ||
       (grammar::isAllKanji(prev.surface) && (isSingleHiraganaVerbRenyokei(next) || bare_kana_continuative_host));
@@ -319,7 +320,7 @@ float computeNegativeAndNounVerbBonus(const core::LatticeEdge& prev, const core:
   if ((prev.extended_pos == core::ExtendedPOS::Noun || prev.extended_pos == core::ExtendedPOS::Pronoun) &&
       next.extended_pos == core::ExtendedPOS::VerbRenyokei && !grammar::isSuruRenyokeiSurface(next.surface) &&
       next.surface != "せ" && next.surface.size() <= core::kTwoJapaneseCharBytes && bare_kanji_host &&
-      !renyokei_has_okurigana && !bound_derivational_suffix && !counted_subject_before_finite_iru) {
+      !renyokei_has_okurigana && !bound_derivational_suffix && !attested_noun_before_finite_iru) {
     SUZUME_CONNECTION_ADD(bonus, cost::kRare);  // Cancel the bigram bonus
   }
 
@@ -336,7 +337,7 @@ float computeNegativeAndNounVerbBonus(const core::LatticeEdge& prev, const core:
   // E.g., 上手いし should be 上手い+し, not 上手+い+し. Must NOT block サ変+でき (外出+でき).
   if ((prev.extended_pos == core::ExtendedPOS::AdjNaAdj || prev.extended_pos == core::ExtendedPOS::Noun) &&
       next.extended_pos == core::ExtendedPOS::VerbRenyokei && next.surface == "い" &&
-      !counted_subject_before_finite_iru) {
+      !attested_noun_before_finite_iru) {
     SUZUME_CONNECTION_ADD(bonus, cost::kSevere);
   }
 

@@ -73,6 +73,122 @@ bool isDictionaryVerbContinuative(const dictionary::DictionaryManager* dict_mana
 
 }  // namespace
 
+bool hasFiniteExistentialContinuation(const dictionary::DictionaryManager& dict_manager,
+                                      const grammar::Inflection& inflection, const std::vector<char32_t>& codepoints,
+                                      size_t verb_start) {
+  if (verb_start >= codepoints.size()) {
+    return false;
+  }
+
+  const auto* existential =
+      lookupEntryInRange(dict_manager, codepoints, verb_start, verb_start + 1, core::PartOfSpeech::Verb);
+  if (existential == nullptr || existential->extended_pos != core::ExtendedPOS::VerbRenyokei ||
+      lemmaOrSurface(*existential) != "いる") {
+    return false;
+  }
+
+  constexpr size_t kMaximumAuxiliarySurfaceLength = 6;
+  const size_t auxiliary_start = verb_start + 1;
+  const size_t auxiliary_probe_end = lookaheadEnd(codepoints.size(), auxiliary_start, kMaximumAuxiliarySurfaceLength);
+  bool has_finite_dictionary_auxiliary = false;
+  bool has_initial_dictionary_masu_auxiliary = false;
+  const auto first_auxiliary_matches =
+      lookupResultsInRange(dict_manager, codepoints, auxiliary_start, auxiliary_probe_end);
+  for (const auto& match : first_auxiliary_matches) {
+    if (match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Auxiliary &&
+        (match.entry->extended_pos == core::ExtendedPOS::AuxTenseTa ||
+         match.entry->extended_pos == core::ExtendedPOS::AuxTenseMasu)) {
+      has_finite_dictionary_auxiliary = true;
+    }
+    if (match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Auxiliary &&
+        match.entry->extended_pos == core::ExtendedPOS::AuxTenseMasu) {
+      has_initial_dictionary_masu_auxiliary = true;
+    }
+    if (has_finite_dictionary_auxiliary && has_initial_dictionary_masu_auxiliary) {
+      break;
+    }
+  }
+  if (!has_finite_dictionary_auxiliary) {
+    return false;
+  }
+
+  constexpr size_t kMaximumExistentialPrefixLength = 8;
+  constexpr size_t kMaximumFinalParticleLength = 3;
+  const size_t prefix_probe_end = lookaheadEnd(codepoints.size(), verb_start, kMaximumExistentialPrefixLength);
+  for (size_t prefix_end = verb_start + 1; prefix_end <= prefix_probe_end; ++prefix_end) {
+    if (!kana::isHiraganaCodepoint(codepoints[prefix_end - 1])) {
+      break;
+    }
+    const bool closes_clause = verb_helpers::clauseEndsAt(codepoints, prefix_end);
+    bool closes_after_final_particle = false;
+    const size_t particle_probe_end = lookaheadEnd(codepoints.size(), prefix_end, kMaximumFinalParticleLength);
+    for (const auto& match : lookupResultsInRange(dict_manager, codepoints, prefix_end, particle_probe_end)) {
+      if (match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Particle &&
+          match.entry->extended_pos == core::ExtendedPOS::ParticleFinal &&
+          match.length <= kMaximumFinalParticleLength &&
+          verb_helpers::clauseEndsAt(codepoints, prefix_end + match.length)) {
+        closes_after_final_particle = true;
+        break;
+      }
+    }
+    if (!closes_clause && !closes_after_final_particle) {
+      continue;
+    }
+
+    const std::string prefix = extractSubstring(codepoints, verb_start, prefix_end);
+    for (const auto& analysis : inflection.analyze(prefix)) {
+      if (analysis.base_form != "いる" || analysis.verb_type != grammar::VerbType::Ichidan ||
+          analysis.has_explanatory_suffix || analysis.morphemes.empty()) {
+        continue;
+      }
+
+      const auto& outer_auxiliary = analysis.morphemes.front();
+      if (inflection.auxiliaryProvidesConnection(outer_auxiliary, grammar::conn::kAuxOutTa) ||
+          inflection.auxiliaryProvidesConnection(outer_auxiliary, grammar::conn::kAuxOutMasu)) {
+        return true;
+      }
+
+      // The base-output auxiliary ん licenses finite ません only as the end
+      // of a dictionary-proven AuxTenseMasu + AuxNegativeNu chain. This keeps
+      // other base-output forms such as ましょう outside the exemption.
+      if (!inflection.auxiliaryProvidesConnection(outer_auxiliary, grammar::conn::kAuxOutBase) ||
+          !has_initial_dictionary_masu_auxiliary) {
+        continue;
+      }
+
+      constexpr size_t kMaximumNegativeAuxiliarySurfaceLength = 6;
+      const size_t negative_probe_start =
+          std::max(auxiliary_start, lookbehindStart(prefix_end, kMaximumNegativeAuxiliarySurfaceLength));
+      bool ends_in_dictionary_negative_auxiliary = false;
+      for (size_t negative_start = negative_probe_start; negative_start < prefix_end; ++negative_start) {
+        for (const auto& match : lookupResultsInRange(dict_manager, codepoints, negative_start, prefix_end)) {
+          if (match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Auxiliary &&
+              match.entry->extended_pos == core::ExtendedPOS::AuxNegativeNu &&
+              negative_start + match.length == prefix_end &&
+              std::any_of(first_auxiliary_matches.begin(), first_auxiliary_matches.end(),
+                          [auxiliary_start, negative_start](const dictionary::LookupResult& first_match) {
+                            return first_match.entry != nullptr &&
+                                   first_match.entry->pos == core::PartOfSpeech::Auxiliary &&
+                                   first_match.entry->extended_pos == core::ExtendedPOS::AuxTenseMasu &&
+                                   auxiliary_start + first_match.length <= negative_start;
+                          })) {
+            ends_in_dictionary_negative_auxiliary = true;
+            break;
+          }
+        }
+        if (ends_in_dictionary_negative_auxiliary) {
+          break;
+        }
+      }
+      if (!ends_in_dictionary_negative_auxiliary) {
+        continue;
+      }
+      return true;
+    }
+  }
+  return false;
+}
+
 bool hasKanjiSuruPredicateAt(const std::vector<char32_t>& codepoints,
                              const std::vector<normalize::CharType>& char_types, size_t start_pos,
                              size_t minimum_kanji_count) {

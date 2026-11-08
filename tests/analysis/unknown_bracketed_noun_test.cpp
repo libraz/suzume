@@ -6,7 +6,9 @@
 #include <utility>
 
 #include "analysis/adjective_candidates.h"
+#include "analysis/tokenizer_unknown_internal.h"
 #include "analysis/unknown.h"
+#include "analysis/unknown_bracketed_noun_internal.h"
 #include "dictionary/dictionary.h"
 #include "grammar/char_patterns.h"
 #include "normalize/utf8.h"
@@ -25,6 +27,14 @@ std::vector<UnknownCandidate> generateNaCandidatesAt(std::string_view input, siz
   std::vector<UnknownCandidate> candidates;
   generateNaAdjectiveCandidates(codepoints, start_pos, char_types, options, inflection, &dict_manager, candidates);
   return candidates;
+}
+
+std::vector<UnknownCandidate> generateUnknownCandidatesAt(std::string_view input, size_t start_pos,
+                                                          const dictionary::DictionaryManager& dict_manager) {
+  const auto codepoints = normalize::toCodepoints(input);
+  const auto char_types = normalize::classifyCodepoints(codepoints);
+  const UnknownWordGenerator generator({}, &dict_manager);
+  return generator.generate(input, codepoints, start_pos, char_types);
 }
 
 TEST(NoncontinuativeTeNominal, ShapeRejectsRealContinuativesAndMalformedText) {
@@ -212,6 +222,204 @@ TEST(NoncontinuativeTeNominal, PreservesLexicalRolesAndProductiveInflections) {
     ASSERT_FALSE(result.empty());
     EXPECT_FALSE(result[0].pos == core::PartOfSpeech::Noun && result[0].surface == std::string(input).substr(0, 9));
   }
+}
+
+TEST(QuantityYoonNoun, EmitsSeparateCounterBoundCandidatesForYoonNouns) {
+  const dictionary::DictionaryManager dict_manager;
+  for (const auto& [input, surface, start] :
+       {std::tuple{"二人いっしょ", "いっしょ", 2U}, std::tuple{"3人いっしょ", "いっしょ", 2U},
+        std::tuple{"三件とっきょ", "とっきょ", 2U}}) {
+    SCOPED_TRACE(input);
+    const auto candidates = generateUnknownCandidatesAt(input, start, dict_manager);
+    const std::string_view expected_surface = surface;
+    const auto quantity_noun = std::find_if(candidates.begin(), candidates.end(), [&](const UnknownCandidate& value) {
+      return value.surface == expected_surface && value.pos == core::PartOfSpeech::Noun &&
+             value.origin == CandidateOrigin::BracketedNoun && value.requires_left_counter_edge;
+    });
+    ASSERT_NE(quantity_noun, candidates.end());
+    EXPECT_EQ(quantity_noun->start, start);
+    EXPECT_EQ(quantity_noun->end, start + normalize::utf8Length(surface));
+    EXPECT_FALSE(quantity_noun->requires_left_attributive_edge);
+  }
+}
+
+TEST(QuantityYoonNoun, AuxiliaryChainsAndNonYoonRunsDoNotGetCounterBoundCandidates) {
+  const dictionary::DictionaryManager dict_manager;
+  for (const auto& [input, surface, start] :
+       {std::tuple{"二人いましょ", "いましょ", 2U}, std::tuple{"二人だっしょ", "だっしょ", 2U},
+        std::tuple{"二人っしょ", "っしょ", 2U}}) {
+    SCOPED_TRACE(input);
+    const auto candidates = generateUnknownCandidatesAt(input, start, dict_manager);
+    const std::string_view expected_surface = surface;
+    EXPECT_EQ(std::find_if(candidates.begin(), candidates.end(),
+                           [&](const UnknownCandidate& candidate) {
+                             return candidate.surface == expected_surface &&
+                                    candidate.pos == core::PartOfSpeech::Noun &&
+                                    candidate.origin == CandidateOrigin::BracketedNoun &&
+                                    candidate.requires_left_counter_edge;
+                           }),
+              candidates.end());
+  }
+}
+
+TEST(QuantityYoonNoun, PreservesAnExplicitMimeticWithTheSameYoonEnding) {
+  const dictionary::DictionaryManager dict_manager;
+  const auto candidates = generateUnknownCandidatesAt("三人きゃきゃ", 2, dict_manager);
+  const auto mimetic = std::find_if(candidates.begin(), candidates.end(), [](const UnknownCandidate& candidate) {
+    return candidate.surface == "きゃきゃ" && candidate.origin == CandidateOrigin::Onomatopoeia &&
+           candidate.pos == core::PartOfSpeech::Adverb;
+  });
+  ASSERT_NE(mimetic, candidates.end());
+  EXPECT_TRUE(std::none_of(candidates.begin(), candidates.end(), [](const UnknownCandidate& candidate) {
+    return candidate.surface == "きゃきゃ" && candidate.requires_left_counter_edge;
+  }));
+}
+
+TEST(QuantityYoonNoun, SelectsBoundedNounWithoutChangingExistingPredicateAndWordReadings) {
+  SuzumeOptions options;
+  options.skip_user_dictionary = true;
+  Suzume analyzer(options);
+  for (const auto& [input, surface, start] :
+       {std::tuple{"二人いっしょ", "いっしょ", 2U}, std::tuple{"数人いっしょ", "いっしょ", 2U},
+        std::tuple{"3人いっしょ", "いっしょ", 2U}, std::tuple{"三人いっしょ", "いっしょ", 2U},
+        std::tuple{"三人いっしょに行く", "いっしょ", 2U}, std::tuple{"二人いっしょだ", "いっしょ", 2U},
+        std::tuple{"三件とっきょ", "とっきょ", 2U}}) {
+    SCOPED_TRACE(input);
+    const auto result = analyzer.analyze(input);
+    const std::string_view expected_surface = surface;
+    const auto noun = std::find_if(result.begin(), result.end(), [&](const core::Morpheme& token) {
+      return token.surface == expected_surface && token.pos == core::PartOfSpeech::Noun;
+    });
+    ASSERT_NE(noun, result.end());
+    EXPECT_EQ(noun->start, start);
+    EXPECT_EQ(noun->end, start + normalize::utf8Length(expected_surface));
+  }
+
+  const auto predicate = analyzer.analyze("行けるっしょ");
+  EXPECT_NE(std::find_if(predicate.begin(), predicate.end(),
+                         [](const core::Morpheme& token) {
+                           return token.surface == "っしょ" && token.pos == core::PartOfSpeech::Auxiliary;
+                         }),
+            predicate.end());
+
+  const auto dictionary_word = analyzer.analyze("三人いつも元気");
+  EXPECT_NE(std::find_if(dictionary_word.begin(), dictionary_word.end(),
+                         [](const core::Morpheme& token) {
+                           return token.surface == "いつも" && token.pos == core::PartOfSpeech::Adverb;
+                         }),
+            dictionary_word.end());
+
+  const auto mimetic = analyzer.analyze("ふわふわだ");
+  EXPECT_NE(std::find_if(mimetic.begin(), mimetic.end(),
+                         [](const core::Morpheme& token) { return token.surface == "ふわふわ"; }),
+            mimetic.end());
+}
+
+TEST(QuantityYoonNoun, CandidateRequiresCounterEdgeAtAdmission) {
+  const std::string input = "二人いっしょ";
+  const auto codepoints = normalize::toCodepoints(input);
+  const auto char_types = normalize::classifyCodepoints(codepoints);
+  const auto byte_offsets = buildByteOffsets(codepoints);
+  const dictionary::DictionaryManager dict_manager;
+  const UnknownWordGenerator generator({}, &dict_manager);
+  const size_t candidate_start = 2;
+  const auto candidates = generator.generate(input, codepoints, candidate_start, char_types);
+  const auto quantity_noun = std::find_if(candidates.begin(), candidates.end(), [](const UnknownCandidate& candidate) {
+    return candidate.surface == "いっしょ" && candidate.pos == core::PartOfSpeech::Noun &&
+           candidate.origin == CandidateOrigin::BracketedNoun && candidate.requires_left_counter_edge;
+  });
+  ASSERT_NE(quantity_noun, candidates.end());
+
+  std::vector<dictionary::LookupResult> dict_results;
+  const tokenizer_unknown_detail::UnknownCandidateContext ctx{
+      dict_manager,    generator.inflection(), generator,  input,        codepoints,
+      byte_offsets,    candidate_start,        char_types, dict_results, candidates,
+      candidate_start, candidate_start,        0};
+  core::Lattice without_counter(codepoints.size());
+  EXPECT_TRUE(tokenizer_unknown_detail::isRejectedUnknownCandidate(ctx, without_counter, *quantity_noun));
+
+  const auto counter_candidates = generator.generate(input, codepoints, 0, char_types);
+  const auto counter = std::find_if(counter_candidates.begin(), counter_candidates.end(), [&](const auto& candidate) {
+    return candidate.pos == core::PartOfSpeech::Noun && candidate.origin == CandidateOrigin::Counter &&
+           candidate.start == 0 && candidate.end == candidate_start;
+  });
+  ASSERT_NE(counter, counter_candidates.end());
+  core::Lattice with_counter(codepoints.size());
+  with_counter.addEdge(counter->surface, static_cast<uint32_t>(counter->start), static_cast<uint32_t>(counter->end),
+                       counter->pos, counter->cost, core::LatticeEdge::kIsUnknown, counter->lemma, counter->conj_type,
+                       counter->origin, 0.0F, {}, counter->extended_pos);
+  EXPECT_FALSE(tokenizer_unknown_detail::isRejectedUnknownCandidate(ctx, with_counter, *quantity_noun));
+}
+
+TEST(QuantityYoonNoun, RejectsANominalizedStemThatAbsorbsTheQuantity) {
+  const std::string input = "二人いっしょ";
+  const auto codepoints = normalize::toCodepoints(input);
+  const auto char_types = normalize::classifyCodepoints(codepoints);
+  const auto byte_offsets = buildByteOffsets(codepoints);
+  const dictionary::DictionaryManager dict_manager;
+  const UnknownWordGenerator generator({}, &dict_manager);
+  const auto candidates = generator.generate(input, codepoints, 0, char_types);
+  const auto nominalized = std::find_if(candidates.begin(), candidates.end(), [](const UnknownCandidate& candidate) {
+    return candidate.surface == "二人い" && candidate.origin == CandidateOrigin::NominalizedNoun;
+  });
+  ASSERT_NE(nominalized, candidates.end());
+  ASSERT_TRUE(std::any_of(candidates.begin(), candidates.end(), [](const UnknownCandidate& candidate) {
+    return candidate.start == 0 && candidate.end == 2 && candidate.pos == core::PartOfSpeech::Noun &&
+           candidate.origin == CandidateOrigin::Counter;
+  }));
+  const std::vector<dictionary::LookupResult> dict_results;
+  const tokenizer_unknown_detail::UnknownCandidateContext ctx{dict_manager,
+                                                              generator.inflection(),
+                                                              generator,
+                                                              input,
+                                                              codepoints,
+                                                              byte_offsets,
+                                                              0,
+                                                              char_types,
+                                                              dict_results,
+                                                              candidates,
+                                                              2,
+                                                              2,
+                                                              0};
+  const core::Lattice lattice(codepoints.size());
+  EXPECT_TRUE(tokenizer_unknown_detail::isRejectedUnknownCandidate(ctx, lattice, *nominalized));
+}
+
+TEST(QuantityYoonNoun, QuantityEmitterDoesNotDeriveAnUnlicensedHostAfterHonorificPrefix) {
+  const std::string input = "おもちゃ";
+  const auto codepoints = normalize::toCodepoints(input);
+  const auto char_types = normalize::classifyCodepoints(codepoints);
+  const dictionary::DictionaryManager dict_manager;
+  grammar::Inflection inflection;
+  UnknownOptions options;
+  const bracketed_noun_detail::BracketedNounContext ctx{codepoints,    char_types, 0,
+                                                        &dict_manager, inflection, options.verb_candidate_options};
+  bracketed_noun_detail::BracketedScan bracketed;
+  bracketed.left_clause_bracket = true;
+  bracketed_noun_detail::PromotedRun promoted;
+  promoted.scan = codepoints.size();
+  promoted.len = codepoints.size();
+  promoted.right_clause = true;
+  promoted.promoted_surface = input;
+  promoted.promoted_dictionary_reading = nullptr;
+  promoted.promoted_inflections = &inflection.analyze(input);
+  promoted.min_len = 3;
+  std::vector<UnknownCandidate> candidates;
+
+  bracketed_noun_detail::appendPromotedRunCandidates(ctx, bracketed, promoted, 0.0F, 0, candidates,
+                                                     /*after_quantity=*/true);
+
+  const auto quantity_noun = std::find_if(candidates.begin(), candidates.end(), [](const UnknownCandidate& candidate) {
+    return candidate.start == 0 && candidate.end == 4 && candidate.pos == core::PartOfSpeech::Noun &&
+           candidate.requires_left_counter_edge;
+  });
+  ASSERT_NE(quantity_noun, candidates.end());
+  EXPECT_EQ(std::find_if(candidates.begin(), candidates.end(),
+                         [](const UnknownCandidate& candidate) {
+                           return candidate.start == 1 && candidate.end == 4 &&
+                                  candidate.origin == CandidateOrigin::BracketedNoun;
+                         }),
+            candidates.end());
 }
 
 }  // namespace

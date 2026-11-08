@@ -26,7 +26,46 @@ namespace bracketed_noun_detail {
 using same_type_detail::isRightBoundaryParticle;
 using same_type_detail::opensOnParticleBeforePronoun;
 
-bool admitsPromotedRun(const BracketedNounContext& ctx, const BracketedScan& bracketed, const PromotedRun& promoted) {
+namespace {
+bool hasQuantityYoonNounShape(const BracketedNounContext& ctx, const PromotedRun& promoted) {
+  if (promoted.len < 3 || promoted.len > 4 || promoted.promoted_dictionary_reading != nullptr ||
+      promoted.scan < ctx.start_pos + 3 || promoted.scan > ctx.codepoints.size()) {
+    return false;
+  }
+  const auto& codepoints = ctx.codepoints;
+  const size_t yoon_pos = promoted.scan - 1;
+  const char32_t yoon = codepoints[yoon_pos];
+  if (yoon != U'ゃ' && yoon != U'ゅ' && yoon != U'ょ') {
+    return false;
+  }
+  const size_t onset_pos = yoon_pos - 1;
+  if (!kana::isIRowCodepoint(codepoints[onset_pos])) {
+    return false;
+  }
+  return std::all_of(ctx.char_types.begin() + static_cast<std::ptrdiff_t>(ctx.start_pos),
+                     ctx.char_types.begin() + static_cast<std::ptrdiff_t>(promoted.scan),
+                     [](normalize::CharType type) { return type == normalize::CharType::Hiragana; });
+}
+
+bool isQuantityAspectCopulaChain(const BracketedNounContext& ctx, const PromotedRun& promoted) {
+  if (ctx.dict_manager == nullptr || promoted.scan <= ctx.start_pos + 1) {
+    return false;
+  }
+  const auto* aspect = lookupEntryInRange(*ctx.dict_manager, ctx.codepoints, ctx.start_pos, ctx.start_pos + 1,
+                                          core::PartOfSpeech::Auxiliary);
+  const auto* copula = lookupEntryInRange(*ctx.dict_manager, ctx.codepoints, ctx.start_pos + 1, promoted.scan,
+                                          core::PartOfSpeech::Auxiliary);
+  return aspect != nullptr && aspect->extended_pos == core::ExtendedPOS::AuxAspectIru && copula != nullptr &&
+         copula->extended_pos == core::ExtendedPOS::AuxCopulaDesu;
+}
+
+}  // namespace
+
+bool admitsPromotedRun(const BracketedNounContext& ctx, const BracketedScan& bracketed, const PromotedRun& promoted,
+                       bool after_quantity) {
+  if (after_quantity && !hasQuantityYoonNounShape(ctx, promoted)) {
+    return false;
+  }
   const auto& codepoints = ctx.codepoints;
   const size_t start_pos = ctx.start_pos;
   const auto* dict_manager = ctx.dict_manager;
@@ -176,6 +215,11 @@ bool admitsPromotedRun(const BracketedNounContext& ctx, const BracketedScan& bra
       maximalSegmentCount(*dict_manager, codepoints, start_pos, scan, core::PartOfSpeech::Auxiliary,
                           core::ExtendedPOS::AuxClassicalPerfect, !particleMoraLacksHost(codepoints, start_pos)) >= 2 &&
       continuesAuxiliaryChain(*dict_manager, codepoints, core::ExtendedPOS::Count_, start_pos, scan);
+  // In a quantity phrase, いっしょ can be misread as the unattached aspect
+  // auxiliary い plus the contracted copula っしょ. Let only that exact
+  // one-mora aspect + complete copula decomposition through; other auxiliary
+  // chains remain predicate evidence (二人いましょ, 二人だっしょ).
+  const bool quantity_aspect_copula_chain = after_quantity && isQuantityAspectCopulaChain(ctx, promoted);
   // A run that is one copula form is that predicate (私+の+です+が): the
   // longer copula chains are caught as auxiliary chains below.
   const bool spells_copula = dict_manager != nullptr && [&] {
@@ -218,7 +262,8 @@ bool admitsPromotedRun(const BracketedNounContext& ctx, const BracketedScan& bra
          !opens_on_te_connective && !spans_laugh && !closes_registered_word_predicate && !finishes_auxiliary_chain &&
          !spells_copula && !spells_contracted_hypothetical && !steals_formal_noun_head &&
          !promoted.absorbs_copula_before_sokuon_final &&
-         ((!hasAuxiliaryParticleDecomposition(codepoints, start_pos, scan, dict_manager) && !spells_auxiliary_chain) ||
+         ((!hasAuxiliaryParticleDecomposition(codepoints, start_pos, scan, dict_manager) &&
+           (!spells_auxiliary_chain || quantity_aspect_copula_chain)) ||
           promoted.has_deverbal_noun_shape_before_genitive || promoted.copula_selected_predicate_homograph ||
           genitive_selects_nominal_head || promoted.copula_selected_noncontinuative_te) &&
          (!hasFunctionWordChainDecomposition(codepoints, start_pos, scan, dict_manager) ||
@@ -286,7 +331,7 @@ bool longerReadingSpansBracket(const BracketedNounContext& ctx, size_t run_end, 
 
 void appendPromotedRunCandidates(const BracketedNounContext& ctx, const BracketedScan& bracketed,
                                  const PromotedRun& promoted, float noun_cost, size_t longer_rescue_end,
-                                 std::vector<UnknownCandidate>& candidates) {
+                                 std::vector<UnknownCandidate>& candidates, bool after_quantity) {
   const auto& codepoints = ctx.codepoints;
   const size_t start_pos = ctx.start_pos;
   const size_t scan = promoted.scan;
@@ -427,6 +472,10 @@ void appendPromotedRunCandidates(const BracketedNounContext& ctx, const Brackete
   noun_cand.requires_left_attributive_edge = bracketed.left_attributive_bracket && !bracketed.left_particle_bracket &&
                                              !bracketed.left_determiner_bracket && !bracketed.left_clause_bracket &&
                                              !bracketed.left_te_bracket;
+  if (after_quantity) {
+    noun_cand.requires_left_counter_edge = true;
+    noun_cand.requires_left_attributive_edge = false;
+  }
 #ifdef SUZUME_DEBUG_INFO
   noun_cand.pattern = "bracketed_hira_noun";
 #endif
@@ -442,7 +491,9 @@ void appendPromotedRunCandidates(const BracketedNounContext& ctx, const Brackete
   const bool opens_on_native_prefix = codepoints[start_pos] == U'お' && promoted.len >= 3 &&
                                       promoted.promoted_dictionary_reading == nullptr &&
                                       !kana::isIOrERowCodepoint(last_mora);
-  if (opens_on_native_prefix) {
+  // The quantity witness belongs to start_pos. A derived host after お would
+  // have a different boundary and cannot inherit that witness.
+  if (opens_on_native_prefix && !after_quantity) {
     auto host_cand = makeCandidate(codepoints, start_pos + 1, scan, core::PartOfSpeech::Noun, noun_cost,
                                    /*has_suffix=*/true, CandidateOrigin::BracketedNoun);
 #ifdef SUZUME_DEBUG_INFO

@@ -46,9 +46,42 @@ KANA_NUMBER_STEMS: frozenset[str] = frozenset({"いち", "ふた", "よん"})
 KANA_COUNTER_SUFFIXES: frozenset[str] = frozenset({"まい", "にん", "月"})
 
 
-# Closed-class construction/composition suffixes that remain independent search
-# units after a numeral+counter phrase (二階|建て, 二本|立て).
-QUANTITY_BOUND_SUFFIXES: frozenset[str] = frozenset({"建て", "立て"})
+# Digit readings that form a closed kana ordinal before the suffix ばん.
+# Seven has both common readings; the grammar below combines these digits with
+# じゅう instead of listing whole number spellings.
+KANA_ORDINAL_DIGIT_READINGS: tuple[tuple[str, int], ...] = (
+    ("いち", 1),
+    ("に", 2),
+    ("さん", 3),
+    ("よん", 4),
+    ("ご", 5),
+    ("ろく", 6),
+    ("なな", 7),
+    ("しち", 7),
+    ("はち", 8),
+    ("きゅう", 9),
+)
+KANA_ORDINAL_TEN_READING: str = "じゅう"
+KANA_ORDINAL_COUNTER_SURFACE: str = "ばん"
+KANA_ORDINAL_MAX_NUMBER_LENGTH: int = 9
+
+# These complete copula forms close an ordinal only at a clause boundary.
+KANA_ORDINAL_FINITE_COPULAS: tuple[str, ...] = ("だった", "でした", "です", "だ")
+
+# One-character L1 ParticleFinal entries. This mirrors the finite entries in
+# src/dictionary/entries/particles.cpp; multi-character final particles cannot
+# close the kana-ordinal normalization rule.
+KANA_ORDINAL_FINAL_PARTICLES: frozenset[str] = frozenset(
+    {"か", "け", "な", "ね", "よ", "さ", "わ", "ぞ", "ぜ", "や", "べ", "え"}
+)
+
+# Clause-closing punctuation shared with the native clauseEndsAt probe.
+KANA_ORDINAL_CLAUSE_END_PUNCTUATION: frozenset[str] = frozenset({"。", "、", "！", "？", "」", "）"})
+
+
+# Closed-class suffixes that remain independent search units after a quantity
+# phrase: construction (二階|建て, 二本|立て) and comparison (三人|以下).
+QUANTITY_BOUND_SUFFIXES: frozenset[str] = frozenset({"建て", "立て", "以下"})
 
 
 # One-kanji general suffixes that stay their own token after a noun: the
