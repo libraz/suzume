@@ -104,11 +104,14 @@ void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, s
       continue;
     }
     // The contraction is a listed contracted subsidiary (とく, ちゃう, どく,
-    // じゃう) opening right after the onbin; a bare と is the quotative or the
-    // adverb's own mora (そっと+して).
+    // じゃう) or contracted copula (じゃ) opening right after the onbin.
+    // An unrelated auxiliary such as classical negative じ does not license
+    // this contraction; a bare と can also be a quotative or an adverb's mora.
     if (is_contraction_pattern && !is_tense_pattern &&
-        !vh::auxiliaryFollowsAt(dict_manager, codepoints, onbin_pos + 1,
-                                [](const dictionary::DictionaryEntry&) { return true; })) {
+        !vh::auxiliaryFollowsAt(dict_manager, codepoints, onbin_pos + 1, [](const dictionary::DictionaryEntry& entry) {
+          return core::isAspectAuxiliaryType(entry.extended_pos) ||
+                 entry.extended_pos == core::ExtendedPOS::AuxCopulaDa;
+        })) {
       continue;
     }
 

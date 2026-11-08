@@ -1,5 +1,13 @@
 #include <gtest/gtest.h>
 
+#include <algorithm>
+#include <string_view>
+#include <utility>
+#include <vector>
+
+#include "analysis/unknown.h"
+#include "analysis/verb_candidates_hiragana_internal.h"
+#include "normalize/utf8.h"
 #include "suzume.h"
 
 namespace suzume::analysis {
@@ -9,6 +17,41 @@ Suzume makeHiraganaGodanAnalyzer() {
   SuzumeOptions options;
   options.skip_user_dictionary = true;
   return Suzume(options);
+}
+
+TEST(HiraganaOnbinContraction, RequiresAContractedAspectOrCopulaAuxiliary) {
+  dictionary::DictionaryManager dictionary_manager;
+  ASSERT_TRUE(dictionary_manager.loadCoreDictionaryResult("data/core.dic").hasValue());
+  const grammar::Inflection inflection;
+  const auto generate = [&](std::string_view text) {
+    const auto codepoints = normalize::toCodepoints(text);
+    std::vector<UnknownCandidate> candidates;
+    hiragana_verb_detail::appendOnbinContractionCandidates(codepoints, 0, codepoints.size(), inflection,
+                                                           &dictionary_manager, candidates);
+    return candidates;
+  };
+  for (const auto& [text, stem] : {std::pair<std::string_view, std::string_view>{"よんじゃう", "よん"},
+                                   {"よんじゃだめ", "よん"},
+                                   {"よんどく", "よん"},
+                                   {"かっとく", "かっ"},
+                                   {"かっちゃう", "かっ"},
+                                   {"よんだ", "よん"},
+                                   {"よんで", "よん"}}) {
+    SCOPED_TRACE(text);
+    const auto candidates = generate(text);
+    const std::string_view expected_stem = stem;
+    EXPECT_TRUE(std::any_of(candidates.begin(), candidates.end(), [&](const UnknownCandidate& candidate) {
+      return candidate.surface == expected_stem && candidate.origin == core::CandidateOrigin::VerbHiragana &&
+             candidate.extended_pos == core::ExtendedPOS::VerbOnbinkei;
+    }));
+  }
+  for (const std::string_view text : {"よんじ", "よんじゅうばんだ"}) {
+    SCOPED_TRACE(text);
+    const auto candidates = generate(text);
+    EXPECT_TRUE(std::none_of(candidates.begin(), candidates.end(), [](const UnknownCandidate& candidate) {
+      return candidate.surface == "よん" && candidate.origin == core::CandidateOrigin::VerbHiragana;
+    }));
+  }
 }
 
 TEST(HiraganaGodanTerminal, KeepsCompleteWaRowPredicateBeforeNoun) {
