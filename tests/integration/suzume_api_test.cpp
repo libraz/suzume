@@ -875,7 +875,7 @@ TEST_F(SuzumeApiTest, AnalyzeWithMergeCompoundsOption) {
 
 TEST_F(SuzumeApiTest, LoadUserDictionaryFromInvalidPath) {
   Suzume instance(makeTestOptions());
-  bool result = instance.loadUserDictionary("/nonexistent/path/dict.csv");
+  bool result = instance.loadUserDictionaryResult("/nonexistent/path/dict.csv").hasValue();
   EXPECT_FALSE(result);
 }
 
@@ -889,7 +889,7 @@ TEST_F(SuzumeApiTest, LoadUserDictionaryResultReportsInvalidPath) {
 
 TEST_F(SuzumeApiTest, LoadUserDictionaryFromNullMemory) {
   Suzume instance(makeTestOptions());
-  bool result = instance.loadUserDictionaryFromMemory(nullptr, 0);
+  bool result = instance.loadUserDictionaryFromMemoryResult(nullptr, 0).hasValue();
   EXPECT_FALSE(result);
 }
 
@@ -929,7 +929,7 @@ TEST_F(SuzumeApiTest, SourceDictionaryReportsExpandedInstallCountAndSkippedLines
 TEST_F(SuzumeApiTest, LoadBinaryDictionaryFromInvalidMemory) {
   Suzume instance(makeTestOptions());
   const uint8_t bad_data[] = {0x00, 0x01, 0x02, 0x03};
-  bool result = instance.loadBinaryDictionary(bad_data, sizeof(bad_data));
+  bool result = instance.loadBinaryDictionaryResult(bad_data, sizeof(bad_data)).hasValue();
   EXPECT_FALSE(result);
 }
 

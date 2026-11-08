@@ -40,7 +40,7 @@ std::vector<std::string> surfacesOf(Suzume& instance, const std::string& text) {
 }
 
 bool loadEntries(Suzume& instance, const char* csv) {
-  return instance.loadUserDictionaryFromMemory(csv, std::strlen(csv));
+  return instance.loadUserDictionaryFromMemoryResult(csv, std::strlen(csv)).hasValue();
 }
 
 TEST(UserDictPrecedenceTest, KatakanaReduplicationPrefixEntryWins) {

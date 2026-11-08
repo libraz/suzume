@@ -332,10 +332,6 @@ Suzume::Suzume(Suzume&&) noexcept = default;
 
 Suzume& Suzume::operator=(Suzume&&) noexcept = default;
 
-bool Suzume::loadUserDictionary(const std::string& path) {
-  return loadUserDictionaryResult(path).hasValue();
-}
-
 core::Expected<size_t, core::Error> Suzume::loadUserDictionaryResult(const std::string& path) {
 #ifdef __EMSCRIPTEN__
   (void)path;
@@ -351,10 +347,6 @@ core::Expected<size_t, core::Error> Suzume::loadUserDictionaryResult(const std::
 #endif
 }
 
-bool Suzume::loadUserDictionaryFromMemory(const char* data, size_t size) {
-  return loadUserDictionaryFromMemoryResult(data, size).hasValue();
-}
-
 core::Expected<size_t, core::Error> Suzume::loadUserDictionaryFromMemoryResult(const char* data, size_t size) {
   auto loaded = loadSourceDictionaryFromMemory(data, size);
   if (!loaded.hasValue()) {
@@ -363,10 +355,6 @@ core::Expected<size_t, core::Error> Suzume::loadUserDictionaryFromMemoryResult(c
   impl_->analyzer.addUserDictionary(loaded.value().dictionary);
   impl_->appendDictionaryWarnings(std::move(loaded.value().warnings));
   return loaded.value().installed_entry_count;
-}
-
-bool Suzume::loadBinaryDictionary(const uint8_t* data, size_t size) {
-  return loadBinaryDictionaryResult(data, size).hasValue();
 }
 
 core::Expected<size_t, core::Error> Suzume::loadBinaryDictionaryResult(const uint8_t* data, size_t size) {

@@ -67,30 +67,11 @@ class Suzume {
   Suzume& operator=(Suzume&&) noexcept;
 
   /**
-   * @brief Add a user dictionary from a source file
-   * @param path Path to dictionary source file (current TSV or legacy CSV)
-   * @note Loads are additive until clearUserDictionaries() is called.
-   * @return true on success
-   * @see loadUserDictionaryResult for error details
-   */
-  bool loadUserDictionary(const std::string& path);
-
-  /**
    * @brief Load user dictionary from file with error details
    * @param path Path to dictionary source file (current TSV or legacy CSV)
    * @return Number of loaded entries on success, error on failure
    */
   core::Expected<size_t, core::Error> loadUserDictionaryResult(const std::string& path);
-
-  /**
-   * @brief Add a user dictionary from source text in memory
-   * @param data Dictionary data
-   * @param size Data size
-   * @note Loads are additive until clearUserDictionaries() is called.
-   * @return true on success
-   * @see loadUserDictionaryFromMemoryResult for error details
-   */
-  bool loadUserDictionaryFromMemory(const char* data, size_t size);
 
   /**
    * @brief Load user dictionary from memory with error details
@@ -99,15 +80,6 @@ class Suzume {
    * @return Number of loaded entries on success, error on failure
    */
   core::Expected<size_t, core::Error> loadUserDictionaryFromMemoryResult(const char* data, size_t size);
-
-  /**
-   * @brief Add a binary dictionary from memory (as a user dictionary)
-   * @param data Dictionary data (.dic binary format)
-   * @param size Data size in bytes
-   * @note Loads are additive until clearUserDictionaries() is called.
-   * @return true on success
-   */
-  bool loadBinaryDictionary(const uint8_t* data, size_t size);
 
   /**
    * @brief Load binary dictionary from memory with error details
