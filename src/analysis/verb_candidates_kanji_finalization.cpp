@@ -287,7 +287,8 @@ float initialVerbCost(const KanjiVerbSelection& sel) {
   if (best.verb_type == grammar::VerbType::Suru && best.stem.size() >= core::kTwoJapaneseCharBytes) {
     // Penalize unified suru-verb to prefer noun + する/される/させる split
     base_cost += candidate::kSuruVerbSplitPenalty;
-    SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +3.0 (suru_split_penalty)\n");
+    SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +" << candidate::kSuruVerbSplitPenalty
+                                             << " (suru_split_penalty)\n");
   }
   // Penalize ALL verb candidates with prefix-like kanji at start
   // e.g., 今何する/今何してる should split, not be single verb
@@ -295,14 +296,16 @@ float initialVerbCost(const KanjiVerbSelection& sel) {
   const char32_t stem_head = utf8::decodeFirstChar(best.stem);
   if (best.stem.size() >= core::kTwoJapaneseCharBytes && isPrefixLikeKanji(stem_head)) {
     base_cost += candidate::kStandaloneKanjiVerbSplitPenalty;
-    SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +3.0 (prefix_kanji_penalty)\n");
+    SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +" << candidate::kStandaloneKanjiVerbSplitPenalty
+                                             << " (prefix_kanji_penalty)\n");
   }
   // Penalize verb candidates starting with interrogative kanji (何, 誰, 幾)
   // e.g., 何してる should split as 何|し|てる, not be single verb
   // Interrogatives are standalone words, not verb stems
   if (isInterrogativeKanji(stem_head)) {
     base_cost += candidate::kStandaloneKanjiVerbSplitPenalty;
-    SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +3.0 (interrogative_kanji_penalty)\n");
+    SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +" << candidate::kStandaloneKanjiVerbSplitPenalty
+                                             << " (interrogative_kanji_penalty)\n");
   }
   return base_cost;
 }
@@ -444,8 +447,8 @@ void applyDictionaryVerbCost(const KanjiVerbSelection& sel, bool in_dict, bool i
       std::string ichidan_base = surface + "る";
       if (vh::isVerbInDictionary(dict_manager, ichidan_base)) {
         base_cost += candidate::kGodanRaIchidanAmbiguityPenalty;
-        SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +1.0 (godan_ra_ichidan_ambiguity, " << ichidan_base
-                                                 << " in dict)\n");
+        SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +" << candidate::kGodanRaIchidanAmbiguityPenalty
+                                                 << " (godan_ra_ichidan_ambiguity, " << ichidan_base << " in dict)\n");
       }
     }
   }
@@ -453,7 +456,8 @@ void applyDictionaryVerbCost(const KanjiVerbSelection& sel, bool in_dict, bool i
   // MeCab splits these: 使いにくい → 使い + にくい
   if (is_comp_adj) {
     base_cost += candidate::kAdjSplitForcePenalty;
-    SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +2.0 (compound_adj_penalty)\n");
+    SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +" << candidate::kAdjSplitForcePenalty
+                                             << " (compound_adj_penalty)\n");
   }
 }
 
@@ -517,7 +521,8 @@ void addUnverifiedStemPenalties(const KanjiVerbSelection& sel, bool in_dict, boo
   if (kanji_count >= 2 && !in_dict && !productive_denominal_ru && !is_multi_kanji_godan_wa_renyokei &&
       !follows_reduplicated_noun) {
     base_cost += bigram_cost::kRare;
-    SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +1.0 (two_kanji_non_dict_penalty)\n");
+    SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +" << bigram_cost::kRare
+                                             << " (two_kanji_non_dict_penalty)\n");
   }
   // A terminal hypothesis must not absorb a classical auxiliary that a
   // dictionary-attested irrealis already licenses: 読ま+む is the irrealis of
@@ -558,7 +563,8 @@ void addUnverifiedStemPenalties(const KanjiVerbSelection& sel, bool in_dict, boo
   // single-kanji stem and should be penalized to favor noun + aux split.
   if (!in_dict && best.verb_type == grammar::VerbType::Ichidan && best.stem.size() == core::kJapaneseCharBytes) {
     base_cost += bigram_cost::kRare;
-    SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +1.0 (single_kanji_stem_ichidan_non_dict_penalty)\n");
+    SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +" << bigram_cost::kRare
+                                             << " (single_kanji_stem_ichidan_non_dict_penalty)\n");
   }
 }
 
@@ -887,7 +893,8 @@ void addInflectionalSuffixPenalties(const KanjiVerbSelection& sel, bool in_dict,
     // e.g., 待ちい (base=待ちう) extends beyond 待ち (dict verb 待つ)
     if (best.verb_type == grammar::VerbType::GodanWa && extends_dict_verb) {
       base_cost += candidate::kUnverifiedGodanWaExceedsVerbPenalty;
-      SUZUME_DEBUG_LOG("[COST_ADJ] \"" << surface << "\" +2.0 (godan_wa_exceeds_dict_verb)\n");
+      SUZUME_DEBUG_LOG("[COST_ADJ] \"" << surface << "\" +" << candidate::kUnverifiedGodanWaExceedsVerbPenalty
+                                       << " (godan_wa_exceeds_dict_verb)\n");
     }
     // Japanese builds longer verbs on the continuative stem (読み+始める), never
     // on a finite form, so a fabricated candidate whose prefix is already a
@@ -950,10 +957,9 @@ void appendSelectedKanjiVerbCandidate(const std::vector<char32_t>& codepoints, s
 
   // Dictionary-verified candidates use lower threshold (0.3)
   // This allows hiragana verbs like いわれる (conf=0.33) to be recognized
-  const float proceed_threshold = (is_dict_verified || proceed_is_i_row_ichidan || is_multi_kanji_godan_wa_renyokei)
-                                      ? verb_opts.confidence_ichidan_dict
-                                  : has_mixed_godan_ka_stem ? mixedGodanKaStemThreshold(best, verb_opts)
-                                                            : verb_opts.confidence_standard;
+  const float proceed_threshold = kanjiVerbAcceptanceThreshold(
+      best, is_dict_verified || proceed_is_i_row_ichidan || is_multi_kanji_godan_wa_renyokei, has_mixed_godan_ka_stem,
+      verb_opts);
   if (best.confidence > proceed_threshold ||
       (follows_reduplicated_noun && best.confidence >= verb_opts.confidence_ichidan_dict) ||
       (is_multi_kanji_godan_wa_renyokei && best.confidence >= proceed_threshold)) {
@@ -972,7 +978,8 @@ void appendSelectedKanjiVerbCandidate(const std::vector<char32_t>& codepoints, s
     if (end_pos - start_pos == 3 && normalize::isKanjiCodepoint(codepoints[start_pos]) &&
         textMatchesAt(codepoints, start_pos + 1, "いる")) {
       base_cost += candidate::kSingleKanjiIruVerbSplitPenalty;
-      SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +2.5 (single_kanji_iru_penalty)\n");
+      SUZUME_DEBUG_LOG_VERBOSE("[COST_ADJ] \"" << surface << "\" +" << candidate::kSingleKanjiIruVerbSplitPenalty
+                                               << " (single_kanji_iru_penalty)\n");
     }
     // Check if base form exists in dictionary - significant bonus for known verbs
     // This helps 行われた (base=行う) beat 行(suffix)+われた split

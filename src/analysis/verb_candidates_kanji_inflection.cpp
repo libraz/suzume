@@ -3,6 +3,8 @@
  * @brief General inflection-analyzed kanji verb candidates
  */
 
+#include <algorithm>
+
 #include "analysis/candidate_constants.h"
 #include "analysis/tokenizer_utils.h"
 #include "analysis/verb_candidates_dictionary_probes.h"
@@ -83,6 +85,18 @@ bool hasAttestedDeverbalNominalization(const grammar::InflectionCandidate& candi
 float mixedGodanKaStemThreshold(const grammar::InflectionCandidate& candidate, const VerbCandidateOptions& verb_opts) {
   return utf8::startsWithAny(candidate.suffix, {"いた", "いて"}) ? verb_opts.confidence_past_te
                                                                  : verb_opts.confidence_low;
+}
+
+float kanjiVerbAcceptanceThreshold(const grammar::InflectionCandidate& candidate, bool has_lexical_evidence,
+                                   bool has_mixed_godan_ka_stem, const VerbCandidateOptions& verb_opts) {
+  float threshold = verb_opts.confidence_standard;
+  if (has_mixed_godan_ka_stem) {
+    threshold = std::min(threshold, mixedGodanKaStemThreshold(candidate, verb_opts));
+  }
+  if (has_lexical_evidence) {
+    threshold = std::min(threshold, verb_opts.confidence_ichidan_dict);
+  }
+  return threshold;
 }
 
 bool isMultiKanjiGodanWaRenyokei(const grammar::InflectionCandidate& candidate, std::string_view surface,
@@ -241,9 +255,8 @@ void appendAnalyzedKanjiVerbCandidates(const std::vector<char32_t>& codepoints, 
         bool is_i_row_ichidan = cand.verb_type == grammar::VerbType::Ichidan && vh::isValidIRowIchidanStem(cand.stem);
         const bool has_mixed_godan_ka_stem =
             has_conjunctive_initial && stem_end > kanji_end + 1 && cand.verb_type == grammar::VerbType::GodanKa;
-        const float conf_threshold = (is_i_row_ichidan || sokuonbin_stem_verified) ? verb_opts.confidence_ichidan_dict
-                                     : has_mixed_godan_ka_stem ? mixedGodanKaStemThreshold(cand, verb_opts)
-                                                               : verb_opts.confidence_standard;
+        const float conf_threshold = kanjiVerbAcceptanceThreshold(cand, is_i_row_ichidan || sokuonbin_stem_verified,
+                                                                  has_mixed_godan_ka_stem, verb_opts);
         const bool is_multi_kanji_godan_wa_renyokei = isMultiKanjiGodanWaRenyokei(cand, surface, codepoints, end_pos);
         if (cand.stem == expected_stem && (stem_end <= kanji_end + 1 || has_mixed_godan_ka_stem) &&
             (cand.confidence > conf_threshold ||

@@ -18,6 +18,12 @@ bool appendIchidanKateikeiCandidate(std::vector<UnknownCandidate>& candidates,
 // い-onbin past/te cell clears the past/te bar, every other cell the low bar.
 float mixedGodanKaStemThreshold(const grammar::InflectionCandidate& candidate, const VerbCandidateOptions& verb_opts);
 
+// Acceptance threshold for a kanji-stem verb candidate. Lexical evidence (a
+// dictionary-verified base, an i-row ichidan stem, a verified sokuonbin stem)
+// and a mixed godan-ka stem each only lower the bar, so the lowest one applies.
+float kanjiVerbAcceptanceThreshold(const grammar::InflectionCandidate& candidate, bool has_lexical_evidence,
+                                   bool has_mixed_godan_ka_stem, const VerbCandidateOptions& verb_opts);
+
 // Whether an adjective that attaches to a verb continuative (にくい, やすい)
 // starts at @p pos.
 bool renyokeiAdjectiveFollowsAt(const dictionary::DictionaryManager* dict_manager,

@@ -95,6 +95,7 @@ set(TEST_SOURCES
   analysis/deverbal_noun_naku_test.cpp
   analysis/hiragana_godan_terminal_test.cpp
   analysis/kana_u_onbin_adjective_test.cpp
+  analysis/kanji_verb_acceptance_threshold_test.cpp
   analysis/unknown_bracketed_noun_test.cpp
   analysis/short_ichidan_relative_clause_test.cpp
   analysis/noun_nagara_ni_test.cpp
