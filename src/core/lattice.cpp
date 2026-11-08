@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <cstddef>
-#include <queue>
 
 namespace suzume::core {
 
@@ -92,19 +91,6 @@ size_t Lattice::addEdge(std::string_view surface, uint32_t start, uint32_t end, 
   return edge.id;
 }
 
-std::vector<LatticeEdge> Lattice::edgesAt(size_t pos) const {
-  if (pos >= edge_indices_by_start_.size()) {
-    return {};
-  }
-  const auto& indices = edge_indices_by_start_[pos];
-  std::vector<LatticeEdge> result;
-  result.reserve(indices.size());
-  for (uint32_t idx : indices) {
-    result.push_back(all_edges_[idx]);
-  }
-  return result;
-}
-
 const std::vector<uint32_t>& Lattice::edgeIdsAt(size_t pos) const {
   return elementOrEmpty(edge_indices_by_start_, pos);
 }
@@ -125,44 +111,6 @@ void Lattice::setEdgeCost(size_t edge_id, float cost) {
   all_edges_[edge_id].flags = all_edges_[edge_id].flags | EdgeFlags::HasCustomCost;
 }
 
-bool Lattice::isValid() const {
-  if (text_length_ == 0) {
-    return true;
-  }
-
-  // BFS to check if we can reach end from start
-  std::vector<bool> reachable(text_length_ + 1, false);
-  std::queue<size_t> que;
-  que.push(0);
-  reachable[0] = true;
-
-  while (!que.empty()) {
-    size_t pos = que.front();
-    que.pop();
-
-    for (uint32_t edge_id : edgeIdsAt(pos)) {
-      const auto& edge = getEdge(edge_id);
-      if (edge.end <= text_length_ && !reachable[edge.end]) {
-        reachable[edge.end] = true;
-        que.push(edge.end);
-      }
-    }
-  }
-
-  return reachable[text_length_];
-}
-
-void Lattice::clear() {
-  for (auto& indices : edge_indices_by_start_) {
-    indices.clear();
-  }
-  for (auto& indices : edge_indices_by_end_) {
-    indices.clear();
-  }
-  all_edges_.clear();
-  text_storage_.clear();
-}
-
 std::string_view Lattice::TextStorage::store(std::string_view text) {
   if (text.empty()) {
     return {};
@@ -177,12 +125,6 @@ std::string_view Lattice::TextStorage::store(std::string_view text) {
   std::copy(text.begin(), text.end(), destination);
   used_ += text.size();
   return {destination, text.size()};
-}
-
-void Lattice::TextStorage::clear() {
-  chunks_.clear();
-  used_ = 0;
-  capacity_ = 0;
 }
 
 }  // namespace suzume::core

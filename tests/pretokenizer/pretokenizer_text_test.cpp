@@ -109,8 +109,8 @@ TEST_F(PreTokenizerTextTest, MatchHashtag_WithUnderscore) {
 
 TEST_F(PreTokenizerTextTest, MatchHashtag_FullWidth) {
   const auto normalized = normalize::Normalizer().normalize("＃タグ");
-  ASSERT_TRUE(core::isSuccess(normalized));
-  auto result = pretokenizer_.process(std::get<std::string>(normalized));
+  ASSERT_TRUE(normalized.hasValue());
+  auto result = pretokenizer_.process(normalized.value());
   ASSERT_EQ(result.tokens.size(), 1);
   EXPECT_EQ(result.tokens[0].surface, "#タグ");
   EXPECT_EQ(result.tokens[0].type, PreTokenType::Hashtag);
@@ -118,8 +118,8 @@ TEST_F(PreTokenizerTextTest, MatchHashtag_FullWidth) {
 
 TEST_F(PreTokenizerTextTest, FullWidthHashStartsANewHashtag) {
   const auto normalized = normalize::Normalizer().normalize("＃東京＃テスト");
-  ASSERT_TRUE(core::isSuccess(normalized));
-  const auto result = pretokenizer_.process(std::get<std::string>(normalized));
+  ASSERT_TRUE(normalized.hasValue());
+  const auto result = pretokenizer_.process(normalized.value());
   ASSERT_EQ(result.tokens.size(), 2U);
   EXPECT_EQ(result.tokens[0].surface, "#東京");
   EXPECT_EQ(result.tokens[1].surface, "#テスト");

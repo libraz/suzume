@@ -128,8 +128,8 @@ TEST_F(PreTokenizerNumberTest, MatchAddressNumberSurfaceMatchesNormalizedRange) 
   constexpr std::string_view kAddresses[] = {"1-2-3", "１-２-３", "1-２-3"};
   for (std::string_view address : kAddresses) {
     const auto normalized = normalize::Normalizer().normalize(address);
-    ASSERT_TRUE(core::isSuccess(normalized)) << address;
-    const auto& text = std::get<std::string>(normalized);
+    ASSERT_TRUE(normalized.hasValue()) << address;
+    const auto& text = normalized.value();
     auto result = pretokenizer_.process(text);
     ASSERT_EQ(result.tokens.size(), 1) << address;
     const auto& token = result.tokens.front();

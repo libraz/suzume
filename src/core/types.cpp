@@ -144,17 +144,9 @@ std::optional<PartOfSpeech> stringToPosStrict(std::string_view str) {
   return std::nullopt;
 }
 
-PartOfSpeech stringToPos(std::string_view str) {
-  return stringToPosStrict(str).value_or(PartOfSpeech::Other);
-}
-
-bool isTaggable(PartOfSpeech pos) {
+bool isContentWord(PartOfSpeech pos) {
   return pos == PartOfSpeech::Noun || pos == PartOfSpeech::Verb || pos == PartOfSpeech::Adjective ||
          pos == PartOfSpeech::Adverb;
-}
-
-bool isContentWord(PartOfSpeech pos) {
-  return isTaggable(pos);
 }
 
 const char* originToString(CandidateOrigin origin) {

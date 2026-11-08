@@ -52,14 +52,7 @@ class Normalizer {
    * @param text Input text
    * @return Normalized text or error
    */
-  core::Result<std::string> normalize(std::string_view text) const;
-
-  /**
-   * @brief Check if text needs normalization
-   * @param text Input text
-   * @return true if normalization would change the text
-   */
-  bool needsNormalization(std::string_view text) const;
+  core::Expected<std::string, core::Error> normalize(std::string_view text) const;
 
   /**
    * @brief Get current options

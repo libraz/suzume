@@ -4,7 +4,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <optional>
-#include <string>
 #include <string_view>
 
 namespace suzume::core {
@@ -342,17 +341,7 @@ std::string_view posToJapanese(PartOfSpeech pos);
 std::optional<PartOfSpeech> stringToPosStrict(std::string_view str);
 
 /**
- * @brief Convert string to part of speech, returning Other for unknown input.
- */
-PartOfSpeech stringToPos(std::string_view str);
-
-/**
- * @brief Check if POS is taggable (content word)
- */
-bool isTaggable(PartOfSpeech pos);
-
-/**
- * @brief Check if POS is content word
+ * @brief Check if POS is content word (noun, verb, adjective or adverb)
  */
 bool isContentWord(PartOfSpeech pos);
 

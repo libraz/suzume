@@ -7,21 +7,6 @@ namespace core {
 namespace {
 
 // =============================================================================
-// errorCodeToString - all ErrorCode values
-// =============================================================================
-
-TEST(ErrorTest, ErrorCodeToStringAllValues) {
-  EXPECT_EQ(errorCodeToString(ErrorCode::Success), "Success");
-  EXPECT_EQ(errorCodeToString(ErrorCode::InvalidUtf8), "InvalidUtf8");
-  EXPECT_EQ(errorCodeToString(ErrorCode::DictionaryLoadFailed), "DictionaryLoadFailed");
-  EXPECT_EQ(errorCodeToString(ErrorCode::FileNotFound), "FileNotFound");
-  EXPECT_EQ(errorCodeToString(ErrorCode::ParseError), "ParseError");
-  EXPECT_EQ(errorCodeToString(ErrorCode::OutOfMemory), "OutOfMemory");
-  EXPECT_EQ(errorCodeToString(ErrorCode::InvalidInput), "InvalidInput");
-  EXPECT_EQ(errorCodeToString(ErrorCode::InternalError), "InternalError");
-}
-
-// =============================================================================
 // Error struct construction
 // =============================================================================
 
@@ -52,15 +37,6 @@ TEST(ErrorTest, ErrorBoolConversion) {
 
   Error failure(ErrorCode::InternalError, "something broke");
   EXPECT_TRUE(static_cast<bool>(failure));
-}
-
-// =============================================================================
-// Error code aliases
-// =============================================================================
-
-TEST(ErrorTest, ErrorCodeAliases) {
-  EXPECT_EQ(kInvalidArgument, ErrorCode::InvalidInput);
-  EXPECT_EQ(kFileNotFound, ErrorCode::FileNotFound);
 }
 
 // =============================================================================
@@ -151,55 +127,6 @@ TEST(ErrorTest, ExpectedFromMovedUnexpected) {
   const auto& ref = result;
   EXPECT_EQ(ref.error().code, ErrorCode::ParseError);
   EXPECT_EQ(ref.error().message, "bad");
-}
-
-// =============================================================================
-// Result<T> helpers (getValuePtr, getErrorPtr, isSuccess)
-// =============================================================================
-
-TEST(ErrorTest, ResultSuccessPath) {
-  Result<std::string> result = std::string("test value");
-  EXPECT_TRUE(isSuccess(result));
-
-  const auto* val_ptr = getValuePtr(result);
-  ASSERT_NE(val_ptr, nullptr);
-  EXPECT_EQ(*val_ptr, "test value");
-
-  const auto* err_ptr = getErrorPtr(result);
-  EXPECT_EQ(err_ptr, nullptr);
-}
-
-TEST(ErrorTest, ResultErrorPath) {
-  Result<std::string> result = Error(ErrorCode::InvalidUtf8, "bad bytes");
-  EXPECT_FALSE(isSuccess(result));
-
-  const auto* val_ptr = getValuePtr(result);
-  EXPECT_EQ(val_ptr, nullptr);
-
-  const auto* err_ptr = getErrorPtr(result);
-  ASSERT_NE(err_ptr, nullptr);
-  EXPECT_EQ(err_ptr->code, ErrorCode::InvalidUtf8);
-  EXPECT_EQ(err_ptr->message, "bad bytes");
-}
-
-TEST(ErrorTest, ResultMutableValuePtr) {
-  Result<std::string> result = std::string("mutable");
-  auto* val_ptr = getValuePtr(result);
-  ASSERT_NE(val_ptr, nullptr);
-  *val_ptr = "changed";
-  EXPECT_EQ(*getValuePtr(result), "changed");
-}
-
-TEST(ErrorTest, ResultWithIntType) {
-  Result<int> success = 42;
-  EXPECT_TRUE(isSuccess(success));
-  ASSERT_NE(getValuePtr(success), nullptr);
-  EXPECT_EQ(*getValuePtr(success), 42);
-
-  Result<int> failure = Error(ErrorCode::OutOfMemory);
-  EXPECT_FALSE(isSuccess(failure));
-  ASSERT_NE(getErrorPtr(failure), nullptr);
-  EXPECT_EQ(getErrorPtr(failure)->code, ErrorCode::OutOfMemory);
 }
 
 }  // namespace

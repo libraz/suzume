@@ -144,15 +144,15 @@ core::Expected<core::AnalysisOutput, core::Error> Analyzer::analyzeWithNormalize
   // single normalized-text coordinate system. Length-changing normalization
   // (e.g. ｶ+ﾞ → ガ) would otherwise desync raw pretoken and normalized offsets.
   auto norm_result = normalizer_.normalize(text);
-  if (!core::isSuccess(norm_result)) {
+  if (!norm_result.hasValue()) {
     SUZUME_DEBUG_BLOCK {
-      auto& error = std::get<core::Error>(norm_result);
+      const auto& error = norm_result.error();
       SUZUME_DEBUG_STREAM << "[ANALYZER] Normalization failed: " << error.message
                           << " (code=" << static_cast<int>(error.code) << ")\n";
     }
-    return core::makeUnexpected(std::get<core::Error>(std::move(norm_result)));
+    return core::makeUnexpected(norm_result.error());
   }
-  std::string normalized = std::get<std::string>(std::move(norm_result));
+  std::string normalized = std::move(norm_result).value();
   if (normalized.empty()) {
     return core::AnalysisOutput{std::move(normalized), {}};
   }

@@ -30,31 +30,6 @@ TEST(TypesExtendedTest, PosToJapaneseAllValues) {
 }
 
 // =============================================================================
-// isTaggable - all POS values
-// =============================================================================
-
-TEST(TypesExtendedTest, IsTaggableContentWords) {
-  EXPECT_TRUE(isTaggable(PartOfSpeech::Noun));
-  EXPECT_TRUE(isTaggable(PartOfSpeech::Verb));
-  EXPECT_TRUE(isTaggable(PartOfSpeech::Adjective));
-  EXPECT_TRUE(isTaggable(PartOfSpeech::Adverb));
-}
-
-TEST(TypesExtendedTest, IsTaggableFunctionWords) {
-  EXPECT_FALSE(isTaggable(PartOfSpeech::Particle));
-  EXPECT_FALSE(isTaggable(PartOfSpeech::Auxiliary));
-  EXPECT_FALSE(isTaggable(PartOfSpeech::Conjunction));
-  EXPECT_FALSE(isTaggable(PartOfSpeech::Determiner));
-  EXPECT_FALSE(isTaggable(PartOfSpeech::Pronoun));
-  EXPECT_FALSE(isTaggable(PartOfSpeech::Prefix));
-  EXPECT_FALSE(isTaggable(PartOfSpeech::Suffix));
-  EXPECT_FALSE(isTaggable(PartOfSpeech::Interjection));
-  EXPECT_FALSE(isTaggable(PartOfSpeech::Symbol));
-  EXPECT_FALSE(isTaggable(PartOfSpeech::Other));
-  EXPECT_FALSE(isTaggable(PartOfSpeech::Unknown));
-}
-
-// =============================================================================
 // isContentWord - all POS values
 // =============================================================================
 

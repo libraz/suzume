@@ -22,25 +22,9 @@ TEST(LatticeTest, RejectsInvalidSpansAndCategoriesWithoutMutatingIndexes) {
 
   EXPECT_TRUE(lattice.edgeIdsAt(0).empty());
   EXPECT_TRUE(lattice.edgeIdsEndingAt(1).empty());
-  EXPECT_FALSE(lattice.isValid());
 }
 
-TEST(LatticeTest, ValidityRequiresACompletePath) {
-  Lattice lattice(3);
-  lattice.addEdge("a", 0, 1, PartOfSpeech::Noun, 0.0F, 0);
-  lattice.addEdge("c", 2, 3, PartOfSpeech::Noun, 0.0F, 0);
-  EXPECT_FALSE(lattice.isValid());
-
-  lattice.addEdge("b", 1, 2, PartOfSpeech::Noun, 0.0F, 0);
-  EXPECT_TRUE(lattice.isValid());
-}
-
-TEST(LatticeTest, EmptyTextIsValid) {
-  Lattice lattice(0);
-  EXPECT_TRUE(lattice.isValid());
-}
-
-TEST(LatticeTest, EndingIndexTracksAddMoveAndClear) {
+TEST(LatticeTest, EndingIndexTracksAddAndMove) {
   Lattice lattice(3);
   const auto first = lattice.addEdge("ab", 0, 2, PartOfSpeech::Noun, 0.0F, 0);
   const auto second = lattice.addEdge("b", 1, 2, PartOfSpeech::Noun, 0.0F, 0);
@@ -56,12 +40,6 @@ TEST(LatticeTest, EndingIndexTracksAddMoveAndClear) {
   Lattice moved(std::move(lattice));
   ASSERT_EQ(moved.edgeIdsEndingAt(2).size(), 2U);
   EXPECT_EQ(moved.getEdge(moved.edgeIdsEndingAt(2)[0]).surface, "ab");
-  EXPECT_TRUE(moved.isValid());
-
-  moved.clear();
-  EXPECT_TRUE(moved.edgeIdsAt(0).empty());
-  EXPECT_TRUE(moved.edgeIdsEndingAt(2).empty());
-  EXPECT_FALSE(moved.isValid());
 }
 
 }  // namespace

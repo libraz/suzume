@@ -18,32 +18,31 @@ TEST(TypesTest, PosToStringConvertsAllTypes) {
   EXPECT_EQ(posToString(PartOfSpeech::Other), "OTHER");
 }
 
-TEST(TypesTest, StringToPosConvertsAllTypes) {
-  EXPECT_EQ(stringToPos("NOUN"), PartOfSpeech::Noun);
-  EXPECT_EQ(stringToPos("名詞"), PartOfSpeech::Noun);
-  EXPECT_EQ(stringToPos("VERB"), PartOfSpeech::Verb);
-  EXPECT_EQ(stringToPos("動詞"), PartOfSpeech::Verb);
-  EXPECT_EQ(stringToPos("ADJ"), PartOfSpeech::Adjective);
-  EXPECT_EQ(stringToPos("形容詞"), PartOfSpeech::Adjective);
-  EXPECT_EQ(stringToPos("PARTICLE"), PartOfSpeech::Particle);
-  EXPECT_EQ(stringToPos("助詞"), PartOfSpeech::Particle);
-  EXPECT_EQ(stringToPos("AUX"), PartOfSpeech::Auxiliary);
-  EXPECT_EQ(stringToPos("助動詞"), PartOfSpeech::Auxiliary);
-  EXPECT_EQ(stringToPos("CONJ"), PartOfSpeech::Conjunction);
-  EXPECT_EQ(stringToPos("接続詞"), PartOfSpeech::Conjunction);
-  EXPECT_EQ(stringToPos("UNKNOWN"), PartOfSpeech::Other);
+TEST(TypesTest, StringToPosStrictConvertsAllTypes) {
+  EXPECT_EQ(stringToPosStrict("NOUN"), PartOfSpeech::Noun);
+  EXPECT_EQ(stringToPosStrict("名詞"), PartOfSpeech::Noun);
+  EXPECT_EQ(stringToPosStrict("VERB"), PartOfSpeech::Verb);
+  EXPECT_EQ(stringToPosStrict("動詞"), PartOfSpeech::Verb);
+  EXPECT_EQ(stringToPosStrict("ADJ"), PartOfSpeech::Adjective);
+  EXPECT_EQ(stringToPosStrict("形容詞"), PartOfSpeech::Adjective);
+  EXPECT_EQ(stringToPosStrict("PARTICLE"), PartOfSpeech::Particle);
+  EXPECT_EQ(stringToPosStrict("助詞"), PartOfSpeech::Particle);
+  EXPECT_EQ(stringToPosStrict("AUX"), PartOfSpeech::Auxiliary);
+  EXPECT_EQ(stringToPosStrict("助動詞"), PartOfSpeech::Auxiliary);
+  EXPECT_EQ(stringToPosStrict("CONJ"), PartOfSpeech::Conjunction);
+  EXPECT_EQ(stringToPosStrict("接続詞"), PartOfSpeech::Conjunction);
 }
 
-TEST(TypesTest, StringToPosAcceptsLongAliases) {
-  // Long-form English aliases must resolve, not fall through to Other.
-  EXPECT_EQ(stringToPos("ADJECTIVE"), PartOfSpeech::Adjective);
-  EXPECT_EQ(stringToPos("ADVERB"), PartOfSpeech::Adverb);
-  EXPECT_EQ(stringToPos("AUXILIARY"), PartOfSpeech::Auxiliary);
-  EXPECT_EQ(stringToPos("CONJUNCTION"), PartOfSpeech::Conjunction);
-  EXPECT_EQ(stringToPos("PRONOUN"), PartOfSpeech::Pronoun);
-  EXPECT_EQ(stringToPos("DETERMINER"), PartOfSpeech::Determiner);
-  EXPECT_EQ(stringToPos("INTERJECTION"), PartOfSpeech::Interjection);
-  EXPECT_EQ(stringToPos("PROPN"), PartOfSpeech::Noun);
+TEST(TypesTest, StringToPosStrictAcceptsLongAliases) {
+  // Long-form English aliases must resolve.
+  EXPECT_EQ(stringToPosStrict("ADJECTIVE"), PartOfSpeech::Adjective);
+  EXPECT_EQ(stringToPosStrict("ADVERB"), PartOfSpeech::Adverb);
+  EXPECT_EQ(stringToPosStrict("AUXILIARY"), PartOfSpeech::Auxiliary);
+  EXPECT_EQ(stringToPosStrict("CONJUNCTION"), PartOfSpeech::Conjunction);
+  EXPECT_EQ(stringToPosStrict("PRONOUN"), PartOfSpeech::Pronoun);
+  EXPECT_EQ(stringToPosStrict("DETERMINER"), PartOfSpeech::Determiner);
+  EXPECT_EQ(stringToPosStrict("INTERJECTION"), PartOfSpeech::Interjection);
+  EXPECT_EQ(stringToPosStrict("PROPN"), PartOfSpeech::Noun);
 }
 
 TEST(TypesTest, StringToPosStrictRejectsUnknown) {

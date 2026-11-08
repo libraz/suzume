@@ -106,18 +106,9 @@ class Lattice {
                  std::string_view epos_source = {}, bool has_finite_existential_continuation = false);
 
   /**
-   * @brief Get all edges starting at a position
-   * @note Returns by value (indices internally, edges constructed on-demand)
-   *       This enables memory optimization while keeping API compatibility.
-   *       Caller can use: const auto& edges = edgesAt(pos); // lifetime extended
-   */
-  std::vector<LatticeEdge> edgesAt(size_t pos) const;
-
-  /**
    * @brief Get IDs of all edges starting at a position (no copy)
    * @note Returns a reference to internal storage. Resolve each ID with
-   *       getEdge(); prefer this over edgesAt() on hot paths to avoid
-   *       building a temporary edge vector.
+   *       getEdge().
    */
   const std::vector<uint32_t>& edgeIdsAt(size_t pos) const;
 
@@ -146,19 +137,9 @@ class Lattice {
   void setEdgeCost(size_t edge_id, float cost);
 
   /**
-   * @brief Check if lattice is valid (path exists from start to end)
-   */
-  bool isValid() const;
-
-  /**
    * @brief Get text length
    */
   size_t textLength() const { return text_length_; }
-
-  /**
-   * @brief Clear the lattice
-   */
-  void clear();
 
  private:
   /**
@@ -171,11 +152,9 @@ class Lattice {
    */
   class TextStorage {
    public:
-    /** Copy text into the storage and return a view that stays valid until clear(); empty text yields an empty view. */
+    /** Copy text into the storage and return a view that stays valid for the storage's lifetime; empty text yields an
+     * empty view. */
     std::string_view store(std::string_view text);
-
-    /** Drop every stored run. */
-    void clear();
 
    private:
     static constexpr size_t kChunkBytes = 4096;

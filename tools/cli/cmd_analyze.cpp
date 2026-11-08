@@ -276,10 +276,11 @@ int cmdAnalyze(const CommandArgs& args) {
 
     std::cerr << "\n=== Lattice Candidates ===\n";
     for (size_t pos = 0; pos < lattice.textLength(); ++pos) {
-      const auto& edges = lattice.edgesAt(pos);
-      if (!edges.empty()) {
+      const auto& edge_ids = lattice.edgeIdsAt(pos);
+      if (!edge_ids.empty()) {
         std::cerr << "Position " << pos << ":\n";
-        for (const auto& edge : edges) {
+        for (const uint32_t edge_id : edge_ids) {
+          const auto& edge = lattice.getEdge(edge_id);
           std::cerr << "  [" << edge.start << "-" << edge.end << "] " << edge.surface << " ("
                     << core::posToString(edge.pos) << ") cost=" << edge.cost;
           if (!edge.lemma.empty()) {

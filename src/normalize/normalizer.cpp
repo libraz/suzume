@@ -144,7 +144,7 @@ char32_t normalizeVuSequence(char32_t vu_char, char32_t next_char) {
 
 }  // namespace
 
-core::Result<std::string> Normalizer::normalize(std::string_view text) const {
+core::Expected<std::string, core::Error> Normalizer::normalize(std::string_view text) const {
   if (!isValidUtf8(text)) {
     return core::Error(core::ErrorCode::InvalidUtf8, "Invalid UTF-8 input");
   }
@@ -244,14 +244,6 @@ core::Result<std::string> Normalizer::normalize(std::string_view text) const {
   }
 
   return result;
-}
-
-bool Normalizer::needsNormalization(std::string_view text) const {
-  auto normalized = normalize(text);
-  if (auto* value = core::getValuePtr(normalized)) {
-    return *value != text;
-  }
-  return false;
 }
 
 }  // namespace suzume::normalize

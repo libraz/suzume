@@ -5,7 +5,6 @@
 #include <cstddef>
 #include <string>
 #include <string_view>
-#include <variant>
 
 namespace suzume::core {
 
@@ -37,58 +36,6 @@ struct Error {
 };
 
 /**
- * @brief Result type representing success or failure
- *
- * Usage:
- *   Result<std::string> normalize(std::string_view input);
- *   auto result = normalize("test");
- *   if (auto* value = std::get_if<std::string>(&result)) {
- *     // Success: use *value
- *   } else {
- *     // Failure: std::get<Error>(result)
- *   }
- */
-template <typename T>
-using Result = std::variant<T, Error>;
-
-/**
- * @brief Get value pointer from Result (on success)
- */
-template <typename T>
-const T* getValuePtr(const Result<T>& result) {
-  return std::get_if<T>(&result);
-}
-
-/**
- * @brief Get mutable value pointer from Result (on success)
- */
-template <typename T>
-T* getValuePtr(Result<T>& result) {
-  return std::get_if<T>(&result);
-}
-
-/**
- * @brief Get error pointer from Result (on failure)
- */
-template <typename T>
-const Error* getErrorPtr(const Result<T>& result) {
-  return std::get_if<Error>(&result);
-}
-
-/**
- * @brief Check if Result is success
- */
-template <typename T>
-bool isSuccess(const Result<T>& result) {
-  return std::holds_alternative<T>(result);
-}
-
-/**
- * @brief Convert error code to string
- */
-std::string_view errorCodeToString(ErrorCode code);
-
-/**
  * @brief Render an unsigned value as decimal digits
  * @note Diagnostic messages are the only place this library turns a number into
  *       text, and they only ever report counts and line numbers. Formatting them
@@ -96,10 +43,6 @@ std::string_view errorCodeToString(ErrorCode code);
  *       handles signed and wider types, out of the build.
  */
 std::string decimalDigits(size_t value);
-
-// Error code aliases for consistency
-constexpr ErrorCode kInvalidArgument = ErrorCode::InvalidInput;
-constexpr ErrorCode kFileNotFound = ErrorCode::FileNotFound;
 
 /**
  * @brief Expected type for error handling (similar to std::expected)
