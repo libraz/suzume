@@ -29,17 +29,11 @@
 namespace suzume::analysis {
 
 using verb_helpers::addEmphaticVariants;
-using verb_helpers::isAdjectiveInDictionary;
-using verb_helpers::isEmphaticChar;
-using verb_helpers::isVerbInDictionary;
 
 using adj_detail::addReduplicatedShiiAdjective;
-using adj_detail::appendHiraganaPrefixedKanjiIAdjCandidates;
 using adj_detail::dropCoinedAdjectivesOverDictionaryAdjective;
 using adj_detail::makeIAdjCandidate;
-using adj_detail::makeIAdjCellCandidate;
 using adj_detail::makeIAdjStemCandidate;
-using adj_detail::makeNaAdjCandidate;
 
 void generateKatakanaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                          const std::vector<normalize::CharType>& char_types,

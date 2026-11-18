@@ -31,8 +31,6 @@ namespace suzume::analysis {
 
 using verb_helpers::addEmphaticVariants;
 using verb_helpers::isAdjectiveInDictionary;
-using verb_helpers::isEmphaticChar;
-using verb_helpers::isVerbInDictionary;
 
 using adj_detail::addReduplicatedShiiAdjective;
 using adj_detail::appendClippedExclamative;
@@ -44,9 +42,6 @@ using adj_detail::appendStemBeforeNominalizerSa;
 using adj_detail::dropCoinedAdjectivesOverDictionaryAdjective;
 using adj_detail::HiraganaAdjectiveRun;
 using adj_detail::makeIAdjCandidate;
-using adj_detail::makeIAdjCellCandidate;
-using adj_detail::makeIAdjStemCandidate;
-using adj_detail::makeNaAdjCandidate;
 
 namespace {
 

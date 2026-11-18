@@ -538,19 +538,19 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
     const auto& all_candidates = inflection.analyze(surface);
 
     for (const auto& cand : all_candidates) {
+      const bool base_listed = isAdjectiveInDictionary(dict_manager, cand.base_form);
       // A dictionary-backed adjective remains eligible as a second component
       // of a compound (山 / 高し). Only an unverified hypothesis that crosses
       // an independently attested verb boundary is suppressed.
-      if (!isAdjectiveInDictionary(dict_manager, cand.base_form) &&
+      if (!base_listed &&
           containsDictionaryVerbBoundary(codepoints, start_pos, start_pos + normalize::utf8Length(cand.stem), end_pos,
                                          dict_manager)) {
         continue;
       }
       // A multi-mora auxiliary stem closing the okurigana (春+らし) carries the
       // adjective paradigm itself; the kanji before it is its host, not a stem.
-      if (!isAdjectiveInDictionary(dict_manager, cand.base_form) &&
-          closesOnAdjectivalAuxiliaryStem(codepoints, kanji_end, start_pos + normalize::utf8Length(cand.stem),
-                                          dict_manager)) {
+      if (!base_listed && closesOnAdjectivalAuxiliaryStem(codepoints, kanji_end,
+                                                          start_pos + normalize::utf8Length(cand.stem), dict_manager)) {
         continue;
       }
       // A long unregistered i-adjective in its uninflected form is recognizable
@@ -566,8 +566,7 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
                                          !tail_is_dict_verb;
       const bool complete_past_form =
           cand.verb_type == grammar::VerbType::IAdjective && utf8::endsWith(surface, "かった") &&
-          cand.confidence >= candidate::kCompoundAdjConfMin &&
-          (!utf8::endsWith(cand.base_form, "ない") || isAdjectiveInDictionary(dict_manager, cand.base_form));
+          cand.confidence >= candidate::kCompoundAdjConfMin && (!utf8::endsWith(cand.base_form, "ない") || base_listed);
       // Require confidence >= 0.5 for i-adjectives
       // Base forms like 寒い get exactly 0.5, conjugated forms like 美しかった get 0.68+
       if ((cand.confidence >= candidate::kIAdjConfMin || complete_past_form ||
@@ -708,7 +707,7 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
         // pure-kanji stems like 高い), and the hiragana tail is itself a complete
         // conjugation of a dictionary verb (かかった → かかる). [noun][verb] is not
         // an adjective, so skip rather than penalize (mirrors the ゆく/いく case).
-        if (!isAdjectiveInDictionary(dict_manager, cand.base_form)) {
+        if (!base_listed) {
           if (containsAuxiliaryFinalParticleBoundary(codepoints, start_pos, end_pos, dict_manager) ||
               endsWithMultiMoraFinalParticle(codepoints, start_pos, end_pos, dict_manager)) {
             SUZUME_DEBUG_LOG_VERBOSE("[ADJ_SKIP] \"" << surface << "\" crosses auxiliary + final-particle boundary\n");
@@ -731,8 +730,7 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
         // even though the preceding っ is already a productive verb form.
         // The dictionary gate preserves genuine open-class adjectives while
         // rejecting this structural homograph for every verified verb.
-        if (!isAdjectiveInDictionary(dict_manager, cand.base_form) && utf8::endsWith(surface, "かった") &&
-            surface.size() > core::kJapaneseCharBytes) {
+        if (!base_listed && utf8::endsWith(surface, "かった") && surface.size() > core::kJapaneseCharBytes) {
           std::string sokuonbin_surface = surface.substr(0, surface.size() - core::kJapaneseCharBytes);
           if (isVerbInDictionary(dict_manager, sokuonbin_surface)) {
             SUZUME_DEBUG_LOG_VERBOSE("[ADJ_SKIP] \"" << surface
@@ -747,7 +745,7 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
         // Lexicalized compounds are dictionary entries themselves (力強い, 心細い)
         // and are exempt, as is the case where the adjective spans everything.
         // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
-        if (!isAdjectiveInDictionary(dict_manager, cand.base_form)) {
+        if (!base_listed) {
           bool prefixes_dictionary_adjective = false;
           for (size_t tail_start = start_pos + 1; tail_start < end_pos && !prefixes_dictionary_adjective;
                ++tail_start) {
@@ -777,8 +775,7 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
         // (消え → 消える 0.74, 暮れ → 暮れる 0.3 after e-row ambiguity penalty);
         // the competing i-adjective base (Xゆい) is already known to be fake.
         if (surface.size() > 2 * core::kJapaneseCharBytes && utf8::endsWithAny(surface, {"ゆく", "いく"}) &&
-            !isAdjectiveInDictionary(dict_manager, cand.base_form) &&
-            readsAsVerbForm(inflection, dict_manager, utf8::dropLast2Chars(surface))) {
+            !base_listed && readsAsVerbForm(inflection, dict_manager, utf8::dropLast2Chars(surface))) {
           SUZUME_DEBUG_LOG_VERBOSE("[ADJ_SKIP] \"" << surface << "\" is verb renyokei + subsidiary ゆく/いく\n");
           continue;  // Skip - compound verb, not adjective
         }
@@ -790,8 +787,7 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
         // coverage rather than on form. Lexical ない-adjectives are dictionary
         // entries (少ない, 情けない, もったいない) and keep their reading; so does a
         // registered adjective's own negative, whose base is the adjective.
-        if (surface.size() > 2 * core::kJapaneseCharBytes && utf8::endsWith(surface, "ない") &&
-            !isAdjectiveInDictionary(dict_manager, cand.base_form) &&
+        if (surface.size() > 2 * core::kJapaneseCharBytes && utf8::endsWith(surface, "ない") && !base_listed &&
             readsAsVerbForm(inflection, dict_manager, utf8::dropLast2Chars(surface))) {
           SUZUME_DEBUG_LOG_VERBOSE("[ADJ_SKIP] \"" << surface << "\" is verb + negative ない\n");
           continue;
@@ -821,7 +817,7 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
               verb_helpers::auxiliaryClosingAfterOkurigana(dict_manager, codepoints, kanji_end, kere_end);
           closes_on_keri = keri != nullptr && keri->extended_pos == core::ExtendedPOS::AuxClassicalKeri;
         }
-        if (closes_on_keri && !isAdjectiveInDictionary(dict_manager, cand.base_form)) {
+        if (closes_on_keri && !base_listed) {
           continue;
         }
         // Set lemma to base form from inflection analysis (e.g., 使いやすく → 使いやすい)
