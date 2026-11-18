@@ -14,8 +14,9 @@
 # A reject only stops ncu from rewriting the range; the held package is also
 # pinned exactly in package.json.
 reject:
-  # @biomejs/biome: 2.6.6 panics ("path is expected to be under the root" in the
-  # ignore crate) on `biome check --config-path ../../examples/ts/biome.json`,
-  # which `yarn lint` runs; 2.5.10 passes. Release the hold once a newer biome
-  # fixes that invocation.
+  # @biomejs/biome: 2.5.15 and every 2.6.x through 2.6.8 panic ("path is
+  # expected to be under the root" in the ignore crate) on
+  # `biome check --config-path ../../examples/ts/biome.json`, which `yarn lint`
+  # runs; 2.5.14 is the newest release that passes. Release the hold once a
+  # newer biome fixes that invocation.
   - "@biomejs/biome"
