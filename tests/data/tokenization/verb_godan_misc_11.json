@@ -2412,6 +2412,50 @@
       ],
       "id": "be_nai",
       "input": "食べ、ない"
+    },
+    {
+      "description": "Kana spelling of the adverb 決して stays one adverb before a te-form subsidiary verb",
+      "expected": [
+        {
+          "lemma": "けっして",
+          "pos": "Adverb",
+          "surface": "けっして"
+        },
+        {
+          "lemma": "くれる",
+          "pos": "Verb",
+          "surface": "くれ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "kettshitekurenai",
+      "input": "けっしてくれない"
+    },
+    {
+      "description": "Kana adverb けっして before a lexical motion verb",
+      "expected": [
+        {
+          "lemma": "けっして",
+          "pos": "Adverb",
+          "surface": "けっして"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行か"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "kettshite_kanai",
+      "input": "けっして行かない"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 11/11)",

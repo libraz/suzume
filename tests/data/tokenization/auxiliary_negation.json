@@ -2507,6 +2507,23 @@
       ],
       "id": "ha_nai",
       "input": "彼はセンスない"
+    },
+    {
+      "description": "Kana adverb けっして before the negative adjective ない",
+      "expected": [
+        {
+          "lemma": "けっして",
+          "pos": "Adverb",
+          "surface": "けっして"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
+      "id": "kettshitenai",
+      "input": "けっしてない"
     }
   ],
   "description": "Negation auxiliaries (ない、ぬ)",
