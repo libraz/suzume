@@ -10,7 +10,10 @@ from __future__ import annotations
 
 import ctypes
 
+import pytest
+
 import suzume
+import suzume._ffi as ffi
 from suzume._ffi import (
     ABI_VERSION,
     SuzumeExtendedOptions,
@@ -34,6 +37,21 @@ def test_loaded_library_reports_the_expected_abi_revision() -> None:
         "if the ABI change was deliberate, update the mirrors and set "
         "suzume._ffi.ABI_VERSION to the header's SUZUME_ABI_VERSION."
     )
+
+
+def test_load_refuses_a_library_of_another_abi_revision(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(ffi, "ABI_VERSION", ABI_VERSION + 1)
+    with pytest.raises(OSError, match=f"revision {ABI_VERSION}, but .* requires revision"):
+        ffi.load_library()
+
+
+def test_load_refuses_a_library_without_an_abi_revision(monkeypatch: pytest.MonkeyPatch) -> None:
+    class _LibraryWithoutRevision:
+        pass
+
+    monkeypatch.setattr(ffi.ctypes, "CDLL", lambda path: _LibraryWithoutRevision())
+    with pytest.raises(OSError, match="does not export suzume_abi_version"):
+        ffi.load_library("libsuzume-old.so")
 
 
 def test_sizeof_matches_native() -> None:

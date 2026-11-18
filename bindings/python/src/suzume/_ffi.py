@@ -20,7 +20,7 @@ from typing import Any
 # The revision of include/suzume/suzume_c.h that the mirrors below were written
 # against. ctypes loads whatever libsuzume it discovers, so a library built from
 # a different layout would be read at the wrong offsets rather than failing to
-# link. tests/test_abi_layout.py asserts the loaded library reports this value.
+# link. load_library() refuses a library that reports any other value.
 
 ABI_VERSION = 1
 
@@ -224,14 +224,40 @@ def _bundled_data_dir(pkg_dir: Path) -> Path | None:
     return None
 
 
+def _require_matching_abi(lib: ctypes.CDLL, path: str) -> None:
+    """Refuse a library whose C ABI revision differs from the ctypes mirrors."""
+    try:
+        abi_version = lib.suzume_abi_version
+    except AttributeError:
+        raise OSError(
+            f"{path} does not export suzume_abi_version, so it predates the C ABI "
+            f"revision {ABI_VERSION} this suzume package requires. Install a matching "
+            "libsuzume, or point SUZUME_LIB_PATH at one."
+        ) from None
+    abi_version.restype = ctypes.c_uint32
+    abi_version.argtypes = []
+    loaded = abi_version()
+    if loaded != ABI_VERSION:
+        raise OSError(
+            f"{path} implements suzume C ABI revision {loaded}, but this suzume package "
+            f"requires revision {ABI_VERSION}; its structures would be read at the wrong "
+            "offsets. Install a matching libsuzume, or point SUZUME_LIB_PATH at one."
+        )
+
+
 def load_library(lib_path: str | None = None) -> ctypes.CDLL:
     """Load the suzume shared library with configured signatures.
 
     Dictionary discovery is configured per analyzer, after loading the library,
     so importing this module never mutates ``SUZUME_DATA_DIR``.
+
+    Raises:
+        OSError: no library was found, or the one found implements a different
+            C ABI revision than this package.
     """
     path = lib_path or _find_library()
 
     lib = ctypes.CDLL(path)
+    _require_matching_abi(lib, path)
     _configure_signatures(lib)
     return lib
