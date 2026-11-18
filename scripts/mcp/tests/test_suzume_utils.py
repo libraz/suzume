@@ -373,6 +373,17 @@ class TestStrandedAdjectiveStem:
         assert [token["surface"] for token in tokens] == ["バリ", "かっこいい"]
 
 
+class TestFrequencyQuantityAdverb:
+    def test_one_time_is_the_same_quantity_noun_before_a_predicate_and_a_particle(self):
+        for text in ("一度みた", "一度は見た", "二度みた"):
+            tokens, _, _ = get_expected_tokens(text)
+            assert (tokens[0]["surface"], tokens[0]["pos"]) == (text[:2], "Noun"), text
+
+    def test_a_lexicalized_adverb_on_another_counter_stays_an_adverb(self):
+        tokens, _, _ = get_expected_tokens("一杯飲んだ")
+        assert (tokens[0]["surface"], tokens[0]["pos"]) == ("一杯", "Adverb")
+
+
 class TestEmphaticFinalSokuon:
     def test_keeps_the_adjective_the_mark_closes(self):
         tokens, _, _ = get_expected_tokens("すごっ")

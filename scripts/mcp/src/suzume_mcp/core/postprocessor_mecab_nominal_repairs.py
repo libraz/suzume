@@ -292,6 +292,35 @@ def split_demonstrative_dake(tokens: list[dict]) -> None:
         idx += 1
 
 
+# Counters of occurrences. A numeral + one of these is the count of times
+# whether or not the dictionary lexicalized it as an adverb (一度 = 二度 = 三回).
+_FREQUENCY_COUNTERS = "度回遍"
+_FREQUENCY_QUANTITY_ADVERB = regex.compile(rf"([〇零一二三四五六七八九十百千]+)([{_FREQUENCY_COUNTERS}])")
+
+
+def split_frequency_quantity_adverb(tokens: list[dict]) -> None:
+    """Split the reference's adverb 一度 into numeral + counter, as it splits 二度.
+
+    Adverbial use of a quantity does not change its class, so 一度みた, 一度は見た
+    and 二度みた all carry the same quantity noun; the number+unit merge then
+    rejoins the pair. Lexicalized adverbs on other counters (一杯, 一体) keep
+    their meaning apart from the count and are left alone.
+    """
+    idx = 0
+    while idx < len(tokens):
+        token = tokens[idx]
+        matched = _FREQUENCY_QUANTITY_ADVERB.fullmatch(token.get("surface", ""))
+        if token.get("pos") == "副詞" and matched is not None:
+            numeral, counter = matched.groups()
+            tokens[idx : idx + 1] = [
+                {"surface": numeral, "pos": "名詞", "pos_sub1": "数", "lemma": numeral},
+                {"surface": counter, "pos": "名詞", "pos_sub1": "接尾", "pos_sub2": "助数詞", "lemma": counter},
+            ]
+            idx += 2
+            continue
+        idx += 1
+
+
 def split_predicate_tokoro_ga(tokens: list[dict]) -> None:
     """Split the conjunction ところが after a predicate into ところ + が.
 
