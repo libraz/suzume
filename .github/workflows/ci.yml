@@ -54,19 +54,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
+        with:
+          version: ${{ env.UV_VERSION }}
       # Ratchet on hardcoded word tests / raw score literals / scorer rules,
       # plus WASM-core purity (no unguarded file-I/O headers). See CLAUDE.md.
       - run: scripts/check_code_guardrails.sh
-      - run: python3 scripts/check_oracle_overrides.py
+      - run: uv run --locked --project scripts/mcp python scripts/check_oracle_overrides.py
       # A POS added to the C ABI must reach both bindings' label tables; the
       # C++ suite cannot see that gap.
-      - run: python3 scripts/check_binding_labels.py
+      - run: uv run --locked --project scripts/mcp python scripts/check_binding_labels.py
       # A V2 added to the core's compound lexicon must reach the oracle's mirror,
       # or expectations start splitting compounds the tokenizer joins.
-      - run: python3 scripts/check_compound_v2_sync.py
+      - run: uv run --locked --project scripts/mcp python scripts/check_compound_v2_sync.py
       # Closed Unicode/grammar sets duplicated in the Python oracle must remain
       # exact mirrors of their C++ sources.
-      - run: python3 scripts/check_oracle_mirrors.py
+      - run: uv run --locked --project scripts/mcp python scripts/check_oracle_mirrors.py
       # Version must stay in lockstep across every binding manifest.
       - run: scripts/check_version_mirror.sh
 
@@ -191,7 +194,7 @@ jobs:
       - name: Check native, Python, and WASM parity
         run: |
           make python-build
-          cd bindings/python && uv run --locked python ../../scripts/check_binding_parity.py
+          uv run --locked --project bindings/python python scripts/check_binding_parity.py
 
   python-binding:
     runs-on: ubuntu-latest
