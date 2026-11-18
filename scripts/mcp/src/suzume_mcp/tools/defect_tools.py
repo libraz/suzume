@@ -473,7 +473,13 @@ async def defect_recheck(ids: str = "", source: str = "defect", apply: bool = Fa
 
 @mcp.tool()
 @stale_cli_guard(persists=lambda args: True)
-async def defect_resolve(ids: str, source: str = "defect", note: str = "", force: bool = False) -> str:
+async def defect_resolve(
+    ids: str,
+    source: str = "defect",
+    note: str = "",
+    force: bool = False,
+    resolution: str = bug_store.RESOLUTION_FIXED,
+) -> str:
     """Close named records, moving them to `resolved/`.
 
     Each record is re-run first; one that still reproduces is refused unless
@@ -485,11 +491,20 @@ async def defect_resolve(ids: str, source: str = "defect", note: str = "", force
         source: Store to update.
         note: Why the record is being closed (e.g. the plan and package that fixed it).
         force: Close even when the record still reproduces. Requires `note`.
+        resolution: `fixed` (default), or a judgment — known-limit / conformant /
+            ambiguous / duplicate — for an open record adjudicated as not fixable
+            or not a defect. A judgment still reproduces by definition, so it skips
+            the reproduction check, requires `note`, and is never probed again.
     """
     try:
         wanted = _parse_ids(ids)
     except ValueError as exc:
         return json_error(str(exc))
+    if resolution not in bug_store.RESOLUTIONS:
+        return json_error(f"resolution must be one of {bug_store.RESOLUTIONS}")
+    judged = resolution != bug_store.RESOLUTION_FIXED
+    if judged and not note.strip():
+        return json_error(f"resolution={resolution!r} requires note recording the judgment")
     if force and not note.strip():
         return json_error("force=True requires note explaining why the record is closed while still failing")
 
@@ -499,12 +514,13 @@ async def defect_resolve(ids: str, source: str = "defect", note: str = "", force
     refused: list[dict] = []
     for record in records:
         info = states.get(record["id"], {"state": "error", "error": "not evaluated"})
-        if info["state"] == "resolved" or force:
+        if info["state"] == "resolved" or force or judged:
             path = bug_store.resolve(
                 source,
                 record,
                 note=note or f"defect_resolve (state={info['state']})",
                 output=info.get("current", ""),
+                resolution=resolution,
             )
             resolved.append({"id": record["id"], "state": info["state"], "file": Path(path).name})
         else:

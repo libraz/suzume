@@ -346,6 +346,32 @@ class TestDefectResolve:
         assert result["status"] == "ok"
         assert bug_store.load_resolved("defect")[0]["resolved_note"] == "verified by hand"
 
+    def test_an_open_record_can_be_closed_as_a_known_limit(self, store, engine):
+        file_record(text="まだ", expected="ま だ", suzume="まだ")
+        engine["oracle"]["まだ"] = "ま だ"
+        engine["cli"]["まだ"] = "まだ"
+
+        result = parse_json(run(defect_resolve(ids="1", resolution="known-limit", note="lexical boundary")))
+
+        assert result["status"] == "ok"
+        assert bug_store.load_open("defect") == []
+        closed = bug_store.load_resolved("defect")[0]
+        assert closed["resolution"] == "known-limit"
+        assert closed["resolved_note"] == "lexical boundary"
+        probed = parse_json(run(defect_probe(texts=["まだ"])))
+        assert probed["rows"][0]["state"] == "dismissed"
+
+    def test_a_judgment_resolution_demands_a_note(self, store, engine):
+        file_record(text="まだ", expected="ま だ", suzume="まだ")
+        assert parse_json(run(defect_resolve(ids="1", resolution="known-limit")))["status"] == "error"
+        assert len(bug_store.load_open("defect")) == 1
+
+    def test_an_unknown_resolution_is_refused(self, store, engine):
+        file_record(text="まだ", expected="ま だ", suzume="まだ")
+        result = parse_json(run(defect_resolve(ids="1", resolution="wontfix", note="x")))
+        assert result["status"] == "error"
+        assert len(bug_store.load_open("defect")) == 1
+
     def test_ids_are_required(self, store, engine):
         file_record(text="a", expected="a b", suzume="ab")
         assert parse_json(run(defect_resolve(ids="")))["status"] == "error"

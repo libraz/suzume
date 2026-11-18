@@ -438,11 +438,17 @@ def update(source: str, record: dict, changes: dict) -> dict:
     return _persist(source, updated, Path(record["_path"]).parent)
 
 
-def resolve(source: str, record: dict, note: str, output: str) -> Path:
-    """Move a record into ``resolved/`` as fixed, recording how it was closed."""
+def resolve(source: str, record: dict, note: str, output: str, resolution: str = RESOLUTION_FIXED) -> Path:
+    """Move a record into ``resolved/``, recording how and why it was closed.
+
+    ``fixed`` is the only resolution a later probe reports as a regression; the
+    judgment resolutions close an open record the way ``dismiss`` closes a new one.
+    """
+    if resolution not in RESOLUTIONS:
+        raise BugStoreError(f"resolution must be one of {RESOLUTIONS}")
     retired = dict(record)
     retired["status"] = "resolved"
-    retired["resolution"] = RESOLUTION_FIXED
+    retired["resolution"] = resolution
     retired["resolved_at"] = today()
     if note:
         retired["resolved_note"] = note
