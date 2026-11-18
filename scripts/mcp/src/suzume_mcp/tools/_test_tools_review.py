@@ -2,12 +2,13 @@
 
 import re
 
+from ..app import mcp
+from ..config import PROJECT_ROOT
 from ..core.suzume_cli import (
     get_expected_tokens_subprocess as get_expected_tokens,
 )
 from ..core.test_file_suggestions import suggest_test_files
 from ..core.test_file_utils import generate_id
-from ..server import PROJECT_ROOT, mcp
 from ._test_tools_common import (
     BANNED_ORACLE_KEYS,
     ORACLE_OVERRIDE_REMEDIATION,

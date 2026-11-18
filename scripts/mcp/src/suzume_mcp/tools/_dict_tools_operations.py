@@ -2,9 +2,10 @@
 
 import re
 
+from ..app import mcp
+from ..config import PROJECT_ROOT
 from ..core.mecab import mecab_analyze
 from ..core.suzume_cli import get_suzume_rules_subprocess, map_mecab_pos_subprocess
-from ..server import PROJECT_ROOT, mcp
 from ._cli_freshness import stale_cli_guard
 from ._dict_tools_common import (
     CORE_DIR_PREFIX,

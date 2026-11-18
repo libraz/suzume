@@ -5,6 +5,7 @@ import subprocess
 from collections.abc import Iterable
 from pathlib import Path
 
+from ..config import PROJECT_ROOT
 from ..core.json_utils import json_error as _json_error  # noqa: F401
 from ..core.json_utils import json_result as _json_result  # noqa: F401
 from ..core.pos_mapping import normalize_pos
@@ -20,7 +21,6 @@ from ..core.test_file_utils import (
     normalize_test_file_name,
     save_json,
 )
-from ..server import PROJECT_ROOT
 
 # Per-case oracle overrides. Banned: a case that carries its own expectation for
 # Suzume silences that one case instead of generalizing the rule.

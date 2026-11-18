@@ -3,7 +3,6 @@
 from pathlib import Path
 from types import SimpleNamespace
 
-from suzume_mcp import server as _server  # noqa: F401
 from suzume_mcp.tools import _test_tools_common as common
 from tests.helpers import CORPUS_DIR
 

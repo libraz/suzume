@@ -9,13 +9,14 @@ import re
 from collections.abc import Callable
 from pathlib import Path
 
+from ..app import mcp
+from ..config import PROJECT_ROOT
 from ..core import bug_store
 from ..core.diff_utils import classify_surface_diff
 from ..core.file_utils import atomic_write_text
 from ..core.json_utils import json_error as _json_error
 from ..core.json_utils import json_result as _json_result
 from ..core.suzume_cli import get_expected_tokens_subprocess, get_suzume_surfaces
-from ..server import PROJECT_ROOT, mcp
 from ._cli_freshness import stale_cli_guard
 
 SKILL_DIR = PROJECT_ROOT / ".claude" / "skills" / "thread-quality-check"

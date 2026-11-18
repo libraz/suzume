@@ -4,6 +4,8 @@ import re
 from itertools import zip_longest
 from pathlib import Path
 
+from ..app import mcp
+from ..config import PROJECT_ROOT
 from ..core.diff_utils import classify_surface_diff
 from ..core.pos_mapping import normalize_pos
 from ..core.suzume_cli import (
@@ -22,7 +24,6 @@ from ..core.test_file_utils import (
     get_test_files,
     load_json,
 )
-from ..server import PROJECT_ROOT, mcp
 from ._cli_freshness import stale_cli_guard
 from ._test_tools_common import (
     _case_id,

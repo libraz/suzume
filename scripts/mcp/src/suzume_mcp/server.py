@@ -3,11 +3,7 @@
 from importlib import import_module
 from pathlib import Path
 
-from mcp.server.mcpserver import MCPServer
-
-from .config import PROJECT_ROOT  # noqa: F401 — re-exported for tools
-
-mcp = MCPServer("suzume")
+from .app import mcp
 
 # Import every tool module to register its decorated functions. Keeping this
 # discovery next to the server eliminates a second, manually maintained list:

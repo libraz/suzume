@@ -3,10 +3,10 @@
 import datetime
 from pathlib import Path
 
+from ..app import mcp
 from ..core import bug_store
 from ..core.json_utils import json_error
 from ..core.json_utils import json_result as _json_result
-from ..server import mcp
 from ._defect_tools_common import _entry, _kind_error, _parse_ids, _priority_error
 
 

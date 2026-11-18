@@ -63,8 +63,6 @@ def no_oracle_recompute(monkeypatch: pytest.MonkeyPatch) -> None:
     The drift check itself is exercised end to end in test_dict_oracle_check.py,
     which restores the real computation against a throwaway project.
     """
-    # The server registers every tool module; importing a tool module first enters the import cycle.
-    import suzume_mcp.server  # noqa: F401
     from suzume_mcp.tools import _dict_tools_common
 
     monkeypatch.setattr(

@@ -5,11 +5,12 @@ import subprocess
 
 import regex
 
+from ..app import mcp
+from ..config import PROJECT_ROOT
 from ..core.constants import katakana_to_hiragana
 from ..core.mecab import mecab_analyze
 from ..core.suzume_cli import existing_cli
 from ..core.suzume_utils import get_char_types
-from ..server import PROJECT_ROOT, mcp
 from ._cli_freshness import stale_cli_guard
 from ._dict_tools_common import (
     DISABLED_PREFIX,

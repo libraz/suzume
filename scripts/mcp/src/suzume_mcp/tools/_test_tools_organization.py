@@ -6,6 +6,8 @@ import math
 import re
 from pathlib import Path
 
+from ..app import mcp
+from ..config import PROJECT_ROOT
 from ..core.test_file_utils import (
     TEST_CASES_KEY,
     get_cases,
@@ -16,7 +18,6 @@ from ..core.test_file_utils import (
     save_json,
     serialize_test_data,
 )
-from ..server import PROJECT_ROOT, mcp
 from ._test_tools_common import _json_error, _json_result, _load_test_cases
 
 MAX_TEST_CASES_PER_FILE = 100

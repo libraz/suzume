@@ -5,11 +5,11 @@ import tempfile
 from collections.abc import Awaitable, Callable, Iterable, Iterator
 from pathlib import Path
 
+from ..config import PROJECT_ROOT
 from ..core.file_utils import atomic_write_text as _atomic_write_text
 from ..core.json_utils import json_error as _json_error
 from ..core.json_utils import json_result as _json_result
 from ..core.suzume_cli import get_cli_path, recompile_dic
-from ..server import PROJECT_ROOT
 from ._test_tools_common import oracle_drift
 
 # User dictionary categories

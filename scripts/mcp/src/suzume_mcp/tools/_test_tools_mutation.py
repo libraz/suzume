@@ -1,5 +1,7 @@
 """Test corpus mutation MCP tools."""
 
+from ..app import mcp
+from ..config import PROJECT_ROOT
 from ..core.constants import VALID_POS
 from ..core.suzume_cli import (
     get_expected_tokens_batch_subprocess,
@@ -16,7 +18,6 @@ from ..core.test_file_utils import (
     normalize_test_file_name,
     save_json,
 )
-from ..server import PROJECT_ROOT, mcp
 from ._test_tools_common import (
     ORACLE_OVERRIDE_REMEDIATION,
     _case_locations,
