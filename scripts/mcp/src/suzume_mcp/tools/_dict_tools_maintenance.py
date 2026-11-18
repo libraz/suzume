@@ -13,7 +13,9 @@ from ..server import PROJECT_ROOT, mcp
 from ._cli_freshness import stale_cli_guard
 from ._dict_tools_common import (
     DISABLED_PREFIX,
+    GODAN_ROWS,
     USER_CATEGORIES,
+    USER_DIR_PREFIX,
     VALID_CONJ,
     VALID_POS,
     _apply_recompile_outcome,
@@ -21,6 +23,7 @@ from ._dict_tools_common import (
     _dict_files,
     _invalid_value,
     _iter_dictionary_lines,
+    _join_lines,
     _json_error,
     _json_result,
     _recompile_core_dic,
@@ -32,15 +35,7 @@ from ._dict_tools_common import (
 _CONJ_LABELS = {
     "I_ADJ": "I-adjectives (い形容詞)",
     "NA_ADJ": "NA-adjectives (な形容詞)",
-    "GODAN_KA": "Godan-KA verbs (カ行五段)",
-    "GODAN_GA": "Godan-GA verbs (ガ行五段)",
-    "GODAN_SA": "Godan-SA verbs (サ行五段)",
-    "GODAN_TA": "Godan-TA verbs (タ行五段)",
-    "GODAN_NA": "Godan-NA verbs (ナ行五段)",
-    "GODAN_BA": "Godan-BA verbs (バ行五段)",
-    "GODAN_MA": "Godan-MA verbs (マ行五段)",
-    "GODAN_RA": "Godan-RA verbs (ラ行五段)",
-    "GODAN_WA": "Godan-WA verbs (ワ行五段)",
+    **{f"GODAN_{suffix}": f"Godan-{suffix} verbs ({row}五段)" for suffix, row in GODAN_ROWS.items()},
     "ICHIDAN": "Ichidan verbs (一段動詞)",
     "SURU": "Suru verbs (サ変)",
     "KURU": "Kuru verbs (カ変)",
@@ -259,7 +254,7 @@ async def dict_sort(
             output_lines.append(disabled["raw"])
     output_lines.extend(trailing_comments)
 
-    sorted_content = "\n".join(output_lines) + "\n"
+    sorted_content = _join_lines(output_lines)
 
     result: dict = {
         "file": target_rel,
@@ -283,7 +278,7 @@ async def dict_sort(
 
     recompile_status, error, oracle = await _write_files_and_recompile(
         {filepath: sorted_content},
-        _recompile_user_dic if target_rel.startswith("data/user/") else _recompile_core_dic,
+        _recompile_user_dic if target_rel.startswith(USER_DIR_PREFIX) else _recompile_core_dic,
         oracle_check=oracle_check,
     )
     return _apply_recompile_outcome({**result, **oracle}, recompile_status, error)
@@ -348,7 +343,7 @@ async def dict_remove_matching(
                 if surface in surfaces_to_remove:
                     continue
             new_lines.append(line)
-        updates[filepath] = "\n".join(new_lines) + "\n"
+        updates[filepath] = _join_lines(new_lines)
 
     recompile_status, error, oracle = await _write_files_and_recompile(
         updates,
@@ -473,8 +468,8 @@ async def dict_cleanup(
     keep_path = output_dir / f"{filepath.stem}_keep.tsv"
     noise_path = output_dir / f"{filepath.stem}_noise.tsv"
 
-    _atomic_write_text(keep_path, "\n".join(keep_lines) + "\n")
-    _atomic_write_text(noise_path, "\n".join(noise_lines) + "\n")
+    _atomic_write_text(keep_path, _join_lines(keep_lines))
+    _atomic_write_text(noise_path, _join_lines(noise_lines))
 
     result["applied"] = True
     result["keep_file"] = str(keep_path.relative_to(PROJECT_ROOT))

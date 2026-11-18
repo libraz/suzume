@@ -1,4 +1,4 @@
-"""Dictionary tools ported from dict_tool.pl - MCP tool registration."""
+"""Shared helpers for the dictionary MCP tools: POS/conjugation tables, entry loading, and atomic write-and-recompile."""
 
 import asyncio
 import tempfile
@@ -96,17 +96,25 @@ VALID_POS = tuple(POS_ALIASES)
 # Marker that keeps an entry in its source file while excluding it from compilation.
 DISABLED_PREFIX = "#DISABLED# "
 
+CORE_DIR_PREFIX = "data/core/"
+USER_DIR_PREFIX = "data/user/"
+
+# Godan conjugation rows: dictionary suffix -> kana row label.
+GODAN_ROWS = {
+    "KA": "カ行",
+    "GA": "ガ行",
+    "SA": "サ行",
+    "TA": "タ行",
+    "NA": "ナ行",
+    "BA": "バ行",
+    "MA": "マ行",
+    "RA": "ラ行",
+    "WA": "ワ行",
+}
+
 VALID_CONJ = [
     "ICHIDAN",
-    "GODAN_KA",
-    "GODAN_GA",
-    "GODAN_SA",
-    "GODAN_TA",
-    "GODAN_NA",
-    "GODAN_BA",
-    "GODAN_MA",
-    "GODAN_RA",
-    "GODAN_WA",
+    *(f"GODAN_{suffix}" for suffix in GODAN_ROWS),
     "SURU",
     "KURU",
     "I_ADJ",
@@ -171,19 +179,9 @@ def _map_conj_type(token: dict) -> str:
     ctype = token.get("conj_type", "")
     if "一段" in ctype:
         return "ICHIDAN"
-    for row, name in [
-        ("カ行", "GODAN_KA"),
-        ("ガ行", "GODAN_GA"),
-        ("サ行", "GODAN_SA"),
-        ("タ行", "GODAN_TA"),
-        ("ナ行", "GODAN_NA"),
-        ("バ行", "GODAN_BA"),
-        ("マ行", "GODAN_MA"),
-        ("ラ行", "GODAN_RA"),
-        ("ワ行", "GODAN_WA"),
-    ]:
+    for suffix, row in GODAN_ROWS.items():
         if f"五段・{row}" in ctype:
-            return name
+            return f"GODAN_{suffix}"
     if "サ変" in ctype:
         return "SURU"
     if "カ変" in ctype:
@@ -234,7 +232,17 @@ def _load_dictionary() -> tuple[list[dict], dict[str, list[dict]]]:
 
 
 def _user_file(user: str) -> str:
-    return f"data/user/{user}.tsv"
+    return f"{USER_DIR_PREFIX}{user}.tsv"
+
+
+def _target_file(user: str, pos: str) -> str:
+    """Destination file for a new entry: the user dictionary, else the POS's core file."""
+    return _user_file(user) if user else POS_TO_FILE[pos]
+
+
+def _join_lines(lines: list[str]) -> str:
+    """Join lines into file content with a trailing newline."""
+    return "\n".join(lines) + "\n"
 
 
 def _all_user_files() -> list[str]:
@@ -274,7 +282,7 @@ def _with_appended_lines(path: Path, lines: list[str]) -> str:
     """Return the file content with complete lines appended."""
     previous = path.read_text(encoding="utf-8") if path.exists() else ""
     separator = "" if not previous or previous.endswith("\n") else "\n"
-    return previous + separator + "\n".join(lines) + "\n"
+    return previous + separator + _join_lines(lines)
 
 
 def _token_to_dict(token: dict) -> dict:

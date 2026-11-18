@@ -5,7 +5,6 @@ from ..core.suzume_cli import get_suzume_rules_subprocess
 from ..server import PROJECT_ROOT, mcp
 from ._cli_freshness import stale_cli_guard
 from ._dict_tools_common import (
-    POS_TO_FILE,
     USER_CATEGORIES,
     VALID_CONJ,
     VALID_POS,
@@ -19,6 +18,7 @@ from ._dict_tools_common import (
     _recompile_core_dic,
     _recompile_response,
     _recompile_user_dic,
+    _target_file,
     _user_file,
     _validate_surface,
     _with_appended_lines,
@@ -118,7 +118,7 @@ async def dict_bulk_add(
     if not lines_to_append:
         return _json_result({"status": "ok", **fields})
 
-    target_rel = _user_file(user) if user else POS_TO_FILE.get(pos, "data/core/nouns.tsv")
+    target_rel = _target_file(user, pos)
     target_file = PROJECT_ROOT / target_rel
     recompile_status, error, oracle = await _write_files_and_recompile(
         {target_file: _with_appended_lines(target_file, lines_to_append)},

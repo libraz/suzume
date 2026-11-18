@@ -7,9 +7,10 @@ from ..core.suzume_cli import get_suzume_rules_subprocess, map_mecab_pos_subproc
 from ..server import PROJECT_ROOT, mcp
 from ._cli_freshness import stale_cli_guard
 from ._dict_tools_common import (
+    CORE_DIR_PREFIX,
     DISABLED_PREFIX,
-    POS_TO_FILE,
     USER_CATEGORIES,
+    USER_DIR_PREFIX,
     VALID_CONJ,
     VALID_POS,
     _canonical_pos,
@@ -19,6 +20,7 @@ from ._dict_tools_common import (
     _files_with_pos,
     _group_by_pos,
     _invalid_value,
+    _join_lines,
     _json_error,
     _json_result,
     _load_all_entries,
@@ -27,6 +29,7 @@ from ._dict_tools_common import (
     _recompile_core_dic,
     _recompile_response,
     _recompile_user_dic,
+    _target_file,
     _to_dict_pos,
     _token_to_dict,
     _user_file,
@@ -73,8 +76,8 @@ async def dict_check(word: str) -> str:
             }
     elif len(tokens) > 1:
         result["suggestion"] = {
-            "entry": f"{word}\tNOUN",
-            "command": f'dict_add word="{word}" pos="NOUN" force=True',
+            "entry": _entry_line(word, "NOUN"),
+            "command": f"{_dict_add_command(word, 'NOUN')} force=True",
         }
 
     return _json_result(result)
@@ -181,7 +184,7 @@ async def dict_add(
         )
 
     entry_line = _entry_line(word, pos, conj_type)
-    target_rel = _user_file(user) if user else POS_TO_FILE.get(pos, "data/core/nouns.tsv")
+    target_rel = _target_file(user, pos)
     fields = {"word": word, "entry": entry_line, "file": target_rel}
     if dry_run:
         return _json_result({"status": "ok", **fields, "dry_run": True})
@@ -219,7 +222,7 @@ async def dict_remove(
     if user:
         candidates = [entry for entry in candidates if entry["file"] == _user_file(user)]
     else:
-        candidates = [entry for entry in candidates if entry["file"].startswith("data/core/")]
+        candidates = [entry for entry in candidates if entry["file"].startswith(CORE_DIR_PREFIX)]
     if pos:
         canonical = _canonical_pos(pos)
         candidates = [entry for entry in candidates if _canonical_pos(entry.get("pos", "")) == canonical]
@@ -311,7 +314,7 @@ async def _toggle_entry(word: str, pos: str, user: str, dry_run: bool, oracle_ch
 
     lines[selected["index"]] = DISABLED_PREFIX + line if disable else line[len(DISABLED_PREFIX) :]
     recompile_status, error, oracle = await _write_files_and_recompile(
-        {selected["path"]: "\n".join(lines) + "\n"},
+        {selected["path"]: _join_lines(lines)},
         _recompile_user_dic if user else _recompile_core_dic,
         oracle_check=oracle_check,
     )
@@ -392,10 +395,10 @@ async def dict_validate(fix: bool = False, oracle_check: bool = True) -> str:
     # Cross-dictionary duplicates (core vs user)
     _, all_by_surface = _load_all_entries()
     cross_duplicates = []
-    for surface, all_entries in all_by_surface.items():
-        for canonical_pos, pos_entries in _group_by_pos(all_entries).items():
+    for surface, surface_entries in all_by_surface.items():
+        for canonical_pos, pos_entries in _group_by_pos(surface_entries).items():
             files = {entry["file"] for entry in pos_entries}
-            if any(f.startswith("data/core/") for f in files) and any(f.startswith("data/user/") for f in files):
+            if any(f.startswith(CORE_DIR_PREFIX) for f in files) and any(f.startswith(USER_DIR_PREFIX) for f in files):
                 cross_duplicates.append({"surface": surface, "pos": canonical_pos, "files": sorted(files)})
 
     result: dict = {
@@ -429,7 +432,7 @@ async def dict_validate(fix: bool = False, oracle_check: bool = True) -> str:
             file_lines = filepath.read_text(encoding="utf-8").splitlines()
             remove_nums = {ln for f, ln in lines_to_remove if f == file_rel}
             new_lines = [line for idx, line in enumerate(file_lines, 1) if idx not in remove_nums]
-            updates[filepath] = "\n".join(new_lines) + "\n"
+            updates[filepath] = _join_lines(new_lines)
 
         recompile_status, error, oracle = await _write_files_and_recompile(
             updates, _recompile_core_dic, oracle_check=oracle_check
