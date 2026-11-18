@@ -3,7 +3,7 @@
     "suzume": {
       "type": "stdio",
       "command": "sh",
-      "args": ["-c", "cd scripts/mcp && exec rye run suzume-mcp"]
+      "args": ["-c", "cd scripts/mcp && exec uv run --locked suzume-mcp"]
     }
   }
 }
