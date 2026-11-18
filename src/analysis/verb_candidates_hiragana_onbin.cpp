@@ -580,12 +580,22 @@ bool listedVerbOwnsOneMoraStem(const std::vector<char32_t>& codepoints, size_t s
   return false;
 }
 
-// A listed noun, or a katakana run, closes right before a one-mora verb stem.
+// A listed noun, a katakana run, or a quantity (numeral + counter run, 二度,
+// 三人) closes right before a one-mora verb stem.
 bool nominalClosesBeforeOneMoraStem(const std::vector<char32_t>& codepoints, size_t start_pos,
                                     const dictionary::DictionaryManager* dict_manager) {
   constexpr size_t kMaxNounMorae = 4;
   if (start_pos == 0 || start_pos >= codepoints.size() || dict_manager == nullptr) {
     return false;
+  }
+  for (size_t numeral_end = start_pos; numeral_end > 0 && start_pos - numeral_end < kMaxNounMorae; --numeral_end) {
+    if (normalize::isNumeralCodepoint(codepoints[numeral_end - 1])) {
+      if (numeral_end < start_pos &&
+          vh::counterKanjiRunEnd(dict_manager, codepoints, numeral_end, start_pos) == start_pos) {
+        return true;
+      }
+      break;
+    }
   }
   return normalize::classifyChar(codepoints[start_pos - 1]) == normalize::CharType::Katakana ||
          hasDictionaryEntryEndingAt(*dict_manager, codepoints, lookbehindStart(start_pos, kMaxNounMorae), start_pos,

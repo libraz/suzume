@@ -731,6 +731,138 @@
       ],
       "id": "1_shita",
       "input": "1回見した"
+    },
+    {
+      "description": "二度みた - regression test",
+      "expected": [
+        {
+          "lemma": "二度",
+          "pos": "Noun",
+          "surface": "二度"
+        },
+        {
+          "lemma": "みる",
+          "pos": "Verb",
+          "surface": "み"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "mita_2",
+      "input": "二度みた"
+    },
+    {
+      "description": "三回みた - regression test",
+      "expected": [
+        {
+          "lemma": "三回",
+          "pos": "Noun",
+          "surface": "三回"
+        },
+        {
+          "lemma": "みる",
+          "pos": "Verb",
+          "surface": "み"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "mita_3",
+      "input": "三回みた"
+    },
+    {
+      "description": "2度みた - regression test",
+      "expected": [
+        {
+          "lemma": "2度",
+          "pos": "Noun",
+          "surface": "2度"
+        },
+        {
+          "lemma": "みる",
+          "pos": "Verb",
+          "surface": "み"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "2_mita",
+      "input": "2度みた"
+    },
+    {
+      "description": "二人きた - regression test",
+      "expected": [
+        {
+          "lemma": "二人",
+          "pos": "Noun",
+          "surface": "二人"
+        },
+        {
+          "lemma": "くる",
+          "pos": "Verb",
+          "surface": "き"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "kita_3",
+      "input": "二人きた"
+    },
+    {
+      "description": "二度きた - regression test",
+      "expected": [
+        {
+          "lemma": "二度",
+          "pos": "Noun",
+          "surface": "二度"
+        },
+        {
+          "lemma": "くる",
+          "pos": "Verb",
+          "surface": "き"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "kita_4",
+      "input": "二度きた"
+    },
+    {
+      "description": "二度ねた - regression test",
+      "expected": [
+        {
+          "lemma": "二度",
+          "pos": "Noun",
+          "surface": "二度"
+        },
+        {
+          "lemma": "ねる",
+          "pos": "Verb",
+          "surface": "ね"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "neta",
+      "input": "二度ねた"
     }
   ],
   "description": "number_counter tests (part 2/2)",
