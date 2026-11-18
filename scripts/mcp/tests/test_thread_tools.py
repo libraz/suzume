@@ -4,8 +4,10 @@ import pytest
 
 from suzume_mcp.core import bug_store
 from suzume_mcp.core.diff_utils import normalize_width as _normalize_width
+from suzume_mcp.tools import thread_tools
 from suzume_mcp.tools.thread_tools import (
     _append_issue,
+    _compare_surfaces,
     _is_japanese,
     _load_progress,
     _process_lines,
@@ -344,3 +346,21 @@ class TestAppendIssue:
         _append_issue(9, "テスト文", issue)
 
         assert len(bug_store.load_open("thread")) == 1
+
+
+class TestScanAnalyzer:
+    def test_scan_judges_with_the_user_dict_setting_of_its_store(self, monkeypatch):
+        calls = []
+
+        def fake_cli(text, cli_path=None, skip_user_dict=False):
+            calls.append(skip_user_dict)
+            return ["テスト"]
+
+        monkeypatch.setattr(thread_tools, "get_suzume_surfaces", fake_cli)
+        monkeypatch.setattr(
+            thread_tools, "get_expected_tokens_subprocess", lambda text: ([{"surface": "テスト"}], None, None)
+        )
+
+        _compare_surfaces("テスト")
+
+        assert calls == [not bug_store.uses_user_dict(thread_tools.SCAN_SOURCE)]

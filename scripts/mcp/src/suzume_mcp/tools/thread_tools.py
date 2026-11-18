@@ -95,9 +95,8 @@ def _save_progress(progress: dict) -> None:
 
 def _compare_surfaces(text: str) -> dict:
     """Compare suzume CLI output vs expected surfaces."""
-    # Thread checking runs WITH user.dic (skip_user_dict=False) so that entries
-    # added via dict_add are reflected and defect_recheck can close the record.
-    suzume_surfaces = get_suzume_surfaces(text, skip_user_dict=False)
+    # Judged the way the store it files into is rechecked, so defect_recheck agrees.
+    suzume_surfaces = get_suzume_surfaces(text, skip_user_dict=not bug_store.uses_user_dict(SCAN_SOURCE))
     tokens, _, _ = get_expected_tokens_subprocess(text)
     expected_surfaces = [t["surface"] for t in tokens]
 
