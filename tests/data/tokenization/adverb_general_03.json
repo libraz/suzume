@@ -1195,6 +1195,50 @@
       ],
       "id": "tattta_watttatokorodesu",
       "input": "たった今終わったところです"
+    },
+    {
+      "description": "Degree adverb warini at the start of a clause",
+      "expected": [
+        {
+          "lemma": "わりに",
+          "pos": "Adverb",
+          "surface": "わりに"
+        },
+        {
+          "lemma": "速い",
+          "pos": "Adjective",
+          "surface": "速い"
+        }
+      ],
+      "id": "warini_clause_initial",
+      "input": "わりに速い"
+    },
+    {
+      "description": "Degree adverb warini after a topic particle",
+      "expected": [
+        {
+          "lemma": "今日",
+          "pos": "Noun",
+          "surface": "今日"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "わりに",
+          "pos": "Adverb",
+          "surface": "わりに"
+        },
+        {
+          "lemma": "暖かい",
+          "pos": "Adjective",
+          "surface": "暖かい"
+        }
+      ],
+      "id": "warini_after_topic",
+      "input": "今日はわりに暖かい"
     }
   ],
   "description": "General adverbs (part 3/3)",

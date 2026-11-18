@@ -3317,6 +3317,257 @@
       ],
       "id": "nonitamonowo",
       "input": "私のにたものを"
+    },
+    {
+      "description": "Formal noun wari + ni after attributive no, before an adjective",
+      "expected": [
+        {
+          "lemma": "年",
+          "pos": "Noun",
+          "surface": "年"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "わり",
+          "pos": "Noun",
+          "surface": "わり"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "若い",
+          "pos": "Adjective",
+          "surface": "若い"
+        }
+      ],
+      "id": "wari_ni_after_no_before_adjective",
+      "input": "年のわりに若い"
+    },
+    {
+      "description": "Formal noun wari + ni after a verb, before an adjective",
+      "expected": [
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読む"
+        },
+        {
+          "lemma": "わり",
+          "pos": "Noun",
+          "surface": "わり"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "速い",
+          "pos": "Adjective",
+          "surface": "速い"
+        }
+      ],
+      "id": "wari_ni_after_verb_before_adjective",
+      "input": "読むわりに速い"
+    },
+    {
+      "description": "Formal noun wari + ni after an adjective, before an adjective",
+      "expected": [
+        {
+          "lemma": "高い",
+          "pos": "Adjective",
+          "surface": "高い"
+        },
+        {
+          "lemma": "わり",
+          "pos": "Noun",
+          "surface": "わり"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "まずい",
+          "pos": "Adjective",
+          "surface": "まずい"
+        }
+      ],
+      "id": "wari_ni_after_adjective_before_adjective",
+      "input": "高いわりにまずい"
+    },
+    {
+      "description": "Formal noun wari + ni after the attributive copula of a na-adjective",
+      "expected": [
+        {
+          "lemma": "静か",
+          "pos": "Adjective",
+          "surface": "静か"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "わり",
+          "pos": "Noun",
+          "surface": "わり"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "人",
+          "pos": "Noun",
+          "surface": "人"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "多い",
+          "pos": "Adjective",
+          "surface": "多い"
+        }
+      ],
+      "id": "wari_ni_after_attributive_copula",
+      "input": "静かなわりに人が多い"
+    },
+    {
+      "description": "Formal noun wari + ni after attributive no, before a kana adjective",
+      "expected": [
+        {
+          "lemma": "値段",
+          "pos": "Noun",
+          "surface": "値段"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "わり",
+          "pos": "Noun",
+          "surface": "わり"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "おいしい",
+          "pos": "Adjective",
+          "surface": "おいしい"
+        }
+      ],
+      "id": "wari_ni_after_no_before_kana_adjective",
+      "input": "値段のわりにおいしい"
+    },
+    {
+      "description": "Formal noun wari + ni after a past auxiliary, before a negated verb",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "わり",
+          "pos": "Noun",
+          "surface": "わり"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "太る",
+          "pos": "Verb",
+          "surface": "太ら"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "wari_ni_after_past_before_verb",
+      "input": "食べたわりに太らない"
+    },
+    {
+      "description": "Kanji wari + ni + verb stays a noun and a case particle",
+      "expected": [
+        {
+          "lemma": "割",
+          "pos": "Noun",
+          "surface": "割"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "合う",
+          "pos": "Verb",
+          "surface": "合わ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "kanji_wari_ni_au_control",
+      "input": "割に合わない"
+    },
+    {
+      "description": "A noun ending in wari followed by ni is not the formal noun or the adverb",
+      "expected": [
+        {
+          "lemma": "終わり",
+          "pos": "Noun",
+          "surface": "終わり"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "しよ"
+        },
+        {
+          "lemma": "う",
+          "pos": "Auxiliary",
+          "surface": "う"
+        }
+      ],
+      "id": "owari_ni_control",
+      "input": "終わりにしよう"
     }
   ],
   "description": "formal_noun tests",
