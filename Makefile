@@ -3,7 +3,7 @@
 
 .PHONY: help build test native-test native-test-nodebug native-bench mcp-test oracle-sync-check guardrails asan clean clean-build rebuild format format-check lint configure \
         wasm wasm-configure wasm-dict wasm-test wasm-bench wasm-clean wasm-rebuild wasm-linux dict \
-        python-build python-test python-wheel python-sync python-examples version-check binding-parity \
+        python-build python-dict python-test python-wheel python-sync python-examples version-check binding-parity \
         install uninstall examples examples-test embedded consumer-smoke cmake-smoke
 
 # Build directories
@@ -82,6 +82,7 @@ help:
 	@echo ""
 	@echo "Python binding targets:"
 	@echo "  make python-build - Build the shared C-ABI library (libsuzume)"
+	@echo "  make python-dict  - Compile the git-tracked dictionaries into the Python package"
 	@echo "  make python-test  - Run Python binding tests (pytest/ruff/mypy)"
 	@echo "  make python-wheel - Build a platform-tagged wheel"
 	@echo ""
