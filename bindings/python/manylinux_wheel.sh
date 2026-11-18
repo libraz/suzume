@@ -28,7 +28,7 @@ docker run --rm \
         export PATH="/tmp/suzume-uv/bin:$HOME/.local/bin:$PATH"
         export UV_MANAGED_PYTHON=1
         export UV_PYTHON="$(<bindings/python/.python-version)"
-        uv tool install "cmake==3.31.6"
+        uv tool install "cmake==4.4.5"
         bindings/python/build_wheel.sh
         for wheel in bindings/python/dist/*.whl; do
             bindings/python/smoke_wheel.sh "$wheel"

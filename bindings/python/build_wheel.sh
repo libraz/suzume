@@ -38,8 +38,8 @@ BUILD_DIR="${SUZUME_PYTHON_BUILD_DIR:-$PROJECT_ROOT/build-python-$BUILD_PLATFORM
 
 # uv supplies the interpreter, the build frontend and every packaging tool at
 # the versions pinned here, so nothing depends on the python found on PATH.
-WHEEL_VERSION="0.45.1"
-AUDITWHEEL_VERSION="6.4.2"
+WHEEL_VERSION="0.48.0"
+AUDITWHEEL_VERSION="6.8.2"
 PATCHELF_VERSION="0.19.3.0"
 export UV_MANAGED_PYTHON=1
 UV_PYTHON="$(<"$SCRIPT_DIR/.python-version")"
