@@ -51,7 +51,7 @@ Python binding (ctypes over the shared library):
 make python-test
 ```
 
-WebAssembly binding, which needs an Emscripten toolchain and Yarn:
+WebAssembly binding, which needs an Emscripten toolchain plus the Node and Yarn that [mise](https://mise.jdx.dev/) installs from `bindings/wasm/mise.toml` (the Yarn version is read from `packageManager` in `package.json`):
 
 ```bash
 source /path/to/emsdk/emsdk_env.sh

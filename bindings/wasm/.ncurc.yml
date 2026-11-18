@@ -7,9 +7,9 @@
 #
 # `reject` holds packages deliberately pinned below their latest release.
 # Add an entry (with the reason) whenever a package's newer version needs a
-# Node newer than the mise / CI pin. That pin is Node 22.x (see mise.toml
-# and node-version in .github/workflows/publish.yml);
-# a bump there is what unblocks such packages.
+# Node newer than the development pin. That pin is Node 26.x in mise.toml,
+# which CI reads too (jdx/mise-action); a bump there is what unblocks such
+# packages.
 #
 # A reject only stops ncu from rewriting the range; the held package is also
 # pinned exactly in package.json.

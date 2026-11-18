@@ -45,19 +45,21 @@ if [ "${lock_ver:-missing}" != "$canonical" ]; then
   echo "   refresh it with: (cd bindings/python && uv lock)"
 fi
 
-# Every workflow provisions Python with one uv release: ci.yml states it in its
-# workflow-level env and publish.yml mirrors it.
-uv_version() {
-  grep -Eo '^  UV_VERSION: *"[^"]+"' "$1" 2>/dev/null | grep -Eo '"[^"]+"' | tr -d '"' | head -1
+# Every workflow provisions its tools with one uv release and one mise release:
+# ci.yml states each in its workflow-level env and publish.yml mirrors it.
+workflow_env() {
+  grep -Eo "^  $2: *\"[^\"]+\"" "$1" 2>/dev/null | grep -Eo '"[^"]+"' | tr -d '"' | head -1
 }
-ci_uv=$(uv_version .github/workflows/ci.yml)
-publish_uv=$(uv_version .github/workflows/publish.yml)
-if [ -z "$ci_uv" ]; then
-  echo "❌ ci.yml UV_VERSION (.github/workflows/ci.yml): missing"
-  status=1
-else
-  check "publish.yml UV_VERSION" .github/workflows/publish.yml "${publish_uv:-missing}" "$ci_uv"
-fi
+for tool_var in UV_VERSION MISE_VERSION; do
+  ci_ver=$(workflow_env .github/workflows/ci.yml "$tool_var")
+  publish_ver=$(workflow_env .github/workflows/publish.yml "$tool_var")
+  if [ -z "$ci_ver" ]; then
+    echo "❌ ci.yml $tool_var (.github/workflows/ci.yml): missing"
+    status=1
+  else
+    check "publish.yml $tool_var" .github/workflows/publish.yml "${publish_ver:-missing}" "$ci_ver"
+  fi
+done
 
 if [ "$status" -eq 0 ]; then
   echo "All version mirrors consistent: $canonical"

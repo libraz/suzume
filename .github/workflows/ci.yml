@@ -24,6 +24,9 @@ env:
   # The uv release every Python environment is provisioned with (scripts/mcp,
   # bindings/python). Each project's uv.lock must stay readable by it.
   UV_VERSION: "0.13.9"
+  # The mise release that provisions Node, and Yarn from packageManager, out of
+  # bindings/wasm/mise.toml, the same way a local checkout does.
+  MISE_VERSION: "2026.11.10"
 
 jobs:
   lint:
@@ -33,12 +36,10 @@ jobs:
         working-directory: bindings/wasm
     steps:
       - uses: actions/checkout@v7
-      - run: corepack enable
-      - uses: actions/setup-node@v7
+      - uses: jdx/mise-action@v5
         with:
-          node-version: 22
-          cache: yarn
-          cache-dependency-path: bindings/wasm/yarn.lock
+          version: ${{ env.MISE_VERSION }}
+          working_directory: bindings/wasm
       - uses: astral-sh/setup-uv@v10.3.3
         with:
           version: ${{ env.UV_VERSION }}
@@ -146,12 +147,10 @@ jobs:
       - uses: mymindstorm/setup-emsdk@v16
         with:
           version: 6.0.13
-      - run: corepack enable
-      - uses: actions/setup-node@v7
+      - uses: jdx/mise-action@v5
         with:
-          node-version: 22
-          cache: yarn
-          cache-dependency-path: bindings/wasm/yarn.lock
+          version: ${{ env.MISE_VERSION }}
+          working_directory: bindings/wasm
       - uses: astral-sh/setup-uv@v10.3.3
         with:
           version: ${{ env.UV_VERSION }}
