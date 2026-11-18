@@ -311,25 +311,25 @@ void addBarredHostRules(const core::LatticeEdge& prev, const core::LatticeEdge& 
   const bool barred_kanji_formal_noun = kana_spelled_formal_noun && prev.pos == core::PartOfSpeech::Noun &&
                                         !prev.surface.empty() &&
                                         normalize::isKanjiCodepoint(utf8::decodeLastChar(prev.surface));
-  if (barred_conjunction_host || barred_focus_particle_host || barred_kanji_formal_noun) {
+  // A kana conjunction ending in a te-form cannot govern a subsidiary that
+  // needs a predicate te-form host: that ending is the te-form of the
+  // predicate inside it (そう+し+て+おく), which the productive split states.
+  const std::string_view next_lemma = next.lemma.empty() ? next.surface : next.lemma;
+  const bool te_form_kana = grammar::isPureHiragana(prev.surface) && utf8::endsWithAny(prev.surface, {"て", "で"});
+  const bool connective_before_subsidiary =
+      prev.pos == core::PartOfSpeech::Conjunction && te_form_kana && grammar::isTeFormSubsidiaryLemma(next_lemma);
+  if (barred_conjunction_host || barred_focus_particle_host || barred_kanji_formal_noun ||
+      connective_before_subsidiary) {
     SUZUME_CONNECTION_ADD(bonus, cost::kProhibitive);
   }
   const bool conjunction_before_hiragana_de = prev.pos == core::PartOfSpeech::Conjunction &&
                                               next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
                                               next.surface == "で";
-  // A closed conjunction or adverb spelled in kana and ending in a te-form
-  // cannot govern a subsidiary that needs a predicate te-form host: that
-  // ending is the te-form of the predicate inside it (そう+し+て+おく,
-  // かえっ+て+くる), which the productive split states.
-  const std::string_view next_lemma = next.lemma.empty() ? next.surface : next.lemma;
-  const bool closed_te_form_before_subsidiary =
-      (prev.pos == core::PartOfSpeech::Conjunction || prev.pos == core::PartOfSpeech::Adverb) &&
-      grammar::isPureHiragana(prev.surface) && utf8::endsWithAny(prev.surface, {"て", "で"}) &&
-      grammar::isTeFormSubsidiaryLemma(next_lemma);
-  if (closed_te_form_before_subsidiary) {
-    SUZUME_CONNECTION_ADD(bonus, cost::kProhibitive);
-  }
-  if (conjunction_before_hiragana_de) {
+  // An adverb modifies a lexical verb freely, so only the directional
+  // subsidiary is weighed against it, by cost (かえっ+て+くる over かえって+くる).
+  const bool adverb_te_before_directional =
+      prev.pos == core::PartOfSpeech::Adverb && te_form_kana && utf8::equalsAny(next.surface, {"いく", "ゆく", "くる"});
+  if (conjunction_before_hiragana_de || adverb_te_before_directional) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
 }
