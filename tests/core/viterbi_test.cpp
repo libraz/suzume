@@ -286,5 +286,20 @@ TEST(ViterbiTest, LeavesTheSameAspectEdgeAloneWhenItDoesNotEndTheSentence) {
   EXPECT_NE(result.path[0], noun_id);
 }
 
+// Path costs are sums of products, and every build must round each product
+// before the sum, or scores differ between targets that fuse a*b+c and those
+// that do not. (1+2^-12)^2 rounds to 1+2^-11 as a float, so the separate
+// product cancels exactly against -(1+2^-11) while a fused one leaves 2^-24.
+TEST(ViterbiTest, RoundsAProductBeforeAddingToIt) {
+  constexpr float kOnePlusTwoPowMinus12 = 1.0F + (1.0F / 4096.0F);
+  constexpr float kOnePlusTwoPowMinus11 = 1.0F + (1.0F / 2048.0F);
+  volatile float factor = kOnePlusTwoPowMinus12;
+  volatile float addend = -kOnePlusTwoPowMinus11;
+  const float lhs = factor;
+  const float rhs = factor;
+  const float offset = addend;
+  EXPECT_EQ(lhs * rhs + offset, 0.0F);
+}
+
 }  // namespace
 }  // namespace suzume::core
