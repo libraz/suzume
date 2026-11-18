@@ -451,6 +451,28 @@
       ],
       "id": "kita_2",
       "input": "バスきた"
+    },
+    {
+      "description": "こどもがくる - regression test",
+      "expected": [
+        {
+          "lemma": "こども",
+          "pos": "Noun",
+          "surface": "こども"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "くる",
+          "pos": "Verb",
+          "surface": "くる"
+        }
+      ],
+      "id": "kodomogakuru",
+      "input": "こどもがくる"
     }
   ],
   "description": "Irregular verbs (する、くる) (part 2/2)",

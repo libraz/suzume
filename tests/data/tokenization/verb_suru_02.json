@@ -1865,6 +1865,33 @@
       ],
       "id": "nekoganigatenamonowo_suru",
       "input": "ねこがにがてなものを確認する"
+    },
+    {
+      "description": "結果を発表し、 - regression test",
+      "expected": [
+        {
+          "lemma": "結果",
+          "pos": "Noun",
+          "surface": "結果"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "発表",
+          "pos": "Noun",
+          "surface": "発表"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        }
+      ],
+      "id": "wo_shi",
+      "input": "結果を発表し、"
     }
   ],
   "description": "Suru-verb patterns with subsidiary verbs - MeCab互換分割 (part 2/2)",

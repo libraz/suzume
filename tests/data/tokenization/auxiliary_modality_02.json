@@ -1630,6 +1630,131 @@
       ],
       "id": "goji_ushichibandeshita",
       "input": "ごじゅうしちばんでした"
+    },
+    {
+      "description": "まちです - regression test",
+      "expected": [
+        {
+          "lemma": "まち",
+          "pos": "Noun",
+          "surface": "まち"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "machidesu",
+      "input": "まちです"
+    },
+    {
+      "description": "まちだった - regression test",
+      "expected": [
+        {
+          "lemma": "まち",
+          "pos": "Noun",
+          "surface": "まち"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "machidattta",
+      "input": "まちだった"
+    },
+    {
+      "description": "これはまちだ - regression test",
+      "expected": [
+        {
+          "lemma": "これ",
+          "pos": "Pronoun",
+          "surface": "これ"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "まち",
+          "pos": "Noun",
+          "surface": "まち"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "korehamachida",
+      "input": "これはまちだ"
+    },
+    {
+      "description": "ねこのえさです - regression test",
+      "expected": [
+        {
+          "lemma": "ねこ",
+          "pos": "Noun",
+          "surface": "ねこ"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "えさ",
+          "pos": "Noun",
+          "surface": "えさ"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "nekonoesadesu",
+      "input": "ねこのえさです"
+    },
+    {
+      "description": "ただ今日は休みだ - regression test",
+      "expected": [
+        {
+          "lemma": "ただ",
+          "pos": "Conjunction",
+          "surface": "ただ"
+        },
+        {
+          "lemma": "今日",
+          "pos": "Noun",
+          "surface": "今日"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "休み",
+          "pos": "Noun",
+          "surface": "休み"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "tada_ha_mida",
+      "input": "ただ今日は休みだ"
     }
   ],
   "description": "Modality auxiliaries (たい、そう、らしい) (part 2/2)",

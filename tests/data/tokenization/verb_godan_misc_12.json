@@ -624,6 +624,106 @@
       ],
       "id": "ikita",
       "input": "いきた"
+    },
+    {
+      "description": "昔ありき - regression test",
+      "expected": [
+        {
+          "lemma": "昔",
+          "pos": "Noun",
+          "surface": "昔"
+        },
+        {
+          "lemma": "ある",
+          "pos": "Verb",
+          "surface": "あり"
+        },
+        {
+          "lemma": "き",
+          "pos": "Auxiliary",
+          "surface": "き"
+        }
+      ],
+      "id": "ariki",
+      "input": "昔ありき"
+    },
+    {
+      "description": "波寄せる - regression test",
+      "expected": [
+        {
+          "lemma": "波",
+          "pos": "Noun",
+          "surface": "波"
+        },
+        {
+          "lemma": "寄せる",
+          "pos": "Verb",
+          "surface": "寄せる"
+        }
+      ],
+      "id": "seru",
+      "input": "波寄せる"
+    },
+    {
+      "description": "あるくるま - regression test",
+      "expected": [
+        {
+          "lemma": "ある",
+          "pos": "Determiner",
+          "surface": "ある"
+        },
+        {
+          "lemma": "くるむ",
+          "pos": "Verb",
+          "surface": "くるま"
+        }
+      ],
+      "id": "arukuruma",
+      "input": "あるくるま"
+    },
+    {
+      "description": "行かんせいで - regression test",
+      "expected": [
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行か"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        },
+        {
+          "lemma": "せい",
+          "pos": "Noun",
+          "surface": "せい"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        }
+      ],
+      "id": "kanseide",
+      "input": "行かんせいで"
+    },
+    {
+      "description": "構います - regression test",
+      "expected": [
+        {
+          "lemma": "構う",
+          "pos": "Verb",
+          "surface": "構い"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "imasu",
+      "input": "構います"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 12/12)",
