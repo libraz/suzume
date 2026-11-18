@@ -286,6 +286,72 @@
       ],
       "id": "moumimasu",
       "input": "もうみます"
+    },
+    {
+      "description": "まだにた - regression test",
+      "expected": [
+        {
+          "lemma": "まだ",
+          "pos": "Adverb",
+          "surface": "まだ"
+        },
+        {
+          "lemma": "にる",
+          "pos": "Verb",
+          "surface": "に"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "madanita",
+      "input": "まだにた"
+    },
+    {
+      "description": "まだにます - regression test",
+      "expected": [
+        {
+          "lemma": "まだ",
+          "pos": "Adverb",
+          "surface": "まだ"
+        },
+        {
+          "lemma": "にる",
+          "pos": "Verb",
+          "surface": "に"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "madanimasu",
+      "input": "まだにます"
+    },
+    {
+      "description": "まだにて - regression test",
+      "expected": [
+        {
+          "lemma": "まだ",
+          "pos": "Adverb",
+          "surface": "まだ"
+        },
+        {
+          "lemma": "にる",
+          "pos": "Verb",
+          "surface": "に"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "madanite",
+      "input": "まだにて"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 12/12)",
