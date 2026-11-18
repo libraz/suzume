@@ -557,6 +557,43 @@ def postprocess_formal_noun_lemma(tokens: list[dict]) -> bool:
     return changed
 
 
+def _reanalyze_tail(tokens: list[dict], idx: int, head: str) -> list[dict]:
+    """Analyze ``head`` plus every token after ``idx`` again, as mapped tokens.
+
+    The whole tail goes in so the reanalyzed word keeps the context that reads it as one.
+    """
+    tail = head + "".join(following.get("surface", "") for following in tokens[idx + 1 :])
+    return [
+        {"surface": item["surface"], "pos": map_mecab_pos(item), "lemma": item.get("lemma", item["surface"])}
+        for item in mecab_analyze(tail)
+    ]
+
+
+def postprocess_hostless_mo_adverb(tokens: list[dict]) -> bool:
+    """Read a sentence-initial も + う-initial verb as the adverb もう.
+
+    A binding particle needs a host, so も cannot open a sentence; the
+    reference splits もうみます as も + 産み + ます because no host is checked.
+    The う is handed back to もう and the rest is analyzed again (もう+み+ます).
+    """
+    if len(tokens) < 2:
+        return False
+    first, verb = tokens[0], tokens[1]
+    if not (
+        first.get("surface") == "も"
+        and first.get("pos") == "Particle"
+        and verb.get("pos") == "Verb"
+        and len(verb.get("surface", "")) > 1
+        and verb.get("surface", "").startswith("う")
+    ):
+        return False
+    tokens[:] = [
+        {"surface": "もう", "pos": "Adverb", "lemma": "もう"},
+        *_reanalyze_tail(tokens, 1, verb["surface"][1:]),
+    ]
+    return True
+
+
 def postprocess_indefinite_pronoun_ka(tokens: list[dict]) -> bool:
     """Split the か of an indefinite pronoun off a verb the reference fused it into.
 
@@ -576,12 +613,7 @@ def postprocess_indefinite_pronoun_ka(tokens: list[dict]) -> bool:
             and tokens[idx - 1].get("pos") == "Pronoun"
             and tokens[idx - 1].get("surface") in {"何", "誰"}
         ):
-            # Analyze the whole tail so the verb keeps the context that reads it as one.
-            tail = surface[1:] + "".join(following.get("surface", "") for following in tokens[idx + 1 :])
-            rest = [
-                {"surface": item["surface"], "pos": map_mecab_pos(item), "lemma": item.get("lemma", item["surface"])}
-                for item in mecab_analyze(tail)
-            ]
+            rest = _reanalyze_tail(tokens, idx, surface[1:])
             tokens[idx:] = [{"surface": "か", "pos": "Particle", "lemma": "か"}, *rest]
             changed = True
             idx += 1 + len(rest)

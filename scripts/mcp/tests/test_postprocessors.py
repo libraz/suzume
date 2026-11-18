@@ -1893,6 +1893,27 @@ class TestIndefinitePronounKa:
         assert not postprocessors.postprocess_indefinite_pronoun_ka(tokens)
 
 
+class TestHostlessMoAdverb:
+    def test_sentence_initial_mo_before_a_u_verb_is_the_adverb_mou(self):
+        tokens = [
+            {"surface": "も", "pos": "Particle", "lemma": "も"},
+            {"surface": "うみ", "pos": "Verb", "lemma": "うむ"},
+            {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"},
+        ]
+        assert postprocessors.postprocess_hostless_mo_adverb(tokens)
+        assert [(t["surface"], t["lemma"]) for t in tokens] == [("もう", "もう"), ("み", "みる"), ("ます", "ます")]
+        assert tokens[0]["pos"] == "Adverb"
+
+    def test_mo_with_a_host_keeps_the_binding_particle(self):
+        tokens = [
+            {"surface": "子ども", "pos": "Noun", "lemma": "子ども"},
+            {"surface": "も", "pos": "Particle", "lemma": "も"},
+            {"surface": "うみ", "pos": "Verb", "lemma": "うむ"},
+            {"surface": "ます", "pos": "Auxiliary", "lemma": "ます"},
+        ]
+        assert not postprocessors.postprocess_hostless_mo_adverb(tokens)
+
+
 class TestGodanImperativeBeforeEmphaticYo:
     @staticmethod
     def _repaired(text):

@@ -129,6 +129,7 @@ postprocess_noncontinuative_te_nominal = postprocessor_nominals.postprocess_nonc
 postprocess_adjective_nominalizer = postprocessor_nominals.postprocess_adjective_nominalizer
 postprocess_prefix_before_verb = postprocessor_nominals.postprocess_prefix_before_verb
 postprocess_indefinite_pronoun_ka = postprocessor_nominals.postprocess_indefinite_pronoun_ka
+postprocess_hostless_mo_adverb = postprocessor_nominals.postprocess_hostless_mo_adverb
 postprocess_adverb_nominal_context = postprocessor_nominals.postprocess_adverb_nominal_context
 postprocess_adverbial_temporal_prefix = postprocessor_nominals.postprocess_adverbial_temporal_prefix
 postprocess_attributive_mamonaku = postprocessor_nominals.postprocess_attributive_mamonaku
@@ -243,6 +244,7 @@ POSTPROCESSORS: tuple[tuple[str, Callable[[list[dict]], bool]], ...] = (
     ("formal-noun-lemma", postprocess_formal_noun_lemma),
     ("adjective-nominalizer", postprocess_adjective_nominalizer),
     ("indefinite-pronoun-ka", postprocess_indefinite_pronoun_ka),
+    ("hostless-mo-adverb", postprocess_hostless_mo_adverb),
     ("verbal-nominalizer-mi", postprocess_verbal_nominalizer_mi),
     ("mu-verb-desiderative", postprocess_mu_verb_desiderative),
     ("shortened-causative-passive", postprocess_shortened_causative_passive),
