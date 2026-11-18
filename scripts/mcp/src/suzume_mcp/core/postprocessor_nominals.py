@@ -12,7 +12,7 @@ from .core_lexicon import core_headwords
 from .mecab import mecab_analyze
 from .merge_postprocessors import NIDAN_TERMINAL_KANA
 from .pos_mapping import map_mecab_pos
-from .postprocessor_common import reports_mutation
+from .postprocessor_common import PREDICATE_POS, reports_mutation
 
 _INTERJECTION_HOST_FINITE_COPULAS = COPULA_SURFACES - {"で", "な", "なら"}
 
@@ -339,7 +339,7 @@ def postprocess_attributive_mamonaku(tokens: list[dict]) -> bool:
         token = tokens[idx]
         if token.get("surface") != "間もなく" or token.get("pos") not in ("Adverb", "Adjective"):
             continue
-        if tokens[idx - 1].get("pos") not in ("Verb", "Adjective", "Auxiliary"):
+        if tokens[idx - 1].get("pos") not in PREDICATE_POS:
             continue
         tokens[idx : idx + 1] = [
             {"surface": "間", "pos": "Noun", "lemma": "間"},

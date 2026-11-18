@@ -3,6 +3,7 @@
 import regex
 
 from .mecab import is_single_token_of_pos
+from .postprocessor_common import PREDICATE_POS
 from .split_rules import base_from_mizenkei, bases_from_renyokei
 
 # Auxiliaries that do not conjugate like a verb. The negative auxiliary ない
@@ -79,7 +80,7 @@ def postprocess_sou_host(tokens: list[dict]) -> bool:
             and (following is None or following.get("pos") != "Verb")
         )
         predicate_host = previous is not None and (
-            previous.get("pos") in ("Verb", "Adjective", "Auxiliary")
+            previous.get("pos") in PREDICATE_POS
             or (previous.get("pos") == "Suffix" and previous.get("surface") == "さ")
             or nominal_stem_host
         )

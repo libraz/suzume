@@ -4,7 +4,7 @@ import regex
 
 from .mecab import is_single_token_of_pos, mecab_analyze
 from .merge_postprocessor_common import _continuative_verb_tokens
-from .postprocessor_common import reports_mutation
+from .postprocessor_common import PREDICATE_POS, reports_mutation
 from .split_rules import base_from_renyokei
 
 
@@ -292,7 +292,7 @@ _CLASSICAL_RAMU = "らむ"
 # predicate of one of these classes.  A nominal in that slot is what the plural
 # suffix of the same spelling follows instead (子供ら), which is why the host is
 # tested rather than the two kana alone.
-_RAMU_HOST_POS = ("Verb", "Adjective", "Auxiliary")
+_RAMU_HOST_POS = PREDICATE_POS
 
 
 def _godan_ka_stem_offset(host: str) -> int | None:

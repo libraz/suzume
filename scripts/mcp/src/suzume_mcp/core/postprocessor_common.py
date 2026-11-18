@@ -5,8 +5,9 @@ from functools import wraps
 
 from .mecab import mecab_analyze
 
-# Parts of speech whose continuative takes the conjunctive て/で.
-TE_FORM_HOST_POS = frozenset({"Verb", "Adjective", "Auxiliary"})
+# Inflecting predicates: the parts of speech whose continuative takes the
+# conjunctive て/で and whose terminal or attributive closes a clause.
+PREDICATE_POS = frozenset({"Verb", "Adjective", "Auxiliary"})
 
 
 def follows_te_form(tokens: list[dict], te_idx: int) -> bool:
@@ -20,7 +21,7 @@ def follows_te_form(tokens: list[dict], te_idx: int) -> bool:
         0 < te_idx < len(tokens)
         and tokens[te_idx].get("surface") in ("て", "で")
         and tokens[te_idx].get("pos") == "Particle"
-        and tokens[te_idx - 1].get("pos") in TE_FORM_HOST_POS
+        and tokens[te_idx - 1].get("pos") in PREDICATE_POS
     )
 
 
