@@ -3,7 +3,8 @@
 
 The C ABI transports compact numeric codes. The bindings use canonical native
 label functions where available and retain mirrors only for POS labels. This
-guard checks those mirrors plus error codes, flags, modes, and tag-filter bits.
+guard checks those mirrors, the native conjugation and extended-POS label
+tables, and error codes, flags, modes, and tag-filter bits.
 
 Usage:
   scripts/check_binding_labels.py
@@ -20,6 +21,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 CPP_TYPES = "src/core/types.cpp"
+CPP_CONJUGATION = "src/grammar/conjugation.cpp"
+C_ABI = "src/suzume_c.cpp"
 CPP_WRAPPER = "include/suzume/suzume.hpp"
 WASM_LABELS = "bindings/wasm/js/abi_labels.ts"
 PYTHON_LABELS = "bindings/python/src/suzume/_labels.py"
@@ -279,6 +282,51 @@ def compare(
     return True
 
 
+def check_distinct_labels(table_path: str, table_name: str, members: list[str], labels: list[str]) -> bool:
+    """A label is the only public name of its code, so it must identify one member."""
+    failed = False
+    owners: dict[str, str] = {}
+    for member, label in zip(members, labels, strict=True):
+        if not label:
+            print(f"❌ {table_path}: `{table_name}` has an empty label for {member}")
+            failed = True
+        elif label in owners:
+            print(f"❌ {table_path}: `{table_name}` gives {owners[label]} and {member} the same label {label!r}")
+            failed = True
+        else:
+            owners[label] = member
+    return failed
+
+
+def check_canonical_calls() -> bool:
+    """Every label accessor must decode through the one native owner of that label."""
+    failed = False
+    for path, function, callee in (
+        (CPP_WRAPPER, "posLabel", "suzume_pos_label"),
+        (CPP_WRAPPER, "conjugationTypeLabel", "suzume_conjugation_type_label"),
+        (CPP_WRAPPER, "conjugationFormLabel", "suzume_conjugation_form_label"),
+        (CPP_WRAPPER, "extendedPosLabel", "suzume_extended_pos_label"),
+        (C_ABI, "suzume_pos_label", "posToString"),
+        (C_ABI, "suzume_extended_pos_label", "extendedPosToString"),
+        (C_ABI, "suzume_conjugation_form_label", "conjFormToJapanese"),
+    ):
+        if callee not in function_body(path, function):
+            print(f"❌ {path}: `{function}` must call `{callee}`")
+            failed = True
+
+    wasm = Path(WASM_INDEX).read_text()
+    python = Path(PYTHON_API).read_text()
+    for label in ("pos", "conjugation_type", "conjugation_form", "extended_pos"):
+        for path, text, call in (
+            (WASM_INDEX, wasm, f"this.module._suzume_{label}_label"),
+            (PYTHON_API, python, f"_lib.suzume_{label}_label"),
+        ):
+            if call not in text:
+                print(f"❌ {path}: the {label} label must be decoded by `{call}`")
+                failed = True
+    return failed
+
+
 def normalized_name(name: str) -> str:
     return name.replace("_", "").lower()
 
@@ -313,13 +361,13 @@ def parse_default_literal(expression: str, source: str) -> bool | int | None:
 
 
 def c_initializer_defaults(function: str, fields: tuple[str, ...]) -> dict[str, bool | int | None]:
-    body = function_body("src/suzume_c.cpp", function)
+    body = function_body(C_ABI, function)
     defaults = {
-        field: parse_default_literal(expression, "src/suzume_c.cpp")
+        field: parse_default_literal(expression, C_ABI)
         for field, expression in re.findall(r"options->(\w+)\s*=\s*([^;]+);", body)
     }
     if set(defaults) != set(fields):
-        raise SystemExit(f"❌ src/suzume_c.cpp: `{function}` does not initialize exactly {fields}")
+        raise SystemExit(f"❌ {C_ABI}: `{function}` does not initialize exactly {fields}")
     return defaults
 
 
@@ -543,16 +591,6 @@ def main() -> int:
     os.chdir(repo_root())
 
     members = {name: enum_members(name, spec) for name, spec in MIRRORED_ENUMS.items()}
-    canonical_calls = {
-        "posLabel": "suzume_pos_label",
-        "conjugationTypeLabel": "suzume_conjugation_type_label",
-        "conjugationFormLabel": "suzume_conjugation_form_label",
-        "extendedPosLabel": "suzume_extended_pos_label",
-    }
-    for function, canonical in canonical_calls.items():
-        if canonical not in function_body(CPP_WRAPPER, function):
-            raise SystemExit(f"❌ {CPP_WRAPPER}: `{function}` must call `{canonical}`")
-
     expected = {
         "pos_en": cpp_switch_labels(CPP_TYPES, "posToString", "PartOfSpeech", members["PartOfSpeech"]),
         "pos_ja": cpp_switch_labels(CPP_TYPES, "posToJapanese", "PartOfSpeech", members["PartOfSpeech"]),
@@ -570,11 +608,18 @@ def main() -> int:
             cpp_local_table(CPP_WRAPPER, "posLabel", "japanese_labels"),
         ),
         (
-            "src/suzume_c.cpp",
+            C_ABI,
             "suzume_conjugation_type_label::labels",
             members["ConjugationType"],
             expected["conj_type"],
-            cpp_local_table("src/suzume_c.cpp", "suzume_conjugation_type_label", "labels"),
+            cpp_local_table(C_ABI, "suzume_conjugation_type_label", "labels"),
+        ),
+        (
+            CPP_CONJUGATION,
+            "kConjFormJapanese",
+            members["ConjForm"],
+            expected["conj_form"],
+            named_table(CPP_CONJUGATION, "kConjFormJapanese", "{", "}", r'"(?:\\.|[^"\\])*"', ("nullptr",)),
         ),
         (
             WASM_LABELS,
@@ -606,9 +651,15 @@ def main() -> int:
         ),
     ]
 
+    # Evaluate every group before combining so one failure cannot hide another.
     results = [compare(*check) for check in checks]
-    failed = any(results) or check_numeric_contracts() or check_default_contracts()
-    if failed:
+    results.append(
+        check_distinct_labels(CPP_TYPES, "extendedPosToString", members["ExtendedPOS"], expected["extended"])
+    )
+    results.append(check_canonical_calls())
+    results.append(check_numeric_contracts())
+    results.append(check_default_contracts())
+    if any(results):
         print()
         print("A mislabeled numeric code changes public output. Update every mirror above in enum order.")
         return 1
