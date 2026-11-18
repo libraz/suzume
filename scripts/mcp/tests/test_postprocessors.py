@@ -66,12 +66,7 @@ from suzume_mcp.core.postprocessors import (
     preprocess_for_mecab,
 )
 from suzume_mcp.core.suzume_utils import get_expected_tokens
-
-
-def _tok(surface, pos, **kw):
-    t = {"surface": surface, "pos": pos, "lemma": surface}
-    t.update(kw)
-    return t
+from tests.helpers import tok as _tok
 
 
 def test_postprocessor_registry_is_complete_and_has_unique_labels():

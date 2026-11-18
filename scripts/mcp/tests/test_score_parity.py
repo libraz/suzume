@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import importlib.util
 import json
 import sys
 from pathlib import Path
@@ -10,15 +9,12 @@ from types import ModuleType
 
 import pytest
 
+from tests.helpers import load_script
+
 
 @pytest.fixture(scope="module")
 def parity() -> ModuleType:
-    path = Path(__file__).resolve().parents[2] / "score_parity.py"
-    spec = importlib.util.spec_from_file_location("score_parity", path)
-    assert spec is not None and spec.loader is not None
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
+    return load_script("score_parity")
 
 
 def _fake_cli(tmp_path: Path, morphemes: list[dict], normalized: str) -> Path:

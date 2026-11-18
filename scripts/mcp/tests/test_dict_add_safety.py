@@ -1,7 +1,5 @@
 """Safety tests for single-entry dictionary mutation."""
 
-import asyncio
-import json
 import re
 from importlib import import_module
 from pathlib import Path
@@ -9,18 +7,11 @@ from pathlib import Path
 import pytest
 
 from suzume_mcp.tools.dict_tools import dict_add
+from tests.helpers import parse, run
 
 common = import_module("suzume_mcp.tools._dict_tools_common")
 operations = import_module("suzume_mcp.tools._dict_tools_operations")
 VALID_CONJ = common.VALID_CONJ
-
-
-def run(coro):
-    return asyncio.run(coro)
-
-
-def parse(result_str: str) -> dict:
-    return json.loads(result_str)
 
 
 class TestDictAdd:

@@ -1,12 +1,7 @@
 """Tests for split rules."""
 
 from suzume_mcp.core.split_rules import apply_suzume_split
-
-
-def _tok(surface, pos="名詞", **kw):
-    t = {"surface": surface, "pos": pos, "lemma": surface}
-    t.update(kw)
-    return t
+from tests.helpers import tok as _tok
 
 
 class TestFixedLeadingSearchUnit:

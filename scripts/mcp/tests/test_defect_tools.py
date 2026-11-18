@@ -1,8 +1,5 @@
 """Tests for the defect store MCP tools."""
 
-import asyncio
-import json
-
 import pytest
 
 from suzume_mcp.core import bug_store
@@ -21,14 +18,8 @@ from suzume_mcp.tools.defect_tools import (
     defect_update,
     defect_yield,
 )
-
-
-def run(coro):
-    return asyncio.run(coro)
-
-
-def parse_json(result: str) -> dict:
-    return json.loads(result)
+from tests.helpers import parse as parse_json
+from tests.helpers import run
 
 
 @pytest.fixture

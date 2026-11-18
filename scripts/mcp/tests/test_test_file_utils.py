@@ -13,6 +13,7 @@ from suzume_mcp.core.test_file_utils import (
     normalize_test_file_name,
     save_json,
 )
+from tests.helpers import CORPUS_DIR
 
 
 def test_cases_key_accepts_only_cpp_loader_schema():
@@ -82,7 +83,7 @@ def test_save_json_format(tmp_path):
 
 
 def test_find_test_by_input(tmp_path):
-    test_dir = tmp_path / "tests" / "data" / "tokenization"
+    test_dir = tmp_path / CORPUS_DIR
     test_dir.mkdir(parents=True)
     data = {"cases": [{"input": "テスト", "id": "test1"}]}
     (test_dir / "basic.json").write_text(json.dumps(data), encoding="utf-8")
@@ -95,7 +96,7 @@ def test_find_test_by_input(tmp_path):
 
 
 def test_find_test_by_input_not_found(tmp_path):
-    test_dir = tmp_path / "tests" / "data" / "tokenization"
+    test_dir = tmp_path / CORPUS_DIR
     test_dir.mkdir(parents=True)
     data = {"cases": [{"input": "テスト"}]}
     (test_dir / "basic.json").write_text(json.dumps(data), encoding="utf-8")
@@ -105,7 +106,7 @@ def test_find_test_by_input_not_found(tmp_path):
 
 
 def test_find_test_by_id_numeric(tmp_path):
-    test_dir = tmp_path / "tests" / "data" / "tokenization"
+    test_dir = tmp_path / CORPUS_DIR
     test_dir.mkdir(parents=True)
     data = {"cases": [{"input": "a"}, {"input": "b"}]}
     (test_dir / "basic.json").write_text(json.dumps(data), encoding="utf-8")
@@ -116,7 +117,7 @@ def test_find_test_by_id_numeric(tmp_path):
 
 
 def test_find_test_by_id_string(tmp_path):
-    test_dir = tmp_path / "tests" / "data" / "tokenization"
+    test_dir = tmp_path / CORPUS_DIR
     test_dir.mkdir(parents=True)
     data = {"cases": [{"input": "a", "id": "first"}, {"input": "b", "id": "second"}]}
     (test_dir / "basic.json").write_text(json.dumps(data), encoding="utf-8")
@@ -127,7 +128,7 @@ def test_find_test_by_id_string(tmp_path):
 
 
 def test_get_test_files(tmp_path):
-    test_dir = tmp_path / "tests" / "data" / "tokenization"
+    test_dir = tmp_path / CORPUS_DIR
     test_dir.mkdir(parents=True)
     (test_dir / "b.json").write_text("{}")
     (test_dir / "a.json").write_text("{}")

@@ -5,13 +5,13 @@ file, points the oracle subprocess at it, and compares the tool's report with
 test_needs_suzume_update's dry run over the same tree.
 """
 
-import asyncio
 import json
 from importlib import import_module
 
 import pytest
 
 from suzume_mcp.tools import test_tools as _test_tools  # noqa: F401
+from tests.helpers import CORPUS_DIR, parse, run
 
 dict_common = import_module("suzume_mcp.tools._dict_tools_common")
 operations = import_module("suzume_mcp.tools._dict_tools_operations")
@@ -21,14 +21,6 @@ read_tools = import_module("suzume_mcp.tools._test_tools_read")
 LEXICON_NOUN = "いりぐち"
 ORACLE_LEXICON_FILES = ("nouns.tsv", "verbs.tsv", "adjectives.tsv", "expressions.tsv")
 INPUTS = {"lexicon_noun": "ここはいりぐちだ", "unrelated": "りんごを食べる"}
-
-
-def run(coro):
-    return asyncio.run(coro)
-
-
-def parse(result: str) -> dict:
-    return json.loads(result)
 
 
 async def recompile_ok() -> str:
@@ -41,7 +33,7 @@ def project(tmp_path, monkeypatch):
     for name in ORACLE_LEXICON_FILES:
         (tmp_path / "data/core" / name).write_text("", encoding="utf-8")
     (tmp_path / "data/core/nouns.tsv").write_text(f"{LEXICON_NOUN}\tNOUN\n", encoding="utf-8")
-    test_dir = tmp_path / "tests/data/tokenization"
+    test_dir = tmp_path / CORPUS_DIR
     test_dir.mkdir(parents=True)
     cases = [
         {"id": case_id, "input": text, "expected": [{"surface": text, "pos": "Noun"}]}

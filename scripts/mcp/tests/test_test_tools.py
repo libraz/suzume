@@ -1,21 +1,12 @@
 """Tests for test tools (MCP tool functions)."""
 
-import asyncio
 import importlib
 import json
 
 from suzume_mcp.tools import test_tools as _tt
+from tests.helpers import parse, run, write_suite
 
 mutation_tools = importlib.import_module("suzume_mcp.tools._test_tools_mutation")
-
-
-def run(coro):
-    return asyncio.run(coro)
-
-
-def parse(result: str) -> dict:
-    """Parse JSON result from tool function."""
-    return json.loads(result)
 
 
 class TestTestShow:
@@ -170,30 +161,11 @@ class TestUseSuzumeIsRefused:
 class TestTestDelete:
     @staticmethod
     def write_suite(tmp_path):
-        target = tmp_path / "tests/data/tokenization/sample.json"
-        target.parent.mkdir(parents=True)
-        target.write_text(
-            json.dumps(
-                {
-                    "version": "1.0",
-                    "cases": [
-                        {
-                            "id": "keep",
-                            "input": "東京",
-                            "expected": [{"surface": "東京", "pos": "Noun"}],
-                        },
-                        {
-                            "id": "remove",
-                            "input": "りんご",
-                            "expected": [{"surface": "りんご", "pos": "Noun"}],
-                        },
-                    ],
-                },
-                ensure_ascii=False,
-            ),
-            encoding="utf-8",
-        )
-        return target
+        cases = [
+            {"id": "keep", "input": "東京", "expected": [{"surface": "東京", "pos": "Noun"}]},
+            {"id": "remove", "input": "りんご", "expected": [{"surface": "りんご", "pos": "Noun"}]},
+        ]
+        return write_suite(tmp_path, "sample", cases, header={"version": "1.0"}, compact=True)
 
     def test_delete_by_stable_id_applies_real_write(self, tmp_path, monkeypatch):
         target = self.write_suite(tmp_path)

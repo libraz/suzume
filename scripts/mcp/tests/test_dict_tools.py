@@ -1,8 +1,6 @@
 """Tests for dict tools (MCP tool functions)."""
 
-import asyncio
 import importlib
-import json
 import subprocess
 
 from suzume_mcp.tools.dict_tools import (
@@ -19,20 +17,13 @@ from suzume_mcp.tools.dict_tools import (
     dict_suggest,
     dict_validate,
 )
+from tests.helpers import parse, run
 
 bulk_tools = importlib.import_module("suzume_mcp.tools._dict_tools_bulk")
 maintenance_tools = importlib.import_module("suzume_mcp.tools._dict_tools_maintenance")
 operation_tools = importlib.import_module("suzume_mcp.tools._dict_tools_operations")
 common_tools = importlib.import_module("suzume_mcp.tools._dict_tools_common")
 _write_files_and_recompile = common_tools._write_files_and_recompile
-
-
-def run(coro):
-    return asyncio.run(coro)
-
-
-def parse(result_str: str) -> dict:
-    return json.loads(result_str)
 
 
 class TestDictCheck:

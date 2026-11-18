@@ -1,20 +1,12 @@
 """Tests for tokenization test organization tools."""
 
-import asyncio
-import importlib
 import json
+from importlib import import_module
 
 from suzume_mcp.tools import test_tools as _test_tools  # noqa: F401
+from tests.helpers import CORPUS_DIR, parse, run, write_suite
 
-organization = importlib.import_module("suzume_mcp.tools._test_tools_organization")
-
-
-def run(coro):
-    return asyncio.run(coro)
-
-
-def parse(result: str) -> dict:
-    return json.loads(result)
+organization = import_module("suzume_mcp.tools._test_tools_organization")
 
 
 def make_case(index: int, **extra) -> dict:
@@ -26,21 +18,6 @@ def make_case(index: int, **extra) -> dict:
     }
     case.update(extra)
     return case
-
-
-def write_suite(root, name: str, cases: list[dict]) -> None:
-    path = root / "tests" / "data" / "tokenization" / f"{name}.json"
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(
-        json.dumps(
-            {"version": "1.0", "description": f"{name} tests", "cases": cases},
-            ensure_ascii=False,
-            indent=2,
-            sort_keys=True,
-        )
-        + "\n",
-        encoding="utf-8",
-    )
 
 
 def test_audit_layout_reports_only_oversized_files(tmp_path, monkeypatch):
@@ -72,7 +49,7 @@ def test_split_file_dry_run_does_not_write(tmp_path, monkeypatch):
 
     data = parse(run(organization.test_split_file("large", max_cases=2)))
 
-    test_dir = tmp_path / "tests" / "data" / "tokenization"
+    test_dir = tmp_path / CORPUS_DIR
     assert data["applied"] is False
     assert [part["cases"] for part in data["parts"]] == [2, 2, 1]
     assert (test_dir / "large.json").exists()
@@ -90,7 +67,7 @@ def test_split_file_preserves_complete_cases_and_order(tmp_path, monkeypatch):
 
     data = parse(run(organization.test_split_file("large", max_cases=2, apply=True)))
 
-    test_dir = tmp_path / "tests" / "data" / "tokenization"
+    test_dir = tmp_path / CORPUS_DIR
     assert data["applied"] is True
     assert not (test_dir / "large.json").exists()
     generated_cases = []
@@ -107,7 +84,7 @@ def test_split_file_folds_parts_beside_the_base_into_new_parts(tmp_path, monkeyp
 
     data = parse(run(organization.test_split_file("large", max_cases=2, apply=True)))
 
-    test_dir = tmp_path / "tests" / "data" / "tokenization"
+    test_dir = tmp_path / CORPUS_DIR
     assert data["folded"] == ["large_01"]
     assert not (test_dir / "large.json").exists()
     generated = [json.loads(path.read_text(encoding="utf-8")) for path in sorted(test_dir.glob("large_*.json"))]
@@ -122,7 +99,7 @@ def test_split_file_folds_a_small_family_into_the_base(tmp_path, monkeypatch):
 
     data = parse(run(organization.test_split_file("large", max_cases=100, apply=True)))
 
-    test_dir = tmp_path / "tests" / "data" / "tokenization"
+    test_dir = tmp_path / CORPUS_DIR
     assert data["parts"] == [{"file": "large", "cases": 2, "bytes": data["parts"][0]["bytes"]}]
     assert not (test_dir / "large_01.json").exists()
     assert json.loads((test_dir / "large.json").read_text(encoding="utf-8"))["cases"] == [make_case(1), make_case(2)]
@@ -133,7 +110,7 @@ def test_partitioned_append_to_a_part_name_uses_the_existing_base(tmp_path):
 
     result = organization.append_cases_partitioned(tmp_path, "large_01", [make_case(2)])
 
-    test_dir = tmp_path / "tests" / "data" / "tokenization"
+    test_dir = tmp_path / CORPUS_DIR
     assert result["case_locations"][0]["file"] == "large"
     assert not (test_dir / "large_01.json").exists()
 
@@ -161,7 +138,7 @@ def test_partitioned_append_uses_available_space_in_last_part(tmp_path):
 
     result = organization.append_cases_partitioned(tmp_path, "large", [new_case], max_cases=2)
 
-    test_dir = tmp_path / "tests" / "data" / "tokenization"
+    test_dir = tmp_path / CORPUS_DIR
     assert result["case_locations"] == [{"id": "case_4", "input": "テスト4", "file": "large_02"}]
     assert len(json.loads((test_dir / "large_02.json").read_text(encoding="utf-8"))["cases"]) == 2
     assert not (test_dir / "large_03.json").exists()
@@ -173,7 +150,7 @@ def test_partitioned_append_creates_next_part_and_updates_descriptions(tmp_path)
 
     result = organization.append_cases_partitioned(tmp_path, "large_02", [make_case(5)], max_cases=2)
 
-    test_dir = tmp_path / "tests" / "data" / "tokenization"
+    test_dir = tmp_path / CORPUS_DIR
     assert result["case_locations"][0]["file"] == "large_03"
     for part_number in range(1, 4):
         data = json.loads((test_dir / f"large_{part_number:02}.json").read_text(encoding="utf-8"))
@@ -187,7 +164,7 @@ def test_partitioned_append_splits_full_base_file(tmp_path):
 
     result = organization.append_cases_partitioned(tmp_path, "large", [new_case], max_cases=2)
 
-    test_dir = tmp_path / "tests" / "data" / "tokenization"
+    test_dir = tmp_path / CORPUS_DIR
     assert result["split"] is True
     assert not (test_dir / "large.json").exists()
     generated_cases = []
@@ -201,7 +178,7 @@ def test_partitioned_append_dry_run_does_not_split_base_file(tmp_path):
 
     result = organization.append_cases_partitioned(tmp_path, "large", [make_case(3)], max_cases=2, apply=False)
 
-    test_dir = tmp_path / "tests" / "data" / "tokenization"
+    test_dir = tmp_path / CORPUS_DIR
     assert result["applied"] is False
     assert (test_dir / "large.json").exists()
     assert not list(test_dir.glob("large_*.json"))
@@ -220,7 +197,7 @@ def test_partitioned_append_splits_on_byte_limit(tmp_path):
         max_bytes=1400,
     )
 
-    test_dir = tmp_path / "tests" / "data" / "tokenization"
+    test_dir = tmp_path / CORPUS_DIR
     assert result["split"] is True
     assert [item["cases"] for item in result["files"]] == [1, 1]
     assert all(path.stat().st_size <= 1400 for path in test_dir.glob("large_*.json"))

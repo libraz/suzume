@@ -8,7 +8,9 @@ from pathlib import Path
 
 import pytest
 
-SCRIPT = Path(__file__).resolve().parents[2] / "check_version_mirror.sh"
+from tests.helpers import SCRIPTS_DIR
+
+SCRIPT = SCRIPTS_DIR / "check_version_mirror.sh"
 EMSDK_READER = SCRIPT.with_name("emsdk_version.sh")
 
 LOCK_TEMPLATE = """version = 1

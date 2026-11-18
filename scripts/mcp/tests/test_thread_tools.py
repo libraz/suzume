@@ -1,8 +1,5 @@
 """Tests for thread check tools."""
 
-import asyncio
-import json
-
 import pytest
 
 from suzume_mcp.core import bug_store
@@ -20,16 +17,8 @@ from suzume_mcp.tools.thread_tools import (
     thread_scan,
     thread_status,
 )
-
-
-def run(coro):
-    return asyncio.run(coro)
-
-
-def parse_json(result_str: str) -> dict:
-    """Parse JSON result from tool function."""
-    return json.loads(result_str)
-
+from tests.helpers import parse as parse_json
+from tests.helpers import run
 
 # ============================================================================
 # classify_diff
@@ -119,11 +108,16 @@ class TestNormalizeWidth:
 # ============================================================================
 
 
-class TestProgress:
-    def test_save_and_load(self, tmp_path, monkeypatch):
-        progress_file = tmp_path / ".progress"
-        monkeypatch.setattr("suzume_mcp.tools.thread_tools.PROGRESS_FILE", progress_file)
+@pytest.fixture
+def progress_file(tmp_path, monkeypatch):
+    """Point the progress tracker at a fresh, not yet written file."""
+    path = tmp_path / ".progress"
+    monkeypatch.setattr("suzume_mcp.tools.thread_tools.PROGRESS_FILE", path)
+    return path
 
+
+class TestProgress:
+    def test_save_and_load(self, progress_file):
         progress = {"file": "/some/file.txt", "last_checked": 42, "problems_found": 5}
         _save_progress(progress)
 
@@ -131,10 +125,7 @@ class TestProgress:
         assert loaded["last_checked"] == 42
         assert loaded["problems_found"] == 5
 
-    def test_reset_on_file_change(self, tmp_path, monkeypatch):
-        progress_file = tmp_path / ".progress"
-        monkeypatch.setattr("suzume_mcp.tools.thread_tools.PROGRESS_FILE", progress_file)
-
+    def test_reset_on_file_change(self, progress_file):
         progress = {"file": "/old/file.txt", "last_checked": 100, "problems_found": 10}
         _save_progress(progress)
 
@@ -208,11 +199,9 @@ class TestThreadStatus:
         assert result["status"] == "error"
         assert "not found" in result["message"]
 
-    def test_with_temp_file(self, tmp_path, monkeypatch):
+    def test_with_temp_file(self, tmp_path, progress_file):
         test_file = tmp_path / "thread_names.txt"
         test_file.write_text("テスト1\nテスト2\nテスト3\n", encoding="utf-8")
-        progress_file = tmp_path / ".progress"
-        monkeypatch.setattr("suzume_mcp.tools.thread_tools.PROGRESS_FILE", progress_file)
 
         result = parse_json(run(thread_status(input_file=str(test_file))))
         assert result["total_lines"] == 3
@@ -225,26 +214,22 @@ class TestThreadNext:
         assert result["status"] == "error"
         assert "not found" in result["message"]
 
-    def test_small_batch(self, tmp_path, monkeypatch):
+    def test_small_batch(self, tmp_path, monkeypatch, progress_file):
         test_file = tmp_path / "thread_names.txt"
         test_file.write_text("食べている\nhello\n漢字テスト\n", encoding="utf-8")
-        progress_file = tmp_path / ".progress"
         bugs_dir = tmp_path / "bugs"
-        monkeypatch.setattr("suzume_mcp.tools.thread_tools.PROGRESS_FILE", progress_file)
         monkeypatch.setitem(bug_store._SOURCE_DIRS, "thread", bugs_dir)
 
         result = parse_json(run(thread_next(count=10, input_file=str(test_file))))
         assert result["processed"] == 3
         assert result["skipped"] == 1  # "hello" is ascii-only
 
-    def test_dry_run_does_not_write_progress_or_bugs(self, tmp_path, monkeypatch):
+    def test_dry_run_does_not_write_progress_or_bugs(self, tmp_path, monkeypatch, progress_file):
         test_file = tmp_path / "thread_names.txt"
         test_file.write_text("テスト文\n", encoding="utf-8")
-        progress_file = tmp_path / ".progress"
         original_progress = f"file={test_file}\nlast_checked=0\nproblems_found=7\n"
         progress_file.write_text(original_progress, encoding="utf-8")
         bugs_dir = tmp_path / "bugs"
-        monkeypatch.setattr("suzume_mcp.tools.thread_tools.PROGRESS_FILE", progress_file)
         monkeypatch.setitem(bug_store._SOURCE_DIRS, "thread", bugs_dir)
         monkeypatch.setattr(
             "suzume_mcp.tools.thread_tools._compare_surfaces",
@@ -260,10 +245,9 @@ class TestThreadNext:
 
 
 class TestThreadScan:
-    def test_batch_scan_reuses_one_store_index_for_every_new_issue(self, tmp_path, monkeypatch):
+    def test_batch_scan_reuses_one_store_index_for_every_new_issue(self, tmp_path, monkeypatch, progress_file):
         test_file = tmp_path / "thread_names.txt"
         test_file.write_text("テスト文一\nテスト文二\n", encoding="utf-8")
-        monkeypatch.setattr("suzume_mcp.tools.thread_tools.PROGRESS_FILE", tmp_path / ".progress")
         monkeypatch.setitem(bug_store._SOURCE_DIRS, "thread", tmp_path / "bugs")
         monkeypatch.setattr(
             "suzume_mcp.tools.thread_tools._compare_surfaces",
@@ -284,25 +268,21 @@ class TestThreadScan:
         assert result["status"] == "error"
         assert "not found" in result["message"]
 
-    def test_small_batch(self, tmp_path, monkeypatch):
+    def test_small_batch(self, tmp_path, monkeypatch, progress_file):
         test_file = tmp_path / "thread_names.txt"
         test_file.write_text("食べている\n走っている\n", encoding="utf-8")
-        progress_file = tmp_path / ".progress"
         bugs_dir = tmp_path / "bugs"
-        monkeypatch.setattr("suzume_mcp.tools.thread_tools.PROGRESS_FILE", progress_file)
         monkeypatch.setitem(bug_store._SOURCE_DIRS, "thread", bugs_dir)
 
         result = parse_json(run(thread_scan(count=10, input_file=str(test_file))))
         assert result["processed"] == 2
 
-    def test_dry_run_does_not_write_progress_or_bugs(self, tmp_path, monkeypatch):
+    def test_dry_run_does_not_write_progress_or_bugs(self, tmp_path, monkeypatch, progress_file):
         test_file = tmp_path / "thread_names.txt"
         test_file.write_text("テスト文\n", encoding="utf-8")
-        progress_file = tmp_path / ".progress"
         original_progress = f"file={test_file}\nlast_checked=0\nproblems_found=7\n"
         progress_file.write_text(original_progress, encoding="utf-8")
         bugs_dir = tmp_path / "bugs"
-        monkeypatch.setattr("suzume_mcp.tools.thread_tools.PROGRESS_FILE", progress_file)
         monkeypatch.setitem(bug_store._SOURCE_DIRS, "thread", bugs_dir)
         monkeypatch.setattr(
             "suzume_mcp.tools.thread_tools._compare_surfaces",
@@ -318,10 +298,8 @@ class TestThreadScan:
 
 
 class TestThreadResetProgress:
-    def test_reset(self, tmp_path, monkeypatch):
-        progress_file = tmp_path / ".progress"
+    def test_reset(self, progress_file):
         progress_file.write_text("last_checked=100\n", encoding="utf-8")
-        monkeypatch.setattr("suzume_mcp.tools.thread_tools.PROGRESS_FILE", progress_file)
 
         result = parse_json(run(thread_reset_progress()))
         assert result["status"] == "ok"

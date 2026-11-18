@@ -17,6 +17,7 @@ from suzume_mcp.core.merge_rules import apply_suzume_merge
 from suzume_mcp.core.postprocessor_function_words import postprocess_listed_interjection
 from suzume_mcp.core.postprocessor_predicates import postprocess_adjective_garu, postprocess_bare_sa_row_imperative
 from suzume_mcp.core.postprocessor_subsidiaries import postprocess_mu_verb_desiderative
+from tests.helpers import tok as _tok
 
 CORE = "suzume_mcp.core"
 CLOSED_UNITS = f"{CORE}.merge_rules_closed_units"
@@ -24,13 +25,6 @@ COMPOUNDS = f"{CORE}.merge_rules_compounds"
 CLASSICAL_VERBS = f"{CORE}.merge_postprocessor_classical_verbs"
 PREDICATES = f"{CORE}.postprocessor_predicates"
 SUBSIDIARIES = f"{CORE}.postprocessor_subsidiaries"
-
-
-def _tok(surface, pos="名詞", **kw):
-    """Build a token dict whose lemma defaults to its surface."""
-    token = {"surface": surface, "pos": pos, "lemma": surface}
-    token.update(kw)
-    return token
 
 
 def _opaque_analyzer(text, *_args, **_kwargs):
@@ -49,9 +43,8 @@ def isolated_lexicon(monkeypatch):
             monkeypatch.setattr(module, "core_headwords", lambda filename: frozenset())
         if hasattr(module, "core_headwords_by_length"):
             monkeypatch.setattr(module, "core_headwords_by_length", lambda filename: ())
-        for analyzer in ("mecab_analyze",):
-            if hasattr(module, analyzer):
-                monkeypatch.setattr(module, analyzer, _opaque_analyzer)
+        if hasattr(module, "mecab_analyze"):
+            monkeypatch.setattr(module, "mecab_analyze", _opaque_analyzer)
 
 
 def _headwords(monkeypatch, module, files):

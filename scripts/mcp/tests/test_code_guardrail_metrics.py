@@ -2,21 +2,17 @@
 
 from __future__ import annotations
 
-import importlib.util
 from pathlib import Path
 from types import ModuleType
 
 import pytest
 
+from tests.helpers import load_script
+
 
 @pytest.fixture(scope="module")
 def metrics_module() -> ModuleType:
-    path = Path(__file__).resolve().parents[2] / "code_guardrail_metrics.py"
-    spec = importlib.util.spec_from_file_location("code_guardrail_metrics", path)
-    assert spec is not None and spec.loader is not None
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
+    return load_script("code_guardrail_metrics")
 
 
 def _measure(module: ModuleType, tmp_path: Path, source: str, name: str = "rules.cpp") -> tuple[int, int, int]:

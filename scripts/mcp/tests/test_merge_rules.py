@@ -4,10 +4,8 @@ from suzume_mcp.core.mecab import mecab_analyze
 from suzume_mcp.core.merge_postprocessor_affixes import _postprocess_bound_voiced_suffix
 from suzume_mcp.core.merge_postprocessor_grammar import _postprocess_prefix_split
 from suzume_mcp.core.merge_rules import apply_suzume_merge
-
-
-def _token(surface: str, pos: str) -> dict:
-    return {"surface": surface, "pos": pos, "lemma": surface}
+from tests.helpers import tok as _tok
+from tests.helpers import tok as _token
 
 
 class TestFixedFunctionSearchUnits:
@@ -286,13 +284,6 @@ class TestFixedInflectedFunctionUnits:
         assert [token["surface"] for token in merged] == ["読み", "いただけ", "ませ", "ん"]
         assert merged[1]["lemma"] == "いただける"
         assert rule == "fixed-inflected-function-unit"
-
-
-def _tok(surface, pos="名詞", **kw):
-    """Helper to create a token dict."""
-    t = {"surface": surface, "pos": pos, "lemma": surface}
-    t.update(kw)
-    return t
 
 
 class TestDateMerge:

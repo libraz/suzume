@@ -1,23 +1,16 @@
 """Focused tests for safe oracle override review tools."""
 
-import asyncio
-import importlib
 import json
+from importlib import import_module
 
 from suzume_mcp.tools import test_tools as _test_tools  # noqa: F401
+from tests import helpers
+from tests.helpers import CORPUS_DIR, parse, run
 
-review = importlib.import_module("suzume_mcp.tools._test_tools_review")
-read_tools = importlib.import_module("suzume_mcp.tools._test_tools_read")
-common_tools = importlib.import_module("suzume_mcp.tools._test_tools_common")
-mutation_tools = importlib.import_module("suzume_mcp.tools._test_tools_mutation")
-
-
-def run(coro):
-    return asyncio.run(coro)
-
-
-def parse(result: str) -> dict:
-    return json.loads(result)
+common_tools = import_module("suzume_mcp.tools._test_tools_common")
+mutation_tools = import_module("suzume_mcp.tools._test_tools_mutation")
+read_tools = import_module("suzume_mcp.tools._test_tools_read")
+review = import_module("suzume_mcp.tools._test_tools_review")
 
 
 def token(surface: str) -> dict:
@@ -25,9 +18,7 @@ def token(surface: str) -> dict:
 
 
 def write_suite(root, name: str, cases: list[dict]) -> None:
-    path = root / "tests" / "data" / "tokenization" / f"{name}.json"
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps({"cases": cases}, ensure_ascii=False), encoding="utf-8")
+    helpers.write_suite(root, name, cases, header={}, compact=True)
 
 
 def make_case(case_id: str, input_text: str, **extra) -> dict:
@@ -63,7 +54,7 @@ def test_reset_strips_both_banned_keys(tmp_path, monkeypatch):
 
     assert data["total"] == 1
     assert data["reset"][0]["removed"] == ["suzume_expected", "accepted_diff"]
-    stored = json.loads((tmp_path / "tests/data/tokenization/sample.json").read_text(encoding="utf-8"))
+    stored = json.loads((tmp_path / CORPUS_DIR / "sample.json").read_text(encoding="utf-8"))
     assert "suzume_expected" not in stored["cases"][0]
     assert "accepted_diff" not in stored["cases"][0]
 
@@ -83,13 +74,13 @@ def test_reset_strips_even_while_suzume_still_differs(tmp_path, monkeypatch):
 
     assert data["total"] == 1
     assert "test_needs_suzume_update" in data["next_step"]
-    stored = json.loads((tmp_path / "tests/data/tokenization/sample.json").read_text(encoding="utf-8"))
+    stored = json.loads((tmp_path / CORPUS_DIR / "sample.json").read_text(encoding="utf-8"))
     assert "suzume_expected" not in stored["cases"][0]
 
 
 def test_reset_finds_orphan_accepted_diff(tmp_path, monkeypatch):
     write_suite(tmp_path, "sample", [make_case("orphan", "孤立", accepted_diff={"reason": "old"})])
-    test_file = tmp_path / "tests/data/tokenization/sample.json"
+    test_file = tmp_path / CORPUS_DIR / "sample.json"
     monkeypatch.setattr(review, "_get_test_files_filtered", lambda _file: [test_file])
 
     data = parse(run(review.test_reset_suzume(all_tests=True, apply=True)))
@@ -117,14 +108,14 @@ def test_accept_diff_refuses_and_writes_nothing(tmp_path, monkeypatch):
 
     assert data["status"] == "error"
     assert "disabled by design" in data["message"]
-    stored = json.loads((tmp_path / "tests/data/tokenization/sample.json").read_text(encoding="utf-8"))
+    stored = json.loads((tmp_path / CORPUS_DIR / "sample.json").read_text(encoding="utf-8"))
     assert stored["cases"][0] == case
 
 
 def test_partial_oracle_sync_updates_only_selected_id(tmp_path, monkeypatch):
     cases = [make_case("first", "一つ"), make_case("second", "二つ")]
     write_suite(tmp_path, "sample", cases)
-    test_file = tmp_path / "tests/data/tokenization/sample.json"
+    test_file = tmp_path / CORPUS_DIR / "sample.json"
     monkeypatch.setattr(common_tools, "_get_test_files_filtered", lambda _file: [test_file])
     monkeypatch.setattr(
         common_tools,
@@ -164,7 +155,7 @@ def test_pos_mutations_refuse_case_level_oracle_overrides():
 def test_diff_mecab_uses_one_raw_batch_and_reports_item_errors(tmp_path, monkeypatch):
     cases = [make_case("first", "一つ"), make_case("second", "二つ")]
     write_suite(tmp_path, "sample", cases)
-    test_file = tmp_path / "tests/data/tokenization/sample.json"
+    test_file = tmp_path / CORPUS_DIR / "sample.json"
     monkeypatch.setattr(read_tools, "_get_test_files_filtered", lambda _file: [test_file])
     calls = []
 
@@ -189,7 +180,7 @@ def test_diff_mecab_uses_one_raw_batch_and_reports_item_errors(tmp_path, monkeyp
 def test_oracle_sync_skips_only_the_failed_batch_item(tmp_path, monkeypatch):
     cases = [make_case("first", "一つ"), make_case("second", "二つ")]
     write_suite(tmp_path, "sample", cases)
-    test_file = tmp_path / "tests/data/tokenization/sample.json"
+    test_file = tmp_path / CORPUS_DIR / "sample.json"
     monkeypatch.setattr(common_tools, "_get_test_files_filtered", lambda _file: [test_file])
     monkeypatch.setattr(
         common_tools,
