@@ -665,23 +665,6 @@
       "input": "波寄せる"
     },
     {
-      "description": "あるくるま - regression test",
-      "expected": [
-        {
-          "lemma": "ある",
-          "pos": "Determiner",
-          "surface": "ある"
-        },
-        {
-          "lemma": "くるむ",
-          "pos": "Verb",
-          "surface": "くるま"
-        }
-      ],
-      "id": "arukuruma",
-      "input": "あるくるま"
-    },
-    {
       "description": "行かんせいで - regression test",
       "expected": [
         {
@@ -724,6 +707,99 @@
       ],
       "id": "imasu",
       "input": "構います"
+    },
+    {
+      "description": "駅でまって - regression test",
+      "expected": [
+        {
+          "lemma": "駅",
+          "pos": "Noun",
+          "surface": "駅"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "まう",
+          "pos": "Verb",
+          "surface": "まっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "demattte",
+      "input": "駅でまって"
+    },
+    {
+      "description": "外でよみます - regression test",
+      "expected": [
+        {
+          "lemma": "外",
+          "pos": "Noun",
+          "surface": "外"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "よむ",
+          "pos": "Verb",
+          "surface": "よみ"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "deyomimasu",
+      "input": "外でよみます"
+    },
+    {
+      "description": "家でよむ - regression test",
+      "expected": [
+        {
+          "lemma": "家",
+          "pos": "Noun",
+          "surface": "家"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "よむ",
+          "pos": "Verb",
+          "surface": "よむ"
+        }
+      ],
+      "id": "deyomu",
+      "input": "家でよむ"
+    },
+    {
+      "description": "あるくるま - auto-generated",
+      "expected": [
+        {
+          "lemma": "ある",
+          "pos": "Determiner",
+          "surface": "ある"
+        },
+        {
+          "lemma": "くるま",
+          "pos": "Noun",
+          "surface": "くるま"
+        }
+      ],
+      "id": "arukuruma",
+      "input": "あるくるま"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 12/12)",

@@ -101,15 +101,16 @@ float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::
   const bool is_validated_ichidan_inflection = next.extended_pos == core::ExtendedPOS::VerbMizenkei ||
                                                (next.origin == core::CandidateOrigin::VerbHiraganaInflectedRenyokei &&
                                                 next.extended_pos == core::ExtendedPOS::VerbRenyokei);
-  const bool is_resolved_i_onbin = next.extended_pos == core::ExtendedPOS::VerbOnbinkei &&
-                                   next.origin == core::CandidateOrigin::VerbHiragana &&
-                                   utf8::endsWith(next.surface, "い");
+  // An onbin cell is the same: it exists only before the て/た that built it
+  // (駅で+まっ+た).
+  const bool is_hiragana_onbin =
+      next.extended_pos == core::ExtendedPOS::VerbOnbinkei && next.origin == core::CandidateOrigin::VerbHiragana;
   if (prev.extended_pos == core::ExtendedPOS::ParticleCase &&
       prev.surface.size() <= core::kJapaneseCharBytes &&  // Single hiragana char (3 bytes in UTF-8)
       next.pos == core::PartOfSpeech::Verb && !next.dictionaryBacked() && grammar::isPureHiragana(next.surface) &&
       next.surface.size() <= core::kTwoJapaneseCharBytes && next.extended_pos != core::ExtendedPOS::VerbShuushikei &&
       next.surface != "い" &&  // Exclude い - has specific rule
-      !is_validated_ichidan_inflection && !is_resolved_i_onbin) {
+      !is_validated_ichidan_inflection && !is_hiragana_onbin) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
 

@@ -342,6 +342,20 @@ bool spellsAttributivePredicate(const dictionary::DictionaryManager& dict_manage
 
 }  // namespace
 
+bool spellsCompleteHiraganaPredicate(const std::vector<char32_t>& codepoints,
+                                     const std::vector<normalize::CharType>& char_types, size_t start_pos,
+                                     size_t end_pos, const grammar::Inflection& inflection,
+                                     const dictionary::DictionaryManager* dict_manager) {
+  const auto predicate_candidates =
+      generateHiraganaVerbCandidates(codepoints, start_pos, char_types, inflection, dict_manager);
+  const bool past_closes =
+      end_pos > start_pos + 1 && (codepoints[end_pos - 1] == U'た' || codepoints[end_pos - 1] == U'だ');
+  return std::any_of(predicate_candidates.begin(), predicate_candidates.end(), [&](const auto& predicate) {
+    return (predicate.end == end_pos && predicate.extended_pos == core::ExtendedPOS::VerbTeForm) ||
+           (past_closes && predicate.end + 1 == end_pos && predicate.extended_pos == core::ExtendedPOS::VerbOnbinkei);
+  });
+}
+
 bool spansPredicateBeforeFormalNoun(const std::vector<char32_t>& codepoints,
                                     const std::vector<normalize::CharType>& char_types, size_t start_pos,
                                     size_t head_end, const grammar::Inflection& inflection,
@@ -525,13 +539,7 @@ void generateSelectedNominalHeadCandidates(const std::vector<char32_t>& codepoin
     // of becoming a selected nominal head.  Consult the shared hiragana verb
     // generator rather than special-casing して, so every independently
     // established te-form receives the same protection.
-    const auto predicate_candidates =
-        generateHiraganaVerbCandidates(codepoints, start_pos, char_types, inflection, dict_manager);
-    const bool has_complete_te_predicate =
-        std::any_of(predicate_candidates.begin(), predicate_candidates.end(), [head_end](const auto& predicate) {
-          return predicate.end == head_end && predicate.extended_pos == core::ExtendedPOS::VerbTeForm;
-        });
-    if (has_complete_te_predicate ||
+    if (spellsCompleteHiraganaPredicate(codepoints, char_types, start_pos, head_end, inflection, dict_manager) ||
         spansPredicateBeforeFormalNoun(codepoints, char_types, start_pos, head_end, inflection, *dict_manager)) {
       continue;
     }

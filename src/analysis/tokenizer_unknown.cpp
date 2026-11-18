@@ -148,6 +148,18 @@ bool isOrdinalNounSurface(const std::string& surface) {
          std::all_of(prefix_codepoints.begin() + 1, prefix_codepoints.end(), normalize::isNumeralCodepoint);
 }
 
+// Whether the kana after a verb's leading kanji opens on で. Every one-kanji
+// stem spelled with で is a listed verb (撫で, 茹で, 秀で), so for an unlisted
+// base the で is the case particle or copula after a nominal (外+で+よん).
+bool opensOkuriganaOnDe(const std::vector<normalize::CharType>& char_types, const std::vector<char32_t>& codepoints,
+                        size_t start_pos, size_t end_pos) {
+  size_t kana_pos = start_pos;
+  while (kana_pos < end_pos && char_types[kana_pos] == normalize::CharType::Kanji) {
+    ++kana_pos;
+  }
+  return kana_pos > start_pos && kana_pos + 1 < end_pos && codepoints[kana_pos] == U'で';
+}
+
 // Price an accepted candidate against the dictionary coverage at its start.
 // Returns nullopt when the span absorbs a suru imperative and is no candidate.
 std::optional<float> unknownCandidateCost(const tokenizer_unknown_detail::UnknownCandidateContext& ctx,
@@ -428,6 +440,13 @@ std::optional<float> unknownCandidateCost(const tokenizer_unknown_detail::Unknow
        hiragana_verb_detail::spellsOneMoraStemBeforePolite(codepoints, candidate.start, candidate.end) ||
        hiragana_verb_detail::spellsClosedWordBeforeListedVerb(codepoints, candidate.start, candidate.end,
                                                               candidate.lemma, &dict_manager))) {
+    return std::nullopt;
+  }
+  // Inflection agreement does not attest the stem here: 駅でまっ conjugates as
+  // well as any unlisted godan, so only a listed base keeps the で.
+  if (candidate.pos == core::PartOfSpeech::Verb &&
+      opensOkuriganaOnDe(char_types, codepoints, candidate.start, candidate.end) &&
+      !verb_helpers::isVerbInDictionary(&dict_manager, candidate.lemma)) {
     return std::nullopt;
   }
   // The same two listed words do not fuse into an unlisted kana noun either

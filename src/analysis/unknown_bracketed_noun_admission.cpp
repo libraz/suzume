@@ -229,6 +229,11 @@ bool admitsPromotedRun(const BracketedNounContext& ctx, const BracketedScan& bra
   // Nor may it open on the te-form connective that a continuative right in
   // front of it selects (嬉しく+て|うれぴ, 言っ+て, 読ん+で).
   const bool opens_on_te_connective = closesTeFormAt(ctx, start_pos);
+  // Nor may it take a run that is itself a te-form or past (駅で+まっ+て/た),
+  // unless the copula follows: neither form takes it (にがて+だ is a noun).
+  const bool spells_te_predicate =
+      !promoted.right_copula && !promoted.right_auxiliary &&
+      spellsCompleteHiraganaPredicate(codepoints, ctx.char_types, start_pos, scan, ctx.inflection, dict_manager);
   // A laugh is an interjection, which its own generator offers (あはは).
   const size_t laugh_len = laughterLengthAt(codepoints, start_pos);
   const bool spans_laugh = laugh_len > 0 && scan <= start_pos + laugh_len;
@@ -257,8 +262,8 @@ bool admitsPromotedRun(const BracketedNounContext& ctx, const BracketedScan& bra
          !bracketed.crossed_verified_predicate && !cuts_into_predicate && !opens_inside_hosted_predicate &&
          !carries_left_terminal_into_nominalizer && !opens_on_irrealis_chain &&
          !promoted.has_inflected_predicate_reading && !opens_on_sino_prefix && !absorbs_trailing_suffix &&
-         !opens_on_te_connective && !spans_laugh && !closes_registered_word_predicate && !finishes_auxiliary_chain &&
-         !spells_copula && !spells_contracted_hypothetical && !steals_formal_noun_head &&
+         !opens_on_te_connective && !spells_te_predicate && !spans_laugh && !closes_registered_word_predicate &&
+         !finishes_auxiliary_chain && !spells_copula && !spells_contracted_hypothetical && !steals_formal_noun_head &&
          !promoted.absorbs_copula_before_sokuon_final &&
          ((!hasAuxiliaryParticleDecomposition(codepoints, start_pos, scan, dict_manager) &&
            (!spells_auxiliary_chain || quantity_aspect_copula_chain)) ||

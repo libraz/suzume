@@ -568,6 +568,17 @@ void generateNominalizedNounCandidates(const std::vector<char32_t>& codepoints, 
     skip_single_char = true;
   }
 
+  // Kanji+い is the i-onbin of a listed カ/ガ row verb (書い+て, 泳い+だ) unless
+  // a listed ワ row verb owns it as its continuative (買い, 使い).
+  if (first_hiragana == core::hiragana::kI && dict_manager != nullptr && kanji_end == start_pos + 1) {
+    const std::string kanji_stem = extractSubstring(codepoints, start_pos, kanji_end);
+    if (!verb_helpers::isVerbInDictionary(dict_manager, kanji_stem + "う") &&
+        (verb_helpers::isVerbInDictionary(dict_manager, kanji_stem + "く") ||
+         verb_helpers::isVerbInDictionary(dict_manager, kanji_stem + "ぐ"))) {
+      skip_single_char = true;
+    }
+  }
+
   // A deverbal noun is built on the continuative stem (読み, 調べ), never on
   // the irrealis or the terminal. An a-row or u-row tail is therefore a
   // conjugational boundary rather than a nominalization, and fabricating a

@@ -226,9 +226,11 @@ float computeTaFormVolitionalBonus(const core::LatticeEdge& prev, const core::La
 
   // The literary volitional む selects an irrealis form, never a
   // continuative. Reject a fabricated kanji+し renyokei before む while
-  // retaining the licensed 読ま+む-style mizenkei boundary.
+  // retaining the licensed 読ま+む-style mizenkei boundary. An o-row irrealis
+  // is the stem of the modern う alone (でよ+う), so it does not host む either.
   if (next.extended_pos == core::ExtendedPOS::AuxVolitional && utf8::equalsAny(next.surface, {"む"}) &&
-      prev.extended_pos == core::ExtendedPOS::VerbRenyokei) {
+      (prev.extended_pos == core::ExtendedPOS::VerbRenyokei ||
+       (prev.extended_pos == core::ExtendedPOS::VerbMizenkei && grammar::endsWithORow(prev.surface)))) {
     SUZUME_CONNECTION_ADD(bonus, cost::kSevere);
   }
 

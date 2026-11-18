@@ -195,6 +195,16 @@ void generateSelectedNominalHeadCandidates(const std::vector<char32_t>& codepoin
                                            std::vector<UnknownCandidate>& candidates);
 
 /**
+ * @brief Return true when the shared hiragana verb generator reads the span as
+ *        one complete te-form (し+て, まっ+て) or an onbin plus the past
+ *        (まっ+た, よん+だ), which no nominal rescue may take.
+ */
+bool spellsCompleteHiraganaPredicate(const std::vector<char32_t>& codepoints,
+                                     const std::vector<normalize::CharType>& char_types, size_t start_pos,
+                                     size_t end_pos, const grammar::Inflection& inflection,
+                                     const dictionary::DictionaryManager* dict_manager);
+
+/**
  * @brief Return true when a kana span opens on an attributive predicate that
  *        runs into, or up to, a registered formal noun (いう+こと, し+た+こと).
  *
