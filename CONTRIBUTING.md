@@ -59,7 +59,7 @@ make wasm
 make wasm-test
 ```
 
-`make test` runs every suite above plus the sanitizer, CMake configuration, parity and guardrail checks, so it needs all of these toolchains.
+`make test` runs every suite above plus the sanitizer, CMake configuration, parity and guardrail checks, so it needs all of these toolchains. Its WASM size check compares against a baseline recorded with the Emscripten release pinned in `ci.yml` and with GNU gzip, so a build from another Emscripten release can fail that check without a real regression.
 
 ## What CI requires
 
@@ -67,16 +67,17 @@ A red check on your pull request is not a reason to hold it back; the maintainer
 
 | Workflow | Job | Runs on | What it checks |
 | --- | --- | --- | --- |
-| `ci.yml` | `lint` | pushes to `main` and `develop`, and pull requests to `main` | Biome on the WASM binding; ruff on the tooling and repository scripts |
-| `ci.yml` | `guardrails` | the same events | the code guardrail ratchet and WASM-core purity, oracle overrides, binding label tables, oracle mirrors of core data, version mirrors |
+| `ci.yml` | `lint` | pushes to `main` and `develop`, and pull requests to `main` | Biome on the WASM binding, with Node and Yarn provisioned by mise; ruff on the tooling and repository scripts |
+| `ci.yml` | `guardrails` | the same events | the code guardrail ratchet and WASM-core purity, oracle overrides, binding label tables, oracle mirrors of core data, and version mirrors: the package manifests and `uv.lock`, and the uv, mise and Emscripten releases `publish.yml` must share with `ci.yml` |
 | `ci.yml` | `mcp-tests` | the same events | the tooling tests, and that the stored test expectations match a fresh derivation |
 | `ci.yml` | `sanitizers` | the same events | the C++ tests under ASan, LSan and UBSan |
 | `ci.yml` | `native-nodebug` | the same events | the C++ tests with the debug features compiled out |
+| `ci.yml` | `score-parity` | the same events, after `build-and-test` and `native-nodebug` | that the debug build the tests exercise and the shipped build without debug features give every morpheme of the tokenization test inputs the same score |
 | `ci.yml` | `cmake-configurations` | the same events | each supported CMake build and install configuration |
 | `ci.yml` | `manylinux-toolchain` | the same events | building and testing the wheel with the oldest supported toolchain |
 | `ci.yml` | `build-and-test` | the same events | the C++ tests with coverage, the examples and installed-package consumers, the WASM build, its size check and tests, and native/Python/WASM parity |
 | `ci.yml` | `python-binding` | the same events except pushes to `develop` | ruff, mypy and the tests of the Python binding, and the Python example |
-| `publish.yml` | release jobs | version tags | verifies the version mirrors, runs the C++ tests, publishes to npm and PyPI, and creates the GitHub release |
+| `publish.yml` | release jobs | version tags | verifies the tag and the version mirrors, runs the C++ tests with and without the debug features, builds and tests the WASM package and the Linux and macOS wheels, publishes to npm and PyPI, and creates the GitHub release |
 
 Changes that touch only Markdown, `docs/` or `LICENSE` do not start `ci.yml`.
 
