@@ -1399,6 +1399,94 @@
       ],
       "id": "itobakari_ttta",
       "input": "勢いとばかり走った。"
+    },
+    {
+      "description": "かつていた - regression test",
+      "expected": [
+        {
+          "lemma": "かつて",
+          "pos": "Adverb",
+          "surface": "かつて"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "katsuteita",
+      "input": "かつていた"
+    },
+    {
+      "description": "かつていて - regression test",
+      "expected": [
+        {
+          "lemma": "かつて",
+          "pos": "Adverb",
+          "surface": "かつて"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "い"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "katsuteite",
+      "input": "かつていて"
+    },
+    {
+      "description": "かつていった - regression test",
+      "expected": [
+        {
+          "lemma": "かつて",
+          "pos": "Adverb",
+          "surface": "かつて"
+        },
+        {
+          "lemma": "いく",
+          "pos": "Verb",
+          "surface": "いっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "katsuteittta",
+      "input": "かつていった"
+    },
+    {
+      "description": "かつています - regression test",
+      "expected": [
+        {
+          "lemma": "かつて",
+          "pos": "Adverb",
+          "surface": "かつて"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "い"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "katsuteimasu",
+      "input": "かつています"
     }
   ],
   "description": "adverb tests",

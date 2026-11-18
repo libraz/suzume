@@ -166,8 +166,14 @@ bool lacksLicensingEnvironment(const DictionaryCandidateContext& ctx, const core
 
   // An adverb spelled like a te-form (至って, 決して) is that te-form when an
   // auxiliary selecting the te-form follows it (至っ+て+おら+ず, 至っ+て+ませ+ん).
+  // A kana continuative ends on an i/e-row mora or an onbin, so かつて, whose
+  // つ cannot close one, is never a te-form (かつて+い+た).
+  const auto spells_continuative_end = [](char32_t host) {
+    return !kana::isHiraganaCodepoint(host) || kana::isIOrERowCodepoint(host) || kana::isOnbinCodepoint(host);
+  };
   if (result.entry->pos == core::PartOfSpeech::Adverb && result.length >= 2 &&
-      (codepoints[end_pos - 1] == U'て' || codepoints[end_pos - 1] == U'で')) {
+      (codepoints[end_pos - 1] == U'て' || codepoints[end_pos - 1] == U'で') &&
+      spells_continuative_end(codepoints[end_pos - 2])) {
     bool te_selecting_auxiliary_follows = false;
     for (size_t aux_end = end_pos + 1; aux_end <= lookaheadEnd(codepoints.size(), end_pos, 2); ++aux_end) {
       const auto* aux = lookupEntryInRange(dict_manager, codepoints, end_pos, aux_end, core::PartOfSpeech::Auxiliary);
