@@ -20,7 +20,7 @@ namespace {
 void outputMorphemes(std::ostream& output, const std::vector<core::Morpheme>& morphemes) {
   for (const auto& morpheme : morphemes) {
     output << tabEscape(morpheme.surface) << "\t" << core::posToString(morpheme.pos) << "\t"
-           << tabEscape(morpheme.lemma) << "\t" << morpheme.start << "\t" << morpheme.end << "\n";
+           << tabEscape(morpheme.getLemma()) << "\t" << morpheme.start << "\t" << morpheme.end << "\n";
   }
 }
 
@@ -42,7 +42,7 @@ void outputJson(const std::string& input, const std::string& normalized_text,
     std::cout << "    {";
     std::cout << R"("surface": ")" << jsonEscape(mor.surface) << "\", ";
     std::cout << R"("pos": ")" << core::posToString(mor.pos) << "\", ";
-    std::cout << R"("lemma": ")" << jsonEscape(mor.lemma) << "\", ";
+    std::cout << R"("lemma": ")" << jsonEscape(mor.getLemma()) << "\", ";
     std::cout << R"("start": )" << mor.start << ", ";
     std::cout << R"("end": )" << mor.end << ", ";
     std::cout << R"("extended_pos": ")" << core::extendedPosToString(mor.extended_pos) << "\", ";
@@ -110,7 +110,7 @@ bool sameStructure(const core::Morpheme& left, const core::Morpheme& right) {
 
 void outputDiffMorpheme(std::ostream& output, std::string_view marker, size_t index, const core::Morpheme& morpheme) {
   output << marker << index << ": " << tabEscape(morpheme.surface) << "\t" << core::posToString(morpheme.pos) << "\t"
-         << tabEscape(morpheme.lemma) << "\t" << morpheme.start << "\t" << morpheme.end << "\n";
+         << tabEscape(morpheme.getLemma()) << "\t" << morpheme.start << "\t" << morpheme.end << "\n";
 }
 
 }  // namespace
