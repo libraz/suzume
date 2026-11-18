@@ -17,6 +17,7 @@
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
+#include "grammar/honorific_verbs.h"
 #include "normalize/char_type.h"
 #include "normalize/exceptions.h"
 #include "normalize/utf8.h"
@@ -60,23 +61,14 @@ void generateCompoundVerbCandidates(const std::vector<char32_t>& codepoints, siz
 
   size_t kanji2_end = findCharRegionEnd(char_types, hira1_end, 3, normalize::CharType::Kanji);
 
-  // Skip compound verb candidates when second verb is aspectual/grammatical
-  // These remain separate grammatical/aspectual search units:
-  // 終わる/終える, 始める, 続く/続ける, 過ぎる
-  // e.g., 読み終わる → 読み + 終わる (not single token)
-  if (hira1_end < codepoints.size()) {
-    char32_t second_kanji = codepoints[hira1_end];
-    if (second_kanji == U'終' || second_kanji == U'始' || second_kanji == U'続' || second_kanji == U'過') {
-      return;
-    }
-  }
-
   // Find second hiragana portion (conjugation ending)
   if (!isCharTypeAt(char_types, kanji2_end, normalize::CharType::Hiragana)) {
     return;
   }
 
   size_t hira2_end = findCharRegionEnd(char_types, kanji2_end, 10, normalize::CharType::Hiragana);
+
+  const size_t v1_bytes = extractSubstring(codepoints, start_pos, hira1_end).size();
 
   // Try different ending lengths
   for (size_t end_pos = hira2_end; end_pos > kanji2_end; --end_pos) {
@@ -124,6 +116,13 @@ void generateCompoundVerbCandidates(const std::vector<char32_t>& codepoints, siz
       // e-row cell (咲き誇れ+心), not the potential (見つけ出せ+なかった).
       if (infl_cand.verb_type == grammar::VerbType::Ichidan && infl_cand.suffix.empty() &&
           vh::isStrandedPotentialStem(dict_manager, infl_cand.base_form, codepoints, end_pos)) {
+        continue;
+      }
+      // The lemma must reach into the second kanji run: a V1 lemma whose suffix
+      // swallowed the V2 (読む + み終わらない) is no compound. An aspectual V2
+      // stays its own search unit (読み+終わる), listed compound or not.
+      if (infl_cand.base_form.size() <= v1_bytes ||
+          grammar::isAspectualSubsidiaryLemma(std::string_view(infl_cand.base_form).substr(v1_bytes))) {
         continue;
       }
       // Check if base form exists in dictionary as a verb
