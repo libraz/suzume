@@ -223,10 +223,15 @@ bool hasPrecedingTemporalCompoundBoundary(const core::Lattice& lattice, size_t s
   });
 }
 
-bool startsFormalNounParticleAfterPredicate(const core::Lattice& lattice,
-                                            const dictionary::DictionaryManager& dict_manager,
-                                            const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos) {
-  if (!hasPrecedingPartOfSpeech(lattice, start_pos, kVerbAdjectiveMask)) {
+// An attributive modifier — an adnominal predicate or a genitive の — is
+// followed by a noun, so a dictionary adverb that spells formal noun + particle
+// is that pair there (読む+わり+に, 年の+わり+に, 本の+こと+に).
+bool startsFormalNounParticleAfterAttributive(const core::Lattice& lattice,
+                                              const dictionary::DictionaryManager& dict_manager,
+                                              const std::vector<char32_t>& codepoints, size_t start_pos,
+                                              size_t end_pos) {
+  if (!hasPrecedingPartOfSpeech(lattice, start_pos, kVerbAdjectiveMask) &&
+      !hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::ParticleNo)) {
     return false;
   }
   for (size_t split = start_pos + 1; split < end_pos; ++split) {
@@ -596,28 +601,14 @@ bool isOutOfPlaceForWordClass(const DictionaryCandidateContext& ctx, const core:
     }
   }
 
-  // わりに is an adverb at clause start, but after an attributive の or a
-  // finite predicate it is the formal noun わり followed by the case
-  // particle に (本の+わりに, 読む+わりに). Before an adjective it instead
-  // forms the fixed comparative adverb (年齢の+わりに+若い).
-  if (result.entry->pos == core::PartOfSpeech::Adverb && result.entry->lemma == "わりに" && start_pos > 0) {
-    if (startsInsideKanjiLedVerb(lattice, codepoints, start_pos)) {
-      return true;
-    }
-    const char32_t preceding = codepoints[start_pos - 1];
-    const bool followed_by_adjective =
-        end_pos < codepoints.size() &&
-        lookupResultsHavePartOfSpeech(dict_manager.lookup(text, byteOffsetAt(byte_offsets, end_pos)),
-                                      partOfSpeechMask(core::PartOfSpeech::Adjective));
-    if (!followed_by_adjective &&
-        (preceding == U'の' || preceding == U'る' || preceding == U'く' || preceding == U'む' || preceding == U'ぶ' ||
-         preceding == U'ぬ' || preceding == U'す' || preceding == U'つ' || preceding == U'ぐ')) {
-      return true;
-    }
+  // A dictionary adverb must not open inside the okurigana of a kanji-led verb (終+わりに).
+  if (result.entry->pos == core::PartOfSpeech::Adverb && result.entry->lemma == "わりに" && start_pos > 0 &&
+      startsInsideKanjiLedVerb(lattice, codepoints, start_pos)) {
+    return true;
   }
 
   if (result.entry->pos == core::PartOfSpeech::Adverb &&
-      startsFormalNounParticleAfterPredicate(lattice, dict_manager, codepoints, start_pos, end_pos)) {
+      startsFormalNounParticleAfterAttributive(lattice, dict_manager, codepoints, start_pos, end_pos)) {
     return true;
   }
 
