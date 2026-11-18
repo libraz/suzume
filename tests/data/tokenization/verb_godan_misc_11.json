@@ -2395,6 +2395,23 @@
       ],
       "id": "ittshi_ni_ku",
       "input": "三人いっしょに行く"
+    },
+    {
+      "description": "A comma is a clause boundary: ない after it is the adjective, with or without symbols in the output",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
+      "id": "be_nai",
+      "input": "食べ、ない"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 11/11)",
