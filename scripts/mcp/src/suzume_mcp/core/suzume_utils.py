@@ -462,7 +462,7 @@ def get_char_types(s: str) -> list[str]:
             types.add("katakana")
         elif 0x4E00 <= code <= 0x9FFF:
             types.add("kanji")
-        elif 0x0041 <= code <= 0x007A:
+        elif 0x0041 <= code <= 0x005A or 0x0061 <= code <= 0x007A:
             types.add("alpha")
         elif 0x0030 <= code <= 0x0039:
             types.add("digit")

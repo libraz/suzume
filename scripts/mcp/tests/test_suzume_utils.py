@@ -5,7 +5,13 @@ from unittest.mock import patch
 import pytest
 
 from suzume_mcp.core.postprocessors import POSTPROCESSORS
-from suzume_mcp.core.suzume_utils import _oracle_text, format_expected, get_expected_tokens, tokens_match
+from suzume_mcp.core.suzume_utils import (
+    _oracle_text,
+    format_expected,
+    get_char_types,
+    get_expected_tokens,
+    tokens_match,
+)
 
 
 class TestGetExpectedTokens:
@@ -887,3 +893,8 @@ class TestCutContractedIrrealis:
     def test_particle_nee_after_a_real_negative_stays(self):
         tokens, _, _ = get_expected_tokens("知らんねえ")
         assert tokens[-1]["pos"] == "Particle"
+
+
+@pytest.mark.parametrize(("text", "types"), [("abcXYZ", ["alpha"]), ("[\\]^_`", []), ("A_1", ["alpha", "digit"])])
+def test_char_types_count_only_ascii_letters_as_alpha(text, types):
+    assert sorted(get_char_types(text)) == types
