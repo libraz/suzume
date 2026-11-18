@@ -52,7 +52,7 @@ Environment:
   SUZUME_SCORER_CONFIG   Path to a scorer-options JSON file
   SUZUME_SCORER_{SECTION}_{KEY}
                          Override one scorer option; sections are JOIN, SPLIT,
-                         UNARY, OPTLEN, BIGRAM, VERB, and INFL
+                         UNARY, BIGRAM, VERB, and INFL
 
 Examples:
   suzume-cli "text"                  Analyze text
@@ -126,7 +126,7 @@ Environment:
   SUZUME_SCORER_CONFIG   Path to a scorer-options JSON file
   SUZUME_SCORER_{SECTION}_{KEY}
                          Override one scorer option; sections are JOIN, SPLIT,
-                         UNARY, OPTLEN, BIGRAM, VERB, and INFL
+                         UNARY, BIGRAM, VERB, and INFL
 )";
 }
 
