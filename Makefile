@@ -153,7 +153,7 @@ native-bench: dict
 # Keep local verification aligned with the CI guardrails, including the WASM
 # artifact-size check that needs the shipped module built first.
 guardrails: wasm
-	LC_ALL=C scripts/check_code_guardrails.sh
+	scripts/check_code_guardrails.sh
 	$(SCRIPTS_PYTHON) scripts/check_oracle_overrides.py
 	$(SCRIPTS_PYTHON) scripts/check_binding_labels.py
 	$(SCRIPTS_PYTHON) scripts/check_compound_v2_sync.py
