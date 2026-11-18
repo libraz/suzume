@@ -30,6 +30,10 @@ constexpr std::string_view kHumbleHonorificLemmas[] = {"いたす", "致す",   
                                                        "はする", "申し上げる", "給ふ",     "候ふ"};
 constexpr std::string_view kBenefactiveRenyokei[] = {"もらい", "あげ"};
 constexpr std::string_view kBenefactiveLemmas[] = {"もらう", "もらえる", "くれる", "あげる", "やる"};
+// Subsidiaries that need a predicate te-form host. ある and やる are left out:
+// after a connective they also read as the lexical verb (そしてあった, そしてやった).
+constexpr std::string_view kTeFormSubsidiaryLemmas[] = {"いる", "おく",   "みる",   "しまう", "いく",  "ゆく",
+                                                        "くる", "あげる", "もらう", "くれる", "ほしい"};
 constexpr std::string_view kPotentialBenefactiveLemmas[] = {"いただける", "もらえる"};
 constexpr std::string_view kModalSubsidiaryRenyokei[] = {"かね"};
 // 続ける is deliberately absent: productive V1+続ける compounds are themselves the
@@ -86,6 +90,10 @@ bool isModalSubsidiaryRenyokei(std::string_view surface) {
 
 bool startsHonorificSubsidiaryVerb(std::string_view surface) {
   return startsWithAny(surface, {"くださ", "いただ", "いたし", "いたす", "致し", "致す"});
+}
+
+bool isTeFormSubsidiaryLemma(std::string_view lemma) {
+  return equalsAny(lemma, kTeFormSubsidiaryLemmas);
 }
 
 bool isAspectualSubsidiaryLemma(std::string_view lemma) {

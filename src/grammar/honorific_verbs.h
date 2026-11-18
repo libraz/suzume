@@ -32,6 +32,14 @@ bool isPotentialBenefactiveLemma(std::string_view lemma);
 bool isBenefactiveLemma(std::string_view lemma);
 
 /**
+ * @brief Check whether a kana lemma is a subsidiary that needs a te-form host
+ *        (いる・おく・みる・しまう・いく・くる・あげる・もらう・くれる・ほしい)
+ * @param lemma Dictionary form of the following token (UTF-8)
+ * @return true if nothing but a predicate te-form can govern the lemma
+ */
+bool isTeFormSubsidiaryLemma(std::string_view lemma);
+
+/**
  * @brief Check whether a surface is the renyokei of any honorific or
  *        benefactive subsidiary verb (いたす・くださる・いただく・もらう・あげる)
  * @param surface Candidate token surface (UTF-8)

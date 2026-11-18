@@ -11,6 +11,7 @@
 #include "core/types.h"
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
+#include "grammar/honorific_verbs.h"
 #include "normalize/char_type.h"
 #include "normalize/utf8.h"
 
@@ -316,26 +317,19 @@ void addBarredHostRules(const core::LatticeEdge& prev, const core::LatticeEdge& 
   const bool conjunction_before_hiragana_de = prev.pos == core::PartOfSpeech::Conjunction &&
                                               next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
                                               next.surface == "で";
-  // A hiragana conjunction ending in a connective te-form cannot directly
-  // govern existential いる.  Whatever the conjunction is listed as, that
-  // ending is the productive te-form of the predicate inside it and いる is
-  // the aspectual auxiliary the te-form selects (そう+し+て+いる,
-  // 確認+し+たがっ+て+いる).
-  const bool conjunction_shite_before_iru = prev.pos == core::PartOfSpeech::Conjunction &&
-                                            grammar::isPureHiragana(prev.surface) &&
-                                            utf8::endsWithAny(prev.surface, {"て", "で"}) &&
-                                            ((next.pos == core::PartOfSpeech::Verb && next.lemma == "いる") ||
-                                             next.extended_pos == core::ExtendedPOS::AuxAspectIru);
-  // A closed conjunction/adverb ending in a te-form cannot directly govern
-  // the directional subsidiary いく/ゆく/くる. This would otherwise prefer the
-  // lexical entries もって and かえって over the productive V-て + subsidiary
-  // analysis. The gate is grammatical rather than surface-specific, so real
-  // conjunctions before ordinary lexical verbs remain available.
-  const bool closed_te_form_before_directional_aux =
+  // A closed conjunction or adverb spelled in kana and ending in a te-form
+  // cannot govern a subsidiary that needs a predicate te-form host: that
+  // ending is the te-form of the predicate inside it (そう+し+て+おく,
+  // かえっ+て+くる), which the productive split states.
+  const std::string_view next_lemma = next.lemma.empty() ? next.surface : next.lemma;
+  const bool closed_te_form_before_subsidiary =
       (prev.pos == core::PartOfSpeech::Conjunction || prev.pos == core::PartOfSpeech::Adverb) &&
       grammar::isPureHiragana(prev.surface) && utf8::endsWithAny(prev.surface, {"て", "で"}) &&
-      utf8::equalsAny(next.surface, {"いく", "ゆく", "くる"});
-  if (conjunction_before_hiragana_de || conjunction_shite_before_iru || closed_te_form_before_directional_aux) {
+      grammar::isTeFormSubsidiaryLemma(next_lemma);
+  if (closed_te_form_before_subsidiary) {
+    SUZUME_CONNECTION_ADD(bonus, cost::kProhibitive);
+  }
+  if (conjunction_before_hiragana_de) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
 }
