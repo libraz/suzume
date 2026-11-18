@@ -866,7 +866,7 @@ bool isRejectedUnknownCandidate(const UnknownCandidateContext& ctx, const core::
         continue;
       }
       const size_t adjective_start = candidate.start + prefix.length;
-      const auto remainder_candidates = unknown_gen.generate(text, codepoints, adjective_start, char_types);
+      const auto remainder_candidates = unknown_gen.generate(codepoints, adjective_start, char_types);
       absorbs_determiner =
           std::any_of(remainder_candidates.begin(), remainder_candidates.end(), [&](const auto& remainder) {
             return remainder.pos == core::PartOfSpeech::Adjective && remainder.end == candidate.end;

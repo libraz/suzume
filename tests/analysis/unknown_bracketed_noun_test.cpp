@@ -33,7 +33,7 @@ std::vector<UnknownCandidate> generateUnknownCandidatesAt(std::string_view input
   const auto codepoints = normalize::toCodepoints(input);
   const auto char_types = normalize::classifyCodepoints(codepoints);
   const UnknownWordGenerator generator({}, &dict_manager);
-  return generator.generate(input, codepoints, start_pos, char_types);
+  return generator.generate(codepoints, start_pos, char_types);
 }
 
 TEST(NoncontinuativeTeNominal, ShapeRejectsRealContinuativesAndMalformedText) {
@@ -322,7 +322,7 @@ TEST(QuantityYoonNoun, CandidateRequiresCounterEdgeAtAdmission) {
   const dictionary::DictionaryManager dict_manager;
   const UnknownWordGenerator generator({}, &dict_manager);
   const size_t candidate_start = 2;
-  const auto candidates = generator.generate(input, codepoints, candidate_start, char_types);
+  const auto candidates = generator.generate(codepoints, candidate_start, char_types);
   const auto quantity_noun = std::find_if(candidates.begin(), candidates.end(), [](const UnknownCandidate& candidate) {
     return candidate.surface == "いっしょ" && candidate.pos == core::PartOfSpeech::Noun &&
            candidate.origin == CandidateOrigin::BracketedNoun && candidate.requires_left_counter_edge;
@@ -337,7 +337,7 @@ TEST(QuantityYoonNoun, CandidateRequiresCounterEdgeAtAdmission) {
   core::Lattice without_counter(codepoints.size());
   EXPECT_TRUE(tokenizer_unknown_detail::isRejectedUnknownCandidate(ctx, without_counter, *quantity_noun));
 
-  const auto counter_candidates = generator.generate(input, codepoints, 0, char_types);
+  const auto counter_candidates = generator.generate(codepoints, 0, char_types);
   const auto counter = std::find_if(counter_candidates.begin(), counter_candidates.end(), [&](const auto& candidate) {
     return candidate.pos == core::PartOfSpeech::Noun && candidate.origin == CandidateOrigin::Counter &&
            candidate.start == 0 && candidate.end == candidate_start;
@@ -357,7 +357,7 @@ TEST(QuantityYoonNoun, RejectsANominalizedStemThatAbsorbsTheQuantity) {
   const auto byte_offsets = buildByteOffsets(codepoints);
   const dictionary::DictionaryManager dict_manager;
   const UnknownWordGenerator generator({}, &dict_manager);
-  const auto candidates = generator.generate(input, codepoints, 0, char_types);
+  const auto candidates = generator.generate(codepoints, 0, char_types);
   const auto nominalized = std::find_if(candidates.begin(), candidates.end(), [](const UnknownCandidate& candidate) {
     return candidate.surface == "二人い" && candidate.origin == CandidateOrigin::NominalizedNoun;
   });

@@ -46,7 +46,7 @@ TEST(CandidateGenerationEfficiencyTest, EmitsOneAdjectiveStemEdgeBeforeSaNominal
   const auto char_types = normalize::classifyCodepoints(codepoints);
   const UnknownWordGenerator generator({}, &dictionary_manager);
 
-  const auto candidates = generator.generate(text, codepoints, 0, char_types);
+  const auto candidates = generator.generate(codepoints, 0, char_types);
   const size_t matching_edges =
       static_cast<size_t>(std::count_if(candidates.begin(), candidates.end(), [](const UnknownCandidate& candidate) {
         return candidate.surface == "美し" && candidate.start == 0 && candidate.end == 2 &&
@@ -91,7 +91,7 @@ TEST(CandidateGenerationEfficiencyTest, BoundsSameTypeCandidatesForLongRun) {
   const auto codepoints = normalize::toCodepoints(text);
   const auto char_types = normalize::classifyCodepoints(codepoints);
 
-  const auto candidates = generator.generate(text, codepoints, 0, char_types);
+  const auto candidates = generator.generate(codepoints, 0, char_types);
   auto has_same_type_end = [&candidates](size_t end) {
     return std::any_of(candidates.begin(), candidates.end(), [end](const UnknownCandidate& candidate) {
       return candidate.origin == core::CandidateOrigin::SameType && candidate.start == 0 && candidate.end == end &&
@@ -145,7 +145,7 @@ TEST(CandidateGenerationEfficiencyTest, KeepsAsciiKeycapEmojiInOneSameTypeCandid
   const auto codepoints = normalize::toCodepoints(text);
   const auto char_types = normalize::classifyCodepoints(codepoints);
 
-  const auto candidates = generator.generate(text, codepoints, 0, char_types);
+  const auto candidates = generator.generate(codepoints, 0, char_types);
   const bool has_keycap = std::any_of(candidates.begin(), candidates.end(), [](const UnknownCandidate& candidate) {
     return candidate.origin == core::CandidateOrigin::SameType && candidate.surface == "1️⃣" && candidate.start == 0 &&
            candidate.end == 3;

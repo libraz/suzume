@@ -681,8 +681,7 @@ float UnknownWordGenerator::getCostForType(normalize::CharType ctype, size_t len
   }
 }
 
-std::vector<UnknownCandidate> UnknownWordGenerator::generate(std::string_view /*text*/,
-                                                             const std::vector<char32_t>& codepoints, size_t start_pos,
+std::vector<UnknownCandidate> UnknownWordGenerator::generate(const std::vector<char32_t>& codepoints, size_t start_pos,
                                                              const std::vector<normalize::CharType>& char_types) const {
   std::vector<UnknownCandidate> candidates;
 
