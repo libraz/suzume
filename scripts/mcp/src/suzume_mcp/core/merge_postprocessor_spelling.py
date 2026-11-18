@@ -331,6 +331,11 @@ def _postprocess_ascii_joiner_merge(result: list[dict], applied_rule: str | None
 _NON_INITIAL_SMALL_KANA = "ゃゅょぁぃぅぇぉゎャュョァィゥェォヮ"
 
 
+def _opens_with_copula(tokens: list[dict]) -> bool:
+    """Whether a re-read fragment tail starts with the copula だ/です."""
+    return tokens[0].get("pos") == "助動詞" and tokens[0].get("lemma") in ("だ", "です")
+
+
 def _postprocess_small_kana_head_merge(result: list[dict], applied_rule: str | None) -> tuple[list[dict], str | None]:
     """Reattach a token that opens with a small kana to the one before it.
 
@@ -346,9 +351,10 @@ def _postprocess_small_kana_head_merge(result: list[dict], applied_rule: str | N
             # A long unknown fragment is the small kana plus words the
             # dictionary does know (なき+ゃなんないんだ): only the kana
             # belongs to the previous mora, and the rest is read on its own.
-            rest = mecab_analyze(surface[1:]) if len(surface) > 3 and curr.get("lemma") in (None, "*") else []
+            rest = mecab_analyze(surface[1:]) if len(surface) > 1 and curr.get("lemma") in (None, "*") else []
             if (
                 rest
+                and (len(surface) > 3 or _opens_with_copula(rest))
                 and "".join(token.get("surface", "") for token in rest) == surface[1:]
                 and all(token.get("lemma") not in (None, "*") for token in rest)
             ):

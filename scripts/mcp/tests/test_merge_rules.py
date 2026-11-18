@@ -1,9 +1,12 @@
 """Tests for merge rules - individual pattern tests using mock token lists."""
 
+import pytest
+
 from suzume_mcp.core.mecab import mecab_analyze
 from suzume_mcp.core.merge_postprocessor_affixes import _postprocess_bound_voiced_suffix
 from suzume_mcp.core.merge_postprocessor_grammar import _postprocess_prefix_split
 from suzume_mcp.core.merge_rules import apply_suzume_merge
+from suzume_mcp.core.suzume_utils import get_expected_tokens
 from tests.helpers import tok as _tok
 from tests.helpers import tok as _token
 
@@ -2338,3 +2341,29 @@ class TestAdverbMoJoin:
 
     def test_keeps_a_pair_the_reference_reads_apart(self):
         assert self._merge("少し", "少しもやら")[:2] == ["少し", "も"]
+
+
+class TestSmallKanaFragmentCopula:
+    """A copula carried by an orphan small-kana fragment stays its own token."""
+
+    @pytest.mark.parametrize(
+        ("text", "surfaces"),
+        [
+            ("これはちゅうしゃだ", ["これ", "は", "ちゅうしゃ", "だ"]),
+            ("ちゅうしゃです", ["ちゅうしゃ", "です"]),
+        ],
+    )
+    def test_frees_the_copula_from_a_short_fragment(self, text, surfaces):
+        assert [token["surface"] for token in get_expected_tokens(text)[0]] == surfaces
+
+    @pytest.mark.parametrize(
+        ("text", "surfaces"),
+        [
+            ("りょこう", ["りょこう"]),
+            ("これはりょこうだ", ["これ", "はりょ", "こう", "だ"]),
+            ("本読んじょる", ["本", "読ん", "じょる"]),
+            ("かのじょの本", ["かのじょ", "の", "本"]),
+        ],
+    )
+    def test_a_tail_that_does_not_open_with_the_copula_stays_attached(self, text, surfaces):
+        assert [token["surface"] for token in get_expected_tokens(text)[0]] == surfaces
