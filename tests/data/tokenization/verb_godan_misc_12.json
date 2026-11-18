@@ -139,6 +139,131 @@
       ],
       "id": "mimasu",
       "input": "みます"
+    },
+    {
+      "description": "ああやっておく - regression test",
+      "expected": [
+        {
+          "lemma": "ああ",
+          "pos": "Interjection",
+          "surface": "ああ"
+        },
+        {
+          "lemma": "やる",
+          "pos": "Verb",
+          "surface": "やっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "おく",
+          "pos": "Auxiliary",
+          "surface": "おく"
+        }
+      ],
+      "id": "aayattteoku",
+      "input": "ああやっておく"
+    },
+    {
+      "description": "すぐよんで - regression test",
+      "expected": [
+        {
+          "lemma": "すぐ",
+          "pos": "Adverb",
+          "surface": "すぐ"
+        },
+        {
+          "lemma": "よむ",
+          "pos": "Verb",
+          "surface": "よん"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        }
+      ],
+      "id": "suguyonde",
+      "input": "すぐよんで"
+    },
+    {
+      "description": "すぐよみます - regression test",
+      "expected": [
+        {
+          "lemma": "すぐ",
+          "pos": "Adverb",
+          "surface": "すぐ"
+        },
+        {
+          "lemma": "よむ",
+          "pos": "Verb",
+          "surface": "よみ"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "suguyomimasu",
+      "input": "すぐよみます"
+    },
+    {
+      "description": "まだいきます - regression test",
+      "expected": [
+        {
+          "lemma": "まだ",
+          "pos": "Adverb",
+          "surface": "まだ"
+        },
+        {
+          "lemma": "いく",
+          "pos": "Verb",
+          "surface": "いき"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "madaikimasu",
+      "input": "まだいきます"
+    },
+    {
+      "description": "食べてはよみます - regression test",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "よむ",
+          "pos": "Verb",
+          "surface": "よみ"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "betehayomimasu",
+      "input": "食べてはよみます"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 12/12)",

@@ -425,7 +425,20 @@ std::optional<float> unknownCandidateCost(const tokenizer_unknown_detail::Unknow
       !verb_helpers::isVerbInDictionary(&dict_manager, candidate.lemma) &&
       (hiragana_verb_detail::spellsClosedWordBeforeOneMoraStem(codepoints, candidate.start, candidate.end,
                                                                &dict_manager) ||
-       hiragana_verb_detail::spellsOneMoraStemBeforePolite(codepoints, candidate.start, candidate.end))) {
+       hiragana_verb_detail::spellsOneMoraStemBeforePolite(codepoints, candidate.start, candidate.end) ||
+       hiragana_verb_detail::spellsClosedWordBeforeListedVerb(codepoints, candidate.start, candidate.end,
+                                                              candidate.lemma, &dict_manager))) {
+    return std::nullopt;
+  }
+  // The same two listed words do not fuse into an unlisted kana noun either
+  // (すぐ+よん). An unlisted kana adjective is left alone: まず+かっ and
+  // まずかっ differ only by whether まずい is a word.
+  if (candidate.pos == core::PartOfSpeech::Noun && !candidate.lemma_verified &&
+      dict_manager.lookupExact(candidate.lemma, candidate.pos) == nullptr &&
+      allCharsAre(char_types, codepoints, candidate.start, candidate.end, normalize::CharType::Hiragana,
+                  /*allow_choon=*/false) &&
+      hiragana_verb_detail::spellsClosedWordBeforeListedVerb(codepoints, candidate.start, candidate.end,
+                                                             candidate.lemma, &dict_manager)) {
     return std::nullopt;
   }
   if (exceeds_dict) {

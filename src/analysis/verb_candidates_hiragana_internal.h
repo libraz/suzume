@@ -39,6 +39,15 @@ bool spellsClosedWordBeforeOneMoraStem(const std::vector<char32_t>& codepoints, 
 // finite ます form (み+ます, き+ました): the polite auxiliary, never the tail of
 // an unlisted サ行 base.
 bool spellsOneMoraStemBeforePolite(const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos);
+// Guard (same family, lexical stem): true when [start_pos, end_pos) splits
+// into a closed word and a listed verb of two or more morae, read as a listed
+// cell (すぐ+よん) or as the verb lemma (すぐ+よむ, ああ+やる), so the span is
+// those two words rather than one fabricated word. The closed word is a listed
+// adverb, an interjection of two or more morae, or a particle with a host
+// before it (食べては+よむ): a bare particle or one-mora interjection may open
+// a kana word (な+でる, あ+らし).
+bool spellsClosedWordBeforeListedVerb(const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos,
+                                      std::string_view lemma, const dictionary::DictionaryManager* dict_manager);
 // True when start_pos opens a predicate slot: text start, a symbol, or a particle.
 bool opensPredicateSlot(const std::vector<char32_t>& codepoints, size_t start_pos);
 bool pronounEndsAt(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,

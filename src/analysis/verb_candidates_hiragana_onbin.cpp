@@ -670,6 +670,33 @@ bool spellsClosedWordBeforeOneMoraStem(const std::vector<char32_t>& codepoints, 
          lookupEntryInRange(*dict_manager, codepoints, start_pos, stem_pos, core::PartOfSpeech::Particle) != nullptr;
 }
 
+bool spellsClosedWordBeforeListedVerb(const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos,
+                                      std::string_view lemma, const dictionary::DictionaryManager* dict_manager) {
+  constexpr size_t kMinWordMorae = 2;
+  if (dict_manager == nullptr || end_pos > codepoints.size() || end_pos < start_pos + 1 + kMinWordMorae) {
+    return false;
+  }
+  for (size_t head_end = start_pos + 1; head_end + kMinWordMorae <= end_pos; ++head_end) {
+    const bool head_is_closed_word =
+        lookupEntryInRange(*dict_manager, codepoints, start_pos, head_end, core::PartOfSpeech::Adverb) != nullptr ||
+        (head_end - start_pos >= kMinWordMorae && lookupEntryInRange(*dict_manager, codepoints, start_pos, head_end,
+                                                                     core::PartOfSpeech::Interjection) != nullptr) ||
+        followsHostedParticle(codepoints, head_end, dict_manager);
+    if (!head_is_closed_word) {
+      continue;
+    }
+    if (lookupEntryInRange(*dict_manager, codepoints, head_end, end_pos, core::PartOfSpeech::Verb) != nullptr) {
+      return true;
+    }
+    const std::string head = extractSubstring(codepoints, start_pos, head_end);
+    if (utf8::startsWith(lemma, head) && lemma.size() > head.size() &&
+        vh::isVerbInDictionary(dict_manager, lemma.substr(head.size()))) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool spellsOneMoraStemBeforePolite(const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos) {
   if (end_pos > codepoints.size() || end_pos < start_pos + 2 || !grammar::isOneMoraIchidanStem(codepoints[start_pos])) {
     return false;
