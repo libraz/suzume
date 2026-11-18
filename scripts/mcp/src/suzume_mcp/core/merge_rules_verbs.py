@@ -42,6 +42,7 @@ def _fixed_te_search_unit(surface: str) -> dict | None:
     }
 
 
+_HIRAGANA_COMPOUNDS_LONGEST_FIRST = tuple(sorted(HIRAGANA_COMPOUNDS, key=len, reverse=True))
 _NOMINALIZING_PARTICLES = frozenset({"を", "は", "が", "の", "に", "で", "へ", "と", "も"})
 
 
@@ -222,7 +223,7 @@ def _merge_lexicalized_words(state: MergeState) -> bool:
 
         # 10. Lexicalized hiragana words
         if not merged:
-            for word in sorted(HIRAGANA_COMPOUNDS.keys(), key=len, reverse=True):
+            for word in _HIRAGANA_COMPOUNDS_LONGEST_FIRST:
                 if remaining.startswith(word):
                     length = 0
                     j = i
