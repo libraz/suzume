@@ -666,6 +666,26 @@ bool closesOneMoraVerbStem(const std::vector<char32_t>& codepoints, size_t start
           vh::finiteMasuFormLengthAt(codepoints, start_pos + 1) > 0);
 }
 
+namespace {
+
+// A listed word of @p pos that ends at @p head_end and opens at or before
+// @p start_pos: the candidate's head is that word or completes it (す+ぐおき
+// completes すぐ, ま+だに completes まだ).
+bool closedWordEndsAt(const dictionary::DictionaryManager& dict_manager, const std::vector<char32_t>& codepoints,
+                      size_t start_pos, size_t head_end, core::PartOfSpeech pos, size_t min_morae = 1) {
+  constexpr size_t kMaxReachBack = 3;
+  const size_t earliest = start_pos > kMaxReachBack ? start_pos - kMaxReachBack : 0;
+  for (size_t word_start = start_pos + 1; word_start-- > earliest;) {
+    if (head_end - word_start >= min_morae &&
+        lookupEntryInRange(dict_manager, codepoints, word_start, head_end, pos) != nullptr) {
+      return true;
+    }
+  }
+  return false;
+}
+
+}  // namespace
+
 bool spellsClosedWordBeforeOneMoraStem(const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos,
                                        const dictionary::DictionaryManager* dict_manager) {
   if (dict_manager == nullptr || end_pos > codepoints.size() || end_pos < start_pos + 2) {
@@ -676,8 +696,8 @@ bool spellsClosedWordBeforeOneMoraStem(const std::vector<char32_t>& codepoints, 
       !opensOneMoraPredicateSlot(codepoints, stem_pos, dict_manager)) {
     return false;
   }
-  return lookupEntryInRange(*dict_manager, codepoints, start_pos, stem_pos, core::PartOfSpeech::Adverb) != nullptr ||
-         lookupEntryInRange(*dict_manager, codepoints, start_pos, stem_pos, core::PartOfSpeech::Particle) != nullptr;
+  return closedWordEndsAt(*dict_manager, codepoints, start_pos, stem_pos, core::PartOfSpeech::Adverb) ||
+         closedWordEndsAt(*dict_manager, codepoints, start_pos, stem_pos, core::PartOfSpeech::Particle);
 }
 
 bool spellsClosedWordBeforeListedVerb(const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos,
@@ -688,9 +708,9 @@ bool spellsClosedWordBeforeListedVerb(const std::vector<char32_t>& codepoints, s
   }
   for (size_t head_end = start_pos + 1; head_end + kMinWordMorae <= end_pos; ++head_end) {
     const bool head_is_closed_word =
-        lookupEntryInRange(*dict_manager, codepoints, start_pos, head_end, core::PartOfSpeech::Adverb) != nullptr ||
-        (head_end - start_pos >= kMinWordMorae && lookupEntryInRange(*dict_manager, codepoints, start_pos, head_end,
-                                                                     core::PartOfSpeech::Interjection) != nullptr) ||
+        closedWordEndsAt(*dict_manager, codepoints, start_pos, head_end, core::PartOfSpeech::Adverb) ||
+        closedWordEndsAt(*dict_manager, codepoints, start_pos, head_end, core::PartOfSpeech::Interjection,
+                         kMinWordMorae) ||
         followsHostedParticle(codepoints, head_end, dict_manager);
     if (!head_is_closed_word) {
       continue;

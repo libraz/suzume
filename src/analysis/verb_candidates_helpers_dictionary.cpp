@@ -527,8 +527,31 @@ bool isCommaClauseChainingRenyokei(const std::vector<char32_t>& codepoints, size
 
 namespace {
 
+// True when a listed adverb opens before @p pos and runs past it and no listed
+// word closes at @p pos, so no token can start there (ま|だに inside まだ, but
+// なん|です inside なんで stays open).
+bool liesInsideListedAdverb(const std::vector<char32_t>& codepoints, size_t pos,
+                            const dictionary::DictionaryManager& dict_manager) {
+  constexpr size_t kAdverbReach = 3;
+  constexpr PartOfSpeechMask kAnyPartOfSpeech = ~PartOfSpeechMask{0};
+  if (hasDictionaryEntryEndingAt(dict_manager, codepoints, lookbehindStart(pos, kAdverbReach), pos, kAnyPartOfSpeech)) {
+    return false;
+  }
+  const size_t last_end = lookaheadEnd(codepoints.size(), pos, kAdverbReach);
+  for (size_t adverb_start = lookbehindStart(pos, kAdverbReach); adverb_start < pos; ++adverb_start) {
+    for (size_t adverb_end = pos + 1; adverb_end <= last_end; ++adverb_end) {
+      if (lookupEntryInRange(dict_manager, codepoints, adverb_start, adverb_end, core::PartOfSpeech::Adverb) !=
+          nullptr) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 // True when a @p pos entry taken by @p accept opens within @p lookback before
-// start_pos and runs past it, ending at most @p probe after it.
+// start_pos and runs past it, ending at most @p probe after it. An entry that
+// itself opens inside a listed adverb is not a token there and owns nothing.
 bool startsInsideDictionaryEntry(const std::vector<char32_t>& codepoints, size_t start_pos,
                                  const dictionary::DictionaryManager* dict_manager, size_t lookback, size_t probe,
                                  core::PartOfSpeech pos, EntryAccept accept) {
@@ -538,6 +561,9 @@ bool startsInsideDictionaryEntry(const std::vector<char32_t>& codepoints, size_t
   const size_t first_start = lookbehindStart(start_pos, lookback);
   const size_t probe_end = lookaheadEnd(codepoints.size(), start_pos, probe);
   for (size_t entry_start = first_start; entry_start < start_pos; ++entry_start) {
+    if (liesInsideListedAdverb(codepoints, entry_start, *dict_manager)) {
+      continue;
+    }
     for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, entry_start, probe_end)) {
       if (match.entry != nullptr && match.entry->pos == pos && (accept == nullptr || accept(*match.entry)) &&
           entry_start + normalize::utf8Length(match.entry->surface) > start_pos) {
