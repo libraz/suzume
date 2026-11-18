@@ -39,7 +39,7 @@ jobs:
           node-version: 22
           cache: yarn
           cache-dependency-path: bindings/wasm/yarn.lock
-      - uses: astral-sh/setup-uv@v10
+      - uses: astral-sh/setup-uv@v10.3.3
         with:
           version: ${{ env.UV_VERSION }}
       - run: yarn install --immutable
@@ -54,7 +54,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v10
+      - uses: astral-sh/setup-uv@v10.3.3
         with:
           version: ${{ env.UV_VERSION }}
       # Ratchet on hardcoded word tests / raw score literals / scorer rules,
@@ -82,7 +82,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y mecab libmecab-dev mecab-ipadic-utf8
           command -v mecab
-      - uses: astral-sh/setup-uv@v10
+      - uses: astral-sh/setup-uv@v10.3.3
         with:
           version: ${{ env.UV_VERSION }}
       # The oracle tests shell out to the native CLI for the Suzume side of every
@@ -152,7 +152,7 @@ jobs:
           node-version: 22
           cache: yarn
           cache-dependency-path: bindings/wasm/yarn.lock
-      - uses: astral-sh/setup-uv@v10
+      - uses: astral-sh/setup-uv@v10.3.3
         with:
           version: ${{ env.UV_VERSION }}
       - name: Build native and compile dictionaries
@@ -201,7 +201,7 @@ jobs:
     if: github.ref != 'refs/heads/develop'
     steps:
       - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v10
+      - uses: astral-sh/setup-uv@v10.3.3
         with:
           version: ${{ env.UV_VERSION }}
       # Go through the Makefile rather than restating its cmake invocation here:
