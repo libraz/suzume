@@ -6,8 +6,10 @@
 set -eu
 cd "$(git rev-parse --show-toplevel)"
 
-canonical=$(grep -Eo 'project\(suzume VERSION [0-9]+\.[0-9]+\.[0-9]+' CMakeLists.txt \
-  | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+')
+semver='[0-9]+\.[0-9]+\.[0-9]+'
+
+canonical=$(grep -Eo "project\\(suzume VERSION $semver" CMakeLists.txt \
+  | grep -Eo "$semver")
 
 if [ -z "${canonical:-}" ]; then
   echo "❌ could not read canonical version from CMakeLists.txt"
@@ -25,12 +27,12 @@ check() {
   fi
 }
 
-wasm_ver=$(grep -Eo '"version": *"[0-9]+\.[0-9]+\.[0-9]+"' bindings/wasm/package.json \
-  | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+wasm_ver=$(grep -Eo "\"version\": *\"$semver\"" bindings/wasm/package.json \
+  | grep -Eo "$semver" | head -1)
 check "wasm package.json" bindings/wasm/package.json "$wasm_ver"
 
-py_ver=$(grep -Eo '^version = "[0-9]+\.[0-9]+\.[0-9]+"' bindings/python/pyproject.toml \
-  | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+py_ver=$(grep -Eo "^version = \"$semver\"" bindings/python/pyproject.toml \
+  | grep -Eo "$semver" | head -1)
 check "python pyproject.toml" bindings/python/pyproject.toml "$py_ver"
 
 # uv.lock records the project's own version, so a bump that skips `uv lock`
