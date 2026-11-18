@@ -160,12 +160,7 @@ bool startsIruPoliteFormAt(const std::vector<char32_t>& codepoints, size_t start
     return false;
   }
   const size_t end_pos = start_pos + 1 + masu_length;
-  if (end_pos >= codepoints.size()) {
-    return true;
-  }
-  const char32_t following = codepoints[end_pos];
-  return normalize::isExtendedParticle(following) || following == U'。' || following == U'、' || following == U'」' ||
-         following == U'）';
+  return verb_helpers::clauseEndsAt(codepoints, end_pos) || normalize::isExtendedParticle(codepoints[end_pos]);
 }
 
 // An intentional auxiliary is structurally meaningful here only when it
