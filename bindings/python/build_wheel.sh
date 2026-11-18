@@ -36,14 +36,12 @@ esac
 # silently reusing objects compiled for another architecture or deployment target.
 BUILD_DIR="${SUZUME_PYTHON_BUILD_DIR:-$PROJECT_ROOT/build-python-$BUILD_PLATFORM}"
 
-# uv supplies the interpreter, the build frontend and every packaging tool at
-# the versions pinned here, so nothing depends on the python found on PATH.
+# uv supplies the build frontend and every packaging tool at the versions
+# pinned here, so nothing depends on the python found on PATH.
 WHEEL_VERSION="0.48.0"
 AUDITWHEEL_VERSION="6.8.2"
 PATCHELF_VERSION="0.19.3.0"
-export UV_MANAGED_PYTHON=1
-UV_PYTHON="$(<"$SCRIPT_DIR/.python-version")"
-export UV_PYTHON
+source "$SCRIPT_DIR/wheel_env.sh"
 
 wheel_tool() {
     uv tool run --from "wheel==$WHEEL_VERSION" wheel "$@"

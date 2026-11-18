@@ -3,27 +3,12 @@
 # the public Python and console entry points.
 set -euo pipefail
 
-if [[ $# -ne 1 ]]; then
-    echo "Usage: $0 path/to/suzume-*.whl" >&2
-    exit 2
-fi
-
-WHEEL_INPUT="$1"
-if [[ ! -f "$WHEEL_INPUT" ]]; then
-    echo "Error: wheel not found: $WHEEL_INPUT" >&2
-    exit 1
-fi
-
-WHEEL_DIR="$(cd "$(dirname "$WHEEL_INPUT")" && pwd)"
-WHEEL="$WHEEL_DIR/$(basename "$WHEEL_INPUT")"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+source "$SCRIPT_DIR/wheel_env.sh"
+resolve_wheel_argument "$@"
 SMOKE_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/suzume-wheel-smoke.XXXXXX")"
 trap 'rm -rf "$SMOKE_ROOT"' EXIT
 
-# uv supplies the interpreter pinned for the binding, never the python on PATH.
-export UV_MANAGED_PYTHON=1
-UV_PYTHON="$(<"$SCRIPT_DIR/.python-version")"
-export UV_PYTHON
 uv venv "$SMOKE_ROOT/venv"
 uv pip install --python "$SMOKE_ROOT/venv/bin/python" --no-deps "$WHEEL"
 mkdir "$SMOKE_ROOT/work"

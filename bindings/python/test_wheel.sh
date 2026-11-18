@@ -4,27 +4,12 @@
 # rather than the checkout.
 set -euo pipefail
 
-if [[ $# -ne 1 ]]; then
-    echo "Usage: $0 path/to/suzume-*.whl" >&2
-    exit 2
-fi
-
-WHEEL_INPUT="$1"
-if [[ ! -f "$WHEEL_INPUT" ]]; then
-    echo "Error: wheel not found: $WHEEL_INPUT" >&2
-    exit 1
-fi
-
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-WHEEL_DIR="$(cd "$(dirname "$WHEEL_INPUT")" && pwd)"
-WHEEL="$WHEEL_DIR/$(basename "$WHEEL_INPUT")"
+source "$SCRIPT_DIR/wheel_env.sh"
+resolve_wheel_argument "$@"
 TEST_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/suzume-wheel-test.XXXXXX")"
 trap 'rm -rf "$TEST_ROOT"' EXIT
 
-# uv supplies the interpreter pinned for the binding, never the python on PATH.
-export UV_MANAGED_PYTHON=1
-UV_PYTHON="$(<"$SCRIPT_DIR/.python-version")"
-export UV_PYTHON
 uv venv "$TEST_ROOT/venv"
 # The test tools come from uv.lock at the versions the dev environment uses;
 # the wheel itself goes in without dependency resolution so that nothing is
