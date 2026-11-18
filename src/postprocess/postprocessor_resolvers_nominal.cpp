@@ -163,7 +163,8 @@ bool isNominalForcingParticle(const core::Morpheme& next) {
 // A noun followed by で is normally the case-particle reading (本で、電車で、
 // 雪国であった). Copular continuations (本である、本ではない、本でしかない)
 // retain the auxiliary reading, so resolve the ambiguity after both adjacent
-// morphemes have been selected.
+// morphemes have been selected. A verb で closed by た, て or ます is the
+// continuative of 出る (すぐでた), which neither reading can take.
 void resolveNominalCaseDe(std::vector<core::Morpheme>& result) {
   for (size_t idx = 0; idx < result.size(); ++idx) {
     auto& de = result[idx];
@@ -171,6 +172,12 @@ void resolveNominalCaseDe(std::vector<core::Morpheme>& result) {
       continue;
     }
     core::Morpheme* successor = idx + 1 < result.size() ? &result[idx + 1] : nullptr;
+    if (de.pos == core::PartOfSpeech::Verb && successor != nullptr &&
+        (successor->extended_pos == core::ExtendedPOS::AuxTenseTa ||
+         successor->extended_pos == core::ExtendedPOS::AuxTenseMasu ||
+         (successor->extended_pos == core::ExtendedPOS::ParticleConj && grammar::isTeDeSurface(successor->surface)))) {
+      continue;
+    }
     if (idx == 0) {
       if (successor != nullptr && utf8::equalsAny(successor->surface, kGozaruForms)) {
         retagCopulaDa(de);

@@ -2257,6 +2257,94 @@
       ],
       "id": "rigatattta_ninattta",
       "input": "残りがたった三人になった"
+    },
+    {
+      "description": "すぐでた - regression test",
+      "expected": [
+        {
+          "lemma": "すぐ",
+          "pos": "Adverb",
+          "surface": "すぐ"
+        },
+        {
+          "lemma": "出る",
+          "pos": "Verb",
+          "surface": "で"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "sugudeta",
+      "input": "すぐでた"
+    },
+    {
+      "description": "すぐでて - regression test",
+      "expected": [
+        {
+          "lemma": "すぐ",
+          "pos": "Adverb",
+          "surface": "すぐ"
+        },
+        {
+          "lemma": "出る",
+          "pos": "Verb",
+          "surface": "で"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "sugudete",
+      "input": "すぐでて"
+    },
+    {
+      "description": "すぐでます - regression test",
+      "expected": [
+        {
+          "lemma": "すぐ",
+          "pos": "Adverb",
+          "surface": "すぐ"
+        },
+        {
+          "lemma": "出る",
+          "pos": "Verb",
+          "surface": "で"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "sugudemasu",
+      "input": "すぐでます"
+    },
+    {
+      "description": "すぐでたら - regression test",
+      "expected": [
+        {
+          "lemma": "すぐ",
+          "pos": "Adverb",
+          "surface": "すぐ"
+        },
+        {
+          "lemma": "出る",
+          "pos": "Verb",
+          "surface": "で"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "たら"
+        }
+      ],
+      "id": "sugudetara",
+      "input": "すぐでたら"
     }
   ],
   "description": "Te-form and ta-form patterns",

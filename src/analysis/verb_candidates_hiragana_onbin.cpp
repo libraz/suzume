@@ -777,16 +777,18 @@ void appendIchidanRenyokei1CharCandidates(const std::vector<char32_t>& codepoint
   if (!(kana::isERowCodepoint(codepoints[start_pos]) && base_is_dict_verb) && !predicate_slot_ichidan) {
     return;
   }
+  // A listed continuative carries its own lemma (で of 出る), shared with its dictionary edge.
+  const std::string lemma = vh::lookupVerbLemma(dict_manager, stem_surface, base_form);
   // Strong negative cost to beat particle split
   // Particle path can be as low as -0.2, so we need lower
   constexpr float kCost = candidate::verb_cost::kStandardBonus;
   SUZUME_DEBUG_VERBOSE_BLOCK {
-    SUZUME_DEBUG_STREAM << "[VERB_CAND] " << stem_surface << " hiragana_ichidan_renyokei_1char lemma=" << base_form
+    SUZUME_DEBUG_STREAM << "[VERB_CAND] " << stem_surface << " hiragana_ichidan_renyokei_1char lemma=" << lemma
                         << " cost=" << kCost << "\n";
   }
   // Explicit VerbRenyokei for て/た connection
   candidates.push_back(makeVerbCandidate(
-      stem_surface, start_pos, start_pos + 1, kCost, base_form, dictionary::ConjugationType::Ichidan, true,
+      stem_surface, start_pos, start_pos + 1, kCost, lemma, dictionary::ConjugationType::Ichidan, true,
       predicate_slot_ichidan ? CandidateOrigin::VerbHiraganaInflectedRenyokei : CandidateOrigin::VerbHiragana,
       candidate::kStandardOriginConfidence, "hiragana_ichidan_renyokei_1char", core::ExtendedPOS::VerbRenyokei));
 }
