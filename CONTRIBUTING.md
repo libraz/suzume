@@ -43,6 +43,8 @@ make lint                                       # read-only static checks
 make format                                     # apply formatting across every language
 ```
 
+`make lint` also runs Biome on the WebAssembly binding, so it needs the Node and Yarn set up below, and `make format` additionally needs clang-format (`make CLANG_FORMAT=<binary> format` selects a versioned one).
+
 `make python-sync` provisions both Python environments up front; every target that needs one also syncs it on demand. The tooling tests (`make mcp-test`) and `make oracle-sync-check` also need the reference analyzer that CI installs in the `mcp-tests` job.
 
 Python binding (ctypes over the shared library):
@@ -51,9 +53,10 @@ Python binding (ctypes over the shared library):
 make python-test
 ```
 
-WebAssembly binding, which needs an Emscripten toolchain plus the Node and Yarn that [mise](https://mise.jdx.dev/) installs from `bindings/wasm/mise.toml` (the Yarn version is read from `packageManager` in `package.json`):
+WebAssembly binding, which needs an Emscripten toolchain plus the Node and Yarn that [mise](https://mise.jdx.dev/) installs from `bindings/wasm/mise.toml` (the Yarn version is read from `packageManager` in `package.json`). The Makefile calls `yarn` directly, so mise must be activated in the shell:
 
 ```bash
+(cd bindings/wasm && mise install && yarn install)   # no make target installs the JS dependencies
 source /path/to/emsdk/emsdk_env.sh
 make wasm
 make wasm-test
