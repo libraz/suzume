@@ -1506,6 +1506,136 @@
       ],
       "id": "temporal_ato_suffix_direct_attachment_control",
       "input": "終了後に確認します"
+    },
+    {
+      "description": "環境づくりを進める - regression test",
+      "expected": [
+        {
+          "lemma": "環境",
+          "pos": "Noun",
+          "surface": "環境"
+        },
+        {
+          "lemma": "づくり",
+          "pos": "Suffix",
+          "surface": "づくり"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "進める",
+          "pos": "Verb",
+          "surface": "進める"
+        }
+      ],
+      "id": "dukuriwo_meru",
+      "input": "環境づくりを進める"
+    },
+    {
+      "description": "街づくりの計画 - regression test",
+      "expected": [
+        {
+          "lemma": "街",
+          "pos": "Noun",
+          "surface": "街"
+        },
+        {
+          "lemma": "づくり",
+          "pos": "Suffix",
+          "surface": "づくり"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "計画",
+          "pos": "Noun",
+          "surface": "計画"
+        }
+      ],
+      "id": "dukurino",
+      "input": "街づくりの計画"
+    },
+    {
+      "description": "体づくりを始める - regression test",
+      "expected": [
+        {
+          "lemma": "体",
+          "pos": "Noun",
+          "surface": "体"
+        },
+        {
+          "lemma": "づくり",
+          "pos": "Suffix",
+          "surface": "づくり"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "始める",
+          "pos": "Verb",
+          "surface": "始める"
+        }
+      ],
+      "id": "dukuriwo_meru_2",
+      "input": "体づくりを始める"
+    },
+    {
+      "description": "パンを作りたい - regression test",
+      "expected": [
+        {
+          "lemma": "パン",
+          "pos": "Noun",
+          "surface": "パン"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "作る",
+          "pos": "Verb",
+          "surface": "作り"
+        },
+        {
+          "lemma": "たい",
+          "pos": "Auxiliary",
+          "surface": "たい"
+        }
+      ],
+      "id": "wo_ritai",
+      "input": "パンを作りたい"
+    },
+    {
+      "description": "作りが甘い - regression test",
+      "expected": [
+        {
+          "lemma": "作り",
+          "pos": "Noun",
+          "surface": "作り"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "甘い",
+          "pos": "Adjective",
+          "surface": "甘い"
+        }
+      ],
+      "id": "riga_i_2",
+      "input": "作りが甘い"
     }
   ],
   "description": "Suffixes (さん、的、化)",
