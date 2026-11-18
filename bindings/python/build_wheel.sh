@@ -168,8 +168,8 @@ else
     # auditwheel needs a Linux wheel as input. This is an intermediate tag only:
     # the public manylinux tag is produced and validated by auditwheel repair.
     wheel_tool tags --platform-tag "linux_x86_64" --remove "$INITIAL_WHEEL"
-    WHEELS=("$SCRIPT_DIR"/dist/*.whl)
-    INITIAL_WHEEL="${WHEELS[0]}"
+    require_single_wheel "retagged Linux wheel"
+    INITIAL_WHEEL="$SINGLE_WHEEL"
     REPAIR_DIR="$SCRIPT_DIR/dist-repaired"
     rm -rf "$REPAIR_DIR"
     mkdir -p "$REPAIR_DIR"
