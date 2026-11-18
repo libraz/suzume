@@ -132,6 +132,8 @@ if(MSVC)
   add_compile_options(/wd4456 /wd4267 /wd4244 /wd4101)
 else()
   add_compile_options(-Wall -Wextra -Wpedantic)
+  # Scores must be bit-identical across compilers, architectures and debug configurations.
+  add_compile_options(-ffp-contract=off)
 endif()
 
 # Generate compile_commands.json
