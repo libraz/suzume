@@ -155,14 +155,18 @@ bool hasKanaOrdinalRightBoundary(const std::vector<char32_t>& codepoints, size_t
   return false;
 }
 
-bool isClosedKanaNumberCounter(const std::vector<char32_t>& codepoints, size_t number_start, size_t number_end,
-                               size_t suffix_end) {
-  static constexpr std::array<std::string_view, 3> kNumberReadings = {"いち", "ふた", "よん"};
-  static constexpr std::array<std::string_view, 2> kCounterReadings = {"まい", "にん"};
-  const std::string number = extractSubstring(codepoints, number_start, number_end);
-  const std::string counter = extractSubstring(codepoints, number_end, suffix_end);
-  return std::find(kNumberReadings.begin(), kNumberReadings.end(), number) != kNumberReadings.end() &&
-         std::find(kCounterReadings.begin(), kCounterReadings.end(), counter) != kCounterReadings.end();
+// まい and にん are Sino-Japanese counters, so in kana they follow a Sino-Japanese
+// digit reading; a native numeral takes native counters instead (ふた+つ, ひと+り).
+bool isSinoKanaNumberCounter(const std::vector<char32_t>& codepoints, size_t number_start, size_t number_end,
+                             size_t suffix_end) {
+  static constexpr std::array<std::u32string_view, 2> kSinoKanaCounters = {U"まい", U"にん"};
+  KanaDigitReading digit{};
+  if (!kanaDigitAt(codepoints, number_start, number_end, digit) || digit.surface.size() != number_end - number_start) {
+    return false;
+  }
+  return std::any_of(kSinoKanaCounters.begin(), kSinoKanaCounters.end(), [&](std::u32string_view counter) {
+    return counter.size() == suffix_end - number_end && codepointsMatchAt(codepoints, number_end, suffix_end, counter);
+  });
 }
 
 }  // namespace
@@ -231,9 +235,9 @@ void appendStructuralCounterCandidates(const std::vector<char32_t>& codepoints, 
   }
 
   // Kana quantity readings are a finite composition of the closed NounNumber
-  // and quantitative Suffix classes (いち+まい, よん+にん). Hiragana suffixes
-  // are restricted to those readings; kanji counters such as 月 keep the
-  // mixed-script path.
+  // and quantitative Suffix classes (いち+まい, よん+にん). A hiragana suffix
+  // must be a Sino-Japanese counter after a Sino-Japanese digit; kanji
+  // counters such as 月 keep the mixed-script path.
   if (dict_manager != nullptr && char_types[start_pos] == normalize::CharType::Hiragana) {
     const size_t number_probe_end = std::min(codepoints.size(), start_pos + kMaxKanaNounNumberLength);
     for (const auto& number_result : lookupResultsInRange(*dict_manager, codepoints, start_pos, number_probe_end)) {
@@ -249,7 +253,7 @@ void appendStructuralCounterCandidates(const std::vector<char32_t>& codepoints, 
         }
         const size_t suffix_end = number_end + suffix_result.length;
         if (normalize::isCharTypeSpan(char_types, number_end, suffix_end, normalize::CharType::Hiragana) &&
-            !isClosedKanaNumberCounter(codepoints, start_pos, number_end, suffix_end)) {
+            !isSinoKanaNumberCounter(codepoints, start_pos, number_end, suffix_end)) {
           continue;
         }
         std::string surface = extractSubstring(codepoints, start_pos, suffix_end);
