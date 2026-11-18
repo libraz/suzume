@@ -71,8 +71,7 @@ void adj_detail::appendKanjiIAdjPostVariants(const std::vector<char32_t>& codepo
       {"くなかっ", 3, candidate::kAdjKuSplitBonus, core::ExtendedPOS::AdjRenyokei, 0, "i_adjective_ku_nakatt"},
       {"くて", 1, candidate::kAdjKuSplitBonus, core::ExtendedPOS::AdjRenyokei, 1, "i_adjective_ku_te"},
       {"かった", 1, candidate::kAdjKattSplitBonus, core::ExtendedPOS::AdjKatt, 2, "i_adjective_katt"},
-      {"ければ", 1, candidate::kAdjKeSplitBonus, core::ExtendedPOS::AdjKeForm, 3, "i_adjective_kere", false, false,
-       true},
+      {"ければ", 1, candidate::kAdjKeSplitBonus, core::ExtendedPOS::AdjKeForm, 3, "i_adjective_kere", false, true},
   }};
   adj_detail::appendTrimmedAdjVariants(candidates, kTrimRules.data(), kTrimRules.size(), candidate_start, dict_manager);
 

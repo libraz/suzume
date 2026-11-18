@@ -363,9 +363,6 @@ void appendTrimmedAdjVariants(std::vector<UnknownCandidate>& candidates, const T
         if (!utf8::endsWith(surface, rule.suffix)) {
           continue;
         }
-        if (rule.reject_contracted_n_past && utf8::endsWith(surface, "んかった")) {
-          continue;
-        }
         if (rule.require_nonempty_stem && surface.size() <= rule.char_trim * core::kJapaneseCharBytes) {
           continue;
         }

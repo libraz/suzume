@@ -37,15 +37,13 @@ constexpr size_t kHiraganaIAdjStemAuxPatternCount = 6;
 struct TrimmedAdjVariantRule {
   constexpr TrimmedAdjVariantRule(std::string_view suffix_value, size_t char_trim_value, float cost_bonus_value,
                                   core::ExtendedPOS epos_value, uint8_t group_value,
-                                  [[maybe_unused]] const char* pattern_value,
-                                  bool reject_contracted_n_past_value = false, bool require_nonempty_stem_value = false,
+                                  [[maybe_unused]] const char* pattern_value, bool require_nonempty_stem_value = false,
                                   bool prefer_dictionary_lemma_value = false)
       : suffix(suffix_value),
         char_trim(char_trim_value),
         cost_bonus(cost_bonus_value),
         epos(epos_value),
         group(group_value),
-        reject_contracted_n_past(reject_contracted_n_past_value),
         require_nonempty_stem(require_nonempty_stem_value),
         prefer_dictionary_lemma(prefer_dictionary_lemma_value) {
 #ifdef SUZUME_DEBUG_INFO
@@ -58,7 +56,6 @@ struct TrimmedAdjVariantRule {
   float cost_bonus;
   core::ExtendedPOS epos;
   uint8_t group;
-  bool reject_contracted_n_past = false;
   bool require_nonempty_stem = false;
   bool prefer_dictionary_lemma = false;
 #ifdef SUZUME_DEBUG_INFO
