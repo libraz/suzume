@@ -96,6 +96,15 @@ def test_existing_kana_quantity_and_kanji_controls_are_not_rewritten_as_ordinals
         assert matches[0]["pos"] == "Noun"
 
 
+@pytest.mark.parametrize(
+    "text,merged", [("ふたにんが来た", "ふたにん"), ("ふたまいの紙", "ふたまい"), ("よん月に会う", "よん月")]
+)
+def test_kana_quantity_requires_a_counter_of_the_numeral_class(text, merged):
+    tokens, _source, _rule = get_expected_tokens(text)
+
+    assert merged not in [token["surface"] for token in tokens]
+
+
 def test_kana_ordinal_consumes_only_its_exact_source_span():
     ordinal = "にじゅういちばん"
     token_surfaces = ["に", "じゅう", "いち", "ばん", "でした", "ね", "。"]

@@ -11,8 +11,7 @@ from .constants import (
     FIXED_FUNCTION_SEARCH_UNITS,
     FIXED_INFLECTED_FUNCTION_UNITS,
     GREETING_INTERJECTIONS,
-    KANA_COUNTER_SUFFIXES,
-    KANA_NUMBER_STEMS,
+    KANA_NUMBER_COUNTER_CLASSES,
     KANA_PERSONAL_PRONOUNS,
 )
 from .constants_search_units import (
@@ -177,7 +176,11 @@ def _classical_adjective_cells(remaining: str) -> list[dict] | None:
 
 
 _KANA_NUMBER_COUNTERS = tuple(
-    sorted((stem + suffix for stem in KANA_NUMBER_STEMS for suffix in KANA_COUNTER_SUFFIXES), key=len, reverse=True)
+    sorted(
+        (stem + suffix for stems, suffixes in KANA_NUMBER_COUNTER_CLASSES for stem in stems for suffix in suffixes),
+        key=len,
+        reverse=True,
+    )
 )
 
 

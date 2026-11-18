@@ -36,14 +36,14 @@ COUNTER_UNITS: list[str] = [
 ]
 
 
-# Productive kana quantity readings owned by Suzume's finite L1 classes.  The
-# stems are NounNumber entries and the tails are quantitative Suffix entries;
-# their Cartesian product is closed and can therefore repair MeCab's arbitrary
-# syllable splits without enumerating open-class nouns.
-KANA_NUMBER_STEMS: frozenset[str] = frozenset({"いち", "ふた", "よん"})
-
-
-KANA_COUNTER_SUFFIXES: frozenset[str] = frozenset({"まい", "にん", "月"})
+# Productive kana quantity readings owned by Suzume's finite L1 classes: number
+# stems and quantitative suffixes, paired by numeral class. A Sino-slot reading
+# takes Sino counters and a native reading takes native ones, so each class is
+# its own closed product (ふた月, never ふたにん).
+KANA_NUMBER_COUNTER_CLASSES: tuple[tuple[frozenset[str], frozenset[str]], ...] = (
+    (frozenset({"いち", "よん"}), frozenset({"まい", "にん"})),
+    (frozenset({"ふた"}), frozenset({"月"})),
+)
 
 
 # Digit readings that form a closed kana ordinal before the suffix ばん.
