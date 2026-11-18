@@ -71,6 +71,32 @@ bool isDictionaryVerbContinuative(const dictionary::DictionaryManager* dict_mana
           verb_helpers::isVerbInDictionary(dict_manager, codepoints, head_start, continuative_end, "る"));
 }
 
+constexpr size_t kMaximumAuxiliarySurfaceLength = 6;
+constexpr size_t kNoMasuAuxiliary = static_cast<size_t>(-1);
+
+bool isAuxiliaryMatch(const dictionary::LookupResult& match, core::ExtendedPOS epos) {
+  return match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Auxiliary &&
+         match.entry->extended_pos == epos;
+}
+
+// Whether a dictionary AuxNegativeNu ends exactly at @p chain_end and starts
+// no earlier than @p masu_end, the end of the preceding AuxTenseMasu.
+bool endsInNegativeAuxiliaryAfter(const dictionary::DictionaryManager& dict_manager,
+                                  const std::vector<char32_t>& codepoints, size_t masu_end, size_t chain_end) {
+  if (masu_end >= chain_end) {
+    return false;
+  }
+  const size_t probe_start = std::max(masu_end, lookbehindStart(chain_end, kMaximumAuxiliarySurfaceLength));
+  for (size_t negative_start = probe_start; negative_start < chain_end; ++negative_start) {
+    for (const auto& match : lookupResultsInRange(dict_manager, codepoints, negative_start, chain_end)) {
+      if (isAuxiliaryMatch(match, core::ExtendedPOS::AuxNegativeNu) && negative_start + match.length == chain_end) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 }  // namespace
 
 bool hasFiniteExistentialContinuation(const dictionary::DictionaryManager& dict_manager,
@@ -87,25 +113,16 @@ bool hasFiniteExistentialContinuation(const dictionary::DictionaryManager& dict_
     return false;
   }
 
-  constexpr size_t kMaximumAuxiliarySurfaceLength = 6;
   const size_t auxiliary_start = verb_start + 1;
   const size_t auxiliary_probe_end = lookaheadEnd(codepoints.size(), auxiliary_start, kMaximumAuxiliarySurfaceLength);
   bool has_finite_dictionary_auxiliary = false;
-  bool has_initial_dictionary_masu_auxiliary = false;
-  const auto first_auxiliary_matches =
-      lookupResultsInRange(dict_manager, codepoints, auxiliary_start, auxiliary_probe_end);
-  for (const auto& match : first_auxiliary_matches) {
-    if (match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Auxiliary &&
-        (match.entry->extended_pos == core::ExtendedPOS::AuxTenseTa ||
-         match.entry->extended_pos == core::ExtendedPOS::AuxTenseMasu)) {
+  size_t first_masu_end = kNoMasuAuxiliary;
+  for (const auto& match : lookupResultsInRange(dict_manager, codepoints, auxiliary_start, auxiliary_probe_end)) {
+    if (isAuxiliaryMatch(match, core::ExtendedPOS::AuxTenseMasu)) {
       has_finite_dictionary_auxiliary = true;
-    }
-    if (match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Auxiliary &&
-        match.entry->extended_pos == core::ExtendedPOS::AuxTenseMasu) {
-      has_initial_dictionary_masu_auxiliary = true;
-    }
-    if (has_finite_dictionary_auxiliary && has_initial_dictionary_masu_auxiliary) {
-      break;
+      first_masu_end = std::min(first_masu_end, auxiliary_start + match.length);
+    } else if (isAuxiliaryMatch(match, core::ExtendedPOS::AuxTenseTa)) {
+      has_finite_dictionary_auxiliary = true;
     }
   }
   if (!has_finite_dictionary_auxiliary) {
@@ -151,39 +168,10 @@ bool hasFiniteExistentialContinuation(const dictionary::DictionaryManager& dict_
       // The base-output auxiliary ん licenses finite ません only as the end
       // of a dictionary-proven AuxTenseMasu + AuxNegativeNu chain. This keeps
       // other base-output forms such as ましょう outside the exemption.
-      if (!inflection.auxiliaryProvidesConnection(outer_auxiliary, grammar::conn::kAuxOutBase) ||
-          !has_initial_dictionary_masu_auxiliary) {
-        continue;
+      if (inflection.auxiliaryProvidesConnection(outer_auxiliary, grammar::conn::kAuxOutBase) &&
+          endsInNegativeAuxiliaryAfter(dict_manager, codepoints, first_masu_end, prefix_end)) {
+        return true;
       }
-
-      constexpr size_t kMaximumNegativeAuxiliarySurfaceLength = 6;
-      const size_t negative_probe_start =
-          std::max(auxiliary_start, lookbehindStart(prefix_end, kMaximumNegativeAuxiliarySurfaceLength));
-      bool ends_in_dictionary_negative_auxiliary = false;
-      for (size_t negative_start = negative_probe_start; negative_start < prefix_end; ++negative_start) {
-        for (const auto& match : lookupResultsInRange(dict_manager, codepoints, negative_start, prefix_end)) {
-          if (match.entry != nullptr && match.entry->pos == core::PartOfSpeech::Auxiliary &&
-              match.entry->extended_pos == core::ExtendedPOS::AuxNegativeNu &&
-              negative_start + match.length == prefix_end &&
-              std::any_of(first_auxiliary_matches.begin(), first_auxiliary_matches.end(),
-                          [auxiliary_start, negative_start](const dictionary::LookupResult& first_match) {
-                            return first_match.entry != nullptr &&
-                                   first_match.entry->pos == core::PartOfSpeech::Auxiliary &&
-                                   first_match.entry->extended_pos == core::ExtendedPOS::AuxTenseMasu &&
-                                   auxiliary_start + first_match.length <= negative_start;
-                          })) {
-            ends_in_dictionary_negative_auxiliary = true;
-            break;
-          }
-        }
-        if (ends_in_dictionary_negative_auxiliary) {
-          break;
-        }
-      }
-      if (!ends_in_dictionary_negative_auxiliary) {
-        continue;
-      }
-      return true;
     }
   }
   return false;
