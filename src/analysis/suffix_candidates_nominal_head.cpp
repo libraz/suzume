@@ -279,10 +279,7 @@ bool hasAttributiveNominalSelector(const std::vector<char32_t>& codepoints,
 bool isSelectedNominalHeadShape(const std::vector<normalize::CharType>& char_types, size_t start_pos, size_t end_pos,
                                 bool has_attributive_selector) {
   const size_t length = end_pos - start_pos;
-  const bool all_hiragana = std::all_of(char_types.begin() + static_cast<std::ptrdiff_t>(start_pos),
-                                        char_types.begin() + static_cast<std::ptrdiff_t>(end_pos),
-                                        [](normalize::CharType type) { return type == normalize::CharType::Hiragana; });
-  if (all_hiragana) {
+  if (normalize::isCharTypeSpan(char_types, start_pos, end_pos, normalize::CharType::Hiragana)) {
     return length >= (has_attributive_selector ? 2U : 3U);
   }
   // Both an explicit attributive and genitive の select a nominal head.  A
@@ -293,9 +290,7 @@ bool isSelectedNominalHeadShape(const std::vector<normalize::CharType>& char_typ
       char_types[start_pos + 1] != normalize::CharType::Hiragana) {
     return false;
   }
-  return std::all_of(char_types.begin() + static_cast<std::ptrdiff_t>(start_pos + 1),
-                     char_types.begin() + static_cast<std::ptrdiff_t>(end_pos),
-                     [](normalize::CharType type) { return type == normalize::CharType::Hiragana; });
+  return normalize::isCharTypeSpan(char_types, start_pos + 1, end_pos, normalize::CharType::Hiragana);
 }
 
 // True when a registered suffix, particle, auxiliary or numeral starts in

@@ -314,6 +314,18 @@ std::vector<CharType> classifyCodepoints(const std::vector<char32_t>& codepoints
   return char_types;
 }
 
+bool isCharTypeSpan(const std::vector<CharType>& char_types, size_t start, size_t end, CharType type) {
+  if (start > end || end > char_types.size()) {
+    return false;
+  }
+  for (size_t idx = start; idx < end; ++idx) {
+    if (char_types[idx] != type) {
+      return false;
+    }
+  }
+  return true;
+}
+
 bool isCommonParticle(char32_t ch) {
   // Common particles: を, が, は, に, へ, の
   return ch == U'を' || ch == U'が' || ch == U'は' || ch == U'に' || ch == U'へ' || ch == U'の';

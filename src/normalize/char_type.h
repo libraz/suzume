@@ -1,6 +1,7 @@
 #ifndef SUZUME_NORMALIZE_CHAR_TYPE_H_
 #define SUZUME_NORMALIZE_CHAR_TYPE_H_
 
+#include <cstddef>
 #include <cstdint>
 #include <string_view>
 #include <vector>
@@ -34,6 +35,13 @@ CharType classifyChar(char32_t codepoint);
  * @return One character type for each input codepoint
  */
 std::vector<CharType> classifyCodepoints(const std::vector<char32_t>& codepoints);
+
+/**
+ * @brief Whether every position in [start, end) has character type @p type
+ *
+ * An empty span is true; a span reaching past @p char_types is false.
+ */
+bool isCharTypeSpan(const std::vector<CharType>& char_types, size_t start, size_t end, CharType type);
 
 /**
  * @brief Check if character is a common particle (助詞)

@@ -3,7 +3,6 @@
  * @brief Suffix-based unknown word candidate generation
  */
 
-#include <algorithm>
 #include <utility>
 
 #include "candidate_constants.h"
@@ -198,9 +197,7 @@ void generateCounterCandidates(const std::vector<char32_t>& codepoints, size_t s
   // numeral before katakana (五センチ, 十キロメートル) is split at the natural
   // kanji→katakana boundary (五|センチ), matching MeCab, so it must not merge here.
   const bool numeral_is_digits =
-      std::all_of(char_types.begin() + static_cast<std::ptrdiff_t>(start_pos),
-                  char_types.begin() + static_cast<std::ptrdiff_t>(numeral_end),
-                  [](normalize::CharType type) { return type == normalize::CharType::Digit; });
+      normalize::isCharTypeSpan(char_types, start_pos, numeral_end, normalize::CharType::Digit);
   if (!numeral_is_digits) {
     counter_detail::appendUnevenKanjiRunCandidate(codepoints, start_pos, numeral_end, dict_manager, candidates);
   }

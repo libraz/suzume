@@ -42,9 +42,7 @@ bool hasQuantityYoonNounShape(const BracketedNounContext& ctx, const PromotedRun
   if (!kana::isIRowCodepoint(codepoints[onset_pos])) {
     return false;
   }
-  return std::all_of(ctx.char_types.begin() + static_cast<std::ptrdiff_t>(ctx.start_pos),
-                     ctx.char_types.begin() + static_cast<std::ptrdiff_t>(promoted.scan),
-                     [](normalize::CharType type) { return type == normalize::CharType::Hiragana; });
+  return normalize::isCharTypeSpan(ctx.char_types, ctx.start_pos, promoted.scan, normalize::CharType::Hiragana);
 }
 
 bool isQuantityAspectCopulaChain(const BracketedNounContext& ctx, const PromotedRun& promoted) {

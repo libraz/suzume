@@ -71,9 +71,8 @@ void UnknownWordGenerator::appendBracketedHiraganaNounCandidates(const std::vect
     const bool long_deverbal_object_shape =
         getMaxLength(start_type) >= kLongDeverbalNounLength &&
         start_pos + kLongDeverbalNounLength < codepoints.size() &&
-        std::all_of(char_types.begin() + static_cast<std::ptrdiff_t>(start_pos),
-                    char_types.begin() + static_cast<std::ptrdiff_t>(start_pos + kLongDeverbalNounLength),
-                    [](normalize::CharType type) { return type == normalize::CharType::Hiragana; }) &&
+        normalize::isCharTypeSpan(char_types, start_pos, start_pos + kLongDeverbalNounLength,
+                                  normalize::CharType::Hiragana) &&
         kana::isERowCodepoint(codepoints[start_pos + kLongDeverbalNounLength - 1]) &&
         codepoints[start_pos + kLongDeverbalNounLength] == U'を';
     const size_t bracketed_noun_limit =

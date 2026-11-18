@@ -165,11 +165,6 @@ bool isClosedKanaNumberCounter(const std::vector<char32_t>& codepoints, size_t n
          std::find(kCounterReadings.begin(), kCounterReadings.end(), counter) != kCounterReadings.end();
 }
 
-bool isHiraganaSpan(const std::vector<normalize::CharType>& char_types, size_t start, size_t end) {
-  return start < end && end <= char_types.size() &&
-         std::all_of(char_types.begin() + start, char_types.begin() + end,
-                     [](normalize::CharType char_type) { return char_type == normalize::CharType::Hiragana; });
-}
 }  // namespace
 
 }  // namespace suzume::analysis::counter_detail
@@ -253,7 +248,7 @@ void appendStructuralCounterCandidates(const std::vector<char32_t>& codepoints, 
           continue;
         }
         const size_t suffix_end = number_end + suffix_result.length;
-        if (isHiraganaSpan(char_types, number_end, suffix_end) &&
+        if (normalize::isCharTypeSpan(char_types, number_end, suffix_end, normalize::CharType::Hiragana) &&
             !isClosedKanaNumberCounter(codepoints, start_pos, number_end, suffix_end)) {
           continue;
         }
