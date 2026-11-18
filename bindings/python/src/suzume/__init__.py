@@ -74,17 +74,30 @@ _POS_FILTER_BITS = {
     "particle": 16,
     "auxiliary": 32,
 }
+_POS_FILTER_ALL = sum(_POS_FILTER_BITS.values())
+_SIZE_MAX = 2 ** (8 * ctypes.sizeof(ctypes.c_size_t)) - 1
+
+
+def _size_option(name: str, value: int) -> int:
+    """Return ``value`` if it fits the native ``size_t`` field ``name``."""
+    if not 0 <= value <= _SIZE_MAX:
+        raise ValueError(f"{name} must be between 0 and {_SIZE_MAX}")
+    return value
 
 
 def _resolve_pos_filter(pos_filter: int | Iterable[str]) -> int:
     """Resolve a ``pos_filter`` argument to a native bitmask.
 
-    Accepts a raw bitmask ``int`` (passed through unchanged) or an iterable of
-    POS names (``"noun"``, ``"verb"``, ``"adjective"``, ``"adverb"``,
-    ``"particle"``, ``"auxiliary"``) whose bits are OR-ed together.
+    Accepts a raw bitmask ``int`` within the known POS bits, a single POS name,
+    or an iterable of POS names (``"noun"``, ``"verb"``, ``"adjective"``,
+    ``"adverb"``, ``"particle"``, ``"auxiliary"``) whose bits are OR-ed together.
     """
     if isinstance(pos_filter, int):
+        if not 0 <= pos_filter <= _POS_FILTER_ALL:
+            raise ValueError(f"pos_filter bitmask must be between 0 and {_POS_FILTER_ALL}")
         return pos_filter
+    if isinstance(pos_filter, str):
+        pos_filter = (pos_filter,)
     mask = 0
     for name in pos_filter:
         try:
@@ -432,11 +445,13 @@ class Suzume:
     ) -> list[Tag]:
         """Generate keyword tags from ``text``.
 
-        ``pos_filter`` selects which parts of speech to keep. Pass either a raw
+        ``pos_filter`` selects which parts of speech to keep. Pass a raw
         bitmask ``int`` (1=noun, 2=verb, 4=adjective, 8=adverb, 16=particle,
-        32=auxiliary; 0=all) or an
-        iterable of POS names, e.g. ``["noun", "verb"]``, whose bits are OR-ed
-        together. All other flags map directly to the native tag options.
+        32=auxiliary; 0=all), a single POS name, or an iterable of POS names,
+        e.g. ``["noun", "verb"]``, whose bits are OR-ed together. An unknown
+        name, an out-of-range bitmask, or a ``min_length`` or ``max_tags``
+        outside the native ``size_t`` range raises ``ValueError``. All other
+        flags map directly to the native tag options.
         """
         handle = self._require_handle()
         payload = _encode_text(text)
@@ -445,8 +460,8 @@ class Suzume:
         opts.pos_filter = _resolve_pos_filter(pos_filter)
         opts.exclude_basic = int(exclude_basic)
         opts.use_lemma = int(use_lemma)
-        opts.min_length = min_length
-        opts.max_tags = max_tags
+        opts.min_length = _size_option("min_length", min_length)
+        opts.max_tags = _size_option("max_tags", max_tags)
         opts.exclude_particles = int(exclude_particles)
         opts.exclude_auxiliaries = int(exclude_auxiliaries)
         opts.exclude_formal_nouns = int(exclude_formal_nouns)

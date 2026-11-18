@@ -61,3 +61,24 @@ def test_pos_filter_can_select_particles_and_auxiliaries() -> None:
         )
     assert [(tag.tag, tag.pos) for tag in particles] == [("について", "PARTICLE")]
     assert [(tag.tag, tag.pos) for tag in auxiliaries] == [("ます", "AUX")]
+
+
+def test_pos_filter_accepts_a_single_name_string() -> None:
+    with Suzume() as sz:
+        by_string = sz.generate_tags("美味しいラーメンを食べた", pos_filter="noun")
+        by_list = sz.generate_tags("美味しいラーメンを食べた", pos_filter=["noun"])
+    assert by_string
+    assert by_string == by_list
+
+
+@pytest.mark.parametrize("pos_filter", [-1, 64, 256])
+def test_pos_filter_rejects_an_out_of_range_bitmask(pos_filter: int) -> None:
+    with Suzume() as sz, pytest.raises(ValueError, match="pos_filter"):
+        sz.generate_tags("東京", pos_filter=pos_filter)
+
+
+@pytest.mark.parametrize("option", ["min_length", "max_tags"])
+@pytest.mark.parametrize("value", [-1, 2**64])
+def test_size_options_reject_values_outside_size_t(option: str, value: int) -> None:
+    with Suzume() as sz, pytest.raises(ValueError, match=option):
+        sz.generate_tags("東京", **{option: value})
