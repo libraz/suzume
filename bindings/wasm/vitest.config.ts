@@ -7,8 +7,9 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
-      include: ['js/**/*.ts'],
-      exclude: ['js/**/*.d.ts'],
+      // The tests import the tsc output, so measure that; suzume.js is the Emscripten glue.
+      include: ['dist/**/*.js'],
+      exclude: ['dist/suzume.js'],
     },
   },
 });

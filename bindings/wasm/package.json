@@ -30,8 +30,8 @@
     "format": "biome format --write js/ tests/ && biome format --write --config-path ../../examples/ts/biome.json ../../examples/ts/",
     "test": "yarn build:js && vitest run",
     "test:examples": "yarn build:js && node --experimental-strip-types ../../examples/ts/basic.ts && node --experimental-strip-types ../../examples/ts/search_indexer.ts && node --experimental-strip-types ../../examples/ts/tags.ts && node --experimental-strip-types ../../examples/ts/user_dictionary.ts",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
+    "test:watch": "yarn build:js && vitest",
+    "test:coverage": "yarn build:js && vitest run --coverage",
     "prepublishOnly": "yarn clean && yarn build && yarn lint && yarn test"
   },
   "keywords": [
@@ -69,6 +69,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.14",
+    "@vitest/coverage-v8": "^5.1.1",
     "lint-staged": "^17.6.1",
     "simple-git-hooks": "^2.14.0",
     "typescript": "^7.0.2",
