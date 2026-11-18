@@ -140,16 +140,11 @@ bool opensOnContentWordTailBeforeParticle(const core::Lattice& lattice,
     }
     return false;
   };
-  for (size_t content_start = 0; content_start < start_pos; ++content_start) {
-    if (core::anyEdgeStartingAt(lattice, content_start, [&](const core::LatticeEdge& edge) {
-          return edge.end == content_end &&
-                 (edge.pos == core::PartOfSpeech::Noun || edge.pos == core::PartOfSpeech::Adjective) &&
-                 (edge.lemmaVerified() || !crosses_dictionary_boundary(edge));
-        })) {
-      return true;
-    }
-  }
-  return false;
+  return core::anyEdgeEndingAt(lattice, content_end, [&](const core::LatticeEdge& edge) {
+    return edge.start < start_pos &&
+           (edge.pos == core::PartOfSpeech::Noun || edge.pos == core::PartOfSpeech::Adjective) &&
+           (edge.lemmaVerified() || !crosses_dictionary_boundary(edge));
+  });
 }
 
 // The temporal adverb いま overlaps the full polite forms of いる
