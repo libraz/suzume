@@ -128,8 +128,21 @@ const EXTENDED_OPTION_DEFAULTS = {
   dataDirectory: null,
 } as const;
 
+/** Look up a caller-supplied name in a table, ignoring inherited keys such as `constructor`. */
+function ownEntry<Value>(table: Readonly<Record<string, Value>>, key: string): Value | undefined {
+  return Object.getOwnPropertyDescriptor(table, key)?.value;
+}
+
+/** Validate a tag option that the C struct stores as a 32-bit `size_t`. */
+function sizeOption(name: string, value: number): number {
+  if (!Number.isSafeInteger(value) || value < 0 || value > 0xffffffff) {
+    throw new Error(`${name} must be an integer between 0 and ${0xffffffff}`);
+  }
+  return value;
+}
+
 function modeCode(mode: AnalysisMode): number {
-  const code = ANALYSIS_MODE_CODES[mode];
+  const code = ownEntry(ANALYSIS_MODE_CODES, mode);
   if (code === undefined) {
     throw new Error(`Invalid Suzume mode: ${String(mode)}`);
   }
@@ -305,7 +318,7 @@ function resolveTagPosFilter(options: TagOptions): number {
   let filter = 0;
 
   for (const pos of selectedPos ?? []) {
-    const bit = TAG_POS_FILTER_BITS[pos];
+    const bit = ownEntry(TAG_POS_FILTER_BITS, pos);
     if (bit === undefined) {
       throw new Error(
         `unknown POS filter name: ${JSON.stringify(pos)} ` +
@@ -539,6 +552,11 @@ export class Suzume {
     return this.withUtf8String(text, (textPtr, textByteLength) => {
       if (options) {
         const posFilter = resolveTagPosFilter(options);
+        const minLength = sizeOption(
+          'minLength',
+          options.minLength ?? TAG_OPTION_DEFAULTS.minLength,
+        );
+        const maxTags = sizeOption('maxTags', options.maxTags ?? TAG_OPTION_DEFAULTS.maxTags);
 
         const optionsPtr = this.module._malloc(C_LAYOUTS.tagOptions.size);
 
@@ -552,10 +570,8 @@ export class Suzume {
           const layout = C_LAYOUTS.tagOptions;
 
           heapU8[optionsPtr + layout.posFilter] = posFilter & 0xff;
-          heapU32[(optionsPtr + layout.minLength) >> 2] =
-            options.minLength ?? TAG_OPTION_DEFAULTS.minLength;
-          heapU32[(optionsPtr + layout.maxTags) >> 2] =
-            options.maxTags ?? TAG_OPTION_DEFAULTS.maxTags;
+          heapU32[(optionsPtr + layout.minLength) >> 2] = minLength;
+          heapU32[(optionsPtr + layout.maxTags) >> 2] = maxTags;
           writeBoolFields(
             heapU8,
             optionsPtr,

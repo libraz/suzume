@@ -663,6 +663,48 @@ describe('JS API: error reporting', () => {
     }
   });
 
+  it.each(['constructor', 'toString', '__proto__', 'hasOwnProperty'])(
+    'generateTags rejects the prototype key %s as a POS filter name',
+    async (name) => {
+      const suzume = await Suzume.create();
+
+      try {
+        expect(() => suzume.generateTags('東京', { posFilter: [name] as never })).toThrow(
+          `unknown POS filter name: ${JSON.stringify(name)}`,
+        );
+      } finally {
+        suzume.destroy();
+      }
+    },
+  );
+
+  it.each([
+    ['minLength', -1],
+    ['minLength', 1.5],
+    ['minLength', Number.NaN],
+    ['minLength', 2 ** 32],
+    ['maxTags', -1],
+    ['maxTags', Number.POSITIVE_INFINITY],
+    ['maxTags', 2 ** 32],
+  ] as const)('generateTags rejects %s = %s', async (option, value) => {
+    const suzume = await Suzume.create();
+
+    try {
+      expect(() => suzume.generateTags('東京', { [option]: value })).toThrow(option);
+    } finally {
+      suzume.destroy();
+    }
+  });
+
+  it.each(['constructor', 'toString', '__proto__'])(
+    'create rejects the prototype key %s as a mode',
+    async (mode) => {
+      await expect(Suzume.create({ mode: mode as never })).rejects.toThrow(
+        `Invalid Suzume mode: ${mode}`,
+      );
+    },
+  );
+
   it('throws when a destroyed instance is used', async () => {
     const suzume = await Suzume.create();
     suzume.destroy();
