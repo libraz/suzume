@@ -48,37 +48,39 @@ $baseline_line
 EOF
 
 [ -n "$raw_base" ] || { echo "❌ invalid WASM baseline: $BASELINE"; exit 1; }
-raw_limit=$(( raw_base + raw_base * TOLERANCE_PCT / 100 ))
-raw_delta=$(( raw_size - raw_base ))
-raw_pct=$(( raw_delta * 100 / raw_base ))
-
-printf 'wasm raw: %d KB (baseline %d KB, delta %+d KB / %+d%%)\n' \
-  "$((raw_size/1024))" "$((raw_base/1024))" "$((raw_delta/1024))" "$raw_pct"
-
-gzip_failed=0
-if [ -n "${gzip_base:-}" ]; then
-  gzip_limit=$(( gzip_base + gzip_base * TOLERANCE_PCT / 100 ))
-  gzip_delta=$(( gzip_size - gzip_base ))
-  gzip_pct=$(( gzip_delta * 100 / gzip_base ))
-  printf 'wasm gzip: %d KB (baseline %d KB, delta %+d KB / %+d%%)\n' \
-    "$((gzip_size/1024))" "$((gzip_base/1024))" "$((gzip_delta/1024))" "$gzip_pct"
-  [ "$gzip_size" -gt "$gzip_limit" ] && gzip_failed=1
-else
-  printf 'wasm gzip: %d KB (legacy baseline has no gzip value)\n' "$((gzip_size/1024))"
-fi
-
-[ -n "${GITHUB_STEP_SUMMARY:-}" ] && {
-  printf '### WASM size\nraw: %d KB (baseline %d KB, %+d%%)\n' \
-    "$((raw_size/1024))" "$((raw_base/1024))" "$raw_pct" >> "$GITHUB_STEP_SUMMARY"
-  if [ -n "${gzip_base:-}" ]; then
-    printf 'gzip: %d KB (baseline %d KB, %+d%%)\n' \
-      "$((gzip_size/1024))" "$((gzip_base/1024))" "$gzip_pct" >> "$GITHUB_STEP_SUMMARY"
-  else
-    printf 'gzip: %d KB (legacy baseline unavailable)\n' "$((gzip_size/1024))" >> "$GITHUB_STEP_SUMMARY"
+size_failed=0
+# Print one measurement against its baseline, mirror it to the CI step summary,
+# and flag it when it exceeds the tolerance.
+compare_size() {
+  local label="$1" size="$2" base="$3" limit delta pct
+  limit=$(( base + base * TOLERANCE_PCT / 100 ))
+  delta=$(( size - base ))
+  pct=$(( delta * 100 / base ))
+  printf 'wasm %s: %d KB (baseline %d KB, delta %+d KB / %+d%%)\n' \
+    "$label" "$((size/1024))" "$((base/1024))" "$((delta/1024))" "$pct"
+  if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
+    printf '%s: %d KB (baseline %d KB, %+d%%)\n' \
+      "$label" "$((size/1024))" "$((base/1024))" "$pct" >> "$GITHUB_STEP_SUMMARY"
+  fi
+  if [ "$size" -gt "$limit" ]; then
+    size_failed=1
   fi
 }
 
-if [ "$raw_size" -gt "$raw_limit" ] || [ "$gzip_failed" -ne 0 ]; then
+if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
+  printf '### WASM size\n' >> "$GITHUB_STEP_SUMMARY"
+fi
+compare_size raw "$raw_size" "$raw_base"
+if [ -n "${gzip_base:-}" ]; then
+  compare_size gzip "$gzip_size" "$gzip_base"
+else
+  printf 'wasm gzip: %d KB (legacy baseline has no gzip value)\n' "$((gzip_size/1024))"
+  if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
+    printf 'gzip: %d KB (legacy baseline unavailable)\n' "$((gzip_size/1024))" >> "$GITHUB_STEP_SUMMARY"
+  fi
+fi
+
+if [ "$size_failed" -ne 0 ]; then
   echo "❌ wasm grew more than ${TOLERANCE_PCT}% over baseline."
   echo "   Investigate raw CODE/DATA and gzip regressions."
   echo "   If intentional, run: scripts/check_wasm_size.sh $WASM update"
