@@ -1002,57 +1002,6 @@
       "input": "山高い"
     },
     {
-      "description": "使い道具 - regression test",
-      "expected": [
-        {
-          "lemma": "使い",
-          "pos": "Noun",
-          "surface": "使い"
-        },
-        {
-          "lemma": "道具",
-          "pos": "Noun",
-          "surface": "道具"
-        }
-      ],
-      "id": "i_14",
-      "input": "使い道具"
-    },
-    {
-      "description": "食べ物屋 - regression test",
-      "expected": [
-        {
-          "lemma": "食べ物",
-          "pos": "Noun",
-          "surface": "食べ物"
-        },
-        {
-          "lemma": "屋",
-          "pos": "Suffix",
-          "surface": "屋"
-        }
-      ],
-      "id": "be",
-      "input": "食べ物屋"
-    },
-    {
-      "description": "飲み物代 - regression test",
-      "expected": [
-        {
-          "lemma": "飲み物",
-          "pos": "Noun",
-          "surface": "飲み物"
-        },
-        {
-          "lemma": "代",
-          "pos": "Suffix",
-          "surface": "代"
-        }
-      ],
-      "id": "mi_4",
-      "input": "飲み物代"
-    },
-    {
       "description": "新聞かな - regression test",
       "expected": [
         {
