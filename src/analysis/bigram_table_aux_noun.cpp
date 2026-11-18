@@ -1031,11 +1031,13 @@ bool setAuxiliaryAndNounCosts(BigramMatrix& table) {
 
   // The causative and passive auxiliaries select a verb's irrealis form and
   // nothing else, so no particle of any role can host one. Stating that over
-  // the particle range keeps any one particle (の+せる) from outscoring the
+  // the particle class keeps any one particle (の+せる) from outscoring the
   // kana verb that spans it (のせる).
   constexpr uint8_t kNoParticleHost = encodeCost(cost::kAlmostNever);
-  for (size_t epos = static_cast<size_t>(EPOS::ParticleCase); epos <= static_cast<size_t>(EPOS::ParticleBinding);
-       ++epos) {
+  for (size_t epos = 0; epos < BigramTable::kSize; ++epos) {
+    if (!core::isParticleType(static_cast<EPOS>(epos))) {
+      continue;
+    }
     table[epos][static_cast<size_t>(EPOS::AuxCausative)] = kNoParticleHost;
     table[epos][static_cast<size_t>(EPOS::AuxPassive)] = kNoParticleHost;
   }
