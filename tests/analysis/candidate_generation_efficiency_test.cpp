@@ -123,19 +123,47 @@ TEST(CandidateGenerationEfficiencyTest, SameScriptRunsScaleLinearly) {
     return elapsed;
   };
 
-  const auto hiragana_2k = measure("あ", 2000);
-  const auto hiragana_4k = measure("あ", 4000);
-  const auto hiragana_8k = measure("あ", 8000);
-  const auto hiragana_16k = measure("あ", 16000);
-  const auto katakana_8k = measure("ア", 8000);
+  struct Sample {
+    std::string_view unit;
+    size_t count;
+    Clock::duration elapsed;
+  };
+  Sample hiragana_2k{"あ", 2000, {}};
+  Sample hiragana_4k{"あ", 4000, {}};
+  Sample hiragana_8k{"あ", 8000, {}};
+  Sample hiragana_16k{"あ", 16000, {}};
+  Sample katakana_8k{"ア", 8000, {}};
+  Sample* const samples[] = {&hiragana_2k, &hiragana_4k, &hiragana_8k, &hiragana_16k, &katakana_8k};
 
   // A threefold allowance absorbs shared-CI variance while rejecting the
   // quadratic candidate/lattice growth that this guard protects against.
   constexpr auto kTimingSlack = std::chrono::milliseconds(100);
-  EXPECT_LT(hiragana_4k, hiragana_2k * 3 + kTimingSlack);
-  EXPECT_LT(hiragana_8k, hiragana_4k * 3 + kTimingSlack);
-  EXPECT_LT(hiragana_16k, hiragana_8k * 3 + kTimingSlack);
-  EXPECT_LT(katakana_8k, hiragana_8k * 3 + kTimingSlack);
+  const auto within = [&](const Sample& larger, const Sample& smaller) {
+    return larger.elapsed < smaller.elapsed * 3 + kTimingSlack;
+  };
+  const auto linear = [&] {
+    return within(hiragana_4k, hiragana_2k) && within(hiragana_8k, hiragana_4k) && within(hiragana_16k, hiragana_8k) &&
+           within(katakana_8k, hiragana_8k);
+  };
+
+  for (Sample* sample : samples) {
+    sample->elapsed = measure(sample->unit, sample->count);
+  }
+  // Scheduling noise only adds time, so the minimum over a few passes is the
+  // estimate; the extra passes run only when the first one misses a bound.
+  constexpr int kExtraPasses = 2;
+  for (int pass = 0; pass < kExtraPasses && !linear(); ++pass) {
+    for (Sample* sample : samples) {
+      sample->elapsed = std::min(sample->elapsed, measure(sample->unit, sample->count));
+    }
+  }
+
+  const auto millis = [](const Sample& sample) {
+    return std::chrono::duration_cast<std::chrono::milliseconds>(sample.elapsed).count();
+  };
+  EXPECT_TRUE(linear()) << "ms: 2k=" << millis(hiragana_2k) << " 4k=" << millis(hiragana_4k)
+                        << " 8k=" << millis(hiragana_8k) << " 16k=" << millis(hiragana_16k)
+                        << " katakana 8k=" << millis(katakana_8k);
 }
 
 TEST(CandidateGenerationEfficiencyTest, KeepsAsciiKeycapEmojiInOneSameTypeCandidate) {
