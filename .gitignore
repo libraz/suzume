@@ -88,9 +88,6 @@ __pycache__/
 *.py[oc]
 *.egg-info
 .venv/
-# rye drives uv underneath and drops a uv.lock next to its own requirements
-# locks. requirements{,-dev}.lock are the tracked ones.
-uv.lock
 
 
 data/user/adult.tsv

@@ -60,11 +60,10 @@ dev = [
     "mypy>=1.13",
 ]
 
-[tool.rye]
-managed = true
+[dependency-groups]
 # Reuse the published `dev` extra rather than restating the tools here, so the
 # wheel's metadata and the local dev environment cannot drift apart.
-dev-dependencies = ["suzume[dev]"]
+dev = ["suzume[dev]"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/suzume"]
