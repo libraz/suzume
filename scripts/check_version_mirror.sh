@@ -16,9 +16,9 @@ fi
 
 status=0
 check() {
-  local label="$1" file="$2" found="$3"
-  if [ "$found" != "$canonical" ]; then
-    echo "❌ $label ($file): $found != $canonical"
+  local label="$1" file="$2" found="$3" expected="${4:-$canonical}"
+  if [ "$found" != "$expected" ]; then
+    echo "❌ $label ($file): $found != $expected"
     status=1
   else
     echo "✅ $label: $found"
@@ -43,6 +43,20 @@ lock_ver=$(awk '
 check "python uv.lock" bindings/python/uv.lock "${lock_ver:-missing}"
 if [ "${lock_ver:-missing}" != "$canonical" ]; then
   echo "   refresh it with: (cd bindings/python && uv lock)"
+fi
+
+# Every workflow provisions Python with one uv release: ci.yml states it in its
+# workflow-level env and publish.yml mirrors it.
+uv_version() {
+  grep -Eo '^  UV_VERSION: *"[^"]+"' "$1" 2>/dev/null | grep -Eo '"[^"]+"' | tr -d '"' | head -1
+}
+ci_uv=$(uv_version .github/workflows/ci.yml)
+publish_uv=$(uv_version .github/workflows/publish.yml)
+if [ -z "$ci_uv" ]; then
+  echo "❌ ci.yml UV_VERSION (.github/workflows/ci.yml): missing"
+  status=1
+else
+  check "publish.yml UV_VERSION" .github/workflows/publish.yml "${publish_uv:-missing}" "$ci_uv"
 fi
 
 if [ "$status" -eq 0 ]; then
