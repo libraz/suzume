@@ -101,7 +101,7 @@ describe('C API: analyze', () => {
     expect(negative).toBeDefined();
     expect(negative?.pos).toBe('AUX');
     expect(negative?.conjType).toBeNull();
-    expect(negative?.conjForm).toBe('終止形');
+    expect(negative?.conjForm).toBe('連用形');
 
     resultFree(resultPtr);
   });

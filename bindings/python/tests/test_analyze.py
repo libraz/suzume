@@ -120,7 +120,7 @@ def test_auxiliary_conjugation_form_is_exposed() -> None:
     negative = next(m for m in result if m.surface == "なかっ")
     assert negative.pos == "AUX"
     assert negative.conj_type is None
-    assert negative.conj_form == "終止形"
+    assert negative.conj_form == "連用形"
 
 
 def test_empty_string_yields_no_morphemes() -> None:
