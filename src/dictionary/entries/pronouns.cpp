@@ -168,6 +168,9 @@ EntrySpecRange getPronounEntries() {
       // Register as both adverb and na-adjective for correct copula connection
       quotative_adv("どう", ""),
       na_adj("どう", "どう"),
+      // Closed demonstrative adverb series (こう/そう/どう); そう sits with its
+      // auxiliary homograph.
+      quotative_adv("こう", ""),
       adv("いかが", ""),
       na_adj("いかが", "いかが"),
       na_adj("さまざま", "さまざま"),
