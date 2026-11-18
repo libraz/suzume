@@ -123,6 +123,12 @@ inline bool isOnbinCodepoint(char32_t cp) {
   return cp == U'い' || cp == U'っ' || cp == U'ん';
 }
 
+/// Whether @p host can be the last character before a te-form て/で: a kana
+/// continuative ends on an i/e-row mora or an onbin, so the つ of かつて cannot.
+inline bool canEndContinuative(char32_t host) {
+  return !isHiraganaCodepoint(host) || isIOrERowCodepoint(host) || isOnbinCodepoint(host);
+}
+
 inline bool isSmallKanaCodepoint(char32_t cp) {
   // Hiragana small kana
   if (cp == U'ゃ' || cp == U'ゅ' || cp == U'ょ' || cp == U'ぁ' || cp == U'ぃ' || cp == U'ぅ' || cp == U'ぇ' ||

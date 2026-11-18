@@ -1487,6 +1487,72 @@
       ],
       "id": "katsuteimasu",
       "input": "かつています"
+    },
+    {
+      "description": "かつてきます - regression test",
+      "expected": [
+        {
+          "lemma": "かつて",
+          "pos": "Adverb",
+          "surface": "かつて"
+        },
+        {
+          "lemma": "くる",
+          "pos": "Verb",
+          "surface": "き"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "katsutekimasu",
+      "input": "かつてきます"
+    },
+    {
+      "description": "かつてきた - regression test",
+      "expected": [
+        {
+          "lemma": "かつて",
+          "pos": "Adverb",
+          "surface": "かつて"
+        },
+        {
+          "lemma": "くる",
+          "pos": "Verb",
+          "surface": "き"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "katsutekita",
+      "input": "かつてきた"
+    },
+    {
+      "description": "かつてきて - regression test",
+      "expected": [
+        {
+          "lemma": "かつて",
+          "pos": "Adverb",
+          "surface": "かつて"
+        },
+        {
+          "lemma": "くる",
+          "pos": "Verb",
+          "surface": "き"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "katsutekite",
+      "input": "かつてきて"
     }
   ],
   "description": "adverb tests",

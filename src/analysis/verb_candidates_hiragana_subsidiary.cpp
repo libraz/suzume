@@ -13,6 +13,7 @@
 #include "analysis/tokenizer_utils.h"
 #include "analysis/verb_candidates_auxiliary_patterns.h"
 #include "analysis/verb_candidates_hiragana_internal.h"
+#include "core/kana_constants.h"
 #include "core/utf8_constants.h"
 #include "unknown.h"
 
@@ -24,8 +25,9 @@ bool isClearTeFormBeforeSubsidiary(const std::vector<char32_t>& codepoints, size
   if (start_pos == 0) {
     return false;
   }
+  // A て after a mora no continuative ends on is not a te-form (かつて+き+ます).
   if (codepoints[start_pos - 1] == core::hiragana::kTe) {
-    return true;
+    return start_pos < 2 || kana::canEndContinuative(codepoints[start_pos - 2]);
   }
   // A binding particle on the te-form keeps the same attachment (思ってもみる,
   // 読んではみる). Retain the voiced-onbin guard for で so an ordinary
@@ -33,7 +35,7 @@ bool isClearTeFormBeforeSubsidiary(const std::vector<char32_t>& codepoints, size
   const char32_t binder = codepoints[start_pos - 1];
   if (allow_binding_particle && (binder == U'も' || binder == U'は') && start_pos >= 2) {
     if (codepoints[start_pos - 2] == core::hiragana::kTe) {
-      return true;
+      return start_pos < 3 || kana::canEndContinuative(codepoints[start_pos - 3]);
     }
     return start_pos >= 3 && codepoints[start_pos - 2] == U'で' &&
            (codepoints[start_pos - 3] == core::hiragana::kI || codepoints[start_pos - 3] == U'ん');
