@@ -348,7 +348,7 @@ void generateKatakanaVerbCandidates(const std::vector<char32_t>& codepoints, siz
     }
     candidates.push_back(makeVerbCandidate(stem_cell, start_pos, kata_end + 1, cost, denominal_lemma,
                                            dictionary::ConjugationType::GodanRa, true, CandidateOrigin::VerbKatakana,
-                                           0.9F, label, extended_pos));
+                                           candidate::kHighOriginConfidence, label, extended_pos));
   };
 
   // Sokuonbin stem before た/て/だ/で (バズっ+た, ググっ+て).
@@ -383,13 +383,13 @@ void generateKatakanaVerbCandidates(const std::vector<char32_t>& codepoints, siz
       }
     } else {
       // Neutral cost — let bigram connections decide between verb+て and noun+って
-      push_stem_cell(0.1F, "katakana_sokuonbin", core::ExtendedPOS::VerbOnbinkei);
+      push_stem_cell(candidate::verb_cost::kWeakPenalty, "katakana_sokuonbin", core::ExtendedPOS::VerbOnbinkei);
     }
   }
 
   // Irrealis stems before the negative, the causative and the volitional う
   // (ググら+ない, バズら+せる, ググろ+う); the negative cost beats unsplit forms.
-  constexpr float kIrrealisStemCost = -0.5F;
+  constexpr float kIrrealisStemCost = candidate::verb_cost::kStandardBonus;
   if (utf8::startsWithAny(hira_part, {"らな", "らせ"})) {
     push_stem_cell(kIrrealisStemCost, "katakana_mizenkei", core::ExtendedPOS::VerbMizenkei);
   }

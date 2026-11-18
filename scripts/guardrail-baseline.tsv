@@ -60,7 +60,7 @@ src/analysis/scorer_connection_rules_renyokei.cpp	8	4	97
 src/analysis/scorer_connection_rules_suffix.cpp	1	8	66
 src/analysis/scorer_connection_rules_verb.cpp	8	0	12
 src/analysis/scorer_connection_rules_voice.cpp	1	1	27
-src/analysis/scorer_constants.h	0	89	0
+src/analysis/scorer_constants.h	0	80	0
 src/analysis/scorer_options_loader.cpp	0	2	0
 src/analysis/scorer_options_loader.h	0	0	0
 src/analysis/scorer_word_cost.cpp	4	22	9
@@ -107,7 +107,7 @@ src/analysis/unknown_same_type_internal.h	0	0	0
 src/analysis/unknown_same_type_prefix_cost.cpp	0	10	0
 src/analysis/unknown_same_type_prefixes.cpp	0	4	0
 src/analysis/unknown_speech.cpp	0	11	0
-src/analysis/verb_candidates.cpp	0	8	0
+src/analysis/verb_candidates.cpp	0	5	0
 src/analysis/verb_candidates.h	0	0	0
 src/analysis/verb_candidates_absorption_guards.h	0	0	0
 src/analysis/verb_candidates_auxiliary_patterns.h	0	0	0
