@@ -3568,6 +3568,114 @@
       ],
       "id": "owari_ni_control",
       "input": "終わりにしよう"
+    },
+    {
+      "description": "A determiner selects a kana noun whose run reads as sa-row irrealis + negative before a formal noun",
+      "expected": [
+        {
+          "lemma": "この",
+          "pos": "Determiner",
+          "surface": "この"
+        },
+        {
+          "lemma": "せんせい",
+          "pos": "Noun",
+          "surface": "せんせい"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        }
+      ],
+      "id": "konosenseiha",
+      "input": "このせんせいは"
+    },
+    {
+      "description": "A determiner selects a kana noun whose run reads as sa-row irrealis + negative before a formal noun",
+      "expected": [
+        {
+          "lemma": "この",
+          "pos": "Determiner",
+          "surface": "この"
+        },
+        {
+          "lemma": "せんせい",
+          "pos": "Noun",
+          "surface": "せんせい"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        }
+      ],
+      "id": "konosenseiga",
+      "input": "このせんせいが"
+    },
+    {
+      "description": "A determiner selects a kana noun whose run reads as sa-row irrealis + negative before a formal noun",
+      "expected": [
+        {
+          "lemma": "あの",
+          "pos": "Determiner",
+          "surface": "あの"
+        },
+        {
+          "lemma": "せんせい",
+          "pos": "Noun",
+          "surface": "せんせい"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "やさしい",
+          "pos": "Adjective",
+          "surface": "やさしい"
+        }
+      ],
+      "id": "anosenseihayasashii",
+      "input": "あのせんせいはやさしい"
+    },
+    {
+      "description": "A genitive-marked subject keeps the kana relative clause out of the selected noun",
+      "expected": [
+        {
+          "lemma": "子ども",
+          "pos": "Noun",
+          "surface": "子ども"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "つくる",
+          "pos": "Verb",
+          "surface": "つくっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        },
+        {
+          "lemma": "もの",
+          "pos": "Noun",
+          "surface": "もの"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        }
+      ],
+      "id": "domonotsukutttamonowo",
+      "input": "子どものつくったものを"
     }
   ],
   "description": "formal_noun tests",

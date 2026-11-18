@@ -346,6 +346,12 @@ bool spansPredicateBeforeFormalNoun(const std::vector<char32_t>& codepoints,
                                     const std::vector<normalize::CharType>& char_types, size_t start_pos,
                                     size_t head_end, const grammar::Inflection& inflection,
                                     const dictionary::DictionaryManager& dict_manager) {
+  // A determiner selects the kana run itself as its head (この+せんせい); only a
+  // nominal's の can mark the subject of a relative clause in that position.
+  if (start_pos > 0 && hasDictionaryEntryEndingAt(dict_manager, codepoints, lookbehindStart(start_pos, 3), start_pos,
+                                                  partOfSpeechMask(core::PartOfSpeech::Determiner))) {
+    return false;
+  }
   constexpr size_t kFormalNounProbe = 4;
   std::vector<UnknownCandidate> generated_verbs;
   bool generated = false;
