@@ -11,6 +11,9 @@ BUILD_DIR := build
 WASM_BUILD_DIR := build-wasm
 ASAN_BUILD_DIR := build-asan
 NODEBUG_BUILD_DIR := build-nodebug
+INSTALL_BUILD_DIR := build-install
+SHARED_BUILD_DIR := build-shared
+EMBEDDED_BUILD_DIR := build-embedded
 # Apple's ASan runtime aborts when leak detection is requested. Linux enables
 # LeakSanitizer in the same target; the CI sanitizer job is the authoritative
 # leak gate.
@@ -216,21 +219,21 @@ PREFIX ?= /usr/local
 # and dictionaries, then install them under $(PREFIX) for find_package / pkg-config.
 install:
 	@echo "Configuring install build (shared + static) ..."
-	$(CMAKE) -B build-install -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED=ON -DBUILD_TESTING=OFF \
+	$(CMAKE) -B $(INSTALL_BUILD_DIR) -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED=ON -DBUILD_TESTING=OFF \
 		-DCMAKE_INSTALL_PREFIX=$(PREFIX) $(CMAKE_OPTIONS)
-	$(CMAKE) --build build-install --parallel $(JOBS)
-	$(CMAKE) --build build-install --target build-dict
-	$(CMAKE) --install build-install
+	$(CMAKE) --build $(INSTALL_BUILD_DIR) --parallel $(JOBS)
+	$(CMAKE) --build $(INSTALL_BUILD_DIR) --target build-dict
+	$(CMAKE) --install $(INSTALL_BUILD_DIR)
 	@echo "Installed suzume under $(PREFIX)"
 
 # Remove what `make install` placed under $(PREFIX), using the manifest CMake wrote.
-# Must run before `make clean`, which deletes build-install along with the manifest.
+# Must run before `make clean`, which deletes $(INSTALL_BUILD_DIR) along with the manifest.
 uninstall:
-	@if [ -f build-install/install_manifest.txt ]; then \
-		xargs rm -f < build-install/install_manifest.txt; \
+	@if [ -f $(INSTALL_BUILD_DIR)/install_manifest.txt ]; then \
+		xargs rm -f < $(INSTALL_BUILD_DIR)/install_manifest.txt; \
 		echo "Uninstalled suzume from the recorded prefix."; \
 	else \
-		echo "build-install/install_manifest.txt not found - nothing to uninstall."; \
+		echo "$(INSTALL_BUILD_DIR)/install_manifest.txt not found - nothing to uninstall."; \
 		echo "It is written by 'make install' and removed by 'make clean'."; \
 		exit 1; \
 	fi
@@ -250,38 +253,32 @@ examples-test: examples
 # Build the embedded (no-filesystem) configuration: dictionaries baked in, static
 # library, no CLI/tests. Useful for hosted-embedded / RTOS targets.
 embedded:
-	$(CMAKE) -B build-embedded -DCMAKE_BUILD_TYPE=Release -DSUZUME_EMBED_DICT=ON \
+	$(CMAKE) -B $(EMBEDDED_BUILD_DIR) -DCMAKE_BUILD_TYPE=Release -DSUZUME_EMBED_DICT=ON \
 		-DBUILD_TESTING=OFF -DSUZUME_INSTALL=OFF $(CMAKE_OPTIONS)
-	$(CMAKE) --build build-embedded --target suzume --parallel $(JOBS)
-	@echo "Embedded static library built: build-embedded/lib/"
+	$(CMAKE) --build $(EMBEDDED_BUILD_DIR) --target suzume --parallel $(JOBS)
+	@echo "Embedded static library built: $(EMBEDDED_BUILD_DIR)/lib/"
 
 # Packaging smoke test: install both static and shared configurations, then
 # build + run C/C++ consumers against each package via find_package.
+# $(1): package variant name, $(2): its extra configure flags.
+define consumer-smoke-variant
+	$(CMAKE) -E remove_directory build-smoke-$(1)
+	$(CMAKE) -E remove_directory build-smoke-prefix-$(1)
+	$(CMAKE) -E remove_directory build-smoke-consumer-$(1)
+	$(CMAKE) -B build-smoke-$(1) -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF $(2) \
+		-DCMAKE_INSTALL_PREFIX=$(CURDIR)/build-smoke-prefix-$(1)
+	$(CMAKE) --build build-smoke-$(1) --parallel $(JOBS)
+	$(CMAKE) --build build-smoke-$(1) --target build-dict
+	$(CMAKE) --install build-smoke-$(1)
+	$(CMAKE) -S examples/consumer -B build-smoke-consumer-$(1) \
+		-DCMAKE_PREFIX_PATH=$(CURDIR)/build-smoke-prefix-$(1)
+	$(CMAKE) --build build-smoke-consumer-$(1)
+	ctest --test-dir build-smoke-consumer-$(1) --output-on-failure
+endef
+
 consumer-smoke:
-	$(CMAKE) -E remove_directory build-smoke-static
-	$(CMAKE) -E remove_directory build-smoke-prefix-static
-	$(CMAKE) -E remove_directory build-smoke-consumer-static
-	$(CMAKE) -B build-smoke-static -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF \
-		-DCMAKE_INSTALL_PREFIX=$(CURDIR)/build-smoke-prefix-static
-	$(CMAKE) --build build-smoke-static --parallel $(JOBS)
-	$(CMAKE) --build build-smoke-static --target build-dict
-	$(CMAKE) --install build-smoke-static
-	$(CMAKE) -S examples/consumer -B build-smoke-consumer-static \
-		-DCMAKE_PREFIX_PATH=$(CURDIR)/build-smoke-prefix-static
-	$(CMAKE) --build build-smoke-consumer-static
-	ctest --test-dir build-smoke-consumer-static --output-on-failure
-	$(CMAKE) -E remove_directory build-smoke-shared
-	$(CMAKE) -E remove_directory build-smoke-prefix-shared
-	$(CMAKE) -E remove_directory build-smoke-consumer-shared
-	$(CMAKE) -B build-smoke-shared -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DBUILD_SHARED=ON \
-		-DCMAKE_INSTALL_PREFIX=$(CURDIR)/build-smoke-prefix-shared
-	$(CMAKE) --build build-smoke-shared --parallel $(JOBS)
-	$(CMAKE) --build build-smoke-shared --target build-dict
-	$(CMAKE) --install build-smoke-shared
-	$(CMAKE) -S examples/consumer -B build-smoke-consumer-shared \
-		-DCMAKE_PREFIX_PATH=$(CURDIR)/build-smoke-prefix-shared
-	$(CMAKE) --build build-smoke-consumer-shared
-	ctest --test-dir build-smoke-consumer-shared --output-on-failure
+	$(call consumer-smoke-variant,static,)
+	$(call consumer-smoke-variant,shared,-DBUILD_SHARED=ON)
 	@echo "Static and shared consumer smoke tests passed."
 
 # Reproducible build/install matrix covering library-only, no-install, and
@@ -332,16 +329,23 @@ lint:
 # Build shared library + Python package (editable) into a local venv
 python-build:
 	@echo "Building shared library for Python binding..."
-	$(CMAKE) -B build-shared -DBUILD_SHARED=ON -DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release \
+	$(CMAKE) -B $(SHARED_BUILD_DIR) -DBUILD_SHARED=ON -DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release \
 		-DENABLE_DEBUG_INFO=OFF -DENABLE_DEBUG_LOG=OFF -DSUZUME_LIB_SOVERSION=OFF
-	$(CMAKE) --build build-shared --target suzume_shared --parallel $(JOBS)
-	@echo "Shared library built: build-shared/lib/"
+	$(CMAKE) --build $(SHARED_BUILD_DIR) --target suzume_shared --parallel $(JOBS)
+	@echo "Shared library built: $(SHARED_BUILD_DIR)/lib/"
+
+# The wheel and the WASM binary ship publicly, so their dictionaries compile
+# git-tracked TSVs only: a gitignored, local-only dictionary is excluded without
+# being named, matching a CI clone (which has no ignored files).
+define compile-tracked-dicts
+	$(BUILD_DIR)/bin/suzume-cli dict compile $$(git ls-files 'data/core/*.tsv') data/core.dic
+	$(BUILD_DIR)/bin/suzume-cli dict compile $$(git ls-files 'data/user/*.tsv') data/user.dic
+endef
 
 # Compile the dictionaries the Python test package loads
 python-dict: build
 	@echo "Building dictionaries for the Python test package (git-tracked entries only)..."
-	$(BUILD_DIR)/bin/suzume-cli dict compile $$(git ls-files 'data/core/*.tsv') data/core.dic
-	$(BUILD_DIR)/bin/suzume-cli dict compile $$(git ls-files 'data/user/*.tsv') data/user.dic
+	$(compile-tracked-dicts)
 	$(CMAKE) -E copy_if_different data/core.dic bindings/python/src/suzume/core.dic
 	$(CMAKE) -E copy_if_different data/user.dic bindings/python/src/suzume/user.dic
 
@@ -382,11 +386,7 @@ wasm-dict:
 		exit 1; \
 	fi
 	@echo "Building dictionaries for WASM (git-tracked entries only)..."
-	$(BUILD_DIR)/bin/suzume-cli dict compile $$(git ls-files 'data/core/*.tsv') data/core.dic
-	@# The WASM binary ships publicly, so embed only git-tracked user
-	@# dictionaries. Any gitignored, local-only dictionary is excluded here
-	@# without being named, matching the CI checkout (which lacks ignored files).
-	$(BUILD_DIR)/bin/suzume-cli dict compile $$(git ls-files 'data/user/*.tsv') data/user.dic
+	$(compile-tracked-dicts)
 
 # Build WASM module
 wasm: wasm-dict wasm-configure
