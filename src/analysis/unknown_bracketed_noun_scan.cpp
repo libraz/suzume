@@ -716,14 +716,14 @@ void readPromotedSurface(const BracketedNounContext& ctx, const BracketedScan& b
   // while a bare い ending is as often a noun's last mora (ぶたい+です).
   // An enumerated item is nominal, so the predicate reading of its kana does not apply.
   promoted.has_inflected_predicate_reading =
-      !bracketed.left_enumerating_bracket &&
-          (((promoted.right_clause && !(bracketed.left_genitive_bracket && len == 2)) || promoted.right_kanji_word ||
-            (promoted.right_genitive_after_substantive_run && !promoted.has_deverbal_noun_shape_before_genitive)) &&
-           std::any_of(promoted.promoted_inflections->begin(), promoted.promoted_inflections->end(),
-                       [](const grammar::InflectionCandidate& inflection_candidate) {
-                         return !inflection_candidate.suffix.empty() &&
-                                inflection_candidate.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence;
-                       })) ||
+      (!bracketed.left_enumerating_bracket &&
+       (((promoted.right_clause && !(bracketed.left_genitive_bracket && len == 2)) || promoted.right_kanji_word ||
+         (promoted.right_genitive_after_substantive_run && !promoted.has_deverbal_noun_shape_before_genitive)) &&
+        std::any_of(promoted.promoted_inflections->begin(), promoted.promoted_inflections->end(),
+                    [](const grammar::InflectionCandidate& inflection_candidate) {
+                      return !inflection_candidate.suffix.empty() &&
+                             inflection_candidate.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence;
+                    }))) ||
       ((promoted.right_copula || promoted.right_auxiliary) &&
        verb_helpers::isProductiveShiiAdjectiveTerminal(promoted_surface, ctx.inflection));
   promoted.promoted_surface = promoted_surface;

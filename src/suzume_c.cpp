@@ -328,12 +328,13 @@ suzume_result_t* analyzeBytes(SuzumeHandle* handle, std::string_view text) {
     const bool conjugatable = morph.pos == suzume::core::PartOfSpeech::Verb ||
                               morph.pos == suzume::core::PartOfSpeech::Adjective ||
                               morph.pos == suzume::core::PartOfSpeech::Auxiliary;
-    out.flags = static_cast<uint8_t>((morph.fromUserDict() ? SUZUME_MORPHEME_USER_DICT : 0U) |
-                                     (morph.isFormalNoun() ? SUZUME_MORPHEME_FORMAL_NOUN : 0U) |
-                                     (morph.isLowInformation() ? SUZUME_MORPHEME_LOW_INFO : 0U) |
-                                     (morph.isUnknown() ? SUZUME_MORPHEME_UNKNOWN : 0U) |
-                                     (morph.fromDictionary() ? SUZUME_MORPHEME_FROM_DICTIONARY : 0U) |
-                                     (conjugatable ? SUZUME_MORPHEME_CONJUGATABLE : 0U));
+    const auto flag = [](bool set, unsigned bit) { return set ? bit : 0U; };
+    out.flags = static_cast<uint8_t>(flag(morph.fromUserDict(), SUZUME_MORPHEME_USER_DICT) |
+                                     flag(morph.isFormalNoun(), SUZUME_MORPHEME_FORMAL_NOUN) |
+                                     flag(morph.isLowInformation(), SUZUME_MORPHEME_LOW_INFO) |
+                                     flag(morph.isUnknown(), SUZUME_MORPHEME_UNKNOWN) |
+                                     flag(morph.fromDictionary(), SUZUME_MORPHEME_FROM_DICTIONARY) |
+                                     flag(conjugatable, SUZUME_MORPHEME_CONJUGATABLE));
     out.surface_size = morph.surface.size();
     out.base_form_size = lemma.size();
   }
