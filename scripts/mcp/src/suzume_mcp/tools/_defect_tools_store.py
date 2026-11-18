@@ -7,7 +7,7 @@ from ..core import bug_store
 from ..core.json_utils import json_error
 from ..core.json_utils import json_result as _json_result
 from ..server import mcp
-from ._defect_tools_common import _entry, _parse_ids
+from ._defect_tools_common import _entry, _kind_error, _parse_ids, _priority_error
 
 
 @mcp.tool()
@@ -157,10 +157,9 @@ async def defect_update(
     record = bug_store.load_one(source, id, include_resolved=False)
     if record is None:
         return json_error(f"No open record #{id} in {source}")
-    if priority and priority.lower() not in bug_store.PRIORITIES:
-        return json_error(f"priority must be one of {bug_store.PRIORITIES}")
-    if kind and kind not in bug_store.KINDS:
-        return json_error(f"kind must be one of {bug_store.KINDS}")
+    error = _priority_error(priority) or _kind_error(kind)
+    if error:
+        return error
     if check and check not in (bug_store.CHECK_SURFACE, bug_store.CHECK_MANUAL):
         return json_error('check must be "surface" or "manual"')
 
@@ -192,10 +191,13 @@ async def defect_reopen(ids: str, source: str = "defect") -> str:
     except ValueError as exc:
         return json_error(str(exc))
 
+    resolved_by_id: dict[int, dict] = {}
+    for rec in bug_store.load_resolved(source):
+        resolved_by_id.setdefault(rec["id"], rec)
     reopened = []
     missing = []
     for bug_id in wanted:
-        record = next((rec for rec in bug_store.load_resolved(source) if rec["id"] == bug_id), None)
+        record = resolved_by_id.pop(bug_id, None)
         if record is None:
             missing.append(bug_id)
             continue

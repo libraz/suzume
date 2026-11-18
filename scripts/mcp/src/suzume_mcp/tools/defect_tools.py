@@ -16,7 +16,15 @@ from ..core.json_utils import json_result as _json_result
 from ..core.suzume_cli import get_expected_tokens_batch_subprocess, get_suzume_surfaces_async
 from ..server import PROJECT_ROOT, mcp
 from ._cli_freshness import stale_banner, stale_cli_guard
-from ._defect_tools_common import _duplicate, _entry, _load_by_ids, _parse_ids
+from ._defect_tools_common import (
+    _duplicate,
+    _entry,
+    _kind_error,
+    _load_by_ids,
+    _parse_ids,
+    _priority_error,
+    _text_error,
+)
 from ._defect_tools_store import defect_archive, defect_list, defect_reopen, defect_update, defect_yield
 
 __all__ = [
@@ -257,10 +265,9 @@ async def defect_dismiss(
         kind: Optional, when the judgment still identified a side.
         source: Store to write to.
     """
-    if not (text or "").strip():
-        return json_error("text is required")
-    if kind and kind not in bug_store.KINDS:
-        return json_error(f"kind must be one of {bug_store.KINDS}")
+    error = _text_error(text) or _kind_error(kind)
+    if error:
+        return error
     try:
         existing = bug_store.find_by_text(source, text)
         if existing is not None:
@@ -322,18 +329,18 @@ async def defect_add(
         source: Store to write to — "defect", "thread", or "literary".
         force: Register even when a record already exists for this text.
     """
-    if not (text or "").strip():
-        return json_error("text is required")
-    if kind and kind not in bug_store.KINDS:
-        return json_error(f"kind must be one of {bug_store.KINDS}")
+    error = _text_error(text) or _kind_error(kind)
+    if error:
+        return error
     try:
         existing = bug_store.find_by_text(source, text)
         if existing and not force:
             return _duplicate(existing, "filed")
 
         expected, suzume = await _derive_tokenizations(text, expected, suzume, source)
-        if priority and priority.lower() not in bug_store.PRIORITIES:
-            return json_error(f"priority must be one of {bug_store.PRIORITIES}")
+        error = _priority_error(priority)
+        if error:
+            return error
 
         record = bug_store.create(
             source,

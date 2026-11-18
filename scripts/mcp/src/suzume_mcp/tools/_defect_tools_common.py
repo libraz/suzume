@@ -1,6 +1,7 @@
 """Shared helpers for defect store MCP tools."""
 
 from ..core import bug_store
+from ..core.json_utils import json_error
 from ..core.json_utils import json_result as _json_result
 
 
@@ -20,6 +21,25 @@ def _parse_ids(ids: str) -> list[int]:
     if not parsed:
         raise ValueError("ids is required — list the record ids explicitly")
     return parsed
+
+
+def _text_error(text: str) -> str | None:
+    """Return the error JSON for a missing text, or None when it is present."""
+    return None if (text or "").strip() else json_error("text is required")
+
+
+def _kind_error(kind: str) -> str | None:
+    """Return the error JSON for an unknown kind; an empty kind is accepted."""
+    if kind and kind not in bug_store.KINDS:
+        return json_error(f"kind must be one of {bug_store.KINDS}")
+    return None
+
+
+def _priority_error(priority: str) -> str | None:
+    """Return the error JSON for an unknown priority; an empty priority is accepted."""
+    if priority and priority.lower() not in bug_store.PRIORITIES:
+        return json_error(f"priority must be one of {bug_store.PRIORITIES}")
+    return None
 
 
 def _entry(record: dict, compact: bool = True) -> dict:
@@ -44,7 +64,6 @@ def _entry(record: dict, compact: bool = True) -> dict:
     else:
         for key in (
             "description",
-            "status",
             "created",
             "line_num",
             "resolution",
@@ -69,10 +88,14 @@ def _duplicate(existing: dict, verb: str) -> str:
 
 def _load_by_ids(source: str, wanted: list[int], include_resolved: bool = True) -> tuple[list[dict], list[int]]:
     """Load the named records in request order, listing the ids that do not exist."""
+    by_id: dict[int, dict] = {}
+    for load in (bug_store.load_open, bug_store.load_resolved) if include_resolved else (bug_store.load_open,):
+        for record in load(source):
+            by_id.setdefault(record["id"], record)
     records = []
     missing = []
     for bug_id in wanted:
-        record = bug_store.load_one(source, bug_id, include_resolved=include_resolved)
+        record = by_id.get(bug_id)
         if record is None:
             missing.append(bug_id)
         else:
