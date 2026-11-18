@@ -13,7 +13,7 @@
 
 import { C_LAYOUTS } from './abi_layout.js';
 import { decodeAnalysisResult, decodeTags, heapBytes } from './decode.js';
-import type { EmscriptenModule } from './suzume.js';
+import type { EmscriptenModule, EmscriptenModuleOptions } from './suzume.js';
 
 export enum ErrorCode {
   Success = 0,
@@ -43,7 +43,7 @@ async function instantiateModule(
   freshWasmModule: boolean,
 ): Promise<EmscriptenModule> {
   const createModule = await import('./suzume.js');
-  const moduleOptions: Record<string, unknown> = {};
+  const moduleOptions: EmscriptenModuleOptions = {};
   if (wasmPath) {
     moduleOptions.locateFile = (path: string) => (path.endsWith('.wasm') ? wasmPath : path);
   }
@@ -56,7 +56,7 @@ async function instantiateModule(
   if (cached) {
     return cached;
   }
-  const pending = createModule.default(moduleOptions) as Promise<EmscriptenModule>;
+  const pending = createModule.default(moduleOptions);
   modulePromises.set(key, pending);
   try {
     return await pending;
@@ -127,6 +127,14 @@ const EXTENDED_OPTION_DEFAULTS = {
   scorerOptions: null,
   dataDirectory: null,
 } as const;
+
+function modeCode(mode: AnalysisMode): number {
+  const code = ANALYSIS_MODE_CODES[mode];
+  if (code === undefined) {
+    throw new Error(`Invalid Suzume mode: ${String(mode)}`);
+  }
+  return code;
+}
 
 const EXTENDED_BOOL_FIELDS = [
   'preserveVu',
@@ -266,6 +274,32 @@ const TAG_POS_FILTER_BITS: Readonly<Record<string, number>> = {
   auxiliary: 32,
 };
 
+/** Write each boolean field as one heap byte, falling back to its default when unset. */
+function writeBoolFields<Field extends string>(
+  heap: Uint8Array,
+  structPtr: number,
+  layout: Readonly<Record<NoInfer<Field>, number>>,
+  fields: readonly Field[],
+  options: Readonly<Partial<Record<NoInfer<Field>, boolean>>>,
+  defaults: Readonly<Record<NoInfer<Field>, boolean>>,
+): void {
+  for (const field of fields) {
+    heap[structPtr + layout[field]] = (options[field] ?? defaults[field]) ? 1 : 0;
+  }
+}
+
+function nativeLastError(module: EmscriptenModule): string {
+  return module.UTF8ToString(module._suzume_last_error());
+}
+
+function nativeLastErrorCode(module: EmscriptenModule): ErrorCode {
+  return module._suzume_last_error_code() as ErrorCode;
+}
+
+function readVersion(module: EmscriptenModule): string {
+  return module.UTF8ToString(module._suzume_version());
+}
+
 function resolveTagPosFilter(options: TagOptions): number {
   const selectedPos = options.posFilter !== undefined ? options.posFilter : options.pos;
   let filter = 0;
@@ -316,21 +350,25 @@ function assertWellFormedUtf16(value: string): void {
   }
 }
 
-/** Copy a string into freshly malloc'd NUL-terminated UTF-8; the caller frees `pointer`. */
+/**
+ * Copy a string into freshly malloc'd NUL-terminated UTF-8; the caller frees `pointer`.
+ * `payloadByteLength` excludes the trailing NUL.
+ */
 function allocUtf8(
   module: EmscriptenModule,
   value: string,
-): { pointer: number; byteLength: number } {
+): { pointer: number; payloadByteLength: number } {
   assertWellFormedUtf16(value);
-  const byteLength = module.lengthBytesUTF8(value) + 1;
-  const pointer = module._malloc(byteLength);
+  const payloadByteLength = module.lengthBytesUTF8(value);
+  const bufferSize = payloadByteLength + 1;
+  const pointer = module._malloc(bufferSize);
   try {
-    module.stringToUTF8(value, pointer, byteLength);
+    module.stringToUTF8(value, pointer, bufferSize);
   } catch (error) {
     module._free(pointer);
     throw error;
   }
-  return { pointer, byteLength };
+  return { pointer, payloadByteLength };
 }
 
 /**
@@ -389,16 +427,15 @@ export class Suzume {
         module._suzume_init_extended_options(optionsPtr);
 
         const heap = heapBytes(module);
-        const selectedMode = options.mode ?? EXTENDED_OPTION_DEFAULTS.mode;
-        const modeValue = ANALYSIS_MODE_CODES[selectedMode];
-        if (modeValue === undefined) {
-          throw new Error(`Invalid Suzume mode: ${String(options.mode)}`);
-        }
-        heap[optionsPtr + layout.mode] = modeValue;
-        for (const field of EXTENDED_BOOL_FIELDS) {
-          heap[optionsPtr + layout[field]] =
-            (options[field] ?? EXTENDED_OPTION_DEFAULTS[field]) ? 1 : 0;
-        }
+        heap[optionsPtr + layout.mode] = modeCode(options.mode ?? EXTENDED_OPTION_DEFAULTS.mode);
+        writeBoolFields(
+          heap,
+          optionsPtr,
+          layout,
+          EXTENDED_BOOL_FIELDS,
+          options,
+          EXTENDED_OPTION_DEFAULTS,
+        );
         if (options.scorerOptions !== undefined) {
           const scorerJson =
             typeof options.scorerOptions === 'string'
@@ -428,12 +465,12 @@ export class Suzume {
     }
 
     if (handle === 0) {
-      const message = module.UTF8ToString(module._suzume_last_error());
+      const message = nativeLastError(module);
       throw new SuzumeError(
         message
           ? `Failed to create Suzume instance: ${message}`
           : 'Failed to create Suzume instance',
-        module._suzume_last_error_code() as ErrorCode,
+        nativeLastErrorCode(module),
       );
     }
 
@@ -463,11 +500,7 @@ export class Suzume {
   /** Change analysis mode without reloading dictionaries. */
   set mode(value: AnalysisMode) {
     this.ensureAlive();
-    const mode = ANALYSIS_MODE_CODES[value];
-    if (mode === undefined) {
-      throw new Error(`Invalid Suzume mode: ${String(value)}`);
-    }
-    if (this.module._suzume_set_mode(this.handle, mode) !== 1) {
+    if (this.module._suzume_set_mode(this.handle, modeCode(value)) !== 1) {
       throw this.nativeError('mode change failed');
     }
   }
@@ -523,10 +556,14 @@ export class Suzume {
             options.minLength ?? TAG_OPTION_DEFAULTS.minLength;
           heapU32[(optionsPtr + layout.maxTags) >> 2] =
             options.maxTags ?? TAG_OPTION_DEFAULTS.maxTags;
-          for (const field of TAG_BOOL_FIELDS) {
-            heapU8[optionsPtr + layout[field]] =
-              (options[field] ?? TAG_OPTION_DEFAULTS[field]) ? 1 : 0;
-          }
+          writeBoolFields(
+            heapU8,
+            optionsPtr,
+            layout,
+            TAG_BOOL_FIELDS,
+            options,
+            TAG_OPTION_DEFAULTS,
+          );
           return this.consumeTags(
             this.module._suzume_generate_tags_with_options_n(
               this.handle,
@@ -621,20 +658,19 @@ export class Suzume {
    * Get Suzume version string
    */
   get version(): string {
-    const versionPtr = this.module._suzume_version();
-    return this.module.UTF8ToString(versionPtr);
+    return readVersion(this.module);
   }
 
   /**
    * Last C API error for this thread, or empty string if the last C API call succeeded.
    */
   get lastError(): string {
-    return this.module.UTF8ToString(this.module._suzume_last_error());
+    return nativeLastError(this.module);
   }
 
   /** Stable native error category for the last failed C ABI call. */
   get lastErrorCode(): ErrorCode {
-    return this.module._suzume_last_error_code() as ErrorCode;
+    return nativeLastErrorCode(this.module);
   }
 
   /** Current WebAssembly linear-memory size in bytes. */
@@ -686,9 +722,9 @@ export class Suzume {
     value: string,
     operation: (pointer: number, byteLength: number) => T,
   ): T {
-    const { pointer, byteLength } = allocUtf8(this.module, value);
+    const { pointer, payloadByteLength } = allocUtf8(this.module, value);
     try {
-      return operation(pointer, byteLength - 1);
+      return operation(pointer, payloadByteLength);
     } finally {
       this.module._free(pointer);
     }
@@ -699,7 +735,7 @@ export class Suzume {
       throw this.nativeError('tag generation failed');
     }
     try {
-      return this.parseTags(tagsPtr);
+      return decodeTags(this.module, tagsPtr, (code) => this.posLabel(code));
     } finally {
       this.module._suzume_tags_free(tagsPtr);
     }
@@ -715,11 +751,6 @@ export class Suzume {
       (code) => this.extendedPosLabel(code),
       (code) => this.posLabel(code),
     );
-  }
-
-  // Parse suzume_tags_t structure from WASM memory
-  private parseTags(tagsPtr: number): Tag[] {
-    return decodeTags(this.module, tagsPtr, (code) => this.posLabel(code));
   }
 
   private posLabel(code: number): string {
@@ -786,5 +817,5 @@ export async function version(options?: {
   freshWasmModule?: boolean;
 }): Promise<string> {
   const module = await instantiateModule(options?.wasmPath, options?.freshWasmModule === true);
-  return module.UTF8ToString(module._suzume_version());
+  return readVersion(module);
 }
