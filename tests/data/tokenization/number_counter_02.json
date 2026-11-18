@@ -863,6 +863,28 @@
       ],
       "id": "neta",
       "input": "二度ねた"
+    },
+    {
+      "description": "一度みた - auto-generated",
+      "expected": [
+        {
+          "lemma": "一度",
+          "pos": "Noun",
+          "surface": "一度"
+        },
+        {
+          "lemma": "みる",
+          "pos": "Verb",
+          "surface": "み"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "mita_4",
+      "input": "一度みた"
     }
   ],
   "description": "number_counter tests (part 2/2)",
