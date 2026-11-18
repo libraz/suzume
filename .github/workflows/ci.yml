@@ -100,6 +100,15 @@ jobs:
       - name: Run ASan, LSan, and UBSan
         run: make asan
 
+  # The WASM module and the Python wheel compile the debug features out, and
+  # every other test job keeps them. Run the suite in the shipped configuration.
+  native-nodebug:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Run native tests with debug features compiled out
+        run: make native-test-nodebug
+
   # The published Linux wheel is compiled inside the manylinux image, whose GCC
   # is years older than the runner's. Without this job that compiler first meets
   # the code during the tag-triggered publish, which is past the point where a

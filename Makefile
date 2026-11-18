@@ -1,7 +1,7 @@
 # Suzume Makefile
 # Convenience wrapper for CMake build system
 
-.PHONY: help build test native-test native-bench mcp-test oracle-sync-check guardrails asan clean clean-build rebuild format format-check lint configure \
+.PHONY: help build test native-test native-test-nodebug native-bench mcp-test oracle-sync-check guardrails asan clean clean-build rebuild format format-check lint configure \
         wasm wasm-configure wasm-dict wasm-test wasm-bench wasm-clean wasm-rebuild dict \
         python-build python-test python-wheel python-sync python-examples version-check binding-parity \
         install uninstall examples examples-test embedded consumer-smoke cmake-smoke
@@ -10,6 +10,7 @@
 BUILD_DIR := build
 WASM_BUILD_DIR := build-wasm
 ASAN_BUILD_DIR := build-asan
+NODEBUG_BUILD_DIR := build-nodebug
 # Apple's ASan runtime aborts when leak detection is requested. Linux enables
 # LeakSanitizer in the same target; the CI sanitizer job is the authoritative
 # leak gate.
@@ -57,6 +58,7 @@ help:
 	@echo "  make test         - Run all tests (includes dict)"
 	@echo "  make mcp-test     - Run MCP server/oracle tests"
 	@echo "  make asan         - Run native tests under ASan/LSan/UBSan"
+	@echo "  make native-test-nodebug - Run native tests with the debug features compiled out"
 	@echo "  make native-bench - Measure native token throughput and long-input scaling"
 	@echo "  make clean        - Remove $(BUILD_DIR) and every scratch build-* directory"
 	@echo "  make clean-build  - Remove $(BUILD_DIR) only"
@@ -121,13 +123,25 @@ dict: build
 # Run every shipped surface, consumer example, and repository invariant. Keep the native binary as
 # the source of truth: CTest's configure-time discovery can miss newly added
 # JSON golden cases and otherwise starts one process per gtest case.
-test: native-test mcp-test oracle-sync-check python-test wasm-test examples-test consumer-smoke binding-parity guardrails
+test: native-test native-test-nodebug mcp-test oracle-sync-check python-test wasm-test examples-test consumer-smoke binding-parity guardrails
 	@echo "All tests complete!"
 
 native-test: dict
 	@echo "Running native tests..."
 	$(BUILD_DIR)/bin/suzume_test
 	ctest --test-dir $(BUILD_DIR) --output-on-failure -R native_cli_contract
+
+# The WASM module and the Python wheel compile the debug features out; the
+# default build keeps them. A value assigned only under those guards would
+# change shipped output without failing native-test, so run the suite both ways.
+native-test-nodebug:
+	@echo "Running native tests with debug features compiled out..."
+	$(CMAKE) -B $(NODEBUG_BUILD_DIR) -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release \
+		-DENABLE_DEBUG_INFO=OFF -DENABLE_DEBUG_LOG=OFF
+	$(CMAKE) --build $(NODEBUG_BUILD_DIR) --parallel
+	$(CMAKE) --build $(NODEBUG_BUILD_DIR) --target build-dict
+	$(NODEBUG_BUILD_DIR)/bin/suzume_test
+	ctest --test-dir $(NODEBUG_BUILD_DIR) --output-on-failure -R native_cli_contract
 
 native-bench: dict
 	python3 scripts/measure_native_metrics.py
