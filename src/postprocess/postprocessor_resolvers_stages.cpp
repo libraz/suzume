@@ -4,6 +4,7 @@
 #include "core/utf8_constants.h"
 #include "grammar/char_patterns.h"
 #include "grammar/conjugation.h"
+#include "grammar/honorific_verbs.h"
 #include "grammar/inflection_scorer_constants.h"
 #include "normalize/char_type.h"
 #include "normalize/utf8.h"
@@ -291,8 +292,15 @@ void resolvePredicateFollowerAuxiliaries(std::vector<core::Morpheme>& result) {
     if (!resolver::followsTeFormConnective(previous) || current.pos != core::PartOfSpeech::Verb) {
       continue;
     }
+    // こう/どう + やって is a manner adverbial, so the kanji motion verb after
+    // it is the predicate (どうやって+行く); kana いく stays the aspect reading.
+    const bool after_manner_adverbial = idx >= 3 && grammar::isMannerLightVerbLemma(result[idx - 2].lemma) &&
+                                        grammar::isDemonstrativeUAdverb(result[idx - 3].surface);
     for (const auto& subsidiary : kTeFormSubsidiaries) {
       if (current.lemma == subsidiary.lemma) {
+        if (after_manner_adverbial && grammar::containsKanji(current.lemma)) {
+          break;
+        }
         current.pos = core::PartOfSpeech::Auxiliary;
         current.extended_pos = subsidiary.extended_pos;
         break;

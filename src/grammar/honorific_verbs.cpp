@@ -36,6 +36,9 @@ constexpr std::string_view kModalSubsidiaryRenyokei[] = {"かね"};
 // search unit, so it belongs to the lexical V2 lexicon rather than to this class.
 constexpr std::string_view kAspectualSubsidiaryLemmas[] = {"始める", "はじめる", "終わる", "おわる",
                                                            "終える", "おえる",   "過ぎる", "すぎる"};
+// Light verbs whose te-form after a demonstrative adverb is a manner adverbial
+// rather than a clause of its own (こうやって, どうして).
+constexpr std::string_view kMannerLightVerbLemmas[] = {"やる", "する"};
 // The excessive subsidiary, whose finite and continuative cells the auxiliary
 // dictionary spells while its other cells are generated as ordinary verb cells.
 constexpr std::string_view kExcessiveSubsidiaryLemmas[] = {"過ぎる", "すぎる"};
@@ -87,6 +90,10 @@ bool startsHonorificSubsidiaryVerb(std::string_view surface) {
 
 bool isAspectualSubsidiaryLemma(std::string_view lemma) {
   return equalsAny(lemma, kAspectualSubsidiaryLemmas);
+}
+
+bool isMannerLightVerbLemma(std::string_view lemma) {
+  return equalsAny(lemma, kMannerLightVerbLemmas);
 }
 
 bool isExcessiveSubsidiaryLemma(std::string_view lemma) {

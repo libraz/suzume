@@ -60,6 +60,14 @@ bool isModalSubsidiaryRenyokei(std::string_view surface);
 bool isAspectualSubsidiaryLemma(std::string_view lemma);
 
 /**
+ * @brief Check whether a lemma is a light verb that forms a manner adverbial with a demonstrative (こう+やって,
+ * どう+して)
+ * @param lemma Dictionary form of the verb before the connective て (UTF-8)
+ * @return true if demonstrative adverb + this verb + て reads as one adverbial
+ */
+bool isMannerLightVerbLemma(std::string_view lemma);
+
+/**
  * @brief Check whether a lemma is the excessive subsidiary verb (過ぎる・すぎる)
  * @param lemma Dictionary form of the candidate (UTF-8, kanji or reading)
  * @return true if the lemma is the excessive subsidiary
