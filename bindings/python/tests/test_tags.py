@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import pytest
+
 from suzume import Suzume, Tag
 
 
@@ -45,13 +47,8 @@ def test_pos_filter_accepts_names() -> None:
 
 
 def test_pos_filter_rejects_unknown_name() -> None:
-    with Suzume() as sz:
-        try:
-            sz.generate_tags("東京", pos_filter=["bogus"])
-        except ValueError:
-            pass
-        else:  # pragma: no cover
-            raise AssertionError("expected ValueError for unknown POS name")
+    with Suzume() as sz, pytest.raises(ValueError):
+        sz.generate_tags("東京", pos_filter=["bogus"])
 
 
 def test_pos_filter_can_select_particles_and_auxiliaries() -> None:

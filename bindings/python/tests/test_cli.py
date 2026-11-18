@@ -373,18 +373,9 @@ def test_repeatable_text_dictionaries_affect_analysis(tmp_path: Path) -> None:
     second = tmp_path / "second.tsv"
     first.write_text("青空庭園\tNOUN\n", encoding="utf-8")
     second.write_text("東京果樹園\tNOUN\n", encoding="utf-8")
-    result = _run_cli(
-        "--dict",
-        str(first),
-        "--dict",
-        str(second),
-        "--format",
-        "json",
-        "青空庭園",
-        "東京果樹園",
-    )
-    assert result.returncode == 0, result.stderr
-    morphemes = json.loads(result.stdout)["morphemes"]
+    morphemes = _json_result("--dict", str(first), "--dict", str(second), "青空庭園", "東京果樹園")[
+        "morphemes"
+    ]
     user_surfaces = {item["surface"] for item in morphemes if item["is_user_dict"]}
     assert user_surfaces == {"青空庭園", "東京果樹園"}
 
@@ -393,11 +384,10 @@ def test_relative_dictionary_path_and_uppercase_binary_extension(tmp_path: Path)
     relative_dictionary = tmp_path / "relative.tsv"
     relative_dictionary.write_text("青空庭園\tNOUN\n", encoding="utf-8")
     relative_path = os.path.relpath(relative_dictionary, Path.cwd())
-    relative_result = _run_cli("--dict", relative_path, "--format", "json", "青空庭園")
-    assert relative_result.returncode == 0, relative_result.stderr
+    relative_payload = _json_result("--dict", relative_path, "青空庭園")
     assert any(
         morpheme["surface"] == "青空庭園" and morpheme["is_user_dict"]
-        for morpheme in json.loads(relative_result.stdout)["morphemes"]
+        for morpheme in relative_payload["morphemes"]
     )
 
     uppercase_binary = tmp_path / "user.DIC"
@@ -471,25 +461,30 @@ def test_missing_input_returns_one_and_uses_stderr() -> None:
     assert "no input text provided" in result.stderr
 
 
+class _StubAnalyzer:
+    """Stand-in for ``Suzume`` that records its constructor arguments."""
+
+    dictionary_warnings: list[str] = []
+    last_kwargs: dict[str, object] = {}
+
+    def __init__(self, **kwargs: object) -> None:
+        type(self).last_kwargs = kwargs
+
+    def __enter__(self) -> _StubAnalyzer:
+        return self
+
+    def __exit__(self, *args: object) -> None:
+        pass
+
+    def analyze_with_normalized_text(self, text: str) -> suzume.AnalysisResult:
+        return suzume.AnalysisResult(normalized_text=text, morphemes=[])
+
+
 def test_dictionary_warnings_are_written_to_stderr(
     monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    class WarningAnalyzer:
-        dictionary_warnings = ["dictionary unavailable"]
-
-        def __init__(self, **kwargs: object) -> None:
-            pass
-
-        def __enter__(self) -> WarningAnalyzer:
-            return self
-
-        def __exit__(self, *args: object) -> None:
-            pass
-
-        def analyze_with_normalized_text(self, text: str) -> suzume.AnalysisResult:
-            return suzume.AnalysisResult(normalized_text=text, morphemes=[])
-
-    monkeypatch.setattr(cli, "Suzume", WarningAnalyzer)
+    monkeypatch.setattr(_StubAnalyzer, "dictionary_warnings", ["dictionary unavailable"])
+    monkeypatch.setattr(cli, "Suzume", _StubAnalyzer)
     parser = cli._build_parser()
     args = parser.parse_args(["東京"])
     assert cli._run_analysis(args, parser) == 0
@@ -499,27 +494,12 @@ def test_dictionary_warnings_are_written_to_stderr(
 def test_dictionary_disable_flags_are_passed_to_analyzer(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    captured: dict[str, object] = {}
-
-    class CapturingAnalyzer:
-        dictionary_warnings: list[str] = []
-
-        def __init__(self, **kwargs: object) -> None:
-            captured.update(kwargs)
-
-        def __enter__(self) -> CapturingAnalyzer:
-            return self
-
-        def __exit__(self, *args: object) -> None:
-            pass
-
-        def analyze_with_normalized_text(self, text: str) -> suzume.AnalysisResult:
-            return suzume.AnalysisResult(normalized_text=text, morphemes=[])
-
-    monkeypatch.setattr(cli, "Suzume", CapturingAnalyzer)
+    monkeypatch.setattr(_StubAnalyzer, "last_kwargs", {})
+    monkeypatch.setattr(cli, "Suzume", _StubAnalyzer)
     parser = cli._build_parser()
     args = parser.parse_args(["--no-core-dict", "--no-user-dict", "--skip-env-config", "東京"])
     assert cli._run_analysis(args, parser) == 0
+    captured = _StubAnalyzer.last_kwargs
     assert captured["skip_core_dictionary"] is True
     assert captured["skip_user_dictionary"] is True
     assert captured["skip_env_config"] is True

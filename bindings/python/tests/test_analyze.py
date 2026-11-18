@@ -139,13 +139,9 @@ def test_length_aware_analysis_preserves_embedded_null_and_normalized_text() -> 
 
 
 def test_invalid_unicode_reports_stable_error_code() -> None:
-    with Suzume() as sz:
-        try:
-            sz.analyze("\ud800")
-        except SuzumeError as error:
-            assert error.code is ErrorCode.INVALID_UTF8
-        else:  # pragma: no cover
-            raise AssertionError("expected invalid UTF-8 error")
+    with Suzume() as sz, pytest.raises(SuzumeError) as error:
+        sz.analyze("\ud800")
+    assert error.value.code is ErrorCode.INVALID_UTF8
 
 
 def test_extended_options_and_clear_are_public() -> None:
@@ -182,12 +178,9 @@ def test_clear_user_dictionaries_retains_bundled_dictionary() -> None:
 
 
 def test_invalid_scorer_json_reports_parse_error() -> None:
-    try:
+    with pytest.raises(SuzumeError) as error:
         Suzume(scorer_options="{")
-    except SuzumeError as error:
-        assert error.code is ErrorCode.PARSE
-    else:  # pragma: no cover
-        raise AssertionError("expected scorer parse error")
+    assert error.value.code is ErrorCode.PARSE
 
 
 def test_program_scorer_options_override_environment(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -250,12 +243,8 @@ def test_mode_property_switches_an_existing_handle() -> None:
 def test_use_after_close_raises() -> None:
     sz = Suzume()
     sz.close()
-    try:
+    with pytest.raises(SuzumeError):
         sz.analyze("東京")
-    except SuzumeError:
-        pass
-    else:  # pragma: no cover
-        raise AssertionError("expected SuzumeError after close")
 
 
 def test_close_is_idempotent() -> None:
