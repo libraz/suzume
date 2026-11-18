@@ -3,8 +3,7 @@
 import re
 
 from ..core.mecab import mecab_analyze
-from ..core.pos_mapping import map_mecab_pos
-from ..core.suzume_utils import get_suzume_rule
+from ..core.suzume_cli import get_suzume_rules_subprocess, map_mecab_pos_subprocess
 from ..server import PROJECT_ROOT, mcp
 from ._cli_freshness import stale_cli_guard
 from ._dict_tools_common import (
@@ -44,7 +43,7 @@ async def dict_check(word: str) -> str:
     Args:
         word: Japanese word to check.
     """
-    result: dict = {"word": word, "suzume_rule": get_suzume_rule(word) or None}
+    result: dict = {"word": word, "suzume_rule": get_suzume_rules_subprocess([word])[0] or None}
 
     tokens = mecab_analyze(word)
     is_single = len(tokens) == 1
@@ -65,7 +64,7 @@ async def dict_check(word: str) -> str:
         return _json_result(result)
 
     if is_single:
-        suggested_pos = _to_dict_pos(map_mecab_pos(tokens[0]))
+        suggested_pos = _to_dict_pos(map_mecab_pos_subprocess(tokens[:1])[0])
         suggested_conj = _map_conj_type(tokens[0])
         if suggested_pos:
             result["suggestion"] = {
@@ -104,7 +103,7 @@ async def dict_suggest(word: str) -> str:
         )
 
     tok = tokens[0]
-    pos = _to_dict_pos(map_mecab_pos(tok))
+    pos = _to_dict_pos(map_mecab_pos_subprocess([tok])[0])
     conj = _map_conj_type(tok)
 
     result: dict = {
@@ -163,8 +162,7 @@ async def dict_add(
         return _json_error(f"DUPLICATE: '{word}' already has POS {_canonical_pos(pos)} in {', '.join(duplicate_files)}")
 
     tokens = mecab_analyze(word)
-    suzume_rule = get_suzume_rule(word)
-    if len(tokens) > 1 and not force and pos != "PROPER_NOUN" and not suzume_rule:
+    if len(tokens) > 1 and not force and pos != "PROPER_NOUN" and not get_suzume_rules_subprocess([word])[0]:
         token_dicts = [_token_to_dict(t) for t in tokens]
         if len(tokens) == 2 and tokens[1]["pos"] in ("助動詞", "助詞"):
             return _json_error(
@@ -346,16 +344,18 @@ async def dict_validate(fix: bool = False) -> str:
     """
     entries, by_surface = _load_dictionary()
 
+    analyzed = ((entry, mecab_analyze(entry["surface"])) for entry in entries)
+    split_entries = [(entry, tokens) for entry, tokens in analyzed if len(tokens) > 1]
+    rules = get_suzume_rules_subprocess([entry["surface"] for entry, _tokens in split_entries]) if split_entries else []
+
     conjugated_forms = []
     compound_words = 0
-    for entry in entries:
-        tokens = mecab_analyze(entry["surface"])
-        if len(tokens) > 1:
-            reason = _is_conjugated_form(tokens, entry)
-            if reason:
-                conjugated_forms.append({"entry": entry, "lemma": tokens[0].get("lemma", ""), "reason": reason})
-            else:
-                compound_words += 1
+    for (entry, tokens), suzume_rule in zip(split_entries, rules, strict=True):
+        reason = _is_conjugated_form(tokens, entry, suzume_rule)
+        if reason:
+            conjugated_forms.append({"entry": entry, "lemma": tokens[0].get("lemma", ""), "reason": reason})
+        else:
+            compound_words += 1
 
     duplicates = [
         {"surface": surface, "pos": canonical_pos, "entries": pos_entries}
@@ -419,7 +419,7 @@ async def dict_validate(fix: bool = False) -> str:
     return _json_result(result)
 
 
-def _is_conjugated_form(tokens: list[dict], entry: dict) -> str:
+def _is_conjugated_form(tokens: list[dict], entry: dict, suzume_rule: str) -> str:
     """Check if a multi-token result is a conjugated form that shouldn't be in dictionary."""
     pos = entry.get("pos", "")
     surface = entry.get("surface", "")
@@ -429,7 +429,6 @@ def _is_conjugated_form(tokens: list[dict], entry: dict) -> str:
     if surface in fixed:
         return ""
 
-    suzume_rule = get_suzume_rule(surface)
     if suzume_rule:
         return ""
 

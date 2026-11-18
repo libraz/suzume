@@ -10,6 +10,10 @@ Usage:
 
     # Batch (JSON array on stdin)
     echo '["食べている","走った"]' | python -m suzume_mcp normalize --batch
+
+    # Normalization rule name per text, and Suzume POS per raw MeCab token
+    echo '["経済成長"]' | python -m suzume_mcp rule
+    echo '[{"pos":"名詞","pos_sub1":"一般"}]' | python -m suzume_mcp map-pos
 """
 
 import json
@@ -61,18 +65,44 @@ def cmd_normalize(args: list[str]) -> None:
         print(json.dumps(results[0], ensure_ascii=False))
 
 
+def _read_json_array() -> list:
+    data = json.loads(sys.stdin.read())
+    if not isinstance(data, list):
+        print(json.dumps({"error": "Expected JSON array on stdin"}), file=sys.stderr)
+        sys.exit(1)
+    return data
+
+
+def cmd_rule(_args: list[str]) -> None:
+    """Print the normalization rule name for each text of a JSON array on stdin."""
+    from .core.suzume_utils import get_suzume_rule
+
+    print(json.dumps([get_suzume_rule(text) for text in _read_json_array()], ensure_ascii=False))
+
+
+def cmd_map_pos(_args: list[str]) -> None:
+    """Print the Suzume POS for each raw MeCab token of a JSON array on stdin."""
+    from .core.pos_mapping import map_mecab_pos
+
+    print(json.dumps([map_mecab_pos(token) for token in _read_json_array()], ensure_ascii=False))
+
+
+_COMMANDS = {"normalize": cmd_normalize, "rule": cmd_rule, "map-pos": cmd_map_pos}
+
+
 def main() -> None:
     args = sys.argv[1:]
     if not args:
         print("Usage: python -m suzume_mcp normalize <text>", file=sys.stderr)
         print("       python -m suzume_mcp normalize --batch  (JSON array on stdin)", file=sys.stderr)
+        print("       python -m suzume_mcp rule | map-pos     (JSON array on stdin)", file=sys.stderr)
         sys.exit(1)
 
-    subcmd = args[0]
-    if subcmd == "normalize":
-        cmd_normalize(args[1:])
+    command = _COMMANDS.get(args[0])
+    if command is not None:
+        command(args[1:])
     else:
-        print(f"Unknown command: {subcmd}", file=sys.stderr)
+        print(f"Unknown command: {args[0]}", file=sys.stderr)
         sys.exit(1)
 
 

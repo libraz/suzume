@@ -33,7 +33,7 @@ class TestDictAdd:
             "mecab_analyze",
             lambda word: [{"surface": word, "pos": "名詞", "lemma": word, "conj_form": "基本形"}],
         )
-        monkeypatch.setattr(operations, "get_suzume_rule", lambda _word: "")
+        monkeypatch.setattr(operations, "get_suzume_rules_subprocess", lambda words: [""] * len(words))
 
     def test_conjugation_types_match_cpp_canonical_spellings(self, project_root):
         alias_source = (project_root / "src/dictionary/dictionary.cpp").read_text(encoding="utf-8")

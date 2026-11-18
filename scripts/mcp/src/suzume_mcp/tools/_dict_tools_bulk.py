@@ -1,7 +1,7 @@
 """Bulk dictionary mutation MCP tools."""
 
 from ..core.mecab import mecab_analyze
-from ..core.suzume_utils import get_suzume_rule
+from ..core.suzume_cli import get_suzume_rules_subprocess
 from ..server import PROJECT_ROOT, mcp
 from ._cli_freshness import stale_cli_guard
 from ._dict_tools_common import (
@@ -66,6 +66,8 @@ async def dict_bulk_add(
     skipped = []
     lines_to_append = []
     skip_conj_check = pos == "PROPER_NOUN"
+    check_split = not force and not skip_conj_check
+    rules = dict(zip(word_list, get_suzume_rules_subprocess(word_list), strict=True)) if check_split else {}
 
     for word in word_list:
         surface_error = _validate_surface(word)
@@ -84,10 +86,9 @@ async def dict_bulk_add(
             continue
 
         # MeCab split check
-        if not force and not skip_conj_check:
+        if check_split:
             tokens = mecab_analyze(word)
-            suzume_rule = get_suzume_rule(word)
-            if len(tokens) > 1 and not suzume_rule:
+            if len(tokens) > 1 and not rules[word]:
                 if len(tokens) == 2 and tokens[1]["pos"] in ("助動詞", "助詞"):
                     skipped.append(
                         {

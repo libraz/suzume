@@ -288,29 +288,42 @@ async def recompile_dic(glob_pattern: str, output_path: str) -> bool:
 _MCP_PROJECT_DIR = str(Path(__file__).resolve().parent.parent.parent.parent)
 
 
-def _run_normalize_cli(texts: list[str], *, raw_mecab: bool = False) -> list[dict]:
-    """Call normalization CLI via subprocess for fresh code.
-
-    Returns list of {"tokens": [...], "source": str, "rule": str}.
-    """
-    cmd = [sys.executable, "-m", "suzume_mcp", "normalize", "--batch"]
-    if raw_mecab:
-        cmd.append("--mecab")
-    timeout = _NORMALIZE_TIMEOUT_SECONDS + _NORMALIZE_TIMEOUT_PER_TEXT_SECONDS * len(texts)
+def _run_module_cli(args: list[str], payload: list) -> list:
+    """Run ``python -m suzume_mcp <args>`` with a JSON array on stdin, in a fresh process."""
+    command = " ".join(args[:1])
+    timeout = _NORMALIZE_TIMEOUT_SECONDS + _NORMALIZE_TIMEOUT_PER_TEXT_SECONDS * len(payload)
     try:
         result = subprocess.run(
-            cmd,
-            input=json.dumps(texts, ensure_ascii=False),
+            [sys.executable, "-m", "suzume_mcp", *args],
+            input=json.dumps(payload, ensure_ascii=False),
             capture_output=True,
             text=True,
             cwd=_MCP_PROJECT_DIR,
             timeout=timeout,
         )
     except subprocess.TimeoutExpired:
-        raise _timed_out("normalize CLI", timeout) from None
+        raise _timed_out(f"{command} CLI", timeout) from None
     if result.returncode != 0:
-        raise RuntimeError(f"normalize CLI failed: {result.stderr}")
+        raise RuntimeError(f"{command} CLI failed: {result.stderr}")
     return json.loads(result.stdout)
+
+
+def _run_normalize_cli(texts: list[str], *, raw_mecab: bool = False) -> list[dict]:
+    """Call normalization CLI via subprocess for fresh code.
+
+    Returns list of {"tokens": [...], "source": str, "rule": str}.
+    """
+    return _run_module_cli(["normalize", "--batch", *(["--mecab"] if raw_mecab else [])], texts)
+
+
+def get_suzume_rules_subprocess(texts: list[str]) -> list[str]:
+    """Name the normalization rule each text falls under ("" when none), from the latest code."""
+    return _run_module_cli(["rule"], texts)
+
+
+def map_mecab_pos_subprocess(tokens: list[dict]) -> list[str]:
+    """Map raw MeCab tokens to Suzume POS names with the latest mapping code."""
+    return _run_module_cli(["map-pos"], tokens)
 
 
 def get_expected_tokens_subprocess(text: str) -> tuple[list[dict], str, str]:

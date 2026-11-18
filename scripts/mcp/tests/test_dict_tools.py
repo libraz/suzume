@@ -174,7 +174,7 @@ class TestDictBulkAdd:
         monkeypatch.setattr(bulk_tools, "PROJECT_ROOT", root)
         monkeypatch.setattr(bulk_tools, "_load_all_entries", lambda: ([], {}))
         monkeypatch.setattr(bulk_tools, "mecab_analyze", lambda word: [{"surface": word, "pos": "動詞"}])
-        monkeypatch.setattr(bulk_tools, "get_suzume_rule", lambda word: None)
+        monkeypatch.setattr(bulk_tools, "get_suzume_rules_subprocess", lambda words: [""] * len(words))
         monkeypatch.setattr(bulk_tools, "_recompile_core_dic", recompile)
 
         result = parse(run(dict_bulk_add(words="試す", pos="VERB", conj_type="GODAN_SA", force=True)))
@@ -194,7 +194,7 @@ class TestDictBulkAdd:
         monkeypatch.setattr(bulk_tools, "PROJECT_ROOT", root)
         monkeypatch.setattr(bulk_tools, "_load_all_entries", lambda: ([], {}))
         monkeypatch.setattr(bulk_tools, "mecab_analyze", lambda word: [{"surface": word, "pos": "名詞"}])
-        monkeypatch.setattr(bulk_tools, "get_suzume_rule", lambda word: None)
+        monkeypatch.setattr(bulk_tools, "get_suzume_rules_subprocess", lambda words: [""] * len(words))
         monkeypatch.setattr(bulk_tools, "_recompile_core_dic", recompile)
 
         result = parse(run(dict_bulk_add(words="りんご", pos="NOUN", force=True)))

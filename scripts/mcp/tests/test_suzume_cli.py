@@ -203,3 +203,56 @@ def test_normalize_timeout_grows_with_the_batch(monkeypatch: pytest.MonkeyPatch)
     suzume_cli._run_normalize_cli(["東京"] * 100)
 
     assert observed["timeout"] == pytest.approx(160.0)
+
+
+def test_rule_command_prints_one_rule_per_text(monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture) -> None:
+    monkeypatch.setattr("sys.stdin", io.StringIO(json.dumps(["経済成長", "りんご"], ensure_ascii=False)))
+
+    normalization_cli.cmd_rule([])
+
+    assert json.loads(capsys.readouterr().out) == ["kanji-compound", ""]
+
+
+def test_map_pos_command_maps_raw_tokens(monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture) -> None:
+    tokens = [{"surface": "東京", "pos": "名詞", "pos_sub1": "固有名詞"}, {"surface": "た", "pos": "助動詞"}]
+    monkeypatch.setattr("sys.stdin", io.StringIO(json.dumps(tokens, ensure_ascii=False)))
+
+    normalization_cli.cmd_map_pos([])
+
+    assert json.loads(capsys.readouterr().out) == ["Noun", "Auxiliary"]
+
+
+def test_rule_and_map_pos_wrappers_call_their_subcommands(monkeypatch: pytest.MonkeyPatch) -> None:
+    calls = []
+    monkeypatch.setattr(suzume_cli, "_run_module_cli", lambda args, payload: calls.append((args, payload)) or ["x"])
+
+    suzume_cli.get_suzume_rules_subprocess(["東京"])
+    suzume_cli.map_mecab_pos_subprocess([{"pos": "名詞"}])
+
+    assert calls == [(["rule"], ["東京"]), (["map-pos"], [{"pos": "名詞"}])]
+
+
+ORACLE_ENTRY_POINTS = {
+    "get_expected_tokens",
+    "get_mecab_tokens",
+    "get_suzume_rule",
+    "map_mecab_pos",
+    "correct_mecab_pos",
+}
+ORACLE_MODULE_PREFIXES = ("merge_rules", "merge_postprocessor", "split_rules", "postprocessor")
+
+
+def test_tools_reach_the_oracle_only_through_a_subprocess() -> None:
+    import ast
+
+    tools_dir = Path(suzume_cli.__file__).resolve().parent.parent / "tools"
+    offenders = []
+    for path in sorted(tools_dir.glob("*.py")):
+        for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+            if not isinstance(node, ast.ImportFrom) or not (node.module or "").startswith("core"):
+                continue
+            module = (node.module or "").removeprefix("core").lstrip(".")
+            names = {alias.name for alias in node.names}
+            if module.startswith(ORACLE_MODULE_PREFIXES) or names & ORACLE_ENTRY_POINTS:
+                offenders.append(f"{path.name}:{node.lineno}")
+    assert offenders == []
