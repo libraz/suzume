@@ -2578,6 +2578,82 @@
       ],
       "id": "koreshimau",
       "input": "これしまう"
+    },
+    {
+      "description": "Adverb かつて before the kana ichidan stem み of 見る",
+      "expected": [
+        {
+          "lemma": "かつて",
+          "pos": "Adverb",
+          "surface": "かつて"
+        },
+        {
+          "lemma": "みる",
+          "pos": "Verb",
+          "surface": "み"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "katsutemita",
+      "input": "かつてみた"
+    },
+    {
+      "description": "Adjective continuative よく before the kana ichidan stem み of 見る",
+      "expected": [
+        {
+          "lemma": "よい",
+          "pos": "Adjective",
+          "surface": "よく"
+        },
+        {
+          "lemma": "みる",
+          "pos": "Verb",
+          "surface": "み"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "yokumita",
+      "input": "よくみた"
+    },
+    {
+      "description": "Binding particle は between the te-form and the attemptive みる",
+      "expected": [
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読ん"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "みる",
+          "pos": "Auxiliary",
+          "surface": "み"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ndehamita",
+      "input": "読んではみた"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 11/11)",
