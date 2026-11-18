@@ -140,7 +140,7 @@ float computeSpuriousVerbPenalty(const core::LatticeEdge& edge) {
   // Penalty for pure-hiragana hatsuonbin (撥音便) verb forms not in dictionary
   // E.g., "おさん" as 撥音便 of "おさむ" is rare and likely mis-segmentation
   // Valid hatsuonbin usually has kanji stem (読ん, 飲ん, 呼ん)
-  // This helps prevent が+おさん misanalysis (should be がお+さん)
+  // This helps prevent が+おさん misanalysis (should be が+お+さん)
   // Exception: short hiragana verbs (2-4 chars like もらっ, あげっ) get reduced penalty
   // as they are more likely to be legitimate verbs written in hiragana
   // Exception: an onbin edge whose base lemma was dictionary-verified during

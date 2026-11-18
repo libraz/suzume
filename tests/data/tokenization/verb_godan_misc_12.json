@@ -465,6 +465,165 @@
       ],
       "id": "mohaneta",
       "input": "手もはねた"
+    },
+    {
+      "description": "まだおきた - regression test",
+      "expected": [
+        {
+          "lemma": "まだ",
+          "pos": "Adverb",
+          "surface": "まだ"
+        },
+        {
+          "lemma": "おきる",
+          "pos": "Verb",
+          "surface": "おき"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "madaokita",
+      "input": "まだおきた"
+    },
+    {
+      "description": "すぐおきた - regression test",
+      "expected": [
+        {
+          "lemma": "すぐ",
+          "pos": "Adverb",
+          "surface": "すぐ"
+        },
+        {
+          "lemma": "おきる",
+          "pos": "Verb",
+          "surface": "おき"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "suguokita",
+      "input": "すぐおきた"
+    },
+    {
+      "description": "おきた - regression test",
+      "expected": [
+        {
+          "lemma": "おきる",
+          "pos": "Verb",
+          "surface": "おき"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "okita",
+      "input": "おきた"
+    },
+    {
+      "description": "事件がおきた - regression test",
+      "expected": [
+        {
+          "lemma": "事件",
+          "pos": "Noun",
+          "surface": "事件"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "おきる",
+          "pos": "Verb",
+          "surface": "おき"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "gaokita",
+      "input": "事件がおきた"
+    },
+    {
+      "description": "何がおきた - regression test",
+      "expected": [
+        {
+          "lemma": "何",
+          "pos": "Pronoun",
+          "surface": "何"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "おきる",
+          "pos": "Verb",
+          "surface": "おき"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "gaokita_2",
+      "input": "何がおきた"
+    },
+    {
+      "description": "地震がおきた - regression test",
+      "expected": [
+        {
+          "lemma": "地震",
+          "pos": "Noun",
+          "surface": "地震"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "おきる",
+          "pos": "Verb",
+          "surface": "おき"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "gaokita_3",
+      "input": "地震がおきた"
+    },
+    {
+      "description": "いきた - regression test",
+      "expected": [
+        {
+          "lemma": "いきる",
+          "pos": "Verb",
+          "surface": "いき"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ikita",
+      "input": "いきた"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 12/12)",

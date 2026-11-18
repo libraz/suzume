@@ -254,12 +254,19 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
     // A registered inflectional surface already supplies its own lemma and
     // conjugation type.  Do not overlay an unverified Ichidan reconstruction
     // such as あり→ありる on that closed lexical evidence. A surface registered
-    // as another cell leaves this one open (いれ is the hypothetical of いる).
+    // as another cell leaves this one open (いれ is the hypothetical of いる),
+    // and so does a godan continuative before た/て, which only the サ row
+    // takes without onbin (おき+た is おきる, not おく). An い stem is left
+    // closed: it is also the i-onbin of the カ/ガ rows (かい+た is かく).
     const auto* registered_cell =
         is_dict_verb || dict_manager == nullptr
             ? nullptr
             : lookupEntryInRange(*dict_manager, codepoints, start_pos, end_pos, core::PartOfSpeech::Verb);
-    if (registered_cell != nullptr && registered_cell->extended_pos != core::ExtendedPOS::VerbKateikei) {
+    const bool godan_cell_before_te_ta =
+        registered_cell != nullptr && registered_cell->extended_pos == core::ExtendedPOS::VerbRenyokei &&
+        is_followed_by_te_ta && stem_end_char != U'し' && stem_end_char != core::hiragana::kI;
+    if (registered_cell != nullptr && registered_cell->extended_pos != core::ExtendedPOS::VerbKateikei &&
+        !godan_cell_before_te_ta) {
       continue;
     }
     // A surface registered as a cell of a non-verbal auxiliary is that

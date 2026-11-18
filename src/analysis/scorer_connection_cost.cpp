@@ -29,13 +29,14 @@ namespace {
 // Closed auxiliaries whose conjunctive continuations are fixed: た, ます, い, たら, まして, か.
 void addClosedAuxiliaryContinuationRules(const core::LatticeEdge& prev, const core::LatticeEdge& next,
                                          float& surface_bonus) {
-  // A past auxiliary cannot normally be followed directly by the conjunctive
-  // particle で. This otherwise lets た+で+す outrank the closed-class polite
-  // copula た+です because the general past→conjunction bonus is intentionally
-  // strong for forms such as たものの.
+  // A past auxiliary has no te-form, so it cannot be followed directly by the
+  // conjunctive particle て/で. This otherwise lets た+で+す outrank the
+  // closed-class polite copula た+です, and a past た split off a verb stem
+  // (とり+た+て) outrank the verb, because the general past→conjunction bonus
+  // is intentionally strong for forms such as たものの.
   bool invalid_closed_conjunctive = prev.extended_pos == core::ExtendedPOS::AuxTenseTa &&
                                     next.extended_pos == core::ExtendedPOS::ParticleConj &&
-                                    utf8::equalsAny(next.surface, {"で"});
+                                    utf8::equalsAny(next.surface, {"て", "で"});
 
   // The polite auxiliary has only two productive conjunctive continuations:
   // まし+て and the literary conditional ますれ+ば.  The POS-level bigram is
@@ -93,7 +94,7 @@ void addClosedAuxiliaryContinuationRules(const core::LatticeEdge& prev, const co
 void addShortHiraganaIrrealisRules(const core::LatticeEdge& prev, const core::LatticeEdge& next, float& surface_bonus) {
   // Penalty for a fabricated short hiragana irrealis before ん. Two morae of
   // kana are too little to establish an irrealis on their own, and a name plus
-  // an honorific spells the same run (が+おさ+ん is がお+さん). What settles it
+  // an honorific spells the same run (が+おさ+ん is が+お+さん). What settles it
   // is whether the cell is spelled by a dictionary entry: the irrealis of a
   // real verb is (せ+ん, いか+ん, あら+ん), while the misreading only ever comes
   // out of the hiragana candidate generator. Kanji stems are unaffected either
