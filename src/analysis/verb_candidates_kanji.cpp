@@ -581,7 +581,8 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
   // verb generator to absorb; retaining that fallback only fabricates verbs
   // such as 遠すぎる→遠る. The left token's lexical POS remains independent.
   if (is_sugi_pattern && kanji_end == sugi_pos) {
-    // The passes after the generators only judge spans that close on a particle, comma or clause end, never on すぎ.
+    // The later passes (emphatic た, deverbal noun, homograph erase, comma clause)
+    // have nothing to judge in a span closing before すぎ.
     apply_mid_compound_penalty();
     return;
   }
@@ -657,7 +658,7 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
     }
 
     // Skip the whole-span generators so renyokei + すぎ + auxiliary is the only
-    // verbal path; the later passes do not apply to a span that closes on すぎ.
+    // verbal path; the later passes exempt or never reach a span closing before すぎ.
     apply_mid_compound_penalty();
     return;
   }
