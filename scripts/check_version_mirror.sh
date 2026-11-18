@@ -41,6 +41,9 @@ lock_ver=$(awk '
   in_project && /^version = / { gsub(/"/, "", $3); print $3; exit }
 ' bindings/python/uv.lock 2>/dev/null || true)
 check "python uv.lock" bindings/python/uv.lock "${lock_ver:-missing}"
+if [ "${lock_ver:-missing}" != "$canonical" ]; then
+  echo "   refresh it with: (cd bindings/python && uv lock)"
+fi
 
 if [ "$status" -eq 0 ]; then
   echo "All version mirrors consistent: $canonical"
