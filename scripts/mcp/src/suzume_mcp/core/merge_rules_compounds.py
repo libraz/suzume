@@ -33,19 +33,16 @@ HASHTAG_BODY_CHAR = regex.compile(_HASHTAG_BODY_CLASS)
 HASHTAG_BODY_RUN = regex.compile(_HASHTAG_BODY_CLASS + "+")
 
 
-def _opens_hashtag(text: str, pos: int) -> bool:
-    """A marker opens a tag at a text boundary.
+def _opens_hashtag(text: str, pos: int, follows_hashtag: bool) -> bool:
+    """A marker opens a tag at a text boundary or directly after another tag.
 
-    Start of input, whitespace, punctuation, or the marker of a preceding tag
-    (#東京#テスト) all qualify. Scanning back over body characters and running out of
-    text means the marker sits inside an ordinary word (C#).
+    Start of input, whitespace and punctuation are boundaries (#東京#テスト chains
+    through the preceding tag). After any other body character the marker sits
+    inside an ordinary word (C#), however far back that word began.
     """
-    cursor = pos
-    while cursor > 0:
-        if not HASHTAG_BODY_CHAR.match(text[cursor - 1]):
-            return True
-        cursor -= 1
-    return pos == 0
+    if pos == 0 or follows_hashtag:
+        return True
+    return not HASHTAG_BODY_CHAR.match(text[pos - 1])
 
 
 def _merge_tari_adverbs(state: MergeState) -> bool:
@@ -463,7 +460,10 @@ def _merge_name_and_script_compounds(state: MergeState) -> bool:
         # whose body spans several morphemes (#経済成長, #美しい景色).
         if not merged and t.get("surface") in ("#", "＃"):
             marker = t["surface"]
-            body_match = HASHTAG_BODY_RUN.match(remaining, len(marker)) if _opens_hashtag(text, pos_in_text) else None
+            previous_surface = result[-1].get("surface", "") if result else ""
+            follows_hashtag = len(previous_surface) > 1 and previous_surface[0] in ("#", "＃")
+            opens = _opens_hashtag(text, pos_in_text, follows_hashtag)
+            body_match = HASHTAG_BODY_RUN.match(remaining, len(marker)) if opens else None
             body = body_match.group(0) if body_match else ""
             if body:
                 consumed, j = _covered_length(tokens, i + 1, len(body))
