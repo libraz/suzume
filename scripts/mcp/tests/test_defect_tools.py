@@ -33,9 +33,10 @@ def parse_json(result: str) -> dict:
 
 @pytest.fixture
 def store(tmp_path, monkeypatch):
-    """Point the "defect" source at a temporary directory."""
+    """Point every source at a temporary directory; returns the "defect" one."""
     path = tmp_path / "bugs"
-    monkeypatch.setitem(bug_store._SOURCE_DIRS, "defect", path)
+    for source in bug_store.KNOWN_SOURCES:
+        monkeypatch.setitem(bug_store._SOURCE_DIRS, source, path if source == "defect" else tmp_path / source)
     return path
 
 
@@ -47,12 +48,13 @@ def engine(monkeypatch):
     texts whose behavior it cares about.
     """
 
-    tables = {"oracle": {}, "cli": {}}
+    tables = {"oracle": {}, "cli": {}, "skip_user_dict": []}
 
     def fake_oracle(texts):
         return [([{"surface": tok} for tok in tables["oracle"].get(text, text).split()], "test", "") for text in texts]
 
     async def fake_cli(text, cli_path=None, skip_user_dict=False):
+        tables["skip_user_dict"].append(skip_user_dict)
         return tables["cli"].get(text, text).split()
 
     monkeypatch.setattr("suzume_mcp.tools.defect_tools.get_expected_tokens_batch_subprocess", fake_oracle)
@@ -460,6 +462,34 @@ class TestDefectArchive:
         run(defect_archive(confirm="defect:1"))
 
         assert len(bug_store.load_resolved("defect")) == 1
+
+
+# ============================================================================
+# Analyzer selection
+# ============================================================================
+
+
+_JUDGED_WITHOUT_USER_DICT = {"defect": True, "literary": True, "thread": False}
+
+
+class TestAnalyzerMatchesTheStore:
+    """Only thread records are judged with user.dic; the rest run like the tokenization tests."""
+
+    @pytest.mark.parametrize("source", sorted(_JUDGED_WITHOUT_USER_DICT))
+    def test_probe(self, store, engine, source):
+        run(defect_probe(texts=["テスト文"], source=source))
+        assert engine["skip_user_dict"] == [_JUDGED_WITHOUT_USER_DICT[source]]
+
+    @pytest.mark.parametrize("source", sorted(_JUDGED_WITHOUT_USER_DICT))
+    def test_add_deriving_the_observed_output(self, store, engine, source):
+        run(defect_add(text="テスト文", expected="テスト 文", source=source))
+        assert engine["skip_user_dict"] == [_JUDGED_WITHOUT_USER_DICT[source]]
+
+    @pytest.mark.parametrize("source", sorted(_JUDGED_WITHOUT_USER_DICT))
+    def test_recheck(self, store, engine, source):
+        bug_store.create(source, text="テスト文", expected="テスト 文", suzume="テスト文")
+        run(defect_recheck(source=source))
+        assert engine["skip_user_dict"] == [_JUDGED_WITHOUT_USER_DICT[source]]
 
 
 # ============================================================================

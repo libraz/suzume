@@ -35,6 +35,17 @@ _SOURCE_DIRS = {
 
 KNOWN_SOURCES = tuple(_SOURCE_DIRS)
 
+# Stores judged with user.dic loaded. Thread titles are full of proper nouns and
+# a dict_add to the user dictionary is how such a record gets fixed. Every other
+# store is judged like the tokenization tests, which run without user.dic.
+_USER_DICT_SOURCES = frozenset({"thread"})
+
+
+def uses_user_dict(source: str) -> bool:
+    """Whether records of ``source`` are judged with the user dictionary loaded."""
+    return source in _USER_DICT_SOURCES
+
+
 # Field order used when writing a record, so a rewrite produces a stable diff.
 _FIELD_ORDER = (
     "id",

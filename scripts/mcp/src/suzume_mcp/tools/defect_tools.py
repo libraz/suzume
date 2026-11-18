@@ -37,25 +37,24 @@ __all__ = [
 _RECHECK_CONCURRENCY = 8
 
 
-async def _current_outputs(texts: list[str]) -> list[list[str]]:
+async def _current_outputs(texts: list[str], source: str) -> list[list[str]]:
     """Run the CLI over many texts with bounded concurrency."""
     semaphore = asyncio.Semaphore(_RECHECK_CONCURRENCY)
 
     async def one(text: str) -> list[str]:
         async with semaphore:
-            # user.dic stays loaded so dict_add fixes count as resolutions.
-            return await get_suzume_surfaces_async(text, skip_user_dict=False)
+            return await get_suzume_surfaces_async(text, skip_user_dict=not bug_store.uses_user_dict(source))
 
     return await asyncio.gather(*(one(text) for text in texts), return_exceptions=True)
 
 
-async def _compare_texts(texts: list[str]) -> list[dict]:
+async def _compare_texts(texts: list[str], source: str) -> list[dict]:
     """Run the oracle once and the CLI concurrently; one {error} or {current, expected} per text."""
     oracle = get_expected_tokens_batch_subprocess(texts)
-    outputs = await _current_outputs(texts)
+    outputs = await _current_outputs(texts, source)
     rows = []
-    for (tokens, source, rule), output in zip(oracle, outputs, strict=True):
-        if source == "error":
+    for (tokens, oracle_source, rule), output in zip(oracle, outputs, strict=True):
+        if oracle_source == "error":
             rows.append({"error": rule})
         elif isinstance(output, BaseException):
             rows.append({"error": str(output)})
@@ -69,7 +68,7 @@ async def _compare_texts(texts: list[str]) -> list[dict]:
     return rows
 
 
-async def _recheck_records(records: list[dict]) -> dict[int, dict]:
+async def _recheck_records(records: list[dict], source: str) -> dict[int, dict]:
     """Re-run every record and classify its current state.
 
     States:
@@ -82,7 +81,7 @@ async def _recheck_records(records: list[dict]) -> dict[int, dict]:
     if not records:
         return {}
     try:
-        compared = await _compare_texts([record.get("text", "") for record in records])
+        compared = await _compare_texts([record.get("text", "") for record in records], source)
     except Exception as exc:
         return {record["id"]: {"state": "error", "error": str(exc)} for record in records}
 
@@ -110,7 +109,7 @@ async def _screen(texts: list[str], source: str) -> list[dict]:
     One oracle subprocess plus concurrent CLI runs, so a whole family of
     generated sentences costs a single call.
     """
-    compared = await _compare_texts(texts)
+    compared = await _compare_texts(texts, source)
 
     open_by_text = {rec.get("text", ""): rec for rec in bug_store.load_open(source)}
     closed_by_text = {rec.get("text", ""): rec for rec in bug_store.load_resolved(source)}
@@ -150,7 +149,7 @@ async def _screen(texts: list[str], source: str) -> list[dict]:
     return rows
 
 
-async def _derive_tokenizations(text: str, expected: str, suzume: str) -> tuple[str, str]:
+async def _derive_tokenizations(text: str, expected: str, suzume: str, source: str) -> tuple[str, str]:
     """Fill an omitted oracle or observed tokenization from the pipeline and the CLI."""
     if not expected:
         tokens, oracle_source, rule = get_expected_tokens_batch_subprocess([text])[0]
@@ -158,7 +157,8 @@ async def _derive_tokenizations(text: str, expected: str, suzume: str) -> tuple[
             raise RuntimeError(rule)
         expected = bug_store.join_tokens([tok["surface"] for tok in tokens])
     if not suzume:
-        suzume = bug_store.join_tokens(list(await get_suzume_surfaces_async(text, skip_user_dict=False)))
+        skip_user_dict = not bug_store.uses_user_dict(source)
+        suzume = bug_store.join_tokens(list(await get_suzume_surfaces_async(text, skip_user_dict=skip_user_dict)))
     return expected, suzume
 
 
@@ -262,7 +262,7 @@ async def defect_dismiss(
         existing = bug_store.find_by_text(source, text)
         if existing is not None:
             return _duplicate(existing, "recorded")
-        expected, suzume = await _derive_tokenizations(text, expected, suzume)
+        expected, suzume = await _derive_tokenizations(text, expected, suzume, source)
         record = bug_store.dismiss(
             source,
             text=text,
@@ -327,7 +327,7 @@ async def defect_add(
         if existing and not force:
             return _duplicate(existing, "filed")
 
-        expected, suzume = await _derive_tokenizations(text, expected, suzume)
+        expected, suzume = await _derive_tokenizations(text, expected, suzume, source)
         if priority and priority.lower() not in bug_store.PRIORITIES:
             return json_error(f"priority must be one of {bug_store.PRIORITIES}")
 
@@ -373,7 +373,7 @@ async def defect_get(ids: str, source: str = "defect", live: bool = True) -> str
         return json_error(str(exc))
 
     records, missing = _load_by_ids(source, wanted)
-    states = await _recheck_records([rec for rec in records if rec["status"] == "open"]) if live else {}
+    states = await _recheck_records([rec for rec in records if rec["status"] == "open"], source) if live else {}
     entries = []
     for record in records:
         entry = _entry(record, compact=False)
@@ -412,7 +412,7 @@ async def defect_recheck(ids: str = "", source: str = "defect", apply: bool = Fa
     except (ValueError, bug_store.BugStoreError) as exc:
         return json_error(str(exc))
 
-    states = await _recheck_records(records)
+    states = await _recheck_records(records, source)
     buckets: dict[str, list[dict]] = {}
     for record in records:
         info = states.get(record["id"], {"state": "error", "error": "not evaluated"})
@@ -479,7 +479,7 @@ async def defect_resolve(ids: str, source: str = "defect", note: str = "", force
         return json_error("force=True requires note explaining why the record is closed while still failing")
 
     records, missing = _load_by_ids(source, wanted, include_resolved=False)
-    states = await _recheck_records(records)
+    states = await _recheck_records(records, source)
     resolved: list[dict] = []
     refused: list[dict] = []
     for record in records:
@@ -540,7 +540,7 @@ async def defect_report(source: str = "defect", out: str = "", include_resolved:
     except Exception as exc:
         return json_error(str(exc))
 
-    live = await _recheck_records(records)
+    live = await _recheck_records(records, source)
     text = bug_store.render_report(
         source=source,
         records=records,
