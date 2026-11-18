@@ -21,7 +21,8 @@ Suzume is a lightweight Japanese tokenizer with a small dictionary. Before you s
 ## Development Setup
 
 Requirements: a C++17 compiler, CMake 3.15+, Python 3.11+, and
-[Rye](https://rye.astral.sh/) for the MCP/oracle and Python-binding test environments.
+[uv](https://docs.astral.sh/uv/) 0.10 or later for the MCP/oracle and Python-binding test
+environments (each has a committed `uv.lock`; `make python-sync` provisions both).
 
 ```bash
 make build   # Configure + build (or: cmake -B build && cmake --build build --parallel)

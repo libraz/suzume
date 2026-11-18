@@ -53,21 +53,21 @@ fi
 python_binding=$(printf '%s\n' "$staged" | grep -E '^bindings/python/.*\.py$')
 repository_scripts=$(printf '%s\n' "$staged" | grep -E '^scripts/.*\.py$')
 if [ -n "$python_binding$repository_scripts" ]; then
-    if ! command -v rye >/dev/null 2>&1; then
-        echo "[pre-commit] rye is required for staged Python files."
+    if ! command -v uv >/dev/null 2>&1; then
+        echo "[pre-commit] uv is required for staged Python files."
         status=1
     else
         if [ -n "$python_binding" ]; then
-            if ! (cd bindings/python && rye run ruff format --check . \
-                && rye run ruff check .) >/dev/null 2>&1; then
-                echo "[pre-commit] Python binding formatting/lint issues (ruff). Run 'make python-sync' if the venv is missing."
+            if ! (cd bindings/python && uv run --locked ruff format --check . \
+                && uv run --locked ruff check .) >/dev/null 2>&1; then
+                echo "[pre-commit] Python binding formatting/lint issues (ruff)."
                 status=1
             fi
         fi
         if [ -n "$repository_scripts" ]; then
-            if ! (cd scripts/mcp && rye run ruff format --check . ../../scripts/*.py \
-                && rye run ruff check . ../../scripts/*.py) >/dev/null 2>&1; then
-                echo "[pre-commit] MCP server/repository script formatting or lint issues (ruff). Run 'make python-sync' if the venv is missing."
+            if ! (cd scripts/mcp && uv run --locked ruff format --check . ../../scripts/*.py \
+                && uv run --locked ruff check . ../../scripts/*.py) >/dev/null 2>&1; then
+                echo "[pre-commit] MCP server/repository script formatting or lint issues (ruff)."
                 status=1
             fi
         fi

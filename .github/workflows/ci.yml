@@ -20,6 +20,11 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: ${{ github.ref == 'refs/heads/develop' }}
 
+env:
+  # The uv release every Python environment is provisioned with (scripts/mcp,
+  # bindings/python). Each project's uv.lock must stay readable by it.
+  UV_VERSION: "0.10.0"
+
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -34,19 +39,16 @@ jobs:
           node-version: 22
           cache: yarn
           cache-dependency-path: bindings/wasm/yarn.lock
-      - name: Install rye
-        working-directory: .
-        run: |
-          curl -sSf https://rye.astral.sh/get | RYE_INSTALL_OPTION="--yes" RYE_NO_AUTO_INSTALL=0 bash
-          echo "$HOME/.rye/shims" >> "$GITHUB_PATH"
+      - uses: astral-sh/setup-uv@v10
+        with:
+          version: ${{ env.UV_VERSION }}
       - run: yarn install --immutable
       - run: yarn lint
       - name: Lint MCP server and repository scripts
         working-directory: scripts/mcp
         run: |
-          rye sync
-          rye run ruff format --check . ../../scripts/*.py
-          rye run ruff check . ../../scripts/*.py
+          uv run --locked ruff format --check . ../../scripts/*.py
+          uv run --locked ruff check . ../../scripts/*.py
 
   guardrails:
     runs-on: ubuntu-latest
@@ -77,19 +79,16 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y mecab libmecab-dev mecab-ipadic-utf8
           command -v mecab
-      - name: Install rye
-        run: |
-          curl -sSf https://rye.astral.sh/get | RYE_INSTALL_OPTION="--yes" RYE_NO_AUTO_INSTALL=0 bash
-          echo "$HOME/.rye/shims" >> "$GITHUB_PATH"
+      - uses: astral-sh/setup-uv@v10
+        with:
+          version: ${{ env.UV_VERSION }}
       # The oracle tests shell out to the native CLI for the Suzume side of every
       # comparison, so it must exist before pytest, not only for the sync check.
       - name: Build the native CLI and dictionaries
         run: make dict
       - name: Run MCP server and oracle tests
         working-directory: scripts/mcp
-        run: |
-          rye sync
-          rye run pytest -q
+        run: uv run --locked pytest -q
       - name: Verify golden expectations are synchronized
         run: make oracle-sync-check
 
@@ -200,26 +199,23 @@ jobs:
     if: github.ref != 'refs/heads/develop'
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
+      - uses: astral-sh/setup-uv@v10
         with:
-          python-version: '3.12'
+          version: ${{ env.UV_VERSION }}
       # Go through the Makefile rather than restating its cmake invocation here:
       # the binding loads the shared library AND reads the dictionaries staged
       # into the package, and python-dict is what stages them. A hand-copied
       # build step drifts from python-build and leaves the tests without data.
       - name: Build the shared C-ABI library and stage the dictionaries
         run: make python-build python-dict
-      - name: Install Python binding
-        working-directory: bindings/python
-        run: pip install -e ".[dev]"
       - name: Lint and type-check
         working-directory: bindings/python
         run: |
-          ruff check .
-          ruff format --check .
-          mypy src/suzume
+          uv run --locked ruff check .
+          uv run --locked ruff format --check .
+          uv run --locked mypy src/suzume
       - name: Run Python tests
         working-directory: bindings/python
         run: |
-          pytest -q
-          python ../../examples/python/basic.py
+          uv run --locked pytest -q
+          uv run --locked python ../../examples/python/basic.py

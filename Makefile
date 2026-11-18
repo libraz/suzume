@@ -35,22 +35,15 @@ CLANG_FORMAT ?= clang-format
 CMAKE := $(shell command -v cmake 2>/dev/null || echo cmake)
 NODE := $(shell command -v node 2>/dev/null || echo node)
 
-# Python environments. `rye run` does not provision on demand the way `uv run`
-# did, so every Python target depends on its venv and re-syncs when the lock
-# moves. `rye sync` touches the venv directory, which is what make compares.
-MCP_VENV := scripts/mcp/.venv
-PYBINDING_VENV := bindings/python/.venv
+# Python environments. `uv run --locked` syncs the project's venv from its
+# committed uv.lock on every call and fails if the lock no longer matches
+# pyproject.toml, so no target needs a separate provisioning step.
+UV_RUN := uv run --locked
 
-$(MCP_VENV): scripts/mcp/requirements-dev.lock scripts/mcp/pyproject.toml
-	cd scripts/mcp && rye sync
-
-$(PYBINDING_VENV): bindings/python/requirements-dev.lock bindings/python/pyproject.toml
-	cd bindings/python && rye sync
-
-# Force a re-provision of both Python environments.
+# Re-provision both Python environments from their locks.
 python-sync:
-	cd scripts/mcp && rye sync --force
-	cd bindings/python && rye sync --force
+	cd scripts/mcp && uv sync --locked
+	cd bindings/python && uv sync --locked
 
 # Default target
 .DEFAULT_GOAL := build
@@ -73,7 +66,7 @@ help:
 	@echo "  make format-check - Check formatting across all languages"
 	@echo "  make lint         - Run read-only scripts/MCP, WASM, and Python static checks"
 	@echo "  make configure    - Configure CMake"
-	@echo "  make python-sync  - Re-provision both rye-managed Python environments"
+	@echo "  make python-sync  - Re-provision both Python environments from their uv.lock"
 	@echo "  make version-check - Verify version is consistent across binding manifests"
 	@echo "  make cmake-smoke  - Verify supported CMake build/install configurations"
 	@echo ""
@@ -180,13 +173,13 @@ asan:
 
 # Run the MCP server/oracle test suite from its project root so pytest uses
 # scripts/mcp/pyproject.toml and imports the local package correctly.
-mcp-test: $(MCP_VENV)
+mcp-test:
 	@echo "Running MCP server/oracle tests..."
-	cd scripts/mcp && rye run pytest -q
+	cd scripts/mcp && $(UV_RUN) pytest -q
 
-oracle-sync-check: build $(MCP_VENV)
+oracle-sync-check: build
 	@echo "Checking golden expectations against a fresh oracle process..."
-	cd scripts/mcp && rye run python ../../scripts/check_oracle_sync.py
+	cd scripts/mcp && $(UV_RUN) python ../../scripts/check_oracle_sync.py
 
 # Clean the primary build directory only
 clean-build:
@@ -294,38 +287,38 @@ cmake-smoke:
 # Auto-fix formatting/lint across every language in the repo:
 # C++ core (clang-format), MCP/repository scripts (ruff), WASM binding (biome),
 # Python binding (ruff).
-format: $(MCP_VENV) $(PYBINDING_VENV)
+format:
 	@echo "Formatting C++ (clang-format)..."
 	@find src include tools tests examples -type f \( -name "*.cpp" -o -name "*.h" -o -name "*.hpp" -o -name "*.c" \) | xargs $(CLANG_FORMAT) -i
 	@echo "Formatting MCP server and repository scripts (ruff)..."
-	cd scripts/mcp && rye run ruff format . ../../scripts/*.py && rye run ruff check --fix . ../../scripts/*.py
+	cd scripts/mcp && $(UV_RUN) ruff format . ../../scripts/*.py && $(UV_RUN) ruff check --fix . ../../scripts/*.py
 	@echo "Formatting WASM binding (biome)..."
 	cd bindings/wasm && yarn lint:fix
 	@echo "Formatting Python binding (ruff)..."
-	cd bindings/python && rye run ruff format . && rye run ruff check --fix .
+	cd bindings/python && $(UV_RUN) ruff format . && $(UV_RUN) ruff check --fix .
 	$(MAKE) lint
 	@echo "Format complete!"
 
 # Check-only counterpart for CI (same language fan-out, no writes).
-format-check: $(MCP_VENV) $(PYBINDING_VENV)
+format-check:
 	@echo "Checking C++ formatting (clang-format)..."
 	@find src include tools tests examples -type f \( -name "*.cpp" -o -name "*.h" -o -name "*.hpp" -o -name "*.c" \) | xargs $(CLANG_FORMAT) --dry-run --Werror
 	@echo "Checking MCP server and repository script formatting (ruff)..."
-	cd scripts/mcp && rye run ruff format --check . ../../scripts/*.py
+	cd scripts/mcp && $(UV_RUN) ruff format --check . ../../scripts/*.py
 	@echo "Checking Python binding formatting (ruff)..."
-	cd bindings/python && rye run ruff format --check .
+	cd bindings/python && $(UV_RUN) ruff format --check .
 	$(MAKE) lint
 	@echo "Format check passed!"
 
 # Read-only static analysis. This repository does not configure clang-tidy, so
 # C++ is covered by clang-format in format-check rather than a nominal lint step.
-lint: $(MCP_VENV) $(PYBINDING_VENV)
+lint:
 	@echo "Linting MCP server and repository scripts (ruff)..."
-	cd scripts/mcp && rye run ruff check . ../../scripts/*.py
+	cd scripts/mcp && $(UV_RUN) ruff check . ../../scripts/*.py
 	@echo "Linting WASM binding (biome)..."
 	cd bindings/wasm && yarn lint
 	@echo "Linting Python binding (ruff)..."
-	cd bindings/python && rye run ruff check .
+	cd bindings/python && $(UV_RUN) ruff check .
 
 # ============================================
 # Python binding targets
@@ -339,7 +332,7 @@ python-build:
 	$(CMAKE) --build build-shared --target suzume_shared --parallel $(JOBS)
 	@echo "Shared library built: build-shared/lib/"
 
-# Run the Python binding test suite in the rye-managed venv
+# Compile the dictionaries the Python test package loads
 python-dict: build
 	@echo "Building dictionaries for the Python test package (git-tracked user entries only)..."
 	$(BUILD_DIR)/bin/suzume-cli dict compile data/core/*.tsv data/core.dic
@@ -347,16 +340,16 @@ python-dict: build
 	$(CMAKE) -E copy_if_different data/core.dic bindings/python/src/suzume/core.dic
 	$(CMAKE) -E copy_if_different data/user.dic bindings/python/src/suzume/user.dic
 
-python-test: python-build python-dict $(PYBINDING_VENV)
+python-test: python-build python-dict
 	@echo "Running Python binding tests..."
-	cd bindings/python && rye run pytest -q \
-		&& rye run ruff check . \
-		&& rye run ruff format --check . \
-		&& rye run mypy src/suzume
+	cd bindings/python && $(UV_RUN) pytest -q \
+		&& $(UV_RUN) ruff check . \
+		&& $(UV_RUN) ruff format --check . \
+		&& $(UV_RUN) mypy src/suzume
 	$(MAKE) python-examples
 
-python-examples: python-build $(PYBINDING_VENV)
-	cd bindings/python && rye run python ../../examples/python/basic.py
+python-examples: python-build
+	cd bindings/python && $(UV_RUN) python ../../examples/python/basic.py
 
 # Build a platform-tagged wheel
 python-wheel:
@@ -406,8 +399,8 @@ wasm-test: wasm
 	cd bindings/wasm && yarn test:examples
 	@echo "WASM tests complete!"
 
-binding-parity: build python-build wasm $(PYBINDING_VENV)
-	cd bindings/python && rye run python ../../scripts/check_binding_parity.py
+binding-parity: build python-build wasm
+	cd bindings/python && $(UV_RUN) python ../../scripts/check_binding_parity.py
 
 # Measure the shipped public JS API, including result decoding. Override the
 # workload with WASM_BENCH_ARGS, for example:
