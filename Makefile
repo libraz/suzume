@@ -39,6 +39,9 @@ NODE := $(shell command -v node 2>/dev/null || echo node)
 # committed uv.lock on every call and fails if the lock no longer matches
 # pyproject.toml, so no target needs a separate provisioning step.
 UV_RUN := uv run --locked
+# Repository scripts (scripts/*.py) run on the MCP project's pinned interpreter,
+# never a bare python3 from PATH, whose version varies by machine.
+SCRIPTS_PYTHON := $(UV_RUN) --project scripts/mcp python
 
 # Re-provision both Python environments from their locks.
 python-sync:
@@ -143,16 +146,16 @@ native-test-nodebug:
 	ctest --test-dir $(NODEBUG_BUILD_DIR) --output-on-failure -R native_cli_contract
 
 native-bench: dict
-	python3 scripts/measure_native_metrics.py
+	$(SCRIPTS_PYTHON) scripts/measure_native_metrics.py
 
 # Keep local verification aligned with the CI guardrails, including the WASM
 # artifact-size check that needs the shipped module built first.
 guardrails: wasm
 	LC_ALL=C scripts/check_code_guardrails.sh
-	python3 scripts/check_oracle_overrides.py
-	python3 scripts/check_binding_labels.py
-	python3 scripts/check_compound_v2_sync.py
-	python3 scripts/check_oracle_mirrors.py
+	$(SCRIPTS_PYTHON) scripts/check_oracle_overrides.py
+	$(SCRIPTS_PYTHON) scripts/check_binding_labels.py
+	$(SCRIPTS_PYTHON) scripts/check_compound_v2_sync.py
+	$(SCRIPTS_PYTHON) scripts/check_oracle_mirrors.py
 	scripts/check_version_mirror.sh
 	scripts/check_wasm_size.sh bindings/wasm/dist/suzume.wasm
 
@@ -179,7 +182,7 @@ mcp-test:
 
 oracle-sync-check: build
 	@echo "Checking golden expectations against a fresh oracle process..."
-	cd scripts/mcp && $(UV_RUN) python ../../scripts/check_oracle_sync.py
+	$(SCRIPTS_PYTHON) scripts/check_oracle_sync.py
 
 # Clean the primary build directory only
 clean-build:
@@ -400,7 +403,7 @@ wasm-test: wasm
 	@echo "WASM tests complete!"
 
 binding-parity: build python-build wasm
-	cd bindings/python && $(UV_RUN) python ../../scripts/check_binding_parity.py
+	$(UV_RUN) --project bindings/python python scripts/check_binding_parity.py
 
 # Measure the shipped public JS API, including result decoding. Override the
 # workload with WASM_BENCH_ARGS, for example:

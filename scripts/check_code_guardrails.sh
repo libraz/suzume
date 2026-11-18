@@ -26,7 +26,8 @@ cd "$(git rev-parse --show-toplevel)"
 BASELINE="scripts/guardrail-baseline.tsv"
 MODE="${1:-check}"
 
-# scripts/code_guardrail_metrics.py owns what each metric counts.
+# scripts/code_guardrail_metrics.py owns what each metric counts. It runs on the
+# MCP project's pinned interpreter, like every repository script.
 METRICS="scripts/code_guardrail_metrics.py"
 
 # Analysis, grammar, and postprocessing carry candidate/scoring decisions across
@@ -42,7 +43,7 @@ FILES=$(
 gen_baseline() {
   printf '# file\tsurface_cmp\tscore_literals\tscore_additions\n'
   # shellcheck disable=SC2086
-  python3 "$METRICS" $FILES
+  uv run --locked --project scripts/mcp python "$METRICS" $FILES
 }
 
 # WASM-core purity: native file-I/O, thread, and stream headers must never reach
