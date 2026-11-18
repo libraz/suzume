@@ -34,18 +34,22 @@ PreTokenResult PreTokenizer::process(std::string_view text) const {
     // only manufacture a token that starts in the middle of a number.
     const bool inside_numeric_run = previous_was_digit && current_is_digit;
 
+    const bool follows_hashtag =
+        !result.tokens.empty() && result.tokens.back().type == PreTokenType::Hashtag && result.tokens.back().end == pos;
+
     // Try to match patterns in priority order
     // Note: URL must come before Email (URLs contain @ in some cases)
     // Note: Email must come before Mention (emails have @ followed by domain)
     // Note: Percentage must come before Version to avoid "3.14%" being parsed as version
     // Note: Date must come before Time (日付 includes 日 which looks like time suffix)
     if (!inside_numeric_run &&
-        (tryMatchUrl(text, pos, token) || tryMatchEmail(text, pos, token) || tryMatchHashtag(text, pos, token) ||
-         tryMatchMention(text, pos, token) || tryMatchKaomoji(text, pos, token) || tryMatchDate(text, pos, token) ||
-         tryMatchCounter(text, pos, token) || tryMatchTime(text, pos, token) || tryMatchCurrency(text, pos, token) ||
-         tryMatchStorage(text, pos, token) || tryMatchPercentage(text, pos, token) ||
-         tryMatchGroupedNumber(text, pos, token) || tryMatchAddressNumber(text, pos, token) ||
-         tryMatchVersion(text, pos, token) || tryMatchAsciiWithJoiners(text, pos, token))) {
+        (tryMatchUrl(text, pos, token) || tryMatchEmail(text, pos, token) ||
+         tryMatchHashtag(text, pos, follows_hashtag, token) || tryMatchMention(text, pos, token) ||
+         tryMatchKaomoji(text, pos, token) || tryMatchDate(text, pos, token) || tryMatchCounter(text, pos, token) ||
+         tryMatchTime(text, pos, token) || tryMatchCurrency(text, pos, token) || tryMatchStorage(text, pos, token) ||
+         tryMatchPercentage(text, pos, token) || tryMatchGroupedNumber(text, pos, token) ||
+         tryMatchAddressNumber(text, pos, token) || tryMatchVersion(text, pos, token) ||
+         tryMatchAsciiWithJoiners(text, pos, token))) {
       // Add span before this token if any
       if (pos > span_start) {
         result.spans.push_back({span_start, pos});

@@ -125,6 +125,23 @@ TEST_F(PreTokenizerTextTest, FullWidthHashStartsANewHashtag) {
   EXPECT_EQ(result.tokens[1].surface, "#テスト");
 }
 
+TEST_F(PreTokenizerTextTest, HashAfterWordCharacterOpensNoHashtag) {
+  // The word in front of the marker may itself start after punctuation.
+  for (const char* text : {"C#が好き", "今日、C#が好き", "「F#で書く」", "色は#fff", "C#東京#テスト"}) {
+    const auto result = pretokenizer_.process(text);
+    for (const auto& token : result.tokens) {
+      EXPECT_NE(token.type, PreTokenType::Hashtag) << text << " -> " << token.surface;
+    }
+  }
+}
+
+TEST_F(PreTokenizerTextTest, HashAfterPunctuationOpensHashtag) {
+  const auto result = pretokenizer_.process("今日、#東京#テスト");
+  ASSERT_EQ(result.tokens.size(), 2U);
+  EXPECT_EQ(result.tokens[0].surface, "#東京");
+  EXPECT_EQ(result.tokens[1].surface, "#テスト");
+}
+
 TEST_F(PreTokenizerTextTest, MatchHashtag_SupplementaryKanji) {
   const auto result = pretokenizer_.process("#𠮟");
   ASSERT_EQ(result.tokens.size(), 1U);

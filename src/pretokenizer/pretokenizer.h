@@ -184,10 +184,11 @@ class PreTokenizer {
    * @brief Try to match hashtag at position
    * @param text Input text
    * @param pos Current position
+   * @param follows_hashtag Whether the previous token is a hashtag ending at @p pos
    * @param token Output token if matched
    * @return true if hashtag matched
    */
-  bool tryMatchHashtag(std::string_view text, size_t pos, PreToken& token) const;
+  bool tryMatchHashtag(std::string_view text, size_t pos, bool follows_hashtag, PreToken& token) const;
 
   /**
    * @brief Try to match mention at position

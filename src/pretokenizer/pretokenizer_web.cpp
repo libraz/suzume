@@ -173,25 +173,20 @@ bool isHashtagChar(char32_t codepoint) {
   return codepoint == U'々';
 }
 
-// A marker opens a tag at a text boundary — start of input, whitespace, punctuation,
-// or the marker of a preceding tag (#東京#テスト). Scanning back over body characters
-// and running out of text means the marker sits inside an ordinary word (C#).
-bool opensHashtag(std::string_view text, size_t pos) {
-  size_t cursor = pos;
-  while (cursor > 0) {
-    const size_t start = normalize::findUtf8Boundary(text, cursor - 1);
-    size_t decode_pos = start;
-    if (!isHashtagChar(normalize::decodeUtf8(text, decode_pos))) {
-      return true;
-    }
-    cursor = start;
+// A marker opens a tag at a text boundary — start of input, whitespace, punctuation —
+// or directly after another tag (#東京#テスト). After any other body character it sits
+// inside an ordinary word (C#, 色は#fff), however far back that word began.
+bool opensHashtag(std::string_view text, size_t pos, bool follows_hashtag) {
+  if (pos == 0 || follows_hashtag) {
+    return true;
   }
-  return pos == 0;
+  size_t previous_pos = normalize::findUtf8Boundary(text, pos - 1);
+  return !isHashtagChar(normalize::decodeUtf8(text, previous_pos));
 }
 
 }  // namespace
 
-bool PreTokenizer::tryMatchHashtag(std::string_view text, size_t pos, PreToken& token) const {
+bool PreTokenizer::tryMatchHashtag(std::string_view text, size_t pos, bool follows_hashtag, PreToken& token) const {
   // Match pattern: # + (Japanese chars | alphanumeric | underscore)+
   if (pos >= text.size()) {
     return false;
@@ -204,7 +199,7 @@ bool PreTokenizer::tryMatchHashtag(std::string_view text, size_t pos, PreToken& 
   if (codepoint != '#') {
     return false;
   }
-  if (!opensHashtag(text, pos)) {
+  if (!opensHashtag(text, pos, follows_hashtag)) {
     return false;
   }
   size_t idx = byte_pos;
