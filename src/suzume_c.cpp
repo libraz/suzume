@@ -596,8 +596,11 @@ SUZUME_EXPORT int suzume_clear_user_dictionaries(suzume_t handle) {
     return 0;
   }
   clearLastError();
-  handle->instance.clearUserDictionaries();
-  return 1;
+  SUZUME_C_TRY {
+    handle->instance.clearUserDictionaries();
+    return 1;
+  }
+  SUZUME_C_CATCH(return 0)
 }
 
 SUZUME_EXPORT int suzume_has_core_dictionary(suzume_t handle) {
@@ -666,14 +669,17 @@ SUZUME_EXPORT const char* suzume_dictionary_warning(suzume_t handle, size_t inde
     setLastError("suzume_dictionary_warning: null handle", SUZUME_ERROR_INVALID_INPUT);
     return nullptr;
   }
-  const auto& warnings = handle->instance.dictionaryWarnings();
-  if (index >= warnings.size()) {
-    setLastError("suzume_dictionary_warning: index out of range", SUZUME_ERROR_INVALID_INPUT);
-    return nullptr;
+  SUZUME_C_TRY {
+    const auto& warnings = handle->instance.dictionaryWarnings();
+    if (index >= warnings.size()) {
+      setLastError("suzume_dictionary_warning: index out of range", SUZUME_ERROR_INVALID_INPUT);
+      return nullptr;
+    }
+    thread_local std::string warning;
+    warning = warnings[index];
+    return warning.c_str();
   }
-  thread_local std::string warning;
-  warning = warnings[index];
-  return warning.c_str();
+  SUZUME_C_CATCH(return nullptr)
 }
 
 SUZUME_EXPORT size_t suzume_sizeof_result(void) {
