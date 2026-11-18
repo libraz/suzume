@@ -36,6 +36,24 @@ esac
 # silently reusing objects compiled for another architecture or deployment target.
 BUILD_DIR="${SUZUME_PYTHON_BUILD_DIR:-$PROJECT_ROOT/build-python-$BUILD_PLATFORM}"
 
+# uv supplies the interpreter, the build frontend and every packaging tool at
+# the versions pinned here, so nothing depends on the python found on PATH.
+WHEEL_VERSION="0.45.1"
+AUDITWHEEL_VERSION="6.4.2"
+PATCHELF_VERSION="0.19.3.0"
+export UV_MANAGED_PYTHON=1
+UV_PYTHON="$(<"$SCRIPT_DIR/.python-version")"
+export UV_PYTHON
+
+wheel_tool() {
+    uv tool run --from "wheel==$WHEEL_VERSION" wheel "$@"
+}
+
+auditwheel_tool() {
+    uv tool run --from "auditwheel==$AUDITWHEEL_VERSION" \
+        --with "patchelf==$PATCHELF_VERSION" auditwheel "$@"
+}
+
 if ! git -C "$PROJECT_ROOT" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     echo "Error: public wheels must be built from a git checkout" >&2
     exit 1
@@ -128,7 +146,7 @@ fi
 echo "=== Building wheel ==="
 rm -rf "$SCRIPT_DIR/dist"
 mkdir -p "$SCRIPT_DIR/dist"
-python3 -m pip wheel "$SCRIPT_DIR" --no-deps -w "$SCRIPT_DIR/dist"
+uv build --wheel --out-dir "$SCRIPT_DIR/dist" "$SCRIPT_DIR"
 
 shopt -s nullglob
 WHEELS=("$SCRIPT_DIR"/dist/*.whl)
@@ -141,22 +159,17 @@ INITIAL_WHEEL="${WHEELS[0]}"
 if [[ "$SYSTEM" == "Darwin" ]]; then
     # The dylib target was verified above; only now is it safe to apply the
     # corresponding platform tag.
-    python3 -m wheel tags --platform-tag "$PLATFORM_TAG" --remove "$INITIAL_WHEEL"
+    wheel_tool tags --platform-tag "$PLATFORM_TAG" --remove "$INITIAL_WHEEL"
 else
-    if ! command -v auditwheel >/dev/null 2>&1; then
-        echo "Error: Linux wheel builds require auditwheel" >&2
-        exit 1
-    fi
-
     # auditwheel needs a Linux wheel as input. This is an intermediate tag only:
     # the public manylinux tag is produced and validated by auditwheel repair.
-    python3 -m wheel tags --platform-tag "linux_x86_64" --remove "$INITIAL_WHEEL"
+    wheel_tool tags --platform-tag "linux_x86_64" --remove "$INITIAL_WHEEL"
     WHEELS=("$SCRIPT_DIR"/dist/*.whl)
     INITIAL_WHEEL="${WHEELS[0]}"
     REPAIR_DIR="$SCRIPT_DIR/dist-repaired"
     rm -rf "$REPAIR_DIR"
     mkdir -p "$REPAIR_DIR"
-    auditwheel repair --plat "$PLATFORM_TAG" --wheel-dir "$REPAIR_DIR" "$INITIAL_WHEEL"
+    auditwheel_tool repair --plat "$PLATFORM_TAG" --wheel-dir "$REPAIR_DIR" "$INITIAL_WHEEL"
     rm -f "$INITIAL_WHEEL"
     mv "$REPAIR_DIR"/*.whl "$SCRIPT_DIR/dist/"
     rmdir "$REPAIR_DIR"
@@ -166,7 +179,7 @@ else
         echo "Error: expected exactly one repaired Linux wheel" >&2
         exit 1
     fi
-    AUDIT_OUTPUT="$(auditwheel show "${WHEELS[0]}")"
+    AUDIT_OUTPUT="$(auditwheel_tool show "${WHEELS[0]}")"
     printf '%s\n' "$AUDIT_OUTPUT"
     if [[ "$AUDIT_OUTPUT" != *"$PLATFORM_TAG"* ]]; then
         echo "Error: auditwheel did not validate $PLATFORM_TAG compatibility" >&2

@@ -18,13 +18,22 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 WHEEL_DIR="$(cd "$(dirname "$WHEEL_INPUT")" && pwd)"
 WHEEL="$WHEEL_DIR/$(basename "$WHEEL_INPUT")"
-PYTHON_BIN="${PYTHON_BIN:-python3}"
 TEST_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/suzume-wheel-test.XXXXXX")"
 trap 'rm -rf "$TEST_ROOT"' EXIT
 
-"$PYTHON_BIN" -m venv "$TEST_ROOT/venv"
-# The dev extra is the single place the test tool versions are declared.
-"$TEST_ROOT/venv/bin/python" -m pip install "${WHEEL}[dev]"
+# uv supplies the interpreter pinned for the binding, never the python on PATH.
+export UV_MANAGED_PYTHON=1
+UV_PYTHON="$(<"$SCRIPT_DIR/.python-version")"
+export UV_PYTHON
+uv venv "$TEST_ROOT/venv"
+# The test tools come from uv.lock at the versions the dev environment uses;
+# the wheel itself goes in without dependency resolution so that nothing is
+# re-resolved against the index.
+uv export --project "$SCRIPT_DIR" --locked --only-group dev --no-emit-project \
+    --format requirements.txt --output-file "$TEST_ROOT/dev-requirements.txt" --quiet
+uv pip install --python "$TEST_ROOT/venv/bin/python" --require-hashes \
+    --requirement "$TEST_ROOT/dev-requirements.txt"
+uv pip install --python "$TEST_ROOT/venv/bin/python" --no-deps "$WHEEL"
 
 export PYTHONNOUSERSITE=1
 unset PYTHONPATH

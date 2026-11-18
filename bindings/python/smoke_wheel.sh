@@ -16,12 +16,16 @@ fi
 
 WHEEL_DIR="$(cd "$(dirname "$WHEEL_INPUT")" && pwd)"
 WHEEL="$WHEEL_DIR/$(basename "$WHEEL_INPUT")"
-PYTHON_BIN="${PYTHON_BIN:-python3}"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SMOKE_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/suzume-wheel-smoke.XXXXXX")"
 trap 'rm -rf "$SMOKE_ROOT"' EXIT
 
-"$PYTHON_BIN" -m venv "$SMOKE_ROOT/venv"
-"$SMOKE_ROOT/venv/bin/python" -m pip install --no-deps "$WHEEL"
+# uv supplies the interpreter pinned for the binding, never the python on PATH.
+export UV_MANAGED_PYTHON=1
+UV_PYTHON="$(<"$SCRIPT_DIR/.python-version")"
+export UV_PYTHON
+uv venv "$SMOKE_ROOT/venv"
+uv pip install --python "$SMOKE_ROOT/venv/bin/python" --no-deps "$WHEEL"
 mkdir "$SMOKE_ROOT/work"
 cd "$SMOKE_ROOT/work"
 

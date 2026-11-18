@@ -9,6 +9,11 @@ permissions:
   contents: write
   id-token: write
 
+env:
+  # Must match UV_VERSION in ci.yml, so a release is built with the uv that CI
+  # verified the wheel scripts against.
+  UV_VERSION: "0.10.0"
+
 jobs:
   verify-version:
     runs-on: ubuntu-latest
@@ -100,10 +105,9 @@ jobs:
     runs-on: macos-15  # arm64
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
+      - uses: astral-sh/setup-uv@v10
         with:
-          python-version: '3.12'
-      - run: pip install 'wheel==0.45.1'
+          version: ${{ env.UV_VERSION }}
       - name: Build macOS arm64 wheel
         working-directory: bindings/python
         run: ./build_wheel.sh
