@@ -287,6 +287,28 @@ def test_normalization_lemmatize_compound_and_tag_options_are_wired() -> None:
     assert args.text == ["東京"]
 
 
+def test_tag_pos_choices_are_the_names_the_library_accepts() -> None:
+    parser = cli._build_parser()
+    for name in ("noun", "verb", "adjective", "adverb", "particle", "auxiliary"):
+        args = parser.parse_args(cli._without_explicit_command(["--tag-pos", name, "東京"]))
+        assert args.tag_pos == [name]
+
+
+def test_tag_pos_particle_reaches_tag_output() -> None:
+    tags = _run_cli(
+        "--format",
+        "tags",
+        "--tag-pos",
+        "particle",
+        "--include-particles",
+        "--tag-min-length",
+        "1",
+        "りんごについて",
+    )
+    assert tags.returncode == 0, tags.stderr
+    assert tags.stdout == "について\tPARTICLE\n"
+
+
 def test_normalization_and_symbol_options_change_analysis() -> None:
     preserved = _json_result("--preserve-symbols", "TEST。")
     normalized = _json_result("--lowercase", "--preserve-symbols", "TEST。")

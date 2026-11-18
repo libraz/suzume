@@ -9,10 +9,9 @@ from collections.abc import Iterator, Sequence
 from pathlib import Path
 from typing import Any, TextIO
 
-from . import Mode, Morpheme, Suzume, SuzumeError, Tag, version
+from . import _POS_FILTER_BITS, Mode, Morpheme, Suzume, SuzumeError, Tag, version
 
 _FORMATS = ("morpheme", "tags", "json", "tsv", "chasen")
-_TAG_POS = ("noun", "verb", "adjective", "adverb")
 _OPTIONS_WITH_VALUES = {
     "-d",
     "--dict",
@@ -124,7 +123,7 @@ def _add_analysis_arguments(parser: argparse.ArgumentParser) -> None:
     tag_group.add_argument(
         "--tag-pos",
         action="append",
-        choices=_TAG_POS,
+        choices=tuple(_POS_FILTER_BITS),
         default=[],
         metavar="POS",
         help="Include a POS in tag output (repeatable)",
