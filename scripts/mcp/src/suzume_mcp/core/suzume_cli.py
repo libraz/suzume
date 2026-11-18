@@ -8,11 +8,13 @@ the latest normalization code from disk.
 
 import asyncio
 import json
+import math
 import os
 import re
 import subprocess
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from pathlib import Path
 
@@ -26,6 +28,11 @@ _ANALYZE_TIMEOUT_SECONDS = 30.0
 _DICT_COMPILE_TIMEOUT_SECONDS = 120.0
 _NORMALIZE_TIMEOUT_SECONDS = 60.0
 _NORMALIZE_TIMEOUT_PER_TEXT_SECONDS = 1.0
+# A full test-suite batch spends minutes in per-text reference-analyzer calls.
+# Four processes is the machine's per-job cap for CPU-heavy work; a batch too
+# small to amortize the interpreter start-up stays in one process.
+_NORMALIZE_WORKERS = 4
+_NORMALIZE_MIN_TEXTS_PER_WORKER = 200
 
 # Directories whose files are compiled into the CLI. A binary older than any of
 # them answers for code that is no longer in the tree.
@@ -311,9 +318,20 @@ def _run_module_cli(args: list[str], payload: list) -> list:
 def _run_normalize_cli(texts: list[str], *, raw_mecab: bool = False) -> list[dict]:
     """Call normalization CLI via subprocess for fresh code.
 
+    Each text is normalized independently, so a large batch is split into
+    contiguous chunks run in parallel processes and concatenated in order.
+
     Returns list of {"tokens": [...], "source": str, "rule": str}.
     """
-    return _run_module_cli(["normalize", "--batch", *(["--mecab"] if raw_mecab else [])], texts)
+    args = ["normalize", "--batch", *(["--mecab"] if raw_mecab else [])]
+    workers = min(_NORMALIZE_WORKERS, max(1, len(texts) // _NORMALIZE_MIN_TEXTS_PER_WORKER))
+    if workers == 1:
+        return _run_module_cli(args, texts)
+    size = math.ceil(len(texts) / workers)
+    chunks = [texts[start : start + size] for start in range(0, len(texts), size)]
+    with ThreadPoolExecutor(max_workers=len(chunks)) as pool:
+        parts = list(pool.map(lambda chunk: _run_module_cli(args, chunk), chunks))
+    return [result for part in parts for result in part]
 
 
 def get_suzume_rules_subprocess(texts: list[str]) -> list[str]:

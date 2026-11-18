@@ -256,3 +256,29 @@ def test_tools_reach_the_oracle_only_through_a_subprocess() -> None:
             if module.startswith(ORACLE_MODULE_PREFIXES) or names & ORACLE_ENTRY_POINTS:
                 offenders.append(f"{path.name}:{node.lineno}")
     assert offenders == []
+
+
+def test_a_large_normalize_batch_is_split_across_workers_in_order(monkeypatch: pytest.MonkeyPatch) -> None:
+    chunks = []
+
+    def fake_module_cli(args, payload):
+        chunks.append(list(payload))
+        return [{"tokens": [], "source": "MeCab", "rule": text} for text in payload]
+
+    monkeypatch.setattr(suzume_cli, "_run_module_cli", fake_module_cli)
+    texts = [f"t{index}" for index in range(1000)]
+
+    results = suzume_cli._run_normalize_cli(texts)
+
+    assert [result["rule"] for result in results] == texts
+    assert len(chunks) == suzume_cli._NORMALIZE_WORKERS
+    assert sorted(len(chunk) for chunk in chunks) == [250, 250, 250, 250]
+
+
+def test_a_small_normalize_batch_stays_in_one_process(monkeypatch: pytest.MonkeyPatch) -> None:
+    calls = []
+    monkeypatch.setattr(suzume_cli, "_run_module_cli", lambda args, payload: calls.append(payload) or payload)
+
+    suzume_cli._run_normalize_cli(["東京"] * 100)
+
+    assert len(calls) == 1
