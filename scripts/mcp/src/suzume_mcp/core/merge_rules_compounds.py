@@ -63,12 +63,12 @@ def _merge_tari_adverbs(state: MergeState) -> bool:
                 previous_surface = result[-1].get("surface", "") if result else ""
                 following_surface = remaining[len(adverb) : len(adverb) + 1]
                 if (previous_surface == "の" and following_surface == "は") or (
-                    adverb[:-1] in core_headwords("nouns.tsv") | core_headwords("adjectives.tsv")
+                    adverb[:-1] in core_headwords("nouns.tsv")
+                    or adverb[:-1] in core_headwords("adjectives.tsv")
                     or adverb[:-1] in ADVERBIAL_NA_ADJECTIVES
                 ):
                     derived_tari = None
             if derived_tari is not None:
-                adverb = derived_tari.group(0)
                 length, j = _covered_length(tokens, i, len(adverb))
                 if length == len(adverb):
                     result.append({"surface": adverb, "pos": "副詞", "lemma": adverb[:-1]})

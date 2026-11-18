@@ -863,7 +863,7 @@ def _merge_fixed_search_units(state: MergeState) -> bool:
         # A closing emphatic っ belongs to it as well (おはよっ).
         if not merged:
             clipped = clipped_greetings()
-            clip = next((word for word in sorted(clipped, key=len, reverse=True) if remaining.startswith(word)), "")
+            clip = next((word for word in clipped if remaining.startswith(word)), "")
             span = clip + regex.match(r"ー*っ?", remaining[len(clip) :]).group() if clip else ""
             after = remaining[len(span) : len(span) + 1]
             if clip and (
