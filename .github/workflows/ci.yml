@@ -111,6 +111,26 @@ jobs:
       - uses: actions/checkout@v7
       - name: Run native tests with debug features compiled out
         run: make native-test-nodebug
+      - name: Dump per-morpheme scores
+        run: scripts/score_parity.py dump build-nodebug/bin/suzume-cli scores-nodebug.tsv
+      - uses: actions/upload-artifact@v7
+        with:
+          name: scores-nodebug
+          path: scores-nodebug.tsv
+
+  # Both builds of one commit must score every morpheme identically: the debug
+  # build is what the tests exercise, the nodebug one is what ships.
+  score-parity:
+    needs: [build-and-test, native-nodebug]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: scores-*
+          merge-multiple: true
+      - name: Compare debug and nodebug scores exactly
+        run: scripts/score_parity.py compare scores-debug.tsv scores-nodebug.tsv
 
   # Library-only, no-install and multi-config builds are supported shapes that
   # no other job configures.
@@ -176,6 +196,13 @@ jobs:
         uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+      # Before examples-test, which reconfigures build/ as Release.
+      - name: Dump per-morpheme scores
+        run: scripts/score_parity.py dump build/bin/suzume-cli scores-debug.tsv
+      - uses: actions/upload-artifact@v7
+        with:
+          name: scores-debug
+          path: scores-debug.tsv
       - name: Run in-tree and installed-package examples
         run: make examples-test consumer-smoke
       - name: Build WASM binding
