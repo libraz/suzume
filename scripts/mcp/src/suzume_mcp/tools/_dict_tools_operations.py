@@ -134,6 +134,7 @@ async def dict_add(
     user: str = "",
     force: bool = False,
     dry_run: bool = False,
+    oracle_check: bool = True,
 ) -> str:
     """Add a word to the dictionary with safety checks.
 
@@ -144,6 +145,9 @@ async def dict_add(
         user: User dictionary category (entertainment, adult, etc.). Empty for core dict.
         force: Allow adding even if MeCab splits the word.
         dry_run: Preview only, don't modify files.
+        oracle_check: After a data/core edit, report which test expectations a full
+            oracle recompute would change. Pass False only for all but the last of
+            several chained edits.
     """
     if pos not in VALID_POS:
         return _json_error(_invalid_value("POS", pos, VALID_POS))
@@ -183,16 +187,19 @@ async def dict_add(
         return _json_result({"status": "ok", **fields, "dry_run": True})
 
     target_file = PROJECT_ROOT / target_rel
-    recompile_status, error = await _write_files_and_recompile(
+    recompile_status, error, oracle = await _write_files_and_recompile(
         {target_file: _with_appended_lines(target_file, [entry_line])},
         _recompile_user_dic if user else _recompile_core_dic,
+        oracle_check=oracle_check,
     )
-    return _recompile_response(fields, recompile_status, error)
+    return _recompile_response({**fields, **oracle}, recompile_status, error)
 
 
 @mcp.tool()
 @stale_cli_guard(uses_cli=lambda args: not args["dry_run"])
-async def dict_remove(word: str, pos: str = "", user: str = "", dry_run: bool = False) -> str:
+async def dict_remove(
+    word: str, pos: str = "", user: str = "", dry_run: bool = False, oracle_check: bool = True
+) -> str:
     """Remove a word from the dictionary.
 
     Args:
@@ -200,6 +207,9 @@ async def dict_remove(word: str, pos: str = "", user: str = "", dry_run: bool = 
         pos: POS of the entry to remove. Required when the surface has multiple POS entries.
         user: User dictionary category (empty for core dict).
         dry_run: Preview only.
+        oracle_check: After a data/core edit, report which test expectations a full
+            oracle recompute would change. Pass False only for all but the last of
+            several chained edits.
     """
     if pos and pos not in VALID_POS:
         return _json_error(_invalid_value("POS", pos, VALID_POS))
@@ -242,11 +252,12 @@ async def dict_remove(word: str, pos: str = "", user: str = "", dry_run: bool = 
     if dry_run:
         return _json_result({"status": "ok", **fields, "dry_run": True})
 
-    recompile_status, error = await _write_files_and_recompile(
+    recompile_status, error, oracle = await _write_files_and_recompile(
         {filepath: "\n".join(new_lines) + ("\n" if new_lines else "")},
         _recompile_user_dic if user else _recompile_core_dic,
+        oracle_check=oracle_check,
     )
-    return _recompile_response(fields, recompile_status, error)
+    return _recompile_response({**fields, **oracle}, recompile_status, error)
 
 
 def _select_toggle_entry(word: str, pos: str, user: str, *, disabled: bool) -> tuple[dict | None, str | None]:
@@ -286,7 +297,7 @@ def _select_toggle_entry(word: str, pos: str, user: str, *, disabled: bool) -> t
     return matches[0], None
 
 
-async def _toggle_entry(word: str, pos: str, user: str, dry_run: bool, *, disable: bool) -> str:
+async def _toggle_entry(word: str, pos: str, user: str, dry_run: bool, oracle_check: bool, *, disable: bool) -> str:
     """Comment an entry out with the disabled marker, or restore a disabled one."""
     selected, error = _select_toggle_entry(word, pos, user, disabled=not disable)
     if error:
@@ -299,16 +310,19 @@ async def _toggle_entry(word: str, pos: str, user: str, dry_run: bool, *, disabl
         return _json_result({"status": "ok", **fields, "entry": line, "dry_run": True})
 
     lines[selected["index"]] = DISABLED_PREFIX + line if disable else line[len(DISABLED_PREFIX) :]
-    recompile_status, error = await _write_files_and_recompile(
+    recompile_status, error, oracle = await _write_files_and_recompile(
         {selected["path"]: "\n".join(lines) + "\n"},
         _recompile_user_dic if user else _recompile_core_dic,
+        oracle_check=oracle_check,
     )
-    return _recompile_response(fields, recompile_status, error)
+    return _recompile_response({**fields, **oracle}, recompile_status, error)
 
 
 @mcp.tool()
 @stale_cli_guard(uses_cli=lambda args: not args["dry_run"])
-async def dict_disable(word: str, pos: str = "", user: str = "", dry_run: bool = False) -> str:
+async def dict_disable(
+    word: str, pos: str = "", user: str = "", dry_run: bool = False, oracle_check: bool = True
+) -> str:
     """Disable a dictionary entry by commenting it out (keeps in file but inactive).
 
     Args:
@@ -316,13 +330,18 @@ async def dict_disable(word: str, pos: str = "", user: str = "", dry_run: bool =
         pos: POS of the entry to disable. Required when the surface has multiple POS entries.
         user: User dictionary category (empty for core dict).
         dry_run: Preview only.
+        oracle_check: After a data/core edit, report which test expectations a full
+            oracle recompute would change. Pass False only for all but the last of
+            several chained edits.
     """
-    return await _toggle_entry(word, pos, user, dry_run, disable=True)
+    return await _toggle_entry(word, pos, user, dry_run, oracle_check, disable=True)
 
 
 @mcp.tool()
 @stale_cli_guard(uses_cli=lambda args: not args["dry_run"])
-async def dict_enable(word: str, pos: str = "", user: str = "", dry_run: bool = False) -> str:
+async def dict_enable(
+    word: str, pos: str = "", user: str = "", dry_run: bool = False, oracle_check: bool = True
+) -> str:
     """Re-enable a disabled dictionary entry.
 
     Args:
@@ -330,17 +349,23 @@ async def dict_enable(word: str, pos: str = "", user: str = "", dry_run: bool = 
         pos: POS of the entry to enable. Required when the surface has multiple POS entries.
         user: User dictionary category (empty for core dict).
         dry_run: Preview only.
+        oracle_check: After a data/core edit, report which test expectations a full
+            oracle recompute would change. Pass False only for all but the last of
+            several chained edits.
     """
-    return await _toggle_entry(word, pos, user, dry_run, disable=False)
+    return await _toggle_entry(word, pos, user, dry_run, oracle_check, disable=False)
 
 
 @mcp.tool()
 @stale_cli_guard(uses_cli=lambda args: args["fix"])
-async def dict_validate(fix: bool = False) -> str:
+async def dict_validate(fix: bool = False, oracle_check: bool = True) -> str:
     """Validate dictionary for issues (conjugated forms, duplicates).
 
     Args:
         fix: If True, remove problematic entries. Default is report-only.
+        oracle_check: After a data/core edit, report which test expectations a full
+            oracle recompute would change. Pass False only for all but the last of
+            several chained edits.
     """
     entries, by_surface = _load_dictionary()
 
@@ -406,7 +431,10 @@ async def dict_validate(fix: bool = False) -> str:
             new_lines = [line for idx, line in enumerate(file_lines, 1) if idx not in remove_nums]
             updates[filepath] = "\n".join(new_lines) + "\n"
 
-        recompile_status, error = await _write_files_and_recompile(updates, _recompile_core_dic)
+        recompile_status, error, oracle = await _write_files_and_recompile(
+            updates, _recompile_core_dic, oracle_check=oracle_check
+        )
+        result.update(oracle)
         result["fixed"] = error is None
         result["recompile"] = recompile_status
         if error:

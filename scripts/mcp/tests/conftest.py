@@ -69,6 +69,22 @@ def reference_analyzer(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 @pytest.fixture(autouse=True)
+def no_oracle_recompute(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Report no expectation drift after a dictionary write instead of recomputing the real suite.
+
+    The drift check itself is exercised end to end in test_dict_oracle_check.py,
+    which restores the real computation against a throwaway project.
+    """
+    from suzume_mcp.tools import _dict_tools_common
+
+    monkeypatch.setattr(
+        _dict_tools_common,
+        "oracle_drift",
+        lambda *_args, **_kwargs: ({"entries": [], "by_rule": {}, "errors": []}, None),
+    )
+
+
+@pytest.fixture(autouse=True)
 def native_cli(monkeypatch: pytest.MonkeyPatch) -> None:
     """Skip, with one reason, every test that reaches the native CLI on a checkout without a build.
 

@@ -7,12 +7,11 @@ from pathlib import Path
 from ..core.diff_utils import classify_surface_diff
 from ..core.pos_mapping import normalize_pos
 from ..core.suzume_cli import (
-    get_expected_tokens_batch_subprocess,
-    get_mecab_tokens_batch_subprocess,
-    get_suzume_debug_info,
+    get_expected_tokens_subprocess as get_expected_tokens,
 )
 from ..core.suzume_cli import (
-    get_expected_tokens_subprocess as get_expected_tokens,
+    get_mecab_tokens_batch_subprocess,
+    get_suzume_debug_info,
 )
 from ..core.suzume_utils import tokens_match
 from ..core.test_file_utils import (
@@ -29,6 +28,7 @@ from ..server import PROJECT_ROOT, mcp
 from ._cli_freshness import stale_cli_guard
 from ._test_tools_common import (
     _case_id,
+    _cases_with_input,
     _detect_segmentation_pattern,
     _format_expected_checked,
     _get_suzume_tokens,
@@ -36,11 +36,9 @@ from ._test_tools_common import (
     _json_error,
     _json_result,
     _load_test_cases,
+    _surfaces,
+    oracle_drift,
 )
-
-
-def _surfaces(tokens: list[dict]) -> str:
-    return "|".join(t.get("surface", "") for t in tokens)
 
 
 @mcp.tool()
@@ -346,16 +344,6 @@ async def test_diff_suzume(
     )
 
 
-def _cases_with_input(loaded: list[tuple[Path, dict, list[dict]]]) -> list[dict]:
-    """Every case that carries an input, with its qualified basename/id."""
-    return [
-        {"path": path, "data": data, "case": case, "input": case["input"], "id": f"{path.stem}/{_case_id(case, idx)}"}
-        for path, data, cases in loaded
-        for idx, case in enumerate(cases)
-        if case.get("input", "")
-    ]
-
-
 @mcp.tool()
 async def test_diff_mecab(file: str = "") -> str:
     """Find tests where expected differs from MeCab output, categorized by type.
@@ -444,58 +432,10 @@ async def test_needs_suzume_update(
         apply: If True, update test expectations. Default is dry-run.
         test_ids: Optional stable basename/id selectors for a safe partial sync.
     """
-    selected_ids = set(test_ids or [])
-    if file and selected_ids:
-        return _json_error("file and test_ids cannot be combined")
-
-    files = _get_test_files_filtered(file)
-    if not files:
-        return _json_error("No test files found")
-    loaded, error = _load_test_cases(files)
+    drift, error = oracle_drift(file, test_ids)
     if error:
         return _json_error(error)
-
-    metas = [meta for meta in _cases_with_input(loaded) if not selected_ids or meta["id"] in selected_ids]
-    if selected_ids:
-        missing_ids = sorted(selected_ids - {meta["id"] for meta in metas})
-        if missing_ids:
-            return _json_error(f"No tests found for ids: {', '.join(missing_ids)}")
-
-    # One oracle subprocess for every input.
-    batch_results = get_expected_tokens_batch_subprocess([meta["input"] for meta in metas]) if metas else []
-
-    needs_update = []
-    by_rule: dict[str, list[str]] = {}
-    normalization_errors: list[dict] = []
-    for meta, (correct, source, rule) in zip(metas, batch_results, strict=True):
-        if source == "error":
-            normalization_errors.append({"id": meta["id"], "input": meta["input"], "error": rule})
-            continue
-        expected = meta["case"].get("expected") or []
-        if tokens_match(expected, correct):
-            continue
-
-        exp_str = _surfaces(expected)
-        cor_str = _surfaces(correct)
-        exp_pos = "|".join(t.get("pos", "") for t in expected)
-        cor_pos = "|".join(t["pos"] for t in correct)
-        rule_label = rule or "mecab-only"
-        needs_update.append(
-            {
-                "meta": meta,
-                "rule": rule_label,
-                "correct_tokens": correct,
-                "out": {
-                    "id": meta["id"],
-                    "input": meta["input"],
-                    "rule": rule_label,
-                    "diff_type": "surface" if exp_str != cor_str else ("pos" if exp_pos != cor_pos else "lemma"),
-                    "expected": exp_str,
-                    "correct": cor_str,
-                },
-            }
-        )
-        by_rule.setdefault(rule_label, []).append(meta["id"])
+    needs_update = drift["entries"]
 
     if apply and needs_update:
         files_to_save: dict[Path, dict] = {}
@@ -512,9 +452,9 @@ async def test_needs_suzume_update(
     return _json_result(
         {
             "needs_update": [entry["out"] for entry in needs_update],
-            "by_rule": dict(sorted(by_rule.items())),
+            "by_rule": drift["by_rule"],
             "total": len(needs_update),
-            "errors": normalization_errors,
+            "errors": drift["errors"],
             "applied": apply and bool(needs_update),
         }
     )

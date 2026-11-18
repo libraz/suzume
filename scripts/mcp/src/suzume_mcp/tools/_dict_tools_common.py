@@ -1,5 +1,6 @@
 """Dictionary tools ported from dict_tool.pl - MCP tool registration."""
 
+import asyncio
 import tempfile
 from collections.abc import Awaitable, Callable, Iterable, Iterator
 from pathlib import Path
@@ -9,6 +10,7 @@ from ..core.json_utils import json_error as _json_error
 from ..core.json_utils import json_result as _json_result
 from ..core.suzume_cli import get_cli_path, recompile_dic
 from ..server import PROJECT_ROOT
+from ._test_tools_common import oracle_drift
 
 # User dictionary categories
 USER_CATEGORIES = [
@@ -312,11 +314,49 @@ async def _recompile_user_dic() -> str:
     return await _recompile("data/user/*.tsv", "data/user.dic")
 
 
+# The normalization oracle reads data/core/*.tsv (core_lexicon) and no other
+# dictionary source; user dictionaries never reach a test expectation.
+ORACLE_SOURCE_DIR = Path("data") / "core"
+ORACLE_APPLY_HINT = "test_needs_suzume_update(apply=True)"
+
+
+async def _oracle_check(paths: Iterable[Path], enabled: bool) -> dict:
+    """Report the expectation changes a data/core edit causes, from a full oracle recompute."""
+    oracle_dir = (PROJECT_ROOT / ORACLE_SOURCE_DIR).resolve()
+    if not any(path.resolve().is_relative_to(oracle_dir) for path in paths):
+        return {}
+    if not enabled:
+        return {
+            "oracle_check": {
+                "skipped": True,
+                "hint": f"Run {ORACLE_APPLY_HINT.replace('True', 'False')} after the last edit",
+            }
+        }
+    drift, error = await asyncio.to_thread(oracle_drift)
+    if error:
+        return {"oracle_check": {"error": error}}
+    changed = [entry["out"]["id"] for entry in drift["entries"]]
+    return {
+        "oracle_check": {
+            "scope": "full recompute of every test case",
+            "total": len(changed),
+            "needs_update": changed,
+            "errors": drift["errors"],
+            "apply_with": ORACLE_APPLY_HINT if changed else None,
+        }
+    }
+
+
 async def _write_files_and_recompile(
     updates: dict[Path, str],
     recompile: Callable[[], Awaitable[str]],
-) -> tuple[str, str | None]:
-    """Atomically write source files and restore all of them if compilation fails."""
+    *,
+    oracle_check: bool,
+) -> tuple[str, str | None, dict]:
+    """Atomically write source files and restore all of them if compilation fails.
+
+    On success the third value holds the oracle check for an edit under data/core.
+    """
     snapshots = {path: (path.exists(), path.read_text(encoding="utf-8") if path.exists() else "") for path in updates}
 
     try:
@@ -327,7 +367,7 @@ async def _write_files_and_recompile(
         except Exception as exc:
             recompile_status = f"exception: {type(exc).__name__}: {exc}"
         if recompile_status == "ok":
-            return recompile_status, None
+            return recompile_status, None, await _oracle_check(updates, oracle_check)
     except Exception as exc:
         recompile_status = f"exception: {type(exc).__name__}: {exc}"
 
@@ -344,7 +384,7 @@ async def _write_files_and_recompile(
     message = f"Dictionary recompile failed ({recompile_status}); source changes were rolled back."
     if rollback_errors:
         message += " Rollback errors: " + "; ".join(rollback_errors)
-    return recompile_status, message
+    return recompile_status, message, {}
 
 
 def _recompile_response(fields: dict, recompile_status: str, error: str | None) -> str:

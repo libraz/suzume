@@ -8,6 +8,7 @@ from suzume_mcp.tools import test_tools as _test_tools  # noqa: F401
 
 review = importlib.import_module("suzume_mcp.tools._test_tools_review")
 read_tools = importlib.import_module("suzume_mcp.tools._test_tools_read")
+common_tools = importlib.import_module("suzume_mcp.tools._test_tools_common")
 mutation_tools = importlib.import_module("suzume_mcp.tools._test_tools_mutation")
 
 
@@ -124,9 +125,9 @@ def test_partial_oracle_sync_updates_only_selected_id(tmp_path, monkeypatch):
     cases = [make_case("first", "一つ"), make_case("second", "二つ")]
     write_suite(tmp_path, "sample", cases)
     test_file = tmp_path / "tests/data/tokenization/sample.json"
-    monkeypatch.setattr(read_tools, "_get_test_files_filtered", lambda _file: [test_file])
+    monkeypatch.setattr(common_tools, "_get_test_files_filtered", lambda _file: [test_file])
     monkeypatch.setattr(
-        read_tools,
+        common_tools,
         "get_expected_tokens_batch_subprocess",
         lambda texts: [([token("新値")], "MeCab+SuzumeRules", "test-rule") for _text in texts],
     )
@@ -189,9 +190,9 @@ def test_oracle_sync_skips_only_the_failed_batch_item(tmp_path, monkeypatch):
     cases = [make_case("first", "一つ"), make_case("second", "二つ")]
     write_suite(tmp_path, "sample", cases)
     test_file = tmp_path / "tests/data/tokenization/sample.json"
-    monkeypatch.setattr(read_tools, "_get_test_files_filtered", lambda _file: [test_file])
+    monkeypatch.setattr(common_tools, "_get_test_files_filtered", lambda _file: [test_file])
     monkeypatch.setattr(
-        read_tools,
+        common_tools,
         "get_expected_tokens_batch_subprocess",
         lambda _texts: [([token("新値")], "MeCab", ""), ([], "error", "second failed")],
     )

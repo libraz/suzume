@@ -506,14 +506,16 @@ def test_multi_file_mutation_rolls_back_all_sources(tmp_path):
     async def recompile():
         return "failed"
 
-    status, error = run(
+    status, error, oracle = run(
         _write_files_and_recompile(
             {first: "changed\n", second: "created\n"},
             recompile,
+            oracle_check=True,
         )
     )
     assert status == "failed"
     assert error is not None
+    assert oracle == {}
     assert first.read_text(encoding="utf-8") == "first\n"
     assert not second.exists()
 

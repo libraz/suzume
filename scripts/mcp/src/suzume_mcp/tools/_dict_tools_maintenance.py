@@ -120,6 +120,7 @@ async def dict_sort(
     file: str = "",
     user: str = "",
     dry_run: bool = True,
+    oracle_check: bool = True,
 ) -> str:
     """Sort dictionary entries by conjugation type and あいうえお order.
 
@@ -130,6 +131,9 @@ async def dict_sort(
         file: Specific dict file path relative to project root (e.g. "data/core/verbs.tsv").
         user: User dictionary category to sort (entertainment, adult, etc.).
         dry_run: If True (default), preview the sorted result. Set False to apply.
+        oracle_check: After a data/core edit, report which test expectations a full
+            oracle recompute would change. Pass False only for all but the last of
+            several chained edits.
     """
     if user:
         if user not in USER_CATEGORIES:
@@ -277,11 +281,12 @@ async def dict_sort(
         result["preview"] = preview
         return _json_result(result)
 
-    recompile_status, error = await _write_files_and_recompile(
+    recompile_status, error, oracle = await _write_files_and_recompile(
         {filepath: sorted_content},
         _recompile_user_dic if target_rel.startswith("data/user/") else _recompile_core_dic,
+        oracle_check=oracle_check,
     )
-    return _apply_recompile_outcome(result, recompile_status, error)
+    return _apply_recompile_outcome({**result, **oracle}, recompile_status, error)
 
 
 async def _get_reading(surface: str) -> str:
@@ -304,6 +309,7 @@ async def dict_remove_matching(
     pattern: str,
     user: str = "",
     dry_run: bool = True,
+    oracle_check: bool = True,
 ) -> str:
     """Bulk remove dictionary entries matching a regex pattern.
 
@@ -311,6 +317,9 @@ async def dict_remove_matching(
         pattern: Regex pattern to match against entry surfaces.
         user: User dictionary category (empty for core dict).
         dry_run: If True (default), preview without removing. Set False to apply.
+        oracle_check: After a data/core edit, report which test expectations a full
+            oracle recompute would change. Pass False only for all but the last of
+            several chained edits.
     """
     matches, error = _matching_entries(pattern, user)
     if error:
@@ -341,11 +350,12 @@ async def dict_remove_matching(
             new_lines.append(line)
         updates[filepath] = "\n".join(new_lines) + "\n"
 
-    recompile_status, error = await _write_files_and_recompile(
+    recompile_status, error, oracle = await _write_files_and_recompile(
         updates,
         _recompile_user_dic if user else _recompile_core_dic,
+        oracle_check=oracle_check,
     )
-    return _apply_recompile_outcome(result, recompile_status, error)
+    return _apply_recompile_outcome({**result, **oracle}, recompile_status, error)
 
 
 @mcp.tool()

@@ -7,7 +7,8 @@ from pathlib import Path
 from ..core.json_utils import json_error as _json_error  # noqa: F401
 from ..core.json_utils import json_result as _json_result  # noqa: F401
 from ..core.pos_mapping import normalize_pos
-from ..core.suzume_cli import existing_cli
+from ..core.suzume_cli import existing_cli, get_expected_tokens_batch_subprocess
+from ..core.suzume_utils import tokens_match
 from ..core.test_file_utils import (
     find_test_by_id,
     find_test_by_input,
@@ -157,3 +158,80 @@ def _detect_segmentation_pattern(correct_str: str, suzume_str: str, input_text: 
     if len(suzume) > len(correct):
         return "過分割"
     return "その他"
+
+
+def _surfaces(tokens: list[dict]) -> str:
+    return "|".join(t.get("surface", "") for t in tokens)
+
+
+def _cases_with_input(loaded: list[tuple[Path, dict, list[dict]]]) -> list[dict]:
+    """Every case that carries an input, with its qualified basename/id."""
+    return [
+        {"path": path, "data": data, "case": case, "input": case["input"], "id": f"{path.stem}/{_case_id(case, idx)}"}
+        for path, data, cases in loaded
+        for idx, case in enumerate(cases)
+        if case.get("input", "")
+    ]
+
+
+def oracle_drift(file: str = "", test_ids: list[str] | None = None) -> tuple[dict | None, str | None]:
+    """Compare stored expectations with a full oracle recompute of every selected case.
+
+    Returns ({"entries", "by_rule", "errors"}, None), or (None, message) when the
+    selection is invalid. Each entry carries the case, its fresh tokens and the
+    reportable "out" row; nothing is written.
+    """
+    selected_ids = set(test_ids or [])
+    if file and selected_ids:
+        return None, "file and test_ids cannot be combined"
+
+    files = _get_test_files_filtered(file)
+    if not files:
+        return None, "No test files found"
+    loaded, error = _load_test_cases(files)
+    if error:
+        return None, error
+
+    metas = [meta for meta in _cases_with_input(loaded) if not selected_ids or meta["id"] in selected_ids]
+    if selected_ids:
+        missing_ids = sorted(selected_ids - {meta["id"] for meta in metas})
+        if missing_ids:
+            return None, f"No tests found for ids: {', '.join(missing_ids)}"
+
+    # One full oracle recompute over every selected input.
+    batch_results = get_expected_tokens_batch_subprocess([meta["input"] for meta in metas]) if metas else []
+
+    needs_update = []
+    by_rule: dict[str, list[str]] = {}
+    normalization_errors: list[dict] = []
+    for meta, (correct, source, rule) in zip(metas, batch_results, strict=True):
+        if source == "error":
+            normalization_errors.append({"id": meta["id"], "input": meta["input"], "error": rule})
+            continue
+        expected = meta["case"].get("expected") or []
+        if tokens_match(expected, correct):
+            continue
+
+        exp_str = _surfaces(expected)
+        cor_str = _surfaces(correct)
+        exp_pos = "|".join(t.get("pos", "") for t in expected)
+        cor_pos = "|".join(t["pos"] for t in correct)
+        rule_label = rule or "mecab-only"
+        needs_update.append(
+            {
+                "meta": meta,
+                "rule": rule_label,
+                "correct_tokens": correct,
+                "out": {
+                    "id": meta["id"],
+                    "input": meta["input"],
+                    "rule": rule_label,
+                    "diff_type": "surface" if exp_str != cor_str else ("pos" if exp_pos != cor_pos else "lemma"),
+                    "expected": exp_str,
+                    "correct": cor_str,
+                },
+            }
+        )
+        by_rule.setdefault(rule_label, []).append(meta["id"])
+
+    return {"entries": needs_update, "by_rule": dict(sorted(by_rule.items())), "errors": normalization_errors}, None

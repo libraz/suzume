@@ -35,6 +35,7 @@ async def dict_bulk_add(
     user: str = "",
     force: bool = False,
     dry_run: bool = False,
+    oracle_check: bool = True,
 ) -> str:
     """Add multiple words to the dictionary at once.
 
@@ -45,6 +46,9 @@ async def dict_bulk_add(
         user: User dictionary category.
         force: Allow adding even if MeCab splits words.
         dry_run: Preview only.
+        oracle_check: After a data/core edit, report which test expectations a full
+            oracle recompute would change. Pass False only for all but the last of
+            several chained edits.
     """
     if pos not in VALID_POS:
         return _json_error(_invalid_value("POS", pos, VALID_POS))
@@ -116,13 +120,14 @@ async def dict_bulk_add(
 
     target_rel = _user_file(user) if user else POS_TO_FILE.get(pos, "data/core/nouns.tsv")
     target_file = PROJECT_ROOT / target_rel
-    recompile_status, error = await _write_files_and_recompile(
+    recompile_status, error, oracle = await _write_files_and_recompile(
         {target_file: _with_appended_lines(target_file, lines_to_append)},
         _recompile_user_dic if user else _recompile_core_dic,
+        oracle_check=oracle_check,
     )
     if error:
         fields["total_added"] = 0
-    return _recompile_response({**fields, "file": target_rel}, recompile_status, error)
+    return _recompile_response({**fields, "file": target_rel, **oracle}, recompile_status, error)
 
 
 @mcp.tool()
@@ -182,9 +187,11 @@ async def dict_bulk_move(
         return _json_result({"status": "ok", **fields})
 
     source_content = "\n".join(remaining_lines) + ("\n" if remaining_lines else "")
-    recompile_status, error = await _write_files_and_recompile(
+    # Both files are user dictionaries, which the oracle never reads.
+    recompile_status, error, _oracle = await _write_files_and_recompile(
         {source_file: source_content, dest_file: _with_appended_lines(dest_file, matched_entries)},
         _recompile_user_dic,
+        oracle_check=False,
     )
     if error:
         fields["total_moved"] = 0
