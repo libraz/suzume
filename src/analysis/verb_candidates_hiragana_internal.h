@@ -22,6 +22,12 @@ inline constexpr size_t kPredicateRunMax = 12;
 bool endsWithParticleAfterVerb(const dictionary::DictionaryManager* dict_manager, const grammar::Inflection& inflection,
                                const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos);
 
+// True when a case particle, or a one-mora topic particle, with an
+// independent host (a kanji/katakana/digit, listed nominal, or te-form) ends
+// at @p start_pos (東京に+き, 手は+み, 食べては+み).
+bool followsHostedParticle(const std::vector<char32_t>& codepoints, size_t start_pos,
+                           const dictionary::DictionaryManager* dict_manager);
+
 // True when start_pos is the left edge at which a one-mora verb stem opens a
 // predicate after a closed word (case or hosted topic particle, subject の,
 // listed adverb, closing nominal).

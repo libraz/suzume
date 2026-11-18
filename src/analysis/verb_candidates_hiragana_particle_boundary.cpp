@@ -111,10 +111,19 @@ bool startsWithParticleThenVerifiedVerb(const std::vector<char32_t>& codepoints,
     return false;
   }
   const bool follows_particle_host = immediatelyFollowsParticleHost(codepoints, start_pos, dict_manager);
+  // A binding particle does not stack on a hosted one (手は+は, 食べては+は),
+  // so a は/も there is the first mora of the predicate (手は+はね+た).
+  const auto* preceding_particle = start_pos == 0 ? nullptr
+                                                  : lookupEntryInRange(*dict_manager, codepoints, start_pos - 1,
+                                                                       start_pos, core::PartOfSpeech::Particle);
+  const bool follows_hosted_topic = preceding_particle != nullptr &&
+                                    preceding_particle->extended_pos == core::ExtendedPOS::ParticleTopic &&
+                                    followsHostedParticle(codepoints, start_pos, dict_manager);
   for (size_t particle_end = start_pos + 1; particle_end <= max_particle_end; ++particle_end) {
     std::string particle_surface = extractSubstring(codepoints, start_pos, particle_end);
     const auto* particle_entry = dict_manager->lookupExact(particle_surface, core::PartOfSpeech::Particle);
-    if (particle_entry == nullptr) {
+    if (particle_entry == nullptr ||
+        (follows_hosted_topic && particle_entry->extended_pos == core::ExtendedPOS::ParticleTopic)) {
       continue;
     }
     // A sentence-final particle cannot introduce a dependent auxiliary or a
