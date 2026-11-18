@@ -3,6 +3,7 @@
 from ..core.mecab import mecab_analyze
 from ..core.suzume_utils import get_suzume_rule
 from ..server import PROJECT_ROOT, mcp
+from ._cli_freshness import stale_cli_guard
 from ._dict_tools_common import (
     POS_TO_FILE,
     USER_CATEGORIES,
@@ -26,6 +27,7 @@ from ._dict_tools_common import (
 
 
 @mcp.tool()
+@stale_cli_guard(uses_cli=lambda args: not args["dry_run"])
 async def dict_bulk_add(
     words: str,
     pos: str = "NOUN",
@@ -123,6 +125,7 @@ async def dict_bulk_add(
 
 
 @mcp.tool()
+@stale_cli_guard(uses_cli=lambda args: not args["dry_run"])
 async def dict_bulk_move(
     words: str,
     from_user: str,

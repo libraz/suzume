@@ -450,7 +450,7 @@ class TestDictCleanup:
             return subprocess.CompletedProcess(args, 0, "東京公園\tNOUN\nEOS\n", "")
 
         monkeypatch.setattr(maintenance_tools, "PROJECT_ROOT", tmp_path)
-        monkeypatch.setattr(maintenance_tools, "get_cli_path", lambda: cli)
+        monkeypatch.setattr(maintenance_tools, "existing_cli", lambda: cli)
         monkeypatch.setattr(subprocess, "run", fake_run)
 
         result = parse(run(dict_cleanup(input_file="data/core/sample.tsv")))
@@ -468,7 +468,7 @@ class TestDictCleanup:
             return subprocess.CompletedProcess(args, 2, "", "dictionary missing")
 
         monkeypatch.setattr(maintenance_tools, "PROJECT_ROOT", tmp_path)
-        monkeypatch.setattr(maintenance_tools, "get_cli_path", lambda: cli)
+        monkeypatch.setattr(maintenance_tools, "existing_cli", lambda: cli)
         monkeypatch.setattr(subprocess, "run", fake_run)
 
         result = parse(run(dict_cleanup(input_file="data/core/sample.tsv")))
@@ -495,7 +495,7 @@ class TestDictCleanup:
             return subprocess.CompletedProcess(args, 0, "東京\tNOUN\n公園\tNOUN\nEOS\n", "")
 
         monkeypatch.setattr(maintenance_tools, "PROJECT_ROOT", tmp_path)
-        monkeypatch.setattr(maintenance_tools, "get_cli_path", lambda: cli)
+        monkeypatch.setattr(maintenance_tools, "existing_cli", lambda: cli)
         monkeypatch.setattr(subprocess, "run", fake_run)
 
         result = parse(run(dict_cleanup(input_file="data/core/sample.tsv", dry_run=False)))

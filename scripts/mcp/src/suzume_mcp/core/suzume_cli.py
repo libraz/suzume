@@ -12,12 +12,27 @@ import os
 import re
 import subprocess
 import sys
+import time
+from datetime import datetime
 from pathlib import Path
 
 from ..config import PROJECT_ROOT
 
 _CLI_ENV_VAR = "SUZUME_CLI_PATH"
 _MULTI_CONFIG_NAMES = ("Debug", "Release", "RelWithDebInfo", "MinSizeRel")
+
+# A hung child would otherwise block the tool call that spawned it forever.
+_ANALYZE_TIMEOUT_SECONDS = 30.0
+_DICT_COMPILE_TIMEOUT_SECONDS = 120.0
+_NORMALIZE_TIMEOUT_SECONDS = 60.0
+_NORMALIZE_TIMEOUT_PER_TEXT_SECONDS = 1.0
+
+# Directories whose files are compiled into the CLI. A binary older than any of
+# them answers for code that is no longer in the tree.
+_CLI_SOURCE_DIRS = ("src", "include", "tools/cli")
+_ALLOW_STALE_ENV_VAR = "SUZUME_ALLOW_STALE_CLI"
+_SOURCE_SCAN_TTL_SECONDS = 2.0
+_source_scan: dict[Path, tuple[float, tuple[Path, int] | None]] = {}
 
 
 def get_cli_path(project_root: Path | None = None) -> Path:
@@ -41,11 +56,72 @@ def get_cli_path(project_root: Path | None = None) -> Path:
     return next((candidate for candidate in candidates if candidate.is_file()), candidates[0])
 
 
-def _existing_cli(cli_path: Path | None) -> Path:
+def _newest_source(root: Path) -> tuple[Path, int] | None:
+    """Return the most recently modified CLI source file and its mtime."""
+    cached = _source_scan.get(root)
+    now = time.monotonic()
+    if cached is not None and now - cached[0] < _SOURCE_SCAN_TTL_SECONDS:
+        return cached[1]
+    newest: tuple[Path, int] | None = None
+    for directory in _CLI_SOURCE_DIRS:
+        for path in (root / directory).rglob("*"):
+            if not path.is_file():
+                continue
+            modified = path.stat().st_mtime_ns
+            if newest is None or modified > newest[1]:
+                newest = (path, modified)
+    _source_scan[root] = (now, newest)
+    return newest
+
+
+def cli_staleness(cli_path: Path | None = None, project_root: Path | None = None) -> dict | None:
+    """Describe how the CLI lags its sources, or return None when it is current or absent.
+
+    A stale binary answers for code that is no longer in the tree. Callers that only
+    show its output pass this along; callers that persist it refuse (see
+    ``stale_cli_refusal``).
+    """
+    root = project_root or PROJECT_ROOT
+    cli = cli_path or get_cli_path(root)
+    if not cli.exists():
+        return None
+    newest = _newest_source(root)
+    built = cli.stat().st_mtime_ns
+    if newest is None or newest[1] <= built:
+        return None
+    return {
+        "message": "Suzume CLI is older than its sources; this output reflects the last build, not the working tree.",
+        "newest_source": str(newest[0].relative_to(root)),
+        "source_modified": _local_time(newest[1]),
+        "cli": str(cli.relative_to(root)) if cli.is_relative_to(root) else str(cli),
+        "cli_built": _local_time(built),
+    }
+
+
+def stale_cli_refusal(staleness: dict | None) -> str | None:
+    """Return why output from this CLI must not be persisted, or None when it may be."""
+    if staleness is None or os.environ.get(_ALLOW_STALE_ENV_VAR):
+        return None
+    return (
+        f"Refusing to persist output from a stale Suzume CLI: {staleness['newest_source']} changed after "
+        f"{staleness['cli']} was built. Rebuild, or set {_ALLOW_STALE_ENV_VAR}=1 to write it anyway."
+    )
+
+
+def _local_time(mtime_ns: int) -> str:
+    return datetime.fromtimestamp(mtime_ns / 1e9).isoformat(timespec="seconds")
+
+
+def existing_cli(cli_path: Path | None = None) -> Path:
+    """Return the CLI to analyze with, raising when it has not been built."""
     cli = cli_path or get_cli_path()
     if not cli.exists():
         raise RuntimeError(f"Suzume CLI not found: {cli}")
     return cli
+
+
+def _timed_out(what: str, timeout: float) -> RuntimeError:
+    return RuntimeError(f"{what} timed out after {timeout:g}s")
 
 
 def _analyze_args(text: str, skip_user_dict: bool) -> list[str]:
@@ -67,8 +143,10 @@ def _surfaces_from_output(stdout: str) -> list[str]:
     return surfaces
 
 
-async def _run_cli_async(cli: Path, args: list[str], env: dict[str, str] | None = None) -> tuple[str, str]:
-    """Run the CLI without blocking the event loop; raise on a non-zero exit."""
+async def _run_cli_async(
+    cli: Path, args: list[str], env: dict[str, str] | None = None, timeout: float = _ANALYZE_TIMEOUT_SECONDS
+) -> tuple[str, str]:
+    """Run the CLI without blocking the event loop; raise on a non-zero exit or a timeout."""
     proc = await asyncio.create_subprocess_exec(
         str(cli),
         *args,
@@ -77,7 +155,12 @@ async def _run_cli_async(cli: Path, args: list[str], env: dict[str, str] | None 
         env=env,
         cwd=PROJECT_ROOT,
     )
-    stdout, stderr = await proc.communicate()
+    try:
+        stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout)
+    except TimeoutError:
+        proc.kill()
+        await proc.wait()
+        raise _timed_out("Suzume CLI", timeout) from None
     if proc.returncode != 0:
         raise _cli_failure(stderr.decode("utf-8"))
     return stdout.decode("utf-8"), stderr.decode("utf-8")
@@ -92,13 +175,17 @@ def get_suzume_surfaces(text: str, cli_path: Path | None = None, skip_user_dict:
             CLI auto-loads user.dic, matching real-world CLI behavior — this is what
             thread checking wants so that dict_add fixes are reflected.
     """
-    cli = _existing_cli(cli_path)
-    result = subprocess.run(
-        [str(cli), *_analyze_args(text, skip_user_dict)],
-        capture_output=True,
-        text=True,
-        cwd=PROJECT_ROOT,
-    )
+    cli = existing_cli(cli_path)
+    try:
+        result = subprocess.run(
+            [str(cli), *_analyze_args(text, skip_user_dict)],
+            capture_output=True,
+            text=True,
+            cwd=PROJECT_ROOT,
+            timeout=_ANALYZE_TIMEOUT_SECONDS,
+        )
+    except subprocess.TimeoutExpired:
+        raise _timed_out("Suzume CLI", _ANALYZE_TIMEOUT_SECONDS) from None
     if result.returncode != 0:
         raise _cli_failure(result.stderr)
     return _surfaces_from_output(result.stdout)
@@ -111,7 +198,7 @@ async def get_suzume_surfaces_async(text: str, cli_path: Path | None = None, ski
         skip_user_dict: When True, pass --no-user-dict to match the C++ tokenization
             test runner oracle. When False (default), the CLI auto-loads user.dic.
     """
-    stdout, _ = await _run_cli_async(_existing_cli(cli_path), _analyze_args(text, skip_user_dict))
+    stdout, _ = await _run_cli_async(existing_cli(cli_path), _analyze_args(text, skip_user_dict))
     return _surfaces_from_output(stdout)
 
 
@@ -124,7 +211,7 @@ async def get_suzume_debug_info(text: str, cli_path: Path | None = None, skip_us
             inspect real-world CLI behavior with user.dic loaded.
     """
     stdout, stderr = await _run_cli_async(
-        _existing_cli(cli_path), _analyze_args(text, skip_user_dict), {**os.environ, "SUZUME_DEBUG": "2"}
+        existing_cli(cli_path), _analyze_args(text, skip_user_dict), {**os.environ, "SUZUME_DEBUG": "2"}
     )
     output = stdout + stderr
 
@@ -182,18 +269,11 @@ async def recompile_dic(glob_pattern: str, output_path: str) -> bool:
     if not cli.exists():
         return False
 
-    proc = await asyncio.create_subprocess_exec(
-        str(cli),
-        "dict",
-        "compile",
-        glob_pattern,
-        output_path,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-        cwd=PROJECT_ROOT,
-    )
-    _, _ = await proc.communicate()
-    return proc.returncode == 0
+    try:
+        await _run_cli_async(cli, ["dict", "compile", glob_pattern, output_path], timeout=_DICT_COMPILE_TIMEOUT_SECONDS)
+    except RuntimeError:
+        return False
+    return True
 
 
 # ---------------------------------------------------------------------------
@@ -216,13 +296,18 @@ def _run_normalize_cli(texts: list[str], *, raw_mecab: bool = False) -> list[dic
     cmd = [sys.executable, "-m", "suzume_mcp", "normalize", "--batch"]
     if raw_mecab:
         cmd.append("--mecab")
-    result = subprocess.run(
-        cmd,
-        input=json.dumps(texts, ensure_ascii=False),
-        capture_output=True,
-        text=True,
-        cwd=_MCP_PROJECT_DIR,
-    )
+    timeout = _NORMALIZE_TIMEOUT_SECONDS + _NORMALIZE_TIMEOUT_PER_TEXT_SECONDS * len(texts)
+    try:
+        result = subprocess.run(
+            cmd,
+            input=json.dumps(texts, ensure_ascii=False),
+            capture_output=True,
+            text=True,
+            cwd=_MCP_PROJECT_DIR,
+            timeout=timeout,
+        )
+    except subprocess.TimeoutExpired:
+        raise _timed_out("normalize CLI", timeout) from None
     if result.returncode != 0:
         raise RuntimeError(f"normalize CLI failed: {result.stderr}")
     return json.loads(result.stdout)

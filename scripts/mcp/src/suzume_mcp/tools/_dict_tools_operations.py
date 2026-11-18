@@ -6,6 +6,7 @@ from ..core.mecab import mecab_analyze
 from ..core.pos_mapping import map_mecab_pos
 from ..core.suzume_utils import get_suzume_rule
 from ..server import PROJECT_ROOT, mcp
+from ._cli_freshness import stale_cli_guard
 from ._dict_tools_common import (
     DISABLED_PREFIX,
     POS_TO_FILE,
@@ -126,6 +127,7 @@ async def dict_suggest(word: str) -> str:
 
 
 @mcp.tool()
+@stale_cli_guard(uses_cli=lambda args: not args["dry_run"])
 async def dict_add(
     word: str,
     pos: str,
@@ -191,6 +193,7 @@ async def dict_add(
 
 
 @mcp.tool()
+@stale_cli_guard(uses_cli=lambda args: not args["dry_run"])
 async def dict_remove(word: str, pos: str = "", user: str = "", dry_run: bool = False) -> str:
     """Remove a word from the dictionary.
 
@@ -306,6 +309,7 @@ async def _toggle_entry(word: str, pos: str, user: str, dry_run: bool, *, disabl
 
 
 @mcp.tool()
+@stale_cli_guard(uses_cli=lambda args: not args["dry_run"])
 async def dict_disable(word: str, pos: str = "", user: str = "", dry_run: bool = False) -> str:
     """Disable a dictionary entry by commenting it out (keeps in file but inactive).
 
@@ -319,6 +323,7 @@ async def dict_disable(word: str, pos: str = "", user: str = "", dry_run: bool =
 
 
 @mcp.tool()
+@stale_cli_guard(uses_cli=lambda args: not args["dry_run"])
 async def dict_enable(word: str, pos: str = "", user: str = "", dry_run: bool = False) -> str:
     """Re-enable a disabled dictionary entry.
 
@@ -332,6 +337,7 @@ async def dict_enable(word: str, pos: str = "", user: str = "", dry_run: bool = 
 
 
 @mcp.tool()
+@stale_cli_guard(uses_cli=lambda args: args["fix"])
 async def dict_validate(fix: bool = False) -> str:
     """Validate dictionary for issues (conjugated forms, duplicates).
 

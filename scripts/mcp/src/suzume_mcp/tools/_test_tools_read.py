@@ -26,6 +26,7 @@ from ..core.test_file_utils import (
     save_json,
 )
 from ..server import PROJECT_ROOT, mcp
+from ._cli_freshness import stale_cli_guard
 from ._test_tools_common import (
     _case_id,
     _detect_segmentation_pattern,
@@ -43,6 +44,7 @@ def _surfaces(tokens: list[dict]) -> str:
 
 
 @mcp.tool()
+@stale_cli_guard()
 async def test_show(
     input_text: str,
     mode: str = "default",
@@ -254,6 +256,7 @@ async def test_compare(before_file: str, after_file: str) -> str:
 
 
 @mcp.tool()
+@stale_cli_guard()
 async def test_diff_suzume(
     limit: int = 10,
     test_output_file: str = "/tmp/test.txt",

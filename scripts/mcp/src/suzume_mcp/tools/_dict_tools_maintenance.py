@@ -7,9 +7,10 @@ import regex
 
 from ..core.constants import katakana_to_hiragana
 from ..core.mecab import mecab_analyze
-from ..core.suzume_cli import get_cli_path
+from ..core.suzume_cli import existing_cli
 from ..core.suzume_utils import get_char_types
 from ..server import PROJECT_ROOT, mcp
+from ._cli_freshness import stale_cli_guard
 from ._dict_tools_common import (
     DISABLED_PREFIX,
     USER_CATEGORIES,
@@ -114,6 +115,7 @@ async def dict_grep(pattern: str, user: str = "", search_all: bool = False) -> s
 
 
 @mcp.tool()
+@stale_cli_guard(uses_cli=lambda args: not args["dry_run"])
 async def dict_sort(
     file: str = "",
     user: str = "",
@@ -297,6 +299,7 @@ async def _get_reading(surface: str) -> str:
 
 
 @mcp.tool()
+@stale_cli_guard(uses_cli=lambda args: not args["dry_run"])
 async def dict_remove_matching(
     pattern: str,
     user: str = "",
@@ -346,6 +349,7 @@ async def dict_remove_matching(
 
 
 @mcp.tool()
+@stale_cli_guard(persists=lambda args: not args["dry_run"])
 async def dict_cleanup(
     input_file: str,
     dry_run: bool = True,
@@ -366,9 +370,10 @@ async def dict_cleanup(
     if not filepath.exists() or not filepath.is_file():
         return _json_error(f"File not found: {input_file}")
 
-    cli = get_cli_path()
-    if not cli.exists():
-        return _json_error("suzume-cli not found (build first)")
+    try:
+        cli = existing_cli()
+    except RuntimeError as exc:
+        return _json_error(str(exc))
 
     def is_fixed_expression(surface: str) -> bool:
         return bool(regex.search(r"[\p{Han}][\p{Hiragana}][\p{Han}\p{Hiragana}\p{Katakana}]", surface))

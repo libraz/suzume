@@ -16,7 +16,7 @@ def test_get_suzume_tokens_uses_explicit_analyze_command_and_option_separator(mo
         observed.extend(command)
         return SimpleNamespace(returncode=0, stdout="-x\tNoun\t-x\nEOS\n", stderr="")
 
-    monkeypatch.setattr(common, "get_cli_path", lambda: cli)
+    monkeypatch.setattr(common, "existing_cli", lambda: cli)
     monkeypatch.setattr(common.subprocess, "run", run)
 
     assert common._get_suzume_tokens("-x") == [{"surface": "-x", "pos": "Noun", "lemma": "-x"}]

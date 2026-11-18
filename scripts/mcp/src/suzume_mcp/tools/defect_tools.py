@@ -15,6 +15,7 @@ from ..core.json_utils import json_error
 from ..core.json_utils import json_result as _json_result
 from ..core.suzume_cli import get_expected_tokens_batch_subprocess, get_suzume_surfaces_async
 from ..server import PROJECT_ROOT, mcp
+from ._cli_freshness import stale_banner, stale_cli_guard
 from ._defect_tools_common import _duplicate, _entry, _load_by_ids, _parse_ids
 from ._defect_tools_store import defect_archive, defect_list, defect_reopen, defect_update, defect_yield
 
@@ -168,6 +169,7 @@ async def _derive_tokenizations(text: str, expected: str, suzume: str, source: s
 
 
 @mcp.tool()
+@stale_cli_guard()
 async def defect_probe(
     texts: list[str],
     source: str = "defect",
@@ -226,6 +228,7 @@ async def defect_probe(
 
 
 @mcp.tool()
+@stale_cli_guard(persists=lambda args: not args["suzume"], uses_cli=lambda args: not args["suzume"])
 async def defect_dismiss(
     text: str,
     resolution: str,
@@ -288,6 +291,7 @@ async def defect_dismiss(
 
 
 @mcp.tool()
+@stale_cli_guard(persists=lambda args: not args["suzume"], uses_cli=lambda args: not args["suzume"])
 async def defect_add(
     text: str,
     expected: str = "",
@@ -359,6 +363,7 @@ async def defect_add(
 
 
 @mcp.tool()
+@stale_cli_guard(uses_cli=lambda args: args["live"])
 async def defect_get(ids: str, source: str = "defect", live: bool = True) -> str:
     """Show full records by id, optionally with their current behavior.
 
@@ -388,6 +393,7 @@ async def defect_get(ids: str, source: str = "defect", live: bool = True) -> str
 
 
 @mcp.tool()
+@stale_cli_guard(persists=lambda args: args["apply"])
 async def defect_recheck(ids: str = "", source: str = "defect", apply: bool = False) -> str:
     """Re-run open records against the current build and report their state.
 
@@ -458,6 +464,7 @@ async def defect_recheck(ids: str = "", source: str = "defect", apply: bool = Fa
 
 
 @mcp.tool()
+@stale_cli_guard(persists=lambda args: True)
 async def defect_resolve(ids: str, source: str = "defect", note: str = "", force: bool = False) -> str:
     """Close named records, moving them to `resolved/`.
 
@@ -520,6 +527,7 @@ async def defect_resolve(ids: str, source: str = "defect", note: str = "", force
 
 
 @mcp.tool()
+@stale_cli_guard()
 async def defect_report(source: str = "defect", out: str = "", include_resolved: bool = False) -> str:
     """Render the deterministic Markdown report for a store.
 
@@ -567,6 +575,7 @@ async def defect_report(source: str = "defect", out: str = "", include_resolved:
             for state in sorted({info["state"] for info in live.values()})
         },
     }
+    text = stale_banner() + text
     if out:
         requested = Path(out)
         backup_root = (PROJECT_ROOT / "backup").resolve()

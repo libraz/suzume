@@ -16,6 +16,7 @@ from ..core.json_utils import json_error as _json_error
 from ..core.json_utils import json_result as _json_result
 from ..core.suzume_cli import get_expected_tokens_subprocess, get_suzume_surfaces
 from ..server import PROJECT_ROOT, mcp
+from ._cli_freshness import stale_cli_guard
 
 SKILL_DIR = PROJECT_ROOT / ".claude" / "skills" / "thread-quality-check"
 PROGRESS_FILE = SKILL_DIR / ".thread_check_progress"
@@ -349,6 +350,7 @@ async def thread_status(input_file: str = "") -> str:
 
 
 @mcp.tool()
+@stale_cli_guard(persists=lambda args: not args["dry_run"])
 async def thread_scan(
     count: int = 100,
     from_line: int = 0,
@@ -368,6 +370,7 @@ async def thread_scan(
 
 
 @mcp.tool()
+@stale_cli_guard(persists=lambda args: not args["dry_run"])
 async def thread_next(
     count: int = 20,
     from_line: int = 0,

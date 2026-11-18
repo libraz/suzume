@@ -1,5 +1,6 @@
 """Tests for native Suzume CLI discovery."""
 
+import asyncio
 import io
 import json
 import os
@@ -101,3 +102,104 @@ def test_mecab_batch_wrapper_selects_raw_mode(monkeypatch: pytest.MonkeyPatch) -
 
     assert suzume_cli.get_mecab_tokens_batch_subprocess(["東京"]) == [([], "MeCab", "intentional-rule")]
     assert calls == [(["東京"], True)]
+
+
+def _write(path: Path, modified: int) -> Path:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.touch()
+    os.utime(path, ns=(modified, modified))
+    return path
+
+
+@pytest.fixture
+def fresh_source_scan(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(suzume_cli, "_source_scan", {})
+    monkeypatch.delenv("SUZUME_ALLOW_STALE_CLI", raising=False)
+
+
+_BUILT_AT = 2_000_000_000_000_000_000
+_ONE_SECOND = 1_000_000_000
+
+
+@pytest.mark.parametrize("source", ["src/analysis/scorer.cpp", "include/suzume/suzume_c.h", "tools/cli/main.cpp"])
+def test_staleness_names_the_source_changed_after_the_build(tmp_path: Path, fresh_source_scan, source: str) -> None:
+    _write(tmp_path / "build" / "bin" / CLI_NAME, _BUILT_AT)
+    _write(tmp_path / source, _BUILT_AT + _ONE_SECOND)
+
+    staleness = suzume_cli.cli_staleness(project_root=tmp_path)
+
+    assert staleness is not None
+    assert staleness["newest_source"] == str(Path(source))
+    assert staleness["cli"] == str(Path("build") / "bin" / CLI_NAME)
+    assert staleness["source_modified"] > staleness["cli_built"]
+
+
+@pytest.mark.parametrize("source", ["src/analysis/scorer.cpp", "include/suzume/suzume_c.h", "tools/cli/main.cpp"])
+def test_staleness_is_none_for_a_binary_built_after_its_sources(tmp_path: Path, fresh_source_scan, source: str) -> None:
+    _write(tmp_path / "build" / "bin" / CLI_NAME, _BUILT_AT)
+    _write(tmp_path / source, _BUILT_AT - 1)
+
+    assert suzume_cli.cli_staleness(project_root=tmp_path) is None
+
+
+def test_staleness_ignores_files_outside_the_compiled_directories(tmp_path: Path, fresh_source_scan) -> None:
+    _write(tmp_path / "build" / "bin" / CLI_NAME, _BUILT_AT)
+    _write(tmp_path / "scripts" / "check.py", _BUILT_AT + 1)
+
+    assert suzume_cli.cli_staleness(project_root=tmp_path) is None
+
+
+def test_staleness_is_none_without_a_binary(tmp_path: Path, fresh_source_scan) -> None:
+    _write(tmp_path / "src" / "core" / "types.cpp", _BUILT_AT)
+
+    assert suzume_cli.cli_staleness(project_root=tmp_path) is None
+
+
+def test_refusal_names_the_override_and_yields_to_it(fresh_source_scan, monkeypatch: pytest.MonkeyPatch) -> None:
+    staleness = {"newest_source": "src/core/types.cpp", "cli": "build/bin/suzume-cli"}
+
+    refusal = suzume_cli.stale_cli_refusal(staleness)
+    assert refusal is not None and "src/core/types.cpp" in refusal and "SUZUME_ALLOW_STALE_CLI=1" in refusal
+    assert suzume_cli.stale_cli_refusal(None) is None
+
+    monkeypatch.setenv("SUZUME_ALLOW_STALE_CLI", "1")
+    assert suzume_cli.stale_cli_refusal(staleness) is None
+
+
+def test_existing_cli_reports_a_missing_binary(tmp_path: Path) -> None:
+    with pytest.raises(RuntimeError, match="not found"):
+        suzume_cli.existing_cli(tmp_path / "build" / "bin" / CLI_NAME)
+
+
+def _hanging_cli(tmp_path: Path) -> Path:
+    cli = tmp_path / "hanging-cli"
+    cli.write_text("#!/bin/sh\nexec sleep 30\n", encoding="utf-8")
+    cli.chmod(0o755)
+    return cli
+
+
+@pytest.mark.skipif(os.name == "nt", reason="uses a shell script as the child")
+def test_a_hung_cli_times_out_in_the_blocking_call(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(suzume_cli, "_ANALYZE_TIMEOUT_SECONDS", 0.2)
+
+    with pytest.raises(RuntimeError, match=r"timed out after 0\.2s"):
+        suzume_cli.get_suzume_surfaces("東京", cli_path=_hanging_cli(tmp_path))
+
+
+@pytest.mark.skipif(os.name == "nt", reason="uses a shell script as the child")
+def test_a_hung_cli_times_out_and_is_killed_in_the_async_call(tmp_path: Path) -> None:
+    with pytest.raises(RuntimeError, match=r"timed out after 0\.2s"):
+        asyncio.run(suzume_cli._run_cli_async(_hanging_cli(tmp_path), ["analyze"], timeout=0.2))
+
+
+def test_normalize_timeout_grows_with_the_batch(monkeypatch: pytest.MonkeyPatch) -> None:
+    observed: dict = {}
+
+    def fake_run(command, **kwargs):
+        observed.update(kwargs)
+        return type("Result", (), {"returncode": 0, "stdout": "[]", "stderr": ""})()
+
+    monkeypatch.setattr(suzume_cli.subprocess, "run", fake_run)
+    suzume_cli._run_normalize_cli(["東京"] * 100)
+
+    assert observed["timeout"] == pytest.approx(160.0)

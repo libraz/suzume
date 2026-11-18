@@ -7,7 +7,7 @@ from pathlib import Path
 from ..core.json_utils import json_error as _json_error  # noqa: F401
 from ..core.json_utils import json_result as _json_result  # noqa: F401
 from ..core.pos_mapping import normalize_pos
-from ..core.suzume_cli import get_cli_path
+from ..core.suzume_cli import existing_cli
 from ..core.test_file_utils import (
     find_test_by_id,
     find_test_by_input,
@@ -39,9 +39,7 @@ def _get_suzume_tokens(text: str) -> list[dict]:
 
     Uses --no-user-dict to match the C++ tokenization test runner oracle.
     """
-    cli = get_cli_path()
-    if not cli.exists():
-        raise RuntimeError(f"Suzume CLI not found: {cli}")
+    cli = existing_cli()
 
     result = subprocess.run(
         [str(cli), "analyze", "--no-user-dict", "--", text],

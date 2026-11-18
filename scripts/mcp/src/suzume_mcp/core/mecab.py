@@ -3,6 +3,8 @@
 import functools
 import subprocess
 
+_MECAB_TIMEOUT_SECONDS = 30.0
+
 
 def mecab_analyze(text: str) -> list[dict]:
     """Run MeCab on text and return parsed tokens (synchronous).
@@ -15,12 +17,16 @@ def mecab_analyze(text: str) -> list[dict]:
 
 @functools.lru_cache(maxsize=16384)
 def _mecab_tokens(text: str) -> tuple[dict, ...]:
-    result = subprocess.run(
-        ["mecab"],
-        input=text + "\n",
-        capture_output=True,
-        text=True,
-    )
+    try:
+        result = subprocess.run(
+            ["mecab"],
+            input=text + "\n",
+            capture_output=True,
+            text=True,
+            timeout=_MECAB_TIMEOUT_SECONDS,
+        )
+    except subprocess.TimeoutExpired:
+        raise RuntimeError(f"MeCab timed out after {_MECAB_TIMEOUT_SECONDS:g}s") from None
     if result.returncode != 0:
         raise RuntimeError(f"MeCab failed: {result.stderr.strip() or 'non-zero exit'}")
     if "EOS" not in result.stdout.splitlines():
