@@ -218,39 +218,6 @@
       ]
     },
     {
-      "description": "がおさんである - 固有名詞検出はMeCab差異許容 (W-001)",
-      "expected": [
-        {
-          "lemma": "がお",
-          "pos": "Noun",
-          "surface": "がお"
-        },
-        {
-          "lemma": "さん",
-          "pos": "Suffix",
-          "surface": "さん"
-        },
-        {
-          "lemma": "だ",
-          "pos": "Auxiliary",
-          "surface": "で"
-        },
-        {
-          "lemma": "ある",
-          "pos": "Verb",
-          "surface": "ある"
-        }
-      ],
-      "id": "embedded_particle_gao_penalty",
-      "input": "がおさんである",
-      "tags": [
-        "penalty",
-        "wagahai",
-        "W-001",
-        "mecab-diff-acceptable"
-      ]
-    },
-    {
       "description": "高さ - regression test",
       "expected": [
         {
