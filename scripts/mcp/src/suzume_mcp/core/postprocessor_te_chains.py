@@ -2,7 +2,7 @@
 
 from itertools import pairwise
 
-from .postprocessor_common import reports_mutation
+from .postprocessor_common import follows_te_form, reports_mutation
 from .split_rules import base_from_renyokei
 
 # Fabricated readings the reference analyzer gives the remainder of a
@@ -258,8 +258,7 @@ def postprocess_contracted_iku_tte_na(tokens: list[dict]) -> bool:
     while idx < len(tokens):
         token = tokens[idx]
         if token.get("surface") == "ってな" and token.get("pos") == "Particle":
-            after_te_form = idx > 0 and tokens[idx - 1].get("surface") in ("て", "で")
-            if after_te_form:
+            if follows_te_form(tokens, idx - 1):
                 cells = [
                     {"surface": "っ", "pos": "Auxiliary", "lemma": "く"},
                     {"surface": "て", "pos": "Particle", "lemma": "て"},
@@ -295,12 +294,12 @@ def postprocess_contracted_iku_lemma(tokens: list[dict]) -> bool:
             ]
             changed = True
         idx += 1
-    for previous, token in pairwise(tokens):
+    for idx, token in enumerate(tokens):
         if (
             token.get("pos") == "Auxiliary"
             and token.get("lemma") == "く"
             and token.get("surface") in ("く", "っ", "か")
-            and previous.get("surface") in ("て", "で")
+            and follows_te_form(tokens, idx - 1)
         ):
             token["lemma"] = "いく"
             changed = True

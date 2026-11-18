@@ -91,6 +91,11 @@ def postprocess_sou_host(tokens: list[dict]) -> bool:
     return changed
 
 
+def _takes_continuative(token: dict) -> bool:
+    """Whether ``token`` attaches only to a verb continuative: た, て, ます."""
+    return token.get("surface") in ("た", "たら", "たり", "て") or token.get("lemma") == "ます"
+
+
 def postprocess_adverb_host_context(tokens: list[dict]) -> bool:
     """Retag an adverb by the slot its neighbours give it.
 
@@ -101,6 +106,9 @@ def postprocess_adverb_host_context(tokens: list[dict]) -> bool:
     - a kanji-spelled く-form whose base form is an i-adjective is that
       adjective's continuative (険しく, 長く), however the reference tagged it;
       a kana one can belong to a homographic adverb (いたく is 甚く).
+
+    Neither the copula nor a case particle で can follow an adverb and host
+    た/て/ます, so that で is the continuative of 出る (すぐ+で+た).
     """
     changed = False
     for idx, token in enumerate(tokens):
@@ -109,6 +117,9 @@ def postprocess_adverb_host_context(tokens: list[dict]) -> bool:
         surface = token.get("surface", "")
         following = tokens[idx + 1] if idx + 1 < len(tokens) else {}
         after = tokens[idx + 2] if idx + 2 < len(tokens) else {}
+        if following.get("surface") == "で" and following.get("pos") != "Verb" and _takes_continuative(after):
+            following.update(pos="Verb", lemma="出る")
+            changed = True
         if following.get("surface") == "な" and following.get("lemma") == "だ" and after.get("pos") == "Noun":
             token["pos"] = "Adjective"
             changed = True

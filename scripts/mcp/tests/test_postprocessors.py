@@ -446,9 +446,19 @@ class TestPostprocessIi:
 
 class TestPostprocessIruAux:
     def test_iru_after_te(self):
-        tokens = [_tok("て", "Particle"), _tok("いる", "Verb")]
+        tokens = [_tok("見", "Verb", lemma="見る"), _tok("て", "Particle"), _tok("いる", "Verb")]
         postprocess_iru_aux(tokens)
-        assert tokens[1]["pos"] == "Auxiliary"
+        assert tokens[2]["pos"] == "Auxiliary"
+
+    def test_iru_after_a_nominal_and_case_de_stays_a_verb(self):
+        tokens = [_tok("東京", "Noun"), _tok("で", "Particle"), _tok("いる", "Verb")]
+        postprocess_iru_aux(tokens)
+        assert tokens[2]["pos"] == "Verb"
+
+    def test_iru_after_the_copula_de_stays_a_verb(self):
+        tokens = [_tok("静か", "Adjective"), _tok("で", "Auxiliary", lemma="だ"), _tok("いる", "Verb")]
+        postprocess_iru_aux(tokens)
+        assert tokens[2]["pos"] == "Verb"
 
     def test_iru_standalone(self):
         tokens = [_tok("猫", "Noun"), _tok("いる", "Verb")]
@@ -456,15 +466,25 @@ class TestPostprocessIruAux:
         assert tokens[1]["pos"] == "Verb"
 
     def test_iru_after_focused_te_form(self):
-        tokens = [_tok("で", "Particle"), _tok("しか", "Particle", pos_sub1="係助詞"), _tok("い", "Verb", lemma="いる")]
+        tokens = [
+            _tok("読ん", "Verb", lemma="読む"),
+            _tok("で", "Particle"),
+            _tok("しか", "Particle", pos_sub1="係助詞"),
+            _tok("い", "Verb", lemma="いる"),
+        ]
         postprocess_iru_aux(tokens)
-        assert tokens[2]["pos"] == "Auxiliary"
+        assert tokens[3]["pos"] == "Auxiliary"
 
     @pytest.mark.parametrize(("particle", "sub"), [("は", "係助詞"), ("など", "副助詞"), ("ばかり", "副助詞")])
     def test_iru_after_topic_or_adverbial_particle_in_te_frame(self, particle, sub):
-        tokens = [_tok("て", "Particle"), _tok(particle, "Particle", pos_sub1=sub), _tok("いる", "Verb", lemma="いる")]
+        tokens = [
+            _tok("見", "Verb", lemma="見る"),
+            _tok("て", "Particle"),
+            _tok(particle, "Particle", pos_sub1=sub),
+            _tok("いる", "Verb", lemma="いる"),
+        ]
         postprocess_iru_aux(tokens)
-        assert tokens[2]["pos"] == "Auxiliary"
+        assert tokens[3]["pos"] == "Auxiliary"
 
     def test_iru_after_conjunctive_particle_stays_verb(self):
         tokens = [
@@ -483,9 +503,14 @@ class TestPostprocessIruAux:
 
 class TestPostprocessGivingAux:
     def test_receiving_verb_after_te_is_auxiliary(self):
-        tokens = [_tok("て", "Particle"), _tok("もらっ", "Verb", lemma="もらう")]
+        tokens = [_tok("書い", "Verb", lemma="書く"), _tok("て", "Particle"), _tok("もらっ", "Verb", lemma="もらう")]
         assert postprocess_giving_aux(tokens)
-        assert tokens[1]["pos"] == "Auxiliary"
+        assert tokens[2]["pos"] == "Auxiliary"
+
+    def test_receiving_verb_after_case_de_stays_a_verb(self):
+        tokens = [_tok("ただ", "Adverb"), _tok("で", "Particle"), _tok("もらっ", "Verb", lemma="もらう")]
+        assert not postprocess_giving_aux(tokens)
+        assert tokens[2]["pos"] == "Verb"
 
     def test_lexical_giving_verb_stays_verb(self):
         tokens = [_tok("本", "Noun"), _tok("を", "Particle"), _tok("あげる", "Verb", lemma="あげる")]
@@ -614,11 +639,44 @@ class TestPostprocessConjunctionTeAdverb:
         assert not postprocess_conjunction_te_adverb(tokens)
 
 
+class TestAdverbHostDe:
+    @pytest.mark.parametrize("follower", [_tok("た", "Auxiliary"), _tok("て", "Particle"), _tok("ます", "Auxiliary")])
+    def test_de_between_an_adverb_and_a_continuative_follower_is_deru(self, follower):
+        tokens = [_tok("すぐ", "Adverb"), _tok("で", "Auxiliary", lemma="だ"), follower]
+        assert postprocessors.postprocess_adverb_host_context(tokens)
+        assert tokens[1] == _tok("で", "Verb", lemma="出る")
+
+    def test_case_de_after_an_adverb_before_a_verb_is_left_alone(self):
+        tokens = [_tok("ただ", "Adverb"), _tok("で", "Particle"), _tok("もらっ", "Verb", lemma="もらう")]
+        assert not postprocessors.postprocess_adverb_host_context(tokens)
+        assert tokens[1] == _tok("で", "Particle")
+
+
+class TestContractedIkuLemma:
+    @pytest.mark.parametrize(
+        ("host", "lemma"), [(_tok("持っ", "Verb", lemma="持つ"), "いく"), (_tok("東京", "Noun"), "く")]
+    )
+    def test_clipped_iku_cell_takes_iku_only_after_a_te_form(self, host, lemma):
+        tokens = [host, _tok("て" if host["pos"] == "Verb" else "で", "Particle"), _tok("く", "Auxiliary", lemma="く")]
+        postprocessors.postprocess_contracted_iku_lemma(tokens)
+        assert tokens[2]["lemma"] == lemma
+
+
 class TestPostprocessShimauAux:
     def test_kanji_shimau_after_te(self):
-        tokens = [_tok("て", "Particle"), _tok("仕舞っ", "Verb", lemma="仕舞う"), _tok("た", "Auxiliary")]
+        tokens = [
+            _tok("食べ", "Verb", lemma="食べる"),
+            _tok("て", "Particle"),
+            _tok("仕舞っ", "Verb", lemma="仕舞う"),
+            _tok("た", "Auxiliary"),
+        ]
         postprocess_shimau_aux(tokens)
-        assert tokens[1] == _tok("仕舞っ", "Auxiliary", lemma="しまう")
+        assert tokens[2] == _tok("仕舞っ", "Auxiliary", lemma="しまう")
+
+    def test_kanji_shimau_after_case_de_stays_a_verb(self):
+        tokens = [_tok("箱", "Noun"), _tok("で", "Particle"), _tok("仕舞っ", "Verb", lemma="仕舞う")]
+        assert not postprocess_shimau_aux(tokens)
+        assert tokens[2] == _tok("仕舞っ", "Verb", lemma="仕舞う")
 
     def test_kanji_shimau_standalone(self):
         tokens = [_tok("物", "Noun"), _tok("を", "Particle"), _tok("仕舞う", "Verb")]
@@ -1727,6 +1785,15 @@ class TestContractedIkuTteNa:
             ("て", "Particle"),
             ("な", "Particle"),
         ]
+
+    def test_splits_tte_na_after_case_de_into_quotative_and_na(self):
+        tokens = [
+            {"surface": "東京", "pos": "Noun", "lemma": "東京"},
+            {"surface": "で", "pos": "Particle", "lemma": "で"},
+            {"surface": "ってな", "pos": "Particle", "lemma": "ってな"},
+        ]
+        assert postprocessors.postprocess_contracted_iku_tte_na(tokens)
+        assert [t["surface"] for t in tokens] == ["東京", "で", "って", "な"]
 
     def test_splits_tte_na_elsewhere_into_quotative_and_na(self):
         tokens = [

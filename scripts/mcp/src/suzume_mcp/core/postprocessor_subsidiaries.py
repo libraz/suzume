@@ -4,7 +4,7 @@ import regex
 
 from . import postprocessor_predicate_hosts, postprocessor_te_chains
 from .core_lexicon import core_headwords
-from .postprocessor_common import reports_mutation
+from .postprocessor_common import follows_te_form, reports_mutation
 from .split_rules import base_from_renyokei
 
 # Exports from postprocessor_predicate_hosts.
@@ -83,15 +83,11 @@ def postprocess_iru_aux(tokens: list[dict]) -> bool:
             continue
         if t.get("pos") != "Verb":
             continue
-        prev_surface = tokens[i - 1].get("surface", "")
-        direct_te_form = prev_surface in ("て", "で")
+        direct_te_form = follows_te_form(tokens, i - 1)
         # A binding or adverbial particle may sit inside the frame (見て+は+いない,
         # 読んで+ばかり+いる) without making いる existential.
         focused_te_form = (
-            surface in ("い", "いる")
-            and _is_focus_particle(tokens[i - 1])
-            and i >= 2
-            and tokens[i - 2].get("surface") in ("て", "で")
+            surface in ("い", "いる") and _is_focus_particle(tokens[i - 1]) and follows_te_form(tokens, i - 2)
         )
         if direct_te_form or focused_te_form:
             t["pos"] = "Auxiliary"
@@ -115,7 +111,7 @@ def postprocess_giving_aux(tokens: list[dict]) -> bool:
         # before its negative (待って+くん+ない).
         if (
             token.get("surface") == "くん"
-            and tokens[idx - 1].get("surface") in ("て", "で")
+            and follows_te_form(tokens, idx - 1)
             and following.startswith(_CONTRACTED_KURU_FOLLOWERS)
         ):
             if (token.get("pos"), token.get("lemma")) != ("Auxiliary", "くる"):
@@ -125,7 +121,7 @@ def postprocess_giving_aux(tokens: list[dict]) -> bool:
             continue
         if token.get("lemma") not in auxiliary_lemmas:
             continue
-        if tokens[idx - 1].get("surface") not in ("て", "で"):
+        if not follows_te_form(tokens, idx - 1):
             continue
         if token.get("pos") != "Auxiliary":
             token["pos"] = "Auxiliary"
@@ -178,10 +174,6 @@ def postprocess_contracted_progressive_aux(tokens: list[dict]) -> bool:
     return changed
 
 
-# Parts of speech whose continuative takes the conjunctive て/で.
-_TE_FORM_HOST_POS = frozenset({"Verb", "Adjective", "Auxiliary"})
-
-
 @reports_mutation
 def postprocess_miru_aux(tokens: list[dict]) -> bool:
     """Classify trial みる and demonstrative みせる after a te-form as Auxiliary.
@@ -191,20 +183,17 @@ def postprocess_miru_aux(tokens: list[dict]) -> bool:
     follow a predicate: after a nominal, で is a case particle (東京でみた).
     """
 
-    def follows_te_form(te_idx: int) -> bool:
-        return (
-            te_idx > 0
-            and tokens[te_idx].get("surface") in ("て", "で")
-            and tokens[te_idx - 1].get("pos") in _TE_FORM_HOST_POS
-        )
-
     subsidiary_lemmas = {
         **dict.fromkeys(("み", "みる", "みれ", "みろ", "みよ"), "みる"),
         **dict.fromkeys(("みせ", "みせる", "みせれ", "みせろ", "みせよ"), "みせる"),
     }
     # 食べてみな is the trial み plus the imperative な, not the pronoun みな.
     for idx in range(len(tokens) - 1, 0, -1):
-        if tokens[idx].get("surface") == "みな" and tokens[idx].get("pos") == "Pronoun" and follows_te_form(idx - 1):
+        if (
+            tokens[idx].get("surface") == "みな"
+            and tokens[idx].get("pos") == "Pronoun"
+            and follows_te_form(tokens, idx - 1)
+        ):
             tokens[idx : idx + 1] = [
                 {"surface": "み", "pos": "Auxiliary", "lemma": "みる"},
                 {"surface": "な", "pos": "Particle", "lemma": "な"},
@@ -217,7 +206,7 @@ def postprocess_miru_aux(tokens: list[dict]) -> bool:
         prev_idx = idx - 1
         if _is_focus_particle(tokens[prev_idx]) and prev_idx > 0:
             prev_idx -= 1
-        if not follows_te_form(prev_idx):
+        if not follows_te_form(tokens, prev_idx):
             continue
         token["pos"] = "Auxiliary"
         token["lemma"] = lemma
@@ -255,7 +244,7 @@ def postprocess_shimau_aux(tokens: list[dict]) -> bool:
     while idx < len(tokens):
         token = tokens[idx]
         previous = tokens[idx - 1]
-        if token.get("surface") in shimau_forms and previous.get("surface") in ("て", "で"):
+        if token.get("surface") in shimau_forms and follows_te_form(tokens, idx - 1):
             token["pos"] = "Auxiliary"
             token["lemma"] = "しまう"
             changed = True
