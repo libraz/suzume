@@ -6,16 +6,11 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$SCRIPT_DIR/wheel_env.sh"
 resolve_wheel_argument "$@"
-SMOKE_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/suzume-wheel-smoke.XXXXXX")"
-trap 'rm -rf "$SMOKE_ROOT"' EXIT
-
-uv venv "$SMOKE_ROOT/venv"
-uv pip install --python "$SMOKE_ROOT/venv/bin/python" --no-deps "$WHEEL"
+create_wheel_env suzume-wheel-smoke
+SMOKE_ROOT="$WHEEL_ENV_ROOT"
+install_wheel_into_env
 mkdir "$SMOKE_ROOT/work"
 cd "$SMOKE_ROOT/work"
-
-export PYTHONNOUSERSITE=1
-unset PYTHONPATH
 
 "$SMOKE_ROOT/venv/bin/python" - <<'PY'
 from importlib import metadata, resources

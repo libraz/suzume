@@ -52,6 +52,16 @@ auditwheel_tool() {
         --with "patchelf==$PATCHELF_VERSION" auditwheel "$@"
 }
 
+# Set SINGLE_WHEEL to the only wheel in dist/, or fail describing $1.
+require_single_wheel() {
+    local wheels=("$SCRIPT_DIR"/dist/*.whl)
+    if [[ ${#wheels[@]} -ne 1 ]]; then
+        echo "Error: expected exactly one $1" >&2
+        exit 1
+    fi
+    SINGLE_WHEEL="${wheels[0]}"
+}
+
 if ! git -C "$PROJECT_ROOT" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     echo "Error: public wheels must be built from a git checkout" >&2
     exit 1
@@ -147,12 +157,8 @@ mkdir -p "$SCRIPT_DIR/dist"
 uv build --wheel --out-dir "$SCRIPT_DIR/dist" "$SCRIPT_DIR"
 
 shopt -s nullglob
-WHEELS=("$SCRIPT_DIR"/dist/*.whl)
-if [[ ${#WHEELS[@]} -ne 1 ]]; then
-    echo "Error: expected exactly one wheel before platform processing" >&2
-    exit 1
-fi
-INITIAL_WHEEL="${WHEELS[0]}"
+require_single_wheel "wheel before platform processing"
+INITIAL_WHEEL="$SINGLE_WHEEL"
 
 if [[ "$SYSTEM" == "Darwin" ]]; then
     # The dylib target was verified above; only now is it safe to apply the
@@ -172,12 +178,8 @@ else
     mv "$REPAIR_DIR"/*.whl "$SCRIPT_DIR/dist/"
     rmdir "$REPAIR_DIR"
 
-    WHEELS=("$SCRIPT_DIR"/dist/*.whl)
-    if [[ ${#WHEELS[@]} -ne 1 ]]; then
-        echo "Error: expected exactly one repaired Linux wheel" >&2
-        exit 1
-    fi
-    AUDIT_OUTPUT="$(auditwheel_tool show "${WHEELS[0]}")"
+    require_single_wheel "repaired Linux wheel"
+    AUDIT_OUTPUT="$(auditwheel_tool show "$SINGLE_WHEEL")"
     printf '%s\n' "$AUDIT_OUTPUT"
     if [[ "$AUDIT_OUTPUT" != *"$PLATFORM_TAG"* ]]; then
         echo "Error: auditwheel did not validate $PLATFORM_TAG compatibility" >&2

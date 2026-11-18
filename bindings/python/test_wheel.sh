@@ -7,10 +7,8 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$SCRIPT_DIR/wheel_env.sh"
 resolve_wheel_argument "$@"
-TEST_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/suzume-wheel-test.XXXXXX")"
-trap 'rm -rf "$TEST_ROOT"' EXIT
-
-uv venv "$TEST_ROOT/venv"
+create_wheel_env suzume-wheel-test
+TEST_ROOT="$WHEEL_ENV_ROOT"
 # The test tools come from uv.lock at the versions the dev environment uses;
 # the wheel itself goes in without dependency resolution so that nothing is
 # re-resolved against the index.
@@ -18,10 +16,7 @@ uv export --project "$SCRIPT_DIR" --locked --only-group dev --no-emit-project \
     --format requirements.txt --output-file "$TEST_ROOT/dev-requirements.txt" --quiet
 uv pip install --python "$TEST_ROOT/venv/bin/python" --require-hashes \
     --requirement "$TEST_ROOT/dev-requirements.txt"
-uv pip install --python "$TEST_ROOT/venv/bin/python" --no-deps "$WHEEL"
-
-export PYTHONNOUSERSITE=1
-unset PYTHONPATH
+install_wheel_into_env
 
 # The tests live in the checkout; the package under test must not.
 cd "$SCRIPT_DIR"
