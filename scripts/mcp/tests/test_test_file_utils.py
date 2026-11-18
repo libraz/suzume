@@ -5,7 +5,7 @@ import json
 from suzume_mcp.core.test_file_utils import (
     cases_key,
     find_test_by_id,
-    find_test_by_input,
+    find_tests_by_input,
     generate_id,
     get_failures_from_test_output,
     get_test_files,
@@ -82,27 +82,36 @@ def test_save_json_format(tmp_path):
     assert content.index('"a"') < content.index('"b"')
 
 
-def test_find_test_by_input(tmp_path):
+def test_find_tests_by_input(tmp_path):
     test_dir = tmp_path / CORPUS_DIR
     test_dir.mkdir(parents=True)
     data = {"cases": [{"input": "テスト", "id": "test1"}]}
     (test_dir / "basic.json").write_text(json.dumps(data), encoding="utf-8")
 
-    result = find_test_by_input(tmp_path, "テスト")
-    assert result is not None
+    [result] = find_tests_by_input(tmp_path, "テスト")
     assert result["basename"] == "basic"
     assert result["index"] == 0
     assert result["case"]["input"] == "テスト"
 
 
-def test_find_test_by_input_not_found(tmp_path):
+def test_find_tests_by_input_returns_every_match(tmp_path):
+    test_dir = tmp_path / CORPUS_DIR
+    test_dir.mkdir(parents=True)
+    for name in ("first", "second"):
+        data = {"cases": [{"input": "テスト", "id": name}]}
+        (test_dir / f"{name}.json").write_text(json.dumps(data), encoding="utf-8")
+
+    matches = find_tests_by_input(tmp_path, "テスト")
+    assert sorted(match["basename"] for match in matches) == ["first", "second"]
+
+
+def test_find_tests_by_input_not_found(tmp_path):
     test_dir = tmp_path / CORPUS_DIR
     test_dir.mkdir(parents=True)
     data = {"cases": [{"input": "テスト"}]}
     (test_dir / "basic.json").write_text(json.dumps(data), encoding="utf-8")
 
-    result = find_test_by_input(tmp_path, "不存在")
-    assert result is None
+    assert find_tests_by_input(tmp_path, "不存在") == []
 
 
 def test_find_test_by_id_numeric(tmp_path):

@@ -16,7 +16,6 @@ from ..core.suzume_cli import (
 from ..core.suzume_utils import tokens_match
 from ..core.test_file_utils import (
     find_test_by_id,
-    find_test_by_input,
     get_cases,
     get_failures_from_test_output,
     get_test_data_dir,
@@ -27,6 +26,7 @@ from ..server import PROJECT_ROOT, mcp
 from ._cli_freshness import stale_cli_guard
 from ._test_tools_common import (
     _case_id,
+    _case_locations,
     _cases_with_input,
     _detect_segmentation_pattern,
     _format_expected_checked,
@@ -63,7 +63,7 @@ async def test_show(
     suzume_tokens = _get_suzume_tokens(input_text)
     suzume_surfaces = [t["surface"] for t in suzume_tokens]
 
-    found = find_test_by_input(PROJECT_ROOT, input_text)
+    existing = _case_locations(PROJECT_ROOT, input_text)
 
     # Diff classification
     surface_match = "|".join(expected_surfaces) == "|".join(suzume_surfaces)
@@ -112,7 +112,7 @@ async def test_show(
         "diff_type": diff_type,
         "diff_details": diff_details,
         "rule": rule,
-        "test_exists": {"file": found["basename"], "id": _case_id(found["case"], found["index"])} if found else None,
+        "test_exists": existing or None,
     }
 
     if mode == "brief":

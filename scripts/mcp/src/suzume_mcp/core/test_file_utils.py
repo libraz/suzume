@@ -86,17 +86,12 @@ def _iter_cases_by_input(project_root: Path, input_text: str) -> Iterator[dict]:
                 yield _case_record(path, path.stem, index, case, data)
 
 
-def find_test_by_input(project_root: Path, input_text: str) -> dict | None:
-    """Find a test case by input text across all test files.
+def find_tests_by_input(project_root: Path, input_text: str) -> list[dict]:
+    """Find every test case matching an input across all test files.
 
     Returns:
-        Dict with keys: file, basename, index, case, data; or None.
+        One dict per match with keys: file, basename, index, case, data.
     """
-    return next(_iter_cases_by_input(project_root, input_text), None)
-
-
-def find_tests_by_input(project_root: Path, input_text: str) -> list[dict]:
-    """Find every test case matching an input across all test files."""
     return list(_iter_cases_by_input(project_root, input_text))
 
 

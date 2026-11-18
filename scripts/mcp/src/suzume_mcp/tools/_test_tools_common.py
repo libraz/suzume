@@ -12,7 +12,7 @@ from ..core.suzume_cli import existing_cli, get_expected_tokens_batch_subprocess
 from ..core.suzume_utils import tokens_match
 from ..core.test_file_utils import (
     find_test_by_id,
-    find_test_by_input,
+    find_tests_by_input,
     get_cases,
     get_test_data_dir,
     get_test_files,
@@ -118,14 +118,36 @@ def _case_id(case: dict, index: int) -> str:
     return case.get("id", str(index))
 
 
+def _case_location(found: dict) -> str:
+    """The file/id selector that names one case."""
+    return f"{found['basename']}/{_case_id(found['case'], found['index'])}"
+
+
+def _case_locations(project_root: Path, input_text: str) -> list[str]:
+    """The file/id selector of every case whose input is ``input_text``."""
+    return [_case_location(found) for found in find_tests_by_input(project_root, input_text)]
+
+
 def _find_case(project_root: Path, input_text: str, test_id: str) -> tuple[dict | None, str]:
-    """Find one case by id, else by input, returning an error message when absent."""
+    """Resolve exactly one case by file/id, else by input, or return an error message.
+
+    An input shared by several cases is an error naming each of them, never the first hit.
+    """
     if test_id:
         found = find_test_by_id(project_root, test_id)
-        return found, "" if found else f"Test not found: {test_id}"
+        if not found:
+            return None, f"Test not found: {test_id}"
+        if input_text and found["case"].get("input") != input_text:
+            return None, f"Input does not match test id: {test_id}"
+        return found, ""
     if input_text:
-        found = find_test_by_input(project_root, input_text)
-        return found, "" if found else f"No test found for input: {input_text}"
+        matches = find_tests_by_input(project_root, input_text)
+        if not matches:
+            return None, f"No test found for input: {input_text}"
+        if len(matches) > 1:
+            locations = ", ".join(_case_location(found) for found in matches)
+            return None, f"Input matches multiple tests; pass test_id as one of: {locations}"
+        return matches[0], ""
     return None, "Either input_text or test_id is required."
 
 

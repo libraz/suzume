@@ -6,17 +6,14 @@ from ..core.suzume_cli import (
     get_expected_tokens_subprocess as get_expected_tokens,
 )
 from ..core.test_file_suggestions import suggest_test_files
-from ..core.test_file_utils import (
-    find_test_by_id,
-    find_test_by_input,
-    find_tests_by_input,
-    generate_id,
-)
+from ..core.test_file_utils import generate_id
 from ..server import PROJECT_ROOT, mcp
 from ._test_tools_common import (
     BANNED_ORACLE_KEYS,
     ORACLE_OVERRIDE_REMEDIATION,
-    _case_id,
+    _case_location,
+    _case_locations,
+    _find_case,
     _get_test_files_filtered,
     _json_error,
     _json_result,
@@ -29,29 +26,6 @@ from ._test_tools_organization import _sanitize_gtest_name
 
 def _banned_keys_in(case: dict) -> list[str]:
     return [key for key in BANNED_ORACLE_KEYS if case.get(key)]
-
-
-def _case_location(found: dict) -> str:
-    return f"{found['basename']}/{_case_id(found['case'], found['index'])}"
-
-
-def _resolve_single_test(input_text: str, test_id: str) -> tuple[dict | None, str]:
-    """Resolve a test case without silently choosing among duplicate inputs."""
-    if test_id:
-        found = find_test_by_id(PROJECT_ROOT, test_id)
-        if not found:
-            return None, f"No test found for id: {test_id}"
-        if input_text and found["case"].get("input") != input_text:
-            return None, f"Input does not match test id: {test_id}"
-        return found, ""
-
-    matches = find_tests_by_input(PROJECT_ROOT, input_text)
-    if not matches:
-        return None, f"No test found for input: {input_text}"
-    if len(matches) > 1:
-        locations = ", ".join(_case_location(found) for found in matches)
-        return None, f"Input matches multiple tests; specify test_id: {locations}"
-    return matches[0], ""
 
 
 @mcp.tool()
@@ -108,7 +82,7 @@ async def test_reset_suzume(
             if _banned_keys_in(case)
         ]
     elif input_text or test_id:
-        found, error = _resolve_single_test(input_text, test_id)
+        found, error = _find_case(PROJECT_ROOT, input_text, test_id)
         if not found:
             return _json_error(error)
         if not _banned_keys_in(found["case"]):
@@ -224,9 +198,9 @@ async def test_check_coverage(inputs: list[str]) -> str:
     missing = []
 
     for inp in inputs:
-        found = find_test_by_input(PROJECT_ROOT, inp)
-        if found:
-            existing.append({"input": inp, "location": f"{found['basename']}/{found['index']}"})
+        locations = _case_locations(PROJECT_ROOT, inp)
+        if locations:
+            existing.append({"input": inp, "locations": locations})
         else:
             missing.append(inp)
 

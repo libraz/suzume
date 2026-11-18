@@ -3,10 +3,13 @@
 import importlib
 import json
 
+import pytest
+
 from suzume_mcp.tools import test_tools as _tt
-from tests.helpers import parse, run, write_suite
+from tests.helpers import CORPUS_DIR, parse, run, write_suite
 
 mutation_tools = importlib.import_module("suzume_mcp.tools._test_tools_mutation")
+review_tools = importlib.import_module("suzume_mcp.tools._test_tools_review")
 
 
 class TestTestShow:
@@ -187,6 +190,80 @@ class TestTestDelete:
         missing_case = parse(run(_tt.test_delete(test_id="sample/missing")))
         assert missing_case["status"] == "error"
         assert "not found" in missing_case["message"].lower()
+
+
+class TestCaseResolutionByInput:
+    """An input shared by several cases never resolves to the first hit."""
+
+    @pytest.fixture
+    def corpus(self, tmp_path, monkeypatch):
+        noun = [{"surface": "りんご", "pos": "Noun"}]
+        write_suite(
+            tmp_path,
+            "first",
+            [
+                {"id": "shared", "input": "りんご", "expected": noun, "suzume_expected": noun},
+                {"id": "solo", "input": "東京", "expected": [{"surface": "東京", "pos": "Noun"}]},
+            ],
+        )
+        write_suite(tmp_path, "second", [{"id": "shared_too", "input": "りんご", "expected": noun}])
+        for module in (mutation_tools, review_tools):
+            monkeypatch.setattr(module, "PROJECT_ROOT", tmp_path)
+        return tmp_path
+
+    @staticmethod
+    def snapshot(root):
+        return {path.name: path.read_text(encoding="utf-8") for path in sorted(root.rglob("*.json"))}
+
+    @pytest.mark.parametrize(
+        "call",
+        [
+            lambda: _tt.test_update(input_text="りんご"),
+            lambda: _tt.test_delete(input_text="りんご"),
+            lambda: _tt.test_reset_suzume(input_text="りんご", apply=True),
+        ],
+        ids=["update", "delete", "reset_suzume"],
+    )
+    def test_an_ambiguous_input_is_an_error_naming_every_candidate(self, corpus, call):
+        before = self.snapshot(corpus)
+
+        result = parse(run(call()))
+
+        assert result["status"] == "error"
+        assert "first/shared" in result["message"] and "second/shared_too" in result["message"]
+        assert self.snapshot(corpus) == before
+
+    def test_a_unique_input_resolves_its_case(self, corpus):
+        result = parse(run(_tt.test_delete(input_text="東京")))
+
+        assert result["status"] == "ok"
+        assert result["id"] == "solo"
+        remaining = json.loads((corpus / CORPUS_DIR / "first.json").read_text(encoding="utf-8"))["cases"]
+        assert [case["id"] for case in remaining] == ["shared"]
+
+    def test_a_file_id_selects_one_of_the_duplicates(self, corpus):
+        result = parse(run(_tt.test_delete(test_id="second/shared_too")))
+
+        assert result["status"] == "ok"
+        assert self.snapshot(corpus)["second.json"].count("りんご") == 0
+        assert "りんご" in self.snapshot(corpus)["first.json"]
+
+    def test_an_id_whose_input_differs_is_refused(self, corpus):
+        result = parse(run(_tt.test_delete(input_text="りんご", test_id="first/solo")))
+
+        assert result["status"] == "error"
+        assert "does not match" in result["message"]
+
+    def test_reports_list_every_location(self, corpus):
+        coverage = parse(run(_tt.test_check_coverage(inputs=["りんご", "東京"])))
+        duplicate = parse(run(_tt.test_add(input_text="りんご")))
+
+        assert coverage["existing"] == [
+            {"input": "りんご", "locations": ["first/shared", "second/shared_too"]},
+            {"input": "東京", "locations": ["first/solo"]},
+        ]
+        assert duplicate["status"] == "error"
+        assert duplicate["existing"] == ["first/shared", "second/shared_too"]
 
 
 class TestTestResetSuzume:

@@ -9,7 +9,6 @@ from ..core.suzume_cli import (
 )
 from ..core.test_file_suggestions import suggest_test_files
 from ..core.test_file_utils import (
-    find_test_by_input,
     generate_id,
     get_cases,
     get_test_data_dir,
@@ -20,6 +19,7 @@ from ..core.test_file_utils import (
 from ..server import PROJECT_ROOT, mcp
 from ._test_tools_common import (
     ORACLE_OVERRIDE_REMEDIATION,
+    _case_locations,
     _find_case,
     _format_expected_checked,
     _get_test_files_filtered,
@@ -73,11 +73,9 @@ async def test_add(
         return _json_error(_USE_SUZUME_REFUSAL)
 
     # Check for duplicates
-    existing = find_test_by_input(PROJECT_ROOT, input_text)
+    existing = _case_locations(PROJECT_ROOT, input_text)
     if existing:
-        return _json_error(
-            "Duplicate input rejected", existing={"file": existing["basename"], "index": existing["index"]}
-        )
+        return _json_error("Duplicate input rejected", existing=existing)
 
     try:
         tokens, source, rule = get_expected_tokens(input_text)
@@ -138,7 +136,8 @@ async def test_update(
     """Update an existing test case's expected value.
 
     Args:
-        input_text: Input text to find and update (mutually exclusive with test_id).
+        input_text: Input text to find and update. An input shared by several cases is
+            refused with their file/id selectors; pass test_id instead.
         test_id: Test ID to update (format: file/index or file/id_string).
         use_suzume: Rejected. Kept only so the refusal is reached instead of a schema error.
     """
@@ -182,7 +181,8 @@ async def test_delete(
     """Delete a test case.
 
     Args:
-        input_text: Input text to find and delete.
+        input_text: Input text to find and delete. An input shared by several cases is
+            refused with their file/id selectors; pass test_id instead.
         test_id: Test ID to delete (format: file/index or file/id_string).
     """
     found, error = _find_case(PROJECT_ROOT, input_text, test_id)
@@ -244,9 +244,9 @@ async def test_batch_add(
             skipped.append({"input": inp, "reason": "duplicate within request"})
             continue
         seen_inputs.add(inp)
-        existing = find_test_by_input(PROJECT_ROOT, inp)
+        existing = _case_locations(PROJECT_ROOT, inp)
         if existing:
-            skipped.append({"input": inp, "reason": f"exists at {existing['basename']}/{existing['index']}"})
+            skipped.append({"input": inp, "reason": f"exists at {', '.join(existing)}"})
             continue
         new_inputs.append(inp)
 
