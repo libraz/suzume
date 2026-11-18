@@ -988,9 +988,14 @@
           "surface": "の"
         },
         {
-          "lemma": "わりに",
-          "pos": "Adverb",
-          "surface": "わりに"
+          "lemma": "わり",
+          "pos": "Noun",
+          "surface": "わり"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
         },
         {
           "lemma": "若い",

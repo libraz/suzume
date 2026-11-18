@@ -37,6 +37,7 @@ from .postprocessors import (
     repair_regional_imperative,
     repair_sentence_final_godan_imperative,
     repair_te_negative_causal_shi,
+    split_attributive_wari_ni,
     split_demonstrative_dake,
     split_predicate_tokoro_ga,
     split_reason_nde,
@@ -326,6 +327,7 @@ def get_expected_tokens(text: str, suzume_tokens: list[dict] | None = None) -> t
     repair_mimetic_n_to_suru(raw_tokens)
     split_demonstrative_dake(raw_tokens)
     split_predicate_tokoro_ga(raw_tokens)
+    split_attributive_wari_ni(raw_tokens)
     merge_honorific_kana_verbal_noun(raw_tokens)
     _merge_ideographic_variation_selectors(raw_tokens)
 
