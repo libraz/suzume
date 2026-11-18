@@ -201,11 +201,15 @@ core::Expected<size_t, core::Error> BinaryDictionary::loadFromFile(const std::st
     return core::makeUnexpected(core::Error(core::ErrorCode::FileNotFound, "Failed to open dictionary file: " + path));
   }
 
-  size_t file_size = static_cast<size_t>(file.tellg());
-  file.seekg(0);
+  // tellg() reports failure as -1 (a directory, an unseekable stream), which must not become a size.
+  const std::streamoff end_offset = file.tellg();
+  if (end_offset < 0 || !file.seekg(0)) {
+    return core::makeUnexpected(core::Error(core::ErrorCode::InternalError, "Failed to read dictionary file: " + path));
+  }
+  const auto file_size = static_cast<size_t>(end_offset);
 
   std::vector<uint8_t> loaded_data(file_size);
-  if (!file.read(reinterpret_cast<char*>(loaded_data.data()), file_size)) {
+  if (!file.read(reinterpret_cast<char*>(loaded_data.data()), end_offset)) {
     return core::makeUnexpected(core::Error(core::ErrorCode::InternalError, "Failed to read dictionary file: " + path));
   }
 

@@ -97,6 +97,13 @@ TEST_F(BinaryDictTest, WriteAndLoadEmpty) {
   EXPECT_FALSE(result.hasValue());
 }
 
+TEST_F(BinaryDictTest, LoadFromDirectoryPathReportsAnError) {
+  // A directory opens as a stream on some platforms but has no size to read.
+  BinaryDictionary dict;
+  const auto result = dict.loadFromFile(std::filesystem::temp_directory_path().string());
+  EXPECT_FALSE(result.hasValue());
+}
+
 TEST_F(BinaryDictTest, WriteAndLoadSingleEntry) {
   BinaryDictWriter writer;
 
