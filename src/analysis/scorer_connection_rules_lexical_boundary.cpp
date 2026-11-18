@@ -319,8 +319,13 @@ void addBarredHostRules(const core::LatticeEdge& prev, const core::LatticeEdge& 
   const bool te_form_kana = grammar::isPureHiragana(prev.surface) && utf8::endsWithAny(prev.surface, {"て", "で"});
   const bool connective_before_subsidiary =
       prev.pos == core::PartOfSpeech::Conjunction && te_form_kana && grammar::isTeFormSubsidiaryLemma(next_lemma);
+  // The conjunctive て/で attaches to a predicate's continuative; a conjunction
+  // supplies none (かつて+見る, not かつ+て+見る).
+  const bool connective_before_te_particle = prev.pos == core::PartOfSpeech::Conjunction &&
+                                             next.extended_pos == core::ExtendedPOS::ParticleConj &&
+                                             grammar::isTeDeSurface(next.surface);
   if (barred_conjunction_host || barred_focus_particle_host || barred_kanji_formal_noun ||
-      connective_before_subsidiary) {
+      connective_before_subsidiary || connective_before_te_particle) {
     SUZUME_CONNECTION_ADD(bonus, cost::kProhibitive);
   }
   const bool conjunction_before_hiragana_de = prev.pos == core::PartOfSpeech::Conjunction &&

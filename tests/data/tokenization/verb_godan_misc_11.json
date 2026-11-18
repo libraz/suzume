@@ -2456,6 +2456,50 @@
       ],
       "id": "kettshite_kanai",
       "input": "けっして行かない"
+    },
+    {
+      "description": "One-mora kana ichidan continuative after a listed nominal is the lexical verb",
+      "expected": [
+        {
+          "lemma": "今日",
+          "pos": "Noun",
+          "surface": "今日"
+        },
+        {
+          "lemma": "みる",
+          "pos": "Verb",
+          "surface": "み"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "mita",
+      "input": "今日みた"
+    },
+    {
+      "description": "One-mora kana ichidan continuative after a listed adverb ending in te",
+      "expected": [
+        {
+          "lemma": "かつて",
+          "pos": "Adverb",
+          "surface": "かつて"
+        },
+        {
+          "lemma": "ねる",
+          "pos": "Verb",
+          "surface": "ね"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "katsuteneta",
+      "input": "かつてねた"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 11/11)",

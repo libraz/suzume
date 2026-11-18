@@ -557,19 +557,21 @@ bool followsListedAdverb(const std::vector<char32_t>& codepoints, size_t start_p
                                     partOfSpeechMask(core::PartOfSpeech::Adverb));
 }
 
-// A listed noun, or a katakana run, closes right before the き, and no listed
-// verb reads that き as its own okurigana (生+き+る, 書+き from 書く).
-bool nominalClosesBeforeKuru(const std::vector<char32_t>& codepoints, size_t start_pos,
-                             const dictionary::DictionaryManager* dict_manager) {
+// A listed noun, or a katakana run, closes right before a one-mora verb stem,
+// and no listed verb reads that mora as its own okurigana (生+き+る and 書+き
+// from 書く for き; 試+み+る and 読+み from 読む for み).
+bool nominalClosesBeforeOneMoraStem(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                    const dictionary::DictionaryManager* dict_manager) {
   constexpr size_t kMaxNounMorae = 4;
   constexpr size_t kMaxVerbStemKanji = 2;
-  if (start_pos == 0 || dict_manager == nullptr) {
+  if (start_pos == 0 || start_pos >= codepoints.size() || dict_manager == nullptr) {
     return false;
   }
+  const std::string_view godan_ending = grammar::godanBaseSuffixFromIRow(codepoints[start_pos]);
   for (size_t stem = 1; stem <= kMaxVerbStemKanji && stem <= start_pos; ++stem) {
     const size_t from = start_pos - stem;
     if (vh::isVerbInDictionary(dict_manager, codepoints, from, start_pos + 1, "る") ||
-        vh::isVerbInDictionary(dict_manager, codepoints, from, start_pos, "く")) {
+        (!godan_ending.empty() && vh::isVerbInDictionary(dict_manager, codepoints, from, start_pos, godan_ending))) {
       return false;
     }
   }
@@ -610,7 +612,7 @@ void appendKuruRenyokeiCandidates(const std::vector<char32_t>& codepoints, size_
       start_pos == 0 || normalize::classifyChar(codepoints[start_pos - 1]) == normalize::CharType::Symbol ||
       (normalize::isExtendedParticle(codepoints[start_pos - 1]) && codepoints[start_pos - 1] != U'で') ||
       followsListedAdverb(codepoints, start_pos, dict_manager) ||
-      nominalClosesBeforeKuru(codepoints, start_pos, dict_manager);
+      nominalClosesBeforeOneMoraStem(codepoints, start_pos, dict_manager);
   if (!left_boundary) {
     return;
   }
@@ -655,9 +657,10 @@ bool followsSubjectGenitiveRelativeClauseSlot(const dictionary::DictionaryManage
 
 // 1-char ichidan renyokei before て/た (ねて → ね + て). Requires the base form
 // (stem + る) in the dictionary, or — as for the passive stem before られる — an
-// Ichidan reading of the base in the predicate slot right after a case
-// particle (と+み+て, を+み+た). Contextual subsidiary verbs are generated
-// separately with their auxiliary ExtendedPOS.
+// Ichidan reading of the base in the predicate slot: after a case particle
+// (と+み+て, を+み+た), or where a listed adverb or nominal closes, as for the
+// one-mora き of 来る (かつて+み+た, 一度+み+た). Contextual subsidiary verbs are
+// generated separately with their auxiliary ExtendedPOS.
 void appendIchidanRenyokei1CharCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                           const grammar::Inflection& inflection,
                                           const dictionary::DictionaryManager* dict_manager,
@@ -673,7 +676,9 @@ void appendIchidanRenyokei1CharCandidates(const std::vector<char32_t>& codepoint
   const std::string base_form = stem_surface + "る";
   const bool base_is_dict_verb = vh::isVerbInDictionary(dict_manager, base_form);
   const bool follows_predicate_slot = vh::followsCaseParticle(dict_manager, codepoints, start_pos) ||
-                                      followsSubjectGenitiveRelativeClauseSlot(dict_manager, codepoints, start_pos);
+                                      followsSubjectGenitiveRelativeClauseSlot(dict_manager, codepoints, start_pos) ||
+                                      followsListedAdverb(codepoints, start_pos, dict_manager) ||
+                                      nominalClosesBeforeOneMoraStem(codepoints, start_pos, dict_manager);
   const bool predicate_slot_ichidan = !base_is_dict_verb && follows_predicate_slot &&
                                       vh::readsAsBaseForm(inflection, base_form, base_form, grammar::VerbType::Ichidan,
                                                           candidate::kV1PrefixMinConfidence) &&
