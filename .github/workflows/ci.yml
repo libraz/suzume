@@ -123,29 +123,16 @@ jobs:
         run: make cmake-smoke
 
   # The published Linux wheel is compiled inside the manylinux image, whose GCC
-  # is years older than the runner's. Without this job that compiler first meets
-  # the code during the tag-triggered publish, which is past the point where a
-  # release can be called off cleanly. Compile only: the wheel and its smoke test
-  # stay in publish.yml, and both read the image from the same tracked file.
+  # is years older than the runner's. Without this job that compiler, and the
+  # test suite run against the packaged wheel, first meet the code during the
+  # tag-triggered publish, which is past the point where a release can be called
+  # off cleanly. publish.yml runs the same script.
   manylinux-toolchain:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - name: Compile the core with the oldest supported toolchain
-        run: |
-          docker run --rm \
-            --user "$(id -u):$(id -g)" \
-            --volume "$GITHUB_WORKSPACE:/project" \
-            --workdir /project \
-            "$(cat scripts/manylinux-image.txt)" \
-            /bin/bash -euxo pipefail -c '
-              /opt/python/cp312-cp312/bin/python -m venv /tmp/suzume-toolchain
-              source /tmp/suzume-toolchain/bin/activate
-              python -m pip install --no-cache-dir "cmake==3.31.6"
-              cmake -B build-manylinux -DBUILD_SHARED=ON -DBUILD_TESTING=OFF \
-                -DCMAKE_BUILD_TYPE=Release -DENABLE_DEBUG_INFO=OFF -DENABLE_DEBUG_LOG=OFF
-              cmake --build build-manylinux --target suzume_shared --parallel
-            '
+      - name: Build and test the wheel with the oldest supported toolchain
+        run: bindings/python/manylinux_wheel.sh
 
   build-and-test:
     runs-on: ubuntu-latest

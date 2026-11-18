@@ -6,6 +6,7 @@ import json
 import os
 import subprocess
 import sysconfig
+from importlib import resources
 from io import StringIO
 from pathlib import Path
 from typing import TypedDict, cast
@@ -42,6 +43,10 @@ def _console_script() -> str:
     script = Path(sysconfig.get_path("scripts")) / executable
     assert script.is_file(), "the active Python environment has no suzume console script"
     return str(script)
+
+
+def _bundled_user_dictionary() -> bytes:
+    return resources.files("suzume").joinpath("user.dic").read_bytes()
 
 
 def _run_cli(
@@ -395,9 +400,8 @@ def test_relative_dictionary_path_and_uppercase_binary_extension(tmp_path: Path)
         for morpheme in json.loads(relative_result.stdout)["morphemes"]
     )
 
-    repository_root = Path(__file__).resolve().parents[3]
     uppercase_binary = tmp_path / "user.DIC"
-    uppercase_binary.write_bytes((repository_root / "data" / "user.dic").read_bytes())
+    uppercase_binary.write_bytes(_bundled_user_dictionary())
     uppercase_result = _run_cli("--dict", str(uppercase_binary), "--format", "json", "東京")
     assert uppercase_result.returncode == 0, uppercase_result.stderr
 
@@ -423,12 +427,10 @@ def test_invalid_binary_dictionary_fails(tmp_path: Path) -> None:
 
 
 def test_multiple_binary_dictionaries_load_additively(tmp_path: Path) -> None:
-    repository_root = Path(__file__).resolve().parents[3]
-    source_dictionary = repository_root / "data" / "user.dic"
     first = tmp_path / "first.dic"
     second = tmp_path / "second.dic"
-    first.write_bytes(source_dictionary.read_bytes())
-    second.write_bytes(source_dictionary.read_bytes())
+    first.write_bytes(_bundled_user_dictionary())
+    second.write_bytes(_bundled_user_dictionary())
     result = _run_cli("--dict", str(first), "--dict", str(second), "東京")
     assert result.returncode == 0, result.stderr
 

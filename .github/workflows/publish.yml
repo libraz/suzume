@@ -26,8 +26,18 @@ jobs:
           fi
           scripts/check_version_mirror.sh
 
-  publish-npm:
+  # Both registries ship the core with the debug features compiled out, so the
+  # suite must pass in that configuration as well as the default one.
+  native-tests:
     needs: verify-version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Run native tests in the default and shipped configurations
+        run: make native-test native-test-nodebug
+
+  publish-npm:
+    needs: [verify-version, native-tests]
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -50,26 +60,19 @@ jobs:
       - run: corepack enable
       - run: corepack prepare yarn@4.18.0 --activate
 
+      # The WASM link embeds the dictionaries the native CLI compiles.
       - name: Build native and compile dictionaries
         working-directory: ${{ github.workspace }}
-        run: |
-          cmake -B build -DBUILD_WASM=OFF
-          cmake --build build --parallel
-          cmake --build build --target build-dict
-
-      # Run the gtest binary directly; ctest registers each case separately, so it
-      # would spawn thousands of dictionary-loading processes. Non-gtest tests are
-      # still driven by ctest and must be named here.
-      - name: Run C++ tests
-        working-directory: ${{ github.workspace }}
-        run: |
-          ./build/bin/suzume_test
-          ctest --test-dir build --output-on-failure -R native_cli_contract
+        run: make dict
 
       - run: yarn install --immutable
       - run: yarn lint
       - run: yarn build
+      - name: Check WASM size regression
+        working-directory: ${{ github.workspace }}
+        run: scripts/check_wasm_size.sh bindings/wasm/dist/suzume.wasm
       - run: yarn test
+      - run: yarn test:examples
       - name: Publish to npm (skip if the version is already published)
         run: |
           PKG=$(node -p "require('./package.json').name")
@@ -85,25 +88,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - name: Build and smoke-test manylinux2014 x86_64 wheel
-        run: |
-          docker run --rm \
-            --user "$(id -u):$(id -g)" \
-            --volume "$GITHUB_WORKSPACE:/project" \
-            --workdir /project \
-            "$(cat scripts/manylinux-image.txt)" \
-            /bin/bash -euxo pipefail -c '
-              /opt/python/cp312-cp312/bin/python -m venv /tmp/suzume-wheel-build
-              source /tmp/suzume-wheel-build/bin/activate
-              python -m pip install --no-cache-dir \
-                "auditwheel==6.4.2" \
-                "cmake==3.31.6" \
-                "wheel==0.45.1"
-              bindings/python/build_wheel.sh
-              for wheel in bindings/python/dist/*.whl; do
-                bindings/python/smoke_wheel.sh "$wheel"
-              done
-            '
+      - name: Build and test manylinux2014 x86_64 wheel
+        run: bindings/python/manylinux_wheel.sh
       - uses: actions/upload-artifact@v7
         with:
           name: wheels-linux-x86_64
@@ -126,13 +112,18 @@ jobs:
           for wheel in bindings/python/dist/*.whl; do
             bindings/python/smoke_wheel.sh "$wheel"
           done
+      - name: Run the binding test suite against the wheel
+        run: |
+          for wheel in bindings/python/dist/*.whl; do
+            bindings/python/test_wheel.sh "$wheel"
+          done
       - uses: actions/upload-artifact@v7
         with:
           name: wheels-macos-arm64
           path: bindings/python/dist/*.whl
 
   publish-pypi:
-    needs: [build-linux-wheel, build-macos-wheel]
+    needs: [native-tests, build-linux-wheel, build-macos-wheel]
     runs-on: ubuntu-latest
     environment:
       name: pypi
