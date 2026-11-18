@@ -264,6 +264,28 @@
       ],
       "id": "betehayomimasu",
       "input": "食べてはよみます"
+    },
+    {
+      "description": "もうみます - auto-generated",
+      "expected": [
+        {
+          "lemma": "もう",
+          "pos": "Adverb",
+          "surface": "もう"
+        },
+        {
+          "lemma": "みる",
+          "pos": "Verb",
+          "surface": "み"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "moumimasu",
+      "input": "もうみます"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 12/12)",
