@@ -715,8 +715,6 @@ bool setAuxiliaryAndNounCosts(BigramMatrix& table) {
       {EPOS::ParticleCase, EPOS::AuxAspectOku, cost::kProhibitive},
       {EPOS::ParticleAdverbial, EPOS::AuxAspectOku, cost::kProhibitive},
       {EPOS::ParticleConjFinite, EPOS::AuxAspectOku, cost::kProhibitive},
-      // A bare nominal is no verb either (ごはん+おい+しい is ごはん+おいしい).
-      {EPOS::Noun, EPOS::AuxAspectOku, cost::kProhibitive},
 
       // A finished predicate takes a following determiner only as a relative
       // clause skipping over it (買った+この+本), which is rare but grammatical.
@@ -899,16 +897,9 @@ bool setAuxiliaryAndNounCosts(BigramMatrix& table) {
       {EPOS::Adverb, EPOS::AuxTenseMasu, cost::kSevere},
       {EPOS::Adverb, EPOS::AuxAspectIru, cost::kSevere},
 
-      // Noun → aspect auxiliary いる/くる (驚+い, 先生+き): aspect attaches only to a
-      // te-form, never a bare noun (食べて+いた, 走って+きた). Prevents 間続+い+た and
-      // overcomes the DET→NOUN bonus on prefix compounds like 先生. Both rows are
-      // prohibitive, so a kana い after a bare noun is the main verb いる
-      // (人+い+ない), never the aspect auxiliary.
-      {EPOS::Noun, EPOS::AuxAspectIru, cost::kProhibitive},
-      {EPOS::Noun, EPOS::AuxAspectKuru, cost::kProhibitive},
-      // A pronoun, a case or binding particle and the copula host no te-form
-      // either (彼が+とっ+さ is 彼が+とっさ, ゆっくり+な+でる is ゆっくり+なでる).
-      {EPOS::Pronoun, EPOS::AuxAspectIru, cost::kSevere},
+      // A nominal never hosts an aspect auxiliary (setNominalParticleCosts);
+      // a case or binding particle and the copula host no te-form either
+      // (彼が+とっ+さ is 彼が+とっさ, ゆっくり+な+でる is ゆっくり+なでる).
       {EPOS::ParticleCase, EPOS::AuxAspectIru, cost::kSevere},
       {EPOS::ParticleBinding, EPOS::AuxAspectIru, cost::kSevere},
       {EPOS::AuxCopulaDa, EPOS::AuxAspectIru, cost::kSevere},

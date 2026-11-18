@@ -75,6 +75,13 @@ bool applyNominalHeadRules(BigramMatrix& table) {
       // and the fixed indefinite pronoun 何かしら.
       all_applied = applyRule(table, head, EPOS::ParticleFinal, cost::kModerateBonus) && all_applied;
     }
+    // An aspect auxiliary selects a verb's te-form or continuative, which no
+    // nominal supplies (すべて+しまっ+た is the lexical しまう, 先生+き+た 来る).
+    for (size_t aspect = 0; aspect < static_cast<size_t>(EPOS::Count_); ++aspect) {
+      if (core::isAspectAuxiliaryType(static_cast<EPOS>(aspect))) {
+        all_applied = applyRule(table, head, static_cast<EPOS>(aspect), cost::kProhibitive) && all_applied;
+      }
+    }
   }
   return all_applied;
 }

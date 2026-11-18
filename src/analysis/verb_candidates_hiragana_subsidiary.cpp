@@ -19,17 +19,19 @@
 namespace suzume::analysis::hiragana_verb_detail {
 namespace vh = verb_helpers;
 
-bool isClearTeFormBeforeSubsidiary(const std::vector<char32_t>& codepoints, size_t start_pos, bool allow_emphatic_mo) {
+bool isClearTeFormBeforeSubsidiary(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                   bool allow_binding_particle) {
   if (start_pos == 0) {
     return false;
   }
   if (codepoints[start_pos - 1] == core::hiragana::kTe) {
     return true;
   }
-  // Emphatic ても/でも keeps the same te-form attachment (思ってもみる,
-  // 読んでもみる). Retain the voiced-onbin guard for で so an ordinary
+  // A binding particle on the te-form keeps the same attachment (思ってもみる,
+  // 読んではみる). Retain the voiced-onbin guard for で so an ordinary
   // case-particle sequence such as 外でもみる stays lexical.
-  if (allow_emphatic_mo && codepoints[start_pos - 1] == U'も' && start_pos >= 2) {
+  const char32_t binder = codepoints[start_pos - 1];
+  if (allow_binding_particle && (binder == U'も' || binder == U'は') && start_pos >= 2) {
     if (codepoints[start_pos - 2] == core::hiragana::kTe) {
       return true;
     }

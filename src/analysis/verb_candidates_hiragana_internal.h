@@ -95,7 +95,8 @@ void appendEruObligationCandidates(const std::vector<char32_t>& codepoints, size
 void appendSuruSubsidiaryCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                     const dictionary::DictionaryManager* dict_manager,
                                     std::vector<UnknownCandidate>& candidates);
-bool isClearTeFormBeforeSubsidiary(const std::vector<char32_t>& codepoints, size_t start_pos, bool allow_emphatic_mo);
+bool isClearTeFormBeforeSubsidiary(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                   bool allow_binding_particle);
 void appendContextualSubsidiaryCandidate(const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos,
                                          std::string_view lemma, dictionary::ConjugationType conj_type,
                                          core::ExtendedPOS extended_pos, const char* pattern, float candidate_cost,

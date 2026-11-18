@@ -2500,6 +2500,84 @@
       ],
       "id": "katsuteneta",
       "input": "かつてねた"
+    },
+    {
+      "description": "A nominal cannot host the completive auxiliary; しまう is the lexical verb",
+      "expected": [
+        {
+          "lemma": "すべて",
+          "pos": "Noun",
+          "surface": "すべて"
+        },
+        {
+          "lemma": "しまう",
+          "pos": "Verb",
+          "surface": "しまっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "subeteshimattta",
+      "input": "すべてしまった"
+    },
+    {
+      "description": "A nominal ending in te cannot host the attemptive auxiliary; みる is the lexical verb",
+      "expected": [
+        {
+          "lemma": "すべて",
+          "pos": "Noun",
+          "surface": "すべて"
+        },
+        {
+          "lemma": "みる",
+          "pos": "Verb",
+          "surface": "みる"
+        }
+      ],
+      "id": "subetemiru",
+      "input": "すべてみる"
+    },
+    {
+      "description": "Kanji spelling of the nominal before the lexical verb しまう",
+      "expected": [
+        {
+          "lemma": "全て",
+          "pos": "Noun",
+          "surface": "全て"
+        },
+        {
+          "lemma": "しまう",
+          "pos": "Verb",
+          "surface": "しまっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "teshimattta",
+      "input": "全てしまった"
+    },
+    {
+      "description": "A pronoun cannot host the completive auxiliary; しまう is the lexical verb",
+      "expected": [
+        {
+          "lemma": "これ",
+          "pos": "Pronoun",
+          "surface": "これ"
+        },
+        {
+          "lemma": "しまう",
+          "pos": "Verb",
+          "surface": "しまう"
+        }
+      ],
+      "id": "koreshimau",
+      "input": "これしまう"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 11/11)",
