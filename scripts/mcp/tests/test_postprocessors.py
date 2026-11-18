@@ -15,6 +15,7 @@ from suzume_mcp.core.postprocessors import (
     postprocess_closed_function_words,
     postprocess_closed_subsidiary_aux,
     postprocess_compound_case_particle_aru,
+    postprocess_conjunction_te_adverb,
     postprocess_copula_neg,
     postprocess_de_particle,
     postprocess_demo,
@@ -60,6 +61,7 @@ from suzume_mcp.core.postprocessors import (
     postprocess_temporal_nao,
     postprocess_to_areba_conditional,
     postprocess_tsuke_noun,
+    postprocess_verbal_nominalizer_mi,
     postprocess_you_noun,
     preprocess_for_mecab,
 )
@@ -535,23 +537,81 @@ class TestPostprocessClassicalPerfectAux:
 
 class TestPostprocessMiruAux:
     def test_miru_after_te(self):
-        tokens = [_tok("て", "Particle"), _tok("み", "Verb", lemma="みる")]
+        tokens = [_tok("食べ", "Verb", lemma="食べる"), _tok("て", "Particle"), _tok("み", "Verb", lemma="みる")]
         postprocess_miru_aux(tokens)
-        assert tokens[1]["pos"] == "Auxiliary"
+        assert tokens[2]["pos"] == "Auxiliary"
 
-    def test_miru_after_emphatic_mo(self):
+    @pytest.mark.parametrize("binding", ["も", "は"])
+    def test_miru_after_a_binding_particle(self, binding):
         tokens = [
-            _tok("て", "Particle"),
-            _tok("も", "Particle"),
+            _tok("読ん", "Verb", lemma="読む"),
+            _tok("で", "Particle"),
+            _tok(binding, "Particle", pos_sub1="係助詞"),
             _tok("み", "Verb", lemma="みる"),
         ]
         postprocess_miru_aux(tokens)
-        assert tokens[2]["pos"] == "Auxiliary"
+        assert tokens[3] == _tok("み", "Auxiliary", lemma="みる")
+
+    def test_miseru_after_a_binding_particle(self):
+        tokens = [
+            _tok("書い", "Verb", lemma="書く"),
+            _tok("て", "Particle"),
+            _tok("は", "Particle", pos_sub1="係助詞"),
+            _tok("みせる", "Verb"),
+        ]
+        postprocess_miru_aux(tokens)
+        assert tokens[3] == _tok("みせる", "Auxiliary")
+
+    @pytest.mark.parametrize("binding", [None, "は"])
+    def test_miru_after_a_nominal_and_case_de_stays_a_verb(self, binding):
+        tokens = [_tok("東京", "Noun"), _tok("で", "Particle")]
+        tokens += [_tok(binding, "Particle", pos_sub1="係助詞")] if binding else []
+        tokens += [_tok("み", "Verb", lemma="みる")]
+        postprocess_miru_aux(tokens)
+        assert tokens[-1]["pos"] == "Verb"
 
     def test_miru_standalone(self):
         tokens = [_tok("花", "Noun"), _tok("を", "Particle"), _tok("みる", "Verb")]
         postprocess_miru_aux(tokens)
         assert tokens[2]["pos"] == "Verb"
+
+
+class TestPostprocessVerbalNominalizerMi:
+    def test_after_a_verb_continuative_it_is_the_suffix(self):
+        tokens = [_tok("分かり", "Verb", lemma="分かる"), _tok("み", "Auxiliary", lemma="みる")]
+        assert postprocess_verbal_nominalizer_mi(tokens)
+        assert tokens[1] == _tok("み", "Suffix")
+
+    def test_after_an_adjective_stem_it_joins_the_noun(self):
+        tokens = [_tok("しんど", "Adjective", lemma="しんどい"), _tok("み", "Auxiliary", lemma="みる")]
+        assert postprocess_verbal_nominalizer_mi(tokens)
+        assert tokens == [_tok("しんどみ", "Noun")]
+
+    def test_after_an_adjective_continuative_it_is_the_lexical_verb(self):
+        tokens = [
+            _tok("よく", "Adjective", lemma="よい"),
+            _tok("み", "Auxiliary", lemma="みる"),
+            _tok("た", "Auxiliary"),
+        ]
+        assert postprocess_verbal_nominalizer_mi(tokens)
+        assert tokens[:2] == [_tok("よく", "Adjective", lemma="よい"), _tok("み", "Verb", lemma="みる")]
+
+    def test_after_an_adverb_ending_in_te_it_is_the_lexical_verb(self):
+        tokens = [_tok("かつて", "Adverb"), _tok("み", "Auxiliary", lemma="みる")]
+        assert postprocess_verbal_nominalizer_mi(tokens)
+        assert tokens[1] == _tok("み", "Verb", lemma="みる")
+
+
+class TestPostprocessConjunctionTeAdverb:
+    def test_conjunction_and_te_rejoin_as_an_adverb(self):
+        tokens = [_tok("かつ", "Conjunction"), _tok("て", "Particle"), _tok("み", "Auxiliary", lemma="みる")]
+        assert postprocess_conjunction_te_adverb(tokens)
+        assert tokens[0] == _tok("かつて", "Adverb")
+        assert len(tokens) == 2
+
+    def test_case_de_after_a_conjunction_is_left_alone(self):
+        tokens = [_tok("ただ", "Conjunction"), _tok("で", "Particle")]
+        assert not postprocess_conjunction_te_adverb(tokens)
 
 
 class TestPostprocessShimauAux:

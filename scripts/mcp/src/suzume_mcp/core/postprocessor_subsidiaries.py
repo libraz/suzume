@@ -68,6 +68,11 @@ def postprocess_closed_subsidiary_aux(tokens: list[dict]) -> bool:
     return changed
 
 
+def _is_focus_particle(token: dict) -> bool:
+    """A binding or adverbial particle, which may sit inside a te-form frame."""
+    return token.get("pos") == "Particle" and (token.get("pos_sub1") or "").startswith(("係助詞", "副助詞"))
+
+
 @reports_mutation
 def postprocess_iru_aux(tokens: list[dict]) -> bool:
     """Fix dependent い/いる after a te-form: Verb -> Auxiliary."""
@@ -84,8 +89,7 @@ def postprocess_iru_aux(tokens: list[dict]) -> bool:
         # 読んで+ばかり+いる) without making いる existential.
         focused_te_form = (
             surface in ("い", "いる")
-            and tokens[i - 1].get("pos") == "Particle"
-            and (tokens[i - 1].get("pos_sub1") or "").startswith(("係助詞", "副助詞"))
+            and _is_focus_particle(tokens[i - 1])
             and i >= 2
             and tokens[i - 2].get("surface") in ("て", "で")
         )
@@ -174,32 +178,49 @@ def postprocess_contracted_progressive_aux(tokens: list[dict]) -> bool:
     return changed
 
 
+# Parts of speech whose continuative takes the conjunctive て/で.
+_TE_FORM_HOST_POS = frozenset({"Verb", "Adjective", "Auxiliary"})
+
+
 @reports_mutation
 def postprocess_miru_aux(tokens: list[dict]) -> bool:
-    """Classify trial みる after a te-form boundary as Auxiliary."""
-    trial_surfaces = {"み", "みる", "みれ", "みろ", "みよ"}
+    """Classify trial みる and demonstrative みせる after a te-form as Auxiliary.
+
+    A binding particle between the te-form and the subsidiary keeps the
+    attachment (読んではみた, 書いてもみせる), as it does for いる. The て/で must
+    follow a predicate: after a nominal, で is a case particle (東京でみた).
+    """
+
+    def follows_te_form(te_idx: int) -> bool:
+        return (
+            te_idx > 0
+            and tokens[te_idx].get("surface") in ("て", "で")
+            and tokens[te_idx - 1].get("pos") in _TE_FORM_HOST_POS
+        )
+
+    subsidiary_lemmas = {
+        **dict.fromkeys(("み", "みる", "みれ", "みろ", "みよ"), "みる"),
+        **dict.fromkeys(("みせ", "みせる", "みせれ", "みせろ", "みせよ"), "みせる"),
+    }
     # 食べてみな is the trial み plus the imperative な, not the pronoun みな.
     for idx in range(len(tokens) - 1, 0, -1):
-        if (
-            tokens[idx].get("surface") == "みな"
-            and tokens[idx].get("pos") == "Pronoun"
-            and tokens[idx - 1].get("surface") in ("て", "で")
-        ):
+        if tokens[idx].get("surface") == "みな" and tokens[idx].get("pos") == "Pronoun" and follows_te_form(idx - 1):
             tokens[idx : idx + 1] = [
                 {"surface": "み", "pos": "Auxiliary", "lemma": "みる"},
                 {"surface": "な", "pos": "Particle", "lemma": "な"},
             ]
     for idx in range(1, len(tokens)):
         token = tokens[idx]
-        if token.get("surface") not in trial_surfaces:
+        lemma = subsidiary_lemmas.get(token.get("surface", ""))
+        if lemma is None:
             continue
         prev_idx = idx - 1
-        if tokens[prev_idx].get("surface") == "も" and prev_idx > 0:
+        if _is_focus_particle(tokens[prev_idx]) and prev_idx > 0:
             prev_idx -= 1
-        if tokens[prev_idx].get("surface") not in ("て", "で"):
+        if not follows_te_form(prev_idx):
             continue
         token["pos"] = "Auxiliary"
-        token["lemma"] = "みる"
+        token["lemma"] = lemma
 
 
 def postprocess_shimau_aux(tokens: list[dict]) -> bool:

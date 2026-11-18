@@ -106,6 +106,29 @@ def postprocess_tada(tokens: list[dict]) -> bool:
             t["lemma"] = "ただ"
 
 
+def postprocess_conjunction_te_adverb(tokens: list[dict]) -> bool:
+    """Rejoin a conjunction and a following conjunctive て into one adverb.
+
+    A conjunction has no te-form, so conjunction + て is never a grammatical
+    chain; the span is the adverb MeCab split (かつ + て → かつて). で is not
+    included: after a conjunction it is a case particle (ただ + で).
+    """
+    changed = False
+    idx = 0
+    while idx + 1 < len(tokens):
+        token, following = tokens[idx], tokens[idx + 1]
+        if (
+            token.get("pos") == "Conjunction"
+            and following.get("surface") == "て"
+            and following.get("pos") == "Particle"
+        ):
+            adverb = token.get("surface", "") + "て"
+            tokens[idx : idx + 2] = [{"surface": adverb, "pos": "Adverb", "lemma": adverb}]
+            changed = True
+        idx += 1
+    return changed
+
+
 def postprocess_l2_noun_context(tokens: list[dict]) -> bool:
     """Prefer an L2 noun homograph in contexts that select a nominal."""
     lexical_nouns = core_headwords("nouns.tsv")
@@ -588,6 +611,12 @@ def postprocess_adjective_nominalizer(tokens: list[dict]) -> bool:
     return changed
 
 
+def _is_adjective_stem(token: dict) -> bool:
+    """True for a bare i-adjective stem (嬉し of 嬉しい) or a na-adjective (無理)."""
+    surface, lemma = token.get("surface", ""), token.get("lemma", "")
+    return lemma in (surface, surface + "い")
+
+
 def postprocess_verbal_nominalizer_mi(tokens: list[dict]) -> bool:
     """Classify the productive nominalizing み that MeCab reads as みる.
 
@@ -596,7 +625,8 @@ def postprocess_verbal_nominalizer_mi(tokens: list[dict]) -> bool:
     continuative it is the nominalizing suffix (分かり + み + が). On an
     adjective stem it is the property nominal the merge pipeline already
     joins when MeCab tags it as a suffix (嬉しみ, 痛み), so it joins here too
-    (しんどみ, 無理み).
+    (しんどみ, 無理み). After an adjective continuative or an adverb, which
+    modify a predicate, it is the lexical verb みる (よく + み + た).
     """
     changed = False
     idx = 1
@@ -606,12 +636,16 @@ def postprocess_verbal_nominalizer_mi(tokens: list[dict]) -> bool:
         if (
             token.get("surface") != "み"
             or token.get("lemma") != "みる"
-            or previous.get("pos") not in ("Verb", "Adjective")
-            or previous.get("surface", "").endswith(("て", "で"))
+            or previous.get("pos") not in ("Verb", "Adjective", "Adverb")
+            # A predicate ending in て/で is a te-form host; an adverb (かつて) is not.
+            or (previous.get("pos") != "Adverb" and previous.get("surface", "").endswith(("て", "で")))
         ):
             idx += 1
             continue
-        if previous.get("pos") == "Adjective":
+        if previous.get("pos") == "Adverb" or (previous.get("pos") == "Adjective" and not _is_adjective_stem(previous)):
+            token["pos"] = "Verb"
+            idx += 1
+        elif previous.get("pos") == "Adjective":
             combined = previous.get("surface", "") + "み"
             tokens[idx - 1 : idx + 1] = [{"surface": combined, "pos": "Noun", "lemma": combined}]
         else:

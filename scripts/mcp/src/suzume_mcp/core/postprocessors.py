@@ -142,6 +142,7 @@ postprocess_ka_suru_noun = postprocessor_nominals.postprocess_ka_suru_noun
 postprocess_l2_noun_context = postprocessor_nominals.postprocess_l2_noun_context
 postprocess_prolonged_sound_noun = postprocessor_nominals.postprocess_prolonged_sound_noun
 postprocess_tada = postprocessor_nominals.postprocess_tada
+postprocess_conjunction_te_adverb = postprocessor_nominals.postprocess_conjunction_te_adverb
 postprocess_taihen = postprocessor_nominals.postprocess_taihen
 postprocess_temporal_nao = postprocessor_nominals.postprocess_temporal_nao
 postprocess_tsuke_noun = postprocessor_nominals.postprocess_tsuke_noun
@@ -219,6 +220,7 @@ POSTPROCESSORS: tuple[tuple[str, Callable[[list[dict]], bool]], ...] = (
     ("katakana-godan-te-form", postprocess_katakana_godan_te_form),
     ("ikaga-adverb", postprocess_ikaga),
     ("tada-context", postprocess_tada),
+    ("conjunction-te-adverb", postprocess_conjunction_te_adverb),
     ("demo-particle", postprocess_demo),
     ("hiragana-yaka-adverbial", postprocess_hiragana_yaka_adverbial),
     ("closed-function-word-pos", postprocess_closed_function_words),
