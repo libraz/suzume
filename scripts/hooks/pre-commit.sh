@@ -58,15 +58,15 @@ if [ -n "$python_binding$repository_scripts" ]; then
         status=1
     else
         if [ -n "$python_binding" ]; then
-            if ! (cd bindings/python && uv run --locked ruff format --check . \
-                && uv run --locked ruff check .) >/dev/null 2>&1; then
+            if ! (cd bindings/python && uv run --locked ruff format --quiet --check . \
+                && uv run --locked ruff check --quiet .); then
                 echo "[pre-commit] Python binding formatting/lint issues (ruff)."
                 status=1
             fi
         fi
         if [ -n "$repository_scripts" ]; then
-            if ! (cd scripts/mcp && uv run --locked ruff format --check . ../../scripts/*.py \
-                && uv run --locked ruff check . ../../scripts/*.py) >/dev/null 2>&1; then
+            if ! (cd scripts/mcp && uv run --locked ruff format --quiet --check . ../../scripts/*.py \
+                && uv run --locked ruff check --quiet . ../../scripts/*.py); then
                 echo "[pre-commit] MCP server/repository script formatting or lint issues (ruff)."
                 status=1
             fi
