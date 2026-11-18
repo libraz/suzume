@@ -319,7 +319,10 @@ bool isOutOfPlaceForWordClass(const DictionaryCandidateContext& ctx, const core:
   const auto& byte_offsets = ctx.byte_offsets;
   const size_t start_pos = ctx.start_pos;
   const auto& lookup_results = ctx.lookup_results;
-  const bool suppress_prefixed_noun_interior = ctx.suppress_prefixed_noun_interior;
+  // A position inside a prefixed noun is vetoed for every dictionary result.
+  if (ctx.suppress_prefixed_noun_interior) {
+    return true;
+  }
   const size_t longest_conjunction = ctx.longest_conjunction;
   const size_t longest_fixed_conjunction = ctx.longest_fixed_conjunction;
   const size_t longest_adverb = ctx.longest_adverb;
@@ -622,10 +625,6 @@ bool isOutOfPlaceForWordClass(const DictionaryCandidateContext& ctx, const core:
                                         codepoints[start_pos + 1] == U'も' &&
                                         hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::VerbOnbinkei);
   if (fused_demo_after_te_form) {
-    return true;
-  }
-
-  if (suppress_prefixed_noun_interior) {
     return true;
   }
 
