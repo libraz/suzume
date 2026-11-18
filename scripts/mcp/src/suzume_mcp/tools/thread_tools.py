@@ -174,16 +174,14 @@ def _process_lines(
     for current_line in range(start, len(all_lines) + 1):
         if processed >= limit:
             break
-        line = all_lines[current_line - 1] if current_line <= len(all_lines) else ""
-
-        if not line or len(line) < 2 or not _is_japanese(line):
-            skipped += 1
-            max_line = current_line
-            processed += 1
-            continue
-
+        line = all_lines[current_line - 1]
         max_line = current_line
         processed += 1
+
+        if len(line) < 2 or not _is_japanese(line):
+            skipped += 1
+            continue
+
         try:
             result = _compare_surfaces(line)
         except Exception as e:

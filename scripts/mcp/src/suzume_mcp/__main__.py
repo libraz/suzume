@@ -27,15 +27,9 @@ def cmd_normalize(args: list[str]) -> None:
 
     batch = "--batch" in args
     raw_mecab = "--mecab" in args
-    texts: list[str] = []
 
     if batch:
-        data = json.loads(sys.stdin.read())
-        if isinstance(data, list):
-            texts = data
-        else:
-            print(json.dumps({"error": "Expected JSON array on stdin"}), file=sys.stderr)
-            sys.exit(1)
+        texts = _read_json_array()
     else:
         non_flag = [a for a in args if not a.startswith("-")]
         if not non_flag:
