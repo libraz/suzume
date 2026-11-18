@@ -36,8 +36,8 @@ bool hasPrecedingSahenNominal(const core::Lattice& lattice, size_t end_pos) {
     // script rather than on its class.
     constexpr size_t kMinSahenNominalLength = 2;
     return edge.pos == core::PartOfSpeech::Noun &&
-           (edge.fromDictionary() || ((grammar::isAllKanji(edge.surface) || normalize::isAllKatakana(edge.surface)) &&
-                                      normalize::utf8Length(edge.surface) >= kMinSahenNominalLength));
+           (edge.dictionaryBacked() || ((grammar::isAllKanji(edge.surface) || normalize::isAllKatakana(edge.surface)) &&
+                                        normalize::utf8Length(edge.surface) >= kMinSahenNominalLength));
   });
 }
 

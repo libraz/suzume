@@ -43,7 +43,10 @@ struct Morpheme {
    */
   std::string_view getLemma() const { return lemma.empty() ? surface : lemma; }
 
+  // Published: the surface is a dictionary entry.
   bool fromDictionary() const { return hasFlag(flags, EdgeFlags::FromDictionary); }
+  // Internal evidence: an entry, or a rule composition of entries. Never published.
+  bool dictionaryBacked() const { return fromDictionary() || hasFlag(flags, EdgeFlags::DictionaryComposed); }
   bool fromUserDict() const { return hasFlag(flags, EdgeFlags::FromUserDict); }
   bool isFormalNoun() const { return hasFlag(flags, EdgeFlags::IsFormalNoun); }
   bool isUnknown() const { return hasFlag(flags, EdgeFlags::IsUnknown); }

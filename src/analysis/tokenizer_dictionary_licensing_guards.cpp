@@ -480,7 +480,7 @@ bool lacksLicensingEnvironment(const DictionaryCandidateContext& ctx, const core
       ((normalize::isKanjiCodepoint(codepoints[start_pos - 1]) &&
         !core::anyEdgeEndingAt(lattice, start_pos,
                                [](const core::LatticeEdge& edge) {
-                                 return edge.pos == core::PartOfSpeech::Noun && edge.fromDictionary() &&
+                                 return edge.pos == core::PartOfSpeech::Noun && edge.dictionaryBacked() &&
                                         edge.end - edge.start >= 2;
                                })) ||
        core::anyEdgeEndingAt(lattice, start_pos, [](const core::LatticeEdge& edge) {

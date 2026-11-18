@@ -135,7 +135,7 @@ float computeNegativeAndNounVerbBonus(const core::LatticeEdge& prev, const core:
   // but are actually 未然形 — bonus would incorrectly boost 走ら+ない split
   const bool dictionary_renyokei_negative =
       prev.pos == core::PartOfSpeech::Verb && prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
-      prev.fromDictionary() && prev.surface != "で" && !grammar::endsWithARow(prev.surface) &&
+      prev.dictionaryBacked() && prev.surface != "で" && !grammar::endsWithARow(prev.surface) &&
       (next.pos == core::PartOfSpeech::Adjective || next.pos == core::PartOfSpeech::Auxiliary) &&
       utf8::equalsAny(next.surface, {"なく", "ない", "なかっ", "なけれ"});
   const bool adjective_conditional_negative = prev.extended_pos == core::ExtendedPOS::AdjRenyokei &&
@@ -302,11 +302,11 @@ float computeNegativeAndNounVerbBonus(const core::LatticeEdge& prev, const core:
   // content word either, and a bare noun cannot stand directly before one
   // (先生+たち is the plural suffix, not 先生+立ち). The sa-row continuative and
   // the potential of する (外出+でき) are the productive exceptions.
-  const bool bare_kana_continuative_host = next.fromDictionary() && grammar::isPureHiragana(next.surface) &&
+  const bool bare_kana_continuative_host = next.dictionaryBacked() && grammar::isPureHiragana(next.surface) &&
                                            !grammar::isSuruRenyokeiSurface(next.surface) && next.lemma != "できる";
   const bool attested_noun_before_finite_iru =
       prev.has_finite_existential_continuation && prev.pos == core::PartOfSpeech::Noun &&
-      (prev.origin == core::CandidateOrigin::Counter || prev.fromDictionary()) && next.fromDictionary() &&
+      (prev.origin == core::CandidateOrigin::Counter || prev.dictionaryBacked()) && next.dictionaryBacked() &&
       next.pos == core::PartOfSpeech::Verb && next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
       next.lemma == "いる";
   const bool bare_kanji_host =

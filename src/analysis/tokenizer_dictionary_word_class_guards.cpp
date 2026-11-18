@@ -77,7 +77,7 @@ bool startsInsideVerifiedPredicate(const core::Lattice& lattice, const std::vect
     // at start_pos (な|んか|もう → かも) is that word's fragment, not a witness.
     const auto ends_function_word_here = [&](bool same_start) {
       return core::anyEdgeEndingAt(lattice, start_pos, [edge_start, same_start](const core::LatticeEdge& word) {
-        return (same_start ? word.start == edge_start : word.start < edge_start) && word.fromDictionary() &&
+        return (same_start ? word.start == edge_start : word.start < edge_start) && word.dictionaryBacked() &&
                (word.pos == core::PartOfSpeech::Particle || word.pos == core::PartOfSpeech::Auxiliary);
       });
     };
@@ -134,7 +134,7 @@ bool opensOnContentWordTailBeforeParticle(const core::Lattice& lattice,
   const auto crosses_dictionary_boundary = [&lattice](const core::LatticeEdge& edge) {
     for (size_t interior = edge.start + 1; interior < edge.end; ++interior) {
       if (core::anyEdgeEndingAt(lattice, interior,
-                                [](const core::LatticeEdge& inner) { return inner.fromDictionary(); })) {
+                                [](const core::LatticeEdge& inner) { return inner.dictionaryBacked(); })) {
         return true;
       }
     }
@@ -204,7 +204,7 @@ bool crossesAttributiveNaHonorificNominal(const core::Lattice& lattice, const st
   }
 
   return core::anyEdgeEndingAt(lattice, start_pos, [](const core::LatticeEdge& edge) {
-    return edge.extended_pos == core::ExtendedPOS::AdjNaAdj && edge.fromDictionary();
+    return edge.extended_pos == core::ExtendedPOS::AdjNaAdj && edge.dictionaryBacked();
   });
 }
 

@@ -38,7 +38,7 @@ float Scorer::eosCost(const core::LatticeEdge& edge, core::ExtendedPOS prev_exte
 
   // Only after content: a lone adverb (the whole input or a fragment after a
   // punctuation mark) is the clause opener itself.
-  if (edge.pos == core::PartOfSpeech::Adverb && edge.fromDictionary() &&
+  if (edge.pos == core::PartOfSpeech::Adverb && edge.dictionaryBacked() &&
       connection_rules::adverbSpellsPredicateCell(edge.surface) && prev_extended_pos != core::ExtendedPOS::Unknown &&
       prev_extended_pos != core::ExtendedPOS::Symbol) {
     return sc::kEosTeEndingAdverbPenalty;
@@ -46,7 +46,7 @@ float Scorer::eosCost(const core::LatticeEdge& edge, core::ExtendedPOS prev_exte
 
   // A fabricated continuative after a one-character noun that closes the
   // utterance is the okurigana tail of a nominalized verb compound (日暮れ).
-  if (edge.extended_pos == core::ExtendedPOS::VerbRenyokei && !edge.fromDictionary() &&
+  if (edge.extended_pos == core::ExtendedPOS::VerbRenyokei && !edge.dictionaryBacked() &&
       prev_extended_pos == core::ExtendedPOS::Noun && prev_length == 1) {
     return sc::kEosNounContinuativePenalty;
   }
@@ -54,7 +54,7 @@ float Scorer::eosCost(const core::LatticeEdge& edge, core::ExtendedPOS prev_exte
   // A 連体詞 modifies the nominal after it, so after a conjunctive て/で, which
   // asks for a predicate, closing the utterance on a listed one means its
   // homographic predicate reading instead (罰されて+しかる+べき).
-  if (edge.extended_pos == core::ExtendedPOS::Determiner && edge.fromDictionary() &&
+  if (edge.extended_pos == core::ExtendedPOS::Determiner && edge.dictionaryBacked() &&
       prev_extended_pos == core::ExtendedPOS::ParticleConj) {
     return sc::kEosDeterminerPenalty;
   }
@@ -83,7 +83,7 @@ float Scorer::eosCost(const core::LatticeEdge& edge, core::ExtendedPOS prev_exte
     case sc::EosBoundaryGate::ClauseDependentParticle:
       return grammar::isClauseDependentConjunctiveParticle(edge.surface) ? boundary_cost.eos : sc::scale::kNeutral;
     case sc::EosBoundaryGate::NonDictionary:
-      return edge.fromDictionary() ? sc::scale::kNeutral : boundary_cost.eos;
+      return edge.dictionaryBacked() ? sc::scale::kNeutral : boundary_cost.eos;
     case sc::EosBoundaryGate::IzenkeiNegative:
       // Only the 已然形 ね is barred: it needs ば or ど(も) after it, while the
       // other cells of the same auxiliary close a clause (読ま+ず, 知ら+ぬ).

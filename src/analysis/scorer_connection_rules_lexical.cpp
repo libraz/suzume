@@ -41,7 +41,7 @@ float computeAdjectiveDerivationHostPenalty(const core::LatticeEdge& prev, const
   const bool kanji_compound_host = prev.extended_pos == core::ExtendedPOS::Noun &&
                                    normalize::utf8Length(prev.surface) >= 2 && grammar::isAllKanji(prev.surface);
   const bool dictionary_nominal_host =
-      prev.extended_pos == core::ExtendedPOS::Noun && (prev.fromDictionary() || kanji_compound_host);
+      prev.extended_pos == core::ExtendedPOS::Noun && (prev.dictionaryBacked() || kanji_compound_host);
   if (next.extended_pos == core::ExtendedPOS::AuxGaru && prev.extended_pos != core::ExtendedPOS::AdjStem &&
       prev.extended_pos != core::ExtendedPOS::AdjNaAdj && !dictionary_nominal_host) {
     return cost::kAlmostNever;
@@ -67,7 +67,7 @@ float computeParticleQuoteBonus(const core::LatticeEdge& prev, const core::Latti
   // case stacks (本+に+も) and generated adjectival adverbials remain outside
   // this preference.
   if (next.extended_pos == core::ExtendedPOS::ParticleTopic && grammar::isSingleHiragana(next.surface, U'も') &&
-      prev.fromDictionary() &&
+      prev.dictionaryBacked() &&
       (prev.pos == core::PartOfSpeech::Adverb || prev.pos == core::PartOfSpeech::Conjunction)) {
     return cost::kMinorBonus;
   }
@@ -165,10 +165,10 @@ float computeSugiFinalParticleBonus(const core::LatticeEdge& prev, const core::L
   // stretched or not (当+たったーー). A doubled mimetic spells no ending
   // (飯+うまうま), so it is not such a tail.
   const bool lone_kanji_noun = prev.pos == core::PartOfSpeech::Noun && normalize::utf8Length(prev.surface) == 1;
-  const bool generated_te_tail = next.origin == core::CandidateOrigin::VerbHiragana && !next.fromDictionary() &&
+  const bool generated_te_tail = next.origin == core::CandidateOrigin::VerbHiragana && !next.dictionaryBacked() &&
                                  next.extended_pos == core::ExtendedPOS::VerbTeForm &&
                                  next.surface.size() >= core::kTwoJapaneseCharBytes;
-  const bool kana_adverb_tail = !prev.fromDictionary() && grammar::isAllKanji(prev.surface) &&
+  const bool kana_adverb_tail = !prev.dictionaryBacked() && grammar::isAllKanji(prev.surface) &&
                                 next.pos == core::PartOfSpeech::Adverb && grammar::isElongatedHiragana(next.surface) &&
                                 next.origin != core::CandidateOrigin::Onomatopoeia;
   if (lone_kanji_noun && (generated_te_tail || kana_adverb_tail)) {
@@ -189,7 +189,7 @@ float computeSugiFinalParticleBonus(const core::LatticeEdge& prev, const core::L
   // Before an independent finite predicate, the productive analysis is
   // mizenkei + ず + predicate (種類を問わ|ず|進む), not a fabricated verb
   // connection. Dictionary words retain their lexical reading.
-  if (!prev.fromDictionary() && prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+  if (!prev.dictionaryBacked() && prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
       utf8::endsWith(prev.surface, "ず") && next.extended_pos == core::ExtendedPOS::VerbShuushikei) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
@@ -362,7 +362,7 @@ float computeSugiFinalParticleBonus(const core::LatticeEdge& prev, const core::L
   // sentence-final. Cancel the generic final-particle-to-verb penalty for this
   // homograph while retaining it for genuine final particles よ/ね/な/わ.
   if (prev.extended_pos == core::ExtendedPOS::ParticleFinal && utf8::equalsAny(prev.surface, {"か"}) &&
-      next.pos == core::PartOfSpeech::Verb && next.fromDictionary() &&
+      next.pos == core::PartOfSpeech::Verb && next.dictionaryBacked() &&
       next.extended_pos != core::ExtendedPOS::VerbMizenkei) {
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryStrongBonus);
   }
@@ -557,7 +557,7 @@ float computeExistentialAruNominalPredicateBonus(const core::LatticeEdge& prev, 
   // A bare noun can directly predicate the existential verb in literary and
   // fixed constructions (本あってこそ, 本あれば, 本ある限り). This is distinct
   // from the copular である sequence, whose preceding morpheme is auxiliary.
-  if (prev.extended_pos == core::ExtendedPOS::Noun && next.pos == core::PartOfSpeech::Verb && next.fromDictionary() &&
+  if (prev.extended_pos == core::ExtendedPOS::Noun && next.pos == core::PartOfSpeech::Verb && next.dictionaryBacked() &&
       next.lemma == "ある") {
     // The generic noun-to-short-verb guards intentionally resist an unmarked
     // object+verb split. A dictionary-backed existential form is the

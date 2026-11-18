@@ -186,6 +186,34 @@ TEST(SuzumeCApiTest, AnalyzeReturnsOffsetsAndDiagnosticFields) {
   suzume_destroy(handle);
 }
 
+// Only a listed compound is published as a dictionary entry; a compound composed
+// by rule from listed parts publishes no flag outside the public set.
+TEST(SuzumeCApiTest, FromDictionaryMarksOnlyListedCompounds) {
+  suzume_t handle = suzume_create();
+  ASSERT_NE(handle, nullptr);
+  const unsigned public_flags = SUZUME_MORPHEME_USER_DICT | SUZUME_MORPHEME_FORMAL_NOUN | SUZUME_MORPHEME_LOW_INFO |
+                                SUZUME_MORPHEME_UNKNOWN | SUZUME_MORPHEME_FROM_DICTIONARY |
+                                SUZUME_MORPHEME_CONJUGATABLE;
+
+  suzume_result_t* composed = suzume_analyze(handle, "書き込む");
+  ASSERT_NE(composed, nullptr);
+  ASSERT_EQ(composed->count, 1u);
+  EXPECT_STREQ(composed->morphemes[0].surface, "書き込む");
+  EXPECT_EQ(composed->morphemes[0].flags & ~public_flags, 0U);
+  EXPECT_EQ(composed->morphemes[0].flags & SUZUME_MORPHEME_FROM_DICTIONARY, 0U);
+  suzume_result_free(composed);
+
+  suzume_result_t* listed = suzume_analyze(handle, "取り壊す");
+  ASSERT_NE(listed, nullptr);
+  ASSERT_EQ(listed->count, 1u);
+  EXPECT_STREQ(listed->morphemes[0].surface, "取り壊す");
+  EXPECT_EQ(listed->morphemes[0].flags & ~public_flags, 0U);
+  EXPECT_NE(listed->morphemes[0].flags & SUZUME_MORPHEME_FROM_DICTIONARY, 0U);
+  suzume_result_free(listed);
+
+  suzume_destroy(handle);
+}
+
 TEST(SuzumeCApiTest, ConjugationMetadataUsesCompactCodes) {
   suzume_t handle = suzume_create();
   ASSERT_NE(handle, nullptr);

@@ -56,7 +56,7 @@ float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::
   // offsets the general renyokei-before-case-particle nominalization bias while
   // leaving standalone nominal forms such as 読みを/香りを untouched.
   if (prev.extended_pos == core::ExtendedPOS::ParticleCase && grammar::isAccusativeParticleWoSurface(prev.surface) &&
-      next.extended_pos == core::ExtendedPOS::VerbRenyokei && next.fromDictionary()) {
+      next.extended_pos == core::ExtendedPOS::VerbRenyokei && next.dictionaryBacked()) {
     SUZUME_CONNECTION_ADD(bonus, cost::kExtraStrongBonus);
   }
 
@@ -95,7 +95,7 @@ float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::
                                    utf8::endsWith(next.surface, "い");
   if (prev.extended_pos == core::ExtendedPOS::ParticleCase &&
       prev.surface.size() <= core::kJapaneseCharBytes &&  // Single hiragana char (3 bytes in UTF-8)
-      next.pos == core::PartOfSpeech::Verb && !next.fromDictionary() && grammar::isPureHiragana(next.surface) &&
+      next.pos == core::PartOfSpeech::Verb && !next.dictionaryBacked() && grammar::isPureHiragana(next.surface) &&
       next.surface.size() <= core::kTwoJapaneseCharBytes && next.extended_pos != core::ExtendedPOS::VerbShuushikei &&
       next.surface != "い" &&  // Exclude い - has specific rule
       !is_validated_ichidan_inflection && !is_resolved_i_onbin) {
@@ -203,7 +203,7 @@ float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::
                           is_quotative_determiner ? sc::kHeadlessQuotativeDeterminerPenalty : cost::kAlmostNever);
   }
 
-  if (prev.pos == core::PartOfSpeech::Determiner && next.pos == core::PartOfSpeech::Noun && !next.fromDictionary()) {
+  if (prev.pos == core::PartOfSpeech::Determiner && next.pos == core::PartOfSpeech::Noun && !next.dictionaryBacked()) {
     // Penalty for DET → non-dict single-kanji NOUN
     // The DET→NOUN bigram bonus (-2.5) is too strong for unknown single-kanji tokens,
     // causing splits like こんな+伸+びる instead of こんな+伸びる
@@ -321,7 +321,7 @@ namespace {
 // nominal either, short of a continuative read as its deverbal noun — a kanji
 // one or an attested kana one (に関する+調べ, but によると+みて, not による+とみ+て).
 bool isAttributiveCompoundParticle(const core::LatticeEdge& edge) {
-  return edge.extended_pos == core::ExtendedPOS::ParticleCase && edge.fromDictionary() &&
+  return edge.extended_pos == core::ExtendedPOS::ParticleCase && edge.dictionaryBacked() &&
          grammar::isAttributiveCompoundParticleSurface(edge.surface);
 }
 
@@ -351,7 +351,7 @@ float computeAttributiveCompoundParticlePenalty(const core::LatticeEdge& prev, c
 // 参加した) rather than marking とも as an argument.
 float computeQuantifierTomoCasePenalty(const core::LatticeEdge& prev, const core::LatticeEdge& next) {
   const bool quantifier_tomo = prev.extended_pos == core::ExtendedPOS::ParticleAdverbial &&
-                               utf8::equalsAny(prev.surface, {"とも"}) && prev.fromDictionary();
+                               utf8::equalsAny(prev.surface, {"とも"}) && prev.dictionaryBacked();
   const bool case_ni = next.extended_pos == core::ExtendedPOS::ParticleCase && utf8::equalsAny(next.surface, {"に"});
   return quantifier_tomo && case_ni ? sc::kPenaltyQuantifierTomoCase : sc::scale::kNeutral;
 }
@@ -395,8 +395,8 @@ float computeAdverbialNiAfterPredicatePenalty(const core::LatticeEdge& prev, con
       prev.extended_pos == core::ExtendedPOS::Determiner || prev.extended_pos == core::ExtendedPOS::ParticleNo ||
       (prev.extended_pos == core::ExtendedPOS::AuxCopulaDa && grammar::isAttributiveCopulaNa(prev.surface));
   const bool formal_noun_frame = nominal_modifier && grammar::isSubstantiveFormalNoun(utf8::dropLastChar(next.surface));
-  if ((!finished_predicate && !formal_noun_frame) || next.pos != core::PartOfSpeech::Adverb || !next.fromDictionary() ||
-      !utf8::endsWith(next.surface, "に")) {
+  if ((!finished_predicate && !formal_noun_frame) || next.pos != core::PartOfSpeech::Adverb ||
+      !next.dictionaryBacked() || !utf8::endsWith(next.surface, "に")) {
     return cost::kNeutral;
   }
   return cost::kProhibitive;
@@ -443,7 +443,7 @@ float computePrefixSymbolBonus(const core::LatticeEdge& prev, const core::Lattic
   // to this short-prefix guard (お+はす). Other one- or two-mora hypotheses,
   // including the L1 い stem, remain too ambiguous to license directly.
   const bool is_honorific_prefix_verb = prev.extended_pos == core::ExtendedPOS::Prefix &&
-                                        grammar::isHonorificPrefix(prev.surface) && next.fromDictionary() &&
+                                        grammar::isHonorificPrefix(prev.surface) && next.dictionaryBacked() &&
                                         grammar::isHumbleHonorificLemma(next.lemma);
   if (prev.pos == core::PartOfSpeech::Prefix && next.pos == core::PartOfSpeech::Verb && !is_honorific_prefix_verb &&
       grammar::isPureHiragana(next.surface) && next.surface.size() <= core::kTwoJapaneseCharBytes) {
@@ -453,7 +453,7 @@ float computePrefixSymbolBonus(const core::LatticeEdge& prev, const core::Lattic
   // Penalty for PREFIX → non-dictionary pure-hiragana verb pattern (3 chars)
   // E.g., お+はよう in おはよう - はよう is not a real verb
   // Valid patterns like お+待ち have kanji, お+召し would be in dictionary
-  if (prev.pos == core::PartOfSpeech::Prefix && next.pos == core::PartOfSpeech::Verb && !next.fromDictionary() &&
+  if (prev.pos == core::PartOfSpeech::Prefix && next.pos == core::PartOfSpeech::Verb && !next.dictionaryBacked() &&
       grammar::isPureHiragana(next.surface) && next.surface.size() == core::kThreeJapaneseCharBytes) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
@@ -466,7 +466,7 @@ float computePrefixSymbolBonus(const core::LatticeEdge& prev, const core::Lattic
   // so is the カ変 continuative. Its one mora is a cell of a closed irregular
   // paradigm rather than a stem hypothesized from the adverb's tail, so it
   // carries the same lexical weight as a listed entry (ぐっと+き+た).
-  if (prev.pos == core::PartOfSpeech::Adverb && isSingleHiraganaVerbRenyokei(next) && !next.fromDictionary() &&
+  if (prev.pos == core::PartOfSpeech::Adverb && isSingleHiraganaVerbRenyokei(next) && !next.dictionaryBacked() &&
       next.conj_type != dictionary::ConjugationType::Kuru) {
     // The bar weighs twice kVeryRare.
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryRare + cost::kVeryRare);

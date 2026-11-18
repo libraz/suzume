@@ -104,7 +104,7 @@ void addClosedMorphemeHostRules(const core::LatticeEdge& prev, const core::Latti
   // nominal phrase (あん+だけ, そん+だけ). Keep that lexical boundary ahead
   // of a spurious copula plus sentence-final particle, but do not promote
   // generated noun readings such as the adjective ない before ほど.
-  if (prev.pos == core::PartOfSpeech::Noun && prev.fromDictionary() &&
+  if (prev.pos == core::PartOfSpeech::Noun && prev.dictionaryBacked() &&
       next.extended_pos == core::ExtendedPOS::ParticleAdverbial) {
     SUZUME_CONNECTION_ADD(bonus, sc::kBonusHonorificGeneratedRenyokei);
   }
@@ -115,7 +115,7 @@ void addClosedMorphemeHostRules(const core::LatticeEdge& prev, const core::Latti
   // dictionary, length, and initial-codepoint gates describe the collision
   // family without assigning a word-specific score.
   if (prev.pos == core::PartOfSpeech::Noun && next.extended_pos == core::ExtendedPOS::ParticleAdverbial &&
-      next.fromDictionary() && normalize::utf8Length(next.surface) == 2 &&
+      next.dictionaryBacked() && normalize::utf8Length(next.surface) == 2 &&
       utf8::decodeFirstChar(next.surface) == U'だ' && utf8::decodeLastChar(next.surface) == U'に') {
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryStrongBonus);
   }
@@ -140,7 +140,7 @@ void addHonorificPrefixRules(const core::LatticeEdge& prev, const core::LatticeE
   // complete.
   if (prev.extended_pos == core::ExtendedPOS::Prefix && grammar::isHonorificPrefix(prev.surface) &&
       next.pos == core::PartOfSpeech::Verb && next.extended_pos != core::ExtendedPOS::VerbMizenkei &&
-      next.fromDictionary()) {
+      next.dictionaryBacked()) {
     SUZUME_CONNECTION_ADD(bonus, cost::kStrongBonus);
   }
 
@@ -199,7 +199,7 @@ void addCaseParticlePredicateRules(const core::LatticeEdge& prev, const core::La
   // productive subsidiary analysis, while leaving short productive forms
   // (読み+過ぎる) to their ordinary auxiliary path.
   if (prev.extended_pos == core::ExtendedPOS::ParticleCase && grammar::isAccusativeParticleWoSurface(prev.surface) &&
-      next.extended_pos == core::ExtendedPOS::VerbShuushikei && next.fromDictionary() &&
+      next.extended_pos == core::ExtendedPOS::VerbShuushikei && next.dictionaryBacked() &&
       normalize::utf8Length(next.surface) >= 4) {
     SUZUME_CONNECTION_ADD(bonus, sc::kBonusVerifiedTerminalAfterObject);
   }
@@ -214,7 +214,7 @@ void addCaseParticlePredicateRules(const core::LatticeEdge& prev, const core::La
   // homographic with という and です.
   if (prev.extended_pos == core::ExtendedPOS::ParticleCase && !utf8::equalsAny(prev.surface, {"と", "で"}) &&
       !grammar::isAccusativeParticleWoSurface(prev.surface) && next.extended_pos == core::ExtendedPOS::VerbShuushikei &&
-      next.fromDictionary()) {
+      next.dictionaryBacked()) {
     SUZUME_CONNECTION_ADD(bonus, cost::kStrongBonus);
   }
 }
@@ -326,7 +326,7 @@ void addKanjiCompoundBoundaryRules(const core::LatticeEdge& prev, const core::La
   // A productive temporal compound ending in 時 (開始時, 緊急時) is a
   // complete search unit before a following case particle.  Keep that unit
   // ahead of the competing noun + formal-noun 時 path.
-  if (prev.pos == core::PartOfSpeech::Noun && !prev.fromDictionary() && utf8::endsWith(prev.surface, "時") &&
+  if (prev.pos == core::PartOfSpeech::Noun && !prev.dictionaryBacked() && utf8::endsWith(prev.surface, "時") &&
       next.extended_pos == core::ExtendedPOS::ParticleCase) {
     SUZUME_CONNECTION_ADD(bonus, cost::kStrongBonus);
   }
@@ -339,7 +339,7 @@ void addKanjiCompoundBoundaryRules(const core::LatticeEdge& prev, const core::La
   if (prev.pos == core::PartOfSpeech::Noun && next.pos == core::PartOfSpeech::Noun &&
       grammar::isSingleKanjiSurface(prev.surface) && grammar::isSingleKanjiSurface(next.surface) &&
       (next.extended_pos == core::ExtendedPOS::NounFormal ||
-       (prev.extended_pos == core::ExtendedPOS::NounFormal && !next.fromDictionary()))) {
+       (prev.extended_pos == core::ExtendedPOS::NounFormal && !next.dictionaryBacked()))) {
     SUZUME_CONNECTION_ADD(bonus, cost::kStrong);
   }
 
@@ -377,7 +377,7 @@ void addClauseLinkageRules(const core::LatticeEdge& prev, const core::LatticeEdg
   // formal noun heads no predicate of its own (あきらめ+よう is あきらめよ+う),
   // and a subsidiary honorific (いただき) closes the construction before it
   // rather than lexicalizing as a connective.
-  if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei && prev.fromDictionary() &&
+  if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei && prev.dictionaryBacked() &&
       prev.surface.size() >= 4 * core::kJapaneseCharBytes && grammar::isPureHiragana(prev.surface) &&
       !grammar::isSubsidiaryHonorificRenyokei(prev.surface) && next.pos == core::PartOfSpeech::Noun &&
       next.extended_pos != core::ExtendedPOS::NounFormal) {
@@ -445,7 +445,7 @@ void addStackedCaseParticleRules(const core::LatticeEdge& prev, const core::Latt
   // right; sequences such as に+を and を+に remain under the general
   // ParticleCase→ParticleCase penalty.
   if (prev.extended_pos == core::ExtendedPOS::ParticleCase && next.extended_pos == core::ExtendedPOS::ParticleCase &&
-      prev.fromDictionary() && prev.surface.size() >= core::kTwoJapaneseCharBytes &&
+      prev.dictionaryBacked() && prev.surface.size() >= core::kTwoJapaneseCharBytes &&
       grammar::isSingleHiragana(next.surface, U'が')) {
     SUZUME_CONNECTION_ADD(bonus, cost::kStrongBonus);
   }
@@ -571,7 +571,7 @@ void addKangoSuffixSplitRules(const core::LatticeEdge& prev, const core::Lattice
                                             grammar::isAllKanji(next.surface);
   // A prefix plus one kanji of its head (最優+先) is no suffix host either.
   const bool prefixed_run_before_suffix =
-      prev.pos == core::PartOfSpeech::Noun && !prev.fromDictionary() && next.pos == core::PartOfSpeech::Suffix &&
+      prev.pos == core::PartOfSpeech::Noun && !prev.dictionaryBacked() && next.pos == core::PartOfSpeech::Suffix &&
       normalize::utf8Length(prev.surface) == 2 && grammar::startsWithSuperlativePrefix(prev.surface);
   if (((one_kanji_noun_before_suffix || one_kanji_suffix_before_noun) && normalize::utf8Length(prev.surface) == 1 &&
        normalize::utf8Length(next.surface) == 1) ||
@@ -607,7 +607,7 @@ void addKangoSuffixSplitRules(const core::LatticeEdge& prev, const core::Lattice
   // 間, so it needs the same neutralizing penalty as the 3+ char case. Keyed on
   // the period unit rather than the length: after any other two-kanji noun the
   // suffix keeps its productive "between X" reading (部署|間, 世代|間).
-  if (prev.pos == core::PartOfSpeech::Noun && next.pos == core::PartOfSpeech::Suffix && !prev.fromDictionary()) {
+  if (prev.pos == core::PartOfSpeech::Noun && next.pos == core::PartOfSpeech::Suffix && !prev.dictionaryBacked()) {
     const size_t suffix_stem_len = normalize::utf8Length(prev.surface);
     const bool duration_noun_tail = suffix_stem_len == 2 &&
                                     normalize::isQuantityPhraseSuffixKanji(utf8::decodeFirstChar(next.surface)) &&
@@ -653,7 +653,7 @@ void addCopulaFusedConjunctionRules(const core::LatticeEdge& prev, const core::L
       grammar::isCopulaFusedConjunction(next.surface) &&
       (next.pos == core::PartOfSpeech::Conjunction || next.extended_pos == core::ExtendedPOS::ParticleAdverbial);
   const bool adverb_before_focus_mo =
-      prev.pos == core::PartOfSpeech::Adverb && prev.fromDictionary() && normalize::utf8Length(prev.surface) == 2 &&
+      prev.pos == core::PartOfSpeech::Adverb && prev.dictionaryBacked() && normalize::utf8Length(prev.surface) == 2 &&
       grammar::containsKanji(prev.surface) && utf8::endsWith(prev.surface, "し") &&
       next.extended_pos == core::ExtendedPOS::ParticleTopic && grammar::isSingleHiragana(next.surface, U'も');
   const bool fused_conjunction_unavailable = content_before_discourse_demo || fused_topic_before_existential;
@@ -696,7 +696,7 @@ void addShortVerbFragmentRules(const core::LatticeEdge& prev, const core::Lattic
   // but not after verb renyokei
   // Valid patterns after VerbRenyokei: た, て, ます, etc. (multi-char or dictionary)
   if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei && next.pos == core::PartOfSpeech::Auxiliary &&
-      !next.fromDictionary() && next.surface.size() <= core::kJapaneseCharBytes) {  // Single char (3 bytes)
+      !next.dictionaryBacked() && next.surface.size() <= core::kJapaneseCharBytes) {  // Single char (3 bytes)
     SUZUME_CONNECTION_ADD(bonus, cost::kUncommon);
   }
 
@@ -756,7 +756,7 @@ float computeSuffixShortVerbBonus(const core::LatticeEdge& prev, const core::Lat
   // noun-suffix connections keep the base preference. A generated suffix was
   // emitted only after its generator checked the right context (声+がけ+する),
   // so the ambiguity this guards against is the dictionary spelling's alone.
-  if (prev.pos == core::PartOfSpeech::Noun && next.pos == core::PartOfSpeech::Suffix && next.fromDictionary() &&
+  if (prev.pos == core::PartOfSpeech::Noun && next.pos == core::PartOfSpeech::Suffix && next.dictionaryBacked() &&
       normalize::utf8Length(next.surface) >= 2 && startsWithCaseParticleMora(next.surface)) {
     SUZUME_CONNECTION_ADD(bonus, sc::kPenaltyAmbiguousSuffixBoundary);
   }
@@ -765,7 +765,7 @@ float computeSuffixShortVerbBonus(const core::LatticeEdge& prev, const core::Lat
   // beginning with the binding-particle mora も. In that environment も closes
   // the predicate and the following mora starts the next word (渡る+も+いとわ+ない).
   if (prev.extended_pos == core::ExtendedPOS::VerbShuushikei && next.extended_pos == core::ExtendedPOS::VerbMizenkei &&
-      !next.fromDictionary() && utf8::startsWith(next.surface, "も")) {
+      !next.dictionaryBacked() && utf8::startsWith(next.surface, "も")) {
     SUZUME_CONNECTION_ADD(bonus, sc::kPenaltyClosedClassBoundary);
   }
 
@@ -774,7 +774,7 @@ float computeSuffixShortVerbBonus(const core::LatticeEdge& prev, const core::Lat
   // at the same boundary (しかも+間違えた). Do not let the generic conjunction
   // bonus split that predicate; registered one-kanji nouns remain available.
   if (prev.extended_pos == core::ExtendedPOS::Conjunction && next.pos == core::PartOfSpeech::Noun &&
-      !next.fromDictionary() && grammar::isSingleKanjiSurface(next.surface)) {
+      !next.dictionaryBacked() && grammar::isSingleKanjiSurface(next.surface)) {
     SUZUME_CONNECTION_ADD(bonus, sc::kPenaltyConjunctionInternalNoun);
   }
 

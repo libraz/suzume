@@ -77,7 +77,7 @@ float computeProgressiveHonorificBonus(const core::LatticeEdge& prev, const core
   // this to a true renyokei (e.g. おり from おる) so fused inflected forms such
   // as います and いない retain their grammatical internal split.
   if (prev.extended_pos == core::ExtendedPOS::ParticleConj && grammar::isTeDeSurface(prev.surface) &&
-      next.extended_pos == core::ExtendedPOS::AuxAspectIru && next.fromDictionary() &&
+      next.extended_pos == core::ExtendedPOS::AuxAspectIru && next.dictionaryBacked() &&
       isGodanRenyokeiOfLemma(next.surface, next.lemma)) {
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryStrongBonus);
   }

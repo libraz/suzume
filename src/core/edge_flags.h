@@ -14,6 +14,9 @@ enum class EdgeFlags : uint8_t {
   // Bit 3 is reserved for the removed IsLowInfo flag. Low-information status
   // is derived exclusively from ExtendedPOS.
   IsUnknown = 1 << 4,
+  // Composed by a rule from dictionary-attested parts (a compound of a
+  // listed V1 and a closed-lexicon V2) without being an entry itself.
+  DictionaryComposed = 1 << 5,
   HasCustomCost = 1 << 6,
   LemmaVerified = 1 << 7,
 };

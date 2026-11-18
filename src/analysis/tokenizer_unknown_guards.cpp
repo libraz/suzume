@@ -136,7 +136,7 @@ bool coversRegisteredAuxiliaryOnVerifiedMizenkei(const core::Lattice& lattice,
     }
     for (size_t predecessor_start = candidate.start; predecessor_start < auxiliary_start; ++predecessor_start) {
       if (core::anyEdgeStartingAt(lattice, predecessor_start, [&](const core::LatticeEdge& predecessor) {
-            return predecessor.end == auxiliary_start && predecessor.fromDictionary() &&
+            return predecessor.end == auxiliary_start && predecessor.dictionaryBacked() &&
                    predecessor.extended_pos == core::ExtendedPOS::VerbMizenkei &&
                    (!require_same_lemma || predecessor.lemma == candidate.lemma);
           })) {
@@ -467,7 +467,7 @@ bool crossesAttestedNominalExistentialBoundary(const core::Lattice& lattice,
   const bool crosses_nominal_boundary =
       core::anyEdgeEndingAt(lattice, candidate.end - 1, [&](const core::LatticeEdge& edge) {
         return edge.start == candidate.start && edge.pos == core::PartOfSpeech::Noun &&
-               edge.extended_pos == core::ExtendedPOS::Noun && edge.fromDictionary() &&
+               edge.extended_pos == core::ExtendedPOS::Noun && edge.dictionaryBacked() &&
                edge.has_finite_existential_continuation;
       });
   return crosses_nominal_boundary && !hasDictionaryPredicateReading(dict_manager, candidate);

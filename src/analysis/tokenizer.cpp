@@ -46,13 +46,13 @@ void diagnoseGeneratedSpanBoundaries(const core::Lattice& lattice) {
     for (size_t pos = 0; pos < lattice.textLength(); ++pos) {
       for (uint32_t candidate_id : lattice.edgeIdsAt(pos)) {
         const core::LatticeEdge& candidate = lattice.getEdge(candidate_id);
-        if (candidate.fromDictionary()) {
+        if (candidate.dictionaryBacked()) {
           continue;
         }
         for (size_t inner_pos = candidate.start; inner_pos < candidate.end; ++inner_pos) {
           for (uint32_t inner_id : lattice.edgeIdsAt(inner_pos)) {
             const core::LatticeEdge& inner = lattice.getEdge(inner_id);
-            if (inner.id == candidate.id || !inner.fromDictionary() || !isClosedClassEdge(inner) ||
+            if (inner.id == candidate.id || !inner.dictionaryBacked() || !isClosedClassEdge(inner) ||
                 inner.start <= candidate.start || inner.end >= candidate.end) {
               continue;
             }
@@ -177,7 +177,7 @@ void Tokenizer::clampHeuristicBonusesInUserDictSpans(core::Lattice& lattice) {
     for (uint32_t edge_id : lattice.edgeIdsAt(pos)) {
       const core::LatticeEdge& edge = lattice.getEdge(edge_id);
       const bool is_inside_registration = furthest_end_at_start[edge.start] >= edge.end;
-      if (!isShapeDerivedOrigin(edge.origin) || edge.fromDictionary() || !is_inside_registration) {
+      if (!isShapeDerivedOrigin(edge.origin) || edge.dictionaryBacked() || !is_inside_registration) {
         continue;
       }
       // Back to the plain category cost: the shape bonus is dropped, no penalty

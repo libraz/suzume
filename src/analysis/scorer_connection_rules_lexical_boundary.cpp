@@ -76,7 +76,7 @@ void addImpossibleAttachmentRules(const core::LatticeEdge& prev, const core::Lat
       ((prev.extended_pos == core::ExtendedPOS::VerbShuushikei || finite_predicate_cell) &&
        next.extended_pos == core::ExtendedPOS::ParticleCase && grammar::isSingleHiragana(next.surface, U'が')) ||
       (prev.extended_pos == core::ExtendedPOS::VerbShuushikei &&
-       ((next.extended_pos == core::ExtendedPOS::ParticleConjFinite && !prev.fromDictionary()) ||
+       ((next.extended_pos == core::ExtendedPOS::ParticleConjFinite && !prev.dictionaryBacked()) ||
         (next.extended_pos == core::ExtendedPOS::ParticleCase && !prev.lemmaVerified() &&
          utf8::equalsAny(next.surface, {"に", "を"}))));
   // The assertive copula predicates over a nominal.  A conditional verb form or
@@ -106,7 +106,7 @@ void addImpossibleAttachmentRules(const core::LatticeEdge& prev, const core::Lat
   // nominal: it is what is left when a terminal verb is cut at its own final
   // mora and the mora reads as the volitional (言うとも as 言+う+とも).
   const bool volitional_after_stray_kanji = next.extended_pos == core::ExtendedPOS::AuxVolitional &&
-                                            prev.pos == core::PartOfSpeech::Noun && !prev.fromDictionary() &&
+                                            prev.pos == core::PartOfSpeech::Noun && !prev.dictionaryBacked() &&
                                             normalize::utf8Length(prev.surface) == 1;
   // The connective て/で takes an i-adjective only through its continuative
   // くて, never its terminal (せんとい+て is a fabricated adjective).
@@ -197,8 +197,8 @@ void addImpossibleAttachmentRules(const core::LatticeEdge& prev, const core::Lat
                                            grammar::isContractedTeWaParticle(next.surface);
   // An adverb spelling a geminate past (たった) modifies a quantity after it;
   // in front of an auxiliary it is the verb's past instead (たっ+た+だろ+う).
-  const bool geminate_past_adverb_before_auxiliary = prev.pos == core::PartOfSpeech::Adverb && prev.fromDictionary() &&
-                                                     utf8::endsWith(prev.surface, "った") &&
+  const bool geminate_past_adverb_before_auxiliary = prev.pos == core::PartOfSpeech::Adverb &&
+                                                     prev.dictionaryBacked() && utf8::endsWith(prev.surface, "った") &&
                                                      next.pos == core::PartOfSpeech::Auxiliary;
   // The dubitative かも closes a terminal or a nominal; a bare continuative in
   // front of it is the conjunction cut apart (し+かも is しかも).
@@ -211,9 +211,10 @@ void addImpossibleAttachmentRules(const core::LatticeEdge& prev, const core::Lat
   const bool kana_geminate_onbin = prev.extended_pos == core::ExtendedPOS::VerbOnbinkei &&
                                    grammar::isPureHiragana(prev.surface) && utf8::endsWith(prev.surface, "っ");
   const bool mimetic_cut_at_geminate =
-      kana_geminate_onbin && (next.extended_pos == core::ExtendedPOS::ParticleAdverbial ||
-                              (next.extended_pos == core::ExtendedPOS::AuxAspectIru && is_dialectal_oru_contraction &&
-                               !prev.fromDictionary() && !prev.lemmaVerified() && grammar::endsWithIRow(next.surface)));
+      kana_geminate_onbin &&
+      (next.extended_pos == core::ExtendedPOS::ParticleAdverbial ||
+       (next.extended_pos == core::ExtendedPOS::AuxAspectIru && is_dialectal_oru_contraction &&
+        !prev.dictionaryBacked() && !prev.lemmaVerified() && grammar::endsWithIRow(next.surface)));
   // A final particle closes the utterance, so no conjunctive particle hangs
   // off it (行こう+け+ど is 行こう+けど).
   const bool conjunctive_after_final_particle =
@@ -295,7 +296,7 @@ void addBarredHostRules(const core::LatticeEdge& prev, const core::LatticeEdge& 
   // pairing means the boundary landed inside a word rather than after one
   // (昔+の+まま+で, where のま+まで invents a host for まで).
   const bool barred_focus_particle_host = next.extended_pos == core::ExtendedPOS::ParticleAdverbial &&
-                                          prev.pos == core::PartOfSpeech::Noun && !prev.fromDictionary() &&
+                                          prev.pos == core::PartOfSpeech::Noun && !prev.dictionaryBacked() &&
                                           prev.origin != core::CandidateOrigin::BracketedNoun &&
                                           grammar::isPureHiragana(prev.surface);
   // A formal noun whose canonical spelling is kana (こと, もの) is not one when
@@ -338,10 +339,10 @@ void addLexicalBoundaryRetentionRules(const core::LatticeEdge& prev, const core:
   // Dictionary compound adverbs and formal-noun constructions retain their
   // lexical boundary, unlike the corresponding accidental short-token splits.
   if (prev.extended_pos == core::ExtendedPOS::ParticleCase && next.pos == core::PartOfSpeech::Adverb &&
-      next.fromDictionary() && grammar::containsKanji(next.surface) && utf8::contains(next.surface, "の")) {
+      next.dictionaryBacked() && grammar::containsKanji(next.surface) && utf8::contains(next.surface, "の")) {
     SUZUME_CONNECTION_ADD(bonus, cost::kModerateBonus);
   }
-  if (prev.extended_pos == core::ExtendedPOS::NounFormal && prev.fromDictionary() &&
+  if (prev.extended_pos == core::ExtendedPOS::NounFormal && prev.dictionaryBacked() &&
       normalize::utf8Length(prev.surface) == 1 &&
       (next.pos == core::PartOfSpeech::Noun || next.pos == core::PartOfSpeech::Suffix) &&
       normalize::utf8Length(next.surface) == 1 && grammar::containsKanji(prev.surface) &&
@@ -423,7 +424,7 @@ float computeLateLexicalBoundaryBonus(const core::LatticeEdge& prev, const core:
 
   // Dictionary-backed i-adjectives form a reliable nominal predicate boundary.
   if (prev.pos == core::PartOfSpeech::Noun && next.extended_pos == core::ExtendedPOS::AdjBasic &&
-      next.fromDictionary()) {
+      next.dictionaryBacked()) {
     SUZUME_CONNECTION_ADD(bonus, cost::kModerateBonus);
   }
 

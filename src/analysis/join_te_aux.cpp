@@ -98,7 +98,8 @@ void addTaruAdjectiveJoinCandidates(core::Lattice& lattice, std::string_view tex
   constexpr float kTaruAdverbBonus = -1.5F;  // Strong bonus to beat Noun + Particle
   float final_cost = base_cost + kTaruAdverbBonus;
 
-  uint8_t flags = core::LatticeEdge::kFromDictionary;
+  // The nominal itself was checked above not to be an entry.
+  uint8_t flags = core::LatticeEdge::kDictionaryComposed;
 
   lattice.addEdge(surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(end_pos), core::PartOfSpeech::Adverb,
                   final_cost, flags, lemma);

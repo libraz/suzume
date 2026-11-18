@@ -287,7 +287,7 @@ int cmdAnalyze(const CommandArgs& args) {
             std::cerr << " lemma=" << edge.lemma;
           }
           // Show source info
-          if (edge.fromDictionary()) {
+          if (edge.dictionaryBacked()) {
             std::cerr << " [dict";
             if (edge.fromUserDict()) {
               std::cerr << ":user";

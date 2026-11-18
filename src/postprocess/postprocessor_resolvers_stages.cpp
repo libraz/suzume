@@ -355,8 +355,9 @@ void resolveHomographsFromClosedFollower(std::vector<core::Morpheme>& result) {
     // A non-lexical noun candidate ending in い cannot take conjectural だろ
     // as an attributive noun marker. The closed follower licenses the finite
     // i-adjective reading (遠い+だろ+う) without touching lexical nouns.
-    if (!current.fromDictionary() && current.pos == core::PartOfSpeech::Noun && utf8::endsWith(current.surface, "い") &&
-        next.extended_pos == core::ExtendedPOS::AuxCopulaDa && next.surface == "だろ") {
+    if (!current.dictionaryBacked() && current.pos == core::PartOfSpeech::Noun &&
+        utf8::endsWith(current.surface, "い") && next.extended_pos == core::ExtendedPOS::AuxCopulaDa &&
+        next.surface == "だろ") {
       resolver::retag(current, core::PartOfSpeech::Adjective, core::ExtendedPOS::AdjBasic, current.surface,
                       dictionary::ConjugationType::IAdjective, grammar::ConjForm::Base);
     }
@@ -404,6 +405,7 @@ void resolveFocusedContinuativeBeforeSuru(std::vector<core::Morpheme>& result) {
     const auto& focus = result[idx + 1];
     const auto& suru = result[idx + 2];
     const auto& left_context = result[idx - 1];
+    // A composed compound nominal is a continuative too (話し合い+は+する).
     if (stem.pos == core::PartOfSpeech::Noun && !stem.fromDictionary() && grammar::containsKanji(stem.surface) &&
         left_context.pos == core::PartOfSpeech::Particle && focus.surface == "は" &&
         focus.pos == core::PartOfSpeech::Particle && suru.pos == core::PartOfSpeech::Verb && suru.lemma == "する") {

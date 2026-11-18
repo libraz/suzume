@@ -22,7 +22,7 @@ void addDictionaryCompoundNominalEdge(core::Lattice& lattice, std::string_view t
   lattice.addEdge(textRange(text, byte_offsets, start_pos, end_pos), static_cast<uint32_t>(start_pos),
                   static_cast<uint32_t>(end_pos), core::PartOfSpeech::Noun,
                   scorer.posPrior(core::PartOfSpeech::Noun) + candidate::kCompoundVerbSuffixNounBonus,
-                  core::LatticeEdge::kFromDictionary, surface, dictionary::ConjugationType::None,
+                  core::LatticeEdge::kDictionaryComposed, surface, dictionary::ConjugationType::None,
                   core::CandidateOrigin::VerbCompound, candidate::kNoOriginConfidence, pattern,
                   core::ExtendedPOS::NounVerbal, pattern);
 }

@@ -468,7 +468,7 @@ void addVerbSuffixNounJoinCandidates(core::Lattice& lattice, std::string_view te
     const std::string_view surface = textRange(text, byte_offsets, start_pos, end_pos);
     lattice.addEdge(surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(end_pos), core::PartOfSpeech::Noun,
                     scorer.posPrior(core::PartOfSpeech::Noun) + candidate::kVerbSuffixNounJoinBonus,
-                    core::LatticeEdge::kFromDictionary, surface);  // lemma = surface for compound nouns
+                    core::LatticeEdge::kDictionaryComposed, surface);  // lemma = surface for compound nouns
   };
 
   // Hiragana-only stem + 方 (やり方, あり方) — V連用形 written entirely in hiragana.

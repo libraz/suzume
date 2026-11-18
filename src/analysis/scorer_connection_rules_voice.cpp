@@ -168,7 +168,7 @@ float computePassiveCausativeBonus(const core::LatticeEdge& prev, const core::La
   // available when its surface is dictionary-backed (任せ+られ), while this
   // blocks a fabricated tail such as 確か+めさせ+られ.
   if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei && next.extended_pos == core::ExtendedPOS::AuxPassive &&
-      utf8::endsWith(prev.surface, "させ") && !prev.fromDictionary()) {
+      utf8::endsWith(prev.surface, "させ") && !prev.dictionaryBacked()) {
     return cost::kAlmostNever;
   }
 
@@ -204,7 +204,7 @@ float computePassiveCausativeBonus(const core::LatticeEdge& prev, const core::La
   // Splitting after them produces invalid word boundaries
   // E.g., くしょん should stay as one token, not くしょ+ん
   // Only apply to non-dictionary tokens (dict entries like でしょ are valid boundaries)
-  if (!prev.fromDictionary() && prev.pos == core::PartOfSpeech::Other) {
+  if (!prev.dictionaryBacked() && prev.pos == core::PartOfSpeech::Other) {
     std::string_view last_char = utf8::lastChar(prev.surface);
     if (grammar::isSmallKana(last_char)) {
       SUZUME_CONNECTION_ADD(bonus, cost::kStrong);

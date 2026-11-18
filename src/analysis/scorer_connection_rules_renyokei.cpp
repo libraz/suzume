@@ -116,7 +116,7 @@ void addCompoundPredicateRules(const core::LatticeEdge& prev, const core::Lattic
   const bool renyokei_suru_compound = prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
                                       next.extended_pos == core::ExtendedPOS::VerbRenyokei && next.lemma == "する";
   const bool sahen_lexical_v2 = prev.extended_pos == core::ExtendedPOS::VerbRenyokei && prev.lemma == "する" &&
-                                next.extended_pos == core::ExtendedPOS::VerbShuushikei && next.fromDictionary();
+                                next.extended_pos == core::ExtendedPOS::VerbShuushikei && next.dictionaryBacked();
   const bool verified_v1_v2_mizenkei = prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
                                        next.extended_pos == core::ExtendedPOS::VerbMizenkei && prev.lemmaVerified() &&
                                        next.lemmaVerified();
@@ -189,7 +189,7 @@ void addModifierPredicateRules(const core::LatticeEdge& prev, const core::Lattic
   // A dictionary adverb may directly modify a pronoun-headed phrase
   // (時として+己). Prefer the lexical adverb over an unrelated formal noun
   // plus case-particle segmentation.
-  if (prev.pos == core::PartOfSpeech::Adverb && prev.fromDictionary() &&
+  if (prev.pos == core::PartOfSpeech::Adverb && prev.dictionaryBacked() &&
       next.extended_pos == core::ExtendedPOS::Pronoun) {
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryStrongBonus + cost::kMinorBonus);
   }
@@ -243,7 +243,7 @@ void addConnectiveBoundaryRules(const core::LatticeEdge& prev, const core::Latti
   // gate keeps the general onbin rule conservative for mimetic fragments.
   const bool is_compound_onbin =
       prev.origin == core::CandidateOrigin::VerbCompound || prev.origin == core::CandidateOrigin::Join;
-  const bool is_humble_auxiliary_onbin = prev.fromDictionary() && grammar::isHumbleHonorificLemma(prev.lemma);
+  const bool is_humble_auxiliary_onbin = prev.dictionaryBacked() && grammar::isHumbleHonorificLemma(prev.lemma);
   if ((is_compound_onbin || is_humble_auxiliary_onbin) && prev.extended_pos == core::ExtendedPOS::VerbOnbinkei &&
       next.extended_pos == core::ExtendedPOS::ParticleConj && grammar::isTeDeSurface(next.surface)) {
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryStrongBonus);
@@ -252,7 +252,7 @@ void addConnectiveBoundaryRules(const core::LatticeEdge& prev, const core::Latti
   // A dictionary-attested continuative directly before て/で is likewise a
   // complete te-form boundary.  This prevents a nominalized homograph from
   // taking precedence over a verified lexical verb (押しのけ+て).
-  if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei && prev.fromDictionary() &&
+  if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei && prev.dictionaryBacked() &&
       next.extended_pos == core::ExtendedPOS::ParticleConj && grammar::isTeDeSurface(next.surface)) {
     SUZUME_CONNECTION_ADD(bonus, cost::kModerateBonus);
   }
@@ -446,7 +446,7 @@ void addFinitePredicateParticleRules(const core::LatticeEdge& prev, const core::
   // zero-nominalized object clause can retain its lexical predicate reading.
   if (prev.extended_pos == core::ExtendedPOS::VerbShuushikei && next.extended_pos == core::ExtendedPOS::ParticleCase &&
       grammar::isAccusativeParticleWoSurface(next.surface)) {
-    SUZUME_CONNECTION_ADD(bonus, prev.fromDictionary() ? cost::kRare : cost::kStrong);
+    SUZUME_CONNECTION_ADD(bonus, prev.dictionaryBacked() ? cost::kRare : cost::kStrong);
   }
 }
 
@@ -553,7 +553,7 @@ void addContinuativeAttachmentRules(const core::LatticeEdge& prev, const core::L
 
   // An attested euphonic lexical verb followed by the past auxiliary remains
   // one search unit (言い損なっ+た), ahead of a productive subsidiary split.
-  if (prev.fromDictionary() && prev.extended_pos == core::ExtendedPOS::VerbOnbinkei &&
+  if (prev.dictionaryBacked() && prev.extended_pos == core::ExtendedPOS::VerbOnbinkei &&
       next.extended_pos == core::ExtendedPOS::AuxTenseTa) {
     SUZUME_CONNECTION_ADD(bonus, cost::kModerateBonus);
   }
@@ -598,7 +598,7 @@ void addSubsidiaryVerbRules(const core::LatticeEdge& prev, const core::LatticeEd
                                                    next.extended_pos == core::ExtendedPOS::VerbRenyokei ||
                                                    next.extended_pos == core::ExtendedPOS::VerbKateikei;
   if (prev.extended_pos == core::ExtendedPOS::ParticleConj && is_potential_benefactive_inflection &&
-      next.fromDictionary() && grammar::isPotentialBenefactiveLemma(next.lemma)) {
+      next.dictionaryBacked() && grammar::isPotentialBenefactiveLemma(next.lemma)) {
     SUZUME_CONNECTION_ADD(bonus, cost::kDoubleVeryStrongBonus);
   }
 
@@ -606,7 +606,7 @@ void addSubsidiaryVerbRules(const core::LatticeEdge& prev, const core::LatticeEd
   // but after the connective particle it forms the productive aspectual
   // sequence て+いく rather than an unrelated coordinate predicate.
   if (prev.extended_pos == core::ExtendedPOS::ParticleConj && next.extended_pos == core::ExtendedPOS::VerbShuushikei &&
-      next.fromDictionary() && utf8::equalsAny(next.lemma, {"いく", "ゆく"})) {
+      next.dictionaryBacked() && utf8::equalsAny(next.lemma, {"いく", "ゆく"})) {
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryStrongBonus);
   }
 }

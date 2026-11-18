@@ -105,6 +105,7 @@ void resolveDeverbalNominalSuffix(std::vector<core::Morpheme>& result) {
   for (size_t idx = 1; idx < result.size(); ++idx) {
     const auto& predecessor = result[idx - 1];
     auto& suffix = result[idx];
+    // A bare kana continuative needs a listed verb; composition is not enough.
     if (predecessor.extended_pos != core::ExtendedPOS::VerbRenyokei || !predecessor.fromDictionary() ||
         !grammar::isPureHiragana(predecessor.surface) || suffix.extended_pos != core::ExtendedPOS::NounFormal ||
         !grammar::isDeverbalNominalSuffix(suffix.surface)) {
@@ -403,7 +404,7 @@ void resolveAdjectivalStemBeforeGaru(std::vector<core::Morpheme>& result) {
   for (size_t idx = 1; idx < result.size(); ++idx) {
     auto& host = result[idx - 1];
     if (result[idx].extended_pos != core::ExtendedPOS::AuxGaru || host.pos != core::PartOfSpeech::Noun ||
-        host.fromDictionary()) {
+        host.dictionaryBacked()) {
       continue;
     }
     retagNaAdjectiveSurface(host);

@@ -47,17 +47,21 @@ struct LatticeEdge {
   static constexpr uint8_t kFromUserDict = static_cast<uint8_t>(EdgeFlags::FromUserDict);
   static constexpr uint8_t kIsFormalNoun = static_cast<uint8_t>(EdgeFlags::IsFormalNoun);
   static constexpr uint8_t kIsUnknown = static_cast<uint8_t>(EdgeFlags::IsUnknown);
+  static constexpr uint8_t kDictionaryComposed = static_cast<uint8_t>(EdgeFlags::DictionaryComposed);
   static constexpr uint8_t kHasCustomCost = static_cast<uint8_t>(EdgeFlags::HasCustomCost);
   static constexpr uint8_t kLemmaVerified = static_cast<uint8_t>(EdgeFlags::LemmaVerified);
 
   // Flag accessors
+  // The surface is a dictionary entry. Scoring wants dictionaryBacked().
   bool fromDictionary() const { return hasFlag(flags, EdgeFlags::FromDictionary); }
+  // Dictionary evidence: an entry, or a rule composition of entries.
+  bool dictionaryBacked() const { return fromDictionary() || hasFlag(flags, EdgeFlags::DictionaryComposed); }
   bool fromUserDict() const { return hasFlag(flags, EdgeFlags::FromUserDict); }
   bool isFormalNoun() const { return hasFlag(flags, EdgeFlags::IsFormalNoun); }
   bool hasCustomCost() const { return hasFlag(flags, EdgeFlags::HasCustomCost); }
-  // A dictionary edge's lemma is dictionary-attested by definition, so OR in
-  // fromDictionary(): consumers see a strict superset of the dictionary gate.
-  bool lemmaVerified() const { return fromDictionary() || hasFlag(flags, EdgeFlags::LemmaVerified); }
+  // A dictionary-backed edge's lemma is attested by definition, so OR in
+  // dictionaryBacked(): consumers see a strict superset of the dictionary gate.
+  bool lemmaVerified() const { return dictionaryBacked() || hasFlag(flags, EdgeFlags::LemmaVerified); }
   bool isUnknown() const { return hasFlag(flags, EdgeFlags::IsUnknown); }
 };
 

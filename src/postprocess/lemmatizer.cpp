@@ -27,7 +27,7 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
   // If morpheme is from dictionary and has distinct lemma set, trust it
   // (lemma != surface means it was explicitly set, not defaulted)
   // When lemma == surface, we need to re-derive for conjugated forms
-  if (morpheme.fromDictionary() && !morpheme.lemma.empty() && morpheme.lemma != morpheme.surface) {
+  if (morpheme.dictionaryBacked() && !morpheme.lemma.empty() && morpheme.lemma != morpheme.surface) {
     return morpheme.lemma;
   }
 
@@ -51,7 +51,7 @@ std::string Lemmatizer::lemmatize(const core::Morpheme& morpheme) const {
   // strip it (組み合わせる → 組み合う). Scoped to dictionary-backed edges: a
   // token that is genuinely mizenkei+させる never reaches here as one
   // dictionary-flagged 終止形 token (the tokenizer splits it: 話し合わ+せる).
-  if (morpheme.fromDictionary() && isTerminalVerb(morpheme) && utf8::endsWith(morpheme.surface, "せる")) {
+  if (morpheme.dictionaryBacked() && isTerminalVerb(morpheme) && utf8::endsWith(morpheme.surface, "せる")) {
     return std::string(morpheme.surface);
   }
 

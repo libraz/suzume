@@ -189,7 +189,7 @@ void resolveNominalPredicateNai(std::vector<core::Morpheme>& result) {
     // its all-kanji, non-dictionary renyokei shape is unambiguously nominal.
     // Restore that reading before resolving the independent negative.
     if (idx >= 2 && predicate.pos == core::PartOfSpeech::Verb &&
-        predicate.extended_pos == core::ExtendedPOS::VerbRenyokei && !predicate.fromDictionary() &&
+        predicate.extended_pos == core::ExtendedPOS::VerbRenyokei && !predicate.dictionaryBacked() &&
         grammar::isAllKanji(predicate.surface) && utf8::endsWith(predicate.lemma, "る")) {
       const auto& marker = result[idx - 2];
       if (marker.extended_pos == core::ExtendedPOS::ParticleCase && marker.surface == "に") {

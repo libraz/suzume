@@ -346,7 +346,10 @@ void emitCompoundVerbCandidates(core::Lattice& lattice, std::string_view text, c
     final_cost += bigram_cost::kStrong;
   }
 
-  uint8_t flags = core::LatticeEdge::kFromDictionary;
+  // The edge is an entry only when its complete lemma is listed; otherwise it
+  // is composed from a listed V1 and a closed-lexicon V2.
+  uint8_t flags =
+      compound_lemma_in_dictionary ? core::LatticeEdge::kFromDictionary : core::LatticeEdge::kDictionaryComposed;
   // Only direct registration of the complete compound lemma grants lexical
   // boundary ownership. A nominalized continuative is useful scoring
   // evidence above, but must not suppress productive te-form boundaries.

@@ -99,8 +99,8 @@ class Viterbi {
       static bool hasSameScoringIdentity(const LatticeEdge& lhs, const LatticeEdge& rhs) {
         return lhs.start == rhs.start && lhs.surface == rhs.surface && lhs.lemma == rhs.lemma && lhs.pos == rhs.pos &&
                lhs.origin == rhs.origin && lhs.conj_type == rhs.conj_type &&
-               lhs.fromDictionary() == rhs.fromDictionary() && lhs.isFormalNoun() == rhs.isFormalNoun() &&
-               lhs.lemmaVerified() == rhs.lemmaVerified();
+               lhs.fromDictionary() == rhs.fromDictionary() && lhs.dictionaryBacked() == rhs.dictionaryBacked() &&
+               lhs.isFormalNoun() == rhs.isFormalNoun() && lhs.lemmaVerified() == rhs.lemmaVerified();
       }
 
       // Insert a candidate, keeping entries sorted by ascending cost and

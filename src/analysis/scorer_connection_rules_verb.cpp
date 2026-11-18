@@ -90,7 +90,7 @@ float computeTaFormVolitionalBonus(const core::LatticeEdge& prev, const core::La
   // unknown pure-hiragana sound-symbolic forms (まっ+たり).
   if (core::isVerbContinuativeForm(prev.extended_pos) && (next.surface == "たり" || next.surface == "だり") &&
       next.extended_pos == core::ExtendedPOS::ParticleConj &&
-      (grammar::containsKanji(prev.surface) || prev.fromDictionary())) {
+      (grammar::containsKanji(prev.surface) || prev.dictionaryBacked())) {
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryStrongBonus);
   }
 
@@ -154,7 +154,7 @@ float computeTaFormVolitionalBonus(const core::LatticeEdge& prev, const core::La
       // irrealis cell other than よ exists only in the godan paradigm (くださろ,
       // なさろ); よ is the ichidan and カ変 volitional stem (こよ).
       (grammar::isGodanVerbType(grammar::conjTypeToVerbType(prev.conj_type)) ||
-       (prev.fromDictionary() && prev.conj_type == dictionary::ConjugationType::None &&
+       (prev.dictionaryBacked() && prev.conj_type == dictionary::ConjugationType::None &&
         !utf8::endsWith(prev.surface, "よ")) ||
        prev_is_suru || (prev.conj_type == dictionary::ConjugationType::Ichidan && utf8::endsWith(prev.surface, "よ")));
 

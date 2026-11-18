@@ -100,7 +100,7 @@ void addShortHiraganaIrrealisRules(const core::LatticeEdge& prev, const core::La
   // way (押さ+ん). ん can be AUX_否定古 or PART_準体, both are penalized.
   // Neither an adverb nor a na-adjective stem takes ん directly (どう+ん of どうん;
   // a na-adjective stem takes な first).
-  if (((prev.extended_pos == core::ExtendedPOS::VerbMizenkei && !prev.fromDictionary() &&
+  if (((prev.extended_pos == core::ExtendedPOS::VerbMizenkei && !prev.dictionaryBacked() &&
         grammar::isPureHiragana(prev.surface) && prev.surface.size() <= core::kTwoJapaneseCharBytes) ||
        prev.pos == core::PartOfSpeech::Adverb || prev.extended_pos == core::ExtendedPOS::AdjNaAdj) &&
       next.surface == "ん") {
@@ -120,7 +120,7 @@ void addShortHiraganaIrrealisRules(const core::LatticeEdge& prev, const core::La
   // the same auxiliary through its syncretic irrealis/continuative stem, which
   // ends on the i-row or the e-row and spells no such noun, so penalizing it
   // only cost 理解+でき+ず its boundary.
-  if (prev.extended_pos == core::ExtendedPOS::VerbMizenkei && prev.fromDictionary() &&
+  if (prev.extended_pos == core::ExtendedPOS::VerbMizenkei && prev.dictionaryBacked() &&
       grammar::isPureHiragana(prev.surface) && kana::isARowCodepoint(utf8::decodeLastChar(prev.surface)) &&
       prev.surface.size() <= core::kThreeJapaneseCharBytes && next.extended_pos == core::ExtendedPOS::AuxNegativeNu &&
       prev.lemma != "する" && prev.lemma != "ある" && prev.lemma != "なる" && utf8::equalsAny(next.surface, {"ず"})) {
@@ -146,10 +146,10 @@ void addSingleKanjiNounHostRules(const core::LatticeEdge& prev, const core::Latt
   if (prev.pos == core::PartOfSpeech::Noun && prev.extended_pos != core::ExtendedPOS::NounNumber &&
       normalize::utf8Length(prev.surface) == 1 &&  // Single char
       next.pos == core::PartOfSpeech::Verb && core::isVerbContinuativeForm(next.extended_pos) &&
-      !(grammar::isSuruRenyokeiSurface(next.surface) && prev.fromDictionary()) &&   // サ変動詞パターン
-      !grammar::isBoundDerivationalSuffixVerbLemma(next.lemma) &&                   // 束縛派生接尾辞
-      !kana::isKatakanaCodepoint(utf8::decodeFirstChar(next.surface)) &&            // Exclude katakana verbs
-      !suzume::normalize::isKanjiCodepoint(utf8::decodeFirstChar(next.surface))) {  // Exclude kanji verbs
+      !(grammar::isSuruRenyokeiSurface(next.surface) && prev.dictionaryBacked()) &&  // サ変動詞パターン
+      !grammar::isBoundDerivationalSuffixVerbLemma(next.lemma) &&                    // 束縛派生接尾辞
+      !kana::isKatakanaCodepoint(utf8::decodeFirstChar(next.surface)) &&             // Exclude katakana verbs
+      !suzume::normalize::isKanjiCodepoint(utf8::decodeFirstChar(next.surface))) {   // Exclude kanji verbs
     SUZUME_CONNECTION_ADD(surface_bonus, cost::kVeryRare);
   }
 
@@ -157,8 +157,8 @@ void addSingleKanjiNounHostRules(const core::LatticeEdge& prev, const core::Latt
   // for a dictionary terminal verb. Keep the compound candidate intact
   // (提+出す, 外+出す) while preserving genuine particleless noun predicates,
   // whose nominal head is dictionary-attested.
-  if (prev.pos == core::PartOfSpeech::Noun && !prev.fromDictionary() && normalize::utf8Length(prev.surface) == 1 &&
-      next.pos == core::PartOfSpeech::Verb && next.fromDictionary() &&
+  if (prev.pos == core::PartOfSpeech::Noun && !prev.dictionaryBacked() && normalize::utf8Length(prev.surface) == 1 &&
+      next.pos == core::PartOfSpeech::Verb && next.dictionaryBacked() &&
       next.extended_pos == core::ExtendedPOS::VerbShuushikei && normalize::utf8Length(next.surface) == 2 &&
       suzume::normalize::isKanjiCodepoint(utf8::decodeFirstChar(next.surface))) {
     SUZUME_CONNECTION_ADD(surface_bonus, cost::kVeryRare);
@@ -223,7 +223,7 @@ void addSuruStemHostRules(const core::LatticeEdge& prev, const core::LatticeEdge
   // Exclude single-char "い" which is いる renyokei (interferes with 上手い+し)
   // Exclude "で" which is でる renyokei (interferes with んでした → ん+でし+た)
   if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei && next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
-      grammar::isSuruRenyokeiSurface(next.surface) && prev.fromDictionary() && prev.surface != "い" &&
+      grammar::isSuruRenyokeiSurface(next.surface) && prev.dictionaryBacked() && prev.surface != "い" &&
       prev.surface != "で") {
     SUZUME_CONNECTION_ADD(surface_bonus, cost::kStrongBonus);
   }
@@ -232,7 +232,7 @@ void addSuruStemHostRules(const core::LatticeEdge& prev, const core::LatticeEdge
   // E.g., 引っ越+し should be 引っ越し (compound verb), not NOUN + suru renyokei
   // These patterns are usually compound verbs registered in dictionary
   // The pattern: 漢字+っ+漢字 (kanji + sokuon + kanji) as NOUN → し(する連用形)
-  if (prev.pos == core::PartOfSpeech::Noun && !prev.fromDictionary() &&
+  if (prev.pos == core::PartOfSpeech::Noun && !prev.dictionaryBacked() &&
       next.extended_pos == core::ExtendedPOS::VerbRenyokei && grammar::isSuruRenyokeiSurface(next.surface) &&
       prev.surface.size() >= core::kThreeJapaneseCharBytes &&  // At least 3 chars (2 kanji + っ)
       utf8::contains(prev.surface, "っ")) {
@@ -256,7 +256,7 @@ void addSuruStemHostRules(const core::LatticeEdge& prev, const core::LatticeEdge
   // はな is a dict NOUN but not a suru-noun, so はな+し is not a valid suru compound
   // This does not affect kanji nouns (勉強+し is valid suru compound)
   // Use small penalty (0.08) to tip balance: はなし gap=0.013, なんし gap=0.102
-  if (prev.pos == core::PartOfSpeech::Noun && prev.fromDictionary() &&
+  if (prev.pos == core::PartOfSpeech::Noun && prev.dictionaryBacked() &&
       next.extended_pos == core::ExtendedPOS::VerbRenyokei && grammar::isSuruRenyokeiSurface(next.surface) &&
       grammar::isPureHiragana(prev.surface)) {
     SUZUME_CONNECTION_ADD(surface_bonus, sc::kPenaltyHiraganaNounToSuruTip);
@@ -406,7 +406,7 @@ void addClosedMorphemeSelectionRules(const core::LatticeEdge& prev, const core::
   // attributive (夜明け+ゆえ) or is itself a continuative (受け+付け) follows a
   // deverbal noun or is the second verb of a compound instead.
   if (prev.extended_pos == core::ExtendedPOS::VerbRenyokei && next.extended_pos == core::ExtendedPOS::NounFormal &&
-      next.fromDictionary() && !grammar::selectsVerbContinuative(next.surface)) {
+      next.dictionaryBacked() && !grammar::selectsVerbContinuative(next.surface)) {
     SUZUME_CONNECTION_ADD(surface_bonus, sc::kPenaltyDeverbalFormalNounAfterRenyokei);
   }
 
@@ -485,8 +485,8 @@ void addDictionaryNounSequenceRules(const core::LatticeEdge& prev, const core::L
   // E.g., 明日+雨, 毎日+電車 should beat 明日雨, 毎日電車 (kanji_seq)
   // When both nouns are in dictionary, the split path is more accurate
   // This helps time nouns (明日, 今日, 毎日) + common nouns (雨, 電車)
-  if (prev.pos == core::PartOfSpeech::Noun && prev.fromDictionary() && next.pos == core::PartOfSpeech::Noun &&
-      next.fromDictionary() && !prev.isFormalNoun() && !next.isFormalNoun()) {
+  if (prev.pos == core::PartOfSpeech::Noun && prev.dictionaryBacked() && next.pos == core::PartOfSpeech::Noun &&
+      next.dictionaryBacked() && !prev.isFormalNoun() && !next.isFormalNoun()) {
     SUZUME_CONNECTION_ADD(surface_bonus, cost::kModerateBonus);  // Prefer dict+dict split over kanji_seq
   }
 
@@ -502,7 +502,7 @@ void addDictionaryNounSequenceRules(const core::LatticeEdge& prev, const core::L
   // E.g., すもも|も|もも should beat すもも|もも (particle interpretation)
   // E.g., もも|の|うち should beat もの|うち (particle interpretation)
   // This helps famous test sentence: すもももももももものうち
-  if (prev.pos == core::PartOfSpeech::Noun && prev.fromDictionary() && grammar::isPureHiragana(prev.surface) &&
+  if (prev.pos == core::PartOfSpeech::Noun && prev.dictionaryBacked() && grammar::isPureHiragana(prev.surface) &&
       next.pos == core::PartOfSpeech::Particle && (next.surface == "も" || next.surface == "の")) {
     SUZUME_CONNECTION_ADD(surface_bonus, cost::kModerateBonus);
   }
@@ -518,7 +518,7 @@ void addHiraganaPredicateFragmentRules(const core::LatticeEdge& prev, const core
   // Pure-hiragana た-form verbs after NOUN/PRON are typically particle+aux sequences
   // Valid kanji+hiragana た-forms like 食べた are not affected (not pure hiragana)
   if ((prev.pos == core::PartOfSpeech::Noun || prev.pos == core::PartOfSpeech::Pronoun) &&
-      next.extended_pos == core::ExtendedPOS::VerbTaForm && !next.fromDictionary() &&
+      next.extended_pos == core::ExtendedPOS::VerbTaForm && !next.dictionaryBacked() &&
       grammar::isPureHiragana(next.surface) &&
       next.surface.size() <= core::kFourJapaneseCharBytes) {  // 4 chars or less (12 bytes in UTF-8)
     SUZUME_CONNECTION_ADD(surface_bonus, cost::kVeryRare);
@@ -528,7 +528,7 @@ void addHiraganaPredicateFragmentRules(const core::LatticeEdge& prev, const core
   // In quotative patterns like かどうか分からない, か is followed by verb directly
   // Override the PART_終→VERB_未然 penalty for dictionary verbs
   if (prev.surface == "か" && prev.extended_pos == core::ExtendedPOS::ParticleFinal &&
-      next.extended_pos == core::ExtendedPOS::VerbMizenkei && next.fromDictionary()) {
+      next.extended_pos == core::ExtendedPOS::VerbMizenkei && next.dictionaryBacked()) {
     SUZUME_CONNECTION_ADD(surface_bonus, cost::kStrongBonus);  // -0.8 to reduce the 1.8 penalty
   }
 
@@ -536,7 +536,7 @@ void addHiraganaPredicateFragmentRules(const core::LatticeEdge& prev, const core
   // E.g., 分+から should be 分から (single verb), not 分(NOUN) + から(VERB かる)
   // When a dictionary entry exists for combined form, penalize the split
   if (prev.pos == core::PartOfSpeech::Noun && grammar::isSingleKanjiSurface(prev.surface) &&
-      next.extended_pos == core::ExtendedPOS::VerbMizenkei && !next.fromDictionary() &&
+      next.extended_pos == core::ExtendedPOS::VerbMizenkei && !next.dictionaryBacked() &&
       grammar::isPureHiragana(next.surface)) {
     SUZUME_CONNECTION_ADD(surface_bonus, cost::kVeryRare);  // Penalize split to favor combined dict verb
   }

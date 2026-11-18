@@ -97,6 +97,7 @@ void mergeInto(core::Morpheme& head, const core::Morpheme& tail) {
   head.surface += tail.surface;
   head.end = tail.end;
   head.flags = core::withoutFlag(head.flags, core::EdgeFlags::FromDictionary);
+  head.flags = core::withoutFlag(head.flags, core::EdgeFlags::DictionaryComposed);
   head.flags = core::withoutFlag(head.flags, core::EdgeFlags::FromUserDict);
 }
 
