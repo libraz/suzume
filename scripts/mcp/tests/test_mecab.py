@@ -1,15 +1,6 @@
 """Tests for MeCab interface (requires MeCab installed)."""
 
-import shutil
-
-import pytest
-
 from suzume_mcp.core.mecab import mecab_analyze
-
-pytestmark = pytest.mark.skipif(
-    shutil.which("mecab") is None,
-    reason="MeCab not installed",
-)
 
 
 def test_basic_sentence():

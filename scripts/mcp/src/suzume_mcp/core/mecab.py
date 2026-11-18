@@ -5,6 +5,9 @@ import subprocess
 
 _MECAB_TIMEOUT_SECONDS = 30.0
 
+# Raised, and reported by the normalize subprocess, when no mecab is on PATH.
+MECAB_MISSING_MESSAGE = "MeCab is not installed (no mecab command on PATH)"
+
 
 def mecab_analyze(text: str) -> list[dict]:
     """Run MeCab on text and return parsed tokens (synchronous).
@@ -25,6 +28,8 @@ def _mecab_tokens(text: str) -> tuple[dict, ...]:
             text=True,
             timeout=_MECAB_TIMEOUT_SECONDS,
         )
+    except FileNotFoundError:
+        raise RuntimeError(MECAB_MISSING_MESSAGE) from None
     except subprocess.TimeoutExpired:
         raise RuntimeError(f"MeCab timed out after {_MECAB_TIMEOUT_SECONDS:g}s") from None
     if result.returncode != 0:

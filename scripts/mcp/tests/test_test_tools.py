@@ -3,18 +3,10 @@
 import asyncio
 import importlib
 import json
-import shutil
-
-import pytest
 
 from suzume_mcp.tools import test_tools as _tt
 
 mutation_tools = importlib.import_module("suzume_mcp.tools._test_tools_mutation")
-
-pytestmark = pytest.mark.skipif(
-    shutil.which("mecab") is None,
-    reason="MeCab not installed",
-)
 
 
 def run(coro):

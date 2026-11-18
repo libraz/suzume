@@ -1,17 +1,11 @@
 """Integration tests for get_expected_tokens (requires MeCab)."""
 
-import shutil
 from unittest.mock import patch
 
 import pytest
 
 from suzume_mcp.core.postprocessors import POSTPROCESSORS
 from suzume_mcp.core.suzume_utils import _oracle_text, format_expected, get_expected_tokens, tokens_match
-
-pytestmark = pytest.mark.skipif(
-    shutil.which("mecab") is None,
-    reason="MeCab not installed",
-)
 
 
 class TestGetExpectedTokens:

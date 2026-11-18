@@ -2,7 +2,6 @@
 
 import asyncio
 import json
-import shutil
 
 import pytest
 
@@ -20,11 +19,6 @@ from suzume_mcp.tools.thread_tools import (
     thread_reset_progress,
     thread_scan,
     thread_status,
-)
-
-pytestmark = pytest.mark.skipif(
-    shutil.which("mecab") is None,
-    reason="MeCab not installed",
 )
 
 

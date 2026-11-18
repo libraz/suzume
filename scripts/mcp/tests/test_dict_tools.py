@@ -3,10 +3,7 @@
 import asyncio
 import importlib
 import json
-import shutil
 import subprocess
-
-import pytest
 
 from suzume_mcp.tools.dict_tools import (
     dict_bulk_add,
@@ -28,11 +25,6 @@ maintenance_tools = importlib.import_module("suzume_mcp.tools._dict_tools_mainte
 operation_tools = importlib.import_module("suzume_mcp.tools._dict_tools_operations")
 common_tools = importlib.import_module("suzume_mcp.tools._dict_tools_common")
 _write_files_and_recompile = common_tools._write_files_and_recompile
-
-pytestmark = pytest.mark.skipif(
-    shutil.which("mecab") is None,
-    reason="MeCab not installed",
-)
 
 
 def run(coro):
