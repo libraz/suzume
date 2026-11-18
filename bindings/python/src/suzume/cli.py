@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
 from pathlib import Path
 from typing import Any, TextIO
 
@@ -200,48 +200,41 @@ def _build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _without_explicit_command(argv: Sequence[str]) -> list[str]:
-    """Remove a leading command token while preserving text after ``--``."""
-    args = list(argv)
+def _scan_arguments(argv: Sequence[str]) -> Iterator[tuple[int, str]]:
+    """Yield ``(index, argument)`` for arguments that are not option values.
+
+    Scanning stops at ``--`` so text after it is never interpreted.
+    """
     idx = 0
-    while idx < len(args):
-        arg = args[idx]
+    while idx < len(argv):
+        arg = argv[idx]
         if arg == "--":
-            return args
+            return
         if arg in _OPTIONS_WITH_VALUES:
             idx += 2
             continue
-        if arg.startswith(_OPTIONS_WITH_ATTACHED_VALUES):
-            idx += 1
-            continue
+        if not arg.startswith(_OPTIONS_WITH_ATTACHED_VALUES):
+            yield idx, arg
+        idx += 1
+
+
+def _without_explicit_command(argv: Sequence[str]) -> list[str]:
+    """Remove a leading command token while preserving text after ``--``."""
+    args = list(argv)
+    for idx, arg in _scan_arguments(argv):
         if arg in _FLAG_OPTIONS:
-            idx += 1
             continue
         if arg == "analyze":
             del args[idx]
         elif arg == "version":
             args[idx] = "--version"
-        return args
+        break
     return args
 
 
 def _has_standalone_version_option(argv: Sequence[str]) -> bool:
     """Return whether a version flag occurs as an option, not text or a value."""
-    index = 0
-    while index < len(argv):
-        argument = argv[index]
-        if argument == "--":
-            return False
-        if argument in _OPTIONS_WITH_VALUES:
-            index += 2
-            continue
-        if argument.startswith(_OPTIONS_WITH_ATTACHED_VALUES):
-            index += 1
-            continue
-        if argument in {"--version", "-v"}:
-            return True
-        index += 1
-    return False
+    return any(arg in {"--version", "-v"} for _, arg in _scan_arguments(argv))
 
 
 def _read_text(parts: Sequence[str], stream: TextIO) -> str:
@@ -387,7 +380,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     try:
         return _run_analysis(args, parser)
     except (OSError, UnicodeError, SuzumeError, ValueError) as error:
-        print(f"suzume: error: {error}", file=sys.stderr)
+        print(f"{parser.prog}: error: {error}", file=sys.stderr)
         return 1
 
 

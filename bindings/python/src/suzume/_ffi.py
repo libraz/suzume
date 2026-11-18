@@ -181,7 +181,6 @@ _SIGNATURES: dict[str, tuple[Any, list[Any]]] = {
     "suzume_clear_user_dictionaries": (ctypes.c_int, [_HANDLE]),
     "suzume_has_core_dictionary": (ctypes.c_int, [_HANDLE]),
     "suzume_version": (_TEXT, []),
-    "suzume_abi_version": (ctypes.c_uint32, []),
     "suzume_last_error": (_TEXT, []),
     "suzume_last_error_code": (_CODE, []),
     "suzume_conjugation_type_label": (_TEXT, [_CODE]),
@@ -196,6 +195,11 @@ _SIGNATURES: dict[str, tuple[Any, list[Any]]] = {
     "suzume_sizeof_tags": (_SIZE, []),
     "suzume_sizeof_tag_options": (_SIZE, []),
     "suzume_sizeof_extended_options": (_SIZE, []),
+    "suzume_offsetof_result": (_SIZE, [ctypes.c_uint32]),
+    "suzume_offsetof_morpheme": (_SIZE, [ctypes.c_uint32]),
+    "suzume_offsetof_tags": (_SIZE, [ctypes.c_uint32]),
+    "suzume_offsetof_tag_options": (_SIZE, [ctypes.c_uint32]),
+    "suzume_offsetof_extended_options": (_SIZE, [ctypes.c_uint32]),
 }
 
 
@@ -205,16 +209,6 @@ def _configure_signatures(lib: ctypes.CDLL) -> None:
         fn = getattr(lib, name)
         fn.restype = restype
         fn.argtypes = argtypes
-    for name in (
-        "suzume_offsetof_result",
-        "suzume_offsetof_morpheme",
-        "suzume_offsetof_tags",
-        "suzume_offsetof_tag_options",
-        "suzume_offsetof_extended_options",
-    ):
-        fn = getattr(lib, name)
-        fn.restype = ctypes.c_size_t
-        fn.argtypes = [ctypes.c_uint32]
 
 
 def _bundled_data_dir(pkg_dir: Path) -> Path | None:

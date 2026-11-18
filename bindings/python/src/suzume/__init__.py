@@ -61,6 +61,8 @@ _POS_LABELS: dict[int, str | None] = {}
 _CONJUGATION_TYPE_LABELS: dict[int, str | None] = {}
 _CONJUGATION_FORM_LABELS: dict[int, str | None] = {}
 _EXTENDED_POS_LABELS: dict[int, str | None] = {}
+_POS_FALLBACK = "OTHER"
+_EXTENDED_POS_FALLBACK = "UNKNOWN"
 
 # POS names accepted by ``generate_tags(pos_filter=...)``, mapped to their
 # bitmask value. Names and casing mirror the WASM binding's TagOptions.pos.
@@ -188,13 +190,18 @@ def _cached_native_label(
 
 
 def _pos_label(code: int) -> str:
-    return _cached_native_label(_POS_LABELS, _lib.suzume_pos_label, code, "OTHER") or "OTHER"
+    return (
+        _cached_native_label(_POS_LABELS, _lib.suzume_pos_label, code, _POS_FALLBACK)
+        or _POS_FALLBACK
+    )
 
 
 def _extended_pos_label(code: int) -> str:
     return (
-        _cached_native_label(_EXTENDED_POS_LABELS, _lib.suzume_extended_pos_label, code, "UNKNOWN")
-        or "UNKNOWN"
+        _cached_native_label(
+            _EXTENDED_POS_LABELS, _lib.suzume_extended_pos_label, code, _EXTENDED_POS_FALLBACK
+        )
+        or _EXTENDED_POS_FALLBACK
     )
 
 
@@ -336,7 +343,7 @@ class Suzume:
     @_locked
     def mode(self) -> Mode:
         """Current analysis mode for this handle."""
-        code = int(_lib.suzume_mode(self._require_handle()))
+        code = _lib.suzume_mode(self._require_handle())
         try:
             return _MODES_BY_CODE[code]
         except KeyError as error:  # pragma: no cover - native ABI invariant
@@ -375,7 +382,8 @@ class Suzume:
             out: list[Morpheme] = []
             for idx in range(data.count):
                 m = data.morphemes[idx]
-                conjugates = bool(m.flags & FLAG_CONJUGATABLE)
+                flags = m.flags
+                conjugates = bool(flags & FLAG_CONJUGATABLE)
                 out.append(
                     Morpheme(
                         surface=_decode_sized(m.surface, m.surface_size),
@@ -389,20 +397,18 @@ class Suzume:
                         if conjugates
                         else None,
                         extended_pos=_extended_pos_label(m.extended_pos),
-                        start=int(m.start),
-                        end=int(m.end),
-                        is_user_dict=bool(m.flags & FLAG_USER_DICT),
-                        is_formal_noun=bool(m.flags & FLAG_FORMAL_NOUN),
-                        is_low_info=bool(m.flags & FLAG_LOW_INFO),
-                        is_unknown=bool(m.flags & FLAG_UNKNOWN),
-                        is_from_dictionary=bool(m.flags & FLAG_FROM_DICTIONARY),
-                        score=float(m.score),
+                        start=m.start,
+                        end=m.end,
+                        is_user_dict=bool(flags & FLAG_USER_DICT),
+                        is_formal_noun=bool(flags & FLAG_FORMAL_NOUN),
+                        is_low_info=bool(flags & FLAG_LOW_INFO),
+                        is_unknown=bool(flags & FLAG_UNKNOWN),
+                        is_from_dictionary=bool(flags & FLAG_FROM_DICTIONARY),
+                        score=m.score,
                     )
                 )
             return AnalysisResult(
-                normalized_text=ctypes.string_at(
-                    data.normalized_text, data.normalized_text_size
-                ).decode("utf-8"),
+                normalized_text=_decode_sized(data.normalized_text, data.normalized_text_size),
                 morphemes=out,
             )
         finally:
@@ -453,15 +459,10 @@ class Suzume:
             raise _native_error("tag generation failed")
         try:
             data = result.contents
-            out: list[Tag] = []
-            for idx in range(data.count):
-                out.append(
-                    Tag(
-                        tag=_decode(data.tags[idx]),
-                        pos=_pos_label(data.pos[idx]),
-                    )
-                )
-            return out
+            return [
+                Tag(tag=_decode(data.tags[idx]), pos=_pos_label(data.pos[idx]))
+                for idx in range(data.count)
+            ]
         finally:
             _lib.suzume_tags_free(result)
 

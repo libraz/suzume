@@ -45,9 +45,5 @@ FLAG_FROM_DICTIONARY = 1 << 4
 FLAG_CONJUGATABLE = 1 << 5
 
 
-def _lookup(values: tuple[str, ...], code: int, fallback: str) -> str:
-    return values[code] if 0 <= code < len(values) else fallback
-
-
 def pos_japanese(code: int) -> str:
-    return _lookup(POS_JAPANESE, code, "その他")
+    return POS_JAPANESE[code] if 0 <= code < len(POS_JAPANESE) else POS_JAPANESE[0]
