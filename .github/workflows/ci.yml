@@ -23,7 +23,7 @@ concurrency:
 env:
   # The uv release every Python environment is provisioned with (scripts/mcp,
   # bindings/python). Each project's uv.lock must stay readable by it.
-  UV_VERSION: "0.10.0"
+  UV_VERSION: "0.13.9"
 
 jobs:
   lint:

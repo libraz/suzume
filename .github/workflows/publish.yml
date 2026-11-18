@@ -12,7 +12,7 @@ permissions:
 env:
   # Must match UV_VERSION in ci.yml, so a release is built with the uv that CI
   # verified the wheel scripts against.
-  UV_VERSION: "0.10.0"
+  UV_VERSION: "0.13.9"
 
 jobs:
   verify-version:
