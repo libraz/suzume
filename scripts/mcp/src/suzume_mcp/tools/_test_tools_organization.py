@@ -135,9 +135,20 @@ def _family_paths(test_dir: Path, file_name: str) -> tuple[str, list[tuple[int, 
         return sorted(parts)
 
     parts = numbered_parts(requested_base)
-    if parts:
+    # A part name whose base file exists belongs to that family; resolving it to
+    # a family of its own would create a second, numbered file beside the base.
+    if parts or (match and (test_dir / f"{requested_base}.json").exists()):
         return requested_base, parts
     return file_name, numbered_parts(file_name)
+
+
+def _ambiguous_families(test_dir: Path) -> list[str]:
+    """Families holding both a base file and numbered parts, which no append can resolve."""
+    return sorted(
+        path.stem
+        for path in test_dir.glob("*.json")
+        if not _PART_SUFFIX_RE.fullmatch(path.stem) and _family_paths(test_dir, path.stem)[1]
+    )
 
 
 def _base_description(data: dict, family: str) -> str:
@@ -170,21 +181,29 @@ def _cross_file_collisions(project_root: Path, planned_names: set[str], skipped:
 def _apply_partition_plan(
     planned: list[tuple[Path, dict]],
     originals: dict[Path, dict],
-    source_to_remove: Path | None,
+    sources_to_remove: list[Path],
 ) -> None:
+    """Write every planned file, then remove the sources; undo all of it on failure.
+
+    ``originals`` holds the prior content of every overwritten or removed path.
+    """
     written: list[Path] = []
+    removed: list[Path] = []
     try:
         for path, data in planned:
             save_json(path, data)
             written.append(path)
-        if source_to_remove is not None:
-            source_to_remove.unlink()
+        for source in sources_to_remove:
+            source.unlink()
+            removed.append(source)
     except Exception:
         for path in written:
             if path in originals:
                 save_json(path, originals[path])
             else:
                 path.unlink(missing_ok=True)
+        for path in removed:
+            save_json(path, originals[path])
         raise
 
 
@@ -279,7 +298,7 @@ def append_cases_partitioned(
     if len(locations) != len(new_cases):
         raise ValueError("Partition plan did not place every new test case")
     if apply:
-        _apply_partition_plan(planned, originals, source_to_remove)
+        _apply_partition_plan(planned, originals, [source_to_remove] if source_to_remove else [])
 
     return {
         "requested_file": file_name,
@@ -326,6 +345,7 @@ async def test_audit_layout(
         )
 
     oversized = [item for item in files if item["over_case_limit"] or item["over_byte_limit"]]
+    ambiguous = _ambiguous_families(get_test_data_dir(PROJECT_ROOT))
     oversized.sort(key=lambda item: (item["bytes"], item["cases"]), reverse=True)
     return _json_result(
         {
@@ -335,8 +355,10 @@ async def test_audit_layout(
                 "files": len(files),
                 "cases": total_cases,
                 "oversized_files": len(oversized),
+                "ambiguous_families": len(ambiguous),
             },
             "oversized": oversized,
+            "ambiguous_families": ambiguous,
         }
     )
 
@@ -351,6 +373,8 @@ async def test_split_file(
 
     Every valid case object and its supported metadata is preserved. The source
     file is removed only after all destination files have been written successfully.
+    Numbered parts that already sit beside the base file are folded in after the
+    base's cases, so the family ends up as either one base file or parts only.
 
     Args:
         file: Source test file basename, without .json.
@@ -374,7 +398,16 @@ async def test_split_file(
     except Exception as exc:
         return _json_error(f"Failed to parse JSON file {source_path}: {exc}")
     cases = get_cases(source_data, str(source_path))
-    if len(cases) <= max_cases:
+    family, numbered_paths = _family_paths(test_dir, file_name)
+    folded_paths = [path for _number, path in numbered_paths] if family == file_name else []
+    originals = {source_path: load_json(source_path)}
+    for path in folded_paths:
+        try:
+            originals[path] = load_json(path)
+        except Exception as exc:
+            return _json_error(f"Failed to parse JSON file {path}: {exc}")
+        cases = [*cases, *get_cases(originals[path], str(path))]
+    if len(cases) <= max_cases and not folded_paths:
         return _json_result(
             {
                 "status": "ok",
@@ -386,16 +419,22 @@ async def test_split_file(
             }
         )
 
-    chunks = _balanced_chunks(cases, max_cases)
-    destinations = [
-        (
-            _part_path(test_dir, file_name, part_index, len(chunks)),
-            _part_data(source_data, chunk, part_index, len(chunks)),
-        )
-        for part_index, chunk in enumerate(chunks, start=1)
-    ]
+    source_data = {**source_data, "description": _base_description(source_data, file_name)}
+    if len(cases) <= max_cases:
+        destinations = [(source_path, {**source_data, TEST_CASES_KEY: cases})]
+    else:
+        chunks = _balanced_chunks(cases, max_cases)
+        destinations = [
+            (
+                _part_path(test_dir, file_name, part_index, len(chunks)),
+                _part_data(source_data, chunk, part_index, len(chunks)),
+            )
+            for part_index, chunk in enumerate(chunks, start=1)
+        ]
+    destination_paths = {path for path, _data in destinations}
+    sources_to_remove = [path for path in originals if path not in destination_paths]
 
-    existing = [path.name for path, _data in destinations if path.exists()]
+    existing = [path.name for path, _data in destinations if path.exists() and path not in originals]
     if existing:
         return _json_error(f"Destination files already exist: {', '.join(existing)}")
 
@@ -408,7 +447,7 @@ async def test_split_file(
             if parameter_name in planned_names:
                 problems.append(f"Generated GoogleTest name collision: {parameter_name}")
             planned_names.add(parameter_name)
-    problems.extend(_cross_file_collisions(PROJECT_ROOT, planned_names, {source_path}))
+    problems.extend(_cross_file_collisions(PROJECT_ROOT, planned_names, set(originals)))
 
     source_digest = _case_digest(cases)
     combined_cases = [case for _path, data in destinations for case in data[TEST_CASES_KEY]]
@@ -430,13 +469,14 @@ async def test_split_file(
         "source_bytes": source_path.stat().st_size,
         "case_digest": source_digest,
         "parts": parts,
+        "folded": [path.stem for path in folded_paths],
         "applied": apply,
     }
     if not apply:
         return _json_result(result)
 
     try:
-        _apply_partition_plan(destinations, {}, source_path)
+        _apply_partition_plan(destinations, originals, sources_to_remove)
     except Exception as exc:
         return _json_error(f"Failed to apply split; generated files were rolled back: {exc}")
 

@@ -50,8 +50,19 @@ def test_audit_layout_reports_only_oversized_files(tmp_path, monkeypatch):
 
     data = parse(run(organization.test_audit_layout(max_cases=2, max_bytes=1_000_000)))
 
-    assert data["summary"] == {"files": 2, "cases": 4, "oversized_files": 1}
+    assert data["summary"] == {"files": 2, "cases": 4, "oversized_files": 1, "ambiguous_families": 0}
     assert [item["file"] for item in data["oversized"]] == ["large"]
+
+
+def test_audit_layout_reports_a_base_file_beside_numbered_parts(tmp_path, monkeypatch):
+    write_suite(tmp_path, "large", [make_case(1)])
+    write_suite(tmp_path, "large_01", [make_case(2)])
+    write_suite(tmp_path, "other_01", [make_case(3)])
+    monkeypatch.setattr(organization, "PROJECT_ROOT", tmp_path)
+
+    data = parse(run(organization.test_audit_layout()))
+
+    assert data["ambiguous_families"] == ["large"]
 
 
 def test_split_file_dry_run_does_not_write(tmp_path, monkeypatch):
@@ -88,7 +99,7 @@ def test_split_file_preserves_complete_cases_and_order(tmp_path, monkeypatch):
     assert generated_cases == cases
 
 
-def test_split_file_refuses_existing_destination(tmp_path, monkeypatch):
+def test_split_file_folds_parts_beside_the_base_into_new_parts(tmp_path, monkeypatch):
     cases = [make_case(index) for index in range(3)]
     write_suite(tmp_path, "large", cases)
     write_suite(tmp_path, "large_01", [make_case(10)])
@@ -96,9 +107,35 @@ def test_split_file_refuses_existing_destination(tmp_path, monkeypatch):
 
     data = parse(run(organization.test_split_file("large", max_cases=2, apply=True)))
 
-    assert data["status"] == "error"
-    assert "already exist" in data["message"]
-    assert (tmp_path / "tests" / "data" / "tokenization" / "large.json").exists()
+    test_dir = tmp_path / "tests" / "data" / "tokenization"
+    assert data["folded"] == ["large_01"]
+    assert not (test_dir / "large.json").exists()
+    generated = [json.loads(path.read_text(encoding="utf-8")) for path in sorted(test_dir.glob("large_*.json"))]
+    assert [case for part in generated for case in part["cases"]] == [*cases, make_case(10)]
+    assert [part["description"] for part in generated] == ["large tests (part 1/2)", "large tests (part 2/2)"]
+
+
+def test_split_file_folds_a_small_family_into_the_base(tmp_path, monkeypatch):
+    write_suite(tmp_path, "large", [make_case(1)])
+    write_suite(tmp_path, "large_01", [make_case(2)])
+    monkeypatch.setattr(organization, "PROJECT_ROOT", tmp_path)
+
+    data = parse(run(organization.test_split_file("large", max_cases=100, apply=True)))
+
+    test_dir = tmp_path / "tests" / "data" / "tokenization"
+    assert data["parts"] == [{"file": "large", "cases": 2, "bytes": data["parts"][0]["bytes"]}]
+    assert not (test_dir / "large_01.json").exists()
+    assert json.loads((test_dir / "large.json").read_text(encoding="utf-8"))["cases"] == [make_case(1), make_case(2)]
+
+
+def test_partitioned_append_to_a_part_name_uses_the_existing_base(tmp_path):
+    write_suite(tmp_path, "large", [make_case(1)])
+
+    result = organization.append_cases_partitioned(tmp_path, "large_01", [make_case(2)])
+
+    test_dir = tmp_path / "tests" / "data" / "tokenization"
+    assert result["case_locations"][0]["file"] == "large"
+    assert not (test_dir / "large_01.json").exists()
 
 
 def test_split_file_rejects_sanitized_id_collision(tmp_path, monkeypatch):
