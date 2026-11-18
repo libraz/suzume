@@ -458,7 +458,8 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
     // run is [noun] + particle, and the い that looks like an adjective ending
     // starts the next word (水とか + いう read as the non-word 水とかい).
     // @see fabricated closed-class absorption guards (verb_candidates_absorption_guards.h)
-    if (!isAdjectiveInDictionary(dict_manager, surface) &&
+    const bool surface_listed = isAdjectiveInDictionary(dict_manager, surface);
+    if (!surface_listed &&
         verb_helpers::guardIsWired(verb_helpers::GuardMember::FocusParticleHead,
                                    verb_helpers::GuardOrigin::KanjiAdjective) &&
         verb_helpers::startsWithFocusParticleHead(dict_manager, codepoints, kanji_end, end_pos)) {
@@ -483,7 +484,7 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
     // These are genuine i-adjectives whose okurigana coincidentally matches
     // verb negative patterns but must not be blocked.
     if (grammar::endsWithVerbNegative(hiragana_part)) {
-      if (!isAdjectiveInDictionary(dict_manager, surface)) {
+      if (!surface_listed) {
         continue;  // Skip - verb negative pattern, not adjective
       }
       SUZUME_DEBUG_LOG_VERBOSE("[ADJ_NAI] dict-confirmed nai-adj: \"" << surface << "\"\n");
@@ -500,7 +501,7 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
     // nai-adjectives (味気ない etc.) keep their fused form, in any cell.
     const bool is_bare_nai_form =
         verb_helpers::readsAsBaseForm(inflection, hiragana_part, kNegativeAdjectiveBase, grammar::VerbType::IAdjective);
-    if (is_bare_nai_form && (kanji_end - start_pos) >= 2 && !isAdjectiveInDictionary(dict_manager, surface) &&
+    if (is_bare_nai_form && (kanji_end - start_pos) >= 2 && !surface_listed &&
         !isAdjectiveInDictionary(dict_manager, codepoints, start_pos, kanji_end, kNegativeAdjectiveBase)) {
       continue;
     }

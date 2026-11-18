@@ -183,7 +183,7 @@ float iAdjectiveConfidenceAtLeast(const std::vector<grammar::InflectionCandidate
       return candidate.confidence;
     }
   }
-  return float{};
+  return candidate::kNoOriginConfidence;
 }
 
 bool closesAtTextEndOrSymbol(const std::vector<normalize::CharType>& char_types, size_t pos) {

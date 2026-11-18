@@ -733,7 +733,7 @@ void generateAdjectiveStemCandidates(const std::vector<char32_t>& codepoints, si
       // Validate that this looks like a real adjective
       const auto& adj_results = inflection.analyze(base_form);
       const float adj_confidence = adj_detail::iAdjectiveConfidenceAtLeast(adj_results, candidate::kIAdjConfMin);
-      const bool is_valid_adjective = adj_confidence != 0.0F;
+      const bool is_valid_adjective = adj_confidence != candidate::kNoOriginConfidence;
 
       SUZUME_DEBUG_LOG_VERBOSE("[ADJ_STEM]   base=\"" << base_form << "\" is_valid=" << is_valid_adjective
                                                       << " conf=" << adj_confidence << "\n");

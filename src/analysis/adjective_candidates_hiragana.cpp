@@ -334,7 +334,8 @@ size_t boundedAdjectiveRunEnd(const HiraganaAdjectiveRun& run, const std::string
   const auto& bounded_candidates = run.inflection.analyze(bounded_analysis_surface);
   const bool has_bounded_i_adjective =
       bounded_long_ku_form &&
-      adj_detail::iAdjectiveConfidenceAtLeast(bounded_candidates, candidate::kHiraAdjConfParticle) != float{};
+      adj_detail::iAdjectiveConfidenceAtLeast(bounded_candidates, candidate::kHiraAdjConfParticle) !=
+          candidate::kNoOriginConfidence;
   size_t hiragana_end = has_bounded_i_adjective ? max_hiragana_end : start_pos;
   while (!has_bounded_i_adjective && hiragana_end < max_hiragana_end) {
     char32_t curr_char = codepoints[hiragana_end];
