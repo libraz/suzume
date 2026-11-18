@@ -1,48 +1,49 @@
 # Contributing to Suzume
 
-Thanks for your interest in Suzume! Contributions are welcome.
+Contributions are welcome, including small and unfinished ones. A maintainer reviews every pull request, finishes what is missing, and merges it, so you do not need to get everything in this document right, or even read all of it.
 
-Suzume is a lightweight Japanese tokenizer with a small dictionary. Before you start, one thing is worth knowing up front: unlike many projects, Suzume enforces a few **design invariants in CI** (see below). They are what keep the analyzer generalizable instead of a pile of special cases, so a change that violates them will fail CI even if the tests pass. Skimming that section first will save you a red pipeline.
+## What a pull request needs
 
-## How to Contribute
+- A description of what the change does and why. If the intent is clear, the maintainer can verify the behaviour. For a tokenization change, the input sentence and the tokens you expect are enough.
+- If you can, a build and the tests for the part you changed.
 
-1. **Fork the repository**
-2. **Create a feature branch**
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-3. **Make your changes**
-4. **Test your changes**
-   ```bash
-   make test
-   ```
-5. **Commit and push**, then **open a Pull Request** against the `develop` branch.
+That is all. A red check, a missing test, or a binding you did not touch is fine: say what you know in the pull request, and the maintainer will finish it or tell you what is left. Target `develop` if you can; a pull request against `main` is retargeted.
 
-## Development Setup
+For a larger change, such as a new analysis stage or a change to the public API, opening an issue first to describe the idea can save you work. It is not required.
 
-Requirements: a C++17 compiler, CMake 3.15+, and [uv](https://docs.astral.sh/uv/) 0.10 or
-later. uv provides the Python interpreter pinned in each project's `.python-version` and the
-MCP/oracle and Python-binding environments from their committed `uv.lock`; no system Python is
-needed. `make python-sync` provisions both.
+Reporting a bug you do not intend to fix is a useful contribution too, and needs none of the setup below. A sentence that Suzume splits in the wrong place is a bug report.
 
-```bash
-make build   # Configure + build (or: cmake -B build && cmake --build build --parallel)
-make test    # Run the test suite
-make format  # Format code (clang-format), optional
-```
+### What the maintainer can verify
 
-Debug a single sentence without running the whole suite:
+The maintainer tests on macOS, on Linux through CI, and on Windows in Japanese only. If your change or bug depends on Windows in another language (the console code page, how Japanese text reaches the CLI, the per-user or system dictionary directory), describe what you see there, ideally with the exact command and its output, because it cannot be reproduced on the maintainer's side.
 
-```bash
-SUZUME_DEBUG=1 ./build/bin/suzume-cli "問題文"   # 1=basic, 2=detailed, 3=trace
-```
+## What you are contributing to
 
-WebAssembly build (for the `@libraz/suzume` npm binding):
+A Japanese tokenizer with a C++17 core and a C ABI, shipped to several runtimes:
+
+- `src/` and `include/` are the core library and its public C and C++ headers.
+- `tools/cli` is the `suzume-cli` command.
+- `bindings/wasm` is the `@libraz/suzume` npm package; `bindings/python` is the `suzume` PyPI package.
+- `data/` holds the dictionary sources; `tests/` holds the C++ tests and the tokenization test data.
+- `scripts/mcp` is the tooling that derives test expectations and edits test data and dictionaries.
+
+The Go binding is maintained in a separate repository, [libraz/go-suzume](https://github.com/libraz/go-suzume). Report problems with the Go module there.
+
+The rest of this document has two parts. [Checklist](#checklist) describes what a finished change looks like. [Reference](#reference) explains how the checks and tools behave.
+
+## Development setup
+
+A C++17 compiler, CMake 3.15 or later, and [uv](https://docs.astral.sh/uv/) 0.10 or later. uv provides the Python interpreter pinned in each project's `.python-version`, and the tooling and Python binding environments from their committed `uv.lock`; no system Python is needed.
 
 ```bash
-source /path/to/emsdk/emsdk_env.sh
-make wasm
+make build                                      # configure and build the core, CLI and tests
+make native-test                                # compile the dictionaries and run the C++ tests
+SUZUME_DEBUG=1 ./build/bin/suzume-cli "東京に行く"  # analyse one sentence; 1=basic, 2=detailed, 3=trace
+make lint                                       # read-only static checks
+make format                                     # apply formatting across every language
 ```
+
+`make python-sync` provisions both Python environments up front; every target that needs one also syncs it on demand. The tooling tests (`make mcp-test`) and `make oracle-sync-check` also need the reference analyzer that CI installs in the `mcp-tests` job.
 
 Python binding (ctypes over the shared library):
 
@@ -50,63 +51,74 @@ Python binding (ctypes over the shared library):
 make python-test
 ```
 
-## Design Invariants (enforced by CI)
+WebAssembly binding, which needs an Emscripten toolchain and Yarn:
 
-These are checked by the `guardrails` and `build-and-test` jobs and are **blocking**. They exist because Suzume aims to be correct *by rule*, not by enumerating cases.
-
-### 1. Fix the implementation, not the expectations
-
-Test expectations are **derived**, not hand-written. The pipeline is:
-
-```
-reference analyzer output → normalization rules → test expectation
+```bash
+source /path/to/emsdk/emsdk_env.sh
+make wasm
+make wasm-test
 ```
 
-When a test fails, the fix is almost always in the analyzer or the normalization rules — **not** in the expected tokens. Do not edit a test's expected output to match Suzume's current (wrong) output. Test data under `tests/data/tokenization/*.json` and dictionary data under `data/**/*.tsv` are managed through tooling, not edited by hand (a hook blocks direct writes).
+`make test` runs every suite above plus the sanitizer, CMake configuration, parity and guardrail checks, so it needs all of these toolchains.
 
-Note: the reference analyzer (MeCab) is a *reference*, not ground truth. Suzume is a tokenizer aimed at search-friendly units, so it intentionally differs in many places (compound merging, number/date merging, POS choices). "Matching MeCab" is not the goal, and MeCab bugs are not reproduced — see the [tokenization differences](https://suzume.libraz.net/docs/mecab-comparison) page.
+## What CI requires
 
-### 2. Generalize with rules — no hardcoding
+A red check on your pull request is not a reason to hold it back; the maintainer can look at it with you.
 
-The `guardrails` job ratchets down the number of surface-string comparisons (`surface == "..."`) and raw score literals in `src/analysis/*.cpp`. Adding either will fail CI. Solve boundary and scoring problems with:
+| Workflow | Job | Runs on | What it checks |
+| --- | --- | --- | --- |
+| `ci.yml` | `lint` | pushes to `main` and `develop`, and pull requests to `main` | Biome on the WASM binding; ruff on the tooling and repository scripts |
+| `ci.yml` | `guardrails` | the same events | the code guardrail ratchet and WASM-core purity, oracle overrides, binding label tables, oracle mirrors of core data, version mirrors |
+| `ci.yml` | `mcp-tests` | the same events | the tooling tests, and that the stored test expectations match a fresh derivation |
+| `ci.yml` | `sanitizers` | the same events | the C++ tests under ASan, LSan and UBSan |
+| `ci.yml` | `native-nodebug` | the same events | the C++ tests with the debug features compiled out |
+| `ci.yml` | `cmake-configurations` | the same events | each supported CMake build and install configuration |
+| `ci.yml` | `manylinux-toolchain` | the same events | building and testing the wheel with the oldest supported toolchain |
+| `ci.yml` | `build-and-test` | the same events | the C++ tests with coverage, the examples and installed-package consumers, the WASM build, its size check and tests, and native/Python/WASM parity |
+| `ci.yml` | `python-binding` | the same events except pushes to `develop` | ruff, mypy and the tests of the Python binding, and the Python example |
+| `publish.yml` | release jobs | version tags | verifies the version mirrors, runs the C++ tests, publishes to npm and PyPI, and creates the GitHub release |
 
-- Conjugation / connection **rules** (`grammar::` helpers)
-- **bigram** connection penalties/bonuses (`src/analysis/bigram_table.cpp`) for over- or under-splitting
-- Category costs, with constants defined in the `*_constants.h` files
+Changes that touch only Markdown, `docs/` or `LICENSE` do not start `ci.yml`.
 
-There are **no per-word costs** — scoring generalizes by category, never by individual word.
+## Checklist
 
-### 3. Keep the core WASM-pure
+This is what a change looks like by the time it is merged. The maintainer checks it and fills in what is missing, so you are not expected to know all of it.
 
-The core must build to WebAssembly. Do not include `<fstream>`, `<thread>`, `<filesystem>`, or `<mutex>` unguarded in the core layers — wrap them in `#ifndef __EMSCRIPTEN__` or avoid them. There is also a WASM size-regression check; large additions of static data or hardcoded entries will trip it.
+- When a tokenization test fails, change the analyzer or the normalization rules under `scripts/mcp/src/suzume_mcp/core/`, not the expected tokens.
+- Fix over-splitting with a bigram connection penalty in `src/analysis/bigram_table.cpp` and under-splitting with a bonus, before reaching for a dictionary entry.
+- Solve boundary and scoring problems with conjugation and connection rules (the `grammar::` helpers), bigram costs, or category costs, rather than comparing against specific surface strings.
+- Put score values in the `*_constants.h` files instead of writing numeric literals in analysis code.
+- Add a dictionary entry only for a closed-class word, or for a proper noun or domain term in the user dictionary under `data/user/`.
+- Keep `<fstream>`, `<thread>`, `<filesystem>`, `<mutex>` and `<iostream>` out of the core layers, or inside an `#ifndef __EMSCRIPTEN__` branch.
+- Keep morpheme boundaries at particles and inflected forms: `条件に関わらず` stays `条件 / に / 関わら / ず`.
+- When a change fixes a tokenization bug, add the sentence as a regression test, through the tooling rather than by editing the JSON.
+- Use generic Japanese in tests, examples and comments (`東京`, `りんご`, `テスト`), with no real person's name and no title or character name from a published work.
+- Write comments in English.
 
-### 4. Dictionaries are the last resort
+### Commit messages
 
-The decision rule for adding a dictionary entry is **"closed class or open class?"**:
+Conventional Commits, in English: `type(scope): summary`. A body, when there is one, is a blank line followed by `- ` bullets, one per line. Commit messages can be rewritten at merge, so do not let them hold up a pull request.
 
-- **Closed class** (grammatically finite — particles, auxiliaries, conjunctions): may live in the L1/L2 dictionaries.
-- **Open class** (general nouns, verbs, adjectives — derivable by rule): do **not** add these; handle them with rules.
-- **Over-splitting** is fixed with a bigram penalty, **not** by adding a dictionary entry.
+## Reference
 
-Proper nouns and domain terms buried in kanji runs (names, places) are the main legitimate use of the User dictionary.
+Nothing in this section asks anything of you; read it when a checklist item or a check puzzles you.
 
-## Pull Request Guidelines
+- Test expectations are derived, not hand-written: the output of a reference morphological analyzer passes through the normalization rules in `scripts/mcp/src/suzume_mcp/core/`, and the result is the expectation. Changing one case's expected tokens would silence that case without changing the rule, so a test case carries no expectation of its own, and `suzume_test` and the `guardrails` job both fail on a case that tries to.
+- The reference analyzer is a reference, not ground truth. Suzume splits into search units, so it differs on purpose in many places (compounds, numbers and dates, part-of-speech choices), does not reproduce the reference analyzer's errors, and does not aim to match it. The [tokenization differences](https://suzume.libraz.net/docs/mecab-comparison) page lists the intentional ones.
+- Scoring generalizes by category; there are no per-word costs. A cost tuned for one word changes how every sentence containing that word is scored, and hides the rule that would have fixed the whole class.
+- `scripts/check_code_guardrails.sh` counts, per file under `src/analysis`, `src/grammar`, `src/postprocess` and the `src/core` headers, the comparisons against Japanese string literals, the raw score literals, and the score constants referenced in scorer files, and fails when a count rises above `scripts/guardrail-baseline.tsv`. The same script checks that the file-I/O, thread and stream headers stay out of the core layers outside an `__EMSCRIPTEN__`-excluded branch.
+- The WASM build keeps its dictionaries embedded and the core holds only static data, which is why the core cannot use those headers. `scripts/check_wasm_size.sh` fails when the built module, raw or gzipped, grows past a tolerance over its recorded baseline, which large static tables or new hard-coded entries tend to cause.
+- A dictionary entry is decided by whether the word belongs to a closed or an open class. Closed classes (particles, auxiliaries, conjunctions, adnominals, pronouns, formal nouns) are finite and live in the built-in dictionary under `src/dictionary/entries/`. Open-class words (general nouns, verbs, adjectives) are derived by rule; the core dictionary under `data/core/` holds only the exceptions rules cannot resolve. The user dictionary under `data/user/` is for proper nouns and domain terms buried in kanji runs.
+- Test data in `tests/data/tokenization/*.json` and dictionary sources in `data/**/*.tsv` are written through the MCP server in `scripts/mcp` (wired up in `.mcp.json`): `test_show` shows a sentence's analysis, `test_add` registers a regression test, `dict_add` adds a dictionary entry, and `test_needs_suzume_update` resynchronizes expectations after a normalization rule changes. The agent hooks in `.claude/hooks/` block direct edits of those files. None of this is needed to contribute: describe the sentence and the expected tokens, and the maintainer registers the test.
+- A pull request to `develop` does not start `ci.yml`; the maintainer runs the same checks before merging.
+- The pre-commit hook in `scripts/hooks/pre-commit.sh` is installed by `yarn install` in `bindings/wasm` and checks the formatting of staged files. `SKIP_SIMPLE_GIT_HOOKS=1` skips it.
 
-- **Target `develop`**, not `main`.
-- **Tests pass** (`make test`) and the `guardrails` job is green.
-- **One change per PR** — keep it focused and atomic.
-- **Comments in English**; follow the surrounding style.
-- If you fixed a tokenization bug, **add the sentence as a regression test** (via the tooling — see below).
+## Reporting issues
 
-## Using Claude Code (optional)
+Search the existing issues first, then include the input text, the tokens Suzume produced, the tokens you expected, the Suzume version, which package you used (npm, PyPI, C/C++ library or CLI), and your OS and its display language. For a problem with a user dictionary, include the dictionary file or the entries that trigger it.
 
-Day-to-day development in this repo is driven through an MCP server under `scripts/mcp/` (the `.mcp.json` at the root wires it up). If you use Claude Code, tools like `test_show`, `test_add`, and `dict_add` automate the test-expectation pipeline and dictionary edits described above, so you don't touch the JSON/TSV files directly. This is entirely optional — everything above works from a normal shell with `make`.
+Security vulnerabilities go through the process in [SECURITY.md](SECURITY.md), not the public issue tracker.
 
-## Reporting Issues
+## Licence
 
-- Check whether the issue already exists.
-- Include the input sentence, the tokens Suzume produced, and what you expected.
-
-## License
-
-By contributing, you agree that your contributions will be licensed under the [Apache License 2.0](LICENSE).
+By contributing, you agree that your contributions are licensed under the [Apache License 2.0](LICENSE).
