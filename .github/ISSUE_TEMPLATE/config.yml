@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Documentation
+    url: https://suzume.libraz.net
+    about: Getting started, the API of each binding, and the user dictionary format
+  - name: Go module
+    url: https://github.com/libraz/go-suzume/issues
+    about: The Go binding is maintained in its own repository
+  - name: Security vulnerabilities
+    url: https://github.com/libraz/suzume/blob/main/SECURITY.md
+    about: Report privately as described in the security policy
