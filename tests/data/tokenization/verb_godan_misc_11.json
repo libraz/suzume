@@ -2654,6 +2654,50 @@
       ],
       "id": "ndehamita",
       "input": "読んではみた"
+    },
+    {
+      "description": "One-mora ichidan stem み after a listed adverb",
+      "expected": [
+        {
+          "lemma": "すぐ",
+          "pos": "Adverb",
+          "surface": "すぐ"
+        },
+        {
+          "lemma": "みる",
+          "pos": "Verb",
+          "surface": "み"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "sugumita",
+      "input": "すぐみた"
+    },
+    {
+      "description": "One-mora ichidan stem み after the adverb もう",
+      "expected": [
+        {
+          "lemma": "もう",
+          "pos": "Adverb",
+          "surface": "もう"
+        },
+        {
+          "lemma": "みる",
+          "pos": "Verb",
+          "surface": "み"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "moumita",
+      "input": "もうみた"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 11/11)",

@@ -463,11 +463,12 @@ float computePrefixSymbolBonus(const core::LatticeEdge& prev, const core::Lattic
   // Valid ADV+verb patterns: ゆっくり+歩く (verb is longer/has kanji)
   // This prevents split like はなはだ+し+い when はなはだしい exists in dict
   // Exception: dictionary verbs like ね(寝る), み(見る), で(出る) are valid, and
-  // so is the カ変 continuative. Its one mora is a cell of a closed irregular
-  // paradigm rather than a stem hypothesized from the adverb's tail, so it
-  // carries the same lexical weight as a listed entry (ぐっと+き+た).
+  // so are the カ変 continuative and a one-mora 一段 stem. Each is a cell of a
+  // closed paradigm (来る; 見る・寝る・出る and their few kin) rather than a stem
+  // hypothesized from the adverb's tail, so it carries the same lexical weight
+  // as a listed entry (ぐっと+き+た, すぐ+み+た).
   if (prev.pos == core::PartOfSpeech::Adverb && isSingleHiraganaVerbRenyokei(next) && !next.dictionaryBacked() &&
-      next.conj_type != dictionary::ConjugationType::Kuru) {
+      next.conj_type != dictionary::ConjugationType::Kuru && next.conj_type != dictionary::ConjugationType::Ichidan) {
     // The bar weighs twice kVeryRare.
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryRare + cost::kVeryRare);
   }
