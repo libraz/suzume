@@ -1501,6 +1501,112 @@
       ],
       "id": "egaarenandayo",
       "input": "答えがあれなんだよ"
+    },
+    {
+      "description": "Kanji motion verb after a demonstrative manner adverbial is the predicate",
+      "expected": [
+        {
+          "lemma": "こう",
+          "pos": "Adverb",
+          "surface": "こう"
+        },
+        {
+          "lemma": "やる",
+          "pos": "Verb",
+          "surface": "やっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行き"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "kou_yatte_iku_motion_verb",
+      "input": "こうやって行きます"
+    },
+    {
+      "description": "Past form of the kanji motion verb after a demonstrative manner adverbial",
+      "expected": [
+        {
+          "lemma": "そう",
+          "pos": "Adverb",
+          "surface": "そう"
+        },
+        {
+          "lemma": "やる",
+          "pos": "Verb",
+          "surface": "やっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "sou_yatte_iku_motion_verb_past",
+      "input": "そうやって行った"
+    },
+    {
+      "description": "Kana iku after a demonstrative manner adverbial stays the aspect auxiliary",
+      "expected": [
+        {
+          "lemma": "これ",
+          "pos": "Pronoun",
+          "surface": "これ"
+        },
+        {
+          "lemma": "から",
+          "pos": "Particle",
+          "surface": "から"
+        },
+        {
+          "lemma": "どう",
+          "pos": "Adverb",
+          "surface": "どう"
+        },
+        {
+          "lemma": "やる",
+          "pos": "Verb",
+          "surface": "やっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いく",
+          "pos": "Auxiliary",
+          "surface": "いく"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        }
+      ],
+      "id": "dou_yatte_kana_iku_aspect_control",
+      "input": "これからどうやっていくか"
     }
   ],
   "version": "1.0"
