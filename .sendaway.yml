@@ -1,4 +1,6 @@
-# Only build directories named build-linux-* run on the build host. The default
-# build/ stays on the workstation: the oracle tooling runs its macOS binaries.
-remote: [[cmake, "build-linux-*"], [ctest, "build-linux-*"]]
-env: [SUZUME_*, CTEST_*]
+# Only build directories named build-linux-* run on the build host, plus
+# `make wasm-linux`, which builds in such directories with the Emscripten
+# release installed there. The default build/ and build-wasm stay on the
+# workstation: the oracle tooling runs its macOS binaries.
+remote: [[cmake, "build-linux-*"], [ctest, "build-linux-*"], [make, wasm-linux]]
+env: [SUZUME_*, CTEST_*, JOBS]

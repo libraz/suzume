@@ -2,7 +2,7 @@
 # Convenience wrapper for CMake build system
 
 .PHONY: help build test native-test native-test-nodebug native-bench mcp-test oracle-sync-check guardrails asan clean clean-build rebuild format format-check lint configure \
-        wasm wasm-configure wasm-dict wasm-test wasm-bench wasm-clean wasm-rebuild dict \
+        wasm wasm-configure wasm-dict wasm-test wasm-bench wasm-clean wasm-rebuild wasm-linux dict \
         python-build python-test python-wheel python-sync python-examples version-check binding-parity \
         install uninstall examples examples-test embedded consumer-smoke cmake-smoke
 
@@ -93,6 +93,7 @@ help:
 	@echo "  make wasm-bench   - Measure public-API WASM throughput and memory"
 	@echo "  make wasm-clean   - Clean WASM build"
 	@echo "  make wasm-rebuild - Clean and rebuild WASM"
+	@echo "  make wasm-linux   - Build WASM with the pinned Emscripten in build-linux-* (build host)"
 	@echo ""
 	@echo "Options:"
 	@echo "  CMAKE_OPTIONS     - Extra CMake options (e.g., -DENABLE_DEBUG_INFO=OFF)"
@@ -394,6 +395,13 @@ wasm: wasm-dict wasm-configure
 	$(CMAKE) --build $(WASM_BUILD_DIR) --parallel $(JOBS)
 	@echo "WASM build complete!"
 	@ls -lh bindings/wasm/dist/suzume.wasm bindings/wasm/dist/suzume.js
+
+# Build WASM with the Emscripten release CI pins, in build-linux-* directories,
+# and run the size gate. .sendaway.yml sends this target to the build host,
+# where the pinned SDK sits beside other releases; the result stays there
+# (copy it out with `sendaway fetch`). Niced: that host is shared.
+wasm-linux:
+	nice -n 10 scripts/build_wasm_pinned.sh
 
 # Run WASM tests
 wasm-test: wasm
