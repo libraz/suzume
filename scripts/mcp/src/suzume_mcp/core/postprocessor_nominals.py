@@ -2,6 +2,7 @@
 
 import regex
 
+from .conjugation_rows import GODAN_A_ROW_TO_BASE
 from .constants import (
     ADVERB_NOMINAL_HOMOGRAPHS,
     COPULA_SURFACES,
@@ -314,8 +315,18 @@ def postprocess_deverbal_noun_context(tokens: list[dict]) -> bool:
             and following.get("lemma") == "ない"
             and not _is_irrealis_before_negative(surface)
         )
+        # An irrealis selects an auxiliary (くるま+ない, くるま+れる), so a kana one
+        # closing the clause is not that verb cell but a noun spelled the same.
+        clause_final_irrealis = (
+            not following
+            and regex.fullmatch(r"\p{Hiragana}+", surface) is not None
+            and len(surface) == len(lemma)
+            and surface[:-1] == lemma[:-1]
+            and GODAN_A_ROW_TO_BASE.get(surface[-1:]) == lemma[-1:]
+        )
         if (
             not nominal_particle
+            and not clause_final_irrealis
             and not nominal_follower
             and not suru_object
             and not predicative_copula

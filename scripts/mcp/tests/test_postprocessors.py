@@ -2064,3 +2064,21 @@ class TestRepairDesiderativeAfterOnbin:
         ]
         postprocessors.repair_desiderative_after_onbin(tokens)
         assert [t["surface"] for t in tokens] == ["やっ", "たかっ", "た"]
+
+
+class TestClauseFinalKanaIrrealis:
+    """A kana godan irrealis closing a clause is read as the noun it spells."""
+
+    @pytest.mark.parametrize("text", ["あるくるま", "くるま。", "布でくるま、"])
+    def test_a_clause_final_kana_irrealis_is_a_noun(self, text):
+        token = next(t for t in get_expected_tokens(text)[0] if t["surface"] == "くるま")
+        assert (token["pos"], token["lemma"]) == ("Noun", "くるま")
+
+    @pytest.mark.parametrize("text", ["布でくるまない", "布にくるまれる", "布でくるまず"])
+    def test_an_irrealis_before_its_auxiliary_stays_a_verb(self, text):
+        token = next(t for t in get_expected_tokens(text)[0] if t["surface"] == "くるま")
+        assert (token["pos"], token["lemma"]) == ("Verb", "くるむ")
+
+    def test_a_kanji_stem_irrealis_stays_a_verb(self):
+        token = next(t for t in get_expected_tokens("これを読ま")[0] if t["surface"] == "読ま")
+        assert (token["pos"], token["lemma"]) == ("Verb", "読む")
