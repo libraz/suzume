@@ -17,10 +17,7 @@
 set -eu
 cd "$(git rev-parse --show-toplevel)"
 
-version=$(awk '
-  /uses: mymindstorm\/setup-emsdk@/ { in_step = 1; next }
-  in_step && /version:/ { sub(/.*version:[ \t]*/, ""); print; exit }
-' .github/workflows/ci.yml)
+version=$(scripts/emsdk_version.sh)
 [ -n "$version" ] || { echo "❌ no setup-emsdk version in .github/workflows/ci.yml"; exit 1; }
 
 sdk="${EMSDK_PINNED_ROOT:-/opt/emsdk-$version}"

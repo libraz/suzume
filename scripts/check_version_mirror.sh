@@ -45,14 +45,18 @@ if [ "${lock_ver:-missing}" != "$canonical" ]; then
   echo "   refresh it with: (cd bindings/python && uv lock)"
 fi
 
-# Every workflow provisions its tools with one uv release and one mise release:
-# ci.yml states each in its workflow-level env and publish.yml mirrors it.
-workflow_env() {
-  grep -Eo "^  $2: *\"[^\"]+\"" "$1" 2>/dev/null | grep -Eo '"[^"]+"' | tr -d '"' | head -1
+# Every workflow provisions its tools with one uv, one mise and one Emscripten
+# release: ci.yml states each (uv and mise in its workflow-level env, Emscripten
+# in its setup-emsdk step) and publish.yml mirrors it.
+tool_version() {
+  case "$2" in
+    setup-emsdk) scripts/emsdk_version.sh "$1" ;;
+    *) grep -Eo "^  $2: *\"[^\"]+\"" "$1" 2>/dev/null | grep -Eo '"[^"]+"' | tr -d '"' | head -1 ;;
+  esac
 }
-for tool_var in UV_VERSION MISE_VERSION; do
-  ci_ver=$(workflow_env .github/workflows/ci.yml "$tool_var")
-  publish_ver=$(workflow_env .github/workflows/publish.yml "$tool_var")
+for tool_var in UV_VERSION MISE_VERSION setup-emsdk; do
+  ci_ver=$(tool_version .github/workflows/ci.yml "$tool_var")
+  publish_ver=$(tool_version .github/workflows/publish.yml "$tool_var")
   if [ -z "$ci_ver" ]; then
     echo "❌ ci.yml $tool_var (.github/workflows/ci.yml): missing"
     status=1

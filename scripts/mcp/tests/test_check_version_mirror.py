@@ -9,6 +9,7 @@ from pathlib import Path
 import pytest
 
 SCRIPT = Path(__file__).resolve().parents[2] / "check_version_mirror.sh"
+EMSDK_READER = SCRIPT.with_name("emsdk_version.sh")
 
 LOCK_TEMPLATE = """version = 1
 revision = 3
@@ -29,12 +30,19 @@ version = "2.3.0"
 """
 
 
-TOOL_VARIABLES = ("UV_VERSION", "MISE_VERSION")
+# Workflow-level env variables, plus the setup-emsdk step's version input.
+EMSDK_STEP = "setup-emsdk"
+TOOL_VARIABLES = ("UV_VERSION", "MISE_VERSION", EMSDK_STEP)
 
 
 def _workflow(name: str, versions: dict[str, str]) -> str:
-    env = "".join(f'  {variable}: "{value}"\n' for variable, value in versions.items())
-    return f"name: {name}\n\nenv:\n{env}\njobs:\n  job:\n    steps:\n      - run: true\n"
+    env = "".join(f'  {variable}: "{value}"\n' for variable, value in versions.items() if variable != EMSDK_STEP)
+    steps = "      - run: true\n"
+    if EMSDK_STEP in versions:
+        steps += (
+            f"      - uses: mymindstorm/setup-emsdk@v16\n        with:\n          version: {versions[EMSDK_STEP]}\n"
+        )
+    return f"name: {name}\n\nenv:\n{env}\njobs:\n  job:\n    steps:\n{steps}"
 
 
 def _repository(
@@ -56,7 +64,8 @@ def _repository(
         (root / ".github" / "workflows" / f"{name}.yml").write_text(_workflow(name, pinned), encoding="utf-8")
     (root / "bindings" / "wasm").mkdir(parents=True)
     (root / "bindings" / "python").mkdir(parents=True)
-    shutil.copy(SCRIPT, root / "scripts" / SCRIPT.name)
+    for script in (SCRIPT, EMSDK_READER):
+        shutil.copy(script, root / "scripts" / script.name)
     (root / "CMakeLists.txt").write_text(f"project(suzume VERSION {cmake} LANGUAGES CXX)\n", encoding="utf-8")
     (root / "bindings" / "wasm" / "package.json").write_text(f'{{\n  "version": "{wasm}"\n}}\n', encoding="utf-8")
     (root / "bindings" / "python" / "pyproject.toml").write_text(
