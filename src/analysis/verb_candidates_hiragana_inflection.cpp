@@ -729,7 +729,7 @@ float hiraganaVerbBaseCost(const InflectedScanContext& ctx, const InflectedSpan&
     // Medium-length past form verbs (3-4 chars ending with た/だ)
     // e.g., つかれた (conf=0.43) should beat つ+か+れた split
     // Give bonus to compete with particle splits
-    base_cost = candidate::confidenceScaledCost(verb_opts.confidence_cost_scale_medium, best.confidence,
+    base_cost = candidate::confidenceScaledCost(verb_opts.base_cost_medium, best.confidence,
                                                 verb_opts.confidence_cost_scale_medium);
   } else if (looks_like_ichidan_dict_form) {
     // Ichidan dictionary form (e-row stem + る)
@@ -764,7 +764,7 @@ float hiraganaVerbBaseCost(const InflectedScanContext& ctx, const InflectedSpan&
       base_cost = candidate::confidenceScaledCost(verb_opts.base_cost_long_verified, best.confidence,
                                                   verb_opts.confidence_cost_scale_small);
     } else {
-      base_cost = candidate::confidenceScaledCost(verb_opts.confidence_cost_scale_medium, best.confidence,
+      base_cost = candidate::confidenceScaledCost(verb_opts.base_cost_medium, best.confidence,
                                                   verb_opts.confidence_cost_scale_medium);
     }
   }

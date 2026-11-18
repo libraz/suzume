@@ -40,10 +40,11 @@ struct VerbCandidateOptions {
   float confidence_very_high = 0.8F;          // Very high for long verbs
 
   // Base costs (lower = more preferred)
-  float base_cost_standard = 0.4F;        // Standard base cost
-  float base_cost_high = 0.5F;            // Higher cost for uncertain
-  float base_cost_low = 0.3F;             // Low cost for good matches
-  float base_cost_verified = 0.1F;        // Very low for verified
+  float base_cost_standard = 0.4F;  // Standard base cost
+  float base_cost_high = 0.5F;      // Higher cost for uncertain
+  float base_cost_low = 0.3F;       // Low cost for good matches
+  float base_cost_medium = 0.2F;    // Between low and verified: medium-length forms competing with particle splits
+  float base_cost_verified = 0.1F;  // Very low for verified
   float base_cost_long_verified = 0.05F;  // Minimal for long verified
 
   // Bonuses (negative = preferred)

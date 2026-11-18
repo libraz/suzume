@@ -75,7 +75,7 @@ constexpr std::array<OptionSpec, 8> kUnaryOptionSpecs{{
     SUZUME_OPTION(ScorerOptions, user_dict_bonus),
 }};
 
-constexpr std::array<OptionSpec, 21> kVerbOptionSpecs{{
+constexpr std::array<OptionSpec, 22> kVerbOptionSpecs{{
     SUZUME_OPTION(VerbCandidateOptions, confidence_low),
     SUZUME_OPTION(VerbCandidateOptions, confidence_standard),
     SUZUME_OPTION(VerbCandidateOptions, confidence_past_te),
@@ -88,6 +88,7 @@ constexpr std::array<OptionSpec, 21> kVerbOptionSpecs{{
     SUZUME_OPTION(VerbCandidateOptions, base_cost_standard),
     SUZUME_OPTION(VerbCandidateOptions, base_cost_high),
     SUZUME_OPTION(VerbCandidateOptions, base_cost_low),
+    SUZUME_OPTION(VerbCandidateOptions, base_cost_medium),
     SUZUME_OPTION(VerbCandidateOptions, base_cost_verified),
     SUZUME_OPTION(VerbCandidateOptions, base_cost_long_verified),
     SUZUME_OPTION(VerbCandidateOptions, bonus_ichidan),

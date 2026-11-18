@@ -176,7 +176,8 @@ TEST_F(JsonParserTest, LoadJsonStringAndEveryVerbCandidateOption) {
       "penalty_single_char": 18,
       "confidence_cost_scale": 19,
       "confidence_cost_scale_small": 20,
-      "confidence_cost_scale_medium": 21
+      "confidence_cost_scale_medium": 21,
+      "base_cost_medium": 22
     }
   })";
 
@@ -186,6 +187,7 @@ TEST_F(JsonParserTest, LoadJsonStringAndEveryVerbCandidateOption) {
   EXPECT_FLOAT_EQ(opts.candidates.verb.confidence_cost_scale, 19.0F);
   EXPECT_FLOAT_EQ(opts.candidates.verb.confidence_cost_scale_small, 20.0F);
   EXPECT_FLOAT_EQ(opts.candidates.verb.confidence_cost_scale_medium, 21.0F);
+  EXPECT_FLOAT_EQ(opts.candidates.verb.base_cost_medium, 22.0F);
 }
 
 TEST_F(JsonParserTest, LoadsPreviouslyUnreachableInflectionOptions) {
