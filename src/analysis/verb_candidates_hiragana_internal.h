@@ -22,6 +22,23 @@ inline constexpr size_t kPredicateRunMax = 12;
 bool endsWithParticleAfterVerb(const dictionary::DictionaryManager* dict_manager, const grammar::Inflection& inflection,
                                const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos);
 
+// True when start_pos is the left edge at which a one-mora verb stem opens a
+// predicate after a closed word (case or hosted topic particle, subject の,
+// listed adverb, closing nominal).
+bool opensOneMoraPredicateSlot(const std::vector<char32_t>& codepoints, size_t start_pos,
+                               const dictionary::DictionaryManager* dict_manager);
+// True when a one-mora verb stem at start_pos closes on た, て or ます.
+bool closesOneMoraVerbStem(const std::vector<char32_t>& codepoints, size_t start_pos);
+// Guard (fabricated closed-class absorption family, head class): true when the
+// span [start_pos, end_pos) spells a listed adverb or particle followed by a
+// closed one-mora 一段 stem standing in its own predicate slot, so the span is
+// that word plus the stem (すぐ+い+た, 食べては+み+た), never one unlisted verb.
+bool spellsClosedWordBeforeOneMoraStem(const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos,
+                                       const dictionary::DictionaryManager* dict_manager);
+// True when [start_pos, end_pos) is exactly a closed one-mora 一段 stem plus a
+// finite ます form (み+ます, き+ました): the polite auxiliary, never the tail of
+// an unlisted サ行 base.
+bool spellsOneMoraStemBeforePolite(const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos);
 // True when start_pos opens a predicate slot: text start, a symbol, or a particle.
 bool opensPredicateSlot(const std::vector<char32_t>& codepoints, size_t start_pos);
 bool pronounEndsAt(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
@@ -118,11 +135,9 @@ void appendAgeruBenefactiveCandidates(const std::vector<char32_t>& codepoints, s
 void appendOkuAuxiliaryCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
                                   std::vector<UnknownCandidate>& candidates);
 void appendIchidanRenyokei1CharCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
-                                          const grammar::Inflection& inflection,
                                           const dictionary::DictionaryManager* dict_manager,
                                           std::vector<UnknownCandidate>& candidates);
 void appendSubjectGenitiveIchidanBeforeFormalNoun(const std::vector<char32_t>& codepoints, size_t start_pos,
-                                                  const grammar::Inflection& inflection,
                                                   const dictionary::DictionaryManager* dict_manager,
                                                   std::vector<UnknownCandidate>& candidates);
 void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, size_t start_pos, size_t hiragana_end,

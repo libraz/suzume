@@ -99,7 +99,10 @@ constexpr bool guardIsWired(GuardMember member, GuardOrigin origin) {
 //                argument boundary, so 水 + を + くみ cannot be one word.
 //   - Head  (H): a leading 副助詞 ‖ 係助詞 opens the hiragana portion of an
 //                adjective. Helper: startsWithFocusParticleHead, used by both
-//                the plain and the compound kanji adjective path.
+//                the plain and the compound kanji adjective path. Also
+//                hiragana_verb_detail::spellsClosedWordBeforeOneMoraStem (a
+//                listed adverb or particle before a closed one-mora 一段 stem),
+//                applied once at unknown-candidate admission for every origin.
 //
 // A real verb/adjective that genuinely embeds these kana (押さえる, 起こす) is
 // protected by its dictionary base form where such a lexical candidate exists.

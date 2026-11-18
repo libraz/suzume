@@ -439,6 +439,11 @@ std::string_view godanBaseSuffixFromIRow(char32_t i_row_cp) {
   return lookupGodanSuffix(i_row_cp, GodanColumn::I, GodanColumn::Base);
 }
 
+bool isOneMoraIchidanStem(char32_t stem_cp) {
+  constexpr std::u32string_view kStems = U"いえきでにねひへみ";
+  return kStems.find(stem_cp) != std::u32string_view::npos;
+}
+
 std::string_view godanBaseSuffixFromERow(char32_t e_row_cp) {
   return lookupGodanSuffix(e_row_cp, GodanColumn::E, GodanColumn::Base);
 }

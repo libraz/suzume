@@ -27,6 +27,15 @@ char32_t firstCodepoint(std::string_view surface) {
   return normalize::decodeUtf8(surface, byte_pos);
 }
 
+// A cell of a closed one-mora paradigm (来る's き; the closed one-mora 一段
+// stems). Candidate generation admits it only at a predicate slot, so it
+// carries the weight of a listed entry rather than of a hypothesized stem.
+bool isClosedOneMoraVerbStem(const core::LatticeEdge& edge) {
+  return edge.conj_type == dictionary::ConjugationType::Kuru ||
+         (edge.conj_type == dictionary::ConjugationType::Ichidan &&
+          grammar::isOneMoraIchidanStem(firstCodepoint(edge.surface)));
+}
+
 }  // namespace
 
 // Surface-based connection rules, extracted from connectionCost for readability.
@@ -87,6 +96,8 @@ float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::
   // +ない). Naming the ichidan generator alone left its godan sibling out, and
   // the missing exemption pushed the parse into any reading that avoids this
   // edge — a fabricated verb opening on the case particle itself (にしら).
+  // A one-mora stem admitted at a hosted predicate slot carries that origin
+  // too (東京に+き+ます).
   const bool is_validated_ichidan_inflection = next.extended_pos == core::ExtendedPOS::VerbMizenkei ||
                                                (next.origin == core::CandidateOrigin::VerbHiraganaInflectedRenyokei &&
                                                 next.extended_pos == core::ExtendedPOS::VerbRenyokei);
@@ -109,11 +120,13 @@ float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::
   // Exception: い (renyokei of いる) - valid in ずにはいられない pattern
   // Exception: し (renyokei of する) - valid in emphatic negation ありはしない pattern,
   // and its irrealis せ in the literary one (容赦はせぬ)
+  // Exception: a generated closed one-mora verb stem (手は+み+て)
   if (prev.extended_pos == core::ExtendedPOS::ParticleTopic && prev.surface == "は" &&
       next.pos == core::PartOfSpeech::Verb && grammar::isPureHiragana(next.surface) &&
       next.surface.size() <= core::kJapaneseCharBytes && next.surface != "い" &&  // い+られ is valid (いる potential)
       !grammar::isSuruRenyokeiSurface(next.surface) &&
-      !(grammar::isSuruMizenkeiSurface(next.surface) && next.extended_pos == core::ExtendedPOS::VerbMizenkei)) {
+      !(grammar::isSuruMizenkeiSurface(next.surface) && next.extended_pos == core::ExtendedPOS::VerbMizenkei) &&
+      !(isClosedOneMoraVerbStem(next) && !next.dictionaryBacked())) {
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryRare);
   }
 
@@ -463,12 +476,12 @@ float computePrefixSymbolBonus(const core::LatticeEdge& prev, const core::Lattic
   // Valid ADV+verb patterns: ゆっくり+歩く (verb is longer/has kanji)
   // This prevents split like はなはだ+し+い when はなはだしい exists in dict
   // Exception: dictionary verbs like ね(寝る), み(見る), で(出る) are valid, and
-  // so are the カ変 continuative and a one-mora 一段 stem. Each is a cell of a
-  // closed paradigm (来る; 見る・寝る・出る and their few kin) rather than a stem
-  // hypothesized from the adverb's tail, so it carries the same lexical weight
-  // as a listed entry (ぐっと+き+た, すぐ+み+た).
+  // so are the カ変 continuative and a stem of the closed one-mora 一段 class.
+  // Each is a cell of a closed paradigm rather than a stem hypothesized from
+  // the adverb's tail, so it carries the same lexical weight as a listed entry
+  // (ぐっと+き+た, すぐ+み+た).
   if (prev.pos == core::PartOfSpeech::Adverb && isSingleHiraganaVerbRenyokei(next) && !next.dictionaryBacked() &&
-      next.conj_type != dictionary::ConjugationType::Kuru && next.conj_type != dictionary::ConjugationType::Ichidan) {
+      !isClosedOneMoraVerbStem(next)) {
     // The bar weighs twice kVeryRare.
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryRare + cost::kVeryRare);
   }

@@ -85,7 +85,7 @@ void resolvePrePrefixMorphemeRoles(std::vector<core::Morpheme>& result,
   resolver::resolveBindingParticleNegative(result);
   resolver::resolveInitialInabilityVerb(result);
   resolver::resolveDependentVerbHomographs(result);
-  resolver::resolveProgressiveIru(result);
+  resolver::resolveTeFormAspectSubsidiary(result);
   resolver::resolveSahenRenyokei(result);
   resolver::resolveDemonstrativeQuotativeOnbin(result);
   resolver::resolvePoliteSuruRenyokei(result);

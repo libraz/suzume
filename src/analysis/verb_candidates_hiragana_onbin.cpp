@@ -557,27 +557,124 @@ bool followsListedAdverb(const std::vector<char32_t>& codepoints, size_t start_p
                                     partOfSpeechMask(core::PartOfSpeech::Adverb));
 }
 
-// A listed noun, or a katakana run, closes right before a one-mora verb stem,
-// and no listed verb reads that mora as its own okurigana (生+き+る and 書+き
-// from 書く for き; 試+み+る and 読+み from 読む for み).
-bool nominalClosesBeforeOneMoraStem(const std::vector<char32_t>& codepoints, size_t start_pos,
-                                    const dictionary::DictionaryManager* dict_manager) {
-  constexpr size_t kMaxNounMorae = 4;
-  constexpr size_t kMaxVerbStemKanji = 2;
-  if (start_pos == 0 || start_pos >= codepoints.size() || dict_manager == nullptr) {
-    return false;
+// Whether a listed verb reads the mora at start_pos as its own okurigana
+// (生+き+る and 書+き from 書く for き; 試+み+る and 読+み from 読む for み;
+// で+き+る for き after a particle-shaped で). A godan 連用形 other than the
+// サ行 one takes 音便 before た/て, so there only ます can follow it.
+bool listedVerbOwnsOneMoraStem(const std::vector<char32_t>& codepoints, size_t start_pos,
+                               const dictionary::DictionaryManager* dict_manager) {
+  constexpr size_t kMaxVerbStemChars = 2;
+  const bool before_past_or_te =
+      start_pos + 1 < codepoints.size() && (codepoints[start_pos + 1] == U'た' || codepoints[start_pos + 1] == U'て');
+  std::string_view godan_ending = grammar::godanBaseSuffixFromIRow(codepoints[start_pos]);
+  if (before_past_or_te && codepoints[start_pos] != U'し') {
+    godan_ending = {};
   }
-  const std::string_view godan_ending = grammar::godanBaseSuffixFromIRow(codepoints[start_pos]);
-  for (size_t stem = 1; stem <= kMaxVerbStemKanji && stem <= start_pos; ++stem) {
+  for (size_t stem = 1; stem <= kMaxVerbStemChars && stem <= start_pos; ++stem) {
     const size_t from = start_pos - stem;
     if (vh::isVerbInDictionary(dict_manager, codepoints, from, start_pos + 1, "る") ||
         (!godan_ending.empty() && vh::isVerbInDictionary(dict_manager, codepoints, from, start_pos, godan_ending))) {
-      return false;
+      return true;
     }
+  }
+  return false;
+}
+
+// A listed noun, or a katakana run, closes right before a one-mora verb stem.
+bool nominalClosesBeforeOneMoraStem(const std::vector<char32_t>& codepoints, size_t start_pos,
+                                    const dictionary::DictionaryManager* dict_manager) {
+  constexpr size_t kMaxNounMorae = 4;
+  if (start_pos == 0 || start_pos >= codepoints.size() || dict_manager == nullptr) {
+    return false;
   }
   return normalize::classifyChar(codepoints[start_pos - 1]) == normalize::CharType::Katakana ||
          hasDictionaryEntryEndingAt(*dict_manager, codepoints, lookbehindStart(start_pos, kMaxNounMorae), start_pos,
                                     partOfSpeechMask(core::PartOfSpeech::Noun));
+}
+
+bool followsSubjectGenitiveRelativeClauseSlot(const dictionary::DictionaryManager* dict_manager,
+                                              const std::vector<char32_t>& codepoints, size_t start_pos);
+
+// A case particle, or a one-mora topic particle, closes an argument or a
+// te-form, after which the predicate opens (東京に+き+ます, 手は+み+た,
+// 食べては+み+た). The host is what proves the mora a particle rather than
+// part of a predicate form or the head of a kana word (終わらせと+き = ておく).
+bool followsHostedParticle(const std::vector<char32_t>& codepoints, size_t start_pos,
+                           const dictionary::DictionaryManager* dict_manager) {
+  constexpr size_t kMaxNominalMorae = 4;
+  if (dict_manager == nullptr || start_pos < 2) {
+    return false;
+  }
+  size_t host_end = vh::caseParticleStartBefore(dict_manager, codepoints, start_pos);
+  bool te_form_host = false;
+  if (host_end == std::string::npos) {
+    const auto* particle =
+        lookupEntryInRange(*dict_manager, codepoints, start_pos - 1, start_pos, core::PartOfSpeech::Particle);
+    if (particle == nullptr || particle->extended_pos != core::ExtendedPOS::ParticleTopic) {
+      return false;
+    }
+    host_end = start_pos - 1;
+    te_form_host = codepoints[host_end - 1] == U'て' || codepoints[host_end - 1] == U'で';
+  }
+  if (host_end == 0) {
+    return false;
+  }
+  const normalize::CharType host_type = normalize::classifyChar(codepoints[host_end - 1]);
+  return host_type == normalize::CharType::Kanji || host_type == normalize::CharType::Katakana ||
+         host_type == normalize::CharType::Digit || te_form_host ||
+         hasDictionaryEntryEndingAt(
+             *dict_manager, codepoints, lookbehindStart(host_end, kMaxNominalMorae), host_end,
+             partOfSpeechMask(core::PartOfSpeech::Noun) | partOfSpeechMask(core::PartOfSpeech::Pronoun));
+}
+
+// The text start, or a symbol right before start_pos.
+bool startsClause(const std::vector<char32_t>& codepoints, size_t start_pos) {
+  return start_pos == 0 || normalize::classifyChar(codepoints[start_pos - 1]) == normalize::CharType::Symbol;
+}
+
+// The left edge at which a one-mora verb stem (来る's き, a one-mora 一段 stem)
+// opens a predicate after a closed word: a case particle, a hosted topic
+// particle, a subject-marking の, a listed adverb, or a closing nominal, unless
+// a listed verb spells the mora as its own okurigana.
+bool opensOneMoraPredicateSlot(const std::vector<char32_t>& codepoints, size_t start_pos,
+                               const dictionary::DictionaryManager* dict_manager) {
+  if (start_pos == 0 || start_pos >= codepoints.size() || dict_manager == nullptr ||
+      listedVerbOwnsOneMoraStem(codepoints, start_pos, dict_manager)) {
+    return false;
+  }
+  return vh::followsCaseParticle(dict_manager, codepoints, start_pos) ||
+         followsHostedParticle(codepoints, start_pos, dict_manager) ||
+         followsSubjectGenitiveRelativeClauseSlot(dict_manager, codepoints, start_pos) ||
+         followsListedAdverb(codepoints, start_pos, dict_manager) ||
+         nominalClosesBeforeOneMoraStem(codepoints, start_pos, dict_manager);
+}
+
+// A one-mora verb stem closes on the past, the te-form or polite ます.
+bool closesOneMoraVerbStem(const std::vector<char32_t>& codepoints, size_t start_pos) {
+  return start_pos + 1 < codepoints.size() &&
+         (codepoints[start_pos + 1] == U'た' || codepoints[start_pos + 1] == U'て' ||
+          vh::finiteMasuFormLengthAt(codepoints, start_pos + 1) > 0);
+}
+
+bool spellsClosedWordBeforeOneMoraStem(const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos,
+                                       const dictionary::DictionaryManager* dict_manager) {
+  if (dict_manager == nullptr || end_pos > codepoints.size() || end_pos < start_pos + 2) {
+    return false;
+  }
+  const size_t stem_pos = end_pos - 1;
+  if (!grammar::isOneMoraIchidanStem(codepoints[stem_pos]) || !closesOneMoraVerbStem(codepoints, stem_pos) ||
+      !opensOneMoraPredicateSlot(codepoints, stem_pos, dict_manager)) {
+    return false;
+  }
+  return lookupEntryInRange(*dict_manager, codepoints, start_pos, stem_pos, core::PartOfSpeech::Adverb) != nullptr ||
+         lookupEntryInRange(*dict_manager, codepoints, start_pos, stem_pos, core::PartOfSpeech::Particle) != nullptr;
+}
+
+bool spellsOneMoraStemBeforePolite(const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos) {
+  if (end_pos > codepoints.size() || end_pos < start_pos + 2 || !grammar::isOneMoraIchidanStem(codepoints[start_pos])) {
+    return false;
+  }
+  return vh::finiteMasuFormLengthAt(codepoints, start_pos + 1) == end_pos - start_pos - 1;
 }
 
 void appendKuruRenyokeiCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
@@ -602,22 +699,21 @@ void appendKuruRenyokeiCandidates(const std::vector<char32_t>& codepoints, size_
   // irregular stem.  In particular, do not treat a preceding て/で as an
   // ordinary particle boundary: those codepoints also occur inside でき and
   // the subsidiary case was handled above using a verified te-form.
-  const bool right_continuation =
-      start_pos + 1 < codepoints.size() && (codepoints[start_pos + 1] == U'た' || codepoints[start_pos + 1] == U'て' ||
-                                            vh::finiteMasuFormLengthAt(codepoints, start_pos + 1) > 0);
-  if (!right_continuation) {
+  // The text start and a symbol open き on every closure; a 一段 mora there
+  // collides with lexicalized kana before た (みたい, ひた), so it gets only ます.
+  const bool opens_slot =
+      startsClause(codepoints, start_pos) || opensOneMoraPredicateSlot(codepoints, start_pos, dict_manager);
+  if (!closesOneMoraVerbStem(codepoints, start_pos) || !opens_slot) {
     return;
   }
-  const bool left_boundary =
-      start_pos == 0 || normalize::classifyChar(codepoints[start_pos - 1]) == normalize::CharType::Symbol ||
-      (normalize::isExtendedParticle(codepoints[start_pos - 1]) && codepoints[start_pos - 1] != U'で') ||
-      followsListedAdverb(codepoints, start_pos, dict_manager) ||
-      nominalClosesBeforeOneMoraStem(codepoints, start_pos, dict_manager);
-  if (!left_boundary) {
-    return;
-  }
+  // After a hosted particle the slot itself validates the stem, as for the
+  // predicate-slot 一段 stem (東京に+き+ます); a bare particle mora does not
+  // (終わらせと+き is the contracted ておく).
+  const CandidateOrigin origin = followsHostedParticle(codepoints, start_pos, dict_manager)
+                                     ? CandidateOrigin::VerbHiraganaInflectedRenyokei
+                                     : CandidateOrigin::VerbHiragana;
   candidates.push_back(makeVerbCandidate("き", start_pos, start_pos + 1, candidate::verb_cost::kKuruRenyokeiBonus,
-                                         "くる", dictionary::ConjugationType::Kuru, true, CandidateOrigin::VerbHiragana,
+                                         "くる", dictionary::ConjugationType::Kuru, true, origin,
                                          candidate::kHighOriginConfidence, "hiragana_kuru_renyokei",
                                          core::ExtendedPOS::VerbRenyokei));
 }
@@ -655,33 +751,28 @@ bool followsSubjectGenitiveRelativeClauseSlot(const dictionary::DictionaryManage
   });
 }
 
-// 1-char ichidan renyokei before て/た (ねて → ね + て). Requires the base form
-// (stem + る) in the dictionary, or — as for the passive stem before られる — an
-// Ichidan reading of the base in the predicate slot: after a case particle
-// (と+み+て, を+み+た), or where a listed adverb or nominal closes, as for the
-// one-mora き of 来る (かつて+み+た, 一度+み+た). Contextual subsidiary verbs are
+// 1-char ichidan renyokei before て/た/ます (ねて → ね + て). Requires the base
+// form (stem + る) in the dictionary, or a member of the closed one-mora 一段
+// class in the predicate slot that also opens the one-mora き of 来る
+// (と+み+て, かつて+み+た, 手は+み+た). Contextual subsidiary verbs are
 // generated separately with their auxiliary ExtendedPOS.
 void appendIchidanRenyokei1CharCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
-                                          const grammar::Inflection& inflection,
                                           const dictionary::DictionaryManager* dict_manager,
                                           std::vector<UnknownCandidate>& candidates) {
   // Pattern: e-row or i-row hiragana followed by て or た
   // Without dictionary evidence the stem needs the predicate slot, to avoid
   // false positives like めて → め + て inside a word.
-  if (start_pos + 1 >= codepoints.size() || !kana::isIOrERowCodepoint(codepoints[start_pos]) ||
-      (codepoints[start_pos + 1] != U'て' && codepoints[start_pos + 1] != U'た')) {
+  if (!kana::isIOrERowCodepoint(codepoints[start_pos]) || !closesOneMoraVerbStem(codepoints, start_pos)) {
     return;
   }
   const std::string stem_surface = extractSubstring(codepoints, start_pos, start_pos + 1);
   const std::string base_form = stem_surface + "る";
   const bool base_is_dict_verb = vh::isVerbInDictionary(dict_manager, base_form);
-  const bool follows_predicate_slot = vh::followsCaseParticle(dict_manager, codepoints, start_pos) ||
-                                      followsSubjectGenitiveRelativeClauseSlot(dict_manager, codepoints, start_pos) ||
-                                      followsListedAdverb(codepoints, start_pos, dict_manager) ||
-                                      nominalClosesBeforeOneMoraStem(codepoints, start_pos, dict_manager);
-  const bool predicate_slot_ichidan = !base_is_dict_verb && follows_predicate_slot &&
-                                      vh::readsAsBaseForm(inflection, base_form, base_form, grammar::VerbType::Ichidan,
-                                                          candidate::kV1PrefixMinConfidence) &&
+  const bool opens_slot =
+      opensOneMoraPredicateSlot(codepoints, start_pos, dict_manager) ||
+      (startsClause(codepoints, start_pos) && vh::finiteMasuFormLengthAt(codepoints, start_pos + 1) > 0);
+  const bool predicate_slot_ichidan = !base_is_dict_verb && grammar::isOneMoraIchidanStem(codepoints[start_pos]) &&
+                                      opens_slot &&
                                       vh::lookupVerbLemma(dict_manager, stem_surface, base_form) == base_form;
   if (!(kana::isERowCodepoint(codepoints[start_pos]) && base_is_dict_verb) && !predicate_slot_ichidan) {
     return;
@@ -701,7 +792,6 @@ void appendIchidanRenyokei1CharCandidates(const std::vector<char32_t>& codepoint
 }
 
 void appendSubjectGenitiveIchidanBeforeFormalNoun(const std::vector<char32_t>& codepoints, size_t start_pos,
-                                                  const grammar::Inflection& inflection,
                                                   const dictionary::DictionaryManager* dict_manager,
                                                   std::vector<UnknownCandidate>& candidates) {
   // Pre-emit only when a registered particle blocks a verb opening inside its
@@ -711,7 +801,7 @@ void appendSubjectGenitiveIchidanBeforeFormalNoun(const std::vector<char32_t>& c
       !followsSubjectGenitiveRelativeClauseSlot(dict_manager, codepoints, start_pos)) {
     return;
   }
-  appendIchidanRenyokei1CharCandidates(codepoints, start_pos, inflection, dict_manager, candidates);
+  appendIchidanRenyokei1CharCandidates(codepoints, start_pos, dict_manager, candidates);
 }
 
 }  // namespace suzume::analysis::hiragana_verb_detail

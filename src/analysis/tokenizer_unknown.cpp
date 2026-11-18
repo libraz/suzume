@@ -21,6 +21,7 @@
 #include "tokenizer_utils.h"
 #include "verb_candidates_auxiliary_patterns.h"
 #include "verb_candidates_dictionary_probes.h"
+#include "verb_candidates_hiragana_internal.h"
 
 namespace suzume::analysis {
 
@@ -418,6 +419,13 @@ std::optional<float> unknownCandidateCost(const tokenizer_unknown_detail::Unknow
     }
   }
   if (absorbs_suru_imperative) {
+    return std::nullopt;
+  }
+  if (candidate.pos == core::PartOfSpeech::Verb && !candidate.lemma_verified &&
+      !verb_helpers::isVerbInDictionary(&dict_manager, candidate.lemma) &&
+      (hiragana_verb_detail::spellsClosedWordBeforeOneMoraStem(codepoints, candidate.start, candidate.end,
+                                                               &dict_manager) ||
+       hiragana_verb_detail::spellsOneMoraStemBeforePolite(codepoints, candidate.start, candidate.end))) {
     return std::nullopt;
   }
   if (exceeds_dict) {

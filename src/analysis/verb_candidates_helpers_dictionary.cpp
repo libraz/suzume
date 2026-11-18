@@ -457,20 +457,25 @@ bool hasCaseParticleDictionaryEntry(const dictionary::DictionaryManager* dict_ma
 
 }  // namespace
 
-bool followsCaseParticle(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
-                         size_t pos) {
+size_t caseParticleStartBefore(const dictionary::DictionaryManager* dict_manager,
+                               const std::vector<char32_t>& codepoints, size_t pos) {
   if (dict_manager == nullptr || pos == 0) {
-    return false;
+    return std::string::npos;
   }
   constexpr size_t kMaxParticleChars = 4;
   const size_t min_particle_start = lookbehindStart(pos, kMaxParticleChars);
   for (size_t particle_start = pos; particle_start > min_particle_start;) {
     --particle_start;
     if (hasCaseParticleDictionaryEntry(dict_manager, extractSubstring(codepoints, particle_start, pos))) {
-      return true;
+      return particle_start;
     }
   }
-  return false;
+  return std::string::npos;
+}
+
+bool followsCaseParticle(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
+                         size_t pos) {
+  return caseParticleStartBefore(dict_manager, codepoints, pos) != std::string::npos;
 }
 
 bool followsCaseMarkedArgument(const dictionary::DictionaryManager* dict_manager,

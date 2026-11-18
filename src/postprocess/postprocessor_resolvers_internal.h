@@ -86,7 +86,7 @@ void resolveParticleHostedExistentialAru(std::vector<core::Morpheme>& result);
 void resolvePoliteSuruRenyokei(std::vector<core::Morpheme>& result);
 void resolvePreparatoryVolitional(std::vector<core::Morpheme>& result);
 void resolveProgressiveContractionNominalizer(std::vector<core::Morpheme>& result);
-void resolveProgressiveIru(std::vector<core::Morpheme>& result);
+void resolveTeFormAspectSubsidiary(std::vector<core::Morpheme>& result);
 void resolveDependentVerbHomographs(std::vector<core::Morpheme>& result);
 void resolveClosedInflectionalChains(std::vector<core::Morpheme>& result);
 void resolveSahenRenyokei(std::vector<core::Morpheme>& result);

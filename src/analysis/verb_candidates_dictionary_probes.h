@@ -355,6 +355,10 @@ core::ExtendedPOS oneMoraParticlePosEndingAt(const dictionary::DictionaryManager
 bool followsCaseParticle(const dictionary::DictionaryManager* dict_manager, const std::vector<char32_t>& codepoints,
                          size_t pos);
 
+// Start of the shortest complete case-particle entry ending exactly at @p pos, or npos.
+size_t caseParticleStartBefore(const dictionary::DictionaryManager* dict_manager,
+                               const std::vector<char32_t>& codepoints, size_t pos);
+
 /**
  * @brief Whether a case-marked argument ends at @p pos, through any focus particles
  *

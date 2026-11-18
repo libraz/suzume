@@ -880,6 +880,14 @@ VerbType verbTypeFromARowCodepoint(char32_t a_row_cp);
 std::string_view godanBaseSuffixFromIRow(char32_t i_row_cp);
 
 /**
+ * @brief Whether @p stem_cp is the whole stem of a one-mora 一段 verb.
+ *
+ * The class is closed: 居る/射る (い), 得る (え), 着る (き), 出る (で),
+ * 似る/煮る (に), 寝る (ね), 干る (ひ), 経る (へ), 見る (み).
+ */
+bool isOneMoraIchidanStem(char32_t stem_cp);
+
+/**
  * @brief Get Godan verb base suffix from E-row (仮定形/potential) ending
  * @param e_row_cp E-row codepoint (け, せ, て, etc.)
  * @return Corresponding u-row ending (く, す, つ, etc.), or empty if invalid

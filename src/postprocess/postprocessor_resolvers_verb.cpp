@@ -290,31 +290,32 @@ void resolveInitialInabilityVerb(std::vector<core::Morpheme>& result) {
   }
 }
 
-// A finite いる directly after the connective te/de particle is the
-// progressive auxiliary. The lattice preserves the lexical verb candidate so
-// existential uses remain available, then this complete local context assigns
-// the dependent reading (遅れて+いる, 読んで+いる).
-void resolveProgressiveIru(std::vector<core::Morpheme>& result) {
+// A finite いる or みる after the connective te/de particle is the aspectual
+// auxiliary. The lattice preserves the lexical verb candidate so existential
+// and perceptual uses remain available, then this complete local context
+// assigns the dependent reading (遅れて+いる, 読んで+いる, 食べては+み+た).
+void resolveTeFormAspectSubsidiary(std::vector<core::Morpheme>& result) {
   for (size_t idx = 1; idx < result.size(); ++idx) {
-    auto& iru = result[idx];
+    auto& subsidiary = result[idx];
     const auto& immediate = result[idx - 1];
     const bool direct_te_form = followsTeFormConnective(immediate);
     // A binding or adverbial particle may sit inside the frame (見て+は+いない,
-    // 読んで+ばかり+いる) without making いる existential.
+    // 読んで+ばかり+いる) without making the verb lexical.
     const bool framed_particle = immediate.extended_pos == core::ExtendedPOS::ParticleTopic ||
                                  immediate.extended_pos == core::ExtendedPOS::ParticleAdverbial ||
                                  immediate.extended_pos == core::ExtendedPOS::ParticleBinding;
     const bool focused_te_form = idx >= 2 && framed_particle && followsTeFormConnective(result[idx - 2]);
-    const bool finite_iru_form =
-        iru.extended_pos == core::ExtendedPOS::VerbShuushikei || iru.extended_pos == core::ExtendedPOS::VerbRenyokei;
-    if ((!direct_te_form && !focused_te_form) || iru.lemma != "いる" || !finite_iru_form) {
+    const bool finite_form = subsidiary.extended_pos == core::ExtendedPOS::VerbShuushikei ||
+                             subsidiary.extended_pos == core::ExtendedPOS::VerbRenyokei;
+    const bool is_iru = subsidiary.lemma == "いる";
+    if ((!direct_te_form && !focused_te_form) || (!is_iru && subsidiary.lemma != "みる") || !finite_form) {
       continue;
     }
-    iru.pos = core::PartOfSpeech::Auxiliary;
-    iru.extended_pos = core::ExtendedPOS::AuxAspectIru;
-    iru.conj_type = dictionary::ConjugationType::Ichidan;
-    if (iru.surface == "いる") {
-      iru.conj_form = grammar::ConjForm::Base;
+    subsidiary.pos = core::PartOfSpeech::Auxiliary;
+    subsidiary.extended_pos = is_iru ? core::ExtendedPOS::AuxAspectIru : core::ExtendedPOS::AuxAspectMiru;
+    subsidiary.conj_type = dictionary::ConjugationType::Ichidan;
+    if (subsidiary.surface == subsidiary.lemma) {
+      subsidiary.conj_form = grammar::ConjForm::Base;
     }
   }
 }
