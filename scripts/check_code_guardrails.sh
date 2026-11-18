@@ -2,9 +2,9 @@
 #
 # Mechanical guardrails for the design principles in CLAUDE.md that were previously
 # only enforced by convention. Ratchet-based: per core source file it counts
-#   - surface_cmp:    surface-string equality comparisons (hardcoded word tests)
-#   - score_literals: raw float score literals (magic numbers not via named constants)
-#   - score_additions: named score rules referenced in scorer translation units
+#   - surface_cmp:    Japanese string literals a string is tested against (hardcoded word tests)
+#   - score_literals: float literals in shipped code (magic numbers not via named constants)
+#   - score_additions: score-namespace constants referenced in scorer translation units
 # and fails if any metric EXCEEDS the committed baseline. Metrics may only go down;
 # an intentional reduction is recorded by re-running with `update`, which shows up as
 # a baseline diff in the commit.
@@ -26,24 +26,8 @@ cd "$(git rev-parse --show-toplevel)"
 BASELINE="scripts/guardrail-baseline.tsv"
 MODE="${1:-check}"
 
-count() { grep -oE "$1" "$2" 2>/dev/null | wc -l | tr -d ' '; }
-
-metrics_for() {
-  local f="$1" surf floats additions
-  surf=$(count '(^|[^[:alnum:]_])surface[[:space:]]*[!=]=' "$f")
-  floats=$(count '[0-9]+\.[0-9]+F?' "$f")
-  additions=0
-  case "$f" in
-    src/analysis/scorer*.cpp)
-      # Count individual named score rules, not `bonus +=` statements.  A
-      # single statement may legitimately contain several independent
-      # conditional rules, so counting statements rewards less readable
-      # ternary bundles rather than reducing scoring complexity.
-      additions=$(count 'cost::k[A-Za-z0-9_]+' "$f")
-      ;;
-  esac
-  printf '%s\t%s\t%s\t%s\n' "$f" "$surf" "$floats" "$additions"
-}
+# scripts/code_guardrail_metrics.py owns what each metric counts.
+METRICS="scripts/code_guardrail_metrics.py"
 
 # Analysis, grammar, and postprocessing carry candidate/scoring decisions across
 # both translation units and headers. Core headers are included because a scoring
@@ -57,7 +41,8 @@ FILES=$(
 
 gen_baseline() {
   printf '# file\tsurface_cmp\tscore_literals\tscore_additions\n'
-  for f in $FILES; do metrics_for "$f"; done
+  # shellcheck disable=SC2086
+  python3 "$METRICS" $FILES
 }
 
 # WASM-core purity: native file-I/O, thread, and stream headers must never reach
@@ -187,16 +172,17 @@ fi
 [ -f "$BASELINE" ] || { echo "❌ missing $BASELINE (run: scripts/check_code_guardrails.sh update)"; exit 1; }
 
 fail=0
+current=$(gen_baseline)
 for f in $FILES; do
-  cur=$(metrics_for "$f")
+  cur=$(printf '%s\n' "$current" | grep -F "$(printf '%s\t' "$f")" || true)
   s=$(echo "$cur" | cut -f2); fl=$(echo "$cur" | cut -f3); add=$(echo "$cur" | cut -f4)
   base=$(grep -F "$(printf '%s\t' "$f")" "$BASELINE" || true)
   if [ -z "$base" ]; then
     echo "❌ new scanned file not in baseline: $f (run: update)"; fail=1; continue
   fi
   bs=$(echo "$base" | cut -f2); bf=$(echo "$base" | cut -f3); ba=$(echo "$base" | cut -f4)
-  [ "$s"  -gt "$bs" ] && { echo "❌ $f surface comparisons $s > baseline $bs (generalize with grammar rules; don't add word tests)"; fail=1; } || true
-  [ "$fl" -gt "$bf" ] && { echo "❌ $f raw score literals $fl > baseline $bf (use named constants in *_constants.h)"; fail=1; } || true
+  [ "$s"  -gt "$bs" ] && { echo "❌ $f literal word tests $s > baseline $bs (generalize with grammar rules; don't add word tests)"; fail=1; } || true
+  [ "$fl" -gt "$bf" ] && { echo "❌ $f float literals $fl > baseline $bf (use named constants in *_constants.h)"; fail=1; } || true
   [ "$add" -gt "$ba" ] && { echo "❌ $f scorer rules $add > baseline $ba (reuse a semantic group or predicate)"; fail=1; } || true
 done
 
