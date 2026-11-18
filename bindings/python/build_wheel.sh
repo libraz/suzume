@@ -79,7 +79,10 @@ fi
 
 echo "=== Building suzume shared library + dictionary compiler (Release) ==="
 cmake "${CMAKE_ARGS[@]}" "$PROJECT_ROOT"
-cmake --build "$BUILD_DIR" --target suzume_shared suzume-cli --parallel
+# A bare `--parallel` is an unbounded job count; a caller's
+# CMAKE_BUILD_PARALLEL_LEVEL wins over the processor count.
+cmake --build "$BUILD_DIR" --target suzume_shared suzume-cli \
+    --parallel "${CMAKE_BUILD_PARALLEL_LEVEL:-$(getconf _NPROCESSORS_ONLN)}"
 
 BUILT_LIBRARY="$BUILD_DIR/lib/$LIB_NAME"
 if [[ ! -f "$BUILT_LIBRARY" ]]; then
