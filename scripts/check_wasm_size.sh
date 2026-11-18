@@ -30,6 +30,12 @@ raw_size=$(wc -c < "$WASM" | tr -d ' ')
 gzip_size=$(gzip -9 -n -c "$WASM" | wc -c | tr -d ' ')
 
 if [ "$MODE" = "update" ]; then
+  # Other gzip implementations compress the same module to a different size
+  # (Apple's ~0.2% larger), so the recorded value is GNU gzip's, as in CI.
+  case "$(gzip --version 2>&1 | head -1)" in
+    "gzip "[0-9]*) ;;
+    *) echo "❌ the baseline is recorded with GNU gzip; re-record on the build host with: make wasm-linux, then scripts/check_wasm_size.sh $WASM update there"; exit 1 ;;
+  esac
   printf '%s\t%s\n' "$raw_size" "$gzip_size" > "$BASELINE"
   echo "✅ wasm-size baseline set to raw=$raw_size bytes ($((raw_size/1024)) KB), gzip=$gzip_size bytes"
   exit 0
