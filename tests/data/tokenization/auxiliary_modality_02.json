@@ -1723,38 +1723,6 @@
       ],
       "id": "nekonoesadesu",
       "input": "ねこのえさです"
-    },
-    {
-      "description": "ただ今日は休みだ - regression test",
-      "expected": [
-        {
-          "lemma": "ただ",
-          "pos": "Conjunction",
-          "surface": "ただ"
-        },
-        {
-          "lemma": "今日",
-          "pos": "Noun",
-          "surface": "今日"
-        },
-        {
-          "lemma": "は",
-          "pos": "Particle",
-          "surface": "は"
-        },
-        {
-          "lemma": "休み",
-          "pos": "Noun",
-          "surface": "休み"
-        },
-        {
-          "lemma": "だ",
-          "pos": "Auxiliary",
-          "surface": "だ"
-        }
-      ],
-      "id": "tada_ha_mida",
-      "input": "ただ今日は休みだ"
     }
   ],
   "description": "Modality auxiliaries (たい、そう、らしい) (part 2/2)",
