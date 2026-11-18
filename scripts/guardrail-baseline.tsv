@@ -91,7 +91,7 @@ src/analysis/tokenizer_dictionary_licensing_guards.cpp	0	0	0
 src/analysis/tokenizer_dictionary_special.cpp	0	0	0
 src/analysis/tokenizer_dictionary_variants.cpp	0	0	0
 src/analysis/tokenizer_dictionary_word_class_guards.cpp	0	0	0
-src/analysis/tokenizer_unknown.cpp	0	5	0
+src/analysis/tokenizer_unknown.cpp	0	0	0
 src/analysis/tokenizer_unknown_guards.cpp	0	0	0
 src/analysis/tokenizer_unknown_internal.h	0	0	0
 src/analysis/tokenizer_utils.cpp	0	0	0

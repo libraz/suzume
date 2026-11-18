@@ -322,7 +322,7 @@ std::optional<float> unknownCandidateCost(const tokenizer_unknown_detail::Unknow
               ((result.entry->pos != core::PartOfSpeech::Noun &&
                 result.entry->extended_pos != core::ExtendedPOS::AdjNaAdj) ||
                isOrdinalNounSurface(result.entry->surface))) {
-            constexpr float kDictPrefixPenalty = 1.5F;
+            constexpr float kDictPrefixPenalty = bigram_cost::kStrong;
             adjusted_cost += kDictPrefixPenalty;
             SUZUME_DEBUG_LOG_VERBOSE("[TOK_UNK] \"" << candidate.surface << "\" (NOUN): +" << kDictPrefixPenalty
                                                     << " (kanji_compound_dict_prefix, dict=\"" << result.entry->surface
@@ -344,7 +344,7 @@ std::optional<float> unknownCandidateCost(const tokenizer_unknown_detail::Unknow
           for (const auto& result : prev_results) {
             if (result.entry != nullptr && result.length >= 2 && result.length > back &&
                 result.entry->pos != core::PartOfSpeech::Noun && result.entry->pos != core::PartOfSpeech::Pronoun) {
-              constexpr float kDictOverlapPenalty = 1.5F;
+              constexpr float kDictOverlapPenalty = bigram_cost::kStrong;
               adjusted_cost += kDictOverlapPenalty;
               SUZUME_DEBUG_LOG_VERBOSE("[TOK_UNK] \"" << candidate.surface << "\" (NOUN): +" << kDictOverlapPenalty
                                                       << " (kanji_compound_dict_overlap, dict=\""
@@ -434,7 +434,7 @@ std::optional<float> unknownCandidateCost(const tokenizer_unknown_detail::Unknow
                                                                            : "kanji_stem_verb")
                                                << ")\n");
     } else {
-      float penalty = reduced_penalty ? 1.0F : 3.5F;
+      const float penalty = reduced_penalty ? bigram_cost::kRare : bigram_cost::kNever;
       adjusted_cost += penalty;
       SUZUME_DEBUG_LOG_VERBOSE("[TOK_UNK] \"" << candidate.surface << "\" (" << core::posToString(candidate.pos)
                                               << "): +" << penalty << " (exceeds_dict_length"
@@ -474,7 +474,7 @@ std::optional<float> unknownCandidateCost(const tokenizer_unknown_detail::Unknow
       // - Candidate has has_suffix flag (mizenkei for ぬ/れべき patterns)
       if (!is_verb_ending && !candidate.has_suffix) {
         if (dict_manager.lookupExact(hiragana_suffix, core::PartOfSpeech::Particle) != nullptr) {
-          constexpr float kParticleSuffixPenalty = 1.5F;
+          constexpr float kParticleSuffixPenalty = bigram_cost::kStrong;
           adjusted_cost += kParticleSuffixPenalty;
           SUZUME_DEBUG_LOG_VERBOSE("[TOK_UNK] \"" << candidate.surface << "\": +" << kParticleSuffixPenalty
                                                   << " (particle_suffix=\"" << hiragana_suffix << "\")\n");
@@ -691,7 +691,7 @@ void Tokenizer::addUnknownCandidates(core::Lattice& lattice, std::string_view te
   }
 
   // Generate unknown word candidates
-  auto candidates = unknown_gen_.generate(text, codepoints, start_pos, char_types);
+  auto candidates = unknown_gen_.generate(codepoints, start_pos, char_types);
   const size_t kanji_end =
       start_pos < char_types.size() && char_types[start_pos] == normalize::CharType::Kanji
           ? findCharRegionEnd(char_types, start_pos, char_types.size() - start_pos, normalize::CharType::Kanji)
