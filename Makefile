@@ -338,8 +338,8 @@ python-build:
 
 # Compile the dictionaries the Python test package loads
 python-dict: build
-	@echo "Building dictionaries for the Python test package (git-tracked user entries only)..."
-	$(BUILD_DIR)/bin/suzume-cli dict compile data/core/*.tsv data/core.dic
+	@echo "Building dictionaries for the Python test package (git-tracked entries only)..."
+	$(BUILD_DIR)/bin/suzume-cli dict compile $$(git ls-files 'data/core/*.tsv') data/core.dic
 	$(BUILD_DIR)/bin/suzume-cli dict compile $$(git ls-files 'data/user/*.tsv') data/user.dic
 	$(CMAKE) -E copy_if_different data/core.dic bindings/python/src/suzume/core.dic
 	$(CMAKE) -E copy_if_different data/user.dic bindings/python/src/suzume/user.dic
@@ -381,7 +381,7 @@ wasm-dict:
 		exit 1; \
 	fi
 	@echo "Building dictionaries for WASM (git-tracked entries only)..."
-	$(BUILD_DIR)/bin/suzume-cli dict compile data/core/*.tsv data/core.dic
+	$(BUILD_DIR)/bin/suzume-cli dict compile $$(git ls-files 'data/core/*.tsv') data/core.dic
 	@# The WASM binary ships publicly, so embed only git-tracked user
 	@# dictionaries. Any gitignored, local-only dictionary is excluded here
 	@# without being named, matching the CI checkout (which lacks ignored files).
