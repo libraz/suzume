@@ -536,8 +536,7 @@ void resolveNegativeChainRoles(std::vector<core::Morpheme>& result) {
     if (negative.surface == "なかっ" && negative.extended_pos == core::ExtendedPOS::AuxNegativeNai &&
         focus.surface == "は" && adjective.pos == core::PartOfSpeech::Adjective &&
         adjective.extended_pos == core::ExtendedPOS::AdjRenyokei) {
-      resolver::retag(negative, core::PartOfSpeech::Adjective, core::ExtendedPOS::AdjKatt, "ない",
-                      dictionary::ConjugationType::IAdjective, grammar::ConjForm::Renyokei);
+      resolver::retagNegativeAdjectiveCell(negative);
     }
   }
 }

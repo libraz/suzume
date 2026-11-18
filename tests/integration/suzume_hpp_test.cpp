@@ -82,7 +82,7 @@ TEST(SuzumeHppTest, AnalyzeExposesAuxiliaryConjugationMetadata) {
                                      [](const suzume::Morpheme& morpheme) { return morpheme.surface == "なかっ"; });
   ASSERT_NE(negative, morphemes.end());
   EXPECT_TRUE(negative->conj_type.empty());
-  EXPECT_EQ(negative->conj_form, "終止形");
+  EXPECT_EQ(negative->conj_form, "連用形");
 }
 
 TEST(SuzumeHppTest, AnalyzeReportsMalformedInputThroughLastError) {

@@ -733,6 +733,31 @@ TEST_F(SuzumeApiTest, PreservingSymbolsDoesNotChangeNeighboringRoles) {
   EXPECT_EQ(preserved_hon->extended_pos, filtered_hon->extended_pos);
 }
 
+TEST_F(SuzumeApiTest, AdjectivalAuxiliaryCellsReportTheAdjectiveForm) {
+  Suzume instance(makeTestOptions());
+  const auto form_of = [&instance](const char* text, std::string_view surface) {
+    for (const auto& morpheme : instance.analyze(text)) {
+      if (morpheme.surface == surface) {
+        return morpheme.conj_form;
+      }
+    }
+    ADD_FAILURE() << surface << " not found in " << text;
+    return grammar::ConjForm::Count_;
+  };
+
+  const grammar::ConjForm adjective_past_stem = form_of("高かった", "高かっ");
+  EXPECT_NE(adjective_past_stem, grammar::ConjForm::Base);
+  EXPECT_EQ(form_of("行かなかった", "なかっ"), adjective_past_stem);
+  EXPECT_EQ(form_of("食べたかった", "たかっ"), adjective_past_stem);
+  EXPECT_EQ(form_of("彼らしかった", "らしかっ"), adjective_past_stem);
+  EXPECT_EQ(form_of("高くなかった", "なかっ"), adjective_past_stem);
+
+  EXPECT_EQ(form_of("行かなくて", "なく"), form_of("高くて", "高く"));
+  EXPECT_EQ(form_of("行かなければ", "なけれ"), form_of("高ければ", "高けれ"));
+  EXPECT_EQ(form_of("行かない", "ない"), grammar::ConjForm::Base);
+  EXPECT_EQ(form_of("行きたい", "たい"), grammar::ConjForm::Base);
+}
+
 TEST_F(SuzumeApiTest, DebugAnalysisUsesTheProductionPretokenizerPipeline) {
   Suzume instance(makeTestOptions());
   const std::string text = "2024年12月23日にhttps://example.com/abcを見た。価格は1,000円。";

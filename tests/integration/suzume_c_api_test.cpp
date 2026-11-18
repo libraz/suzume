@@ -219,7 +219,8 @@ TEST(SuzumeCApiTest, AuxiliaryConjugationMetadataIsExposed) {
   EXPECT_EQ(negative->pos, SUZUME_POS_AUXILIARY);
   EXPECT_NE(negative->flags & SUZUME_MORPHEME_CONJUGATABLE, 0U);
   EXPECT_EQ(negative->conjugation_type, 0U);
-  EXPECT_STREQ(suzume_conjugation_form_label(negative->conjugation_form), "終止形");
+  // The かっ cell before た, as on the adjective itself (高かっ).
+  EXPECT_STREQ(suzume_conjugation_form_label(negative->conjugation_form), "連用形");
 
   suzume_result_free(result);
   suzume_destroy(handle);

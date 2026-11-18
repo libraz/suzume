@@ -8,7 +8,14 @@ namespace suzume::postprocess {
 grammar::ConjForm Lemmatizer::detectConjForm(std::string_view surface, std::string_view lemma, core::PartOfSpeech pos,
                                              std::string_view next_lemma, core::ExtendedPOS extended_pos,
                                              core::ExtendedPOS next_extended_pos) {
-  // Only verbs and adjectives have conjugation forms
+  // An auxiliary on the i-adjective paradigm (ない, たい, らしい) reports the cell
+  // its ending spells, through the same mapping as the adjective itself.
+  if (pos == core::PartOfSpeech::Auxiliary && utf8::endsWith(lemma, "い")) {
+    const core::ExtendedPOS cell = core::detectAdjForm(surface);
+    return cell == core::ExtendedPOS::AdjStem ? grammar::ConjForm::Base : grammar::conjFormFromExtendedPos(cell);
+  }
+
+  // Otherwise only verbs and adjectives have conjugation forms
   if (pos != core::PartOfSpeech::Verb && pos != core::PartOfSpeech::Adjective) {
     return grammar::ConjForm::Base;
   }
