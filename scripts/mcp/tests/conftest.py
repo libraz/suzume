@@ -1,11 +1,13 @@
 """Shared fixtures for Suzume MCP tests."""
 
 import shutil
+import sys
 from pathlib import Path
 
 import pytest
 
 REFERENCE_ANALYZER_MISSING = "reference analyzer (mecab) is not installed"
+NATIVE_CLI_MISSING = "native Suzume CLI is not built"
 
 
 @pytest.fixture
@@ -64,3 +66,26 @@ def reference_analyzer(monkeypatch: pytest.MonkeyPatch) -> None:
 
     monkeypatch.setattr(mecab, "_mecab_tokens", missing)
     monkeypatch.setattr(suzume_cli, "_run_normalize_cli", normalize_or_skip)
+
+
+@pytest.fixture(autouse=True)
+def native_cli(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Skip, with one reason, every test that reaches the native CLI on a checkout without a build.
+
+    Every module bound to ``existing_cli`` gets a version that skips when asked for
+    the default CLI; a test that passes its own path or stubs the CLI still runs.
+    """
+    from suzume_mcp.core import suzume_cli
+
+    if suzume_cli.get_cli_path().exists():
+        return
+    resolve = suzume_cli.existing_cli
+
+    def existing_or_skip(cli_path: Path | None = None) -> Path:
+        if cli_path is None:
+            pytest.skip(NATIVE_CLI_MISSING)
+        return resolve(cli_path)
+
+    for name, module in list(sys.modules.items()):
+        if name.startswith("suzume_mcp") and getattr(module, "existing_cli", None) is resolve:
+            monkeypatch.setattr(module, "existing_cli", existing_or_skip)
