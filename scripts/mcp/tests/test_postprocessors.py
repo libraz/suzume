@@ -646,6 +646,30 @@ class TestAdverbHostDe:
         assert not postprocessors.postprocess_adverb_host_context(tokens)
         assert tokens[1] == _tok("で", "Particle")
 
+    @pytest.mark.parametrize("follower", [_tok("た", "Auxiliary"), _tok("ます", "Auxiliary")])
+    def test_ni_between_an_adverb_and_a_continuative_follower_is_niru(self, follower):
+        tokens = [_tok("まだ", "Adverb"), _tok("に", "Particle"), follower]
+        assert postprocessors.postprocess_adverb_host_context(tokens)
+        assert tokens[1] == _tok("に", "Verb", lemma="にる")
+
+    def test_ni_after_an_adverb_before_a_verb_is_left_alone(self):
+        tokens = [_tok("すぐ", "Adverb"), _tok("に", "Particle"), _tok("行く", "Verb")]
+        assert not postprocessors.postprocess_adverb_host_context(tokens)
+
+
+class TestHostlessNite:
+    @pytest.mark.parametrize(
+        "host", [_tok("まだ", "Adverb"), _tok("で", "Particle"), _tok("よく", "Adjective", lemma="よい")]
+    )
+    def test_nite_after_a_non_nominal_host_is_niru_plus_te(self, host):
+        tokens = [host, _tok("にて", "Particle")]
+        assert postprocessors.postprocess_hostless_nite(tokens)
+        assert tokens[1:] == [_tok("に", "Verb", lemma="にる"), _tok("て", "Particle")]
+
+    def test_nite_after_a_noun_stays_the_case_particle(self):
+        tokens = [_tok("会場", "Noun"), _tok("にて", "Particle")]
+        assert not postprocessors.postprocess_hostless_nite(tokens)
+
 
 class TestContractedIkuLemma:
     @pytest.mark.parametrize(

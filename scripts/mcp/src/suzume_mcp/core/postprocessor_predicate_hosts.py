@@ -96,6 +96,14 @@ def _takes_continuative(token: dict) -> bool:
     return token.get("surface") in ("た", "たら", "たり", "て") or token.get("lemma") == "ます"
 
 
+# One-mora ichidan continuatives that share a surface with a particle; the
+# lemma is the one the reference gives the verb reading.
+_PARTICLE_HOMOGRAPH_CONTINUATIVES = {"で": "出る", "に": "にる"}
+
+# Hosts that a case particle cannot take: it needs a nominal.
+_NON_NOMINAL_HOST_POS = frozenset({"Adverb", "Particle"})
+
+
 def postprocess_adverb_host_context(tokens: list[dict]) -> bool:
     """Retag an adverb by the slot its neighbours give it.
 
@@ -107,8 +115,8 @@ def postprocess_adverb_host_context(tokens: list[dict]) -> bool:
       adjective's continuative (険しく, 長く), however the reference tagged it;
       a kana one can belong to a homographic adverb (いたく is 甚く).
 
-    Neither the copula nor a case particle で can follow an adverb and host
-    た/て/ます, so that で is the continuative of 出る (すぐ+で+た).
+    Neither the copula nor a case particle で/に can follow an adverb and host
+    た/て/ます, so that で/に is the continuative of 出る/似る (すぐ+で+た, まだ+に+た).
     """
     changed = False
     for idx, token in enumerate(tokens):
@@ -117,8 +125,9 @@ def postprocess_adverb_host_context(tokens: list[dict]) -> bool:
         surface = token.get("surface", "")
         following = tokens[idx + 1] if idx + 1 < len(tokens) else {}
         after = tokens[idx + 2] if idx + 2 < len(tokens) else {}
-        if following.get("surface") == "で" and following.get("pos") != "Verb" and _takes_continuative(after):
-            following.update(pos="Verb", lemma="出る")
+        verb_lemma = _PARTICLE_HOMOGRAPH_CONTINUATIVES.get(following.get("surface", ""))
+        if verb_lemma and following.get("pos") != "Verb" and _takes_continuative(after):
+            following.update(pos="Verb", lemma=verb_lemma)
             changed = True
         if following.get("surface") == "な" and following.get("lemma") == "だ" and after.get("pos") == "Noun":
             token["pos"] = "Adjective"
@@ -133,6 +142,28 @@ def postprocess_adverb_host_context(tokens: list[dict]) -> bool:
         ):
             token["pos"] = "Adjective"
             token["lemma"] = surface[:-1] + "い"
+            changed = True
+    return changed
+
+
+def postprocess_hostless_nite(tokens: list[dict]) -> bool:
+    """Split にて after a non-nominal host into the continuative of 似る and て.
+
+    The case particle にて needs a nominal host (東京+にて). After an adverb, a
+    particle or an adjective continuative (まだ+にて, 外で+にて, よく+にて) only
+    似る's continuative plus the conjunctive て fits.
+    """
+    changed = False
+    for idx in range(len(tokens) - 1, 0, -1):
+        token, host = tokens[idx], tokens[idx - 1]
+        if token.get("surface") != "にて" or token.get("pos") != "Particle":
+            continue
+        host_pos = host.get("pos")
+        if host_pos in _NON_NOMINAL_HOST_POS or (host_pos == "Adjective" and host.get("surface", "").endswith("く")):
+            tokens[idx : idx + 1] = [
+                {"surface": "に", "pos": "Verb", "lemma": _PARTICLE_HOMOGRAPH_CONTINUATIVES["に"]},
+                {"surface": "て", "pos": "Particle", "lemma": "て"},
+            ]
             changed = True
     return changed
 
