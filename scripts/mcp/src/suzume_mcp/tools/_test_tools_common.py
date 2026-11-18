@@ -4,7 +4,6 @@ import re
 import subprocess
 from pathlib import Path
 
-from ..core.constants import TARI_ADVERB_STEMS
 from ..core.json_utils import json_error as _json_error  # noqa: F401
 from ..core.json_utils import json_result as _json_result  # noqa: F401
 from ..core.pos_mapping import normalize_pos
@@ -62,11 +61,6 @@ def _get_suzume_tokens(text: str) -> list[dict]:
         surface = parts[0]
         pos = normalize_pos(parts[1]) if len(parts) > 1 else "Other"
         lemma = parts[2] if len(parts) > 2 else surface
-        # Tari adverb lemma normalization
-        for stem in TARI_ADVERB_STEMS:
-            if surface == f"{stem}と" and lemma == f"{stem}と":
-                lemma = stem
-                break
         tokens.append({"surface": surface, "pos": pos, "lemma": lemma})
     return tokens
 
