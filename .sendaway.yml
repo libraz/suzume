@@ -1,0 +1,4 @@
+# Only build directories named build-linux-* run on the build host. The default
+# build/ stays on the workstation: the oracle tooling runs its macOS binaries.
+remote: [[cmake, "build-linux-*"], [ctest, "build-linux-*"]]
+env: [SUZUME_*, CTEST_*]
