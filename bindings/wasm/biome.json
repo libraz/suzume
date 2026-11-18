@@ -52,6 +52,6 @@
     }
   },
   "files": {
-    "includes": ["js/**/*.ts", "js/**/*.js", "tests/**/*.ts"]
+    "includes": ["js/**/*.ts", "tests/**/*.ts"]
   }
 }
