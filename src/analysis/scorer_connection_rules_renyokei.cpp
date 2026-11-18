@@ -179,10 +179,14 @@ void addModifierPredicateRules(const core::LatticeEdge& prev, const core::Lattic
     SUZUME_CONNECTION_ADD(bonus, cost::kStrongBonus);
 
   // A one-mora euphonic verb after an adverb is generally a fabricated split
-  // of an inflected predicate. Lexical past forms retain their kanji stem,
-  // while the productive adjective inflection remains available as one unit.
+  // of an inflected predicate (まず+かっ+た). A demonstrative manner adverb is
+  // a pro-form any listed verb takes, so a listed verb's cell is exempt after
+  // one (こう+やっ+て, not こう+や+って).
+  const bool manner_proform_before_listed_verb =
+      prev.extended_pos == core::ExtendedPOS::AdverbQuotative && next.dictionaryBacked();
   if (prev.pos == core::PartOfSpeech::Adverb && next.extended_pos == core::ExtendedPOS::VerbOnbinkei &&
-      grammar::isPureHiragana(next.surface) && next.surface.size() == core::kTwoJapaneseCharBytes) {
+      !manner_proform_before_listed_verb && grammar::isPureHiragana(next.surface) &&
+      next.surface.size() == core::kTwoJapaneseCharBytes) {
     SUZUME_CONNECTION_ADD(bonus, cost::kStrong);
   }
 

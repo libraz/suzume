@@ -2088,6 +2088,92 @@
       ],
       "id": "toiuka_u",
       "input": "というか違う"
+    },
+    {
+      "description": "Demonstrative adverb + onbin of the listed verb やる + te, not regional copula + quotative",
+      "expected": [
+        {
+          "lemma": "こう",
+          "pos": "Adverb",
+          "surface": "こう"
+        },
+        {
+          "lemma": "やる",
+          "pos": "Verb",
+          "surface": "やっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "おく",
+          "pos": "Auxiliary",
+          "surface": "おく"
+        }
+      ],
+      "id": "kouyattteoku",
+      "input": "こうやっておく"
+    },
+    {
+      "description": "Interrogative adverb + やっ + te + aspect いる",
+      "expected": [
+        {
+          "lemma": "どう",
+          "pos": "Adverb",
+          "surface": "どう"
+        },
+        {
+          "lemma": "やる",
+          "pos": "Verb",
+          "surface": "やっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        }
+      ],
+      "id": "douyattteiruno",
+      "input": "どうやっているの"
+    },
+    {
+      "description": "Demonstrative adverb そう + やっ + te + preparative おく",
+      "expected": [
+        {
+          "lemma": "そう",
+          "pos": "Adverb",
+          "surface": "そう"
+        },
+        {
+          "lemma": "やる",
+          "pos": "Verb",
+          "surface": "やっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "おく",
+          "pos": "Auxiliary",
+          "surface": "おく"
+        }
+      ],
+      "id": "souyattteoku",
+      "input": "そうやっておく"
     }
   ],
   "description": "Quotative patterns (という, といって, etc.)",
