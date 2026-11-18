@@ -26,7 +26,7 @@ src/analysis/bigram_table_particle_lexical.cpp	0	0	0
 src/analysis/bigram_table_particle_penalties.cpp	0	0	0
 src/analysis/bigram_table_verb_adj.cpp	0	0	0
 src/analysis/candidate_constants.h	0	173	0
-src/analysis/candidate_options.h	0	34	0
+src/analysis/candidate_options.h	0	35	0
 src/analysis/category_cost.h	0	79	0
 src/analysis/compound_verb_emit.cpp	2	1	0
 src/analysis/compound_verb_forms.cpp	4	0	0
