@@ -284,6 +284,10 @@ def postprocess_tagaru_aux(tokens: list[dict]) -> bool:
     return changed
 
 
+_DEMONSTRATIVE_U_ADVERBS = frozenset({"こう", "そう", "どう"})
+_MANNER_LIGHT_VERB_LEMMAS = frozenset({"やる", "する"})
+
+
 def postprocess_subsidiary_yuku(tokens: list[dict]) -> bool:
     """Treat literary 連用形 + ゆく/いく as a subsidiary verb.
 
@@ -304,9 +308,18 @@ def postprocess_subsidiary_yuku(tokens: list[dict]) -> bool:
         connective_te_de = previous.get("surface") == "て" or (
             previous.get("surface") == "で" and idx >= 2 and tokens[idx - 2].get("pos") == "Verb"
         )
+        # こう/そう/どう + やって/して is a manner adverbial, not a host clause, so
+        # the kanji motion verb after it is the predicate; kana いく stays aspectual.
+        after_manner_adverbial = (
+            idx >= 3
+            and tokens[idx - 2].get("lemma") in _MANNER_LIGHT_VERB_LEMMAS
+            and tokens[idx - 3].get("surface") in _DEMONSTRATIVE_U_ADVERBS
+            and regex.search(r"\p{Han}", token.get("surface", "")) is not None
+        )
         if connective_te_de and previous.get("pos") == "Particle":
-            if token.get("pos") != "Auxiliary":
-                token["pos"] = "Auxiliary"
+            motion_pos = "Verb" if after_manner_adverbial else "Auxiliary"
+            if token.get("pos") != motion_pos:
+                token["pos"] = motion_pos
                 changed = True
         elif previous.get("pos") == "Verb" and token.get("pos") != "Verb":
             token["pos"] = "Verb"
