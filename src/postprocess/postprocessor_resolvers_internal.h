@@ -23,6 +23,10 @@ void eraseAfter(std::vector<core::Morpheme>& result, size_t idx);
 inline const core::Morpheme* morphemeBefore(const std::vector<core::Morpheme>& result, size_t idx) {
   return idx > 0 ? &result[idx - 1] : nullptr;
 }
+/// The morpheme @p idx attaches to: the one before it with no source text (a removed symbol) in between.
+inline const core::Morpheme* attachedHost(const std::vector<core::Morpheme>& result, size_t idx) {
+  return idx > 0 && result[idx - 1].end == result[idx].start ? &result[idx - 1] : nullptr;
+}
 /// The morpheme @p offset positions after @p idx, or nullptr past the end.
 inline const core::Morpheme* morphemeAfter(const std::vector<core::Morpheme>& result, size_t idx, size_t offset) {
   return idx + offset < result.size() ? &result[idx + offset] : nullptr;

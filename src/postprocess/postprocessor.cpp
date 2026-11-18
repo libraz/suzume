@@ -45,6 +45,17 @@ void resolveSemanticRolesPreservingSymbols(std::vector<core::Morpheme>& result,
   }
 
   resolveFinalMorphemeRoles(semantic_morphemes, dict_manager);
+  resolver::resolveNegativeHost(semantic_morphemes);
+  resolver::resolveSouHost(semantic_morphemes);
+  resolver::resolveCopulaAru(semantic_morphemes);
+  resolver::mergeContractedTeruBeforeNominalizer(semantic_morphemes);
+  resolver::resolveListingTari(semantic_morphemes);
+  resolver::resolveExcessiveDeverbalNoun(semantic_morphemes);
+  resolver::resolveHonorificContinuativePast(semantic_morphemes);
+  resolver::resolveAdverbBeforeCase(semantic_morphemes);
+  resolver::resolvePredicateCellLemmas(semantic_morphemes);
+  resolver::resolveFrameRepairs(semantic_morphemes);
+  resolver::resolveVerbFrameRepairs(semantic_morphemes);
 
   result.clear();
   result.reserve(semantic_morphemes.size() + symbols.size());
@@ -152,10 +163,10 @@ std::vector<core::Morpheme> Postprocessor::process(std::vector<core::Morpheme> r
   runMergePass(result, mergeNumericExpressions, "mergeNumericExpressions");
 
   // Conjugation-form detection and contextual POS repairs are annotations, not
-  // optional lemma output. Always run the batch pass; the option controls only
-  // whether its corrected lemmas are retained.
-  lemmatizer_.lemmatizeAll(result, options_.lemmatize);
-  SUZUME_DEBUG_LOG_VERBOSE("[POSTPROC] lemmatize: " << (options_.lemmatize ? "applied" : "lemma writes suppressed")
+  // optional lemma output, and the resolvers below read the corrected lemmas.
+  // Always run the batch pass; the source lemmas are put back at the end.
+  lemmatizer_.lemmatizeAll(result);
+  SUZUME_DEBUG_LOG_VERBOSE("[POSTPROC] lemmatize: " << (options_.lemmatize ? "applied" : "source lemmas restored")
                                                     << "\n");
 
   resolvePrePrefixMorphemeRoles(result, dict_manager_);
@@ -181,25 +192,14 @@ std::vector<core::Morpheme> Postprocessor::process(std::vector<core::Morpheme> r
   // Merge prolonged sound mark (ー) with preceding token
   runMergePass(result, mergeProlongedSoundMark, "mergeProlongedSoundMark");
 
-  // Punctuation must not affect neighboring semantic roles. Resolve a
-  // symbol-free owning vector, then merge its potentially shortened result
-  // back by source spans.
+  // Every role is resolved on one symbol-free vector whether or not symbols are
+  // kept in the output, so the result cannot depend on remove_symbols; a resolver
+  // that needs a boundary reads it from the source spans. The potentially
+  // shortened result is merged back by span.
   resolveSemanticRolesPreservingSymbols(result, dict_manager_);
 
   // Filter unwanted morphemes only after every role has been resolved.
   result = filterMorphemes(std::move(result));
-  // The POS of ない follows from its host, which is only final once symbols are gone.
-  resolver::resolveNegativeHost(result);
-  resolver::resolveSouHost(result);
-  resolver::resolveCopulaAru(result);
-  resolver::mergeContractedTeruBeforeNominalizer(result);
-  resolver::resolveListingTari(result);
-  resolver::resolveExcessiveDeverbalNoun(result);
-  resolver::resolveHonorificContinuativePast(result);
-  resolver::resolveAdverbBeforeCase(result);
-  resolver::resolvePredicateCellLemmas(result);
-  resolver::resolveFrameRepairs(result);
-  resolver::resolveVerbFrameRepairs(result);
 
   if (!options_.lemmatize) {
     // Role resolution must still run to supply POS and conjugation annotations,

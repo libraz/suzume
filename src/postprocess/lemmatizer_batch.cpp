@@ -387,15 +387,7 @@ void fixImperativeAndTara(core::Morpheme& morpheme) {
 
 }  // namespace
 
-void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes, bool update_lemmas) const {
-  std::vector<std::string> original_lemmas;
-  if (!update_lemmas) {
-    original_lemmas.reserve(morphemes.size());
-    for (const auto& morpheme : morphemes) {
-      original_lemmas.push_back(morpheme.lemma);
-    }
-  }
-
+void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes) const {
   for (size_t idx = 0; idx < morphemes.size(); ++idx) {
     auto& morpheme = morphemes[idx];
     core::Morpheme* next = idx + 1 < morphemes.size() ? &morphemes[idx + 1] : nullptr;
@@ -423,12 +415,6 @@ void Lemmatizer::lemmatizeAll(std::vector<core::Morpheme>& morphemes, bool updat
     fixImperativeAndTara(morpheme);
     morpheme.conj_form = detectConjForm(morpheme.surface, morpheme.lemma, morpheme.pos, next_lemma,
                                         morpheme.extended_pos, next_extended_pos);
-  }
-
-  if (!update_lemmas) {
-    for (size_t idx = 0; idx < morphemes.size(); ++idx) {
-      morphemes[idx].lemma = std::move(original_lemmas[idx]);
-    }
   }
 }
 

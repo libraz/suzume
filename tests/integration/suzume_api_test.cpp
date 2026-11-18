@@ -733,6 +733,53 @@ TEST_F(SuzumeApiTest, PreservingSymbolsDoesNotChangeNeighboringRoles) {
   EXPECT_EQ(preserved_hon->extended_pos, filtered_hon->extended_pos);
 }
 
+TEST_F(SuzumeApiTest, OutputOptionsDoNotChangeCategories) {
+  // remove_symbols and lemmatize select what is emitted; neither may change a
+  // surface, a POS or a conjugation cell of the morphemes both outputs share.
+  struct Category {
+    std::string surface;
+    core::PartOfSpeech pos;
+    core::ExtendedPOS extended_pos;
+    bool operator==(const Category& other) const {
+      return surface == other.surface && pos == other.pos && extended_pos == other.extended_pos;
+    }
+  };
+  const auto categories = [this](bool remove_symbols, bool lemmatize, const char* text) {
+    SuzumeOptions options = makeTestOptions();
+    options.remove_symbols = remove_symbols;
+    options.lemmatize = lemmatize;
+    std::vector<Category> result;
+    for (const auto& morpheme : Suzume(options).analyze(text)) {
+      if (morpheme.pos != core::PartOfSpeech::Symbol) {
+        result.push_back({morpheme.surface, morpheme.pos, morpheme.extended_pos});
+      }
+    }
+    return result;
+  };
+
+  for (const char* text : {"食べ、ない", "理由がなければ戻る", "駅までどうやって行きますか", "おいしい。そうだ"}) {
+    const auto reference = categories(true, true, text);
+    for (const bool remove_symbols : {true, false}) {
+      for (const bool lemmatize : {true, false}) {
+        EXPECT_TRUE(categories(remove_symbols, lemmatize, text) == reference)
+            << text << " remove_symbols=" << remove_symbols << " lemmatize=" << lemmatize;
+      }
+    }
+  }
+}
+
+TEST_F(SuzumeApiTest, NegativeAfterClauseBoundaryIsTheAdjective) {
+  // A comma ends the clause, so ない has no verbal host to attach to.
+  Suzume instance(makeTestOptions());
+  const auto separated = instance.analyze("食べ、ない");
+  ASSERT_EQ(separated.size(), 2U);
+  EXPECT_EQ(separated[1].pos, core::PartOfSpeech::Adjective);
+
+  const auto attached = instance.analyze("食べない");
+  ASSERT_EQ(attached.size(), 2U);
+  EXPECT_EQ(attached[1].pos, core::PartOfSpeech::Auxiliary);
+}
+
 TEST_F(SuzumeApiTest, AdjectivalAuxiliaryCellsReportTheAdjectiveForm) {
   Suzume instance(makeTestOptions());
   const auto form_of = [&instance](const char* text, std::string_view surface) {

@@ -165,7 +165,7 @@ void resolveNegativeHost(std::vector<core::Morpheme>& result) {
         (negative.pos != core::PartOfSpeech::Auxiliary && negative.pos != core::PartOfSpeech::Adjective)) {
       continue;
     }
-    const core::Morpheme* host = morphemeBefore(result, idx);
+    const core::Morpheme* host = attachedHost(result, idx);
     const bool verbal_host =
         host != nullptr &&
         (host->pos == core::PartOfSpeech::Verb ||
@@ -193,7 +193,7 @@ void resolveSouHost(std::vector<core::Morpheme>& result) {
                                 sou.pos != core::PartOfSpeech::Adverb)) {
       continue;
     }
-    const core::Morpheme* host = morphemeBefore(result, idx);
+    const core::Morpheme* host = attachedHost(result, idx);
     const core::Morpheme* following = morphemeAfter(result, idx, 1);
     const bool nominal_stem_host = host != nullptr && host->pos == core::PartOfSpeech::Noun &&
                                    (following == nullptr || following->pos != core::PartOfSpeech::Verb);

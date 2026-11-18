@@ -43,9 +43,8 @@ class Lemmatizer {
   /**
    * @brief Derive lemmas, conjugation forms, and contextual POS corrections
    * @param morphemes Vector of morphemes
-   * @param update_lemmas Whether to retain derived lemmas in the output
    */
-  void lemmatizeAll(std::vector<core::Morpheme>& morphemes, bool update_lemmas = true) const;
+  void lemmatizeAll(std::vector<core::Morpheme>& morphemes) const;
 
   /**
    * @brief Detect conjugation form from surface and lemma
