@@ -1,7 +1,6 @@
 """Test corpus review, validation, and coverage MCP tools."""
 
 import re
-from pathlib import Path
 
 from ..core.suzume_cli import (
     get_expected_tokens_subprocess as get_expected_tokens,
@@ -12,7 +11,6 @@ from ..core.test_file_utils import (
     find_test_by_input,
     find_tests_by_input,
     generate_id,
-    save_json,
 )
 from ..server import PROJECT_ROOT, mcp
 from ._test_tools_common import (
@@ -22,8 +20,11 @@ from ._test_tools_common import (
     _get_test_files_filtered,
     _json_error,
     _json_result,
+    _load_selected_cases,
     _load_test_cases,
+    _save_changed,
 )
+from ._test_tools_organization import _sanitize_gtest_name
 
 
 def _banned_keys_in(case: dict) -> list[str]:
@@ -97,7 +98,7 @@ async def test_reset_suzume(
         apply: If True, apply changes. Default is dry-run.
     """
     if all_tests:
-        loaded, error = _load_test_cases(_get_test_files_filtered(file or "all"))
+        loaded, error = _load_test_cases(_get_test_files_filtered(file))
         if error:
             return _json_error(error)
         to_reset = [
@@ -128,13 +129,10 @@ async def test_reset_suzume(
     ]
 
     if apply:
-        files_to_save: dict[Path, dict] = {}
         for found in to_reset:
             for key in BANNED_ORACLE_KEYS:
                 found["case"].pop(key, None)
-            files_to_save[found["file"]] = found["data"]
-        for path, data in files_to_save.items():
-            save_json(path, data)
+        _save_changed((found["file"], found["data"]) for found in to_reset)
 
     return _json_result(
         {
@@ -158,11 +156,7 @@ async def test_validate_ids(
         file: Optional test file filter (without .json), or empty for all.
         apply: If True, fix invalid IDs. Default is report-only.
     """
-    files = _get_test_files_filtered(file or "all")
-    if not files:
-        return _json_error("No test files found")
-
-    loaded, error = _load_test_cases(files)
+    loaded, error = _load_selected_cases(_get_test_files_filtered(file))
     if error:
         return _json_error(error)
 
@@ -175,12 +169,10 @@ async def test_validate_ids(
             inp = case.get("input", "")
 
             # Sanitize ID
-            sanitized = re.sub(r"[^a-zA-Z0-9_]", "_", case_id)
-            sanitized = re.sub(r"_+", "_", sanitized)
-            sanitized = sanitized.strip("_")
+            sanitized = re.sub(r"_+", "_", _sanitize_gtest_name(case_id)).strip("_")
 
             has_non_ascii = bool(re.search(r"[^\x00-\x7F]", case_id))
-            becomes_empty = not sanitized or sanitized == "_"
+            becomes_empty = not sanitized
             is_dup = sanitized in file_ids
 
             if has_non_ascii or becomes_empty or is_dup:
@@ -214,12 +206,9 @@ async def test_validate_ids(
 
     applied = apply and bool(problems)
     if applied:
-        files_to_save: dict[Path, dict] = {}
         for prob in problems:
             prob["case"]["id"] = prob["out"]["new_id"]
-            files_to_save[prob["path"]] = prob["data"]
-        for path, data in files_to_save.items():
-            save_json(path, data)
+        _save_changed((prob["path"], prob["data"]) for prob in problems)
 
     return _json_result({"problems": [prob["out"] for prob in problems], "total": len(problems), "applied": applied})
 

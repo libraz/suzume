@@ -22,6 +22,8 @@ from ._test_tools_common import _json_error, _json_result, _load_test_cases
 MAX_TEST_CASES_PER_FILE = 100
 MAX_TEST_FILE_BYTES = 131072
 _PART_SUFFIX_RE = re.compile(r"^(?P<base>.+)_(?P<number>[0-9]{2,})$")
+# Part number and count used only to size a chunk with the widest description suffix.
+_SIZING_PART = (9999, 9999)
 _PART_DESCRIPTION_RE = re.compile(r" \(part [0-9]+/[0-9]+\)$")
 
 
@@ -96,13 +98,13 @@ def _limited_chunks(source_data: dict, cases: list[dict], max_cases: int, max_by
     current: list[dict] = []
     for case in cases:
         candidate = [*current, case]
-        if _fits_limits(_part_data(source_data, candidate, 9999, 9999), candidate, max_cases, max_bytes):
+        if _fits_limits(_part_data(source_data, candidate, *_SIZING_PART), candidate, max_cases, max_bytes):
             current = candidate
             continue
         if current:
             chunks.append(current)
         current = [case]
-        if not _fits_limits(_part_data(source_data, current, 9999, 9999), current, max_cases, max_bytes):
+        if not _fits_limits(_part_data(source_data, current, *_SIZING_PART), current, max_cases, max_bytes):
             raise _oversized_case_error(case, max_bytes)
     if current:
         chunks.append(current)
@@ -263,7 +265,7 @@ def append_cases_partitioned(
             source_data = load_json(base_path)
             originals[base_path] = load_json(base_path)
         else:
-            source_data = {"version": "1.0", "description": f"{family} tests", "cases": []}
+            source_data = {"version": "1.0", "description": f"{family} tests", TEST_CASES_KEY: []}
         combined = [*get_cases(source_data, str(base_path)), *new_cases]
         if _fits_limits(source_data, combined, max_cases, max_bytes):
             planned.append((base_path, {**source_data, TEST_CASES_KEY: combined}))
@@ -366,7 +368,7 @@ async def test_audit_layout(
 @mcp.tool()
 async def test_split_file(
     file: str,
-    max_cases: int = 100,
+    max_cases: int = MAX_TEST_CASES_PER_FILE,
     apply: bool = False,
 ) -> str:
     """Split one test file into balanced, stable numbered parts.

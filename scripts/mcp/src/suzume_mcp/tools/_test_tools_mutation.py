@@ -25,7 +25,7 @@ from ._test_tools_common import (
     _get_test_files_filtered,
     _json_error,
     _json_result,
-    _load_test_cases,
+    _load_selected_cases,
 )
 from ._test_tools_organization import append_cases_partitioned
 
@@ -93,10 +93,7 @@ async def test_add(
             return _json_error(str(exc))
         placement_source = "requested"
     else:
-        suggestions = suggest_test_files(input_text, tokens)
-        if not suggestions:
-            return _json_error("Could not suggest a test file")
-        file_name = suggestions[0]
+        file_name = suggest_test_files(input_text, tokens)[0]
         placement_source = "suggested"
 
     if not case_id:
@@ -325,10 +322,7 @@ def _preview_pos_occurrences(old_pos: str, new_pos: str, file: str, apply: bool,
     if apply:
         return _json_error(_ORACLE_OWNED_POS)
 
-    files = _get_test_files_filtered(file or "all")
-    if not files:
-        return _json_error("No test files found")
-    loaded, error = _load_test_cases(files)
+    loaded, error = _load_selected_cases(_get_test_files_filtered(file))
     if error:
         return _json_error(error)
 
@@ -392,11 +386,7 @@ async def test_list_pos(file: str = "") -> str:
     Args:
         file: Optional test file filter (without .json).
     """
-    files = _get_test_files_filtered(file or "all")
-    if not files:
-        return _json_error("No test files found")
-
-    loaded, error = _load_test_cases(files)
+    loaded, error = _load_selected_cases(_get_test_files_filtered(file))
     if error:
         return _json_error(error)
 

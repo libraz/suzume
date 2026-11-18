@@ -1,7 +1,8 @@
-"""Test tools ported from test_tool.pl - MCP tool registration."""
+"""Shared helpers for the test corpus MCP tools: oracle access, case loading and drift detection."""
 
 import re
 import subprocess
+from collections.abc import Iterable
 from pathlib import Path
 
 from ..core.json_utils import json_error as _json_error  # noqa: F401
@@ -17,6 +18,7 @@ from ..core.test_file_utils import (
     get_test_files,
     load_json,
     normalize_test_file_name,
+    save_json,
 )
 from ..server import PROJECT_ROOT
 
@@ -95,6 +97,21 @@ def _load_test_cases(files: list[Path]) -> tuple[list[tuple[Path, dict, list[dic
             return [], f"Failed to parse JSON file {path}: {exc}"
         loaded.append((path, data, get_cases(data, str(path))))
     return loaded, None
+
+
+def _load_selected_cases(
+    files: list[Path],
+) -> tuple[list[tuple[Path, dict, list[dict]]], str | None]:
+    """Load the cases of an already filtered file list, reporting an empty list as an error."""
+    if not files:
+        return [], "No test files found"
+    return _load_test_cases(files)
+
+
+def _save_changed(changed: Iterable[tuple[Path, dict]]) -> None:
+    """Write each changed file once, in first-seen order."""
+    for path, data in dict(changed).items():
+        save_json(path, data)
 
 
 def _case_id(case: dict, index: int) -> str:
@@ -185,10 +202,7 @@ def oracle_drift(file: str = "", test_ids: list[str] | None = None) -> tuple[dic
     if file and selected_ids:
         return None, "file and test_ids cannot be combined"
 
-    files = _get_test_files_filtered(file)
-    if not files:
-        return None, "No test files found"
-    loaded, error = _load_test_cases(files)
+    loaded, error = _load_selected_cases(_get_test_files_filtered(file))
     if error:
         return None, error
 

@@ -22,7 +22,6 @@ from ..core.test_file_utils import (
     get_test_data_dir,
     get_test_files,
     load_json,
-    save_json,
 )
 from ..server import PROJECT_ROOT, mcp
 from ._cli_freshness import stale_cli_guard
@@ -35,7 +34,9 @@ from ._test_tools_common import (
     _get_test_files_filtered,
     _json_error,
     _json_result,
+    _load_selected_cases,
     _load_test_cases,
+    _save_changed,
     _surfaces,
     oracle_drift,
 )
@@ -351,10 +352,7 @@ async def test_diff_mecab(file: str = "") -> str:
     Args:
         file: Optional test file to check (without .json), or empty for all.
     """
-    files = _get_test_files_filtered(file)
-    if not files:
-        return _json_error("No test files found")
-    loaded, error = _load_test_cases(files)
+    loaded, error = _load_selected_cases(_get_test_files_filtered(file))
     if error:
         return _json_error(error)
 
@@ -438,16 +436,15 @@ async def test_needs_suzume_update(
     needs_update = drift["entries"]
 
     if apply and needs_update:
-        files_to_save: dict[Path, dict] = {}
+        changed: list[tuple[Path, dict]] = []
         for entry in needs_update:
             try:
                 formatted = _format_expected_checked(entry["correct_tokens"], entry["rule"])
             except RuntimeError as exc:
                 return _json_error(str(exc))
             entry["meta"]["case"]["expected"] = formatted
-            files_to_save[entry["meta"]["path"]] = entry["meta"]["data"]
-        for path, data in files_to_save.items():
-            save_json(path, data)
+            changed.append((entry["meta"]["path"], entry["meta"]["data"]))
+        _save_changed(changed)
 
     return _json_result(
         {
