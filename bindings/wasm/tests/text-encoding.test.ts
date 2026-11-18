@@ -1,17 +1,9 @@
 /**
  * Every text argument rejects an unpaired surrogate with the same error code.
  */
-import { describe, expect, it } from 'vitest';
-import { ErrorCode, Suzume, SuzumeError } from '../dist/index.js';
-
-async function expectInvalidUtf8(action: () => Promise<unknown>): Promise<void> {
-  const error = await action().then(
-    () => undefined,
-    (thrown: unknown) => thrown,
-  );
-  expect(error).toBeInstanceOf(SuzumeError);
-  expect((error as SuzumeError).code).toBe(ErrorCode.InvalidUtf8);
-}
+import { describe, it } from 'vitest';
+import { Suzume } from '../dist/index.js';
+import { expectInvalidUtf8 } from './helpers';
 
 describe('unpaired surrogates', () => {
   it('are rejected in user dictionary data', async () => {

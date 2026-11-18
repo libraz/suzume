@@ -1,23 +1,25 @@
 /**
- * Tests for the JS API layer (js/index.ts).
+ * Tests for the JS API layer (js/index.ts) against the built WASM module.
  *
- * Since Suzume.create() uses dynamic import('./suzume.js') which doesn't resolve
- * in vitest, we test the JS API indirectly by verifying:
- * 1. The TypeScript types/interfaces are correctly defined
- * 2. The C API struct layouts match what parseTags/parseMorphemes expect
+ * Covers the C ABI export surface and struct layouts the decoders rely on,
+ * the Suzume class (construction options, modes, dictionaries, error codes,
+ * lifecycle) and the module-level version() function.
  *
- * The C API tests (c-api-analyze.test.ts, c-api-tags.test.ts) cover the actual
- * WASM function calls. This file tests the JS-specific concerns.
+ * The C API tests (c-api-analyze.test.ts, c-api-tags.test.ts) cover the raw
+ * WASM function calls.
  */
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { ErrorCode, Suzume, SuzumeError, version } from '../dist/index.js';
+import { Suzume, version } from '../dist/index.js';
 import { C_LAYOUTS } from '../js/abi_layout.js';
 import {
   allocString,
   allocTagOptions,
+  analyzeText,
+  cApi,
   EXTENDED_OPTIONS_LAYOUT,
+  expectInvalidUtf8,
   getModule,
-  parseMorphemes,
+  nativeLabel,
   parseTags,
   TAGS_LAYOUT,
   type WasmModule,
@@ -29,25 +31,17 @@ describe('JS API: struct layout compatibility', () => {
 
   beforeAll(async () => {
     module = await getModule();
-    const create = module.cwrap('suzume_create', 'number', []) as () => number;
-    handle = create();
+    handle = cApi(module).create();
   });
 
   afterAll(() => {
     if (handle && module) {
-      const destroy = module.cwrap('suzume_destroy', null, ['number']) as (h: number) => void;
-      destroy(handle);
+      cApi(module).destroy(handle);
     }
   });
 
   it('labels every serialized ExtendedPOS code without shifting late additions', () => {
-    const label = module.cwrap('suzume_extended_pos_label', 'number', ['number']) as (
-      code: number,
-    ) => number;
-    const text = (code: number) => {
-      const ptr = label(code);
-      return ptr === 0 ? null : module.UTF8ToString(ptr);
-    };
+    const text = (code: number) => nativeLabel(module, 'suzume_extended_pos_label', code);
     expect(text(0)).toBe('UNKNOWN');
     expect(text(32)).toBe('AUX_開始');
     expect(text(82)).toBe('AUX_文語過去キ');
@@ -195,17 +189,7 @@ describe('JS API: struct layout compatibility', () => {
   });
 
   it('parseMorphemes returns the complete Morpheme result field snapshot', () => {
-    const analyze = module.cwrap('suzume_analyze', 'number', ['number', 'number']) as (
-      h: number,
-      t: number,
-    ) => number;
-    const resultFree = module.cwrap('suzume_result_free', null, ['number']) as (r: number) => void;
-
-    const textPtr = allocString(module, '食べた');
-    const resultPtr = analyze(handle, textPtr);
-    module._free(textPtr);
-
-    const morphemes = parseMorphemes(module, resultPtr);
+    const morphemes = analyzeText(module, handle, '食べた');
     expect(morphemes.length).toBeGreaterThan(0);
 
     const m = morphemes[0];
@@ -244,16 +228,10 @@ describe('JS API: struct layout compatibility', () => {
     expect(typeof m.isUnknown).toBe('boolean');
     expect(typeof m.isFromDictionary).toBe('boolean');
     expect(typeof m.score).toBe('number');
-
-    resultFree(resultPtr);
   });
 
   it('parseTags returns tag and pos fields matching Tag interface', () => {
-    const generateTags = module.cwrap('suzume_generate_tags', 'number', ['number', 'number']) as (
-      h: number,
-      t: number,
-    ) => number;
-    const tagsFree = module.cwrap('suzume_tags_free', null, ['number']) as (t: number) => void;
+    const { generateTags, tagsFree } = cApi(module);
 
     const textPtr = allocString(module, '東京タワーは美しい');
     const tagsPtr = generateTags(handle, textPtr);
@@ -273,12 +251,8 @@ describe('JS API: struct layout compatibility', () => {
     tagsFree(tagsPtr);
   });
 
-  it('suzume_tags_t layout: tags ptr at +0, pos ptr at +1, count at +2', () => {
-    const generateTags = module.cwrap('suzume_generate_tags', 'number', ['number', 'number']) as (
-      h: number,
-      t: number,
-    ) => number;
-    const tagsFree = module.cwrap('suzume_tags_free', null, ['number']) as (t: number) => void;
+  it('suzume_tags_t layout: tags ptr at byte 0, pos ptr at byte 4, count at byte 8', () => {
+    const { generateTags, tagsFree } = cApi(module);
 
     const textPtr = allocString(module, '東京タワー');
     const tagsPtr = generateTags(handle, textPtr);
@@ -307,17 +281,6 @@ describe('JS API: struct layout compatibility', () => {
     tagsFree(tagsPtr);
   });
 
-  it('loadBinaryDictionary uses HEAPU32 buffer derivation (not HEAPU8)', () => {
-    // Verify that Uint8Array can be derived from HEAPU32.buffer
-    // This is the pattern used in js/index.ts loadBinaryDictionary
-    const heapU32 = module.HEAPU32;
-    const heapU8 = new Uint8Array(heapU32.buffer);
-    expect(heapU8).toBeInstanceOf(Uint8Array);
-    expect(heapU8.length).toBeGreaterThan(0);
-    // The derived view should share the same underlying buffer
-    expect(heapU8.buffer).toBe(heapU32.buffer);
-  });
-
   it('create_with_extended_options accepts split mode', () => {
     const initOptions = module.cwrap('suzume_init_extended_options', null, ['number']) as (
       optionsPtr: number,
@@ -325,12 +288,7 @@ describe('JS API: struct layout compatibility', () => {
     const createWithOptions = module.cwrap('suzume_create_with_extended_options', 'number', [
       'number',
     ]) as (optionsPtr: number) => number;
-    const analyze = module.cwrap('suzume_analyze', 'number', ['number', 'number']) as (
-      h: number,
-      t: number,
-    ) => number;
-    const resultFree = module.cwrap('suzume_result_free', null, ['number']) as (r: number) => void;
-    const destroy = module.cwrap('suzume_destroy', null, ['number']) as (h: number) => void;
+    const { destroy } = cApi(module);
 
     const optionsPtr = module._malloc(EXTENDED_OPTIONS_LAYOUT.size);
     initOptions(optionsPtr);
@@ -341,11 +299,7 @@ describe('JS API: struct layout compatibility', () => {
 
     try {
       expect(h).toBeGreaterThan(0);
-      const textPtr = allocString(module, 'API開発');
-      const resultPtr = analyze(h, textPtr);
-      module._free(textPtr);
-      const morphemes = parseMorphemes(module, resultPtr);
-      resultFree(resultPtr);
+      const morphemes = analyzeText(module, h, 'API開発');
       expect(morphemes.length).toBeGreaterThan(1);
     } finally {
       destroy(h);
@@ -353,10 +307,7 @@ describe('JS API: struct layout compatibility', () => {
   });
 
   it('last_error reports invalid C API calls', () => {
-    const analyze = module.cwrap('suzume_analyze', 'number', ['number', 'number']) as (
-      h: number,
-      t: number,
-    ) => number;
+    const { analyze } = cApi(module);
     const lastError = module.cwrap('suzume_last_error', 'number', []) as () => number;
 
     expect(analyze(0, 0)).toBe(0);
@@ -369,7 +320,7 @@ describe('JS API: struct layout compatibility', () => {
       'number',
       'number',
     ]) as (h: number, t: number, o: number) => number;
-    const tagsFree = module.cwrap('suzume_tags_free', null, ['number']) as (t: number) => void;
+    const { tagsFree } = cApi(module);
 
     const textPtr = allocString(module, '東京タワー');
     const optionsPtr = allocTagOptions(module, { minLength: 1 });
@@ -493,13 +444,7 @@ describe('JS API: error reporting', () => {
   it('reports stable error codes and rejects unpaired surrogates', async () => {
     const suzume = await Suzume.create();
     try {
-      expect(() => suzume.analyze('\ud800')).toThrow(SuzumeError);
-      try {
-        suzume.analyze('\ud800');
-      } catch (error) {
-        expect(error).toBeInstanceOf(SuzumeError);
-        expect((error as SuzumeError).code).toBe(ErrorCode.InvalidUtf8);
-      }
+      await expectInvalidUtf8(async () => suzume.analyze('\ud800'));
     } finally {
       suzume.destroy();
     }

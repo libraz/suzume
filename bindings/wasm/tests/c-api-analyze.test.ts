@@ -1,6 +1,8 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
   allocString,
+  analyzeText,
+  cApi,
   EXTENDED_OPTIONS_LAYOUT,
   getModule,
   parseMorphemes,
@@ -15,16 +17,15 @@ describe('C API: analyze', () => {
 
   beforeAll(async () => {
     module = await getModule();
-    const create = module.cwrap('suzume_create', 'number', []) as () => number;
-    handle = create();
-    analyze = module.cwrap('suzume_analyze', 'number', ['number', 'number']) as typeof analyze;
-    resultFree = module.cwrap('suzume_result_free', null, ['number']) as typeof resultFree;
+    const api = cApi(module);
+    handle = api.create();
+    analyze = api.analyze;
+    resultFree = api.resultFree;
   });
 
   afterAll(() => {
     if (handle && module) {
-      const destroy = module.cwrap('suzume_destroy', null, ['number']) as (h: number) => void;
-      destroy(handle);
+      cApi(module).destroy(handle);
     }
   });
 
@@ -73,11 +74,7 @@ describe('C API: analyze', () => {
   });
 
   it('should return chasen-style fields for verbs', () => {
-    const textPtr = allocString(module, '食べた');
-    const resultPtr = analyze(handle, textPtr);
-    module._free(textPtr);
-
-    const morphemes = parseMorphemes(module, resultPtr);
+    const morphemes = analyzeText(module, handle, '食べた');
     expect(morphemes.length).toBeGreaterThan(0);
 
     // First morpheme: 食べ (verb)
@@ -87,31 +84,19 @@ describe('C API: analyze', () => {
     expect(verb.conjType).toBe('一段');
     expect(verb.conjForm).not.toBeNull();
     expect(verb.conjForm?.length).toBeGreaterThan(0);
-
-    resultFree(resultPtr);
   });
 
   it('should expose conjugation fields for auxiliaries', () => {
-    const textPtr = allocString(module, '書かなかった');
-    const resultPtr = analyze(handle, textPtr);
-    module._free(textPtr);
-
-    const morphemes = parseMorphemes(module, resultPtr);
+    const morphemes = analyzeText(module, handle, '書かなかった');
     const negative = morphemes.find((morpheme) => morpheme.surface === 'なかっ');
     expect(negative).toBeDefined();
     expect(negative?.pos).toBe('AUX');
     expect(negative?.conjType).toBeNull();
     expect(negative?.conjForm).toBe('連用形');
-
-    resultFree(resultPtr);
   });
 
   it('should return null conj fields for non-conjugating words', () => {
-    const textPtr = allocString(module, '東京');
-    const resultPtr = analyze(handle, textPtr);
-    module._free(textPtr);
-
-    const morphemes = parseMorphemes(module, resultPtr);
+    const morphemes = analyzeText(module, handle, '東京');
     expect(morphemes.length).toBeGreaterThan(0);
 
     const noun = morphemes[0];
@@ -119,45 +104,27 @@ describe('C API: analyze', () => {
     expect(noun.posJa).toBe('名詞');
     expect(noun.conjType).toBeNull();
     expect(noun.conjForm).toBeNull();
-
-    resultFree(resultPtr);
   });
 
   it('should return base_form field', () => {
-    const textPtr = allocString(module, '食べた');
-    const resultPtr = analyze(handle, textPtr);
-    module._free(textPtr);
-
-    const morphemes = parseMorphemes(module, resultPtr);
+    const morphemes = analyzeText(module, handle, '食べた');
     const verb = morphemes[0];
     // base_form should be the dictionary form
     expect(verb.baseForm.length).toBeGreaterThan(0);
-
-    resultFree(resultPtr);
   });
 
   it('should return extendedPos for all morphemes', () => {
-    const textPtr = allocString(module, '猫が走る');
-    const resultPtr = analyze(handle, textPtr);
-    module._free(textPtr);
-
-    const morphemes = parseMorphemes(module, resultPtr);
+    const morphemes = analyzeText(module, handle, '猫が走る');
     expect(morphemes.length).toBeGreaterThan(0);
 
     for (const m of morphemes) {
       expect(typeof m.extendedPos).toBe('string');
       expect(m.extendedPos.length).toBeGreaterThan(0);
     }
-
-    resultFree(resultPtr);
   });
 
   it('should return offsets and diagnostic fields for all morphemes', () => {
-    const textPtr = allocString(module, '猫が走る');
-    const resultPtr = analyze(handle, textPtr);
-    module._free(textPtr);
-
-    const morphemes = parseMorphemes(module, resultPtr);
+    const morphemes = analyzeText(module, handle, '猫が走る');
     expect(morphemes.length).toBeGreaterThan(0);
 
     for (const m of morphemes) {
@@ -171,30 +138,18 @@ describe('C API: analyze', () => {
       expect(typeof m.isFromDictionary).toBe('boolean');
       expect(typeof m.score).toBe('number');
     }
-
-    resultFree(resultPtr);
   });
 
   it('should return correct extendedPos for verb conjugation forms', () => {
     // 食べた → 食べ(VerbRenyokei) + た(AuxPast)
-    const textPtr = allocString(module, '食べた');
-    const resultPtr = analyze(handle, textPtr);
-    module._free(textPtr);
-
-    const morphemes = parseMorphemes(module, resultPtr);
+    const morphemes = analyzeText(module, handle, '食べた');
     const verb = morphemes[0];
     expect(verb.surface).toBe('食べ');
     expect(verb.extendedPos).toBe('VERB_連用');
-
-    resultFree(resultPtr);
   });
 
   it('should analyze full sentence with mixed POS', () => {
-    const textPtr = allocString(module, '私は東京に行った');
-    const resultPtr = analyze(handle, textPtr);
-    module._free(textPtr);
-
-    const morphemes = parseMorphemes(module, resultPtr);
+    const morphemes = analyzeText(module, handle, '私は東京に行った');
     // Should have multiple morphemes: 私/は/東京/に/行っ/た
     expect(morphemes.length).toBeGreaterThanOrEqual(5);
 
@@ -218,8 +173,6 @@ describe('C API: analyze', () => {
       expect(verb.posJa).toBe('動詞');
       expect(verb.conjType === null || typeof verb.conjType === 'string').toBe(true);
     }
-
-    resultFree(resultPtr);
   });
 });
 
@@ -237,12 +190,7 @@ describe('C API: create_with_extended_options', () => {
     const createWithOptions = module.cwrap('suzume_create_with_extended_options', 'number', [
       'number',
     ]) as (optionsPtr: number) => number;
-    const analyze = module.cwrap('suzume_analyze', 'number', ['number', 'number']) as (
-      h: number,
-      t: number,
-    ) => number;
-    const resultFree = module.cwrap('suzume_result_free', null, ['number']) as (r: number) => void;
-    const destroy = module.cwrap('suzume_destroy', null, ['number']) as (h: number) => void;
+    const { destroy } = cApi(module);
 
     const optionsPtr = module._malloc(EXTENDED_OPTIONS_LAYOUT.size);
     initOptions(optionsPtr);
@@ -251,39 +199,23 @@ describe('C API: create_with_extended_options', () => {
     module._free(optionsPtr);
     expect(h).toBeGreaterThan(0);
 
-    const textPtr = allocString(module, 'こんにちは😊');
-    const resultPtr = analyze(h, textPtr);
-    module._free(textPtr);
-
-    const morphemes = parseMorphemes(module, resultPtr);
+    const morphemes = analyzeText(module, h, 'こんにちは😊');
     expect(morphemes.length).toBe(2);
     expect(morphemes[1].surface).toBe('😊');
     expect(morphemes[1].pos).toBe('OTHER');
 
-    resultFree(resultPtr);
     destroy(h);
   });
 
   it('keeps emoji by default for full offset coverage', () => {
-    const create = module.cwrap('suzume_create', 'number', []) as () => number;
-    const analyze = module.cwrap('suzume_analyze', 'number', ['number', 'number']) as (
-      h: number,
-      t: number,
-    ) => number;
-    const resultFree = module.cwrap('suzume_result_free', null, ['number']) as (r: number) => void;
-    const destroy = module.cwrap('suzume_destroy', null, ['number']) as (h: number) => void;
+    const { create, destroy } = cApi(module);
 
     const h = create();
-    const textPtr = allocString(module, 'こんにちは😊');
-    const resultPtr = analyze(h, textPtr);
-    module._free(textPtr);
-
-    const morphemes = parseMorphemes(module, resultPtr);
+    const morphemes = analyzeText(module, h, 'こんにちは😊');
     expect(morphemes.length).toBe(2);
     expect(morphemes[1].surface).toBe('😊');
     expect(morphemes[1].pos).toBe('OTHER');
 
-    resultFree(resultPtr);
     destroy(h);
   });
 });

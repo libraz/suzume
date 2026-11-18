@@ -3,6 +3,7 @@ import type { Tag as ParsedTag } from '../js/index.js';
 import {
   allocString,
   allocTagOptions,
+  cApi,
   getModule,
   getTagCount,
   parseTags,
@@ -20,24 +21,20 @@ describe('C API: generate_tags', () => {
 
   beforeAll(async () => {
     module = await getModule();
-    const create = module.cwrap('suzume_create', 'number', []) as () => number;
-    handle = create();
-    generateTags = module.cwrap('suzume_generate_tags', 'number', [
-      'number',
-      'number',
-    ]) as typeof generateTags;
+    const api = cApi(module);
+    handle = api.create();
+    generateTags = api.generateTags;
     generateTagsWithOptions = module.cwrap('suzume_generate_tags_with_options', 'number', [
       'number',
       'number',
       'number',
     ]) as typeof generateTagsWithOptions;
-    tagsFree = module.cwrap('suzume_tags_free', null, ['number']) as typeof tagsFree;
+    tagsFree = api.tagsFree;
   });
 
   afterAll(() => {
     if (handle && module) {
-      const destroy = module.cwrap('suzume_destroy', null, ['number']) as (h: number) => void;
-      destroy(handle);
+      cApi(module).destroy(handle);
     }
   });
 

@@ -1,3 +1,5 @@
+import { expect } from 'vitest';
+import { ErrorCode, SuzumeError } from '../dist/index.js';
 import createModule from '../dist/suzume.js';
 import { posEnglish } from '../js/abi_labels.js';
 import { C_LAYOUTS } from '../js/abi_layout.js';
@@ -18,8 +20,6 @@ export interface WasmModule {
   HEAPU32: Uint32Array;
 }
 
-export const RESULT_LAYOUT = C_LAYOUTS.result;
-export const MORPHEME_LAYOUT = C_LAYOUTS.morpheme;
 export const TAGS_LAYOUT = C_LAYOUTS.tags;
 export const TAG_OPTIONS_LAYOUT = C_LAYOUTS.tagOptions;
 export const EXTENDED_OPTIONS_LAYOUT = C_LAYOUTS.extendedOptions;
@@ -82,19 +82,71 @@ export function allocTagOptions(module: WasmModule, opts: TagOptionValues = {}):
   return ptr;
 }
 
-export function parseMorphemes(module: WasmModule, resultPtr: number): ParsedMorpheme[] {
-  const label = (name: string, code: number): string | null => {
-    const ptr = module.cwrap(name, 'number', ['number'])(code) as number;
-    return ptr === 0 ? null : module.UTF8ToString(ptr);
+/** Typed wrappers over the C functions the C-API tests call repeatedly. */
+export interface CApi {
+  create: () => number;
+  destroy: (handle: number) => void;
+  analyze: (handle: number, textPtr: number) => number;
+  resultFree: (resultPtr: number) => void;
+  generateTags: (handle: number, textPtr: number) => number;
+  tagsFree: (tagsPtr: number) => void;
+}
+
+export function cApi(module: WasmModule): CApi {
+  return {
+    create: module.cwrap('suzume_create', 'number', []) as () => number,
+    destroy: module.cwrap('suzume_destroy', null, ['number']) as (handle: number) => void,
+    analyze: module.cwrap('suzume_analyze', 'number', ['number', 'number']) as (
+      handle: number,
+      textPtr: number,
+    ) => number,
+    resultFree: module.cwrap('suzume_result_free', null, ['number']) as (resultPtr: number) => void,
+    generateTags: module.cwrap('suzume_generate_tags', 'number', ['number', 'number']) as (
+      handle: number,
+      textPtr: number,
+    ) => number,
+    tagsFree: module.cwrap('suzume_tags_free', null, ['number']) as (tagsPtr: number) => void,
   };
+}
+
+/** Call a `suzume_*_label` function; null when the code has no label. */
+export function nativeLabel(module: WasmModule, name: string, code: number): string | null {
+  const ptr = module.cwrap(name, 'number', ['number'])(code) as number;
+  return ptr === 0 ? null : module.UTF8ToString(ptr);
+}
+
+export function parseMorphemes(module: WasmModule, resultPtr: number): ParsedMorpheme[] {
   return decodeAnalysisResult(
     module,
     resultPtr,
-    (code) => label('suzume_conjugation_type_label', code),
-    (code) => label('suzume_conjugation_form_label', code),
-    (code) => label('suzume_extended_pos_label', code) ?? 'UNKNOWN',
+    (code) => nativeLabel(module, 'suzume_conjugation_type_label', code),
+    (code) => nativeLabel(module, 'suzume_conjugation_form_label', code),
+    (code) => nativeLabel(module, 'suzume_extended_pos_label', code) ?? 'UNKNOWN',
     posEnglish,
   ).morphemes;
+}
+
+/** Analyze `text` with `handle` through the C API and return the decoded morphemes. */
+export function analyzeText(module: WasmModule, handle: number, text: string): ParsedMorpheme[] {
+  const { analyze, resultFree } = cApi(module);
+  const textPtr = allocString(module, text);
+  const resultPtr = analyze(handle, textPtr);
+  module._free(textPtr);
+  try {
+    return parseMorphemes(module, resultPtr);
+  } finally {
+    resultFree(resultPtr);
+  }
+}
+
+/** Assert that `action` rejects with a SuzumeError carrying ErrorCode.InvalidUtf8. */
+export async function expectInvalidUtf8(action: () => Promise<unknown>): Promise<void> {
+  const error = await action().then(
+    () => undefined,
+    (thrown: unknown) => thrown,
+  );
+  expect(error).toBeInstanceOf(SuzumeError);
+  expect((error as SuzumeError).code).toBe(ErrorCode.InvalidUtf8);
 }
 
 export function parseTags(module: WasmModule, tagsPtr: number): ParsedTag[] {
