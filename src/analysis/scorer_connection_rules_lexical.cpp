@@ -305,7 +305,7 @@ float computeSugiFinalParticleBonus(const core::LatticeEdge& prev, const core::L
   if (prev.extended_pos == core::ExtendedPOS::AdjStem && next.extended_pos != core::ExtendedPOS::VerbTeForm &&
       utf8::startsWith(next.surface, "すぎ")) {
     // Strong bonus to overcome AdjStem→Verb prohibitive penalty
-    SUZUME_CONNECTION_ADD(bonus, sc::kBonusDoubleVeryStrong);
+    SUZUME_CONNECTION_ADD(bonus, sc::scale::kDoubleVeryStrongBonus);
   }
 
   // Surface-based bonus for AdjNaAdj → すぎ pattern
@@ -323,7 +323,7 @@ float computeSugiFinalParticleBonus(const core::LatticeEdge& prev, const core::L
   // Only apply to all-kanji surfaces (not katakana/verb renyokei)
   if (prev.pos == core::PartOfSpeech::Noun && prev.surface.size() >= core::kTwoJapaneseCharBytes &&
       grammar::isAllKanji(prev.surface) && utf8::startsWith(next.surface, "すぎ")) {
-    SUZUME_CONNECTION_ADD(bonus, sc::kBonusDoubleVeryStrong);
+    SUZUME_CONNECTION_ADD(bonus, sc::scale::kDoubleVeryStrongBonus);
   }
 
   // A sokuonbin copula followed by たら uses the hypothetical form of the
@@ -442,9 +442,12 @@ float computeBareClassicalTerminalFormalNounPenalty(const core::LatticeEdge& pre
 float computeLiteraryAdjectiveTerminalNominalPenalty(const core::LatticeEdge& prev, const core::LatticeEdge& next) {
   const bool literary_terminal = prev.pos == core::PartOfSpeech::Adjective &&
                                  prev.extended_pos == core::ExtendedPOS::AdjBasic && prev.lemma != prev.surface;
+  if (!literary_terminal) {
+    return sc::scale::kNeutral;
+  }
   const bool kana_nominal = (next.pos == core::PartOfSpeech::Noun || next.pos == core::PartOfSpeech::Other) &&
                             grammar::isPureHiragana(next.surface);
-  return literary_terminal && kana_nominal ? sc::kPenaltyLiteraryAdjectiveTerminalBeforeKana : sc::scale::kNeutral;
+  return kana_nominal ? sc::kPenaltyLiteraryAdjectiveTerminalBeforeKana : sc::scale::kNeutral;
 }
 
 float computeCopulaConditionalBonus(const core::LatticeEdge& prev, const core::LatticeEdge& next) {
@@ -456,7 +459,7 @@ float computeCopulaConditionalBonus(const core::LatticeEdge& prev, const core::L
   const bool continuative_copula = grammar::isSingleHiragana(prev.surface, U'で');
   const bool aru_hypothetical_stem = grammar::isAruHypotheticalStem(next.surface) && next.lemma == "ある";
   if (copula_before_hypothetical && continuative_copula && aru_hypothetical_stem) {
-    return sc::kBonusDoubleVeryStrong;
+    return sc::scale::kDoubleVeryStrongBonus;
   }
   if (copula_before_hypothetical && aru_hypothetical_stem) {
     return cost::kVeryStrongBonus;

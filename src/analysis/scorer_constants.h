@@ -338,9 +338,6 @@ constexpr float kBonusHonorificGoNounPerChar = 0.3F;
 // =============================================================================
 // Arithmetic-composed magnitudes kept as expressions to stay bit-identical.
 
-// Double very-strong bonus to overcome an AdjStem→Verb / strong compound penalty
-// Used by AdjStem→すぎ, all-kanji NOUN→すぎ, で→ある patterns
-constexpr float kBonusDoubleVeryStrong = scale::kVeryStrongBonus * 2;  // -3.2
 // Lifts the stem-to-verb prohibition and prefers the stem over a bare noun before a bound suffix verb.
 constexpr float kBonusBoundSuffixAfterAdjStem = -scale::kAlmostNever + scale::kVeryStrongBonus;
 // Withdraws the continuative-to-past bonus for the contracted くん, whose ん is already the nominalizer.
@@ -392,8 +389,8 @@ constexpr std::string_view kNegationPrefixKanji[] = {"非", "不", "無", "未"}
 // =============================================================================
 // BOS (beginning-of-sentence) connection-cost adjustments. A morpheme that
 // cannot naturally start a sentence is penalized; a conjunction is rewarded.
-constexpr float kBosSuffixPenalty = 3.0F;      // Suffix cannot lead a sentence
-constexpr float kBosConjunctionBonus = -0.5F;  // でも / しかし are natural at BOS
+constexpr float kBosSuffixPenalty = scale::kAlmostNever;       // Suffix cannot lead a sentence
+constexpr float kBosConjunctionBonus = scale::kModerateBonus;  // でも / しかし are natural at BOS
 constexpr float kBosDemoConjunctionBonus = scale::kDoubleVeryStrongBonus;
 // A conjunction that spells a predicate plus the conditional と (すると,
 // そうすると, さもないと) is the listed conjunction exactly where a clause
@@ -401,17 +398,17 @@ constexpr float kBosDemoConjunctionBonus = scale::kDoubleVeryStrongBonus;
 // and is barred after a nominal host. The start of the sentence is that
 // boundary, so the reading is restored here instead of context-free.
 constexpr float kBosConditionalToConjunctionBonus = scale::kExtremeBonus;
-constexpr float kBosAppearanceSouPenalty = 0.5F;             // 様態そう should be demonstrative at BOS
-constexpr float kBosAspectIruPenalty = scale::kRare;         // いる aspect needs a preceding て-form
-constexpr float kBosAspectShimauPenalty = scale::kVeryRare;  // しまう aspect needs a preceding て-form
-constexpr float kBosAspectOkuPenalty = scale::kVeryRare;     // おく aspect needs a preceding て-form
-constexpr float kBosAspectIkuPenalty = 1.0F;                 // いく aspect needs a preceding て-form
-constexpr float kBosAspectKuruPenalty = 3.0F;                // くる aspect (き) needs a preceding て-form
-constexpr float kBosTensePenalty = 2.0F;                     // た/だ needs a preceding verb/adj stem
-constexpr float kBosFinalParticlePenalty = 2.0F;             // Sentence-final particle cannot lead
-constexpr float kBosTopicParticlePenalty = 1.0F;             // 係助詞 は/も cannot lead a sentence
-constexpr float kBosConjunctiveParticlePenalty = 1.0F;       // 接続助詞 joins clauses, so it rarely leads one
-constexpr float kBosBindingParticlePenalty = scale::kRare;   // 係結び has no host at sentence start
+constexpr float kBosAppearanceSouPenalty = scale::kMinor;       // 様態そう should be demonstrative at BOS
+constexpr float kBosAspectIruPenalty = scale::kRare;            // いる aspect needs a preceding て-form
+constexpr float kBosAspectShimauPenalty = scale::kVeryRare;     // しまう aspect needs a preceding て-form
+constexpr float kBosAspectOkuPenalty = scale::kVeryRare;        // おく aspect needs a preceding て-form
+constexpr float kBosAspectIkuPenalty = scale::kRare;            // いく aspect needs a preceding て-form
+constexpr float kBosAspectKuruPenalty = scale::kAlmostNever;    // くる aspect (き) needs a preceding て-form
+constexpr float kBosTensePenalty = 2.0F;                        // た/だ needs a preceding verb/adj stem
+constexpr float kBosFinalParticlePenalty = 2.0F;                // Sentence-final particle cannot lead
+constexpr float kBosTopicParticlePenalty = scale::kRare;        // 係助詞 は/も cannot lead a sentence
+constexpr float kBosConjunctiveParticlePenalty = scale::kRare;  // 接続助詞 joins clauses, so it rarely leads one
+constexpr float kBosBindingParticlePenalty = scale::kRare;      // 係結び has no host at sentence start
 // A 格助詞 marks the case of the nominal in front of it, so it is bound leftward
 // exactly as the topic and binding particles are. At sentence start there is no
 // such nominal, and without the penalty the particle reading of a noun's first
@@ -448,7 +445,8 @@ constexpr float kBosStemBoundAuxPenalty = kBosTensePenalty;
 // EOS (end-of-sentence) adjustments share the table below with BOS. The two
 // columns are intentionally asymmetric: a final particle can naturally close a
 // sentence, while a prefix cannot.
-constexpr float kEosAspectKuruPenalty = 3.0F;  // き (来 aspect) needs a following stem (ひこうき → ひこう+き)
+// き (来 aspect) needs a following stem (ひこうき → ひこう+き).
+constexpr float kEosAspectKuruPenalty = scale::kAlmostNever;
 constexpr float kEosClauseDependentParticlePenalty = scale::kSevere;  // たり/なり need the predicate they link to
 constexpr float kEosBindingParticleBonus = scale::kExtraStrongBonus;  // Keep standalone こそ/さえ intact
 constexpr float kEosPrefixPenalty = scale::kAlmostNever;              // Prefix requires a following host

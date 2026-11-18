@@ -378,7 +378,7 @@ void addCopulaDeRules(const core::LatticeEdge& prev, const core::LatticeEdge& ne
   // Total penalty to overcome: ~2.3
   if (prev_is_copula_de && next.pos == core::PartOfSpeech::Verb &&
       utf8::equalsAny(next.surface, {"ある", "あっ", "あろ", "あり"})) {
-    SUZUME_CONNECTION_ADD(surface_bonus, sc::kBonusDoubleVeryStrong);  // -3.2 to overcome ~2.3 total penalty
+    SUZUME_CONNECTION_ADD(surface_bonus, sc::scale::kDoubleVeryStrongBonus);  // -3.2 to overcome ~2.3 total penalty
   }
 
   // Bonus for で(AuxCopulaDa) → は(ParticleTopic) surface connection
