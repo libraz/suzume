@@ -16,6 +16,12 @@ NODEBUG_BUILD_DIR := build-nodebug
 # leak gate.
 ASAN_DETECT_LEAKS ?= $(if $(filter Darwin,$(shell uname -s)),0,1)
 
+# Build jobs for every `cmake --build` here and in the scripts the recipes call
+# (through CMAKE_BUILD_PARALLEL_LEVEL). A bare `--parallel` is an unbounded job
+# count with the Makefile generator. Override: make JOBS=4 build
+JOBS ?= $(shell getconf _NPROCESSORS_ONLN 2>/dev/null || echo 2)
+export CMAKE_BUILD_PARALLEL_LEVEL := $(JOBS)
+
 # clang-format command (can be overridden: make CLANG_FORMAT=clang-format-18 format)
 CLANG_FORMAT ?= clang-format
 
@@ -111,7 +117,7 @@ configure:
 # Build the project
 build: configure
 	@echo "Building Suzume..."
-	$(CMAKE) --build $(BUILD_DIR) --parallel
+	$(CMAKE) --build $(BUILD_DIR) --parallel $(JOBS)
 	@echo "Build complete!"
 
 # Build dictionaries
@@ -123,7 +129,7 @@ dict: build
 # Run every shipped surface, consumer example, and repository invariant. Keep the native binary as
 # the source of truth: CTest's configure-time discovery can miss newly added
 # JSON golden cases and otherwise starts one process per gtest case.
-test: native-test native-test-nodebug mcp-test oracle-sync-check python-test wasm-test examples-test consumer-smoke binding-parity guardrails
+test: native-test native-test-nodebug mcp-test oracle-sync-check python-test wasm-test examples-test consumer-smoke cmake-smoke binding-parity guardrails
 	@echo "All tests complete!"
 
 native-test: dict
@@ -138,7 +144,7 @@ native-test-nodebug:
 	@echo "Running native tests with debug features compiled out..."
 	$(CMAKE) -B $(NODEBUG_BUILD_DIR) -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release \
 		-DENABLE_DEBUG_INFO=OFF -DENABLE_DEBUG_LOG=OFF
-	$(CMAKE) --build $(NODEBUG_BUILD_DIR) --parallel
+	$(CMAKE) --build $(NODEBUG_BUILD_DIR) --parallel $(JOBS)
 	$(CMAKE) --build $(NODEBUG_BUILD_DIR) --target build-dict
 	$(NODEBUG_BUILD_DIR)/bin/suzume_test
 	ctest --test-dir $(NODEBUG_BUILD_DIR) --output-on-failure -R native_cli_contract
@@ -163,7 +169,7 @@ asan:
 	@echo "Running sanitizers (ASan leak detection=$(ASAN_DETECT_LEAKS), UBSan=on)..."
 	$(CMAKE) -B $(ASAN_BUILD_DIR) -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Debug \
 		-DENABLE_SANITIZER=ON -DENABLE_ASAN=ON -DENABLE_UBSAN=ON
-	$(CMAKE) --build $(ASAN_BUILD_DIR) --parallel
+	$(CMAKE) --build $(ASAN_BUILD_DIR) --parallel $(JOBS)
 	$(CMAKE) --build $(ASAN_BUILD_DIR) --target build-dict
 	ASAN_OPTIONS=detect_leaks=$(ASAN_DETECT_LEAKS):halt_on_error=1 \
 	UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1 \
@@ -214,7 +220,7 @@ install:
 	@echo "Configuring install build (shared + static) ..."
 	$(CMAKE) -B build-install -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED=ON -DBUILD_TESTING=OFF \
 		-DCMAKE_INSTALL_PREFIX=$(PREFIX) $(CMAKE_OPTIONS)
-	$(CMAKE) --build build-install --parallel
+	$(CMAKE) --build build-install --parallel $(JOBS)
 	$(CMAKE) --build build-install --target build-dict
 	$(CMAKE) --install build-install
 	@echo "Installed suzume under $(PREFIX)"
@@ -237,7 +243,7 @@ examples: dict
 	$(CMAKE) --build $(BUILD_DIR) --target \
 		suzume_example_c suzume_example_cpp suzume_example_cpp_basic \
 		suzume_example_cpp_search_indexer suzume_example_cpp_tags \
-		suzume_example_cpp_user_dictionary --parallel
+		suzume_example_cpp_user_dictionary --parallel $(JOBS)
 	@echo "Built all C/C++ examples under $(BUILD_DIR)/bin"
 
 examples-test: examples
@@ -248,7 +254,7 @@ examples-test: examples
 embedded:
 	$(CMAKE) -B build-embedded -DCMAKE_BUILD_TYPE=Release -DSUZUME_EMBED_DICT=ON \
 		-DBUILD_TESTING=OFF -DSUZUME_INSTALL=OFF $(CMAKE_OPTIONS)
-	$(CMAKE) --build build-embedded --target suzume --parallel
+	$(CMAKE) --build build-embedded --target suzume --parallel $(JOBS)
 	@echo "Embedded static library built: build-embedded/lib/"
 
 # Packaging smoke test: install both static and shared configurations, then
@@ -259,7 +265,7 @@ consumer-smoke:
 	$(CMAKE) -E remove_directory build-smoke-consumer-static
 	$(CMAKE) -B build-smoke-static -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF \
 		-DCMAKE_INSTALL_PREFIX=$(CURDIR)/build-smoke-prefix-static
-	$(CMAKE) --build build-smoke-static --parallel
+	$(CMAKE) --build build-smoke-static --parallel $(JOBS)
 	$(CMAKE) --build build-smoke-static --target build-dict
 	$(CMAKE) --install build-smoke-static
 	$(CMAKE) -S examples/consumer -B build-smoke-consumer-static \
@@ -271,7 +277,7 @@ consumer-smoke:
 	$(CMAKE) -E remove_directory build-smoke-consumer-shared
 	$(CMAKE) -B build-smoke-shared -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DBUILD_SHARED=ON \
 		-DCMAKE_INSTALL_PREFIX=$(CURDIR)/build-smoke-prefix-shared
-	$(CMAKE) --build build-smoke-shared --parallel
+	$(CMAKE) --build build-smoke-shared --parallel $(JOBS)
 	$(CMAKE) --build build-smoke-shared --target build-dict
 	$(CMAKE) --install build-smoke-shared
 	$(CMAKE) -S examples/consumer -B build-smoke-consumer-shared \
@@ -330,7 +336,7 @@ python-build:
 	@echo "Building shared library for Python binding..."
 	$(CMAKE) -B build-shared -DBUILD_SHARED=ON -DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release \
 		-DENABLE_DEBUG_INFO=OFF -DENABLE_DEBUG_LOG=OFF -DSUZUME_LIB_SOVERSION=OFF
-	$(CMAKE) --build build-shared --target suzume_shared --parallel
+	$(CMAKE) --build build-shared --target suzume_shared --parallel $(JOBS)
 	@echo "Shared library built: build-shared/lib/"
 
 # Run the Python binding test suite in the rye-managed venv
@@ -389,7 +395,7 @@ wasm: wasm-dict wasm-configure
 	@echo "Building WASM module..."
 	@# Force re-link so updated embedded dictionaries are picked up
 	@rm -f $(WASM_BUILD_DIR)/bin/suzume.wasm $(WASM_BUILD_DIR)/bin/suzume.js
-	$(CMAKE) --build $(WASM_BUILD_DIR) --parallel
+	$(CMAKE) --build $(WASM_BUILD_DIR) --parallel $(JOBS)
 	@echo "WASM build complete!"
 	@ls -lh bindings/wasm/dist/suzume.wasm bindings/wasm/dist/suzume.js
 
