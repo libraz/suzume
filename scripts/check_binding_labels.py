@@ -15,11 +15,11 @@ from __future__ import annotations
 import ast
 import os
 import re
-import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
 
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 CPP_TYPES = "src/core/types.cpp"
 CPP_CONJUGATION = "src/grammar/conjugation.cpp"
 C_ABI = "src/suzume_c.cpp"
@@ -136,16 +136,6 @@ CONJUGATION_FORM_LABELS = {
     "Meireikei": "命令形",
     "Ishikei": "意志形",
 }
-
-
-def repo_root() -> Path:
-    out = subprocess.run(
-        ["git", "rev-parse", "--show-toplevel"],
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    return Path(out.stdout.strip())
 
 
 def strip_comments(text: str) -> str:
@@ -588,7 +578,7 @@ def check_numeric_contracts() -> bool:
 
 
 def main() -> int:
-    os.chdir(repo_root())
+    os.chdir(REPOSITORY_ROOT)
 
     members = {name: enum_members(name, spec) for name, spec in MIRRORED_ENUMS.items()}
     expected = {

@@ -20,10 +20,10 @@ from __future__ import annotations
 
 import os
 import re
-import subprocess
 import sys
 from pathlib import Path
 
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 LEXICON = "src/analysis/join_compound_verb_lexicon.cpp"
 CONSTANTS = "scripts/mcp/src/suzume_mcp/core/constants.py"
 
@@ -35,11 +35,6 @@ READINGS_NOT_MIRRORED = {"とく", "とる", "はる"}
 ROW = re.compile(
     r'\{"([^"]+)",\s*(?:"([^"]*)"|nullptr),\s*"[^"]*",\s*V2VerbType::(Godan|Ichidan)((?:\s*,\s*(?:true|false))*)\}'
 )
-
-
-def repo_root() -> Path:
-    out = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True, check=True)
-    return Path(out.stdout.strip())
 
 
 def core_lexicon() -> tuple[dict[str, set[str]], set[str], set[str]]:
@@ -75,7 +70,7 @@ def core_lexicon() -> tuple[dict[str, set[str]], set[str], set[str]]:
 
 
 def main() -> int:
-    os.chdir(repo_root())
+    os.chdir(REPOSITORY_ROOT)
 
     sys.path.insert(0, "scripts/mcp/src")
     from suzume_mcp.core.constants import (
