@@ -1607,6 +1607,65 @@
       ],
       "id": "dou_yatte_kana_iku_aspect_control",
       "input": "これからどうやっていくか"
+    },
+    {
+      "description": "demonstrative connective こうして before the kanji motion verb",
+      "expected": [
+        {
+          "lemma": "こうして",
+          "pos": "Conjunction",
+          "surface": "こうして"
+        },
+        {
+          "lemma": "行く",
+          "pos": "Verb",
+          "surface": "行き"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "koushite_kimasu",
+      "input": "こうして行きます"
+    },
+    {
+      "description": "demonstrative connective こうして opening a clause",
+      "expected": [
+        {
+          "lemma": "こうして",
+          "pos": "Conjunction",
+          "surface": "こうして"
+        },
+        {
+          "lemma": "問題",
+          "pos": "Noun",
+          "surface": "問題"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "解決",
+          "pos": "Noun",
+          "surface": "解決"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "koushite_ha_shita",
+      "input": "こうして問題は解決した"
     }
   ],
   "version": "1.0"
