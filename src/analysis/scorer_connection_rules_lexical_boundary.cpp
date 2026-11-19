@@ -150,6 +150,12 @@ void addImpossibleAttachmentRules(const core::LatticeEdge& prev, const core::Lat
       prev.extended_pos == core::ExtendedPOS::AuxCopulaDesu && utf8::equalsAny(prev.surface, {"でし"}) &&
       next.extended_pos != core::ExtendedPOS::AuxTenseTa &&
       !(next.extended_pos == core::ExtendedPOS::ParticleConj && grammar::isTeDeSurface(next.surface));
+  // The copula's continuative で predicates over a nominal; a binding particle
+  // closes its phrase and leaves none in front of it (手は+で+ます is 出る).
+  const bool copula_continuative_after_binding = (prev.extended_pos == core::ExtendedPOS::ParticleTopic ||
+                                                  prev.extended_pos == core::ExtendedPOS::ParticleBinding) &&
+                                                 next.extended_pos == core::ExtendedPOS::AuxCopulaDa &&
+                                                 grammar::isTeDeSurface(next.surface);
   // A nominal or na-stem takes the attributive copula, so an adverb spelled
   // from it there is the copula chain instead (好き+な+ん+で, not 好き+なんで).
   const bool copula_spelled_adverb_on_nominal =
@@ -233,12 +239,12 @@ void addImpossibleAttachmentRules(const core::LatticeEdge& prev, const core::Lat
       terminal_verb_before_ga || nonterminal_predicate_before_assertive_copula || emphatic_adverb_before_past ||
       volitional_after_stray_kanji || terminal_adjective_before_te || clipped_desu_off_nominalizer ||
       listing_ya_after_predicate || copular_aru_on_nominal || concessive_noni_before_binding ||
-      attributive_na_after_final_particle || polite_copula_continuative_stranded || copula_spelled_adverb_on_nominal ||
-      contracted_nominalizer_before_continuative || contracted_nominalizer_after_adverb ||
-      unpaired_assimilated_copula || terminal_spelled_final_particle_in_kana_run ||
-      contracted_volitional_off_predicate || conjunctive_after_final_particle || contracted_te_wa_off_adverb ||
-      dubitative_kamo_after_continuative || geminate_past_adverb_before_auxiliary || mimetic_cut_at_geminate ||
-      final_nee_after_contracted_copula) {
+      attributive_na_after_final_particle || polite_copula_continuative_stranded || copula_continuative_after_binding ||
+      copula_spelled_adverb_on_nominal || contracted_nominalizer_before_continuative ||
+      contracted_nominalizer_after_adverb || unpaired_assimilated_copula ||
+      terminal_spelled_final_particle_in_kana_run || contracted_volitional_off_predicate ||
+      conjunctive_after_final_particle || contracted_te_wa_off_adverb || dubitative_kamo_after_continuative ||
+      geminate_past_adverb_before_auxiliary || mimetic_cut_at_geminate || final_nee_after_contracted_copula) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
   if (core::isVerbContinuativeForm(prev.extended_pos) && next.extended_pos == core::ExtendedPOS::AuxAspectIru &&
