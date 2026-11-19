@@ -2000,6 +2000,119 @@
       ],
       "id": "benki_ushita",
       "input": "毎日べんきょうした"
+    },
+    {
+      "description": "Kana-written suru noun before the suru continuative and past",
+      "expected": [
+        {
+          "lemma": "部屋",
+          "pos": "Noun",
+          "surface": "部屋"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "そうじ",
+          "pos": "Noun",
+          "surface": "そうじ"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wosoujishita",
+      "input": "部屋をそうじした"
+    },
+    {
+      "description": "Kana-written suru noun not read as negative plus desiderative",
+      "expected": [
+        {
+          "lemma": "服",
+          "pos": "Noun",
+          "surface": "服"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "せんたく",
+          "pos": "Noun",
+          "surface": "せんたく"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wosentakushita",
+      "input": "服をせんたくした"
+    },
+    {
+      "description": "Kana-written suru noun before the terminal suru",
+      "expected": [
+        {
+          "lemma": "毎日",
+          "pos": "Noun",
+          "surface": "毎日"
+        },
+        {
+          "lemma": "べんきょう",
+          "pos": "Noun",
+          "surface": "べんきょう"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "benki_usuru",
+      "input": "毎日べんきょうする"
+    },
+    {
+      "description": "Case particle de kept before a kana-written suru noun",
+      "expected": [
+        {
+          "lemma": "家",
+          "pos": "Noun",
+          "surface": "家"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "るすばん",
+          "pos": "Noun",
+          "surface": "るすばん"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "derusubansuru_2",
+      "input": "家でるすばんする"
     }
   ],
   "description": "Suru-verb patterns with subsidiary verbs - MeCab互換分割 (part 2/2)",
