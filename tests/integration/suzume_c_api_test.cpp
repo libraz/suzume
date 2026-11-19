@@ -588,6 +588,38 @@ TEST(SuzumeCApiTest, SkippedSourceRecordsReachTheDictionaryWarningChannel) {
   suzume_destroy(handle);
 }
 
+TEST(SuzumeCApiTest, NullTagOptionsMeanInitDefaults) {
+  suzume_t handle = suzume_create();
+  ASSERT_NE(handle, nullptr);
+  const std::string text = "東京の大学で日本語を勉強しています";
+  suzume_tag_options_t defaults{};
+  suzume_init_tag_options(&defaults);
+
+  const auto collect = [](suzume_tags_t* tags) {
+    std::vector<std::string> result;
+    EXPECT_NE(tags, nullptr) << suzume_last_error();
+    if (tags != nullptr) {
+      for (size_t index = 0; index < tags->count; ++index) {
+        result.emplace_back(tags->tags[index]);
+      }
+      suzume_tags_free(tags);
+    }
+    return result;
+  };
+  const auto expected = collect(suzume_generate_tags_with_options(handle, text.c_str(), &defaults));
+  ASSERT_FALSE(expected.empty());
+  EXPECT_EQ(collect(suzume_generate_tags_with_options(handle, text.c_str(), nullptr)), expected);
+  EXPECT_EQ(suzume_last_error_code(), SUZUME_ERROR_SUCCESS);
+  EXPECT_EQ(collect(suzume_generate_tags_with_options_n(handle, text.data(), text.size(), nullptr)), expected);
+
+  EXPECT_EQ(suzume_generate_tags_with_options(nullptr, text.c_str(), nullptr), nullptr);
+  EXPECT_EQ(suzume_last_error_code(), SUZUME_ERROR_INVALID_INPUT);
+  EXPECT_EQ(suzume_generate_tags_with_options(handle, nullptr, nullptr), nullptr);
+  EXPECT_EQ(suzume_last_error_code(), SUZUME_ERROR_INVALID_INPUT);
+
+  suzume_destroy(handle);
+}
+
 TEST(SuzumeCApiTest, TagOptionsExposeAllGeneratorFilters) {
   suzume_t handle = suzume_create();
   ASSERT_NE(handle, nullptr);

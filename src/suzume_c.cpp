@@ -530,13 +530,18 @@ SUZUME_EXPORT suzume_tags_t* suzume_generate_tags_with_options(suzume_t handle, 
 
 SUZUME_EXPORT suzume_tags_t* suzume_generate_tags_with_options_n(suzume_t handle, const char* text, size_t size,
                                                                  const suzume_tag_options_t* options) {
-  if (handle == nullptr || text == nullptr || options == nullptr) {
-    setLastError("suzume_generate_tags_with_options: null handle, text, or options", SUZUME_ERROR_INVALID_INPUT);
+  if (handle == nullptr || text == nullptr) {
+    setLastError("suzume_generate_tags_with_options: null handle or text", SUZUME_ERROR_INVALID_INPUT);
     return nullptr;
   }
 
   clearLastError();
   SUZUME_C_TRY {
+    suzume_tag_options_t defaults;
+    if (options == nullptr) {
+      suzume_init_tag_options(&defaults);
+      options = &defaults;
+    }
     return generateTagsBytes(handle, std::string_view(text, size), options);
   }
   SUZUME_C_CATCH(return nullptr)

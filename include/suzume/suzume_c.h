@@ -357,16 +357,17 @@ SUZUME_EXPORT void suzume_init_tag_options(suzume_tag_options_t* options);
  * @brief Generate tags from Japanese text with options
  * @param handle Suzume handle
  * @param text UTF-8 encoded Japanese text
- * @param options Tag generation options
+ * @param options Tag generation options, or NULL for the values
+ *                suzume_init_tag_options() writes
  * @return Tags result allocated by Suzume, or NULL on failure.
  *         Non-NULL results must be freed exactly once with suzume_tags_free.
- * @note options must not be NULL.
  */
 SUZUME_EXPORT suzume_tags_t* suzume_generate_tags_with_options(suzume_t handle, const char* text,
                                                                const suzume_tag_options_t* options);
 
 /**
  * @brief Generate tags from an explicit UTF-8 byte range with options
+ * @note options == NULL means the values suzume_init_tag_options() writes.
  */
 SUZUME_EXPORT suzume_tags_t* suzume_generate_tags_with_options_n(suzume_t handle, const char* text, size_t size,
                                                                  const suzume_tag_options_t* options);
