@@ -658,7 +658,7 @@ TEST(SuzumeCApiTest, TagOptionsExposeAllGeneratorFilters) {
   EXPECT_EQ(std::count(all.begin(), all.end(), "りんご"), 1);
 
   auto surface = inclusive;
-  surface.use_lemma = 0;
+  surface.use_base_form = 0;
   const auto surface_tags = generate(surface);
   EXPECT_TRUE(contains(surface_tags, "歩き"));
   EXPECT_FALSE(contains(surface_tags, "歩く"));

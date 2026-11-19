@@ -336,7 +336,7 @@ SUZUME_EXPORT suzume_tags_t* suzume_generate_tags_n(suzume_t handle, const char*
 typedef struct {
   uint8_t pos_filter;           /**< Bitwise SUZUME_TAG_POS_* values; 0 includes all filterable POS */
   uint8_t exclude_basic;        /**< Exclude basic words (hiragana-only lemma) */
-  uint8_t use_lemma;            /**< Use lemma instead of surface (default: 1) */
+  uint8_t use_base_form;        /**< Use the base form instead of the surface (default: 1) */
   size_t min_length;            /**< Minimum tag length in characters (default: 2) */
   size_t max_tags;              /**< Maximum number of tags (0=unlimited) */
   uint8_t exclude_particles;    /**< Exclude particles (default: 1) */
@@ -538,7 +538,7 @@ SUZUME_EXPORT size_t suzume_offsetof_tags(uint32_t field);
 
 /**
  * @brief Get byte offset of field in suzume_tag_options_t
- * @param field 0=pos_filter, 1=exclude_basic, 2=use_lemma,
+ * @param field 0=pos_filter, 1=exclude_basic, 2=use_base_form,
  *              3=min_length, 4=max_tags, 5=exclude_particles,
  *              6=exclude_auxiliaries, 7=exclude_formal_nouns,
  *              8=exclude_low_info, 9=remove_duplicates

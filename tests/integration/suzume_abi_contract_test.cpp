@@ -81,7 +81,7 @@ std::vector<StructLayout> frozenLayouts() {
        suzume_offsetof_tag_options,
        {{0, 0, "pos_filter"},
         {1, 1, "exclude_basic"},
-        {2, 2, "use_lemma"},
+        {2, 2, "use_base_form"},
         {3, 8, "min_length"},
         {4, 16, "max_tags"},
         {5, 24, "exclude_particles"},

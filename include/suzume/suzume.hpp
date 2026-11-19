@@ -231,7 +231,7 @@ class Tokenizer {
     suzume_init_tag_options(&copts);
     copts.pos_filter = options.pos_filter;
     copts.exclude_basic = options.exclude_basic ? 1 : 0;
-    copts.use_lemma = options.use_lemma ? 1 : 0;
+    copts.use_base_form = options.use_lemma ? 1 : 0;
     copts.min_length = options.min_length;
     copts.max_tags = options.max_tags;
     copts.exclude_particles = options.exclude_particles ? 1 : 0;

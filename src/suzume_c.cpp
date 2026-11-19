@@ -345,7 +345,7 @@ suzume::postprocess::TagGeneratorOptions toTagGeneratorOptions(const suzume_tag_
   suzume::postprocess::TagGeneratorOptions tag_opts;
   tag_opts.pos_filter = options.pos_filter;
   tag_opts.exclude_basic = (options.exclude_basic != 0);
-  tag_opts.use_lemma = (options.use_lemma != 0);
+  tag_opts.use_lemma = (options.use_base_form != 0);
   tag_opts.min_tag_length = options.min_length;
   tag_opts.max_tags = options.max_tags;
   tag_opts.exclude_particles = (options.exclude_particles != 0);
@@ -402,7 +402,7 @@ SUZUME_EXPORT void suzume_init_tag_options(suzume_tag_options_t* options) {
   }
   options->pos_filter = 0;
   options->exclude_basic = 0;
-  options->use_lemma = 1;
+  options->use_base_form = 1;
   options->min_length = 2;
   options->max_tags = 0;
   options->exclude_particles = 1;
@@ -745,7 +745,7 @@ SUZUME_EXPORT size_t suzume_offsetof_tag_options(uint32_t field) {
   static constexpr size_t kOffsets[] = {
       offsetof(suzume_tag_options_t, pos_filter),
       offsetof(suzume_tag_options_t, exclude_basic),
-      offsetof(suzume_tag_options_t, use_lemma),
+      offsetof(suzume_tag_options_t, use_base_form),
       offsetof(suzume_tag_options_t, min_length),
       offsetof(suzume_tag_options_t, max_tags),
       offsetof(suzume_tag_options_t, exclude_particles),
@@ -801,7 +801,7 @@ static_assert(offsetof(suzume_tags_t, count) == 8);
 static_assert(sizeof(suzume_tag_options_t) == 20);
 static_assert(offsetof(suzume_tag_options_t, pos_filter) == 0);
 static_assert(offsetof(suzume_tag_options_t, exclude_basic) == 1);
-static_assert(offsetof(suzume_tag_options_t, use_lemma) == 2);
+static_assert(offsetof(suzume_tag_options_t, use_base_form) == 2);
 static_assert(offsetof(suzume_tag_options_t, min_length) == 4);
 static_assert(offsetof(suzume_tag_options_t, max_tags) == 8);
 static_assert(offsetof(suzume_tag_options_t, exclude_particles) == 12);
