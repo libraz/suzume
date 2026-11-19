@@ -1536,6 +1536,87 @@
       ],
       "id": "denwawokakeru",
       "input": "でんわをかける"
+    },
+    {
+      "description": "kana verb opening on a binding-particle mora after a hosted accusative",
+      "expected": [
+        {
+          "lemma": "泥",
+          "pos": "Noun",
+          "surface": "泥"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "はねる",
+          "pos": "Verb",
+          "surface": "はね"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wohaneta",
+      "input": "泥をはねた"
+    },
+    {
+      "description": "kana verb opening on a conjunctive-particle mora after a hosted accusative",
+      "expected": [
+        {
+          "lemma": "雪",
+          "pos": "Noun",
+          "surface": "雪"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "どける",
+          "pos": "Verb",
+          "surface": "どけ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wodoketa",
+      "input": "雪をどけた"
+    },
+    {
+      "description": "kana verb te-form opening on a binding-particle mora after a hosted accusative",
+      "expected": [
+        {
+          "lemma": "泥",
+          "pos": "Noun",
+          "surface": "泥"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "はねる",
+          "pos": "Verb",
+          "surface": "はね"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "wohanete",
+      "input": "泥をはねて"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 12/12)",
