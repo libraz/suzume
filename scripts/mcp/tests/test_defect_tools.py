@@ -39,17 +39,23 @@ def engine(monkeypatch):
     texts whose behavior it cares about.
     """
 
-    tables = {"oracle": {}, "cli": {}, "skip_user_dict": []}
+    tables = {"oracle": {}, "cli": {}, "oracle_tokens": {}, "cli_tokens": {}, "skip_user_dict": []}
+
+    def surface_tokens(spaced):
+        return [{"surface": tok} for tok in spaced.split()]
 
     def fake_oracle(texts):
-        return [([{"surface": tok} for tok in tables["oracle"].get(text, text).split()], "test", "") for text in texts]
+        return [
+            (tables["oracle_tokens"].get(text) or surface_tokens(tables["oracle"].get(text, text)), "test", "")
+            for text in texts
+        ]
 
     async def fake_cli(text, cli_path=None, skip_user_dict=False):
         tables["skip_user_dict"].append(skip_user_dict)
-        return tables["cli"].get(text, text).split()
+        return tables["cli_tokens"].get(text) or surface_tokens(tables["cli"].get(text, text))
 
     monkeypatch.setattr("suzume_mcp.tools.defect_tools.get_expected_tokens_batch_subprocess", fake_oracle)
-    monkeypatch.setattr("suzume_mcp.tools.defect_tools.get_suzume_surfaces_async", fake_cli)
+    monkeypatch.setattr("suzume_mcp.core.suzume_cli.get_suzume_tokens_async", fake_cli)
     return tables
 
 
@@ -585,6 +591,81 @@ class TestDefectProbe:
         engine["cli"]["違う"] = "違う"
         row = parse_json(run(defect_probe(texts=["違う"], pattern="particle-chain")))["rows"][0]
         assert row["pattern"] == "particle-chain"
+
+    @staticmethod
+    def red_on_pos(engine, text="がくしゃだ"):
+        """Surfaces agree; the noun comes out as a verb."""
+        engine["oracle_tokens"][text] = [
+            {"surface": "がくしゃ", "pos": "Noun", "lemma": "がくしゃ"},
+            {"surface": "だ", "pos": "Auxiliary", "lemma": "だ"},
+        ]
+        engine["cli_tokens"][text] = [
+            {"surface": "がくしゃ", "pos": "Verb", "lemma": "がくす"},
+            {"surface": "だ", "pos": "Auxiliary", "lemma": "だ"},
+        ]
+
+    def test_agreeing_surfaces_with_a_pos_or_lemma_difference_are_not_a_match(self, store, engine):
+        self.red_on_pos(engine)
+
+        result = parse_json(run(defect_probe(texts=["がくしゃだ"])))
+
+        row = result["rows"][0]
+        assert row["state"] == "pos-lemma"
+        assert row["expected"] == row["suzume"] == "がくしゃ だ"
+        assert row["differences"] == [
+            {"index": 0, "type": "pos", "surface": "がくしゃ", "expected": "Noun", "suzume": "Verb"},
+            {"index": 0, "type": "lemma", "surface": "がくしゃ", "expected": "がくしゃ", "suzume": "がくす"},
+        ]
+        assert result["counts"] == {"pos-lemma": 1}
+
+    def test_the_comparison_totals_separate_match_pos_lemma_and_surface(self, store, engine):
+        self.red_on_pos(engine)
+        engine["oracle"].update({"同じ": "同じ", "違う": "違 う"})
+        engine["cli"].update({"同じ": "同じ", "違う": "違う"})
+        file_record(text="既出", expected="既 出", suzume="既出")
+        engine["oracle"]["既出"] = "既 出"
+        engine["cli"]["既出"] = "既出"
+
+        result = parse_json(run(defect_probe(texts=["同じ", "がくしゃだ", "違う", "既出"])))
+
+        assert result["comparison"] == {"match": 1, "pos-lemma": 1, "surface": 2}
+        assert result["counts"] == {"match": 1, "pos-lemma": 1, "candidate": 1, "known": 1}
+
+    def test_a_pos_lemma_row_is_returned_without_include_match_and_is_not_to_judge(self, store, engine):
+        self.red_on_pos(engine)
+
+        result = parse_json(run(defect_probe(texts=["がくしゃだ"])))
+
+        assert [row["text"] for row in result["rows"]] == ["がくしゃだ"]
+        assert result["to_judge"] == 0
+
+    def test_a_pos_lemma_text_with_an_open_record_is_known(self, store, engine):
+        self.red_on_pos(engine)
+        file_record(text="がくしゃだ", expected="がくしゃ だ", suzume="がくしゃ だ")
+
+        row = parse_json(run(defect_probe(texts=["がくしゃだ"])))["rows"][0]
+
+        assert row["state"] == "known"
+        assert row["differences"][0]["type"] == "pos"
+
+    def test_a_surface_fix_that_still_differs_on_pos_is_not_a_regression(self, store, engine):
+        record = file_record(text="がくしゃだ", expected="がくしゃ だ", suzume="がく しゃだ")
+        bug_store.resolve("defect", record, note="fixed", output="がくしゃ だ")
+        self.red_on_pos(engine)
+
+        row = parse_json(run(defect_probe(texts=["がくしゃだ"])))["rows"][0]
+
+        assert row["state"] == "pos-lemma"
+
+    def test_a_fixed_manual_record_that_differs_on_pos_again_is_a_regression(self, store, engine):
+        record = file_record(text="がくしゃだ", expected="がくしゃ だ", suzume="がくしゃ だ")
+        assert record["check"] == bug_store.CHECK_MANUAL
+        bug_store.resolve("defect", record, note="fixed", output="がくしゃ だ")
+        self.red_on_pos(engine)
+
+        row = parse_json(run(defect_probe(texts=["がくしゃだ"])))["rows"][0]
+
+        assert row["state"] == "regression"
 
     def test_an_oversized_batch_is_refused_rather_than_truncated(self, store, engine):
         result = parse_json(run(defect_probe(texts=[f"文{idx}" for idx in range(201)])))

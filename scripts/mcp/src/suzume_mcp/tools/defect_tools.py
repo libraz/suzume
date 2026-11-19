@@ -6,7 +6,6 @@ its records to ``_archive/<timestamp>/``, so any mistaken bulk call stays
 recoverable. See ``core/bug_store.py`` for the on-disk contract.
 """
 
-import asyncio
 from pathlib import Path
 
 from ..app import mcp
@@ -15,7 +14,8 @@ from ..core import bug_store
 from ..core.file_utils import atomic_write_text
 from ..core.json_utils import json_error
 from ..core.json_utils import json_result as _json_result
-from ..core.suzume_cli import get_expected_tokens_batch_subprocess, get_suzume_surfaces_async
+from ..core.suzume_cli import get_expected_tokens_batch_subprocess, get_suzume_tokens_many
+from ..core.suzume_utils import token_differences
 from ._cli_freshness import stale_banner, stale_cli_guard
 from ._defect_tools_common import (
     _duplicate,
@@ -43,25 +43,19 @@ __all__ = [
     "defect_yield",
 ]
 
-# Number of CLI processes to keep in flight while rechecking a store.
-_RECHECK_CONCURRENCY = 8
-
-
-async def _current_outputs(texts: list[str], source: str) -> list[list[str]]:
-    """Run the CLI over many texts with bounded concurrency."""
-    semaphore = asyncio.Semaphore(_RECHECK_CONCURRENCY)
-
-    async def one(text: str) -> list[str]:
-        async with semaphore:
-            return await get_suzume_surfaces_async(text, skip_user_dict=not bug_store.uses_user_dict(source))
-
-    return await asyncio.gather(*(one(text) for text in texts), return_exceptions=True)
+# Probe outcome when the surfaces agree but a POS or lemma differs; the name
+# test_show gives the same condition.
+STATE_POS_LEMMA = "pos-lemma"
 
 
 async def _compare_texts(texts: list[str], source: str) -> list[dict]:
-    """Run the oracle once and the CLI concurrently; one {error} or {current, expected} per text."""
+    """Run the oracle once and the CLI concurrently.
+
+    One {error} per failed text, otherwise {current, expected} surfaces plus the
+    token-field ``differences`` the C++ runner would fail on.
+    """
     oracle = get_expected_tokens_batch_subprocess(texts)
-    outputs = await _current_outputs(texts, source)
+    outputs = await get_suzume_tokens_many(texts, skip_user_dict=not bug_store.uses_user_dict(source))
     rows = []
     for (tokens, oracle_source, rule), output in zip(oracle, outputs, strict=True):
         if oracle_source == "error":
@@ -71,8 +65,9 @@ async def _compare_texts(texts: list[str], source: str) -> list[dict]:
         else:
             rows.append(
                 {
-                    "current": bug_store.join_tokens(list(output)),
+                    "current": bug_store.join_tokens([tok["surface"] for tok in output]),
                     "expected": bug_store.join_tokens([tok["surface"] for tok in tokens]),
+                    "differences": token_differences(tokens, output),
                 }
             )
     return rows
@@ -129,13 +124,16 @@ async def _screen(texts: list[str], source: str) -> list[dict]:
         if "error" in compare:
             rows.append({"text": text, "state": "error", "error": compare["error"]})
             continue
-        current, expected = compare["current"], compare["expected"]
-        if current == expected:
+        current, expected, differences = compare["current"], compare["expected"], compare["differences"]
+        if not differences:
             rows.append({"text": text, "state": "match"})
             continue
 
-        row = {"text": text, "state": "candidate", "expected": expected, "suzume": current}
-        row["token_delta"] = len(bug_store.normalize_tokens(current)) - len(bug_store.normalize_tokens(expected))
+        surfaces_agree = current == expected
+        row = {"text": text, "state": STATE_POS_LEMMA if surfaces_agree else "candidate"}
+        row.update({"expected": expected, "suzume": current, "differences": differences})
+        if not surfaces_agree:
+            row["token_delta"] = len(bug_store.normalize_tokens(current)) - len(bug_store.normalize_tokens(expected))
 
         known = open_by_text.get(text)
         closed = closed_by_text.get(text)
@@ -144,8 +142,10 @@ async def _screen(texts: list[str], source: str) -> list[dict]:
         elif closed is not None:
             resolution = closed.get("resolution", bug_store.RESOLUTION_FIXED)
             if resolution == bug_store.RESOLUTION_FIXED:
-                # It was fixed once and differs again: worth judging, not skipping.
-                row.update({"state": "regression", "id": closed["id"], "fixed_at": closed.get("resolved_at", "")})
+                # A surface record was closed on surfaces, so only a surface difference
+                # undoes it; a POS/lemma record is undone by any difference.
+                if not surfaces_agree or closed.get("check") == bug_store.CHECK_MANUAL:
+                    row.update({"state": "regression", "id": closed["id"], "fixed_at": closed.get("resolved_at", "")})
             else:
                 row.update(
                     {
@@ -159,6 +159,21 @@ async def _screen(texts: list[str], source: str) -> list[dict]:
     return rows
 
 
+def _comparison_totals(rows: list[dict]) -> dict[str, int]:
+    """Count rows by what the comparison alone found, before the store is consulted."""
+    totals = {"match": 0, STATE_POS_LEMMA: 0, "surface": 0}
+    for row in rows:
+        if row["state"] == "error":
+            continue
+        if row["state"] == "match":
+            totals["match"] += 1
+        elif row["expected"] == row["suzume"]:
+            totals[STATE_POS_LEMMA] += 1
+        else:
+            totals["surface"] += 1
+    return totals
+
+
 async def _derive_tokenizations(text: str, expected: str, suzume: str, source: str) -> tuple[str, str]:
     """Fill an omitted oracle or observed tokenization from the pipeline and the CLI."""
     if not expected:
@@ -167,8 +182,10 @@ async def _derive_tokenizations(text: str, expected: str, suzume: str, source: s
             raise RuntimeError(rule)
         expected = bug_store.join_tokens([tok["surface"] for tok in tokens])
     if not suzume:
-        skip_user_dict = not bug_store.uses_user_dict(source)
-        suzume = bug_store.join_tokens(list(await get_suzume_surfaces_async(text, skip_user_dict=skip_user_dict)))
+        (output,) = await get_suzume_tokens_many([text], skip_user_dict=not bug_store.uses_user_dict(source))
+        if isinstance(output, BaseException):
+            raise output
+        suzume = bug_store.join_tokens([tok["surface"] for tok in output])
     return expected, suzume
 
 
@@ -191,16 +208,23 @@ async def defect_probe(
     them here, and pass only what comes back as `candidate` or `regression` on
     for judgment. Everything the store has already seen is filtered out.
 
-    States: `candidate` (differs, unknown), `regression` (differs again after
-    being fixed), `known` (an open record exists), `dismissed` (judged and
-    closed as a non-defect), `match` (no difference), `error`.
+    The comparison is the one the C++ tokenization runner applies: surface,
+    POS and lemma. States: `candidate` (surfaces differ, unknown),
+    `pos-lemma` (surfaces agree but a POS or lemma differs, unknown; not
+    counted in `to_judge`), `regression` (differs again after being fixed),
+    `known` (an open record exists), `dismissed` (judged and closed as a
+    non-defect), `match` (no difference at all), `error`. Every differing row
+    carries `differences`: the index, field and both values of each token
+    field that differs. `comparison` counts match / pos-lemma / surface over
+    the whole batch before the store is consulted.
 
     Args:
         texts: Sentences to probe. At most 200 per call.
         source: Store to screen against.
         pattern: Grammar family these sentences came from; echoed back on every
             row so the caller can file without re-tagging.
-        include_match: Also return the sentences that showed no difference.
+        include_match: Also return the sentences that showed no difference on
+            any field.
     """
     if not texts:
         return json_error("texts is required")
@@ -230,6 +254,7 @@ async def defect_probe(
             "source": source,
             "probed": len(rows),
             "counts": counts,
+            "comparison": _comparison_totals(rows),
             "to_judge": counts.get("candidate", 0) + counts.get("regression", 0),
             "rows": returned,
         }

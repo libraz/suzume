@@ -19,12 +19,15 @@ from datetime import datetime
 from pathlib import Path
 
 from ..config import PROJECT_ROOT
+from .pos_mapping import normalize_pos
 
 _CLI_ENV_VAR = "SUZUME_CLI_PATH"
 _MULTI_CONFIG_NAMES = ("Debug", "Release", "RelWithDebInfo", "MinSizeRel")
 
 # A hung child would otherwise block the tool call that spawned it forever.
 _ANALYZE_TIMEOUT_SECONDS = 30.0
+# CLI processes kept in flight when one call analyzes many texts.
+_ANALYZE_CONCURRENCY = 8
 _DICT_COMPILE_TIMEOUT_SECONDS = 120.0
 _NORMALIZE_TIMEOUT_SECONDS = 60.0
 _NORMALIZE_TIMEOUT_PER_TEXT_SECONDS = 1.0
@@ -139,15 +142,23 @@ def _cli_failure(stderr: str) -> RuntimeError:
     return RuntimeError(f"Suzume CLI failed: {stderr.strip() or 'non-zero exit'}")
 
 
-def _surfaces_from_output(stdout: str) -> list[str]:
-    surfaces = []
+def tokens_from_output(stdout: str) -> list[dict]:
+    """Parse ``analyze`` output into tokens with a normalized POS; a missing lemma is the surface."""
+    tokens = []
     for line in stdout.split("\n"):
         if not line or line == "EOS":
             continue
-        surface = line.split("\t")[0]
-        if surface:
-            surfaces.append(surface)
-    return surfaces
+        parts = line.split("\t")
+        surface = parts[0]
+        if not surface:
+            continue
+        pos = normalize_pos(parts[1]) if len(parts) > 1 else "Other"
+        tokens.append({"surface": surface, "pos": pos, "lemma": parts[2] if len(parts) > 2 else surface})
+    return tokens
+
+
+def _surfaces_from_output(stdout: str) -> list[str]:
+    return [token["surface"] for token in tokens_from_output(stdout)]
 
 
 async def _run_cli_async(
@@ -198,15 +209,26 @@ def get_suzume_surfaces(text: str, cli_path: Path | None = None, skip_user_dict:
     return _surfaces_from_output(result.stdout)
 
 
-async def get_suzume_surfaces_async(text: str, cli_path: Path | None = None, skip_user_dict: bool = False) -> list[str]:
-    """Get surface tokens from Suzume CLI output (async).
+async def get_suzume_tokens_async(text: str, cli_path: Path | None = None, skip_user_dict: bool = False) -> list[dict]:
+    """Get tokens with POS and lemma from Suzume CLI output (async).
 
     Args:
         skip_user_dict: When True, pass --no-user-dict to match the C++ tokenization
             test runner oracle. When False (default), the CLI auto-loads user.dic.
     """
     stdout, _ = await _run_cli_async(existing_cli(cli_path), _analyze_args(text, skip_user_dict))
-    return _surfaces_from_output(stdout)
+    return tokens_from_output(stdout)
+
+
+async def get_suzume_tokens_many(texts: list[str], *, skip_user_dict: bool) -> list[list[dict] | BaseException]:
+    """Analyze many texts with bounded concurrency; a failed text yields its exception in place."""
+    semaphore = asyncio.Semaphore(_ANALYZE_CONCURRENCY)
+
+    async def one(text: str) -> list[dict]:
+        async with semaphore:
+            return await get_suzume_tokens_async(text, skip_user_dict=skip_user_dict)
+
+    return await asyncio.gather(*(one(text) for text in texts), return_exceptions=True)
 
 
 async def get_suzume_debug_info(text: str, cli_path: Path | None = None, skip_user_dict: bool = True) -> dict:

@@ -8,8 +8,7 @@ from pathlib import Path
 from ..config import PROJECT_ROOT
 from ..core.json_utils import json_error as _json_error  # noqa: F401
 from ..core.json_utils import json_result as _json_result  # noqa: F401
-from ..core.pos_mapping import normalize_pos
-from ..core.suzume_cli import existing_cli, get_expected_tokens_batch_subprocess
+from ..core.suzume_cli import existing_cli, get_expected_tokens_batch_subprocess, tokens_from_output
 from ..core.suzume_utils import tokens_match
 from ..core.test_file_utils import (
     find_test_by_id,
@@ -54,16 +53,7 @@ def _get_suzume_tokens(text: str) -> list[dict]:
     if result.returncode != 0:
         raise RuntimeError(f"Suzume CLI failed: {result.stderr.strip() or 'non-zero exit'}")
 
-    tokens = []
-    for line in result.stdout.split("\n"):
-        if not line or line == "EOS":
-            continue
-        parts = line.split("\t")
-        surface = parts[0]
-        pos = normalize_pos(parts[1]) if len(parts) > 1 else "Other"
-        lemma = parts[2] if len(parts) > 2 else surface
-        tokens.append({"surface": surface, "pos": pos, "lemma": lemma})
-    return tokens
+    return tokens_from_output(result.stdout)
 
 
 def _format_expected_checked(tokens: list[dict], source: str) -> list[dict]:
