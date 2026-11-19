@@ -1,16 +1,11 @@
 #include "dictionary/user_dict.h"
 
-#include "core/types.h"
-#include "normalize/utf8.h"
-
 namespace suzume::dictionary {
 
 UserDictionary::UserDictionary() = default;
 
 bool UserDictionary::addEntry(const DictionaryEntry& entry) {
-  if (entry.surface.empty() || !core::isValidPartOfSpeech(entry.pos) || !core::isValidExtendedPos(entry.extended_pos) ||
-      entry.surface.size() > kMaxSerializedSurfaceLength || !normalize::isValidUtf8(entry.surface) ||
-      (!entry.lemma.empty() && !normalize::isValidUtf8(entry.lemma))) {
+  if (checkEntryAdmission(entry) != EntryAdmission::Admitted) {
     return false;
   }
 

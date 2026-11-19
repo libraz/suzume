@@ -2,6 +2,11 @@
 
 #include <gtest/gtest.h>
 
+#include <iterator>
+#include <string>
+
+#include "dictionary/binary_dict.h"
+
 namespace suzume {
 namespace dictionary {
 namespace {
@@ -58,6 +63,24 @@ TEST(UserDictTest, RejectsAnOverlongSurfaceBeforeBuildingTheTrie) {
 
   EXPECT_FALSE(dict.addEntry(entry));
   EXPECT_TRUE(dict.lookup(entry.surface, 0).empty());
+}
+
+TEST(UserDictTest, AdmitsExactlyWhatTheBinaryCompilerAdmits) {
+  const std::string boundary(kMaxSerializedSurfaceLength, 'a');
+  const DictionaryEntry cases[] = {
+      {"検査", core::PartOfSpeech::Noun, core::ExtendedPOS::Noun, "検査"},
+      {boundary, core::PartOfSpeech::Noun, core::ExtendedPOS::Noun, boundary},
+      {"検査", core::PartOfSpeech::Noun, core::ExtendedPOS::Noun, boundary + "a"},
+      {std::string("東京\0大阪", 13), core::PartOfSpeech::Noun, core::ExtendedPOS::Noun, ""},
+  };
+  const bool expected_admitted[] = {true, true, false, false};
+  for (size_t index = 0; index < std::size(cases); ++index) {
+    UserDictionary dict;
+    BinaryDictWriter writer;
+    writer.addEntry(cases[index]);
+    EXPECT_EQ(dict.addEntry(cases[index]), expected_admitted[index]) << index;
+    EXPECT_EQ(writer.build().hasValue(), expected_admitted[index]) << index;
+  }
 }
 
 TEST(UserDictTest, Lookup) {

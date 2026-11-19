@@ -6,6 +6,7 @@
 #include "dictionary/binary_dict.h"
 #include "dictionary/core_dict.h"
 #include "dictionary/user_dict.h"
+#include "normalize/utf8.h"
 
 namespace suzume::dictionary {
 
@@ -230,6 +231,53 @@ core::Expected<size_t, core::Error> DictionaryManager::loadBundledUserBinaryDict
 core::Expected<size_t, core::Error> DictionaryManager::loadBundledUserBinaryDictionaryFromMemoryResult(
     const uint8_t* data, size_t size) {
   return loadUserBinaryDictionaryFromMemoryResultInto(data, size, bundled_user_binary_dicts_);
+}
+
+EntryAdmission checkEntryAdmission(const DictionaryEntry& entry) {
+  if (entry.surface.empty()) {
+    return EntryAdmission::EmptySurface;
+  }
+  if (entry.surface.find('\0') != std::string::npos) {
+    return EntryAdmission::EmbeddedNul;
+  }
+  if (!normalize::isValidUtf8(entry.surface) || (!entry.lemma.empty() && !normalize::isValidUtf8(entry.lemma))) {
+    return EntryAdmission::InvalidUtf8;
+  }
+  if (entry.surface.size() > kMaxSerializedSurfaceLength) {
+    return EntryAdmission::SurfaceTooLong;
+  }
+  if (entry.lemma.size() > kMaxSerializedSurfaceLength) {
+    return EntryAdmission::LemmaTooLong;
+  }
+  if (!core::isValidPartOfSpeech(entry.pos)) {
+    return EntryAdmission::InvalidPos;
+  }
+  if (!core::isValidExtendedPos(entry.extended_pos)) {
+    return EntryAdmission::InvalidExtendedPos;
+  }
+  return EntryAdmission::Admitted;
+}
+
+std::string entryAdmissionMessage(EntryAdmission admission, const DictionaryEntry& entry) {
+  switch (admission) {
+    case EntryAdmission::Admitted:
+      return {};
+    case EntryAdmission::EmptySurface:
+      return "Dictionary surface must not be empty";
+    case EntryAdmission::EmbeddedNul:
+      return "Dictionary surface contains an embedded NUL byte";
+    case EntryAdmission::InvalidUtf8:
+      return "Dictionary entry is not valid UTF-8";
+    case EntryAdmission::SurfaceTooLong:
+      return "Dictionary surface exceeds 255 bytes: " + entry.surface;
+    case EntryAdmission::LemmaTooLong:
+      return "Dictionary base form exceeds 255 bytes: " + entry.lemma;
+    case EntryAdmission::InvalidPos:
+      return "Dictionary entry has invalid POS";
+    case EntryAdmission::InvalidExtendedPos:
+      return "Dictionary entry has invalid extended POS";
+  }
+  return {};
 }
 
 }  // namespace suzume::dictionary

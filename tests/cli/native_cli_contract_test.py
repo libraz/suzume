@@ -518,6 +518,25 @@ def assert_dictionary_contract(cli: Path) -> None:
         created.write_text(created_header + "東京公園\tNOUN\n", encoding="utf-8")
         run_cli(cli, "dict", "compile", str(created), str(temp_dir / "created.dic"))
 
+        # validate refuses what the loader and compiler refuse.
+        for name, row, refusal in (
+            ("oversized", "あ" * 86 + "\tNOUN\n", "Dictionary surface exceeds 255 bytes"),
+            ("long_base_form", "検査\tNOUN\t\t" + "あ" * 86 + "\n", "Dictionary base form exceeds 255 bytes"),
+        ):
+            refused_source = temp_dir / f"{name}.tsv"
+            refused_binary = temp_dir / f"{name}.dic"
+            refused_source.write_text(row, encoding="utf-8")
+            refused_validate = run_cli(cli, "dict", "validate", str(refused_source), expect_success=False)
+            assert refused_validate.returncode == 1
+            assert f"Invalid entry at line 1: {refusal}" in refused_validate.stderr
+            refused_compile = run_cli(
+                cli, "dict", "compile", str(refused_source), str(refused_binary), expect_success=False
+            )
+            assert refused_compile.returncode == 1
+            assert f"Invalid entry at line 1: {refusal}" in refused_compile.stderr
+            assert "Validation failed: 1 error(s)" in refused_compile.stderr
+            assert not refused_binary.exists()
+
         filter_source = temp_dir / "filter.tsv"
         filter_binary = temp_dir / "filter.dic"
         filter_source.write_text("東京公園\tNOUN\nりん\tNOUN\n", encoding="utf-8")

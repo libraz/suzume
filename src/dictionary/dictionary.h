@@ -90,6 +90,24 @@ struct DictionaryEntry {
   std::string lemma;                                           // Lemma (optional)
 };
 
+/// Why a dictionary refuses an entry. The runtime loader, the binary compiler and the
+/// source validator all decide through checkEntryAdmission, so none admits what another refuses.
+enum class EntryAdmission : uint8_t {
+  Admitted,
+  EmptySurface,
+  EmbeddedNul,
+  InvalidUtf8,
+  SurfaceTooLong,
+  LemmaTooLong,
+  InvalidPos,
+  InvalidExtendedPos,
+};
+
+[[nodiscard]] EntryAdmission checkEntryAdmission(const DictionaryEntry& entry);
+
+/// Diagnostic for a refused entry; names the offending string where one is too long.
+[[nodiscard]] std::string entryAdmissionMessage(EntryAdmission admission, const DictionaryEntry& entry);
+
 /**
  * @brief Lookup result
  */

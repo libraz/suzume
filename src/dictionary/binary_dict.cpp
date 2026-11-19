@@ -483,34 +483,13 @@ core::Expected<std::vector<uint8_t>, core::Error> BinaryDictWriter::build() {
   compact_entries.reserve(entries_.size());
 
   for (const auto& ent : entries_) {
-    if (ent.surface.empty()) {
-      return invalid("Dictionary surface must not be empty");
-    }
-    if (ent.surface.find('\0') != std::string::npos) {
-      return invalid("Dictionary surface contains an embedded NUL byte");
-    }
-    if (!normalize::isValidUtf8(ent.surface) || (!ent.lemma.empty() && !normalize::isValidUtf8(ent.lemma))) {
-      return invalid("Dictionary entry is not valid UTF-8");
-    }
-
-    if (ent.surface.size() > kMaxSerializedSurfaceLength) {
-      return invalid("Dictionary surface exceeds 255 bytes: " + ent.surface);
-    }
-
-    if (ent.lemma.size() > kMaxSerializedSurfaceLength) {
-      return invalid("Dictionary lemma exceeds 255 bytes: " + ent.lemma);
-    }
-
-    if (!core::isValidPartOfSpeech(ent.pos)) {
-      return invalid("Dictionary entry has invalid POS");
+    if (const EntryAdmission admission = checkEntryAdmission(ent); admission != EntryAdmission::Admitted) {
+      return invalid(entryAdmissionMessage(admission, ent));
     }
 
     core::ExtendedPOS extended_pos_value = ent.extended_pos;
     if (extended_pos_value == core::ExtendedPOS::Unknown && ent.pos != core::PartOfSpeech::Unknown) {
       extended_pos_value = core::posToExtendedPos(ent.pos);
-    }
-    if (!core::isValidExtendedPos(extended_pos_value)) {
-      return invalid("Dictionary entry has invalid extended POS");
     }
 
     uint16_t lemma_reference = 0;

@@ -121,6 +121,19 @@ size_t TsvParser::validate(const std::vector<TsvEntry>& entries, std::vector<std
                           conjugation_issue + ")");
       }
     }
+
+    // Report the first expanded form the loader and compiler would refuse.
+    for (const auto& expanded_entry : grammar::expandDictionarySourceEntry(entry)) {
+      const dictionary::EntryAdmission admission = dictionary::checkEntryAdmission(expanded_entry);
+      if (admission != dictionary::EntryAdmission::Admitted) {
+        ++issue_count;
+        if (issues != nullptr) {
+          issues->push_back("Invalid entry" + line_suffix + ": " +
+                            dictionary::entryAdmissionMessage(admission, expanded_entry));
+        }
+        break;
+      }
+    }
   }
 
   return issue_count;
