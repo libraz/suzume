@@ -1,5 +1,5 @@
 import { expect } from 'vitest';
-import { ErrorCode, SuzumeError } from '../dist/index.js';
+import { type ErrorCode, SuzumeError } from '../dist/index.js';
 import createModule from '../dist/suzume.js';
 import { posEnglish } from '../js/abi_labels.js';
 import { C_LAYOUTS } from '../js/abi_layout.js';
@@ -139,14 +139,29 @@ export function analyzeText(module: WasmModule, handle: number, text: string): P
   }
 }
 
-/** Assert that `action` rejects with a SuzumeError carrying ErrorCode.InvalidUtf8. */
-export async function expectInvalidUtf8(action: () => Promise<unknown>): Promise<void> {
-  const error = await action().then(
-    () => undefined,
-    (thrown: unknown) => thrown,
-  );
+/** Assert that `action` throws or rejects with a SuzumeError of `code` and `operation`; returns it. */
+export async function expectSuzumeError(
+  action: () => unknown,
+  code: ErrorCode,
+  operation: string,
+  message?: string | RegExp,
+): Promise<SuzumeError> {
+  let error: unknown;
+  try {
+    await action();
+  } catch (thrown) {
+    error = thrown;
+  }
   expect(error).toBeInstanceOf(SuzumeError);
-  expect((error as SuzumeError).code).toBe(ErrorCode.InvalidUtf8);
+  const suzumeError = error as SuzumeError;
+  expect(suzumeError.code).toBe(code);
+  expect(suzumeError.operation).toBe(operation);
+  if (typeof message === 'string') {
+    expect(suzumeError.message).toBe(message);
+  } else if (message !== undefined) {
+    expect(suzumeError.message).toMatch(message);
+  }
+  return suzumeError;
 }
 
 export function parseTags(module: WasmModule, tagsPtr: number): ParsedTag[] {

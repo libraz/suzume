@@ -9,7 +9,7 @@
  * WASM function calls.
  */
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { Suzume, version } from '../dist/index.js';
+import { ErrorCode, Suzume, version } from '../dist/index.js';
 import { C_LAYOUTS } from '../js/abi_layout.js';
 import {
   allocString,
@@ -17,7 +17,7 @@ import {
   analyzeText,
   cApi,
   EXTENDED_OPTIONS_LAYOUT,
-  expectInvalidUtf8,
+  expectSuzumeError,
   getModule,
   nativeLabel,
   parseTags,
@@ -338,36 +338,31 @@ describe('JS API: struct layout compatibility', () => {
 });
 
 describe('JS API: error reporting', () => {
-  it('exposes last C API error after a failed dictionary load', async () => {
+  it('throws a failed dictionary load with the native code and text', async () => {
     const suzume = await Suzume.create();
 
     try {
-      expect(suzume.loadUserDictionary('"東京,NOUN,0.5\n')).toBe(false);
-      expect(suzume.lastError).toContain('Invalid legacy CSV quoting');
-      expect(suzume.lastError).toContain('unterminated quoted field');
-    } finally {
-      suzume.destroy();
-    }
-  });
-
-  it('loadUserDictionaryOrThrow includes C API parse details', async () => {
-    const suzume = await Suzume.create();
-
-    try {
-      expect(() => suzume.loadUserDictionaryOrThrow('"東京,NOUN,0.5\n')).toThrow(
-        /Invalid legacy CSV quoting.*unterminated quoted field/,
+      const error = await expectSuzumeError(
+        () => suzume.loadUserDictionary('"東京,NOUN,0.5\n'),
+        ErrorCode.Parse,
+        'load_user_dictionary',
+        /^Invalid legacy CSV quoting.*unterminated quoted field/,
       );
+      expect(error.cause).toBeUndefined();
     } finally {
       suzume.destroy();
     }
   });
 
-  it('loadBinaryDictionaryOrThrow includes C API parse details', async () => {
+  it('throws a failed binary dictionary load with the native text', async () => {
     const suzume = await Suzume.create();
 
     try {
-      expect(() => suzume.loadBinaryDictionaryOrThrow(new Uint8Array([0, 1, 2, 3]))).toThrow(
-        /Dictionary file too small/,
+      await expectSuzumeError(
+        () => suzume.loadBinaryDictionary(new Uint8Array([0, 1, 2, 3])),
+        ErrorCode.DictionaryLoadFailed,
+        'load_binary_dictionary',
+        /^Dictionary file too small/,
       );
     } finally {
       suzume.destroy();
@@ -441,10 +436,15 @@ describe('JS API: error reporting', () => {
     await expect(Suzume.create({ scorerOptions: '{' })).rejects.toThrow(/invalid scorer options/i);
   });
 
-  it('reports stable error codes and rejects unpaired surrogates', async () => {
+  it('rejects unpaired surrogates as invalid input', async () => {
     const suzume = await Suzume.create();
     try {
-      await expectInvalidUtf8(async () => suzume.analyze('\ud800'));
+      await expectSuzumeError(
+        () => suzume.analyze('\ud800'),
+        ErrorCode.InvalidInput,
+        'analyze',
+        'invalid text: contains an unpaired surrogate',
+      );
     } finally {
       suzume.destroy();
     }
@@ -535,14 +535,12 @@ describe('JS API: error reporting', () => {
     }
   });
 
-  it('exposes version, warnings, stable errors, and memory size', async () => {
+  it('exposes version, warnings, and memory size', async () => {
     const suzume = await Suzume.create();
     try {
       expect(suzume.version).toMatch(/^\d+\.\d+\.\d+$/);
       expect(suzume.dictionaryWarnings).toEqual([]);
       expect(suzume.wasmMemoryBytes()).toBeGreaterThan(0);
-      expect(suzume.loadUserDictionary('"東京,NOUN,0.5\n')).toBe(false);
-      expect(suzume.lastErrorCode).not.toBe(0);
     } finally {
       suzume.destroy();
     }
@@ -555,12 +553,16 @@ describe('JS API: error reporting', () => {
       expect(suzume.analyze('コーヒー豆')).toMatchObject([
         { surface: 'コーヒー豆', isUserDict: true },
       ]);
-      expect(suzume.loadUserDictionaryCount('検査する\tVERB\tSURU\n')).toBeGreaterThan(1);
-      expect(suzume.loadUserDictionaryCount('ignored-record\n検査語\tNOUN\n')).toBe(1);
+      expect(suzume.loadUserDictionary('検査する\tVERB\tSURU\n')).toBeGreaterThan(1);
+      expect(suzume.loadUserDictionary('ignored-record\n検査語\tNOUN\n')).toBe(1);
       expect(suzume.dictionaryWarnings.some((warning) => warning.includes('line 1'))).toBe(true);
-      expect(suzume.loadUserDictionaryCount('ignored-record\n')).toBe(0);
-      expect(suzume.lastErrorCode).toBe(4);
-      expect(suzume.loadUserDictionary('検査語\tNOUN\n')).toBe(true);
+      await expectSuzumeError(
+        () => suzume.loadUserDictionary('ignored-record\n'),
+        ErrorCode.Parse,
+        'load_user_dictionary',
+        'Dictionary source contains no loadable entries',
+      );
+      expect(suzume.loadUserDictionary('検査語\tNOUN\n')).toBe(1);
       expect(suzume.analyze('検査語').some((morpheme) => morpheme.isUserDict)).toBe(true);
       suzume.clearUserDictionaries();
       expect(suzume.analyze('検査語').some((morpheme) => morpheme.isUserDict)).toBe(false);
@@ -688,9 +690,15 @@ describe('JS API: error reporting', () => {
     ['maxTags', 2 ** 32],
   ] as const)('generateTags rejects %s = %s', async (option, value) => {
     const suzume = await Suzume.create();
+    const name = option === 'minLength' ? 'min_length' : 'max_tags';
 
     try {
-      expect(() => suzume.generateTags('東京', { [option]: value })).toThrow(option);
+      await expectSuzumeError(
+        () => suzume.generateTags('東京', { [option]: value }),
+        ErrorCode.InvalidInput,
+        'generate_tags',
+        `invalid ${name}: ${String(value)} (expected an integer from 0 to 4294967295)`,
+      );
     } finally {
       suzume.destroy();
     }
@@ -699,16 +707,25 @@ describe('JS API: error reporting', () => {
   it.each(['constructor', 'toString', '__proto__'])(
     'create rejects the prototype key %s as a mode',
     async (mode) => {
-      await expect(Suzume.create({ mode: mode as never })).rejects.toThrow(
-        `Invalid Suzume mode: ${mode}`,
+      await expectSuzumeError(
+        () => Suzume.create({ mode: mode as never }),
+        ErrorCode.InvalidInput,
+        'create',
+        `invalid mode: ${JSON.stringify(mode)} (expected one of: normal, search, split)`,
       );
     },
   );
 
-  it('throws when a destroyed instance is used', async () => {
+  it('throws the released error when a destroyed instance is used', async () => {
     const suzume = await Suzume.create();
     suzume.destroy();
+    suzume.destroy();
 
-    expect(() => suzume.analyze('東京')).toThrow('Suzume instance has been destroyed');
+    await expectSuzumeError(
+      () => suzume.analyze('東京'),
+      ErrorCode.InvalidInput,
+      'analyze',
+      'Suzume instance has been released',
+    );
   });
 });

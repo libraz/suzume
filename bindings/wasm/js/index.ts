@@ -15,25 +15,111 @@ import { C_LAYOUTS } from './abi_layout.js';
 import { decodeAnalysisResult, decodeTags, heapBytes } from './decode.js';
 import type { EmscriptenModule, EmscriptenModuleOptions } from './suzume.js';
 
-export enum ErrorCode {
-  Success = 0,
-  InvalidUtf8 = 1,
-  DictionaryLoadFailed = 2,
-  FileNotFound = 3,
-  Parse = 4,
-  OutOfMemory = 5,
-  InvalidInput = 6,
-  Internal = 7,
-}
+/**
+ * Error categories carried by {@link SuzumeError.code}. Values 0-7 mirror the
+ * C ABI's `SUZUME_ERROR_*`; `Unknown` (255) is reserved for bindings and is
+ * what any other value maps to.
+ */
+export const ErrorCode = Object.freeze({
+  Success: 0,
+  InvalidUtf8: 1,
+  DictionaryLoadFailed: 2,
+  FileNotFound: 3,
+  Parse: 4,
+  OutOfMemory: 5,
+  InvalidInput: 6,
+  Internal: 7,
+  Unknown: 255,
+} as const);
 
+/** One of the {@link ErrorCode} values. */
+export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
+
+/**
+ * The call that raised a {@link SuzumeError}. Tokens are snake_case and shared
+ * with the other bindings; a setter carries its getter's token.
+ */
+export type SuzumeOperation =
+  | 'create'
+  | 'analyze'
+  | 'generate_tags'
+  | 'load_user_dictionary'
+  | 'load_binary_dictionary'
+  | 'clear_user_dictionaries'
+  | 'mode'
+  | 'version'
+  | 'dictionary_warnings'
+  | 'has_core_dictionary'
+  | 'wasm_memory_bytes';
+
+const ERROR_CODE_VALUES: ReadonlySet<number> = new Set(Object.values(ErrorCode));
+
+/**
+ * Every error this package throws: invalid input (`code` InvalidInput, a
+ * message naming the option and the accepted values), use after `destroy()`,
+ * and native failures, whose message is the library's own text.
+ */
 export class SuzumeError extends Error {
   readonly code: ErrorCode;
+  /** The call that raised the error; undefined only on an error constructed without one. */
+  readonly operation?: SuzumeOperation;
+  /** The wrapped non-native error (module load, scorer-options serialization). */
+  readonly cause?: unknown;
 
-  constructor(message: string, code: ErrorCode = ErrorCode.Internal) {
+  /**
+   * @param code - any number; values outside {@link ErrorCode} become `ErrorCode.Unknown`
+   */
+  constructor(
+    message: string,
+    code: number = ErrorCode.Internal,
+    options?: { operation?: SuzumeOperation; cause?: unknown },
+  ) {
     super(message);
     this.name = 'SuzumeError';
-    this.code = code;
+    this.code = ERROR_CODE_VALUES.has(code) ? (code as ErrorCode) : ErrorCode.Unknown;
+    if (options?.operation !== undefined) {
+      this.operation = options.operation;
+    }
+    if (options !== undefined && 'cause' in options) {
+      this.cause = options.cause;
+    }
   }
+}
+
+const RELEASED_MESSAGE = 'Suzume instance has been released';
+const MAX_SIZE_OPTION = 0xffffffff;
+
+/** Render a rejected value the same way in every binding. */
+function renderValue(value: unknown): string {
+  if (typeof value === 'string') {
+    return JSON.stringify(value);
+  }
+  if (typeof value === 'number' || typeof value === 'boolean' || value === undefined) {
+    return String(value);
+  }
+  if (value === null) {
+    return 'null';
+  }
+  if (Array.isArray(value)) {
+    return 'array';
+  }
+  if (typeof value === 'object') {
+    return 'object';
+  }
+  return 'value';
+}
+
+function invalidInput(operation: SuzumeOperation, message: string, cause?: unknown): SuzumeError {
+  return new SuzumeError(
+    message,
+    ErrorCode.InvalidInput,
+    cause === undefined ? { operation } : { operation, cause },
+  );
+}
+
+/** The snake_case spelling every binding uses in messages (`preserveVu` -> `preserve_vu`). */
+function messageName(name: string): string {
+  return name.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
 }
 
 const modulePromises = new Map<string, Promise<EmscriptenModule>>();
@@ -133,20 +219,79 @@ function ownEntry<Value>(table: Readonly<Record<string, Value>>, key: string): V
   return Object.getOwnPropertyDescriptor(table, key)?.value;
 }
 
-/** Validate a tag option that the C struct stores as a 32-bit `size_t`. */
-function sizeOption(name: string, value: number): number {
-  if (!Number.isSafeInteger(value) || value < 0 || value > 0xffffffff) {
-    throw new Error(`${name} must be an integer between 0 and ${0xffffffff}`);
+/** Validate a tag option that the C struct stores as a 32-bit `size_t`; -0 becomes 0. */
+function sizeOption(operation: SuzumeOperation, name: string, value: unknown): number {
+  if (
+    typeof value !== 'number' ||
+    !Number.isInteger(value) ||
+    value < 0 ||
+    value > MAX_SIZE_OPTION
+  ) {
+    throw invalidInput(
+      operation,
+      `invalid ${messageName(name)}: ${renderValue(value)} (expected an integer from 0 to ${MAX_SIZE_OPTION})`,
+    );
+  }
+  return value + 0;
+}
+
+function modeCode(operation: SuzumeOperation, mode: unknown): number {
+  const code = typeof mode === 'string' ? ownEntry(ANALYSIS_MODE_CODES, mode) : undefined;
+  if (code === undefined) {
+    throw invalidInput(
+      operation,
+      `invalid mode: ${renderValue(mode)} (expected one of: ${Object.keys(ANALYSIS_MODE_CODES).join(', ')})`,
+    );
+  }
+  return code;
+}
+
+function booleanOption(operation: SuzumeOperation, name: string, value: unknown): void {
+  if (value !== undefined && typeof value !== 'boolean') {
+    throw invalidInput(
+      operation,
+      `invalid ${messageName(name)}: ${renderValue(value)} (expected a boolean)`,
+    );
+  }
+}
+
+function stringArgument(operation: SuzumeOperation, name: string, value: unknown): string {
+  if (typeof value !== 'string') {
+    throw invalidInput(operation, `invalid ${name}: ${renderValue(value)} (expected a string)`);
   }
   return value;
 }
 
-function modeCode(mode: AnalysisMode): number {
-  const code = ownEntry(ANALYSIS_MODE_CODES, mode);
-  if (code === undefined) {
-    throw new Error(`Invalid Suzume mode: ${String(mode)}`);
+/** Serialize `scorerOptions` to the JSON text the C struct carries, or null when absent. */
+function scorerOptionsJson(value: unknown): string | null {
+  if (value === undefined || value === null) {
+    return null;
   }
-  return code;
+  let json: string;
+  if (typeof value === 'string') {
+    json = value;
+  } else {
+    try {
+      // JSON.stringify escapes a lone surrogate as ASCII, so check each key and string first.
+      json = JSON.stringify(value, (key, member: unknown) => {
+        assertWellFormedUtf16('create', 'scorer_options', key);
+        if (typeof member === 'string') {
+          assertWellFormedUtf16('create', 'scorer_options', member);
+        }
+        return member;
+      });
+    } catch (error) {
+      if (error instanceof SuzumeError) {
+        throw error;
+      }
+      throw invalidInput('create', 'invalid scorer_options: not serializable as JSON', error);
+    }
+  }
+  assertWellFormedUtf16('create', 'scorer_options', json);
+  if (json.includes('\0')) {
+    throw invalidInput('create', 'invalid scorer_options: contains a NUL character');
+  }
+  return json;
 }
 
 const EXTENDED_BOOL_FIELDS = [
@@ -287,7 +432,7 @@ const TAG_POS_FILTER_BITS: Readonly<Record<string, number>> = {
   auxiliary: 32,
 };
 
-/** Write each boolean field as one heap byte, falling back to its default when unset. */
+/** Write each (already validated) boolean field as one heap byte, falling back to its default when unset. */
 function writeBoolFields<Field extends string>(
   heap: Uint8Array,
   structPtr: number,
@@ -301,16 +446,51 @@ function writeBoolFields<Field extends string>(
   }
 }
 
-function nativeLastError(module: EmscriptenModule): string {
-  return module.UTF8ToString(module._suzume_last_error());
+/** Read a native C string; a NULL pointer and an empty string both mean "missing". */
+function nativeString(module: EmscriptenModule, pointer: number): string | undefined {
+  if (pointer === 0) {
+    return undefined;
+  }
+  const value = module.UTF8ToString(pointer);
+  return value === '' ? undefined : value;
 }
 
-function nativeLastErrorCode(module: EmscriptenModule): ErrorCode {
-  return module._suzume_last_error_code() as ErrorCode;
+/**
+ * Build the error for a native call that reported failure: the library's own
+ * text and code, or `<operation> failed` when it left no text. A failure whose
+ * code reads Success is the library breaking its contract, i.e. Internal.
+ */
+function nativeError(module: EmscriptenModule, operation: SuzumeOperation): SuzumeError {
+  const code = module._suzume_last_error_code();
+  const fallback = `${operation} failed`;
+  if (code === ErrorCode.Success) {
+    return new SuzumeError(fallback, ErrorCode.Internal, { operation });
+  }
+  const text = nativeString(module, module._suzume_last_error());
+  return new SuzumeError(text ?? fallback, code, { operation });
 }
 
 function readVersion(module: EmscriptenModule): string {
   return module.UTF8ToString(module._suzume_version());
+}
+
+/** Instantiate the WASM runtime, reporting a load failure as an Internal error of `operation`. */
+async function loadModule(
+  operation: SuzumeOperation,
+  wasmPath: string | undefined,
+  freshWasmModule: boolean,
+): Promise<EmscriptenModule> {
+  try {
+    return await instantiateModule(wasmPath, freshWasmModule);
+  } catch (error) {
+    const text = error instanceof Error ? error.message : '';
+    return Promise.reject(
+      new SuzumeError(text || `${operation} failed`, ErrorCode.Internal, {
+        operation,
+        cause: error,
+      }),
+    );
+  }
 }
 
 function resolveTagPosFilter(options: TagOptions): number {
@@ -344,8 +524,8 @@ const registry = new FinalizationRegistry((ref: CleanupRef) => {
   }
 });
 
-/** Throws InvalidUtf8 for an unpaired surrogate, which has no UTF-8 encoding. */
-function assertWellFormedUtf16(value: string): void {
+/** Rejects an unpaired surrogate, which has no UTF-8 encoding, as invalid input named `name`. */
+function assertWellFormedUtf16(operation: SuzumeOperation, name: string, value: string): void {
   for (let idx = 0; idx < value.length; idx++) {
     const codeUnit = value.charCodeAt(idx);
     if (codeUnit < 0xd800 || codeUnit > 0xdfff) {
@@ -359,19 +539,18 @@ function assertWellFormedUtf16(value: string): void {
         continue;
       }
     }
-    throw new SuzumeError('Input contains an unpaired UTF-16 surrogate', ErrorCode.InvalidUtf8);
+    throw invalidInput(operation, `invalid ${name}: contains an unpaired surrogate`);
   }
 }
 
 /**
- * Copy a string into freshly malloc'd NUL-terminated UTF-8; the caller frees `pointer`.
- * `payloadByteLength` excludes the trailing NUL.
+ * Copy a well-formed string into freshly malloc'd NUL-terminated UTF-8; the
+ * caller frees `pointer`. `payloadByteLength` excludes the trailing NUL.
  */
 function allocUtf8(
   module: EmscriptenModule,
   value: string,
 ): { pointer: number; payloadByteLength: number } {
-  assertWellFormedUtf16(value);
   const payloadByteLength = module.lengthBytesUTF8(value);
   const bufferSize = payloadByteLength + 1;
   const pointer = module._malloc(bufferSize);
@@ -412,12 +591,22 @@ export class Suzume {
   /**
    * Create a new Suzume instance
    *
-   * @param options - Optional configuration options
+   * @param options - Optional configuration options; unknown keys are ignored
    * @returns Promise resolving to Suzume instance
+   * @throws {SuzumeError} InvalidInput for an invalid option (before the module
+   *   loads), Internal when the WASM module fails to load, or the native code
+   *   and text when the library rejects the configuration
    */
   static async create(options?: SuzumeOptions & { wasmPath?: string }): Promise<Suzume> {
+    const modeValue = options?.mode === undefined ? EXTENDED_OPTION_DEFAULTS.mode : options.mode;
+    const mode = modeCode('create', modeValue);
+    for (const field of EXTENDED_BOOL_FIELDS) {
+      booleanOption('create', field, options?.[field]);
+    }
+    const scorerJson = scorerOptionsJson(options?.scorerOptions);
+
     const wasmPath = options?.wasmPath;
-    const module = await instantiateModule(wasmPath, options?.freshWasmModule === true);
+    const module = await loadModule('create', wasmPath, options?.freshWasmModule === true);
 
     let handle: number;
 
@@ -425,7 +614,7 @@ export class Suzume {
       options &&
       (EXTENDED_BOOL_FIELDS.some((field) => options[field] !== undefined) ||
         options.mode !== undefined ||
-        options.scorerOptions !== undefined)
+        scorerJson !== null)
     ) {
       // Create with options
       const layout = C_LAYOUTS.extendedOptions;
@@ -440,7 +629,7 @@ export class Suzume {
         module._suzume_init_extended_options(optionsPtr);
 
         const heap = heapBytes(module);
-        heap[optionsPtr + layout.mode] = modeCode(options.mode ?? EXTENDED_OPTION_DEFAULTS.mode);
+        heap[optionsPtr + layout.mode] = mode;
         writeBoolFields(
           heap,
           optionsPtr,
@@ -449,18 +638,7 @@ export class Suzume {
           options,
           EXTENDED_OPTION_DEFAULTS,
         );
-        if (options.scorerOptions !== undefined) {
-          const scorerJson =
-            typeof options.scorerOptions === 'string'
-              ? options.scorerOptions
-              : // JSON.stringify escapes a lone surrogate as ASCII, so check each key and string first.
-                JSON.stringify(options.scorerOptions, (key, value: unknown) => {
-                  assertWellFormedUtf16(key);
-                  if (typeof value === 'string') {
-                    assertWellFormedUtf16(value);
-                  }
-                  return value;
-                });
+        if (scorerJson !== null) {
           scorerOptionsPtr = allocUtf8(module, scorerJson).pointer;
           module.HEAPU32[(optionsPtr + layout.scorerOptionsJson) >> 2] = scorerOptionsPtr;
         }
@@ -478,13 +656,7 @@ export class Suzume {
     }
 
     if (handle === 0) {
-      const message = nativeLastError(module);
-      throw new SuzumeError(
-        message
-          ? `Failed to create Suzume instance: ${message}`
-          : 'Failed to create Suzume instance',
-        nativeLastErrorCode(module),
-      );
+      throw nativeError(module, 'create');
     }
 
     return new Suzume(module, handle);
@@ -493,42 +665,51 @@ export class Suzume {
   /**
    * Analyze Japanese text into morphemes
    *
-   * @param text - UTF-8 encoded Japanese text
+   * @param text - Japanese text
    * @returns Array of morphemes
+   * @throws {SuzumeError} InvalidInput for a non-string or an unpaired surrogate,
+   *   or after {@link destroy}
    */
   analyze(text: string): Morpheme[] {
     return this.analyzeWithNormalizedText(text).morphemes;
   }
 
-  /** Current analysis mode for this instance. */
+  /**
+   * Current analysis mode for this instance.
+   *
+   * @throws {SuzumeError} InvalidInput for a name other than normal, search or
+   *   split, or after {@link destroy}
+   */
   get mode(): AnalysisMode {
-    this.ensureAlive();
+    this.ensureAlive('mode');
     const mode = ANALYSIS_MODE_NAMES[this.module._suzume_mode(this.handle)];
     if (mode === undefined) {
-      throw this.nativeError('mode query failed');
+      throw nativeError(this.module, 'mode');
     }
     return mode;
   }
 
   /** Change analysis mode without reloading dictionaries. */
   set mode(value: AnalysisMode) {
-    this.ensureAlive();
-    if (this.module._suzume_set_mode(this.handle, modeCode(value)) !== 1) {
-      throw this.nativeError('mode change failed');
+    this.ensureAlive('mode');
+    if (this.module._suzume_set_mode(this.handle, modeCode('mode', value)) !== 1) {
+      throw nativeError(this.module, 'mode');
     }
   }
 
   /**
    * Analyze text and return the exact normalized text used for offsets.
+   *
+   * @throws {SuzumeError} as {@link analyze}
    */
   analyzeWithNormalizedText(text: string): AnalysisResult {
-    this.ensureAlive();
+    this.ensureAlive('analyze');
 
-    return this.withUtf8String(text, (textPtr, textByteLength) => {
+    return this.withUtf8String('analyze', 'text', text, (textPtr, textByteLength) => {
       const resultPtr = this.module._suzume_analyze_n(this.handle, textPtr, textByteLength);
 
       if (resultPtr === 0) {
-        throw this.nativeError('analyze failed');
+        throw nativeError(this.module, 'analyze');
       }
 
       try {
@@ -542,22 +723,33 @@ export class Suzume {
   /**
    * Generate tags from Japanese text
    *
-   * @param text - UTF-8 encoded Japanese text
-   * @param options - Optional tag generation options
+   * @param text - Japanese text
+   * @param options - Optional tag generation options; unknown keys are ignored
    * @returns Array of tag entries with POS information
+   * @throws {SuzumeError} InvalidInput for an invalid text or option, or after
+   *   {@link destroy}
    */
   generateTags(text: string, options?: TagOptions): Tag[] {
-    this.ensureAlive();
+    this.ensureAlive('generate_tags');
 
-    return this.withUtf8String(text, (textPtr, textByteLength) => {
+    let posFilter = 0;
+    let minLength: number = TAG_OPTION_DEFAULTS.minLength;
+    let maxTags: number = TAG_OPTION_DEFAULTS.maxTags;
+    if (options) {
+      posFilter = resolveTagPosFilter(options);
+      if (options.minLength !== undefined) {
+        minLength = sizeOption('generate_tags', 'minLength', options.minLength);
+      }
+      if (options.maxTags !== undefined) {
+        maxTags = sizeOption('generate_tags', 'maxTags', options.maxTags);
+      }
+      for (const field of TAG_BOOL_FIELDS) {
+        booleanOption('generate_tags', field, options[field]);
+      }
+    }
+
+    return this.withUtf8String('generate_tags', 'text', text, (textPtr, textByteLength) => {
       if (options) {
-        const posFilter = resolveTagPosFilter(options);
-        const minLength = sizeOption(
-          'minLength',
-          options.minLength ?? TAG_OPTION_DEFAULTS.minLength,
-        );
-        const maxTags = sizeOption('maxTags', options.maxTags ?? TAG_OPTION_DEFAULTS.maxTags);
-
         const optionsPtr = this.module._malloc(C_LAYOUTS.tagOptions.size);
 
         try {
@@ -600,73 +792,70 @@ export class Suzume {
   }
 
   /**
-   * Load user dictionary from string data
+   * Add entries from tab-separated dictionary text. Loads are additive; a
+   * failed load leaves earlier dictionaries installed.
    *
-   * @param data - Dictionary data in current TSV format (legacy CSV is also accepted)
-   * @returns true on success
+   * @param data - Rows of `surface<TAB>POS[<TAB>conj_type][<TAB>base_form]`
+   * @returns The number of installed entries (always at least 1)
+   * @throws {SuzumeError} with the native code and text when the source cannot
+   *   be loaded (an empty or entry-less source included), InvalidInput for a
+   *   non-string, or after {@link destroy}
    */
-  loadUserDictionary(data: string): boolean {
-    return this.loadUserDictionaryCount(data) > 0;
-  }
+  loadUserDictionary(data: string): number {
+    this.ensureAlive('load_user_dictionary');
 
-  /**
-   * Load user dictionary and return the number of installed expanded entries.
-   */
-  loadUserDictionaryCount(data: string): number {
-    this.ensureAlive();
-
-    return this.withUtf8String(data, (dataPtr, dataByteLength) =>
-      this.module._suzume_load_user_dict_count(this.handle, dataPtr, dataByteLength),
+    const installed = this.withUtf8String(
+      'load_user_dictionary',
+      'dictionary',
+      data,
+      (dataPtr, dataByteLength) =>
+        this.module._suzume_load_user_dict_count(this.handle, dataPtr, dataByteLength),
     );
-  }
-
-  /**
-   * Load user dictionary from string data, throwing with C API details on failure.
-   *
-   * @param data - Dictionary data in current TSV format (legacy CSV is also accepted)
-   */
-  loadUserDictionaryOrThrow(data: string): void {
-    if (!this.loadUserDictionary(data)) {
-      throw this.nativeError('user dictionary load failed');
+    if (installed === 0) {
+      throw nativeError(this.module, 'load_user_dictionary');
     }
+    return installed;
   }
 
   /**
-   * Load binary dictionary from buffer data (as user dictionary)
+   * Add a compiled binary dictionary (.dic) as a user dictionary.
    *
-   * @param data - Binary dictionary data (.dic format)
-   * @returns true on success
+   * @param data - Binary dictionary bytes
+   * @throws {SuzumeError} DictionaryLoadFailed with the native text when the
+   *   bytes cannot be loaded, InvalidInput for a non-Uint8Array, or after
+   *   {@link destroy}
    */
-  loadBinaryDictionary(data: Uint8Array): boolean {
-    this.ensureAlive();
+  loadBinaryDictionary(data: Uint8Array): void {
+    this.ensureAlive('load_binary_dictionary');
+    if (!(data instanceof Uint8Array)) {
+      throw invalidInput(
+        'load_binary_dictionary',
+        `invalid dictionary: ${renderValue(data)} (expected binary data)`,
+      );
+    }
 
     const dataPtr = this.module._malloc(data.byteLength);
+    let loaded: boolean;
     try {
       heapBytes(this.module).set(data, dataPtr);
-      return this.module._suzume_load_binary_dict(this.handle, dataPtr, data.byteLength) === 1;
+      loaded = this.module._suzume_load_binary_dict(this.handle, dataPtr, data.byteLength) === 1;
     } finally {
       this.module._free(dataPtr);
     }
-  }
-
-  /**
-   * Load binary dictionary from buffer data, throwing with C API details on failure.
-   *
-   * @param data - Binary dictionary data (.dic format)
-   */
-  loadBinaryDictionaryOrThrow(data: Uint8Array): void {
-    if (!this.loadBinaryDictionary(data)) {
-      throw this.nativeError('binary dictionary load failed');
+    if (!loaded) {
+      throw nativeError(this.module, 'load_binary_dictionary');
     }
   }
 
   /**
    * Remove caller-loaded dictionaries while retaining the bundled user dictionary.
+   *
+   * @throws {SuzumeError} after {@link destroy}
    */
   clearUserDictionaries(): void {
-    this.ensureAlive();
+    this.ensureAlive('clear_user_dictionaries');
     if (this.module._suzume_clear_user_dictionaries(this.handle) !== 1) {
-      throw this.nativeError('dictionary clear failed');
+      throw nativeError(this.module, 'clear_user_dictionaries');
     }
   }
 
@@ -678,40 +867,43 @@ export class Suzume {
   }
 
   /**
-   * Last C API error for this thread, or empty string if the last C API call succeeded.
+   * Current WebAssembly linear-memory size in bytes.
+   *
+   * @throws {SuzumeError} after {@link destroy}
    */
-  get lastError(): string {
-    return nativeLastError(this.module);
-  }
-
-  /** Stable native error category for the last failed C ABI call. */
-  get lastErrorCode(): ErrorCode {
-    return nativeLastErrorCode(this.module);
-  }
-
-  /** Current WebAssembly linear-memory size in bytes. */
   wasmMemoryBytes(): number {
-    this.ensureAlive();
+    this.ensureAlive('wasm_memory_bytes');
     return this.module.HEAPU32.buffer.byteLength;
   }
 
-  /** Dictionary-loading, parsing, and scorer-configuration diagnostics. */
+  /**
+   * Dictionary-loading, parsing, and scorer-configuration diagnostics; empty when there are none.
+   *
+   * @throws {SuzumeError} after {@link destroy}
+   */
   get dictionaryWarnings(): string[] {
-    this.ensureAlive();
+    this.ensureAlive('dictionary_warnings');
     const count = this.module._suzume_dictionary_warning_count(this.handle);
     const warnings: string[] = [];
     for (let idx = 0; idx < count; idx++) {
-      const warningPtr = this.module._suzume_dictionary_warning(this.handle, idx);
-      if (warningPtr !== 0) {
-        warnings.push(this.module.UTF8ToString(warningPtr));
+      const warning = nativeString(
+        this.module,
+        this.module._suzume_dictionary_warning(this.handle, idx),
+      );
+      if (warning !== undefined) {
+        warnings.push(warning);
       }
     }
     return warnings;
   }
 
-  /** Whether the bundled L2 core dictionary is loaded. */
+  /**
+   * Whether the bundled L2 core dictionary is loaded.
+   *
+   * @throws {SuzumeError} after {@link destroy}
+   */
   get hasCoreDictionary(): boolean {
-    this.ensureAlive();
+    this.ensureAlive('has_core_dictionary');
     return this.module._suzume_has_core_dictionary(this.handle) === 1;
   }
 
@@ -728,19 +920,24 @@ export class Suzume {
     }
   }
 
-  private ensureAlive(): void {
+  private ensureAlive(operation: SuzumeOperation): void {
     if (this.handle === 0) {
-      throw new Error('Suzume instance has been destroyed');
+      throw new SuzumeError(RELEASED_MESSAGE, ErrorCode.InvalidInput, { operation });
     }
   }
 
+  /** Validate `value` as the string argument `name`, then pass it to `body` as UTF-8. */
   private withUtf8String<T>(
-    value: string,
-    operation: (pointer: number, byteLength: number) => T,
+    operation: SuzumeOperation,
+    name: string,
+    value: unknown,
+    body: (pointer: number, byteLength: number) => T,
   ): T {
-    const { pointer, payloadByteLength } = allocUtf8(this.module, value);
+    const text = stringArgument(operation, name, value);
+    assertWellFormedUtf16(operation, name, text);
+    const { pointer, payloadByteLength } = allocUtf8(this.module, text);
     try {
-      return operation(pointer, payloadByteLength);
+      return body(pointer, payloadByteLength);
     } finally {
       this.module._free(pointer);
     }
@@ -748,7 +945,7 @@ export class Suzume {
 
   private consumeTags(tagsPtr: number): Tag[] {
     if (tagsPtr === 0) {
-      throw this.nativeError('tag generation failed');
+      throw nativeError(this.module, 'generate_tags');
     }
     try {
       return decodeTags(this.module, tagsPtr, (code) => this.posLabel(code));
@@ -810,28 +1007,25 @@ export class Suzume {
     if (cached !== undefined) {
       return cached;
     }
-    const labelPtr = nativeLabel(code);
-    const label = labelPtr === 0 ? fallback : this.module.UTF8ToString(labelPtr);
+    const native = nativeString(this.module, nativeLabel(code));
+    const label: string | T = native === undefined ? fallback : native;
     cache.set(code, label);
     return label;
-  }
-
-  private nativeError(action: string): SuzumeError {
-    return new SuzumeError(
-      `Suzume ${action}: ${this.lastError || 'unknown error'}`,
-      this.lastErrorCode,
-    );
   }
 }
 
 // Default export
 export default Suzume;
 
-/** Return the package version without creating an analyzer handle. */
+/**
+ * Return the package version without creating an analyzer handle.
+ *
+ * @throws {SuzumeError} Internal when the WASM module fails to load
+ */
 export async function version(options?: {
   wasmPath?: string;
   freshWasmModule?: boolean;
 }): Promise<string> {
-  const module = await instantiateModule(options?.wasmPath, options?.freshWasmModule === true);
+  const module = await loadModule('version', options?.wasmPath, options?.freshWasmModule === true);
   return readVersion(module);
 }
