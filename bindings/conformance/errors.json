@@ -2238,9 +2238,7 @@
           "operation": "create"
         }
       },
-      "message": null,
-      "message_prefix": "invalid scorer options: JSON parse error: ",
-      "note": "message_prefix holds after the native prefix removal; until then the suites assert code and operation only"
+      "message": "invalid scorer options: JSON parse error: Expected string key in object"
     }
   ]
 }

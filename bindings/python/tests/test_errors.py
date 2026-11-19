@@ -120,9 +120,6 @@ def test_conformance(case: dict[str, Any], live: Suzume) -> None:
         assert error.operation == expected["operation"]
     if case["message"] is not None:
         assert str(error) == case["message"]
-    elif case.get("message_prefix") is not None:
-        # The native text keeps its C symbol prefix until the C ABI drops it.
-        assert case["message_prefix"] in str(error)
 
 
 def test_error_code_unknown_is_255() -> None:

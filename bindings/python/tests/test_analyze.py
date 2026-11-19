@@ -2,13 +2,16 @@
 
 from __future__ import annotations
 
+import ctypes
 import ctypes.util
 from concurrent.futures import ThreadPoolExecutor
+from importlib import resources
 
 import pytest
 
 import suzume
 import suzume._ffi as ffi
+import suzume._labels
 from suzume import ErrorCode, Mode, Morpheme, Suzume, SuzumeError
 from suzume._ffi import load_library
 
@@ -27,16 +30,43 @@ def test_extended_pos_labels_match_the_serialized_range() -> None:
     assert lib.suzume_extended_pos_label(90).decode() == "AUX_卑罵"
     assert lib.suzume_extended_pos_label(91).decode() == "SUFFIX_気配"
     assert lib.suzume_extended_pos_label(92).decode() == "PART_選択"
-    assert lib.suzume_extended_pos_label(93) is None
+    assert lib.suzume_extended_pos_label(93).decode() == "UNKNOWN"
 
 
 def test_conjugation_labels_match_the_serialized_range() -> None:
     lib = load_library()
-    assert lib.suzume_conjugation_type_label(0) is None
+    assert lib.suzume_conjugation_type_label(0).decode() == ""
     assert lib.suzume_conjugation_type_label(17).decode() == "固有名詞・名"
-    assert lib.suzume_conjugation_type_label(18) is None
+    assert lib.suzume_conjugation_type_label(18).decode() == ""
+    assert lib.suzume_conjugation_form_label(0).decode() == "終止形"
     assert lib.suzume_conjugation_form_label(6).decode() == "意志形"
-    assert lib.suzume_conjugation_form_label(7) is None
+    assert lib.suzume_conjugation_form_label(7).decode() == ""
+
+
+def test_japanese_pos_labels_come_from_the_library() -> None:
+    lib = load_library()
+    assert lib.suzume_pos_label_ja(1).decode() == "名詞"
+    assert lib.suzume_pos_label_ja(14).decode() == "その他"
+    assert lib.suzume_pos_label_ja(200).decode() == "その他"
+    with Suzume() as sz:
+        morphemes = sz.analyze("東京に行く")
+    assert [m.pos_ja for m in morphemes] == [
+        lib.suzume_pos_label_ja(code).decode()
+        for code in (ffi_pos_code(lib, m.pos) for m in morphemes)
+    ]
+    assert not hasattr(suzume._labels, "POS_JAPANESE")
+
+
+def ffi_pos_code(lib: ctypes.CDLL, label: str) -> int:
+    return next(code for code in range(15) if lib.suzume_pos_label(code).decode() == label)
+
+
+def test_binary_loader_returns_the_installed_entry_count() -> None:
+    dictionary = resources.files("suzume").joinpath("user.dic").read_bytes()
+    with Suzume(skip_user_dictionary=True) as sz:
+        count = sz.load_binary_dictionary(dictionary)
+    assert isinstance(count, int)
+    assert count >= 1
 
 
 def test_version_is_nonempty() -> None:

@@ -13,7 +13,7 @@ from typing import Any, TypedDict, cast
 
 from suzume import Suzume
 from suzume._ffi import (
-    SuzumeExtendedOptions,
+    SuzumeOptions,
     SuzumeTagOptions,
     load_library,
 )
@@ -91,6 +91,8 @@ TAG_CASES: list[TagCase] = [
 
 _POS_FILTER_BITS = {"noun": 1, "verb": 2, "adjective": 4, "adverb": 8}
 _MODE_CODES = {"normal": 0, "search": 1, "split": 2}
+# Binding option name -> C field name, where they differ.
+_NATIVE_TAG_FIELDS = {"use_lemma": "use_base_form"}
 # Bit positions in the native morpheme flags word, in record order.
 _FLAG_BITS = {
     "user_dict": 0,
@@ -177,9 +179,9 @@ def _native_cli_records() -> list[list[dict[str, object]]]:
     return records
 
 
-def _native_options(options: dict[str, Any]) -> SuzumeExtendedOptions:
-    native = SuzumeExtendedOptions()
-    _lib.suzume_init_extended_options(ctypes.byref(native))
+def _native_options(options: dict[str, Any]) -> SuzumeOptions:
+    native = SuzumeOptions()
+    _lib.suzume_init_options(ctypes.byref(native))
     for field in (
         "preserve_vu",
         "preserve_case",
@@ -200,7 +202,7 @@ def _native_analysis_records() -> list[AnalysisRecord]:
         options = _native_options(case["options"])
         payload = case["text"].encode("utf-8")
         with (
-            _native_handle(_lib.suzume_create_with_extended_options(ctypes.byref(options))) as handle,
+            _native_handle(_lib.suzume_create_with_options(ctypes.byref(options))) as handle,
             _native_result(_lib.suzume_analyze_n(handle, payload, len(payload)), _lib.suzume_result_free) as raw,
         ):
             morphemes: list[MorphemeRecord] = []
@@ -243,7 +245,7 @@ def _native_tag_records() -> list[list[TagRecord]]:
             if field == "pos_filter":
                 options.pos_filter = sum(_POS_FILTER_BITS[name] for name in value)
             else:
-                setattr(options, field, int(value))
+                setattr(options, _NATIVE_TAG_FIELDS.get(field, field), int(value))
         payload = case["text"].encode("utf-8")
         with (
             _native_handle(_lib.suzume_create()) as handle,

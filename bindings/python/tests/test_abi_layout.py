@@ -16,8 +16,8 @@ import suzume
 import suzume._ffi as ffi
 from suzume._ffi import (
     ABI_VERSION,
-    SuzumeExtendedOptions,
     SuzumeMorpheme,
+    SuzumeOptions,
     SuzumeResult,
     SuzumeTagOptions,
     SuzumeTags,
@@ -59,7 +59,7 @@ def test_sizeof_matches_native() -> None:
     assert ctypes.sizeof(SuzumeResult) == _lib.suzume_sizeof_result()
     assert ctypes.sizeof(SuzumeTags) == _lib.suzume_sizeof_tags()
     assert ctypes.sizeof(SuzumeTagOptions) == _lib.suzume_sizeof_tag_options()
-    assert ctypes.sizeof(SuzumeExtendedOptions) == _lib.suzume_sizeof_extended_options()
+    assert ctypes.sizeof(SuzumeOptions) == _lib.suzume_sizeof_options()
 
 
 def test_morpheme_offsets_match_native() -> None:
@@ -82,6 +82,6 @@ def test_tag_options_offsets_match_native() -> None:
         assert offset == _lib.suzume_offsetof_tag_options(idx), f"tag_options field {idx}"
 
 
-def test_extended_options_offsets_match_native() -> None:
-    for idx, offset in enumerate(_offsets(SuzumeExtendedOptions)):
-        assert offset == _lib.suzume_offsetof_extended_options(idx), f"extended_options field {idx}"
+def test_options_offsets_match_native() -> None:
+    for idx, offset in enumerate(_offsets(SuzumeOptions)):
+        assert offset == _lib.suzume_offsetof_options(idx), f"options field {idx}"

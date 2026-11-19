@@ -22,7 +22,7 @@ from typing import Any
 # a different layout would be read at the wrong offsets rather than failing to
 # link. load_library() refuses a library that reports any other value.
 
-ABI_VERSION = 1
+ABI_VERSION = 2
 
 # --- ctypes structure mirrors of include/suzume/suzume_c.h ---------------------
 #
@@ -66,7 +66,7 @@ class SuzumeTags(ctypes.Structure):
     ]
 
 
-class SuzumeExtendedOptions(ctypes.Structure):
+class SuzumeOptions(ctypes.Structure):
     _fields_ = [
         ("preserve_vu", ctypes.c_uint8),
         ("preserve_case", ctypes.c_uint8),
@@ -74,7 +74,7 @@ class SuzumeExtendedOptions(ctypes.Structure):
         ("mode", ctypes.c_uint8),
         ("lemmatize", ctypes.c_uint8),
         ("merge_compounds", ctypes.c_uint8),
-        ("skip_user_dictionary", ctypes.c_uint8),
+        ("skip_bundled_user_dictionary", ctypes.c_uint8),
         ("skip_core_dictionary", ctypes.c_uint8),
         ("report_scorer_config", ctypes.c_uint8),
         ("skip_env_config", ctypes.c_uint8),
@@ -87,7 +87,7 @@ class SuzumeTagOptions(ctypes.Structure):
     _fields_ = [
         ("pos_filter", ctypes.c_uint8),
         ("exclude_basic", ctypes.c_uint8),
-        ("use_lemma", ctypes.c_uint8),
+        ("use_base_form", ctypes.c_uint8),
         ("min_length", ctypes.c_size_t),
         ("max_tags", ctypes.c_size_t),
         ("exclude_particles", ctypes.c_uint8),
@@ -157,14 +157,14 @@ _SIZE = ctypes.c_size_t
 _CODE = ctypes.c_uint8
 _RESULT_PTR = ctypes.POINTER(SuzumeResult)
 _TAGS_PTR = ctypes.POINTER(SuzumeTags)
-_EXTENDED_OPTIONS_PTR = ctypes.POINTER(SuzumeExtendedOptions)
+_OPTIONS_PTR = ctypes.POINTER(SuzumeOptions)
 _TAG_OPTIONS_PTR = ctypes.POINTER(SuzumeTagOptions)
 
 # name -> (restype, argtypes)
 _SIGNATURES: dict[str, tuple[Any, list[Any]]] = {
     "suzume_create": (_HANDLE, []),
-    "suzume_init_extended_options": (None, [_EXTENDED_OPTIONS_PTR]),
-    "suzume_create_with_extended_options": (_HANDLE, [_EXTENDED_OPTIONS_PTR]),
+    "suzume_init_options": (None, [_OPTIONS_PTR]),
+    "suzume_create_with_options": (_HANDLE, [_OPTIONS_PTR]),
     "suzume_destroy": (None, [_HANDLE]),
     "suzume_set_mode": (ctypes.c_int, [_HANDLE, _CODE]),
     "suzume_mode": (_CODE, [_HANDLE]),
@@ -176,8 +176,8 @@ _SIGNATURES: dict[str, tuple[Any, list[Any]]] = {
         [_HANDLE, _TEXT, _SIZE, _TAG_OPTIONS_PTR],
     ),
     "suzume_tags_free": (None, [_TAGS_PTR]),
-    "suzume_load_user_dict_count": (_SIZE, [_HANDLE, _TEXT, _SIZE]),
-    "suzume_load_binary_dict": (ctypes.c_int, [_HANDLE, ctypes.POINTER(ctypes.c_uint8), _SIZE]),
+    "suzume_load_user_dictionary": (_SIZE, [_HANDLE, _TEXT, _SIZE]),
+    "suzume_load_binary_dictionary": (_SIZE, [_HANDLE, ctypes.POINTER(ctypes.c_uint8), _SIZE]),
     "suzume_clear_user_dictionaries": (ctypes.c_int, [_HANDLE]),
     "suzume_has_core_dictionary": (ctypes.c_int, [_HANDLE]),
     "suzume_version": (_TEXT, []),
@@ -187,6 +187,7 @@ _SIGNATURES: dict[str, tuple[Any, list[Any]]] = {
     "suzume_extended_pos_label": (_TEXT, [_CODE]),
     "suzume_conjugation_form_label": (_TEXT, [_CODE]),
     "suzume_pos_label": (_TEXT, [_CODE]),
+    "suzume_pos_label_ja": (_TEXT, [_CODE]),
     "suzume_dictionary_warning_count": (_SIZE, [_HANDLE]),
     "suzume_dictionary_warning": (_TEXT, [_HANDLE, _SIZE]),
     # ABI layout oracles (used by the layout-guard test).
@@ -194,12 +195,12 @@ _SIGNATURES: dict[str, tuple[Any, list[Any]]] = {
     "suzume_sizeof_morpheme": (_SIZE, []),
     "suzume_sizeof_tags": (_SIZE, []),
     "suzume_sizeof_tag_options": (_SIZE, []),
-    "suzume_sizeof_extended_options": (_SIZE, []),
+    "suzume_sizeof_options": (_SIZE, []),
     "suzume_offsetof_result": (_SIZE, [ctypes.c_uint32]),
     "suzume_offsetof_morpheme": (_SIZE, [ctypes.c_uint32]),
     "suzume_offsetof_tags": (_SIZE, [ctypes.c_uint32]),
     "suzume_offsetof_tag_options": (_SIZE, [ctypes.c_uint32]),
-    "suzume_offsetof_extended_options": (_SIZE, [ctypes.c_uint32]),
+    "suzume_offsetof_options": (_SIZE, [ctypes.c_uint32]),
 }
 
 

@@ -28,7 +28,7 @@ from types import TracebackType
 from typing import Concatenate, Literal, ParamSpec, TypeVar
 
 from ._ffi import (
-    SuzumeExtendedOptions,
+    SuzumeOptions,
     SuzumeTagOptions,
     _bundled_data_dir,
     load_library,
@@ -40,7 +40,6 @@ from ._labels import (
     FLAG_LOW_INFO,
     FLAG_UNKNOWN,
     FLAG_USER_DICT,
-    pos_japanese,
 )
 
 __all__ = [
@@ -65,8 +64,10 @@ _POS_LABELS: dict[int, str | None] = {}
 _CONJUGATION_TYPE_LABELS: dict[int, str | None] = {}
 _CONJUGATION_FORM_LABELS: dict[int, str | None] = {}
 _EXTENDED_POS_LABELS: dict[int, str | None] = {}
+_POS_JAPANESE_LABELS: dict[int, str | None] = {}
 _POS_FALLBACK = "OTHER"
 _EXTENDED_POS_FALLBACK = "UNKNOWN"
+_POS_JAPANESE_FALLBACK = "その他"
 
 # POS names accepted by ``generate_tags(pos_filter=...)``, mapped to their
 # bitmask value. Names and casing mirror the WASM binding's TagOptions.pos.
@@ -351,6 +352,15 @@ def _pos_label(code: int) -> str:
     )
 
 
+def _pos_japanese_label(code: int) -> str:
+    return (
+        _cached_native_label(
+            _POS_JAPANESE_LABELS, _lib.suzume_pos_label_ja, code, _POS_JAPANESE_FALLBACK
+        )
+        or _POS_JAPANESE_FALLBACK
+    )
+
+
 def _extended_pos_label(code: int) -> str:
     return (
         _cached_native_label(
@@ -463,15 +473,17 @@ class Suzume:
     ) -> None:
         self._lock = threading.RLock()
         self._handle: int | None = None
-        opts = SuzumeExtendedOptions()
-        _lib.suzume_init_extended_options(ctypes.byref(opts))
+        opts = SuzumeOptions()
+        _lib.suzume_init_options(ctypes.byref(opts))
         opts.mode = _mode_option(mode)._code
         opts.preserve_vu = _bool_option("preserve_vu", preserve_vu)
         opts.preserve_case = _bool_option("preserve_case", preserve_case)
         opts.preserve_symbols = _bool_option("preserve_symbols", preserve_symbols)
         opts.lemmatize = _bool_option("lemmatize", lemmatize)
         opts.merge_compounds = _bool_option("merge_compounds", merge_compounds)
-        opts.skip_user_dictionary = _bool_option("skip_user_dictionary", skip_user_dictionary)
+        opts.skip_bundled_user_dictionary = _bool_option(
+            "skip_user_dictionary", skip_user_dictionary
+        )
         opts.skip_core_dictionary = _bool_option("skip_core_dictionary", skip_core_dictionary)
         opts.skip_env_config = _bool_option("skip_env_config", skip_env_config)
         opts.report_scorer_config = _bool_option("report_scorer_config", report_scorer_config)
@@ -479,7 +491,7 @@ class Suzume:
         data_directory = os.fsencode(_BUNDLED_DATA_DIR) if _BUNDLED_DATA_DIR is not None else None
         opts.data_directory = data_directory
 
-        handle = _lib.suzume_create_with_extended_options(ctypes.byref(opts))
+        handle = _lib.suzume_create_with_options(ctypes.byref(opts))
         if not handle:
             raise _native_error("create")
         self._handle = handle
@@ -561,7 +573,7 @@ class Suzume:
                         surface=_decode_sized(m.surface, m.surface_size),
                         pos=_pos_label(m.pos),
                         base_form=_decode_sized(m.base_form, m.base_form_size),
-                        pos_ja=pos_japanese(m.pos),
+                        pos_ja=_pos_japanese_label(m.pos),
                         conj_type=_conjugation_type_label(m.conjugation_type)
                         if conjugates
                         else None,
@@ -618,7 +630,7 @@ class Suzume:
         _lib.suzume_init_tag_options(ctypes.byref(opts))
         opts.pos_filter = _resolve_pos_filter(pos_filter)
         opts.exclude_basic = _bool_option("exclude_basic", exclude_basic)
-        opts.use_lemma = _bool_option("use_lemma", use_lemma)
+        opts.use_base_form = _bool_option("use_lemma", use_lemma)
         opts.min_length = _size_option("min_length", min_length)
         opts.max_tags = _size_option("max_tags", max_tags)
         opts.exclude_particles = _bool_option("exclude_particles", exclude_particles)
@@ -651,14 +663,18 @@ class Suzume:
         """
         handle = self._require_handle("load_user_dictionary")
         payload = _encode_argument("dictionary", dictionary)
-        count = int(_lib.suzume_load_user_dict_count(handle, payload, len(payload)))
+        count = int(_lib.suzume_load_user_dictionary(handle, payload, len(payload)))
         if count == 0:
             raise _native_error("load_user_dictionary")
         return count
 
     @_locked
-    def load_binary_dictionary(self, dictionary: bytes | bytearray | memoryview) -> None:
-        """Load a compiled binary (.dic) dictionary from memory."""
+    def load_binary_dictionary(self, dictionary: bytes | bytearray | memoryview) -> int:
+        """Load a compiled binary (.dic) dictionary and return the installed entry count.
+
+        A dictionary that cannot be loaded raises :class:`SuzumeError`, so the
+        returned count is always at least 1.
+        """
         handle = self._require_handle("load_binary_dictionary")
         if not isinstance(dictionary, (bytes, bytearray, memoryview)):
             raise ValueError(
@@ -666,8 +682,10 @@ class Suzume:
             )
         data = bytes(dictionary)
         buf = (ctypes.c_uint8 * len(data)).from_buffer_copy(data)
-        if not _lib.suzume_load_binary_dict(handle, buf, len(data)):
+        count = int(_lib.suzume_load_binary_dictionary(handle, buf, len(data)))
+        if count == 0:
             raise _native_error("load_binary_dictionary")
+        return count
 
     @_locked
     def clear_user_dictionaries(self) -> None:
