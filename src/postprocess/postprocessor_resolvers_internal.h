@@ -47,6 +47,7 @@ void resolveAdjectivalStemBeforeGaru(std::vector<core::Morpheme>& result);
 void resolveAdjectiveNominalizerSa(std::vector<core::Morpheme>& result);
 void resolveAttributiveDeverbalNoun(std::vector<core::Morpheme>& result,
                                     const dictionary::DictionaryManager* dict_manager);
+void resolveDeverbalNounBeforeKanjiNoun(std::vector<core::Morpheme>& result);
 void resolveAdverbExplanatoryCopula(std::vector<core::Morpheme>& result);
 void resolveAmbiguousInflections(std::vector<core::Morpheme>& result);
 void resolveAppearanceSouPredicate(std::vector<core::Morpheme>& result);

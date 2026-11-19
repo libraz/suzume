@@ -97,6 +97,32 @@ void resolveAttributiveDeverbalNoun(std::vector<core::Morpheme>& result,
   }
 }
 
+// A continuative opening its phrase (clause start or after の) and followed by
+// an all-kanji general noun names the action as a modifier (使い+道具, 置き+場所).
+// A verbal continuative there would need its own argument; a following する
+// marks the noun as the clause predicate instead (踏まえ+決定+する). A
+// one-mora continuative (出, 見) does not stand as a noun on its own.
+void resolveDeverbalNounBeforeKanjiNoun(std::vector<core::Morpheme>& result) {
+  for (size_t idx = 0; idx + 1 < result.size(); ++idx) {
+    auto& head = result[idx];
+    if (head.pos != core::PartOfSpeech::Verb || !core::isVerbContinuativeForm(head.extended_pos) ||
+        normalize::utf8Length(head.surface) < 2) {
+      continue;
+    }
+    const bool opens_phrase = idx == 0 || result[idx - 1].pos == core::PartOfSpeech::Symbol ||
+                              result[idx - 1].extended_pos == core::ExtendedPOS::ParticleNo;
+    const auto& noun = result[idx + 1];
+    if (!opens_phrase || noun.extended_pos != core::ExtendedPOS::Noun || !grammar::isAllKanji(noun.surface)) {
+      continue;
+    }
+    if (idx + 2 < result.size() && result[idx + 2].pos == core::PartOfSpeech::Verb &&
+        grammar::isSuruBaseForm(result[idx + 2].lemma)) {
+      continue;
+    }
+    retagNounSurface(head);
+  }
+}
+
 // A kana-spelled, dictionary-verified continuative before a kanji event-noun
 // suffix exposes an explicit orthographic boundary (ねがい+事). The lattice
 // selects the homographic formal noun because both readings have the same

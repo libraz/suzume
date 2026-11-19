@@ -51,6 +51,7 @@ void resolvePrePrefixMorphemeRoles(std::vector<core::Morpheme>& result,
   resolver::resolveHonorificVerbInflection(result);
   resolver::resolvePreparatoryVolitional(result);
   resolver::resolveAttributiveDeverbalNoun(result, dict_manager);
+  resolver::resolveDeverbalNounBeforeKanjiNoun(result);
   resolver::resolveCopularForms(result);
   resolver::resolveGozaruPoliteAuxiliary(result);
   resolver::resolveNominalCaseDe(result);
