@@ -305,8 +305,18 @@ float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::
   const bool unlicensed_attributive_nari = prev.extended_pos == core::ExtendedPOS::AuxClassicalNari &&
                                            next.extended_pos == core::ExtendedPOS::ParticleConj &&
                                            !utf8::endsWith(prev.surface, "れ");
+  // The accusative closes its phrase: a focus particle scopes over the bare
+  // nominal before it (本だけを, 本とかを), never after (本をとか+し+た is とかす).
+  const bool unlicensed_accusative_focus = prev.extended_pos == core::ExtendedPOS::ParticleCase &&
+                                           grammar::isAccusativeParticleWoSurface(prev.surface) &&
+                                           next.extended_pos == core::ExtendedPOS::ParticleAdverbial;
+  // The eastern conjectural べ follows a finite predicate (行く+べ, 寒い+べ); a
+  // bare nominal offers none (食+べ+な is the continuative 食べ+な).
+  const bool unlicensed_nominal_be = (core::isNounType(prev.extended_pos) || core::isPronounType(prev.extended_pos)) &&
+                                     next.extended_pos == core::ExtendedPOS::ParticleFinal &&
+                                     utf8::equalsAny(next.surface, {"べ"});
   if (quantifier_host || unlicensed_tomo || unlicensed_hypothetical || unlicensed_nominative_stacking ||
-      unlicensed_listing_shi || unlicensed_attributive_nari) {
+      unlicensed_listing_shi || unlicensed_attributive_nari || unlicensed_accusative_focus || unlicensed_nominal_be) {
     SUZUME_CONNECTION_ADD(bonus, quantifier_host ? cost::kExtremeBonus : cost::kAlmostNever);
   }
 
