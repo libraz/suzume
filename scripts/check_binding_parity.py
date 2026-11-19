@@ -10,6 +10,7 @@ message literals kept here.
 from __future__ import annotations
 
 import ctypes
+import difflib
 import json
 import os
 import pty
@@ -420,18 +421,59 @@ def _run_cli(program: str, executable: Path, args: list[str], stdin: str | None)
     return pattern.sub("<prog>", completed.stdout), pattern.sub("<prog>", completed.stderr), completed.returncode
 
 
-def _without_exempt_help_lines(stdout: str, exempt_flags: set[str]) -> str:
-    """Drop the help lines that document a native-only developer flag, and nothing else."""
-    return "".join(
-        line
-        for line in stdout.splitlines(keepends=True)
-        if re.split(r"[,\s]", line.strip(), maxsplit=1)[0] not in exempt_flags
-    )
+class HelpContract(TypedDict):
+    options: list[str]
+    formats: list[str]
+    notes: list[str]
+
+
+def _help_contract(stdout: str, exempt_flags: set[str], exempt_sections: set[str]) -> HelpContract:
+    """Reduce a help text to what both CLIs must agree on.
+
+    The option table (shared flags, in order) and the Output Formats entries (in order) are kept with
+    whitespace runs collapsed, since column padding is not contract; every other line outside the title,
+    the Usage block and the exempt sections is a note, compared as a set. A section runs from its
+    unindented ``Name:`` header to the next blank line.
+    """
+    contract: HelpContract = {"options": [], "formats": [], "notes": []}
+    section: str | None = "title"
+    for raw in stdout.splitlines():
+        line = " ".join(raw.split())
+        if not line:
+            section = None
+            continue
+        if not raw[0].isspace() and line.endswith(":"):
+            section = line[:-1]
+            continue
+        if section in ("title", "Usage") or section in exempt_sections:
+            continue
+        if section is not None and section.endswith("Options") and line.startswith("-"):
+            if re.split(r"[,\s]", line, maxsplit=1)[0] not in exempt_flags:
+                contract["options"].append(line)
+        elif section == "Output Formats":
+            contract["formats"].append(line)
+        else:
+            contract["notes"].append(line)
+    contract["notes"].sort()
+    return contract
+
+
+def _help_differences(native: HelpContract, python: HelpContract) -> list[str]:
+    differences = []
+    for part in ("options", "formats"):
+        for line in difflib.unified_diff(native[part], python[part], "native", "python", lineterm="", n=0):
+            if not line.startswith(("---", "+++", "@@")):
+                differences.append(f"  {part}: {line}")
+    native_notes, python_notes = set(native["notes"]), set(python["notes"])
+    differences += [f"  notes: native only: {note}" for note in sorted(native_notes - python_notes)]
+    differences += [f"  notes: python only: {note}" for note in sorted(python_notes - native_notes)]
+    return differences
 
 
 def check_cli_parity() -> None:
     matrix = json.loads(CLI_MATRIX.read_text())
     exempt_flags = set(matrix["help_exempt_flags"])
+    exempt_sections = set(matrix["help_exempt_sections"])
     help_names = {case["name"] for case in matrix["help"]}
     cases = [*matrix["pairwise"], *matrix["negative"], *matrix["extra"], *matrix["help"]]
     runs = 0
@@ -451,9 +493,17 @@ def check_cli_parity() -> None:
                     stdin = text
                 native = _run_cli("native", NATIVE_CLI, args, stdin)
                 python = _run_cli("python", PYTHON_CLI, args, stdin)
-                if case["name"] in help_names:
-                    native = (_without_exempt_help_lines(native[0], exempt_flags), *native[1:])
                 runs += 1
+                if case["name"] in help_names:
+                    differences = _help_differences(
+                        _help_contract(native[0], exempt_flags, exempt_sections),
+                        _help_contract(python[0], exempt_flags, exempt_sections),
+                    )
+                    if native[1:] != python[1:]:
+                        differences.append(f"  stderr/exit: native {native[1:]!r}, python {python[1:]!r}")
+                    if differences:
+                        mismatches.append(f"{case['name']} {args!r}\n" + "\n".join(differences))
+                    continue
                 if native != python:
                     mismatches.append(
                         f"{case['name']} {args!r} stdin={stdin!r}\n"

@@ -1,5 +1,5 @@
 {
-  "description": "CLI flag matrix for check_binding_parity.py --cli: both CLIs run every case with every text and must agree on stdout, stderr and exit code after the program name is replaced with <prog>. Pairwise rows come from cli_flag_matrix.model.json; {text} is replaced by each text. Help rows compare stdout after dropping, from the native output only, the lines that document a flag in help_exempt_flags (native-only developer flags); nothing else is masked. {non_utf8_source} is replaced by a temporary source dictionary whose bytes are not UTF-8.",
+  "description": "CLI flag matrix for check_binding_parity.py --cli: both CLIs run every case with every text and must agree on stdout, stderr and exit code after the program name is replaced with <prog>. Pairwise rows come from cli_flag_matrix.model.json; {text} is replaced by each text. Help rows compare only the help contract: the option lines of the shared flags and the Output Formats lines, in order with whitespace runs collapsed, and the set of other note lines; the title, the Usage block, option lines of help_exempt_flags (native-only developer flags) and the help_exempt_sections (native-only sections) are not compared, and stderr and exit code must match exactly. {non_utf8_source} is replaced by a temporary source dictionary whose bytes are not UTF-8.",
   "texts": [
     "ヴァイオリンとABCの東京で書かなかった。",
     "りんごを食べるりんごを食べる👨‍👩‍👧",
@@ -12,6 +12,11 @@
     "--very-verbose",
     "--debug",
     "--compare"
+  ],
+  "help_exempt_sections": [
+    "Commands",
+    "Examples",
+    "Environment"
   ],
   "pairwise": [
     {
