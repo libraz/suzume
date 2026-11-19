@@ -76,7 +76,7 @@ A red check on your pull request is not a reason to hold it back; the maintainer
 | `ci.yml` | `sanitizers` | the same events except pull requests to `develop` | the C++ tests under ASan, LSan and UBSan |
 | `ci.yml` | `native-nodebug` | the same events except pull requests to `develop` | the C++ tests with the debug features compiled out |
 | `ci.yml` | `score-parity` | the same events except pull requests to `develop`, after `build-and-test` and `native-nodebug` | that the debug build the tests exercise and the shipped build without debug features give every morpheme of the tokenization test inputs the same score |
-| `ci.yml` | `cmake-configurations` | the same events except pull requests to `develop` | each supported CMake build and install configuration |
+| `ci.yml` | `cmake-configurations` | the same events except pull requests to `develop` | each supported CMake build and install configuration, and the consumers `find_package` does not cover: C and C++ programs built through pkg-config against the static and shared packages, programs linked to the embedded-dictionary library and run with no data directory, and the `suzume.hpp` no-exceptions and removed-name checks |
 | `ci.yml` | `manylinux-toolchain` | pushes and pull requests to `main` | building and testing the wheel with the oldest supported toolchain |
 | `ci.yml` | `build-and-test` | the same events | the C++ tests with coverage, the examples and installed-package consumers, the WASM build, its size check and tests, and native/Python/WASM parity |
 | `ci.yml` | `python-binding` | pushes to `main` and pull requests to `main` | ruff, mypy and the tests of the Python binding, and the Python example |

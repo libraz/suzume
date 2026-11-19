@@ -141,19 +141,22 @@ jobs:
       - name: Compare debug and nodebug scores exactly
         run: scripts/score_parity.py compare scores-debug.tsv scores-nodebug.tsv
 
-  # Library-only, no-install and multi-config builds are supported shapes that
-  # no other job configures.
+  # Library-only, no-install and multi-config builds, and the consumer shapes
+  # find_package does not cover (pkg-config, the embedded library, the
+  # suzume.hpp no-exceptions contract), are supported shapes no other job builds.
   cmake-configurations:
     if: github.event_name != 'pull_request' || github.base_ref != 'develop'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - name: Install Ninja for the multi-config leg
+      - name: Install Ninja for the multi-config leg and pkg-config
         run: |
           sudo apt-get update
-          sudo apt-get install -y ninja-build
+          sudo apt-get install -y ninja-build pkg-config
       - name: Build and install each supported CMake configuration
         run: make cmake-smoke
+      - name: Build and run pkg-config, embedded and suzume.hpp consumers
+        run: make pkgconfig-smoke embedded-smoke hpp-contract-smoke
 
   # The published Linux wheel is compiled inside the manylinux image, whose GCC
   # is years older than the runner's. Without this job that compiler, and the

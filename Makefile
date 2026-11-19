@@ -4,7 +4,7 @@
 .PHONY: help build test native-test native-test-nodebug native-bench mcp-test oracle-sync-check guardrails asan clean clean-build rebuild format format-check lint configure \
         wasm wasm-configure wasm-dict wasm-test wasm-bench wasm-clean wasm-rebuild wasm-linux dict \
         python-build python-dict python-test python-wheel python-sync python-examples version-check binding-parity \
-        install uninstall examples examples-test embedded consumer-smoke cmake-smoke
+        install uninstall examples examples-test embedded consumer-smoke pkgconfig-smoke embedded-smoke hpp-contract-smoke cmake-smoke
 
 # Build directories
 BUILD_DIR := build
@@ -14,6 +14,7 @@ NODEBUG_BUILD_DIR := build-nodebug
 INSTALL_BUILD_DIR := build-install
 SHARED_BUILD_DIR := build-shared
 EMBEDDED_BUILD_DIR := build-embedded
+HPP_CONTRACT_BUILD_DIR := build-hpp-contract
 # Apple's ASan runtime aborts when leak detection is requested. Linux enables
 # LeakSanitizer in the same target; the CI sanitizer job is the authoritative
 # leak gate.
@@ -82,6 +83,9 @@ help:
 	@echo "  make examples     - Build the in-tree C and C++ examples"
 	@echo "  make embedded     - Build the embedded (no-filesystem, dict baked-in) static library"
 	@echo "  make consumer-smoke - Install to a temp prefix and build examples via find_package"
+	@echo "  make pkgconfig-smoke - Build and run the hello examples via pkg-config (static + shared)"
+	@echo "  make embedded-smoke - Link the hello examples to the embedded library, run without a data dir"
+	@echo "  make hpp-contract-smoke - Check suzume.hpp builds with -fno-exceptions and removed names fail"
 	@echo ""
 	@echo "Python binding targets:"
 	@echo "  make python-build - Build the shared C-ABI library (libsuzume)"
@@ -280,6 +284,46 @@ consumer-smoke:
 	$(call consumer-smoke-variant,static,)
 	$(call consumer-smoke-variant,shared,-DBUILD_SHARED=ON)
 	@echo "Static and shared consumer smoke tests passed."
+
+# pkg-config consumers of the packages consumer-smoke installed: C11, and C++17
+# without exceptions or RTTI, warnings as errors. The rpath lets the shared
+# variant run without a loader path.
+# $(1): package variant name, $(2): extra pkg-config flags.
+define pkgconfig-smoke-variant
+	$(CMAKE) -E remove_directory build-smoke-pkgconfig-$(1)
+	$(CMAKE) -E make_directory build-smoke-pkgconfig-$(1)
+	export PKG_CONFIG_PATH=$(CURDIR)/build-smoke-prefix-$(1)/lib/pkgconfig:$(CURDIR)/build-smoke-prefix-$(1)/lib64/pkgconfig && \
+	flags="$$(pkg-config $(2) --cflags --libs suzume) -Wl,-rpath,$$(pkg-config --variable=libdir suzume)" && \
+	$(CC) -std=c11 -Wall -Werror examples/hello.c $$flags -o build-smoke-pkgconfig-$(1)/hello_c && \
+	$(CXX) -std=c++17 -Wall -Werror -fno-exceptions -fno-rtti examples/hello.cpp $$flags \
+		-o build-smoke-pkgconfig-$(1)/hello_cpp
+	build-smoke-pkgconfig-$(1)/hello_c
+	build-smoke-pkgconfig-$(1)/hello_cpp
+endef
+
+pkgconfig-smoke: consumer-smoke
+	$(call pkgconfig-smoke-variant,static,--static)
+	$(call pkgconfig-smoke-variant,shared,)
+	@echo "Static and shared pkg-config consumer smoke tests passed."
+
+# Consumers linked to the embedded static library, run from an empty directory
+# with SUZUME_DATA_DIR unset so nothing can come from a data directory.
+embedded-smoke: embedded
+	$(CMAKE) -E remove_directory build-smoke-embedded-run
+	$(CMAKE) -E make_directory build-smoke-embedded-run/empty
+	$(CC) -std=c11 -Wall -Werror -Iinclude -c examples/hello.c -o build-smoke-embedded-run/hello_c.o
+	$(CXX) build-smoke-embedded-run/hello_c.o $(EMBEDDED_BUILD_DIR)/lib/libsuzume.a -o build-smoke-embedded-run/hello_c
+	$(CXX) -std=c++17 -Wall -Werror -fno-exceptions -fno-rtti -Iinclude examples/hello.cpp \
+		$(EMBEDDED_BUILD_DIR)/lib/libsuzume.a -o build-smoke-embedded-run/hello_cpp
+	cd build-smoke-embedded-run/empty && env -u SUZUME_DATA_DIR ../hello_c && env -u SUZUME_DATA_DIR ../hello_cpp
+	@echo "Embedded consumer smoke tests passed."
+
+# suzume.hpp contract (tests/CMakeLists.txt): the control source builds with
+# -fno-exceptions and each removed name fails to compile. The targets are
+# EXCLUDE_FROM_ALL and no other gate builds them, so they get their own tree.
+hpp-contract-smoke:
+	$(CMAKE) -B $(HPP_CONTRACT_BUILD_DIR) -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON $(CMAKE_OPTIONS)
+	ctest --test-dir $(HPP_CONTRACT_BUILD_DIR) --output-on-failure -R '^suzume_hpp_removed_'
 
 # Reproducible build/install matrix covering library-only, no-install, and
 # multi-config dictionary builds without touching the shared build directories.
