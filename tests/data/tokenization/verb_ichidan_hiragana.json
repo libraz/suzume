@@ -750,6 +750,119 @@
       ],
       "id": "wotakushiageru",
       "input": "裾をたくしあげる"
+    },
+    {
+      "description": "雨にぬれた - regression test",
+      "expected": [
+        {
+          "lemma": "雨",
+          "pos": "Noun",
+          "surface": "雨"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "ぬれる",
+          "pos": "Verb",
+          "surface": "ぬれ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ninureta",
+      "input": "雨にぬれた"
+    },
+    {
+      "description": "服がぬれた - regression test",
+      "expected": [
+        {
+          "lemma": "服",
+          "pos": "Noun",
+          "surface": "服"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "ぬれる",
+          "pos": "Verb",
+          "surface": "ぬれ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ganureta",
+      "input": "服がぬれた"
+    },
+    {
+      "description": "ぬれている - regression test",
+      "expected": [
+        {
+          "lemma": "ぬれる",
+          "pos": "Verb",
+          "surface": "ぬれ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Auxiliary",
+          "surface": "いる"
+        }
+      ],
+      "id": "nureteiru",
+      "input": "ぬれている"
+    },
+    {
+      "description": "雨にぬれて帰った - regression test",
+      "expected": [
+        {
+          "lemma": "雨",
+          "pos": "Noun",
+          "surface": "雨"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "ぬれる",
+          "pos": "Verb",
+          "surface": "ぬれ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "帰る",
+          "pos": "Verb",
+          "surface": "帰っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ninurete_ttta",
+      "input": "雨にぬれて帰った"
     }
   ],
   "description": "verb_ichidan_hiragana tests",
