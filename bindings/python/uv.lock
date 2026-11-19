@@ -387,7 +387,7 @@ wheels = [
 
 [[package]]
 name = "suzume"
-version = "0.9.15"
+version = "0.10.0"
 source = { editable = "." }
 
 [package.optional-dependencies]
