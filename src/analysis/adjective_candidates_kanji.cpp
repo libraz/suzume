@@ -42,6 +42,10 @@ namespace {
 
 /// Base form the inflection analyzer reports for every cell of the negative
 /// predicate (ない/なく/なかっ/なけれ).
+bool isPlainSuffixEntry(const dictionary::DictionaryEntry& entry) {
+  return entry.extended_pos == core::ExtendedPOS::Suffix;
+}
+
 constexpr const char* kNegativeAdjectiveBase = "ない";
 
 /// Stem of the derivational suffix that builds an i-adjective from a nominal
@@ -464,6 +468,14 @@ void generateAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t
                                    verb_helpers::GuardOrigin::KanjiAdjective) &&
         verb_helpers::startsWithFocusParticleHead(dict_manager, codepoints, kanji_end, end_pos)) {
       SUZUME_DEBUG_LOG_VERBOSE("[ADJ_SKIP] \"" << surface << "\" hiragana head is a focus particle\n");
+      continue;
+    }
+
+    // A multi-mora nominal suffix opening the okurigana closes the noun the
+    // kanji spell (友達+さん+はい), so the kana after it are a new word.
+    if (!surface_listed && hasDictionaryEntryFrom(dict_manager, codepoints, kanji_end, 2, end_pos - kanji_end,
+                                                  core::PartOfSpeech::Suffix, isPlainSuffixEntry)) {
+      SUZUME_DEBUG_LOG_VERBOSE("[ADJ_SKIP] \"" << surface << "\" hiragana head is a nominal suffix\n");
       continue;
     }
 
