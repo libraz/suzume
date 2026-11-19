@@ -382,7 +382,7 @@ describe('JS API: error reporting', () => {
       mode: 'split',
       lemmatize: true,
       mergeCompounds: false,
-      skipUserDictionary: true,
+      skipBundledUserDictionary: true,
       skipCoreDictionary: true,
       skipEnvConfig: true,
       scorerOptions: { unary: { noun_prior: 0.25 } },
@@ -410,13 +410,13 @@ describe('JS API: error reporting', () => {
   });
 
   it('lemmatize and mergeCompounds change analysis output', async () => {
-    const lemmatized = await Suzume.create({ lemmatize: true, skipUserDictionary: true });
-    const sourceLemma = await Suzume.create({ lemmatize: false, skipUserDictionary: true });
+    const lemmatized = await Suzume.create({ lemmatize: true, skipBundledUserDictionary: true });
+    const sourceLemma = await Suzume.create({ lemmatize: false, skipBundledUserDictionary: true });
     const separate = await Suzume.create({
       mergeCompounds: false,
-      skipUserDictionary: true,
+      skipBundledUserDictionary: true,
     });
-    const merged = await Suzume.create({ mergeCompounds: true, skipUserDictionary: true });
+    const merged = await Suzume.create({ mergeCompounds: true, skipBundledUserDictionary: true });
 
     try {
       expect(lemmatized.analyze('歩きます')[0]).toMatchObject({
@@ -462,7 +462,7 @@ describe('JS API: error reporting', () => {
     const packageVersion = await version();
     const suzume = await Suzume.create();
     suzume.destroy();
-    expect(suzume.version).toBe(packageVersion);
+    expect(packageVersion).toMatch(/^\d+\.\d+\.\d+$/);
   });
 
   it('shares one runtime across ten handles and supports isolated opt-out', async () => {
@@ -503,7 +503,7 @@ describe('JS API: error reporting', () => {
 
   it('applies scorer configuration to analysis', async () => {
     const suzume = await Suzume.create({
-      skipUserDictionary: true,
+      skipBundledUserDictionary: true,
       skipCoreDictionary: true,
       scorerOptions: { inflection: { confidence_ceiling: 0 } },
     });
@@ -543,10 +543,9 @@ describe('JS API: error reporting', () => {
     }
   });
 
-  it('exposes version, warnings, and memory size', async () => {
+  it('exposes warnings and memory size', async () => {
     const suzume = await Suzume.create();
     try {
-      expect(suzume.version).toMatch(/^\d+\.\d+\.\d+$/);
       expect(suzume.dictionaryWarnings).toEqual([]);
       expect(suzume.wasmMemoryBytes()).toBeGreaterThan(0);
     } finally {
@@ -582,28 +581,6 @@ describe('JS API: error reporting', () => {
     }
   });
 
-  it('generateTags accepts posFilter and keeps pos as an alias', async () => {
-    const suzume = await Suzume.create();
-
-    try {
-      const text = '東京でりんごを食べる';
-      const canonical = suzume.generateTags(text, { posFilter: ['noun'], minLength: 1 });
-      const alias = suzume.generateTags(text, { pos: ['noun'], minLength: 1 });
-      const canonicalWins = suzume.generateTags(text, {
-        posFilter: ['noun'],
-        pos: ['verb'],
-        minLength: 1,
-      });
-
-      expect(canonical).toEqual(alias);
-      expect(canonical).toEqual(canonicalWins);
-      expect(canonical.length).toBeGreaterThan(0);
-      expect(canonical.every((tag) => tag.pos === 'NOUN')).toBe(true);
-    } finally {
-      suzume.destroy();
-    }
-  });
-
   it('generateTags applies every public filtering option', async () => {
     const suzume = await Suzume.create();
     const text = 'りんごが歩きます。読むこと。それ。りんご';
@@ -626,48 +603,21 @@ describe('JS API: error reporting', () => {
       expect(all).toContain('歩く');
       expect(all.filter((tag) => tag === 'りんご')).toHaveLength(1);
 
-      expect(texts({ ...inclusive, useLemma: false })).toContain('歩き');
-      expect(texts({ ...inclusive, useLemma: false })).not.toContain('歩く');
+      expect(texts({ ...inclusive, useBaseForm: false })).toContain('歩き');
+      expect(texts({ ...inclusive, useBaseForm: false })).not.toContain('歩く');
       expect(texts({ ...inclusive, minLength: 2 })).not.toContain('が');
       expect(texts({ ...inclusive, maxTags: 2 })).toHaveLength(2);
       expect(
         texts({ ...inclusive, removeDuplicates: false }).filter((tag) => tag === 'りんご'),
       ).toHaveLength(2);
-      expect(texts({ ...inclusive, posFilter: ['noun'] })).not.toContain('歩く');
-      expect(texts({ ...inclusive, posFilter: ['particle'] })).toEqual(['が']);
-      expect(texts({ ...inclusive, posFilter: ['auxiliary'] })).toEqual(['ます']);
+      expect(texts({ ...inclusive, posFilter: ['NOUN'] })).not.toContain('歩く');
+      expect(texts({ ...inclusive, posFilter: ['PARTICLE'] })).toEqual(['が']);
+      expect(texts({ ...inclusive, posFilter: ['AUX'] })).toEqual(['ます']);
       expect(texts({ ...inclusive, excludeBasic: true })).not.toContain('りんご');
       expect(texts({ ...inclusive, excludeParticles: true })).not.toContain('が');
       expect(texts({ ...inclusive, excludeAuxiliaries: true })).not.toContain('ます');
       expect(texts({ ...inclusive, excludeFormalNouns: true })).not.toContain('こと');
       expect(texts({ ...inclusive, excludeLowInfo: true })).not.toContain('それ');
-    } finally {
-      suzume.destroy();
-    }
-  });
-
-  it('generateTags treats an empty posFilter as all content words', async () => {
-    const suzume = await Suzume.create();
-
-    try {
-      const text = '東京でりんごを食べる';
-      expect(suzume.generateTags(text, { posFilter: [] })).toEqual(suzume.generateTags(text));
-    } finally {
-      suzume.destroy();
-    }
-  });
-
-  it('generateTags rejects an unknown POS filter name', async () => {
-    const suzume = await Suzume.create();
-
-    try {
-      expect(() =>
-        suzume.generateTags('東京', {
-          posFilter: ['bogus'] as never,
-        }),
-      ).toThrow(
-        'unknown POS filter name: "bogus" (expected one of adjective, adverb, auxiliary, noun, particle, verb)',
-      );
     } finally {
       suzume.destroy();
     }
@@ -679,8 +629,11 @@ describe('JS API: error reporting', () => {
       const suzume = await Suzume.create();
 
       try {
-        expect(() => suzume.generateTags('東京', { posFilter: [name] as never })).toThrow(
-          `unknown POS filter name: ${JSON.stringify(name)}`,
+        await expectSuzumeError(
+          () => suzume.generateTags('東京', { posFilter: [name] as never }),
+          ErrorCode.InvalidInput,
+          'generate_tags',
+          `invalid pos_filter: ${JSON.stringify(name)} (expected one of: NOUN, VERB, ADJ, ADV, PARTICLE, AUX)`,
         );
       } finally {
         suzume.destroy();

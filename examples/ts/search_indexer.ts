@@ -26,9 +26,9 @@ const index = new Map<string, Set<number>>();
 
 for (const doc of docs) {
   const tags = suzume.generateTags(doc.text, {
-    posFilter: ['noun', 'verb'],
+    posFilter: ['NOUN', 'VERB'],
     excludeBasic: true,
-    useLemma: true,
+    useBaseForm: true,
     minLength: 2,
   });
   if (tags.length === 0) {
@@ -51,8 +51,8 @@ for (const [tag, docIds] of index) {
 // Search
 function search(query: string): number[] {
   const queryTags = suzume.generateTags(query, {
-    posFilter: ['noun', 'verb'],
-    useLemma: true,
+    posFilter: ['NOUN', 'VERB'],
+    useBaseForm: true,
   });
 
   const scores = new Map<number, number>();

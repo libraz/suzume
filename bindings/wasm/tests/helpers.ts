@@ -3,7 +3,7 @@ import { type ErrorCode, SuzumeError } from '../dist/index.js';
 import createModule from '../dist/suzume.js';
 import { C_LAYOUTS } from '../js/abi_layout.js';
 import { decodeAnalysisResult, decodeTags } from '../js/decode.js';
-import type { Morpheme as ParsedMorpheme, Tag as ParsedTag } from '../js/index.js';
+import type { Morpheme as ParsedMorpheme, Tag as ParsedTag, PosLabel } from '../js/index.js';
 
 export interface WasmModule {
   cwrap: (
@@ -126,7 +126,7 @@ export function parseMorphemes(module: WasmModule, resultPtr: number): ParsedMor
     (code) => optionalLabel(module, 'suzume_conjugation_type_label', code),
     (code) => optionalLabel(module, 'suzume_conjugation_form_label', code),
     (code) => nativeLabel(module, 'suzume_extended_pos_label', code),
-    (code) => nativeLabel(module, 'suzume_pos_label', code),
+    (code) => nativeLabel(module, 'suzume_pos_label', code) as PosLabel,
     (code) => nativeLabel(module, 'suzume_pos_label_ja', code),
   ).morphemes;
 }
@@ -170,7 +170,11 @@ export async function expectSuzumeError(
 }
 
 export function parseTags(module: WasmModule, tagsPtr: number): ParsedTag[] {
-  return decodeTags(module, tagsPtr, (code) => nativeLabel(module, 'suzume_pos_label', code));
+  return decodeTags(
+    module,
+    tagsPtr,
+    (code) => nativeLabel(module, 'suzume_pos_label', code) as PosLabel,
+  );
 }
 
 export function getTagCount(module: WasmModule, tagsPtr: number): number {

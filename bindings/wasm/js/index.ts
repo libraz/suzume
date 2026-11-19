@@ -3,11 +3,11 @@
  *
  * @example
  * ```typescript
- * import { Suzume } from 'suzume';
+ * import { Suzume } from '@libraz/suzume';
  *
  * const suzume = await Suzume.create();
- * const result = suzume.analyze('すもももももももものうち');
- * console.log(result);
+ * const morphemes = suzume.analyze('すもももももももものうち');
+ * console.log(morphemes);
  * ```
  */
 
@@ -152,37 +152,48 @@ async function instantiateModule(
   }
 }
 
+/** Analysis mode: `normal`, `search` (finer split for indexing) or `split`. */
+export type AnalysisMode = 'normal' | 'search' | 'split';
+
 /**
- * Options for creating a Suzume instance
+ * Options for creating a Suzume instance. Unknown keys are ignored at runtime;
+ * TypeScript rejects them at compile time.
  */
 export interface SuzumeOptions {
-  /** Create an isolated WASM runtime instead of sharing the cached module, default: false */
-  freshWasmModule?: boolean;
   /** Preserve ヴ (don't normalize to ビ etc.), default: true */
   preserveVu?: boolean;
   /** Preserve case (don't lowercase ASCII), default: true */
   preserveCase?: boolean;
-  /** Preserve symbols/emoji in output, default: false */
+  /** Keep punctuation-like SYMBOL tokens; emoji and content symbols stay OTHER either way. Default: false */
   preserveSymbols?: boolean;
   /** Analysis mode, default: normal */
-  mode?: 'normal' | 'search' | 'split';
-  /** Retain corrected lemmas; conjugation/POS annotations are always computed. Default: true */
+  mode?: AnalysisMode;
+  /** Correct base forms after analysis; conjugation and POS annotations are always computed. Default: true */
   lemmatize?: boolean;
   /** Merge consecutive noun compounds, default: false */
   mergeCompounds?: boolean;
   /** Skip automatic loading of the bundled user dictionary, default: false */
-  skipUserDictionary?: boolean;
+  skipBundledUserDictionary?: boolean;
   /** Skip automatic loading of the bundled core dictionary, default: false */
   skipCoreDictionary?: boolean;
-  /** Ignore native scorer configuration environment variables, default: false */
+  /**
+   * Ignore native scorer configuration environment variables, default: false.
+   * The WebAssembly build reads no environment, so this has no effect here.
+   */
   skipEnvConfig?: boolean;
   /** Add scorer configuration diagnostics to dictionaryWarnings, default: false */
   reportScorerConfig?: boolean;
-  /** Final-priority scorer override JSON, or an object serialized to JSON */
-  scorerOptions?: string | Record<string, unknown>;
+  /** Final-priority scorer override JSON, or an object serialized to JSON; null means none */
+  scorerOptions?: string | Record<string, unknown> | null;
 }
 
-type AnalysisMode = NonNullable<SuzumeOptions['mode']>;
+/** How the WebAssembly runtime is located and shared; accepted by `Suzume.create` and `version`. */
+export interface RuntimeOptions {
+  /** URL or path of `suzume.wasm`, for bundlers that move it */
+  wasmPath?: string;
+  /** Create an isolated WASM runtime instead of sharing the cached module, default: false */
+  freshWasmModule?: boolean;
+}
 
 const ANALYSIS_MODE_CODES: Readonly<Record<AnalysisMode, number>> = {
   normal: 0,
@@ -206,7 +217,7 @@ const EXTENDED_OPTION_DEFAULTS = {
   mode: 'normal',
   lemmatize: true,
   mergeCompounds: false,
-  skipUserDictionary: false,
+  skipBundledUserDictionary: false,
   skipCoreDictionary: false,
   skipEnvConfig: false,
   reportScorerConfig: false,
@@ -300,89 +311,103 @@ const EXTENDED_BOOL_FIELDS = [
   'preserveSymbols',
   'lemmatize',
   'mergeCompounds',
-  'skipUserDictionary',
+  'skipBundledUserDictionary',
   'skipCoreDictionary',
   'skipEnvConfig',
   'reportScorerConfig',
 ] as const;
+
+/** A part-of-speech label as {@link Morpheme.pos} and {@link Tag.pos} print it. */
+export type PosLabel =
+  | 'NOUN'
+  | 'PRON'
+  | 'VERB'
+  | 'ADJ'
+  | 'ADV'
+  | 'PARTICLE'
+  | 'AUX'
+  | 'CONJ'
+  | 'DET'
+  | 'PREFIX'
+  | 'SUFFIX'
+  | 'INTJ'
+  | 'SYMBOL'
+  | 'OTHER';
 
 /**
  * Morpheme - A single token produced by analysis
  */
 export interface Morpheme {
   /** Surface form (as it appears in the text) */
-  surface: string;
-  /** Part of speech (English) */
-  pos: string;
-  /** Base/dictionary form */
-  baseForm: string;
+  readonly surface: string;
+  /** Part of speech (English label) */
+  readonly pos: PosLabel;
+  /** Base (dictionary) form */
+  readonly baseForm: string;
   /** Part of speech (Japanese) */
-  posJa: string;
+  readonly posJa: string;
   /** Conjugation type (Japanese, e.g., "一段", "五段・カ行") - null for non-conjugating words */
-  conjType: string | null;
+  readonly conjType: string | null;
   /** Conjugation form (Japanese, e.g., "連用形", "終止形") - null for non-conjugating words */
-  conjForm: string | null;
+  readonly conjForm: string | null;
   /** Stable extended POS code (e.g., "VERB_連用", "AUX_過去") */
-  extendedPos: string;
+  readonly extendedPos: string;
   /** Start Unicode code-point offset in normalized text */
-  start: number;
+  readonly start: number;
   /** End Unicode code-point offset in normalized text */
-  end: number;
+  readonly end: number;
   /** Start JavaScript UTF-16 offset, suitable for normalizedText.slice() */
-  startUtf16: number;
+  readonly startUtf16: number;
   /** End JavaScript UTF-16 offset, suitable for normalizedText.slice() */
-  endUtf16: number;
+  readonly endUtf16: number;
   /** True if matched from a user dictionary */
-  isUserDict: boolean;
+  readonly isUserDict: boolean;
   /** True if the morpheme is a formal noun */
-  isFormalNoun: boolean;
+  readonly isFormalNoun: boolean;
   /** True if the morpheme is low information for tag generation */
-  isLowInfo: boolean;
+  readonly isLowInfo: boolean;
   /** True if generated as an unknown word */
-  isUnknown: boolean;
+  readonly isUnknown: boolean;
   /** True if matched from any dictionary */
-  isFromDictionary: boolean;
+  readonly isFromDictionary: boolean;
   /** Candidate score/cost */
-  score: number;
+  readonly score: number;
 }
 
 /** Normalized input together with its morphemes. */
 export interface AnalysisResult {
-  normalizedText: string;
-  morphemes: Morpheme[];
+  readonly normalizedText: string;
+  readonly morphemes: readonly Morpheme[];
 }
 
 /**
  * Tag entry with POS information
  */
 export interface Tag {
-  /** Tag text (surface or lemma) */
-  tag: string;
-  /** Part of speech (English) */
-  pos: string;
+  /** Tag text (surface or base form) */
+  readonly tag: string;
+  /** Part of speech (English label) */
+  readonly pos: PosLabel;
 }
+
+/** A part of speech `posFilter` can select: the labels {@link Tag.pos} prints, case-sensitive. */
+export type TagPosLabel = 'NOUN' | 'VERB' | 'ADJ' | 'ADV' | 'PARTICLE' | 'AUX';
 
 /**
  * Options for tag generation
  */
-export type TagPosFilterName = 'noun' | 'verb' | 'adjective' | 'adverb' | 'particle' | 'auxiliary';
-
 export interface TagOptions {
   /**
-   * POS categories to include. An empty array includes all filterable POS,
-   * matching the native `pos_filter = 0` default.
+   * Parts of speech to keep: one label or an array of labels. `NOUN` also
+   * keeps pronouns (`PRON`). Naming `PARTICLE` or `AUX` keeps those tags
+   * although `excludeParticles` and `excludeAuxiliaries` default to true.
+   * Absent, null or an empty array keeps every part of speech.
    */
-  posFilter?: readonly TagPosFilterName[];
-  /**
-   * Deprecated alias for `posFilter`. When both are present, `posFilter` wins.
-   *
-   * @deprecated Use `posFilter` instead.
-   */
-  pos?: readonly TagPosFilterName[];
-  /** Exclude basic/common words with hiragana-only lemma (default: false) */
+  posFilter?: TagPosLabel | readonly TagPosLabel[] | null;
+  /** Exclude basic/common words whose base form is hiragana only (default: false) */
   excludeBasic?: boolean;
-  /** Use lemma instead of surface form (default: true) */
-  useLemma?: boolean;
+  /** Use the base form instead of the surface form (default: true) */
+  useBaseForm?: boolean;
   /** Minimum tag length in characters (default: 2) */
   minLength?: number;
   /** Maximum number of tags, 0 for unlimited (default: 0) */
@@ -403,7 +428,7 @@ export interface TagOptions {
 const TAG_OPTION_DEFAULTS = {
   posFilter: 0,
   excludeBasic: false,
-  useLemma: true,
+  useBaseForm: true,
   minLength: 2,
   maxTags: 0,
   excludeParticles: true,
@@ -415,7 +440,7 @@ const TAG_OPTION_DEFAULTS = {
 
 const TAG_BOOL_FIELDS = [
   'excludeBasic',
-  'useLemma',
+  'useBaseForm',
   'excludeParticles',
   'excludeAuxiliaries',
   'excludeFormalNouns',
@@ -423,24 +448,15 @@ const TAG_BOOL_FIELDS = [
   'removeDuplicates',
 ] as const;
 
-const TAG_POS_FILTER_BITS: Readonly<Record<string, number>> = {
-  noun: 1,
-  verb: 2,
-  adjective: 4,
-  adverb: 8,
-  particle: 16,
-  auxiliary: 32,
+// Each name's native SUZUME_TAG_POS_* bit.
+const TAG_POS_FILTER_BITS: Readonly<Record<TagPosLabel, number>> = {
+  NOUN: 1,
+  VERB: 2,
+  ADJ: 4,
+  ADV: 8,
+  PARTICLE: 16,
+  AUX: 32,
 };
-
-// Byte offsets keyed by this binding's option names where they differ from the C field names.
-const OPTIONS_FIELD_OFFSETS = {
-  ...C_LAYOUTS.options,
-  skipUserDictionary: C_LAYOUTS.options.skipBundledUserDictionary,
-} as const;
-const TAG_OPTIONS_FIELD_OFFSETS = {
-  ...C_LAYOUTS.tagOptions,
-  useLemma: C_LAYOUTS.tagOptions.useBaseForm,
-} as const;
 
 /** Write each (already validated) boolean field as one heap byte, falling back to its default when unset. */
 function writeBoolFields<Field extends string>(
@@ -503,21 +519,23 @@ async function loadModule(
   }
 }
 
-function resolveTagPosFilter(options: TagOptions): number {
-  const selectedPos = options.posFilter !== undefined ? options.posFilter : options.pos;
+/** The native bitmask for a label or an array of labels; absent or null selects every POS. */
+function tagPosFilter(value: unknown): number {
+  if (value === undefined || value === null) {
+    return 0;
+  }
+  const names: readonly unknown[] = Array.isArray(value) ? value : [value];
   let filter = 0;
-
-  for (const pos of selectedPos ?? []) {
-    const bit = ownEntry(TAG_POS_FILTER_BITS, pos);
+  for (const name of names) {
+    const bit = typeof name === 'string' ? ownEntry(TAG_POS_FILTER_BITS, name) : undefined;
     if (bit === undefined) {
-      throw new Error(
-        `unknown POS filter name: ${JSON.stringify(pos)} ` +
-          `(expected one of ${Object.keys(TAG_POS_FILTER_BITS).sort().join(', ')})`,
+      throw invalidInput(
+        'generate_tags',
+        `invalid pos_filter: ${renderValue(name)} (expected one of: ${Object.keys(TAG_POS_FILTER_BITS).join(', ')})`,
       );
     }
     filter |= bit;
   }
-
   return filter;
 }
 
@@ -576,6 +594,10 @@ function allocUtf8(
 /**
  * Suzume instance for Japanese tokenization.
  *
+ * Every call on an instance is synchronous and runs to completion, so one
+ * instance can be shared freely within a JavaScript thread. A worker needs its
+ * own instance, since a WebAssembly module belongs to the thread that loaded it.
+ *
  * Error contract note: under the WebAssembly build, a memory-allocation failure
  * aborts the module rather than returning NULL, so the C++ allocation-failure
  * path (which maps to a NULL return and a thrown Error on native/Python) is
@@ -608,7 +630,7 @@ export class Suzume {
    *   loads), Internal when the WASM module fails to load, or the native code
    *   and text when the library rejects the configuration
    */
-  static async create(options?: SuzumeOptions & { wasmPath?: string }): Promise<Suzume> {
+  static async create(options?: SuzumeOptions & RuntimeOptions): Promise<Suzume> {
     const modeValue = options?.mode === undefined ? EXTENDED_OPTION_DEFAULTS.mode : options.mode;
     const mode = modeCode('create', modeValue);
     for (const field of EXTENDED_BOOL_FIELDS) {
@@ -628,7 +650,7 @@ export class Suzume {
         scorerJson !== null)
     ) {
       // Create with options
-      const layout = OPTIONS_FIELD_OFFSETS;
+      const layout = C_LAYOUTS.options;
       const OPTIONS_SIZE = layout.size;
       const optionsPtr = module._malloc(OPTIONS_SIZE);
       let scorerOptionsPtr = 0;
@@ -677,11 +699,11 @@ export class Suzume {
    * Analyze Japanese text into morphemes
    *
    * @param text - Japanese text
-   * @returns Array of morphemes
+   * @returns The morphemes, in text order
    * @throws {SuzumeError} InvalidInput for a non-string or an unpaired surrogate,
    *   or after {@link destroy}
    */
-  analyze(text: string): Morpheme[] {
+  analyze(text: string): readonly Morpheme[] {
     return this.analyzeWithNormalizedText(text).morphemes;
   }
 
@@ -736,18 +758,18 @@ export class Suzume {
    *
    * @param text - Japanese text
    * @param options - Optional tag generation options; unknown keys are ignored
-   * @returns Array of tag entries with POS information
+   * @returns The tags with their POS labels
    * @throws {SuzumeError} InvalidInput for an invalid text or option, or after
    *   {@link destroy}
    */
-  generateTags(text: string, options?: TagOptions): Tag[] {
+  generateTags(text: string, options?: TagOptions): readonly Tag[] {
     this.ensureAlive('generate_tags');
 
     let posFilter = 0;
     let minLength: number = TAG_OPTION_DEFAULTS.minLength;
     let maxTags: number = TAG_OPTION_DEFAULTS.maxTags;
     if (options) {
-      posFilter = resolveTagPosFilter(options);
+      posFilter = tagPosFilter(options.posFilter);
       if (options.minLength !== undefined) {
         minLength = sizeOption('generate_tags', 'minLength', options.minLength);
       }
@@ -770,7 +792,7 @@ export class Suzume {
 
           const heapU32 = this.module.HEAPU32;
           const heapU8 = heapBytes(this.module);
-          const layout = TAG_OPTIONS_FIELD_OFFSETS;
+          const layout = C_LAYOUTS.tagOptions;
 
           heapU8[optionsPtr + layout.posFilter] = posFilter & 0xff;
           heapU32[(optionsPtr + layout.minLength) >> 2] = minLength;
@@ -873,13 +895,6 @@ export class Suzume {
   }
 
   /**
-   * Get Suzume version string
-   */
-  get version(): string {
-    return readVersion(this.module);
-  }
-
-  /**
    * Current WebAssembly linear-memory size in bytes.
    *
    * @throws {SuzumeError} after {@link destroy}
@@ -894,7 +909,7 @@ export class Suzume {
    *
    * @throws {SuzumeError} after {@link destroy}
    */
-  get dictionaryWarnings(): string[] {
+  get dictionaryWarnings(): readonly string[] {
     this.ensureAlive('dictionary_warnings');
     const count = this.module._suzume_dictionary_warning_count(this.handle);
     const warnings: string[] = [];
@@ -956,7 +971,7 @@ export class Suzume {
     }
   }
 
-  private consumeTags(tagsPtr: number): Tag[] {
+  private consumeTags(tagsPtr: number): readonly Tag[] {
     if (tagsPtr === 0) {
       throw nativeError(this.module, 'generate_tags');
     }
@@ -980,8 +995,14 @@ export class Suzume {
     );
   }
 
-  private posLabel(code: number): string {
-    return this.cachedLabel(this._posLabels, this.module._suzume_pos_label, code, 'OTHER');
+  private posLabel(code: number): PosLabel {
+    // The native table holds exactly the PosLabel members, and 'OTHER' for any other code.
+    return this.cachedLabel(
+      this._posLabels,
+      this.module._suzume_pos_label,
+      code,
+      'OTHER',
+    ) as PosLabel;
   }
 
   private posJapaneseLabel(code: number): string {
@@ -1037,18 +1058,12 @@ export class Suzume {
   }
 }
 
-// Default export
-export default Suzume;
-
 /**
  * Return the package version without creating an analyzer handle.
  *
  * @throws {SuzumeError} Internal when the WASM module fails to load
  */
-export async function version(options?: {
-  wasmPath?: string;
-  freshWasmModule?: boolean;
-}): Promise<string> {
+export async function version(options?: RuntimeOptions): Promise<string> {
   const module = await loadModule('version', options?.wasmPath, options?.freshWasmModule === true);
   return readVersion(module);
 }

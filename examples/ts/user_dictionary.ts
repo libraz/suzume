@@ -18,7 +18,7 @@ for (const m of suzume.analyze(text)) {
   console.log(`  ${m.surface} [${m.pos}]`);
 }
 
-// TSV: surface<TAB>POS[<TAB>conj_type][<TAB>lemma]
+// TSV: surface<TAB>POS[<TAB>conj_type][<TAB>base_form]
 const dictData = '青空りんご園\tNOUN\n';
 const loaded = suzume.loadUserDictionary(dictData);
 if (!loaded) {
@@ -32,8 +32,8 @@ if (!withDictionary.some((m) => m.isUserDict)) {
   throw new Error('loaded user dictionary entry was not used');
 }
 for (const m of withDictionary) {
-  const lemma = m.baseForm !== m.surface ? ` (lemma: ${m.baseForm})` : '';
-  console.log(`  ${m.surface} [${m.pos}]${lemma}`);
+  const baseForm = m.baseForm !== m.surface ? ` (base form: ${m.baseForm})` : '';
+  console.log(`  ${m.surface} [${m.pos}]${baseForm}`);
 }
 
 // Binary dictionary: load pre-compiled .dic file

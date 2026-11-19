@@ -24,7 +24,7 @@ for (const t of tags) {
 
 // Nouns only, exclude basic words
 const nounTags = suzume.generateTags(text, {
-  posFilter: ['noun'],
+  posFilter: 'NOUN',
   excludeBasic: true,
 });
 if (nounTags.length === 0) {
@@ -35,12 +35,12 @@ for (const t of nounTags) {
   console.log(`  ${t.tag}`);
 }
 
-// Verbs and adjectives with lemma
+// Verbs and adjectives by base form
 const verbAdjTags = suzume.generateTags(text, {
-  posFilter: ['verb', 'adjective'],
-  useLemma: true,
+  posFilter: ['VERB', 'ADJ'],
+  useBaseForm: true,
 });
-console.log('\nVerb/Adjective tags (lemma):');
+console.log('\nVerb/Adjective tags (base form):');
 for (const t of verbAdjTags) {
   console.log(`  ${t.tag} (${t.pos})`);
 }

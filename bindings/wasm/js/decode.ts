@@ -1,6 +1,6 @@
 import { MORPHEME_FLAG } from './abi_labels.js';
 import { C_LAYOUTS } from './abi_layout.js';
-import type { AnalysisResult, Morpheme, Tag } from './index.js';
+import type { AnalysisResult, Morpheme, PosLabel, Tag } from './index.js';
 
 export interface DecodeMemory {
   UTF8ToString: (ptr: number) => string;
@@ -18,19 +18,19 @@ export function heapBytes(module: Pick<DecodeMemory, 'HEAPU32'>): Uint8Array {
   return new Uint8Array(module.HEAPU32.buffer);
 }
 
-export type ConjugationTypeLabel = (code: number) => string | null;
-export type ConjugationFormLabel = (code: number) => string | null;
-export type ExtendedPosLabel = (code: number) => string;
-export type PosLabel = (code: number) => string;
+/** Maps a native code to its label; `null` means the morpheme has none. */
+export type OptionalLabelLookup = (code: number) => string | null;
+export type LabelLookup = (code: number) => string;
+export type PosLabelLookup = (code: number) => PosLabel;
 
 export function decodeAnalysisResult(
   module: DecodeMemory,
   resultPtr: number,
-  conjugationTypeLabel: ConjugationTypeLabel,
-  conjugationFormLabel: ConjugationFormLabel,
-  extendedPosLabel: ExtendedPosLabel,
-  posLabel: PosLabel,
-  posJapaneseLabel: PosLabel,
+  conjugationTypeLabel: OptionalLabelLookup,
+  conjugationFormLabel: OptionalLabelLookup,
+  extendedPosLabel: LabelLookup,
+  posLabel: PosLabelLookup,
+  posJapaneseLabel: LabelLookup,
 ): AnalysisResult {
   const heapU32 = module.HEAPU32;
   const heapU8 = heapBytes(module);
@@ -92,7 +92,7 @@ export function decodeAnalysisResult(
   };
 }
 
-export function decodeTags(module: DecodeMemory, tagsPtr: number, posLabel: PosLabel): Tag[] {
+export function decodeTags(module: DecodeMemory, tagsPtr: number, posLabel: PosLabelLookup): Tag[] {
   const heapU32 = module.HEAPU32;
   const heapU8 = heapBytes(module);
   const layout = C_LAYOUTS.tags;
