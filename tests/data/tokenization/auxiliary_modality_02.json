@@ -1912,6 +1912,84 @@
       ],
       "id": "nodenwadesu",
       "input": "母のでんわです"
+    },
+    {
+      "description": "A kana noun with yoon digraphs before the copula is a noun",
+      "expected": [
+        {
+          "lemma": "ちゅうしゃ",
+          "pos": "Noun",
+          "surface": "ちゅうしゃ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "chi_ushi_da",
+      "input": "ちゅうしゃだ"
+    },
+    {
+      "description": "A kana noun with yoon digraphs before the polite copula",
+      "expected": [
+        {
+          "lemma": "ちゅうしゃ",
+          "pos": "Noun",
+          "surface": "ちゅうしゃ"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "chi_ushi_desu",
+      "input": "ちゅうしゃです"
+    },
+    {
+      "description": "The topic particle stays out of a following yoon kana noun",
+      "expected": [
+        {
+          "lemma": "これ",
+          "pos": "Pronoun",
+          "surface": "これ"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "ちゅうしゃ",
+          "pos": "Noun",
+          "surface": "ちゅうしゃ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "korehachi_ushi_da",
+      "input": "これはちゅうしゃだ"
+    },
+    {
+      "description": "A three-mora kana noun spelled with two yoon digraphs",
+      "expected": [
+        {
+          "lemma": "きょうしゅ",
+          "pos": "Noun",
+          "surface": "きょうしゅ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "ki_ushi_da",
+      "input": "きょうしゅだ"
     }
   ],
   "description": "Modality auxiliaries (たい、そう、らしい) (part 2/2)",

@@ -16,6 +16,7 @@
 #include "analysis/unknown_same_type_internal.h"
 #include "candidate_constants.h"
 #include "core/kana_constants.h"
+#include "core/utf8_constants.h"
 #include "normalize/char_type.h"
 
 namespace suzume {
@@ -75,8 +76,14 @@ void UnknownWordGenerator::appendBracketedHiraganaNounCandidates(const std::vect
                                   normalize::CharType::Hiragana) &&
         kana::isERowCodepoint(codepoints[start_pos + kLongDeverbalNounLength - 1]) &&
         codepoints[start_pos + kLongDeverbalNounLength] == U'を';
-    const size_t bracketed_noun_limit =
-        long_deverbal_object_shape ? kLongDeverbalNounLength : kDefaultBracketedNounLength;
+    size_t bracketed_noun_limit = long_deverbal_object_shape ? kLongDeverbalNounLength : kDefaultBracketedNounLength;
+    // The limit counts morae: a small kana that fuses with the kana before it
+    // (ちゅ, しゃ) adds a codepoint but no mora, so ちゅうしゃ is a three-mora run.
+    for (size_t pos = start_pos + 1; pos < codepoints.size() && pos < start_pos + bracketed_noun_limit; ++pos) {
+      if (kana::isSmallKanaCodepoint(codepoints[pos]) && codepoints[pos] != core::hiragana::kSmallTsu) {
+        ++bracketed_noun_limit;
+      }
+    }
     scanBracketedRun(ctx, bracketed_noun_limit, bracketed);
     // A te-form on the left closes its clause, so the run after it needs neither
     // a nominal nor an attributive in front of the connective (嬉しく+て+うれぴ).

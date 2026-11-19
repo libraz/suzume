@@ -335,6 +335,14 @@ void scanBracketedRun(const BracketedNounContext& ctx, size_t bracketed_noun_lim
     if (curr == U'を') {
       break;  // accusative を does not sit inside a native hiragana noun
     }
+    // The copula right after a small kana closing a yoon mora is inflectional
+    // (ちゅうしゃ|だ), so the run stops in front of it.
+    if (dict_manager != nullptr && kana::isSmallKanaCodepoint(codepoints[scan - 1])) {
+      const auto* copula = lookupEntryInRange(*dict_manager, codepoints, scan, scan + 1, core::PartOfSpeech::Auxiliary);
+      if (copula != nullptr && core::isPlainCopulaType(copula->extended_pos)) {
+        break;
+      }
+    }
     // Once a substantive three-mora run has formed, a case/topic or genitive
     // particle starts the right bracket even when the next word is also
     // hiragana (あたり|は|すっかり, となり|の|いえ). Shorter offsets remain
