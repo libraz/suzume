@@ -24,7 +24,7 @@ core::Morpheme token(std::string surface, core::PartOfSpeech pos, core::Extended
 
 TEST(CopularQuote, SplitsAdjectivalPredicatesWithCompleteMetadata) {
   SuzumeOptions options;
-  options.skip_user_dictionary = true;
+  options.skip_bundled_user_dictionary = true;
   Suzume analyzer(options);
   for (const auto* input : {"無理だって", "無理だって言った", "静かだって聞いた", "元気だって聞いた"}) {
     SCOPED_TRACE(input);
@@ -52,7 +52,7 @@ TEST(CopularQuote, SplitsAdjectivalPredicatesWithCompleteMetadata) {
 
 TEST(CopularQuote, PreservesOtherParticleReadings) {
   SuzumeOptions options;
-  options.skip_user_dictionary = true;
+  options.skip_bundled_user_dictionary = true;
   Suzume analyzer(options);
   for (const auto& [input, particle] : {std::pair{"学生だって", "だって"}, std::pair{"学生だって言った", "だって"},
                                         std::pair{"無理でも", "でも"}, std::pair{"無理だの", "だの"}}) {

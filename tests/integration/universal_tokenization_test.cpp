@@ -48,7 +48,7 @@ class UniversalTokenizationTest : public ::testing::Test {
 
   Suzume analyzer_{[] {
     SuzumeOptions opts;
-    opts.skip_user_dictionary = true;
+    opts.skip_bundled_user_dictionary = true;
     return opts;
   }()};
 };

@@ -69,7 +69,7 @@ TEST(SuffixCandidatesCounterTest, BoundsKanaCounterProbesOnLongHiraganaRun) {
 
 TEST(SuffixCandidatesCounterTest, KeepsRepeatedQuantityTogetherBeforeSuruPredicate) {
   SuzumeOptions options;
-  options.skip_user_dictionary = true;
+  options.skip_bundled_user_dictionary = true;
   Suzume analyzer(options);
 
   for (const std::string_view text :
@@ -86,7 +86,7 @@ TEST(SuffixCandidatesCounterTest, KeepsRepeatedQuantityTogetherBeforeSuruPredica
 
 TEST(SuffixCandidatesCounterTest, PreservesFiniteExistentialAfterCountedSubject) {
   SuzumeOptions options;
-  options.skip_user_dictionary = true;
+  options.skip_bundled_user_dictionary = true;
   Suzume analyzer(options);
   const auto existing_quantity = analyzer.analyze("3人いた");
   ASSERT_EQ(existing_quantity.size(), 3U);
@@ -203,7 +203,7 @@ TEST(SuffixCandidatesCounterTest, LatticeMarksOnlyFiniteExistentialCounterContin
 
 TEST(SuffixCandidatesCounterTest, KeepsExistingVerbAndCounterControls) {
   SuzumeOptions options;
-  options.skip_user_dictionary = true;
+  options.skip_bundled_user_dictionary = true;
   Suzume analyzer(options);
 
   for (const auto& [text, first_surface, first_lemma] :
@@ -257,7 +257,7 @@ TEST(SuffixCandidatesCounterTest, KeepsExistingVerbAndCounterControls) {
 
 TEST(SuffixCandidatesCounterTest, ExtendsKeCounterThroughFollowingKanji) {
   SuzumeOptions options;
-  options.skip_user_dictionary = true;
+  options.skip_bundled_user_dictionary = true;
   Suzume analyzer(options);
 
   for (const std::string_view text : {"5ヶ国", "10ヶ年"}) {
@@ -270,7 +270,7 @@ TEST(SuffixCandidatesCounterTest, ExtendsKeCounterThroughFollowingKanji) {
 
 TEST(SuffixCandidatesCounterTest, MarksKatakanaQuantityOrdinalAsSuffix) {
   SuzumeOptions options;
-  options.skip_user_dictionary = true;
+  options.skip_bundled_user_dictionary = true;
   Suzume analyzer(options);
 
   for (const std::string_view text : {"三ページ目を読む", "五セット目"}) {
@@ -285,7 +285,7 @@ TEST(SuffixCandidatesCounterTest, MarksKatakanaQuantityOrdinalAsSuffix) {
 
 TEST(SuffixCandidatesCounterTest, KeepsKatakanaQuantityAndLexicalKanjiTailBoundaries) {
   SuzumeOptions options;
-  options.skip_user_dictionary = true;
+  options.skip_bundled_user_dictionary = true;
   Suzume analyzer(options);
 
   const auto bare_unit = analyzer.analyze("ページ目");
@@ -379,7 +379,7 @@ TEST(SuffixCandidatesCounterTest, RejectsKanaOrdinalPrefixesWithoutClosedContext
 
 TEST(SuffixCandidatesCounterTest, SelectsKanaOrdinalNounsBeforeFiniteCopula) {
   SuzumeOptions options;
-  options.skip_user_dictionary = true;
+  options.skip_bundled_user_dictionary = true;
   Suzume analyzer(options);
   struct TestCase {
     std::string_view text;
@@ -423,7 +423,7 @@ TEST(SuffixCandidatesCounterTest, SelectsKanaOrdinalNounsBeforeFiniteCopula) {
 
 TEST(SuffixCandidatesCounterTest, PreservesExistingCounterAndKanaVerbCandidates) {
   SuzumeOptions options;
-  options.skip_user_dictionary = true;
+  options.skip_bundled_user_dictionary = true;
   Suzume analyzer(options);
 
   for (const auto& [text, first_surface] : {std::pair<std::string_view, std::string_view>{"いちまいだ", "いちまい"},
@@ -548,7 +548,7 @@ TEST(SuffixCandidatesCounterTest, ComposesEveryKanaNumberReadingThroughNinetyNin
                                                             {"はち", 8},
                                                             {"きゅう", 9}}};
   SuzumeOptions options;
-  options.skip_user_dictionary = true;
+  options.skip_bundled_user_dictionary = true;
   Suzume analyzer(options);
 
   std::vector<std::string> number_readings;

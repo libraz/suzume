@@ -73,7 +73,7 @@ const core::LatticeEdge* findEdge(const core::Lattice& lattice, std::string_view
 TEST(TokenizerExistentialNoun, FiniteDictionaryNounsAndCountersKeepTheirMorphemeBoundaries) {
   for (const bool lemmatize : {true, false}) {
     SuzumeOptions options;
-    options.skip_user_dictionary = true;
+    options.skip_bundled_user_dictionary = true;
     options.lemmatize = lemmatize;
     Suzume analyzer(options);
     const auto counted_baseline = analyzer.analyze("三人いた");
@@ -210,7 +210,7 @@ TEST(TokenizerExistentialNoun, FullSpanDictionaryWordsRemainAvailable) {
 
 TEST(TokenizerExistentialNoun, ExistingPredicateAndLexicalNounControlsStayAttested) {
   SuzumeOptions options;
-  options.skip_user_dictionary = true;
+  options.skip_bundled_user_dictionary = true;
   Suzume analyzer(options);
 
   for (const auto& [text, verb_surface, verb_lemma, auxiliary_surface] :

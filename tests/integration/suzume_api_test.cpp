@@ -18,7 +18,7 @@ class SuzumeApiTest : public ::testing::Test {
  protected:
   SuzumeOptions makeTestOptions() {
     SuzumeOptions opts;
-    opts.skip_user_dictionary = true;
+    opts.skip_bundled_user_dictionary = true;
     return opts;
   }
 };
@@ -40,7 +40,7 @@ TEST_F(SuzumeApiTest, ConstructWithOptions) {
 
 TEST_F(SuzumeApiTest, ConstructWithSkipUserDictionary) {
   SuzumeOptions opts;
-  opts.skip_user_dictionary = true;
+  opts.skip_bundled_user_dictionary = true;
   Suzume instance(opts);
   auto results = instance.analyze("\xe6\x9d\xb1\xe4\xba\xac");  // Tokyo
   EXPECT_FALSE(results.empty());
@@ -196,7 +196,7 @@ TEST_F(SuzumeApiTest, SuruVerbSplitsWithoutCoreDictionary) {
   // in L1, so this does not depend on the L2 dictionary. Without a standalone
   // する token the analyzer mis-splits into 管 / 理する / 会社.
   SuzumeOptions opts;
-  opts.skip_user_dictionary = true;
+  opts.skip_bundled_user_dictionary = true;
   opts.skip_core_dictionary = true;
   Suzume instance(opts);
 

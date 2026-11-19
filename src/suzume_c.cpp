@@ -444,7 +444,7 @@ SUZUME_EXPORT suzume_t suzume_create_with_options(const suzume_options_t* option
       opts.mode = *mode;
       opts.lemmatize = (options->lemmatize != 0);
       opts.merge_compounds = (options->merge_compounds != 0);
-      opts.skip_user_dictionary = (options->skip_bundled_user_dictionary != 0);
+      opts.skip_bundled_user_dictionary = (options->skip_bundled_user_dictionary != 0);
       opts.skip_core_dictionary = (options->skip_core_dictionary != 0);
       opts.skip_env_config = (options->skip_env_config != 0);
       opts.report_scorer_config = (options->report_scorer_config != 0);

@@ -47,7 +47,7 @@ TEST(VerbGuardFamilyBounds, KkoNominalizerRejectsInvalidEndPosition) {
 
 TEST(VerbGuardFamilyBounds, FormalNounDoesNotLoseItsHeadToHiraganaNounRescue) {
   SuzumeOptions options;
-  options.skip_user_dictionary = true;
+  options.skip_bundled_user_dictionary = true;
   Suzume analyzer(options);
 
   for (const std::string_view text : {"くること", "おくこと"}) {
@@ -61,7 +61,7 @@ TEST(VerbGuardFamilyBounds, FormalNounDoesNotLoseItsHeadToHiraganaNounRescue) {
 
 TEST(VerbGuardFamilyBounds, ClassicalCopulaIrrealisWinsBeforeClassicalNegative) {
   SuzumeOptions options;
-  options.skip_user_dictionary = true;
+  options.skip_bundled_user_dictionary = true;
   Suzume analyzer(options);
 
   for (const std::string_view text : {"静かならず", "平和ならず", "元気ならず", "有名ならず"}) {
@@ -196,7 +196,7 @@ TEST(VerbGuardFamilyWiring, EveryGuardedOriginIsDeclared) {
 
 TEST(VerbGuardFamilyWiring, HiraganaOriginsKeepClosedClassBoundaries) {
   SuzumeOptions options;
-  options.skip_user_dictionary = true;
+  options.skip_bundled_user_dictionary = true;
   Suzume analyzer(options);
   const auto surfaces = [&](std::string_view input) {
     std::vector<std::string> result;
@@ -272,7 +272,7 @@ TEST(CompoundVerbForms, GodanRowsDriveConjugationAndTeForms) {
 
 TEST(CompoundVerbForms, KanjiAndHiraganaHostsShareV2InflectionCells) {
   SuzumeOptions options;
-  options.skip_user_dictionary = true;
+  options.skip_bundled_user_dictionary = true;
   Suzume analyzer(options);
   const auto surfaces = [&](std::string_view input) {
     std::vector<std::string> result;
@@ -290,7 +290,7 @@ TEST(CompoundVerbForms, KanjiAndHiraganaHostsShareV2InflectionCells) {
 
 TEST(CandidateGenerationRegression, IAdjectiveStemUsesCanonicalGaruParadigm) {
   SuzumeOptions options;
-  options.skip_user_dictionary = true;
+  options.skip_bundled_user_dictionary = true;
   Suzume analyzer(options);
 
   const auto result = analyzer.analyze("恥ずかしがらない");
@@ -307,7 +307,7 @@ TEST(CandidateGenerationRegression, IAdjectiveStemUsesCanonicalGaruParadigm) {
 
 TEST(CandidateGenerationRegression, KatakanaIAdjectiveNegativePastKeepsStemBoundary) {
   SuzumeOptions options;
-  options.skip_user_dictionary = true;
+  options.skip_bundled_user_dictionary = true;
   Suzume analyzer(options);
 
   const auto result = analyzer.analyze("エモくなかった");
@@ -328,7 +328,7 @@ TEST(CandidateGenerationRegression, KatakanaIAdjectiveNegativePastKeepsStemBound
 
 TEST(VerbGuardFamilyPrefix, KeepsConfidentLexicalStemMatchingBindingParticle) {
   SuzumeOptions options;
-  options.skip_user_dictionary = true;
+  options.skip_bundled_user_dictionary = true;
   Suzume analyzer(options);
 
   const auto result = analyzer.analyze("さえない映画だった");
@@ -353,7 +353,7 @@ TEST(VerbGuardFamilyPrefix, KeepsConfidentLexicalStemMatchingBindingParticle) {
 
 TEST(VerbGuardFamilyPrefix, StillSplitsActualBindingParticleBeforeSubsidiaryVerb) {
   SuzumeOptions options;
-  options.skip_user_dictionary = true;
+  options.skip_bundled_user_dictionary = true;
   Suzume analyzer(options);
 
   const auto result = analyzer.analyze("読んでさえいればよい");
@@ -371,7 +371,7 @@ TEST(VerbGuardFamilyPrefix, StillSplitsActualBindingParticleBeforeSubsidiaryVerb
 
 TEST(VerbGuardFamilyPrefix, StillKeepsBindingParticleAfterNominalHost) {
   SuzumeOptions options;
-  options.skip_user_dictionary = true;
+  options.skip_bundled_user_dictionary = true;
   Suzume analyzer(options);
 
   const auto result = analyzer.analyze("読むことさえない");

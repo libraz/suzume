@@ -27,7 +27,7 @@ namespace {
 
 SuzumeOptions userDictOptions() {
   SuzumeOptions opts;
-  opts.skip_user_dictionary = true;  // Ignore data/user.dic; load entries explicitly
+  opts.skip_bundled_user_dictionary = true;  // Ignore data/user.dic; load entries explicitly
   return opts;
 }
 

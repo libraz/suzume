@@ -203,7 +203,7 @@ int cmdAnalyze(const CommandArgs& args) {
   options.normalize_options.preserve_vu = args.preserve_vu;
   options.normalize_options.preserve_case = args.preserve_case;
   options.remove_symbols = !args.preserve_symbols;
-  options.skip_user_dictionary = args.skip_bundled_user_dictionary;
+  options.skip_bundled_user_dictionary = args.skip_bundled_user_dictionary;
   options.skip_core_dictionary = args.skip_core_dictionary;
   options.skip_env_config = args.skip_env_config;
   options.lemmatize = args.lemmatize;
@@ -238,7 +238,7 @@ int cmdAnalyze(const CommandArgs& args) {
   if (args.compare) {
     // Analyze without user dictionary
     SuzumeOptions base_options = options;
-    base_options.skip_user_dictionary = true;
+    base_options.skip_bundled_user_dictionary = true;
     Suzume base_analyzer(base_options);
     for (const auto& warning : base_analyzer.dictionaryWarnings()) {
       printWarning(warning);

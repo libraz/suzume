@@ -25,7 +25,7 @@ core::Morpheme renyokeiToken(std::string surface, std::string lemma, core::PartO
 TEST(RenyokeiSuruNominalization, NominalizesContiguousActionNounWithoutChangingBoundaries) {
   for (const bool lemmatize : {true, false}) {
     SuzumeOptions options;
-    options.skip_user_dictionary = true;
+    options.skip_bundled_user_dictionary = true;
     options.lemmatize = lemmatize;
     Suzume analyzer(options);
     for (const auto* input : {"一人歩きする", "一人歩きした", "一人歩きしない"}) {
@@ -52,7 +52,7 @@ TEST(RenyokeiSuruNominalization, NominalizesContiguousActionNounWithoutChangingB
 
 TEST(RenyokeiSuruNominalization, PreservesHonorificVerbStemsAndExistingNouns) {
   SuzumeOptions options;
-  options.skip_user_dictionary = true;
+  options.skip_bundled_user_dictionary = true;
   Suzume analyzer(options);
   for (const auto* input : {"お読みする", "お読みします", "お話しする", "お見せする"}) {
     SCOPED_TRACE(input);

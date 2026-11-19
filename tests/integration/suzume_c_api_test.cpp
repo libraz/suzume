@@ -81,6 +81,16 @@ TEST(SuzumeCApiTest, LoadUserDictionaryReportsEmptyAndNullSources) {
   EXPECT_EQ(suzume_last_error_code(), SUZUME_ERROR_PARSE);
   EXPECT_STREQ(suzume_last_error(), "Dictionary source contains no loadable entries");
 
+  // Valid UTF-8 whose only row is refused at install: the error names no cause it did not check.
+  std::string oversized_surface;
+  for (int count = 0; count < 86; ++count) {
+    oversized_surface += "あ";
+  }
+  oversized_surface += "\tNOUN\n";
+  EXPECT_EQ(suzume_load_user_dictionary(handle, oversized_surface.data(), oversized_surface.size()), 0u);
+  EXPECT_EQ(suzume_last_error_code(), SUZUME_ERROR_PARSE);
+  EXPECT_STREQ(suzume_last_error(), "Dictionary source contains no loadable entries");
+
   EXPECT_EQ(suzume_load_user_dictionary(handle, nullptr, 5), 0u);
   EXPECT_EQ(suzume_last_error_code(), SUZUME_ERROR_INVALID_INPUT);
   EXPECT_NE(std::string(suzume_last_error()).find("null handle or data"), std::string::npos);

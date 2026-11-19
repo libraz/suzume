@@ -53,7 +53,7 @@ TEST(NoncontinuativeTeNominal, ShapeRejectsRealContinuativesAndMalformedText) {
 TEST(NoncontinuativeTeNominal, FiniteCopulaSelectsCompleteKanaNoun) {
   for (const bool lemmatize : {true, false}) {
     SuzumeOptions options;
-    options.skip_user_dictionary = true;
+    options.skip_bundled_user_dictionary = true;
     options.lemmatize = lemmatize;
     Suzume analyzer(options);
     for (const auto& [input, surface] :
@@ -87,7 +87,7 @@ TEST(NoncontinuativeTeNominal, SubstantiveFormalNounSelectsAttributiveNaStem) {
   const dictionary::DictionaryManager dict_manager;
   for (const bool lemmatize : {true, false}) {
     SuzumeOptions options;
-    options.skip_user_dictionary = true;
+    options.skip_bundled_user_dictionary = true;
     options.lemmatize = lemmatize;
     Suzume analyzer(options);
     const auto attributive = analyzer.analyze("にがてな人");
@@ -164,7 +164,7 @@ TEST(NoncontinuativeTeNominal, PreservesNominalParticleBeforeIndependentlyAdmitt
   EXPECT_FALSE(narrow->rejects_preceding_nominal_head);
 
   SuzumeOptions options;
-  options.skip_user_dictionary = true;
+  options.skip_bundled_user_dictionary = true;
   Suzume analyzer(options);
   for (const auto& [input, stem] : {std::pair{"にこやかなもの", "にこやか"}, std::pair{"はなやかなもの", "はなやか"}}) {
     SCOPED_TRACE(input);
@@ -177,7 +177,7 @@ TEST(NoncontinuativeTeNominal, PreservesNominalParticleBeforeIndependentlyAdmitt
 
 TEST(NoncontinuativeTeNominal, KeepsDictionaryProvenHomographicVerb) {
   SuzumeOptions options;
-  options.skip_user_dictionary = true;
+  options.skip_bundled_user_dictionary = true;
   Suzume analyzer(options);
   const std::string source = "おもてだつ\tVERB\tGODAN_TA\n";
   ASSERT_TRUE(analyzer.loadUserDictionaryFromMemoryResult(source.data(), source.size()).hasValue());
@@ -191,7 +191,7 @@ TEST(NoncontinuativeTeNominal, KeepsDictionaryProvenHomographicVerb) {
 
 TEST(NoncontinuativeTeNominal, PreservesLexicalRolesAndProductiveInflections) {
   SuzumeOptions options;
-  options.skip_user_dictionary = true;
+  options.skip_bundled_user_dictionary = true;
   Suzume analyzer(options);
   for (const auto& [input, surface] : {std::pair{"苦手だ", "苦手"}, std::pair{"にがてな人", "にがて"}}) {
     SCOPED_TRACE(input);
@@ -276,7 +276,7 @@ TEST(QuantityYoonNoun, PreservesAnExplicitMimeticWithTheSameYoonEnding) {
 
 TEST(QuantityYoonNoun, SelectsBoundedNounWithoutChangingExistingPredicateAndWordReadings) {
   SuzumeOptions options;
-  options.skip_user_dictionary = true;
+  options.skip_bundled_user_dictionary = true;
   Suzume analyzer(options);
   for (const auto& [input, surface, start] :
        {std::tuple{"二人いっしょ", "いっしょ", 2U}, std::tuple{"数人いっしょ", "いっしょ", 2U},
@@ -437,7 +437,7 @@ TEST(SmallKanaCopulaBoundary, UnknownKanaRunNeverClosesOnCopulaAfterSmallKana) {
 
 TEST(SmallKanaCopulaBoundary, CopulaStandsAloneOnlyAfterAnUnknownRun) {
   SuzumeOptions options;
-  options.skip_user_dictionary = true;
+  options.skip_bundled_user_dictionary = true;
   Suzume analyzer(options);
   for (const auto* input : {"ちゅうしゃだ", "しゃだ", "しょうしゃだ"}) {
     SCOPED_TRACE(input);

@@ -9,7 +9,7 @@ namespace {
 
 Suzume makeDependentGrammarAnalyzer() {
   SuzumeOptions options;
-  options.skip_user_dictionary = true;
+  options.skip_bundled_user_dictionary = true;
   return Suzume(options);
 }
 

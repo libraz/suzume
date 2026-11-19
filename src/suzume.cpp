@@ -65,7 +65,7 @@ core::Expected<LoadedSourceDictionary, core::Error> loadSourceDictionaryFromMemo
   }
   if (installed_entry_count == 0) {
     return core::makeUnexpected(
-        core::Error(core::ErrorCode::ParseError, "Dictionary source contains no valid UTF-8 entries"));
+        core::Error(core::ErrorCode::ParseError, "Dictionary source contains no loadable entries"));
   }
   std::vector<std::string> warnings = std::move(parsed.value().warnings);
   if (installed_entry_count < expanded.entries.size()) {
@@ -275,7 +275,7 @@ struct Suzume::Impl {
       autoLoadDictionary("core.dic", &DictionaryManager::loadCoreDictionaryResult, opts.data_directory);
 #endif
     }
-    if (!opts.skip_user_dictionary) {
+    if (!opts.skip_bundled_user_dictionary) {
 #ifdef SUZUME_USE_EMBEDDED_DICT
       autoLoadDictionary("user.dic", &DictionaryManager::loadBundledUserBinaryDictionaryFromMemoryResult,
                          embedded::kUserDictionary, embedded::kUserDictionarySize);

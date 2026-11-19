@@ -72,7 +72,7 @@ TEST(SourceDictionaryParityTest, CompilerAndRuntimeUseIdenticalExpandedEntries) 
 
   SuzumeOptions options;
   options.skip_core_dictionary = true;
-  options.skip_user_dictionary = true;
+  options.skip_bundled_user_dictionary = true;
   Suzume analyzer(options);
   auto source_load = analyzer.loadUserDictionaryFromMemoryResult(source.data(), source.size());
   ASSERT_TRUE(source_load.hasValue()) << source_load.error().message;
@@ -117,7 +117,7 @@ TEST(SourceDictionaryParityTest, CompilerAndRuntimeRejectRemovedLayoutsAlike) {
 
   SuzumeOptions options;
   options.skip_core_dictionary = true;
-  options.skip_user_dictionary = true;
+  options.skip_bundled_user_dictionary = true;
   for (const auto& [source, message] : cases) {
     {
       std::ofstream file(source_path);

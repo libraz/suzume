@@ -22,13 +22,13 @@ struct SuzumeOptions {
   core::AnalysisMode mode = core::AnalysisMode::Normal;
   bool lemmatize = true;  // Retain corrected lemmas; conjugation/POS annotations are always computed
   bool merge_compounds = false;
-  bool remove_symbols = true;         // Remove symbol-only morphemes (default: true)
-  bool skip_user_dictionary = false;  // Skip auto-loading user.dic (for testing)
-  bool skip_core_dictionary = false;  // Skip auto-loading core.dic (for testing)
-  bool skip_env_config = false;       // Ignore SUZUME_SCORER_CONFIG and SUZUME_SCORER_* variables
-  bool report_scorer_config = false;  // Add scorer config status/warnings to dictionaryWarnings()
-  std::string scorer_options_json;    // Final-priority JSON overrides (available on every target)
-  std::string data_directory;         // Exclusive directory for core.dic and user.dic
+  bool remove_symbols = true;                 // Remove symbol-only morphemes (default: true)
+  bool skip_bundled_user_dictionary = false;  // Skip auto-loading user.dic (for testing)
+  bool skip_core_dictionary = false;          // Skip auto-loading core.dic (for testing)
+  bool skip_env_config = false;               // Ignore SUZUME_SCORER_CONFIG and SUZUME_SCORER_* variables
+  bool report_scorer_config = false;          // Add scorer config status/warnings to dictionaryWarnings()
+  std::string scorer_options_json;            // Final-priority JSON overrides (available on every target)
+  std::string data_directory;                 // Exclusive directory for core.dic and user.dic
   postprocess::TagGeneratorOptions tag_options;
   normalize::NormalizeOptions normalize_options;
   analysis::ScorerOptions scorer_options;  // Scoring parameters (tunable at runtime)

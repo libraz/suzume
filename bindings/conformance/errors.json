@@ -2207,6 +2207,37 @@
       "message": "Dictionary source contains no loadable entries"
     },
     {
+      "id": "native-oversized-surface-dictionary",
+      "group": "error-model",
+      "call": {
+        "npm": {
+          "member": "loadUserDictionary",
+          "kind": "call"
+        },
+        "python": {
+          "member": "load_user_dictionary",
+          "kind": "call"
+        }
+      },
+      "option": null,
+      "value": "ああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ\tNOUN\n",
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 4,
+          "operation": "load_user_dictionary"
+        },
+        "python": {
+          "type": "SuzumeError",
+          "code": 4,
+          "operation": "load_user_dictionary"
+        }
+      },
+      "message": "Dictionary source contains no loadable entries"
+    },
+    {
       "id": "native-bad-scorer-json-code",
       "group": "error-model",
       "call": {

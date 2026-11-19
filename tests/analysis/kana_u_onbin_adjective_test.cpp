@@ -14,7 +14,7 @@ namespace {
 
 TEST(KanaUOnbinAdjective, RegisteredAdjectiveBeforeLexicalVerbHasContinuativeMetadata) {
   SuzumeOptions options;
-  options.skip_user_dictionary = true;
+  options.skip_bundled_user_dictionary = true;
   Suzume analyzer(options);
   for (const auto* input :
        {"ようできました", "ようできた", "ようできます", "ようなりました", "よう出来ました", "よう見える"}) {
@@ -42,7 +42,7 @@ TEST(KanaUOnbinAdjective, RegisteredAdjectiveBeforeLexicalVerbHasContinuativeMet
 
 TEST(KanaUOnbinAdjective, PreservesNounsDemonstrativesAndReduplicatedAdverbs) {
   SuzumeOptions options;
-  options.skip_user_dictionary = true;
+  options.skip_bundled_user_dictionary = true;
   Suzume analyzer(options);
   for (const auto* input : {"ようだ", "ようです"}) {
     SCOPED_TRACE(input);
@@ -94,7 +94,7 @@ TEST(KanaUOnbinAdjective, DoesNotInferPredicateAcrossPunctuationOrInsideKanaTail
 
 TEST(KanaUOnbinAdjective, PreservesKanjiAndGlideContinuatives) {
   SuzumeOptions options;
-  options.skip_user_dictionary = true;
+  options.skip_bundled_user_dictionary = true;
   Suzume analyzer(options);
   for (const auto& [input, surface] :
        {std::pair{"良うできました", "良う"}, std::pair{"よろしゅうございます", "よろしゅう"}}) {
