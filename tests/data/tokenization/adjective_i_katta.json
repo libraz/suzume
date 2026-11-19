@@ -489,6 +489,135 @@
       ],
       "id": "morokattta",
       "input": "涙もろかった"
+    },
+    {
+      "description": "顔はずかしかった - regression test",
+      "expected": [
+        {
+          "lemma": "顔",
+          "pos": "Noun",
+          "surface": "顔"
+        },
+        {
+          "lemma": "はずかしい",
+          "pos": "Adjective",
+          "surface": "はずかしかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "hazukashikattta",
+      "input": "顔はずかしかった"
+    },
+    {
+      "description": "本当にはずかしかった - regression test",
+      "expected": [
+        {
+          "lemma": "本当",
+          "pos": "Noun",
+          "surface": "本当"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "はずかしい",
+          "pos": "Adjective",
+          "surface": "はずかしかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "nihazukashikattta",
+      "input": "本当にはずかしかった"
+    },
+    {
+      "description": "顔はずかしい - regression test",
+      "expected": [
+        {
+          "lemma": "顔",
+          "pos": "Noun",
+          "surface": "顔"
+        },
+        {
+          "lemma": "はずかしい",
+          "pos": "Adjective",
+          "surface": "はずかしい"
+        }
+      ],
+      "id": "hazukashii",
+      "input": "顔はずかしい"
+    },
+    {
+      "description": "はずかしい - regression test",
+      "expected": [
+        {
+          "lemma": "はずかしい",
+          "pos": "Adjective",
+          "surface": "はずかしい"
+        }
+      ],
+      "id": "hazukashii_2",
+      "input": "はずかしい"
+    },
+    {
+      "description": "とてもはずかしい - regression test",
+      "expected": [
+        {
+          "lemma": "とても",
+          "pos": "Adverb",
+          "surface": "とても"
+        },
+        {
+          "lemma": "はずかしい",
+          "pos": "Adjective",
+          "surface": "はずかしい"
+        }
+      ],
+      "id": "totemohazukashii",
+      "input": "とてもはずかしい"
+    },
+    {
+      "description": "はずかしくない - regression test",
+      "expected": [
+        {
+          "lemma": "はずかしい",
+          "pos": "Adjective",
+          "surface": "はずかしく"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
+      "id": "hazukashikunai",
+      "input": "はずかしくない"
+    },
+    {
+      "description": "はずかしさ - regression test",
+      "expected": [
+        {
+          "lemma": "はずかしい",
+          "pos": "Adjective",
+          "surface": "はずかし"
+        },
+        {
+          "lemma": "さ",
+          "pos": "Suffix",
+          "surface": "さ"
+        }
+      ],
+      "id": "hazukashisa",
+      "input": "はずかしさ"
     }
   ],
   "description": "I-adjectives past forms (過去形) - katta forms, past negative, past with desu",
