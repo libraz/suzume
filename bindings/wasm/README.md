@@ -10,7 +10,7 @@
 
 **Japanese tokenization for browser and Node.js applications.** Suzume is not a
 full morphological analyzer like MeCab: it prioritizes useful search units while
-still providing part-of-speech tags, lemmas, and keyword extraction in one
+still providing part-of-speech tags, base forms, and keyword extraction in one
 WebAssembly package.
 
 📖 **[Documentation & getting started](https://suzume.libraz.net/docs/getting-started)** &nbsp;·&nbsp; 🧪 **[Live Demo](https://suzume.libraz.net/#demo)**
@@ -39,19 +39,19 @@ suzume.destroy() // optional immediate cleanup
 
 ## Filtering generated tags by part of speech
 
-Use `posFilter` with any combination of `noun`, `verb`, `adjective`, and
-`adverb`:
+`posFilter` takes the labels that `Tag.pos` prints: `NOUN`, `VERB`, `ADJ`,
+`ADV`, `PARTICLE`, and `AUX`, as one name or an array:
 
 ```typescript
 const tags = suzume.generateTags('東京の公園に行きました', {
-  posFilter: ['noun', 'verb'],
+  posFilter: ['NOUN', 'VERB'],
 })
 ```
 
-Unknown names throw an `Error`. An empty array (`posFilter: []`) means all
-content words, matching the default native filter. The former `pos` option
-remains available as a deprecated alias; when both are provided, `posFilter`
-takes precedence.
+`NOUN` also keeps pronouns (`PRON`). Naming `PARTICLE` or `AUX` returns those
+tags even though they are excluded by default. Any other value throws a
+`SuzumeError` with code `ErrorCode.InvalidInput`. Leaving `posFilter` out,
+`null`, or an empty array keeps every part of speech.
 
 ## Loading the `.wasm` file
 
@@ -69,15 +69,19 @@ For CDN usage, user dictionaries, and the full API, see the
 
 ## Error handling
 
-A failing native call throws an `Error` carrying the message from the
-WebAssembly module, so ordinary failures — a rejected user dictionary, use
-after `destroy()` — are catchable:
+A failing call throws a `SuzumeError` carrying the library's message, an
+`ErrorCode` and the name of the operation, so ordinary failures — a rejected
+user dictionary, an invalid option, use after `destroy()` — are catchable:
 
 ```typescript
+import { ErrorCode, SuzumeError } from '@libraz/suzume'
+
 try {
-  suzume.loadUserDictionaryOrThrow(csv)
+  const installed = suzume.loadUserDictionary(tsv)
 } catch (error) {
-  // message comes from the module
+  if (error instanceof SuzumeError && error.code === ErrorCode.InvalidInput) {
+    // error.message comes from the library
+  }
 }
 ```
 

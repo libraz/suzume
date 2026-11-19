@@ -7,7 +7,7 @@
 
 **Japanese tokenization for Python applications.** Suzume is not a full
 morphological analyzer like MeCab: it prioritizes useful search units while
-still providing part-of-speech tags, lemmas, and keyword extraction. The wheel
+still providing part-of-speech tags, base forms, and keyword extraction. The wheel
 requires no extra dictionary installation.
 
 📖 **[Full API reference and guides](https://suzume.libraz.net/docs/python)**
@@ -52,7 +52,7 @@ printf 'りんごを食べる\n' | suzume --format tags
 ```
 
 Run `suzume --help` for analysis modes, normalization controls, output formats,
-tag filters, and repeatable `--dict` options. Dictionary compilation,
+tag filters, and repeatable `-d`/`--dictionary` options. Dictionary compilation,
 validation, and test commands remain part of the separate native developer
 tool, `suzume-cli`.
 
