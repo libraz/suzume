@@ -1677,6 +1677,62 @@
       ],
       "id": "mendoudakedoyaru",
       "input": "めんどうだけどやる"
+    },
+    {
+      "description": "不安定だった - auto-generated",
+      "expected": [
+        {
+          "lemma": "不安定",
+          "pos": "Adjective",
+          "surface": "不安定"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "dattta_2",
+      "input": "不安定だった"
+    },
+    {
+      "description": "不安定だ - auto-generated",
+      "expected": [
+        {
+          "lemma": "不安定",
+          "pos": "Adjective",
+          "surface": "不安定"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "da_12",
+      "input": "不安定だ"
+    },
+    {
+      "description": "不安定です - auto-generated",
+      "expected": [
+        {
+          "lemma": "不安定",
+          "pos": "Adjective",
+          "surface": "不安定"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "desu_5",
+      "input": "不安定です"
     }
   ],
   "description": "Na-adjectives (ナ形容詞) (part 2/2)",
