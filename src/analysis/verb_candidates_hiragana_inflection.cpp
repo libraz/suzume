@@ -120,6 +120,28 @@ struct InflectedSpan {
   bool is_dictionary_verb{false};
 };
 
+// Whether a bound auxiliary opening the scan has anything to attach to. Its
+// first element is bound leftward, so clause start, a symbol or a particle that
+// already closed the previous phrase leaves it no host.
+bool auxiliaryHasHost(const InflectedScanContext& ctx) {
+  const size_t start_pos = ctx.start_pos;
+  return start_pos > 0 && ctx.char_types[start_pos - 1] != normalize::CharType::Symbol &&
+         (ctx.dict_manager == nullptr || lookupEntryInRange(*ctx.dict_manager, ctx.codepoints, start_pos - 1, start_pos,
+                                                            core::PartOfSpeech::Particle) == nullptr);
+}
+
+// Whether a two-mora e-row Ichidan continuative is closed by the past or the
+// connective, which is the same evidence as the fused form (ぬれ+た).
+bool isERowContinuativeBeforeTaTe(const InflectedScanContext& ctx, const InflectedSpan& span) {
+  const size_t end_pos = span.end_pos;
+  if (end_pos != ctx.start_pos + 2 || end_pos >= ctx.codepoints.size() ||
+      span.best.verb_type != grammar::VerbType::Ichidan || !kana::isERowCodepoint(ctx.codepoints[end_pos - 1])) {
+    return false;
+  }
+  const char32_t follower = ctx.codepoints[end_pos];
+  return follower == U'た' || follower == U'て';
+}
+
 void pickBestInflection(const dictionary::DictionaryManager* dict_manager, InflectedSpan& span) {
   // The best dictionary-verified reading wins; otherwise the best reading
   // overall. Both folds share one tie-break (prefersOverInflection).
@@ -221,11 +243,7 @@ bool admitsUnattestedSpan(const InflectedScanContext& ctx, InflectedSpan& span) 
   // decomposition is not an analysis of this span and the run is an ordinary
   // open-class verb (時刻|が|ずれる, not 時刻|が|ず|れる). 死ぬ+べし and
   // 出で+に+ける keep their host and stay rejected.
-  const bool auxiliary_chain_has_host =
-      start_pos > 0 && ctx.char_types[start_pos - 1] != normalize::CharType::Symbol &&
-      (dict_manager == nullptr || lookupEntryInRange(*dict_manager, codepoints, start_pos - 1, start_pos,
-                                                     core::PartOfSpeech::Particle) == nullptr);
-  if (!is_dictionary_verb && auxiliary_chain_has_host &&
+  if (!is_dictionary_verb && auxiliaryHasHost(ctx) &&
       hasAuxiliaryChainDecomposition(codepoints, start_pos, end_pos, dict_manager)) {
     SUZUME_DEBUG_LOG_VERBOSE("[VERB_SKIP] \"" << surface << "\" auxiliary_chain\n");
     return false;
@@ -316,8 +334,10 @@ bool rejectsNonVerbSurface(const InflectedScanContext& ctx, const InflectedSpan&
   // Filter out words that exist in dictionary as non-verb entries.  A complete
   // independent terminal may still be the lexical reading of an auxiliary
   // homograph; dependent uses remain on the ordinary auxiliary path.
+  // Nor does a continuative auxiliary homograph with no host (雨に+ぬれ+た).
   const bool is_independent_auxiliary_homograph =
-      ctx.has_complete_godan_wa_terminal && span.end_pos == ctx.hiragana_end &&
+      ((ctx.has_complete_godan_wa_terminal && span.end_pos == ctx.hiragana_end) ||
+       (!auxiliaryHasHost(ctx) && isERowContinuativeBeforeTaTe(ctx, span))) &&
       vh::hasDictionaryEntry(ctx.dict_manager, surface, core::PartOfSpeech::Auxiliary);
   if (vh::hasNonVerbDictionaryEntry(ctx.dict_manager, surface) && !is_independent_auxiliary_homograph) {
     return true;  // Skip - dictionary has non-verb entry for this surface
@@ -559,6 +579,9 @@ float acceptanceThreshold(const InflectedScanContext& ctx, const InflectedSpan& 
       // Te-form verbs (あらって, しまって, かって) need lower threshold too
       looks_like_te_form = true;
     }
+  }
+  if (isERowContinuativeBeforeTaTe(ctx, span)) {
+    looks_like_past_form = true;
   }
 
   // Only accept verb types (not IAdjective) with sufficient confidence
