@@ -20,7 +20,11 @@ int main() {
 
   // Content words suitable for search indexing
   auto tags = analyzer->generateTags(text);
-  if (!tags || tags->empty()) {
+  if (!tags) {
+    std::cerr << "tag generation failed: " << tags.error().message << "\n";
+    return 1;
+  }
+  if (tags->empty()) {
     std::cerr << "tag generation returned no tags\n";
     return 1;
   }
@@ -35,7 +39,11 @@ int main() {
   opts.exclude_basic = true;
 
   auto noun_tags = analyzer->generateTags(text, opts);
-  if (!noun_tags || noun_tags->empty()) {
+  if (!noun_tags) {
+    std::cerr << "noun tag generation failed: " << noun_tags.error().message << "\n";
+    return 1;
+  }
+  if (noun_tags->empty()) {
     std::cerr << "noun tag generation returned no tags\n";
     return 1;
   }

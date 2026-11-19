@@ -21,9 +21,6 @@ for (const m of suzume.analyze(text)) {
 // TSV: surface<TAB>POS[<TAB>conj_type][<TAB>base_form]
 const dictData = '青空りんご園\tNOUN\n';
 const loaded = suzume.loadUserDictionary(dictData);
-if (!loaded) {
-  throw new Error('failed to load in-memory user dictionary');
-}
 console.log(`\nDictionary loaded: ${loaded}`);
 
 console.log('\nWith user dictionary:');

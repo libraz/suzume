@@ -39,7 +39,11 @@ int main() {
 
   for (const auto& doc : docs) {
     auto tags = analyzer->generateTags(doc.text, tag_opts);
-    if (!tags || tags->empty()) {
+    if (!tags) {
+      std::cerr << "tag generation failed for document " << doc.id << ": " << tags.error().message << "\n";
+      return 1;
+    }
+    if (tags->empty()) {
       std::cerr << "tag generation returned no tags for document " << doc.id << "\n";
       return 1;
     }

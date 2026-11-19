@@ -22,9 +22,7 @@ void printMorphemes(const std::vector<suzume::Morpheme>& morphemes) {
 }
 
 int main() {
-  suzume::Options opts;
-  opts.skip_bundled_user_dictionary = true;  // Start clean
-  auto analyzer = suzume::Tokenizer::create(opts);
+  auto analyzer = suzume::Tokenizer::create();
   if (!analyzer) {
     std::cerr << "failed to create tokenizer: " << analyzer.error().message << "\n";
     return 1;
