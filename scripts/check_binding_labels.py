@@ -65,10 +65,9 @@ CPP_DEFAULT_NAMES = {
     "options": {"scorer_options_json": "scorer_options"},
     "tag": {},
 }
-PYTHON_DEFAULT_NAMES = {
-    "options": {"skip_bundled_user_dictionary": "skip_user_dictionary"},
-    "tag": {"use_base_form": "use_lemma"},
-}
+PYTHON_DEFAULT_NAMES: dict[str, dict[str, str]] = {"options": {}, "tag": {}}
+# Python takes POS filters by label only, so "no filter" is None where C has 0.
+PYTHON_NONE_AS_ZERO = {"pos_filter"}
 
 WASM_DEFAULT_NAMES = {
     "options": {
@@ -78,7 +77,7 @@ WASM_DEFAULT_NAMES = {
         "mode": "mode",
         "lemmatize": "lemmatize",
         "merge_compounds": "mergeCompounds",
-        "skip_bundled_user_dictionary": "skipUserDictionary",
+        "skip_bundled_user_dictionary": "skipBundledUserDictionary",
         "skip_core_dictionary": "skipCoreDictionary",
         "report_scorer_config": "reportScorerConfig",
         "skip_env_config": "skipEnvConfig",
@@ -88,7 +87,7 @@ WASM_DEFAULT_NAMES = {
     "tag": {
         "pos_filter": "posFilter",
         "exclude_basic": "excludeBasic",
-        "use_base_form": "useLemma",
+        "use_base_form": "useBaseForm",
         "min_length": "minLength",
         "max_tags": "maxTags",
         "exclude_particles": "excludeParticles",
@@ -360,13 +359,40 @@ def native_name(label: str) -> str:
     return label if label.startswith("pos_label") else f"{label}_label"
 
 
+def ts_string_union(text: str, name: str) -> tuple[re.Match[str] | None, set[str]]:
+    """The exported string-literal union type `name` and its members."""
+    match = re.search(rf"export type {name}\s*=\s*(?P<body>(?:\s*\|?\s*'[^']*')+)\s*;", text)
+    return match, set(re.findall(r"'([^']*)'", match.group("body"))) if match else set()
+
+
+def check_label_type_unions(members: list[str], tag_labels: set[str]) -> bool:
+    """The npm label types list exactly the labels the library prints and filters on."""
+    text = strip_comments(Path(WASM_INDEX).read_text())
+    failed = False
+    for name, expected in (("PosLabel", {POS_LABELS[member][0] for member in members}), ("TagPosLabel", tag_labels)):
+        match, found = ts_string_union(text, name)
+        if match is None:
+            print(f"❌ {WASM_INDEX}: export type {name} not found as a string-literal union")
+            failed = True
+        elif found != expected:
+            print(f"❌ {WASM_INDEX}: {name} drift: expected {sorted(expected)}, got {sorted(found)}")
+            failed = True
+    return failed
+
+
 def check_no_local_label_tables() -> bool:
     """A binding that quotes several POS labels has re-introduced a local label table."""
     japanese = {ja for _, ja in POS_LABELS.values()}
     failed = False
     for pattern in BINDING_SOURCES:
         for path in sorted(Path().glob(pattern)):
-            literals = set(re.findall(r"""["']([^"'\\\n]+)["']""", strip_comments(path.read_text())))
+            text = strip_comments(path.read_text())
+            if path.as_posix() == WASM_INDEX:
+                # The exported PosLabel type is checked against the C table by check_label_type_unions.
+                match, _ = ts_string_union(text, "PosLabel")
+                if match is not None:
+                    text = text[: match.start()] + text[match.end() :]
+            literals = set(re.findall(r"""["']([^"'\\\n]+)["']""", text))
             found = sorted((literals & japanese) | (literals & TABLE_ONLY_POS_LABELS))
             if len(found) >= LOCAL_TABLE_THRESHOLD:
                 print(f"❌ {path}: quotes POS labels {found}; decode them through suzume_pos_label/_ja instead")
@@ -513,7 +539,11 @@ def check_default_contracts() -> bool:
     }
     python = {
         kind: {
-            field: python_raw[kind][PYTHON_DEFAULT_NAMES[kind].get(field, field)]
+            field: (
+                0
+                if field in PYTHON_NONE_AS_ZERO and python_raw[kind][field] is None
+                else python_raw[kind][PYTHON_DEFAULT_NAMES[kind].get(field, field)]
+            )
             for field in fields
             if field not in {"scorer_options_json", "data_directory"}
         }
@@ -555,7 +585,20 @@ def check_default_contracts() -> bool:
     return failed
 
 
-def check_numeric_contracts() -> bool:
+def tag_filter_labels(pos_members: list[str]) -> tuple[dict[str, int], bool]:
+    """Each SUZUME_TAG_POS_* bit keyed by the POS label it selects: bit n is SUZUME_POS_* code n+1."""
+    labels: dict[str, int] = {}
+    failed = False
+    for name, value in c_numeric_constants("SUZUME_TAG_POS_").items():
+        member = pos_members[value.bit_length()]
+        if normalized_name(member) != name:
+            print(f"❌ SUZUME_TAG_POS_{name.upper()} selects POS code {value.bit_length()} ({member})")
+            failed = True
+        labels[POS_LABELS[member][0]] = value
+    return labels, failed
+
+
+def check_numeric_contracts(tag_labels: dict[str, int]) -> bool:
     failed = False
     wasm = Path(WASM_INDEX).read_text()
     wasm_labels = Path(WASM_LABELS).read_text()
@@ -599,15 +642,13 @@ def check_numeric_contracts() -> bool:
         for name, shift in re.findall(r"\bFLAG_([A-Z_]+)\s*=\s*1\s*<<\s*(\d+)", python_labels)
     }
 
-    canonical_tags = c_numeric_constants("SUZUME_TAG_POS_")
+    # Tag filters are spelled with the output POS labels, so keys compare exactly.
+    canonical_tags = tag_labels
     wasm_tag_body = enclosed(wasm, wasm.index("{", wasm.index("TAG_POS_FILTER_BITS")), "{", "}", WASM_INDEX)
-    wasm_tags = {normalized_name(name): int(value) for name, value in re.findall(r"\b(\w+)\s*:\s*(\d+)", wasm_tag_body)}
+    wasm_tags = {name: int(value) for name, value in re.findall(r"\b(\w+)\s*:\s*(\d+)", wasm_tag_body)}
     python_tag_match = re.search(r"_POS_FILTER_BITS\s*=\s*\{(?P<body>.*?)\}", python, re.DOTALL)
     python_tags = (
-        {
-            normalized_name(name): int(value)
-            for name, value in re.findall(r'"(\w+)"\s*:\s*(\d+)', python_tag_match.group("body"))
-        }
+        {name: int(value) for name, value in re.findall(r'"(\w+)"\s*:\s*(\d+)', python_tag_match.group("body"))}
         if python_tag_match
         else {}
     )
@@ -700,8 +741,11 @@ def main() -> int:
         check_distinct_labels(CPP_TYPES, "extendedPosToString", members["ExtendedPOS"], expected["extended"])
     )
     results.append(check_canonical_calls())
+    tag_labels, tag_failed = tag_filter_labels(members["PartOfSpeech"])
+    results.append(tag_failed)
     results.append(check_no_local_label_tables())
-    results.append(check_numeric_contracts())
+    results.append(check_label_type_unions(members["PartOfSpeech"], set(tag_labels)))
+    results.append(check_numeric_contracts(tag_labels))
     results.append(check_default_contracts())
     if any(results):
         print()
