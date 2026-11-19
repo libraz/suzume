@@ -217,15 +217,7 @@ void appendIchidanRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
         // the stem's role is decided by what follows the auxiliary rather than
         // by the auxiliary itself.
         const bool classical_negative_aux_follows =
-            first_hira != U'せ' &&
-            vh::auxiliaryFollowsAt(dict_manager, codepoints, renyokei_end,
-                                   [](const dictionary::DictionaryEntry& entry) {
-                                     if (entry.extended_pos == core::ExtendedPOS::AuxVolitional) {
-                                       return normalize::utf8Length(entry.surface) == 1;
-                                     }
-                                     return entry.extended_pos == core::ExtendedPOS::AuxNegativeNu ||
-                                            entry.extended_pos == core::ExtendedPOS::AuxNegativeMai;
-                                   });
+            first_hira != U'せ' && vh::irrealisAuxiliaryFollowsAt(dict_manager, codepoints, renyokei_end);
         // A multi-kanji nominal stem followed by せ+ん is the literary
         // irrealis of する (解決+せ+ん), not an unverified Ichidan verb
         // ending in ～せる.  Dictionary-verified lexical verbs such as

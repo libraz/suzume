@@ -680,6 +680,32 @@ bool auxiliaryFollowsAt(const dictionary::DictionaryManager* dict_manager, const
                                 accept);
 }
 
+bool irrealisAuxiliaryFollowsAt(const dictionary::DictionaryManager* dict_manager,
+                                const std::vector<char32_t>& codepoints, size_t pos) {
+  if (dict_manager == nullptr || pos >= codepoints.size()) {
+    return false;
+  }
+  constexpr size_t kAuxiliaryProbe = 3;
+  const size_t max_end = lookaheadEnd(codepoints.size(), pos, kAuxiliaryProbe);
+  for (size_t aux_end = pos + 1; aux_end <= max_end; ++aux_end) {
+    const auto* entry = lookupEntryInRange(*dict_manager, codepoints, pos, aux_end, core::PartOfSpeech::Auxiliary);
+    if (entry == nullptr) {
+      continue;
+    }
+    const bool selects_irrealis = entry->extended_pos == core::ExtendedPOS::AuxVolitional
+                                      ? aux_end == pos + 1
+                                      : entry->extended_pos == core::ExtendedPOS::AuxNegativeNu ||
+                                            entry->extended_pos == core::ExtendedPOS::AuxNegativeMai;
+    // A spelling that is also a final particle (the 已然形 ね of ぬ) closes a
+    // clause after any word, so it says nothing about the stem before it.
+    const auto* particle = lookupEntryInRange(*dict_manager, codepoints, pos, aux_end, core::PartOfSpeech::Particle);
+    if (selects_irrealis && (particle == nullptr || particle->extended_pos != core::ExtendedPOS::ParticleFinal)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool classicalAuxiliaryFollowsAt(const dictionary::DictionaryManager* dict_manager,
                                  const std::vector<char32_t>& codepoints, size_t pos) {
   if (dict_manager == nullptr || pos >= codepoints.size()) {

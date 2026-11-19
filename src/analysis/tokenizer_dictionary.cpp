@@ -611,6 +611,22 @@ void addDictionaryEntryEdges(core::Lattice& lattice, const tokenizer_dictionary_
                     core::CandidateOrigin::NominalizedNoun, candidate::kNoOriginConfidence, {},
                     core::ExtendedPOS::NounVerbal, "dictionary_renyokei_nominalized_after_noun");
   }
+  // A listed Ichidan continuative also spells the irrealis, which an
+  // irrealis-selecting auxiliary needs (秀で+む); the unlisted stem path reads
+  // the same cell the same way, behind a kanji stem as that path does (a kana
+  // ん after a kana stem is also the contracted terminal, やめん+な). A
+  // continuative that is the lemma minus る is Ichidan; a godan-ra one ends in り.
+  if (result.entry->pos == core::PartOfSpeech::Verb && result.entry->extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      normalize::classifyChar(codepoints[start_pos]) == normalize::CharType::Kanji &&
+      utf8::decodeLastChar(lemma) == core::hiragana::kRu &&
+      utf8::dropLastChar(lemma) == std::string_view(result.entry->surface) &&
+      verb_helpers::irrealisAuxiliaryFollowsAt(&dict_manager, codepoints, end_pos)) {
+    lattice.addEdge(result.entry->surface, static_cast<uint32_t>(start_pos), static_cast<uint32_t>(end_pos),
+                    result.entry->pos, getCategoryCost(core::ExtendedPOS::VerbMizenkei), flags, lemma,
+                    dictionary::ConjugationType::Ichidan, core::CandidateOrigin::Dictionary,
+                    candidate::kDictionaryOriginConfidence, {}, core::ExtendedPOS::VerbMizenkei,
+                    "dict_ichidan_irrealis");
+  }
   // An auxiliary cell spelled with a final sokuon is an onbin form, and what
   // it can connect to follows from the paradigm it belongs to. The past た is
   // always available. The connective て needs a paradigm that has a te-form at

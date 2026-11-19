@@ -1234,6 +1234,146 @@
       ],
       "id": "wonomi_renai",
       "input": "危険をのみ恐れない"
+    },
+    {
+      "description": "mid-clause ただ before a predicate is an adverb",
+      "expected": [
+        {
+          "lemma": "彼",
+          "pos": "Pronoun",
+          "surface": "彼"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "ただ",
+          "pos": "Adverb",
+          "surface": "ただ"
+        },
+        {
+          "lemma": "笑う",
+          "pos": "Verb",
+          "surface": "笑っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "hatada_ttta",
+      "input": "彼はただ笑った"
+    },
+    {
+      "description": "clause-opening ただ before 単に is an adverb",
+      "expected": [
+        {
+          "lemma": "ただ",
+          "pos": "Adverb",
+          "surface": "ただ"
+        },
+        {
+          "lemma": "単",
+          "pos": "Noun",
+          "surface": "単"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "そう",
+          "pos": "Adverb",
+          "surface": "そう"
+        },
+        {
+          "lemma": "思う",
+          "pos": "Verb",
+          "surface": "思っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "tada_nisou_ttta",
+      "input": "ただ単にそう思った"
+    },
+    {
+      "description": "clause-opening ただ with a restrictive particle in the clause is an adverb",
+      "expected": [
+        {
+          "lemma": "ただ",
+          "pos": "Adverb",
+          "surface": "ただ"
+        },
+        {
+          "lemma": "泣く",
+          "pos": "Verb",
+          "surface": "泣く"
+        },
+        {
+          "lemma": "ばかり",
+          "pos": "Particle",
+          "surface": "ばかり"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "tada_kubakarida",
+      "input": "ただ泣くばかりだ"
+    },
+    {
+      "description": "listed ichidan stem hosts the literary conjectural む as its irrealis",
+      "expected": [
+        {
+          "lemma": "秀でる",
+          "pos": "Verb",
+          "surface": "秀で"
+        },
+        {
+          "lemma": "む",
+          "pos": "Auxiliary",
+          "surface": "む"
+        }
+      ],
+      "id": "demu",
+      "input": "秀でむ"
+    },
+    {
+      "description": "listed ichidan stem after a case argument hosts the literary conjectural む",
+      "expected": [
+        {
+          "lemma": "人",
+          "pos": "Noun",
+          "surface": "人"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "秀でる",
+          "pos": "Verb",
+          "surface": "秀で"
+        },
+        {
+          "lemma": "む",
+          "pos": "Auxiliary",
+          "surface": "む"
+        }
+      ],
+      "id": "ni_demu",
+      "input": "人に秀でむ"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 12/12)",

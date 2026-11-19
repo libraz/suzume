@@ -473,6 +473,38 @@
       ],
       "id": "kodomogakuru",
       "input": "こどもがくる"
+    },
+    {
+      "description": "clause-opening ただ before a quantity is an adverb",
+      "expected": [
+        {
+          "lemma": "ただ",
+          "pos": "Adverb",
+          "surface": "ただ"
+        },
+        {
+          "lemma": "一人",
+          "pos": "Noun",
+          "surface": "一人"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "来る",
+          "pos": "Verb",
+          "surface": "来"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "tada_de_ta",
+      "input": "ただ一人で来た"
     }
   ],
   "description": "Irregular verbs (する、くる) (part 2/2)",

@@ -441,6 +441,16 @@ bool auxiliaryFollowsAt(const dictionary::DictionaryManager* dict_manager, const
                         size_t pos, EntryAccept accept);
 
 /**
+ * @brief True when an auxiliary that selects an Ichidan irrealis starts at @p pos.
+ *
+ * The negative ぬ/まい and the one-mora conjectural (む, ん) take the irrealis,
+ * which an Ichidan verb spells like its continuative (流れ+む, 食べ+ん). よう is
+ * left out: it is equally the formal noun 様 the continuative hosts.
+ */
+bool irrealisAuxiliaryFollowsAt(const dictionary::DictionaryManager* dict_manager,
+                                const std::vector<char32_t>& codepoints, size_t pos);
+
+/**
  * @brief True when a dictionary auxiliary that selects a predicate starts at
  *        @p pos.
  *

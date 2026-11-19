@@ -99,6 +99,7 @@ set(TEST_SOURCES
   analysis/kanji_verb_acceptance_threshold_test.cpp
   analysis/unknown_bracketed_noun_test.cpp
   analysis/short_ichidan_relative_clause_test.cpp
+  analysis/listed_ichidan_irrealis_test.cpp
   analysis/noun_nagara_ni_test.cpp
   analysis/scorer_character_count_test.cpp
   analysis/scorer_word_cost_test.cpp
