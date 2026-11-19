@@ -38,7 +38,7 @@ class TestFixedFunctionSearchUnit:
             result, rule = apply_suzume_split([_tok("次に", pos=reference_pos)])
             assert result == [
                 {"surface": "次", "pos": "名詞", "lemma": "次"},
-                {"surface": "に", "pos": "助詞", "lemma": "に"},
+                {"surface": "に", "pos": "助詞", "pos_sub1": "副詞化", "lemma": "に"},
             ]
         assert rule == "adverb-ni-split"
 

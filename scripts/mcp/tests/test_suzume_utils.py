@@ -1013,3 +1013,22 @@ class TestNegationPrefixedStemBeforeCopula:
     def test_leaves_nominal_uses(self, text):
         tokens, _, _ = get_expected_tokens(text)
         assert tokens[0]["pos"] == "Noun"
+
+
+class TestTadaReading:
+    @pytest.mark.parametrize(
+        ("text", "pos"),
+        [
+            ("彼はただ笑った", "Adverb"),
+            ("ただ一人", "Adverb"),
+            ("ただ単に面倒だ", "Adverb"),
+            ("ただひたすら待つ", "Adverb"),
+            ("ただ泣くばかりだ", "Adverb"),
+            ("ただの水", "Noun"),
+            ("ただ、今日は休みだ", "Conjunction"),
+            ("ただ今日は休みだ", "Conjunction"),
+        ],
+    )
+    def test_reads_tada_by_its_clause(self, text, pos):
+        tokens = get_expected_tokens(text)[0]
+        assert next(t["pos"] for t in tokens if t["surface"] == "ただ") == pos

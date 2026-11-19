@@ -504,7 +504,7 @@ def apply_suzume_split(tokens: list[dict]) -> tuple[list[dict], str | None]:
             if m:
                 base = m.group(1)
                 result.append({"surface": base, "pos": "名詞", "lemma": base})
-                result.append({"surface": "に", "pos": "助詞", "lemma": "に"})
+                result.append({"surface": "に", "pos": "助詞", "pos_sub1": "副詞化", "lemma": "に"})
                 if applied_rule is None:
                     applied_rule = "adverb-ni-split"
                 continue

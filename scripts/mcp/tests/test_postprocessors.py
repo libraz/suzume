@@ -56,6 +56,7 @@ from suzume_mcp.core.postprocessors import (
     postprocess_sou_host,
     postprocess_state_suffix,
     postprocess_subsidiary_yuku,
+    postprocess_tada,
     postprocess_tagaru_aux,
     postprocess_teki_na_adjective,
     postprocess_temporal_nao,
@@ -323,6 +324,57 @@ class TestPostprocessIkaga:
         tokens = [_tok("いかが", "Adjective"), _tok("食べ", "Verb")]
         postprocess_ikaga(tokens)
         assert tokens[0]["pos"] == "Adverb"
+
+
+class TestPostprocessTada:
+    """ただ opens a clause as a conjunction only when nothing in the clause ties it to an adverb."""
+
+    @staticmethod
+    def _tada_pos(tokens: list[dict]) -> str:
+        postprocess_tada(tokens)
+        return next(t["pos"] for t in tokens if t["surface"] == "ただ")
+
+    def test_after_another_word_of_the_clause_is_the_adverb(self):
+        tokens = [_tok("彼", "Pronoun"), _tok("は", "Particle"), _tok("ただ", "Conjunction"), _tok("笑っ", "Verb")]
+        assert self._tada_pos(tokens) == "Adverb"
+
+    @pytest.mark.parametrize(
+        "following",
+        [
+            pytest.param([_tok("一人", "Noun", pos_sub1="数")], id="quantity"),
+            pytest.param([_tok("ひたすら", "Adverb"), _tok("待つ", "Verb")], id="adverb"),
+            pytest.param([_tok("単", "Noun"), _tok("に", "Particle", pos_sub1="副詞化")], id="split-adverb"),
+            pytest.param([_tok("泣く", "Verb"), _tok("ばかり", "Particle"), _tok("だ", "Auxiliary")], id="restrictive"),
+            pytest.param(
+                [_tok("今日", "Noun"), _tok("だけ", "Particle"), _tok("は", "Particle")], id="restrictive-noun"
+            ),
+        ],
+    )
+    def test_clause_opening_modifier_is_the_adverb(self, following):
+        assert self._tada_pos([_tok("ただ", "Conjunction"), *following]) == "Adverb"
+
+    def test_before_de_is_the_adverbial_noun(self):
+        assert self._tada_pos([_tok("ただ", "Conjunction"), _tok("で", "Particle"), _tok("貰っ", "Verb")]) == "Adverb"
+
+    @pytest.mark.parametrize(
+        "tokens",
+        [
+            pytest.param([_tok("ただ", "Conjunction")], id="alone-before-comma"),
+            pytest.param(
+                [_tok("ただ", "Conjunction"), _tok("今日", "Noun"), _tok("は", "Particle"), _tok("休み", "Noun")],
+                id="bare-clause-opening",
+            ),
+            pytest.param(
+                [_tok("ただ", "Conjunction"), _tok("東京", "Noun"), _tok("に", "Particle", pos_sub1="格助詞")],
+                id="case-ni-is-not-a-split-adverb",
+            ),
+            pytest.param(
+                [_tok("だが", "Conjunction"), _tok("ただ", "Conjunction"), _tok("雨", "Noun")], id="after-conjunction"
+            ),
+        ],
+    )
+    def test_keeps_the_conjunction_without_adverb_evidence(self, tokens):
+        assert self._tada_pos(tokens) == "Conjunction"
 
 
 class TestPostprocessDemo:

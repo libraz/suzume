@@ -89,20 +89,38 @@ def postprocess_prefix_before_verb(tokens: list[dict]) -> bool:
             token["pos"] = "Noun"
 
 
+_RESTRICTIVE_PARTICLES = frozenset({"だけ", "ばかり", "のみ", "しか"})
+
+
+def _modifies_following(tokens: list[dict], i: int) -> bool:
+    """Whether a clause-opening ただ at ``i`` modifies what follows it."""
+    following = tokens[i + 1 : i + 3]
+    if not following:
+        return False
+    head = following[0]
+    split_adverb = len(following) == 2 and following[1].get("pos_sub1") == "副詞化"
+    if head.get("surface") == "で" or head.get("pos") == "Adverb" or head.get("pos_sub1") == "数" or split_adverb:
+        return True
+    return any(t.get("pos") == "Particle" and t.get("surface") in _RESTRICTIVE_PARTICLES for t in tokens[i + 1 :])
+
+
 @reports_mutation
 def postprocess_tada(tokens: list[dict]) -> bool:
-    """Context-dependent ただ normalization.
+    """Read ただ as the conjunction only where it opens a clause of its own.
 
-    The reference dictionary defaults ただ to the clause-opening conjunction
-    ("however"), but directly before で it is the adverbial noun meaning "free
-    of charge" (ただで手に入る, ただでさえ, ただでは済まない). The conjunction
-    reading needs a clause boundary, which shows up as punctuation, so gating on
-    the immediately following で keeps it untouched.
+    The reference defaults ただ to the conjunction ("however"). Each token list
+    is one clause, so ただ after another word of the clause is the adverb (彼は
+    ただ笑った), as is a clause-opening ただ that modifies what follows: a
+    quantity (ただ一人), an adverb (ただひたすら, ただ単に), a predicate a
+    restrictive particle limits (ただ泣くばかりだ), or で, where it is the noun
+    "free of charge" read adverbially (ただで貰った). A bare clause-opening ただ
+    keeps the reference's reading, since both hold (ただ今日は休みだ).
     """
     for i, t in enumerate(tokens):
         if t.get("surface") != "ただ" or t.get("pos") != "Conjunction":
             continue
-        if i + 1 < len(tokens) and tokens[i + 1].get("surface") == "で":
+        mid_clause = i > 0 and tokens[i - 1].get("pos") != "Conjunction"
+        if mid_clause or (i == 0 and _modifies_following(tokens, i)):
             t["pos"] = "Adverb"
             t["lemma"] = "ただ"
 
