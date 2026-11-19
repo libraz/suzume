@@ -1422,6 +1422,119 @@
       ],
       "id": "deyoku_ta",
       "input": "家でよく寝た"
+    },
+    {
+      "description": "外でいた - regression test",
+      "expected": [
+        {
+          "lemma": "外",
+          "pos": "Noun",
+          "surface": "外"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "deita",
+      "input": "外でいた"
+    },
+    {
+      "description": "外でいます - regression test",
+      "expected": [
+        {
+          "lemma": "外",
+          "pos": "Noun",
+          "surface": "外"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "い"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "deimasu",
+      "input": "外でいます"
+    },
+    {
+      "description": "公園でいました - regression test",
+      "expected": [
+        {
+          "lemma": "公園",
+          "pos": "Noun",
+          "surface": "公園"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "い"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "まし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "deimashita",
+      "input": "公園でいました"
+    },
+    {
+      "description": "一人でいた - regression test",
+      "expected": [
+        {
+          "lemma": "一人",
+          "pos": "Noun",
+          "surface": "一人"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "いる",
+          "pos": "Verb",
+          "surface": "い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "deita_2",
+      "input": "一人でいた"
     }
   ],
   "description": "Case particles (が、を、に、で)",
