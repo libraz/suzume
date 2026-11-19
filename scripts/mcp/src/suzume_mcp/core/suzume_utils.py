@@ -1,6 +1,7 @@
 """Main orchestration module ported from SuzumeUtils.pm get_expected_tokens() etc."""
 
 import unicodedata
+from itertools import zip_longest
 
 import regex
 
@@ -423,23 +424,38 @@ def get_expected_tokens(text: str, suzume_tokens: list[dict] | None = None) -> t
     return tokens, "MeCab", ""
 
 
+def token_differences(expected: list[dict], actual: list[dict], *, compare_lemma: bool = True) -> list[dict]:
+    """List what the C++ tokenization runner would fail on, one row per differing token field.
+
+    Surfaces come first: when the splits disagree only the differing surfaces are
+    listed, since POS and lemma are not comparable across different tokens. A
+    missing lemma stands for the surface.
+    """
+    expected_surfaces = [tok.get("surface", "") for tok in expected]
+    actual_surfaces = [tok.get("surface", "") for tok in actual]
+    if expected_surfaces != actual_surfaces:
+        return [
+            {"index": index, "type": "surface", "expected": exp, "suzume": act}
+            for index, (exp, act) in enumerate(zip_longest(expected_surfaces, actual_surfaces, fillvalue=""))
+            if exp != act
+        ]
+    differences = []
+    for index, (exp, act) in enumerate(zip(expected, actual, strict=True)):
+        surface = exp.get("surface", "")
+        fields = [("pos", normalize_pos(exp.get("pos", "")), normalize_pos(act.get("pos", "")))]
+        if compare_lemma:
+            fields.append(("lemma", exp.get("lemma") or surface, act.get("lemma") or surface))
+        differences.extend(
+            {"index": index, "type": field, "surface": surface, "expected": exp_value, "suzume": act_value}
+            for field, exp_value, act_value in fields
+            if exp_value != act_value
+        )
+    return differences
+
+
 def tokens_match(a: list[dict], b: list[dict], *, compare_lemma: bool = True) -> bool:
     """Compare two token arrays for equality (surface, pos, and lemma by default)."""
-    if len(a) != len(b):
-        return False
-    for ta, tb in zip(a, b, strict=True):
-        if ta.get("surface", "") != tb.get("surface", ""):
-            return False
-        pos_a = normalize_pos(ta.get("pos", ""))
-        pos_b = normalize_pos(tb.get("pos", ""))
-        if pos_a != pos_b:
-            return False
-        if compare_lemma:
-            lemma_a = ta.get("lemma") or ta.get("surface", "")
-            lemma_b = tb.get("lemma") or tb.get("surface", "")
-            if lemma_a != lemma_b:
-                return False
-    return True
+    return not token_differences(a, b, compare_lemma=compare_lemma)
 
 
 def format_expected(tokens: list[dict]) -> list[dict]:

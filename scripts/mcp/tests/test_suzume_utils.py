@@ -10,6 +10,7 @@ from suzume_mcp.core.suzume_utils import (
     format_expected,
     get_char_types,
     get_expected_tokens,
+    token_differences,
     tokens_match,
 )
 
@@ -336,6 +337,48 @@ class TestTokensMatch:
         a = [{"surface": "食べ", "pos": "Verb"}]
         b = [{"surface": "食べ", "pos": "Verb"}, {"surface": "た", "pos": "Auxiliary"}]
         assert not tokens_match(a, b)
+
+
+class TestTokenDifferences:
+    """The single comparison behind test_show, defect_probe and the pin verdict of test_add."""
+
+    def test_identical_tokens_have_no_differences(self):
+        tokens = [{"surface": "食べ", "pos": "Verb", "lemma": "食べる"}, {"surface": "た", "pos": "Auxiliary"}]
+        assert token_differences(tokens, [dict(tok) for tok in tokens]) == []
+
+    def test_a_different_split_reports_surfaces_only(self):
+        expected = [{"surface": "がくしゃ", "pos": "Noun"}, {"surface": "だ", "pos": "Auxiliary"}]
+        actual = [{"surface": "がく", "pos": "Noun"}, {"surface": "しゃだ", "pos": "Noun"}]
+
+        assert token_differences(expected, actual) == [
+            {"index": 0, "type": "surface", "expected": "がくしゃ", "suzume": "がく"},
+            {"index": 1, "type": "surface", "expected": "だ", "suzume": "しゃだ"},
+        ]
+
+    def test_an_extra_token_is_a_surface_difference(self):
+        expected = [{"surface": "食べ", "pos": "Verb"}]
+        actual = [{"surface": "食べ", "pos": "Verb"}, {"surface": "た", "pos": "Auxiliary"}]
+        assert token_differences(expected, actual) == [{"index": 1, "type": "surface", "expected": "", "suzume": "た"}]
+
+    def test_agreeing_surfaces_name_the_token_and_field_that_differ(self):
+        expected = [{"surface": "がくしゃ", "pos": "Noun", "lemma": "がくしゃ"}, {"surface": "だ", "pos": "Auxiliary"}]
+        actual = [{"surface": "がくしゃ", "pos": "Verb", "lemma": "がくす"}, {"surface": "だ", "pos": "AUXILIARY"}]
+
+        assert token_differences(expected, actual) == [
+            {"index": 0, "type": "pos", "surface": "がくしゃ", "expected": "Noun", "suzume": "Verb"},
+            {"index": 0, "type": "lemma", "surface": "がくしゃ", "expected": "がくしゃ", "suzume": "がくす"},
+        ]
+
+    def test_a_missing_lemma_stands_for_the_surface(self):
+        expected = [{"surface": "東京", "pos": "Noun"}]
+        assert token_differences(expected, [{"surface": "東京", "pos": "Noun", "lemma": "東京"}]) == []
+
+    def test_lemma_can_be_left_out(self):
+        expected = [{"surface": "見", "pos": "Verb", "lemma": "見る"}]
+        actual = [{"surface": "見", "pos": "Verb", "lemma": "見える"}]
+        assert token_differences(expected, actual, compare_lemma=False) == []
+        assert tokens_match(expected, actual, compare_lemma=False)
+        assert not tokens_match(expected, actual)
 
 
 class TestFormatExpected:

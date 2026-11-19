@@ -1,13 +1,11 @@
 """Read-only test inspection and comparison MCP tools."""
 
 import re
-from itertools import zip_longest
 from pathlib import Path
 
 from ..app import mcp
 from ..config import PROJECT_ROOT
 from ..core.diff_utils import classify_surface_diff
-from ..core.pos_mapping import normalize_pos
 from ..core.suzume_cli import (
     get_expected_tokens_subprocess as get_expected_tokens,
 )
@@ -15,7 +13,7 @@ from ..core.suzume_cli import (
     get_mecab_tokens_batch_subprocess,
     get_suzume_debug_info,
 )
-from ..core.suzume_utils import tokens_match
+from ..core.suzume_utils import token_differences, tokens_match
 from ..core.test_file_utils import (
     find_test_by_id,
     get_cases,
@@ -66,31 +64,12 @@ async def test_show(
 
     existing = _case_locations(PROJECT_ROOT, input_text)
 
-    # Diff classification
-    surface_match = "|".join(expected_surfaces) == "|".join(suzume_surfaces)
-    full_match = surface_match and tokens_match(expected_tokens, suzume_tokens)
+    # Diff classification: the same comparison the C++ runner applies.
+    diff_details = token_differences(expected_tokens, suzume_tokens)
+    full_match = not diff_details
     diff_type = classify_surface_diff(expected_surfaces, suzume_surfaces)
-    diff_details = []
-
-    if not surface_match:
-        for idx, (exp, suz) in enumerate(zip_longest(expected_surfaces, suzume_surfaces, fillvalue="")):
-            if exp != suz:
-                diff_details.append({"index": idx, "expected": exp, "suzume": suz, "type": "surface"})
-    elif not full_match:
+    if diff_details and diff_details[0]["type"] != "surface":
         diff_type = "pos-lemma"
-        for idx, (exp, suz) in enumerate(zip(expected_tokens, suzume_tokens, strict=True)):
-            e_pos = normalize_pos(exp.get("pos", ""))
-            s_pos = normalize_pos(suz.get("pos", ""))
-            e_lemma = exp.get("lemma", exp["surface"])
-            s_lemma = suz.get("lemma", suz["surface"])
-            if e_pos != s_pos:
-                diff_details.append(
-                    {"index": idx, "surface": exp["surface"], "expected": e_pos, "suzume": s_pos, "type": "pos"}
-                )
-            if e_lemma != s_lemma:
-                diff_details.append(
-                    {"index": idx, "surface": exp["surface"], "expected": e_lemma, "suzume": s_lemma, "type": "lemma"}
-                )
 
     # TSV mode - keep plain text for copy-paste
     if mode == "tsv":
