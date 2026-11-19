@@ -258,6 +258,6 @@ jobs:
           uv run --locked mypy src/suzume
       - name: Run Python tests
         working-directory: bindings/python
-        run: |
-          uv run --locked pytest -q
-          uv run --locked python ../../examples/python/basic.py
+        run: uv run --locked pytest -q
+      - name: Run the Python examples
+        run: make python-examples

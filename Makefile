@@ -358,7 +358,10 @@ python-test: python-build python-dict
 	$(MAKE) python-examples
 
 python-examples: python-build
-	cd bindings/python && $(UV_RUN) python ../../examples/python/basic.py
+	cd bindings/python && for example in ../../examples/python/*.py; do \
+		echo "Running $$example"; \
+		$(UV_RUN) python "$$example" || exit 1; \
+	done
 
 # Build a platform-tagged wheel
 python-wheel:
