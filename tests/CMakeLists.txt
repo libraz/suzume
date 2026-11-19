@@ -103,6 +103,7 @@ set(TEST_SOURCES
   analysis/noun_nagara_ni_test.cpp
   analysis/scorer_character_count_test.cpp
   analysis/scorer_word_cost_test.cpp
+  analysis/tokenizer_utils_test.cpp
   analysis/suffix_candidates_counter_test.cpp
   analysis/tokenizer_existential_noun_test.cpp
   analysis/user_dict_precedence_test.cpp

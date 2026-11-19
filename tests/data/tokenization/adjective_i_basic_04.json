@@ -606,6 +606,87 @@
       ],
       "id": "iihanashiwo_ita",
       "input": "いいはなしを聞いた"
+    },
+    {
+      "description": "adjective terminal before a kana noun that opens on the topic particle mora",
+      "expected": [
+        {
+          "lemma": "よい",
+          "pos": "Adjective",
+          "surface": "よい"
+        },
+        {
+          "lemma": "はなし",
+          "pos": "Noun",
+          "surface": "はなし"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "yoihanashidesu",
+      "input": "よいはなしです"
+    },
+    {
+      "description": "control: adjective terminals listed with the binding particle",
+      "expected": [
+        {
+          "lemma": "高い",
+          "pos": "Adjective",
+          "surface": "高い"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "安い",
+          "pos": "Adjective",
+          "surface": "安い"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Adjective",
+          "surface": "ない"
+        }
+      ],
+      "id": "imo_imonai",
+      "input": "高いも安いもない"
+    },
+    {
+      "description": "control: concessive reduplication with the topic particle after an adjective terminal",
+      "expected": [
+        {
+          "lemma": "寒い",
+          "pos": "Adjective",
+          "surface": "寒い"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "寒い",
+          "pos": "Adjective",
+          "surface": "寒い"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        }
+      ],
+      "id": "iha_iga",
+      "input": "寒いは寒いが"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 4/4)",

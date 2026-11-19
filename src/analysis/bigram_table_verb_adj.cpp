@@ -399,6 +399,11 @@ bool setVerbAndAdjectiveCosts(BigramMatrix& table) {
       // nominalizer+case-particle path before a past predicate.
       {EPOS::AdjBasic, EPOS::ParticleConj, cost::kVeryStrongBonus},
 
+      // An adjective terminal takes a binding particle only in a reduplication
+      // or a listing (高い+は+高い, 高い+も+安い+も); before a kana run that
+      // spells a noun the attributive reading is the usual one (よい+はなし).
+      {EPOS::AdjBasic, EPOS::ParticleTopic, cost::kMinor},
+
       // AdjBasic → Noun (美しい+猫, 大きい+家, 高い+山) - strong bonus
       // i-adjective attributive form + noun is fundamental Japanese grammar
       // and must beat the homographic verb-renyokei reading of deverbal nouns
