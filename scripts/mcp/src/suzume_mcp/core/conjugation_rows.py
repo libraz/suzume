@@ -23,3 +23,8 @@ GODAN_E_ROW_TO_BASE: dict[str, str] = {
     "め": "む",
     "れ": "る",
 }
+
+
+def takes_continuative(token: dict) -> bool:
+    """Whether ``token`` attaches only to a verb continuative: た, て, ます."""
+    return token.get("surface") in ("た", "たら", "たり", "て") or token.get("lemma") == "ます"

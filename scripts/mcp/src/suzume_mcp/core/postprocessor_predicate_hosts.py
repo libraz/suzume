@@ -2,6 +2,7 @@
 
 import regex
 
+from .conjugation_rows import takes_continuative
 from .mecab import is_single_token_of_pos
 from .postprocessor_common import PREDICATE_POS
 from .split_rules import base_from_mizenkei, bases_from_renyokei
@@ -92,11 +93,6 @@ def postprocess_sou_host(tokens: list[dict]) -> bool:
     return changed
 
 
-def _takes_continuative(token: dict) -> bool:
-    """Whether ``token`` attaches only to a verb continuative: た, て, ます."""
-    return token.get("surface") in ("た", "たら", "たり", "て") or token.get("lemma") == "ます"
-
-
 # One-mora ichidan continuatives that share a surface with a particle; the
 # lemma is the one the reference gives the verb reading.
 _PARTICLE_HOMOGRAPH_CONTINUATIVES = {"で": "出る", "に": "にる"}
@@ -127,7 +123,7 @@ def postprocess_adverb_host_context(tokens: list[dict]) -> bool:
         following = tokens[idx + 1] if idx + 1 < len(tokens) else {}
         after = tokens[idx + 2] if idx + 2 < len(tokens) else {}
         verb_lemma = _PARTICLE_HOMOGRAPH_CONTINUATIVES.get(following.get("surface", ""))
-        if verb_lemma and following.get("pos") != "Verb" and _takes_continuative(after):
+        if verb_lemma and following.get("pos") != "Verb" and takes_continuative(after):
             following.update(pos="Verb", lemma=verb_lemma)
             changed = True
         if following.get("surface") == "な" and following.get("lemma") == "だ" and after.get("pos") == "Noun":
@@ -143,6 +139,27 @@ def postprocess_adverb_host_context(tokens: list[dict]) -> bool:
         ):
             token["pos"] = "Adjective"
             token["lemma"] = surface[:-1] + "い"
+            changed = True
+    return changed
+
+
+def postprocess_copula_de_before_masu(tokens: list[dict]) -> bool:
+    """Read a copula-tagged で directly before ます as the continuative of 出る.
+
+    The copula's continuative で never hosts ます (polite copula is です, であります),
+    whatever precedes it (よく+で+ます, 外で+で+ます, 元気+で+ます).
+    """
+    changed = False
+    for idx in range(len(tokens) - 1):
+        token, following = tokens[idx], tokens[idx + 1]
+        if (
+            token.get("surface") == "で"
+            and token.get("pos") == "Auxiliary"
+            and token.get("lemma") == "だ"
+            and following.get("pos") == "Auxiliary"
+            and following.get("lemma") == "ます"
+        ):
+            token.update(pos="Verb", lemma=_PARTICLE_HOMOGRAPH_CONTINUATIVES["で"])
             changed = True
     return changed
 

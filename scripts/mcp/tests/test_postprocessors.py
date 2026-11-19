@@ -2082,3 +2082,39 @@ class TestClauseFinalKanaIrrealis:
     def test_a_kanji_stem_irrealis_stays_a_verb(self):
         token = next(t for t in get_expected_tokens("これを読ま")[0] if t["surface"] == "読ま")
         assert (token["pos"], token["lemma"]) == ("Verb", "読む")
+
+
+class TestCopulaDeBeforeMasu:
+    """A copula-tagged で never hosts ます; it is the continuative of 出る."""
+
+    @pytest.mark.parametrize("text", ["よくでます", "食べてもでます", "外ででます", "元気でます", "部屋ででません"])
+    def test_de_before_masu_is_the_verb(self, text):
+        tokens = get_expected_tokens(text)[0]
+        index = next(i for i, t in enumerate(tokens) if t["lemma"] == "ます")
+        assert (tokens[index - 1]["surface"], tokens[index - 1]["pos"], tokens[index - 1]["lemma"]) == (
+            "で",
+            "Verb",
+            "出る",
+        )
+
+    def test_the_conjunctive_de_of_a_nasal_te_form_is_kept(self):
+        tokens = get_expected_tokens("読んでます")[0]
+        assert [(t["surface"], t["pos"]) for t in tokens] == [
+            ("読ん", "Verb"),
+            ("で", "Particle"),
+            ("ます", "Auxiliary"),
+        ]
+
+
+class TestConjunctionTeAdverbStrandedSubsidiary:
+    """A subsidiary verb read off the て inside かつて becomes the main verb."""
+
+    @pytest.mark.parametrize(("text", "surface"), [("かつておきます", "おき"), ("かつてしまった", "しまっ")])
+    def test_the_stranded_subsidiary_is_a_verb(self, text, surface):
+        tokens = get_expected_tokens(text)[0]
+        assert tokens[0]["surface"] == "かつて"
+        assert next(t for t in tokens if t["surface"] == surface)["pos"] == "Verb"
+
+    def test_a_real_auxiliary_after_the_adverb_is_left_alone(self):
+        tokens = get_expected_tokens("かつていました")[0]
+        assert [t["pos"] for t in tokens] == ["Adverb", "Verb", "Auxiliary", "Auxiliary"]

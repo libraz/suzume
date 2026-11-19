@@ -182,6 +182,7 @@ postprocess_negative_host = postprocessor_subsidiaries.postprocess_negative_host
 postprocess_sou_host = postprocessor_subsidiaries.postprocess_sou_host
 postprocess_listing_tari = postprocessor_classical.postprocess_listing_tari
 postprocess_adverb_host_context = postprocessor_subsidiaries.postprocess_adverb_host_context
+postprocess_copula_de_before_masu = postprocessor_subsidiaries.postprocess_copula_de_before_masu
 postprocess_hostless_nite = postprocessor_subsidiaries.postprocess_hostless_nite
 postprocess_predicate_cell_lemmas = postprocessor_subsidiaries.postprocess_predicate_cell_lemmas
 postprocess_frame_repairs = postprocessor_subsidiaries.postprocess_frame_repairs
@@ -358,6 +359,7 @@ POSTPROCESSORS: tuple[tuple[str, Callable[[list[dict]], bool]], ...] = (
     ("sou-host", postprocess_sou_host),
     ("listing-tari", postprocess_listing_tari),
     ("adverb-host-context", postprocess_adverb_host_context),
+    ("copula-de-before-masu", postprocess_copula_de_before_masu),
     ("hostless-nite", postprocess_hostless_nite),
     ("predicate-cell-lemmas", postprocess_predicate_cell_lemmas),
     ("frame-repairs", postprocess_frame_repairs),

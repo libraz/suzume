@@ -2258,6 +2258,18 @@ class TestL2KanaAdjective:
         assert result[0]["lemma"] == "すくない"
         assert rule == "l2-adjective"
 
+    @pytest.mark.parametrize(("follower", "lemma"), [("ます", "ます"), ("た", "た"), ("て", "て")])
+    def test_an_i_cell_before_a_continuative_follower_is_not_merged(self, follower, lemma):
+        tokens = [
+            _tok("外", pos="名詞", lemma="外"),
+            _tok("で", pos="助詞", pos_sub1="格助詞", lemma="で"),
+            _tok("かい", pos="動詞", lemma="かう"),
+            _tok(follower, pos="助動詞" if follower != "て" else "助詞", lemma=lemma),
+        ]
+        result, rule = apply_suzume_merge(tokens, "外でかい" + follower)
+        assert [t["surface"] for t in result] == ["外", "で", "かい", follower]
+        assert rule != "l2-adjective"
+
 
 class TestBoundVoicedSuffix:
     def test_ichidan_kare_keeps_case_particle(self):

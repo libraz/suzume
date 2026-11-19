@@ -2,6 +2,7 @@
 
 import regex
 
+from .conjugation_rows import takes_continuative
 from .constants import CHARACTER_SPEECH_COPULAS, DERIVED_ADJECTIVE_SUFFIX_LEMMAS, NAI_ADJECTIVES
 from .core_lexicon import kana_i_adjective_lemmas
 from .mecab import mecab_analyze
@@ -113,6 +114,10 @@ def _merge_adjective_forms(state: MergeState) -> bool:
                         continue
                     consumed, j = _consume_span(tokens, i, len(cell))
                     if consumed != cell or j == i + 1:
+                        continue
+                    # The い cell is final/attributive and takes no た/て/ます; a verb
+                    # continuative ends the span instead (外/で/かい/ます, not でかい).
+                    if ending == "い" and j < len(tokens) and takes_continuative(tokens[j]):
                         continue
                     result.append({"surface": cell, "pos": "形容詞", "lemma": adjective})
                     i = j

@@ -112,7 +112,9 @@ def postprocess_conjunction_te_adverb(tokens: list[dict]) -> bool:
 
     A conjunction has no te-form, so conjunction + て is never a grammatical
     chain; the span is the adverb MeCab split (かつ + て → かつて). で is not
-    included: after a conjunction it is a case particle (ただ + で).
+    included: after a conjunction it is a case particle (ただ + で). A
+    subsidiary verb read off that て loses its host and is the main verb
+    (かつて + おき + ます).
     """
     changed = False
     idx = 0
@@ -125,6 +127,9 @@ def postprocess_conjunction_te_adverb(tokens: list[dict]) -> bool:
         ):
             adverb = token.get("surface", "") + "て"
             tokens[idx : idx + 2] = [{"surface": adverb, "pos": "Adverb", "lemma": adverb}]
+            stranded = tokens[idx + 1] if idx + 1 < len(tokens) else {}
+            if stranded.get("pos") == "Auxiliary" and stranded.get("pos_sub1") == "非自立":
+                stranded["pos"] = "Verb"
             changed = True
         idx += 1
     return changed
