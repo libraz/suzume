@@ -19,14 +19,14 @@ namespace suzume::cli {
  * @brief Output format for analysis results
  */
 enum class OutputFormat {
-  Morpheme,  // Default: surface TAB pos TAB lemma
-  Tags,      // Tags only, one per line
-  Json,      // JSON format
-  Chasen     // ChaSen-like format (Japanese POS, conjugation info)
+  Tsv,     // Default: surface TAB pos TAB base_form TAB start TAB end
+  Json,    // JSON format
+  Chasen,  // ChaSen-like format (Japanese POS, conjugation info)
+  Tags     // Tags only, one per line
 };
 
 /**
- * @brief Print error message to stderr
+ * @brief Print "suzume-cli: error: <message>" to stderr
  */
 void printError(std::string_view message);
 
@@ -124,34 +124,35 @@ struct CommandArgs {
   // Common options
   std::vector<std::string> dict_paths;
   std::string mode = "normal";
-  OutputFormat format = OutputFormat::Morpheme;
+  OutputFormat format = OutputFormat::Tsv;
   bool verbose = false;
   bool very_verbose = false;
   bool debug = false;
   bool help = false;
   bool version = false;
-  bool no_user_dict = false;
-  bool no_core_dict = false;
+  bool skip_bundled_user_dictionary = false;
+  bool skip_core_dictionary = false;
   bool skip_env_config = false;
   bool compare = false;
+  bool tag_option_given = false;  // any --tag-* option was parsed
   std::string parse_error;
 
-  // Normalization options (defaults preserve original)
-  bool normalize_vu = false;  // --normalize-vu: convert ヴ→ビ
-  bool lowercase = false;     // --lowercase: convert to lowercase
+  // Normalization options
+  bool preserve_vu = true;
+  bool preserve_case = true;
 
   // Postprocess options
-  bool preserve_symbols = false;  // --preserve-symbols: keep symbols in output
-  bool no_lemmatize = false;
+  bool preserve_symbols = false;
+  bool lemmatize = true;
   bool merge_compounds = false;
 
   // Tag generation options
-  bool tag_include_particles = false;
-  bool tag_include_auxiliaries = false;
-  bool tag_include_formal_nouns = false;
-  bool tag_include_low_info = false;
-  bool tag_keep_duplicates = false;
-  bool tag_use_surface = false;
+  bool tag_exclude_particles = true;
+  bool tag_exclude_auxiliaries = true;
+  bool tag_exclude_formal_nouns = true;
+  bool tag_exclude_low_info = true;
+  bool tag_remove_duplicates = true;
+  bool tag_use_base_form = true;
   uint8_t tag_pos_filter = 0;
   bool tag_exclude_basic = false;
   size_t tag_min_length = 2;

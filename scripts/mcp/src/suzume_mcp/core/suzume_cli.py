@@ -135,7 +135,7 @@ def _timed_out(what: str, timeout: float) -> RuntimeError:
 
 
 def _analyze_args(text: str, skip_user_dict: bool) -> list[str]:
-    return ["analyze"] + (["--no-user-dict"] if skip_user_dict else []) + ["--", text]
+    return ["analyze"] + (["--skip-bundled-user-dictionary"] if skip_user_dict else []) + ["--", text]
 
 
 def _cli_failure(stderr: str) -> RuntimeError:
@@ -188,7 +188,7 @@ def get_suzume_surfaces(text: str, cli_path: Path | None = None, skip_user_dict:
     """Get surface tokens from Suzume CLI output (synchronous).
 
     Args:
-        skip_user_dict: When True, pass --no-user-dict to match the C++ tokenization
+        skip_user_dict: When True, pass --skip-bundled-user-dictionary to match the C++ tokenization
             test runner oracle (skip_bundled_user_dictionary=true). When False (default), the
             CLI auto-loads user.dic, matching real-world CLI behavior — this is what
             thread checking wants so that dict_add fixes are reflected.
@@ -213,7 +213,7 @@ async def get_suzume_tokens_async(text: str, cli_path: Path | None = None, skip_
     """Get tokens with POS and lemma from Suzume CLI output (async).
 
     Args:
-        skip_user_dict: When True, pass --no-user-dict to match the C++ tokenization
+        skip_user_dict: When True, pass --skip-bundled-user-dictionary to match the C++ tokenization
             test runner oracle. When False (default), the CLI auto-loads user.dic.
     """
     stdout, _ = await _run_cli_async(existing_cli(cli_path), _analyze_args(text, skip_user_dict))

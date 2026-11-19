@@ -32,13 +32,13 @@ SuzumeOptions analyzerOptions(const CommandArgs& args) {
   } else if (args.mode == "split") {
     options.mode = core::AnalysisMode::Split;
   }
-  options.normalize_options.preserve_vu = !args.normalize_vu;
-  options.normalize_options.preserve_case = !args.lowercase;
+  options.normalize_options.preserve_vu = args.preserve_vu;
+  options.normalize_options.preserve_case = args.preserve_case;
   options.remove_symbols = !args.preserve_symbols;
-  options.skip_user_dictionary = args.no_user_dict;
-  options.skip_core_dictionary = args.no_core_dict;
+  options.skip_user_dictionary = args.skip_bundled_user_dictionary;
+  options.skip_core_dictionary = args.skip_core_dictionary;
   options.skip_env_config = args.skip_env_config;
-  options.lemmatize = !args.no_lemmatize;
+  options.lemmatize = args.lemmatize;
   options.merge_compounds = args.merge_compounds;
   options.report_scorer_config = args.verbose;
   return options;
@@ -46,12 +46,12 @@ SuzumeOptions analyzerOptions(const CommandArgs& args) {
 
 postprocess::TagGeneratorOptions tagOptions(const CommandArgs& args) {
   postprocess::TagGeneratorOptions options;
-  options.exclude_particles = !args.tag_include_particles;
-  options.exclude_auxiliaries = !args.tag_include_auxiliaries;
-  options.exclude_formal_nouns = !args.tag_include_formal_nouns;
-  options.exclude_low_info = !args.tag_include_low_info;
-  options.remove_duplicates = !args.tag_keep_duplicates;
-  options.use_lemma = !args.tag_use_surface;
+  options.exclude_particles = args.tag_exclude_particles;
+  options.exclude_auxiliaries = args.tag_exclude_auxiliaries;
+  options.exclude_formal_nouns = args.tag_exclude_formal_nouns;
+  options.exclude_low_info = args.tag_exclude_low_info;
+  options.remove_duplicates = args.tag_remove_duplicates;
+  options.use_lemma = args.tag_use_base_form;
   options.min_tag_length = args.tag_min_length;
   options.max_tags = args.tag_max_tags;
   options.pos_filter = args.tag_pos_filter;
@@ -216,7 +216,7 @@ int cmdTestFile(const std::vector<std::string>& args, const CommandArgs& command
   std::string test_file;
 
   for (size_t idx = 0; idx < args.size(); ++idx) {
-    if (args[idx] == "-f" || args[idx] == "--file") {
+    if (args[idx] == "--file") {
       if (idx + 1 >= args.size()) {
         printError("Missing value for " + args[idx]);
         return 1;
@@ -327,7 +327,7 @@ int cmdTestBenchmark(const std::vector<std::string>& args, const CommandArgs& co
         printError("Invalid warmup: " + args[idx].substr(9));
         return 1;
       }
-    } else if ((args[idx] == "-f" || args[idx] == "--file") && idx + 1 < args.size()) {
+    } else if (args[idx] == "--file" && idx + 1 < args.size()) {
       corpus_file = args[++idx];
     } else if (args[idx].rfind("--file=", 0) == 0) {
       corpus_file = args[idx].substr(7);
@@ -468,10 +468,10 @@ int cmdTest(const CommandArgs& args) {
     return 1;
   }
 
-  // Check for -f flag (file test)
+  // Check for --file (file test)
   bool has_file_flag = false;
   for (const auto& arg : args.args) {
-    if (arg == "-f" || arg == "--file" || arg.rfind("--file=", 0) == 0) {
+    if (arg == "--file" || arg.rfind("--file=", 0) == 0) {
       has_file_flag = true;
       break;
     }

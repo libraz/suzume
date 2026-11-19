@@ -99,7 +99,7 @@ int cmdDictNew(const std::vector<std::string>& args, bool /* verbose */) {
   }
 
   file << "# suzume dictionary source file\n";
-  file << "# Format: surface<TAB>pos<TAB>conj_type<TAB>lemma\n";
+  file << "# Format: surface<TAB>pos<TAB>conj_type<TAB>base_form\n";
   file << "#\n";
   file << "# POS values: NOUN, PROPN, VERB, ADJECTIVE, ADVERB, PARTICLE, AUXILIARY,\n";
   file << "#   CONJUNCTION, DETERMINER, PRONOUN, PREFIX, SUFFIX, INTERJECTION, SYMBOL, OTHER\n";
@@ -612,7 +612,7 @@ int cmdDictLookup(const std::vector<std::string>& args, bool /* verbose */) {
     if (result.entry != nullptr && result.entry->surface == word) {
       std::cout << result.entry->surface << "\t" << core::posToString(result.entry->pos);
       if (!result.entry->lemma.empty() && result.entry->lemma != result.entry->surface) {
-        std::cout << "\t(lemma: " << result.entry->lemma << ")";
+        std::cout << "\t(base_form: " << result.entry->lemma << ")";
       }
       std::cout << "\n";
       ++l1_count;
@@ -754,8 +754,8 @@ int cmdDict(const CommandArgs& args) {
   const std::string& subcommand = args.args[0];
   std::vector<std::string> subargs(args.args.begin() + 1, args.args.end());
 
-  // Check for -i flag (interactive mode shorthand)
-  if (subcommand == "-i") {
+  // -i / --interactive select interactive mode
+  if (subcommand == "-i" || subcommand == "--interactive") {
     return cmdDictInteractive(subargs, args.verbose);
   }
   if (subcommand == "interactive" || subcommand == "edit") {

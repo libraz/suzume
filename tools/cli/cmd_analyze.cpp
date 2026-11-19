@@ -8,7 +8,6 @@
 #include <sstream>
 #include <vector>
 
-#include "grammar/conjugation.h"
 #include "normalize/utf8.h"
 #include "suzume.h"
 #include "suzume/suzume_c.h"
@@ -30,6 +29,31 @@ void outputTags(const std::vector<postprocess::TagEntry>& tags) {
   }
 }
 
+/** @brief Conjugation labels of a VERB/ADJECTIVE/AUXILIARY morpheme; empty for every other POS. */
+struct ConjugationLabels {
+  std::string_view type;
+  std::string_view form;
+};
+
+ConjugationLabels conjugationLabels(const core::Morpheme& morpheme) {
+  if (morpheme.pos != core::PartOfSpeech::Verb && morpheme.pos != core::PartOfSpeech::Adjective &&
+      morpheme.pos != core::PartOfSpeech::Auxiliary) {
+    return {};
+  }
+  return {suzume_conjugation_type_label(static_cast<suzume_conjugation_type_t>(morpheme.conj_type)),
+          suzume_conjugation_form_label(static_cast<suzume_conjugation_form_t>(morpheme.conj_form))};
+}
+
+void outputJsonLabel(std::string_view key, std::string_view label) {
+  std::cout << '"' << key << "\": ";
+  if (label.empty()) {
+    std::cout << "null";
+  } else {
+    std::cout << '"' << jsonEscape(label) << '"';
+  }
+  std::cout << ", ";
+}
+
 void outputJson(const std::string& input, const std::string& normalized_text,
                 const std::vector<core::Morpheme>& morphemes) {
   std::cout << "{\n";
@@ -42,10 +66,14 @@ void outputJson(const std::string& input, const std::string& normalized_text,
     std::cout << "    {";
     std::cout << R"("surface": ")" << jsonEscape(mor.surface) << "\", ";
     std::cout << R"("pos": ")" << core::posToString(mor.pos) << "\", ";
-    std::cout << R"("lemma": ")" << jsonEscape(mor.getLemma()) << "\", ";
+    std::cout << R"("base_form": ")" << jsonEscape(mor.getLemma()) << "\", ";
+    std::cout << R"("pos_ja": ")" << core::posToJapanese(mor.pos) << "\", ";
+    const ConjugationLabels labels = conjugationLabels(mor);
+    outputJsonLabel("conj_type", labels.type);
+    outputJsonLabel("conj_form", labels.form);
+    std::cout << R"("extended_pos": ")" << core::extendedPosToString(mor.extended_pos) << "\", ";
     std::cout << R"("start": )" << mor.start << ", ";
     std::cout << R"("end": )" << mor.end << ", ";
-    std::cout << R"("extended_pos": ")" << core::extendedPosToString(mor.extended_pos) << "\", ";
     std::cout << R"("is_user_dict": )" << (mor.fromUserDict() ? "true" : "false") << ", ";
     std::cout << R"("is_formal_noun": )" << (mor.isFormalNoun() ? "true" : "false") << ", ";
     std::cout << R"("is_low_info": )" << (mor.isLowInformation() ? "true" : "false") << ", ";
@@ -71,24 +99,16 @@ void outputChasen(const std::vector<core::Morpheme>& morphemes) {
     // Reading column placeholder (Suzume does not generate readings)
     std::cout << "*\t";
 
-    // Lemma (base form)
+    // Base form
     std::cout << tabEscape(mor.getLemma()) << "\t";
 
     // Part of speech (Japanese)
     std::cout << core::posToJapanese(mor.pos) << "\t";
 
-    // Conjugation type and form (for verbs, adjectives, and auxiliaries).
-    if (mor.pos == core::PartOfSpeech::Verb || mor.pos == core::PartOfSpeech::Adjective ||
-        mor.pos == core::PartOfSpeech::Auxiliary) {
-      const char* canonical_type = suzume_conjugation_type_label(static_cast<suzume_conjugation_type_t>(mor.conj_type));
-      const std::string conjugation_type = canonical_type != nullptr ? canonical_type : "";
-      const std::string conjugation_form(grammar::conjFormToJapanese(mor.conj_form));
-      std::cout << (conjugation_type.empty() ? "*" : conjugation_type) << "\t";
-      std::cout << (conjugation_form.empty() ? "*" : conjugation_form);
-    } else {
-      std::cout << "*\t*";
-    }
-    std::cout << "\n";
+    // Conjugation type and form; "*" for a word that does not conjugate.
+    const ConjugationLabels labels = conjugationLabels(mor);
+    std::cout << (labels.type.empty() ? "*" : labels.type) << "\t";
+    std::cout << (labels.form.empty() ? "*" : labels.form) << "\n";
   }
   std::cout << "EOS\n";
 }
@@ -133,12 +153,15 @@ int cmdAnalyze(const CommandArgs& args) {
       oss << args.args[idx];
     }
     text = oss.str();
-  } else if (!isTerminal()) {
+  } else if (isTerminal()) {
+    printError("no input text provided");
+    return 2;
+  } else {
     // Read stdin byte-for-byte so embedded newlines are preserved.
     std::ostringstream oss;
     oss << std::cin.rdbuf();
     if (std::cin.bad()) {
-      printError("Failed to read input");
+      printError("failed to read input");
       return 1;
     }
     text = oss.str();
@@ -156,14 +179,13 @@ int cmdAnalyze(const CommandArgs& args) {
   // Validate once before analysis or any format-specific output. This keeps
   // malformed scalar sequences away from both the tokenizer and JSON output.
   if (!normalize::isValidUtf8(text)) {
-    printError("Invalid UTF-8 input");
+    printError("invalid UTF-8 input");
     return 1;
   }
 
+  // An empty operand or an empty pipe is valid input with nothing to report.
   if (text.empty()) {
-    printError("No input text provided");
-    printAnalyzeHelp(std::cerr);
-    return 1;
+    return 0;
   }
 
   if (args.debug) {
@@ -178,30 +200,36 @@ int cmdAnalyze(const CommandArgs& args) {
   // Create analyzer
   SuzumeOptions options;
   options.mode = parseMode(args.mode);
-  // Default is preserve (true), flags invert to normalize
-  options.normalize_options.preserve_vu = !args.normalize_vu;
-  options.normalize_options.preserve_case = !args.lowercase;
-  // Default is remove symbols (true), flag inverts to preserve
+  options.normalize_options.preserve_vu = args.preserve_vu;
+  options.normalize_options.preserve_case = args.preserve_case;
   options.remove_symbols = !args.preserve_symbols;
-  options.skip_user_dictionary = args.no_user_dict;
-  options.skip_core_dictionary = args.no_core_dict;
+  options.skip_user_dictionary = args.skip_bundled_user_dictionary;
+  options.skip_core_dictionary = args.skip_core_dictionary;
   options.skip_env_config = args.skip_env_config;
-  options.lemmatize = !args.no_lemmatize;
+  options.lemmatize = args.lemmatize;
   options.merge_compounds = args.merge_compounds;
   options.report_scorer_config = args.verbose;
 
   Suzume analyzer(options);
-  for (const auto& warning : analyzer.dictionaryWarnings()) {
-    printWarning(warning);
-  }
+  // Warnings accumulate across loads; print each one once, right after the load that produced it.
+  size_t printed_warnings = 0;
+  const auto print_new_warnings = [&analyzer, &printed_warnings]() {
+    const auto& warnings = analyzer.dictionaryWarnings();
+    for (; printed_warnings < warnings.size(); ++printed_warnings) {
+      printWarning(warnings[printed_warnings]);
+    }
+  };
+  print_new_warnings();
 
   // Source and binary dictionaries share the same additive user layer.
   for (const auto& dict_path : args.dict_paths) {
     auto load_result = loadUserDictionaryPath(&analyzer, dict_path);
     if (!load_result.hasValue()) {
-      printError("Failed to load dictionary: " + dict_path + ": " + load_result.error().message);
+      printError("failed to load dictionary: " + dict_path + ": " + load_result.error().message);
       return 1;
-    } else if (args.verbose) {
+    }
+    print_new_warnings();
+    if (args.verbose) {
       printInfo("Loaded dictionary: " + dict_path);
     }
   }
@@ -217,7 +245,7 @@ int cmdAnalyze(const CommandArgs& args) {
     }
     auto base_analysis = base_analyzer.analyzeWithNormalizedTextResult(text);
     if (!base_analysis.hasValue()) {
-      printError("Analysis failed: " + base_analysis.error().message);
+      printError("analysis failed: " + base_analysis.error().message);
       return 1;
     }
     auto base_morphemes = std::move(base_analysis.value().morphemes);
@@ -229,7 +257,7 @@ int cmdAnalyze(const CommandArgs& args) {
     // Analyze with user dictionary
     auto analysis = analyzer.analyzeWithNormalizedTextResult(text);
     if (!analysis.hasValue()) {
-      printError("Analysis failed: " + analysis.error().message);
+      printError("analysis failed: " + analysis.error().message);
       return 1;
     }
     auto morphemes = std::move(analysis.value().morphemes);
@@ -264,7 +292,7 @@ int cmdAnalyze(const CommandArgs& args) {
   if (args.debug) {
     auto analysis = analyzer.analyzeWithNormalizedTextResult(text);
     if (!analysis.hasValue()) {
-      printError("Analysis failed: " + analysis.error().message);
+      printError("analysis failed: " + analysis.error().message);
       return 1;
     }
     std::cerr << "=== Debug Mode ===\n";
@@ -309,12 +337,12 @@ int cmdAnalyze(const CommandArgs& args) {
 
   if (args.format == OutputFormat::Tags) {
     postprocess::TagGeneratorOptions tag_options;
-    tag_options.exclude_particles = !args.tag_include_particles;
-    tag_options.exclude_auxiliaries = !args.tag_include_auxiliaries;
-    tag_options.exclude_formal_nouns = !args.tag_include_formal_nouns;
-    tag_options.exclude_low_info = !args.tag_include_low_info;
-    tag_options.remove_duplicates = !args.tag_keep_duplicates;
-    tag_options.use_lemma = !args.tag_use_surface;
+    tag_options.exclude_particles = args.tag_exclude_particles;
+    tag_options.exclude_auxiliaries = args.tag_exclude_auxiliaries;
+    tag_options.exclude_formal_nouns = args.tag_exclude_formal_nouns;
+    tag_options.exclude_low_info = args.tag_exclude_low_info;
+    tag_options.remove_duplicates = args.tag_remove_duplicates;
+    tag_options.use_lemma = args.tag_use_base_form;
     tag_options.min_tag_length = args.tag_min_length;
     tag_options.max_tags = args.tag_max_tags;
     tag_options.pos_filter = args.tag_pos_filter;
@@ -325,12 +353,12 @@ int cmdAnalyze(const CommandArgs& args) {
 
   auto analysis = analyzer.analyzeWithNormalizedTextResult(text);
   if (!analysis.hasValue()) {
-    printError("Analysis failed: " + analysis.error().message);
+    printError("analysis failed: " + analysis.error().message);
     return 1;
   }
   const auto& output = analysis.value();
   switch (args.format) {
-    case OutputFormat::Morpheme:
+    case OutputFormat::Tsv:
       outputMorphemes(std::cout, output.morphemes);
       break;
     case OutputFormat::Json:

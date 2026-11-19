@@ -385,10 +385,10 @@ async def dict_cleanup(
         return bool(regex.search(r"[\p{Han}][\p{Hiragana}][\p{Han}\p{Hiragana}\p{Katakana}]", surface))
 
     def is_split_by_suzume(surface: str) -> bool:
-        # --no-user-dict: judge whether suzume splits the word on its OWN merits,
+        # --skip-bundled-user-dictionary: judge whether suzume splits the word on its OWN merits,
         # not because of the very user-dict entry we are evaluating for removal.
         result = subprocess.run(
-            [str(cli), "--no-user-dict", surface],
+            [str(cli), "--skip-bundled-user-dictionary", surface],
             capture_output=True,
             text=True,
             timeout=10,

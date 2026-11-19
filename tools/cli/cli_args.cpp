@@ -1,3 +1,4 @@
+#include <array>
 #include <cstring>
 #include <utility>
 
@@ -9,76 +10,192 @@ namespace cli {
 
 namespace {
 
+/** @brief Which commands an option belongs to. */
+enum class OptionScope : uint8_t {
+  Global,    // every command, including dict, which owns the rest of its grammar
+  Analysis,  // analyze and test
+  TestOnly   // passed through verbatim to the test command's own parser
+};
+
+/** @brief Applies a parsed option; returns false with @p error set on an invalid value. */
+using OptionApply = bool (*)(CommandArgs* args, std::string_view value, std::string* error);
+
+/**
+ * @brief One command-line option. The parser, the known-option check used for
+ *        missing values, and the test passthrough all read this table.
+ */
+struct OptionSpec {
+  std::string_view long_name;
+  std::string_view short_name;  // empty when the option has no short form
+  bool takes_value;
+  OptionScope scope;
+  OptionApply apply;
+};
+
 bool isKnownCommand(std::string_view value) {
   return value == "analyze" || value == "dict" || value == "test" || value == "version" || value == "help";
 }
 
-bool isKnownOption(std::string_view value) {
-  return value == "--" || value == "-h" || value == "--help" || value == "-v" || value == "--version" ||
-         value == "-V" || value == "--verbose" || value == "-VV" || value == "--very-verbose" || value == "--debug" ||
-         value == "-d" || value == "--dict" || value == "-m" || value == "--mode" || value == "-f" ||
-         value == "--format" || value == "--no-user-dict" || value == "--no-core-dict" ||
-         value == "--skip-env-config" || value == "--compare" || value == "--normalize-vu" || value == "--lowercase" ||
-         value == "--preserve-symbols" || value == "--no-lemmatize" || value == "--merge-compounds" ||
-         value == "--include-particles" || value == "--include-auxiliaries" || value == "--include-formal-nouns" ||
-         value == "--include-low-info" || value == "--tag-keep-duplicates" || value == "--tag-use-surface" ||
-         value == "--tag-pos" || value == "--tag-exclude-basic" || value == "--tag-min-length" ||
-         value == "--tag-max-tags" || value == "--expect" || value == "--file";
-}
-
-bool isValidMode(std::string_view value) {
-  return value == "normal" || value == "search" || value == "split";
-}
-
-bool tryParseOutputFormat(std::string_view value, OutputFormat* output) {
-  if (output == nullptr) {
+bool parseMode(std::string_view value, std::string* mode, std::string* error) {
+  if (value != "normal" && value != "search" && value != "split") {
+    *error = "invalid mode: " + std::string(value) + " (expected normal, search, or split)";
     return false;
   }
-  if (value == "morpheme") {
-    *output = OutputFormat::Morpheme;
-  } else if (value == "tags") {
-    *output = OutputFormat::Tags;
+  *mode = std::string(value);
+  return true;
+}
+
+bool parseFormat(std::string_view value, OutputFormat* format, std::string* error) {
+  if (value == "tsv") {
+    *format = OutputFormat::Tsv;
   } else if (value == "json") {
-    *output = OutputFormat::Json;
-  } else if (value == "tsv") {
-    *output = OutputFormat::Morpheme;
+    *format = OutputFormat::Json;
   } else if (value == "chasen") {
-    *output = OutputFormat::Chasen;
+    *format = OutputFormat::Chasen;
+  } else if (value == "tags") {
+    *format = OutputFormat::Tags;
   } else {
+    *error = "invalid format: " + std::string(value) + " (expected tsv, json, chasen, or tags)";
     return false;
   }
   return true;
 }
 
-bool takeOptionValue(int argc, char* argv[], int* index, std::string_view option, std::string* value,
-                     std::string* error) {
-  if (*index + 1 >= argc || isKnownOption(argv[*index + 1])) {
-    *error = "Missing value for " + std::string(option);
+bool parseTagPos(std::string_view value, uint8_t* filter, std::string* error) {
+  static constexpr std::array<std::pair<std::string_view, uint8_t>, 6> kNames = {{
+      {"NOUN", postprocess::kTagPosNoun},
+      {"VERB", postprocess::kTagPosVerb},
+      {"ADJ", postprocess::kTagPosAdjective},
+      {"ADV", postprocess::kTagPosAdverb},
+      {"PARTICLE", postprocess::kTagPosParticle},
+      {"AUX", postprocess::kTagPosAuxiliary},
+  }};
+  for (const auto& [name, bit] : kNames) {
+    if (value == name) {
+      *filter = static_cast<uint8_t>(*filter | bit);  // NOLINT(hicpp-signed-bitwise): bit flag operation
+      return true;
+    }
+  }
+  *error =
+      "invalid --tag-pos-filter value: " + std::string(value) + " (expected NOUN, VERB, ADJ, ADV, PARTICLE, or AUX)";
+  return false;
+}
+
+bool parseSize(std::string_view option, std::string_view value, size_t* out, std::string* error) {
+  if (!parseSizeOption(value, out)) {
+    *error = "invalid " + std::string(option) + " value: " + std::string(value);
     return false;
   }
-  *value = argv[++(*index)];
   return true;
 }
 
-bool parseTagPos(std::string_view value, uint8_t* filter) {
-  uint8_t bit = 0;
-  if (value == "noun") {
-    bit = postprocess::kTagPosNoun;
-  } else if (value == "verb") {
-    bit = postprocess::kTagPosVerb;
-  } else if (value == "adjective") {
-    bit = postprocess::kTagPosAdjective;
-  } else if (value == "adverb") {
-    bit = postprocess::kTagPosAdverb;
-  } else if (value == "particle") {
-    bit = postprocess::kTagPosParticle;
-  } else if (value == "auxiliary") {
-    bit = postprocess::kTagPosAuxiliary;
-  } else {
-    return false;
+// Captureless lambdas convert to OptionApply. Flags ignore the value argument.
+#define SUZUME_CLI_FLAG(member, set_to) /* NOLINT(cppcoreguidelines-macro-usage) */ \
+  [](CommandArgs* args, std::string_view, std::string*) { return (args->member = (set_to), true); }
+
+const OptionSpec kOptions[] = {
+    // NOLINT(cppcoreguidelines-avoid-c-arrays): size follows the entries
+    {"--help", "-h", false, OptionScope::Global, SUZUME_CLI_FLAG(help, true)},
+    {"--version", "-v", false, OptionScope::Global, SUZUME_CLI_FLAG(version, true)},
+    {"--verbose", "-V", false, OptionScope::Global, SUZUME_CLI_FLAG(verbose, true)},
+    {"--very-verbose", "-VV", false, OptionScope::Global,
+     [](CommandArgs* args, std::string_view, std::string*) {
+       args->verbose = true;
+       args->very_verbose = true;
+       args->debug = true;
+       return true;
+     }},
+    {"--debug", "", false, OptionScope::Analysis, SUZUME_CLI_FLAG(debug, true)},
+    {"--dictionary", "-d", true, OptionScope::Analysis,
+     [](CommandArgs* args, std::string_view value, std::string*) {
+       args->dict_paths.emplace_back(value);
+       return true;
+     }},
+    {"--mode", "-m", true, OptionScope::Analysis,
+     [](CommandArgs* args, std::string_view value, std::string* error) {
+       return parseMode(value, &args->mode, error);
+     }},
+    {"--format", "-f", true, OptionScope::Analysis,
+     [](CommandArgs* args, std::string_view value, std::string* error) {
+       return parseFormat(value, &args->format, error);
+     }},
+    {"--skip-core-dictionary", "", false, OptionScope::Analysis, SUZUME_CLI_FLAG(skip_core_dictionary, true)},
+    {"--skip-bundled-user-dictionary", "", false, OptionScope::Analysis,
+     SUZUME_CLI_FLAG(skip_bundled_user_dictionary, true)},
+    {"--skip-env-config", "", false, OptionScope::Analysis, SUZUME_CLI_FLAG(skip_env_config, true)},
+    {"--compare", "", false, OptionScope::Analysis, SUZUME_CLI_FLAG(compare, true)},
+    {"--no-preserve-vu", "", false, OptionScope::Analysis, SUZUME_CLI_FLAG(preserve_vu, false)},
+    {"--no-preserve-case", "", false, OptionScope::Analysis, SUZUME_CLI_FLAG(preserve_case, false)},
+    {"--preserve-symbols", "", false, OptionScope::Analysis, SUZUME_CLI_FLAG(preserve_symbols, true)},
+    {"--no-lemmatize", "", false, OptionScope::Analysis, SUZUME_CLI_FLAG(lemmatize, false)},
+    {"--merge-compounds", "", false, OptionScope::Analysis, SUZUME_CLI_FLAG(merge_compounds, true)},
+    {"--tag-no-exclude-particles", "", false, OptionScope::Analysis, SUZUME_CLI_FLAG(tag_exclude_particles, false)},
+    {"--tag-no-exclude-auxiliaries", "", false, OptionScope::Analysis, SUZUME_CLI_FLAG(tag_exclude_auxiliaries, false)},
+    {"--tag-no-exclude-formal-nouns", "", false, OptionScope::Analysis,
+     SUZUME_CLI_FLAG(tag_exclude_formal_nouns, false)},
+    {"--tag-no-exclude-low-info", "", false, OptionScope::Analysis, SUZUME_CLI_FLAG(tag_exclude_low_info, false)},
+    {"--tag-exclude-basic", "", false, OptionScope::Analysis, SUZUME_CLI_FLAG(tag_exclude_basic, true)},
+    {"--tag-no-remove-duplicates", "", false, OptionScope::Analysis, SUZUME_CLI_FLAG(tag_remove_duplicates, false)},
+    {"--tag-no-use-base-form", "", false, OptionScope::Analysis, SUZUME_CLI_FLAG(tag_use_base_form, false)},
+    {"--tag-pos-filter", "", true, OptionScope::Analysis,
+     [](CommandArgs* args, std::string_view value, std::string* error) {
+       return parseTagPos(value, &args->tag_pos_filter, error);
+     }},
+    {"--tag-min-length", "", true, OptionScope::Analysis,
+     [](CommandArgs* args, std::string_view value, std::string* error) {
+       return parseSize("--tag-min-length", value, &args->tag_min_length, error);
+     }},
+    {"--tag-max-tags", "", true, OptionScope::Analysis,
+     [](CommandArgs* args, std::string_view value, std::string* error) {
+       return parseSize("--tag-max-tags", value, &args->tag_max_tags, error);
+     }},
+    {"--expect", "", true, OptionScope::TestOnly, nullptr},
+    {"--file", "", true, OptionScope::TestOnly, nullptr},
+    {"--iterations", "", true, OptionScope::TestOnly, nullptr},
+    {"--samples", "", true, OptionScope::TestOnly, nullptr},
+    {"--warmup", "", true, OptionScope::TestOnly, nullptr},
+    {"--", "", false, OptionScope::Global, nullptr},
+};
+
+#undef SUZUME_CLI_FLAG
+
+const OptionSpec* findOption(std::string_view name) {
+  for (const auto& spec : kOptions) {
+    if (name == spec.long_name || (!spec.short_name.empty() && name == spec.short_name)) {
+      return &spec;
+    }
   }
-  *filter = static_cast<uint8_t>(*filter | bit);  // NOLINT(hicpp-signed-bitwise): bit flag operation
-  return true;
+  return nullptr;
+}
+
+bool isTagOption(const OptionSpec& spec) {
+  return spec.long_name.rfind("--tag-", 0) == 0;
+}
+
+/** @brief The table entry an argument names, with any attached "--name=value" value split off. */
+struct MatchedOption {
+  const OptionSpec* spec = nullptr;
+  bool has_attached_value = false;
+  std::string_view attached_value;
+};
+
+MatchedOption matchOption(std::string_view arg) {
+  MatchedOption match;
+  match.spec = findOption(arg);
+  if (match.spec != nullptr || arg.rfind("--", 0) != 0) {
+    return match;
+  }
+  const size_t equals = arg.find('=');
+  if (equals == std::string_view::npos) {
+    return match;
+  }
+  const OptionSpec* spec = findOption(arg.substr(0, equals));
+  if (spec != nullptr && spec->takes_value) {
+    match.spec = spec;
+    match.has_attached_value = true;
+    match.attached_value = arg.substr(equals + 1);
+  }
+  return match;
 }
 
 }  // namespace
@@ -88,335 +205,95 @@ CommandArgs parseArgs(int argc, char* argv[]) {
 
   int idx = 1;
   bool positional_only = false;
-  while (idx < argc) {
-    std::string arg = argv[idx];
+  for (; idx < argc; ++idx) {
+    const std::string_view arg = argv[idx];
 
     // After a literal "--", every remaining argument is positional.
-    if (positional_only) {
+    if (positional_only || arg == "--") {
       if (args.command.empty()) {
         args.command = "analyze";
       }
-      args.args.push_back(arg);
-      ++idx;
-      continue;
-    }
-
-    if (arg == "--") {
-      if (args.command.empty()) {
-        args.command = "analyze";
+      if (positional_only) {
+        args.args.emplace_back(arg);
       }
       positional_only = true;
-      ++idx;
       continue;
     }
 
-    if (arg == "-h" || arg == "--help") {
-      args.help = true;
-      ++idx;
+    const MatchedOption match = matchOption(arg);
+    const OptionSpec* spec = match.spec;
+
+    // Dict owns its complete option grammar after the global options.
+    if (args.command == "dict" && (spec == nullptr || spec->scope != OptionScope::Global)) {
+      args.args.emplace_back(arg);
       continue;
     }
 
-    if (arg == "-v" || arg == "--version") {
-      args.version = true;
-      ++idx;
-      continue;
-    }
-
-    if (arg == "-V" || arg == "--verbose") {
-      args.verbose = true;
-      ++idx;
-      continue;
-    }
-
-    if (arg == "-VV" || arg == "--very-verbose") {
-      args.verbose = true;
-      args.very_verbose = true;
-      args.debug = true;
-      ++idx;
-      continue;
-    }
-
-    // Dict owns its complete option grammar. Test owns only its expectation,
-    // input-file, and benchmark options; shared analysis options continue
-    // through the regular parser below.
-    if (args.command == "dict") {
-      args.args.push_back(arg);
-      ++idx;
-      continue;
-    }
-    if (args.command == "test" &&
-        (arg == "--expect" || arg.rfind("--expect=", 0) == 0 || arg == "-f" || arg == "--file" ||
-         arg.rfind("--file=", 0) == 0 || arg.rfind("--iterations=", 0) == 0 || arg.rfind("--samples=", 0) == 0 ||
-         arg.rfind("--warmup=", 0) == 0)) {
-      args.args.push_back(arg);
-      ++idx;
-      continue;
-    }
-
-    if (arg[0] != '-') {
+    if (arg.empty() || arg[0] != '-') {
       if (args.command.empty() && isKnownCommand(arg)) {
-        args.command = arg;
+        args.command = std::string(arg);
       } else {
         if (args.command.empty()) {
           args.command = "analyze";
         }
-        args.args.push_back(arg);
+        args.args.emplace_back(arg);
       }
-      ++idx;
       continue;
     }
 
-    if (arg == "--debug") {
-      args.debug = true;
-      ++idx;
+    if (spec != nullptr && spec->scope == OptionScope::TestOnly && args.command == "test") {
+      args.args.emplace_back(arg);
+      if (!match.has_attached_value && idx + 1 < argc) {
+        args.args.emplace_back(argv[++idx]);
+      }
       continue;
     }
 
-    if (arg == "-d" || arg == "--dict") {
-      std::string value;
-      if (!takeOptionValue(argc, argv, &idx, arg, &value, &args.parse_error)) {
-        return args;
+    if (spec == nullptr || spec->scope == OptionScope::TestOnly) {
+      // The test command's own parser reports options it does not know.
+      if (args.command == "test") {
+        args.args.emplace_back(arg);
+        continue;
       }
-      args.dict_paths.push_back(std::move(value));
-      ++idx;
-      continue;
+      if (args.command.empty()) {
+        args.command = "analyze";
+      }
+      args.parse_error = "unknown option: " + std::string(arg);
+      return args;
     }
-    if (arg.rfind("--dict=", 0) == 0) {
-      std::string value = arg.substr(std::strlen("--dict="));
+
+    std::string_view value;
+    if (match.has_attached_value) {
+      value = match.attached_value;
       if (value.empty()) {
-        args.parse_error = "Missing value for --dict";
+        args.parse_error = "missing value for " + std::string(spec->long_name);
         return args;
       }
-      args.dict_paths.push_back(std::move(value));
-      ++idx;
-      continue;
-    }
-
-    if (arg == "-m" || arg == "--mode") {
-      std::string value;
-      if (!takeOptionValue(argc, argv, &idx, arg, &value, &args.parse_error)) {
+    } else if (spec->takes_value) {
+      if (idx + 1 >= argc || findOption(argv[idx + 1]) != nullptr) {
+        args.parse_error = "missing value for " + std::string(arg);
         return args;
       }
-      if (!isValidMode(value)) {
-        args.parse_error = "Invalid mode: " + value + " (expected normal, search, or split)";
-        return args;
-      }
-      args.mode = std::move(value);
-      ++idx;
-      continue;
-    }
-    if (arg.rfind("--mode=", 0) == 0) {
-      std::string value = arg.substr(std::strlen("--mode="));
-      if (!isValidMode(value)) {
-        args.parse_error = "Invalid mode: " + value + " (expected normal, search, or split)";
-        return args;
-      }
-      args.mode = std::move(value);
-      ++idx;
-      continue;
+      value = argv[++idx];
     }
 
-    if (arg == "-f" || arg == "--format") {
-      std::string value;
-      if (!takeOptionValue(argc, argv, &idx, arg, &value, &args.parse_error)) {
-        return args;
-      }
-      if (!tryParseOutputFormat(value, &args.format)) {
-        args.parse_error = "Invalid format: " + value + " (expected morpheme, tags, json, tsv, or chasen)";
-        return args;
-      }
-      ++idx;
-      continue;
+    if (!spec->apply(&args, value, &args.parse_error)) {
+      return args;
     }
-    if (arg.rfind("--format=", 0) == 0) {
-      std::string value = arg.substr(std::strlen("--format="));
-      if (!tryParseOutputFormat(value, &args.format)) {
-        args.parse_error = "Invalid format: " + value + " (expected morpheme, tags, json, tsv, or chasen)";
-        return args;
-      }
-      ++idx;
-      continue;
+    if (isTagOption(*spec)) {
+      args.tag_option_given = true;
     }
-
-    if (arg == "--no-user-dict") {
-      args.no_user_dict = true;
-      ++idx;
-      continue;
-    }
-
-    if (arg == "--no-core-dict") {
-      args.no_core_dict = true;
-      ++idx;
-      continue;
-    }
-
-    if (arg == "--skip-env-config") {
-      args.skip_env_config = true;
-      ++idx;
-      continue;
-    }
-
-    if (arg == "--compare") {
-      args.compare = true;
-      ++idx;
-      continue;
-    }
-
-    if (arg == "--normalize-vu") {
-      args.normalize_vu = true;
-      ++idx;
-      continue;
-    }
-
-    if (arg == "--lowercase") {
-      args.lowercase = true;
-      ++idx;
-      continue;
-    }
-
-    if (arg == "--preserve-symbols") {
-      args.preserve_symbols = true;
-      ++idx;
-      continue;
-    }
-
-    if (arg == "--no-lemmatize") {
-      args.no_lemmatize = true;
-      ++idx;
-      continue;
-    }
-
-    if (arg == "--merge-compounds") {
-      args.merge_compounds = true;
-      ++idx;
-      continue;
-    }
-
-    if (arg == "--include-particles") {
-      args.tag_include_particles = true;
-      ++idx;
-      continue;
-    }
-
-    if (arg == "--include-auxiliaries") {
-      args.tag_include_auxiliaries = true;
-      ++idx;
-      continue;
-    }
-
-    if (arg == "--include-formal-nouns") {
-      args.tag_include_formal_nouns = true;
-      ++idx;
-      continue;
-    }
-
-    if (arg == "--include-low-info") {
-      args.tag_include_low_info = true;
-      ++idx;
-      continue;
-    }
-
-    if (arg == "--tag-keep-duplicates") {
-      args.tag_keep_duplicates = true;
-      ++idx;
-      continue;
-    }
-
-    if (arg == "--tag-use-surface") {
-      args.tag_use_surface = true;
-      ++idx;
-      continue;
-    }
-
-    if (arg == "--tag-pos") {
-      std::string value;
-      if (!takeOptionValue(argc, argv, &idx, arg, &value, &args.parse_error)) {
-        return args;
-      }
-      if (!parseTagPos(value, &args.tag_pos_filter)) {
-        args.parse_error =
-            "Invalid --tag-pos value: " + value + " (expected noun, verb, adjective, adverb, particle, or auxiliary)";
-        return args;
-      }
-      ++idx;
-      continue;
-    }
-    if (arg.rfind("--tag-pos=", 0) == 0) {
-      std::string value = arg.substr(std::strlen("--tag-pos="));
-      if (!parseTagPos(value, &args.tag_pos_filter)) {
-        args.parse_error =
-            "Invalid --tag-pos value: " + value + " (expected noun, verb, adjective, adverb, particle, or auxiliary)";
-        return args;
-      }
-      ++idx;
-      continue;
-    }
-
-    if (arg == "--tag-exclude-basic") {
-      args.tag_exclude_basic = true;
-      ++idx;
-      continue;
-    }
-
-    if (arg == "--tag-min-length") {
-      std::string value;
-      if (!takeOptionValue(argc, argv, &idx, arg, &value, &args.parse_error)) {
-        return args;
-      }
-      if (!parseSizeOption(value, &args.tag_min_length)) {
-        args.parse_error = "Invalid --tag-min-length value: " + value;
-        return args;
-      }
-      ++idx;
-      continue;
-    }
-    if (arg.rfind("--tag-min-length=", 0) == 0) {
-      std::string value = arg.substr(std::strlen("--tag-min-length="));
-      if (!parseSizeOption(value, &args.tag_min_length)) {
-        args.parse_error = "Invalid --tag-min-length value: " + value;
-        return args;
-      }
-      ++idx;
-      continue;
-    }
-
-    if (arg == "--tag-max-tags") {
-      std::string value;
-      if (!takeOptionValue(argc, argv, &idx, arg, &value, &args.parse_error)) {
-        return args;
-      }
-      if (!parseSizeOption(value, &args.tag_max_tags)) {
-        args.parse_error = "Invalid --tag-max-tags value: " + value;
-        return args;
-      }
-      ++idx;
-      continue;
-    }
-    if (arg.rfind("--tag-max-tags=", 0) == 0) {
-      std::string value = arg.substr(std::strlen("--tag-max-tags="));
-      if (!parseSizeOption(value, &args.tag_max_tags)) {
-        args.parse_error = "Invalid --tag-max-tags value: " + value;
-        return args;
-      }
-      ++idx;
-      continue;
-    }
-
-    if (args.command == "test") {
-      args.args.push_back(arg);
-      ++idx;
-      continue;
-    }
-    if (args.command.empty()) {
-      args.command = "analyze";
-    }
-    args.parse_error = "Unknown analysis option: " + arg;
-    return args;
   }
 
   // Default command is analyze
   if (args.command.empty() && !args.help) {
     args.command = "analyze";
+  }
+
+  // Tag options shape only -f tags output; elsewhere they would be silently ignored.
+  // The test command consumes them for tag test files without -f tags.
+  if (args.command == "analyze" && !args.help && args.tag_option_given && args.format != OutputFormat::Tags) {
+    args.parse_error = "--tag-* options require -f tags";
   }
 
   return args;

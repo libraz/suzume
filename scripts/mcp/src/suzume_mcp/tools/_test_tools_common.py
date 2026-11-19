@@ -39,12 +39,12 @@ ORACLE_OVERRIDE_REMEDIATION = (
 def _get_suzume_tokens(text: str) -> list[dict]:
     """Get Suzume CLI tokens with POS and lemma.
 
-    Uses --no-user-dict to match the C++ tokenization test runner oracle.
+    Uses --skip-bundled-user-dictionary to match the C++ tokenization test runner oracle.
     """
     cli = existing_cli()
 
     result = subprocess.run(
-        [str(cli), "analyze", "--no-user-dict", "--", text],
+        [str(cli), "analyze", "--skip-bundled-user-dictionary", "--", text],
         capture_output=True,
         text=True,
         timeout=30,

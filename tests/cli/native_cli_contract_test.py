@@ -90,15 +90,17 @@ def assert_invalid_arguments(cli: Path) -> None:
     invalid_commands = (
         ("analyze", "--mode", "wide", "東京"),
         ("analyze", "--format", "yaml", "東京"),
-        ("analyze", "--dict"),
-        ("analyze", "--dict", "--format", "json", "東京"),
-        ("analyze", "--tag-pos", "other", "東京"),
-        ("analyze", "--tag-min-length"),
+        ("analyze", "--dictionary"),
+        ("analyze", "--dictionary", "--format", "json", "東京"),
+        ("analyze", "-f", "tags", "--tag-pos-filter", "other", "東京"),
+        ("analyze", "-f", "tags", "--tag-min-length"),
         ("analyze", "--unknown-analysis-flag", "東京"),
     )
     for command in invalid_commands:
         result = run_cli(cli, *command, expect_success=False)
-        assert result.stderr.startswith("error:"), (command, result.stderr)
+        assert result.returncode == 2, (command, result.returncode)
+        assert result.stdout == "", (command, result.stdout)
+        assert result.stderr.startswith("suzume-cli: error: "), (command, result.stderr)
 
 
 def assert_version_contract(cli: Path) -> None:
@@ -106,13 +108,11 @@ def assert_version_contract(cli: Path) -> None:
     long = run_cli(cli, "--version")
     command = run_cli(cli, "version")
     assert short.stdout == long.stdout == command.stdout
-    first_line = short.stdout.splitlines()[0]
-    assert first_line.startswith("suzume-cli ")
-    assert len(first_line.split()) == 2
+    assert re.fullmatch(r"suzume-cli [0-9]+\.[0-9]+\.[0-9]+\S*\n", short.stdout), short.stdout
 
     invalid = run_cli(cli, "-v", "--mode", "invalid", "東京", expect_success=False)
     assert invalid.returncode == 2
-    assert "Invalid mode" in invalid.stderr
+    assert invalid.stderr == "suzume-cli: error: invalid mode: invalid (expected normal, search, or split)\n"
 
 
 def assert_help_contract(cli: Path) -> None:
@@ -128,7 +128,7 @@ def assert_help_contract(cli: Path) -> None:
     assert "--debug" in analyze.stdout
     assert "SUZUME_DEBUG" in top_level.stdout
     assert "SUZUME_SCORER_{SECTION}_{KEY}" in analyze.stdout
-    assert "tsv                    Alias of morpheme" in analyze.stdout
+    assert "tsv                    surface TAB pos TAB base_form TAB start TAB end (default)" in analyze.stdout
     assert "offsets refer to normalized text" in analyze.stdout
     assert "compile <in1.tsv> <in2.tsv>... <out.dic>" in dictionary.stdout
     assert "--filter-trivial" in dictionary.stdout
@@ -140,9 +140,22 @@ def assert_help_contract(cli: Path) -> None:
     assert "Long options that take a value also accept --option=value." in top_level.stdout
     assert "Long options that take a value also accept --option=value." in analyze.stdout
 
-    morpheme = run_cli(cli, "analyze", "--format", "morpheme", "東京")
+    default = run_cli(cli, "analyze", "東京")
     tsv = run_cli(cli, "analyze", "--format", "tsv", "東京")
-    assert tsv.stdout == morpheme.stdout
+    assert tsv.stdout == default.stdout
+    for help_text in (top_level.stdout, analyze.stdout):
+        assert re.search(r"\blemma\b", help_text) is None
+        assert (
+            "--preserve-symbols                Keep punctuation-like SYMBOL tokens "
+            "(emoji and content symbols stay OTHER either way)"
+        ) in help_text
+        assert (
+            "--no-lemmatize                    Keep dictionary base forms without post-analysis correction"
+        ) in help_text
+        assert (
+            "--skip-bundled-user-dictionary    Skip only the bundled user.dic; -d dictionaries still load"
+        ) in help_text
+        assert re.search(r"\bmorpheme\b", help_text) is None
 
 
 def assert_stdin_contract(cli: Path) -> None:
@@ -176,7 +189,8 @@ def assert_invalid_utf8_rejected(cli: Path) -> None:
             expect_success=False,
         )
         assert result.stdout == "", (label, result.stdout)
-        assert "Invalid UTF-8 input" in result.stderr, (label, result.stderr)
+        assert result.returncode == 1, (label, result.returncode)
+        assert result.stderr == "suzume-cli: error: invalid UTF-8 input\n", (label, result.stderr)
 
 
 def assert_json_schema(cli: Path) -> None:
@@ -185,20 +199,51 @@ def assert_json_schema(cli: Path) -> None:
     assert set(payload) == {"input", "normalized_text", "morphemes"}
     assert payload["input"] == payload["normalized_text"] == "東京へ行く"
     assert payload["morphemes"]
-    assert set(payload["morphemes"][0]) == {
-        "surface",
-        "pos",
-        "lemma",
-        "start",
-        "end",
-        "extended_pos",
-        "is_user_dict",
-        "is_formal_noun",
-        "is_low_info",
-        "is_unknown",
-        "is_from_dictionary",
-        "score",
-    }
+    ordered = json.loads(result.stdout, object_pairs_hook=lambda pairs: pairs)
+    morpheme_pairs = dict(ordered)["morphemes"]
+    for pairs in morpheme_pairs:
+        assert [key for key, _ in pairs] == [
+            "surface",
+            "pos",
+            "base_form",
+            "pos_ja",
+            "conj_type",
+            "conj_form",
+            "extended_pos",
+            "start",
+            "end",
+            "is_user_dict",
+            "is_formal_noun",
+            "is_low_info",
+            "is_unknown",
+            "is_from_dictionary",
+            "score",
+        ]
+    by_surface = {morpheme["surface"]: morpheme for morpheme in payload["morphemes"]}
+    assert by_surface["東京"]["pos_ja"] == "名詞"
+    assert by_surface["東京"]["conj_type"] is None
+    assert by_surface["東京"]["conj_form"] is None
+    assert by_surface["行く"]["base_form"] == "行く"
+    assert by_surface["行く"]["pos_ja"] == "動詞"
+    assert by_surface["行く"]["conj_type"] == "五段・カ行"
+    assert by_surface["行く"]["conj_form"] == "終止形"
+    assert '"conj_type": null, "conj_form": null' in result.stdout
+    lines = result.stdout.splitlines()
+    assert lines[0] == "{"
+    assert lines[1] == '  "input": "東京へ行く",'
+    assert lines[2] == '  "normalized_text": "東京へ行く",'
+    assert lines[3] == '  "morphemes": ['
+    assert lines[4].startswith('    {"surface": "東京", "pos": "NOUN", "base_form": "東京", "pos_ja": "名詞", ')
+    assert lines[-2:] == ["  ]", "}"]
+
+    auxiliary = json.loads(run_cli(cli, "analyze", "--format", "json", "書かなかった").stdout)
+    nakat = next(morpheme for morpheme in auxiliary["morphemes"] if morpheme["surface"] == "なかっ")
+    assert nakat["pos"] == "AUX"
+    assert nakat["conj_type"] is None
+    assert nakat["conj_form"] == "連用形"
+
+    escaped = run_cli(cli, "analyze", "--format", "json", "東京\x01\x7fé")
+    assert '"input": "東京\\u0001\x7fé",' in escaped.stdout
 
 
 def assert_offsets_slice_normalized_text(cli: Path) -> None:
@@ -232,8 +277,8 @@ def assert_score_precision(cli: Path) -> None:
     result = run_cli(
         cli,
         "analyze",
-        "--no-core-dict",
-        "--no-user-dict",
+        "--skip-core-dictionary",
+        "--skip-bundled-user-dictionary",
         "--format",
         "json",
         "へ",
@@ -249,8 +294,8 @@ def assert_tag_filters(cli: Path) -> None:
         "analyze",
         "--format",
         "tags",
-        "--tag-pos",
-        "noun",
+        "--tag-pos-filter",
+        "NOUN",
         "--tag-min-length",
         "1",
         "東京を走る",
@@ -264,10 +309,10 @@ def assert_tag_filters(cli: Path) -> None:
         "analyze",
         "--format",
         "tags",
-        "--tag-pos",
-        "noun",
-        "--tag-pos",
-        "verb",
+        "--tag-pos-filter",
+        "NOUN",
+        "--tag-pos-filter",
+        "VERB",
         "--tag-min-length",
         "1",
         "東京を走る",
@@ -303,7 +348,7 @@ def assert_chasen_contract(cli: Path) -> None:
     assert "論理的\t*\t論理的\t形容詞\tナ形容詞\t終止形\n" in na_adjective.stdout
 
     auxiliary = run_cli(cli, "analyze", "--format", "chasen", "書かなかった")
-    assert "なかっ\t*\tない\t助動詞\t*\t終止形\n" in auxiliary.stdout
+    assert "なかっ\t*\tない\t助動詞\t*\t連用形\n" in auxiliary.stdout
 
 
 def assert_debug_and_compare_preserve_output_formats(cli: Path) -> None:
@@ -324,7 +369,7 @@ def assert_single_test_contract(cli: Path) -> None:
         "test",
         "--tag-min-length",
         "1",
-        "--include-particles",
+        "--tag-no-exclude-particles",
         "東京へ",
         "--expect",
         "東京,へ",
@@ -332,9 +377,6 @@ def assert_single_test_contract(cli: Path) -> None:
 
 
 def assert_cli_failure_and_structural_diff_contract(cli: Path) -> None:
-    missing_input = run_cli(cli, "analyze", expect_success=False)
-    assert missing_input.stdout == ""
-    assert "Usage:" in missing_input.stderr
 
     no_dict_args = run_cli(cli, "dict", expect_success=False)
     assert no_dict_args.stdout == ""
@@ -358,15 +400,15 @@ def assert_cli_failure_and_structural_diff_contract(cli: Path) -> None:
         expect_success=False,
     )
     assert "Unknown benchmark option" in unknown_benchmark.stderr
-    missing_test_file = run_cli(cli, "test", "-f", expect_success=False)
-    assert "Missing value for -f" in missing_test_file.stderr
+    missing_test_file = run_cli(cli, "test", "--file", expect_success=False)
+    assert "Missing value for --file" in missing_test_file.stderr
 
     with tempfile.TemporaryDirectory(prefix="suzume-cli-contract-") as temp_name:
         temp_dir = Path(temp_name)
         dictionary = temp_dir / "lemma.tsv"
         dictionary.write_text("東京\tNOUN\t\tとうきょう\n", encoding="utf-8")
-        production = run_cli(cli, "analyze", "--dict", str(dictionary), "--format", "json", "東京")
-        compared = run_cli(cli, "analyze", "--compare", "--dict", str(dictionary), "--format", "json", "東京")
+        production = run_cli(cli, "analyze", "--dictionary", str(dictionary), "--format", "json", "東京")
+        compared = run_cli(cli, "analyze", "--compare", "--dictionary", str(dictionary), "--format", "json", "東京")
         assert compared.stdout == production.stdout
         assert "[Diff]" in compared.stderr
         assert "- 0:" in compared.stderr
@@ -458,7 +500,7 @@ def assert_dictionary_contract(cli: Path) -> None:
         created = temp_dir / "created.tsv"
         run_cli(cli, "dict", "new", str(created))
         created_header = created.read_text(encoding="utf-8")
-        assert "surface<TAB>pos<TAB>conj_type<TAB>lemma" in created_header
+        assert "# Format: surface<TAB>pos<TAB>conj_type<TAB>base_form\n" in created_header
         assert "reading<TAB>cost" not in created_header
         for value in ("CONJUNCTION", "DETERMINER", "PRONOUN", "PREFIX", "SUFFIX", "INTERJECTION"):
             assert value in created_header
@@ -527,7 +569,7 @@ def assert_dictionary_contract(cli: Path) -> None:
             cli,
             "test",
             "--verbose",
-            "--dict",
+            "--dictionary",
             str(compiled),
             "東京テスト",
             "--expect",
@@ -535,7 +577,7 @@ def assert_dictionary_contract(cli: Path) -> None:
         )
         assert "PASS: 東京テスト" in binary_test.stdout, binary_test.stdout
 
-        result = run_cli(cli, "analyze", "--dict", str(compiled), "--format", "json", "東京テスト")
+        result = run_cli(cli, "analyze", "--dictionary", str(compiled), "--format", "json", "東京テスト")
         morphemes = json.loads(result.stdout)["morphemes"]
         matching = [morpheme for morpheme in morphemes if morpheme["surface"] == "東京テスト"]
         assert matching
@@ -571,9 +613,9 @@ def assert_dictionary_contract(cli: Path) -> None:
         additive_binary = run_cli(
             cli,
             "analyze",
-            "--dict",
+            "--dictionary",
             str(compiled),
-            "--dict",
+            "--dictionary",
             str(second_binary),
             "--format",
             "json",
@@ -591,11 +633,11 @@ def assert_dictionary_contract(cli: Path) -> None:
         mixed = run_cli(
             cli,
             "analyze",
-            "--dict",
+            "--dictionary",
             str(first_text),
-            "--dict",
+            "--dictionary",
             str(compiled),
-            "--dict",
+            "--dictionary",
             str(second_text),
             "--format",
             "json",
@@ -796,9 +838,9 @@ def assert_dictionary_contract(cli: Path) -> None:
         dash_named_result = run_cli(
             cli,
             "analyze",
-            "--no-user-dict",
-            "--no-core-dict",
-            "--dict",
+            "--skip-bundled-user-dictionary",
+            "--skip-core-dictionary",
+            "--dictionary",
             dash_named_source.name,
             "--format",
             "json",
@@ -810,6 +852,179 @@ def assert_dictionary_contract(cli: Path) -> None:
             morpheme["surface"] == "東京辞書" and morpheme["is_user_dict"]
             for morpheme in dash_named_morphemes
         )
+
+
+REMOVED_FLAGS = (
+    "--normalize-vu",
+    "--lowercase",
+    "--no-core-dict",
+    "--no-user-dict",
+    "--include-particles",
+    "--include-auxiliaries",
+    "--include-formal-nouns",
+    "--include-low-info",
+    "--tag-keep-duplicates",
+    "--tag-use-surface",
+)
+
+TAG_OPTIONS = (
+    ("--tag-no-exclude-particles",),
+    ("--tag-no-exclude-auxiliaries",),
+    ("--tag-no-exclude-formal-nouns",),
+    ("--tag-no-exclude-low-info",),
+    ("--tag-exclude-basic",),
+    ("--tag-no-remove-duplicates",),
+    ("--tag-no-use-base-form",),
+    ("--tag-min-length", "1"),
+    ("--tag-max-tags", "3"),
+    ("--tag-pos-filter", "NOUN"),
+)
+
+
+def tag_lines(result: subprocess.CompletedProcess[str]) -> list[tuple[str, str]]:
+    return [tuple(line.split("\t")) for line in result.stdout.splitlines()]
+
+
+def assert_flag_table_contract(cli: Path) -> None:
+    for removed in REMOVED_FLAGS:
+        result = run_cli(cli, removed, "東京", expect_success=False)
+        assert result.returncode == 2, (removed, result.returncode)
+        assert result.stderr == f"suzume-cli: error: unknown option: {removed}\n", result.stderr
+    for removed in (("--tag-pos", "noun"), ("--dict", "user.tsv"), ("-f", "morpheme")):
+        result = run_cli(cli, "-f", "tags", *removed, "東京", expect_success=False)
+        assert result.returncode == 2, (removed, result.returncode)
+
+    assert run_cli(cli, "--no-preserve-vu", "ヴァイオリン").stdout.startswith("バイオリン\t")
+    assert run_cli(cli, "ヴァイオリン").stdout.startswith("ヴァイオリン\t")
+    assert run_cli(cli, "--no-preserve-case", "ABC").stdout.startswith("abc\t")
+    assert run_cli(cli, "ABC").stdout.startswith("ABC\t")
+    for flag in ("--preserve-symbols", "--no-lemmatize", "--merge-compounds", "--skip-env-config"):
+        run_cli(cli, flag, "東京へ行く")
+    bare = run_cli(cli, "--skip-core-dictionary", "--skip-bundled-user-dictionary", "東京へ行く")
+    assert bare.stdout
+
+    base_forms = tag_lines(run_cli(cli, "-f", "tags", "東京へ走った"))
+    surfaces = tag_lines(run_cli(cli, "-f", "tags", "--tag-no-use-base-form", "東京へ走った"))
+    assert ("走る", "VERB") in base_forms
+    assert ("走っ", "VERB") in surfaces
+
+    particles = tag_lines(
+        run_cli(cli, "-f", "tags", "--tag-min-length", "1", "--tag-no-exclude-particles", "東京へ")
+    )
+    assert ("へ", "PARTICLE") in particles
+    assert ("へ", "PARTICLE") not in tag_lines(run_cli(cli, "-f", "tags", "--tag-min-length", "1", "東京へ"))
+
+    duplicates = tag_lines(run_cli(cli, "-f", "tags", "--tag-no-remove-duplicates", "東京と東京"))
+    assert duplicates.count(("東京", "NOUN")) == 2
+    assert tag_lines(run_cli(cli, "-f", "tags", "東京と東京")).count(("東京", "NOUN")) == 1
+
+    repeated = run_cli(cli, "-f", "tags", "--tag-pos-filter", "NOUN", "--tag-pos-filter=NOUN", "東京を走る")
+    assert {pos for _, pos in tag_lines(repeated)} == {"NOUN"}
+    for name in ("noun", "adjective", "Adj", ""):
+        result = run_cli(cli, "-f", "tags", "--tag-pos-filter", name, "東京", expect_success=False)
+        assert result.returncode == 2
+        assert result.stderr == (
+            f"suzume-cli: error: invalid --tag-pos-filter value: {name} "
+            "(expected NOUN, VERB, ADJ, ADV, PARTICLE, or AUX)\n"
+        ), result.stderr
+    for options in TAG_OPTIONS:
+        run_cli(cli, "-f", "tags", *options, "東京を走る")
+
+    for name in ("Search", "fast"):
+        result = run_cli(cli, "--mode", name, "東京", expect_success=False)
+        assert result.returncode == 2
+
+
+def assert_tag_options_require_tags_format(cli: Path) -> None:
+    expected = "suzume-cli: error: --tag-* options require -f tags\n"
+    for options in TAG_OPTIONS:
+        for format_args in (("-f", "json"), ("-f", "tsv"), ("-f", "chasen"), ()):
+            result = run_cli(cli, "analyze", *format_args, *options, "東京", expect_success=False)
+            assert result.returncode == 2, (options, format_args)
+            assert result.stdout == ""
+            assert result.stderr == expected, (options, format_args, result.stderr)
+    run_cli(cli, "test", "--tag-min-length", "1", "東京へ", "--expect", "東京")
+
+
+def assert_input_contract(cli: Path) -> None:
+    master, slave = pty.openpty()
+    try:
+        tty_result = subprocess.run([str(cli)], stdin=slave, capture_output=True, check=False, timeout=10)
+    finally:
+        os.close(slave)
+        os.close(master)
+    assert tty_result.returncode == 2, tty_result
+    assert tty_result.stdout == b""
+    assert tty_result.stderr == b"suzume-cli: error: no input text provided\n", tty_result.stderr
+
+    for output_format in ("tsv", "json", "chasen", "tags"):
+        operand = run_cli(cli, "-f", output_format, "")
+        assert operand.stdout == "" and operand.stderr == "", (output_format, operand)
+        for empty_input in ("", "\n", "\r\n", "\ufeff"):
+            piped = run_cli(cli, "-f", output_format, input_text=empty_input)
+            assert piped.stdout == "" and piped.stderr == "", (output_format, repr(empty_input), piped)
+
+    dash_text = run_cli(cli, "--", "-東京")
+    assert dash_text.stdout
+    no_tags = run_cli(cli, "-f", "tags", "を")
+    assert no_tags.stdout == ""
+
+
+def assert_dictionary_loading_contract(cli: Path) -> None:
+    with tempfile.TemporaryDirectory(prefix="suzume-cli-load-") as temp_name:
+        temp_dir = Path(temp_name)
+        missing = temp_dir / "missing.tsv"
+        failed = run_cli(cli, "-d", str(missing), "東京", expect_success=False)
+        assert failed.returncode == 1
+        assert failed.stdout == ""
+        prefix = f"suzume-cli: error: failed to load dictionary: {missing}: "
+        error_line = failed.stderr.splitlines()[-1]
+        assert error_line.startswith(prefix) and len(error_line) > len(prefix), failed.stderr
+        assert failed.stderr.count("suzume-cli: error:") == 1, failed.stderr
+
+        first = temp_dir / "first.tsv"
+        first.write_text("東京公園\tNOUN\nてすとの\tPARTICLE\n", encoding="utf-8")
+        second = temp_dir / "second.tsv"
+        second.write_text("てすとだ\tAUXILIARY\n", encoding="utf-8")
+        loaded = run_cli(
+            cli,
+            "--skip-bundled-user-dictionary",
+            "-d",
+            str(first),
+            "--dictionary",
+            str(second),
+            "東京公園",
+        )
+        warnings = [line for line in loaded.stderr.splitlines() if "closed-class POS" in line]
+        assert len(warnings) == 2, loaded.stderr
+        assert warnings[0].startswith("warning: Dictionary entry at line 2 uses closed-class POS PARTICLE")
+        assert warnings[1].startswith("warning: Dictionary entry at line 1 uses closed-class POS AUX")
+
+
+def assert_subcommand_option_contract(cli: Path) -> None:
+    with tempfile.TemporaryDirectory(prefix="suzume-cli-sub-") as temp_name:
+        temp_dir = Path(temp_name)
+        cases = temp_dir / "cases.tsv"
+        cases.write_text("東京へ\t東京\n", encoding="utf-8")
+        run_cli(cli, "test", "--file", str(cases))
+        run_cli(cli, "test", f"--file={cases}")
+        dash_f = run_cli(cli, "test", "-f", str(cases), expect_success=False)
+        assert dash_f.returncode == 2
+        assert dash_f.stderr == (
+            f"suzume-cli: error: invalid format: {cases} (expected tsv, json, chasen, or tags)\n"
+        ), dash_f.stderr
+
+        corpus = temp_dir / "corpus.txt"
+        corpus.write_text("東京へ行く\n", encoding="utf-8")
+        run_cli(cli, "test", "benchmark", "--iterations=1", "--samples=1", "--warmup=0", "--file", str(corpus))
+
+        source = temp_dir / "interactive.tsv"
+        source.write_text("東京公園\tNOUN\n", encoding="utf-8")
+        run_cli(cli, "dict", "--interactive", str(source), input_text="quit\n")
+
+        lookup = run_cli(cli, "dict", "lookup", "でし")
+        assert "でし\tAUX\t(base_form: です)\n" in lookup.stdout, lookup.stdout
+        assert "(lemma:" not in lookup.stdout
 
 
 def main() -> int:
@@ -837,6 +1052,11 @@ def main() -> int:
     assert_cli_failure_and_structural_diff_contract(cli)
     assert_bundled_user_dictionary_contract(cli)
     assert_dictionary_contract(cli)
+    assert_flag_table_contract(cli)
+    assert_tag_options_require_tags_format(cli)
+    assert_input_contract(cli)
+    assert_dictionary_loading_contract(cli)
+    assert_subcommand_option_contract(cli)
     return 0
 
 

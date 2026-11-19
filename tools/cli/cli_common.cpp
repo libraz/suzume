@@ -20,7 +20,7 @@
 namespace suzume::cli {
 
 void printError(std::string_view message) {
-  std::cerr << "error: " << message << "\n";
+  std::cerr << "suzume-cli: error: " << message << "\n";
 }
 
 void printWarning(std::string_view message) {
@@ -289,7 +289,6 @@ std::string getVersionString() {
 
 void printVersion() {
   std::cout << "suzume-cli " << getVersionString() << "\n";
-  std::cout << "Japanese tokenizer\n";
 }
 
 }  // namespace suzume::cli

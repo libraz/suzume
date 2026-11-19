@@ -17,33 +17,33 @@ Commands:
   help        Show this help
 
 Global Options:
-  -d, --dict PATH        Load user dictionary (can specify multiple)
-  -m, --mode MODE        Analysis mode: normal, search, split
-  -f, --format FMT       Output format: morpheme, tags, json, tsv, chasen
-  -V, --verbose          Verbose output
-  -VV, --very-verbose    Very verbose output (includes lattice dump)
-  --debug                Write lattice diagnostics to stderr; preserves the selected output format
-  --no-user-dict         Disable user dictionary
-  --no-core-dict         Disable auto-loaded core.dic
-  --skip-env-config      Ignore scorer configuration environment variables
-  --compare              Write user-dictionary comparison diagnostics to stderr; preserves output format
-  --normalize-vu         Normalize ヴ to ビ etc. (default: preserve)
-  --lowercase            Convert ASCII to lowercase (default: preserve)
-  --preserve-symbols     Keep symbols/emoji in output (default: remove)
-  --no-lemmatize         Keep source lemmas without post-analysis correction
-  --merge-compounds      Merge consecutive noun compounds
-  --include-particles    Include particles in tag output
-  --include-auxiliaries  Include auxiliaries in tag output
-  --include-formal-nouns Include formal nouns in tag output
-  --include-low-info     Include low-information words in tag output
-  --tag-keep-duplicates  Keep duplicate tags
-  --tag-use-surface      Use surface instead of lemma for tags
-  --tag-pos POS          Include noun, verb, adjective, adverb, particle, or auxiliary (repeatable)
-  --tag-exclude-basic    Exclude hiragana-only basic words
-  --tag-min-length N     Minimum tag length (default: 2)
-  --tag-max-tags N       Maximum tags (default: 0, unlimited)
-  -h, --help             Show help
-  -v, --version          Show version
+  -d, --dictionary PATH             Load user dictionary (can specify multiple)
+  -m, --mode MODE                   Analysis mode: normal, search, split
+  -f, --format FMT                  Output format: tsv (default), json, chasen, tags
+  -V, --verbose                     Verbose output
+  -VV, --very-verbose               Very verbose output (includes lattice dump)
+  --debug                           Write lattice diagnostics to stderr; preserves the selected output format
+  --skip-core-dictionary            Skip the auto-loaded core.dic
+  --skip-bundled-user-dictionary    Skip only the bundled user.dic; -d dictionaries still load
+  --skip-env-config                 Ignore scorer configuration environment variables
+  --compare                         Write user-dictionary comparison diagnostics to stderr; preserves output format
+  --no-preserve-vu                  Normalize ヴ to ビ etc. (default: preserve)
+  --no-preserve-case                Convert ASCII to lowercase (default: preserve)
+  --preserve-symbols                Keep punctuation-like SYMBOL tokens (emoji and content symbols stay OTHER either way)
+  --no-lemmatize                    Keep dictionary base forms without post-analysis correction
+  --merge-compounds                 Merge consecutive noun compounds
+  --tag-no-exclude-particles        Keep particles in tag output
+  --tag-no-exclude-auxiliaries      Keep auxiliaries in tag output
+  --tag-no-exclude-formal-nouns     Keep formal nouns in tag output
+  --tag-no-exclude-low-info         Keep low-information words in tag output
+  --tag-exclude-basic               Exclude hiragana-only basic words
+  --tag-no-remove-duplicates        Keep duplicate tags
+  --tag-no-use-base-form            Use the surface instead of the base form for tags
+  --tag-pos-filter NAME             Keep only NOUN, VERB, ADJ, ADV, PARTICLE, or AUX (repeatable)
+  --tag-min-length N                Minimum tag length (default: 2)
+  --tag-max-tags N                  Maximum tags (default: 0, unlimited)
+  -h, --help                        Show help
+  -v, --version                     Show version
 
 Long options that take a value also accept --option=value.
 
@@ -72,41 +72,41 @@ Usage:
   suzume-cli [options] [text]         (analyze is default)
 
 Options:
-  -d, --dict PATH        Load user dictionary (can specify multiple)
-  -m, --mode MODE        Analysis mode: normal, search, split
-  -f, --format FMT       Output format: morpheme, tags, json, tsv, chasen
-  -V, --verbose          Verbose output
-  -VV, --very-verbose    Very verbose output (includes lattice dump)
-  --debug                Write lattice diagnostics to stderr; preserves the selected output format
-  --no-user-dict         Disable user dictionary
-  --no-core-dict         Disable auto-loaded core.dic
-  --skip-env-config      Ignore scorer configuration environment variables
-  --compare              Write user-dictionary comparison diagnostics to stderr; preserves output format
-  --normalize-vu         Normalize ヴ to ビ etc. (default: preserve)
-  --lowercase            Convert ASCII to lowercase (default: preserve)
-  --preserve-symbols     Keep symbols/emoji in output (default: remove)
-  --no-lemmatize         Keep source lemmas without post-analysis correction
-  --merge-compounds      Merge consecutive noun compounds
-  --include-particles    Include particles in tag output
-  --include-auxiliaries  Include auxiliaries in tag output
-  --include-formal-nouns Include formal nouns in tag output
-  --include-low-info     Include low-information words in tag output
-  --tag-keep-duplicates  Keep duplicate tags
-  --tag-use-surface      Use surface instead of lemma for tags
-  --tag-pos POS          Include noun, verb, adjective, adverb, particle, or auxiliary (repeatable)
-  --tag-exclude-basic    Exclude hiragana-only basic words
-  --tag-min-length N     Minimum tag length (default: 2)
-  --tag-max-tags N       Maximum tags (default: 0, unlimited)
-  -h, --help             Show this help
+  -d, --dictionary PATH             Load user dictionary (can specify multiple)
+  -m, --mode MODE                   Analysis mode: normal, search, split
+  -f, --format FMT                  Output format: tsv (default), json, chasen, tags
+  -V, --verbose                     Verbose output
+  -VV, --very-verbose               Very verbose output (includes lattice dump)
+  --debug                           Write lattice diagnostics to stderr; preserves the selected output format
+  --skip-core-dictionary            Skip the auto-loaded core.dic
+  --skip-bundled-user-dictionary    Skip only the bundled user.dic; -d dictionaries still load
+  --skip-env-config                 Ignore scorer configuration environment variables
+  --compare                         Write user-dictionary comparison diagnostics to stderr; preserves output format
+  --no-preserve-vu                  Normalize ヴ to ビ etc. (default: preserve)
+  --no-preserve-case                Convert ASCII to lowercase (default: preserve)
+  --preserve-symbols                Keep punctuation-like SYMBOL tokens (emoji and content symbols stay OTHER either way)
+  --no-lemmatize                    Keep dictionary base forms without post-analysis correction
+  --merge-compounds                 Merge consecutive noun compounds
+  --tag-no-exclude-particles        Keep particles in tag output
+  --tag-no-exclude-auxiliaries      Keep auxiliaries in tag output
+  --tag-no-exclude-formal-nouns     Keep formal nouns in tag output
+  --tag-no-exclude-low-info         Keep low-information words in tag output
+  --tag-exclude-basic               Exclude hiragana-only basic words
+  --tag-no-remove-duplicates        Keep duplicate tags
+  --tag-no-use-base-form            Use the surface instead of the base form for tags
+  --tag-pos-filter NAME             Keep only NOUN, VERB, ADJ, ADV, PARTICLE, or AUX (repeatable)
+  --tag-min-length N                Minimum tag length (default: 2)
+  --tag-max-tags N                  Maximum tags (default: 0, unlimited)
+  -h, --help                        Show this help
 
 Long options that take a value also accept --option=value.
+--tag-* options require -f tags.
 
 Output Formats:
-  morpheme               surface TAB pos TAB lemma TAB start TAB end (default)
-  tags                   tag TAB pos, one per line
+  tsv                    surface TAB pos TAB base_form TAB start TAB end (default)
   json                   JSON format
-  tsv                    Alias of morpheme
   chasen                 ChaSen-like format (Japanese POS, conjugation info)
+  tags                   tag TAB pos, one per line
   TAB formats escape backslash, TAB, CR, and LF as \\, \t, \r, and \n
   Morpheme start/end offsets refer to normalized text; JSON includes it as normalized_text
 
@@ -117,7 +117,7 @@ Examples:
   suzume-cli analyze -f json "text"
   suzume-cli analyze -f chasen "text"
   suzume-cli analyze --compare -d user.dic "text"
-  suzume-cli analyze --normalize-vu "ヴァイオリン"
+  suzume-cli analyze --no-preserve-vu "ヴァイオリン"
   echo "text" | suzume-cli analyze
 
 Environment:
@@ -187,12 +187,12 @@ Usage:
 Subcommands:
   <text> --expect <tags>
                          Test single input with expected output
-  -f, --file <tests.tsv>
+  --file <tests.tsv>
                          Run tests from file
-  benchmark [--iterations=N] [--samples=N] [--warmup=N] [-f <corpus.txt>]
+  benchmark [--iterations=N] [--samples=N] [--warmup=N] [--file <corpus.txt>]
                          Report median initialize, first-analysis, and steady-analysis timing
 Options:
-  -d, --dict PATH        Load user dictionary
+  -d, --dictionary PATH  Load user dictionary
   Analysis, normalization, dictionary, and --tag-* options match `analyze`
   -h, --help             Show this help
 
@@ -201,8 +201,8 @@ Test File Format (TSV):
 
 Examples:
   suzume-cli test "text" --expect "tag1,tag2"
-  suzume-cli test -f tests.tsv
-  suzume-cli test -f tests.tsv -d user.dic
+  suzume-cli test --file tests.tsv
+  suzume-cli test --file tests.tsv -d user.dic
   suzume-cli test benchmark --iterations=1000 --samples=5 --warmup=1
 )";
 }

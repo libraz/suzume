@@ -43,6 +43,12 @@ TEST(CliCommonTest, JsonEscapeEscapesControlCharacters) {
   EXPECT_EQ(jsonEscape(input), "\\u0001ok");
 }
 
+TEST(CliCommonTest, JsonEscapeMatchesPythonJsonDumpsWithoutAsciiEscaping) {
+  EXPECT_EQ(jsonEscape("\b\f\x1f"), "\\b\\f\\u001f");
+  EXPECT_EQ(jsonEscape("\x7f"), "\x7f");
+  EXPECT_EQ(jsonEscape("東京/é"), "東京/é");
+}
+
 TEST(CliCommonTest, TabEscapeKeepsEveryRecordOnOneLine) {
   EXPECT_EQ(tabEscape("a\\b\tc\r\nd"), "a\\\\b\\tc\\r\\nd");
 }
@@ -78,56 +84,127 @@ TEST(CliCommonTest, LimitZeroMeansUnlimited) {
   EXPECT_TRUE(limitReached(3, 3));
 }
 
+template <size_t N>
+CommandArgs parse(const char* (&argv)[N]) {
+  return parseArgs(static_cast<int>(N), const_cast<char**>(argv));
+}
+
 TEST(CliCommonTest, ParseArgsAcceptsTagOptions) {
   const char* argv[] = {"suzume-cli",
                         "-f",
                         "tags",
-                        "--include-particles",
-                        "--include-auxiliaries",
-                        "--include-formal-nouns",
-                        "--include-low-info",
-                        "--tag-keep-duplicates",
-                        "--tag-use-surface",
-                        "--tag-pos",
-                        "noun",
-                        "--tag-pos=verb",
-                        "--tag-pos",
-                        "particle",
-                        "--tag-pos=auxiliary",
+                        "--tag-no-exclude-particles",
+                        "--tag-no-exclude-auxiliaries",
+                        "--tag-no-exclude-formal-nouns",
+                        "--tag-no-exclude-low-info",
+                        "--tag-no-remove-duplicates",
+                        "--tag-no-use-base-form",
+                        "--tag-pos-filter",
+                        "NOUN",
+                        "--tag-pos-filter=VERB",
+                        "--tag-pos-filter",
+                        "PARTICLE",
+                        "--tag-pos-filter=AUX",
+                        "--tag-pos-filter",
+                        "NOUN",
                         "--tag-exclude-basic",
                         "--tag-min-length",
                         "1",
                         "--tag-max-tags",
                         "3",
                         "猫が走る"};
-  auto args = parseArgs(static_cast<int>(sizeof(argv) / sizeof(argv[0])), const_cast<char**>(argv));
+  auto args = parse(argv);
 
+  EXPECT_TRUE(args.parse_error.empty()) << args.parse_error;
   EXPECT_EQ(args.format, OutputFormat::Tags);
-  EXPECT_TRUE(args.tag_include_particles);
-  EXPECT_TRUE(args.tag_include_auxiliaries);
-  EXPECT_TRUE(args.tag_include_formal_nouns);
-  EXPECT_TRUE(args.tag_include_low_info);
-  EXPECT_TRUE(args.tag_keep_duplicates);
-  EXPECT_TRUE(args.tag_use_surface);
+  EXPECT_FALSE(args.tag_exclude_particles);
+  EXPECT_FALSE(args.tag_exclude_auxiliaries);
+  EXPECT_FALSE(args.tag_exclude_formal_nouns);
+  EXPECT_FALSE(args.tag_exclude_low_info);
+  EXPECT_FALSE(args.tag_remove_duplicates);
+  EXPECT_FALSE(args.tag_use_base_form);
   EXPECT_EQ(args.tag_pos_filter, 51u);
   EXPECT_TRUE(args.tag_exclude_basic);
   EXPECT_EQ(args.tag_min_length, 1u);
   EXPECT_EQ(args.tag_max_tags, 3u);
-  EXPECT_TRUE(args.parse_error.empty());
+}
+
+TEST(CliCommonTest, ParseArgsDefaultsMatchLibraryOptions) {
+  const char* argv[] = {"suzume-cli", "テスト"};
+  auto args = parse(argv);
+
+  EXPECT_EQ(args.format, OutputFormat::Tsv);
+  EXPECT_TRUE(args.preserve_vu);
+  EXPECT_TRUE(args.preserve_case);
+  EXPECT_FALSE(args.preserve_symbols);
+  EXPECT_TRUE(args.lemmatize);
+  EXPECT_FALSE(args.merge_compounds);
+  EXPECT_FALSE(args.skip_core_dictionary);
+  EXPECT_FALSE(args.skip_bundled_user_dictionary);
+  EXPECT_TRUE(args.tag_exclude_particles);
+  EXPECT_TRUE(args.tag_exclude_auxiliaries);
+  EXPECT_TRUE(args.tag_exclude_formal_nouns);
+  EXPECT_TRUE(args.tag_exclude_low_info);
+  EXPECT_TRUE(args.tag_remove_duplicates);
+  EXPECT_TRUE(args.tag_use_base_form);
+  EXPECT_EQ(args.tag_pos_filter, 0u);
+}
+
+TEST(CliCommonTest, ParseArgsAcceptsPosFilterNamesExactly) {
+  for (const char* name : {"NOUN", "VERB", "ADJ", "ADV", "PARTICLE", "AUX"}) {
+    const char* argv[] = {"suzume-cli", "-f", "tags", "--tag-pos-filter", name, "テスト"};
+    auto args = parse(argv);
+    EXPECT_TRUE(args.parse_error.empty()) << name << ": " << args.parse_error;
+  }
+  for (const char* name : {"noun", "adjective", "Adj", "", "OTHER"}) {
+    const char* argv[] = {"suzume-cli", "-f", "tags", "--tag-pos-filter", name, "テスト"};
+    auto args = parse(argv);
+    EXPECT_EQ(args.parse_error, std::string("invalid --tag-pos-filter value: ") + name +
+                                    " (expected NOUN, VERB, ADJ, ADV, PARTICLE, or AUX)");
+  }
+}
+
+TEST(CliCommonTest, ParseArgsRejectsRemovedFlagSpellings) {
+  for (const char* removed :
+       {"--normalize-vu", "--lowercase", "--no-core-dict", "--no-user-dict", "--include-particles",
+        "--include-auxiliaries", "--include-formal-nouns", "--include-low-info", "--tag-keep-duplicates",
+        "--tag-use-surface", "--tag-pos", "--dict"}) {
+    const char* argv[] = {"suzume-cli", removed, "テスト"};
+    auto args = parse(argv);
+    EXPECT_EQ(args.parse_error, std::string("unknown option: ") + removed);
+  }
+  const char* morpheme_format[] = {"suzume-cli", "-f", "morpheme", "テスト"};
+  EXPECT_EQ(parse(morpheme_format).parse_error, "invalid format: morpheme (expected tsv, json, chasen, or tags)");
+}
+
+TEST(CliCommonTest, ParseArgsRequiresTagsFormatForTagOptionsInAnalyze) {
+  const char* with_json[] = {"suzume-cli", "-f", "json", "--tag-min-length", "1", "テスト"};
+  EXPECT_EQ(parse(with_json).parse_error, "--tag-* options require -f tags");
+
+  const char* with_default[] = {"suzume-cli", "analyze", "--tag-exclude-basic", "テスト"};
+  EXPECT_EQ(parse(with_default).parse_error, "--tag-* options require -f tags");
+
+  const char* format_after[] = {"suzume-cli", "--tag-no-use-base-form", "-f", "tags", "テスト"};
+  EXPECT_TRUE(parse(format_after).parse_error.empty());
+
+  const char* in_test[] = {"suzume-cli", "test", "--tag-min-length", "1", "テスト", "--expect", "テスト"};
+  auto test_args = parse(in_test);
+  EXPECT_TRUE(test_args.parse_error.empty()) << test_args.parse_error;
+  EXPECT_EQ(test_args.tag_min_length, 1u);
 }
 
 TEST(CliCommonTest, ParseArgsRejectsUnknownAnalysisOption) {
   const char* argv[] = {"suzume-cli", "-テスト"};
-  auto args = parseArgs(static_cast<int>(sizeof(argv) / sizeof(argv[0])), const_cast<char**>(argv));
+  auto args = parse(argv);
 
   EXPECT_EQ(args.command, "analyze");
   EXPECT_TRUE(args.args.empty());
-  EXPECT_EQ(args.parse_error, "Unknown analysis option: -テスト");
+  EXPECT_EQ(args.parse_error, "unknown option: -テスト");
 }
 
 TEST(CliCommonTest, ParseArgsAcceptsLeadingDashTextAfterOptionTerminator) {
   const char* argv[] = {"suzume-cli", "--", "-テスト"};
-  auto args = parseArgs(static_cast<int>(sizeof(argv) / sizeof(argv[0])), const_cast<char**>(argv));
+  auto args = parse(argv);
 
   EXPECT_EQ(args.command, "analyze");
   ASSERT_EQ(args.args.size(), 1u);
@@ -136,61 +213,102 @@ TEST(CliCommonTest, ParseArgsAcceptsLeadingDashTextAfterOptionTerminator) {
 }
 
 TEST(CliCommonTest, ParseArgsConnectsAdvancedAnalyzeOptions) {
-  const char* argv[] = {"suzume-cli",        "-VV",   "--no-core-dict", "--skip-env-config", "--no-lemmatize",
-                        "--merge-compounds", "テスト"};
-  auto args = parseArgs(static_cast<int>(sizeof(argv) / sizeof(argv[0])), const_cast<char**>(argv));
+  const char* argv[] = {"suzume-cli",
+                        "-VV",
+                        "--skip-core-dictionary",
+                        "--skip-bundled-user-dictionary",
+                        "--skip-env-config",
+                        "--no-lemmatize",
+                        "--merge-compounds",
+                        "--no-preserve-vu",
+                        "--no-preserve-case",
+                        "--preserve-symbols",
+                        "--dictionary",
+                        "a.tsv",
+                        "-d",
+                        "b.dic",
+                        "--dictionary=c.tsv",
+                        "テスト"};
+  auto args = parse(argv);
 
+  EXPECT_TRUE(args.parse_error.empty()) << args.parse_error;
   EXPECT_TRUE(args.verbose);
   EXPECT_TRUE(args.very_verbose);
   EXPECT_TRUE(args.debug);
-  EXPECT_TRUE(args.no_core_dict);
+  EXPECT_TRUE(args.skip_core_dictionary);
+  EXPECT_TRUE(args.skip_bundled_user_dictionary);
   EXPECT_TRUE(args.skip_env_config);
-  EXPECT_TRUE(args.no_lemmatize);
+  EXPECT_FALSE(args.lemmatize);
   EXPECT_TRUE(args.merge_compounds);
+  EXPECT_FALSE(args.preserve_vu);
+  EXPECT_FALSE(args.preserve_case);
+  EXPECT_TRUE(args.preserve_symbols);
+  EXPECT_EQ(args.dict_paths, (std::vector<std::string>{"a.tsv", "b.dic", "c.tsv"}));
 }
 
 TEST(CliCommonTest, ParseArgsRejectsInvalidModeAndFormat) {
   const char* invalid_mode[] = {"suzume-cli", "analyze", "--mode", "wide", "テスト"};
-  auto mode_args =
-      parseArgs(static_cast<int>(sizeof(invalid_mode) / sizeof(invalid_mode[0])), const_cast<char**>(invalid_mode));
-  EXPECT_NE(mode_args.parse_error.find("Invalid mode"), std::string::npos);
+  EXPECT_EQ(parse(invalid_mode).parse_error, "invalid mode: wide (expected normal, search, or split)");
+
+  const char* capitalized_mode[] = {"suzume-cli", "--mode=Search", "テスト"};
+  EXPECT_EQ(parse(capitalized_mode).parse_error, "invalid mode: Search (expected normal, search, or split)");
 
   const char* invalid_format[] = {"suzume-cli", "--format=yaml", "テスト"};
-  auto format_args = parseArgs(static_cast<int>(sizeof(invalid_format) / sizeof(invalid_format[0])),
-                               const_cast<char**>(invalid_format));
-  EXPECT_NE(format_args.parse_error.find("Invalid format"), std::string::npos);
+  EXPECT_EQ(parse(invalid_format).parse_error, "invalid format: yaml (expected tsv, json, chasen, or tags)");
+
+  for (const char* name : {"tsv", "json", "chasen", "tags"}) {
+    const char* argv[] = {"suzume-cli", "-f", name, "テスト"};
+    EXPECT_TRUE(parse(argv).parse_error.empty()) << name;
+  }
 }
 
 TEST(CliCommonTest, ParseArgsRejectsMissingOptionValues) {
-  const char* missing_dict[] = {"suzume-cli", "analyze", "--dict"};
-  auto dict_args =
-      parseArgs(static_cast<int>(sizeof(missing_dict) / sizeof(missing_dict[0])), const_cast<char**>(missing_dict));
-  EXPECT_EQ(dict_args.parse_error, "Missing value for --dict");
+  const char* missing_dict[] = {"suzume-cli", "analyze", "--dictionary"};
+  EXPECT_EQ(parse(missing_dict).parse_error, "missing value for --dictionary");
 
   const char* missing_mode[] = {"suzume-cli", "--mode", "--format", "json", "テスト"};
-  auto mode_args =
-      parseArgs(static_cast<int>(sizeof(missing_mode) / sizeof(missing_mode[0])), const_cast<char**>(missing_mode));
-  EXPECT_EQ(mode_args.parse_error, "Missing value for --mode");
+  EXPECT_EQ(parse(missing_mode).parse_error, "missing value for --mode");
 
-  const char* missing_tag_pos[] = {"suzume-cli", "--tag-pos"};
-  auto tag_args = parseArgs(static_cast<int>(sizeof(missing_tag_pos) / sizeof(missing_tag_pos[0])),
-                            const_cast<char**>(missing_tag_pos));
-  EXPECT_EQ(tag_args.parse_error, "Missing value for --tag-pos");
+  const char* missing_tag_pos[] = {"suzume-cli", "-f", "tags", "--tag-pos-filter"};
+  EXPECT_EQ(parse(missing_tag_pos).parse_error, "missing value for --tag-pos-filter");
+
+  const char* empty_equals[] = {"suzume-cli", "--dictionary=", "テスト"};
+  EXPECT_EQ(parse(empty_equals).parse_error, "missing value for --dictionary");
+}
+
+TEST(CliCommonTest, ParseArgsRejectsValueOnFlagOption) {
+  const char* argv[] = {"suzume-cli", "--merge-compounds=yes", "テスト"};
+  EXPECT_EQ(parse(argv).parse_error, "unknown option: --merge-compounds=yes");
 }
 
 TEST(CliCommonTest, ParseArgsPreservesDictAndTestSubcommandOptions) {
   const char* dict_argv[] = {"suzume-cli", "dict", "list", "test.tsv", "--pos=NOUN", "--limit=3"};
-  auto dict_args = parseArgs(static_cast<int>(sizeof(dict_argv) / sizeof(dict_argv[0])), const_cast<char**>(dict_argv));
+  auto dict_args = parse(dict_argv);
   EXPECT_EQ(dict_args.command, "dict");
   EXPECT_EQ(dict_args.args, (std::vector<std::string>{"list", "test.tsv", "--pos=NOUN", "--limit=3"}));
   EXPECT_TRUE(dict_args.parse_error.empty());
 
-  const char* test_argv[] = {"suzume-cli", "test", "-f", "cases.tsv", "-d", "user.tsv"};
-  auto test_args = parseArgs(static_cast<int>(sizeof(test_argv) / sizeof(test_argv[0])), const_cast<char**>(test_argv));
+  const char* test_argv[] = {"suzume-cli", "test", "--file", "cases.tsv", "-d", "user.tsv"};
+  auto test_args = parse(test_argv);
   EXPECT_EQ(test_args.command, "test");
-  EXPECT_EQ(test_args.args, (std::vector<std::string>{"-f", "cases.tsv"}));
+  EXPECT_EQ(test_args.args, (std::vector<std::string>{"--file", "cases.tsv"}));
   EXPECT_EQ(test_args.dict_paths, (std::vector<std::string>{"user.tsv"}));
   EXPECT_TRUE(test_args.parse_error.empty());
+
+  const char* expect_argv[] = {"suzume-cli", "test", "-テスト", "--expect", "-テスト"};
+  auto expect_args = parse(expect_argv);
+  EXPECT_TRUE(expect_args.parse_error.empty()) << expect_args.parse_error;
+  EXPECT_EQ(expect_args.args, (std::vector<std::string>{"-テスト", "--expect", "-テスト"}));
+}
+
+TEST(CliCommonTest, ParseArgsTreatsTestDashFAsOutputFormat) {
+  const char* argv[] = {"suzume-cli", "test", "-f", "cases.tsv"};
+  EXPECT_EQ(parse(argv).parse_error, "invalid format: cases.tsv (expected tsv, json, chasen, or tags)");
+}
+
+TEST(CliCommonTest, ParseArgsKeepsTestOnlyOptionsOutOfAnalyze) {
+  const char* argv[] = {"suzume-cli", "--file", "cases.tsv"};
+  EXPECT_EQ(parse(argv).parse_error, "unknown option: --file");
 }
 
 TEST(CliCommonTest, ParseArgsRecordsVersionWithoutExiting) {
