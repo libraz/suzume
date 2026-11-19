@@ -98,11 +98,17 @@ float Scorer::eosCost(const core::LatticeEdge& edge, core::ExtendedPOS prev_exte
     case sc::EosBoundaryGate::NonVolitionalStem:
       return grammar::endsWithORow(edge.surface) ? sc::scale::kNeutral : boundary_cost.eos;
     case sc::EosBoundaryGate::AfterContent:
+    case sc::EosBoundaryGate::AfterContinuative: {
       // The sentence start arrives here as Unknown, and a punctuation mark
       // opens a fragment; in both the token introduces what follows instead.
-      return prev_extended_pos == core::ExtendedPOS::Unknown || prev_extended_pos == core::ExtendedPOS::Symbol
-                 ? sc::scale::kNeutral
-                 : boundary_cost.eos;
+      // A hypothetical stem fires only after a continuative, where it has lost
+      // its ば (受け+止め); alone, a godan one is the homographic imperative (読め).
+      const bool fires =
+          boundary_cost.eos_gate == sc::EosBoundaryGate::AfterContent
+              ? prev_extended_pos != core::ExtendedPOS::Unknown && prev_extended_pos != core::ExtendedPOS::Symbol
+              : prev_extended_pos == core::ExtendedPOS::VerbRenyokei;
+      return fires ? boundary_cost.eos : sc::scale::kNeutral;
+    }
   }
 
   return sc::scale::kNeutral;

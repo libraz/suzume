@@ -481,6 +481,8 @@ constexpr float kEosNounContinuativePenalty = scale::kStrong;
 // auxiliary or particle to serve: it is the deverbal noun (答え, 考え), since
 // only a comma-chained clause ends on the bare continuative.
 constexpr float kEosBareERowRenyokeiPenalty = scale::kStrong;
+// A hypothetical stem after a continuative cannot close the utterance without ば/ど.
+constexpr float kEosHypotheticalPenalty = scale::kSevere;
 
 // A formal noun does not follow the bare-kanji terminal of a classical verb (候+はず).
 constexpr float kPenaltyBareClassicalTerminalBeforeFormalNoun = scale::kStrong;
@@ -546,6 +548,7 @@ enum class EosBoundaryGate {
   IzenkeiNegative,
   AttributiveCopula,
   NonVolitionalStem,
+  AfterContinuative,
 };
 
 struct BoundaryCost {
@@ -618,6 +621,8 @@ constexpr std::array<BoundaryCost, static_cast<size_t>(core::ExtendedPOS::Count_
   table[static_cast<size_t>(core::ExtendedPOS::VerbRenyokei)].eos_gate = EosBoundaryGate::SingleCodepoint;
   table[static_cast<size_t>(core::ExtendedPOS::VerbMizenkei)].eos = kEosMizenkeiPenalty;
   table[static_cast<size_t>(core::ExtendedPOS::VerbMizenkei)].eos_gate = EosBoundaryGate::NonVolitionalStem;
+  table[static_cast<size_t>(core::ExtendedPOS::VerbKateikei)].eos = kEosHypotheticalPenalty;
+  table[static_cast<size_t>(core::ExtendedPOS::VerbKateikei)].eos_gate = EosBoundaryGate::AfterContinuative;
   table[static_cast<size_t>(core::ExtendedPOS::AuxNegativeNu)].eos = kEosIzenkeiNegativePenalty;
   table[static_cast<size_t>(core::ExtendedPOS::AuxNegativeNu)].eos_gate = EosBoundaryGate::IzenkeiNegative;
   table[static_cast<size_t>(core::ExtendedPOS::AuxCopulaDa)].eos = kEosAttributiveCopulaPenalty;
