@@ -414,10 +414,32 @@ constexpr bool isConjectureRashiiType(ExtendedPOS epos) {
 }
 
 /**
+ * @brief Whether ExtendedPOS is a cell of the plain copula だ
+ */
+constexpr bool isPlainCopulaType(ExtendedPOS epos) {
+  return epos == ExtendedPOS::AuxCopulaDa;
+}
+
+/**
  * @brief Whether ExtendedPOS is the plain or polite copula (だ, です)
  */
 constexpr bool isCopulaType(ExtendedPOS epos) {
-  return epos == ExtendedPOS::AuxCopulaDa || epos == ExtendedPOS::AuxCopulaDesu;
+  return isPlainCopulaType(epos) || epos == ExtendedPOS::AuxCopulaDesu;
+}
+
+/**
+ * @brief Whether ExtendedPOS is an adverbial particle (だけ, まで, とか)
+ */
+constexpr bool isAdverbialParticleType(ExtendedPOS epos) {
+  return epos == ExtendedPOS::ParticleAdverbial;
+}
+
+/**
+ * @brief Whether ExtendedPOS is a general suffix (用, 後), not one of its
+ *        separately profiled subclasses (っけ, がち)
+ */
+constexpr bool isGeneralSuffixType(ExtendedPOS epos) {
+  return epos == ExtendedPOS::Suffix;
 }
 
 /**
