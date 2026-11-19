@@ -285,9 +285,17 @@ suzume_tags_t* makeTagsResult(const std::vector<suzume::postprocess::TagEntry>& 
   return result;
 }
 
+// Shared by the analyze and tag entry points so one malformed input reports one text.
+bool rejectInvalidUtf8(std::string_view text) {
+  if (suzume::normalize::isValidUtf8(text)) {
+    return false;
+  }
+  setLastError("invalid UTF-8 input", SUZUME_ERROR_INVALID_UTF8);
+  return true;
+}
+
 suzume_result_t* analyzeBytes(SuzumeHandle* handle, std::string_view text) {
-  if (!suzume::normalize::isValidUtf8(text)) {
-    setLastError("invalid UTF-8 input", SUZUME_ERROR_INVALID_UTF8);
+  if (rejectInvalidUtf8(text)) {
     return nullptr;
   }
 
@@ -359,6 +367,9 @@ suzume::postprocess::TagGeneratorOptions toTagGeneratorOptions(const suzume_tag_
 }
 
 suzume_tags_t* generateTagsBytes(SuzumeHandle* handle, std::string_view text, const suzume_tag_options_t* options) {
+  if (rejectInvalidUtf8(text)) {
+    return nullptr;
+  }
   auto result = options == nullptr ? handle->instance.generateTagsResult(text)
                                    : handle->instance.generateTagsResult(text, toTagGeneratorOptions(*options));
   if (!result.hasValue()) {

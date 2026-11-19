@@ -496,11 +496,13 @@ TEST(SuzumeCApiTest, TagEntrypointsRejectInvalidUtf8WithStableCode) {
 
   EXPECT_EQ(suzume_generate_tags_n(handle, invalid.data(), invalid.size()), nullptr);
   EXPECT_EQ(suzume_last_error_code(), SUZUME_ERROR_INVALID_UTF8);
+  EXPECT_STREQ(suzume_last_error(), "invalid UTF-8 input");
 
   suzume_tag_options_t options{};
   suzume_init_tag_options(&options);
   EXPECT_EQ(suzume_generate_tags_with_options_n(handle, invalid.data(), invalid.size(), &options), nullptr);
   EXPECT_EQ(suzume_last_error_code(), SUZUME_ERROR_INVALID_UTF8);
+  EXPECT_STREQ(suzume_last_error(), "invalid UTF-8 input");
   suzume_destroy(handle);
 }
 
