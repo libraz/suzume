@@ -1454,6 +1454,55 @@
       ],
       "id": "samahai_2",
       "input": "テストさまはい"
+    },
+    {
+      "description": "compound verb continuative ending in 出し is not 出る plus the literary past",
+      "expected": [
+        {
+          "lemma": "書き出し",
+          "pos": "Noun",
+          "surface": "書き出し"
+        }
+      ],
+      "id": "ki_shi",
+      "input": "書き出し"
+    },
+    {
+      "description": "compound noun ending in 出し mid-sentence is not 出る plus the literary past",
+      "expected": [
+        {
+          "lemma": "文章",
+          "pos": "Noun",
+          "surface": "文章"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "書き出し",
+          "pos": "Noun",
+          "surface": "書き出し"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "大切",
+          "pos": "Adjective",
+          "surface": "大切"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "no_ki_shiga_da",
+      "input": "文章の書き出しが大切だ"
     }
   ],
   "description": "General nouns (part 5/5)",

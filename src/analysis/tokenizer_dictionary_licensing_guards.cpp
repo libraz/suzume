@@ -101,6 +101,17 @@ bool lacksLicensingEnvironment(const DictionaryCandidateContext& ctx, const core
     return true;
   }
 
+  // The literary past し cannot close a span that, with the mora before it,
+  // spells a listed verb's continuative: that span is the verb (出し of 出す),
+  // not 出る plus the past (提出+し, not 提+出+し).
+  if (result.entry->extended_pos == core::ExtendedPOS::AuxClassicalKi && start_pos > 0) {
+    const auto* continuative =
+        lookupEntryInRange(dict_manager, codepoints, start_pos - 1, end_pos, core::PartOfSpeech::Verb);
+    if (continuative != nullptr && continuative->extended_pos == core::ExtendedPOS::VerbRenyokei) {
+      return true;
+    }
+  }
+
   // An adverbial particle spelled like a listed verb's irrealis (やら) is that
   // verb when the negative follows and no nominal hosts the particle
   // (宿題を+やら+なきゃ, どうしても+やら+なければ); a hosted particle keeps
