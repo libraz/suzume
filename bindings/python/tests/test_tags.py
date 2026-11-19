@@ -37,44 +37,12 @@ def test_remove_duplicates() -> None:
     assert len(texts) == len(set(texts))
 
 
-def test_pos_filter_accepts_names() -> None:
-    with Suzume() as sz:
-        by_names = sz.generate_tags("美味しいラーメンを食べた", pos_filter=["noun"])
-        by_bitmask = sz.generate_tags("美味しいラーメンを食べた", pos_filter=1)
-    assert by_names
-    assert [(t.tag, t.pos) for t in by_names] == [(t.tag, t.pos) for t in by_bitmask]
-    assert all(t.pos == "NOUN" for t in by_names)
-
-
-def test_pos_filter_rejects_unknown_name() -> None:
-    with Suzume() as sz, pytest.raises(ValueError):
-        sz.generate_tags("東京", pos_filter=["bogus"])
-
-
 def test_pos_filter_can_select_particles_and_auxiliaries() -> None:
     with Suzume() as sz:
-        particles = sz.generate_tags(
-            "りんごについて", pos_filter=["particle"], exclude_particles=False, min_length=1
-        )
-        auxiliaries = sz.generate_tags(
-            "歩きます", pos_filter=["auxiliary"], exclude_auxiliaries=False, min_length=1
-        )
+        particles = sz.generate_tags("りんごについて", pos_filter="PARTICLE", min_length=1)
+        auxiliaries = sz.generate_tags("歩きます", pos_filter="AUX", min_length=1)
     assert [(tag.tag, tag.pos) for tag in particles] == [("について", "PARTICLE")]
     assert [(tag.tag, tag.pos) for tag in auxiliaries] == [("ます", "AUX")]
-
-
-def test_pos_filter_accepts_a_single_name_string() -> None:
-    with Suzume() as sz:
-        by_string = sz.generate_tags("美味しいラーメンを食べた", pos_filter="noun")
-        by_list = sz.generate_tags("美味しいラーメンを食べた", pos_filter=["noun"])
-    assert by_string
-    assert by_string == by_list
-
-
-@pytest.mark.parametrize("pos_filter", [-1, 64, 256])
-def test_pos_filter_rejects_an_out_of_range_bitmask(pos_filter: int) -> None:
-    with Suzume() as sz, pytest.raises(ValueError, match="pos_filter"):
-        sz.generate_tags("東京", pos_filter=pos_filter)
 
 
 @pytest.mark.parametrize("option", ["min_length", "max_tags"])

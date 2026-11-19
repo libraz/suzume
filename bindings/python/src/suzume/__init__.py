@@ -14,12 +14,13 @@ from __future__ import annotations
 
 import ctypes
 import functools
+import importlib.metadata
 import json
 import math
 import os
 import threading
 import weakref
-from collections.abc import Callable, Iterable
+from collections.abc import Callable
 from dataclasses import dataclass
 from decimal import Decimal
 from enum import Enum, IntEnum
@@ -52,7 +53,11 @@ __all__ = [
     "ErrorCode",
     "Operation",
     "version",
+    "__version__",
 ]
+
+__version__ = importlib.metadata.version("suzume")
+"""The installed distribution's version."""
 
 _lib = load_library()
 _BUNDLED_DATA_DIR = _bundled_data_dir(Path(__file__).parent)
@@ -69,17 +74,17 @@ _POS_FALLBACK = "OTHER"
 _EXTENDED_POS_FALLBACK = "UNKNOWN"
 _POS_JAPANESE_FALLBACK = "その他"
 
-# POS names accepted by ``generate_tags(pos_filter=...)``, mapped to their
-# bitmask value. Names and casing mirror the WASM binding's TagOptions.pos.
+# POS names accepted by ``generate_tags(pos_filter=...)``: the labels
+# ``Tag.pos`` prints, mapped to their native ``SUZUME_TAG_POS_*`` bit.
 _POS_FILTER_BITS = {
-    "noun": 1,
-    "verb": 2,
-    "adjective": 4,
-    "adverb": 8,
-    "particle": 16,
-    "auxiliary": 32,
+    "NOUN": 1,
+    "VERB": 2,
+    "ADJ": 4,
+    "ADV": 8,
+    "PARTICLE": 16,
+    "AUX": 32,
 }
-_POS_FILTER_ALL = sum(_POS_FILTER_BITS.values())
+_POS_FILTER_CONTAINERS = (list, tuple, set, frozenset)
 _SIZE_OPTION_MAX = 0xFFFFFFFF
 _SAFE_INTEGER_MAX = 2**53
 _RELEASED_MESSAGE = "Suzume instance has been released"
@@ -211,27 +216,26 @@ def _encode_argument(name: str, value: object) -> bytes:
     return _encode_text(name, value)
 
 
-def _resolve_pos_filter(pos_filter: int | Iterable[str]) -> int:
-    """Resolve a ``pos_filter`` argument to a native bitmask.
+def _invalid_pos_filter(value: object) -> ValueError:
+    expected = ", ".join(_POS_FILTER_BITS)
+    return ValueError(f"invalid pos_filter: {_render_value(value)} (expected one of: {expected})")
 
-    Accepts a raw bitmask ``int`` within the known POS bits, a single POS name,
-    or an iterable of POS names (``"noun"``, ``"verb"``, ``"adjective"``,
-    ``"adverb"``, ``"particle"``, ``"auxiliary"``) whose bits are OR-ed together.
-    """
-    if isinstance(pos_filter, int):
-        if not 0 <= pos_filter <= _POS_FILTER_ALL:
-            raise ValueError(f"pos_filter bitmask must be between 0 and {_POS_FILTER_ALL}")
-        return pos_filter
+
+def _resolve_pos_filter(pos_filter: object) -> int:
+    """Return the native bitmask for a POS name or a container of names; ``None`` selects all."""
+    if pos_filter is None:
+        return 0
     if isinstance(pos_filter, str):
-        pos_filter = (pos_filter,)
+        names: tuple[object, ...] = (pos_filter,)
+    elif isinstance(pos_filter, _POS_FILTER_CONTAINERS):
+        names = tuple(pos_filter)
+    else:
+        raise _invalid_pos_filter(pos_filter)
     mask = 0
-    for name in pos_filter:
-        try:
-            mask |= _POS_FILTER_BITS[name]
-        except KeyError:
-            raise ValueError(
-                f"unknown POS filter name: {name!r} (expected one of {sorted(_POS_FILTER_BITS)})"
-            ) from None
+    for name in names:
+        if not isinstance(name, str) or name not in _POS_FILTER_BITS:
+            raise _invalid_pos_filter(name)
+        mask |= _POS_FILTER_BITS[name]
     return mask
 
 
@@ -289,7 +293,7 @@ _MODE_CODES = {Mode.NORMAL: 0, Mode.SEARCH: 1, Mode.SPLIT: 2}
 _MODES_BY_CODE = {code: mode for mode, code in _MODE_CODES.items()}
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, slots=True, kw_only=True)
 class Morpheme:
     """A single analyzed token."""
 
@@ -310,15 +314,15 @@ class Morpheme:
     score: float
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True, kw_only=True)
 class AnalysisResult:
     """Normalized input together with its morphemes."""
 
     normalized_text: str
-    morphemes: list[Morpheme]
+    morphemes: tuple[Morpheme, ...]
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True, kw_only=True)
 class Tag:
     """A generated tag: the keyword text plus its part of speech."""
 
@@ -465,7 +469,7 @@ class Suzume:
         preserve_symbols: bool = False,
         lemmatize: bool = True,
         merge_compounds: bool = False,
-        skip_user_dictionary: bool = False,
+        skip_bundled_user_dictionary: bool = False,
         skip_core_dictionary: bool = False,
         skip_env_config: bool = False,
         report_scorer_config: bool = False,
@@ -482,7 +486,7 @@ class Suzume:
         opts.lemmatize = _bool_option("lemmatize", lemmatize)
         opts.merge_compounds = _bool_option("merge_compounds", merge_compounds)
         opts.skip_bundled_user_dictionary = _bool_option(
-            "skip_user_dictionary", skip_user_dictionary
+            "skip_bundled_user_dictionary", skip_bundled_user_dictionary
         )
         opts.skip_core_dictionary = _bool_option("skip_core_dictionary", skip_core_dictionary)
         opts.skip_env_config = _bool_option("skip_env_config", skip_env_config)
@@ -543,8 +547,8 @@ class Suzume:
 
     # --- analysis ---
 
-    def analyze(self, text: str) -> list[Morpheme]:
-        """Analyze ``text`` into a list of :class:`Morpheme`."""
+    def analyze(self, text: str) -> tuple[Morpheme, ...]:
+        """Analyze ``text`` into a tuple of :class:`Morpheme`."""
         return self.analyze_with_normalized_text(text).morphemes
 
     @_locked
@@ -593,7 +597,7 @@ class Suzume:
                 )
             return AnalysisResult(
                 normalized_text=_decode_sized(data.normalized_text, data.normalized_text_size),
-                morphemes=out,
+                morphemes=tuple(out),
             )
         finally:
             _lib.suzume_result_free(result)
@@ -603,9 +607,9 @@ class Suzume:
         self,
         text: str,
         *,
-        pos_filter: int | Iterable[str] = 0,
+        pos_filter: str | list[str] | tuple[str, ...] | set[str] | frozenset[str] | None = None,
         exclude_basic: bool = False,
-        use_lemma: bool = True,
+        use_base_form: bool = True,
         min_length: int = 2,
         max_tags: int = 0,
         exclude_particles: bool = True,
@@ -613,16 +617,19 @@ class Suzume:
         exclude_formal_nouns: bool = True,
         exclude_low_info: bool = True,
         remove_duplicates: bool = True,
-    ) -> list[Tag]:
+    ) -> tuple[Tag, ...]:
         """Generate keyword tags from ``text``.
 
-        ``pos_filter`` selects which parts of speech to keep. Pass a raw
-        bitmask ``int`` (1=noun, 2=verb, 4=adjective, 8=adverb, 16=particle,
-        32=auxiliary; 0=all), a single POS name, or an iterable of POS names,
-        e.g. ``["noun", "verb"]``, whose bits are OR-ed together. An unknown
-        name, an out-of-range bitmask, or a ``min_length`` or ``max_tags``
-        outside the native ``size_t`` range raises ``ValueError``. All other
-        flags map directly to the native tag options.
+        ``pos_filter`` keeps only the named parts of speech: one of ``"NOUN"``,
+        ``"VERB"``, ``"ADJ"``, ``"ADV"``, ``"PARTICLE"``, ``"AUX"`` (the labels
+        :attr:`Tag.pos` prints, case-sensitive), or a list, tuple, set or
+        frozenset of them. ``None`` or an empty container keeps every part of
+        speech. ``"NOUN"`` also keeps pronouns (``PRON``). Naming ``"PARTICLE"``
+        or ``"AUX"`` keeps those tags even though ``exclude_particles`` and
+        ``exclude_auxiliaries`` default to true. ``use_base_form`` emits the
+        base form of conjugated words instead of their surface form.
+        ``min_length`` and ``max_tags`` take an integer from 0 to 4294967295;
+        ``max_tags=0`` means no limit. An invalid value raises ``ValueError``.
         """
         handle = self._require_handle("generate_tags")
         payload = _encode_argument("text", text)
@@ -630,7 +637,7 @@ class Suzume:
         _lib.suzume_init_tag_options(ctypes.byref(opts))
         opts.pos_filter = _resolve_pos_filter(pos_filter)
         opts.exclude_basic = _bool_option("exclude_basic", exclude_basic)
-        opts.use_base_form = _bool_option("use_lemma", use_lemma)
+        opts.use_base_form = _bool_option("use_base_form", use_base_form)
         opts.min_length = _size_option("min_length", min_length)
         opts.max_tags = _size_option("max_tags", max_tags)
         opts.exclude_particles = _bool_option("exclude_particles", exclude_particles)
@@ -645,10 +652,10 @@ class Suzume:
             raise _native_error("generate_tags")
         try:
             data = result.contents
-            return [
+            return tuple(
                 Tag(tag=_decode(data.tags[idx]), pos=_pos_label(data.pos[idx]))
                 for idx in range(data.count)
-            ]
+            )
         finally:
             _lib.suzume_tags_free(result)
 
@@ -656,7 +663,7 @@ class Suzume:
 
     @_locked
     def load_user_dictionary(self, dictionary: str) -> int:
-        """Load a TSV (or legacy CSV) user dictionary and return the installed entry count.
+        """Load a tab-separated user dictionary and return the installed entry count.
 
         A source that installs nothing raises :class:`SuzumeError`, so the
         returned count is always at least 1.
@@ -696,12 +703,12 @@ class Suzume:
 
     @property
     @_locked
-    def dictionary_warnings(self) -> list[str]:
+    def dictionary_warnings(self) -> tuple[str, ...]:
         """Return dictionary-loading, parsing, and scorer-configuration diagnostics."""
         handle = self._require_handle("dictionary_warnings")
         count = _lib.suzume_dictionary_warning_count(handle)
         warnings = (_decode(_lib.suzume_dictionary_warning(handle, idx)) for idx in range(count))
-        return [warning for warning in warnings if warning]
+        return tuple(warning for warning in warnings if warning)
 
     @property
     @_locked

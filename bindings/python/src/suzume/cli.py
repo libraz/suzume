@@ -331,7 +331,7 @@ def _run_analysis(args: argparse.Namespace, parser: argparse.ArgumentParser) -> 
         lemmatize=not args.no_lemmatize,
         merge_compounds=args.merge_compounds,
         skip_core_dictionary=args.no_core_dict,
-        skip_user_dictionary=args.no_user_dict,
+        skip_bundled_user_dictionary=args.no_user_dict,
         skip_env_config=args.skip_env_config,
     ) as analyzer:
         for warning in analyzer.dictionary_warnings:
@@ -342,7 +342,7 @@ def _run_analysis(args: argparse.Namespace, parser: argparse.ArgumentParser) -> 
                 text,
                 pos_filter=args.tag_pos,
                 exclude_basic=args.tag_exclude_basic,
-                use_lemma=not args.tag_use_surface,
+                use_base_form=not args.tag_use_surface,
                 min_length=args.tag_min_length,
                 max_tags=args.tag_max_tags,
                 exclude_particles=not args.include_particles,

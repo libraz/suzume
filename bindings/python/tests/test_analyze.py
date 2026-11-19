@@ -63,7 +63,7 @@ def ffi_pos_code(lib: ctypes.CDLL, label: str) -> int:
 
 def test_binary_loader_returns_the_installed_entry_count() -> None:
     dictionary = resources.files("suzume").joinpath("user.dic").read_bytes()
-    with Suzume(skip_user_dictionary=True) as sz:
+    with Suzume(skip_bundled_user_dictionary=True) as sz:
         count = sz.load_binary_dictionary(dictionary)
     assert isinstance(count, int)
     assert count >= 1
@@ -155,7 +155,7 @@ def test_auxiliary_conjugation_form_is_exposed() -> None:
 
 def test_empty_string_yields_no_morphemes() -> None:
     with Suzume() as sz:
-        assert sz.analyze("") == []
+        assert sz.analyze("") == ()
 
 
 def test_length_aware_analysis_preserves_embedded_null_and_normalized_text() -> None:
@@ -178,11 +178,11 @@ def test_unpaired_surrogate_text_is_a_value_error() -> None:
 
 def test_extended_options_and_clear_are_public() -> None:
     with Suzume(
-        skip_user_dictionary=True,
+        skip_bundled_user_dictionary=True,
         skip_core_dictionary=True,
         scorer_options={"unary": {"noun_prior": 0.25}},
     ) as sz:
-        assert sz.dictionary_warnings == []
+        assert sz.dictionary_warnings == ()
         assert sz.has_core_dictionary is False
         assert sz.load_user_dictionary("検査する\tVERB\tSURU\n") > 1
         assert sz.load_user_dictionary("ignored-record\n検査語\tNOUN\n") == 1
@@ -218,7 +218,7 @@ def test_invalid_scorer_json_reports_parse_error() -> None:
 def test_program_scorer_options_override_environment(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("SUZUME_SCORER_INFL_confidence_ceiling", "0")
     with Suzume(
-        skip_user_dictionary=True,
+        skip_bundled_user_dictionary=True,
         skip_core_dictionary=True,
         scorer_options={"inflection": {"confidence_ceiling": 0.95}},
     ) as sz:
@@ -227,7 +227,7 @@ def test_program_scorer_options_override_environment(monkeypatch: pytest.MonkeyP
 
 def test_scorer_options_change_analysis() -> None:
     with Suzume(
-        skip_user_dictionary=True,
+        skip_bundled_user_dictionary=True,
         skip_core_dictionary=True,
         skip_env_config=True,
         scorer_options={"inflection": {"confidence_ceiling": 0}},
@@ -238,7 +238,7 @@ def test_scorer_options_change_analysis() -> None:
 def test_environment_scorer_config_can_be_disabled(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("SUZUME_SCORER_INFL_confidence_ceiling", "0")
     with Suzume(
-        skip_user_dictionary=True,
+        skip_bundled_user_dictionary=True,
         skip_core_dictionary=True,
         skip_env_config=True,
     ) as sz:

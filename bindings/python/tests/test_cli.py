@@ -248,9 +248,9 @@ def test_normalization_lemmatize_compound_and_tag_options_are_wired() -> None:
                 "--no-core-dict",
                 "--no-user-dict",
                 "--tag-pos",
-                "noun",
+                "NOUN",
                 "--tag-pos",
-                "verb",
+                "VERB",
                 "--tag-exclude-basic",
                 "--tag-use-surface",
                 "--tag-min-length",
@@ -274,7 +274,7 @@ def test_normalization_lemmatize_compound_and_tag_options_are_wired() -> None:
     assert args.merge_compounds
     assert args.no_core_dict
     assert args.no_user_dict
-    assert args.tag_pos == ["noun", "verb"]
+    assert args.tag_pos == ["NOUN", "VERB"]
     assert args.tag_exclude_basic
     assert args.tag_use_surface
     assert args.tag_min_length == 1
@@ -289,7 +289,7 @@ def test_normalization_lemmatize_compound_and_tag_options_are_wired() -> None:
 
 def test_tag_pos_choices_are_the_names_the_library_accepts() -> None:
     parser = cli._build_parser()
-    for name in ("noun", "verb", "adjective", "adverb", "particle", "auxiliary"):
+    for name in ("NOUN", "VERB", "ADJ", "ADV", "PARTICLE", "AUX"):
         args = parser.parse_args(cli._without_explicit_command(["--tag-pos", name, "東京"]))
         assert args.tag_pos == [name]
 
@@ -299,7 +299,7 @@ def test_tag_pos_particle_reaches_tag_output() -> None:
         "--format",
         "tags",
         "--tag-pos",
-        "particle",
+        "PARTICLE",
         "--include-particles",
         "--tag-min-length",
         "1",
@@ -336,7 +336,7 @@ def test_tag_and_chasen_outputs() -> None:
         "--format",
         "tags",
         "--tag-pos",
-        "noun",
+        "NOUN",
         "--tag-min-length",
         "1",
         "東京の公園",
@@ -499,7 +499,7 @@ class _StubAnalyzer:
         pass
 
     def analyze_with_normalized_text(self, text: str) -> suzume.AnalysisResult:
-        return suzume.AnalysisResult(normalized_text=text, morphemes=[])
+        return suzume.AnalysisResult(normalized_text=text, morphemes=())
 
 
 def test_dictionary_warnings_are_written_to_stderr(
@@ -523,7 +523,7 @@ def test_dictionary_disable_flags_are_passed_to_analyzer(
     assert cli._run_analysis(args, parser) == 0
     captured = _StubAnalyzer.last_kwargs
     assert captured["skip_core_dictionary"] is True
-    assert captured["skip_user_dictionary"] is True
+    assert captured["skip_bundled_user_dictionary"] is True
     assert captured["skip_env_config"] is True
 
 
