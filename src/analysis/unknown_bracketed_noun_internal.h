@@ -59,7 +59,7 @@ struct PromotedRun {
   const dictionary::DictionaryEntry* promoted_dictionary_reading{nullptr};
   const dictionary::DictionaryEntry* short_right_particle{nullptr};
   const std::vector<grammar::InflectionCandidate>* promoted_inflections{nullptr};
-  bool absorbs_copula_before_sokuon_final{false};
+  bool absorbs_copula_at_inflectional_boundary{false};
   bool has_exact_noun{false};
   bool has_competing_exact_predicate{false};
   bool copula_selected_predicate_homograph{false};

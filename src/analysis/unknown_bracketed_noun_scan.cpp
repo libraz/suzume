@@ -598,13 +598,15 @@ void readPromotedSurface(const BracketedNounContext& ctx, const BracketedScan& b
       dict_manager != nullptr && scan > start_pos
           ? lookupEntryInRange(*dict_manager, codepoints, scan - 1, scan, core::PartOfSpeech::Auxiliary)
           : nullptr;
-  // A sokuon-initial final particle may follow a completed nominal, but it
-  // cannot license a noun candidate that has swallowed the copula
-  // immediately before it. That boundary is inflectional
-  // (りんご|だっ|たら), so the copula must remain available to the auxiliary
-  // path instead of becoming the noun's last mora.
-  promoted.absorbs_copula_before_sokuon_final = promoted.right_sokuon_final_particle && absorbed_auxiliary != nullptr &&
-                                                absorbed_auxiliary->extended_pos == core::ExtendedPOS::AuxCopulaDa;
+  // A noun candidate must not swallow the copula where that boundary is
+  // inflectional: before a sokuon-initial final particle (りんご|だっ|たら),
+  // or right after a small kana that closes a yoon mora (ちゅうしゃ|だ). The
+  // copula stays available to the auxiliary path instead of becoming the
+  // noun's last mora.
+  const bool copula_after_small_kana = scan >= start_pos + 2 && kana::isSmallKanaCodepoint(codepoints[scan - 2]);
+  promoted.absorbs_copula_at_inflectional_boundary =
+      (promoted.right_sokuon_final_particle || copula_after_small_kana) && absorbed_auxiliary != nullptr &&
+      absorbed_auxiliary->extended_pos == core::ExtendedPOS::AuxCopulaDa;
   promoted.has_exact_noun =
       dict_manager != nullptr && dict_manager->lookupExact(promoted_surface, core::PartOfSpeech::Noun) != nullptr;
   promoted.has_competing_exact_predicate =

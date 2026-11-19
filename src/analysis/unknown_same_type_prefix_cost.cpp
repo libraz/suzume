@@ -272,6 +272,14 @@ bool priceHiraganaRun(const PrefixScanContext& ctx, size_t len, size_t candidate
         codepoints[candidate_end - 1] == U'ば') {
       return false;
     }
+    // Nor can the copula close it right after a small kana: that kana ends
+    // the run's last mora, so だ opens a word of its own (しょうしゃ|だ).
+    const auto* final_auxiliary =
+        lookupEntryInRange(*dict_manager, codepoints, candidate_end - 1, candidate_end, core::PartOfSpeech::Auxiliary);
+    if (final_auxiliary != nullptr && final_auxiliary->extended_pos == core::ExtendedPOS::AuxCopulaDa &&
+        kana::isSmallKanaCodepoint(codepoints[candidate_end - 2])) {
+      return false;
+    }
   }
   return true;
 }

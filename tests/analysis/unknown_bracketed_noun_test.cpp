@@ -421,6 +421,38 @@ TEST(QuantityYoonNoun, QuantityEmitterDoesNotDeriveAnUnlicensedHostAfterHonorifi
             candidates.end());
 }
 
+TEST(SmallKanaCopulaBoundary, UnknownKanaRunNeverClosesOnCopulaAfterSmallKana) {
+  const dictionary::DictionaryManager dict_manager;
+  for (const auto& [input, start_pos] : {std::pair{"ちゅうしゃだ", size_t{0}}, std::pair{"ちゅうしゃだ", size_t{3}},
+                                         std::pair{"しゃだ", size_t{0}}, std::pair{"しょうしゃだ", size_t{3}}}) {
+    SCOPED_TRACE(input);
+    SCOPED_TRACE(start_pos);
+    const size_t length = normalize::toCodepoints(input).size();
+    const auto candidates = generateUnknownCandidatesAt(input, start_pos, dict_manager);
+    EXPECT_EQ(std::find_if(candidates.begin(), candidates.end(),
+                           [&](const UnknownCandidate& candidate) { return candidate.end == length; }),
+              candidates.end());
+  }
+}
+
+TEST(SmallKanaCopulaBoundary, CopulaStandsAloneOnlyAfterAnUnknownRun) {
+  SuzumeOptions options;
+  options.skip_user_dictionary = true;
+  Suzume analyzer(options);
+  for (const auto* input : {"ちゅうしゃだ", "しゃだ", "しょうしゃだ"}) {
+    SCOPED_TRACE(input);
+    const auto result = analyzer.analyze(input);
+    ASSERT_GE(result.size(), 2U);
+    EXPECT_EQ(result.back().surface, "だ");
+    EXPECT_EQ(result.back().pos, core::PartOfSpeech::Auxiliary);
+    EXPECT_EQ(result[result.size() - 2].end, result.back().start);
+  }
+  // A listed word keeps a final だ of its own spelling.
+  const auto listed = analyzer.analyze("からだ");
+  ASSERT_EQ(listed.size(), 1U);
+  EXPECT_EQ(listed.front().surface, "からだ");
+}
+
 }  // namespace
 }  // namespace analysis
 }  // namespace suzume

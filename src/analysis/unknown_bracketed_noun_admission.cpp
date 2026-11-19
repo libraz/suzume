@@ -264,7 +264,7 @@ bool admitsPromotedRun(const BracketedNounContext& ctx, const BracketedScan& bra
          !promoted.has_inflected_predicate_reading && !opens_on_sino_prefix && !absorbs_trailing_suffix &&
          !opens_on_te_connective && !spells_te_predicate && !spans_laugh && !closes_registered_word_predicate &&
          !finishes_auxiliary_chain && !spells_copula && !spells_contracted_hypothetical && !steals_formal_noun_head &&
-         !promoted.absorbs_copula_before_sokuon_final &&
+         !promoted.absorbs_copula_at_inflectional_boundary &&
          ((!hasAuxiliaryParticleDecomposition(codepoints, start_pos, scan, dict_manager) &&
            (!spells_auxiliary_chain || quantity_aspect_copula_chain)) ||
           promoted.has_deverbal_noun_shape_before_genitive || promoted.copula_selected_predicate_homograph ||
