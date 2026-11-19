@@ -75,9 +75,9 @@ TAG_CASES: list[TagCase] = [
         "name": "all-non-default-tag-options",
         "text": "りんごを食べるりんごを食べる",
         "options": {
-            "pos_filter": ["noun", "verb"],
+            "pos_filter": ["NOUN", "VERB"],
             "exclude_basic": True,
-            "use_lemma": False,
+            "use_base_form": False,
             "min_length": 1,
             "max_tags": 3,
             "exclude_particles": False,
@@ -89,10 +89,8 @@ TAG_CASES: list[TagCase] = [
     }
 ]
 
-_POS_FILTER_BITS = {"noun": 1, "verb": 2, "adjective": 4, "adverb": 8}
+_POS_FILTER_BITS = {"NOUN": 1, "VERB": 2, "ADJ": 4, "ADV": 8, "PARTICLE": 16, "AUX": 32}
 _MODE_CODES = {"normal": 0, "search": 1, "split": 2}
-# Binding option name -> C field name, where they differ.
-_NATIVE_TAG_FIELDS = {"use_lemma": "use_base_form"}
 # Bit positions in the native morpheme flags word, in record order.
 _FLAG_BITS = {
     "user_dict": 0,
@@ -245,7 +243,7 @@ def _native_tag_records() -> list[list[TagRecord]]:
             if field == "pos_filter":
                 options.pos_filter = sum(_POS_FILTER_BITS[name] for name in value)
             else:
-                setattr(options, _NATIVE_TAG_FIELDS.get(field, field), int(value))
+                setattr(options, field, int(value))
         payload = case["text"].encode("utf-8")
         with (
             _native_handle(_lib.suzume_create()) as handle,

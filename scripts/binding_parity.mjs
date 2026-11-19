@@ -29,7 +29,7 @@ const EXTENDED_OPTION_PAIRS = [
 const TAG_OPTION_PAIRS = [
   ['pos_filter', 'posFilter'],
   ['exclude_basic', 'excludeBasic'],
-  ['use_lemma', 'useLemma'],
+  ['use_base_form', 'useBaseForm'],
   ['min_length', 'minLength'],
   ['max_tags', 'maxTags'],
   ['exclude_particles', 'excludeParticles'],
