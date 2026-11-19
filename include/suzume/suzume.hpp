@@ -33,7 +33,7 @@ enum class Mode : std::uint8_t {
   Split = SUZUME_MODE_SPLIT,
 };
 
-/** @brief Tokenizer construction options (see suzume_extended_options_t). */
+/** @brief Tokenizer construction options (see suzume_options_t). */
 struct Options {
   bool preserve_vu = true;
   bool preserve_case = true;
@@ -120,8 +120,8 @@ class Tokenizer {
   Tokenizer() : handle_(suzume_create()) {}
 
   explicit Tokenizer(const Options& options) : handle_(nullptr) {
-    suzume_extended_options_t copts;
-    suzume_init_extended_options(&copts);
+    suzume_options_t copts;
+    suzume_init_options(&copts);
     copts.preserve_vu = options.preserve_vu ? 1 : 0;
     copts.preserve_case = options.preserve_case ? 1 : 0;
     copts.preserve_symbols = options.preserve_symbols ? 1 : 0;
@@ -134,7 +134,7 @@ class Tokenizer {
     copts.report_scorer_config = options.report_scorer_config ? 1 : 0;
     copts.scorer_options_json = options.scorer_options_json.empty() ? nullptr : options.scorer_options_json.c_str();
     copts.data_directory = options.data_directory.empty() ? nullptr : options.data_directory.c_str();
-    handle_ = suzume_create_with_extended_options(&copts);
+    handle_ = suzume_create_with_options(&copts);
   }
 
   Tokenizer(const Tokenizer&) = delete;

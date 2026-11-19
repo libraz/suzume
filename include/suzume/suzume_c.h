@@ -160,7 +160,7 @@ enum {
   SUZUME_TAG_POS_AUXILIARY = 1U << 5U,
 };
 
-/** Stable analysis-mode codes used by extended options and mode accessors. */
+/** Stable analysis-mode codes used by suzume_options_t and the mode accessors. */
 enum {
   SUZUME_MODE_NORMAL = 0,
   SUZUME_MODE_SEARCH = 1,
@@ -206,9 +206,9 @@ typedef struct {
 } suzume_tags_t;
 
 /**
- * @brief Extended analysis options structure.
+ * @brief Analysis options structure.
  *
- * Use suzume_init_extended_options() before overriding individual fields so
+ * Use suzume_init_options() before overriding individual fields so
  * default true values such as preserve_case and lemmatize are preserved.
  */
 typedef struct {
@@ -224,7 +224,7 @@ typedef struct {
   uint8_t skip_env_config;         /**< Ignore native scorer configuration environment variables */
   const char* scorer_options_json; /**< UTF-8 JSON scorer overrides, or NULL for defaults */
   const char* data_directory;      /**< Exclusive dictionary directory, or NULL for search defaults */
-} suzume_extended_options_t;
+} suzume_options_t;
 
 // --- Lifecycle functions ---
 
@@ -237,21 +237,21 @@ typedef struct {
 SUZUME_EXPORT suzume_t suzume_create(void);
 
 /**
- * @brief Initialize extended options with Suzume defaults
+ * @brief Initialize analysis options with Suzume defaults
  * @param options Pointer to options structure to initialize
  * @note Passing NULL is allowed and has no effect.
  */
-SUZUME_EXPORT void suzume_init_extended_options(suzume_extended_options_t* options);
+SUZUME_EXPORT void suzume_init_options(suzume_options_t* options);
 
 /**
- * @brief Create a new Suzume instance with extended options
- * @param options Pointer to extended options structure
+ * @brief Create a new Suzume instance with analysis options
+ * @param options Pointer to options structure, or NULL
  * @return Handle to Suzume instance, or NULL on failure
- * @note Passing NULL selects all defaults. String pointers are borrowed only
+ * @note Passing NULL selects all defaults, exactly like suzume_create(). String pointers are borrowed only
  *       for the duration of this call and may be NULL. Program JSON overrides
  *       native environment configuration unless skip_env_config disables it.
  */
-SUZUME_EXPORT suzume_t suzume_create_with_extended_options(const suzume_extended_options_t* options);
+SUZUME_EXPORT suzume_t suzume_create_with_options(const suzume_options_t* options);
 
 /**
  * @brief Destroy Suzume instance and free resources
@@ -507,9 +507,9 @@ SUZUME_EXPORT size_t suzume_sizeof_tags(void);
 SUZUME_EXPORT size_t suzume_sizeof_tag_options(void);
 
 /**
- * @brief Get sizeof(suzume_extended_options_t)
+ * @brief Get sizeof(suzume_options_t)
  */
-SUZUME_EXPORT size_t suzume_sizeof_extended_options(void);
+SUZUME_EXPORT size_t suzume_sizeof_options(void);
 
 /**
  * @brief Get byte offset of field in suzume_result_t
@@ -543,14 +543,14 @@ SUZUME_EXPORT size_t suzume_offsetof_tags(uint32_t field);
 SUZUME_EXPORT size_t suzume_offsetof_tag_options(uint32_t field);
 
 /**
- * @brief Get byte offset of field in suzume_extended_options_t
+ * @brief Get byte offset of field in suzume_options_t
  * @param field 0=preserve_vu, 1=preserve_case, 2=preserve_symbols,
  *              3=mode, 4=lemmatize, 5=merge_compounds,
  *              6=skip_user_dictionary, 7=skip_core_dictionary,
  *              8=report_scorer_config, 9=skip_env_config,
  *              10=scorer_options_json, 11=data_directory
  */
-SUZUME_EXPORT size_t suzume_offsetof_extended_options(uint32_t field);
+SUZUME_EXPORT size_t suzume_offsetof_options(uint32_t field);
 
 #ifdef __cplusplus
 }

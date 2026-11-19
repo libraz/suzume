@@ -63,12 +63,12 @@ TEST(SuzumeCApiTest, LoadBinaryDictReportsParseDetails) {
   suzume_destroy(handle);
 }
 
-TEST(SuzumeCApiTest, CreateWithExtendedOptionsAcceptsModeAndPostprocessOptions) {
-  suzume_extended_options_t options{};
-  suzume_init_extended_options(&options);
+TEST(SuzumeCApiTest, CreateWithOptionsAcceptsModeAndPostprocessOptions) {
+  suzume_options_t options{};
+  suzume_init_options(&options);
   options.mode = 2;  // split
 
-  suzume_t handle = suzume_create_with_extended_options(&options);
+  suzume_t handle = suzume_create_with_options(&options);
   ASSERT_NE(handle, nullptr);
 
   suzume_result_t* result = suzume_analyze(handle, "API開発");
@@ -77,6 +77,31 @@ TEST(SuzumeCApiTest, CreateWithExtendedOptionsAcceptsModeAndPostprocessOptions) 
 
   suzume_result_free(result);
   suzume_destroy(handle);
+}
+
+TEST(SuzumeCApiTest, CreateWithNullOptionsMatchesCreate) {
+  suzume_t plain = suzume_create();
+  suzume_t with_null = suzume_create_with_options(nullptr);
+  ASSERT_NE(plain, nullptr);
+  ASSERT_NE(with_null, nullptr) << suzume_last_error();
+  EXPECT_EQ(suzume_mode(with_null), suzume_mode(plain));
+  EXPECT_EQ(suzume_has_core_dictionary(with_null), suzume_has_core_dictionary(plain));
+
+  suzume_result_t* expected = suzume_analyze(plain, "東京に行きました");
+  suzume_result_t* actual = suzume_analyze(with_null, "東京に行きました");
+  ASSERT_NE(expected, nullptr);
+  ASSERT_NE(actual, nullptr);
+  ASSERT_EQ(actual->count, expected->count);
+  for (size_t idx = 0; idx < expected->count; ++idx) {
+    EXPECT_STREQ(actual->morphemes[idx].surface, expected->morphemes[idx].surface);
+    EXPECT_STREQ(actual->morphemes[idx].base_form, expected->morphemes[idx].base_form);
+    EXPECT_EQ(actual->morphemes[idx].pos, expected->morphemes[idx].pos);
+  }
+
+  suzume_result_free(actual);
+  suzume_result_free(expected);
+  suzume_destroy(with_null);
+  suzume_destroy(plain);
 }
 
 TEST(SuzumeCApiTest, RuntimeModeSwitchChangesAnalysisWithoutReplacingTheHandle) {
@@ -103,9 +128,9 @@ TEST(SuzumeCApiTest, RuntimeModeSwitchChangesAnalysisWithoutReplacingTheHandle) 
   suzume_destroy(handle);
 }
 
-TEST(SuzumeCApiTest, InitExtendedOptionsPreservesDefaultTrueFields) {
-  suzume_extended_options_t options{};
-  suzume_init_extended_options(&options);
+TEST(SuzumeCApiTest, InitOptionsPreservesDefaultTrueFields) {
+  suzume_options_t options{};
+  suzume_init_options(&options);
 
   EXPECT_EQ(options.preserve_vu, 1);
   EXPECT_EQ(options.preserve_case, 1);
@@ -132,10 +157,10 @@ TEST(SuzumeCApiTest, ExplicitDataDirectoryOverridesEnvironmentSearch) {
   const std::string bundled_dir = fs::absolute("data").string();
 
   setenv("SUZUME_DATA_DIR", empty_dir.string().c_str(), 1);
-  suzume_extended_options_t options{};
-  suzume_init_extended_options(&options);
+  suzume_options_t options{};
+  suzume_init_options(&options);
   options.data_directory = bundled_dir.c_str();
-  suzume_t handle = suzume_create_with_extended_options(&options);
+  suzume_t handle = suzume_create_with_options(&options);
   if (old_data_dir != nullptr) {
     setenv("SUZUME_DATA_DIR", old_value.c_str(), 1);
   } else {
@@ -153,12 +178,12 @@ TEST(SuzumeCApiTest, ExplicitDataDirectoryOverridesEnvironmentSearch) {
 #endif
 }
 
-TEST(SuzumeCApiTest, CreateWithExtendedOptionsRejectsInvalidMode) {
-  suzume_extended_options_t options{};
-  suzume_init_extended_options(&options);
+TEST(SuzumeCApiTest, CreateWithOptionsRejectsInvalidMode) {
+  suzume_options_t options{};
+  suzume_init_options(&options);
   options.mode = 99;
 
-  suzume_t handle = suzume_create_with_extended_options(&options);
+  suzume_t handle = suzume_create_with_options(&options);
   EXPECT_EQ(handle, nullptr);
 
   std::string error = suzume_last_error();
@@ -293,10 +318,10 @@ TEST(SuzumeCApiTest, LengthAwareAnalyzePreservesTextAfterEmbeddedNull) {
 }
 
 TEST(SuzumeCApiTest, MorphemeLengthsPreserveEmbeddedNull) {
-  suzume_extended_options_t options{};
-  suzume_init_extended_options(&options);
+  suzume_options_t options{};
+  suzume_init_options(&options);
   options.preserve_symbols = 1;
-  suzume_t handle = suzume_create_with_extended_options(&options);
+  suzume_t handle = suzume_create_with_options(&options);
   ASSERT_NE(handle, nullptr);
 
   const std::string text("検査\0語", 7);
@@ -355,11 +380,11 @@ TEST(SuzumeCApiTest, TagEntrypointsRejectInvalidUtf8WithStableCode) {
 }
 
 TEST(SuzumeCApiTest, InvalidScorerJsonFailsConstruction) {
-  suzume_extended_options_t options{};
-  suzume_init_extended_options(&options);
+  suzume_options_t options{};
+  suzume_init_options(&options);
   options.scorer_options_json = "{";
 
-  EXPECT_EQ(suzume_create_with_extended_options(&options), nullptr);
+  EXPECT_EQ(suzume_create_with_options(&options), nullptr);
   EXPECT_EQ(suzume_last_error_code(), SUZUME_ERROR_PARSE);
   EXPECT_NE(std::string(suzume_last_error()).find("scorer options"), std::string::npos);
 }
@@ -367,12 +392,12 @@ TEST(SuzumeCApiTest, InvalidScorerJsonFailsConstruction) {
 TEST(SuzumeCApiTest, ExtendedOptionsCanDisableEnvironmentScorerConfig) {
 #ifndef __EMSCRIPTEN__
   setenv("SUZUME_SCORER_INFL_confidence_ceiling", "0", 1);
-  suzume_extended_options_t options{};
-  suzume_init_extended_options(&options);
+  suzume_options_t options{};
+  suzume_init_options(&options);
   options.skip_user_dictionary = 1;
   options.skip_core_dictionary = 1;
   options.skip_env_config = 1;
-  suzume_t handle = suzume_create_with_extended_options(&options);
+  suzume_t handle = suzume_create_with_options(&options);
   unsetenv("SUZUME_SCORER_INFL_confidence_ceiling");
   ASSERT_NE(handle, nullptr);
 
@@ -387,11 +412,11 @@ TEST(SuzumeCApiTest, ExtendedOptionsCanDisableEnvironmentScorerConfig) {
 }
 
 TEST(SuzumeCApiTest, ScorerConfigStatusUsesTheWarningChannel) {
-  suzume_extended_options_t options{};
-  suzume_init_extended_options(&options);
+  suzume_options_t options{};
+  suzume_init_options(&options);
   options.report_scorer_config = 1;
   options.scorer_options_json = R"({"unary":{"noun_prior":0.25}})";
-  suzume_t handle = suzume_create_with_extended_options(&options);
+  suzume_t handle = suzume_create_with_options(&options);
   ASSERT_NE(handle, nullptr);
 
   ASSERT_GT(suzume_dictionary_warning_count(handle), 0u);
@@ -403,13 +428,13 @@ TEST(SuzumeCApiTest, ScorerConfigStatusUsesTheWarningChannel) {
 }
 
 TEST(SuzumeCApiTest, ScorerJsonChangesAnalysis) {
-  suzume_extended_options_t options{};
-  suzume_init_extended_options(&options);
+  suzume_options_t options{};
+  suzume_init_options(&options);
   options.skip_user_dictionary = 1;
   options.skip_core_dictionary = 1;
   options.skip_env_config = 1;
   options.scorer_options_json = R"({"inflection":{"confidence_ceiling":0}})";
-  suzume_t handle = suzume_create_with_extended_options(&options);
+  suzume_t handle = suzume_create_with_options(&options);
   ASSERT_NE(handle, nullptr);
 
   suzume_result_t* result = suzume_analyze(handle, "歩いています");
@@ -422,11 +447,11 @@ TEST(SuzumeCApiTest, ScorerJsonChangesAnalysis) {
 }
 
 TEST(SuzumeCApiTest, UserDictionariesCanBeCleared) {
-  suzume_extended_options_t options{};
-  suzume_init_extended_options(&options);
+  suzume_options_t options{};
+  suzume_init_options(&options);
   options.skip_user_dictionary = 1;
   options.skip_core_dictionary = 1;
-  suzume_t handle = suzume_create_with_extended_options(&options);
+  suzume_t handle = suzume_create_with_options(&options);
   ASSERT_NE(handle, nullptr);
   const std::string dictionary = "検査語\tNOUN\n";
   ASSERT_EQ(suzume_load_user_dict(handle, dictionary.data(), dictionary.size()), 1);
@@ -462,11 +487,11 @@ TEST(SuzumeCApiTest, ClearUserDictionariesRetainsBundledDictionary) {
 }
 
 TEST(SuzumeCApiTest, UserDictionaryCountAndCorePresenceAreExposed) {
-  suzume_extended_options_t options{};
-  suzume_init_extended_options(&options);
+  suzume_options_t options{};
+  suzume_init_options(&options);
   options.skip_user_dictionary = 1;
   options.skip_core_dictionary = 1;
-  suzume_t handle = suzume_create_with_extended_options(&options);
+  suzume_t handle = suzume_create_with_options(&options);
   ASSERT_NE(handle, nullptr);
 
   const std::string dictionary = "検査する\tVERB\tSURU\n";
@@ -480,11 +505,11 @@ TEST(SuzumeCApiTest, UserDictionaryCountAndCorePresenceAreExposed) {
 }
 
 TEST(SuzumeCApiTest, SkippedSourceRecordsReachTheDictionaryWarningChannel) {
-  suzume_extended_options_t options{};
-  suzume_init_extended_options(&options);
+  suzume_options_t options{};
+  suzume_init_options(&options);
   options.skip_user_dictionary = 1;
   options.skip_core_dictionary = 1;
-  suzume_t handle = suzume_create_with_extended_options(&options);
+  suzume_t handle = suzume_create_with_options(&options);
   ASSERT_NE(handle, nullptr);
 
   const std::string dictionary = "missing-pos\n検査語\tNOUN\n";
@@ -651,7 +676,7 @@ TEST(SuzumeCApiTest, LayoutFunctionsMatchNativeStructs) {
   EXPECT_EQ(suzume_sizeof_morpheme(), sizeof(suzume_morpheme_t));
   EXPECT_EQ(suzume_sizeof_tags(), sizeof(suzume_tags_t));
   EXPECT_EQ(suzume_sizeof_tag_options(), sizeof(suzume_tag_options_t));
-  EXPECT_EQ(suzume_sizeof_extended_options(), sizeof(suzume_extended_options_t));
+  EXPECT_EQ(suzume_sizeof_options(), sizeof(suzume_options_t));
 
   EXPECT_EQ(suzume_offsetof_result(0), offsetof(suzume_result_t, morphemes));
   EXPECT_EQ(suzume_offsetof_result(1), offsetof(suzume_result_t, count));
@@ -667,16 +692,16 @@ TEST(SuzumeCApiTest, LayoutFunctionsMatchNativeStructs) {
   EXPECT_EQ(suzume_offsetof_tag_options(4), offsetof(suzume_tag_options_t, max_tags));
   EXPECT_EQ(suzume_offsetof_tag_options(5), offsetof(suzume_tag_options_t, exclude_particles));
   EXPECT_EQ(suzume_offsetof_tag_options(9), offsetof(suzume_tag_options_t, remove_duplicates));
-  EXPECT_EQ(suzume_offsetof_extended_options(0), offsetof(suzume_extended_options_t, preserve_vu));
-  EXPECT_EQ(suzume_offsetof_extended_options(3), offsetof(suzume_extended_options_t, mode));
-  EXPECT_EQ(suzume_offsetof_extended_options(5), offsetof(suzume_extended_options_t, merge_compounds));
-  EXPECT_EQ(suzume_offsetof_extended_options(6), offsetof(suzume_extended_options_t, skip_user_dictionary));
-  EXPECT_EQ(suzume_offsetof_extended_options(7), offsetof(suzume_extended_options_t, skip_core_dictionary));
-  EXPECT_EQ(suzume_offsetof_extended_options(8), offsetof(suzume_extended_options_t, report_scorer_config));
-  EXPECT_EQ(suzume_offsetof_extended_options(9), offsetof(suzume_extended_options_t, skip_env_config));
-  EXPECT_EQ(suzume_offsetof_extended_options(10), offsetof(suzume_extended_options_t, scorer_options_json));
+  EXPECT_EQ(suzume_offsetof_options(0), offsetof(suzume_options_t, preserve_vu));
+  EXPECT_EQ(suzume_offsetof_options(3), offsetof(suzume_options_t, mode));
+  EXPECT_EQ(suzume_offsetof_options(5), offsetof(suzume_options_t, merge_compounds));
+  EXPECT_EQ(suzume_offsetof_options(6), offsetof(suzume_options_t, skip_user_dictionary));
+  EXPECT_EQ(suzume_offsetof_options(7), offsetof(suzume_options_t, skip_core_dictionary));
+  EXPECT_EQ(suzume_offsetof_options(8), offsetof(suzume_options_t, report_scorer_config));
+  EXPECT_EQ(suzume_offsetof_options(9), offsetof(suzume_options_t, skip_env_config));
+  EXPECT_EQ(suzume_offsetof_options(10), offsetof(suzume_options_t, scorer_options_json));
   EXPECT_EQ(suzume_offsetof_result(99), static_cast<size_t>(-1));
-  EXPECT_EQ(suzume_offsetof_extended_options(99), static_cast<size_t>(-1));
+  EXPECT_EQ(suzume_offsetof_options(99), static_cast<size_t>(-1));
 }
 
 }  // namespace

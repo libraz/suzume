@@ -378,7 +378,7 @@ SUZUME_EXPORT suzume_t suzume_create(void) {
   SUZUME_C_CATCH(return nullptr)
 }
 
-SUZUME_EXPORT void suzume_init_extended_options(suzume_extended_options_t* options) {
+SUZUME_EXPORT void suzume_init_options(suzume_options_t* options) {
   if (options == nullptr) {
     return;
   }
@@ -412,7 +412,7 @@ SUZUME_EXPORT void suzume_init_tag_options(suzume_tag_options_t* options) {
   options->remove_duplicates = 1;
 }
 
-SUZUME_EXPORT suzume_t suzume_create_with_extended_options(const suzume_extended_options_t* options) {
+SUZUME_EXPORT suzume_t suzume_create_with_options(const suzume_options_t* options) {
   clearLastError();
   SUZUME_C_TRY {
     suzume::SuzumeOptions opts;
@@ -422,7 +422,7 @@ SUZUME_EXPORT suzume_t suzume_create_with_extended_options(const suzume_extended
       opts.remove_symbols = (options->preserve_symbols == 0);
       auto mode = parseAnalysisMode(options->mode);
       if (!mode.has_value()) {
-        setLastError("suzume_create_with_extended_options: invalid mode", SUZUME_ERROR_INVALID_INPUT);
+        setLastError("suzume_create_with_options: invalid mode", SUZUME_ERROR_INVALID_INPUT);
         return nullptr;
       }
       opts.mode = *mode;
@@ -436,8 +436,7 @@ SUZUME_EXPORT suzume_t suzume_create_with_extended_options(const suzume_extended
         std::string scorer_error;
         if (!suzume::analysis::ScorerOptionsLoader::loadFromJsonString(options->scorer_options_json,
                                                                        opts.scorer_options, &scorer_error)) {
-          setLastError("suzume_create_with_extended_options: invalid scorer options: " + scorer_error,
-                       SUZUME_ERROR_PARSE);
+          setLastError("suzume_create_with_options: invalid scorer options: " + scorer_error, SUZUME_ERROR_PARSE);
           return nullptr;
         }
         opts.scorer_options_json = options->scorer_options_json;
@@ -699,8 +698,8 @@ SUZUME_EXPORT size_t suzume_sizeof_tag_options(void) {
   return sizeof(suzume_tag_options_t);
 }
 
-SUZUME_EXPORT size_t suzume_sizeof_extended_options(void) {
-  return sizeof(suzume_extended_options_t);
+SUZUME_EXPORT size_t suzume_sizeof_options(void) {
+  return sizeof(suzume_options_t);
 }
 
 SUZUME_EXPORT size_t suzume_offsetof_result(uint32_t field) {
@@ -756,20 +755,20 @@ SUZUME_EXPORT size_t suzume_offsetof_tag_options(uint32_t field) {
   return field < std::size(kOffsets) ? kOffsets[field] : static_cast<size_t>(-1);
 }
 
-SUZUME_EXPORT size_t suzume_offsetof_extended_options(uint32_t field) {
+SUZUME_EXPORT size_t suzume_offsetof_options(uint32_t field) {
   static constexpr size_t kOffsets[] = {
-      offsetof(suzume_extended_options_t, preserve_vu),
-      offsetof(suzume_extended_options_t, preserve_case),
-      offsetof(suzume_extended_options_t, preserve_symbols),
-      offsetof(suzume_extended_options_t, mode),
-      offsetof(suzume_extended_options_t, lemmatize),
-      offsetof(suzume_extended_options_t, merge_compounds),
-      offsetof(suzume_extended_options_t, skip_user_dictionary),
-      offsetof(suzume_extended_options_t, skip_core_dictionary),
-      offsetof(suzume_extended_options_t, report_scorer_config),
-      offsetof(suzume_extended_options_t, skip_env_config),
-      offsetof(suzume_extended_options_t, scorer_options_json),
-      offsetof(suzume_extended_options_t, data_directory),
+      offsetof(suzume_options_t, preserve_vu),
+      offsetof(suzume_options_t, preserve_case),
+      offsetof(suzume_options_t, preserve_symbols),
+      offsetof(suzume_options_t, mode),
+      offsetof(suzume_options_t, lemmatize),
+      offsetof(suzume_options_t, merge_compounds),
+      offsetof(suzume_options_t, skip_user_dictionary),
+      offsetof(suzume_options_t, skip_core_dictionary),
+      offsetof(suzume_options_t, report_scorer_config),
+      offsetof(suzume_options_t, skip_env_config),
+      offsetof(suzume_options_t, scorer_options_json),
+      offsetof(suzume_options_t, data_directory),
   };
   return field < std::size(kOffsets) ? kOffsets[field] : static_cast<size_t>(-1);
 }
@@ -808,19 +807,19 @@ static_assert(offsetof(suzume_tag_options_t, exclude_auxiliaries) == 13);
 static_assert(offsetof(suzume_tag_options_t, exclude_formal_nouns) == 14);
 static_assert(offsetof(suzume_tag_options_t, exclude_low_info) == 15);
 static_assert(offsetof(suzume_tag_options_t, remove_duplicates) == 16);
-static_assert(sizeof(suzume_extended_options_t) == 20);
-static_assert(offsetof(suzume_extended_options_t, preserve_vu) == 0);
-static_assert(offsetof(suzume_extended_options_t, preserve_case) == 1);
-static_assert(offsetof(suzume_extended_options_t, preserve_symbols) == 2);
-static_assert(offsetof(suzume_extended_options_t, mode) == 3);
-static_assert(offsetof(suzume_extended_options_t, lemmatize) == 4);
-static_assert(offsetof(suzume_extended_options_t, merge_compounds) == 5);
-static_assert(offsetof(suzume_extended_options_t, skip_user_dictionary) == 6);
-static_assert(offsetof(suzume_extended_options_t, skip_core_dictionary) == 7);
-static_assert(offsetof(suzume_extended_options_t, report_scorer_config) == 8);
-static_assert(offsetof(suzume_extended_options_t, skip_env_config) == 9);
-static_assert(offsetof(suzume_extended_options_t, scorer_options_json) == 12);
-static_assert(offsetof(suzume_extended_options_t, data_directory) == 16);
+static_assert(sizeof(suzume_options_t) == 20);
+static_assert(offsetof(suzume_options_t, preserve_vu) == 0);
+static_assert(offsetof(suzume_options_t, preserve_case) == 1);
+static_assert(offsetof(suzume_options_t, preserve_symbols) == 2);
+static_assert(offsetof(suzume_options_t, mode) == 3);
+static_assert(offsetof(suzume_options_t, lemmatize) == 4);
+static_assert(offsetof(suzume_options_t, merge_compounds) == 5);
+static_assert(offsetof(suzume_options_t, skip_user_dictionary) == 6);
+static_assert(offsetof(suzume_options_t, skip_core_dictionary) == 7);
+static_assert(offsetof(suzume_options_t, report_scorer_config) == 8);
+static_assert(offsetof(suzume_options_t, skip_env_config) == 9);
+static_assert(offsetof(suzume_options_t, scorer_options_json) == 12);
+static_assert(offsetof(suzume_options_t, data_directory) == 16);
 #endif
 
 }  // extern "C"
