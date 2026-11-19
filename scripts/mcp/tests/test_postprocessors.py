@@ -2118,3 +2118,23 @@ class TestConjunctionTeAdverbStrandedSubsidiary:
     def test_a_real_auxiliary_after_the_adverb_is_left_alone(self):
         tokens = get_expected_tokens("かつていました")[0]
         assert [t["pos"] for t in tokens] == ["Adverb", "Verb", "Auxiliary", "Auxiliary"]
+
+
+class TestKanaCompoundVerbOverAttributiveNoun:
+    """A kana compound-verb continuative in a nominal slot that spells adjective + noun is read as those two."""
+
+    @pytest.mark.parametrize("text", ["いいはなしです", "いいはなしだ"])
+    def test_it_splits_into_the_adjective_and_the_noun(self, text):
+        tokens = get_expected_tokens(text)[0]
+        assert [(t["surface"], t["pos"], t["lemma"]) for t in tokens[:2]] == [
+            ("いい", "Adjective", "いい"),
+            ("はなし", "Noun", "はなし"),
+        ]
+
+    def test_a_remainder_that_is_no_noun_keeps_the_deverbal_noun(self):
+        tokens = get_expected_tokens("いいかえです")[0]
+        assert (tokens[0]["surface"], tokens[0]["pos"]) == ("いいかえ", "Noun")
+
+    def test_a_kanji_continuative_is_left_to_the_deverbal_noun(self):
+        tokens = get_expected_tokens("押し付けだ")[0]
+        assert (tokens[0]["surface"], tokens[0]["pos"]) == ("押し付け", "Noun")

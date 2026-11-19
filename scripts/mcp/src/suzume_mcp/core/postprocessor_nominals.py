@@ -10,7 +10,7 @@ from .constants import (
     TEMPORAL_PREFIX_KANJI,
 )
 from .core_lexicon import core_headwords
-from .mecab import mecab_analyze
+from .mecab import is_single_token_of_pos, mecab_analyze
 from .merge_postprocessors import NIDAN_TERMINAL_KANA
 from .pos_mapping import map_mecab_pos
 from .postprocessor_common import PREDICATE_POS, reports_mutation
@@ -216,6 +216,29 @@ def _is_irrealis_before_negative(surface: str) -> bool:
     )
 
 
+def _attributive_adjective_noun(surface: str) -> list[dict] | None:
+    """Read a kana run as an i-adjective's い cell plus a noun, if the dictionary spells both.
+
+    The reference keeps a kana compound verb whole (いいはなし as 言い放す) where
+    it splits the same shape without one (いい+わけ); a nominal slot then wants
+    the attributive phrase rather than a nominalized compound.
+    """
+    if regex.fullmatch(r"\p{Hiragana}+", surface) is None:
+        return None
+    for cut in range(len(surface) - 1, 1, -1):
+        head, rest = surface[:cut], surface[cut:]
+        if not head.endswith("い"):
+            continue
+        adjective = mecab_analyze(head)
+        if len(adjective) != 1 or adjective[0].get("pos") != "形容詞" or not is_single_token_of_pos(rest, "名詞"):
+            continue
+        return [
+            {"surface": head, "pos": "Adjective", "lemma": adjective[0].get("lemma") or head},
+            {"surface": rest, "pos": "Noun", "lemma": rest},
+        ]
+    return None
+
+
 def postprocess_deverbal_noun_context(tokens: list[dict]) -> bool:
     """Normalize a continuative verb used as the head of a noun phrase.
 
@@ -227,6 +250,7 @@ def postprocess_deverbal_noun_context(tokens: list[dict]) -> bool:
     not a bare continuative verb.
     """
     changed = False
+    attributive_splits: list[tuple[int, list[dict]]] = []
     for idx, token in enumerate(tokens):
         if token.get("pos") != "Verb":
             continue
@@ -339,9 +363,15 @@ def postprocess_deverbal_noun_context(tokens: list[dict]) -> bool:
             and not genitive_phrase_head
         ):
             continue
-        token["pos"] = "Noun"
-        token["lemma"] = surface
+        split = _attributive_adjective_noun(surface)
+        if split is not None:
+            attributive_splits.append((idx, split))
+        else:
+            token["pos"] = "Noun"
+            token["lemma"] = surface
         changed = True
+    for idx, split in reversed(attributive_splits):
+        tokens[idx : idx + 1] = split
     return changed
 
 
