@@ -213,7 +213,19 @@ def test_morpheme_format_is_removed_and_tsv_is_the_default() -> None:
         (["--dictionary"], "missing value for --dictionary"),
         (["--mode="], "missing value for --mode"),
         (["--mode", "--format", "json", "東京"], "missing value for --mode"),
-        (["-f", "tags", "--tag-min-length", "-1", "東京"], "invalid --tag-min-length value: -1"),
+        (["-f", "tags", "--tag-min-length=-1", "東京"], "invalid --tag-min-length value: -1"),
+        (
+            ["-f", "tags", "--tag-min-length", "4294967296", "東京"],
+            "invalid --tag-min-length value: 4294967296",
+        ),
+        (
+            ["-f", "tags", "--tag-max-tags=18446744073709551615", "東京"],
+            "invalid --tag-max-tags value: 18446744073709551615",
+        ),
+        (["-f", "tags", "--tag-min-length", "-1", "東京"], "missing value for --tag-min-length"),
+        (["-d", "-x", "東京"], "missing value for -d"),
+        (["--dictionary", "--", "東京"], "missing value for --dictionary"),
+        (["--mode", "-f", "tsv", "東京"], "missing value for --mode"),
         (["-f", "tags", "--tag-max-tags", "1.5", "東京"], "invalid --tag-max-tags value: 1.5"),
         (
             ["-f", "tags", "--tag-pos-filter", "noun", "東京"],
@@ -226,6 +238,21 @@ def test_morpheme_format_is_removed_and_tsv_is_the_default() -> None:
 )
 def test_usage_errors_print_one_line_and_exit_two(args: list[str], message: str) -> None:
     _assert_usage_error(_run_cli(*args), message)
+
+
+def test_size_options_accept_the_full_unsigned_32_bit_range() -> None:
+    for value in ("0", "4294967295"):
+        result = _run_cli("-f", "tags", "--tag-min-length", value, "--tag-max-tags", value, "東京")
+        assert result.returncode == 0, result.stderr
+
+
+def test_a_bare_dash_is_a_value_and_the_equals_form_passes_a_dash_value() -> None:
+    _assert_usage_error(
+        _run_cli("--mode", "-", "東京"), "invalid mode: - (expected one of: normal, search, split)"
+    )
+    _assert_usage_error(
+        _run_cli("--mode=-x", "東京"), "invalid mode: -x (expected one of: normal, search, split)"
+    )
 
 
 @pytest.mark.parametrize(

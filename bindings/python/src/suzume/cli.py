@@ -22,7 +22,7 @@ _FORMATS = ("tsv", "json", "chasen", "tags")
 _COMMANDS = ("analyze", "version", "help")
 _CONJUGATING_POS = frozenset({"VERB", "ADJ", "AUX"})
 _UTF8_BOM = b"\xef\xbb\xbf"
-_SIZE_MAX = 2**64 - 1
+_SIZE_MAX = 2**32 - 1
 
 
 class _UsageError(Exception):
@@ -92,8 +92,6 @@ _MODES = tuple(mode.value for mode in Mode)
 _TAG_NAMES = tuple(_POS_FILTER_BITS)
 
 _OPTIONS = (
-    _Option("--help", "-h", "", "Show this help", _flag("help", True)),
-    _Option("--version", "-v", "", "Show the version", _flag("version", True)),
     _Option(
         "--dictionary",
         "-d",
@@ -243,6 +241,8 @@ _OPTIONS = (
         "Maximum tags (default: 0, unlimited)",
         lambda args, value: setattr(args, "tag_max_tags", _size("--tag-max-tags", value)),
     ),
+    _Option("--help", "-h", "", "Show this help", _flag("help", True)),
+    _Option("--version", "-v", "", "Show the version", _flag("version", True)),
 )
 _OPTIONS_BY_NAME = {
     name: option for option in _OPTIONS for name in (option.long_name, option.short_name) if name
@@ -319,7 +319,8 @@ def _parse(argv: Sequence[str]) -> _Args:
             if not value:
                 raise _UsageError(f"missing value for {option.long_name}")
         elif option.takes_value:
-            if idx >= len(argv) or argv[idx] == "--" or argv[idx] in _OPTIONS_BY_NAME:
+            # A next token that looks like an option is never taken as the value.
+            if idx >= len(argv) or (argv[idx].startswith("-") and len(argv[idx]) > 1):
                 raise _UsageError(f"missing value for {arg}")
             value = argv[idx]
             idx += 1
