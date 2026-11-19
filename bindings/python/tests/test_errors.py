@@ -52,6 +52,8 @@ def _build_value(value: Any) -> Any:
         return {"weights": {"join": [math.nan]}}
     if special == "nested_infinity":
         return {"weights": {"join": [math.inf]}}
+    if special == "invalid_utf8_source":
+        return b"\x93\x8c\x8b\x9e\tNOUN\n"
     raise AssertionError(f"unknown $special in fixture: {special}")
 
 
@@ -161,6 +163,9 @@ def test_with_block_after_close_raises_only_on_member_use() -> None:
 
 def test_loaders_return_counts_and_raise_on_failure(live: Suzume) -> None:
     assert live.load_user_dictionary("検査語\tNOUN\n") == 1
+    assert live.load_user_dictionary("検査語\tNOUN\n".encode()) == 1
+    assert live.load_user_dictionary(bytearray("検査語\tNOUN\n".encode())) == 1
+    assert live.load_user_dictionary(memoryview("検査語\tNOUN\n".encode())) == 1
     with pytest.raises(SuzumeError) as caught:
         live.load_binary_dictionary(b"\x00\x01\x02\x03")
     assert caught.value.code is ErrorCode.DICTIONARY_LOAD_FAILED

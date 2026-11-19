@@ -663,14 +663,24 @@ class Suzume:
     # --- dictionaries ---
 
     @_locked
-    def load_user_dictionary(self, dictionary: str) -> int:
+    def load_user_dictionary(self, dictionary: str | bytes | bytearray | memoryview) -> int:
         """Load a tab-separated user dictionary and return the installed entry count.
 
+        ``dictionary`` is the source text, or its UTF-8 bytes as read from a
+        file; bytes that are not UTF-8 raise the library's own parse error.
         A source that installs nothing raises :class:`SuzumeError`, so the
         returned count is always at least 1.
         """
         handle = self._require_handle("load_user_dictionary")
-        payload = _encode_argument("dictionary", dictionary)
+        if isinstance(dictionary, (bytes, bytearray, memoryview)):
+            payload = bytes(dictionary)
+        elif isinstance(dictionary, str):
+            payload = _encode_text("dictionary", dictionary)
+        else:
+            raise ValueError(
+                f"invalid dictionary: {_render_value(dictionary)} "
+                "(expected a string or binary data)"
+            )
         count = int(_lib.suzume_load_user_dictionary(handle, payload, len(payload)))
         if count == 0:
             raise _native_error("load_user_dictionary")

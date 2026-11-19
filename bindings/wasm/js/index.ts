@@ -853,20 +853,30 @@ export class Suzume {
    * Add entries from tab-separated dictionary text. Loads are additive; a
    * failed load leaves earlier dictionaries installed.
    *
-   * @param data - Rows of `surface<TAB>POS[<TAB>conj_type][<TAB>base_form]`
+   * @param data - Rows of `surface<TAB>POS[<TAB>conj_type][<TAB>base_form]`, as
+   *   text or as its UTF-8 bytes (bytes that are not UTF-8 fail with the
+   *   library's own parse error)
    * @returns The number of installed entries (always at least 1)
    * @throws {SuzumeError} with the native code and text when the source cannot
-   *   be loaded (an empty or entry-less source included), InvalidInput for a
-   *   non-string, or after {@link destroy}
+   *   be loaded (an empty or entry-less source included), InvalidInput for
+   *   anything but a string or a Uint8Array, or after {@link destroy}
    */
-  loadUserDictionary(data: string): number {
+  loadUserDictionary(data: string | Uint8Array): number {
     this.ensureAlive('load_user_dictionary');
 
-    const installed = this.withUtf8(
-      utf8Argument('load_user_dictionary', 'dictionary', data),
-      (dataPtr, dataByteLength) =>
-        this.module._suzume_load_user_dictionary(this.handle, dataPtr, dataByteLength),
-    );
+    const load = (dataPtr: number, dataByteLength: number): number =>
+      this.module._suzume_load_user_dictionary(this.handle, dataPtr, dataByteLength);
+    let installed: number;
+    if (data instanceof Uint8Array) {
+      installed = this.withBytes(data, load);
+    } else if (typeof data === 'string') {
+      installed = this.withUtf8(utf8Argument('load_user_dictionary', 'dictionary', data), load);
+    } else {
+      throw invalidInput(
+        'load_user_dictionary',
+        `invalid dictionary: ${renderValue(data)} (expected a string or binary data)`,
+      );
+    }
     if (installed === 0) {
       throw nativeError(this.module, 'load_user_dictionary');
     }
@@ -891,14 +901,9 @@ export class Suzume {
       );
     }
 
-    const dataPtr = this.module._malloc(data.byteLength);
-    let installed: number;
-    try {
-      heapBytes(this.module).set(data, dataPtr);
-      installed = this.module._suzume_load_binary_dictionary(this.handle, dataPtr, data.byteLength);
-    } finally {
-      this.module._free(dataPtr);
-    }
+    const installed = this.withBytes(data, (dataPtr, dataByteLength) =>
+      this.module._suzume_load_binary_dictionary(this.handle, dataPtr, dataByteLength),
+    );
     if (installed === 0) {
       throw nativeError(this.module, 'load_binary_dictionary');
     }
@@ -974,6 +979,17 @@ export class Suzume {
   private ensureAlive(operation: SuzumeOperation): void {
     if (this.handle === 0) {
       throw new SuzumeError(RELEASED_MESSAGE, ErrorCode.InvalidInput, { operation });
+    }
+  }
+
+  /** Copy `data` into WASM memory for the duration of `body`. */
+  private withBytes<T>(data: Uint8Array, body: (pointer: number, byteLength: number) => T): T {
+    const pointer = this.module._malloc(data.byteLength);
+    try {
+      heapBytes(this.module).set(data, pointer);
+      return body(pointer, data.byteLength);
+    } finally {
+      this.module._free(pointer);
     }
   }
 

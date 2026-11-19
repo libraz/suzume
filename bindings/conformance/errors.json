@@ -1628,7 +1628,7 @@
           "type": "ValueError"
         }
       },
-      "message": "invalid dictionary: 5 (expected a string)"
+      "message": "invalid dictionary: 5 (expected a string or binary data)"
     },
     {
       "id": "arg-binary-string",
@@ -2868,6 +2868,39 @@
         "python": null
       },
       "message": "invalid scorer_options: not serializable as JSON"
+    },
+    {
+      "id": "native-dictionary-invalid-utf8",
+      "group": "error-model",
+      "call": {
+        "npm": {
+          "member": "loadUserDictionary",
+          "kind": "call"
+        },
+        "python": {
+          "member": "load_user_dictionary",
+          "kind": "call"
+        }
+      },
+      "option": null,
+      "value": {
+        "$special": "invalid_utf8_source"
+      },
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 4,
+          "operation": "load_user_dictionary"
+        },
+        "python": {
+          "type": "SuzumeError",
+          "code": 4,
+          "operation": "load_user_dictionary"
+        }
+      },
+      "message": "Dictionary entry is not valid UTF-8 at line 1"
     }
   ]
 }

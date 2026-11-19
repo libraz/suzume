@@ -440,7 +440,7 @@ def _load_dictionary(analyzer: Suzume, path: str) -> None:
             if binary:
                 analyzer.load_binary_dictionary(data)
             else:
-                analyzer.load_user_dictionary(data.decode("utf-8", "surrogateescape"))
+                analyzer.load_user_dictionary(data)
             return
         except (SuzumeError, ValueError) as error:
             detail = str(error)

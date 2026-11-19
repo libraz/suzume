@@ -259,7 +259,7 @@ class _StubAnalyzer:
         self.kwargs = kwargs
         self.tag_kwargs: dict[str, object] = {}
         self.warnings = list(type(self).initial_warnings)
-        self.loads: list[str] = []
+        self.loads: list[bytes] = []
         type(self).instances.append(self)
 
     def __enter__(self) -> _StubAnalyzer:
@@ -272,7 +272,7 @@ class _StubAnalyzer:
     def dictionary_warnings(self) -> tuple[str, ...]:
         return tuple(self.warnings)
 
-    def load_user_dictionary(self, dictionary: str) -> int:
+    def load_user_dictionary(self, dictionary: bytes) -> int:
         self.loads.append(dictionary)
         self.warnings.append(f"warning from load {len(self.loads)}")
         return 1
@@ -379,7 +379,7 @@ def test_warnings_print_once_after_the_load_that_produced_them(
     assert capsys.readouterr().err == (
         "warning: bundled warning\nwarning: warning from load 1\nwarning: warning from load 2\n"
     )
-    assert stub.instances[0].loads == ["一\tNOUN\n", "二\tNOUN\n"]
+    assert stub.instances[0].loads == ["一\tNOUN\n".encode(), "二\tNOUN\n".encode()]
 
 
 def test_dictionary_option_accepts_an_attached_value(
@@ -388,7 +388,7 @@ def test_dictionary_option_accepts_an_attached_value(
     source = tmp_path / "words.tsv"
     source.write_text("一\tNOUN\n", encoding="utf-8")
     assert cli.main([f"--dictionary={source}", "東京"]) == 0
-    assert stub.instances[0].loads == ["一\tNOUN\n"]
+    assert stub.instances[0].loads == ["一\tNOUN\n".encode()]
 
 
 # --- input ---
@@ -662,6 +662,7 @@ def test_missing_dictionary_reports_the_path(tmp_path: Path, name: str, native_t
     [
         ("invalid.dic", b"invalid", "Dictionary file too small"),
         ("invalid.csv", '"東京,NOUN,0.5\n'.encode(), "Invalid quoting"),
+        ("sjis.tsv", b"\x93\x8c\x8b\x9e\tNOUN\n", "Dictionary entry is not valid UTF-8 at line 1"),
     ],
 )
 def test_malformed_dictionary_reports_the_library_text(

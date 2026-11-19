@@ -73,6 +73,8 @@ function buildValue(value: unknown): unknown {
       return { key: undefined };
     case 'nested_undefined':
       return { weights: [undefined] };
+    case 'invalid_utf8_source':
+      return new Uint8Array([0x93, 0x8c, 0x8b, 0x9e, 0x09, 0x4e, 0x4f, 0x55, 0x4e, 0x0a]);
     default:
       throw new Error(`unknown $special in fixture: ${special}`);
   }
@@ -233,6 +235,10 @@ describe('dictionary loaders', () => {
   it('returns the installed entry count', () => {
     expect(suzume.loadUserDictionary('検査語\tNOUN\n')).toBe(1);
     expect(suzume.loadUserDictionary('検査する\tVERB\tSURU\n')).toBeGreaterThan(1);
+  });
+
+  it('loads source dictionary bytes like the same text', () => {
+    expect(suzume.loadUserDictionary(new TextEncoder().encode('検査語\tNOUN\n'))).toBe(1);
   });
 
   it('returns the installed entry count from a binary dictionary', () => {
