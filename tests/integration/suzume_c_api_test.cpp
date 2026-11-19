@@ -45,7 +45,7 @@ TEST(SuzumeCApiTest, LoadUserDictionaryReportsParseDetails) {
   EXPECT_EQ(suzume_load_user_dictionary(handle, csv_data, std::strlen(csv_data)), 0u);
 
   std::string error = suzume_last_error();
-  EXPECT_NE(error.find("Invalid legacy CSV quoting"), std::string::npos);
+  EXPECT_NE(error.find("Invalid quoting"), std::string::npos);
   EXPECT_NE(error.find("unterminated quoted field"), std::string::npos);
 
   suzume_destroy(handle);
@@ -483,8 +483,7 @@ TEST(SuzumeCApiTest, NativeMessagesCarryNoSymbolPrefix) {
   // Core text that itself contains ": " is forwarded verbatim.
   const char* csv_data = "\"東京,NOUN,0.5\n";
   EXPECT_EQ(suzume_load_user_dictionary(handle, csv_data, std::strlen(csv_data)), 0u);
-  EXPECT_EQ(std::string(suzume_last_error()).rfind("Invalid legacy CSV quoting at line 1: ", 0), 0u)
-      << suzume_last_error();
+  EXPECT_EQ(std::string(suzume_last_error()).rfind("Invalid quoting at line 1: ", 0), 0u) << suzume_last_error();
 
   suzume_destroy(handle);
 }

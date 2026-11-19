@@ -35,8 +35,8 @@ void stripUtf8Bom(std::string_view& text) {
 }
 
 core::Error quotingError(size_t line_number, std::string_view detail) {
-  return core::Error(core::ErrorCode::ParseError, "Invalid legacy CSV quoting at line " +
-                                                      core::decimalDigits(line_number) + ": " + std::string(detail));
+  return core::Error(core::ErrorCode::ParseError,
+                     "Invalid quoting at line " + core::decimalDigits(line_number) + ": " + std::string(detail));
 }
 
 // Rejects any non-empty field from index `first_unused` on: those columns carry no meaning.
