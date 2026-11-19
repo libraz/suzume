@@ -5,10 +5,12 @@ from ..config import PROJECT_ROOT
 from ..core.constants import VALID_POS
 from ..core.suzume_cli import (
     get_expected_tokens_batch_subprocess,
+    get_suzume_tokens_many,
 )
 from ..core.suzume_cli import (
     get_expected_tokens_subprocess as get_expected_tokens,
 )
+from ..core.suzume_utils import token_differences
 from ..core.test_file_suggestions import suggest_test_files
 from ..core.test_file_utils import (
     generate_id,
@@ -18,6 +20,7 @@ from ..core.test_file_utils import (
     normalize_test_file_name,
     save_json,
 )
+from ._cli_freshness import stale_cli_guard
 from ._test_tools_common import (
     ORACLE_OVERRIDE_REMEDIATION,
     _case_locations,
@@ -34,6 +37,31 @@ from ._test_tools_organization import append_cases_partitioned
 # suzume_expected, only harder to see: the stored case keeps no trace of where the
 # expectation came from, so nothing downstream can flag it.
 _USE_SUZUME_REFUSAL = f"use_suzume is disabled by design. {ORACLE_OVERRIDE_REMEDIATION}"
+
+
+_RED_PIN = "Suzume does not pass this expectation on surface, POS and lemma; see differences"
+_UNCHECKED_PIN = "whether Suzume passes this expectation could not be checked; see check_error"
+
+
+async def _pin_verdicts(cases: list[tuple[str, list[dict]]]) -> list[dict]:
+    """Say, per (input, expected) case, whether Suzume passes it the way the C++ runner judges it."""
+    outputs = await get_suzume_tokens_many([text for text, _expected in cases], skip_user_dict=True)
+    verdicts = []
+    for (_text, expected), output in zip(cases, outputs, strict=True):
+        if isinstance(output, BaseException):
+            verdicts.append({"passes": None, "check_error": str(output)})
+            continue
+        differences = token_differences(expected, output)
+        verdicts.append({"passes": False, "differences": differences} if differences else {"passes": True})
+    return verdicts
+
+
+def _single_pin_report(verdict: dict) -> dict:
+    """The verdict fields of a one-case registration, with a warning unless it passes."""
+    if verdict["passes"] is True:
+        return verdict
+    reason = _RED_PIN if verdict["passes"] is False else _UNCHECKED_PIN
+    return {**verdict, "warning": f"Registered, but {reason}."}
 
 
 def _deduplicate_generated_ids(items: list[dict]) -> None:
@@ -54,6 +82,7 @@ def _deduplicate_generated_ids(items: list[dict]) -> None:
 
 
 @mcp.tool()
+@stale_cli_guard()
 async def test_add(
     input_text: str,
     file: str = "",
@@ -62,6 +91,11 @@ async def test_add(
     use_suzume: bool = False,
 ) -> str:
     """Add a new test case to a test file.
+
+    The result says whether Suzume currently passes the registered expectation
+    on surface, POS and lemma (`passes`), with the differing token fields under
+    `differences` and a `warning` when it does not. A red case is still
+    registered, since pinning before a fix is sometimes intended.
 
     Args:
         input_text: Japanese text for the test case.
@@ -112,6 +146,7 @@ async def test_add(
     except (OSError, ValueError) as exc:
         return _json_error(str(exc))
     actual_file = placement["case_locations"][0]["file"]
+    (verdict,) = await _pin_verdicts([(input_text, expected)])
 
     return _json_result(
         {
@@ -124,17 +159,22 @@ async def test_add(
             "id": test_id,
             "source": source,
             "rule": rule,
+            **_single_pin_report(verdict),
         }
     )
 
 
 @mcp.tool()
+@stale_cli_guard()
 async def test_update(
     input_text: str = "",
     test_id: str = "",
     use_suzume: bool = False,
 ) -> str:
     """Update an existing test case's expected value.
+
+    Like `test_add`, the result says whether Suzume passes the rewritten
+    expectation (`passes`, `differences`, `warning`).
 
     Args:
         input_text: Input text to find and update. An input shared by several cases is
@@ -160,6 +200,7 @@ async def test_update(
 
     found["case"]["expected"] = expected
     save_json(found["file"], found["data"])
+    (verdict,) = await _pin_verdicts([(input_text, expected)])
 
     return _json_result(
         {
@@ -170,6 +211,7 @@ async def test_update(
             "old_surfaces": "|".join(t.get("surface", "") for t in old_expected),
             "new_surfaces": "|".join(t["surface"] for t in expected),
             "source": source,
+            **_single_pin_report(verdict),
         }
     )
 
@@ -209,6 +251,7 @@ async def test_delete(
 
 
 @mcp.tool()
+@stale_cli_guard()
 async def test_batch_add(
     file: str,
     inputs: list[str],
@@ -216,6 +259,11 @@ async def test_batch_add(
     use_suzume: bool = False,
 ) -> str:
     """Batch add multiple test cases.
+
+    Every case in `to_add` says whether Suzume currently passes it on surface,
+    POS and lemma (`passes`, plus `differences` when it does not), in the
+    preview as well as on apply. `red` lists the inputs that do not pass and a
+    `warning` names how many; red cases are still added.
 
     Args:
         file: Logical test file name. An empty string groups inputs by their highest-ranked suggestions.
@@ -274,6 +322,10 @@ async def test_batch_add(
         )
 
     _deduplicate_generated_ids(to_add)
+    for item, verdict in zip(
+        to_add, await _pin_verdicts([(item["input"], item["_expected"]) for item in to_add]), strict=True
+    ):
+        item.update(verdict)
 
     placements = []
     grouped_items: dict[str, list[dict]] = {}
@@ -297,17 +349,26 @@ async def test_batch_add(
         for item, location in zip(items, placement["case_locations"], strict=True):
             item["file"] = location["file"]
 
-    return _json_result(
-        {
-            "file": file_name,
-            "files": [entry for placement in placements for entry in placement["files"]],
-            "to_add": [
-                {key: item[key] for key in ("input", "id", "surfaces", "source", "rule", "file")} for item in to_add
-            ],
-            "skipped": skipped,
-            "applied": apply,
-        }
-    )
+    shown = ("input", "id", "surfaces", "source", "rule", "file", "passes", "differences", "check_error")
+    red = [item["input"] for item in to_add if item["passes"] is False]
+    unchecked = [item["input"] for item in to_add if item["passes"] is None]
+    result = {
+        "file": file_name,
+        "files": [entry for placement in placements for entry in placement["files"]],
+        "to_add": [{key: item[key] for key in shown if key in item} for item in to_add],
+        "red": red,
+        "skipped": skipped,
+        "applied": apply,
+    }
+    if red or unchecked:
+        verb = "are registered" if apply else "would be registered"
+        notes = []
+        if red:
+            notes.append(f"{len(red)} of {len(to_add)} cases {verb} red: {_RED_PIN}")
+        if unchecked:
+            notes.append(f"{len(unchecked)} of {len(to_add)} cases could not be checked: see check_error")
+        result["warning"] = ". ".join(notes) + "."
+    return _json_result(result)
 
 
 _ORACLE_OWNED_POS = (

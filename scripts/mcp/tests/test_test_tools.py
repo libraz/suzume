@@ -161,6 +161,106 @@ class TestUseSuzumeIsRefused:
         assert "use_suzume is disabled by design" in data["message"]
 
 
+PIN_NOUN = [
+    {"surface": "がくしゃ", "pos": "Noun", "lemma": "がくしゃ"},
+    {"surface": "だ", "pos": "Auxiliary", "lemma": "だ"},
+]
+PIN_VERB = [
+    {"surface": "がくしゃ", "pos": "Verb", "lemma": "がくす"},
+    {"surface": "だ", "pos": "Auxiliary", "lemma": "だ"},
+]
+PIN_POS_AND_LEMMA = [
+    {"index": 0, "type": "pos", "surface": "がくしゃ", "expected": "Noun", "suzume": "Verb"},
+    {"index": 0, "type": "lemma", "surface": "がくしゃ", "expected": "がくしゃ", "suzume": "がくす"},
+]
+
+
+class TestPinVerdict:
+    """A registration states whether Suzume passes it on surface, POS and lemma."""
+
+    @pytest.fixture
+    def engine(self, tmp_path, monkeypatch):
+        cli: dict[str, list[dict]] = {}
+
+        async def fake_cli(text, cli_path=None, skip_user_dict=False):
+            assert skip_user_dict, "pins are judged the way the C++ runner runs, without the user dictionary"
+            if text not in cli:
+                raise RuntimeError("Suzume CLI failed: boom")
+            return cli[text]
+
+        monkeypatch.setattr(mutation_tools, "PROJECT_ROOT", tmp_path)
+        monkeypatch.setattr(mutation_tools, "get_expected_tokens", lambda _text: (PIN_NOUN, "reference", ""))
+        monkeypatch.setattr(
+            mutation_tools,
+            "get_expected_tokens_batch_subprocess",
+            lambda texts: [(PIN_NOUN, "reference", "") for _text in texts],
+        )
+        monkeypatch.setattr("suzume_mcp.core.suzume_cli.get_suzume_tokens_async", fake_cli)
+        return cli
+
+    def test_a_green_pin_says_it_passes(self, engine):
+        engine["がくしゃだ"] = PIN_NOUN
+
+        data = parse(run(_tt.test_add(input_text="がくしゃだ", file="noun_general")))
+
+        assert data["status"] == "ok"
+        assert data["passes"] is True
+        assert "warning" not in data and "differences" not in data
+
+    def test_a_red_pin_is_registered_but_flagged_with_the_differing_fields(self, engine, tmp_path):
+        engine["がくしゃだ"] = PIN_VERB
+
+        data = parse(run(_tt.test_add(input_text="がくしゃだ", file="noun_general")))
+
+        assert data["status"] == "ok"
+        assert data["passes"] is False
+        assert data["differences"] == PIN_POS_AND_LEMMA
+        assert "does not pass" in data["warning"]
+        stored = json.loads((tmp_path / CORPUS_DIR / "noun_general.json").read_text(encoding="utf-8"))
+        assert [case["input"] for case in stored["cases"]] == ["がくしゃだ"]
+
+    def test_a_failed_check_is_reported_as_unknown_not_as_passing(self, engine):
+        data = parse(run(_tt.test_add(input_text="がくしゃだ", file="noun_general")))
+
+        assert data["status"] == "ok"
+        assert data["passes"] is None
+        assert "boom" in data["check_error"]
+        assert "warning" in data
+
+    @pytest.mark.parametrize("apply", [False, True], ids=["preview", "applied"])
+    def test_batch_add_gives_a_verdict_per_case_and_lists_the_red_ones(self, engine, apply):
+        engine["がくしゃだ"] = PIN_VERB
+        engine["きしゃだ"] = PIN_NOUN
+
+        data = parse(run(_tt.test_batch_add(file="noun_general", inputs=["がくしゃだ", "きしゃだ"], apply=apply)))
+
+        by_input = {item["input"]: item for item in data["to_add"]}
+        assert by_input["がくしゃだ"]["passes"] is False
+        assert by_input["がくしゃだ"]["differences"] == PIN_POS_AND_LEMMA
+        assert by_input["きしゃだ"]["passes"] is True
+        assert "differences" not in by_input["きしゃだ"]
+        assert data["red"] == ["がくしゃだ"]
+        assert "1 of 2" in data["warning"]
+
+    def test_batch_add_without_red_cases_carries_no_warning(self, engine):
+        engine["きしゃだ"] = PIN_NOUN
+
+        data = parse(run(_tt.test_batch_add(file="noun_general", inputs=["きしゃだ"], apply=False)))
+
+        assert data["red"] == []
+        assert "warning" not in data
+
+    def test_update_reports_the_verdict_for_the_rewritten_expectation(self, engine, tmp_path):
+        write_suite(tmp_path, "noun_general", [{"id": "gakusha_da", "input": "がくしゃだ", "expected": PIN_NOUN}])
+        engine["がくしゃだ"] = PIN_VERB
+
+        data = parse(run(_tt.test_update(test_id="noun_general/gakusha_da")))
+
+        assert data["status"] == "ok"
+        assert data["passes"] is False
+        assert data["differences"] == PIN_POS_AND_LEMMA
+
+
 class TestTestDelete:
     @staticmethod
     def write_suite(tmp_path):
