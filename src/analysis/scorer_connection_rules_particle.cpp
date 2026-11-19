@@ -442,9 +442,11 @@ float computePrefixSymbolBonus(const core::LatticeEdge& prev, const core::Lattic
 
   // A ん (the contracted nominalizer or the volitional) after an unverified
   // pure-hiragana terminal is the tail of a mimetic word (ぐう+ん), not a
-  // grammatical morpheme.
-  if (prev.extended_pos == core::ExtendedPOS::VerbShuushikei && !prev.lemmaVerified() &&
-      grammar::isPureHiragana(prev.surface) &&
+  // grammatical morpheme. A case particle closes a nominal, and neither ん
+  // attaches to one (曲+が+ん+ない is the contracted 曲がんない).
+  if (((prev.extended_pos == core::ExtendedPOS::VerbShuushikei && !prev.lemmaVerified() &&
+        grammar::isPureHiragana(prev.surface)) ||
+       prev.extended_pos == core::ExtendedPOS::ParticleCase) &&
       (next.extended_pos == core::ExtendedPOS::ParticleNo || next.extended_pos == core::ExtendedPOS::AuxVolitional) &&
       grammar::isSingleHiragana(next.surface, U'ん')) {
     SUZUME_CONNECTION_ADD(bonus, sc::kPenaltyUnverifiedVerbNominalizer);

@@ -502,7 +502,8 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
     // A-row + れ: passive verb stem (言われ, 書かれ). が + る/ら/り/っ: godan-ra
     // cells (上がる, 下がら, 上がり, 上がっ); が + せ/さ/ず: godan-ga irrealis
     // (脱がせる, 脱がさない, 脱がず); が + な only when kanji+ぐ is a known
-    // godan-ga verb (脱がない, but 金がない).
+    // godan-ga verb (脱がない, but 金がない); が + ん only when kanji+がる is a
+    // known godan-ra verb, as its nasal contraction (曲がんない, but 私がんばる).
     const char32_t next_char = kanji_end + 1 < codepoints.size() ? codepoints[kanji_end + 1] : 0;
     const bool is_verb_pattern =
         kana::isARowCodepoint(first_hiragana) &&
@@ -510,7 +511,9 @@ void generateVerbCandidates(const std::vector<char32_t>& codepoints, size_t star
                                 (next_char == U'る' || next_char == U'ら' || next_char == U'り' || next_char == U'っ' ||
                                  next_char == U'せ' || next_char == U'さ' || next_char == U'ず' ||
                                  (next_char == U'な' && dict_manager != nullptr &&
-                                  vh::isVerbInDictionary(dict_manager, codepoints, start_pos, kanji_end, "ぐ")))));
+                                  vh::isVerbInDictionary(dict_manager, codepoints, start_pos, kanji_end, "ぐ")) ||
+                                 (next_char == U'ん' && dict_manager != nullptr &&
+                                  vh::isVerbInDictionary(dict_manager, codepoints, start_pos, kanji_end, "がる")))));
     if (!is_verb_pattern) {
       return;  // Not a verb - these particles follow nouns
     }
