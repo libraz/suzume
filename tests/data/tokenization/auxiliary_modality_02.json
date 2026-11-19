@@ -1723,6 +1723,38 @@
       ],
       "id": "nekonoesadesu",
       "input": "ねこのえさです"
+    },
+    {
+      "description": "会社のでございます - auto-generated",
+      "expected": [
+        {
+          "lemma": "会社",
+          "pos": "Noun",
+          "surface": "会社"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "で"
+        },
+        {
+          "lemma": "ござる",
+          "pos": "Auxiliary",
+          "surface": "ござい"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "nodegozaimasu",
+      "input": "会社のでございます"
     }
   ],
   "description": "Modality auxiliaries (たい、そう、らしい) (part 2/2)",
