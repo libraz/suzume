@@ -518,12 +518,10 @@ bool yieldsToListedReading(const CompoundMatchContext& ctx, const CompoundVerbMa
 
 }  // namespace
 
-CompoundVerbMatch findCompoundVerbMatch(
-    std::string_view text, const std::vector<char32_t>& codepoints, const ByteOffsets& byte_offsets, size_t start_pos,
-    const std::vector<normalize::CharType>& char_types, size_t kanji_end, size_t v2_start, char32_t base_ending,
-    bool is_sokuonbin, bool is_ichidan, bool has_kanji_v2_after_bare_ichidan, bool dict_compound_v1,
-    std::string_view dict_compound_v1_lemma, const dictionary::DictionaryManager& dict_manager,
-    const grammar::Inflection& inflection, bool hiragana_v1, bool allow_closed_onbin_v1) {
+CompoundVerbMatch findCompoundVerbMatch(const CompoundVerbMatchRequest& request) {
+  const auto& [text, codepoints, byte_offsets, start_pos, char_types, kanji_end, v2_start, base_ending, is_sokuonbin,
+               is_ichidan, has_kanji_v2_after_bare_ichidan, dict_compound_v1, dict_compound_v1_lemma, dict_manager,
+               inflection, hiragana_v1, allow_closed_onbin_v1] = request;
   if (v2_start >= codepoints.size()) {
     return {};
   }

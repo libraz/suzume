@@ -161,14 +161,31 @@ inline bool isMizenkeiAuxiliaryStarter(char32_t codepoint, char32_t following) {
 bool addPassiveContinuativeTailCandidates(core::Lattice& lattice, const std::vector<char32_t>& codepoints,
                                           size_t kanji_end);
 
+// The V1 span and its reconstruction hints for one V2 boundary. A caller trying
+// another boundary copies the request and moves v2_start and the hints.
+struct CompoundVerbMatchRequest {
+  std::string_view text;
+  const std::vector<char32_t>& codepoints;
+  const ByteOffsets& byte_offsets;
+  size_t start_pos;
+  const std::vector<normalize::CharType>& char_types;
+  size_t kanji_end;
+  size_t v2_start;
+  char32_t base_ending;
+  bool is_sokuonbin;
+  bool is_ichidan;
+  bool has_kanji_v2_after_bare_ichidan;
+  bool dict_compound_v1;
+  std::string_view dict_compound_v1_lemma;
+  const dictionary::DictionaryManager& dict_manager;
+  const grammar::Inflection& inflection;
+  bool hiragana_v1 = false;
+  bool allow_closed_onbin_v1 = false;
+};
+
 // Resolves V2 forms, verifies the corresponding V1, and returns the highest-priority
 // match. The caller retains V2 boundary discovery and emits the selected edge separately.
-CompoundVerbMatch findCompoundVerbMatch(
-    std::string_view text, const std::vector<char32_t>& codepoints, const ByteOffsets& byte_offsets, size_t start_pos,
-    const std::vector<normalize::CharType>& char_types, size_t kanji_end, size_t v2_start, char32_t base_ending,
-    bool is_sokuonbin, bool is_ichidan, bool has_kanji_v2_after_bare_ichidan, bool dict_compound_v1,
-    std::string_view dict_compound_v1_lemma, const dictionary::DictionaryManager& dict_manager,
-    const grammar::Inflection& inflection, bool hiragana_v1 = false, bool allow_closed_onbin_v1 = false);
+CompoundVerbMatch findCompoundVerbMatch(const CompoundVerbMatchRequest& request);
 
 // The dictionary form a hiragana V1 continuative reconstructs to: する for the
 // サ変 continuative, the stem plus る for an Ichidan V1, and the Godan i-row

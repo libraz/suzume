@@ -190,9 +190,9 @@ void addHiraganaCompoundVerbJoinCandidates(core::Lattice& lattice, std::string_v
       }
     }
 
-    CompoundVerbMatch match = findCompoundVerbMatch(text, codepoints, byte_offsets, start_pos, char_types, v2_start - 1,
-                                                    v2_start, base_ending, false, is_ichidan, false, false, "",
-                                                    dict_manager, inflection, true, closed_onbin_context);
+    CompoundVerbMatch match = findCompoundVerbMatch({text, codepoints, byte_offsets, start_pos, char_types,
+                                                     v2_start - 1, v2_start, base_ending, false, is_ichidan, false,
+                                                     false, "", dict_manager, inflection, true, closed_onbin_context});
     if (match.v2_verb == nullptr) {
       continue;
     }
