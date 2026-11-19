@@ -23,10 +23,10 @@ interface ConformanceCase {
   only: 'npm' | 'python' | null;
   expect: { npm: { type: string; code: number; operation?: string } | null };
   message: string | null;
-  message_prefix?: string;
 }
 
 const fixturePath = fileURLToPath(new URL('../../conformance/errors.json', import.meta.url));
+const userDictionaryUrl = new URL('../../../data/user.dic', import.meta.url);
 const { cases } = JSON.parse(readFileSync(fixturePath, 'utf8')) as { cases: ConformanceCase[] };
 
 const npmCases = cases.filter(
@@ -160,9 +160,6 @@ describe('error conformance (bindings/conformance/errors.json)', () => {
       expect(suzumeError.operation).toBe(expected.operation);
       if (testCase.message !== null) {
         expect(suzumeError.message).toBe(testCase.message);
-      } else if (testCase.message_prefix !== undefined) {
-        // The native text keeps its C symbol prefix until the C ABI drops it.
-        expect(suzumeError.message).toContain(testCase.message_prefix);
       }
     },
   );
@@ -218,6 +215,13 @@ describe('dictionary loaders', () => {
   it('returns the installed entry count', () => {
     expect(suzume.loadUserDictionary('検査語\tNOUN\n')).toBe(1);
     expect(suzume.loadUserDictionary('検査する\tVERB\tSURU\n')).toBeGreaterThan(1);
+  });
+
+  it('returns the installed entry count from a binary dictionary', () => {
+    const dictionary = new Uint8Array(readFileSync(fileURLToPath(userDictionaryUrl)));
+    const count = suzume.loadBinaryDictionary(dictionary);
+    expect(typeof count).toBe('number');
+    expect(count).toBeGreaterThanOrEqual(1);
   });
 
   it('throws a native binary load failure with its own text', () => {

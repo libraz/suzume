@@ -1,7 +1,6 @@
 import { expect } from 'vitest';
 import { type ErrorCode, SuzumeError } from '../dist/index.js';
 import createModule from '../dist/suzume.js';
-import { posEnglish } from '../js/abi_labels.js';
 import { C_LAYOUTS } from '../js/abi_layout.js';
 import { decodeAnalysisResult, decodeTags } from '../js/decode.js';
 import type { Morpheme as ParsedMorpheme, Tag as ParsedTag } from '../js/index.js';
@@ -22,7 +21,7 @@ export interface WasmModule {
 
 export const TAGS_LAYOUT = C_LAYOUTS.tags;
 export const TAG_OPTIONS_LAYOUT = C_LAYOUTS.tagOptions;
-export const EXTENDED_OPTIONS_LAYOUT = C_LAYOUTS.extendedOptions;
+export const OPTIONS_LAYOUT = C_LAYOUTS.options;
 
 // Shared module instance (loaded once across all test files)
 let cachedModule: WasmModule | null = null;
@@ -55,7 +54,7 @@ export function allocString(module: WasmModule, text: string): number {
 export interface TagOptionValues {
   posFilter?: number;
   excludeBasic?: boolean;
-  useLemma?: boolean;
+  useBaseForm?: boolean;
   minLength?: number;
   maxTags?: number;
   excludeParticles?: boolean;
@@ -71,7 +70,7 @@ export function allocTagOptions(module: WasmModule, opts: TagOptionValues = {}):
   const heapU8 = new Uint8Array(module.HEAPU32.buffer);
   heapU8[ptr + TAG_OPTIONS_LAYOUT.posFilter] = (opts.posFilter ?? 0) & 0xff;
   heapU8[ptr + TAG_OPTIONS_LAYOUT.excludeBasic] = opts.excludeBasic ? 1 : 0;
-  heapU8[ptr + TAG_OPTIONS_LAYOUT.useLemma] = opts.useLemma !== false ? 1 : 0;
+  heapU8[ptr + TAG_OPTIONS_LAYOUT.useBaseForm] = opts.useBaseForm !== false ? 1 : 0;
   module.HEAPU32[(ptr + TAG_OPTIONS_LAYOUT.minLength) >> 2] = opts.minLength ?? 2;
   module.HEAPU32[(ptr + TAG_OPTIONS_LAYOUT.maxTags) >> 2] = opts.maxTags ?? 0;
   heapU8[ptr + TAG_OPTIONS_LAYOUT.excludeParticles] = opts.excludeParticles !== false ? 1 : 0;
@@ -109,20 +108,26 @@ export function cApi(module: WasmModule): CApi {
   };
 }
 
-/** Call a `suzume_*_label` function; null when the code has no label. */
-export function nativeLabel(module: WasmModule, name: string, code: number): string | null {
-  const ptr = module.cwrap(name, 'number', ['number'])(code) as number;
-  return ptr === 0 ? null : module.UTF8ToString(ptr);
+/** Call a `suzume_*_label` function; the C ABI labels are total and never NULL. */
+export function nativeLabel(module: WasmModule, name: string, code: number): string {
+  return module.UTF8ToString(module.cwrap(name, 'number', ['number'])(code) as number);
+}
+
+/** Decode a label as the binding does: an empty native label means "absent". */
+function optionalLabel(module: WasmModule, name: string, code: number): string | null {
+  const label = nativeLabel(module, name, code);
+  return label === '' ? null : label;
 }
 
 export function parseMorphemes(module: WasmModule, resultPtr: number): ParsedMorpheme[] {
   return decodeAnalysisResult(
     module,
     resultPtr,
-    (code) => nativeLabel(module, 'suzume_conjugation_type_label', code),
-    (code) => nativeLabel(module, 'suzume_conjugation_form_label', code),
-    (code) => nativeLabel(module, 'suzume_extended_pos_label', code) ?? 'UNKNOWN',
-    posEnglish,
+    (code) => optionalLabel(module, 'suzume_conjugation_type_label', code),
+    (code) => optionalLabel(module, 'suzume_conjugation_form_label', code),
+    (code) => nativeLabel(module, 'suzume_extended_pos_label', code),
+    (code) => nativeLabel(module, 'suzume_pos_label', code),
+    (code) => nativeLabel(module, 'suzume_pos_label_ja', code),
   ).morphemes;
 }
 
@@ -165,7 +170,7 @@ export async function expectSuzumeError(
 }
 
 export function parseTags(module: WasmModule, tagsPtr: number): ParsedTag[] {
-  return decodeTags(module, tagsPtr, posEnglish);
+  return decodeTags(module, tagsPtr, (code) => nativeLabel(module, 'suzume_pos_label', code));
 }
 
 export function getTagCount(module: WasmModule, tagsPtr: number): number {

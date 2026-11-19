@@ -28,7 +28,7 @@ export const C_LAYOUTS = {
     size: 20,
     posFilter: 0,
     excludeBasic: 1,
-    useLemma: 2,
+    useBaseForm: 2,
     minLength: 4,
     maxTags: 8,
     excludeParticles: 12,
@@ -37,7 +37,7 @@ export const C_LAYOUTS = {
     excludeLowInfo: 15,
     removeDuplicates: 16,
   },
-  extendedOptions: {
+  options: {
     size: 20,
     preserveVu: 0,
     preserveCase: 1,
@@ -45,7 +45,7 @@ export const C_LAYOUTS = {
     mode: 3,
     lemmatize: 4,
     mergeCompounds: 5,
-    skipUserDictionary: 6,
+    skipBundledUserDictionary: 6,
     skipCoreDictionary: 7,
     reportScorerConfig: 8,
     skipEnvConfig: 9,

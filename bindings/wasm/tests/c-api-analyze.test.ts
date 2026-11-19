@@ -3,8 +3,8 @@ import {
   allocString,
   analyzeText,
   cApi,
-  EXTENDED_OPTIONS_LAYOUT,
   getModule,
+  OPTIONS_LAYOUT,
   parseMorphemes,
   type WasmModule,
 } from './helpers';
@@ -176,7 +176,7 @@ describe('C API: analyze', () => {
   });
 });
 
-describe('C API: create_with_extended_options', () => {
+describe('C API: create_with_options', () => {
   let module: WasmModule;
 
   beforeAll(async () => {
@@ -184,17 +184,17 @@ describe('C API: create_with_extended_options', () => {
   });
 
   it('keeps emoji as text-bearing OTHER when preserveSymbols is enabled', () => {
-    const initOptions = module.cwrap('suzume_init_extended_options', null, ['number']) as (
+    const initOptions = module.cwrap('suzume_init_options', null, ['number']) as (
       optionsPtr: number,
     ) => void;
-    const createWithOptions = module.cwrap('suzume_create_with_extended_options', 'number', [
-      'number',
-    ]) as (optionsPtr: number) => number;
+    const createWithOptions = module.cwrap('suzume_create_with_options', 'number', ['number']) as (
+      optionsPtr: number,
+    ) => number;
     const { destroy } = cApi(module);
 
-    const optionsPtr = module._malloc(EXTENDED_OPTIONS_LAYOUT.size);
+    const optionsPtr = module._malloc(OPTIONS_LAYOUT.size);
     initOptions(optionsPtr);
-    new Uint8Array(module.HEAPU32.buffer)[optionsPtr + EXTENDED_OPTIONS_LAYOUT.preserveSymbols] = 1;
+    new Uint8Array(module.HEAPU32.buffer)[optionsPtr + OPTIONS_LAYOUT.preserveSymbols] = 1;
     const h = createWithOptions(optionsPtr);
     module._free(optionsPtr);
     expect(h).toBeGreaterThan(0);

@@ -1,4 +1,4 @@
-import { MORPHEME_FLAG, posJapanese } from './abi_labels.js';
+import { MORPHEME_FLAG } from './abi_labels.js';
 import { C_LAYOUTS } from './abi_layout.js';
 import type { AnalysisResult, Morpheme, Tag } from './index.js';
 
@@ -30,6 +30,7 @@ export function decodeAnalysisResult(
   conjugationFormLabel: ConjugationFormLabel,
   extendedPosLabel: ExtendedPosLabel,
   posLabel: PosLabel,
+  posJapaneseLabel: PosLabel,
 ): AnalysisResult {
   const heapU32 = module.HEAPU32;
   const heapU8 = heapBytes(module);
@@ -64,7 +65,7 @@ export function decodeAnalysisResult(
       surface: decodeUtf8(heapU32.buffer, surfacePtr, surfaceSize),
       pos: posLabel(posCode),
       baseForm: decodeUtf8(heapU32.buffer, baseFormPtr, baseFormSize),
-      posJa: posJapanese(posCode),
+      posJa: posJapaneseLabel(posCode),
       conjType: conjugates
         ? conjugationTypeLabel(heapU8[morphPtr + morphemeLayout.conjugationType])
         : null,

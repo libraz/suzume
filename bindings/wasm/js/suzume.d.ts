@@ -17,8 +17,8 @@ export interface EmscriptenModule {
   _free: (ptr: number) => void;
   HEAPU32: Uint32Array;
   _suzume_create: () => number;
-  _suzume_init_extended_options: (optionsPtr: number) => void;
-  _suzume_create_with_extended_options: (optionsPtr: number) => number;
+  _suzume_init_options: (optionsPtr: number) => void;
+  _suzume_create_with_options: (optionsPtr: number) => number;
   _suzume_destroy: (handle: number) => void;
   _suzume_set_mode: (handle: number, mode: number) => number;
   _suzume_mode: (handle: number) => number;
@@ -40,9 +40,8 @@ export interface EmscriptenModule {
     optionsPtr: number,
   ) => number;
   _suzume_tags_free: (tagsPtr: number) => void;
-  _suzume_load_user_dict: (handle: number, dataPtr: number, size: number) => number;
-  _suzume_load_user_dict_count: (handle: number, dataPtr: number, size: number) => number;
-  _suzume_load_binary_dict: (handle: number, dataPtr: number, size: number) => number;
+  _suzume_load_user_dictionary: (handle: number, dataPtr: number, size: number) => number;
+  _suzume_load_binary_dictionary: (handle: number, dataPtr: number, size: number) => number;
   _suzume_clear_user_dictionaries: (handle: number) => number;
   _suzume_has_core_dictionary: (handle: number) => number;
   _suzume_version: () => number;
@@ -52,6 +51,7 @@ export interface EmscriptenModule {
   _suzume_extended_pos_label: (code: number) => number;
   _suzume_conjugation_form_label: (code: number) => number;
   _suzume_pos_label: (code: number) => number;
+  _suzume_pos_label_ja: (code: number) => number;
   _suzume_dictionary_warning_count: (handle: number) => number;
   _suzume_dictionary_warning: (handle: number, index: number) => number;
 }

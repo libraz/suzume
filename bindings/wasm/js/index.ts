@@ -432,6 +432,16 @@ const TAG_POS_FILTER_BITS: Readonly<Record<string, number>> = {
   auxiliary: 32,
 };
 
+// Byte offsets keyed by this binding's option names where they differ from the C field names.
+const OPTIONS_FIELD_OFFSETS = {
+  ...C_LAYOUTS.options,
+  skipUserDictionary: C_LAYOUTS.options.skipBundledUserDictionary,
+} as const;
+const TAG_OPTIONS_FIELD_OFFSETS = {
+  ...C_LAYOUTS.tagOptions,
+  useLemma: C_LAYOUTS.tagOptions.useBaseForm,
+} as const;
+
 /** Write each (already validated) boolean field as one heap byte, falling back to its default when unset. */
 function writeBoolFields<Field extends string>(
   heap: Uint8Array,
@@ -576,6 +586,7 @@ export class Suzume {
   private handle: number;
   private cleanupRef: CleanupRef;
   private readonly _posLabels = new Map<number, string>();
+  private readonly _posJapaneseLabels = new Map<number, string>();
   private readonly _conjugationTypeLabels = new Map<number, string | null>();
   private readonly _conjugationFormLabels = new Map<number, string | null>();
   private readonly _extendedPosLabels = new Map<number, string>();
@@ -617,7 +628,7 @@ export class Suzume {
         scorerJson !== null)
     ) {
       // Create with options
-      const layout = C_LAYOUTS.extendedOptions;
+      const layout = OPTIONS_FIELD_OFFSETS;
       const OPTIONS_SIZE = layout.size;
       const optionsPtr = module._malloc(OPTIONS_SIZE);
       let scorerOptionsPtr = 0;
@@ -626,7 +637,7 @@ export class Suzume {
         // _malloc hands back uninitialized heap, so seed the struct with the C
         // defaults before overriding fields. Every field below is written today,
         // but a field added to the C struct would otherwise be read as garbage.
-        module._suzume_init_extended_options(optionsPtr);
+        module._suzume_init_options(optionsPtr);
 
         const heap = heapBytes(module);
         heap[optionsPtr + layout.mode] = mode;
@@ -643,7 +654,7 @@ export class Suzume {
           module.HEAPU32[(optionsPtr + layout.scorerOptionsJson) >> 2] = scorerOptionsPtr;
         }
 
-        handle = module._suzume_create_with_extended_options(optionsPtr);
+        handle = module._suzume_create_with_options(optionsPtr);
       } finally {
         if (scorerOptionsPtr !== 0) {
           module._free(scorerOptionsPtr);
@@ -759,7 +770,7 @@ export class Suzume {
 
           const heapU32 = this.module.HEAPU32;
           const heapU8 = heapBytes(this.module);
-          const layout = C_LAYOUTS.tagOptions;
+          const layout = TAG_OPTIONS_FIELD_OFFSETS;
 
           heapU8[optionsPtr + layout.posFilter] = posFilter & 0xff;
           heapU32[(optionsPtr + layout.minLength) >> 2] = minLength;
@@ -809,7 +820,7 @@ export class Suzume {
       'dictionary',
       data,
       (dataPtr, dataByteLength) =>
-        this.module._suzume_load_user_dict_count(this.handle, dataPtr, dataByteLength),
+        this.module._suzume_load_user_dictionary(this.handle, dataPtr, dataByteLength),
     );
     if (installed === 0) {
       throw nativeError(this.module, 'load_user_dictionary');
@@ -821,11 +832,12 @@ export class Suzume {
    * Add a compiled binary dictionary (.dic) as a user dictionary.
    *
    * @param data - Binary dictionary bytes
+   * @returns The number of installed entries (always at least 1)
    * @throws {SuzumeError} DictionaryLoadFailed with the native text when the
    *   bytes cannot be loaded, InvalidInput for a non-Uint8Array, or after
    *   {@link destroy}
    */
-  loadBinaryDictionary(data: Uint8Array): void {
+  loadBinaryDictionary(data: Uint8Array): number {
     this.ensureAlive('load_binary_dictionary');
     if (!(data instanceof Uint8Array)) {
       throw invalidInput(
@@ -835,16 +847,17 @@ export class Suzume {
     }
 
     const dataPtr = this.module._malloc(data.byteLength);
-    let loaded: boolean;
+    let installed: number;
     try {
       heapBytes(this.module).set(data, dataPtr);
-      loaded = this.module._suzume_load_binary_dict(this.handle, dataPtr, data.byteLength) === 1;
+      installed = this.module._suzume_load_binary_dictionary(this.handle, dataPtr, data.byteLength);
     } finally {
       this.module._free(dataPtr);
     }
-    if (!loaded) {
+    if (installed === 0) {
       throw nativeError(this.module, 'load_binary_dictionary');
     }
+    return installed;
   }
 
   /**
@@ -963,11 +976,21 @@ export class Suzume {
       (code) => this.conjugationFormLabel(code),
       (code) => this.extendedPosLabel(code),
       (code) => this.posLabel(code),
+      (code) => this.posJapaneseLabel(code),
     );
   }
 
   private posLabel(code: number): string {
     return this.cachedLabel(this._posLabels, this.module._suzume_pos_label, code, 'OTHER');
+  }
+
+  private posJapaneseLabel(code: number): string {
+    return this.cachedLabel(
+      this._posJapaneseLabels,
+      this.module._suzume_pos_label_ja,
+      code,
+      'その他',
+    );
   }
 
   private conjugationTypeLabel(code: number): string | null {

@@ -173,7 +173,7 @@ describe('C API: generate_tags', () => {
       const heapU32 = module.HEAPU32;
       expect(heapU8[optionsPtr + TAG_OPTIONS_LAYOUT.posFilter]).toBe(0);
       expect(heapU8[optionsPtr + TAG_OPTIONS_LAYOUT.excludeBasic]).toBe(0);
-      expect(heapU8[optionsPtr + TAG_OPTIONS_LAYOUT.useLemma]).toBe(1);
+      expect(heapU8[optionsPtr + TAG_OPTIONS_LAYOUT.useBaseForm]).toBe(1);
       expect(heapU32[(optionsPtr + TAG_OPTIONS_LAYOUT.minLength) >> 2]).toBe(2);
       expect(heapU32[(optionsPtr + TAG_OPTIONS_LAYOUT.maxTags) >> 2]).toBe(0);
       expect(heapU8[optionsPtr + TAG_OPTIONS_LAYOUT.excludeParticles]).toBe(1);

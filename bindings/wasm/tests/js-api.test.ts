@@ -16,10 +16,10 @@ import {
   allocTagOptions,
   analyzeText,
   cApi,
-  EXTENDED_OPTIONS_LAYOUT,
   expectSuzumeError,
   getModule,
   nativeLabel,
+  OPTIONS_LAYOUT,
   parseTags,
   TAGS_LAYOUT,
   type WasmModule,
@@ -55,7 +55,7 @@ describe('JS API: struct layout compatibility', () => {
     expect(text(90)).toBe('AUX_卑罵');
     expect(text(91)).toBe('SUFFIX_気配');
     expect(text(92)).toBe('PART_選択');
-    expect(text(93)).toBeNull();
+    expect(text(93)).toBe('UNKNOWN');
   });
 
   it('labels every serialized conjugation code and rejects the next value', () => {
@@ -66,10 +66,18 @@ describe('JS API: struct layout compatibility', () => {
       code: number,
     ) => number;
     expect(module.UTF8ToString(typeLabel(17))).toBe('固有名詞・名');
-    expect(typeLabel(0)).toBe(0);
-    expect(typeLabel(18)).toBe(0);
+    expect(module.UTF8ToString(typeLabel(0))).toBe('');
+    expect(module.UTF8ToString(typeLabel(18))).toBe('');
+    expect(module.UTF8ToString(formLabel(0))).toBe('終止形');
     expect(module.UTF8ToString(formLabel(6))).toBe('意志形');
-    expect(formLabel(7)).toBe(0);
+    expect(module.UTF8ToString(formLabel(7))).toBe('');
+  });
+
+  it('labels POS codes in Japanese through the library, total like the English label', () => {
+    expect(nativeLabel(module, 'suzume_pos_label_ja', 1)).toBe('名詞');
+    expect(nativeLabel(module, 'suzume_pos_label_ja', 14)).toBe('その他');
+    expect(nativeLabel(module, 'suzume_pos_label_ja', 200)).toBe('その他');
+    expect(nativeLabel(module, 'suzume_pos_label', 200)).toBe('OTHER');
   });
 
   it('exports the complete C ABI surface required by the JS binding', () => {
@@ -80,7 +88,7 @@ describe('JS API: struct layout compatibility', () => {
       '_suzume_conjugation_form_label',
       '_suzume_conjugation_type_label',
       '_suzume_create',
-      '_suzume_create_with_extended_options',
+      '_suzume_create_with_options',
       '_suzume_destroy',
       '_suzume_mode',
       '_suzume_dictionary_warning',
@@ -91,26 +99,26 @@ describe('JS API: struct layout compatibility', () => {
       '_suzume_generate_tags_with_options_n',
       '_suzume_extended_pos_label',
       '_suzume_has_core_dictionary',
-      '_suzume_init_extended_options',
+      '_suzume_init_options',
       '_suzume_init_tag_options',
       '_suzume_last_error',
       '_suzume_last_error_code',
-      '_suzume_load_binary_dict',
-      '_suzume_load_user_dict',
-      '_suzume_load_user_dict_count',
+      '_suzume_load_binary_dictionary',
+      '_suzume_load_user_dictionary',
       '_suzume_result_free',
       '_suzume_set_mode',
-      '_suzume_sizeof_extended_options',
+      '_suzume_sizeof_options',
       '_suzume_sizeof_morpheme',
       '_suzume_sizeof_result',
       '_suzume_sizeof_tag_options',
       '_suzume_sizeof_tags',
-      '_suzume_offsetof_extended_options',
+      '_suzume_offsetof_options',
       '_suzume_offsetof_morpheme',
       '_suzume_offsetof_result',
       '_suzume_offsetof_tag_options',
       '_suzume_offsetof_tags',
       '_suzume_pos_label',
+      '_suzume_pos_label_ja',
       '_suzume_tags_free',
       '_suzume_version',
     ].sort();
@@ -133,7 +141,7 @@ describe('JS API: struct layout compatibility', () => {
       ['morpheme', C_LAYOUTS.morpheme],
       ['tags', C_LAYOUTS.tags],
       ['tag_options', C_LAYOUTS.tagOptions],
-      ['extended_options', C_LAYOUTS.extendedOptions],
+      ['options', C_LAYOUTS.options],
     ] as const;
     const fieldNames = [
       ['morphemes', 'count', 'normalizedText', 'normalizedTextSize'],
@@ -155,7 +163,7 @@ describe('JS API: struct layout compatibility', () => {
       [
         'posFilter',
         'excludeBasic',
-        'useLemma',
+        'useBaseForm',
         'minLength',
         'maxTags',
         'excludeParticles',
@@ -171,7 +179,7 @@ describe('JS API: struct layout compatibility', () => {
         'mode',
         'lemmatize',
         'mergeCompounds',
-        'skipUserDictionary',
+        'skipBundledUserDictionary',
         'skipCoreDictionary',
         'reportScorerConfig',
         'skipEnvConfig',
@@ -281,18 +289,18 @@ describe('JS API: struct layout compatibility', () => {
     tagsFree(tagsPtr);
   });
 
-  it('create_with_extended_options accepts split mode', () => {
-    const initOptions = module.cwrap('suzume_init_extended_options', null, ['number']) as (
+  it('create_with_options accepts split mode', () => {
+    const initOptions = module.cwrap('suzume_init_options', null, ['number']) as (
       optionsPtr: number,
     ) => void;
-    const createWithOptions = module.cwrap('suzume_create_with_extended_options', 'number', [
-      'number',
-    ]) as (optionsPtr: number) => number;
+    const createWithOptions = module.cwrap('suzume_create_with_options', 'number', ['number']) as (
+      optionsPtr: number,
+    ) => number;
     const { destroy } = cApi(module);
 
-    const optionsPtr = module._malloc(EXTENDED_OPTIONS_LAYOUT.size);
+    const optionsPtr = module._malloc(OPTIONS_LAYOUT.size);
     initOptions(optionsPtr);
-    new Uint8Array(module.HEAPU32.buffer)[optionsPtr + EXTENDED_OPTIONS_LAYOUT.mode] = 2;
+    new Uint8Array(module.HEAPU32.buffer)[optionsPtr + OPTIONS_LAYOUT.mode] = 2;
 
     const h = createWithOptions(optionsPtr);
     module._free(optionsPtr);
