@@ -291,15 +291,18 @@ TEST_F(SuzumeApiTest, CopulaContinuativeCellsCarryTheirOwnExtendedPos) {
   ASSERT_EQ(clause_final.size(), 2u);
   EXPECT_EQ(clause_final[1].surface, "で");
   EXPECT_EQ(clause_final[1].extended_pos, core::ExtendedPOS::AuxCopulaDaRenyokei);
+  EXPECT_EQ(clause_final[1].conj_form, grammar::ConjForm::Renyokei);
 
   const auto past = instance.analyze("学生だった");
   ASSERT_EQ(past.size(), 3u);
   EXPECT_EQ(past[1].surface, "だっ");
   EXPECT_EQ(past[1].extended_pos, core::ExtendedPOS::AuxCopulaDaRenyokei);
+  EXPECT_EQ(past[1].conj_form, grammar::ConjForm::Onbinkei);
 
   const auto terminal = instance.analyze("学生だ");
   ASSERT_EQ(terminal.size(), 2u);
   EXPECT_EQ(terminal[1].extended_pos, core::ExtendedPOS::AuxCopulaDa);
+  EXPECT_EQ(terminal[1].conj_form, grammar::ConjForm::Base);
 }
 
 TEST_F(SuzumeApiTest, DictionaryHomographsPreserveProductiveNominalBoundaries) {

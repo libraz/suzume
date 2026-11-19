@@ -51,6 +51,29 @@ ConjForm conjFormFromExtendedPos(core::ExtendedPOS extended_pos, core::ExtendedP
   }
 }
 
+namespace {
+
+struct CopulaDaCellSpelling {
+  std::string_view surface;
+  CopulaDaCell cell;
+};
+
+constexpr CopulaDaCellSpelling kCopulaDaCells[] = {
+    {"で", {core::ExtendedPOS::AuxCopulaDaRenyokei, ConjForm::Renyokei}},
+    {"だっ", {core::ExtendedPOS::AuxCopulaDaRenyokei, ConjForm::Onbinkei}},
+};
+
+}  // namespace
+
+CopulaDaCell copulaDaCell(std::string_view surface) {
+  for (const auto& spelling : kCopulaDaCells) {
+    if (spelling.surface == surface) {
+      return spelling.cell;
+    }
+  }
+  return {core::ExtendedPOS::AuxCopulaDa, ConjForm::Base};
+}
+
 Conjugation::Conjugation() = default;
 
 const std::array<Conjugation::GodanEntry, Conjugation::kGodanRowCount>& Conjugation::getGodanRows() {

@@ -88,6 +88,22 @@ ConjForm conjFormFromExtendedPos(core::ExtendedPOS extended_pos,
                                  core::ExtendedPOS next_extended_pos = core::ExtendedPOS::Unknown,
                                  std::string_view next_lemma = {});
 
+/// The extended POS and conjugation form of one cell of the copula だ.
+struct CopulaDaCell {
+  core::ExtendedPOS extended_pos;
+  ConjForm conj_form;
+};
+
+/**
+ * @brief Classify a cell of the copula だ by its surface.
+ *
+ * The continuative で (連用形) and its ta-connective onbin cell だっ (音便形, like
+ * the adjective's かっ) are AuxCopulaDaRenyokei; every other cell (だ, な, なら,
+ * だろ, ...) is AuxCopulaDa in the base form. Every site that tags a copula cell
+ * goes through this, so the cell table has one owner.
+ */
+CopulaDaCell copulaDaCell(std::string_view surface);
+
 static_assert(static_cast<uint8_t>(ConjForm::Base) == 0 && static_cast<uint8_t>(ConjForm::Mizenkei) == 1 &&
                   static_cast<uint8_t>(ConjForm::Renyokei) == 2 && static_cast<uint8_t>(ConjForm::Onbinkei) == 3 &&
                   static_cast<uint8_t>(ConjForm::Kateikei) == 4 && static_cast<uint8_t>(ConjForm::Meireikei) == 5 &&

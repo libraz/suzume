@@ -463,7 +463,7 @@ void resolveTearuAuxiliary(std::vector<core::Morpheme>& result) {
       continue;
     }
     aru.pos = core::PartOfSpeech::Auxiliary;
-    aru.extended_pos = core::detectCopulaDaForm(aru.surface);
+    aru.extended_pos = grammar::copulaDaCell(aru.surface).extended_pos;
     aru.conj_type = dictionary::ConjugationType::GodanRa;
     aru.conj_form = grammar::ConjForm::Renyokei;
   }

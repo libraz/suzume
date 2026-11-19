@@ -582,18 +582,6 @@ ExtendedPOS detectVerbForm(std::string_view surface, std::string_view suffix = {
  */
 ExtendedPOS detectAdjForm(std::string_view surface, bool is_na_adj = false);
 
-/**
- * @brief Detect the extended POS of a cell of the copula だ from its surface
- *
- * The continuative cells で and だっ are AuxCopulaDaRenyokei; every other cell
- * (だ, な, なら, だろ, ...) is AuxCopulaDa. Every site that tags a copula cell
- * goes through this, so the cell table has one owner.
- *
- * @param surface The copula cell surface
- * @return The extended POS of that cell
- */
-ExtendedPOS detectCopulaDaForm(std::string_view surface);
-
 }  // namespace suzume::core
 
 #endif  // SUZUME_CORE_TYPES_H_

@@ -15,6 +15,11 @@ grammar::ConjForm Lemmatizer::detectConjForm(std::string_view surface, std::stri
     return cell == core::ExtendedPOS::AdjStem ? grammar::ConjForm::Base : grammar::conjFormFromExtendedPos(cell);
   }
 
+  // A copula cell reports the form its own cell table assigns (で, だっ).
+  if (pos == core::PartOfSpeech::Auxiliary && core::isPlainCopulaType(extended_pos)) {
+    return grammar::copulaDaCell(surface).conj_form;
+  }
+
   // Otherwise only verbs and adjectives have conjugation forms
   if (pos != core::PartOfSpeech::Verb && pos != core::PartOfSpeech::Adjective) {
     return grammar::ConjForm::Base;
