@@ -1,0 +1,79 @@
+{
+  "cases": [
+    {
+      "description": "おきて - regression test",
+      "expected": [
+        {
+          "lemma": "おきる",
+          "pos": "Verb",
+          "surface": "おき"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "okite",
+      "input": "おきて"
+    },
+    {
+      "description": "すぐおきて - regression test",
+      "expected": [
+        {
+          "lemma": "すぐ",
+          "pos": "Adverb",
+          "surface": "すぐ"
+        },
+        {
+          "lemma": "おきる",
+          "pos": "Verb",
+          "surface": "おき"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        }
+      ],
+      "id": "suguokite",
+      "input": "すぐおきて"
+    },
+    {
+      "description": "おきても - regression test",
+      "expected": [
+        {
+          "lemma": "おきる",
+          "pos": "Verb",
+          "surface": "おき"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "も",
+          "pos": "Particle",
+          "surface": "も"
+        }
+      ],
+      "id": "okitemo",
+      "input": "おきても"
+    },
+    {
+      "description": "おきろ - regression test",
+      "expected": [
+        {
+          "lemma": "おきる",
+          "pos": "Verb",
+          "surface": "おきろ"
+        }
+      ],
+      "id": "okiro",
+      "input": "おきろ"
+    }
+  ],
+  "description": "verb_ichidan_misc tests",
+  "version": "1.0"
+}

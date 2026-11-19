@@ -28,6 +28,9 @@ std::string fixSpecialRaRowLemma(std::string_view lemma, const dictionary::Dicti
 std::string fixGodanRenyokeiBeforeLiteraryTe(std::string_view surface, std::string_view lemma,
                                              std::string_view next_surface,
                                              const dictionary::DictionaryManager* dict_manager);
+std::string resolveSharedKanaContinuative(std::string_view surface, std::string_view lemma,
+                                          std::string_view next_surface,
+                                          const dictionary::DictionaryManager* dict_manager);
 std::string fixIchidanRenyokeiBeforeTe(std::string_view surface, std::string_view lemma, std::string_view next_surface,
                                        const dictionary::DictionaryManager* dict_manager);
 std::string fixPotentialVerb(const core::Morpheme& morpheme);

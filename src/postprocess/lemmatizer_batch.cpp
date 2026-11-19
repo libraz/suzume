@@ -284,9 +284,13 @@ void fixRenyokeiBeforeTe(core::Morpheme& morpheme, const core::Morpheme* next2, 
   // so the modern onbin argument for an ichidan reading does not apply.
   const bool classical_te = next2 != nullptr && core::isClassicalAuxiliaryType(next2->extended_pos);
   if (morpheme.pos == core::PartOfSpeech::Verb && morpheme.extended_pos == core::ExtendedPOS::VerbRenyokei) {
-    if (std::string godan =
-            fixGodanRenyokeiBeforeLiteraryTe(morpheme.surface, morpheme.lemma, next_surface, dict_manager);
-        !godan.empty()) {
+    if (std::string shared =
+            resolveSharedKanaContinuative(morpheme.surface, morpheme.lemma, next_surface, dict_manager);
+        !shared.empty()) {
+      morpheme.lemma = shared;
+    } else if (std::string godan =
+                   fixGodanRenyokeiBeforeLiteraryTe(morpheme.surface, morpheme.lemma, next_surface, dict_manager);
+               !godan.empty()) {
       morpheme.lemma = godan;
     } else if (std::string ichidan = classical_te ? std::string()
                                                   : fixIchidanRenyokeiBeforeTe(morpheme.surface, morpheme.lemma,

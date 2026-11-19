@@ -800,6 +800,38 @@
       ],
       "id": "arukuruma",
       "input": "あるくるま"
+    },
+    {
+      "description": "かばんをおきました - auto-generated",
+      "expected": [
+        {
+          "lemma": "かばん",
+          "pos": "Noun",
+          "surface": "かばん"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "おく",
+          "pos": "Verb",
+          "surface": "おき"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "まし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "kabanwookimashita",
+      "input": "かばんをおきました"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 12/12)",

@@ -419,6 +419,30 @@ std::string fixGodanRenyokeiBeforeLiteraryTe(std::string_view surface, std::stri
   return hasExactVerbEntry(dict_manager, candidate) ? candidate : "";
 }
 
+// A kana continuative spelled by both a listed Ichidan and a listed Godan verb
+// (おき of おきる and おく) carries one dictionary reading, which is no
+// evidence. It is the Ichidan before a bare て/た, where the Godan takes its
+// onbin, and the Godan everywhere else, where both conjugate alike.
+std::string resolveSharedKanaContinuative(std::string_view surface, std::string_view lemma,
+                                          std::string_view next_surface,
+                                          const dictionary::DictionaryManager* dict_manager) {
+  if (dict_manager == nullptr || !grammar::isPureHiragana(surface)) {
+    return "";
+  }
+  const std::string_view godan_ending = grammar::godanBaseSuffixFromIRow(utf8::decodeLastChar(surface));
+  if (godan_ending.empty()) {
+    return "";
+  }
+  std::string ichidan_base = normalize::concat(surface, "る");
+  std::string godan_base = normalize::concat(utf8::dropLastChar(surface), godan_ending);
+  if ((lemma != ichidan_base && lemma != godan_base) || !hasExactVerbEntry(dict_manager, ichidan_base) ||
+      !hasExactVerbEntry(dict_manager, godan_base)) {
+    return "";
+  }
+  std::string resolved = utf8::equalsAny(next_surface, {"て", "た"}) ? ichidan_base : godan_base;
+  return resolved == lemma ? "" : resolved;
+}
+
 std::string fixIchidanRenyokeiBeforeTe(std::string_view surface, std::string_view lemma, std::string_view next_surface,
                                        const dictionary::DictionaryManager* dict_manager) {
   if (!utf8::equalsAny(next_surface, {"て", "た"}) || surface.size() < core::kJapaneseCharBytes) {
