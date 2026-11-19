@@ -1,9 +1,17 @@
 {
-  "description": "CLI flag matrix for check_binding_parity.py --cli: both CLIs run every case with every text and must agree on stdout, stderr and exit code after the program name is replaced with <prog>. Pairwise rows come from cli_flag_matrix.model.json; {text} is replaced by each text.",
+  "description": "CLI flag matrix for check_binding_parity.py --cli: both CLIs run every case with every text and must agree on stdout, stderr and exit code after the program name is replaced with <prog>. Pairwise rows come from cli_flag_matrix.model.json; {text} is replaced by each text. Help rows compare stdout after dropping, from the native output only, the lines that document a flag in help_exempt_flags (native-only developer flags); nothing else is masked. {non_utf8_source} is replaced by a temporary source dictionary whose bytes are not UTF-8.",
   "texts": [
     "ヴァイオリンとABCの東京で書かなかった。",
     "りんごを食べるりんごを食べる👨‍👩‍👧",
     "ｶﾀｶﾅとＡＢＣ１２３"
+  ],
+  "help_exempt_flags": [
+    "-V",
+    "--verbose",
+    "-VV",
+    "--very-verbose",
+    "--debug",
+    "--compare"
   ],
   "pairwise": [
     {
@@ -512,6 +520,310 @@
       "name": "no-input",
       "args": [],
       "stdin": "tty"
+    },
+    {
+      "name": "missing-value-dictionary-short-before-long-flag",
+      "args": [
+        "-d",
+        "--skip-env-config",
+        "東京"
+      ]
+    },
+    {
+      "name": "missing-value-dictionary-short-before-short-flag",
+      "args": [
+        "-d",
+        "-v",
+        "東京"
+      ]
+    },
+    {
+      "name": "missing-value-dictionary-short-at-end",
+      "args": [
+        "-d"
+      ]
+    },
+    {
+      "name": "missing-value-dictionary-long-before-long-flag",
+      "args": [
+        "--dictionary",
+        "--skip-env-config",
+        "東京"
+      ]
+    },
+    {
+      "name": "missing-value-dictionary-long-before-short-flag",
+      "args": [
+        "--dictionary",
+        "-v",
+        "東京"
+      ]
+    },
+    {
+      "name": "missing-value-dictionary-long-at-end",
+      "args": [
+        "--dictionary"
+      ]
+    },
+    {
+      "name": "missing-value-mode-short-before-long-flag",
+      "args": [
+        "-m",
+        "--skip-env-config",
+        "東京"
+      ]
+    },
+    {
+      "name": "missing-value-mode-short-before-short-flag",
+      "args": [
+        "-m",
+        "-v",
+        "東京"
+      ]
+    },
+    {
+      "name": "missing-value-mode-short-at-end",
+      "args": [
+        "-m"
+      ]
+    },
+    {
+      "name": "missing-value-mode-long-before-long-flag",
+      "args": [
+        "--mode",
+        "--skip-env-config",
+        "東京"
+      ]
+    },
+    {
+      "name": "missing-value-mode-long-before-short-flag",
+      "args": [
+        "--mode",
+        "-v",
+        "東京"
+      ]
+    },
+    {
+      "name": "missing-value-mode-long-at-end",
+      "args": [
+        "--mode"
+      ]
+    },
+    {
+      "name": "missing-value-format-short-before-long-flag",
+      "args": [
+        "-f",
+        "--skip-env-config",
+        "東京"
+      ]
+    },
+    {
+      "name": "missing-value-format-short-before-short-flag",
+      "args": [
+        "-f",
+        "-v",
+        "東京"
+      ]
+    },
+    {
+      "name": "missing-value-format-short-at-end",
+      "args": [
+        "-f"
+      ]
+    },
+    {
+      "name": "missing-value-format-long-before-long-flag",
+      "args": [
+        "--format",
+        "--skip-env-config",
+        "東京"
+      ]
+    },
+    {
+      "name": "missing-value-format-long-before-short-flag",
+      "args": [
+        "--format",
+        "-v",
+        "東京"
+      ]
+    },
+    {
+      "name": "missing-value-format-long-at-end",
+      "args": [
+        "--format"
+      ]
+    },
+    {
+      "name": "missing-value-tag-pos-filter-before-long-flag",
+      "args": [
+        "-f",
+        "tags",
+        "--tag-pos-filter",
+        "--skip-env-config",
+        "東京"
+      ]
+    },
+    {
+      "name": "missing-value-tag-pos-filter-before-short-flag",
+      "args": [
+        "-f",
+        "tags",
+        "--tag-pos-filter",
+        "-v",
+        "東京"
+      ]
+    },
+    {
+      "name": "missing-value-tag-pos-filter-at-end",
+      "args": [
+        "-f",
+        "tags",
+        "--tag-pos-filter"
+      ]
+    },
+    {
+      "name": "missing-value-tag-min-length-before-long-flag",
+      "args": [
+        "-f",
+        "tags",
+        "--tag-min-length",
+        "--skip-env-config",
+        "東京"
+      ]
+    },
+    {
+      "name": "missing-value-tag-min-length-before-short-flag",
+      "args": [
+        "-f",
+        "tags",
+        "--tag-min-length",
+        "-v",
+        "東京"
+      ]
+    },
+    {
+      "name": "missing-value-tag-min-length-at-end",
+      "args": [
+        "-f",
+        "tags",
+        "--tag-min-length"
+      ]
+    },
+    {
+      "name": "missing-value-tag-max-tags-before-long-flag",
+      "args": [
+        "-f",
+        "tags",
+        "--tag-max-tags",
+        "--skip-env-config",
+        "東京"
+      ]
+    },
+    {
+      "name": "missing-value-tag-max-tags-before-short-flag",
+      "args": [
+        "-f",
+        "tags",
+        "--tag-max-tags",
+        "-v",
+        "東京"
+      ]
+    },
+    {
+      "name": "missing-value-tag-max-tags-at-end",
+      "args": [
+        "-f",
+        "tags",
+        "--tag-max-tags"
+      ]
+    },
+    {
+      "name": "missing-value-mode-before-mode",
+      "args": [
+        "-m",
+        "--mode",
+        "東京"
+      ]
+    },
+    {
+      "name": "missing-value-tag-min-length-negative",
+      "args": [
+        "-f",
+        "tags",
+        "--tag-min-length",
+        "-1",
+        "東京"
+      ]
+    },
+    {
+      "name": "missing-value-tag-max-tags-negative",
+      "args": [
+        "-f",
+        "tags",
+        "--tag-max-tags",
+        "-1",
+        "東京"
+      ]
+    },
+    {
+      "name": "single-dash-is-a-value",
+      "args": [
+        "-m",
+        "-",
+        "東京"
+      ]
+    },
+    {
+      "name": "range-tag-min-length",
+      "args": [
+        "-f",
+        "tags",
+        "--tag-min-length",
+        "5000000000",
+        "東京"
+      ]
+    },
+    {
+      "name": "range-tag-min-length-attached",
+      "args": [
+        "-f",
+        "tags",
+        "--tag-min-length=5000000000",
+        "東京"
+      ]
+    },
+    {
+      "name": "range-tag-max-tags",
+      "args": [
+        "-f",
+        "tags",
+        "--tag-max-tags",
+        "5000000000",
+        "東京"
+      ]
+    },
+    {
+      "name": "non-utf8-source-dictionary",
+      "args": [
+        "-d",
+        "{non_utf8_source}",
+        "東京"
+      ]
+    },
+    {
+      "name": "usage-analyze-unknown-flag",
+      "args": [
+        "analyze",
+        "--unknown-flag",
+        "東京"
+      ]
+    },
+    {
+      "name": "usage-version-unknown-flag",
+      "args": [
+        "version",
+        "--unknown-flag"
+      ]
     }
   ],
   "extra": [
@@ -560,6 +872,34 @@
       "name": "empty-stdin",
       "args": [],
       "stdin": ""
+    }
+  ],
+  "help": [
+    {
+      "name": "help-long",
+      "args": [
+        "--help"
+      ]
+    },
+    {
+      "name": "help-short",
+      "args": [
+        "-h"
+      ]
+    },
+    {
+      "name": "analyze-help-long",
+      "args": [
+        "analyze",
+        "--help"
+      ]
+    },
+    {
+      "name": "analyze-help-short",
+      "args": [
+        "analyze",
+        "-h"
+      ]
     }
   ]
 }

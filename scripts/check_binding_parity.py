@@ -16,6 +16,7 @@ import pty
 import re
 import subprocess
 import sys
+import tempfile
 from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
@@ -419,27 +420,46 @@ def _run_cli(program: str, executable: Path, args: list[str], stdin: str | None)
     return pattern.sub("<prog>", completed.stdout), pattern.sub("<prog>", completed.stderr), completed.returncode
 
 
+def _without_exempt_help_lines(stdout: str, exempt_flags: set[str]) -> str:
+    """Drop the help lines that document a native-only developer flag, and nothing else."""
+    return "".join(
+        line
+        for line in stdout.splitlines(keepends=True)
+        if re.split(r"[,\s]", line.strip(), maxsplit=1)[0] not in exempt_flags
+    )
+
+
 def check_cli_parity() -> None:
     matrix = json.loads(CLI_MATRIX.read_text())
-    cases = [*matrix["pairwise"], *matrix["negative"], *matrix["extra"]]
+    exempt_flags = set(matrix["help_exempt_flags"])
+    help_names = {case["name"] for case in matrix["help"]}
+    cases = [*matrix["pairwise"], *matrix["negative"], *matrix["extra"], *matrix["help"]]
     runs = 0
     mismatches: list[str] = []
-    for case in cases:
-        uses_text = "{text}" in case["args"] or case.get("stdin") == "{text}"
-        for text in matrix["texts"] if uses_text else [None]:
-            args = [text if arg == "{text}" and text is not None else arg for arg in case["args"]]
-            stdin = case.get("stdin")
-            if stdin == "{text}":
-                stdin = text
-            native = _run_cli("native", NATIVE_CLI, args, stdin)
-            python = _run_cli("python", PYTHON_CLI, args, stdin)
-            runs += 1
-            if native != python:
-                mismatches.append(
-                    f"{case['name']} {args!r} stdin={stdin!r}\n"
-                    f"  native exit {native[2]}: stdout={native[0]!r} stderr={native[1]!r}\n"
-                    f"  python exit {python[2]}: stdout={python[0]!r} stderr={python[1]!r}"
-                )
+    with tempfile.TemporaryDirectory() as scratch:
+        non_utf8_source = Path(scratch) / "non_utf8.tsv"
+        non_utf8_source.write_bytes(b"\xe6\x9d\xb1\xff\tNOUN\n")
+        placeholders = {"{non_utf8_source}": str(non_utf8_source)}
+        for case in cases:
+            uses_text = "{text}" in case["args"] or case.get("stdin") == "{text}"
+            for text in matrix["texts"] if uses_text else [None]:
+                args = [
+                    text if arg == "{text}" and text is not None else placeholders.get(arg, arg) for arg in case["args"]
+                ]
+                stdin = case.get("stdin")
+                if stdin == "{text}":
+                    stdin = text
+                native = _run_cli("native", NATIVE_CLI, args, stdin)
+                python = _run_cli("python", PYTHON_CLI, args, stdin)
+                if case["name"] in help_names:
+                    native = (_without_exempt_help_lines(native[0], exempt_flags), *native[1:])
+                runs += 1
+                if native != python:
+                    mismatches.append(
+                        f"{case['name']} {args!r} stdin={stdin!r}\n"
+                        f"  native exit {native[2]}: stdout={native[0]!r} stderr={native[1]!r}\n"
+                        f"  python exit {python[2]}: stdout={python[0]!r} stderr={python[1]!r}"
+                    )
     if mismatches:
         raise AssertionError(f"{len(mismatches)} of {runs} CLI runs differ:\n" + "\n".join(mismatches))
     print(f"CLI parity passed: {len(cases)} cases, {runs} runs, native and Python CLIs agree")
