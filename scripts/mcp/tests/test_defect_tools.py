@@ -209,23 +209,33 @@ class TestDefectUpdate:
     def test_kind_can_be_corrected_after_triage(self, store, engine):
         file_record(text="a", expected="a b", suzume="ab", kind="tokenizer")
 
-        result = parse_json(run(defect_update(id=1, kind="oracle")))
+        result = parse_json(run(defect_update(id=1, kind="oracle", corrected="a b")))
 
         assert result["record"]["kind"] == "oracle"
+        assert result["record"]["corrected"] == "a b"
         assert bug_store.load_open("defect")[0]["kind"] == "oracle"
+
+    def test_turning_a_record_oracle_side_needs_a_corrected_reading(self, store, engine):
+        file_record(text="a", expected="a b", suzume="ab", kind="tokenizer")
+
+        result = parse_json(run(defect_update(id=1, kind="oracle")))
+
+        assert result["status"] == "error"
+        assert "corrected" in result["message"]
+        assert bug_store.load_open("defect")[0]["kind"] == "tokenizer"
+
+    def test_a_malformed_corrected_reading_is_rejected(self, store, engine):
+        file_record(text="a", expected="a b", suzume="ab")
+        assert parse_json(run(defect_update(id=1, corrected="a|NOUNISH")))["status"] == "error"
 
     def test_an_unknown_kind_is_rejected(self, store, engine):
         file_record(text="a", expected="a b", suzume="ab")
         assert parse_json(run(defect_update(id=1, kind="unknown")))["status"] == "error"
 
-    def test_expected_change_recomputes_derived_fields_unless_forced(self, store, engine):
+    def test_the_filing_oracle_is_not_editable(self, store, engine):
         file_record(text="a", expected="a b", suzume="ab")
-
-        result = parse_json(run(defect_update(id=1, expected="ab")))
-
-        assert result["record"]["diff_type"] == "match"
-        assert result["record"]["check"] == "manual"
-        assert (store / "0001_match.json").is_file()
+        with pytest.raises(TypeError):
+            run(defect_update(id=1, expected="ab"))
 
 
 # ============================================================================
@@ -783,7 +793,7 @@ class TestDefectYield:
 
 class TestKind:
     def test_the_side_at_fault_is_recorded(self, store, engine):
-        result = parse_json(run(defect_add(text="a", expected="a b", suzume="ab", kind="oracle")))
+        result = parse_json(run(defect_add(text="a", expected="a b", suzume="ab", kind="oracle", corrected="ab")))
         assert result["kind"] == "oracle"
         assert bug_store.load_open("defect")[0]["kind"] == "oracle"
 
@@ -793,15 +803,15 @@ class TestKind:
 
     def test_records_can_be_listed_by_side(self, store, engine):
         file_record(text="a", expected="a b", suzume="ab")
-        file_record(text="b", expected="c d", suzume="cd", kind="oracle")
+        file_record(text="b", expected="c d", suzume="cd", kind="oracle", corrected=[{"surface": "cd"}])
 
         result = parse_json(run(defect_list(kind="oracle")))
 
         assert result["matched"] == 1
         assert result["records"][0]["kind"] == "oracle"
 
-    def test_the_side_does_not_change_how_a_record_is_closed(self, store, engine):
-        file_record(text="直った", expected="直 った", suzume="直った", kind="oracle")
+    def test_a_tokenizer_record_still_closes_on_the_oracle_surfaces(self, store, engine):
+        file_record(text="直った", expected="直 った", suzume="直った", kind="tokenizer")
         engine["oracle"]["直った"] = "直 った"
         engine["cli"]["直った"] = "直 った"
 
@@ -844,3 +854,114 @@ class TestListStatus:
 
         assert result["matched"] == 1
         assert result["records"][0]["text"] == "a"
+
+
+# ============================================================================
+# Oracle-side records close against their corrected reading
+# ============================================================================
+
+
+def tokens(spec):
+    """Full tokens from the same surface|POS|lemma form the tools accept."""
+    return bug_store.parse_corrected(spec)
+
+
+def file_oracle_record(text, kind, corrected, expected, suzume):
+    return file_record(
+        text=text, expected=expected, suzume=suzume, kind=kind, corrected=bug_store.parse_corrected(corrected)
+    )
+
+
+class TestCorrectedReading:
+    def test_defect_add_requires_a_reading_for_an_oracle_side_record(self, store, engine):
+        result = parse_json(run(defect_add(text="ab", expected="ab", suzume="a b", kind="oracle")))
+        assert result["status"] == "error"
+        assert "corrected" in result["message"]
+        assert bug_store.load_open("defect") == []
+
+    def test_defect_add_stores_the_reading(self, store, engine):
+        result = parse_json(
+            run(defect_add(text="ab", expected="ab", suzume="a b", kind="both", corrected="a|Noun b|Particle"))
+        )
+        assert result["status"] == "ok"
+        assert result["corrected"] == "a|Noun|a b|Particle|b"
+        assert bug_store.load_open("defect")[0]["corrected"][1] == {"surface": "b", "pos": "Particle", "lemma": "b"}
+
+    def test_defect_add_rejects_a_malformed_reading(self, store, engine):
+        result = parse_json(run(defect_add(text="ab", expected="ab", suzume="a b", kind="oracle", corrected="a|X")))
+        assert result["status"] == "error"
+
+    def test_an_oracle_record_closes_once_the_oracle_matches_whatever_suzume_says(self, store, engine):
+        file_oracle_record("ab", "oracle", "a|Noun b|Particle", expected="ab", suzume="ab")
+        engine["oracle_tokens"]["ab"] = tokens("a|Noun b|Particle")
+        engine["cli"]["ab"] = "ab"  # an unrelated tokenizer limit
+
+        result = parse_json(run(defect_recheck()))
+
+        assert result["counts"] == {"resolved": 1}
+
+    def test_a_both_record_needs_suzume_to_match_as_well(self, store, engine):
+        file_oracle_record("ab", "both", "a|Noun b|Particle", expected="a b", suzume="abc")
+        engine["oracle_tokens"]["ab"] = tokens("a|Noun b|Particle")
+        engine["cli"]["ab"] = "abc"
+
+        info = parse_json(run(defect_get(ids="1")))["records"][0]
+
+        assert info["state"] == "open"
+        assert info["remaining"] == ["tokenizer"]
+
+        engine["cli_tokens"]["ab"] = tokens("a|Noun b|Particle")
+        assert parse_json(run(defect_recheck()))["counts"] == {"resolved": 1}
+
+    def test_a_full_reading_is_compared_on_pos_and_lemma(self, store, engine):
+        file_oracle_record("ab", "oracle", "a|Noun b|Particle", expected="a b", suzume="a b")
+        engine["oracle_tokens"]["ab"] = tokens("a|Noun b|Auxiliary")
+
+        info = parse_json(run(defect_get(ids="1")))["records"][0]
+
+        assert info["state"] == "open"
+        assert info["remaining"] == ["oracle"]
+
+    def test_a_surface_only_reading_is_compared_on_surfaces(self, store, engine):
+        file_oracle_record("ab", "oracle", "a b", expected="ab", suzume="a b")
+        engine["oracle_tokens"]["ab"] = tokens("a|Noun b|Auxiliary")
+        assert parse_json(run(defect_recheck()))["counts"] == {"resolved": 1}
+
+    def test_check_manual_does_not_hold_back_an_oracle_record(self, store, engine):
+        file_oracle_record("ab", "oracle", "a|Noun b|Particle", expected="a b", suzume="a b")
+        assert bug_store.load_open("defect")[0]["check"] == "manual"
+        engine["oracle_tokens"]["ab"] = tokens("a|Noun b|Particle")
+        assert parse_json(run(defect_recheck()))["counts"] == {"resolved": 1}
+
+    def test_an_oracle_record_is_stale_once_the_oracle_moved_from_its_filing_output(self, store, engine):
+        file_oracle_record("abc", "oracle", "a b c", expected="abc", suzume="a b c")
+        engine["oracle"]["abc"] = "ab c"
+        assert parse_json(run(defect_recheck()))["counts"] == {"stale": 1}
+
+    def test_a_record_without_a_reading_is_never_closed(self, store, engine):
+        store.mkdir(parents=True)
+        (store / "0001_over-split.json").write_text(
+            '{"id": 1, "text": "ab", "expected": "ab", "suzume": "a b", "kind": "oracle"}', encoding="utf-8"
+        )
+        engine["oracle"]["ab"] = "a b"
+        engine["cli"]["ab"] = "a b"
+
+        assert parse_json(run(defect_recheck(apply=True)))["counts"] == {"needs-corrected": 1}
+        refused = parse_json(run(defect_resolve(ids="1")))["refused"][0]
+        assert refused["state"] == "needs-corrected"
+        assert "defect_update" in refused["reason"]
+        assert len(bug_store.load_open("defect")) == 1
+
+    def test_resolve_closes_an_oracle_record_whose_oracle_now_matches(self, store, engine):
+        file_oracle_record("ab", "oracle", "a b", expected="ab", suzume="a b")
+        engine["oracle"]["ab"] = "a b"
+        result = parse_json(run(defect_resolve(ids="1")))
+        assert [row["id"] for row in result["resolved"]] == [1]
+
+    def test_the_report_names_the_needs_corrected_state(self, store, engine):
+        store.mkdir(parents=True)
+        (store / "0001_over-split.json").write_text(
+            '{"id": 1, "text": "ab", "expected": "ab", "suzume": "a b", "kind": "oracle"}', encoding="utf-8"
+        )
+        report = parse_json(run(defect_report()))["report"]
+        assert "| needs-corrected | 1 | #1 |" in report

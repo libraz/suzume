@@ -54,6 +54,8 @@ def _entry(record: dict, compact: bool = True) -> dict:
         "check": record.get("check", ""),
         "status": record.get("status", "open"),
     }
+    if record.get("corrected"):
+        entry["corrected"] = bug_store.format_corrected(record["corrected"])
     for key in ("priority", "pattern"):
         if record.get(key):
             entry[key] = record[key]

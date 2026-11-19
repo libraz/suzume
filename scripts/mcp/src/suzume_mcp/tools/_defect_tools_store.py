@@ -140,7 +140,7 @@ async def defect_update(
     priority: str = "",
     kind: str = "",
     check: str = "",
-    expected: str = "",
+    corrected: str = "",
 ) -> str:
     """Amend an open record. `id` and `text` are immutable.
 
@@ -152,7 +152,10 @@ async def defect_update(
         priority: high / medium / low.
         kind: tokenizer / oracle / both.
         check: "surface" or "manual" — force the resolution mode.
-        expected: Corrected expected tokenization.
+        corrected: The reading the oracle should give, as space-separated
+            ``surface|POS|lemma`` tokens (lemma defaults to the surface), or bare
+            surfaces to constrain surfaces only. Required before kind becomes
+            oracle or both; those records close against it.
     """
     record = bug_store.load_one(source, id, include_resolved=False)
     if record is None:
@@ -163,18 +166,20 @@ async def defect_update(
     if check and check not in (bug_store.CHECK_SURFACE, bug_store.CHECK_MANUAL):
         return json_error('check must be "surface" or "manual"')
 
-    changes = {
-        "pattern": pattern or None,
-        "description": description or None,
-        "priority": priority.lower() if priority else None,
-        "kind": kind or None,
-        "check": check or None,
-        "expected": bug_store.canonical_tokens(expected) if expected else None,
-    }
-    if not any(value is not None for value in changes.values()):
-        return json_error("No fields to update")
-
-    updated = bug_store.update(source, record, changes)
+    try:
+        changes = {
+            "pattern": pattern or None,
+            "description": description or None,
+            "priority": priority.lower() if priority else None,
+            "kind": kind or None,
+            "check": check or None,
+            "corrected": bug_store.parse_corrected(corrected) if corrected else None,
+        }
+        if not any(value is not None for value in changes.values()):
+            return json_error("No fields to update")
+        updated = bug_store.update(source, record, changes)
+    except bug_store.BugStoreError as exc:
+        return json_error(str(exc))
     return _json_result({"status": "ok", "record": _entry(updated, compact=False)})
 
 

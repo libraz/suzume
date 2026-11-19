@@ -15,6 +15,9 @@ def store(tmp_path, monkeypatch):
     return path
 
 
+ORACLE_READING = [{"surface": "ab"}]
+
+
 def make(store_name="defect", **kwargs):
     params = {
         "text": "テスト文",
@@ -340,7 +343,7 @@ class TestKind:
         assert make(text="a", expected="a b", suzume="ab")["kind"] == bug_store.KIND_TOKENIZER
 
     def test_an_oracle_defect_is_recorded_as_such(self, store):
-        record = make(text="a", expected="a b", suzume="ab", kind=bug_store.KIND_ORACLE)
+        record = make(text="a", expected="a b", suzume="ab", kind=bug_store.KIND_ORACLE, corrected=ORACLE_READING)
         assert record["kind"] == bug_store.KIND_ORACLE
         assert bug_store.load_open("defect")[0]["kind"] == bug_store.KIND_ORACLE
 
@@ -354,7 +357,7 @@ class TestKind:
 
     def test_the_summary_counts_each_side(self, store):
         make(text="a", expected="a b", suzume="ab")
-        make(text="b", expected="c d", suzume="cd", kind=bug_store.KIND_ORACLE)
+        make(text="b", expected="c d", suzume="cd", kind=bug_store.KIND_ORACLE, corrected=ORACLE_READING)
         summary = bug_store.summarize(bug_store.load_open("defect"))
         assert summary["kinds"] == {"oracle": 1, "tokenizer": 1}
 
@@ -469,7 +472,14 @@ class TestYieldByPattern:
         assert bug_store.yield_by_pattern([], []) == {}
 
     def test_the_oracle_side_is_visible_per_family(self, store):
-        make(text="a", expected="a b", suzume="ab", pattern="literary", kind=bug_store.KIND_ORACLE)
+        make(
+            text="a",
+            expected="a b",
+            suzume="ab",
+            pattern="literary",
+            kind=bug_store.KIND_ORACLE,
+            corrected=ORACLE_READING,
+        )
         families = bug_store.yield_by_pattern(bug_store.load_open("defect"), [])
         assert families["literary"]["kinds"] == {"oracle": 1}
 
@@ -486,7 +496,7 @@ class TestYieldByPattern:
 class TestReportKind:
     def test_oracle_records_get_their_own_section(self, store):
         make(text="a", expected="a b", suzume="ab", pattern="p1")
-        make(text="b", expected="c d", suzume="cd", pattern="p2", kind=bug_store.KIND_ORACLE)
+        make(text="b", expected="c d", suzume="cd", pattern="p2", kind=bug_store.KIND_ORACLE, corrected=ORACLE_READING)
         report = bug_store.render_report("defect", bug_store.load_open("defect"), {}, 0, "2026-07-28")
         assert "## Oracle-side records" in report
         assert "| kind | oracle 1 / tokenizer 1 |" in report
@@ -497,9 +507,98 @@ class TestReportKind:
         assert "Oracle-side records" not in report
 
     def test_output_stays_deterministic_with_kinds(self, store):
-        make(text="a", expected="a b", suzume="ab", pattern="p1", kind=bug_store.KIND_ORACLE)
+        make(text="a", expected="a b", suzume="ab", pattern="p1", kind=bug_store.KIND_ORACLE, corrected=ORACLE_READING)
         make(text="b", expected="c d", suzume="cd", pattern="p0")
         records = bug_store.load_open("defect")
         first = bug_store.render_report("defect", records, {}, 0, "2026-07-28")
         second = bug_store.render_report("defect", list(reversed(records)), {}, 0, "2026-07-28")
         assert first == second
+
+
+# ============================================================================
+# Corrected reading: the ground truth an oracle-side record closes against
+# ============================================================================
+
+
+class TestParseCorrected:
+    def test_a_full_reading_carries_pos_and_lemma(self):
+        assert bug_store.parse_corrected("よい|Adjective はなし|Noun|はなし です|Auxiliary|です") == [
+            {"surface": "よい", "pos": "Adjective", "lemma": "よい"},
+            {"surface": "はなし", "pos": "Noun", "lemma": "はなし"},
+            {"surface": "です", "pos": "Auxiliary", "lemma": "です"},
+        ]
+
+    def test_an_omitted_lemma_stands_for_the_surface(self):
+        assert bug_store.parse_corrected("行っ|Verb|行く た|Auxiliary")[1]["lemma"] == "た"
+
+    def test_a_surface_only_reading_is_valid(self):
+        assert bug_store.parse_corrected("これ は ちゅうしゃ だ") == [
+            {"surface": "これ"},
+            {"surface": "は"},
+            {"surface": "ちゅうしゃ"},
+            {"surface": "だ"},
+        ]
+
+    @pytest.mark.parametrize(
+        "raw",
+        [
+            "",
+            "   ",
+            "よい|Adjective はなし",  # mixes full tokens with surface-only ones
+            "よい|ADJ",  # not a canonical POS
+            "よい|Adjective|よい|extra",
+            "|Noun",
+        ],
+    )
+    def test_malformed_readings_are_rejected(self, raw):
+        with pytest.raises(bug_store.BugStoreError):
+            bug_store.parse_corrected(raw)
+
+    @pytest.mark.parametrize("raw", ["よい|Adjective|よい はなし|Noun|はなし", "これ は ちゅうしゃ"])
+    def test_format_round_trips(self, raw):
+        assert bug_store.format_corrected(bug_store.parse_corrected(raw)) == raw
+
+
+class TestCorrectedOnRecords:
+    @pytest.mark.parametrize("kind", [bug_store.KIND_ORACLE, bug_store.KIND_BOTH])
+    def test_an_oracle_side_record_requires_a_corrected_reading(self, store, kind):
+        with pytest.raises(bug_store.BugStoreError, match="corrected"):
+            make(text="a", expected="a b", suzume="ab", kind=kind)
+
+    def test_the_reading_is_persisted(self, store):
+        reading = bug_store.parse_corrected("a|Noun b|Particle")
+        make(text="a", expected="ab", suzume="ab", kind=bug_store.KIND_ORACLE, corrected=reading)
+        assert bug_store.load_open("defect")[0]["corrected"] == [
+            {"surface": "a", "pos": "Noun", "lemma": "a"},
+            {"surface": "b", "pos": "Particle", "lemma": "b"},
+        ]
+
+    def test_a_tokenizer_record_needs_none(self, store):
+        assert "corrected" not in make(text="a", expected="a b", suzume="ab")
+
+    def test_turning_a_record_oracle_side_without_a_reading_is_refused(self, store):
+        record = make(text="a", expected="a b", suzume="ab")
+        with pytest.raises(bug_store.BugStoreError, match="corrected"):
+            bug_store.update("defect", record, {"kind": bug_store.KIND_ORACLE})
+        assert bug_store.load_open("defect")[0]["kind"] == bug_store.KIND_TOKENIZER
+
+    def test_a_reading_can_be_added_with_the_kind(self, store):
+        record = make(text="a", expected="a b", suzume="ab")
+        bug_store.update("defect", record, {"kind": bug_store.KIND_BOTH, "corrected": ORACLE_READING})
+        reloaded = bug_store.load_open("defect")[0]
+        assert (reloaded["kind"], reloaded["corrected"]) == (bug_store.KIND_BOTH, ORACLE_READING)
+
+    def test_a_stored_record_without_a_reading_still_loads(self, store):
+        store.mkdir(parents=True)
+        (store / "0004_over-split.json").write_text(
+            json.dumps({"id": 4, "text": "x", "expected": "a b", "suzume": "ab", "kind": "oracle"}),
+            encoding="utf-8",
+        )
+        assert "corrected" not in bug_store.load_open("defect")[0]
+
+    def test_the_report_shows_the_reading(self, store):
+        reading = bug_store.parse_corrected("a|Noun b|Particle")
+        make(text="ab", expected="ab", suzume="a b", kind=bug_store.KIND_ORACLE, corrected=reading)
+        report = bug_store.render_report("defect", bug_store.load_open("defect"), {}, 0, "2026-07-28")
+        assert "| corrected |" in report
+        assert "a\\|Noun\\|a b\\|Particle\\|b" in report

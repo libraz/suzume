@@ -16,6 +16,7 @@ import shutil
 from pathlib import Path
 
 from ..config import PROJECT_ROOT
+from .constants_pos import VALID_POS
 from .diff_utils import classify_surface_diff
 from .file_utils import atomic_write_text
 
@@ -52,6 +53,7 @@ _FIELD_ORDER = (
     "text",
     "expected",
     "suzume",
+    "corrected",
     "diff_type",
     "kind",
     "check",
@@ -75,13 +77,17 @@ PRIORITIES = ("high", "medium", "low")
 CHECK_SURFACE = "surface"
 CHECK_MANUAL = "manual"
 
-# Which side of the comparison is wrong. `expected` is the oracle's output and
-# `suzume` is the tokenizer's, so `kind` says which of the two to believe --
-# nothing else in the record needs to change.
+# Which side of the comparison is wrong. `expected` is the oracle's surfaces and
+# `suzume` the tokenizer's, both as filed. When the oracle is wrong neither holds
+# the right answer, so an oracle-side record carries it in `corrected`.
 KIND_TOKENIZER = "tokenizer"  # Suzume violates the specification; fix src/
 KIND_ORACLE = "oracle"  # the normalization pipeline is wrong; fix core/
 KIND_BOTH = "both"
 KINDS = (KIND_TOKENIZER, KIND_ORACLE, KIND_BOTH)
+CORRECTED_KINDS = (KIND_ORACLE, KIND_BOTH)
+
+# Separator inside one `corrected` token: surface|POS|lemma.
+CORRECTED_FIELD_SEPARATOR = "|"
 
 # Why a closed record was closed. Only `fixed` can resurface: the others record
 # a judgment about the language, which a code change does not invalidate.
@@ -147,6 +153,46 @@ def detect_check(expected: str, suzume: str) -> str:
     if normalize_tokens(expected) == normalize_tokens(suzume):
         return CHECK_MANUAL
     return CHECK_SURFACE
+
+
+def parse_corrected(text: str) -> list[dict]:
+    """Parse a corrected reading written as space-separated ``surface|POS|lemma`` tokens.
+
+    Either every token names its POS (lemma defaults to the surface), or none
+    does and the reading constrains surfaces only.
+    """
+    reading: list[dict] = []
+    for raw in (text or "").split():
+        parts = raw.split(CORRECTED_FIELD_SEPARATOR)
+        if len(parts) > 3 or not parts[0]:
+            raise BugStoreError(f"corrected token {raw!r} must be surface, surface|POS or surface|POS|lemma")
+        token = {"surface": parts[0]}
+        if len(parts) > 1:
+            if parts[1] not in VALID_POS:
+                raise BugStoreError(f"corrected token {raw!r}: POS must be one of {', '.join(sorted(VALID_POS))}")
+            token["pos"] = parts[1]
+            token["lemma"] = (parts[2] if len(parts) == 3 else "") or parts[0]
+        reading.append(token)
+    if not reading:
+        raise BugStoreError("corrected is empty")
+    if len({"pos" in token for token in reading}) > 1:
+        raise BugStoreError("corrected must give a POS for every token or for none")
+    return reading
+
+
+def format_corrected(reading: list[dict]) -> str:
+    """Render a corrected reading in the form ``parse_corrected`` reads."""
+    return " ".join(
+        CORRECTED_FIELD_SEPARATOR.join((token["surface"], token["pos"], token["lemma"]))
+        if "pos" in token
+        else token["surface"]
+        for token in reading
+    )
+
+
+def _require_corrected(record: dict) -> None:
+    if record.get("kind") in CORRECTED_KINDS and not record.get("corrected"):
+        raise BugStoreError(f"kind={record['kind']!r} requires corrected: the reading the oracle should give")
 
 
 def today() -> str:
@@ -346,6 +392,7 @@ def _build(
     pattern: str,
     description: str,
     line_num: int,
+    corrected: list[dict] | None = None,
 ) -> dict:
     expected_canonical = canonical_tokens(expected)
     suzume_canonical = canonical_tokens(suzume)
@@ -363,6 +410,8 @@ def _build(
         "description": description,
         "created": today(),
     }
+    if corrected:
+        record["corrected"] = corrected
     if line_num > 0:
         record["line_num"] = line_num
     return record
@@ -381,9 +430,13 @@ def create(
     description: str = "",
     line_num: int = 0,
     record_id: int | None = None,
+    corrected: list[dict] | None = None,
 ) -> dict:
     """Build and persist a new open record, assigning its id."""
-    record = _build(source, text, expected, suzume, diff_type, check, kind, priority, pattern, description, line_num)
+    record = _build(
+        source, text, expected, suzume, diff_type, check, kind, priority, pattern, description, line_num, corrected
+    )
+    _require_corrected(record)
     if record_id is not None:
         record["id"] = record_id
     record["status"] = "open"
@@ -435,6 +488,7 @@ def update(source: str, record: dict, changes: dict) -> dict:
             updated["diff_type"] = classify_surface_diff(normalize_tokens(expected), normalize_tokens(suzume))
         if changes.get("check") is None:
             updated["check"] = detect_check(expected, suzume)
+    _require_corrected(updated)
     return _persist(source, updated, Path(record["_path"]).parent)
 
 
@@ -617,11 +671,12 @@ def _first_line(text: str, limit: int = 80) -> str:
 
 # States a recheck can assign, in the order the report presents them: what needs
 # acting on first comes first.
-REPORT_STATE_ORDER = ("error", "resolved", "stale", "needs-manual", "open")
+REPORT_STATE_ORDER = ("error", "resolved", "needs-corrected", "stale", "needs-manual", "open")
 
 _STATE_NOTE = {
     "error": "the CLI or the oracle failed — investigate before planning around it",
     "resolved": "current output matches the oracle — close with `defect_resolve` and a note",
+    "needs-corrected": "oracle-side record without a corrected reading — add one with `defect_update`",
     "stale": "still wrong, but the output moved since it was filed — re-triage from `current`",
     "needs-manual": "POS/lemma only — surface comparison cannot judge it, reproduce by hand",
     "open": "still wrong, unchanged since it was filed",
@@ -690,13 +745,14 @@ def render_report(
             "work package. `both` needs a change on each side."
         )
         lines.append("")
-        lines.append("| ID | kind | pattern | text | oracle says | Suzume says | note |")
-        lines.append("|---|---|---|---|---|---|---|")
+        lines.append("| ID | kind | pattern | text | oracle as filed | corrected | Suzume says | note |")
+        lines.append("|---|---|---|---|---|---|---|---|")
         for record in oracle_side:
             current = live.get(record["id"], {}).get("current") or record.get("suzume", "")
             lines.append(
                 f"| #{record['id']} | {record.get('kind')} | {_cell(record.get('pattern', ''))} | "
                 f"{_cell(record.get('text', ''), 40)} | {_cell(record.get('expected', ''), 60)} | "
+                f"{_cell(format_corrected(record.get('corrected') or []), 80)} | "
                 f"{_cell(current, 60)} | {_first_line(record.get('description', ''))} |"
             )
 

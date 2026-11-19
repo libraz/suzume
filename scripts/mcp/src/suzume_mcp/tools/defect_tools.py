@@ -51,8 +51,9 @@ STATE_POS_LEMMA = "pos-lemma"
 async def _compare_texts(texts: list[str], source: str) -> list[dict]:
     """Run the oracle once and the CLI concurrently.
 
-    One {error} per failed text, otherwise {current, expected} surfaces plus the
-    token-field ``differences`` the C++ runner would fail on.
+    One {error} per failed text, otherwise {current, expected} surfaces, the
+    token-field ``differences`` the C++ runner would fail on, and both full token
+    lists for comparison against a corrected reading.
     """
     oracle = get_expected_tokens_batch_subprocess(texts)
     outputs = await get_suzume_tokens_many(texts, skip_user_dict=not bug_store.uses_user_dict(source))
@@ -68,20 +69,56 @@ async def _compare_texts(texts: list[str], source: str) -> list[dict]:
                     "current": bug_store.join_tokens([tok["surface"] for tok in output]),
                     "expected": bug_store.join_tokens([tok["surface"] for tok in tokens]),
                     "differences": token_differences(tokens, output),
+                    "oracle_tokens": tokens,
+                    "output_tokens": output,
                 }
             )
     return rows
+
+
+def _corrected_differences(corrected: list[dict], tokens: list[dict]) -> list[dict]:
+    """Where ``tokens`` departs from a corrected reading; a surface-only reading checks surfaces only."""
+    differences = token_differences(corrected, tokens)
+    if all("pos" in token for token in corrected):
+        return differences
+    return [row for row in differences if row["type"] == "surface"]
+
+
+def _oracle_side_state(record: dict, row: dict) -> dict:
+    """Classify an oracle-side record against its corrected reading.
+
+    ``oracle`` closes once the oracle gives the reading; ``both`` also needs Suzume
+    to give it. Moved means either side's surfaces left what was filed.
+    """
+    corrected = record.get("corrected")
+    if not corrected:
+        return {"state": "needs-corrected"}
+    remaining = []
+    if _corrected_differences(corrected, row["oracle_tokens"]):
+        remaining.append("oracle")
+    if record.get("kind") == bug_store.KIND_BOTH and _corrected_differences(corrected, row["output_tokens"]):
+        remaining.append("tokenizer")
+    if not remaining:
+        return {"state": "resolved"}
+    filed_oracle = record.get("expected", "")
+    moved = (filed_oracle and row["expected"] != filed_oracle) or (
+        record.get("kind") == bug_store.KIND_BOTH and row["current"] != record.get("suzume", "")
+    )
+    return {"state": "stale" if moved else "open", "remaining": remaining}
 
 
 async def _recheck_records(records: list[dict], source: str) -> dict[int, dict]:
     """Re-run every record and classify its current state.
 
     States:
-        resolved     — current output matches the current oracle
-        needs-manual — POS/lemma-only record; surface comparison cannot close it
-        stale        — still wrong, but the output moved since the record was filed
-        open         — still wrong, unchanged
-        error        — the CLI or the oracle failed for this text
+        resolved        — current output matches the current oracle; for an
+                          oracle-side record, the sides its kind names give its
+                          corrected reading
+        needs-corrected — oracle-side record without a corrected reading
+        needs-manual    — POS/lemma-only tokenizer record; surface comparison cannot close it
+        stale           — still wrong, but the output moved since the record was filed
+        open            — still wrong, unchanged
+        error           — the CLI or the oracle failed for this text
     """
     if not records:
         return {}
@@ -96,15 +133,17 @@ async def _recheck_records(records: list[dict], source: str) -> dict[int, dict]:
             results[record["id"]] = {"state": "error", "error": row["error"]}
             continue
         current = row["current"]
-        if record.get("check") == bug_store.CHECK_MANUAL:
-            state = "needs-manual"
+        if record.get("kind") in bug_store.CORRECTED_KINDS:
+            info = _oracle_side_state(record, row)
+        elif record.get("check") == bug_store.CHECK_MANUAL:
+            info = {"state": "needs-manual"}
         elif current == row["expected"]:
-            state = "resolved"
+            info = {"state": "resolved"}
         elif current != record.get("suzume", ""):
-            state = "stale"
+            info = {"state": "stale"}
         else:
-            state = "open"
-        results[record["id"]] = {"state": state, "current": current, "oracle": row["expected"]}
+            info = {"state": "open"}
+        results[record["id"]] = {**info, "current": current, "oracle": row["expected"]}
     return results
 
 
@@ -336,6 +375,7 @@ async def defect_add(
     line_num: int = 0,
     source: str = "defect",
     force: bool = False,
+    corrected: str = "",
 ) -> str:
     """Register a defect root in the store.
 
@@ -354,11 +394,16 @@ async def defect_add(
         line_num: Corpus line number, when the record came from a scan.
         source: Store to write to — "defect", "thread", or "literary".
         force: Register even when a record already exists for this text.
+        corrected: The reading the oracle should give, as space-separated
+            ``surface|POS|lemma`` tokens (lemma defaults to the surface), or bare
+            surfaces to constrain surfaces only. Required for kind oracle and
+            both, which close once the sides they name give it.
     """
     error = _text_error(text) or _kind_error(kind)
     if error:
         return error
     try:
+        reading = bug_store.parse_corrected(corrected) if corrected else None
         existing = bug_store.find_by_text(source, text)
         if existing and not force:
             return _duplicate(existing, "filed")
@@ -378,21 +423,23 @@ async def defect_add(
             pattern=pattern,
             description=description,
             line_num=line_num,
+            corrected=reading,
         )
     except Exception as exc:
         return json_error(str(exc))
 
-    return _json_result(
-        {
-            "status": "ok",
-            "id": record["id"],
-            "file": record["_file"],
-            "diff_type": record["diff_type"],
-            "kind": record["kind"],
-            "check": record["check"],
-            "open_total": len(bug_store.load_open(source)),
-        }
-    )
+    result = {
+        "status": "ok",
+        "id": record["id"],
+        "file": record["_file"],
+        "diff_type": record["diff_type"],
+        "kind": record["kind"],
+        "check": record["check"],
+        "open_total": len(bug_store.load_open(source)),
+    }
+    if reading:
+        result["corrected"] = bug_store.format_corrected(reading)
+    return _json_result(result)
 
 
 @mcp.tool()
@@ -461,6 +508,8 @@ async def defect_recheck(ids: str = "", source: str = "defect", apply: bool = Fa
         if info["state"] in ("stale", "open"):
             row["filed_as"] = record.get("suzume", "")
             row["oracle"] = info.get("oracle", "")
+        if info.get("remaining"):
+            row["remaining"] = info["remaining"]
         if info.get("error"):
             row["error"] = info["error"]
         buckets.setdefault(info["state"], []).append(row)
@@ -494,6 +543,12 @@ async def defect_recheck(ids: str = "", source: str = "defect", apply: bool = Fa
     if missing:
         result["missing"] = missing
     return _json_result(result)
+
+
+_REFUSAL_REASONS = {
+    "needs-manual": "POS/lemma-only record — confirm the fix by hand, then re-run with force=True and a note",
+    "needs-corrected": "oracle-side record without a corrected reading — add one with defect_update(corrected=...)",
+}
 
 
 @mcp.tool()
@@ -555,11 +610,7 @@ async def defect_resolve(
                     "state": info["state"],
                     "current": info.get("current", ""),
                     "oracle": info.get("oracle", ""),
-                    "reason": (
-                        "POS/lemma-only record — confirm the fix by hand, then re-run with force=True and a note"
-                        if info["state"] == "needs-manual"
-                        else "still reproduces"
-                    ),
+                    "reason": _REFUSAL_REASONS.get(info["state"], "still reproduces"),
                 }
             )
 
