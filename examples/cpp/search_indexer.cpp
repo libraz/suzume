@@ -17,14 +17,13 @@ struct Document {
 };
 
 int main() {
-  suzume::Tokenizer analyzer;
+  auto analyzer = suzume::Tokenizer::create();
   if (!analyzer) {
-    std::cerr << "failed to create tokenizer: " << suzume::Tokenizer::lastError() << "\n";
+    std::cerr << "failed to create tokenizer: " << analyzer.error().message << "\n";
     return 1;
   }
 
-  // Sample documents
-  std::vector<Document> docs = {
+  const std::vector<Document> docs = {
       {1, "東京都渋谷区で新しいカフェがオープンしました"},
       {2, "渋谷のカフェで美味しいコーヒーを飲みました"},
       {3, "新宿駅の近くにある図書館で本を読んでいます"},
@@ -34,31 +33,29 @@ int main() {
   std::unordered_map<std::string, std::vector<int>> index;
 
   suzume::TagOptions tag_opts;
-  tag_opts.pos_filter = static_cast<std::uint8_t>(SUZUME_TAG_POS_NOUN | SUZUME_TAG_POS_VERB);
+  tag_opts.pos_filter = {suzume::TagPos::Noun, suzume::TagPos::Verb};
   tag_opts.exclude_basic = true;
-  tag_opts.use_lemma = true;
   tag_opts.min_length = 2;
 
   for (const auto& doc : docs) {
-    auto tags = analyzer.generateTags(doc.text, tag_opts);
-    if (tags.empty()) {
+    auto tags = analyzer->generateTags(doc.text, tag_opts);
+    if (!tags || tags->empty()) {
       std::cerr << "tag generation returned no tags for document " << doc.id << "\n";
       return 1;
     }
-    for (const auto& tag : tags) {
+    for (const auto& tag : *tags) {
       index[tag.tag].push_back(doc.id);
     }
   }
 
-  // Print index
   std::cout << "Inverted index:\n";
   for (const auto& [tag, doc_ids] : index) {
     std::cout << "  " << tag << " -> [";
-    for (size_t i = 0; i < doc_ids.size(); ++i) {
-      if (i > 0) {
+    for (size_t idx = 0; idx < doc_ids.size(); ++idx) {
+      if (idx > 0) {
         std::cout << ", ";
       }
-      std::cout << doc_ids[i];
+      std::cout << doc_ids[idx];
     }
     std::cout << "]\n";
   }

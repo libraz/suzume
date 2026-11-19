@@ -1,19 +1,21 @@
 /**
  * User dictionary - load custom vocabulary for domain-specific text
  *
- * Demonstrates: user dictionary loading from file and from memory,
- * before/after comparison of analysis results.
+ * Demonstrates: loading a user dictionary from memory and comparing
+ * analysis results before and after.
  */
 #include <algorithm>
 #include <iostream>
+#include <string>
+#include <vector>
 
 #include "suzume/suzume.hpp"
 
 void printMorphemes(const std::vector<suzume::Morpheme>& morphemes) {
-  for (const auto& m : morphemes) {
-    std::cout << "  " << m.surface << " [" << m.pos << "]";
-    if (!m.base_form.empty() && m.base_form != m.surface) {
-      std::cout << " (lemma: " << m.base_form << ")";
+  for (const auto& morpheme : morphemes) {
+    std::cout << "  " << morpheme.surface << " [" << morpheme.pos << "]";
+    if (!morpheme.base_form.empty() && morpheme.base_form != morpheme.surface) {
+      std::cout << " (base form: " << morpheme.base_form << ")";
     }
     std::cout << "\n";
   }
@@ -21,37 +23,43 @@ void printMorphemes(const std::vector<suzume::Morpheme>& morphemes) {
 
 int main() {
   suzume::Options opts;
-  opts.skip_user_dictionary = true;  // Start clean
-  suzume::Tokenizer analyzer(opts);
+  opts.skip_bundled_user_dictionary = true;  // Start clean
+  auto analyzer = suzume::Tokenizer::create(opts);
   if (!analyzer) {
-    std::cerr << "failed to create tokenizer: " << suzume::Tokenizer::lastError() << "\n";
+    std::cerr << "failed to create tokenizer: " << analyzer.error().message << "\n";
     return 1;
   }
 
-  std::string text = "青空りんご園の案内図を作りました";
+  const std::string text = "青空りんご園の案内図を作りました";
 
-  // Without user dictionary
+  auto before = analyzer->analyze(text);
+  if (!before) {
+    std::cerr << "analysis failed: " << before.error().message << "\n";
+    return 1;
+  }
   std::cout << "Without user dictionary:\n";
-  printMorphemes(analyzer.analyze(text));
+  printMorphemes(*before);
 
-  // TSV: surface<TAB>POS[<TAB>conj_type][<TAB>lemma]
-  std::string dict_data = "青空りんご園\tNOUN\n";
-  if (!analyzer.loadUserDictionary(dict_data)) {
-    std::cerr << "failed to load in-memory user dictionary: " << suzume::Tokenizer::lastError() << "\n";
+  // TSV: surface<TAB>POS[<TAB>conj_type][<TAB>base_form]
+  auto loaded = analyzer->loadUserDictionary("青空りんご園\tNOUN\n");
+  if (!loaded) {
+    std::cerr << "failed to load in-memory user dictionary: " << loaded.error().message << "\n";
+    return 1;
+  }
+  std::cout << "\nDictionary loaded: " << *loaded << "\n";
+
+  auto after = analyzer->analyze(text);
+  if (!after) {
+    std::cerr << "analysis failed: " << after.error().message << "\n";
     return 1;
   }
   std::cout << "\nWith user dictionary:\n";
-  const auto morphemes = analyzer.analyze(text);
-  printMorphemes(morphemes);
+  printMorphemes(*after);
   const bool found_user_entry =
-      std::any_of(morphemes.begin(), morphemes.end(), [](const auto& morpheme) { return morpheme.is_user_dict; });
+      std::any_of(after->begin(), after->end(), [](const auto& morpheme) { return morpheme.is_user_dict; });
   if (!found_user_entry) {
     std::cerr << "loaded user dictionary entry was not used\n";
     return 1;
   }
-
-  // Or load from file:
-  // analyzer.loadUserDictionary(std::string_view{"surface\tNOUN\n"});
-
   return 0;
 }
