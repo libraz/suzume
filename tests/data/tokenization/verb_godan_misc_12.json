@@ -1136,6 +1136,94 @@
       ],
       "id": "senseinikiku",
       "input": "せんせいにきく"
+    },
+    {
+      "description": "Accusative case not followed by an adverbial particle; kana godan-sa continuative",
+      "expected": [
+        {
+          "lemma": "氷",
+          "pos": "Noun",
+          "surface": "氷"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "とかす",
+          "pos": "Verb",
+          "surface": "とかし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wotokashita",
+      "input": "氷をとかした"
+    },
+    {
+      "description": "Accusative case not followed by an adverbial particle; kana godan-sa continuative",
+      "expected": [
+        {
+          "lemma": "砂糖",
+          "pos": "Noun",
+          "surface": "砂糖"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "とかす",
+          "pos": "Verb",
+          "surface": "とかし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wotokashita_2",
+      "input": "砂糖をとかした"
+    },
+    {
+      "description": "Imperative na after an ichidan continuative, not a bare noun hosting final be",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        }
+      ],
+      "id": "bena",
+      "input": "食べな"
+    },
+    {
+      "description": "Imperative na after an ichidan continuative, not a bare noun hosting final be",
+      "expected": [
+        {
+          "lemma": "調べる",
+          "pos": "Verb",
+          "surface": "調べ"
+        },
+        {
+          "lemma": "な",
+          "pos": "Particle",
+          "surface": "な"
+        }
+      ],
+      "id": "bena_2",
+      "input": "調べな"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 12/12)",
