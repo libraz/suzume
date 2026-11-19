@@ -63,6 +63,9 @@ bool setVerbAndAdjectiveCosts(BigramMatrix& table) {
       // A finite i-adjective also cannot take that negative auxiliary. The
       // following ん in ないんだ is the nominalizer の.
       {EPOS::AdjBasic, EPOS::AuxNegativeNu, cost::kAlmostNever},
+      // Nor the polite ます, which only a verb continuative hosts (でかい+ます
+      // is で+かい+ます).
+      {EPOS::AdjBasic, EPOS::AuxTenseMasu, cost::kAlmostNever},
 
       // まい (negative volitional) connection grammar:
       // - Godan 終止形 + まい (行く+まい, なる+まい)

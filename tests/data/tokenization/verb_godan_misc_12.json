@@ -832,6 +832,92 @@
       ],
       "id": "kabanwookimashita",
       "input": "かばんをおきました"
+    },
+    {
+      "description": "外でかいます - regression test",
+      "expected": [
+        {
+          "lemma": "外",
+          "pos": "Noun",
+          "surface": "外"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "かう",
+          "pos": "Verb",
+          "surface": "かい"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "dekaimasu",
+      "input": "外でかいます"
+    },
+    {
+      "description": "店でかいます - regression test",
+      "expected": [
+        {
+          "lemma": "店",
+          "pos": "Noun",
+          "surface": "店"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "かう",
+          "pos": "Verb",
+          "surface": "かい"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "dekaimasu_2",
+      "input": "店でかいます"
+    },
+    {
+      "description": "家でかいません - regression test",
+      "expected": [
+        {
+          "lemma": "家",
+          "pos": "Noun",
+          "surface": "家"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "かう",
+          "pos": "Verb",
+          "surface": "かい"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ませ"
+        },
+        {
+          "lemma": "ん",
+          "pos": "Auxiliary",
+          "surface": "ん"
+        }
+      ],
+      "id": "dekaimasen",
+      "input": "家でかいません"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 12/12)",
