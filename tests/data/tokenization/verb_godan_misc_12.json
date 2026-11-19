@@ -1401,6 +1401,87 @@
       ],
       "id": "ni_kemu",
       "input": "才に長けむ"
+    },
+    {
+      "description": "氷をとかした - auto-generated",
+      "expected": [
+        {
+          "lemma": "氷",
+          "pos": "Noun",
+          "surface": "氷"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "とかす",
+          "pos": "Verb",
+          "surface": "とかし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wotokashita",
+      "input": "氷をとかした"
+    },
+    {
+      "description": "砂糖をとかした - auto-generated",
+      "expected": [
+        {
+          "lemma": "砂糖",
+          "pos": "Noun",
+          "surface": "砂糖"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "とかす",
+          "pos": "Verb",
+          "surface": "とかし"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "wotokashita_2",
+      "input": "砂糖をとかした"
+    },
+    {
+      "description": "本とかを読む - auto-generated",
+      "expected": [
+        {
+          "lemma": "本",
+          "pos": "Noun",
+          "surface": "本"
+        },
+        {
+          "lemma": "とか",
+          "pos": "Particle",
+          "surface": "とか"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "読む",
+          "pos": "Verb",
+          "surface": "読む"
+        }
+      ],
+      "id": "tokawo_mu",
+      "input": "本とかを読む"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 12/12)",

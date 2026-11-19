@@ -309,8 +309,13 @@ float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::
   const bool unlicensed_nominal_be = (core::isNounType(prev.extended_pos) || core::isPronounType(prev.extended_pos)) &&
                                      next.extended_pos == core::ExtendedPOS::ParticleFinal &&
                                      utf8::equalsAny(next.surface, {"べ"});
+  // A listing particle enumerates nominals and takes the case marker after it
+  // (本とかを); the accusative closes its phrase and lists nothing (氷を+とかした).
+  const bool unlicensed_accusative_listing = prev.extended_pos == core::ExtendedPOS::ParticleCase &&
+                                             grammar::isAccusativeParticleWoSurface(prev.surface) &&
+                                             next.extended_pos == core::ExtendedPOS::ParticleListing;
   if (quantifier_host || unlicensed_tomo || unlicensed_hypothetical || unlicensed_nominative_stacking ||
-      unlicensed_listing_shi || unlicensed_attributive_nari || unlicensed_nominal_be) {
+      unlicensed_listing_shi || unlicensed_attributive_nari || unlicensed_nominal_be || unlicensed_accusative_listing) {
     SUZUME_CONNECTION_ADD(bonus, quantifier_host ? cost::kExtremeBonus : cost::kAlmostNever);
   }
 
