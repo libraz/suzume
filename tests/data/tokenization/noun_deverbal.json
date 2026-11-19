@@ -1830,8 +1830,8 @@
       "description": "方 opens 方法 when an odd kanji run follows the continuative",
       "expected": [
         {
-          "lemma": "読む",
-          "pos": "Verb",
+          "lemma": "読み",
+          "pos": "Noun",
           "surface": "読み"
         },
         {
@@ -1847,8 +1847,8 @@
       "description": "作り方法を学ぶ - auto-generated",
       "expected": [
         {
-          "lemma": "作る",
-          "pos": "Verb",
+          "lemma": "作り",
+          "pos": "Noun",
           "surface": "作り"
         },
         {
@@ -1874,8 +1874,8 @@
       "description": "kana continuative + 方 obeys the same kanji-run parity",
       "expected": [
         {
-          "lemma": "やる",
-          "pos": "Verb",
+          "lemma": "やり",
+          "pos": "Noun",
           "surface": "やり"
         },
         {

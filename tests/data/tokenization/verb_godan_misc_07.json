@@ -1064,8 +1064,8 @@
       "description": "Bound head releases the kanji compound that follows it",
       "expected": [
         {
-          "lemma": "書く",
-          "pos": "Verb",
+          "lemma": "書き",
+          "pos": "Noun",
           "surface": "書き"
         },
         {

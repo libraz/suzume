@@ -2138,3 +2138,35 @@ class TestKanaCompoundVerbOverAttributiveNoun:
     def test_a_kanji_continuative_is_left_to_the_deverbal_noun(self):
         tokens = get_expected_tokens("押し付けだ")[0]
         assert (tokens[0]["surface"], tokens[0]["pos"]) == ("押し付け", "Noun")
+
+
+class TestContinuativeBeforeKanjiNoun:
+    """A phrase-initial continuative before a plain kanji noun is the deverbal noun modifying it."""
+
+    @pytest.mark.parametrize(
+        ("text", "head"),
+        [
+            ("書き方向を変える", "書き"),
+            ("使い道具", "使い"),
+            ("読み方法", "読み"),
+            ("日本語の読み方法", "読み"),
+        ],
+    )
+    def test_reads_the_continuative_as_a_noun(self, text, head):
+        token = next(t for t in get_expected_tokens(text)[0] if t["surface"] == head)
+        assert (token["pos"], token["lemma"]) == ("Noun", head)
+
+    @pytest.mark.parametrize(
+        ("text", "head"),
+        [
+            ("雨が降り風が吹く", "降り"),
+            ("本を読み感想を書く", "読み"),
+            ("踏まえ決定する", "踏まえ"),
+            ("書け今", "書け"),
+            ("走れ目標へ", "走れ"),
+            ("咲き誇れ心の花よ", "咲き誇れ"),
+        ],
+    )
+    def test_keeps_the_verb_elsewhere(self, text, head):
+        token = next(t for t in get_expected_tokens(text)[0] if t["surface"] == head)
+        assert token["pos"] == "Verb"

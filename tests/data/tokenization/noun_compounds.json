@@ -1236,8 +1236,8 @@
       "description": "置き場所を探す - regression test",
       "expected": [
         {
-          "lemma": "置く",
-          "pos": "Verb",
+          "lemma": "置き",
+          "pos": "Noun",
           "surface": "置き"
         },
         {

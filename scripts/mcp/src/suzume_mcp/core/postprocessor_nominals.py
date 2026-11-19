@@ -216,6 +216,22 @@ def _is_irrealis_before_negative(surface: str) -> bool:
     )
 
 
+def _is_own_continuative(surface: str, lemma: str) -> bool:
+    """Whether the reference reads a surface plus ます as the continuative of this very verb.
+
+    走れ (imperative of 走る) also spells the potential 走れる's continuative, so
+    the probe must come back with the token's own lemma.
+    """
+    probe = mecab_analyze(surface + "ます")
+    return (
+        len(probe) == 2
+        and probe[0].get("surface") == surface
+        and probe[0].get("pos") == "動詞"
+        and probe[0].get("conj_form") == "連用形"
+        and probe[0].get("lemma") == lemma
+    )
+
+
 def _attributive_adjective_noun(surface: str) -> list[dict] | None:
     """Read a kana run as an i-adjective's い cell plus a noun, if the dictionary spells both.
 
@@ -247,7 +263,8 @@ def postprocess_deverbal_noun_context(tokens: list[dict]) -> bool:
     surface is the productive deverbal noun (読みを, いとなみが, 書きかけの).
     Finite verbs such as 読むの and continuative verb chains remain unchanged.
     The copula likewise selects a nominal predicate (曇りでしょう, 押し付けだ),
-    not a bare continuative verb.
+    not a bare continuative verb. A continuative standing as its own token
+    before a plain kanji noun modifies it as a deverbal noun (使い+道具, 書き+方向).
     """
     changed = False
     attributive_splits: list[tuple[int, list[dict]]] = []
@@ -353,8 +370,20 @@ def postprocess_deverbal_noun_context(tokens: list[dict]) -> bool:
             and surface[:-1] == lemma[:-1]
             and GODAN_A_ROW_TO_BASE.get(surface[-1:]) == lemma[-1:]
         )
+        # Only a phrase-initial continuative: one with its own argument (雨が降り
+        # 風が) is a suspended clause, and サ変 or adverbial nouns (決定する, 今)
+        # are not modified this way.
+        previous = tokens[idx - 1] if idx > 0 else {}
+        kanji_noun_modifier = (
+            following.get("pos") == "Noun"
+            and following.get("pos_sub1") == "一般"
+            and regex.fullmatch(r"\p{Han}+", following.get("surface", "")) is not None
+            and (not previous or previous.get("pos") == "Symbol" or previous.get("surface") == "の")
+            and _is_own_continuative(surface, lemma)
+        )
         if (
             not nominal_particle
+            and not kanji_noun_modifier
             and not clause_final_irrealis
             and not nominal_follower
             and not suru_object
