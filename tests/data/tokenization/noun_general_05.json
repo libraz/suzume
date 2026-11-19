@@ -1104,6 +1104,28 @@
       ],
       "id": "hai",
       "input": "東京はい"
+    },
+    {
+      "description": "はなしを聞く - auto-generated",
+      "expected": [
+        {
+          "lemma": "はなし",
+          "pos": "Noun",
+          "surface": "はなし"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "聞く",
+          "pos": "Verb",
+          "surface": "聞く"
+        }
+      ],
+      "id": "hanashiwo_ku",
+      "input": "はなしを聞く"
     }
   ],
   "description": "General nouns (part 5/5)",
