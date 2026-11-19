@@ -568,9 +568,7 @@ void addDictionaryEntryEdges(core::Lattice& lattice, const tokenizer_dictionary_
     // the ichidan paradigm has (あきらめ+よ), never a godan-ra one.
     const std::string_view surface = result.entry->surface;
     if (conj_type == dictionary::ConjugationType::None && utf8::endsWith(lemma, "る") &&
-        utf8::endsWith(surface, "よ") &&
-        surface.substr(0, surface.size() - core::kJapaneseCharBytes) ==
-            lemma.substr(0, lemma.size() - core::kJapaneseCharBytes)) {
+        utf8::endsWith(surface, "よ") && utf8::dropLastChar(surface) == utf8::dropLastChar(lemma)) {
       conj_type = dictionary::ConjugationType::Ichidan;
     }
   }

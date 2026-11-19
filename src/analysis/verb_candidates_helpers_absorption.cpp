@@ -183,8 +183,7 @@ bool endsWithCaseParticleAfterContinuative(const dictionary::DictionaryManager* 
 
 bool spellsClassicalAuxiliaryEnding(const dictionary::DictionaryManager* dict_manager, std::string_view surface,
                                     std::string_view stem) {
-  if (dict_manager == nullptr || stem.empty() || surface.size() <= stem.size() ||
-      surface.compare(0, stem.size(), stem) != 0) {
+  if (dict_manager == nullptr || stem.empty() || surface.size() <= stem.size() || !utf8::startsWith(surface, stem)) {
     return false;
   }
   const auto* ending = dict_manager->lookupExact(surface.substr(stem.size()), core::PartOfSpeech::Auxiliary);

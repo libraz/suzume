@@ -323,8 +323,7 @@ void generateProductiveSuffixCandidates(const std::vector<char32_t>& codepoints,
       if (stem_chars >= 2 && stem_chars <= 3) {
         // Only an honorific-style stem can lexicalize with さん. Ordinary
         // さん terms remain dictionary-backed or split above.
-        bool starts_with_honorific_prefix = stem.compare(0, core::kJapaneseCharBytes, "お") == 0 ||
-                                            stem.compare(0, core::kJapaneseCharBytes, "ご") == 0;
+        bool starts_with_honorific_prefix = utf8::startsWithAny(stem, {"お", "ご"});
         if (honorific == "さん" && !starts_with_honorific_prefix) {
           break;
         }

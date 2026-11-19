@@ -186,7 +186,7 @@ bool isKuruStem(std::string_view stem) {
     return true;
   }
   for (const std::string_view kanji_base : kKuruKanjiBaseForms) {
-    if (kanji_base.substr(0, kanji_base.size() - core::kJapaneseCharBytes) == stem) {
+    if (utf8::dropLastChar(kanji_base) == stem) {
       return true;
     }
   }
