@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Verify that public numeric contracts match the canonical C/C++ definitions.
 
-The C ABI transports compact numeric codes. The bindings use canonical native
-label functions where available and retain mirrors only for POS labels. This
-guard checks those mirrors, the native conjugation and extended-POS label
-tables, and error codes, flags, modes, and tag-filter bits.
+The C ABI transports compact numeric codes and owns every label for them. This
+guard checks that each binding decodes labels through the canonical C function
+and keeps no local label table of its own, that the native label tables match
+their enums, and that error codes, flags, modes, tag-filter bits and option
+defaults agree across the C ABI, C++, WASM and Python.
 
 Usage:
   scripts/check_binding_labels.py
@@ -31,14 +32,14 @@ WASM_INDEX = "bindings/wasm/js/index.ts"
 PYTHON_API = "bindings/python/src/suzume/__init__.py"
 
 DEFAULT_FIELDS = {
-    "extended": (
+    "options": (
         "preserve_vu",
         "preserve_case",
         "preserve_symbols",
         "mode",
         "lemmatize",
         "merge_compounds",
-        "skip_user_dictionary",
+        "skip_bundled_user_dictionary",
         "skip_core_dictionary",
         "report_scorer_config",
         "skip_env_config",
@@ -48,7 +49,7 @@ DEFAULT_FIELDS = {
     "tag": (
         "pos_filter",
         "exclude_basic",
-        "use_lemma",
+        "use_base_form",
         "min_length",
         "max_tags",
         "exclude_particles",
@@ -59,15 +60,25 @@ DEFAULT_FIELDS = {
     ),
 }
 
+# C field -> binding option name, where the binding spells it differently.
+CPP_DEFAULT_NAMES = {
+    "options": {"scorer_options_json": "scorer_options"},
+    "tag": {},
+}
+PYTHON_DEFAULT_NAMES = {
+    "options": {"skip_bundled_user_dictionary": "skip_user_dictionary"},
+    "tag": {"use_base_form": "use_lemma"},
+}
+
 WASM_DEFAULT_NAMES = {
-    "extended": {
+    "options": {
         "preserve_vu": "preserveVu",
         "preserve_case": "preserveCase",
         "preserve_symbols": "preserveSymbols",
         "mode": "mode",
         "lemmatize": "lemmatize",
         "merge_compounds": "mergeCompounds",
-        "skip_user_dictionary": "skipUserDictionary",
+        "skip_bundled_user_dictionary": "skipUserDictionary",
         "skip_core_dictionary": "skipCoreDictionary",
         "report_scorer_config": "reportScorerConfig",
         "skip_env_config": "skipEnvConfig",
@@ -77,7 +88,7 @@ WASM_DEFAULT_NAMES = {
     "tag": {
         "pos_filter": "posFilter",
         "exclude_basic": "excludeBasic",
-        "use_lemma": "useLemma",
+        "use_base_form": "useLemma",
         "min_length": "minLength",
         "max_tags": "maxTags",
         "exclude_particles": "excludeParticles",
@@ -95,8 +106,8 @@ class EnumSpec:
     sentinel: str | None
 
 
-# These enums define serialized public label domains. Only PartOfSpeech retains
-# binding-side mirrors; the others are decoded by canonical C ABI functions.
+# These enums define serialized public label domains; every binding decodes
+# them through the canonical C ABI label functions.
 MIRRORED_ENUMS = {
     "PartOfSpeech": EnumSpec("src/core/types.h", "Count_"),
     "ExtendedPOS": EnumSpec("src/core/types.h", "Count_"),
@@ -104,8 +115,37 @@ MIRRORED_ENUMS = {
     "ConjForm": EnumSpec("src/grammar/conjugation.h", "Count_"),
 }
 
-# Keep snapshots keyed by enum member so additions and reorderings fail closed
-# even though bindings now obtain these labels from the C ABI.
+# Keep snapshots keyed by enum member so additions, reorderings and relabelings
+# fail closed even though bindings obtain these labels from the C ABI.
+POS_LABELS = {
+    "Unknown": ("OTHER", "その他"),
+    "Noun": ("NOUN", "名詞"),
+    "Verb": ("VERB", "動詞"),
+    "Adjective": ("ADJ", "形容詞"),
+    "Adverb": ("ADV", "副詞"),
+    "Particle": ("PARTICLE", "助詞"),
+    "Auxiliary": ("AUX", "助動詞"),
+    "Conjunction": ("CONJ", "接続詞"),
+    "Determiner": ("DET", "連体詞"),
+    "Pronoun": ("PRON", "代名詞"),
+    "Prefix": ("PREFIX", "接頭辞"),
+    "Suffix": ("SUFFIX", "接尾辞"),
+    "Interjection": ("INTJ", "感動詞"),
+    "Symbol": ("SYMBOL", "記号"),
+    "Other": ("OTHER", "その他"),
+}
+
+# Binding sources that must not carry a copy of a native label table.
+BINDING_SOURCES = (
+    CPP_WRAPPER,
+    "bindings/wasm/js/*.ts",
+    "bindings/python/src/suzume/*.py",
+)
+# POS labels that are not also tag-filter names, so a file quoting several of
+# them is holding a label table rather than naming a filter.
+TABLE_ONLY_POS_LABELS = {"CONJ", "DET", "PRON", "PREFIX", "SUFFIX", "INTJ", "SYMBOL"}
+LOCAL_TABLE_THRESHOLD = 3
+
 CONJUGATION_TYPE_LABELS = {
     "None": None,
     "Ichidan": "一段",
@@ -292,11 +332,8 @@ def check_canonical_calls() -> bool:
     """Every label accessor must decode through the one native owner of that label."""
     failed = False
     for path, function, callee in (
-        (CPP_WRAPPER, "posLabel", "suzume_pos_label"),
-        (CPP_WRAPPER, "conjugationTypeLabel", "suzume_conjugation_type_label"),
-        (CPP_WRAPPER, "conjugationFormLabel", "suzume_conjugation_form_label"),
-        (CPP_WRAPPER, "extendedPosLabel", "suzume_extended_pos_label"),
         (C_ABI, "suzume_pos_label", "posToString"),
+        (C_ABI, "suzume_pos_label_ja", "posToJapanese"),
         (C_ABI, "suzume_extended_pos_label", "extendedPosToString"),
         (C_ABI, "suzume_conjugation_form_label", "conjFormToJapanese"),
     ):
@@ -304,15 +341,35 @@ def check_canonical_calls() -> bool:
             print(f"❌ {path}: `{function}` must call `{callee}`")
             failed = True
 
+    wrapper = strip_comments(Path(CPP_WRAPPER).read_text())
     wasm = Path(WASM_INDEX).read_text()
     python = Path(PYTHON_API).read_text()
-    for label in ("pos", "conjugation_type", "conjugation_form", "extended_pos"):
+    for label in ("pos", "pos_label_ja", "conjugation_type", "conjugation_form", "extended_pos"):
         for path, text, call in (
-            (WASM_INDEX, wasm, f"this.module._suzume_{label}_label"),
-            (PYTHON_API, python, f"_lib.suzume_{label}_label"),
+            (CPP_WRAPPER, wrapper, f"suzume_{native_name(label)}("),
+            (WASM_INDEX, wasm, f"this.module._suzume_{native_name(label)}"),
+            (PYTHON_API, python, f"_lib.suzume_{native_name(label)}"),
         ):
             if call not in text:
                 print(f"❌ {path}: the {label} label must be decoded by `{call}`")
+                failed = True
+    return failed
+
+
+def native_name(label: str) -> str:
+    return label if label.startswith("pos_label") else f"{label}_label"
+
+
+def check_no_local_label_tables() -> bool:
+    """A binding that quotes several POS labels has re-introduced a local label table."""
+    japanese = {ja for _, ja in POS_LABELS.values()}
+    failed = False
+    for pattern in BINDING_SOURCES:
+        for path in sorted(Path().glob(pattern)):
+            literals = set(re.findall(r"""["']([^"'\\\n]+)["']""", strip_comments(path.read_text())))
+            found = sorted((literals & japanese) | (literals & TABLE_ONLY_POS_LABELS))
+            if len(found) >= LOCAL_TABLE_THRESHOLD:
+                print(f"❌ {path}: quotes POS labels {found}; decode them through suzume_pos_label/_ja instead")
                 failed = True
     return failed
 
@@ -325,6 +382,8 @@ def c_numeric_constants(prefix: str) -> dict[str, int]:
     text = Path(C_HEADER).read_text()
     values: dict[str, int] = {}
     for name, expression in re.findall(rf"\b{prefix}([A-Z0-9_]+)\s*=\s*([^,\n]+)", text):
+        if name.startswith("FIELD_"):
+            continue  # offsetof field indexes share the prefix but are not values
         expression = expression.strip()
         shift = re.fullmatch(r"1U?\s*<<\s*(\d+)U?", expression)
         literal = re.fullmatch(r"(\d+)U?", expression)
@@ -361,21 +420,28 @@ def c_initializer_defaults(function: str, fields: tuple[str, ...]) -> dict[str, 
     return defaults
 
 
-def cpp_struct_defaults(name: str, fields: tuple[str, ...]) -> dict[str, bool | int | None]:
+# A C++ member with no initializer (an empty string or container) stands for
+# the C default of NULL or 0.
+DEFAULT_CONSTRUCTED = object()
+
+
+def cpp_struct_defaults(name: str, fields: tuple[str, ...], names: dict[str, str]) -> dict[str, object]:
     text = Path(CPP_WRAPPER).read_text()
     match = re.search(rf"struct {name}\s*\{{", text)
     if match is None:
         raise SystemExit(f"❌ {CPP_WRAPPER}: cannot find `struct {name}`")
     body = strip_comments(enclosed(text, match.end() - 1, "{", "}", CPP_WRAPPER))
-    defaults: dict[str, bool | int | None] = {}
+    members = {names.get(field, field): field for field in fields}
+    defaults: dict[str, object] = {}
     for statement in body.split(";"):
         match = re.search(r"\b(\w+)\s*(?:=\s*([^;]+))?$", statement.strip())
         if match is None:
             continue
-        field, expression = match.groups()
-        if field not in fields:
+        member, expression = match.groups()
+        if member not in members:
             continue
-        defaults[field] = None if expression is None else parse_default_literal(expression, CPP_WRAPPER)
+        field = members[member]
+        defaults[field] = DEFAULT_CONSTRUCTED if expression is None else parse_default_literal(expression, CPP_WRAPPER)
     if set(defaults) != set(fields):
         raise SystemExit(f"❌ {CPP_WRAPPER}: `{name}` does not declare defaults for exactly {fields}")
     return defaults
@@ -426,30 +492,32 @@ def python_method_defaults(class_name: str, method: str) -> dict[str, bool | int
 
 def check_default_contracts() -> bool:
     canonical = {
-        "extended": c_initializer_defaults("suzume_init_extended_options", DEFAULT_FIELDS["extended"]),
+        "options": c_initializer_defaults("suzume_init_options", DEFAULT_FIELDS["options"]),
         "tag": c_initializer_defaults("suzume_init_tag_options", DEFAULT_FIELDS["tag"]),
     }
     cpp = {
-        "extended": cpp_struct_defaults("Options", DEFAULT_FIELDS["extended"]),
-        "tag": cpp_struct_defaults("TagOptions", DEFAULT_FIELDS["tag"]),
+        "options": cpp_struct_defaults("Options", DEFAULT_FIELDS["options"], CPP_DEFAULT_NAMES["options"]),
+        "tag": cpp_struct_defaults("TagOptions", DEFAULT_FIELDS["tag"], CPP_DEFAULT_NAMES["tag"]),
     }
     wasm_raw = {
-        "extended": ts_default_object("EXTENDED_OPTION_DEFAULTS"),
+        "options": ts_default_object("EXTENDED_OPTION_DEFAULTS"),
         "tag": ts_default_object("TAG_OPTION_DEFAULTS"),
     }
     wasm = {
         kind: {field: wasm_raw[kind][name] for field, name in names.items()}
         for kind, names in WASM_DEFAULT_NAMES.items()
     }
-    python_extended = python_method_defaults("Suzume", "__init__")
-    python_tag = python_method_defaults("Suzume", "generate_tags")
+    python_raw = {
+        "options": python_method_defaults("Suzume", "__init__"),
+        "tag": python_method_defaults("Suzume", "generate_tags"),
+    }
     python = {
-        "extended": {
-            field: python_extended[field]
-            for field in DEFAULT_FIELDS["extended"]
+        kind: {
+            field: python_raw[kind][PYTHON_DEFAULT_NAMES[kind].get(field, field)]
+            for field in fields
             if field not in {"scorer_options_json", "data_directory"}
-        },
-        "tag": {field: python_tag[field] for field in DEFAULT_FIELDS["tag"]},
+        }
+        for kind, fields in DEFAULT_FIELDS.items()
     }
 
     failed = False
@@ -459,10 +527,14 @@ def check_default_contracts() -> bool:
             "WASM": wasm[kind],
             "Python": python[kind],
         }
-        for surface, actual in mirrors.items():
+        for surface, raw in mirrors.items():
+            actual = {
+                field: expected[field] if value is DEFAULT_CONSTRUCTED and expected[field] in (None, 0) else value
+                for field, value in raw.items()
+            }
             comparable = (
                 expected
-                if surface != "Python" or kind != "extended"
+                if surface != "Python" or kind != "options"
                 else {
                     field: value
                     for field, value in expected.items()
@@ -491,9 +563,11 @@ def check_numeric_contracts() -> bool:
     python_labels = Path(PYTHON_LABELS).read_text()
 
     canonical_errors = c_numeric_constants("SUZUME_ERROR_")
-    wasm_error_body = enclosed(wasm, wasm.index("{", wasm.index("export enum ErrorCode")), "{", "}", WASM_INDEX)
+    # 255 is reserved for the bindings: a code the binding does not know.
+    binding_errors = {**canonical_errors, "unknown": 255}
+    wasm_error_body = enclosed(wasm, wasm.index("{", wasm.index("export const ErrorCode")), "{", "}", WASM_INDEX)
     wasm_errors = {
-        normalized_name(name): int(value) for name, value in re.findall(r"\b(\w+)\s*=\s*(\d+)", wasm_error_body)
+        normalized_name(name): int(value) for name, value in re.findall(r"\b(\w+)\s*:\s*(\d+)", wasm_error_body)
     }
     python_errors: dict[str, int] = {}
     for node in ast.parse(python).body:
@@ -565,7 +639,7 @@ def check_numeric_contracts() -> bool:
     }
 
     for label, canonical, mirrors in (
-        ("error codes", canonical_errors, (wasm_errors, python_errors)),
+        ("error codes", binding_errors, (wasm_errors, python_errors)),
         ("morpheme flags", canonical_flags, (wasm_flags, python_flags)),
         ("tag POS bits", canonical_tags, (wasm_tags, python_tags)),
         ("analysis modes", canonical_modes, (wrapper_modes, wasm_modes, python_modes)),
@@ -582,8 +656,8 @@ def main() -> int:
 
     members = {name: enum_members(name, spec) for name, spec in MIRRORED_ENUMS.items()}
     expected = {
-        "pos_en": cpp_switch_labels(CPP_TYPES, "posToString", "PartOfSpeech", members["PartOfSpeech"]),
-        "pos_ja": cpp_switch_labels(CPP_TYPES, "posToJapanese", "PartOfSpeech", members["PartOfSpeech"]),
+        "pos_en": [POS_LABELS[name][0] for name in members["PartOfSpeech"]],
+        "pos_ja": [POS_LABELS[name][1] for name in members["PartOfSpeech"]],
         "extended": cpp_switch_labels(CPP_TYPES, "extendedPosToString", "ExtendedPOS", members["ExtendedPOS"]),
         "conj_type": [CONJUGATION_TYPE_LABELS[name] for name in members["ConjugationType"]],
         "conj_form": [CONJUGATION_FORM_LABELS[name] for name in members["ConjForm"]],
@@ -591,11 +665,18 @@ def main() -> int:
 
     checks = [
         (
-            CPP_WRAPPER,
-            "posLabel::japanese_labels",
+            CPP_TYPES,
+            "posToString",
+            members["PartOfSpeech"],
+            expected["pos_en"],
+            cpp_switch_labels(CPP_TYPES, "posToString", "PartOfSpeech", members["PartOfSpeech"]),
+        ),
+        (
+            CPP_TYPES,
+            "posToJapanese",
             members["PartOfSpeech"],
             expected["pos_ja"],
-            cpp_local_table(CPP_WRAPPER, "posLabel", "japanese_labels"),
+            cpp_switch_labels(CPP_TYPES, "posToJapanese", "PartOfSpeech", members["PartOfSpeech"]),
         ),
         (
             C_ABI,
@@ -611,34 +692,6 @@ def main() -> int:
             expected["conj_form"],
             named_table(CPP_CONJUGATION, "kConjFormJapanese", "{", "}", r'"(?:\\.|[^"\\])*"', ("nullptr",)),
         ),
-        (
-            WASM_LABELS,
-            "POS_ENGLISH",
-            members["PartOfSpeech"],
-            expected["pos_en"],
-            named_table(WASM_LABELS, "POS_ENGLISH", "[", "]", r"'(?:\\.|[^'\\])*'", ("null",)),
-        ),
-        (
-            WASM_LABELS,
-            "POS_JAPANESE",
-            members["PartOfSpeech"],
-            expected["pos_ja"],
-            named_table(WASM_LABELS, "POS_JAPANESE", "[", "]", r"'(?:\\.|[^'\\])*'", ("null",)),
-        ),
-        (
-            PYTHON_LABELS,
-            "POS_ENGLISH",
-            members["PartOfSpeech"],
-            expected["pos_en"],
-            named_table(PYTHON_LABELS, "POS_ENGLISH", "(", ")", r'"(?:\\.|[^"\\])*"', ("None",)),
-        ),
-        (
-            PYTHON_LABELS,
-            "POS_JAPANESE",
-            members["PartOfSpeech"],
-            expected["pos_ja"],
-            named_table(PYTHON_LABELS, "POS_JAPANESE", "(", ")", r'"(?:\\.|[^"\\])*"', ("None",)),
-        ),
     ]
 
     # Evaluate every group before combining so one failure cannot hide another.
@@ -647,11 +700,12 @@ def main() -> int:
         check_distinct_labels(CPP_TYPES, "extendedPosToString", members["ExtendedPOS"], expected["extended"])
     )
     results.append(check_canonical_calls())
+    results.append(check_no_local_label_tables())
     results.append(check_numeric_contracts())
     results.append(check_default_contracts())
     if any(results):
         print()
-        print("A mislabeled numeric code changes public output. Update every mirror above in enum order.")
+        print("A mislabeled numeric code changes public output. Fix the native table or the binding above.")
         return 1
 
     print("✅ C++, WASM, and Python labels and numeric contracts match")
