@@ -8,6 +8,7 @@ registers.
 
 import copy
 import sys
+from typing import ClassVar
 
 import pytest
 
@@ -130,11 +131,22 @@ class TestTopicBeforeListedNoun:
         _assert_merge_untouched([_tok("はほげら"), _tok("だ", pos="助動詞")], "はほげらだ")
 
 
-class TestClosedHeadBeforeListedNoun:
-    """A case particle or beautifying prefix absorbed into the first cell of a listed noun."""
+class TestListedNounSpanAcrossCells:
+    """A listed noun whose span crosses a reference cell boundary at either end."""
 
-    def test_splits_case_particle_from_a_noun_starting_inside_its_cell(self, monkeypatch):
+    _CELLS: ClassVar[dict[str, list[dict[str, str]]]] = {
+        "し": [{"surface": "し", "pos": "動詞", "pos_sub1": "自立", "conj_form": "連用形", "lemma": "する"}],
+        "せ": [{"surface": "せ", "pos": "動詞", "pos_sub1": "自立", "conj_form": "連用形", "lemma": "せる"}],
+    }
+
+    @pytest.fixture(autouse=True)
+    def _reference_cells(self, monkeypatch):
+        monkeypatch.setattr(
+            f"{CLOSED_UNITS}.mecab_analyze", lambda text, *_a, **_k: self._CELLS.get(text) or _opaque_analyzer(text)
+        )
         _headwords_by_length(monkeypatch, CLOSED_UNITS, {"nouns.tsv": ["ほげら"]})
+
+    def test_splits_case_particle_from_a_noun_starting_inside_its_cell(self):
         tokens = [
             _tok("ここ", pos="名詞", pos_sub1="代名詞"),
             _tok("でほ", pos="動詞"),
@@ -150,19 +162,16 @@ class TestClosedHeadBeforeListedNoun:
             ("ほげら", "Noun", "ほげら"),
             ("する", "動詞", "する"),
         ]
-        assert rule == "case+l2-noun-boundary"
+        assert rule == "l2-noun-span"
 
-    def test_keeps_a_case_particle_cell_without_a_preceding_nominal(self, monkeypatch):
-        _headwords_by_length(monkeypatch, CLOSED_UNITS, {"nouns.tsv": ["ほげら"]})
-
+    def test_keeps_a_case_particle_cell_without_a_preceding_nominal(self):
         _assert_merge_untouched([_tok("でほ", pos="動詞"), _tok("げら"), _tok("する", pos="動詞")], "でほげらする")
 
     @pytest.mark.parametrize(
         ("left", "text"),
         [([], "おほげらを"), ([_tok("の", pos="助詞", pos_sub1="連体化")], "のおほげらを")],
     )
-    def test_splits_prefix_from_a_noun_starting_inside_its_cell(self, monkeypatch, left, text):
-        _headwords_by_length(monkeypatch, CLOSED_UNITS, {"nouns.tsv": ["ほげら"]})
+    def test_splits_prefix_from_a_noun_starting_inside_its_cell(self, left, text):
         tokens = [*left, _tok("おほ", pos="動詞"), _tok("げ"), _tok("ら"), _tok("を", pos="助詞")]
 
         merged, rule = apply_suzume_merge(tokens, text)
@@ -172,12 +181,73 @@ class TestClosedHeadBeforeListedNoun:
             ("ほげら", "Noun", "ほげら"),
             ("を", "助詞", "を"),
         ]
-        assert rule == "prefix+l2-noun-boundary"
+        assert rule == "l2-noun-span"
 
-    def test_keeps_a_prefixed_noun_the_reference_spells_as_one_cell(self, monkeypatch):
-        _headwords_by_length(monkeypatch, CLOSED_UNITS, {"nouns.tsv": ["ほげら"]})
+    def test_re_reads_a_light_verb_fused_into_the_last_cell(self):
+        tokens = [
+            _tok("部屋", pos="名詞"),
+            _tok("を", pos="助詞", pos_sub1="格助詞"),
+            _tok("ほげ", pos="副詞"),
+            _tok("らし", pos="動詞", conj_form="連用形"),
+            _tok("た", pos="助動詞"),
+        ]
 
+        merged, rule = apply_suzume_merge(tokens, "部屋をほげらした")
+
+        assert [(t["surface"], t["pos"], t["lemma"]) for t in merged] == [
+            ("部屋", "名詞", "部屋"),
+            ("を", "助詞", "を"),
+            ("ほげら", "Noun", "ほげら"),
+            ("し", "動詞", "する"),
+            ("た", "助動詞", "た"),
+        ]
+        assert rule == "l2-noun-span"
+
+    def test_keeps_a_last_cell_whose_overflow_is_not_the_light_verb(self):
+        tokens = [_tok("ほげ", pos="副詞"), _tok("らせ", pos="動詞"), _tok("た", pos="助動詞")]
+
+        _assert_merge_untouched(tokens, "ほげらせた")
+
+    def test_keeps_a_prefixed_noun_the_reference_spells_as_one_cell(self):
         _assert_merge_untouched([_tok("おほげら"), _tok("を", pos="助詞")], "おほげらを")
+
+    def test_never_breaks_a_nominal_cell_at_the_left_edge(self, monkeypatch):
+        # 声 + がけ (suffix) + が: a listed けが must not cut the suffix cell the reference chose.
+        _headwords_by_length(monkeypatch, CLOSED_UNITS, {"nouns.tsv": ["けが"]})
+        tokens = [
+            _tok("声", pos="名詞"),
+            _tok("がけ", pos="名詞", pos_sub1="接尾"),
+            _tok("が", pos="助詞", pos_sub1="格助詞"),
+            _tok("大切", pos="名詞", pos_sub1="形容動詞語幹"),
+            _tok("だ", pos="助動詞"),
+        ]
+
+        _assert_merge_untouched(tokens, "声がけが大切だ")
+
+    @pytest.mark.parametrize(
+        ("tokens", "text"),
+        [
+            # ご + listed とき inside one auxiliary cell (ごとき).
+            pytest.param(
+                [_tok("の", pos="助詞", pos_sub1="連体化"), _tok("ごほげら", pos="助動詞"), _tok("だ", pos="助動詞")],
+                "のごほげらだ",
+                id="head-inside-one-cell",
+            ),
+            # listed noun + light verb inside one verb cell (はなし, 思い出し).
+            pytest.param(
+                [_tok("を", pos="助詞", pos_sub1="格助詞"), _tok("ほげらし", pos="動詞"), _tok("た", pos="助動詞")],
+                "をほげらした",
+                id="overflow-inside-one-cell",
+            ),
+        ],
+    )
+    def test_keeps_a_listed_noun_that_crosses_no_cell_boundary(self, tokens, text):
+        _assert_merge_untouched(tokens, text)
+
+    def test_never_breaks_a_nominal_cell_at_the_right_edge(self):
+        tokens = [_tok("ほげ", pos="副詞"), _tok("らし", pos="名詞"), _tok("た", pos="助動詞")]
+
+        _assert_merge_untouched(tokens, "ほげらした")
 
 
 class TestClippedGreeting:

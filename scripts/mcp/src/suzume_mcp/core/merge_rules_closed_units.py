@@ -44,13 +44,78 @@ _CLASSICAL_ADJECTIVE_CELLS: tuple[tuple[str, str, str], ...] = (
 _CLASSICAL_AUXILIARY_LEMMAS: dict[str, str] = {"ず": "ぬ", "し": "き"}
 
 # Closed heads a reference cell can absorb into a following listed noun:
-# surface -> (POS, POS detail, boundary class).
-_CLOSED_HEADS_BEFORE_NOUN: dict[str, tuple[str, str, str]] = {
-    "は": ("助詞", "係助詞", "topic"),
-    **{particle: ("助詞", "格助詞", "case") for particle in ("が", "を", "に", "で", "と", "へ")},
-    "の": ("助詞", "連体化", "case"),
-    **{prefix: ("接頭詞", "名詞接続", "prefix") for prefix in ("お", "ご")},
+# surface -> (POS, POS detail). Particles attach to a nominal on their left.
+_CLOSED_HEADS_BEFORE_NOUN: dict[str, tuple[str, str]] = {
+    **{particle: ("助詞", "格助詞") for particle in ("が", "を", "に", "で", "と", "へ")},
+    "の": ("助詞", "連体化"),
+    **{prefix: ("接頭詞", "名詞接続") for prefix in ("お", "ご")},
 }
+
+_NOMINAL_POS = ("名詞", "代名詞", "Noun", "Pronoun")
+
+
+def _light_verb_overflow(overflow: str) -> list[dict] | None:
+    """Re-read the tail a listed noun leaves of its last cell; only する and what it hosts stand."""
+    rest = mecab_analyze(overflow)
+    if "".join(cell.get("surface", "") for cell in rest) != overflow:
+        return None
+    if not rest or rest[0].get("pos") != "動詞" or rest[0].get("lemma") != "する":
+        return None
+    if any(cell.get("pos") not in ("動詞", "助動詞") for cell in rest[1:]):
+        return None
+    return rest
+
+
+def _opens_on_closed_word(tokens: list[dict], i: int, j: int) -> bool:
+    """Whether cells ``i:j`` open on a closed word too short a span to outweigh (は + なし)."""
+    corrected_two_mora_noun = (
+        j == i + 2 and tokens[i + 1].get("pos") == "Particle" and tokens[i + 1].get("pos_sub1") == "一般"
+    )
+    return tokens[i].get("pos") in ("助詞", "助動詞", "連体詞") and j < i + 3 and not corrected_two_mora_noun
+
+
+def _listed_noun_span(tokens: list[dict], i: int, remaining: str, result: list[dict]) -> tuple[list[dict], int] | None:
+    """Cut a listed noun out of reference cells that cross its edges.
+
+    The noun may start inside cell ``i`` after a closed head (ここ + でる + す +
+    ばん, おる + す + ばん) and may end inside its last cell before a light
+    verb (そう + じし, べ + ん + きょうする). The evidence that the reference
+    misread the noun is a cell boundary inside it, so the span must cover two
+    cells or more (ご + とき inside ごとき, 思い出 + し inside 思い出し stay),
+    and a crossed cell must not be nominal: a noun or suffix cell is a unit
+    the reference chose (声 + がけ + が). Return the replacement cells and
+    the index after the span.
+    """
+    surface = tokens[i].get("surface", "")
+    head = surface[:1]
+    starts = [0]
+    if head in _CLOSED_HEADS_BEFORE_NOUN and len(surface) > 1:
+        head_pos, _ = _CLOSED_HEADS_BEFORE_NOUN[head]
+        if head_pos != "助詞" or (result and result[-1].get("pos") in _NOMINAL_POS):
+            starts.append(1)
+    for start in starts:
+        if start and tokens[i].get("pos") == "名詞":
+            continue
+        for noun in core_headwords_by_length("nouns.tsv"):
+            if not remaining.startswith(noun, start):
+                continue
+            consumed, j = _consume_span(tokens, i, start + len(noun))
+            overflow = consumed[start + len(noun) :]
+            if j - i < 2 or (not start and (not overflow or _opens_on_closed_word(tokens, i, j))):
+                continue
+            rest: list[dict] = []
+            if overflow:
+                if tokens[j - 1].get("pos") == "名詞":
+                    continue
+                rest = _light_verb_overflow(overflow) or []
+                if not rest:
+                    continue
+            cells = [{"surface": noun, "pos": "Noun", "lemma": noun}, *rest]
+            if start:
+                head_pos, head_pos_sub1 = _CLOSED_HEADS_BEFORE_NOUN[head]
+                cells.insert(0, {"surface": head, "pos": head_pos, "pos_sub1": head_pos_sub1, "lemma": head})
+            return cells, j
+    return None
 
 
 # Cells that select an irrealis, paired with the reading each one keeps once the
@@ -469,40 +534,46 @@ def _merge_closed_function_units(state: MergeState) -> bool:
                     applied_rule = "continuative-mono-compound"
                 return True
 
-        # A reference cell can absorb a closed head into a following unknown
-        # kana noun (そこ + はにわ, ここ + でる + す + ばん, おる + す + ばん).
-        # L2 evidence for the noun restores the head's boundary. A particle
-        # head needs a preceding nominal, which keeps a standalone lexical
-        # noun such as はにわ intact; a prefix head needs the noun to run past
-        # the cell, since a prefixed noun spelled as one cell is the separate
-        # prefix-split decision.
-        head = t.get("surface", "")[:1]
-        head_cell = _CLOSED_HEADS_BEFORE_NOUN.get(head)
-        if not merged and head_cell is not None and t.get("surface") != head:
-            head_pos, head_pos_sub1, head_class = head_cell
-            nominal_left = bool(result) and result[-1].get("pos") in ("名詞", "代名詞", "Noun", "Pronoun")
+        # A reference headword can absorb topic は into a following unknown
+        # kana noun (そこ + はにわ, ここ + はいり + ぐち).  L2 evidence for the
+        # suffix noun restores the productive topic boundary, while requiring
+        # a preceding nominal keeps a standalone lexical noun such as はにわ
+        # intact.
+        if (
+            not merged
+            and result
+            and result[-1].get("pos") in _NOMINAL_POS
+            and t.get("surface", "").startswith("は")
+            and t.get("surface") != "は"
+        ):
             for noun in core_headwords_by_length("nouns.tsv"):
-                headed_noun = head + noun
-                if not remaining.startswith(headed_noun):
+                topic_noun = "は" + noun
+                if not remaining.startswith(topic_noun):
                     continue
-                if head_class == "prefix" and len(noun) < len(t.get("surface", "")):
-                    continue
-                if head_class != "prefix" and not nominal_left:
-                    continue
-                consumed, j = _consume_span(tokens, i, len(headed_noun))
-                if consumed != headed_noun:
+                consumed, j = _consume_span(tokens, i, len(topic_noun))
+                if consumed != topic_noun:
                     continue
                 result.extend(
                     (
-                        {"surface": head, "pos": head_pos, "pos_sub1": head_pos_sub1, "lemma": head},
+                        {"surface": "は", "pos": "助詞", "pos_sub1": "係助詞", "lemma": "は"},
                         {"surface": noun, "pos": "Noun", "lemma": noun},
                     )
                 )
                 i = j
                 merged = True
                 if applied_rule is None:
-                    applied_rule = f"{head_class}+l2-noun-boundary"
+                    applied_rule = "topic+l2-noun-boundary"
                 break
+
+        # A listed noun whose span crosses reference cells at either edge.
+        if not merged:
+            span = _listed_noun_span(tokens, i, remaining, result)
+            if span is not None:
+                cells, i = span
+                result.extend(cells)
+                merged = True
+                if applied_rule is None:
+                    applied_rule = "l2-noun-span"
 
         # After a clause-final predicate (a verb, an i-adjective, or the
         # auxiliaries た/だ/ない/な), ものの is a closed concessive particle when a
@@ -900,11 +971,7 @@ def _merge_fixed_search_units(state: MergeState) -> bool:
                 consumed, j = _consume_span(tokens, i, len(noun))
                 if consumed != noun or j == i + 1:
                     continue
-                starts_as_closed_class = t.get("pos") in ("助詞", "助動詞", "連体詞")
-                corrected_two_mora_noun = (
-                    j == i + 2 and tokens[i + 1].get("pos") == "Particle" and tokens[i + 1].get("pos_sub1") == "一般"
-                )
-                if starts_as_closed_class and j < i + 3 and not corrected_two_mora_noun:
+                if _opens_on_closed_word(tokens, i, j):
                     continue
                 follows_verb_as_classical_ha_row = (
                     bool(result)
