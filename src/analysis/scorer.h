@@ -25,9 +25,6 @@ struct ScorerOptions {
   float verb_prior = 0.2F;
   float adj_prior = 0.3F;
   float adv_prior = 0.2F;  // Reduced from 0.4F to avoid penalizing common adverbs
-  float particle_prior = 0.1F;
-  float aux_prior = 0.2F;
-  float pronoun_prior = 0.1F;
 
   // Bonuses
   float user_dict_bonus = -2.0F;

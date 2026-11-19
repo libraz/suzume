@@ -584,6 +584,23 @@ TEST_F(LoadFromEnvTest, UnknownScorerEnvironmentVariableIsReported) {
   EXPECT_EQ(result.warnings.front(), "Unknown scorer environment variable: SUZUME_SCORER_JOIN_compund_verb_bonus");
 }
 
+// The removed unary priors are refused like any other unknown name, in JSON and in the environment.
+TEST_F(LoadFromEnvTest, RemovedUnaryPriorsAreUnknown) {
+  for (const std::string removed : {"particle_prior", "aux_prior", "pronoun_prior"}) {
+    ScorerOptions opts;
+    std::string error;
+    EXPECT_FALSE(ScorerOptionsLoader::loadFromJsonString(R"({"unary":{")" + removed + R"(":0.1}})", opts, &error));
+    EXPECT_EQ(error, "Unknown scorer option: unary." + removed);
+
+    const std::string variable_name = "SUZUME_SCORER_UNARY_" + removed;
+    ScopedEnv env(variable_name, "0.1");
+    const auto result = ScorerOptionsLoader::loadFromEnv(opts, true);
+    EXPECT_EQ(result.env_override_count, 0);
+    ASSERT_EQ(result.warnings.size(), 1u);
+    EXPECT_EQ(result.warnings.front(), "Unknown scorer environment variable: " + variable_name);
+  }
+}
+
 #endif  // __EMSCRIPTEN__
 
 // =============================================================================

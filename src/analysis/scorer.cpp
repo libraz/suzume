@@ -8,6 +8,9 @@ namespace suzume::analysis {
 
 namespace {
 
+// Prior for a POS with no prior option; of the posPrior callers only the interjection join reaches it.
+constexpr float kUnconfiguredPosPrior = 0.5F;
+
 // Convert POS to array index
 constexpr size_t posToIndex(core::PartOfSpeech pos) {
   switch (pos) {
@@ -101,14 +104,8 @@ float Scorer::posPrior(core::PartOfSpeech pos) const {
       return options_.adj_prior;
     case core::PartOfSpeech::Adverb:
       return options_.adv_prior;
-    case core::PartOfSpeech::Particle:
-      return options_.particle_prior;
-    case core::PartOfSpeech::Auxiliary:
-      return options_.aux_prior;
-    case core::PartOfSpeech::Pronoun:
-      return options_.pronoun_prior;
     default:
-      return 0.5F;
+      return kUnconfiguredPosPrior;
   }
 }
 

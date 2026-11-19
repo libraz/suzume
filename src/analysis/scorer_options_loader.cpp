@@ -64,14 +64,11 @@ constexpr std::array<OptionSpec, 10> kSplitOptionSpecs{{
     SUZUME_OPTION(SplitOptions, verified_verb_bonus),
 }};
 
-constexpr std::array<OptionSpec, 8> kUnaryOptionSpecs{{
+constexpr std::array<OptionSpec, 5> kUnaryOptionSpecs{{
     SUZUME_OPTION(ScorerOptions, noun_prior),
     SUZUME_OPTION(ScorerOptions, verb_prior),
     SUZUME_OPTION(ScorerOptions, adj_prior),
     SUZUME_OPTION(ScorerOptions, adv_prior),
-    SUZUME_OPTION(ScorerOptions, particle_prior),
-    SUZUME_OPTION(ScorerOptions, aux_prior),
-    SUZUME_OPTION(ScorerOptions, pronoun_prior),
     SUZUME_OPTION(ScorerOptions, user_dict_bonus),
 }};
 

@@ -2303,6 +2303,108 @@
       "message": "invalid scorer options: JSON parse error: Expected string key in object"
     },
     {
+      "id": "native-removed-scorer-key-particle-prior",
+      "group": "error-model",
+      "call": {
+        "npm": {
+          "member": "create",
+          "kind": "call"
+        },
+        "python": {
+          "member": "Suzume",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "scorerOptions",
+        "python": "scorer_options"
+      },
+      "value": "{\"unary\": {\"particle_prior\": 0.1}}",
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 4,
+          "operation": "create"
+        },
+        "python": {
+          "type": "SuzumeError",
+          "code": 4,
+          "operation": "create"
+        }
+      },
+      "message": "invalid scorer options: Unknown scorer option: unary.particle_prior"
+    },
+    {
+      "id": "native-removed-scorer-key-aux-prior",
+      "group": "error-model",
+      "call": {
+        "npm": {
+          "member": "create",
+          "kind": "call"
+        },
+        "python": {
+          "member": "Suzume",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "scorerOptions",
+        "python": "scorer_options"
+      },
+      "value": "{\"unary\": {\"aux_prior\": 0.1}}",
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 4,
+          "operation": "create"
+        },
+        "python": {
+          "type": "SuzumeError",
+          "code": 4,
+          "operation": "create"
+        }
+      },
+      "message": "invalid scorer options: Unknown scorer option: unary.aux_prior"
+    },
+    {
+      "id": "native-removed-scorer-key-pronoun-prior",
+      "group": "error-model",
+      "call": {
+        "npm": {
+          "member": "create",
+          "kind": "call"
+        },
+        "python": {
+          "member": "Suzume",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "scorerOptions",
+        "python": "scorer_options"
+      },
+      "value": "{\"unary\": {\"pronoun_prior\": 0.1}}",
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 4,
+          "operation": "create"
+        },
+        "python": {
+          "type": "SuzumeError",
+          "code": 4,
+          "operation": "create"
+        }
+      },
+      "message": "invalid scorer options: Unknown scorer option: unary.pronoun_prior"
+    },
+    {
       "id": "order-text-before-options",
       "group": "order",
       "call": {

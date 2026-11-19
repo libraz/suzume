@@ -141,6 +141,9 @@ REMOVED_NAMES = (
     "--no-user-dict",
     "--dict",
     "-f morpheme",
+    "particle_prior",
+    "aux_prior",
+    "pronoun_prior",
 )
 # Consumer-facing text says "base form"; the `lemmatize` option keeps its name, which
 # the whole-identifier match leaves alone.
