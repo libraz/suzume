@@ -141,6 +141,35 @@ def _postprocess_terminal_listing_shi(result: list[dict], applied_rule: str | No
     return result, applied_rule
 
 
+def _postprocess_terminal_adjective_topic_noun(
+    result: list[dict], applied_rule: str | None
+) -> tuple[list[dict], str | None]:
+    """Read は plus a literary adjective after an i-adjective's terminal cell as one noun.
+
+    A modern terminal cell does not take the topic particle bare (it needs の), so
+    よい+は+なし is the attributive phrase before the noun はなし, when the
+    reference dictionary spells that run as a single noun.
+    """
+    for index in range(len(result) - 2, 0, -1):
+        previous, particle, adjective = result[index - 1], result[index], result[index + 1]
+        if not (
+            previous.get("pos") == "形容詞"
+            and previous.get("conj_form") == "基本形"
+            and particle.get("pos") == "助詞"
+            and particle.get("pos_sub1") == "係助詞"
+            and adjective.get("pos") == "形容詞"
+            and adjective.get("conj_form") == "文語基本形"
+        ):
+            continue
+        noun = particle.get("surface", "") + adjective.get("surface", "")
+        if not is_single_token_of_pos(noun, "名詞"):
+            continue
+        result[index : index + 2] = [{"surface": noun, "pos": "名詞", "pos_sub1": "一般", "lemma": noun}]
+        if applied_rule is None:
+            applied_rule = "terminal-adjective-topic-noun"
+    return result, applied_rule
+
+
 _KARI_TAILS = ("かり", "かる", "かれ")
 KARI_MIZENKEI_CELL = "から"
 # The supplementary conjugation offers two cells the reference dictionary

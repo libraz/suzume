@@ -2379,3 +2379,35 @@ class TestSmallKanaFragmentCopula:
     )
     def test_a_tail_that_does_not_open_with_the_copula_stays_attached(self, text, surfaces):
         assert [token["surface"] for token in get_expected_tokens(text)[0]] == surfaces
+
+
+class TestTerminalAdjectiveBeforeTopicNashi:
+    """An i-adjective's terminal cell modifies the noun は spells with a literary adjective after it."""
+
+    @staticmethod
+    def _read(text):
+        return [(token["surface"], token["pos"], token.get("lemma")) for token in get_expected_tokens(text)[0]]
+
+    @pytest.mark.parametrize(
+        ("text", "head"),
+        [
+            ("よいはなしです", ("よい", "Adjective", "よい")),
+            ("悪いはなしです", ("悪い", "Adjective", "悪い")),
+            ("楽しいはなし。", ("楽しい", "Adjective", "楽しい")),
+        ],
+    )
+    def test_reads_the_noun_after_a_terminal_adjective(self, text, head):
+        assert self._read(text)[:2] == [head, ("はなし", "Noun", "はなし")]
+
+    @pytest.mark.parametrize(
+        ("text", "surfaces"),
+        [
+            ("問題はなしです", ["問題", "は", "なし", "です"]),
+            ("よいことはなしです", ["よい", "こと", "は", "なし", "です"]),
+            ("悪くはない", ["悪く", "は", "ない"]),
+            ("いいはない", ["いい", "は", "ない"]),
+            ("いいはいいが", ["いい", "は", "いい", "が"]),
+        ],
+    )
+    def test_keeps_the_topic_particle_elsewhere(self, text, surfaces):
+        assert [token[0] for token in self._read(text)] == surfaces
