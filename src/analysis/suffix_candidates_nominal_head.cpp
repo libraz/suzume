@@ -108,6 +108,34 @@ bool hasNominalClosingParticleAt(const std::vector<char32_t>& codepoints, size_t
   return false;
 }
 
+// The one-mora genitive closes a selected head as a case particle does
+// (その+せんせい+の), but it is weaker evidence: the head may not open on a
+// particle mora (ある+か+なき+か+の) nor start inside a listed word that
+// runs through the selector (かのじょ+の); its contraction ん is a nominalizer.
+bool hasGenitiveClosingAt(const std::vector<char32_t>& codepoints, size_t head_start, size_t head_end,
+                          const dictionary::DictionaryManager& dict_manager) {
+  if (head_end >= codepoints.size() || codepoints[head_end] != U'の' ||
+      lookupEntryInRange(dict_manager, codepoints, head_start, head_start + 1, core::PartOfSpeech::Particle) !=
+          nullptr) {
+    return false;
+  }
+  const auto* genitive =
+      lookupEntryInRange(dict_manager, codepoints, head_end, head_end + 1, core::PartOfSpeech::Particle);
+  if (genitive == nullptr || genitive->extended_pos != core::ExtendedPOS::ParticleNo) {
+    return false;
+  }
+  constexpr size_t kSelectorWindow = 3;
+  for (size_t word_start = lookbehindStart(head_start, kSelectorWindow); word_start < head_start; ++word_start) {
+    for (const auto& match : lookupResultsInRange(dict_manager, codepoints, word_start,
+                                                  lookaheadEnd(codepoints.size(), head_start, kSelectorWindow))) {
+      if (word_start + match.length > head_start) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
 bool hasGenitiveNominalSelector(const std::vector<char32_t>& codepoints,
                                 const std::vector<normalize::CharType>& char_types, size_t start_pos,
                                 const dictionary::DictionaryManager* dict_manager) {
@@ -425,7 +453,8 @@ void generateSelectedNominalHeadCandidates(const std::vector<char32_t>& codepoin
     // (ほんの+ちょっ+と is the adverb ちょっと read through its own ending).
     if (head_end > codepoints.size() || codepoints[head_end - 1] == core::hiragana::kSmallTsu ||
         !isSelectedNominalHeadShape(char_types, start_pos, head_end, has_attributive_selector) ||
-        !hasNominalClosingParticleAt(codepoints, head_end, dict_manager)) {
+        (!hasNominalClosingParticleAt(codepoints, head_end, dict_manager) &&
+         !hasGenitiveClosingAt(codepoints, start_pos, head_end, *dict_manager))) {
       continue;
     }
 
