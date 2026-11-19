@@ -43,6 +43,30 @@ def _bare_kanji_vowel_stem_lemma(surface: str) -> str | None:
     return surface + "る" if tokens[0].get("conj_type", "").startswith(("一段", "カ変")) else None
 
 
+def _vowel_stem_irrealis_host(merged: list[dict]) -> tuple[int, str, str] | None:
+    """The closing cells of ``merged`` that spell a 一段/カ変 irrealis with okurigana.
+
+    The vowel-stem irrealis is the same cell as its continuative (食べ, 秀で), and
+    the dictionary may cut it at the okurigana (秀 + で). Join the last two
+    cells, then the last one, and keep them only when the join plus る is one
+    一段/カ変 verb that opens on a content word, so a case particle that spells
+    no stem (家 + で, and で alone, which is 出る's stem) stays. Return (cell
+    count, stem, lemma).
+    """
+    for count in (2, 1):
+        if len(merged) < count or merged[-count].get("pos") in ("助詞", "助動詞"):
+            continue
+        stem = "".join(cell.get("surface", "") for cell in merged[-count:])
+        if not _HIRAGANA_TAIL.search(stem):
+            continue
+        probe = mecab_analyze(stem + "る")
+        if len(probe) != 1 or probe[0].get("pos") != "動詞" or probe[0].get("surface") != stem + "る":
+            continue
+        if probe[0].get("conj_type", "").startswith(("一段", "カ変")):
+            return count, stem, stem + "る"
+    return None
+
+
 def _promote_bare_kanji_host(merged: list[dict], previous: dict, lemma: str) -> None:
     """Give a bare vowel stem back the verb reading its irrealis position implies.
 
@@ -153,21 +177,30 @@ def _postprocess_classical_mu(result: list[dict], applied_rule: str | None) -> t
                 applied_rule = "classical-mu-boundary"
             continue
         # The boundary already stands, but with no auxiliary entry to land on the
-        # dictionary files the bare mora as an interjection (成ら+む, 待た+む).  An
-        # interjection cannot follow an irrealis stem, so the position settles the
-        # POS and the auxiliary keeps one reading across every context.
+        # dictionary files the bare mora as an interjection or a noun (成ら+む,
+        # 食べ+む).  Neither can follow an irrealis stem, so the position settles
+        # the POS and the auxiliary keeps one reading across every context.
+        vowel_stem = (
+            _vowel_stem_irrealis_host(merged)
+            if surface == _CLASSICAL_IRREALIS_AUX and token.get("pos") != "助動詞" and bare_kanji_lemma is None
+            else None
+        )
         if (
             previous is not None
             and surface == _CLASSICAL_IRREALIS_AUX
             and token.get("pos") != "助動詞"
             and (
                 bare_kanji_lemma is not None
+                or vowel_stem is not None
                 # An auxiliary's own irrealis hosts it the same way (来+たら+む, 花+なら+む).
                 or (previous.get("pos") in ("動詞", "助動詞") and previous.get("surface", "")[-1:] in _A_ROW_TO_U_ROW)
             )
         ):
             if bare_kanji_lemma is not None:
                 _promote_bare_kanji_host(merged, previous, bare_kanji_lemma)
+            elif vowel_stem is not None:
+                count, stem, lemma = vowel_stem
+                merged[-count:] = [{"surface": stem, "pos": "動詞", "lemma": lemma}]
             merged.append({"surface": surface, "pos": "助動詞", "lemma": surface})
             idx += 1
             if applied_rule is None:

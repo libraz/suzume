@@ -1032,3 +1032,33 @@ class TestTadaReading:
     def test_reads_tada_by_its_clause(self, text, pos):
         tokens = get_expected_tokens(text)[0]
         assert next(t["pos"] for t in tokens if t["surface"] == "ただ") == pos
+
+
+class TestVowelStemIrrealisMu:
+    @pytest.mark.parametrize(
+        ("text", "pair"),
+        [
+            ("食べむ", [("食べ", "Verb", "食べる"), ("む", "Auxiliary", "む")]),
+            ("撫でむ", [("撫で", "Verb", "撫でる"), ("む", "Auxiliary", "む")]),
+            ("人に秀でむ", [("秀で", "Verb", "秀でる"), ("む", "Auxiliary", "む")]),
+            ("秀でむ", [("秀で", "Verb", "秀でる"), ("む", "Auxiliary", "む")]),
+            ("見む", [("見", "Verb", "見る"), ("む", "Auxiliary", "む")]),
+        ],
+    )
+    def test_reads_mu_after_a_vowel_stem_irrealis(self, text, pair):
+        tokens = get_expected_tokens(text)[0]
+        assert [(t["surface"], t["pos"], t["lemma"]) for t in tokens[-2:]] == pair
+
+    @pytest.mark.parametrize(
+        ("text", "surfaces"),
+        [
+            ("外でむかう", ["外", "で", "むかう"]),
+            ("手でむく", ["手", "で", "むく"]),
+            ("家でむ", None),
+        ],
+    )
+    def test_keeps_a_case_particle_that_spells_no_verb_stem(self, text, surfaces):
+        tokens = get_expected_tokens(text)[0]
+        assert not any(t["pos"] == "Verb" and t["surface"].endswith("で") for t in tokens)
+        if surfaces is not None:
+            assert [t["surface"] for t in tokens] == surfaces
