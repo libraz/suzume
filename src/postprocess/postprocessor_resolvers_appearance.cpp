@@ -16,8 +16,7 @@ namespace suzume::postprocess::resolver {
 // auxiliary. Attributive な is deliberately excluded because it is not a
 // predicative copula onset.
 bool isPredicativeCopula(const core::Morpheme& morpheme) {
-  if (morpheme.extended_pos != core::ExtendedPOS::AuxCopulaDa &&
-      morpheme.extended_pos != core::ExtendedPOS::AuxCopulaDesu) {
+  if (!core::isPlainCopulaType(morpheme.extended_pos) && morpheme.extended_pos != core::ExtendedPOS::AuxCopulaDesu) {
     return false;
   }
   return morpheme.surface == "だ" || morpheme.surface == "だっ" || morpheme.surface == "です" ||
@@ -131,7 +130,7 @@ void resolveProgressiveContractionNominalizer(std::vector<core::Morpheme>& resul
   // copula behind it cannot supply one either. What the two spell there is the
   // nominalizer plus that copula (んじゃないか).
   if (result.size() >= 2 && result[0].extended_pos == core::ExtendedPOS::AuxNegativeNu &&
-      result[1].extended_pos == core::ExtendedPOS::AuxCopulaDa) {
+      core::isPlainCopulaType(result[1].extended_pos)) {
     retagUninflected(result[0], core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleNo, "の");
     // What negates that copula is the auxiliary, as in any copular negative
     // chain, not the existence adjective.
@@ -146,7 +145,7 @@ void resolveProgressiveContractionNominalizer(std::vector<core::Morpheme>& resul
     if (contraction.surface != "ん" || contraction.extended_pos != core::ExtendedPOS::AuxNegativeNu ||
         !followsTeFormConnective(connective) ||
         (continuation.extended_pos != core::ExtendedPOS::ParticleNo &&
-         continuation.extended_pos != core::ExtendedPOS::AuxCopulaDa)) {
+         !core::isPlainCopulaType(continuation.extended_pos))) {
       continue;
     }
     retagUninflected(contraction, core::PartOfSpeech::Particle, core::ExtendedPOS::ParticleNo, "の");
@@ -266,7 +265,7 @@ void resolveCopularNegative(std::vector<core::Morpheme>& result) {
         predicate.extended_pos == core::ExtendedPOS::ParticleBinding ||
         // An auxiliary that hosts the copula is a predicate nominal too (べき+で+は+ない).
         predicate.pos == core::PartOfSpeech::Auxiliary;
-    if (!is_nominal_predicate || de.surface != "で" || de.extended_pos != core::ExtendedPOS::AuxCopulaDa ||
+    if (!is_nominal_predicate || de.surface != "で" || !core::isPlainCopulaType(de.extended_pos) ||
         topic.extended_pos != core::ExtendedPOS::ParticleTopic || topic.surface != "は" ||
         !utf8::equalsAny(negative.surface, {"ない", "なく", "なかっ"})) {
       continue;
@@ -279,7 +278,7 @@ void resolveCopularNegative(std::vector<core::Morpheme>& result) {
   for (size_t idx = 1; idx < result.size(); ++idx) {
     const auto& de = result[idx - 1];
     auto& negative = result[idx];
-    if (de.surface != "で" || de.extended_pos != core::ExtendedPOS::AuxCopulaDa || negative.surface != "ない") {
+    if (de.surface != "で" || !core::isPlainCopulaType(de.extended_pos) || negative.surface != "ない") {
       continue;
     }
     retagNegativeNai(negative);
@@ -294,7 +293,7 @@ void resolveNaAdjectiveCopularPast(std::vector<core::Morpheme>& result) {
     const auto& predicate = result[idx - 1];
     auto& aru = result[idx + 1];
     if (predicate.extended_pos != core::ExtendedPOS::AdjNaAdj || de.surface != "で" ||
-        de.extended_pos != core::ExtendedPOS::AuxCopulaDa || aru.surface != "あっ") {
+        !core::isPlainCopulaType(de.extended_pos) || aru.surface != "あっ") {
       continue;
     }
     retag(aru, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxCopulaDa, "ある",
@@ -308,7 +307,7 @@ void resolveCopularPastConditional(std::vector<core::Morpheme>& result) {
   for (size_t idx = 1; idx < result.size(); ++idx) {
     const auto& copula = result[idx - 1];
     auto& conditional = result[idx];
-    if (copula.extended_pos != core::ExtendedPOS::AuxCopulaDa || !utf8::endsWith(copula.surface, "っ") ||
+    if (!core::isPlainCopulaType(copula.extended_pos) || !utf8::endsWith(copula.surface, "っ") ||
         conditional.surface != "たら" || conditional.extended_pos != core::ExtendedPOS::ParticleConj) {
       continue;
     }
@@ -350,7 +349,7 @@ void mergeSplitCopularNegative(std::vector<core::Morpheme>& result) {
   for (size_t idx = 0; idx + 1 < result.size(); ++idx) {
     auto& na = result[idx];
     const auto& i = result[idx + 1];
-    if (na.extended_pos != core::ExtendedPOS::AuxCopulaDa || na.surface != "な" || na.end != i.start ||
+    if (!core::isPlainCopulaType(na.extended_pos) || na.surface != "な" || na.end != i.start ||
         i.extended_pos != core::ExtendedPOS::AuxAspectIru || i.surface != "い") {
       continue;
     }
@@ -375,7 +374,7 @@ void mergeSplitFormalNounNegativeRenyokei(std::vector<core::Morpheme>& result) {
     auto& na = result[idx];
     const auto& ku = result[idx + 1];
     if (formal_noun.surface != "こと" || formal_noun.extended_pos != core::ExtendedPOS::NounFormal ||
-        na.surface != "な" || na.extended_pos != core::ExtendedPOS::AuxCopulaDa || ku.surface != "く" ||
+        na.surface != "な" || !core::isPlainCopulaType(na.extended_pos) || ku.surface != "く" ||
         ku.pos != core::PartOfSpeech::Auxiliary || na.end != ku.start) {
       continue;
     }
@@ -577,8 +576,7 @@ void resolveNegativeAppearanceSuffix(std::vector<core::Morpheme>& result) {
 // verbal auxiliary. The copula is not one — its negation takes the
 // supplementary adjective instead.
 bool followsPredicateStem(const core::Morpheme& morpheme) {
-  if (morpheme.extended_pos == core::ExtendedPOS::AuxCopulaDa ||
-      morpheme.extended_pos == core::ExtendedPOS::AuxCopulaDesu) {
+  if (core::isPlainCopulaType(morpheme.extended_pos) || morpheme.extended_pos == core::ExtendedPOS::AuxCopulaDesu) {
     return false;
   }
   return morpheme.pos == core::PartOfSpeech::Verb || morpheme.pos == core::PartOfSpeech::Auxiliary;
@@ -617,7 +615,7 @@ void resolveNegativeRenyokei(std::vector<core::Morpheme>& result) {
     // ではなく keeps the auxiliary reading even though the topical particle
     // separates it from the copula it negates.
     const bool follows_copular_topic = idx >= 2 && result[idx - 1].extended_pos == core::ExtendedPOS::ParticleTopic &&
-                                       result[idx - 2].extended_pos == core::ExtendedPOS::AuxCopulaDa;
+                                       core::isPlainCopulaType(result[idx - 2].extended_pos);
     if (follows_copular_topic) {
       continue;
     }

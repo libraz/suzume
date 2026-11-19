@@ -349,7 +349,7 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
                                                                          kanji_end, core::PartOfSpeech::Pronoun);
       const auto* copula =
           dict_manager == nullptr ? nullptr : dict_manager->lookupExact("だ", core::PartOfSpeech::Auxiliary);
-      if (pronoun == nullptr && copula != nullptr && copula->extended_pos == core::ExtendedPOS::AuxCopulaDa) {
+      if (pronoun == nullptr && copula != nullptr && core::isPlainCopulaType(copula->extended_pos)) {
         const size_t stem_end = kanji_end + 1;
         const std::string stem = extractSubstring(codepoints, start_pos, stem_end);
         candidates.push_back(makeNaAdjCandidate(stem, start_pos, stem_end, candidate::kNaAdjStemCost, true,
@@ -384,7 +384,7 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
               const bool plural_ra = !plural_host && match.entry->pos == core::PartOfSpeech::Suffix &&
                                      grammar::isSingleHiragana(match.entry->surface, U'ら');
               contains_closed_suffix = contains_closed_suffix || (match.length == stem_end - kanji_end && !plural_ra);
-              starts_closed_tail = starts_closed_tail || match.entry->extended_pos == core::ExtendedPOS::AuxCopulaDa ||
+              starts_closed_tail = starts_closed_tail || core::isPlainCopulaType(match.entry->extended_pos) ||
                                    match.entry->extended_pos == core::ExtendedPOS::AuxCopulaDesu;
             }
           }

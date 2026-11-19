@@ -250,7 +250,7 @@ bool hasAttributiveNominalSelector(const std::vector<char32_t>& codepoints,
       }
       return false;
     }();
-    if (attributive_copula != nullptr && attributive_copula->extended_pos == core::ExtendedPOS::AuxCopulaDa &&
+    if (attributive_copula != nullptr && core::isPlainCopulaType(attributive_copula->extended_pos) &&
         selector_start + 1 < start_pos && !crosses_selected_ta) {
       const auto* na_adjective =
           lookupEntryInRange(*dict_manager, codepoints, selector_start, start_pos - 1, core::PartOfSpeech::Adjective);
@@ -466,7 +466,7 @@ void generateSelectedNominalHeadCandidates(const std::vector<char32_t>& codepoin
     // という話だが, the selected head is 話 and だ begins its predicate; treating
     // 話だ as the head erases an inflectional boundary.
     const bool absorbs_copula =
-        trailing_auxiliary != nullptr && trailing_auxiliary->extended_pos == core::ExtendedPOS::AuxCopulaDa;
+        trailing_auxiliary != nullptr && core::isPlainCopulaType(trailing_auxiliary->extended_pos);
     const bool mixed_head = char_types[start_pos] == normalize::CharType::Kanji;
     bool has_productive_adjective_nominalization = false;
     if (codepoints[head_end - 1] == U'さ') {

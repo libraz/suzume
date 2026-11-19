@@ -128,7 +128,7 @@ bool lacksLicensingEnvironment(const DictionaryCandidateContext& ctx, const core
   // The copula's continuative (で) chains a clause and is never case-marked;
   // only its terminal quotes or takes a particle (学生だ+と). Before a case
   // particle the mora is the case particle itself (人+で+にぎわう).
-  if (result.entry->extended_pos == core::ExtendedPOS::AuxCopulaDa && grammar::endsWithERow(result.entry->surface) &&
+  if (core::isPlainCopulaType(result.entry->extended_pos) && grammar::endsWithERow(result.entry->surface) &&
       verb_helpers::caseParticleFollowsAt(dict_manager, codepoints, end_pos)) {
     return true;
   }

@@ -735,7 +735,7 @@ bool predicateAuxiliaryFollowsAt(const dictionary::DictionaryManager* dict_manag
   constexpr size_t kAuxiliaryProbe = 4;
   return hasDictionaryEntryFrom(dict_manager, codepoints, pos, 1, kAuxiliaryProbe, core::PartOfSpeech::Auxiliary,
                                 [](const dictionary::DictionaryEntry& entry) {
-                                  return entry.extended_pos != core::ExtendedPOS::AuxCopulaDa &&
+                                  return !core::isPlainCopulaType(entry.extended_pos) &&
                                          entry.extended_pos != core::ExtendedPOS::AuxCopulaDesu;
                                 });
 }

@@ -55,7 +55,7 @@ void addImpossibleAttachmentRules(const core::LatticeEdge& prev, const core::Lat
   const bool incomplete_potential_before_symbol =
       next.extended_pos == core::ExtendedPOS::Symbol &&
       ((prev.extended_pos == core::ExtendedPOS::AuxPotential && normalize::utf8Length(prev.surface) == 1) ||
-       (prev.extended_pos == core::ExtendedPOS::AuxCopulaDa && grammar::isAttributiveCopulaNa(prev.surface)));
+       (core::isPlainCopulaType(prev.extended_pos) && grammar::isAttributiveCopulaNa(prev.surface)));
   // が after a terminal verb has two readings, and neither is open to a
   // fabricated predicate.  The case particle requires a nominal on its left, so
   // it is barred there outright and the adversative conjunctive particle takes
@@ -72,7 +72,7 @@ void addImpossibleAttachmentRules(const core::LatticeEdge& prev, const core::Lat
   // barred outright (は+なし+を is はなし+を).
   const bool finite_predicate_cell =
       prev.extended_pos == core::ExtendedPOS::AdjBasic || prev.extended_pos == core::ExtendedPOS::AuxTenseTa ||
-      prev.extended_pos == core::ExtendedPOS::AuxNegativeNai || prev.extended_pos == core::ExtendedPOS::AuxCopulaDa ||
+      prev.extended_pos == core::ExtendedPOS::AuxNegativeNai || core::isPlainCopulaType(prev.extended_pos) ||
       prev.extended_pos == core::ExtendedPOS::AuxCopulaDesu || prev.extended_pos == core::ExtendedPOS::AuxTenseMasu;
   const bool terminal_verb_before_ga =
       ((prev.extended_pos == core::ExtendedPOS::VerbShuushikei || finite_predicate_cell) &&
@@ -92,7 +92,7 @@ void addImpossibleAttachmentRules(const core::LatticeEdge& prev, const core::Lat
   // never the attributive copula; nor does the negative ぬ/ん, which is
   // attributive itself (見ん+な is the prohibitive, 知らん+な the final particle).
   const bool nonterminal_predicate_before_assertive_copula =
-      next.extended_pos == core::ExtendedPOS::AuxCopulaDa &&
+      core::isPlainCopulaType(next.extended_pos) &&
       (prev.extended_pos == core::ExtendedPOS::VerbKateikei || prev.extended_pos == core::ExtendedPOS::AuxPotential ||
        ((prev.extended_pos == core::ExtendedPOS::VerbRenyokei ||
          prev.extended_pos == core::ExtendedPOS::AuxAspectMiru ||
@@ -131,7 +131,7 @@ void addImpossibleAttachmentRules(const core::LatticeEdge& prev, const core::Lat
        prev.extended_pos == core::ExtendedPOS::AuxNegativeNai || prev.extended_pos == core::ExtendedPOS::VerbRenyokei);
   // The copular ある completes で(+binding particle)+ある; directly on a nominal
   // it is the existential verb with its case particle dropped (ことある).
-  const bool copular_aru_on_nominal = next.extended_pos == core::ExtendedPOS::AuxCopulaDa &&
+  const bool copular_aru_on_nominal = core::isPlainCopulaType(next.extended_pos) &&
                                       prev.pos == core::PartOfSpeech::Noun &&
                                       grammar::isCopulaPeriphrasisCell(next.surface);
   // The concessive のに closes its clause; before a binding particle the
@@ -142,7 +142,7 @@ void addImpossibleAttachmentRules(const core::LatticeEdge& prev, const core::Lat
   // The attributive な needs a nominal head, which a final particle is not;
   // か+な in front of a predicate is an irrealis cut at its stem (行+か+な).
   const bool attributive_na_after_final_particle = prev.extended_pos == core::ExtendedPOS::ParticleFinal &&
-                                                   next.extended_pos == core::ExtendedPOS::AuxCopulaDa &&
+                                                   core::isPlainCopulaType(next.extended_pos) &&
                                                    grammar::isAttributiveCopulaNa(next.surface);
   // The continuative でし of です exists only before the past (でし+た/たら) and
   // the connective (でし+て); elsewhere で+し is a case particle and a kana run.
@@ -154,7 +154,7 @@ void addImpossibleAttachmentRules(const core::LatticeEdge& prev, const core::Lat
   // closes its phrase and leaves none in front of it (手は+で+ます is 出る).
   const bool copula_continuative_after_binding = (prev.extended_pos == core::ExtendedPOS::ParticleTopic ||
                                                   prev.extended_pos == core::ExtendedPOS::ParticleBinding) &&
-                                                 next.extended_pos == core::ExtendedPOS::AuxCopulaDa &&
+                                                 core::isPlainCopulaType(next.extended_pos) &&
                                                  grammar::isTeDeSurface(next.surface);
   // A nominal or na-stem takes the attributive copula, so an adverb spelled
   // from it there is the copula chain instead (好き+な+ん+で, not 好き+なんで).
@@ -181,7 +181,7 @@ void addImpossibleAttachmentRules(const core::LatticeEdge& prev, const core::Lat
   const bool geminate_formal_noun =
       prev.extended_pos == core::ExtendedPOS::NounFormal && utf8::endsWith(prev.surface, "っ");
   const bool assimilated_copula =
-      next.extended_pos == core::ExtendedPOS::AuxCopulaDa && grammar::isGeminateAssimilatedCopula(next.surface);
+      core::isPlainCopulaType(next.extended_pos) && grammar::isGeminateAssimilatedCopula(next.surface);
   const bool unpaired_assimilated_copula =
       geminate_formal_noun != assimilated_copula ||
       (prev.pos == core::PartOfSpeech::Particle && next.extended_pos == core::ExtendedPOS::NounFormal &&
@@ -394,7 +394,7 @@ void addClosedClauseParticleRules(const core::LatticeEdge& prev, const core::Lat
                                 prev.extended_pos == core::ExtendedPOS::AuxTenseTa;
   const bool binding_after_finite =
       next.extended_pos == core::ExtendedPOS::ParticleBinding &&
-      ((prev.extended_pos == core::ExtendedPOS::AuxCopulaDa && grammar::isSingleHiragana(prev.surface, U'だ')) ||
+      ((core::isPlainCopulaType(prev.extended_pos) && grammar::isSingleHiragana(prev.surface, U'だ')) ||
        (finite_predicate && grammar::isSingleHiragana(next.surface, U'ぞ')));
   if (case_after_final_particle || binding_after_finite) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);

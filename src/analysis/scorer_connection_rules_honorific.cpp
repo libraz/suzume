@@ -98,7 +98,7 @@ float computeProgressiveHonorificBonus(const core::LatticeEdge& prev, const core
   // んじゃ+ない+の),
   // never the independent adjective.
   const bool conjunctive_independent_nai =
-      (prev.extended_pos == core::ExtendedPOS::ParticleConj || prev.extended_pos == core::ExtendedPOS::AuxCopulaDa) &&
+      (prev.extended_pos == core::ExtendedPOS::ParticleConj || core::isPlainCopulaType(prev.extended_pos)) &&
       next.extended_pos == core::ExtendedPOS::AdjBasic && grammar::isIndependentNegativeAdjective(next.surface);
   if ((grammar::isTeDeSurface(prev.surface) && next.extended_pos == core::ExtendedPOS::AuxConjectureMitai) ||
       conjunctive_independent_nai) {
@@ -198,7 +198,7 @@ float computeProgressiveHonorificBonus(const core::LatticeEdge& prev, const core
 
   // Dialectal/character-speech やで is particle + particle in the regression
   // corpus, not copula で.
-  if (prev.surface == "や" && next.surface == "で" && next.extended_pos == core::ExtendedPOS::AuxCopulaDa) {
+  if (prev.surface == "や" && next.surface == "で" && core::isPlainCopulaType(next.extended_pos)) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
 
@@ -207,7 +207,7 @@ float computeProgressiveHonorificBonus(const core::LatticeEdge& prev, const core
   // adjective plus nominalizer in ないんだ. Nor can it take the past auxiliary,
   // which a character-speech ending is scored as, unless a nominalizer leads
   // it (雨+な+のだ, but not と+な+ぞる for なぞる).
-  if (prev.extended_pos == core::ExtendedPOS::AuxCopulaDa && grammar::isAttributiveCopulaNa(prev.surface)) {
+  if (core::isPlainCopulaType(prev.extended_pos) && grammar::isAttributiveCopulaNa(prev.surface)) {
     const bool past_without_nominalizer = next.extended_pos == core::ExtendedPOS::AuxTenseTa &&
                                           !utf8::startsWith(next.surface, "の") &&
                                           !utf8::startsWith(next.surface, "ん");

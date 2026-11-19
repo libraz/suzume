@@ -109,8 +109,7 @@ void appendOnbinContractionCandidates(const std::vector<char32_t>& codepoints, s
     // this contraction; a bare と can also be a quotative or an adverb's mora.
     if (is_contraction_pattern && !is_tense_pattern &&
         !vh::auxiliaryFollowsAt(dict_manager, codepoints, onbin_pos + 1, [](const dictionary::DictionaryEntry& entry) {
-          return core::isAspectAuxiliaryType(entry.extended_pos) ||
-                 entry.extended_pos == core::ExtendedPOS::AuxCopulaDa;
+          return core::isAspectAuxiliaryType(entry.extended_pos) || core::isPlainCopulaType(entry.extended_pos);
         })) {
       continue;
     }

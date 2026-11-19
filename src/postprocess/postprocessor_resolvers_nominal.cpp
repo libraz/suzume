@@ -21,7 +21,7 @@ bool followsAttributiveModifier(const std::vector<core::Morpheme>& result, size_
   }
   const auto& modifier = result[idx - 1];
   return modifier.extended_pos == core::ExtendedPOS::AdjBasic || modifier.pos == core::PartOfSpeech::Determiner ||
-         (modifier.extended_pos == core::ExtendedPOS::AuxCopulaDa && grammar::isAttributiveCopulaNa(modifier.surface));
+         (core::isPlainCopulaType(modifier.extended_pos) && grammar::isAttributiveCopulaNa(modifier.surface));
 }
 
 bool hasDictionaryGodanBaseFromIRow(const core::Morpheme& noun, const dictionary::DictionaryManager* dict_manager) {
@@ -263,7 +263,7 @@ void resolveNominalCaseDe(std::vector<core::Morpheme>& result) {
         successor != nullptr &&
         (successor->extended_pos == core::ExtendedPOS::AuxGozaru || follows_negative || topic_starts_copular_negative ||
          topic_starts_copular_aru || binding_is_copular ||
-         (successor->extended_pos == core::ExtendedPOS::AuxCopulaDa && successor->surface != "あっ") ||
+         (core::isPlainCopulaType(successor->extended_pos) && successor->surface != "あっ") ||
          ((is_na_adjective || is_nominalized_clause) && successor->surface == "あっ") ||
          utf8::equalsAny(successor->surface, kAruForms) || utf8::equalsAny(successor->surface, kGozaruForms));
     const bool na_adjective_coordination =
@@ -309,7 +309,7 @@ void resolveCopularAro(std::vector<core::Morpheme>& result) {
   for (size_t idx = 1; idx < result.size(); ++idx) {
     const auto& copula = result[idx - 1];
     auto& aro = result[idx];
-    if (copula.extended_pos != core::ExtendedPOS::AuxCopulaDa || copula.surface != "で" || aro.surface != "あろ" ||
+    if (!core::isPlainCopulaType(copula.extended_pos) || copula.surface != "で" || aro.surface != "あろ" ||
         aro.extended_pos != core::ExtendedPOS::VerbMizenkei || aro.lemma != "ある") {
       continue;
     }
@@ -464,7 +464,7 @@ void resolveIndefiniteCaseDe(std::vector<core::Morpheme>& result) {
       retagCopulaDa(de);
       continue;
     }
-    if (de.extended_pos != core::ExtendedPOS::AuxCopulaDa || predicate.pos == core::PartOfSpeech::Auxiliary ||
+    if (!core::isPlainCopulaType(de.extended_pos) || predicate.pos == core::PartOfSpeech::Auxiliary ||
         (predicate.pos == core::PartOfSpeech::Verb && predicate.lemma == "ある")) {
       continue;
     }
@@ -507,7 +507,7 @@ void resolveNominalizedRenyokeiPredicate(std::vector<core::Morpheme>& result) {
     // だろ included), and add the polite copula class.  isPredicativeCopula()
     // is intentionally narrower and would drop attributive/conjectural forms.
     const bool before_copula =
-        next.extended_pos == core::ExtendedPOS::AuxCopulaDa || next.extended_pos == core::ExtendedPOS::AuxCopulaDesu;
+        core::isPlainCopulaType(next.extended_pos) || next.extended_pos == core::ExtendedPOS::AuxCopulaDesu;
     const bool before_nominalizing_suffix =
         next.pos == core::PartOfSpeech::Suffix && grammar::isRenyokeiNominalizingSuffix(next.surface);
     const bool before_naru = next.extended_pos == core::ExtendedPOS::ParticleCase && next.surface == "に" &&
@@ -613,7 +613,7 @@ void splitCopularQuoteAfterAdjectivalStem(std::vector<core::Morpheme>& result,
     }
     for (const auto& prefix : dict_manager->lookup(fused.surface, 0)) {
       const auto& copula_entry = *prefix.entry;
-      if ((copula_entry.extended_pos != core::ExtendedPOS::AuxCopulaDa &&
+      if ((!core::isPlainCopulaType(copula_entry.extended_pos) &&
            copula_entry.extended_pos != core::ExtendedPOS::AuxCopulaDesu) ||
           copula_entry.surface.size() >= fused.surface.size()) {
         continue;

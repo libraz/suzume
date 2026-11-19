@@ -606,7 +606,7 @@ void readPromotedSurface(const BracketedNounContext& ctx, const BracketedScan& b
   const bool copula_after_small_kana = scan >= start_pos + 2 && kana::isSmallKanaCodepoint(codepoints[scan - 2]);
   promoted.absorbs_copula_at_inflectional_boundary =
       (promoted.right_sokuon_final_particle || copula_after_small_kana) && absorbed_auxiliary != nullptr &&
-      absorbed_auxiliary->extended_pos == core::ExtendedPOS::AuxCopulaDa;
+      core::isPlainCopulaType(absorbed_auxiliary->extended_pos);
   promoted.has_exact_noun =
       dict_manager != nullptr && dict_manager->lookupExact(promoted_surface, core::PartOfSpeech::Noun) != nullptr;
   promoted.has_competing_exact_predicate =

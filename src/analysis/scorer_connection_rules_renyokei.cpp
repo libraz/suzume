@@ -222,7 +222,7 @@ void addConnectiveBoundaryRules(const core::LatticeEdge& prev, const core::Latti
   // A nominal or na-adjectival copula can be followed by the continuative
   // negative adjective in the change-of-state construction (本で+なく+なっ
   // +た, 静かで+なく+なる). This preserves the copular reading of で.
-  if (prev.extended_pos == core::ExtendedPOS::AuxCopulaDa && next.extended_pos == core::ExtendedPOS::AdjRenyokei &&
+  if (core::isPlainCopulaType(prev.extended_pos) && next.extended_pos == core::ExtendedPOS::AdjRenyokei &&
       next.lemma == "ない") {
     SUZUME_CONNECTION_ADD(bonus, cost::kDoubleVeryStrongBonus);
   }
@@ -230,7 +230,7 @@ void addConnectiveBoundaryRules(const core::LatticeEdge& prev, const core::Latti
   // The conditional copular negative retains the closed inflectional chain
   // で+なけれ+ば. Prefer its negative auxiliary over an adjective stem plus
   // the homographic classical auxiliary.
-  if (prev.extended_pos == core::ExtendedPOS::AuxCopulaDa && next.extended_pos == core::ExtendedPOS::AuxNegativeNai &&
+  if (core::isPlainCopulaType(prev.extended_pos) && next.extended_pos == core::ExtendedPOS::AuxNegativeNai &&
       utf8::equalsAny(next.surface, {"なけれ"})) {
     SUZUME_CONNECTION_ADD(bonus, cost::kDoubleVeryStrongBonus);
   }
@@ -590,7 +590,7 @@ void addSubsidiaryVerbRules(const core::LatticeEdge& prev, const core::LatticeEd
   // The continuative allomorph of ある can be followed by a topic marker in
   // emphatic negation (あり+は+しない). Keep its auxiliary analysis ahead of
   // the homographic lexical verb candidate.
-  if (prev.extended_pos == core::ExtendedPOS::AuxCopulaDa && grammar::isAruContinuativeSurface(prev.surface) &&
+  if (core::isPlainCopulaType(prev.extended_pos) && grammar::isAruContinuativeSurface(prev.surface) &&
       next.extended_pos == core::ExtendedPOS::ParticleTopic) {
     SUZUME_CONNECTION_ADD(bonus, cost::kStrongBonus);
   }

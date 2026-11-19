@@ -142,7 +142,7 @@ void appendIAdjClassicalTerminalCandidates(const std::vector<char32_t>& codepoin
       }
       return verb_helpers::auxiliaryFollowsAt(dict_manager, codepoints, pos,
                                               [](const dictionary::DictionaryEntry& entry) {
-                                                return entry.extended_pos == core::ExtendedPOS::AuxCopulaDa ||
+                                                return core::isPlainCopulaType(entry.extended_pos) ||
                                                        entry.extended_pos == core::ExtendedPOS::AuxCopulaDesu;
                                               });
     };

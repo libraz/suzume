@@ -226,7 +226,7 @@ void resolveCopulaAru(std::vector<core::Morpheme>& result) {
         result[idx - 1].conj_form != grammar::ConjForm::Base) {
       continue;
     }
-    if (copula.extended_pos != core::ExtendedPOS::AuxCopulaDa) {
+    if (!core::isPlainCopulaType(copula.extended_pos)) {
       retagCopulaDa(copula);
     }
     if (aru.pos == core::PartOfSpeech::Verb) {

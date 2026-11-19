@@ -413,7 +413,7 @@ float computeAdverbialNiAfterPredicatePenalty(const core::LatticeEdge& prev, con
   // instead (あまりの+こと+に).
   const bool nominal_modifier =
       prev.extended_pos == core::ExtendedPOS::Determiner || prev.extended_pos == core::ExtendedPOS::ParticleNo ||
-      (prev.extended_pos == core::ExtendedPOS::AuxCopulaDa && grammar::isAttributiveCopulaNa(prev.surface));
+      (core::isPlainCopulaType(prev.extended_pos) && grammar::isAttributiveCopulaNa(prev.surface));
   const bool formal_noun_frame = nominal_modifier && grammar::isSubstantiveFormalNoun(utf8::dropLastChar(next.surface));
   if ((!finished_predicate && !formal_noun_frame) || next.pos != core::PartOfSpeech::Adverb ||
       !next.dictionaryBacked() || !utf8::endsWith(next.surface, "に")) {
@@ -440,7 +440,7 @@ float computePrefixSymbolBonus(const core::LatticeEdge& prev, const core::Lattic
 
   // The attributive copula な selects a nominal, so it cannot be followed by
   // the quotative って (重+な+って is 重なっ+て): only the terminal だ quotes.
-  if (prev.extended_pos == core::ExtendedPOS::AuxCopulaDa && grammar::isAttributiveCopulaNa(prev.surface) &&
+  if (core::isPlainCopulaType(prev.extended_pos) && grammar::isAttributiveCopulaNa(prev.surface) &&
       next.extended_pos == core::ExtendedPOS::ParticleQuote) {
     SUZUME_CONNECTION_ADD(bonus, sc::kPenaltyIncompatibleInflection);
   }
@@ -525,7 +525,7 @@ float computePrefixSymbolBonus(const core::LatticeEdge& prev, const core::Lattic
   // This prevents 雨+で+も split when 雨+でも (副助詞) is correct
   // But allows 何+で+も split (で=copula連用形, も=係助詞)
   // The difference: 何(Pronoun) vs 雨(Noun) - Pronoun should split
-  if (prev.extended_pos == core::ExtendedPOS::AuxCopulaDa && prev.surface == "で" &&
+  if (core::isPlainCopulaType(prev.extended_pos) && prev.surface == "で" &&
       next.extended_pos == core::ExtendedPOS::ParticleTopic && next.surface == "も") {
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryRare);
   }

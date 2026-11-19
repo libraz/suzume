@@ -425,8 +425,8 @@ void resolveClosedInflectionalChains(std::vector<core::Morpheme>& result) {
     const auto& binding = result[idx + 1];
     const auto& suru = result[idx + 2];
     const auto& negative = result[idx + 3];
-    if (aru.pos == core::PartOfSpeech::Auxiliary && aru.extended_pos == core::ExtendedPOS::AuxCopulaDa &&
-        aru.lemma == "ある" && binding.pos == core::PartOfSpeech::Particle && binding.surface == "は" &&
+    if (aru.pos == core::PartOfSpeech::Auxiliary && core::isPlainCopulaType(aru.extended_pos) && aru.lemma == "ある" &&
+        binding.pos == core::PartOfSpeech::Particle && binding.surface == "は" &&
         suru.pos == core::PartOfSpeech::Verb && suru.lemma == "する" && negative.pos == core::PartOfSpeech::Auxiliary &&
         negative.lemma == "ない") {
       retag(aru, core::PartOfSpeech::Verb, core::ExtendedPOS::VerbRenyokei, "ある",
@@ -515,8 +515,8 @@ void resolveKuruwaPoliteAru(std::vector<core::Morpheme>& result) {
     auto& aru = result[idx];
     auto& n = result[idx + 1];
     const auto& su = result[idx + 2];
-    if (de.surface != "で" || de.extended_pos != core::ExtendedPOS::AuxCopulaDa || aru.surface != "あり" ||
-        n.surface != "ん" || su.surface != "す" || su.lemma != "する") {
+    if (de.surface != "で" || !core::isPlainCopulaType(de.extended_pos) || aru.surface != "あり" || n.surface != "ん" ||
+        su.surface != "す" || su.lemma != "する") {
       continue;
     }
     retag(aru, core::PartOfSpeech::Verb, core::ExtendedPOS::VerbRenyokei, "ある", dictionary::ConjugationType::GodanRa,
@@ -534,7 +534,7 @@ void resolveParticleAruOnbin(std::vector<core::Morpheme>& result) {
     auto& aru = result[idx];
     auto& te = result[idx + 1];
     if (!core::isAdverbialParticleType(particle.extended_pos) || aru.surface != "あっ" ||
-        aru.extended_pos != core::ExtendedPOS::AuxCopulaDa || te.surface != "て" ||
+        !core::isPlainCopulaType(aru.extended_pos) || te.surface != "て" ||
         te.extended_pos != core::ExtendedPOS::AuxAspectIru) {
       continue;
     }
@@ -552,8 +552,7 @@ void resolveParticleHostedExistentialAru(std::vector<core::Morpheme>& result) {
   for (size_t idx = 1; idx < result.size(); ++idx) {
     auto& aru = result[idx];
     const auto& host = result[idx - 1];
-    if (aru.extended_pos != core::ExtendedPOS::AuxCopulaDa || aru.lemma != "ある" ||
-        host.pos != core::PartOfSpeech::Particle) {
+    if (!core::isPlainCopulaType(aru.extended_pos) || aru.lemma != "ある" || host.pos != core::PartOfSpeech::Particle) {
       continue;
     }
     const bool binding_after_de = idx >= 2 &&

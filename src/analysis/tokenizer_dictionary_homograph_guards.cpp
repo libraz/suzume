@@ -65,7 +65,9 @@ bool losesHomographReading(const DictionaryCandidateContext& ctx, const core::La
         return true;
       }
     }
-    if (ends_at_sentence_boundary && hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::AuxCopulaDa) &&
+    if (ends_at_sentence_boundary &&
+        hasPrecedingExtendedPOS(lattice, start_pos,
+                                {core::ExtendedPOS::AuxCopulaDa, core::ExtendedPOS::AuxCopulaDaRenyokei}) &&
         start_pos >= 2 && codepoints[start_pos - 2] == U'の' &&
         hasPrecedingExtendedPOS(lattice, start_pos - 1, core::ExtendedPOS::ParticleNo)) {
       return true;
@@ -185,7 +187,7 @@ bool losesHomographReading(const DictionaryCandidateContext& ctx, const core::La
             }
             const auto extended_pos = following.entry->extended_pos;
             return isNominalForcingParticle(extended_pos) ||
-                   (extended_pos == core::ExtendedPOS::AuxCopulaDa &&
+                   (core::isPlainCopulaType(extended_pos) &&
                     !grammar::isSingleHiragana(following.entry->surface, core::hiragana::kNa)) ||
                    extended_pos == core::ExtendedPOS::AuxCopulaDesu;
           });

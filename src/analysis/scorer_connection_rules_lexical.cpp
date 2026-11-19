@@ -328,7 +328,7 @@ float computeSugiFinalParticleBonus(const core::LatticeEdge& prev, const core::L
   // A sokuonbin copula followed by たら uses the hypothetical form of the
   // past auxiliary: 静か+だっ+たら. The homographic conjunctive particle
   // cannot attach directly to the copula's だっ form.
-  if (prev.extended_pos == core::ExtendedPOS::AuxCopulaDa && utf8::endsWith(prev.surface, "っ") &&
+  if (core::isPlainCopulaType(prev.extended_pos) && utf8::endsWith(prev.surface, "っ") &&
       next.extended_pos == core::ExtendedPOS::AuxTenseTa && utf8::equalsAny(next.surface, {"たら"})) {
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryStrongBonus);
   }
@@ -340,7 +340,7 @@ float computeSugiFinalParticleBonus(const core::LatticeEdge& prev, const core::L
   // だっ+たら (copula conditional) or なっ+たら (なる conditional). The
   // homographic past auxiliary だ follows the same boundary after a voiced
   // onbin stem (読ん+だっ+たら).
-  if ((prev.extended_pos == core::ExtendedPOS::AuxCopulaDa || prev.extended_pos == core::ExtendedPOS::AuxTenseTa) &&
+  if ((core::isPlainCopulaType(prev.extended_pos) || prev.extended_pos == core::ExtendedPOS::AuxTenseTa) &&
       utf8::equalsAny(prev.surface, {"だ", "な"}) && next.extended_pos == core::ExtendedPOS::ParticleFinal &&
       utf8::startsWith(next.surface, "った")) {
     SUZUME_CONNECTION_ADD(bonus,
@@ -454,7 +454,7 @@ float computeCopulaConditionalBonus(const core::LatticeEdge& prev, const core::L
   // continuative copula followed by the hypothetical form of ある. Favor this
   // grammatical chain over the homographic case-particle + pronoun sequence.
   const bool copula_before_hypothetical =
-      prev.extended_pos == core::ExtendedPOS::AuxCopulaDa && next.extended_pos == core::ExtendedPOS::VerbKateikei;
+      core::isPlainCopulaType(prev.extended_pos) && next.extended_pos == core::ExtendedPOS::VerbKateikei;
   const bool continuative_copula = grammar::isSingleHiragana(prev.surface, U'で');
   const bool aru_hypothetical_stem = grammar::isAruHypotheticalStem(next.surface) && next.lemma == "ある";
   if (copula_before_hypothetical && continuative_copula && aru_hypothetical_stem) {

@@ -293,7 +293,7 @@ void addCopulaAndShiHomographRules(const core::LatticeEdge& prev, const core::La
   // Conversely those forms need that attributive predicate: a bare nominal
   // cannot host them (私+の+でんわ, not 私+ので; 学生なので needs な).
   const bool attributive_na =
-      prev.extended_pos == core::ExtendedPOS::AuxCopulaDa && grammar::isAttributiveCopulaNa(prev.surface);
+      core::isPlainCopulaType(prev.extended_pos) && grammar::isAttributiveCopulaNa(prev.surface);
   const bool nominalizer_led_conjunction =
       next.extended_pos == core::ExtendedPOS::ParticleConj && utf8::startsWith(next.surface, "の");
   const bool bare_nominal = prev.pos == core::PartOfSpeech::Noun || prev.pos == core::PartOfSpeech::Pronoun;
@@ -316,7 +316,7 @@ void addCopulaAndShiHomographRules(const core::LatticeEdge& prev, const core::La
   // し can be recognized as VerbRenyokei (suru) or PARTICLE_接続 (parallel particle)
   // Neither is correct in this context - the でし is the renyokei of です copula
   // This ensures でし (AuxCopulaDesu renyokei) wins over で+し split
-  if (prev.extended_pos == core::ExtendedPOS::AuxCopulaDa && prev.surface == "で" && next_is_shi) {
+  if (core::isPlainCopulaType(prev.extended_pos) && prev.surface == "で" && next_is_shi) {
     SUZUME_CONNECTION_ADD(surface_bonus, cost::kAlmostNever);
   }
 
@@ -360,7 +360,7 @@ void addNegationPrefixRules(const core::LatticeEdge& prev, const core::LatticeEd
 
 // Copular で before symbols, after nouns, and before ある and は.
 void addCopulaDeRules(const core::LatticeEdge& prev, const core::LatticeEdge& next, float& surface_bonus) {
-  const bool prev_is_copula_de = prev.extended_pos == core::ExtendedPOS::AuxCopulaDa && prev.surface == "で";
+  const bool prev_is_copula_de = core::isPlainCopulaType(prev.extended_pos) && prev.surface == "で";
 
   // Penalty for AuxCopulaDa(で) → Symbol/EOS pattern
   // E.g., あとで。 should be NOUN+PART_格+。, not NOUN+AUX_断定+。
@@ -376,7 +376,7 @@ void addCopulaDeRules(const core::LatticeEdge& prev, const core::LatticeEdge& ne
   // E.g., あとで, 爆速で, きっかけで, 電車で → NOUN+PART_格 preferred
   // Note: NOUN→だ(AUX_断定) is NOT affected (学生だ is correct)
   if ((prev.pos == core::PartOfSpeech::Noun || prev.pos == core::PartOfSpeech::Pronoun) &&
-      next.extended_pos == core::ExtendedPOS::AuxCopulaDa && next.surface == "で") {
+      core::isPlainCopulaType(next.extended_pos) && next.surface == "で") {
     SUZUME_CONNECTION_ADD(surface_bonus, cost::kRare);  // 1.0: must exceed kModerateBonus (-0.5)
   }
 

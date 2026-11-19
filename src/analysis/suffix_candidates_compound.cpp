@@ -47,7 +47,7 @@ size_t scanCompoundHiraganaEnd(const std::vector<char32_t>& codepoints,
          !normalize::isParticleCodepoint(codepoints[end])) {
     if (dict_manager != nullptr) {
       const auto* copula = lookupEntryInRange(*dict_manager, codepoints, end, end + 1, core::PartOfSpeech::Auxiliary);
-      const bool terminal_copula = copula != nullptr && copula->extended_pos == core::ExtendedPOS::AuxCopulaDa &&
+      const bool terminal_copula = copula != nullptr && core::isPlainCopulaType(copula->extended_pos) &&
                                    copula->lemma == extractSubstring(codepoints, end, end + 1);
       const auto* final_particle =
           lookupEntryInRange(*dict_manager, codepoints, end, end + 1, core::PartOfSpeech::Particle);
@@ -89,7 +89,7 @@ bool hasNominalPhraseSelectorAt(const dictionary::DictionaryManager* dict_manage
     return true;
   }
   const auto* auxiliary = lookupEntryInRange(*dict_manager, codepoints, pos, pos + 1, core::PartOfSpeech::Auxiliary);
-  return auxiliary != nullptr && auxiliary->extended_pos == core::ExtendedPOS::AuxCopulaDa;
+  return auxiliary != nullptr && core::isPlainCopulaType(auxiliary->extended_pos);
 }
 
 // A particle-like kana may be the final mora of an open-class content noun. If

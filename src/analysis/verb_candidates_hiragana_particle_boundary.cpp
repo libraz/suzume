@@ -181,7 +181,7 @@ bool startsWithParticleThenVerifiedVerb(const std::vector<char32_t>& codepoints,
             lookupEntryInRange(*dict_manager, codepoints, nominal_end, nominal_end + 1, core::PartOfSpeech::Particle) !=
                 nullptr ||
             vh::auxiliaryFollowsAt(dict_manager, codepoints, nominal_end, [](const dictionary::DictionaryEntry& entry) {
-              return entry.extended_pos == core::ExtendedPOS::AuxCopulaDa ||
+              return core::isPlainCopulaType(entry.extended_pos) ||
                      entry.extended_pos == core::ExtendedPOS::AuxCopulaDesu;
             });
         if (closes_nominal) {

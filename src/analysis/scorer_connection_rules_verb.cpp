@@ -215,7 +215,7 @@ float computeTaFormVolitionalBonus(const core::LatticeEdge& prev, const core::La
   if (voiced_past_after_contracted_kuru)
     SUZUME_CONNECTION_ADD(bonus, scorer::kPenaltyVoicedPastAfterContractedKuru);
   if (prev.extended_pos == core::ExtendedPOS::AuxAspectKuru && utf8::endsWith(prev.surface, "ん") &&
-      next.extended_pos == core::ExtendedPOS::AuxCopulaDa)
+      core::isPlainCopulaType(next.extended_pos))
     SUZUME_CONNECTION_ADD(bonus, scorer::kBonusCopulaAfterContractedKuru);
   if (modern_volitional)
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryStrongBonus + cost::kStrongBonus);

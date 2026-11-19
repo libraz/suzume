@@ -62,7 +62,7 @@ bool isCopulaVolitionalSequence(const dictionary::DictionaryManager& dict_manage
   const std::string_view suffix = textRange(text, byte_offsets, end - 1, end);
   const auto* copula = dict_manager.lookupExact(prefix, core::PartOfSpeech::Auxiliary);
   const auto* volitional = dict_manager.lookupExact(suffix, core::PartOfSpeech::Auxiliary);
-  return copula != nullptr && copula->extended_pos == core::ExtendedPOS::AuxCopulaDa && volitional != nullptr &&
+  return copula != nullptr && core::isPlainCopulaType(copula->extended_pos) && volitional != nullptr &&
          volitional->extended_pos == core::ExtendedPOS::AuxVolitional;
 }
 

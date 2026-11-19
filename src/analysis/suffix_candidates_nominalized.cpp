@@ -195,7 +195,7 @@ bool selectsNominalHost(const dictionary::DictionaryManager* dict_manager, const
   // Read the copula's cells out of its own paradigm instead of listing them.
   const size_t probe_end = lookaheadEnd(codepoints.size(), pos, 3);
   for (const auto& result : lookupResultsInRange(*dict_manager, codepoints, pos, probe_end)) {
-    if (result.entry != nullptr && (result.entry->extended_pos == core::ExtendedPOS::AuxCopulaDa ||
+    if (result.entry != nullptr && (core::isPlainCopulaType(result.entry->extended_pos) ||
                                     result.entry->extended_pos == core::ExtendedPOS::AuxCopulaDesu)) {
       return true;
     }

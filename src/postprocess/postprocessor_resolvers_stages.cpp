@@ -357,8 +357,7 @@ void resolveHomographsFromClosedFollower(std::vector<core::Morpheme>& result) {
     // as an attributive noun marker. The closed follower licenses the finite
     // i-adjective reading (遠い+だろ+う) without touching lexical nouns.
     if (!current.dictionaryBacked() && current.pos == core::PartOfSpeech::Noun &&
-        utf8::endsWith(current.surface, "い") && next.extended_pos == core::ExtendedPOS::AuxCopulaDa &&
-        next.surface == "だろ") {
+        utf8::endsWith(current.surface, "い") && core::isPlainCopulaType(next.extended_pos) && next.surface == "だろ") {
       resolver::retag(current, core::PartOfSpeech::Adjective, core::ExtendedPOS::AdjBasic, current.surface,
                       dictionary::ConjugationType::IAdjective, grammar::ConjForm::Base);
     }
@@ -379,7 +378,7 @@ void resolveHomographsFromClosedFollower(std::vector<core::Morpheme>& result) {
     // na-adjective stem, even when its dictionary homograph is an adverb
     // (さすが+な+人, 散々+な+結果): an adverb takes no copula.
     if (idx + 2 < result.size() && current.pos == core::PartOfSpeech::Adverb && next.surface == "な" &&
-        next.extended_pos == core::ExtendedPOS::AuxCopulaDa &&
+        core::isPlainCopulaType(next.extended_pos) &&
         (result[idx + 2].pos == core::PartOfSpeech::Noun ||
          result[idx + 2].extended_pos == core::ExtendedPOS::NounFormal)) {
       resolver::retagNaAdjectiveSurface(current);

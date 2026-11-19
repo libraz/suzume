@@ -69,7 +69,7 @@ void addClosedMorphemeHostRules(const core::LatticeEdge& prev, const core::Latti
 
   // The adjacent copula and nominalizer spelling だの is the enumerative
   // particle, not a productive copula phrase.
-  if (prev.extended_pos == core::ExtendedPOS::AuxCopulaDa && next.extended_pos == core::ExtendedPOS::ParticleNo &&
+  if (core::isPlainCopulaType(prev.extended_pos) && next.extended_pos == core::ExtendedPOS::ParticleNo &&
       utf8::equalsAny(prev.surface, {"だ"}) && utf8::equalsAny(next.surface, {"の"})) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
@@ -507,7 +507,7 @@ void addFormalNounPhraseRules(const core::LatticeEdge& prev, const core::Lattice
   if (next.extended_pos == core::ExtendedPOS::Conjunction &&
       utf8::equalsAny(next.surface, {"ところで", "ところが", "ついで"}) &&
       (prev.extended_pos == core::ExtendedPOS::NounFormal || prev.extended_pos == core::ExtendedPOS::AuxTenseTa ||
-       prev.extended_pos == core::ExtendedPOS::AuxCopulaDa || prev.extended_pos == core::ExtendedPOS::VerbTaForm ||
+       core::isPlainCopulaType(prev.extended_pos) || prev.extended_pos == core::ExtendedPOS::VerbTaForm ||
        prev.extended_pos == core::ExtendedPOS::ParticleNo)) {
     SUZUME_CONNECTION_ADD(bonus, cost::kProhibitive + cost::kSevere);
   }
@@ -524,7 +524,7 @@ void addFormalNounPhraseRules(const core::LatticeEdge& prev, const core::Lattice
   // The formal particle により cannot follow the copula's attributive form
   // な. Reject that accidental path so a following interrogative pronoun can
   // retain the productive comparison boundary (なに+より).
-  if ((prev.extended_pos == core::ExtendedPOS::AuxCopulaDa || prev.extended_pos == core::ExtendedPOS::AdjStem) &&
+  if ((core::isPlainCopulaType(prev.extended_pos) || prev.extended_pos == core::ExtendedPOS::AdjStem) &&
       next.extended_pos == core::ExtendedPOS::ParticleCase && utf8::equalsAny(next.surface, {"により"})) {
     SUZUME_CONNECTION_ADD(bonus, cost::kProhibitive);
   }

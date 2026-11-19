@@ -155,7 +155,7 @@ bool hasPrecedingAttributivePredicate(const core::Lattice& lattice, size_t start
       lattice, start_pos,
       {core::ExtendedPOS::VerbShuushikei, core::ExtendedPOS::VerbRentaikei, core::ExtendedPOS::AdjBasic,
        core::ExtendedPOS::AuxTenseTa, core::ExtendedPOS::AuxTenseMasu, core::ExtendedPOS::AuxNegativeNai,
-       core::ExtendedPOS::AuxCopulaDa, core::ExtendedPOS::AuxCopulaDesu});
+       core::ExtendedPOS::AuxCopulaDa, core::ExtendedPOS::AuxCopulaDaRenyokei, core::ExtendedPOS::AuxCopulaDesu});
 }
 
 ContextualDictionaryCandidateState addContextualDictionaryCandidates(

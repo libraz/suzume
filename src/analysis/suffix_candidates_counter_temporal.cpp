@@ -200,7 +200,7 @@ void appendTemporalCounterCandidates(const std::vector<char32_t>& codepoints, si
            ++copula_end) {
         const auto* copula =
             lookupEntryInRange(*dict_manager, codepoints, scan, copula_end, core::PartOfSpeech::Auxiliary);
-        na_adjective_before_copula = copula != nullptr && (copula->extended_pos == core::ExtendedPOS::AuxCopulaDa ||
+        na_adjective_before_copula = copula != nullptr && (core::isPlainCopulaType(copula->extended_pos) ||
                                                            copula->extended_pos == core::ExtendedPOS::AuxCopulaDesu);
       }
     }

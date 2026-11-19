@@ -64,7 +64,7 @@ float computeNegativeAndNounVerbBonus(const core::LatticeEdge& prev, const core:
   // the verb's hatsuonbin and だ is the past auxiliary (膨らん+だ).
   const bool contracted_negative_before_copula =
       prev.extended_pos == core::ExtendedPOS::AuxNegativeNu && grammar::isSingleHiragana(prev.surface, U'ん') &&
-      next.extended_pos == core::ExtendedPOS::AuxCopulaDa && grammar::isSingleHiragana(next.surface, U'だ');
+      core::isPlainCopulaType(next.extended_pos) && grammar::isSingleHiragana(next.surface, U'だ');
 
   // A shape-verified mimetic adverb may follow a case/topic-marked nominal
   // directly (水滴が+ぽつり, 地図を+じっくり). Prefer that reading over
@@ -121,7 +121,7 @@ float computeNegativeAndNounVerbBonus(const core::LatticeEdge& prev, const core:
   // The copula's conjunctive form is で; an emphatic small-tsu variant cannot
   // take connective て/で. In なっ+て the onbin belongs to lexical なる, so
   // prevent a generated emphatic AuxCopulaDa edge from replacing that verb.
-  if (prev.extended_pos == core::ExtendedPOS::AuxCopulaDa && utf8::endsWith(prev.surface, "っ") &&
+  if (core::isPlainCopulaType(prev.extended_pos) && utf8::endsWith(prev.surface, "っ") &&
       next.extended_pos == core::ExtendedPOS::ParticleConj && grammar::isTeDeSurface(next.surface)) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }

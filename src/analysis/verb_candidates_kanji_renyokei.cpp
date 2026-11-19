@@ -791,7 +791,7 @@ void appendGodanSaRenyokeiCandidates(const std::vector<char32_t>& codepoints, si
              vh::continuativeConjunctiveFollowsAt(codepoints, renyokei_end) ||
              vh::isCommaClauseChainingRenyokei(codepoints, start_pos, renyokei_end, dict_manager));
         if (tail_entry != nullptr &&
-            (tail_entry->extended_pos == core::ExtendedPOS::AuxCopulaDa ||
+            (core::isPlainCopulaType(tail_entry->extended_pos) ||
              tail_entry->extended_pos == core::ExtendedPOS::AuxCopulaDesu ||
              (core::isConjectureRashiiType(tail_entry->extended_pos) && !selects_godan_sa_onbin))) {
           SUZUME_DEBUG_LOG("[VERB_SKIP] \"" << surface << "\" hiragana tail is a closed auxiliary\n");

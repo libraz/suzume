@@ -276,7 +276,7 @@ bool priceHiraganaRun(const PrefixScanContext& ctx, size_t len, size_t candidate
     // the run's last mora, so だ opens a word of its own (しょうしゃ|だ).
     const auto* final_auxiliary =
         lookupEntryInRange(*dict_manager, codepoints, candidate_end - 1, candidate_end, core::PartOfSpeech::Auxiliary);
-    if (final_auxiliary != nullptr && final_auxiliary->extended_pos == core::ExtendedPOS::AuxCopulaDa &&
+    if (final_auxiliary != nullptr && core::isPlainCopulaType(final_auxiliary->extended_pos) &&
         kana::isSmallKanaCodepoint(codepoints[candidate_end - 2])) {
       return false;
     }
