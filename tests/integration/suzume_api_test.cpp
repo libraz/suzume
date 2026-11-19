@@ -278,6 +278,30 @@ TEST_F(SuzumeApiTest, KuruKanaMizenkeiRequiresItsSelectingAuxiliary) {
   EXPECT_EQ(ra_nuki_potential[2].pos, core::PartOfSpeech::Verb);
 }
 
+TEST_F(SuzumeApiTest, CopulaContinuativeCellsCarryTheirOwnExtendedPos) {
+  Suzume instance(makeTestOptions());
+
+  const auto periphrastic = instance.analyze("学生である");
+  ASSERT_EQ(periphrastic.size(), 3u);
+  EXPECT_EQ(periphrastic[1].surface, "で");
+  EXPECT_EQ(periphrastic[1].extended_pos, core::ExtendedPOS::AuxCopulaDaRenyokei);
+  EXPECT_EQ(periphrastic[1].conj_form, grammar::ConjForm::Renyokei);
+
+  const auto clause_final = instance.analyze("静かで");
+  ASSERT_EQ(clause_final.size(), 2u);
+  EXPECT_EQ(clause_final[1].surface, "で");
+  EXPECT_EQ(clause_final[1].extended_pos, core::ExtendedPOS::AuxCopulaDaRenyokei);
+
+  const auto past = instance.analyze("学生だった");
+  ASSERT_EQ(past.size(), 3u);
+  EXPECT_EQ(past[1].surface, "だっ");
+  EXPECT_EQ(past[1].extended_pos, core::ExtendedPOS::AuxCopulaDaRenyokei);
+
+  const auto terminal = instance.analyze("学生だ");
+  ASSERT_EQ(terminal.size(), 2u);
+  EXPECT_EQ(terminal[1].extended_pos, core::ExtendedPOS::AuxCopulaDa);
+}
+
 TEST_F(SuzumeApiTest, DictionaryHomographsPreserveProductiveNominalBoundaries) {
   Suzume instance(makeTestOptions());
 

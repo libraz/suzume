@@ -48,7 +48,7 @@ void retagCopularAru(std::vector<core::Morpheme>& result, size_t aru_idx) {
     return;
   }
   aru.pos = core::PartOfSpeech::Auxiliary;
-  aru.extended_pos = core::ExtendedPOS::AuxCopulaDa;
+  aru.extended_pos = core::detectCopulaDaForm(aru.surface);
   aru.lemma = "ある";
   aru.conj_type = dictionary::ConjugationType::GodanRa;
 }
@@ -313,7 +313,7 @@ void resolveCopularAro(std::vector<core::Morpheme>& result) {
         aro.extended_pos != core::ExtendedPOS::VerbMizenkei || aro.lemma != "ある") {
       continue;
     }
-    retag(aro, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxCopulaDa, "ある",
+    retag(aro, core::PartOfSpeech::Auxiliary, core::detectCopulaDaForm(aro.surface), "ある",
           dictionary::ConjugationType::GodanRa, grammar::ConjForm::Mizenkei);
   }
 }

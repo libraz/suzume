@@ -296,7 +296,7 @@ void resolveNaAdjectiveCopularPast(std::vector<core::Morpheme>& result) {
         !core::isPlainCopulaType(de.extended_pos) || aru.surface != "あっ") {
       continue;
     }
-    retag(aru, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxCopulaDa, "ある",
+    retag(aru, core::PartOfSpeech::Auxiliary, core::detectCopulaDaForm(aru.surface), "ある",
           dictionary::ConjugationType::GodanRa, grammar::ConjForm::Onbinkei);
   }
 }

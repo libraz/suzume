@@ -58,7 +58,9 @@ void retagAdverbialSou(core::Morpheme& sou) {
 }
 
 void retagCopulaDa(core::Morpheme& copula) {
-  retagUninflected(copula, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxCopulaDa, "だ");
+  const core::ExtendedPOS cell = core::detectCopulaDaForm(copula.surface);
+  retag(copula, core::PartOfSpeech::Auxiliary, cell, "だ", dictionary::ConjugationType::None,
+        cell == core::ExtendedPOS::AuxCopulaDaRenyokei ? grammar::ConjForm::Renyokei : grammar::ConjForm::Base);
 }
 
 void retagNegativeNai(core::Morpheme& negative) {

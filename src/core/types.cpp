@@ -524,6 +524,12 @@ constexpr SuffixForm kAdjSuffixForms[] = {
     {"かろ", ExtendedPOS::AdjMizenkei}, {"く", ExtendedPOS::AdjRenyokei}, {"い", ExtendedPOS::AdjBasic},
 };
 
+// Cells of the copula だ with their own extended POS; every other cell is AuxCopulaDa.
+constexpr SuffixForm kCopulaDaCells[] = {
+    {"で", ExtendedPOS::AuxCopulaDaRenyokei},
+    {"だっ", ExtendedPOS::AuxCopulaDaRenyokei},
+};
+
 }  // namespace
 
 // This detector assigns ExtendedPOS while candidates are built. Postprocessing
@@ -629,6 +635,15 @@ ExtendedPOS detectAdjForm(std::string_view surface, bool is_na_adj) {
   // But we can't reliably detect this without knowing the full word
   // Default to stem for short forms that don't match above patterns
   return ExtendedPOS::AdjStem;
+}
+
+ExtendedPOS detectCopulaDaForm(std::string_view surface) {
+  for (const auto& cell : kCopulaDaCells) {
+    if (surface == cell.suffix) {
+      return cell.form;
+    }
+  }
+  return ExtendedPOS::AuxCopulaDa;
 }
 
 }  // namespace suzume::core
