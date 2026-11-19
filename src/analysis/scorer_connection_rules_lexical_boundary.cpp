@@ -68,6 +68,8 @@ void addImpossibleAttachmentRules(const core::LatticeEdge& prev, const core::Lat
   // 学生だ+が, 行った+が) — where が can only be the adversative. A terminal
   // whose lemma is attested nowhere is no nominalized clause before に/を
   // either: it is a kana noun cut at a terminal-looking mora (こたつ+に).
+  // を has no connective homograph, so after the other finite cells it is
+  // barred outright (は+なし+を is はなし+を).
   const bool finite_predicate_cell =
       prev.extended_pos == core::ExtendedPOS::AdjBasic || prev.extended_pos == core::ExtendedPOS::AuxTenseTa ||
       prev.extended_pos == core::ExtendedPOS::AuxNegativeNai || prev.extended_pos == core::ExtendedPOS::AuxCopulaDa ||
@@ -75,6 +77,8 @@ void addImpossibleAttachmentRules(const core::LatticeEdge& prev, const core::Lat
   const bool terminal_verb_before_ga =
       ((prev.extended_pos == core::ExtendedPOS::VerbShuushikei || finite_predicate_cell) &&
        next.extended_pos == core::ExtendedPOS::ParticleCase && grammar::isSingleHiragana(next.surface, U'が')) ||
+      (finite_predicate_cell && next.extended_pos == core::ExtendedPOS::ParticleCase &&
+       grammar::isSingleHiragana(next.surface, U'を')) ||
       (prev.extended_pos == core::ExtendedPOS::VerbShuushikei &&
        ((next.extended_pos == core::ExtendedPOS::ParticleConjFinite && !prev.dictionaryBacked()) ||
         (next.extended_pos == core::ExtendedPOS::ParticleCase && !prev.lemmaVerified() &&
