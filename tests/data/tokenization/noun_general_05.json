@@ -1126,6 +1126,50 @@
       ],
       "id": "hanashiwo_ku",
       "input": "はなしを聞く"
+    },
+    {
+      "description": "友達さんはい - regression test",
+      "expected": [
+        {
+          "lemma": "友達",
+          "pos": "Noun",
+          "surface": "友達"
+        },
+        {
+          "lemma": "さん",
+          "pos": "Suffix",
+          "surface": "さん"
+        },
+        {
+          "lemma": "はい",
+          "pos": "Interjection",
+          "surface": "はい"
+        }
+      ],
+      "id": "sanhai",
+      "input": "友達さんはい"
+    },
+    {
+      "description": "山田さんはい - regression test",
+      "expected": [
+        {
+          "lemma": "山田",
+          "pos": "Noun",
+          "surface": "山田"
+        },
+        {
+          "lemma": "さん",
+          "pos": "Suffix",
+          "surface": "さん"
+        },
+        {
+          "lemma": "はい",
+          "pos": "Interjection",
+          "surface": "はい"
+        }
+      ],
+      "id": "sanhai_2",
+      "input": "山田さんはい"
     }
   ],
   "description": "General nouns (part 5/5)",
