@@ -480,7 +480,7 @@ def check_cli_parity() -> None:
     mismatches: list[str] = []
     with tempfile.TemporaryDirectory() as scratch:
         non_utf8_source = Path(scratch) / "non_utf8.tsv"
-        non_utf8_source.write_bytes(b"\xe6\x9d\xb1\xff\tNOUN\n")
+        non_utf8_source.write_bytes("東京\tNOUN\n".encode("shift_jis"))
         placeholders = {"{non_utf8_source}": str(non_utf8_source)}
         for case in cases:
             uses_text = "{text}" in case["args"] or case.get("stdin") == "{text}"

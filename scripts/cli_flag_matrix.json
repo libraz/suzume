@@ -1,5 +1,5 @@
 {
-  "description": "CLI flag matrix for check_binding_parity.py --cli: both CLIs run every case with every text and must agree on stdout, stderr and exit code after the program name is replaced with <prog>. Pairwise rows come from cli_flag_matrix.model.json; {text} is replaced by each text. Help rows compare only the help contract: the option lines of the shared flags and the Output Formats lines, in order with whitespace runs collapsed, and the set of other note lines; the title, the Usage block, option lines of help_exempt_flags (native-only developer flags) and the help_exempt_sections (native-only sections) are not compared, and stderr and exit code must match exactly. {non_utf8_source} is replaced by a temporary source dictionary whose bytes are not UTF-8.",
+  "description": "CLI flag matrix for check_binding_parity.py --cli: both CLIs run every case with every text and must agree on stdout, stderr and exit code after the program name is replaced with <prog>. Pairwise rows come from cli_flag_matrix.model.json; {text} is replaced by each text. Help rows compare only the help contract: the option lines of the shared flags and the Output Formats lines, in order with whitespace runs collapsed, and the set of other note lines; the title, the Usage block, option lines of help_exempt_flags (native-only developer flags) and the help_exempt_sections (native-only sections) are not compared, and stderr and exit code must match exactly. {non_utf8_source} is replaced by a temporary source dictionary whose bytes are Shift_JIS, not UTF-8.",
   "texts": [
     "ヴァイオリンとABCの東京で書かなかった。",
     "りんごを食べるりんごを食べる👨‍👩‍👧",
@@ -829,6 +829,73 @@
         "version",
         "--unknown-flag"
       ]
+    },
+    {
+      "name": "tag-min-length-above-u32",
+      "args": [
+        "-f",
+        "tags",
+        "--tag-min-length",
+        "4294967296",
+        "{text}"
+      ]
+    },
+    {
+      "name": "tag-max-tags-above-u32-equals",
+      "args": [
+        "-f",
+        "tags",
+        "--tag-max-tags=4294967296",
+        "{text}"
+      ]
+    },
+    {
+      "name": "missing-value-short-before-flag",
+      "args": [
+        "-d",
+        "--mode",
+        "search",
+        "{text}"
+      ]
+    },
+    {
+      "name": "missing-value-before-double-dash",
+      "args": [
+        "--dictionary",
+        "--",
+        "{text}"
+      ]
+    },
+    {
+      "name": "missing-value-empty-equals",
+      "args": [
+        "--dictionary=",
+        "{text}"
+      ]
+    },
+    {
+      "name": "equals-passes-dash-value",
+      "args": [
+        "--mode=-x",
+        "{text}"
+      ]
+    },
+    {
+      "name": "equals-passes-negative-size",
+      "args": [
+        "-f",
+        "tags",
+        "--tag-min-length=-1",
+        "{text}"
+      ]
+    },
+    {
+      "name": "bare-dash-is-a-value",
+      "args": [
+        "--mode",
+        "-",
+        "{text}"
+      ]
     }
   ],
   "extra": [
@@ -877,6 +944,18 @@
       "name": "empty-stdin",
       "args": [],
       "stdin": ""
+    },
+    {
+      "name": "size-u32-max",
+      "args": [
+        "-f",
+        "tags",
+        "--tag-min-length",
+        "4294967295",
+        "--tag-max-tags",
+        "4294967295",
+        "{text}"
+      ]
     }
   ],
   "help": [
