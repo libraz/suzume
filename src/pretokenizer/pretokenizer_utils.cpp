@@ -3,6 +3,7 @@
  * @brief Shared byte and numeric helpers for pre-tokenizer matchers
  */
 
+#include "core/utf8_constants.h"
 #include "normalize/char_type.h"
 #include "normalize/utf8.h"
 #include "pretokenizer/pretokenizer_internal.h"
@@ -90,8 +91,7 @@ bool leavesOddKanjiRun(std::string_view text, size_t pos) {
 // suffix follows it. This preserves the noun→suffix boundary in 1時間おき,
 // which an atomic time pretoken would otherwise hide.
 bool hasIntervalSuffix(std::string_view text, size_t pos) {
-  constexpr std::string_view kIntervalSuffix{"おき"};
-  return text.substr(pos).compare(0, kIntervalSuffix.size(), kIntervalSuffix) == 0;
+  return utf8::startsWith(text.substr(pos), "おき");
 }
 
 // Check if byte is ASCII alpha

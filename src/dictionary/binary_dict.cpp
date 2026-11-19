@@ -128,8 +128,7 @@ bool readFrontLength(const uint8_t* data, size_t size, size_t& offset, uint8_t i
   return false;
 }
 
-core::Expected<std::vector<uint8_t>, core::Error> encodeFrontCodedSurfaces(
-    const std::vector<DictionaryEntry>& entries) {
+std::vector<uint8_t> encodeFrontCodedSurfaces(const std::vector<DictionaryEntry>& entries) {
   std::vector<uint8_t> output;
   std::string_view previous;
   for (const DictionaryEntry& entry : entries) {
@@ -232,7 +231,7 @@ core::Expected<size_t, core::Error> BinaryDictionary::loadFromMemory(const uint8
     return result;
   }
 
-  // loaded_data is not retained (see loadFromFile): decoded structures own copies.
+  // The caller's buffer is not retained: decoded structures own copies.
   trie_ = std::move(loaded_trie);
   entries_ = std::move(loaded_entries);
   return result;
@@ -675,11 +674,7 @@ core::Expected<std::vector<uint8_t>, core::Error> BinaryDictWriter::build() {
     }
   }
 
-  auto surface_result = encodeFrontCodedSurfaces(entries_);
-  if (!surface_result) {
-    return core::makeUnexpected(surface_result.error());
-  }
-  std::vector<uint8_t> surface_data = std::move(surface_result.value());
+  std::vector<uint8_t> surface_data = encodeFrontCodedSurfaces(entries_);
   std::vector<char> string_pool = std::move(compact_lemma_table);
 
   // Calculate offsets

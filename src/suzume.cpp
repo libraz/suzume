@@ -22,7 +22,6 @@
 
 #include "analysis/analyzer.h"
 #include "analysis/scorer_options_loader.h"
-#include "dictionary/binary_dict.h"
 #include "dictionary/source_parser.h"
 #include "dictionary/user_dict.h"
 #include "grammar/dictionary_expansion.h"

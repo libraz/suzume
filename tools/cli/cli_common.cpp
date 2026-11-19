@@ -197,14 +197,7 @@ core::Expected<size_t, core::Error> loadUserDictionaryPath(Suzume* analyzer, con
     return core::makeUnexpected(core::Error(core::ErrorCode::InvalidInput, "Analyzer must not be null"));
   }
 
-  std::string extension;
-  if (path.size() >= 4) {
-    extension = path.substr(path.size() - 4);
-    for (char& chr : extension) {
-      chr = static_cast<char>(std::tolower(static_cast<unsigned char>(chr)));
-    }
-  }
-  if (extension != ".dic") {
+  if (!hasExtension(path, ".dic")) {
     return analyzer->loadUserDictionaryResult(path);
   }
 

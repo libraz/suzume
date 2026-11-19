@@ -113,16 +113,15 @@ size_t utf8Length(std::string_view str) {
 
 size_t charToByteOffset(std::string_view str, size_t char_index) {
   size_t pos = 0;
-  for (size_t i = 0; i < char_index && pos < str.size(); ++i) {
+  for (size_t char_idx = 0; char_idx < char_index && pos < str.size(); ++char_idx) {
     decodeUtf8(str, pos);
   }
   return pos;
 }
 
 std::string_view utf8Substr(std::string_view str, size_t start, size_t length) {
-  size_t start_byte = charToByteOffset(str, start);
-  size_t end_byte = charToByteOffset(str, start + length);
-  return str.substr(start_byte, end_byte - start_byte);
+  const std::string_view tail = str.substr(charToByteOffset(str, start));
+  return tail.substr(0, charToByteOffset(tail, length));
 }
 
 size_t findUtf8Boundary(std::string_view str, size_t pos) {

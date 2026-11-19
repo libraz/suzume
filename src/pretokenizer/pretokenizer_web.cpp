@@ -140,8 +140,7 @@ bool PreTokenizer::tryMatchEmail(std::string_view text, size_t pos, PreToken& to
 
 namespace {
 
-// Check if codepoint is valid for hashtag content
-// Allows: Hiragana, Katakana, Kanji, alphanumeric, underscore
+// Check if codepoint is valid for hashtag content.
 // A tag is a single search unit and ends at whitespace, punctuation or any other
 // symbol, so the body class is word text in any script. Particles inside a tag
 // (#今日は…) belong to the tag; the marker only opens one at a text boundary,
