@@ -81,8 +81,11 @@ bool parseTagPos(std::string_view value, uint8_t* filter, std::string* error) {
   return false;
 }
 
+// Tag lengths and counts cross the C ABI as uint32_t.
+constexpr size_t kMaxTagSizeValue = 4294967295U;
+
 bool parseSize(std::string_view option, std::string_view value, size_t* out, std::string* error) {
-  if (!parseSizeOption(value, out)) {
+  if (!parseSizeOption(value, out) || *out > kMaxTagSizeValue) {
     *error = "invalid " + std::string(option) + " value: " + std::string(value);
     return false;
   }
@@ -242,8 +245,12 @@ CommandArgs parseArgs(int argc, char* argv[]) {
     }
 
     if (spec != nullptr && spec->scope == OptionScope::TestOnly && args.command == "test") {
+      if (!match.has_attached_value && (idx + 1 >= argc || isOptionLike(argv[idx + 1]))) {
+        args.parse_error = "missing value for " + std::string(arg);
+        return args;
+      }
       args.args.emplace_back(arg);
-      if (!match.has_attached_value && idx + 1 < argc) {
+      if (!match.has_attached_value) {
         args.args.emplace_back(argv[++idx]);
       }
       continue;
@@ -270,7 +277,7 @@ CommandArgs parseArgs(int argc, char* argv[]) {
         return args;
       }
     } else if (spec->takes_value) {
-      if (idx + 1 >= argc || findOption(argv[idx + 1]) != nullptr) {
+      if (idx + 1 >= argc || isOptionLike(argv[idx + 1])) {
         args.parse_error = "missing value for " + std::string(arg);
         return args;
       }

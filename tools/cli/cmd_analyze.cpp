@@ -155,7 +155,7 @@ int cmdAnalyze(const CommandArgs& args) {
     text = oss.str();
   } else if (isTerminal()) {
     printError("no input text provided");
-    return 2;
+    return kUsageErrorExit;
   } else {
     // Read stdin byte-for-byte so embedded newlines are preserved.
     std::ostringstream oss;

@@ -63,6 +63,27 @@ bool parseSizeOption(std::string_view value, size_t* out) {
   }
 }
 
+bool isOptionLike(std::string_view arg) {
+  return arg.size() > 1 && arg[0] == '-';
+}
+
+ValueOptionMatch matchValueOption(const std::vector<std::string>& args, size_t* idx, std::string_view name,
+                                  std::string* value) {
+  const std::string_view arg = args[*idx];
+  if (arg.size() > name.size() && arg.compare(0, name.size(), name) == 0 && arg[name.size()] == '=') {
+    *value = std::string(arg.substr(name.size() + 1));
+    return value->empty() ? ValueOptionMatch::Missing : ValueOptionMatch::Matched;
+  }
+  if (arg != name) {
+    return ValueOptionMatch::NoMatch;
+  }
+  if (*idx + 1 >= args.size() || isOptionLike(args[*idx + 1])) {
+    return ValueOptionMatch::Missing;
+  }
+  *value = args[++*idx];
+  return ValueOptionMatch::Matched;
+}
+
 bool limitReached(size_t count, size_t limit) {
   return limit > 0 && count >= limit;
 }
@@ -242,7 +263,7 @@ core::Expected<bool, core::Error> validateWildcardPattern(std::string_view patte
   for (char chr : pattern) {
     if (chr == '*' && ++star_count > kMaxWildcardStars) {
       return core::makeUnexpected(
-          core::Error(core::ErrorCode::InvalidInput, "Wildcard pattern has too many '*' characters (maximum 64)"));
+          core::Error(core::ErrorCode::InvalidInput, "wildcard pattern has too many '*' characters (maximum 64)"));
     }
   }
   return true;

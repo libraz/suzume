@@ -78,7 +78,7 @@ void printConjugationStems(const std::string& base_form, dictionary::Conjugation
 int cmdDictNew(const std::vector<std::string>& args, bool /* verbose */) {
   if (args.empty()) {
     printError("usage: suzume-cli dict new <file.tsv>");
-    return 1;
+    return kUsageErrorExit;
   }
 
   const std::string& path = args[0];
@@ -128,7 +128,7 @@ int cmdDictNew(const std::vector<std::string>& args, bool /* verbose */) {
 int cmdDictInfo(const std::vector<std::string>& args, bool /* verbose */) {
   if (args.empty()) {
     printError("usage: suzume-cli dict info <file>");
-    return 1;
+    return kUsageErrorExit;
   }
 
   const std::string& path = args[0];
@@ -174,7 +174,7 @@ int cmdDictInfo(const std::vector<std::string>& args, bool /* verbose */) {
 int cmdDictValidate(const std::vector<std::string>& args, bool /* verbose */) {
   if (args.empty()) {
     printError("usage: suzume-cli dict validate <file.tsv>");
-    return 1;
+    return kUsageErrorExit;
   }
 
   const std::string& path = args[0];
@@ -267,7 +267,7 @@ int cmdDictCompile(const std::vector<std::string>& args, bool verbose) {
         "<output.dic>\n"
         "       suzume-cli dict compile [--filter-trivial] <input.tsv>  "
         "(output: input.dic)");
-    return 1;
+    return kUsageErrorExit;
   }
 
   // Extract --filter-trivial flag from args
@@ -278,7 +278,7 @@ int cmdDictCompile(const std::vector<std::string>& args, bool verbose) {
       filter_trivial = true;
     } else if (arg.rfind("--", 0) == 0) {
       printError("unknown compile option: " + arg);
-      return 1;
+      return kUsageErrorExit;
     } else {
       file_args.push_back(arg);
     }
@@ -286,7 +286,7 @@ int cmdDictCompile(const std::vector<std::string>& args, bool verbose) {
 
   if (file_args.empty()) {
     printError("no input files specified");
-    return 1;
+    return kUsageErrorExit;
   }
 
   DictCompiler compiler;
@@ -302,7 +302,7 @@ int cmdDictCompile(const std::vector<std::string>& args, bool verbose) {
     auto expanded_result = expandGlob(tsv_path);
     if (!expanded_result.hasValue()) {
       printError(expanded_result.error().message);
-      return 1;
+      return kUsageErrorExit;
     }
     auto& expanded = expanded_result.value();
     if (expanded.size() == 1 && expanded[0] == tsv_path) {
@@ -330,7 +330,7 @@ int cmdDictCompile(const std::vector<std::string>& args, bool verbose) {
     fs::path dir = p.parent_path();
     if (dir.empty() || p.filename() != "*.tsv") {
       printError("a subset glob requires an explicit output .dic path");
-      return 1;
+      return kUsageErrorExit;
     }
     dic_path = dir.string() + ".dic";
 
@@ -357,14 +357,14 @@ int cmdDictCompile(const std::vector<std::string>& args, bool verbose) {
   const std::string& dic_path = file_args.back();
   if (!hasExtension(dic_path, ".dic")) {
     printError("output file must have .dic extension: " + dic_path);
-    return 1;
+    return kUsageErrorExit;
   }
 
   std::vector<std::string> raw_paths(file_args.begin(), file_args.end() - 1);
   auto tsv_paths_result = expandGlobs(raw_paths);
   if (!tsv_paths_result.hasValue()) {
     printError(tsv_paths_result.error().message);
-    return 1;
+    return kUsageErrorExit;
   }
   auto& tsv_paths = tsv_paths_result.value();
 
@@ -381,7 +381,7 @@ int cmdDictCompile(const std::vector<std::string>& args, bool verbose) {
 int cmdDictDecompile(const std::vector<std::string>& args, bool verbose) {
   if (args.empty()) {
     printError("usage: suzume-cli dict decompile <input.dic> [output.tsv] [--force]");
-    return 1;
+    return kUsageErrorExit;
   }
 
   bool force = false;
@@ -391,14 +391,14 @@ int cmdDictDecompile(const std::vector<std::string>& args, bool verbose) {
       force = true;
     } else if (arg.rfind("--", 0) == 0) {
       printError("unknown decompile option: " + arg);
-      return 1;
+      return kUsageErrorExit;
     } else {
       file_args.push_back(arg);
     }
   }
   if (file_args.empty() || file_args.size() > 2) {
     printError("usage: suzume-cli dict decompile <input.dic> [output.tsv] [--force]");
-    return 1;
+    return kUsageErrorExit;
   }
 
   const std::string& dic_path = file_args[0];
@@ -435,45 +435,17 @@ int cmdDictDecompile(const std::vector<std::string>& args, bool verbose) {
 
 int cmdDictList(const std::vector<std::string>& args, bool /* verbose */) {
   if (args.empty()) {
-    printError("usage: suzume-cli dict list <file> [--pos=POS] [--pattern=PATTERN] [--limit=N]");
-    return 1;
+    printError("usage: suzume-cli dict list <file> [--pos POS] [--pattern PATTERN] [--limit N]");
+    return kUsageErrorExit;
   }
 
   const std::string& path = args[0];
-  std::optional<core::PartOfSpeech> pos_filter;
-  std::string pattern;
-  size_t limit = 0;
-
-  // Parse options
-  for (size_t idx = 1; idx < args.size(); ++idx) {
-    if (args[idx].substr(0, 6) == "--pos=") {
-      const std::string value = toUpper(args[idx].substr(6));
-      pos_filter = core::stringToPosStrict(value);
-      if (!pos_filter.has_value()) {
-        printError("invalid POS: " + args[idx].substr(6));
-        return 1;
-      }
-    } else if (args[idx].substr(0, 10) == "--pattern=") {
-      pattern = args[idx].substr(10);
-    } else if (args[idx].substr(0, 8) == "--limit=") {
-      if (!parseSizeOption(args[idx].substr(8), &limit)) {
-        printError("invalid limit: " + args[idx].substr(8));
-        return 1;
-      }
-    } else {
-      printError("unknown list option: " + args[idx]);
-      return 1;
-    }
+  ListFilter filter;
+  if (const std::string error = parseListFilter(args, 1, &filter); !error.empty()) {
+    printError(error);
+    return kUsageErrorExit;
   }
-
-  bool has_pattern = !pattern.empty();
-  if (has_pattern) {
-    auto validation = validateWildcardPattern(pattern);
-    if (!validation.hasValue()) {
-      printError(validation.error().message);
-      return 1;
-    }
-  }
+  const bool has_pattern = !filter.pattern.empty();
 
   // Load dictionary
   if (hasExtension(path, ".dic")) {
@@ -492,10 +464,10 @@ int cmdDictList(const std::vector<std::string>& args, bool /* verbose */) {
         continue;
       }
 
-      if (pos_filter.has_value() && entry->pos != *pos_filter) {
+      if (filter.pos.has_value() && entry->pos != *filter.pos) {
         continue;
       }
-      if (has_pattern && !wildcardMatches(pattern, entry->surface)) {
+      if (has_pattern && !wildcardMatches(filter.pattern, entry->surface)) {
         continue;
       }
 
@@ -503,7 +475,7 @@ int cmdDictList(const std::vector<std::string>& args, bool /* verbose */) {
                 << "\n";
 
       ++count;
-      if (limitReached(count, limit)) {
+      if (limitReached(count, filter.limit)) {
         break;
       }
     }
@@ -520,10 +492,10 @@ int cmdDictList(const std::vector<std::string>& args, bool /* verbose */) {
 
     size_t count = 0;
     for (const auto& entry : result.value()) {
-      if (pos_filter.has_value() && entry.pos != *pos_filter) {
+      if (filter.pos.has_value() && entry.pos != *filter.pos) {
         continue;
       }
-      if (has_pattern && !wildcardMatches(pattern, entry.surface)) {
+      if (has_pattern && !wildcardMatches(filter.pattern, entry.surface)) {
         continue;
       }
 
@@ -531,7 +503,7 @@ int cmdDictList(const std::vector<std::string>& args, bool /* verbose */) {
                 << tabEscape(entry.lemma.empty() ? entry.surface : entry.lemma) << "\n";
 
       ++count;
-      if (limitReached(count, limit)) {
+      if (limitReached(count, filter.limit)) {
         break;
       }
     }
@@ -545,7 +517,7 @@ int cmdDictList(const std::vector<std::string>& args, bool /* verbose */) {
 int cmdDictSearch(const std::vector<std::string>& args, bool /* verbose */) {
   if (args.size() < 2) {
     printError("usage: suzume-cli dict search <file> <pattern>");
-    return 1;
+    return kUsageErrorExit;
   }
 
   const std::string& path = args[0];
@@ -554,7 +526,7 @@ int cmdDictSearch(const std::vector<std::string>& args, bool /* verbose */) {
   auto validation = validateWildcardPattern(pattern);
   if (!validation.hasValue()) {
     printError(validation.error().message);
-    return 1;
+    return kUsageErrorExit;
   }
 
   size_t count = 0;
@@ -594,7 +566,7 @@ int cmdDictSearch(const std::vector<std::string>& args, bool /* verbose */) {
 int cmdDictLookup(const std::vector<std::string>& args, bool /* verbose */) {
   if (args.empty()) {
     printError("usage: suzume-cli dict lookup <word> [dictionary ...]");
-    return 1;
+    return kUsageErrorExit;
   }
 
   const std::string& word = args[0];
@@ -748,7 +720,7 @@ int cmdDict(const CommandArgs& args) {
 
   if (args.args.empty()) {
     printDictHelp(std::cerr);
-    return 1;
+    return kUsageErrorExit;
   }
 
   const std::string& subcommand = args.args[0];
@@ -758,15 +730,12 @@ int cmdDict(const CommandArgs& args) {
   if (subcommand == "-i" || subcommand == "--interactive") {
     return cmdDictInteractive(subargs, args.verbose);
   }
-  if (subcommand == "interactive" || subcommand == "edit") {
-    return cmdDictInteractive(subargs, args.verbose);
-  }
   if (subcommand == "new") {
     return cmdDictNew(subargs, args.verbose);
   }
   if (subcommand == "select" || subcommand == "add" || subcommand == "remove") {
     printError("dict " + subcommand + " is available only in interactive mode (use 'suzume-cli dict -i [file.tsv]')");
-    return 1;
+    return kUsageErrorExit;
   }
   if (subcommand == "info") {
     return cmdDictInfo(subargs, args.verbose);
@@ -792,7 +761,7 @@ int cmdDict(const CommandArgs& args) {
 
   printError("unknown dict subcommand: " + subcommand);
   printDictHelp(std::cerr);
-  return 1;
+  return kUsageErrorExit;
 }
 
 }  // namespace suzume::cli

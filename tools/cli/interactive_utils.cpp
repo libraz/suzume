@@ -2,6 +2,8 @@
 
 #include <cctype>
 
+#include "cli_common.h"
+
 namespace suzume::cli {
 
 std::string trim(std::string_view str) {
@@ -43,6 +45,48 @@ std::optional<dictionary::ConjugationType> parseConjType(const std::string& str)
 
 std::optional<core::PartOfSpeech> parsePos(const std::string& str) {
   return core::stringToPosStrict(str);
+}
+
+std::string parseListFilter(const std::vector<std::string>& args, size_t first, ListFilter* filter) {
+  for (size_t idx = first; idx < args.size(); ++idx) {
+    std::string value;
+    ValueOptionMatch match = matchValueOption(args, &idx, "--pos", &value);
+    if (match == ValueOptionMatch::Matched) {
+      filter->pos = core::stringToPosStrict(toUpper(value));
+      if (!filter->pos.has_value()) {
+        return "invalid --pos value: " + value;
+      }
+      continue;
+    }
+    if (match == ValueOptionMatch::Missing) {
+      return "missing value for --pos";
+    }
+    match = matchValueOption(args, &idx, "--pattern", &filter->pattern);
+    if (match == ValueOptionMatch::Matched) {
+      continue;
+    }
+    if (match == ValueOptionMatch::Missing) {
+      return "missing value for --pattern";
+    }
+    match = matchValueOption(args, &idx, "--limit", &value);
+    if (match == ValueOptionMatch::Matched) {
+      if (!parseSizeOption(value, &filter->limit)) {
+        return "invalid --limit value: " + value;
+      }
+      continue;
+    }
+    if (match == ValueOptionMatch::Missing) {
+      return "missing value for --limit";
+    }
+    return "unknown list option: " + args[idx];
+  }
+  if (!filter->pattern.empty()) {
+    auto validation = validateWildcardPattern(filter->pattern);
+    if (!validation.hasValue()) {
+      return validation.error().message;
+    }
+  }
+  return {};
 }
 
 }  // namespace suzume::cli

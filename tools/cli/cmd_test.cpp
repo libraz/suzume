@@ -1,6 +1,7 @@
 #include "cmd_test.h"
 
 #include <algorithm>
+#include <array>
 #include <chrono>
 #include <fstream>
 #include <iomanip>
@@ -163,33 +164,30 @@ int cmdTestSingle(const std::vector<std::string>& args, const CommandArgs& comma
   std::string input;
   std::string expect_str;
 
-  // Find --expect
   for (size_t idx = 0; idx < args.size(); ++idx) {
-    if (args[idx] == "--expect") {
-      if (idx + 1 >= args.size()) {
-        printError("missing value for --expect");
-        return 1;
-      }
-      expect_str = args[idx + 1];
-      ++idx;
-    } else if (args[idx].substr(0, 9) == "--expect=") {
-      expect_str = args[idx].substr(9);
-    } else if (!args[idx].empty() && args[idx][0] == '-') {
-      printError("unknown test option: " + args[idx]);
-      return 1;
-    } else {
-      input = args[idx];
+    const ValueOptionMatch expect = matchValueOption(args, &idx, "--expect", &expect_str);
+    if (expect == ValueOptionMatch::Missing) {
+      printError("missing value for --expect");
+      return kUsageErrorExit;
     }
+    if (expect == ValueOptionMatch::Matched) {
+      continue;
+    }
+    if (isOptionLike(args[idx])) {
+      printError("unknown test option: " + args[idx]);
+      return kUsageErrorExit;
+    }
+    input = args[idx];
   }
 
   if (input.empty()) {
     printError("no input text provided");
-    return 1;
+    return kUsageErrorExit;
   }
 
   if (expect_str.empty()) {
     printError("no expected tags provided (use --expect)");
-    return 1;
+    return kUsageErrorExit;
   }
 
   // Parse expected tags
@@ -216,23 +214,20 @@ int cmdTestFile(const std::vector<std::string>& args, const CommandArgs& command
   std::string test_file;
 
   for (size_t idx = 0; idx < args.size(); ++idx) {
-    if (args[idx] == "--file") {
-      if (idx + 1 >= args.size()) {
-        printError("missing value for " + args[idx]);
-        return 1;
-      }
-      test_file = args[++idx];
-    } else if (args[idx].rfind("--file=", 0) == 0) {
-      test_file = args[idx].substr(7);
-    } else {
+    const ValueOptionMatch file = matchValueOption(args, &idx, "--file", &test_file);
+    if (file == ValueOptionMatch::Missing) {
+      printError("missing value for --file");
+      return kUsageErrorExit;
+    }
+    if (file == ValueOptionMatch::NoMatch) {
       printError("unknown test file option: " + args[idx]);
-      return 1;
+      return kUsageErrorExit;
     }
   }
 
   if (test_file.empty()) {
     printError("no test file provided");
-    return 1;
+    return kUsageErrorExit;
   }
 
   // Read test file
@@ -311,29 +306,58 @@ int cmdTestBenchmark(const std::vector<std::string>& args, const CommandArgs& co
   size_t warmup_iterations = 1;
   std::string corpus_file;
 
+  std::string iterations_text;
+  std::string samples_text;
+  std::string warmup_text;
+  struct ValueOption {
+    std::string_view name;
+    std::string* value;
+  };
+  const std::array<ValueOption, 4> value_options = {{
+      {"--iterations", &iterations_text},
+      {"--samples", &samples_text},
+      {"--warmup", &warmup_text},
+      {"--file", &corpus_file},
+  }};
+
   for (size_t idx = 0; idx < args.size(); ++idx) {
-    if (args[idx].substr(0, 13) == "--iterations=") {
-      if (!parseSizeOption(args[idx].substr(13), &iterations) || iterations == 0) {
-        printError("invalid iterations: " + args[idx].substr(13));
-        return 1;
+    ValueOptionMatch match = ValueOptionMatch::NoMatch;
+    const ValueOption* matched = nullptr;
+    for (const auto& option : value_options) {
+      match = matchValueOption(args, &idx, option.name, option.value);
+      if (match != ValueOptionMatch::NoMatch) {
+        matched = &option;
+        break;
       }
-    } else if (args[idx].substr(0, 10) == "--samples=") {
-      if (!parseSizeOption(args[idx].substr(10), &samples) || samples == 0) {
-        printError("invalid samples: " + args[idx].substr(10));
-        return 1;
-      }
-    } else if (args[idx].substr(0, 9) == "--warmup=") {
-      if (!parseSizeOption(args[idx].substr(9), &warmup_iterations)) {
-        printError("invalid warmup: " + args[idx].substr(9));
-        return 1;
-      }
-    } else if (args[idx] == "--file" && idx + 1 < args.size()) {
-      corpus_file = args[++idx];
-    } else if (args[idx].rfind("--file=", 0) == 0) {
-      corpus_file = args[idx].substr(7);
-    } else {
+    }
+    if (matched == nullptr) {
       printError("unknown benchmark option: " + args[idx]);
-      return 1;
+      return kUsageErrorExit;
+    }
+    if (match == ValueOptionMatch::Missing) {
+      printError("missing value for " + std::string(matched->name));
+      return kUsageErrorExit;
+    }
+  }
+
+  struct CountOption {
+    std::string_view name;
+    const std::string* text;
+    size_t* target;
+    bool allow_zero;
+  };
+  const std::array<CountOption, 3> count_options = {{
+      {"--iterations", &iterations_text, &iterations, false},
+      {"--samples", &samples_text, &samples, false},
+      {"--warmup", &warmup_text, &warmup_iterations, true},
+  }};
+  for (const auto& option : count_options) {
+    if (option.text->empty()) {
+      continue;
+    }
+    if (!parseSizeOption(*option.text, option.target) || (!option.allow_zero && *option.target == 0)) {
+      printError("invalid " + std::string(option.name) + " value: " + *option.text);
+      return kUsageErrorExit;
     }
   }
 
@@ -454,7 +478,7 @@ int cmdTest(const CommandArgs& args) {
 
   if (args.args.empty()) {
     printTestHelp(std::cerr);
-    return 1;
+    return kUsageErrorExit;
   }
 
   const std::string& subcommand = args.args[0];

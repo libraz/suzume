@@ -227,57 +227,30 @@ bool InteractiveSession::cmdUpdate(const std::vector<std::string>& args) {
 }
 
 bool InteractiveSession::cmdList(const std::vector<std::string>& args) {
-  std::optional<core::PartOfSpeech> pos_filter;
-  std::string pattern;
-  size_t limit = 50;
-
-  // Parse options
-  for (const auto& arg : args) {
-    if (arg.substr(0, 6) == "--pos=") {
-      const std::string value = toUpper(arg.substr(6));
-      pos_filter = core::stringToPosStrict(value);
-      if (!pos_filter.has_value()) {
-        printError("invalid POS: " + arg.substr(6));
-        return true;
-      }
-    } else if (arg.substr(0, 10) == "--pattern=") {
-      pattern = arg.substr(10);
-    } else if (arg.substr(0, 8) == "--limit=") {
-      if (!parseSizeOption(arg.substr(8), &limit)) {
-        printError("invalid limit: " + arg.substr(8));
-        return true;
-      }
-    } else {
-      printError("unknown list option: " + arg);
-      return true;
-    }
-  }
-
-  if (!pattern.empty()) {
-    auto validation = validateWildcardPattern(pattern);
-    if (!validation.hasValue()) {
-      printError(validation.error().message);
-      return true;
-    }
+  ListFilter filter;
+  filter.limit = 50;
+  if (const std::string error = parseListFilter(args, 0, &filter); !error.empty()) {
+    printError(error);
+    return true;
   }
 
   size_t count = 0;
   for (const auto& entry : entries_) {
     // Apply POS filter
-    if (pos_filter.has_value() && entry.pos != *pos_filter) {
+    if (filter.pos.has_value() && entry.pos != *filter.pos) {
       continue;
     }
 
     // Apply pattern filter
-    if (!pattern.empty() && !wildcardMatches(pattern, entry.surface)) {
+    if (!filter.pattern.empty() && !wildcardMatches(filter.pattern, entry.surface)) {
       continue;
     }
 
     printEntry(entry);
     ++count;
 
-    if (limitReached(count, limit)) {
-      std::cout << "...(limited to " << limit << " entries)\n";
+    if (limitReached(count, filter.limit)) {
+      std::cout << "...(limited to " << filter.limit << " entries)\n";
       break;
     }
   }

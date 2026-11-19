@@ -295,10 +295,83 @@ TEST(CliCommonTest, ParseArgsPreservesDictAndTestSubcommandOptions) {
   EXPECT_EQ(test_args.dict_paths, (std::vector<std::string>{"user.tsv"}));
   EXPECT_TRUE(test_args.parse_error.empty());
 
-  const char* expect_argv[] = {"suzume-cli", "test", "-テスト", "--expect", "-テスト"};
+  const char* expect_argv[] = {"suzume-cli", "test", "テスト", "--expect=-テスト"};
   auto expect_args = parse(expect_argv);
   EXPECT_TRUE(expect_args.parse_error.empty()) << expect_args.parse_error;
-  EXPECT_EQ(expect_args.args, (std::vector<std::string>{"-テスト", "--expect", "-テスト"}));
+  EXPECT_EQ(expect_args.args, (std::vector<std::string>{"テスト", "--expect=-テスト"}));
+
+  const char* spaced_dash_argv[] = {"suzume-cli", "test", "テスト", "--expect", "-テスト"};
+  EXPECT_EQ(parse(spaced_dash_argv).parse_error, "missing value for --expect");
+}
+
+TEST(CliCommonTest, ParseArgsNeverTakesAnOptionLikeArgumentAsAValue) {
+  const char* short_name[] = {"suzume-cli", "-d", "--mode", "normal", "テスト"};
+  EXPECT_EQ(parse(short_name).parse_error, "missing value for -d");
+
+  const char* dashed_path[] = {"suzume-cli", "--dictionary", "-x.tsv", "テスト"};
+  EXPECT_EQ(parse(dashed_path).parse_error, "missing value for --dictionary");
+
+  const char* terminator[] = {"suzume-cli", "--dictionary", "--", "テスト"};
+  EXPECT_EQ(parse(terminator).parse_error, "missing value for --dictionary");
+
+  const char* negative[] = {"suzume-cli", "-f", "tags", "--tag-min-length", "-1", "テスト"};
+  EXPECT_EQ(parse(negative).parse_error, "missing value for --tag-min-length");
+
+  const char* bare_dash[] = {"suzume-cli", "-d", "-", "テスト"};
+  auto bare_args = parse(bare_dash);
+  EXPECT_TRUE(bare_args.parse_error.empty()) << bare_args.parse_error;
+  EXPECT_EQ(bare_args.dict_paths, (std::vector<std::string>{"-"}));
+
+  const char* attached[] = {"suzume-cli", "--dictionary=-x.tsv", "テスト"};
+  auto attached_args = parse(attached);
+  EXPECT_TRUE(attached_args.parse_error.empty()) << attached_args.parse_error;
+  EXPECT_EQ(attached_args.dict_paths, (std::vector<std::string>{"-x.tsv"}));
+}
+
+TEST(CliCommonTest, ParseArgsBoundsTagSizesToUint32) {
+  const char* largest[] = {"suzume-cli", "-f", "tags", "--tag-min-length", "4294967295", "--tag-max-tags=4294967295",
+                           "テスト"};
+  auto args = parse(largest);
+  EXPECT_TRUE(args.parse_error.empty()) << args.parse_error;
+  EXPECT_EQ(args.tag_min_length, 4294967295U);
+  EXPECT_EQ(args.tag_max_tags, 4294967295U);
+
+  const char* too_long[] = {"suzume-cli", "-f", "tags", "--tag-min-length", "4294967296", "テスト"};
+  EXPECT_EQ(parse(too_long).parse_error, "invalid --tag-min-length value: 4294967296");
+
+  const char* too_many[] = {"suzume-cli", "-f", "tags", "--tag-max-tags=18446744073709551616", "テスト"};
+  EXPECT_EQ(parse(too_many).parse_error, "invalid --tag-max-tags value: 18446744073709551616");
+}
+
+TEST(CliCommonTest, MatchValueOptionAcceptsBothFormsAndRejectsOptionLikeValues) {
+  const std::vector<std::string> args = {"--pos", "NOUN", "--limit=3", "--pattern", "--limit", "-", "--pos="};
+  std::string value;
+  size_t idx = 0;
+  EXPECT_EQ(matchValueOption(args, &idx, "--pos", &value), ValueOptionMatch::Matched);
+  EXPECT_EQ(value, "NOUN");
+  EXPECT_EQ(idx, 1u);
+
+  idx = 2;
+  EXPECT_EQ(matchValueOption(args, &idx, "--pos", &value), ValueOptionMatch::NoMatch);
+  EXPECT_EQ(matchValueOption(args, &idx, "--limit", &value), ValueOptionMatch::Matched);
+  EXPECT_EQ(value, "3");
+  EXPECT_EQ(idx, 2u);
+
+  idx = 3;
+  EXPECT_EQ(matchValueOption(args, &idx, "--pattern", &value), ValueOptionMatch::Missing);
+
+  idx = 4;
+  EXPECT_EQ(matchValueOption(args, &idx, "--limit", &value), ValueOptionMatch::Matched);
+  EXPECT_EQ(value, "-");
+  EXPECT_EQ(idx, 5u);
+
+  idx = 6;
+  EXPECT_EQ(matchValueOption(args, &idx, "--pos", &value), ValueOptionMatch::Missing);
+
+  EXPECT_FALSE(isOptionLike("-"));
+  EXPECT_FALSE(isOptionLike("テスト"));
+  EXPECT_TRUE(isOptionLike("-x"));
+  EXPECT_TRUE(isOptionLike("--"));
 }
 
 TEST(CliCommonTest, ParseArgsTreatsTestDashFAsOutputFormat) {

@@ -15,64 +15,10 @@ Commands:
   test        Verification and testing
   version     Show version information
   help        Show this help
+Use 'suzume-cli [command] --help' for command-specific help.
 
 Global Options:
-  -d, --dictionary PATH             Load user dictionary (can specify multiple)
-  -m, --mode MODE                   Analysis mode: normal, search, split
-  -f, --format FMT                  Output format: tsv (default), json, chasen, tags
-  -V, --verbose                     Verbose output
-  -VV, --very-verbose               Very verbose output (includes lattice dump)
-  --debug                           Write lattice diagnostics to stderr; preserves the selected output format
-  --skip-core-dictionary            Skip the auto-loaded core.dic
-  --skip-bundled-user-dictionary    Skip only the bundled user.dic; -d dictionaries still load
-  --skip-env-config                 Ignore scorer configuration environment variables
-  --compare                         Write user-dictionary comparison diagnostics to stderr; preserves output format
-  --no-preserve-vu                  Normalize ヴ to ビ etc. (default: preserve)
-  --no-preserve-case                Convert ASCII to lowercase (default: preserve)
-  --preserve-symbols                Keep punctuation-like SYMBOL tokens (emoji and content symbols stay OTHER either way)
-  --no-lemmatize                    Keep dictionary base forms without post-analysis correction
-  --merge-compounds                 Merge consecutive noun compounds
-  --tag-no-exclude-particles        Keep particles in tag output
-  --tag-no-exclude-auxiliaries      Keep auxiliaries in tag output
-  --tag-no-exclude-formal-nouns     Keep formal nouns in tag output
-  --tag-no-exclude-low-info         Keep low-information words in tag output
-  --tag-exclude-basic               Exclude hiragana-only basic words
-  --tag-no-remove-duplicates        Keep duplicate tags
-  --tag-no-use-base-form            Use the surface instead of the base form for tags
-  --tag-pos-filter NAME             Keep only NOUN, VERB, ADJ, ADV, PARTICLE, or AUX (repeatable)
-  --tag-min-length N                Minimum tag length (default: 2)
-  --tag-max-tags N                  Maximum tags (default: 0, unlimited)
-  -h, --help                        Show help
-  -v, --version                     Show version
-
-Long options that take a value also accept --option=value.
-
-Environment:
-  SUZUME_DEBUG           Debug level: 1=basic, 2=detailed, 3=trace
-  SUZUME_SCORER_CONFIG   Path to a scorer-options JSON file
-  SUZUME_SCORER_{SECTION}_{KEY}
-                         Override one scorer option; sections are JOIN, SPLIT,
-                         UNARY, BIGRAM, VERB, and INFL
-
-Examples:
-  suzume-cli "text"                  Analyze text
-  suzume-cli analyze -f json "text"  Analyze with JSON output
-  suzume-cli dict compile user.tsv   Compile dictionary
-  suzume-cli dict -i user.tsv        Interactive dictionary editor
-
-Use 'suzume-cli [command] --help' for command-specific help.
-)";
-}
-
-void printAnalyzeHelp(std::ostream& output) {
-  output << R"(suzume-cli analyze - Tokenize text
-
-Usage:
-  suzume-cli analyze [options] [text]
-  suzume-cli [options] [text]         (analyze is default)
-
-Options:
-  -d, --dictionary PATH             Load user dictionary (can specify multiple)
+  -d, --dictionary PATH             Load a user dictionary; .dic is binary, anything else source (repeatable)
   -m, --mode MODE                   Analysis mode: normal, search, split
   -f, --format FMT                  Output format: tsv (default), json, chasen, tags
   -V, --verbose                     Verbose output
@@ -98,9 +44,74 @@ Options:
   --tag-min-length N                Minimum tag length (default: 2)
   --tag-max-tags N                  Maximum tags (default: 0, unlimited)
   -h, --help                        Show this help
+  -v, --version                     Show the version
 
 Long options that take a value also accept --option=value.
 --tag-* options require -f tags.
+Text operands are joined with spaces; with none, text is read from stdin.
+
+Output Formats:
+  tsv                    surface TAB pos TAB base_form TAB start TAB end (default)
+  json                   JSON format
+  chasen                 ChaSen-like format (Japanese POS, conjugation info)
+  tags                   tag TAB pos, one per line
+  TAB formats escape backslash, TAB, CR, and LF as \\, \t, \r, and \n
+  Morpheme start/end offsets refer to normalized text; JSON includes it as normalized_text
+
+Environment:
+  SUZUME_DEBUG           Debug level: 1=basic, 2=detailed, 3=trace
+  SUZUME_SCORER_CONFIG   Path to a scorer-options JSON file
+  SUZUME_SCORER_{SECTION}_{KEY}
+                         Override one scorer option; sections are JOIN, SPLIT,
+                         UNARY, BIGRAM, VERB, and INFL
+
+Examples:
+  suzume-cli "text"                  Analyze text
+  suzume-cli analyze -f json "text"  Analyze with JSON output
+  suzume-cli dict compile user.tsv   Compile dictionary
+  suzume-cli dict -i user.tsv        Interactive dictionary editor
+)";
+}
+
+void printAnalyzeHelp(std::ostream& output) {
+  output << R"(suzume-cli analyze - Tokenize text
+
+Usage:
+  suzume-cli analyze [options] [text]
+  suzume-cli [options] [text]         (analyze is default)
+
+Options:
+  -d, --dictionary PATH             Load a user dictionary; .dic is binary, anything else source (repeatable)
+  -m, --mode MODE                   Analysis mode: normal, search, split
+  -f, --format FMT                  Output format: tsv (default), json, chasen, tags
+  -V, --verbose                     Verbose output
+  -VV, --very-verbose               Very verbose output (includes lattice dump)
+  --debug                           Write lattice diagnostics to stderr; preserves the selected output format
+  --skip-core-dictionary            Skip the auto-loaded core.dic
+  --skip-bundled-user-dictionary    Skip only the bundled user.dic; -d dictionaries still load
+  --skip-env-config                 Ignore scorer configuration environment variables
+  --compare                         Write user-dictionary comparison diagnostics to stderr; preserves output format
+  --no-preserve-vu                  Normalize ヴ to ビ etc. (default: preserve)
+  --no-preserve-case                Convert ASCII to lowercase (default: preserve)
+  --preserve-symbols                Keep punctuation-like SYMBOL tokens (emoji and content symbols stay OTHER either way)
+  --no-lemmatize                    Keep dictionary base forms without post-analysis correction
+  --merge-compounds                 Merge consecutive noun compounds
+  --tag-no-exclude-particles        Keep particles in tag output
+  --tag-no-exclude-auxiliaries      Keep auxiliaries in tag output
+  --tag-no-exclude-formal-nouns     Keep formal nouns in tag output
+  --tag-no-exclude-low-info         Keep low-information words in tag output
+  --tag-exclude-basic               Exclude hiragana-only basic words
+  --tag-no-remove-duplicates        Keep duplicate tags
+  --tag-no-use-base-form            Use the surface instead of the base form for tags
+  --tag-pos-filter NAME             Keep only NOUN, VERB, ADJ, ADV, PARTICLE, or AUX (repeatable)
+  --tag-min-length N                Minimum tag length (default: 2)
+  --tag-max-tags N                  Maximum tags (default: 0, unlimited)
+  -h, --help                        Show this help
+  -v, --version                     Show the version
+
+Long options that take a value also accept --option=value.
+--tag-* options require -f tags.
+Text operands are joined with spaces; with none, text is read from stdin.
 
 Output Formats:
   tsv                    surface TAB pos TAB base_form TAB start TAB end (default)
@@ -137,7 +148,7 @@ Usage:
   suzume-cli dict [subcommand] [options] [arguments]
 
 Subcommands:
-  list <file> [--pos=POS] [--pattern=PATTERN] [--limit=N]
+  list <file> [--pos POS] [--pattern PATTERN] [--limit N]
                          List entries in TSV or binary dictionary
   search <file> <pattern>
                          Search entries by pattern in file
@@ -172,7 +183,7 @@ Conjugation Types / Name Roles:
 Examples:
   suzume-cli dict lookup すぎる
   suzume-cli dict new user.tsv
-  suzume-cli dict list user.tsv --pos=NOUN --limit=10
+  suzume-cli dict list user.tsv --pos NOUN --limit 10
   suzume-cli dict compile user.tsv
   suzume-cli dict -i user.tsv
 )";
@@ -189,10 +200,10 @@ Subcommands:
                          Test single input with expected output
   --file <tests.tsv>
                          Run tests from file
-  benchmark [--iterations=N] [--samples=N] [--warmup=N] [--file <corpus.txt>]
+  benchmark [--iterations N] [--samples N] [--warmup N] [--file <corpus.txt>]
                          Report median initialize, first-analysis, and steady-analysis timing
 Options:
-  -d, --dictionary PATH  Load user dictionary
+  -d, --dictionary PATH  Load a user dictionary; .dic is binary, anything else source (repeatable)
   Analysis, normalization, dictionary, and --tag-* options match `analyze`
   -h, --help             Show this help
 
@@ -203,7 +214,7 @@ Examples:
   suzume-cli test "text" --expect "tag1,tag2"
   suzume-cli test --file tests.tsv
   suzume-cli test --file tests.tsv -d user.dic
-  suzume-cli test benchmark --iterations=1000 --samples=5 --warmup=1
+  suzume-cli test benchmark --iterations 1000 --samples 5 --warmup 1
 )";
 }
 

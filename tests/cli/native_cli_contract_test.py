@@ -120,8 +120,14 @@ def assert_help_contract(cli: Path) -> None:
     analyze = run_cli(cli, "analyze", "--help")
     dictionary = run_cli(cli, "dict", "--help")
     assert "Commands:" in top_level.stdout
-    assert "Output Formats:" not in top_level.stdout
+    assert "Output Formats:" in top_level.stdout
     assert "Output Formats:" in analyze.stdout
+    commands_block = top_level.stdout.split("Commands:\n", 1)[1].split("\n\n", 1)[0]
+    assert "Use 'suzume-cli [command] --help' for command-specific help." in commands_block
+    for help_text in (top_level.stdout, analyze.stdout):
+        assert "-v, --version                     Show the version" in help_text
+        assert "--tag-* options require -f tags." in help_text
+        assert "Text operands are joined with spaces; with none, text is read from stdin." in help_text
     assert "Commands:" not in analyze.stdout
     assert "-VV, --very-verbose" in analyze.stdout
     assert "--debug" in top_level.stdout
@@ -379,6 +385,7 @@ def assert_single_test_contract(cli: Path) -> None:
 def assert_cli_failure_and_structural_diff_contract(cli: Path) -> None:
 
     no_dict_args = run_cli(cli, "dict", expect_success=False)
+    assert no_dict_args.returncode == 2
     assert no_dict_args.stdout == ""
     assert "Usage:" in no_dict_args.stderr
 
@@ -391,6 +398,7 @@ def assert_cli_failure_and_structural_diff_contract(cli: Path) -> None:
         "--unexpected",
         expect_success=False,
     )
+    assert unknown_test.returncode == 2
     assert "unknown test option" in unknown_test.stderr
     unknown_benchmark = run_cli(
         cli,
@@ -399,8 +407,10 @@ def assert_cli_failure_and_structural_diff_contract(cli: Path) -> None:
         "--iterrations=1",
         expect_success=False,
     )
+    assert unknown_benchmark.returncode == 2
     assert "unknown benchmark option" in unknown_benchmark.stderr
     missing_test_file = run_cli(cli, "test", "--file", expect_success=False)
+    assert missing_test_file.returncode == 2
     assert "missing value for --file" in missing_test_file.stderr
 
     with tempfile.TemporaryDirectory(prefix="suzume-cli-contract-") as temp_name:
@@ -595,7 +605,7 @@ def assert_dictionary_contract(cli: Path) -> None:
             input_text="list --pos=ADJECTIVE\nlist --pos=NOT_A_POS\nquit\n",
         )
         assert "静か\tADJ" in interactive_list.stdout
-        assert "invalid POS: NOT_A_POS" in interactive_list.stderr
+        assert "invalid --pos value: NOT_A_POS" in interactive_list.stderr
         invalid_pos = run_cli(
             cli,
             "dict",
@@ -604,7 +614,14 @@ def assert_dictionary_contract(cli: Path) -> None:
             "--pos=NOT_A_POS",
             expect_success=False,
         )
-        assert "invalid POS: NOT_A_POS" in invalid_pos.stderr
+        assert invalid_pos.returncode == 2
+        assert invalid_pos.stderr == "suzume-cli: error: invalid --pos value: NOT_A_POS\n", invalid_pos.stderr
+        spaced_list = run_cli(cli, "dict", "list", str(adjective_source), "--pos", "ADJECTIVE", "--limit", "1")
+        assert spaced_list.stdout == adjective_list.stdout, spaced_list.stdout
+        for option in ("--pos", "--pattern", "--limit"):
+            missing = run_cli(cli, "dict", "list", str(adjective_source), option, expect_success=False)
+            assert missing.returncode == 2
+            assert missing.stderr == f"suzume-cli: error: missing value for {option}\n", missing.stderr
 
         second_binary_source = temp_dir / "second-binary.tsv"
         second_binary = temp_dir / "second-binary.dic"
@@ -840,8 +857,7 @@ def assert_dictionary_contract(cli: Path) -> None:
             "analyze",
             "--skip-bundled-user-dictionary",
             "--skip-core-dictionary",
-            "--dictionary",
-            dash_named_source.name,
+            f"--dictionary={dash_named_source.name}",
             "--format",
             "json",
             "東京辞書",
@@ -1017,6 +1033,11 @@ def assert_subcommand_option_contract(cli: Path) -> None:
         corpus = temp_dir / "corpus.txt"
         corpus.write_text("東京へ行く\n", encoding="utf-8")
         run_cli(cli, "test", "benchmark", "--iterations=1", "--samples=1", "--warmup=0", "--file", str(corpus))
+        run_cli(cli, "test", "benchmark", "--iterations", "1", "--samples", "1", "--warmup", "0", "--file", str(corpus))
+        for bad_count in (("--iterations", "0"), ("--samples", "x"), ("--warmup", "-1")):
+            bad = run_cli(cli, "test", "benchmark", f"{bad_count[0]}={bad_count[1]}", expect_success=False)
+            assert bad.returncode == 2
+            assert bad.stderr == f"suzume-cli: error: invalid {bad_count[0]} value: {bad_count[1]}\n", bad.stderr
 
         source = temp_dir / "interactive.tsv"
         source.write_text("東京公園\tNOUN\n", encoding="utf-8")
@@ -1025,6 +1046,48 @@ def assert_subcommand_option_contract(cli: Path) -> None:
         lookup = run_cli(cli, "dict", "lookup", "でし")
         assert "でし\tAUX\t(base_form: です)\n" in lookup.stdout, lookup.stdout
         assert "(lemma:" not in lookup.stdout
+
+
+def assert_usage_error(cli: Path, args: tuple[str, ...], message: str) -> None:
+    result = run_cli(cli, *args, expect_success=False)
+    assert result.returncode == 2, (args, result.returncode, result.stderr)
+    assert result.stdout == "", (args, result.stdout)
+    assert result.stderr.splitlines()[0] == f"suzume-cli: error: {message}", (args, result.stderr)
+
+
+def assert_usage_error_contract(cli: Path) -> None:
+    """Every usage error in every command exits 2, and value options share one missing-value rule."""
+    # A value option never takes a next argument that reads as an option.
+    assert_usage_error(cli, ("-d", "--mode", "normal", "東京"), "missing value for -d")
+    assert_usage_error(cli, ("--dictionary", "-x.tsv", "東京"), "missing value for --dictionary")
+    assert_usage_error(cli, ("--dictionary", "--", "東京"), "missing value for --dictionary")
+    assert_usage_error(cli, ("--dictionary=", "東京"), "missing value for --dictionary")
+    assert_usage_error(cli, ("-f", "tags", "--tag-min-length", "-1", "東京"), "missing value for --tag-min-length")
+    assert_usage_error(cli, ("test", "東京", "--expect", "--file"), "missing value for --expect")
+    assert_usage_error(cli, ("test", "benchmark", "--iterations", "--samples=1"), "missing value for --iterations")
+    # A bare "-" and an attached "--option=value" are values.
+    for args, path in ((("-d", "-"), "-"), (("--dictionary=-x.tsv",), "-x.tsv")):
+        result = run_cli(cli, *args, "東京", expect_success=False)
+        assert result.returncode == 1, (args, result.returncode)
+        assert result.stderr.splitlines()[-1].startswith(f"suzume-cli: error: failed to load dictionary: {path}: ")
+
+    # Tag sizes cross the C ABI as uint32_t.
+    run_cli(cli, "-f", "tags", "--tag-max-tags", "4294967295", "--tag-min-length=4294967295", "東京")
+    for option in ("--tag-min-length", "--tag-max-tags"):
+        assert_usage_error(cli, ("-f", "tags", option, "4294967296", "東京"), f"invalid {option} value: 4294967296")
+        assert_usage_error(
+            cli, ("-f", "tags", f"{option}=18446744073709551616", "東京"), f"invalid {option} value: 18446744073709551616"
+        )
+
+    assert_usage_error(cli, ("test", "--expect", "東京"), "no input text provided")
+    assert_usage_error(cli, ("test", "東京"), "no expected tags provided (use --expect)")
+    assert_usage_error(cli, ("dict", "info"), "usage: suzume-cli dict info <file>")
+    assert_usage_error(cli, ("dict", "decompile", "a.dic", "b.tsv", "--bogus"), "unknown decompile option: --bogus")
+    assert_usage_error(cli, ("dict", "compile", "--bogus", "a.tsv"), "unknown compile option: --bogus")
+    assert_usage_error(cli, ("dict", "add", "東京"), "dict add is available only in interactive mode (use 'suzume-cli dict -i [file.tsv]')")
+    # Interactive mode has one spelling, -i / --interactive.
+    for alias in ("interactive", "edit"):
+        assert_usage_error(cli, ("dict", alias), f"unknown dict subcommand: {alias}")
 
 
 def main() -> int:
@@ -1057,6 +1120,7 @@ def main() -> int:
     assert_input_contract(cli)
     assert_dictionary_loading_contract(cli)
     assert_subcommand_option_contract(cli)
+    assert_usage_error_contract(cli)
     return 0
 
 

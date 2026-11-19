@@ -45,6 +45,24 @@ void printInfo(std::string_view message);
  */
 bool parseSizeOption(std::string_view value, size_t* out);
 
+/** @brief Exit status of every usage error: an unknown option, a missing or invalid value, a bad operand. */
+constexpr int kUsageErrorExit = 2;
+
+/** @brief Whether @p arg reads as an option: it starts with '-' and is longer than one character. */
+bool isOptionLike(std::string_view arg);
+
+/** @brief Outcome of matching one value-taking subcommand option. */
+enum class ValueOptionMatch : uint8_t { NoMatch, Matched, Missing };
+
+/**
+ * @brief Match args[*idx] against @p name as "name value" or "name=value".
+ *
+ * The space form never takes a next argument that isOptionLike(). On Matched,
+ * *idx is left on the last argument consumed and @p value holds the value.
+ */
+ValueOptionMatch matchValueOption(const std::vector<std::string>& args, size_t* idx, std::string_view name,
+                                  std::string* value);
+
 /** @brief Whether a 0-as-unlimited result cap has been reached. */
 bool limitReached(size_t count, size_t limit);
 
