@@ -20,7 +20,7 @@ namespace {
 
 // The revision the table below describes. Bumping SUZUME_ABI_VERSION without
 // updating this constant, or the reverse, fails AbiVersionMatchesFrozenLayout.
-constexpr uint32_t kFrozenAbiVersion = 1;
+constexpr uint32_t kFrozenAbiVersion = 2;
 
 constexpr const char* kBumpInstruction =
     "If this layout change was deliberate, bump SUZUME_ABI_VERSION in "

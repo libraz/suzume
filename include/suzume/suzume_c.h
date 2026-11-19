@@ -65,7 +65,7 @@ extern "C" {
  * exported entry point is removed or changes its signature. Adding a new entry
  * point that leaves the existing ones untouched does not bump it.
  */
-#define SUZUME_ABI_VERSION 1
+#define SUZUME_ABI_VERSION 2
 
 /**
  * @brief Get the ABI revision the library was compiled with
