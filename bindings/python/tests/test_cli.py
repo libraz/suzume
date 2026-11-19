@@ -38,7 +38,7 @@ _JSON_MORPHEME_KEYS = [
     "is_from_dictionary",
     "score",
 ]
-_TAG_NAMES = "NOUN, VERB, ADJ, ADV, PARTICLE, or AUX"
+_TAG_NAMES = "NOUN, VERB, ADJ, ADV, PARTICLE, AUX"
 
 # Every boolean option of the analyze command: (flag, constructor or tag keyword, value it sets).
 _ANALYZER_FLAGS = [
@@ -149,7 +149,7 @@ def test_version_prints_exactly_one_line(alias: list[str]) -> None:
 def test_a_usage_error_wins_over_version() -> None:
     _assert_usage_error(
         _run_cli("-v", "--mode", "invalid", "東京"),
-        "invalid mode: invalid (expected normal, search, or split)",
+        "invalid mode: invalid (expected one of: normal, search, split)",
     )
 
 
@@ -197,7 +197,7 @@ def test_long_options_are_never_abbreviated(abbreviation: str) -> None:
 def test_morpheme_format_is_removed_and_tsv_is_the_default() -> None:
     _assert_usage_error(
         _run_cli("-f", "morpheme", "東京"),
-        "invalid format: morpheme (expected tsv, json, chasen, or tags)",
+        "invalid format: morpheme (expected one of: tsv, json, chasen, tags)",
     )
     default = _run_cli("東京の公園")
     assert default.returncode == 0
@@ -217,9 +217,9 @@ def test_morpheme_format_is_removed_and_tsv_is_the_default() -> None:
         (["-f", "tags", "--tag-max-tags", "1.5", "東京"], "invalid --tag-max-tags value: 1.5"),
         (
             ["-f", "tags", "--tag-pos-filter", "noun", "東京"],
-            f"invalid --tag-pos-filter value: noun (expected {_TAG_NAMES})",
+            f"invalid --tag-pos-filter value: noun (expected one of: {_TAG_NAMES})",
         ),
-        (["--mode", "fast", "東京"], "invalid mode: fast (expected normal, search, or split)"),
+        (["--mode", "fast", "東京"], "invalid mode: fast (expected one of: normal, search, split)"),
         (["--unknown-flag", "東京"], "unknown option: --unknown-flag"),
         (["-dfile.tsv", "東京"], "unknown option: -dfile.tsv"),
     ],
@@ -661,7 +661,7 @@ def test_missing_dictionary_reports_the_path(tmp_path: Path, name: str, native_t
     ("name", "content", "native_text"),
     [
         ("invalid.dic", b"invalid", "Dictionary file too small"),
-        ("invalid.csv", '"東京,NOUN,0.5\n'.encode(), "Invalid legacy CSV quoting"),
+        ("invalid.csv", '"東京,NOUN,0.5\n'.encode(), "Invalid quoting"),
     ],
 )
 def test_malformed_dictionary_reports_the_library_text(

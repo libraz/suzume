@@ -354,7 +354,7 @@ describe('JS API: error reporting', () => {
         () => suzume.loadUserDictionary('"東京,NOUN,0.5\n'),
         ErrorCode.Parse,
         'load_user_dictionary',
-        /^Invalid legacy CSV quoting.*unterminated quoted field/,
+        /^Invalid quoting.*unterminated quoted field/,
       );
       expect(error.cause).toBeUndefined();
     } finally {

@@ -61,8 +61,7 @@ class _Args:
 
 def _choice(value: str, choices: Sequence[str], label: str) -> str:
     if value not in choices:
-        expected = ", ".join(choices[:-1]) + f", or {choices[-1]}"
-        raise _UsageError(f"invalid {label}: {value} (expected {expected})")
+        raise _UsageError(f"invalid {label}: {value} (expected one of: {', '.join(choices)})")
     return value
 
 
