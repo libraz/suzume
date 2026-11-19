@@ -142,11 +142,16 @@ REMOVED_NAMES = (
     "--dict",
     "-f morpheme",
 )
+# Consumer-facing text says "base form"; the `lemmatize` option keeps its name, which
+# the whole-identifier match leaves alone.
+REMOVED_WORDS = ("lemma", "lemmas")
 REMOVED_NAME_SCOPE = (
     "examples/**/*",
     "bindings/*/README.md",
     "bindings/python/src/suzume/cli.py",
     "tools/cli/cli_help.cpp",
+    "include/suzume/*.h",
+    "include/suzume/suzume.hpp",
 )
 
 
@@ -458,8 +463,8 @@ def removed_name_pattern(name: str) -> re.Pattern[str]:
 
 
 def check_removed_names() -> bool:
-    """Docs, examples and CLI help name none of the removed public names."""
-    patterns = {name: removed_name_pattern(name) for name in REMOVED_NAMES}
+    """Docs, examples, CLI help and public headers name none of the removed public names or words."""
+    patterns = {name: removed_name_pattern(name) for name in (*REMOVED_NAMES, *REMOVED_WORDS)}
     failed = False
     for pattern in REMOVED_NAME_SCOPE:
         for path in sorted(Path().glob(pattern)):
