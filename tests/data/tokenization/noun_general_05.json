@@ -1170,6 +1170,23 @@
       ],
       "id": "sanhai_2",
       "input": "山田さんはい"
+    },
+    {
+      "description": "phrase-initial verb continuative before a kanji noun reads as a deverbal noun",
+      "expected": [
+        {
+          "lemma": "使い",
+          "pos": "Noun",
+          "surface": "使い"
+        },
+        {
+          "lemma": "道具",
+          "pos": "Noun",
+          "surface": "道具"
+        }
+      ],
+      "id": "i_14",
+      "input": "使い道具"
     }
   ],
   "description": "General nouns (part 5/5)",
