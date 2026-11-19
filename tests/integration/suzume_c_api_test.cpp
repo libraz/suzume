@@ -441,6 +441,47 @@ TEST(SuzumeCApiTest, CanonicalLabelFunctionsCoverSerializedBoundaries) {
   EXPECT_STREQ(suzume_conjugation_form_label(255), "");
 }
 
+TEST(SuzumeCApiTest, NativeMessagesCarryNoSymbolPrefix) {
+  suzume_t handle = suzume_create();
+  ASSERT_NE(handle, nullptr);
+  const std::string invalid("\xE3\x81", 2);
+
+  EXPECT_EQ(suzume_analyze_n(handle, invalid.data(), invalid.size()), nullptr);
+  EXPECT_STREQ(suzume_last_error(), "invalid UTF-8 input");
+  EXPECT_EQ(suzume_analyze(nullptr, "x"), nullptr);
+  EXPECT_STREQ(suzume_last_error(), "null handle or text");
+  EXPECT_EQ(suzume_generate_tags(nullptr, "x"), nullptr);
+  EXPECT_STREQ(suzume_last_error(), "null handle or text");
+  EXPECT_EQ(suzume_set_mode(nullptr, SUZUME_MODE_NORMAL), 0);
+  EXPECT_STREQ(suzume_last_error(), "null handle");
+  EXPECT_EQ(suzume_set_mode(handle, 7), 0);
+  EXPECT_STREQ(suzume_last_error(), "invalid mode");
+  EXPECT_EQ(suzume_mode(nullptr), SUZUME_MODE_INVALID);
+  EXPECT_STREQ(suzume_last_error(), "null handle");
+  EXPECT_EQ(suzume_clear_user_dictionaries(nullptr), 0);
+  EXPECT_STREQ(suzume_last_error(), "null handle");
+  EXPECT_EQ(suzume_dictionary_warning(handle, 100000), nullptr);
+  EXPECT_STREQ(suzume_last_error(), "index out of range");
+
+  suzume_options_t options{};
+  suzume_init_options(&options);
+  options.mode = 9;
+  EXPECT_EQ(suzume_create_with_options(&options), nullptr);
+  EXPECT_STREQ(suzume_last_error(), "invalid mode");
+  suzume_init_options(&options);
+  options.scorer_options_json = "{";
+  EXPECT_EQ(suzume_create_with_options(&options), nullptr);
+  EXPECT_EQ(std::string(suzume_last_error()).rfind("invalid scorer options: ", 0), 0u) << suzume_last_error();
+
+  // Core text that itself contains ": " is forwarded verbatim.
+  const char* csv_data = "\"東京,NOUN,0.5\n";
+  EXPECT_EQ(suzume_load_user_dictionary(handle, csv_data, std::strlen(csv_data)), 0u);
+  EXPECT_EQ(std::string(suzume_last_error()).rfind("Invalid legacy CSV quoting at line 1: ", 0), 0u)
+      << suzume_last_error();
+
+  suzume_destroy(handle);
+}
+
 TEST(SuzumeCApiTest, TagEntrypointsRejectInvalidUtf8WithStableCode) {
   suzume_t handle = suzume_create();
   ASSERT_NE(handle, nullptr);

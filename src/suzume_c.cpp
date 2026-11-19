@@ -285,7 +285,7 @@ suzume_tags_t* makeTagsResult(const std::vector<suzume::postprocess::TagEntry>& 
 
 suzume_result_t* analyzeBytes(SuzumeHandle* handle, std::string_view text) {
   if (!suzume::normalize::isValidUtf8(text)) {
-    setLastError("suzume_analyze: invalid UTF-8 input", SUZUME_ERROR_INVALID_UTF8);
+    setLastError("invalid UTF-8 input", SUZUME_ERROR_INVALID_UTF8);
     return nullptr;
   }
 
@@ -422,7 +422,7 @@ SUZUME_EXPORT suzume_t suzume_create_with_options(const suzume_options_t* option
       opts.remove_symbols = (options->preserve_symbols == 0);
       auto mode = parseAnalysisMode(options->mode);
       if (!mode.has_value()) {
-        setLastError("suzume_create_with_options: invalid mode", SUZUME_ERROR_INVALID_INPUT);
+        setLastError("invalid mode", SUZUME_ERROR_INVALID_INPUT);
         return nullptr;
       }
       opts.mode = *mode;
@@ -436,7 +436,7 @@ SUZUME_EXPORT suzume_t suzume_create_with_options(const suzume_options_t* option
         std::string scorer_error;
         if (!suzume::analysis::ScorerOptionsLoader::loadFromJsonString(options->scorer_options_json,
                                                                        opts.scorer_options, &scorer_error)) {
-          setLastError("suzume_create_with_options: invalid scorer options: " + scorer_error, SUZUME_ERROR_PARSE);
+          setLastError("invalid scorer options: " + scorer_error, SUZUME_ERROR_PARSE);
           return nullptr;
         }
         opts.scorer_options_json = options->scorer_options_json;
@@ -456,12 +456,12 @@ SUZUME_EXPORT void suzume_destroy(suzume_t handle) {
 
 SUZUME_EXPORT int suzume_set_mode(suzume_t handle, uint8_t mode) {
   if (handle == nullptr) {
-    setLastError("suzume_set_mode: null handle", SUZUME_ERROR_INVALID_INPUT);
+    setLastError("null handle", SUZUME_ERROR_INVALID_INPUT);
     return 0;
   }
   const auto parsed_mode = parseAnalysisMode(mode);
   if (!parsed_mode.has_value()) {
-    setLastError("suzume_set_mode: invalid mode", SUZUME_ERROR_INVALID_INPUT);
+    setLastError("invalid mode", SUZUME_ERROR_INVALID_INPUT);
     return 0;
   }
 
@@ -475,7 +475,7 @@ SUZUME_EXPORT int suzume_set_mode(suzume_t handle, uint8_t mode) {
 
 SUZUME_EXPORT uint8_t suzume_mode(suzume_t handle) {
   if (handle == nullptr) {
-    setLastError("suzume_mode: null handle", SUZUME_ERROR_INVALID_INPUT);
+    setLastError("null handle", SUZUME_ERROR_INVALID_INPUT);
     return SUZUME_MODE_INVALID;
   }
   return static_cast<uint8_t>(handle->instance.mode());
@@ -487,7 +487,7 @@ SUZUME_EXPORT suzume_result_t* suzume_analyze(suzume_t handle, const char* text)
 
 SUZUME_EXPORT suzume_result_t* suzume_analyze_n(suzume_t handle, const char* text, size_t size) {
   if (handle == nullptr || text == nullptr) {
-    setLastError("suzume_analyze: null handle or text", SUZUME_ERROR_INVALID_INPUT);
+    setLastError("null handle or text", SUZUME_ERROR_INVALID_INPUT);
     return nullptr;
   }
 
@@ -512,7 +512,7 @@ SUZUME_EXPORT suzume_tags_t* suzume_generate_tags(suzume_t handle, const char* t
 
 SUZUME_EXPORT suzume_tags_t* suzume_generate_tags_n(suzume_t handle, const char* text, size_t size) {
   if (handle == nullptr || text == nullptr) {
-    setLastError("suzume_generate_tags: null handle or text", SUZUME_ERROR_INVALID_INPUT);
+    setLastError("null handle or text", SUZUME_ERROR_INVALID_INPUT);
     return nullptr;
   }
 
@@ -531,7 +531,7 @@ SUZUME_EXPORT suzume_tags_t* suzume_generate_tags_with_options(suzume_t handle, 
 SUZUME_EXPORT suzume_tags_t* suzume_generate_tags_with_options_n(suzume_t handle, const char* text, size_t size,
                                                                  const suzume_tag_options_t* options) {
   if (handle == nullptr || text == nullptr) {
-    setLastError("suzume_generate_tags_with_options: null handle or text", SUZUME_ERROR_INVALID_INPUT);
+    setLastError("null handle or text", SUZUME_ERROR_INVALID_INPUT);
     return nullptr;
   }
 
@@ -558,7 +558,7 @@ SUZUME_EXPORT void suzume_tags_free(suzume_tags_t* tags) {
 SUZUME_EXPORT size_t suzume_load_user_dictionary(suzume_t handle, const char* data, size_t size) {
   // A zero-length source is empty whatever the pointer is; the core reports it.
   if (handle == nullptr || (data == nullptr && size > 0)) {
-    setLastError("suzume_load_user_dictionary: null handle or data", SUZUME_ERROR_INVALID_INPUT);
+    setLastError("null handle or data", SUZUME_ERROR_INVALID_INPUT);
     return 0;
   }
 
@@ -576,7 +576,7 @@ SUZUME_EXPORT size_t suzume_load_user_dictionary(suzume_t handle, const char* da
 
 SUZUME_EXPORT size_t suzume_load_binary_dictionary(suzume_t handle, const uint8_t* data, size_t size) {
   if (handle == nullptr || (data == nullptr && size > 0)) {
-    setLastError("suzume_load_binary_dictionary: null handle or data", SUZUME_ERROR_INVALID_INPUT);
+    setLastError("null handle or data", SUZUME_ERROR_INVALID_INPUT);
     return 0;
   }
 
@@ -594,7 +594,7 @@ SUZUME_EXPORT size_t suzume_load_binary_dictionary(suzume_t handle, const uint8_
 
 SUZUME_EXPORT int suzume_clear_user_dictionaries(suzume_t handle) {
   if (handle == nullptr) {
-    setLastError("suzume_clear_user_dictionaries: null handle", SUZUME_ERROR_INVALID_INPUT);
+    setLastError("null handle", SUZUME_ERROR_INVALID_INPUT);
     return 0;
   }
   clearLastError();
@@ -607,7 +607,7 @@ SUZUME_EXPORT int suzume_clear_user_dictionaries(suzume_t handle) {
 
 SUZUME_EXPORT int suzume_has_core_dictionary(suzume_t handle) {
   if (handle == nullptr) {
-    setLastError("suzume_has_core_dictionary: null handle", SUZUME_ERROR_INVALID_INPUT);
+    setLastError("null handle", SUZUME_ERROR_INVALID_INPUT);
     return 0;
   }
   return handle->instance.hasCoreDictionary() ? 1 : 0;
@@ -660,7 +660,7 @@ SUZUME_EXPORT const char* suzume_pos_label(suzume_pos_t code) {
 
 SUZUME_EXPORT size_t suzume_dictionary_warning_count(suzume_t handle) {
   if (handle == nullptr) {
-    setLastError("suzume_dictionary_warning_count: null handle", SUZUME_ERROR_INVALID_INPUT);
+    setLastError("null handle", SUZUME_ERROR_INVALID_INPUT);
     return 0;
   }
   return handle->instance.dictionaryWarnings().size();
@@ -668,13 +668,13 @@ SUZUME_EXPORT size_t suzume_dictionary_warning_count(suzume_t handle) {
 
 SUZUME_EXPORT const char* suzume_dictionary_warning(suzume_t handle, size_t index) {
   if (handle == nullptr) {
-    setLastError("suzume_dictionary_warning: null handle", SUZUME_ERROR_INVALID_INPUT);
+    setLastError("null handle", SUZUME_ERROR_INVALID_INPUT);
     return nullptr;
   }
   SUZUME_C_TRY {
     const auto& warnings = handle->instance.dictionaryWarnings();
     if (index >= warnings.size()) {
-      setLastError("suzume_dictionary_warning: index out of range", SUZUME_ERROR_INVALID_INPUT);
+      setLastError("index out of range", SUZUME_ERROR_INVALID_INPUT);
       return nullptr;
     }
     thread_local std::string warning;
