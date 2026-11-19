@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) {
       printVersion();
       std::cout.flush();
       if (!std::cout) {
-        printError("Failed to write output");
+        printError("failed to write output");
         return 1;
       }
       return 0;
@@ -43,7 +43,7 @@ int main(int argc, char* argv[]) {
     } else if (args.command == "test") {
       exit_code = cmdTest(args);
     } else {
-      printError("Unknown command: " + args.command);
+      printError("unknown command: " + args.command);
       printHelp(std::cerr);
       exit_code = 1;
     }
@@ -52,15 +52,15 @@ int main(int argc, char* argv[]) {
     // Do not report success after writing only a truncated response.
     std::cout.flush();
     if (!std::cout) {
-      printError("Failed to write output");
+      printError("failed to write output");
       return 1;
     }
     return exit_code;
   } catch (const std::exception& error) {
-    printError("Unexpected error: " + std::string(error.what()));
+    printError("unexpected error: " + std::string(error.what()));
     return 1;
   } catch (...) {
-    printError("Unexpected non-standard error");
+    printError("unexpected non-standard error");
     return 1;
   }
 }

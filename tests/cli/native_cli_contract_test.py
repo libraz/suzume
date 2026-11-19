@@ -112,7 +112,7 @@ def assert_version_contract(cli: Path) -> None:
 
     invalid = run_cli(cli, "-v", "--mode", "invalid", "東京", expect_success=False)
     assert invalid.returncode == 2
-    assert invalid.stderr == "suzume-cli: error: invalid mode: invalid (expected normal, search, or split)\n"
+    assert invalid.stderr == "suzume-cli: error: invalid mode: invalid (expected one of: normal, search, split)\n"
 
 
 def assert_help_contract(cli: Path) -> None:
@@ -391,7 +391,7 @@ def assert_cli_failure_and_structural_diff_contract(cli: Path) -> None:
         "--unexpected",
         expect_success=False,
     )
-    assert "Unknown test option" in unknown_test.stderr
+    assert "unknown test option" in unknown_test.stderr
     unknown_benchmark = run_cli(
         cli,
         "test",
@@ -399,9 +399,9 @@ def assert_cli_failure_and_structural_diff_contract(cli: Path) -> None:
         "--iterrations=1",
         expect_success=False,
     )
-    assert "Unknown benchmark option" in unknown_benchmark.stderr
+    assert "unknown benchmark option" in unknown_benchmark.stderr
     missing_test_file = run_cli(cli, "test", "--file", expect_success=False)
-    assert "Missing value for --file" in missing_test_file.stderr
+    assert "missing value for --file" in missing_test_file.stderr
 
     with tempfile.TemporaryDirectory(prefix="suzume-cli-contract-") as temp_name:
         temp_dir = Path(temp_name)
@@ -458,7 +458,7 @@ def assert_cli_failure_and_structural_diff_contract(cli: Path) -> None:
         inferred_single_output = shard_dir / "alpha.dic"
         inferred_single_output.write_bytes(b"must remain untouched")
         single_source = run_cli(cli, "dict", "compile", str(shard_dir / "alpha.tsv"), expect_success=False)
-        assert "Refusing to overwrite inferred dictionary output" in single_source.stderr
+        assert "refusing to overwrite inferred dictionary output" in single_source.stderr
         assert inferred_single_output.read_bytes() == b"must remain untouched"
 
 
@@ -519,7 +519,7 @@ def assert_dictionary_contract(cli: Path) -> None:
             str(filter_source),
             str(filter_binary),
         )
-        assert "Filtered 1 trivial entries (kept 1)" in filtered.stderr
+        assert "filtered 1 trivial entries (kept 1)" in filtered.stderr
 
         iku_lookup = run_cli(cli, "dict", "lookup", "行く")
         assert "行っ- (音便形)" in iku_lookup.stdout
@@ -547,7 +547,7 @@ def assert_dictionary_contract(cli: Path) -> None:
         assert default_dump.is_file()
         assert source.read_text(encoding="utf-8") == "東京テスト\tNOUN\n"
         refused_dump = run_cli(cli, "dict", "decompile", str(compiled), expect_success=False)
-        assert "Refusing to overwrite" in refused_dump.stderr
+        assert "refusing to overwrite" in refused_dump.stderr
         run_cli(cli, "dict", "decompile", str(compiled), "--force")
 
         explicit_dump = temp_dir / "explicit.tsv"
@@ -595,7 +595,7 @@ def assert_dictionary_contract(cli: Path) -> None:
             input_text="list --pos=ADJECTIVE\nlist --pos=NOT_A_POS\nquit\n",
         )
         assert "静か\tADJ" in interactive_list.stdout
-        assert "Invalid POS: NOT_A_POS" in interactive_list.stderr
+        assert "invalid POS: NOT_A_POS" in interactive_list.stderr
         invalid_pos = run_cli(
             cli,
             "dict",
@@ -604,7 +604,7 @@ def assert_dictionary_contract(cli: Path) -> None:
             "--pos=NOT_A_POS",
             expect_success=False,
         )
-        assert "Invalid POS: NOT_A_POS" in invalid_pos.stderr
+        assert "invalid POS: NOT_A_POS" in invalid_pos.stderr
 
         second_binary_source = temp_dir / "second-binary.tsv"
         second_binary = temp_dir / "second-binary.dic"
@@ -693,8 +693,8 @@ def assert_dictionary_contract(cli: Path) -> None:
                 "quit\n"
             ),
         )
-        assert "Unknown import option: --skip-duplicate" in rejected_import.stderr
-        assert "Unknown import option: extra.tsv" in rejected_import.stderr
+        assert "unknown import option: --skip-duplicate" in rejected_import.stderr
+        assert "unknown import option: extra.tsv" in rejected_import.stderr
 
         protected_source = temp_dir / "protected.dic"
         protected_content = "東京\tNOUN\n"
@@ -706,7 +706,7 @@ def assert_dictionary_contract(cli: Path) -> None:
             str(protected_source),
             input_text=f"compile {protected_source}\nquit\n",
         )
-        assert "Refusing to overwrite dictionary source" in protected.stderr
+        assert "refusing to overwrite dictionary source" in protected.stderr
         assert protected_source.read_text(encoding="utf-8") == protected_content
 
         wrong_extension = run_cli(
@@ -716,7 +716,7 @@ def assert_dictionary_contract(cli: Path) -> None:
             str(protected_source),
             input_text=f"compile {temp_dir / 'protected.tsv'}\nquit\n",
         )
-        assert "Output file must have .dic extension" in wrong_extension.stderr
+        assert "output file must have .dic extension" in wrong_extension.stderr
 
         session_source = temp_dir / "session.tsv"
         session = run_cli(
@@ -735,7 +735,7 @@ def assert_dictionary_contract(cli: Path) -> None:
             ),
         )
         assert "青空りんご園\tNOUN\t青空りんご園" in session.stdout
-        assert "Missing conjugation type: 東京" in session.stderr
+        assert "missing conjugation type: 東京" in session.stderr
         saved_session = session_source.read_text(encoding="utf-8")
         assert "東京\tNOUN\tFAMILY" in saved_session
         assert "テスト\tNOUN\tGIVEN" in saved_session
@@ -762,8 +762,8 @@ def assert_dictionary_contract(cli: Path) -> None:
             str(quoted_source),
             input_text="add '' NOUN\nadd '東京 NOUN\nquit\n",
         )
-        assert "Surface must not be empty" in quoted.stderr
-        assert "Unterminated quoted argument" in quoted.stderr
+        assert "surface must not be empty" in quoted.stderr
+        assert "unterminated quoted argument" in quoted.stderr
         assert not quoted_source.exists()
 
         metachar_surface = r"記号.^$+()[]{}|\終"
@@ -825,7 +825,7 @@ def assert_dictionary_contract(cli: Path) -> None:
             env=lookup_env,
         )
         assert "東京テスト公園\tNOUN" in source_result.stdout
-        assert "Failed to parse source TSV" in source_result.stderr
+        assert "failed to parse source TSV" in source_result.stderr
         assert malformed_lookup.name in source_result.stderr
 
         user_result = run_cli(cli, "dict", "lookup", "東京果樹園", env=lookup_env)
@@ -925,7 +925,7 @@ def assert_flag_table_contract(cli: Path) -> None:
         assert result.returncode == 2
         assert result.stderr == (
             f"suzume-cli: error: invalid --tag-pos-filter value: {name} "
-            "(expected NOUN, VERB, ADJ, ADV, PARTICLE, or AUX)\n"
+            "(expected one of: NOUN, VERB, ADJ, ADV, PARTICLE, AUX)\n"
         ), result.stderr
     for options in TAG_OPTIONS:
         run_cli(cli, "-f", "tags", *options, "東京を走る")
@@ -1011,7 +1011,7 @@ def assert_subcommand_option_contract(cli: Path) -> None:
         dash_f = run_cli(cli, "test", "-f", str(cases), expect_success=False)
         assert dash_f.returncode == 2
         assert dash_f.stderr == (
-            f"suzume-cli: error: invalid format: {cases} (expected tsv, json, chasen, or tags)\n"
+            f"suzume-cli: error: invalid format: {cases} (expected one of: tsv, json, chasen, tags)\n"
         ), dash_f.stderr
 
         corpus = temp_dir / "corpus.txt"

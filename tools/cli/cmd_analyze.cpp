@@ -230,7 +230,7 @@ int cmdAnalyze(const CommandArgs& args) {
     }
     print_new_warnings();
     if (args.verbose) {
-      printInfo("Loaded dictionary: " + dict_path);
+      printInfo("loaded dictionary: " + dict_path);
     }
   }
 

@@ -29,7 +29,7 @@ int InteractiveSession::run() {
   if (check.good()) {
     check.close();
     if (!loadEntries()) {
-      printError("Failed to load dictionary: " + last_error_);
+      printError("failed to load dictionary: " + last_error_);
       return 1;
     }
     std::cout << "Loaded " << entries_.size() << " entries from " << tsv_path_ << "\n";
@@ -49,7 +49,7 @@ int InteractiveSession::run() {
       std::cout << "\n";
       if (modified_) {
         if (!saveEntries()) {
-          printError("Failed to save changes at EOF: " + last_error_);
+          printError("failed to save changes at EOF: " + last_error_);
           return 1;
         }
         std::cerr << "Saved unsaved changes at EOF.\n";
@@ -74,7 +74,7 @@ bool InteractiveSession::processCommand(std::string_view line) {
   bool unterminated_quote = false;
   auto args = parseCommandLine(line, &unterminated_quote);
   if (unterminated_quote) {
-    printError("Unterminated quoted argument");
+    printError("unterminated quoted argument");
     return true;
   }
   if (args.empty()) {
@@ -133,7 +133,7 @@ bool InteractiveSession::processCommand(std::string_view line) {
     return cmdQuit(cmd_args);
   }
 
-  printError("Unknown command: " + cmd);
+  printError("unknown command: " + cmd);
   std::cout << "Type 'help' for available commands.\n";
   return true;
 }

@@ -77,7 +77,7 @@ void printConjugationStems(const std::string& base_form, dictionary::Conjugation
 
 int cmdDictNew(const std::vector<std::string>& args, bool /* verbose */) {
   if (args.empty()) {
-    printError("Usage: suzume-cli dict new <file.tsv>");
+    printError("usage: suzume-cli dict new <file.tsv>");
     return 1;
   }
 
@@ -86,7 +86,7 @@ int cmdDictNew(const std::vector<std::string>& args, bool /* verbose */) {
   // Check if file already exists
   std::ifstream check(path);
   if (check.good()) {
-    printError("File already exists: " + path);
+    printError("file already exists: " + path);
     return 1;
   }
   check.close();
@@ -94,7 +94,7 @@ int cmdDictNew(const std::vector<std::string>& args, bool /* verbose */) {
   // Create empty TSV file with header
   std::ofstream file(path);
   if (!file) {
-    printError("Failed to create file: " + path);
+    printError("failed to create file: " + path);
     return 1;
   }
 
@@ -112,12 +112,12 @@ int cmdDictNew(const std::vector<std::string>& args, bool /* verbose */) {
 
   file.flush();
   if (!file) {
-    printError("Failed to write file: " + path);
+    printError("failed to write file: " + path);
     return 1;
   }
   file.close();
   if (!file) {
-    printError("Failed to finalize file: " + path);
+    printError("failed to finalize file: " + path);
     return 1;
   }
 
@@ -127,7 +127,7 @@ int cmdDictNew(const std::vector<std::string>& args, bool /* verbose */) {
 
 int cmdDictInfo(const std::vector<std::string>& args, bool /* verbose */) {
   if (args.empty()) {
-    printError("Usage: suzume-cli dict info <file>");
+    printError("usage: suzume-cli dict info <file>");
     return 1;
   }
 
@@ -139,7 +139,7 @@ int cmdDictInfo(const std::vector<std::string>& args, bool /* verbose */) {
     dictionary::BinaryDictionary dict;
     auto result = dict.loadFromFile(path);
     if (!result.hasValue()) {
-      printError("Failed to load dictionary: " + result.error().message);
+      printError("failed to load dictionary: " + result.error().message);
       return 1;
     }
 
@@ -157,7 +157,7 @@ int cmdDictInfo(const std::vector<std::string>& args, bool /* verbose */) {
     TsvParser parser;
     auto result = parser.parseFile(path);
     if (!result.hasValue()) {
-      printError("Failed to parse TSV: " + result.error().message);
+      printError("failed to parse TSV: " + result.error().message);
       return 1;
     }
 
@@ -173,7 +173,7 @@ int cmdDictInfo(const std::vector<std::string>& args, bool /* verbose */) {
 
 int cmdDictValidate(const std::vector<std::string>& args, bool /* verbose */) {
   if (args.empty()) {
-    printError("Usage: suzume-cli dict validate <file.tsv>");
+    printError("usage: suzume-cli dict validate <file.tsv>");
     return 1;
   }
 
@@ -182,7 +182,7 @@ int cmdDictValidate(const std::vector<std::string>& args, bool /* verbose */) {
   TsvParser parser;
   auto result = parser.parseFile(path);
   if (!result.hasValue()) {
-    printError("Parse error: " + result.error().message);
+    printError("parse error: " + result.error().message);
     return 1;
   }
 
@@ -263,7 +263,7 @@ core::Expected<std::vector<std::string>, core::Error> expandGlobs(const std::vec
 int cmdDictCompile(const std::vector<std::string>& args, bool verbose) {
   if (args.empty()) {
     printError(
-        "Usage: suzume-cli dict compile [--filter-trivial] <input.tsv>... "
+        "usage: suzume-cli dict compile [--filter-trivial] <input.tsv>... "
         "<output.dic>\n"
         "       suzume-cli dict compile [--filter-trivial] <input.tsv>  "
         "(output: input.dic)");
@@ -277,7 +277,7 @@ int cmdDictCompile(const std::vector<std::string>& args, bool verbose) {
     if (arg == "--filter-trivial") {
       filter_trivial = true;
     } else if (arg.rfind("--", 0) == 0) {
-      printError("Unknown compile option: " + arg);
+      printError("unknown compile option: " + arg);
       return 1;
     } else {
       file_args.push_back(arg);
@@ -285,7 +285,7 @@ int cmdDictCompile(const std::vector<std::string>& args, bool verbose) {
   }
 
   if (file_args.empty()) {
-    printError("No input files specified");
+    printError("no input files specified");
     return 1;
   }
 
@@ -308,13 +308,13 @@ int cmdDictCompile(const std::vector<std::string>& args, bool verbose) {
     if (expanded.size() == 1 && expanded[0] == tsv_path) {
       // No glob expansion, single file compile
       if (std::filesystem::exists(dic_path)) {
-        printError("Refusing to overwrite inferred dictionary output: " + dic_path +
+        printError("refusing to overwrite inferred dictionary output: " + dic_path +
                    " (specify an explicit output .dic path)");
         return 1;
       }
       auto result = compiler.compile(tsv_path, dic_path);
       if (!result.hasValue()) {
-        printError("Compile error: " + result.error().message);
+        printError("compile error: " + result.error().message);
         return 1;
       }
 
@@ -329,7 +329,7 @@ int cmdDictCompile(const std::vector<std::string>& args, bool verbose) {
     fs::path p(tsv_path);
     fs::path dir = p.parent_path();
     if (dir.empty() || p.filename() != "*.tsv") {
-      printError("A subset glob requires an explicit output .dic path");
+      printError("a subset glob requires an explicit output .dic path");
       return 1;
     }
     dic_path = dir.string() + ".dic";
@@ -338,14 +338,14 @@ int cmdDictCompile(const std::vector<std::string>& args, bool verbose) {
     // replace an existing dictionary, which may contain shards outside the
     // glob match set.
     if (fs::exists(dic_path)) {
-      printError("Refusing to overwrite inferred dictionary output: " + dic_path +
+      printError("refusing to overwrite inferred dictionary output: " + dic_path +
                  " (specify an explicit output .dic path)");
       return 1;
     }
 
     auto result = compiler.compileMultiple(expanded, dic_path);
     if (!result.hasValue()) {
-      printError("Compile error: " + result.error().message);
+      printError("compile error: " + result.error().message);
       return 1;
     }
 
@@ -356,7 +356,7 @@ int cmdDictCompile(const std::vector<std::string>& args, bool verbose) {
   // Multi-file mode: last arg is output .dic, rest are input .tsv files
   const std::string& dic_path = file_args.back();
   if (!hasExtension(dic_path, ".dic")) {
-    printError("Output file must have .dic extension: " + dic_path);
+    printError("output file must have .dic extension: " + dic_path);
     return 1;
   }
 
@@ -370,7 +370,7 @@ int cmdDictCompile(const std::vector<std::string>& args, bool verbose) {
 
   auto result = compiler.compileMultiple(tsv_paths, dic_path);
   if (!result.hasValue()) {
-    printError("Compile error: " + result.error().message);
+    printError("compile error: " + result.error().message);
     return 1;
   }
 
@@ -380,7 +380,7 @@ int cmdDictCompile(const std::vector<std::string>& args, bool verbose) {
 
 int cmdDictDecompile(const std::vector<std::string>& args, bool verbose) {
   if (args.empty()) {
-    printError("Usage: suzume-cli dict decompile <input.dic> [output.tsv] [--force]");
+    printError("usage: suzume-cli dict decompile <input.dic> [output.tsv] [--force]");
     return 1;
   }
 
@@ -390,14 +390,14 @@ int cmdDictDecompile(const std::vector<std::string>& args, bool verbose) {
     if (arg == "--force") {
       force = true;
     } else if (arg.rfind("--", 0) == 0) {
-      printError("Unknown decompile option: " + arg);
+      printError("unknown decompile option: " + arg);
       return 1;
     } else {
       file_args.push_back(arg);
     }
   }
   if (file_args.empty() || file_args.size() > 2) {
-    printError("Usage: suzume-cli dict decompile <input.dic> [output.tsv] [--force]");
+    printError("usage: suzume-cli dict decompile <input.dic> [output.tsv] [--force]");
     return 1;
   }
 
@@ -416,7 +416,7 @@ int cmdDictDecompile(const std::vector<std::string>& args, bool verbose) {
   }
 
   if (!force && std::filesystem::exists(tsv_path)) {
-    printError("Refusing to overwrite existing decompile output: " + tsv_path + " (use --force)");
+    printError("refusing to overwrite existing decompile output: " + tsv_path + " (use --force)");
     return 1;
   }
 
@@ -425,7 +425,7 @@ int cmdDictDecompile(const std::vector<std::string>& args, bool verbose) {
 
   auto result = compiler.decompile(dic_path, tsv_path);
   if (!result.hasValue()) {
-    printError("Decompile error: " + result.error().message);
+    printError("decompile error: " + result.error().message);
     return 1;
   }
 
@@ -435,7 +435,7 @@ int cmdDictDecompile(const std::vector<std::string>& args, bool verbose) {
 
 int cmdDictList(const std::vector<std::string>& args, bool /* verbose */) {
   if (args.empty()) {
-    printError("Usage: suzume-cli dict list <file> [--pos=POS] [--pattern=PATTERN] [--limit=N]");
+    printError("usage: suzume-cli dict list <file> [--pos=POS] [--pattern=PATTERN] [--limit=N]");
     return 1;
   }
 
@@ -450,18 +450,18 @@ int cmdDictList(const std::vector<std::string>& args, bool /* verbose */) {
       const std::string value = toUpper(args[idx].substr(6));
       pos_filter = core::stringToPosStrict(value);
       if (!pos_filter.has_value()) {
-        printError("Invalid POS: " + args[idx].substr(6));
+        printError("invalid POS: " + args[idx].substr(6));
         return 1;
       }
     } else if (args[idx].substr(0, 10) == "--pattern=") {
       pattern = args[idx].substr(10);
     } else if (args[idx].substr(0, 8) == "--limit=") {
       if (!parseSizeOption(args[idx].substr(8), &limit)) {
-        printError("Invalid limit: " + args[idx].substr(8));
+        printError("invalid limit: " + args[idx].substr(8));
         return 1;
       }
     } else {
-      printError("Unknown list option: " + args[idx]);
+      printError("unknown list option: " + args[idx]);
       return 1;
     }
   }
@@ -481,7 +481,7 @@ int cmdDictList(const std::vector<std::string>& args, bool /* verbose */) {
     dictionary::BinaryDictionary dict;
     auto result = dict.loadFromFile(path);
     if (!result.hasValue()) {
-      printError("Failed to load dictionary: " + result.error().message);
+      printError("failed to load dictionary: " + result.error().message);
       return 1;
     }
 
@@ -514,7 +514,7 @@ int cmdDictList(const std::vector<std::string>& args, bool /* verbose */) {
     TsvParser parser;
     auto result = parser.parseFile(path);
     if (!result.hasValue()) {
-      printError("Failed to parse TSV: " + result.error().message);
+      printError("failed to parse TSV: " + result.error().message);
       return 1;
     }
 
@@ -544,7 +544,7 @@ int cmdDictList(const std::vector<std::string>& args, bool /* verbose */) {
 
 int cmdDictSearch(const std::vector<std::string>& args, bool /* verbose */) {
   if (args.size() < 2) {
-    printError("Usage: suzume-cli dict search <file> <pattern>");
+    printError("usage: suzume-cli dict search <file> <pattern>");
     return 1;
   }
 
@@ -562,7 +562,7 @@ int cmdDictSearch(const std::vector<std::string>& args, bool /* verbose */) {
     dictionary::BinaryDictionary dictionary;
     auto result = dictionary.loadFromFile(path);
     if (!result.hasValue()) {
-      printError("Failed to load dictionary: " + result.error().message);
+      printError("failed to load dictionary: " + result.error().message);
       return 1;
     }
     for (size_t idx = 0; idx < dictionary.size(); ++idx) {
@@ -576,7 +576,7 @@ int cmdDictSearch(const std::vector<std::string>& args, bool /* verbose */) {
     TsvParser parser;
     auto result = parser.parseFile(path);
     if (!result.hasValue()) {
-      printError("Failed to parse TSV: " + result.error().message);
+      printError("failed to parse TSV: " + result.error().message);
       return 1;
     }
     for (const auto& entry : result.value()) {
@@ -593,7 +593,7 @@ int cmdDictSearch(const std::vector<std::string>& args, bool /* verbose */) {
 
 int cmdDictLookup(const std::vector<std::string>& args, bool /* verbose */) {
   if (args.empty()) {
-    printError("Usage: suzume-cli dict lookup <word> [dictionary ...]");
+    printError("usage: suzume-cli dict lookup <word> [dictionary ...]");
     return 1;
   }
 
@@ -645,7 +645,7 @@ int cmdDictLookup(const std::vector<std::string>& args, bool /* verbose */) {
           TsvParser parser;
           auto result = parser.parseFile(entry.path().string());
           if (!result.hasValue()) {
-            printWarning("Failed to parse source TSV " + entry.path().string() + ": " + result.error().message);
+            printWarning("failed to parse source TSV " + entry.path().string() + ": " + result.error().message);
             continue;
           }
           tsv_found = true;
@@ -672,14 +672,14 @@ int cmdDictLookup(const std::vector<std::string>& args, bool /* verbose */) {
   const fs::path core_dir = data_root / "core";
   const bool core_sources_found = search_tsv_directory(core_dir);
   if (!core_sources_found) {
-    printWarning("No TSV files found in: " + core_dir.string());
+    printWarning("no TSV files found in: " + core_dir.string());
   }
 
   std::cout << "\n=== User (user/*.tsv source) ===\n";
   const fs::path user_dir = data_root / "user";
   const bool user_sources_found = search_tsv_directory(user_dir);
   if (!user_sources_found) {
-    printWarning("No TSV files found in: " + user_dir.string());
+    printWarning("no TSV files found in: " + user_dir.string());
   }
 
   if (args.size() > 1) {
@@ -690,7 +690,7 @@ int cmdDictLookup(const std::vector<std::string>& args, bool /* verbose */) {
         dictionary::BinaryDictionary dictionary;
         auto result = dictionary.loadFromFile(path.string());
         if (!result.hasValue()) {
-          printWarning("Failed to load dictionary " + path.string() + ": " + result.error().message);
+          printWarning("failed to load dictionary " + path.string() + ": " + result.error().message);
           continue;
         }
         for (size_t entry_index = 0; entry_index < dictionary.size(); ++entry_index) {
@@ -706,7 +706,7 @@ int cmdDictLookup(const std::vector<std::string>& args, bool /* verbose */) {
         TsvParser parser;
         auto result = parser.parseFile(path.string());
         if (!result.hasValue()) {
-          printWarning("Failed to parse dictionary " + path.string() + ": " + result.error().message);
+          printWarning("failed to parse dictionary " + path.string() + ": " + result.error().message);
           continue;
         }
         for (const auto& entry : result.value()) {
@@ -790,7 +790,7 @@ int cmdDict(const CommandArgs& args) {
     return cmdDictLookup(subargs, args.verbose);
   }
 
-  printError("Unknown dict subcommand: " + subcommand);
+  printError("unknown dict subcommand: " + subcommand);
   printDictHelp(std::cerr);
   return 1;
 }

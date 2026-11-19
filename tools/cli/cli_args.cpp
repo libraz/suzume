@@ -38,7 +38,7 @@ bool isKnownCommand(std::string_view value) {
 
 bool parseMode(std::string_view value, std::string* mode, std::string* error) {
   if (value != "normal" && value != "search" && value != "split") {
-    *error = "invalid mode: " + std::string(value) + " (expected normal, search, or split)";
+    *error = "invalid mode: " + std::string(value) + " (expected one of: normal, search, split)";
     return false;
   }
   *mode = std::string(value);
@@ -55,7 +55,7 @@ bool parseFormat(std::string_view value, OutputFormat* format, std::string* erro
   } else if (value == "tags") {
     *format = OutputFormat::Tags;
   } else {
-    *error = "invalid format: " + std::string(value) + " (expected tsv, json, chasen, or tags)";
+    *error = "invalid format: " + std::string(value) + " (expected one of: tsv, json, chasen, tags)";
     return false;
   }
   return true;
@@ -76,8 +76,8 @@ bool parseTagPos(std::string_view value, uint8_t* filter, std::string* error) {
       return true;
     }
   }
-  *error =
-      "invalid --tag-pos-filter value: " + std::string(value) + " (expected NOUN, VERB, ADJ, ADV, PARTICLE, or AUX)";
+  *error = "invalid --tag-pos-filter value: " + std::string(value) +
+           " (expected one of: NOUN, VERB, ADJ, ADV, PARTICLE, AUX)";
   return false;
 }
 

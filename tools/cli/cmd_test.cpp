@@ -167,7 +167,7 @@ int cmdTestSingle(const std::vector<std::string>& args, const CommandArgs& comma
   for (size_t idx = 0; idx < args.size(); ++idx) {
     if (args[idx] == "--expect") {
       if (idx + 1 >= args.size()) {
-        printError("Missing value for --expect");
+        printError("missing value for --expect");
         return 1;
       }
       expect_str = args[idx + 1];
@@ -175,7 +175,7 @@ int cmdTestSingle(const std::vector<std::string>& args, const CommandArgs& comma
     } else if (args[idx].substr(0, 9) == "--expect=") {
       expect_str = args[idx].substr(9);
     } else if (!args[idx].empty() && args[idx][0] == '-') {
-      printError("Unknown test option: " + args[idx]);
+      printError("unknown test option: " + args[idx]);
       return 1;
     } else {
       input = args[idx];
@@ -183,12 +183,12 @@ int cmdTestSingle(const std::vector<std::string>& args, const CommandArgs& comma
   }
 
   if (input.empty()) {
-    printError("No input text provided");
+    printError("no input text provided");
     return 1;
   }
 
   if (expect_str.empty()) {
-    printError("No expected tags provided (use --expect)");
+    printError("no expected tags provided (use --expect)");
     return 1;
   }
 
@@ -203,7 +203,7 @@ int cmdTestSingle(const std::vector<std::string>& args, const CommandArgs& comma
   for (const auto& path : command_args.dict_paths) {
     auto load_result = loadUserDictionaryPath(&analyzer, path);
     if (!load_result.hasValue()) {
-      printError("Failed to load dictionary: " + path + ": " + load_result.error().message);
+      printError("failed to load dictionary: " + path + ": " + load_result.error().message);
       return 1;
     }
   }
@@ -218,27 +218,27 @@ int cmdTestFile(const std::vector<std::string>& args, const CommandArgs& command
   for (size_t idx = 0; idx < args.size(); ++idx) {
     if (args[idx] == "--file") {
       if (idx + 1 >= args.size()) {
-        printError("Missing value for " + args[idx]);
+        printError("missing value for " + args[idx]);
         return 1;
       }
       test_file = args[++idx];
     } else if (args[idx].rfind("--file=", 0) == 0) {
       test_file = args[idx].substr(7);
     } else {
-      printError("Unknown test file option: " + args[idx]);
+      printError("unknown test file option: " + args[idx]);
       return 1;
     }
   }
 
   if (test_file.empty()) {
-    printError("No test file provided");
+    printError("no test file provided");
     return 1;
   }
 
   // Read test file
   std::ifstream file(test_file);
   if (!file) {
-    printError("Failed to open test file: " + test_file);
+    printError("failed to open test file: " + test_file);
     return 1;
   }
 
@@ -261,7 +261,7 @@ int cmdTestFile(const std::vector<std::string>& args, const CommandArgs& command
     // Parse: input<TAB>expected_tags (comma-separated)
     size_t tab = line.find('\t');
     if (tab == std::string::npos) {
-      printWarning("Invalid test line " + std::to_string(line_num) + ": missing tab");
+      printWarning("invalid test line " + std::to_string(line_num) + ": missing tab");
       continue;
     }
 
@@ -282,7 +282,7 @@ int cmdTestFile(const std::vector<std::string>& args, const CommandArgs& command
   for (const auto& path : command_args.dict_paths) {
     auto load_result = loadUserDictionaryPath(&analyzer, path);
     if (!load_result.hasValue()) {
-      printError("Failed to load dictionary: " + path + ": " + load_result.error().message);
+      printError("failed to load dictionary: " + path + ": " + load_result.error().message);
       return 1;
     }
   }
@@ -314,17 +314,17 @@ int cmdTestBenchmark(const std::vector<std::string>& args, const CommandArgs& co
   for (size_t idx = 0; idx < args.size(); ++idx) {
     if (args[idx].substr(0, 13) == "--iterations=") {
       if (!parseSizeOption(args[idx].substr(13), &iterations) || iterations == 0) {
-        printError("Invalid iterations: " + args[idx].substr(13));
+        printError("invalid iterations: " + args[idx].substr(13));
         return 1;
       }
     } else if (args[idx].substr(0, 10) == "--samples=") {
       if (!parseSizeOption(args[idx].substr(10), &samples) || samples == 0) {
-        printError("Invalid samples: " + args[idx].substr(10));
+        printError("invalid samples: " + args[idx].substr(10));
         return 1;
       }
     } else if (args[idx].substr(0, 9) == "--warmup=") {
       if (!parseSizeOption(args[idx].substr(9), &warmup_iterations)) {
-        printError("Invalid warmup: " + args[idx].substr(9));
+        printError("invalid warmup: " + args[idx].substr(9));
         return 1;
       }
     } else if (args[idx] == "--file" && idx + 1 < args.size()) {
@@ -332,7 +332,7 @@ int cmdTestBenchmark(const std::vector<std::string>& args, const CommandArgs& co
     } else if (args[idx].rfind("--file=", 0) == 0) {
       corpus_file = args[idx].substr(7);
     } else {
-      printError("Unknown benchmark option: " + args[idx]);
+      printError("unknown benchmark option: " + args[idx]);
       return 1;
     }
   }
@@ -342,7 +342,7 @@ int cmdTestBenchmark(const std::vector<std::string>& args, const CommandArgs& co
   if (!corpus_file.empty()) {
     std::ifstream file(corpus_file);
     if (!file) {
-      printError("Failed to open corpus file: " + corpus_file);
+      printError("failed to open corpus file: " + corpus_file);
       return 1;
     }
     std::string line;
@@ -362,7 +362,7 @@ int cmdTestBenchmark(const std::vector<std::string>& args, const CommandArgs& co
   }
 
   if (texts.empty()) {
-    printError("No test texts available");
+    printError("no test texts available");
     return 1;
   }
 
@@ -388,7 +388,7 @@ int cmdTestBenchmark(const std::vector<std::string>& args, const CommandArgs& co
     for (const auto& path : command_args.dict_paths) {
       auto load_result = loadUserDictionaryPath(&analyzer, path);
       if (!load_result.hasValue()) {
-        printError("Failed to load dictionary: " + path + ": " + load_result.error().message);
+        printError("failed to load dictionary: " + path + ": " + load_result.error().message);
         return 1;
       }
     }
@@ -438,7 +438,7 @@ int cmdTestBenchmark(const std::vector<std::string>& args, const CommandArgs& co
   std::cout << "Steady per text: " << (steady_median / (iterations * texts.size())) << " ms\n";
   std::cout << "Peak RSS: " << peakResidentSetBytes() << " bytes\n";
   if (analyzed_morphemes == 0) {
-    printWarning("Benchmark inputs produced no morphemes");
+    printWarning("benchmark inputs produced no morphemes");
   }
 
   return 0;

@@ -160,7 +160,7 @@ TEST(CliCommonTest, ParseArgsAcceptsPosFilterNamesExactly) {
     const char* argv[] = {"suzume-cli", "-f", "tags", "--tag-pos-filter", name, "テスト"};
     auto args = parse(argv);
     EXPECT_EQ(args.parse_error, std::string("invalid --tag-pos-filter value: ") + name +
-                                    " (expected NOUN, VERB, ADJ, ADV, PARTICLE, or AUX)");
+                                    " (expected one of: NOUN, VERB, ADJ, ADV, PARTICLE, AUX)");
   }
 }
 
@@ -174,7 +174,7 @@ TEST(CliCommonTest, ParseArgsRejectsRemovedFlagSpellings) {
     EXPECT_EQ(args.parse_error, std::string("unknown option: ") + removed);
   }
   const char* morpheme_format[] = {"suzume-cli", "-f", "morpheme", "テスト"};
-  EXPECT_EQ(parse(morpheme_format).parse_error, "invalid format: morpheme (expected tsv, json, chasen, or tags)");
+  EXPECT_EQ(parse(morpheme_format).parse_error, "invalid format: morpheme (expected one of: tsv, json, chasen, tags)");
 }
 
 TEST(CliCommonTest, ParseArgsRequiresTagsFormatForTagOptionsInAnalyze) {
@@ -248,13 +248,13 @@ TEST(CliCommonTest, ParseArgsConnectsAdvancedAnalyzeOptions) {
 
 TEST(CliCommonTest, ParseArgsRejectsInvalidModeAndFormat) {
   const char* invalid_mode[] = {"suzume-cli", "analyze", "--mode", "wide", "テスト"};
-  EXPECT_EQ(parse(invalid_mode).parse_error, "invalid mode: wide (expected normal, search, or split)");
+  EXPECT_EQ(parse(invalid_mode).parse_error, "invalid mode: wide (expected one of: normal, search, split)");
 
   const char* capitalized_mode[] = {"suzume-cli", "--mode=Search", "テスト"};
-  EXPECT_EQ(parse(capitalized_mode).parse_error, "invalid mode: Search (expected normal, search, or split)");
+  EXPECT_EQ(parse(capitalized_mode).parse_error, "invalid mode: Search (expected one of: normal, search, split)");
 
   const char* invalid_format[] = {"suzume-cli", "--format=yaml", "テスト"};
-  EXPECT_EQ(parse(invalid_format).parse_error, "invalid format: yaml (expected tsv, json, chasen, or tags)");
+  EXPECT_EQ(parse(invalid_format).parse_error, "invalid format: yaml (expected one of: tsv, json, chasen, tags)");
 
   for (const char* name : {"tsv", "json", "chasen", "tags"}) {
     const char* argv[] = {"suzume-cli", "-f", name, "テスト"};
@@ -303,7 +303,7 @@ TEST(CliCommonTest, ParseArgsPreservesDictAndTestSubcommandOptions) {
 
 TEST(CliCommonTest, ParseArgsTreatsTestDashFAsOutputFormat) {
   const char* argv[] = {"suzume-cli", "test", "-f", "cases.tsv"};
-  EXPECT_EQ(parse(argv).parse_error, "invalid format: cases.tsv (expected tsv, json, chasen, or tags)");
+  EXPECT_EQ(parse(argv).parse_error, "invalid format: cases.tsv (expected one of: tsv, json, chasen, tags)");
 }
 
 TEST(CliCommonTest, ParseArgsKeepsTestOnlyOptionsOutOfAnalyze) {

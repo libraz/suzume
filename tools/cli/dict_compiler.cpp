@@ -93,7 +93,7 @@ core::Expected<size_t, core::Error> DictCompiler::compile(const std::string& tsv
   const auto& entries = parse_result.value();
 
   if (verbose_) {
-    printInfo("Parsed " + std::to_string(entries.size()) + " entries from " + tsv_path);
+    printInfo("parsed " + std::to_string(entries.size()) + " entries from " + tsv_path);
   }
 
   // Validate entries
@@ -130,7 +130,7 @@ core::Expected<size_t, core::Error> DictCompiler::compileEntries(const std::vect
       }
     }
     if (trivial_count > 0) {
-      printInfo("Filtered " + std::to_string(trivial_count) + " trivial entries (kept " +
+      printInfo("filtered " + std::to_string(trivial_count) + " trivial entries (kept " +
                 std::to_string(filtered_entries.size()) + ")");
     }
     active_entries = &filtered_entries;
@@ -153,11 +153,11 @@ core::Expected<size_t, core::Error> DictCompiler::compileEntries(const std::vect
   conj_expanded_ = expanded.expanded_forms;
 
   if (verbose_ && conj_expanded_ > 0) {
-    printInfo("Expanded " + std::to_string(conj_expanded_) + " conjugated forms");
+    printInfo("expanded " + std::to_string(conj_expanded_) + " conjugated forms");
   }
 
   if (expanded.duplicates_skipped > 0) {
-    printWarning("Skipped " + std::to_string(expanded.duplicates_skipped) +
+    printWarning("skipped " + std::to_string(expanded.duplicates_skipped) +
                  " duplicate expanded entries inside the same POS");
   }
 
@@ -167,8 +167,8 @@ core::Expected<size_t, core::Error> DictCompiler::compileEntries(const std::vect
   }
 
   if (verbose_) {
-    printInfo("Compiled " + std::to_string(entries_compiled_) + " entries to " + dic_path);
-    printInfo("Output size: " + std::to_string(write_result.value()) + " bytes");
+    printInfo("compiled " + std::to_string(entries_compiled_) + " entries to " + dic_path);
+    printInfo("output size: " + std::to_string(write_result.value()) + " bytes");
   }
 
   return entries_compiled_;
@@ -203,12 +203,12 @@ core::Expected<size_t, core::Error> DictCompiler::compileMultiple(const std::vec
     }
 
     if (verbose_) {
-      printInfo("Parsed " + std::to_string(entries.size()) + " entries from " + tsv_path);
+      printInfo("parsed " + std::to_string(entries.size()) + " entries from " + tsv_path);
     }
   }
 
   if (verbose_) {
-    printInfo("Total entries before deduplication: " + std::to_string(all_entries.size()));
+    printInfo("total entries before deduplication: " + std::to_string(all_entries.size()));
   }
 
   // Validate entries
@@ -266,7 +266,7 @@ core::Expected<size_t, core::Error> DictCompiler::decompile(const std::string& d
   }
 
   if (verbose_) {
-    printInfo("Decompiled " + std::to_string(written) + " entries to " + tsv_path);
+    printInfo("decompiled " + std::to_string(written) + " entries to " + tsv_path);
   }
 
   return written;

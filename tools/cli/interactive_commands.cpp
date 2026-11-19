@@ -14,14 +14,14 @@ namespace suzume::cli {
 
 bool InteractiveSession::cmdAdd(const std::vector<std::string>& args) {
   if (args.size() < 2) {
-    printError("Usage: add <surface> <pos> [conj_type]");
+    printError("usage: add <surface> <pos> [conj_type]");
     return true;
   }
 
   TsvEntry entry;
   entry.surface = args[0];
   if (entry.surface.empty()) {
-    printError("Surface must not be empty");
+    printError("surface must not be empty");
     return true;
   }
   if (const std::string issue = tsvWriteFieldIssue(entry.surface, "Surface"); !issue.empty()) {
@@ -33,7 +33,7 @@ bool InteractiveSession::cmdAdd(const std::vector<std::string>& args) {
   std::string pos_str = toUpper(args[1]);
   auto pos_opt = parsePos(pos_str);
   if (!pos_opt.has_value()) {
-    printError("Invalid POS: " + args[1]);
+    printError("invalid POS: " + args[1]);
     std::cout << "Valid: NOUN, PROPN, VERB, ADJECTIVE, ADVERB, PARTICLE, "
                  "AUXILIARY, CONJUNCTION, DETERMINER, PRONOUN, PREFIX, SUFFIX, "
                  "INTERJECTION, SYMBOL, OTHER\n";
@@ -46,7 +46,7 @@ bool InteractiveSession::cmdAdd(const std::vector<std::string>& args) {
     std::string conj_str = toUpper(args[2]);
     auto conj_opt = parseConjType(conj_str);
     if (!conj_opt.has_value()) {
-      printError("Invalid conjugation type: " + args[2]);
+      printError("invalid conjugation type: " + args[2]);
       std::cout << "Valid: ICHIDAN, GODAN_KA, GODAN_GA, GODAN_SA, GODAN_TA, "
                    "GODAN_NA, GODAN_BA, GODAN_MA, GODAN_RA, GODAN_WA, SURU, "
                    "KURU, I_ADJ, NA_ADJ, FAMILY, GIVEN\n";
@@ -56,14 +56,14 @@ bool InteractiveSession::cmdAdd(const std::vector<std::string>& args) {
   }
   if ((entry.pos == core::PartOfSpeech::Verb || entry.pos == core::PartOfSpeech::Adjective) &&
       entry.conj_type == dictionary::ConjugationType::None) {
-    printError("Missing conjugation type: " + entry.surface);
+    printError("missing conjugation type: " + entry.surface);
     return true;
   }
 
   // Check for existing entry with same surface and POS in current file
   for (const auto& existing : entries_) {
     if (existing.surface == entry.surface && existing.pos == entry.pos) {
-      printError("Entry already exists: " + entry.surface + " (" + std::string(core::posToString(entry.pos)) + ")");
+      printError("entry already exists: " + entry.surface + " (" + std::string(core::posToString(entry.pos)) + ")");
       return true;
     }
     if (existing.surface == entry.surface && existing.pos != entry.pos) {
@@ -81,7 +81,7 @@ bool InteractiveSession::cmdAdd(const std::vector<std::string>& args) {
   // This prevents redundant entries for words handled by grammar logic
   ::suzume::Suzume* analyzer = currentAnalyzer();
   if (analyzer == nullptr) {
-    printError("Failed to rebuild session analyzer: " + last_error_);
+    printError("failed to rebuild session analyzer: " + last_error_);
     return true;
   }
   auto morphemes = analyzer->analyze(entry.surface);
@@ -131,7 +131,7 @@ bool InteractiveSession::cmdAdd(const std::vector<std::string>& args) {
 
 bool InteractiveSession::cmdRemove(const std::vector<std::string>& args) {
   if (args.empty()) {
-    printError("Usage: remove <surface> [pos]");
+    printError("usage: remove <surface> [pos]");
     return true;
   }
 
@@ -142,7 +142,7 @@ bool InteractiveSession::cmdRemove(const std::vector<std::string>& args) {
     std::string pos_str = toUpper(args[1]);
     pos_filter = parsePos(pos_str);
     if (!pos_filter.has_value()) {
-      printError("Invalid POS: " + args[1]);
+      printError("invalid POS: " + args[1]);
       return true;
     }
   }
@@ -175,7 +175,7 @@ bool InteractiveSession::cmdRemove(const std::vector<std::string>& args) {
 
 bool InteractiveSession::cmdUpdate(const std::vector<std::string>& args) {
   if (args.size() < 2) {
-    printError("Usage: update <surface> <pos> [conj_type]");
+    printError("usage: update <surface> <pos> [conj_type]");
     return true;
   }
 
@@ -183,7 +183,7 @@ bool InteractiveSession::cmdUpdate(const std::vector<std::string>& args) {
   std::string pos_str = toUpper(args[1]);
   auto pos_opt = parsePos(pos_str);
   if (!pos_opt.has_value()) {
-    printError("Invalid POS: " + args[1]);
+    printError("invalid POS: " + args[1]);
     return true;
   }
   auto pos = pos_opt.value();
@@ -198,7 +198,7 @@ bool InteractiveSession::cmdUpdate(const std::vector<std::string>& args) {
   }
 
   if (found == nullptr) {
-    printError("Entry not found: " + surface + " (" + pos_str + ")");
+    printError("entry not found: " + surface + " (" + pos_str + ")");
     return true;
   }
 
@@ -207,14 +207,14 @@ bool InteractiveSession::cmdUpdate(const std::vector<std::string>& args) {
     std::string conj_str = toUpper(args[2]);
     auto conj_opt = parseConjType(conj_str);
     if (!conj_opt.has_value()) {
-      printError("Invalid conjugation type: " + args[2]);
+      printError("invalid conjugation type: " + args[2]);
       return true;
     }
     found->conj_type = conj_opt.value();
   }
   if ((found->pos == core::PartOfSpeech::Verb || found->pos == core::PartOfSpeech::Adjective) &&
       found->conj_type == dictionary::ConjugationType::None) {
-    printError("Missing conjugation type: " + found->surface);
+    printError("missing conjugation type: " + found->surface);
     return true;
   }
 
@@ -237,18 +237,18 @@ bool InteractiveSession::cmdList(const std::vector<std::string>& args) {
       const std::string value = toUpper(arg.substr(6));
       pos_filter = core::stringToPosStrict(value);
       if (!pos_filter.has_value()) {
-        printError("Invalid POS: " + arg.substr(6));
+        printError("invalid POS: " + arg.substr(6));
         return true;
       }
     } else if (arg.substr(0, 10) == "--pattern=") {
       pattern = arg.substr(10);
     } else if (arg.substr(0, 8) == "--limit=") {
       if (!parseSizeOption(arg.substr(8), &limit)) {
-        printError("Invalid limit: " + arg.substr(8));
+        printError("invalid limit: " + arg.substr(8));
         return true;
       }
     } else {
-      printError("Unknown list option: " + arg);
+      printError("unknown list option: " + arg);
       return true;
     }
   }
@@ -293,7 +293,7 @@ bool InteractiveSession::cmdList(const std::vector<std::string>& args) {
 
 bool InteractiveSession::cmdSearch(const std::vector<std::string>& args) {
   if (args.empty()) {
-    printError("Usage: search <pattern>");
+    printError("usage: search <pattern>");
     return true;
   }
 
@@ -336,14 +336,14 @@ bool InteractiveSession::cmdValidate(const std::vector<std::string>& /* args */)
 
 bool InteractiveSession::cmdCompile(const std::vector<std::string>& args) {
   if (args.empty()) {
-    printError("Usage: compile <output.dic>");
+    printError("usage: compile <output.dic>");
     return true;
   }
 
   // Save current entries first if modified
   if (modified_) {
     if (!saveEntries()) {
-      printError("Failed to save before compile: " + last_error_);
+      printError("failed to save before compile: " + last_error_);
       return true;
     }
     std::cout << "Saved " << entries_.size() << " entries to " << tsv_path_ << "\n";
@@ -351,7 +351,7 @@ bool InteractiveSession::cmdCompile(const std::vector<std::string>& args) {
 
   const std::string& output_path = args[0];
   if (!hasExtension(output_path, ".dic")) {
-    printError("Output file must have .dic extension: " + output_path);
+    printError("output file must have .dic extension: " + output_path);
     return true;
   }
 
@@ -359,23 +359,23 @@ bool InteractiveSession::cmdCompile(const std::vector<std::string>& args) {
   std::error_code error;
   const fs::path input_canonical = fs::weakly_canonical(tsv_path_, error);
   if (error) {
-    printError("Cannot resolve dictionary source path: " + error.message());
+    printError("cannot resolve dictionary source path: " + error.message());
     return true;
   }
   const fs::path output_canonical = fs::weakly_canonical(output_path, error);
   if (error) {
-    printError("Cannot resolve dictionary output path: " + error.message());
+    printError("cannot resolve dictionary output path: " + error.message());
     return true;
   }
   if (input_canonical == output_canonical) {
-    printError("Refusing to overwrite dictionary source: " + output_path);
+    printError("refusing to overwrite dictionary source: " + output_path);
     return true;
   }
 
   DictCompiler compiler;
   auto result = compiler.compile(tsv_path_, output_path);
   if (!result.hasValue()) {
-    printError("Compile error: " + result.error().message);
+    printError("compile error: " + result.error().message);
     return true;
   }
 
@@ -385,7 +385,7 @@ bool InteractiveSession::cmdCompile(const std::vector<std::string>& args) {
 
 bool InteractiveSession::cmdAnalyze(const std::vector<std::string>& args) {
   if (args.empty()) {
-    printError("Usage: analyze <text>");
+    printError("usage: analyze <text>");
     return true;
   }
 
@@ -400,7 +400,7 @@ bool InteractiveSession::cmdAnalyze(const std::vector<std::string>& args) {
 
   ::suzume::Suzume* analyzer = currentAnalyzer();
   if (analyzer == nullptr) {
-    printError("Failed to rebuild session analyzer: " + last_error_);
+    printError("failed to rebuild session analyzer: " + last_error_);
     return true;
   }
 
@@ -416,7 +416,7 @@ bool InteractiveSession::cmdAnalyze(const std::vector<std::string>& args) {
 
 bool InteractiveSession::cmdSave(const std::vector<std::string>& /* args */) {
   if (!saveEntries()) {
-    printError("Failed to save: " + last_error_);
+    printError("failed to save: " + last_error_);
     return true;
   }
 
@@ -484,7 +484,7 @@ bool InteractiveSession::cmdHelp(const std::vector<std::string>& /* args */) {
 bool InteractiveSession::cmdQuit(const std::vector<std::string>& /* args */) {
   if (modified_ && !isTerminal()) {
     if (!saveEntries()) {
-      printError("Failed to save before non-interactive exit: " + last_error_);
+      printError("failed to save before non-interactive exit: " + last_error_);
       return true;
     }
     std::cerr << "Saved unsaved changes before non-interactive exit.\n";
@@ -495,7 +495,7 @@ bool InteractiveSession::cmdQuit(const std::vector<std::string>& /* args */) {
 
 bool InteractiveSession::cmdFind(const std::vector<std::string>& args) {
   if (args.empty()) {
-    printError("Usage: find <surface>");
+    printError("usage: find <surface>");
     return true;
   }
 
@@ -567,17 +567,17 @@ bool InteractiveSession::cmdLayer(const std::vector<std::string>& args) {
   try {
     layer_num = std::stoi(args[0]);
   } catch (...) {
-    printError("Invalid layer number: " + args[0]);
+    printError("invalid layer number: " + args[0]);
     return true;
   }
 
   if (layer_num == 1) {
-    printError("Layer 1 (hardcoded) is read-only");
+    printError("layer 1 (hardcoded) is read-only");
     return true;
   }
 
   if (layer_num != 2 && layer_num != 3) {
-    printError("Invalid layer: " + args[0] + " (valid: 2, 3)");
+    printError("invalid layer: " + args[0] + " (valid: 2, 3)");
     return true;
   }
 
@@ -594,7 +594,7 @@ bool InteractiveSession::cmdLayer(const std::vector<std::string>& args) {
 
 bool InteractiveSession::cmdImport(const std::vector<std::string>& args) {
   if (args.empty()) {
-    printError("Usage: import <file.tsv> [--skip-duplicates]");
+    printError("usage: import <file.tsv> [--skip-duplicates]");
     return true;
   }
 
@@ -605,7 +605,7 @@ bool InteractiveSession::cmdImport(const std::vector<std::string>& args) {
     if (args[idx] == "--skip-duplicates") {
       skip_duplicates = true;
     } else {
-      printError("Unknown import option: " + args[idx]);
+      printError("unknown import option: " + args[idx]);
       return true;
     }
   }
@@ -614,7 +614,7 @@ bool InteractiveSession::cmdImport(const std::vector<std::string>& args) {
   TsvParser parser;
   auto result = parser.parseFile(import_path);
   if (!result.hasValue()) {
-    printError("Failed to parse import file: " + result.error().message);
+    printError("failed to parse import file: " + result.error().message);
     return true;
   }
 
