@@ -16,7 +16,7 @@ WebAssembly package.
 📖 **[Documentation & getting started](https://suzume.libraz.net/docs/getting-started)** &nbsp;·&nbsp; 🧪 **[Live Demo](https://suzume.libraz.net/#demo)**
 
 See the [MeCab comparison](https://suzume.libraz.net/docs/mecab-comparison) for
-concrete examples of token boundaries, lemmatization, and trade-offs.
+concrete examples of token boundaries, base forms, and trade-offs.
 
 ## Installation
 
@@ -63,6 +63,10 @@ import wasmUrl from '@libraz/suzume/wasm?url' // Vite
 
 const suzume = await Suzume.create({ wasmPath: wasmUrl })
 ```
+
+The dictionaries are embedded in the WebAssembly binary, so there is no
+data-directory option; user dictionaries load from a string or bytes with
+`loadUserDictionary` / `loadBinaryDictionary`.
 
 For CDN usage, user dictionaries, and the full API, see the
 [JavaScript / TypeScript guide](https://suzume.libraz.net/docs/api).

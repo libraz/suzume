@@ -13,7 +13,7 @@ requires no extra dictionary installation.
 📖 **[Full API reference and guides](https://suzume.libraz.net/docs/python)**
 
 See the [MeCab comparison](https://suzume.libraz.net/docs/mecab-comparison) for
-concrete examples of token boundaries, lemmatization, and trade-offs.
+concrete examples of token boundaries, base forms, and trade-offs.
 
 ## Installation
 
@@ -35,6 +35,41 @@ from suzume import Suzume
 with Suzume() as sz:
     tokens = sz.analyze("すもももももももものうち")
     tags = sz.generate_tags("東京の公園に行きました")
+```
+
+The wheel loads its bundled dictionaries from the package directory, so
+`Suzume()` takes no data-directory argument and does not consult
+`SUZUME_DATA_DIR`.
+
+## Filtering generated tags by part of speech
+
+`pos_filter` takes the labels that `Tag.pos` prints: `NOUN`, `VERB`, `ADJ`,
+`ADV`, `PARTICLE`, and `AUX`, as one name or a list, tuple or set of names:
+
+```python
+tags = sz.generate_tags("東京の公園に行きました", pos_filter=["NOUN", "VERB"])
+```
+
+`NOUN` also keeps pronouns (`PRON`). Naming `PARTICLE` or `AUX` returns those
+tags even though they are excluded by default. Any other value raises
+`ValueError`. Leaving `pos_filter` out, `None`, or an empty container keeps
+every part of speech.
+
+## Error handling
+
+An invalid argument or option raises `ValueError`. A failure inside the
+library, such as a rejected user dictionary, raises `SuzumeError`, carrying the
+library's message, an `ErrorCode` and the name of the operation. Using an
+instance after `close()` raises `SuzumeError` with `ErrorCode.INVALID_INPUT`.
+
+```python
+from suzume import ErrorCode, Suzume, SuzumeError
+
+try:
+    installed = sz.load_user_dictionary(tsv)
+except SuzumeError as error:
+    if error.code == ErrorCode.PARSE:
+        print(error)  # the library's message
 ```
 
 ## Threads

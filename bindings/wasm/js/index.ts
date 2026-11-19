@@ -158,6 +158,10 @@ export type AnalysisMode = 'normal' | 'search' | 'split';
 /**
  * Options for creating a Suzume instance. Unknown keys are ignored at runtime;
  * TypeScript rejects them at compile time.
+ *
+ * There is no data-directory option: the dictionaries are embedded in the
+ * WebAssembly binary, and user dictionaries are loaded with
+ * {@link Suzume.loadUserDictionary} or {@link Suzume.loadBinaryDictionary}.
  */
 export interface SuzumeOptions {
   /** Preserve ヴ (don't normalize to ビ etc.), default: true */
@@ -222,7 +226,6 @@ const EXTENDED_OPTION_DEFAULTS = {
   skipEnvConfig: false,
   reportScorerConfig: false,
   scorerOptions: null,
-  dataDirectory: null,
 } as const;
 
 /** Look up a caller-supplied name in a table, ignoring inherited keys such as `constructor`. */
@@ -617,9 +620,8 @@ function allocUtf8(
  * own instance, since a WebAssembly module belongs to the thread that loaded it.
  *
  * Error contract note: under the WebAssembly build, a memory-allocation failure
- * aborts the module rather than returning NULL, so the C++ allocation-failure
- * path (which maps to a NULL return and a thrown Error on native/Python) is
- * effectively unreachable here.
+ * aborts the module rather than returning NULL, so the allocation-failure path
+ * (an `Expected` error in C++, a `SuzumeError` in Python) is unreachable here.
  */
 export class Suzume {
   private module: EmscriptenModule;
@@ -731,8 +733,7 @@ export class Suzume {
   /**
    * Current analysis mode for this instance.
    *
-   * @throws {SuzumeError} InvalidInput for a name other than normal, search or
-   *   split, or after {@link destroy}
+   * @throws {SuzumeError} InvalidInput after {@link destroy}
    */
   get mode(): AnalysisMode {
     this.ensureAlive('mode');
@@ -743,7 +744,12 @@ export class Suzume {
     return mode;
   }
 
-  /** Change analysis mode without reloading dictionaries. */
+  /**
+   * Change analysis mode without reloading dictionaries.
+   *
+   * @throws {SuzumeError} InvalidInput for a name other than normal, search or
+   *   split, or after {@link destroy}
+   */
   set mode(value: AnalysisMode) {
     this.ensureAlive('mode');
     if (this.module._suzume_set_mode(this.handle, modeCode('mode', value)) !== 1) {
