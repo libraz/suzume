@@ -1,11 +1,21 @@
 #!/usr/bin/env python3
-"""Compare native C ABI, Python, and WASM at their public API boundaries."""
+"""Compare native C ABI, Python, and WASM at their public API boundaries.
+
+With --cli, compare the native and Python CLIs over scripts/cli_flag_matrix.json
+instead: stdout, stderr and exit code must agree after each program name is
+replaced with <prog>. The two CLIs are compared with each other, never with
+message literals kept here.
+"""
 
 from __future__ import annotations
 
 import ctypes
 import json
+import os
+import pty
+import re
 import subprocess
+import sys
 from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
@@ -57,6 +67,14 @@ class TagCase(TypedDict):
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 NATIVE_CLI = REPOSITORY_ROOT / "build" / "bin" / "suzume-cli"
 WASM_RUNNER = REPOSITORY_ROOT / "scripts" / "binding_parity.mjs"
+CLI_MATRIX = REPOSITORY_ROOT / "scripts" / "cli_flag_matrix.json"
+# The Python console script installed beside the interpreter running this check.
+PYTHON_CLI = Path(sys.executable).parent / "suzume"
+# Program names as they appear in output; a path component (/suzume/) is not one.
+CLI_PROGRAM_NAMES = {
+    "native": re.compile(r"(?<![\w/.-])suzume-cli(?![\w-])"),
+    "python": re.compile(r"(?<![\w/.-])suzume(?![\w-])"),
+}
 
 # Each non-default analysis option has a dedicated case. The tag case varies
 # every generator option at once, which also covers the POS-filter bit mapping.
@@ -172,7 +190,10 @@ def _native_cli_records() -> list[list[dict[str, object]]]:
         )
         payload = json.loads(completed.stdout)
         records.append(
-            [{key: item[key] for key in ("surface", "pos", "lemma", "start", "end")} for item in payload["morphemes"]]
+            [
+                {key: item[key] for key in ("surface", "pos", "base_form", "start", "end")}
+                for item in payload["morphemes"]
+            ]
         )
     return records
 
@@ -357,7 +378,13 @@ def main() -> None:
             )
 
     cli_default = [
-        {key: morpheme[key] for key in ("surface", "pos", "lemma", "start", "end")}
+        {
+            "surface": morpheme["surface"],
+            "pos": morpheme["pos"],
+            "base_form": morpheme["lemma"],
+            "start": morpheme["start"],
+            "end": morpheme["end"],
+        }
         for morpheme in native[0]["morphemes"]
     ]
     if native_cli[0] != cli_default:
@@ -368,5 +395,60 @@ def main() -> None:
     )
 
 
+def _run_cli(program: str, executable: Path, args: list[str], stdin: str | None) -> tuple[str, str, int]:
+    """Run one CLI and return stdout, stderr and exit code with its program name replaced by <prog>."""
+    command = [str(executable), *args]
+    if stdin == "tty":
+        # No operand with a terminal on stdin is the no-input usage error.
+        controller, terminal = pty.openpty()
+        try:
+            completed = subprocess.run(command, stdin=terminal, capture_output=True, text=True, timeout=60)
+        finally:
+            os.close(terminal)
+            os.close(controller)
+    else:
+        completed = subprocess.run(
+            command,
+            input=stdin if stdin is not None else None,
+            stdin=None if stdin is not None else subprocess.DEVNULL,
+            capture_output=True,
+            text=True,
+            timeout=60,
+        )
+    pattern = CLI_PROGRAM_NAMES[program]
+    return pattern.sub("<prog>", completed.stdout), pattern.sub("<prog>", completed.stderr), completed.returncode
+
+
+def check_cli_parity() -> None:
+    matrix = json.loads(CLI_MATRIX.read_text())
+    cases = [*matrix["pairwise"], *matrix["negative"], *matrix["extra"]]
+    runs = 0
+    mismatches: list[str] = []
+    for case in cases:
+        uses_text = "{text}" in case["args"] or case.get("stdin") == "{text}"
+        for text in matrix["texts"] if uses_text else [None]:
+            args = [text if arg == "{text}" and text is not None else arg for arg in case["args"]]
+            stdin = case.get("stdin")
+            if stdin == "{text}":
+                stdin = text
+            native = _run_cli("native", NATIVE_CLI, args, stdin)
+            python = _run_cli("python", PYTHON_CLI, args, stdin)
+            runs += 1
+            if native != python:
+                mismatches.append(
+                    f"{case['name']} {args!r} stdin={stdin!r}\n"
+                    f"  native exit {native[2]}: stdout={native[0]!r} stderr={native[1]!r}\n"
+                    f"  python exit {python[2]}: stdout={python[0]!r} stderr={python[1]!r}"
+                )
+    if mismatches:
+        raise AssertionError(f"{len(mismatches)} of {runs} CLI runs differ:\n" + "\n".join(mismatches))
+    print(f"CLI parity passed: {len(cases)} cases, {runs} runs, native and Python CLIs agree")
+
+
 if __name__ == "__main__":
-    main()
+    if sys.argv[1:] == ["--cli"]:
+        check_cli_parity()
+    elif sys.argv[1:]:
+        raise SystemExit("usage: check_binding_parity.py [--cli]")
+    else:
+        main()

@@ -416,6 +416,7 @@ wasm-test: wasm
 
 binding-parity: build python-build wasm
 	$(UV_RUN) --project bindings/python python scripts/check_binding_parity.py
+	$(UV_RUN) --project bindings/python python scripts/check_binding_parity.py --cli
 
 # Measure the shipped public JS API, including result decoding. Override the
 # workload with WASM_BENCH_ARGS, for example:

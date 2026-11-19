@@ -1,0 +1,565 @@
+{
+  "description": "CLI flag matrix for check_binding_parity.py --cli: both CLIs run every case with every text and must agree on stdout, stderr and exit code after the program name is replaced with <prog>. Pairwise rows come from cli_flag_matrix.model.json; {text} is replaced by each text.",
+  "texts": [
+    "ヴァイオリンとABCの東京で書かなかった。",
+    "りんごを食べるりんごを食べる👨‍👩‍👧",
+    "ｶﾀｶﾅとＡＢＣ１２３"
+  ],
+  "pairwise": [
+    {
+      "name": "pairwise-01",
+      "args": [
+        "-f",
+        "json",
+        "--no-preserve-case",
+        "--preserve-symbols"
+      ],
+      "stdin": "{text}"
+    },
+    {
+      "name": "pairwise-02",
+      "args": [
+        "-f",
+        "tags",
+        "--no-preserve-vu",
+        "--no-lemmatize",
+        "--merge-compounds",
+        "--skip-env-config",
+        "--skip-core-dictionary",
+        "--skip-bundled-user-dictionary",
+        "--tag-no-exclude-particles",
+        "--tag-no-exclude-auxiliaries",
+        "--tag-no-exclude-formal-nouns",
+        "--tag-no-exclude-low-info",
+        "--tag-exclude-basic",
+        "--tag-no-remove-duplicates",
+        "--tag-no-use-base-form",
+        "--tag-min-length",
+        "0",
+        "--tag-max-tags",
+        "0",
+        "{text}"
+      ]
+    },
+    {
+      "name": "pairwise-03",
+      "args": [
+        "-f",
+        "tags",
+        "--no-lemmatize",
+        "--skip-env-config",
+        "--skip-bundled-user-dictionary",
+        "--tag-no-exclude-formal-nouns",
+        "--tag-no-exclude-low-info",
+        "--tag-no-use-base-form",
+        "--tag-min-length",
+        "5",
+        "--tag-max-tags",
+        "3",
+        "--tag-pos-filter",
+        "noun",
+        "--tag-pos-filter",
+        "VERB"
+      ],
+      "stdin": "{text}"
+    },
+    {
+      "name": "pairwise-04",
+      "args": [
+        "-f",
+        "tags",
+        "--no-preserve-vu",
+        "--no-preserve-case",
+        "--preserve-symbols",
+        "--merge-compounds",
+        "--skip-env-config",
+        "--tag-no-exclude-particles",
+        "--tag-no-exclude-auxiliaries",
+        "--tag-exclude-basic",
+        "--tag-no-remove-duplicates",
+        "--tag-no-use-base-form",
+        "--tag-min-length",
+        "0",
+        "--tag-max-tags",
+        "3",
+        "--tag-pos-filter",
+        "NOUN",
+        "{text}"
+      ]
+    },
+    {
+      "name": "pairwise-05",
+      "args": [
+        "-f",
+        "tags",
+        "--no-preserve-vu",
+        "--no-preserve-case",
+        "--skip-core-dictionary",
+        "--skip-bundled-user-dictionary",
+        "--tag-no-exclude-auxiliaries",
+        "--tag-no-exclude-formal-nouns",
+        "--tag-exclude-basic",
+        "--tag-min-length",
+        "5",
+        "--tag-max-tags",
+        "0",
+        "--tag-pos-filter",
+        "NOUN"
+      ],
+      "stdin": "{text}"
+    },
+    {
+      "name": "pairwise-06",
+      "args": [
+        "-f",
+        "tags",
+        "--preserve-symbols",
+        "--merge-compounds",
+        "--skip-core-dictionary",
+        "--tag-no-exclude-auxiliaries",
+        "--tag-no-exclude-low-info",
+        "--tag-no-remove-duplicates",
+        "--tag-max-tags",
+        "0",
+        "--tag-pos-filter",
+        "noun",
+        "--tag-pos-filter",
+        "VERB",
+        "{text}"
+      ]
+    },
+    {
+      "name": "pairwise-07",
+      "args": [
+        "-f",
+        "tags",
+        "--no-lemmatize",
+        "--tag-no-exclude-particles",
+        "--tag-no-remove-duplicates",
+        "--tag-min-length",
+        "0",
+        "--tag-max-tags",
+        "0",
+        "--tag-pos-filter",
+        "NOUN"
+      ],
+      "stdin": "{text}"
+    },
+    {
+      "name": "pairwise-08",
+      "args": [
+        "-f",
+        "tags",
+        "--no-preserve-vu",
+        "--preserve-symbols",
+        "--no-lemmatize",
+        "--merge-compounds",
+        "--skip-env-config",
+        "--skip-core-dictionary",
+        "--tag-no-exclude-particles",
+        "--tag-no-exclude-formal-nouns",
+        "--tag-exclude-basic",
+        "--tag-no-use-base-form",
+        "--tag-min-length",
+        "5",
+        "--tag-pos-filter",
+        "noun",
+        "--tag-pos-filter",
+        "VERB",
+        "{text}"
+      ]
+    },
+    {
+      "name": "pairwise-09",
+      "args": [
+        "-f",
+        "tags",
+        "--no-preserve-vu",
+        "--no-preserve-case",
+        "--no-lemmatize",
+        "--merge-compounds",
+        "--skip-env-config",
+        "--skip-core-dictionary",
+        "--skip-bundled-user-dictionary",
+        "--tag-no-exclude-particles",
+        "--tag-no-exclude-formal-nouns",
+        "--tag-no-exclude-low-info",
+        "--tag-exclude-basic",
+        "--tag-max-tags",
+        "3",
+        "--tag-pos-filter",
+        "NOUN"
+      ],
+      "stdin": "{text}"
+    },
+    {
+      "name": "pairwise-10",
+      "args": [
+        "-f",
+        "tags",
+        "--no-preserve-case",
+        "--skip-bundled-user-dictionary",
+        "--tag-no-exclude-auxiliaries",
+        "--tag-no-exclude-formal-nouns",
+        "--tag-no-exclude-low-info",
+        "--tag-exclude-basic",
+        "--tag-no-use-base-form",
+        "--tag-min-length",
+        "0",
+        "--tag-pos-filter",
+        "noun",
+        "--tag-pos-filter",
+        "VERB",
+        "{text}"
+      ]
+    },
+    {
+      "name": "pairwise-11",
+      "args": [
+        "-f",
+        "tags",
+        "--no-preserve-vu",
+        "--preserve-symbols",
+        "--skip-core-dictionary",
+        "--skip-bundled-user-dictionary",
+        "--tag-no-exclude-auxiliaries",
+        "--tag-no-remove-duplicates",
+        "--tag-min-length",
+        "0",
+        "--tag-max-tags",
+        "3",
+        "--tag-pos-filter",
+        "noun",
+        "--tag-pos-filter",
+        "VERB",
+        "{text}"
+      ]
+    },
+    {
+      "name": "pairwise-12",
+      "args": [
+        "-f",
+        "tags",
+        "--preserve-symbols",
+        "--no-lemmatize",
+        "--skip-env-config",
+        "--skip-core-dictionary",
+        "--skip-bundled-user-dictionary",
+        "--tag-no-exclude-particles",
+        "--tag-no-exclude-formal-nouns",
+        "--tag-no-exclude-low-info",
+        "--tag-exclude-basic",
+        "--tag-no-remove-duplicates",
+        "--tag-min-length",
+        "0",
+        "--tag-pos-filter",
+        "NOUN"
+      ],
+      "stdin": "{text}"
+    },
+    {
+      "name": "pairwise-13",
+      "args": [
+        "-f",
+        "tags",
+        "--no-preserve-vu",
+        "--no-preserve-case",
+        "--no-lemmatize",
+        "--merge-compounds",
+        "--skip-env-config",
+        "--skip-bundled-user-dictionary",
+        "--tag-no-use-base-form",
+        "--tag-max-tags",
+        "3"
+      ],
+      "stdin": "{text}"
+    },
+    {
+      "name": "pairwise-14",
+      "args": [
+        "-f",
+        "tags",
+        "--no-preserve-case",
+        "--preserve-symbols",
+        "--merge-compounds",
+        "--skip-env-config",
+        "--skip-bundled-user-dictionary",
+        "--tag-no-exclude-particles",
+        "--tag-no-exclude-auxiliaries",
+        "--tag-no-exclude-formal-nouns",
+        "--tag-no-exclude-low-info",
+        "--tag-no-remove-duplicates",
+        "--tag-min-length",
+        "5",
+        "--tag-max-tags",
+        "0"
+      ],
+      "stdin": "{text}"
+    },
+    {
+      "name": "pairwise-15",
+      "args": [
+        "-f",
+        "tags",
+        "--no-preserve-vu",
+        "--preserve-symbols",
+        "--no-lemmatize",
+        "--merge-compounds",
+        "--skip-env-config",
+        "--tag-no-exclude-particles",
+        "--tag-no-exclude-auxiliaries",
+        "--tag-no-remove-duplicates",
+        "--tag-no-use-base-form",
+        "--tag-min-length",
+        "5"
+      ],
+      "stdin": "{text}"
+    },
+    {
+      "name": "pairwise-16",
+      "args": [
+        "-f",
+        "chasen",
+        "--preserve-symbols",
+        "--no-lemmatize",
+        "--merge-compounds",
+        "--skip-env-config",
+        "--skip-bundled-user-dictionary"
+      ],
+      "stdin": "{text}"
+    },
+    {
+      "name": "pairwise-17",
+      "args": [
+        "-f",
+        "tsv",
+        "--no-lemmatize",
+        "--skip-env-config"
+      ],
+      "stdin": "{text}"
+    },
+    {
+      "name": "pairwise-18",
+      "args": [
+        "-f",
+        "tsv",
+        "--no-preserve-vu",
+        "--no-preserve-case",
+        "--preserve-symbols",
+        "--merge-compounds",
+        "--skip-core-dictionary",
+        "--skip-bundled-user-dictionary",
+        "{text}"
+      ]
+    },
+    {
+      "name": "pairwise-19",
+      "args": [
+        "-f",
+        "json",
+        "--no-preserve-vu",
+        "--no-lemmatize",
+        "--merge-compounds",
+        "--skip-env-config",
+        "--skip-core-dictionary",
+        "--skip-bundled-user-dictionary",
+        "{text}"
+      ]
+    },
+    {
+      "name": "pairwise-20",
+      "args": [
+        "-f",
+        "chasen",
+        "--no-preserve-vu",
+        "--skip-core-dictionary",
+        "{text}"
+      ]
+    },
+    {
+      "name": "pairwise-21",
+      "args": [
+        "-f",
+        "chasen",
+        "--no-preserve-vu",
+        "--no-preserve-case",
+        "--preserve-symbols",
+        "--no-lemmatize",
+        "{text}"
+      ]
+    }
+  ],
+  "negative": [
+    {
+      "name": "tag-flag-without-tags-tag-no-exclude-particles",
+      "args": [
+        "-f",
+        "json",
+        "--tag-no-exclude-particles",
+        "{text}"
+      ]
+    },
+    {
+      "name": "tag-flag-without-tags-tag-no-exclude-auxiliaries",
+      "args": [
+        "-f",
+        "json",
+        "--tag-no-exclude-auxiliaries",
+        "{text}"
+      ]
+    },
+    {
+      "name": "tag-flag-without-tags-tag-no-exclude-formal-nouns",
+      "args": [
+        "-f",
+        "json",
+        "--tag-no-exclude-formal-nouns",
+        "{text}"
+      ]
+    },
+    {
+      "name": "tag-flag-without-tags-tag-no-exclude-low-info",
+      "args": [
+        "-f",
+        "json",
+        "--tag-no-exclude-low-info",
+        "{text}"
+      ]
+    },
+    {
+      "name": "tag-flag-without-tags-tag-exclude-basic",
+      "args": [
+        "-f",
+        "json",
+        "--tag-exclude-basic",
+        "{text}"
+      ]
+    },
+    {
+      "name": "tag-flag-without-tags-tag-no-remove-duplicates",
+      "args": [
+        "-f",
+        "json",
+        "--tag-no-remove-duplicates",
+        "{text}"
+      ]
+    },
+    {
+      "name": "tag-flag-without-tags-tag-no-use-base-form",
+      "args": [
+        "-f",
+        "json",
+        "--tag-no-use-base-form",
+        "{text}"
+      ]
+    },
+    {
+      "name": "tag-min-length-without-tags",
+      "args": [
+        "-f",
+        "json",
+        "--tag-min-length",
+        "1",
+        "{text}"
+      ]
+    },
+    {
+      "name": "tag-max-tags-without-tags",
+      "args": [
+        "-f",
+        "json",
+        "--tag-max-tags",
+        "3",
+        "{text}"
+      ]
+    },
+    {
+      "name": "tag-pos-filter-without-tags",
+      "args": [
+        "-f",
+        "json",
+        "--tag-pos-filter",
+        "NOUN",
+        "{text}"
+      ]
+    },
+    {
+      "name": "unknown-flag",
+      "args": [
+        "--unknown-flag",
+        "{text}"
+      ]
+    },
+    {
+      "name": "invalid-mode",
+      "args": [
+        "-m",
+        "fast",
+        "{text}"
+      ]
+    },
+    {
+      "name": "invalid-pos-name",
+      "args": [
+        "-f",
+        "tags",
+        "--tag-pos-filter",
+        "noun",
+        "{text}"
+      ]
+    },
+    {
+      "name": "no-input",
+      "args": [],
+      "stdin": "tty"
+    }
+  ],
+  "extra": [
+    {
+      "name": "version-flag",
+      "args": [
+        "--version"
+      ]
+    },
+    {
+      "name": "version-command",
+      "args": [
+        "version"
+      ]
+    },
+    {
+      "name": "pos-filter-repeated-valid",
+      "args": [
+        "-f",
+        "tags",
+        "--tag-min-length",
+        "1",
+        "--tag-pos-filter",
+        "PARTICLE",
+        "--tag-pos-filter",
+        "NOUN",
+        "--tag-pos-filter",
+        "NOUN",
+        "{text}"
+      ]
+    },
+    {
+      "name": "operand-after-double-dash",
+      "args": [
+        "--",
+        "-v"
+      ]
+    },
+    {
+      "name": "empty-operand",
+      "args": [
+        ""
+      ]
+    },
+    {
+      "name": "empty-stdin",
+      "args": [],
+      "stdin": ""
+    }
+  ]
+}

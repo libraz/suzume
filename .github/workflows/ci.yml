@@ -233,6 +233,7 @@ jobs:
         run: |
           make python-build
           uv run --locked --project bindings/python python scripts/check_binding_parity.py
+          uv run --locked --project bindings/python python scripts/check_binding_parity.py --cli
 
   python-binding:
     runs-on: ubuntu-latest
