@@ -54,9 +54,9 @@ BUNDLED_USER="$(
         'from importlib.resources import files; print(files("suzume").joinpath("user.dic"))'
 )"
 "$SMOKE_ROOT/venv/bin/suzume" \
-    --dict "$FIRST_TEXT_DICTIONARY" \
-    --dict "$BUNDLED_USER" \
-    --dict "$SECOND_TEXT_DICTIONARY" \
+    --dictionary "$FIRST_TEXT_DICTIONARY" \
+    --dictionary "$BUNDLED_USER" \
+    --dictionary "$SECOND_TEXT_DICTIONARY" \
     --format json \
     "青空庭園 コーヒー豆 東京果樹園" > "$SMOKE_ROOT/dictionary-analysis.json"
 
