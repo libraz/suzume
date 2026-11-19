@@ -6,8 +6,8 @@ EntrySpecRange getAuxiliaryEntries() {
   static constexpr EntrySpec kEntries[] = {
       // Copula/Assertion - だ (断定)
       aux("だ", "だ", EPOS::AuxCopulaDa),
-      aux("だっ", "だ", EPOS::AuxCopulaDa),  // 連用タ接続形
-      aux("で", "だ", EPOS::AuxCopulaDa),    // copula renyokei
+      aux("だっ", "だ", EPOS::AuxCopulaDaRenyokei),  // 連用タ接続形
+      aux("で", "だ", EPOS::AuxCopulaDaRenyokei),    // copula renyokei
       aux("だったら", "だ", EPOS::AuxCopulaDa),
       aux("な", "だ", EPOS::AuxCopulaDa),  // attributive form (連体形)
 

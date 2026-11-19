@@ -484,8 +484,8 @@ void resolveEchoedConditionalCopula(std::vector<core::Morpheme>& result) {
         !utf8::equalsAny(conditional.surface, {"なら", "たら"})) {
       continue;
     }
-    retag(de, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxCopulaDa, "だ", dictionary::ConjugationType::None,
-          grammar::ConjForm::Renyokei);
+    retag(de, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxCopulaDaRenyokei, "だ",
+          dictionary::ConjugationType::None, grammar::ConjForm::Renyokei);
   }
 }
 
@@ -500,8 +500,8 @@ void resolveParticleHostedDearu(std::vector<core::Morpheme>& result) {
         !utf8::equalsAny(de.surface, {"で"}) || result[idx + 1].lemma != "ある") {
       continue;
     }
-    retag(de, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxCopulaDa, "だ", dictionary::ConjugationType::None,
-          grammar::ConjForm::Renyokei);
+    retag(de, core::PartOfSpeech::Auxiliary, core::ExtendedPOS::AuxCopulaDaRenyokei, "だ",
+          dictionary::ConjugationType::None, grammar::ConjForm::Renyokei);
   }
 }
 
