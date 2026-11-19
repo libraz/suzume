@@ -70,16 +70,16 @@ A red check on your pull request is not a reason to hold it back; the maintainer
 
 | Workflow | Job | Runs on | What it checks |
 | --- | --- | --- | --- |
-| `ci.yml` | `lint` | pushes to `main` and `develop`, and pull requests to `main` | Biome on the WASM binding, with Node and Yarn provisioned by mise; ruff on the tooling and repository scripts |
+| `ci.yml` | `lint` | pushes to `main` and `develop`, and pull requests to `main` and `develop` | Biome on the WASM binding, with Node and Yarn provisioned by mise; ruff on the tooling and repository scripts |
 | `ci.yml` | `guardrails` | the same events | the code guardrail ratchet and WASM-core purity, oracle overrides, binding label tables, oracle mirrors of core data, and version mirrors: the package manifests and `uv.lock`, and the uv, mise and Emscripten releases `publish.yml` must share with `ci.yml` |
-| `ci.yml` | `mcp-tests` | the same events | the tooling tests, and that the stored test expectations match a fresh derivation |
-| `ci.yml` | `sanitizers` | the same events | the C++ tests under ASan, LSan and UBSan |
-| `ci.yml` | `native-nodebug` | the same events | the C++ tests with the debug features compiled out |
-| `ci.yml` | `score-parity` | the same events, after `build-and-test` and `native-nodebug` | that the debug build the tests exercise and the shipped build without debug features give every morpheme of the tokenization test inputs the same score |
-| `ci.yml` | `cmake-configurations` | the same events | each supported CMake build and install configuration |
-| `ci.yml` | `manylinux-toolchain` | the same events | building and testing the wheel with the oldest supported toolchain |
+| `ci.yml` | `mcp-tests` | the same events except pull requests to `develop` | the tooling tests, and that the stored test expectations match a fresh derivation |
+| `ci.yml` | `sanitizers` | the same events except pull requests to `develop` | the C++ tests under ASan, LSan and UBSan |
+| `ci.yml` | `native-nodebug` | the same events except pull requests to `develop` | the C++ tests with the debug features compiled out |
+| `ci.yml` | `score-parity` | the same events except pull requests to `develop`, after `build-and-test` and `native-nodebug` | that the debug build the tests exercise and the shipped build without debug features give every morpheme of the tokenization test inputs the same score |
+| `ci.yml` | `cmake-configurations` | the same events except pull requests to `develop` | each supported CMake build and install configuration |
+| `ci.yml` | `manylinux-toolchain` | pushes and pull requests to `main` | building and testing the wheel with the oldest supported toolchain |
 | `ci.yml` | `build-and-test` | the same events | the C++ tests with coverage, the examples and installed-package consumers, the WASM build, its size check and tests, and native/Python/WASM parity |
-| `ci.yml` | `python-binding` | the same events except pushes to `develop` | ruff, mypy and the tests of the Python binding, and the Python example |
+| `ci.yml` | `python-binding` | pushes to `main` and pull requests to `main` | ruff, mypy and the tests of the Python binding, and the Python example |
 | `publish.yml` | release jobs | version tags | verifies the tag and the version mirrors, runs the C++ tests with and without the debug features, builds and tests the WASM package and the Linux and macOS wheels, publishes to npm and PyPI, and creates the GitHub release |
 
 Changes that touch only Markdown, `docs/` or `LICENSE` do not start `ci.yml`.
@@ -114,7 +114,7 @@ Nothing in this section asks anything of you; read it when a checklist item or a
 - The WASM build keeps its dictionaries embedded and the core holds only static data, which is why the core cannot use those headers. `scripts/check_wasm_size.sh` fails when the built module, raw or gzipped, grows past a tolerance over its recorded baseline, which large static tables or new hard-coded entries tend to cause.
 - A dictionary entry is decided by whether the word belongs to a closed or an open class. Closed classes (particles, auxiliaries, conjunctions, adnominals, pronouns, formal nouns) are finite and live in the built-in dictionary under `src/dictionary/entries/`. Open-class words (general nouns, verbs, adjectives) are derived by rule; the core dictionary under `data/core/` holds only the exceptions rules cannot resolve. The user dictionary under `data/user/` is for proper nouns and domain terms buried in kanji runs.
 - Test data in `tests/data/tokenization/*.json` and dictionary sources in `data/**/*.tsv` are written through the MCP server in `scripts/mcp` (wired up in `.mcp.json`): `test_show` shows a sentence's analysis, `test_add` registers a regression test, `dict_add` adds a dictionary entry, and `test_needs_suzume_update` resynchronizes expectations after a normalization rule changes. The agent hooks in `.claude/hooks/` block direct edits of those files. None of this is needed to contribute: describe the sentence and the expected tokens, and the maintainer registers the test.
-- A pull request to `develop` does not start `ci.yml`; the maintainer runs the same checks before merging.
+- A pull request to `develop` runs only `lint`, `guardrails` and `build-and-test`; the rest of `ci.yml` runs on the push to `develop` after the merge, or before the release on `main`.
 - The pre-commit hook in `scripts/hooks/pre-commit.sh` is installed by `yarn install` in `bindings/wasm` and checks the formatting of staged files. `SKIP_SIMPLE_GIT_HOOKS=1` skips it.
 
 ## Reporting issues

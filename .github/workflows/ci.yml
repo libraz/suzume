@@ -9,7 +9,7 @@ on:
       - 'docs/**'
       - 'LICENSE'
   pull_request:
-    branches: [main]
+    branches: [main, develop]
     paths-ignore:
       - '**.md'
       - 'docs/**'
@@ -19,6 +19,11 @@ on:
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: ${{ github.ref == 'refs/heads/develop' }}
+
+# A pull request to develop runs only lint, guardrails and build-and-test. Every
+# other job carries the condition
+#   github.event_name != 'pull_request' || github.base_ref != 'develop'
+# so the push to develop that follows the merge still runs the full set.
 
 env:
   # The uv release every Python environment is provisioned with (scripts/mcp,
@@ -75,6 +80,7 @@ jobs:
       - run: scripts/check_version_mirror.sh
 
   mcp-tests:
+    if: github.event_name != 'pull_request' || github.base_ref != 'develop'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -97,6 +103,7 @@ jobs:
         run: make oracle-sync-check
 
   sanitizers:
+    if: github.event_name != 'pull_request' || github.base_ref != 'develop'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -106,6 +113,7 @@ jobs:
   # The WASM module and the Python wheel compile the debug features out, and
   # every other test job keeps them. Run the suite in the shipped configuration.
   native-nodebug:
+    if: github.event_name != 'pull_request' || github.base_ref != 'develop'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -122,6 +130,7 @@ jobs:
   # build is what the tests exercise, the nodebug one is what ships.
   score-parity:
     needs: [build-and-test, native-nodebug]
+    if: github.event_name != 'pull_request' || github.base_ref != 'develop'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -135,6 +144,7 @@ jobs:
   # Library-only, no-install and multi-config builds are supported shapes that
   # no other job configures.
   cmake-configurations:
+    if: github.event_name != 'pull_request' || github.base_ref != 'develop'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -149,8 +159,10 @@ jobs:
   # is years older than the runner's. Without this job that compiler, and the
   # test suite run against the packaged wheel, first meet the code during the
   # tag-triggered publish, which is past the point where a release can be called
-  # off cleanly. publish.yml runs the same script.
+  # off cleanly. publish.yml runs the same script. It runs for main only (pushes
+  # and pull requests), which still precedes every tag.
   manylinux-toolchain:
+    if: github.ref == 'refs/heads/main' || github.base_ref == 'main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -224,7 +236,9 @@ jobs:
 
   python-binding:
     runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/develop'
+    if: >-
+      github.ref != 'refs/heads/develop' &&
+      (github.event_name != 'pull_request' || github.base_ref != 'develop')
     steps:
       - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v10.3.3
