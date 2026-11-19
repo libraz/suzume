@@ -984,6 +984,23 @@
       ],
       "id": "katsuteyonda",
       "input": "かつてよんだ"
+    },
+    {
+      "description": "曲がんない - auto-generated",
+      "expected": [
+        {
+          "lemma": "曲がる",
+          "pos": "Verb",
+          "surface": "曲がん"
+        },
+        {
+          "lemma": "ない",
+          "pos": "Auxiliary",
+          "surface": "ない"
+        }
+      ],
+      "id": "gannai",
+      "input": "曲がんない"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 12/12)",
