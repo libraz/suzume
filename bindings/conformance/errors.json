@@ -1,0 +1,2246 @@
+{
+  "cases": [
+    {
+      "id": "mode-unknown",
+      "group": "mode",
+      "call": {
+        "npm": {
+          "member": "create",
+          "kind": "call"
+        },
+        "python": {
+          "member": "Suzume",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "mode",
+        "python": "mode"
+      },
+      "value": "fast",
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "create"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid mode: \"fast\" (expected one of: normal, search, split)"
+    },
+    {
+      "id": "mode-wrong-case",
+      "group": "mode",
+      "call": {
+        "npm": {
+          "member": "create",
+          "kind": "call"
+        },
+        "python": {
+          "member": "Suzume",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "mode",
+        "python": "mode"
+      },
+      "value": "Search",
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "create"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid mode: \"Search\" (expected one of: normal, search, split)"
+    },
+    {
+      "id": "mode-null",
+      "group": "mode",
+      "call": {
+        "npm": {
+          "member": "create",
+          "kind": "call"
+        },
+        "python": {
+          "member": "Suzume",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "mode",
+        "python": "mode"
+      },
+      "value": null,
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "create"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid mode: null (expected one of: normal, search, split)"
+    },
+    {
+      "id": "mode-number",
+      "group": "mode",
+      "call": {
+        "npm": {
+          "member": "create",
+          "kind": "call"
+        },
+        "python": {
+          "member": "Suzume",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "mode",
+        "python": "mode"
+      },
+      "value": 1,
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "create"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid mode: 1 (expected one of: normal, search, split)"
+    },
+    {
+      "id": "mode-setter-unknown",
+      "group": "mode",
+      "call": {
+        "npm": {
+          "member": "mode",
+          "kind": "set"
+        },
+        "python": {
+          "member": "mode",
+          "kind": "set"
+        }
+      },
+      "option": {
+        "npm": null,
+        "python": null
+      },
+      "value": "fast",
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "mode"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid mode: \"fast\" (expected one of: normal, search, split)"
+    },
+    {
+      "id": "pos-filter-long-name",
+      "group": "pos_filter",
+      "call": {
+        "npm": {
+          "member": "generateTags",
+          "kind": "call"
+        },
+        "python": {
+          "member": "generate_tags",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "posFilter",
+        "python": "pos_filter"
+      },
+      "value": "adjective",
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "generate_tags"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid pos_filter: \"adjective\" (expected one of: NOUN, VERB, ADJ, ADV, PARTICLE, AUX)"
+    },
+    {
+      "id": "pos-filter-lowercase",
+      "group": "pos_filter",
+      "call": {
+        "npm": {
+          "member": "generateTags",
+          "kind": "call"
+        },
+        "python": {
+          "member": "generate_tags",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "posFilter",
+        "python": "pos_filter"
+      },
+      "value": "noun",
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "generate_tags"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid pos_filter: \"noun\" (expected one of: NOUN, VERB, ADJ, ADV, PARTICLE, AUX)"
+    },
+    {
+      "id": "pos-filter-empty-string",
+      "group": "pos_filter",
+      "call": {
+        "npm": {
+          "member": "generateTags",
+          "kind": "call"
+        },
+        "python": {
+          "member": "generate_tags",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "posFilter",
+        "python": "pos_filter"
+      },
+      "value": "",
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "generate_tags"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid pos_filter: \"\" (expected one of: NOUN, VERB, ADJ, ADV, PARTICLE, AUX)"
+    },
+    {
+      "id": "pos-filter-japanese",
+      "group": "pos_filter",
+      "call": {
+        "npm": {
+          "member": "generateTags",
+          "kind": "call"
+        },
+        "python": {
+          "member": "generate_tags",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "posFilter",
+        "python": "pos_filter"
+      },
+      "value": "名詞",
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "generate_tags"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid pos_filter: \"名詞\" (expected one of: NOUN, VERB, ADJ, ADV, PARTICLE, AUX)"
+    },
+    {
+      "id": "pos-filter-in-array",
+      "group": "pos_filter",
+      "call": {
+        "npm": {
+          "member": "generateTags",
+          "kind": "call"
+        },
+        "python": {
+          "member": "generate_tags",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "posFilter",
+        "python": "pos_filter"
+      },
+      "value": [
+        "NOUN",
+        "adverb"
+      ],
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "generate_tags"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid pos_filter: \"adverb\" (expected one of: NOUN, VERB, ADJ, ADV, PARTICLE, AUX)"
+    },
+    {
+      "id": "pos-filter-mixed-case-dup",
+      "group": "pos_filter",
+      "call": {
+        "npm": {
+          "member": "generateTags",
+          "kind": "call"
+        },
+        "python": {
+          "member": "generate_tags",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "posFilter",
+        "python": "pos_filter"
+      },
+      "value": [
+        "NOUN",
+        "noun"
+      ],
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "generate_tags"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid pos_filter: \"noun\" (expected one of: NOUN, VERB, ADJ, ADV, PARTICLE, AUX)"
+    },
+    {
+      "id": "pos-filter-nested-array",
+      "group": "pos_filter",
+      "call": {
+        "npm": {
+          "member": "generateTags",
+          "kind": "call"
+        },
+        "python": {
+          "member": "generate_tags",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "posFilter",
+        "python": "pos_filter"
+      },
+      "value": [
+        [
+          "NOUN"
+        ]
+      ],
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "generate_tags"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid pos_filter: array (expected one of: NOUN, VERB, ADJ, ADV, PARTICLE, AUX)"
+    },
+    {
+      "id": "pos-filter-object",
+      "group": "pos_filter",
+      "call": {
+        "npm": {
+          "member": "generateTags",
+          "kind": "call"
+        },
+        "python": {
+          "member": "generate_tags",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "posFilter",
+        "python": "pos_filter"
+      },
+      "value": {
+        "$special": "object"
+      },
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "generate_tags"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid pos_filter: object (expected one of: NOUN, VERB, ADJ, ADV, PARTICLE, AUX)"
+    },
+    {
+      "id": "pos-filter-undefined-in-array",
+      "group": "pos_filter",
+      "call": {
+        "npm": {
+          "member": "generateTags",
+          "kind": "call"
+        },
+        "python": {
+          "member": "generate_tags",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "posFilter",
+        "python": "pos_filter"
+      },
+      "value": [
+        {
+          "$special": "undefined"
+        }
+      ],
+      "released": false,
+      "only": "npm",
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "generate_tags"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid pos_filter: undefined (expected one of: NOUN, VERB, ADJ, ADV, PARTICLE, AUX)"
+    },
+    {
+      "id": "pos-filter-none-in-list",
+      "group": "pos_filter",
+      "call": {
+        "npm": {
+          "member": "generateTags",
+          "kind": "call"
+        },
+        "python": {
+          "member": "generate_tags",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "posFilter",
+        "python": "pos_filter"
+      },
+      "value": [
+        "NOUN",
+        null
+      ],
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "generate_tags"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid pos_filter: null (expected one of: NOUN, VERB, ADJ, ADV, PARTICLE, AUX)"
+    },
+    {
+      "id": "pos-filter-int",
+      "group": "pos_filter",
+      "call": {
+        "npm": {
+          "member": "generateTags",
+          "kind": "call"
+        },
+        "python": {
+          "member": "generate_tags",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "posFilter",
+        "python": "pos_filter"
+      },
+      "value": 1,
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "generate_tags"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid pos_filter: 1 (expected one of: NOUN, VERB, ADJ, ADV, PARTICLE, AUX)"
+    },
+    {
+      "id": "pos-filter-int-zero",
+      "group": "pos_filter",
+      "call": {
+        "npm": {
+          "member": "generateTags",
+          "kind": "call"
+        },
+        "python": {
+          "member": "generate_tags",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "posFilter",
+        "python": "pos_filter"
+      },
+      "value": 0,
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "generate_tags"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid pos_filter: 0 (expected one of: NOUN, VERB, ADJ, ADV, PARTICLE, AUX)"
+    },
+    {
+      "id": "size-fraction",
+      "group": "size",
+      "call": {
+        "npm": {
+          "member": "generateTags",
+          "kind": "call"
+        },
+        "python": {
+          "member": "generate_tags",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "minLength",
+        "python": "min_length"
+      },
+      "value": 2.5,
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "generate_tags"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid min_length: 2.5 (expected an integer from 0 to 4294967295)"
+    },
+    {
+      "id": "size-negative",
+      "group": "size",
+      "call": {
+        "npm": {
+          "member": "generateTags",
+          "kind": "call"
+        },
+        "python": {
+          "member": "generate_tags",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "minLength",
+        "python": "min_length"
+      },
+      "value": -1,
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "generate_tags"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid min_length: -1 (expected an integer from 0 to 4294967295)"
+    },
+    {
+      "id": "size-max-plus-one",
+      "group": "size",
+      "call": {
+        "npm": {
+          "member": "generateTags",
+          "kind": "call"
+        },
+        "python": {
+          "member": "generate_tags",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "minLength",
+        "python": "min_length"
+      },
+      "value": 4294967296,
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "generate_tags"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid min_length: 4294967296 (expected an integer from 0 to 4294967295)"
+    },
+    {
+      "id": "size-nan",
+      "group": "size",
+      "call": {
+        "npm": {
+          "member": "generateTags",
+          "kind": "call"
+        },
+        "python": {
+          "member": "generate_tags",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "minLength",
+        "python": "min_length"
+      },
+      "value": {
+        "$special": "NaN"
+      },
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "generate_tags"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid min_length: NaN (expected an integer from 0 to 4294967295)"
+    },
+    {
+      "id": "size-inf",
+      "group": "size",
+      "call": {
+        "npm": {
+          "member": "generateTags",
+          "kind": "call"
+        },
+        "python": {
+          "member": "generate_tags",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "minLength",
+        "python": "min_length"
+      },
+      "value": {
+        "$special": "Infinity"
+      },
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "generate_tags"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid min_length: Infinity (expected an integer from 0 to 4294967295)"
+    },
+    {
+      "id": "size-neg-inf",
+      "group": "size",
+      "call": {
+        "npm": {
+          "member": "generateTags",
+          "kind": "call"
+        },
+        "python": {
+          "member": "generate_tags",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "minLength",
+        "python": "min_length"
+      },
+      "value": {
+        "$special": "-Infinity"
+      },
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "generate_tags"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid min_length: -Infinity (expected an integer from 0 to 4294967295)"
+    },
+    {
+      "id": "size-null",
+      "group": "size",
+      "call": {
+        "npm": {
+          "member": "generateTags",
+          "kind": "call"
+        },
+        "python": {
+          "member": "generate_tags",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "minLength",
+        "python": "min_length"
+      },
+      "value": null,
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "generate_tags"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid min_length: null (expected an integer from 0 to 4294967295)"
+    },
+    {
+      "id": "size-bool",
+      "group": "size",
+      "call": {
+        "npm": {
+          "member": "generateTags",
+          "kind": "call"
+        },
+        "python": {
+          "member": "generate_tags",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "minLength",
+        "python": "min_length"
+      },
+      "value": true,
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "generate_tags"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid min_length: true (expected an integer from 0 to 4294967295)"
+    },
+    {
+      "id": "size-string",
+      "group": "size",
+      "call": {
+        "npm": {
+          "member": "generateTags",
+          "kind": "call"
+        },
+        "python": {
+          "member": "generate_tags",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "minLength",
+        "python": "min_length"
+      },
+      "value": "2",
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "generate_tags"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid min_length: \"2\" (expected an integer from 0 to 4294967295)"
+    },
+    {
+      "id": "size-max-tags-fraction",
+      "group": "size",
+      "call": {
+        "npm": {
+          "member": "generateTags",
+          "kind": "call"
+        },
+        "python": {
+          "member": "generate_tags",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "maxTags",
+        "python": "max_tags"
+      },
+      "value": 0.5,
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "generate_tags"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid max_tags: 0.5 (expected an integer from 0 to 4294967295)"
+    },
+    {
+      "id": "bool-string",
+      "group": "boolean",
+      "call": {
+        "npm": {
+          "member": "create",
+          "kind": "call"
+        },
+        "python": {
+          "member": "Suzume",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "preserveVu",
+        "python": "preserve_vu"
+      },
+      "value": "false",
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "create"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid preserve_vu: \"false\" (expected a boolean)"
+    },
+    {
+      "id": "bool-null",
+      "group": "boolean",
+      "call": {
+        "npm": {
+          "member": "create",
+          "kind": "call"
+        },
+        "python": {
+          "member": "Suzume",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "preserveVu",
+        "python": "preserve_vu"
+      },
+      "value": null,
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "create"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid preserve_vu: null (expected a boolean)"
+    },
+    {
+      "id": "bool-zero",
+      "group": "boolean",
+      "call": {
+        "npm": {
+          "member": "create",
+          "kind": "call"
+        },
+        "python": {
+          "member": "Suzume",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "preserveVu",
+        "python": "preserve_vu"
+      },
+      "value": 0,
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "create"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid preserve_vu: 0 (expected a boolean)"
+    },
+    {
+      "id": "bool-tag-string",
+      "group": "boolean",
+      "call": {
+        "npm": {
+          "member": "generateTags",
+          "kind": "call"
+        },
+        "python": {
+          "member": "generate_tags",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "removeDuplicates",
+        "python": "remove_duplicates"
+      },
+      "value": "yes",
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "generate_tags"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid remove_duplicates: \"yes\" (expected a boolean)"
+    },
+    {
+      "id": "render-quote-backslash",
+      "group": "render",
+      "call": {
+        "npm": {
+          "member": "create",
+          "kind": "call"
+        },
+        "python": {
+          "member": "Suzume",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "mode",
+        "python": "mode"
+      },
+      "value": "a\"b\\c",
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "create"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid mode: \"a\\\"b\\\\c\" (expected one of: normal, search, split)"
+    },
+    {
+      "id": "render-control",
+      "group": "render",
+      "call": {
+        "npm": {
+          "member": "create",
+          "kind": "call"
+        },
+        "python": {
+          "member": "Suzume",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "mode",
+        "python": "mode"
+      },
+      "value": "a\nb\u0001",
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "create"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid mode: \"a\\nb\\u0001\" (expected one of: normal, search, split)"
+    },
+    {
+      "id": "render-non-ascii",
+      "group": "render",
+      "call": {
+        "npm": {
+          "member": "create",
+          "kind": "call"
+        },
+        "python": {
+          "member": "Suzume",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "mode",
+        "python": "mode"
+      },
+      "value": "検索",
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "create"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid mode: \"検索\" (expected one of: normal, search, split)"
+    },
+    {
+      "id": "render-small-float",
+      "group": "render",
+      "call": {
+        "npm": {
+          "member": "create",
+          "kind": "call"
+        },
+        "python": {
+          "member": "Suzume",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "mode",
+        "python": "mode"
+      },
+      "value": 1e-07,
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "create"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid mode: 1e-7 (expected one of: normal, search, split)"
+    },
+    {
+      "id": "render-mid-float",
+      "group": "render",
+      "call": {
+        "npm": {
+          "member": "create",
+          "kind": "call"
+        },
+        "python": {
+          "member": "Suzume",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "mode",
+        "python": "mode"
+      },
+      "value": 1e-06,
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "create"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid mode: 0.000001 (expected one of: normal, search, split)"
+    },
+    {
+      "id": "render-large-float",
+      "group": "render",
+      "call": {
+        "npm": {
+          "member": "create",
+          "kind": "call"
+        },
+        "python": {
+          "member": "Suzume",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "mode",
+        "python": "mode"
+      },
+      "value": 1e+21,
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "create"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid mode: 1e+21 (expected one of: normal, search, split)"
+    },
+    {
+      "id": "render-big-integer",
+      "group": "render",
+      "call": {
+        "npm": {
+          "member": "create",
+          "kind": "call"
+        },
+        "python": {
+          "member": "Suzume",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "mode",
+        "python": "mode"
+      },
+      "value": 10000000000000000,
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "create"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid mode: 10000000000000000 (expected one of: normal, search, split)"
+    },
+    {
+      "id": "render-negzero",
+      "group": "render",
+      "call": {
+        "npm": {
+          "member": "create",
+          "kind": "call"
+        },
+        "python": {
+          "member": "Suzume",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "mode",
+        "python": "mode"
+      },
+      "value": {
+        "$special": "negzero"
+      },
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "create"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid mode: 0 (expected one of: normal, search, split)"
+    },
+    {
+      "id": "render-array",
+      "group": "render",
+      "call": {
+        "npm": {
+          "member": "create",
+          "kind": "call"
+        },
+        "python": {
+          "member": "Suzume",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "mode",
+        "python": "mode"
+      },
+      "value": {
+        "$special": "array"
+      },
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "create"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid mode: array (expected one of: normal, search, split)"
+    },
+    {
+      "id": "render-object",
+      "group": "render",
+      "call": {
+        "npm": {
+          "member": "create",
+          "kind": "call"
+        },
+        "python": {
+          "member": "Suzume",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "mode",
+        "python": "mode"
+      },
+      "value": {
+        "$special": "object"
+      },
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "create"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid mode: object (expected one of: normal, search, split)"
+    },
+    {
+      "id": "render-lone-surrogate",
+      "group": "render",
+      "call": {
+        "npm": {
+          "member": "create",
+          "kind": "call"
+        },
+        "python": {
+          "member": "Suzume",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "mode",
+        "python": "mode"
+      },
+      "value": {
+        "$special": "lone_surrogate"
+      },
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "create"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid mode: \"\\ud800\" (expected one of: normal, search, split)"
+    },
+    {
+      "id": "render-python-integral-float",
+      "group": "render",
+      "call": {
+        "npm": {
+          "member": "create",
+          "kind": "call"
+        },
+        "python": {
+          "member": "Suzume",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "mode",
+        "python": "mode"
+      },
+      "value": {
+        "$special": "float",
+        "repr": "2.0"
+      },
+      "released": false,
+      "only": "python",
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "create"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid mode: 2 (expected one of: normal, search, split)"
+    },
+    {
+      "id": "surrogate-text",
+      "group": "surrogate",
+      "call": {
+        "npm": {
+          "member": "analyze",
+          "kind": "call"
+        },
+        "python": {
+          "member": "analyze",
+          "kind": "call"
+        }
+      },
+      "option": null,
+      "value": {
+        "$special": "lone_surrogate"
+      },
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "analyze"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid text: contains an unpaired surrogate"
+    },
+    {
+      "id": "surrogate-scorer-string",
+      "group": "surrogate",
+      "call": {
+        "npm": {
+          "member": "create",
+          "kind": "call"
+        },
+        "python": {
+          "member": "Suzume",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "scorerOptions",
+        "python": "scorer_options"
+      },
+      "value": {
+        "$special": "lone_surrogate"
+      },
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "create"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid scorer_options: contains an unpaired surrogate"
+    },
+    {
+      "id": "scorer-cycle",
+      "group": "scorer",
+      "call": {
+        "npm": {
+          "member": "create",
+          "kind": "call"
+        },
+        "python": {
+          "member": "Suzume",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "scorerOptions",
+        "python": "scorer_options"
+      },
+      "value": {
+        "$special": "cycle"
+      },
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "create"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid scorer_options: not serializable as JSON"
+    },
+    {
+      "id": "scorer-nul",
+      "group": "scorer",
+      "call": {
+        "npm": {
+          "member": "create",
+          "kind": "call"
+        },
+        "python": {
+          "member": "Suzume",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "scorerOptions",
+        "python": "scorer_options"
+      },
+      "value": "{\"a\u0000\":1}",
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "create"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid scorer_options: contains a NUL character"
+    },
+    {
+      "id": "arg-text-number",
+      "group": "argument",
+      "call": {
+        "npm": {
+          "member": "analyze",
+          "kind": "call"
+        },
+        "python": {
+          "member": "analyze",
+          "kind": "call"
+        }
+      },
+      "option": null,
+      "value": 123,
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "analyze"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid text: 123 (expected a string)"
+    },
+    {
+      "id": "arg-text-null",
+      "group": "argument",
+      "call": {
+        "npm": {
+          "member": "analyze",
+          "kind": "call"
+        },
+        "python": {
+          "member": "analyze",
+          "kind": "call"
+        }
+      },
+      "option": null,
+      "value": null,
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "analyze"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid text: null (expected a string)"
+    },
+    {
+      "id": "arg-dict-number",
+      "group": "argument",
+      "call": {
+        "npm": {
+          "member": "loadUserDictionary",
+          "kind": "call"
+        },
+        "python": {
+          "member": "load_user_dictionary",
+          "kind": "call"
+        }
+      },
+      "option": null,
+      "value": 5,
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "load_user_dictionary"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid dictionary: 5 (expected a string)"
+    },
+    {
+      "id": "arg-binary-string",
+      "group": "argument",
+      "call": {
+        "npm": {
+          "member": "loadBinaryDictionary",
+          "kind": "call"
+        },
+        "python": {
+          "member": "load_binary_dictionary",
+          "kind": "call"
+        }
+      },
+      "option": null,
+      "value": "x",
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "load_binary_dictionary"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid dictionary: \"x\" (expected binary data)"
+    },
+    {
+      "id": "released-analyze",
+      "group": "released",
+      "call": {
+        "npm": {
+          "member": "analyze",
+          "kind": "call"
+        },
+        "python": {
+          "member": "analyze",
+          "kind": "call"
+        }
+      },
+      "option": null,
+      "value": null,
+      "released": true,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "analyze"
+        },
+        "python": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "analyze"
+        }
+      },
+      "message": "Suzume instance has been released"
+    },
+    {
+      "id": "released-analyze-with-normalized-text",
+      "group": "released",
+      "call": {
+        "npm": {
+          "member": "analyzeWithNormalizedText",
+          "kind": "call"
+        },
+        "python": {
+          "member": "analyze_with_normalized_text",
+          "kind": "call"
+        }
+      },
+      "option": null,
+      "value": null,
+      "released": true,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "analyze"
+        },
+        "python": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "analyze"
+        }
+      },
+      "message": "Suzume instance has been released"
+    },
+    {
+      "id": "released-generate-tags",
+      "group": "released",
+      "call": {
+        "npm": {
+          "member": "generateTags",
+          "kind": "call"
+        },
+        "python": {
+          "member": "generate_tags",
+          "kind": "call"
+        }
+      },
+      "option": null,
+      "value": null,
+      "released": true,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "generate_tags"
+        },
+        "python": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "generate_tags"
+        }
+      },
+      "message": "Suzume instance has been released"
+    },
+    {
+      "id": "released-load-user-dictionary",
+      "group": "released",
+      "call": {
+        "npm": {
+          "member": "loadUserDictionary",
+          "kind": "call"
+        },
+        "python": {
+          "member": "load_user_dictionary",
+          "kind": "call"
+        }
+      },
+      "option": null,
+      "value": null,
+      "released": true,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "load_user_dictionary"
+        },
+        "python": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "load_user_dictionary"
+        }
+      },
+      "message": "Suzume instance has been released"
+    },
+    {
+      "id": "released-load-binary-dictionary",
+      "group": "released",
+      "call": {
+        "npm": {
+          "member": "loadBinaryDictionary",
+          "kind": "call"
+        },
+        "python": {
+          "member": "load_binary_dictionary",
+          "kind": "call"
+        }
+      },
+      "option": null,
+      "value": null,
+      "released": true,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "load_binary_dictionary"
+        },
+        "python": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "load_binary_dictionary"
+        }
+      },
+      "message": "Suzume instance has been released"
+    },
+    {
+      "id": "released-clear-user-dictionaries",
+      "group": "released",
+      "call": {
+        "npm": {
+          "member": "clearUserDictionaries",
+          "kind": "call"
+        },
+        "python": {
+          "member": "clear_user_dictionaries",
+          "kind": "call"
+        }
+      },
+      "option": null,
+      "value": null,
+      "released": true,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "clear_user_dictionaries"
+        },
+        "python": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "clear_user_dictionaries"
+        }
+      },
+      "message": "Suzume instance has been released"
+    },
+    {
+      "id": "released-mode",
+      "group": "released",
+      "call": {
+        "npm": {
+          "member": "mode",
+          "kind": "get"
+        },
+        "python": {
+          "member": "mode",
+          "kind": "get"
+        }
+      },
+      "option": null,
+      "value": null,
+      "released": true,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "mode"
+        },
+        "python": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "mode"
+        }
+      },
+      "message": "Suzume instance has been released"
+    },
+    {
+      "id": "released-mode-set",
+      "group": "released",
+      "call": {
+        "npm": {
+          "member": "mode",
+          "kind": "set"
+        },
+        "python": {
+          "member": "mode",
+          "kind": "set"
+        }
+      },
+      "option": null,
+      "value": "search",
+      "released": true,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "mode"
+        },
+        "python": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "mode"
+        }
+      },
+      "message": "Suzume instance has been released"
+    },
+    {
+      "id": "released-dictionary-warnings",
+      "group": "released",
+      "call": {
+        "npm": {
+          "member": "dictionaryWarnings",
+          "kind": "get"
+        },
+        "python": {
+          "member": "dictionary_warnings",
+          "kind": "get"
+        }
+      },
+      "option": null,
+      "value": null,
+      "released": true,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "dictionary_warnings"
+        },
+        "python": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "dictionary_warnings"
+        }
+      },
+      "message": "Suzume instance has been released"
+    },
+    {
+      "id": "released-has-core-dictionary",
+      "group": "released",
+      "call": {
+        "npm": {
+          "member": "hasCoreDictionary",
+          "kind": "get"
+        },
+        "python": {
+          "member": "has_core_dictionary",
+          "kind": "get"
+        }
+      },
+      "option": null,
+      "value": null,
+      "released": true,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "has_core_dictionary"
+        },
+        "python": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "has_core_dictionary"
+        }
+      },
+      "message": "Suzume instance has been released"
+    },
+    {
+      "id": "released-wasm-memory-bytes",
+      "group": "released",
+      "call": {
+        "npm": {
+          "member": "wasmMemoryBytes",
+          "kind": "call"
+        },
+        "python": null
+      },
+      "option": null,
+      "value": null,
+      "released": true,
+      "only": "npm",
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "wasm_memory_bytes"
+        },
+        "python": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "wasm_memory_bytes"
+        }
+      },
+      "message": "Suzume instance has been released"
+    },
+    {
+      "id": "released-before-invalid-option",
+      "group": "released",
+      "call": {
+        "npm": {
+          "member": "mode",
+          "kind": "set"
+        },
+        "python": {
+          "member": "mode",
+          "kind": "set"
+        }
+      },
+      "option": null,
+      "value": "fast",
+      "released": true,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "mode"
+        },
+        "python": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "mode"
+        }
+      },
+      "message": "Suzume instance has been released"
+    },
+    {
+      "id": "unknown-code-42",
+      "group": "unknown-code",
+      "call": {
+        "npm": {
+          "member": "SuzumeError",
+          "kind": "construct"
+        },
+        "python": {
+          "member": "SuzumeError",
+          "kind": "construct"
+        }
+      },
+      "option": null,
+      "value": 42,
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 255
+        },
+        "python": {
+          "type": "SuzumeError",
+          "code": 255
+        }
+      },
+      "message": "boom"
+    },
+    {
+      "id": "unknown-code-minus1",
+      "group": "unknown-code",
+      "call": {
+        "npm": {
+          "member": "SuzumeError",
+          "kind": "construct"
+        },
+        "python": {
+          "member": "SuzumeError",
+          "kind": "construct"
+        }
+      },
+      "option": null,
+      "value": -1,
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 255
+        },
+        "python": {
+          "type": "SuzumeError",
+          "code": 255
+        }
+      },
+      "message": "boom"
+    },
+    {
+      "id": "unknown-code-255",
+      "group": "unknown-code",
+      "call": {
+        "npm": {
+          "member": "SuzumeError",
+          "kind": "construct"
+        },
+        "python": {
+          "member": "SuzumeError",
+          "kind": "construct"
+        }
+      },
+      "option": null,
+      "value": 255,
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 255
+        },
+        "python": {
+          "type": "SuzumeError",
+          "code": 255
+        }
+      },
+      "message": "boom"
+    },
+    {
+      "id": "unknown-code-6",
+      "group": "unknown-code",
+      "call": {
+        "npm": {
+          "member": "SuzumeError",
+          "kind": "construct"
+        },
+        "python": {
+          "member": "SuzumeError",
+          "kind": "construct"
+        }
+      },
+      "option": null,
+      "value": 6,
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6
+        },
+        "python": {
+          "type": "SuzumeError",
+          "code": 6
+        }
+      },
+      "message": "boom"
+    },
+    {
+      "id": "native-empty-dictionary",
+      "group": "error-model",
+      "call": {
+        "npm": {
+          "member": "loadUserDictionary",
+          "kind": "call"
+        },
+        "python": {
+          "member": "load_user_dictionary",
+          "kind": "call"
+        }
+      },
+      "option": null,
+      "value": "",
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "load_user_dictionary"
+        },
+        "python": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "load_user_dictionary"
+        }
+      },
+      "message": "Empty dictionary data"
+    },
+    {
+      "id": "native-comment-only-dictionary",
+      "group": "error-model",
+      "call": {
+        "npm": {
+          "member": "loadUserDictionary",
+          "kind": "call"
+        },
+        "python": {
+          "member": "load_user_dictionary",
+          "kind": "call"
+        }
+      },
+      "option": null,
+      "value": "# comment only\n",
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 4,
+          "operation": "load_user_dictionary"
+        },
+        "python": {
+          "type": "SuzumeError",
+          "code": 4,
+          "operation": "load_user_dictionary"
+        }
+      },
+      "message": "Dictionary source contains no loadable entries"
+    },
+    {
+      "id": "native-bad-scorer-json-code",
+      "group": "error-model",
+      "call": {
+        "npm": {
+          "member": "create",
+          "kind": "call"
+        },
+        "python": {
+          "member": "Suzume",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "scorerOptions",
+        "python": "scorer_options"
+      },
+      "value": "{bad",
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 4,
+          "operation": "create"
+        },
+        "python": {
+          "type": "SuzumeError",
+          "code": 4,
+          "operation": "create"
+        }
+      },
+      "message": null,
+      "message_prefix": "invalid scorer options: JSON parse error: ",
+      "note": "message_prefix holds after the native prefix removal; until then the suites assert code and operation only"
+    }
+  ]
+}
