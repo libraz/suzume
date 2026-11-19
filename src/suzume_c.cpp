@@ -144,6 +144,8 @@ static_assert(sizeof(suzume_extended_pos_t) == 1);
 static_assert(sizeof(suzume_conjugation_type_t) == 1);
 static_assert(sizeof(suzume_conjugation_form_t) == 1);
 static_assert(sizeof(suzume_error_code_t) == 1);
+static_assert(sizeof(suzume_mode_t) == 1);
+static_assert(sizeof(suzume_tag_pos_t) == 1);
 static_assert(SUZUME_POS_UNKNOWN == static_cast<uint8_t>(suzume::core::PartOfSpeech::Unknown));
 static_assert(SUZUME_POS_NOUN == static_cast<uint8_t>(suzume::core::PartOfSpeech::Noun));
 static_assert(SUZUME_POS_VERB == static_cast<uint8_t>(suzume::core::PartOfSpeech::Verb));
@@ -454,7 +456,7 @@ SUZUME_EXPORT void suzume_destroy(suzume_t handle) {
   delete handle;
 }
 
-SUZUME_EXPORT int suzume_set_mode(suzume_t handle, uint8_t mode) {
+SUZUME_EXPORT int suzume_set_mode(suzume_t handle, suzume_mode_t mode) {
   if (handle == nullptr) {
     setLastError("null handle", SUZUME_ERROR_INVALID_INPUT);
     return 0;
@@ -473,12 +475,12 @@ SUZUME_EXPORT int suzume_set_mode(suzume_t handle, uint8_t mode) {
   SUZUME_C_CATCH(return 0)
 }
 
-SUZUME_EXPORT uint8_t suzume_mode(suzume_t handle) {
+SUZUME_EXPORT suzume_mode_t suzume_mode(suzume_t handle) {
   if (handle == nullptr) {
     setLastError("null handle", SUZUME_ERROR_INVALID_INPUT);
     return SUZUME_MODE_INVALID;
   }
-  return static_cast<uint8_t>(handle->instance.mode());
+  return static_cast<suzume_mode_t>(handle->instance.mode());
 }
 
 SUZUME_EXPORT suzume_result_t* suzume_analyze(suzume_t handle, const char* text) {
@@ -711,6 +713,7 @@ SUZUME_EXPORT size_t suzume_offsetof_result(uint32_t field) {
       offsetof(suzume_result_t, normalized_text),
       offsetof(suzume_result_t, normalized_text_size),
   };
+  static_assert(std::size(kOffsets) == SUZUME_RESULT_FIELD_NORMALIZED_TEXT_SIZE + 1);
   return field < std::size(kOffsets) ? kOffsets[field] : static_cast<size_t>(-1);
 }
 
@@ -729,6 +732,7 @@ SUZUME_EXPORT size_t suzume_offsetof_morpheme(uint32_t field) {
       offsetof(suzume_morpheme_t, surface_size),
       offsetof(suzume_morpheme_t, base_form_size),
   };
+  static_assert(std::size(kOffsets) == SUZUME_MORPHEME_FIELD_BASE_FORM_SIZE + 1);
   return field < std::size(kOffsets) ? kOffsets[field] : static_cast<size_t>(-1);
 }
 
@@ -738,6 +742,7 @@ SUZUME_EXPORT size_t suzume_offsetof_tags(uint32_t field) {
       offsetof(suzume_tags_t, pos),
       offsetof(suzume_tags_t, count),
   };
+  static_assert(std::size(kOffsets) == SUZUME_TAGS_FIELD_COUNT + 1);
   return field < std::size(kOffsets) ? kOffsets[field] : static_cast<size_t>(-1);
 }
 
@@ -754,6 +759,7 @@ SUZUME_EXPORT size_t suzume_offsetof_tag_options(uint32_t field) {
       offsetof(suzume_tag_options_t, exclude_low_info),
       offsetof(suzume_tag_options_t, remove_duplicates),
   };
+  static_assert(std::size(kOffsets) == SUZUME_TAG_OPTIONS_FIELD_REMOVE_DUPLICATES + 1);
   return field < std::size(kOffsets) ? kOffsets[field] : static_cast<size_t>(-1);
 }
 
@@ -772,6 +778,7 @@ SUZUME_EXPORT size_t suzume_offsetof_options(uint32_t field) {
       offsetof(suzume_options_t, scorer_options_json),
       offsetof(suzume_options_t, data_directory),
   };
+  static_assert(std::size(kOffsets) == SUZUME_OPTIONS_FIELD_DATA_DIRECTORY + 1);
   return field < std::size(kOffsets) ? kOffsets[field] : static_cast<size_t>(-1);
 }
 

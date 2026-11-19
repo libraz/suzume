@@ -150,6 +150,9 @@ enum {
   SUZUME_MORPHEME_CONJUGATABLE = 1U << 5U,
 };
 
+/** Bitwise OR of SUZUME_TAG_POS_* values; bit n selects SUZUME_POS_* code n+1. */
+typedef uint8_t suzume_tag_pos_t;
+
 /** Stable POS-filter bits used by suzume_tag_options_t::pos_filter. */
 enum {
   SUZUME_TAG_POS_NOUN = 1U << 0U,
@@ -159,6 +162,9 @@ enum {
   SUZUME_TAG_POS_PARTICLE = 1U << 4U,
   SUZUME_TAG_POS_AUXILIARY = 1U << 5U,
 };
+
+/** One of the SUZUME_MODE_* values. */
+typedef uint8_t suzume_mode_t;
 
 /** Stable analysis-mode codes used by suzume_options_t and the mode accessors. */
 enum {
@@ -215,7 +221,7 @@ typedef struct {
   uint8_t preserve_vu;      /**< Preserve ヴ (don't normalize to ビ etc.) */
   uint8_t preserve_case;    /**< Preserve case (don't lowercase ASCII) */
   uint8_t preserve_symbols; /**< Preserve punctuation-like SYMBOL tokens (emoji remain OTHER) */
-  uint8_t mode;             /**< 0=normal, 1=search, 2=split */
+  suzume_mode_t mode;       /**< 0=normal, 1=search, 2=split */
   uint8_t lemmatize;        /**< Replace source lemmas with corrected lemmas; annotations are always computed */
   uint8_t merge_compounds;  /**< Merge consecutive noun compounds */
   uint8_t skip_bundled_user_dictionary; /**< Skip automatic loading of the bundled user dictionary only */
@@ -266,14 +272,14 @@ SUZUME_EXPORT void suzume_destroy(suzume_t handle);
  * @param mode One of SUZUME_MODE_NORMAL, SUZUME_MODE_SEARCH, or SUZUME_MODE_SPLIT
  * @return 1 on success, 0 for an invalid handle or mode (see suzume_last_error).
  */
-SUZUME_EXPORT int suzume_set_mode(suzume_t handle, uint8_t mode);
+SUZUME_EXPORT int suzume_set_mode(suzume_t handle, suzume_mode_t mode);
 
 /**
  * @brief Get an existing handle's analysis mode.
  * @param handle Suzume handle
  * @return A SUZUME_MODE_* value, or SUZUME_MODE_INVALID for an invalid handle.
  */
-SUZUME_EXPORT uint8_t suzume_mode(suzume_t handle);
+SUZUME_EXPORT suzume_mode_t suzume_mode(suzume_t handle);
 
 // --- Analysis functions ---
 
@@ -334,7 +340,7 @@ SUZUME_EXPORT suzume_tags_t* suzume_generate_tags_n(suzume_t handle, const char*
  * overriding individual fields.
  */
 typedef struct {
-  uint8_t pos_filter;           /**< Bitwise SUZUME_TAG_POS_* values; 0 includes all filterable POS */
+  suzume_tag_pos_t pos_filter;  /**< Bitwise SUZUME_TAG_POS_* values; 0 includes all filterable POS */
   uint8_t exclude_basic;        /**< Exclude basic words (hiragana-only lemma) */
   uint8_t use_base_form;        /**< Use the base form instead of the surface (default: 1) */
   size_t min_length;            /**< Minimum tag length in characters (default: 2) */
@@ -519,44 +525,99 @@ SUZUME_EXPORT size_t suzume_sizeof_tag_options(void);
  */
 SUZUME_EXPORT size_t suzume_sizeof_options(void);
 
+/** Field indexes for suzume_offsetof_result(). */
+enum {
+  SUZUME_RESULT_FIELD_MORPHEMES = 0,
+  SUZUME_RESULT_FIELD_COUNT = 1,
+  SUZUME_RESULT_FIELD_NORMALIZED_TEXT = 2,
+  SUZUME_RESULT_FIELD_NORMALIZED_TEXT_SIZE = 3,
+};
+
 /**
  * @brief Get byte offset of field in suzume_result_t
- * @param field 0=morphemes, 1=count, 2=normalized_text,
- *              3=normalized_text_size
+ * @param field A SUZUME_RESULT_FIELD_* index
+ * @return The byte offset, or (size_t)-1 for an unknown index
  */
 SUZUME_EXPORT size_t suzume_offsetof_result(uint32_t field);
 
+/** Field indexes for suzume_offsetof_morpheme(). */
+enum {
+  SUZUME_MORPHEME_FIELD_SURFACE = 0,
+  SUZUME_MORPHEME_FIELD_BASE_FORM = 1,
+  SUZUME_MORPHEME_FIELD_START = 2,
+  SUZUME_MORPHEME_FIELD_END = 3,
+  SUZUME_MORPHEME_FIELD_SCORE = 4,
+  SUZUME_MORPHEME_FIELD_POS = 5,
+  SUZUME_MORPHEME_FIELD_EXTENDED_POS = 6,
+  SUZUME_MORPHEME_FIELD_CONJUGATION_TYPE = 7,
+  SUZUME_MORPHEME_FIELD_CONJUGATION_FORM = 8,
+  SUZUME_MORPHEME_FIELD_FLAGS = 9,
+  SUZUME_MORPHEME_FIELD_SURFACE_SIZE = 10,
+  SUZUME_MORPHEME_FIELD_BASE_FORM_SIZE = 11,
+};
+
 /**
  * @brief Get byte offset of field in suzume_morpheme_t
- * @param field 0=surface, 1=base_form, 2=start, 3=end, 4=score,
- *              5=pos, 6=extended_pos, 7=conjugation_type,
- *              8=conjugation_form, 9=flags, 10=surface_size,
- *              11=base_form_size
+ * @param field A SUZUME_MORPHEME_FIELD_* index
+ * @return The byte offset, or (size_t)-1 for an unknown index
  */
 SUZUME_EXPORT size_t suzume_offsetof_morpheme(uint32_t field);
 
+/** Field indexes for suzume_offsetof_tags(). */
+enum {
+  SUZUME_TAGS_FIELD_TAGS = 0,
+  SUZUME_TAGS_FIELD_POS = 1,
+  SUZUME_TAGS_FIELD_COUNT = 2,
+};
+
 /**
  * @brief Get byte offset of field in suzume_tags_t
- * @param field 0=tags, 1=pos, 2=count
+ * @param field A SUZUME_TAGS_FIELD_* index
+ * @return The byte offset, or (size_t)-1 for an unknown index
  */
 SUZUME_EXPORT size_t suzume_offsetof_tags(uint32_t field);
 
+/** Field indexes for suzume_offsetof_tag_options(). */
+enum {
+  SUZUME_TAG_OPTIONS_FIELD_POS_FILTER = 0,
+  SUZUME_TAG_OPTIONS_FIELD_EXCLUDE_BASIC = 1,
+  SUZUME_TAG_OPTIONS_FIELD_USE_BASE_FORM = 2,
+  SUZUME_TAG_OPTIONS_FIELD_MIN_LENGTH = 3,
+  SUZUME_TAG_OPTIONS_FIELD_MAX_TAGS = 4,
+  SUZUME_TAG_OPTIONS_FIELD_EXCLUDE_PARTICLES = 5,
+  SUZUME_TAG_OPTIONS_FIELD_EXCLUDE_AUXILIARIES = 6,
+  SUZUME_TAG_OPTIONS_FIELD_EXCLUDE_FORMAL_NOUNS = 7,
+  SUZUME_TAG_OPTIONS_FIELD_EXCLUDE_LOW_INFO = 8,
+  SUZUME_TAG_OPTIONS_FIELD_REMOVE_DUPLICATES = 9,
+};
+
 /**
  * @brief Get byte offset of field in suzume_tag_options_t
- * @param field 0=pos_filter, 1=exclude_basic, 2=use_base_form,
- *              3=min_length, 4=max_tags, 5=exclude_particles,
- *              6=exclude_auxiliaries, 7=exclude_formal_nouns,
- *              8=exclude_low_info, 9=remove_duplicates
+ * @param field A SUZUME_TAG_OPTIONS_FIELD_* index
+ * @return The byte offset, or (size_t)-1 for an unknown index
  */
 SUZUME_EXPORT size_t suzume_offsetof_tag_options(uint32_t field);
 
+/** Field indexes for suzume_offsetof_options(). */
+enum {
+  SUZUME_OPTIONS_FIELD_PRESERVE_VU = 0,
+  SUZUME_OPTIONS_FIELD_PRESERVE_CASE = 1,
+  SUZUME_OPTIONS_FIELD_PRESERVE_SYMBOLS = 2,
+  SUZUME_OPTIONS_FIELD_MODE = 3,
+  SUZUME_OPTIONS_FIELD_LEMMATIZE = 4,
+  SUZUME_OPTIONS_FIELD_MERGE_COMPOUNDS = 5,
+  SUZUME_OPTIONS_FIELD_SKIP_BUNDLED_USER_DICTIONARY = 6,
+  SUZUME_OPTIONS_FIELD_SKIP_CORE_DICTIONARY = 7,
+  SUZUME_OPTIONS_FIELD_REPORT_SCORER_CONFIG = 8,
+  SUZUME_OPTIONS_FIELD_SKIP_ENV_CONFIG = 9,
+  SUZUME_OPTIONS_FIELD_SCORER_OPTIONS_JSON = 10,
+  SUZUME_OPTIONS_FIELD_DATA_DIRECTORY = 11,
+};
+
 /**
  * @brief Get byte offset of field in suzume_options_t
- * @param field 0=preserve_vu, 1=preserve_case, 2=preserve_symbols,
- *              3=mode, 4=lemmatize, 5=merge_compounds,
- *              6=skip_bundled_user_dictionary, 7=skip_core_dictionary,
- *              8=report_scorer_config, 9=skip_env_config,
- *              10=scorer_options_json, 11=data_directory
+ * @param field A SUZUME_OPTIONS_FIELD_* index
+ * @return The byte offset, or (size_t)-1 for an unknown index
  */
 SUZUME_EXPORT size_t suzume_offsetof_options(uint32_t field);
 

@@ -12,6 +12,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 #include "suzume/suzume_c.h"
@@ -53,58 +54,63 @@ std::vector<StructLayout> frozenLayouts() {
        56,
        suzume_sizeof_morpheme,
        suzume_offsetof_morpheme,
-       {{0, 0, "surface"},
-        {1, 8, "base_form"},
-        {2, 16, "start"},
-        {3, 20, "end"},
-        {4, 24, "score"},
-        {5, 28, "pos"},
-        {6, 29, "extended_pos"},
-        {7, 30, "conjugation_type"},
-        {8, 31, "conjugation_form"},
-        {9, 32, "flags"},
-        {10, 40, "surface_size"},
-        {11, 48, "base_form_size"}}},
+       {{SUZUME_MORPHEME_FIELD_SURFACE, 0, "surface"},
+        {SUZUME_MORPHEME_FIELD_BASE_FORM, 8, "base_form"},
+        {SUZUME_MORPHEME_FIELD_START, 16, "start"},
+        {SUZUME_MORPHEME_FIELD_END, 20, "end"},
+        {SUZUME_MORPHEME_FIELD_SCORE, 24, "score"},
+        {SUZUME_MORPHEME_FIELD_POS, 28, "pos"},
+        {SUZUME_MORPHEME_FIELD_EXTENDED_POS, 29, "extended_pos"},
+        {SUZUME_MORPHEME_FIELD_CONJUGATION_TYPE, 30, "conjugation_type"},
+        {SUZUME_MORPHEME_FIELD_CONJUGATION_FORM, 31, "conjugation_form"},
+        {SUZUME_MORPHEME_FIELD_FLAGS, 32, "flags"},
+        {SUZUME_MORPHEME_FIELD_SURFACE_SIZE, 40, "surface_size"},
+        {SUZUME_MORPHEME_FIELD_BASE_FORM_SIZE, 48, "base_form_size"}}},
       {"suzume_result_t",
        32,
        suzume_sizeof_result,
        suzume_offsetof_result,
-       {{0, 0, "morphemes"}, {1, 8, "count"}, {2, 16, "normalized_text"}, {3, 24, "normalized_text_size"}}},
+       {{SUZUME_RESULT_FIELD_MORPHEMES, 0, "morphemes"},
+        {SUZUME_RESULT_FIELD_COUNT, 8, "count"},
+        {SUZUME_RESULT_FIELD_NORMALIZED_TEXT, 16, "normalized_text"},
+        {SUZUME_RESULT_FIELD_NORMALIZED_TEXT_SIZE, 24, "normalized_text_size"}}},
       {"suzume_tags_t",
        24,
        suzume_sizeof_tags,
        suzume_offsetof_tags,
-       {{0, 0, "tags"}, {1, 8, "pos"}, {2, 16, "count"}}},
+       {{SUZUME_TAGS_FIELD_TAGS, 0, "tags"},
+        {SUZUME_TAGS_FIELD_POS, 8, "pos"},
+        {SUZUME_TAGS_FIELD_COUNT, 16, "count"}}},
       {"suzume_tag_options_t",
        32,
        suzume_sizeof_tag_options,
        suzume_offsetof_tag_options,
-       {{0, 0, "pos_filter"},
-        {1, 1, "exclude_basic"},
-        {2, 2, "use_base_form"},
-        {3, 8, "min_length"},
-        {4, 16, "max_tags"},
-        {5, 24, "exclude_particles"},
-        {6, 25, "exclude_auxiliaries"},
-        {7, 26, "exclude_formal_nouns"},
-        {8, 27, "exclude_low_info"},
-        {9, 28, "remove_duplicates"}}},
+       {{SUZUME_TAG_OPTIONS_FIELD_POS_FILTER, 0, "pos_filter"},
+        {SUZUME_TAG_OPTIONS_FIELD_EXCLUDE_BASIC, 1, "exclude_basic"},
+        {SUZUME_TAG_OPTIONS_FIELD_USE_BASE_FORM, 2, "use_base_form"},
+        {SUZUME_TAG_OPTIONS_FIELD_MIN_LENGTH, 8, "min_length"},
+        {SUZUME_TAG_OPTIONS_FIELD_MAX_TAGS, 16, "max_tags"},
+        {SUZUME_TAG_OPTIONS_FIELD_EXCLUDE_PARTICLES, 24, "exclude_particles"},
+        {SUZUME_TAG_OPTIONS_FIELD_EXCLUDE_AUXILIARIES, 25, "exclude_auxiliaries"},
+        {SUZUME_TAG_OPTIONS_FIELD_EXCLUDE_FORMAL_NOUNS, 26, "exclude_formal_nouns"},
+        {SUZUME_TAG_OPTIONS_FIELD_EXCLUDE_LOW_INFO, 27, "exclude_low_info"},
+        {SUZUME_TAG_OPTIONS_FIELD_REMOVE_DUPLICATES, 28, "remove_duplicates"}}},
       {"suzume_options_t",
        32,
        suzume_sizeof_options,
        suzume_offsetof_options,
-       {{0, 0, "preserve_vu"},
-        {1, 1, "preserve_case"},
-        {2, 2, "preserve_symbols"},
-        {3, 3, "mode"},
-        {4, 4, "lemmatize"},
-        {5, 5, "merge_compounds"},
-        {6, 6, "skip_bundled_user_dictionary"},
-        {7, 7, "skip_core_dictionary"},
-        {8, 8, "report_scorer_config"},
-        {9, 9, "skip_env_config"},
-        {10, 16, "scorer_options_json"},
-        {11, 24, "data_directory"}}},
+       {{SUZUME_OPTIONS_FIELD_PRESERVE_VU, 0, "preserve_vu"},
+        {SUZUME_OPTIONS_FIELD_PRESERVE_CASE, 1, "preserve_case"},
+        {SUZUME_OPTIONS_FIELD_PRESERVE_SYMBOLS, 2, "preserve_symbols"},
+        {SUZUME_OPTIONS_FIELD_MODE, 3, "mode"},
+        {SUZUME_OPTIONS_FIELD_LEMMATIZE, 4, "lemmatize"},
+        {SUZUME_OPTIONS_FIELD_MERGE_COMPOUNDS, 5, "merge_compounds"},
+        {SUZUME_OPTIONS_FIELD_SKIP_BUNDLED_USER_DICTIONARY, 6, "skip_bundled_user_dictionary"},
+        {SUZUME_OPTIONS_FIELD_SKIP_CORE_DICTIONARY, 7, "skip_core_dictionary"},
+        {SUZUME_OPTIONS_FIELD_REPORT_SCORER_CONFIG, 8, "report_scorer_config"},
+        {SUZUME_OPTIONS_FIELD_SKIP_ENV_CONFIG, 9, "skip_env_config"},
+        {SUZUME_OPTIONS_FIELD_SCORER_OPTIONS_JSON, 16, "scorer_options_json"},
+        {SUZUME_OPTIONS_FIELD_DATA_DIRECTORY, 24, "data_directory"}}},
   };
 }
 
@@ -116,6 +122,11 @@ TEST(SuzumeAbiContractTest, AbiVersionMatchesFrozenLayout) {
       << "suzume_abi_version() must return the header's SUZUME_ABI_VERSION; a consumer compares the two "
       << "to decide whether the library it loaded is safe to call.";
 }
+
+static_assert(std::is_same_v<suzume_mode_t, uint8_t>, "suzume_mode_t must stay one byte");
+static_assert(std::is_same_v<suzume_tag_pos_t, uint8_t>, "suzume_tag_pos_t must stay one byte");
+static_assert(std::is_same_v<decltype(suzume_options_t::mode), suzume_mode_t>);
+static_assert(std::is_same_v<decltype(suzume_tag_options_t::pos_filter), suzume_tag_pos_t>);
 
 TEST(SuzumeAbiContractTest, PublicStructsKeepTheirFrozenByteLayout) {
   if (sizeof(void*) != 8 || sizeof(size_t) != 8) {
