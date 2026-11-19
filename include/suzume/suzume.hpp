@@ -256,7 +256,7 @@ class Tokenizer {
     if (handle_ == nullptr) {
       return 0;
     }
-    return suzume_load_user_dict_count(handle_, tsv.empty() ? "" : tsv.data(), tsv.size());
+    return suzume_load_user_dictionary(handle_, tsv.empty() ? "" : tsv.data(), tsv.size());
   }
 
   /**
@@ -267,7 +267,7 @@ class Tokenizer {
     if (handle_ == nullptr) {
       return false;
     }
-    return suzume_load_binary_dict(handle_, data, size) != 0;
+    return suzume_load_binary_dictionary(handle_, data, size) != 0;
   }
 
   /** @brief Remove caller-loaded dictionaries while retaining the bundled user dictionary. */

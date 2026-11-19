@@ -385,29 +385,31 @@ SUZUME_EXPORT void suzume_tags_free(suzume_tags_t* tags);
  * @param handle Suzume handle
  * @param data Current TSV or legacy 3-column CSV source bytes. TSV rows use
  *             surface<TAB>POS[<TAB>conj_type][<TAB>lemma]. The legacy CSV cost
- *             column is accepted but ignored.
+ *             column is accepted but ignored. May be NULL only when size is 0.
  * @param size Data size in bytes
- * @return 1 on success, 0 on failure
+ * @return Number of installed entries (at least 1), or 0 on failure with
+ *         suzume_last_error() set. SUZUME_ERROR_INVALID_INPUT: a NULL handle,
+ *         NULL data with a non-zero size, or a zero-length source ("Empty
+ *         dictionary data"). SUZUME_ERROR_PARSE: a malformed source, or one with
+ *         no loadable entries ("Dictionary source contains no loadable entries").
  * @note Loads are additive until suzume_clear_user_dictionaries() is called.
+ *       A failed load leaves earlier dictionaries installed.
  */
-SUZUME_EXPORT int suzume_load_user_dict(suzume_t handle, const char* data, size_t size);
+SUZUME_EXPORT size_t suzume_load_user_dictionary(suzume_t handle, const char* data, size_t size);
 
 /**
- * @brief Add user-dictionary entries and return the installed entry count
- * @return Number of installed entries, or 0 on failure. Inspect
- *         suzume_last_error_code() to distinguish failure.
- */
-SUZUME_EXPORT size_t suzume_load_user_dict_count(suzume_t handle, const char* data, size_t size);
-
-/**
- * @brief Load binary dictionary from memory (as user dictionary)
+ * @brief Add a binary user dictionary (.dic format) from memory
  * @param handle Suzume handle
- * @param data Binary dictionary data (.dic format)
+ * @param data Binary dictionary bytes. May be NULL only when size is 0.
  * @param size Data size in bytes
- * @return 1 on success, 0 on failure
- * @note Loads are additive. A failed load preserves all existing dictionaries.
+ * @return Number of installed entries (at least 1), or 0 on failure with
+ *         suzume_last_error() set. SUZUME_ERROR_INVALID_INPUT: a NULL handle,
+ *         or NULL data with a non-zero size. SUZUME_ERROR_DICTIONARY_LOAD_FAILED:
+ *         every other failure, including a zero-length source ("Empty
+ *         dictionary data") and a malformed or zero-entry dictionary.
+ * @note Loads are additive. A failed load leaves earlier dictionaries installed.
  */
-SUZUME_EXPORT int suzume_load_binary_dict(suzume_t handle, const uint8_t* data, size_t size);
+SUZUME_EXPORT size_t suzume_load_binary_dictionary(suzume_t handle, const uint8_t* data, size_t size);
 
 /**
  * @brief Remove user dictionaries explicitly loaded through this handle

@@ -550,13 +550,10 @@ SUZUME_EXPORT void suzume_tags_free(suzume_tags_t* tags) {
   ::operator delete(tags);
 }
 
-SUZUME_EXPORT int suzume_load_user_dict(suzume_t handle, const char* data, size_t size) {
-  return suzume_load_user_dict_count(handle, data, size) > 0 ? 1 : 0;
-}
-
-SUZUME_EXPORT size_t suzume_load_user_dict_count(suzume_t handle, const char* data, size_t size) {
-  if (handle == nullptr || data == nullptr) {
-    setLastError("suzume_load_user_dict_count: null handle or data", SUZUME_ERROR_INVALID_INPUT);
+SUZUME_EXPORT size_t suzume_load_user_dictionary(suzume_t handle, const char* data, size_t size) {
+  // A zero-length source is empty whatever the pointer is; the core reports it.
+  if (handle == nullptr || (data == nullptr && size > 0)) {
+    setLastError("suzume_load_user_dictionary: null handle or data", SUZUME_ERROR_INVALID_INPUT);
     return 0;
   }
 
@@ -572,9 +569,9 @@ SUZUME_EXPORT size_t suzume_load_user_dict_count(suzume_t handle, const char* da
   SUZUME_C_CATCH(return 0)
 }
 
-SUZUME_EXPORT int suzume_load_binary_dict(suzume_t handle, const uint8_t* data, size_t size) {
-  if (handle == nullptr || data == nullptr) {
-    setLastError("suzume_load_binary_dict: null handle or data", SUZUME_ERROR_INVALID_INPUT);
+SUZUME_EXPORT size_t suzume_load_binary_dictionary(suzume_t handle, const uint8_t* data, size_t size) {
+  if (handle == nullptr || (data == nullptr && size > 0)) {
+    setLastError("suzume_load_binary_dictionary: null handle or data", SUZUME_ERROR_INVALID_INPUT);
     return 0;
   }
 
@@ -582,7 +579,7 @@ SUZUME_EXPORT int suzume_load_binary_dict(suzume_t handle, const uint8_t* data, 
   SUZUME_C_TRY {
     auto result = handle->instance.loadBinaryDictionaryResult(data, size);
     if (result.hasValue()) {
-      return 1;
+      return result.value();
     }
     setLastError(result.error());
     return 0;

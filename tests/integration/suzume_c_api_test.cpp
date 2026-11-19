@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 
+#include "dictionary/binary_dict.h"
 #include "suzume/suzume_c.h"
 
 namespace {
@@ -36,12 +37,12 @@ TEST(SuzumeCApiTest, LastErrorClearsAfterSuccess) {
   suzume_destroy(handle);
 }
 
-TEST(SuzumeCApiTest, LoadUserDictReportsParseDetails) {
+TEST(SuzumeCApiTest, LoadUserDictionaryReportsParseDetails) {
   suzume_t handle = suzume_create();
   ASSERT_NE(handle, nullptr);
 
   const char* csv_data = "\"東京,NOUN,0.5\n";
-  EXPECT_EQ(suzume_load_user_dict(handle, csv_data, std::strlen(csv_data)), 0);
+  EXPECT_EQ(suzume_load_user_dictionary(handle, csv_data, std::strlen(csv_data)), 0u);
 
   std::string error = suzume_last_error();
   EXPECT_NE(error.find("Invalid legacy CSV quoting"), std::string::npos);
@@ -50,15 +51,81 @@ TEST(SuzumeCApiTest, LoadUserDictReportsParseDetails) {
   suzume_destroy(handle);
 }
 
-TEST(SuzumeCApiTest, LoadBinaryDictReportsParseDetails) {
+TEST(SuzumeCApiTest, LoadBinaryDictionaryReportsParseDetails) {
   suzume_t handle = suzume_create();
   ASSERT_NE(handle, nullptr);
 
   const uint8_t bad_data[] = {0x00, 0x01, 0x02, 0x03};
-  EXPECT_EQ(suzume_load_binary_dict(handle, bad_data, sizeof(bad_data)), 0);
+  EXPECT_EQ(suzume_load_binary_dictionary(handle, bad_data, sizeof(bad_data)), 0u);
+  EXPECT_EQ(suzume_last_error_code(), SUZUME_ERROR_DICTIONARY_LOAD_FAILED);
 
   std::string error = suzume_last_error();
   EXPECT_NE(error.find("Dictionary file too small"), std::string::npos);
+
+  suzume_destroy(handle);
+}
+
+TEST(SuzumeCApiTest, LoadUserDictionaryReportsEmptyAndNullSources) {
+  suzume_t handle = suzume_create();
+  ASSERT_NE(handle, nullptr);
+
+  EXPECT_EQ(suzume_load_user_dictionary(handle, nullptr, 0), 0u);
+  EXPECT_EQ(suzume_last_error_code(), SUZUME_ERROR_INVALID_INPUT);
+  EXPECT_STREQ(suzume_last_error(), "Empty dictionary data");
+  EXPECT_EQ(suzume_load_user_dictionary(handle, "x", 0), 0u);
+  EXPECT_EQ(suzume_last_error_code(), SUZUME_ERROR_INVALID_INPUT);
+  EXPECT_STREQ(suzume_last_error(), "Empty dictionary data");
+
+  const std::string comment_only = "# comment\n";
+  EXPECT_EQ(suzume_load_user_dictionary(handle, comment_only.data(), comment_only.size()), 0u);
+  EXPECT_EQ(suzume_last_error_code(), SUZUME_ERROR_PARSE);
+  EXPECT_STREQ(suzume_last_error(), "Dictionary source contains no loadable entries");
+
+  EXPECT_EQ(suzume_load_user_dictionary(handle, nullptr, 5), 0u);
+  EXPECT_EQ(suzume_last_error_code(), SUZUME_ERROR_INVALID_INPUT);
+  EXPECT_NE(std::string(suzume_last_error()).find("null handle or data"), std::string::npos);
+  EXPECT_EQ(suzume_load_user_dictionary(nullptr, nullptr, 0), 0u);
+  EXPECT_EQ(suzume_last_error_code(), SUZUME_ERROR_INVALID_INPUT);
+  EXPECT_NE(std::string(suzume_last_error()).find("null handle or data"), std::string::npos);
+
+  suzume_destroy(handle);
+}
+
+TEST(SuzumeCApiTest, LoadBinaryDictionaryReturnsCountAndReportsFailures) {
+  suzume::dictionary::BinaryDictWriter writer;
+  suzume::dictionary::DictionaryEntry entry;
+  entry.surface = "検査語";
+  entry.lemma = "検査語";
+  entry.pos = suzume::core::PartOfSpeech::Noun;
+  writer.addEntry(entry);
+  auto built = writer.build();
+  ASSERT_TRUE(built.hasValue());
+  std::vector<uint8_t> bytes = built.value();
+
+  suzume_t handle = suzume_create();
+  ASSERT_NE(handle, nullptr);
+  EXPECT_EQ(suzume_load_binary_dictionary(handle, bytes.data(), bytes.size()), 1u) << suzume_last_error();
+  EXPECT_EQ(suzume_last_error_code(), SUZUME_ERROR_SUCCESS);
+
+  EXPECT_EQ(suzume_load_binary_dictionary(handle, nullptr, 0), 0u);
+  EXPECT_EQ(suzume_last_error_code(), SUZUME_ERROR_DICTIONARY_LOAD_FAILED);
+  EXPECT_STREQ(suzume_last_error(), "Empty dictionary data");
+  EXPECT_EQ(suzume_load_binary_dictionary(handle, bytes.data(), 0), 0u);
+  EXPECT_EQ(suzume_last_error_code(), SUZUME_ERROR_DICTIONARY_LOAD_FAILED);
+  EXPECT_STREQ(suzume_last_error(), "Empty dictionary data");
+
+  // A zero-entry dictionary cannot be written, so it is a malformed header.
+  std::vector<uint8_t> zero_entries = bytes;
+  const uint32_t zero = 0;
+  std::memcpy(zero_entries.data() + offsetof(suzume::dictionary::BinaryDictHeader, entry_count), &zero, sizeof(zero));
+  EXPECT_EQ(suzume_load_binary_dictionary(handle, zero_entries.data(), zero_entries.size()), 0u);
+  EXPECT_EQ(suzume_last_error_code(), SUZUME_ERROR_DICTIONARY_LOAD_FAILED);
+  EXPECT_STREQ(suzume_last_error(), "Invalid dictionary header");
+
+  EXPECT_EQ(suzume_load_binary_dictionary(handle, nullptr, 5), 0u);
+  EXPECT_EQ(suzume_last_error_code(), SUZUME_ERROR_INVALID_INPUT);
+  EXPECT_EQ(suzume_load_binary_dictionary(nullptr, bytes.data(), bytes.size()), 0u);
+  EXPECT_EQ(suzume_last_error_code(), SUZUME_ERROR_INVALID_INPUT);
 
   suzume_destroy(handle);
 }
@@ -454,7 +521,7 @@ TEST(SuzumeCApiTest, UserDictionariesCanBeCleared) {
   suzume_t handle = suzume_create_with_options(&options);
   ASSERT_NE(handle, nullptr);
   const std::string dictionary = "検査語\tNOUN\n";
-  ASSERT_EQ(suzume_load_user_dict(handle, dictionary.data(), dictionary.size()), 1);
+  ASSERT_GT(suzume_load_user_dictionary(handle, dictionary.data(), dictionary.size()), 0u);
   ASSERT_EQ(suzume_clear_user_dictionaries(handle), 1);
   EXPECT_EQ(suzume_last_error_code(), SUZUME_ERROR_SUCCESS);
   EXPECT_EQ(suzume_clear_user_dictionaries(nullptr), 0);
@@ -467,7 +534,7 @@ TEST(SuzumeCApiTest, ClearUserDictionariesRetainsBundledDictionary) {
   ASSERT_NE(handle, nullptr);
 
   const std::string runtime_dictionary = "検査語\tNOUN\n";
-  ASSERT_EQ(suzume_load_user_dict(handle, runtime_dictionary.data(), runtime_dictionary.size()), 1);
+  ASSERT_GT(suzume_load_user_dictionary(handle, runtime_dictionary.data(), runtime_dictionary.size()), 0u);
   ASSERT_EQ(suzume_clear_user_dictionaries(handle), 1);
 
   suzume_result_t* runtime_result = suzume_analyze(handle, "検査語");
@@ -495,7 +562,7 @@ TEST(SuzumeCApiTest, UserDictionaryCountAndCorePresenceAreExposed) {
   ASSERT_NE(handle, nullptr);
 
   const std::string dictionary = "検査する\tVERB\tSURU\n";
-  EXPECT_GT(suzume_load_user_dict_count(handle, dictionary.data(), dictionary.size()), 1u);
+  EXPECT_GT(suzume_load_user_dictionary(handle, dictionary.data(), dictionary.size()), 1u);
   EXPECT_EQ(suzume_has_core_dictionary(handle), 0);
   EXPECT_EQ(suzume_last_error_code(), SUZUME_ERROR_SUCCESS);
   EXPECT_EQ(suzume_has_core_dictionary(nullptr), 0);
@@ -513,7 +580,7 @@ TEST(SuzumeCApiTest, SkippedSourceRecordsReachTheDictionaryWarningChannel) {
   ASSERT_NE(handle, nullptr);
 
   const std::string dictionary = "missing-pos\n検査語\tNOUN\n";
-  EXPECT_EQ(suzume_load_user_dict_count(handle, dictionary.data(), dictionary.size()), 1u);
+  EXPECT_EQ(suzume_load_user_dictionary(handle, dictionary.data(), dictionary.size()), 1u);
   ASSERT_EQ(suzume_dictionary_warning_count(handle), 1u);
   ASSERT_NE(suzume_dictionary_warning(handle, 0), nullptr);
   EXPECT_NE(std::string(suzume_dictionary_warning(handle, 0)).find("line 1"), std::string::npos);
@@ -641,7 +708,7 @@ TEST(SuzumeCApiTest, ReadAccessorsPreserveExistingErrorDiagnostics) {
   suzume_t handle = suzume_create();
   ASSERT_NE(handle, nullptr);
   const std::string dictionary = "missing-pos\n検査語\tNOUN\n";
-  ASSERT_EQ(suzume_load_user_dict_count(handle, dictionary.data(), dictionary.size()), 1u);
+  ASSERT_EQ(suzume_load_user_dictionary(handle, dictionary.data(), dictionary.size()), 1u);
   ASSERT_GT(suzume_dictionary_warning_count(handle), 0u);
 
   const char invalid_utf8[] = {static_cast<char>(0xE3), static_cast<char>(0x81)};
