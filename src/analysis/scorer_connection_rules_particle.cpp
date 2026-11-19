@@ -221,8 +221,10 @@ float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::
     // Penalty for DET → non-dict single-kanji NOUN
     // The DET→NOUN bigram bonus (-2.5) is too strong for unknown single-kanji tokens,
     // causing splits like こんな+伸+びる instead of こんな+伸びる
-    // Valid DET+NOUN patterns (こんな+事, あんな+人) use dict nouns or multi-char nouns
-    if (grammar::isSingleKanjiSurface(next.surface)) {
+    // Valid DET+NOUN patterns (こんな+事, あんな+人) use dict nouns or multi-char nouns.
+    // A determiner spelled with kanji has no kana fragment to lend the next
+    // word (何らかの+形), so the guard is for the kana ones only.
+    if (grammar::isSingleKanjiSurface(next.surface) && !grammar::containsKanji(prev.surface)) {
       SUZUME_CONNECTION_ADD(bonus, cost::kStrong);
     }
 
