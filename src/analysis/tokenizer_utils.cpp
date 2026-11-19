@@ -546,7 +546,8 @@ bool spellsRiMimeticShape(const std::vector<char32_t>& codepoints, size_t start_
     return false;
   }
   const size_t length = end_pos - start_pos;
-  return length == kShortLength || (length == kGeminateLength && kana::isSmallKanaCodepoint(codepoints[start_pos + 1]));
+  return length == kShortLength ||
+         (length == kGeminateLength && codepoints[start_pos + 1] == core::hiragana::kSmallTsu);
 }
 
 bool particleMoraLacksHost(const std::vector<char32_t>& codepoints, size_t start_pos) {

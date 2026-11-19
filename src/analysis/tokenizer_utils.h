@@ -122,7 +122,9 @@ bool particleMoraLacksHost(const std::vector<char32_t>& codepoints, size_t start
 
 /**
  * Whether [start_pos, end_pos) has the shape of an AB+り or Aっ+B+り manner
- * mimetic (どさり, うっとり). Shape only: callers add their own lexical guards.
+ * mimetic (どさり, うっとり). The geminate slot is the sokuon only: a yoon digraph
+ * is one mora (しゃべり is AB+り, not Aっ+B+り). Shape only: callers add their own
+ * lexical guards.
  */
 bool spellsRiMimeticShape(const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos);
 
