@@ -52,9 +52,9 @@ constexpr ErrorCode errorCodeFromNative(int code) noexcept {
  * @brief A failed call.
  *
  * `message` is the native text unchanged, or exactly "<operation> failed" when
- * the library supplied none. `operation` is one of: create, analyze,
- * generate_tags, load_user_dictionary, load_binary_dictionary,
- * clear_user_dictionaries, mode.
+ * the library supplied none. `operation` names the failing call; the operations
+ * this wrapper can report are create, analyze, generate_tags,
+ * load_user_dictionary, load_binary_dictionary, clear_user_dictionaries and mode.
  */
 struct Error {
   ErrorCode code = ErrorCode::Success;
@@ -256,8 +256,8 @@ inline Error released(const char* operation) {
  * Move-only. A handle is not thread-safe for concurrent analysis; use one
  * Tokenizer per thread or serialize calls that share one. A moved-from
  * Tokenizer returns Error{InvalidInput, "Suzume instance has been released"}
- * from every Expected member, and its noexcept getters return Mode::Normal,
- * false and an empty list.
+ * from every Expected member; mode() returns Mode::Normal, hasCoreDictionary()
+ * returns false and dictionaryWarnings() returns an empty list.
  */
 class Tokenizer {
  public:

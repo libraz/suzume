@@ -245,7 +245,7 @@ typedef struct {
   uint8_t preserve_case;    /**< Preserve case (don't lowercase ASCII) */
   uint8_t preserve_symbols; /**< Preserve punctuation-like SYMBOL tokens (emoji remain OTHER) */
   suzume_mode_t mode;       /**< 0=normal, 1=search, 2=split */
-  uint8_t lemmatize;        /**< Replace source lemmas with corrected lemmas; annotations are always computed */
+  uint8_t lemmatize;        /**< Replace source base forms with corrected base forms; annotations are always computed */
   uint8_t merge_compounds;  /**< Merge consecutive noun compounds */
   uint8_t skip_bundled_user_dictionary; /**< Skip automatic loading of the bundled user dictionary only */
   uint8_t skip_core_dictionary;         /**< Skip automatic loading of the bundled core dictionary */
@@ -382,7 +382,7 @@ SUZUME_EXPORT suzume_tags_t* suzume_generate_tags_n(suzume_t handle, const char*
  */
 typedef struct {
   suzume_tag_pos_t pos_filter;  /**< Bitwise SUZUME_TAG_POS_* values; 0 includes all filterable POS */
-  uint8_t exclude_basic;        /**< Exclude basic words (hiragana-only lemma) */
+  uint8_t exclude_basic;        /**< Exclude basic words (hiragana-only base form) */
   uint8_t use_base_form;        /**< Use the base form instead of the surface (default: 1) */
   size_t min_length;            /**< Minimum tag length in characters (default: 2) */
   size_t max_tags;              /**< Maximum number of tags (0=unlimited) */
