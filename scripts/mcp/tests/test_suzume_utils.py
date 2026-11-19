@@ -989,3 +989,27 @@ class TestConjunctiveNodeAfterNominal:
     def test_keeps_the_conjunctive_after_a_predicate(self, text, particle):
         tokens, _, _ = get_expected_tokens(text)
         assert tokens[-1]["surface"] == particle
+
+
+class TestNegationPrefixedStemBeforeCopula:
+    """A negation prefix plus two kanji that is a na-adjective stem before な keeps that class before the copula.
+
+    An unprefixed dual-class stem before the copula stays on the noun convention.
+    """
+
+    @pytest.mark.parametrize(
+        "text", ["非常識だ", "未完成だ", "未完成です", "不完全だ", "不安定だ", "非常識な", "未完成な", "健康だ"]
+    )
+    def test_reads_the_stem_as_na_adjective(self, text):
+        tokens, _, _ = get_expected_tokens(text)
+        assert tokens[0]["pos"] == "Adjective"
+
+    @pytest.mark.parametrize("text", ["最悪だ", "平気だ", "本当です"])
+    def test_leaves_unprefixed_dual_class_stems_on_the_noun_convention(self, text):
+        tokens, _, _ = get_expected_tokens(text)
+        assert tokens[0]["pos"] == "Noun"
+
+    @pytest.mark.parametrize("text", ["未完成の作品", "非常識の", "完成だ", "未経験者だ"])
+    def test_leaves_nominal_uses(self, text):
+        tokens, _, _ = get_expected_tokens(text)
+        assert tokens[0]["pos"] == "Noun"

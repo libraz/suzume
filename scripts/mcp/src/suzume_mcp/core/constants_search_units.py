@@ -222,6 +222,9 @@ FIXED_LEADING_SEARCH_UNITS: dict[str, str] = {
 # one, so an ordinary noun after it starts a new word: 今紙, 今水, 今大会.
 TEMPORAL_PREFIX_KANJI: frozenset[str] = frozenset({"今", "来", "先", "昨", "翌", "毎"})
 
+# Mirrors kNegationPrefixKanji in src/analysis/scorer_constants.h.
+NEGATION_PREFIX_KANJI: frozenset[str] = frozenset({"非", "不", "無", "未"})
+
 
 TEMPORAL_COMPOUND_UNITS: frozenset[str] = frozenset(
     {

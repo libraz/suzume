@@ -28,7 +28,7 @@ from .constants import (
     VERB_NOT_AUX_LEMMAS,
     is_all_kanji,
 )
-from .mecab import is_na_adjective_stem, is_single_token_of_pos, mecab_analyze
+from .mecab import is_na_adjective_stem, is_negation_prefixed_stem_before_copula, is_single_token_of_pos, mecab_analyze
 
 # The word classes a terminal predicate belongs to, in the two tag vocabularies a
 # token may still be carrying at this point in the pipeline.
@@ -339,6 +339,15 @@ def correct_mecab_pos(tokens: list[dict]) -> None:
             and is_na_adjective_stem(surface)
         ):
             t["pos"] = "名詞"
+            t["pos_sub1"] = "形容動詞語幹"
+
+        # A negation-prefixed run comes back as a plain noun before the copula
+        # (非常識だ) but as a na-adjective stem before な.
+        if (
+            pos == "名詞"
+            and t.get("pos_sub1") == "一般"
+            and is_negation_prefixed_stem_before_copula(surface, tokens, idx)
+        ):
             t["pos_sub1"] = "形容動詞語幹"
 
         # Before the negative, the reference reads the te of a dropped-い

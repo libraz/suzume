@@ -3,7 +3,7 @@
 import regex
 
 from .constants import FAMILY_TERMS, TEMPORAL_COMPOUND_UNITS, TEMPORAL_PREFIX_KANJI
-from .mecab import mecab_analyze, reads_as_counter
+from .mecab import is_negation_prefixed_stem_before_copula, mecab_analyze, reads_as_counter
 from .merge_rules_helpers import _covered_length, _kanji_noun_run
 from .merge_rules_state import MergeState
 
@@ -768,7 +768,12 @@ def _merge_numbered_and_prefixed_nouns(state: MergeState) -> bool:
                     and nxt.get("surface", "")[:1] not in TEMPORAL_COMPOUND_UNITS
                 )
                 if not temporal_break and regex.match(r"^[\p{Han}]+$", combined):
-                    result.append({"surface": combined, "pos": "名詞", "lemma": combined})
+                    # The reference spells a negation-prefixed run as one na-adjective
+                    # stem only before な (未完成な); the class holds before the copula too.
+                    merged_noun = {"surface": combined, "pos": "名詞", "lemma": combined}
+                    if is_negation_prefixed_stem_before_copula(combined, tokens, noun_end - 1):
+                        merged_noun["pos_sub1"] = "形容動詞語幹"
+                    result.append(merged_noun)
                     i = noun_end
                     merged = True
                     if applied_rule is None:

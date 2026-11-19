@@ -3,6 +3,10 @@
 import functools
 import subprocess
 
+import regex
+
+from .constants import NEGATION_PREFIX_KANJI
+
 _MECAB_TIMEOUT_SECONDS = 30.0
 
 # Raised, and reported by the normalize subprocess, when no mecab is on PATH.
@@ -60,6 +64,24 @@ def is_na_adjective_stem(surface: str) -> bool:
     """
     probe = mecab_analyze(surface + "な")
     return bool(probe) and probe[0].get("surface") == surface and probe[0].get("pos_sub1") == "形容動詞語幹"
+
+
+def is_negation_prefixed_stem_before_copula(surface: str, tokens: list[dict], end: int) -> bool:
+    """Whether a negation prefix plus two kanji, followed by the copula, is a na-adjective stem.
+
+    The reference returns the stem before な but a plain or merged noun before
+    だ/です (非常識だ, 未+完成だ); the prefix makes the run a derived predicate
+    nominal whatever follows. An unprefixed dual-class stem (最悪だ, 平気だ) stays
+    on the noun convention, since nothing in its form decides it.
+    """
+    following = tokens[end + 1] if end + 1 < len(tokens) else {}
+    return (
+        following.get("pos") == "助動詞"
+        and following.get("lemma") in ("だ", "です")
+        and surface[:1] in NEGATION_PREFIX_KANJI
+        and regex.fullmatch(r"\p{Han}{3}", surface) is not None
+        and is_na_adjective_stem(surface)
+    )
 
 
 def reads_as_counter(kanji: str, suffix_only: bool = False) -> bool:
