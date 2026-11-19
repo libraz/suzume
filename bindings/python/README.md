@@ -78,6 +78,8 @@ Calls on one `Suzume` instance are serialized, so it can safely be shared
 between Python threads. Create one instance per worker when native analysis
 should run in parallel.
 
+## Command line
+
 Installing the wheel also provides the `suzume` command:
 
 ```bash

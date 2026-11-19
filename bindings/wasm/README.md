@@ -83,7 +83,7 @@ import { ErrorCode, SuzumeError } from '@libraz/suzume'
 try {
   const installed = suzume.loadUserDictionary(tsv)
 } catch (error) {
-  if (error instanceof SuzumeError && error.code === ErrorCode.InvalidInput) {
+  if (error instanceof SuzumeError && error.code === ErrorCode.Parse) {
     // error.message comes from the library
   }
 }

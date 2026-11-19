@@ -12,12 +12,12 @@
 **Suzume is a lightweight Japanese tokenizer for browsers and native apps.** It
 is not a full morphological analyzer like MeCab: its primary goal is to split
 text into useful units for search, display, and application code. Unlike a
-boundary-only tokenizer, it also returns part-of-speech tags and lemmas.
+boundary-only tokenizer, it also returns part-of-speech tags and base forms.
 
 **Reach for it when you need to:**
 
 - **Tokenize Japanese anywhere** — use the same tokenizer in a browser, serverless function, Python process, Go service, or C/C++ application.
-- **Extract search terms** — generate keyword tags with POS filtering, lemmas, and duplicate removal.
+- **Extract search terms** — generate keyword tags with POS filtering, base forms, and duplicate removal.
 - **Add your vocabulary** — load application-specific words through a user dictionary.
 
 📖 **[Documentation](https://suzume.libraz.net)** &nbsp;·&nbsp; 🧪 **[Live Demo](https://suzume.libraz.net/#demo)** &nbsp;·&nbsp; **[Getting Started](https://suzume.libraz.net/docs/getting-started)**
@@ -35,7 +35,7 @@ MeCab:  経済 / 成長  3 / 人
 Suzume: 経済成長     3人
 ```
 
-Suzume still provides POS tagging and lemmatization, so applications can
+Suzume still provides POS tags and base forms, so applications can
 normalize inflected verbs and adjectives without adopting MeCab-style output.
 The outputs are intentionally different rather than drop-in compatible. See
 [Differences from MeCab](https://suzume.libraz.net/docs/mecab-comparison) for
@@ -99,7 +99,11 @@ if err != nil {
 }
 defer s.Close()
 
-morphemes := s.Analyze("すもももももももものうち")
+morphemes, err := s.Analyze("すもももももももものうち")
+if err != nil {
+	log.Fatal(err)
+}
+fmt.Println(morphemes)
 ```
 
 The same Python package provides a command-line interface:

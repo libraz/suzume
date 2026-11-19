@@ -80,7 +80,11 @@ if err != nil {
 }
 defer s.Close()
 
-morphemes := s.Analyze("すもももももももものうち")
+morphemes, err := s.Analyze("すもももももももものうち")
+if err != nil {
+	log.Fatal(err)
+}
+fmt.Println(morphemes)
 ```
 
 同じPythonパッケージからコマンドラインでも実行できます。
