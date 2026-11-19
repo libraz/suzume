@@ -23,15 +23,17 @@ static constexpr uint8_t kTagPosAuxiliary = 1 << 5;  // NOLINT(readability-magic
  */
 struct TagGeneratorOptions {
   bool use_lemma = true;             // Use lemma instead of surface
-  bool exclude_particles = true;     // Exclude particles
-  bool exclude_auxiliaries = true;   // Exclude auxiliary verbs
+  bool exclude_particles = true;     // Exclude particles unless pos_filter names them
+  bool exclude_auxiliaries = true;   // Exclude auxiliary verbs unless pos_filter names them
   bool exclude_formal_nouns = true;  // Exclude formal nouns
   bool exclude_low_info = true;      // Exclude low info words
   bool remove_duplicates = true;     // Remove duplicate tags
   size_t min_tag_length = 2;         // Minimum tag length (characters)
   size_t max_tags = 0;               // Maximum number of tags (0 = unlimited)
 
-  // POS filter (if any bit is set, only include matching filterable POS)
+  // POS filter (if any bit is set, only include matching filterable POS). Naming kTagPosParticle or
+  // kTagPosAuxiliary admits that POS even when exclude_particles / exclude_auxiliaries is set; the formal-noun,
+  // low-info, exclude_basic and min_tag_length checks still apply.
   uint8_t pos_filter = 0;      // 0 = include all filterable POS
   bool exclude_basic = false;  // Exclude basic words (hiragana-only lemma)
 };

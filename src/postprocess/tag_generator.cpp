@@ -11,12 +11,14 @@ namespace suzume::postprocess {
 TagGenerator::TagGenerator(const TagGeneratorOptions& options) : options_(options) {}
 
 bool TagGenerator::shouldInclude(const core::Morpheme& morpheme) const {
-  // Exclude by POS
-  if (options_.exclude_particles && morpheme.pos == core::PartOfSpeech::Particle) {
+  // Exclude by POS; a POS named in a non-zero pos_filter overrides these exclusions.
+  if (options_.exclude_particles && morpheme.pos == core::PartOfSpeech::Particle &&
+      (options_.pos_filter & kTagPosParticle) == 0) {  // NOLINT(hicpp-signed-bitwise): bit flag operation
     return false;
   }
 
-  if (options_.exclude_auxiliaries && morpheme.pos == core::PartOfSpeech::Auxiliary) {
+  if (options_.exclude_auxiliaries && morpheme.pos == core::PartOfSpeech::Auxiliary &&
+      (options_.pos_filter & kTagPosAuxiliary) == 0) {  // NOLINT(hicpp-signed-bitwise): bit flag operation
     return false;
   }
 
@@ -31,8 +33,7 @@ bool TagGenerator::shouldInclude(const core::Morpheme& morpheme) const {
   }
 
   // POS filter (whitelist); categories without a bit (conjunctions, symbols, ...) are excluded.
-  // Zero means every filterable content-word category, plus particles/auxiliaries only when their explicit include
-  // flags allow it.
+  // Zero means every filterable category; particles/auxiliaries then still depend on their exclude flags.
   uint8_t pos_bit = 0;
   switch (morpheme.pos) {
     case core::PartOfSpeech::Noun:
