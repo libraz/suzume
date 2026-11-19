@@ -1422,6 +1422,50 @@
       ],
       "id": "koresuki",
       "input": "これすき"
+    },
+    {
+      "description": "A manner pro-form question closed by the quotative at the clause end",
+      "expected": [
+        {
+          "lemma": "そう",
+          "pos": "Adverb",
+          "surface": "そう"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        }
+      ],
+      "id": "soukattte",
+      "input": "そうかって"
+    },
+    {
+      "description": "A manner pro-form question closed by the quotative before punctuation",
+      "expected": [
+        {
+          "lemma": "こう",
+          "pos": "Adverb",
+          "surface": "こう"
+        },
+        {
+          "lemma": "か",
+          "pos": "Particle",
+          "surface": "か"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        }
+      ],
+      "id": "koukattte",
+      "input": "こうかって。"
     }
   ],
   "description": "Basic tokenization tests",

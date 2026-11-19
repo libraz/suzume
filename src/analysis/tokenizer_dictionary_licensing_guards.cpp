@@ -438,6 +438,19 @@ bool lacksLicensingEnvironment(const DictionaryCandidateContext& ctx, const core
     }
   }
 
+  // A manner pro-form closing as a question takes the quotative at a clause
+  // end (そう+か+って). The one-mora かっ cell of a listed verb there would
+  // be a bare te-form request on the pro-form; a continuing te-form keeps it
+  // (そう+かっ+て+くる).
+  if (result.entry->pos == core::PartOfSpeech::Verb && result.entry->extended_pos == core::ExtendedPOS::VerbOnbinkei &&
+      end_pos == start_pos + 2 && end_pos + 1 <= codepoints.size() && codepoints[start_pos] == core::hiragana::kKa &&
+      codepoints[start_pos + 1] == core::hiragana::kSmallTsu && codepoints[end_pos] == core::hiragana::kTe &&
+      (end_pos + 1 == codepoints.size() ||
+       normalize::classifyChar(codepoints[end_pos + 1]) == normalize::CharType::Symbol) &&
+      hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::AdverbQuotative)) {
+    return true;
+  }
+
   // A 終助詞 closes its clause, so the nominalizer cannot follow it. The な in
   // そう+な+ん+です is the copula's attributive form instead; the indefinite
   // stack the bigram favors (いくつ+か+の) uses the の spelling and is untouched.

@@ -1681,6 +1681,33 @@
       ],
       "id": "eettte_eta",
       "input": "彼女ええって答えた"
+    },
+    {
+      "description": "A continuing te-form after a pro-form keeps the verb",
+      "expected": [
+        {
+          "lemma": "そう",
+          "pos": "Adverb",
+          "surface": "そう"
+        },
+        {
+          "lemma": "かう",
+          "pos": "Verb",
+          "surface": "かっ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "くる",
+          "pos": "Auxiliary",
+          "surface": "くる"
+        }
+      ],
+      "id": "soukatttekuru",
+      "input": "そうかってくる"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 12/12)",
