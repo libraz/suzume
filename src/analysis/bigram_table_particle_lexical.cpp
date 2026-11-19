@@ -379,6 +379,10 @@ bool setParticleAndLexicalCosts(BigramMatrix& table) {
 
       // VerbShuushikei → AuxDesireTai (食べる+たい) - prohibitive
       {EPOS::VerbShuushikei, EPOS::AuxDesireTai, cost::kAlmostNever},
+      // The desiderative selects the continuative, never the irrealis (せ+ん+たく)
+      {EPOS::VerbMizenkei, EPOS::AuxDesireTai, cost::kAlmostNever},
+      // The literary negative selects a verb irrealis; a na-adjective stem has none
+      {EPOS::AdjNaAdj, EPOS::AuxNegativeNu, cost::kAlmostNever},
 
       // The desiderative selects a verb continuative — a nominal has no event
       // for it to want. Only a deverbal noun ever reaches the position, because
