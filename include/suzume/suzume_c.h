@@ -483,6 +483,13 @@ SUZUME_EXPORT const char* suzume_conjugation_form_label(suzume_conjugation_form_
 SUZUME_EXPORT const char* suzume_pos_label(suzume_pos_t code);
 
 /**
+ * @brief Get the Japanese label for a serialized POS code
+ * @return Static string, never NULL: "その他" for SUZUME_POS_UNKNOWN,
+ *         SUZUME_POS_OTHER and any code outside the enum
+ */
+SUZUME_EXPORT const char* suzume_pos_label_ja(suzume_pos_t code);
+
+/**
  * @brief Get number of dictionary warnings from auto-loading dictionaries
  * @param handle Suzume handle
  * @return Warning count, or 0 for an invalid handle (see suzume_last_error)

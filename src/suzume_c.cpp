@@ -660,6 +660,13 @@ SUZUME_EXPORT const char* suzume_pos_label(suzume_pos_t code) {
   return suzume::core::posToString(static_cast<suzume::core::PartOfSpeech>(code)).data();
 }
 
+SUZUME_EXPORT const char* suzume_pos_label_ja(suzume_pos_t code) {
+  if (code >= static_cast<suzume_pos_t>(suzume::core::PartOfSpeech::Count_)) {
+    code = SUZUME_POS_OTHER;
+  }
+  return suzume::core::posToJapanese(static_cast<suzume::core::PartOfSpeech>(code)).data();
+}
+
 SUZUME_EXPORT size_t suzume_dictionary_warning_count(suzume_t handle) {
   if (handle == nullptr) {
     setLastError("null handle", SUZUME_ERROR_INVALID_INPUT);

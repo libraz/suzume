@@ -13,7 +13,6 @@
 #ifndef SUZUME_SUZUME_HPP_
 #define SUZUME_SUZUME_HPP_
 
-#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -306,16 +305,7 @@ class Tokenizer {
   static std::string cstr(const char* str) { return str != nullptr ? std::string(str) : std::string(); }
 
   static std::string posLabel(std::uint8_t code, bool japanese) {
-    static constexpr std::array<const char*, 15> japanese_labels = {"その他", "名詞",   "動詞",   "形容詞", "副詞",
-                                                                    "助詞",   "助動詞", "接続詞", "連体詞", "代名詞",
-                                                                    "接頭辞", "接尾辞", "感動詞", "記号",   "その他"};
-    if (!japanese) {
-      return cstr(suzume_pos_label(code));
-    }
-    if (code >= japanese_labels.size()) {
-      code = 0;
-    }
-    return japanese_labels[code];
+    return cstr(japanese ? suzume_pos_label_ja(code) : suzume_pos_label(code));
   }
 
   static std::string extendedPosLabel(std::uint8_t code) {

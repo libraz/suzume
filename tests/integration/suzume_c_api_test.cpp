@@ -420,6 +420,13 @@ TEST(SuzumeCApiTest, CanonicalLabelFunctionsCoverSerializedBoundaries) {
   EXPECT_STREQ(suzume_pos_label(15), "OTHER");
   EXPECT_STREQ(suzume_pos_label(255), "OTHER");
 
+  EXPECT_STREQ(suzume_pos_label_ja(0), "その他");
+  EXPECT_STREQ(suzume_pos_label_ja(SUZUME_POS_NOUN), "名詞");
+  EXPECT_STREQ(suzume_pos_label_ja(SUZUME_POS_SYMBOL), "記号");
+  EXPECT_STREQ(suzume_pos_label_ja(SUZUME_POS_OTHER), "その他");
+  EXPECT_STREQ(suzume_pos_label_ja(15), "その他");
+  EXPECT_STREQ(suzume_pos_label_ja(255), "その他");
+
   EXPECT_STREQ(suzume_extended_pos_label(0), "UNKNOWN");
   EXPECT_STREQ(suzume_extended_pos_label(83), "VERB_仮定縮約");
   EXPECT_STREQ(suzume_extended_pos_label(84), "PART_接続終止");

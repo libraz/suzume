@@ -37,6 +37,8 @@ TEST(SuzumeHppTest, AnalyzeReturnsMorphemesForJapaneseText) {
   EXPECT_EQ(morphemes.front().surface, "本");
   EXPECT_FALSE(morphemes.front().pos.empty());
   EXPECT_FALSE(morphemes.front().base_form.empty());
+  EXPECT_EQ(morphemes.front().pos, "NOUN");
+  EXPECT_EQ(morphemes.front().pos_ja, "名詞");
 }
 
 TEST(SuzumeHppTest, RuntimeModeSwitchChangesAnalysisWithoutRecreatingTokenizer) {
