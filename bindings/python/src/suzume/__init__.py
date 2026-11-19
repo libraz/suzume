@@ -15,14 +15,17 @@ from __future__ import annotations
 import ctypes
 import functools
 import json
+import math
 import os
 import threading
+import weakref
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
+from decimal import Decimal
 from enum import Enum, IntEnum
 from pathlib import Path
 from types import TracebackType
-from typing import Concatenate, ParamSpec, TypeVar
+from typing import Concatenate, Literal, ParamSpec, TypeVar
 
 from ._ffi import (
     SuzumeExtendedOptions,
@@ -48,6 +51,7 @@ __all__ = [
     "Mode",
     "SuzumeError",
     "ErrorCode",
+    "Operation",
     "version",
 ]
 
@@ -75,14 +79,135 @@ _POS_FILTER_BITS = {
     "auxiliary": 32,
 }
 _POS_FILTER_ALL = sum(_POS_FILTER_BITS.values())
-_SIZE_MAX = 2 ** (8 * ctypes.sizeof(ctypes.c_size_t)) - 1
+_SIZE_OPTION_MAX = 0xFFFFFFFF
+_SAFE_INTEGER_MAX = 2**53
+_RELEASED_MESSAGE = "Suzume instance has been released"
+
+Operation = Literal[
+    "create",
+    "analyze",
+    "generate_tags",
+    "load_user_dictionary",
+    "load_binary_dictionary",
+    "clear_user_dictionaries",
+    "mode",
+    "version",
+    "dictionary_warnings",
+    "has_core_dictionary",
+    "wasm_memory_bytes",
+]
+"""The call that raised a :class:`SuzumeError`; shared with the other bindings."""
+
+_JSON_ESCAPES = {
+    '"': '\\"',
+    "\\": "\\\\",
+    "\b": "\\b",
+    "\t": "\\t",
+    "\n": "\\n",
+    "\f": "\\f",
+    "\r": "\\r",
+}
 
 
-def _size_option(name: str, value: int) -> int:
-    """Return ``value`` if it fits the native ``size_t`` field ``name``."""
-    if not 0 <= value <= _SIZE_MAX:
-        raise ValueError(f"{name} must be between 0 and {_SIZE_MAX}")
-    return value
+def _render_string(value: str) -> str:
+    """Quote ``value`` the way ECMAScript ``JSON.stringify`` does (ES2019)."""
+    out = []
+    for char in value:
+        code = ord(char)
+        if char in _JSON_ESCAPES:
+            out.append(_JSON_ESCAPES[char])
+        elif code < 0x20 or 0xD800 <= code <= 0xDFFF:
+            out.append(f"\\u{code:04x}")
+        else:
+            out.append(char)
+    return '"' + "".join(out) + '"'
+
+
+def _render_number(value: float) -> str:
+    """Format a finite non-integral float as ECMAScript ``Number::toString`` would."""
+    sign = "-" if value < 0 else ""
+    digits_tuple, exponent = Decimal(repr(abs(value))).normalize().as_tuple()[1:]
+    digits = "".join(str(digit) for digit in digits_tuple)
+    count = len(digits)
+    point = count + int(exponent)
+    if count <= point <= 21:
+        body = digits + "0" * (point - count)
+    elif 0 < point <= 21:
+        body = digits[:point] + "." + digits[point:]
+    elif -6 < point <= 0:
+        body = "0." + "0" * (-point) + digits
+    else:
+        shown = point - 1
+        mantissa = digits if count == 1 else digits[0] + "." + digits[1:]
+        body = f"{mantissa}e{'+' if shown >= 0 else '-'}{abs(shown)}"
+    return sign + body
+
+
+def _render_value(value: object) -> str:
+    """Render a rejected value identically to the other bindings."""
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if value is None:
+        return "null"
+    if isinstance(value, str):
+        return _render_string(value)
+    if isinstance(value, int):
+        if abs(value) <= _SAFE_INTEGER_MAX:
+            return str(value)
+        return _render_value(float(value))
+    if isinstance(value, float):
+        if math.isnan(value):
+            return "NaN"
+        if math.isinf(value):
+            return "Infinity" if value > 0 else "-Infinity"
+        if value.is_integer() and abs(value) <= _SAFE_INTEGER_MAX:
+            return str(int(value))
+        return _render_number(value)
+    if isinstance(value, (list, tuple)):
+        return "array"
+    if isinstance(value, dict):
+        return "object"
+    return "value"
+
+
+def _size_option(name: str, value: object) -> int:
+    """Return ``value`` as the native 32-bit size field ``name``; integral floats are accepted."""
+    if (
+        isinstance(value, bool)
+        or not isinstance(value, (int, float))
+        or (isinstance(value, float) and not value.is_integer())
+        or not 0 <= value <= _SIZE_OPTION_MAX
+    ):
+        raise ValueError(
+            f"invalid {name}: {_render_value(value)} "
+            f"(expected an integer from 0 to {_SIZE_OPTION_MAX})"
+        )
+    return int(value)
+
+
+def _bool_option(name: str, value: object) -> int:
+    if not isinstance(value, bool):
+        raise ValueError(f"invalid {name}: {_render_value(value)} (expected a boolean)")
+    return int(value)
+
+
+def _mode_option(value: object) -> Mode:
+    if isinstance(value, Mode):
+        return value
+    if isinstance(value, str):
+        try:
+            return Mode(value)
+        except ValueError:
+            pass
+    expected = ", ".join(mode.value for mode in Mode)
+    raise ValueError(f"invalid mode: {_render_value(value)} (expected one of: {expected})")
+
+
+def _encode_argument(name: str, value: object) -> bytes:
+    """Encode the string argument ``name`` as UTF-8, rejecting non-strings and lone surrogates."""
+    if not isinstance(value, str):
+        raise ValueError(f"invalid {name}: {_render_value(value)} (expected a string)")
+    return _encode_text(name, value)
 
 
 def _resolve_pos_filter(pos_filter: int | Iterable[str]) -> int:
@@ -110,7 +235,7 @@ def _resolve_pos_filter(pos_filter: int | Iterable[str]) -> int:
 
 
 class ErrorCode(IntEnum):
-    """Stable native error categories."""
+    """Stable error categories: 0-7 mirror the C ABI; ``UNKNOWN`` (255) is reserved for bindings."""
 
     SUCCESS = 0
     INVALID_UTF8 = 1
@@ -120,14 +245,31 @@ class ErrorCode(IntEnum):
     OUT_OF_MEMORY = 5
     INVALID_INPUT = 6
     INTERNAL = 7
+    UNKNOWN = 255
 
 
 class SuzumeError(RuntimeError):
-    """Raised when a native suzume call fails."""
+    """Raised when a native suzume call fails, or when a released instance is used.
 
-    def __init__(self, message: str, code: ErrorCode | int = ErrorCode.INTERNAL) -> None:
+    ``message`` is the library's own text (``"<operation> failed"`` when it
+    gave none); ``code`` is an :class:`ErrorCode`, any other value becoming
+    ``UNKNOWN``; ``operation`` names the call that raised it. Invalid
+    arguments and options raise :class:`ValueError` instead.
+    """
+
+    def __init__(
+        self,
+        message: str,
+        code: ErrorCode | int = ErrorCode.INTERNAL,
+        *,
+        operation: Operation | None = None,
+    ) -> None:
         super().__init__(message)
-        self.code = ErrorCode(code)
+        try:
+            self.code = ErrorCode(code)
+        except ValueError:
+            self.code = ErrorCode.UNKNOWN
+        self.operation = operation
 
 
 class Mode(str, Enum):
@@ -230,12 +372,12 @@ def _conjugation_form_label(code: int) -> str | None:
     )
 
 
-def _encode_text(text: str) -> bytes:
-    """Encode ``text`` as UTF-8, mapping lone surrogates to a SuzumeError."""
+def _encode_text(name: str, text: str) -> bytes:
+    """Encode ``text`` as UTF-8; a lone surrogate is a ValueError naming ``name``."""
     try:
         return text.encode("utf-8")
     except UnicodeEncodeError as error:
-        raise SuzumeError(str(error), ErrorCode.INVALID_UTF8) from error
+        raise ValueError(f"invalid {name}: contains an unpaired surrogate") from error
 
 
 def version() -> str:
@@ -243,11 +385,17 @@ def version() -> str:
     return _decode(_lib.suzume_version())
 
 
-def _native_error(fallback: str) -> SuzumeError:
-    return SuzumeError(
-        _decode(_lib.suzume_last_error()) or fallback,
-        _lib.suzume_last_error_code(),
-    )
+def _native_error(operation: Operation) -> SuzumeError:
+    """Error for a native call that reported failure: its own text and code.
+
+    Falls back to ``"<operation> failed"`` when the library left no text, and
+    to ``INTERNAL`` when the code reads ``SUCCESS`` (a broken contract).
+    """
+    code = _lib.suzume_last_error_code()
+    fallback = f"{operation} failed"
+    if code == ErrorCode.SUCCESS:
+        return SuzumeError(fallback, ErrorCode.INTERNAL, operation=operation)
+    return SuzumeError(_decode(_lib.suzume_last_error()) or fallback, code, operation=operation)
 
 
 _MethodParams = ParamSpec("_MethodParams")
@@ -269,12 +417,24 @@ def _locked(
     return wrapper
 
 
-def _encode_scorer_options(scorer_options: str | dict[str, object] | None) -> bytes | None:
+def _encode_scorer_options(scorer_options: object) -> bytes | None:
     if scorer_options is None:
         return None
     if isinstance(scorer_options, str):
-        return _encode_text(scorer_options)
-    return _encode_text(json.dumps(scorer_options, ensure_ascii=False))
+        text = scorer_options
+    else:
+        try:
+            text = json.dumps(scorer_options, ensure_ascii=False, allow_nan=False)
+        except (TypeError, ValueError, RecursionError) as error:
+            raise ValueError("invalid scorer_options: not serializable as JSON") from error
+    payload = _encode_text("scorer_options", text)
+    if b"\x00" in payload:
+        raise ValueError("invalid scorer_options: contains a NUL character")
+    return payload
+
+
+def _destroy_handle(handle: int) -> None:
+    _lib.suzume_destroy(handle)
 
 
 class Suzume:
@@ -302,39 +462,37 @@ class Suzume:
         scorer_options: str | dict[str, object] | None = None,
     ) -> None:
         self._lock = threading.RLock()
-        mode = Mode(mode)
+        self._handle: int | None = None
         opts = SuzumeExtendedOptions()
         _lib.suzume_init_extended_options(ctypes.byref(opts))
-        opts.preserve_vu = int(preserve_vu)
-        opts.preserve_case = int(preserve_case)
-        opts.preserve_symbols = int(preserve_symbols)
-        opts.mode = mode._code
-        opts.lemmatize = int(lemmatize)
-        opts.merge_compounds = int(merge_compounds)
-        opts.skip_user_dictionary = int(skip_user_dictionary)
-        opts.skip_core_dictionary = int(skip_core_dictionary)
-        opts.skip_env_config = int(skip_env_config)
-        opts.report_scorer_config = int(report_scorer_config)
+        opts.mode = _mode_option(mode)._code
+        opts.preserve_vu = _bool_option("preserve_vu", preserve_vu)
+        opts.preserve_case = _bool_option("preserve_case", preserve_case)
+        opts.preserve_symbols = _bool_option("preserve_symbols", preserve_symbols)
+        opts.lemmatize = _bool_option("lemmatize", lemmatize)
+        opts.merge_compounds = _bool_option("merge_compounds", merge_compounds)
+        opts.skip_user_dictionary = _bool_option("skip_user_dictionary", skip_user_dictionary)
+        opts.skip_core_dictionary = _bool_option("skip_core_dictionary", skip_core_dictionary)
+        opts.skip_env_config = _bool_option("skip_env_config", skip_env_config)
+        opts.report_scorer_config = _bool_option("report_scorer_config", report_scorer_config)
         opts.scorer_options_json = _encode_scorer_options(scorer_options)
         data_directory = os.fsencode(_BUNDLED_DATA_DIR) if _BUNDLED_DATA_DIR is not None else None
         opts.data_directory = data_directory
 
         handle = _lib.suzume_create_with_extended_options(ctypes.byref(opts))
         if not handle:
-            raise _native_error("failed to create Suzume instance")
-        self._handle: int | None = handle
+            raise _native_error("create")
+        self._handle = handle
+        self._finalizer = weakref.finalize(self, _destroy_handle, handle)
 
     # --- lifecycle ---
 
     @_locked
     def close(self) -> None:
-        """Release the native handle. Idempotent."""
-        if getattr(self, "_handle", None) is not None:
-            _lib.suzume_destroy(self._handle)
+        """Release the native handle. Idempotent; any later member use raises."""
+        if self._handle is not None:
             self._handle = None
-
-    def __del__(self) -> None:
-        self.close()
+            self._finalizer()
 
     def __enter__(self) -> Suzume:
         return self
@@ -347,28 +505,29 @@ class Suzume:
     ) -> None:
         self.close()
 
-    def _require_handle(self) -> int:
+    def _require_handle(self, operation: Operation) -> int:
+        """Return the live handle; a released instance raises before any argument is checked."""
         if self._handle is None:
-            raise SuzumeError("Suzume instance has been closed")
+            raise SuzumeError(_RELEASED_MESSAGE, ErrorCode.INVALID_INPUT, operation=operation)
         return self._handle
 
     @property
     @_locked
     def mode(self) -> Mode:
         """Current analysis mode for this handle."""
-        code = _lib.suzume_mode(self._require_handle())
+        code = _lib.suzume_mode(self._require_handle("mode"))
         try:
             return _MODES_BY_CODE[code]
-        except KeyError as error:  # pragma: no cover - native ABI invariant
-            raise _native_error("failed to read analysis mode") from error
+        except KeyError:  # pragma: no cover - native ABI invariant
+            raise _native_error("mode") from None
 
     @mode.setter
     @_locked
     def mode(self, value: Mode | str) -> None:
         """Change analysis mode without reloading dictionaries."""
-        mode = Mode(value)
-        if not _lib.suzume_set_mode(self._require_handle(), mode._code):
-            raise _native_error("failed to set analysis mode")
+        handle = self._require_handle("mode")
+        if not _lib.suzume_set_mode(handle, _mode_option(value)._code):
+            raise _native_error("mode")
 
     # --- analysis ---
 
@@ -385,11 +544,11 @@ class Suzume:
         called; arbitrary invalid byte sequences are only reachable through
         the length-aware native API.
         """
-        handle = self._require_handle()
-        payload = _encode_text(text)
+        handle = self._require_handle("analyze")
+        payload = _encode_argument("text", text)
         result = _lib.suzume_analyze_n(handle, payload, len(payload))
         if not result:
-            raise _native_error("analysis failed")
+            raise _native_error("analyze")
         try:
             data = result.contents
             out: list[Morpheme] = []
@@ -453,25 +612,25 @@ class Suzume:
         outside the native ``size_t`` range raises ``ValueError``. All other
         flags map directly to the native tag options.
         """
-        handle = self._require_handle()
-        payload = _encode_text(text)
+        handle = self._require_handle("generate_tags")
+        payload = _encode_argument("text", text)
         opts = SuzumeTagOptions()
         _lib.suzume_init_tag_options(ctypes.byref(opts))
         opts.pos_filter = _resolve_pos_filter(pos_filter)
-        opts.exclude_basic = int(exclude_basic)
-        opts.use_lemma = int(use_lemma)
+        opts.exclude_basic = _bool_option("exclude_basic", exclude_basic)
+        opts.use_lemma = _bool_option("use_lemma", use_lemma)
         opts.min_length = _size_option("min_length", min_length)
         opts.max_tags = _size_option("max_tags", max_tags)
-        opts.exclude_particles = int(exclude_particles)
-        opts.exclude_auxiliaries = int(exclude_auxiliaries)
-        opts.exclude_formal_nouns = int(exclude_formal_nouns)
-        opts.exclude_low_info = int(exclude_low_info)
-        opts.remove_duplicates = int(remove_duplicates)
+        opts.exclude_particles = _bool_option("exclude_particles", exclude_particles)
+        opts.exclude_auxiliaries = _bool_option("exclude_auxiliaries", exclude_auxiliaries)
+        opts.exclude_formal_nouns = _bool_option("exclude_formal_nouns", exclude_formal_nouns)
+        opts.exclude_low_info = _bool_option("exclude_low_info", exclude_low_info)
+        opts.remove_duplicates = _bool_option("remove_duplicates", remove_duplicates)
         result = _lib.suzume_generate_tags_with_options_n(
             handle, payload, len(payload), ctypes.byref(opts)
         )
         if not result:
-            raise _native_error("tag generation failed")
+            raise _native_error("generate_tags")
         try:
             data = result.contents
             return [
@@ -484,40 +643,50 @@ class Suzume:
     # --- dictionaries ---
 
     @_locked
-    def load_user_dict(self, data: str) -> int:
-        """Load current TSV (or legacy CSV) and return the installed expanded-entry count."""
-        handle = self._require_handle()
-        payload = _encode_text(data)
+    def load_user_dictionary(self, dictionary: str) -> int:
+        """Load a TSV (or legacy CSV) user dictionary and return the installed entry count.
+
+        A source that installs nothing raises :class:`SuzumeError`, so the
+        returned count is always at least 1.
+        """
+        handle = self._require_handle("load_user_dictionary")
+        payload = _encode_argument("dictionary", dictionary)
         count = int(_lib.suzume_load_user_dict_count(handle, payload, len(payload)))
         if count == 0:
-            raise _native_error("failed to load user dictionary")
+            raise _native_error("load_user_dictionary")
         return count
 
     @_locked
-    def load_binary_dict(self, data: bytes) -> None:
+    def load_binary_dictionary(self, dictionary: bytes | bytearray | memoryview) -> None:
         """Load a compiled binary (.dic) dictionary from memory."""
-        handle = self._require_handle()
+        handle = self._require_handle("load_binary_dictionary")
+        if not isinstance(dictionary, (bytes, bytearray, memoryview)):
+            raise ValueError(
+                f"invalid dictionary: {_render_value(dictionary)} (expected binary data)"
+            )
+        data = bytes(dictionary)
         buf = (ctypes.c_uint8 * len(data)).from_buffer_copy(data)
         if not _lib.suzume_load_binary_dict(handle, buf, len(data)):
-            raise _native_error("failed to load binary dictionary")
+            raise _native_error("load_binary_dictionary")
 
     @_locked
     def clear_user_dictionaries(self) -> None:
         """Remove caller-loaded dictionaries while retaining the bundled user dictionary."""
-        handle = self._require_handle()
+        handle = self._require_handle("clear_user_dictionaries")
         if not _lib.suzume_clear_user_dictionaries(handle):
-            raise _native_error("failed to clear user dictionaries")
+            raise _native_error("clear_user_dictionaries")
 
     @property
     @_locked
     def dictionary_warnings(self) -> list[str]:
         """Return dictionary-loading, parsing, and scorer-configuration diagnostics."""
-        handle = self._require_handle()
+        handle = self._require_handle("dictionary_warnings")
         count = _lib.suzume_dictionary_warning_count(handle)
-        return [_decode(_lib.suzume_dictionary_warning(handle, idx)) for idx in range(count)]
+        warnings = (_decode(_lib.suzume_dictionary_warning(handle, idx)) for idx in range(count))
+        return [warning for warning in warnings if warning]
 
     @property
     @_locked
     def has_core_dictionary(self) -> bool:
         """Whether the L2 core binary dictionary is loaded."""
-        return bool(_lib.suzume_has_core_dictionary(self._require_handle()))
+        return bool(_lib.suzume_has_core_dictionary(self._require_handle("has_core_dictionary")))

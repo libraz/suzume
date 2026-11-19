@@ -138,10 +138,12 @@ def test_length_aware_analysis_preserves_embedded_null_and_normalized_text() -> 
     assert any(tag.tag == "大阪" for tag in tags)
 
 
-def test_invalid_unicode_reports_stable_error_code() -> None:
-    with Suzume() as sz, pytest.raises(SuzumeError) as error:
+def test_unpaired_surrogate_text_is_a_value_error() -> None:
+    with (
+        Suzume() as sz,
+        pytest.raises(ValueError, match="^invalid text: contains an unpaired surrogate$"),
+    ):
         sz.analyze("\ud800")
-    assert error.value.code is ErrorCode.INVALID_UTF8
 
 
 def test_extended_options_and_clear_are_public() -> None:
@@ -152,11 +154,11 @@ def test_extended_options_and_clear_are_public() -> None:
     ) as sz:
         assert sz.dictionary_warnings == []
         assert sz.has_core_dictionary is False
-        assert sz.load_user_dict("検査する\tVERB\tSURU\n") > 1
-        assert sz.load_user_dict("ignored-record\n検査語\tNOUN\n") == 1
+        assert sz.load_user_dictionary("検査する\tVERB\tSURU\n") > 1
+        assert sz.load_user_dictionary("ignored-record\n検査語\tNOUN\n") == 1
         assert any("line 1" in warning for warning in sz.dictionary_warnings)
         with pytest.raises(SuzumeError) as error:
-            sz.load_user_dict("ignored-record\n")
+            sz.load_user_dictionary("ignored-record\n")
         assert error.value.code is ErrorCode.PARSE
         sz.clear_user_dictionaries()
 
@@ -167,7 +169,7 @@ def test_clear_user_dictionaries_retains_bundled_dictionary() -> None:
         assert len(before) == 1
         assert before[0].is_user_dict is True
 
-        assert sz.load_user_dict("検査語\tNOUN\n") == 1
+        assert sz.load_user_dictionary("検査語\tNOUN\n") == 1
         assert any(m.is_user_dict for m in sz.analyze("検査語"))
         sz.clear_user_dictionaries()
 

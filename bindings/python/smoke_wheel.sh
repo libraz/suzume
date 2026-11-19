@@ -33,7 +33,7 @@ with suzume.Suzume() as analyzer:
     assert any(morpheme.is_from_dictionary for morpheme in morphemes)
 
 with suzume.Suzume() as analyzer:
-    analyzer.load_binary_dict(core_dictionary.read_bytes())
+    analyzer.load_binary_dictionary(core_dictionary.read_bytes())
     assert analyzer.analyze("りんごを食べる")
 PY
 

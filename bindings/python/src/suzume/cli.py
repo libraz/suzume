@@ -257,9 +257,9 @@ def _load_dictionaries(analyzer: Suzume, paths: Sequence[str]) -> None:
     for raw_path in paths:
         path = Path(raw_path)
         if path.suffix.lower() == ".dic":
-            analyzer.load_binary_dict(path.read_bytes())
+            analyzer.load_binary_dictionary(path.read_bytes())
         else:
-            analyzer.load_user_dict(path.read_text(encoding="utf-8"))
+            analyzer.load_user_dictionary(path.read_text(encoding="utf-8"))
 
 
 def _morpheme_dict(morpheme: Morpheme) -> dict[str, Any]:
