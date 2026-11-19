@@ -918,6 +918,72 @@
       ],
       "id": "dekaimasen",
       "input": "家でかいません"
+    },
+    {
+      "description": "すぐよんだ - regression test",
+      "expected": [
+        {
+          "lemma": "すぐ",
+          "pos": "Adverb",
+          "surface": "すぐ"
+        },
+        {
+          "lemma": "よむ",
+          "pos": "Verb",
+          "surface": "よん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "suguyonda",
+      "input": "すぐよんだ"
+    },
+    {
+      "description": "まだよんだ - regression test",
+      "expected": [
+        {
+          "lemma": "まだ",
+          "pos": "Adverb",
+          "surface": "まだ"
+        },
+        {
+          "lemma": "よむ",
+          "pos": "Verb",
+          "surface": "よん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "madayonda",
+      "input": "まだよんだ"
+    },
+    {
+      "description": "かつてよんだ - regression test",
+      "expected": [
+        {
+          "lemma": "かつて",
+          "pos": "Adverb",
+          "surface": "かつて"
+        },
+        {
+          "lemma": "よむ",
+          "pos": "Verb",
+          "surface": "よん"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "katsuteyonda",
+      "input": "かつてよんだ"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 12/12)",
