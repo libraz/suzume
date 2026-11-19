@@ -311,12 +311,11 @@ void appendHiraganaDerivedCandidates(const std::vector<char32_t>& codepoints, si
       continue;
     }
 
-    // A passive cell followed by its next auxiliary is not an independent
-    // lexical continuative.  In particular, a weak reconstruction of
-    // やめられ must leave the productive やめ + られ + ない/ます boundary
-    // available.  The same rule is structural, so it also covers other
-    // hiragana Ichidan hosts without naming a lexical verb.
-    if (utf8::endsWith(stem_surface, "られ") && (is_followed_by_nai || is_followed_by_masu)) {
+    // A passive cell is not an independent lexical continuative. An
+    // unregistered stem ending in られ is a host plus the passive (やめ+られ,
+    // しから+れ), and before its next auxiliary even a registered one leaves
+    // the productive やめ + られ + ない/ます boundary available.
+    if (utf8::endsWith(stem_surface, "られ") && (!is_dict_verb || is_followed_by_nai || is_followed_by_masu)) {
       continue;
     }
 

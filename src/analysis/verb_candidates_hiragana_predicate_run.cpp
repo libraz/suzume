@@ -184,9 +184,11 @@ bool kaContinuesConjugation(const std::vector<char32_t>& codepoints, size_t ka_p
   if (next == U'ん' && (after_next == U'で' || after_next == U'だ')) {
     return true;
   }
-  // Mizenkei + contracted negative (わからん), godan-ra irrealis + negative
-  // (わからない), and godan-wa irrealis (つかわない, つかわれる, つかわせる, つかわず)
-  if ((kana::isARowCodepoint(next) && after_next == U'ん') || (next == U'ら' && after_next == U'な') ||
+  // Mizenkei + contracted negative (わからん) or passive (しかられる), godan-ra
+  // irrealis + negative (わからない), and godan-wa irrealis (つかわない, つかわれる,
+  // つかわせる, つかわず)
+  if ((kana::isARowCodepoint(next) && (after_next == U'ん' || after_next == U'れ')) ||
+      (next == U'ら' && after_next == U'な') ||
       (next == U'わ' && (after_next == U'な' || after_next == U'れ' || after_next == U'せ' || after_next == U'ず'))) {
     return true;
   }

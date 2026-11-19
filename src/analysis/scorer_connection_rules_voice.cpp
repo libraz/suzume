@@ -112,7 +112,8 @@ float computePassiveCausativeBonus(const core::LatticeEdge& prev, const core::La
   // continuative takes られる (食べ+られ), so a れ cell after one is a false split
   // (来+れ+ば for 来れ+ば, い+れよ+う for いれよ+う, し+て+い+れ+ば). Hiragana
   // a-row stems are exempt, as a short hiragana irrealis carries the
-  // continuative tag (やら+れ+た).
+  // continuative tag (やら+れ+た). Conversely a godan irrealis takes れる, never
+  // られる (おこら+れ, not おこ+られ).
   const bool classical_causative_off_a_row =
       next.extended_pos == core::ExtendedPOS::AuxCausative && grammar::isClassicalCausativeAuxiliaryLemma(next.lemma) &&
       (prev.extended_pos != core::ExtendedPOS::VerbMizenkei || !grammar::endsWithARow(prev.surface));
@@ -120,7 +121,10 @@ float computePassiveCausativeBonus(const core::LatticeEdge& prev, const core::La
       (prev.extended_pos == core::ExtendedPOS::VerbRenyokei || prev.extended_pos == core::ExtendedPOS::AuxAspectIru) &&
       next.extended_pos == core::ExtendedPOS::AuxPassive && utf8::startsWith(next.surface, "れ") &&
       !grammar::endsWithARow(prev.surface);
-  if (classical_causative_off_a_row || passive_re_off_continuative) {
+  const bool passive_rare_off_godan = prev.pos == core::PartOfSpeech::Verb &&
+                                      grammar::isGodanVerbType(grammar::conjTypeToVerbType(prev.conj_type)) &&
+                                      grammar::isPassiveAuxiliaryLemma(next.lemma);
+  if (classical_causative_off_a_row || passive_re_off_continuative || passive_rare_off_godan) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
 
