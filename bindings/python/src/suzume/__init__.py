@@ -227,6 +227,9 @@ def _resolve_pos_filter(pos_filter: object) -> int:
         return 0
     if isinstance(pos_filter, str):
         names: tuple[object, ...] = (pos_filter,)
+    elif isinstance(pos_filter, (set, frozenset)):
+        # Sort so the reported invalid name does not depend on hash order.
+        names = tuple(sorted(pos_filter, key=_render_value))
     elif isinstance(pos_filter, _POS_FILTER_CONTAINERS):
         names = tuple(pos_filter)
     else:
@@ -458,6 +461,11 @@ class Suzume:
     :meth:`close` when done. Calls on one instance are serialized, so it is
     safe to share an instance between threads; use separate instances for
     parallel native analysis.
+
+    There is no ``data_directory`` argument. An installed wheel ships its
+    dictionaries in the package directory and always loads from there, so
+    ``SUZUME_DATA_DIR`` and ``~/.suzume`` are not consulted. A source checkout
+    without bundled dictionaries falls back to the native search order.
     """
 
     def __init__(

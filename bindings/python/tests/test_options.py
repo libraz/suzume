@@ -113,3 +113,13 @@ def test_released_check_runs_before_pos_filter_validation() -> None:
     with pytest.raises(Exception) as caught:
         sz.generate_tags("東京", pos_filter="bogus")
     assert type(caught.value).__name__ == "SuzumeError"
+
+
+@pytest.mark.parametrize("container", [set, frozenset])
+def test_an_unordered_container_reports_its_first_invalid_name_in_sorted_order(
+    container: type, sz: Suzume
+) -> None:
+    value = container({"zeta", "NOUN", "alpha", "mid"})
+    with pytest.raises(ValueError) as caught:
+        sz.generate_tags("東京", pos_filter=value)
+    assert str(caught.value) == f'invalid pos_filter: "alpha" (expected one of: {_NAMES})'
