@@ -426,6 +426,42 @@ TEST(TagGeneratorTest, PosFilterIncludesExplicitParticleAndAuxiliaryBits) {
   EXPECT_EQ(tags[1].tag, "た");
 }
 
+TEST(TagGeneratorTest, PosFilterParticleOverridesDefaultExclusion) {
+  TagGeneratorOptions options;
+  options.pos_filter = kTagPosParticle;
+  TagGenerator generator(options);
+
+  std::vector<core::Morpheme> morphemes;
+  morphemes.push_back(makeMorpheme("東京", core::PartOfSpeech::Noun));
+  morphemes.push_back(makeMorpheme("から", core::PartOfSpeech::Particle));
+  morphemes.push_back(makeMorpheme("が", core::PartOfSpeech::Particle));
+
+  // The default min_tag_length still drops the one-character particle.
+  const auto tags = generator.generate(morphemes);
+  ASSERT_EQ(tags.size(), 1);
+  EXPECT_EQ(tags[0].tag, "から");
+  EXPECT_EQ(tags[0].pos, core::PartOfSpeech::Particle);
+}
+
+TEST(TagGeneratorTest, PosFilterAuxiliaryOverridesExplicitExclusion) {
+  TagGeneratorOptions options;
+  options.pos_filter = kTagPosVerb | kTagPosAuxiliary;  // NOLINT(hicpp-signed-bitwise): bit flag operation
+  options.exclude_particles = true;
+  options.exclude_auxiliaries = true;
+  TagGenerator generator(options);
+
+  std::vector<core::Morpheme> morphemes;
+  morphemes.push_back(makeMorpheme("食べ", core::PartOfSpeech::Verb, "食べる"));
+  morphemes.push_back(makeMorpheme("ます", core::PartOfSpeech::Auxiliary));
+  morphemes.push_back(makeMorpheme("から", core::PartOfSpeech::Particle));
+
+  const auto tags = generator.generate(morphemes);
+  ASSERT_EQ(tags.size(), 2);
+  EXPECT_EQ(tags[0].tag, "食べる");
+  EXPECT_EQ(tags[1].tag, "ます");
+  EXPECT_EQ(tags[1].pos, core::PartOfSpeech::Auxiliary);
+}
+
 TEST(TagGeneratorTest, PosFilterIncludesPronounAsNoun) {
   TagGeneratorOptions options;
   options.pos_filter = kTagPosNoun;

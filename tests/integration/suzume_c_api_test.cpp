@@ -753,6 +753,13 @@ TEST(SuzumeCApiTest, TagOptionsExposeAllGeneratorFilters) {
   EXPECT_TRUE(contains(auxiliary_tags, "ます"));
   EXPECT_FALSE(contains(auxiliary_tags, "りんご"));
 
+  // Naming a POS in pos_filter admits it even though the defaults exclude particles.
+  suzume_tag_options_t named_particles;
+  suzume_init_tag_options(&named_particles);
+  named_particles.pos_filter = SUZUME_TAG_POS_PARTICLE;
+  named_particles.min_length = 1;
+  EXPECT_TRUE(contains(generate(named_particles), "が"));
+
   auto non_basic = inclusive;
   non_basic.exclude_basic = 1;
   const auto non_basic_tags = generate(non_basic);
