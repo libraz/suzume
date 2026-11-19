@@ -449,25 +449,30 @@ SUZUME_EXPORT suzume_error_code_t suzume_last_error_code(void);
 
 /**
  * @brief Get the Japanese label for a serialized conjugation type
- * @return Static string, or NULL when code is none/out of range
+ * @return Static string, never NULL: "" for 0 (none) and for any code outside
+ *         the enum
  */
 SUZUME_EXPORT const char* suzume_conjugation_type_label(suzume_conjugation_type_t code);
 
 /**
  * @brief Get the stable label for a serialized extended POS code
- * @return Static string, or NULL when code is out of range
+ * @return Static string, never NULL: "UNKNOWN" for any code outside the enum
+ *         (the same label as code 0)
  */
 SUZUME_EXPORT const char* suzume_extended_pos_label(suzume_extended_pos_t code);
 
 /**
  * @brief Get the Japanese label for a serialized conjugation form code
- * @return Static string, or NULL when code is out of range
+ * @return Static string, never NULL: "" for any code outside the enum. Code 0
+ *         is the terminal form; whether a morpheme conjugates at all is given
+ *         by SUZUME_MORPHEME_CONJUGATABLE, not by the form code.
  */
 SUZUME_EXPORT const char* suzume_conjugation_form_label(suzume_conjugation_form_t code);
 
 /**
  * @brief Get the stable English label for a serialized POS code
- * @return Static string, or NULL when code is out of range
+ * @return Static string, never NULL: "OTHER" for any code outside the enum
+ *         (the same label as SUZUME_POS_OTHER)
  */
 SUZUME_EXPORT const char* suzume_pos_label(suzume_pos_t code);
 

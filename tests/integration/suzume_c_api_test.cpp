@@ -318,9 +318,9 @@ TEST(SuzumeCApiTest, ConjugationMetadataUsesCompactCodes) {
   EXPECT_EQ(result->morphemes[0].conjugation_form, 2U);
   EXPECT_NE(result->morphemes[0].flags & SUZUME_MORPHEME_CONJUGATABLE, 0U);
   EXPECT_STREQ(suzume_conjugation_type_label(14), "ナ形容詞");
-  EXPECT_EQ(suzume_conjugation_type_label(18), nullptr);
+  EXPECT_STREQ(suzume_conjugation_type_label(18), "");
   EXPECT_STREQ(suzume_pos_label(SUZUME_POS_VERB), "VERB");
-  EXPECT_EQ(suzume_pos_label(15), nullptr);
+  EXPECT_STREQ(suzume_pos_label(15), "OTHER");
 
   suzume_result_free(result);
   suzume_destroy(handle);
@@ -410,9 +410,15 @@ TEST(SuzumeCApiTest, MorphemeLengthsPreserveEmbeddedNull) {
 }
 
 TEST(SuzumeCApiTest, CanonicalLabelFunctionsCoverSerializedBoundaries) {
-  EXPECT_EQ(suzume_conjugation_type_label(0), nullptr);
+  EXPECT_STREQ(suzume_conjugation_type_label(0), "");
   EXPECT_STREQ(suzume_conjugation_type_label(17), "固有名詞・名");
-  EXPECT_EQ(suzume_conjugation_type_label(18), nullptr);
+  EXPECT_STREQ(suzume_conjugation_type_label(18), "");
+  EXPECT_STREQ(suzume_conjugation_type_label(255), "");
+
+  EXPECT_STREQ(suzume_pos_label(0), "OTHER");
+  EXPECT_STREQ(suzume_pos_label(SUZUME_POS_OTHER), "OTHER");
+  EXPECT_STREQ(suzume_pos_label(15), "OTHER");
+  EXPECT_STREQ(suzume_pos_label(255), "OTHER");
 
   EXPECT_STREQ(suzume_extended_pos_label(0), "UNKNOWN");
   EXPECT_STREQ(suzume_extended_pos_label(83), "VERB_仮定縮約");
@@ -425,10 +431,14 @@ TEST(SuzumeCApiTest, CanonicalLabelFunctionsCoverSerializedBoundaries) {
   EXPECT_STREQ(suzume_extended_pos_label(90), "AUX_卑罵");
   EXPECT_STREQ(suzume_extended_pos_label(91), "SUFFIX_気配");
   EXPECT_STREQ(suzume_extended_pos_label(92), "PART_選択");
-  EXPECT_EQ(suzume_extended_pos_label(93), nullptr);
+  EXPECT_STREQ(suzume_extended_pos_label(93), "UNKNOWN");
+  EXPECT_STREQ(suzume_extended_pos_label(255), "UNKNOWN");
 
+  // Form code 0 is the terminal form, a real cell; only out-of-range codes are "".
+  EXPECT_STREQ(suzume_conjugation_form_label(0), "終止形");
   EXPECT_STREQ(suzume_conjugation_form_label(6), "意志形");
-  EXPECT_EQ(suzume_conjugation_form_label(7), nullptr);
+  EXPECT_STREQ(suzume_conjugation_form_label(7), "");
+  EXPECT_STREQ(suzume_conjugation_form_label(255), "");
 }
 
 TEST(SuzumeCApiTest, TagEntrypointsRejectInvalidUtf8WithStableCode) {

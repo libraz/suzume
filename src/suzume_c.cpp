@@ -634,26 +634,26 @@ SUZUME_EXPORT const char* suzume_conjugation_type_label(suzume_conjugation_type_
       "",           "一段",       "五段・カ行", "五段・ガ行", "五段・サ行",   "五段・タ行",
       "五段・ナ行", "五段・バ行", "五段・マ行", "五段・ラ行", "五段・ワ行",   "サ変",
       "カ変",       "形容詞",     "ナ形容詞",   "感動詞",     "固有名詞・姓", "固有名詞・名"};
-  return code > 0 && code < labels.size() ? labels[code] : nullptr;
+  return code < labels.size() ? labels[code] : "";
 }
 
 SUZUME_EXPORT const char* suzume_extended_pos_label(suzume_extended_pos_t code) {
   if (code >= static_cast<suzume_extended_pos_t>(suzume::core::ExtendedPOS::Count_)) {
-    return nullptr;
+    code = static_cast<suzume_extended_pos_t>(suzume::core::ExtendedPOS::Unknown);
   }
   return suzume::core::extendedPosToString(static_cast<suzume::core::ExtendedPOS>(code)).data();
 }
 
 SUZUME_EXPORT const char* suzume_conjugation_form_label(suzume_conjugation_form_t code) {
   if (code >= static_cast<suzume_conjugation_form_t>(suzume::grammar::ConjForm::Count_)) {
-    return nullptr;
+    return "";
   }
   return suzume::grammar::conjFormToJapanese(static_cast<suzume::grammar::ConjForm>(code)).data();
 }
 
 SUZUME_EXPORT const char* suzume_pos_label(suzume_pos_t code) {
   if (code >= static_cast<suzume_pos_t>(suzume::core::PartOfSpeech::Count_)) {
-    return nullptr;
+    code = SUZUME_POS_OTHER;
   }
   return suzume::core::posToString(static_cast<suzume::core::PartOfSpeech>(code)).data();
 }
