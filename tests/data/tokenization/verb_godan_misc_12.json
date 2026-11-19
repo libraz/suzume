@@ -1617,6 +1617,70 @@
       ],
       "id": "wohanete",
       "input": "泥をはねて"
+    },
+    {
+      "description": "A greeting quoted after a bare vocative noun keeps the interjection",
+      "expected": [
+        {
+          "lemma": "先生",
+          "pos": "Noun",
+          "surface": "先生"
+        },
+        {
+          "lemma": "おはよう",
+          "pos": "Interjection",
+          "surface": "おはよう"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "言う",
+          "pos": "Verb",
+          "surface": "言っ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "ohayouttte_ttta",
+      "input": "先生おはようって言った"
+    },
+    {
+      "description": "An interjection quoted after a bare noun keeps its reading when no verb shares the surface",
+      "expected": [
+        {
+          "lemma": "彼女",
+          "pos": "Pronoun",
+          "surface": "彼女"
+        },
+        {
+          "lemma": "ええ",
+          "pos": "Adjective",
+          "surface": "ええ"
+        },
+        {
+          "lemma": "って",
+          "pos": "Particle",
+          "surface": "って"
+        },
+        {
+          "lemma": "答える",
+          "pos": "Verb",
+          "surface": "答え"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "eettte_eta",
+      "input": "彼女ええって答えた"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 12/12)",

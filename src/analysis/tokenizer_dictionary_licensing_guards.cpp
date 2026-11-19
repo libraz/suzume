@@ -420,6 +420,24 @@ bool lacksLicensingEnvironment(const DictionaryCandidateContext& ctx, const core
     }
   }
 
+  // Before the two-mora quotative, an interjection whose surface plus the
+  // sokuon is a dictionary verb's onbin cell yields to that verb when a bare
+  // content word precedes it: 手+はいっ+て. A quoted utterance after a
+  // vocative keeps the interjection where no verb shares it (部長+ありがとう+って).
+  if (result.entry->pos == core::PartOfSpeech::Interjection && start_pos > 0 && end_pos < codepoints.size() &&
+      codepoints[end_pos] == core::hiragana::kSmallTsu &&
+      (normalize::classifyChar(codepoints[start_pos - 1]) == normalize::CharType::Kanji ||
+       normalize::classifyChar(codepoints[start_pos - 1]) == normalize::CharType::Katakana)) {
+    constexpr size_t kQuotativeTteLength = 2;
+    if (lookupEntryInRange(dict_manager, codepoints, start_pos, end_pos + 1, core::PartOfSpeech::Verb) != nullptr &&
+        hasDictionaryEntryFrom(&dict_manager, codepoints, end_pos, kQuotativeTteLength, kQuotativeTteLength,
+                               core::PartOfSpeech::Particle, [](const dictionary::DictionaryEntry& entry) {
+                                 return entry.extended_pos == core::ExtendedPOS::ParticleQuote;
+                               })) {
+      return true;
+    }
+  }
+
   // A 終助詞 closes its clause, so the nominalizer cannot follow it. The な in
   // そう+な+ん+です is the copula's attributive form instead; the indefinite
   // stack the bigram favors (いくつ+か+の) uses the の spelling and is untouched.
