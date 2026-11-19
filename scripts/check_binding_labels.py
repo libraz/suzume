@@ -99,6 +99,42 @@ WASM_DEFAULT_NAMES = {
 }
 
 
+# Public names the 0.10 surface removed. Docs, examples and CLI help must not
+# mention them; binding sources may still call the C names they mirror.
+REMOVED_NAMES = (
+    "loadUserDictionaryCount",
+    "loadUserDictionaryOrThrow",
+    "loadBinaryDictionaryOrThrow",
+    "lastError",
+    "lastErrorCode",
+    "useLemma",
+    "skipUserDictionary",
+    "load_user_dict",
+    "load_binary_dict",
+    "use_lemma",
+    "skip_user_dictionary",
+    "--tag-pos",
+    "--tag-use-surface",
+    "--tag-keep-duplicates",
+    "--include-particles",
+    "--include-auxiliaries",
+    "--include-formal-nouns",
+    "--include-low-info",
+    "--normalize-vu",
+    "--lowercase",
+    "--no-core-dict",
+    "--no-user-dict",
+    "--dict",
+    "-f morpheme",
+)
+REMOVED_NAME_SCOPE = (
+    "examples/**/*",
+    "bindings/*/README.md",
+    "bindings/python/src/suzume/cli.py",
+    "tools/cli/cli_help.cpp",
+)
+
+
 @dataclass(frozen=True)
 class EnumSpec:
     header: str
@@ -400,6 +436,32 @@ def check_no_local_label_tables() -> bool:
     return failed
 
 
+def removed_name_pattern(name: str) -> re.Pattern[str]:
+    """A whole-word match where `-` counts as part of the word (--dict is not --dictionary)."""
+    body = r"\s+".join(re.escape(part) for part in name.split())
+    return re.compile(rf"(?<![\w-]){body}(?![\w-])")
+
+
+def check_removed_names() -> bool:
+    """Docs, examples and CLI help name none of the removed public names."""
+    patterns = {name: removed_name_pattern(name) for name in REMOVED_NAMES}
+    failed = False
+    for pattern in REMOVED_NAME_SCOPE:
+        for path in sorted(Path().glob(pattern)):
+            if not path.is_file():
+                continue
+            try:
+                text = path.read_text()
+            except UnicodeDecodeError:
+                continue
+            for number, line in enumerate(text.splitlines(), start=1):
+                for name, regex in patterns.items():
+                    if regex.search(line):
+                        print(f"❌ {path}:{number}: names removed `{name}`")
+                        failed = True
+    return failed
+
+
 def normalized_name(name: str) -> str:
     return name.replace("_", "").lower()
 
@@ -625,6 +687,21 @@ def check_numeric_contracts(tag_labels: dict[str, int]) -> bool:
                 ):
                     python_errors[normalized_name(statement.targets[0].id)] = statement.value.value
 
+    wrapper_text = Path(CPP_WRAPPER).read_text()
+    wrapper_error_match = re.search(r"enum class ErrorCode[^{]*\{(?P<body>.*?)\}", wrapper_text, re.DOTALL)
+    wrapper_errors: dict[str, int] = {}
+    for name, value in re.findall(
+        r"\b(\w+)\s*=\s*(\w+)", wrapper_error_match.group("body") if wrapper_error_match else ""
+    ):
+        if value.isdigit():
+            wrapper_errors[normalized_name(name)] = int(value)
+        elif value.startswith("SUZUME_ERROR_"):
+            wrapper_errors[normalized_name(name)] = canonical_errors.get(
+                normalized_name(value[len("SUZUME_ERROR_") :]), -1
+            )
+        else:
+            wrapper_errors[normalized_name(name)] = -1
+
     canonical_flags = c_numeric_constants("SUZUME_MORPHEME_")
     wasm_flag_body = enclosed(
         wasm_labels,
@@ -680,7 +757,7 @@ def check_numeric_contracts(tag_labels: dict[str, int]) -> bool:
     }
 
     for label, canonical, mirrors in (
-        ("error codes", binding_errors, (wasm_errors, python_errors)),
+        ("error codes", binding_errors, (wrapper_errors, wasm_errors, python_errors)),
         ("morpheme flags", canonical_flags, (wasm_flags, python_flags)),
         ("tag POS bits", canonical_tags, (wasm_tags, python_tags)),
         ("analysis modes", canonical_modes, (wrapper_modes, wasm_modes, python_modes)),
@@ -747,6 +824,7 @@ def main() -> int:
     results.append(check_label_type_unions(members["PartOfSpeech"], set(tag_labels)))
     results.append(check_numeric_contracts(tag_labels))
     results.append(check_default_contracts())
+    results.append(check_removed_names())
     if any(results):
         print()
         print("A mislabeled numeric code changes public output. Fix the native table or the binding above.")
