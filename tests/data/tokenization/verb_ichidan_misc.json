@@ -72,6 +72,92 @@
       ],
       "id": "okiro",
       "input": "おきろ"
+    },
+    {
+      "description": "手はでます - regression test",
+      "expected": [
+        {
+          "lemma": "手",
+          "pos": "Noun",
+          "surface": "手"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "出る",
+          "pos": "Verb",
+          "surface": "で"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "hademasu",
+      "input": "手はでます"
+    },
+    {
+      "description": "声はでます - regression test",
+      "expected": [
+        {
+          "lemma": "声",
+          "pos": "Noun",
+          "surface": "声"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "出る",
+          "pos": "Verb",
+          "surface": "で"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "hademasu_2",
+      "input": "声はでます"
+    },
+    {
+      "description": "食べてはでます - regression test",
+      "expected": [
+        {
+          "lemma": "食べる",
+          "pos": "Verb",
+          "surface": "食べ"
+        },
+        {
+          "lemma": "て",
+          "pos": "Particle",
+          "surface": "て"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "出る",
+          "pos": "Verb",
+          "surface": "で"
+        },
+        {
+          "lemma": "ます",
+          "pos": "Auxiliary",
+          "surface": "ます"
+        }
+      ],
+      "id": "betehademasu",
+      "input": "食べてはでます"
     }
   ],
   "description": "verb_ichidan_misc tests",
