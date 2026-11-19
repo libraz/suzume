@@ -30,6 +30,15 @@ PYTHON_LABELS = "bindings/python/src/suzume/_labels.py"
 C_HEADER = "include/suzume/suzume_c.h"
 WASM_INDEX = "bindings/wasm/js/index.ts"
 PYTHON_API = "bindings/python/src/suzume/__init__.py"
+# Both binding suites must read error and option expectations from this one fixture,
+# so a message or code change cannot be made to one binding's suite alone.
+CONFORMANCE_FIXTURE = "bindings/conformance/errors.json"
+CONFORMANCE_SUITES = (
+    "bindings/wasm/tests/errors.test.ts",
+    "bindings/wasm/tests/options.test.ts",
+    "bindings/python/tests/test_errors.py",
+    "bindings/python/tests/test_options.py",
+)
 
 DEFAULT_FIELDS = {
     "options": (
@@ -462,6 +471,76 @@ def check_removed_names() -> bool:
     return failed
 
 
+def ts_fixture_loaded(suite: Path, fixture: Path) -> bool:
+    """True when the TS suite binds the fixture's URL to a name and JSON-parses that file."""
+    text = re.sub(r"/\*.*?\*/", "", suite.read_text(encoding="utf-8"), flags=re.DOTALL)
+    text = re.sub(r"(?m)^\s*//.*$", "", text)
+    url = r"const\s+(\w+)\s*=\s*fileURLToPath\(\s*new URL\(\s*['\"]([^'\"]+)['\"]\s*,\s*import\.meta\.url\s*\)\s*\)"
+    for match in re.finditer(url, text):
+        name, relative = match.groups()
+        if (suite.parent / relative).resolve() == fixture and re.search(
+            rf"JSON\.parse\(\s*readFileSync\(\s*{name}\b", text
+        ):
+            return True
+    return False
+
+
+def python_fixture_path(suite: Path, value: ast.expr) -> Path | None:
+    """Resolve ``Path(__file__).resolve().parents[N] / "a" / "b"`` statically, or None for any other shape."""
+    parts: list[str] = []
+    while isinstance(value, ast.BinOp) and isinstance(value.op, ast.Div):
+        if not (isinstance(value.right, ast.Constant) and isinstance(value.right.value, str)):
+            return None
+        parts.insert(0, value.right.value)
+        value = value.left
+    if not (
+        isinstance(value, ast.Subscript)
+        and isinstance(value.value, ast.Attribute)
+        and value.value.attr == "parents"
+        and isinstance(value.slice, ast.Constant)
+        and isinstance(value.slice.value, int)
+    ):
+        return None
+    return suite.resolve().parents[value.slice.value].joinpath(*parts)
+
+
+def python_fixture_loaded(suite: Path, fixture: Path) -> bool:
+    """True when the Python suite binds the fixture path to a name and passes that file to ``json.loads``."""
+    tree = ast.parse(suite.read_text(encoding="utf-8"))
+    names = {
+        target.id
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Assign) and python_fixture_path(suite, node.value) == fixture
+        for target in node.targets
+        if isinstance(target, ast.Name)
+    }
+    return any(
+        isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute)
+        and node.func.attr == "loads"
+        and isinstance(node.func.value, ast.Name)
+        and node.func.value.id == "json"
+        and any(isinstance(inner, ast.Name) and inner.id in names for arg in node.args for inner in ast.walk(arg))
+        for node in ast.walk(tree)
+    )
+
+
+def check_conformance_fixture_loaded() -> bool:
+    """Both binding suites read their error and option cases from the one shared fixture."""
+    fixture = Path(CONFORMANCE_FIXTURE).resolve()
+    if not fixture.is_file():
+        print(f"❌ {CONFORMANCE_FIXTURE} is missing")
+        return True
+    failed = False
+    for suite in CONFORMANCE_SUITES:
+        path = Path(suite)
+        loaded = ts_fixture_loaded(path, fixture) if path.suffix == ".ts" else python_fixture_loaded(path, fixture)
+        if not loaded:
+            print(f"❌ {suite} does not load {CONFORMANCE_FIXTURE}; read its cases instead of local expectations")
+            failed = True
+    return failed
+
+
 def normalized_name(name: str) -> str:
     return name.replace("_", "").lower()
 
@@ -825,6 +904,7 @@ def main() -> int:
     results.append(check_numeric_contracts(tag_labels))
     results.append(check_default_contracts())
     results.append(check_removed_names())
+    results.append(check_conformance_fixture_loaded())
     if any(results):
         print()
         print("A mislabeled numeric code changes public output. Fix the native table or the binding above.")
