@@ -215,10 +215,11 @@ void addMixedScriptCandidates(core::Lattice& lattice, std::string_view text, con
 
       // Count how many leading kanji are counter/unit kanji
       size_t counter_prefix_len = 0;
-      for (size_t k = 0; k < kanji_len; ++k) {
-        if (isCounterKanji(codepoints[first_end + k]) &&
-            (k == 0 || !verb_helpers::headsListedGodanSaContinuativeAt(&dict_manager, codepoints, first_end + k))) {
-          counter_prefix_len = k + 1;
+      for (size_t offset = 0; offset < kanji_len; ++offset) {
+        if (isCounterKanji(codepoints[first_end + offset]) &&
+            (offset == 0 ||
+             !verb_helpers::headsListedGodanSaContinuativeAt(&dict_manager, codepoints, first_end + offset))) {
+          counter_prefix_len = offset + 1;
         } else {
           break;
         }

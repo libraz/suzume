@@ -277,18 +277,19 @@ void appendKanjiStemCompoundIAdjCandidates(const std::vector<char32_t>& codepoin
                                                << "\" is a dictionary adjective\n");
       continue;
     }
-    for (const auto& ic : inflection.analyze(surface)) {
-      if (ic.confidence >= candidate::kCompoundAdjConfMin && ic.verb_type == grammar::VerbType::IAdjective) {
-        float cost = candidate::confidenceScaledCost(candidate::kCompoundAdjBaseCost, ic.confidence,
+    for (const auto& analysis : inflection.analyze(surface)) {
+      if (analysis.confidence >= candidate::kCompoundAdjConfMin &&
+          analysis.verb_type == grammar::VerbType::IAdjective) {
+        float cost = candidate::confidenceScaledCost(candidate::kCompoundAdjBaseCost, analysis.confidence,
                                                      candidate::kKanjiAdjConfScale);
         if (!productive_tail_base.empty()) {
           cost += candidate::kCompoundIAdjectiveLexicalBonus;
         }
-        SUZUME_DEBUG_LOG_VERBOSE("[ADJ_COMPOUND] \"" << surface << "\" cost=" << cost << " conf=" << ic.confidence
+        SUZUME_DEBUG_LOG_VERBOSE("[ADJ_COMPOUND] \"" << surface << "\" cost=" << cost << " conf=" << analysis.confidence
                                                      << "\n");
         auto adj_cand =
-            adj_detail::makeIAdjCandidate(surface, start_pos, end_pos, ic.base_form, cost, CandidateOrigin::AdjectiveI,
-                                          ic.confidence, "i_adjective_compound");
+            adj_detail::makeIAdjCandidate(surface, start_pos, end_pos, analysis.base_form, cost,
+                                          CandidateOrigin::AdjectiveI, analysis.confidence, "i_adjective_compound");
         adj_cand.has_suffix = true;
         candidates.push_back(std::move(adj_cand));
         return;

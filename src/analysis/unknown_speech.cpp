@@ -399,8 +399,8 @@ void UnknownWordGenerator::generateOnomatopoeiaCandidates(const std::vector<char
     bool is_aa = true;
 
     // Check if first half equals second half
-    for (size_t i = 0; i < half_len; ++i) {
-      if (codepoints[start_pos + i] != codepoints[start_pos + half_len + i]) {
+    for (size_t offset = 0; offset < half_len; ++offset) {
+      if (codepoints[start_pos + offset] != codepoints[start_pos + half_len + offset]) {
         is_aa = false;
         break;
       }

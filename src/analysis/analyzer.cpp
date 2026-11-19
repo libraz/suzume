@@ -29,8 +29,8 @@ inline size_t sentenceBoundaryLen(std::string_view text, size_t pos) {
 // Count UTF-8 characters in a byte range.
 inline size_t countChars(std::string_view text, size_t from, size_t to) {
   size_t count = 0;
-  for (size_t i = from; i < to; ++i) {
-    if ((static_cast<unsigned char>(text[i]) & 0xC0) != 0x80) {
+  for (size_t byte_idx = from; byte_idx < to; ++byte_idx) {
+    if ((static_cast<unsigned char>(text[byte_idx]) & 0xC0) != 0x80) {
       ++count;
     }
   }
@@ -59,13 +59,13 @@ std::vector<core::Morpheme> chunkBySentenceBoundary(
     size_t scan_end = std::min(pos + kMaxChunkBytes, text.size());
     size_t best_break = 0;  // byte position of best break point (after boundary char)
 
-    for (size_t i = pos; i < scan_end;) {
-      size_t blen = sentenceBoundaryLen(text, i);
+    for (size_t byte_pos = pos; byte_pos < scan_end;) {
+      size_t blen = sentenceBoundaryLen(text, byte_pos);
       if (blen > 0) {
-        best_break = i + blen;
-        i += blen;
+        best_break = byte_pos + blen;
+        byte_pos += blen;
       } else {
-        ++i;
+        ++byte_pos;
       }
     }
 

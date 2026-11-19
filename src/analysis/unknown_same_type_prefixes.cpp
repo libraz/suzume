@@ -91,10 +91,10 @@ bool spellsAuxiliaryChain(const dictionary::DictionaryManager& dict_manager, con
     if (!reachable[from - start]) {
       continue;
     }
-    for (size_t to = from + 1; to <= end; ++to) {
-      if (!reachable[to - start] &&
-          lookupEntryInRange(dict_manager, codepoints, from, to, core::PartOfSpeech::Auxiliary) != nullptr) {
-        reachable[to - start] = true;
+    for (size_t span_end = from + 1; span_end <= end; ++span_end) {
+      if (!reachable[span_end - start] &&
+          lookupEntryInRange(dict_manager, codepoints, from, span_end, core::PartOfSpeech::Auxiliary) != nullptr) {
+        reachable[span_end - start] = true;
       }
     }
   }

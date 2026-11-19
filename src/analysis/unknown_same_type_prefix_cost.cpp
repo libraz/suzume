@@ -168,8 +168,8 @@ bool priceKanjiRun(const PrefixScanContext& ctx, size_t len, size_t candidate_en
   if (start_type == normalize::CharType::Kanji && len >= 3) {
     bool is_double_reduplication = len == 4 && normalize::isIterationMark(codepoints[start_pos + 1]) &&
                                    normalize::isIterationMark(codepoints[start_pos + 3]);
-    for (size_t i = start_pos + 1; i < candidate_end - 1; ++i) {
-      if (!is_double_reduplication && normalize::isIterationMark(codepoints[i])) {
+    for (size_t pos = start_pos + 1; pos < candidate_end - 1; ++pos) {
+      if (!is_double_reduplication && normalize::isIterationMark(codepoints[pos])) {
         // Found 々 in the middle - penalize extending past it
         cost += 5.0F;
         break;
@@ -182,8 +182,8 @@ bool priceKanjiRun(const PrefixScanContext& ctx, size_t len, size_t candidate_en
   // But 何日, 何人 (interrogative + counter) should stay together
   // Interrogatives are standalone words unless they're at the start (counter pattern)
   if (start_type == normalize::CharType::Kanji && len >= 2) {
-    for (size_t i = start_pos + 1; i < candidate_end; ++i) {  // Skip first char
-      if (isInterrogativeKanji(codepoints[i])) {
+    for (size_t pos = start_pos + 1; pos < candidate_end; ++pos) {  // Skip first char
+      if (isInterrogativeKanji(codepoints[pos])) {
         // Heavy penalty to force split
         cost += 3.0F;
         break;

@@ -808,15 +808,16 @@ bool spellsVerbCellWithClassicalAuxiliaries(const dictionary::DictionaryManager*
     return false;
   }
   const size_t chain_end = codepoints[end_pos - 1] == U'ば' || codepoints[end_pos - 1] == U'ど' ? end_pos - 1 : end_pos;
-  // chain_starts[i]: [i, chain_end) is a run of classical auxiliary cells.
+  // chain_starts[pos]: [pos, chain_end) is a run of classical auxiliary cells.
   std::vector<bool> chain_starts(chain_end + 1, false);
   chain_starts[chain_end] = true;
   for (size_t from = chain_end; from-- > start_pos + 1;) {
-    for (size_t to = from + 1; to <= chain_end && !chain_starts[from]; ++to) {
-      if (!chain_starts[to]) {
+    for (size_t span_end = from + 1; span_end <= chain_end && !chain_starts[from]; ++span_end) {
+      if (!chain_starts[span_end]) {
         continue;
       }
-      const auto* auxiliary = lookupEntryInRange(*dict_manager, codepoints, from, to, core::PartOfSpeech::Auxiliary);
+      const auto* auxiliary =
+          lookupEntryInRange(*dict_manager, codepoints, from, span_end, core::PartOfSpeech::Auxiliary);
       chain_starts[from] = auxiliary != nullptr && core::isClassicalAuxiliaryType(auxiliary->extended_pos);
     }
   }
