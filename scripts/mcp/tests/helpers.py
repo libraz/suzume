@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import importlib.util
 import json
+from collections.abc import Callable
 from pathlib import Path
 from types import ModuleType
 
@@ -58,3 +59,22 @@ def write_suite(root: Path, name: str, cases: list[dict], *, header: dict | None
         text = json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
     path.write_text(text, encoding="utf-8")
     return path
+
+
+def fake_native_analyze(monkeypatch, per_text: Callable[..., list[dict]]) -> None:
+    """Answer native-CLI analysis with ``per_text(text, cli_path=..., skip_user_dict=...)``.
+
+    A ``RuntimeError`` it raises becomes that text's in-place failure, as from the real child.
+    """
+    from suzume_mcp.core import suzume_cli
+
+    def analyze_many(texts, cli_path, skip_user_dict):
+        results = []
+        for text in texts:
+            try:
+                results.append(per_text(text, cli_path=cli_path, skip_user_dict=skip_user_dict))
+            except RuntimeError as exc:
+                results.append(exc)
+        return results
+
+    monkeypatch.setattr(suzume_cli, "_analyze_many_sync", analyze_many)

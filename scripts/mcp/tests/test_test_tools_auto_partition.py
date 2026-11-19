@@ -6,7 +6,7 @@ from importlib import import_module
 import pytest
 
 from suzume_mcp.tools import test_tools as _test_tools  # noqa: F401
-from tests.helpers import CORPUS_DIR, parse, run, write_suite
+from tests.helpers import CORPUS_DIR, fake_native_analyze, parse, run, write_suite
 
 mutation = import_module("suzume_mcp.tools._test_tools_mutation")
 
@@ -15,10 +15,10 @@ mutation = import_module("suzume_mcp.tools._test_tools_mutation")
 def passing_cli(monkeypatch):
     """Placement is under test here, not the pin verdict: Suzume echoes the expectation."""
 
-    async def fake_cli(text, cli_path=None, skip_user_dict=False):
+    def fake_cli(text, cli_path=None, skip_user_dict=False):
         return expected_tokens()
 
-    monkeypatch.setattr("suzume_mcp.core.suzume_cli.get_suzume_tokens_async", fake_cli)
+    fake_native_analyze(monkeypatch, fake_cli)
 
 
 def expected_tokens():

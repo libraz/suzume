@@ -1,26 +1,28 @@
 """Contract tests for shared tokenization-test tool helpers."""
 
 from pathlib import Path
-from types import SimpleNamespace
 
+from suzume_mcp.core import native_cli, suzume_cli
 from suzume_mcp.tools import _test_tools_common as common
 from tests.helpers import CORPUS_DIR
 
 
-def test_get_suzume_tokens_uses_explicit_analyze_command_and_option_separator(monkeypatch, tmp_path: Path):
-    cli = tmp_path / "suzume-cli"
-    cli.touch()
-    observed: list[str] = []
+def test_get_suzume_tokens_runs_without_the_bundled_user_dictionary(monkeypatch):
+    observed = []
 
-    def run(command, **_kwargs):
-        observed.extend(command)
-        return SimpleNamespace(returncode=0, stdout="-x\tNoun\t-x\nEOS\n", stderr="")
+    def analyze_many(texts, cli_path, skip_user_dict):
+        observed.append((texts, skip_user_dict))
+        return [[{"surface": "-x", "pos": "Noun", "lemma": "-x"}]]
 
-    monkeypatch.setattr(common, "existing_cli", lambda: cli)
-    monkeypatch.setattr(common.subprocess, "run", run)
+    monkeypatch.setattr(suzume_cli, "_analyze_many_sync", analyze_many)
 
     assert common._get_suzume_tokens("-x") == [{"surface": "-x", "pos": "Noun", "lemma": "-x"}]
-    assert observed == [str(cli), "analyze", "--skip-bundled-user-dictionary", "--", "-x"]
+    assert observed == [(["-x"], True)]
+
+
+def test_analyze_command_puts_an_option_separator_before_the_text():
+    assert native_cli.analyze_args("-x", skip_user_dict=False) == ["analyze", "--", "-x"]
+    assert native_cli.analyze_args("-x", skip_user_dict=True)[-2:] == ["--", "-x"]
 
 
 def test_filtered_test_files_reject_path_like_names(monkeypatch, tmp_path: Path):

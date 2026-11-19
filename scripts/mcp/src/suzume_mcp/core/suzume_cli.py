@@ -1,16 +1,16 @@
 """Suzume CLI interface - subprocess-based suzume-cli calls.
 
-Normalization functions (get_expected_tokens etc.) are called via subprocess
-to ensure code changes are reflected without MCP server restart.
-Each subprocess invocation starts a fresh Python process, importing
-the latest normalization code from disk.
+Normalization functions (get_expected_tokens etc.) and native suzume-cli calls
+both run in a fresh ``python -m suzume_mcp`` process, so changes to the
+normalization code and to the native CLI's command line (``native_cli``) are
+reflected without an MCP server restart. This module locates the CLI and
+checks its freshness, but never spells its arguments.
 """
 
 import asyncio
 import json
 import math
 import os
-import re
 import subprocess
 import sys
 import time
@@ -19,7 +19,6 @@ from datetime import datetime
 from pathlib import Path
 
 from ..config import PROJECT_ROOT
-from .pos_mapping import normalize_pos
 
 _CLI_ENV_VAR = "SUZUME_CLI_PATH"
 _MULTI_CONFIG_NAMES = ("Debug", "Release", "RelWithDebInfo", "MinSizeRel")
@@ -134,175 +133,109 @@ def _timed_out(what: str, timeout: float) -> RuntimeError:
     return RuntimeError(f"{what} timed out after {timeout:g}s")
 
 
-def _analyze_args(text: str, skip_user_dict: bool) -> list[str]:
-    return ["analyze"] + (["--skip-bundled-user-dictionary"] if skip_user_dict else []) + ["--", text]
+def _native_timeout(cli_timeout: float, rounds: int = 1) -> float:
+    """Bound the whole native child: interpreter start-up plus its sequential CLI rounds."""
+    return _NORMALIZE_TIMEOUT_SECONDS + cli_timeout * rounds
 
 
-def _cli_failure(stderr: str) -> RuntimeError:
-    return RuntimeError(f"Suzume CLI failed: {stderr.strip() or 'non-zero exit'}")
+def _run_native(request: dict, timeout: float) -> object:
+    """Run one native-CLI request in a fresh ``python -m suzume_mcp native`` process.
+
+    The CLI's command line is spelled in ``native_cli``, which this process never
+    imports, so a renamed flag or subcommand reaches running servers on the next call.
+    """
+    return _run_module_cli(["native"], request, timeout=timeout)
 
 
-def tokens_from_output(stdout: str) -> list[dict]:
-    """Parse ``analyze`` output into tokens with a normalized POS; a missing lemma is the surface."""
-    tokens = []
-    for line in stdout.split("\n"):
-        if not line or line == "EOS":
-            continue
-        parts = line.split("\t")
-        surface = parts[0]
-        if not surface:
-            continue
-        pos = normalize_pos(parts[1]) if len(parts) > 1 else "Other"
-        tokens.append({"surface": surface, "pos": pos, "lemma": parts[2] if len(parts) > 2 else surface})
-    return tokens
+def _analyze_many_sync(
+    texts: list[str], cli_path: Path | None, skip_user_dict: bool
+) -> list[list[dict] | RuntimeError]:
+    cli = existing_cli(cli_path)
+    rounds = max(1, math.ceil(len(texts) / _ANALYZE_CONCURRENCY))
+    request = {
+        "op": "analyze",
+        "cli": str(cli),
+        "texts": texts,
+        "skip_user_dict": skip_user_dict,
+        "timeout": _ANALYZE_TIMEOUT_SECONDS,
+        "concurrency": _ANALYZE_CONCURRENCY,
+    }
+    results = _run_native(request, _native_timeout(_ANALYZE_TIMEOUT_SECONDS, rounds))
+    return [RuntimeError(result["error"]) if "error" in result else result["tokens"] for result in results]
 
 
-def _surfaces_from_output(stdout: str) -> list[str]:
-    return [token["surface"] for token in tokens_from_output(stdout)]
+def get_suzume_tokens(text: str, cli_path: Path | None = None, skip_user_dict: bool = False) -> list[dict]:
+    """Get tokens with POS and lemma from Suzume CLI output (synchronous).
 
-
-async def _run_cli_async(
-    cli: Path, args: list[str], env: dict[str, str] | None = None, timeout: float = _ANALYZE_TIMEOUT_SECONDS
-) -> tuple[str, str]:
-    """Run the CLI without blocking the event loop; raise on a non-zero exit or a timeout."""
-    proc = await asyncio.create_subprocess_exec(
-        str(cli),
-        *args,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-        env=env,
-        cwd=PROJECT_ROOT,
-    )
-    try:
-        stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout)
-    except TimeoutError:
-        proc.kill()
-        await proc.wait()
-        raise _timed_out("Suzume CLI", timeout) from None
-    if proc.returncode != 0:
-        raise _cli_failure(stderr.decode("utf-8"))
-    return stdout.decode("utf-8"), stderr.decode("utf-8")
+    Args:
+        skip_user_dict: When True, analyze without the bundled user dictionary, matching the C++
+            tokenization test runner oracle (skip_bundled_user_dictionary=true). When False
+            (default), the CLI auto-loads user.dic, matching real-world CLI behavior — this is
+            what thread checking wants so that dict_add fixes are reflected.
+    """
+    (result,) = _analyze_many_sync([text], cli_path, skip_user_dict)
+    if isinstance(result, RuntimeError):
+        raise result
+    return result
 
 
 def get_suzume_surfaces(text: str, cli_path: Path | None = None, skip_user_dict: bool = False) -> list[str]:
-    """Get surface tokens from Suzume CLI output (synchronous).
-
-    Args:
-        skip_user_dict: When True, pass --skip-bundled-user-dictionary to match the C++ tokenization
-            test runner oracle (skip_bundled_user_dictionary=true). When False (default), the
-            CLI auto-loads user.dic, matching real-world CLI behavior — this is what
-            thread checking wants so that dict_add fixes are reflected.
-    """
-    cli = existing_cli(cli_path)
-    try:
-        result = subprocess.run(
-            [str(cli), *_analyze_args(text, skip_user_dict)],
-            capture_output=True,
-            text=True,
-            cwd=PROJECT_ROOT,
-            timeout=_ANALYZE_TIMEOUT_SECONDS,
-        )
-    except subprocess.TimeoutExpired:
-        raise _timed_out("Suzume CLI", _ANALYZE_TIMEOUT_SECONDS) from None
-    if result.returncode != 0:
-        raise _cli_failure(result.stderr)
-    return _surfaces_from_output(result.stdout)
+    """Get surface tokens from Suzume CLI output (synchronous); see ``get_suzume_tokens``."""
+    return [token["surface"] for token in get_suzume_tokens(text, cli_path, skip_user_dict)]
 
 
 async def get_suzume_tokens_async(text: str, cli_path: Path | None = None, skip_user_dict: bool = False) -> list[dict]:
-    """Get tokens with POS and lemma from Suzume CLI output (async).
-
-    Args:
-        skip_user_dict: When True, pass --skip-bundled-user-dictionary to match the C++ tokenization
-            test runner oracle. When False (default), the CLI auto-loads user.dic.
-    """
-    stdout, _ = await _run_cli_async(existing_cli(cli_path), _analyze_args(text, skip_user_dict))
-    return tokens_from_output(stdout)
+    """Async ``get_suzume_tokens``; the child process runs off the event loop."""
+    return await asyncio.to_thread(get_suzume_tokens, text, cli_path, skip_user_dict)
 
 
-async def get_suzume_tokens_many(texts: list[str], *, skip_user_dict: bool) -> list[list[dict] | BaseException]:
-    """Analyze many texts with bounded concurrency; a failed text yields its exception in place."""
-    semaphore = asyncio.Semaphore(_ANALYZE_CONCURRENCY)
-
-    async def one(text: str) -> list[dict]:
-        async with semaphore:
-            return await get_suzume_tokens_async(text, skip_user_dict=skip_user_dict)
-
-    return await asyncio.gather(*(one(text) for text in texts), return_exceptions=True)
+async def get_suzume_tokens_many(
+    texts: list[str], *, skip_user_dict: bool, cli_path: Path | None = None
+) -> list[list[dict] | BaseException]:
+    """Analyze many texts in one child with bounded concurrency; a failed text yields its exception in place."""
+    if not texts:
+        return []
+    return await asyncio.to_thread(_analyze_many_sync, texts, cli_path, skip_user_dict)
 
 
 async def get_suzume_debug_info(text: str, cli_path: Path | None = None, skip_user_dict: bool = True) -> dict:
-    """Get debug info from Suzume CLI (SUZUME_DEBUG=2).
+    """Get debug info from Suzume CLI (debug level 2).
 
     Args:
         skip_user_dict: Defaults to True so test_show debug output matches the test
             oracle (the C++ runner uses skip_bundled_user_dictionary=true). Pass False to
             inspect real-world CLI behavior with user.dic loaded.
     """
-    stdout, stderr = await _run_cli_async(
-        existing_cli(cli_path), _analyze_args(text, skip_user_dict), {**os.environ, "SUZUME_DEBUG": "2"}
-    )
-    output = stdout + stderr
-
-    info: dict = {"best_path": "", "total_cost": 0, "margin": 0, "tokens": [], "connections": [], "word_costs": []}
-
-    m = re.search(r"\[VITERBI\] Best path \(cost=([-\d.]+)\): (.+?) \[margin=([-\d.]+)\]", output)
-    if m:
-        info["total_cost"] = float(m.group(1))
-        info["best_path"] = m.group(2)
-        info["margin"] = float(m.group(3))
-
-    for part in info["best_path"].split(" → "):
-        m2 = re.match(r'"(.+?)"\((\w+)/(\w+)\)', part)
-        if m2:
-            info["tokens"].append({"surface": m2.group(1), "pos": m2.group(2), "epos": m2.group(3)})
-
-    for m3 in re.finditer(
-        r'\[CONN\] "(.+?)" \((\w+)/\w+\) → "(.+?)" \((\w+)/\w+\): bigram=([-\d.]+) epos_adj=([-\d.]+) \(([^)]+)\) total=([-\d.]+)',
-        output,
-    ):
-        info["connections"].append(
-            {
-                "from_surface": m3.group(1),
-                "from_pos": m3.group(2),
-                "to_surface": m3.group(3),
-                "to_pos": m3.group(4),
-                "bigram": float(m3.group(5)),
-                "epos_adj": float(m3.group(6)),
-                "reason": m3.group(7),
-                "total": float(m3.group(8)),
-            }
-        )
-
-    for m4 in re.finditer(
-        r'\[WORD\] "(.+?)" \(([^)]+)\) cost=([-\d.]+) \(from edge\) \[cat=([-\d.]+) edge=([-\d.]+) epos=([^\]]+)\]',
-        output,
-    ):
-        info["word_costs"].append(
-            {
-                "surface": m4.group(1),
-                "source": m4.group(2),
-                "cost": float(m4.group(3)),
-                "cat_cost": float(m4.group(4)),
-                "edge_cost": float(m4.group(5)),
-                "epos": m4.group(6),
-            }
-        )
-
-    return info
+    request = {
+        "op": "debug",
+        "cli": str(existing_cli(cli_path)),
+        "text": text,
+        "skip_user_dict": skip_user_dict,
+        "timeout": _ANALYZE_TIMEOUT_SECONDS,
+    }
+    result = await asyncio.to_thread(_run_native, request, _native_timeout(_ANALYZE_TIMEOUT_SECONDS))
+    if "error" in result:
+        raise RuntimeError(result["error"])
+    return result["info"]
 
 
 async def recompile_dic(glob_pattern: str, output_path: str) -> bool:
-    """Recompile dictionary using suzume-cli dict compile."""
+    """Recompile a dictionary with the CLI's dictionary compiler; False when it is missing or fails."""
     cli = get_cli_path()
     if not cli.exists():
         return False
-
+    request = {
+        "op": "dict-compile",
+        "cli": str(cli),
+        "glob": glob_pattern,
+        "output": output_path,
+        "timeout": _DICT_COMPILE_TIMEOUT_SECONDS,
+    }
     try:
-        await _run_cli_async(cli, ["dict", "compile", glob_pattern, output_path], timeout=_DICT_COMPILE_TIMEOUT_SECONDS)
+        result = await asyncio.to_thread(_run_native, request, _native_timeout(_DICT_COMPILE_TIMEOUT_SECONDS))
     except RuntimeError:
         return False
-    return True
+    return "error" not in result
 
 
 # ---------------------------------------------------------------------------
@@ -317,10 +250,14 @@ async def recompile_dic(glob_pattern: str, output_path: str) -> bool:
 _MCP_PROJECT_DIR = str(Path(__file__).resolve().parent.parent.parent.parent)
 
 
-def _run_module_cli(args: list[str], payload: list) -> list:
-    """Run ``python -m suzume_mcp <args>`` with a JSON array on stdin, in a fresh process."""
+def _run_module_cli(args: list[str], payload: list | dict, timeout: float | None = None):
+    """Run ``python -m suzume_mcp <args>`` with JSON on stdin, in a fresh process.
+
+    Without an explicit ``timeout`` the payload is a batch and the bound grows with its length.
+    """
     command = " ".join(args[:1])
-    timeout = _NORMALIZE_TIMEOUT_SECONDS + _NORMALIZE_TIMEOUT_PER_TEXT_SECONDS * len(payload)
+    if timeout is None:
+        timeout = _NORMALIZE_TIMEOUT_SECONDS + _NORMALIZE_TIMEOUT_PER_TEXT_SECONDS * len(payload)
     try:
         result = subprocess.run(
             [sys.executable, "-m", "suzume_mcp", *args],

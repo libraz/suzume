@@ -1,7 +1,6 @@
 """Dictionary search, sorting, and cleanup MCP tools."""
 
 import re
-import subprocess
 
 import regex
 
@@ -9,7 +8,7 @@ from ..app import mcp
 from ..config import PROJECT_ROOT
 from ..core.constants import katakana_to_hiragana
 from ..core.mecab import mecab_analyze
-from ..core.suzume_cli import existing_cli
+from ..core.suzume_cli import existing_cli, get_suzume_tokens_many
 from ..core.suzume_utils import get_char_types
 from ._cli_freshness import stale_cli_guard
 from ._dict_tools_common import (
@@ -384,22 +383,6 @@ async def dict_cleanup(
     def is_fixed_expression(surface: str) -> bool:
         return bool(regex.search(r"[\p{Han}][\p{Hiragana}][\p{Han}\p{Hiragana}\p{Katakana}]", surface))
 
-    def is_split_by_suzume(surface: str) -> bool:
-        # --skip-bundled-user-dictionary: judge whether suzume splits the word on its OWN merits,
-        # not because of the very user-dict entry we are evaluating for removal.
-        result = subprocess.run(
-            [str(cli), "--skip-bundled-user-dictionary", surface],
-            capture_output=True,
-            text=True,
-            timeout=10,
-            cwd=PROJECT_ROOT,
-        )
-        if result.returncode != 0:
-            detail = result.stderr.strip() or result.stdout.strip() or "no diagnostic output"
-            raise RuntimeError(f"suzume-cli exited with {result.returncode}: {detail}")
-        lines = [line for line in result.stdout.strip().split("\n") if line and line != "EOS"]
-        return len(lines) > 1
-
     keep_lines = []
     noise_lines = []
     total = 0
@@ -408,6 +391,23 @@ async def dict_cleanup(
 
     try:
         input_lines = filepath.read_text(encoding="utf-8").splitlines()
+        # Without the bundled user dictionary: judge whether suzume splits the word on its OWN
+        # merits, not because of the very user-dict entry being evaluated for removal.
+        candidates = sorted(
+            {
+                fields[0]
+                for fields in (line.split("\t") for line in input_lines if line.strip() and not line.startswith("#"))
+                if len(fields) >= 2 and len(fields[0]) > 2
+            }
+        )
+        token_counts: dict[str, int] = {}
+        for surface, output in zip(
+            candidates, await get_suzume_tokens_many(candidates, skip_user_dict=True, cli_path=cli), strict=True
+        ):
+            if isinstance(output, BaseException):
+                raise RuntimeError(f"suzume-cli failed for {surface!r}: {output}")
+            token_counts[surface] = len(output)
+
         for line in input_lines:
             if line.startswith("#") or not line.strip():
                 keep_lines.append(line)
@@ -428,7 +428,7 @@ async def dict_cleanup(
             if len(surface) <= 2:
                 keep = False
                 reason = "too_short"
-            elif not is_split_by_suzume(surface):
+            elif token_counts[surface] <= 1:
                 keep = False
                 reason = "handled_by_suzume"
             elif is_fixed_expression(surface):
@@ -448,7 +448,7 @@ async def dict_cleanup(
                 kept += 1
             else:
                 noise_lines.append(f"{line}\t# {reason}")
-    except (OSError, subprocess.SubprocessError, RuntimeError) as exc:
+    except (OSError, RuntimeError) as exc:
         return _json_error(f"Cleanup analysis failed: {exc}")
 
     result: dict = {

@@ -4,12 +4,14 @@ import asyncio
 import io
 import json
 import os
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
 
 from suzume_mcp import __main__ as normalization_cli
-from suzume_mcp.core import suzume_cli
+from suzume_mcp.core import native_cli, suzume_cli
 from suzume_mcp.core.suzume_cli import get_cli_path
 
 CLI_NAME = "suzume-cli.exe" if os.name == "nt" else "suzume-cli"
@@ -189,7 +191,54 @@ def test_a_hung_cli_times_out_in_the_blocking_call(tmp_path: Path, monkeypatch: 
 @pytest.mark.skipif(os.name == "nt", reason="uses a shell script as the child")
 def test_a_hung_cli_times_out_and_is_killed_in_the_async_call(tmp_path: Path) -> None:
     with pytest.raises(RuntimeError, match=r"timed out after 0\.2s"):
-        asyncio.run(suzume_cli._run_cli_async(_hanging_cli(tmp_path), ["analyze"], timeout=0.2))
+        asyncio.run(native_cli.run_cli(_hanging_cli(tmp_path), ["analyze"], timeout=0.2))
+
+
+@pytest.mark.skipif(os.name == "nt", reason="uses a shell script as the child")
+def test_one_failed_text_keeps_the_rest_of_the_batch(tmp_path: Path) -> None:
+    cli = tmp_path / "picky-cli"
+    cli.write_text(
+        '#!/bin/sh\nfor arg; do last="$arg"; done\n[ "$last" = bad ] && exit 3\nprintf "%s\\tNOUN\\nEOS\\n" "$last"\n'
+    )
+    cli.chmod(0o755)
+
+    results = asyncio.run(suzume_cli.get_suzume_tokens_many(["東京", "bad"], skip_user_dict=True, cli_path=cli))
+
+    assert results[0] == [{"surface": "東京", "pos": "Noun", "lemma": "東京"}]
+    assert isinstance(results[1], RuntimeError) and "Suzume CLI failed" in str(results[1])
+
+
+def test_the_server_never_spells_the_native_cli_command_line() -> None:
+    """A CLI flag rename must reach running servers on the next call, not after a reconnect.
+
+    The server process imports every tool module once and keeps it. Any native-CLI flag or
+    subcommand spelled there is frozen at server start, which is how a renamed user-dictionary
+    flag once broke every live check until the servers were restarted. Only ``native_cli``,
+    loaded fresh in each child, may spell it.
+    """
+    import ast
+
+    probe = (
+        "import json, sys; import suzume_mcp.server; "
+        "print(json.dumps(sorted((n, m.__file__) for n, m in sys.modules.items() "
+        "if n.startswith('suzume_mcp') and getattr(m, '__file__', None))))"
+    )
+    result = subprocess.run(
+        [sys.executable, "-c", probe], capture_output=True, text=True, cwd=suzume_cli._MCP_PROJECT_DIR, check=True
+    )
+    loaded = dict(json.loads(result.stdout))
+
+    assert "suzume_mcp.core.native_cli" not in loaded
+    own_cli_flags = {"--batch", "--mecab"}
+    offenders = []
+    for name, path in sorted(loaded.items()):
+        if name == "suzume_mcp.__main__":
+            continue
+        for node in ast.walk(ast.parse(Path(path).read_text(encoding="utf-8"))):
+            if isinstance(node, ast.Constant) and isinstance(node.value, str):
+                if node.value.startswith("--") and node.value not in own_cli_flags:
+                    offenders.append(f"{name}:{node.lineno}: {node.value}")
+    assert offenders == []
 
 
 def test_normalize_timeout_grows_with_the_batch(monkeypatch: pytest.MonkeyPatch) -> None:

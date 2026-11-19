@@ -1,14 +1,13 @@
 """Shared helpers for the test corpus MCP tools: oracle access, case loading and drift detection."""
 
 import re
-import subprocess
 from collections.abc import Iterable
 from pathlib import Path
 
 from ..config import PROJECT_ROOT
 from ..core.json_utils import json_error as _json_error  # noqa: F401
 from ..core.json_utils import json_result as _json_result  # noqa: F401
-from ..core.suzume_cli import existing_cli, get_expected_tokens_batch_subprocess, tokens_from_output
+from ..core.suzume_cli import get_expected_tokens_batch_subprocess, get_suzume_tokens
 from ..core.suzume_utils import tokens_match
 from ..core.test_file_utils import (
     find_test_by_id,
@@ -37,23 +36,11 @@ ORACLE_OVERRIDE_REMEDIATION = (
 
 
 def _get_suzume_tokens(text: str) -> list[dict]:
-    """Get Suzume CLI tokens with POS and lemma.
+    """Get Suzume CLI tokens with POS and lemma, without the bundled user dictionary.
 
-    Uses --skip-bundled-user-dictionary to match the C++ tokenization test runner oracle.
+    That matches the C++ tokenization test runner oracle.
     """
-    cli = existing_cli()
-
-    result = subprocess.run(
-        [str(cli), "analyze", "--skip-bundled-user-dictionary", "--", text],
-        capture_output=True,
-        text=True,
-        timeout=30,
-        cwd=PROJECT_ROOT,
-    )
-    if result.returncode != 0:
-        raise RuntimeError(f"Suzume CLI failed: {result.stderr.strip() or 'non-zero exit'}")
-
-    return tokens_from_output(result.stdout)
+    return get_suzume_tokens(text, skip_user_dict=True)
 
 
 def _format_expected_checked(tokens: list[dict], source: str) -> list[dict]:

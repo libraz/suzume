@@ -6,7 +6,7 @@ import json
 import pytest
 
 from suzume_mcp.tools import test_tools as _tt
-from tests.helpers import CORPUS_DIR, parse, run, write_suite
+from tests.helpers import CORPUS_DIR, fake_native_analyze, parse, run, write_suite
 
 mutation_tools = importlib.import_module("suzume_mcp.tools._test_tools_mutation")
 review_tools = importlib.import_module("suzume_mcp.tools._test_tools_review")
@@ -182,7 +182,7 @@ class TestPinVerdict:
     def engine(self, tmp_path, monkeypatch):
         cli: dict[str, list[dict]] = {}
 
-        async def fake_cli(text, cli_path=None, skip_user_dict=False):
+        def fake_cli(text, cli_path=None, skip_user_dict=False):
             assert skip_user_dict, "pins are judged the way the C++ runner runs, without the user dictionary"
             if text not in cli:
                 raise RuntimeError("Suzume CLI failed: boom")
@@ -195,7 +195,7 @@ class TestPinVerdict:
             "get_expected_tokens_batch_subprocess",
             lambda texts: [(PIN_NOUN, "reference", "") for _text in texts],
         )
-        monkeypatch.setattr("suzume_mcp.core.suzume_cli.get_suzume_tokens_async", fake_cli)
+        fake_native_analyze(monkeypatch, fake_cli)
         return cli
 
     def test_a_green_pin_says_it_passes(self, engine):

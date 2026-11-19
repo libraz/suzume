@@ -14,6 +14,9 @@ Usage:
     # Normalization rule name per text, and Suzume POS per raw MeCab token
     echo '["経済成長"]' | python -m suzume_mcp rule
     echo '[{"pos":"名詞","pos_sub1":"一般"}]' | python -m suzume_mcp map-pos
+
+    # Native suzume-cli call (JSON request object on stdin; see core/native_cli.py)
+    echo '{"op":"analyze","cli":"...","texts":["東京"],...}' | python -m suzume_mcp native
 """
 
 import json
@@ -81,7 +84,14 @@ def cmd_map_pos(_args: list[str]) -> None:
     print(json.dumps([map_mecab_pos(token) for token in _read_json_array()], ensure_ascii=False))
 
 
-_COMMANDS = {"normalize": cmd_normalize, "rule": cmd_rule, "map-pos": cmd_map_pos}
+def cmd_native(_args: list[str]) -> None:
+    """Run one native suzume-cli request (a JSON object on stdin) and print its JSON result."""
+    from .core.native_cli import run
+
+    print(json.dumps(run(json.loads(sys.stdin.read())), ensure_ascii=False))
+
+
+_COMMANDS = {"normalize": cmd_normalize, "rule": cmd_rule, "map-pos": cmd_map_pos, "native": cmd_native}
 
 
 def main() -> None:
@@ -90,6 +100,7 @@ def main() -> None:
         print("Usage: python -m suzume_mcp normalize <text>", file=sys.stderr)
         print("       python -m suzume_mcp normalize --batch  (JSON array on stdin)", file=sys.stderr)
         print("       python -m suzume_mcp rule | map-pos     (JSON array on stdin)", file=sys.stderr)
+        print("       python -m suzume_mcp native             (JSON request object on stdin)", file=sys.stderr)
         sys.exit(1)
 
     command = _COMMANDS.get(args[0])

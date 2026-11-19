@@ -1,8 +1,13 @@
 """Tests for dict tools (MCP tool functions)."""
 
 import importlib
-import subprocess
+import os
+from pathlib import Path
 
+import pytest
+
+from suzume_mcp.config import PROJECT_ROOT
+from suzume_mcp.core import native_cli
 from suzume_mcp.tools.dict_tools import (
     dict_bulk_add,
     dict_bulk_move,
@@ -420,43 +425,41 @@ class TestDictCleanup:
         assert result["status"] == "error"
         assert "not found" in result["message"]
 
-    def test_cleanup_runs_cli_from_project_root(self, tmp_path, monkeypatch):
+    @staticmethod
+    def _sample_with_cli(tmp_path, monkeypatch, script: str):
         target = tmp_path / "data/core/sample.tsv"
         target.parent.mkdir(parents=True)
         target.write_text("東京公園\tNOUN\n", encoding="utf-8")
         cli = tmp_path / "suzume-cli"
-        cli.touch()
-        observed = {}
-
-        def fake_run(args, **kwargs):
-            observed["cwd"] = kwargs.get("cwd")
-            return subprocess.CompletedProcess(args, 0, "東京公園\tNOUN\nEOS\n", "")
-
+        cli.write_text("#!/bin/sh\n" + script, encoding="utf-8")
+        cli.chmod(0o755)
         monkeypatch.setattr(maintenance_tools, "PROJECT_ROOT", tmp_path)
         monkeypatch.setattr(maintenance_tools, "existing_cli", lambda: cli)
-        monkeypatch.setattr(subprocess, "run", fake_run)
+        return target
+
+    @pytest.mark.skipif(os.name == "nt", reason="uses a shell script as the CLI")
+    def test_cleanup_analyzes_without_the_bundled_user_dictionary_from_the_project_root(self, tmp_path, monkeypatch):
+        record = tmp_path / "argv.txt"
+        self._sample_with_cli(
+            tmp_path,
+            monkeypatch,
+            f'pwd > "{record}"\nprintf "%s\\n" "$@" >> "{record}"\nprintf "東京公園\\tNOUN\\nEOS\\n"\n',
+        )
 
         result = parse(run(dict_cleanup(input_file="data/core/sample.tsv")))
+
         assert result["dry_run"] is True
-        assert observed["cwd"] == tmp_path
+        cwd, *argv = record.read_text(encoding="utf-8").splitlines()
+        assert Path(cwd).resolve() == PROJECT_ROOT.resolve()
+        assert argv == native_cli.analyze_args("東京公園", skip_user_dict=True)
 
+    @pytest.mark.skipif(os.name == "nt", reason="uses a shell script as the CLI")
     def test_cleanup_reports_nonzero_cli_exit(self, tmp_path, monkeypatch):
-        target = tmp_path / "data/core/sample.tsv"
-        target.parent.mkdir(parents=True)
-        target.write_text("東京公園\tNOUN\n", encoding="utf-8")
-        cli = tmp_path / "suzume-cli"
-        cli.touch()
-
-        def fake_run(args, **kwargs):
-            return subprocess.CompletedProcess(args, 2, "", "dictionary missing")
-
-        monkeypatch.setattr(maintenance_tools, "PROJECT_ROOT", tmp_path)
-        monkeypatch.setattr(maintenance_tools, "existing_cli", lambda: cli)
-        monkeypatch.setattr(subprocess, "run", fake_run)
+        self._sample_with_cli(tmp_path, monkeypatch, "echo 'dictionary missing' >&2\nexit 2\n")
 
         result = parse(run(dict_cleanup(input_file="data/core/sample.tsv")))
         assert result["status"] == "error"
-        assert "exited with 2" in result["message"]
+        assert "dictionary missing" in result["message"]
 
     def test_cleanup_rejects_paths_outside_dictionary_data(self, tmp_path, monkeypatch):
         target = tmp_path / "sample.tsv"
@@ -467,19 +470,9 @@ class TestDictCleanup:
         assert result["status"] == "error"
         assert "inside data" in result["message"]
 
+    @pytest.mark.skipif(os.name == "nt", reason="uses a shell script as the CLI")
     def test_cleanup_writes_artifacts_outside_the_compiler_glob(self, tmp_path, monkeypatch):
-        target = tmp_path / "data/core/sample.tsv"
-        target.parent.mkdir(parents=True)
-        target.write_text("東京公園\tNOUN\n", encoding="utf-8")
-        cli = tmp_path / "suzume-cli"
-        cli.touch()
-
-        def fake_run(args, **kwargs):
-            return subprocess.CompletedProcess(args, 0, "東京\tNOUN\n公園\tNOUN\nEOS\n", "")
-
-        monkeypatch.setattr(maintenance_tools, "PROJECT_ROOT", tmp_path)
-        monkeypatch.setattr(maintenance_tools, "existing_cli", lambda: cli)
-        monkeypatch.setattr(subprocess, "run", fake_run)
+        target = self._sample_with_cli(tmp_path, monkeypatch, 'printf "東京\\tNOUN\\n公園\\tNOUN\\nEOS\\n"\n')
 
         result = parse(run(dict_cleanup(input_file="data/core/sample.tsv", dry_run=False)))
 

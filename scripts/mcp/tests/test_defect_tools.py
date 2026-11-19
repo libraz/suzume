@@ -18,8 +18,8 @@ from suzume_mcp.tools.defect_tools import (
     defect_update,
     defect_yield,
 )
+from tests.helpers import fake_native_analyze, run
 from tests.helpers import parse as parse_json
-from tests.helpers import run
 
 
 @pytest.fixture
@@ -50,12 +50,12 @@ def engine(monkeypatch):
             for text in texts
         ]
 
-    async def fake_cli(text, cli_path=None, skip_user_dict=False):
+    def fake_cli(text, cli_path=None, skip_user_dict=False):
         tables["skip_user_dict"].append(skip_user_dict)
         return tables["cli_tokens"].get(text) or surface_tokens(tables["cli"].get(text, text))
 
     monkeypatch.setattr("suzume_mcp.tools.defect_tools.get_expected_tokens_batch_subprocess", fake_oracle)
-    monkeypatch.setattr("suzume_mcp.core.suzume_cli.get_suzume_tokens_async", fake_cli)
+    fake_native_analyze(monkeypatch, fake_cli)
     return tables
 
 
