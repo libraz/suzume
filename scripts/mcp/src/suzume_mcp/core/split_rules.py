@@ -582,6 +582,22 @@ def apply_suzume_split(tokens: list[dict]) -> tuple[list[dict], str | None]:
                 applied_rule = "locative-iru-desiderative"
             continue
 
+        # 0ab. Conjunctive ので/のに attaches to an attributive predicate; after a
+        # bare nominal the span is the genitive の plus で/に (私ので, それのに).
+        if (
+            surface in ("ので", "のに")
+            and t.get("pos") == "助詞"
+            and t.get("pos_sub1") == "接続助詞"
+            and result
+            and result[-1].get("pos") == "名詞"
+            and result[-1].get("pos_sub1") != "非自立"
+        ):
+            result.append({"surface": "の", "pos": "助詞", "pos_sub1": "連体化", "lemma": "の"})
+            result.append({"surface": surface[1:], "pos": "助詞", "pos_sub1": "格助詞", "lemma": surface[1:]})
+            if applied_rule is None:
+                applied_rule = "nominal-conjunctive-node-split"
+            continue
+
         # 0. Plural suffix ら
         m = regex.match(r"^(彼女|彼|僕|奴|我)ら$", surface)
         if m:

@@ -975,3 +975,17 @@ class TestCutContractedIrrealis:
 @pytest.mark.parametrize(("text", "types"), [("abcXYZ", ["alpha"]), ("[\\]^_`", []), ("A_1", ["alpha", "digit"])])
 def test_char_types_count_only_ascii_letters_as_alpha(text, types):
     assert sorted(get_char_types(text)) == types
+
+
+class TestConjunctiveNodeAfterNominal:
+    """Conjunctive ので/のに needs an attributive predicate; after a bare nominal it is の plus で/に."""
+
+    @pytest.mark.parametrize(("text", "tail"), [("私ので", "で"), ("私のに", "に"), ("それので", "で")])
+    def test_splits_after_a_nominal(self, text, tail):
+        tokens, _, _ = get_expected_tokens(text)
+        assert [(token["surface"], token["pos"]) for token in tokens][-2:] == [("の", "Particle"), (tail, "Particle")]
+
+    @pytest.mark.parametrize(("text", "particle"), [("学生なので", "ので"), ("行くので", "ので"), ("雨なのに", "のに")])
+    def test_keeps_the_conjunctive_after_a_predicate(self, text, particle):
+        tokens, _, _ = get_expected_tokens(text)
+        assert tokens[-1]["surface"] == particle
