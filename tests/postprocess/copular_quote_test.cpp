@@ -59,7 +59,7 @@ TEST(CopularQuote, PreservesOtherParticleReadings) {
     SCOPED_TRACE(input);
     const auto result = analyzer.analyze(input);
     ASSERT_GE(result.size(), 2U);
-    EXPECT_EQ(result[1].extended_pos, core::ExtendedPOS::ParticleAdverbial);
+    EXPECT_TRUE(core::isAdverbialParticleType(result[1].extended_pos));
     EXPECT_EQ(result[1].start, 2U);
     EXPECT_EQ(result[1].surface, particle);
     EXPECT_GE(result[1].end, 4U);

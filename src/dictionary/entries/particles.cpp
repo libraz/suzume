@@ -76,12 +76,12 @@ EntrySpecRange getParticleEntries() {
       particle("けども", EPOS::ParticleConj),
       particle("けれども", EPOS::ParticleConj),
       particle("ものの", EPOS::ParticleConj),
-      particle("し", EPOS::ParticleConj),         // 列挙・理由 (接続助詞)
-      particle("たり", EPOS::ParticleConj),       // 並立助詞 (食べたり飲んだり)
-      particle("だり", EPOS::ParticleConj),       // 並立助詞 (voiced: 飲んだり)
-      particle("なり", EPOS::ParticleConj),       // 動作直後: 鳴るなり
-      particle("や", EPOS::ParticleConj),         // 並立助詞 (AやB)
-      particle("だの", EPOS::ParticleAdverbial),  // 列挙・並立: 赤だの青だの
+      particle("し", EPOS::ParticleConj),       // 列挙・理由 (接続助詞)
+      particle("たり", EPOS::ParticleConj),     // 並立助詞 (食べたり飲んだり)
+      particle("だり", EPOS::ParticleConj),     // 並立助詞 (voiced: 飲んだり)
+      particle("なり", EPOS::ParticleConj),     // 動作直後: 鳴るなり
+      particle("や", EPOS::ParticleConj),       // 並立助詞 (AやB)
+      particle("だの", EPOS::ParticleListing),  // 列挙・並立: 赤だの青だの
 
       // Quotation particles (引用助詞)
       particle("って", EPOS::ParticleQuote),
@@ -156,7 +156,7 @@ EntrySpecRange getParticleEntries() {
       particle("くらい", EPOS::ParticleAdverbial),
       particle("ぐらい", EPOS::ParticleAdverbial),
       particle("など", EPOS::ParticleAdverbial),
-      particle("とか", EPOS::ParticleAdverbial),  // 並立 (AとかBとか)
+      particle("とか", EPOS::ParticleListing),    // 並立 (AとかBとか)
       particle("とも", EPOS::ParticleAdverbial),  // 集合の全称 (二人とも, 三つとも)
       particle("なんて", EPOS::ParticleAdverbial),
       particle("だって", EPOS::ParticleAdverbial),

@@ -134,8 +134,8 @@ EntrySpecRange getConjunctionEntries() {
       adv("生憎", ""),          // Orthographic variant
       adv("つねに", ""),        // 恒常副詞
       adv("おそらくは", ""),    // Fixed probability adverb
-      particle("がてら", EPOS::ParticleConj),     // purpose-combining conjunctive expression
-      particle("やら", EPOS::ParticleAdverbial),  // 列挙助詞
+      particle("がてら", EPOS::ParticleConj),   // purpose-combining conjunctive expression
+      particle("やら", EPOS::ParticleListing),  // 列挙助詞
   };
   return makeEntrySpecRange(kEntries);
 }

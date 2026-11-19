@@ -296,13 +296,13 @@ TEST_F(SuzumeApiTest, DictionaryHomographsPreserveProductiveNominalBoundaries) {
   const auto coordinated = instance.analyze("行為やら経過やら確認する");
   ASSERT_EQ(coordinated.size(), 6u);
   EXPECT_EQ(coordinated[0].surface, "行為");
-  EXPECT_EQ(coordinated[1].extended_pos, core::ExtendedPOS::ParticleAdverbial);
+  EXPECT_EQ(coordinated[1].extended_pos, core::ExtendedPOS::ParticleListing);
   EXPECT_EQ(coordinated[2].surface, "経過");
 
   const auto temporal = instance.analyze("当時やらの話");
   ASSERT_EQ(temporal.size(), 4u);
   EXPECT_EQ(temporal[0].surface, "当時");
-  EXPECT_EQ(temporal[1].extended_pos, core::ExtendedPOS::ParticleAdverbial);
+  EXPECT_EQ(temporal[1].extended_pos, core::ExtendedPOS::ParticleListing);
 }
 
 TEST_F(SuzumeApiTest, AnalyzeSimpleText) {
