@@ -1973,6 +1973,33 @@
       ],
       "id": "derusubansuru",
       "input": "一人でるすばんする"
+    },
+    {
+      "description": "毎日べんきょうした - auto-generated",
+      "expected": [
+        {
+          "lemma": "毎日",
+          "pos": "Noun",
+          "surface": "毎日"
+        },
+        {
+          "lemma": "べんきょう",
+          "pos": "Noun",
+          "surface": "べんきょう"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "し"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "benki_ushita",
+      "input": "毎日べんきょうした"
     }
   ],
   "description": "Suru-verb patterns with subsidiary verbs - MeCab互換分割 (part 2/2)",

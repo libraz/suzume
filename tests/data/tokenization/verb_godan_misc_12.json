@@ -1065,6 +1065,77 @@
       ],
       "id": "niokorareta",
       "input": "母におこられた"
+    },
+    {
+      "description": "猫がこたつで寝る - auto-generated",
+      "expected": [
+        {
+          "lemma": "猫",
+          "pos": "Noun",
+          "surface": "猫"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "こたつ",
+          "pos": "Noun",
+          "surface": "こたつ"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "寝る",
+          "pos": "Verb",
+          "surface": "寝る"
+        }
+      ],
+      "id": "gakotatsude_ru",
+      "input": "猫がこたつで寝る"
+    },
+    {
+      "description": "なべつかみ - auto-generated",
+      "expected": [
+        {
+          "lemma": "なべ",
+          "pos": "Noun",
+          "surface": "なべ"
+        },
+        {
+          "lemma": "つかむ",
+          "pos": "Verb",
+          "surface": "つかみ"
+        }
+      ],
+      "id": "nabetsukami",
+      "input": "なべつかみ"
+    },
+    {
+      "description": "せんせいにきく - auto-generated",
+      "expected": [
+        {
+          "lemma": "せんせい",
+          "pos": "Noun",
+          "surface": "せんせい"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "きく",
+          "pos": "Verb",
+          "surface": "きく"
+        }
+      ],
+      "id": "senseinikiku",
+      "input": "せんせいにきく"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 12/12)",

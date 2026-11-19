@@ -1334,6 +1334,82 @@
       ],
       "id": "hajimetenoorusuban",
       "input": "はじめてのおるすばん"
+    },
+    {
+      "description": "へやのそうじ - auto-generated",
+      "expected": [
+        {
+          "lemma": "へや",
+          "pos": "Noun",
+          "surface": "へや"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "そうじ",
+          "pos": "Noun",
+          "surface": "そうじ"
+        }
+      ],
+      "id": "heyanosouji",
+      "input": "へやのそうじ"
+    },
+    {
+      "description": "こどもとおとな - auto-generated",
+      "expected": [
+        {
+          "lemma": "こども",
+          "pos": "Noun",
+          "surface": "こども"
+        },
+        {
+          "lemma": "と",
+          "pos": "Particle",
+          "surface": "と"
+        },
+        {
+          "lemma": "おとな",
+          "pos": "Noun",
+          "surface": "おとな"
+        }
+      ],
+      "id": "kodomotootona",
+      "input": "こどもとおとな"
+    },
+    {
+      "description": "先生のおはなしが - auto-generated",
+      "expected": [
+        {
+          "lemma": "先生",
+          "pos": "Noun",
+          "surface": "先生"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "はなし",
+          "pos": "Noun",
+          "surface": "はなし"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        }
+      ],
+      "id": "noohanashiga",
+      "input": "先生のおはなしが"
     }
   ],
   "description": "General nouns (part 5/5)",

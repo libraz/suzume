@@ -552,6 +552,60 @@
       ],
       "id": "nigatenakoto",
       "input": "にがてなこと"
+    },
+    {
+      "description": "いいはなしだ - auto-generated",
+      "expected": [
+        {
+          "lemma": "いい",
+          "pos": "Adjective",
+          "surface": "いい"
+        },
+        {
+          "lemma": "はなし",
+          "pos": "Noun",
+          "surface": "はなし"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "iihanashida",
+      "input": "いいはなしだ"
+    },
+    {
+      "description": "いいはなしを聞いた - auto-generated",
+      "expected": [
+        {
+          "lemma": "いい",
+          "pos": "Adjective",
+          "surface": "いい"
+        },
+        {
+          "lemma": "はなし",
+          "pos": "Noun",
+          "surface": "はなし"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "聞く",
+          "pos": "Verb",
+          "surface": "聞い"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "iihanashiwo_ita",
+      "input": "いいはなしを聞いた"
     }
   ],
   "description": "I-adjectives basic forms (終止形・連体形) - base forms, attributive, polite forms, conditional (part 4/4)",

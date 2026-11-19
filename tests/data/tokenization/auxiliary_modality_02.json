@@ -1755,6 +1755,55 @@
       ],
       "id": "nodegozaimasu",
       "input": "会社のでございます"
+    },
+    {
+      "description": "あのひとがせんせいです - auto-generated",
+      "expected": [
+        {
+          "lemma": "あの",
+          "pos": "Determiner",
+          "surface": "あの"
+        },
+        {
+          "lemma": "ひと",
+          "pos": "Noun",
+          "surface": "ひと"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "せんせい",
+          "pos": "Noun",
+          "surface": "せんせい"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "anohitogasenseidesu",
+      "input": "あのひとがせんせいです"
+    },
+    {
+      "description": "かぶだ - auto-generated",
+      "expected": [
+        {
+          "lemma": "かぶ",
+          "pos": "Noun",
+          "surface": "かぶ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "kabuda",
+      "input": "かぶだ"
     }
   ],
   "description": "Modality auxiliaries (たい、そう、らしい) (part 2/2)",
