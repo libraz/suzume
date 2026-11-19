@@ -131,7 +131,7 @@ void DictionaryManager::lookupInto(std::string_view text, size_t start_pos, std:
     appendLookupResults(out, user_binary_dict->lookup(text, start_pos), true);
   }
 
-  // Lookup in caller-loaded source user dictionaries (Layer 5: CSV/TSV files)
+  // Lookup in caller-loaded source user dictionaries (Layer 5: TSV source files)
   for (const auto& user_dict : user_dicts_) {
     appendLookupResults(out, user_dict->lookup(text, start_pos), true);
   }

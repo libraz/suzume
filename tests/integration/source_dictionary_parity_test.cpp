@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <fstream>
 #include <string>
+#include <utility>
 
 #include "dict_compiler.h"
 #include "dictionary/binary_dict.h"
@@ -95,6 +96,47 @@ TEST(SourceDictionaryParityTest, CompilerAndRuntimeUseIdenticalExpandedEntries) 
   EXPECT_EQ(file_form->lemma, runtime_form->lemma);
   EXPECT_EQ(file_form->extended_pos, runtime_form->extended_pos);
 
+  std::filesystem::remove(source_path);
+  std::filesystem::remove(binary_path);
+}
+
+TEST(SourceDictionaryParityTest, CompilerAndRuntimeRejectRemovedLayoutsAlike) {
+  const std::pair<std::string, std::string> cases[] = {
+      {"東京\tNOUN\tトウキョウ\t0.5\n",
+       "Removed legacy TSV layout at line 1: column 4 is a numeric cost; rows are surface, POS[, conj_type][, "
+       "base_form]"},
+      {"word\tNOUN\t0.05\n",
+       "Removed cost column at line 1: column 3 is numeric; rows are surface, POS[, conj_type][, base_form]"},
+      {"食べた,VERB,0.5,食べる\n", "Removed legacy CSV layout at line 1; use tab-separated rows"},
+  };
+  const auto unique_id = reinterpret_cast<uintptr_t>(&cases);
+  const auto source_path =
+      std::filesystem::temp_directory_path() / ("suzume_removed_layout_" + std::to_string(unique_id) + ".tsv");
+  const auto binary_path =
+      std::filesystem::temp_directory_path() / ("suzume_removed_layout_" + std::to_string(unique_id) + ".dic");
+
+  SuzumeOptions options;
+  options.skip_core_dictionary = true;
+  options.skip_user_dictionary = true;
+  for (const auto& [source, message] : cases) {
+    {
+      std::ofstream file(source_path);
+      file << source;
+    }
+    cli::DictCompiler compiler;
+    auto compiled = compiler.compile(source_path.string(), binary_path.string());
+    ASSERT_FALSE(compiled.hasValue()) << source;
+    EXPECT_EQ(compiled.error().code, core::ErrorCode::ParseError);
+    EXPECT_EQ(compiled.error().message, message);
+
+    Suzume analyzer(options);
+    const size_t startup_warnings = analyzer.dictionaryWarnings().size();
+    auto loaded = analyzer.loadUserDictionaryFromMemoryResult(source.data(), source.size());
+    ASSERT_FALSE(loaded.hasValue()) << source;
+    EXPECT_EQ(loaded.error().code, core::ErrorCode::ParseError);
+    EXPECT_EQ(loaded.error().message, message);
+    EXPECT_EQ(analyzer.dictionaryWarnings().size(), startup_warnings);
+  }
   std::filesystem::remove(source_path);
   std::filesystem::remove(binary_path);
 }

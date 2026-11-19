@@ -68,7 +68,7 @@ class Suzume {
 
   /**
    * @brief Load user dictionary from file with error details
-   * @param path Path to dictionary source file (current TSV or legacy CSV)
+   * @param path Path to a tab-separated dictionary source file
    * @return Number of loaded entries on success, error on failure
    */
   core::Expected<size_t, core::Error> loadUserDictionaryResult(const std::string& path);

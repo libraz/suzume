@@ -86,11 +86,13 @@ std::optional<ConjugationType> parseConjugationType(std::string_view field) {
   return conjTypeFromAnyAlias(field);
 }
 
-bool usesLegacyTsvLayout(const std::vector<std::string>& fields) {
-  // The legacy schema identifies itself with its numeric cost column:
-  // surface, POS, reading, cost[, conj_type, lemma]. Empty spreadsheet padding
-  // must not silently switch a current-format row into this schema.
-  return fields.size() >= 4 && isNumericField(fields[3]);
+constexpr std::string_view kCurrentLayout = "rows are surface, POS[, conj_type][, base_form]";
+
+// The removed legacy TSV layout was surface, POS, reading, cost[, conj_type, lemma]. A numeric
+// column 4 after an empty column 3 is a numeric base form in the current layout.
+bool usesRemovedLegacyTsvLayout(const std::vector<std::string>& fields) {
+  return fields.size() >= 4 && isNumericField(fields[3]) && !fields[2].empty() &&
+         !parseConjugationType(fields[2]).has_value();
 }
 
 // Quote tracking shared by delimiter detection and record splitting.
@@ -209,6 +211,10 @@ core::Expected<SourceEntry, core::Error> convertFields(const std::vector<std::st
   if (fields.size() < 2) {
     return parseError("Missing POS field at line " + core::decimalDigits(line_number));
   }
+  if (delimiter != '\t') {
+    return parseError("Removed legacy CSV layout at line " + core::decimalDigits(line_number) +
+                      "; use tab-separated rows");
+  }
   if (fields[0].empty()) {
     return parseError("Empty surface at line " + core::decimalDigits(line_number));
   }
@@ -230,55 +236,37 @@ core::Expected<SourceEntry, core::Error> convertFields(const std::vector<std::st
     entry.conj_type = ConjugationType::Interjection;
   }
 
-  const bool is_tsv = delimiter == '\t';
-  if (is_tsv) {
-    entry.used_legacy_tsv_layout = usesLegacyTsvLayout(fields);
-    if (entry.used_legacy_tsv_layout) {
-      // Legacy extended TSV: surface, POS, reading, cost, conj_type, lemma.
-      if (fields.size() > 4 && !fields[4].empty()) {
-        auto conj_type = parseConjugationType(fields[4]);
-        if (!conj_type.has_value()) {
-          return parseError("Line " + core::decimalDigits(line_number) + ": Invalid conjugation type: " + fields[4]);
-        }
-        entry.conj_type = *conj_type;
-      }
-      if (fields.size() > 5) {
-        entry.lemma = fields[5];
-      }
-      if (auto error = findUnexpectedColumn(fields, 6, line_number)) {
-        return core::makeUnexpected(std::move(*error));
-      }
-      return entry;
-    }
+  if (usesRemovedLegacyTsvLayout(fields)) {
+    return parseError("Removed legacy TSV layout at line " + core::decimalDigits(line_number) +
+                      ": column 4 is a numeric cost; " + std::string(kCurrentLayout));
+  }
+  if (fields.size() > 2 && isNumericField(fields[2])) {
+    return parseError("Removed cost column at line " + core::decimalDigits(line_number) + ": column 3 is numeric; " +
+                      std::string(kCurrentLayout));
+  }
 
-    if (fields.size() > 4) {
-      if (auto error = findUnexpectedColumn(fields, 4, line_number)) {
-        return core::makeUnexpected(std::move(*error));
-      }
-      entry.ignored_empty_padding_columns = true;
+  if (fields.size() > 4) {
+    if (auto error = findUnexpectedColumn(fields, 4, line_number)) {
+      return core::makeUnexpected(std::move(*error));
     }
+    entry.ignored_empty_padding_columns = true;
+  }
 
-    // Current TSV: surface, POS, conj_type[, lemma]. A third field which is
-    // neither a conjugation marker nor a numeric legacy cost is a runtime lemma.
-    if (fields.size() > 2 && !fields[2].empty()) {
-      auto conj_type = parseConjugationType(fields[2]);
-      if (conj_type.has_value()) {
-        entry.conj_type = *conj_type;
-      } else if (!isNumericField(fields[2])) {
-        if (fields.size() >= 4 && !fields[3].empty()) {
-          return parseError("Ambiguous non-empty TSV columns 3 and 4 at line " + core::decimalDigits(line_number));
-        }
-        entry.lemma = fields[2];
+  // surface, POS, conj_type[, base_form]. A third field which is not a
+  // conjugation marker is a base form.
+  if (fields.size() > 2 && !fields[2].empty()) {
+    auto conj_type = parseConjugationType(fields[2]);
+    if (conj_type.has_value()) {
+      entry.conj_type = *conj_type;
+    } else {
+      if (fields.size() >= 4 && !fields[3].empty()) {
+        return parseError("Ambiguous non-empty TSV columns 3 and 4 at line " + core::decimalDigits(line_number));
       }
+      entry.lemma = fields[2];
     }
-    if (fields.size() >= 4 && !fields[3].empty()) {
-      entry.lemma = fields[3];
-    }
-  } else {
-    // Legacy CSV: surface, POS, cost, lemma.
-    if (fields.size() > 3) {
-      entry.lemma = fields[3];
-    }
+  }
+  if (fields.size() >= 4 && !fields[3].empty()) {
+    entry.lemma = fields[3];
   }
 
   if (!normalize::isValidUtf8(entry.surface) || (!entry.lemma.empty() && !normalize::isValidUtf8(entry.lemma))) {
@@ -303,7 +291,6 @@ core::Expected<SourceParseResult, core::Error> parseDictionarySource(std::string
   SourceParseResult result;
   stripUtf8Bom(content);
 
-  std::optional<char> delimiter;
   size_t record_start = 0;
   size_t record_line = 1;
   size_t current_line = 1;
@@ -335,7 +322,8 @@ core::Expected<SourceParseResult, core::Error> parseDictionarySource(std::string
     } else if (trimmed.front() == '#') {
       ++result.stats.comment_lines;
     } else {
-      const char record_delimiter = delimiter.value_or(detectDelimiter(record));
+      // Detected per record so a comma-separated row anywhere reports the removed CSV layout.
+      const char record_delimiter = detectDelimiter(record);
       auto parsed_record = parseDelimitedRecord(record, record_delimiter);
       if (!parsed_record.error.empty()) {
         return core::makeUnexpected(quotingError(record_line, parsed_record.error));
@@ -349,15 +337,9 @@ core::Expected<SourceParseResult, core::Error> parseDictionarySource(std::string
           continue;
         }
       }
-      if (!delimiter.has_value()) {
-        delimiter = record_delimiter;
-      }
       auto entry = convertFields(parsed_record.fields, record_line, record_delimiter);
       if (!entry.hasValue()) {
         return core::makeUnexpected(entry.error());
-      }
-      if (entry.value().used_legacy_tsv_layout) {
-        result.warnings.push_back("Used legacy TSV layout at line " + core::decimalDigits(record_line));
       }
       if (entry.value().ignored_empty_padding_columns) {
         result.warnings.push_back("Ignored empty TSV padding columns at line " + core::decimalDigits(record_line));

@@ -976,10 +976,10 @@ TEST_F(SuzumeApiTest, LoadUserDictionaryFromMemoryResultReportsParseError) {
 
 TEST_F(SuzumeApiTest, LoadUserDictionaryFromMemoryResultReportsEntryCount) {
   Suzume instance(makeTestOptions());
-  const char* csv_data =
-      "東京,NOUN,0.5\n"
-      "大阪,NOUN,0.5\n";
-  auto result = instance.loadUserDictionaryFromMemoryResult(csv_data, std::strlen(csv_data));
+  const char* source =
+      "東京\tNOUN\n"
+      "大阪\tNOUN\n";
+  auto result = instance.loadUserDictionaryFromMemoryResult(source, std::strlen(source));
   ASSERT_TRUE(result.hasValue());
   EXPECT_EQ(result.value(), 2u);
 }

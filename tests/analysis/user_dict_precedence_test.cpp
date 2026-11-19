@@ -45,21 +45,21 @@ bool loadEntries(Suzume& instance, const char* csv) {
 
 TEST(UserDictPrecedenceTest, KatakanaReduplicationPrefixEntryWins) {
   Suzume instance(userDictOptions());
-  ASSERT_TRUE(loadEntries(instance, "ワクワク商会,NOUN,0.5,ワクワク商会\n"));
+  ASSERT_TRUE(loadEntries(instance, "ワクワク商会\tNOUN\t\tワクワク商会\n"));
 
   EXPECT_EQ(surfacesOf(instance, "ワクワク商会"), (std::vector<std::string>{"ワクワク商会"}));
 }
 
 TEST(UserDictPrecedenceTest, HiraganaReduplicationPrefixEntryWins) {
   Suzume instance(userDictOptions());
-  ASSERT_TRUE(loadEntries(instance, "わくわく商会,NOUN,0.5,わくわく商会\n"));
+  ASSERT_TRUE(loadEntries(instance, "わくわく商会\tNOUN\t\tわくわく商会\n"));
 
   EXPECT_EQ(surfacesOf(instance, "わくわく商会"), (std::vector<std::string>{"わくわく商会"}));
 }
 
 TEST(UserDictPrecedenceTest, EntryCoveringExactlyTheMimeticSpanWins) {
   Suzume instance(userDictOptions());
-  ASSERT_TRUE(loadEntries(instance, "キラキラ,NOUN,0.5,キラキラ\n"));
+  ASSERT_TRUE(loadEntries(instance, "キラキラ\tNOUN\t\tキラキラ\n"));
 
   const auto tokens = instance.analyze("キラキラ");
   ASSERT_EQ(tokens.size(), 1U);
@@ -69,7 +69,7 @@ TEST(UserDictPrecedenceTest, EntryCoveringExactlyTheMimeticSpanWins) {
 
 TEST(UserDictPrecedenceTest, EntryWinsAtNonZeroOffset) {
   Suzume instance(userDictOptions());
-  ASSERT_TRUE(loadEntries(instance, "ワクワク商会,NOUN,0.5,ワクワク商会\n"));
+  ASSERT_TRUE(loadEntries(instance, "ワクワク商会\tNOUN\t\tワクワク商会\n"));
 
   const auto surfaces = surfacesOf(instance, "昨日ワクワク商会に行った");
   ASSERT_FALSE(surfaces.empty());
@@ -86,7 +86,7 @@ TEST(UserDictPrecedenceTest, UnregisteredMimeticStillSplitsOffAsAdverb) {
 
 TEST(UserDictPrecedenceTest, EntryDoesNotAbsorbTextOutsideItsSpan) {
   Suzume instance(userDictOptions());
-  ASSERT_TRUE(loadEntries(instance, "ワクワク商会,NOUN,0.5,ワクワク商会\n"));
+  ASSERT_TRUE(loadEntries(instance, "ワクワク商会\tNOUN\t\tワクワク商会\n"));
 
   const auto surfaces = surfacesOf(instance, "ワクワク商店");
   EXPECT_EQ(surfaces, (std::vector<std::string>{"ワクワク", "商店"}));

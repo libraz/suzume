@@ -26,7 +26,6 @@ using TsvEntry = dictionary::SourceEntry;
  * @brief TSV dictionary parser
  *
  * Wraps the Dictionary-layer source parser with CLI statistics and validation.
- * Both current TSV and legacy runtime CSV input are accepted.
  *
  * Comments start with #, empty lines are ignored.
  */

@@ -16,9 +16,9 @@ namespace dictionary {
 /**
  * @brief One entry parsed from a dictionary source file.
  *
- * The source parser accepts the current TSV format and the legacy runtime CSV
- * formats. Per-entry cost and reading fields are accepted for compatibility but
- * intentionally discarded.
+ * Rows are tab-separated: surface, POS[, conj_type][, base_form]. The removed
+ * legacy TSV (numeric cost in column 4), cost-column (numeric column 3) and CSV
+ * layouts fail with a ParseError naming the line.
  */
 struct SourceEntry {
   std::string surface;
@@ -27,7 +27,6 @@ struct SourceEntry {
   std::string lemma;
   size_t line_number{0};
   bool is_proper_noun{false};
-  bool used_legacy_tsv_layout{false};
   bool ignored_empty_padding_columns{false};
 };
 
@@ -44,15 +43,16 @@ struct SourceParseResult {
 };
 
 struct SourceParseOptions {
-  // Legacy runtime CSV loading skipped records without a POS column. The CLI
+  // Runtime loaders skip records without a POS column. The CLI
   // compiler remains strict by using the default.
   bool skip_single_field_records{false};
 };
 
 /**
- * @brief Parse current TSV or legacy CSV dictionary source text.
+ * @brief Parse tab-separated dictionary source text.
  *
- * The delimiter is selected from the first data record. UTF-8 BOM, CRLF,
+ * A data record without a tab is read as comma-separated only to reject it as
+ * the removed CSV layout. UTF-8 BOM, CRLF,
  * comments, surrounding ASCII whitespace, and RFC 4180 quoted fields
  * (including escaped quotes and embedded newlines) are supported.
  */

@@ -68,7 +68,7 @@ void stripUtf8Bom(std::string* value);
 /**
  * @brief Add one source or binary user dictionary based on its file extension.
  *
- * Source TSV/legacy CSV and binary .dic files share additive load semantics.
+ * Source TSV and binary .dic files share additive load semantics.
  */
 core::Expected<size_t, core::Error> loadUserDictionaryPath(Suzume* analyzer, const std::string& path);
 

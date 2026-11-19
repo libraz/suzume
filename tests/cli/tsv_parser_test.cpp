@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iterator>
+#include <utility>
 
 #include "dictionary/source_parser.h"
 
@@ -59,6 +60,29 @@ TEST(TsvParserTest, WritePreservesCanonicalMarkerAndLemma) {
   EXPECT_EQ(parsed.value()[0].lemma, "東京");
   EXPECT_EQ(parsed.value()[1].conj_type, dictionary::ConjugationType::Interjection);
   EXPECT_EQ(parsed.value()[1].lemma, "なるほど");
+}
+
+TEST(TsvParserTest, RejectsRemovedSourceLayoutsWithTheRuntimeMessages) {
+  const std::pair<const char*, const char*> cases[] = {
+      {"東京\tNOUN\tトウキョウ\t0.5\n",
+       "Removed legacy TSV layout at line 1: column 4 is a numeric cost; rows are surface, POS[, conj_type][, "
+       "base_form]"},
+      {"東京公園\tNOUN\nword\tNOUN\t0.05\tword\n",
+       "Removed cost column at line 2: column 3 is numeric; rows are surface, POS[, conj_type][, base_form]"},
+      {"食べた,VERB,0.5,食べる\n", "Removed legacy CSV layout at line 1; use tab-separated rows"},
+  };
+  for (const auto& [source, message] : cases) {
+    TsvParser parser;
+    auto parsed = parser.parseString(source);
+    ASSERT_FALSE(parsed.hasValue()) << source;
+    EXPECT_EQ(parsed.error().code, core::ErrorCode::ParseError);
+    EXPECT_EQ(parsed.error().message, message);
+  }
+
+  TsvParser parser;
+  auto numeric_base_form = parser.parseString("三\tNOUN\t\t3\n");
+  ASSERT_TRUE(numeric_base_form.hasValue()) << numeric_base_form.error().message;
+  EXPECT_EQ(numeric_base_form.value()[0].lemma, "3");
 }
 
 TEST(TsvParserTest, ValidateReportsSpreadsheetPaddingColumns) {

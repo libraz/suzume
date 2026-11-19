@@ -439,15 +439,16 @@ SUZUME_EXPORT void suzume_tags_free(suzume_tags_t* tags);
 /**
  * @brief Add user-dictionary entries from UTF-8 source text
  * @param handle Suzume handle
- * @param data Current TSV or legacy 3-column CSV source bytes. TSV rows use
- *             surface<TAB>POS[<TAB>conj_type][<TAB>lemma]. The legacy CSV cost
- *             column is accepted but ignored. May be NULL only when size is 0.
+ * @param data Dictionary source bytes: tab-separated rows
+ *             surface<TAB>POS[<TAB>conj_type][<TAB>base_form]. May be NULL only
+ *             when size is 0.
  * @param size Data size in bytes
  * @return Number of installed entries (at least 1), or 0 on failure with
  *         suzume_last_error() set. SUZUME_ERROR_INVALID_INPUT: a NULL handle,
  *         NULL data with a non-zero size, or a zero-length source ("Empty
- *         dictionary data"). SUZUME_ERROR_PARSE: a malformed source, or one with
- *         no loadable entries ("Dictionary source contains no loadable entries").
+ *         dictionary data"). SUZUME_ERROR_PARSE: a malformed source, including
+ *         a row outside that layout, or one with no loadable entries
+ *         ("Dictionary source contains no loadable entries").
  * @note Loads are additive until suzume_clear_user_dictionaries() is called.
  *       A failed load leaves earlier dictionaries installed.
  */
