@@ -228,6 +228,15 @@ bool hasAuxiliaryChainDecomposition(const std::vector<char32_t>& codepoints, siz
                                     const dictionary::DictionaryManager* dict_manager);
 
 /**
+ * @brief Whether codepoints[start, end) is a chain of registered auxiliaries
+ * each of which the word before it licenses, starting from @p previous
+ *
+ * Count_ opens the chain with no word in front of it.
+ */
+bool continuesAuxiliaryChain(const dictionary::DictionaryManager& dict_manager, const std::vector<char32_t>& codepoints,
+                             core::ExtendedPOS previous, size_t start, size_t end);
+
+/**
  * @brief Return true when a span is exactly a closed auxiliary+particle chain
  *        (です+よ), the particle being possibly a final-particle stack (だ+よ+ね)
  *

@@ -77,6 +77,24 @@ bool hasAuxiliaryChainDecomposition(const std::vector<char32_t>& codepoints, siz
   return false;
 }
 
+bool continuesAuxiliaryChain(const dictionary::DictionaryManager& dict_manager, const std::vector<char32_t>& codepoints,
+                             core::ExtendedPOS previous, size_t start, size_t end) {
+  if (start == end) {
+    return true;
+  }
+  for (size_t next_end = start + 1; next_end <= end; ++next_end) {
+    const auto* auxiliary =
+        lookupEntryInRange(dict_manager, codepoints, start, next_end, core::PartOfSpeech::Auxiliary);
+    if (auxiliary != nullptr &&
+        (previous == core::ExtendedPOS::Count_ ||
+         BigramTable::getCost(previous, auxiliary->extended_pos) < bigram_cost::kStrong) &&
+        continuesAuxiliaryChain(dict_manager, codepoints, auxiliary->extended_pos, next_end, end)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool hasFunctionWordChainDecomposition(const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos,
                                        const dictionary::DictionaryManager* dict_manager) {
   if (dict_manager == nullptr || end_pos < start_pos + 3) {
@@ -96,9 +114,11 @@ bool hasFunctionWordChainDecomposition(const std::vector<char32_t>& codepoints, 
     // own form implies, so its presence in the dictionary says nothing about
     // what an ordinary hiragana run spells: the one-mora continuative alone
     // would decompose にんじん as に+ん+じ+ん.
+    // The auxiliaries must also license each other (で+ん is no chain, so でんわ stays open).
     if (maximalSegmentCount(*dict_manager, codepoints, start_pos, particle_start, core::PartOfSpeech::Auxiliary,
                             core::ExtendedPOS::AuxClassicalPerfect,
-                            !particleMoraLacksHost(codepoints, start_pos)) >= 1) {
+                            !particleMoraLacksHost(codepoints, start_pos)) >= 1 &&
+        continuesAuxiliaryChain(*dict_manager, codepoints, core::ExtendedPOS::Count_, start_pos, particle_start)) {
       return true;
     }
   }

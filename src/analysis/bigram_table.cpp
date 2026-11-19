@@ -176,6 +176,12 @@ BigramTable::EncodedTable BigramTable::initTable() {
   bigram_rules::inheritRuleProfile(table, core::ExtendedPOS::ParticleAdverbial, core::ExtendedPOS::ParticleListing);
   bigram_rules::inheritRuleProfile(table, core::ExtendedPOS::Suffix, core::ExtendedPOS::SuffixCompounding);
   bigram_rules::inheritRuleProfile(table, core::ExtendedPOS::AuxCopulaDa, core::ExtendedPOS::AuxCopulaDaRenyokei);
+  // The copula's continuative cells hand on to a connective or existential
+  // continuation (で+ある, だっ+た); the negative ぬ/ん and the volitional う
+  // stand on its irrealis (なら+ぬ, だろ+う), so で+ん is no reading.
+  for (const auto irrealis_follower : {core::ExtendedPOS::AuxNegativeNu, core::ExtendedPOS::AuxVolitional}) {
+    bigram_rules::setCost(table, core::ExtendedPOS::AuxCopulaDaRenyokei, irrealis_follower, bigram_cost::kNever);
+  }
   for (auto& row : table) {
     for (uint8_t& encoded_cost : row) {
       if (encoded_cost == bigram_rules::kUnsetCost) {

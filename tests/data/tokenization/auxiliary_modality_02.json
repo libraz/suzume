@@ -1858,6 +1858,60 @@
       ],
       "id": "na_15",
       "input": "一大事な問題"
+    },
+    {
+      "description": "kana noun closed by the copula; で+ん does not chain",
+      "expected": [
+        {
+          "lemma": "あれ",
+          "pos": "Pronoun",
+          "surface": "あれ"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "でんわ",
+          "pos": "Noun",
+          "surface": "でんわ"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        }
+      ],
+      "id": "arehadenwada",
+      "input": "あれはでんわだ"
+    },
+    {
+      "description": "kana noun after a genitive before the polite copula",
+      "expected": [
+        {
+          "lemma": "母",
+          "pos": "Noun",
+          "surface": "母"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "でんわ",
+          "pos": "Noun",
+          "surface": "でんわ"
+        },
+        {
+          "lemma": "です",
+          "pos": "Auxiliary",
+          "surface": "です"
+        }
+      ],
+      "id": "nodenwadesu",
+      "input": "母のでんわです"
     }
   ],
   "description": "Modality auxiliaries (たい、そう、らしい) (part 2/2)",

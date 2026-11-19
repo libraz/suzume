@@ -17,6 +17,7 @@
 #include "grammar/char_patterns.h"
 #include "normalize/char_type.h"
 #include "normalize/utf8.h"
+#include "suffix_candidates.h"
 #include "tokenizer_utils.h"
 #include "verb_candidates.h"
 #include "verb_candidates_dictionary_probes.h"
@@ -397,27 +398,6 @@ bool readsAsVerbTerminal(const grammar::Inflection& inflection, const std::strin
     return analysis.verb_type != grammar::VerbType::Unknown && analysis.verb_type != grammar::VerbType::IAdjective &&
            analysis.base_form == surface && analysis.confidence >= candidate::verb_cost::kConstructedVerbMinConfidence;
   });
-}
-
-// Whether codepoints[start, end) is a chain of registered auxiliaries each of
-// which the word before it licenses, starting from @p previous. Count_ opens
-// the chain with no word in front of it.
-bool continuesAuxiliaryChain(const dictionary::DictionaryManager& dict_manager, const std::vector<char32_t>& codepoints,
-                             core::ExtendedPOS previous, size_t start, size_t end) {
-  if (start == end) {
-    return true;
-  }
-  for (size_t next_end = start + 1; next_end <= end; ++next_end) {
-    const auto* auxiliary =
-        lookupEntryInRange(dict_manager, codepoints, start, next_end, core::PartOfSpeech::Auxiliary);
-    if (auxiliary != nullptr &&
-        (previous == core::ExtendedPOS::Count_ ||
-         BigramTable::getCost(previous, auxiliary->extended_pos) < scorer::scale::kStrong) &&
-        continuesAuxiliaryChain(dict_manager, codepoints, auxiliary->extended_pos, next_end, end)) {
-      return true;
-    }
-  }
-  return false;
 }
 
 bool endsOnPredicateTail(const BracketedNounContext& ctx, size_t run_end) {

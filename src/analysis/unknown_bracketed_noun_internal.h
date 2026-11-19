@@ -86,8 +86,6 @@ bool registeredAdjectiveOpensAt(const BracketedNounContext& ctx, size_t pos);
 BracketedScan classifyLeftBrackets(const BracketedNounContext& ctx);
 void scanBracketedRun(const BracketedNounContext& ctx, size_t bracketed_noun_limit, BracketedScan& bracketed);
 bool readsAsVerbTerminal(const grammar::Inflection& inflection, const std::string& surface);
-bool continuesAuxiliaryChain(const dictionary::DictionaryManager& dict_manager, const std::vector<char32_t>& codepoints,
-                             core::ExtendedPOS previous, size_t start, size_t end);
 bool endsOnPredicateTail(const BracketedNounContext& ctx, size_t run_end);
 PromotedRun classifyRightBrackets(const BracketedNounContext& ctx, const BracketedScan& bracketed, size_t run_end);
 void readPromotedSurface(const BracketedNounContext& ctx, const BracketedScan& bracketed, PromotedRun& promoted);

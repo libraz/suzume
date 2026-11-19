@@ -1482,6 +1482,60 @@
       ],
       "id": "tokawo_mu",
       "input": "本とかを読む"
+    },
+    {
+      "description": "kana noun after a genitive whose kana spell copula continuative + negative + particle",
+      "expected": [
+        {
+          "lemma": "私",
+          "pos": "Pronoun",
+          "surface": "私"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "でんわ",
+          "pos": "Noun",
+          "surface": "でんわ"
+        },
+        {
+          "lemma": "が",
+          "pos": "Particle",
+          "surface": "が"
+        },
+        {
+          "lemma": "鳴る",
+          "pos": "Verb",
+          "surface": "鳴る"
+        }
+      ],
+      "id": "nodenwaga_ru",
+      "input": "私のでんわが鳴る"
+    },
+    {
+      "description": "sentence-initial kana noun before the accusative",
+      "expected": [
+        {
+          "lemma": "でんわ",
+          "pos": "Noun",
+          "surface": "でんわ"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "かける",
+          "pos": "Verb",
+          "surface": "かける"
+        }
+      ],
+      "id": "denwawokakeru",
+      "input": "でんわをかける"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 12/12)",
