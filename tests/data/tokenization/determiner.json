@@ -715,6 +715,33 @@
       ],
       "id": "nikakaru_wo_ta",
       "input": "壁にかかる絵を見た"
+    },
+    {
+      "description": "何らかの手を打つ - auto-generated",
+      "expected": [
+        {
+          "lemma": "何らかの",
+          "pos": "Determiner",
+          "surface": "何らかの"
+        },
+        {
+          "lemma": "手",
+          "pos": "Noun",
+          "surface": "手"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "打つ",
+          "pos": "Verb",
+          "surface": "打つ"
+        }
+      ],
+      "id": "rakano_wo_tsu",
+      "input": "何らかの手を打つ"
     }
   ],
   "description": "determiner tests",
