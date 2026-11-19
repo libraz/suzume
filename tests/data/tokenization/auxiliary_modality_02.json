@@ -1804,6 +1804,60 @@
       ],
       "id": "kabuda",
       "input": "かぶだ"
+    },
+    {
+      "description": "listed noun is not split into a one-kanji noun and a na-adjective before the copula",
+      "expected": [
+        {
+          "lemma": "これ",
+          "pos": "Pronoun",
+          "surface": "これ"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "一大事",
+          "pos": "Noun",
+          "surface": "一大事"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "だ"
+        },
+        {
+          "lemma": "ぞ",
+          "pos": "Particle",
+          "surface": "ぞ"
+        }
+      ],
+      "id": "koreha_dazo",
+      "input": "これは一大事だぞ"
+    },
+    {
+      "description": "listed noun is not split into a one-kanji noun and a na-adjective before attributive な",
+      "expected": [
+        {
+          "lemma": "一大事",
+          "pos": "Noun",
+          "surface": "一大事"
+        },
+        {
+          "lemma": "だ",
+          "pos": "Auxiliary",
+          "surface": "な"
+        },
+        {
+          "lemma": "問題",
+          "pos": "Noun",
+          "surface": "問題"
+        }
+      ],
+      "id": "na_15",
+      "input": "一大事な問題"
     }
   ],
   "description": "Modality auxiliaries (たい、そう、らしい) (part 2/2)",

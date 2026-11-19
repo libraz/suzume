@@ -1374,6 +1374,33 @@
       ],
       "id": "ni_demu",
       "input": "人に秀でむ"
+    },
+    {
+      "description": "listed vowel-stem ichidan hosts the literary conjectural む",
+      "expected": [
+        {
+          "lemma": "才",
+          "pos": "Noun",
+          "surface": "才"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "長ける",
+          "pos": "Verb",
+          "surface": "長け"
+        },
+        {
+          "lemma": "む",
+          "pos": "Auxiliary",
+          "surface": "む"
+        }
+      ],
+      "id": "ni_kemu",
+      "input": "才に長けむ"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 12/12)",

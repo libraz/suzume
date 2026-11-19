@@ -492,6 +492,26 @@ std::optional<float> unknownCandidateCost(const tokenizer_unknown_detail::Unknow
                                             << " (truncates_dictionary_word, dict_max=" << max_dict_length << ")\n");
   }
 
+  // An unknown one-kanji noun that cuts a listed noun into itself plus a listed
+  // na-adjective (一+大事 of 一大事) gets no generic Noun→AdjNa bonus from it.
+  if (candidate.pos == core::PartOfSpeech::Noun && candidate.end == candidate.start + 1 &&
+      char_types[candidate.start] == normalize::CharType::Kanji) {
+    for (const auto& result : lookupResultsInRange(dict_manager, codepoints, candidate.start, codepoints.size())) {
+      const size_t noun_end = candidate.start + result.length;
+      if (result.entry == nullptr || result.entry->pos != core::PartOfSpeech::Noun || noun_end <= candidate.end) {
+        continue;
+      }
+      const auto* remainder =
+          lookupEntryInRange(dict_manager, codepoints, candidate.end, noun_end, core::PartOfSpeech::Adjective);
+      if (remainder != nullptr && remainder->extended_pos == core::ExtendedPOS::AdjNaAdj) {
+        adjusted_cost -= bigram_cost::kStrongBonus;
+        SUZUME_DEBUG_LOG_VERBOSE("[TOK_UNK] \"" << candidate.surface << "\" (NOUN): +" << -bigram_cost::kStrongBonus
+                                                << " (splits_listed_noun_before_na_adjective)\n");
+        break;
+      }
+    }
+  }
+
   // For verb candidates, check if the hiragana suffix is a known particle
   if (candidate.pos == core::PartOfSpeech::Verb && candidate.end > candidate.start) {
     size_t hiragana_start = candidate.start;
