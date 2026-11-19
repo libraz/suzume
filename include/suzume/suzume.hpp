@@ -128,7 +128,7 @@ class Tokenizer {
     copts.mode = static_cast<std::uint8_t>(options.mode);
     copts.lemmatize = options.lemmatize ? 1 : 0;
     copts.merge_compounds = options.merge_compounds ? 1 : 0;
-    copts.skip_user_dictionary = options.skip_user_dictionary ? 1 : 0;
+    copts.skip_bundled_user_dictionary = options.skip_user_dictionary ? 1 : 0;
     copts.skip_core_dictionary = options.skip_core_dictionary ? 1 : 0;
     copts.skip_env_config = options.skip_env_config ? 1 : 0;
     copts.report_scorer_config = options.report_scorer_config ? 1 : 0;

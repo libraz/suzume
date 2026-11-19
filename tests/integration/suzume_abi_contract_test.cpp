@@ -99,7 +99,7 @@ std::vector<StructLayout> frozenLayouts() {
         {3, 3, "mode"},
         {4, 4, "lemmatize"},
         {5, 5, "merge_compounds"},
-        {6, 6, "skip_user_dictionary"},
+        {6, 6, "skip_bundled_user_dictionary"},
         {7, 7, "skip_core_dictionary"},
         {8, 8, "report_scorer_config"},
         {9, 9, "skip_env_config"},

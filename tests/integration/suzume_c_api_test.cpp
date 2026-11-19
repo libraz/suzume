@@ -205,7 +205,7 @@ TEST(SuzumeCApiTest, InitOptionsPreservesDefaultTrueFields) {
   EXPECT_EQ(options.mode, 0);
   EXPECT_EQ(options.lemmatize, 1);
   EXPECT_EQ(options.merge_compounds, 0);
-  EXPECT_EQ(options.skip_user_dictionary, 0);
+  EXPECT_EQ(options.skip_bundled_user_dictionary, 0);
   EXPECT_EQ(options.skip_core_dictionary, 0);
   EXPECT_EQ(options.report_scorer_config, 0);
   EXPECT_EQ(options.skip_env_config, 0);
@@ -461,7 +461,7 @@ TEST(SuzumeCApiTest, ExtendedOptionsCanDisableEnvironmentScorerConfig) {
   setenv("SUZUME_SCORER_INFL_confidence_ceiling", "0", 1);
   suzume_options_t options{};
   suzume_init_options(&options);
-  options.skip_user_dictionary = 1;
+  options.skip_bundled_user_dictionary = 1;
   options.skip_core_dictionary = 1;
   options.skip_env_config = 1;
   suzume_t handle = suzume_create_with_options(&options);
@@ -497,7 +497,7 @@ TEST(SuzumeCApiTest, ScorerConfigStatusUsesTheWarningChannel) {
 TEST(SuzumeCApiTest, ScorerJsonChangesAnalysis) {
   suzume_options_t options{};
   suzume_init_options(&options);
-  options.skip_user_dictionary = 1;
+  options.skip_bundled_user_dictionary = 1;
   options.skip_core_dictionary = 1;
   options.skip_env_config = 1;
   options.scorer_options_json = R"({"inflection":{"confidence_ceiling":0}})";
@@ -516,7 +516,7 @@ TEST(SuzumeCApiTest, ScorerJsonChangesAnalysis) {
 TEST(SuzumeCApiTest, UserDictionariesCanBeCleared) {
   suzume_options_t options{};
   suzume_init_options(&options);
-  options.skip_user_dictionary = 1;
+  options.skip_bundled_user_dictionary = 1;
   options.skip_core_dictionary = 1;
   suzume_t handle = suzume_create_with_options(&options);
   ASSERT_NE(handle, nullptr);
@@ -556,7 +556,7 @@ TEST(SuzumeCApiTest, ClearUserDictionariesRetainsBundledDictionary) {
 TEST(SuzumeCApiTest, UserDictionaryCountAndCorePresenceAreExposed) {
   suzume_options_t options{};
   suzume_init_options(&options);
-  options.skip_user_dictionary = 1;
+  options.skip_bundled_user_dictionary = 1;
   options.skip_core_dictionary = 1;
   suzume_t handle = suzume_create_with_options(&options);
   ASSERT_NE(handle, nullptr);
@@ -574,7 +574,7 @@ TEST(SuzumeCApiTest, UserDictionaryCountAndCorePresenceAreExposed) {
 TEST(SuzumeCApiTest, SkippedSourceRecordsReachTheDictionaryWarningChannel) {
   suzume_options_t options{};
   suzume_init_options(&options);
-  options.skip_user_dictionary = 1;
+  options.skip_bundled_user_dictionary = 1;
   options.skip_core_dictionary = 1;
   suzume_t handle = suzume_create_with_options(&options);
   ASSERT_NE(handle, nullptr);
@@ -794,7 +794,7 @@ TEST(SuzumeCApiTest, LayoutFunctionsMatchNativeStructs) {
   EXPECT_EQ(suzume_offsetof_options(0), offsetof(suzume_options_t, preserve_vu));
   EXPECT_EQ(suzume_offsetof_options(3), offsetof(suzume_options_t, mode));
   EXPECT_EQ(suzume_offsetof_options(5), offsetof(suzume_options_t, merge_compounds));
-  EXPECT_EQ(suzume_offsetof_options(6), offsetof(suzume_options_t, skip_user_dictionary));
+  EXPECT_EQ(suzume_offsetof_options(6), offsetof(suzume_options_t, skip_bundled_user_dictionary));
   EXPECT_EQ(suzume_offsetof_options(7), offsetof(suzume_options_t, skip_core_dictionary));
   EXPECT_EQ(suzume_offsetof_options(8), offsetof(suzume_options_t, report_scorer_config));
   EXPECT_EQ(suzume_offsetof_options(9), offsetof(suzume_options_t, skip_env_config));

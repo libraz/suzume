@@ -212,18 +212,18 @@ typedef struct {
  * default true values such as preserve_case and lemmatize are preserved.
  */
 typedef struct {
-  uint8_t preserve_vu;             /**< Preserve ヴ (don't normalize to ビ etc.) */
-  uint8_t preserve_case;           /**< Preserve case (don't lowercase ASCII) */
-  uint8_t preserve_symbols;        /**< Preserve punctuation-like SYMBOL tokens (emoji remain OTHER) */
-  uint8_t mode;                    /**< 0=normal, 1=search, 2=split */
-  uint8_t lemmatize;               /**< Replace source lemmas with corrected lemmas; annotations are always computed */
-  uint8_t merge_compounds;         /**< Merge consecutive noun compounds */
-  uint8_t skip_user_dictionary;    /**< Skip automatic loading of the bundled user dictionary */
-  uint8_t skip_core_dictionary;    /**< Skip automatic loading of the bundled core dictionary */
-  uint8_t report_scorer_config;    /**< Add scorer configuration diagnostics to dictionary warnings */
-  uint8_t skip_env_config;         /**< Ignore native scorer configuration environment variables */
-  const char* scorer_options_json; /**< UTF-8 JSON scorer overrides, or NULL for defaults */
-  const char* data_directory;      /**< Exclusive dictionary directory, or NULL for search defaults */
+  uint8_t preserve_vu;      /**< Preserve ヴ (don't normalize to ビ etc.) */
+  uint8_t preserve_case;    /**< Preserve case (don't lowercase ASCII) */
+  uint8_t preserve_symbols; /**< Preserve punctuation-like SYMBOL tokens (emoji remain OTHER) */
+  uint8_t mode;             /**< 0=normal, 1=search, 2=split */
+  uint8_t lemmatize;        /**< Replace source lemmas with corrected lemmas; annotations are always computed */
+  uint8_t merge_compounds;  /**< Merge consecutive noun compounds */
+  uint8_t skip_bundled_user_dictionary; /**< Skip automatic loading of the bundled user dictionary only */
+  uint8_t skip_core_dictionary;         /**< Skip automatic loading of the bundled core dictionary */
+  uint8_t report_scorer_config;         /**< Add scorer configuration diagnostics to dictionary warnings */
+  uint8_t skip_env_config;              /**< Ignore native scorer configuration environment variables */
+  const char* scorer_options_json;      /**< UTF-8 JSON scorer overrides, or NULL for defaults */
+  const char* data_directory;           /**< Exclusive dictionary directory, or NULL for search defaults */
 } suzume_options_t;
 
 // --- Lifecycle functions ---
@@ -549,7 +549,7 @@ SUZUME_EXPORT size_t suzume_offsetof_tag_options(uint32_t field);
  * @brief Get byte offset of field in suzume_options_t
  * @param field 0=preserve_vu, 1=preserve_case, 2=preserve_symbols,
  *              3=mode, 4=lemmatize, 5=merge_compounds,
- *              6=skip_user_dictionary, 7=skip_core_dictionary,
+ *              6=skip_bundled_user_dictionary, 7=skip_core_dictionary,
  *              8=report_scorer_config, 9=skip_env_config,
  *              10=scorer_options_json, 11=data_directory
  */
