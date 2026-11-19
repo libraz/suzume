@@ -1187,6 +1187,126 @@
       ],
       "id": "i_14",
       "input": "使い道具"
+    },
+    {
+      "description": "ふるさと納税 - auto-generated",
+      "expected": [
+        {
+          "lemma": "ふるさと",
+          "pos": "Noun",
+          "surface": "ふるさと"
+        },
+        {
+          "lemma": "納税",
+          "pos": "Noun",
+          "surface": "納税"
+        }
+      ],
+      "id": "furusato",
+      "input": "ふるさと納税"
+    },
+    {
+      "description": "ふるさと納税の返礼品を選ぶ - auto-generated",
+      "expected": [
+        {
+          "lemma": "ふるさと",
+          "pos": "Noun",
+          "surface": "ふるさと"
+        },
+        {
+          "lemma": "納税",
+          "pos": "Noun",
+          "surface": "納税"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "返礼品",
+          "pos": "Noun",
+          "surface": "返礼品"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "選ぶ",
+          "pos": "Verb",
+          "surface": "選ぶ"
+        }
+      ],
+      "id": "furusato_no_wo_bu",
+      "input": "ふるさと納税の返礼品を選ぶ"
+    },
+    {
+      "description": "ふるさとに帰る - auto-generated",
+      "expected": [
+        {
+          "lemma": "ふるさと",
+          "pos": "Noun",
+          "surface": "ふるさと"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "帰る",
+          "pos": "Verb",
+          "surface": "帰る"
+        }
+      ],
+      "id": "furusatoni_ru",
+      "input": "ふるさとに帰る"
+    },
+    {
+      "description": "ふるさとは遠い - auto-generated",
+      "expected": [
+        {
+          "lemma": "ふるさと",
+          "pos": "Noun",
+          "surface": "ふるさと"
+        },
+        {
+          "lemma": "は",
+          "pos": "Particle",
+          "surface": "は"
+        },
+        {
+          "lemma": "遠い",
+          "pos": "Adjective",
+          "surface": "遠い"
+        }
+      ],
+      "id": "furusatoha_i",
+      "input": "ふるさとは遠い"
+    },
+    {
+      "description": "私のふるさと - auto-generated",
+      "expected": [
+        {
+          "lemma": "私",
+          "pos": "Pronoun",
+          "surface": "私"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "ふるさと",
+          "pos": "Noun",
+          "surface": "ふるさと"
+        }
+      ],
+      "id": "nofurusato",
+      "input": "私のふるさと"
     }
   ],
   "description": "General nouns (part 5/5)",
