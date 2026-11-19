@@ -519,6 +519,10 @@ EntrySpecRange getAuxiliaryEntries() {
       suffix("用", "用"),
       // Naming suffix after a nominal base (ファイル+名、利用者+名).
       suffix("名", "名"),
+      // Trade and charge suffixes join a kanji host as one word (八百屋, 電気代)
+      // and split only after kana or katakana (パン+屋, 食べ物+代).
+      suffix_compounding("屋", "屋"),
+      suffix_compounding("代", "代"),
 
       // Note: 的 was previously L1 SUFFIX, but Suzume's tokenizer use case
       // prefers X+的 as one search unit (論理的, 科学的, 経済的). Merging is

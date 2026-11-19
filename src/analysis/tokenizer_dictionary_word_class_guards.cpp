@@ -553,6 +553,24 @@ bool isOutOfPlaceForWordClass(const DictionaryCandidateContext& ctx, const core:
     return true;
   }
 
+  // A compounding suffix is bound, and inside a kanji compound it is part of
+  // the compound (電気代, 居酒屋, 本屋). A lone kanji closing a kana-spelled
+  // word is that word's head and still takes the suffix (食べ物+屋, お茶+代).
+  if (result.entry->extended_pos == core::ExtendedPOS::SuffixCompounding) {
+    size_t kanji_run_start = start_pos;
+    while (kanji_run_start > 0 &&
+           normalize::classifyChar(codepoints[kanji_run_start - 1]) == normalize::CharType::Kanji) {
+      --kanji_run_start;
+    }
+    const size_t kanji_run_length = start_pos - kanji_run_start;
+    const bool closes_kana_spelled_word =
+        kanji_run_length == 1 && kanji_run_start > 0 &&
+        normalize::classifyChar(codepoints[kanji_run_start - 1]) == normalize::CharType::Hiragana;
+    if (start_pos == 0 || (kanji_run_length > 0 && !closes_kana_spelled_word)) {
+      return true;
+    }
+  }
+
   // A period suffix cannot head an interval compound.  In a numeral-led
   // expression such as 10分間隔, the counter generator already supplies
   // 10分 and the following lexical noun must remain 間隔, not 間+隔.
