@@ -290,13 +290,20 @@ void addCopulaAndShiHomographRules(const core::LatticeEdge& prev, const core::La
   // closed particle such as など from being split into な+ど while preserving
   // productive copular constructions. Those two forms are in turn the expected
   // continuation, rewarded by the same amount over な+の+に (雨+な+のに).
-  if (prev.extended_pos == core::ExtendedPOS::AuxCopulaDa && grammar::isAttributiveCopulaNa(prev.surface) &&
-      (next.extended_pos == core::ExtendedPOS::ParticleCase || next.extended_pos == core::ExtendedPOS::ParticleConj)) {
-    const bool nominalizer_led_conjunction =
-        next.extended_pos == core::ExtendedPOS::ParticleConj && utf8::startsWith(next.surface, "の");
+  // Conversely those forms need that attributive predicate: a bare nominal
+  // cannot host them (私+の+でんわ, not 私+ので; 学生なので needs な).
+  const bool attributive_na =
+      prev.extended_pos == core::ExtendedPOS::AuxCopulaDa && grammar::isAttributiveCopulaNa(prev.surface);
+  const bool nominalizer_led_conjunction =
+      next.extended_pos == core::ExtendedPOS::ParticleConj && utf8::startsWith(next.surface, "の");
+  const bool bare_nominal = prev.pos == core::PartOfSpeech::Noun || prev.pos == core::PartOfSpeech::Pronoun;
+  if ((attributive_na && (next.extended_pos == core::ExtendedPOS::ParticleCase ||
+                          next.extended_pos == core::ExtendedPOS::ParticleConj)) ||
+      (bare_nominal && nominalizer_led_conjunction)) {
     const float attributive_continuation_weight = cost::kVeryRare;
-    SUZUME_CONNECTION_ADD(surface_bonus, nominalizer_led_conjunction ? -attributive_continuation_weight
-                                                                     : attributive_continuation_weight);
+    SUZUME_CONNECTION_ADD(surface_bonus, attributive_na && nominalizer_led_conjunction
+                                             ? -attributive_continuation_weight
+                                             : attributive_continuation_weight);
   }
 
   const bool next_is_shi =
