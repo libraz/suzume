@@ -288,6 +288,12 @@ function scorerOptionsJson(value: unknown): string | null {
         assertWellFormedUtf16('create', 'scorer_options', key);
         if (typeof member === 'string') {
           assertWellFormedUtf16('create', 'scorer_options', member);
+        } else if (
+          member === undefined ||
+          (typeof member === 'number' && !Number.isFinite(member))
+        ) {
+          // JSON.stringify would write null or drop the member; JSON has no such value.
+          throw invalidInput('create', 'invalid scorer_options: not serializable as JSON');
         }
         return member;
       });
@@ -305,16 +311,20 @@ function scorerOptionsJson(value: unknown): string | null {
   return json;
 }
 
-const EXTENDED_BOOL_FIELDS = [
-  'preserveVu',
-  'preserveCase',
-  'preserveSymbols',
+// Boolean options in C struct field order, split where `mode` sits between them;
+// options are validated in this order so every binding reports the same one first.
+const EXTENDED_BOOL_FIELDS_BEFORE_MODE = ['preserveVu', 'preserveCase', 'preserveSymbols'] as const;
+const EXTENDED_BOOL_FIELDS_AFTER_MODE = [
   'lemmatize',
   'mergeCompounds',
   'skipBundledUserDictionary',
   'skipCoreDictionary',
-  'skipEnvConfig',
   'reportScorerConfig',
+  'skipEnvConfig',
+] as const;
+const EXTENDED_BOOL_FIELDS = [
+  ...EXTENDED_BOOL_FIELDS_BEFORE_MODE,
+  ...EXTENDED_BOOL_FIELDS_AFTER_MODE,
 ] as const;
 
 /** A part-of-speech label as {@link Morpheme.pos} and {@link Tag.pos} print it. */
@@ -438,15 +448,16 @@ const TAG_OPTION_DEFAULTS = {
   removeDuplicates: true,
 } as const;
 
-const TAG_BOOL_FIELDS = [
-  'excludeBasic',
-  'useBaseForm',
+// Boolean tag options in C struct field order, split where the size fields sit between them.
+const TAG_BOOL_FIELDS_BEFORE_SIZES = ['excludeBasic', 'useBaseForm'] as const;
+const TAG_BOOL_FIELDS_AFTER_SIZES = [
   'excludeParticles',
   'excludeAuxiliaries',
   'excludeFormalNouns',
   'excludeLowInfo',
   'removeDuplicates',
 ] as const;
+const TAG_BOOL_FIELDS = [...TAG_BOOL_FIELDS_BEFORE_SIZES, ...TAG_BOOL_FIELDS_AFTER_SIZES] as const;
 
 // Each name's native SUZUME_TAG_POS_* bit.
 const TAG_POS_FILTER_BITS: Readonly<Record<TagPosLabel, number>> = {
@@ -552,6 +563,13 @@ const registry = new FinalizationRegistry((ref: CleanupRef) => {
   }
 });
 
+/** Validate `value` as the string argument `name`: a string with a UTF-8 encoding. */
+function utf8Argument(operation: SuzumeOperation, name: string, value: unknown): string {
+  const text = stringArgument(operation, name, value);
+  assertWellFormedUtf16(operation, name, text);
+  return text;
+}
+
 /** Rejects an unpaired surrogate, which has no UTF-8 encoding, as invalid input named `name`. */
 function assertWellFormedUtf16(operation: SuzumeOperation, name: string, value: string): void {
   for (let idx = 0; idx < value.length; idx++) {
@@ -631,9 +649,12 @@ export class Suzume {
    *   and text when the library rejects the configuration
    */
   static async create(options?: SuzumeOptions & RuntimeOptions): Promise<Suzume> {
+    for (const field of EXTENDED_BOOL_FIELDS_BEFORE_MODE) {
+      booleanOption('create', field, options?.[field]);
+    }
     const modeValue = options?.mode === undefined ? EXTENDED_OPTION_DEFAULTS.mode : options.mode;
     const mode = modeCode('create', modeValue);
-    for (const field of EXTENDED_BOOL_FIELDS) {
+    for (const field of EXTENDED_BOOL_FIELDS_AFTER_MODE) {
       booleanOption('create', field, options?.[field]);
     }
     const scorerJson = scorerOptionsJson(options?.scorerOptions);
@@ -738,7 +759,7 @@ export class Suzume {
   analyzeWithNormalizedText(text: string): AnalysisResult {
     this.ensureAlive('analyze');
 
-    return this.withUtf8String('analyze', 'text', text, (textPtr, textByteLength) => {
+    return this.withUtf8(utf8Argument('analyze', 'text', text), (textPtr, textByteLength) => {
       const resultPtr = this.module._suzume_analyze_n(this.handle, textPtr, textByteLength);
 
       if (resultPtr === 0) {
@@ -764,24 +785,28 @@ export class Suzume {
    */
   generateTags(text: string, options?: TagOptions): readonly Tag[] {
     this.ensureAlive('generate_tags');
+    const validText = utf8Argument('generate_tags', 'text', text);
 
     let posFilter = 0;
     let minLength: number = TAG_OPTION_DEFAULTS.minLength;
     let maxTags: number = TAG_OPTION_DEFAULTS.maxTags;
     if (options) {
       posFilter = tagPosFilter(options.posFilter);
+      for (const field of TAG_BOOL_FIELDS_BEFORE_SIZES) {
+        booleanOption('generate_tags', field, options[field]);
+      }
       if (options.minLength !== undefined) {
         minLength = sizeOption('generate_tags', 'minLength', options.minLength);
       }
       if (options.maxTags !== undefined) {
         maxTags = sizeOption('generate_tags', 'maxTags', options.maxTags);
       }
-      for (const field of TAG_BOOL_FIELDS) {
+      for (const field of TAG_BOOL_FIELDS_AFTER_SIZES) {
         booleanOption('generate_tags', field, options[field]);
       }
     }
 
-    return this.withUtf8String('generate_tags', 'text', text, (textPtr, textByteLength) => {
+    return this.withUtf8(validText, (textPtr, textByteLength) => {
       if (options) {
         const optionsPtr = this.module._malloc(C_LAYOUTS.tagOptions.size);
 
@@ -837,10 +862,8 @@ export class Suzume {
   loadUserDictionary(data: string): number {
     this.ensureAlive('load_user_dictionary');
 
-    const installed = this.withUtf8String(
-      'load_user_dictionary',
-      'dictionary',
-      data,
+    const installed = this.withUtf8(
+      utf8Argument('load_user_dictionary', 'dictionary', data),
       (dataPtr, dataByteLength) =>
         this.module._suzume_load_user_dictionary(this.handle, dataPtr, dataByteLength),
     );
@@ -954,15 +977,8 @@ export class Suzume {
     }
   }
 
-  /** Validate `value` as the string argument `name`, then pass it to `body` as UTF-8. */
-  private withUtf8String<T>(
-    operation: SuzumeOperation,
-    name: string,
-    value: unknown,
-    body: (pointer: number, byteLength: number) => T,
-  ): T {
-    const text = stringArgument(operation, name, value);
-    assertWellFormedUtf16(operation, name, text);
+  /** Pass an already validated string to `body` as UTF-8 in WASM memory. */
+  private withUtf8<T>(text: string, body: (pointer: number, byteLength: number) => T): T {
     const { pointer, payloadByteLength } = allocUtf8(this.module, text);
     try {
       return body(pointer, payloadByteLength);

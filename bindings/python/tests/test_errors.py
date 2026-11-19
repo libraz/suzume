@@ -48,6 +48,10 @@ def _build_value(value: Any) -> Any:
         cyclic: dict[str, object] = {}
         cyclic["self"] = cyclic
         return cyclic
+    if special == "nested_nan":
+        return {"weights": {"join": [math.nan]}}
+    if special == "nested_infinity":
+        return {"weights": {"join": [math.inf]}}
     raise AssertionError(f"unknown $special in fixture: {special}")
 
 
@@ -55,9 +59,14 @@ def _invoke(case: dict[str, Any], live: Suzume) -> None:
     call = case["call"]["python"]
     value = _build_value(case["value"])
     option = case["option"]["python"] if case["option"] else None
+    if case.get("options"):
+        options = {key: _build_value(member) for key, member in case["options"]["python"].items()}
+    else:
+        options = {option: value} if option else {}
+    text = _build_value(case["text"]) if "text" in case else "東京"
     member = call["member"]
     if member == "Suzume":
-        Suzume(**({option: value} if option else {})).close()
+        Suzume(**options).close()
         return
     target = live
     if case["released"]:
@@ -68,7 +77,7 @@ def _invoke(case: dict[str, Any], live: Suzume) -> None:
     elif call["kind"] == "set":
         setattr(target, member, value)
     elif member == "generate_tags":
-        target.generate_tags("東京", **({option: value} if option else {}))
+        target.generate_tags(text, **options)
     else:
         method = getattr(target, member)
         if inspect.signature(method).parameters:
@@ -96,6 +105,7 @@ def test_fixture_covers_every_non_pos_filter_group() -> None:
         "boolean",
         "argument",
         "render",
+        "order",
     }
 
 

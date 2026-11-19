@@ -479,18 +479,19 @@ class Suzume:
         self._handle: int | None = None
         opts = SuzumeOptions()
         _lib.suzume_init_options(ctypes.byref(opts))
-        opts.mode = _mode_option(mode)._code
+        # Validate in C struct field order so every binding reports the same option first.
         opts.preserve_vu = _bool_option("preserve_vu", preserve_vu)
         opts.preserve_case = _bool_option("preserve_case", preserve_case)
         opts.preserve_symbols = _bool_option("preserve_symbols", preserve_symbols)
+        opts.mode = _mode_option(mode)._code
         opts.lemmatize = _bool_option("lemmatize", lemmatize)
         opts.merge_compounds = _bool_option("merge_compounds", merge_compounds)
         opts.skip_bundled_user_dictionary = _bool_option(
             "skip_bundled_user_dictionary", skip_bundled_user_dictionary
         )
         opts.skip_core_dictionary = _bool_option("skip_core_dictionary", skip_core_dictionary)
-        opts.skip_env_config = _bool_option("skip_env_config", skip_env_config)
         opts.report_scorer_config = _bool_option("report_scorer_config", report_scorer_config)
+        opts.skip_env_config = _bool_option("skip_env_config", skip_env_config)
         opts.scorer_options_json = _encode_scorer_options(scorer_options)
         data_directory = os.fsencode(_BUNDLED_DATA_DIR) if _BUNDLED_DATA_DIR is not None else None
         opts.data_directory = data_directory

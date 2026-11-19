@@ -19,6 +19,10 @@ interface ConformanceCase {
   call: { npm: NpmCall | null };
   option: { npm: string } | null;
   value: unknown;
+  /** Several options at once, for the cases that pin which invalid option is reported first. */
+  options?: { npm: Record<string, unknown> };
+  /** The text argument, when a case replaces the default. */
+  text?: unknown;
   released: boolean;
   only: 'npm' | 'python' | null;
   expect: { npm: { type: string; code: number; operation?: string } | null };
@@ -61,6 +65,14 @@ function buildValue(value: unknown): unknown {
       cyclic.self = cyclic;
       return cyclic;
     }
+    case 'nested_nan':
+      return { weights: { join: [Number.NaN] } };
+    case 'nested_infinity':
+      return { weights: { join: [Number.POSITIVE_INFINITY] } };
+    case 'undefined_member':
+      return { key: undefined };
+    case 'nested_undefined':
+      return { weights: [undefined] };
     default:
       throw new Error(`unknown $special in fixture: ${special}`);
   }
@@ -99,6 +111,7 @@ describe('error conformance (bindings/conformance/errors.json)', () => {
       'boolean',
       'argument',
       'render',
+      'order',
     ]) {
       expect(groups.has(group), group).toBe(true);
     }
@@ -114,6 +127,15 @@ describe('error conformance (bindings/conformance/errors.json)', () => {
       }
       const value = buildValue(testCase.value);
       const option = testCase.option?.npm;
+      const text = 'text' in testCase ? buildValue(testCase.text) : '東京';
+      let options: Record<string, unknown> | undefined;
+      if (testCase.options) {
+        options = Object.fromEntries(
+          Object.entries(testCase.options.npm).map(([key, member]) => [key, buildValue(member)]),
+        );
+      } else if (option !== undefined) {
+        options = { [option]: value };
+      }
 
       if (call.kind === 'construct') {
         const error = new SuzumeError(testCase.message ?? '', value as number);
@@ -133,7 +155,7 @@ describe('error conformance (bindings/conformance/errors.json)', () => {
 
       const error = await captureError(() => {
         if (call.member === 'create') {
-          return Suzume.create(option === undefined ? undefined : { [option]: value });
+          return Suzume.create(options);
         }
         if (call.kind === 'get') {
           return subject[call.member];
@@ -144,11 +166,7 @@ describe('error conformance (bindings/conformance/errors.json)', () => {
         }
         const method = subject[call.member] as (...args: unknown[]) => unknown;
         if (call.member === 'generateTags') {
-          return method.call(
-            target,
-            '東京',
-            option === undefined ? undefined : { [option]: value },
-          );
+          return method.call(target, text, options);
         }
         return method.call(target, value);
       });

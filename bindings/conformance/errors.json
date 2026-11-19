@@ -2239,6 +2239,635 @@
         }
       },
       "message": "invalid scorer options: JSON parse error: Expected string key in object"
+    },
+    {
+      "id": "order-text-before-options",
+      "group": "order",
+      "call": {
+        "npm": {
+          "member": "generateTags",
+          "kind": "call"
+        },
+        "python": {
+          "member": "generate_tags",
+          "kind": "call"
+        }
+      },
+      "option": null,
+      "value": null,
+      "options": {
+        "npm": {
+          "minLength": 2.5
+        },
+        "python": {
+          "min_length": 2.5
+        }
+      },
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "generate_tags"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid text: 123 (expected a string)",
+      "text": 123
+    },
+    {
+      "id": "order-surrogate-text-before-options",
+      "group": "order",
+      "call": {
+        "npm": {
+          "member": "generateTags",
+          "kind": "call"
+        },
+        "python": {
+          "member": "generate_tags",
+          "kind": "call"
+        }
+      },
+      "option": null,
+      "value": null,
+      "options": {
+        "npm": {
+          "posFilter": "adjective"
+        },
+        "python": {
+          "pos_filter": "adjective"
+        }
+      },
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "generate_tags"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid text: contains an unpaired surrogate",
+      "text": {
+        "$special": "lone_surrogate"
+      }
+    },
+    {
+      "id": "order-pos-filter-before-exclude-basic",
+      "group": "order",
+      "call": {
+        "npm": {
+          "member": "generateTags",
+          "kind": "call"
+        },
+        "python": {
+          "member": "generate_tags",
+          "kind": "call"
+        }
+      },
+      "option": null,
+      "value": null,
+      "options": {
+        "npm": {
+          "posFilter": "adjective",
+          "excludeBasic": "x"
+        },
+        "python": {
+          "pos_filter": "adjective",
+          "exclude_basic": "x"
+        }
+      },
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "generate_tags"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid pos_filter: \"adjective\" (expected one of: NOUN, VERB, ADJ, ADV, PARTICLE, AUX)"
+    },
+    {
+      "id": "order-exclude-basic-before-min-length",
+      "group": "order",
+      "call": {
+        "npm": {
+          "member": "generateTags",
+          "kind": "call"
+        },
+        "python": {
+          "member": "generate_tags",
+          "kind": "call"
+        }
+      },
+      "option": null,
+      "value": null,
+      "options": {
+        "npm": {
+          "excludeBasic": "x",
+          "minLength": 2.5
+        },
+        "python": {
+          "exclude_basic": "x",
+          "min_length": 2.5
+        }
+      },
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "generate_tags"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid exclude_basic: \"x\" (expected a boolean)"
+    },
+    {
+      "id": "order-use-base-form-before-max-tags",
+      "group": "order",
+      "call": {
+        "npm": {
+          "member": "generateTags",
+          "kind": "call"
+        },
+        "python": {
+          "member": "generate_tags",
+          "kind": "call"
+        }
+      },
+      "option": null,
+      "value": null,
+      "options": {
+        "npm": {
+          "useBaseForm": "yes",
+          "maxTags": -1
+        },
+        "python": {
+          "use_base_form": "yes",
+          "max_tags": -1
+        }
+      },
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "generate_tags"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid use_base_form: \"yes\" (expected a boolean)"
+    },
+    {
+      "id": "order-max-tags-before-exclude-particles",
+      "group": "order",
+      "call": {
+        "npm": {
+          "member": "generateTags",
+          "kind": "call"
+        },
+        "python": {
+          "member": "generate_tags",
+          "kind": "call"
+        }
+      },
+      "option": null,
+      "value": null,
+      "options": {
+        "npm": {
+          "maxTags": -1,
+          "excludeParticles": "x"
+        },
+        "python": {
+          "max_tags": -1,
+          "exclude_particles": "x"
+        }
+      },
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "generate_tags"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid max_tags: -1 (expected an integer from 0 to 4294967295)"
+    },
+    {
+      "id": "order-preserve-symbols-before-mode",
+      "group": "order",
+      "call": {
+        "npm": {
+          "member": "create",
+          "kind": "call"
+        },
+        "python": {
+          "member": "Suzume",
+          "kind": "call"
+        }
+      },
+      "option": null,
+      "value": null,
+      "options": {
+        "npm": {
+          "preserveSymbols": "x",
+          "mode": "fast"
+        },
+        "python": {
+          "preserve_symbols": "x",
+          "mode": "fast"
+        }
+      },
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "create"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid preserve_symbols: \"x\" (expected a boolean)"
+    },
+    {
+      "id": "order-report-scorer-config-before-skip-env-config",
+      "group": "order",
+      "call": {
+        "npm": {
+          "member": "create",
+          "kind": "call"
+        },
+        "python": {
+          "member": "Suzume",
+          "kind": "call"
+        }
+      },
+      "option": null,
+      "value": null,
+      "options": {
+        "npm": {
+          "reportScorerConfig": "x",
+          "skipEnvConfig": "y"
+        },
+        "python": {
+          "report_scorer_config": "x",
+          "skip_env_config": "y"
+        }
+      },
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "create"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid report_scorer_config: \"x\" (expected a boolean)"
+    },
+    {
+      "id": "order-skip-env-config-before-scorer-options",
+      "group": "order",
+      "call": {
+        "npm": {
+          "member": "create",
+          "kind": "call"
+        },
+        "python": {
+          "member": "Suzume",
+          "kind": "call"
+        }
+      },
+      "option": null,
+      "value": null,
+      "options": {
+        "npm": {
+          "skipEnvConfig": "x",
+          "scorerOptions": {
+            "$special": "cycle"
+          }
+        },
+        "python": {
+          "skip_env_config": "x",
+          "scorer_options": {
+            "$special": "cycle"
+          }
+        }
+      },
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "create"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid skip_env_config: \"x\" (expected a boolean)"
+    },
+    {
+      "id": "order-released-before-text",
+      "group": "order",
+      "call": {
+        "npm": {
+          "member": "generateTags",
+          "kind": "call"
+        },
+        "python": {
+          "member": "generate_tags",
+          "kind": "call"
+        }
+      },
+      "option": null,
+      "value": null,
+      "options": {
+        "npm": {
+          "minLength": 2.5
+        },
+        "python": {
+          "min_length": 2.5
+        }
+      },
+      "released": true,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "generate_tags"
+        },
+        "python": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "generate_tags"
+        }
+      },
+      "message": "Suzume instance has been released",
+      "text": 123
+    },
+    {
+      "id": "scorer-nan",
+      "group": "scorer",
+      "call": {
+        "npm": {
+          "member": "create",
+          "kind": "call"
+        },
+        "python": {
+          "member": "Suzume",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "scorerOptions",
+        "python": "scorer_options"
+      },
+      "value": {
+        "$special": "NaN"
+      },
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "create"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid scorer_options: not serializable as JSON"
+    },
+    {
+      "id": "scorer-infinity",
+      "group": "scorer",
+      "call": {
+        "npm": {
+          "member": "create",
+          "kind": "call"
+        },
+        "python": {
+          "member": "Suzume",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "scorerOptions",
+        "python": "scorer_options"
+      },
+      "value": {
+        "$special": "Infinity"
+      },
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "create"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid scorer_options: not serializable as JSON"
+    },
+    {
+      "id": "scorer-negative-infinity",
+      "group": "scorer",
+      "call": {
+        "npm": {
+          "member": "create",
+          "kind": "call"
+        },
+        "python": {
+          "member": "Suzume",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "scorerOptions",
+        "python": "scorer_options"
+      },
+      "value": {
+        "$special": "-Infinity"
+      },
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "create"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid scorer_options: not serializable as JSON"
+    },
+    {
+      "id": "scorer-nested-nan",
+      "group": "scorer",
+      "call": {
+        "npm": {
+          "member": "create",
+          "kind": "call"
+        },
+        "python": {
+          "member": "Suzume",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "scorerOptions",
+        "python": "scorer_options"
+      },
+      "value": {
+        "$special": "nested_nan"
+      },
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "create"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid scorer_options: not serializable as JSON"
+    },
+    {
+      "id": "scorer-nested-infinity",
+      "group": "scorer",
+      "call": {
+        "npm": {
+          "member": "create",
+          "kind": "call"
+        },
+        "python": {
+          "member": "Suzume",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "scorerOptions",
+        "python": "scorer_options"
+      },
+      "value": {
+        "$special": "nested_infinity"
+      },
+      "released": false,
+      "only": null,
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "create"
+        },
+        "python": {
+          "type": "ValueError"
+        }
+      },
+      "message": "invalid scorer_options: not serializable as JSON"
+    },
+    {
+      "id": "scorer-undefined-member",
+      "group": "scorer",
+      "call": {
+        "npm": {
+          "member": "create",
+          "kind": "call"
+        },
+        "python": {
+          "member": "Suzume",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "scorerOptions",
+        "python": "scorer_options"
+      },
+      "value": {
+        "$special": "undefined_member"
+      },
+      "released": false,
+      "only": "npm",
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "create"
+        },
+        "python": null
+      },
+      "message": "invalid scorer_options: not serializable as JSON"
+    },
+    {
+      "id": "scorer-nested-undefined",
+      "group": "scorer",
+      "call": {
+        "npm": {
+          "member": "create",
+          "kind": "call"
+        },
+        "python": {
+          "member": "Suzume",
+          "kind": "call"
+        }
+      },
+      "option": {
+        "npm": "scorerOptions",
+        "python": "scorer_options"
+      },
+      "value": {
+        "$special": "nested_undefined"
+      },
+      "released": false,
+      "only": "npm",
+      "expect": {
+        "npm": {
+          "type": "SuzumeError",
+          "code": 6,
+          "operation": "create"
+        },
+        "python": null
+      },
+      "message": "invalid scorer_options: not serializable as JSON"
     }
   ]
 }
