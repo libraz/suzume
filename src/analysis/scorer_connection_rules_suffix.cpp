@@ -53,7 +53,7 @@ void addClosedMorphemeHostRules(const core::LatticeEdge& prev, const core::Latti
                                                   next.extended_pos == core::ExtendedPOS::ParticleFinal &&
                                                   utf8::equalsAny(next.surface, {"ったら"});
   const bool address_suffix_on_predicate_host =
-      next.extended_pos == core::ExtendedPOS::Suffix && grammar::isPersonalAddressSuffix(next.surface) &&
+      core::isGeneralSuffixType(next.extended_pos) && grammar::isPersonalAddressSuffix(next.surface) &&
       (prev.pos == core::PartOfSpeech::Verb || prev.pos == core::PartOfSpeech::Adjective ||
        prev.pos == core::PartOfSpeech::Auxiliary);
   if (predicate_particle_on_nominal_host || address_suffix_on_predicate_host) {
@@ -800,7 +800,7 @@ float computeSuffixShortVerbBonus(const core::LatticeEdge& prev, const core::Lat
   // The temporal suffix 中 cannot govern an accusative object.  In a noun
   // compound before を, retain the complete lexical noun (背中を) rather than
   // treating its final character as a duration suffix.
-  if (prev.extended_pos == core::ExtendedPOS::Suffix && grammar::isStateDurationSuffix(prev.surface) &&
+  if (core::isGeneralSuffixType(prev.extended_pos) && grammar::isStateDurationSuffix(prev.surface) &&
       next.extended_pos == core::ExtendedPOS::ParticleCase && grammar::isAccusativeParticleWoSurface(next.surface)) {
     SUZUME_CONNECTION_ADD(bonus, cost::kStrong);
   }

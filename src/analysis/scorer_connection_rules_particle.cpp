@@ -175,7 +175,7 @@ float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::
   // homographic determiner cannot fill that slot. The ParticleCase→Determiner
   // bigram penalty covers only noun+particle+かかる (壁にかかる).
   const bool duration_host_before_kakaru = prev.pos == core::PartOfSpeech::Noun ||
-                                           (prev.extended_pos == core::ExtendedPOS::Suffix && prev.surface == "間") ||
+                                           (core::isGeneralSuffixType(prev.extended_pos) && prev.surface == "間") ||
                                            prev.extended_pos == core::ExtendedPOS::ParticleAdverbial;
   if (duration_host_before_kakaru && grammar::isDurationPredicateKakaru(next.surface) &&
       next.extended_pos == core::ExtendedPOS::Determiner) {

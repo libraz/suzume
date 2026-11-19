@@ -43,7 +43,7 @@ namespace {
 /// Base form the inflection analyzer reports for every cell of the negative
 /// predicate (ない/なく/なかっ/なけれ).
 bool isPlainSuffixEntry(const dictionary::DictionaryEntry& entry) {
-  return entry.extended_pos == core::ExtendedPOS::Suffix;
+  return core::isGeneralSuffixType(entry.extended_pos);
 }
 
 constexpr const char* kNegativeAdjectiveBase = "ない";

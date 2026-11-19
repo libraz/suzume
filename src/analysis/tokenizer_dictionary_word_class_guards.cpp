@@ -556,7 +556,7 @@ bool isOutOfPlaceForWordClass(const DictionaryCandidateContext& ctx, const core:
   // A period suffix cannot head an interval compound.  In a numeral-led
   // expression such as 10分間隔, the counter generator already supplies
   // 10分 and the following lexical noun must remain 間隔, not 間+隔.
-  if (result.entry->extended_pos == core::ExtendedPOS::Suffix && result.length == 1 &&
+  if (core::isGeneralSuffixType(result.entry->extended_pos) && result.length == 1 &&
       start_pos + 1 < codepoints.size() && codepoints[start_pos] == U'間' &&
       normalize::isIntervalCompoundSecondKanji(codepoints[start_pos + 1])) {
     return true;
@@ -565,7 +565,7 @@ bool isOutOfPlaceForWordClass(const DictionaryCandidateContext& ctx, const core:
   // 時間接尾辞「後」は終了+後・三日+後のように内容語へ直接接合
   // する。ひらがな活用や助詞の後では独立時間名詞なので、suffix
   // edgeを出さず既存のnoun候補へ任せる（食べた+後、ので+後）。
-  if (result.entry->extended_pos == core::ExtendedPOS::Suffix &&
+  if (core::isGeneralSuffixType(result.entry->extended_pos) &&
       grammar::isDirectAttachmentTemporalSuffix(result.entry->surface)) {
     if (start_pos == 0) {
       return true;

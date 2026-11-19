@@ -152,7 +152,7 @@ void appendAnalyzedKanjiVerbCandidates(const std::vector<char32_t>& codepoints, 
             // For multi-kanji stems, skip any suffix pattern
             bool is_suffix_pos = (result.entry->pos == core::PartOfSpeech::Suffix);
             bool is_multi_kanji = (kanji_end - start_pos >= 2);
-            if (is_suffix_pos || (is_multi_kanji && (result.entry->extended_pos == core::ExtendedPOS::Suffix ||
+            if (is_suffix_pos || (is_multi_kanji && (core::isGeneralSuffixType(result.entry->extended_pos) ||
                                                      result.entry->pos == core::PartOfSpeech::Other))) {
               // Exception: さ + れ/せ is godan-sa mizenkei + passive/causative
               if (hiragana_part == "さ" && end_pos < codepoints.size()) {

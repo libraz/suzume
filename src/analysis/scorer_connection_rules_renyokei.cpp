@@ -287,11 +287,11 @@ void addConditionalParticleRules(const core::LatticeEdge& prev, const core::Latt
   if (next.extended_pos == core::ExtendedPOS::ParticleConj && utf8::equalsAny(next.surface, {"なら"})) {
     if (prev.extended_pos == core::ExtendedPOS::AdjNaAdj) {
       SUZUME_CONNECTION_ADD(bonus, cost::kStrongBonus);
-    } else if (prev.pos == core::PartOfSpeech::Noun || prev.extended_pos == core::ExtendedPOS::Suffix) {
+    } else if (prev.pos == core::PartOfSpeech::Noun || core::isGeneralSuffixType(prev.extended_pos)) {
       // A nominal suffix takes the same conditional copula as its host
       // (作業中+なら). Cancel the generic suffix→conjunctive penalty.
       SUZUME_CONNECTION_ADD(
-          bonus, prev.extended_pos == core::ExtendedPOS::Suffix ? cost::kDoubleVeryStrongBonus : cost::kStrongBonus);
+          bonus, core::isGeneralSuffixType(prev.extended_pos) ? cost::kDoubleVeryStrongBonus : cost::kStrongBonus);
     } else if (prev.extended_pos == core::ExtendedPOS::Adverb ||
                prev.extended_pos == core::ExtendedPOS::AdverbQuotative ||
                prev.extended_pos == core::ExtendedPOS::AdverbInterrogative ||

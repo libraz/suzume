@@ -124,7 +124,7 @@ float computeTaFormVolitionalBonus(const core::LatticeEdge& prev, const core::La
   // This discourages splitting たら into た+ら
   // たら is a conditional form of た and should stay together
   if (prev.surface == "た" && prev.extended_pos == core::ExtendedPOS::AuxTenseTa && next.surface == "ら" &&
-      next.extended_pos == core::ExtendedPOS::Suffix) {
+      core::isGeneralSuffixType(next.extended_pos)) {
     SUZUME_CONNECTION_ADD(bonus, cost::kSevere);  // Penalty to discourage た+ら split
   }
 
