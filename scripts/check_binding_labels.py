@@ -77,6 +77,13 @@ CPP_DEFAULT_NAMES = {
 PYTHON_DEFAULT_NAMES: dict[str, dict[str, str]] = {"options": {}, "tag": {}}
 # Python takes POS filters by label only, so "no filter" is None where C has 0.
 PYTHON_NONE_AS_ZERO = {"pos_filter"}
+# C option fields a binding does not expose as an option. npm embeds its dictionaries, so it has
+# no data directory; Python resolves its bundled data directory at runtime and passes scorer
+# options through its own path (both checked separately below).
+UNMIRRORED_DEFAULTS = {
+    "WASM": {"options": {"data_directory"}, "tag": set()},
+    "Python": {"options": {"scorer_options_json", "data_directory"}, "tag": set()},
+}
 
 WASM_DEFAULT_NAMES = {
     "options": {
@@ -91,7 +98,6 @@ WASM_DEFAULT_NAMES = {
         "report_scorer_config": "reportScorerConfig",
         "skip_env_config": "skipEnvConfig",
         "scorer_options_json": "scorerOptions",
-        "data_directory": "dataDirectory",
     },
     "tag": {
         "pos_filter": "posFilter",
@@ -686,7 +692,7 @@ def check_default_contracts() -> bool:
                 else python_raw[kind][PYTHON_DEFAULT_NAMES[kind].get(field, field)]
             )
             for field in fields
-            if field not in {"scorer_options_json", "data_directory"}
+            if field not in UNMIRRORED_DEFAULTS["Python"][kind]
         }
         for kind, fields in DEFAULT_FIELDS.items()
     }
@@ -703,15 +709,8 @@ def check_default_contracts() -> bool:
                 field: expected[field] if value is DEFAULT_CONSTRUCTED and expected[field] in (None, 0) else value
                 for field, value in raw.items()
             }
-            comparable = (
-                expected
-                if surface != "Python" or kind != "options"
-                else {
-                    field: value
-                    for field, value in expected.items()
-                    if field not in {"scorer_options_json", "data_directory"}
-                }
-            )
+            unmirrored = UNMIRRORED_DEFAULTS.get(surface, {}).get(kind, set())
+            comparable = {field: value for field, value in expected.items() if field not in unmirrored}
             if actual != comparable:
                 print(f"❌ {surface} {kind} option defaults drift: expected {comparable}, got {actual}")
                 failed = True
