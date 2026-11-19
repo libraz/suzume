@@ -101,6 +101,8 @@ jobs:
           name: wheels-linux-x86_64
           path: bindings/python/dist/*.whl
 
+  # ci.yml's macos-wheel runs these same steps on main before any tag; keep the
+  # runner and steps of the two in step.
   build-macos-wheel:
     needs: verify-version
     runs-on: macos-26  # arm64

@@ -172,6 +172,31 @@ jobs:
       - name: Build and test the wheel with the oldest supported toolchain
         run: bindings/python/manylinux_wheel.sh
 
+  # The macOS wheel's twin of manylinux-toolchain: the same runner and steps as
+  # publish.yml's build-macos-wheel, so a runner image change is met on main
+  # before the tag rather than inside the publish run. Keep the two in step.
+  macos-wheel:
+    if: github.ref == 'refs/heads/main' || github.base_ref == 'main'
+    runs-on: macos-26  # arm64
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.3.3
+        with:
+          version: ${{ env.UV_VERSION }}
+      - name: Build macOS arm64 wheel
+        working-directory: bindings/python
+        run: ./build_wheel.sh
+      - name: Smoke-test wheel outside the checkout
+        run: |
+          for wheel in bindings/python/dist/*.whl; do
+            bindings/python/smoke_wheel.sh "$wheel"
+          done
+      - name: Run the binding test suite against the wheel
+        run: |
+          for wheel in bindings/python/dist/*.whl; do
+            bindings/python/test_wheel.sh "$wheel"
+          done
+
   build-and-test:
     runs-on: ubuntu-latest
     steps:
