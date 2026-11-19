@@ -111,7 +111,7 @@ enum class ExtendedPOS : uint8_t {
   AuxConjectureMitai,   // 推定: みたい
 
   // Copula auxiliaries
-  AuxCopulaDa,    // 断定: だ、で、な、なら
+  AuxCopulaDa,    // 断定: だ、な、なら
   AuxCopulaDesu,  // 丁寧断定: です、でし
 
   // Other auxiliaries
@@ -240,6 +240,20 @@ enum class ExtendedPOS : uint8_t {
   // it joins the next item instead of closing the clause, so a nominal or a
   // predicate may follow it.
   ParticleChoice,
+
+  // 列挙の副助詞: とか, だの, やら. Each member lists examples and may repeat after
+  // every item (りんごとかみかんとか), so the class is set apart from the general
+  // adverbial particles it otherwise behaves like.
+  ParticleListing,
+
+  // 造語成分の接尾辞: 屋, 代. A bound element that forms one word with its host;
+  // it is a separate token only after a kana or katakana host (パン+屋, ガス+代).
+  SuffixCompounding,
+
+  // 断定 だ の連用形: で, だっ. The continuative cells of the plain copula, split off
+  // so they can carry the connections of a continuative rather than the whole
+  // paradigm's.
+  AuxCopulaDaRenyokei,
 
   // Count marker (for array sizing)
   Count_  // Total number of categories
@@ -403,7 +417,7 @@ constexpr bool isAuxiliaryType(ExtendedPOS epos) {
          epos == ExtendedPOS::AuxBenefactive || epos == ExtendedPOS::AuxSimilitudeYou ||
          epos == ExtendedPOS::AuxKuruwaPolite || epos == ExtendedPOS::AuxClassicalKi ||
          epos == ExtendedPOS::AuxConjectureRashiiStem || epos == ExtendedPOS::AuxClassicalConjectureTerminal ||
-         epos == ExtendedPOS::AuxPejorativeYagaru;
+         epos == ExtendedPOS::AuxPejorativeYagaru || epos == ExtendedPOS::AuxCopulaDaRenyokei;
 }
 
 /**
@@ -417,7 +431,7 @@ constexpr bool isConjectureRashiiType(ExtendedPOS epos) {
  * @brief Whether ExtendedPOS is a cell of the plain copula だ
  */
 constexpr bool isPlainCopulaType(ExtendedPOS epos) {
-  return epos == ExtendedPOS::AuxCopulaDa;
+  return epos == ExtendedPOS::AuxCopulaDa || epos == ExtendedPOS::AuxCopulaDaRenyokei;
 }
 
 /**
@@ -431,15 +445,16 @@ constexpr bool isCopulaType(ExtendedPOS epos) {
  * @brief Whether ExtendedPOS is an adverbial particle (だけ, まで, とか)
  */
 constexpr bool isAdverbialParticleType(ExtendedPOS epos) {
-  return epos == ExtendedPOS::ParticleAdverbial;
+  return epos == ExtendedPOS::ParticleAdverbial || epos == ExtendedPOS::ParticleListing;
 }
 
 /**
  * @brief Whether ExtendedPOS is a general suffix (用, 後), not one of its
- *        separately profiled subclasses (っけ, がち)
+ *        separately profiled subclasses (っけ, がち); the compounding suffix
+ *        (屋, 代) shares its profile
  */
 constexpr bool isGeneralSuffixType(ExtendedPOS epos) {
-  return epos == ExtendedPOS::Suffix;
+  return epos == ExtendedPOS::Suffix || epos == ExtendedPOS::SuffixCompounding;
 }
 
 /**
@@ -491,7 +506,8 @@ constexpr bool isParticleType(ExtendedPOS epos) {
   // appended after it because ExtendedPOS is serialized as uint8 in the
   // compiled dictionaries, so the range alone no longer covers the class.
   return (epos >= ExtendedPOS::ParticleCase && epos <= ExtendedPOS::ParticleBinding) ||
-         epos == ExtendedPOS::ParticleConjFinite || epos == ExtendedPOS::ParticleChoice;
+         epos == ExtendedPOS::ParticleConjFinite || epos == ExtendedPOS::ParticleChoice ||
+         epos == ExtendedPOS::ParticleListing;
 }
 
 /**

@@ -128,6 +128,7 @@ TEST(TypesExtendedTest, ExtendedPosToStringAuxiliaries) {
   EXPECT_EQ(extendedPosToString(ExtendedPOS::AuxCausative), "AUX_使役");
   EXPECT_EQ(extendedPosToString(ExtendedPOS::AuxAspectIru), "AUX_継続");
   EXPECT_EQ(extendedPosToString(ExtendedPOS::AuxCopulaDa), "AUX_断定");
+  EXPECT_EQ(extendedPosToString(ExtendedPOS::AuxCopulaDaRenyokei), "AUX_断定連用");
   EXPECT_EQ(extendedPosToString(ExtendedPOS::AuxExcessive), "AUX_過度");
   EXPECT_EQ(extendedPosToString(ExtendedPOS::AuxGaru), "AUX_ガル");
 }
@@ -139,6 +140,7 @@ TEST(TypesExtendedTest, ExtendedPosToStringParticles) {
   EXPECT_EQ(extendedPosToString(ExtendedPOS::ParticleConj), "PART_接続");
   EXPECT_EQ(extendedPosToString(ExtendedPOS::ParticleConjFinite), "PART_接続終止");
   EXPECT_EQ(extendedPosToString(ExtendedPOS::ParticleChoice), "PART_選択");
+  EXPECT_EQ(extendedPosToString(ExtendedPOS::ParticleListing), "PART_列挙");
   EXPECT_EQ(extendedPosToString(ExtendedPOS::ParticleNo), "PART_準体");
 }
 
@@ -149,6 +151,7 @@ TEST(TypesExtendedTest, ExtendedPosToStringOther) {
   EXPECT_EQ(extendedPosToString(ExtendedPOS::Adverb), "ADV");
   EXPECT_EQ(extendedPosToString(ExtendedPOS::Conjunction), "CONJ");
   EXPECT_EQ(extendedPosToString(ExtendedPOS::Determiner), "DET");
+  EXPECT_EQ(extendedPosToString(ExtendedPOS::SuffixCompounding), "SUFFIX_造語");
   EXPECT_EQ(extendedPosToString(ExtendedPOS::Symbol), "SYMBOL");
   EXPECT_EQ(extendedPosToString(ExtendedPOS::Unknown), "UNKNOWN");
   EXPECT_EQ(extendedPosToString(ExtendedPOS::Count_), "UNKNOWN");
@@ -201,6 +204,7 @@ TEST(TypesExtendedTest, ExtendedPosToPosAuxiliaries) {
   EXPECT_EQ(extendedPosToPos(ExtendedPOS::AuxConjectureRashii), PartOfSpeech::Auxiliary);
   EXPECT_EQ(extendedPosToPos(ExtendedPOS::AuxConjectureMitai), PartOfSpeech::Auxiliary);
   EXPECT_EQ(extendedPosToPos(ExtendedPOS::AuxCopulaDa), PartOfSpeech::Auxiliary);
+  EXPECT_EQ(extendedPosToPos(ExtendedPOS::AuxCopulaDaRenyokei), PartOfSpeech::Auxiliary);
   EXPECT_EQ(extendedPosToPos(ExtendedPOS::AuxCopulaDesu), PartOfSpeech::Auxiliary);
   EXPECT_EQ(extendedPosToPos(ExtendedPOS::AuxHonorific), PartOfSpeech::Auxiliary);
   EXPECT_EQ(extendedPosToPos(ExtendedPOS::AuxGozaru), PartOfSpeech::Auxiliary);
@@ -229,6 +233,7 @@ TEST(TypesExtendedTest, ExtendedPosToPosParticles) {
   EXPECT_EQ(extendedPosToPos(ExtendedPOS::ParticleConj), PartOfSpeech::Particle);
   EXPECT_EQ(extendedPosToPos(ExtendedPOS::ParticleConjFinite), PartOfSpeech::Particle);
   EXPECT_EQ(extendedPosToPos(ExtendedPOS::ParticleChoice), PartOfSpeech::Particle);
+  EXPECT_EQ(extendedPosToPos(ExtendedPOS::ParticleListing), PartOfSpeech::Particle);
   EXPECT_EQ(extendedPosToPos(ExtendedPOS::ParticleQuote), PartOfSpeech::Particle);
   EXPECT_EQ(extendedPosToPos(ExtendedPOS::ParticleAdverbial), PartOfSpeech::Particle);
   EXPECT_EQ(extendedPosToPos(ExtendedPOS::ParticleNo), PartOfSpeech::Particle);
@@ -268,6 +273,7 @@ TEST(TypesExtendedTest, ExtendedPosToPosOthers) {
   EXPECT_EQ(extendedPosToPos(ExtendedPOS::AdverbInterrogative), PartOfSpeech::Adverb);
   EXPECT_EQ(extendedPosToPos(ExtendedPOS::AuxPejorativeYagaru), PartOfSpeech::Auxiliary);
   EXPECT_EQ(extendedPosToPos(ExtendedPOS::SuffixTrace), PartOfSpeech::Suffix);
+  EXPECT_EQ(extendedPosToPos(ExtendedPOS::SuffixCompounding), PartOfSpeech::Suffix);
   EXPECT_EQ(extendedPosToPos(ExtendedPOS::Other), PartOfSpeech::Other);
   EXPECT_EQ(extendedPosToPos(ExtendedPOS::Unknown), PartOfSpeech::Other);
   EXPECT_EQ(extendedPosToPos(ExtendedPOS::Count_), PartOfSpeech::Other);
@@ -336,6 +342,9 @@ TEST(TypesExtendedTest, IsAuxiliaryType) {
   EXPECT_TRUE(isAuxiliaryType(ExtendedPOS::AuxGozaru));
   EXPECT_TRUE(isAuxiliaryType(ExtendedPOS::AuxClassicalBeshi));
   EXPECT_TRUE(isAuxiliaryType(ExtendedPOS::AuxSimilitudeYou));
+  EXPECT_TRUE(isAuxiliaryType(ExtendedPOS::AuxCopulaDaRenyokei));
+  EXPECT_TRUE(isPlainCopulaType(ExtendedPOS::AuxCopulaDaRenyokei));
+  EXPECT_TRUE(isCopulaType(ExtendedPOS::AuxCopulaDaRenyokei));
   // AuxExcessive and AuxGaru are outside the range
   EXPECT_FALSE(isAuxiliaryType(ExtendedPOS::AuxExcessive));
   EXPECT_FALSE(isAuxiliaryType(ExtendedPOS::AuxGaru));
@@ -348,6 +357,9 @@ TEST(TypesExtendedTest, IsParticleType) {
   // Appended after the original contiguous block, so the range alone misses it.
   EXPECT_TRUE(isParticleType(ExtendedPOS::ParticleConjFinite));
   EXPECT_TRUE(isParticleType(ExtendedPOS::ParticleChoice));
+  EXPECT_TRUE(isParticleType(ExtendedPOS::ParticleListing));
+  EXPECT_TRUE(isAdverbialParticleType(ExtendedPOS::ParticleListing));
+  EXPECT_TRUE(isGeneralSuffixType(ExtendedPOS::SuffixCompounding));
   EXPECT_FALSE(isParticleType(ExtendedPOS::Noun));
   EXPECT_FALSE(isParticleType(ExtendedPOS::AuxTenseTa));
 }

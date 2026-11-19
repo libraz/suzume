@@ -283,6 +283,8 @@ std::string_view extendedPosToString(ExtendedPOS epos) {
       return "SUFFIX_傾向";
     case ExtendedPOS::SuffixTrace:
       return "SUFFIX_気配";
+    case ExtendedPOS::SuffixCompounding:
+      return "SUFFIX_造語";
     case ExtendedPOS::DeterminerQuotative:
       return "DET_引用";
 
@@ -319,6 +321,8 @@ std::string_view extendedPosToString(ExtendedPOS epos) {
     // Auxiliaries - Copula
     case ExtendedPOS::AuxCopulaDa:
       return "AUX_断定";
+    case ExtendedPOS::AuxCopulaDaRenyokei:
+      return "AUX_断定連用";
     case ExtendedPOS::AuxCopulaDesu:
       return "AUX_丁寧断定";
 
@@ -345,6 +349,8 @@ std::string_view extendedPosToString(ExtendedPOS epos) {
       return "PART_接続終止";
     case ExtendedPOS::ParticleChoice:
       return "PART_選択";
+    case ExtendedPOS::ParticleListing:
+      return "PART_列挙";
     case ExtendedPOS::ParticleQuote:
       return "PART_引用";
     case ExtendedPOS::ParticleAdverbial:
@@ -451,6 +457,7 @@ PartOfSpeech extendedPosToPos(ExtendedPOS epos) {
     case ExtendedPOS::SuffixRecentCompletion:
     case ExtendedPOS::SuffixTendency:
     case ExtendedPOS::SuffixTrace:
+    case ExtendedPOS::SuffixCompounding:
       return PartOfSpeech::Suffix;
     case ExtendedPOS::Symbol:
       return PartOfSpeech::Symbol;

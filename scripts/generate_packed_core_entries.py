@@ -33,6 +33,7 @@ HELPERS = {
     "adv": ("POS::Adverb", "EPOS::Adverb"),
     "quotative_adv": ("POS::Adverb", "EPOS::AdverbQuotative"),
     "suffix_trace": ("POS::Suffix", "EPOS::SuffixTrace"),
+    "suffix_compounding": ("POS::Suffix", "EPOS::SuffixCompounding"),
     "interrogative_adv": ("POS::Adverb", "EPOS::AdverbInterrogative"),
     "suffix": ("POS::Suffix", "EPOS::Suffix"),
     "suffix_recent_completion": ("POS::Suffix", "EPOS::SuffixRecentCompletion"),

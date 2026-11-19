@@ -133,7 +133,8 @@ inline constexpr std::array<float, static_cast<size_t>(ExtendedPOS::Count_)> kCa
   table[static_cast<size_t>(ExtendedPOS::AuxSimilitudeYou)] = 0.4F;    // よう
 
   // Copula
-  table[static_cast<size_t>(ExtendedPOS::AuxCopulaDa)] = 0.2F;    // だ
+  table[static_cast<size_t>(ExtendedPOS::AuxCopulaDa)] = 0.2F;  // だ
+  table[static_cast<size_t>(ExtendedPOS::AuxCopulaDaRenyokei)] = table[static_cast<size_t>(ExtendedPOS::AuxCopulaDa)];
   table[static_cast<size_t>(ExtendedPOS::AuxCopulaDesu)] = 0.2F;  // です
 
   // Other auxiliaries
@@ -157,6 +158,7 @@ inline constexpr std::array<float, static_cast<size_t>(ExtendedPOS::Count_)> kCa
       table[static_cast<size_t>(ExtendedPOS::ParticleConj)];  // が(逆接)
   table[static_cast<size_t>(ExtendedPOS::ParticleChoice)] =
       table[static_cast<size_t>(ExtendedPOS::ParticleFinal)];  // か(選択・並立)
+  table[static_cast<size_t>(ExtendedPOS::ParticleListing)] = table[static_cast<size_t>(ExtendedPOS::ParticleAdverbial)];
 
   // ===========================================================================
   // Nouns (0.5-0.6)
@@ -191,6 +193,7 @@ inline constexpr std::array<float, static_cast<size_t>(ExtendedPOS::Count_)> kCa
   table[static_cast<size_t>(ExtendedPOS::Prefix)] = 0.5F;       // 接頭辞
   table[static_cast<size_t>(ExtendedPOS::Suffix)] = 0.5F;       // 接尾辞
   table[static_cast<size_t>(ExtendedPOS::SuffixTrace)] = table[static_cast<size_t>(ExtendedPOS::Suffix)];
+  table[static_cast<size_t>(ExtendedPOS::SuffixCompounding)] = table[static_cast<size_t>(ExtendedPOS::Suffix)];
   table[static_cast<size_t>(ExtendedPOS::Symbol)] = 0.3F;        // 記号
   table[static_cast<size_t>(ExtendedPOS::Interjection)] = 0.5F;  // 感動詞
   table[static_cast<size_t>(ExtendedPOS::InterjectionGreeting)] = table[static_cast<size_t>(ExtendedPOS::Interjection)];

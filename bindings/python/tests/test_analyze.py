@@ -30,7 +30,10 @@ def test_extended_pos_labels_match_the_serialized_range() -> None:
     assert lib.suzume_extended_pos_label(90).decode() == "AUX_卑罵"
     assert lib.suzume_extended_pos_label(91).decode() == "SUFFIX_気配"
     assert lib.suzume_extended_pos_label(92).decode() == "PART_選択"
-    assert lib.suzume_extended_pos_label(93).decode() == "UNKNOWN"
+    assert lib.suzume_extended_pos_label(93).decode() == "PART_列挙"
+    assert lib.suzume_extended_pos_label(94).decode() == "SUFFIX_造語"
+    assert lib.suzume_extended_pos_label(95).decode() == "AUX_断定連用"
+    assert lib.suzume_extended_pos_label(96).decode() == "UNKNOWN"
 
 
 def test_conjugation_labels_match_the_serialized_range() -> None:

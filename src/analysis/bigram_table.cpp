@@ -171,6 +171,11 @@ BigramTable::EncodedTable BigramTable::initTable() {
   // A quotative demonstrative cannot directly complete an adjective stem.
   // Keep appearance そう on its auxiliary path (高+そう, キモ+そう).
   bigram_rules::setCost(table, core::ExtendedPOS::AdjStem, core::ExtendedPOS::AdverbQuotative, bigram_cost::kRare);
+  // The listing particle, the compounding suffix and the copula continuative
+  // start from their parent's complete profile; their own cells are set on top.
+  bigram_rules::inheritRuleProfile(table, core::ExtendedPOS::ParticleAdverbial, core::ExtendedPOS::ParticleListing);
+  bigram_rules::inheritRuleProfile(table, core::ExtendedPOS::Suffix, core::ExtendedPOS::SuffixCompounding);
+  bigram_rules::inheritRuleProfile(table, core::ExtendedPOS::AuxCopulaDa, core::ExtendedPOS::AuxCopulaDaRenyokei);
   for (auto& row : table) {
     for (uint8_t& encoded_cost : row) {
       if (encoded_cost == bigram_rules::kUnsetCost) {

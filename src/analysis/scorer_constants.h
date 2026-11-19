@@ -636,6 +636,14 @@ constexpr std::array<BoundaryCost, static_cast<size_t>(core::ExtendedPOS::Count_
   table[static_cast<size_t>(core::ExtendedPOS::AdjStem)].eos = kEosShortAdjStemPenalty;
   table[static_cast<size_t>(core::ExtendedPOS::AdjStem)].eos_gate = EosBoundaryGate::SingleCodepoint;
 
+  // Subclasses split off a parent keep its sentence-boundary profile whole.
+  table[static_cast<size_t>(core::ExtendedPOS::ParticleListing)] =
+      table[static_cast<size_t>(core::ExtendedPOS::ParticleAdverbial)];
+  table[static_cast<size_t>(core::ExtendedPOS::SuffixCompounding)] =
+      table[static_cast<size_t>(core::ExtendedPOS::Suffix)];
+  table[static_cast<size_t>(core::ExtendedPOS::AuxCopulaDaRenyokei)] =
+      table[static_cast<size_t>(core::ExtendedPOS::AuxCopulaDa)];
+
   return table;
 }();
 

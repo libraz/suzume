@@ -99,6 +99,11 @@ constexpr EntrySpec suffix_trace(const char* s, const char* lemma = "") {
   return {s, POS::Suffix, EPOS::SuffixTrace, lemma};
 }
 
+// Compounding suffix helper (造語成分: 屋, 代), split off only after a kana host.
+constexpr EntrySpec suffix_compounding(const char* s, const char* lemma = "") {
+  return {s, POS::Suffix, EPOS::SuffixCompounding, lemma};
+}
+
 // Suffix helper: creates SUFFIX entry
 // Usage: suffix("さん")
 constexpr EntrySpec suffix(const char* s, const char* lemma = "") {

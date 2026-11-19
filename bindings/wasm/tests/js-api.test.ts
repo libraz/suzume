@@ -55,7 +55,10 @@ describe('JS API: struct layout compatibility', () => {
     expect(text(90)).toBe('AUX_卑罵');
     expect(text(91)).toBe('SUFFIX_気配');
     expect(text(92)).toBe('PART_選択');
-    expect(text(93)).toBe('UNKNOWN');
+    expect(text(93)).toBe('PART_列挙');
+    expect(text(94)).toBe('SUFFIX_造語');
+    expect(text(95)).toBe('AUX_断定連用');
+    expect(text(96)).toBe('UNKNOWN');
   });
 
   it('labels every serialized conjugation code and rejects the next value', () => {

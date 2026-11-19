@@ -438,7 +438,10 @@ TEST(SuzumeCApiTest, CanonicalLabelFunctionsCoverSerializedBoundaries) {
   EXPECT_STREQ(suzume_extended_pos_label(90), "AUX_卑罵");
   EXPECT_STREQ(suzume_extended_pos_label(91), "SUFFIX_気配");
   EXPECT_STREQ(suzume_extended_pos_label(92), "PART_選択");
-  EXPECT_STREQ(suzume_extended_pos_label(93), "UNKNOWN");
+  EXPECT_STREQ(suzume_extended_pos_label(93), "PART_列挙");
+  EXPECT_STREQ(suzume_extended_pos_label(94), "SUFFIX_造語");
+  EXPECT_STREQ(suzume_extended_pos_label(95), "AUX_断定連用");
+  EXPECT_STREQ(suzume_extended_pos_label(96), "UNKNOWN");
   EXPECT_STREQ(suzume_extended_pos_label(255), "UNKNOWN");
 
   // Form code 0 is the terminal form, a real cell; only out-of-range codes are "".
