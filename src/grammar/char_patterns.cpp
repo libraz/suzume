@@ -26,43 +26,31 @@ namespace {
 // Character Iteration Templates
 // =============================================================================
 
-/**
- * @brief Check if all characters in string match a predicate
- * Iterates through 3-byte UTF-8 sequences (Japanese characters)
- */
+// The iteration templates decode every UTF-8 length, so supplementary-plane
+// kanji (CJK Extension B and later, 4 bytes) reach the predicate too.
+
+/// Whether the string is non-empty and every character satisfies a predicate.
 template <typename Predicate>
 bool allCharsMatch(std::string_view str, Predicate pred) {
-  if (str.empty())
+  if (str.empty()) {
     return false;
+  }
   size_t pos = 0;
   while (pos < str.size()) {
-    if (!utf8::is3ByteUtf8At(str, pos))
+    if (!pred(normalize::decodeUtf8(str, pos))) {
       return false;
-    char32_t cp = utf8::decode3ByteUtf8At(str, pos);
-    if (!pred(cp))
-      return false;
-    pos += core::kJapaneseCharBytes;
+    }
   }
   return true;
 }
 
-/**
- * @brief Check if any character in string matches a predicate
- * Handles mixed-byte strings (skips non-3-byte sequences)
- */
+/// Whether any character satisfies a predicate.
 template <typename Predicate>
 bool anyCharMatches(std::string_view str, Predicate pred) {
-  if (str.empty())
-    return false;
   size_t pos = 0;
-  while (pos + core::kJapaneseCharBytes <= str.size()) {
-    if (utf8::is3ByteUtf8At(str, pos)) {
-      char32_t cp = utf8::decode3ByteUtf8At(str, pos);
-      if (pred(cp))
-        return true;
-      pos += core::kJapaneseCharBytes;
-    } else {
-      pos += 1;
+  while (pos < str.size()) {
+    if (pred(normalize::decodeUtf8(str, pos))) {
+      return true;
     }
   }
   return false;
@@ -71,15 +59,21 @@ bool anyCharMatches(std::string_view str, Predicate pred) {
 /// Whether the last character exists and satisfies a predicate.
 template <typename Predicate>
 bool lastCharMatches(std::string_view str, Predicate pred) {
-  const char32_t cp = utf8::decodeLastChar(str);
-  return cp != 0 && pred(cp);
+  if (str.empty()) {
+    return false;
+  }
+  size_t pos = normalize::findUtf8Boundary(str, str.size() - 1);
+  return pred(normalize::decodeUtf8(str, pos));
 }
 
 /// Whether the first character exists and satisfies a predicate.
 template <typename Predicate>
 bool firstCharMatches(std::string_view str, Predicate pred) {
-  const char32_t cp = utf8::decodeFirstChar(str);
-  return cp != 0 && pred(cp);
+  if (str.empty()) {
+    return false;
+  }
+  size_t pos = 0;
+  return pred(normalize::decodeUtf8(str, pos));
 }
 
 }  // namespace

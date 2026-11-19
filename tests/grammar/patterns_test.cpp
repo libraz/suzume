@@ -8,10 +8,33 @@
 
 #include <gtest/gtest.h>
 
+#include <string>
+#include <string_view>
+
 #include "grammar/char_patterns.h"
 
 namespace suzume::grammar {
 namespace {
+
+TEST(CharPatternsTest, KanjiClassifiersSeeSupplementaryPlaneKanji) {
+  // U+20BB7 (CJK Extension B) is a 4-byte UTF-8 sequence.
+  constexpr std::string_view kExtB = "\xF0\xA0\xAE\xB7";
+  const std::string ext_b_first = std::string(kExtB) + "野";
+  const std::string ext_b_last = std::string("山") + std::string(kExtB);
+  const std::string ext_b_inside_kana = std::string("あ") + std::string(kExtB) + "い";
+  EXPECT_TRUE(containsKanji(kExtB));
+  EXPECT_TRUE(isAllKanji(kExtB));
+  EXPECT_TRUE(isAllKanji(ext_b_first));
+  EXPECT_TRUE(startsWithKanji(ext_b_first));
+  EXPECT_TRUE(endsWithKanji(ext_b_last));
+  EXPECT_TRUE(containsKanji(ext_b_inside_kana));
+  EXPECT_FALSE(isAllKanji(ext_b_inside_kana));
+  EXPECT_FALSE(startsWithKanji(ext_b_inside_kana));
+  EXPECT_FALSE(endsWithKanji(ext_b_inside_kana));
+  EXPECT_FALSE(containsKanji("abcあい"));
+  EXPECT_FALSE(isAllKanji(""));
+  EXPECT_FALSE(isPureHiragana(std::string("あ") + std::string(kExtB)));
+}
 
 TEST(CharPatternsTest, CausalParticleBeforeTopic) {
   EXPECT_TRUE(isCausalParticleBeforeTopic("ので", "はない"));
