@@ -1892,6 +1892,87 @@
       ],
       "id": "wo_shi",
       "input": "結果を発表し、"
+    },
+    {
+      "description": "ここでるすばんする - auto-generated",
+      "expected": [
+        {
+          "lemma": "ここ",
+          "pos": "Pronoun",
+          "surface": "ここ"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "るすばん",
+          "pos": "Noun",
+          "surface": "るすばん"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "kokoderusubansuru",
+      "input": "ここでるすばんする"
+    },
+    {
+      "description": "おるすばんをする - auto-generated",
+      "expected": [
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "るすばん",
+          "pos": "Noun",
+          "surface": "るすばん"
+        },
+        {
+          "lemma": "を",
+          "pos": "Particle",
+          "surface": "を"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "orusubanwosuru",
+      "input": "おるすばんをする"
+    },
+    {
+      "description": "一人でるすばんする - auto-generated",
+      "expected": [
+        {
+          "lemma": "一人",
+          "pos": "Noun",
+          "surface": "一人"
+        },
+        {
+          "lemma": "で",
+          "pos": "Particle",
+          "surface": "で"
+        },
+        {
+          "lemma": "るすばん",
+          "pos": "Noun",
+          "surface": "るすばん"
+        },
+        {
+          "lemma": "する",
+          "pos": "Verb",
+          "surface": "する"
+        }
+      ],
+      "id": "derusubansuru",
+      "input": "一人でるすばんする"
     }
   ],
   "description": "Suru-verb patterns with subsidiary verbs - MeCab互換分割 (part 2/2)",

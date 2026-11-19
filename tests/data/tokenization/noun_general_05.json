@@ -1307,6 +1307,33 @@
       ],
       "id": "nofurusato",
       "input": "私のふるさと"
+    },
+    {
+      "description": "はじめてのおるすばん - auto-generated",
+      "expected": [
+        {
+          "lemma": "はじめて",
+          "pos": "Noun",
+          "surface": "はじめて"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "お",
+          "pos": "Prefix",
+          "surface": "お"
+        },
+        {
+          "lemma": "るすばん",
+          "pos": "Noun",
+          "surface": "るすばん"
+        }
+      ],
+      "id": "hajimetenoorusuban",
+      "input": "はじめてのおるすばん"
     }
   ],
   "description": "General nouns (part 5/5)",
