@@ -176,7 +176,7 @@ float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::
   // bigram penalty covers only noun+particle+かかる (壁にかかる).
   const bool duration_host_before_kakaru = prev.pos == core::PartOfSpeech::Noun ||
                                            (core::isGeneralSuffixType(prev.extended_pos) && prev.surface == "間") ||
-                                           prev.extended_pos == core::ExtendedPOS::ParticleAdverbial;
+                                           core::isAdverbialParticleType(prev.extended_pos);
   if (duration_host_before_kakaru && grammar::isDurationPredicateKakaru(next.surface) &&
       next.extended_pos == core::ExtendedPOS::Determiner) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
@@ -270,14 +270,13 @@ float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::
                                                   prev.extended_pos != core::ExtendedPOS::AuxNegativeNai &&
                                                   prev.extended_pos != core::ExtendedPOS::AuxVolitional &&
                                                   prev.extended_pos != core::ExtendedPOS::AdjRenyokei) ||
-                                                 next.extended_pos == core::ExtendedPOS::ParticleAdverbial);
+                                                 core::isAdverbialParticleType(next.extended_pos));
   // A particle offers no inflected stem, and the passive fills the conditional
   // ば slot with its own cell れれ/られれ.  The concessive ど/ども, however,
   // attaches to the passive continuative itself (書か+れ+ども), just like
   // ながら; do not reject that productive classical construction.
   const bool unlicensed_hypothetical_host =
-      prev.extended_pos == core::ExtendedPOS::ParticleAdverbial ||
-      prev.extended_pos == core::ExtendedPOS::ParticleChoice ||
+      core::isAdverbialParticleType(prev.extended_pos) || prev.extended_pos == core::ExtendedPOS::ParticleChoice ||
       prev.extended_pos == core::ExtendedPOS::ParticleBinding ||
       (prev.extended_pos == core::ExtendedPOS::AuxPassive && !grammar::spellsHypotheticalAuxiliaryCell(prev.surface) &&
        utf8::equalsAny(next.surface, {"ば"}));
@@ -293,7 +292,7 @@ float computeParticleDeterminerBonus(const core::LatticeEdge& prev, const core::
   // case marks (太陽+が+も+たらす for 太陽+が+もたらす).
   // The listing し follows a finite predicate, which a particle is not: after an
   // adverbial particle the mora is the light verb's continuative (何か+し+忘れた).
-  const bool unlicensed_listing_shi = prev.extended_pos == core::ExtendedPOS::ParticleAdverbial &&
+  const bool unlicensed_listing_shi = core::isAdverbialParticleType(prev.extended_pos) &&
                                       next.extended_pos == core::ExtendedPOS::ParticleConj &&
                                       utf8::equalsAny(next.surface, {"し"});
   const bool unlicensed_nominative_stacking = prev.extended_pos == core::ExtendedPOS::ParticleCase &&
@@ -371,7 +370,7 @@ float computeAttributiveCompoundParticlePenalty(const core::LatticeEdge& prev, c
 // follow it, so に after a counted quantity opens the adverb ともに (二人ともに
 // 参加した) rather than marking とも as an argument.
 float computeQuantifierTomoCasePenalty(const core::LatticeEdge& prev, const core::LatticeEdge& next) {
-  const bool quantifier_tomo = prev.extended_pos == core::ExtendedPOS::ParticleAdverbial &&
+  const bool quantifier_tomo = core::isAdverbialParticleType(prev.extended_pos) &&
                                utf8::equalsAny(prev.surface, {"とも"}) && prev.dictionaryBacked();
   const bool case_ni = next.extended_pos == core::ExtendedPOS::ParticleCase && utf8::equalsAny(next.surface, {"に"});
   return quantifier_tomo && case_ni ? sc::kPenaltyQuantifierTomoCase : sc::scale::kNeutral;
@@ -432,8 +431,7 @@ bool adverbSpellsPredicateCell(std::string_view surface) {
 // adverbial particle (the listing など) still attach across the comma.
 bool opensClauseAfterComma(const core::LatticeEdge& prev, const core::LatticeEdge& next) {
   return prev.pos == core::PartOfSpeech::Symbol && normalize::isClauseChainingComma(firstCodepoint(prev.surface)) &&
-         next.extended_pos != core::ExtendedPOS::ParticleCase &&
-         next.extended_pos != core::ExtendedPOS::ParticleAdverbial;
+         next.extended_pos != core::ExtendedPOS::ParticleCase && !core::isAdverbialParticleType(next.extended_pos);
 }
 
 // Prefix/adverb→short-verb, symbol→particle/aux/furigana, and で+も copula rules.

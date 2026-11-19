@@ -126,7 +126,7 @@ bool hasFunctionWordChainDecomposition(const std::vector<char32_t>& codepoints, 
     // unknown noun to recover either (なにが for なに+が, これから, それでも,
     // かなあ for か+なあ).
     const auto* head = dict_manager->lookupExact(head_surface, core::PartOfSpeech::Particle);
-    const bool focus_particle_head = head != nullptr && (head->extended_pos == core::ExtendedPOS::ParticleAdverbial ||
+    const bool focus_particle_head = head != nullptr && (core::isAdverbialParticleType(head->extended_pos) ||
                                                          head->extended_pos == core::ExtendedPOS::ParticleBinding ||
                                                          head->extended_pos == core::ExtendedPOS::ParticleFinal);
     if (!focus_particle_head &&

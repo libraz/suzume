@@ -434,8 +434,7 @@ float computeFixedExpressionDictBonus(const core::LatticeEdge& edge, size_t char
     // (ことに + 関して). The other multi-mora particles are contested from
     // inside their own span, which the flat bonus already settles.
     const size_t growth_min_len = edge.extended_pos == core::ExtendedPOS::ParticleCase ? 2 : 3;
-    const bool is_two_mora_adverbial =
-        is_particle && char_len == 2 && edge.extended_pos == core::ExtendedPOS::ParticleAdverbial;
+    const bool is_two_mora_adverbial = is_particle && char_len == 2 && core::isAdverbialParticleType(edge.extended_pos);
     const bool is_closed_interjection = edge.pos == core::PartOfSpeech::Interjection && char_len >= 3;
     const float closed_expression_bonus =
         is_compound_particle

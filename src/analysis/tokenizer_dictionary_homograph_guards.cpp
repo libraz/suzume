@@ -147,8 +147,8 @@ bool losesHomographReading(const DictionaryCandidateContext& ctx, const core::La
         }
         const size_t suffix_pos = start_pos + prefix.length;
         const auto suffix_results = dict_manager.lookup(text, byteOffsetAt(byte_offsets, suffix_pos));
-        has_interrogative_particle_split = lookupResultsHaveExtendedPOS(
-            suffix_results, core::ExtendedPOS::ParticleAdverbial, result.length - prefix.length);
+        has_interrogative_particle_split =
+            lookupResultsHaveExtendedPOS(suffix_results, core::isAdverbialParticleType, result.length - prefix.length);
         if (has_interrogative_particle_split) {
           break;
         }
@@ -169,10 +169,10 @@ bool losesHomographReading(const DictionaryCandidateContext& ctx, const core::La
     const bool has_same_span_adverb =
         lookupResultsHavePartOfSpeech(lookup_results, partOfSpeechMask(core::PartOfSpeech::Adverb), result.length);
     const bool follows_genitive = hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::ParticleNo);
-    const bool follows_non_genitive_nominal_particle =
-        hasPrecedingExtendedPOS(lattice, start_pos,
-                                {core::ExtendedPOS::ParticleCase, core::ExtendedPOS::ParticleTopic,
-                                 core::ExtendedPOS::ParticleBinding, core::ExtendedPOS::ParticleAdverbial});
+    const bool follows_non_genitive_nominal_particle = hasPrecedingExtendedPOS(
+        lattice, start_pos,
+        {core::ExtendedPOS::ParticleCase, core::ExtendedPOS::ParticleTopic, core::ExtendedPOS::ParticleBinding,
+         core::ExtendedPOS::ParticleAdverbial, core::ExtendedPOS::ParticleListing});
     const bool has_formal_noun_left_context =
         follows_genitive ||
         (hasPrecedingAttributivePredicate(lattice, start_pos) && !follows_non_genitive_nominal_particle);

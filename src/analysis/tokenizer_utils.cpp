@@ -443,6 +443,7 @@ bool isNominalForcingParticle(core::ExtendedPOS extended_pos) {
     case core::ExtendedPOS::ParticleCase:
     case core::ExtendedPOS::ParticleTopic:
     case core::ExtendedPOS::ParticleAdverbial:
+    case core::ExtendedPOS::ParticleListing:
     case core::ExtendedPOS::ParticleNo:
     case core::ExtendedPOS::ParticleBinding:
       return true;
@@ -524,6 +525,13 @@ bool lookupResultsHaveExtendedPOS(const std::vector<dictionary::LookupResult>& r
   return std::any_of(results.begin(), results.end(), [=](const auto& result) {
     return result.entry != nullptr && (length == 0 || result.length == length) &&
            result.entry->extended_pos == extended_pos;
+  });
+}
+
+bool lookupResultsHaveExtendedPOS(const std::vector<dictionary::LookupResult>& results,
+                                  bool (*in_class)(core::ExtendedPOS), size_t length) {
+  return std::any_of(results.begin(), results.end(), [=](const auto& result) {
+    return result.entry != nullptr && (length == 0 || result.length == length) && in_class(result.entry->extended_pos);
   });
 }
 

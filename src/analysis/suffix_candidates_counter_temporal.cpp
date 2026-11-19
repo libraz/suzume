@@ -174,7 +174,7 @@ void appendTemporalCounterCandidates(const std::vector<char32_t>& codepoints, si
     for (size_t particle_end = scan + 1; particle_end <= max_particle_end; ++particle_end) {
       const auto* particle =
           lookupEntryInRange(*dict_manager, codepoints, scan, particle_end, core::PartOfSpeech::Particle);
-      if (particle != nullptr && particle->extended_pos == core::ExtendedPOS::ParticleAdverbial) {
+      if (particle != nullptr && core::isAdverbialParticleType(particle->extended_pos)) {
         followed_by_quantity_particle = true;
         break;
       }

@@ -495,7 +495,7 @@ bool followsCaseMarkedArgument(const dictionary::DictionaryManager* dict_manager
         lookupEntryInRange(*dict_manager, codepoints, argument_end - 1, argument_end, core::PartOfSpeech::Particle);
     if (particle == nullptr || (particle->extended_pos != core::ExtendedPOS::ParticleBinding &&
                                 particle->extended_pos != core::ExtendedPOS::ParticleTopic &&
-                                particle->extended_pos != core::ExtendedPOS::ParticleAdverbial)) {
+                                !core::isAdverbialParticleType(particle->extended_pos))) {
       return false;
     }
     --argument_end;

@@ -454,8 +454,7 @@ void resolveIndefiniteCaseDe(std::vector<core::Morpheme>& result) {
     auto& de = result[idx];
     const auto& predicate = result[idx + 1];
     if (interrogative.extended_pos != core::ExtendedPOS::PronounInterrogative ||
-        indefinite.extended_pos != core::ExtendedPOS::ParticleAdverbial || indefinite.surface != "か" ||
-        de.surface != "で") {
+        !core::isAdverbialParticleType(indefinite.extended_pos) || indefinite.surface != "か" || de.surface != "で") {
       continue;
     }
     const bool starts_copular_negative = idx + 2 < result.size() &&
@@ -570,7 +569,7 @@ void splitFormalNounCopularDemo(std::vector<core::Morpheme>& result) {
     const bool copular_frame =
         supporting_verb && (copular_head || (predicate.getLemma() == "ある" &&
                                              host.extended_pos != core::ExtendedPOS::PronounInterrogative));
-    if (copula.extended_pos != core::ExtendedPOS::ParticleAdverbial || !utf8::equalsAny(copula.surface, {"でも"}) ||
+    if (!core::isAdverbialParticleType(copula.extended_pos) || !utf8::equalsAny(copula.surface, {"でも"}) ||
         host.end != copula.start || copula.end != predicate.start || !copular_frame) {
       continue;
     }
@@ -589,8 +588,8 @@ void splitFormalNounCopularDemo(std::vector<core::Morpheme>& result) {
     const auto& demo = result[idx - 1];
     auto& aru = result[idx];
     const bool followed_by_auxiliary = idx + 1 < result.size() && result[idx + 1].pos == core::PartOfSpeech::Auxiliary;
-    if (demo.extended_pos == core::ExtendedPOS::ParticleAdverbial && demo.getLemma() == "でも" &&
-        aru.getLemma() == "ある" && aru.conj_form == grammar::ConjForm::Base && !followed_by_auxiliary) {
+    if (core::isAdverbialParticleType(demo.extended_pos) && demo.getLemma() == "でも" && aru.getLemma() == "ある" &&
+        aru.conj_form == grammar::ConjForm::Base && !followed_by_auxiliary) {
       retag(aru, core::PartOfSpeech::Verb, core::ExtendedPOS::VerbShuushikei, "ある",
             dictionary::ConjugationType::GodanRa, grammar::ConjForm::Base);
     }
@@ -609,7 +608,7 @@ void splitCopularQuoteAfterAdjectivalStem(std::vector<core::Morpheme>& result,
     const auto& host = result[idx - 1];
     auto& fused = result[idx];
     if (host.extended_pos != core::ExtendedPOS::AdjNaAdj || host.end != fused.start ||
-        fused.extended_pos != core::ExtendedPOS::ParticleAdverbial) {
+        !core::isAdverbialParticleType(fused.extended_pos)) {
       continue;
     }
     for (const auto& prefix : dict_manager->lookup(fused.surface, 0)) {

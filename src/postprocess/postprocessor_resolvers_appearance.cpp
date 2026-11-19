@@ -262,7 +262,7 @@ void resolveCopularNegative(std::vector<core::Morpheme>& result) {
         predicate.pos == core::PartOfSpeech::Noun || predicate.pos == core::PartOfSpeech::Pronoun ||
         predicate.pos == core::PartOfSpeech::Suffix || predicate.extended_pos == core::ExtendedPOS::AdjNaAdj ||
         predicate.extended_pos == core::ExtendedPOS::ParticleNo ||
-        predicate.extended_pos == core::ExtendedPOS::ParticleAdverbial ||
+        core::isAdverbialParticleType(predicate.extended_pos) ||
         predicate.extended_pos == core::ExtendedPOS::ParticleBinding ||
         // An auxiliary that hosts the copula is a predicate nominal too (べき+で+は+ない).
         predicate.pos == core::PartOfSpeech::Auxiliary;

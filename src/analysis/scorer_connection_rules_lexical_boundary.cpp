@@ -213,7 +213,7 @@ void addImpossibleAttachmentRules(const core::LatticeEdge& prev, const core::Lat
   // The dubitative かも closes a terminal or a nominal; a bare continuative in
   // front of it is the conjunction cut apart (し+かも is しかも).
   const bool dubitative_kamo_after_continuative = prev.extended_pos == core::ExtendedPOS::VerbRenyokei &&
-                                                  next.extended_pos == core::ExtendedPOS::ParticleAdverbial &&
+                                                  core::isAdverbialParticleType(next.extended_pos) &&
                                                   utf8::equalsAny(next.surface, {"かも"});
   // A kana geminate onbin before an adverbial particle, which follows the past
   // (行っ+た+きり), or an unverified one before the continuative cell of the
@@ -222,7 +222,7 @@ void addImpossibleAttachmentRules(const core::LatticeEdge& prev, const core::Lat
                                    grammar::isPureHiragana(prev.surface) && utf8::endsWith(prev.surface, "っ");
   const bool mimetic_cut_at_geminate =
       kana_geminate_onbin &&
-      (next.extended_pos == core::ExtendedPOS::ParticleAdverbial ||
+      (core::isAdverbialParticleType(next.extended_pos) ||
        (next.extended_pos == core::ExtendedPOS::AuxAspectIru && is_dialectal_oru_contraction &&
         !prev.dictionaryBacked() && !prev.lemmaVerified() && grammar::endsWithIRow(next.surface)));
   // A final particle closes the utterance, so no conjunctive particle hangs
@@ -305,7 +305,7 @@ void addBarredHostRules(const core::LatticeEdge& prev, const core::LatticeEdge& 
   // unknown hiragana noun is the fallback for material it could not, so the
   // pairing means the boundary landed inside a word rather than after one
   // (昔+の+まま+で, where のま+まで invents a host for まで).
-  const bool barred_focus_particle_host = next.extended_pos == core::ExtendedPOS::ParticleAdverbial &&
+  const bool barred_focus_particle_host = core::isAdverbialParticleType(next.extended_pos) &&
                                           prev.pos == core::PartOfSpeech::Noun && !prev.dictionaryBacked() &&
                                           prev.origin != core::CandidateOrigin::BracketedNoun &&
                                           grammar::isPureHiragana(prev.surface);

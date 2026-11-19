@@ -71,6 +71,7 @@ bool endsWithFocusParticleTail(const dictionary::DictionaryManager* dict_manager
                                const std::vector<char32_t>& codepoints, size_t start_pos, size_t end_pos) {
   return endsWithParticleTailOfPos(dict_manager, codepoints, start_pos, end_pos,
                                    core::ExtendedPOS::ParticleAdverbial) ||
+         endsWithParticleTailOfPos(dict_manager, codepoints, start_pos, end_pos, core::ExtendedPOS::ParticleListing) ||
          endsWithParticleTailOfPos(dict_manager, codepoints, start_pos, end_pos, core::ExtendedPOS::ParticleBinding);
 }
 
@@ -86,7 +87,7 @@ bool startsWithFocusParticleHead(const dictionary::DictionaryManager* dict_manag
     const size_t particle_end = hiragana_start + particle_len;
     const dictionary::DictionaryEntry* entry =
         lookupEntryInRange(*dict_manager, codepoints, hiragana_start, particle_end);
-    if (entry == nullptr || (entry->extended_pos != core::ExtendedPOS::ParticleAdverbial &&
+    if (entry == nullptr || (!core::isAdverbialParticleType(entry->extended_pos) &&
                              entry->extended_pos != core::ExtendedPOS::ParticleBinding)) {
       continue;
     }

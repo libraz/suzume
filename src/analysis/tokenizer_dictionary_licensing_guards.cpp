@@ -116,7 +116,7 @@ bool lacksLicensingEnvironment(const DictionaryCandidateContext& ctx, const core
   // verb when the negative follows and no nominal hosts the particle
   // (宿題を+やら+なきゃ, どうしても+やら+なければ); a hosted particle keeps
   // its reading (金+さえ+ない).
-  if (result.entry->extended_pos == core::ExtendedPOS::ParticleAdverbial && result.length >= 2 &&
+  if (core::isAdverbialParticleType(result.entry->extended_pos) && result.length >= 2 &&
       verb_helpers::naiNegativeFollowsAt(codepoints, end_pos) && !hasPrecedingNominal(lattice, start_pos) &&
       std::any_of(lookup_results.begin(), lookup_results.end(), [&](const dictionary::LookupResult& other) {
         return other.entry != nullptr && other.length == result.length &&
@@ -444,7 +444,7 @@ bool lacksLicensingEnvironment(const DictionaryCandidateContext& ctx, const core
   // word (読ん+だ+って).  The stem is a kanji verb whose dictionary base takes
   // the voiced allomorph, or the hatsuonbin shape kanji + ん; an ordinary
   // noun (みかん+だって) and every other left context stay untouched.
-  if ((result.entry->extended_pos == core::ExtendedPOS::ParticleAdverbial ||
+  if ((core::isAdverbialParticleType(result.entry->extended_pos) ||
        result.entry->pos == core::PartOfSpeech::Conjunction) &&
       start_pos >= 2 && codepoints[start_pos] == U'だ' &&
       ((codepoints[start_pos - 1] == U'ん' && normalize::isKanjiCodepoint(codepoints[start_pos - 2])) ||

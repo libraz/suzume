@@ -38,7 +38,7 @@ bool endsWithParticleAfterVerb(const dictionary::DictionaryManager* dict_manager
     const dictionary::DictionaryEntry* suffix_entry = lookupEntryInRange(*dict_manager, codepoints, split, end_pos);
     if (suffix_entry == nullptr || suffix_entry->pos != core::PartOfSpeech::Particle ||
         (suffix_entry->extended_pos != core::ExtendedPOS::ParticleBinding &&
-         suffix_entry->extended_pos != core::ExtendedPOS::ParticleAdverbial)) {
+         !core::isAdverbialParticleType(suffix_entry->extended_pos))) {
       continue;
     }
     if (prefix_len == 1) {

@@ -293,9 +293,8 @@ float computeProgressiveHonorificBonus(const core::LatticeEdge& prev, const core
   // would otherwise receive. The light verb's continuative し is the real
   // predicate after an adverbial particle (何か+し+忘れた), not a fabricated
   // ichidan stem.
-  if (prev.extended_pos == core::ExtendedPOS::ParticleAdverbial &&
-      next.extended_pos == core::ExtendedPOS::VerbRenyokei && next.surface.size() == core::kJapaneseCharBytes &&
-      !grammar::isSuruRenyokeiSurface(next.surface) &&
+  if (core::isAdverbialParticleType(prev.extended_pos) && next.extended_pos == core::ExtendedPOS::VerbRenyokei &&
+      next.surface.size() == core::kJapaneseCharBytes && !grammar::isSuruRenyokeiSurface(next.surface) &&
       normalize::classifyChar(utf8::decodeFirstChar(next.surface)) == normalize::CharType::Hiragana) {
     SUZUME_CONNECTION_ADD(bonus, cost::kStrong);
   }

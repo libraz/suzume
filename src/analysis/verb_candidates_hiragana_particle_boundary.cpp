@@ -266,7 +266,7 @@ bool followsKanjiOrNominalHostBeforeCaseParticle(const std::vector<char32_t>& co
                              ? lookupEntryInRange(*dict_manager, codepoints, start_pos - kLimitingParticleMorae,
                                                   start_pos, core::PartOfSpeech::Particle)
                              : nullptr;
-  if (limiting != nullptr && limiting->extended_pos == core::ExtendedPOS::ParticleAdverbial) {
+  if (limiting != nullptr && core::isAdverbialParticleType(limiting->extended_pos)) {
     return true;
   }
   if (!vh::oneMoraParticleEndsAt(dict_manager, codepoints, start_pos, core::ExtendedPOS::ParticleCase)) {

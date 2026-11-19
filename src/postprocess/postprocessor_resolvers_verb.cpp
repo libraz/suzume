@@ -302,7 +302,7 @@ void resolveTeFormAspectSubsidiary(std::vector<core::Morpheme>& result) {
     // A binding or adverbial particle may sit inside the frame (見て+は+いない,
     // 読んで+ばかり+いる) without making the verb lexical.
     const bool framed_particle = immediate.extended_pos == core::ExtendedPOS::ParticleTopic ||
-                                 immediate.extended_pos == core::ExtendedPOS::ParticleAdverbial ||
+                                 core::isAdverbialParticleType(immediate.extended_pos) ||
                                  immediate.extended_pos == core::ExtendedPOS::ParticleBinding;
     const bool focused_te_form = idx >= 2 && framed_particle && followsTeFormConnective(result[idx - 2]);
     const bool finite_form = subsidiary.extended_pos == core::ExtendedPOS::VerbShuushikei ||
@@ -533,7 +533,7 @@ void resolveParticleAruOnbin(std::vector<core::Morpheme>& result) {
     const auto& particle = result[idx - 1];
     auto& aru = result[idx];
     auto& te = result[idx + 1];
-    if (particle.extended_pos != core::ExtendedPOS::ParticleAdverbial || aru.surface != "あっ" ||
+    if (!core::isAdverbialParticleType(particle.extended_pos) || aru.surface != "あっ" ||
         aru.extended_pos != core::ExtendedPOS::AuxCopulaDa || te.surface != "て" ||
         te.extended_pos != core::ExtendedPOS::AuxAspectIru) {
       continue;

@@ -211,7 +211,7 @@ void addModifierPredicateRules(const core::LatticeEdge& prev, const core::Lattic
   // An adverbial particle can introduce an adjective predicate
   // (何+でも+いい, 学生+でも+ない). The following open-class predicate does
   // not change the particle's grammatical boundary.
-  if (prev.extended_pos == core::ExtendedPOS::ParticleAdverbial && next.extended_pos == core::ExtendedPOS::AdjBasic &&
+  if (core::isAdverbialParticleType(prev.extended_pos) && next.extended_pos == core::ExtendedPOS::AdjBasic &&
       (next.lemma != "ない" || utf8::equalsAny(prev.surface, {"でも"}))) {
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryStrongBonus + cost::kMinorBonus);
   }

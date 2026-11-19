@@ -102,6 +102,10 @@ bool lookupResultsHaveLongerPartOfSpeech(const std::vector<dictionary::LookupRes
 bool lookupResultsHaveExtendedPOS(const std::vector<dictionary::LookupResult>& results, core::ExtendedPOS extended_pos,
                                   size_t length = 0);
 
+/** Whether dictionary lookup results contain an ExtendedPOS of the class @p in_class tests, optionally at a length. */
+bool lookupResultsHaveExtendedPOS(const std::vector<dictionary::LookupResult>& results,
+                                  bool (*in_class)(core::ExtendedPOS), size_t length = 0);
+
 /**
  * Whether a word stands in front of @p start_pos that could host a bound
  * auxiliary: false at the start of the text and after a symbol.

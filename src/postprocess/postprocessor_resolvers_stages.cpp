@@ -169,7 +169,7 @@ void resolvePostPrefixMorphemeRoles(std::vector<core::Morpheme>& result) {
     const bool direct_nominal_particle = idx + 1 < result.size() &&
                                          result[idx + 1].pos == core::PartOfSpeech::Particle &&
                                          (resolver::isNominalForcingParticle(result[idx + 1]) ||
-                                          result[idx + 1].extended_pos == core::ExtendedPOS::ParticleAdverbial ||
+                                          core::isAdverbialParticleType(result[idx + 1].extended_pos) ||
                                           grammar::isSingleHiragana(result[idx + 1].surface, U'で'));
     const bool purpose_construction = direct_nominal_particle &&
                                       grammar::isSingleHiragana(result[idx + 1].surface, U'に') &&

@@ -232,8 +232,7 @@ float computeSugiFinalParticleBonus(const core::LatticeEdge& prev, const core::L
       prev.extended_pos == core::ExtendedPOS::AuxNegativeNu ||
       (prev.extended_pos == core::ExtendedPOS::VerbOnbinkei && utf8::endsWith(prev.lemma, "ぬ"));
   if (follows_negative && utf8::startsWith(next.surface, "で") &&
-      (next.extended_pos == core::ExtendedPOS::ParticleConj ||
-       next.extended_pos == core::ExtendedPOS::ParticleAdverbial ||
+      (next.extended_pos == core::ExtendedPOS::ParticleConj || core::isAdverbialParticleType(next.extended_pos) ||
        next.extended_pos == core::ExtendedPOS::Conjunction)) {
     SUZUME_CONNECTION_ADD(bonus, cost::kSevere);
   }
@@ -276,7 +275,7 @@ float computeSugiFinalParticleBonus(const core::LatticeEdge& prev, const core::L
   if (next.pos == core::PartOfSpeech::Verb && next.surface == "できる") {
     if (prev.pos == core::PartOfSpeech::Noun) {
       SUZUME_CONNECTION_ADD(bonus, cost::kModerateBonus);
-    } else if (prev.extended_pos == core::ExtendedPOS::ParticleAdverbial) {
+    } else if (core::isAdverbialParticleType(prev.extended_pos)) {
       SUZUME_CONNECTION_ADD(bonus, cost::kStrongBonus);
     }
   }

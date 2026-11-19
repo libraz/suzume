@@ -408,7 +408,7 @@ bool crossesEstablishedBoundary(const DictionaryCandidateContext& ctx, const cor
   if (result.entry->extended_pos == core::ExtendedPOS::NounFormal && result.length == 1 && start_pos > 0 &&
       normalize::isKanjiCodepoint(codepoints[start_pos - 1]) && end_pos < codepoints.size() &&
       lookupResultsHaveExtendedPOS(dict_manager.lookup(text, byteOffsetAt(byte_offsets, end_pos)),
-                                   core::ExtendedPOS::ParticleAdverbial)) {
+                                   core::isAdverbialParticleType)) {
     return true;
   }
 

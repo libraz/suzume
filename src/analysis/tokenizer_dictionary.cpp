@@ -516,7 +516,7 @@ void addDictionaryEntryEdges(core::Lattice& lattice, const tokenizer_dictionary_
 
   const bool is_fused_demo = result.length == 2 && end_pos >= 2 && codepoints[end_pos - 2] == U'で' &&
                              codepoints[end_pos - 1] == U'も' &&
-                             result.entry->extended_pos == core::ExtendedPOS::ParticleAdverbial;
+                             core::isAdverbialParticleType(result.entry->extended_pos);
   if (is_fused_demo && verb_helpers::naiNegativeFollowsAt(codepoints, end_pos) &&
       hasPrecedingExtendedPOS(lattice, start_pos, core::ExtendedPOS::AdjNaAdj)) {
     return;

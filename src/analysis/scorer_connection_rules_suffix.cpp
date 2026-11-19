@@ -105,7 +105,7 @@ void addClosedMorphemeHostRules(const core::LatticeEdge& prev, const core::Latti
   // of a spurious copula plus sentence-final particle, but do not promote
   // generated noun readings such as the adjective ない before ほど.
   if (prev.pos == core::PartOfSpeech::Noun && prev.dictionaryBacked() &&
-      next.extended_pos == core::ExtendedPOS::ParticleAdverbial) {
+      core::isAdverbialParticleType(next.extended_pos)) {
     SUZUME_CONNECTION_ADD(bonus, sc::kBonusHonorificGeneratedRenyokei);
   }
 
@@ -114,7 +114,7 @@ void addClosedMorphemeHostRules(const core::LatticeEdge& prev, const core::Latti
   // the mechanically attractive だ(AUX)+case-particle path. The category,
   // dictionary, length, and initial-codepoint gates describe the collision
   // family without assigning a word-specific score.
-  if (prev.pos == core::PartOfSpeech::Noun && next.extended_pos == core::ExtendedPOS::ParticleAdverbial &&
+  if (prev.pos == core::PartOfSpeech::Noun && core::isAdverbialParticleType(next.extended_pos) &&
       next.dictionaryBacked() && normalize::utf8Length(next.surface) == 2 &&
       utf8::decodeFirstChar(next.surface) == U'だ' && utf8::decodeLastChar(next.surface) == U'に') {
     SUZUME_CONNECTION_ADD(bonus, cost::kVeryStrongBonus);
@@ -313,8 +313,8 @@ void addInflectedPredicateBoundaryRules(const core::LatticeEdge& prev, const cor
   // assigned to an unsplit negative such as 帰らない. Keep the productive past
   // split ahead of a single VerbTaForm candidate; pure-hiragana copular forms
   // stay outside this rule.
-  if (prev.extended_pos == core::ExtendedPOS::ParticleAdverbial &&
-      next.extended_pos == core::ExtendedPOS::VerbOnbinkei && grammar::containsKanji(next.surface) &&
+  if (core::isAdverbialParticleType(prev.extended_pos) && next.extended_pos == core::ExtendedPOS::VerbOnbinkei &&
+      grammar::containsKanji(next.surface) &&
       (utf8::endsWithAny(next.surface, {"っ", "ん"}) ||
        (utf8::endsWith(next.surface, "い") && !utf8::endsWith(next.surface, "ない")))) {
     SUZUME_CONNECTION_ADD(bonus, cost::kExtremeBonus);
@@ -651,7 +651,7 @@ void addCopulaFusedConjunctionRules(const core::LatticeEdge& prev, const core::L
   const bool adverb_before_fused_demo =
       prev.pos == core::PartOfSpeech::Adverb && !interrogative_adverb &&
       grammar::isCopulaFusedConjunction(next.surface) &&
-      (next.pos == core::PartOfSpeech::Conjunction || next.extended_pos == core::ExtendedPOS::ParticleAdverbial);
+      (next.pos == core::PartOfSpeech::Conjunction || core::isAdverbialParticleType(next.extended_pos));
   const bool adverb_before_focus_mo =
       prev.pos == core::PartOfSpeech::Adverb && prev.dictionaryBacked() && normalize::utf8Length(prev.surface) == 2 &&
       grammar::containsKanji(prev.surface) && utf8::endsWith(prev.surface, "し") &&
