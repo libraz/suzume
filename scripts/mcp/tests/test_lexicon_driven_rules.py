@@ -130,6 +130,56 @@ class TestTopicBeforeListedNoun:
         _assert_merge_untouched([_tok("はほげら"), _tok("だ", pos="助動詞")], "はほげらだ")
 
 
+class TestClosedHeadBeforeListedNoun:
+    """A case particle or beautifying prefix absorbed into the first cell of a listed noun."""
+
+    def test_splits_case_particle_from_a_noun_starting_inside_its_cell(self, monkeypatch):
+        _headwords_by_length(monkeypatch, CLOSED_UNITS, {"nouns.tsv": ["ほげら"]})
+        tokens = [
+            _tok("ここ", pos="名詞", pos_sub1="代名詞"),
+            _tok("でほ", pos="動詞"),
+            _tok("げら"),
+            _tok("する", pos="動詞"),
+        ]
+
+        merged, rule = apply_suzume_merge(tokens, "ここでほげらする")
+
+        assert [(t["surface"], t["pos"], t["lemma"]) for t in merged] == [
+            ("ここ", "名詞", "ここ"),
+            ("で", "助詞", "で"),
+            ("ほげら", "Noun", "ほげら"),
+            ("する", "動詞", "する"),
+        ]
+        assert rule == "case+l2-noun-boundary"
+
+    def test_keeps_a_case_particle_cell_without_a_preceding_nominal(self, monkeypatch):
+        _headwords_by_length(monkeypatch, CLOSED_UNITS, {"nouns.tsv": ["ほげら"]})
+
+        _assert_merge_untouched([_tok("でほ", pos="動詞"), _tok("げら"), _tok("する", pos="動詞")], "でほげらする")
+
+    @pytest.mark.parametrize(
+        ("left", "text"),
+        [([], "おほげらを"), ([_tok("の", pos="助詞", pos_sub1="連体化")], "のおほげらを")],
+    )
+    def test_splits_prefix_from_a_noun_starting_inside_its_cell(self, monkeypatch, left, text):
+        _headwords_by_length(monkeypatch, CLOSED_UNITS, {"nouns.tsv": ["ほげら"]})
+        tokens = [*left, _tok("おほ", pos="動詞"), _tok("げ"), _tok("ら"), _tok("を", pos="助詞")]
+
+        merged, rule = apply_suzume_merge(tokens, text)
+
+        assert [(t["surface"], t["pos"], t["lemma"]) for t in merged][len(left) :] == [
+            ("お", "接頭詞", "お"),
+            ("ほげら", "Noun", "ほげら"),
+            ("を", "助詞", "を"),
+        ]
+        assert rule == "prefix+l2-noun-boundary"
+
+    def test_keeps_a_prefixed_noun_the_reference_spells_as_one_cell(self, monkeypatch):
+        _headwords_by_length(monkeypatch, CLOSED_UNITS, {"nouns.tsv": ["ほげら"]})
+
+        _assert_merge_untouched([_tok("おほげら"), _tok("を", pos="助詞")], "おほげらを")
+
+
 class TestClippedGreeting:
     GREETING = ("ほげそう", "INTERJECTION")
 

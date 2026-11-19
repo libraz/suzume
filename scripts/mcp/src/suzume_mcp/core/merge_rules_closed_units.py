@@ -43,6 +43,15 @@ _CLASSICAL_ADJECTIVE_CELLS: tuple[tuple[str, str, str], ...] = (
 
 _CLASSICAL_AUXILIARY_LEMMAS: dict[str, str] = {"ず": "ぬ", "し": "き"}
 
+# Closed heads a reference cell can absorb into a following listed noun:
+# surface -> (POS, POS detail, boundary class).
+_CLOSED_HEADS_BEFORE_NOUN: dict[str, tuple[str, str, str]] = {
+    "は": ("助詞", "係助詞", "topic"),
+    **{particle: ("助詞", "格助詞", "case") for particle in ("が", "を", "に", "で", "と", "へ")},
+    "の": ("助詞", "連体化", "case"),
+    **{prefix: ("接頭詞", "名詞接続", "prefix") for prefix in ("お", "ご")},
+}
+
 
 # Cells that select an irrealis, paired with the reading each one keeps once the
 # ハ行四段 未然形 in front of it is restored. は is also the topic particle, so
@@ -460,35 +469,39 @@ def _merge_closed_function_units(state: MergeState) -> bool:
                     applied_rule = "continuative-mono-compound"
                 return True
 
-        # A reference headword can absorb topic は into a following unknown
-        # kana noun (そこ + はにわ, ここ + はいり + ぐち).  L2 evidence for the
-        # suffix noun restores the productive topic boundary, while requiring
-        # a preceding nominal keeps a standalone lexical noun such as はにわ
-        # intact.
-        if (
-            not merged
-            and result
-            and result[-1].get("pos") in ("名詞", "代名詞", "Noun", "Pronoun")
-            and t.get("surface", "").startswith("は")
-            and t.get("surface") != "は"
-        ):
+        # A reference cell can absorb a closed head into a following unknown
+        # kana noun (そこ + はにわ, ここ + でる + す + ばん, おる + す + ばん).
+        # L2 evidence for the noun restores the head's boundary. A particle
+        # head needs a preceding nominal, which keeps a standalone lexical
+        # noun such as はにわ intact; a prefix head needs the noun to run past
+        # the cell, since a prefixed noun spelled as one cell is the separate
+        # prefix-split decision.
+        head = t.get("surface", "")[:1]
+        head_cell = _CLOSED_HEADS_BEFORE_NOUN.get(head)
+        if not merged and head_cell is not None and t.get("surface") != head:
+            head_pos, head_pos_sub1, head_class = head_cell
+            nominal_left = bool(result) and result[-1].get("pos") in ("名詞", "代名詞", "Noun", "Pronoun")
             for noun in core_headwords_by_length("nouns.tsv"):
-                topic_noun = "は" + noun
-                if not remaining.startswith(topic_noun):
+                headed_noun = head + noun
+                if not remaining.startswith(headed_noun):
                     continue
-                consumed, j = _consume_span(tokens, i, len(topic_noun))
-                if consumed != topic_noun:
+                if head_class == "prefix" and len(noun) < len(t.get("surface", "")):
+                    continue
+                if head_class != "prefix" and not nominal_left:
+                    continue
+                consumed, j = _consume_span(tokens, i, len(headed_noun))
+                if consumed != headed_noun:
                     continue
                 result.extend(
                     (
-                        {"surface": "は", "pos": "助詞", "pos_sub1": "係助詞", "lemma": "は"},
+                        {"surface": head, "pos": head_pos, "pos_sub1": head_pos_sub1, "lemma": head},
                         {"surface": noun, "pos": "Noun", "lemma": noun},
                     )
                 )
                 i = j
                 merged = True
                 if applied_rule is None:
-                    applied_rule = "topic+l2-noun-boundary"
+                    applied_rule = f"{head_class}+l2-noun-boundary"
                 break
 
         # After a clause-final predicate (a verb, an i-adjective, or the
