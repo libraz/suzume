@@ -956,6 +956,21 @@ class TestCutContractedIrrealis:
         tokens, _, _ = get_expected_tokens("知らんねえ")
         assert tokens[-1]["pos"] == "Particle"
 
+    @pytest.mark.parametrize(
+        ("text", "verb"), [("曲がんない", "曲がる"), ("下がんない", "下がる"), ("上がんない", "上がる")]
+    )
+    def test_kanji_stem_cut_before_gan_is_the_contracted_irrealis(self, text, verb):
+        tokens, _, _ = get_expected_tokens(text)
+        assert [(token["surface"], token["pos"], token["lemma"]) for token in tokens] == [
+            (text[:3], "Verb", verb),
+            ("ない", "Auxiliary", "ない"),
+        ]
+
+    @pytest.mark.parametrize("text", ["東京がんない", "胃がんない"])
+    def test_gan_after_a_kanji_that_spells_no_ra_row_verb_stays_nominal(self, text):
+        tokens, _, _ = get_expected_tokens(text)
+        assert all(token["pos"] != "Verb" for token in tokens)
+
 
 @pytest.mark.parametrize(("text", "types"), [("abcXYZ", ["alpha"]), ("[\\]^_`", []), ("A_1", ["alpha", "digit"])])
 def test_char_types_count_only_ascii_letters_as_alpha(text, types):

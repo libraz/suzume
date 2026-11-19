@@ -606,6 +606,40 @@ def repair_lengthened_negative(tokens: list[dict]) -> None:
                     }
                 ]
                 continue
+        # A kanji stem the reference does not know in this cell comes back as
+        # the kanji plus a kana noun (曲+がん+ない); ない is then a bare adjective.
+        if (
+            regex.fullmatch(r"\p{Han}+", host.get("surface", ""))
+            and regex.fullmatch(r"\p{Hiragana}ん", nasal.get("surface", ""))
+            and following.get("surface") in _CONTRACTED_NEGATIVES
+        ):
+            stem = host.get("surface", "") + nasal.get("surface", "")[:-1]
+            ra_row = mecab_analyze(stem + "らない")
+            if (
+                ra_row
+                and ra_row[0].get("pos") == "動詞"
+                and ra_row[0].get("pos_sub1") == "自立"
+                and ra_row[0].get("surface") == stem + "ら"
+            ):
+                tokens[idx - 1 : idx + 2] = [
+                    {
+                        "surface": stem + "ん",
+                        "pos": "動詞",
+                        "pos_sub1": "自立",
+                        "conj_form": "未然特殊",
+                        "lemma": ra_row[0].get("lemma", ""),
+                    },
+                    following
+                    if following.get("surface") != "ない"
+                    else {
+                        "surface": "ない",
+                        "pos": "助動詞",
+                        "conj_type": "特殊・ナイ",
+                        "conj_form": "基本形",
+                        "lemma": "ない",
+                    },
+                ]
+                continue
         idx += 1
     for idx in range(1, len(tokens)):
         host, token = tokens[idx - 1], tokens[idx]
