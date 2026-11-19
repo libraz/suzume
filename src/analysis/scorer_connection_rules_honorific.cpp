@@ -107,8 +107,10 @@ float computeProgressiveHonorificBonus(const core::LatticeEdge& prev, const core
 
   // Progressive で+い+ます should use the auxiliary い, not the standalone verb いる.
   // The preceding で can be tagged as either a conjunction particle or a te-form
-  // particle depending on the onbin path, so match by surface here.
-  if (prev.surface == "で" && next.surface == "い" && next.extended_pos == core::ExtendedPOS::VerbRenyokei) {
+  // particle depending on the onbin path, so match by surface here. The case
+  // particle で (外+で+い+た) hosts the existential verb, not the aspect.
+  if (prev.surface == "で" && prev.extended_pos != core::ExtendedPOS::ParticleCase && next.surface == "い" &&
+      next.extended_pos == core::ExtendedPOS::VerbRenyokei) {
     SUZUME_CONNECTION_ADD(bonus, cost::kAlmostNever);
   }
 
