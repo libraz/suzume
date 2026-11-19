@@ -467,6 +467,28 @@
       ],
       "id": "roshisouna",
       "input": "恐ろしそうな顔"
+    },
+    {
+      "description": "涙もろかった - auto-generated",
+      "expected": [
+        {
+          "lemma": "涙",
+          "pos": "Noun",
+          "surface": "涙"
+        },
+        {
+          "lemma": "もろい",
+          "pos": "Adjective",
+          "surface": "もろかっ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "morokattta",
+      "input": "涙もろかった"
     }
   ],
   "description": "I-adjectives past forms (過去形) - katta forms, past negative, past with desu",

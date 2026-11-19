@@ -1087,6 +1087,23 @@
       ],
       "id": "okashi",
       "input": "おかし"
+    },
+    {
+      "description": "東京はい - auto-generated",
+      "expected": [
+        {
+          "lemma": "東京",
+          "pos": "Noun",
+          "surface": "東京"
+        },
+        {
+          "lemma": "はい",
+          "pos": "Interjection",
+          "surface": "はい"
+        }
+      ],
+      "id": "hai",
+      "input": "東京はい"
     }
   ],
   "description": "General nouns (part 5/5)",
