@@ -742,6 +742,33 @@
       ],
       "id": "rakano_wo_tsu",
       "input": "何らかの手を打つ"
+    },
+    {
+      "description": "このせんせいの話 - auto-generated",
+      "expected": [
+        {
+          "lemma": "この",
+          "pos": "Determiner",
+          "surface": "この"
+        },
+        {
+          "lemma": "せんせい",
+          "pos": "Noun",
+          "surface": "せんせい"
+        },
+        {
+          "lemma": "の",
+          "pos": "Particle",
+          "surface": "の"
+        },
+        {
+          "lemma": "話",
+          "pos": "Noun",
+          "surface": "話"
+        }
+      ],
+      "id": "konosenseino",
+      "input": "このせんせいの話"
     }
   ],
   "description": "determiner tests",
