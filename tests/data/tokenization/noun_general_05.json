@@ -1410,6 +1410,50 @@
       ],
       "id": "noohanashiga",
       "input": "先生のおはなしが"
+    },
+    {
+      "description": "honorific suffix after a kanji noun keeps its span before the interjection",
+      "expected": [
+        {
+          "lemma": "先生",
+          "pos": "Noun",
+          "surface": "先生"
+        },
+        {
+          "lemma": "さま",
+          "pos": "Suffix",
+          "surface": "さま"
+        },
+        {
+          "lemma": "はい",
+          "pos": "Interjection",
+          "surface": "はい"
+        }
+      ],
+      "id": "samahai",
+      "input": "先生さまはい"
+    },
+    {
+      "description": "honorific suffix after a katakana noun keeps its span before the interjection",
+      "expected": [
+        {
+          "lemma": "テスト",
+          "pos": "Noun",
+          "surface": "テスト"
+        },
+        {
+          "lemma": "さま",
+          "pos": "Suffix",
+          "surface": "さま"
+        },
+        {
+          "lemma": "はい",
+          "pos": "Interjection",
+          "surface": "はい"
+        }
+      ],
+      "id": "samahai_2",
+      "input": "テストさまはい"
     }
   ],
   "description": "General nouns (part 5/5)",
