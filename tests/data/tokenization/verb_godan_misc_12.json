@@ -1001,6 +1001,70 @@
       ],
       "id": "gannai",
       "input": "曲がんない"
+    },
+    {
+      "description": "母にしかられた - auto-generated",
+      "expected": [
+        {
+          "lemma": "母",
+          "pos": "Noun",
+          "surface": "母"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "しかる",
+          "pos": "Verb",
+          "surface": "しから"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "nishikarareta",
+      "input": "母にしかられた"
+    },
+    {
+      "description": "母におこられた - auto-generated",
+      "expected": [
+        {
+          "lemma": "母",
+          "pos": "Noun",
+          "surface": "母"
+        },
+        {
+          "lemma": "に",
+          "pos": "Particle",
+          "surface": "に"
+        },
+        {
+          "lemma": "おこる",
+          "pos": "Verb",
+          "surface": "おこら"
+        },
+        {
+          "lemma": "れる",
+          "pos": "Auxiliary",
+          "surface": "れ"
+        },
+        {
+          "lemma": "た",
+          "pos": "Auxiliary",
+          "surface": "た"
+        }
+      ],
+      "id": "niokorareta",
+      "input": "母におこられた"
     }
   ],
   "description": "Godan verb miscellaneous tests (五段動詞その他) - general tests or mixed verb rows (part 12/12)",
