@@ -601,7 +601,11 @@ void generateNaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size
       kanji_end < codepoints.size() &&
       (codepoints[kanji_end] == U'だ' || (codepoints[kanji_end] == U'で' && kanji_end + 1 < codepoints.size() &&
                                           (codepoints[kanji_end + 1] == U'す' || codepoints[kanji_end + 1] == U'し')));
-  if ((followed_by_na || followed_by_sou || (has_dictionary_head && followed_by_da)) &&
+  // A negation prefix on a two-kanji word licenses the predicative copula
+  // exactly as it licenses な (不安定だ, 不安定な); a longer run is a noun
+  // compound the prefix does not reach (不安材料だ).
+  const bool negation_compound_before_da = is_productive_negation_compound && kanji_end == start_pos + 3;
+  if ((followed_by_na || followed_by_sou || ((has_dictionary_head || negation_compound_before_da) && followed_by_da)) &&
       (!has_independent_adjective_host || is_productive_negation_compound)) {
     // Skip if first character is a formal noun (形式名詞)
     // e.g., 時妙な should be 時+妙な, not 時妙(ADJ)+な
