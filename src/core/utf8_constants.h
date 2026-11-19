@@ -285,7 +285,8 @@ template <typename Entry, size_t Size>
 // =============================================================================
 // UTF-8 Decoding Utilities for Japanese Characters
 // =============================================================================
-// These functions decode 3-byte UTF-8 sequences (Japanese characters).
+// These functions decode 3-byte UTF-8 sequences (kana, BMP kanji) and the
+// 4-byte sequences of supplementary-plane kanji; anything else decodes as 0.
 
 /// Check if byte at position starts a 3-byte UTF-8 sequence
 /// @param s The string to check
@@ -307,25 +308,39 @@ template <typename Entry, size_t Size>
   return static_cast<char32_t>(((ptr[0] & 0x0F) << 12) | ((ptr[1] & 0x3F) << 6) | (ptr[2] & 0x3F));
 }
 
+/// Decode a complete 4-byte UTF-8 sequence at position
+/// @param s The string to decode from
+/// @param pos Byte position
+/// @return Unicode codepoint, or 0 if no complete 4-byte sequence starts there
+[[nodiscard]] inline char32_t decode4ByteUtf8At(std::string_view s, size_t pos) noexcept {
+  if (pos + 4 > s.size())
+    return 0;
+  const auto* ptr = reinterpret_cast<const unsigned char*>(s.data() + pos);
+  if ((ptr[0] & 0xF8) != 0xF0 || (ptr[1] & 0xC0) != 0x80 || (ptr[2] & 0xC0) != 0x80 || (ptr[3] & 0xC0) != 0x80)
+    return 0;
+  return static_cast<char32_t>(((ptr[0] & 0x07) << 18) | ((ptr[1] & 0x3F) << 12) | ((ptr[2] & 0x3F) << 6) |
+                               (ptr[3] & 0x3F));
+}
+
 /// Decode last Japanese character as codepoint
-/// @param s The string (must have at least 3 bytes)
-/// @return Unicode codepoint, or 0 if invalid
+/// @param s The string
+/// @return Unicode codepoint, or 0 if s does not end in a 3- or 4-byte sequence
 [[nodiscard]] inline char32_t decodeLastChar(std::string_view s) noexcept {
   if (s.size() < kJapaneseCharBytes)
     return 0;
   size_t pos = s.size() - kJapaneseCharBytes;
-  if (!is3ByteUtf8At(s, pos))
-    return 0;
-  return decode3ByteUtf8At(s, pos);
+  if (is3ByteUtf8At(s, pos))
+    return decode3ByteUtf8At(s, pos);
+  return pos == 0 ? 0 : decode4ByteUtf8At(s, pos - 1);
 }
 
 /// Decode first Japanese character as codepoint
-/// @param s The string (must have at least 3 bytes)
-/// @return Unicode codepoint, or 0 if invalid
+/// @param s The string
+/// @return Unicode codepoint, or 0 if s does not start with a 3- or 4-byte sequence
 [[nodiscard]] inline char32_t decodeFirstChar(std::string_view s) noexcept {
-  if (!is3ByteUtf8At(s, 0))
-    return 0;
-  return decode3ByteUtf8At(s, 0);
+  if (is3ByteUtf8At(s, 0))
+    return decode3ByteUtf8At(s, 0);
+  return decode4ByteUtf8At(s, 0);
 }
 
 }  // namespace utf8

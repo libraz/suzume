@@ -61,6 +61,7 @@ set(TEST_SOURCES
   core/error_test.cpp
   core/viterbi_test.cpp
   core/lattice_test.cpp
+  core/utf8_constants_test.cpp
   normalize/utf8_test.cpp
   normalize/char_type_test.cpp
   normalize/normalizer_test.cpp
