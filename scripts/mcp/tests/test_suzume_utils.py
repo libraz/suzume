@@ -579,6 +579,14 @@ class TestSlangAdjectiveStems:
         assert surfaces[surfaces.index("に") + 1] == "い"
         assert tokens[surfaces.index("に") + 1]["lemma"] == "いる"
 
+    @pytest.mark.parametrize("text", ["学生でいたい", "元気でいたい", "健康でいたかった"])
+    def test_reads_de_itai_as_iru_plus_desiderative(self, text):
+        tokens, _, _ = get_expected_tokens(text)
+        surfaces = [token["surface"] for token in tokens]
+        index = surfaces.index("で") + 1
+        assert (surfaces[index], tokens[index]["pos"], tokens[index]["lemma"]) == ("い", "Verb", "いる")
+        assert (tokens[index + 1]["pos"], tokens[index + 1]["lemma"]) == ("Auxiliary", "たい")
+
     def test_keeps_the_adjective_after_ga(self):
         tokens, _, _ = get_expected_tokens("頭がいたい")
         assert (tokens[-1]["surface"], tokens[-1]["pos"]) == ("いたい", "Adjective")

@@ -565,16 +565,16 @@ def apply_suzume_split(tokens: list[dict]) -> tuple[list[dict], str | None]:
                 applied_rule = "derived-verb-suffix-split"
             continue
 
-        # 0aa. After a locative に the kana いた- is いる plus the desiderative
-        # (そばにいたい, 家にいたかった), not the adjective 痛い, which takes its
-        # experiencer with が.
+        # 0aa. After a locative に or a stative で the kana いた- is いる plus the
+        # desiderative (そばにいたい, 学生でいたい, 元気でいたかった), not the
+        # adjective 痛い, which takes its experiencer with が.
         if (
             t.get("pos") == "形容詞"
             and t.get("lemma") == "いたい"
             and surface.startswith("いた")
             and result
-            and result[-1].get("surface") == "に"
-            and result[-1].get("pos") == "助詞"
+            and result[-1].get("surface") in ("に", "で")
+            and result[-1].get("pos") in ("助詞", "助動詞")
         ):
             result.append({"surface": "い", "pos": "動詞", "lemma": "いる", "conj_form": "連用形"})
             result.append({"surface": surface[1:], "pos": "助動詞", "lemma": "たい"})
