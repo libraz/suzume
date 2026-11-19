@@ -176,3 +176,37 @@ if(BUILD_CLI)
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
   )
 endif()
+
+# Removed suzume.hpp names: each source must fail to compile. The control source
+# uses every replacement and must build, so a failure proves the name is gone
+# rather than that the setup is broken.
+set(SUZUME_HPP_REMOVED_NAMES
+  morpheme_lemma
+  last_error
+  last_error_code
+  load_user_dictionary_count
+  tokenizer_version
+  valid
+  load_binary_dictionary_pointer
+  tag_options_use_lemma
+  options_skip_user_dictionary
+  options_scorer_options_json
+  default_constructor
+  options_constructor
+)
+foreach(removed_name IN LISTS SUZUME_HPP_REMOVED_NAMES ITEMS control)
+  set(removed_target suzume_hpp_removed_${removed_name})
+  add_executable(${removed_target} EXCLUDE_FROM_ALL cpp_removed/${removed_name}.cpp)
+  target_link_libraries(${removed_target} PRIVATE suzume)
+  if(NOT MSVC)
+    # The wrapper promises to build without exceptions; the control target proves it.
+    target_compile_options(${removed_target} PRIVATE -fno-exceptions)
+  endif()
+  add_test(
+    NAME ${removed_target}
+    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target ${removed_target}
+  )
+  if(NOT removed_name STREQUAL "control")
+    set_tests_properties(${removed_target} PROPERTIES WILL_FAIL TRUE)
+  endif()
+endforeach()
