@@ -519,6 +519,28 @@ void appendHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints, 
   verb_helpers::sortCandidatesByCost(candidates, candidate_start);
 }
 
+// A listed suffix opening right after a kanji or katakana host owns its own
+// span (東京+さま), so no adjective may start inside it (さ+まはい).
+bool startsInsideHostedSuffix(const std::vector<char32_t>& codepoints, size_t start_pos,
+                              const std::vector<normalize::CharType>& char_types,
+                              const dictionary::DictionaryManager* dict_manager) {
+  constexpr size_t kSuffixProbe = 3;
+  for (size_t suffix_start = start_pos; suffix_start > 1 && start_pos - suffix_start < kSuffixProbe;) {
+    --suffix_start;
+    if (char_types[suffix_start] != normalize::CharType::Hiragana) {
+      return false;
+    }
+    const auto host_type = char_types[suffix_start - 1];
+    if ((host_type == normalize::CharType::Kanji || host_type == normalize::CharType::Katakana) &&
+        hasDictionaryEntryFrom(dict_manager, codepoints, suffix_start, start_pos - suffix_start + 1,
+                               start_pos - suffix_start + kSuffixProbe, core::PartOfSpeech::Suffix,
+                               [](const dictionary::DictionaryEntry& /*entry*/) { return true; })) {
+      return true;
+    }
+  }
+  return false;
+}
+
 }  // namespace
 
 void generateHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints, size_t start_pos,
@@ -526,6 +548,9 @@ void generateHiraganaAdjectiveCandidates(const std::vector<char32_t>& codepoints
                                          const grammar::Inflection& inflection,
                                          const dictionary::DictionaryManager* dict_manager,
                                          std::vector<UnknownCandidate>& candidates) {
+  if (dict_manager != nullptr && startsInsideHostedSuffix(codepoints, start_pos, char_types, dict_manager)) {
+    return;
+  }
   const size_t candidate_start = candidates.size();
   appendHiraganaAdjectiveCandidates(codepoints, start_pos, char_types, inflection, dict_manager, candidates);
   appendPainAdjectiveAfterNominative(codepoints, start_pos, char_types, inflection, dict_manager, candidates);
