@@ -490,6 +490,10 @@ bool startsLongerNonParticleEntry(const std::vector<char32_t>& codepoints, size_
 
 bool hasExactPartOfSpeech(const dictionary::DictionaryManager& dict_manager, std::string_view surface,
                           PartOfSpeechMask pos_mask) {
+  // An Unknown lookup matches an entry of any POS, so it alone decides a mask that includes it.
+  if ((pos_mask & partOfSpeechMask(core::PartOfSpeech::Unknown)) != 0) {
+    return dict_manager.lookupExact(surface, core::PartOfSpeech::Unknown) != nullptr;
+  }
   for (uint8_t pos_value = 0; pos_mask != 0; ++pos_value, pos_mask >>= 1) {
     if ((pos_mask & 1U) != 0 &&
         dict_manager.lookupExact(surface, static_cast<core::PartOfSpeech>(pos_value)) != nullptr) {

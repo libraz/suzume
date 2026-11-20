@@ -561,14 +561,14 @@ bool startsInsideDictionaryEntry(const std::vector<char32_t>& codepoints, size_t
   const size_t first_start = lookbehindStart(start_pos, lookback);
   const size_t probe_end = lookaheadEnd(codepoints.size(), start_pos, probe);
   for (size_t entry_start = first_start; entry_start < start_pos; ++entry_start) {
-    if (liesInsideListedAdverb(codepoints, entry_start, *dict_manager)) {
-      continue;
-    }
-    for (const auto& match : lookupResultsInRange(*dict_manager, codepoints, entry_start, probe_end)) {
-      if (match.entry != nullptr && match.entry->pos == pos && (accept == nullptr || accept(*match.entry)) &&
-          entry_start + normalize::utf8Length(match.entry->surface) > start_pos) {
-        return true;
-      }
+    const auto matches = lookupResultsInRange(*dict_manager, codepoints, entry_start, probe_end);
+    const bool spans_start = std::any_of(matches.begin(), matches.end(), [&](const dictionary::LookupResult& match) {
+      return match.entry != nullptr && match.entry->pos == pos && (accept == nullptr || accept(*match.entry)) &&
+             entry_start + normalize::utf8Length(match.entry->surface) > start_pos;
+    });
+    // The adverb check costs more than the lookup, so it runs only for a spanning entry.
+    if (spans_start && !liesInsideListedAdverb(codepoints, entry_start, *dict_manager)) {
+      return true;
     }
   }
   return false;
